@@ -20,6 +20,7 @@ using AlphaTab.Platform;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Staves;
 using AlphaTab.Rendering.Utils;
+using Staff = AlphaTab.Rendering.Staves.Staff;
 
 namespace AlphaTab.Rendering
 {
@@ -28,7 +29,7 @@ namespace AlphaTab.Rendering
     /// </summary>
     public class BarRendererBase
     {
-        public Stave Stave { get; set; }
+        public Staff Staff { get; set; }
         public float X { get; set; }
         public float Y { get; set; }
         public float Width { get; set; }
@@ -82,7 +83,7 @@ namespace AlphaTab.Rendering
         {
             get
             {
-                return Stave.StaveGroup.Layout;
+                return Staff.StaveGroup.Layout;
             }
         }
 
@@ -114,7 +115,7 @@ namespace AlphaTab.Rendering
         {
             get
             {
-                return Index == Stave.BarRenderers.Count - 1;
+                return Index == Staff.BarRenderers.Count - 1;
             }
         }
 
@@ -122,7 +123,7 @@ namespace AlphaTab.Rendering
         {
             get
             {
-                return Bar.Index == Stave.BarRenderers.Count - 1;
+                return Bar.Index == Staff.BarRenderers.Count - 1;
             }
         }
 
@@ -182,8 +183,8 @@ namespace AlphaTab.Rendering
             barLookup.Bar = Bar;
             barLookup.IsFirstOfLine = IsFirstOfLine;
             barLookup.IsLastOfLine = IsLastOfLine;
-            barLookup.VisualBounds = new Bounds(x + Stave.X + X, visualTop, Width, visualHeight);
-            barLookup.Bounds = new Bounds(x + Stave.X + X, realTop, Width, realHeight);
+            barLookup.VisualBounds = new Bounds(x + Staff.X + X, visualTop, Width, visualHeight);
+            barLookup.Bounds = new Bounds(x + Staff.X + X, realTop, Width, realHeight);
             lookup.Bars.Add(barLookup);
         }
     }

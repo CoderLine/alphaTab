@@ -189,7 +189,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\ScoreBarRendererFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\ScoreRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Staves\BarSizeInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Staves\Stave.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Staves\Staff.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Staves\StaveGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\TabBarRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\TabBarRendererFactory.cs" />

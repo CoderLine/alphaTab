@@ -32,10 +32,10 @@ namespace AlphaTab.Test.Importer
 
             Assert.AreEqual(1, score.Tracks.Count);
             Assert.AreEqual(32, score.MasterBars.Count);
-            Assert.AreEqual(32, score.Tracks[0].Bars.Count);
+            Assert.AreEqual(32, score.Tracks[0].Staves[0].Bars.Count);
 
             // Bar 1
-            var bar = score.Tracks[0].Bars[0];
+            var bar = score.Tracks[0].Staves[0].Bars[0];
             var masterBar = score.MasterBars[0];
             Assert.AreEqual(0, masterBar.KeySignature);
             Assert.AreEqual(4, masterBar.TimeSignatureDenominator);

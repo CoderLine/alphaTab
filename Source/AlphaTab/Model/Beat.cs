@@ -120,7 +120,7 @@ namespace AlphaTab.Model
         {
             get
             {
-                return Voice.Bar.Track.Chords[ChordId];
+                return Voice.Bar.Staff.Track.Chords[ChordId];
             }
         }
 

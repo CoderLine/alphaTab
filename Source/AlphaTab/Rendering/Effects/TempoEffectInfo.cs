@@ -43,7 +43,7 @@ namespace AlphaTab.Rendering.Effects
             }
             else
             {
-                tempo = beat.Voice.Bar.Track.Score.Tempo;
+                tempo = beat.Voice.Bar.Staff.Track.Score.Tempo;
             }
             return new TempoGlyph(0, 0, tempo);
         }

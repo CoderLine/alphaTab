@@ -101,15 +101,15 @@ namespace AlphaTab.Rendering
 
         public override void DoLayout()
         {
-            _helpers = Stave.StaveGroup.Helpers.Helpers[Bar.Track.Index][Bar.Index];
+            _helpers = Staff.StaveGroup.Helpers.Helpers[Bar.Staff.Track.Index][Bar.Staff.Index][Bar.Index];
             base.DoLayout();
 
 
             Height = (LineOffset * 4) + TopPadding + BottomPadding;
             if (Index == 0)
             {
-                Stave.RegisterStaveTop(GlyphOverflow);
-                Stave.RegisterStaveBottom(Height - GlyphOverflow);
+                Staff.RegisterStaveTop(GlyphOverflow);
+                Staff.RegisterStaveBottom(Height - GlyphOverflow);
             }
 
             var top = GetScoreY(0);
@@ -538,7 +538,7 @@ namespace AlphaTab.Rendering
                 CreateTimeSignatureGlyphs();
             }
 
-            AddPreBeatGlyph(new BarNumberGlyph(0, GetScoreY(-1, -3), Bar.Index + 1, !Stave.IsFirstInAccolade));
+            AddPreBeatGlyph(new BarNumberGlyph(0, GetScoreY(-1, -3), Bar.Index + 1, !Staff.IsFirstInAccolade));
 
             if (Bar.IsEmpty)
             {

@@ -39,21 +39,25 @@ namespace AlphaTab.Gdi
             base.DoubleBuffered = true;
             base.BackColor = Color.FromArgb(93, 95, 94);
 
-            _usedBars = new bool[track.Bars.Count];
-            for (int barI = 0; barI < track.Bars.Count; barI++)
+            _usedBars = new bool[track.Score.MasterBars.Count];
+            for (int s = 0; s < track.Staves.Count; s++)
             {
-                Bar bar = track.Bars[barI];
-                _usedBars[barI] = false;
-
-                for (int voiceI = 0; voiceI < bar.Voices.Count && (!_usedBars[barI]); voiceI++)
+                var staff = track.Staves[s];
+                for (int barI = 0; barI < staff.Bars.Count; barI++)
                 {
-                    Voice voice = bar.Voices[voiceI];
-                    for (int i = 0; i < voice.Beats.Count; i++)
+                    var bar = staff.Bars[barI];
+                    _usedBars[barI] = false;
+
+                    for (int voiceI = 0; voiceI < bar.Voices.Count && (!_usedBars[barI]); voiceI++)
                     {
-                        var b = voice.Beats[i];
-                        if (!b.IsRest)
+                        Voice voice = bar.Voices[voiceI];
+                        for (int i = 0; i < voice.Beats.Count; i++)
                         {
-                            _usedBars[barI] = true;
+                            var b = voice.Beats[i];
+                            if (!b.IsRest)
+                            {
+                                _usedBars[barI] = true;
+                            }
                         }
                     }
                 }

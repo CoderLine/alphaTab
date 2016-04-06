@@ -71,7 +71,10 @@ namespace AlphaTab.Rendering.Layout
                         var factory = Environment.StaveFactories[s.Id](this);
                         if (factory.CanCreate(track) && (isFirstTrack || !factory.HideOnMultiTrack))
                         {
-                            group.AddStave(track, new Stave(s.Id, factory, s.AdditionalSettings));
+                            for (int k = 0; k < track.Staves.Count; k++)
+                            {
+                                group.AddStave(track, new Staff(track.Staves[k], s.Id, factory, s.AdditionalSettings));
+                            }
                         }
                     }
                 }

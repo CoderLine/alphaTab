@@ -42,7 +42,7 @@ namespace AlphaTab.Rendering.Glyphs
                 trillNote.String = n.String;
                 var tr = (TabBarRenderer)Renderer;
                 var trillNumberGlyph = new NoteNumberGlyph(0, 0, trillNote, true);
-                var l = n.Beat.Voice.Bar.Track.Tuning.Length - n.String;
+                var l = n.Beat.Voice.Bar.Staff.Track.Tuning.Length - n.String;
                 trillNumberGlyph.Y = tr.GetTabY(l);
 
                 AddGlyph(trillNumberGlyph);

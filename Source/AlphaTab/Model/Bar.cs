@@ -29,7 +29,7 @@ namespace AlphaTab.Model
         public Bar NextBar { get; set; }
         public Bar PreviousBar { get; set; }
         public Clef Clef { get; set; }
-        public Track Track { get; set; }
+        public Staff Staff { get; set; }
         public FastList<Voice> Voices { get; set; }
         public Duration? MinDuration { get; set; }
         public Duration? MaxDuration { get; set; }
@@ -57,7 +57,7 @@ namespace AlphaTab.Model
         {
             get
             {
-                return Track.Score.MasterBars[Index];
+                return Staff.Track.Score.MasterBars[Index];
             }
         }
 
@@ -76,7 +76,6 @@ namespace AlphaTab.Model
                 return true;
             }
         }
-
 
         public void Finish()
         {

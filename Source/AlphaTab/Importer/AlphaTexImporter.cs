@@ -87,7 +87,7 @@ namespace AlphaTab.Importer
             _score.Tempo = 120;
             _score.TempoLabel = "";
 
-            _track = new Track();
+            _track = new Track(1);
             _track.PlaybackInfo.Program = 25;
             _track.PlaybackInfo.PrimaryChannel = TrackChannels[0];
             _track.PlaybackInfo.SecondaryChannel = TrackChannels[1];
@@ -637,7 +637,7 @@ namespace AlphaTab.Importer
             _score.AddMasterBar(master);
 
             var bar = new Bar();
-            _track.AddBar(bar);
+            _track.AddBarToStaff(0, bar);
 
             if (master.Index > 0)
             {

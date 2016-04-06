@@ -326,6 +326,12 @@
             This public enum lists all different types of finger slides on a string.
             </summary>
         </member>
+        <member name="T:AlphaTab.Model.Staff">
+            <summary>
+            This class describes a single staff within a track. There are instruments like pianos
+            where a single track can contain multiple staffs. 
+            </summary>
+        </member>
         <member name="T:AlphaTab.Model.Track">
             <summary>
             This public class describes a single track or instrument of score
@@ -1051,29 +1057,29 @@
             to align the parts across multiple staves.
             </summary>
         </member>
-        <member name="T:AlphaTab.Rendering.Staves.Stave">
+        <member name="T:AlphaTab.Rendering.Staves.Staff">
             <summary>
-            A stave represents a single line within a StaveGroup. 
+            A Staff represents a single line within a StaveGroup. 
             It stores BarRenderer instances created from a given factory. 
             </summary>
         </member>
-        <member name="P:AlphaTab.Rendering.Staves.Stave.StaveTop">
+        <member name="P:AlphaTab.Rendering.Staves.Staff.StaveTop">
             <summary>
             This is the visual offset from top where the
-            stave contents actually start. Used for grouping 
+            Staff contents actually start. Used for grouping 
             using a accolade
             </summary>
         </member>
-        <member name="P:AlphaTab.Rendering.Staves.Stave.StaveBottom">
+        <member name="P:AlphaTab.Rendering.Staves.Staff.StaveBottom">
             <summary>
             This is the visual offset from top where the
-            stave contents actually ends. Used for grouping 
+            Staff contents actually ends. Used for grouping 
             using a accolade
             </summary>
         </member>
         <member name="T:AlphaTab.Rendering.Staves.StaveGroup">
             <summary>
-            A stave consists of a list of different staves and groups
+            A Staff consists of a list of different staves and groups
             them using an accolade. 
             </summary>
         </member>

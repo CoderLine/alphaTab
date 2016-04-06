@@ -19,7 +19,7 @@ namespace AlphaTab.Model
 
             #region MasterBars
 
-            for (var i = 0;i < score.MasterBars.Count; i++)
+            for (var i = 0; i < score.MasterBars.Count; i++)
             {
                 MasterBar masterBar = score.MasterBars[i];
                 MasterBar masterBar2 = NewObject();
@@ -65,84 +65,96 @@ namespace AlphaTab.Model
                     track2.Chords[key] = chord;
                 }
 
-                #region Bars
+                #region Staves
+                track2.Staves = new FastList<Staff>();
 
-                track2.Bars = new FastList<Bar>();
-                for (int b = 0; b < track.Bars.Count; b++)
+                for (int s = 0; s < track.Staves.Count; s++)
                 {
-                    var bar = track.Bars[b];
-                    Bar bar2 = NewObject();
-                    Bar.CopyTo(bar, bar2);
+                    var staff = track.Staves[s];
+                    Staff staff2 = NewObject();
 
-                    #region Voices
+                    #region Bars
 
-                    bar2.Voices = new FastList<Voice>();
-                    for (int v = 0; v < bar.Voices.Count; v++)
+                    staff2.Bars = new FastList<Bar>();
+                    for (int b = 0; b < staff.Bars.Count; b++)
                     {
-                        var voice = bar.Voices[v];
-                        Voice voice2 = NewObject();
-                        Voice.CopyTo(voice, voice2);
+                        var bar = staff.Bars[b];
+                        Bar bar2 = NewObject();
+                        Bar.CopyTo(bar, bar2);
 
-                        #region Beats
+                        #region Voices
 
-                        voice2.Beats = new FastList<Beat>();
-                        for (int bb = 0; bb < voice.Beats.Count; bb++)
+                        bar2.Voices = new FastList<Voice>();
+                        for (int v = 0; v < bar.Voices.Count; v++)
                         {
-                            var beat = voice.Beats[bb];
-                            Beat beat2 = NewObject();
-                            Beat.CopyTo(beat, beat2);
-                            
-                            beat2.Automations = new FastList<Automation>();
-                            for (int a = 0; a < beat.Automations.Count; a++)
-                            {
-                                Automation automation = NewObject();
-                                Automation.CopyTo(beat.Automations[a], automation);
-                                beat2.Automations.Add(automation);
-                            }
-                            
-                            beat2.WhammyBarPoints = new FastList<BendPoint>();
-                            for (int i = 0; i < beat.WhammyBarPoints.Count; i++)
-                            {
-                                BendPoint point = NewObject();
-                                BendPoint.CopyTo(beat.WhammyBarPoints[i], point);
-                                beat2.WhammyBarPoints.Add(point);
-                            }
-                            
-                            #region Notes
+                            var voice = bar.Voices[v];
+                            Voice voice2 = NewObject();
+                            Voice.CopyTo(voice, voice2);
 
-                            beat2.Notes = new FastList<Note>();
-                            for (int n = 0; n < beat.Notes.Count; n++)
-                            {
-                                var note = beat.Notes[n];
-                                Note note2 = NewObject();
-                                Note.CopyTo(note, note2);
+                            #region Beats
 
-                                note2.BendPoints = new FastList<BendPoint>();
-                                for (int i = 0; i < note.BendPoints.Count; i++)
+                            voice2.Beats = new FastList<Beat>();
+                            for (int bb = 0; bb < voice.Beats.Count; bb++)
+                            {
+                                var beat = voice.Beats[bb];
+                                Beat beat2 = NewObject();
+                                Beat.CopyTo(beat, beat2);
+
+                                beat2.Automations = new FastList<Automation>();
+                                for (int a = 0; a < beat.Automations.Count; a++)
                                 {
-                                    BendPoint point = NewObject();
-                                    BendPoint.CopyTo(note.BendPoints[i], point);
-                                    note2.BendPoints.Add(point);
+                                    Automation automation = NewObject();
+                                    Automation.CopyTo(beat.Automations[a], automation);
+                                    beat2.Automations.Add(automation);
                                 }
 
-                                beat2.Notes.Add(note2);
+                                beat2.WhammyBarPoints = new FastList<BendPoint>();
+                                for (int i = 0; i < beat.WhammyBarPoints.Count; i++)
+                                {
+                                    BendPoint point = NewObject();
+                                    BendPoint.CopyTo(beat.WhammyBarPoints[i], point);
+                                    beat2.WhammyBarPoints.Add(point);
+                                }
+
+                                #region Notes
+
+                                beat2.Notes = new FastList<Note>();
+                                for (int n = 0; n < beat.Notes.Count; n++)
+                                {
+                                    var note = beat.Notes[n];
+                                    Note note2 = NewObject();
+                                    Note.CopyTo(note, note2);
+
+                                    note2.BendPoints = new FastList<BendPoint>();
+                                    for (int i = 0; i < note.BendPoints.Count; i++)
+                                    {
+                                        BendPoint point = NewObject();
+                                        BendPoint.CopyTo(note.BendPoints[i], point);
+                                        note2.BendPoints.Add(point);
+                                    }
+
+                                    beat2.Notes.Add(note2);
+                                }
+
+                                #endregion
+
+                                voice2.Beats.Add(beat2);
                             }
 
                             #endregion
 
-                            voice2.Beats.Add(beat2);
+                            bar2.Voices.Add(voice2);
                         }
 
                         #endregion
 
-                        bar2.Voices.Add(voice2);
+                        staff.Bars.Add(bar2);
                     }
 
                     #endregion
-
-                    track2.Bars.Add(bar2);
+                    track2.Staves.Add(staff);
                 }
-                
+
                 #endregion
 
                 score2.Tracks.Add(track2);
@@ -160,7 +172,7 @@ namespace AlphaTab.Model
 
             #region MasterBars
 
-            for (var i = 0;i < score.MasterBars.Count; i++)
+            for (var i = 0; i < score.MasterBars.Count; i++)
             {
                 var masterBar = score.MasterBars[i];
                 var masterBar2 = new MasterBar();
@@ -190,7 +202,7 @@ namespace AlphaTab.Model
             for (int t = 0; t < score.Tracks.Count; t++)
             {
                 var track = score.Tracks[t];
-                var track2 = new Track();
+                var track2 = new Track(track.Staves.Count);
                 Track.CopyTo(track, track2);
                 score2.AddTrack(track2);
 
@@ -204,62 +216,70 @@ namespace AlphaTab.Model
                     track2.Chords[key] = chord2;
                 }
 
-                #region Bars
+                #region Staves
 
-                for (int b = 0; b < track.Bars.Count; b++)
+                for (var s = 0; s < track.Staves.Count; s++)
                 {
-                    var bar = track.Bars[b];
-                    var bar2 = new Bar();
-                    Bar.CopyTo(bar, bar2);
-                    track2.AddBar(bar2);
+                    var staff = track.Staves[s];
+                    #region Bars
 
-                    #region Voices
-
-                    for (int v = 0; v < bar.Voices.Count; v++)
+                    for (int b = 0; b < staff.Bars.Count; b++)
                     {
-                        var voice = bar.Voices[v];
-                        var voice2 = new Voice();
-                        Voice.CopyTo(voice, voice2);
-                        bar2.AddVoice(voice2);
+                        var bar = staff.Bars[b];
+                        var bar2 = new Bar();
+                        Bar.CopyTo(bar, bar2);
+                        track2.AddBarToStaff(s, bar2);
 
-                        #region Beats
+                        #region Voices
 
-                        for (int bb = 0; bb < voice.Beats.Count; bb++)
+                        for (int v = 0; v < bar.Voices.Count; v++)
                         {
-                            var beat = voice.Beats[bb];
-                            var beat2 = new Beat();
-                            Beat.CopyTo(beat, beat2);
-                            voice2.AddBeat(beat2);
+                            var voice = bar.Voices[v];
+                            var voice2 = new Voice();
+                            Voice.CopyTo(voice, voice2);
+                            bar2.AddVoice(voice2);
 
-                            for (int a = 0; a < beat.Automations.Count; a++)
-                            {
-                                var automation = new Automation();
-                                Automation.CopyTo(beat.Automations[a], automation);
-                                beat2.Automations.Add(automation);
-                            }
-                            
-                            for (int i = 0; i < beat.WhammyBarPoints.Count; i++)
-                            {
-                                var point = new BendPoint();
-                                BendPoint.CopyTo(beat.WhammyBarPoints[i], point);
-                                beat2.WhammyBarPoints.Add(point);
-                            }
-                            
-                            #region Notes
+                            #region Beats
 
-                            for (int n = 0; n < beat.Notes.Count; n++)
+                            for (int bb = 0; bb < voice.Beats.Count; bb++)
                             {
-                                var note = beat.Notes[n];
-                                var note2 = new Note();
-                                Note.CopyTo(note, note2);
-                                beat2.AddNote(note2);
+                                var beat = voice.Beats[bb];
+                                var beat2 = new Beat();
+                                Beat.CopyTo(beat, beat2);
+                                voice2.AddBeat(beat2);
 
-                                for (int i = 0; i < note.BendPoints.Count; i++)
+                                for (int a = 0; a < beat.Automations.Count; a++)
+                                {
+                                    var automation = new Automation();
+                                    Automation.CopyTo(beat.Automations[a], automation);
+                                    beat2.Automations.Add(automation);
+                                }
+
+                                for (int i = 0; i < beat.WhammyBarPoints.Count; i++)
                                 {
                                     var point = new BendPoint();
-                                    BendPoint.CopyTo(note.BendPoints[i], point);
-                                    note2.AddBendPoint(point);
+                                    BendPoint.CopyTo(beat.WhammyBarPoints[i], point);
+                                    beat2.WhammyBarPoints.Add(point);
                                 }
+
+                                #region Notes
+
+                                for (int n = 0; n < beat.Notes.Count; n++)
+                                {
+                                    var note = beat.Notes[n];
+                                    var note2 = new Note();
+                                    Note.CopyTo(note, note2);
+                                    beat2.AddNote(note2);
+
+                                    for (int i = 0; i < note.BendPoints.Count; i++)
+                                    {
+                                        var point = new BendPoint();
+                                        BendPoint.CopyTo(note.BendPoints[i], point);
+                                        note2.AddBendPoint(point);
+                                    }
+                                }
+
+                                #endregion
                             }
 
                             #endregion
@@ -269,8 +289,8 @@ namespace AlphaTab.Model
                     }
 
                     #endregion
+
                 }
-                
                 #endregion
             }
 

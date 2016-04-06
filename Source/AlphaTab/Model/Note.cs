@@ -129,7 +129,7 @@ namespace AlphaTab.Model
         {
             get
             {
-                return GetStringTuning(Beat.Voice.Bar.Track, String);
+                return GetStringTuning(Beat.Voice.Bar.Staff.Track, String);
             }
         }
 

@@ -54,9 +54,9 @@ namespace AlphaTab.Rendering.Glyphs
             if (EndNote == null) return;
 
             var startNoteRenderer =
-                    (GroupedBarRenderer)Renderer.Layout.GetRendererForBar(Renderer.Stave.StaveId, StartNote.Beat.Voice.Bar.Index);
+                    (GroupedBarRenderer)Renderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, StartNote.Beat.Voice.Bar.Index);
             var endNoteRenderer =
-                    (GroupedBarRenderer)Renderer.Layout.GetRendererForBar(Renderer.Stave.StaveId, EndNote.Beat.Voice.Bar.Index);
+                    (GroupedBarRenderer)Renderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, EndNote.Beat.Voice.Bar.Index);
 
             float startX = 0;
             float endX = 0;
@@ -95,7 +95,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
             // if we draw for the tie end, we only draw a tie if we had a line break between start and end
             // in this case there will be a tie from bar start to the note
-            else if (startNoteRenderer.Stave != endNoteRenderer.Stave)
+            else if (startNoteRenderer.Staff != endNoteRenderer.Staff)
             {
                 startX = cx;
                 endX = cx + endNoteRenderer.GetNoteX(EndNote);

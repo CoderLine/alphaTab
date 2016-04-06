@@ -120,11 +120,11 @@ namespace AlphaTab.Importer
             // create empty bars to the current index
             Bar bar = null;
             MasterBar masterBar = null;
-            for (int i = track.Bars.Count; i <= barIndex; i++)
+            for (int i = track.Staves[0].Bars.Count; i <= barIndex; i++)
             {
                 bar = new Bar();
                 masterBar = GetOrCreateMasterBar(barIndex);
-                track.AddBar(bar);
+                track.AddBarToStaff(0, bar);
 
                 for (int j = 0; j < _maxVoices; j++)
                 {
@@ -719,7 +719,7 @@ namespace AlphaTab.Importer
         private void ParseScorePart(IXmlNode element)
         {
             string id = element.GetAttribute("id");
-            var track = new Track();
+            var track = new Track(1);
             _trackById[id] = track;
             _score.AddTrack(track);
             element.IterateChildren(c =>

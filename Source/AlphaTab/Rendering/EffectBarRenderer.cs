@@ -47,8 +47,8 @@ namespace AlphaTab.Rendering
             base.DoLayout();
             if (Index == 0)
             {
-                Stave.TopSpacing = 5;
-                Stave.BottomSpacing = 5;
+                Staff.TopSpacing = 5;
+                Staff.BottomSpacing = 5;
             }
             Height = _info.GetHeight(this);
         }
@@ -67,7 +67,7 @@ namespace AlphaTab.Rendering
             {
                 // check if previous renderer had an effect on his last beat
                 // and use this as merging element
-                EffectBarRenderer prevRenderer = (EffectBarRenderer) Stave.BarRenderers[Index - 1];
+                EffectBarRenderer prevRenderer = (EffectBarRenderer) Staff.BarRenderers[Index - 1];
                 if (prevRenderer._lastBeat != null)
                 {
                     prevGlyph = prevRenderer._effectGlyphs[v.Index][prevRenderer._lastBeat.Index];
@@ -90,7 +90,7 @@ namespace AlphaTab.Rendering
             {
                 // check if previous renderer had an effect on his last beat
                 // and use this as merging element
-                EffectBarRenderer prevRenderer = (EffectBarRenderer)Stave.BarRenderers[Index - 1];
+                EffectBarRenderer prevRenderer = (EffectBarRenderer)Staff.BarRenderers[Index - 1];
                 if (prevRenderer._lastBeat != null && prevRenderer._effectGlyphs[0].ContainsKey(prevRenderer._lastBeat.Index))
                 {
                     prevGlyph = prevRenderer._effectGlyphs[0][prevRenderer._lastBeat.Index];
@@ -310,7 +310,7 @@ namespace AlphaTab.Rendering
                             }
                             else if(Index > 0)
                             {
-                                previousRenderer = ((EffectBarRenderer) (Stave.BarRenderers[Index - 1]));
+                                previousRenderer = ((EffectBarRenderer) (Staff.BarRenderers[Index - 1]));
                                 var voiceGlyphs = previousRenderer._effectGlyphs[b.Voice.Index];
                                 if (voiceGlyphs.ContainsKey(prevBeat.Index))
                                 {

@@ -367,11 +367,11 @@ namespace AlphaTab.Rendering
                     beatLookup.Beat = bc.Beat;
                     // on beat bounding rectangle
                     beatLookup.VisualBounds = new Bounds(
-                    x + Stave.X + X + beatStart + c.X + bc.X + bc.OnNotes.X, visualTop,
+                    x + Staff.X + X + beatStart + c.X + bc.X + bc.OnNotes.X, visualTop,
                     bc.OnNotes.Width, visualHeight);
                     // real beat boundings
                     beatLookup.Bounds = new Bounds(
-                    x + Stave.X + X + beatStart + c.X + bc.X, realTop,
+                    x + Staff.X + X + beatStart + c.X + bc.X, realTop,
                     bc.Width, realHeight);
                     barLookup.Beats.Add(beatLookup);
                 }

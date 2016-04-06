@@ -385,7 +385,7 @@ namespace AlphaTab.Importer
 
         public void ReadTrack()
         {
-            var newTrack = new Track();
+            var newTrack = new Track(1);
             _score.AddTrack(newTrack);
 
 
@@ -465,7 +465,7 @@ namespace AlphaTab.Importer
             {
                 newBar.Clef = Clef.Neutral;
             }
-            track.AddBar(newBar);
+            track.AddBarToStaff(0, newBar);
 
             var voiceCount = 1;
             if (_versionNumber >= 500)
@@ -717,7 +717,7 @@ namespace AlphaTab.Importer
             if (!string.IsNullOrEmpty(chord.Name))
             {
                 beat.ChordId = chordId;
-                beat.Voice.Bar.Track.Chords[beat.ChordId] = chord;
+                beat.Voice.Bar.Staff.Track.Chords[beat.ChordId] = chord;
             }
         }
 

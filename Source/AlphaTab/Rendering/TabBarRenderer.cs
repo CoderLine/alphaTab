@@ -76,13 +76,13 @@ namespace AlphaTab.Rendering
 
         public override void DoLayout()
         {
-            _helpers = Stave.StaveGroup.Helpers.Helpers[Bar.Track.Index][Bar.Index];
+            _helpers = Staff.StaveGroup.Helpers.Helpers[Bar.Staff.Track.Index][Bar.Staff.Index][Bar.Index];
             base.DoLayout();
-            Height = LineOffset * (Bar.Track.Tuning.Length - 1) + (NumberOverflow * 2);
+            Height = LineOffset * (Bar.Staff.Track.Tuning.Length - 1) + (NumberOverflow * 2);
             if (Index == 0)
             {
-                Stave.RegisterStaveTop(NumberOverflow);
-                Stave.RegisterStaveBottom(Height - NumberOverflow);
+                Staff.RegisterStaveTop(NumberOverflow);
+                Staff.RegisterStaveBottom(Height - NumberOverflow);
             }
         }
 
@@ -99,7 +99,7 @@ namespace AlphaTab.Rendering
                 AddPreBeatGlyph(new TabClefGlyph(0, 0));
             }
 
-            AddPreBeatGlyph(new BarNumberGlyph(0, GetTabY(-1, -3), Bar.Index + 1, !Stave.IsFirstInAccolade));
+            AddPreBeatGlyph(new BarNumberGlyph(0, GetTabY(-1, -3), Bar.Index + 1, !Staff.IsFirstInAccolade));
 
             if (Bar.IsEmpty)
             {
@@ -201,7 +201,7 @@ namespace AlphaTab.Rendering
             canvas.Color = res.StaveLineColor;
             var lineY = cy + Y + NumberOverflow;
 
-            for (int i = 0, j = Bar.Track.Tuning.Length; i < j; i++)
+            for (int i = 0, j = Bar.Staff.Track.Tuning.Length; i < j; i++)
             {
                 if (i > 0) lineY += LineOffset;
                 canvas.BeginPath();

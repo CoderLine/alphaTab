@@ -23,6 +23,30 @@ using AlphaTab.Platform.Model;
 namespace AlphaTab.Model
 {
     /// <summary>
+    /// This class describes a single staff within a track. There are instruments like pianos
+    /// where a single track can contain multiple staffs. 
+    /// </summary>
+    public class Staff
+    {
+        public FastList<Bar> Bars { get; set; }
+        public Track Track { get; set; }
+        public int Index { get; set; }
+
+        public Staff()
+        {
+            Bars = new FastList<Bar>();
+        }
+
+        public void Finish()
+        {
+            for (int i = 0, j = Bars.Count; i < j; i++)
+            {
+                Bars[i].Finish();
+            }
+        }
+    }
+
+    /// <summary>
     /// This public class describes a single track or instrument of score
     /// </summary>
     public class Track
@@ -46,19 +70,26 @@ namespace AlphaTab.Model
         public bool IsPercussion { get; set; }
 
         public Score Score { get; set; }
-        public FastList<Bar> Bars { get; set; }
+        public FastList<Staff> Staves { get; set; }
 
         public FastDictionary<string, Chord> Chords { get; set; }
 
-        public Track()
+        public Track(int staffCount)
         {
             Name = "";
             ShortName = "";
             Tuning = new int[0];
-            Bars = new FastList<Bar>();
             Chords = new FastDictionary<string, Chord>();
             PlaybackInfo = new PlaybackInformation();
             Color = new Color(200, 0, 0);
+            Staves = new FastList<Staff>();
+            for (int i = 0; i < staffCount; i++)
+            {
+                var staff = new Staff();
+                staff.Index = i;
+                staff.Track = this;
+                Staves.Add(staff);
+            }
         }
 
         public static void CopyTo(Track src, Track dst)
@@ -70,11 +101,14 @@ namespace AlphaTab.Model
             dst.Color.Raw = src.Color.Raw;
             dst.IsPercussion = src.IsPercussion;
         }
-        public void AddBar(Bar bar)
+
+        public void AddBarToStaff(int staffIndex, Bar bar)
         {
-            var bars = Bars;
-            bar.Track = this;
-            bar.Index = Bars.Count;
+            var staff = Staves[staffIndex];
+
+            var bars = staff.Bars;
+            bar.Staff = staff;
+            bar.Index = bars.Count;
             if (bars.Count > 0)
             {
                 bar.PreviousBar = bars[bars.Count - 1];
@@ -92,9 +126,9 @@ namespace AlphaTab.Model
                     ShortName = ShortName.Substring(0, ShortNameMaxLength);
             }
 
-            for (int i = 0, j = Bars.Count; i < j; i++)
+            for (int i = 0, j = Staves.Count; i < j; i++)
             {
-                Bars[i].Finish();
+                Staves[i].Finish();
             }
         }
     }

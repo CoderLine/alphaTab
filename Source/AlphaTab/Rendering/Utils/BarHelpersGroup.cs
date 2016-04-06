@@ -54,7 +54,7 @@ namespace AlphaTab.Rendering.Utils
                         if (currentBeamHelper == null || !currentBeamHelper.CheckBeat(b))
                         {
                             // if not possible, create the next beaming helper
-                            currentBeamHelper = new BeamingHelper(bar.Track);
+                            currentBeamHelper = new BeamingHelper(bar.Staff.Track);
                             currentBeamHelper.CheckBeat(b);
                             BeamHelpers[v.Index].Add(currentBeamHelper);
                             newBeamingHelper = true;
@@ -99,11 +99,11 @@ namespace AlphaTab.Rendering.Utils
     /// </summary>
     public class BarHelpersGroup
     {
-        public FastDictionary<int, FastDictionary<int, BarHelpers>> Helpers { get; set; }
+        public FastDictionary<int, FastList<FastDictionary<int, BarHelpers>>> Helpers { get; set; }
 
         public BarHelpersGroup()
         {
-            Helpers = new FastDictionary<int, FastDictionary<int, BarHelpers>>();
+            Helpers = new FastDictionary<int, FastList<FastDictionary<int, BarHelpers>>>();
         }
 
         public void BuildHelpers(Track[] tracks, int barIndex)
@@ -111,10 +111,14 @@ namespace AlphaTab.Rendering.Utils
             for (int i = 0; i < tracks.Length; i++)
             {
                 var t = tracks[i];
-                FastDictionary<int, BarHelpers> h;
+                FastList<FastDictionary<int, BarHelpers>> h;
                 if (!Helpers.ContainsKey(t.Index))
                 {
-                    h = new FastDictionary<int, BarHelpers>();
+                    h = new FastList<FastDictionary<int, BarHelpers>>();
+                    for (int s = 0; s < t.Staves.Count; s++)
+                    {
+                        h.Add(new FastDictionary<int, BarHelpers>());
+                    }
                     Helpers[t.Index] = h;
                 }
                 else
@@ -122,9 +126,12 @@ namespace AlphaTab.Rendering.Utils
                     h = Helpers[t.Index];
                 }
 
-                if (!h.ContainsKey(barIndex))
+                for (int s = 0; s < t.Staves.Count; s++)
                 {
-                    h[barIndex] = new BarHelpers(t.Bars[barIndex]);
+                    if (!h[s].ContainsKey(barIndex))
+                    {
+                        h[s][barIndex] = new BarHelpers(t.Staves[s].Bars[barIndex]);
+                    }
                 }
             }
         }

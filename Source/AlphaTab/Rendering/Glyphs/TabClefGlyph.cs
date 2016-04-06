@@ -40,7 +40,7 @@ namespace AlphaTab.Rendering.Glyphs
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             //TabBarRenderer tabBarRenderer = (TabBarRenderer)Renderer;
-            var track = Renderer.Bar.Track;
+            var track = Renderer.Bar.Staff.Track;
             var res = Renderer.Resources;
 
             var startY = cy + Y + TabBarRenderer.LineSpacing * Scale * 0.6f;

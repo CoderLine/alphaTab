@@ -47,7 +47,7 @@ namespace AlphaTab.Audio.Model
             // some heuristics: try last found beat and it's next beat for lookup first
 
             // try last beat or next beat of last beat first
-            if (_lastBeat != null && _lastBeat.NextBeat != null && _lastBeat.Voice.Bar.Track == track)
+            if (_lastBeat != null && _lastBeat.NextBeat != null && _lastBeat.Voice.Bar.Staff.Track == track)
             {
                 // check if tick is between _lastBeat and _lastBeat.nextBeat (still _lastBeat)
                 if (tick >= _lastBeat.AbsoluteStart && tick < _lastBeat.NextBeat.AbsoluteStart)
@@ -74,7 +74,7 @@ namespace AlphaTab.Audio.Model
             if (lookup == null) return null;
 
             var masterBar = lookup.Bar;
-            var bar = track.Bars[masterBar.Index];
+            var bar = track.Staves[0].Bars[masterBar.Index];
 
             // remap tick to initial bar start
             tick = (tick - lookup.Start + masterBar.Start);

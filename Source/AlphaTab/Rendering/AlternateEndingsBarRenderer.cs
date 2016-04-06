@@ -87,8 +87,8 @@ namespace AlphaTab.Rendering
             base.DoLayout();
             if (Index == 0)
             {
-                Stave.TopSpacing = 5;
-                Stave.BottomSpacing = 4;
+                Staff.TopSpacing = 5;
+                Staff.BottomSpacing = 4;
             }
             Height = Resources.WordsFont.Size;
 

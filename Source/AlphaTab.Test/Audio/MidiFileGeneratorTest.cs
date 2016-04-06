@@ -28,18 +28,18 @@ namespace AlphaTab.Test.Audio
             var score = ParseTex(tex);
 
             Assert.AreEqual(1, score.Tracks.Count);
-            Assert.AreEqual(1, score.Tracks[0].Bars.Count);
-            Assert.AreEqual(1, score.Tracks[0].Bars[0].Voices.Count);
-            Assert.AreEqual(2, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
-            Assert.AreEqual(1, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes.Count);
-            Assert.AreEqual(1, score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes.Count);
+            Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars.Count);
+            Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[0].Voices.Count);
+            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes.Count);
+            Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes.Count);
 
             var handler = new FlatMidiEventGenerator();
             var generator = new MidiFileGenerator(score, handler);
             generator.Generate();
 
             var info = score.Tracks[0].PlaybackInfo;
-            var note = score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0];
+            var note = score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0];
 
             var expectedEvents = new FlatMidiEventGenerator.MidiEvent[]
             {
@@ -96,18 +96,18 @@ namespace AlphaTab.Test.Audio
             var score = ParseTex(tex);
 
             Assert.AreEqual(1, score.Tracks.Count);
-            Assert.AreEqual(1, score.Tracks[0].Bars.Count);
-            Assert.AreEqual(1, score.Tracks[0].Bars[0].Voices.Count);
-            Assert.AreEqual(2, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
-            Assert.AreEqual(1, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes.Count);
-            Assert.AreEqual(1, score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes.Count);
+            Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars.Count);
+            Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[0].Voices.Count);
+            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes.Count);
+            Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes.Count);
 
             var handler = new FlatMidiEventGenerator();
             var generator = new MidiFileGenerator(score, handler);
             generator.Generate();
 
             var info = score.Tracks[0].PlaybackInfo;
-            var note = score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0];
+            var note = score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0];
 
             var expectedEvents = new FlatMidiEventGenerator.MidiEvent[]
             {

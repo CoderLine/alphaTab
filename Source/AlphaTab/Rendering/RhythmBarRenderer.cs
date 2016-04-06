@@ -35,9 +35,9 @@ namespace AlphaTab.Rendering
 
         public override void DoLayout()
         {
-            _helpers = Stave.StaveGroup.Helpers.Helpers[Bar.Track.Index][Bar.Index];
+            _helpers = Staff.StaveGroup.Helpers.Helpers[Bar.Staff.Track.Index][Bar.Staff.Index][Bar.Index];
             base.DoLayout();
-            Height = Stave.GetSetting("rhythm-height", 24) * Scale;
+            Height = Staff.GetSetting("rhythm-height", 24) * Scale;
             IsEmpty = false;
         }
 
@@ -85,7 +85,7 @@ namespace AlphaTab.Rendering
         private void PaintBeamHelper(float cx, float cy, ICanvas canvas, BeamingHelper h)
         {
             if (h.Beats[0].GraceType != GraceType.None) return;
-            var useBeams = Stave.GetSetting("use-beams", false);
+            var useBeams = Staff.GetSetting("use-beams", false);
             // check if we need to paint simple footer
             if (useBeams && h.Beats.Count == 1)
             {

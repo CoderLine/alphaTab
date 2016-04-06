@@ -353,7 +353,9 @@ namespace AlphaTab.Importer
 
         private void ParseTrack(IXmlNode node)
         {
-            var track = new Track();
+            // TODO: if the instrument name ends with -gs or "GrandStaff"
+            // the track has 2 staffs.
+            var track = new Track(1); 
             var trackId = node.Attributes.Get("id").Value;
 
             node.IterateChildren(c =>
@@ -1356,7 +1358,8 @@ namespace AlphaTab.Importer
                     var barId = barIds[trackIndex];
                     if (barId != InvalidId)
                     {
-                        track.AddBar(_barsById[barId]);
+                        // TODO: add bars depending on staff count 
+                        track.AddBarToStaff(0, _barsById[barId]);
                     }
                 }
 

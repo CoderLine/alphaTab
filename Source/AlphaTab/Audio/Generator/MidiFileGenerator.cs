@@ -77,7 +77,15 @@ namespace AlphaTab.Audio.Generator
                     GenerateMasterBar(bar, previousMasterBar, currentTick);
                     for (int i = 0, j = _score.Tracks.Count; i < j; i++)
                     {
-                        GenerateBar(_score.Tracks[i].Bars[index], currentTick);
+                        var track = _score.Tracks[i];
+                        for (int k = 0, l = track.Staves.Count; k < l; k++)
+                        {
+                            var staff = track.Staves[k];
+                            for (int m = 0, n = staff.Bars.Count; m < n; m++)
+                            {
+                                GenerateBar(staff.Bars[index], currentTick);
+                            }
+                        }
                     }
                 }
                 controller.MoveNext();
@@ -178,7 +186,7 @@ namespace AlphaTab.Audio.Generator
             var beatStart = beat.Start;
             var duration = beat.CalculateDuration();
 
-            var track = beat.Voice.Bar.Track;
+            var track = beat.Voice.Bar.Staff.Track;
 
             for (int i = 0, j = beat.Automations.Count; i < j; i++)
             {
@@ -205,7 +213,7 @@ namespace AlphaTab.Audio.Generator
 
         private void GenerateNote(Note note, int beatStart, int beatDuration, int[] brushInfo)
         {
-            var track = note.Beat.Voice.Bar.Track;
+            var track = note.Beat.Voice.Bar.Staff.Track;
             var noteKey = track.Capo + note.RealValue;
             var noteStart = beatStart + brushInfo[note.String - 1];
             var noteDuration = GetNoteDuration(note, beatDuration) - brushInfo[note.String - 1];
@@ -357,7 +365,7 @@ namespace AlphaTab.Audio.Generator
             var dynamicValue = note.Dynamic;
 
             // more silent on hammer destination
-            if (!note.Beat.Voice.Bar.Track.IsPercussion && note.HammerPullOrigin != null)
+            if (!note.Beat.Voice.Bar.Staff.Track.IsPercussion && note.HammerPullOrigin != null)
             {
                 dynamicValue--;
             }
@@ -416,7 +424,7 @@ namespace AlphaTab.Audio.Generator
 
         private void GenerateBend(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
         {
-            var track = note.Beat.Voice.Bar.Track;
+            var track = note.Beat.Voice.Bar.Staff.Track;
             var ticksPerPosition = ((double)noteDuration) / BendPoint.MaxPosition;
             for (int i = 0; i < note.BendPoints.Count - 1; i++)
             {
@@ -434,7 +442,7 @@ namespace AlphaTab.Audio.Generator
                 // for this we need to calculate how many ticks to offset per value
 
                 var ticksPerValue = ticksBetweenPoints / Math.Abs(nextBendValue - currentBendValue);
-                var tick = noteStart + (ticksPerPosition*currentPoint.Offset);
+                var tick = noteStart + (ticksPerPosition * currentPoint.Offset);
                 // bend up
                 if (currentBendValue < nextBendValue)
                 {
@@ -463,7 +471,7 @@ namespace AlphaTab.Audio.Generator
 
         private void GenerateTrill(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
         {
-            var track = note.Beat.Voice.Bar.Track;
+            var track = note.Beat.Voice.Bar.Staff.Track;
             var trillKey = track.Capo + note.StringTuning + note.TrillFret;
             var trillLength = note.TrillSpeed.ToTicks();
             var realKey = true;
@@ -483,7 +491,7 @@ namespace AlphaTab.Audio.Generator
 
         private void GenerateTremoloPicking(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
         {
-            var track = note.Beat.Voice.Bar.Track;
+            var track = note.Beat.Voice.Bar.Staff.Track;
             var tpLength = note.Beat.TremoloSpeed.Value.ToTicks();
             var tick = noteStart;
             while (tick + 10 < (noteStart + noteDuration))
@@ -500,7 +508,7 @@ namespace AlphaTab.Audio.Generator
 
         private int[] GetBrushInfo(Beat beat)
         {
-            var brushInfo = new int[beat.Voice.Bar.Track.Tuning.Length];
+            var brushInfo = new int[beat.Voice.Bar.Staff.Track.Tuning.Length];
 
             if (beat.BrushType != BrushType.None)
             {
@@ -523,7 +531,7 @@ namespace AlphaTab.Audio.Generator
                 {
                     int brushMove = 0;
                     var brushIncrement = GetBrushIncrement(beat);
-                    for (int i = 0, j = beat.Voice.Bar.Track.Tuning.Length; i < j; i++)
+                    for (int i = 0, j = beat.Voice.Bar.Staff.Track.Tuning.Length; i < j; i++)
                     {
                         var index = (beat.BrushType == BrushType.ArpeggioDown || beat.BrushType == BrushType.BrushDown)
                                     ? i
@@ -557,30 +565,30 @@ namespace AlphaTab.Audio.Generator
             switch (automation.Type)
             {
                 case AutomationType.Instrument:
-                    _handler.AddProgramChange(beat.Voice.Bar.Track.Index, beat.Start + startMove,
-                                                (byte)beat.Voice.Bar.Track.PlaybackInfo.PrimaryChannel,
+                    _handler.AddProgramChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
+                                                (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel,
                                                 (byte)(automation.Value));
-                    _handler.AddProgramChange(beat.Voice.Bar.Track.Index, beat.Start + startMove,
-                                                (byte)beat.Voice.Bar.Track.PlaybackInfo.SecondaryChannel,
+                    _handler.AddProgramChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
+                                                (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel,
                                                 (byte)(automation.Value));
                     break;
                 case AutomationType.Balance:
-                    _handler.AddControlChange(beat.Voice.Bar.Track.Index, beat.Start + startMove,
-                                                (byte)beat.Voice.Bar.Track.PlaybackInfo.PrimaryChannel,
+                    _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
+                                                (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel,
                                                 (byte)MidiController.Balance,
                                                 (byte)(automation.Value));
-                    _handler.AddControlChange(beat.Voice.Bar.Track.Index, beat.Start + startMove,
-                                                (byte)beat.Voice.Bar.Track.PlaybackInfo.SecondaryChannel,
+                    _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
+                                                (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel,
                                                 (byte)MidiController.Balance,
                                                 (byte)(automation.Value));
                     break;
                 case AutomationType.Volume:
-                    _handler.AddControlChange(beat.Voice.Bar.Track.Index, beat.Start + startMove,
-                                                (byte)beat.Voice.Bar.Track.PlaybackInfo.PrimaryChannel,
+                    _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
+                                                (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel,
                                                 (byte)MidiController.Volume,
                                                 (byte)(automation.Value));
-                    _handler.AddControlChange(beat.Voice.Bar.Track.Index, beat.Start + startMove,
-                                                (byte)beat.Voice.Bar.Track.PlaybackInfo.SecondaryChannel,
+                    _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
+                                                (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel,
                                                 (byte)MidiController.Volume,
                                                 (byte)(automation.Value));
                     break;

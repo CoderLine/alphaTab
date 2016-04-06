@@ -24,10 +24,10 @@ using AlphaTab.Rendering.Layout;
 namespace AlphaTab.Rendering.Staves
 {
     /// <summary>
-    /// A stave represents a single line within a StaveGroup. 
+    /// A Staff represents a single line within a StaveGroup. 
     /// It stores BarRenderer instances created from a given factory. 
     /// </summary>
-    public class Stave
+    public class Staff
     {
         private BarRendererFactory _factory;
         private readonly FastDictionary<string, object> _settings;
@@ -41,13 +41,16 @@ namespace AlphaTab.Rendering.Staves
         public float Y { get; set; }
         public float Height { get; set; }
         public int Index { get; set; }
+        public int StaffIndex { get; set; }
+
+        public Model.Staff ModelStaff { get; set; }
         public string StaveId { get; private set; }
 
 
 
         /// <summary>
         /// This is the visual offset from top where the
-        /// stave contents actually start. Used for grouping 
+        /// Staff contents actually start. Used for grouping 
         /// using a accolade
         /// </summary>
         public float StaveTop { get; set; }
@@ -55,7 +58,7 @@ namespace AlphaTab.Rendering.Staves
         public float BottomSpacing { get; set; }
         /// <summary>
         /// This is the visual offset from top where the
-        /// stave contents actually ends. Used for grouping 
+        /// Staff contents actually ends. Used for grouping 
         /// using a accolade
         /// </summary>
         public float StaveBottom { get; set; }
@@ -63,9 +66,10 @@ namespace AlphaTab.Rendering.Staves
         public bool IsFirstInAccolade { get; set; }
         public bool IsLastInAccolade { get; set; }
 
-        public Stave(string staveId, BarRendererFactory factory, FastDictionary<string, object> settings)
+        public Staff(Model.Staff staff, string staveId, BarRendererFactory factory, FastDictionary<string, object> settings)
         {
             BarRenderers = new FastList<BarRendererBase>();
+            ModelStaff = staff;
             StaveId = staveId;
             _factory = factory;
             _settings = settings;
@@ -106,7 +110,7 @@ namespace AlphaTab.Rendering.Staves
         public void AddBar(Bar bar)
         {
             var renderer = _factory.Create(bar);
-            renderer.Stave = this;
+            renderer.Staff = this;
             renderer.Index = BarRenderers.Count;
             renderer.DoLayout();
             BarRenderers.Add(renderer);
