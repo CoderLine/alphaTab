@@ -1220,6 +1220,28 @@ namespace AlphaTab.Importer
                     note.Fret = 0;
                     note.IsDead = true;
                 }
+                else if (syData == "lf")
+                {
+                    NewSy();
+                    var finger = Fingers.Thumb;
+                    if (_sy == AlphaTexSymbols.Number)
+                    {
+                        finger = ToFinger((int) _syData);
+                        NewSy();
+                    }
+                    note.LeftHandFinger = finger;
+                }
+                else if (syData == "rf")
+                {
+                    NewSy();
+                    var finger = Fingers.Thumb;
+                    if (_sy == AlphaTexSymbols.Number)
+                    {
+                        finger = ToFinger((int)_syData);
+                        NewSy();
+                    }
+                    note.RightHandFinger = finger;
+                }
                 else if (ApplyBeatEffect(note.Beat)) // also try beat effects
                 {
                     // Success
@@ -1235,6 +1257,24 @@ namespace AlphaTab.Importer
                 Error("note-effect", AlphaTexSymbols.RBrace, false);
             }
             NewSy();
+        }
+
+        private Fingers ToFinger(int syData)
+        {
+            switch (syData)
+            {
+                case 1:
+                    return Fingers.Thumb;
+                case 2:
+                    return Fingers.IndexFinger;
+                case 3:
+                    return Fingers.MiddleFinger;
+                case 4:
+                    return Fingers.AnnularFinger;
+                case 5:
+                    return Fingers.LittleFinger;
+            }
+            return Fingers.Thumb;
         }
 
         private Duration ParseDuration(int duration)

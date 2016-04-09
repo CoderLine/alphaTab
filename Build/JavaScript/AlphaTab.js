@@ -3531,6 +3531,24 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 note.Fret = 0;
                 note.IsDead = true;
             }
+            else if (syData == "lf"){
+                this.NewSy();
+                var finger = AlphaTab.Model.Fingers.Thumb;
+                if (this._sy == AlphaTab.Importer.AlphaTexSymbols.Number){
+                    finger = this.ToFinger((this._syData));
+                    this.NewSy();
+                }
+                note.LeftHandFinger = finger;
+            }
+            else if (syData == "rf"){
+                this.NewSy();
+                var finger = AlphaTab.Model.Fingers.Thumb;
+                if (this._sy == AlphaTab.Importer.AlphaTexSymbols.Number){
+                    finger = this.ToFinger((this._syData));
+                    this.NewSy();
+                }
+                note.RightHandFinger = finger;
+            }
             else if (this.ApplyBeatEffect(note.Beat)){
                 // Success
             }
@@ -3542,6 +3560,21 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             this.Error("note-effect", AlphaTab.Importer.AlphaTexSymbols.RBrace, false);
         }
         this.NewSy();
+    },
+    ToFinger: function (syData){
+        switch (syData){
+            case 1:
+                return AlphaTab.Model.Fingers.Thumb;
+            case 2:
+                return AlphaTab.Model.Fingers.IndexFinger;
+            case 3:
+                return AlphaTab.Model.Fingers.MiddleFinger;
+            case 4:
+                return AlphaTab.Model.Fingers.AnnularFinger;
+            case 5:
+                return AlphaTab.Model.Fingers.LittleFinger;
+        }
+        return AlphaTab.Model.Fingers.Thumb;
     },
     ParseDuration: function (duration){
         switch (duration){
