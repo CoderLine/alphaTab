@@ -3512,6 +3512,24 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 note.Fret = 0;
                 note.IsDead = true;
             }
+            else if (syData == "lf"){
+                this.NewSy();
+                var finger = AlphaTab.Model.Fingers.Thumb;
+                if (this._sy == AlphaTab.Importer.AlphaTexSymbols.Number){
+                    finger = this.ToFinger((this._syData));
+                    this.NewSy();
+                }
+                note.LeftHandFinger = finger;
+            }
+            else if (syData == "rf"){
+                this.NewSy();
+                var finger = AlphaTab.Model.Fingers.Thumb;
+                if (this._sy == AlphaTab.Importer.AlphaTexSymbols.Number){
+                    finger = this.ToFinger((this._syData));
+                    this.NewSy();
+                }
+                note.RightHandFinger = finger;
+            }
             else if (this.ApplyBeatEffect(note.Beat)){
                 // Success
             }
@@ -3523,6 +3541,21 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             this.Error("note-effect", AlphaTab.Importer.AlphaTexSymbols.RBrace, false);
         }
         this.NewSy();
+    },
+    ToFinger: function (syData){
+        switch (syData){
+            case 1:
+                return AlphaTab.Model.Fingers.Thumb;
+            case 2:
+                return AlphaTab.Model.Fingers.IndexFinger;
+            case 3:
+                return AlphaTab.Model.Fingers.MiddleFinger;
+            case 4:
+                return AlphaTab.Model.Fingers.AnnularFinger;
+            case 5:
+                return AlphaTab.Model.Fingers.LittleFinger;
+        }
+        return AlphaTab.Model.Fingers.Thumb;
     },
     ParseDuration: function (duration){
         switch (duration){
@@ -6838,8 +6871,9 @@ AlphaTab.IO.ByteBuffer.prototype = {
             while (--byteCount >= 0)
                 this._buffer[this._position + byteCount] = buffer[offset + byteCount];
         }
-        else
-            this._buffer.set(buffer.subarray(offset,offset+count),this._position);
+        else {
+            this._buffer.set(buffer.subarray(offset,offset+Math.min(count, buffer.length - offset)),this._position);
+        }
         this._position = i;
     },
     EnsureCapacity: function (value){

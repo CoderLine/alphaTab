@@ -288,5 +288,72 @@ namespace AlphaTab.Test.Importer
             }
         }
 
+        [TestMethod]
+        public void TestLeftHandFingerSingleNote()
+        {
+            var tex = @":8 3.3{lf 1} 3.3{lf 2} 3.3{lf 3} 3.3{lf 4} 3.3{lf 5}";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(1, score.MasterBars.Count);
+            Assert.AreEqual(5, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(Fingers.Thumb, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].LeftHandFinger);
+            Assert.AreEqual(Fingers.IndexFinger, score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes[0].LeftHandFinger);
+            Assert.AreEqual(Fingers.MiddleFinger, score.Tracks[0].Bars[0].Voices[0].Beats[2].Notes[0].LeftHandFinger);
+            Assert.AreEqual(Fingers.AnnularFinger, score.Tracks[0].Bars[0].Voices[0].Beats[3].Notes[0].LeftHandFinger);
+            Assert.AreEqual(Fingers.LittleFinger, score.Tracks[0].Bars[0].Voices[0].Beats[4].Notes[0].LeftHandFinger);
+        }
+
+        [TestMethod]
+        public void TestRightHandFingerSingleNote()
+        {
+            var tex = @":8 3.3{rf 1} 3.3{rf 2} 3.3{rf 3} 3.3{rf 4} 3.3{rf 5}";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(1, score.MasterBars.Count);
+            Assert.AreEqual(5, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(Fingers.Thumb, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].RightHandFinger);
+            Assert.AreEqual(Fingers.IndexFinger, score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes[0].RightHandFinger);
+            Assert.AreEqual(Fingers.MiddleFinger, score.Tracks[0].Bars[0].Voices[0].Beats[2].Notes[0].RightHandFinger);
+            Assert.AreEqual(Fingers.AnnularFinger, score.Tracks[0].Bars[0].Voices[0].Beats[3].Notes[0].RightHandFinger);
+            Assert.AreEqual(Fingers.LittleFinger, score.Tracks[0].Bars[0].Voices[0].Beats[4].Notes[0].RightHandFinger);
+        }
+
+        [TestMethod]
+        public void TestLeftHandFingerChord()
+        {
+            var tex = @":8 (3.1{lf 1} 3.2{lf 2} 3.3{lf 3} 3.4{lf 4} 3.5{lf 5})";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(1, score.MasterBars.Count);
+            Assert.AreEqual(1, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(5, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes.Count);
+            Assert.AreEqual(Fingers.Thumb, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].LeftHandFinger);
+            Assert.AreEqual(Fingers.IndexFinger, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[1].LeftHandFinger);
+            Assert.AreEqual(Fingers.MiddleFinger, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[2].LeftHandFinger);
+            Assert.AreEqual(Fingers.AnnularFinger, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[3].LeftHandFinger);
+            Assert.AreEqual(Fingers.LittleFinger, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[4].LeftHandFinger);
+        }
+
+        [TestMethod]
+        public void TestRightHandFingerChord()
+        {
+            var tex = @":8 (3.1{rf 1} 3.2{rf 2} 3.3{rf 3} 3.4{rf 4} 3.5{rf 5})";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(1, score.MasterBars.Count);
+            Assert.AreEqual(1, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(5, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes.Count);
+            Assert.AreEqual(Fingers.Thumb, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].RightHandFinger);
+            Assert.AreEqual(Fingers.IndexFinger, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[1].RightHandFinger);
+            Assert.AreEqual(Fingers.MiddleFinger, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[2].RightHandFinger);
+            Assert.AreEqual(Fingers.AnnularFinger, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[3].RightHandFinger);
+            Assert.AreEqual(Fingers.LittleFinger, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[4].RightHandFinger);
+        }
+
+
     }
 }
