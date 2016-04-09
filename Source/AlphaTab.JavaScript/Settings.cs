@@ -54,6 +54,7 @@ namespace AlphaTab
             if (JsonExists(json, "width")) settings.Width = json.width;
             if (JsonExists(json, "height")) settings.Height = json.height;
             if (JsonExists(json, "engine")) settings.Engine = json.engine;
+            if (JsonExists(json, "forcePianoFingering")) settings.ForcePianoFingering = json.forcePianoFingering;
 
             if (JsonExists(json, "layout"))
             {

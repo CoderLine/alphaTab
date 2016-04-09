@@ -161,8 +161,8 @@ namespace AlphaTab.Model
             SlideType = SlideType.None;
             Vibrato = VibratoType.None;
 
-            LeftHandFinger = Fingers.NoOrDead;
-            RightHandFinger = Fingers.NoOrDead;
+            LeftHandFinger = Fingers.Unknown;
+            RightHandFinger = Fingers.Unknown;
 
             TrillValue = -1;
             TrillSpeed = Duration.ThirtySecond;

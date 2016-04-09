@@ -16,6 +16,7 @@
  * License along with this library.
  */
 using System;
+using AlphaTab.Audio;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
@@ -128,6 +129,7 @@ namespace AlphaTab.Rendering
                     if (h.Direction == BeamDirection.Up)
                     {
                         maxNoteY -= GetStemSize(h.MaxDuration);
+                        maxNoteY -= h.FingeringCount * Resources.GraceFont.Size;
                     }
 
                     if (maxNoteY < top)
@@ -142,6 +144,7 @@ namespace AlphaTab.Rendering
                     if (h.Direction == BeamDirection.Down)
                     {
                         minNoteY += GetStemSize(h.MaxDuration);
+                        minNoteY += h.FingeringCount * Resources.GraceFont.Size;
                     }
 
                     if (minNoteY > bottom)
@@ -342,6 +345,17 @@ namespace AlphaTab.Rendering
                 canvas.LineTo(cx + X + beatLineX, y2);
                 canvas.Stroke();
 
+                float fingeringY = y2;
+                if (direction == BeamDirection.Up)
+                {
+                    fingeringY -= correction * 3;
+                }
+                else
+                {
+                    fingeringY += correction * 3;
+                }
+                PaintFingering(canvas, beat, cx + X + beatLineX, direction, fingeringY);
+
                 var brokenBarOffset = 6 * Scale;
                 var barSpacing = 6 * Scale;
                 var barSize = 3 * Scale;
@@ -425,11 +439,6 @@ namespace AlphaTab.Rendering
         {
             var beat = h.Beats[0];
 
-            if (beat.Duration == Duration.Whole)
-            {
-                return;
-            }
-
             var isGrace = beat.GraceType != GraceType.None;
             var scaleMod = isGrace ? NoteHeadGlyph.GraceScale : 1;
 
@@ -447,17 +456,33 @@ namespace AlphaTab.Rendering
             var topY = GetScoreY(GetNoteLine(beat.MaxNote), correction);
             var bottomY = GetScoreY(GetNoteLine(beat.MinNote), correction);
 
+            if (beat.Duration == Duration.Whole)
+            {
+                correction += (1.5f * NoteHeadGlyph.NoteHeadHeight) * scaleMod;
+            }
+
             float beamY;
+            float fingeringY;
             if (direction == BeamDirection.Down)
             {
                 bottomY += stemSize * scaleMod;
                 beamY = bottomY;
+                fingeringY = cy + Y + bottomY;
             }
             else
             {
                 topY -= stemSize * scaleMod;
                 beamY = topY;
+                fingeringY = cy + Y + topY - correction;
             }
+
+            PaintFingering(canvas, beat, cx + X + beatLineX, direction, fingeringY);
+
+            if (beat.Duration == Duration.Whole)
+            {
+                return;
+            }
+
 
             canvas.BeginPath();
             canvas.MoveTo(cx + X + beatLineX, cy + Y + topY);
@@ -496,6 +521,113 @@ namespace AlphaTab.Rendering
             }
         }
 
+        private void PaintFingering(ICanvas canvas, Beat beat, float beatLineX, BeamDirection direction, float topY)
+        {
+            if (direction == BeamDirection.Up)
+            {
+                beatLineX -= 10 * Scale;
+            }
+            else
+            {
+                beatLineX += 3 * Scale;
+                topY -= canvas.Font.Size;
+            }
+
+            // sort notes ascending in their value to ensure 
+            // we are drawing the numbers according to their order on the stave 
+            var noteList = beat.Notes.Clone();
+            noteList.Sort((a, b) => b.RealValue - a.RealValue);
+
+            for (int n = 0; n < noteList.Count; n++)
+            {
+                var note = noteList[n];
+                string text = null;
+                if (note.LeftHandFinger != Fingers.Unknown)
+                {
+                    text = FingerToString(beat, note.LeftHandFinger, true);
+                }
+                else if (note.RightHandFinger != Fingers.Unknown)
+                {
+                    text = FingerToString(beat, note.RightHandFinger, false);
+                }
+
+                if (text == null)
+                {
+                    continue;
+                }
+
+                canvas.FillText(text, beatLineX, topY);
+                topY -= (int)(canvas.Font.Size);
+            }
+        }
+
+        private string FingerToString(Beat beat, Fingers finger, bool leftHand)
+        {
+            if (Settings.ForcePianoFingering || GeneralMidi.IsPiano(beat.Voice.Bar.Track.PlaybackInfo.Program))
+            {
+                switch (finger)
+                {
+                    case Fingers.Unknown:
+                    case Fingers.NoOrDead:
+                        return null;
+                    case Fingers.Thumb:
+                        return "1";
+                    case Fingers.IndexFinger:
+                        return "2";
+                    case Fingers.MiddleFinger:
+                        return "3";
+                    case Fingers.AnnularFinger:
+                        return "4";
+                    case Fingers.LittleFinger:
+                        return "5";
+                    default:
+                        return null;
+                }
+            }
+            else if (leftHand)
+            {
+                switch (finger)
+                {
+                    case Fingers.Unknown:
+                    case Fingers.NoOrDead:
+                        return "0";
+                    case Fingers.Thumb:
+                        return "T";
+                    case Fingers.IndexFinger:
+                        return "1";
+                    case Fingers.MiddleFinger:
+                        return "2";
+                    case Fingers.AnnularFinger:
+                        return "3";
+                    case Fingers.LittleFinger:
+                        return "4";
+                    default:
+                        return null;
+                }
+            }
+            else
+            {
+                switch (finger)
+                {
+                    case Fingers.Unknown:
+                    case Fingers.NoOrDead:
+                        return null;
+                    case Fingers.Thumb:
+                        return "p";
+                    case Fingers.IndexFinger:
+                        return "i";
+                    case Fingers.MiddleFinger:
+                        return "m";
+                    case Fingers.AnnularFinger:
+                        return "a";
+                    case Fingers.LittleFinger:
+                        return "c";
+                    default:
+                        return null;
+                }
+            }
+        }
+
 
         protected override void CreatePreBeatGlyphs()
         {
@@ -510,29 +642,35 @@ namespace AlphaTab.Rendering
                 var offset = 0;
                 switch (Bar.Clef)
                 {
-                    case Clef.Neutral: offset = 4; break;
-                    case Clef.F4: offset = 4; break;
-                    case Clef.C3: offset = 6; break;
-                    case Clef.C4: offset = 4; break;
-                    case Clef.G2: offset = 6; break;
+                    case Clef.Neutral:
+                        offset = 4;
+                        break;
+                    case Clef.F4:
+                        offset = 4;
+                        break;
+                    case Clef.C3:
+                        offset = 6;
+                        break;
+                    case Clef.C4:
+                        offset = 4;
+                        break;
+                    case Clef.G2:
+                        offset = 6;
+                        break;
                 }
                 CreateStartSpacing();
                 AddPreBeatGlyph(new ClefGlyph(0, GetScoreY(offset), Bar.Clef));
             }
 
             // Key signature
-            if ((Bar.PreviousBar == null && Bar.MasterBar.KeySignature != 0)
-                || (Bar.PreviousBar != null && Bar.MasterBar.KeySignature != Bar.PreviousBar.MasterBar.KeySignature))
+            if ((Bar.PreviousBar == null && Bar.MasterBar.KeySignature != 0) || (Bar.PreviousBar != null && Bar.MasterBar.KeySignature != Bar.PreviousBar.MasterBar.KeySignature))
             {
                 CreateStartSpacing();
                 CreateKeySignatureGlyphs();
             }
 
             // Time Signature
-            if ((Bar.PreviousBar == null)
-                || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureNumerator != Bar.PreviousBar.MasterBar.TimeSignatureNumerator)
-                || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureDenominator != Bar.PreviousBar.MasterBar.TimeSignatureDenominator)
-                )
+            if ((Bar.PreviousBar == null) || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureNumerator != Bar.PreviousBar.MasterBar.TimeSignatureNumerator) || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureDenominator != Bar.PreviousBar.MasterBar.TimeSignatureDenominator))
             {
                 CreateStartSpacing();
                 CreateTimeSignatureGlyphs();
@@ -582,6 +720,7 @@ namespace AlphaTab.Rendering
         }
 
         private bool _startSpacing;
+
         private void CreateStartSpacing()
         {
             if (_startSpacing) return;

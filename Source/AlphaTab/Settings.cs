@@ -56,6 +56,12 @@ namespace AlphaTab
         public LayoutSettings Layout { get; set; }
 
         /// <summary>
+        /// Forces the fingering rendering to use always the piano finger stýle where 
+        /// fingers are rendered as 1-5 instead of p,i,m,a,c and T,1,2,3,4.
+        /// </summary>
+        public bool ForcePianoFingering { get; set; }
+
+        /// <summary>
         /// The staves to create for each row.
         /// </summary>
         public FastList<StaveSettings> Staves { get; set; }

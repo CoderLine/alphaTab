@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+using System;
 using AlphaTab.Audio.Generator;
 using AlphaTab.Audio.Model;
 using AlphaTab.Model;
@@ -111,6 +112,5 @@ namespace AlphaTab.Audio
 
             return lookup;
         }
-
     }
 }

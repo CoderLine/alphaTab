@@ -1385,6 +1385,7 @@ AlphaTab.Settings = function (){
     this.Height = 0;
     this.Engine = null;
     this.Layout = null;
+    this.ForcePianoFingering = false;
     this.Staves = null;
 };
 AlphaTab.Settings.FromJson = function (json){
@@ -1402,6 +1403,8 @@ AlphaTab.Settings.FromJson = function (json){
         settings.Height = json.height;
     if ("engine"in json)
         settings.Engine = json.engine;
+    if ("forcePianoFingering"in json)
+        settings.ForcePianoFingering = json.forcePianoFingering;
     if ("layout"in json){
         if (typeof(json.layout) == "string"){
             settings.Layout.Mode = json.layout;
@@ -1675,6 +1678,25 @@ AlphaTab.Audio.GeneralMidi.GetValue = function (name){
     }
     name = name.toLowerCase().replace(" ","");
     return AlphaTab.Audio.GeneralMidi._values.hasOwnProperty(name) ? AlphaTab.Audio.GeneralMidi._values[name] : 0;
+};
+AlphaTab.Audio.GeneralMidi.IsPiano = function (program){
+    // 1 Acoustic Grand Piano
+    // 2 Bright Acoustic Piano
+    // 3 Electric Grand Piano
+    // 4 Honky - tonk Piano
+    // 5 Electric Piano 1
+    // 6 Electric Piano 2
+    // 7 Harpsichord
+    // 8 Clavi
+    // 17 Drawbar Organ
+    // 18 Percussive Organ
+    // 19 Rock Organ
+    // 20 Church Organ
+    // 21 Reed Organ
+    // 22 Accordion
+    // 23 Harmonica
+    // 24 Tango Accordion
+    return program <= 8 || (program >= 17 && program <= 24);
 };
 AlphaTab.Audio.Generator = AlphaTab.Audio.Generator || {};
 AlphaTab.Audio.Generator.MidiFileGenerator = function (score, handler, generateMetronome){
@@ -7401,8 +7423,8 @@ AlphaTab.Model.Note = function (){
     this.HarmonicType = AlphaTab.Model.HarmonicType.None;
     this.SlideType = AlphaTab.Model.SlideType.None;
     this.Vibrato = AlphaTab.Model.VibratoType.None;
-    this.LeftHandFinger = AlphaTab.Model.Fingers.NoOrDead;
-    this.RightHandFinger = AlphaTab.Model.Fingers.NoOrDead;
+    this.LeftHandFinger = AlphaTab.Model.Fingers.Unknown;
+    this.RightHandFinger = AlphaTab.Model.Fingers.Unknown;
     this.TrillValue = -1;
     this.TrillSpeed = AlphaTab.Model.Duration.ThirtySecond;
     this.DurationPercent = 1;
@@ -13157,6 +13179,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
                 var maxNoteY = this.GetScoreY(this.GetNoteLine(h.MaxNote), 0);
                 if (h.get_Direction() == AlphaTab.Rendering.Utils.BeamDirection.Up){
                     maxNoteY -= this.GetStemSize(h.MaxDuration);
+                    maxNoteY -= h.FingeringCount * this.get_Resources().GraceFont.Size;
                 }
                 if (maxNoteY < top){
                     this.RegisterOverflowTop(Math.abs(maxNoteY));
@@ -13167,6 +13190,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
                 var minNoteY = this.GetScoreY(this.GetNoteLine(h.MinNote), 0);
                 if (h.get_Direction() == AlphaTab.Rendering.Utils.BeamDirection.Down){
                     minNoteY += this.GetStemSize(h.MaxDuration);
+                    minNoteY += h.FingeringCount * this.get_Resources().GraceFont.Size;
                 }
                 if (minNoteY > bottom){
                     this.RegisterOverflowBottom(Math.abs(minNoteY) - bottom);
@@ -13327,6 +13351,14 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
             canvas.MoveTo(cx + this.X + beatLineX, y1);
             canvas.LineTo(cx + this.X + beatLineX, y2);
             canvas.Stroke();
+            var fingeringY = y2;
+            if (direction == AlphaTab.Rendering.Utils.BeamDirection.Up){
+                fingeringY -= correction * 3;
+            }
+            else {
+                fingeringY += correction * 3;
+            }
+            this.PaintFingering(canvas, beat, cx + this.X + beatLineX, direction, fingeringY);
             var brokenBarOffset = 6 * this.get_Scale();
             var barSpacing = 6 * this.get_Scale();
             var barSize = 3 * this.get_Scale();
@@ -13377,9 +13409,6 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
     },
     PaintFooter: function (cx, cy, canvas, h){
         var beat = h.Beats[0];
-        if (beat.Duration == AlphaTab.Model.Duration.Whole){
-            return;
-        }
         var isGrace = beat.GraceType != AlphaTab.Model.GraceType.None;
         var scaleMod = isGrace ? 0.5 : 1;
         //
@@ -13391,14 +13420,24 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
         var direction = h.get_Direction();
         var topY = this.GetScoreY(this.GetNoteLine(beat.get_MaxNote()), correction);
         var bottomY = this.GetScoreY(this.GetNoteLine(beat.get_MinNote()), correction);
+        if (beat.Duration == AlphaTab.Model.Duration.Whole){
+            correction += (13.5) * scaleMod;
+        }
         var beamY;
+        var fingeringY;
         if (direction == AlphaTab.Rendering.Utils.BeamDirection.Down){
             bottomY += stemSize * scaleMod;
             beamY = bottomY;
+            fingeringY = cy + this.Y + bottomY;
         }
         else {
             topY -= stemSize * scaleMod;
             beamY = topY;
+            fingeringY = cy + this.Y + topY - correction;
+        }
+        this.PaintFingering(canvas, beat, cx + this.X + beatLineX, direction, fingeringY);
+        if (beat.Duration == AlphaTab.Model.Duration.Whole){
+            return;
         }
         canvas.BeginPath();
         canvas.MoveTo(cx + this.X + beatLineX, cy + this.Y + topY);
@@ -13426,6 +13465,95 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
             glyph.Renderer = this;
             glyph.DoLayout();
             glyph.Paint(cx + this.X, cy + this.Y, canvas);
+        }
+    },
+    PaintFingering: function (canvas, beat, beatLineX, direction, topY){
+        if (direction == AlphaTab.Rendering.Utils.BeamDirection.Up){
+            beatLineX -= 10 * this.get_Scale();
+        }
+        else {
+            beatLineX += 3 * this.get_Scale();
+            topY -= canvas.get_Font().Size;
+        }
+        // sort notes ascending in their value to ensure 
+        // we are drawing the numbers according to their order on the stave 
+        var noteList = beat.Notes.slice();
+        noteList.sort($CreateAnonymousDelegate(this, function (a, b){
+    return b.get_RealValue() - a.get_RealValue();
+}));
+        for (var n = 0; n < noteList.length; n++){
+            var note = noteList[n];
+            var text = null;
+            if (note.LeftHandFinger != AlphaTab.Model.Fingers.Unknown){
+                text = this.FingerToString(beat, note.LeftHandFinger, true);
+            }
+            else if (note.RightHandFinger != AlphaTab.Model.Fingers.Unknown){
+                text = this.FingerToString(beat, note.RightHandFinger, false);
+            }
+            if (text == null){
+                continue;
+            }
+            canvas.FillText(text, beatLineX, topY);
+            topY -= ((canvas.get_Font().Size)) | 0;
+        }
+    },
+    FingerToString: function (beat, finger, leftHand){
+        if (this.get_Settings().ForcePianoFingering || AlphaTab.Audio.GeneralMidi.IsPiano(beat.Voice.Bar.Track.PlaybackInfo.Program)){
+            switch (finger){
+                case AlphaTab.Model.Fingers.Unknown:
+                case AlphaTab.Model.Fingers.NoOrDead:
+                    return null;
+                case AlphaTab.Model.Fingers.Thumb:
+                    return "1";
+                case AlphaTab.Model.Fingers.IndexFinger:
+                    return "2";
+                case AlphaTab.Model.Fingers.MiddleFinger:
+                    return "3";
+                case AlphaTab.Model.Fingers.AnnularFinger:
+                    return "4";
+                case AlphaTab.Model.Fingers.LittleFinger:
+                    return "5";
+                default:
+                    return null;
+            }
+        }
+        else if (leftHand){
+            switch (finger){
+                case AlphaTab.Model.Fingers.Unknown:
+                case AlphaTab.Model.Fingers.NoOrDead:
+                    return "0";
+                case AlphaTab.Model.Fingers.Thumb:
+                    return "T";
+                case AlphaTab.Model.Fingers.IndexFinger:
+                    return "1";
+                case AlphaTab.Model.Fingers.MiddleFinger:
+                    return "2";
+                case AlphaTab.Model.Fingers.AnnularFinger:
+                    return "3";
+                case AlphaTab.Model.Fingers.LittleFinger:
+                    return "4";
+                default:
+                    return null;
+            }
+        }
+        else {
+            switch (finger){
+                case AlphaTab.Model.Fingers.Unknown:
+                case AlphaTab.Model.Fingers.NoOrDead:
+                    return null;
+                case AlphaTab.Model.Fingers.Thumb:
+                    return "p";
+                case AlphaTab.Model.Fingers.IndexFinger:
+                    return "i";
+                case AlphaTab.Model.Fingers.MiddleFinger:
+                    return "m";
+                case AlphaTab.Model.Fingers.AnnularFinger:
+                    return "a";
+                case AlphaTab.Model.Fingers.LittleFinger:
+                    return "c";
+                default:
+                    return null;
+            }
         }
     },
     CreatePreBeatGlyphs: function (){
@@ -14460,6 +14588,7 @@ AlphaTab.Rendering.Utils.BeamingHelper = function (track){
     this.Voice = null;
     this.Beats = null;
     this.MaxDuration = AlphaTab.Model.Duration.Whole;
+    this.FingeringCount = 0;
     this.FirstMinNote = null;
     this.FirstMaxNote = null;
     this.LastMinNote = null;
@@ -14501,6 +14630,9 @@ AlphaTab.Rendering.Utils.BeamingHelper.prototype = {
         if (this._track.IsPercussion){
             return AlphaTab.Rendering.Utils.BeamDirection.Up;
         }
+        if (this.Beats.length == 1 && this.Beats[0].Duration == AlphaTab.Model.Duration.Whole){
+            return AlphaTab.Rendering.Utils.BeamDirection.Up;
+        }
         // the average key is used for determination
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
@@ -14522,6 +14654,16 @@ AlphaTab.Rendering.Utils.BeamingHelper.prototype = {
         if (add){
             this._lastBeat = beat;
             this.Beats.push(beat);
+            var fingeringCount = 0;
+            for (var n = 0; n < beat.Notes.length; n++){
+                var note = beat.Notes[n];
+                if (note.LeftHandFinger != AlphaTab.Model.Fingers.Unknown || note.RightHandFinger != AlphaTab.Model.Fingers.Unknown){
+                    fingeringCount++;
+                }
+            }
+            if (fingeringCount > this.FingeringCount){
+                this.FingeringCount = fingeringCount;
+            }
             this.CheckNote(beat.get_MinNote());
             this.CheckNote(beat.get_MaxNote());
             if (this.MaxDuration < beat.Duration){
