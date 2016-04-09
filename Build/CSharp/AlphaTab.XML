@@ -326,12 +326,6 @@
             This public enum lists all different types of finger slides on a string.
             </summary>
         </member>
-        <member name="T:AlphaTab.Model.Staff">
-            <summary>
-            This class describes a single staff within a track. There are instruments like pianos
-            where a single track can contain multiple staffs. 
-            </summary>
-        </member>
         <member name="T:AlphaTab.Model.Track">
             <summary>
             This public class describes a single track or instrument of score
@@ -1057,29 +1051,29 @@
             to align the parts across multiple staves.
             </summary>
         </member>
-        <member name="T:AlphaTab.Rendering.Staves.Staff">
+        <member name="T:AlphaTab.Rendering.Staves.Stave">
             <summary>
-            A Staff represents a single line within a StaveGroup. 
+            A stave represents a single line within a StaveGroup. 
             It stores BarRenderer instances created from a given factory. 
             </summary>
         </member>
-        <member name="P:AlphaTab.Rendering.Staves.Staff.StaveTop">
+        <member name="P:AlphaTab.Rendering.Staves.Stave.StaveTop">
             <summary>
             This is the visual offset from top where the
-            Staff contents actually start. Used for grouping 
+            stave contents actually start. Used for grouping 
             using a accolade
             </summary>
         </member>
-        <member name="P:AlphaTab.Rendering.Staves.Staff.StaveBottom">
+        <member name="P:AlphaTab.Rendering.Staves.Stave.StaveBottom">
             <summary>
             This is the visual offset from top where the
-            Staff contents actually ends. Used for grouping 
+            stave contents actually ends. Used for grouping 
             using a accolade
             </summary>
         </member>
         <member name="T:AlphaTab.Rendering.Staves.StaveGroup">
             <summary>
-            A Staff consists of a list of different staves and groups
+            A stave consists of a list of different staves and groups
             them using an accolade. 
             </summary>
         </member>
@@ -1269,10 +1263,10 @@
             The layout specific settings
             </summary>
         </member>
-        <member name="P:AlphaTab.Settings.StretchForce">
+        <member name="P:AlphaTab.Settings.ForcePianoFingering">
             <summary>
-            The force factor to use by default for layouting the score. 
-            Adjust this value to adjust the stretching of the notation. 
+            Forces the fingering rendering to use always the piano finger stýle where 
+            fingers are rendered as 1-5 instead of p,i,m,a,c and T,1,2,3,4.
             </summary>
         </member>
         <member name="P:AlphaTab.Settings.Staves">

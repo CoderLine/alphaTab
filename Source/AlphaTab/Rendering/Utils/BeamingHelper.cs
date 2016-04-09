@@ -81,6 +81,11 @@ namespace AlphaTab.Rendering.Utils
         public bool HasTuplet { get; private set; }
 
         /// <summary>
+        /// the number of fingering indicators that will be drawn
+        /// </summary>
+        public int FingeringCount { get; set; }
+
+        /// <summary>
         /// the first min note within this group
         /// </summary>
         public Note FirstMinNote { get; set; }
@@ -179,6 +184,12 @@ namespace AlphaTab.Rendering.Utils
                 {
                     return BeamDirection.Up;
                 }
+
+                if (Beats.Count == 1 && Beats[0].Duration == Duration.Whole)
+                {
+                    return BeamDirection.Up;
+                }
+
                 // the average key is used for determination
                 //      key lowerequal than middle line -> up
                 //      key higher than middle line -> down
@@ -209,6 +220,22 @@ namespace AlphaTab.Rendering.Utils
             {
                 _lastBeat = beat;
                 Beats.Add(beat);
+
+                int fingeringCount = 0;
+                for (var n = 0; n < beat.Notes.Count; n++)
+                {
+                    var note = beat.Notes[n];
+                    if (note.LeftHandFinger != Fingers.Unknown ||  note.RightHandFinger != Fingers.Unknown)
+                    {
+                        fingeringCount++;
+                    }
+                }
+
+                if (fingeringCount > FingeringCount)
+                {
+                    FingeringCount = fingeringCount;
+                }
+
                 CheckNote(beat.MinNote);
                 CheckNote(beat.MaxNote);
                 if (MaxDuration < beat.Duration)
