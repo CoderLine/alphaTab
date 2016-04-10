@@ -61,6 +61,7 @@ namespace AlphaTab.Platform.JavaScript
                 CanvasElement = (HtmlElement)document.createElement("div");
 
                 CanvasElement.className = "alphaTabSurface";
+                CanvasElement.style.fontSize = "0";
                 element.appendChild(CanvasElement);
 
                 #endregion
