@@ -551,6 +551,7 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
         }
         this.CanvasElement = document.createElement("div");
         this.CanvasElement.className = "alphaTabSurface";
+        this.CanvasElement.style.fontSize = "0";
         element.appendChild(this.CanvasElement);
     }
     this.Renderer = this.CreateScoreRenderer(settings, options, this.CanvasElement);

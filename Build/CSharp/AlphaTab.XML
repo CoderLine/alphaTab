@@ -1193,6 +1193,11 @@
             stores the X-positions for beat indices
             </summary>
         </member>
+        <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.FingeringCount">
+            <summary>
+            the number of fingering indicators that will be drawn
+            </summary>
+        </member>
         <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.FirstMinNote">
             <summary>
             the first min note within this group
