@@ -343,6 +343,10 @@ namespace AlphaTab.Audio.Generator
             {
                 return (duration / 2);
             }
+            if (note.IsTieOrigin) 
+            {
+                return GetTieOriginNoteDuration(note);
+            }
             return duration;
         }
 
@@ -350,6 +354,30 @@ namespace AlphaTab.Audio.Generator
         {
             var value = (_currentTempo * duration) / 60;
             return Math.Min(value, maximum);
+        }
+
+        private int GetTieOriginNoteDuration(Note startNote) {
+            int duration = 0;
+
+            Note note = startNote;
+            for (Beat beat = note.Beat; ; beat = beat.NextBeat) 
+            {
+                duration += beat.Duration.ToTicks();
+
+                Note destination = note.TieDestination;
+                if (beat == destination.Beat) 
+                {
+                    if (destination.IsTieOrigin)
+                    {
+                        note = destination;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            return duration;
         }
 
         private DynamicValue GetDynamicValue(Note note)
