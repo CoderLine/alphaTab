@@ -351,6 +351,24 @@ namespace AlphaTab.Audio.Generator
             {
                 return (duration / 2);
             }
+            if (note.IsTieOrigin)
+            {
+                var endNote = note.TieDestination;
+
+                // for the initial start of the tie calculate absolute duration from start to end note
+                if (!note.IsTieDestination)
+                {
+                    var startTick = note.Beat.AbsoluteStart;
+                    var endTick = endNote.Beat.AbsoluteStart + GetNoteDuration(endNote, endNote.Beat.CalculateDuration());
+                    return endTick - startTick;
+                }
+                else
+                {
+                    // for continuing ties, take the current duration + the one from the destination 
+                    // this branch will be entered as part of the recusion of the if branch
+                    return duration + GetNoteDuration(endNote, endNote.Beat.CalculateDuration());
+                }
+            }
             return duration;
         }
 
