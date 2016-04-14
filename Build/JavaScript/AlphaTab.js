@@ -1921,6 +1921,20 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
         if (note.IsStaccato){
             return ((duration / 2) | 0);
         }
+        if (note.IsTieOrigin){
+            var endNote = note.TieDestination;
+            // for the initial start of the tie calculate absolute duration from start to end note
+            if (!note.IsTieDestination){
+                var startTick = note.Beat.get_AbsoluteStart();
+                var endTick = endNote.Beat.get_AbsoluteStart() + this.GetNoteDuration(endNote, endNote.Beat.CalculateDuration());
+                return endTick - startTick;
+            }
+            else {
+                // for continuing ties, take the current duration + the one from the destination 
+                // this branch will be entered as part of the recusion of the if branch
+                return duration + this.GetNoteDuration(endNote, endNote.Beat.CalculateDuration());
+            }
+        }
         return duration;
     },
     ApplyStaticDuration: function (duration, maximum){
