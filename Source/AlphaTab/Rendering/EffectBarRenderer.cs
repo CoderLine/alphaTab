@@ -60,28 +60,30 @@ namespace AlphaTab.Rendering
             IsEmpty = true;
 
 #if MULTIVOICE_SUPPORT
-        foreach (var v in Bar.Voices)
-        {
-            Glyph prevGlyph = null;
-            if (Index > 0)
+            for (int v = 0; v < Bar.Voices.Count; v++)
             {
-                // check if previous renderer had an effect on his last beat
-                // and use this as merging element
-                EffectBarRenderer prevRenderer = (EffectBarRenderer) Staff.BarRenderers[Index - 1];
-                if (prevRenderer._lastBeat != null)
+                var voice = Bar.Voices[v];
+                EffectGlyph prevGlyph = null;
+                if (Index > 0)
                 {
-                    prevGlyph = prevRenderer._effectGlyphs[v.Index][prevRenderer._lastBeat.Index];
+                    // check if previous renderer had an effect on his last beat
+                    // and use this as merging element
+                    var prevRenderer = (EffectBarRenderer) Staff.BarRenderers[Index - 1];
+                    if (prevRenderer._lastBeat != null)
+                    {
+                        prevGlyph = prevRenderer._effectGlyphs[voice.Index][prevRenderer._lastBeat.Index];
+                    }
                 }
-            }
-            foreach (var beatIndex in _effectGlyphs[v.Index].Keys)
-            {
-                Glyph effect = _effectGlyphs[v.Index][beatIndex];
+                foreach (var key in _effectGlyphs[voice.Index].Keys)
+                {
+                    var beatIndex = Std.ParseInt(key);
+                    var effect = _effectGlyphs[voice.Index][beatIndex];
                 
-                AlignGlyph(_info.SizingMode, beatIndex, 0, prevGlyph);
+                    AlignGlyph(_info.SizingMode, beatIndex, voice.Index, prevGlyph);
                 
-                prevGlyph = effect;
-                IsEmpty = false;
-            }
+                    prevGlyph = effect;
+                    IsEmpty = false;
+                }
             
         }
 #else
@@ -237,11 +239,12 @@ namespace AlphaTab.Rendering
         protected override void CreateBeatGlyphs()
         {
 #if MULTIVOICE_SUPPORT
-            foreach (var v in Bar.Voices)
+            for (int v = 0; v < Bar.Voices.Count; v++)
             {
+                var voice = Bar.Voices[v];
                 _effectGlyphs.Add(new FastDictionary<int, EffectGlyph>());
                 _uniqueEffectGlyphs.Add(new FastList<EffectGlyph>());
-                CreateVoiceGlyphs(v);
+                CreateVoiceGlyphs(voice);
             }
 #else
             _effectGlyphs.Add(new FastDictionary<int, EffectGlyph>());

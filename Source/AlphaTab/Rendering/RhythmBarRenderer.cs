@@ -44,10 +44,10 @@ namespace AlphaTab.Rendering
         protected override void CreateBeatGlyphs()
         {
 #if MULTIVOICE_SUPPORT
-        foreach (var v in Bar.Voices)
-        {
-            CreateVoiceGlyphs(v);
-        }
+            for (int v = 0; v < Bar.Voices.Count; v++)
+            {
+                CreateVoiceGlyphs(Bar.Voices[v]);
+            }
 #else
             CreateVoiceGlyphs(Bar.Voices[0]);
 #endif

@@ -1384,6 +1384,7 @@ namespace AlphaTab.Importer
                     }
                     else
                     {
+
                         // no bar for track
                         trackIndex++;
                     }

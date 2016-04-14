@@ -68,7 +68,6 @@ namespace AlphaTab.Rendering
 
         public virtual void ApplyBarSpacing(float spacing)
         {
-
         }
 
         public RenderingResources Resources
@@ -134,7 +133,7 @@ namespace AlphaTab.Rendering
 
         public virtual void ApplySizes(BarSizeInfo sizes)
         {
-
+            Width = sizes.FullWidth;
         }
 
         public virtual void FinalizeRenderer(ScoreLayout layout)

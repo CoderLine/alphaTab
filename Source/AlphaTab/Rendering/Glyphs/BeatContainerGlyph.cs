@@ -25,7 +25,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class BeatContainerGlyph : Glyph, ISupportsFinalize
     {
-        //private static readonly int[] SizeTable = { 82, 43, 30, 22, 18, 14, 14 };
+        private static readonly int[] SizeTable = { 82, 43, 30, 22, 18, 14, 14 };
 
         public Beat Beat { get; set; }
         public BeatGlyphBase PreNotes { get; set; }
@@ -89,14 +89,7 @@ namespace AlphaTab.Rendering.Glyphs
         private float CalculateWidth()
         {
 #if MULTIVOICE_SUPPORT
-            var index = Beat.Duration.GetIndex();
-            var minIndex = Beat.Voice.Bar.MinDuration.GetValueOrDefault().GetIndex();
-            var minDurationSize = SizeTable[minIndex];
-            while (index < minIndex)
-            {
-                minDurationSize *= 2;
-            }
-            return minDurationSize;
+            return PostNotes.X + PostNotes.Width;
 #else
             return PostNotes.X + PostNotes.Width;
 #endif

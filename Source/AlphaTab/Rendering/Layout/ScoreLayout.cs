@@ -60,20 +60,20 @@ namespace AlphaTab.Rendering.Layout
             group.Layout = this;
 
             var isFirstTrack = true;
-            for (var i = 0; i < Renderer.Tracks.Length; i++)
+            for (var trackIndex = 0; trackIndex < Renderer.Tracks.Length; trackIndex++)
             {
-                var track = Renderer.Tracks[i];
-                for (var j = 0; j < Renderer.Settings.Staves.Count; j++)
+                var track = Renderer.Tracks[trackIndex];
+                for (int staveIndex = 0; staveIndex < track.Staves.Count; staveIndex++)
                 {
-                    var s = Renderer.Settings.Staves[j];
-                    if (Environment.StaveFactories.ContainsKey(s.Id))
+                    for (var renderStaveIndex = 0; renderStaveIndex < Renderer.Settings.Staves.Count; renderStaveIndex++)
                     {
-                        var factory = Environment.StaveFactories[s.Id](this);
-                        if (factory.CanCreate(track) && (isFirstTrack || !factory.HideOnMultiTrack))
+                        var s = Renderer.Settings.Staves[renderStaveIndex];
+                        if (Environment.StaveFactories.ContainsKey(s.Id))
                         {
-                            for (int k = 0; k < track.Staves.Count; k++)
+                            var factory = Environment.StaveFactories[s.Id](this);
+                            if (factory.CanCreate(track) && (isFirstTrack || !factory.HideOnMultiTrack) && (staveIndex == 0 || !factory.HideOnMultiTrack))
                             {
-                                group.AddStave(track, new Staff(track.Staves[k], s.Id, factory, s.AdditionalSettings));
+                                group.AddStave(track, new Staff(track.Staves[staveIndex], s.Id, factory, s.AdditionalSettings));
                             }
                         }
                     }

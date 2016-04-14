@@ -109,12 +109,23 @@ namespace AlphaTab.Rendering.Staves
 
         public void AddBar(Bar bar)
         {
-            var renderer = _factory.Create(bar);
+            BarRendererBase renderer;
+            if (bar == null)
+            {
+                renderer = new BarRendererBase(bar);
+            }
+            else
+            {
+                renderer = _factory.Create(bar);
+            }
             renderer.Staff = this;
             renderer.Index = BarRenderers.Count;
             renderer.DoLayout();
             BarRenderers.Add(renderer);
-            StaveGroup.Layout.RegisterBarRenderer(StaveId, bar.Index, renderer);
+            if (bar != null)
+            {
+                StaveGroup.Layout.RegisterBarRenderer(StaveId, bar.Index, renderer);
+            }
         }
 
         public void RevertLastBar()

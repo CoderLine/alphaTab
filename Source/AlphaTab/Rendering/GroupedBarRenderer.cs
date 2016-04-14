@@ -121,43 +121,44 @@ namespace AlphaTab.Rendering
 
         public override void ApplySizes(BarSizeInfo sizes)
         {
-            // if we need additional space in the preBeat group we simply
-            // add a new spacer
-            var preSize = sizes.GetSize(KeySizePre);
-            var preSizeDiff = preSize - BeatGlyphsStart;
-            if (preSizeDiff > 0)
-            {
-                AddPreBeatGlyph(new SpacingGlyph(0, 0, preSizeDiff));
-            }
+            //// if we need additional space in the preBeat group we simply
+            //// add a new spacer
+            //var preSize = sizes.GetSize(KeySizePre);
+            //var preSizeDiff = preSize - BeatGlyphsStart;
+            //if (preSizeDiff > 0)
+            //{
+            //    AddPreBeatGlyph(new SpacingGlyph(0, 0, preSizeDiff));
+            //}
 
-            // on beat glyphs we apply the glyph spacing
-            Std.Foreach(_voiceContainers.Values, c=>c.ApplySizes(sizes));
+            //// on beat glyphs we apply the glyph spacing
+            //Std.Foreach(_voiceContainers.Values, c=>c.ApplySizes(sizes));
 
-            // on the post glyphs we add the spacing before all other glyphs
-            var postSize = sizes.GetSize(KeySizePost);
-            float postSizeDiff;
-            if (_postBeatGlyphs.Count == 0)
-            {
-                postSizeDiff = postSize;
-            }
-            else
-            {
-                postSizeDiff = postSize - (_postBeatGlyphs[_postBeatGlyphs.Count - 1].X + _postBeatGlyphs[_postBeatGlyphs.Count - 1].Width);
-            }
+            //// on the post glyphs we add the spacing before all other glyphs
+            //var postSize = sizes.GetSize(KeySizePost);
+            //float postSizeDiff;
+            //if (_postBeatGlyphs.Count == 0)
+            //{
+            //    postSizeDiff = postSize;
+            //}
+            //else
+            //{
+            //    postSizeDiff = postSize - (_postBeatGlyphs[_postBeatGlyphs.Count - 1].X + _postBeatGlyphs[_postBeatGlyphs.Count - 1].Width);
+            //}
 
-            if (postSizeDiff > 0)
-            {
-                _postBeatGlyphs.Insert(0, new SpacingGlyph(0, 0, postSizeDiff));
-                for (var i = 0; i < _postBeatGlyphs.Count; i++)
-                {
-                    var g = _postBeatGlyphs[i];
-                    g.X = i == 0 ? 0 : _postBeatGlyphs[_postBeatGlyphs.Count - 1].X + _postBeatGlyphs[_postBeatGlyphs.Count - 1].Width;
-                    g.Index = i;
-                    g.Renderer = this;
-                }
-            }
+            //if (postSizeDiff > 0)
+            //{
+            //    _postBeatGlyphs.Insert(0, new SpacingGlyph(0, 0, postSizeDiff));
+            //    for (var i = 0; i < _postBeatGlyphs.Count; i++)
+            //    {
+            //        var g = _postBeatGlyphs[i];
+            //        g.X = i == 0 ? 0 : _postBeatGlyphs[_postBeatGlyphs.Count - 1].X + _postBeatGlyphs[_postBeatGlyphs.Count - 1].Width;
+            //        g.Index = i;
+            //        g.Renderer = this;
+            //    }
+            //}
 
-            UpdateWidth();
+            Width = sizes.FullWidth;
+            //UpdateWidth();
         }
 
         private void AddGlyph(FastList<Glyph> c, Glyph g)

@@ -36,59 +36,62 @@ namespace AlphaTab.Rendering.Utils
             BeamingHelper currentBeamHelper = null;
             TupletHelper currentTupletHelper = null;
 
-            for (int i = 0, j = bar.Voices.Count; i < j; i++)
+            if (bar != null)
             {
-                var v = bar.Voices[i];
-                BeamHelpers.Add(new FastList<BeamingHelper>());
-                BeamHelperLookup.Add(new FastDictionary<int, BeamingHelper>());
-                TupletHelpers.Add(new FastList<TupletHelper>());
-
-                for (int k = 0, l = v.Beats.Count; k < l; k++)
+                for (int i = 0, j = bar.Voices.Count; i < j; i++)
                 {
-                    var b = v.Beats[k];
-                    var newBeamingHelper = false;
+                    var v = bar.Voices[i];
+                    BeamHelpers.Add(new FastList<BeamingHelper>());
+                    BeamHelperLookup.Add(new FastDictionary<int, BeamingHelper>());
+                    TupletHelpers.Add(new FastList<TupletHelper>());
 
-                    if (!b.IsRest)
+                    for (int k = 0, l = v.Beats.Count; k < l; k++)
                     {
-                        // try to fit beam to current beamhelper
-                        if (currentBeamHelper == null || !currentBeamHelper.CheckBeat(b))
+                        var b = v.Beats[k];
+                        var newBeamingHelper = false;
+
+                        if (!b.IsRest)
                         {
-                            // if not possible, create the next beaming helper
-                            currentBeamHelper = new BeamingHelper(bar.Staff.Track);
-                            currentBeamHelper.CheckBeat(b);
-                            BeamHelpers[v.Index].Add(currentBeamHelper);
-                            newBeamingHelper = true;
+                            // try to fit beam to current beamhelper
+                            if (currentBeamHelper == null || !currentBeamHelper.CheckBeat(b))
+                            {
+                                // if not possible, create the next beaming helper
+                                currentBeamHelper = new BeamingHelper(bar.Staff.Track);
+                                currentBeamHelper.CheckBeat(b);
+                                BeamHelpers[v.Index].Add(currentBeamHelper);
+                                newBeamingHelper = true;
+                            }
                         }
+
+                        if (b.HasTuplet)
+                        {
+                            // try to fit tuplet to current tuplethelper
+                            // TODO: register tuplet overflow
+                            var previousBeat = b.PreviousBeat;
+
+                            // don't group if the previous beat isn't in the same voice
+                            if (previousBeat != null && previousBeat.Voice != b.Voice) previousBeat = null;
+
+                            // if a new beaming helper was started, we close our tuplet grouping as well
+                            if (newBeamingHelper && currentTupletHelper != null)
+                            {
+                                currentTupletHelper.Finish();
+                            }
+
+                            if (previousBeat == null || currentTupletHelper == null || !currentTupletHelper.Check(b))
+                            {
+                                currentTupletHelper = new TupletHelper(v.Index);
+                                currentTupletHelper.Check(b);
+                                TupletHelpers[v.Index].Add(currentTupletHelper);
+                            }
+                        }
+
+                        BeamHelperLookup[v.Index][b.Index] = currentBeamHelper;
                     }
 
-                    if (b.HasTuplet)
-                    {
-                        // try to fit tuplet to current tuplethelper
-                        // TODO: register tuplet overflow
-                        var previousBeat = b.PreviousBeat;
-
-                        // don't group if the previous beat isn't in the same voice
-                        if (previousBeat != null && previousBeat.Voice != b.Voice) previousBeat = null;
-
-                        // if a new beaming helper was started, we close our tuplet grouping as well
-                        if (newBeamingHelper && currentTupletHelper != null)
-                        {
-                            currentTupletHelper.Finish();
-                        }
-
-                        if (previousBeat == null || currentTupletHelper == null || !currentTupletHelper.Check(b))
-                        {
-                            currentTupletHelper = new TupletHelper(v.Index);
-                            currentTupletHelper.Check(b);
-                            TupletHelpers[v.Index].Add(currentTupletHelper);
-                        }
-                    }
-
-                    BeamHelperLookup[v.Index][b.Index] = currentBeamHelper;
+                    currentBeamHelper = null;
+                    currentTupletHelper = null;
                 }
-
-                currentBeamHelper = null;
-                currentTupletHelper = null;
             }
         }
     }
