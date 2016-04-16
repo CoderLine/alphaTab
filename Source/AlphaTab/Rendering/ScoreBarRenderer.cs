@@ -130,6 +130,10 @@ namespace AlphaTab.Rendering
                     {
                         maxNoteY -= GetStemSize(h.MaxDuration);
                         maxNoteY -= h.FingeringCount * Resources.GraceFont.Size;
+                        if (h.HasTuplet)
+                        {
+                            maxNoteY -= Resources.EffectFont.Size*2;
+                        }
                     }
 
                     if (h.HasTuplet)
@@ -144,7 +148,7 @@ namespace AlphaTab.Rendering
 
                     //
                     // min note (lowest) -> bottom overflow
-                    //
+                    //t
                     var minNoteY = GetScoreY(GetNoteLine(h.MinNote));
                     if (h.Direction == BeamDirection.Down)
                     {
@@ -241,16 +245,17 @@ namespace AlphaTab.Rendering
                 var firstBeat = h.Beats[0];
                 var lastBeat = h.Beats[h.Beats.Count - 1];
 
-                var beamingHelper = _helpers.BeamHelperLookup[h.VoiceIndex][firstBeat.Index];
-                if (beamingHelper != null)
+                var firstBeamingHelper = _helpers.BeamHelperLookup[h.VoiceIndex][firstBeat.Index];
+                var lastBeamingHelper = _helpers.BeamHelperLookup[h.VoiceIndex][lastBeat.Index];
+                if (firstBeamingHelper != null && lastBeamingHelper != null)
                 {
-                    var direction = beamingHelper.Direction;
+                    var direction = firstBeamingHelper.Direction;
 
                     // 
                     // Calculate the overall area of the tuplet bracket
 
-                    var startX = beamingHelper.GetBeatLineX(firstBeat) + Scale;
-                    var endX = beamingHelper.GetBeatLineX(lastBeat) + Scale;
+                    var startX = firstBeamingHelper.GetBeatLineX(firstBeat) + Scale;
+                    var endX = lastBeamingHelper.GetBeatLineX(lastBeat) + Scale;
 
                     //
                     // Calculate how many space the text will need
@@ -268,11 +273,11 @@ namespace AlphaTab.Rendering
                     //
                     // calculate the y positions for our bracket
 
-                    var startY = CalculateBeamY(beamingHelper, startX);
-                    var offset1Y = CalculateBeamY(beamingHelper, offset1X);
-                    var middleY = CalculateBeamY(beamingHelper, middleX);
-                    var offset2Y = CalculateBeamY(beamingHelper, offset2X);
-                    var endY = CalculateBeamY(beamingHelper, endX);
+                    var startY = CalculateBeamY(firstBeamingHelper, startX);
+                    var offset1Y = CalculateBeamY(firstBeamingHelper, offset1X);
+                    var middleY = CalculateBeamY(firstBeamingHelper, middleX);
+                    var offset2Y = CalculateBeamY(lastBeamingHelper, offset2X);
+                    var endY = CalculateBeamY(lastBeamingHelper, endX);
 
                     var offset = 10 * Scale;
                     var size = 5 * Scale;

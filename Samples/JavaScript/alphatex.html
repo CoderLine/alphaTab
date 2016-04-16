@@ -201,6 +201,20 @@
             $('#alphaTabDurationRanges').alphaTab();
         </script>
         
+        
+        <h2>Repeat beats</h2>
+        
+        <p>
+            You can specify a multiplier after a beat to add the same beat multiple times to the score. 
+        </p>
+        
+        <div id="alphaTabBeatMultiplier" data-tex="true">
+        3.3*4 | 4.3*4
+        </div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabBeatMultiplier').alphaTab();
+        </script>
+        
     </div>
             
     
@@ -298,7 +312,77 @@
         </script>
         
     </div>
-            
+        
+    <div id="beateffects" class="group">
+        <h1>Beat Effects</h1>
+        
+        <p>
+            There are various effects that can be applied to a beat. All beat
+            effects are specified in braces after the beat. 
+            <code>Beat{Effects}</code>
+        </p>    
+        
+        <h2>Simple Effects</h2>
+        
+        <p>
+            Please find the list of support effects in the example below. 
+        </p>
+        
+        <div id="alphaTabBeatEffects" data-tex="true">
+        // fade in
+        3.3{f}
+        // vibrato
+        3.3{v}
+        // slap
+        3.3{s}
+        // pop
+        3.3{p} 
+        |
+        // dotted 
+        3.3{d}
+        // double dotted
+        3.3{dd}
+        // pick stroke (su => up, sd => down)
+        3.3{su}
+        3.3{sd}
+        |
+        // grace (on beat)
+        3.3{gr ob}
+        3.3
+        // grace (before beat)
+        3.3{gr}
+        3.3
+        |
+        // Tuplets (supported variants: 3,5,6,7,9,10,11,12)
+        3.3{tu 3} 3.3{tu 3} 3.3{tu 3}
+        3.3{tu 5} 3.3{tu 5} 3.3{tu 5} 3.3{tu 5} 3.3{tu 5}
+        |
+        // tremolo picking (`tp duration` where duration can be 8,16 or 32)
+        3.3{tp 8} 3.3{tp 16} 3.3{tp 32}
+        </div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabBeatEffects').alphaTab();
+        </script>
+        
+        <h2>Tremolo / Whammy Bar</h2>
+        
+        <p>
+            The tremolo/whammy bar effect is a bit more complex than the others. 
+            You can specify a number of values which are evenly distributed over the
+            time when the note is played. The values indicate the number of quarter notes
+            increased or decreased on playing. <code>\tb (value1 value2 ...)</code>
+        </p>
+        
+        <div id="alphaTabBeatWhammy" data-tex="true">
+        3.3.1{tb (0 4 0 8)} |
+        3.3.1{tb (0 -4 0 -8)} |
+        </div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabBeatWhammy').alphaTab();
+        </script>
+    </div>
+
+        
     <!-- Demo Scripts -->    
     <script type="text/javascript" src="support/demo.js"></script>
     <script type="text/javascript" src="support/prism.js"></script>

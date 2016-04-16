@@ -892,36 +892,37 @@ namespace AlphaTab.Importer
                 switch (tuplet)
                 {
                     case 3:
-                        beat.TupletDenominator = 3;
-                        beat.TupletNumerator = 2;
+                        beat.TupletNumerator = 3;
+                        beat.TupletDenominator = 2;
                         break;
                     case 5:
-                        beat.TupletDenominator = 5;
-                        beat.TupletNumerator = 4;
+                        beat.TupletNumerator = 5;
+                        beat.TupletDenominator = 4;
                         break;
                     case 6:
-                        beat.TupletDenominator = 6;
-                        beat.TupletNumerator = 4;
+                        beat.TupletNumerator = 6;
+                        beat.TupletDenominator = 4;
                         break;
                     case 7:
-                        beat.TupletDenominator = 7;
-                        beat.TupletNumerator = 4;
+                        beat.TupletNumerator = 7;
+                        beat.TupletDenominator = 4;
                         break;
                     case 9:
-                        beat.TupletDenominator = 9;
-                        beat.TupletNumerator = 8;
+                        beat.TupletNumerator = 9;
+                        beat.TupletDenominator = 8;
                         break;
                     case 10:
-                        beat.TupletDenominator = 10;
-                        beat.TupletNumerator = 8;
+                        beat.TupletNumerator = 10;
+                        beat.TupletDenominator = 8;
                         break;
                     case 11:
-                        beat.TupletDenominator = 11;
-                        beat.TupletNumerator = 8;
+                        beat.TupletNumerator = 11;
+                        beat.TupletDenominator = 8;
                         break;
                     case 12:
-                        beat.TupletDenominator = 12;
+                        beat.TupletNumerator = 12;
                         beat.TupletNumerator = 8;
+                        beat.TupletDenominator = 8;
                         break;
                 }
                 NewSy();
@@ -1049,6 +1050,8 @@ namespace AlphaTab.Importer
                     NewSy();
                 }
                 beat.TremoloSpeed = duration;
+
+                return true;
             }
 
             return false;
