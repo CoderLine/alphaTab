@@ -71,7 +71,7 @@ namespace AlphaTab.Rendering.Utils
                         if (previousBeat != null && previousBeat.Voice != b.Voice) previousBeat = null;
 
                         // if a new beaming helper was started, we close our tuplet grouping as well
-                        if (newBeamingHelper && currentTupletHelper != null)
+                        if (newBeamingHelper && b.Duration > Duration.Quarter && currentTupletHelper != null)
                         {
                             currentTupletHelper.Finish();
                         }

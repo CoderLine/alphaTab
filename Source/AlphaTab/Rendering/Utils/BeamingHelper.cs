@@ -84,6 +84,11 @@ namespace AlphaTab.Rendering.Utils
         public int FingeringCount { get; set; }
 
         /// <summary>
+        /// an indicator whether any beat has a tuplet on it. 
+        /// </summary>
+        public bool HasTuplet { get; set; }
+
+        /// <summary>
         /// the first min note within this group
         /// </summary>
         public Note FirstMinNote { get; set; }
@@ -218,6 +223,11 @@ namespace AlphaTab.Rendering.Utils
             {
                 _lastBeat = beat;
                 Beats.Add(beat);
+
+                if (beat.HasTuplet)
+                {
+                    HasTuplet = true;
+                }
 
                 int fingeringCount = 0;
                 for (var n = 0; n < beat.Notes.Count; n++)

@@ -3736,36 +3736,37 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             var tuplet = (this._syData);
             switch (tuplet){
                 case 3:
-                    beat.TupletDenominator = 3;
-                    beat.TupletNumerator = 2;
+                    beat.TupletNumerator = 3;
+                    beat.TupletDenominator = 2;
                     break;
                 case 5:
-                    beat.TupletDenominator = 5;
-                    beat.TupletNumerator = 4;
+                    beat.TupletNumerator = 5;
+                    beat.TupletDenominator = 4;
                     break;
                 case 6:
-                    beat.TupletDenominator = 6;
-                    beat.TupletNumerator = 4;
+                    beat.TupletNumerator = 6;
+                    beat.TupletDenominator = 4;
                     break;
                 case 7:
-                    beat.TupletDenominator = 7;
-                    beat.TupletNumerator = 4;
+                    beat.TupletNumerator = 7;
+                    beat.TupletDenominator = 4;
                     break;
                 case 9:
-                    beat.TupletDenominator = 9;
-                    beat.TupletNumerator = 8;
+                    beat.TupletNumerator = 9;
+                    beat.TupletDenominator = 8;
                     break;
                 case 10:
-                    beat.TupletDenominator = 10;
-                    beat.TupletNumerator = 8;
+                    beat.TupletNumerator = 10;
+                    beat.TupletDenominator = 8;
                     break;
                 case 11:
-                    beat.TupletDenominator = 11;
-                    beat.TupletNumerator = 8;
+                    beat.TupletNumerator = 11;
+                    beat.TupletDenominator = 8;
                     break;
                 case 12:
-                    beat.TupletDenominator = 12;
+                    beat.TupletNumerator = 12;
                     beat.TupletNumerator = 8;
+                    beat.TupletDenominator = 8;
                     break;
             }
             this.NewSy();
@@ -3866,6 +3867,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 this.NewSy();
             }
             beat.TremoloSpeed = duration;
+            return true;
         }
         return false;
     },
@@ -13719,13 +13721,16 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
                 if (h.get_Direction() == AlphaTab.Rendering.Utils.BeamDirection.Up){
                     maxNoteY -= this.GetStemSize(h.MaxDuration);
                     maxNoteY -= h.FingeringCount * this.get_Resources().GraceFont.Size;
+                    if (h.HasTuplet){
+                        maxNoteY -= this.get_Resources().EffectFont.Size * 2;
+                    }
                 }
                 if (maxNoteY < top){
                     this.RegisterOverflowTop(Math.abs(maxNoteY));
                 }
                 //
                 // min note (lowest) -> bottom overflow
-                //
+                //t
                 var minNoteY = this.GetScoreY(this.GetNoteLine(h.MinNote), 0);
                 if (h.get_Direction() == AlphaTab.Rendering.Utils.BeamDirection.Down){
                     minNoteY += this.GetStemSize(h.MaxDuration);
@@ -13791,13 +13796,14 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
         else {
             var firstBeat = h.Beats[0];
             var lastBeat = h.Beats[h.Beats.length - 1];
-            var beamingHelper = this._helpers.BeamHelperLookup[h.VoiceIndex][firstBeat.Index];
-            if (beamingHelper != null){
-                var direction = beamingHelper.get_Direction();
+            var firstBeamingHelper = this._helpers.BeamHelperLookup[h.VoiceIndex][firstBeat.Index];
+            var lastBeamingHelper = this._helpers.BeamHelperLookup[h.VoiceIndex][lastBeat.Index];
+            if (firstBeamingHelper != null && lastBeamingHelper != null){
+                var direction = firstBeamingHelper.get_Direction();
                 // 
                 // Calculate the overall area of the tuplet bracket
-                var startX = beamingHelper.GetBeatLineX(firstBeat) + this.get_Scale();
-                var endX = beamingHelper.GetBeatLineX(lastBeat) + this.get_Scale();
+                var startX = firstBeamingHelper.GetBeatLineX(firstBeat) + this.get_Scale();
+                var endX = lastBeamingHelper.GetBeatLineX(lastBeat) + this.get_Scale();
                 //
                 // Calculate how many space the text will need
                 canvas.set_Font(res.EffectFont);
@@ -13811,11 +13817,11 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
                 var offset2X = middleX + sw / 2 + sp;
                 //
                 // calculate the y positions for our bracket
-                var startY = this.CalculateBeamY(beamingHelper, startX);
-                var offset1Y = this.CalculateBeamY(beamingHelper, offset1X);
-                var middleY = this.CalculateBeamY(beamingHelper, middleX);
-                var offset2Y = this.CalculateBeamY(beamingHelper, offset2X);
-                var endY = this.CalculateBeamY(beamingHelper, endX);
+                var startY = this.CalculateBeamY(firstBeamingHelper, startX);
+                var offset1Y = this.CalculateBeamY(firstBeamingHelper, offset1X);
+                var middleY = this.CalculateBeamY(firstBeamingHelper, middleX);
+                var offset2Y = this.CalculateBeamY(lastBeamingHelper, offset2X);
+                var endY = this.CalculateBeamY(lastBeamingHelper, endX);
                 var offset = 10 * this.get_Scale();
                 var size = 5 * this.get_Scale();
                 if (direction == AlphaTab.Rendering.Utils.BeamDirection.Down){
@@ -15070,7 +15076,7 @@ AlphaTab.Rendering.Utils.BarHelpers = function (bar){
                 if (previousBeat != null && previousBeat.Voice != b.Voice)
                     previousBeat = null;
                 // if a new beaming helper was started, we close our tuplet grouping as well
-                if (newBeamingHelper && currentTupletHelper != null){
+                if (newBeamingHelper && b.Duration > AlphaTab.Model.Duration.Quarter && currentTupletHelper != null){
                     currentTupletHelper.Finish();
                 }
                 if (previousBeat == null || currentTupletHelper == null || !currentTupletHelper.Check(b)){
@@ -15130,6 +15136,7 @@ AlphaTab.Rendering.Utils.BeamingHelper = function (track){
     this.Beats = null;
     this.MaxDuration = AlphaTab.Model.Duration.Whole;
     this.FingeringCount = 0;
+    this.HasTuplet = false;
     this.FirstMinNote = null;
     this.FirstMaxNote = null;
     this.LastMinNote = null;
@@ -15195,6 +15202,9 @@ AlphaTab.Rendering.Utils.BeamingHelper.prototype = {
         if (add){
             this._lastBeat = beat;
             this.Beats.push(beat);
+            if (beat.get_HasTuplet()){
+                this.HasTuplet = true;
+            }
             var fingeringCount = 0;
             for (var n = 0; n < beat.Notes.length; n++){
                 var note = beat.Notes[n];
