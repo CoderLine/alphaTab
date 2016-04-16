@@ -71,14 +71,23 @@ namespace AlphaTab.Rendering.Glyphs
             // either can draw till the end note, or we just can draw till the bar end
             if (!_forEnd)
             {
-                // bar break or line break: to bar end
+                // line break or bar break
                 if (startNoteRenderer != endNoteRenderer)
                 {
-                    // TODO: expand tie to next bar if possible, currently we draw a tie till the 
-                    // bar end if we have different bars
-
                     startX = cx + startNoteRenderer.GetNoteX(StartNote);
-                    endX = cx + parent.X + parent.PostNotes.X + parent.PostNotes.Width;
+
+                    // line break: to bar end
+                    if (endNoteRenderer == null || startNoteRenderer.Stave != endNoteRenderer.Stave)
+                    {
+                        endX = cx + parent.X + parent.PostNotes.X + parent.PostNotes.Width;
+                    }
+                    // bar break: to tie destination 
+                    // differs only by addition of EndNote X coordinate
+                    else
+                    {
+                        endX = cx + parent.X + parent.PostNotes.X + parent.PostNotes.Width;
+                        endX += endNoteRenderer.GetNoteX(EndNote);
+                    }
 
                     startY = cy + startNoteRenderer.GetNoteY(StartNote) + YOffset;
                     endY = startY;

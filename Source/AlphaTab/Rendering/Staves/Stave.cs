@@ -115,7 +115,10 @@ namespace AlphaTab.Rendering.Staves
 
         public void RevertLastBar()
         {
+            var lastBar = BarRenderers[BarRenderers.Count - 1];
             BarRenderers.RemoveAt(BarRenderers.Count - 1);
+            StaveGroup.Layout.UnregisterBarRenderer(StaveId, lastBar.Bar.Index);
+
         }
 
         public void ApplyBarSpacing(float spacing)

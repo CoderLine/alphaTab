@@ -961,33 +961,23 @@ AlphaTab.Platform.JavaScript.JsApi.prototype = {
         return new AlphaTab.Rendering.ScoreRenderer(settings, canvasElement);
     },
     Load: function (data){
-        try{
-            if ((data instanceof ArrayBuffer)){
-                this.ScoreLoaded(AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(new Uint8Array(data)));
-            }
-            else if ((data instanceof Uint8Array)){
-                this.ScoreLoaded(AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(data));
-            }
-            else if (typeof(data) == "string"){
-                AlphaTab.Importer.ScoreLoader.LoadScoreAsync(data, $CreateDelegate(this, this.ScoreLoaded), $CreateAnonymousDelegate(this, function (e){
-                    console.error(e);
-                }));
-            }
+        if ((data instanceof ArrayBuffer)){
+            this.ScoreLoaded(AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(new Uint8Array(data)));
         }
-        catch(e){
-            console.error(e);
+        else if ((data instanceof Uint8Array)){
+            this.ScoreLoaded(AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(data));
+        }
+        else if (typeof(data) == "string"){
+            AlphaTab.Importer.ScoreLoader.LoadScoreAsync(data, $CreateDelegate(this, this.ScoreLoaded), $CreateAnonymousDelegate(this, function (e){
+                console.error(e);
+            }));
         }
     },
     Tex: function (contents){
-        try{
-            var parser = new AlphaTab.Importer.AlphaTexImporter();
-            var data = AlphaTab.IO.ByteBuffer.FromBuffer(AlphaTab.Platform.Std.StringToByteArray(contents));
-            parser.Init(data);
-            this.ScoreLoaded(parser.ReadScore());
-        }
-        catch(e){
-            console.error(e);
-        }
+        var parser = new AlphaTab.Importer.AlphaTexImporter();
+        var data = AlphaTab.IO.ByteBuffer.FromBuffer(AlphaTab.Platform.Std.StringToByteArray(contents));
+        parser.Init(data);
+        this.ScoreLoaded(parser.ReadScore());
     },
     Render: function (){
         if (this.Renderer != null){
@@ -11697,12 +11687,17 @@ AlphaTab.Rendering.Glyphs.TieGlyph.prototype = {
         // if we are on the tie start, we check if we 
         // either can draw till the end note, or we just can draw till the bar end
         if (!this._forEnd){
-            // bar break or line break: to bar end
+            // line break or bar break
             if (startNoteRenderer != endNoteRenderer){
-                // TODO: expand tie to next bar if possible, currently we draw a tie till the 
-                // bar end if we have different bars
                 startX = cx + startNoteRenderer.GetNoteX(this.StartNote, true);
-                endX = cx + parent.X + parent.PostNotes.X + parent.PostNotes.Width;
+                // line break: to bar end
+                if (endNoteRenderer == null || startNoteRenderer.Stave != endNoteRenderer.Stave){
+                    endX = cx + parent.X + parent.PostNotes.X + parent.PostNotes.Width;
+                }
+                else {
+                    endX = cx + parent.X + parent.PostNotes.X + parent.PostNotes.Width;
+                    endX += endNoteRenderer.GetNoteX(this.EndNote, true);
+                }
                 startY = cy + startNoteRenderer.GetNoteY(this.StartNote) + this.YOffset;
                 endY = startY;
             }
@@ -12560,6 +12555,12 @@ AlphaTab.Rendering.Layout.ScoreLayout.prototype = {
             this._barRendererLookup[key] = {};
         }
         this._barRendererLookup[key][index] = renderer;
+    },
+    UnregisterBarRenderer: function (key, index){
+        if (this._barRendererLookup.hasOwnProperty(key)){
+            var lookup = this._barRendererLookup[key];
+            delete lookup[index];
+        }
     },
     GetRendererForBar: function (key, index){
         if (this._barRendererLookup.hasOwnProperty(key) && this._barRendererLookup[key].hasOwnProperty(index)){
@@ -13982,7 +13983,9 @@ AlphaTab.Rendering.Staves.Stave.prototype = {
         this.StaveGroup.Layout.RegisterBarRenderer(this.StaveId, bar.Index, renderer);
     },
     RevertLastBar: function (){
+        var lastBar = this.BarRenderers[this.BarRenderers.length - 1];
         this.BarRenderers.splice(this.BarRenderers.length - 1,1);
+        this.StaveGroup.Layout.UnregisterBarRenderer(this.StaveId, lastBar.Bar.Index);
     },
     ApplyBarSpacing: function (spacing){
         for (var i = 0,j = this.BarRenderers.length; i < j; i++){

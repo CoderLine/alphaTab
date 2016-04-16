@@ -89,6 +89,15 @@ namespace AlphaTab.Rendering.Layout
             _barRendererLookup[key][index] = renderer;
         }
 
+        public void UnregisterBarRenderer(string key, int index)
+        {
+            if (_barRendererLookup.ContainsKey(key))
+            {
+                var lookup = _barRendererLookup[key];
+                lookup.Remove(index);
+            }
+        }
+
         public BarRendererBase GetRendererForBar(string key, int index)
         {
             if (_barRendererLookup.ContainsKey(key) && _barRendererLookup[key].ContainsKey(index))
