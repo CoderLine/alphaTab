@@ -64,40 +64,26 @@ namespace AlphaTab.Platform.JavaScript
 
         public override void Load(object data)
         {
-            try
+            if (Std.InstanceOf<ArrayBuffer>(data))
             {
-                if (Std.InstanceOf<ArrayBuffer>(data))
-                {
-                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes(Std.ArrayBufferToByteArray((ArrayBuffer)data)));
-                }
-                else if (Std.InstanceOf<Uint8Array>(data))
-                {
-                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes((byte[])data));
-                }
-                else if (JsTypeOf(data) == JsTypes.@string)
-                {
-                    ScoreLoader.LoadScoreAsync((string)data, ScoreLoaded, e => console.error(e));
-                }
+                ScoreLoaded(ScoreLoader.LoadScoreFromBytes(Std.ArrayBufferToByteArray((ArrayBuffer)data)));
             }
-            catch (Exception e)
+            else if (Std.InstanceOf<Uint8Array>(data))
             {
-                console.error(e);
+                ScoreLoaded(ScoreLoader.LoadScoreFromBytes((byte[])data));
+            }
+            else if (JsTypeOf(data) == JsTypes.@string)
+            {
+                ScoreLoader.LoadScoreAsync((string)data, ScoreLoaded, e => console.error(e));
             }
         }
 
         public override void Tex(string contents)
         {
-            try
-            {
-                var parser = new AlphaTexImporter();
-                var data = ByteBuffer.FromBuffer(Std.StringToByteArray(contents));
-                parser.Init(data);
-                ScoreLoaded(parser.ReadScore());
-            }
-            catch (Exception e)
-            {
-                console.error(e);
-            }
+            var parser = new AlphaTexImporter();
+            var data = ByteBuffer.FromBuffer(Std.StringToByteArray(contents));
+            parser.Init(data);
+            ScoreLoaded(parser.ReadScore());
         }
 
         public override void Render()
