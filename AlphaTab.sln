@@ -23,6 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		Build\JavaScript\AlphaTab.css = Build\JavaScript\AlphaTab.css
 		Build\JavaScript\jquery.alphaTab.js = Build\JavaScript\jquery.alphaTab.js
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{49FB227C-950C-49E1-8740-0ABBC3FF2942}"

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <!-- Styling of alphaTab -->
+    <style type="text/css">
+	.alphaTabSurface { box-shadow: 0 0 10px rgba(0,0,0,0.3); background:#FFF; border-radius:3px; }
+	</style>
+    
+    <!-- Including alphaTab -->
+    <script type="text/javascript" src="../../Build/JavaScript/AlphaTab.js"></script>
+    <link rel="stylesheet" href="../../Build/JavaScript/AlphaTab.css" />
+
+    <!-- jQuery Plugin -->
+    <script type="text/javascript" src="lib/jquery/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="../../Build/JavaScript/jquery.alphaTab.js"></script>
+
+    
+    <!-- Demo Styles -->
+    <link rel="stylesheet" href="support/gh-buttons.css" />
+    <link rel="stylesheet" href="support/demo.css" />
+    <link rel="stylesheet" href="support/prism.css" />
+    <link rel="stylesheet" href="support/alphaTexDemo.css" />
+    
+</head>
+<body>
+    <div id="menu" class="button-group">
+    </div>
+    
+    <div id="all" class="group">
+        <h1>Introduction</h1>
+        
+        <p>
+            In This section you find all details about how to write music notation using AlphaTex.
+            AlphaTex is a text format for writing music notation for AlphaTab. <br /> AlphaTex loading
+            can be enabled by specifying <code>data-tex="true"</code> on the container elmement. 
+            AlphaTab will load the tex code from the element contents and parse it. 
+        </p>
+        
+        <h2>Showcase</h2>
+        
+        <p>
+            Here is an example score fully rendered using alphaTex. 
+        </p>    
+        
+        <div id="alphaTabShowcase" data-tex="true">
+        \title "Lightning Flame Dragon Roaring"
+        \subtitle "Guitar Extended Cover"
+        \artist "Yasuharu Takanashi"
+        \album "Fairy Tail OST"
+        \music "Y. Takanashi"
+        \tempo 157
+        \tuning E5 B4 G4 D4 A3 D3\instrument 30
+        .
+        r.2 r.4 (11.6 11.5 11.4 ).4 {tbe (0 0 21 -16 21 -16 59 -32 )} |
+        13.2 .8 15.2 .8 15.2 .8 14.3 .8 13.2 .8 15.2 .16 13.2 .16 14.3 {v }.8 12.3 .8  |
+        14.3 {v }.4 15.4 .8 12.3 .8 14.3 .8 13.2 .8 14.3 .4  |
+        13.2 .8 15.2 .8 15.2 .8 14.3 .8 13.2 .8 15.2 .16 13.2 .16 14.3 {v }.8 13.2 .8  |
+        15.2 .8 14.3 .16 13.2 .16 14.3 .8 13.2 .8 15.2 .8 13.1 .8 12.1 {v }.4  |
+        13.2 .8 15.2 .8 15.2 .8 14.3 .8 13.2 .8 15.2 .16 13.2 .16 14.3 {v }.8 12.3 .8  |
+        14.3 {v }.4 15.4 .8 12.3 .8 14.3 .8 13.2 .8 14.3 .4  |
+        13.2 .8 15.2 .8 15.2 .8 14.3 .8 13.2 .8 15.2 .16 13.2 .16 14.3 {v }.8 13.2 .8  |
+        15.2 .8 14.3 .16 13.2 .16 14.3 .8 13.2 .8 15.2 .8 13.1 .8 12.1 {v }.4  |
+        13.2 .8 15.2 .8 15.2 .8 14.3 .8 13.2 .8 15.2 .16 13.2 .16 14.3 {v }.8 12.3 .8  |
+        14.3 {v }.4 15.4 .8 12.3 .8 14.3 .8 13.2 .8 14.3 .4  |
+        13.2 .8 15.2 .8 15.2 .8 14.3 .8 13.2 .8 15.2 .16 13.2 .16 14.3 {v }.8 13.2 .8  |
+        15.2 .8 14.3 .16 13.2 .16 14.3 .8 13.2 .8 15.2 .8 13.1 .8 12.1 {v }.4  |
+        0.6 {pm }.16 0.6 {pm }.16 0.6 {pm }.8 (8.5 {sl }10.3 {sl }).8 (7.5 9.3 ).8 0.6 {pm }.16 0.6 {pm }.16 0.6 {pm }.8 (5.4 {sl }8.2 {sl }).8 (7.4 10.2 ).8  |
+        0.6 {pm }.16 0.6 {pm }.16 0.6 {pm }.8 (8.5 {sl }10.3 {sl }).8 (7.5 9.3 ).8 0.6 {pm }.16 0.6 {pm }.16 0.6 {pm }.8 (8.4 {sl }11.2 {sl }).8 (7.4 10.2 ).8  |
+        0.6 {pm }.16 0.6 {pm }.16 0.6 {pm }.8 (8.5 {sl }10.3 {sl }).8 (7.5 9.3 ).8 0.6 {pm }.16 0.6 {pm }.16 0.6 {pm }.8 (5.4 {sl }8.2 {sl }).8 (7.4 10.2 ).8  |
+        0.6 {pm }.16 0.6 {pm }.16 0.6 {pm }.16 0.6 {pm }.16 (1.5 3.4 3.3 ).4 0.6 {pm }.16 0.6 {pm }.16 0.6 {pm }.16 0.6 {pm }.16 (3.5 5.4 5.3 ).4  |
+        0.6 {pm }.8 0.6 {pm }.8 (5.5 7.4 7.3 ).4 3.5 {pm }.8 3.5 {pm }.8 (3.5 5.4 5.3 ).4  |
+        0.6 {pm }.8 0.6 {pm }.8 (5.5 7.4 7.3 ).4 0.6 {pm }.8 0.6 {pm }.8 (5.5 7.4 7.3 ).4  |
+        0.6 {pm }.8 0.6 {pm }.8 (5.5 7.4 7.3 ).4 3.5 {pm }.8 3.5 {pm }.8 (3.5 5.4 5.3 ).4  |
+        3.6 {pm }.8 3.6 {pm }.8 (3.6 3.5 3.4 ).4 3.6 {pm }.8 3.6 {pm }.8 (3.6 3.5 3.4 ).4  |
+        (1.5 3.4 3.3 ).2 (3.6 3.5 3.4 ).2  |
+        3.5 {pm }.8 (3.5 5.4 5.3 ).8 3.5 {pm }.8 3.5 {pm }.8 (5.5 7.4 7.3 ).4 (7.3 7.4 5.5 ).4 {tbe (0 0 45 -4 )} |
+        1.5 {pm }.8 1.5 {pm }.8 (1.5 3.4 3.3 ).4 3.5 {pm }.8 3.5 {pm }.8 (3.5 5.4 5.3 ).4  |
+        (5.5 7.4 7.3 ).4 (3.5 5.4 5.3 ).4 (7.3 7.4 5.5 ).2  |
+        10.2 .8 12.4 .8 12.4 {v }.4 10.4 .8 12.4 .8 9.3 .8 12.3 .8  |
+        10.3 {h }.16 9.3 .16 10.3 {h }.16 12.3 .16 10.3 .8 9.3 .8 12.4 {v }.2  |
+        10.2 .8 12.4 .8 12.4 {v }.4 13.2 .8 15.2 .8 13.2 .8 11.2 .8  |
+        10.2 .8 10.2 {h }.16 11.2 .16 10.2 .8 12.3 .8 10.2 {v }.2  |
+        10.1 {v }.4 11.2 {v }.4 10.2 .8 11.2 .8 13.2 .8 14.3 .8  |
+        12.3 .8 12.3 .16 14.3 .16 12.3 .8 10.3 .8 14.3 {v }.4 12.4 {v }.4  |
+        12.4 .4 10.3 .8 9.3 .8 10.3 .8 10.3 .16 12.3 .16 10.3 .8 9.3 .8  |
+        12.4 {v }.4 10.4 .4 12.4 {v }.2  |
+        (1.5 3.4 3.3 ).8 1.5 {pm }.16 1.5 {pm }.16 (1.5 3.4 3.3 ).8 1.5 {pm }.16 1.5 {pm }.16 (1.5 3.4 3.3 ).8 1.5 {pm }.16 1.5 {pm }.16 (1.5 3.4 3.3 ).8 1.5 {pm }.16 1.5 {pm }.16  |
+        (3.6 3.5 3.4 ).8 3.6 {pm }.16 3.6 {pm }.16 (3.6 3.5 3.4 ).8 3.6 {pm }.16 3.6 {pm }.16 (3.6 3.5 3.4 ).8 3.6 {pm }.16 3.6 {pm }.16 (3.6 3.5 3.4 ).8 3.6 {pm }.16 3.6 {pm }.16  |
+        (3.5 5.4 5.3 ).8 3.5 {pm }.16 3.5 {pm }.16 (3.5 5.4 5.3 ).8 3.5 {pm }.16 3.5 {pm }.16 (3.5 5.4 5.3 ).8 3.5 {pm }.16 3.5 {pm }.16 (3.5 5.4 5.3 ).8 3.5 {pm }.16 3.5 {pm }.16  |
+        (5.5 7.4 7.3 ).8 5.5 {pm }.16 5.5 {pm }.16 (5.5 7.4 7.3 ).8 5.5 {pm }.16 5.5 {pm }.16 (5.5 7.4 7.3 ).8 5.5 {pm }.16 5.5 {pm }.16 (5.5 7.4 7.3 ).8 (5.5 {pm }7.4 7.3 ).8 {tbe (0 0 45 -4 )} |
+        11.2 .8 10.2 .8 11.2 .8 8.1 .8 10.1 {h }.16 12.1 .16 10.1 {h }.16 8.1 .16 10.2 .8 8.1 .8  |
+        8.2 .8 10.2 .8 8.1 .8 10.1 .8 10.2 {v }.2  |
+        10.3 .4 8.2 .4 10.2 .8 11.2 .8 10.2 .8 8.2 .8  |
+        11.4 .8 {d }9.3 .8 {d }10.2 .8 9.3 .8 {d }10.2 .8 {d }9.1 .8  |
+        r.1 
+        </div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabShowcase').alphaTab({
+                atRoot: '/Build/Javascript/',
+                useWorker: true
+            });
+        </script>
+            
+    </div>
+    
+    <div id="meta" class="group">
+        <h1>Metadata</h1>
+        
+        <p>
+            Metadata is specified using <code>\tagname value value</code> at the beginning of the score. 
+            It can be used to specify global information like title, tempo or track tuning. <br />
+            Metadata is optional, but if specified, it must be followed by a dot do indicate the end
+            of the metadata. 
+        </p>        
+        
+        <div id="alphaTabMeta" data-tex="true">
+        // Song information
+        \title "Song Title"
+        \subtitle Subtitle
+        \artist Artist
+        \album 'My Album' 
+        \words Daniel
+        \music alphaTab
+        \copyright Daniel
+        // Tempo in BPM
+        \tempo 200
+        // Instrument as General Midi number or name
+        \instrument 30 
+        // Capo fret
+        \capo 2
+        // String tuning starting at the most bottom string
+        \tuning e5 b4 g4 d4 a3 e3 
+        .        
+        </div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabMeta').alphaTab();
+        </script>
+        
+    </div>
+    
+    <div id="notes" class="group">
+        <h1>Notes</h1>
+        
+        <p>
+            The following examples show how to general notes. Multiple bars are
+            separated by <code>|</code>.
+        </p>       
+
+        <h2>Single notes and rests</h2>
+        
+        <p>
+            Notes follow the format <code>fret.string.duration</code>. For rests
+            the fret is simply replaced with <code>r</code>. The duration is specified
+            as a number where 1 represents a full note, 2 a half note and so on. 
+        </p>
+        
+        <div id="alphaTabNumbers" data-tex="true">
+        0.6.2 1.5.4 3.4.4 | 
+        5.3.8 5.3.8 5.3.8 5.3.8 r.2
+        </div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabNumbers').alphaTab();
+        </script>
+
+        <h2>Chords</h2>
+        
+        <p>
+            To specify multiple notes on a beat, group them in parenthesis. The full format is
+            <code>(fret.string fret.string ...).duration</code>
+        </p>
+        
+        <div id="alphaTabChords" data-tex="true">
+        (0.3 0.4).4 (3.3 3.4).4 (5.3 5.4).4 r.8 (0.3 0.4).8 |
+        r.8 (3.3 3.4).8 r.8 (6.3 6.4).8 (5.3 5.4).4 r.4 |
+        (0.3 0.4).4 (3.3 3.4).4 (5.3 5.4).4 r.8 (3.3 3.4).8 |
+        r.8 (0.3 0.4).8
+
+        </div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabChords').alphaTab();
+        </script>
+        
+        <h2>Duration Ranges</h2>
+        
+        <p>
+            To make it simpler to write notes, you can apply the same duration to 
+            multiple notes. Start a new duration range with <code>:duration</code>.
+            The following notes will all have this duration. AlphaTex also remembers
+            the last explictely set duration and will take use it in case of a missing duration.
+        </p>
+        
+        <div id="alphaTabDurationRanges" data-tex="true">
+        // explicit ranges via :duration
+        :4 2.3 3.3 :8 3.3 4.3 3.3 4.3 | 
+        // implicit ranges via beat duration
+        2.3.4 3.3 3.3.8 4.3 3.3 4.3
+        </div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabDurationRanges').alphaTab();
+        </script>
+        
+    </div>
+            
+    
+    <div id="bars" class="group">
+        <h1>Bar Metadata</h1>
+        
+        <p>
+            For bars various tags can be specified which change information like
+            clefs, key signatures repeats etc. They follow the format 
+            <code>\tag value value</code> just like the score metadata. Be sure not to 
+            mix the score metadata and the bar metadata of the first bar.
+        </p>       
+
+        <h2>Time Signatures</h2>
+        
+        <p>
+            Time signatures have the format <code>\ts Numerator Denominator</code>
+        </p>
+        
+        <div id="alphaTabTs" data-tex="true">
+        \ts 3 4 | \ts 4 4 | \ts 6 8       
+        </div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabTs').alphaTab();
+        </script>
+
+        <h2>Repeats</h2>
+        
+        <p>
+            Repeats can be started with <code>\ro</code> and 
+            be closed with <code>\rc Count</code>. Count specifies how often
+            the bar range is repeated. 
+        </p>
+        
+        <div id="alphaTabRepeat" data-tex="true">
+        \ro 1.3 2.3 3.3 4.3 |   
+        5.3 6.3 7.3 8.3 |   
+        \rc 2 1.3 2.3 3.3 4.3 |  
+        \ro \rc 3 1.3 2.3 3.3 4.3 |   
+        
+        
+        </div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabRepeat').alphaTab();
+        </script>
+
+        <h2>Key Signatures</h2>
+        
+        <p>
+            The key signature can be specified with <code>\ks Value</code> where the value is one 
+            of the following: <code>Cb, Gb, Db, Ab, Eb, Bb, F, C, G, D, A, E, B, F#, C#</code>
+        </p>                       
+                                   
+        <div id="alphaTabKs" data-tex="true">
+        \ks Cb | \ks C | \ks C# 
+        
+        
+        </div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabKs').alphaTab();
+        </script>
+
+        <h2>Clef</h2>
+        
+        <p>
+            To change the clef simply specify <code>\clef Clef</code> where Clef is one of the following
+            values: <code>G2, Treble, F4, Bass, C3, Tenor, C4, Alto, N, Neutral</code>
+        </p>                       
+                                   
+        <div id="alphaTabClef" data-tex="true">
+        \clef G2 | \clef F4 | \clef C3 | \clef C4 | \clef N |
+        \clef Treble | \clef Bass | \clef Tenor | \clef Alto | \clef Neutral |
+                
+        </div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabClef').alphaTab();
+        </script>
+        
+        <h2>Tempo</h2>
+        
+        <p>
+            To change the tempo of the score you can specify <code>\tempo BPM</code>.
+            
+        </p>                       
+                                   
+        <div id="alphaTabTempo" data-tex="true">
+        // score meta also supports \tempo, therefore we skip the score meta with a dot
+        .
+        // bars
+        \tempo 30 1.3 2.3 3.3 4.3 | 
+        \tempo 80 1.3 2.3 3.3 4.3 |
+        </div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabTempo').alphaTab();
+        </script>
+        
+    </div>
+            
+    <!-- Demo Scripts -->    
+    <script type="text/javascript" src="support/demo.js"></script>
+    <script type="text/javascript" src="support/prism.js"></script>
+    <script type="text/javascript" src="support/alphaTexDemo.js"></script>
+
+</body>
+</html> 

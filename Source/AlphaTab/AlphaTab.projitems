@@ -22,6 +22,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Model\MidiTickLookup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Model\MidiTrack.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Environment.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Exporter\AlphaTexExporter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\AlphaTexException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\AlphaTexImporter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\AlphaTexSymbols.cs" />

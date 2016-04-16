@@ -52,7 +52,7 @@ namespace AlphaTab.Platform.JavaScript
                 if (element.dataset != null && dataset["tex"] != null &&
                     element.innerText.As<JsBoolean>())
                 {
-                    contents = (element.innerText.As<string>()).Trim();
+                    contents = (element.innerHTML.As<string>()).Trim();
                     element.innerHTML = "";
                 }
 

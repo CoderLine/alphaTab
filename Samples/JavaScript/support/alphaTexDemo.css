@@ -1,0 +1,11 @@
+.texSample {
+    width:800px;
+    margin: 0 auto;
+}
+
+p code {
+    border-left: 5px solid #358ccb;
+    background: #FFF;
+    white-space: pre;
+    padding: 3px;
+}
