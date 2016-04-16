@@ -83,6 +83,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SharpKit\SharpKit.JavaScript.dll</HintPath>
     </Reference>
+    <Reference Include="System" />
   </ItemGroup>
   <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\AlphaTab\AlphaTab.projitems')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -101,6 +102,6 @@
   -->
   <Target Name="AfterBuild">
     <Copy SourceFiles="$(ProjectDir)res\$(TargetName).js" DestinationFolder="$(SolutionDir)Build\JavaScript" />
-    <Exec Command='uglifyjs "$(SolutionDir)Build\JavaScript\AlphaTab.js" -o "$(SolutionDir)Build\JavaScript\AlphaTab.min.js" -c' />
+    <Exec Command="uglifyjs &quot;$(SolutionDir)Build\JavaScript\AlphaTab.js&quot; -o &quot;$(SolutionDir)Build\JavaScript\AlphaTab.min.js&quot; -c" />
   </Target>
 </Project>

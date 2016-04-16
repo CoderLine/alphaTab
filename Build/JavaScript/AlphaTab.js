@@ -546,7 +546,7 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
     if (element != null){
         // get load contents
         if (element.dataset != null && dataset["tex"] != null && element.innerText){
-            contents = (element.innerText).trim();
+            contents = (element.innerHTML).trim();
             element.innerHTML = "";
         }
         this.CanvasElement = document.createElement("div");
@@ -742,6 +742,7 @@ AlphaTab.Platform.JavaScript.JsWorker.prototype = {
             var parser = new AlphaTab.Importer.AlphaTexImporter();
             var data = AlphaTab.IO.ByteBuffer.FromBuffer(AlphaTab.Platform.Std.StringToByteArray(contents));
             parser.Init(data);
+            this._trackIndexes = new Int32Array([0]);
             this.ScoreLoaded(parser.ReadScore());
         }
         catch(e){
@@ -768,7 +769,7 @@ AlphaTab.Platform.JavaScript.JsWorker.prototype = {
     Error: function (e){
         this._main.postMessage({
     cmd: "error",
-    exception: e
+    exception: e.toString()
 }
 );
     },
@@ -2625,6 +2626,467 @@ AlphaTab.Audio.Model.MidiTrack.prototype = {
         s.Write(data, 0, data.length);
     }
 };
+AlphaTab.Exporter = AlphaTab.Exporter || {};
+AlphaTab.Exporter.AlphaTexExporter = function (){
+    this._builder = null;
+    this._builder = new Array();
+};
+AlphaTab.Exporter.AlphaTexExporter.prototype = {
+    Export: function (track){
+        this.Score(track);
+    },
+    Score: function (track){
+        this.MetaData(track);
+        this.Bars(track);
+    },
+    ToTex: function (){
+        return this._builder.join('');
+    },
+    MetaData: function (track){
+        var score = track.Score;
+        this.StringMetaData("title", score.Title);
+        this.StringMetaData("subtitle", score.SubTitle);
+        this.StringMetaData("artist", score.Artist);
+        this.StringMetaData("album", score.Album);
+        this.StringMetaData("words", score.Words);
+        this.StringMetaData("music", score.Music);
+        this.StringMetaData("copyright", score.Copyright);
+        this._builder.push("\\tempo ");
+        this._builder.push(score.Tempo);
+        this._builder.push('\r\n');
+        if (track.Capo > 0){
+            this._builder.push("\\capo ");
+            this._builder.push(track.Capo);
+            this._builder.push('\r\n');
+        }
+        this._builder.push("\\tuning");
+        for (var i = 0; i < track.Tuning.length; i++){
+            this._builder.push(" ");
+            this._builder.push(AlphaTab.Model.Tuning.GetTextForTuning(track.Tuning[i], true));
+        }
+        this._builder.push("\\instrument ");
+        this._builder.push(track.PlaybackInfo.Program);
+        this._builder.push('\r\n');
+        this._builder.push(".");
+        this._builder.push('\r\n');
+    },
+    StringMetaData: function (key, value){
+        if (!AlphaTab.Platform.Std.IsNullOrWhiteSpace(value)){
+            this._builder.push("\\");
+            this._builder.push(key);
+            this._builder.push(" \"");
+            this._builder.push(value.replace("\"","\\\""));
+            this._builder.push("\"");
+            this._builder.push('\r\n');
+        }
+    },
+    Bars: function (track){
+        for (var i = 0; i < track.Bars.length; i++){
+            if (i > 0){
+                this._builder.push(" |");
+                this._builder.push('\r\n');
+            }
+            this.Bar(track.Bars[i]);
+        }
+    },
+    Bar: function (bar){
+        this.BarMeta(bar);
+        this.Voice(bar.Voices[0]);
+    },
+    Voice: function (voice){
+        for (var i = 0; i < voice.Beats.length; i++){
+            this.Beat(voice.Beats[i]);
+        }
+    },
+    Beat: function (beat){
+        if (beat.get_IsRest()){
+            this._builder.push("r");
+        }
+        else {
+            if (beat.Notes.length > 1){
+                this._builder.push("(");
+            }
+            for (var i = 0; i < beat.Notes.length; i++){
+                this.Note(beat.Notes[i]);
+            }
+            if (beat.Notes.length > 1){
+                this._builder.push(")");
+            }
+        }
+        this._builder.push(".");
+        this._builder.push(beat.Duration);
+        this._builder.push(" ");
+        this.BeatEffects(beat);
+    },
+    Note: function (note){
+        if (note.IsDead){
+            this._builder.push("x");
+        }
+        else if (note.IsTieDestination){
+            this._builder.push("-");
+        }
+        else {
+            this._builder.push(note.Fret);
+        }
+        this._builder.push(".");
+        this._builder.push(note.Beat.Voice.Bar.Track.Tuning.length - note.String + 1);
+        this._builder.push(" ");
+        this.NoteEffects(note);
+    },
+    NoteEffects: function (note){
+        var hasEffectOpen = false;
+        if (note.get_HasBend()){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("be (");
+            for (var i = 0; i < note.BendPoints.length; i++){
+                this._builder.push(note.BendPoints[i].Offset);
+                this._builder.push(" ");
+                this._builder.push(note.BendPoints[i].Value);
+                this._builder.push(" ");
+            }
+            this._builder.push(")");
+        }
+        switch (note.HarmonicType){
+            case AlphaTab.Model.HarmonicType.Natural:
+                hasEffectOpen = this.EffectOpen(hasEffectOpen);
+                this._builder.push("nh ");
+                break;
+            case AlphaTab.Model.HarmonicType.Artificial:
+                hasEffectOpen = this.EffectOpen(hasEffectOpen);
+                this._builder.push("ah ");
+                break;
+            case AlphaTab.Model.HarmonicType.Tap:
+                hasEffectOpen = this.EffectOpen(hasEffectOpen);
+                this._builder.push("th ");
+                break;
+            case AlphaTab.Model.HarmonicType.Pinch:
+                hasEffectOpen = this.EffectOpen(hasEffectOpen);
+                this._builder.push("ph ");
+                break;
+            case AlphaTab.Model.HarmonicType.Semi:
+                hasEffectOpen = this.EffectOpen(hasEffectOpen);
+                this._builder.push("sh ");
+                break;
+        }
+        if (note.get_IsTrill()){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("tr ");
+            this._builder.push(note.get_TrillFret());
+            this._builder.push(" ");
+            switch (note.TrillSpeed){
+                case AlphaTab.Model.Duration.Sixteenth:
+                    this._builder.push("16 ");
+                    break;
+                case AlphaTab.Model.Duration.ThirtySecond:
+                    this._builder.push("32 ");
+                    break;
+                case AlphaTab.Model.Duration.SixtyFourth:
+                    this._builder.push("64 ");
+                    break;
+            }
+        }
+        if (note.Vibrato != AlphaTab.Model.VibratoType.None){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("v ");
+        }
+        if (note.SlideType == AlphaTab.Model.SlideType.Legato){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("sl ");
+        }
+        if (note.SlideType == AlphaTab.Model.SlideType.Shift){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("ss ");
+        }
+        if (note.IsHammerPullOrigin){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("h ");
+        }
+        if (note.IsGhost){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("g ");
+        }
+        if (note.Accentuated == AlphaTab.Model.AccentuationType.Normal){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("ac ");
+        }
+        else if (note.Accentuated == AlphaTab.Model.AccentuationType.Heavy){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("hac ");
+        }
+        if (note.IsPalmMute){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("pm ");
+        }
+        if (note.IsStaccato){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("st ");
+        }
+        if (note.IsLetRing){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("lr ");
+        }
+        switch (note.LeftHandFinger){
+            case AlphaTab.Model.Fingers.Thumb:
+                hasEffectOpen = this.EffectOpen(hasEffectOpen);
+                this._builder.push("1 ");
+                break;
+            case AlphaTab.Model.Fingers.IndexFinger:
+                hasEffectOpen = this.EffectOpen(hasEffectOpen);
+                this._builder.push("2 ");
+                break;
+            case AlphaTab.Model.Fingers.MiddleFinger:
+                hasEffectOpen = this.EffectOpen(hasEffectOpen);
+                this._builder.push("3 ");
+                break;
+            case AlphaTab.Model.Fingers.AnnularFinger:
+                hasEffectOpen = this.EffectOpen(hasEffectOpen);
+                this._builder.push("4 ");
+                break;
+            case AlphaTab.Model.Fingers.LittleFinger:
+                hasEffectOpen = this.EffectOpen(hasEffectOpen);
+                this._builder.push("5 ");
+                break;
+        }
+        switch (note.RightHandFinger){
+            case AlphaTab.Model.Fingers.Thumb:
+                hasEffectOpen = this.EffectOpen(hasEffectOpen);
+                this._builder.push("1 ");
+                break;
+            case AlphaTab.Model.Fingers.IndexFinger:
+                hasEffectOpen = this.EffectOpen(hasEffectOpen);
+                this._builder.push("2 ");
+                break;
+            case AlphaTab.Model.Fingers.MiddleFinger:
+                hasEffectOpen = this.EffectOpen(hasEffectOpen);
+                this._builder.push("3 ");
+                break;
+            case AlphaTab.Model.Fingers.AnnularFinger:
+                hasEffectOpen = this.EffectOpen(hasEffectOpen);
+                this._builder.push("4 ");
+                break;
+            case AlphaTab.Model.Fingers.LittleFinger:
+                hasEffectOpen = this.EffectOpen(hasEffectOpen);
+                this._builder.push("5 ");
+                break;
+        }
+        this.EffectClose(hasEffectOpen);
+    },
+    EffectOpen: function (hasBeatEffectOpen){
+        if (!hasBeatEffectOpen){
+            this._builder.push("{");
+        }
+        return true;
+    },
+    EffectClose: function (hasBeatEffectOpen){
+        if (hasBeatEffectOpen){
+            this._builder.push("}");
+        }
+    },
+    BeatEffects: function (beat){
+        var hasEffectOpen = false;
+        if (beat.FadeIn){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("f ");
+        }
+        switch (beat.GraceType){
+            case AlphaTab.Model.GraceType.OnBeat:
+                this._builder.push("gr ob ");
+                break;
+            case AlphaTab.Model.GraceType.BeforeBeat:
+                this._builder.push("gr ");
+                break;
+        }
+        if (beat.Vibrato != AlphaTab.Model.VibratoType.None){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("v ");
+        }
+        if (beat.Slap){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("s ");
+        }
+        if (beat.Pop){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("p ");
+        }
+        if (beat.Dots == 2){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("dd ");
+        }
+        else if (beat.Dots == 1){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("d ");
+        }
+        if (beat.PickStroke == AlphaTab.Model.PickStrokeType.Up){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("su ");
+        }
+        else if (beat.PickStroke == AlphaTab.Model.PickStrokeType.Down){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("sd ");
+        }
+        if (beat.get_HasTuplet()){
+            var tupletValue = 0;
+            if (beat.TupletDenominator == 3 && beat.TupletNumerator == 2){
+                tupletValue = 3;
+            }
+            else if (beat.TupletDenominator == 5 && beat.TupletNumerator == 4){
+                tupletValue = 5;
+            }
+            else if (beat.TupletDenominator == 6 && beat.TupletNumerator == 4){
+                tupletValue = 6;
+            }
+            else if (beat.TupletDenominator == 7 && beat.TupletNumerator == 4){
+                tupletValue = 7;
+            }
+            else if (beat.TupletDenominator == 9 && beat.TupletNumerator == 8){
+                tupletValue = 9;
+            }
+            else if (beat.TupletDenominator == 10 && beat.TupletNumerator == 8){
+                tupletValue = 10;
+            }
+            else if (beat.TupletDenominator == 11 && beat.TupletNumerator == 8){
+                tupletValue = 11;
+            }
+            else if (beat.TupletDenominator == 12 && beat.TupletNumerator == 8){
+                tupletValue = 12;
+            }
+            if (tupletValue != 0){
+                hasEffectOpen = this.EffectOpen(hasEffectOpen);
+                this._builder.push("tu ");
+                this._builder.push(tupletValue);
+                this._builder.push(" ");
+            }
+        }
+        if (beat.get_HasWhammyBar()){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("tbe (");
+            for (var i = 0; i < beat.WhammyBarPoints.length; i++){
+                this._builder.push(beat.WhammyBarPoints[i].Offset);
+                this._builder.push(" ");
+                this._builder.push(beat.WhammyBarPoints[i].Value);
+                this._builder.push(" ");
+            }
+            this._builder.push(")");
+        }
+        if (beat.get_IsTremolo()){
+            hasEffectOpen = this.EffectOpen(hasEffectOpen);
+            this._builder.push("tp ");
+            if (beat.TremoloSpeed == AlphaTab.Model.Duration.Eighth){
+                this._builder.push("8 ");
+            }
+            else if (beat.TremoloSpeed == AlphaTab.Model.Duration.Sixteenth){
+                this._builder.push("16 ");
+            }
+            else if (beat.TremoloSpeed == AlphaTab.Model.Duration.ThirtySecond){
+                this._builder.push("32 ");
+            }
+            else {
+                this._builder.push("8 ");
+            }
+        }
+        this.EffectClose(hasEffectOpen);
+    },
+    BarMeta: function (bar){
+        var masterBar = bar.get_MasterBar();
+        if (masterBar.Index > 0){
+            var previousMasterBar = masterBar.PreviousMasterBar;
+            var previousBar = bar.PreviousBar;
+            if (previousMasterBar.TimeSignatureDenominator != masterBar.TimeSignatureDenominator || previousMasterBar.TimeSignatureNumerator != masterBar.TimeSignatureNumerator){
+                this._builder.push("\\ts ");
+                this._builder.push(masterBar.TimeSignatureNumerator);
+                this._builder.push(" ");
+                this._builder.push(masterBar.TimeSignatureDenominator);
+                this._builder.push('\r\n');
+            }
+            if (previousMasterBar.KeySignature != masterBar.KeySignature){
+                this._builder.push("\\ks ");
+                switch (masterBar.KeySignature){
+                    case -7:
+                        this._builder.push("cb");
+                        break;
+                    case -6:
+                        this._builder.push("gb");
+                        break;
+                    case -5:
+                        this._builder.push("db");
+                        break;
+                    case -4:
+                        this._builder.push("ab");
+                        break;
+                    case -3:
+                        this._builder.push("eb");
+                        break;
+                    case -2:
+                        this._builder.push("bb");
+                        break;
+                    case -1:
+                        this._builder.push("f");
+                        break;
+                    case 0:
+                        this._builder.push("c");
+                        break;
+                    case 1:
+                        this._builder.push("g");
+                        break;
+                    case 2:
+                        this._builder.push("d");
+                        break;
+                    case 3:
+                        this._builder.push("a");
+                        break;
+                    case 4:
+                        this._builder.push("e");
+                        break;
+                    case 5:
+                        this._builder.push("b");
+                        break;
+                    case 6:
+                        this._builder.push("f#");
+                        break;
+                    case 7:
+                        this._builder.push("c#");
+                        break;
+                }
+                this._builder.push('\r\n');
+            }
+            if (bar.Clef != previousBar.Clef){
+                this._builder.push("\\clef ");
+                switch (bar.Clef){
+                    case AlphaTab.Model.Clef.Neutral:
+                        this._builder.push("n");
+                        break;
+                    case AlphaTab.Model.Clef.C3:
+                        this._builder.push("c3");
+                        break;
+                    case AlphaTab.Model.Clef.C4:
+                        this._builder.push("c4");
+                        break;
+                    case AlphaTab.Model.Clef.F4:
+                        this._builder.push("f4");
+                        break;
+                    case AlphaTab.Model.Clef.G2:
+                        this._builder.push("g2");
+                        break;
+                }
+                this._builder.push('\r\n');
+            }
+            if (masterBar.TempoAutomation != null){
+                this._builder.push("\\tempo ");
+                this._builder.push(masterBar.TempoAutomation.Value);
+                this._builder.push('\r\n');
+            }
+        }
+        if (masterBar.IsRepeatStart){
+            this._builder.push("\\ro ");
+            this._builder.push('\r\n');
+        }
+        if (masterBar.get_IsRepeatEnd()){
+            this._builder.push("\\rc ");
+            this._builder.push(masterBar.RepeatCount + 1);
+            this._builder.push('\r\n');
+        }
+    }
+};
 AlphaTab.Importer = AlphaTab.Importer || {};
 AlphaTab.Importer.AlphaTexException = function (position, nonTerm, expected, symbol, symbolData){
     this.Position = 0;
@@ -2718,6 +3180,9 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             case "c4":
             case "alto":
                 return AlphaTab.Model.Clef.C4;
+            case "n":
+            case "neutral":
+                return AlphaTab.Model.Clef.Neutral;
             default:
                 return AlphaTab.Model.Clef.G2;
         }
@@ -3061,14 +3526,21 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 this.NewSy();
                 anyMeta = true;
             }
-            else {
+            else if (anyMeta){
                 this.Error("metaDataTags", AlphaTab.Importer.AlphaTexSymbols.String, false);
+            }
+            else {
+                // fall forward to bar meta if unknown score meta was found
+                break;
             }
         }
         if (anyMeta){
             if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Dot){
                 this.Error("song", AlphaTab.Importer.AlphaTexSymbols.Dot, true);
             }
+            this.NewSy();
+        }
+        else if (this._sy == AlphaTab.Importer.AlphaTexSymbols.Dot){
             this.NewSy();
         }
     },
@@ -3299,7 +3771,8 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             this.NewSy();
             return true;
         }
-        if (syData == "tb"){
+        if (syData == "tb" || syData == "tbe"){
+            var exact = syData == "tbe";
             // read points
             this.NewSy();
             if (this._sy != AlphaTab.Importer.AlphaTexSymbols.LParensis){
@@ -3309,23 +3782,49 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             this._allowNegatives = true;
             this.NewSy();
             while (this._sy != AlphaTab.Importer.AlphaTexSymbols.RParensis && this._sy != AlphaTab.Importer.AlphaTexSymbols.Eof){
-                if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
-                    this.Error("tremolobar-effect", AlphaTab.Importer.AlphaTexSymbols.Number, true);
-                    return false;
+                var offset;
+                var value;
+                if (exact){
+                    if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
+                        this.Error("tremolobar-effect", AlphaTab.Importer.AlphaTexSymbols.Number, true);
+                        return false;
+                    }
+                    offset = (this._syData);
+                    this.NewSy();
+                    if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
+                        this.Error("tremolobar-effect", AlphaTab.Importer.AlphaTexSymbols.Number, true);
+                        return false;
+                    }
+                    value = (this._syData);
                 }
-                beat.WhammyBarPoints.push(new AlphaTab.Model.BendPoint(0, (this._syData)));
+                else {
+                    if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
+                        this.Error("tremolobar-effect", AlphaTab.Importer.AlphaTexSymbols.Number, true);
+                        return false;
+                    }
+                    offset = 0;
+                    value = (this._syData);
+                }
+                beat.WhammyBarPoints.push(new AlphaTab.Model.BendPoint(offset, value));
                 this.NewSy();
             }
             while (beat.WhammyBarPoints.length > 60){
                 beat.WhammyBarPoints.splice(beat.WhammyBarPoints.length - 1,1);
             }
             // set positions
-            var count = beat.WhammyBarPoints.length;
-            var step = ((60 / count) | 0);
-            var i = 0;
-            while (i < count){
-                beat.WhammyBarPoints[i].Offset = Math.min(60, (i * step));
-                i++;
+            if (!exact){
+                var count = beat.WhammyBarPoints.length;
+                var step = ((60 / count) | 0);
+                var i = 0;
+                while (i < count){
+                    beat.WhammyBarPoints[i].Offset = Math.min(60, (i * step));
+                    i++;
+                }
+            }
+            else {
+                beat.WhammyBarPoints.sort($CreateAnonymousDelegate(this, function (a, b){
+    return a.Offset - b.Offset;
+}));
             }
             this._allowNegatives = false;
             if (this._sy != AlphaTab.Importer.AlphaTexSymbols.RParensis){
@@ -3334,6 +3833,39 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             }
             this.NewSy();
             return true;
+        }
+        if (syData == "gr"){
+            this.NewSy();
+            if ((this._syData).toString().toLowerCase() == "ob"){
+                beat.GraceType = AlphaTab.Model.GraceType.OnBeat;
+                this.NewSy();
+            }
+            else {
+                beat.GraceType = AlphaTab.Model.GraceType.BeforeBeat;
+            }
+            return true;
+        }
+        if (syData == "tp"){
+            this.NewSy();
+            var duration = AlphaTab.Model.Duration.Eighth;
+            if (this._sy == AlphaTab.Importer.AlphaTexSymbols.Number){
+                switch ((this._syData)){
+                    case 8:
+                        duration = AlphaTab.Model.Duration.Eighth;
+                        break;
+                    case 16:
+                        duration = AlphaTab.Model.Duration.Sixteenth;
+                        break;
+                    case 32:
+                        duration = AlphaTab.Model.Duration.ThirtySecond;
+                        break;
+                    default:
+                        duration = AlphaTab.Model.Duration.Eighth;
+                        break;
+                }
+                this.NewSy();
+            }
+            beat.TremoloSpeed = duration;
         }
         return false;
     },
@@ -3381,7 +3913,8 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
         while (this._sy == AlphaTab.Importer.AlphaTexSymbols.String){
             var syData = (this._syData).toString().toLowerCase();
             (this._syData) = syData;
-            if (syData == "b"){
+            if (syData == "b" || syData == "be"){
+                var exact = (this._syData) == "be";
                 // read points
                 this.NewSy();
                 if (this._sy != AlphaTab.Importer.AlphaTexSymbols.LParensis){
@@ -3389,23 +3922,45 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 }
                 this.NewSy();
                 while (this._sy != AlphaTab.Importer.AlphaTexSymbols.RParensis && this._sy != AlphaTab.Importer.AlphaTexSymbols.Eof){
-                    if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
-                        this.Error("bend-effect-value", AlphaTab.Importer.AlphaTexSymbols.Number, true);
+                    var offset = 0;
+                    var value = 0;
+                    if (exact){
+                        if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
+                            this.Error("bend-effect-value", AlphaTab.Importer.AlphaTexSymbols.Number, true);
+                        }
+                        offset = (this._syData);
+                        this.NewSy();
+                        if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
+                            this.Error("bend-effect-value", AlphaTab.Importer.AlphaTexSymbols.Number, true);
+                        }
+                        value = (this._syData);
                     }
-                    var bendValue = (this._syData);
-                    note.AddBendPoint(new AlphaTab.Model.BendPoint(0, (Math.abs(bendValue))));
+                    else {
+                        if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
+                            this.Error("bend-effect-value", AlphaTab.Importer.AlphaTexSymbols.Number, true);
+                        }
+                        value = (this._syData);
+                    }
+                    note.AddBendPoint(new AlphaTab.Model.BendPoint(offset, value));
                     this.NewSy();
                 }
                 while (note.BendPoints.length > 60){
                     note.BendPoints.splice(note.BendPoints.length - 1,1);
                 }
                 // set positions
-                var count = note.BendPoints.length;
-                var step = (60 / (count - 1)) | 0;
-                var i = 0;
-                while (i < count){
-                    note.BendPoints[i].Offset = Math.min(60, (i * step));
-                    i++;
+                if (exact){
+                    note.BendPoints.sort($CreateAnonymousDelegate(this, function (a, b){
+    return a.Offset - b.Offset;
+}));
+                }
+                else {
+                    var count = note.BendPoints.length;
+                    var step = (60 / (count - 1)) | 0;
+                    var i = 0;
+                    while (i < count){
+                        note.BendPoints[i].Offset = Math.min(60, (i * step));
+                        i++;
+                    }
                 }
                 if (this._sy != AlphaTab.Importer.AlphaTexSymbols.RParensis){
                     this.Error("bend-effect", AlphaTab.Importer.AlphaTexSymbols.RParensis, true);
@@ -3434,16 +3989,6 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 note.HarmonicType = AlphaTab.Model.HarmonicType.Semi;
                 this.NewSy();
             }
-            else if (syData == "gr"){
-                this.NewSy();
-                if ((this._syData).toString().toLowerCase() == "ob"){
-                    note.Beat.GraceType = AlphaTab.Model.GraceType.OnBeat;
-                    this.NewSy();
-                }
-                else {
-                    note.Beat.GraceType = AlphaTab.Model.GraceType.BeforeBeat;
-                }
-            }
             else if (syData == "tr"){
                 this.NewSy();
                 if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
@@ -3461,7 +4006,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                             duration = AlphaTab.Model.Duration.ThirtySecond;
                             break;
                         case 64:
-                            duration = AlphaTab.Model.Duration.ThirtySecond;
+                            duration = AlphaTab.Model.Duration.SixtyFourth;
                             break;
                         default:
                             duration = AlphaTab.Model.Duration.Sixteenth;
@@ -3471,28 +4016,6 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                 }
                 note.TrillValue = fret + note.get_StringTuning();
                 note.TrillSpeed = duration;
-            }
-            else if (syData == "tp"){
-                this.NewSy();
-                var duration = AlphaTab.Model.Duration.Eighth;
-                if (this._sy == AlphaTab.Importer.AlphaTexSymbols.Number){
-                    switch ((this._syData)){
-                        case 8:
-                            duration = AlphaTab.Model.Duration.Eighth;
-                            break;
-                        case 16:
-                            duration = AlphaTab.Model.Duration.Sixteenth;
-                            break;
-                        case 32:
-                            duration = AlphaTab.Model.Duration.ThirtySecond;
-                            break;
-                        default:
-                            duration = AlphaTab.Model.Duration.Eighth;
-                            break;
-                    }
-                    this.NewSy();
-                }
-                note.Beat.TremoloSpeed = duration;
             }
             else if (syData == "v"){
                 this.NewSy();

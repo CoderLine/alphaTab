@@ -62,7 +62,7 @@ namespace AlphaTab.Importer
             {
                 if (Std.IsException<AlphaTexException>(e))
                 {
-                    throw e;
+                    throw;
                 }
                 throw new UnsupportedFormatException();
             }
@@ -117,6 +117,9 @@ namespace AlphaTab.Importer
                 case "c4":
                 case "alto":
                     return Clef.C4;
+                case "n":
+                case "neutral":
+                    return Clef.Neutral;
                 default:
                     return Clef.G2; // error("clef-value", AlphaTexSymbols.String, false);
             }
@@ -599,9 +602,14 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else
+                else if(anyMeta)
                 {
                     Error("metaDataTags", AlphaTexSymbols.String, false);
+                }
+                else
+                {
+                    // fall forward to bar meta if unknown score meta was found
+                    break;
                 }
             }
 
@@ -611,6 +619,10 @@ namespace AlphaTab.Importer
                 {
                     Error("song", AlphaTexSymbols.Dot);
                 }
+                NewSy();
+            }
+            else if (_sy == AlphaTexSymbols.Dot)
+            {
                 NewSy();
             }
         }
@@ -915,8 +927,9 @@ namespace AlphaTab.Importer
                 NewSy();
                 return true;
             }
-            if (syData == "tb")
+            if (syData == "tb" || syData == "tbe")
             {
+                var exact = syData == "tbe";
                 // read points
                 NewSy();
                 if (_sy != AlphaTexSymbols.LParensis)
@@ -925,16 +938,43 @@ namespace AlphaTab.Importer
                     return false;
                 }
                 _allowNegatives = true;
-                NewSy();
 
+                NewSy();
                 while (_sy != AlphaTexSymbols.RParensis && _sy != AlphaTexSymbols.Eof)
                 {
-                    if (_sy != AlphaTexSymbols.Number)
+                    int offset;
+                    int value;
+
+                    if (exact)
                     {
-                        Error("tremolobar-effect", AlphaTexSymbols.Number);
-                        return false;
+                        if (_sy != AlphaTexSymbols.Number)
+                        {
+                            Error("tremolobar-effect", AlphaTexSymbols.Number);
+                            return false;
+                        }
+                        offset = (int)_syData;
+
+                        NewSy();
+                        if (_sy != AlphaTexSymbols.Number)
+                        {
+                            Error("tremolobar-effect", AlphaTexSymbols.Number);
+                            return false;
+                        }
+                        value = (int)_syData;
                     }
-                    beat.WhammyBarPoints.Add(new BendPoint(0, (int)_syData));
+                    else
+                    {
+                        if (_sy != AlphaTexSymbols.Number)
+                        {
+                            Error("tremolobar-effect", AlphaTexSymbols.Number);
+                            return false;
+                        }
+                        offset = 0;
+                        value = (int)_syData;
+                    }
+
+                    beat.WhammyBarPoints.Add(new BendPoint(offset, value));
+
                     NewSy();
                 }
 
@@ -944,13 +984,20 @@ namespace AlphaTab.Importer
                 }
 
                 // set positions
-                var count = beat.WhammyBarPoints.Count;
-                var step = (60 / count);
-                var i = 0;
-                while (i < count)
+                if (!exact)
                 {
-                    beat.WhammyBarPoints[i].Offset = Math.Min(60, (i * step));
-                    i++;
+                    var count = beat.WhammyBarPoints.Count;
+                    var step = (60 / count);
+                    var i = 0;
+                    while (i < count)
+                    {
+                        beat.WhammyBarPoints[i].Offset = Math.Min(60, (i * step));
+                        i++;
+                    }
+                }
+                else
+                {
+                    beat.WhammyBarPoints.Sort((a, b) => a.Offset - b.Offset);
                 }
                 _allowNegatives = false;
 
@@ -962,6 +1009,48 @@ namespace AlphaTab.Importer
                 NewSy();
                 return true;
             }
+
+            if (syData == "gr") 
+            {
+                NewSy();
+                if (_syData.ToString().ToLower() == "ob")
+                {
+                    beat.GraceType = GraceType.OnBeat;
+                    NewSy();
+                }
+                else
+                {
+                    beat.GraceType = GraceType.BeforeBeat;
+                }
+                return true;
+            }
+
+            if (syData == "tp")
+            {
+                NewSy();
+                var duration = Duration.Eighth;
+                if (_sy == AlphaTexSymbols.Number)
+                {
+                    switch ((int)_syData)
+                    {
+                        case 8:
+                            duration = Duration.Eighth;
+                            break;
+                        case 16:
+                            duration = Duration.Sixteenth;
+                            break;
+                        case 32:
+                            duration = Duration.ThirtySecond;
+                            break;
+                        default:
+                            duration = Duration.Eighth;
+                            break;
+                    }
+                    NewSy();
+                }
+                beat.TremoloSpeed = duration;
+            }
+
             return false;
         }
 
@@ -1023,24 +1112,46 @@ namespace AlphaTab.Importer
             {
                 var syData = _syData.ToString().ToLower();
                 _syData = syData;
-                if (syData == "b")
+                if (syData == "b" || syData == "be")
                 {
+                    var exact = _syData == "be";
                     // read points
                     NewSy();
                     if (_sy != AlphaTexSymbols.LParensis)
                     {
                         Error("bend-effect", AlphaTexSymbols.LParensis);
                     }
-                    NewSy();
 
+                    NewSy();
                     while (_sy != AlphaTexSymbols.RParensis && _sy != AlphaTexSymbols.Eof)
                     {
-                        if (_sy != AlphaTexSymbols.Number)
+                        var offset = 0;
+                        var value = 0;
+                        if (exact)
                         {
-                            Error("bend-effect-value", AlphaTexSymbols.Number);
+                            if (_sy != AlphaTexSymbols.Number)
+                            {
+                                Error("bend-effect-value", AlphaTexSymbols.Number);
+                            }
+                            offset = (int)_syData;
+
+                            NewSy();
+                            if (_sy != AlphaTexSymbols.Number)
+                            {
+                                Error("bend-effect-value", AlphaTexSymbols.Number);
+                            }
+                            value = (int)_syData;
                         }
-                        var bendValue = (int)_syData;
-                        note.AddBendPoint(new BendPoint(0, (Math.Abs(bendValue))));
+                        else
+                        {
+                            if (_sy != AlphaTexSymbols.Number)
+                            {
+                                Error("bend-effect-value", AlphaTexSymbols.Number);
+                            }
+                            value = (int)_syData;
+                        }
+
+                        note.AddBendPoint(new BendPoint(offset, value));
                         NewSy();
                     }
 
@@ -1050,14 +1161,22 @@ namespace AlphaTab.Importer
                     }
 
                     // set positions
-                    var count = note.BendPoints.Count;
-                    var step = 60 / (count - 1);
-                    var i = 0;
-                    while (i < count)
+                    if (exact)
                     {
-                        note.BendPoints[i].Offset = Math.Min(60, (i * step));
-                        i++;
+                        note.BendPoints.Sort((a, b) => a.Offset - b.Offset);
                     }
+                    else
+                    {
+                        var count = note.BendPoints.Count;
+                        var step = 60 / (count - 1);
+                        var i = 0;
+                        while (i < count)
+                        {
+                            note.BendPoints[i].Offset = Math.Min(60, (i * step));
+                            i++;
+                        }
+                    }
+                   
 
                     if (_sy != AlphaTexSymbols.RParensis)
                     {
@@ -1092,19 +1211,6 @@ namespace AlphaTab.Importer
                     note.HarmonicType = HarmonicType.Semi;
                     NewSy();
                 }
-                else if (syData == "gr") // TODO: Make this a beat effect!
-                {
-                    NewSy();
-                    if (_syData.ToString().ToLower() == "ob")
-                    {
-                        note.Beat.GraceType = GraceType.OnBeat;
-                        NewSy();
-                    }
-                    else
-                    {
-                        note.Beat.GraceType = GraceType.BeforeBeat;
-                    }
-                }
                 else if (syData == "tr")
                 {
                     NewSy();
@@ -1127,7 +1233,7 @@ namespace AlphaTab.Importer
                                 duration = Duration.ThirtySecond;
                                 break;
                             case 64:
-                                duration = Duration.ThirtySecond;
+                                duration = Duration.SixtyFourth;
                                 break;
                             default:
                                 duration = Duration.Sixteenth;
@@ -1138,31 +1244,6 @@ namespace AlphaTab.Importer
 
                     note.TrillValue = fret + note.StringTuning;
                     note.TrillSpeed = duration;
-                }
-                else if (syData == "tp")
-                {
-                    NewSy();
-                    var duration = Duration.Eighth;
-                    if (_sy == AlphaTexSymbols.Number)
-                    {
-                        switch ((int)_syData)
-                        {
-                            case 8:
-                                duration = Duration.Eighth;
-                                break;
-                            case 16:
-                                duration = Duration.Sixteenth;
-                                break;
-                            case 32:
-                                duration = Duration.ThirtySecond;
-                                break;
-                            default:
-                                duration = Duration.Eighth;
-                                break;
-                        }
-                        NewSy();
-                    }
-                    note.Beat.TremoloSpeed = duration;
                 }
                 else if (syData == "v")
                 {
@@ -1226,7 +1307,7 @@ namespace AlphaTab.Importer
                     var finger = Fingers.Thumb;
                     if (_sy == AlphaTexSymbols.Number)
                     {
-                        finger = ToFinger((int) _syData);
+                        finger = ToFinger((int)_syData);
                         NewSy();
                     }
                     note.LeftHandFinger = finger;

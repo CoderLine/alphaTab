@@ -125,6 +125,7 @@ namespace AlphaTab.Platform.JavaScript
                 var parser = new AlphaTexImporter();
                 var data = ByteBuffer.FromBuffer(Std.StringToByteArray(contents));
                 parser.Init(data);
+                _trackIndexes = new[] {0};
                 ScoreLoaded(parser.ReadScore());
             }
             catch (Exception e)
@@ -159,7 +160,7 @@ namespace AlphaTab.Platform.JavaScript
 
         private void Error(Exception e)
         {
-            PostMessage(new { cmd = "error", exception = e });
+            PostMessage(new { cmd = "error", exception = e.ToString() });
         }
 
         private void ScoreLoaded(Score score)

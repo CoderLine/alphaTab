@@ -23,8 +23,8 @@ function showGroup(groupId) {
         
         $('script[type="text/javascript-lazy"]', group).each(function() {
             if(!$(this).data('run')) {
+                $(this).data('run',true).trigger('sampleLoad');
                 eval($(this).html());
-                $(this).data('run',true);
             }
         });
     }    
