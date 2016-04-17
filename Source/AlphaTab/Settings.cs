@@ -31,7 +31,7 @@ namespace AlphaTab
         public float Scale { get; set; }
 
         /// <summary>
-        /// The initial size of the canvas during loading or the width when {@see autoSize} set to false
+        /// The initial size of the canvas during loading or the width for particular layouts (e.g. page layout).
         /// </summary>
         public int Width { get; set; }
 
@@ -73,7 +73,7 @@ namespace AlphaTab
                 var settings = new Settings();
 
                 settings.Scale = 1.0f;
-                settings.Width = 600;
+                settings.Width = 950;
                 settings.Height = 200;
                 settings.Engine = "default";
 
@@ -129,7 +129,6 @@ namespace AlphaTab
         /// Additional layout mode specific settings.
         /// <strong>mode=page</strong>
         /// <ul>
-        ///  <li><strong>autoSize</strong> - Whether the width of the canvas should be automatically determined by the used layout. (bool, default:true)</li>
         ///  <li><strong>barsPerRow</strong> - Limit the displayed bars per row, <em>-1 for sized based limit<em> (integer, default:-1)</li>
         ///  <li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li>
         ///  <li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li>

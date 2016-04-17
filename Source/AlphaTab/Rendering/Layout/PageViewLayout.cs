@@ -32,7 +32,6 @@ namespace AlphaTab.Rendering.Layout
     {
         // left top right bottom
         public static readonly float[] PagePadding = { 40, 40, 40, 40 };
-        public const float WidthOn100 = 950;
         public const float GroupSpacing = 20;
 
         private FastList<StaveGroup> _groups;
@@ -46,15 +45,7 @@ namespace AlphaTab.Rendering.Layout
         {
             var x = PagePadding[0];
             var y = PagePadding[1];
-            var autoSize = Renderer.Settings.Layout.Get("autoSize", true);
-            if (autoSize || Renderer.Settings.Width <= 0)
-            {
-                Width = WidthOn100 * Scale;
-            }
-            else
-            {
-                Width = Renderer.Settings.Width;
-            }
+            Width = Renderer.Settings.Width;
 
             // 
             // 1. Score Info
@@ -303,20 +294,10 @@ namespace AlphaTab.Rendering.Layout
         {
             get
             {
-                var autoSize = Renderer.Settings.Layout.Get("autoSize", true);
-                var width = autoSize ? SheetWidth : Renderer.Settings.Width;
-                return width - PagePadding[0] - PagePadding[2];
+                return Renderer.Settings.Width - PagePadding[0] - PagePadding[2];
             }
         }
-
-        private float SheetWidth
-        {
-            get
-            {
-                return (WidthOn100 * Scale);
-            }
-        }
-
+        
         public override void BuildBoundingsLookup(BoundingsLookup lookup)
         {
             for (int i = 0, j = _groups.Count; i < j; i++)

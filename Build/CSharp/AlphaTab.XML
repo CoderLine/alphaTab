@@ -1198,6 +1198,11 @@
             the number of fingering indicators that will be drawn
             </summary>
         </member>
+        <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.HasTuplet">
+            <summary>
+            an indicator whether any beat has a tuplet on it. 
+            </summary>
+        </member>
         <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.FirstMinNote">
             <summary>
             the first min note within this group
@@ -1245,7 +1250,7 @@
         </member>
         <member name="P:AlphaTab.Settings.Width">
             <summary>
-            The initial size of the canvas during loading or the width when {@see autoSize} set to false
+            The initial size of the canvas during loading or the width for particular layouts (e.g. page layout).
             </summary>
         </member>
         <member name="P:AlphaTab.Settings.Height">

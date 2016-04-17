@@ -1439,7 +1439,7 @@ AlphaTab.Settings.FromJson = function (json){
 AlphaTab.Settings.get_Defaults = function (){
     var settings = new AlphaTab.Settings();
     settings.Scale = 1;
-    settings.Width = 600;
+    settings.Width = 950;
     settings.Height = 200;
     settings.Engine = "default";
     settings.Layout = AlphaTab.LayoutSettings.get_Defaults();
@@ -13245,13 +13245,7 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
     DoLayoutAndRender: function (){
         var x = AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[0];
         var y = AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[1];
-        var autoSize = this.Renderer.Settings.Layout.Get("autoSize", true);
-        if (autoSize || this.Renderer.Settings.Width <= 0){
-            this.Width = 950 * this.get_Scale();
-        }
-        else {
-            this.Width = this.Renderer.Settings.Width;
-        }
+        this.Width = this.Renderer.Settings.Width;
         // 
         // 1. Score Info
         y = this.LayoutAndRenderScoreInfo(x, y);
@@ -13431,12 +13425,7 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
         return group;
     },
     get_MaxWidth: function (){
-        var autoSize = this.Renderer.Settings.Layout.Get("autoSize", true);
-        var width = autoSize ? this.get_SheetWidth() : this.Renderer.Settings.Width;
-        return width - AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[0] - AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[2];
-    },
-    get_SheetWidth: function (){
-        return (950 * this.get_Scale());
+        return this.Renderer.Settings.Width - AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[0] - AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[2];
     },
     BuildBoundingsLookup: function (lookup){
         for (var i = 0,j = this._groups.length; i < j; i++){
@@ -13446,7 +13435,6 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
 };
 $StaticConstructor(function (){
     AlphaTab.Rendering.Layout.PageViewLayout.PagePadding = new Float32Array([40, 40, 40, 40]);
-    AlphaTab.Rendering.Layout.PageViewLayout.WidthOn100 = 950;
     AlphaTab.Rendering.Layout.PageViewLayout.GroupSpacing = 20;
 });
 $Inherit(AlphaTab.Rendering.Layout.PageViewLayout, AlphaTab.Rendering.Layout.ScoreLayout);
