@@ -21,17 +21,6 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class ScoreBeatPreNotesGlyph : BeatGlyphBase
     {
-        public override void ApplyGlyphSpacing(float spacing)
-        {
-            base.ApplyGlyphSpacing(spacing);
-            if (Glyphs == null) return;
-            // add spacing at the beginning, this way the elements are closer to the note head
-            for (int i = 0, j = Glyphs.Count; i < j; i++)
-            {
-                Glyphs[i].X += spacing;
-            }
-        }
-
         public override void DoLayout()
         {
             if (Container.Beat.BrushType != BrushType.None)
@@ -44,11 +33,13 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 var accidentals = new AccidentalGroupGlyph();
                 NoteLoop(n => CreateAccidentalGlyph(n, accidentals));
-                AddGlyph(accidentals);
-            }
 
-            // a small padding
-            AddGlyph(new SpacingGlyph(0, 0, 4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
+                if (!accidentals.IsEmpty)
+                {
+                    AddGlyph(accidentals);
+                    AddGlyph(new SpacingGlyph(0, 0, 4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
+                }
+            }
 
             base.DoLayout();
         }

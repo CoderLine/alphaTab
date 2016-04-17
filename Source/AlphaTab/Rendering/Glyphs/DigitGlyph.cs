@@ -54,11 +54,6 @@ namespace AlphaTab.Rendering.Glyphs
             }
         }
 
-        public override bool CanScale
-        {
-            get { return false; }
-        }
-
         private static MusicFontSymbol GetSymbol(int digit)
         {
             switch (digit)

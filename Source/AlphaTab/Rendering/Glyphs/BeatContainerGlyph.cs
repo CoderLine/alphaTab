@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -25,8 +27,6 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class BeatContainerGlyph : Glyph, ISupportsFinalize
     {
-        private static readonly int[] SizeTable = { 82, 43, 30, 22, 18, 14, 14 };
-
         public Beat Beat { get; set; }
         public BeatGlyphBase PreNotes { get; set; }
         public BeatGlyphBase OnNotes { get; set; }
@@ -49,50 +49,58 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void RegisterMaxSizes(BarSizeInfo sizes)
         {
-            if (sizes.GetPreNoteSize(Beat.Start) < PreNotes.Width)
-            {
-                sizes.SetPreNoteSize(Beat.Start, PreNotes.Width);
-            }
-            if (sizes.GetOnNoteSize(Beat.Start) < OnNotes.Width)
-            {
-                sizes.SetOnNoteSize(Beat.Start, OnNotes.Width);
-            }
-            if (sizes.GetPostNoteSize(Beat.Start) < PostNotes.Width)
-            {
-                sizes.SetPostNoteSize(Beat.Start, PostNotes.Width);
-            }
+            sizes.UpdatePreNoteSize(PreNotes.Width);
+            sizes.UpdatePostNoteSize(PostNotes.Width);
         }
 
         public void ApplySizes(BarSizeInfo sizes)
         {
-            float size;
-            float diff;
+            PreNotes.Width = sizes.PreNoteSize;
 
-            size = sizes.GetPreNoteSize(Beat.Start);
-            diff = size - PreNotes.Width;
-            PreNotes.X = 0;
-            if (diff > 0) PreNotes.ApplyGlyphSpacing(diff);
-
-            size = sizes.GetOnNoteSize(Beat.Start);
-            diff = size - OnNotes.Width;
             OnNotes.X = PreNotes.X + PreNotes.Width;
-            if (diff > 0) OnNotes.ApplyGlyphSpacing(diff);
 
-            size = sizes.GetPostNoteSize(Beat.Start);
-            diff = size - PostNotes.Width;
             PostNotes.X = OnNotes.X + OnNotes.Width;
-            if (diff > 0) PostNotes.ApplyGlyphSpacing(diff);
+            PostNotes.Width = sizes.PostNoteSize;
 
             Width = CalculateWidth();
         }
 
         private float CalculateWidth()
         {
-#if MULTIVOICE_SUPPORT
-            return PostNotes.X + PostNotes.Width;
-#else
-            return PostNotes.X + PostNotes.Width;
-#endif
+            var shortestDurationSpace = 2;
+            var globalShortest = 2;
+
+
+            var minDuration = Beat.Voice.Bar.MinDuration.Value;
+
+            var factor = 1f;
+            switch (minDuration)
+            {
+                case Duration.Whole:
+                    factor = 0.5f;
+                    break;
+                case Duration.Half:
+                    factor = 0.8f;
+                    break;
+                case Duration.Quarter:
+                    factor = 1;
+                    break;
+                case Duration.Eighth:
+                    factor = 1;
+                    break;
+                case Duration.Sixteenth:
+                    factor = 1.5f;
+                    break;
+                case Duration.ThirtySecond:
+                    factor = 3f;
+                    break;
+                case Duration.SixtyFourth:
+                    factor = 4f;
+                    break;
+            }
+
+            var quarters = Beat.CalculateDuration() / (float)MidiUtils.QuarterTime;
+            return quarters * 65 * Scale * factor;
         }
 
         public override void DoLayout()
@@ -130,11 +138,11 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            // canvas.Color = new Color(200, 0, 0, 100);
-            // canvas.FillRect(cx + x, cy + y + 15 * Beat.Voice.Index, width, 10);
-            // canvas.Font = new Font("Arial", 10);
-            // canvas.Color = new Color(0, 0, 0);
-            // canvas.FillText(Beat.Voice.Index + ":" + Beat.Index, cx + X, cy + Y + 15 * Beat.Voice.Index);
+            //canvas.Color = new Color(200, 0, 0, 100);
+            //canvas.StrokeRect(cx + X, cy + Y + 15 * Beat.Voice.Index, Width, 10);
+            //canvas.Font = new Font("Arial", 10);
+            //canvas.Color = new Color(0, 0, 0);
+            //canvas.FillText(Beat.Voice.Index + ":" + Beat.Index, cx + X, cy + Y + 15 * Beat.Voice.Index);
 
             PreNotes.Paint(cx + X, cy + Y, canvas);
             //canvas.Color = new Color(200, 0, 0, 100);

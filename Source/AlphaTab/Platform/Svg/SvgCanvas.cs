@@ -100,6 +100,7 @@ namespace AlphaTab.Platform.Svg
             _buffer.Append(Color.ToRgbaString());
             _buffer.Append("; stroke-width:");
             _buffer.Append(LineWidth);
+            _buffer.Append("; fill:transparent");
             _buffer.Append(";\" />\n");
         }
 

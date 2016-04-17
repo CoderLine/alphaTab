@@ -36,11 +36,6 @@ namespace AlphaTab.Rendering.Glyphs
             Width = 10 * Scale;
         }
 
-        public override bool CanScale
-        {
-            get { return false; }
-        }
-
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             if (_hidden)

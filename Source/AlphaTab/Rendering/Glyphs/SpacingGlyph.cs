@@ -31,10 +31,5 @@ namespace AlphaTab.Rendering.Glyphs
             Width = width;
             _scaling = scaling;
         }
-
-        public override bool CanScale
-        {
-            get { return _scaling; }
-        }
     }
 }

@@ -76,16 +76,6 @@ namespace AlphaTab.Rendering.Glyphs
             }
         }
 
-        public override void ApplyGlyphSpacing(float spacing)
-        {
-            base.ApplyGlyphSpacing(spacing);
-            // TODO: we need to tell the beaming helper the position of rest beats
-            if (!Container.Beat.IsRest)
-            {
-                NoteNumbers.UpdateBeamingHelper(Container.X + X);
-            }
-        }
-
         private void CreateNoteGlyph(Note n)
         {
             var isGrace = Container.Beat.GraceType != GraceType.None;

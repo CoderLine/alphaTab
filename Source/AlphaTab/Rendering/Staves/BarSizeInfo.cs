@@ -30,17 +30,31 @@ namespace AlphaTab.Rendering.Staves
         public float FullWidth { get; set; }
         public FastDictionary<string, float> Sizes { get; set; }
 
-        public FastDictionary<int, float> PreNoteSizes { get; set; }
-        public FastDictionary<int, float> OnNoteSizes { get; set; }
-        public FastDictionary<int, float> PostNoteSizes { get; set; }
+        public float PreNoteSize { get; set; }
+        public float PostNoteSize { get; set; }
 
         public BarSizeInfo()
         {
             Sizes = new FastDictionary<string, float>();
-            PreNoteSizes = new FastDictionary<int, float>();
-            OnNoteSizes = new FastDictionary<int, float>();
-            PostNoteSizes = new FastDictionary<int, float>();
             FullWidth = 0;
+            PreNoteSize = 0;
+            PostNoteSize = 0;
+        }
+
+        public void UpdatePreNoteSize(float size)
+        {
+            if (size > PreNoteSize)
+            {
+                PreNoteSize = size;
+            }
+        }
+
+        public void UpdatePostNoteSize(float size)
+        {
+            if (size > PostNoteSize)
+            {
+                PostNoteSize = size;
+            }
         }
 
         public void SetSize(string key, float size)
@@ -55,48 +69,6 @@ namespace AlphaTab.Rendering.Staves
                 return Sizes[key];
             }
             return 0;
-        }
-
-        public float GetPreNoteSize(int beat)
-        {
-            if (PreNoteSizes.ContainsKey(beat))
-            {
-                return PreNoteSizes[beat];
-            }
-            return 0;
-        }
-
-        public float GetOnNoteSize(int beat)
-        {
-            if (OnNoteSizes.ContainsKey(beat))
-            {
-                return OnNoteSizes[beat];
-            }
-            return 0;
-        }
-
-        public float GetPostNoteSize(int beat)
-        {
-            if (PostNoteSizes.ContainsKey(beat))
-            {
-                return PostNoteSizes[beat];
-            }
-            return 0;
-        }
-
-        public void SetPreNoteSize(int beat, float size)
-        {
-            PreNoteSizes[beat] = size;
-        }
-
-        public void SetOnNoteSize(int beat, float size)
-        {
-            OnNoteSizes[beat] = size;
-        }
-
-        public void SetPostNoteSize(int beat, float size)
-        {
-            PostNoteSizes[beat] = size;
         }
     }
 }

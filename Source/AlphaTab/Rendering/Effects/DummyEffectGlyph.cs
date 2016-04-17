@@ -35,11 +35,6 @@ namespace AlphaTab.Rendering.Effects
             Width = 20 * Scale;
         }
 
-        public override bool CanScale
-        {
-            get { return false; }
-        }
-
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var res = Renderer.Resources;

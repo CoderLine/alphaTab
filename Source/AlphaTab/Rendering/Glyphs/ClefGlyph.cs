@@ -32,11 +32,6 @@ namespace AlphaTab.Rendering.Glyphs
             Width = 28 * Scale;
         }
 
-        public override bool CanScale
-        {
-            get { return false; }
-        }
-
         private static MusicFontSymbol GetSymbol(Clef clef)
         {
             switch (clef)

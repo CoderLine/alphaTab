@@ -38,22 +38,6 @@ namespace AlphaTab.Rendering.Glyphs
             Y = y;
         }
 
-        public virtual void ApplyGlyphSpacing(float spacing)
-        {
-            if (CanScale)
-            {
-                Width += spacing;
-            }
-        }
-
-        public virtual bool CanScale
-        {
-            get
-            {
-                return true;
-            }
-        }
-
         public float Scale
         {
             get

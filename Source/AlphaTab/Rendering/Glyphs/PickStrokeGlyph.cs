@@ -31,11 +31,6 @@ namespace AlphaTab.Rendering.Glyphs
             Width = 9 * Scale;
         }
 
-        public override bool CanScale
-        {
-            get { return false; }
-        }
-
         private static MusicFontSymbol GetSymbol(PickStrokeType pickStroke)
         {
             switch (pickStroke)

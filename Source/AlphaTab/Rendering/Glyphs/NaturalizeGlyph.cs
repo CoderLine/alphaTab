@@ -31,10 +31,5 @@ namespace AlphaTab.Rendering.Glyphs
         {
             Width = 8 * (_isGrace ? NoteHeadGlyph.GraceScale : 1) * Scale;
         }
-
-        public override bool CanScale
-        {
-            get { return false; }
-        }
     }
 }

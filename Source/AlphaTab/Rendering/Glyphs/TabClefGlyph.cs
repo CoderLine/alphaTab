@@ -32,11 +32,6 @@ namespace AlphaTab.Rendering.Glyphs
             Width = 28 * Scale;
         }
 
-        public override bool CanScale
-        {
-            get { return false; }
-        }
-
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             //TabBarRenderer tabBarRenderer = (TabBarRenderer)Renderer;

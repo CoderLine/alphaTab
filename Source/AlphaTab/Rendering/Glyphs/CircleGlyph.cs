@@ -34,11 +34,6 @@ namespace AlphaTab.Rendering.Glyphs
             Width = _size + (3 * Scale);
         }
 
-        public override bool CanScale
-        {
-            get { return false; }
-        }
-
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             canvas.FillCircle(cx + X, cy + Y, _size);

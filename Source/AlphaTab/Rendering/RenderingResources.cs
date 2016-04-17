@@ -45,6 +45,7 @@ namespace AlphaTab.Rendering
         public Font TabClefFont { get; set; }
 
         public Color MainGlyphColor { get; set; }
+        public Color SecondaryGlyphColor { get; set; }
 
         public float Scale { get; set; }
 
@@ -86,6 +87,7 @@ namespace AlphaTab.Rendering
         
             ScoreInfoColor = new Color(0,0,0);
             MainGlyphColor = new Color(0,0,0);
+            SecondaryGlyphColor = new Color(0,0,0, 100);
         }
     }
 }

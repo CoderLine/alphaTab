@@ -41,20 +41,6 @@ namespace AlphaTab.Rendering.Glyphs
             VoiceIndex = voiceIndex;
         }
 
-        public override void ApplyGlyphSpacing(float spacing)
-        {
-            var glyphSpacing = spacing / BeatGlyphs.Count;
-            var gx = 0.0f;
-            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
-            {
-                var g = BeatGlyphs[i];
-                g.X = gx;
-                gx += g.Width + glyphSpacing;
-                g.ApplyGlyphSpacing(glyphSpacing);
-            }
-            Width = gx;
-        }
-
         public void RegisterMaxSizes(BarSizeInfo sizes)
         {
             for (int i = 0, j = BeatGlyphs.Count; i < j; i++)

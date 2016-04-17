@@ -47,14 +47,6 @@ namespace AlphaTab.Rendering.Glyphs
             }
         }
 
-        public override bool CanScale
-        {
-            get
-            {
-                return false;
-            }
-        }
-
         private static MusicFontSymbol GetSymbol(Duration duration)
         {
             switch (duration)

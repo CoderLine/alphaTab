@@ -70,10 +70,5 @@ namespace AlphaTab.Rendering.Glyphs
                     break;
             }
         }
-
-        public override bool CanScale
-        {
-            get { return false; }
-        }
     }
 }

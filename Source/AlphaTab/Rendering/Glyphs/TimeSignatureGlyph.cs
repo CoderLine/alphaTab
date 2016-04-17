@@ -29,11 +29,6 @@ namespace AlphaTab.Rendering.Glyphs
             _denominator = denominator;
         }
 
-        public override bool CanScale
-        {
-            get { return false; }
-        }
-
         public override void DoLayout()
         {
             var numerator = new NumberGlyph(0, 0, _numerator);

@@ -29,6 +29,11 @@ namespace AlphaTab.Rendering.Glyphs
     {
         protected FastList<Glyph> Glyphs;
 
+        public bool IsEmpty
+        {
+            get { return Glyphs == null || Glyphs.Count == 0; }
+        }
+
         public GlyphGroup(float x, float y)
             : base(x, y)
         {

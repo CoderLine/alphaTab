@@ -27,11 +27,6 @@ namespace AlphaTab.Rendering.Glyphs
             _number = number;
         }
 
-        public override bool CanScale
-        {
-            get { return false; }
-        }
-
         public override void DoLayout()
         {
             var i = _number;

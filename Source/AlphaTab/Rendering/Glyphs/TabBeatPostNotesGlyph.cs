@@ -26,8 +26,6 @@ namespace AlphaTab.Rendering.Glyphs
             // note specific effects
             NoteLoop(CreateNoteGlyphs);
 
-            AddGlyph(new SpacingGlyph(0, 0, BeatDurationWidth * Scale));
-
             base.DoLayout();
         }
 
@@ -53,7 +51,7 @@ namespace AlphaTab.Rendering.Glyphs
                 var bendValueHeight = 6;
                 var bendHeight = n.MaxBendPoint.Value * bendValueHeight;
                 Renderer.RegisterOverflowTop(bendHeight);
-                AddGlyph(new BendGlyph(n, BeatDurationWidth * Scale, bendValueHeight));
+                AddGlyph(new BendGlyph(n, Width, bendValueHeight));
             }
         }
     }

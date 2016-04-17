@@ -108,11 +108,6 @@ namespace AlphaTab.Rendering.Glyphs
             }
         }
 
-        public override bool CanScale
-        {
-            get { return false; }
-        }
-
         public void UpdateBeamingHelper(float cx)
         {
             BeamingHelper.RegisterBeatLineX(Beat, cx + X + UpLineX, cx + X + DownLineX);
@@ -297,7 +292,9 @@ namespace AlphaTab.Rendering.Glyphs
                 }
             }
 
-            canvas.Color = Renderer.Layout.Renderer.RenderingResources.MainGlyphColor;
+            canvas.Color = Beat.Voice.Index == 0 
+                ? Renderer.Layout.Renderer.RenderingResources.MainGlyphColor
+                : Renderer.Layout.Renderer.RenderingResources.SecondaryGlyphColor;
 
             if (_tremoloPicking != null)
                 _tremoloPicking.Paint(cx + X, cy + Y, canvas);
