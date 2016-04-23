@@ -15,6 +15,9 @@ namespace AlphaTab.Platform
             return JsContext.parseFloat(s);
         }
 
+        [JsMethod(InlineCodeExpression = "Math.log2(f)")]
+        public static extern float Log2(float f);
+
         public static int ParseInt(string s)
         {
             return JsContext.parseInt(s);

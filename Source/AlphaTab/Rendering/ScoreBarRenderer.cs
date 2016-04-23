@@ -188,7 +188,7 @@ namespace AlphaTab.Rendering
         private void PaintBeamHelper(float cx, float cy, ICanvas canvas, BeamingHelper h)
         {
             canvas.Color = h.Voice.Index == 0
-                ? Resources.SecondaryGlyphColor
+                ? Resources.MainGlyphColor
                 : Resources.SecondaryGlyphColor;
 
             // check if we need to paint simple footer

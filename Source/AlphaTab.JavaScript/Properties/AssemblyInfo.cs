@@ -72,6 +72,7 @@ using SharpKit.JavaScript;
 [assembly: JsMethod(TargetType = typeof(Math), TargetMethod = "Sqrt", Name = "sqrt")]
 [assembly: JsMethod(TargetType = typeof(Math), TargetMethod = "Ceiling", Name = "ceil")]
 [assembly: JsMethod(TargetType = typeof(Math), TargetMethod = "Round", Name = "round")]
+[assembly: JsMethod(TargetType = typeof(Math), TargetMethod = "Log", Name = "log")]
 
 [assembly: JsMethod(TargetType = typeof(string), TargetMethod = "IsNullOrEmpty", InlineCodeExpression = "((value == null) || (value.length == 0))")]
 [assembly: JsMethod(TargetType = typeof(string), TargetMethod = "StartsWith", InlineCodeExpression = "this.indexOf(value) == 0")]
@@ -84,6 +85,8 @@ using SharpKit.JavaScript;
 [assembly: JsMethod(TargetType = typeof(IComparable), TargetMethod = "CompareTo", InlineCodeExpression = "(this - obj)")]
 [assembly: JsMethod(TargetType = typeof(int), TargetMethod = "CompareTo", InlineCodeExpression = "(this - value)")]
 [assembly: JsMethod(TargetType = typeof(float), TargetMethod = "CompareTo", InlineCodeExpression = "(this - value)")]
+
+[assembly: JsMethod(TargetType = typeof(System.Console), TargetMethod = "WriteLine", InlineCodeExpression = "console.log(value)")]
 
 [assembly: JsMethod(TargetType = typeof(Nullable<>), TargetMethod = "get_Value", InlineCodeExpression = "this")]
 

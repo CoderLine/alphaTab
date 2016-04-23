@@ -112,11 +112,12 @@ namespace AlphaTab.Model
             {
                 var beat = Beats[i];
                 beat.Finish();
-                if (MinDuration == null || MinDuration.Value > beat.Duration)
+                // MinDuration means biggest duration value considering the denominator of the fraction
+                if (MinDuration == null || MinDuration.Value < beat.Duration)
                 {
                     MinDuration = beat.Duration;
                 }
-                if (MaxDuration == null || MaxDuration.Value < beat.Duration)
+                if (MaxDuration == null || MaxDuration.Value > beat.Duration)
                 {
                     MaxDuration = beat.Duration;
                 }

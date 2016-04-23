@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
@@ -67,40 +68,43 @@ namespace AlphaTab.Rendering.Glyphs
 
         private float CalculateWidth()
         {
-            var shortestDurationSpace = 2;
-            var globalShortest = 2;
-
-
             var minDuration = Beat.Voice.Bar.MinDuration.Value;
+            var minDurationTicks = minDuration.ToTicks();
+            var ticks = (float)Beat.CalculateDuration();
 
-            var factor = 1f;
-            switch (minDuration)
-            {
-                case Duration.Whole:
-                    factor = 0.5f;
-                    break;
-                case Duration.Half:
-                    factor = 0.8f;
-                    break;
-                case Duration.Quarter:
-                    factor = 1;
-                    break;
-                case Duration.Eighth:
-                    factor = 1;
-                    break;
-                case Duration.Sixteenth:
-                    factor = 1.5f;
-                    break;
-                case Duration.ThirtySecond:
-                    factor = 3f;
-                    break;
-                case Duration.SixtyFourth:
-                    factor = 4f;
-                    break;
-            }
+            var factor = 1 + Std.Log2(ticks / minDurationTicks);
+            //switch (minDuration)
+            //{
+            //    case Duration.Whole:
+            //        factor = 0.5f;
+            //        break;
+            //    case Duration.Half:
+            //        factor = 0.3f;
+            //        break;
+            //    case Duration.Quarter:
+            //        factor = 1f;
+            //        break;
+            //    case Duration.Eighth:
+            //        factor = 1f;
+            //        break;
+            //    case Duration.Sixteenth:
+            //        factor = 1f;
+            //        break;
+            //    case Duration.ThirtySecond:
+            //        factor = 1f;
+            //        break;
+            //    case Duration.SixtyFourth:
+            //        factor = 1f;
+            //        break;
+            //}
 
-            var quarters = Beat.CalculateDuration() / (float)MidiUtils.QuarterTime;
-            return quarters * 65 * Scale * factor;
+            //var quarters = Beat.CalculateDuration() / MidiUtils.QuarterTime;
+            var width = 30 * Scale * factor;
+            Width = width;
+            Console.WriteLine("Ticks:" + ticks + ", MinDuration:" + minDurationTicks + ",Factor: " + factor + ", Width:" + width);
+
+
+            return width;
         }
 
         public override void DoLayout()

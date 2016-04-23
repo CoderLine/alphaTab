@@ -37,6 +37,12 @@ namespace AlphaTab.Platform
             return f;
         }
 
+        public static float Log2(float s)
+        {
+            return (float)Math.Log(s, 2);
+        }
+
+
         public static int ParseInt(int s)
         {
             return s;

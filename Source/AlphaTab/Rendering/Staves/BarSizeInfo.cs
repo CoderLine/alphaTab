@@ -70,5 +70,14 @@ namespace AlphaTab.Rendering.Staves
             }
             return 0;
         }
+
+        public float Force { get; set; }
+        public void UpdateForce(float newForce)
+        {
+            if (Force < newForce)
+            {
+                Force = newForce;
+            }
+        }
     }
 }

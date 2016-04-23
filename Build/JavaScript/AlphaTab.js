@@ -6995,11 +6995,11 @@ AlphaTab.Model.Bar.prototype = {
         for (var i = 0,j = this.Voices.length; i < j; i++){
             var voice = this.Voices[i];
             voice.Finish();
-            if (voice.MinDuration == null || this.MinDuration == null || this.MinDuration > voice.MinDuration){
+            if (voice.MinDuration == null || this.MinDuration == null || this.MinDuration < voice.MinDuration){
                 this.MinDuration = voice.MinDuration;
             }
             if (voice.MaxDuration == null || this.MaxDuration == null || this.MaxDuration > voice.MaxDuration){
-                this.MinDuration = voice.MaxDuration;
+                this.MaxDuration = voice.MaxDuration;
             }
         }
     }
@@ -7954,10 +7954,11 @@ AlphaTab.Model.Voice.prototype = {
         for (var i = 0,j = this.Beats.length; i < j; i++){
             var beat = this.Beats[i];
             beat.Finish();
-            if (this.MinDuration == null || this.MinDuration > beat.Duration){
+            // MinDuration means biggest duration value considering the denominator of the fraction
+            if (this.MinDuration == null || this.MinDuration < beat.Duration){
                 this.MinDuration = beat.Duration;
             }
-            if (this.MaxDuration == null || this.MaxDuration < beat.Duration){
+            if (this.MaxDuration == null || this.MaxDuration > beat.Duration){
                 this.MaxDuration = beat.Duration;
             }
         }
@@ -9747,36 +9748,39 @@ AlphaTab.Rendering.Glyphs.BeatContainerGlyph.prototype = {
         this.Width = this.CalculateWidth();
     },
     CalculateWidth: function (){
-        // the shortest note indicates which spacing to take. 
-        // if we have 32th notes, we need to be more generous per tick to have enough space for them. 
-        // if we only have quarter notes, we can squeeze them a bit more. 
-        var maxDuration = this.Beat.Voice.Bar.MinDuration;
-        var factor = 1;
-        switch (maxDuration){
-            case AlphaTab.Model.Duration.Whole:
-                factor = 0.5;
-                break;
-            case AlphaTab.Model.Duration.Half:
-                factor = 0.8;
-                break;
-            case AlphaTab.Model.Duration.Quarter:
-                factor = 1;
-                break;
-            case AlphaTab.Model.Duration.Eighth:
-                factor = 1;
-                break;
-            case AlphaTab.Model.Duration.Sixteenth:
-                factor = 1.5;
-                break;
-            case AlphaTab.Model.Duration.ThirtySecond:
-                factor = 3;
-                break;
-            case AlphaTab.Model.Duration.SixtyFourth:
-                factor = 4;
-                break;
-        }
-        var quarters = this.Beat.CalculateDuration() / 960;
-        return quarters * 65 * this.get_Scale() * factor;
+        var minDuration = this.Beat.Voice.Bar.MinDuration;
+        var minDurationTicks = AlphaTab.Audio.MidiUtils.ToTicks(minDuration);
+        var ticks = this.Beat.CalculateDuration();
+        var factor = 1 + Math.log2(ticks / minDurationTicks);
+        //switch (minDuration)
+        //{
+        //    case Duration.Whole:
+        //        factor = 0.5f;
+        //        break;
+        //    case Duration.Half:
+        //        factor = 0.3f;
+        //        break;
+        //    case Duration.Quarter:
+        //        factor = 1f;
+        //        break;
+        //    case Duration.Eighth:
+        //        factor = 1f;
+        //        break;
+        //    case Duration.Sixteenth:
+        //        factor = 1f;
+        //        break;
+        //    case Duration.ThirtySecond:
+        //        factor = 1f;
+        //        break;
+        //    case Duration.SixtyFourth:
+        //        factor = 1f;
+        //        break;
+        //}
+        //var quarters = Beat.CalculateDuration() / MidiUtils.QuarterTime;
+        var width = 30 * this.get_Scale() * factor;
+        this.Width = width;
+        console.log("Ticks:" + ticks + ", MinDuration:" + minDurationTicks + ",Factor: " + factor + ", Width:" + width);
+        return width;
     },
     DoLayout: function (){
         this.PreNotes.X = 0;
@@ -13067,7 +13071,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
         }
     },
     PaintBeamHelper: function (cx, cy, canvas, h){
-        canvas.set_Color(h.Voice.Index == 0 ? this.get_Resources().SecondaryGlyphColor : this.get_Resources().SecondaryGlyphColor);
+        canvas.set_Color(h.Voice.Index == 0 ? this.get_Resources().MainGlyphColor : this.get_Resources().SecondaryGlyphColor);
         // check if we need to paint simple footer
         if (h.Beats.length == 1){
             this.PaintFooter(cx, cy, canvas, h);
@@ -13615,6 +13619,7 @@ AlphaTab.Rendering.Staves.BarSizeInfo = function (){
     this.Sizes = null;
     this.PreNoteSize = 0;
     this.PostNoteSize = 0;
+    this.Force = 0;
     this.Sizes = {};
     this.FullWidth = 0;
     this.PreNoteSize = 0;
@@ -13639,6 +13644,11 @@ AlphaTab.Rendering.Staves.BarSizeInfo.prototype = {
             return this.Sizes[key];
         }
         return 0;
+    },
+    UpdateForce: function (newForce){
+        if (this.Force < newForce){
+            this.Force = newForce;
+        }
     }
 };
 AlphaTab.Rendering.Staves.Staff = function (staff, staveId, factory, settings){

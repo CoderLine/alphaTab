@@ -83,13 +83,13 @@ namespace AlphaTab.Model
             {
                 var voice = Voices[i];
                 voice.Finish();
-                if (voice.MinDuration == null || MinDuration == null || MinDuration.Value > voice.MinDuration.Value)
+                if (voice.MinDuration == null || MinDuration == null || MinDuration.Value < voice.MinDuration.Value)
                 {
                     MinDuration = voice.MinDuration;
                 }
                 if (voice.MaxDuration == null || MaxDuration == null || MaxDuration.Value > voice.MaxDuration.Value)
                 {
-                    MinDuration = voice.MaxDuration;
+                    MaxDuration = voice.MaxDuration;
                 }
             }
         }
