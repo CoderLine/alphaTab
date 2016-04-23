@@ -132,12 +132,16 @@ namespace AlphaTab.Rendering.Staves
         {
             BarRenderers.RemoveAt(BarRenderers.Count - 1);
         }
-
-        public void ApplyBarSpacing(float spacing)
+        
+        public void ScaleToWidth(float width)
         {
+            // Note: here we could do some "intelligent" distribution of 
+            // the space over the bar renderers, for now we evenly apply the space to all bars
+            var difference = width - StaveGroup.Width;
+            var spacePerBar = difference/BarRenderers.Count;
             for (int i = 0, j = BarRenderers.Count; i < j; i++)
             {
-                BarRenderers[i].ApplyBarSpacing(spacing);
+                BarRenderers[i].ScaleToWidth(BarRenderers[i].Width + spacePerBar);
             }
         }
 

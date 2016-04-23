@@ -56,6 +56,12 @@ namespace AlphaTab
         public LayoutSettings Layout { get; set; }
 
         /// <summary>
+        /// The force factor to use by default for layouting the score. 
+        /// Adjust this value to adjust the stretching of the notation. 
+        /// </summary>
+        public float StretchForce { get; set; }
+
+        /// <summary>
         /// The staves to create for each row.
         /// </summary>
         public FastList<StaveSettings> Staves { get; set; }
@@ -67,6 +73,7 @@ namespace AlphaTab
                 var settings = new Settings();
 
                 settings.Scale = 1.0f;
+                settings.StretchForce = 30;
                 settings.Width = 600;
                 settings.Height = 200;
                 settings.Engine = "default";

@@ -252,13 +252,13 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public void ApplyBarSpacing(float spacing)
+        public void ScaleToWidth(float width)
         {
             for (int i = 0, j = _allStaves.Count; i < j; i++)
             {
-                _allStaves[i].ApplyBarSpacing(spacing);
+                _allStaves[i].ScaleToWidth(width);
             }
-            Width += MasterBars.Count * spacing;
+            Width = width;
         }
 
         public void Paint(float cx, float cy, ICanvas canvas)

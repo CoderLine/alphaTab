@@ -51,7 +51,7 @@ namespace AlphaTab.Rendering
             {
                 return beat.Container.X + beat.X + beat.NoteNumbers.GetNoteX(note, onEnd);
             }
-            return PostBeatGlyphsStart;
+            return 0;
         }
 
         public float GetBeatX(Beat beat)

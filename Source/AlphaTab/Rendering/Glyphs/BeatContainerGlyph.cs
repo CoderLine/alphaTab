@@ -34,6 +34,8 @@ namespace AlphaTab.Rendering.Glyphs
         public BeatGlyphBase PostNotes { get; set; }
         public FastList<Glyph> Ties { get; set; }
 
+        public float ScalingFactor { get; set; }
+
         public BeatContainerGlyph(Beat beat)
             : base(0, 0)
         {
@@ -62,67 +64,26 @@ namespace AlphaTab.Rendering.Glyphs
 
             PostNotes.X = OnNotes.X + OnNotes.Width;
             PostNotes.Width = sizes.PostNoteSize;
-
-            Width = CalculateWidth();
         }
 
-        private float CalculateWidth()
+        private float CalculateWidth(float force)
         {
-            var minDuration = Beat.Voice.Bar.MinDuration.Value;
-            var minDurationTicks = minDuration.ToTicks();
-            var ticks = (float)Beat.CalculateDuration();
-
-            var factor = 1 + Std.Log2(ticks / minDurationTicks);
-            //switch (minDuration)
-            //{
-            //    case Duration.Whole:
-            //        factor = 0.5f;
-            //        break;
-            //    case Duration.Half:
-            //        factor = 0.3f;
-            //        break;
-            //    case Duration.Quarter:
-            //        factor = 1f;
-            //        break;
-            //    case Duration.Eighth:
-            //        factor = 1f;
-            //        break;
-            //    case Duration.Sixteenth:
-            //        factor = 1f;
-            //        break;
-            //    case Duration.ThirtySecond:
-            //        factor = 1f;
-            //        break;
-            //    case Duration.SixtyFourth:
-            //        factor = 1f;
-            //        break;
-            //}
-
-            //var quarters = Beat.CalculateDuration() / MidiUtils.QuarterTime;
-            var width = 30 * Scale * factor;
-            Width = width;
-            Console.WriteLine("Ticks:" + ticks + ", MinDuration:" + minDurationTicks + ",Factor: " + factor + ", Width:" + width);
-
-
-            return width;
+            return force * Scale * ScalingFactor;
         }
 
         public override void DoLayout()
         {
             PreNotes.X = 0;
-            PreNotes.Index = 0;
             PreNotes.Renderer = Renderer;
             PreNotes.Container = this;
             PreNotes.DoLayout();
 
             OnNotes.X = PreNotes.X + PreNotes.Width;
-            OnNotes.Index = 1;
             OnNotes.Renderer = Renderer;
             OnNotes.Container = this;
             OnNotes.DoLayout();
 
             PostNotes.X = OnNotes.X + OnNotes.Width;
-            PostNotes.Index = 2;
             PostNotes.Renderer = Renderer;
             PostNotes.Container = this;
             PostNotes.DoLayout();
@@ -133,8 +94,16 @@ namespace AlphaTab.Rendering.Glyphs
                 CreateTies(Beat.Notes[i--]);
             }
 
-            Width = CalculateWidth();
+            var minDuration = Beat.Voice.Bar.MinDuration.Value;
+            var minDurationTicks = minDuration.ToTicks();
+            var ticks = (float)Beat.CalculateDuration();
+
+            ScalingFactor = 1 + Std.Log2(ticks / minDurationTicks);
+
+            
+            Width = CalculateWidth(Renderer.Settings.StretchForce);
         }
+
 
         protected virtual void CreateTies(Note n)
         {

@@ -65,9 +65,9 @@ namespace AlphaTab.Rendering
                 BottomOverflow = bottomOverflow;
         }
 
-
-        public virtual void ApplyBarSpacing(float spacing)
+        public virtual void ScaleToWidth(float width)
         {
+            Width = width;
         }
 
         public RenderingResources Resources

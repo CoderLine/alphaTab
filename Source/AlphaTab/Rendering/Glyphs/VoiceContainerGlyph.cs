@@ -16,8 +16,10 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Staves;
 
@@ -39,6 +41,12 @@ namespace AlphaTab.Rendering.Glyphs
         {
             BeatGlyphs = new FastList<BeatContainerGlyph>();
             VoiceIndex = voiceIndex;
+        }
+
+
+        public void ScaleToWidth(float width)
+        {
+            Width = width;
         }
 
         public void RegisterMaxSizes(BarSizeInfo sizes)
@@ -70,7 +78,6 @@ namespace AlphaTab.Rendering.Glyphs
             g.X = BeatGlyphs.Count == 0
                 ? 0
                 : BeatGlyphs[BeatGlyphs.Count - 1].X + BeatGlyphs[BeatGlyphs.Count - 1].Width;
-            g.Index = BeatGlyphs.Count;
             g.Renderer = Renderer;
             g.DoLayout();
             BeatGlyphs.Add((BeatContainerGlyph)g);
@@ -92,8 +99,8 @@ namespace AlphaTab.Rendering.Glyphs
         //private static Random Random = new Random();
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            //canvas.Color = new Color((byte) Random.Next(255), (byte) Random.Next(255), (byte) Random.Next(255), 128);
-            //canvas.FillRect(cx + X, cy + Y, Width, 100);
+            canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 128);
+            canvas.FillRect(cx + X, cy + Y, Width, 100);
             for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {
                 BeatGlyphs[i].Paint(cx + X, cy + Y, canvas);

@@ -243,19 +243,9 @@ namespace AlphaTab.Rendering.Layout
         /// </summary>
         private void FitGroup(StaveGroup group)
         {
-            // calculate additional space for each bar (can be negative!)
-            float barSpace = 0f;
-            float freeSpace = MaxWidth - group.Width;
-
-            if (freeSpace != 0 && group.MasterBars.Count > 0)
+            if (group.IsFull || group.Width > MaxWidth)
             {
-                barSpace = freeSpace / group.MasterBars.Count;
-            }
-
-            if (group.IsFull || barSpace < 0)
-            {
-                // add it to the measures
-                group.ApplyBarSpacing(barSpace);
+                group.ScaleToWidth(MaxWidth);
             }
 
             Width = Math.Max(Width, group.Width);
