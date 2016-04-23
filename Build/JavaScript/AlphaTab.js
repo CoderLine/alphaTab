@@ -1412,6 +1412,8 @@ AlphaTab.Settings.FromJson = function (json){
         settings.Height = json.height;
     if ("engine"in json)
         settings.Engine = json.engine;
+    if ("stretchForce"in json)
+        settings.StretchForce = json.stretchForce;
     if ("layout"in json){
         if (typeof(json.layout) == "string"){
             settings.Layout.Mode = json.layout;
@@ -12632,7 +12634,9 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
         return y;
     },
     FitGroup: function (group){
-        group.ScaleToWidth(this.get_MaxWidth());
+        if (group.IsFull || group.Width > this.get_MaxWidth()){
+            group.ScaleToWidth(this.get_MaxWidth());
+        }
         this.Width = Math.max(this.Width, group.Width);
     },
     CreateStaveGroup: function (currentBarIndex, endIndex){
@@ -14088,7 +14092,7 @@ AlphaTab.Rendering.Utils.AccidentalHelper = function (){
 };
 AlphaTab.Rendering.Utils.AccidentalHelper.prototype = {
     GetNoteId: function (n){
-        return n.Beat.Index + "-" + n.String;
+        return n.Beat.Voice.Index + "-" + n.Beat.Index + "-" + n.String;
     },
     ApplyAccidental: function (note){
         var noteValue = note.get_RealValue();

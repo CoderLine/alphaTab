@@ -243,7 +243,7 @@ namespace AlphaTab.Rendering.Layout
         /// </summary>
         private void FitGroup(StaveGroup group)
         {
-            //if (group.IsFull || group.Width > MaxWidth)
+            if (group.IsFull || group.Width > MaxWidth)
             {
                 group.ScaleToWidth(MaxWidth);
             }
