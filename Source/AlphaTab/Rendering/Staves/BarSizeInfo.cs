@@ -32,6 +32,7 @@ namespace AlphaTab.Rendering.Staves
 
         public float PreNoteSize { get; set; }
         public float PostNoteSize { get; set; }
+        public float VoiceSize { get; set; }
 
         public BarSizeInfo()
         {
@@ -39,6 +40,7 @@ namespace AlphaTab.Rendering.Staves
             FullWidth = 0;
             PreNoteSize = 0;
             PostNoteSize = 0;
+            VoiceSize = 0;
         }
 
         public void UpdatePreNoteSize(float size)
@@ -57,6 +59,14 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
+        public void UpdateVoiceSize(float size)
+        {
+            if (size > VoiceSize)
+            {
+                VoiceSize = size;
+            }
+        }
+
         public void SetSize(string key, float size)
         {
             Sizes[key] = size;
@@ -71,13 +81,5 @@ namespace AlphaTab.Rendering.Staves
             return 0;
         }
 
-        public float Force { get; set; }
-        public void UpdateForce(float newForce)
-        {
-            if (Force < newForce)
-            {
-                Force = newForce;
-            }
-        }
     }
 }

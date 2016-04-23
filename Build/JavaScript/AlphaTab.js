@@ -12109,17 +12109,20 @@ AlphaTab.Rendering.Glyphs.VoiceContainerGlyph.prototype = {
         var previousWidth = this.Width;
         var previousForce = this.Renderer.get_Settings().StretchForce;
         this.Width = width;
-        // calculate the force we need according to the resizing
-        var newForce = previousForce * this.Width / previousWidth;
-        var x = 0;
-        for (var i = 0,j = this.BeatGlyphs.length; i < j; i++){
-            var b = this.BeatGlyphs[i];
-            b.X = x;
-            b.ScaleToForce(newForce);
-            x += b.Width;
+        if (this.BeatGlyphs.length > 0){
+            // calculate the force we need according to the resizing
+            var newForce = previousForce * this.Width / previousWidth;
+            var x = 0;
+            for (var i = 0,j = this.BeatGlyphs.length; i < j; i++){
+                var b = this.BeatGlyphs[i];
+                b.X = x;
+                b.ScaleToForce(newForce);
+                x += b.Width;
+            }
         }
     },
     RegisterMaxSizes: function (sizes){
+        sizes.UpdateVoiceSize(this.Width);
         for (var i = 0,j = this.BeatGlyphs.length; i < j; i++){
             var b = this.BeatGlyphs[i];
             b.RegisterMaxSizes(sizes);
@@ -12134,6 +12137,8 @@ AlphaTab.Rendering.Glyphs.VoiceContainerGlyph.prototype = {
         if (this.BeatGlyphs.length > 0){
             this.Width = this.BeatGlyphs[this.BeatGlyphs.length - 1].X + this.BeatGlyphs[this.BeatGlyphs.length - 1].Width;
         }
+        var size = sizes.VoiceSize;
+        this.ScaleToWidth(size);
     },
     AddGlyph: function (g){
         g.X = this.BeatGlyphs.length == 0 ? 0 : this.BeatGlyphs[this.BeatGlyphs.length - 1].X + this.BeatGlyphs[this.BeatGlyphs.length - 1].Width;
@@ -13541,11 +13546,12 @@ AlphaTab.Rendering.Staves.BarSizeInfo = function (){
     this.Sizes = null;
     this.PreNoteSize = 0;
     this.PostNoteSize = 0;
-    this.Force = 0;
+    this.VoiceSize = 0;
     this.Sizes = {};
     this.FullWidth = 0;
     this.PreNoteSize = 0;
     this.PostNoteSize = 0;
+    this.VoiceSize = 0;
 };
 AlphaTab.Rendering.Staves.BarSizeInfo.prototype = {
     UpdatePreNoteSize: function (size){
@@ -13558,6 +13564,11 @@ AlphaTab.Rendering.Staves.BarSizeInfo.prototype = {
             this.PostNoteSize = size;
         }
     },
+    UpdateVoiceSize: function (size){
+        if (size > this.VoiceSize){
+            this.VoiceSize = size;
+        }
+    },
     SetSize: function (key, size){
         this.Sizes[key] = size;
     },
@@ -13566,11 +13577,6 @@ AlphaTab.Rendering.Staves.BarSizeInfo.prototype = {
             return this.Sizes[key];
         }
         return 0;
-    },
-    UpdateForce: function (newForce){
-        if (this.Force < newForce){
-            this.Force = newForce;
-        }
     }
 };
 AlphaTab.Rendering.Staves.Staff = function (staff, staveId, factory, settings){

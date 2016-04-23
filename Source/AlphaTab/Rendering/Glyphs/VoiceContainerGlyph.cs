@@ -50,20 +50,24 @@ namespace AlphaTab.Rendering.Glyphs
 
             Width = width;
 
-            // calculate the force we need according to the resizing
-            var newForce = previousForce * Width / previousWidth;
-            var x = 0f;
-            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
+            if (BeatGlyphs.Count > 0)
             {
-                var b = BeatGlyphs[i];
-                b.X = x;
-                b.ScaleToForce(newForce);
-                x += b.Width;
+                // calculate the force we need according to the resizing
+                var newForce = previousForce*Width/previousWidth;
+                var x = 0f;
+                for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
+                {
+                    var b = BeatGlyphs[i];
+                    b.X = x;
+                    b.ScaleToForce(newForce);
+                    x += b.Width;
+                }
             }
         }
 
         public void RegisterMaxSizes(BarSizeInfo sizes)
         {
+            sizes.UpdateVoiceSize(Width);
             for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {
                 var b = BeatGlyphs[i];
@@ -84,6 +88,9 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 Width = BeatGlyphs[BeatGlyphs.Count - 1].X + BeatGlyphs[BeatGlyphs.Count - 1].Width;
             }
+
+            var size = sizes.VoiceSize;
+            ScaleToWidth(size);
         }
 
         public override void AddGlyph(Glyph g)
