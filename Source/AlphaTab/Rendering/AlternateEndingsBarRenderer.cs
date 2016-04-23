@@ -57,14 +57,10 @@ namespace AlphaTab.Rendering
 
         protected override void CreateBeatGlyphs()
         {
-#if MULTIVOICE_SUPPORT
             for (int v = 0; v < Bar.Voices.Count; v++)
             {
                 CreateVoiceGlyphs(Bar.Voices[v]);
             }
-#else
-            CreateVoiceGlyphs(Bar.Voices[0]);
-#endif
         }
 
         private void CreateVoiceGlyphs(Voice voice)

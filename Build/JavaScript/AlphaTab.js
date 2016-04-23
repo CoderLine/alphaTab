@@ -8624,7 +8624,6 @@ AlphaTab.Rendering.AlternateEndingsBarRenderer.prototype = {
         for (var v = 0; v < this.Bar.Voices.length; v++){
             this.CreateVoiceGlyphs(this.Bar.Voices[v]);
         }
-        
     },
     CreateVoiceGlyphs: function (voice){
         for (var i = 0,j = voice.Beats.length; i < j; i++){
@@ -8752,7 +8751,6 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
                 this.IsEmpty = false;
             }
         }
-        
     },
     AlignGlyph: function (sizing, beatIndex, voiceIndex, prevGlyph){
         var g = this._effectGlyphs[voiceIndex][beatIndex];
@@ -8875,7 +8873,6 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
             this._uniqueEffectGlyphs.push([]);
             this.CreateVoiceGlyphs(voice);
         }
-        
     },
     CreateVoiceGlyphs: function (v){
         for (var i = 0,j = v.Beats.length; i < j; i++){
@@ -12100,6 +12097,7 @@ $Inherit(AlphaTab.Rendering.Glyphs.VibratoGlyph, AlphaTab.Rendering.Glyphs.Effec
 AlphaTab.Rendering.Glyphs.VoiceContainerGlyph = function (x, y, voiceIndex){
     this.BeatGlyphs = null;
     this.VoiceIndex = 0;
+    this.CurrentForce = 0;
     AlphaTab.Rendering.Glyphs.GlyphGroup.call(this, x, y);
     this.BeatGlyphs = [];
     this.VoiceIndex = voiceIndex;
@@ -12107,16 +12105,16 @@ AlphaTab.Rendering.Glyphs.VoiceContainerGlyph = function (x, y, voiceIndex){
 AlphaTab.Rendering.Glyphs.VoiceContainerGlyph.prototype = {
     ScaleToWidth: function (width){
         var previousWidth = this.Width;
-        var previousForce = this.Renderer.get_Settings().StretchForce;
+        var previousForce = this.CurrentForce;
         this.Width = width;
+        this.CurrentForce = previousForce * this.Width / previousWidth;
         if (this.BeatGlyphs.length > 0){
             // calculate the force we need according to the resizing
-            var newForce = previousForce * this.Width / previousWidth;
             var x = 0;
             for (var i = 0,j = this.BeatGlyphs.length; i < j; i++){
                 var b = this.BeatGlyphs[i];
                 b.X = x;
-                b.ScaleToForce(newForce);
+                b.ScaleToForce(this.CurrentForce);
                 x += b.Width;
             }
         }
@@ -12148,6 +12146,7 @@ AlphaTab.Rendering.Glyphs.VoiceContainerGlyph.prototype = {
         this.Width = g.X + g.Width;
     },
     DoLayout: function (){
+        this.CurrentForce = this.Renderer.get_Settings().StretchForce;
     },
     FinalizeGlyph: function (layout){
         for (var i = 0,j = this.BeatGlyphs.length; i < j; i++){
@@ -12633,9 +12632,7 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
         return y;
     },
     FitGroup: function (group){
-        if (group.IsFull || group.Width > this.get_MaxWidth()){
-            group.ScaleToWidth(this.get_MaxWidth());
-        }
+        group.ScaleToWidth(this.get_MaxWidth());
         this.Width = Math.max(this.Width, group.Width);
     },
     CreateStaveGroup: function (currentBarIndex, endIndex){
@@ -12746,7 +12743,6 @@ AlphaTab.Rendering.RhythmBarRenderer.prototype = {
         for (var v = 0; v < this.Bar.Voices.length; v++){
             this.CreateVoiceGlyphs(this.Bar.Voices[v]);
         }
-        
     },
     CreateVoiceGlyphs: function (voice){
         for (var i = 0,j = voice.Beats.length; i < j; i++){
@@ -13275,7 +13271,6 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
         for (var v = 0; v < this.Bar.Voices.length; v++){
             this.CreateVoiceGlyphs(this.Bar.Voices[v]);
         }
-        
     },
     CreatePostBeatGlyphs: function (){
         if (this.Bar.get_MasterBar().get_IsRepeatEnd()){
@@ -14002,7 +13997,6 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
         for (var v = 0; v < this.Bar.Voices.length; v++){
             this.CreateVoiceGlyphs(this.Bar.Voices[v]);
         }
-        
     },
     CreateVoiceGlyphs: function (v){
         for (var i = 0,j = v.Beats.length; i < j; i++){

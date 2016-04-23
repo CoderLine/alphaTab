@@ -158,7 +158,6 @@ namespace AlphaTab.Rendering.Utils
             get
             {
                 // multivoice handling
-#if MULTIVOICE_SUPPORT
                 if (Voice.Index > 0)
                 {
                     return BeamDirection.Down;
@@ -173,7 +172,7 @@ namespace AlphaTab.Rendering.Utils
                         }
                     }
                 }
-#endif
+
                 if (_track.IsPercussion)
                 {
                     return BeamDirection.Up;

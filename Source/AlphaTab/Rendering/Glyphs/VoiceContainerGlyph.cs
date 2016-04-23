@@ -36,6 +36,8 @@ namespace AlphaTab.Rendering.Glyphs
         public FastList<BeatContainerGlyph> BeatGlyphs { get; set; }
         public int VoiceIndex { get; set; }
 
+        public float CurrentForce { get; private set; }
+
         public VoiceContainerGlyph(float x, float y, int voiceIndex)
             : base(x, y)
         {
@@ -46,20 +48,21 @@ namespace AlphaTab.Rendering.Glyphs
         public void ScaleToWidth(float width)
         {
             var previousWidth = Width;
-            var previousForce = Renderer.Settings.StretchForce;
+            var previousForce = CurrentForce;
 
             Width = width;
+            CurrentForce = previousForce * Width / previousWidth;
+
 
             if (BeatGlyphs.Count > 0)
             {
                 // calculate the force we need according to the resizing
-                var newForce = previousForce*Width/previousWidth;
                 var x = 0f;
                 for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
                 {
                     var b = BeatGlyphs[i];
                     b.X = x;
-                    b.ScaleToForce(newForce);
+                    b.ScaleToForce(CurrentForce);
                     x += b.Width;
                 }
             }
@@ -106,6 +109,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
+            CurrentForce = Renderer.Settings.StretchForce;
         }
 
         public void FinalizeGlyph(ScoreLayout layout)
