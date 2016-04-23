@@ -43,10 +43,23 @@ namespace AlphaTab.Rendering.Glyphs
             VoiceIndex = voiceIndex;
         }
 
-
         public void ScaleToWidth(float width)
         {
+            var previousWidth = Width;
+            var previousForce = Renderer.Settings.StretchForce;
+
             Width = width;
+
+            // calculate the force we need according to the resizing
+            var newForce = previousForce * Width / previousWidth;
+            var x = 0f;
+            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
+            {
+                var b = BeatGlyphs[i];
+                b.X = x;
+                b.ScaleToForce(newForce);
+                x += b.Width;
+            }
         }
 
         public void RegisterMaxSizes(BarSizeInfo sizes)
@@ -99,8 +112,8 @@ namespace AlphaTab.Rendering.Glyphs
         //private static Random Random = new Random();
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 128);
-            canvas.FillRect(cx + X, cy + Y, Width, 100);
+            //canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 128);
+            //canvas.FillRect(cx + X, cy + Y, Width, 100);
             for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {
                 BeatGlyphs[i].Paint(cx + X, cy + Y, canvas);

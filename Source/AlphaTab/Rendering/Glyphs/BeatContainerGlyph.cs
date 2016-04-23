@@ -100,10 +100,13 @@ namespace AlphaTab.Rendering.Glyphs
 
             ScalingFactor = 1 + Std.Log2(ticks / minDurationTicks);
 
-            
-            Width = CalculateWidth(Renderer.Settings.StretchForce);
+            ScaleToForce(Renderer.Settings.StretchForce);
         }
 
+        public void ScaleToForce(float force)
+        {
+            Width = CalculateWidth(force);
+        }
 
         protected virtual void CreateTies(Note n)
         {

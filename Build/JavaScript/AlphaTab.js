@@ -9701,7 +9701,10 @@ AlphaTab.Rendering.Glyphs.BeatContainerGlyph.prototype = {
         var minDurationTicks = AlphaTab.Audio.MidiUtils.ToTicks(minDuration);
         var ticks = this.Beat.CalculateDuration();
         this.ScalingFactor = 1 + Math.log2(ticks / minDurationTicks);
-        this.Width = this.CalculateWidth(this.Renderer.get_Settings().StretchForce);
+        this.ScaleToForce(this.Renderer.get_Settings().StretchForce);
+    },
+    ScaleToForce: function (force){
+        this.Width = this.CalculateWidth(force);
     },
     CreateTies: function (n){
     },
@@ -12103,7 +12106,18 @@ AlphaTab.Rendering.Glyphs.VoiceContainerGlyph = function (x, y, voiceIndex){
 };
 AlphaTab.Rendering.Glyphs.VoiceContainerGlyph.prototype = {
     ScaleToWidth: function (width){
+        var previousWidth = this.Width;
+        var previousForce = this.Renderer.get_Settings().StretchForce;
         this.Width = width;
+        // calculate the force we need according to the resizing
+        var newForce = previousForce * this.Width / previousWidth;
+        var x = 0;
+        for (var i = 0,j = this.BeatGlyphs.length; i < j; i++){
+            var b = this.BeatGlyphs[i];
+            b.X = x;
+            b.ScaleToForce(newForce);
+            x += b.Width;
+        }
     },
     RegisterMaxSizes: function (sizes){
         for (var i = 0,j = this.BeatGlyphs.length; i < j; i++){
@@ -12136,8 +12150,8 @@ AlphaTab.Rendering.Glyphs.VoiceContainerGlyph.prototype = {
         }
     },
     Paint: function (cx, cy, canvas){
-        canvas.set_Color(new AlphaTab.Platform.Model.Color(AlphaTab.Platform.Std.Random(255), AlphaTab.Platform.Std.Random(255), AlphaTab.Platform.Std.Random(255), 128));
-        canvas.FillRect(cx + this.X, cy + this.Y, this.Width, 100);
+        //canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 128);
+        //canvas.FillRect(cx + X, cy + Y, Width, 100);
         for (var i = 0,j = this.BeatGlyphs.length; i < j; i++){
             this.BeatGlyphs[i].Paint(cx + this.X, cy + this.Y, canvas);
         }
