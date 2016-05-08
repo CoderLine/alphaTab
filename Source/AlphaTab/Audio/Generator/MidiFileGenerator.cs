@@ -101,9 +101,18 @@ namespace AlphaTab.Audio.Generator
         {
             var volume = ToChannelShort(playbackInfo.Volume);
             var balance = ToChannelShort(playbackInfo.Balance);
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.Volume, (byte)volume);
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.Balance, (byte)balance);
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.Expression, 127);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.VolumeCoarse, (byte)volume);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.PanCoarse, (byte)balance);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.ExpressionControllerCoarse, 127);
+
+            // set parameter that is being updated (0) -> PitchBendRangeCoarse
+            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.RegisteredParameterFine, 0);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.RegisteredParameterCourse, 0);
+
+            // Set PitchBendRangeCoarse to 12
+            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.DataEntryFine, 0);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.DataEntryCoarse, 12);
+
             _handler.AddProgramChange(track.Index, 0, channel, (byte)playbackInfo.Program);
         }
 
@@ -196,7 +205,6 @@ namespace AlphaTab.Audio.Generator
                 for (int i = 0, j = beat.Notes.Count; i < j; i++)
                 {
                     var n = beat.Notes[i];
-                    if (n.IsTieDestination) continue;
 
                     GenerateNote(n, barStartTick + beatStart, duration, brushInfo);
                 }
@@ -244,18 +252,25 @@ namespace AlphaTab.Audio.Generator
             {
                 GenerateBend(note, noteStart, noteDuration, noteKey, dynamicValue);
             }
-            else if (note.Beat.HasWhammyBar)
+            else
             {
-                GenerateWhammyBar(note, noteStart, noteDuration, noteKey, dynamicValue);
+                // reset bend
+                _handler.AddBend(track.Index, noteStart + noteDuration, (byte)track.PlaybackInfo.PrimaryChannel, DefaultBend);
+
+                if (note.Beat.HasWhammyBar)
+                {
+                    GenerateWhammyBar(note, noteStart, noteDuration, noteKey, dynamicValue);
+                }
+                else if (note.SlideType != SlideType.None)
+                {
+                    GenerateSlide(note, noteStart, noteDuration, noteKey, dynamicValue);
+                }
+                else if (note.Vibrato != VibratoType.None)
+                {
+                    GenerateVibrato(note, noteStart, noteDuration, noteKey, dynamicValue);
+                }
             }
-            else if (note.SlideType != SlideType.None)
-            {
-                GenerateSlide(note, noteStart, noteDuration, noteKey, dynamicValue);
-            }
-            else if (note.Vibrato != VibratoType.None)
-            {
-                GenerateVibrato(note, noteStart, noteDuration, noteKey, dynamicValue);
-            }
+           
 
             //
             // Harmonics
@@ -264,7 +279,10 @@ namespace AlphaTab.Audio.Generator
                 GenerateHarmonic(note, noteStart, noteDuration, noteKey, dynamicValue);
             }
 
-            _handler.AddNote(track.Index, noteStart, noteDuration, (byte)noteKey, dynamicValue, (byte)track.PlaybackInfo.PrimaryChannel);
+            if (!note.IsTieDestination)
+            {
+                _handler.AddNote(track.Index, noteStart, noteDuration, (byte)noteKey, dynamicValue, (byte)track.PlaybackInfo.PrimaryChannel);
+            }
         }
 
         private int GetNoteDuration(Note note, int beatDuration)
@@ -474,9 +492,6 @@ namespace AlphaTab.Audio.Generator
                     }
                 }
             }
-
-            // reset bend
-            _handler.AddBend(track.Index, noteStart + noteDuration, (byte)track.PlaybackInfo.PrimaryChannel, DefaultBend);
         }
 
         private void GenerateTrill(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
@@ -585,21 +600,21 @@ namespace AlphaTab.Audio.Generator
                 case AutomationType.Balance:
                     _handler.AddControlChange(beat.Voice.Bar.Track.Index, beat.Start + startMove,
                                                 (byte)beat.Voice.Bar.Track.PlaybackInfo.PrimaryChannel,
-                                                (byte)MidiController.Balance,
+                                                (byte)MidiController.PanCoarse,
                                                 (byte)(automation.Value));
                     _handler.AddControlChange(beat.Voice.Bar.Track.Index, beat.Start + startMove,
                                                 (byte)beat.Voice.Bar.Track.PlaybackInfo.SecondaryChannel,
-                                                (byte)MidiController.Balance,
+                                                (byte)MidiController.PanCoarse,
                                                 (byte)(automation.Value));
                     break;
                 case AutomationType.Volume:
                     _handler.AddControlChange(beat.Voice.Bar.Track.Index, beat.Start + startMove,
                                                 (byte)beat.Voice.Bar.Track.PlaybackInfo.PrimaryChannel,
-                                                (byte)MidiController.Volume,
+                                                (byte)MidiController.VolumeCoarse,
                                                 (byte)(automation.Value));
                     _handler.AddControlChange(beat.Voice.Bar.Track.Index, beat.Start + startMove,
                                                 (byte)beat.Voice.Bar.Track.PlaybackInfo.SecondaryChannel,
-                                                (byte)MidiController.Volume,
+                                                (byte)MidiController.VolumeCoarse,
                                                 (byte)(automation.Value));
                     break;
             }

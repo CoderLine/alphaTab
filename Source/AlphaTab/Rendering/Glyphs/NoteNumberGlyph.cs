@@ -37,7 +37,7 @@ namespace AlphaTab.Rendering.Glyphs
                     _noteString = "(" + _noteString + ")";
                 }
             }
-            else if (n.Beat.Index == 0)
+            else if (n.Beat.Index == 0 || n.HasBend)
             {
                 _noteString = "(" + n.TieOrigin.Fret + ")";
             }
