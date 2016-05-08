@@ -209,6 +209,14 @@ namespace AlphaTab.Audio.Generator
                     GenerateNote(n, barStartTick + beatStart, duration, brushInfo);
                 }
             }
+
+            if (beat.Vibrato != VibratoType.None)
+            {
+                const int phaseLength = 240; // ticks
+                const int bendAmplitude = 3;
+
+                GenerateVibratorWithParams(beat.Voice.Bar.Track, barStartTick + beatStart, beat.CalculateDuration(), phaseLength, bendAmplitude);
+            }
         }
 
         private void GenerateNote(Note note, int beatStart, int beatDuration, int[] brushInfo)
@@ -255,7 +263,7 @@ namespace AlphaTab.Audio.Generator
             else
             {
                 // reset bend
-                _handler.AddBend(track.Index, noteStart + noteDuration, (byte)track.PlaybackInfo.PrimaryChannel, DefaultBend);
+                _handler.AddBend(track.Index, noteStart, (byte)track.PlaybackInfo.PrimaryChannel, DefaultBend);
 
                 if (note.Beat.HasWhammyBar)
                 {
@@ -270,7 +278,7 @@ namespace AlphaTab.Audio.Generator
                     GenerateVibrato(note, noteStart, noteDuration, noteKey, dynamicValue);
                 }
             }
-           
+
 
             //
             // Harmonics
@@ -434,7 +442,39 @@ namespace AlphaTab.Audio.Generator
 
         private void GenerateVibrato(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
         {
-            // TODO 
+            const int phaseLength = 480; // ticks
+            const int bendAmplitude = 2;
+            var track = note.Beat.Voice.Bar.Track;
+
+            GenerateVibratorWithParams(track, noteStart, noteDuration, phaseLength, bendAmplitude);
+        }
+
+        private void GenerateVibratorWithParams(Track track, int noteStart, int noteDuration, int phaseLength, int bendAmplitude)
+        {
+            const int resolution = 16;
+
+            int phaseHalf = phaseLength / 2;
+            // 1st Phase stays at bend 0, 
+            // then we have a sine wave with the given amplitude and phase length
+
+            noteStart += phaseLength;
+            var noteEnd = noteStart + noteDuration;
+
+            while (noteStart < noteEnd)
+            {
+                var phase = 0;
+                var phaseDuration = noteStart + phaseLength < noteEnd ? phaseLength : noteEnd - noteStart;
+                while (phase < phaseDuration)
+                {
+                    var bend = bendAmplitude*Math.Sin(phase*Math.PI/phaseHalf);
+
+                    _handler.AddBend(track.Index, noteStart + phase, (byte) track.PlaybackInfo.PrimaryChannel, (byte)(DefaultBend + bend));
+
+                    phase += resolution;
+                }
+
+                noteStart += phaseLength;
+            }
         }
 
         private void GenerateSlide(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
@@ -470,7 +510,7 @@ namespace AlphaTab.Audio.Generator
                 // for this we need to calculate how many ticks to offset per value
 
                 var ticksPerValue = ticksBetweenPoints / Math.Abs(nextBendValue - currentBendValue);
-                var tick = noteStart + (ticksPerPosition*currentPoint.Offset);
+                var tick = noteStart + (ticksPerPosition * currentPoint.Offset);
                 // bend up
                 if (currentBendValue < nextBendValue)
                 {

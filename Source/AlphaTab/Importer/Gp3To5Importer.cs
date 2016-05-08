@@ -731,7 +731,7 @@ namespace AlphaTab.Importer
             }
 
             beat.FadeIn = (flags & 0x10) != 0;
-            if ((flags & 0x01) != 0 || (flags & 0x02) != 0)
+            if ( (_versionNumber < 400 && (flags & 0x01) != 0) || (flags & 0x02) != 0)
             {
                 beat.Vibrato = VibratoType.Slight;
             }

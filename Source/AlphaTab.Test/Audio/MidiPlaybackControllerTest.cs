@@ -17,7 +17,7 @@ namespace AlphaTab.Test.Audio
         [TestMethod]
         public void TestRepeatClose()
         {
-            var reader = PrepareImporterWithFile("RepeatClose.gp5");
+            var reader = PrepareImporterWithFile("GuitarPro5/RepeatClose.gp5");
             var score = reader.ReadScore();
             var expectedIndexes = new[]
             {
@@ -30,7 +30,7 @@ namespace AlphaTab.Test.Audio
         [TestMethod]
         public void TestRepeatCloseMulti()
         {
-            var reader = PrepareImporterWithFile("RepeatCloseMulti.gp5");
+            var reader = PrepareImporterWithFile("GuitarPro5/RepeatCloseMulti.gp5");
             var score = reader.ReadScore();
             var expectedIndexes = new[]
             {
@@ -42,7 +42,7 @@ namespace AlphaTab.Test.Audio
         [TestMethod]
         public void TestRepeatCloseWithoutStartAtBeginning()
         {
-            var reader = PrepareImporterWithFile("RepeatCloseWithoutStartAtBeginning.gp5");
+            var reader = PrepareImporterWithFile("GuitarPro5/RepeatCloseWithoutStartAtBeginning.gp5");
             var score = reader.ReadScore();
             var expectedIndexes = new[]
             {
@@ -55,7 +55,7 @@ namespace AlphaTab.Test.Audio
         [TestMethod]
         public void TestRepeatCloseAlternateEndings()
         {
-            var reader = PrepareImporterWithFile("RepeatCloseAlternateEndings.gp5");
+            var reader = PrepareImporterWithFile("GuitarPro5/RepeatCloseAlternateEndings.gp5");
             var score = reader.ReadScore();
             var expectedIndexes = new[]
             {

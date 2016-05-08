@@ -47,11 +47,19 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Controller = (byte) MidiController.VolumeCoarse, Value = 120},
                 new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Controller = (byte) MidiController.PanCoarse, Value = 64},
                 new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Controller = (byte) MidiController.ExpressionControllerCoarse, Value = 127},
+                new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Controller = (byte) MidiController.RegisteredParameterFine, Value = 0},
+                new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Controller = (byte) MidiController.RegisteredParameterCourse, Value = 0},
+                new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Controller = (byte) MidiController.DataEntryFine, Value = 0},
+                new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Controller = (byte) MidiController.DataEntryCoarse, Value = 12},
                 new FlatMidiEventGenerator.ProgramChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Program = (byte) info.Program },
 
                 new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.SecondaryChannel, Controller = (byte) MidiController.VolumeCoarse, Value = 120},
                 new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.SecondaryChannel, Controller = (byte) MidiController.PanCoarse, Value = 64},
                 new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.SecondaryChannel, Controller = (byte) MidiController.ExpressionControllerCoarse, Value = 127},
+                new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.SecondaryChannel, Controller = (byte) MidiController.RegisteredParameterFine, Value = 0},
+                new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.SecondaryChannel, Controller = (byte) MidiController.RegisteredParameterCourse, Value = 0},
+                new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.SecondaryChannel, Controller = (byte) MidiController.DataEntryFine, Value = 0},
+                new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.SecondaryChannel, Controller = (byte) MidiController.DataEntryCoarse, Value = 12},
                 new FlatMidiEventGenerator.ProgramChangeEvent { Tick = 0, Track = 0, Channel=info.SecondaryChannel, Program = (byte) info.Program },
 
                 new FlatMidiEventGenerator.TimeSignatureEvent { Tick = 0, Numerator = 4, Denominator = 4 },
@@ -70,10 +78,12 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.BendEvent { Tick = 785, Track = 0, Channel = info.PrimaryChannel, Value = 73 },
                 new FlatMidiEventGenerator.BendEvent { Tick = 872, Track = 0, Channel = info.PrimaryChannel, Value = 74 },
                 new FlatMidiEventGenerator.BendEvent { Tick = 959, Track = 0, Channel = info.PrimaryChannel, Value = 75 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, Value = 64 },
 
                 // note itself
                 new FlatMidiEventGenerator.NoteEvent { Tick = 0, Track = 0, Channel = info.PrimaryChannel, DynamicValue = note.Dynamic, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
+                
+                // reset bend
+                new FlatMidiEventGenerator.BendEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, Value = 64 },
                 new FlatMidiEventGenerator.NoteEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, DynamicValue = note.Dynamic, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() }
             };
 
@@ -115,11 +125,19 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Controller = (byte) MidiController.VolumeCoarse, Value = 120},
                 new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Controller = (byte) MidiController.PanCoarse, Value = 64},
                 new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Controller = (byte) MidiController.ExpressionControllerCoarse, Value = 127},
+                new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Controller = (byte) MidiController.RegisteredParameterFine, Value = 0},
+                new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Controller = (byte) MidiController.RegisteredParameterCourse, Value = 0},
+                new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Controller = (byte) MidiController.DataEntryFine, Value = 0},
+                new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Controller = (byte) MidiController.DataEntryCoarse, Value = 12},
                 new FlatMidiEventGenerator.ProgramChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Program = (byte) info.Program },
 
                 new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.SecondaryChannel, Controller = (byte) MidiController.VolumeCoarse, Value = 120},
                 new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.SecondaryChannel, Controller = (byte) MidiController.PanCoarse, Value = 64},
                 new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.SecondaryChannel, Controller = (byte) MidiController.ExpressionControllerCoarse, Value = 127},
+                new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.SecondaryChannel, Controller = (byte) MidiController.RegisteredParameterFine, Value = 0},
+                new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.SecondaryChannel, Controller = (byte) MidiController.RegisteredParameterCourse, Value = 0},
+                new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.SecondaryChannel, Controller = (byte) MidiController.DataEntryFine, Value = 0},
+                new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.SecondaryChannel, Controller = (byte) MidiController.DataEntryCoarse, Value = 12},
                 new FlatMidiEventGenerator.ProgramChangeEvent { Tick = 0, Track = 0, Channel=info.SecondaryChannel, Program = (byte) info.Program },
 
                 new FlatMidiEventGenerator.TimeSignatureEvent { Tick = 0, Numerator = 4, Denominator = 4 },
@@ -151,10 +169,12 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.BendEvent { Tick = 872, Track = 0, Channel = info.PrimaryChannel, Value = 66 }, 
                 new FlatMidiEventGenerator.BendEvent { Tick = 916, Track = 0, Channel = info.PrimaryChannel, Value = 65 },
                 new FlatMidiEventGenerator.BendEvent { Tick = 959, Track = 0, Channel = info.PrimaryChannel, Value = 64 }, // no bend 
-                new FlatMidiEventGenerator.BendEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, Value = 64 }, // finish
 
                 // note itself
                 new FlatMidiEventGenerator.NoteEvent { Tick = 0, Track = 0, Channel = info.PrimaryChannel, DynamicValue = note.Dynamic, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
+
+                // reset bend
+                new FlatMidiEventGenerator.BendEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, Value = 64 }, // finish
                 new FlatMidiEventGenerator.NoteEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, DynamicValue = note.Dynamic, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() }
             };
 

@@ -1798,6 +1798,12 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
                 this.GenerateNote(n, barStartTick + beatStart, duration, brushInfo);
             }
         }
+        if (beat.Vibrato != AlphaTab.Model.VibratoType.None){
+            var phaseLength = 240;
+            // ticks
+            var bendAmplitude = 3;
+            this.GenerateVibratorWithParams(beat.Voice.Bar.Track, barStartTick + beatStart, beat.CalculateDuration(), phaseLength, bendAmplitude);
+        }
     },
     GenerateNote: function (note, beatStart, beatDuration, brushInfo){
         var track = note.Beat.Voice.Bar.Track;
@@ -1970,7 +1976,29 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
         // TODO
     },
     GenerateVibrato: function (note, noteStart, noteDuration, noteKey, dynamicValue){
-        // TODO 
+        var phaseLength = 480;
+        // ticks
+        var bendAmplitude = 2;
+        var track = note.Beat.Voice.Bar.Track;
+        this.GenerateVibratorWithParams(track, noteStart, noteDuration, phaseLength, bendAmplitude);
+    },
+    GenerateVibratorWithParams: function (track, noteStart, noteDuration, phaseLength, bendAmplitude){
+        var resolution = 16;
+        var phaseHalf = (phaseLength / 2) | 0;
+        // 1st Phase stays at bend 0, 
+        // then we have a sine wave with the given amplitude and phase length
+        noteStart += phaseLength;
+        var noteEnd = noteStart + noteDuration;
+        while (noteStart < noteEnd){
+            var phase = 0;
+            var phaseDuration = noteStart + phaseLength < noteEnd ? phaseLength : noteEnd - noteStart;
+            while (phase < phaseDuration){
+                var bend = bendAmplitude * Math.sin(phase * 3.14159265358979 / phaseHalf);
+                this._handler.AddBend(track.Index, noteStart + phase, track.PlaybackInfo.PrimaryChannel, (64 + bend));
+                phase += resolution;
+            }
+            noteStart += phaseLength;
+        }
     },
     GenerateSlide: function (note, noteStart, noteDuration, noteKey, dynamicValue){
         // TODO 
@@ -4756,7 +4784,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             flags2 = this._data.ReadByte();
         }
         beat.FadeIn = (flags & 16) != 0;
-        if ((flags & 1) != 0 || (flags & 2) != 0){
+        if ((flags & 2) != 0){
             beat.Vibrato = AlphaTab.Model.VibratoType.Slight;
         }
         beat.HasRasgueado = (flags2 & 1) != 0;
