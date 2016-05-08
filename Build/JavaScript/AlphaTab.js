@@ -1738,6 +1738,12 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
         this._handler.AddControlChange(track.Index, 0, channel, 7, volume);
         this._handler.AddControlChange(track.Index, 0, channel, 10, balance);
         this._handler.AddControlChange(track.Index, 0, channel, 11, 127);
+        // set parameter that is being updated (0) -> PitchBendRangeCoarse
+        this._handler.AddControlChange(track.Index, 0, channel, 100, 0);
+        this._handler.AddControlChange(track.Index, 0, channel, 101, 0);
+        // Set PitchBendRangeCoarse to 12
+        this._handler.AddControlChange(track.Index, 0, channel, 38, 0);
+        this._handler.AddControlChange(track.Index, 0, channel, 6, 12);
         this._handler.AddProgramChange(track.Index, 0, channel, playbackInfo.Program);
     },
     GenerateMasterBar: function (masterBar, previousMasterBar, currentTick){
@@ -1789,8 +1795,6 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
             var brushInfo = this.GetBrushInfo(beat);
             for (var i = 0,j = beat.Notes.length; i < j; i++){
                 var n = beat.Notes[i];
-                if (n.IsTieDestination)
-                    continue;
                 this.GenerateNote(n, barStartTick + beatStart, duration, brushInfo);
             }
         }
@@ -1826,21 +1830,27 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
         if (note.get_HasBend()){
             this.GenerateBend(note, noteStart, noteDuration, noteKey, dynamicValue);
         }
-        else if (note.Beat.get_HasWhammyBar()){
-            this.GenerateWhammyBar(note, noteStart, noteDuration, noteKey, dynamicValue);
-        }
-        else if (note.SlideType != AlphaTab.Model.SlideType.None){
-            this.GenerateSlide(note, noteStart, noteDuration, noteKey, dynamicValue);
-        }
-        else if (note.Vibrato != AlphaTab.Model.VibratoType.None){
-            this.GenerateVibrato(note, noteStart, noteDuration, noteKey, dynamicValue);
+        else {
+            // reset bend
+            this._handler.AddBend(track.Index, noteStart + noteDuration, track.PlaybackInfo.PrimaryChannel, 64);
+            if (note.Beat.get_HasWhammyBar()){
+                this.GenerateWhammyBar(note, noteStart, noteDuration, noteKey, dynamicValue);
+            }
+            else if (note.SlideType != AlphaTab.Model.SlideType.None){
+                this.GenerateSlide(note, noteStart, noteDuration, noteKey, dynamicValue);
+            }
+            else if (note.Vibrato != AlphaTab.Model.VibratoType.None){
+                this.GenerateVibrato(note, noteStart, noteDuration, noteKey, dynamicValue);
+            }
         }
         //
         // Harmonics
         if (note.HarmonicType != AlphaTab.Model.HarmonicType.None){
             this.GenerateHarmonic(note, noteStart, noteDuration, noteKey, dynamicValue);
         }
-        this._handler.AddNote(track.Index, noteStart, noteDuration, noteKey, dynamicValue, track.PlaybackInfo.PrimaryChannel);
+        if (!note.IsTieDestination){
+            this._handler.AddNote(track.Index, noteStart, noteDuration, noteKey, dynamicValue, track.PlaybackInfo.PrimaryChannel);
+        }
     },
     GetNoteDuration: function (note, beatDuration){
         return this.ApplyDurationEffects(note, beatDuration);
@@ -1999,8 +2009,6 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
                 }
             }
         }
-        // reset bend
-        this._handler.AddBend(track.Index, noteStart + noteDuration, track.PlaybackInfo.PrimaryChannel, 64);
     },
     GenerateTrill: function (note, noteStart, noteDuration, noteKey, dynamicValue){
         var track = note.Beat.Voice.Bar.Track;
@@ -2335,18 +2343,13 @@ AlphaTab.Audio.MidiUtils.BuildTickLookup = function (score){
 };
 AlphaTab.Audio.Model = AlphaTab.Audio.Model || {};
 AlphaTab.Audio.Model.MidiController = {
-    AllNotesOff: 123,
-    Balance: 10,
-    Chorus: 93,
-    DataEntryLsb: 38,
-    DataEntryMsb: 6,
-    Expression: 11,
-    Phaser: 95,
-    Reverb: 91,
-    RpnLsb: 100,
-    RpnMsb: 101,
-    Tremolo: 92,
-    Volume: 7
+    DataEntryCoarse: 6,
+    VolumeCoarse: 7,
+    PanCoarse: 10,
+    ExpressionControllerCoarse: 11,
+    DataEntryFine: 38,
+    RegisteredParameterFine: 100,
+    RegisteredParameterCourse: 101
 };
 AlphaTab.Audio.Model.MidiEvent = function (tick, message){
     this.Track = null;
@@ -2560,7 +2563,7 @@ AlphaTab.Audio.Model.MidiTrack.prototype = {
                     var previous = this.FirstEvent;
                     // as long the upcoming e is still before 
                     // the new one
-                    while (previous != null && previous.NextEvent != null && previous.NextEvent.Tick < e.Tick){
+                    while (previous != null && previous.NextEvent != null && previous.NextEvent.Tick <= e.Tick){
                         // we're moving to the next e 
                         previous = previous.NextEvent;
                     }
@@ -10443,7 +10446,8 @@ AlphaTab.Rendering.Glyphs.BendGlyph.prototype = {
         for (var i = 0,j = this._note.BendPoints.length - 1; i < j; i++){
             var firstPt = this._note.BendPoints[i];
             var secondPt = this._note.BendPoints[i + 1];
-            if (i == 0 && firstPt.Value != 0){
+            // draw pre-bend if previous 
+            if (i == 0 && firstPt.Value != 0 && !this._note.IsTieDestination){
                 this.PaintBend(new AlphaTab.Model.BendPoint(0, 0), firstPt, cx, cy, dX, canvas);
             }
             // don't draw a line if there's no offset and it's the last point
@@ -11365,7 +11369,7 @@ AlphaTab.Rendering.Glyphs.NoteNumberGlyph = function (x, y, n, isGrace){
             this._noteString = "(" + this._noteString + ")";
         }
     }
-    else if (n.Beat.Index == 0){
+    else if (n.Beat.Index == 0 || n.get_HasBend()){
         this._noteString = "(" + n.TieOrigin.Fret + ")";
     }
     else {

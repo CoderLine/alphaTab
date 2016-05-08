@@ -55,7 +55,9 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 var firstPt = _note.BendPoints[i];
                 var secondPt = _note.BendPoints[i + 1];
-                if (i == 0 && firstPt.Value != 0)
+
+                // draw pre-bend if previous 
+                if (i == 0 && firstPt.Value != 0 && !_note.IsTieDestination)
                 {
                     PaintBend(new BendPoint(), firstPt, cx, cy, dX, canvas);
                 }

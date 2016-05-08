@@ -80,7 +80,7 @@ namespace AlphaTab.Audio.Model
                         // the new one
                         while (previous != null &&
                                previous.NextEvent != null &&
-                               previous.NextEvent.Tick < e.Tick)
+                               previous.NextEvent.Tick <= e.Tick)
                         {
                             // we're moving to the next e 
                             previous = previous.NextEvent;
