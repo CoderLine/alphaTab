@@ -61,5 +61,10 @@ namespace AlphaTab.Rendering.Glyphs
         {
 
         }
+
+        public virtual void ScaleToWidth(float width)
+        {
+            Width = width;
+        }
     }
 }

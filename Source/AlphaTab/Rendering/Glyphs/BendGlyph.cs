@@ -21,7 +21,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class BendGlyph : Glyph
+    public class BendGlyph : Glyph, IPostBeatNoteScaleListener
     {
         private readonly Note _note;
         private readonly float _bendValueHeight;
@@ -201,6 +201,11 @@ namespace AlphaTab.Rendering.Glyphs
                 default:
                     return steps + "/ 4";
             }
+        }
+
+        public void ScaleToWidth(float width)
+        {
+            Width = width;
         }
     }
 }

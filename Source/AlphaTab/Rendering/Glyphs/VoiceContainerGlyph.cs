@@ -53,18 +53,24 @@ namespace AlphaTab.Rendering.Glyphs
             Width = width;
             CurrentForce = previousForce * Width / previousWidth;
 
-
             if (BeatGlyphs.Count > 0)
             {
-                // calculate the force we need according to the resizing
-                var x = 0f;
-                for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
-                {
-                    var b = BeatGlyphs[i];
-                    b.X = x;
-                    b.ScaleToForce(CurrentForce);
-                    x += b.Width;
-                }
+                ScaleToForce(CurrentForce);
+            }
+        }
+
+        public void ScaleToForce(float force)
+        {
+            Width = Width * force / CurrentForce;
+
+            // calculate the force we need according to the resizing
+            var x = 0f;
+            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
+            {
+                var b = BeatGlyphs[i];
+                b.X = x;
+                b.ScaleToForce(force);
+                x += b.Width;
             }
         }
 
@@ -87,13 +93,15 @@ namespace AlphaTab.Rendering.Glyphs
                 BeatGlyphs[i].ApplySizes(sizes);
             }
 
+            if (sizes.MinStretchForce > CurrentForce)
+            {
+                ScaleToForce(sizes.MinStretchForce);
+            }
+
             if (BeatGlyphs.Count > 0)
             {
                 Width = BeatGlyphs[BeatGlyphs.Count - 1].X + BeatGlyphs[BeatGlyphs.Count - 1].Width;
             }
-
-            var size = sizes.VoiceSize;
-            ScaleToWidth(size);
         }
 
         public override void AddGlyph(Glyph g)

@@ -130,6 +130,11 @@ namespace AlphaTab.Rendering
                         maxNoteY -= GetStemSize(h.MaxDuration);
                     }
 
+                    if (h.HasTuplet)
+                    {
+                        maxNoteY -= Resources.EffectFont.Size * 1.5f;
+                    }
+
                     if (maxNoteY < top)
                     {
                         RegisterOverflowTop(Math.Abs(maxNoteY));

@@ -2418,7 +2418,9 @@ AlphaSynth.Bank.Patch.Sf2Patch.prototype = {
     },
     Process: function (voiceparams, startIndex, endIndex){
         //--Base pitch calculation
-        var basePitch = AlphaSynth.Synthesis.SynthHelper.CentsToPitch(voiceparams.PitchOffset + voiceparams.SynthParams.CurrentPitch) * this.gen.Frequency / voiceparams.SynthParams.Synth.SampleRate;
+        var basePitchFrequency = AlphaSynth.Synthesis.SynthHelper.CentsToPitch(voiceparams.SynthParams.CurrentPitch) * this.gen.Frequency;
+        var pitchWithBend = basePitchFrequency * AlphaSynth.Synthesis.SynthHelper.CentsToPitch(voiceparams.PitchOffset);
+        var basePitch = pitchWithBend / voiceparams.SynthParams.Synth.SampleRate;
         var baseVolume = voiceparams.SynthParams.Synth.get_MasterVolume() * voiceparams.SynthParams.CurrentVolume * voiceparams.SynthParams.Synth.get_MixGain();
         //--Main Loop
         for (var x = startIndex; x < endIndex; x += 64 * voiceparams.SynthParams.Synth.AudioChannels){

@@ -15,12 +15,40 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
     public class TabBeatPostNotesGlyph : BeatGlyphBase
     {
+        private FastList<IPostBeatNoteScaleListener> _scaleListeners;
+
+        public TabBeatPostNotesGlyph()
+        {
+            _scaleListeners = new FastList<IPostBeatNoteScaleListener>();
+        }
+
+        public override void AddGlyph(Glyph g)
+        {
+            base.AddGlyph(g);
+            if (g is IPostBeatNoteScaleListener)
+            {
+                _scaleListeners.Add((IPostBeatNoteScaleListener) g);
+            }
+        }
+
+        public override void ScaleToWidth(float width)
+        {
+            base.ScaleToWidth(width);
+
+            for (int i = 0; i < _scaleListeners.Count; i++)
+            {
+                _scaleListeners[i].ScaleToWidth(width);
+            }
+        }
+
         public override void DoLayout()
         {
             // note specific effects

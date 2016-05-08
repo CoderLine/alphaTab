@@ -130,6 +130,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\Glyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\GlyphGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\HiHatGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\IPostBeatNoteScaleListener.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ISupportsFinalize.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\LazySvg.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\LeftToRightLayoutingGlyphGroup.cs" />

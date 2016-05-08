@@ -41,6 +41,48 @@ namespace AlphaTab.Rendering
         private readonly FastDictionary<int, VoiceContainerGlyph> _voiceContainers;
         private readonly LeftToRightLayoutingGlyphGroup _postBeatGlyphs;
 
+        public float PreBeatX
+        {
+            get
+            {
+                return _preBeatGlyphs.X;
+            }
+        }
+
+        public float PreBeatWidth
+        {
+            get
+            {
+                return _preBeatGlyphs.Width;
+            }
+        }
+
+        public float VoiceContainerX
+        {
+            get { return _preBeatGlyphs.X + _preBeatGlyphs.Width; }
+        }
+
+        public float VoiceContainerWidth
+        {
+            get { return PostBeatX - VoiceContainerX; }
+        }
+
+        public float PostBeatX
+        {
+            get
+            {
+                return _postBeatGlyphs.X;
+            }
+        }
+
+        public float PostBeatWidth
+        {
+            get
+            {
+                return _postBeatGlyphs.Width;
+            }
+        }
+
         protected GroupedBarRenderer(Bar bar)
             : base(bar)
         {

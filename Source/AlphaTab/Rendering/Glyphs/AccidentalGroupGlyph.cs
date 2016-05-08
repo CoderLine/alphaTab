@@ -77,19 +77,20 @@ namespace AlphaTab.Rendering.Glyphs
             // Place accidentals in columns
             //
             var columnWidth = 8 * Scale;
+            var padding = 2*Scale;
             if (Glyphs.Count == 0)
             {
                 Width = 0;
             }
             else
             {
-                Width = columnWidth * columns.Count;
+                Width = padding + (columnWidth * columns.Count);
             }
 
             for (int i = 0, j = Glyphs.Count; i < j; i++)
             {
                 var g = Glyphs[i];
-                g.X = Width - ((g.X + 1) * columnWidth);
+                g.X = padding + (Width - ((g.X + 1) * columnWidth));
             }
         }
     }

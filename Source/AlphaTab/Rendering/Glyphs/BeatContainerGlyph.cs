@@ -21,6 +21,7 @@ using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Staves;
 
@@ -34,6 +35,8 @@ namespace AlphaTab.Rendering.Glyphs
         public BeatGlyphBase PostNotes { get; set; }
         public FastList<Glyph> Ties { get; set; }
 
+        public float MinWidth { get; set; }
+        public float MinStretchForce { get; set; }
         public float ScalingFactor { get; set; }
 
         public BeatContainerGlyph(Beat beat)
@@ -53,7 +56,9 @@ namespace AlphaTab.Rendering.Glyphs
         public void RegisterMaxSizes(BarSizeInfo sizes)
         {
             sizes.UpdatePreNoteSize(PreNotes.Width);
+            sizes.UpdateOnNoteSize(OnNotes.Width);
             sizes.UpdatePostNoteSize(PostNotes.Width);
+            sizes.UpdateMinStretchForce(MinStretchForce);
         }
 
         public void ApplySizes(BarSizeInfo sizes)
@@ -61,9 +66,16 @@ namespace AlphaTab.Rendering.Glyphs
             PreNotes.Width = sizes.PreNoteSize;
 
             OnNotes.X = PreNotes.X + PreNotes.Width;
+            OnNotes.Width = sizes.OnNoteSize;
 
             PostNotes.X = OnNotes.X + OnNotes.Width;
             PostNotes.Width = sizes.PostNoteSize;
+
+            var newWidth = PostNotes.X + PostNotes.Width;
+            if (Width < newWidth)
+            {
+                Width = newWidth;
+            }
         }
 
         private float CalculateWidth(float force)
@@ -100,12 +112,25 @@ namespace AlphaTab.Rendering.Glyphs
 
             ScalingFactor = 1 + Std.Log2(ticks / minDurationTicks);
 
+            MinWidth = PreNotes.Width + OnNotes.Width + PostNotes.Width;
+            MinStretchForce = MinWidth / (Scale * ScalingFactor);
+
             ScaleToForce(Renderer.Settings.StretchForce);
         }
 
         public void ScaleToForce(float force)
         {
+            if (force < MinStretchForce)
+            {
+                force = MinStretchForce;
+            }
             Width = CalculateWidth(force);
+
+            var postNotes = Width - PreNotes.Width - OnNotes.Width;
+            if (postNotes > 0 && !Beat.IsEmpty)
+            {
+                PostNotes.ScaleToWidth(postNotes);
+            }
         }
 
         protected virtual void CreateTies(Note n)
@@ -114,6 +139,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
+            if (Beat.Voice.IsEmpty || Beat.IsRest) return; 
             //canvas.Color = new Color(200, 0, 0, 100);
             //canvas.StrokeRect(cx + X, cy + Y + 15 * Beat.Voice.Index, Width, 10);
             //canvas.Font = new Font("Arial", 10);
@@ -121,16 +147,23 @@ namespace AlphaTab.Rendering.Glyphs
             //canvas.FillText(Beat.Voice.Index + ":" + Beat.Index, cx + X, cy + Y + 15 * Beat.Voice.Index);
 
             PreNotes.Paint(cx + X, cy + Y, canvas);
-            //canvas.Color = new Color(200, 0, 0, 100);
-            //canvas.FillRect(cx + X + PreNotes.X, cy + Y + PreNotes.Y, PreNotes.Width, 10);
-
+            if (Beat.Voice.Index == 0)
+            {
+                canvas.Color = new Color(200, 0, 0, 100);
+                canvas.FillRect(cx + X + PreNotes.X, cy + Y + PreNotes.Y, PreNotes.Width, 10);
+            }
             OnNotes.Paint(cx + X, cy + Y, canvas);
-            //canvas.Color new Color(0, 200, 0, 100);
-            //canvas.FillRect(cx + X + OnNotes.X, cy + Y + OnNotes.Y + 10, OnNotes.Width, 10);
-
+            if (Beat.Voice.Index == 0)
+            {
+                canvas.Color = new Color(0, 200, 0, 100);
+                canvas.FillRect(cx + X + OnNotes.X, cy + Y + OnNotes.Y + 10, OnNotes.Width, 10);
+            }
             PostNotes.Paint(cx + X, cy + Y, canvas);
-            //canvas.Color = new Color(0, 0, 200, 100);
-            //canvas.FillRect(cx + X + PostNotes.X, cy + Y + PostNotes.Y + 20, PostNotes.Width, 10);
+            if (Beat.Voice.Index == 0)
+            {
+                canvas.Color = new Color(0, 0, 200, 100);
+                canvas.FillRect(cx + X + PostNotes.X, cy + Y + PostNotes.Y + 20, PostNotes.Width, 10);
+            }
 
             for (int i = 0, j = Ties.Count; i < j; i++)
             {

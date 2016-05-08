@@ -78,6 +78,8 @@ namespace AlphaTab.Rendering.Utils
         public FastList<Beat> Beats { get; set; }
         public Duration MaxDuration { get; set; }
 
+        public bool HasTuplet { get; private set; }
+
         /// <summary>
         /// the first min note within this group
         /// </summary>
@@ -185,6 +187,7 @@ namespace AlphaTab.Rendering.Utils
             }
         }
 
+
         public bool CheckBeat(Beat beat)
         {
             if (Voice == null)
@@ -211,6 +214,11 @@ namespace AlphaTab.Rendering.Utils
                 if (MaxDuration < beat.Duration)
                 {
                     MaxDuration = beat.Duration;
+                }
+
+                if (beat.HasTuplet)
+                {
+                    HasTuplet = true;
                 }
             }
 

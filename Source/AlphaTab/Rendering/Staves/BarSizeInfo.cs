@@ -31,14 +31,17 @@ namespace AlphaTab.Rendering.Staves
         public FastDictionary<string, float> Sizes { get; set; }
 
         public float PreNoteSize { get; set; }
+        public float OnNoteSize { get; set; }
         public float PostNoteSize { get; set; }
         public float VoiceSize { get; set; }
+        public float MinStretchForce { get; set; }
 
         public BarSizeInfo()
         {
             Sizes = new FastDictionary<string, float>();
             FullWidth = 0;
             PreNoteSize = 0;
+            OnNoteSize = 0;
             PostNoteSize = 0;
             VoiceSize = 0;
         }
@@ -48,6 +51,14 @@ namespace AlphaTab.Rendering.Staves
             if (size > PreNoteSize)
             {
                 PreNoteSize = size;
+            }
+        }
+
+        public void UpdateOnNoteSize(float size)
+        {
+            if (size > OnNoteSize)
+            {
+                OnNoteSize = size;
             }
         }
 
@@ -81,5 +92,12 @@ namespace AlphaTab.Rendering.Staves
             return 0;
         }
 
+        public void UpdateMinStretchForce(float force)
+        {
+            if (MinStretchForce < force)
+            {
+                MinStretchForce = force;
+            }
+        }
     }
 }

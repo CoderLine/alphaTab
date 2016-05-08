@@ -342,6 +342,10 @@ namespace AlphaTab.Rendering
             for (int i = 0, j = _uniqueEffectGlyphs.Count; i < j; i++)
             {
                 var v = _uniqueEffectGlyphs[i];
+                canvas.Color = i == 0
+                    ? Resources.MainGlyphColor
+                    : Resources.SecondaryGlyphColor;
+
                 for (int k = 0, l = v.Count; k < l; k++)
                 {
                     var g = v[k];
