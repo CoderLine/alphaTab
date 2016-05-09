@@ -227,6 +227,13 @@ namespace AlphaTab.Audio.Generator
             var noteDuration = GetNoteDuration(note, beatDuration) - brushInfo[note.String - 1];
             var dynamicValue = GetDynamicValue(note);
 
+            // TODO: enable second condition after whammy generation is implemented
+            if (!note.HasBend /* && !note.Beat.HasWhammyBar */)
+            {
+                // reset bend 
+                _handler.AddBend(track.Index, noteStart, (byte)track.PlaybackInfo.PrimaryChannel, DefaultBend);
+            }
+
             // 
             // Fade in
             if (note.Beat.FadeIn)
@@ -260,23 +267,17 @@ namespace AlphaTab.Audio.Generator
             {
                 GenerateBend(note, noteStart, noteDuration, noteKey, dynamicValue);
             }
-            else
+            else if (note.Beat.HasWhammyBar)
             {
-                // reset bend
-                _handler.AddBend(track.Index, noteStart, (byte)track.PlaybackInfo.PrimaryChannel, DefaultBend);
-
-                if (note.Beat.HasWhammyBar)
-                {
-                    GenerateWhammyBar(note, noteStart, noteDuration, noteKey, dynamicValue);
-                }
-                else if (note.SlideType != SlideType.None)
-                {
-                    GenerateSlide(note, noteStart, noteDuration, noteKey, dynamicValue);
-                }
-                else if (note.Vibrato != VibratoType.None)
-                {
-                    GenerateVibrato(note, noteStart, noteDuration, noteKey, dynamicValue);
-                }
+                GenerateWhammyBar(note, noteStart, noteDuration, noteKey, dynamicValue);
+            }
+            else if (note.SlideType != SlideType.None)
+            {
+                GenerateSlide(note, noteStart, noteDuration, noteKey, dynamicValue);
+            }
+            else if (note.Vibrato != VibratoType.None)
+            {
+                GenerateVibrato(note, noteStart, noteDuration, noteKey, dynamicValue);
             }
 
 

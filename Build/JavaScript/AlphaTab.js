@@ -1811,6 +1811,11 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
         var noteStart = beatStart + brushInfo[note.String - 1];
         var noteDuration = this.GetNoteDuration(note, beatDuration) - brushInfo[note.String - 1];
         var dynamicValue = this.GetDynamicValue(note);
+        // TODO: enable second condition after whammy generation is implemented
+        if (!note.get_HasBend()){
+            // reset bend 
+            this._handler.AddBend(track.Index, noteStart, track.PlaybackInfo.PrimaryChannel, 64);
+        }
         // 
         // Fade in
         if (note.Beat.FadeIn){
@@ -1836,18 +1841,14 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
         if (note.get_HasBend()){
             this.GenerateBend(note, noteStart, noteDuration, noteKey, dynamicValue);
         }
-        else {
-            // reset bend
-            this._handler.AddBend(track.Index, noteStart + noteDuration, track.PlaybackInfo.PrimaryChannel, 64);
-            if (note.Beat.get_HasWhammyBar()){
-                this.GenerateWhammyBar(note, noteStart, noteDuration, noteKey, dynamicValue);
-            }
-            else if (note.SlideType != AlphaTab.Model.SlideType.None){
-                this.GenerateSlide(note, noteStart, noteDuration, noteKey, dynamicValue);
-            }
-            else if (note.Vibrato != AlphaTab.Model.VibratoType.None){
-                this.GenerateVibrato(note, noteStart, noteDuration, noteKey, dynamicValue);
-            }
+        else if (note.Beat.get_HasWhammyBar()){
+            this.GenerateWhammyBar(note, noteStart, noteDuration, noteKey, dynamicValue);
+        }
+        else if (note.SlideType != AlphaTab.Model.SlideType.None){
+            this.GenerateSlide(note, noteStart, noteDuration, noteKey, dynamicValue);
+        }
+        else if (note.Vibrato != AlphaTab.Model.VibratoType.None){
+            this.GenerateVibrato(note, noteStart, noteDuration, noteKey, dynamicValue);
         }
         //
         // Harmonics
@@ -4784,7 +4785,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             flags2 = this._data.ReadByte();
         }
         beat.FadeIn = (flags & 16) != 0;
-        if ((flags & 2) != 0){
+        if ((this._versionNumber < 400 && (flags & 1) != 0) || (flags & 2) != 0){
             beat.Vibrato = AlphaTab.Model.VibratoType.Slight;
         }
         beat.HasRasgueado = (flags2 & 1) != 0;
