@@ -50,6 +50,7 @@ _ReSharper*/
 /Private
 /Samples/JavaScript/files/Test.gp5
 /Samples/JavaScript/test.html
+/Samples/JavaScript/test/*
 
 # temps
 .DS_Store 

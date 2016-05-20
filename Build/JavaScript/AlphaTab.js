@@ -6199,6 +6199,7 @@ AlphaTab.Importer.GpxParser.prototype = {
                             isWhammy = true;
                             break;
                             case "WhammyBarExtend":
+                            break;
                             case "WhammyBarOriginValue":
                             if (whammyOrigin == null)
                             whammyOrigin = new AlphaTab.Model.BendPoint(0, 0);

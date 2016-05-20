@@ -877,7 +877,8 @@ namespace AlphaTab.Importer
                                     isWhammy = true;
                                     break;
                                 case "WhammyBarExtend":
-
+                                    // not clear what this is used for
+                                    break;
                                 case "WhammyBarOriginValue":
                                     if (whammyOrigin == null) whammyOrigin = new BendPoint();
                                     whammyOrigin.Value = ToBendValue(Std.ParseFloat(GetValue(FindChildElement(c, "Float"))));
