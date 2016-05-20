@@ -7592,6 +7592,8 @@ AlphaTab.Model.Bar.CopyTo = function (src, dst){
 AlphaTab.Model.Beat = function (){
     this._minNote = null;
     this._maxNote = null;
+    this._maxStringNote = null;
+    this._minStringNote = null;
     this.PreviousBeat = null;
     this.NextBeat = null;
     this.Index = 0;
@@ -7649,6 +7651,18 @@ AlphaTab.Model.Beat.prototype = {
             this.RefreshNotes();
         }
         return this._maxNote;
+    },
+    get_MaxStringNote: function (){
+        if (this._maxStringNote == null){
+            this.RefreshNotes();
+        }
+        return this._maxStringNote;
+    },
+    get_MinStringNote: function (){
+        if (this._minStringNote == null){
+            this.RefreshNotes();
+        }
+        return this._minStringNote;
     },
     get_IsRest: function (){
         return this.Notes.length == 0;
@@ -7710,6 +7724,12 @@ AlphaTab.Model.Beat.prototype = {
             }
             if (this._maxNote == null || note.get_RealValue() > this._maxNote.get_RealValue()){
                 this._maxNote = note;
+            }
+            if (this._minStringNote == null || note.String < this._minStringNote.String){
+                this._minStringNote = note;
+            }
+            if (this._maxStringNote == null || note.String > this._maxStringNote.String){
+                this._maxStringNote = note;
             }
         }
     },
@@ -11908,31 +11928,43 @@ AlphaTab.Rendering.Glyphs.ScoreBrushGlyph.prototype = {
     Paint: function (cx, cy, canvas){
         var scoreBarRenderer = this.Renderer;
         var lineSize = scoreBarRenderer.get_LineOffset();
-        var startY = cy + this.Y + (scoreBarRenderer.GetNoteY(this._beat.get_MaxNote()) - lineSize / 2);
-        var endY = cy + this.Y + scoreBarRenderer.GetNoteY(this._beat.get_MinNote()) + lineSize;
+        var topY = cy + this.Y + scoreBarRenderer.GetNoteY(this._beat.get_MaxNote());
+        var bottomY = cy + this.Y + scoreBarRenderer.GetNoteY(this._beat.get_MinNote()) + lineSize;
         var arrowX = cx + this.X + this.Width / 2;
         var arrowSize = 8 * this.get_Scale();
-        if (this._beat.BrushType != AlphaTab.Model.BrushType.None){
-            if (this._beat.BrushType == AlphaTab.Model.BrushType.ArpeggioUp || this._beat.BrushType == AlphaTab.Model.BrushType.ArpeggioDown){
-                var size = 15 * this.get_Scale();
-                var steps = Math.abs(endY - startY) / size;
+        if (this._beat.BrushType == AlphaTab.Model.BrushType.ArpeggioUp || this._beat.BrushType == AlphaTab.Model.BrushType.ArpeggioDown){
+            var size = 14 * this.get_Scale();
+            var waveTop = topY;
+            var waveBottom = bottomY;
+            if (this._beat.BrushType == AlphaTab.Model.BrushType.ArpeggioUp){
+                waveTop -= lineSize;
+                waveBottom -= arrowSize;
+                var steps = Math.floor((waveBottom - waveTop) / size);
                 for (var i = 0; i < steps; i++){
-                    canvas.FillMusicFontSymbol(cx + this.X + (3 * this.get_Scale()), 1, startY + (i * size), AlphaTab.Rendering.Glyphs.MusicFontSymbol.WaveVertical);
+                    canvas.FillMusicFontSymbol(cx + this.X + (2 * this.get_Scale()), waveBottom - ((i + 1) * size), 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.WaveVertical);
+                }
+            }
+            else {
+                waveTop += arrowSize;
+                waveBottom += lineSize;
+                var steps = Math.floor((waveBottom - waveTop) / size);
+                for (var i = 0; i < steps; i++){
+                    canvas.FillMusicFontSymbol(cx + this.X + (2 * this.get_Scale()), waveTop + (i * size), 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.WaveVertical);
                 }
             }
             if (this._beat.BrushType == AlphaTab.Model.BrushType.ArpeggioUp){
                 canvas.BeginPath();
-                canvas.MoveTo(arrowX, endY);
-                canvas.LineTo(arrowX + arrowSize / 2, endY - arrowSize);
-                canvas.LineTo(arrowX - arrowSize / 2, endY - arrowSize);
+                canvas.MoveTo(arrowX, bottomY);
+                canvas.LineTo(arrowX + arrowSize / 2, bottomY - arrowSize);
+                canvas.LineTo(arrowX - arrowSize / 2, bottomY - arrowSize);
                 canvas.ClosePath();
                 canvas.Fill();
             }
             else if (this._beat.BrushType == AlphaTab.Model.BrushType.ArpeggioDown){
                 canvas.BeginPath();
-                canvas.MoveTo(arrowX, startY);
-                canvas.LineTo(arrowX + arrowSize / 2, startY + arrowSize);
-                canvas.LineTo(arrowX - arrowSize / 2, startY + arrowSize);
+                canvas.MoveTo(arrowX, topY);
+                canvas.LineTo(arrowX + arrowSize / 2, topY + arrowSize);
+                canvas.LineTo(arrowX - arrowSize / 2, topY + arrowSize);
                 canvas.ClosePath();
                 canvas.Fill();
             }
@@ -12505,37 +12537,49 @@ AlphaTab.Rendering.Glyphs.TabBrushGlyph.prototype = {
     Paint: function (cx, cy, canvas){
         var tabBarRenderer = this.Renderer;
         var res = this.Renderer.get_Resources();
-        var startY = cy + this.X + (tabBarRenderer.GetNoteY(this._beat.get_MaxNote()) - res.TablatureFont.Size / 2);
-        var endY = cy + this.Y + tabBarRenderer.GetNoteY(this._beat.get_MinNote()) + res.TablatureFont.Size / 2;
+        var topY = cy + this.Y + tabBarRenderer.GetNoteY(this._beat.get_MaxStringNote()) - res.TablatureFont.Size / 2;
+        var bottomY = cy + this.Y + tabBarRenderer.GetNoteY(this._beat.get_MinStringNote()) + res.TablatureFont.Size / 2;
         var arrowX = ((cx + this.X + this.Width / 2)) | 0;
         var arrowSize = 8 * this.get_Scale();
         if (this._beat.BrushType != AlphaTab.Model.BrushType.None){
             if (this._beat.BrushType == AlphaTab.Model.BrushType.BrushUp || this._beat.BrushType == AlphaTab.Model.BrushType.BrushDown){
                 canvas.BeginPath();
-                canvas.MoveTo(arrowX, startY);
-                canvas.LineTo(arrowX, endY);
+                canvas.MoveTo(arrowX, topY);
+                canvas.LineTo(arrowX, bottomY);
                 canvas.Stroke();
             }
             else {
-                var size = 15 * this.get_Scale();
-                var steps = Math.abs(endY - startY) / size;
-                for (var i = 0; i < steps; i++){
-                    canvas.FillMusicFontSymbol(cx + this.X + (3 * this.get_Scale()), 1, startY + (i * size), AlphaTab.Rendering.Glyphs.MusicFontSymbol.WaveVertical);
+                var size = 14 * this.get_Scale();
+                var waveTop = topY;
+                var waveBottom = bottomY;
+                if (this._beat.BrushType == AlphaTab.Model.BrushType.BrushUp || this._beat.BrushType == AlphaTab.Model.BrushType.ArpeggioUp){
+                    waveBottom -= arrowSize;
+                    var steps = Math.floor((waveBottom - waveTop) / size);
+                    for (var i = 0; i < steps; i++){
+                        canvas.FillMusicFontSymbol(cx + this.X + (2 * this.get_Scale()), waveBottom - ((i + 1) * size), 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.WaveVertical);
+                    }
+                }
+                else {
+                    waveTop += arrowSize;
+                    var steps = Math.floor((waveBottom - waveTop) / size);
+                    for (var i = 0; i < steps; i++){
+                        canvas.FillMusicFontSymbol(cx + this.X + (2 * this.get_Scale()), waveTop + (i * size), 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.WaveVertical);
+                    }
                 }
             }
             if (this._beat.BrushType == AlphaTab.Model.BrushType.BrushUp || this._beat.BrushType == AlphaTab.Model.BrushType.ArpeggioUp){
                 canvas.BeginPath();
-                canvas.MoveTo(arrowX, endY);
-                canvas.LineTo(arrowX + arrowSize / 2, endY - arrowSize);
-                canvas.LineTo(arrowX - arrowSize / 2, endY - arrowSize);
+                canvas.MoveTo(arrowX, bottomY);
+                canvas.LineTo(arrowX + arrowSize / 2, bottomY - arrowSize);
+                canvas.LineTo(arrowX - arrowSize / 2, bottomY - arrowSize);
                 canvas.ClosePath();
                 canvas.Fill();
             }
             else {
                 canvas.BeginPath();
-                canvas.MoveTo(arrowX, startY);
-                canvas.LineTo(arrowX + arrowSize / 2, startY + arrowSize);
-                canvas.LineTo(arrowX - arrowSize / 2, startY + arrowSize);
+                canvas.MoveTo(arrowX, topY);
+                canvas.LineTo(arrowX + arrowSize / 2, topY + arrowSize);
+                canvas.LineTo(arrowX - arrowSize / 2, topY + arrowSize);
                 canvas.ClosePath();
                 canvas.Fill();
             }

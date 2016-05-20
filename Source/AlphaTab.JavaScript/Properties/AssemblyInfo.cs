@@ -71,6 +71,7 @@ using SharpKit.JavaScript;
 [assembly: JsMethod(TargetType = typeof(Math), TargetMethod = "Pow", Name = "pow")]
 [assembly: JsMethod(TargetType = typeof(Math), TargetMethod = "Sqrt", Name = "sqrt")]
 [assembly: JsMethod(TargetType = typeof(Math), TargetMethod = "Ceiling", Name = "ceil")]
+[assembly: JsMethod(TargetType = typeof(Math), TargetMethod = "Floor", Name = "floor")]
 [assembly: JsMethod(TargetType = typeof(Math), TargetMethod = "Round", Name = "round")]
 [assembly: JsMethod(TargetType = typeof(Math), TargetMethod = "Sin", Name = "sin")]
 
