@@ -66,6 +66,34 @@ namespace AlphaTab.Model
             }
         }
 
+        private Note _maxStringNote;
+
+        public Note MaxStringNote
+        {
+            get
+            {
+                if (_maxStringNote == null)
+                {
+                    RefreshNotes();
+                }
+                return _maxStringNote;
+            }
+        }
+
+        private Note _minStringNote;
+
+        public Note MinStringNote
+        {
+            get
+            {
+                if (_minStringNote == null)
+                {
+                    RefreshNotes();
+                }
+                return _minStringNote;
+            }
+        }
+
         public Duration Duration { get; set; }
 
         public bool IsRest
@@ -253,6 +281,14 @@ namespace AlphaTab.Model
                 if (_maxNote == null || note.RealValue > _maxNote.RealValue)
                 {
                     _maxNote = note;
+                }
+                if (_minStringNote == null || note.String < _minStringNote.String)
+                {
+                    _minStringNote = note;
+                }
+                if (_maxStringNote == null || note.String > _maxStringNote.String)
+                {
+                    _maxStringNote = note;
                 }
             }
         }
