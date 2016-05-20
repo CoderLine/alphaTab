@@ -9296,12 +9296,14 @@ $Inherit(AlphaTab.Rendering.AlternateEndingsBarRenderer, AlphaTab.Rendering.Grou
 AlphaTab.Rendering.BarRendererFactory = function (){
     this.IsInAccolade = false;
     this.HideOnMultiTrack = false;
+    this.HideOnPercussionTrack = false;
     this.IsInAccolade = true;
     this.HideOnMultiTrack = false;
+    this.HideOnPercussionTrack = false;
 };
 AlphaTab.Rendering.BarRendererFactory.prototype = {
     CanCreate: function (track){
-        return true;
+        return !this.HideOnPercussionTrack || !track.IsPercussion;
     }
 };
 AlphaTab.Rendering.AlternateEndingsBarRendererFactory = function (){
@@ -11864,7 +11866,7 @@ AlphaTab.Rendering.Glyphs.ScoreBeatPreNotesGlyph.prototype = {
             this.AddGlyph(new AlphaTab.Rendering.Glyphs.ScoreBrushGlyph(this.Container.Beat));
             this.AddGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 4 * this.get_Scale(), true));
         }
-        if (!this.Container.Beat.get_IsRest() && !this.Container.Beat.Voice.Bar.Track.IsPercussion){
+        if (!this.Container.Beat.get_IsRest()){
             var accidentals = new AlphaTab.Rendering.Glyphs.AccidentalGroupGlyph();
             this.NoteLoop($CreateAnonymousDelegate(this, function (n){
                 this.CreateAccidentalGlyph(n, accidentals);
@@ -14963,10 +14965,11 @@ $StaticConstructor(function (){
 $Inherit(AlphaTab.Rendering.TabBarRenderer, AlphaTab.Rendering.GroupedBarRenderer);
 AlphaTab.Rendering.TabBarRendererFactory = function (){
     AlphaTab.Rendering.BarRendererFactory.call(this);
+    this.HideOnPercussionTrack = true;
 };
 AlphaTab.Rendering.TabBarRendererFactory.prototype = {
     CanCreate: function (track){
-        return track.Tuning.length > 0;
+        return track.Tuning.length > 0 && AlphaTab.Rendering.BarRendererFactory.prototype.CanCreate.call(this, track);
     },
     Create: function (bar){
         return new AlphaTab.Rendering.TabBarRenderer(bar);
@@ -14997,7 +15000,10 @@ AlphaTab.Rendering.Utils.AccidentalHelper.prototype = {
         // if there is already an accidental registered, we check if we 
         // have a new accidental
         var updateAccidental = true;
-        if (this._registeredAccidentals.hasOwnProperty(noteLine)){
+        if (note.Beat.Voice.Bar.Track.IsPercussion){
+            accidentalToSet = AlphaTab.Model.AccidentalType.None;
+        }
+        else if (this._registeredAccidentals.hasOwnProperty(noteLine)){
             var registeredAccidental = this._registeredAccidentals[noteLine];
             // we only need to do anything if we are changing the accidental
             if (registeredAccidental == accidentalToSet){

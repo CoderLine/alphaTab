@@ -120,7 +120,11 @@ namespace AlphaTab.Rendering.Utils
             // if there is already an accidental registered, we check if we 
             // have a new accidental
             var updateAccidental = true;
-            if (_registeredAccidentals.ContainsKey(noteLine))
+            if (note.Beat.Voice.Bar.Track.IsPercussion)
+            {
+                accidentalToSet = AccidentalType.None;
+            }
+            else if (_registeredAccidentals.ContainsKey(noteLine))
             {
                 var registeredAccidental = _registeredAccidentals[noteLine];
 

@@ -27,16 +27,18 @@ namespace AlphaTab.Rendering
     {
         public bool IsInAccolade { get; set; }
         public bool HideOnMultiTrack { get; set; }
+        public bool HideOnPercussionTrack { get; set; }
 
         protected BarRendererFactory()
         {
             IsInAccolade = true;
             HideOnMultiTrack = false;
+            HideOnPercussionTrack = false;
         }
 
         public virtual bool CanCreate(Track track)
         {
-            return true;
+            return !HideOnPercussionTrack || !track.IsPercussion;
         }
         public abstract BarRendererBase Create(Bar bar);
     }

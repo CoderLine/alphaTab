@@ -28,8 +28,8 @@ namespace AlphaTab.Rendering.Glyphs
                 AddGlyph(new ScoreBrushGlyph(Container.Beat));
                 AddGlyph(new SpacingGlyph(0, 0, 4 * Scale));
             }
-
-            if (!Container.Beat.IsRest && !Container.Beat.Voice.Bar.Staff.Track.IsPercussion)
+            
+            if (!Container.Beat.IsRest)
             {
                 var accidentals = new AccidentalGroupGlyph();
                 NoteLoop(n => CreateAccidentalGlyph(n, accidentals));
