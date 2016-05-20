@@ -40,7 +40,7 @@ namespace AlphaTab.Rendering.Glyphs
                 AddGlyph(new SpacingGlyph(0, 0, 4 * Scale));
             }
 
-            if (!Container.Beat.IsRest && !Container.Beat.Voice.Bar.Track.IsPercussion)
+            if (!Container.Beat.IsRest)
             {
                 var accidentals = new AccidentalGroupGlyph();
                 NoteLoop(n => CreateAccidentalGlyph(n, accidentals));

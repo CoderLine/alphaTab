@@ -24,9 +24,14 @@ namespace AlphaTab.Rendering
     /// </summary>
     public class TabBarRendererFactory : BarRendererFactory
     {
+        public TabBarRendererFactory()
+        {
+            HideOnPercussionTrack = true;
+        }
+
         public override bool CanCreate(Track track)
         {
-            return track.Tuning.Length > 0;
+            return track.Tuning.Length > 0 && base.CanCreate(track);
         }
 
         public override BarRendererBase Create(Bar bar)
