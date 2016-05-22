@@ -153,14 +153,6 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             base.DoLayout();
-            if (NoteHeads != null)
-            {
-                NoteHeads.UpdateBeamingHelper(X);
-            }
-            else if (RestGlyph != null)
-            {
-                RestGlyph.UpdateBeamingHelper(X);
-            }
         }
 
         private void CreateBeatDot(int line, float offset, GlyphGroup group)

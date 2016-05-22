@@ -20,7 +20,10 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void UpdateBeamingHelper(float cx)
         {
-            BeamingHelper.RegisterBeatLineX(Beat, cx + X + Width / 2, cx + X + Width / 2);
+            if (BeamingHelper != null)
+            {
+                BeamingHelper.RegisterBeatLineX(Beat, cx + X + Width / 2, cx + X + Width / 2);
+            }
         }
     }
 }

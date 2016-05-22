@@ -115,7 +115,10 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void UpdateBeamingHelper(float cx)
         {
-            BeamingHelper.RegisterBeatLineX(Beat, cx + X + UpLineX, cx + X + DownLineX);
+            if (BeamingHelper != null)
+            {
+                BeamingHelper.RegisterBeatLineX(Beat, cx + X + UpLineX, cx + X + DownLineX);
+            }
         }
 
         public bool HasTopOverflow
