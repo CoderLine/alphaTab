@@ -11648,7 +11648,9 @@ AlphaTab.Rendering.Glyphs.ScoreRestGlyph.prototype = {
         return false;
     },
     UpdateBeamingHelper: function (cx){
-        this.BeamingHelper.RegisterBeatLineX(this.Beat, cx + this.X + this.Width / 2, cx + this.X + this.Width / 2);
+        if (this.BeamingHelper != null){
+            this.BeamingHelper.RegisterBeatLineX(this.Beat, cx + this.X + this.Width / 2, cx + this.X + this.Width / 2);
+        }
     }
 };
 AlphaTab.Rendering.Glyphs.ScoreRestGlyph.GetSymbol = function (duration){
@@ -11829,12 +11831,6 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
             }
         }
         AlphaTab.Rendering.Glyphs.BeatGlyphBase.prototype.DoLayout.call(this);
-        if (this.NoteHeads != null){
-            this.NoteHeads.UpdateBeamingHelper(this.X);
-        }
-        else if (this.RestGlyph != null){
-            this.RestGlyph.UpdateBeamingHelper(this.X);
-        }
     },
     CreateBeatDot: function (line, offset, group){
         var sr = this.Renderer;
@@ -12080,7 +12076,9 @@ AlphaTab.Rendering.Glyphs.ScoreNoteChordGlyph.prototype = {
         return false;
     },
     UpdateBeamingHelper: function (cx){
-        this.BeamingHelper.RegisterBeatLineX(this.Beat, cx + this.X + this.UpLineX, cx + this.X + this.DownLineX);
+        if (this.BeamingHelper != null){
+            this.BeamingHelper.RegisterBeatLineX(this.Beat, cx + this.X + this.UpLineX, cx + this.X + this.DownLineX);
+        }
     },
     get_HasTopOverflow: function (){
         return this.MinNote != null && this.MinNote.Line < 0;
@@ -12513,12 +12511,6 @@ AlphaTab.Rendering.Glyphs.TabBeatGlyph.prototype = {
             w += g.Width;
         }
         this.Width = w;
-        if (this.NoteNumbers != null){
-            this.NoteNumbers.UpdateBeamingHelper(this.X);
-        }
-        else if (this.RestGlyph != null){
-            this.RestGlyph.UpdateBeamingHelper(this.X);
-        }
     },
     FinalizeGlyph: function (layout){
         if (!this.Container.Beat.get_IsRest()){
@@ -12783,7 +12775,7 @@ AlphaTab.Rendering.Glyphs.TabNoteChordGlyph.prototype = {
         }));
     },
     UpdateBeamingHelper: function (cx){
-        if (!this.BeamingHelper.HasBeatLineX(this.Beat)){
+        if (this.BeamingHelper != null){
             this.BeamingHelper.RegisterBeatLineX(this.Beat, cx + this.X + this._centerX, cx + this.X + this._centerX);
         }
     }
@@ -12799,7 +12791,9 @@ AlphaTab.Rendering.Glyphs.TabRestGlyph.prototype = {
         this.Width = 10 * this.get_Scale();
     },
     UpdateBeamingHelper: function (cx){
-        this.BeamingHelper.RegisterBeatLineX(this.Beat, cx + this.X + this.Width / 2, cx + this.X + this.Width / 2);
+        if (this.BeamingHelper != null){
+            this.BeamingHelper.RegisterBeatLineX(this.Beat, cx + this.X + this.Width / 2, cx + this.X + this.Width / 2);
+        }
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.TabRestGlyph, AlphaTab.Rendering.Glyphs.SpacingGlyph);

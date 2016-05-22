@@ -75,14 +75,6 @@ namespace AlphaTab.Rendering.Glyphs
                 w += g.Width;
             }
             Width = w;
-            if (NoteNumbers != null)
-            {
-                NoteNumbers.UpdateBeamingHelper(X);
-            }
-            else if (RestGlyph != null)
-            {
-                RestGlyph.UpdateBeamingHelper(X);
-            }
         }
 
         public override void FinalizeGlyph(ScoreLayout layout)
