@@ -16,14 +16,18 @@
  * License along with this library.
  */
 using AlphaTab.Model;
+using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class RestGlyph : MusicFontGlyph
+    public class ScoreRestGlyph : MusicFontGlyph
     {
         private readonly Duration _duration;
 
-        public RestGlyph(float x, float y, Duration duration)
+        public Beat Beat { get; set; }
+        public BeamingHelper BeamingHelper { get; set; }
+
+        public ScoreRestGlyph(float x, float y, Duration duration)
             : base(x, y, 1, GetSymbol(duration))
         {
             _duration = duration;

@@ -25,13 +25,18 @@ namespace AlphaTab.Rendering.Glyphs
     public class ScoreBeatGlyph : BeatOnNoteGlyphBase
     {
         public ScoreNoteChordGlyph NoteHeads { get; set; }
-        public RestGlyph RestGlyph { get; set; }
+        public ScoreRestGlyph RestGlyph { get; set; }
+        public BeamingHelper BeamingHelper { get; set; }
 
         public override void FinalizeGlyph(ScoreLayout layout)
         {
             if (!Container.Beat.IsRest)
             {
                 NoteHeads.UpdateBeamingHelper(Container.X + X);
+            }
+            else
+            {
+                RestGlyph.UpdateBeamingHelper(Container.X + X);
             }
         }
 
@@ -113,7 +118,10 @@ namespace AlphaTab.Rendering.Glyphs
 
                     var y = sr.GetScoreY(line, offset);
 
-                    AddGlyph(new RestGlyph(0, y, Container.Beat.Duration));
+                    RestGlyph = new ScoreRestGlyph(0, y, Container.Beat.Duration);
+                    RestGlyph.Beat = Container.Beat;
+                    RestGlyph.BeamingHelper = BeamingHelper;
+                    AddGlyph(RestGlyph);
 
                     //
                     // Note dots
@@ -135,6 +143,10 @@ namespace AlphaTab.Rendering.Glyphs
             if (NoteHeads != null)
             {
                 NoteHeads.UpdateBeamingHelper(X);
+            }
+            else if (RestGlyph != null)
+            {
+                RestGlyph.UpdateBeamingHelper(X);
             }
         }
 
