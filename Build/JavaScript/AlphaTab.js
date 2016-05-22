@@ -1807,9 +1807,10 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
     },
     GenerateNote: function (note, beatStart, beatDuration, brushInfo){
         var track = note.Beat.Voice.Bar.Track;
-        var noteKey = track.Capo + note.get_RealValue();
-        var noteStart = beatStart + brushInfo[note.String - 1];
-        var noteDuration = this.GetNoteDuration(note, beatDuration) - brushInfo[note.String - 1];
+        var noteKey = note.get_RealValue();
+        var brushOffset = note.get_IsStringed() && note.String <= brushInfo.length ? brushInfo[note.String - 1] : 0;
+        var noteStart = beatStart + brushOffset;
+        var noteDuration = this.GetNoteDuration(note, beatDuration) - brushOffset;
         var dynamicValue = this.GetDynamicValue(note);
         // TODO: enable second condition after whammy generation is implemented
         if (!note.get_HasBend()){
@@ -2041,7 +2042,7 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
     },
     GenerateTrill: function (note, noteStart, noteDuration, noteKey, dynamicValue){
         var track = note.Beat.Voice.Bar.Track;
-        var trillKey = track.Capo + note.get_StringTuning() + note.get_TrillFret();
+        var trillKey = note.get_StringTuning() + note.get_TrillFret();
         var trillLength = AlphaTab.Audio.MidiUtils.ToTicks(note.TrillSpeed);
         var realKey = true;
         var tick = noteStart;
@@ -6377,6 +6378,12 @@ AlphaTab.Importer.GpxParser.prototype = {
                             case "Fret":
                             note.Fret = AlphaTab.Platform.Std.ParseInt(this.GetValue(this.FindChildElement(c, "Fret")));
                             break;
+                            case "Element":
+                            note.Element = AlphaTab.Platform.Std.ParseInt(this.GetValue(this.FindChildElement(c, "Element")));
+                            break;
+                            case "Variation":
+                            note.Variation = AlphaTab.Platform.Std.ParseInt(this.GetValue(this.FindChildElement(c, "Variation")));
+                            break;
                             case "Tapped":
                             this._tappedNotes[noteId] = true;
                             break;
@@ -7971,6 +7978,10 @@ AlphaTab.Model.Note = function (){
     this.MaxBendPoint = null;
     this.Fret = 0;
     this.String = 0;
+    this.Octave = 0;
+    this.Tone = 0;
+    this.Element = 0;
+    this.Variation = 0;
     this.IsHammerPullOrigin = false;
     this.HammerPullOrigin = null;
     this.HammerPullDestination = null;
@@ -7997,8 +8008,6 @@ AlphaTab.Model.Note = function (){
     this.AccidentalMode = AlphaTab.Model.NoteAccidentalMode.Default;
     this.Beat = null;
     this.Dynamic = AlphaTab.Model.DynamicValue.PPP;
-    this.Octave = 0;
-    this.Tone = 0;
     this.BendPoints = [];
     this.Dynamic = AlphaTab.Model.DynamicValue.F;
     this.Accentuated = AlphaTab.Model.AccentuationType.None;
@@ -8012,10 +8021,24 @@ AlphaTab.Model.Note = function (){
     this.TrillSpeed = AlphaTab.Model.Duration.ThirtySecond;
     this.DurationPercent = 1;
     this.Octave = -1;
+    this.Tone = -1;
+    this.Fret = -1;
+    this.String = -1;
+    this.Element = -1;
+    this.Variation = -1;
 };
 AlphaTab.Model.Note.prototype = {
     get_HasBend: function (){
         return this.BendPoints.length > 0;
+    },
+    get_IsStringed: function (){
+        return this.Fret >= 0 && this.String >= 0;
+    },
+    get_IsPiano: function (){
+        return this.Octave >= 0 && this.Tone >= 0;
+    },
+    get_IsPercussion: function (){
+        return this.Element >= 0 && this.Variation >= 0;
     },
     get_IsHarmonic: function (){
         return this.HarmonicType != AlphaTab.Model.HarmonicType.None;
@@ -8027,12 +8050,19 @@ AlphaTab.Model.Note.prototype = {
         return this.TrillValue >= 0;
     },
     get_StringTuning: function (){
-        return AlphaTab.Model.Note.GetStringTuning(this.Beat.Voice.Bar.Track, this.String);
+        return this.Beat.Voice.Bar.Track.Capo + AlphaTab.Model.Note.GetStringTuning(this.Beat.Voice.Bar.Track, this.String);
     },
     get_RealValue: function (){
-        if (this.Fret == -2147483648)
+        if (this.get_IsPercussion()){
+            return AlphaTab.Rendering.Utils.PercussionMapper.MidiFromElementVariation(this);
+        }
+        if (this.get_IsStringed()){
+            return this.Fret + this.get_StringTuning();
+        }
+        if (this.get_IsPiano()){
             return this.Octave * 12 + this.Tone;
-        return this.Fret + this.get_StringTuning();
+        }
+        return 0;
     },
     Clone: function (){
         var n = new AlphaTab.Model.Note();
@@ -8116,6 +8146,8 @@ AlphaTab.Model.Note.CopyTo = function (src, dst){
     dst.Dynamic = src.Dynamic;
     dst.Octave = src.Octave;
     dst.Tone = src.Tone;
+    dst.Element = src.Element;
+    dst.Variation = src.Variation;
 };
 AlphaTab.Model.Note.NextNoteOnSameLine = function (note){
     var nextBeat = note.Beat.NextBeat;
@@ -15071,7 +15103,7 @@ AlphaTab.Rendering.Utils.AccidentalHelper.prototype = {
         return accidentalToSet;
     },
     GetNoteLineWithAccidental: function (n, accidentalToSet){
-        var value = n.Beat.Voice.Bar.Track.IsPercussion ? AlphaTab.Rendering.Utils.PercussionMapper.MapValue(n) : n.get_RealValue();
+        var value = n.Beat.Voice.Bar.Track.IsPercussion ? AlphaTab.Rendering.Utils.PercussionMapper.MapNoteForDisplay(n) : n.get_RealValue();
         var ks = n.Beat.Voice.Bar.get_MasterBar().KeySignature;
         var clef = n.Beat.Voice.Bar.Clef;
         var index = value % 12;
@@ -15223,7 +15255,7 @@ AlphaTab.Rendering.Utils.BeamingHelper = function (track){
 AlphaTab.Rendering.Utils.BeamingHelper.prototype = {
     GetValue: function (n){
         if (this._track.IsPercussion){
-            return AlphaTab.Rendering.Utils.PercussionMapper.MapValue(n);
+            return AlphaTab.Rendering.Utils.PercussionMapper.MapNoteForDisplay(n);
         }
         else {
             return n.get_RealValue();
@@ -15512,7 +15544,13 @@ AlphaTab.Rendering.Utils.BoundingsLookup.prototype = {
 };
 AlphaTab.Rendering.Utils.PercussionMapper = function (){
 };
-AlphaTab.Rendering.Utils.PercussionMapper.MapValue = function (note){
+$StaticConstructor(function (){
+    AlphaTab.Rendering.Utils.PercussionMapper.ElementVariationToMidi = [new Int32Array([35, 35, 35]), new Int32Array([38, 38, 37]), new Int32Array([56, 56, 56]), new Int32Array([56, 56, 56]), new Int32Array([56, 56, 56]), new Int32Array([41, 41, 41]), new Int32Array([43, 43, 43]), new Int32Array([45, 45, 45]), new Int32Array([47, 47, 47]), new Int32Array([48, 48, 48]), new Int32Array([42, 46, 46]), new Int32Array([44, 44, 44]), new Int32Array([49, 49, 49]), new Int32Array([57, 57, 57]), new Int32Array([55, 55, 55]), new Int32Array([51, 59, 53]), new Int32Array([52, 52, 52])];
+});
+AlphaTab.Rendering.Utils.PercussionMapper.MidiFromElementVariation = function (note){
+    return AlphaTab.Rendering.Utils.PercussionMapper.ElementVariationToMidi[note.Element][note.Variation];
+};
+AlphaTab.Rendering.Utils.PercussionMapper.MapNoteForDisplay = function (note){
     var value = note.get_RealValue();
     if (value == 61 || value == 66){
         return 50;

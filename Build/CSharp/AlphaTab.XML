@@ -1233,6 +1233,14 @@
             the overall max note within this group
             </summary>
         </member>
+        <member name="M:AlphaTab.Rendering.Utils.PercussionMapper.MapNoteForDisplay(AlphaTab.Model.Note)">
+            <summary>
+            Maps the given note to a normal note value to place the note at the 
+            correct line on score notation
+            </summary>
+            <param name="note"></param>
+            <returns></returns>
+        </member>
         <member name="T:AlphaTab.Rendering.Utils.SvgPathParser">
             <summary>
             A utility which can parse and deliver single tokens from a svg pathdata string

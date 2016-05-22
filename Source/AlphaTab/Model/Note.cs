@@ -17,6 +17,7 @@
  */
 
 using AlphaTab.Collections;
+using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Model
 {
@@ -60,6 +61,13 @@ namespace AlphaTab.Model
         public BendPoint MaxBendPoint { get; set; }
         public bool HasBend { get { return BendPoints.Count > 0; } }
 
+        #region Stringed Instruments
+
+        public bool IsStringed
+        {
+            get { return Fret >= 0 && String >= 0; }
+        }
+
         public int Fret { get; set; }
 
         /// <summary>
@@ -68,6 +76,33 @@ namespace AlphaTab.Model
         /// It then increases the the number of strings on available on the track. 
         /// </summary>
         public int String { get; set; }
+
+        #endregion
+
+        #region Piano Instruments
+
+        public bool IsPiano
+        {
+            get { return Octave >= 0 && Tone >= 0; }
+        }
+
+        public int Octave { get; set; }
+        public int Tone { get; set; }
+
+        #endregion
+
+        #region Percussion
+
+        public bool IsPercussion
+        {
+            get { return Element >= 0 && Variation >= 0; }
+        }
+
+
+        public int Element { get; set; }
+        public int Variation { get; set; }
+
+        #endregion
 
         public bool IsHammerPullOrigin { get; set; }
         public Note HammerPullOrigin { get; set; }
@@ -122,14 +157,11 @@ namespace AlphaTab.Model
         public Beat Beat { get; set; }
         public DynamicValue Dynamic { get; set; }
 
-        public int Octave { get; set; }
-        public int Tone { get; set; }
-
         public int StringTuning
         {
             get
             {
-                return GetStringTuning(Beat.Voice.Bar.Staff.Track, String);
+                return Beat.Voice.Bar.Track.Capo + GetStringTuning(Beat.Voice.Bar.Track, String);
             }
         }
 
@@ -144,9 +176,20 @@ namespace AlphaTab.Model
         {
             get
             {
-                if (Fret == int.MinValue)
+                if (IsPercussion)
+                {
+                    return PercussionMapper.MidiFromElementVariation(this);
+                }
+                if (IsStringed)
+                {
+                    return Fret + StringTuning;
+                }
+                if (IsPiano)
+                {
                     return Octave * 12 + Tone;
-                return Fret + StringTuning;
+                }
+
+                return 0;
             }
         }
 
@@ -167,7 +210,15 @@ namespace AlphaTab.Model
             TrillValue = -1;
             TrillSpeed = Duration.ThirtySecond;
             DurationPercent = 1;
+
             Octave = -1;
+            Tone = -1;
+
+            Fret = -1;
+            String = -1;
+
+            Element = -1;
+            Variation = -1;
         }
 
         public static void CopyTo(Note src, Note dst)
@@ -196,6 +247,8 @@ namespace AlphaTab.Model
             dst.Dynamic = src.Dynamic;
             dst.Octave = src.Octave;
             dst.Tone = src.Tone;
+            dst.Element = src.Element;
+            dst.Variation = src.Variation;
         }
 
         public Note Clone()

@@ -1099,6 +1099,12 @@ namespace AlphaTab.Importer
                                 case "Fret":
                                     note.Fret = Std.ParseInt(GetValue(FindChildElement(c, "Fret")));
                                     break;
+                                case "Element":
+                                    note.Element = Std.ParseInt(GetValue(FindChildElement(c, "Element")));
+                                    break;
+                                case "Variation":
+                                    note.Variation = Std.ParseInt(GetValue(FindChildElement(c, "Variation")));
+                                    break;
                                 case "Tapped":
                                     _tappedNotes[noteId] = true;
                                     break;
