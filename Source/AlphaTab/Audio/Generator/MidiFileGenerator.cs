@@ -222,9 +222,10 @@ namespace AlphaTab.Audio.Generator
         private void GenerateNote(Note note, int beatStart, int beatDuration, int[] brushInfo)
         {
             var track = note.Beat.Voice.Bar.Track;
-            var noteKey = track.Capo + note.RealValue;
-            var noteStart = beatStart + brushInfo[note.String - 1];
-            var noteDuration = GetNoteDuration(note, beatDuration) - brushInfo[note.String - 1];
+            var noteKey = note.RealValue;
+            var brushOffset = note.IsStringed && note.String <= brushInfo.Length ? brushInfo[note.String - 1] : 0;
+            var noteStart = beatStart + brushOffset;
+            var noteDuration = GetNoteDuration(note, beatDuration) - brushOffset;
             var dynamicValue = GetDynamicValue(note);
 
             // TODO: enable second condition after whammy generation is implemented
@@ -538,7 +539,7 @@ namespace AlphaTab.Audio.Generator
         private void GenerateTrill(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
         {
             var track = note.Beat.Voice.Bar.Track;
-            var trillKey = track.Capo + note.StringTuning + note.TrillFret;
+            var trillKey = note.StringTuning + note.TrillFret;
             var trillLength = note.TrillSpeed.ToTicks();
             var realKey = true;
             var tick = noteStart;

@@ -132,7 +132,7 @@ namespace AlphaTab.Rendering.Utils
         {
             if (_track.IsPercussion)
             {
-                return PercussionMapper.MapValue(n);
+                return PercussionMapper.MapNoteForDisplay(n);
             }
             else
             {
