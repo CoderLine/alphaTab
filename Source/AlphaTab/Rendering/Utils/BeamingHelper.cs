@@ -184,11 +184,6 @@ namespace AlphaTab.Rendering.Utils
                     }
                 }
 #endif
-                if (_track.IsPercussion)
-                {
-                    return BeamDirection.Up;
-                }
-
                 if (Beats.Count == 1 && Beats[0].Duration == Duration.Whole)
                 {
                     return BeamDirection.Up;

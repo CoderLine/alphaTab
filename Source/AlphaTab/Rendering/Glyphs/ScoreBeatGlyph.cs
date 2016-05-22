@@ -25,7 +25,7 @@ namespace AlphaTab.Rendering.Glyphs
     public class ScoreBeatGlyph : BeatGlyphBase
     {
         public ScoreNoteChordGlyph NoteHeads { get; set; }
-        public RestGlyph RestGlyph { get; set; }
+        public ScoreRestGlyph RestGlyph { get; set; }
         public BeamingHelper BeamingHelper { get; set; }
 
         public override void FinalizeGlyph(ScoreLayout layout)
@@ -34,15 +34,22 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 NoteHeads.UpdateBeamingHelper(Container.X + X);
             }
+            else
+            {
+                RestGlyph.UpdateBeamingHelper(Container.X + X);
+            }
         }
 
         public override void ApplyGlyphSpacing(float spacing)
         {
             base.ApplyGlyphSpacing(spacing);
-            // TODO: we need to tell the beaming helper the position of rest beats
             if (!Container.Beat.IsRest)
             {
                 NoteHeads.UpdateBeamingHelper(Container.X + X);
+            }
+            else
+            {
+                RestGlyph.UpdateBeamingHelper(Container.X + X);
             }
         }
 
@@ -124,7 +131,10 @@ namespace AlphaTab.Rendering.Glyphs
 
                     var y = sr.GetScoreY(line, offset);
 
-                    AddGlyph(new RestGlyph(0, y, Container.Beat.Duration));
+                    RestGlyph = new ScoreRestGlyph(0, y, Container.Beat.Duration);
+                    RestGlyph.Beat = Container.Beat;
+                    RestGlyph.BeamingHelper = BeamingHelper;
+                    AddGlyph(RestGlyph);
 
                     //
                     // Note dots
@@ -146,6 +156,10 @@ namespace AlphaTab.Rendering.Glyphs
             if (NoteHeads != null)
             {
                 NoteHeads.UpdateBeamingHelper(X);
+            }
+            else if (RestGlyph != null)
+            {
+                RestGlyph.UpdateBeamingHelper(X);
             }
         }
 

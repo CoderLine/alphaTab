@@ -24,6 +24,7 @@ namespace AlphaTab.Rendering.Glyphs
     public class TabBeatGlyph : BeatGlyphBase, ISupportsFinalize
     {
         public TabNoteChordGlyph NoteNumbers { get; set; }
+        public TabRestGlyph RestGlyph { get; set; }
         public BeamingHelper BeamingHelper { get; set; }
 
         public override void DoLayout()
@@ -50,8 +51,16 @@ namespace AlphaTab.Rendering.Glyphs
                 // Tremolo Picking
                 if (Container.Beat.IsTremolo && !NoteNumbers.BeatEffects.ContainsKey("Tremolo"))
                 {
-                    NoteNumbers.BeatEffects["Tremolo"] = new TremoloPickingGlyph(5 * Scale, 0, Container.Beat.TremoloSpeed.Value);
+                    NoteNumbers.BeatEffects["Tremolo"] = new TremoloPickingGlyph(5 * Scale, 0,
+                        Container.Beat.TremoloSpeed.Value);
                 }
+            }
+            else
+            {
+                RestGlyph = new TabRestGlyph();
+                RestGlyph.Beat = Container.Beat;
+                RestGlyph.BeamingHelper = BeamingHelper;
+                AddGlyph(RestGlyph);
             }
 
             // left to right layout
@@ -66,6 +75,14 @@ namespace AlphaTab.Rendering.Glyphs
                 w += g.Width;
             }
             Width = w;
+            if (NoteNumbers != null)
+            {
+                NoteNumbers.UpdateBeamingHelper(X);
+            }
+            else if (RestGlyph != null)
+            {
+                RestGlyph.UpdateBeamingHelper(X);
+            }
         }
 
         public override void FinalizeGlyph(ScoreLayout layout)
@@ -74,15 +91,22 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 NoteNumbers.UpdateBeamingHelper(Container.X + X);
             }
+            else
+            {
+                RestGlyph.UpdateBeamingHelper(Container.X + X);
+            }
         }
 
         public override void ApplyGlyphSpacing(float spacing)
         {
             base.ApplyGlyphSpacing(spacing);
-            // TODO: we need to tell the beaming helper the position of rest beats
             if (!Container.Beat.IsRest)
             {
                 NoteNumbers.UpdateBeamingHelper(Container.X + X);
+            }
+            else
+            {
+                RestGlyph.UpdateBeamingHelper(Container.X + X);
             }
         }
 

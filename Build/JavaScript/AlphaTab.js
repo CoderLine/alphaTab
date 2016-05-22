@@ -11619,12 +11619,14 @@ AlphaTab.Rendering.Glyphs.RepeatOpenGlyph.prototype = {
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.RepeatOpenGlyph, AlphaTab.Rendering.Glyphs.Glyph);
-AlphaTab.Rendering.Glyphs.RestGlyph = function (x, y, duration){
+AlphaTab.Rendering.Glyphs.ScoreRestGlyph = function (x, y, duration){
     this._duration = AlphaTab.Model.Duration.Whole;
-    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, 1, AlphaTab.Rendering.Glyphs.RestGlyph.GetSymbol(duration));
+    this.Beat = null;
+    this.BeamingHelper = null;
+    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, 1, AlphaTab.Rendering.Glyphs.ScoreRestGlyph.GetSymbol(duration));
     this._duration = duration;
 };
-AlphaTab.Rendering.Glyphs.RestGlyph.prototype = {
+AlphaTab.Rendering.Glyphs.ScoreRestGlyph.prototype = {
     DoLayout: function (){
         switch (this._duration){
             case AlphaTab.Model.Duration.Whole:
@@ -11644,9 +11646,12 @@ AlphaTab.Rendering.Glyphs.RestGlyph.prototype = {
     },
     get_CanScale: function (){
         return false;
+    },
+    UpdateBeamingHelper: function (cx){
+        this.BeamingHelper.RegisterBeatLineX(this.Beat, cx + this.X + this.Width / 2, cx + this.X + this.Width / 2);
     }
 };
-AlphaTab.Rendering.Glyphs.RestGlyph.GetSymbol = function (duration){
+AlphaTab.Rendering.Glyphs.ScoreRestGlyph.GetSymbol = function (duration){
     switch (duration){
         case AlphaTab.Model.Duration.Whole:
         case AlphaTab.Model.Duration.Half:
@@ -11665,7 +11670,7 @@ AlphaTab.Rendering.Glyphs.RestGlyph.GetSymbol = function (duration){
             return AlphaTab.Rendering.Glyphs.MusicFontSymbol.None;
     }
 };
-$Inherit(AlphaTab.Rendering.Glyphs.RestGlyph, AlphaTab.Rendering.Glyphs.MusicFontGlyph);
+$Inherit(AlphaTab.Rendering.Glyphs.ScoreRestGlyph, AlphaTab.Rendering.Glyphs.MusicFontGlyph);
 AlphaTab.Rendering.Glyphs.RideCymbalGlyph = function (x, y, isGrace){
     this._isGrace = false;
     AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, isGrace ? 0.5 : 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.NoteRideCymbal);
@@ -11724,12 +11729,17 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
         if (!this.Container.Beat.get_IsRest()){
             this.NoteHeads.UpdateBeamingHelper(this.Container.X + this.X);
         }
+        else {
+            this.RestGlyph.UpdateBeamingHelper(this.Container.X + this.X);
+        }
     },
     ApplyGlyphSpacing: function (spacing){
         AlphaTab.Rendering.Glyphs.Glyph.prototype.ApplyGlyphSpacing.call(this, spacing);
-        // TODO: we need to tell the beaming helper the position of rest beats
         if (!this.Container.Beat.get_IsRest()){
             this.NoteHeads.UpdateBeamingHelper(this.Container.X + this.X);
+        }
+        else {
+            this.RestGlyph.UpdateBeamingHelper(this.Container.X + this.X);
         }
     },
     DoLayout: function (){
@@ -11801,7 +11811,10 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
                         break;
                 }
                 var y = sr.GetScoreY(line, offset);
-                this.AddGlyph(new AlphaTab.Rendering.Glyphs.RestGlyph(0, y, this.Container.Beat.Duration));
+                this.RestGlyph = new AlphaTab.Rendering.Glyphs.ScoreRestGlyph(0, y, this.Container.Beat.Duration);
+                this.RestGlyph.Beat = this.Container.Beat;
+                this.RestGlyph.BeamingHelper = this.BeamingHelper;
+                this.AddGlyph(this.RestGlyph);
                 //
                 // Note dots
                 //
@@ -11818,6 +11831,9 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
         AlphaTab.Rendering.Glyphs.BeatGlyphBase.prototype.DoLayout.call(this);
         if (this.NoteHeads != null){
             this.NoteHeads.UpdateBeamingHelper(this.X);
+        }
+        else if (this.RestGlyph != null){
+            this.RestGlyph.UpdateBeamingHelper(this.X);
         }
     },
     CreateBeatDot: function (line, offset, group){
@@ -12453,6 +12469,7 @@ AlphaTab.Rendering.Glyphs.TabBeatContainerGlyph.prototype = {
 $Inherit(AlphaTab.Rendering.Glyphs.TabBeatContainerGlyph, AlphaTab.Rendering.Glyphs.BeatContainerGlyph);
 AlphaTab.Rendering.Glyphs.TabBeatGlyph = function (){
     this.NoteNumbers = null;
+    this.RestGlyph = null;
     this.BeamingHelper = null;
     AlphaTab.Rendering.Glyphs.BeatGlyphBase.call(this);
 };
@@ -12478,6 +12495,12 @@ AlphaTab.Rendering.Glyphs.TabBeatGlyph.prototype = {
                 this.NoteNumbers.BeatEffects["Tremolo"] = new AlphaTab.Rendering.Glyphs.TremoloPickingGlyph(5 * this.get_Scale(), 0, this.Container.Beat.TremoloSpeed);
             }
         }
+        else {
+            this.RestGlyph = new AlphaTab.Rendering.Glyphs.TabRestGlyph();
+            this.RestGlyph.Beat = this.Container.Beat;
+            this.RestGlyph.BeamingHelper = this.BeamingHelper;
+            this.AddGlyph(this.RestGlyph);
+        }
         // left to right layout
         if (this.Glyphs == null)
             return;
@@ -12490,17 +12513,28 @@ AlphaTab.Rendering.Glyphs.TabBeatGlyph.prototype = {
             w += g.Width;
         }
         this.Width = w;
+        if (this.NoteNumbers != null){
+            this.NoteNumbers.UpdateBeamingHelper(this.X);
+        }
+        else if (this.RestGlyph != null){
+            this.RestGlyph.UpdateBeamingHelper(this.X);
+        }
     },
     FinalizeGlyph: function (layout){
         if (!this.Container.Beat.get_IsRest()){
             this.NoteNumbers.UpdateBeamingHelper(this.Container.X + this.X);
         }
+        else {
+            this.RestGlyph.UpdateBeamingHelper(this.Container.X + this.X);
+        }
     },
     ApplyGlyphSpacing: function (spacing){
         AlphaTab.Rendering.Glyphs.Glyph.prototype.ApplyGlyphSpacing.call(this, spacing);
-        // TODO: we need to tell the beaming helper the position of rest beats
         if (!this.Container.Beat.get_IsRest()){
             this.NoteNumbers.UpdateBeamingHelper(this.Container.X + this.X);
+        }
+        else {
+            this.RestGlyph.UpdateBeamingHelper(this.Container.X + this.X);
         }
     },
     CreateNoteGlyph: function (n){
@@ -12755,6 +12789,20 @@ AlphaTab.Rendering.Glyphs.TabNoteChordGlyph.prototype = {
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.TabNoteChordGlyph, AlphaTab.Rendering.Glyphs.Glyph);
+AlphaTab.Rendering.Glyphs.TabRestGlyph = function (){
+    this.Beat = null;
+    this.BeamingHelper = null;
+    AlphaTab.Rendering.Glyphs.SpacingGlyph.call(this, 0, 0, 0, false);
+};
+AlphaTab.Rendering.Glyphs.TabRestGlyph.prototype = {
+    DoLayout: function (){
+        this.Width = 10 * this.get_Scale();
+    },
+    UpdateBeamingHelper: function (cx){
+        this.BeamingHelper.RegisterBeatLineX(this.Beat, cx + this.X + this.Width / 2, cx + this.X + this.Width / 2);
+    }
+};
+$Inherit(AlphaTab.Rendering.Glyphs.TabRestGlyph, AlphaTab.Rendering.Glyphs.SpacingGlyph);
 AlphaTab.Rendering.Glyphs.TabSlideLineGlyph = function (type, startNote, parent){
     this._startNote = null;
     this._type = AlphaTab.Model.SlideType.None;
@@ -15279,9 +15327,6 @@ AlphaTab.Rendering.Utils.BeamingHelper.prototype = {
     get_Direction: function (){
         // multivoice handling
         
-        if (this._track.IsPercussion){
-            return AlphaTab.Rendering.Utils.BeamDirection.Up;
-        }
         if (this.Beats.length == 1 && this.Beats[0].Duration == AlphaTab.Model.Duration.Whole){
             return AlphaTab.Rendering.Utils.BeamDirection.Up;
         }
