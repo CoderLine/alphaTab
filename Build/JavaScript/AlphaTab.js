@@ -1972,7 +1972,22 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
         return dynamicValue;
     },
     GenerateFadeIn: function (note, noteStart, noteDuration, noteKey, dynamicValue){
-        // TODO
+        var track = note.Beat.Voice.Bar.Track;
+        var endVolume = AlphaTab.Audio.Generator.MidiFileGenerator.ToChannelShort(track.PlaybackInfo.Volume);
+        var volumeFactor = endVolume / noteDuration;
+        var tickStep = 120;
+        var steps = ((noteDuration / tickStep) | 0);
+        var endTick = noteStart + noteDuration;
+        for (var i = steps - 1; i >= 0; i--){
+            var tick = endTick - (i * tickStep);
+            var volume = (tick - noteStart) * volumeFactor;
+            if (i == steps - 1){
+                this._handler.AddControlChange(track.Index, noteStart, track.PlaybackInfo.PrimaryChannel, 7, volume);
+                this._handler.AddControlChange(track.Index, noteStart, track.PlaybackInfo.SecondaryChannel, 7, volume);
+            }
+            this._handler.AddControlChange(track.Index, tick, track.PlaybackInfo.PrimaryChannel, 7, volume);
+            this._handler.AddControlChange(track.Index, tick, track.PlaybackInfo.SecondaryChannel, 7, volume);
+        }
     },
     GenerateHarmonic: function (note, noteStart, noteDuration, noteKey, dynamicValue){
         // TODO
@@ -11728,19 +11743,19 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph = function (){
 };
 AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
     FinalizeGlyph: function (layout){
-        if (!this.Container.Beat.get_IsRest()){
+        if (this.NoteHeads != null){
             this.NoteHeads.UpdateBeamingHelper(this.Container.X + this.X);
         }
-        else {
+        else if (this.RestGlyph != null){
             this.RestGlyph.UpdateBeamingHelper(this.Container.X + this.X);
         }
     },
     ApplyGlyphSpacing: function (spacing){
         AlphaTab.Rendering.Glyphs.Glyph.prototype.ApplyGlyphSpacing.call(this, spacing);
-        if (!this.Container.Beat.get_IsRest()){
+        if (this.NoteHeads != null){
             this.NoteHeads.UpdateBeamingHelper(this.Container.X + this.X);
         }
-        else {
+        else if (this.RestGlyph != null){
             this.RestGlyph.UpdateBeamingHelper(this.Container.X + this.X);
         }
     },
@@ -12775,7 +12790,7 @@ AlphaTab.Rendering.Glyphs.TabNoteChordGlyph.prototype = {
         }));
     },
     UpdateBeamingHelper: function (cx){
-        if (this.BeamingHelper != null){
+        if (this.BeamingHelper != null && !this.BeamingHelper.HasBeatLineX(this.Beat)){
             this.BeamingHelper.RegisterBeatLineX(this.Beat, cx + this.X + this._centerX, cx + this.X + this._centerX);
         }
     }

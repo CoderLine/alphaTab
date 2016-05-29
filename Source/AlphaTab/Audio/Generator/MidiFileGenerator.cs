@@ -434,7 +434,26 @@ namespace AlphaTab.Audio.Generator
 
         private void GenerateFadeIn(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
         {
-            // TODO
+            var track = note.Beat.Voice.Bar.Track;
+            var endVolume = ToChannelShort(track.PlaybackInfo.Volume);
+            var volumeFactor = (float)endVolume / noteDuration;
+
+            var tickStep = 120;
+            int steps = (noteDuration / tickStep);
+
+            var endTick = noteStart + noteDuration;
+            for (int i = steps - 1; i >= 0; i--)
+            {
+                var tick = endTick - (i * tickStep);
+                var volume = (tick - noteStart) * volumeFactor;
+                if (i == steps - 1)
+                {
+                    _handler.AddControlChange(track.Index, noteStart, (byte)track.PlaybackInfo.PrimaryChannel, (byte)MidiController.VolumeCoarse, (byte)volume);
+                    _handler.AddControlChange(track.Index, noteStart, (byte)track.PlaybackInfo.SecondaryChannel, (byte)MidiController.VolumeCoarse, (byte)volume);
+                }
+                _handler.AddControlChange(track.Index, tick, (byte)track.PlaybackInfo.PrimaryChannel, (byte)MidiController.VolumeCoarse, (byte)volume);
+                _handler.AddControlChange(track.Index, tick, (byte)track.PlaybackInfo.SecondaryChannel, (byte)MidiController.VolumeCoarse, (byte)volume);
+            }
         }
 
         private void GenerateHarmonic(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
@@ -468,9 +487,9 @@ namespace AlphaTab.Audio.Generator
                 var phaseDuration = noteStart + phaseLength < noteEnd ? phaseLength : noteEnd - noteStart;
                 while (phase < phaseDuration)
                 {
-                    var bend = bendAmplitude*Math.Sin(phase*Math.PI/phaseHalf);
+                    var bend = bendAmplitude * Math.Sin(phase * Math.PI / phaseHalf);
 
-                    _handler.AddBend(track.Index, noteStart + phase, (byte) track.PlaybackInfo.PrimaryChannel, (byte)(DefaultBend + bend));
+                    _handler.AddBend(track.Index, noteStart + phase, (byte)track.PlaybackInfo.PrimaryChannel, (byte)(DefaultBend + bend));
 
                     phase += resolution;
                 }

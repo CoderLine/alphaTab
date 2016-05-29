@@ -128,7 +128,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void UpdateBeamingHelper(float cx)
         {
-            if (BeamingHelper != null)
+            if (BeamingHelper != null && !BeamingHelper.HasBeatLineX(Beat))
             {
                 BeamingHelper.RegisterBeatLineX(Beat, cx + X + _centerX, cx + X + _centerX);
             }

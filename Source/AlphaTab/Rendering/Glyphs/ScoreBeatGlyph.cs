@@ -30,11 +30,11 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void FinalizeGlyph(ScoreLayout layout)
         {
-            if (!Container.Beat.IsRest)
+            if (NoteHeads != null)
             {
                 NoteHeads.UpdateBeamingHelper(Container.X + X);
             }
-            else
+            else if(RestGlyph != null)
             {
                 RestGlyph.UpdateBeamingHelper(Container.X + X);
             }
@@ -43,11 +43,11 @@ namespace AlphaTab.Rendering.Glyphs
         public override void ApplyGlyphSpacing(float spacing)
         {
             base.ApplyGlyphSpacing(spacing);
-            if (!Container.Beat.IsRest)
+            if (NoteHeads != null)
             {
                 NoteHeads.UpdateBeamingHelper(Container.X + X);
             }
-            else
+            else if(RestGlyph != null)
             {
                 RestGlyph.UpdateBeamingHelper(Container.X + X);
             }
