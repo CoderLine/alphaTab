@@ -132,40 +132,40 @@ namespace AlphaTab.Rendering
         }
 
 
-        public override void RegisterMaxSizes(BarSizeInfo sizes)
+        public override void RegisterLayoutingInfo(BarLayoutingInfo layoutings)
         {
             var preSize = _preBeatGlyphs.Width;
-            if (sizes.GetSize(KeySizePre) < preSize)
+            if (layoutings.GetSize(KeySizePre) < preSize)
             {
-                sizes.SetSize(KeySizePre, preSize);
+                layoutings.SetSize(KeySizePre, preSize);
             }
 
-            Std.Foreach(_voiceContainers.Values, c => c.RegisterMaxSizes(sizes));
+            Std.Foreach(_voiceContainers.Values, c => c.RegisterLayoutingInfo(layoutings));
 
             var postSize = _postBeatGlyphs.Width;
-            if (sizes.GetSize(KeySizePost) < postSize)
+            if (layoutings.GetSize(KeySizePost) < postSize)
             {
-                sizes.SetSize(KeySizePost, postSize);
+                layoutings.SetSize(KeySizePost, postSize);
             }
 
-            if (sizes.FullWidth < Width)
+            if (layoutings.FullWidth < Width)
             {
-                sizes.FullWidth = Width;
+                layoutings.FullWidth = Width;
             }
         }
 
-        public override void ApplySizes(BarSizeInfo sizes)
+        public override void ApplyLayoutingInfo(BarLayoutingInfo layoutings)
         {
             // if we need additional space in the preBeat group we simply
             // add a new spacer
-            _preBeatGlyphs.Width = sizes.GetSize(KeySizePre);
+            _preBeatGlyphs.Width = layoutings.GetSize(KeySizePre);
 
             // on beat glyphs we apply the glyph spacing
             var voiceEnd = 0f;
             Std.Foreach(_voiceContainers.Values, c =>
             {
                 c.X = _preBeatGlyphs.X + _preBeatGlyphs.Width;
-                c.ApplySizes(sizes);
+                c.ApplySizes(layoutings);
                 var newEnd = c.X + c.Width;
                 if (voiceEnd < newEnd)
                 {
@@ -175,9 +175,9 @@ namespace AlphaTab.Rendering
 
             // on the post glyphs we add the spacing before all other glyphs
             _postBeatGlyphs.X = voiceEnd;
-            _postBeatGlyphs.Width = sizes.GetSize(KeySizePost);
+            _postBeatGlyphs.Width = layoutings.GetSize(KeySizePost);
 
-            Width = sizes.FullWidth;
+            Width = layoutings.FullWidth;
         }
 
         protected void AddPreBeatGlyph(Glyph g)
@@ -188,41 +188,41 @@ namespace AlphaTab.Rendering
 
         protected void AddBeatGlyph(BeatContainerGlyph g)
         {
-            GetOrCreateVoiceContainer(g.Beat.Voice.Index).AddGlyph(g);
+            GetOrCreateVoiceContainer(g.Beat.Voice).AddGlyph(g);
         }
 
-        private VoiceContainerGlyph GetOrCreateVoiceContainer(int voiceIndex)
+        protected VoiceContainerGlyph GetOrCreateVoiceContainer(Voice voice)
         {
             VoiceContainerGlyph c;
-            if (voiceIndex >= _voiceContainers.Count)
+            if (voice.Index >= _voiceContainers.Count)
             {
-                c = new VoiceContainerGlyph(0, 0, voiceIndex);
+                c = new VoiceContainerGlyph(0, 0, voice);
                 c.Renderer = this;
-                _voiceContainers[voiceIndex] = c;
+                _voiceContainers[voice.Index] = c;
             }
             else
             {
-                c = _voiceContainers[voiceIndex];
+                c = _voiceContainers[voice.Index];
             }
             return c;
         }
 
-        public BeatContainerGlyph GetBeatContainer(int voice, int beat)
+        public BeatContainerGlyph GetBeatContainer(Voice voice, int beat)
         {
             return GetOrCreateVoiceContainer(voice).BeatGlyphs[beat];
         }
 
-        public BeatGlyphBase GetPreNotesPosition(int voice, int beat)
+        public BeatGlyphBase GetPreNotesPosition(Voice voice, int beat)
         {
             return GetBeatContainer(voice, beat).PreNotes;
         }
 
-        public BeatGlyphBase GetOnNotesPosition(int voice, int beat)
+        public BeatGlyphBase GetOnNotesPosition(Voice voice, int beat)
         {
             return GetBeatContainer(voice, beat).OnNotes;
         }
 
-        public BeatGlyphBase GetPostNotesPosition(int voice, int beat)
+        public BeatGlyphBase GetPostNotesPosition(Voice voice, int beat)
         {
             return GetBeatContainer(voice, beat).PostNotes;
         }
@@ -286,7 +286,7 @@ namespace AlphaTab.Rendering
 
             Std.Foreach(_voiceContainers.Values, c =>
             {
-                canvas.Color = c.VoiceIndex == 0
+                canvas.Color = c.Voice.Index == 0
                     ? Resources.MainGlyphColor
                     : Resources.SecondaryGlyphColor;
                 c.Paint(cx + X, cy + Y, canvas);

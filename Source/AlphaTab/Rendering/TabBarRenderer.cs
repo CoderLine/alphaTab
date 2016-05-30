@@ -46,7 +46,7 @@ namespace AlphaTab.Rendering
 
         public override float GetNoteX(Note note, bool onEnd = true)
         {
-            var beat = (TabBeatGlyph)GetOnNotesPosition(note.Beat.Voice.Index, note.Beat.Index);
+            var beat = (TabBeatGlyph)GetOnNotesPosition(note.Beat.Voice, note.Beat.Index);
             if (beat != null)
             {
                 return beat.Container.X + beat.X + beat.NoteNumbers.GetNoteX(note, onEnd);
@@ -56,7 +56,7 @@ namespace AlphaTab.Rendering
 
         public float GetBeatX(Beat beat)
         {
-            var bg = (TabBeatGlyph)GetPreNotesPosition(beat.Voice.Index, beat.Index);
+            var bg = (TabBeatGlyph)GetPreNotesPosition(beat.Voice, beat.Index);
             if (bg != null)
             {
                 return bg.Container.X + bg.X;
@@ -66,7 +66,7 @@ namespace AlphaTab.Rendering
 
         public override float GetNoteY(Note note)
         {
-            var beat = (TabBeatGlyph)GetOnNotesPosition(note.Beat.Voice.Index, note.Beat.Index);
+            var beat = (TabBeatGlyph)GetOnNotesPosition(note.Beat.Voice, note.Beat.Index);
             if (beat != null)
             {
                 return beat.NoteNumbers.GetNoteY(note);
@@ -120,10 +120,10 @@ namespace AlphaTab.Rendering
             for (int i = 0, j = v.Beats.Count; i < j; i++)
             {
                 var b = v.Beats[i];
-                var container = new TabBeatContainerGlyph(b);
+                var container = new TabBeatContainerGlyph(b, GetOrCreateVoiceContainer(v));
                 container.PreNotes = new TabBeatPreNotesGlyph();
                 container.OnNotes = new TabBeatGlyph();
-                ((TabBeatGlyph)container.OnNotes).BeamingHelper = _helpers.BeamHelperLookup[v.Index][b.Index];
+                container.OnNotes.BeamingHelper = _helpers.BeamHelperLookup[v.Index][b.Index];
                 container.PostNotes = new TabBeatPostNotesGlyph();
                 AddBeatGlyph(container);
             }

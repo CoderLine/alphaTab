@@ -114,6 +114,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeamGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeatContainerGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeatGlyphBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeatOnNoteGlyphBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BendGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ChineseCymbalGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\CircleGlyph.cs" />
@@ -189,7 +190,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\ScoreBarRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\ScoreBarRendererFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\ScoreRenderer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Staves\BarSizeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Staves\BarLayoutingInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Staves\Staff.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Staves\StaveGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\TabBarRenderer.cs" />

@@ -140,7 +140,7 @@ namespace AlphaTab.Rendering.Staves
                 {
                     var s = g.Staves[k];
                     s.AddBar(g.Track.Staves[s.ModelStaff.Index].Bars[barIndex]);
-                    s.BarRenderers[s.BarRenderers.Count - 1].RegisterMaxSizes(maxSizes);
+                    s.BarRenderers[s.BarRenderers.Count - 1].RegisterLayoutingInfo(maxSizes);
                     if (s.BarRenderers[s.BarRenderers.Count - 1].IsLinkedToPrevious)
                     {
                         result.IsLinkedToPrevious = true;

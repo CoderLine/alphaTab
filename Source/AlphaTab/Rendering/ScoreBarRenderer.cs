@@ -53,7 +53,7 @@ namespace AlphaTab.Rendering
 
         public BeamDirection GetBeatDirection(Beat beat)
         {
-            ScoreBeatGlyph g = (ScoreBeatGlyph)GetOnNotesPosition(beat.Voice.Index, beat.Index);
+            ScoreBeatGlyph g = (ScoreBeatGlyph)GetOnNotesPosition(beat.Voice, beat.Index);
             if (g != null)
             {
                 return g.NoteHeads.Direction;
@@ -63,7 +63,7 @@ namespace AlphaTab.Rendering
 
         public override float GetNoteX(Note note, bool onEnd = true)
         {
-            ScoreBeatGlyph g = (ScoreBeatGlyph)GetOnNotesPosition(note.Beat.Voice.Index, note.Beat.Index);
+            ScoreBeatGlyph g = (ScoreBeatGlyph)GetOnNotesPosition(note.Beat.Voice, note.Beat.Index);
             if (g != null)
             {
                 return g.Container.X + g.X + g.NoteHeads.GetNoteX(note, onEnd);
@@ -73,7 +73,7 @@ namespace AlphaTab.Rendering
 
         public override float GetNoteY(Note note)
         {
-            ScoreBeatGlyph beat = (ScoreBeatGlyph)GetOnNotesPosition(note.Beat.Voice.Index, note.Beat.Index);
+            ScoreBeatGlyph beat = (ScoreBeatGlyph)GetOnNotesPosition(note.Beat.Voice, note.Beat.Index);
             if (beat != null)
             {
                 return beat.NoteHeads.GetNoteY(note);
@@ -661,10 +661,10 @@ namespace AlphaTab.Rendering
             for (int i = 0, j = v.Beats.Count; i < j; i++)
             {
                 var b = v.Beats[i];
-                var container = new ScoreBeatContainerGlyph(b);
+                var container = new ScoreBeatContainerGlyph(b, GetOrCreateVoiceContainer(v));
                 container.PreNotes = new ScoreBeatPreNotesGlyph();
                 container.OnNotes = new ScoreBeatGlyph();
-                ((ScoreBeatGlyph)container.OnNotes).BeamingHelper = _helpers.BeamHelperLookup[v.Index][b.Index];
+                container.OnNotes.BeamingHelper = _helpers.BeamHelperLookup[v.Index][b.Index];
                 container.PostNotes = new ScoreBeatPostNotesGlyph();
                 AddBeatGlyph(container);
             }

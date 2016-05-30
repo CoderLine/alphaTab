@@ -70,9 +70,9 @@ namespace AlphaTab.Rendering
                 var b = voice.Beats[i];
                 // we create empty glyphs as alignment references and to get the 
                 // effect bar sized
-                var container = new BeatContainerGlyph(b);
+                var container = new BeatContainerGlyph(b, GetOrCreateVoiceContainer(voice));
                 container.PreNotes = new BeatGlyphBase();
-                container.OnNotes = new BeatGlyphBase();
+                container.OnNotes = new BeatOnNoteGlyphBase();
                 container.PostNotes = new BeatGlyphBase();
                 AddBeatGlyph(container);
             }

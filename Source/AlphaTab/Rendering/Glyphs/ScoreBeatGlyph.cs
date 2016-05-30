@@ -22,11 +22,10 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ScoreBeatGlyph : BeatGlyphBase
+    public class ScoreBeatGlyph : BeatOnNoteGlyphBase
     {
         public ScoreNoteChordGlyph NoteHeads { get; set; }
         public RestGlyph RestGlyph { get; set; }
-        public BeamingHelper BeamingHelper { get; set; }
 
         public override void FinalizeGlyph(ScoreLayout layout)
         {

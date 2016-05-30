@@ -17,7 +17,9 @@
  */
 
 using System;
+using AlphaTab.Audio;
 using AlphaTab.Collections;
+using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Layout;
@@ -34,15 +36,16 @@ namespace AlphaTab.Rendering.Glyphs
         public const string KeySizeBeat = "Beat";
 
         public FastList<BeatContainerGlyph> BeatGlyphs { get; set; }
-        public int VoiceIndex { get; set; }
 
         public float CurrentForce { get; private set; }
+        public Voice Voice { get; set; }
+        public float MinWidth { get; set; }
 
-        public VoiceContainerGlyph(float x, float y, int voiceIndex)
+        public VoiceContainerGlyph(float x, float y, Voice voice)
             : base(x, y)
         {
+            Voice = voice;
             BeatGlyphs = new FastList<BeatContainerGlyph>();
-            VoiceIndex = voiceIndex;
         }
 
         public void ScaleToWidth(float width)
@@ -74,28 +77,28 @@ namespace AlphaTab.Rendering.Glyphs
             }
         }
 
-        public void RegisterMaxSizes(BarSizeInfo sizes)
+        public void RegisterLayoutingInfo(BarLayoutingInfo layoutings)
         {
-            sizes.UpdateVoiceSize(Width);
+            layoutings.UpdateVoiceSize(Width);
             for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {
                 var b = BeatGlyphs[i];
-                b.RegisterMaxSizes(sizes);
+                b.RegisterLayoutingInfo(layoutings);
             }
         }
 
-        public void ApplySizes(BarSizeInfo sizes)
+        public void ApplyLayoutingInfo(BarLayoutingInfo layoutings)
         {
             Width = 0;
             for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {
                 BeatGlyphs[i].X = (i == 0) ? 0 : BeatGlyphs[i - 1].X + BeatGlyphs[i - 1].Width;
-                BeatGlyphs[i].ApplySizes(sizes);
+                BeatGlyphs[i].ApplyLayoutingInfo(layoutings);
             }
 
-            if (sizes.MinStretchForce > CurrentForce)
+            if (layoutings.MinStretchForce > CurrentForce)
             {
-                ScaleToForce(sizes.MinStretchForce);
+                ScaleToForce(layoutings.MinStretchForce);
             }
 
             if (BeatGlyphs.Count > 0)
@@ -118,7 +121,64 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             CurrentForce = Renderer.Settings.StretchForce;
+            MinWidth = Width;
         }
+
+        //public float SpaceToForce(int width)
+        //{
+        //    if (width < MinWidth || BeatGlyphs.Count == 0)
+        //    {
+        //        return 0;
+        //    }
+
+        //    // sort glyphs by size
+        //    var glyphs = BeatGlyphs.Clone();
+        //    glyphs.Sort((a, b) =>
+        //    {
+        //        if (a.MinWidth < b.MinWidth)
+        //        {
+        //            return -1;
+        //        }
+        //        if (a.MinWidth > b.MinWidth)
+        //        {
+        //            return 1;
+        //        }
+        //        return 0;
+        //    });
+
+        //    var xMin = MinWidth;
+        //    float springConstant = glyphs[0].SpringConstant;
+        //    for (int i = 0; i < glyphs.Count; i++)
+        //    {
+        //        xMin -= glyphs[i].MinWidth;
+        //        var force = (width - xMin) / springConstant;
+        //        if (i == glyphs.Count - 1 || force < glyphs[i + 1].MinStretchForce)
+        //        {
+        //            return force;
+        //        }
+        //        springConstant = 1 / ((1 / springConstant) + (1 / glyphs[i + 1].SpringConstant));
+        //    }
+
+        //    return 0;
+        //}
+
+        //public float TicksToSpace(int ticks)
+        //{
+        //    return Phi(ticks) * Renderer.Settings.StretchForce;
+        //}
+
+        //private float Phi(int ticks)
+        //{
+        //    float minDurationTicks = Voice.Bar.MinDuration.Value.ToTicks();
+        //    const float a = 1;
+        //    return 1 + a * Std.Log2(ticks / minDurationTicks);
+        //}
+
+        //public float TicksToSpringConstant(int ticks)
+        //{
+        //    return 1/(Phi(ticks)*Renderer.Settings.StretchForce);
+        //}
+
 
         public void FinalizeGlyph(ScoreLayout layout)
         {
@@ -131,8 +191,8 @@ namespace AlphaTab.Rendering.Glyphs
         //private static Random Random = new Random();
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            //canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 128);
-            //canvas.FillRect(cx + X, cy + Y, Width, 100);
+            canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 128);
+            canvas.FillRect(cx + X, cy + Y, Width, 100);
             for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {
                 BeatGlyphs[i].Paint(cx + X, cy + Y, canvas);

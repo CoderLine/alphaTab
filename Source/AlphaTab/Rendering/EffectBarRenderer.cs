@@ -78,7 +78,7 @@ namespace AlphaTab.Rendering
                     var beatIndex = Std.ParseInt(key);
                     var effect = _effectGlyphs[voice.Index][beatIndex];
 
-                    AlignGlyph(_info.SizingMode, beatIndex, voice.Index, prevGlyph);
+                    AlignGlyph(_info.SizingMode, beatIndex, voice, prevGlyph);
 
                     prevGlyph = effect;
                     IsEmpty = false;
@@ -86,11 +86,11 @@ namespace AlphaTab.Rendering
             }
         }
 
-        private void AlignGlyph(EffectBarGlyphSizing sizing, int beatIndex, int voiceIndex, EffectGlyph prevGlyph)
+        private void AlignGlyph(EffectBarGlyphSizing sizing, int beatIndex, Voice voice, EffectGlyph prevGlyph)
         {
-            EffectGlyph g = _effectGlyphs[voiceIndex][beatIndex];
+            EffectGlyph g = _effectGlyphs[voice.Index][beatIndex];
             Glyph pos;
-            var container = GetBeatContainer(voiceIndex, beatIndex);
+            var container = GetBeatContainer(voice, beatIndex);
             switch (sizing)
             {
                 case EffectBarGlyphSizing.SinglePreBeatOnly:
@@ -133,7 +133,7 @@ namespace AlphaTab.Rendering
                     break;
 
                 case EffectBarGlyphSizing.GroupedPreBeatOnly:
-                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SinglePreBeatOnly, beatIndex, voiceIndex, prevGlyph); }
+                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SinglePreBeatOnly, beatIndex, voice, prevGlyph); }
                     else
                     {
                         pos = container.PreNotes;
@@ -145,7 +145,7 @@ namespace AlphaTab.Rendering
                     break;
 
                 case EffectBarGlyphSizing.GroupedPreBeatToOnBeat:
-                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SinglePreBeatToOnBeat, beatIndex, voiceIndex, prevGlyph); }
+                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SinglePreBeatToOnBeat, beatIndex, voice, prevGlyph); }
                     else
                     {
                         pos = container.OnNotes;
@@ -157,7 +157,7 @@ namespace AlphaTab.Rendering
                     break;
 
                 case EffectBarGlyphSizing.GroupedPreBeatToPostBeat:
-                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SinglePreBeatToPostBeat, beatIndex, voiceIndex, prevGlyph); }
+                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SinglePreBeatToPostBeat, beatIndex, voice, prevGlyph); }
                     else
                     {
                         pos = container.PostNotes;
@@ -169,7 +169,7 @@ namespace AlphaTab.Rendering
                     break;
 
                 case EffectBarGlyphSizing.GroupedOnBeatOnly:
-                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SingleOnBeatOnly, beatIndex, voiceIndex, prevGlyph); }
+                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SingleOnBeatOnly, beatIndex, voice, prevGlyph); }
                     else
                     {
                         pos = container.OnNotes;
@@ -181,7 +181,7 @@ namespace AlphaTab.Rendering
                     break;
 
                 case EffectBarGlyphSizing.GroupedOnBeatToPostBeat:
-                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SingleOnBeatToPostBeat, beatIndex, voiceIndex, prevGlyph); }
+                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SingleOnBeatToPostBeat, beatIndex, voice, prevGlyph); }
                     else
                     {
                         pos = container.PostNotes;
@@ -193,7 +193,7 @@ namespace AlphaTab.Rendering
                     break;
 
                 case EffectBarGlyphSizing.GroupedPostBeatOnly:
-                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.GroupedPostBeatOnly, beatIndex, voiceIndex, prevGlyph); }
+                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.GroupedPostBeatOnly, beatIndex, voice, prevGlyph); }
                     else
                     {
                         pos = container.PostNotes;
@@ -228,9 +228,9 @@ namespace AlphaTab.Rendering
                 var b = v.Beats[i];
                 // we create empty glyphs as alignment references and to get the 
                 // effect bar sized
-                var container = new BeatContainerGlyph(b);
+                var container = new BeatContainerGlyph(b, GetOrCreateVoiceContainer(v));
                 container.PreNotes = new BeatGlyphBase();
-                container.OnNotes = new BeatGlyphBase();
+                container.OnNotes = new BeatOnNoteGlyphBase();
                 container.PostNotes = new BeatGlyphBase();
                 AddBeatGlyph(container);
 

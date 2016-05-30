@@ -21,7 +21,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabBeatGlyph : BeatGlyphBase, ISupportsFinalize
+    public class TabBeatGlyph : BeatOnNoteGlyphBase, ISupportsFinalize
     {
         public TabNoteChordGlyph NoteNumbers { get; set; }
         public BeamingHelper BeamingHelper { get; set; }

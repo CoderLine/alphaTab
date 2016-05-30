@@ -126,7 +126,7 @@ namespace AlphaTab.Rendering
             }
         }
 
-        public virtual void RegisterMaxSizes(BarSizeInfo sizes)
+        public virtual void RegisterLayoutingInfo(BarSizeInfo sizes)
         {
 
         }

@@ -22,7 +22,7 @@ namespace AlphaTab.Rendering
 {
     public class ScoreBeatContainerGlyph : BeatContainerGlyph
     {
-        public ScoreBeatContainerGlyph(Beat beat) : base(beat)
+        public ScoreBeatContainerGlyph(Beat beat, VoiceContainerGlyph voiceContainer) : base(beat, voiceContainer)
         {
         }
 
