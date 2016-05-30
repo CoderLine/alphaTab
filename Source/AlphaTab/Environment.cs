@@ -68,6 +68,7 @@ namespace AlphaTab
             StaveFactories["score"] = l => new ScoreBarRendererFactory();
             StaveFactories["crescendo"] = l => new EffectBarRendererFactory(new CrescendoEffectInfo());
             StaveFactories["dynamics"] = l => new EffectBarRendererFactory(new DynamicsEffectInfo());
+            StaveFactories["capo"] = l => new EffectBarRendererFactory(new CapoEffectInfo());
             StaveFactories["tap"] = l => new EffectBarRendererFactory(new TapEffectInfo());
             StaveFactories["fade-in"] = l => new EffectBarRendererFactory(new FadeInEffectInfo());
             StaveFactories["harmonics"] = l => new EffectBarRendererFactory(new HarmonicsEffectInfo());

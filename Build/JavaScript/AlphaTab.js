@@ -252,6 +252,9 @@ $StaticConstructor(function (){
     AlphaTab.Environment.StaveFactories["dynamics"] = function (l){
         return new AlphaTab.Rendering.EffectBarRendererFactory(new AlphaTab.Rendering.Effects.DynamicsEffectInfo());
     };
+    AlphaTab.Environment.StaveFactories["capo"] = function (l){
+        return new AlphaTab.Rendering.EffectBarRendererFactory(new AlphaTab.Rendering.Effects.CapoEffectInfo());
+    };
     AlphaTab.Environment.StaveFactories["tap"] = function (l){
         return new AlphaTab.Rendering.EffectBarRendererFactory(new AlphaTab.Rendering.Effects.TapEffectInfo());
     };
@@ -1456,6 +1459,7 @@ AlphaTab.Settings.get_Defaults = function (){
     settings.Staves.push(new AlphaTab.StaveSettings("score"));
     settings.Staves.push(new AlphaTab.StaveSettings("crescendo"));
     settings.Staves.push(new AlphaTab.StaveSettings("dynamics"));
+    settings.Staves.push(new AlphaTab.StaveSettings("capo"));
     settings.Staves.push(new AlphaTab.StaveSettings("trill"));
     settings.Staves.push(new AlphaTab.StaveSettings("beat-vibrato"));
     settings.Staves.push(new AlphaTab.StaveSettings("note-vibrato"));
@@ -9983,6 +9987,28 @@ AlphaTab.Rendering.Effects.NoteVibratoEffectInfo.prototype = {
     }
 };
 $Inherit(AlphaTab.Rendering.Effects.NoteVibratoEffectInfo, AlphaTab.Rendering.Effects.NoteEffectInfoBase);
+AlphaTab.Rendering.Effects.CapoEffectInfo = function (){
+};
+AlphaTab.Rendering.Effects.CapoEffectInfo.prototype = {
+    get_HideOnMultiTrack: function (){
+        return false;
+    },
+    ShouldCreateGlyph: function (renderer, beat){
+        return beat.Index == 0 && beat.Voice.Bar.Index == 0 && beat.Voice.Bar.Track.Capo != 0;
+    },
+    get_SizingMode: function (){
+        return AlphaTab.Rendering.EffectBarGlyphSizing.SinglePreBeatToPostBeat;
+    },
+    GetHeight: function (renderer){
+        return 20 * renderer.get_Scale();
+    },
+    CreateNewGlyph: function (renderer, beat){
+        return new AlphaTab.Rendering.Glyphs.TextGlyph(0, 0, "Capo. fret " + beat.Voice.Bar.Track.Capo, renderer.get_Resources().EffectFont, AlphaTab.Platform.Model.TextAlign.Left);
+    },
+    CanExpand: function (renderer, from, to){
+        return false;
+    }
+};
 AlphaTab.Rendering.Effects.PalmMuteEffectInfo = function (){
     AlphaTab.Rendering.Effects.NoteEffectInfoBase.call(this);
 };
