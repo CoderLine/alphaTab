@@ -102,6 +102,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\MarkerEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\NoteEffectInfoBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\NoteVibratoEffectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\CapoEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\PalmMuteEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\PickStrokeEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\TapEffectInfo.cs" />

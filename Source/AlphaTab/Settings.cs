@@ -95,6 +95,7 @@ namespace AlphaTab
 
                 settings.Staves.Add(new StaveSettings("crescendo"));
                 settings.Staves.Add(new StaveSettings("dynamics"));
+                settings.Staves.Add(new StaveSettings("capo"));
                 settings.Staves.Add(new StaveSettings("trill"));
                 settings.Staves.Add(new StaveSettings("beat-vibrato"));
                 settings.Staves.Add(new StaveSettings("note-vibrato"));
