@@ -56,6 +56,7 @@ namespace AlphaTab.Model
     /// </summary>
     public class Note
     {
+        public int Index { get; set; }
         public AccentuationType Accentuated { get; set; }
         public FastList<BendPoint> BendPoints { get; set; }
         public BendPoint MaxBendPoint { get; set; }
