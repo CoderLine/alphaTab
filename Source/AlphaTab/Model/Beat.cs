@@ -266,6 +266,7 @@ namespace AlphaTab.Model
         public void AddNote(Note note)
         {
             note.Beat = this;
+            note.Index = Notes.Count;
             Notes.Add(note);
         }
 

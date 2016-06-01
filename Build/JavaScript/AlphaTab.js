@@ -7741,6 +7741,7 @@ AlphaTab.Model.Beat.prototype = {
     },
     AddNote: function (note){
         note.Beat = this;
+        note.Index = this.Notes.length;
         this.Notes.push(note);
     },
     RefreshNotes: function (){
@@ -7992,6 +7993,7 @@ AlphaTab.Model.NoteAccidentalMode = {
     ForceFlat: 4
 };
 AlphaTab.Model.Note = function (){
+    this.Index = 0;
     this.Accentuated = AlphaTab.Model.AccentuationType.None;
     this.BendPoints = null;
     this.MaxBendPoint = null;
@@ -15145,7 +15147,7 @@ AlphaTab.Rendering.Utils.AccidentalHelper = function (){
 };
 AlphaTab.Rendering.Utils.AccidentalHelper.prototype = {
     GetNoteId: function (n){
-        return n.Beat.Index + "-" + n.String;
+        return n.Beat.Index + "-" + n.Index;
     },
     ApplyAccidental: function (note){
         var noteValue = note.get_RealValue();
