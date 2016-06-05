@@ -26,7 +26,6 @@ namespace AlphaTab.Rendering.Glyphs
     {
         public ScoreNoteChordGlyph NoteHeads { get; set; }
         public ScoreRestGlyph RestGlyph { get; set; }
-        public BeamingHelper BeamingHelper { get; set; }
 
         public override void FinalizeGlyph(ScoreLayout layout)
         {

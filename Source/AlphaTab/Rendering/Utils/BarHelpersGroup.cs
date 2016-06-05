@@ -51,7 +51,7 @@ namespace AlphaTab.Rendering.Utils
                         var newBeamingHelper = false;
 
                         // if a new beaming helper was started, we close our tuplet grouping as well
-                        if (newBeamingHelper && b.Duration > Duration.Quarter && currentTupletHelper != null)
+                        if (!b.IsRest)
                         {
                             // try to fit beam to current beamhelper
                             if (currentBeamHelper == null || !currentBeamHelper.CheckBeat(b))

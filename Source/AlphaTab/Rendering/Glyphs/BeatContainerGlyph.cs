@@ -46,6 +46,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             Beat = beat;
             Ties = new FastList<Glyph>();
+            VoiceContainer = voiceContainer;
         }
 
         public void FinalizeGlyph(ScoreLayout layout)
@@ -102,11 +103,6 @@ namespace AlphaTab.Rendering.Glyphs
 
             MinWidth = PreNotes.Width + OnNotes.Width + PostNotes.Width;
             Width = MinWidth;
-        }
-
-        public void ScaleToForce(float force)
-        {
-            
         }
 
         protected virtual void CreateTies(Note n)

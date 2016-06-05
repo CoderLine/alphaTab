@@ -16,8 +16,6 @@
  * License along with this library.
  */
 
-using System;
-using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -72,7 +70,6 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 var b = BeatGlyphs[i];
                 b.X = x;
-                b.ScaleToForce(force);
                 x += b.Width;
             }
         }
@@ -123,62 +120,6 @@ namespace AlphaTab.Rendering.Glyphs
             CurrentForce = Renderer.Settings.StretchForce;
             MinWidth = Width;
         }
-
-        //public float SpaceToForce(int width)
-        //{
-        //    if (width < MinWidth || BeatGlyphs.Count == 0)
-        //    {
-        //        return 0;
-        //    }
-
-        //    // sort glyphs by size
-        //    var glyphs = BeatGlyphs.Clone();
-        //    glyphs.Sort((a, b) =>
-        //    {
-        //        if (a.MinWidth < b.MinWidth)
-        //        {
-        //            return -1;
-        //        }
-        //        if (a.MinWidth > b.MinWidth)
-        //        {
-        //            return 1;
-        //        }
-        //        return 0;
-        //    });
-
-        //    var xMin = MinWidth;
-        //    float springConstant = glyphs[0].SpringConstant;
-        //    for (int i = 0; i < glyphs.Count; i++)
-        //    {
-        //        xMin -= glyphs[i].MinWidth;
-        //        var force = (width - xMin) / springConstant;
-        //        if (i == glyphs.Count - 1 || force < glyphs[i + 1].MinStretchForce)
-        //        {
-        //            return force;
-        //        }
-        //        springConstant = 1 / ((1 / springConstant) + (1 / glyphs[i + 1].SpringConstant));
-        //    }
-
-        //    return 0;
-        //}
-
-        //public float TicksToSpace(int ticks)
-        //{
-        //    return Phi(ticks) * Renderer.Settings.StretchForce;
-        //}
-
-        //private float Phi(int ticks)
-        //{
-        //    float minDurationTicks = Voice.Bar.MinDuration.Value.ToTicks();
-        //    const float a = 1;
-        //    return 1 + a * Std.Log2(ticks / minDurationTicks);
-        //}
-
-        //public float TicksToSpringConstant(int ticks)
-        //{
-        //    return 1/(Phi(ticks)*Renderer.Settings.StretchForce);
-        //}
-
 
         public void FinalizeGlyph(ScoreLayout layout)
         {
