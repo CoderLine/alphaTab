@@ -147,11 +147,6 @@ namespace AlphaTab.Rendering
             {
                 info.SetSize(KeySizePost, postSize);
             }
-
-            if (info.FullWidth < Width)
-            {
-                info.FullWidth = Width;
-            }
         }
 
         public override void ApplyLayoutingInfo(BarLayoutingInfo info)
@@ -177,7 +172,7 @@ namespace AlphaTab.Rendering
             _postBeatGlyphs.X = voiceEnd;
             _postBeatGlyphs.Width = info.GetSize(KeySizePost);
 
-            Width = info.FullWidth;
+            Width = _postBeatGlyphs.X + _postBeatGlyphs.Width;
         }
 
         protected void AddPreBeatGlyph(Glyph g)

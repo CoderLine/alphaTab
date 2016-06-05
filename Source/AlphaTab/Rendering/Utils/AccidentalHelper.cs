@@ -92,7 +92,7 @@ namespace AlphaTab.Rendering.Utils
 
         private string GetNoteId(Note n)
         {
-            return n.Beat.Index + "-" + n.Index;
+            return n.Beat.Index + "-" + n.Beat.Voice.Index + "-" + n.Index;
         }
 
         /// <summary>

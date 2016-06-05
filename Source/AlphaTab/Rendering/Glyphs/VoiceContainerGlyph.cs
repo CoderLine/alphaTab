@@ -33,9 +33,10 @@ namespace AlphaTab.Rendering.Glyphs
     {
         public const string KeySizeBeat = "Beat";
 
+        private BarLayoutingInfo _layoutingInfo;
+
         public FastList<BeatContainerGlyph> BeatGlyphs { get; set; }
 
-        public float CurrentForce { get; private set; }
         public Voice Voice { get; set; }
         public float MinWidth { get; set; }
 
@@ -48,60 +49,35 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void ScaleToWidth(float width)
         {
-            var previousWidth = Width;
-            var previousForce = CurrentForce;
+            var force = _layoutingInfo.SpaceToForce(width);
+            ScaleToForce(force);
+        }
 
-            Width = width;
-            CurrentForce = previousForce * Width / previousWidth;
-
-            if (BeatGlyphs.Count > 0)
+        private void ScaleToForce(float force)
+        {
+            Width = _layoutingInfo.CalculateVoiceWidth(force);
+            var positions = _layoutingInfo.BuildOnTimePositions(force);
+            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {
-                ScaleToForce(CurrentForce);
+                var time = BeatGlyphs[i].Beat.AbsoluteStart;
+                BeatGlyphs[i].X = positions[time] - BeatGlyphs[i].OnTimeX;
             }
         }
 
-        public void ScaleToForce(float force)
+        public void RegisterLayoutingInfo(BarLayoutingInfo info)
         {
-            Width = Width * force / CurrentForce;
-
-            // calculate the force we need according to the resizing
-            var x = 0f;
+            info.UpdateVoiceSize(Width);
             for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {
                 var b = BeatGlyphs[i];
-                b.X = x;
-                x += b.Width;
+                b.RegisterLayoutingInfo(info);
             }
         }
 
-        public void RegisterLayoutingInfo(BarLayoutingInfo layoutings)
+        public void ApplyLayoutingInfo(BarLayoutingInfo info)
         {
-            layoutings.UpdateVoiceSize(Width);
-            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
-            {
-                var b = BeatGlyphs[i];
-                b.RegisterLayoutingInfo(layoutings);
-            }
-        }
-
-        public void ApplyLayoutingInfo(BarLayoutingInfo layoutings)
-        {
-            Width = 0;
-            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
-            {
-                BeatGlyphs[i].X = (i == 0) ? 0 : BeatGlyphs[i - 1].X + BeatGlyphs[i - 1].Width;
-                BeatGlyphs[i].ApplyLayoutingInfo(layoutings);
-            }
-
-            if (layoutings.MinStretchForce > CurrentForce)
-            {
-                ScaleToForce(layoutings.MinStretchForce);
-            }
-
-            if (BeatGlyphs.Count > 0)
-            {
-                Width = BeatGlyphs[BeatGlyphs.Count - 1].X + BeatGlyphs[BeatGlyphs.Count - 1].Width;
-            }
+            _layoutingInfo = info;
+            ScaleToForce(Renderer.Settings.StretchForce);
         }
 
         public override void AddGlyph(Glyph g)
@@ -117,7 +93,6 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            CurrentForce = Renderer.Settings.StretchForce;
             MinWidth = Width;
         }
 
@@ -132,12 +107,69 @@ namespace AlphaTab.Rendering.Glyphs
         //private static Random Random = new Random();
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 128);
-            canvas.FillRect(cx + X, cy + Y, Width, 100);
+            //canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 80);
+            //canvas.FillRect(cx + X, cy + Y, Width, 100);
+
+            //if (Voice.Index == 0)
+            //{
+            //    PaintSprings(cx + X, cy + Y, canvas);
+            //}
+
             for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {
                 BeatGlyphs[i].Paint(cx + X, cy + Y, canvas);
             }
         }
+
+        //private void PaintSprings(float x, float y, ICanvas canvas)
+        //{
+        //    var sortedSprings = new FastList<Spring>();
+        //    var xMin = 0f;
+        //    Std.Foreach(_layoutings.Springs.Values, spring =>
+        //    {
+        //        sortedSprings.Add(spring);
+        //        if (spring.PreStretchWidth < xMin)
+        //        {
+        //            xMin = spring.PreStretchWidth;
+        //        }
+        //    });
+
+        //    sortedSprings.Sort((a, b) =>
+        //    {
+        //        if (a.TimePosition < b.TimePosition)
+        //        {
+        //            return -1;
+        //        }
+        //        if (a.TimePosition > b.TimePosition)
+        //        {
+        //            return 1;
+        //        }
+        //        return 0;
+        //    });
+
+        //    y += 40;
+
+
+        //    var positions = _layoutings.BuildOnTimePositions();
+        //    var keys = positions.Keys;
+        //    canvas.Color = new Color(255, 0, 0);
+        //    for (int i = 0; i < keys.Length; i++)
+        //    {
+        //        var time = Std.ParseInt(keys[i]);
+        //        var springX = positions[time];
+        //        var spring = _layoutings.Springs[time];
+
+        //        canvas.BeginPath();
+        //        canvas.MoveTo(x + springX, y);
+        //        canvas.LineTo(x + springX, y + 10);
+        //        canvas.Stroke();
+
+        //        canvas.BeginPath();
+        //        canvas.MoveTo(x + springX, y + 5);
+        //        canvas.LineTo(x + springX + _layoutings.CalculateWidth(spring.SpringConstant), y + 5);
+        //        canvas.Stroke();
+        //    }
+        //}
     }
+
 }

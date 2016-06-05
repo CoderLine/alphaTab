@@ -148,6 +148,8 @@ namespace AlphaTab.Rendering.Staves
                 }
             }
 
+            maxSizes.CalculateSpringConstants();
+
             // ensure same widths of new renderer
             var realWidth = 0f;
             for (int i = 0, j = _allStaves.Count; i < j; i++)

@@ -133,7 +133,6 @@ namespace AlphaTab.Rendering
 
         public virtual void ApplyLayoutingInfo(BarLayoutingInfo info)
         {
-            Width = info.FullWidth;
         }
 
         public virtual void FinalizeRenderer(ScoreLayout layout)

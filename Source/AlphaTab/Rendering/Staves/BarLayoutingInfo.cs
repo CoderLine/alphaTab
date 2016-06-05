@@ -16,10 +16,13 @@
  * License along with this library.
  */
 
+using System;
 using System.Collections.Generic;
+using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Rendering.Layout;
 
 namespace AlphaTab.Rendering.Staves
 {
@@ -30,16 +33,17 @@ namespace AlphaTab.Rendering.Staves
     /// </summary>
     public class BarLayoutingInfo
     {
-        public float FullWidth { get; set; }
+        private const int MinDuration = 30;
+        private const int MinDurationWidth = 10;
         public FastDictionary<string, float> Sizes { get; set; }
 
         public float VoiceSize { get; set; }
         public float MinStretchForce { get; set; }
+        public float TotalSpringConstant { get; set; }
 
         public BarLayoutingInfo()
         {
             Sizes = new FastDictionary<string, float>();
-            FullWidth = 0;
             VoiceSize = 0;
             Springs = new FastDictionary<int, Spring>();
         }
@@ -77,15 +81,15 @@ namespace AlphaTab.Rendering.Staves
         public FastDictionary<int, Spring> Springs { get; set; }
         public int SmallestDuration { get; set; }
 
-        public void AddSpring(Beat beat, float preStretchWidth)
+        public void AddSpring(int start, int duration, float preStretchWidth)
         {
-            var start = beat.AbsoluteStart;
             if (!Springs.ContainsKey(start))
             {
                 var spring = new Spring();
                 spring.TimePosition = start;
+                spring.SmallestDuration = duration;
+                spring.LongestDuration = duration;
                 spring.PreStretchWidth = preStretchWidth;
-                spring.Beats.Add(beat);
                 Springs[start] = spring;
             }
             else
@@ -95,31 +99,30 @@ namespace AlphaTab.Rendering.Staves
                 {
                     spring.PreStretchWidth = preStretchWidth;
                 }
-                spring.Beats.Add(beat);
+                if (duration < spring.SmallestDuration)
+                {
+                    spring.SmallestDuration = duration;
+                }
+                if (duration > spring.LongestDuration)
+                {
+                    spring.LongestDuration = duration;
+                }
             }
 
-            var duration = beat.CalculateDuration();
             if (duration < SmallestDuration)
             {
                 SmallestDuration = duration;
             }
         }
 
+        public void AddBeatSpring(Beat beat, float preStretchWidth)
+        {
+            AddSpring(beat.AbsoluteStart, beat.CalculateDuration(), preStretchWidth);
+        }
+
         public void CalculateSpringConstants()
         {
-            Std.Foreach(Springs.Values, spring =>
-            {
-                CalculateSpringConstant(spring);
-            });
-        }
-
-        private void CalculateSpringConstant(Spring spring)
-        {
-        }
-
-        public float SpaceToForce(float space)
-        {
-            var sortedSprings = new List<Spring>();
+            var sortedSprings = new FastList<Spring>();
             var xMin = 0f;
             Std.Foreach(Springs.Values, spring =>
             {
@@ -132,37 +135,98 @@ namespace AlphaTab.Rendering.Staves
 
             sortedSprings.Sort((a, b) =>
             {
-                if (a.PreStretchWidth < b.PreStretchWidth)
+                if (a.TimePosition < b.TimePosition)
                 {
                     return -1;
                 }
-                if (a.PreStretchWidth > b.PreStretchWidth)
+                if (a.TimePosition > b.TimePosition)
                 {
                     return 1;
                 }
                 return 0;
             });
 
-            if (space < xMin || sortedSprings.Count == 0)
-            {
-                return 0;
-            }
-
-            var c = Springs[0].SpringConstant;
+            var totalSpringConstant = 0f;
             for (int i = 0; i < sortedSprings.Count; i++)
             {
-                xMin -= Springs[i].PreStretchWidth;
-
-                var f = (space - xMin) / c;
-                if (i == sortedSprings.Count - 1 || f < Springs[i].PreStretchForce)
+                var currentSpring = sortedSprings[i];
+                int duration;
+                if (i == sortedSprings.Count - 1)
                 {
-                    return f;
+                    duration = currentSpring.LongestDuration;
+                }
+                else
+                {
+                    var nextSpring = sortedSprings[i + 1];
+                    duration = nextSpring.TimePosition - currentSpring.TimePosition;
                 }
 
-                c = 1 / ((1 / c) + (1 / Springs[i].SpringConstant));
+                currentSpring.SpringConstant = CalculateSpringConstant(currentSpring, duration);
+
+                totalSpringConstant += 1 / currentSpring.SpringConstant;
             }
 
-            return 0;
+            TotalSpringConstant = 1 / totalSpringConstant;
+        }
+
+        private float CalculateSpringConstant(Spring spring, float duration)
+        {
+            float minDuration = spring.SmallestDuration;
+            if (spring.SmallestDuration == 0)
+            {
+                minDuration = duration;
+            }
+            var phi = 1 + 1f * Std.Log2(duration / (float)MinDuration);
+            return (minDuration / duration) * 1 / (phi * MinDurationWidth);
+        }
+
+
+        public float SpaceToForce(float space)
+        {
+            return space * TotalSpringConstant;
+        }
+
+        public float CalculateVoiceWidth(float force)
+        {
+            return CalculateWidth(force, TotalSpringConstant);
+        }
+
+        public float CalculateWidth(float force, float springConstant)
+        {
+            return force / springConstant;
+        }
+
+        public FastDictionary<int, float> BuildOnTimePositions(float force)
+        {
+            var positions = new FastDictionary<int, float>();
+
+            var sortedSprings = new FastList<Spring>();
+            Std.Foreach(Springs.Values, spring =>
+            {
+                sortedSprings.Add(spring);
+            });
+
+            sortedSprings.Sort((a, b) =>
+            {
+                if (a.TimePosition < b.TimePosition)
+                {
+                    return -1;
+                }
+                if (a.TimePosition > b.TimePosition)
+                {
+                    return 1;
+                }
+                return 0;
+            });
+
+            var springX = 0f;
+            for (int i = 0; i < sortedSprings.Count; i++)
+            {
+                positions[sortedSprings[i].TimePosition] = springX;
+                springX += CalculateWidth(force, sortedSprings[i].SpringConstant);
+            }
+
+            return positions;
         }
     }
 
@@ -170,18 +234,14 @@ namespace AlphaTab.Rendering.Staves
     {
         public int TimePosition { get; set; }
 
+        public int LongestDuration { get; set; }
+        public int SmallestDuration { get; set; }
+
         public float Force { get; set; }
         public float Width { get; set; }
         public float SpringConstant { get; set; }
 
-        public FastList<Beat> Beats { get; set; }
-
         public float PreStretchWidth { get; set; }
         public float PreStretchForce { get; set; }
-
-        public Spring()
-        {
-            Beats = new FastList<Beat>();
-        }
     }
 }
