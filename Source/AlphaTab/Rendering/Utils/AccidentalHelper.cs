@@ -120,7 +120,7 @@ namespace AlphaTab.Rendering.Utils
             // if there is already an accidental registered, we check if we 
             // have a new accidental
             var updateAccidental = true;
-            if (note.Beat.Voice.Bar.Track.IsPercussion)
+            if (note.Beat.Voice.Bar.Staff.Track.IsPercussion)
             {
                 accidentalToSet = AccidentalType.None;
             }
@@ -159,7 +159,7 @@ namespace AlphaTab.Rendering.Utils
 
         private int GetNoteLineWithAccidental(Note n, AccidentalType accidentalToSet)
         {
-            var value = n.Beat.Voice.Bar.Track.IsPercussion ? PercussionMapper.MapNoteForDisplay(n) : n.RealValue;
+            var value = n.Beat.Voice.Bar.Staff.Track.IsPercussion ? PercussionMapper.MapNoteForDisplay(n) : n.RealValue;
             var ks = n.Beat.Voice.Bar.MasterBar.KeySignature;
             var clef = n.Beat.Voice.Bar.Clef;
 

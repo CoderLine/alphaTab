@@ -326,6 +326,12 @@
             This public enum lists all different types of finger slides on a string.
             </summary>
         </member>
+        <member name="T:AlphaTab.Model.Staff">
+            <summary>
+            This class describes a single staff within a track. There are instruments like pianos
+            where a single track can contain multiple staffs. 
+            </summary>
+        </member>
         <member name="T:AlphaTab.Model.Track">
             <summary>
             This public class describes a single track or instrument of score
@@ -805,6 +811,11 @@
             like the vibrato. 
             </summary>
         </member>
+        <member name="P:AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase.SpringStartX">
+            <summary>
+            Gets or sets the x position where the spring of this beat starts. 
+            </summary>
+        </member>
         <member name="T:AlphaTab.Rendering.Glyphs.EffectGlyph">
             <summary>
             Effect-Glyphs implementing this public interface get notified
@@ -1044,36 +1055,36 @@
             can render a single track of a score object into a notation sheet.
             </summary>
         </member>
-        <member name="T:AlphaTab.Rendering.Staves.BarSizeInfo">
+        <member name="T:AlphaTab.Rendering.Staves.BarLayoutingInfo">
             <summary>
             This public class stores size information about a stave. 
             It is used by the layout engine to collect the sizes of score parts
             to align the parts across multiple staves.
             </summary>
         </member>
-        <member name="T:AlphaTab.Rendering.Staves.Stave">
+        <member name="T:AlphaTab.Rendering.Staves.Staff">
             <summary>
-            A stave represents a single line within a StaveGroup. 
+            A Staff represents a single line within a StaveGroup. 
             It stores BarRenderer instances created from a given factory. 
             </summary>
         </member>
-        <member name="P:AlphaTab.Rendering.Staves.Stave.StaveTop">
+        <member name="P:AlphaTab.Rendering.Staves.Staff.StaveTop">
             <summary>
             This is the visual offset from top where the
-            stave contents actually start. Used for grouping 
+            Staff contents actually start. Used for grouping 
             using a accolade
             </summary>
         </member>
-        <member name="P:AlphaTab.Rendering.Staves.Stave.StaveBottom">
+        <member name="P:AlphaTab.Rendering.Staves.Staff.StaveBottom">
             <summary>
             This is the visual offset from top where the
-            stave contents actually ends. Used for grouping 
+            Staff contents actually ends. Used for grouping 
             using a accolade
             </summary>
         </member>
         <member name="T:AlphaTab.Rendering.Staves.StaveGroup">
             <summary>
-            A stave consists of a list of different staves and groups
+            A Staff consists of a list of different staves and groups
             them using an accolade. 
             </summary>
         </member>
@@ -1279,6 +1290,12 @@
         <member name="P:AlphaTab.Settings.Layout">
             <summary>
             The layout specific settings
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Settings.StretchForce">
+            <summary>
+            The force factor to use by default for layouting the score. 
+            Adjust this value to adjust the stretching of the notation. 
             </summary>
         </member>
         <member name="P:AlphaTab.Settings.ForcePianoFingering">

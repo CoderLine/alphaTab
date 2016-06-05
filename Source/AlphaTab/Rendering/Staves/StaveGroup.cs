@@ -132,7 +132,7 @@ namespace AlphaTab.Rendering.Staves
             }
 
             // add renderers
-            var maxSizes = new BarSizeInfo();
+            var maxSizes = new BarLayoutingInfo();
             for (int i = 0, j = Staves.Count; i < j; i++)
             {
                 var g = Staves[i];
@@ -153,7 +153,7 @@ namespace AlphaTab.Rendering.Staves
             for (int i = 0, j = _allStaves.Count; i < j; i++)
             {
                 var s = _allStaves[i];
-                s.BarRenderers[s.BarRenderers.Count - 1].ApplySizes(maxSizes);
+                s.BarRenderers[s.BarRenderers.Count - 1].ApplyLayoutingInfo(maxSizes);
                 if (s.BarRenderers[s.BarRenderers.Count - 1].Width > realWidth)
                 {
                     realWidth = s.BarRenderers[s.BarRenderers.Count - 1].Width;
@@ -308,7 +308,7 @@ namespace AlphaTab.Rendering.Staves
                 for (int i = 0, j = Staves.Count; i < j; i++)
                 {
                     var g = Staves[i];
-                    if(g.FirstStaffInAccolade != null && g.LastStaffInAccolade != null)
+                    if (g.FirstStaffInAccolade != null && g.LastStaffInAccolade != null)
                     {
                         var firstStart = cy + g.FirstStaffInAccolade.Y + g.FirstStaffInAccolade.StaveTop + g.FirstStaffInAccolade.TopSpacing + g.FirstStaffInAccolade.TopOverflow;
                         var lastEnd = cy + g.LastStaffInAccolade.Y + g.LastStaffInAccolade.TopSpacing + g.LastStaffInAccolade.TopOverflow

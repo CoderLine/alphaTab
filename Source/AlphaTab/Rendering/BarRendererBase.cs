@@ -126,14 +126,14 @@ namespace AlphaTab.Rendering
             }
         }
 
-        public virtual void RegisterLayoutingInfo(BarSizeInfo sizes)
+        public virtual void RegisterLayoutingInfo(BarLayoutingInfo info)
         {
 
         }
 
-        public virtual void ApplySizes(BarSizeInfo sizes)
+        public virtual void ApplyLayoutingInfo(BarLayoutingInfo info)
         {
-            Width = sizes.FullWidth;
+            Width = info.FullWidth;
         }
 
         public virtual void FinalizeRenderer(ScoreLayout layout)

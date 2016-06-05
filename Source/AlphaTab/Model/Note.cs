@@ -162,7 +162,7 @@ namespace AlphaTab.Model
         {
             get
             {
-                return Beat.Voice.Bar.Track.Capo + GetStringTuning(Beat.Voice.Bar.Track, String);
+                return Beat.Voice.Bar.Staff.Track.Capo + GetStringTuning(Beat.Voice.Bar.Staff.Track, String);
             }
         }
 

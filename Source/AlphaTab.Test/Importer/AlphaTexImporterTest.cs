@@ -296,12 +296,12 @@ namespace AlphaTab.Test.Importer
 
             Assert.AreEqual(1, score.Tracks.Count);
             Assert.AreEqual(1, score.MasterBars.Count);
-            Assert.AreEqual(5, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
-            Assert.AreEqual(Fingers.Thumb, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].LeftHandFinger);
-            Assert.AreEqual(Fingers.IndexFinger, score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes[0].LeftHandFinger);
-            Assert.AreEqual(Fingers.MiddleFinger, score.Tracks[0].Bars[0].Voices[0].Beats[2].Notes[0].LeftHandFinger);
-            Assert.AreEqual(Fingers.AnnularFinger, score.Tracks[0].Bars[0].Voices[0].Beats[3].Notes[0].LeftHandFinger);
-            Assert.AreEqual(Fingers.LittleFinger, score.Tracks[0].Bars[0].Voices[0].Beats[4].Notes[0].LeftHandFinger);
+            Assert.AreEqual(5, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(Fingers.Thumb, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].LeftHandFinger);
+            Assert.AreEqual(Fingers.IndexFinger, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].LeftHandFinger);
+            Assert.AreEqual(Fingers.MiddleFinger, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Notes[0].LeftHandFinger);
+            Assert.AreEqual(Fingers.AnnularFinger, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Notes[0].LeftHandFinger);
+            Assert.AreEqual(Fingers.LittleFinger, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[4].Notes[0].LeftHandFinger);
         }
 
         [TestMethod]
@@ -312,12 +312,12 @@ namespace AlphaTab.Test.Importer
 
             Assert.AreEqual(1, score.Tracks.Count);
             Assert.AreEqual(1, score.MasterBars.Count);
-            Assert.AreEqual(5, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
-            Assert.AreEqual(Fingers.Thumb, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].RightHandFinger);
-            Assert.AreEqual(Fingers.IndexFinger, score.Tracks[0].Bars[0].Voices[0].Beats[1].Notes[0].RightHandFinger);
-            Assert.AreEqual(Fingers.MiddleFinger, score.Tracks[0].Bars[0].Voices[0].Beats[2].Notes[0].RightHandFinger);
-            Assert.AreEqual(Fingers.AnnularFinger, score.Tracks[0].Bars[0].Voices[0].Beats[3].Notes[0].RightHandFinger);
-            Assert.AreEqual(Fingers.LittleFinger, score.Tracks[0].Bars[0].Voices[0].Beats[4].Notes[0].RightHandFinger);
+            Assert.AreEqual(5, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(Fingers.Thumb, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].RightHandFinger);
+            Assert.AreEqual(Fingers.IndexFinger, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].RightHandFinger);
+            Assert.AreEqual(Fingers.MiddleFinger, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Notes[0].RightHandFinger);
+            Assert.AreEqual(Fingers.AnnularFinger, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Notes[0].RightHandFinger);
+            Assert.AreEqual(Fingers.LittleFinger, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[4].Notes[0].RightHandFinger);
         }
 
         [TestMethod]
@@ -328,13 +328,13 @@ namespace AlphaTab.Test.Importer
 
             Assert.AreEqual(1, score.Tracks.Count);
             Assert.AreEqual(1, score.MasterBars.Count);
-            Assert.AreEqual(1, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
-            Assert.AreEqual(5, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes.Count);
-            Assert.AreEqual(Fingers.Thumb, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].LeftHandFinger);
-            Assert.AreEqual(Fingers.IndexFinger, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[1].LeftHandFinger);
-            Assert.AreEqual(Fingers.MiddleFinger, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[2].LeftHandFinger);
-            Assert.AreEqual(Fingers.AnnularFinger, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[3].LeftHandFinger);
-            Assert.AreEqual(Fingers.LittleFinger, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[4].LeftHandFinger);
+            Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(5, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes.Count);
+            Assert.AreEqual(Fingers.Thumb, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].LeftHandFinger);
+            Assert.AreEqual(Fingers.IndexFinger, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[1].LeftHandFinger);
+            Assert.AreEqual(Fingers.MiddleFinger, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[2].LeftHandFinger);
+            Assert.AreEqual(Fingers.AnnularFinger, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[3].LeftHandFinger);
+            Assert.AreEqual(Fingers.LittleFinger, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[4].LeftHandFinger);
         }
 
         [TestMethod]
@@ -345,13 +345,13 @@ namespace AlphaTab.Test.Importer
 
             Assert.AreEqual(1, score.Tracks.Count);
             Assert.AreEqual(1, score.MasterBars.Count);
-            Assert.AreEqual(1, score.Tracks[0].Bars[0].Voices[0].Beats.Count);
-            Assert.AreEqual(5, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes.Count);
-            Assert.AreEqual(Fingers.Thumb, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[0].RightHandFinger);
-            Assert.AreEqual(Fingers.IndexFinger, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[1].RightHandFinger);
-            Assert.AreEqual(Fingers.MiddleFinger, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[2].RightHandFinger);
-            Assert.AreEqual(Fingers.AnnularFinger, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[3].RightHandFinger);
-            Assert.AreEqual(Fingers.LittleFinger, score.Tracks[0].Bars[0].Voices[0].Beats[0].Notes[4].RightHandFinger);
+            Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(5, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes.Count);
+            Assert.AreEqual(Fingers.Thumb, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].RightHandFinger);
+            Assert.AreEqual(Fingers.IndexFinger, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[1].RightHandFinger);
+            Assert.AreEqual(Fingers.MiddleFinger, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[2].RightHandFinger);
+            Assert.AreEqual(Fingers.AnnularFinger, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[3].RightHandFinger);
+            Assert.AreEqual(Fingers.LittleFinger, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[4].RightHandFinger);
         }
 
 

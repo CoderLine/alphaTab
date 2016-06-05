@@ -72,7 +72,7 @@ namespace AlphaTab.Rendering.Glyphs
                     startX = cx + startNoteRenderer.GetNoteX(StartNote);
 
                     // line break: to bar end
-                    if (endNoteRenderer == null || startNoteRenderer.Stave != endNoteRenderer.Stave)
+                    if (endNoteRenderer == null || startNoteRenderer.Staff != endNoteRenderer.Staff)
                     {
                         endX = cx + parent.X + parent.PostNotes.X + parent.PostNotes.Width;
                     }

@@ -577,7 +577,7 @@ namespace AlphaTab.Rendering
 
         private string FingerToString(Beat beat, Fingers finger, bool leftHand)
         {
-            if (Settings.ForcePianoFingering || GeneralMidi.IsPiano(beat.Voice.Bar.Track.PlaybackInfo.Program))
+            if (Settings.ForcePianoFingering || GeneralMidi.IsPiano(beat.Voice.Bar.Staff.Track.PlaybackInfo.Program))
             {
                 switch (finger)
                 {

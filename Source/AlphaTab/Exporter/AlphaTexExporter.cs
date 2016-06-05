@@ -81,15 +81,19 @@ namespace AlphaTab.Exporter
 
         private void Bars(Track track)
         {
-            for (int i = 0; i < track.Bars.Count; i++)
+            // alphatab only supports single staves, 
+            for (int i = 0; i < 1; i++)
             {
-                if (i > 0)
+                for (int j = 0; j < track.Staves[i].Bars.Count; j++)
                 {
-                    _builder.Append(" |");
-                    _builder.AppendLine();
-                }
+                    if (i > 0)
+                    {
+                        _builder.Append(" |");
+                        _builder.AppendLine();
+                    }
 
-                Bar(track.Bars[i]);
+                    Bar(track.Staves[i].Bars[j]);
+                }
             }
         }
 
@@ -154,7 +158,7 @@ namespace AlphaTab.Exporter
             }
 
             _builder.Append(".");
-            _builder.Append(note.Beat.Voice.Bar.Track.Tuning.Length - note.String + 1);
+            _builder.Append(note.Beat.Voice.Bar.Staff.Track.Tuning.Length - note.String + 1);
             _builder.Append(" ");
 
             NoteEffects(note);

@@ -57,7 +57,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void RegisterLayoutingInfo(BarLayoutingInfo layoutings)
         {
-            layoutings.AddSpring(Beat);
+            //layoutings.AddSpring(Beat);
         }
 
         public void ApplyLayoutingInfo(BarLayoutingInfo layoutings)

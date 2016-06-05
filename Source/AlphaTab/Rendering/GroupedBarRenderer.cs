@@ -132,40 +132,40 @@ namespace AlphaTab.Rendering
         }
 
 
-        public override void RegisterLayoutingInfo(BarLayoutingInfo layoutings)
+        public override void RegisterLayoutingInfo(BarLayoutingInfo info)
         {
             var preSize = _preBeatGlyphs.Width;
-            if (layoutings.GetSize(KeySizePre) < preSize)
+            if (info.GetSize(KeySizePre) < preSize)
             {
-                layoutings.SetSize(KeySizePre, preSize);
+                info.SetSize(KeySizePre, preSize);
             }
 
-            Std.Foreach(_voiceContainers.Values, c => c.RegisterLayoutingInfo(layoutings));
+            Std.Foreach(_voiceContainers.Values, c => c.RegisterLayoutingInfo(info));
 
             var postSize = _postBeatGlyphs.Width;
-            if (layoutings.GetSize(KeySizePost) < postSize)
+            if (info.GetSize(KeySizePost) < postSize)
             {
-                layoutings.SetSize(KeySizePost, postSize);
+                info.SetSize(KeySizePost, postSize);
             }
 
-            if (layoutings.FullWidth < Width)
+            if (info.FullWidth < Width)
             {
-                layoutings.FullWidth = Width;
+                info.FullWidth = Width;
             }
         }
 
-        public override void ApplyLayoutingInfo(BarLayoutingInfo layoutings)
+        public override void ApplyLayoutingInfo(BarLayoutingInfo info)
         {
             // if we need additional space in the preBeat group we simply
             // add a new spacer
-            _preBeatGlyphs.Width = layoutings.GetSize(KeySizePre);
+            _preBeatGlyphs.Width = info.GetSize(KeySizePre);
 
             // on beat glyphs we apply the glyph spacing
             var voiceEnd = 0f;
             Std.Foreach(_voiceContainers.Values, c =>
             {
                 c.X = _preBeatGlyphs.X + _preBeatGlyphs.Width;
-                c.ApplySizes(layoutings);
+                c.ApplyLayoutingInfo(info);
                 var newEnd = c.X + c.Width;
                 if (voiceEnd < newEnd)
                 {
@@ -175,9 +175,9 @@ namespace AlphaTab.Rendering
 
             // on the post glyphs we add the spacing before all other glyphs
             _postBeatGlyphs.X = voiceEnd;
-            _postBeatGlyphs.Width = layoutings.GetSize(KeySizePost);
+            _postBeatGlyphs.Width = info.GetSize(KeySizePost);
 
-            Width = layoutings.FullWidth;
+            Width = info.FullWidth;
         }
 
         protected void AddPreBeatGlyph(Glyph g)

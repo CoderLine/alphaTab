@@ -115,7 +115,6 @@ namespace AlphaTab.Rendering.Staves
 
         private void CalculateSpringConstant(Spring spring)
         {
-            var di = spring.d
         }
 
         public float SpaceToForce(float space)

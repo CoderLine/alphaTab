@@ -223,13 +223,13 @@ namespace AlphaTab.Audio.Generator
                 const int phaseLength = 240; // ticks
                 const int bendAmplitude = 3;
 
-                GenerateVibratorWithParams(beat.Voice.Bar.Track, barStartTick + beatStart, beat.CalculateDuration(), phaseLength, bendAmplitude);
+                GenerateVibratorWithParams(beat.Voice.Bar.Staff.Track, barStartTick + beatStart, beat.CalculateDuration(), phaseLength, bendAmplitude);
             }
         }
 
         private void GenerateNote(Note note, int beatStart, int beatDuration, int[] brushInfo)
         {
-            var track = note.Beat.Voice.Bar.Track;
+            var track = note.Beat.Voice.Bar.Staff.Track;
             var noteKey = note.RealValue;
             var brushOffset = note.IsStringed && note.String <= brushInfo.Length ? brushInfo[note.String - 1] : 0;
             var noteStart = beatStart + brushOffset;
@@ -442,7 +442,7 @@ namespace AlphaTab.Audio.Generator
 
         private void GenerateFadeIn(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
         {
-            var track = note.Beat.Voice.Bar.Track;
+            var track = note.Beat.Voice.Bar.Staff.Track;
             var endVolume = ToChannelShort(track.PlaybackInfo.Volume);
             var volumeFactor = (float)endVolume / noteDuration;
 
@@ -473,7 +473,7 @@ namespace AlphaTab.Audio.Generator
         {
             const int phaseLength = 480; // ticks
             const int bendAmplitude = 2;
-            var track = note.Beat.Voice.Bar.Track;
+            var track = note.Beat.Voice.Bar.Staff.Track;
 
             GenerateVibratorWithParams(track, noteStart, noteDuration, phaseLength, bendAmplitude);
         }
@@ -565,7 +565,7 @@ namespace AlphaTab.Audio.Generator
 
         private void GenerateTrill(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
         {
-            var track = note.Beat.Voice.Bar.Track;
+            var track = note.Beat.Voice.Bar.Staff.Track;
             var trillKey = note.StringTuning + note.TrillFret;
             var trillLength = note.TrillSpeed.ToTicks();
             var realKey = true;
@@ -667,22 +667,22 @@ namespace AlphaTab.Audio.Generator
                                                 (byte)(automation.Value));
                     break;
                 case AutomationType.Balance:
-                    _handler.AddControlChange(beat.Voice.Bar.Track.Index, beat.Start + startMove,
-                                                (byte)beat.Voice.Bar.Track.PlaybackInfo.PrimaryChannel,
+                    _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
+                                                (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel,
                                                 (byte)MidiController.PanCoarse,
                                                 (byte)(automation.Value));
-                    _handler.AddControlChange(beat.Voice.Bar.Track.Index, beat.Start + startMove,
-                                                (byte)beat.Voice.Bar.Track.PlaybackInfo.SecondaryChannel,
+                    _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
+                                                (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel,
                                                 (byte)MidiController.PanCoarse,
                                                 (byte)(automation.Value));
                     break;
                 case AutomationType.Volume:
-                    _handler.AddControlChange(beat.Voice.Bar.Track.Index, beat.Start + startMove,
-                                                (byte)beat.Voice.Bar.Track.PlaybackInfo.PrimaryChannel,
+                    _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
+                                                (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel,
                                                 (byte)MidiController.VolumeCoarse,
                                                 (byte)(automation.Value));
-                    _handler.AddControlChange(beat.Voice.Bar.Track.Index, beat.Start + startMove,
-                                                (byte)beat.Voice.Bar.Track.PlaybackInfo.SecondaryChannel,
+                    _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
+                                                (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel,
                                                 (byte)MidiController.VolumeCoarse,
                                                 (byte)(automation.Value));
                     break;

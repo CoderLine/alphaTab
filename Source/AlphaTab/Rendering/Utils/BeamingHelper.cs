@@ -78,8 +78,6 @@ namespace AlphaTab.Rendering.Utils
         public FastList<Beat> Beats { get; set; }
         public Duration MaxDuration { get; set; }
 
-        public bool HasTuplet { get; private set; }
-
         /// <summary>
         /// the number of fingering indicators that will be drawn
         /// </summary>

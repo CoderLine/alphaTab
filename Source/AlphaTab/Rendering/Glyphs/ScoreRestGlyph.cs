@@ -74,5 +74,14 @@ namespace AlphaTab.Rendering.Glyphs
                     break;
             }
         }
+
+        public void UpdateBeamingHelper(float cx)
+        {
+            if (BeamingHelper != null)
+            {
+                BeamingHelper.RegisterBeatLineX(Beat, cx + X + Width / 2, cx + X + Width / 2);
+            }
+        }
+
     }
 }

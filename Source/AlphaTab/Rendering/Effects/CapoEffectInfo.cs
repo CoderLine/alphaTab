@@ -25,7 +25,7 @@ namespace AlphaTab.Rendering.Effects
         public bool HideOnMultiTrack { get { return false; } }
         public bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat)
         {
-            return beat.Index == 0 && beat.Voice.Bar.Index == 0 && beat.Voice.Bar.Track.Capo != 0;
+            return beat.Index == 0 && beat.Voice.Bar.Index == 0 && beat.Voice.Bar.Staff.Track.Capo != 0;
         }
 
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SinglePreBeatToPostBeat;} }
@@ -36,7 +36,7 @@ namespace AlphaTab.Rendering.Effects
 
         public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
-            return new TextGlyph(0,0, "Capo. fret " + beat.Voice.Bar.Track.Capo, renderer.Resources.EffectFont);
+            return new TextGlyph(0,0, "Capo. fret " + beat.Voice.Bar.Staff.Track.Capo, renderer.Resources.EffectFont);
         }
 
         public bool CanExpand(EffectBarRenderer renderer, Beat from, Beat to)
