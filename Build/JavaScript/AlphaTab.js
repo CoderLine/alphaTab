@@ -2512,25 +2512,7 @@ AlphaTab.Audio.Model.MidiTickLookup = function (){
     this.BarLookup = {};
 };
 AlphaTab.Audio.Model.MidiTickLookup.prototype = {
-    FindBeat: function (track, tick){
-        //
-        // some heuristics: try last found beat and it's next beat for lookup first
-        // try last beat or next beat of last beat first
-        if (this._lastBeat != null && this._lastBeat.NextBeat != null && this._lastBeat.Voice.Bar.Staff.Track == track){
-            // check if tick is between _lastBeat and _lastBeat.nextBeat (still _lastBeat)
-            if (tick >= this._lastBeat.get_AbsoluteStart() && tick < this._lastBeat.NextBeat.get_AbsoluteStart()){
-                return this._lastBeat;
-            }
-            // we need a upper-next beat to check the nextbeat range 
-            // TODO: this logic does not apply properly for alternate endings and repeats, better "next beat" detection using 
-            // "next bar" info
-            //if (_lastBeat.NextBeat.NextBeat != null && tick >= _lastBeat.NextBeat.AbsoluteStart && tick < _lastBeat.NextBeat.NextBeat.AbsoluteStart
-            //    && !(_lastBeat.Index == _lastBeat.Voice.Beats.Count - 1 && _lastBeat.Voice.Bar.MasterBar.IsRepeatEnd))
-            //{
-            //    _lastBeat = _lastBeat.NextBeat;
-            //    return _lastBeat;
-            //}
-        }
+    FindBeat: function (tracks, tick){
         //
         // Global Search
         // binary search within lookup
@@ -2538,20 +2520,33 @@ AlphaTab.Audio.Model.MidiTickLookup.prototype = {
         if (lookup == null)
             return null;
         var masterBar = lookup.Bar;
-        var bar = track.Staves[0].Bars[masterBar.Index];
-        // remap tick to initial bar start
-        tick = (tick - lookup.Start + masterBar.Start);
-        // linear search beat within beats
+        // look in all staves for a beat that could match
         var beat = null;
-        for (var i = 0,j = bar.Voices[0].Beats.length; i < j; i++){
-            var b = bar.Voices[0].Beats[i];
-            // we search for the first beat which 
-            // starts after the tick. 
-            if (beat == null || b.get_AbsoluteStart() <= tick){
-                beat = b;
-            }
-            else {
-                break;
+        for (var t = 0; t < tracks.length; t++){
+            var track = tracks[t];
+            for (var s = 0; s < track.Staves.length; s++){
+                var bar = track.Staves[s].Bars[masterBar.Index];
+                // remap tick to initial bar start
+                tick = (tick - lookup.Start + masterBar.Start);
+                // linear search beat within beats
+                // also look in all voices
+                for (var v = 0; v < bar.Voices.length; v++){
+                    var voiceBeat = null;
+                    for (var i = 0,j = bar.Voices[v].Beats.length; i < j; i++){
+                        var b = bar.Voices[v].Beats[i];
+                        var start = b.get_AbsoluteStart();
+                        var end = b.NextBeat != null ? b.NextBeat.get_AbsoluteStart() : start + b.CalculateDuration();
+                        // we search for the first beat which 
+                        // starts after the tick. 
+                        if (start <= tick && tick <= end){
+                            voiceBeat = b;
+                            break;
+                        }
+                    }
+                    if (beat == null || (voiceBeat != null && voiceBeat.get_AbsoluteStart() > beat.get_AbsoluteStart() && !voiceBeat.IsEmpty)){
+                        beat = voiceBeat;
+                    }
+                }
             }
         }
         this._lastBeat = beat;
@@ -9122,8 +9117,8 @@ AlphaTab.Rendering.BarRendererBase.prototype = {
         barLookup.Bar = this.Bar;
         barLookup.IsFirstOfLine = this.get_IsFirstOfLine();
         barLookup.IsLastOfLine = this.get_IsLastOfLine();
-        barLookup.VisualBounds = new AlphaTab.Rendering.Utils.Bounds(x + this.Staff.X + this.X, visualTop, this.Width, visualHeight);
-        barLookup.Bounds = new AlphaTab.Rendering.Utils.Bounds(x + this.Staff.X + this.X, realTop, this.Width, realHeight);
+        barLookup.VisualBounds = new AlphaTab.Rendering.Utils.Bounds(x + this.X, visualTop, this.Width, visualHeight);
+        barLookup.Bounds = new AlphaTab.Rendering.Utils.Bounds(x + this.X, realTop, this.Width, realHeight);
         lookup.Bars.push(barLookup);
     }
 };
@@ -9293,16 +9288,15 @@ AlphaTab.Rendering.GroupedBarRenderer.prototype = {
     BuildBoundingsLookup: function (lookup, visualTop, visualHeight, realTop, realHeight, x){
         AlphaTab.Rendering.BarRendererBase.prototype.BuildBoundingsLookup.call(this, lookup, visualTop, visualHeight, realTop, realHeight, x);
         var barLookup = lookup.Bars[lookup.Bars.length - 1];
-        var beatStart = this.get_BeatGlyphsStart();
         AlphaTab.Platform.Std.Foreach(AlphaTab.Rendering.Glyphs.VoiceContainerGlyph, this._voiceContainers, $CreateAnonymousDelegate(this, function (c){
             for (var i = 0,j = c.BeatGlyphs.length; i < j; i++){
                 var bc = c.BeatGlyphs[i];
                 var beatLookup = new AlphaTab.Rendering.Utils.BeatBoundings();
                 beatLookup.Beat = bc.Beat;
                 // on beat bounding rectangle
-                beatLookup.VisualBounds = new AlphaTab.Rendering.Utils.Bounds(x + this.Staff.X + this.X + beatStart + c.X + bc.X + bc.OnNotes.X, visualTop, bc.OnNotes.Width, visualHeight);
+                beatLookup.VisualBounds = new AlphaTab.Rendering.Utils.Bounds(x + this.X + c.X + bc.X + bc.OnNotes.X, visualTop, bc.OnNotes.Width, visualHeight);
                 // real beat boundings
-                beatLookup.Bounds = new AlphaTab.Rendering.Utils.Bounds(x + this.Staff.X + this.X + beatStart + c.X + bc.X, realTop, bc.Width, realHeight);
+                beatLookup.Bounds = new AlphaTab.Rendering.Utils.Bounds(x + this.X + c.X + bc.X, realTop, bc.Width, realHeight);
                 barLookup.Beats.push(beatLookup);
             }
         }));
@@ -12257,8 +12251,8 @@ AlphaTab.Rendering.Glyphs.TieGlyph.prototype = {
     Paint: function (cx, cy, canvas){
         if (this.EndNote == null)
             return;
-        var startNoteRenderer = this.Renderer.get_Layout().GetRendererForBar(this.Renderer.Staff.StaveId, this.StartNote.Beat.Voice.Bar.Index);
-        var endNoteRenderer = this.Renderer.get_Layout().GetRendererForBar(this.Renderer.Staff.StaveId, this.EndNote.Beat.Voice.Bar.Index);
+        var startNoteRenderer = this.Renderer.get_Layout().GetRendererForBar(this.Renderer.Staff.StaveId, this.StartNote.Beat.Voice.Bar);
+        var endNoteRenderer = this.Renderer.get_Layout().GetRendererForBar(this.Renderer.Staff.StaveId, this.EndNote.Beat.Voice.Bar);
         var startX = 0;
         var endX = 0;
         var startY = 0;
@@ -13159,21 +13153,25 @@ AlphaTab.Rendering.Layout.ScoreLayout.prototype = {
         }
         return group;
     },
-    RegisterBarRenderer: function (key, index, renderer){
+    GetBarRendererId: function (trackId, barId){
+        return trackId + "-" + barId;
+    },
+    RegisterBarRenderer: function (key, renderer){
         if (!this._barRendererLookup.hasOwnProperty(key)){
             this._barRendererLookup[key] = {};
         }
-        this._barRendererLookup[key][index] = renderer;
+        this._barRendererLookup[key][this.GetBarRendererId(renderer.Bar.Staff.Track.Index, renderer.Bar.Index)] = renderer;
     },
-    UnregisterBarRenderer: function (key, index){
+    UnregisterBarRenderer: function (key, renderer){
         if (this._barRendererLookup.hasOwnProperty(key)){
             var lookup = this._barRendererLookup[key];
-            delete lookup[index];
+            delete lookup[this.GetBarRendererId(renderer.Bar.Staff.Track.Index, renderer.Bar.Index)];
         }
     },
-    GetRendererForBar: function (key, index){
-        if (this._barRendererLookup.hasOwnProperty(key) && this._barRendererLookup[key].hasOwnProperty(index)){
-            return this._barRendererLookup[key][index];
+    GetRendererForBar: function (key, bar){
+        var barRendererId = this.GetBarRendererId(bar.Staff.Track.Index, bar.Index);
+        if (this._barRendererLookup.hasOwnProperty(key) && this._barRendererLookup[key].hasOwnProperty(barRendererId)){
+            return this._barRendererLookup[key][barRendererId];
         }
         return null;
     },
@@ -14689,13 +14687,13 @@ AlphaTab.Rendering.Staves.Staff.prototype = {
         renderer.DoLayout();
         this.BarRenderers.push(renderer);
         if (bar != null){
-            this.StaveGroup.Layout.RegisterBarRenderer(this.StaveId, bar.Index, renderer);
+            this.StaveGroup.Layout.RegisterBarRenderer(this.StaveId, renderer);
         }
     },
     RevertLastBar: function (){
         var lastBar = this.BarRenderers[this.BarRenderers.length - 1];
         this.BarRenderers.splice(this.BarRenderers.length - 1,1);
-        this.StaveGroup.Layout.UnregisterBarRenderer(this.StaveId, lastBar.Bar.Index);
+        this.StaveGroup.Layout.UnregisterBarRenderer(this.StaveId, lastBar);
     },
     ScaleToWidth: function (width){
         // Note: here we could do some "intelligent" distribution of 
@@ -14995,7 +14993,7 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
         var visualHeight = visualBottom - visualTop;
         var realHeight = realBottom - realTop;
         for (var i = 0,j = this._firstStaffInAccolade.BarRenderers.length; i < j; i++){
-            this._firstStaffInAccolade.BarRenderers[i].BuildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, this.X);
+            this._firstStaffInAccolade.BarRenderers[i].BuildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, this.X + this._firstStaffInAccolade.X);
         }
     }
 };

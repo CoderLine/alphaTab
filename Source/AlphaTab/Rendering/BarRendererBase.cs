@@ -181,8 +181,8 @@ namespace AlphaTab.Rendering
             barLookup.Bar = Bar;
             barLookup.IsFirstOfLine = IsFirstOfLine;
             barLookup.IsLastOfLine = IsLastOfLine;
-            barLookup.VisualBounds = new Bounds(x + Staff.X + X, visualTop, Width, visualHeight);
-            barLookup.Bounds = new Bounds(x + Staff.X + X, realTop, Width, realHeight);
+            barLookup.VisualBounds = new Bounds(x + X, visualTop, Width, visualHeight);
+            barLookup.Bounds = new Bounds(x + X, realTop, Width, realHeight);
             lookup.Bars.Add(barLookup);
         }
     }

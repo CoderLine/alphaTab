@@ -306,7 +306,6 @@ namespace AlphaTab.Rendering
         {
             base.BuildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, x);
             var barLookup = lookup.Bars[lookup.Bars.Count - 1];
-            var beatStart = BeatGlyphsStart;
             Std.Foreach(_voiceContainers.Values, c =>
             {
                 for (int i = 0, j = c.BeatGlyphs.Count; i < j; i++)
@@ -316,11 +315,11 @@ namespace AlphaTab.Rendering
                     beatLookup.Beat = bc.Beat;
                     // on beat bounding rectangle
                     beatLookup.VisualBounds = new Bounds(
-                    x + Staff.X + X + beatStart + c.X + bc.X + bc.OnNotes.X, visualTop,
+                    x + X + c.X + bc.X + bc.OnNotes.X, visualTop,
                     bc.OnNotes.Width, visualHeight);
                     // real beat boundings
                     beatLookup.Bounds = new Bounds(
-                    x + Staff.X + X + beatStart + c.X + bc.X, realTop,
+                    x + X + c.X + bc.X, realTop,
                     bc.Width, realHeight);
                     barLookup.Beats.Add(beatLookup);
                 }

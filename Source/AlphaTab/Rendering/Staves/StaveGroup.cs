@@ -380,7 +380,7 @@ namespace AlphaTab.Rendering.Staves
             var realHeight = realBottom - realTop;
             for (int i = 0, j = _firstStaffInAccolade.BarRenderers.Count; i < j; i++)
             {
-                _firstStaffInAccolade.BarRenderers[i].BuildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, X);
+                _firstStaffInAccolade.BarRenderers[i].BuildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, X + _firstStaffInAccolade.X);
             }
         }
     }

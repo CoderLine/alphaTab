@@ -49,9 +49,9 @@ namespace AlphaTab.Rendering.Glyphs
             if (EndNote == null) return;
 
             var startNoteRenderer =
-                    (GroupedBarRenderer)Renderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, StartNote.Beat.Voice.Bar.Index);
+                    (GroupedBarRenderer)Renderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, StartNote.Beat.Voice.Bar);
             var endNoteRenderer =
-                    (GroupedBarRenderer)Renderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, EndNote.Beat.Voice.Bar.Index);
+                    (GroupedBarRenderer)Renderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, EndNote.Beat.Voice.Bar);
 
             float startX = 0;
             float endX = 0;

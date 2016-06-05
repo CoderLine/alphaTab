@@ -18,9 +18,11 @@
 
 using System;
 using AlphaTab.Collections;
+using AlphaTab.Model;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 using AlphaTab.Rendering.Utils;
+using Staff = AlphaTab.Rendering.Staves.Staff;
 
 namespace AlphaTab.Rendering.Layout
 {
@@ -29,7 +31,7 @@ namespace AlphaTab.Rendering.Layout
     /// </summary>
     abstract public class ScoreLayout
     {
-        private readonly FastDictionary<string, FastDictionary<int, BarRendererBase>> _barRendererLookup;
+        private readonly FastDictionary<string, FastDictionary<string, BarRendererBase>> _barRendererLookup;
 
         public ScoreRenderer Renderer { get; set; }
 
@@ -39,7 +41,7 @@ namespace AlphaTab.Rendering.Layout
         protected ScoreLayout(ScoreRenderer renderer)
         {
             Renderer = renderer;
-            _barRendererLookup = new FastDictionary<string, FastDictionary<int, BarRendererBase>>();
+            _barRendererLookup = new FastDictionary<string, FastDictionary<string, BarRendererBase>>();
         }
 
         public abstract void DoLayoutAndRender();
@@ -83,29 +85,36 @@ namespace AlphaTab.Rendering.Layout
             return group;
         }
 
-        public void RegisterBarRenderer(string key, int index, BarRendererBase renderer)
+        private string GetBarRendererId(int trackId, int barId)
+        {
+            return trackId + "-" + barId;
+        }
+
+
+        public void RegisterBarRenderer(string key, BarRendererBase renderer)
         {
             if (!_barRendererLookup.ContainsKey(key))
             {
-                _barRendererLookup[key] = new FastDictionary<int, BarRendererBase>();
+                _barRendererLookup[key] = new FastDictionary<string, BarRendererBase>();
             }
-            _barRendererLookup[key][index] = renderer;
+            _barRendererLookup[key][GetBarRendererId(renderer.Bar.Staff.Track.Index, renderer.Bar.Index)] = renderer;
         }
 
-        public void UnregisterBarRenderer(string key, int index)
+        public void UnregisterBarRenderer(string key, BarRendererBase renderer)
         {
             if (_barRendererLookup.ContainsKey(key))
             {
                 var lookup = _barRendererLookup[key];
-                lookup.Remove(index);
+                lookup.Remove(GetBarRendererId(renderer.Bar.Staff.Track.Index, renderer.Bar.Index));
             }
         }
 
-        public BarRendererBase GetRendererForBar(string key, int index)
+        public BarRendererBase GetRendererForBar(string key, Bar bar)
         {
-            if (_barRendererLookup.ContainsKey(key) && _barRendererLookup[key].ContainsKey(index))
+            var barRendererId = GetBarRendererId(bar.Staff.Track.Index, bar.Index);
+            if (_barRendererLookup.ContainsKey(key) && _barRendererLookup[key].ContainsKey(barRendererId))
             {
-                return _barRendererLookup[key][index];
+                return _barRendererLookup[key][barRendererId];
             }
             return null;
         }

@@ -76,7 +76,7 @@
         
         var tracks = api.tracks(element, context);
         if(tracks.length > 0) {
-            var beat = cache.FindBeat(tracks[0], tick);
+            var beat = cache.FindBeat(tracks, tick);
             api.playerCursorUpdateBeat(element, context, beat);
         }
     };

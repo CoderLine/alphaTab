@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 
@@ -41,31 +42,8 @@ namespace AlphaTab.Audio.Model
             BarLookup = new FastDictionary<int, BarTickLookup>();
         }
 
-        public Beat FindBeat(Track track, int tick)
+        public Beat FindBeat(Track[] tracks, int tick)
         {
-            //
-            // some heuristics: try last found beat and it's next beat for lookup first
-
-            // try last beat or next beat of last beat first
-            if (_lastBeat != null && _lastBeat.NextBeat != null && _lastBeat.Voice.Bar.Staff.Track == track)
-            {
-                // check if tick is between _lastBeat and _lastBeat.nextBeat (still _lastBeat)
-                if (tick >= _lastBeat.AbsoluteStart && tick < _lastBeat.NextBeat.AbsoluteStart)
-                {
-                    return _lastBeat;
-                }
-
-                // we need a upper-next beat to check the nextbeat range 
-                // TODO: this logic does not apply properly for alternate endings and repeats, better "next beat" detection using 
-                // "next bar" info
-                //if (_lastBeat.NextBeat.NextBeat != null && tick >= _lastBeat.NextBeat.AbsoluteStart && tick < _lastBeat.NextBeat.NextBeat.AbsoluteStart
-                //    && !(_lastBeat.Index == _lastBeat.Voice.Beats.Count - 1 && _lastBeat.Voice.Bar.MasterBar.IsRepeatEnd))
-                //{
-                //    _lastBeat = _lastBeat.NextBeat;
-                //    return _lastBeat;
-                //}
-            }
-
             //
             // Global Search
 
@@ -74,29 +52,51 @@ namespace AlphaTab.Audio.Model
             if (lookup == null) return null;
 
             var masterBar = lookup.Bar;
-            var bar = track.Staves[0].Bars[masterBar.Index];
 
-            // remap tick to initial bar start
-            tick = (tick - lookup.Start + masterBar.Start);
-
-            // linear search beat within beats
+            // look in all staves for a beat that could match
             Beat beat = null;
-            for (int i = 0, j = bar.Voices[0].Beats.Count; i < j; i++)
+
+            for (int t = 0; t < tracks.Length; t++)
             {
-                var b = bar.Voices[0].Beats[i];
-                // we search for the first beat which 
-                // starts after the tick. 
-                if (beat == null || b.AbsoluteStart <= tick)
+                var track = tracks[t];
+                for (int s = 0; s < track.Staves.Count; s++)
                 {
-                    beat = b;
-                }
-                else
-                {
-                    break;
+                    var bar = track.Staves[s].Bars[masterBar.Index];
+
+                    // remap tick to initial bar start
+                    tick = (tick - lookup.Start + masterBar.Start);
+
+                    // linear search beat within beats
+                    // also look in all voices
+                    for (int v = 0; v < bar.Voices.Count; v++)
+                    {
+                        Beat voiceBeat = null;
+                        for (int i = 0, j = bar.Voices[v].Beats.Count; i < j; i++)
+                        {
+                            var b = bar.Voices[v].Beats[i];
+
+                            var start = b.AbsoluteStart;
+                            var end = b.NextBeat != null ? b.NextBeat.AbsoluteStart : start + b.CalculateDuration();
+
+                            // we search for the first beat which 
+                            // starts after the tick. 
+                            if (start <= tick && tick <= end)
+                            {
+                                voiceBeat = b;
+                                break;
+                            }
+                        }
+
+                        if (beat == null || (voiceBeat != null && voiceBeat.AbsoluteStart > beat.AbsoluteStart && !voiceBeat.IsEmpty))
+                        {
+                            beat = voiceBeat;
+                        }
+                    }
                 }
             }
 
             _lastBeat = beat;
+
 
             return _lastBeat;
         }

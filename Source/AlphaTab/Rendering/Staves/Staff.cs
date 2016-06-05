@@ -124,7 +124,7 @@ namespace AlphaTab.Rendering.Staves
             BarRenderers.Add(renderer);
             if (bar != null)
             {
-                StaveGroup.Layout.RegisterBarRenderer(StaveId, bar.Index, renderer);
+                StaveGroup.Layout.RegisterBarRenderer(StaveId, renderer);
             }
         }
 
@@ -132,7 +132,7 @@ namespace AlphaTab.Rendering.Staves
         {
             var lastBar = BarRenderers[BarRenderers.Count - 1];
             BarRenderers.RemoveAt(BarRenderers.Count - 1);
-            StaveGroup.Layout.UnregisterBarRenderer(StaveId, lastBar.Bar.Index);
+            StaveGroup.Layout.UnregisterBarRenderer(StaveId, lastBar);
 
         }
         
