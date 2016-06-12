@@ -17,21 +17,23 @@
  */
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
     public class NoteNumberGlyph : Glyph
     {
         private readonly string _noteString;
-        private readonly bool _isGrace;
+        private float _noteStringWidth;
+        private readonly string _trillNoteString;
+        private float _trillNoteStringWidth;
 
-        public NoteNumberGlyph(float x, float y, Note n, bool isGrace)
+        public NoteNumberGlyph(float x, float y, Note n)
             : base(x, y)
         {
-            _isGrace = isGrace;
             if (!n.IsTieDestination)
             {
-                _noteString = n.IsDead ? "X" : n.Fret.ToString();
+                _noteString = n.IsDead ? "x" : n.Fret.ToString();
                 if (n.IsGhost)
                 {
                     _noteString = "(" + _noteString + ")";
@@ -45,24 +47,29 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 _noteString = "";
             }
+
+            if (n.IsTrill)
+            {
+                _trillNoteString = "(" + n.TrillFret + ")";
+            }
+            else
+            {
+                _trillNoteString = "";
+            }
         }
 
         public override void DoLayout()
         {
-            Width = 10 * Scale;
-        }
-
-        public void CalculateWidth()
-        {
-            Width = Renderer.Layout.Renderer.Canvas.MeasureText(_noteString);
+            Renderer.Layout.Renderer.Canvas.Font = Renderer.Resources.TablatureFont;
+            _noteStringWidth = Renderer.Layout.Renderer.Canvas.MeasureText(_noteString);
+            _trillNoteStringWidth = Renderer.Layout.Renderer.Canvas.MeasureText(_trillNoteString);
+            Width = _noteStringWidth + _trillNoteStringWidth;
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            if (_noteString != null)
-            {
-                canvas.FillText(_noteString.ToLower(), cx + X, cy + Y);
-            }
+            canvas.FillText(_noteString, cx + X, cy + Y);
+            canvas.FillText(_trillNoteString, cx + X + _noteStringWidth, cy + Y);
         }
     }
 }

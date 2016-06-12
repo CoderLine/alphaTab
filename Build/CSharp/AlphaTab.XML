@@ -869,7 +869,6 @@
             This BarRenderer has 3 different groups which cna store glyphs:
              - PreBeatGlyphs : Those glyphs are aligned left to right before the first glyph which represents a beat
              - BeatGlyphs : Each of those glyphs represents one beat. They are aligned left to right.
-             - PostBeatGlyphs : Those glyphs are aligned left to right after the last beat glyph
             </summary>
         </member>
         <member name="T:AlphaTab.Rendering.IEffectBarRendererInfo">

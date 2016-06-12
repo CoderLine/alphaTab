@@ -8713,7 +8713,7 @@ AlphaTab.Platform.Svg.FontSizes = function (){
 };
 $StaticConstructor(function (){
     AlphaTab.Platform.Svg.FontSizes.TimesNewRoman = new Uint8Array([3, 4, 5, 6, 6, 9, 9, 2, 4, 4, 6, 6, 3, 4, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 6, 6, 6, 5, 10, 8, 7, 7, 8, 7, 6, 7, 8, 4, 4, 8, 7, 10, 8, 8, 7, 8, 7, 5, 8, 8, 7, 11, 8, 8, 7, 4, 3, 4, 5, 6, 4, 5, 5, 5, 5, 5, 4, 5, 6, 3, 3, 6, 3, 9, 6, 6, 6, 5, 4, 4, 4, 5, 6, 7, 6, 6, 5, 5, 2, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 6, 6, 6, 6, 2, 5, 4, 8, 4, 6, 6, 0, 8, 6, 4, 6, 3, 3, 4, 5, 5, 4, 4, 3, 3, 6, 8, 8, 8, 5, 8, 8, 8, 8, 8, 8, 11, 7, 7, 7, 7, 7, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 6, 8, 8, 8, 8, 8, 8, 6, 5, 5, 5, 5, 5, 5, 5, 8, 5, 5, 5, 5, 5, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 6, 6]);
-    AlphaTab.Platform.Svg.FontSizes.Arial11Pt = new Uint8Array([3, 2, 4, 6, 6, 10, 7, 2, 4, 4, 4, 6, 3, 4, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 6, 6, 6, 6, 11, 8, 7, 7, 7, 6, 6, 8, 7, 2, 5, 7, 6, 8, 7, 8, 6, 8, 7, 7, 6, 7, 8, 10, 7, 8, 7, 3, 3, 3, 5, 6, 4, 6, 6, 6, 6, 6, 4, 6, 6, 2, 2, 5, 2, 8, 6, 6, 6, 6, 4, 6, 3, 6, 6, 10, 6, 6, 6, 4, 2, 4, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 2, 6, 6, 7, 6, 2, 6, 4, 8, 4, 6, 6, 0, 8, 6, 4, 6, 4, 4, 4, 6, 6, 4, 4, 4, 5, 6, 9, 10, 10, 6, 8, 8, 8, 8, 8, 8, 11, 7, 6, 6, 6, 6, 2, 2, 2, 2, 8, 7, 8, 8, 8, 8, 8, 6, 8, 7, 7, 7, 7, 8, 7, 7, 6, 6, 6, 6, 6, 6, 10, 6, 6, 6, 6, 6, 2, 2, 2, 2, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]);
+    AlphaTab.Platform.Svg.FontSizes.Arial11Pt = new Uint8Array([3, 3, 4, 6, 6, 10, 7, 2, 4, 4, 4, 6, 3, 4, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 6, 6, 6, 6, 11, 7, 7, 8, 8, 7, 7, 9, 8, 3, 6, 7, 6, 9, 8, 9, 7, 9, 8, 7, 7, 8, 7, 10, 7, 7, 7, 3, 3, 3, 5, 6, 4, 6, 6, 6, 6, 6, 3, 6, 6, 2, 2, 6, 2, 9, 6, 6, 6, 6, 4, 6, 3, 6, 6, 8, 6, 6, 6, 4, 3, 4, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 6, 6, 6, 6, 3, 6, 4, 8, 4, 6, 6, 0, 8, 6, 4, 6, 4, 4, 4, 6, 6, 4, 4, 4, 4, 6, 9, 9, 9, 7, 7, 7, 7, 7, 7, 7, 11, 8, 7, 7, 7, 7, 3, 3, 3, 3, 8, 8, 9, 9, 9, 9, 9, 6, 9, 8, 8, 8, 8, 7, 7, 7, 6, 6, 6, 6, 6, 6, 10, 6, 6, 6, 6, 6, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6, 6]);
     AlphaTab.Platform.Svg.FontSizes.ControlChars = 32;
 });
 AlphaTab.Platform.Svg.FontSizes.MeasureString = function (s, f, size, style){
@@ -9025,6 +9025,9 @@ AlphaTab.Platform.Svg.SvgCanvas.prototype = {
 };
 AlphaTab.Rendering = AlphaTab.Rendering || {};
 AlphaTab.Rendering.BarRendererBase = function (bar){
+    this._preBeatGlyphs = null;
+    this._voiceContainers = null;
+    this._postBeatGlyphs = null;
     this.Staff = null;
     this.X = 0;
     this.Y = 0;
@@ -9036,8 +9039,14 @@ AlphaTab.Rendering.BarRendererBase = function (bar){
     this.BottomOverflow = 0;
     this.Bar = null;
     this.IsLinkedToPrevious = false;
+    this.LayoutingInfo = null;
     this.Bar = bar;
     this.IsEmpty = true;
+    this._preBeatGlyphs = new AlphaTab.Rendering.Glyphs.LeftToRightLayoutingGlyphGroup();
+    this._preBeatGlyphs.Renderer = this;
+    this._voiceContainers = {};
+    this._postBeatGlyphs = new AlphaTab.Rendering.Glyphs.LeftToRightLayoutingGlyphGroup();
+    this._postBeatGlyphs.Renderer = this;
 };
 AlphaTab.Rendering.BarRendererBase.prototype = {
     RegisterOverflowTop: function (topOverflow){
@@ -9049,6 +9058,12 @@ AlphaTab.Rendering.BarRendererBase.prototype = {
             this.BottomOverflow = bottomOverflow;
     },
     ScaleToWidth: function (width){
+        // preBeat and postBeat glyphs do not get resized
+        var containerWidth = width - this._preBeatGlyphs.Width - this._postBeatGlyphs.Width;
+        AlphaTab.Platform.Std.Foreach(AlphaTab.Rendering.Glyphs.VoiceContainerGlyph, this._voiceContainers, $CreateAnonymousDelegate(this, function (c){
+            c.ScaleToWidth(containerWidth);
+        }));
+        this._postBeatGlyphs.X = this._preBeatGlyphs.X + this._preBeatGlyphs.Width + containerWidth;
         this.Width = width;
     },
     get_Resources: function (){
@@ -9073,8 +9088,37 @@ AlphaTab.Rendering.BarRendererBase.prototype = {
         return this.Bar.Index == this.Staff.BarRenderers.length - 1;
     },
     RegisterLayoutingInfo: function (info){
+        this.LayoutingInfo = info;
+        var preSize = this._preBeatGlyphs.Width;
+        if (info.PreBeatSize < preSize){
+            info.PreBeatSize = preSize;
+        }
+        AlphaTab.Platform.Std.Foreach(AlphaTab.Rendering.Glyphs.VoiceContainerGlyph, this._voiceContainers, $CreateAnonymousDelegate(this, function (c){
+            c.RegisterLayoutingInfo(info);
+        }));
+        var postSize = this._postBeatGlyphs.Width;
+        if (info.PostBeatSize < postSize){
+            info.PostBeatSize = postSize;
+        }
     },
-    ApplyLayoutingInfo: function (info){
+    ApplyLayoutingInfo: function (){
+        // if we need additional space in the preBeat group we simply
+        // add a new spacer
+        this._preBeatGlyphs.Width = this.LayoutingInfo.PreBeatSize;
+        // on beat glyphs we apply the glyph spacing
+        var voiceEnd = 0;
+        AlphaTab.Platform.Std.Foreach(AlphaTab.Rendering.Glyphs.VoiceContainerGlyph, this._voiceContainers, $CreateAnonymousDelegate(this, function (c){
+            c.X = this._preBeatGlyphs.X + this._preBeatGlyphs.Width;
+            c.ApplyLayoutingInfo();
+            var newEnd = c.X + c.Width;
+            if (voiceEnd < newEnd){
+                voiceEnd = newEnd;
+            }
+        }));
+        // on the post glyphs we add the spacing before all other glyphs
+        this._postBeatGlyphs.X = voiceEnd;
+        this._postBeatGlyphs.Width = this.LayoutingInfo.PostBeatSize;
+        this.Width = this._postBeatGlyphs.X + this._postBeatGlyphs.Width;
     },
     FinalizeRenderer: function (layout){
     },
@@ -9083,50 +9127,6 @@ AlphaTab.Rendering.BarRendererBase.prototype = {
     },
     get_BottomPadding: function (){
         return 0;
-    },
-    DoLayout: function (){
-    },
-    Paint: function (cx, cy, canvas){
-    },
-    BuildBoundingsLookup: function (lookup, visualTop, visualHeight, realTop, realHeight, x){
-        var barLookup = new AlphaTab.Rendering.Utils.BarBoundings();
-        barLookup.Bar = this.Bar;
-        barLookup.IsFirstOfLine = this.get_IsFirstOfLine();
-        barLookup.IsLastOfLine = this.get_IsLastOfLine();
-        barLookup.VisualBounds = new AlphaTab.Rendering.Utils.Bounds(x + this.X, visualTop, this.Width, visualHeight);
-        barLookup.Bounds = new AlphaTab.Rendering.Utils.Bounds(x + this.X, realTop, this.Width, realHeight);
-        lookup.Bars.push(barLookup);
-    }
-};
-AlphaTab.Rendering.GroupedBarRenderer = function (bar){
-    this._preBeatGlyphs = null;
-    this._voiceContainers = null;
-    this._postBeatGlyphs = null;
-    AlphaTab.Rendering.BarRendererBase.call(this, bar);
-    this._preBeatGlyphs = new AlphaTab.Rendering.Glyphs.LeftToRightLayoutingGlyphGroup();
-    this._preBeatGlyphs.Renderer = this;
-    this._voiceContainers = {};
-    this._postBeatGlyphs = new AlphaTab.Rendering.Glyphs.LeftToRightLayoutingGlyphGroup();
-    this._postBeatGlyphs.Renderer = this;
-};
-AlphaTab.Rendering.GroupedBarRenderer.prototype = {
-    get_PreBeatX: function (){
-        return this._preBeatGlyphs.X;
-    },
-    get_PreBeatWidth: function (){
-        return this._preBeatGlyphs.Width;
-    },
-    get_VoiceContainerX: function (){
-        return this._preBeatGlyphs.X + this._preBeatGlyphs.Width;
-    },
-    get_VoiceContainerWidth: function (){
-        return this.get_PostBeatX() - this.get_VoiceContainerX();
-    },
-    get_PostBeatX: function (){
-        return this._postBeatGlyphs.X;
-    },
-    get_PostBeatWidth: function (){
-        return this._postBeatGlyphs.Width;
     },
     DoLayout: function (){
         this.CreatePreBeatGlyphs();
@@ -9142,47 +9142,6 @@ AlphaTab.Rendering.GroupedBarRenderer.prototype = {
             }
         }));
         this._postBeatGlyphs.X = postBeatStart;
-        this.UpdateWidth();
-    },
-    UpdateWidth: function (){
-        this.Width = this._postBeatGlyphs.X + this._postBeatGlyphs.Width;
-    },
-    GetNoteX: function (note, onEnd){
-        return 0;
-    },
-    GetNoteY: function (note){
-        return 0;
-    },
-    RegisterLayoutingInfo: function (info){
-        var preSize = this._preBeatGlyphs.Width;
-        if (info.GetSize("Pre") < preSize){
-            info.SetSize("Pre", preSize);
-        }
-        AlphaTab.Platform.Std.Foreach(AlphaTab.Rendering.Glyphs.VoiceContainerGlyph, this._voiceContainers, $CreateAnonymousDelegate(this, function (c){
-            c.RegisterLayoutingInfo(info);
-        }));
-        var postSize = this._postBeatGlyphs.Width;
-        if (info.GetSize("Post") < postSize){
-            info.SetSize("Post", postSize);
-        }
-    },
-    ApplyLayoutingInfo: function (info){
-        // if we need additional space in the preBeat group we simply
-        // add a new spacer
-        this._preBeatGlyphs.Width = info.GetSize("Pre");
-        // on beat glyphs we apply the glyph spacing
-        var voiceEnd = 0;
-        AlphaTab.Platform.Std.Foreach(AlphaTab.Rendering.Glyphs.VoiceContainerGlyph, this._voiceContainers, $CreateAnonymousDelegate(this, function (c){
-            c.X = this._preBeatGlyphs.X + this._preBeatGlyphs.Width;
-            c.ApplyLayoutingInfo(info);
-            var newEnd = c.X + c.Width;
-            if (voiceEnd < newEnd){
-                voiceEnd = newEnd;
-            }
-        }));
-        // on the post glyphs we add the spacing before all other glyphs
-        this._postBeatGlyphs.X = voiceEnd;
-        this._postBeatGlyphs.Width = info.GetSize("Post");
         this.Width = this._postBeatGlyphs.X + this._postBeatGlyphs.Width;
     },
     AddPreBeatGlyph: function (g){
@@ -9213,8 +9172,45 @@ AlphaTab.Rendering.GroupedBarRenderer.prototype = {
     GetOnNotesPosition: function (voice, beat){
         return this.GetBeatContainer(voice, beat).OnNotes;
     },
-    GetPostNotesPosition: function (voice, beat){
-        return this.GetBeatContainer(voice, beat).PostNotes;
+    Paint: function (cx, cy, canvas){
+        this.PaintBackground(cx, cy, canvas);
+        canvas.set_Color(this.get_Resources().MainGlyphColor);
+        this._preBeatGlyphs.Paint(cx + this.X, cy + this.Y, canvas);
+        AlphaTab.Platform.Std.Foreach(AlphaTab.Rendering.Glyphs.VoiceContainerGlyph, this._voiceContainers, $CreateAnonymousDelegate(this, function (c){
+            canvas.set_Color(c.Voice.Index == 0 ? this.get_Resources().MainGlyphColor : this.get_Resources().SecondaryGlyphColor);
+            c.Paint(cx + this.X, cy + this.Y, canvas);
+        }));
+        canvas.set_Color(this.get_Resources().MainGlyphColor);
+        this._postBeatGlyphs.Paint(cx + this.X, cy + this.Y, canvas);
+    },
+    PaintBackground: function (cx, cy, canvas){
+        //var c = new Color((byte)Std.Random(255),
+        //      (byte)Std.Random(255),
+        //      (byte)Std.Random(255),
+        //      100);
+        //canvas.Color = c;
+        //canvas.FillRect(cx + X, cy + Y, Width, Height);
+    },
+    BuildBoundingsLookup: function (lookup, visualTop, visualHeight, realTop, realHeight, x){
+        var barLookup = new AlphaTab.Rendering.Utils.BarBoundings();
+        barLookup.Bar = this.Bar;
+        barLookup.IsFirstOfLine = this.get_IsFirstOfLine();
+        barLookup.IsLastOfLine = this.get_IsLastOfLine();
+        barLookup.VisualBounds = new AlphaTab.Rendering.Utils.Bounds(x + this.X, visualTop, this.Width, visualHeight);
+        barLookup.Bounds = new AlphaTab.Rendering.Utils.Bounds(x + this.X, realTop, this.Width, realHeight);
+        lookup.Bars.push(barLookup);
+        AlphaTab.Platform.Std.Foreach(AlphaTab.Rendering.Glyphs.VoiceContainerGlyph, this._voiceContainers, $CreateAnonymousDelegate(this, function (c){
+            for (var i = 0,j = c.BeatGlyphs.length; i < j; i++){
+                var bc = c.BeatGlyphs[i];
+                var beatLookup = new AlphaTab.Rendering.Utils.BeatBoundings();
+                beatLookup.Beat = bc.Beat;
+                // on beat bounding rectangle
+                beatLookup.VisualBounds = new AlphaTab.Rendering.Utils.Bounds(x + this.X + c.X + bc.X + bc.OnNotes.X, visualTop, bc.OnNotes.Width, visualHeight);
+                // real beat boundings
+                beatLookup.Bounds = new AlphaTab.Rendering.Utils.Bounds(x + this.X + c.X + bc.X, realTop, bc.Width, realHeight);
+                barLookup.Beats.push(beatLookup);
+            }
+        }));
     },
     AddPostBeatGlyph: function (g){
         this.IsEmpty = false;
@@ -9229,61 +9225,17 @@ AlphaTab.Rendering.GroupedBarRenderer.prototype = {
     get_BeatGlyphsStart: function (){
         return this._preBeatGlyphs.X + this._preBeatGlyphs.Width;
     },
-    ScaleToWidth: function (width){
-        // preBeat and postBeat glyphs do not get resized
-        var containerWidth = width - this._preBeatGlyphs.Width - this._postBeatGlyphs.Width;
-        AlphaTab.Platform.Std.Foreach(AlphaTab.Rendering.Glyphs.VoiceContainerGlyph, this._voiceContainers, $CreateAnonymousDelegate(this, function (c){
-            c.ScaleToWidth(containerWidth);
-        }));
-        this._postBeatGlyphs.X = this._preBeatGlyphs.X + this._preBeatGlyphs.Width + containerWidth;
-        AlphaTab.Rendering.BarRendererBase.prototype.ScaleToWidth.call(this, width);
+    GetNoteX: function (note, onEnd){
+        return 0;
     },
-    FinalizeRenderer: function (layout){
-    },
-    Paint: function (cx, cy, canvas){
-        this.PaintBackground(cx, cy, canvas);
-        canvas.set_Color(this.get_Resources().MainGlyphColor);
-        this._preBeatGlyphs.Paint(cx + this.X, cy + this.Y, canvas);
-        AlphaTab.Platform.Std.Foreach(AlphaTab.Rendering.Glyphs.VoiceContainerGlyph, this._voiceContainers, $CreateAnonymousDelegate(this, function (c){
-            canvas.set_Color(c.Voice.Index == 0 ? this.get_Resources().MainGlyphColor : this.get_Resources().SecondaryGlyphColor);
-            c.Paint(cx + this.X, cy + this.Y, canvas);
-        }));
-        this._postBeatGlyphs.Paint(cx + this.X, cy + this.Y, canvas);
-    },
-    PaintBackground: function (cx, cy, canvas){
-        //var c = new Color((byte)Std.Random(255),
-        //      (byte)Std.Random(255),
-        //      (byte)Std.Random(255),
-        //      100);
-        //canvas.Color = c;
-        //canvas.FillRect(cx + X, cy + Y, Width, Height);
-    },
-    BuildBoundingsLookup: function (lookup, visualTop, visualHeight, realTop, realHeight, x){
-        AlphaTab.Rendering.BarRendererBase.prototype.BuildBoundingsLookup.call(this, lookup, visualTop, visualHeight, realTop, realHeight, x);
-        var barLookup = lookup.Bars[lookup.Bars.length - 1];
-        AlphaTab.Platform.Std.Foreach(AlphaTab.Rendering.Glyphs.VoiceContainerGlyph, this._voiceContainers, $CreateAnonymousDelegate(this, function (c){
-            for (var i = 0,j = c.BeatGlyphs.length; i < j; i++){
-                var bc = c.BeatGlyphs[i];
-                var beatLookup = new AlphaTab.Rendering.Utils.BeatBoundings();
-                beatLookup.Beat = bc.Beat;
-                // on beat bounding rectangle
-                beatLookup.VisualBounds = new AlphaTab.Rendering.Utils.Bounds(x + this.X + c.X + bc.X + bc.OnNotes.X, visualTop, bc.OnNotes.Width, visualHeight);
-                // real beat boundings
-                beatLookup.Bounds = new AlphaTab.Rendering.Utils.Bounds(x + this.X + c.X + bc.X, realTop, bc.Width, realHeight);
-                barLookup.Beats.push(beatLookup);
-            }
-        }));
+    GetNoteY: function (note){
+        return 0;
     }
 };
-$StaticConstructor(function (){
-    AlphaTab.Rendering.GroupedBarRenderer.KeySizePre = "Pre";
-    AlphaTab.Rendering.GroupedBarRenderer.KeySizePost = "Post";
-});
-$Inherit(AlphaTab.Rendering.GroupedBarRenderer, AlphaTab.Rendering.BarRendererBase);
 AlphaTab.Rendering.AlternateEndingsBarRenderer = function (bar){
     this._endings = null;
     this._endingsString = null;
-    AlphaTab.Rendering.GroupedBarRenderer.call(this, bar);
+    AlphaTab.Rendering.BarRendererBase.call(this, bar);
     var alternateEndings = this.Bar.get_MasterBar().AlternateEndings;
     this._endings = [];
     for (var i = 0; i < 8; i++){
@@ -9291,12 +9243,9 @@ AlphaTab.Rendering.AlternateEndingsBarRenderer = function (bar){
             this._endings.push(i);
         }
     }
+    this.IsEmpty = this._endings.length == 0;
 };
 AlphaTab.Rendering.AlternateEndingsBarRenderer.prototype = {
-    FinalizeRenderer: function (layout){
-        AlphaTab.Rendering.GroupedBarRenderer.prototype.FinalizeRenderer.call(this, layout);
-        this.IsEmpty = this._endings.length == 0;
-    },
     CreateBeatGlyphs: function (){
         for (var v = 0; v < this.Bar.Voices.length; v++){
             this.CreateVoiceGlyphs(this.Bar.Voices[v]);
@@ -9310,12 +9259,11 @@ AlphaTab.Rendering.AlternateEndingsBarRenderer.prototype = {
             var container = new AlphaTab.Rendering.Glyphs.BeatContainerGlyph(b, this.GetOrCreateVoiceContainer(voice));
             container.PreNotes = new AlphaTab.Rendering.Glyphs.BeatGlyphBase();
             container.OnNotes = new AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase();
-            container.PostNotes = new AlphaTab.Rendering.Glyphs.BeatGlyphBase();
             this.AddBeatGlyph(container);
         }
     },
     DoLayout: function (){
-        AlphaTab.Rendering.GroupedBarRenderer.prototype.DoLayout.call(this);
+        AlphaTab.Rendering.BarRendererBase.prototype.DoLayout.call(this);
         if (this.Index == 0){
             this.Staff.TopSpacing = 5;
             this.Staff.BottomSpacing = 4;
@@ -9328,14 +9276,8 @@ AlphaTab.Rendering.AlternateEndingsBarRenderer.prototype = {
         }
         this._endingsString = endingsStrings.join('');
     },
-    get_TopPadding: function (){
-        return 0;
-    },
-    get_BottomPadding: function (){
-        return 0;
-    },
     Paint: function (cx, cy, canvas){
-        AlphaTab.Rendering.GroupedBarRenderer.prototype.Paint.call(this, cx, cy, canvas);
+        AlphaTab.Rendering.BarRendererBase.prototype.Paint.call(this, cx, cy, canvas);
         if (this._endings.length > 0){
             var res = this.get_Resources();
             canvas.set_Font(res.WordsFont);
@@ -9350,7 +9292,7 @@ AlphaTab.Rendering.AlternateEndingsBarRenderer.prototype = {
 $StaticConstructor(function (){
     AlphaTab.Rendering.AlternateEndingsBarRenderer.Padding = 3;
 });
-$Inherit(AlphaTab.Rendering.AlternateEndingsBarRenderer, AlphaTab.Rendering.GroupedBarRenderer);
+$Inherit(AlphaTab.Rendering.AlternateEndingsBarRenderer, AlphaTab.Rendering.BarRendererBase);
 AlphaTab.Rendering.BarRendererFactory = function (){
     this.IsInAccolade = false;
     this.HideOnMultiTrack = false;
@@ -9377,30 +9319,25 @@ $Inherit(AlphaTab.Rendering.AlternateEndingsBarRendererFactory, AlphaTab.Renderi
 AlphaTab.Rendering.EffectBarGlyphSizing = {
     SinglePreBeatOnly: 0,
     SinglePreBeatToOnBeat: 1,
-    SinglePreBeatToPostBeat: 2,
-    SingleOnBeatOnly: 3,
-    SingleOnBeatToPostBeat: 4,
-    SinglePostBeatOnly: 5,
-    GroupedPreBeatOnly: 6,
-    GroupedPreBeatToOnBeat: 7,
-    GroupedPreBeatToPostBeat: 8,
-    GroupedOnBeatOnly: 9,
-    GroupedOnBeatToPostBeat: 10,
-    GroupedPostBeatOnly: 11
+    SingleOnBeatOnly: 2,
+    SinglePostBeatOnly: 3,
+    GroupedPreBeatOnly: 4,
+    GroupedPreBeatToOnBeat: 5,
+    GroupedOnBeatOnly: 6
 };
 AlphaTab.Rendering.EffectBarRenderer = function (bar, info){
     this._info = null;
     this._uniqueEffectGlyphs = null;
     this._effectGlyphs = null;
     this._lastBeat = null;
-    AlphaTab.Rendering.GroupedBarRenderer.call(this, bar);
+    AlphaTab.Rendering.BarRendererBase.call(this, bar);
     this._info = info;
     this._uniqueEffectGlyphs = [];
     this._effectGlyphs = [];
 };
 AlphaTab.Rendering.EffectBarRenderer.prototype = {
     DoLayout: function (){
-        AlphaTab.Rendering.GroupedBarRenderer.prototype.DoLayout.call(this);
+        AlphaTab.Rendering.BarRendererBase.prototype.DoLayout.call(this);
         if (this.Index == 0){
             this.Staff.TopSpacing = 5;
             this.Staff.BottomSpacing = 5;
@@ -9408,7 +9345,7 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
         this.Height = this._info.GetHeight(this);
     },
     FinalizeRenderer: function (layout){
-        AlphaTab.Rendering.GroupedBarRenderer.prototype.FinalizeRenderer.call(this, layout);
+        AlphaTab.Rendering.BarRendererBase.prototype.FinalizeRenderer.call(this, layout);
         // after all layouting and sizing place and size the effect glyphs
         this.IsEmpty = true;
         for (var v = 0; v < this.Bar.Voices.length; v++){
@@ -9447,25 +9384,8 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
                 pos = container.OnNotes;
                 g.Width = (pos.X + container.X + pos.Width) - g.X;
                 break;
-            case AlphaTab.Rendering.EffectBarGlyphSizing.SinglePreBeatToPostBeat:
-                pos = container.PreNotes;
-                g.X = pos.X + container.X;
-                pos = container.PostNotes;
-                g.Width = (pos.X + container.X + pos.Width) - g.X;
-                break;
             case AlphaTab.Rendering.EffectBarGlyphSizing.SingleOnBeatOnly:
                 pos = container.OnNotes;
-                g.X = pos.X + container.X;
-                g.Width = pos.Width;
-                break;
-            case AlphaTab.Rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat:
-                pos = container.OnNotes;
-                g.X = pos.X + container.X;
-                pos = container.PostNotes;
-                g.Width = (pos.X + container.X + pos.Width) - g.X;
-                break;
-            case AlphaTab.Rendering.EffectBarGlyphSizing.SinglePostBeatOnly:
-                pos = container.PostNotes;
                 g.X = pos.X + container.X;
                 g.Width = pos.Width;
                 break;
@@ -9493,48 +9413,12 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
                 g.ExpandTo(container.Beat);
             }
                 break;
-            case AlphaTab.Rendering.EffectBarGlyphSizing.GroupedPreBeatToPostBeat:
-                if (g != prevGlyph){
-                this.AlignGlyph(AlphaTab.Rendering.EffectBarGlyphSizing.SinglePreBeatToPostBeat, beatIndex, voice, prevGlyph);
-            }
-                else {
-                pos = container.PostNotes;
-                var posR = pos.Renderer;
-                var gR = g.Renderer;
-                g.Width = (posR.X + posR.get_BeatGlyphsStart() + container.X + pos.X + pos.Width) - (gR.X + gR.get_BeatGlyphsStart() + g.X);
-                g.ExpandTo(container.Beat);
-            }
-                break;
             case AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeatOnly:
                 if (g != prevGlyph){
                 this.AlignGlyph(AlphaTab.Rendering.EffectBarGlyphSizing.SingleOnBeatOnly, beatIndex, voice, prevGlyph);
             }
                 else {
                 pos = container.OnNotes;
-                var posR = pos.Renderer;
-                var gR = g.Renderer;
-                g.Width = (posR.X + posR.get_BeatGlyphsStart() + container.X + pos.X + pos.Width) - (gR.X + gR.get_BeatGlyphsStart() + g.X);
-                g.ExpandTo(container.Beat);
-            }
-                break;
-            case AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat:
-                if (g != prevGlyph){
-                this.AlignGlyph(AlphaTab.Rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat, beatIndex, voice, prevGlyph);
-            }
-                else {
-                pos = container.PostNotes;
-                var posR = pos.Renderer;
-                var gR = g.Renderer;
-                g.Width = (posR.X + posR.get_BeatGlyphsStart() + container.X + pos.X + pos.Width) - (gR.X + gR.get_BeatGlyphsStart() + g.X);
-                g.ExpandTo(container.Beat);
-            }
-                break;
-            case AlphaTab.Rendering.EffectBarGlyphSizing.GroupedPostBeatOnly:
-                if (g != prevGlyph){
-                this.AlignGlyph(AlphaTab.Rendering.EffectBarGlyphSizing.GroupedPostBeatOnly, beatIndex, voice, prevGlyph);
-            }
-                else {
-                pos = container.PostNotes;
                 var posR = pos.Renderer;
                 var gR = g.Renderer;
                 g.Width = (posR.X + posR.get_BeatGlyphsStart() + container.X + pos.X + pos.Width) - (gR.X + gR.get_BeatGlyphsStart() + g.X);
@@ -9561,7 +9445,6 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
             var container = new AlphaTab.Rendering.Glyphs.BeatContainerGlyph(b, this.GetOrCreateVoiceContainer(v));
             container.PreNotes = new AlphaTab.Rendering.Glyphs.BeatGlyphBase();
             container.OnNotes = new AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase();
-            container.PostNotes = new AlphaTab.Rendering.Glyphs.BeatGlyphBase();
             this.AddBeatGlyph(container);
             if (this._info.ShouldCreateGlyph(this, b)){
                 this.CreateOrResizeGlyph(this._info.get_SizingMode(), b);
@@ -9573,9 +9456,7 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
         switch (sizing){
             case AlphaTab.Rendering.EffectBarGlyphSizing.SinglePreBeatOnly:
             case AlphaTab.Rendering.EffectBarGlyphSizing.SinglePreBeatToOnBeat:
-            case AlphaTab.Rendering.EffectBarGlyphSizing.SinglePreBeatToPostBeat:
             case AlphaTab.Rendering.EffectBarGlyphSizing.SingleOnBeatOnly:
-            case AlphaTab.Rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat:
             case AlphaTab.Rendering.EffectBarGlyphSizing.SinglePostBeatOnly:
                 var g = this._info.CreateNewGlyph(this, b);
                 g.Renderer = this;
@@ -9585,10 +9466,7 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
                 break;
             case AlphaTab.Rendering.EffectBarGlyphSizing.GroupedPreBeatOnly:
             case AlphaTab.Rendering.EffectBarGlyphSizing.GroupedPreBeatToOnBeat:
-            case AlphaTab.Rendering.EffectBarGlyphSizing.GroupedPreBeatToPostBeat:
             case AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeatOnly:
-            case AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat:
-            case AlphaTab.Rendering.EffectBarGlyphSizing.GroupedPostBeatOnly:
                 if (b.Index > 0 || this.Index > 0){
                 // check if the previous beat also had this effect
                 var prevBeat = b.PreviousBeat;
@@ -9628,14 +9506,8 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
     },
     CreatePostBeatGlyphs: function (){
     },
-    get_TopPadding: function (){
-        return 0;
-    },
-    get_BottomPadding: function (){
-        return 0;
-    },
     Paint: function (cx, cy, canvas){
-        AlphaTab.Rendering.GroupedBarRenderer.prototype.Paint.call(this, cx, cy, canvas);
+        AlphaTab.Rendering.BarRendererBase.prototype.Paint.call(this, cx, cy, canvas);
         // canvas.setColor(new Color(0, 0, 200, 100));
         // canvas.fillRect(cx + x, cy + y, width, height);
         var glyphStart = this.get_BeatGlyphsStart();
@@ -9651,7 +9523,7 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
         }
     }
 };
-$Inherit(AlphaTab.Rendering.EffectBarRenderer, AlphaTab.Rendering.GroupedBarRenderer);
+$Inherit(AlphaTab.Rendering.EffectBarRenderer, AlphaTab.Rendering.BarRendererBase);
 AlphaTab.Rendering.EffectBarRendererFactory = function (info){
     this._info = null;
     AlphaTab.Rendering.BarRendererFactory.call(this);
@@ -9676,7 +9548,7 @@ AlphaTab.Rendering.Effects.BeatVibratoEffectInfo.prototype = {
         return (beat.Vibrato != AlphaTab.Model.VibratoType.None);
     },
     get_SizingMode: function (){
-        return AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
+        return AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeatOnly;
     },
     GetHeight: function (renderer){
         return 17 * renderer.get_Scale();
@@ -9720,7 +9592,7 @@ AlphaTab.Rendering.Effects.CrescendoEffectInfo.prototype = {
         return beat.Crescendo != AlphaTab.Model.CrescendoType.None;
     },
     get_SizingMode: function (){
-        return AlphaTab.Rendering.EffectBarGlyphSizing.GroupedPreBeatToPostBeat;
+        return AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeatOnly;
     },
     GetHeight: function (renderer){
         return 17 * renderer.get_Scale();
@@ -9860,7 +9732,7 @@ AlphaTab.Rendering.Effects.HarmonicsEffectInfo.prototype = {
         return 20 * renderer.get_Scale();
     },
     get_SizingMode: function (){
-        return AlphaTab.Rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat;
+        return AlphaTab.Rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
     },
     CreateNewGlyph: function (renderer, beat){
         return new AlphaTab.Rendering.Glyphs.TextGlyph(0, 0, AlphaTab.Rendering.Effects.HarmonicsEffectInfo.HarmonicToString(this._beatType), renderer.get_Resources().EffectFont, AlphaTab.Platform.Model.TextAlign.Left);
@@ -9895,7 +9767,7 @@ AlphaTab.Rendering.Effects.LetRingEffectInfo.prototype = {
         return 15 * renderer.get_Scale();
     },
     get_SizingMode: function (){
-        return AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
+        return AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeatOnly;
     },
     CreateNewGlyph: function (renderer, beat){
         return new AlphaTab.Rendering.Glyphs.LineRangedGlyph(0, 0, "LetRing");
@@ -9935,7 +9807,7 @@ AlphaTab.Rendering.Effects.NoteVibratoEffectInfo.prototype = {
         return 15 * renderer.get_Scale();
     },
     get_SizingMode: function (){
-        return AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
+        return AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeatOnly;
     },
     CreateNewGlyph: function (renderer, beat){
         return new AlphaTab.Rendering.Glyphs.VibratoGlyph(0, 5 * renderer.get_Scale(), 0.9);
@@ -9952,7 +9824,7 @@ AlphaTab.Rendering.Effects.CapoEffectInfo.prototype = {
         return beat.Index == 0 && beat.Voice.Bar.Index == 0 && beat.Voice.Bar.Staff.Track.Capo != 0;
     },
     get_SizingMode: function (){
-        return AlphaTab.Rendering.EffectBarGlyphSizing.SinglePreBeatToPostBeat;
+        return AlphaTab.Rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
     },
     GetHeight: function (renderer){
         return 20 * renderer.get_Scale();
@@ -9975,7 +9847,7 @@ AlphaTab.Rendering.Effects.PalmMuteEffectInfo.prototype = {
         return 20 * renderer.get_Scale();
     },
     get_SizingMode: function (){
-        return AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeatToPostBeat;
+        return AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeatOnly;
     },
     CreateNewGlyph: function (renderer, beat){
         return new AlphaTab.Rendering.Glyphs.LineRangedGlyph(0, 0, "PalmMute");
@@ -10095,7 +9967,7 @@ AlphaTab.Rendering.Effects.TrillEffectInfo.prototype = {
         return 20 * renderer.get_Scale();
     },
     get_SizingMode: function (){
-        return AlphaTab.Rendering.EffectBarGlyphSizing.SingleOnBeatToPostBeat;
+        return AlphaTab.Rendering.EffectBarGlyphSizing.SingleOnBeatOnly;
     },
     CreateNewGlyph: function (renderer, beat){
         return new AlphaTab.Rendering.Glyphs.TrillGlyph(0, 0, 0.9);
@@ -10356,10 +10228,8 @@ AlphaTab.Rendering.Glyphs.BeatContainerGlyph = function (beat, voiceContainer){
     this.Beat = null;
     this.PreNotes = null;
     this.OnNotes = null;
-    this.PostNotes = null;
     this.Ties = null;
     this.MinWidth = 0;
-    this.MinStretchForce = 0;
     this.OnTimeX = 0;
     AlphaTab.Rendering.Glyphs.Glyph.call(this, 0, 0);
     this.Beat = beat;
@@ -10369,20 +10239,8 @@ AlphaTab.Rendering.Glyphs.BeatContainerGlyph = function (beat, voiceContainer){
 AlphaTab.Rendering.Glyphs.BeatContainerGlyph.prototype = {
     RegisterLayoutingInfo: function (layoutings){
         var preBeatStretch = this.PreNotes.Width + this.OnNotes.Width / 2;
-        var postBeatStretch = this.OnNotes.Width / 2 + this.PostNotes.Width;
+        var postBeatStretch = this.OnNotes.Width / 2;
         layoutings.AddBeatSpring(this.Beat, this.MinWidth, preBeatStretch, postBeatStretch);
-    },
-    ApplyLayoutingInfo: function (layoutings){
-        //PreNotes.Width = layoutings.PreNoteSize;
-        //OnNotes.X = PreNotes.X + PreNotes.Width;
-        //OnNotes.Width = layoutings.OnNoteSize;
-        //PostNotes.X = OnNotes.X + OnNotes.Width;
-        //PostNotes.Width = layoutings.PostNoteSize;
-        //var newWidth = PostNotes.X + PostNotes.Width;
-        //if (Width < newWidth)
-        //{
-        //    Width = newWidth;
-        //}
     },
     DoLayout: function (){
         this.PreNotes.X = 0;
@@ -10393,25 +10251,22 @@ AlphaTab.Rendering.Glyphs.BeatContainerGlyph.prototype = {
         this.OnNotes.Renderer = this.Renderer;
         this.OnNotes.Container = this;
         this.OnNotes.DoLayout();
-        this.PostNotes.X = this.OnNotes.X + this.OnNotes.Width;
-        this.PostNotes.Renderer = this.Renderer;
-        this.PostNotes.Container = this;
-        this.PostNotes.DoLayout();
         var i = this.Beat.Notes.length - 1;
         while (i >= 0){
             this.CreateTies(this.Beat.Notes[i--]);
         }
-        this.MinWidth = this.PreNotes.Width + this.OnNotes.Width + this.PostNotes.Width;
+        this.MinWidth = this.PreNotes.Width + this.OnNotes.Width;
         this.Width = this.MinWidth;
         this.OnTimeX = this.OnNotes.X + this.OnNotes.Width / 2;
     },
-    UpdateBeamingHelper: function (){
+    ScaleToWidth: function (beatWidth){
         this.OnNotes.UpdateBeamingHelper();
+        this.Width = beatWidth;
     },
     CreateTies: function (n){
     },
     Paint: function (cx, cy, canvas){
-        if (this.Beat.Voice.get_IsEmpty() || this.Beat.get_IsRest())
+        if (this.Beat.Voice.get_IsEmpty())
             return;
         //canvas.Color = new Color(200, 0, 0, 100);
         //canvas.StrokeRect(cx + X, cy + Y + 15 * Beat.Voice.Index, Width, 10);
@@ -10434,12 +10289,6 @@ AlphaTab.Rendering.Glyphs.BeatContainerGlyph.prototype = {
         //{
         //    canvas.Color = new Color(0, 200, 0, 100);
         //    canvas.StrokeRect(cx + X + OnNotes.X, cy + Y + OnNotes.Y + 10, OnNotes.Width, 10);
-        //}
-        this.PostNotes.Paint(cx + this.X, cy + this.Y, canvas);
-        //if (Beat.Voice.Index == 0)
-        //{
-        //    canvas.Color = new Color(0, 0, 200, 100);
-        //    canvas.StrokeRect(cx + X + PostNotes.X, cy + Y + PostNotes.Y + 20, PostNotes.Width, 10);
         //}
         for (var i = 0,j = this.Ties.length; i < j; i++){
             var t = this.Ties[i];
@@ -10484,12 +10333,11 @@ AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase.prototype = {
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase, AlphaTab.Rendering.Glyphs.BeatGlyphBase);
-AlphaTab.Rendering.Glyphs.BendGlyph = function (n, width, bendValueHeight){
+AlphaTab.Rendering.Glyphs.BendGlyph = function (n, bendValueHeight){
     this._note = null;
     this._bendValueHeight = 0;
     AlphaTab.Rendering.Glyphs.Glyph.call(this, 0, 0);
     this._note = n;
-    this.Width = width;
     this._bendValueHeight = bendValueHeight;
 };
 AlphaTab.Rendering.Glyphs.BendGlyph.prototype = {
@@ -10538,6 +10386,28 @@ AlphaTab.Rendering.Glyphs.BendGlyph.prototype = {
         else {
             y2 += overflowOffset;
         }
+        // what type of arrow? (up/down)
+        var arrowOffset = 0;
+        var arrowSize = 6 * this.get_Scale();
+        if (secondPt.Value > firstPt.Value){
+            canvas.BeginPath();
+            canvas.MoveTo(x2, y2);
+            canvas.LineTo(x2 - arrowSize * 0.5, y2 + arrowSize);
+            canvas.LineTo(x2 + arrowSize * 0.5, y2 + arrowSize);
+            canvas.ClosePath();
+            canvas.Fill();
+            arrowOffset = arrowSize;
+        }
+        else if (secondPt.Value != firstPt.Value){
+            canvas.BeginPath();
+            canvas.MoveTo(x2, y2);
+            canvas.LineTo(x2 - arrowSize * 0.5, y2 - arrowSize);
+            canvas.LineTo(x2 + arrowSize * 0.5, y2 - arrowSize);
+            canvas.ClosePath();
+            canvas.Fill();
+            arrowOffset = -arrowSize;
+        }
+        canvas.Stroke();
         if (firstPt.Value == secondPt.Value){
             // draw horizontal line
             canvas.MoveTo(x1, y1);
@@ -10548,7 +10418,7 @@ AlphaTab.Rendering.Glyphs.BendGlyph.prototype = {
             if (x2 > x1){
                 // draw bezier lien from first to second point
                 canvas.MoveTo(x1, y1);
-                canvas.BezierCurveTo(x2, y1, x2, y2, x2, y2);
+                canvas.BezierCurveTo(x2, y1, x2, y2 + arrowOffset, x2, y2 + arrowOffset);
                 canvas.Stroke();
             }
             else {
@@ -10557,25 +10427,6 @@ AlphaTab.Rendering.Glyphs.BendGlyph.prototype = {
                 canvas.Stroke();
             }
         }
-        // what type of arrow? (up/down)
-        var arrowSize = 6 * this.get_Scale();
-        if (secondPt.Value > firstPt.Value){
-            canvas.BeginPath();
-            canvas.MoveTo(x2, y2);
-            canvas.LineTo(x2 - arrowSize * 0.5, y2 + arrowSize);
-            canvas.LineTo(x2 + arrowSize * 0.5, y2 + arrowSize);
-            canvas.ClosePath();
-            canvas.Fill();
-        }
-        else if (secondPt.Value != firstPt.Value){
-            canvas.BeginPath();
-            canvas.MoveTo(x2, y2);
-            canvas.LineTo(x2 - arrowSize * 0.5, y2 - arrowSize);
-            canvas.LineTo(x2 + arrowSize * 0.5, y2 - arrowSize);
-            canvas.ClosePath();
-            canvas.Fill();
-        }
-        canvas.Stroke();
         if (secondPt.Value != 0){
             var dV = secondPt.Value;
             var up = secondPt.Value > firstPt.Value;
@@ -10620,9 +10471,6 @@ AlphaTab.Rendering.Glyphs.BendGlyph.prototype = {
             default:
                 return steps + "/ 4";
         }
-    },
-    ScaleToWidth: function (width){
-        this.Width = width;
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.BendGlyph, AlphaTab.Rendering.Glyphs.Glyph);
@@ -11404,13 +11252,14 @@ AlphaTab.Rendering.Glyphs.NoteHeadGlyph.GetSymbol = function (duration){
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.NoteHeadGlyph, AlphaTab.Rendering.Glyphs.MusicFontGlyph);
-AlphaTab.Rendering.Glyphs.NoteNumberGlyph = function (x, y, n, isGrace){
+AlphaTab.Rendering.Glyphs.NoteNumberGlyph = function (x, y, n){
     this._noteString = null;
-    this._isGrace = false;
+    this._noteStringWidth = 0;
+    this._trillNoteString = null;
+    this._trillNoteStringWidth = 0;
     AlphaTab.Rendering.Glyphs.Glyph.call(this, x, y);
-    this._isGrace = isGrace;
     if (!n.IsTieDestination){
-        this._noteString = n.IsDead ? "X" : n.Fret.toString();
+        this._noteString = n.IsDead ? "x" : n.Fret.toString();
         if (n.IsGhost){
             this._noteString = "(" + this._noteString + ")";
         }
@@ -11421,18 +11270,23 @@ AlphaTab.Rendering.Glyphs.NoteNumberGlyph = function (x, y, n, isGrace){
     else {
         this._noteString = "";
     }
+    if (n.get_IsTrill()){
+        this._trillNoteString = "(" + n.get_TrillFret() + ")";
+    }
+    else {
+        this._trillNoteString = "";
+    }
 };
 AlphaTab.Rendering.Glyphs.NoteNumberGlyph.prototype = {
     DoLayout: function (){
-        this.Width = 10 * this.get_Scale();
-    },
-    CalculateWidth: function (){
-        this.Width = this.Renderer.get_Layout().Renderer.Canvas.MeasureText(this._noteString);
+        this.Renderer.get_Layout().Renderer.Canvas.set_Font(this.Renderer.get_Resources().TablatureFont);
+        this._noteStringWidth = this.Renderer.get_Layout().Renderer.Canvas.MeasureText(this._noteString);
+        this._trillNoteStringWidth = this.Renderer.get_Layout().Renderer.Canvas.MeasureText(this._trillNoteString);
+        this.Width = this._noteStringWidth + this._trillNoteStringWidth;
     },
     Paint: function (cx, cy, canvas){
-        if (this._noteString != null){
-            canvas.FillText(this._noteString.toLowerCase(), cx + this.X, cy + this.Y);
-        }
+        canvas.FillText(this._noteString, cx + this.X, cy + this.Y);
+        canvas.FillText(this._trillNoteString, cx + this.X + this._noteStringWidth, cy + this.Y);
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.NoteNumberGlyph, AlphaTab.Rendering.Glyphs.Glyph);
@@ -11834,10 +11688,6 @@ $StaticConstructor(function (){
     // ReSharper restore ForCanBeConvertedToForeach
 });
 $Inherit(AlphaTab.Rendering.Glyphs.ScoreBeatGlyph, AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase);
-AlphaTab.Rendering.Glyphs.ScoreBeatPostNotesGlyph = function (){
-    AlphaTab.Rendering.Glyphs.BeatGlyphBase.call(this);
-};
-$Inherit(AlphaTab.Rendering.Glyphs.ScoreBeatPostNotesGlyph, AlphaTab.Rendering.Glyphs.BeatGlyphBase);
 AlphaTab.Rendering.Glyphs.ScoreBeatPreNotesGlyph = function (){
     AlphaTab.Rendering.Glyphs.BeatGlyphBase.call(this);
 };
@@ -12179,7 +12029,7 @@ AlphaTab.Rendering.Glyphs.ScoreSlideLineGlyph.prototype = {
                 endY = cy + r.GetNoteY(this._startNote.SlideTarget) + 4.5;
             }
                 else {
-                endX = cx + this._parent.X + this._parent.PostNotes.X + this._parent.PostNotes.Width;
+                endX = cx + this._parent.X;
                 endY = startY;
             }
                 break;
@@ -12252,10 +12102,10 @@ AlphaTab.Rendering.Glyphs.TieGlyph.prototype = {
                 startX = cx + startNoteRenderer.GetNoteX(this.StartNote, true);
                 // line break: to bar end
                 if (endNoteRenderer == null || startNoteRenderer.Staff != endNoteRenderer.Staff){
-                    endX = cx + parent.X + parent.PostNotes.X + parent.PostNotes.Width;
+                    endX = cx + parent.X;
                 }
                 else {
-                    endX = cx + parent.X + parent.PostNotes.X + parent.PostNotes.Width;
+                    endX = cx + parent.X;
                     endX += endNoteRenderer.GetNoteX(this.EndNote, true);
                 }
                 startY = cy + startNoteRenderer.GetNoteY(this.StartNote) + this.YOffset;
@@ -12359,9 +12209,33 @@ AlphaTab.Rendering.Glyphs.SpacingGlyph = function (x, y, width, scaling){
 };
 $Inherit(AlphaTab.Rendering.Glyphs.SpacingGlyph, AlphaTab.Rendering.Glyphs.Glyph);
 AlphaTab.Rendering.Glyphs.TabBeatContainerGlyph = function (beat, voiceContainer){
+    this._bendGlyphs = null;
     AlphaTab.Rendering.Glyphs.BeatContainerGlyph.call(this, beat, voiceContainer);
 };
 AlphaTab.Rendering.Glyphs.TabBeatContainerGlyph.prototype = {
+    DoLayout: function (){
+        AlphaTab.Rendering.Glyphs.BeatContainerGlyph.prototype.DoLayout.call(this);
+        this._bendGlyphs = [];
+        for (var i = 0; i < this.Beat.Notes.length; i++){
+            var n = this.Beat.Notes[i];
+            if (n.get_HasBend()){
+                var bendValueHeight = 6;
+                var bendHeight = n.MaxBendPoint.Value * bendValueHeight;
+                this.Renderer.RegisterOverflowTop(bendHeight);
+                var bend = new AlphaTab.Rendering.Glyphs.BendGlyph(n, bendValueHeight);
+                bend.X = this.OnNotes.X + this.OnNotes.Width;
+                bend.Renderer = this.Renderer;
+                this._bendGlyphs.push(bend);
+            }
+        }
+    },
+    ScaleToWidth: function (beatWidth){
+        AlphaTab.Rendering.Glyphs.BeatContainerGlyph.prototype.ScaleToWidth.call(this, beatWidth);
+        for (var i = 0; i < this._bendGlyphs.length; i++){
+            var g = this._bendGlyphs[i];
+            g.Width = beatWidth - g.X;
+        }
+    },
     CreateTies: function (n){
         if (n.IsHammerPullOrigin){
             var tie = new AlphaTab.Rendering.Glyphs.TabTieGlyph(n, n.HammerPullDestination, this, false);
@@ -12374,6 +12248,13 @@ AlphaTab.Rendering.Glyphs.TabBeatContainerGlyph.prototype = {
         if (n.SlideType != AlphaTab.Model.SlideType.None){
             var l = new AlphaTab.Rendering.Glyphs.TabSlideLineGlyph(n.SlideType, n, this);
             this.Ties.push(l);
+        }
+    },
+    Paint: function (cx, cy, canvas){
+        AlphaTab.Rendering.Glyphs.BeatContainerGlyph.prototype.Paint.call(this, cx, cy, canvas);
+        for (var i = 0; i < this._bendGlyphs.length; i++){
+            var g = this._bendGlyphs[i];
+            g.Paint(cx + this.X, cy + this.Y, canvas);
         }
     }
 };
@@ -12433,54 +12314,16 @@ AlphaTab.Rendering.Glyphs.TabBeatGlyph.prototype = {
         }
     },
     CreateNoteGlyph: function (n){
-        var isGrace = this.Container.Beat.GraceType != AlphaTab.Model.GraceType.None;
         var tr = this.Renderer;
-        var noteNumberGlyph = new AlphaTab.Rendering.Glyphs.NoteNumberGlyph(0, 0, n, isGrace);
+        var noteNumberGlyph = new AlphaTab.Rendering.Glyphs.NoteNumberGlyph(0, 0, n);
         var l = n.Beat.Voice.Bar.Staff.Track.Tuning.length - n.String + 1;
         noteNumberGlyph.Y = tr.GetTabY(l, -2);
+        noteNumberGlyph.Renderer = this.Renderer;
+        noteNumberGlyph.DoLayout();
         this.NoteNumbers.AddNoteGlyph(noteNumberGlyph, n);
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.TabBeatGlyph, AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase);
-AlphaTab.Rendering.Glyphs.TabBeatPostNotesGlyph = function (){
-    this._scaleListeners = null;
-    AlphaTab.Rendering.Glyphs.BeatGlyphBase.call(this);
-    this._scaleListeners = [];
-};
-AlphaTab.Rendering.Glyphs.TabBeatPostNotesGlyph.prototype = {
-    AddGlyph: function (g){
-        AlphaTab.Rendering.Glyphs.GlyphGroup.prototype.AddGlyph.call(this, g);
-        if (true){
-            this._scaleListeners.push(g);
-        }
-    },
-    DoLayout: function (){
-        // note specific effects
-        this.NoteLoop($CreateDelegate(this, this.CreateNoteGlyphs));
-        AlphaTab.Rendering.Glyphs.BeatGlyphBase.prototype.DoLayout.call(this);
-    },
-    CreateNoteGlyphs: function (n){
-        if (n.get_IsTrill()){
-            this.AddGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 4 * this.get_Scale(), true));
-            var trillNote = new AlphaTab.Model.Note();
-            trillNote.IsGhost = true;
-            trillNote.Fret = n.get_TrillFret();
-            trillNote.String = n.String;
-            var tr = this.Renderer;
-            var trillNumberGlyph = new AlphaTab.Rendering.Glyphs.NoteNumberGlyph(0, 0, trillNote, true);
-            var l = n.Beat.Voice.Bar.Staff.Track.Tuning.length - n.String;
-            trillNumberGlyph.Y = tr.GetTabY(l, 0);
-            this.AddGlyph(trillNumberGlyph);
-        }
-        if (n.get_HasBend()){
-            var bendValueHeight = 6;
-            var bendHeight = n.MaxBendPoint.Value * bendValueHeight;
-            this.Renderer.RegisterOverflowTop(bendHeight);
-            this.AddGlyph(new AlphaTab.Rendering.Glyphs.BendGlyph(n, this.Width, bendValueHeight));
-        }
-    }
-};
-$Inherit(AlphaTab.Rendering.Glyphs.TabBeatPostNotesGlyph, AlphaTab.Rendering.Glyphs.BeatGlyphBase);
 AlphaTab.Rendering.Glyphs.TabBeatPreNotesGlyph = function (){
     AlphaTab.Rendering.Glyphs.BeatGlyphBase.call(this);
 };
@@ -12623,7 +12466,6 @@ AlphaTab.Rendering.Glyphs.TabNoteChordGlyph.prototype = {
             var n = this._noteLookup[note.String];
             var pos = this.X + n.X;
             if (onEnd){
-                n.CalculateWidth();
                 pos += n.Width;
             }
             return pos;
@@ -12749,7 +12591,7 @@ AlphaTab.Rendering.Glyphs.TabSlideLineGlyph.prototype = {
                 endY = cy + r.GetNoteY(this._startNote.SlideTarget) + endOffsetY;
             }
                 else {
-                endX = cx + this._parent.X + this._parent.PostNotes.X + this._parent.PostNotes.Width;
+                endX = cx + this._parent.X;
                 endY = startY;
             }
                 break;
@@ -12913,7 +12755,6 @@ AlphaTab.Rendering.Glyphs.VibratoGlyph.prototype = {
 };
 $Inherit(AlphaTab.Rendering.Glyphs.VibratoGlyph, AlphaTab.Rendering.Glyphs.EffectGlyph);
 AlphaTab.Rendering.Glyphs.VoiceContainerGlyph = function (x, y, voice){
-    this._layoutingInfo = null;
     this.BeatGlyphs = null;
     this.Voice = null;
     this.MinWidth = 0;
@@ -12923,16 +12764,26 @@ AlphaTab.Rendering.Glyphs.VoiceContainerGlyph = function (x, y, voice){
 };
 AlphaTab.Rendering.Glyphs.VoiceContainerGlyph.prototype = {
     ScaleToWidth: function (width){
-        var force = this._layoutingInfo.SpaceToForce(width);
+        var force = this.Renderer.LayoutingInfo.SpaceToForce(width);
         this.ScaleToForce(force);
     },
     ScaleToForce: function (force){
-        this.Width = this._layoutingInfo.CalculateVoiceWidth(force);
-        var positions = this._layoutingInfo.BuildOnTimePositions(force);
+        this.Width = this.Renderer.LayoutingInfo.CalculateVoiceWidth(force);
+        var positions = this.Renderer.LayoutingInfo.BuildOnTimePositions(force);
         for (var i = 0,j = this.BeatGlyphs.length; i < j; i++){
             var time = this.BeatGlyphs[i].Beat.get_AbsoluteStart();
             this.BeatGlyphs[i].X = positions[time] - this.BeatGlyphs[i].OnTimeX;
-            this.BeatGlyphs[i].UpdateBeamingHelper();
+            // size always previousl glyph after we know the position
+            // of the next glyph
+            if (i > 0){
+                var beatWidth = this.BeatGlyphs[i].X - this.BeatGlyphs[i - 1].X;
+                this.BeatGlyphs[i - 1].ScaleToWidth(beatWidth);
+            }
+            // for the last glyph size based on the full width
+            if (i == j - 1){
+                var beatWidth = this.Width - this.BeatGlyphs[this.BeatGlyphs.length - 1].X;
+                this.BeatGlyphs[i].ScaleToWidth(beatWidth);
+            }
         }
     },
     RegisterLayoutingInfo: function (info){
@@ -12942,8 +12793,7 @@ AlphaTab.Rendering.Glyphs.VoiceContainerGlyph.prototype = {
             b.RegisterLayoutingInfo(info);
         }
     },
-    ApplyLayoutingInfo: function (info){
-        this._layoutingInfo = info;
+    ApplyLayoutingInfo: function (){
         this.ScaleToForce(this.Renderer.get_Settings().StretchForce);
     },
     AddGlyph: function (g){
@@ -13015,7 +12865,7 @@ AlphaTab.Rendering.Glyphs.WhammyBarGlyph.prototype = {
         var tabBarRenderer = this.Renderer;
         var res = this.Renderer.get_Resources();
         var startX = cx + this.X + this._parent.OnNotes.Width / 2;
-        var endX = this._beat.NextBeat == null || this._beat.Voice != this._beat.NextBeat.Voice ? cx + this.X + this._parent.OnNotes.Width / 2 + this._parent.PostNotes.Width : cx + tabBarRenderer.GetBeatX(this._beat.NextBeat);
+        var endX = this._beat.NextBeat == null || this._beat.Voice != this._beat.NextBeat.Voice ? cx + this.X + this._parent.OnNotes.Width / 2 : cx + tabBarRenderer.GetBeatX(this._beat.NextBeat);
         var startY = cy + this.X;
         var textOffset = 3 * this.get_Scale();
         var sizeY = 60 * this.get_Scale();
@@ -13201,6 +13051,8 @@ AlphaTab.Rendering.Layout.HorizontalScreenLayout.prototype = {
         startIndex = Math.min(score.MasterBars.length - 1, Math.max(0, startIndex));
         var currentBarIndex = startIndex;
         var endBarIndex = this.Renderer.Settings.Layout.Get("count", score.MasterBars.length);
+        if (endBarIndex < 0)
+            endBarIndex = score.MasterBars.length;
         endBarIndex = startIndex + endBarIndex - 1;
         // map count to array index
         endBarIndex = Math.min(score.MasterBars.length - 1, Math.max(0, endBarIndex));
@@ -13210,36 +13062,37 @@ AlphaTab.Rendering.Layout.HorizontalScreenLayout.prototype = {
         var countPerPartial = this.Renderer.Settings.Layout.Get("countPerPartial", 10);
         var partials = [];
         var currentPartial = new AlphaTab.Rendering.Layout.HorizontalScreenLayoutPartialInfo();
-        while (currentBarIndex <= endBarIndex){
-            var result = this._group.AddBars(this.Renderer.Tracks, currentBarIndex);
-            // if we detect that the new renderer is linked to the previous
-            // renderer, we need to put it into the previous partial 
-            var renderer = this._group.GetBarRenderer(currentBarIndex);
-            if (currentPartial.MasterBars.length == 0 && result.IsLinkedToPrevious && partials.length > 0){
-                var previousPartial = partials[partials.length - 1];
-                previousPartial.MasterBars.push(score.MasterBars[currentBarIndex]);
-                previousPartial.Width += renderer.Width;
-            }
-            else {
-                currentPartial.MasterBars.push(score.MasterBars[currentBarIndex]);
-                currentPartial.Width += renderer.Width;
-                // no targetPartial here because previous partials already handled this code
-                if (currentPartial.MasterBars.length >= countPerPartial){
-                    if (partials.length == 0){
-                        currentPartial.Width += this._group.X + this._group.AccoladeSpacing;
-                    }
-                    partials.push(currentPartial);
-                    currentPartial = new AlphaTab.Rendering.Layout.HorizontalScreenLayoutPartialInfo();
+        if (this.Renderer.Settings.Staves.length > 0){
+            while (currentBarIndex <= endBarIndex){
+                var result = this._group.AddBars(this.Renderer.Tracks, currentBarIndex);
+                // if we detect that the new renderer is linked to the previous
+                // renderer, we need to put it into the previous partial 
+                if (currentPartial.MasterBars.length == 0 && result.IsLinkedToPrevious && partials.length > 0){
+                    var previousPartial = partials[partials.length - 1];
+                    previousPartial.MasterBars.push(score.MasterBars[currentBarIndex]);
+                    previousPartial.Width += result.Width;
                 }
+                else {
+                    currentPartial.MasterBars.push(score.MasterBars[currentBarIndex]);
+                    currentPartial.Width += result.Width;
+                    // no targetPartial here because previous partials already handled this code
+                    if (currentPartial.MasterBars.length >= countPerPartial){
+                        if (partials.length == 0){
+                            currentPartial.Width += this._group.X + this._group.AccoladeSpacing;
+                        }
+                        partials.push(currentPartial);
+                        currentPartial = new AlphaTab.Rendering.Layout.HorizontalScreenLayoutPartialInfo();
+                    }
+                }
+                currentBarIndex++;
             }
-            currentBarIndex++;
-        }
-        // don't miss the last partial if not empty
-        if (currentPartial.MasterBars.length >= 0){
-            if (partials.length == 0){
-                currentPartial.Width += this._group.X + this._group.AccoladeSpacing;
+            // don't miss the last partial if not empty
+            if (currentPartial.MasterBars.length >= 0){
+                if (partials.length == 0){
+                    currentPartial.Width += this._group.X + this._group.AccoladeSpacing;
+                }
+                partials.push(currentPartial);
             }
-            partials.push(currentPartial);
         }
         this._group.FinalizeGroup(this);
         this.Height = this._group.Y + this._group.get_Height() + AlphaTab.Rendering.Layout.HorizontalScreenLayout.PagePadding[3];
@@ -13265,8 +13118,7 @@ AlphaTab.Rendering.Layout.HorizontalScreenLayout.prototype = {
             canvas.BeginRender(partial.Width, this.Height);
             canvas.set_Color(this.Renderer.RenderingResources.MainGlyphColor);
             canvas.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Left);
-            var renderer = this._group.GetBarRenderer(partial.MasterBars[0].Index);
-            var renderX = renderer.X + this._group.AccoladeSpacing;
+            var renderX = this._group.GetBarX(partial.MasterBars[0].Index) + this._group.AccoladeSpacing;
             if (i == 0){
                 renderX -= this._group.X + this._group.AccoladeSpacing;
             }
@@ -13535,13 +13387,13 @@ AlphaTab.Rendering.RenderingResources.prototype = {
 AlphaTab.Rendering.RhythmBarRenderer = function (bar, direction){
     this._direction = AlphaTab.Rendering.Utils.BeamDirection.Up;
     this._helpers = null;
-    AlphaTab.Rendering.GroupedBarRenderer.call(this, bar);
+    AlphaTab.Rendering.BarRendererBase.call(this, bar);
     this._direction = direction;
 };
 AlphaTab.Rendering.RhythmBarRenderer.prototype = {
     DoLayout: function (){
         this._helpers = this.Staff.StaveGroup.Helpers.Helpers[this.Bar.Staff.Track.Index][this.Bar.Staff.Index][this.Bar.Index];
-        AlphaTab.Rendering.GroupedBarRenderer.prototype.DoLayout.call(this);
+        AlphaTab.Rendering.BarRendererBase.prototype.DoLayout.call(this);
         this.Height = this.Staff.GetSetting("rhythm-height", 24) * this.get_Scale();
         this.IsEmpty = false;
     },
@@ -13558,12 +13410,11 @@ AlphaTab.Rendering.RhythmBarRenderer.prototype = {
             var container = new AlphaTab.Rendering.Glyphs.BeatContainerGlyph(b, this.GetOrCreateVoiceContainer(voice));
             container.PreNotes = new AlphaTab.Rendering.Glyphs.BeatGlyphBase();
             container.OnNotes = new AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase();
-            container.PostNotes = new AlphaTab.Rendering.Glyphs.BeatGlyphBase();
             this.AddBeatGlyph(container);
         }
     },
     Paint: function (cx, cy, canvas){
-        AlphaTab.Rendering.GroupedBarRenderer.prototype.Paint.call(this, cx, cy, canvas);
+        AlphaTab.Rendering.BarRendererBase.prototype.Paint.call(this, cx, cy, canvas);
         for (var i = 0,j = this._helpers.BeamHelpers.length; i < j; i++){
             var v = this._helpers.BeamHelpers[i];
             for (var k = 0,l = v.length; k < l; k++){
@@ -13687,7 +13538,7 @@ AlphaTab.Rendering.RhythmBarRenderer.PaintSingleBar = function (canvas, x1, y1, 
     canvas.ClosePath();
     canvas.Fill();
 };
-$Inherit(AlphaTab.Rendering.RhythmBarRenderer, AlphaTab.Rendering.GroupedBarRenderer);
+$Inherit(AlphaTab.Rendering.RhythmBarRenderer, AlphaTab.Rendering.BarRendererBase);
 AlphaTab.Rendering.RhythmBarRendererFactory = function (direction){
     this._direction = AlphaTab.Rendering.Utils.BeamDirection.Up;
     AlphaTab.Rendering.BarRendererFactory.call(this);
@@ -13705,7 +13556,7 @@ AlphaTab.Rendering.ScoreBarRenderer = function (bar){
     this._helpers = null;
     this._startSpacing = false;
     this.AccidentalHelper = null;
-    AlphaTab.Rendering.GroupedBarRenderer.call(this, bar);
+    AlphaTab.Rendering.BarRendererBase.call(this, bar);
     this.AccidentalHelper = new AlphaTab.Rendering.Utils.AccidentalHelper();
 };
 AlphaTab.Rendering.ScoreBarRenderer.prototype = {
@@ -13741,7 +13592,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
     },
     DoLayout: function (){
         this._helpers = this.Staff.StaveGroup.Helpers.Helpers[this.Bar.Staff.Track.Index][this.Bar.Staff.Index][this.Bar.Index];
-        AlphaTab.Rendering.GroupedBarRenderer.prototype.DoLayout.call(this);
+        AlphaTab.Rendering.BarRendererBase.prototype.DoLayout.call(this);
         this.Height = (this.get_LineOffset() * 4) + this.get_TopPadding() + this.get_BottomPadding();
         if (this.Index == 0){
             this.Staff.RegisterStaveTop(this.get_GlyphOverflow());
@@ -13785,7 +13636,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
         }
     },
     Paint: function (cx, cy, canvas){
-        AlphaTab.Rendering.GroupedBarRenderer.prototype.Paint.call(this, cx, cy, canvas);
+        AlphaTab.Rendering.BarRendererBase.prototype.Paint.call(this, cx, cy, canvas);
         this.PaintBeams(cx, cy, canvas);
         this.PaintTuplets(cx, cy, canvas);
     },
@@ -14268,7 +14119,6 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
             container.PreNotes = new AlphaTab.Rendering.Glyphs.ScoreBeatPreNotesGlyph();
             container.OnNotes = new AlphaTab.Rendering.Glyphs.ScoreBeatGlyph();
             container.OnNotes.BeamingHelper = this._helpers.BeamHelperLookup[v.Index][b.Index];
-            container.PostNotes = new AlphaTab.Rendering.Glyphs.ScoreBeatPostNotesGlyph();
             this.AddBeatGlyph(container);
         }
     },
@@ -14283,7 +14133,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
         return (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2);
     },
     PaintBackground: function (cx, cy, canvas){
-        AlphaTab.Rendering.GroupedBarRenderer.prototype.PaintBackground.call(this, cx, cy, canvas);
+        AlphaTab.Rendering.BarRendererBase.prototype.PaintBackground.call(this, cx, cy, canvas);
         var res = this.get_Resources();
         //var c = new Color((byte)Random.Next(255),
         //                  (byte)Random.Next(255),
@@ -14321,7 +14171,7 @@ AlphaTab.Rendering.ScoreBarRenderer.PaintSingleBar = function (canvas, x1, y1, x
     canvas.ClosePath();
     canvas.Fill();
 };
-$Inherit(AlphaTab.Rendering.ScoreBarRenderer, AlphaTab.Rendering.GroupedBarRenderer);
+$Inherit(AlphaTab.Rendering.ScoreBarRenderer, AlphaTab.Rendering.BarRendererBase);
 AlphaTab.Rendering.ScoreBarRendererFactory = function (){
     AlphaTab.Rendering.BarRendererFactory.call(this);
 };
@@ -14457,6 +14307,8 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
 AlphaTab.Rendering.Staves = AlphaTab.Rendering.Staves || {};
 AlphaTab.Rendering.Staves.BarLayoutingInfo = function (){
     this.Sizes = null;
+    this.PreBeatSize = 0;
+    this.PostBeatSize = 0;
     this.VoiceSize = 0;
     this.MinStretchForce = 0;
     this.TotalSpringConstant = 0;
@@ -14563,7 +14415,7 @@ AlphaTab.Rendering.Staves.BarLayoutingInfo.prototype = {
         if (spring.SmallestDuration == 0){
             minDuration = duration;
         }
-        var phi = 1 + 1 * Math.log2(duration / 30);
+        var phi = 1 + 0.6 * Math.log2(duration / 30);
         return (minDuration / duration) * 1 / (phi * 10);
     },
     SpaceToForce: function (space){
@@ -14619,6 +14471,7 @@ AlphaTab.Rendering.Staves.Spring = function (){
 AlphaTab.Rendering.Staves.Staff = function (staff, staveId, factory, settings){
     this._factory = null;
     this._settings = null;
+    this._barRendererLookup = null;
     this.StaveTrackGroup = null;
     this.StaveGroup = null;
     this.BarRenderers = null;
@@ -14636,6 +14489,7 @@ AlphaTab.Rendering.Staves.Staff = function (staff, staveId, factory, settings){
     this.IsFirstInAccolade = false;
     this.IsLastInAccolade = false;
     this.BarRenderers = [];
+    this._barRendererLookup = {};
     this.ModelStaff = staff;
     this.StaveId = staveId;
     this._factory = factory;
@@ -14755,6 +14609,7 @@ AlphaTab.Rendering.Staves.StaveTrackGroup = function (staveGroup, track){
 AlphaTab.Rendering.Staves.AddBarsToStaveGroupResult = function (){
     this.Width = 0;
     this.IsLinkedToPrevious = false;
+    this.Renderer = null;
 };
 AlphaTab.Rendering.Staves.StaveGroup = function (){
     this._firstStaffInAccolade = null;
@@ -14821,7 +14676,7 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
         var realWidth = 0;
         for (var i = 0,j = this._allStaves.length; i < j; i++){
             var s = this._allStaves[i];
-            s.BarRenderers[s.BarRenderers.length - 1].ApplyLayoutingInfo(maxSizes);
+            s.BarRenderers[s.BarRenderers.length - 1].ApplyLayoutingInfo();
             if (s.BarRenderers[s.BarRenderers.length - 1].Width > realWidth){
                 realWidth = s.BarRenderers[s.BarRenderers.length - 1].Width;
             }
@@ -14829,13 +14684,6 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
         this.Width += realWidth;
         result.Width = realWidth;
         return result;
-    },
-    GetBarRenderer: function (barIndex){
-        var stave = this._firstStaffInAccolade;
-        if (barIndex >= stave.BarRenderers.length){
-            return null;
-        }
-        return stave.BarRenderers[barIndex];
     },
     GetStaveTrackGroup: function (track){
         for (var i = 0,j = this.Staves.length; i < j; i++){
@@ -14982,6 +14830,14 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
         for (var i = 0,j = this._firstStaffInAccolade.BarRenderers.length; i < j; i++){
             this._firstStaffInAccolade.BarRenderers[i].BuildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, this.X + this._firstStaffInAccolade.X);
         }
+    },
+    GetBarX: function (index){
+        if (this._firstStaffInAccolade == null || this.Layout.Renderer.Tracks.length == 0){
+            return 0;
+        }
+        var bar = this.Layout.Renderer.Tracks[0].Staves[0].Bars[index];
+        var renderer = this.Layout.GetRendererForBar(this._firstStaffInAccolade.StaveId, bar);
+        return renderer.X;
     }
 };
 $StaticConstructor(function (){
@@ -14989,7 +14845,7 @@ $StaticConstructor(function (){
 });
 AlphaTab.Rendering.TabBarRenderer = function (bar){
     this._helpers = null;
-    AlphaTab.Rendering.GroupedBarRenderer.call(this, bar);
+    AlphaTab.Rendering.BarRendererBase.call(this, bar);
 };
 AlphaTab.Rendering.TabBarRenderer.prototype = {
     get_LineOffset: function (){
@@ -15018,7 +14874,7 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
     },
     DoLayout: function (){
         this._helpers = this.Staff.StaveGroup.Helpers.Helpers[this.Bar.Staff.Track.Index][this.Bar.Staff.Index][this.Bar.Index];
-        AlphaTab.Rendering.GroupedBarRenderer.prototype.DoLayout.call(this);
+        AlphaTab.Rendering.BarRendererBase.prototype.DoLayout.call(this);
         this.Height = this.get_LineOffset() * (this.Bar.Staff.Track.Tuning.length - 1) + (this.get_NumberOverflow() * 2);
         if (this.Index == 0){
             this.Staff.RegisterStaveTop(this.get_NumberOverflow());
@@ -15049,8 +14905,8 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
             var container = new AlphaTab.Rendering.Glyphs.TabBeatContainerGlyph(b, this.GetOrCreateVoiceContainer(v));
             container.PreNotes = new AlphaTab.Rendering.Glyphs.TabBeatPreNotesGlyph();
             container.OnNotes = new AlphaTab.Rendering.Glyphs.TabBeatGlyph();
+            container.OnNotes.Renderer = this;
             container.OnNotes.BeamingHelper = this._helpers.BeamHelperLookup[v.Index][b.Index];
-            container.PostNotes = new AlphaTab.Rendering.Glyphs.TabBeatPostNotesGlyph();
             this.AddBeatGlyph(container);
         }
     },
@@ -15085,7 +14941,7 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
         return (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2);
     },
     PaintBackground: function (cx, cy, canvas){
-        AlphaTab.Rendering.GroupedBarRenderer.prototype.PaintBackground.call(this, cx, cy, canvas);
+        AlphaTab.Rendering.BarRendererBase.prototype.PaintBackground.call(this, cx, cy, canvas);
         var res = this.get_Resources();
         //
         // draw string lines
@@ -15111,7 +14967,7 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
 $StaticConstructor(function (){
     AlphaTab.Rendering.TabBarRenderer.LineSpacing = 10;
 });
-$Inherit(AlphaTab.Rendering.TabBarRenderer, AlphaTab.Rendering.GroupedBarRenderer);
+$Inherit(AlphaTab.Rendering.TabBarRenderer, AlphaTab.Rendering.BarRendererBase);
 AlphaTab.Rendering.TabBarRendererFactory = function (){
     AlphaTab.Rendering.BarRendererFactory.call(this);
     this.HideOnPercussionTrack = true;

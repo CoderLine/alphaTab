@@ -53,7 +53,6 @@ namespace AlphaTab.Rendering.Glyphs
                 var pos = X + n.X;
                 if (onEnd)
                 {
-                    n.CalculateWidth();
                     pos += n.Width;
                 }
                 return pos;

@@ -25,7 +25,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This BarRenderer renders a bar using guitar tablature notation
     /// </summary>
-    public class TabBarRenderer : GroupedBarRenderer
+    public class TabBarRenderer : BarRendererBase
     {
         public const float LineSpacing = 10;
 
@@ -123,8 +123,8 @@ namespace AlphaTab.Rendering
                 var container = new TabBeatContainerGlyph(b, GetOrCreateVoiceContainer(v));
                 container.PreNotes = new TabBeatPreNotesGlyph();
                 container.OnNotes = new TabBeatGlyph();
+                container.OnNotes.Renderer = this;
                 container.OnNotes.BeamingHelper = _helpers.BeamHelperLookup[v.Index][b.Index];
-                container.PostNotes = new TabBeatPostNotesGlyph();
                 AddBeatGlyph(container);
             }
         }

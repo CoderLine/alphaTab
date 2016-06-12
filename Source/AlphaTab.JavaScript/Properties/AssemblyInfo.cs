@@ -55,7 +55,6 @@ using SharpKit.JavaScript;
 [assembly: JsType(Export = false, TargetType = typeof(IFileLoader))]
 [assembly: JsType(Export = false, TargetType = typeof(IEffectBarRendererInfo))]
 [assembly: JsType(Export = false, TargetType = typeof(IScoreRenderer))]
-[assembly: JsType(Export = false, TargetType = typeof(IPostBeatNoteScaleListener))]
 
 [assembly: JsType(Export = false, TargetType = typeof(IXmlAttributeCollection))]
 [assembly: JsType(Export = false, TargetType = typeof(IXmlDocument))]

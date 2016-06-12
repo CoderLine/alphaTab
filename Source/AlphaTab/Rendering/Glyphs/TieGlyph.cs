@@ -48,10 +48,8 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (EndNote == null) return;
 
-            var startNoteRenderer =
-                    (GroupedBarRenderer)Renderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, StartNote.Beat.Voice.Bar);
-            var endNoteRenderer =
-                    (GroupedBarRenderer)Renderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, EndNote.Beat.Voice.Bar);
+            var startNoteRenderer = Renderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, StartNote.Beat.Voice.Bar);
+            var endNoteRenderer = Renderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, EndNote.Beat.Voice.Bar);
 
             float startX = 0;
             float endX = 0;
@@ -74,13 +72,13 @@ namespace AlphaTab.Rendering.Glyphs
                     // line break: to bar end
                     if (endNoteRenderer == null || startNoteRenderer.Staff != endNoteRenderer.Staff)
                     {
-                        endX = cx + parent.X + parent.PostNotes.X + parent.PostNotes.Width;
+                        endX = cx + parent.X;
                     }
                     // bar break: to tie destination 
                     // differs only by addition of EndNote X coordinate
                     else
                     {
-                        endX = cx + parent.X + parent.PostNotes.X + parent.PostNotes.Width;
+                        endX = cx + parent.X;
                         endX += endNoteRenderer.GetNoteX(EndNote);
                     }
 

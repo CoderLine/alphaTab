@@ -31,6 +31,7 @@ namespace AlphaTab.Rendering.Staves
     {
         private readonly BarRendererFactory _factory;
         private readonly FastDictionary<string, object> _settings;
+        private readonly FastDictionary<int, BarRendererBase> _barRendererLookup;
 
         public StaveTrackGroup StaveTrackGroup { get; set; }
         public StaveGroup StaveGroup { get; set; }
@@ -69,6 +70,7 @@ namespace AlphaTab.Rendering.Staves
         public Staff(Model.Staff staff, string staveId, BarRendererFactory factory, FastDictionary<string, object> settings)
         {
             BarRenderers = new FastList<BarRendererBase>();
+            _barRendererLookup = new FastDictionary<int, BarRendererBase>();
             ModelStaff = staff;
             StaveId = staveId;
             _factory = factory;

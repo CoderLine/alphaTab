@@ -24,20 +24,14 @@ namespace AlphaTab.Rendering
     {
         SinglePreBeatOnly,
         SinglePreBeatToOnBeat,
-        SinglePreBeatToPostBeat,
 
         SingleOnBeatOnly,
-        SingleOnBeatToPostBeat,
 
         SinglePostBeatOnly,
 
         GroupedPreBeatOnly,
         GroupedPreBeatToOnBeat,
-        GroupedPreBeatToPostBeat,
 
-        GroupedOnBeatOnly,
-        GroupedOnBeatToPostBeat,
-
-        GroupedPostBeatOnly
+        GroupedOnBeatOnly
     }
 }

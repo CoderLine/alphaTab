@@ -33,6 +33,9 @@ namespace AlphaTab.Rendering.Staves
         private const int MinDurationWidth = 10;
         public FastDictionary<string, float> Sizes { get; set; }
 
+        public float PreBeatSize { get; set; }
+        public float PostBeatSize { get; set; }
+
         public float VoiceSize { get; set; }
         public float MinStretchForce { get; set; }
         public float TotalSpringConstant { get; set; }
@@ -185,7 +188,7 @@ namespace AlphaTab.Rendering.Staves
             {
                 minDuration = duration;
             }
-            var phi = 1 + 1f * Std.Log2(duration / (float)MinDuration);
+            var phi = 1 + 0.6f * Std.Log2(duration / (float)MinDuration);
             return (minDuration / duration) * 1 / (phi * MinDurationWidth);
         }
 

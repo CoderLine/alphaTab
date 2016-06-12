@@ -26,7 +26,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This bar renderer can render repeat endings.
     /// </summary>
-    public class AlternateEndingsBarRenderer : GroupedBarRenderer
+    public class AlternateEndingsBarRenderer : BarRendererBase
     {
         private const float Padding = 3;
 
@@ -45,11 +45,6 @@ namespace AlphaTab.Rendering
                     _endings.Add(i);
                 }
             }
-        }
-
-        public override void FinalizeRenderer(ScoreLayout layout)
-        {
-            base.FinalizeRenderer(layout);
             IsEmpty = _endings.Count == 0;
         }
 
@@ -71,7 +66,6 @@ namespace AlphaTab.Rendering
                 var container = new BeatContainerGlyph(b, GetOrCreateVoiceContainer(voice));
                 container.PreNotes = new BeatGlyphBase();
                 container.OnNotes = new BeatOnNoteGlyphBase();
-                container.PostNotes = new BeatGlyphBase();
                 AddBeatGlyph(container);
             }
         }
@@ -94,17 +88,6 @@ namespace AlphaTab.Rendering
             }
             _endingsString = endingsStrings.ToString();
         }
-
-        public override float TopPadding
-        {
-            get { return 0; }
-        }
-
-        public override float BottomPadding
-        {
-            get { return 0; }
-        }
-
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {

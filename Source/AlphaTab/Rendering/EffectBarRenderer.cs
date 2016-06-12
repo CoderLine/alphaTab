@@ -27,7 +27,7 @@ namespace AlphaTab.Rendering
     /// This renderer is responsible for displaying effects above or below the other staves
     /// like the vibrato. 
     /// </summary>
-    public class EffectBarRenderer : GroupedBarRenderer
+    public class EffectBarRenderer : BarRendererBase
     {
         private readonly IEffectBarRendererInfo _info;
         private readonly FastList<FastList<EffectGlyph>> _uniqueEffectGlyphs;
@@ -106,28 +106,8 @@ namespace AlphaTab.Rendering
                     g.Width = (pos.X + container.X + pos.Width) - g.X;
                     break;
 
-                case EffectBarGlyphSizing.SinglePreBeatToPostBeat:
-                    pos = container.PreNotes;
-                    g.X = pos.X + container.X;
-                    pos = container.PostNotes;
-                    g.Width = (pos.X + container.X + pos.Width) - g.X;
-                    break;
-
                 case EffectBarGlyphSizing.SingleOnBeatOnly:
                     pos = container.OnNotes;
-                    g.X = pos.X + container.X;
-                    g.Width = pos.Width;
-                    break;
-
-                case EffectBarGlyphSizing.SingleOnBeatToPostBeat:
-                    pos = container.OnNotes;
-                    g.X = pos.X + container.X;
-                    pos = container.PostNotes;
-                    g.Width = (pos.X + container.X + pos.Width) - g.X;
-                    break;
-
-                case EffectBarGlyphSizing.SinglePostBeatOnly:
-                    pos = container.PostNotes;
                     g.X = pos.X + container.X;
                     g.Width = pos.Width;
                     break;
@@ -156,47 +136,11 @@ namespace AlphaTab.Rendering
                     }
                     break;
 
-                case EffectBarGlyphSizing.GroupedPreBeatToPostBeat:
-                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SinglePreBeatToPostBeat, beatIndex, voice, prevGlyph); }
-                    else
-                    {
-                        pos = container.PostNotes;
-                        var posR = (EffectBarRenderer)pos.Renderer;
-                        var gR = (EffectBarRenderer)g.Renderer;
-                        g.Width = (posR.X + posR.BeatGlyphsStart + container.X + pos.X + pos.Width) - (gR.X + gR.BeatGlyphsStart + g.X);
-                        g.ExpandTo(container.Beat);
-                    }
-                    break;
-
                 case EffectBarGlyphSizing.GroupedOnBeatOnly:
                     if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SingleOnBeatOnly, beatIndex, voice, prevGlyph); }
                     else
                     {
                         pos = container.OnNotes;
-                        var posR = (EffectBarRenderer)pos.Renderer;
-                        var gR = (EffectBarRenderer)g.Renderer;
-                        g.Width = (posR.X + posR.BeatGlyphsStart + container.X + pos.X + pos.Width) - (gR.X + gR.BeatGlyphsStart + g.X);
-                        g.ExpandTo(container.Beat);
-                    }
-                    break;
-
-                case EffectBarGlyphSizing.GroupedOnBeatToPostBeat:
-                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SingleOnBeatToPostBeat, beatIndex, voice, prevGlyph); }
-                    else
-                    {
-                        pos = container.PostNotes;
-                        var posR = (EffectBarRenderer)pos.Renderer;
-                        var gR = (EffectBarRenderer)g.Renderer;
-                        g.Width = (posR.X + posR.BeatGlyphsStart + container.X + pos.X + pos.Width) - (gR.X + gR.BeatGlyphsStart + g.X);
-                        g.ExpandTo(container.Beat);
-                    }
-                    break;
-
-                case EffectBarGlyphSizing.GroupedPostBeatOnly:
-                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.GroupedPostBeatOnly, beatIndex, voice, prevGlyph); }
-                    else
-                    {
-                        pos = container.PostNotes;
                         var posR = (EffectBarRenderer)pos.Renderer;
                         var gR = (EffectBarRenderer)g.Renderer;
                         g.Width = (posR.X + posR.BeatGlyphsStart + container.X + pos.X + pos.Width) - (gR.X + gR.BeatGlyphsStart + g.X);
@@ -231,7 +175,6 @@ namespace AlphaTab.Rendering
                 var container = new BeatContainerGlyph(b, GetOrCreateVoiceContainer(v));
                 container.PreNotes = new BeatGlyphBase();
                 container.OnNotes = new BeatOnNoteGlyphBase();
-                container.PostNotes = new BeatGlyphBase();
                 AddBeatGlyph(container);
 
                 if (_info.ShouldCreateGlyph(this, b))
@@ -249,9 +192,7 @@ namespace AlphaTab.Rendering
             {
                 case EffectBarGlyphSizing.SinglePreBeatOnly:
                 case EffectBarGlyphSizing.SinglePreBeatToOnBeat:
-                case EffectBarGlyphSizing.SinglePreBeatToPostBeat:
                 case EffectBarGlyphSizing.SingleOnBeatOnly:
-                case EffectBarGlyphSizing.SingleOnBeatToPostBeat:
                 case EffectBarGlyphSizing.SinglePostBeatOnly:
                     var g = _info.CreateNewGlyph(this, b);
                     g.Renderer = this;
@@ -262,10 +203,7 @@ namespace AlphaTab.Rendering
 
                 case EffectBarGlyphSizing.GroupedPreBeatOnly:
                 case EffectBarGlyphSizing.GroupedPreBeatToOnBeat:
-                case EffectBarGlyphSizing.GroupedPreBeatToPostBeat:
                 case EffectBarGlyphSizing.GroupedOnBeatOnly:
-                case EffectBarGlyphSizing.GroupedOnBeatToPostBeat:
-                case EffectBarGlyphSizing.GroupedPostBeatOnly:
                     if (b.Index > 0 || Index > 0)
                     {
                         // check if the previous beat also had this effect
@@ -318,16 +256,6 @@ namespace AlphaTab.Rendering
         protected override void CreatePostBeatGlyphs()
         {
 
-        }
-
-        public override float TopPadding
-        {
-            get { return 0; }
-        }
-
-        public override float BottomPadding
-        {
-            get { return 0; }
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)

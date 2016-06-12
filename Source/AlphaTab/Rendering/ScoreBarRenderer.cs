@@ -28,7 +28,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This BarRenderer renders a bar using standard music notation. 
     /// </summary>
-    public class ScoreBarRenderer : GroupedBarRenderer
+    public class ScoreBarRenderer : BarRendererBase
     {
         /// <summary>
         /// The step offsets of sharp symbols for sharp key signatures.
@@ -809,7 +809,6 @@ namespace AlphaTab.Rendering
                 container.PreNotes = new ScoreBeatPreNotesGlyph();
                 container.OnNotes = new ScoreBeatGlyph();
                 container.OnNotes.BeamingHelper = _helpers.BeamHelperLookup[v.Index][b.Index];
-                container.PostNotes = new ScoreBeatPostNotesGlyph();
                 AddBeatGlyph(container);
             }
         }

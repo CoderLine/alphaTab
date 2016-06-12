@@ -28,7 +28,7 @@ namespace AlphaTab.Rendering.Effects
             return beat.Crescendo != CrescendoType.None;
         }
 
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.GroupedPreBeatToPostBeat; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.GroupedOnBeatOnly; } }
         public float GetHeight(EffectBarRenderer renderer)
         {
             return CrescendoGlyph.Height * renderer.Scale;

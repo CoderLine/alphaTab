@@ -80,7 +80,7 @@ namespace AlphaTab.Rendering.Glyphs
             var res = Renderer.Resources;
             var startX = cx + X + _parent.OnNotes.Width / 2;
             var endX = _beat.NextBeat == null || _beat.Voice != _beat.NextBeat.Voice
-                    ? cx + X + _parent.OnNotes.Width / 2 + _parent.PostNotes.Width
+                    ? cx + X + _parent.OnNotes.Width / 2
                     : cx + tabBarRenderer.GetBeatX(_beat.NextBeat);
             var startY = cy + X;
             var textOffset = 3 * Scale;

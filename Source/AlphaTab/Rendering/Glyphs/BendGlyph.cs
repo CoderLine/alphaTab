@@ -18,19 +18,19 @@
 using System;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class BendGlyph : Glyph, IPostBeatNoteScaleListener
+    public class BendGlyph : Glyph
     {
         private readonly Note _note;
         private readonly float _bendValueHeight;
 
-        public BendGlyph(Note n, float width, float bendValueHeight)
+        public BendGlyph(Note n, float bendValueHeight)
             : base(0, 0)
         {
             _note = n;
-            Width = width;
             _bendValueHeight = bendValueHeight;
         }
 
@@ -97,6 +97,31 @@ namespace AlphaTab.Rendering.Glyphs
                 y2 += overflowOffset;
             }
 
+            // what type of arrow? (up/down)
+            var arrowOffset = 0f;
+            var arrowSize = 6 * Scale;
+            if (secondPt.Value > firstPt.Value)
+            {
+                canvas.BeginPath();
+                canvas.MoveTo(x2, y2);
+                canvas.LineTo(x2 - arrowSize * 0.5f, y2 + arrowSize);
+                canvas.LineTo(x2 + arrowSize * 0.5f, y2 + arrowSize);
+                canvas.ClosePath();
+                canvas.Fill();
+                arrowOffset = arrowSize;
+            }
+            else if (secondPt.Value != firstPt.Value)
+            {
+                canvas.BeginPath();
+                canvas.MoveTo(x2, y2);
+                canvas.LineTo(x2 - arrowSize * 0.5f, y2 - arrowSize);
+                canvas.LineTo(x2 + arrowSize * 0.5f, y2 - arrowSize);
+                canvas.ClosePath();
+                canvas.Fill();
+                arrowOffset = -arrowSize;
+            }
+            canvas.Stroke();
+
             if (firstPt.Value == secondPt.Value)
             {
                 // draw horizontal line
@@ -110,7 +135,7 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     // draw bezier lien from first to second point
                     canvas.MoveTo(x1, y1);
-                    canvas.BezierCurveTo(x2, y1, x2, y2, x2, y2);
+                    canvas.BezierCurveTo(x2, y1, x2, y2 + arrowOffset, x2, y2 + arrowOffset);
                     canvas.Stroke();
                 }
                 else
@@ -123,27 +148,7 @@ namespace AlphaTab.Rendering.Glyphs
 
 
 
-            // what type of arrow? (up/down)
-            var arrowSize = 6 * Scale;
-            if (secondPt.Value > firstPt.Value)
-            {
-                canvas.BeginPath();
-                canvas.MoveTo(x2, y2);
-                canvas.LineTo(x2 - arrowSize * 0.5f, y2 + arrowSize);
-                canvas.LineTo(x2 + arrowSize * 0.5f, y2 + arrowSize);
-                canvas.ClosePath();
-                canvas.Fill();
-            }
-            else if (secondPt.Value != firstPt.Value)
-            {
-                canvas.BeginPath();
-                canvas.MoveTo(x2, y2);
-                canvas.LineTo(x2 - arrowSize * 0.5f, y2 - arrowSize);
-                canvas.LineTo(x2 + arrowSize * 0.5f, y2 - arrowSize);
-                canvas.ClosePath();
-                canvas.Fill();
-            }
-            canvas.Stroke();
+
 
             if (secondPt.Value != 0)
             {
@@ -203,11 +208,6 @@ namespace AlphaTab.Rendering.Glyphs
                 default:
                     return steps + "/ 4";
             }
-        }
-
-        public void ScaleToWidth(float width)
-        {
-            Width = width;
         }
     }
 }

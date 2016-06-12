@@ -31,8 +31,6 @@ namespace AlphaTab.Rendering.Glyphs
     {
         public const string KeySizeBeat = "Beat";
 
-        private BarLayoutingInfo _layoutingInfo;
-
         public FastList<BeatContainerGlyph> BeatGlyphs { get; set; }
 
         public Voice Voice { get; set; }
@@ -47,19 +45,33 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void ScaleToWidth(float width)
         {
-            var force = _layoutingInfo.SpaceToForce(width);
+            var force = Renderer.LayoutingInfo.SpaceToForce(width);
             ScaleToForce(force);
         }
 
         private void ScaleToForce(float force)
         {
-            Width = _layoutingInfo.CalculateVoiceWidth(force);
-            var positions = _layoutingInfo.BuildOnTimePositions(force);
+            Width = Renderer.LayoutingInfo.CalculateVoiceWidth(force);
+            var positions = Renderer.LayoutingInfo.BuildOnTimePositions(force);
             for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {
                 var time = BeatGlyphs[i].Beat.AbsoluteStart;
                 BeatGlyphs[i].X = positions[time] - BeatGlyphs[i].OnTimeX;
-                BeatGlyphs[i].UpdateBeamingHelper();
+
+                // size always previousl glyph after we know the position
+                // of the next glyph
+                if (i > 0)
+                {
+                    var beatWidth = BeatGlyphs[i].X - BeatGlyphs[i - 1].X;
+                    BeatGlyphs[i - 1].ScaleToWidth(beatWidth);
+                }
+
+                // for the last glyph size based on the full width
+                if (i == j - 1)
+                {
+                    float beatWidth = Width - BeatGlyphs[BeatGlyphs.Count - 1].X;
+                    BeatGlyphs[i].ScaleToWidth(beatWidth);
+                }
             }
         }
 
@@ -73,9 +85,8 @@ namespace AlphaTab.Rendering.Glyphs
             }
         }
 
-        public void ApplyLayoutingInfo(BarLayoutingInfo info)
+        public void ApplyLayoutingInfo()
         {
-            _layoutingInfo = info;
             ScaleToForce(Renderer.Settings.StretchForce);
         }
 

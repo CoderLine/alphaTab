@@ -81,7 +81,7 @@ namespace AlphaTab.Rendering.Glyphs
                     }
                     else
                     {
-                        endX = cx + _parent.X + _parent.PostNotes.X + _parent.PostNotes.Width;
+                        endX = cx + _parent.X;
                         endY = startY;
                     }
                     break;

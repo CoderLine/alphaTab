@@ -22,7 +22,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering
 {
-    public class RhythmBarRenderer : GroupedBarRenderer
+    public class RhythmBarRenderer : BarRendererBase
     {
         private readonly BeamDirection _direction;
         private BarHelpers _helpers;
@@ -59,7 +59,6 @@ namespace AlphaTab.Rendering
                 var container = new BeatContainerGlyph(b, GetOrCreateVoiceContainer(voice));
                 container.PreNotes = new BeatGlyphBase();
                 container.OnNotes = new BeatOnNoteGlyphBase();
-                container.PostNotes = new BeatGlyphBase();
                 AddBeatGlyph(container);
             }
         }

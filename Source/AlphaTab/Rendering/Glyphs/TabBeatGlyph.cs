@@ -89,11 +89,12 @@ namespace AlphaTab.Rendering.Glyphs
 
         private void CreateNoteGlyph(Note n)
         {
-            var isGrace = Container.Beat.GraceType != GraceType.None;
             var tr = (TabBarRenderer)Renderer;
-            var noteNumberGlyph = new NoteNumberGlyph(0, 0, n, isGrace);
+            var noteNumberGlyph = new NoteNumberGlyph(0, 0, n);
             var l = n.Beat.Voice.Bar.Staff.Track.Tuning.Length - n.String + 1;
             noteNumberGlyph.Y = tr.GetTabY(l, -2);
+            noteNumberGlyph.Renderer = Renderer;
+            noteNumberGlyph.DoLayout();
             NoteNumbers.AddNoteGlyph(noteNumberGlyph, n);
         }
     }

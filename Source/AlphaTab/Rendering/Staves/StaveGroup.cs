@@ -45,6 +45,7 @@ namespace AlphaTab.Rendering.Staves
     {
         public float Width { get; set; }
         public bool IsLinkedToPrevious { get; set; }
+        public BarRendererBase Renderer { get; set; }
     }
 
     /// <summary>
@@ -155,7 +156,7 @@ namespace AlphaTab.Rendering.Staves
             for (int i = 0, j = _allStaves.Count; i < j; i++)
             {
                 var s = _allStaves[i];
-                s.BarRenderers[s.BarRenderers.Count - 1].ApplyLayoutingInfo(maxSizes);
+                s.BarRenderers[s.BarRenderers.Count - 1].ApplyLayoutingInfo();
                 if (s.BarRenderers[s.BarRenderers.Count - 1].Width > realWidth)
                 {
                     realWidth = s.BarRenderers[s.BarRenderers.Count - 1].Width;
@@ -166,16 +167,6 @@ namespace AlphaTab.Rendering.Staves
             result.Width = realWidth;
 
             return result;
-        }
-
-        public BarRendererBase GetBarRenderer(int barIndex)
-        {
-            var stave = _firstStaffInAccolade;
-            if (barIndex >= stave.BarRenderers.Count)
-            {
-                return null;
-            }
-            return stave.BarRenderers[barIndex];
         }
 
         private StaveTrackGroup GetStaveTrackGroup(Track track)
@@ -382,6 +373,17 @@ namespace AlphaTab.Rendering.Staves
             {
                 _firstStaffInAccolade.BarRenderers[i].BuildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, X + _firstStaffInAccolade.X);
             }
+        }
+
+        public float GetBarX(int index)
+        {
+            if (_firstStaffInAccolade == null || Layout.Renderer.Tracks.Length == 0)
+            {
+                return 0;
+            }
+            var bar = Layout.Renderer.Tracks[0].Staves[0].Bars[index];
+            var renderer = Layout.GetRendererForBar(_firstStaffInAccolade.StaveId, bar);
+            return renderer.X;
         }
     }
 }
