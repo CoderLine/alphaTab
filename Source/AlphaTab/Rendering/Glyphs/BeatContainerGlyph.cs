@@ -58,7 +58,9 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void RegisterLayoutingInfo(BarLayoutingInfo layoutings)
         {
-            layoutings.AddBeatSpring(Beat, MinWidth);
+            var preBeatStretch = PreNotes.Width + OnNotes.Width / 2;
+            var postBeatStretch = OnNotes.Width / 2 + PostNotes.Width;
+            layoutings.AddBeatSpring(Beat, MinWidth, preBeatStretch, postBeatStretch);
         }
 
         public void ApplyLayoutingInfo(BarLayoutingInfo layoutings)
@@ -103,7 +105,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             MinWidth = PreNotes.Width + OnNotes.Width + PostNotes.Width;
             Width = MinWidth;
-            OnTimeX = OnNotes.X + OnNotes.Width/2;
+            OnTimeX = OnNotes.X + OnNotes.Width / 2;
         }
 
         protected virtual void CreateTies(Note n)

@@ -1738,9 +1738,7 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
                     var track = this._score.Tracks[i];
                     for (var k = 0,l = track.Staves.length; k < l; k++){
                         var staff = track.Staves[k];
-                        for (var m = 0,n = staff.Bars.length; m < n; m++){
-                            this.GenerateBar(staff.Bars[index], currentTick);
-                        }
+                        this.GenerateBar(staff.Bars[index], currentTick);
                     }
                 }
             }
@@ -10399,7 +10397,9 @@ AlphaTab.Rendering.Glyphs.BeatContainerGlyph.prototype = {
         this.PostNotes.FinalizeGlyph(layout);
     },
     RegisterLayoutingInfo: function (layoutings){
-        layoutings.AddBeatSpring(this.Beat, this.MinWidth);
+        var preBeatStretch = this.PreNotes.Width + this.OnNotes.Width / 2;
+        var postBeatStretch = this.OnNotes.Width / 2 + this.PostNotes.Width;
+        layoutings.AddBeatSpring(this.Beat, this.MinWidth, preBeatStretch, postBeatStretch);
     },
     ApplyLayoutingInfo: function (layoutings){
         //PreNotes.Width = layoutings.PreNoteSize;
@@ -14513,19 +14513,28 @@ AlphaTab.Rendering.Staves.BarLayoutingInfo.prototype = {
             this.MinStretchForce = force;
         }
     },
-    AddSpring: function (start, duration, preStretchWidth){
+    AddSpring: function (start, duration, springSize, preSpringSize, postSpringSize){
+        var spring;
         if (!this.Springs.hasOwnProperty(start)){
-            var spring = new AlphaTab.Rendering.Staves.Spring();
+            spring = new AlphaTab.Rendering.Staves.Spring();
             spring.TimePosition = start;
             spring.SmallestDuration = duration;
             spring.LongestDuration = duration;
-            spring.PreStretchWidth = preStretchWidth;
+            spring.SpringWidth = springSize;
+            spring.PreSpringWidth = preSpringSize;
+            spring.PostSpringWidth = postSpringSize;
             this.Springs[start] = spring;
         }
         else {
-            var spring = this.Springs[start];
-            if (spring.PreStretchWidth < preStretchWidth){
-                spring.PreStretchWidth = preStretchWidth;
+            spring = this.Springs[start];
+            if (spring.SpringWidth < springSize){
+                spring.SpringWidth = springSize;
+            }
+            if (spring.PreSpringWidth < preSpringSize){
+                spring.PreSpringWidth = preSpringSize;
+            }
+            if (spring.PostSpringWidth < postSpringSize){
+                spring.PostSpringWidth = postSpringSize;
             }
             if (duration < spring.SmallestDuration){
                 spring.SmallestDuration = duration;
@@ -14537,17 +14546,18 @@ AlphaTab.Rendering.Staves.BarLayoutingInfo.prototype = {
         if (duration < this.SmallestDuration){
             this.SmallestDuration = duration;
         }
+        return spring;
     },
-    AddBeatSpring: function (beat, preStretchWidth){
-        this.AddSpring(beat.get_AbsoluteStart(), beat.CalculateDuration(), preStretchWidth);
+    AddBeatSpring: function (beat, beatSize, preBeatSize, postBeatSize){
+        return this.AddSpring(beat.get_AbsoluteStart(), beat.CalculateDuration(), beatSize, preBeatSize, postBeatSize);
     },
     CalculateSpringConstants: function (){
         var sortedSprings = [];
         var xMin = 0;
         AlphaTab.Platform.Std.Foreach(AlphaTab.Rendering.Staves.Spring, this.Springs, $CreateAnonymousDelegate(this, function (spring){
             sortedSprings.push(spring);
-            if (spring.PreStretchWidth < xMin){
-                xMin = spring.PreStretchWidth;
+            if (spring.SpringWidth < xMin){
+                xMin = spring.SpringWidth;
             }
         }));
         sortedSprings.sort($CreateAnonymousDelegate(this, function (a, b){
@@ -14607,7 +14617,10 @@ AlphaTab.Rendering.Staves.BarLayoutingInfo.prototype = {
     }
     return 0;
 }));
-        var springX = 0;
+        if (sortedSprings.length == 0){
+            return positions;
+        }
+        var springX = sortedSprings[0].PreSpringWidth;
         for (var i = 0; i < sortedSprings.length; i++){
             positions[sortedSprings[i].TimePosition] = springX;
             springX += this.CalculateWidth(force, sortedSprings[i].SpringConstant);
@@ -14626,8 +14639,9 @@ AlphaTab.Rendering.Staves.Spring = function (){
     this.Force = 0;
     this.Width = 0;
     this.SpringConstant = 0;
-    this.PreStretchWidth = 0;
-    this.PreStretchForce = 0;
+    this.SpringWidth = 0;
+    this.PreSpringWidth = 0;
+    this.PostSpringWidth = 0;
 };
 AlphaTab.Rendering.Staves.Staff = function (staff, staveId, factory, settings){
     this._factory = null;

@@ -1294,8 +1294,7 @@
         </member>
         <member name="P:AlphaTab.Settings.StretchForce">
             <summary>
-            The force factor to use by default for layouting the score. 
-            Adjust this value to adjust the stretching of the notation. 
+            The default stretch force to use for layouting. 
             </summary>
         </member>
         <member name="P:AlphaTab.Settings.ForcePianoFingering">

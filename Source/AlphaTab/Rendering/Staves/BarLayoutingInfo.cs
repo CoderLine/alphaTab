@@ -81,23 +81,34 @@ namespace AlphaTab.Rendering.Staves
         public FastDictionary<int, Spring> Springs { get; set; }
         public int SmallestDuration { get; set; }
 
-        public void AddSpring(int start, int duration, float preStretchWidth)
+        public Spring AddSpring(int start, int duration, float springSize, float preSpringSize, float postSpringSize)
         {
+            Spring spring;
             if (!Springs.ContainsKey(start))
             {
-                var spring = new Spring();
+                spring = new Spring();
                 spring.TimePosition = start;
                 spring.SmallestDuration = duration;
                 spring.LongestDuration = duration;
-                spring.PreStretchWidth = preStretchWidth;
+                spring.SpringWidth = springSize;
+                spring.PreSpringWidth = preSpringSize;
+                spring.PostSpringWidth = postSpringSize;
                 Springs[start] = spring;
             }
             else
             {
-                var spring = Springs[start];
-                if (spring.PreStretchWidth < preStretchWidth)
+                spring = Springs[start];
+                if (spring.SpringWidth < springSize)
                 {
-                    spring.PreStretchWidth = preStretchWidth;
+                    spring.SpringWidth = springSize;
+                }
+                if (spring.PreSpringWidth < preSpringSize)
+                {
+                    spring.PreSpringWidth = preSpringSize;
+                }
+                if (spring.PostSpringWidth < postSpringSize)
+                {
+                    spring.PostSpringWidth = postSpringSize;
                 }
                 if (duration < spring.SmallestDuration)
                 {
@@ -113,11 +124,13 @@ namespace AlphaTab.Rendering.Staves
             {
                 SmallestDuration = duration;
             }
+
+            return spring;
         }
 
-        public void AddBeatSpring(Beat beat, float preStretchWidth)
+        public Spring AddBeatSpring(Beat beat, float beatSize, float preBeatSize, float postBeatSize)
         {
-            AddSpring(beat.AbsoluteStart, beat.CalculateDuration(), preStretchWidth);
+            return AddSpring(beat.AbsoluteStart, beat.CalculateDuration(), beatSize, preBeatSize, postBeatSize);
         }
 
         public void CalculateSpringConstants()
@@ -127,9 +140,9 @@ namespace AlphaTab.Rendering.Staves
             Std.Foreach(Springs.Values, spring =>
             {
                 sortedSprings.Add(spring);
-                if (spring.PreStretchWidth < xMin)
+                if (spring.SpringWidth < xMin)
                 {
-                    xMin = spring.PreStretchWidth;
+                    xMin = spring.SpringWidth;
                 }
             });
 
@@ -219,7 +232,12 @@ namespace AlphaTab.Rendering.Staves
                 return 0;
             });
 
-            var springX = 0f;
+            if (sortedSprings.Count == 0)
+            {
+                return positions;
+            }
+
+            var springX = sortedSprings[0].PreSpringWidth;
             for (int i = 0; i < sortedSprings.Count; i++)
             {
                 positions[sortedSprings[i].TimePosition] = springX;
@@ -241,7 +259,8 @@ namespace AlphaTab.Rendering.Staves
         public float Width { get; set; }
         public float SpringConstant { get; set; }
 
-        public float PreStretchWidth { get; set; }
-        public float PreStretchForce { get; set; }
+        public float SpringWidth { get; set; }
+        public float PreSpringWidth { get; set; }
+        public float PostSpringWidth { get; set; }
     }
 }

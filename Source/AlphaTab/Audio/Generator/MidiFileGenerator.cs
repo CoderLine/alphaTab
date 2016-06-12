@@ -81,10 +81,7 @@ namespace AlphaTab.Audio.Generator
                         for (int k = 0, l = track.Staves.Count; k < l; k++)
                         {
                             var staff = track.Staves[k];
-                            for (int m = 0, n = staff.Bars.Count; m < n; m++)
-                            {
-                                GenerateBar(staff.Bars[index], currentTick);
-                            }
+                            GenerateBar(staff.Bars[index], currentTick);
                         }
                     }
                 }

@@ -128,9 +128,9 @@ namespace AlphaTab.Rendering.Glyphs
         //    Std.Foreach(_layoutings.Springs.Values, spring =>
         //    {
         //        sortedSprings.Add(spring);
-        //        if (spring.PreStretchWidth < xMin)
+        //        if (spring.SpringWidth < xMin)
         //        {
-        //            xMin = spring.PreStretchWidth;
+        //            xMin = spring.SpringWidth;
         //        }
         //    });
 
