@@ -12087,6 +12087,7 @@ AlphaTab.Rendering.Glyphs.ScoreNoteChordGlyph.prototype = {
         }
         else {
             this._noteHeadPadding = direction == AlphaTab.Rendering.Utils.BeamDirection.Down ? -displacedX : 0;
+            w += this._noteHeadPadding;
             this.UpLineX = w;
             this.DownLineX = 0;
         }

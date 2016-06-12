@@ -210,6 +210,7 @@ namespace AlphaTab.Rendering.Glyphs
             else
             {
                 _noteHeadPadding = direction == BeamDirection.Down ? -displacedX : 0;
+                w += _noteHeadPadding;
                 UpLineX = w;
                 DownLineX = padding;
             }
