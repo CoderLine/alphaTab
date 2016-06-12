@@ -16,16 +16,14 @@
  * License along with this library.
  */
 using AlphaTab.Model;
-using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabBeatGlyph : BeatOnNoteGlyphBase, ISupportsFinalize
+    public class TabBeatGlyph : BeatOnNoteGlyphBase
     {
         public TabNoteChordGlyph NoteNumbers { get; set; }
         public TabRestGlyph RestGlyph { get; set; }
-        public BeamingHelper BeamingHelper { get; set; }
 
         public override void DoLayout()
         {
@@ -77,7 +75,7 @@ namespace AlphaTab.Rendering.Glyphs
             Width = w;
         }
 
-        public override void FinalizeGlyph(ScoreLayout layout)
+        public override void UpdateBeamingHelper()
         {
             if (!Container.Beat.IsRest)
             {

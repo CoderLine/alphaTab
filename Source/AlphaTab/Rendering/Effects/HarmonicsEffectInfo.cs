@@ -1,6 +1,4 @@
-using System;
 using AlphaTab.Model;
-using AlphaTab.Platform;
 using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
@@ -15,6 +13,7 @@ namespace AlphaTab.Rendering.Effects
             if (!note.IsHarmonic) return false;
             if (note.Beat != _beat || note.HarmonicType > _beatType)
             {
+                _beat = note.Beat;
                 _beatType = note.HarmonicType;
             }
             return true;

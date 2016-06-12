@@ -19,8 +19,6 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
-using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering.Glyphs
@@ -29,7 +27,7 @@ namespace AlphaTab.Rendering.Glyphs
     /// This glyph acts as container for handling
     /// multiple voice rendering
     /// </summary>
-    public class VoiceContainerGlyph : GlyphGroup, ISupportsFinalize
+    public class VoiceContainerGlyph : GlyphGroup
     {
         public const string KeySizeBeat = "Beat";
 
@@ -61,6 +59,7 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 var time = BeatGlyphs[i].Beat.AbsoluteStart;
                 BeatGlyphs[i].X = positions[time] - BeatGlyphs[i].OnTimeX;
+                BeatGlyphs[i].UpdateBeamingHelper();
             }
         }
 
@@ -94,14 +93,6 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             MinWidth = Width;
-        }
-
-        public void FinalizeGlyph(ScoreLayout layout)
-        {
-            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
-            {
-                BeatGlyphs[i].FinalizeGlyph(layout);
-            }
         }
 
         //private static Random Random = new Random();

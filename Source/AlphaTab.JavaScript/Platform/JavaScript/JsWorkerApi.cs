@@ -51,10 +51,10 @@ namespace AlphaTab.Platform.JavaScript
 
     public class JsWorker
     {
-        private ScoreRenderer _renderer;
+        private readonly ScoreRenderer _renderer;
         private SharpKit.Html.workers.WorkerContext _main;
         private int[] _trackIndexes;
-        private bool _includeScoreInLoadedEvent;
+        private readonly bool _includeScoreInLoadedEvent;
 
         public Score Score { get; set; }
 

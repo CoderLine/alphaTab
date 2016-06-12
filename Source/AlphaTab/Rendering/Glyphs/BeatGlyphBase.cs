@@ -16,13 +16,11 @@
  * License along with this library.
  */
 using System;
-using AlphaTab.Audio;
 using AlphaTab.Model;
-using AlphaTab.Rendering.Layout;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class BeatGlyphBase : GlyphGroup, ISupportsFinalize
+    public class BeatGlyphBase : GlyphGroup
     {
         public BeatContainerGlyph Container { get; set; }
 
@@ -55,16 +53,6 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 action(Container.Beat.Notes[i]);
             }
-        }
-
-        public virtual void FinalizeGlyph(ScoreLayout layout)
-        {
-
-        }
-
-        public virtual void ScaleToWidth(float width)
-        {
-            Width = width;
         }
     }
 }

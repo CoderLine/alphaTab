@@ -17,7 +17,6 @@
  */
 
 using System;
-using System.IO;
 using AlphaTab.Collections;
 using AlphaTab.Xml;
 

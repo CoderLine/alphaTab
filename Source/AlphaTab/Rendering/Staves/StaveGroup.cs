@@ -80,7 +80,7 @@ namespace AlphaTab.Rendering.Staves
         public FastList<MasterBar> MasterBars { get; set; }
 
         public FastList<StaveTrackGroup> Staves { get; set; }
-        private FastList<Staff> _allStaves;
+        private readonly FastList<Staff> _allStaves;
 
         public ScoreLayout Layout { get; set; }
         public BarHelpersGroup Helpers { get; set; }

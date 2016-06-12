@@ -70,7 +70,6 @@ namespace AlphaTab.Rendering.Layout
 
             var glyphs = new FastList<TextGlyph>();
 
-            string str;
             if (!string.IsNullOrEmpty(score.Title) && (flags & HeaderFooterElements.Title) != 0)
             {
                 glyphs.Add(new TextGlyph(Width / 2f, y, score.Title, res.TitleFont, TextAlign.Center));
@@ -132,7 +131,7 @@ namespace AlphaTab.Rendering.Layout
 
                         for (int i = 0, j = Renderer.Tracks[0].Tuning.Length; i < j; i++)
                         {
-                            str = "(" + (i + 1) + ") = " + Tuning.GetTextForTuning(Renderer.Tracks[0].Tuning[i], false);
+                            var str = "(" + (i + 1) + ") = " + Tuning.GetTextForTuning(Renderer.Tracks[0].Tuning[i], false);
                             glyphs.Add(new TextGlyph(currentX, currentY, str, res.EffectFont, TextAlign.Left));
                             currentY += (15 * scale);
                             if (i == stringsPerColumn - 1)

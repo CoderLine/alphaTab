@@ -69,7 +69,7 @@ namespace AlphaTab.Importer
                 // master effect (4)
                 // master equalizer (10)
                 // master equalizer preset (1)
-                _data.Skip(19);
+                Data.Skip(19);
             }
 
             // page setup since GP5
@@ -91,7 +91,7 @@ namespace AlphaTab.Importer
             if (_versionNumber >= 400)
             {
                 /* octave = */
-                _data.ReadByte();
+                Data.ReadByte();
             }
 
             ReadPlaybackInfos();
@@ -118,9 +118,9 @@ namespace AlphaTab.Importer
                 // "Da Segno Segno al Fine" bar index (2)
                 // "Da Coda" bar index (2)
                 // "Da Double Coda" bar index (2)
-                _data.Skip(38);
+                Data.Skip(38);
                 // unknown (4)
-                _data.Skip(4);
+                Data.Skip(4);
             }
 
             // contents
@@ -196,7 +196,7 @@ namespace AlphaTab.Importer
             // Padding Bottom (4)
             // Size Proportion(4)
             // Header and Footer display flags (2)
-            _data.Skip(30);
+            Data.Skip(30);
             // title format
             // subtitle format
             // artist format
@@ -222,9 +222,9 @@ namespace AlphaTab.Importer
                 info.SecondaryChannel = i;
                 info.Program = ReadInt32();
 
-                info.Volume = _data.ReadByte();
-                info.Balance = _data.ReadByte();
-                _data.Skip(6);
+                info.Volume = Data.ReadByte();
+                info.Balance = Data.ReadByte();
+                Data.Skip(6);
 
                 _playbackInfos.Add(info);
             }
@@ -247,12 +247,12 @@ namespace AlphaTab.Importer
             }
 
             MasterBar newMasterBar = new MasterBar();
-            int flags = _data.ReadByte();
+            int flags = Data.ReadByte();
 
             // time signature
             if ((flags & 0x01) != 0)
             {
-                newMasterBar.TimeSignatureNumerator = _data.ReadByte();
+                newMasterBar.TimeSignatureNumerator = Data.ReadByte();
             }
             else if (previousMasterBar != null)
             {
@@ -260,7 +260,7 @@ namespace AlphaTab.Importer
             }
             if ((flags & 0x02) != 0)
             {
-                newMasterBar.TimeSignatureDenominator = _data.ReadByte();
+                newMasterBar.TimeSignatureDenominator = Data.ReadByte();
             }
             else if (previousMasterBar != null)
             {
@@ -271,7 +271,7 @@ namespace AlphaTab.Importer
             newMasterBar.IsRepeatStart = (flags & 0x04) != 0;
             if ((flags & 0x08) != 0)
             {
-                newMasterBar.RepeatCount = _data.ReadByte() + (_versionNumber >= 500 ? 0 : 1);
+                newMasterBar.RepeatCount = Data.ReadByte() + (_versionNumber >= 500 ? 0 : 1);
             }
 
             // alternate endings
@@ -298,7 +298,7 @@ namespace AlphaTab.Importer
 
                     // now calculate the alternative for this bar
                     var repeatAlternative = 0;
-                    var repeatMask = _data.ReadByte();
+                    var repeatMask = Data.ReadByte();
                     for (var i = 0; i < 8; i++)
                     {
                         // only add the repeating if it is not existing
@@ -314,7 +314,7 @@ namespace AlphaTab.Importer
                 }
                 else
                 {
-                    newMasterBar.AlternateEndings = (byte)_data.ReadByte();
+                    newMasterBar.AlternateEndings = (byte)Data.ReadByte();
                 }
             }
 
@@ -331,8 +331,8 @@ namespace AlphaTab.Importer
             // keysignature
             if ((flags & 0x40) != 0)
             {
-                newMasterBar.KeySignature = _data.ReadSignedByte();
-                _data.ReadByte(); // keysignature type
+                newMasterBar.KeySignature = Data.ReadSignedByte();
+                Data.ReadByte(); // keysignature type
             }
             else if (previousMasterBar != null)
             {
@@ -341,19 +341,19 @@ namespace AlphaTab.Importer
 
             if ((_versionNumber >= 500) && ((flags & 0x03) != 0))
             {
-                _data.Skip(4);
+                Data.Skip(4);
             }
 
             // better alternate ending mask in GP5
             if ((_versionNumber >= 500) && ((flags & 0x10) == 0))
             {
-                newMasterBar.AlternateEndings = (byte)_data.ReadByte();
+                newMasterBar.AlternateEndings = (byte)Data.ReadByte();
             }
 
             // tripletfeel
             if (_versionNumber >= 500)
             {
-                var tripletFeel = _data.ReadByte();
+                var tripletFeel = Data.ReadByte();
                 switch (tripletFeel)
                 {
                     case 1:
@@ -364,7 +364,7 @@ namespace AlphaTab.Importer
                         break;
                 }
 
-                _data.ReadByte();
+                Data.ReadByte();
             }
             else
             {
@@ -389,7 +389,7 @@ namespace AlphaTab.Importer
             _score.AddTrack(newTrack);
 
 
-            var flags = _data.ReadByte();
+            var flags = Data.ReadByte();
             newTrack.Name = ReadStringByteLength(40);
             newTrack.IsPercussion = (flags & 0x01) != 0;
 
@@ -408,7 +408,7 @@ namespace AlphaTab.Importer
             var port = ReadInt32();
             var index = ReadInt32() - 1;
             var effectChannel = ReadInt32() - 1;
-            _data.Skip(4); // Fretcount
+            Data.Skip(4); // Fretcount
             if (index >= 0 && index < _playbackInfos.Count)
             {
                 var info = _playbackInfos[index];
@@ -428,20 +428,20 @@ namespace AlphaTab.Importer
                 // flags for 
                 //  0x01 -> show tablature
                 //  0x02 -> show standard notation
-                _data.ReadByte();
+                Data.ReadByte();
                 // flags for
                 //  0x02 -> auto let ring
                 //  0x04 -> auto brush
-                _data.ReadByte();
+                Data.ReadByte();
 
                 // unknown
-                _data.Skip(43);
+                Data.Skip(43);
             }
 
             // unknown
             if (_versionNumber >= 510)
             {
-                _data.Skip(4);
+                Data.Skip(4);
                 ReadStringIntByte();
                 ReadStringIntByte();
             }
@@ -470,7 +470,7 @@ namespace AlphaTab.Importer
             var voiceCount = 1;
             if (_versionNumber >= 500)
             {
-                _data.ReadByte();
+                Data.ReadByte();
                 voiceCount = 2;
             }
 
@@ -500,7 +500,7 @@ namespace AlphaTab.Importer
         public void ReadBeat(Track track, Bar bar, Voice voice)
         {
             var newBeat = new Beat();
-            var flags = _data.ReadByte();
+            var flags = Data.ReadByte();
 
             if ((flags & 0x01) != 0)
             {
@@ -509,12 +509,12 @@ namespace AlphaTab.Importer
 
             if ((flags & 0x40) != 0)
             {
-                var type = _data.ReadByte();
+                var type = Data.ReadByte();
                 newBeat.IsEmpty = (type & 0x02) == 0;
             }
             voice.AddBeat(newBeat);
 
-            var duration = _data.ReadSignedByte();
+            var duration = Data.ReadSignedByte();
             switch (duration)
             {
                 case -2:
@@ -597,7 +597,7 @@ namespace AlphaTab.Importer
                 ReadMixTableChange(newBeat);
             }
 
-            var stringFlags = _data.ReadByte();
+            var stringFlags = Data.ReadByte();
             for (int i = 6; i >= 0; i--)
             {
                 if ((stringFlags & (1 << i)) != 0 && (6 - i) < track.Tuning.Length)
@@ -608,11 +608,11 @@ namespace AlphaTab.Importer
 
             if (_versionNumber >= 500)
             {
-                _data.ReadByte();
-                var flag = _data.ReadByte();
+                Data.ReadByte();
+                var flag = Data.ReadByte();
                 if ((flag & 0x08) != 0)
                 {
-                    _data.ReadByte();
+                    Data.ReadByte();
                 }
             }
         }
@@ -623,9 +623,9 @@ namespace AlphaTab.Importer
             var chordId = Std.NewGuid();
             if (_versionNumber >= 500)
             {
-                _data.Skip(17);
+                Data.Skip(17);
                 chord.Name = ReadStringByteLength(21);
-                _data.Skip(4);
+                Data.Skip(4);
                 chord.FirstFret = ReadInt32();
                 for (int i = 0; i < 7; i++)
                 {
@@ -635,11 +635,11 @@ namespace AlphaTab.Importer
                         chord.Strings.Add(fret);
                     }
                 }
-                _data.Skip(32);
+                Data.Skip(32);
             }
             else
             {
-                if (_data.ReadByte() != 0) // mode1?
+                if (Data.ReadByte() != 0) // mode1?
                 {
                     // gp4
                     if (_versionNumber >= 400)
@@ -652,13 +652,13 @@ namespace AlphaTab.Importer
                         // Bass (4)
                         // Diminished/Augmented (4)
                         // Add (1)
-                        _data.Skip(16);
+                        Data.Skip(16);
                         chord.Name = (ReadStringByteLength(21));
                         // Unused (2)
                         // Fifth (1)
                         // Ninth (1)
                         // Eleventh (1)
-                        _data.Skip(4);
+                        Data.Skip(4);
                         chord.FirstFret = (ReadInt32());
                         for (int i = 0; i < 7; i++)
                         {
@@ -676,12 +676,12 @@ namespace AlphaTab.Importer
                         // Fingering (7)
                         // Show Diagram Fingering (1)
                         // ??
-                        _data.Skip(32);
+                        Data.Skip(32);
                     }
                     else
                     {
                         // unknown
-                        _data.Skip(25);
+                        Data.Skip(25);
                         chord.Name = ReadStringByteLength(34);
                         chord.FirstFret = ReadInt32();
                         for (int i = 0; i < 6; i++)
@@ -690,7 +690,7 @@ namespace AlphaTab.Importer
                             chord.Strings.Add(fret);
                         }
                         // unknown
-                        _data.Skip(36);
+                        Data.Skip(36);
                     }
                 }
                 else
@@ -723,11 +723,11 @@ namespace AlphaTab.Importer
 
         public void ReadBeatEffects(Beat beat)
         {
-            var flags = _data.ReadByte();
+            var flags = Data.ReadByte();
             var flags2 = 0;
             if (_versionNumber >= 400)
             {
-                flags2 = _data.ReadByte();
+                flags2 = Data.ReadByte();
             }
 
             beat.FadeIn = (flags & 0x10) != 0;
@@ -739,7 +739,7 @@ namespace AlphaTab.Importer
 
             if ((flags & 0x20) != 0 && _versionNumber >= 400)
             {
-                var slapPop = _data.ReadSignedByte();
+                var slapPop = Data.ReadSignedByte();
                 switch (slapPop)
                 {
                     case 1:
@@ -755,7 +755,7 @@ namespace AlphaTab.Importer
             }
             else if ((flags & 0x20) != 0)
             {
-                var slapPop = _data.ReadSignedByte();
+                var slapPop = Data.ReadSignedByte();
                 switch (slapPop)
                 {
                     case 1:
@@ -768,7 +768,7 @@ namespace AlphaTab.Importer
                         beat.Pop = true;
                         break;
                 }
-                _data.Skip(4);
+                Data.Skip(4);
             }
 
             if ((flags2 & 0x04) != 0)
@@ -783,13 +783,13 @@ namespace AlphaTab.Importer
 
                 if (_versionNumber < 500)
                 {
-                    strokeDown = _data.ReadByte();
-                    strokeUp = _data.ReadByte();
+                    strokeDown = Data.ReadByte();
+                    strokeUp = Data.ReadByte();
                 }
                 else
                 {
-                    strokeUp = _data.ReadByte();
-                    strokeDown = _data.ReadByte();
+                    strokeUp = Data.ReadByte();
+                    strokeDown = Data.ReadByte();
                 }
 
                 if (strokeUp > 0)
@@ -806,7 +806,7 @@ namespace AlphaTab.Importer
 
             if ((flags2 & 0x02) != 0)
             {
-                switch (_data.ReadSignedByte())
+                switch (Data.ReadSignedByte())
                 {
                     case 0:
                         beat.PickStroke = PickStrokeType.None;
@@ -823,7 +823,7 @@ namespace AlphaTab.Importer
 
         public void ReadTremoloBarEffect(Beat beat)
         {
-            _data.ReadByte(); // type
+            Data.ReadByte(); // type
             ReadInt32(); // value
             var pointCount = ReadInt32();
             if (pointCount > 0)
@@ -863,17 +863,17 @@ namespace AlphaTab.Importer
         public void ReadMixTableChange(Beat beat)
         {
             var tableChange = new MixTableChange();
-            tableChange.Instrument = _data.ReadByte();
+            tableChange.Instrument = Data.ReadByte();
             if (_versionNumber >= 500)
             {
-                _data.Skip(16); // Rse Info 
+                Data.Skip(16); // Rse Info 
             }
-            tableChange.Volume = _data.ReadSignedByte();
-            tableChange.Balance = _data.ReadSignedByte();
-            var chorus = _data.ReadSignedByte();
-            var reverb = _data.ReadSignedByte();
-            var phaser = _data.ReadSignedByte();
-            var tremolo = _data.ReadSignedByte();
+            tableChange.Volume = Data.ReadSignedByte();
+            tableChange.Balance = Data.ReadSignedByte();
+            var chorus = Data.ReadSignedByte();
+            var reverb = Data.ReadSignedByte();
+            var phaser = Data.ReadSignedByte();
+            var tremolo = Data.ReadSignedByte();
             if (_versionNumber >= 500)
             {
                 tableChange.TempoName = ReadStringIntByte();
@@ -883,52 +883,52 @@ namespace AlphaTab.Importer
             // durations
             if (tableChange.Volume >= 0)
             {
-                _data.ReadByte();
+                Data.ReadByte();
             }
 
             if (tableChange.Balance >= 0)
             {
-                _data.ReadByte();
+                Data.ReadByte();
             }
 
             if (chorus >= 0)
             {
-                _data.ReadByte();
+                Data.ReadByte();
             }
 
             if (reverb >= 0)
             {
-                _data.ReadByte();
+                Data.ReadByte();
             }
 
             if (phaser >= 0)
             {
-                _data.ReadByte();
+                Data.ReadByte();
             }
 
             if (tremolo >= 0)
             {
-                _data.ReadByte();
+                Data.ReadByte();
             }
 
             if (tableChange.Tempo >= 0)
             {
-                tableChange.Duration = _data.ReadSignedByte();
+                tableChange.Duration = Data.ReadSignedByte();
                 if (_versionNumber >= 510)
                 {
-                    _data.ReadByte(); // hideTempo (bool)
+                    Data.ReadByte(); // hideTempo (bool)
                 }
             }
 
             if (_versionNumber >= 400)
             {
-                _data.ReadByte(); // all tracks flag
+                Data.ReadByte(); // all tracks flag
             }
 
             // unknown
             if (_versionNumber >= 500)
             {
-                _data.ReadByte();
+                Data.ReadByte();
             }
             // unknown
             if (_versionNumber >= 510)
@@ -981,7 +981,7 @@ namespace AlphaTab.Importer
             var newNote = new Note();
             newNote.String = track.Tuning.Length - stringIndex;
 
-            var flags = _data.ReadByte();
+            var flags = Data.ReadByte();
             if ((flags & 0x02) != 0)
             {
                 newNote.Accentuated = AccentuationType.Heavy;
@@ -994,7 +994,7 @@ namespace AlphaTab.Importer
             newNote.IsGhost = ((flags & 0x04) != 0);
             if ((flags & 0x20) != 0)
             {
-                var noteType = _data.ReadByte();
+                var noteType = Data.ReadByte();
                 if (noteType == 3)
                 {
                     newNote.IsDead = true;
@@ -1007,26 +1007,26 @@ namespace AlphaTab.Importer
 
             if ((flags & 0x01) != 0 && _versionNumber < 500)
             {
-                _data.ReadByte(); // duration 
-                _data.ReadByte();  // tuplet
+                Data.ReadByte(); // duration 
+                Data.ReadByte();  // tuplet
             }
 
             if ((flags & 0x10) != 0)
             {
-                var dynamicNumber = _data.ReadSignedByte();
+                var dynamicNumber = Data.ReadSignedByte();
                 newNote.Dynamic = ToDynamicValue(dynamicNumber);
                 beat.Dynamic = newNote.Dynamic;
             }
 
             if ((flags & 0x20) != 0)
             {
-                newNote.Fret = _data.ReadSignedByte();
+                newNote.Fret = Data.ReadSignedByte();
             }
 
             if ((flags & 0x80) != 0)
             {
-                newNote.LeftHandFinger = (Fingers)_data.ReadSignedByte();
-                newNote.RightHandFinger = (Fingers)_data.ReadSignedByte();
+                newNote.LeftHandFinger = (Fingers)Data.ReadSignedByte();
+                newNote.RightHandFinger = (Fingers)Data.ReadSignedByte();
                 newNote.IsFingering = true;
             }
 
@@ -1036,7 +1036,7 @@ namespace AlphaTab.Importer
                 {
                     newNote.DurationPercent = ReadDouble();
                 }
-                var flags2 = _data.ReadByte();
+                var flags2 = Data.ReadByte();
                 newNote.AccidentalMode = (flags2 & 0x02) != 0
                     ? NoteAccidentalMode.SwapAccidentals
                     : NoteAccidentalMode.Default;
@@ -1076,11 +1076,11 @@ namespace AlphaTab.Importer
 
         public void ReadNoteEffects(Track track, Voice voice, Beat beat, Note note)
         {
-            var flags = _data.ReadByte();
+            var flags = Data.ReadByte();
             var flags2 = 0;
             if (_versionNumber >= 400)
             {
-                flags2 = _data.ReadByte();
+                flags2 = Data.ReadByte();
             }
 
             if ((flags & 0x01) != 0)
@@ -1145,7 +1145,7 @@ namespace AlphaTab.Importer
         private const int BendStep = 25;
         public void ReadBend(Note note)
         {
-            _data.ReadByte(); // type
+            Data.ReadByte(); // type
             ReadInt32(); // value
             var pointCount = ReadInt32();
             if (pointCount > 0)
@@ -1166,10 +1166,10 @@ namespace AlphaTab.Importer
             var graceBeat = new Beat();
             var graceNote = new Note();
             graceNote.String = note.String;
-            graceNote.Fret = _data.ReadSignedByte();
+            graceNote.Fret = Data.ReadSignedByte();
             graceBeat.Duration = Duration.ThirtySecond;
-            graceBeat.Dynamic = ToDynamicValue(_data.ReadSignedByte());
-            var transition = _data.ReadSignedByte();
+            graceBeat.Dynamic = ToDynamicValue(Data.ReadSignedByte());
+            var transition = Data.ReadSignedByte();
             switch (transition)
             {
                 case 0: // none
@@ -1185,7 +1185,7 @@ namespace AlphaTab.Importer
                     break;
             }
             graceNote.Dynamic = graceBeat.Dynamic;
-            _data.Skip(1); // duration
+            Data.Skip(1); // duration
 
             if (_versionNumber < 500)
             {
@@ -1193,7 +1193,7 @@ namespace AlphaTab.Importer
             }
             else
             {
-                var flags = _data.ReadByte();
+                var flags = Data.ReadByte();
                 graceNote.IsDead = (flags & 0x01) != 0;
                 graceBeat.GraceType = (flags & 0x02) != 0 ? GraceType.OnBeat : GraceType.BeforeBeat;
             }
@@ -1204,7 +1204,7 @@ namespace AlphaTab.Importer
 
         public void ReadTremoloPicking(Beat beat)
         {
-            var speed = _data.ReadByte();
+            var speed = Data.ReadByte();
             switch (speed)
             {
                 case 1:
@@ -1223,7 +1223,7 @@ namespace AlphaTab.Importer
         {
             if (_versionNumber >= 500)
             {
-                var type = _data.ReadSignedByte();
+                var type = Data.ReadSignedByte();
                 switch (type)
                 {
                     case 1:
@@ -1251,7 +1251,7 @@ namespace AlphaTab.Importer
             }
             else
             {
-                var type = _data.ReadSignedByte();
+                var type = Data.ReadSignedByte();
                 switch (type)
                 {
                     case 1:
@@ -1281,7 +1281,7 @@ namespace AlphaTab.Importer
 
         public void ReadArtificialHarmonic(Note note)
         {
-            var type = _data.ReadByte();
+            var type = Data.ReadByte();
             if (_versionNumber >= 500)
             {
                 switch (type)
@@ -1292,16 +1292,16 @@ namespace AlphaTab.Importer
                         break;
                     case 2:
                         // ReSharper disable UnusedVariable
-                        var harmonicTone = _data.ReadByte();
-                        var harmonicKey = _data.ReadByte();
-                        var harmonicOctaveOffset = _data.ReadByte();
+                        var harmonicTone = Data.ReadByte();
+                        var harmonicKey = Data.ReadByte();
+                        var harmonicOctaveOffset = Data.ReadByte();
                         note.HarmonicType = HarmonicType.Artificial;
                         // ReSharper restore UnusedVariable
                         break;
                     // TODO: how to calculate the harmonic value? 
                     case 3:
                         note.HarmonicType = HarmonicType.Tap;
-                        note.HarmonicValue = DeltaFretToHarmonicValue(_data.ReadByte());
+                        note.HarmonicValue = DeltaFretToHarmonicValue(Data.ReadByte());
                         break;
                     case 4:
                         note.HarmonicType = HarmonicType.Pinch;
@@ -1377,8 +1377,8 @@ namespace AlphaTab.Importer
 
         public void ReadTrill(Note note)
         {
-            note.TrillValue = _data.ReadByte() + note.StringTuning;
-            switch (_data.ReadByte())
+            note.TrillValue = Data.ReadByte() + note.StringTuning;
+            switch (Data.ReadByte())
             {
                 case 1:
                     note.TrillSpeed = Duration.Sixteenth;
@@ -1396,7 +1396,7 @@ namespace AlphaTab.Importer
         public double ReadDouble()
         {
             var bytes = new byte[8];
-            _data.Read(bytes, 0, bytes.Length);
+            Data.Read(bytes, 0, bytes.Length);
 
             var sign = 1 - ((bytes[0] >> 7) << 1); // sign = bit 0
             var exp = (((bytes[0] << 4) & 0x7FF) | (bytes[1] >> 4)) - 1023; // exponent = bits 1..11
@@ -1415,23 +1415,23 @@ namespace AlphaTab.Importer
 
         public Color ReadColor()
         {
-            byte r = (byte)_data.ReadByte();
-            byte g = (byte)_data.ReadByte();
-            byte b = (byte)_data.ReadByte();
-            _data.Skip(1); // alpha?
+            byte r = (byte)Data.ReadByte();
+            byte g = (byte)Data.ReadByte();
+            byte b = (byte)Data.ReadByte();
+            Data.Skip(1); // alpha?
             return new Color(r, g, b);
         }
 
 
         public bool ReadBool()
         {
-            return _data.ReadByte() != 0;
+            return Data.ReadByte() != 0;
         }
 
         public int ReadInt32()
         {
             var bytes = new byte[4];
-            _data.Read(bytes, 0, 4);
+            Data.Read(bytes, 0, 4);
             return bytes[0] | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
         }
 
@@ -1442,8 +1442,8 @@ namespace AlphaTab.Importer
         /// <returns></returns>
         public string ReadStringIntUnused()
         {
-            _data.Skip(4);
-            return ReadString(_data.ReadByte());
+            Data.Skip(4);
+            return ReadString(Data.ReadByte());
         }
 
         /// <summary>
@@ -1462,7 +1462,7 @@ namespace AlphaTab.Importer
         public string ReadStringIntByte()
         {
             var length = ReadInt32() - 1;
-            _data.ReadByte();
+            Data.ReadByte();
             return ReadString(length);
         }
 
@@ -1470,7 +1470,7 @@ namespace AlphaTab.Importer
         public string ReadString(int length)
         {
             byte[] b = new byte[length];
-            _data.Read(b, 0, b.Length);
+            Data.Read(b, 0, b.Length);
             return Std.ToString(b);
         }
 
@@ -1482,11 +1482,11 @@ namespace AlphaTab.Importer
         /// <returns></returns>
         public string ReadStringByteLength(int length)
         {
-            var stringLength = _data.ReadByte();
+            var stringLength = Data.ReadByte();
             var s = ReadString(stringLength);
             if (stringLength < length)
             {
-                _data.Skip(length - stringLength);
+                Data.Skip(length - stringLength);
             }
             return s;
         }

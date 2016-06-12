@@ -16,7 +16,6 @@
  * License along with this library.
  */
 
-using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 
@@ -100,7 +99,6 @@ namespace AlphaTab.Rendering.Utils
         /// The new accidental type is also registered within the current scope
         /// </summary>
         /// <param name="note"></param>
-        /// <param name="noteLine"></param>
         /// <returns></returns>
         public AccidentalType ApplyAccidental(Note note)
         {

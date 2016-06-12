@@ -6,7 +6,7 @@ namespace AlphaTab.Exporter
 {
     public class AlphaTexExporter
     {
-        private StringBuilder _builder;
+        private readonly StringBuilder _builder;
 
         public AlphaTexExporter()
         {

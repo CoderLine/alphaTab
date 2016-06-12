@@ -51,10 +51,8 @@ namespace AlphaTab.Audio.Model
 
         public void WriteTo(IWriteable s)
         {
-            byte[] b;
-
             // magic number "MThd" (0x4D546864)
-            b = new byte[] { 0x4D, 0x54, 0x68, 0x64 };
+            var b = new byte[] { 0x4D, 0x54, 0x68, 0x64 };
             s.Write(b, 0, b.Length);
 
             // Header Length 6 (0x00000006)

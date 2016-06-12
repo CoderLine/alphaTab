@@ -29,9 +29,9 @@ namespace AlphaTab.Rendering
     /// </summary>
     public class EffectBarRenderer : GroupedBarRenderer
     {
-        private IEffectBarRendererInfo _info;
-        private FastList<FastList<EffectGlyph>> _uniqueEffectGlyphs;
-        private FastList<FastDictionary<int, EffectGlyph>> _effectGlyphs;
+        private readonly IEffectBarRendererInfo _info;
+        private readonly FastList<FastList<EffectGlyph>> _uniqueEffectGlyphs;
+        private readonly FastList<FastDictionary<int, EffectGlyph>> _effectGlyphs;
         private Beat _lastBeat;
 
         public EffectBarRenderer(Bar bar, IEffectBarRendererInfo info)

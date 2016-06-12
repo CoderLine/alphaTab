@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System;
+
 using AlphaTab.Model;
 
 namespace AlphaTab.Audio.Generator
@@ -24,7 +24,6 @@ namespace AlphaTab.Audio.Generator
     {
         private readonly Score _score;
 
-        private int _currentAlternateEndings;
         private int _repeatStartIndex;
         private int _repeatNumber;
         private bool _repeatOpen;
@@ -97,7 +96,6 @@ namespace AlphaTab.Audio.Generator
         public void MoveNext()
         {
             var masterBar = _score.MasterBars[Index];
-            var masterBarAlternateEndings = masterBar.AlternateEndings;
             var masterBarRepeatCount = masterBar.RepeatCount - 1;
 
             // if we encounter a repeat end 
@@ -115,7 +113,6 @@ namespace AlphaTab.Audio.Generator
                     // no repeats anymore, jump after repeat end
                     _repeatNumber = 0;
                     _repeatOpen = false;
-                    _currentAlternateEndings = 0;
                     ShouldPlay = true;
                     Index++;
                 }

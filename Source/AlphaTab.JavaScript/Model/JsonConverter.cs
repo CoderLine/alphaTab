@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using AlphaTab.Collections;
+﻿using AlphaTab.Collections;
 using SharpKit.JavaScript;
 
 namespace AlphaTab.Model

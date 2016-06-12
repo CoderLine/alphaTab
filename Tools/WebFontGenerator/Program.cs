@@ -18,8 +18,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Json;
-using System.Text;
 using System.Xml.Linq;
 using AlphaTab.Rendering.Glyphs;
 using Newtonsoft.Json;

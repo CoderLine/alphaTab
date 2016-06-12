@@ -23,7 +23,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class TabBeatPostNotesGlyph : BeatGlyphBase
     {
-        private FastList<IPostBeatNoteScaleListener> _scaleListeners;
+        private readonly FastList<IPostBeatNoteScaleListener> _scaleListeners;
 
         public TabBeatPostNotesGlyph()
         {
@@ -36,16 +36,6 @@ namespace AlphaTab.Rendering.Glyphs
             if (g is IPostBeatNoteScaleListener)
             {
                 _scaleListeners.Add((IPostBeatNoteScaleListener) g);
-            }
-        }
-
-        public override void ScaleToWidth(float width)
-        {
-            base.ScaleToWidth(width);
-
-            for (int i = 0; i < _scaleListeners.Count; i++)
-            {
-                _scaleListeners[i].ScaleToWidth(width);
             }
         }
 

@@ -29,7 +29,7 @@ namespace AlphaTab.Rendering.Layout
     /// <summary>
     /// This is the base public class for creating new layouting engines for the score renderer. 
     /// </summary>
-    abstract public class ScoreLayout
+    public abstract class ScoreLayout
     {
         private readonly FastDictionary<string, FastDictionary<string, BarRendererBase>> _barRendererLookup;
 

@@ -811,11 +811,6 @@
             like the vibrato. 
             </summary>
         </member>
-        <member name="P:AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase.SpringStartX">
-            <summary>
-            Gets or sets the x position where the spring of this beat starts. 
-            </summary>
-        </member>
         <member name="T:AlphaTab.Rendering.Glyphs.EffectGlyph">
             <summary>
             Effect-Glyphs implementing this public interface get notified
@@ -1165,7 +1160,6 @@
             The new accidental type is also registered within the current scope
             </summary>
             <param name="note"></param>
-            <param name="noteLine"></param>
             <returns></returns>
         </member>
         <member name="T:AlphaTab.Rendering.Utils.BarHelpersGroup">
@@ -1317,7 +1311,23 @@
             </ul>
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "P:AlphaTab.LayoutSettings.AdditionalSettings" -->
+        <member name="P:AlphaTab.LayoutSettings.AdditionalSettings">
+            <summary>
+            Additional layout mode specific settings.
+            <strong>mode=page</strong>
+            <ul>
+             <li><strong>barsPerRow</strong> - Limit the displayed bars per row, <em>-1 for sized based limit</em> (integer, default:-1)</li>
+             <li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li>
+             <li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li>
+             <li><strong>hideInfo</strong> - Render the song information or not (boolean, default:true)</li>
+            </ul>
+            <strong>mode=horizontal</strong>
+            <ul>
+             <li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li>
+             <li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li>
+            </ul>
+            </summary>
+        </member>
         <member name="P:AlphaTab.StaveSettings.Id">
             <summary>
             The stave identifier.

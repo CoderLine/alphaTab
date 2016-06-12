@@ -18,7 +18,7 @@ namespace AlphaTab.Importer
         {
             _trackById = new FastDictionary<string, Track>();
 
-            var xml = Std.ToString(_data.ReadAll());
+            var xml = Std.ToString(Data.ReadAll());
             IXmlDocument dom ;
             try
             {
@@ -414,7 +414,6 @@ namespace AlphaTab.Importer
 
         private void ParseTimeModification(IXmlNode element, Beat beat)
         {
-            var actualNodes = 0;
             element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)

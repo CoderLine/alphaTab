@@ -15,11 +15,10 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Dynamic;
+
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using System.Xml.XPath;
 
 namespace FontGlyphExtractor
 {

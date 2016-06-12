@@ -16,7 +16,6 @@
  * License along with this library.
  */
 
-using System.Diagnostics;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 
@@ -33,7 +32,7 @@ namespace AlphaTab.Importer
             // from the GPX container
             var fileSystem = new GpxFileSystem();
             fileSystem.FileFilter = s => s == GpxFileSystem.ScoreGpif;
-            fileSystem.Load(_data);
+            fileSystem.Load(Data);
 
             // convert data to string
             var data = fileSystem.Files[0].Data;

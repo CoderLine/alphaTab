@@ -16,7 +16,6 @@
  * License along with this library.
  */
 using System;
-using System.Runtime.CompilerServices;
 using SharpKit.JavaScript;
 
 namespace AlphaTab.Collections

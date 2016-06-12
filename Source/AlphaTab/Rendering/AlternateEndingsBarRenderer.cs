@@ -18,10 +18,8 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Layout;
-using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering
 {

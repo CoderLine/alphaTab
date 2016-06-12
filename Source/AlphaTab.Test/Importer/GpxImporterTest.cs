@@ -16,7 +16,6 @@
  * License along with this library.
  */
 using System;
-using System.Diagnostics;
 using System.IO;
 using AlphaTab.Importer;
 using AlphaTab.IO;
@@ -33,12 +32,12 @@ namespace AlphaTab.Test.Importer
             return Environment.FileLoaders["default"]().LoadBinary(Path.Combine(path, name));
         }
         
-        internal GpxImporter PrepareImporterWithFile(string name)
+        internal new GpxImporter PrepareImporterWithFile(string name)
         {
             return PrepareImporterWithBytes(Load(name));
         }
 
-        internal GpxImporter PrepareImporterWithBytes(byte[] buffer)
+        internal new GpxImporter PrepareImporterWithBytes(byte[] buffer)
         {
             var readerBase = new GpxImporter();
             readerBase.Init(new StreamWrapper(new MemoryStream(buffer)));

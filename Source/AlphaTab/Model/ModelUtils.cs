@@ -20,7 +20,7 @@ namespace AlphaTab.Model
     /// <summary>
     /// This public class contains some utilities for working with model public classes
     /// </summary>
-    static public class ModelUtils
+    public static class ModelUtils
     {
         public static int GetIndex(this Duration duration)
         {

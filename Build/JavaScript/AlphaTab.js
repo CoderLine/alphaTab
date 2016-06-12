@@ -2280,7 +2280,6 @@ AlphaTab.Audio.Generator.MidiFileHandler.BuildSysExMessage = function (data){
 };
 AlphaTab.Audio.Generator.MidiPlaybackController = function (score){
     this._score = null;
-    this._currentAlternateEndings = 0;
     this._repeatStartIndex = 0;
     this._repeatNumber = 0;
     this._repeatOpen = false;
@@ -2328,7 +2327,6 @@ AlphaTab.Audio.Generator.MidiPlaybackController.prototype = {
     },
     MoveNext: function (){
         var masterBar = this._score.MasterBars[this.Index];
-        var masterBarAlternateEndings = masterBar.AlternateEndings;
         var masterBarRepeatCount = masterBar.RepeatCount - 1;
         // if we encounter a repeat end 
         if (this._repeatOpen && (masterBarRepeatCount > 0)){
@@ -2342,7 +2340,6 @@ AlphaTab.Audio.Generator.MidiPlaybackController.prototype = {
                 // no repeats anymore, jump after repeat end
                 this._repeatNumber = 0;
                 this._repeatOpen = false;
-                this._currentAlternateEndings = 0;
                 this.ShouldPlay = true;
                 this.Index++;
             }
@@ -2465,9 +2462,8 @@ AlphaTab.Audio.Model.MidiFile.prototype = {
         return track;
     },
     WriteTo: function (s){
-        var b;
         // magic number "MThd" (0x4D546864)
-        b = new Uint8Array([77, 84, 104, 100]);
+        var b = new Uint8Array([77, 84, 104, 100]);
         s.Write(b, 0, b.length);
         // Header Length 6 (0x00000006)
         b = new Uint8Array([0, 0, 0, 6]);
@@ -3176,11 +3172,11 @@ AlphaTab.Importer.AlphaTexException.prototype = {
     }
 };
 AlphaTab.Importer.ScoreImporter = function (){
-    this._data = null;
+    this.Data = null;
 };
 AlphaTab.Importer.ScoreImporter.prototype = {
     Init: function (data){
-        this._data = data;
+        this.Data = data;
     }
 };
 AlphaTab.Importer.ScoreImporter.BuildImporters = function (){
@@ -3298,7 +3294,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
         return tuning;
     },
     NextChar: function (){
-        var b = this._data.ReadByte();
+        var b = this.Data.ReadByte();
         if (b == -1){
             this._ch = 0;
         }
@@ -4314,7 +4310,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             // master effect (4)
             // master equalizer (10)
             // master equalizer preset (1)
-            this._data.Skip(19);
+            this.Data.Skip(19);
         }
         // page setup since GP5
         if (this._versionNumber >= 500){
@@ -4332,7 +4328,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         this.ReadInt32();
         if (this._versionNumber >= 400){
             /* octave = */
-            this._data.ReadByte();
+            this.Data.ReadByte();
         }
         this.ReadPlaybackInfos();
         // repetition stuff
@@ -4356,9 +4352,9 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             // "Da Segno Segno al Fine" bar index (2)
             // "Da Coda" bar index (2)
             // "Da Double Coda" bar index (2)
-            this._data.Skip(38);
+            this.Data.Skip(38);
             // unknown (4)
-            this._data.Skip(4);
+            this.Data.Skip(4);
         }
         // contents
         this._barCount = this.ReadInt32();
@@ -4415,7 +4411,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         // Padding Bottom (4)
         // Size Proportion(4)
         // Header and Footer display flags (2)
-        this._data.Skip(30);
+        this.Data.Skip(30);
         // title format
         // subtitle format
         // artist format
@@ -4436,9 +4432,9 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             info.PrimaryChannel = i;
             info.SecondaryChannel = i;
             info.Program = this.ReadInt32();
-            info.Volume = this._data.ReadByte();
-            info.Balance = this._data.ReadByte();
-            this._data.Skip(6);
+            info.Volume = this.Data.ReadByte();
+            info.Balance = this.Data.ReadByte();
+            this.Data.Skip(6);
             this._playbackInfos.push(info);
         }
     },
@@ -4453,16 +4449,16 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             previousMasterBar = this._score.MasterBars[this._score.MasterBars.length - 1];
         }
         var newMasterBar = new AlphaTab.Model.MasterBar();
-        var flags = this._data.ReadByte();
+        var flags = this.Data.ReadByte();
         // time signature
         if ((flags & 1) != 0){
-            newMasterBar.TimeSignatureNumerator = this._data.ReadByte();
+            newMasterBar.TimeSignatureNumerator = this.Data.ReadByte();
         }
         else if (previousMasterBar != null){
             newMasterBar.TimeSignatureNumerator = previousMasterBar.TimeSignatureNumerator;
         }
         if ((flags & 2) != 0){
-            newMasterBar.TimeSignatureDenominator = this._data.ReadByte();
+            newMasterBar.TimeSignatureDenominator = this.Data.ReadByte();
         }
         else if (previousMasterBar != null){
             newMasterBar.TimeSignatureDenominator = previousMasterBar.TimeSignatureDenominator;
@@ -4470,7 +4466,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         // repeatings
         newMasterBar.IsRepeatStart = (flags & 4) != 0;
         if ((flags & 8) != 0){
-            newMasterBar.RepeatCount = this._data.ReadByte() + (this._versionNumber >= 500 ? 0 : 1);
+            newMasterBar.RepeatCount = this.Data.ReadByte() + (this._versionNumber >= 500 ? 0 : 1);
         }
         // alternate endings
         if ((flags & 16) != 0){
@@ -4490,7 +4486,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
                 }
                 // now calculate the alternative for this bar
                 var repeatAlternative = 0;
-                var repeatMask = this._data.ReadByte();
+                var repeatMask = this.Data.ReadByte();
                 for (var i = 0; i < 8; i++){
                     // only add the repeating if it is not existing
                     var repeating = (1 << i);
@@ -4501,7 +4497,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
                 newMasterBar.AlternateEndings = repeatAlternative;
             }
             else {
-                newMasterBar.AlternateEndings = this._data.ReadByte();
+                newMasterBar.AlternateEndings = this.Data.ReadByte();
             }
         }
         // marker
@@ -4514,23 +4510,23 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         }
         // keysignature
         if ((flags & 64) != 0){
-            newMasterBar.KeySignature = AlphaTab.Platform.Std.ReadSignedByte(this._data);
-            this._data.ReadByte();
+            newMasterBar.KeySignature = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
+            this.Data.ReadByte();
             // keysignature type
         }
         else if (previousMasterBar != null){
             newMasterBar.KeySignature = previousMasterBar.KeySignature;
         }
         if ((this._versionNumber >= 500) && ((flags & 3) != 0)){
-            this._data.Skip(4);
+            this.Data.Skip(4);
         }
         // better alternate ending mask in GP5
         if ((this._versionNumber >= 500) && ((flags & 16) == 0)){
-            newMasterBar.AlternateEndings = this._data.ReadByte();
+            newMasterBar.AlternateEndings = this.Data.ReadByte();
         }
         // tripletfeel
         if (this._versionNumber >= 500){
-            var tripletFeel = this._data.ReadByte();
+            var tripletFeel = this.Data.ReadByte();
             switch (tripletFeel){
                 case 1:
                     newMasterBar.TripletFeel = AlphaTab.Model.TripletFeel.Triplet8th;
@@ -4539,7 +4535,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
                     newMasterBar.TripletFeel = AlphaTab.Model.TripletFeel.Triplet16th;
                     break;
             }
-            this._data.ReadByte();
+            this.Data.ReadByte();
         }
         else {
             newMasterBar.TripletFeel = this._globalTripletFeel;
@@ -4555,7 +4551,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
     ReadTrack: function (){
         var newTrack = new AlphaTab.Model.Track(1);
         this._score.AddTrack(newTrack);
-        var flags = this._data.ReadByte();
+        var flags = this.Data.ReadByte();
         newTrack.Name = this.ReadStringByteLength(40);
         newTrack.IsPercussion = (flags & 1) != 0;
         var stringCount = this.ReadInt32();
@@ -4570,7 +4566,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         var port = this.ReadInt32();
         var index = this.ReadInt32() - 1;
         var effectChannel = this.ReadInt32() - 1;
-        this._data.Skip(4);
+        this.Data.Skip(4);
         // Fretcount
         if (index >= 0 && index < this._playbackInfos.length){
             var info = this._playbackInfos[index];
@@ -4586,17 +4582,17 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             // flags for 
             //  0x01 -> show tablature
             //  0x02 -> show standard notation
-            this._data.ReadByte();
+            this.Data.ReadByte();
             // flags for
             //  0x02 -> auto let ring
             //  0x04 -> auto brush
-            this._data.ReadByte();
+            this.Data.ReadByte();
             // unknown
-            this._data.Skip(43);
+            this.Data.Skip(43);
         }
         // unknown
         if (this._versionNumber >= 510){
-            this._data.Skip(4);
+            this.Data.Skip(4);
             this.ReadStringIntByte();
             this.ReadStringIntByte();
         }
@@ -4616,7 +4612,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         track.AddBarToStaff(0, newBar);
         var voiceCount = 1;
         if (this._versionNumber >= 500){
-            this._data.ReadByte();
+            this.Data.ReadByte();
             voiceCount = 2;
         }
         for (var v = 0; v < voiceCount; v++){
@@ -4636,16 +4632,16 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
     },
     ReadBeat: function (track, bar, voice){
         var newBeat = new AlphaTab.Model.Beat();
-        var flags = this._data.ReadByte();
+        var flags = this.Data.ReadByte();
         if ((flags & 1) != 0){
             newBeat.Dots = 1;
         }
         if ((flags & 64) != 0){
-            var type = this._data.ReadByte();
+            var type = this.Data.ReadByte();
             newBeat.IsEmpty = (type & 2) == 0;
         }
         voice.AddBeat(newBeat);
-        var duration = AlphaTab.Platform.Std.ReadSignedByte(this._data);
+        var duration = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
         switch (duration){
             case -2:
                 newBeat.Duration = AlphaTab.Model.Duration.Whole;
@@ -4715,17 +4711,17 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         if ((flags & 16) != 0){
             this.ReadMixTableChange(newBeat);
         }
-        var stringFlags = this._data.ReadByte();
+        var stringFlags = this.Data.ReadByte();
         for (var i = 6; i >= 0; i--){
             if ((stringFlags & (1 << i)) != 0 && (6 - i) < track.Tuning.length){
                 this.ReadNote(track, bar, voice, newBeat, (6 - i));
             }
         }
         if (this._versionNumber >= 500){
-            this._data.ReadByte();
-            var flag = this._data.ReadByte();
+            this.Data.ReadByte();
+            var flag = this.Data.ReadByte();
             if ((flag & 8) != 0){
-                this._data.ReadByte();
+                this.Data.ReadByte();
             }
         }
     },
@@ -4733,9 +4729,9 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         var chord = new AlphaTab.Model.Chord();
         var chordId = AlphaTab.Platform.Std.NewGuid();
         if (this._versionNumber >= 500){
-            this._data.Skip(17);
+            this.Data.Skip(17);
             chord.Name = this.ReadStringByteLength(21);
-            this._data.Skip(4);
+            this.Data.Skip(4);
             chord.FirstFret = this.ReadInt32();
             for (var i = 0; i < 7; i++){
                 var fret = this.ReadInt32();
@@ -4743,10 +4739,10 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
                     chord.Strings.push(fret);
                 }
             }
-            this._data.Skip(32);
+            this.Data.Skip(32);
         }
         else {
-            if (this._data.ReadByte() != 0){
+            if (this.Data.ReadByte() != 0){
                 // gp4
                 if (this._versionNumber >= 400){
                     // Sharp (1)
@@ -4757,13 +4753,13 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
                     // Bass (4)
                     // Diminished/Augmented (4)
                     // Add (1)
-                    this._data.Skip(16);
+                    this.Data.Skip(16);
                     chord.Name = (this.ReadStringByteLength(21));
                     // Unused (2)
                     // Fifth (1)
                     // Ninth (1)
                     // Eleventh (1)
-                    this._data.Skip(4);
+                    this.Data.Skip(4);
                     chord.FirstFret = (this.ReadInt32());
                     for (var i = 0; i < 7; i++){
                         var fret = this.ReadInt32();
@@ -4779,11 +4775,11 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
                     // Fingering (7)
                     // Show Diagram Fingering (1)
                     // ??
-                    this._data.Skip(32);
+                    this.Data.Skip(32);
                 }
                 else {
                     // unknown
-                    this._data.Skip(25);
+                    this.Data.Skip(25);
                     chord.Name = this.ReadStringByteLength(34);
                     chord.FirstFret = this.ReadInt32();
                     for (var i = 0; i < 6; i++){
@@ -4791,7 +4787,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
                         chord.Strings.push(fret);
                     }
                     // unknown
-                    this._data.Skip(36);
+                    this.Data.Skip(36);
                 }
             }
             else {
@@ -4814,10 +4810,10 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         }
     },
     ReadBeatEffects: function (beat){
-        var flags = this._data.ReadByte();
+        var flags = this.Data.ReadByte();
         var flags2 = 0;
         if (this._versionNumber >= 400){
-            flags2 = this._data.ReadByte();
+            flags2 = this.Data.ReadByte();
         }
         beat.FadeIn = (flags & 16) != 0;
         if ((this._versionNumber < 400 && (flags & 1) != 0) || (flags & 2) != 0){
@@ -4825,7 +4821,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         }
         beat.HasRasgueado = (flags2 & 1) != 0;
         if ((flags & 32) != 0 && this._versionNumber >= 400){
-            var slapPop = AlphaTab.Platform.Std.ReadSignedByte(this._data);
+            var slapPop = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
             switch (slapPop){
                 case 1:
                     beat.Tap = true;
@@ -4839,7 +4835,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             }
         }
         else if ((flags & 32) != 0){
-            var slapPop = AlphaTab.Platform.Std.ReadSignedByte(this._data);
+            var slapPop = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
             switch (slapPop){
                 case 1:
                     beat.Tap = true;
@@ -4851,7 +4847,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
                     beat.Pop = true;
                     break;
             }
-            this._data.Skip(4);
+            this.Data.Skip(4);
         }
         if ((flags2 & 4) != 0){
             this.ReadTremoloBarEffect(beat);
@@ -4860,12 +4856,12 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             var strokeUp;
             var strokeDown;
             if (this._versionNumber < 500){
-                strokeDown = this._data.ReadByte();
-                strokeUp = this._data.ReadByte();
+                strokeDown = this.Data.ReadByte();
+                strokeUp = this.Data.ReadByte();
             }
             else {
-                strokeUp = this._data.ReadByte();
-                strokeDown = this._data.ReadByte();
+                strokeUp = this.Data.ReadByte();
+                strokeDown = this.Data.ReadByte();
             }
             if (strokeUp > 0){
                 beat.BrushType = AlphaTab.Model.BrushType.BrushUp;
@@ -4877,7 +4873,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             }
         }
         if ((flags2 & 2) != 0){
-            switch (AlphaTab.Platform.Std.ReadSignedByte(this._data)){
+            switch (AlphaTab.Platform.Std.ReadSignedByte(this.Data)){
                 case 0:
                     beat.PickStroke = AlphaTab.Model.PickStrokeType.None;
                     break;
@@ -4891,7 +4887,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         }
     },
     ReadTremoloBarEffect: function (beat){
-        this._data.ReadByte();
+        this.Data.ReadByte();
         // type
         this.ReadInt32();
         // value
@@ -4911,54 +4907,54 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
     },
     ReadMixTableChange: function (beat){
         var tableChange = new AlphaTab.Importer.MixTableChange();
-        tableChange.Instrument = this._data.ReadByte();
+        tableChange.Instrument = this.Data.ReadByte();
         if (this._versionNumber >= 500){
-            this._data.Skip(16);
+            this.Data.Skip(16);
             // Rse Info 
         }
-        tableChange.Volume = AlphaTab.Platform.Std.ReadSignedByte(this._data);
-        tableChange.Balance = AlphaTab.Platform.Std.ReadSignedByte(this._data);
-        var chorus = AlphaTab.Platform.Std.ReadSignedByte(this._data);
-        var reverb = AlphaTab.Platform.Std.ReadSignedByte(this._data);
-        var phaser = AlphaTab.Platform.Std.ReadSignedByte(this._data);
-        var tremolo = AlphaTab.Platform.Std.ReadSignedByte(this._data);
+        tableChange.Volume = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
+        tableChange.Balance = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
+        var chorus = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
+        var reverb = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
+        var phaser = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
+        var tremolo = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
         if (this._versionNumber >= 500){
             tableChange.TempoName = this.ReadStringIntByte();
         }
         tableChange.Tempo = this.ReadInt32();
         // durations
         if (tableChange.Volume >= 0){
-            this._data.ReadByte();
+            this.Data.ReadByte();
         }
         if (tableChange.Balance >= 0){
-            this._data.ReadByte();
+            this.Data.ReadByte();
         }
         if (chorus >= 0){
-            this._data.ReadByte();
+            this.Data.ReadByte();
         }
         if (reverb >= 0){
-            this._data.ReadByte();
+            this.Data.ReadByte();
         }
         if (phaser >= 0){
-            this._data.ReadByte();
+            this.Data.ReadByte();
         }
         if (tremolo >= 0){
-            this._data.ReadByte();
+            this.Data.ReadByte();
         }
         if (tableChange.Tempo >= 0){
-            tableChange.Duration = AlphaTab.Platform.Std.ReadSignedByte(this._data);
+            tableChange.Duration = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
             if (this._versionNumber >= 510){
-                this._data.ReadByte();
+                this.Data.ReadByte();
                 // hideTempo (bool)
             }
         }
         if (this._versionNumber >= 400){
-            this._data.ReadByte();
+            this.Data.ReadByte();
             // all tracks flag
         }
         // unknown
         if (this._versionNumber >= 500){
-            this._data.ReadByte();
+            this.Data.ReadByte();
         }
         // unknown
         if (this._versionNumber >= 510){
@@ -4998,7 +4994,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
     ReadNote: function (track, bar, voice, beat, stringIndex){
         var newNote = new AlphaTab.Model.Note();
         newNote.String = track.Tuning.length - stringIndex;
-        var flags = this._data.ReadByte();
+        var flags = this.Data.ReadByte();
         if ((flags & 2) != 0){
             newNote.Accentuated = AlphaTab.Model.AccentuationType.Heavy;
         }
@@ -5007,7 +5003,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         }
         newNote.IsGhost = ((flags & 4) != 0);
         if ((flags & 32) != 0){
-            var noteType = this._data.ReadByte();
+            var noteType = this.Data.ReadByte();
             if (noteType == 3){
                 newNote.IsDead = true;
             }
@@ -5016,29 +5012,29 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             }
         }
         if ((flags & 1) != 0 && this._versionNumber < 500){
-            this._data.ReadByte();
+            this.Data.ReadByte();
             // duration 
-            this._data.ReadByte();
+            this.Data.ReadByte();
             // tuplet
         }
         if ((flags & 16) != 0){
-            var dynamicNumber = AlphaTab.Platform.Std.ReadSignedByte(this._data);
+            var dynamicNumber = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
             newNote.Dynamic = this.ToDynamicValue(dynamicNumber);
             beat.Dynamic = newNote.Dynamic;
         }
         if ((flags & 32) != 0){
-            newNote.Fret = AlphaTab.Platform.Std.ReadSignedByte(this._data);
+            newNote.Fret = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
         }
         if ((flags & 128) != 0){
-            newNote.LeftHandFinger = AlphaTab.Platform.Std.ReadSignedByte(this._data);
-            newNote.RightHandFinger = AlphaTab.Platform.Std.ReadSignedByte(this._data);
+            newNote.LeftHandFinger = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
+            newNote.RightHandFinger = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
             newNote.IsFingering = true;
         }
         if (this._versionNumber >= 500){
             if ((flags & 1) != 0){
                 newNote.DurationPercent = this.ReadDouble();
             }
-            var flags2 = this._data.ReadByte();
+            var flags2 = this.Data.ReadByte();
             newNote.AccidentalMode = (flags2 & 2) != 0 ? AlphaTab.Model.NoteAccidentalMode.SwapAccidentals : AlphaTab.Model.NoteAccidentalMode.Default;
         }
         beat.AddNote(newNote);
@@ -5069,10 +5065,10 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         }
     },
     ReadNoteEffects: function (track, voice, beat, note){
-        var flags = this._data.ReadByte();
+        var flags = this.Data.ReadByte();
         var flags2 = 0;
         if (this._versionNumber >= 400){
-            flags2 = this._data.ReadByte();
+            flags2 = this.Data.ReadByte();
         }
         if ((flags & 1) != 0){
             this.ReadBend(note);
@@ -5115,7 +5111,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         note.IsStaccato = (flags2 & 1) != 0;
     },
     ReadBend: function (note){
-        this._data.ReadByte();
+        this.Data.ReadByte();
         // type
         this.ReadInt32();
         // value
@@ -5137,10 +5133,10 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         var graceBeat = new AlphaTab.Model.Beat();
         var graceNote = new AlphaTab.Model.Note();
         graceNote.String = note.String;
-        graceNote.Fret = AlphaTab.Platform.Std.ReadSignedByte(this._data);
+        graceNote.Fret = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
         graceBeat.Duration = AlphaTab.Model.Duration.ThirtySecond;
-        graceBeat.Dynamic = this.ToDynamicValue(AlphaTab.Platform.Std.ReadSignedByte(this._data));
-        var transition = AlphaTab.Platform.Std.ReadSignedByte(this._data);
+        graceBeat.Dynamic = this.ToDynamicValue(AlphaTab.Platform.Std.ReadSignedByte(this.Data));
+        var transition = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
         switch (transition){
             case 0:
                 break;
@@ -5155,13 +5151,13 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
                 break;
         }
         graceNote.Dynamic = graceBeat.Dynamic;
-        this._data.Skip(1);
+        this.Data.Skip(1);
         // duration
         if (this._versionNumber < 500){
             graceBeat.GraceType = AlphaTab.Model.GraceType.BeforeBeat;
         }
         else {
-            var flags = this._data.ReadByte();
+            var flags = this.Data.ReadByte();
             graceNote.IsDead = (flags & 1) != 0;
             graceBeat.GraceType = (flags & 2) != 0 ? AlphaTab.Model.GraceType.OnBeat : AlphaTab.Model.GraceType.BeforeBeat;
         }
@@ -5169,7 +5165,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         voice.AddGraceBeat(graceBeat);
     },
     ReadTremoloPicking: function (beat){
-        var speed = this._data.ReadByte();
+        var speed = this.Data.ReadByte();
         switch (speed){
             case 1:
                 beat.TremoloSpeed = AlphaTab.Model.Duration.Eighth;
@@ -5184,7 +5180,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
     },
     ReadSlide: function (note){
         if (this._versionNumber >= 500){
-            var type = AlphaTab.Platform.Std.ReadSignedByte(this._data);
+            var type = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
             switch (type){
                 case 1:
                     note.SlideType = AlphaTab.Model.SlideType.Shift;
@@ -5210,7 +5206,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             }
         }
         else {
-            var type = AlphaTab.Platform.Std.ReadSignedByte(this._data);
+            var type = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
             switch (type){
                 case 1:
                     note.SlideType = AlphaTab.Model.SlideType.Shift;
@@ -5237,7 +5233,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         }
     },
     ReadArtificialHarmonic: function (note){
-        var type = this._data.ReadByte();
+        var type = this.Data.ReadByte();
         if (this._versionNumber >= 500){
             switch (type){
                 case 1:
@@ -5245,14 +5241,14 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
                     note.HarmonicValue = this.DeltaFretToHarmonicValue(note.Fret);
                     break;
                 case 2:
-                    var harmonicTone = this._data.ReadByte();
-                    var harmonicKey = this._data.ReadByte();
-                    var harmonicOctaveOffset = this._data.ReadByte();
+                    var harmonicTone = this.Data.ReadByte();
+                    var harmonicKey = this.Data.ReadByte();
+                    var harmonicOctaveOffset = this.Data.ReadByte();
                     note.HarmonicType = AlphaTab.Model.HarmonicType.Artificial;
                     break;
                 case 3:
                     note.HarmonicType = AlphaTab.Model.HarmonicType.Tap;
-                    note.HarmonicValue = this.DeltaFretToHarmonicValue(this._data.ReadByte());
+                    note.HarmonicValue = this.DeltaFretToHarmonicValue(this.Data.ReadByte());
                     break;
                 case 4:
                     note.HarmonicType = AlphaTab.Model.HarmonicType.Pinch;
@@ -5321,8 +5317,8 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         }
     },
     ReadTrill: function (note){
-        note.TrillValue = this._data.ReadByte() + note.get_StringTuning();
-        switch (this._data.ReadByte()){
+        note.TrillValue = this.Data.ReadByte() + note.get_StringTuning();
+        switch (this.Data.ReadByte()){
             case 1:
                 note.TrillSpeed = AlphaTab.Model.Duration.Sixteenth;
                 break;
@@ -5336,7 +5332,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
     },
     ReadDouble: function (){
         var bytes = new Uint8Array(8);
-        this._data.Read(bytes, 0, bytes.length);
+        this.Data.Read(bytes, 0, bytes.length);
         var sign = 1 - ((bytes[0] >> 7) << 1);
         // sign = bit 0
         var exp = (((bytes[0] << 4) & 2047) | (bytes[1] >> 4)) - 1023;
@@ -5350,43 +5346,43 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         return (((((bytes[1] & 15) << 16) | (bytes[2] << 8) | bytes[3]) * 4294967296 + (bytes[4] >> 7) * 2147483648 + (((bytes[4] & 127) << 24) | (bytes[5] << 16) | (bytes[6] << 8) | bytes[7]))) | 0;
     },
     ReadColor: function (){
-        var r = this._data.ReadByte();
-        var g = this._data.ReadByte();
-        var b = this._data.ReadByte();
-        this._data.Skip(1);
+        var r = this.Data.ReadByte();
+        var g = this.Data.ReadByte();
+        var b = this.Data.ReadByte();
+        this.Data.Skip(1);
         // alpha?
         return new AlphaTab.Platform.Model.Color(r, g, b, 255);
     },
     ReadBool: function (){
-        return this._data.ReadByte() != 0;
+        return this.Data.ReadByte() != 0;
     },
     ReadInt32: function (){
         var bytes = new Uint8Array(4);
-        this._data.Read(bytes, 0, 4);
+        this.Data.Read(bytes, 0, 4);
         return bytes[0] | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
     },
     ReadStringIntUnused: function (){
-        this._data.Skip(4);
-        return this.ReadString(this._data.ReadByte());
+        this.Data.Skip(4);
+        return this.ReadString(this.Data.ReadByte());
     },
     ReadStringInt: function (){
         return this.ReadString(this.ReadInt32());
     },
     ReadStringIntByte: function (){
         var length = this.ReadInt32() - 1;
-        this._data.ReadByte();
+        this.Data.ReadByte();
         return this.ReadString(length);
     },
     ReadString: function (length){
         var b = new Uint8Array(length);
-        this._data.Read(b, 0, b.length);
+        this.Data.Read(b, 0, b.length);
         return AlphaTab.Platform.Std.ToString(b);
     },
     ReadStringByteLength: function (length){
-        var stringLength = this._data.ReadByte();
+        var stringLength = this.Data.ReadByte();
         var s = this.ReadString(stringLength);
         if (stringLength < length){
-            this._data.Skip(length - stringLength);
+            this.Data.Skip(length - stringLength);
         }
         return s;
     }
@@ -5579,7 +5575,7 @@ AlphaTab.Importer.GpxImporter.prototype = {
         fileSystem.FileFilter = $CreateAnonymousDelegate(this, function (s){
             return s == "score.gpif";
         });
-        fileSystem.Load(this._data);
+        fileSystem.Load(this.Data);
         // convert data to string
         var data = fileSystem.Files[0].Data;
         var xml = AlphaTab.Platform.Std.ToString(data);
@@ -6772,7 +6768,7 @@ AlphaTab.Importer.MusicXml2Importer = function (){
 AlphaTab.Importer.MusicXml2Importer.prototype = {
     ReadScore: function (){
         this._trackById = {};
-        var xml = AlphaTab.Platform.Std.ToString(this._data.ReadAll());
+        var xml = AlphaTab.Platform.Std.ToString(this.Data.ReadAll());
         var dom;
         try{
             dom = AlphaTab.Platform.Std.LoadXml(xml);
@@ -7059,7 +7055,6 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
         }));
     },
     ParseTimeModification: function (element, beat){
-        var actualNodes = 0;
         AlphaTab.Platform.Std.IterateChildren(element, $CreateAnonymousDelegate(this, function (c){
             if (c.get_NodeType() == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.get_LocalName()){
@@ -9261,9 +9256,6 @@ AlphaTab.Rendering.GroupedBarRenderer.prototype = {
         AlphaTab.Rendering.BarRendererBase.prototype.ScaleToWidth.call(this, width);
     },
     FinalizeRenderer: function (layout){
-        AlphaTab.Platform.Std.Foreach(AlphaTab.Rendering.Glyphs.VoiceContainerGlyph, this._voiceContainers, $CreateAnonymousDelegate(this, function (c){
-            c.FinalizeGlyph(layout);
-        }));
     },
     Paint: function (cx, cy, canvas){
         this.PaintBackground(cx, cy, canvas);
@@ -9876,6 +9868,7 @@ AlphaTab.Rendering.Effects.HarmonicsEffectInfo.prototype = {
         if (!note.get_IsHarmonic())
             return false;
         if (note.Beat != this._beat || note.HarmonicType > this._beatType){
+            this._beat = note.Beat;
             this._beatType = note.HarmonicType;
         }
         return true;
@@ -10391,11 +10384,6 @@ AlphaTab.Rendering.Glyphs.BeatContainerGlyph = function (beat, voiceContainer){
     this.VoiceContainer = voiceContainer;
 };
 AlphaTab.Rendering.Glyphs.BeatContainerGlyph.prototype = {
-    FinalizeGlyph: function (layout){
-        this.PreNotes.FinalizeGlyph(layout);
-        this.OnNotes.FinalizeGlyph(layout);
-        this.PostNotes.FinalizeGlyph(layout);
-    },
     RegisterLayoutingInfo: function (layoutings){
         var preBeatStretch = this.PreNotes.Width + this.OnNotes.Width / 2;
         var postBeatStretch = this.OnNotes.Width / 2 + this.PostNotes.Width;
@@ -10433,6 +10421,9 @@ AlphaTab.Rendering.Glyphs.BeatContainerGlyph.prototype = {
         this.MinWidth = this.PreNotes.Width + this.OnNotes.Width + this.PostNotes.Width;
         this.Width = this.MinWidth;
         this.OnTimeX = this.OnNotes.X + this.OnNotes.Width / 2;
+    },
+    UpdateBeamingHelper: function (){
+        this.OnNotes.UpdateBeamingHelper();
     },
     CreateTies: function (n){
     },
@@ -10498,18 +10489,16 @@ AlphaTab.Rendering.Glyphs.BeatGlyphBase.prototype = {
         for (var i = this.Container.Beat.Notes.length - 1; i >= 0; i--){
             action(this.Container.Beat.Notes[i]);
         }
-    },
-    FinalizeGlyph: function (layout){
-    },
-    ScaleToWidth: function (width){
-        this.Width = width;
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.BeatGlyphBase, AlphaTab.Rendering.Glyphs.GlyphGroup);
 AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase = function (){
     this.BeamingHelper = null;
-    this.SpringStartX = 0;
     AlphaTab.Rendering.Glyphs.BeatGlyphBase.call(this);
+};
+AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase.prototype = {
+    UpdateBeamingHelper: function (){
+    }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase, AlphaTab.Rendering.Glyphs.BeatGlyphBase);
 AlphaTab.Rendering.Glyphs.BendGlyph = function (n, width, bendValueHeight){
@@ -11695,7 +11684,7 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph = function (){
     AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase.call(this);
 };
 AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
-    FinalizeGlyph: function (layout){
+    UpdateBeamingHelper: function (){
         if (this.NoteHeads != null){
             this.NoteHeads.UpdateBeamingHelper(this.Container.X + this.X);
         }
@@ -12409,7 +12398,6 @@ $Inherit(AlphaTab.Rendering.Glyphs.TabBeatContainerGlyph, AlphaTab.Rendering.Gly
 AlphaTab.Rendering.Glyphs.TabBeatGlyph = function (){
     this.NoteNumbers = null;
     this.RestGlyph = null;
-    this.BeamingHelper = null;
     AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase.call(this);
 };
 AlphaTab.Rendering.Glyphs.TabBeatGlyph.prototype = {
@@ -12453,7 +12441,7 @@ AlphaTab.Rendering.Glyphs.TabBeatGlyph.prototype = {
         }
         this.Width = w;
     },
-    FinalizeGlyph: function (layout){
+    UpdateBeamingHelper: function (){
         if (!this.Container.Beat.get_IsRest()){
             this.NoteNumbers.UpdateBeamingHelper(this.Container.X + this.X);
         }
@@ -12481,12 +12469,6 @@ AlphaTab.Rendering.Glyphs.TabBeatPostNotesGlyph.prototype = {
         AlphaTab.Rendering.Glyphs.GlyphGroup.prototype.AddGlyph.call(this, g);
         if (true){
             this._scaleListeners.push(g);
-        }
-    },
-    ScaleToWidth: function (width){
-        AlphaTab.Rendering.Glyphs.BeatGlyphBase.prototype.ScaleToWidth.call(this, width);
-        for (var i = 0; i < this._scaleListeners.length; i++){
-            this._scaleListeners[i].ScaleToWidth(width);
         }
     },
     DoLayout: function (){
@@ -12967,6 +12949,7 @@ AlphaTab.Rendering.Glyphs.VoiceContainerGlyph.prototype = {
         for (var i = 0,j = this.BeatGlyphs.length; i < j; i++){
             var time = this.BeatGlyphs[i].Beat.get_AbsoluteStart();
             this.BeatGlyphs[i].X = positions[time] - this.BeatGlyphs[i].OnTimeX;
+            this.BeatGlyphs[i].UpdateBeamingHelper();
         }
     },
     RegisterLayoutingInfo: function (info){
@@ -12989,11 +12972,6 @@ AlphaTab.Rendering.Glyphs.VoiceContainerGlyph.prototype = {
     },
     DoLayout: function (){
         this.MinWidth = this.Width;
-    },
-    FinalizeGlyph: function (layout){
-        for (var i = 0,j = this.BeatGlyphs.length; i < j; i++){
-            this.BeatGlyphs[i].FinalizeGlyph(layout);
-        }
     },
     Paint: function (cx, cy, canvas){
         //canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 80);
@@ -13356,7 +13334,6 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
         var canvas = this.Renderer.Canvas;
         var res = this.Renderer.RenderingResources;
         var glyphs = [];
-        var str;
         if (!((score.Title==null)||(score.Title.length==0)) && (flags & AlphaTab.Rendering.Layout.HeaderFooterElements.Title) != AlphaTab.Rendering.Layout.HeaderFooterElements.None){
             glyphs.push(new AlphaTab.Rendering.Glyphs.TextGlyph(this.Width / 2, y, score.Title, res.TitleFont, AlphaTab.Platform.Model.TextAlign.Center));
             y += (35 * scale);
@@ -13400,7 +13377,7 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
                     var currentX = x;
                     var currentY = y;
                     for (var i = 0,j = this.Renderer.Tracks[0].Tuning.length; i < j; i++){
-                        str = "(" + (i + 1) + ") = " + AlphaTab.Model.Tuning.GetTextForTuning(this.Renderer.Tracks[0].Tuning[i], false);
+                        var str = "(" + (i + 1) + ") = " + AlphaTab.Model.Tuning.GetTextForTuning(this.Renderer.Tracks[0].Tuning[i], false);
                         glyphs.push(new AlphaTab.Rendering.Glyphs.TextGlyph(currentX, currentY, str, res.EffectFont, AlphaTab.Platform.Model.TextAlign.Left));
                         currentY += (15 * scale);
                         if (i == stringsPerColumn - 1){

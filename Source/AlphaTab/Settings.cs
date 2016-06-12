@@ -136,7 +136,7 @@ namespace AlphaTab
         /// Additional layout mode specific settings.
         /// <strong>mode=page</strong>
         /// <ul>
-        ///  <li><strong>barsPerRow</strong> - Limit the displayed bars per row, <em>-1 for sized based limit<em> (integer, default:-1)</li>
+        ///  <li><strong>barsPerRow</strong> - Limit the displayed bars per row, <em>-1 for sized based limit</em> (integer, default:-1)</li>
         ///  <li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li>
         ///  <li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li>
         ///  <li><strong>hideInfo</strong> - Render the song information or not (boolean, default:true)</li>

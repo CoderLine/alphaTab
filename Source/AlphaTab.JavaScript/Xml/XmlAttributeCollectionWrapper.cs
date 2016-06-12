@@ -1,5 +1,4 @@
 ﻿using SharpKit.Html;
-using SharpKit.JavaScript;
 
 namespace AlphaTab.Xml
 {

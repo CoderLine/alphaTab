@@ -16,13 +16,9 @@
  * License along with this library.
  */
 
-using System;
-using System.Collections.Generic;
-using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Rendering.Layout;
 
 namespace AlphaTab.Rendering.Staves
 {

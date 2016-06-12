@@ -18,8 +18,6 @@
 using System;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
-using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Utils;
 

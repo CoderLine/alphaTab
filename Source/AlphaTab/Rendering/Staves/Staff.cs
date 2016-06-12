@@ -29,7 +29,7 @@ namespace AlphaTab.Rendering.Staves
     /// </summary>
     public class Staff
     {
-        private BarRendererFactory _factory;
+        private readonly BarRendererFactory _factory;
         private readonly FastDictionary<string, object> _settings;
 
         public StaveTrackGroup StaveTrackGroup { get; set; }

@@ -24,9 +24,9 @@ namespace AlphaTab.Importer
     /// This is the base public class for creating new song importers which 
     /// enable reading scores from any binary datasource
     /// </summary>
-    abstract public class ScoreImporter
+    public abstract class ScoreImporter
     {
-        protected IReadable _data;
+        protected IReadable Data;
 
         /**
          * Gets all default ScoreImporters
@@ -45,7 +45,7 @@ namespace AlphaTab.Importer
 
         public virtual void Init(IReadable data)
         {
-            _data = data;
+            Data = data;
         }
 
         public abstract Score ReadScore();

@@ -17,8 +17,6 @@
  */
 using AlphaTab.Collections;
 using AlphaTab.Model;
-using AlphaTab.Rendering.Layout;
-using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
@@ -27,13 +25,13 @@ namespace AlphaTab.Rendering.Glyphs
         public ScoreNoteChordGlyph NoteHeads { get; set; }
         public ScoreRestGlyph RestGlyph { get; set; }
 
-        public override void FinalizeGlyph(ScoreLayout layout)
+        public override void UpdateBeamingHelper()
         {
             if (NoteHeads != null)
             {
                 NoteHeads.UpdateBeamingHelper(Container.X + X);
             }
-            else if(RestGlyph != null)
+            else if (RestGlyph != null)
             {
                 RestGlyph.UpdateBeamingHelper(Container.X + X);
             }

@@ -268,7 +268,7 @@ namespace AlphaTab.Rendering
 
         public override void FinalizeRenderer(ScoreLayout layout)
         {
-            Std.Foreach(_voiceContainers.Values, c => c.FinalizeGlyph(layout));
+           
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)

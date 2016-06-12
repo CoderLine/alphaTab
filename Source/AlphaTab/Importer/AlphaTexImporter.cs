@@ -173,7 +173,7 @@ namespace AlphaTab.Importer
         /// </summary>
         private void NextChar()
         {
-            var b = _data.ReadByte();
+            var b = Data.ReadByte();
             if (b == -1)
             {
                 _ch = Eof;
@@ -1117,7 +1117,7 @@ namespace AlphaTab.Importer
                 _syData = syData;
                 if (syData == "b" || syData == "be")
                 {
-                    var exact = _syData == "be";
+                    var exact = (string) _syData == "be";
                     // read points
                     NewSy();
                     if (_sy != AlphaTexSymbols.LParensis)

@@ -8,7 +8,6 @@ using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Xml;
-using SharpKit.Html;
 using SharpKit.JavaScript;
 
 // General Information about an assembly is controlled through the following 
@@ -54,7 +53,6 @@ using SharpKit.JavaScript;
 [assembly: JsType(Export = false, TargetType = typeof(ICanvas))]
 [assembly: JsType(Export = false, TargetType = typeof(IPathCanvas))]
 [assembly: JsType(Export = false, TargetType = typeof(IFileLoader))]
-[assembly: JsType(Export = false, TargetType = typeof(ISupportsFinalize))]
 [assembly: JsType(Export = false, TargetType = typeof(IEffectBarRendererInfo))]
 [assembly: JsType(Export = false, TargetType = typeof(IScoreRenderer))]
 [assembly: JsType(Export = false, TargetType = typeof(IPostBeatNoteScaleListener))]

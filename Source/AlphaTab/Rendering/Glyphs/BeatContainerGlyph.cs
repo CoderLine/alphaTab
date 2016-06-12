@@ -16,18 +16,14 @@
  * License along with this library.
  */
 
-using System;
-using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
-using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class BeatContainerGlyph : Glyph, ISupportsFinalize
+    public class BeatContainerGlyph : Glyph
     {
         public VoiceContainerGlyph VoiceContainer { get; set; }
 
@@ -47,13 +43,6 @@ namespace AlphaTab.Rendering.Glyphs
             Beat = beat;
             Ties = new FastList<Glyph>();
             VoiceContainer = voiceContainer;
-        }
-
-        public void FinalizeGlyph(ScoreLayout layout)
-        {
-            PreNotes.FinalizeGlyph(layout);
-            OnNotes.FinalizeGlyph(layout);
-            PostNotes.FinalizeGlyph(layout);
         }
 
         public void RegisterLayoutingInfo(BarLayoutingInfo layoutings)
@@ -106,6 +95,11 @@ namespace AlphaTab.Rendering.Glyphs
             MinWidth = PreNotes.Width + OnNotes.Width + PostNotes.Width;
             Width = MinWidth;
             OnTimeX = OnNotes.X + OnNotes.Width / 2;
+        }
+
+        public void UpdateBeamingHelper()
+        {
+            OnNotes.UpdateBeamingHelper();
         }
 
         protected virtual void CreateTies(Note n)
