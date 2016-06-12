@@ -277,7 +277,7 @@
             Clefs are important for music notation too.
         </p>
         
-        <div id="alphaTabClefs">
+        <div id="alphaTabClefs" data-tex="true">
             \title "Clefs"
             .
             \clef G2 | \clef F4 | \clef C3 | \clef C4
@@ -422,8 +422,10 @@
         
     </div>
 
-    <div id="drums" class="group">
-        <h1>Drum Tabs</h1>
+    <div id="special" class="group">
+        <h1>Special Tracks</h1>
+        
+        <h2>Drum Tabs</h2>
         
         <p>
             AlphaTab uses the same drum tab notation as Guitar Pro 5. Since the guitar tab staff is not meaningful on 
@@ -434,9 +436,35 @@
         <script type="text/javascript-lazy">
             $('#alphaTabDrum').alphaTab({
             });
-        </script>      
+        </script>    
+
+        <h2>Grand Staff</h2>
+        
+        <p>
+            With Guitar Pro 6 files also grand staffs can be rendered.
+        </p>
+        
+        <div id="alphaTabGs" data-file="files/features/Piano.gpx"></div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabGs').alphaTab({
+            });
+        </script>    
+        
+        <h2>Multiple Tracks</h2>
+        
+        <p>
+            AlphaTab can also render multiple tracks at the same time. 
+        </p>
+        
+        <div id="alphaTabMulti" data-file="files/MultiTrack.gp5" data-tracks="[0,1]"></div>
+        <script type="text/javascript-lazy">
+            $('#alphaTabMulti').alphaTab({
+            });
+        </script>    
+        
         
     </div>
+    
 
     <div id="notes" class="group">
         <h1>Special Notes</h1>

@@ -124,18 +124,6 @@ namespace AlphaTab.Rendering
                     }
                     break;
 
-                case EffectBarGlyphSizing.GroupedPreBeatToOnBeat:
-                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SinglePreBeatToOnBeat, beatIndex, voice, prevGlyph); }
-                    else
-                    {
-                        pos = container.OnNotes;
-                        var posR = (EffectBarRenderer)pos.Renderer;
-                        var gR = (EffectBarRenderer)g.Renderer;
-                        g.Width = (posR.X + posR.BeatGlyphsStart + container.X + pos.X + pos.Width) - (gR.X + gR.BeatGlyphsStart + g.X);
-                        g.ExpandTo(container.Beat);
-                    }
-                    break;
-
                 case EffectBarGlyphSizing.GroupedOnBeatOnly:
                     if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SingleOnBeatOnly, beatIndex, voice, prevGlyph); }
                     else
@@ -202,7 +190,6 @@ namespace AlphaTab.Rendering
                     break;
 
                 case EffectBarGlyphSizing.GroupedPreBeatOnly:
-                case EffectBarGlyphSizing.GroupedPreBeatToOnBeat:
                 case EffectBarGlyphSizing.GroupedOnBeatOnly:
                     if (b.Index > 0 || Index > 0)
                     {

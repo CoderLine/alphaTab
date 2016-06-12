@@ -35,7 +35,7 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.Font = res.MarkerFont;
 
             canvas.FillMusicFontSymbol(cx+ X, cy + Y, 1, MusicFontSymbol.Tempo);
-            canvas.FillText("" + _tempo, cx + X + (20 * Scale), cy + X + (7 * Scale));
+            canvas.FillText("" + _tempo, cx + X + (20 * Scale), cy + X);
         }
     }
 }

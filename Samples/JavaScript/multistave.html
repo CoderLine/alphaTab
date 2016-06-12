@@ -9,12 +9,8 @@
 	</style>
     
     <!-- Including alphaTab -->
-    <script type="text/javascript" src="../../Build/JavaScript/mscorlib.js"></script>
     <script type="text/javascript" src="../../Build/JavaScript/AlphaTab.js"></script>
     
-    <!-- IE8 support -->
-    <script type="text/javascript" src="lib/excanvas/excanvas.js"></script>
-
     <!-- jQuery Plugin -->
     <script type="text/javascript" src="lib/jquery/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="../../Build/JavaScript/jquery.alphaTab.js"></script>
@@ -33,33 +29,33 @@
     <script type="text/javascript">
         function resetTracks() {
             var toRender = [];
-            var tracks = $('#alphaTab').alphaTab('renderer').tracks;
             $('#tracks input').each(function() {
                 if($(this).is(':checked')) {
-                    toRender.push($(this).data('track'));
+                    toRender.push($(this).data('track').Index);
                 }
             });
-            $('#alphaTab').alphaTab('renderer').renderMultiple(toRender);
+            $('#alphaTab').alphaTab('tracks', toRender);
         }
-        $('#alphaTab').on('loaded', function(e,score) {
+        $('#alphaTab').on('loaded', function(e) {
             var tracks = $('#tracks');
             tracks.empty();
-            for(var i = 0; i < score.tracks.length; i++) 
+            var score = e.originalEvent.detail;
+            for(var i = 0; i < score.Tracks.length; i++) 
             {
                 var input = $('<input />')
                                 .attr('type', 'checkbox')
                                 .attr('id', 'track_' + i)
-                                .data('track', score.tracks[i])
+                                .data('track', score.Tracks[i])
                                 .change(function() { resetTracks(); });
                 tracks.append(input);
                 var label = $('<label></label>')
                                     .attr('for', 'track_' + i)
-                                    .text(score.tracks[i].name);
+                                    .text(score.Tracks[i].Name);
                 tracks.append(label);
             }
         });
         $('#alphaTab').on('rendered', function() {
-            var tracks = $('#alphaTab').alphaTab('renderer').tracks;
+            var tracks = $('#alphaTab').alphaTab('tracks');
             $('#tracks input').each(function() {
                 var track = $(this).data('track');
                 var selected = false;

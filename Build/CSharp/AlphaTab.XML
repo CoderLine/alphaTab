@@ -864,13 +864,6 @@
             multiple voice rendering
             </summary>
         </member>
-        <member name="T:AlphaTab.Rendering.GroupedBarRenderer">
-            <summary>
-            This BarRenderer has 3 different groups which cna store glyphs:
-             - PreBeatGlyphs : Those glyphs are aligned left to right before the first glyph which represents a beat
-             - BeatGlyphs : Each of those glyphs represents one beat. They are aligned left to right.
-            </summary>
-        </member>
         <member name="T:AlphaTab.Rendering.IEffectBarRendererInfo">
             <summary>
             A public class implementing this public interface can provide the 

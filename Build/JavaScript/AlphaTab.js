@@ -9322,8 +9322,7 @@ AlphaTab.Rendering.EffectBarGlyphSizing = {
     SingleOnBeatOnly: 2,
     SinglePostBeatOnly: 3,
     GroupedPreBeatOnly: 4,
-    GroupedPreBeatToOnBeat: 5,
-    GroupedOnBeatOnly: 6
+    GroupedOnBeatOnly: 5
 };
 AlphaTab.Rendering.EffectBarRenderer = function (bar, info){
     this._info = null;
@@ -9401,18 +9400,6 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
                 g.ExpandTo(container.Beat);
             }
                 break;
-            case AlphaTab.Rendering.EffectBarGlyphSizing.GroupedPreBeatToOnBeat:
-                if (g != prevGlyph){
-                this.AlignGlyph(AlphaTab.Rendering.EffectBarGlyphSizing.SinglePreBeatToOnBeat, beatIndex, voice, prevGlyph);
-            }
-                else {
-                pos = container.OnNotes;
-                var posR = pos.Renderer;
-                var gR = g.Renderer;
-                g.Width = (posR.X + posR.get_BeatGlyphsStart() + container.X + pos.X + pos.Width) - (gR.X + gR.get_BeatGlyphsStart() + g.X);
-                g.ExpandTo(container.Beat);
-            }
-                break;
             case AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeatOnly:
                 if (g != prevGlyph){
                 this.AlignGlyph(AlphaTab.Rendering.EffectBarGlyphSizing.SingleOnBeatOnly, beatIndex, voice, prevGlyph);
@@ -9465,7 +9452,6 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
                 this._uniqueEffectGlyphs[b.Voice.Index].push(g);
                 break;
             case AlphaTab.Rendering.EffectBarGlyphSizing.GroupedPreBeatOnly:
-            case AlphaTab.Rendering.EffectBarGlyphSizing.GroupedPreBeatToOnBeat:
             case AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeatOnly:
                 if (b.Index > 0 || this.Index > 0){
                 // check if the previous beat also had this effect
@@ -10714,11 +10700,12 @@ AlphaTab.Rendering.Glyphs.FadeInGlyph = function (x, y){
 AlphaTab.Rendering.Glyphs.FadeInGlyph.prototype = {
     Paint: function (cx, cy, canvas){
         var size = 6 * this.get_Scale();
+        var width = Math.max(this.Width, 14 * this.get_Scale());
         canvas.BeginPath();
         canvas.MoveTo(cx + this.X, cy + this.Y);
-        canvas.QuadraticCurveTo(cx + this.X + (this.Width / 2), cy + this.Y, cx + this.X + this.Width, cy + this.Y - size);
+        canvas.QuadraticCurveTo(cx + this.X + (width / 2), cy + this.Y, cx + this.X + width, cy + this.Y - size);
         canvas.MoveTo(cx + this.X, cy + this.Y);
-        canvas.QuadraticCurveTo(cx + this.X + (this.Width / 2), cy + this.Y, cx + this.X + this.Width, cy + this.Y + size);
+        canvas.QuadraticCurveTo(cx + this.X + (width / 2), cy + this.Y, cx + this.X + width, cy + this.Y + size);
         canvas.Stroke();
     }
 };
@@ -12648,7 +12635,7 @@ AlphaTab.Rendering.Glyphs.TempoGlyph.prototype = {
         var res = this.Renderer.get_Resources();
         canvas.set_Font(res.MarkerFont);
         canvas.FillMusicFontSymbol(cx + this.X, cy + this.Y, 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.Tempo);
-        canvas.FillText("" + this._tempo, cx + this.X + (20 * this.get_Scale()), cy + this.X + (7 * this.get_Scale()));
+        canvas.FillText("" + this._tempo, cx + this.X + (20 * this.get_Scale()), cy + this.X);
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.TempoGlyph, AlphaTab.Rendering.Glyphs.EffectGlyph);
@@ -12865,7 +12852,7 @@ AlphaTab.Rendering.Glyphs.WhammyBarGlyph.prototype = {
         var tabBarRenderer = this.Renderer;
         var res = this.Renderer.get_Resources();
         var startX = cx + this.X + this._parent.OnNotes.Width / 2;
-        var endX = this._beat.NextBeat == null || this._beat.Voice != this._beat.NextBeat.Voice ? cx + this.X + this._parent.OnNotes.Width / 2 : cx + tabBarRenderer.GetBeatX(this._beat.NextBeat);
+        var endX = this._beat.NextBeat == null || this._beat.Voice != this._beat.NextBeat.Voice ? cx + this.X + this._parent.Width : cx + tabBarRenderer.GetBeatX(this._beat.NextBeat);
         var startY = cy + this.X;
         var textOffset = 3 * this.get_Scale();
         var sizeY = 60 * this.get_Scale();

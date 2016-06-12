@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
@@ -29,12 +31,13 @@ namespace AlphaTab.Rendering.Glyphs
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var size = 6 * Scale;
+            var width = Math.Max(Width, 14*Scale);
 
             canvas.BeginPath();
             canvas.MoveTo(cx + X, cy + Y);
-            canvas.QuadraticCurveTo(cx + X + (Width / 2), cy + Y, cx + X + Width, cy + Y - size);
+            canvas.QuadraticCurveTo(cx + X + (width / 2), cy + Y, cx + X + width, cy + Y - size);
             canvas.MoveTo(cx + X, cy + Y);
-            canvas.QuadraticCurveTo(cx + X + (Width / 2), cy + Y, cx + X + Width, cy + Y + size);
+            canvas.QuadraticCurveTo(cx + X + (width / 2), cy + Y, cx + X + width, cy + Y + size);
             canvas.Stroke();
         }
     }

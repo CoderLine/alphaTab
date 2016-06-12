@@ -30,7 +30,6 @@ namespace AlphaTab.Rendering
         SinglePostBeatOnly,
 
         GroupedPreBeatOnly,
-        GroupedPreBeatToOnBeat,
 
         GroupedOnBeatOnly
     }
