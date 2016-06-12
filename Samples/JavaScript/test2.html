@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.css" />
+
+    <script type="text/javascript" src="../../Build/JavaScript/AlphaTab.js"></script>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script type="text/javascript" src="../../Build/JavaScript/jquery.alphaTab.js"></script>
+   
+    <!-- Including alphaSynth -->
+    <script type="text/javascript" src="lib/swfobject/swfobject.js"></script>
+    <script type="text/javascript" src="lib/alphaSynth/alphaSynth.js"></script>
+    
+    <!-- alphaSynth Plugin -->
+    <script type="text/javascript" src="../../Build/JavaScript/jquery.alphaTab.alphaSynth.js"></script>
+    
+    <!-- Demo Styles and Scripts -->
+    <style>       
+    body {
+        background:#f3f5f6;
+    }
+    .alphaTabSurface {
+      background: #FFF;
+      box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+      margin-bottom: 5px;
+    }
+    </style>
+    
+</head>
+<body>
+    <div id="alphaTab1" data-file="test/kiss_the_rain.gpx">
+    </div>
+    <div id="alphaTab2" data-file="test/kiss_the_rain.gpx">
+    </div>
+
+    <script type="text/javascript">    
+    $('#alphaTab').alphaTab({    
+    }); 
+    </script>
+    
+</body>
+</html>     

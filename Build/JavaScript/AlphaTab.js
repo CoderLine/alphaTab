@@ -7608,8 +7608,6 @@ AlphaTab.Model.Bar = function (){
     this.Clef = AlphaTab.Model.Clef.Neutral;
     this.Staff = null;
     this.Voices = null;
-    this.MinDuration = null;
-    this.MaxDuration = null;
     this.Voices = [];
     this.Clef = AlphaTab.Model.Clef.G2;
 };
@@ -7634,12 +7632,6 @@ AlphaTab.Model.Bar.prototype = {
         for (var i = 0,j = this.Voices.length; i < j; i++){
             var voice = this.Voices[i];
             voice.Finish();
-            if (voice.MinDuration == null || this.MinDuration == null || this.MinDuration < voice.MinDuration){
-                this.MinDuration = voice.MinDuration;
-            }
-            if (voice.MaxDuration == null || this.MaxDuration == null || this.MaxDuration > voice.MaxDuration){
-                this.MaxDuration = voice.MaxDuration;
-            }
         }
     }
 };
@@ -8585,8 +8577,6 @@ AlphaTab.Model.Voice = function (){
     this.Index = 0;
     this.Bar = null;
     this.Beats = null;
-    this.MinDuration = null;
-    this.MaxDuration = null;
     this.Beats = [];
 };
 AlphaTab.Model.Voice.prototype = {
@@ -8640,13 +8630,6 @@ AlphaTab.Model.Voice.prototype = {
         for (var i = 0,j = this.Beats.length; i < j; i++){
             var beat = this.Beats[i];
             beat.Finish();
-            // MinDuration means biggest duration value considering the denominator of the fraction
-            if (this.MinDuration == null || this.MinDuration < beat.Duration){
-                this.MinDuration = beat.Duration;
-            }
-            if (this.MaxDuration == null || this.MaxDuration > beat.Duration){
-                this.MaxDuration = beat.Duration;
-            }
         }
     }
 };

@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+
 using AlphaTab.Model;
 
 namespace AlphaTab.Wpf.ViewModel

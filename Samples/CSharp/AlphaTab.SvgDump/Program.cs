@@ -16,14 +16,12 @@
  * License along with this library.
  */
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Xml.Linq;
 using AlphaTab.Importer;
 using AlphaTab.Model;
-using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;
 
 namespace AlphaTab.SvgDump

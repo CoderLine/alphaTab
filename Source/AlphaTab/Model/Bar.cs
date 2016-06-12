@@ -31,8 +31,6 @@ namespace AlphaTab.Model
         public Clef Clef { get; set; }
         public Staff Staff { get; set; }
         public FastList<Voice> Voices { get; set; }
-        public Duration? MinDuration { get; set; }
-        public Duration? MaxDuration { get; set; }
         
         public Bar()
         {
@@ -83,14 +81,6 @@ namespace AlphaTab.Model
             {
                 var voice = Voices[i];
                 voice.Finish();
-                if (voice.MinDuration == null || MinDuration == null || MinDuration.Value < voice.MinDuration.Value)
-                {
-                    MinDuration = voice.MinDuration;
-                }
-                if (voice.MaxDuration == null || MaxDuration == null || MaxDuration.Value > voice.MaxDuration.Value)
-                {
-                    MaxDuration = voice.MaxDuration;
-                }
             }
         }
     }

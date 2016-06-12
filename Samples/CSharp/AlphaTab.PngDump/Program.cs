@@ -22,8 +22,6 @@ using System.Drawing.Imaging;
 using System.IO;
 using AlphaTab;
 using AlphaTab.Importer;
-using AlphaTab.Model;
-using AlphaTab.Platform.CSharp;
 using AlphaTab.Rendering;
 
 namespace Alphatab.PngDump

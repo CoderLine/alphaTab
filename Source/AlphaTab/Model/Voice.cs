@@ -30,9 +30,6 @@ namespace AlphaTab.Model
         public Bar Bar { get; set; }
         public FastList<Beat> Beats { get; set; }
 
-        public Duration? MinDuration { get; set; }
-        public Duration? MaxDuration { get; set; }
-
         public bool IsEmpty
         {
             get
@@ -112,15 +109,6 @@ namespace AlphaTab.Model
             {
                 var beat = Beats[i];
                 beat.Finish();
-                // MinDuration means biggest duration value considering the denominator of the fraction
-                if (MinDuration == null || MinDuration.Value < beat.Duration)
-                {
-                    MinDuration = beat.Duration;
-                }
-                if (MaxDuration == null || MaxDuration.Value > beat.Duration)
-                {
-                    MaxDuration = beat.Duration;
-                }
             }
         }
     }

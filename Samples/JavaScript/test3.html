@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <script type="text/javascript" src="https://rawgit.com/CoderLine/alphaTab/master/Build/JavaScript/AlphaTab.js"></script>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script type="text/javascript" src="https://rawgit.com/CoderLine/alphaTab/master/Build/JavaScript/jquery.alphaTab.js"></script>
+  
+   <style>       
+    body {
+        background:#f3f5f6;
+        white-space: nowrap;
+    }
+    .alphaTabSurface {
+      background: #FFF;
+      box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+      margin-bottom: 5px;
+      white-space:normal;
+    }
+    
+    .wrapper {
+        display:inline-block;
+    }
+    </style>
+    
+</head>
+<body>
+    <div class="wrapper">
+        <h1>kiss_the_rain.gpx</h1>
+        <div id="alphaTab1" data-file="test/kiss_the_rain.gpx">
+        </div>
+    </div>
+    <div class="wrapper">
+        <h2>Kiss_The_Rain__.gpx</h2>
+        <div id="alphaTab2" data-file="test/Kiss_The_Rain__.gpx">
+        </div>
+    </div>
+    
+
+    <script type="text/javascript">    
+    $('#alphaTab1').alphaTab(); 
+    $('#alphaTab2').alphaTab(); 
+    </script>
+    
+</body>
+</html>     
