@@ -40,6 +40,7 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly FastList<ScoreNoteGlyphInfo> _infos;
         private readonly FastDictionary<int, Glyph> _noteLookup;
         private Glyph _tremoloPicking;
+        private float _noteHeadPadding; 
 
         public ScoreNoteGlyphInfo MinNote { get; set; }
         public ScoreNoteGlyphInfo MaxNote { get; set; }
@@ -143,6 +144,7 @@ namespace AlphaTab.Rendering.Glyphs
             var lastDisplaced = false;
             var lastLine = 0;
             var anyDisplaced = false;
+            var direction = Direction;
 
             var w = 0f;
             for (int i = 0, j = _infos.Count; i < j; i++)
@@ -151,8 +153,7 @@ namespace AlphaTab.Rendering.Glyphs
                 g.Renderer = Renderer;
                 g.DoLayout();
 
-                g.X = padding;
-
+                var displace = false;
                 if (i == 0)
                 {
                     displacedX = g.Width + padding;
@@ -165,6 +166,7 @@ namespace AlphaTab.Rendering.Glyphs
                         // reposition if needed
                         if (!lastDisplaced)
                         {
+                            displace = true;
                             g.X = displacedX - (Scale);
                             anyDisplaced = true;
                             lastDisplaced = true; // let next iteration know we are displace now
@@ -180,17 +182,34 @@ namespace AlphaTab.Rendering.Glyphs
                     }
                 }
 
+                // for beat direction down we invert the displacement.
+                // this means: displaced is on the left side of the stem and not displaced is right
+                if (direction == BeamDirection.Down)
+                {
+                    g.X = displace
+                        ? padding
+                        : displacedX;
+                }
+                else
+                {
+                    g.X = displace
+                        ? displacedX
+                        : padding;
+                }
+
                 lastLine = _infos[i].Line;
                 w = Math.Max(w, g.X + g.Width);
             }
 
             if (anyDisplaced)
             {
+                _noteHeadPadding = 0;
                 UpLineX = displacedX;
                 DownLineX = displacedX;
             }
             else
             {
+                _noteHeadPadding = direction == BeamDirection.Down ? -displacedX : 0;
                 UpLineX = w;
                 DownLineX = padding;
             }
@@ -203,7 +222,6 @@ namespace AlphaTab.Rendering.Glyphs
 
             if (Beat.IsTremolo)
             {
-                var direction = BeamingHelper.Direction;
                 int offset;
                 var baseNote = direction == BeamDirection.Up ? MinNote : MaxNote;
                 var tremoloX = direction == BeamDirection.Up ? displacedX : 0;
@@ -221,7 +239,8 @@ namespace AlphaTab.Rendering.Glyphs
                         case Duration.Eighth:
                             offset = direction == BeamDirection.Up ? -10 : 10;
                             break;
-                        default: offset = direction == BeamDirection.Up ? -15 : 15;
+                        default:
+                            offset = direction == BeamDirection.Up ? -15 : 15;
                             break;
                     }
                 }
@@ -295,7 +314,7 @@ namespace AlphaTab.Rendering.Glyphs
                 }
             }
 
-            canvas.Color = Beat.Voice.Index == 0 
+            canvas.Color = Beat.Voice.Index == 0
                 ? Renderer.Layout.Renderer.RenderingResources.MainGlyphColor
                 : Renderer.Layout.Renderer.RenderingResources.SecondaryGlyphColor;
 
@@ -305,7 +324,7 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 var g = _infos[i];
                 g.Glyph.Renderer = Renderer;
-                g.Glyph.Paint(cx + X, cy + Y, canvas);
+                g.Glyph.Paint(cx + X + _noteHeadPadding, cy + Y, canvas);
             }
         }
     }

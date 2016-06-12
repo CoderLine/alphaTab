@@ -37,7 +37,7 @@ namespace AlphaTab.Model
         {
             get
             {
-                return Beats.Count == 0;
+                return Beats.Count == 0 || (Beats.Count == 1 && Beats[0].IsEmpty);
             }
         }
 

@@ -8596,7 +8596,7 @@ AlphaTab.Model.Voice = function (){
 };
 AlphaTab.Model.Voice.prototype = {
     get_IsEmpty: function (){
-        return this.Beats.length == 0;
+        return this.Beats.length == 0 || (this.Beats.length == 1 && this.Beats[0].IsEmpty);
     },
     AddBeat: function (beat){
         // chaining
@@ -11972,6 +11972,7 @@ AlphaTab.Rendering.Glyphs.ScoreNoteChordGlyph = function (){
     this._infos = null;
     this._noteLookup = null;
     this._tremoloPicking = null;
+    this._noteHeadPadding = 0;
     this.MinNote = null;
     this.MaxNote = null;
     this.SpacingChanged = null;
@@ -12038,12 +12039,13 @@ AlphaTab.Rendering.Glyphs.ScoreNoteChordGlyph.prototype = {
         var lastDisplaced = false;
         var lastLine = 0;
         var anyDisplaced = false;
+        var direction = this.get_Direction();
         var w = 0;
         for (var i = 0,j = this._infos.length; i < j; i++){
             var g = this._infos[i].Glyph;
             g.Renderer = this.Renderer;
             g.DoLayout();
-            g.X = 0;
+            var displace = false;
             if (i == 0){
                 displacedX = g.Width + 0;
             }
@@ -12052,6 +12054,7 @@ AlphaTab.Rendering.Glyphs.ScoreNoteChordGlyph.prototype = {
                 if (Math.abs(lastLine - this._infos[i].Line) <= 1){
                     // reposition if needed
                     if (!lastDisplaced){
+                        displace = true;
                         g.X = displacedX - (this.get_Scale());
                         anyDisplaced = true;
                         lastDisplaced = true;
@@ -12066,14 +12069,24 @@ AlphaTab.Rendering.Glyphs.ScoreNoteChordGlyph.prototype = {
                     lastDisplaced = false;
                 }
             }
+            // for beat direction down we invert the displacement.
+            // this means: displaced is on the left side of the stem and not displaced is right
+            if (direction == AlphaTab.Rendering.Utils.BeamDirection.Down){
+                g.X = displace ? 0 : displacedX;
+            }
+            else {
+                g.X = displace ? displacedX : 0;
+            }
             lastLine = this._infos[i].Line;
             w = Math.max(w, g.X + g.Width);
         }
         if (anyDisplaced){
+            this._noteHeadPadding = 0;
             this.UpLineX = displacedX;
             this.DownLineX = displacedX;
         }
         else {
+            this._noteHeadPadding = direction == AlphaTab.Rendering.Utils.BeamDirection.Down ? -displacedX : 0;
             this.UpLineX = w;
             this.DownLineX = 0;
         }
@@ -12082,7 +12095,6 @@ AlphaTab.Rendering.Glyphs.ScoreNoteChordGlyph.prototype = {
             e.DoLayout();
         }));
         if (this.Beat.get_IsTremolo()){
-            var direction = this.BeamingHelper.get_Direction();
             var offset;
             var baseNote = direction == AlphaTab.Rendering.Utils.BeamDirection.Up ? this.MinNote : this.MaxNote;
             var tremoloX = direction == AlphaTab.Rendering.Utils.BeamDirection.Up ? displacedX : 0;
@@ -12158,7 +12170,7 @@ AlphaTab.Rendering.Glyphs.ScoreNoteChordGlyph.prototype = {
         for (var i = 0,j = this._infos.length; i < j; i++){
             var g = this._infos[i];
             g.Glyph.Renderer = this.Renderer;
-            g.Glyph.Paint(cx + this.X, cy + this.Y, canvas);
+            g.Glyph.Paint(cx + this.X + this._noteHeadPadding, cy + this.Y, canvas);
         }
     }
 };
