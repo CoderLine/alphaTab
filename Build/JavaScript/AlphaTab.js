@@ -15155,39 +15155,28 @@ AlphaTab.Rendering.Utils.AccidentalHelper.prototype = {
         var ksi = (ks + 7);
         var index = (noteValue % 12);
         //var octave = (noteValue / 12);
-        var accidentalToSet = AlphaTab.Rendering.Utils.AccidentalHelper.AccidentalNotes[ksi][index];
-        // calculate the line where the note will be according to the accidental
-        var noteLine = this.GetNoteLineWithAccidental(note, accidentalToSet);
+        var accidentalToSet = AlphaTab.Model.AccidentalType.None;
+        var line = this.RegisterNoteLine(note);
+        if (!note.Beat.Voice.Bar.Track.IsPercussion){
+            // the key signature symbol required according to 
+            var keySignatureAccidental = ksi < 7 ? AlphaTab.Model.AccidentalType.Flat : AlphaTab.Model.AccidentalType.Sharp;
+            // determine whether the current note requires an accidental according to the key signature
+            var hasNoteAccidentalForKeySignature = AlphaTab.Rendering.Utils.AccidentalHelper.KeySignatureLookup[ksi][index];
+            var isAccidentalNote = AlphaTab.Rendering.Utils.AccidentalHelper.AccidentalNotes[index];
+            var isAccidentalRegistered = this._registeredAccidentals.hasOwnProperty(line);
+            if (hasNoteAccidentalForKeySignature != isAccidentalNote && !isAccidentalRegistered){
+                this._registeredAccidentals[line] = true;
+                accidentalToSet = isAccidentalNote ? keySignatureAccidental : AlphaTab.Model.AccidentalType.Natural;
+            }
+            else if (hasNoteAccidentalForKeySignature == isAccidentalNote && isAccidentalRegistered){
+                delete this._registeredAccidentals[line];
+                accidentalToSet = isAccidentalNote ? keySignatureAccidental : AlphaTab.Model.AccidentalType.Natural;
+            }
+        }
         // TODO: change accidentalToSet according to note.AccidentalMode
-        // if there is already an accidental registered, we check if we 
-        // have a new accidental
-        var updateAccidental = true;
-        if (note.Beat.Voice.Bar.Track.IsPercussion){
-            accidentalToSet = AlphaTab.Model.AccidentalType.None;
-        }
-        else if (this._registeredAccidentals.hasOwnProperty(noteLine)){
-            var registeredAccidental = this._registeredAccidentals[noteLine];
-            // we only need to do anything if we are changing the accidental
-            if (registeredAccidental == accidentalToSet){
-                // we set the accidental to none, as the accidental is already set by a previous note
-                accidentalToSet = AlphaTab.Model.AccidentalType.None;
-                updateAccidental = false;
-            }
-            else if (accidentalToSet == AlphaTab.Model.AccidentalType.None){
-                accidentalToSet = AlphaTab.Model.AccidentalType.Natural;
-            }
-        }
-        if (updateAccidental){
-            if ((accidentalToSet == AlphaTab.Model.AccidentalType.None || accidentalToSet == AlphaTab.Model.AccidentalType.Natural)){
-                delete this._registeredAccidentals[noteLine];
-            }
-            else {
-                this._registeredAccidentals[noteLine] = accidentalToSet;
-            }
-        }
         return accidentalToSet;
     },
-    GetNoteLineWithAccidental: function (n, accidentalToSet){
+    RegisterNoteLine: function (n){
         var value = n.Beat.Voice.Bar.Track.IsPercussion ? AlphaTab.Rendering.Utils.PercussionMapper.MapNoteForDisplay(n) : n.get_RealValue();
         var ks = n.Beat.Voice.Bar.get_MasterBar().KeySignature;
         var clef = n.Beat.Voice.Bar.Clef;
@@ -15223,7 +15212,8 @@ AlphaTab.Rendering.Utils.AccidentalHelper.prototype = {
     }
 };
 $StaticConstructor(function (){
-    AlphaTab.Rendering.Utils.AccidentalHelper.AccidentalNotes = [[AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural]];
+    AlphaTab.Rendering.Utils.AccidentalHelper.KeySignatureLookup = [[true, true, true, true, true, true, true, true, true, true, true, true], [true, true, true, true, true, false, true, true, true, true, true, true], [false, true, true, true, true, false, true, true, true, true, true, true], [false, true, true, true, true, false, false, false, true, true, true, true], [false, false, false, true, true, false, false, false, true, true, true, true], [false, false, false, true, true, false, false, false, false, false, true, true], [false, false, false, false, false, false, false, false, false, false, true, true], [false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, true, true, false, false, false, false, false], [true, true, false, false, false, true, true, false, false, false, false, false], [true, true, false, false, false, true, true, true, true, false, false, false], [true, true, true, true, false, true, true, true, true, false, false, false], [true, true, true, true, false, true, true, true, true, true, true, false], [true, true, true, true, true, true, true, true, true, true, true, false], [true, true, true, true, true, true, true, true, true, true, true, true]];
+    AlphaTab.Rendering.Utils.AccidentalHelper.AccidentalNotes = [false, true, false, true, false, false, true, false, true, false, true, false];
     AlphaTab.Rendering.Utils.AccidentalHelper.StepsPerOctave = 7;
     AlphaTab.Rendering.Utils.AccidentalHelper.OctaveSteps = new Int32Array([38, 32, 30, 26, 38]);
     AlphaTab.Rendering.Utils.AccidentalHelper.SharpNoteSteps = new Int32Array([0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6]);

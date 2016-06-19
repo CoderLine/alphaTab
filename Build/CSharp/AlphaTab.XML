@@ -1118,6 +1118,17 @@
             desired scope. 
             </summary>
         </member>
+        <member name="F:AlphaTab.Rendering.Utils.AccidentalHelper.KeySignatureLookup">
+            <summary>
+            a lookup list containing an info whether the notes within an octave 
+            need an accidental rendered. the accidental symbol is determined based on the type of key signature. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Rendering.Utils.AccidentalHelper.AccidentalNotes">
+            <summary>
+            Contains the list of notes within an octave have accidentals set.
+            </summary>
+        </member>
         <member name="F:AlphaTab.Rendering.Utils.AccidentalHelper.StepsPerOctave">
             <summary>
             We always have 7 steps per octave. 
@@ -1339,36 +1350,6 @@
             <ul>
              <li><strong>rhythm</strong> - Renders rhythm beams to tablature notes</li>
             </ul>
-            </summary>
-        </member>
-        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
-            <summary>
-            GeneratedInternalTypeHelper
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
-            <summary>
-            CreateInstance
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            GetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            SetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
-            <summary>
-            CreateDelegate
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
-            <summary>
-            AddEventHandler
             </summary>
         </member>
     </members>
