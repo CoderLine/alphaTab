@@ -135,7 +135,6 @@ namespace AlphaTab.Rendering.Staves
             var lastBar = BarRenderers[BarRenderers.Count - 1];
             BarRenderers.RemoveAt(BarRenderers.Count - 1);
             StaveGroup.Layout.UnregisterBarRenderer(StaveId, lastBar);
-
         }
         
         public void ScaleToWidth(float width)

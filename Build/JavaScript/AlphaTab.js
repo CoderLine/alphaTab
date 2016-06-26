@@ -10334,7 +10334,6 @@ AlphaTab.Rendering.Glyphs.BeatGlyphBase.prototype = {
 $Inherit(AlphaTab.Rendering.Glyphs.BeatGlyphBase, AlphaTab.Rendering.Glyphs.GlyphGroup);
 AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase = function (){
     this.BeamingHelper = null;
-    this.VisualGlyph = null;
     AlphaTab.Rendering.Glyphs.BeatGlyphBase.call(this);
 };
 AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase.prototype = {
@@ -11538,6 +11537,9 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
         else if (this.RestGlyph != null){
             this.RestGlyph.UpdateBeamingHelper(this.Container.X + this.X);
         }
+        else if (this.RestGlyph != null){
+            this.RestGlyph.UpdateBeamingHelper(this.Container.X + this.X);
+        }
     },
     DoLayout: function (){
         // create glyphs
@@ -11552,7 +11554,6 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
                 this.NoteHeads.BeamingHelper = this.BeamingHelper;
                 this.NoteLoop($CreateDelegate(this, this.CreateNoteGlyph));
                 this.AddGlyph(this.NoteHeads);
-                this.VisualGlyph = this.NoteHeads;
                 //
                 // Note dots
                 //
@@ -11613,7 +11614,6 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
                 this.RestGlyph.Beat = this.Container.Beat;
                 this.RestGlyph.BeamingHelper = this.BeamingHelper;
                 this.AddGlyph(this.RestGlyph);
-                this.VisualGlyph = this.RestGlyph;
                 //
                 // Note dots
                 //

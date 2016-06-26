@@ -1151,6 +1151,12 @@
             The step offsets of the notes within an octave in case of for flat keysignatures
             </summary>
         </member>
+        <member name="F:AlphaTab.Rendering.Utils.AccidentalHelper._registeredAccidentals">
+            <summary>
+            this int-hash stores the registered accidentals for
+            all octaves and notes within an octave. 
+            </summary>
+        </member>
         <member name="M:AlphaTab.Rendering.Utils.AccidentalHelper.ApplyAccidental(AlphaTab.Model.Note)">
             <summary>
             Calculates the accidental for the given note and assignes the value to it. 

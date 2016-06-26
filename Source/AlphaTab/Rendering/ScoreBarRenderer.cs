@@ -497,7 +497,6 @@ namespace AlphaTab.Rendering
                 return;
             }
 
-
             canvas.BeginPath();
             canvas.MoveTo(cx + X + beatLineX, cy + Y + topY);
             canvas.LineTo(cx + X + beatLineX, cy + Y + bottomY);

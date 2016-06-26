@@ -35,6 +35,10 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 RestGlyph.UpdateBeamingHelper(Container.X + X);
             }
+            else if(RestGlyph != null)
+            {
+                RestGlyph.UpdateBeamingHelper(Container.X + X);
+            }
         }
 
         public override void DoLayout()
@@ -53,7 +57,6 @@ namespace AlphaTab.Rendering.Glyphs
                     NoteHeads.BeamingHelper = BeamingHelper;
                     NoteLoop(CreateNoteGlyph);
                     AddGlyph(NoteHeads);
-                    VisualGlyph = NoteHeads;
 
                     //
                     // Note dots
@@ -120,7 +123,6 @@ namespace AlphaTab.Rendering.Glyphs
                     RestGlyph.Beat = Container.Beat;
                     RestGlyph.BeamingHelper = BeamingHelper;
                     AddGlyph(RestGlyph);
-                    VisualGlyph = RestGlyph;
 
                     //
                     // Note dots

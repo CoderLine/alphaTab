@@ -82,6 +82,5 @@ namespace AlphaTab.Rendering.Glyphs
                 BeamingHelper.RegisterBeatLineX(Beat, cx + X + Width / 2, cx + X + Width / 2);
             }
         }
-
     }
 }

@@ -21,7 +21,6 @@ using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
-using AlphaTab.Rendering.Utils;
 using Staff = AlphaTab.Rendering.Staves.Staff;
 
 namespace AlphaTab.Rendering.Layout

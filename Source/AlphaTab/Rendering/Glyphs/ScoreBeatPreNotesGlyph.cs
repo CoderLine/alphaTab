@@ -28,7 +28,7 @@ namespace AlphaTab.Rendering.Glyphs
                 AddGlyph(new ScoreBrushGlyph(Container.Beat));
                 AddGlyph(new SpacingGlyph(0, 0, 4 * Scale));
             }
-            
+
             if (!Container.Beat.IsRest)
             {
                 var accidentals = new AccidentalGroupGlyph();
