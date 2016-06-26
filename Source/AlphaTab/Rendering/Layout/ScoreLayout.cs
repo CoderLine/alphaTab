@@ -46,8 +46,6 @@ namespace AlphaTab.Rendering.Layout
 
         public abstract void DoLayoutAndRender();
 
-        public abstract void BuildBoundingsLookup(BoundingsLookup lookup);
-
         public float Scale
         {
             get

@@ -18,100 +18,124 @@
 
 using AlphaTab.Collections;
 using AlphaTab.Model;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Audio.Model
 {
-    public class BarTickLookup
+    public class BeatTickLookup
     {
         public int Start { get; set; }
         public int End { get; set; }
-        public MasterBar Bar { get; set; }
+        public Beat Beat { get; set; }
+    }
+
+    public class MasterBarTickLookup
+    {
+        public int Start { get; set; }
+        public int End { get; set; }
+        public MasterBar MasterBar { get; set; }
+        public FastDictionary<int, FastList<BeatTickLookup>> BeatsPerTrack { get; set; }
+
+        public MasterBarTickLookup()
+        {
+            BeatsPerTrack = new FastDictionary<int, FastList<BeatTickLookup>>();
+        }
+
+        public void Finish()
+        {
+            Std.Foreach(BeatsPerTrack.Values, v =>
+            {
+                v.Sort((a, b) => a.Start - b.Start);
+            });
+        }
+
+        public void AddBeat(BeatTickLookup beat)
+        {
+            var track = beat.Beat.Voice.Bar.Staff.Track.Index;
+            if (!BeatsPerTrack.ContainsKey(track))
+            {
+                BeatsPerTrack[track] = new FastList<BeatTickLookup>();
+            }
+            BeatsPerTrack[track].Add(beat);
+        }
     }
 
     public class MidiTickLookup
     {
-        private Beat _lastBeat;
-
-        public FastList<BarTickLookup> Bars { get; set; }
-        public FastDictionary<int, BarTickLookup> BarLookup { get; set; }
+        public FastDictionary<int, MasterBarTickLookup> MasterBarLookup { get; private set; }
+        public FastList<MasterBarTickLookup> MasterBars { get; private set; }
 
         public MidiTickLookup()
         {
-            Bars = new FastList<BarTickLookup>();
-            BarLookup = new FastDictionary<int, BarTickLookup>();
+            MasterBars = new FastList<MasterBarTickLookup>();
+            MasterBarLookup = new FastDictionary<int, MasterBarTickLookup>();
+        }
+
+        public void Finish()
+        {
+            for (int i = 0; i < MasterBars.Count; i++)
+            {
+                MasterBars[i].Finish();
+            }
         }
 
         public Beat FindBeat(Track[] tracks, int tick)
         {
-            //
-            // Global Search
+            // get all beats within the masterbar
+            var masterBar = FindMasterBar(tick);
+            if (masterBar == null)
+            {
+                return null;
+            }
 
-            // binary search within lookup
-            var lookup = FindBar(tick);
-            if (lookup == null) return null;
-
-            var masterBar = lookup.Bar;
-
-            // look in all staves for a beat that could match
-            Beat beat = null;
-
+            BeatTickLookup beat = null;
             for (int t = 0; t < tracks.Length; t++)
             {
-                var track = tracks[t];
-                for (int s = 0; s < track.Staves.Count; s++)
+                var beats = masterBar.BeatsPerTrack[tracks[t].Index];
+                if (beats != null)
                 {
-                    var bar = track.Staves[s].Bars[masterBar.Index];
-
-                    // remap tick to initial bar start
-                    tick = (tick - lookup.Start + masterBar.Start);
-
-                    // linear search beat within beats
-                    // also look in all voices
-                    for (int v = 0; v < bar.Voices.Count; v++)
+                    for (int b = 0; b < beats.Count; b++)
                     {
-                        Beat voiceBeat = null;
-                        for (int i = 0, j = bar.Voices[v].Beats.Count; i < j; i++)
+                        // is the current beat played on the given tick?
+                        var currentBeat = beats[b];
+                        if (currentBeat.Start <= tick && tick < currentBeat.End)
                         {
-                            var b = bar.Voices[v].Beats[i];
-
-                            var start = b.AbsoluteStart;
-                            var end = b.NextBeat != null ? b.NextBeat.AbsoluteStart : start + b.CalculateDuration();
-
-                            // we search for the first beat which 
-                            // starts after the tick. 
-                            if (start <= tick && tick <= end)
+                            // take the latest played beat we can find. (most right)
+                            if (beat == null || (beat.Start < currentBeat.Start))
                             {
-                                voiceBeat = b;
-                                break;
+                                beat = beats[b];
                             }
                         }
-
-                        if (beat == null || (voiceBeat != null && voiceBeat.AbsoluteStart > beat.AbsoluteStart && !voiceBeat.IsEmpty))
+                        // if we are already past the tick, we can stop searching
+                        else if (currentBeat.End > tick)
                         {
-                            beat = voiceBeat;
+                            break;
                         }
                     }
                 }
             }
 
-            _lastBeat = beat;
+            if (beat == null)
+            {
+                return null;
+            }
 
-
-            return _lastBeat;
+            return beat.Beat;
         }
 
-        private BarTickLookup FindBar(int tick)
+        private MasterBarTickLookup FindMasterBar(int tick)
         {
+            var bars = MasterBars;
             var bottom = 0;
-            var top = Bars.Count - 1;
+            var top = bars.Count - 1;
 
             while (bottom <= top)
             {
                 var middle = (top + bottom) / 2;
-                var bar = Bars[middle];
+                var bar = bars[middle];
 
                 // found?
-                if (tick >= bar.Start && tick <= bar.End)
+                if (tick >= bar.Start && tick < bar.End)
                 {
                     return bar;
                 }
@@ -132,20 +156,28 @@ namespace AlphaTab.Audio.Model
 
         public int GetMasterBarStart(MasterBar bar)
         {
-            if (!BarLookup.ContainsKey(bar.Index))
+            if (!MasterBarLookup.ContainsKey(bar.Index))
             {
                 return 0;
             }
-            return BarLookup[bar.Index].Start;
+            return MasterBarLookup[bar.Index].Start;
         }
 
-        public void AddBar(BarTickLookup bar)
+        public void AddMasterBar(MasterBarTickLookup masterBar)
         {
-            Bars.Add(bar);
-            if (!BarLookup.ContainsKey(bar.Bar.Index))
+            MasterBars.Add(masterBar);
+            _currentMasterBar = masterBar;
+            if (!MasterBarLookup.ContainsKey(masterBar.MasterBar.Index))
             {
-                BarLookup[bar.Bar.Index] = bar;
+                MasterBarLookup[masterBar.MasterBar.Index] = masterBar;
             }
+        }
+
+        private MasterBarTickLookup _currentMasterBar;
+
+        public void AddBeat(BeatTickLookup beat)
+        {
+            _currentMasterBar.AddBeat(beat);
         }
     }
 }

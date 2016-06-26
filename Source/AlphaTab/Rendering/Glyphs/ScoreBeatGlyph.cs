@@ -53,6 +53,7 @@ namespace AlphaTab.Rendering.Glyphs
                     NoteHeads.BeamingHelper = BeamingHelper;
                     NoteLoop(CreateNoteGlyph);
                     AddGlyph(NoteHeads);
+                    VisualGlyph = NoteHeads;
 
                     //
                     // Note dots
@@ -119,6 +120,7 @@ namespace AlphaTab.Rendering.Glyphs
                     RestGlyph.Beat = Container.Beat;
                     RestGlyph.BeamingHelper = BeamingHelper;
                     AddGlyph(RestGlyph);
+                    VisualGlyph = RestGlyph;
 
                     //
                     // Note dots

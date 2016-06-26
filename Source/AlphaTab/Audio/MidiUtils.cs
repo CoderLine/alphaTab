@@ -88,29 +88,5 @@ namespace AlphaTab.Audio
             //     case FFF:   return (MinVelocity + (7 * VelocityIncrement));
             // }
         }
-
-        public static MidiTickLookup BuildTickLookup(Score score)
-        {
-            var lookup = new MidiTickLookup();
-
-            var controller = new MidiPlaybackController(score);
-            while (!controller.Finished)
-            {
-                var index = controller.Index;
-                var currentTick = controller.CurrentTick;
-                controller.ProcessCurrent();
-                if (controller.ShouldPlay)
-                {
-                    var bar = new BarTickLookup();
-                    bar.Bar = score.MasterBars[index];
-                    bar.Start = currentTick;
-                    bar.End = bar.Start + bar.Bar.CalculateDuration();
-                    lookup.AddBar(bar);
-                }
-                controller.MoveNext();
-            }
-
-            return lookup;
-        }
     }
 }

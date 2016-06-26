@@ -1369,7 +1369,7 @@ namespace AlphaTab.Importer
 
                 // add all bars of masterbar vertically to all tracks
                 int staveIndex = 0;
-                for (int barIndex = 0, trackIndex = 0; barIndex < _barsOfMasterBar.Count && trackIndex < Score.Tracks.Count; barIndex++)
+                for (int barIndex = 0, trackIndex = 0; barIndex < barIds.Length && trackIndex < Score.Tracks.Count; barIndex++)
                 {
                     var barId = barIds[barIndex];
                     if (barId != InvalidId)

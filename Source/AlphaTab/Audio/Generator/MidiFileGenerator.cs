@@ -32,12 +32,17 @@ namespace AlphaTab.Audio.Generator
 
         public bool GenerateMetronome { get; set; }
 
+        public MidiTickLookup TickLookup { get; private set; }
+
+
         public MidiFileGenerator(Score score, IMidiFileHandler handler, bool generateMetronome = false)
         {
             _score = score;
             _currentTempo = _score.Tempo;
             _handler = handler;
             GenerateMetronome = generateMetronome;
+            TickLookup = new MidiTickLookup();
+
         }
 
         public static MidiFile GenerateMidiFile(Score score, bool generateMetronome = false)
@@ -53,6 +58,7 @@ namespace AlphaTab.Audio.Generator
             var handler = new MidiFileHandler(midiFile);
             var generator = new MidiFileGenerator(score, handler, generateMetronome);
             generator.Generate();
+            midiFile.TickLookup = generator.TickLookup;
             return midiFile;
         }
 
@@ -81,13 +87,19 @@ namespace AlphaTab.Audio.Generator
                         for (int k = 0, l = track.Staves.Count; k < l; k++)
                         {
                             var staff = track.Staves[k];
-                            GenerateBar(staff.Bars[index], currentTick);
+                            if (index < staff.Bars.Count)
+                            {
+                                GenerateBar(staff.Bars[index], currentTick);
+                            }
                         }
                     }
                 }
                 controller.MoveNext();
                 previousMasterBar = bar;
             }
+
+            TickLookup.Finish();
+
         }
 
         #region Track
@@ -164,6 +176,12 @@ namespace AlphaTab.Audio.Generator
                     start += length;
                 }
             }
+
+            var masterBarLookup = new MasterBarTickLookup();
+            masterBarLookup.MasterBar = masterBar;
+            masterBarLookup.Start = currentTick;
+            masterBarLookup.End = masterBarLookup.Start + masterBar.CalculateDuration();
+            TickLookup.AddMasterBar(masterBarLookup);
         }
 
         #endregion
@@ -180,6 +198,7 @@ namespace AlphaTab.Audio.Generator
 
         private void GenerateVoice(Voice voice, int barStartTick)
         {
+            if (voice.IsEmpty) return;
             for (int i = 0, j = voice.Beats.Count; i < j; i++)
             {
                 GenerateBeat(voice.Beats[i], barStartTick);
@@ -191,6 +210,12 @@ namespace AlphaTab.Audio.Generator
             // TODO: take care of tripletfeel 
             var beatStart = beat.Start;
             var duration = beat.CalculateDuration();
+
+            var beatLookup = new BeatTickLookup();
+            beatLookup.Start = barStartTick + beatStart;
+            beatLookup.End = barStartTick + beatStart + duration;
+            beatLookup.Beat = beat;
+            TickLookup.AddBeat(beatLookup);
 
             var track = beat.Voice.Bar.Staff.Track;
 

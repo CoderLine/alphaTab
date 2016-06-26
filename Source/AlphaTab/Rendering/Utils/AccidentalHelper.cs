@@ -27,26 +27,38 @@ namespace AlphaTab.Rendering.Utils
     /// </summary>
     public class AccidentalHelper
     {
-        private static readonly AccidentalType[][] AccidentalNotes =
+        /// <summary>
+        /// a lookup list containing an info whether the notes within an octave 
+        /// need an accidental rendered. the accidental symbol is determined based on the type of key signature. 
+        /// </summary>
+        private static readonly bool[][] KeySignatureLookup =
         {
-            // Flats
-            new[] {AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural }, // 7 AccidentalType.Flats
-            new[] {AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural}, // 6 AccidentalType.Flats
-            new[] {AccidentalType.None, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural}, // 5 AccidentalType.Flats
-            new[] {AccidentalType.None, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.Flat, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural}, // 4 AccidentalType.Flats
-            new[] {AccidentalType.None, AccidentalType.Flat, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.Flat, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural}, // 3 AccidentalType.Flats
-            new[] {AccidentalType.None, AccidentalType.Flat, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural, AccidentalType.None, AccidentalType.Flat, AccidentalType.Natural, AccidentalType.Flat, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural},  // 2 AccidentalType.Flats
-            new[] {AccidentalType.None, AccidentalType.Flat, AccidentalType.Natural, AccidentalType.Flat, AccidentalType.Natural, AccidentalType.None, AccidentalType.Flat, AccidentalType.Natural, AccidentalType.Flat, AccidentalType.Natural, AccidentalType.None, AccidentalType.Natural},  // 1 AccidentalType.Flat
-            // Natural
-            new []{AccidentalType.None, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Sharp, AccidentalType.None, AccidentalType.None, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Sharp, AccidentalType.None},  
-            // Sharps
-            new []{AccidentalType.None, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Sharp, AccidentalType.None},  // 1 AccidentalType.Sharp
-            new []{AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Sharp, AccidentalType.None},  // 2 AccidentalType.Sharps
-            new []{AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Sharp, AccidentalType.None},  // 3 AccidentalType.Sharps
-            new []{AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Sharp, AccidentalType.None},  // 4 AccidentalType.Sharps
-            new []{AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.None, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.None},  // 5 AccidentalType.Sharps
-            new []{AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.Natural, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.None},  // 6 AccidentalType.Sharps
-            new []{AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.Natural, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.Natural, AccidentalType.Sharp, AccidentalType.Natural}  // 7 AccidentalType.Sharps
+            // Flats (where the value is true, a flat accidental is required for the notes)
+            new[] { true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true, true},
+            new[] { true,  true,  true,  true,  true,  false, true,  true,  true,  true,  true, true},
+            new[] { false, true,  true,  true,  true,  false, true,  true,  true,  true,  true, true},
+            new[] { false, true,  true,  true,  true,  false, false, false, true,  true,  true, true},
+            new[] { false, false, false, true,  true,  false, false, false, true,  true,  true, true},
+            new[] { false, false, false, true,  true,  false, false, false, false, false, true, true},
+            new[] { false, false, false, false, false, false, false, false, false, false, true, true},
+            // natural
+            new[] { false, false, false, false, false, false, false, false, false, false, false, false },
+            // sharps  (where the value is true, a flat accidental is required for the notes)
+            new[] {false, false, false, false, false, true, true, false, false, false, false, false},
+            new[] {true,  true,  false, false, false, true, true, false, false, false, false, false},
+            new[] {true,  true,  false, false, false, true, true, true,  true,  false, false, false},
+            new[] {true,  true,  true,  true,  false, true, true, true,  true,  false, false, false},
+            new[] {true,  true,  true,  true,  false, true, true, true,  true,  true,  true,  false},
+            new[] {true,  true,  true,  true,  true,  true, true, true,  true,  true,  true,  false},
+            new[] {true,  true,  true,  true,  true,  true, true, true,  true,  true,  true,  true }
+       };
+
+        /// <summary>
+        /// Contains the list of notes within an octave have accidentals set.
+        /// </summary>
+        private static readonly bool[] AccidentalNotes =
+        {
+            false, true, false, true, false, false, true, false, true, false, true, false
         };
 
         /// <summary>
@@ -73,11 +85,7 @@ namespace AlphaTab.Rendering.Utils
         /// </summary>
         private static readonly int[] FlatNoteSteps = { 0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6 };
 
-        /// <summary>
-        /// this int-hash stores the registered accidentals for
-        /// all octaves and notes within an octave. 
-        /// </summary>
-        private readonly FastDictionary<int, AccidentalType> _registeredAccidentals;
+        private readonly FastDictionary<int, bool> _registeredAccidentals;
 
         private const int NoteStepCorrection = 1;
 
@@ -85,7 +93,7 @@ namespace AlphaTab.Rendering.Utils
 
         public AccidentalHelper()
         {
-            _registeredAccidentals = new FastDictionary<int, AccidentalType>();
+            _registeredAccidentals = new FastDictionary<int, bool>();
             _appliedScoreLines = new FastDictionary<string, int>();
         }
 
@@ -106,56 +114,39 @@ namespace AlphaTab.Rendering.Utils
             var ks = note.Beat.Voice.Bar.MasterBar.KeySignature;
             var ksi = (ks + 7);
             var index = (noteValue % 12);
-            //var octave = (noteValue / 12);
 
-            AccidentalType accidentalToSet = AccidentalNotes[ksi][index];
+            var accidentalToSet = AccidentalType.None;
 
-            // calculate the line where the note will be according to the accidental
-            int noteLine = GetNoteLineWithAccidental(note, accidentalToSet);
+            var line = RegisterNoteLine(note);
+
+            if (!note.Beat.Voice.Bar.Staff.Track.IsPercussion)
+            {
+                // the key signature symbol required according to 
+                var keySignatureAccidental = ksi < 7 ? AccidentalType.Flat : AccidentalType.Sharp;
+
+                // determine whether the current note requires an accidental according to the key signature
+                var hasNoteAccidentalForKeySignature = KeySignatureLookup[ksi][index];
+                var isAccidentalNote = AccidentalNotes[index];
+
+                var isAccidentalRegistered = _registeredAccidentals.ContainsKey(line);
+                if (hasNoteAccidentalForKeySignature != isAccidentalNote && !isAccidentalRegistered)
+                {
+                    _registeredAccidentals[line] = true;
+                    accidentalToSet = isAccidentalNote ? keySignatureAccidental : AccidentalType.Natural;
+                }
+                else if (hasNoteAccidentalForKeySignature == isAccidentalNote && isAccidentalRegistered)
+                {
+                    _registeredAccidentals.Remove(line);
+                    accidentalToSet = isAccidentalNote ? keySignatureAccidental : AccidentalType.Natural;
+                }
+            }
 
             // TODO: change accidentalToSet according to note.AccidentalMode
-
-            // if there is already an accidental registered, we check if we 
-            // have a new accidental
-            var updateAccidental = true;
-            if (note.Beat.Voice.Bar.Staff.Track.IsPercussion)
-            {
-                accidentalToSet = AccidentalType.None;
-            }
-            else if (_registeredAccidentals.ContainsKey(noteLine))
-            {
-                var registeredAccidental = _registeredAccidentals[noteLine];
-
-                // we only need to do anything if we are changing the accidental
-                if (registeredAccidental == accidentalToSet)
-                {
-                    // we set the accidental to none, as the accidental is already set by a previous note
-                    accidentalToSet = AccidentalType.None;
-                    updateAccidental = false;
-                }
-                // check if we need naturalizing
-                else if (accidentalToSet == AccidentalType.None)
-                {
-                    accidentalToSet = AccidentalType.Natural;
-                }
-            }
-
-            if (updateAccidental)
-            {
-                if ((accidentalToSet == AccidentalType.None || accidentalToSet == AccidentalType.Natural))
-                {
-                    _registeredAccidentals.Remove(noteLine);
-                }
-                else
-                {
-                    _registeredAccidentals[noteLine] = accidentalToSet;
-                }
-            }
 
             return accidentalToSet;
         }
 
-        private int GetNoteLineWithAccidental(Note n, AccidentalType accidentalToSet)
+        private int RegisterNoteLine(Note n)
         {
             var value = n.Beat.Voice.Bar.Staff.Track.IsPercussion ? PercussionMapper.MapNoteForDisplay(n) : n.RealValue;
             var ks = n.Beat.Voice.Bar.MasterBar.KeySignature;
@@ -197,6 +188,7 @@ namespace AlphaTab.Rendering.Utils
             // maybe the SVG paths are wrong, need to recheck where step=0 is really placed
             var line = steps + NoteStepCorrection;
             _appliedScoreLines[GetNoteId(n)] = line;
+
             return line;
         }
 

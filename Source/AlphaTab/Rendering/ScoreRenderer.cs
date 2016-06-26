@@ -40,6 +40,8 @@ namespace AlphaTab.Rendering
         public RenderingResources RenderingResources { get; set; }
         public Settings Settings { get; set; }
 
+        public BoundsLookup BoundsLookup { get; set; }
+
         public ScoreRenderer(Settings settings, object param)
         {
             Settings = settings;
@@ -81,6 +83,7 @@ namespace AlphaTab.Rendering
 
         public void RenderMultiple(Track[] tracks)
         {
+            BoundsLookup = new BoundsLookup();
             if (tracks.Length == 0)
             {
                 Score = null;
@@ -150,11 +153,5 @@ namespace AlphaTab.Rendering
             if (handler != null) handler();
         }
 
-        public BoundingsLookup BuildBoundingsLookup()
-        {
-            var lookup = new BoundingsLookup();
-            Layout.BuildBoundingsLookup(lookup);
-            return lookup;
-        }
     }
 }

@@ -1713,10 +1713,12 @@ AlphaTab.Audio.Generator.MidiFileGenerator = function (score, handler, generateM
     this._handler = null;
     this._currentTempo = 0;
     this.GenerateMetronome = false;
+    this.TickLookup = null;
     this._score = score;
     this._currentTempo = this._score.Tempo;
     this._handler = handler;
     this.GenerateMetronome = generateMetronome;
+    this.TickLookup = new AlphaTab.Audio.Model.MidiTickLookup();
 };
 AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
     Generate: function (){
@@ -1738,13 +1740,16 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
                     var track = this._score.Tracks[i];
                     for (var k = 0,l = track.Staves.length; k < l; k++){
                         var staff = track.Staves[k];
-                        this.GenerateBar(staff.Bars[index], currentTick);
+                        if (index < staff.Bars.length){
+                            this.GenerateBar(staff.Bars[index], currentTick);
+                        }
                     }
                 }
             }
             controller.MoveNext();
             previousMasterBar = bar;
         }
+        this.TickLookup.Finish();
     },
     GenerateTrack: function (track){
         // channel
@@ -1790,6 +1795,11 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
                 start += length;
             }
         }
+        var masterBarLookup = new AlphaTab.Audio.Model.MasterBarTickLookup();
+        masterBarLookup.MasterBar = masterBar;
+        masterBarLookup.Start = currentTick;
+        masterBarLookup.End = masterBarLookup.Start + masterBar.CalculateDuration();
+        this.TickLookup.AddMasterBar(masterBarLookup);
     },
     GenerateBar: function (bar, barStartTick){
         for (var i = 0,j = bar.Voices.length; i < j; i++){
@@ -1797,6 +1807,8 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
         }
     },
     GenerateVoice: function (voice, barStartTick){
+        if (voice.get_IsEmpty())
+            return;
         for (var i = 0,j = voice.Beats.length; i < j; i++){
             this.GenerateBeat(voice.Beats[i], barStartTick);
         }
@@ -1805,6 +1817,11 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
         // TODO: take care of tripletfeel 
         var beatStart = beat.Start;
         var duration = beat.CalculateDuration();
+        var beatLookup = new AlphaTab.Audio.Model.BeatTickLookup();
+        beatLookup.Start = barStartTick + beatStart;
+        beatLookup.End = barStartTick + beatStart + duration;
+        beatLookup.Beat = beat;
+        this.TickLookup.AddBeat(beatLookup);
         var track = beat.Voice.Bar.Staff.Track;
         for (var i = 0,j = beat.Automations.length; i < j; i++){
             this.GenerateAutomation(beat, beat.Automations[i], barStartTick);
@@ -2173,6 +2190,7 @@ AlphaTab.Audio.Generator.MidiFileGenerator.GenerateMidiFile = function (score, g
     var handler = new AlphaTab.Audio.Generator.MidiFileHandler(midiFile);
     var generator = new AlphaTab.Audio.Generator.MidiFileGenerator(score, handler, generateMetronome);
     generator.Generate();
+    midiFile.TickLookup = generator.TickLookup;
     return midiFile;
 };
 AlphaTab.Audio.Generator.MidiFileGenerator.ToChannelShort = function (data){
@@ -2386,24 +2404,6 @@ AlphaTab.Audio.MidiUtils.DynamicToVelocity = function (dyn){
     //     case FFF:   return (MinVelocity + (7 * VelocityIncrement));
     // }
 };
-AlphaTab.Audio.MidiUtils.BuildTickLookup = function (score){
-    var lookup = new AlphaTab.Audio.Model.MidiTickLookup();
-    var controller = new AlphaTab.Audio.Generator.MidiPlaybackController(score);
-    while (!controller.get_Finished()){
-        var index = controller.Index;
-        var currentTick = controller.CurrentTick;
-        controller.ProcessCurrent();
-        if (controller.ShouldPlay){
-            var bar = new AlphaTab.Audio.Model.BarTickLookup();
-            bar.Bar = score.MasterBars[index];
-            bar.Start = currentTick;
-            bar.End = bar.Start + bar.Bar.CalculateDuration();
-            lookup.AddBar(bar);
-        }
-        controller.MoveNext();
-    }
-    return lookup;
-};
 AlphaTab.Audio.Model = AlphaTab.Audio.Model || {};
 AlphaTab.Audio.Model.MidiController = {
     DataEntryCoarse: 6,
@@ -2449,6 +2449,7 @@ AlphaTab.Audio.Model.MidiEvent.prototype = {
     }
 };
 AlphaTab.Audio.Model.MidiFile = function (){
+    this.TickLookup = null;
     this.Tracks = null;
     this.InfoTrack = 0;
     this.Tracks = [];
@@ -2493,67 +2494,86 @@ AlphaTab.Audio.Model.MidiMessage.prototype = {
         s.Write(this.Data, 0, this.Data.length);
     }
 };
-AlphaTab.Audio.Model.BarTickLookup = function (){
+AlphaTab.Audio.Model.BeatTickLookup = function (){
     this.Start = 0;
     this.End = 0;
-    this.Bar = null;
+    this.Beat = null;
+};
+AlphaTab.Audio.Model.MasterBarTickLookup = function (){
+    this.Start = 0;
+    this.End = 0;
+    this.MasterBar = null;
+    this.BeatsPerTrack = null;
+    this.BeatsPerTrack = {};
+};
+AlphaTab.Audio.Model.MasterBarTickLookup.prototype = {
+    Finish: function (){
+        AlphaTab.Platform.Std.Foreach(Array, this.BeatsPerTrack, $CreateAnonymousDelegate(this, function (v){
+            v.sort($CreateAnonymousDelegate(this, function (a, b){
+    return a.Start - b.Start;
+}));
+        }));
+    },
+    AddBeat: function (beat){
+        var track = beat.Beat.Voice.Bar.Staff.Track.Index;
+        if (!this.BeatsPerTrack.hasOwnProperty(track)){
+            this.BeatsPerTrack[track] = [];
+        }
+        this.BeatsPerTrack[track].push(beat);
+    }
 };
 AlphaTab.Audio.Model.MidiTickLookup = function (){
-    this._lastBeat = null;
-    this.Bars = null;
-    this.BarLookup = null;
-    this.Bars = [];
-    this.BarLookup = {};
+    this._currentMasterBar = null;
+    this.MasterBarLookup = null;
+    this.MasterBars = null;
+    this.MasterBars = [];
+    this.MasterBarLookup = {};
 };
 AlphaTab.Audio.Model.MidiTickLookup.prototype = {
+    Finish: function (){
+        for (var i = 0; i < this.MasterBars.length; i++){
+            this.MasterBars[i].Finish();
+        }
+    },
     FindBeat: function (tracks, tick){
-        //
-        // Global Search
-        // binary search within lookup
-        var lookup = this.FindBar(tick);
-        if (lookup == null)
+        // get all beats within the masterbar
+        var masterBar = this.FindMasterBar(tick);
+        if (masterBar == null){
             return null;
-        var masterBar = lookup.Bar;
-        // look in all staves for a beat that could match
+        }
         var beat = null;
         for (var t = 0; t < tracks.length; t++){
-            var track = tracks[t];
-            for (var s = 0; s < track.Staves.length; s++){
-                var bar = track.Staves[s].Bars[masterBar.Index];
-                // remap tick to initial bar start
-                tick = (tick - lookup.Start + masterBar.Start);
-                // linear search beat within beats
-                // also look in all voices
-                for (var v = 0; v < bar.Voices.length; v++){
-                    var voiceBeat = null;
-                    for (var i = 0,j = bar.Voices[v].Beats.length; i < j; i++){
-                        var b = bar.Voices[v].Beats[i];
-                        var start = b.get_AbsoluteStart();
-                        var end = b.NextBeat != null ? b.NextBeat.get_AbsoluteStart() : start + b.CalculateDuration();
-                        // we search for the first beat which 
-                        // starts after the tick. 
-                        if (start <= tick && tick <= end){
-                            voiceBeat = b;
-                            break;
+            var beats = masterBar.BeatsPerTrack[tracks[t].Index];
+            if (beats != null){
+                for (var b = 0; b < beats.length; b++){
+                    // is the current beat played on the given tick?
+                    var currentBeat = beats[b];
+                    if (currentBeat.Start <= tick && tick < currentBeat.End){
+                        // take the latest played beat we can find. (most right)
+                        if (beat == null || (beat.Start < currentBeat.Start)){
+                            beat = beats[b];
                         }
                     }
-                    if (beat == null || (voiceBeat != null && voiceBeat.get_AbsoluteStart() > beat.get_AbsoluteStart() && !voiceBeat.IsEmpty)){
-                        beat = voiceBeat;
+                    else if (currentBeat.End > tick){
+                        break;
                     }
                 }
             }
         }
-        this._lastBeat = beat;
-        return this._lastBeat;
+        if (beat == null){
+            return null;
+        }
+        return beat.Beat;
     },
-    FindBar: function (tick){
+    FindMasterBar: function (tick){
+        var bars = this.MasterBars;
         var bottom = 0;
-        var top = this.Bars.length - 1;
+        var top = bars.length - 1;
         while (bottom <= top){
             var middle = ((top + bottom) / 2) | 0;
-            var bar = this.Bars[middle];
+            var bar = bars[middle];
             // found?
-            if (tick >= bar.Start && tick <= bar.End){
+            if (tick >= bar.Start && tick < bar.End){
                 return bar;
             }
             // search in lower half 
@@ -2567,16 +2587,20 @@ AlphaTab.Audio.Model.MidiTickLookup.prototype = {
         return null;
     },
     GetMasterBarStart: function (bar){
-        if (!this.BarLookup.hasOwnProperty(bar.Index)){
+        if (!this.MasterBarLookup.hasOwnProperty(bar.Index)){
             return 0;
         }
-        return this.BarLookup[bar.Index].Start;
+        return this.MasterBarLookup[bar.Index].Start;
     },
-    AddBar: function (bar){
-        this.Bars.push(bar);
-        if (!this.BarLookup.hasOwnProperty(bar.Bar.Index)){
-            this.BarLookup[bar.Bar.Index] = bar;
+    AddMasterBar: function (masterBar){
+        this.MasterBars.push(masterBar);
+        this._currentMasterBar = masterBar;
+        if (!this.MasterBarLookup.hasOwnProperty(masterBar.MasterBar.Index)){
+            this.MasterBarLookup[masterBar.MasterBar.Index] = masterBar;
         }
+    },
+    AddBeat: function (beat){
+        this._currentMasterBar.AddBeat(beat);
     }
 };
 AlphaTab.Audio.Model.MidiTrack = function (){
@@ -6631,7 +6655,7 @@ AlphaTab.Importer.GpxParser.prototype = {
             var barIds = this._barsOfMasterBar[masterBarIndex];
             // add all bars of masterbar vertically to all tracks
             var staveIndex = 0;
-            for (var barIndex = 0,trackIndex = 0; barIndex < this._barsOfMasterBar.length && trackIndex < this.Score.Tracks.length; barIndex++){
+            for (var barIndex = 0,trackIndex = 0; barIndex < barIds.length && trackIndex < this.Score.Tracks.length; barIndex++){
                 var barId = barIds[barIndex];
                 if (barId != "-1"){
                     var bar = this._barsById[barId];
@@ -9191,24 +9215,22 @@ AlphaTab.Rendering.BarRendererBase.prototype = {
         //canvas.Color = c;
         //canvas.FillRect(cx + X, cy + Y, Width, Height);
     },
-    BuildBoundingsLookup: function (lookup, visualTop, visualHeight, realTop, realHeight, x){
-        var barLookup = new AlphaTab.Rendering.Utils.BarBoundings();
-        barLookup.Bar = this.Bar;
-        barLookup.IsFirstOfLine = this.get_IsFirstOfLine();
-        barLookup.IsLastOfLine = this.get_IsLastOfLine();
-        barLookup.VisualBounds = new AlphaTab.Rendering.Utils.Bounds(x + this.X, visualTop, this.Width, visualHeight);
-        barLookup.Bounds = new AlphaTab.Rendering.Utils.Bounds(x + this.X, realTop, this.Width, realHeight);
-        lookup.Bars.push(barLookup);
+    BuildBoundingsLookup: function (masterBarBounds, cx, cy){
+        var barBounds = new AlphaTab.Rendering.Utils.BarBounds();
+        barBounds.Bar = this.Bar;
+        barBounds.VisualBounds = new AlphaTab.Rendering.Utils.Bounds(cx + this.X, cy + this.Y + this.get_TopPadding(), this.Width, this.Height - this.get_TopPadding() - this.get_BottomPadding());
+        barBounds.RealBounds = new AlphaTab.Rendering.Utils.Bounds(cx + this.X, cy + this.Y, this.Width, this.Height);
+        masterBarBounds.AddBar(barBounds);
         AlphaTab.Platform.Std.Foreach(AlphaTab.Rendering.Glyphs.VoiceContainerGlyph, this._voiceContainers, $CreateAnonymousDelegate(this, function (c){
-            for (var i = 0,j = c.BeatGlyphs.length; i < j; i++){
-                var bc = c.BeatGlyphs[i];
-                var beatLookup = new AlphaTab.Rendering.Utils.BeatBoundings();
-                beatLookup.Beat = bc.Beat;
-                // on beat bounding rectangle
-                beatLookup.VisualBounds = new AlphaTab.Rendering.Utils.Bounds(x + this.X + c.X + bc.X + bc.OnNotes.X, visualTop, bc.OnNotes.Width, visualHeight);
-                // real beat boundings
-                beatLookup.Bounds = new AlphaTab.Rendering.Utils.Bounds(x + this.X + c.X + bc.X, realTop, bc.Width, realHeight);
-                barLookup.Beats.push(beatLookup);
+            if (!c.Voice.get_IsEmpty()){
+                for (var i = 0,j = c.BeatGlyphs.length; i < j; i++){
+                    var bc = c.BeatGlyphs[i];
+                    var beatBoundings = new AlphaTab.Rendering.Utils.BeatBounds();
+                    beatBoundings.Beat = bc.Beat;
+                    beatBoundings.VisualBounds = new AlphaTab.Rendering.Utils.Bounds(cx + this.X + c.X + bc.X + bc.OnNotes.X, barBounds.VisualBounds.Y, bc.OnNotes.Width, barBounds.VisualBounds.H);
+                    beatBoundings.RealBounds = new AlphaTab.Rendering.Utils.Bounds(cx + this.X + c.X + bc.X, barBounds.RealBounds.Y, bc.Width, barBounds.RealBounds.H);
+                    barBounds.AddBeat(beatBoundings);
+                }
             }
         }));
     },
@@ -10312,6 +10334,7 @@ AlphaTab.Rendering.Glyphs.BeatGlyphBase.prototype = {
 $Inherit(AlphaTab.Rendering.Glyphs.BeatGlyphBase, AlphaTab.Rendering.Glyphs.GlyphGroup);
 AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase = function (){
     this.BeamingHelper = null;
+    this.VisualGlyph = null;
     AlphaTab.Rendering.Glyphs.BeatGlyphBase.call(this);
 };
 AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase.prototype = {
@@ -11529,6 +11552,7 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
                 this.NoteHeads.BeamingHelper = this.BeamingHelper;
                 this.NoteLoop($CreateDelegate(this, this.CreateNoteGlyph));
                 this.AddGlyph(this.NoteHeads);
+                this.VisualGlyph = this.NoteHeads;
                 //
                 // Note dots
                 //
@@ -11589,6 +11613,7 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
                 this.RestGlyph.Beat = this.Container.Beat;
                 this.RestGlyph.BeamingHelper = this.BeamingHelper;
                 this.AddGlyph(this.RestGlyph);
+                this.VisualGlyph = this.RestGlyph;
                 //
                 // Note dots
                 //
@@ -13122,9 +13147,6 @@ AlphaTab.Rendering.Layout.HorizontalScreenLayout.prototype = {
             }).call(this));
             currentBarIndex += partial.MasterBars.length;
         }
-    },
-    BuildBoundingsLookup: function (lookup){
-        this._group.BuildBoundingsLookup(lookup);
     }
 };
 $StaticConstructor(function (){
@@ -13313,11 +13335,6 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
     },
     get_MaxWidth: function (){
         return this.Renderer.Settings.Width - AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[0] - AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[2];
-    },
-    BuildBoundingsLookup: function (lookup){
-        for (var i = 0,j = this._groups.length; i < j; i++){
-            this._groups[i].BuildBoundingsLookup(lookup);
-        }
     }
 };
 $StaticConstructor(function (){
@@ -14180,6 +14197,7 @@ AlphaTab.Rendering.ScoreRenderer = function (settings, param){
     this.Layout = null;
     this.RenderingResources = null;
     this.Settings = null;
+    this.BoundsLookup = null;
     this.Settings = settings;
     this.RenderingResources = new AlphaTab.Rendering.RenderingResources(1);
     if (settings.Engine == null || !AlphaTab.Environment.RenderEngines.hasOwnProperty(settings.Engine)){
@@ -14209,6 +14227,7 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
         this.Invalidate();
     },
     RenderMultiple: function (tracks){
+        this.BoundsLookup = new AlphaTab.Rendering.Utils.BoundsLookup();
         if (tracks.length == 0){
             this.Score = null;
         }
@@ -14284,11 +14303,6 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
         var handler = this.PostRenderFinished;
         if (handler != null)
             handler();
-    },
-    BuildBoundingsLookup: function (){
-        var lookup = new AlphaTab.Rendering.Utils.BoundingsLookup();
-        this.Layout.BuildBoundingsLookup(lookup);
-        return lookup;
     }
 };
 AlphaTab.Rendering.Staves = AlphaTab.Rendering.Staves || {};
@@ -14737,6 +14751,7 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
         this.PaintPartial(cx + this.X, cy + this.Y, canvas, 0, this.MasterBars.length);
     },
     PaintPartial: function (cx, cy, canvas, startIndex, count){
+        this.BuildBoundingsLookup(cx, cy);
         for (var i = 0,j = this._allStaves.length; i < j; i++){
             this._allStaves[i].Paint(cx, cy, canvas, startIndex, count);
         }
@@ -14807,15 +14822,31 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
             currentY += this._allStaves[i].Height;
         }
     },
-    BuildBoundingsLookup: function (lookup){
-        var visualTop = this.Y + this._firstStaffInAccolade.Y;
-        var visualBottom = this.Y + this._lastStaffInAccolade.Y + this._lastStaffInAccolade.Height;
-        var realTop = this.Y + this._allStaves[0].Y;
-        var realBottom = this.Y + this._allStaves[this._allStaves.length - 1].Y + this._allStaves[this._allStaves.length - 1].Height;
+    BuildBoundingsLookup: function (cx, cy){
+        var visualTop = cy + this.Y + this._firstStaffInAccolade.Y;
+        var visualBottom = cy + this.Y + this._lastStaffInAccolade.Y + this._lastStaffInAccolade.Height;
+        var realTop = cy + this.Y + this._allStaves[0].Y;
+        var realBottom = cy + this.Y + this._allStaves[this._allStaves.length - 1].Y + this._allStaves[this._allStaves.length - 1].Height;
         var visualHeight = visualBottom - visualTop;
         var realHeight = realBottom - realTop;
-        for (var i = 0,j = this._firstStaffInAccolade.BarRenderers.length; i < j; i++){
-            this._firstStaffInAccolade.BarRenderers[i].BuildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, this.X + this._firstStaffInAccolade.X);
+        var x = cx + this._firstStaffInAccolade.X;
+        var staveGroupBounds = new AlphaTab.Rendering.Utils.StaveGroupBounds();
+        staveGroupBounds.VisualBounds = new AlphaTab.Rendering.Utils.Bounds(cx, cy + this.Y, this.Width, this.get_Height());
+        staveGroupBounds.RealBounds = new AlphaTab.Rendering.Utils.Bounds(cx, cy + this.Y, this.Width, this.get_Height());
+        this.Layout.Renderer.BoundsLookup.AddStaveGroup(staveGroupBounds);
+        var masterBarBoundsLookup = [];
+        for (var i = 0; i < this.Staves.length; i++){
+            for (var j = 0,k = this.Staves[i].FirstStaffInAccolade.BarRenderers.length; j < k; j++){
+                var renderer = this.Staves[i].FirstStaffInAccolade.BarRenderers[j];
+                if (i == 0){
+                    var masterBarBounds = new AlphaTab.Rendering.Utils.MasterBarBounds();
+                    masterBarBounds.RealBounds = new AlphaTab.Rendering.Utils.Bounds(x + renderer.X, realTop, renderer.Width, realHeight);
+                    masterBarBounds.VisualBounds = new AlphaTab.Rendering.Utils.Bounds(x + renderer.X, visualTop, renderer.Width, visualHeight);
+                    this.Layout.Renderer.BoundsLookup.AddMasterBar(masterBarBounds);
+                    masterBarBoundsLookup.push(masterBarBounds);
+                }
+                renderer.BuildBoundingsLookup(masterBarBoundsLookup[j], x, cy + this.Y + this._firstStaffInAccolade.Y);
+            }
         }
     },
     GetBarX: function (index){
@@ -14984,40 +15015,28 @@ AlphaTab.Rendering.Utils.AccidentalHelper.prototype = {
         var ks = note.Beat.Voice.Bar.get_MasterBar().KeySignature;
         var ksi = (ks + 7);
         var index = (noteValue % 12);
-        //var octave = (noteValue / 12);
-        var accidentalToSet = AlphaTab.Rendering.Utils.AccidentalHelper.AccidentalNotes[ksi][index];
-        // calculate the line where the note will be according to the accidental
-        var noteLine = this.GetNoteLineWithAccidental(note, accidentalToSet);
+        var accidentalToSet = AlphaTab.Model.AccidentalType.None;
+        var line = this.RegisterNoteLine(note);
+        if (!note.Beat.Voice.Bar.Staff.Track.IsPercussion){
+            // the key signature symbol required according to 
+            var keySignatureAccidental = ksi < 7 ? AlphaTab.Model.AccidentalType.Flat : AlphaTab.Model.AccidentalType.Sharp;
+            // determine whether the current note requires an accidental according to the key signature
+            var hasNoteAccidentalForKeySignature = AlphaTab.Rendering.Utils.AccidentalHelper.KeySignatureLookup[ksi][index];
+            var isAccidentalNote = AlphaTab.Rendering.Utils.AccidentalHelper.AccidentalNotes[index];
+            var isAccidentalRegistered = this._registeredAccidentals.hasOwnProperty(line);
+            if (hasNoteAccidentalForKeySignature != isAccidentalNote && !isAccidentalRegistered){
+                this._registeredAccidentals[line] = true;
+                accidentalToSet = isAccidentalNote ? keySignatureAccidental : AlphaTab.Model.AccidentalType.Natural;
+            }
+            else if (hasNoteAccidentalForKeySignature == isAccidentalNote && isAccidentalRegistered){
+                delete this._registeredAccidentals[line];
+                accidentalToSet = isAccidentalNote ? keySignatureAccidental : AlphaTab.Model.AccidentalType.Natural;
+            }
+        }
         // TODO: change accidentalToSet according to note.AccidentalMode
-        // if there is already an accidental registered, we check if we 
-        // have a new accidental
-        var updateAccidental = true;
-        if (note.Beat.Voice.Bar.Staff.Track.IsPercussion){
-            accidentalToSet = AlphaTab.Model.AccidentalType.None;
-        }
-        else if (this._registeredAccidentals.hasOwnProperty(noteLine)){
-            var registeredAccidental = this._registeredAccidentals[noteLine];
-            // we only need to do anything if we are changing the accidental
-            if (registeredAccidental == accidentalToSet){
-                // we set the accidental to none, as the accidental is already set by a previous note
-                accidentalToSet = AlphaTab.Model.AccidentalType.None;
-                updateAccidental = false;
-            }
-            else if (accidentalToSet == AlphaTab.Model.AccidentalType.None){
-                accidentalToSet = AlphaTab.Model.AccidentalType.Natural;
-            }
-        }
-        if (updateAccidental){
-            if ((accidentalToSet == AlphaTab.Model.AccidentalType.None || accidentalToSet == AlphaTab.Model.AccidentalType.Natural)){
-                delete this._registeredAccidentals[noteLine];
-            }
-            else {
-                this._registeredAccidentals[noteLine] = accidentalToSet;
-            }
-        }
         return accidentalToSet;
     },
-    GetNoteLineWithAccidental: function (n, accidentalToSet){
+    RegisterNoteLine: function (n){
         var value = n.Beat.Voice.Bar.Staff.Track.IsPercussion ? AlphaTab.Rendering.Utils.PercussionMapper.MapNoteForDisplay(n) : n.get_RealValue();
         var ks = n.Beat.Voice.Bar.get_MasterBar().KeySignature;
         var clef = n.Beat.Voice.Bar.Clef;
@@ -15053,7 +15072,8 @@ AlphaTab.Rendering.Utils.AccidentalHelper.prototype = {
     }
 };
 $StaticConstructor(function (){
-    AlphaTab.Rendering.Utils.AccidentalHelper.AccidentalNotes = [[AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Flat, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.None], [AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural, AlphaTab.Model.AccidentalType.Sharp, AlphaTab.Model.AccidentalType.Natural]];
+    AlphaTab.Rendering.Utils.AccidentalHelper.KeySignatureLookup = [[true, true, true, true, true, true, true, true, true, true, true, true], [true, true, true, true, true, false, true, true, true, true, true, true], [false, true, true, true, true, false, true, true, true, true, true, true], [false, true, true, true, true, false, false, false, true, true, true, true], [false, false, false, true, true, false, false, false, true, true, true, true], [false, false, false, true, true, false, false, false, false, false, true, true], [false, false, false, false, false, false, false, false, false, false, true, true], [false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, true, true, false, false, false, false, false], [true, true, false, false, false, true, true, false, false, false, false, false], [true, true, false, false, false, true, true, true, true, false, false, false], [true, true, true, true, false, true, true, true, true, false, false, false], [true, true, true, true, false, true, true, true, true, true, true, false], [true, true, true, true, true, true, true, true, true, true, true, false], [true, true, true, true, true, true, true, true, true, true, true, true]];
+    AlphaTab.Rendering.Utils.AccidentalHelper.AccidentalNotes = [false, true, false, true, false, false, true, false, true, false, true, false];
     AlphaTab.Rendering.Utils.AccidentalHelper.StepsPerOctave = 7;
     AlphaTab.Rendering.Utils.AccidentalHelper.OctaveSteps = new Int32Array([38, 32, 30, 26, 38]);
     AlphaTab.Rendering.Utils.AccidentalHelper.SharpNoteSteps = new Int32Array([0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6]);
@@ -15399,51 +15419,164 @@ AlphaTab.Rendering.Utils.Bounds = function (x, y, w, h){
     this.W = w;
     this.H = h;
 };
-AlphaTab.Rendering.Utils.BeatBoundings = function (){
-    this.Beat = null;
-    this.Bounds = null;
+AlphaTab.Rendering.Utils.StaveGroupBounds = function (){
     this.VisualBounds = null;
+    this.RealBounds = null;
+    this.Bars = null;
+    this.BoundsLookup = null;
+    this.Bars = [];
 };
-AlphaTab.Rendering.Utils.BarBoundings = function (){
-    this.IsFirstOfLine = false;
-    this.IsLastOfLine = false;
-    this.Bar = null;
-    this.Bounds = null;
+AlphaTab.Rendering.Utils.StaveGroupBounds.prototype = {
+    Finish: function (){
+        for (var i = 0; i < this.Bars.length; i++){
+            this.Bars[i].Finish();
+        }
+    },
+    AddBar: function (bounds){
+        bounds.StaveGroupBounds = this;
+        this.Bars.push(bounds);
+    },
+    FindBarAtPos: function (x){
+        var b = null;
+        // move from left to right as long we find bars that start before the clicked position
+        for (var i = 0; i < this.Bars.length; i++){
+            if (b == null || this.Bars[i].RealBounds.X < x){
+                b = this.Bars[i];
+            }
+            else if (x > this.Bars[i].RealBounds.X + this.Bars[i].RealBounds.W){
+                break;
+            }
+        }
+        return b;
+    }
+};
+AlphaTab.Rendering.Utils.MasterBarBounds = function (){
     this.VisualBounds = null;
+    this.RealBounds = null;
+    this.Bars = null;
+    this.StaveGroupBounds = null;
+    this.Bars = [];
+};
+AlphaTab.Rendering.Utils.MasterBarBounds.prototype = {
+    AddBar: function (bounds){
+        bounds.MasterBarBounds = this;
+        this.Bars.push(bounds);
+    },
+    FindBeatAtPos: function (x, y){
+        var beat = null;
+        for (var i = 0; i < this.Bars.length; i++){
+            var b = this.Bars[i].FindBeatAtPos(x);
+            if (b != null && (beat == null || beat.RealBounds.X < b.RealBounds.X)){
+                beat = b;
+            }
+        }
+        return beat == null ? null : beat.Beat;
+    },
+    Finish: function (){
+        this.Bars.sort($CreateAnonymousDelegate(this, function (a, b){
+    if (a.RealBounds.Y < b.RealBounds.Y){
+        return -1;
+    }
+    if (a.RealBounds.Y > b.RealBounds.Y){
+        return 1;
+    }
+    if (a.RealBounds.X < b.RealBounds.X){
+        return -1;
+    }
+    if (a.RealBounds.X > b.RealBounds.X){
+        return 1;
+    }
+    return 0;
+}));
+    },
+    AddBeat: function (bounds){
+        this.StaveGroupBounds.BoundsLookup.AddBeat(bounds);
+    }
+};
+AlphaTab.Rendering.Utils.BarBounds = function (){
+    this.MasterBarBounds = null;
+    this.VisualBounds = null;
+    this.RealBounds = null;
+    this.Bar = null;
     this.Beats = null;
     this.Beats = [];
 };
-AlphaTab.Rendering.Utils.BarBoundings.prototype = {
+AlphaTab.Rendering.Utils.BarBounds.prototype = {
+    AddBeat: function (bounds){
+        bounds.BarBounds = this;
+        this.Beats.push(bounds);
+        this.MasterBarBounds.AddBeat(bounds);
+    },
     FindBeatAtPos: function (x){
-        var index = 0;
-        // move right as long we didn't pass our x-pos
-        while (index < (this.Beats.length - 1) && x > (this.Beats[index].Bounds.X + this.Beats[index].Bounds.W)){
-            index++;
+        var beat = null;
+        for (var i = 0; i < this.Beats.length; i++){
+            if (beat == null || this.Beats[i].RealBounds.X < x){
+                beat = this.Beats[i];
+            }
+            else if (this.Beats[i].RealBounds.X > x){
+                break;
+            }
         }
-        return this.Beats[index].Beat;
+        return beat;
     }
 };
-AlphaTab.Rendering.Utils.BoundingsLookup = function (){
-    this.Bars = null;
-    this.Bars = [];
+AlphaTab.Rendering.Utils.BeatBounds = function (){
+    this.BarBounds = null;
+    this.VisualBounds = null;
+    this.RealBounds = null;
+    this.Beat = null;
 };
-AlphaTab.Rendering.Utils.BoundingsLookup.prototype = {
+AlphaTab.Rendering.Utils.BoundsLookup = function (){
+    this._beatLookup = null;
+    this._currentStaveGroup = null;
+    this.StaveGroups = null;
+    this.StaveGroups = [];
+    this._beatLookup = {};
+};
+AlphaTab.Rendering.Utils.BoundsLookup.prototype = {
+    Finish: function (){
+        for (var i = 0; i < this.StaveGroups.length; i++){
+            this.StaveGroups[i].Finish();
+        }
+    },
+    AddStaveGroup: function (bounds){
+        bounds.BoundsLookup = this;
+        this.StaveGroups.push(bounds);
+        this._currentStaveGroup = bounds;
+    },
+    AddMasterBar: function (bounds){
+        bounds.StaveGroupBounds = this._currentStaveGroup;
+        this._currentStaveGroup.AddBar(bounds);
+    },
+    AddBeat: function (bounds){
+        this._beatLookup[this.GetBeatId(bounds.Beat)] = bounds;
+    },
+    GetBeatId: function (beat){
+        return beat.Voice.Bar.Staff.Track.Index + "-" + beat.Voice.Bar.Staff.Index + "-" + beat.Voice.Bar.Index + "-" + beat.Voice.Index + "-" + beat.Index;
+    },
+    FindBeat: function (beat){
+        var id = this.GetBeatId(beat);
+        if (this._beatLookup.hasOwnProperty(id)){
+            return this._beatLookup[id];
+        }
+        return null;
+    },
     GetBeatAtPos: function (x, y){
         //
         // find a bar which matches in y-axis
         var bottom = 0;
-        var top = this.Bars.length - 1;
-        var barIndex = -1;
+        var top = this.StaveGroups.length - 1;
+        var staveGroupIndex = -1;
         while (bottom <= top){
             var middle = ((top + bottom) / 2) | 0;
-            var bar = this.Bars[middle];
+            var group = this.StaveGroups[middle];
             // found?
-            if (y >= bar.Bounds.Y && y <= (bar.Bounds.Y + bar.Bounds.H)){
-                barIndex = middle;
+            if (y >= group.RealBounds.Y && y <= (group.RealBounds.Y + group.RealBounds.H)){
+                staveGroupIndex = middle;
                 break;
             }
             // search in lower half 
-            if (y < bar.Bounds.Y){
+            if (y < group.RealBounds.Y){
                 top = middle - 1;
             }
             else {
@@ -15451,27 +15584,16 @@ AlphaTab.Rendering.Utils.BoundingsLookup.prototype = {
             }
         }
         // no bar found
-        if (barIndex == -1)
+        if (staveGroupIndex == -1)
             return null;
         // 
         // Find the matching bar in the row
-        var currentBar = this.Bars[barIndex];
-        // clicked before bar
-        if (x < currentBar.Bounds.X){
-            // we move left till we either pass our x-position or are at the beginning of the line/score
-            while (barIndex > 0 && x < this.Bars[barIndex].Bounds.X && !this.Bars[barIndex].IsFirstOfLine){
-                barIndex--;
-            }
+        var staveGroup = this.StaveGroups[staveGroupIndex];
+        var bar = staveGroup.FindBarAtPos(x);
+        if (bar != null){
+            return bar.FindBeatAtPos(x, y);
         }
-        else {
-            // we move right till we either pass our our x-position or are at the end of the line/score
-            while (barIndex < (this.Bars.length - 1) && x > (this.Bars[barIndex].Bounds.X + this.Bars[barIndex].Bounds.W) && !this.Bars[barIndex].IsLastOfLine){
-                barIndex++;
-            }
-        }
-        // 
-        // Find the matching beat within the bar
-        return this.Bars[barIndex].FindBeatAtPos(x);
+        return null;
     }
 };
 AlphaTab.Rendering.Utils.PercussionMapper = function (){

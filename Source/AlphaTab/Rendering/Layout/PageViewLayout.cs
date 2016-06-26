@@ -286,13 +286,5 @@ namespace AlphaTab.Rendering.Layout
                 return Renderer.Settings.Width - PagePadding[0] - PagePadding[2];
             }
         }
-        
-        public override void BuildBoundingsLookup(BoundingsLookup lookup)
-        {
-            for (int i = 0, j = _groups.Count; i < j; i++)
-            {
-                _groups[i].BuildBoundingsLookup(lookup);
-            }
-        }
     }
 }

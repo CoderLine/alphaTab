@@ -27,6 +27,7 @@ namespace AlphaTab.Audio.Model
     /// </summary>
     public class MidiFile
     {
+        public MidiTickLookup TickLookup { get; set; }
         public FastList<MidiTrack> Tracks { get; set; }
 
         /// <summary>

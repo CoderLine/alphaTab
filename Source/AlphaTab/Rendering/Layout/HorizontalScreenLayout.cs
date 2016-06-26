@@ -171,10 +171,5 @@ namespace AlphaTab.Rendering.Layout
             }
 
         }
-
-        public override void BuildBoundingsLookup(BoundingsLookup lookup)
-        {
-            _group.BuildBoundingsLookup(lookup);
-        }
     }
 }

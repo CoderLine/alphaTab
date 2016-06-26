@@ -4,6 +4,7 @@
         if(score == null || !as.Ready) return;
        
         var midi = AlphaTab.Audio.Generator.MidiFileGenerator.GenerateMidiFile(score);
+        element.data('alphaSynthTickCache', midi.TickLookup);
         var ms = new AlphaTab.IO.ByteBuffer();
         midi.WriteTo(ms);
         var bytes = ms.ToArray();
@@ -43,36 +44,16 @@
     //
     // Plugin 02: Cursors
     
-    // rebuilds the cache which allows fast lookup of beats by tick positions
-    function playerTickUpdateCache(element, context) {
-        var score = api.score(element, context);
-        if(score == null) {
-            element.data('alphaSynthTickCache', null);
-        }
-        else {
-            element.data('alphaSynthTickCache', AlphaTab.Audio.MidiUtils.BuildTickLookup(score));
-        }
-    }
-
-    // rebuilds the cache which allows fast lookup of beats by visual positions
-    function playerCursorUpdateCache(element, context) {
-        var renderer = api.renderer(element, context);
-        element.data('alphaSynthCursorCache', renderer.BuildBoundingsLookup());
-    }
-
-	// gets or creats the tick cache 
-	function getOrCreateTickCache(element, context) {
-		var cache = element.data('alphaSynthTickCache');
-        if(!cache) {
-            playerTickUpdateCache(element, context);
-            cache = element.data('alphaSynthTickCache');
-        }
-		return cache;		
+	function getTickCache(element) {
+		return element.data('alphaSynthTickCache');
+	}
+	function getCursorCache(element) {
+		return element.data('alphaSynthCursorCache');
 	}
 	
     // updates the cursors to highlight the beat at the specified tick position
     api.playerCursorUpdateTick = function(element, context, tick) {
-        var cache = getOrCreateTickCache(element, context);
+        var cache = getTickCache(element);
         
         var tracks = api.tracks(element, context);
         if(tracks.length > 0) {
@@ -86,18 +67,22 @@
         if(beat == null) return;
         context.cursorOptions.currentBeat = beat;
         
-        var cache = element.data('alphaSynthCursorCache');
+        var cache = getCursorCache(element);
         if(!cache) {
-            playerCursorUpdateCache(element, context);
-            cache = element.data('alphaSynthCursorCache');
+            return;
         }
         
         var cursorWrapper = context.cursorOptions.cursors;
         var barCursor = context.cursorOptions.barCursor;
         var beatCursor = context.cursorOptions.beatCursor;
         
-        var barBoundings = cache.Bars[beat.Voice.Bar.Index];
-        var beatBoundings = barBoundings.Beats[beat.Index];
+        var beatBoundings = cache.FindBeat(beat);
+        if(!beatBoundings)
+        {
+            return;
+        }        
+        
+        var barBoundings = beatBoundings.BarBounds.MasterBarBounds;
         barCursor.css({
             top: barBoundings.VisualBounds.Y + 'px', 
             left: barBoundings.VisualBounds.X + 'px',
@@ -105,15 +90,15 @@
             height: barBoundings.VisualBounds.H + 'px'
         });
         beatCursor.css({
-            top: beatBoundings.VisualBounds.Y + 'px', 
-            left: beatBoundings.VisualBounds.X + 'px',
+            top: barBoundings.VisualBounds.Y + 'px', 
+            left: (beatBoundings.VisualBounds.X + beatBoundings.VisualBounds.W/2) + 'px',
             width: context.cursorOptions.beatCursorWidth + 'px',
-            height: beatBoundings.VisualBounds.H + 'px'
+            height: barBoundings.VisualBounds.H + 'px'
         });
         
         if(context.cursorOptions.autoScroll == 'vertical') {
             var padding = beatCursor.offset().top - beatBoundings.VisualBounds.Y;
-            var scrollTop = padding + beatBoundings.Bounds.Y + context.cursorOptions.scrollOffset;
+            var scrollTop = padding + beatBoundings.RealBounds.Y + context.cursorOptions.scrollOffset;
             if(scrollTop != context.cursorOptions.lastScroll) {
                 context.cursorOptions.lastScroll = scrollTop;
                 $(context.cursorOptions.scrollElement).animate({
@@ -124,7 +109,7 @@
         else if(context.cursorOptions.autoScroll == 'horizontal-bar') {
             var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
             if(barBoundings.VisualBounds.X != context.cursorOptions.lastScroll) {
-                var scrollLeft = padding + beatBoundings.Bounds.X + context.cursorOptions.scrollOffset;
+                var scrollLeft = padding + beatBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
                 context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
                 $(context.cursorOptions.scrollElement).animate({
                     scrollLeft:scrollLeft + 'px'
@@ -138,7 +123,7 @@
             if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || 
                  barBoundings.VisualBounds.X < $(context.cursorOptions.scrollElement).scrollLeft()
             ) {
-                var scrollLeft = padding + beatBoundings.Bounds.X + context.cursorOptions.scrollOffset;
+                var scrollLeft = padding + beatBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
                 context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
                 $(context.cursorOptions.scrollElement).animate({
                     scrollLeft:scrollLeft + 'px'
@@ -199,19 +184,16 @@
         
         // we need to update our position caches if we render a tablature
         element.on('post-rendered', function(e, score) {
-            playerCursorUpdateCache(element, context);
+            var renderer = api.renderer(element, context);
+            element.data('alphaSynthCursorCache', renderer.BoundsLookup);
             cursorWrapper.css({position: 'absolute', "z-index": 1000, 
                 width: surface.width(), height: surface.height()});
         });
-        
-        element.on('loaded', function(e, score) {
-            playerTickUpdateCache(element, context);
-        });
-        
+               
         // cursor updating
         as.On('positionChanged', function(currentTime, endTime, currentTick, endTick) {
-            setTimeout(function() {
                 api.playerCursorUpdateTick(element, context, currentTick);
+            setTimeout(function() {
             }, 0); // enqueue cursor update for later to return ExternalInterface call in case of Flash
         });
         
@@ -224,24 +206,21 @@
                 var relX = e.pageX - parentOffset.left;
                 var relY = e.pageY - parentOffset.top;
                 var beat = api.getBeatAtPos(element, context, relX, relY);
-                api.playerCursorUpdateBeat(element, context, beat);
-				
-				var masterBar = beat.Voice.Bar.get_MasterBar();
-				var tickCache = getOrCreateTickCache(element, context);
-				var realMasterBarStart = tickCache.GetMasterBarStart(masterBar);
-				
-                as.SetPositionTick(realMasterBarStart + beat.Start);
+                if(beat) {
+                    api.playerCursorUpdateBeat(element, context, beat);
+                    
+                    var masterBar = beat.Voice.Bar.get_MasterBar();
+                    var tickCache = getTickCache(element);
+                    var realMasterBarStart = tickCache.GetMasterBarStart(masterBar);
+                    
+                    as.SetPositionTick(realMasterBarStart + beat.Start);
+                }
             });
         }        
     }
 
     api.getBeatAtPos = function(element, context, x, y) {
-        var cache = element.data('alphaSynthCursorCache');
-        if(!cache) {
-            api.playerCursorUpdateCache(element, context);
-            cache = element.data('alphaSynthCursorCache');
-        }
-        
+        var cache = getCursorCache(element);
         return cache.GetBeatAtPos(x, y);
     };
     

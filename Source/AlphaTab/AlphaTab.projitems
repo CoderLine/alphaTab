@@ -196,7 +196,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\AccidentalHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\BarHelpersGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\BeamingHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\BoundingsLookup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\BoundsLookup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\PercussionMapper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\SvgPathParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\SvgRenderer.cs" />

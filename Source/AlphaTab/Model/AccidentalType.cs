@@ -21,7 +21,10 @@ namespace AlphaTab.Model
     /// Defines all possible accidentals for notes.
     /// </summary>
 	public enum AccidentalType
-	{
-		None, Natural, Sharp, Flat
-	}
+    {
+        None,
+        Natural,
+        Sharp,
+        Flat
+    }
 }

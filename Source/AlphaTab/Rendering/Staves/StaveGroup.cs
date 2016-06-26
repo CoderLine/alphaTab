@@ -261,6 +261,8 @@ namespace AlphaTab.Rendering.Staves
 
         public void PaintPartial(float cx, float cy, ICanvas canvas, int startIndex, int count)
         {
+            BuildBoundingsLookup(cx, cy);
+
             for (int i = 0, j = _allStaves.Count; i < j; i++)
             {
                 _allStaves[i].Paint(cx, cy, canvas, startIndex, count);
@@ -348,6 +350,7 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
+
         public void FinalizeGroup(ScoreLayout scoreLayout)
         {
             float currentY = 0;
@@ -360,19 +363,43 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public void BuildBoundingsLookup(BoundingsLookup lookup)
+        private void BuildBoundingsLookup(float cx, float cy)
         {
-            var visualTop = Y + _firstStaffInAccolade.Y;
-            var visualBottom = Y + _lastStaffInAccolade.Y + _lastStaffInAccolade.Height;
-            var realTop = Y + _allStaves[0].Y;
-            var realBottom = Y + _allStaves[_allStaves.Count - 1].Y + _allStaves[_allStaves.Count - 1].Height;
+            var visualTop = cy + Y + _firstStaffInAccolade.Y;
+            var visualBottom = cy + Y + _lastStaffInAccolade.Y + _lastStaffInAccolade.Height;
+            var realTop = cy + Y + _allStaves[0].Y;
+            var realBottom = cy + Y + _allStaves[_allStaves.Count - 1].Y + _allStaves[_allStaves.Count - 1].Height;
 
             var visualHeight = visualBottom - visualTop;
             var realHeight = realBottom - realTop;
-            for (int i = 0, j = _firstStaffInAccolade.BarRenderers.Count; i < j; i++)
+
+            var x = cx + _firstStaffInAccolade.X;
+
+            var staveGroupBounds = new StaveGroupBounds();
+            staveGroupBounds.VisualBounds = new Bounds(cx, cy + Y, Width, Height);
+            staveGroupBounds.RealBounds = new Bounds(cx, cy + Y, Width, Height);
+            Layout.Renderer.BoundsLookup.AddStaveGroup(staveGroupBounds);
+
+            var masterBarBoundsLookup = new FastList<MasterBarBounds>();
+            for (int i = 0; i < Staves.Count; i++)
             {
-                _firstStaffInAccolade.BarRenderers[i].BuildBoundingsLookup(lookup, visualTop, visualHeight, realTop, realHeight, X + _firstStaffInAccolade.X);
+                for (int j = 0, k = Staves[i].FirstStaffInAccolade.BarRenderers.Count; j < k; j++)
+                {
+                    var renderer = Staves[i].FirstStaffInAccolade.BarRenderers[j];
+
+                    if (i == 0)
+                    {
+                        var masterBarBounds = new MasterBarBounds();
+                        masterBarBounds.RealBounds = new Bounds(x + renderer.X, realTop, renderer.Width, realHeight);
+                        masterBarBounds.VisualBounds = new Bounds(x + renderer.X, visualTop, renderer.Width, visualHeight);
+                        Layout.Renderer.BoundsLookup.AddMasterBar(masterBarBounds);
+                        masterBarBoundsLookup.Add(masterBarBounds);
+                    }
+
+                    renderer.BuildBoundingsLookup(masterBarBoundsLookup[j], x, cy + Y + _firstStaffInAccolade.Y);
+                }
             }
+          
         }
 
         public float GetBarX(int index)

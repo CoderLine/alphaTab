@@ -19,6 +19,7 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Staves;
@@ -321,32 +322,30 @@ namespace AlphaTab.Rendering
             //canvas.FillRect(cx + X, cy + Y, Width, Height);
         }
 
-        public virtual void BuildBoundingsLookup(BoundingsLookup lookup, float visualTop, float visualHeight, float realTop, float realHeight, float x)
+        public virtual void BuildBoundingsLookup(MasterBarBounds masterBarBounds, float cx, float cy)
         {
-            var barLookup = new BarBoundings();
-            barLookup.Bar = Bar;
-            barLookup.IsFirstOfLine = IsFirstOfLine;
-            barLookup.IsLastOfLine = IsLastOfLine;
-            barLookup.VisualBounds = new Bounds(x + X, visualTop, Width, visualHeight);
-            barLookup.Bounds = new Bounds(x + X, realTop, Width, realHeight);
-            lookup.Bars.Add(barLookup);
+            var barBounds = new BarBounds();
+            barBounds.Bar = Bar;
+            barBounds.VisualBounds = new Bounds(cx + X, cy + Y + TopPadding, Width, Height - TopPadding - BottomPadding);
+            barBounds.RealBounds = new Bounds(cx + X, cy + Y, Width, Height);
+            masterBarBounds.AddBar(barBounds);
 
             Std.Foreach(_voiceContainers.Values, c =>
             {
-                for (int i = 0, j = c.BeatGlyphs.Count; i < j; i++)
+                if (!c.Voice.IsEmpty)
                 {
-                    var bc = c.BeatGlyphs[i];
-                    var beatLookup = new BeatBoundings();
-                    beatLookup.Beat = bc.Beat;
-                    // on beat bounding rectangle
-                    beatLookup.VisualBounds = new Bounds(
-                    x + X + c.X + bc.X + bc.OnNotes.X, visualTop,
-                    bc.OnNotes.Width, visualHeight);
-                    // real beat boundings
-                    beatLookup.Bounds = new Bounds(
-                    x + X + c.X + bc.X, realTop,
-                    bc.Width, realHeight);
-                    barLookup.Beats.Add(beatLookup);
+                    for (int i = 0, j = c.BeatGlyphs.Count; i < j; i++)
+                    {
+                        var bc = c.BeatGlyphs[i];
+
+                        var beatBoundings = new BeatBounds();
+                        beatBoundings.Beat = bc.Beat;
+                        beatBoundings.VisualBounds = new Bounds(cx + X + c.X + bc.X + bc.OnNotes.X,
+                            barBounds.VisualBounds.Y, bc.OnNotes.Width, barBounds.VisualBounds.H);
+                        beatBoundings.RealBounds = new Bounds(cx + X + c.X + bc.X, barBounds.RealBounds.Y, bc.Width,
+                            barBounds.RealBounds.H);
+                        barBounds.AddBeat(beatBoundings);
+                    }
                 }
             });
         }
