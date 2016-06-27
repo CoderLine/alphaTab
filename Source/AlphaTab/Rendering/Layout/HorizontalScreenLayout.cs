@@ -51,7 +51,17 @@ namespace AlphaTab.Rendering.Layout
         {
         }
 
-        public override void DoLayoutAndRender()
+        public override bool SupportsResize
+        {
+            get { return false; }
+        }
+
+        public override void Resize()
+        {
+            // resizing has no effect on this layout
+        }
+
+        protected override void DoLayoutAndRender()
         {
             if (Renderer.Settings.Staves.Count == 0) return;
 

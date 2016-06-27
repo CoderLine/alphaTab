@@ -80,7 +80,7 @@ namespace AlphaTab.Platform.JavaScript
             Blob blob;
             try
             {
-                blob = new Blob(new[] { source }, new { type = "application/javascript" });
+                blob = new Blob(new[] {source}, new {type = "application/javascript"});
             }
             catch
             {
@@ -90,6 +90,16 @@ namespace AlphaTab.Platform.JavaScript
             }
 
             return JsCode("URL.createObjectURL(blob)").As<string>();
+        }
+
+        public void Invalidate()
+        {
+            _worker.postMessage(new { cmd = "invalidate" });
+        }
+
+        public void Resize(int width)
+        {
+            _worker.postMessage(new { cmd = "resize", width = width  });
         }
 
         public void Load(object data, int[] trackIndexes)

@@ -22,6 +22,9 @@ namespace AlphaTab.Rendering
 {
     public interface IScoreRenderer
     {
+        void Invalidate();
+        void Resize(int width);
+
         event Action PreRender;
         event Action<RenderFinishedEventArgs> RenderFinished;
         event Action<RenderFinishedEventArgs> PartialRenderFinished;

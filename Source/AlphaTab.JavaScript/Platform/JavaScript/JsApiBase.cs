@@ -55,7 +55,7 @@ namespace AlphaTab.Platform.JavaScript
 
                 #region Create context elements (wrapper, canvas etc)
 
-                CanvasElement = (HtmlElement)document.createElement("div");
+                CanvasElement = (HtmlElement) document.createElement("div");
 
                 CanvasElement.className = "alphaTabSurface";
                 CanvasElement.style.fontSize = "0";
@@ -63,7 +63,28 @@ namespace AlphaTab.Platform.JavaScript
 
                 #endregion
 
+                #region Auto Sizing
+
+                if (settings.AutoSize)
+                {
+                    settings.Width = element.offsetWidth;
+                    int timeoutId = 0;
+                    window.addEventListener("resize", e =>
+                    {
+                        window.clearTimeout(timeoutId);
+                        timeoutId = window.setTimeout(() =>
+                        {
+                            if (element.offsetWidth != settings.Width)
+                            {
+                                Renderer.Resize(element.offsetWidth);
+                            }
+                        }, 100);
+                    });
+                }
+            
+                #endregion
             }
+
 
             #region Renderer Setup
 

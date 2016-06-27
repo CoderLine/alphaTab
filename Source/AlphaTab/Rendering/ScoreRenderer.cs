@@ -112,9 +112,26 @@ namespace AlphaTab.Rendering
             LayoutAndRender();
         }
 
+        public void Resize(int width)
+        {
+            if (Layout.SupportsResize)
+            {
+                OnPreRender();
+                Settings.Width = width;
+                Layout.Resize();
+                Layout.RenderAnnotation();
+                OnRenderFinished(new RenderFinishedEventArgs
+                {
+                    TotalHeight = Layout.Height,
+                    TotalWidth = Layout.Width
+                });
+                OnPostRenderFinished();
+            }
+        }
+
         private void LayoutAndRender()
         {
-            Layout.DoLayoutAndRender();
+            Layout.LayoutAndRender();
             Layout.RenderAnnotation();
             OnRenderFinished(new RenderFinishedEventArgs
             {

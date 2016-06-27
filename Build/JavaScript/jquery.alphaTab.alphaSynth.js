@@ -54,11 +54,12 @@
     // updates the cursors to highlight the beat at the specified tick position
     api.playerCursorUpdateTick = function(element, context, tick) {
         var cache = getTickCache(element);
-        
-        var tracks = api.tracks(element, context);
-        if(tracks.length > 0) {
-            var beat = cache.FindBeat(tracks, tick);
-            api.playerCursorUpdateBeat(element, context, beat);
+        if(cache) {
+            var tracks = api.tracks(element, context);
+            if(tracks.length > 0) {
+                var beat = cache.FindBeat(tracks, tick);
+                api.playerCursorUpdateBeat(element, context, beat);
+            }
         }
     };
     
@@ -191,20 +192,23 @@
         
         //
         // Hook into events
+        var previousTick = 0;
         
         // we need to update our position caches if we render a tablature
         element.on('post-rendered', function(e, score) {
             var renderer = api.renderer(element, context);
             element.data('alphaSynthCursorCache', renderer.BoundsLookup);
+            api.playerCursorUpdateTick(element, context, previousTick);
             cursorWrapper.css({position: 'absolute', "z-index": 1000, 
                 width: surface.width(), height: surface.height()});
         });
                
         // cursor updating
         as.On('positionChanged', function(currentTime, endTime, currentTick, endTick) {
-                api.playerCursorUpdateTick(element, context, currentTick);
-            setTimeout(function() {
-            }, 0); // enqueue cursor update for later to return ExternalInterface call in case of Flash
+            previousTick = currentTick;
+            api.playerCursorUpdateTick(element, context, currentTick);
+                setTimeout(function() {
+                }, 0); // enqueue cursor update for later to return ExternalInterface call in case of Flash
         });
         
         //

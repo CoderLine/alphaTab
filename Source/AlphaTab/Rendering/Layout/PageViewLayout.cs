@@ -18,6 +18,7 @@
 using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
+using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 using AlphaTab.Rendering.Utils;
@@ -41,7 +42,7 @@ namespace AlphaTab.Rendering.Layout
         {
         }
 
-        public override void DoLayoutAndRender()
+        protected override void DoLayoutAndRender()
         {
             var x = PagePadding[0];
             var y = PagePadding[1];
@@ -49,7 +50,6 @@ namespace AlphaTab.Rendering.Layout
 
             // 
             // 1. Score Info
-
             y = LayoutAndRenderScoreInfo(x, y);
 
             //
@@ -59,101 +59,93 @@ namespace AlphaTab.Rendering.Layout
             Height = y + PagePadding[3];
         }
 
+        public override bool SupportsResize
+        {
+            get { return true; }
+        }
+
+        public override void Resize()
+        {
+            var x = PagePadding[0];
+            var y = PagePadding[1];
+            Width = Renderer.Settings.Width;
+
+            // 
+            // 1. Score Info
+            y = LayoutAndRenderScoreInfo(x, y);
+
+            //
+            // 2. One result per StaveGroup
+            y = ResizeAndRenderScore(x, y);
+
+            Height = y + PagePadding[3];
+        }
+
         private float LayoutAndRenderScoreInfo(float x, float y)
         {
-            HeaderFooterElements flags = Renderer.Settings.Layout.Get("hideInfo", false) ? HeaderFooterElements.None : HeaderFooterElements.All;
-            var score = Renderer.Score;
             var scale = Scale;
-
-            var canvas = Renderer.Canvas;
             var res = Renderer.RenderingResources;
 
-            var glyphs = new FastList<TextGlyph>();
+            var centeredGlyphs = new[]
+            {
+                HeaderFooterElements.Title, HeaderFooterElements.SubTitle, HeaderFooterElements.Artist,
+                HeaderFooterElements.Album, HeaderFooterElements.WordsAndMusic
+            };
 
-            if (!string.IsNullOrEmpty(score.Title) && (flags & HeaderFooterElements.Title) != 0)
+            for (int i = 0; i < centeredGlyphs.Length; i++)
             {
-                glyphs.Add(new TextGlyph(Width / 2f, y, score.Title, res.TitleFont, TextAlign.Center));
-                y += (35 * scale);
-            }
-            if (!string.IsNullOrEmpty(score.SubTitle) && (flags & HeaderFooterElements.SubTitle) != 0)
-            {
-                glyphs.Add(new TextGlyph(Width / 2f, y, score.SubTitle, res.SubTitleFont, TextAlign.Center));
-                y += (20 * scale);
-            }
-            if (!string.IsNullOrEmpty(score.Artist) && (flags & HeaderFooterElements.Artist) != 0)
-            {
-                glyphs.Add(new TextGlyph(Width / 2f, y, score.Artist, res.SubTitleFont, TextAlign.Center));
-                y += (20 * scale);
-            }
-            if (!string.IsNullOrEmpty(score.Album) && (flags & HeaderFooterElements.Album) != 0)
-            {
-                glyphs.Add(new TextGlyph(Width / 2f, y, score.Album, res.SubTitleFont, TextAlign.Center));
-                y += (20 * scale);
-            }
-            if (!string.IsNullOrEmpty(score.Music) && score.Music == score.Words && (flags & HeaderFooterElements.WordsAndMusic) != 0)
-            {
-                glyphs.Add(new TextGlyph(Width / 2f, y, "Music and Words by " + score.Words, res.WordsFont, TextAlign.Center));
-                y += (20 * scale);
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(score.Music) && (flags & HeaderFooterElements.Music) != 0)
+                if (ScoreInfoGlyphs.ContainsKey(centeredGlyphs[i]))
                 {
-                    glyphs.Add(new TextGlyph(Width - PagePadding[2], y, "Music by " + score.Music, res.WordsFont, TextAlign.Right));
-                }
-                if (!string.IsNullOrEmpty(score.Words) && (flags & HeaderFooterElements.Words) != 0)
-                {
-                    glyphs.Add(new TextGlyph(x, y, "Words by " + score.Music, res.WordsFont, TextAlign.Left));
-                }
-                y += (20 * scale);
-            }
-
-            y += (20 * scale);
-
-            // tuning info
-            if (Renderer.Tracks.Length == 1 && !Renderer.Tracks[0].IsPercussion)
-            {
-                var tuning = Tuning.FindTuning(Renderer.Tracks[0].Tuning);
-                if (tuning != null)
-                {
-                    // Name
-                    glyphs.Add(new TextGlyph(x, y, tuning.Name, res.EffectFont, TextAlign.Left));
-
-                    y += (15 * scale);
-
-                    if (!tuning.IsStandard)
-                    {
-                        // Strings
-                        var stringsPerColumn = (int)Math.Ceiling(Renderer.Tracks[0].Tuning.Length / 2.0);
-
-                        var currentX = x;
-                        var currentY = y;
-
-                        for (int i = 0, j = Renderer.Tracks[0].Tuning.Length; i < j; i++)
-                        {
-                            var str = "(" + (i + 1) + ") = " + Tuning.GetTextForTuning(Renderer.Tracks[0].Tuning[i], false);
-                            glyphs.Add(new TextGlyph(currentX, currentY, str, res.EffectFont, TextAlign.Left));
-                            currentY += (15 * scale);
-                            if (i == stringsPerColumn - 1)
-                            {
-                                currentY = y;
-                                currentX += (43 * scale);
-                            }
-                        }
-
-                        y += (stringsPerColumn * (15 * scale));
-                    }
+                    var glyph = ScoreInfoGlyphs[centeredGlyphs[i]];
+                    glyph.X = Width / 2f;
+                    glyph.Y = y;
+                    glyph.TextAlign = TextAlign.Center;
+                    y += glyph.Font.Size;
                 }
             }
-            y += 25 * scale;
 
+            bool musicOrWords = false;
+            float musicOrWordsHeight = 0;
+            if (ScoreInfoGlyphs.ContainsKey(HeaderFooterElements.Music))
+            {
+                var glyph = ScoreInfoGlyphs[HeaderFooterElements.Music];
+                glyph.X = Width - PagePadding[2];
+                glyph.Y = y;
+                glyph.TextAlign = TextAlign.Right;
+                musicOrWords = true;
+                musicOrWordsHeight = glyph.Font.Size;
+            }
+            if (ScoreInfoGlyphs.ContainsKey(HeaderFooterElements.Words))
+            {
+                var glyph = ScoreInfoGlyphs[HeaderFooterElements.Words];
+                glyph.X = x;
+                glyph.Y = y;
+                glyph.TextAlign = TextAlign.Left;
+                musicOrWords = true;
+                musicOrWordsHeight = glyph.Font.Size;
+            }
+
+            if (musicOrWords)
+            {
+                y += musicOrWordsHeight;
+            }
+
+            y += 20 * scale;
+
+            if (TuningGlyph != null)
+            {
+                TuningGlyph.X = x;
+                TuningGlyph.Y = y;
+            }
+
+            var canvas = Renderer.Canvas;
             canvas.BeginRender(Width, y);
             canvas.Color = res.ScoreInfoColor;
             canvas.TextAlign = TextAlign.Center;
-            for (int i = 0; i < glyphs.Count; i++)
+            Std.Foreach(ScoreInfoGlyphs.Values, g =>
             {
-                glyphs[i].Paint(0, 0, canvas);
-            }
+                g.Paint(0, 0, canvas);
+            });
 
             var result = canvas.EndRender();
             OnPartialRenderFinished(new RenderFinishedEventArgs
@@ -164,6 +156,22 @@ namespace AlphaTab.Rendering.Layout
                 TotalWidth = Width,
                 TotalHeight = y
             });
+
+            return y;
+        }
+
+        private float ResizeAndRenderScore(float x, float y)
+        {
+            var canvas = Renderer.Canvas;
+
+            for (int i = 0; i < _groups.Count; i++)
+            {
+                var group = _groups[i];
+                FitGroup(group);
+                group.FinalizeGroup(this);
+
+                y += PaintGroup(group, y, canvas);
+            }
 
             return y;
         }
@@ -184,7 +192,6 @@ namespace AlphaTab.Rendering.Layout
             endBarIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, endBarIndex));
 
             _groups = new FastList<StaveGroup>();
-
             if (Renderer.Settings.Staves.Count > 0)
             {
                 while (currentBarIndex <= endBarIndex)
@@ -195,37 +202,44 @@ namespace AlphaTab.Rendering.Layout
                     group.X = x;
                     group.Y = y;
 
+                    currentBarIndex = group.LastBarIndex + 1;
+
                     // finalize group (sizing etc).
                     FitGroup(group);
                     group.FinalizeGroup(this);
 
-                    // paint into canvas
-                    var height = group.Height + (GroupSpacing * Scale);
-                    canvas.BeginRender(Width, height);
-                    Renderer.Canvas.Color = Renderer.RenderingResources.MainGlyphColor;
-                    Renderer.Canvas.TextAlign = TextAlign.Left;
-                    // NOTE: we use this negation trick to make the group paint itself to 0/0 coordinates 
-                    // since we use partial drawing
-                    group.Paint(0, -group.Y, canvas);
-                    
-                    // calculate coordinates for next group
-                    y += height;
-                    currentBarIndex = group.LastBarIndex + 1;
-
-                    var result = canvas.EndRender();
-                    OnPartialRenderFinished(new RenderFinishedEventArgs
-                    {
-                        TotalWidth = Width,
-                        TotalHeight = y,
-                        Width = Width,
-                        Height = height,
-                        RenderResult = result
-                    });
+                    y += PaintGroup(group, y, canvas);
                 }
-
             }
 
             return y;
+        }
+
+        private float PaintGroup(StaveGroup group, float totalHeight, ICanvas canvas)
+        {
+            // paint into canvas
+            var height = group.Height + (GroupSpacing * Scale);
+            canvas.BeginRender(Width, height);
+            Renderer.Canvas.Color = Renderer.RenderingResources.MainGlyphColor;
+            Renderer.Canvas.TextAlign = TextAlign.Left;
+            // NOTE: we use this negation trick to make the group paint itself to 0/0 coordinates 
+            // since we use partial drawing
+            group.Paint(0, -group.Y, canvas);
+
+            // calculate coordinates for next group
+            totalHeight += height;
+
+            var result = canvas.EndRender();
+            OnPartialRenderFinished(new RenderFinishedEventArgs
+            {
+                TotalWidth = Width,
+                TotalHeight = totalHeight,
+                Width = Width,
+                Height = height,
+                RenderResult = result
+            });
+
+            return height;
         }
 
         /// <summary>

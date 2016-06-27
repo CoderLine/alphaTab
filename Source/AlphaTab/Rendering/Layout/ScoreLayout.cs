@@ -20,6 +20,7 @@ using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform.Model;
+using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Staves;
 using Staff = AlphaTab.Rendering.Staves.Staff;
 
@@ -37,13 +38,77 @@ namespace AlphaTab.Rendering.Layout
         public float Width { get; set; }
         public float Height { get; set; }
 
+        protected FastDictionary<HeaderFooterElements, TextGlyph> ScoreInfoGlyphs;
+        protected TuningGlyph TuningGlyph;
+
+
         protected ScoreLayout(ScoreRenderer renderer)
         {
             Renderer = renderer;
             _barRendererLookup = new FastDictionary<string, FastDictionary<string, BarRendererBase>>();
         }
 
-        public abstract void DoLayoutAndRender();
+
+        public abstract bool SupportsResize { get; }
+        public abstract void Resize();
+
+        public void LayoutAndRender()
+        {
+            CreateScoreInfoGlyphs();
+            DoLayoutAndRender();
+        }
+
+        protected abstract void DoLayoutAndRender();
+
+        private void CreateScoreInfoGlyphs()
+        {
+            var flags = Renderer.Settings.Layout.Get("hideInfo", false) ? HeaderFooterElements.None : HeaderFooterElements.All;
+            var score = Renderer.Score;
+            var res = Renderer.RenderingResources;
+
+            ScoreInfoGlyphs = new FastDictionary<HeaderFooterElements, TextGlyph>();
+            if (!string.IsNullOrEmpty(score.Title) && (flags & HeaderFooterElements.Title) != 0)
+            {
+                ScoreInfoGlyphs[HeaderFooterElements.Title] = new TextGlyph(0, 0, score.Title, res.TitleFont, TextAlign.Center);
+            }
+            if (!string.IsNullOrEmpty(score.SubTitle) && (flags & HeaderFooterElements.SubTitle) != 0)
+            {
+                ScoreInfoGlyphs[HeaderFooterElements.SubTitle] = new TextGlyph(0, 0, score.SubTitle, res.SubTitleFont, TextAlign.Center);
+            }
+            if (!string.IsNullOrEmpty(score.Artist) && (flags & HeaderFooterElements.Artist) != 0)
+            {
+                ScoreInfoGlyphs[HeaderFooterElements.Artist] = new TextGlyph(0, 0, score.Artist, res.SubTitleFont, TextAlign.Center);
+            }
+            if (!string.IsNullOrEmpty(score.Album) && (flags & HeaderFooterElements.Album) != 0)
+            {
+                ScoreInfoGlyphs[HeaderFooterElements.Album] = new TextGlyph(0, 0, score.Album, res.SubTitleFont, TextAlign.Center);
+            }
+            if (!string.IsNullOrEmpty(score.Music) && score.Music == score.Words && (flags & HeaderFooterElements.WordsAndMusic) != 0)
+            {
+                ScoreInfoGlyphs[HeaderFooterElements.WordsAndMusic] = new TextGlyph(0, 0, "Music and Words by " + score.Words, res.WordsFont, TextAlign.Center);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(score.Music) && (flags & HeaderFooterElements.Music) != 0)
+                {
+                    ScoreInfoGlyphs[HeaderFooterElements.Music] = new TextGlyph(0, 0, "Music by " + score.Music, res.WordsFont, TextAlign.Right);
+                }
+                if (!string.IsNullOrEmpty(score.Words) && (flags & HeaderFooterElements.Words) != 0)
+                {
+                    ScoreInfoGlyphs[HeaderFooterElements.Words] = new TextGlyph(0, 0, "Words by " + score.Music, res.WordsFont, TextAlign.Left);
+                }
+            }
+
+            // tuning info
+            if (Renderer.Tracks.Length == 1 && !Renderer.Tracks[0].IsPercussion)
+            {
+                var tuning = Tuning.FindTuning(Renderer.Tracks[0].Tuning);
+                if (tuning != null)
+                {
+                    TuningGlyph = new TuningGlyph(0, 0, Scale, Renderer.RenderingResources, tuning);
+                }
+            }
+        }
 
         public float Scale
         {

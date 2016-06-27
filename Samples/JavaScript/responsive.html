@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+
+    <!-- Including alphaTab -->
+    <script type="text/javascript" src="../../Build/JavaScript/AlphaTab.js"></script>
+    <link rel="stylesheet" href="../../Build/JavaScript/AlphaTab.css" />
+
+    <!-- jQuery Plugin -->
+    <script type="text/javascript" src="lib/jquery/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="../../Build/JavaScript/jquery.alphaTab.js"></script>
+    <script type="text/javascript" src="../../Build/JavaScript/jquery.alphaTab.drop.js"></script>
+   
+    <!-- Including alphaSynth -->
+    <script type="text/javascript" src="lib/swfobject/swfobject.js"></script>
+    <script type="text/javascript" src="lib/alphaSynth/alphaSynth.js"></script>
+    
+    <!-- alphaSynth Plugin -->
+    <script type="text/javascript" src="../../Build/JavaScript/jquery.alphaTab.alphaSynth.js"></script>
+    
+    <!-- Demo Styles and Scripts -->
+    <link rel="stylesheet" href="support/gh-buttons.css" />
+    <link rel="stylesheet" href="support/demo.css" />
+    <link rel="stylesheet" href="support/player.css" />
+    
+    <!-- Styling of alphaTab -->
+    <style type="text/css">
+	.alphaTabSurface { box-shadow: 0 0 10px rgba(0,0,0,0.3); background:#FFF; border-radius:3px; }
+    #alphaTab {
+        width:80%;
+        display: block;
+        margin: auto;
+    }
+	</style>
+        
+</head>
+<body>
+    <div id="alphaTab" data-file="/Samples/JavaScript/files/Canon.gp5">
+    </div>
+    <div id="controls">
+        <div id="loadingInfo">Player not ready</div>
+        <div id="sfInfo">Loading Soundfont <span class="progress"></span></div>
+        <button class="button play" disabled="disabled" id="playPause">Play</button>
+        <button class="button" disabled="disabled" id="stop">Stop</button>
+
+        <div class="button-group" id="layoutButtons">
+            <button class="button active" disabled="disabled" id="page" data-layout="page" data-scrollmode="vertical">Page</button>
+            <button class="button" disabled="disabled" id="horizontalBarwise" data-layout="horizontal" data-scrollmode="horizontal-bar">Horizontal (Barwise)</button>
+            <button class="button" disabled="disabled" id="horizontalOffscreen" data-layout="horizontal" data-scrollmode="horizontal-offscreen">Horizontal (Offscreen)</button>
+        </div>
+    </div>
+    
+    <script type="text/javascript">
+        var playerReady = false;
+        var playerState = 0;
+        var at = $('#alphaTab');
+        
+        //
+        // 1. Load alphaTab
+        at.alphaTab({
+            scale: 1,
+            //layout: 'horizontal',
+            autoSize: true,
+            useWorker: true,
+            atRoot: '/Build/JavaScript'
+        }); 
+        
+        // 
+        // 2. Initialize Player and Setup Player UI
+        var as = at.alphaTab('playerInit', {
+            asRoot: '/Samples/JavaScript/lib/alphaSynth/',
+            swfObjectRoot: '/Samples/JavaScript/lib/alphaSynth/'
+        }); // init alphaSynth
+        
+        as.On('ready', function(r) {
+            // load default data
+            as.LoadSoundFontUrl('lib/alphaSynth/default.sf2');
+        });
+        as.On('soundFontLoad', function(loaded, full) {
+            var percentage = ((loaded / full) * 100)|0;
+            $('#sfInfo .progress').text('(' + percentage + '%)');
+        });
+        as.On('soundFontLoaded', function() {
+            $('#sfInfo').hide();
+        });
+        as.On('readyForPlay', function(r) {
+            playerReady = r;
+            updateControls();
+        });
+        as.On('playerStateChanged', function(s) {
+            playerState = s;
+            updateControls();
+        });
+        
+        $('#playPause').click(function() { 
+            if(playerState == 1) {
+                as.Pause();
+            }
+            else {
+                as.Play();
+            }
+        });
+        $('#stop').click(function() { 
+            as.Stop(); 
+        });
+        
+        function updateControls() {
+            if(!playerReady) {
+                $('#loadingInfo').show()
+                $('#controls button').attr('disabled', 'disabled');
+                $('#layoutButtons button').attr('disabled', 'disabled');
+            }
+            else {
+                $('#loadingInfo').hide()
+                $('#playPause').removeAttr('disabled');
+                $('#layoutButtons button').removeAttr('disabled');
+                switch(playerState) {
+                    case 0: // stopped
+                    $('#playPause').text('Play').removeClass('pause').addClass('play');
+                    $('#stop').attr('disabled', 'disabled');
+                    break;
+                    case 1: // playing
+                    $('#playPause').text('Pause').removeClass('play').addClass('pause');
+                    $('#stop').removeAttr('disabled');
+                    break;
+                    case 2: // paused
+                    $('#playPause').text('Play').removeClass('pause').addClass('play');
+                    $('#stop').removeAttr('disabled');
+                    break;
+                }
+            }
+        }     
+        
+        $('#layoutButtons button').click(function() {
+            $('#layoutButtons button').removeClass('active');
+            $(this).addClass('active');
+            
+            var layout = $(this).data('layout');
+            var scrollmode = $(this).data('scrollmode');
+            // update renderer
+            var renderer = at.alphaTab('renderer');
+            renderer.Settings.Layout.Mode = layout;
+            renderer.Invalidate();
+            
+            // update player
+            var context = at.data('alphaTab');
+            context.cursorOptions.autoScroll = scrollmode;
+            at.alphaTab('playerCursorUpdateBeat', context.cursorOptions.currentBeat);
+        });
+        
+        //
+        // 3. Add cursors (optional)
+        at.alphaTab('playerCursor'); 
+        at.alphaTab('drop'); // drag and drop
+    
+    </script>
+    
+</body>
+</html>     

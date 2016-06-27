@@ -118,6 +118,12 @@ namespace AlphaTab.Platform.JavaScript
                 case "load":
                     Load(data.Member("data"), data.Member("indexes").As<int[]>());
                     break;
+                case "invalidate":
+                    _renderer.Invalidate();
+                    break;
+                case "resize":
+                    _renderer.Resize(data.Member("width").As<int>());
+                    break;
                 case "tex":
                     Tex(data.Member("data").As<string>());
                     break;
@@ -175,7 +181,7 @@ namespace AlphaTab.Platform.JavaScript
 
         private void Error(Exception e)
         {
-            PostMessage(new { cmd = "error", exception = e.ToString() });
+            PostMessage(new { cmd = "error", exception = e });
         }
 
         private void ScoreLoaded(Score score)

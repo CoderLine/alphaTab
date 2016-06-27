@@ -50,6 +50,7 @@ namespace AlphaTab
 
             if (!json) return settings;
             if (JsonExists(json, "scale")) settings.Scale = json.scale;
+            if (JsonExists(json, "autoSize")) settings.AutoSize = json.autoSize;
             if (JsonExists(json, "width")) settings.Width = json.width;
             if (JsonExists(json, "height")) settings.Height = json.height;
             if (JsonExists(json, "engine")) settings.Engine = json.engine;
