@@ -38,10 +38,6 @@ namespace AlphaTab.Importer
             var data = fileSystem.Files[0].Data;
             var xml = Std.ToString(data);
 
-#if CSharp && DEBUG
-            Trace.WriteLine(xml);
-#endif
-
             // lets set the fileSystem to null, maybe the garbage collector will come along
             // and kick the fileSystem binary data before we finish parsing
             fileSystem.Files = null;

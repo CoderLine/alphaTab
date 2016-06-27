@@ -366,6 +366,7 @@ namespace AlphaTab.Rendering.Staves
         private void BuildBoundingsLookup(float cx, float cy)
         {
             if (Layout.Renderer.BoundsLookup.StaveGroups.Count > 0) return;
+            if (_firstStaffInAccolade == null || _lastStaffInAccolade == null) return;
 
             var visualTop = cy + Y + _firstStaffInAccolade.Y;
             var visualBottom = cy + Y + _lastStaffInAccolade.Y + _lastStaffInAccolade.Height;
