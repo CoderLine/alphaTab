@@ -81,6 +81,8 @@ using SharpKit.JavaScript;
 [assembly: JsMethod(TargetType = typeof(string), TargetMethod = "Replace", InlineCodeExpression = "this.replace(oldValue, newValue)")]
 [assembly: JsMethod(TargetType = typeof(string), TargetMethod = "Split", InlineCodeExpression = "this.split(separator)")]
 [assembly: JsMethod(TargetType = typeof(string), TargetMethod = "get_Chars", Name = "charCodeAt", NativeOverloads = true)]
+[assembly: JsMethod(TargetType = typeof(string), TargetMethod = "LastIndexOf", Name = "lastIndexOf", NativeOverloads = true)]
+[assembly: JsMethod(TargetType = typeof(string), TargetMethod = "Substring", Name = "substr", NativeOverloads = true)]
 
 [assembly: JsMethod(TargetType = typeof(IComparable), TargetMethod = "CompareTo", InlineCodeExpression = "(this - obj)")]
 [assembly: JsMethod(TargetType = typeof(int), TargetMethod = "CompareTo", InlineCodeExpression = "(this - value)")]

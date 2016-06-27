@@ -193,12 +193,29 @@ AlphaTab.Environment.PlatformInit = function (){
     AlphaTab.Environment.FileLoaders["default"] = function (){
         return new AlphaTab.Platform.JavaScript.JsFileLoader();
     };
+     Math.log2 = Math.log2 || function(x) { return Math.log(x) * Math.LOG2E; };;
+    // try to build the find the alphaTab script url in case we are not in the webworker already
+    if (self.document){
+        var scriptElement = document["currentScript"];
+        // fallback to script tag that has an alphatab data attribute set.
+        if (!scriptElement){
+            scriptElement = document.querySelector("script[data-alphatab]");
+        }
+        // failed to automatically resolve
+        if (!scriptElement){
+            console.warn("Could not automatically find alphaTab script file for worker, please add the data-alphatab attribute to the script tag that includes alphaTab or provide it when initializin alphaTab");
+        }
+        else {
+            AlphaTab.Environment.ScriptFile = scriptElement.src;
+        }
+    }
 };
 $StaticConstructor(function (){
     AlphaTab.Environment.RenderEngines = null;
     AlphaTab.Environment.FileLoaders = null;
     AlphaTab.Environment.LayoutEngines = null;
     AlphaTab.Environment.StaveFactories = null;
+    AlphaTab.Environment.ScriptFile = null;
     AlphaTab.Environment.RenderEngines = {};
     AlphaTab.Environment.FileLoaders = {};
     AlphaTab.Environment.LayoutEngines = {};
@@ -665,7 +682,17 @@ AlphaTab.Platform.JavaScript.JsWorkerApi.prototype = {
     },
     Load: function (data){
         this.Element.className += " loading";
-        this.Renderer.Load(data, this.TrackIndexes);
+        if (typeof(data) == "string"){
+            var fileLoader = new AlphaTab.Platform.JavaScript.JsFileLoader();
+            fileLoader.LoadBinaryAsync(data, $CreateAnonymousDelegate(this, function (b){
+                this.Renderer.Load(b, this.TrackIndexes);
+            }), $CreateAnonymousDelegate(this, function (e){
+                console.error(e);
+            }));
+        }
+        else {
+            this.Renderer.Load(data, this.TrackIndexes);
+        }
     },
     Render: function (){
         if (this.Renderer != null){
@@ -1116,31 +1143,43 @@ AlphaTab.Platform.JavaScript.JsFileLoader.GetBytesFromString = function (s){
 };
 AlphaTab.Platform.JavaScript.WorkerScoreRenderer = function (workerApi, rawSettings){
     this._workerApi = null;
-    this._atRoot = null;
     this._worker = null;
     this.PreRender = null;
     this.PartialRenderFinished = null;
     this.RenderFinished = null;
     this.PostRenderFinished = null;
     this._workerApi = workerApi;
-    var atRoot = rawSettings.atRoot;
-    if (atRoot != "" && !(atRoot.lastIndexOf("/")==(atRoot.length-"/".length))){
-        atRoot += "/";
+    var alphaTabScriptFile;
+    // explicitly specified file/root path
+    if (rawSettings.atRoot){
+        alphaTabScriptFile = rawSettings.atRoot;
+        // append script name 
+        if (!(alphaTabScriptFile.lastIndexOf(".js")==(alphaTabScriptFile.length-".js".length))){
+            if (!(alphaTabScriptFile.lastIndexOf("/")==(alphaTabScriptFile.length-"/".length))){
+                alphaTabScriptFile += "/";
+            }
+            alphaTabScriptFile += "AlphaTab.js";
+        }
+        if (!alphaTabScriptFile.indexOf("http")==0 && !alphaTabScriptFile.indexOf("https")==0){
+            var root = new Array();
+            root.push(window.location.protocol);
+            root.push("//");
+            root.push(window.location.hostname);
+            if (window.location.port){
+                root.push(":");
+                root.push(window.location.port);
+            }
+            root.push(alphaTabScriptFile);
+            alphaTabScriptFile = root.join('');
+        }
     }
-    this._atRoot = atRoot;
-    this._worker = new Worker(atRoot + "AlphaTab.worker.js");
-    var root = new Array();
-    root.push(window.location.protocol);
-    root.push("//");
-    root.push(window.location.hostname);
-    if (window.location.port){
-        root.push(":");
-        root.push(window.location.port);
+    else {
+        alphaTabScriptFile = AlphaTab.Environment.ScriptFile;
     }
-    root.push(this._atRoot);
+    this._worker = new Worker(this.CreateWorkerUrl());
     this._worker.postMessage({
         cmd: "initialize",
-        root: root.join(''),
+        alphaTabScript: alphaTabScriptFile,
         settings: rawSettings
     });
     this._worker.addEventListener("message", $CreateDelegate(this, this.HandleWorkerMessage), false);
@@ -1148,6 +1187,23 @@ AlphaTab.Platform.JavaScript.WorkerScoreRenderer = function (workerApi, rawSetti
 AlphaTab.Platform.JavaScript.WorkerScoreRenderer.prototype = {
     get_IsSvg: function (){
         return true;
+    },
+    CreateWorkerUrl: function (){
+        var source = "self.onmessage = function(e) {\r\n            if(e.data.cmd == \'initialize\') {\r\n                importScripts(e.data.alphaTabScript);\r\n                    new AlphaTab.Platform.JavaScript.JsWorker(self, e.data.settings);\r\n                }\r\n            }";
+         window.URL = window.URL || window.webkitURL;;
+         window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder  || window.MozBlobBuilder;;
+        var blob;
+        try{
+            blob = new Blob([source], {
+                type: "application/javascript"
+            });
+        }
+        catch($$e2){
+            var builder =  new BlobBuilder();
+            builder.append(source);
+            blob = builder.getBlob();
+        }
+        return  URL.createObjectURL(blob);
     },
     Load: function (data, trackIndexes){
         this._worker.postMessage({
@@ -5487,7 +5543,7 @@ AlphaTab.Importer.GpxFileSystem.prototype = {
                 }
             }
         }
-        catch($$e2){
+        catch($$e3){
         }
         buffer = uncompressed.GetBuffer();
         var resultOffset = skipHeader ? 4 : 0;
@@ -6797,7 +6853,7 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
         try{
             dom = AlphaTab.Platform.Std.LoadXml(xml);
         }
-        catch($$e3){
+        catch($$e4){
             throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(), new Error());
         }
         this._score = new AlphaTab.Model.Score();
@@ -7452,7 +7508,7 @@ AlphaTab.IO.BitReader.prototype = {
                 all.WriteByte(this.ReadByte());
             }
         }
-        catch($$e4){
+        catch($$e5){
         }
         return all.ToArray();
     }
@@ -14268,7 +14324,6 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
         this.Invalidate();
     },
     RenderMultiple: function (tracks){
-        this.BoundsLookup = new AlphaTab.Rendering.Utils.BoundsLookup();
         if (tracks.length == 0){
             this.Score = null;
         }
@@ -14279,6 +14334,7 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
         this.Invalidate();
     },
     Invalidate: function (){
+        this.BoundsLookup = new AlphaTab.Rendering.Utils.BoundsLookup();
         if (this.Tracks.length == 0)
             return;
         if (this.RenderingResources.Scale != this.Settings.Scale){
@@ -14879,6 +14935,8 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
         }
     },
     BuildBoundingsLookup: function (cx, cy){
+        if (this.Layout.Renderer.BoundsLookup.StaveGroups.length > 0)
+            return;
         var visualTop = cy + this.Y + this._firstStaffInAccolade.Y;
         var visualBottom = cy + this.Y + this._lastStaffInAccolade.Y + this._lastStaffInAccolade.Height;
         var realTop = cy + this.Y + this._allStaves[0].Y;

@@ -132,6 +132,26 @@
         }
     };
 
+    var cursorOptionsDefaults = {
+        autoScroll: 'vertical',
+        scrollSpeed: 300,
+        scrollOffset: -30,
+        scrollElement: 'body',
+        scrollAdjustment: 0,
+        beatCursorWidth: 3,
+        handleClick: true
+    };
+
+    
+    api.cursorOptions = function(element, context, options) {
+        if(options) {
+            context.cursorOptions = $.extend(cursorOptionsDefaults, options);
+        }
+        else {
+            return context.cursorOptions;
+        }
+    };
+    
     api.playerCursor = function(element, context, options) {
         var as = element.data('alphaSynth');
         if(!as) { 
@@ -142,17 +162,7 @@
         if(element.data('alphaSynthCursor')) { return; }
         element.data('alphaSynthCursor', true);
                 
-        var defaults = {
-            autoScroll: 'vertical',
-            scrollSpeed: 300,
-            scrollOffset: -30,
-            scrollElement: 'body,html',
-            scrollAdjustment: 0,
-            beatCursorWidth: 3,
-            handleClick: true
-        };
-        
-        context.cursorOptions = $.extend(defaults, options);
+        context.cursorOptions = $.extend(cursorOptionsDefaults, options);
         
         //
         // Create cursors

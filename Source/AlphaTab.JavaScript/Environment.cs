@@ -15,7 +15,11 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using AlphaTab.Platform;
 using AlphaTab.Platform.Svg;
+using SharpKit.Html;
+using SharpKit.JavaScript;
 
 namespace AlphaTab
 {
@@ -26,11 +30,38 @@ namespace AlphaTab
     /// </summary>
     public partial class Environment
     {
+        public static string ScriptFile { get; set; }
+
         static void PlatformInit()
         {
             RenderEngines["default"] = d => new SvgCanvas();
             RenderEngines["html5"] = d => new Platform.JavaScript.Html5Canvas();
             FileLoaders["default"] = () => new Platform.JavaScript.JsFileLoader();
+
+
+            JsContext.JsCode("Math.log2 = Math.log2 || function(x) { return Math.log(x) * Math.LOG2E; };");
+
+            // try to build the find the alphaTab script url in case we are not in the webworker already
+            if (HtmlContext.self.document.As<bool>())
+            {
+                var scriptElement = HtmlContext.document.Member("currentScript").As<HtmlScriptElement>();
+
+                // fallback to script tag that has an alphatab data attribute set.
+                if (!scriptElement.As<bool>())
+                {
+                    scriptElement = HtmlContext.document.querySelector("script[data-alphatab]").As<HtmlScriptElement>();
+                }
+
+                // failed to automatically resolve
+                if (!scriptElement.As<bool>())
+                {
+                    HtmlContext.console.warn("Could not automatically find alphaTab script file for worker, please add the data-alphatab attribute to the script tag that includes alphaTab or provide it when initializin alphaTab");
+                }
+                else
+                {
+                    ScriptFile = scriptElement.src;
+                }
+            }
         }
     }
 }

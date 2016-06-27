@@ -1,7 +1,34 @@
-body { font-family:Open Sans, Arial, sans-serif; background:#F5F6F7; padding:10px;text-align:center; }
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700,400italic);
+body {
+  min-height: 2000px;
+  padding-top: 70px;
+  font-family: Open Sans, Arial, sans-serif;
+}
+
+body.features {
+  padding-top: 100px;    
+}
+
 #alphaTab {
     display: table;
     margin: 0 auto;
+}
+
+.navbar-brand>img {
+    max-height: 100%;
+    display: inline-block;
+}
+
+.btn-link:link, .btn-link:hover, .btn-link:active, .btn-link:focus {
+    text-decoration:none;
+    outline:none;
+}
+
+.nav .progress {
+    margin: 15px 10px;
+    width: 200px;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 ::-webkit-scrollbar-track
@@ -24,34 +51,26 @@ body { font-family:Open Sans, Arial, sans-serif; background:#F5F6F7; padding:10p
 	background-color: #AAA;
 }
 
-
-.cf:before,
-.cf:after {
-    content: " "; 
-    display: table;
-}
-
-.cf:after {
-    clear: both;
-}
-
-.cf {
-    *zoom: 1;
-}
-
-.button { font-size:14px; }
-
-#alphaTabScore { margin: 0 auto; width: 700px; text-align:left; }
-
 .samples { position:absolute; width: 800px;}
-.group { position: absolute; top: 50px; left: 0; right: 0; display:none;}
-.alphaTabSurface {
-    margin:0 auto;
+.group { 
+    display:none; 
+    text-align: center; 
+    font-size: 16px;
 }
+
 #alphaTabHorizontal .alphaTabSurface {
     margin: 0;
 }
 
-#layoutButtons { 
-    vertical-align: middle;
+.alphaTabSurface { 
+    box-shadow: 0 0 10px rgba(0,0,0,0.3); 
+    background:#FFF; 
+    border-radius:3px; 
+    margin: 0 auto;
+}
+
+#alphaTabScore {
+    text-align: left;
+    width:700px;
+    margin: 0 auto;
 }

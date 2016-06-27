@@ -83,7 +83,6 @@ namespace AlphaTab.Rendering
 
         public void RenderMultiple(Track[] tracks)
         {
-            BoundsLookup = new BoundsLookup();
             if (tracks.Length == 0)
             {
                 Score = null;
@@ -100,6 +99,7 @@ namespace AlphaTab.Rendering
 
         public void Invalidate()
         {
+            BoundsLookup = new BoundsLookup();
             if (Tracks.Length == 0) return;
             if (RenderingResources.Scale != Settings.Scale)
             {

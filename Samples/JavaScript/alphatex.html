@@ -3,487 +3,500 @@
 <head>
     <meta charset="utf-8">
     <title></title>
-    <!-- Styling of alphaTab -->
-    <style type="text/css">
-	.alphaTabSurface { box-shadow: 0 0 10px rgba(0,0,0,0.3); background:#FFF; border-radius:3px; }
-	</style>
     
     <!-- Including alphaTab -->
     <script type="text/javascript" src="../../Build/JavaScript/AlphaTab.js"></script>
-    <link rel="stylesheet" href="../../Build/JavaScript/AlphaTab.css" />
 
     <!-- jQuery Plugin -->
-    <script type="text/javascript" src="lib/jquery/jquery-1.10.2.min.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>    
     <script type="text/javascript" src="../../Build/JavaScript/jquery.alphaTab.js"></script>
 
-    
     <!-- Demo Styles -->
-    <link rel="stylesheet" href="support/gh-buttons.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    
     <link rel="stylesheet" href="support/demo.css" />
     <link rel="stylesheet" href="support/prism.css" />
     <link rel="stylesheet" href="support/alphaTexDemo.css" />
-    
 </head>
 <body>
-    <div id="menu" class="button-group">
-    </div>
+    <!-- Toolbar containing the buttons -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">
+              <img alt="alphaTab" src="support/alphaTab.png" />
+              AlphaTex Samples
+          </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <!-- Player controls -->
+          <ul class="nav navbar-nav" id="menu">
+          </ul>
+        </div>
+      </div>
+    </nav>
     
-    <div id="all" class="group">
-        <h1>Introduction</h1>
-        
-        <p>
-            In this section you find all details about how to write music notation using AlphaTex.
-            AlphaTex is a text format for writing music notation for AlphaTab. <br /> AlphaTex loading
-            can be enabled by specifying <code>data-tex="true"</code> on the container elmement. 
-            AlphaTab will load the tex code from the element contents and parse it. 
-            AlphaTex currently only allows writing of a single track.
-        </p>
-        
-        <h2>Showcase</h2>
-        
-        <p>
-            Here is an example score fully rendered using alphaTex. 
-        </p>    
-        
-        <div id="alphaTabShowcase" data-tex="true">
-        \title "Canon Rock"
-        \subtitle "JerryC"
-        \tempo 90
-        .
-        :2 19.2{v f} 17.2{v f} | 
-        15.2{v f} 14.2{v f}| 
-        12.2{v f} 10.2{v f}| 
-        12.2{v f} 14.2{v f}.4 :8 15.2 17.2 |
-        14.1.2 :8 17.2 15.1 14.1{h} 17.2 | 
-        15.2{v d}.4 :16 17.2{h} 15.2 :8 14.2 14.1 17.1{b(0 4 4 0)}.4 |
-        15.1.8 :16 14.1{tu 3} 15.1{tu 3} 14.1{tu 3} :8 17.2 15.1 14.1 :16 12.1{tu 3} 14.1{tu 3} 12.1{tu 3} :8 15.2 14.2 | 
-        12.2 14.3 12.3 15.2 :32 14.2{h} 15.2{h} 14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}
+    <div class="container">
 
-        </div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabShowcase').alphaTab({
-                atRoot: '/Build/Javascript/',
-                useWorker: true
-            });
-        </script>
+        <div id="all" class="group">
+            <h1>Introduction</h1>
             
-    </div>
-    
-    <div id="meta" class="group">
-        <h1>Metadata</h1>
-        
-        <p>
-            Metadata is specified using <code>\tagname value value</code> at the beginning of the score. 
-            It can be used to specify global information like title, tempo or track tuning. <br />
-            Metadata is optional, but if specified, it must be followed by a dot do indicate the end
-            of the metadata. 
-        </p>        
-        
-        <div id="alphaTabMeta" data-tex="true">
-        // Song information
-        \title "Song Title"
-        \subtitle Subtitle
-        \artist Artist
-        \album 'My Album' 
-        \words Daniel
-        \music alphaTab
-        \copyright Daniel
-        // Tempo in BPM
-        \tempo 200
-        // Instrument as General Midi number or name
-        \instrument 30 
-        // Capo fret
-        \capo 2
-        // String tuning starting at the most bottom string
-        \tuning e5 b4 g4 d4 a3 e3 
-        .        
-        </div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabMeta').alphaTab();
-        </script>
-        
-    </div>
-    
-    <div id="notes" class="group">
-        <h1>Notes</h1>
-        
-        <p>
-            The following examples show how to general notes. Multiple bars are
-            separated by <code>|</code>.
-        </p>       
-
-        <h2>Single notes and rests</h2>
-        
-        <p>
-            Notes follow the format <code>fret.string.duration</code>. For rests
-            the fret is simply replaced with <code>r</code>. The duration is specified
-            as a number where 1 represents a full note, 2 a half note and so on. 
-        </p>
-        
-        <div id="alphaTabNumbers" data-tex="true">
-        0.6.2 1.5.4 3.4.4 | 
-        5.3.8 5.3.8 5.3.8 5.3.8 r.2
-        </div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabNumbers').alphaTab();
-        </script>
-
-        <h2>Chords</h2>
-        
-        <p>
-            To specify multiple notes on a beat, group them in parenthesis. The full format is
-            <code>(fret.string fret.string ...).duration</code>
-        </p>
-        
-        <div id="alphaTabChords" data-tex="true">
-        (0.3 0.4).4 (3.3 3.4).4 (5.3 5.4).4 r.8 (0.3 0.4).8 |
-        r.8 (3.3 3.4).8 r.8 (6.3 6.4).8 (5.3 5.4).4 r.4 |
-        (0.3 0.4).4 (3.3 3.4).4 (5.3 5.4).4 r.8 (3.3 3.4).8 |
-        r.8 (0.3 0.4).8
-
-        </div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabChords').alphaTab();
-        </script>
-        
-        <h2>Duration Ranges</h2>
-        
-        <p>
-            To make it simpler to write notes, you can apply the same duration to 
-            multiple notes. Start a new duration range with <code>:duration</code>.
-            The following notes will all have this duration. AlphaTex also remembers
-            the last explictely set duration and will take use it in case of a missing duration.
-        </p>
-        
-        <div id="alphaTabDurationRanges" data-tex="true">
-        // explicit ranges via :duration
-        :4 2.3 3.3 :8 3.3 4.3 3.3 4.3 | 
-        // implicit ranges via beat duration
-        2.3.4 3.3 3.3.8 4.3 3.3 4.3
-        </div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabDurationRanges').alphaTab();
-        </script>
-        
-        
-        <h2>Repeat beats</h2>
-        
-        <p>
-            You can specify a multiplier after a beat to add the same beat multiple times to the score. 
-        </p>
-        
-        <div id="alphaTabBeatMultiplier" data-tex="true">
-        3.3*4 | 4.3*4
-        </div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabBeatMultiplier').alphaTab();
-        </script>
-        
-    </div>
+            <p>
+                In this section you find all details about how to write music notation using AlphaTex.
+                AlphaTex is a text format for writing music notation for AlphaTab. AlphaTex loading
+                can be enabled by specifying <code>data-tex="true"</code> on the container elmement. 
+                AlphaTab will load the tex code from the element contents and parse it. 
+                AlphaTex currently only allows writing of a single track.
+            </p>
             
-    
-    <div id="bars" class="group">
-        <h1>Bar Metadata</h1>
-        
-        <p>
-            For bars various tags can be specified which change information like
-            clefs, key signatures repeats etc. They follow the format 
-            <code>\tag value value</code> just like the score metadata. Be sure not to 
-            mix the score metadata and the bar metadata of the first bar.
-        </p>       
-
-        <h2>Time Signatures</h2>
-        
-        <p>
-            Time signatures have the format <code>\ts Numerator Denominator</code>
-        </p>
-        
-        <div id="alphaTabTs" data-tex="true">
-        \ts 3 4 | \ts 4 4 | \ts 6 8       
-        </div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabTs').alphaTab();
-        </script>
-
-        <h2>Repeats</h2>
-        
-        <p>
-            Repeats can be started with <code>\ro</code> and 
-            be closed with <code>\rc Count</code>. Count specifies how often
-            the bar range is repeated. 
-        </p>
-        
-        <div id="alphaTabRepeat" data-tex="true">
-        \ro 1.3 2.3 3.3 4.3 |   
-        5.3 6.3 7.3 8.3 |   
-        \rc 2 1.3 2.3 3.3 4.3 |  
-        \ro \rc 3 1.3 2.3 3.3 4.3 |   
-        
-        
-        </div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabRepeat').alphaTab();
-        </script>
-
-        <h2>Key Signatures</h2>
-        
-        <p>
-            The key signature can be specified with <code>\ks Value</code> where the value is one 
-            of the following: <code>Cb, Gb, Db, Ab, Eb, Bb, F, C, G, D, A, E, B, F#, C#</code>
-        </p>                       
-                                   
-        <div id="alphaTabKs" data-tex="true">
-        \ks Cb | \ks C | \ks C# 
-        
-        
-        </div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabKs').alphaTab();
-        </script>
-
-        <h2>Clef</h2>
-        
-        <p>
-            To change the clef simply specify <code>\clef Clef</code> where Clef is one of the following
-            values: <code>G2, Treble, F4, Bass, C3, Tenor, C4, Alto, N, Neutral</code>
-        </p>                       
-                                   
-        <div id="alphaTabClef" data-tex="true">
-        \clef G2 | \clef F4 | \clef C3 | \clef C4 | \clef N |
-        \clef Treble | \clef Bass | \clef Tenor | \clef Alto | \clef Neutral |
-                
-        </div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabClef').alphaTab();
-        </script>
-        
-        <h2>Tempo</h2>
-        
-        <p>
-            To change the tempo of the score you can specify <code>\tempo BPM</code>.
+            <h2>Showcase</h2>
             
-        </p>                       
-                                   
-        <div id="alphaTabTempo" data-tex="true">
-        // score meta also supports \tempo, therefore we skip the score meta with a dot
-        .
-        // bars
-        \tempo 30 1.3 2.3 3.3 4.3 | 
-        \tempo 80 1.3 2.3 3.3 4.3 |
-        </div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabTempo').alphaTab();
-        </script>
-        
-    </div>
-        
-    <div id="beateffects" class="group">
-        <h1>Beat Effects</h1>
-        
-        <p>
-            There are various effects that can be applied to a beat. All beat
-            effects are specified in braces after the beat. 
-            <code>Beat{Effects}</code>
-        </p>    
-        
-        <h2>Simple Effects</h2>
-        
-        <p>
-            Please find the list of support effects in the example below. 
-        </p>
-        
-        <div id="alphaTabBeatEffects" data-tex="true">
-        // fade in
-        3.3{f}
-        // vibrato
-        3.3{v}
-        // slap
-        3.3{s}
-        // pop
-        3.3{p} 
-        |
-        // dotted 
-        3.3{d}
-        // double dotted
-        3.3{dd}
-        // pick stroke (su => up, sd => down)
-        3.3{su}
-        3.3{sd}
-        |
-        // grace (on beat)
-        3.3{gr ob}
-        3.3
-        // grace (before beat)
-        3.3{gr}
-        3.3
-        |
-        // Tuplets (supported variants: 3,5,6,7,9,10,11,12)
-        3.3{tu 3} 3.3{tu 3} 3.3{tu 3}
-        3.3{tu 5} 3.3{tu 5} 3.3{tu 5} 3.3{tu 5} 3.3{tu 5}
-        |
-        // tremolo picking (`tp duration` where duration can be 8,16 or 32)
-        3.3{tp 8} 3.3{tp 16} 3.3{tp 32}
-        </div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabBeatEffects').alphaTab();
-        </script>
-        
-        <h2>Tremolo / Whammy Bar</h2>
-        
-        <p>
-            The tremolo/whammy bar effect is a bit more complex than the others. 
-            You can specify a number of values which are evenly distributed over the
-            time when the note is played. The values indicate the number of quarter notes
-            increased or decreased on playing. <code>tb (value1 value2 ...)</code>
-        </p>
-        
-        <div id="alphaTabBeatWhammy" data-tex="true">
-        3.3.1{tb (0 4 0 8)} |
-        3.3.1{tb (0 -4 0 -8)} |
-        </div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabBeatWhammy').alphaTab();
-        </script>
-    </div>
-
-    <div id="noteeffects" class="group">
-        <h1>Note Effects</h1>
-        
-        <p>
-            Just like beat effects, there are also effects for single notes like harmonics,
-            bends, accentuations etc. The syntax is 
-            <code>Fret.String{NoteEffects}</code>
-        </p>    
-        
-        <h2>Simple Effects</h2>
-        
-        <p>
-            Please find the list of support effects in the example below. 
-        </p>
-        
-        <div id="alphaTabNoteEffects" data-tex="true">
-            // Harmonics (natural, articifial, tapped, pinch and semi)
-            :8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh} |
-            // trill (tr fret duration)
-            :4 3.3{tr 4 16} 3.3{tr 5 32} 3.3{tr 6 64} 
-            // vibrato
-            3.3{v} |
-            // slides (legato and shift)
-            3.3{sl} 3.3{ss}
-            // hammer on/pull offs
-            3.3{h} 4.3{h} |
-            // ghost notes
-            3.3{g}
-            // accentuations (normal and heavy)
-            3.3{ac} 3.3{hac}
-            // staccato
-            3.3{st} |
-            // palm mute 
-            3.3{pm} 3.3{pm} 3.3{pm} 3.3{pm} |
-            // let ring 
-            3.3{lr} 3.3{lr} 3.3{lr} 3.3{lr} |
-            // dead notes
-            3.3{x} x.3 |
-            // fingering (left and right; 1 => Thumb, 2 => Index, 3 => Middle, 4 => Annual, 5 => Little)
-            :8 3.3{lf 1} 3.3{lf 2} 3.3{lf 3} 3.3{lf 4} 3.3{lf 5} (2.2{lf 4} 2.3{lf 3} 2.4{lf 2}) |
-            :8 3.3{rf 1} 3.3{rf 2} 3.3{rf 3} 3.3{rf 4} 3.3{lf 5} |
-        </div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabNoteEffects').alphaTab();
-        </script>
-        
-        <h2>Bends</h2>
-        
-        <p>
-            The bend effect works like the tremolo/whammy bar effect.  
-            You can specify a number of values which are evenly distributed over the
-            time when the note is played. The values indicate the number of quarter notes
-            increased bend up upon playing. <code>b (value1 value2 ...)</code>
-        </p>
-        
-        <div id="alphaTabBends" data-tex="true">
-        3.3{b (0 4 )} |
-        3.3{b (0 4 0 8)} |
-        </div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabBends').alphaTab();
-        </script>
-    </div>
-
-    <div id="exporter" class="group">
-        <h1>Exporter</h1>
-        
-        <p>
-            AlphaTab can export an already loaded track as alphaTex. 
-        </p>
-
-        <div id="alphaTabExporter">
-            Open a Guitar Pro file by clicking here to export the 
-            first track as alphaTex.
-            <input type="file" id="exporterFile" />
-        </div>
-        
-        <div class="texSample">
-            <pre><code class="language-JavaScript line-numbers">function toTex(track) {
-    var exporter = new AlphaTab.Exporter.AlphaTexExporter();
-    exporter.Export(track);
-    return exporter.ToTex(); 
-}</code></pre>
-        </div>
-        
-        <h2>Exported AlphaTex</h2>
-        
-        <div id="alphaTabExportedAlphaTex">
-        <code class="language-alphaTex line-numbers">
-        Open a file to see the generated alphaTex here. 
-        </code>
-        </pre>
-        
-        <script type="text/javascript-lazy" id="alphaTabExporterCode">
-        function exportFile(data) {
-            // parse score
-            var score = null;
-            try {
-                score = AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(data);
-            }
-            catch(e) {
-                alert('Failed to load file, did you really open a Guitar Pro file?');
-            }
+            <p>
+                Here is an example score fully rendered using alphaTex. 
+            </p>    
             
-            // export it 
-            if(score != null) {
-                var exporter = new AlphaTab.Exporter.AlphaTexExporter();
-                exporter.Export(score.Tracks[0]);
-                var tex = exporter.ToTex(); 
-                                
-                var code = $('<code class="language-alphaTex line-numbers"></code>')
-                    .text(tex);   
+            <div id="alphaTabShowcase" data-tex="true">
+            \title "Canon Rock"
+            \subtitle "JerryC"
+            \tempo 90
+            .
+            :2 19.2{v f} 17.2{v f} | 
+            15.2{v f} 14.2{v f}| 
+            12.2{v f} 10.2{v f}| 
+            12.2{v f} 14.2{v f}.4 :8 15.2 17.2 |
+            14.1.2 :8 17.2 15.1 14.1{h} 17.2 | 
+            15.2{v d}.4 :16 17.2{h} 15.2 :8 14.2 14.1 17.1{b(0 4 4 0)}.4 |
+            15.1.8 :16 14.1{tu 3} 15.1{tu 3} 14.1{tu 3} :8 17.2 15.1 14.1 :16 12.1{tu 3} 14.1{tu 3} 12.1{tu 3} :8 15.2 14.2 | 
+            12.2 14.3 12.3 15.2 :32 14.2{h} 15.2{h} 14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}
 
-                var pre = $('<pre></pre>').append(code);    
-                
-                $('#alphaTabExportedAlphaTex')
-                    .empty()
-                    .append($('<div class="texSample"></div>').append(pre));
-                Prism.highlightElement(code[0]);
-            }
-        }
-        
-        $('#exporterFile').change(function(e) {
-            debugger;
-            var files = e.originalEvent.target.files;
-            if(files.length > 0) {
-                var reader = new FileReader();
-                reader.onload = (function(e) {
-                    exportFile(new Uint8Array(e.target.result));
+            </div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabShowcase').alphaTab({
+                    atRoot: '/Build/Javascript/',
+                    useWorker: true
                 });
-                reader.readAsArrayBuffer(files[0]);
-            }
-        });
-        </script>
+            </script>
+                
+        </div>
         
-    </div>
+        <div id="meta" class="group">
+            <h1>Metadata</h1>
+            
+            <p>
+                Metadata is specified using <code>\tagname value value</code> at the beginning of the score. 
+                It can be used to specify global information like title, tempo or track tuning.
+                Metadata is optional, but if specified, it must be followed by a dot do indicate the end
+                of the metadata. 
+            </p>        
+            
+            <div id="alphaTabMeta" data-tex="true">
+            // Song information
+            \title "Song Title"
+            \subtitle Subtitle
+            \artist Artist
+            \album 'My Album' 
+            \words Daniel
+            \music alphaTab
+            \copyright Daniel
+            // Tempo in BPM
+            \tempo 200
+            // Instrument as General Midi number or name
+            \instrument 30 
+            // Capo fret
+            \capo 2
+            // String tuning starting at the most bottom string
+            \tuning e5 b4 g4 d4 a3 e3 
+            .        
+            </div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabMeta').alphaTab();
+            </script>
+            
+        </div>
+        
+        <div id="notes" class="group">
+            <h1>Notes</h1>
+            
+            <p>
+                The following examples show how to general notes. Multiple bars are
+                separated by <code>|</code>.
+            </p>       
 
+            <h2>Single notes and rests</h2>
+            
+            <p>
+                Notes follow the format <code>fret.string.duration</code>. For rests
+                the fret is simply replaced with <code>r</code>. The duration is specified
+                as a number where 1 represents a full note, 2 a half note and so on. 
+            </p>
+            
+            <div id="alphaTabNumbers" data-tex="true">
+            0.6.2 1.5.4 3.4.4 | 
+            5.3.8 5.3.8 5.3.8 5.3.8 r.2
+            </div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabNumbers').alphaTab();
+            </script>
+
+            <h2>Chords</h2>
+            
+            <p>
+                To specify multiple notes on a beat, group them in parenthesis. The full format is
+                <code>(fret.string fret.string ...).duration</code>
+            </p>
+            
+            <div id="alphaTabChords" data-tex="true">
+            (0.3 0.4).4 (3.3 3.4).4 (5.3 5.4).4 r.8 (0.3 0.4).8 |
+            r.8 (3.3 3.4).8 r.8 (6.3 6.4).8 (5.3 5.4).4 r.4 |
+            (0.3 0.4).4 (3.3 3.4).4 (5.3 5.4).4 r.8 (3.3 3.4).8 |
+            r.8 (0.3 0.4).8
+
+            </div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabChords').alphaTab();
+            </script>
+            
+            <h2>Duration Ranges</h2>
+            
+            <p>
+                To make it simpler to write notes, you can apply the same duration to 
+                multiple notes. Start a new duration range with <code>:duration</code>.
+                The following notes will all have this duration. AlphaTex also remembers
+                the last explictely set duration and will take use it in case of a missing duration.
+            </p>
+            
+            <div id="alphaTabDurationRanges" data-tex="true">
+            // explicit ranges via :duration
+            :4 2.3 3.3 :8 3.3 4.3 3.3 4.3 | 
+            // implicit ranges via beat duration
+            2.3.4 3.3 3.3.8 4.3 3.3 4.3
+            </div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabDurationRanges').alphaTab();
+            </script>
+            
+            
+            <h2>Repeat beats</h2>
+            
+            <p>
+                You can specify a multiplier after a beat to add the same beat multiple times to the score. 
+            </p>
+            
+            <div id="alphaTabBeatMultiplier" data-tex="true">
+            3.3*4 | 4.3*4
+            </div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabBeatMultiplier').alphaTab();
+            </script>
+            
+        </div>
+                
         
+        <div id="bars" class="group">
+            <h1>Bar Metadata</h1>
+            
+            <p>
+                For bars various tags can be specified which change information like
+                clefs, key signatures repeats etc. They follow the format 
+                <code>\tag value value</code> just like the score metadata. Be sure not to 
+                mix the score metadata and the bar metadata of the first bar.
+            </p>       
+
+            <h2>Time Signatures</h2>
+            
+            <p>
+                Time signatures have the format <code>\ts Numerator Denominator</code>
+            </p>
+            
+            <div id="alphaTabTs" data-tex="true">
+            \ts 3 4 | \ts 4 4 | \ts 6 8       
+            </div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabTs').alphaTab();
+            </script>
+
+            <h2>Repeats</h2>
+            
+            <p>
+                Repeats can be started with <code>\ro</code> and 
+                be closed with <code>\rc Count</code>. Count specifies how often
+                the bar range is repeated. 
+            </p>
+            
+            <div id="alphaTabRepeat" data-tex="true">
+            \ro 1.3 2.3 3.3 4.3 |   
+            5.3 6.3 7.3 8.3 |   
+            \rc 2 1.3 2.3 3.3 4.3 |  
+            \ro \rc 3 1.3 2.3 3.3 4.3 |   
+            
+            
+            </div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabRepeat').alphaTab();
+            </script>
+
+            <h2>Key Signatures</h2>
+            
+            <p>
+                The key signature can be specified with <code>\ks Value</code> where the value is one 
+                of the following: <code>Cb, Gb, Db, Ab, Eb, Bb, F, C, G, D, A, E, B, F#, C#</code>
+            </p>                       
+                                       
+            <div id="alphaTabKs" data-tex="true">
+            \ks Cb | \ks C | \ks C# 
+            
+            
+            </div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabKs').alphaTab();
+            </script>
+
+            <h2>Clef</h2>
+            
+            <p>
+                To change the clef simply specify <code>\clef Clef</code> where Clef is one of the following
+                values: <code>G2, Treble, F4, Bass, C3, Tenor, C4, Alto, N, Neutral</code>
+            </p>                       
+                                       
+            <div id="alphaTabClef" data-tex="true">
+            \clef G2 | \clef F4 | \clef C3 | \clef C4 | \clef N |
+            \clef Treble | \clef Bass | \clef Tenor | \clef Alto | \clef Neutral |
+                    
+            </div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabClef').alphaTab();
+            </script>
+            
+            <h2>Tempo</h2>
+            
+            <p>
+                To change the tempo of the score you can specify <code>\tempo BPM</code>.
+                
+            </p>                       
+                                       
+            <div id="alphaTabTempo" data-tex="true">
+            // score meta also supports \tempo, therefore we skip the score meta with a dot
+            .
+            // bars
+            \tempo 30 1.3 2.3 3.3 4.3 | 
+            \tempo 80 1.3 2.3 3.3 4.3 |
+            </div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabTempo').alphaTab();
+            </script>
+            
+        </div>
+            
+        <div id="beateffects" class="group">
+            <h1>Beat Effects</h1>
+            
+            <p>
+                There are various effects that can be applied to a beat. All beat
+                effects are specified in braces after the beat. 
+                <code>Beat{Effects}</code>
+            </p>    
+            
+            <h2>Simple Effects</h2>
+            
+            <p>
+                Please find the list of support effects in the example below. 
+            </p>
+            
+            <div id="alphaTabBeatEffects" data-tex="true">
+            // fade in
+            3.3{f}
+            // vibrato
+            3.3{v}
+            // slap
+            3.3{s}
+            // pop
+            3.3{p} 
+            |
+            // dotted 
+            3.3{d}
+            // double dotted
+            3.3{dd}
+            // pick stroke (su => up, sd => down)
+            3.3{su}
+            3.3{sd}
+            |
+            // grace (on beat)
+            3.3{gr ob}
+            3.3
+            // grace (before beat)
+            3.3{gr}
+            3.3
+            |
+            // Tuplets (supported variants: 3,5,6,7,9,10,11,12)
+            3.3{tu 3} 3.3{tu 3} 3.3{tu 3}
+            3.3{tu 5} 3.3{tu 5} 3.3{tu 5} 3.3{tu 5} 3.3{tu 5}
+            |
+            // tremolo picking (`tp duration` where duration can be 8,16 or 32)
+            3.3{tp 8} 3.3{tp 16} 3.3{tp 32}
+            </div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabBeatEffects').alphaTab();
+            </script>
+            
+            <h2>Tremolo / Whammy Bar</h2>
+            
+            <p>
+                The tremolo/whammy bar effect is a bit more complex than the others. 
+                You can specify a number of values which are evenly distributed over the
+                time when the note is played. The values indicate the number of quarter notes
+                increased or decreased on playing. <code>tb (value1 value2 ...)</code>
+            </p>
+            
+            <div id="alphaTabBeatWhammy" data-tex="true">
+            3.3.1{tb (0 4 0 8)} |
+            3.3.1{tb (0 -4 0 -8)} |
+            </div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabBeatWhammy').alphaTab();
+            </script>
+        </div>
+
+        <div id="noteeffects" class="group">
+            <h1>Note Effects</h1>
+            
+            <p>
+                Just like beat effects, there are also effects for single notes like harmonics,
+                bends, accentuations etc. The syntax is 
+                <code>Fret.String{NoteEffects}</code>
+            </p>    
+            
+            <h2>Simple Effects</h2>
+            
+            <p>
+                Please find the list of support effects in the example below. 
+            </p>
+            
+            <div id="alphaTabNoteEffects" data-tex="true">
+                // Harmonics (natural, articifial, tapped, pinch and semi)
+                :8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh} |
+                // trill (tr fret duration)
+                :4 3.3{tr 4 16} 3.3{tr 5 32} 3.3{tr 6 64} 
+                // vibrato
+                3.3{v} |
+                // slides (legato and shift)
+                3.3{sl} 3.3{ss}
+                // hammer on/pull offs
+                3.3{h} 4.3{h} |
+                // ghost notes
+                3.3{g}
+                // accentuations (normal and heavy)
+                3.3{ac} 3.3{hac}
+                // staccato
+                3.3{st} |
+                // palm mute 
+                3.3{pm} 3.3{pm} 3.3{pm} 3.3{pm} |
+                // let ring 
+                3.3{lr} 3.3{lr} 3.3{lr} 3.3{lr} |
+                // dead notes
+                3.3{x} x.3 |
+                // fingering (left and right; 1 => Thumb, 2 => Index, 3 => Middle, 4 => Annual, 5 => Little)
+                :8 3.3{lf 1} 3.3{lf 2} 3.3{lf 3} 3.3{lf 4} 3.3{lf 5} (2.2{lf 4} 2.3{lf 3} 2.4{lf 2}) |
+                :8 3.3{rf 1} 3.3{rf 2} 3.3{rf 3} 3.3{rf 4} 3.3{lf 5} |
+            </div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabNoteEffects').alphaTab();
+            </script>
+            
+            <h2>Bends</h2>
+            
+            <p>
+                The bend effect works like the tremolo/whammy bar effect.  
+                You can specify a number of values which are evenly distributed over the
+                time when the note is played. The values indicate the number of quarter notes
+                increased bend up upon playing. <code>b (value1 value2 ...)</code>
+            </p>
+            
+            <div id="alphaTabBends" data-tex="true">
+            3.3{b (0 4 )} |
+            3.3{b (0 4 0 8)} |
+            </div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabBends').alphaTab();
+            </script>
+        </div>
+
+        <div id="exporter" class="group">
+            <h1>Exporter</h1>
+            
+            <p>
+                AlphaTab can export an already loaded track as alphaTex. 
+            </p>
+
+            <div id="alphaTabExporter">
+                Open a Guitar Pro file by clicking here to export the 
+                first track as alphaTex.
+                <input type="file" id="exporterFile" />
+            </div>
+            
+            <div class="texSample">
+                <pre><code class="language-JavaScript line-numbers">function toTex(track) {
+        var exporter = new AlphaTab.Exporter.AlphaTexExporter();
+        exporter.Export(track);
+        return exporter.ToTex(); 
+    }</code></pre>
+            </div>
+            
+            <h2>Exported AlphaTex</h2>
+            
+            <div id="alphaTabExportedAlphaTex">
+            <code class="language-alphaTex line-numbers">
+            Open a file to see the generated alphaTex here. 
+            </code>
+            </pre>
+            
+            <script type="text/javascript-lazy" id="alphaTabExporterCode">
+            function exportFile(data) {
+                // parse score
+                var score = null;
+                try {
+                    score = AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(data);
+                }
+                catch(e) {
+                    alert('Failed to load file, did you really open a Guitar Pro file?');
+                }
+                
+                // export it 
+                if(score != null) {
+                    var exporter = new AlphaTab.Exporter.AlphaTexExporter();
+                    exporter.Export(score.Tracks[0]);
+                    var tex = exporter.ToTex(); 
+                                    
+                    var code = $('<code class="language-alphaTex line-numbers"></code>')
+                        .text(tex);   
+
+                    var pre = $('<pre></pre>').append(code);    
+                    
+                    $('#alphaTabExportedAlphaTex')
+                        .empty()
+                        .append($('<div class="texSample"></div>').append(pre));
+                    Prism.highlightElement(code[0]);
+                }
+            }
+            
+            $('#exporterFile').change(function(e) {
+                debugger;
+                var files = e.originalEvent.target.files;
+                if(files.length > 0) {
+                    var reader = new FileReader();
+                    reader.onload = (function(e) {
+                        exportFile(new Uint8Array(e.target.result));
+                    });
+                    reader.readAsArrayBuffer(files[0]);
+                }
+            });
+            </script>
+            
+        </div>
+
+    </div>
+    
     <!-- Demo Scripts -->    
     <script type="text/javascript" src="support/demo.js"></script>
     <script type="text/javascript" src="support/prism.js"></script>

@@ -7,12 +7,12 @@ function showGroup(groupId) {
     if(!groupId || groupId.length == 0) 
         groupId = firstGroup;
     
-    if(currentGroupMenuItem != null)
-        currentGroupMenuItem.removeClass('active');
+    $('#menu li').removeClass('active');
+    
     currentGroupMenuItem = menuLookup[groupId];
     if(currentGroupMenuItem)
     {
-        currentGroupMenuItem.addClass('active');
+        currentGroupMenuItem.closest('li').addClass('active');
         
         var group = currentGroupMenuItem.data('group');
         if(group == currentGroup) return;
@@ -33,22 +33,23 @@ function showGroup(groupId) {
 $(document).ready(function() {
     var menu = $('#menu');
     
-    
     $('.group').each(function() {
         var group = this;
         var title = $('h1', group).text();
         
-        var menuItem = $(document.createElement('a'));
-        menuItem.addClass('button');
-        menuItem.text(title);
-        menuItem.data('group', group);
+        var menuItem = $(document.createElement('li'));
+        
+        var menuItemLink = $(document.createElement('a'));
+        menuItemLink.text(title);
+        menuItemLink.data('group', group);
         var groupId = '#' + group.id;
-        menuItem.attr('href', groupId);
-        menuLookup[groupId] = menuItem;
+        menuItemLink.attr('href', groupId);
+        menuLookup[groupId] = menuItemLink;
         if(firstGroup == null)
             firstGroup = groupId;
-        menu.append(menuItem);
+        menuItem.append(menuItemLink);
         
+        menu.append(menuItem);
     });
     
     $(window).on('hashchange', function() {

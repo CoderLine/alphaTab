@@ -30,7 +30,22 @@ namespace AlphaTab.Platform.JavaScript
         public override void Load(object data)
         {
             Element.className += " loading";
-            Renderer.As<WorkerScoreRenderer>().Load(data, TrackIndexes);
+
+            if (JsTypeOf(data) == JsTypes.@string)
+            {
+                var fileLoader = new JsFileLoader();
+                fileLoader.LoadBinaryAsync((string)data, b =>
+                {
+                    Renderer.As<WorkerScoreRenderer>().Load(b, TrackIndexes);
+                }, e =>
+                {
+                    console.error(e);
+                });
+            }
+            else
+            {
+                Renderer.As<WorkerScoreRenderer>().Load(data, TrackIndexes);
+            }
         }
 
         public override void Render()
@@ -91,7 +106,7 @@ namespace AlphaTab.Platform.JavaScript
             _renderer.PartialRenderFinished += result => PostMessage(new { cmd = "partialRenderFinished", result = result });
             _renderer.RenderFinished += result => PostMessage(new { cmd = "renderFinished", result = result });
             _renderer.PostRenderFinished += () => PostMessage(new { cmd = "postRenderFinished" });
-            _renderer.PreRender += () => PostMessage(new {cmd = "preRender"});
+            _renderer.PreRender += () => PostMessage(new { cmd = "preRender" });
         }
 
         private void HandleMessage(DOMEvent e)
@@ -125,7 +140,7 @@ namespace AlphaTab.Platform.JavaScript
                 var parser = new AlphaTexImporter();
                 var data = ByteBuffer.FromBuffer(Std.StringToByteArray(contents));
                 parser.Init(data);
-                _trackIndexes = new[] {0};
+                _trackIndexes = new[] { 0 };
                 ScoreLoaded(parser.ReadScore());
             }
             catch (Exception e)

@@ -3,6 +3,7 @@ using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
 using SharpKit.Html;
+using SharpKit.Html.fileapi;
 using SharpKit.Html.workers;
 using SharpKit.JavaScript;
 
@@ -11,7 +12,6 @@ namespace AlphaTab.Platform.JavaScript
     public class WorkerScoreRenderer : HtmlContext, IScoreRenderer
     {
         private readonly JsWorkerApi _workerApi;
-        private string _atRoot;
         private readonly Worker _worker;
 
         public bool IsSvg
@@ -22,26 +22,74 @@ namespace AlphaTab.Platform.JavaScript
         public WorkerScoreRenderer(JsWorkerApi workerApi, dynamic rawSettings)
         {
             _workerApi = workerApi;
-            string atRoot = rawSettings.atRoot;
-            if (atRoot != "" && !atRoot.EndsWith("/"))
-            {
-                atRoot += "/";
-            }
-            _atRoot = atRoot;
-            _worker = new Worker(atRoot + "AlphaTab.worker.js");
 
-            var root = new StringBuilder();
-            root.Append(window.location.protocol);
-            root.Append("//");
-            root.Append(window.location.hostname);
-            if (window.location.port.As<bool>())
+            string alphaTabScriptFile;
+
+            // explicitly specified file/root path
+            if (rawSettings.atRoot)
             {
-                root.Append(":");
-                root.Append(window.location.port);
+                alphaTabScriptFile = rawSettings.atRoot;
+                // append script name 
+                if (!alphaTabScriptFile.EndsWith(".js"))
+                {
+                    if (!alphaTabScriptFile.EndsWith("/"))
+                    {
+                        alphaTabScriptFile += "/";
+                    }
+                    alphaTabScriptFile += "AlphaTab.js";
+                }
+                if (!alphaTabScriptFile.StartsWith("http") && !alphaTabScriptFile.StartsWith("https"))
+                {
+                    var root = new StringBuilder();
+                    root.Append(window.location.protocol);
+                    root.Append("//");
+                    root.Append(window.location.hostname);
+                    if (window.location.port.As<bool>())
+                    {
+                        root.Append(":");
+                        root.Append(window.location.port);
+                    }
+                    root.Append(alphaTabScriptFile);
+                    alphaTabScriptFile = root.ToString();
+                }
             }
-            root.Append(_atRoot);
-            _worker.postMessage(new { cmd = "initialize", root = root.ToString(), settings = rawSettings });
+            // find automatically
+            else
+            {
+                alphaTabScriptFile = Environment.ScriptFile;
+            }
+
+
+            _worker = new Worker(CreateWorkerUrl());
+            _worker.postMessage(new { cmd = "initialize", alphaTabScript = alphaTabScriptFile, settings = rawSettings });
             _worker.addEventListener("message", HandleWorkerMessage, false);
+        }
+
+        private string CreateWorkerUrl()
+        {
+            var source = @"self.onmessage = function(e) {
+            if(e.data.cmd == 'initialize') {
+                importScripts(e.data.alphaTabScript);
+                    new AlphaTab.Platform.JavaScript.JsWorker(self, e.data.settings);
+                }
+            }";
+
+            JsCode("window.URL = window.URL || window.webkitURL;");
+            JsCode("window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder  || window.MozBlobBuilder;");
+
+            Blob blob;
+            try
+            {
+                blob = new Blob(new[] { source }, new { type = "application/javascript" });
+            }
+            catch
+            {
+                dynamic builder = JsCode("new BlobBuilder()");
+                builder.append(source);
+                blob = builder.getBlob();
+            }
+
+            return JsCode("URL.createObjectURL(blob)").As<string>();
         }
 
         public void Load(object data, int[] trackIndexes)
