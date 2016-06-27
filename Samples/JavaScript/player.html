@@ -13,7 +13,7 @@
    
     <!-- Including alphaSynth -->
     <script type="text/javascript" src="lib/swfobject/swfobject.js"></script>
-    <script type="text/javascript" src="lib/alphaSynth/alphaSynth.js"></script>
+    <script type="text/javascript" src="lib/alphaSynth/AlphaSynth.js"></script>
     
     <!-- alphaSynth Plugin -->
     <script type="text/javascript" src="../../Build/JavaScript/jquery.alphaTab.alphaSynth.js"></script>
@@ -84,10 +84,7 @@
         
         // 
         // 2. Initialize Player and Setup Player UI
-        var as = at.alphaTab('playerInit', {
-            asRoot: '/Samples/JavaScript/lib/alphaSynth/',
-            swfObjectRoot: '/Samples/JavaScript/lib/alphaSynth/'
-        }); // init alphaSynth
+        var as = at.alphaTab('playerInit'); // init alphaSynth
         
         as.On('ready', function(r) {
             // load default data

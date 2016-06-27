@@ -20,7 +20,7 @@
         var as = element.data('alphaSynth');
         if(!as) {
             // initialize alphaSynth
-            as = new AlphaSynth.Main.AlphaSynthApi(args.asRoot, args.swfObjectRoot);
+            as = new AlphaSynth.Main.AlphaSynthApi();
             as.On('ready', function(r) {
                 as.Ready = r;
                 // initial loading 

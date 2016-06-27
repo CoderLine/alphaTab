@@ -182,7 +182,7 @@ var Float32Array = Float32Array || Array;
 
 var AlphaSynth = AlphaSynth || {};
 AlphaSynth.Main = AlphaSynth.Main || {};
-AlphaSynth.Main.AlphaSynthApi = function (asRoot, swfObjectRoot){
+AlphaSynth.Main.AlphaSynthApi = function (alphaSynthScriptFile){
     this.RealInstance = null;
     this.Ready = false;
     this.ReadyForPlay = false;
@@ -190,22 +190,38 @@ AlphaSynth.Main.AlphaSynthApi = function (asRoot, swfObjectRoot){
     var supportsWebAudio = !!window.ScriptProcessorNode;
     var supportsWebWorkers = !!window.Worker;
     var forceFlash = !!window.ForceFlash;
-    if (asRoot == ""){
-        asRoot = window["AsRoot"].toString();
+    // explicitly specified file/root path
+    if (!((alphaSynthScriptFile==null)||(alphaSynthScriptFile.length==0))){
+        // append script name 
+        if (!(alphaSynthScriptFile.lastIndexOf(".js")==(alphaSynthScriptFile.length-".js".length))){
+            if (!(alphaSynthScriptFile.lastIndexOf("/")==(alphaSynthScriptFile.length-"/".length))){
+                alphaSynthScriptFile += "/";
+            }
+            alphaSynthScriptFile += "AlphaSynth.js";
+        }
+        if (!alphaSynthScriptFile.indexOf("http")==0 && !alphaSynthScriptFile.indexOf("https")==0){
+            var root = new Array();
+            root.push(window.location.protocol);
+            root.push("//");
+            root.push(window.location.hostname);
+            if (window.location.port){
+                root.push(":");
+                root.push(window.location.port);
+            }
+            root.push(alphaSynthScriptFile);
+            alphaSynthScriptFile = root.join('');
+        }
     }
-    if (swfObjectRoot == ""){
-        swfObjectRoot = window["SwfObjectRoot"].toString();
-    }
-    if (((swfObjectRoot==null)||(swfObjectRoot.length==0))){
-        swfObjectRoot = asRoot;
+    else {
+        alphaSynthScriptFile = AlphaSynth.Platform.Platform.ScriptFile;
     }
     if (supportsWebAudio && !forceFlash){
         AlphaSynth.Util.Logger.Info("Will use webworkers for synthesizing and web audio api for playback");
-        this.RealInstance = new AlphaSynth.Main.AlphaSynthWebWorkerApi(asRoot);
+        this.RealInstance = new AlphaSynth.Main.AlphaSynthWebWorkerApi(alphaSynthScriptFile);
     }
     else if (supportsWebWorkers){
         AlphaSynth.Util.Logger.Info("Will use webworkers for synthesizing and flash for playback");
-        this.RealInstance = new AlphaSynth.Main.AlphaSynthFlashPlayerApi(asRoot, swfObjectRoot);
+        this.RealInstance = new AlphaSynth.Main.AlphaSynthFlashPlayerApi(alphaSynthScriptFile);
     }
     else {
         AlphaSynth.Util.Logger.Error("Incompatible browser");
@@ -321,9 +337,8 @@ AlphaSynth.Main.AlphaSynthApi.prototype = {
 $StaticConstructor(function (){
     AlphaSynth.Main.AlphaSynthApi.AlphaSynthId = "AlphaSynth";
 });
-AlphaSynth.Main.AlphaSynthFlashOutput = function (asRoot, swfObjectRoot){
-    this._asRoot = null;
-    this._swfObjectRoot = null;
+AlphaSynth.Main.AlphaSynthFlashOutput = function (alphaSynthRoot){
+    this._alphaSynthRoot = null;
     this._id = null;
     this._swfId = null;
     this._swfContainer = null;
@@ -331,8 +346,11 @@ AlphaSynth.Main.AlphaSynthFlashOutput = function (asRoot, swfObjectRoot){
     this.Finished = null;
     this.PositionChanged = null;
     this.ReadyChanged = null;
-    this._asRoot = asRoot;
-    this._swfObjectRoot = swfObjectRoot;
+    this._alphaSynthRoot = alphaSynthRoot;
+    var lastSlash = this._alphaSynthRoot.lastIndexOf("/");
+    if (lastSlash != -1){
+        this._alphaSynthRoot = this._alphaSynthRoot.substr(0, lastSlash + 1);
+    }
 };
 AlphaSynth.Main.AlphaSynthFlashOutput.prototype = {
     get_SampleRate: function (){
@@ -349,7 +367,7 @@ AlphaSynth.Main.AlphaSynthFlashOutput.prototype = {
         document.body.appendChild(this._swfContainer);
         var swf =  swfobject;
         var embedSwf = swf["embedSWF"];
-        embedSwf(this._asRoot + "AlphaSynth.FlashOutput.swf", this._id, "1px", "1px", "9.0.0", this._swfObjectRoot + "expressInstall.swf", {
+        embedSwf(this._alphaSynthRoot + "AlphaSynth.FlashOutput.swf", this._id, "1px", "1px", "9.0.0", null, {
             id: this._id,
             sampleRate: 44100
         }, {
@@ -829,45 +847,49 @@ AlphaSynth.Main.AlphaSynthWebWorker.prototype = {
         AlphaSynth.Util.Logger.LogLevel = level;
     }
 };
-AlphaSynth.Main.AlphaSynthWebWorkerApiBase = function (player, asRoot){
-    this._asRoot = null;
+AlphaSynth.Main.AlphaSynthWebWorkerApiBase = function (player, alphaSynthScriptFile){
+    this._alphaSynthScriptFile = null;
     this._synth = null;
     this._player = null;
     this._isPlayerReady = false;
     this._isWorkerReady = false;
     this._events = null;
-    this._asRoot = asRoot;
     this._player = player;
     this._player.add_ReadyChanged($CreateDelegate(this, this.PlayerReadyChanged));
     this._player.add_PositionChanged($CreateDelegate(this, this.PlayerPositionChanged));
     this._player.add_SampleRequest($CreateDelegate(this, this.PlayerSampleRequest));
     this._player.add_Finished($CreateDelegate(this, this.PlayerFinished));
     this._events = {};
-    if (asRoot != "" && !(asRoot.lastIndexOf("/")==(asRoot.length-"/".length))){
-        asRoot += "/";
-    }
-    this._asRoot = asRoot;
+    this._alphaSynthScriptFile = alphaSynthScriptFile;
     // create web worker
-    this._synth = new Worker(asRoot + "AlphaSynth.worker.js");
+    this._synth = new Worker(this.CreateWorkerUrl());
 };
 AlphaSynth.Main.AlphaSynthWebWorkerApiBase.prototype = {
+    CreateWorkerUrl: function (){
+        var source = "self.onmessage = function(e) {\r\n                if(e.data.cmd == \'playerReady\') {\r\n                    importScripts(e.data.alphaSynthScript);\r\n                    AlphaSynth.Player.WebWorkerOutput.PreferredSampleRate = e.data.sampleRate;\r\n                    new AlphaSynth.Main.AlphaSynthWebWorker(self);\r\n                }\r\n            }";
+         window.URL = window.URL || window.webkitURL;;
+         window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder  || window.MozBlobBuilder;;
+        var blob;
+        try{
+            blob = new Blob([source], {
+                type: "application/javascript"
+            });
+        }
+        catch($$e1){
+            var builder =  new BlobBuilder();
+            builder.append(source);
+            blob = builder.getBlob();
+        }
+        return  URL.createObjectURL(blob);
+    },
     Startup: function (){
         // start player
         this._player.Open();
         // start worker
         this._synth.addEventListener("message", $CreateDelegate(this, this.HandleWorkerMessage), false);
-        var root = new Array();
-        root.push(window.location.protocol);
-        root.push("//");
-        root.push(window.location.hostname);
-        if (window.location.port){
-            root.push(":");
-            root.push(window.location.port);
-        }
-        root.push(this._asRoot);
         this._synth.postMessage({
             cmd: "playerReady",
-            root: root.join(''),
+            alphaSynthScript: this._alphaSynthScriptFile,
             sampleRate: this._player.get_SampleRate()
         });
     },
@@ -1098,12 +1120,12 @@ AlphaSynth.Main.AlphaSynthWebWorkerApiBase.QualifyUrl = function (url){
     img.src = null;
     return url;
 };
-AlphaSynth.Main.AlphaSynthFlashPlayerApi = function (asRoot, swfObjectRoot){
-    AlphaSynth.Main.AlphaSynthWebWorkerApiBase.call(this, new AlphaSynth.Main.AlphaSynthFlashOutput(asRoot, swfObjectRoot), asRoot);
+AlphaSynth.Main.AlphaSynthFlashPlayerApi = function (alphaSynthScriptFile){
+    AlphaSynth.Main.AlphaSynthWebWorkerApiBase.call(this, new AlphaSynth.Main.AlphaSynthFlashOutput(alphaSynthScriptFile), alphaSynthScriptFile);
 };
 $Inherit(AlphaSynth.Main.AlphaSynthFlashPlayerApi, AlphaSynth.Main.AlphaSynthWebWorkerApiBase);
-AlphaSynth.Main.AlphaSynthWebWorkerApi = function (asRoot){
-    AlphaSynth.Main.AlphaSynthWebWorkerApiBase.call(this, new AlphaSynth.Main.AlphaSynthWebAudioOutput(), asRoot);
+AlphaSynth.Main.AlphaSynthWebWorkerApi = function (alphaSynthScriptFile){
+    AlphaSynth.Main.AlphaSynthWebWorkerApiBase.call(this, new AlphaSynth.Main.AlphaSynthWebAudioOutput(), alphaSynthScriptFile);
 };
 $Inherit(AlphaSynth.Main.AlphaSynthWebWorkerApi, AlphaSynth.Main.AlphaSynthWebWorkerApiBase);
 AlphaSynth.Platform = AlphaSynth.Platform || {};
@@ -1111,6 +1133,27 @@ AlphaSynth.Platform.Platform = function (){
 };
 AlphaSynth.Platform.Platform.CreateOutput = function (){
     return new AlphaSynth.Player.WebWorkerOutput();
+};
+$StaticConstructor(function (){
+    AlphaSynth.Platform.Platform.ScriptFile = null;
+    AlphaSynth.Platform.Platform.PlatformInit();
+});
+AlphaSynth.Platform.Platform.PlatformInit = function (){
+    // try to build the find the alphaTab script url in case we are not in the webworker already
+    if (self.document){
+        var scriptElement = document["currentScript"];
+        // fallback to script tag that has an alphatab data attribute set.
+        if (!scriptElement){
+            scriptElement = document.querySelector("script[data-alphasynth]");
+        }
+        // failed to automatically resolve
+        if (!scriptElement){
+            console.warn("Could not automatically find alphaSynth script file for worker, please add the data-alphasynth attribute to the script tag that includes alphasynth or provide it when initializing");
+        }
+        else {
+            AlphaSynth.Platform.Platform.ScriptFile = scriptElement.src;
+        }
+    }
 };
 AlphaSynth.Platform.Std = function (){
 };
@@ -5257,11 +5300,7 @@ AlphaSynth.Synthesis.SynthParameters.prototype = {
         //Reset rpn
         this.UpdateCurrentPan();
         this.UpdateCurrentPitch();
-        this.UpdateCurrentVolume();
-    },
-    UpdateCurrentVolume: function (){
-        this.CurrentVolume = this.Expression.get_Combined() / 16383;
-        this.CurrentVolume *= this.CurrentVolume;
+        this.UpdateCurrentVolumeFromExpression();
     },
     UpdateCurrentPitch: function (){
         this.CurrentPitch = ((((this.PitchBend.get_Combined() - 8192) / 8192) * ((100 * this.PitchBendRangeCoarse) + this.PitchBendRangeFine))) | 0;
@@ -5273,6 +5312,15 @@ AlphaSynth.Synthesis.SynthParameters.prototype = {
         var value = 1.5707963267949 * (this.Pan.get_Combined() / 16383);
         this.CurrentPan.Left = Math.cos(value);
         this.CurrentPan.Right = Math.sin(value);
+    },
+    UpdateCurrentVolumeFromVolume: function (){
+        this.CurrentVolume = this.Volume.get_Combined() / 16383;
+        this.CurrentVolume *= this.CurrentVolume;
+        this.CurrentVolume = 1;
+    },
+    UpdateCurrentVolumeFromExpression: function (){
+        this.CurrentVolume = this.Expression.get_Combined() / 16383;
+        this.CurrentVolume *= this.CurrentVolume;
     }
 };
 AlphaSynth.Synthesis.VoiceParameters = function (){
@@ -5971,9 +6019,11 @@ AlphaSynth.Synthesis.Synthesizer.prototype = {
                     break;
                     case AlphaSynth.Midi.Event.ControllerTypeEnum.VolumeCoarse:
                     this._synthChannels[channel].Volume.set_Coarse(data2);
+                    this._synthChannels[channel].UpdateCurrentVolumeFromVolume();
                     break;
                     case AlphaSynth.Midi.Event.ControllerTypeEnum.VolumeFine:
                     this._synthChannels[channel].Volume.set_Fine(data2);
+                    this._synthChannels[channel].UpdateCurrentVolumeFromVolume();
                     break;
                     case AlphaSynth.Midi.Event.ControllerTypeEnum.PanCoarse:
                     this._synthChannels[channel].Pan.set_Coarse(data2);
@@ -5985,11 +6035,11 @@ AlphaSynth.Synthesis.Synthesizer.prototype = {
                     break;
                     case AlphaSynth.Midi.Event.ControllerTypeEnum.ExpressionControllerCoarse:
                     this._synthChannels[channel].Expression.set_Coarse(data2);
-                    this._synthChannels[channel].UpdateCurrentVolume();
+                    this._synthChannels[channel].UpdateCurrentVolumeFromExpression();
                     break;
                     case AlphaSynth.Midi.Event.ControllerTypeEnum.ExpressionControllerFine:
                     this._synthChannels[channel].Expression.set_Fine(data2);
-                    this._synthChannels[channel].UpdateCurrentVolume();
+                    this._synthChannels[channel].UpdateCurrentVolumeFromExpression();
                     break;
                     case AlphaSynth.Midi.Event.ControllerTypeEnum.HoldPedal:
                     if (this._synthChannels[channel].HoldPedal && !(data2 > 63))
@@ -6050,7 +6100,7 @@ AlphaSynth.Synthesis.Synthesizer.prototype = {
                     this._synthChannels[channel].PitchBend.set_Combined(8192);
                     this._synthChannels[channel].ChannelAfterTouch = 0;
                     this._synthChannels[channel].UpdateCurrentPitch();
-                    this._synthChannels[channel].UpdateCurrentVolume();
+                    this._synthChannels[channel].UpdateCurrentVolumeFromExpression();
                     break;
                     default:
                     return;
