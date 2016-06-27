@@ -49,11 +49,6 @@ namespace AlphaTab.Model
 
         public static Tuning GetDefaultTuningFor(int stringCount)
         {
-            if (_sevenStrings == null)
-            {
-                Initialize();
-            }
-
             if (_defaultTunings.ContainsKey(stringCount))
                 return _defaultTunings[stringCount];
             return null;
@@ -61,11 +56,6 @@ namespace AlphaTab.Model
 
         public static FastList<Tuning> GetPresetsFor(int stringCount)
         {
-            if (_sevenStrings == null)
-            {
-                Initialize();
-            }
-
             switch (stringCount)
             {
                 case 7:
@@ -78,6 +68,11 @@ namespace AlphaTab.Model
                     return _fourStrings;
             }
             return new FastList<Tuning>();
+        }
+
+        static Tuning()
+        {
+            Initialize();
         }
 
         private static void Initialize()

@@ -215,11 +215,12 @@ namespace AlphaTab.Rendering.Glyphs
                 DownLineX = padding;
             }
 
-            Std.Foreach(BeatEffects.Values, e =>
+            foreach (var effectKey in BeatEffects)
             {
-                e.Renderer = Renderer;
-                e.DoLayout();
-            });
+                var effect = BeatEffects[effectKey];
+                effect.Renderer = Renderer;
+                effect.DoLayout();
+            }
 
             if (Beat.IsTremolo)
             {
@@ -273,13 +274,14 @@ namespace AlphaTab.Rendering.Glyphs
                             ? 7 * Scale
                             : -7 * Scale;
 
-            Std.Foreach(BeatEffects.Values, g =>
+            foreach (var effectKey in BeatEffects)
             {
+                var g = BeatEffects[effectKey];
                 g.Y = effectY;
                 g.X = Width / 2;
                 g.Paint(cx + X, cy + Y, canvas);
                 effectY += effectSpacing;
-            });
+            }
 
             canvas.Color = Renderer.Layout.Renderer.RenderingResources.StaveLineColor;
 

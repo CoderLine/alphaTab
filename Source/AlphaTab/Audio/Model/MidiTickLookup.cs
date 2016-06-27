@@ -43,10 +43,10 @@ namespace AlphaTab.Audio.Model
 
         public void Finish()
         {
-            Std.Foreach(BeatsPerTrack.Values, v =>
+            foreach (var track in BeatsPerTrack)
             {
-                v.Sort((a, b) => a.Start - b.Start);
-            });
+                BeatsPerTrack[track].Sort((a, b) => a.Start - b.Start);
+            }
         }
 
         public void AddBeat(BeatTickLookup beat)

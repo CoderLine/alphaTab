@@ -85,10 +85,11 @@ namespace AlphaTab.Rendering
             // preBeat and postBeat glyphs do not get resized
             var containerWidth = width - _preBeatGlyphs.Width - _postBeatGlyphs.Width;
 
-            Std.Foreach(_voiceContainers.Values, c =>
+            foreach (var voice in _voiceContainers)
             {
+                var c = _voiceContainers[voice];
                 c.ScaleToWidth(containerWidth);
-            });
+            }
 
             _postBeatGlyphs.X = _preBeatGlyphs.X + _preBeatGlyphs.Width + containerWidth;
 
@@ -163,7 +164,11 @@ namespace AlphaTab.Rendering
                 info.PreBeatSize = preSize;
             }
 
-            Std.Foreach(_voiceContainers.Values, c => c.RegisterLayoutingInfo(info));
+            foreach (var voice in _voiceContainers)
+            {
+                var c = _voiceContainers[voice];
+                c.RegisterLayoutingInfo(info);
+            }
 
             var postSize = _postBeatGlyphs.Width;
             if (info.PostBeatSize < postSize)
@@ -180,8 +185,9 @@ namespace AlphaTab.Rendering
 
             // on beat glyphs we apply the glyph spacing
             var voiceEnd = 0f;
-            Std.Foreach(_voiceContainers.Values, c =>
+            foreach (var voice in _voiceContainers)
             {
+                var c = _voiceContainers[voice];
                 c.X = _preBeatGlyphs.X + _preBeatGlyphs.Width;
                 c.ApplyLayoutingInfo(LayoutingInfo);
                 var newEnd = c.X + c.Width;
@@ -189,7 +195,7 @@ namespace AlphaTab.Rendering
                 {
                     voiceEnd = newEnd;
                 }
-            });
+            }
 
             // on the post glyphs we add the spacing before all other glyphs
             _postBeatGlyphs.X = voiceEnd;
@@ -232,13 +238,22 @@ namespace AlphaTab.Rendering
 
         public virtual void DoLayout()
         {
+            for (int i = 0; i < Bar.Voices.Count; i++)
+            {
+                var voice = Bar.Voices[i];
+                var c = new VoiceContainerGlyph(0, 0, voice);
+                c.Renderer = this;
+                _voiceContainers[Bar.Voices[i].Index] = c;
+            }
+
             CreatePreBeatGlyphs();
             CreateBeatGlyphs();
             CreatePostBeatGlyphs();
 
             var postBeatStart = 0f;
-            Std.Foreach(_voiceContainers.Values, c =>
+            foreach (var voice in _voiceContainers)
             {
+                var c = _voiceContainers[voice];
                 c.X = BeatGlyphsStart;
                 c.DoLayout();
                 var x = c.X + c.Width;
@@ -246,7 +261,7 @@ namespace AlphaTab.Rendering
                 {
                     postBeatStart = x;
                 }
-            });
+            }
 
             _postBeatGlyphs.X = postBeatStart;
 
@@ -267,18 +282,7 @@ namespace AlphaTab.Rendering
 
         protected VoiceContainerGlyph GetOrCreateVoiceContainer(Voice voice)
         {
-            VoiceContainerGlyph c;
-            if (voice.Index >= _voiceContainers.Count)
-            {
-                c = new VoiceContainerGlyph(0, 0, voice);
-                c.Renderer = this;
-                _voiceContainers[voice.Index] = c;
-            }
-            else
-            {
-                c = _voiceContainers[voice.Index];
-            }
-            return c;
+            return _voiceContainers[voice.Index];
         }
 
         public BeatContainerGlyph GetBeatContainer(Beat beat)
@@ -304,13 +308,15 @@ namespace AlphaTab.Rendering
 
             _preBeatGlyphs.Paint(cx + X, cy + Y, canvas);
 
-            Std.Foreach(_voiceContainers.Values, c =>
+            foreach (var voice in _voiceContainers)
             {
+                var c = _voiceContainers[voice];
                 canvas.Color = c.Voice.Index == 0
-                    ? Resources.MainGlyphColor
-                    : Resources.SecondaryGlyphColor;
+                   ? Resources.MainGlyphColor
+                   : Resources.SecondaryGlyphColor;
                 c.Paint(cx + X, cy + Y, canvas);
-            });
+            }
+
 
             canvas.Color = Resources.MainGlyphColor;
             _postBeatGlyphs.Paint(cx + X, cy + Y, canvas);
@@ -334,8 +340,9 @@ namespace AlphaTab.Rendering
             barBounds.RealBounds = new Bounds(cx + X, cy + Y, Width, Height);
             masterBarBounds.AddBar(barBounds);
 
-            Std.Foreach(_voiceContainers.Values, c =>
+            foreach (var voice in _voiceContainers)
             {
+                var c = _voiceContainers[voice];
                 if (!c.Voice.IsEmpty)
                 {
                     for (int i = 0, j = c.BeatGlyphs.Count; i < j; i++)
@@ -351,7 +358,7 @@ namespace AlphaTab.Rendering
                         barBounds.AddBeat(beatBoundings);
                     }
                 }
-            });
+            }
         }
 
         protected void AddPostBeatGlyph(Glyph g)

@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -31,6 +32,14 @@ namespace AlphaTab.Rendering.Staves
     {
         private const int MinDuration = 30;
         private const int MinDurationWidth = 10;
+
+        private FastList<Spring> _timeSortedSprings;
+        private float _xMin;
+
+        private float _onTimePositionsForce;
+        private FastDictionary<int, float> _onTimePositions;
+
+
         public FastDictionary<int, float> PreBeatSizes { get; set; }
         public FastDictionary<int, float> OnBeatSizes { get; set; }
 
@@ -154,18 +163,24 @@ namespace AlphaTab.Rendering.Staves
             return AddSpring(beat.AbsoluteStart, beat.CalculateDuration(), beatSize, preBeatSize, postBeatSize);
         }
 
+        public void Finish()
+        {
+            CalculateSpringConstants();
+        }
+
         public void CalculateSpringConstants()
         {
-            var sortedSprings = new FastList<Spring>();
-            var xMin = 0f;
-            Std.Foreach(Springs.Values, spring =>
+            var sortedSprings = _timeSortedSprings = new FastList<Spring>();
+            _xMin = 0f;
+            foreach (var time in Springs)
             {
+                var spring = Springs[time];
                 sortedSprings.Add(spring);
-                if (spring.SpringWidth < xMin)
+                if (spring.SpringWidth < _xMin)
                 {
-                    xMin = spring.SpringWidth;
+                    _xMin = spring.SpringWidth;
                 }
-            });
+            }
 
             sortedSprings.Sort((a, b) =>
             {
@@ -232,27 +247,14 @@ namespace AlphaTab.Rendering.Staves
 
         public FastDictionary<int, float> BuildOnTimePositions(float force)
         {
-            var positions = new FastDictionary<int, float>();
-
-            var sortedSprings = new FastList<Spring>();
-            Std.Foreach(Springs.Values, spring =>
+            if (Math.Abs(_onTimePositionsForce - force) < 0.00001 && _onTimePositions != null)
             {
-                sortedSprings.Add(spring);
-            });
+                return _onTimePositions;
+            }
 
-            sortedSprings.Sort((a, b) =>
-            {
-                if (a.TimePosition < b.TimePosition)
-                {
-                    return -1;
-                }
-                if (a.TimePosition > b.TimePosition)
-                {
-                    return 1;
-                }
-                return 0;
-            });
+            var positions = _onTimePositions = new FastDictionary<int, float>();
 
+            var sortedSprings = _timeSortedSprings;
             if (sortedSprings.Count == 0)
             {
                 return positions;

@@ -19,8 +19,11 @@ using System.Collections.Generic;
 
 namespace AlphaTab.Collections
 {
-    public class FastDictionary<TKey, TValue>  : Dictionary<TKey, TValue>
+    public class FastDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IEnumerable<TKey>
     {
-        
+        public IEnumerator<TKey> GetEnumerator()
+        {
+            return Keys.GetEnumerator();
+        }
     }
 }

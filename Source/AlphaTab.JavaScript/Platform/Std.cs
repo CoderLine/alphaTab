@@ -45,11 +45,6 @@ namespace AlphaTab.Platform
             return "";
         }
 
-        [JsMethod(Code = "for ( var t in e ) { c(e[t]); }")]
-        public static void Foreach<T>(IEnumerable<T> e, Action<T> c)
-        {
-        }
-
         private static Func<string, Document> _parseXml;
         public static IXmlDocument LoadXml(string xml)
         {

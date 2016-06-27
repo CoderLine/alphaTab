@@ -87,14 +87,15 @@ namespace AlphaTab.Rendering.Glyphs
             var effectY = GetNoteY(_minNote) + tabHeight / 2;
             // TODO: take care of actual glyph height
             var effectSpacing = 7 * Scale;
-            Std.Foreach(BeatEffects.Values, g =>
+            foreach (var beatEffectKey in BeatEffects)
             {
+                var g = BeatEffects[beatEffectKey];
                 g.Y = effectY;
                 g.X += Width / 2;
                 g.Renderer = Renderer;
                 effectY += effectSpacing;
                 g.DoLayout();
-            });
+            }
 
             _centerX = 0;
 
@@ -122,7 +123,11 @@ namespace AlphaTab.Rendering.Glyphs
             }
             canvas.TextBaseline = old;
 
-            Std.Foreach(BeatEffects.Values, g => g.Paint(cx + X, cy + Y, canvas));
+            foreach (var beatEffectKey in BeatEffects)
+            {
+                var g = BeatEffects[beatEffectKey];
+                g.Paint(cx + X, cy + Y, canvas);
+            }
         }
 
         public void UpdateBeamingHelper(float cx)

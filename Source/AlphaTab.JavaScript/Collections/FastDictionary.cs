@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System.Collections;
 using System.Collections.Generic;
 using SharpKit.JavaScript;
 
@@ -25,8 +27,8 @@ namespace AlphaTab.Collections
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
-    [JsType(Mode = JsMode.Prototype, Name = "Object", Export = false, IgnoreGenericTypeArguments = true)]
-    public class FastDictionary<TKey, TValue>
+    [JsType(Mode = JsMode.Prototype, Name = "Object", Export = false, IgnoreGenericTypeArguments = true, NativeEnumerator = true)]
+    public class FastDictionary<TKey, TValue> : IEnumerable<TKey>
     {
         [JsMethod(InlineCode = "{}")]
         public FastDictionary()
@@ -81,5 +83,8 @@ namespace AlphaTab.Collections
         {
             return false;
         }
+
+        public extern IEnumerator<TKey> GetEnumerator();
+        extern IEnumerator IEnumerable.GetEnumerator();
     }
 }

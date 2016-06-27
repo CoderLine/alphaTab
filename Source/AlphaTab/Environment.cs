@@ -17,6 +17,7 @@
  */
 using System;
 using AlphaTab.Collections;
+using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;

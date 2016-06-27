@@ -149,7 +149,7 @@ namespace AlphaTab.Rendering.Staves
                 }
             }
 
-            maxSizes.CalculateSpringConstants();
+            maxSizes.Finish();
 
             // ensure same widths of new renderer
             var realWidth = 0f;
