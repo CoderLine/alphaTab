@@ -28,7 +28,7 @@ namespace AlphaTab.Rendering.Effects
             return beat.FadeIn;
         }
 
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeatOnly; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
         public float GetHeight(EffectBarRenderer renderer)
         {
             return 20 * renderer.Scale;

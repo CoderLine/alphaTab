@@ -28,7 +28,7 @@ namespace AlphaTab.Rendering.Effects
             return beat.Index == 0 && (beat.Voice.Bar.MasterBar.TempoAutomation != null || beat.Voice.Bar.Index == 0);
         }
 
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SinglePreBeatOnly; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SinglePreBeat; } }
         public float GetHeight(EffectBarRenderer renderer)
         {
             return 25 * renderer.Scale;

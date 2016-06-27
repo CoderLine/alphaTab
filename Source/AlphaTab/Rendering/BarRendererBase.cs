@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -182,7 +183,7 @@ namespace AlphaTab.Rendering
             Std.Foreach(_voiceContainers.Values, c =>
             {
                 c.X = _preBeatGlyphs.X + _preBeatGlyphs.Width;
-                c.ApplyLayoutingInfo();
+                c.ApplyLayoutingInfo(LayoutingInfo);
                 var newEnd = c.X + c.Width;
                 if (voiceEnd < newEnd)
                 {
@@ -197,8 +198,11 @@ namespace AlphaTab.Rendering
             Width = _postBeatGlyphs.X + _postBeatGlyphs.Width;
         }
 
+        public bool IsFinalized { get; private set; }
+
         public virtual void FinalizeRenderer(ScoreLayout layout)
         {
+            IsFinalized = true;
         }
 
         /// <summary>
@@ -277,19 +281,19 @@ namespace AlphaTab.Rendering
             return c;
         }
 
-        public BeatContainerGlyph GetBeatContainer(Voice voice, int beat)
+        public BeatContainerGlyph GetBeatContainer(Beat beat)
         {
-            return GetOrCreateVoiceContainer(voice).BeatGlyphs[beat];
+            return GetOrCreateVoiceContainer(beat.Voice).BeatGlyphs[beat.Index];
         }
 
-        public BeatGlyphBase GetPreNotesPosition(Voice voice, int beat)
+        public BeatGlyphBase GetPreNotesGlyphForBeat(Beat beat)
         {
-            return GetBeatContainer(voice, beat).PreNotes;
+            return GetBeatContainer(beat).PreNotes;
         }
 
-        public BeatGlyphBase GetOnNotesPosition(Voice voice, int beat)
+        public BeatGlyphBase GetOnNotesGlyphForBeat(Beat beat)
         {
-            return GetBeatContainer(voice, beat).OnNotes;
+            return GetBeatContainer(beat).OnNotes;
         }
 
         public virtual void Paint(float cx, float cy, ICanvas canvas)
@@ -384,9 +388,56 @@ namespace AlphaTab.Rendering
             return 0;
         }
 
+        public float GetBeatX(Beat beat, BeatXPosition requestedPosition = BeatXPosition.PreNotes)
+        {
+            var container = GetBeatContainer(beat);
+            if (container != null)
+            {
+                switch (requestedPosition)
+                {
+                    case BeatXPosition.PreNotes:
+                        return container.VoiceContainer.X + container.X + container.PreNotes.X;
+                    case BeatXPosition.OnNotes:
+                        return container.VoiceContainer.X + container.X + container.OnNotes.X;
+                    case BeatXPosition.PostNotes:
+                        return container.VoiceContainer.X + container.X + container.OnNotes.X + container.OnNotes.Width;
+                    case BeatXPosition.EndBeat:
+                        return container.VoiceContainer.X + container.X + container.Width;
+                }
+            }
+            return 0;
+        }
+
         public virtual float GetNoteY(Note note)
         {
             return 0;
         }
+    }
+
+    /// <summary>
+    /// Lists the different position modes for <see cref="BarRendererBase.GetBeatX"/>
+    /// </summary>
+    public enum BeatXPosition
+    {
+        /// <summary>
+        /// Gets the pre-notes position which is located before the accidentals
+        /// </summary>
+        PreNotes,
+
+        /// <summary>
+        /// Gets the on-notes position which is located after the accidentals but before the note heads. 
+        /// </summary>
+        OnNotes,
+
+        /// <summary>
+        /// Get the post-notes position which is located at after the note heads. 
+        /// </summary>
+        PostNotes,
+
+        /// <summary>
+        /// Get the end-beat position which is located at the end of the beat. This position is almost
+        /// equal to the pre-notes position of the next beat.
+        /// </summary>
+        EndBeat
     }
 }

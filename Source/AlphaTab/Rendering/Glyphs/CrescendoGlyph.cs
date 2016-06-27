@@ -15,37 +15,42 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class CrescendoGlyph : EffectGlyph
+    public class CrescendoGlyph : GroupedEffectGlyph
     {
         public const float Height = 17;
 
         private readonly CrescendoType _crescendo;
 
         public CrescendoGlyph(float x, float y, CrescendoType crescendo)
-            : base(x, y)
+            : base(BeatXPosition.EndBeat)
         {
             _crescendo = crescendo;
+            X = x;
+            Y = y;
         }
 
-        public override void Paint(float cx, float cy, ICanvas canvas)
+        protected override void PaintGrouped(float cx, float cy, float endX, ICanvas canvas)
         {
+            var startX = cx + X;
             var height = Height * Scale;
             canvas.BeginPath();
             if (_crescendo == CrescendoType.Crescendo)
             {
-                canvas.MoveTo(cx + X + Width, cy + Y);
-                canvas.LineTo(cx + X, cy + Y + (height / 2));
-                canvas.LineTo(cx + X + Width, cy + Y + height);
+                canvas.MoveTo(endX, cy + Y);
+                canvas.LineTo(startX, cy + Y + height / 2);
+                canvas.LineTo(endX, cy + Y + height);
             }
             else
             {
                 canvas.MoveTo(cx + X, cy + Y);
-                canvas.LineTo(cx + X + Width, cy + Y + (height / 2));
+                canvas.LineTo(endX, cy + Y + (height / 2));
                 canvas.LineTo(cx + X, cy + Y + height);
             }
             canvas.Stroke();

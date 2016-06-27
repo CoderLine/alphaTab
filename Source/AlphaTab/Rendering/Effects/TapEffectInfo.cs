@@ -28,7 +28,7 @@ namespace AlphaTab.Rendering.Effects
             return (beat.Slap || beat.Pop || beat.Tap);
         }
 
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeatOnly; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
         public float GetHeight(EffectBarRenderer renderer)
         {
             return 20 * renderer.Scale;

@@ -22,15 +22,20 @@ namespace AlphaTab.Rendering
     /// </summary>
     public enum EffectBarGlyphSizing
     {
-        SinglePreBeatOnly,
-        SinglePreBeatToOnBeat,
-
-        SingleOnBeatOnly,
-
-        SinglePostBeatOnly,
-
-        GroupedPreBeatOnly,
-
-        GroupedOnBeatOnly
+        /// <summary>
+        /// The effect glyph is placed above the pre-beat glyph which is before 
+        /// the actual note in the area where also accidentals are renderered. 
+        /// </summary>
+        SinglePreBeat,
+        /// <summary>
+        /// The effect glyph is placed above the on-beat glyph which is where
+        /// the actual note head glyphs are placed. 
+        /// </summary>
+        SingleOnBeat,
+        /// <summary>
+        /// The effect glyph is placed above the on-beat glyph and expaded to the 
+        /// on-beat position of the next beat.
+        /// </summary>
+        GroupedOnBeat
     }
 }

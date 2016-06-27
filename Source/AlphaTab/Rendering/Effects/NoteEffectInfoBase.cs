@@ -46,7 +46,7 @@ namespace AlphaTab.Rendering.Effects
         public abstract float GetHeight(EffectBarRenderer renderer);
         public abstract EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat);
 
-        public virtual bool CanExpand(EffectBarRenderer renderer, Beat @from, Beat to)
+        public virtual bool CanExpand(EffectBarRenderer renderer, Beat from, Beat to)
         {
             return true;
         }

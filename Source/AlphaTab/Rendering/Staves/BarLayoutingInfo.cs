@@ -31,7 +31,8 @@ namespace AlphaTab.Rendering.Staves
     {
         private const int MinDuration = 30;
         private const int MinDurationWidth = 10;
-        public FastDictionary<string, float> Sizes { get; set; }
+        public FastDictionary<int, float> PreBeatSizes { get; set; }
+        public FastDictionary<int, float> OnBeatSizes { get; set; }
 
         public float PreBeatSize { get; set; }
         public float PostBeatSize { get; set; }
@@ -42,7 +43,8 @@ namespace AlphaTab.Rendering.Staves
 
         public BarLayoutingInfo()
         {
-            Sizes = new FastDictionary<string, float>();
+            PreBeatSizes = new FastDictionary<int, float>();
+            OnBeatSizes = new FastDictionary<int, float>();
             VoiceSize = 0;
             Springs = new FastDictionary<int, Spring>();
         }
@@ -55,16 +57,36 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public void SetSize(string key, float size)
+        public void SetPreBeatSize(Beat beat, float size)
         {
-            Sizes[key] = size;
+            if (!PreBeatSizes.ContainsKey(beat.Index) || PreBeatSizes[beat.Index] < size)
+            {
+                PreBeatSizes[beat.Index] = size;
+            }
         }
 
-        public float GetSize(string key)
+        public float GetPreBeatSize(Beat beat)
         {
-            if (Sizes.ContainsKey(key))
+            if (PreBeatSizes.ContainsKey(beat.Index))
             {
-                return Sizes[key];
+                return PreBeatSizes[beat.Index];
+            }
+            return 0;
+        }
+
+        public void SetOnBeatSize(Beat beat, float size)
+        {
+            if (!OnBeatSizes.ContainsKey(beat.Index) || OnBeatSizes[beat.Index] < size)
+            {
+                OnBeatSizes[beat.Index] = size;
+            }
+        }
+
+        public float GetOnBeatSize(Beat beat)
+        {
+            if (OnBeatSizes.ContainsKey(beat.Index))
+            {
+                return OnBeatSizes[beat.Index];
             }
             return 0;
         }

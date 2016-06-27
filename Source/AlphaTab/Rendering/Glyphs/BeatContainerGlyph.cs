@@ -36,12 +36,19 @@ namespace AlphaTab.Rendering.Glyphs
         public float MinWidth { get; set; }
         public float OnTimeX { get; set; }
 
-        public BeatContainerGlyph(Beat beat, VoiceContainerGlyph voiceContainer)
+        /// <summary>
+        /// Gets or sets a value indicating whether the sizes of the <see cref="BarLayoutingInfo"/>
+        /// should be used to size the <see cref="PreNotes"/> and <see cref="OnNotes"/> glyphs.
+        /// </summary>
+        public bool UseLayoutingInfo { get; set; }
+
+        public BeatContainerGlyph(Beat beat, VoiceContainerGlyph voiceContainer, bool useLayoutingInfo = false)
             : base(0, 0)
         {
             Beat = beat;
             Ties = new FastList<Glyph>();
             VoiceContainer = voiceContainer;
+            UseLayoutingInfo = useLayoutingInfo;
         }
 
         public void RegisterLayoutingInfo(BarLayoutingInfo layoutings)
@@ -49,6 +56,20 @@ namespace AlphaTab.Rendering.Glyphs
             var preBeatStretch = PreNotes.Width + OnNotes.Width / 2;
             var postBeatStretch = OnNotes.Width / 2;
             layoutings.AddBeatSpring(Beat, MinWidth, preBeatStretch, postBeatStretch);
+            // store sizes for special renderers like the EffectBarRenderer
+            layoutings.SetPreBeatSize(Beat, PreNotes.Width);
+            layoutings.SetOnBeatSize(Beat, OnNotes.Width);
+        }
+
+        public void ApplyLayoutingInfo(BarLayoutingInfo info)
+        {
+            if (UseLayoutingInfo)
+            {
+                PreNotes.Width = info.GetPreBeatSize(Beat);
+                OnNotes.Width = info.GetOnBeatSize(Beat);
+                OnNotes.X = PreNotes.X + PreNotes.Width;
+                OnTimeX = OnNotes.X + OnNotes.Width / 2;
+            }
         }
 
         public override void DoLayout()

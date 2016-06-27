@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
@@ -25,14 +26,26 @@ namespace AlphaTab.Rendering.Glyphs
     /// </summary>
     public class EffectGlyph : Glyph
     {
+        /// <summary>
+        /// Gets or sets the beat where the glyph belongs to.
+        /// </summary>
+        public Beat Beat { get; set; }
+
+        /// <summary>
+        /// Gets or sets the next glyph of the same type in case 
+        /// the effect glyph is expanded when using <see cref="EffectBarGlyphSizing.GroupedOnBeat"/>.
+        /// </summary>
+        public EffectGlyph NextGlyph { get; set; }
+
+        /// <summary>
+        /// Gets or sets the previous glyph of the same type in case 
+        /// the effect glyph is expanded when using <see cref="EffectBarGlyphSizing.GroupedOnBeat"/>.
+        /// </summary>
+        public EffectGlyph PreviousGlyph { get; set; }
+
         protected EffectGlyph(float x, float y)
             : base(x, y)
         {
-        }
-
-        public virtual void ExpandTo(Beat beat)
-        {
-            
         }
     }
 }

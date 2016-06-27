@@ -47,8 +47,6 @@ namespace AlphaTab.Rendering.Staves
         public Model.Staff ModelStaff { get; set; }
         public string StaveId { get; private set; }
 
-
-
         /// <summary>
         /// This is the visual offset from top where the
         /// Staff contents actually start. Used for grouping 
@@ -136,13 +134,13 @@ namespace AlphaTab.Rendering.Staves
             BarRenderers.RemoveAt(BarRenderers.Count - 1);
             StaveGroup.Layout.UnregisterBarRenderer(StaveId, lastBar);
         }
-        
+
         public void ScaleToWidth(float width)
         {
             // Note: here we could do some "intelligent" distribution of 
             // the space over the bar renderers, for now we evenly apply the space to all bars
             var difference = width - StaveGroup.Width;
-            var spacePerBar = difference/BarRenderers.Count;
+            var spacePerBar = difference / BarRenderers.Count;
             for (int i = 0, j = BarRenderers.Count; i < j; i++)
             {
                 BarRenderers[i].ScaleToWidth(BarRenderers[i].Width + spacePerBar);

@@ -46,7 +46,7 @@ namespace AlphaTab.Rendering
 
         public override float GetNoteX(Note note, bool onEnd = true)
         {
-            var beat = (TabBeatGlyph)GetOnNotesPosition(note.Beat.Voice, note.Beat.Index);
+            var beat = (TabBeatGlyph)GetOnNotesGlyphForBeat(note.Beat);
             if (beat != null)
             {
                 return beat.Container.X + beat.X + beat.NoteNumbers.GetNoteX(note, onEnd);
@@ -54,19 +54,9 @@ namespace AlphaTab.Rendering
             return 0;
         }
 
-        public float GetBeatX(Beat beat)
-        {
-            var bg = (TabBeatGlyph)GetPreNotesPosition(beat.Voice, beat.Index);
-            if (bg != null)
-            {
-                return bg.Container.X + bg.X;
-            }
-            return 0;
-        }
-
         public override float GetNoteY(Note note)
         {
-            var beat = (TabBeatGlyph)GetOnNotesPosition(note.Beat.Voice, note.Beat.Index);
+            var beat = (TabBeatGlyph)GetOnNotesGlyphForBeat(note.Beat);
             if (beat != null)
             {
                 return beat.NoteNumbers.GetNoteY(note);

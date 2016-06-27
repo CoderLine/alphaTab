@@ -18,6 +18,7 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Layout;
 
@@ -32,7 +33,6 @@ namespace AlphaTab.Rendering
         private readonly IEffectBarRendererInfo _info;
         private readonly FastList<FastList<EffectGlyph>> _uniqueEffectGlyphs;
         private readonly FastList<FastDictionary<int, EffectGlyph>> _effectGlyphs;
-        private Beat _lastBeat;
 
         public EffectBarRenderer(Bar bar, IEffectBarRendererInfo info)
             : base(bar)
@@ -62,78 +62,33 @@ namespace AlphaTab.Rendering
             for (int v = 0; v < Bar.Voices.Count; v++)
             {
                 var voice = Bar.Voices[v];
-                EffectGlyph prevGlyph = null;
-                if (Index > 0)
-                {
-                    // check if previous renderer had an effect on his last beat
-                    // and use this as merging element
-                    var prevRenderer = (EffectBarRenderer)Staff.BarRenderers[Index - 1];
-                    if (prevRenderer._lastBeat != null)
-                    {
-                        prevGlyph = prevRenderer._effectGlyphs[voice.Index][prevRenderer._lastBeat.Index];
-                    }
-                }
                 foreach (var key in _effectGlyphs[voice.Index].Keys)
                 {
                     var beatIndex = Std.ParseInt(key);
-                    var effect = _effectGlyphs[voice.Index][beatIndex];
-
-                    AlignGlyph(_info.SizingMode, beatIndex, voice, prevGlyph);
-
-                    prevGlyph = effect;
+                    AlignGlyph(_info.SizingMode, voice.Beats[beatIndex]);
                     IsEmpty = false;
                 }
             }
         }
 
-        private void AlignGlyph(EffectBarGlyphSizing sizing, int beatIndex, Voice voice, EffectGlyph prevGlyph)
+        private void AlignGlyph(EffectBarGlyphSizing sizing, Beat beat)
         {
-            EffectGlyph g = _effectGlyphs[voice.Index][beatIndex];
+            EffectGlyph g = _effectGlyphs[beat.Voice.Index][beat.Index];
             Glyph pos;
-            var container = GetBeatContainer(voice, beatIndex);
+            var container = GetBeatContainer(beat);
             switch (sizing)
             {
-                case EffectBarGlyphSizing.SinglePreBeatOnly:
+                case EffectBarGlyphSizing.SinglePreBeat:
                     pos = container.PreNotes;
-                    g.X = pos.X + container.X;
+                    g.X = BeatGlyphsStart + pos.X + container.X;
                     g.Width = pos.Width;
                     break;
 
-                case EffectBarGlyphSizing.SinglePreBeatToOnBeat:
-                    pos = container.PreNotes;
-                    g.X = pos.X + container.X;
+                case EffectBarGlyphSizing.SingleOnBeat:
+                case EffectBarGlyphSizing.GroupedOnBeat: // grouping is achieved by linking the normaly aligned glyphs
                     pos = container.OnNotes;
-                    g.Width = (pos.X + container.X + pos.Width) - g.X;
-                    break;
-
-                case EffectBarGlyphSizing.SingleOnBeatOnly:
-                    pos = container.OnNotes;
-                    g.X = pos.X + container.X;
+                    g.X = BeatGlyphsStart + pos.X + container.X;
                     g.Width = pos.Width;
-                    break;
-
-                case EffectBarGlyphSizing.GroupedPreBeatOnly:
-                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SinglePreBeatOnly, beatIndex, voice, prevGlyph); }
-                    else
-                    {
-                        pos = container.PreNotes;
-                        var posR = (EffectBarRenderer)pos.Renderer;
-                        var gR = (EffectBarRenderer)g.Renderer;
-                        g.Width = (posR.X + posR.BeatGlyphsStart + container.X + pos.X + pos.Width) - (gR.X + gR.BeatGlyphsStart + g.X);
-                        g.ExpandTo(container.Beat);
-                    }
-                    break;
-
-                case EffectBarGlyphSizing.GroupedOnBeatOnly:
-                    if (g != prevGlyph) { AlignGlyph(EffectBarGlyphSizing.SingleOnBeatOnly, beatIndex, voice, prevGlyph); }
-                    else
-                    {
-                        pos = container.OnNotes;
-                        var posR = (EffectBarRenderer)pos.Renderer;
-                        var gR = (EffectBarRenderer)g.Renderer;
-                        g.Width = (posR.X + posR.BeatGlyphsStart + container.X + pos.X + pos.Width) - (gR.X + gR.BeatGlyphsStart + g.X);
-                        g.ExpandTo(container.Beat);
-                    }
                     break;
             }
         }
@@ -160,7 +115,7 @@ namespace AlphaTab.Rendering
                 var b = v.Beats[i];
                 // we create empty glyphs as alignment references and to get the 
                 // effect bar sized
-                var container = new BeatContainerGlyph(b, GetOrCreateVoiceContainer(v));
+                var container = new BeatContainerGlyph(b, GetOrCreateVoiceContainer(v), true);
                 container.PreNotes = new BeatGlyphBase();
                 container.OnNotes = new BeatOnNoteGlyphBase();
                 AddBeatGlyph(container);
@@ -169,44 +124,43 @@ namespace AlphaTab.Rendering
                 {
                     CreateOrResizeGlyph(_info.SizingMode, b);
                 }
-
-                _lastBeat = b;
             }
         }
 
-        private void CreateOrResizeGlyph(EffectBarGlyphSizing sizing, Beat b)
+        private EffectGlyph CreateOrResizeGlyph(EffectBarGlyphSizing sizing, Beat b)
         {
             switch (sizing)
             {
-                case EffectBarGlyphSizing.SinglePreBeatOnly:
-                case EffectBarGlyphSizing.SinglePreBeatToOnBeat:
-                case EffectBarGlyphSizing.SingleOnBeatOnly:
-                case EffectBarGlyphSizing.SinglePostBeatOnly:
+                case EffectBarGlyphSizing.SinglePreBeat:
+                case EffectBarGlyphSizing.SingleOnBeat:
                     var g = _info.CreateNewGlyph(this, b);
                     g.Renderer = this;
+                    g.Beat = b;
                     g.DoLayout();
                     _effectGlyphs[b.Voice.Index][b.Index] = g;
                     _uniqueEffectGlyphs[b.Voice.Index].Add(g);
-                    break;
+                    return g;
 
-                case EffectBarGlyphSizing.GroupedPreBeatOnly:
-                case EffectBarGlyphSizing.GroupedOnBeatOnly:
+                case EffectBarGlyphSizing.GroupedOnBeat:
                     if (b.Index > 0 || Index > 0)
                     {
                         // check if the previous beat also had this effect
                         Beat prevBeat = b.PreviousBeat;
                         if (_info.ShouldCreateGlyph(this, prevBeat))
                         {
+                            // first load the effect bar renderer and glyph
                             EffectBarRenderer previousRenderer = null;
-                            // expand the previous effect
                             EffectGlyph prevEffect = null;
+
                             if (b.Index > 0 && _effectGlyphs[b.Voice.Index].ContainsKey(prevBeat.Index))
                             {
+                                // load effect from previous beat in the same renderer
                                 prevEffect = _effectGlyphs[b.Voice.Index][prevBeat.Index];
                             }
                             else if (Index > 0)
                             {
-                                previousRenderer = ((EffectBarRenderer)(Staff.BarRenderers[Index - 1]));
+                                // load the effect from the previous renderer if possible. 
+                                previousRenderer = (EffectBarRenderer)Staff.BarRenderers[Index - 1];
                                 var voiceGlyphs = previousRenderer._effectGlyphs[b.Voice.Index];
                                 if (voiceGlyphs.ContainsKey(prevBeat.Index))
                                 {
@@ -214,30 +168,36 @@ namespace AlphaTab.Rendering
                                 }
                             }
 
-                            if (prevEffect == null || !_info.CanExpand(this, prevBeat, b))
+                            // if the effect cannot be expanded, create a new glyph
+                            // in case of expansion also create a new glyph, but also link the glyphs together 
+                            // so for rendering it might be expanded. 
+                            EffectGlyph newGlyph = CreateOrResizeGlyph(EffectBarGlyphSizing.SingleOnBeat, b);
+
+                            if (prevEffect != null && _info.CanExpand(this, prevBeat, b))
                             {
-                                CreateOrResizeGlyph(EffectBarGlyphSizing.SinglePreBeatOnly, b);
-                            }
-                            else
-                            {
-                                _effectGlyphs[b.Voice.Index][b.Index] = prevEffect;
+                                // link glyphs 
+                                prevEffect.NextGlyph = newGlyph;
+                                newGlyph.PreviousGlyph = prevEffect;
+
+                                // mark renderers as linked for consideration when layouting the renderers (line breaking, partial breaking)
                                 if (previousRenderer != null)
                                 {
                                     IsLinkedToPrevious = true;
                                 }
                             }
+
+                            return newGlyph;
                         }
-                        else
-                        {
-                            CreateOrResizeGlyph(EffectBarGlyphSizing.SinglePreBeatOnly, b);
-                        }
+
+                        // in case the previous beat did not have the same effect, we simply create a new glyph
+                        return CreateOrResizeGlyph(EffectBarGlyphSizing.SingleOnBeat, b);
                     }
-                    else
-                    {
-                        CreateOrResizeGlyph(EffectBarGlyphSizing.SinglePreBeatOnly, b);
-                    }
-                    break;
+
+                    // in case of the very first beat, we simply create the glyph. 
+                    return CreateOrResizeGlyph(EffectBarGlyphSizing.SingleOnBeat, b);
             }
+
+            return null;
         }
 
         protected override void CreatePostBeatGlyphs()
@@ -249,10 +209,8 @@ namespace AlphaTab.Rendering
         {
             base.Paint(cx, cy, canvas);
 
-            // canvas.setColor(new Color(0, 0, 200, 100));
-            // canvas.fillRect(cx + x, cy + y, width, height);
-
-            var glyphStart = BeatGlyphsStart;
+            //canvas.Color = new Color(0, 0, 200, 100);
+            //canvas.StrokeRect(cx + X, cy + Y, Width, Height);
 
             for (int i = 0, j = _uniqueEffectGlyphs.Count; i < j; i++)
             {
@@ -266,7 +224,7 @@ namespace AlphaTab.Rendering
                     var g = v[k];
                     if (g.Renderer == this)
                     {
-                        g.Paint(cx + X + glyphStart, cy + Y, canvas);
+                        g.Paint(cx + X, cy + Y, canvas);
                     }
                 }
             }

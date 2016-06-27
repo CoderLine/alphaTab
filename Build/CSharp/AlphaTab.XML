@@ -795,6 +795,32 @@
             Can be used to specify where i.E. the score lines of the notation end.
             </summary>
         </member>
+        <member name="T:AlphaTab.Rendering.BeatXPosition">
+            <summary>
+            Lists the different position modes for <see cref="M:AlphaTab.Rendering.BarRendererBase.GetBeatX(AlphaTab.Model.Beat,AlphaTab.Rendering.BeatXPosition)"/>
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Rendering.BeatXPosition.PreNotes">
+            <summary>
+            Gets the pre-notes position which is located before the accidentals
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Rendering.BeatXPosition.OnNotes">
+            <summary>
+            Gets the on-notes position which is located after the accidentals but before the note heads. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Rendering.BeatXPosition.PostNotes">
+            <summary>
+            Get the post-notes position which is located at after the note heads. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Rendering.BeatXPosition.EndBeat">
+            <summary>
+            Get the end-beat position which is located at the end of the beat. This position is almost
+            equal to the pre-notes position of the next beat.
+            </summary>
+        </member>
         <member name="T:AlphaTab.Rendering.BarRendererFactory">
             <summary>
             This is the base public class for creating factories providing BarRenderers
@@ -805,16 +831,57 @@
             Lists all sizing types of the effect bar glyphs
             </summary>
         </member>
+        <member name="F:AlphaTab.Rendering.EffectBarGlyphSizing.SinglePreBeat">
+            <summary>
+            The effect glyph is placed above the pre-beat glyph which is before 
+            the actual note in the area where also accidentals are renderered. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Rendering.EffectBarGlyphSizing.SingleOnBeat">
+            <summary>
+            The effect glyph is placed above the on-beat glyph which is where
+            the actual note head glyphs are placed. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeat">
+            <summary>
+            The effect glyph is placed above the on-beat glyph and expaded to the 
+            on-beat position of the next beat.
+            </summary>
+        </member>
         <member name="T:AlphaTab.Rendering.EffectBarRenderer">
             <summary>
             This renderer is responsible for displaying effects above or below the other staves
             like the vibrato. 
             </summary>
         </member>
+        <member name="P:AlphaTab.Rendering.Glyphs.BeatContainerGlyph.UseLayoutingInfo">
+            <summary>
+            Gets or sets a value indicating whether the sizes of the <see cref="T:AlphaTab.Rendering.Staves.BarLayoutingInfo"/>
+            should be used to size the <see cref="P:AlphaTab.Rendering.Glyphs.BeatContainerGlyph.PreNotes"/> and <see cref="P:AlphaTab.Rendering.Glyphs.BeatContainerGlyph.OnNotes"/> glyphs.
+            </summary>
+        </member>
         <member name="T:AlphaTab.Rendering.Glyphs.EffectGlyph">
             <summary>
             Effect-Glyphs implementing this public interface get notified
             as they are expanded over multiple beats.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Glyphs.EffectGlyph.Beat">
+            <summary>
+            Gets or sets the beat where the glyph belongs to.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Glyphs.EffectGlyph.NextGlyph">
+            <summary>
+            Gets or sets the next glyph of the same type in case 
+            the effect glyph is expanded when using <see cref="F:AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeat"/>.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Glyphs.EffectGlyph.PreviousGlyph">
+            <summary>
+            Gets or sets the previous glyph of the same type in case 
+            the effect glyph is expanded when using <see cref="F:AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeat"/>.
             </summary>
         </member>
         <member name="T:AlphaTab.Rendering.Glyphs.Glyph">
@@ -827,6 +894,17 @@
             <summary>
             This glyph allows to group several other glyphs to be
             drawn at the same x position
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Glyphs.GroupedEffectGlyph.IsLinkedWithPrevious">
+            <summary>
+            Gets a value whether this glyph is linked with a previous glyph for rendering. 
+            This means this glyph will not be rendered itself, but rendered as part of the very first glyph of this link-group.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Glyphs.GroupedEffectGlyph.IsLinkedWithNext">
+            <summary>
+            Gets a value whether this glyph is linked with the next glyph for rendering. 
             </summary>
         </member>
         <member name="T:AlphaTab.Rendering.Glyphs.LazySvg">
@@ -1149,12 +1227,6 @@
         <member name="F:AlphaTab.Rendering.Utils.AccidentalHelper.FlatNoteSteps">
             <summary>
             The step offsets of the notes within an octave in case of for flat keysignatures
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Rendering.Utils.AccidentalHelper._registeredAccidentals">
-            <summary>
-            this int-hash stores the registered accidentals for
-            all octaves and notes within an octave. 
             </summary>
         </member>
         <member name="M:AlphaTab.Rendering.Utils.AccidentalHelper.ApplyAccidental(AlphaTab.Model.Note)">

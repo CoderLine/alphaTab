@@ -54,7 +54,7 @@ namespace AlphaTab.Rendering
 
         public BeamDirection GetBeatDirection(Beat beat)
         {
-            ScoreBeatGlyph g = (ScoreBeatGlyph)GetOnNotesPosition(beat.Voice, beat.Index);
+            ScoreBeatGlyph g = (ScoreBeatGlyph)GetOnNotesGlyphForBeat(beat);
             if (g != null)
             {
                 return g.NoteHeads.Direction;
@@ -64,7 +64,7 @@ namespace AlphaTab.Rendering
 
         public override float GetNoteX(Note note, bool onEnd = true)
         {
-            ScoreBeatGlyph g = (ScoreBeatGlyph)GetOnNotesPosition(note.Beat.Voice, note.Beat.Index);
+            ScoreBeatGlyph g = (ScoreBeatGlyph)GetOnNotesGlyphForBeat(note.Beat);
             if (g != null)
             {
                 return g.Container.X + g.X + g.NoteHeads.GetNoteX(note, onEnd);
@@ -74,7 +74,7 @@ namespace AlphaTab.Rendering
 
         public override float GetNoteY(Note note)
         {
-            ScoreBeatGlyph beat = (ScoreBeatGlyph)GetOnNotesPosition(note.Beat.Voice, note.Beat.Index);
+            ScoreBeatGlyph beat = (ScoreBeatGlyph)GetOnNotesGlyphForBeat(note.Beat);
             if (beat != null)
             {
                 return beat.NoteHeads.GetNoteY(note);

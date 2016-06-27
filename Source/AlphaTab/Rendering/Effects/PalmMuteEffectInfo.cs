@@ -34,12 +34,12 @@ namespace AlphaTab.Rendering.Effects
 
         public override EffectBarGlyphSizing SizingMode
         {
-            get { return EffectBarGlyphSizing.GroupedOnBeatOnly; }
+            get { return EffectBarGlyphSizing.GroupedOnBeat; }
         }
 
         public override EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
-            return new LineRangedGlyph(0, 0, "PalmMute");
+            return new LineRangedGlyph("P.M.");
         }
     }
 }

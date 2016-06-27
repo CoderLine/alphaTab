@@ -19,6 +19,7 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering.Glyphs
@@ -85,8 +86,13 @@ namespace AlphaTab.Rendering.Glyphs
             }
         }
 
-        public void ApplyLayoutingInfo()
+        public void ApplyLayoutingInfo(BarLayoutingInfo info)
         {
+            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
+            {
+                var b = BeatGlyphs[i];
+                b.ApplyLayoutingInfo(info);
+            }
             ScaleToForce(Renderer.Settings.StretchForce);
         }
 

@@ -16,6 +16,7 @@
  * License along with this library.
  */
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
@@ -34,8 +35,8 @@ namespace AlphaTab.Rendering.Glyphs
             var res = Renderer.Resources;
             canvas.Font = res.MarkerFont;
 
-            canvas.FillMusicFontSymbol(cx+ X, cy + Y, 1, MusicFontSymbol.Tempo);
-            canvas.FillText("" + _tempo, cx + X + (20 * Scale), cy + X);
+            canvas.FillMusicFontSymbol(cx + X, cy + Y, 1, MusicFontSymbol.Tempo);
+            canvas.FillText("" + _tempo, cx + X + (20 * Scale), cy + Y + canvas.Font.Size / 2);
         }
     }
 }

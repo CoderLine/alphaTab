@@ -20,25 +20,29 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class VibratoGlyph : EffectGlyph
+    public class VibratoGlyph : GroupedEffectGlyph
     {
         private readonly float _scale;
 
         public VibratoGlyph(float x, float y, float scale = 0.9f)
-            : base(x, y)
+            : base(BeatXPosition.EndBeat)
         {
             _scale = scale;
+            X = x;
+            Y = y;
         }
 
-        public override void Paint(float cx, float cy, ICanvas canvas)
+        protected override void PaintGrouped(float cx, float cy, float endX, ICanvas canvas)
         {
+            var startX = cx + X;
+            var width = endX - startX;
             var step = 11 * Scale * _scale;
-            var loops = Math.Max(1, (Width / step));
+            var loops = (int)Math.Max(1, width / step);
 
             var loopX = 0f;
             for (var i = 0; i < loops; i++)
             {
-                canvas.FillMusicFontSymbol(cx + X + loopX, cy +Y, _scale, MusicFontSymbol.WaveHorizontal);
+                canvas.FillMusicFontSymbol(cx + X + loopX, cy + Y, _scale, MusicFontSymbol.WaveHorizontal);
                 loopX += step;
             }
         }

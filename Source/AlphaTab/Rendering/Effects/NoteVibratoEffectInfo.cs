@@ -34,7 +34,7 @@ namespace AlphaTab.Rendering.Effects
 
         public override EffectBarGlyphSizing SizingMode
         {
-            get { return EffectBarGlyphSizing.GroupedOnBeatOnly; }
+            get { return EffectBarGlyphSizing.GroupedOnBeat; }
         }
 
         public override EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)

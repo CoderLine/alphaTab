@@ -30,7 +30,7 @@ namespace AlphaTab.Rendering.Effects
                    || (beat.Voice.Bar.MasterBar.Index > 0 && beat.Voice.Bar.MasterBar.TripletFeel != beat.Voice.Bar.MasterBar.PreviousMasterBar.TripletFeel);
         }
 
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeatOnly; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
         public float GetHeight(EffectBarRenderer renderer)
         {
             return 20 * renderer.Scale;
