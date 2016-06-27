@@ -67,7 +67,7 @@ namespace AlphaTab.Rendering
             ScoreBeatGlyph g = (ScoreBeatGlyph)GetOnNotesGlyphForBeat(note.Beat);
             if (g != null)
             {
-                return g.Container.X + g.X + g.NoteHeads.GetNoteX(note, onEnd);
+                return g.Container.X + g.Container.OnTimeX;
             }
             return 0;
         }

@@ -13671,7 +13671,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
     GetNoteX: function (note, onEnd){
         var g = this.GetOnNotesGlyphForBeat(note.Beat);
         if (g != null){
-            return g.Container.X + g.X + g.NoteHeads.GetNoteX(note, onEnd);
+            return g.Container.X + g.Container.OnTimeX;
         }
         return 0;
     },
