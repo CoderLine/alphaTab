@@ -67,6 +67,7 @@
     <Compile Include="Platform\JavaScript\WorkerScoreRenderer.cs" />
     <Compile Include="Platform\Std.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rendering\Utils\BoundsLookup.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Xml\XmlAttributeCollectionWrapper.cs" />
     <Compile Include="Xml\XmlDocumentWrapper.cs" />

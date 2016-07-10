@@ -28,35 +28,12 @@ namespace AlphaTab.Platform.JavaScript
 {
     public class JsApi : JsApiBase
     {
-        public Track[] Tracks
-        {
-            get
-            {
-                var tracks = new FastList<Track>();
-
-                foreach (var track in TrackIndexes)
-                {
-                    if (track >= 0 && track < Score.Tracks.Count)
-                    {
-                        tracks.Add(Score.Tracks[track]);
-                    }
-                }
-
-                if (tracks.Count == 0 && Score.Tracks.Count > 0)
-                {
-                    tracks.Add(Score.Tracks[0]);
-                }
-
-                return tracks.ToArray();
-            }
-        }
-
         public JsApi(HtmlElement element, object options)
             : base(element, options)
         {
         }
 
-        protected override IScoreRenderer CreateScoreRenderer(Settings settings, HtmlElement canvasElement)
+        protected override IScoreRenderer CreateScoreRenderer(Settings settings, dynamic rawSettings, HtmlElement canvasElement)
         {
             return new ScoreRenderer(settings, canvasElement);
         }
@@ -73,7 +50,7 @@ namespace AlphaTab.Platform.JavaScript
             }
             else if (JsTypeOf(data) == JsTypes.@string)
             {
-                ScoreLoader.LoadScoreAsync((string)data, ScoreLoaded, e => console.error(e));
+                ScoreLoader.LoadScoreAsync((string)data, s => ScoreLoaded(s), e => console.error(e));
             }
         }
 

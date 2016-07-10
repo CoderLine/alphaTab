@@ -27,21 +27,43 @@ namespace AlphaTab
     /// </summary>
     public partial class Settings
     {
-        [JsMethod(InlineCodeExpression = "property in json", Export = false)]
-        private static bool JsonExists(dynamic json, string property)
-        {
-            return false;
-        }
-
-        [JsMethod(InlineCodeExpression = "Object.keys(json)", Export = false)]
-        private static string[] JsonKeys(dynamic json)
-        {
-            return null;
-        }
+       
 
         public dynamic ToJson()
         {
-            return null;
+            dynamic json = Std.NewObject();
+
+            json.scale = Scale;
+            json.width = Width;
+            json.height = Height;
+            json.engine = Engine;
+            json.stretchForce = StretchForce;
+            json.forcePianoFingering = ForcePianoFingering;
+
+            json.layout = Std.NewObject();
+            json.layout.mode = Layout.Mode;
+            json.layout.additionalSettings = Std.NewObject();
+            foreach (string setting in Layout.AdditionalSettings)
+            {
+                json.layout.additionalSettings[setting] = Layout.AdditionalSettings[setting];
+            }
+
+            FastList<dynamic> staves = new FastList<dynamic>();
+            json.staves = staves;
+
+            foreach (var staff in Staves)
+            {
+                var s = Std.NewObject();
+                s.id = staff.Id;
+                s.additionalSettings = Std.NewObject();
+                foreach (var additionalSetting in staff.AdditionalSettings)
+                {
+                    s.additionalSettings[additionalSetting] = staff.AdditionalSettings[additionalSetting];
+                }
+                staves.Add(s);
+            }
+
+            return json;
         }
 
         public static Settings FromJson(dynamic json)
@@ -53,15 +75,21 @@ namespace AlphaTab
 
             var settings = Defaults;
 
-            if (!json) return settings;
-            if (JsonExists(json, "scale")) settings.Scale = json.scale;
-            if (JsonExists(json, "width")) settings.Width = json.width;
-            if (JsonExists(json, "height")) settings.Height = json.height;
-            if (JsonExists(json, "engine")) settings.Engine = json.engine;
-            if (JsonExists(json, "stretchForce")) settings.StretchForce = json.stretchForce;
-            if (JsonExists(json, "forcePianoFingering")) settings.ForcePianoFingering = json.forcePianoFingering;
+            FillFromJson(settings, json);
 
-            if (JsonExists(json, "layout"))
+            return settings;
+        }
+        public static void FillFromJson(Settings settings, dynamic json)
+        {
+            if (!json) return;
+            if (Std.JsonExists(json, "scale")) settings.Scale = json.scale;
+            if (Std.JsonExists(json, "width")) settings.Width = json.width;
+            if (Std.JsonExists(json, "height")) settings.Height = json.height;
+            if (Std.JsonExists(json, "engine")) settings.Engine = json.engine;
+            if (Std.JsonExists(json, "stretchForce")) settings.StretchForce = json.stretchForce;
+            if (Std.JsonExists(json, "forcePianoFingering")) settings.ForcePianoFingering = json.forcePianoFingering;
+
+            if (Std.JsonExists(json, "layout"))
             {
                 if (JsContext.@typeof(json.layout) == "string")
                 {
@@ -72,7 +100,7 @@ namespace AlphaTab
                     if (json.layout.mode) settings.Layout.Mode = json.layout.mode;
                     if (json.layout.additionalSettings)
                     {
-                        string[] keys = JsonKeys(json.layout.additionalSettings);
+                        string[] keys = Std.JsonKeys(json.layout.additionalSettings);
                         foreach (var key in keys)
                         {
                             settings.Layout.AdditionalSettings[key] = json.layout.additionalSettings[key];
@@ -81,10 +109,10 @@ namespace AlphaTab
                 }
             }
 
-            if (JsonExists(json, "staves"))
+            if (Std.JsonExists(json, "staves"))
             {
                 settings.Staves = new FastList<StaveSettings>();
-                string[] keys = JsonKeys(json.staves);
+                string[] keys = Std.JsonKeys(json.staves);
                 foreach (var key in keys)
                 {
                     var val = json.staves[key];
@@ -99,7 +127,7 @@ namespace AlphaTab
                             var staveSettings = new StaveSettings(val.id);
                             if (val.additionalSettings)
                             {
-                                string[] keys2 = JsonKeys(val.additionalSettings);
+                                string[] keys2 = Std.JsonKeys(val.additionalSettings);
                                 foreach (var key2 in keys2)
                                 {
                                     staveSettings.AdditionalSettings[key2] = val.additionalSettings[key2];
@@ -110,8 +138,6 @@ namespace AlphaTab
                     }
                 }
             }
-
-            return settings;
         }
     }
 }

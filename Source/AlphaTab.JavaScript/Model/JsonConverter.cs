@@ -1,4 +1,5 @@
 ﻿using AlphaTab.Collections;
+using AlphaTab.Platform;
 using SharpKit.JavaScript;
 
 namespace AlphaTab.Model
@@ -11,7 +12,7 @@ namespace AlphaTab.Model
     {
         public Score ScoreToJsObject(Score score)
         {
-            Score score2 = NewObject();
+            Score score2 = Std.NewObject();
             Score.CopyTo(score, score2);
             score2.MasterBars = new FastList<MasterBar>();
             score2.Tracks = new FastList<Track>();
@@ -21,21 +22,21 @@ namespace AlphaTab.Model
             for (var i = 0; i < score.MasterBars.Count; i++)
             {
                 MasterBar masterBar = score.MasterBars[i];
-                MasterBar masterBar2 = NewObject();
+                MasterBar masterBar2 = Std.NewObject();
                 MasterBar.CopyTo(masterBar, masterBar2);
                 if (masterBar.TempoAutomation != null)
                 {
-                    masterBar2.TempoAutomation = NewObject();
+                    masterBar2.TempoAutomation = Std.NewObject();
                     Automation.CopyTo(masterBar.TempoAutomation, masterBar2.TempoAutomation);
                 }
                 if (masterBar.VolumeAutomation != null)
                 {
-                    masterBar2.VolumeAutomation = NewObject();
+                    masterBar2.VolumeAutomation = Std.NewObject();
                     Automation.CopyTo(masterBar.VolumeAutomation, masterBar2.VolumeAutomation);
                 }
                 if (masterBar.Section != null)
                 {
-                    masterBar2.Section = NewObject();
+                    masterBar2.Section = Std.NewObject();
                     Section.CopyTo(masterBar.Section, masterBar2.Section);
                 }
                 score2.MasterBars.Add(masterBar2);
@@ -48,18 +49,18 @@ namespace AlphaTab.Model
             for (int t = 0; t < score.Tracks.Count; t++)
             {
                 var track = score.Tracks[t];
-                Track track2 = NewObject();
-                track2.Color = NewObject();
+                Track track2 = Std.NewObject();
+                track2.Color = Std.NewObject();
                 Track.CopyTo(track, track2);
 
-                track2.PlaybackInfo = NewObject();
+                track2.PlaybackInfo = Std.NewObject();
                 PlaybackInformation.CopyTo(track.PlaybackInfo, track2.PlaybackInfo);
 
                 track2.Chords = new FastDictionary<string, Chord>();
                 foreach (var key in track.Chords.Keys)
                 {
                     var chord = track.Chords[key];
-                    Chord chord2 = NewObject();
+                    Chord chord2 = Std.NewObject();
                     Chord.CopyTo(chord, chord2);
                     track2.Chords[key] = chord;
                 }
@@ -70,7 +71,7 @@ namespace AlphaTab.Model
                 for (int s = 0; s < track.Staves.Count; s++)
                 {
                     var staff = track.Staves[s];
-                    Staff staff2 = NewObject();
+                    Staff staff2 = Std.NewObject();
 
                     #region Bars
 
@@ -78,7 +79,7 @@ namespace AlphaTab.Model
                     for (int b = 0; b < staff.Bars.Count; b++)
                     {
                         var bar = staff.Bars[b];
-                        Bar bar2 = NewObject();
+                        Bar bar2 = Std.NewObject();
                         Bar.CopyTo(bar, bar2);
 
                         #region Voices
@@ -87,7 +88,7 @@ namespace AlphaTab.Model
                         for (int v = 0; v < bar.Voices.Count; v++)
                         {
                             var voice = bar.Voices[v];
-                            Voice voice2 = NewObject();
+                            Voice voice2 = Std.NewObject();
                             Voice.CopyTo(voice, voice2);
 
                             #region Beats
@@ -96,13 +97,13 @@ namespace AlphaTab.Model
                             for (int bb = 0; bb < voice.Beats.Count; bb++)
                             {
                                 var beat = voice.Beats[bb];
-                                Beat beat2 = NewObject();
+                                Beat beat2 = Std.NewObject();
                                 Beat.CopyTo(beat, beat2);
 
                                 beat2.Automations = new FastList<Automation>();
                                 for (int a = 0; a < beat.Automations.Count; a++)
                                 {
-                                    Automation automation = NewObject();
+                                    Automation automation = Std.NewObject();
                                     Automation.CopyTo(beat.Automations[a], automation);
                                     beat2.Automations.Add(automation);
                                 }
@@ -110,7 +111,7 @@ namespace AlphaTab.Model
                                 beat2.WhammyBarPoints = new FastList<BendPoint>();
                                 for (int i = 0; i < beat.WhammyBarPoints.Count; i++)
                                 {
-                                    BendPoint point = NewObject();
+                                    BendPoint point = Std.NewObject();
                                     BendPoint.CopyTo(beat.WhammyBarPoints[i], point);
                                     beat2.WhammyBarPoints.Add(point);
                                 }
@@ -121,13 +122,13 @@ namespace AlphaTab.Model
                                 for (int n = 0; n < beat.Notes.Count; n++)
                                 {
                                     var note = beat.Notes[n];
-                                    Note note2 = NewObject();
+                                    Note note2 = Std.NewObject();
                                     Note.CopyTo(note, note2);
 
                                     note2.BendPoints = new FastList<BendPoint>();
                                     for (int i = 0; i < note.BendPoints.Count; i++)
                                     {
-                                        BendPoint point = NewObject();
+                                        BendPoint point = Std.NewObject();
                                         BendPoint.CopyTo(note.BendPoints[i], point);
                                         note2.BendPoints.Add(point);
                                     }
@@ -147,7 +148,7 @@ namespace AlphaTab.Model
 
                         #endregion
 
-                        staff.Bars.Add(bar2);
+                        staff2.Bars.Add(bar2);
                     }
 
                     #endregion
@@ -297,12 +298,6 @@ namespace AlphaTab.Model
 
             score2.Finish();
             return score2;
-        }
-
-        [JsMethod(InlineCodeExpression = "{}")]
-        private dynamic NewObject()
-        {
-            return null;
         }
     }
 }

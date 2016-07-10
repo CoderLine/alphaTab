@@ -18,7 +18,11 @@ namespace AlphaTab.Platform.JavaScript
 
         protected override IScoreRenderer CreateScoreRenderer(Settings settings, object rawSettings, HtmlElement canvasElement)
         {
-            var renderer = new WorkerScoreRenderer(this, rawSettings);
+            var renderer = new WorkerScoreRenderer(settings, rawSettings);
+            renderer.ScoreLoaded += score =>
+            {
+                ScoreLoaded(score, false);
+            };
             renderer.PostRenderFinished += () =>
             {
                 Element.className = Element.className.replace(" loading", "")
@@ -69,7 +73,6 @@ namespace AlphaTab.Platform.JavaScript
         private readonly ScoreRenderer _renderer;
         private SharpKit.Html.workers.WorkerContext _main;
         private int[] _trackIndexes;
-        private readonly bool _includeScoreInLoadedEvent;
 
         public Score Score { get; set; }
 
@@ -99,13 +102,12 @@ namespace AlphaTab.Platform.JavaScript
         public JsWorker(SharpKit.Html.workers.WorkerContext main, object options)
         {
             _main = main;
-            _includeScoreInLoadedEvent = options.Member("scoreInLoadedEvent").As<bool>();
             _main.addEventListener("message", HandleMessage, false);
             Settings settings = Settings.FromJson(options);
             _renderer = new ScoreRenderer(settings, null);
             _renderer.PartialRenderFinished += result => PostMessage(new { cmd = "partialRenderFinished", result = result });
             _renderer.RenderFinished += result => PostMessage(new { cmd = "renderFinished", result = result });
-            _renderer.PostRenderFinished += () => PostMessage(new { cmd = "postRenderFinished" });
+            _renderer.PostRenderFinished += () => PostMessage(new { cmd = "postRenderFinished", boundsLookup = _renderer.BoundsLookup.ToJson() });
             _renderer.PreRender += () => PostMessage(new { cmd = "preRender" });
         }
 
@@ -130,7 +132,15 @@ namespace AlphaTab.Platform.JavaScript
                 case "renderMultiple":
                     RenderMultiple(data.Member("data").As<int[]>());
                     break;
+                case "updateSettings":
+                    UpdateSettings(data.Member("settings"));
+                    break;
             }
+        }
+
+        private void UpdateSettings(object settings)
+        {
+            _renderer.UpdateSettings(Settings.FromJson(settings));
         }
 
         private void RenderMultiple(int[] trackIndexes)
@@ -187,16 +197,8 @@ namespace AlphaTab.Platform.JavaScript
         private void ScoreLoaded(Score score)
         {
             Score = score;
-            if (_includeScoreInLoadedEvent)
-            {
-                var json = new JsonConverter();
-                PostMessage(new { cmd = "loaded", score = json.ScoreToJsObject(score) });
-            }
-            else
-            {
-                PostMessage(new { cmd = "loaded" });
-            }
-
+            var json = new JsonConverter();
+            PostMessage(new { cmd = "loaded", score = json.ScoreToJsObject(score) });
             Render();
         }
 

@@ -121,7 +121,7 @@ namespace AlphaTab.Rendering.Layout
                 }
 
                 // don't miss the last partial if not empty
-                if (currentPartial.MasterBars.Count >= 0)
+                if (currentPartial.MasterBars.Count > 0)
                 {
                     if (partials.Count == 0)
                     {

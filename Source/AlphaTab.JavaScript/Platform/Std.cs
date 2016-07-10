@@ -15,6 +15,15 @@ namespace AlphaTab.Platform
             return JsContext.parseFloat(s);
         }
 
+        [JsMethod(InlineCodeExpression = "{}", Export = false)]
+        public static extern dynamic NewObject();
+
+        [JsMethod(InlineCodeExpression = "property in json", Export = false)]
+        public static extern bool JsonExists(dynamic json, string property);
+
+        [JsMethod(InlineCodeExpression = "Object.keys(json)", Export = false)]
+        public static extern string[] JsonKeys(dynamic json);
+
         [JsMethod(InlineCodeExpression = "Math.log2(f)")]
         public static extern float Log2(float f);
 

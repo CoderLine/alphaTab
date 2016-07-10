@@ -57,7 +57,7 @@ namespace AlphaTab.Rendering
             RecreateLayout();
         }
 
-        private void RecreateLayout()
+        private bool RecreateLayout()
         {
             if (_currentLayoutMode != Settings.Layout.Mode)
             {
@@ -71,7 +71,9 @@ namespace AlphaTab.Rendering
                 }
                 Layout.PartialRenderFinished += OnPartialRenderFinished;
                 _currentLayoutMode = Settings.Layout.Mode;
+                return true;
             }
+            return false;
         }
 
         public void Render(Track track)
@@ -119,8 +121,11 @@ namespace AlphaTab.Rendering
 
         public void Resize(int width)
         {
-            RecreateLayout();
-            if (Layout.SupportsResize)
+            if (RecreateLayout())
+            {
+                Invalidate();
+            }
+            else if (Layout.SupportsResize)
             {
                 OnPreRender();
                 Settings.Width = width;

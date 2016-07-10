@@ -94,6 +94,7 @@ namespace AlphaTab.Platform.JavaScript
                                 resizeEventInfo.NewWidth = element.offsetWidth;
                                 resizeEventInfo.Settings = settings;
                                 TriggerEvent("resize", resizeEventInfo);
+                                settings.Width = resizeEventInfo.NewWidth;
                                 Renderer.UpdateSettings(settings);
                                 Renderer.Resize(element.offsetWidth);
                             }
@@ -104,10 +105,19 @@ namespace AlphaTab.Platform.JavaScript
                 #endregion
             }
 
-
             #region Renderer Setup
 
-            Renderer = CreateScoreRenderer(settings, CanvasElement);
+            if (element != null && AutoSize)
+            {
+                var initialResizeEventInfo = new ResizeEventArgs();
+                initialResizeEventInfo.OldWidth = 0;
+                initialResizeEventInfo.NewWidth = element.offsetWidth;
+                initialResizeEventInfo.Settings = settings;
+                TriggerEvent("resize", initialResizeEventInfo);
+                settings.Width = initialResizeEventInfo.NewWidth;
+            }
+
+            Renderer = CreateScoreRenderer(settings, options, CanvasElement);
             Renderer.RenderFinished += o => TriggerEvent("rendered");
             Renderer.PostRenderFinished += () => TriggerEvent("post-rendered");
             Renderer.PreRender += () =>
@@ -159,10 +169,33 @@ namespace AlphaTab.Platform.JavaScript
             #endregion
         }
 
-        protected abstract IScoreRenderer CreateScoreRenderer(Settings settings, HtmlElement canvasElement);
+        protected abstract IScoreRenderer CreateScoreRenderer(Settings settings, dynamic rawOptions, HtmlElement canvasElement);
 
         public IScoreRenderer Renderer { get; private set; }
         public Score Score { get; set; }
+        public Track[] Tracks
+        {
+            get
+            {
+                var tracks = new FastList<Track>();
+
+                foreach (var track in TrackIndexes)
+                {
+                    if (track >= 0 && track < Score.Tracks.Count)
+                    {
+                        tracks.Add(Score.Tracks[track]);
+                    }
+                }
+
+                if (tracks.Count == 0 && Score.Tracks.Count > 0)
+                {
+                    tracks.Add(Score.Tracks[0]);
+                }
+
+                return tracks.ToArray();
+            }
+        }
+
 
         public abstract void Load(object data);
 
@@ -218,11 +251,14 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
-        public void ScoreLoaded(Score score)
+        protected void ScoreLoaded(Score score, bool render = true)
         {
             Score = score;
             TriggerEvent("loaded", score);
-            Render();
+            if (render)
+            {
+                Render();
+            }
         }
 
         public void TriggerEvent(string name, object details = null)

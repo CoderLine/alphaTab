@@ -194,11 +194,12 @@ namespace AlphaTab.Rendering.Utils
         public Beat Beat { get; set; }
     }
 
-    public class BoundsLookup
+    public partial class BoundsLookup
     {
         private FastDictionary<string, BeatBounds> _beatLookup;
         private StaveGroupBounds _currentStaveGroup;
         public FastList<StaveGroupBounds> StaveGroups { get; set; }
+        public bool IsFinished { get; private set; }
 
         public BoundsLookup()
         {
@@ -212,6 +213,7 @@ namespace AlphaTab.Rendering.Utils
             {
                 StaveGroups[i].Finish();
             }
+            IsFinished = true;
         }
 
         public void AddStaveGroup(StaveGroupBounds bounds)

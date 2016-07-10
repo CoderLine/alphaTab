@@ -143,10 +143,10 @@ namespace AlphaTab.Rendering.Layout
             canvas.BeginRender(Width, y);
             canvas.Color = res.ScoreInfoColor;
             canvas.TextAlign = TextAlign.Center;
-            Std.Foreach(ScoreInfoGlyphs.Values, g =>
+            foreach (var key in ScoreInfoGlyphs)
             {
-                g.Paint(0, 0, canvas);
-            });
+                ScoreInfoGlyphs[key].Paint(0, 0, canvas);
+            }
 
             var result = canvas.EndRender();
             OnPartialRenderFinished(new RenderFinishedEventArgs

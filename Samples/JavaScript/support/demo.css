@@ -74,3 +74,16 @@ body.features {
     width:700px;
     margin: 0 auto;
 }
+
+
+.navbar-nocollapse .nav {
+    float: left;
+    margin: 0;
+}
+.navbar-nocollapse .navbar-header {
+    float: left;
+}
+
+.navbar-nocollapse .navbar-nav>li {
+    float: left;
+}

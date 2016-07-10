@@ -17,11 +17,16 @@
  */
 
 using System;
+using AlphaTab.Model;
+using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering
 {
     public interface IScoreRenderer
     {
+        Score Score { get; }
+        BoundsLookup BoundsLookup { get; }
+
         void Invalidate();
         void Resize(int width);
 

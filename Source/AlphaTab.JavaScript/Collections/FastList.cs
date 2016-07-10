@@ -16,6 +16,8 @@
  * License along with this library.
  */
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using SharpKit.JavaScript;
 
 namespace AlphaTab.Collections
@@ -23,8 +25,8 @@ namespace AlphaTab.Collections
     /// <summary>
     /// This is an improved list which is also optimized for the JavaScript platform. 
     /// </summary>
-    [JsType(Mode = JsMode.Prototype, Name = "Array", Export = false, IgnoreGenericTypeArguments = true)]
-    public class FastList<T>
+    [JsType(Mode = JsMode.Prototype, Name = "Array", Export = false, IgnoreGenericTypeArguments = true, NativeArrayEnumerator = true, NativeCasts = true, NativeEnumerator = false, NativeOperatorOverloads = true)]
+    public class FastList<T> : IJsArrayEnumerable<T>, IEnumerable<T>, IEnumerable
     {
         [JsMethod(InlineCode = "[]")]
         public FastList()
@@ -95,5 +97,10 @@ namespace AlphaTab.Collections
         {
             return null;
         }
+
+        public extern IEnumerator<T> GetEnumerator();
+        extern IEnumerator IEnumerable.GetEnumerator();
+        extern T IJsArrayEnumerable<T>.this[JsNumber index] { get; }
+        public extern JsNumber length { get; }
     }
 }
