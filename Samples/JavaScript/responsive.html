@@ -62,10 +62,16 @@
         at.alphaTab({
             scale: 1,
             //layout: 'horizontal',
-            autoSize: true,
+            width: -1,
             useWorker: true,
             atRoot: '/Build/JavaScript'
         }); 
+        
+        $(at).on('resize', function(e) {
+            var newSize = e.originalEvent.detail.NewWidth;
+            
+            console.log(e);
+        });
         
         // 
         // 2. Initialize Player and Setup Player UI

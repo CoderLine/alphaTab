@@ -97,6 +97,11 @@ namespace AlphaTab.Rendering
         }
 
 
+        public void UpdateSettings(Settings settings)
+        {
+            Settings = settings;
+        }
+
         public void Invalidate()
         {
             BoundsLookup = new BoundsLookup();
@@ -114,6 +119,7 @@ namespace AlphaTab.Rendering
 
         public void Resize(int width)
         {
+            RecreateLayout();
             if (Layout.SupportsResize)
             {
                 OnPreRender();

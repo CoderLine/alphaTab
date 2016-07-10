@@ -6,11 +6,19 @@ using SharpKit.JavaScript;
 
 namespace AlphaTab.Platform.JavaScript
 {
+    public class ResizeEventArgs
+    {
+        public int OldWidth { get; set; }
+        public int NewWidth { get; set; }
+        public Settings Settings { get; set; }
+    }
+
     public abstract class JsApiBase : HtmlContext
     {
         protected readonly HtmlElement Element;
         protected readonly HtmlElement CanvasElement;
         protected int[] TrackIndexes;
+        protected bool AutoSize;
 
         protected JsApiBase(HtmlElement element, dynamic options)
         {
@@ -65,9 +73,14 @@ namespace AlphaTab.Platform.JavaScript
 
                 #region Auto Sizing
 
-                if (settings.AutoSize)
+                AutoSize = settings.Width < 0;
+                if (AutoSize)
                 {
                     settings.Width = element.offsetWidth;
+                    if (options)
+                    {
+                        options.width = element.offsetWidth;
+                    }
                     int timeoutId = 0;
                     window.addEventListener("resize", e =>
                     {
@@ -76,6 +89,12 @@ namespace AlphaTab.Platform.JavaScript
                         {
                             if (element.offsetWidth != settings.Width)
                             {
+                                var resizeEventInfo = new ResizeEventArgs();
+                                resizeEventInfo.OldWidth = settings.Width;
+                                resizeEventInfo.NewWidth = element.offsetWidth;
+                                resizeEventInfo.Settings = settings;
+                                TriggerEvent("resize", resizeEventInfo);
+                                Renderer.UpdateSettings(settings);
                                 Renderer.Resize(element.offsetWidth);
                             }
                         }, 100);
@@ -88,7 +107,7 @@ namespace AlphaTab.Platform.JavaScript
 
             #region Renderer Setup
 
-            Renderer = CreateScoreRenderer(settings, options, CanvasElement);
+            Renderer = CreateScoreRenderer(settings, CanvasElement);
             Renderer.RenderFinished += o => TriggerEvent("rendered");
             Renderer.PostRenderFinished += () => TriggerEvent("post-rendered");
             Renderer.PreRender += () =>
@@ -112,7 +131,6 @@ namespace AlphaTab.Platform.JavaScript
                 CanvasElement.style.width = result.TotalWidth + "px";
                 CanvasElement.style.height = result.TotalHeight + "px";
                 CanvasElement.appendChild(itemToAppend);
-
             };
             Renderer.RenderFinished += result =>
             {
@@ -141,7 +159,7 @@ namespace AlphaTab.Platform.JavaScript
             #endregion
         }
 
-        protected abstract IScoreRenderer CreateScoreRenderer(Settings settings, object rawSettings, HtmlElement canvasElement);
+        protected abstract IScoreRenderer CreateScoreRenderer(Settings settings, HtmlElement canvasElement);
 
         public IScoreRenderer Renderer { get; private set; }
         public Score Score { get; set; }

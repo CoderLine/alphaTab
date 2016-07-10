@@ -36,11 +36,6 @@ namespace AlphaTab
         public int Width { get; set; }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public bool AutoSize { get; set; }
-
-        /// <summary>
         /// The initial size of the canvas during loading or the fixed height on some layouts. 
         /// </summary>
         public int Height { get; set; }

@@ -19,7 +19,7 @@ namespace AlphaTab.Platform.JavaScript
             get { return true; }
         }
 
-        public WorkerScoreRenderer(JsWorkerApi workerApi, dynamic rawSettings)
+        public WorkerScoreRenderer(JsWorkerApi workerApi, Settings settings, dynamic rawSettings)
         {
             _workerApi = workerApi;
 
@@ -59,9 +59,8 @@ namespace AlphaTab.Platform.JavaScript
                 alphaTabScriptFile = Environment.ScriptFile;
             }
 
-
             _worker = new Worker(CreateWorkerUrl());
-            _worker.postMessage(new { cmd = "initialize", alphaTabScript = alphaTabScriptFile, settings = rawSettings });
+            _worker.postMessage(new { cmd = "initialize", alphaTabScript = alphaTabScriptFile, settings = settings.ToJson() });
             _worker.addEventListener("message", HandleWorkerMessage, false);
         }
 
@@ -90,6 +89,12 @@ namespace AlphaTab.Platform.JavaScript
             }
 
             return JsCode("URL.createObjectURL(blob)").As<string>();
+
+        }
+
+        public void UpdateSettings(Settings settings)
+        {
+            _worker.postMessage(new { cmd = "updateSettings", settings = settings.ToJson() });
         }
 
         public void Invalidate()

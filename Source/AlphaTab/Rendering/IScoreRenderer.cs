@@ -29,6 +29,7 @@ namespace AlphaTab.Rendering
         event Action<RenderFinishedEventArgs> RenderFinished;
         event Action<RenderFinishedEventArgs> PartialRenderFinished;
         event Action PostRenderFinished;
+        void UpdateSettings(Settings settings);
     }
 
     public class RenderFinishedEventArgs

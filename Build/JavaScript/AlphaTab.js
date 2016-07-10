@@ -532,10 +532,15 @@ AlphaTab.Model.TuningParser.GetTuningForText = function (str){
 };
 AlphaTab.Platform = AlphaTab.Platform || {};
 AlphaTab.Platform.JavaScript = AlphaTab.Platform.JavaScript || {};
+AlphaTab.Platform.JavaScript.ResizeEventArgs = function (){
+    this.OldWidth = 0;
+    this.NewWidth = 0;
+};
 AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
     this.Element = null;
     this.CanvasElement = null;
     this.TrackIndexes = null;
+    this.AutoSize = false;
     this.Renderer = null;
     this.Score = null;
     this.Element = element;
@@ -565,13 +570,21 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
         this.CanvasElement.className = "alphaTabSurface";
         this.CanvasElement.style.fontSize = "0";
         element.appendChild(this.CanvasElement);
-        if (settings.AutoSize){
+        this.AutoSize = settings.Width < 0;
+        if (this.AutoSize){
             settings.Width = element.offsetWidth;
+            if (options){
+                options.width = element.offsetWidth;
+            }
             var timeoutId = 0;
             window.addEventListener("resize", $CreateAnonymousDelegate(this, function (e){
                 window.clearTimeout(timeoutId);
                 timeoutId = window.setTimeout($CreateAnonymousDelegate(this, function (){
                     if (element.offsetWidth != settings.Width){
+                        var resizeEventInfo = new AlphaTab.Platform.JavaScript.ResizeEventArgs();
+                        resizeEventInfo.OldWidth = settings.Width;
+                        resizeEventInfo.NewWidth = element.offsetWidth;
+                        this.TriggerEvent("resize", resizeEventInfo);
                         this.Renderer.Resize(element.offsetWidth);
                     }
                 }), 100);
@@ -1415,7 +1428,6 @@ AlphaTab.Platform.Std.IterateChildren = function (n, action){
 AlphaTab.Settings = function (){
     this.Scale = 0;
     this.Width = 0;
-    this.AutoSize = false;
     this.Height = 0;
     this.Engine = null;
     this.Layout = null;
@@ -1432,8 +1444,6 @@ AlphaTab.Settings.FromJson = function (json){
         return settings;
     if ("scale"in json)
         settings.Scale = json.scale;
-    if ("autoSize"in json)
-        settings.AutoSize = json.autoSize;
     if ("width"in json)
         settings.Width = json.width;
     if ("height"in json)
@@ -13337,7 +13347,8 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
         y = this.LayoutAndRenderScoreInfo(x, y);
         //
         // 2. One result per StaveGroup
-        y = this.ResizeAndRenderScore(x, y);
+        //y = ResizeAndRenderScore(x, y);
+        y = this.LayoutAndRenderScore(x, y);
         this.Height = y + AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[3];
     },
     LayoutAndRenderScoreInfo: function (x, y){
@@ -14410,6 +14421,7 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
         this.LayoutAndRender();
     },
     Resize: function (width){
+        this.RecreateLayout();
         if (this.Layout.get_SupportsResize()){
             this.OnPreRender();
             this.Settings.Width = width;

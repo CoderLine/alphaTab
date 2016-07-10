@@ -76,7 +76,8 @@ namespace AlphaTab.Rendering.Layout
 
             //
             // 2. One result per StaveGroup
-            y = ResizeAndRenderScore(x, y);
+            //y = ResizeAndRenderScore(x, y);
+            y = LayoutAndRenderScore(x, y);
 
             Height = y + PagePadding[3];
         }
