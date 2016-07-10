@@ -36,6 +36,7 @@ namespace AlphaTab.Model
         public MasterBar PreviousMasterBar { get; set; }
         public int Index { get; set; }
         public int KeySignature { get; set; }
+        public KeySignatureType KeySignatureType { get; set; }
         public bool IsDoubleBar { get; set; }
 
         public bool IsRepeatStart { get; set; }
@@ -66,6 +67,7 @@ namespace AlphaTab.Model
             TimeSignatureDenominator = 4;
             TimeSignatureNumerator = 4;
             TripletFeel = TripletFeel.NoTripletFeel;
+            KeySignatureType = KeySignatureType.Major; 
         }
 
         public static void CopyTo(MasterBar src, MasterBar dst)
@@ -73,6 +75,7 @@ namespace AlphaTab.Model
             dst.AlternateEndings = src.AlternateEndings;
             dst.Index = src.Index;
             dst.KeySignature = src.KeySignature;
+            dst.KeySignatureType = src.KeySignatureType;
             dst.IsDoubleBar = src.IsDoubleBar;
             dst.IsRepeatStart = src.IsRepeatStart;
             dst.RepeatCount = src.RepeatCount;

@@ -4588,11 +4588,11 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         // keysignature
         if ((flags & 64) != 0){
             newMasterBar.KeySignature = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
-            this.Data.ReadByte();
-            // keysignature type
+            newMasterBar.KeySignatureType = this.Data.ReadByte();
         }
         else if (previousMasterBar != null){
             newMasterBar.KeySignature = previousMasterBar.KeySignature;
+            newMasterBar.KeySignatureType = previousMasterBar.KeySignatureType;
         }
         if ((this._versionNumber >= 500) && ((flags & 3) != 0)){
             this.Data.Skip(4);
@@ -6075,6 +6075,17 @@ AlphaTab.Importer.GpxParser.prototype = {
                         break;
                     case "Key":
                         masterBar.KeySignature = AlphaTab.Platform.Std.ParseInt(this.GetValue(this.FindChildElement(c, "AccidentalCount")));
+                        var mode = this.FindChildElement(c, "Mode");
+                        if (mode != null){
+                        switch (this.GetValue(mode).toLowerCase()){
+                            case "major":
+                                masterBar.KeySignatureType = AlphaTab.Model.KeySignatureType.Major;
+                                break;
+                            case "minor":
+                                masterBar.KeySignatureType = AlphaTab.Model.KeySignatureType.Minor;
+                                break;
+                        }
+                    }
                         break;
                 }
             }
@@ -8023,6 +8034,7 @@ AlphaTab.Model.MasterBar = function (){
     this.PreviousMasterBar = null;
     this.Index = 0;
     this.KeySignature = 0;
+    this.KeySignatureType = AlphaTab.Model.KeySignatureType.Major;
     this.IsDoubleBar = false;
     this.IsRepeatStart = false;
     this.RepeatCount = 0;
@@ -8038,6 +8050,7 @@ AlphaTab.Model.MasterBar = function (){
     this.TimeSignatureDenominator = 4;
     this.TimeSignatureNumerator = 4;
     this.TripletFeel = AlphaTab.Model.TripletFeel.NoTripletFeel;
+    this.KeySignatureType = AlphaTab.Model.KeySignatureType.Major;
 };
 AlphaTab.Model.MasterBar.prototype = {
     get_IsRepeatEnd: function (){
@@ -8057,6 +8070,7 @@ AlphaTab.Model.MasterBar.CopyTo = function (src, dst){
     dst.AlternateEndings = src.AlternateEndings;
     dst.Index = src.Index;
     dst.KeySignature = src.KeySignature;
+    dst.KeySignatureType = src.KeySignatureType;
     dst.IsDoubleBar = src.IsDoubleBar;
     dst.IsRepeatStart = src.IsRepeatStart;
     dst.RepeatCount = src.RepeatCount;

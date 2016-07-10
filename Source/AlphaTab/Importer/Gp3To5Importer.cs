@@ -332,11 +332,12 @@ namespace AlphaTab.Importer
             if ((flags & 0x40) != 0)
             {
                 newMasterBar.KeySignature = Data.ReadSignedByte();
-                Data.ReadByte(); // keysignature type
+                newMasterBar.KeySignatureType = (KeySignatureType)Data.ReadByte();
             }
             else if (previousMasterBar != null)
             {
                 newMasterBar.KeySignature = previousMasterBar.KeySignature;
+                newMasterBar.KeySignatureType = previousMasterBar.KeySignatureType;
             }
 
             if ((_versionNumber >= 500) && ((flags & 0x03) != 0))

@@ -224,5 +224,14 @@ namespace AlphaTab.Test.Importer
             CheckStrings(score);
             Render(score);
         }
+
+        [TestMethod]
+        public void TestKeySignatures()
+        {
+            var reader = PrepareImporterWithFile("GuitarPro5/TestKeySignatures.gp5");
+            var score = reader.ReadScore();
+            CheckKeySignatures(score);
+            Render(score);
+        }
     }
 }

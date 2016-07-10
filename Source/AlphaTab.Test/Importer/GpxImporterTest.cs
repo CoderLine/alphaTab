@@ -19,6 +19,7 @@ using System;
 using System.IO;
 using AlphaTab.Importer;
 using AlphaTab.IO;
+using AlphaTab.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test.Importer
@@ -337,6 +338,15 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareImporterWithFile("GuitarPro6/TestStrings.gpx");
             var score = reader.ReadScore();
             CheckStrings(score);
+            Render(score);
+        }
+
+        [TestMethod]
+        public void TestKeySignatures()
+        {
+            var reader = PrepareImporterWithFile("GuitarPro6/TestKeySignatures.gpx");
+            var score = reader.ReadScore();
+            CheckKeySignatures(score);
             Render(score);
         }
     }

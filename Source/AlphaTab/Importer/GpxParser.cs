@@ -575,6 +575,20 @@ namespace AlphaTab.Importer
                             break;
                         case "Key":
                             masterBar.KeySignature = Std.ParseInt(GetValue(FindChildElement(c, "AccidentalCount")));
+                            var mode = FindChildElement(c, "Mode");
+                            if (mode != null)
+                            {
+                                switch (GetValue(mode).ToLower())
+                                {
+                                    case "major":
+                                        masterBar.KeySignatureType = KeySignatureType.Major;
+                                        break;
+                                    case "minor":
+                                        masterBar.KeySignatureType = KeySignatureType.Minor;
+                                        break;
+                                }
+                            }
+
                             break;
                     }
                 }
