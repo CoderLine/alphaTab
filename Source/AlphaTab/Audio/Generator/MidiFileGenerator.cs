@@ -98,6 +98,11 @@ namespace AlphaTab.Audio.Generator
                 previousMasterBar = bar;
             }
 
+            for (int i = 0, j = _score.Tracks.Count; i < j; i++)
+            {
+                _handler.FinishTrack(_score.Tracks[i].Index, controller.CurrentTick);
+            }
+
             TickLookup.Finish();
 
         }

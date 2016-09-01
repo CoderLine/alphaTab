@@ -32,5 +32,6 @@ namespace AlphaTab.Audio.Generator
         void AddTempo(int tick, int tempo);
         void AddBend(int track, int tick, byte channel, byte value);
         void AddMetronome(int start, int length);
+        void FinishTrack(int track, int tick);
     }
 }

@@ -2063,6 +2063,9 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
             controller.MoveNext();
             previousMasterBar = bar;
         }
+        for (var i = 0,j = this._score.Tracks.length; i < j; i++){
+            this._handler.FinishTrack(this._score.Tracks[i].Index, controller.CurrentTick);
+        }
         this.TickLookup.Finish();
     },
     GenerateTrack: function (track){
@@ -2549,6 +2552,9 @@ AlphaTab.Audio.Generator.MidiFileHandler.prototype = {
         // bpm -> microsecond per quarter note
         var tempoInUsq = ((60000000 / tempo) | 0);
         this.AddEvent(this._midiFile.InfoTrack, tick, AlphaTab.Audio.Generator.MidiFileHandler.BuildMetaMessage(81, new Uint8Array([((tempoInUsq >> 16) & 255), ((tempoInUsq >> 8) & 255), (tempoInUsq & 255)])));
+    },
+    FinishTrack: function (track, tick){
+        this.AddEvent(this._midiFile.InfoTrack, tick, AlphaTab.Audio.Generator.MidiFileHandler.BuildMetaMessage(47, new Uint8Array(0)));
     },
     AddBend: function (track, tick, channel, value){
         this.AddEvent(track, tick, new AlphaTab.Audio.Model.MidiMessage(new Uint8Array([this.MakeCommand(224, channel), 0, AlphaTab.Audio.Generator.MidiFileHandler.FixValue(value)])));

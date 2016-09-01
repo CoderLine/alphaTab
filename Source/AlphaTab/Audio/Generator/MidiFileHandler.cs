@@ -101,6 +101,12 @@ namespace AlphaTab.Audio.Generator
                     new[] { (byte)((tempoInUsq >> 16) & 0xFF), (byte)((tempoInUsq >> 8) & 0xFF), (byte)(tempoInUsq & 0xFF) }));
         }
 
+        public void FinishTrack(int track, int tick)
+        {
+            AddEvent(_midiFile.InfoTrack, tick, BuildMetaMessage(0x2F, new byte[0]));
+    }
+
+
         public void AddBend(int track, int tick, byte channel, byte value)
         {
             AddEvent(track, tick, new MidiMessage(new byte[] { MakeCommand(0xE0, channel), 0, FixValue(value) }));
@@ -115,7 +121,6 @@ namespace AlphaTab.Audio.Generator
             }
             AddNote(_metronomeTrack, start, length, DefaultMetronomeKey, DynamicValue.F, MidiUtils.PercussionChannel);
         }
-
 
         private static MidiMessage BuildMetaMessage(int metaType, byte[] data)
         {
@@ -163,6 +168,5 @@ namespace AlphaTab.Audio.Generator
 
             return new MidiMessage(sysex.ToArray());
         }
-
     }
 }

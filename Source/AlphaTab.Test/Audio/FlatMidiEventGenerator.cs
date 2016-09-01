@@ -345,6 +345,14 @@ namespace AlphaTab.Test.Audio
             }
         }
 
+        public class TrackEndEvent : TrackMidiEvent
+        {
+            public override string ToString()
+            {
+                return "End of Track " + base.ToString();
+            }
+        }
+
         public List<MidiEvent> MidiEvents { get; private set; }
 
         public FlatMidiEventGenerator()
@@ -434,6 +442,15 @@ namespace AlphaTab.Test.Audio
             {
                 Tick = start,
                 Length = length
+            });
+        }
+
+        public void FinishTrack(int track, int tick)
+        {
+            MidiEvents.Add(new TrackEndEvent
+            {
+                Track = track,
+                Tick = tick
             });
         }
     }
