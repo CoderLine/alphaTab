@@ -85,6 +85,7 @@ namespace AlphaTab.Rendering.Utils
 
     public class MasterBarBounds
     {
+        public bool IsFirstOfLine { get; set; }
         public Bounds VisualBounds { get; set; }
         public Bounds RealBounds { get; set; }
         public FastList<BarBounds> Bars { get; set; }

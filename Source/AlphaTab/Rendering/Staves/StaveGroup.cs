@@ -393,6 +393,7 @@ namespace AlphaTab.Rendering.Staves
                     if (i == 0)
                     {
                         var masterBarBounds = new MasterBarBounds();
+                        masterBarBounds.IsFirstOfLine = renderer.IsFirstOfLine;
                         masterBarBounds.RealBounds = new Bounds(x + renderer.X, realTop, renderer.Width, realHeight);
                         masterBarBounds.VisualBounds = new Bounds(x + renderer.X, visualTop, renderer.Width, visualHeight);
                         Layout.Renderer.BoundsLookup.AddMasterBar(masterBarBounds);

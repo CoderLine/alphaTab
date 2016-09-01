@@ -1641,6 +1641,7 @@ AlphaTab.Rendering.Utils.BoundsLookup.FromJson = function (json, score){
         lookup.AddStaveGroup(sg);
         for (var $i7 = 0,$t7 = staveGroup.Bars,$l7 = $t7.length,masterBar = $t7[$i7]; $i7 < $l7; $i7++, masterBar = $t7[$i7]){
             var mb = new AlphaTab.Rendering.Utils.MasterBarBounds();
+            mb.IsFirstOfLine = masterBar.IsFirstOfLine;
             mb.VisualBounds = AlphaTab.Rendering.Utils.BoundsLookup.BoundsFromJson(masterBar.VisualBounds);
             mb.RealBounds = AlphaTab.Rendering.Utils.BoundsLookup.BoundsFromJson(masterBar.RealBounds);
             sg.AddBar(mb);
@@ -15337,6 +15338,7 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
                 var renderer = this.Staves[i].FirstStaffInAccolade.BarRenderers[j];
                 if (i == 0){
                     var masterBarBounds = new AlphaTab.Rendering.Utils.MasterBarBounds();
+                    masterBarBounds.IsFirstOfLine = renderer.get_IsFirstOfLine();
                     masterBarBounds.RealBounds = new AlphaTab.Rendering.Utils.Bounds(x + renderer.X, realTop, renderer.Width, realHeight);
                     masterBarBounds.VisualBounds = new AlphaTab.Rendering.Utils.Bounds(x + renderer.X, visualTop, renderer.Width, visualHeight);
                     this.Layout.Renderer.BoundsLookup.AddMasterBar(masterBarBounds);
@@ -15940,6 +15942,7 @@ AlphaTab.Rendering.Utils.StaveGroupBounds.prototype = {
     }
 };
 AlphaTab.Rendering.Utils.MasterBarBounds = function (){
+    this.IsFirstOfLine = false;
     this.VisualBounds = null;
     this.RealBounds = null;
     this.Bars = null;

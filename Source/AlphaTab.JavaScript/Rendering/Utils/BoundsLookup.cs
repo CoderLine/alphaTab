@@ -79,6 +79,7 @@ namespace AlphaTab.Rendering.Utils
                 foreach (var masterBar in staveGroup.Bars)
                 {
                     var mb = new MasterBarBounds();
+                    mb.IsFirstOfLine = masterBar.IsFirstOfLine;
                     mb.VisualBounds = BoundsFromJson(masterBar.VisualBounds);
                     mb.RealBounds = BoundsFromJson(masterBar.RealBounds);
                     sg.AddBar(mb);
