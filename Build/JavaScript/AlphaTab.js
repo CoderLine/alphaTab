@@ -8783,6 +8783,7 @@ $StaticConstructor(function (){
     AlphaTab.Model.Track.ShortNameMaxLength = 10;
 });
 AlphaTab.Model.Track.CopyTo = function (src, dst){
+    dst.Name = src.Name;
     dst.Capo = src.Capo;
     dst.Index = src.Index;
     dst.ShortName = src.ShortName;

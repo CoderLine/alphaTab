@@ -99,6 +99,7 @@ namespace AlphaTab.Model
 
         public static void CopyTo(Track src, Track dst)
         {
+            dst.Name = src.Name;
             dst.Capo = src.Capo;
             dst.Index = src.Index;
             dst.ShortName = src.ShortName;
