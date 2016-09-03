@@ -80,6 +80,7 @@ namespace AlphaTab
             }
 
             var settings = Defaults;
+            settings.ScriptFile = Environment.ScriptFile;
 
             FillFromJson(settings, json);
 

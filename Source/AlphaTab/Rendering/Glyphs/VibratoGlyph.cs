@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly float _scale;
 
-        public VibratoGlyph(float x, float y, float scale = 0.9f)
+        public VibratoGlyph(float x, float y, float scale = 1)
             : base(BeatXPosition.EndBeat)
         {
             _scale = scale;
@@ -36,7 +36,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var startX = cx + X;
             var width = endX - startX;
-            var step = 11 * Scale * _scale;
+            var step = 9 * Scale * _scale;
             var loops = (int)Math.Max(1, width / step);
 
             var loopX = 0f;
