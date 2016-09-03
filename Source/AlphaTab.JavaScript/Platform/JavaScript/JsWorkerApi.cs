@@ -16,9 +16,9 @@ namespace AlphaTab.Platform.JavaScript
         {
         }
 
-        protected override IScoreRenderer CreateScoreRenderer(Settings settings, object rawSettings, HtmlElement canvasElement)
+        protected override IScoreRenderer CreateScoreRenderer(Settings settings, HtmlElement canvasElement)
         {
-            var renderer = new WorkerScoreRenderer(settings, rawSettings);
+            var renderer = new WorkerScoreRenderer(settings);
             renderer.ScoreLoaded += score =>
             {
                 ScoreLoaded(score, false);

@@ -16,103 +16,45 @@
  * License along with this library.
  */
 using AlphaTab.Model;
-using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class DynamicsGlyph : EffectGlyph
+    public class DynamicsGlyph : MusicFontGlyph
     {
-        private const float GlyphScale = 0.8f;
-
-        private readonly DynamicValue _dynamics;
-
         public DynamicsGlyph(float x, float y, DynamicValue dynamics)
-            : base(x, y)
+                  : base(x, y, 0.6f, GetSymbol(dynamics))
         {
-            _dynamics = dynamics;
         }
 
-        public override void Paint(float cx, float cy, ICanvas canvas)
+        private static MusicFontSymbol GetSymbol(DynamicValue dynamics)
         {
-            Glyph[] glyphs;
-
-            switch (_dynamics)
+            switch (dynamics)
             {
                 case DynamicValue.PPP:
-                    glyphs = new[] { P, P, P };
-                    break;
+                    return MusicFontSymbol.DynamicPPP;
                 case DynamicValue.PP:
-                    glyphs = new[] { P, P };
-                    break;
+                    return MusicFontSymbol.DynamicPP;
                 case DynamicValue.P:
-                    glyphs = new[] { P };
-                    break;
+                    return MusicFontSymbol.DynamicP;
                 case DynamicValue.MP:
-                    glyphs = new[] { M, P };
-                    break;
+                    return MusicFontSymbol.DynamicMP;
                 case DynamicValue.MF:
-                    glyphs = new[] { M, F };
-                    break;
+                    return MusicFontSymbol.DynamicMF;
                 case DynamicValue.F:
-                    glyphs = new[] { F };
-                    break;
+                    return MusicFontSymbol.DynamicF;
                 case DynamicValue.FF:
-                    glyphs = new[] { F, F };
-                    break;
+                    return MusicFontSymbol.DynamicFFF;
                 case DynamicValue.FFF:
-                    glyphs = new[] { F, F, F };
-                    break;
+                    return MusicFontSymbol.DynamicFFF;
                 default:
-                    return;
-            }
-
-            var glyphWidth = 0f;
-            foreach (var g in glyphs)
-            {
-                glyphWidth += g.Width;
-            }
-
-            var startX = (Width - glyphWidth) / 2;
-
-            foreach (var g in glyphs)
-            {
-                g.X = startX;
-                g.Y = 0;
-                g.Renderer = Renderer;
-
-                g.Paint(cx + X, cy + Y, canvas);
-                startX += g.Width;
+                    return MusicFontSymbol.None;
             }
         }
 
-        private Glyph P
+        public override void DoLayout()
         {
-            get
-            {
-                var p = new MusicFontGlyph(0, 0, GlyphScale, MusicFontSymbol.DynamicP);
-                p.Width = 7 * Scale;
-                return p;
-            }
-        }
-
-        private Glyph M
-        {
-            get
-            {
-                var m = new MusicFontGlyph(0, 0, GlyphScale, MusicFontSymbol.DynamicM);
-                m.Width = 7 * Scale;
-                return m;
-            }
-        }
-
-        private Glyph F
-        {
-            get
-            {
-                var f = new MusicFontGlyph(0, 0, GlyphScale, MusicFontSymbol.DynamicF);
-                f.Width = 7 * Scale;
-                return f;
-            }
+            base.DoLayout();
+            Y += Renderer.Height * 0.75f;
         }
     }
 }

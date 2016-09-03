@@ -15,15 +15,19 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using AlphaTab.Platform.Svg;
+
 namespace AlphaTab
 {
     public partial class Environment
     {
         static void PlatformInit()
         {
-            RenderEngines["default"] = d => new AlphaTab.Platform.CSharp.GdiCanvas();
-            RenderEngines["gdi"] = d => new AlphaTab.Platform.CSharp.GdiCanvas();
-            FileLoaders["default"] = () => new AlphaTab.Platform.CSharp.CsFileLoader();
+            RenderEngines["default"] = d => new Platform.CSharp.GdiCanvas();
+            RenderEngines["svg"] = d => new PathSvgCanvas();
+            RenderEngines["gdi"] = d => new Platform.CSharp.GdiCanvas();
+            FileLoaders["default"] = () => new Platform.CSharp.CsFileLoader();
         }
     }
 }

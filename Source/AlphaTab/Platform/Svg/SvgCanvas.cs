@@ -27,9 +27,11 @@ namespace AlphaTab.Platform.Svg
     /// <summary>
     ///  A canvas implementation storing SVG data
     /// </summary>
-    public class SvgCanvas : ICanvas, IPathCanvas
+    public abstract class SvgCanvas : ICanvas, IPathCanvas
     {
-        private StringBuilder _buffer;
+        protected const float BlurCorrection = 0.5f;
+
+        protected StringBuilder Buffer;
         private StringBuilder _currentPath;
         private bool _currentPathIsEmpty;
 
@@ -53,54 +55,54 @@ namespace AlphaTab.Platform.Svg
 
         public void BeginRender(float width, float height)
         {
-            _buffer = new StringBuilder();
+            Buffer = new StringBuilder();
 
-            _buffer.Append("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
-            _buffer.Append(width);
-            _buffer.Append("px\" height=\"");
-            _buffer.Append(height);
-            _buffer.Append("px\" class=\"alphaTabSurfaceSvg\">\n");
+            Buffer.Append("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
+            Buffer.Append(width);
+            Buffer.Append("px\" height=\"");
+            Buffer.Append(height);
+            Buffer.Append("px\" class=\"alphaTabSurfaceSvg\">\n");
             _currentPath = new StringBuilder();
             _currentPathIsEmpty = true;
         }
 
         public object EndRender()
         {
-            _buffer.Append("</svg>");
-            return _buffer.ToString();
+            Buffer.Append("</svg>");
+            return Buffer.ToString();
         }
 
         public void FillRect(float x, float y, float w, float h)
         {
-            _buffer.Append("<rect x=\"");
-            _buffer.Append(x - 0.5f);
-            _buffer.Append("\" y=\"");
-            _buffer.Append(y - 0.5f);
-            _buffer.Append("\" width=\"");
-            _buffer.Append(w);
-            _buffer.Append("\" height=\"");
-            _buffer.Append(h);
-            _buffer.Append("\" style=\"fill:");
-            _buffer.Append(Color.ToRgbaString());
-            _buffer.Append(";\" />\n");
+            Buffer.Append("<rect x=\"");
+            Buffer.Append(x - BlurCorrection);
+            Buffer.Append("\" y=\"");
+            Buffer.Append(y - BlurCorrection);
+            Buffer.Append("\" width=\"");
+            Buffer.Append(w);
+            Buffer.Append("\" height=\"");
+            Buffer.Append(h);
+            Buffer.Append("\" style=\"fill:");
+            Buffer.Append(Color.ToRgbaString());
+            Buffer.Append(";\" />\n");
         }
 
         public void StrokeRect(float x, float y, float w, float h)
         {
-            _buffer.Append("<rect x=\"");
-            _buffer.Append(x - 0.5f);
-            _buffer.Append("\" y=\"");
-            _buffer.Append(y - 0.5f);
-            _buffer.Append("\" width=\"");
-            _buffer.Append(w);
-            _buffer.Append("\" height=\"");
-            _buffer.Append(h);
-            _buffer.Append("\" style=\"stroke:");
-            _buffer.Append(Color.ToRgbaString());
-            _buffer.Append("; stroke-width:");
-            _buffer.Append(LineWidth);
-            _buffer.Append("; fill:transparent");
-            _buffer.Append(";\" />\n");
+            Buffer.Append("<rect x=\"");
+            Buffer.Append(x - BlurCorrection);
+            Buffer.Append("\" y=\"");
+            Buffer.Append(y - BlurCorrection);
+            Buffer.Append("\" width=\"");
+            Buffer.Append(w);
+            Buffer.Append("\" height=\"");
+            Buffer.Append(h);
+            Buffer.Append("\" style=\"stroke:");
+            Buffer.Append(Color.ToRgbaString());
+            Buffer.Append("; stroke-width:");
+            Buffer.Append(LineWidth);
+            Buffer.Append("; fill:transparent");
+            Buffer.Append(";\" />\n");
         }
 
         public void BeginPath()
@@ -116,18 +118,18 @@ namespace AlphaTab.Platform.Svg
         public void MoveTo(float x, float y)
         {
             _currentPath.Append(" M");
-            _currentPath.Append(x - 0.5f);
+            _currentPath.Append(x - BlurCorrection);
             _currentPath.Append(",");
-            _currentPath.Append(y - 0.5f);
+            _currentPath.Append(y - BlurCorrection);
         }
 
         public void LineTo(float x, float y)
         {
             _currentPathIsEmpty = false;
             _currentPath.Append(" L");
-            _currentPath.Append(x - 0.5f);
+            _currentPath.Append(x - BlurCorrection);
             _currentPath.Append(",");
-            _currentPath.Append(y - 0.5f);
+            _currentPath.Append(y - BlurCorrection);
         }
 
         public void QuadraticCurveTo(float cpx, float cpy, float x, float y)
@@ -189,11 +191,11 @@ namespace AlphaTab.Platform.Svg
         {
             if (!_currentPathIsEmpty)
             {
-                _buffer.Append("<path d=\"");
-                _buffer.Append(_currentPath.ToString());
-                _buffer.Append("\" style=\"fill:");
-                _buffer.Append(Color.ToRgbaString());
-                _buffer.Append("\" stroke=\"none\"/>\n");
+                Buffer.Append("<path d=\"");
+                Buffer.Append(_currentPath.ToString());
+                Buffer.Append("\" style=\"fill:");
+                Buffer.Append(Color.ToRgbaString());
+                Buffer.Append("\" stroke=\"none\"/>\n");
             }
             _currentPath = new StringBuilder();
             _currentPathIsEmpty = true;
@@ -203,13 +205,13 @@ namespace AlphaTab.Platform.Svg
         {
             if (!_currentPathIsEmpty)
             {
-                _buffer.Append("<path d=\"");
-                _buffer.Append(_currentPath.ToString());
-                _buffer.Append("\" style=\"stroke:");
-                _buffer.Append(Color.ToRgbaString());
-                _buffer.Append("; stroke-width:");
-                _buffer.Append(LineWidth);
-                _buffer.Append(";\" fill=\"none\" />\n");
+                Buffer.Append("<path d=\"");
+                Buffer.Append(_currentPath.ToString());
+                Buffer.Append("\" style=\"stroke:");
+                Buffer.Append(Color.ToRgbaString());
+                Buffer.Append("; stroke-width:");
+                Buffer.Append(LineWidth);
+                Buffer.Append(";\" fill=\"none\" />\n");
             }
             _currentPath = new StringBuilder();
             _currentPathIsEmpty = true;
@@ -217,22 +219,22 @@ namespace AlphaTab.Platform.Svg
 
         public void FillText(string text, float x, float y)
         {
-            _buffer.Append("<text x=\"");
-            _buffer.Append(x);
-            _buffer.Append("\" y=\"");
-            _buffer.Append(y + GetSvgBaseLineOffset());
-            _buffer.Append("\" style=\"font:");
-            _buffer.Append(Font.ToCssString());
-            _buffer.Append("; fill:");
-            _buffer.Append(Color.ToRgbaString());
-            _buffer.Append(";\" ");
-            _buffer.Append(" dominant-baseline=\"");
-            _buffer.Append(GetSvgBaseLine());
-            _buffer.Append("\" text-anchor=\"");
-            _buffer.Append(GetSvgTextAlignment());
-            _buffer.Append("\">\n");
-            _buffer.Append(text);
-            _buffer.Append("</text>\n");
+            Buffer.Append("<text x=\"");
+            Buffer.Append(x);
+            Buffer.Append("\" y=\"");
+            Buffer.Append(y + GetSvgBaseLineOffset());
+            Buffer.Append("\" style=\"font:");
+            Buffer.Append(Font.ToCssString());
+            Buffer.Append("; fill:");
+            Buffer.Append(Color.ToRgbaString());
+            Buffer.Append(";\" ");
+            Buffer.Append(" dominant-baseline=\"");
+            Buffer.Append(GetSvgBaseLine());
+            Buffer.Append("\" text-anchor=\"");
+            Buffer.Append(GetSvgTextAlignment());
+            Buffer.Append("\">\n");
+            Buffer.Append(text);
+            Buffer.Append("</text>\n");
         }
 
         private string GetSvgTextAlignment()
@@ -246,7 +248,7 @@ namespace AlphaTab.Platform.Svg
             return "";
         }
 
-        private float GetSvgBaseLineOffset()
+        protected float GetSvgBaseLineOffset()
         {
             switch (TextBaseline)
             {
@@ -279,35 +281,6 @@ namespace AlphaTab.Platform.Svg
             return FontSizes.MeasureString(text, font, Font.Size, Font.Style);
         }
 
-        public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)
-        {
-            if (symbol == MusicFontSymbol.None)
-            {
-                return;
-            }
-
-            //_buffer += "<text x=\"";
-            //_buffer += x;
-            //_buffer += "\" y=\"";
-            //_buffer += y + GetSvgBaseLineOffset();
-            //_buffer += "\" style=\"font:";
-            //_buffer += Resources.MusicFont.ToCssString();
-            //_buffer += "; fill:";
-            //_buffer += Color.ToRgbaString();
-            //_buffer += ";\" ";
-            //_buffer += " dominant-baseline=\"top\" text-anchor=\"start\"";
-            //_buffer += ">&#x";
-            //_buffer += Std.ToHexString((int)symbol);
-            //_buffer += ";</text>\n";
-
-
-            //if (symbol == MusicFontSymbol.None)
-            //{
-            //    return;
-            //}
-
-            SvgRenderer glyph = new SvgRenderer(MusicFont.SymbolLookup[symbol], scale, scale);
-            glyph.Paint(x, y, this);
-        }
+        public abstract void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol);
     }
 }

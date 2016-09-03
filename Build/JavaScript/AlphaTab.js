@@ -184,8 +184,11 @@ var AlphaTab = AlphaTab || {};
 AlphaTab.Environment = function (){
 };
 AlphaTab.Environment.PlatformInit = function (){
+    AlphaTab.Environment.RenderEngines["svg"] = function (d){
+        return new AlphaTab.Platform.Svg.FontSvgCanvas();
+    };
     AlphaTab.Environment.RenderEngines["default"] = function (d){
-        return new AlphaTab.Platform.Svg.SvgCanvas();
+        return new AlphaTab.Platform.Svg.FontSvgCanvas();
     };
     AlphaTab.Environment.RenderEngines["html5"] = function (d){
         return new AlphaTab.Platform.JavaScript.Html5Canvas();
@@ -221,9 +224,6 @@ $StaticConstructor(function (){
     AlphaTab.Environment.LayoutEngines = {};
     AlphaTab.Environment.StaveFactories = {};
     AlphaTab.Environment.PlatformInit();
-    AlphaTab.Environment.RenderEngines["svg"] = function (d){
-        return new AlphaTab.Platform.Svg.SvgCanvas();
-    };
     // default layout engines
     AlphaTab.Environment.LayoutEngines["default"] = function (r){
         return new AlphaTab.Rendering.Layout.PageViewLayout(r);
@@ -609,6 +609,7 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
             }));
         }
     }
+    this.CreateStyleElement(settings);
     if (element != null && this.AutoSize){
         var initialResizeEventInfo = new AlphaTab.Platform.JavaScript.ResizeEventArgs();
         initialResizeEventInfo.OldWidth = 0;
@@ -617,7 +618,7 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
         this.TriggerEvent("resize", initialResizeEventInfo);
         settings.Width = initialResizeEventInfo.NewWidth;
     }
-    this.Renderer = this.CreateScoreRenderer(settings, options, this.CanvasElement);
+    this.Renderer = this.CreateScoreRenderer(settings, this.CanvasElement);
     this.Renderer.add_RenderFinished($CreateAnonymousDelegate(this, function (o){
         this.TriggerEvent("rendered", null);
     }));
@@ -656,6 +657,44 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
     }
 };
 AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
+    CreateStyleElement: function (settings){
+        var styleElement = document.getElementById("alphaTabStyle");
+        if (styleElement == null){
+            var fontDirectory = settings.ScriptFile;
+            fontDirectory = fontDirectory.substr(0, fontDirectory.lastIndexOf("/")) + "/Font/";
+            var styleUrl = "";
+            styleElement = document.createElement("style");
+            styleElement.id = "alphaTabStyle";
+            styleElement.type = "text/css";
+            var css = new Array();
+            css.push("@font-face {"+'\r\n');
+            css.push("    font-family: \'alphaTab\';"+'\r\n');
+            css.push("     src: url(\'" + fontDirectory + "bravura.eot\');"+'\r\n');
+            css.push("     src: url(\'" + fontDirectory + "bravura.eot?#iefix\') format(\'embedded-opentype\')"+'\r\n');
+            css.push("          , url(\'" + fontDirectory + "bravura.woff\') format(\'woff\')"+'\r\n');
+            css.push("          , url(\'" + fontDirectory + "bravura.otf\') format(\'opentype\')"+'\r\n');
+            css.push("          , url(\'" + fontDirectory + "bravura.svg#Bravura\') format(\'svg\');"+'\r\n');
+            css.push("     font-weight: normal;"+'\r\n');
+            css.push("     font-style: normal;"+'\r\n');
+            css.push("}"+'\r\n');
+            css.push(".at {"+'\r\n');
+            css.push("     font-family: \'alphaTab\';"+'\r\n');
+            css.push("     speak: none;"+'\r\n');
+            css.push("     font-style: normal;"+'\r\n');
+            css.push("     font-weight: normal;"+'\r\n');
+            css.push("     font-variant: normal;"+'\r\n');
+            css.push("     text-transform: none;"+'\r\n');
+            css.push("     line-height: 1;"+'\r\n');
+            css.push("     line-height: 1;"+'\r\n');
+            css.push("     -webkit-font-smoothing: antialiased;"+'\r\n');
+            css.push("     -moz-osx-font-smoothing: grayscale;"+'\r\n');
+            css.push("     font-size: 34px;"+'\r\n');
+            css.push("     overflow: visible !important;"+'\r\n');
+            css.push("}"+'\r\n');
+            styleElement.innerHTML = css.join('');
+            document.getElementsByTagName("head")[0].appendChild(styleElement);
+        }
+    },
     get_Tracks: function (){
         var tracks = [];
         for (var $i4 = 0,$t4 = this.TrackIndexes,$l4 = $t4.length,track = $t4[$i4]; $i4 < $l4; $i4++, track = $t4[$i4]){
@@ -721,8 +760,8 @@ AlphaTab.Platform.JavaScript.JsWorkerApi = function (element, options){
     AlphaTab.Platform.JavaScript.JsApiBase.call(this, element, options);
 };
 AlphaTab.Platform.JavaScript.JsWorkerApi.prototype = {
-    CreateScoreRenderer: function (settings, rawSettings, canvasElement){
-        var renderer = new AlphaTab.Platform.JavaScript.WorkerScoreRenderer(settings, rawSettings);
+    CreateScoreRenderer: function (settings, canvasElement){
+        var renderer = new AlphaTab.Platform.JavaScript.WorkerScoreRenderer(settings);
         renderer.add_ScoreLoaded($CreateAnonymousDelegate(this, function (score){
             this.ScoreLoaded(score, false);
         }));
@@ -1039,7 +1078,7 @@ AlphaTab.Platform.JavaScript.JsApi = function (element, options){
     AlphaTab.Platform.JavaScript.JsApiBase.call(this, element, options);
 };
 AlphaTab.Platform.JavaScript.JsApi.prototype = {
-    CreateScoreRenderer: function (settings, rawSettings, canvasElement){
+    CreateScoreRenderer: function (settings, canvasElement){
         return new AlphaTab.Rendering.ScoreRenderer(settings, canvasElement);
     },
     Load: function (data){
@@ -1185,7 +1224,7 @@ AlphaTab.Platform.JavaScript.JsFileLoader.GetBytesFromString = function (s){
     }
     return b;
 };
-AlphaTab.Platform.JavaScript.WorkerScoreRenderer = function (settings, rawSettings){
+AlphaTab.Platform.JavaScript.WorkerScoreRenderer = function (settings){
     this._worker = null;
     this.PreRender = null;
     this.PartialRenderFinished = null;
@@ -1194,47 +1233,16 @@ AlphaTab.Platform.JavaScript.WorkerScoreRenderer = function (settings, rawSettin
     this.ScoreLoaded = null;
     this.BoundsLookup = null;
     this.Score = null;
-    var alphaTabScriptFile;
-    // explicitly specified file/root path
-    if (rawSettings.atRoot){
-        alphaTabScriptFile = rawSettings.atRoot;
-        // append script name 
-        if (!(alphaTabScriptFile.lastIndexOf(".js")==(alphaTabScriptFile.length-".js".length))){
-            if (!(alphaTabScriptFile.lastIndexOf("/")==(alphaTabScriptFile.length-"/".length))){
-                alphaTabScriptFile += "/";
-            }
-            alphaTabScriptFile += "AlphaTab.js";
-        }
-        if (!alphaTabScriptFile.indexOf("http")==0 && !alphaTabScriptFile.indexOf("https")==0){
-            var root = new Array();
-            root.push(window.location.protocol);
-            root.push("//");
-            root.push(window.location.hostname);
-            if (window.location.port){
-                root.push(":");
-                root.push(window.location.port);
-            }
-            root.push(alphaTabScriptFile);
-            alphaTabScriptFile = root.join('');
-        }
-    }
-    else {
-        alphaTabScriptFile = AlphaTab.Environment.ScriptFile;
-    }
     this._worker = new Worker(this.CreateWorkerUrl());
     this._worker.postMessage({
         cmd: "initialize",
-        alphaTabScript: alphaTabScriptFile,
         settings: settings.ToJson()
     });
     this._worker.addEventListener("message", $CreateDelegate(this, this.HandleWorkerMessage), false);
 };
 AlphaTab.Platform.JavaScript.WorkerScoreRenderer.prototype = {
-    get_IsSvg: function (){
-        return true;
-    },
     CreateWorkerUrl: function (){
-        var source = "self.onmessage = function(e) {\r\n            if(e.data.cmd == \'initialize\') {\r\n                importScripts(e.data.alphaTabScript);\r\n                    new AlphaTab.Platform.JavaScript.JsWorker(self, e.data.settings);\r\n                }\r\n            }";
+        var source = "self.onmessage = function(e) {\r\n            if(e.data.cmd == \'initialize\') {\r\n                importScripts(e.data.settings.atRoot);\r\n                    new AlphaTab.Platform.JavaScript.JsWorker(self, e.data.settings);\r\n                }\r\n            }";
          window.URL = window.URL || window.webkitURL;;
          window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder  || window.MozBlobBuilder;;
         var blob;
@@ -1666,6 +1674,7 @@ AlphaTab.Rendering.Utils.BoundsLookup.BoundsFromJson = function (json){
     return new AlphaTab.Rendering.Utils.Bounds(json.X, json.Y, json.W, json.H);
 };
 AlphaTab.Settings = function (){
+    this.ScriptFile = null;
     this.Scale = 0;
     this.Width = 0;
     this.Height = 0;
@@ -1684,6 +1693,7 @@ AlphaTab.Settings.prototype = {
         json.engine = this.Engine;
         json.stretchForce = this.StretchForce;
         json.forcePianoFingering = this.ForcePianoFingering;
+        json.atRoot = this.ScriptFile;
         json.layout = {};
         json.layout.mode = this.Layout.Mode;
         json.layout.additionalSettings = {};
@@ -1727,6 +1737,31 @@ AlphaTab.Settings.FillFromJson = function (settings, json){
         settings.StretchForce = json.stretchForce;
     if ("forcePianoFingering"in json)
         settings.ForcePianoFingering = json.forcePianoFingering;
+    if ("atRoot"in json){
+        settings.ScriptFile = json.atRoot;
+        // append script name 
+        if (!(settings.ScriptFile.lastIndexOf(".js")==(settings.ScriptFile.length-".js".length))){
+            if (!(settings.ScriptFile.lastIndexOf("/")==(settings.ScriptFile.length-"/".length))){
+                settings.ScriptFile += "/";
+            }
+            settings.ScriptFile += "AlphaTab.js";
+        }
+        if (!settings.ScriptFile.indexOf("http")==0 && !settings.ScriptFile.indexOf("https")==0){
+            var root = new Array();
+            root.push(window.location.protocol);
+            root.push("//");
+            root.push(window.location.hostname);
+            if (window.location.port){
+                root.push(":");
+                root.push(window.location.port);
+            }
+            root.push(settings.ScriptFile);
+            settings.ScriptFile = root.join('');
+        }
+    }
+    else {
+        settings.ScriptFile = AlphaTab.Environment.ScriptFile;
+    }
     if ("layout"in json){
         if (typeof(json.layout) == "string"){
             settings.Layout.Mode = json.layout;
@@ -3057,11 +3092,11 @@ AlphaTab.Exporter.AlphaTexExporter.prototype = {
         this.StringMetaData("copyright", score.Copyright);
         this._builder.push("\\tempo ");
         this._builder.push(score.Tempo);
-        this._builder.push('\r\n');
+        this._builder.push(""+'\r\n');
         if (track.Capo > 0){
             this._builder.push("\\capo ");
             this._builder.push(track.Capo);
-            this._builder.push('\r\n');
+            this._builder.push(""+'\r\n');
         }
         this._builder.push("\\tuning");
         for (var i = 0; i < track.Tuning.length; i++){
@@ -3070,9 +3105,9 @@ AlphaTab.Exporter.AlphaTexExporter.prototype = {
         }
         this._builder.push("\\instrument ");
         this._builder.push(track.PlaybackInfo.Program);
-        this._builder.push('\r\n');
+        this._builder.push(""+'\r\n');
         this._builder.push(".");
-        this._builder.push('\r\n');
+        this._builder.push(""+'\r\n');
     },
     StringMetaData: function (key, value){
         if (!AlphaTab.Platform.Std.IsNullOrWhiteSpace(value)){
@@ -3081,7 +3116,7 @@ AlphaTab.Exporter.AlphaTexExporter.prototype = {
             this._builder.push(" \"");
             this._builder.push(value.replace("\"","\\\""));
             this._builder.push("\"");
-            this._builder.push('\r\n');
+            this._builder.push(""+'\r\n');
         }
     },
     Bars: function (track){
@@ -3090,7 +3125,7 @@ AlphaTab.Exporter.AlphaTexExporter.prototype = {
             for (var j = 0; j < track.Staves[i].Bars.length; j++){
                 if (i > 0){
                     this._builder.push(" |");
-                    this._builder.push('\r\n');
+                    this._builder.push(""+'\r\n');
                 }
                 this.Bar(track.Staves[i].Bars[j]);
             }
@@ -3403,7 +3438,7 @@ AlphaTab.Exporter.AlphaTexExporter.prototype = {
                 this._builder.push(masterBar.TimeSignatureNumerator);
                 this._builder.push(" ");
                 this._builder.push(masterBar.TimeSignatureDenominator);
-                this._builder.push('\r\n');
+                this._builder.push(""+'\r\n');
             }
             if (previousMasterBar.KeySignature != masterBar.KeySignature){
                 this._builder.push("\\ks ");
@@ -3454,7 +3489,7 @@ AlphaTab.Exporter.AlphaTexExporter.prototype = {
                         this._builder.push("c#");
                         break;
                 }
-                this._builder.push('\r\n');
+                this._builder.push(""+'\r\n');
             }
             if (bar.Clef != previousBar.Clef){
                 this._builder.push("\\clef ");
@@ -3475,22 +3510,22 @@ AlphaTab.Exporter.AlphaTexExporter.prototype = {
                         this._builder.push("g2");
                         break;
                 }
-                this._builder.push('\r\n');
+                this._builder.push(""+'\r\n');
             }
             if (masterBar.TempoAutomation != null){
                 this._builder.push("\\tempo ");
                 this._builder.push(masterBar.TempoAutomation.Value);
-                this._builder.push('\r\n');
+                this._builder.push(""+'\r\n');
             }
         }
         if (masterBar.IsRepeatStart){
             this._builder.push("\\ro ");
-            this._builder.push('\r\n');
+            this._builder.push(""+'\r\n');
         }
         if (masterBar.get_IsRepeatEnd()){
             this._builder.push("\\rc ");
             this._builder.push(masterBar.RepeatCount + 1);
-            this._builder.push('\r\n');
+            this._builder.push(""+'\r\n');
         }
     }
 };
@@ -4732,7 +4767,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         var notice = new Array();
         for (var i = 0; i < noticeLines; i++){
             if (i > 0)
-                notice.push('\r\n');
+                notice.push(""+'\r\n');
             notice.push(this.ReadStringIntUnused());
         }
         this._score.Notices = notice.join('');
@@ -9100,12 +9135,8 @@ AlphaTab.Platform.Svg.FontSizes.MeasureString = function (s, f, size, style){
     }
     return stringSize * factor;
 };
-AlphaTab.Platform.Svg.SupportedFonts = {
-    TimesNewRoman: 0,
-    Arial: 1
-};
 AlphaTab.Platform.Svg.SvgCanvas = function (){
-    this._buffer = null;
+    this.Buffer = null;
     this._currentPath = null;
     this._currentPathIsEmpty = false;
     this._Color = null;
@@ -9160,47 +9191,47 @@ AlphaTab.Platform.Svg.SvgCanvas.prototype = {
         this._Resources = value;
     },
     BeginRender: function (width, height){
-        this._buffer = new Array();
-        this._buffer.push("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
-        this._buffer.push(width);
-        this._buffer.push("px\" height=\"");
-        this._buffer.push(height);
-        this._buffer.push("px\" class=\"alphaTabSurfaceSvg\">\n");
+        this.Buffer = new Array();
+        this.Buffer.push("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
+        this.Buffer.push(width);
+        this.Buffer.push("px\" height=\"");
+        this.Buffer.push(height);
+        this.Buffer.push("px\" class=\"alphaTabSurfaceSvg\">\n");
         this._currentPath = new Array();
         this._currentPathIsEmpty = true;
     },
     EndRender: function (){
-        this._buffer.push("</svg>");
-        return this._buffer.join('');
+        this.Buffer.push("</svg>");
+        return this.Buffer.join('');
     },
     FillRect: function (x, y, w, h){
-        this._buffer.push("<rect x=\"");
-        this._buffer.push(x - 0.5);
-        this._buffer.push("\" y=\"");
-        this._buffer.push(y - 0.5);
-        this._buffer.push("\" width=\"");
-        this._buffer.push(w);
-        this._buffer.push("\" height=\"");
-        this._buffer.push(h);
-        this._buffer.push("\" style=\"fill:");
-        this._buffer.push(this.get_Color().ToRgbaString());
-        this._buffer.push(";\" />\n");
+        this.Buffer.push("<rect x=\"");
+        this.Buffer.push(x - 0.5);
+        this.Buffer.push("\" y=\"");
+        this.Buffer.push(y - 0.5);
+        this.Buffer.push("\" width=\"");
+        this.Buffer.push(w);
+        this.Buffer.push("\" height=\"");
+        this.Buffer.push(h);
+        this.Buffer.push("\" style=\"fill:");
+        this.Buffer.push(this.get_Color().ToRgbaString());
+        this.Buffer.push(";\" />\n");
     },
     StrokeRect: function (x, y, w, h){
-        this._buffer.push("<rect x=\"");
-        this._buffer.push(x - 0.5);
-        this._buffer.push("\" y=\"");
-        this._buffer.push(y - 0.5);
-        this._buffer.push("\" width=\"");
-        this._buffer.push(w);
-        this._buffer.push("\" height=\"");
-        this._buffer.push(h);
-        this._buffer.push("\" style=\"stroke:");
-        this._buffer.push(this.get_Color().ToRgbaString());
-        this._buffer.push("; stroke-width:");
-        this._buffer.push(this.get_LineWidth());
-        this._buffer.push("; fill:transparent");
-        this._buffer.push(";\" />\n");
+        this.Buffer.push("<rect x=\"");
+        this.Buffer.push(x - 0.5);
+        this.Buffer.push("\" y=\"");
+        this.Buffer.push(y - 0.5);
+        this.Buffer.push("\" width=\"");
+        this.Buffer.push(w);
+        this.Buffer.push("\" height=\"");
+        this.Buffer.push(h);
+        this.Buffer.push("\" style=\"stroke:");
+        this.Buffer.push(this.get_Color().ToRgbaString());
+        this.Buffer.push("; stroke-width:");
+        this.Buffer.push(this.get_LineWidth());
+        this.Buffer.push("; fill:transparent");
+        this.Buffer.push(";\" />\n");
     },
     BeginPath: function (){
     },
@@ -9267,45 +9298,45 @@ AlphaTab.Platform.Svg.SvgCanvas.prototype = {
     },
     Fill: function (){
         if (!this._currentPathIsEmpty){
-            this._buffer.push("<path d=\"");
-            this._buffer.push(this._currentPath.join(''));
-            this._buffer.push("\" style=\"fill:");
-            this._buffer.push(this.get_Color().ToRgbaString());
-            this._buffer.push("\" stroke=\"none\"/>\n");
+            this.Buffer.push("<path d=\"");
+            this.Buffer.push(this._currentPath.join(''));
+            this.Buffer.push("\" style=\"fill:");
+            this.Buffer.push(this.get_Color().ToRgbaString());
+            this.Buffer.push("\" stroke=\"none\"/>\n");
         }
         this._currentPath = new Array();
         this._currentPathIsEmpty = true;
     },
     Stroke: function (){
         if (!this._currentPathIsEmpty){
-            this._buffer.push("<path d=\"");
-            this._buffer.push(this._currentPath.join(''));
-            this._buffer.push("\" style=\"stroke:");
-            this._buffer.push(this.get_Color().ToRgbaString());
-            this._buffer.push("; stroke-width:");
-            this._buffer.push(this.get_LineWidth());
-            this._buffer.push(";\" fill=\"none\" />\n");
+            this.Buffer.push("<path d=\"");
+            this.Buffer.push(this._currentPath.join(''));
+            this.Buffer.push("\" style=\"stroke:");
+            this.Buffer.push(this.get_Color().ToRgbaString());
+            this.Buffer.push("; stroke-width:");
+            this.Buffer.push(this.get_LineWidth());
+            this.Buffer.push(";\" fill=\"none\" />\n");
         }
         this._currentPath = new Array();
         this._currentPathIsEmpty = true;
     },
     FillText: function (text, x, y){
-        this._buffer.push("<text x=\"");
-        this._buffer.push(x);
-        this._buffer.push("\" y=\"");
-        this._buffer.push(y + this.GetSvgBaseLineOffset());
-        this._buffer.push("\" style=\"font:");
-        this._buffer.push(this.get_Font().ToCssString());
-        this._buffer.push("; fill:");
-        this._buffer.push(this.get_Color().ToRgbaString());
-        this._buffer.push(";\" ");
-        this._buffer.push(" dominant-baseline=\"");
-        this._buffer.push(this.GetSvgBaseLine());
-        this._buffer.push("\" text-anchor=\"");
-        this._buffer.push(this.GetSvgTextAlignment());
-        this._buffer.push("\">\n");
-        this._buffer.push(text);
-        this._buffer.push("</text>\n");
+        this.Buffer.push("<text x=\"");
+        this.Buffer.push(x);
+        this.Buffer.push("\" y=\"");
+        this.Buffer.push(y + this.GetSvgBaseLineOffset());
+        this.Buffer.push("\" style=\"font:");
+        this.Buffer.push(this.get_Font().ToCssString());
+        this.Buffer.push("; fill:");
+        this.Buffer.push(this.get_Color().ToRgbaString());
+        this.Buffer.push(";\" ");
+        this.Buffer.push(" dominant-baseline=\"");
+        this.Buffer.push(this.GetSvgBaseLine());
+        this.Buffer.push("\" text-anchor=\"");
+        this.Buffer.push(this.GetSvgTextAlignment());
+        this.Buffer.push("\">\n");
+        this.Buffer.push(text);
+        this.Buffer.push("</text>\n");
     },
     GetSvgTextAlignment: function (){
         switch (this.get_TextAlign()){
@@ -9350,32 +9381,57 @@ AlphaTab.Platform.Svg.SvgCanvas.prototype = {
             font = AlphaTab.Platform.Svg.SupportedFonts.TimesNewRoman;
         }
         return AlphaTab.Platform.Svg.FontSizes.MeasureString(text, font, this.get_Font().Size, this.get_Font().Style);
-    },
+    }
+};
+$StaticConstructor(function (){
+    AlphaTab.Platform.Svg.SvgCanvas.BlurCorrection = 0.5;
+});
+AlphaTab.Platform.Svg.PathSvgCanvas = function (){
+    AlphaTab.Platform.Svg.SvgCanvas.call(this);
+};
+AlphaTab.Platform.Svg.PathSvgCanvas.prototype = {
     FillMusicFontSymbol: function (x, y, scale, symbol){
         if (symbol == AlphaTab.Rendering.Glyphs.MusicFontSymbol.None){
             return;
         }
-        //_buffer += "<text x=\"";
-        //_buffer += x;
-        //_buffer += "\" y=\"";
-        //_buffer += y + GetSvgBaseLineOffset();
-        //_buffer += "\" style=\"font:";
-        //_buffer += Resources.MusicFont.ToCssString();
-        //_buffer += "; fill:";
-        //_buffer += Color.ToRgbaString();
-        //_buffer += ";\" ";
-        //_buffer += " dominant-baseline=\"top\" text-anchor=\"start\"";
-        //_buffer += ">&#x";
-        //_buffer += Std.ToHexString((int)symbol);
-        //_buffer += ";</text>\n";
-        //if (symbol == MusicFontSymbol.None)
-        //{
-        //    return;
-        //}
         var glyph = new AlphaTab.Rendering.Utils.SvgRenderer(AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[symbol], scale, scale);
         glyph.Paint(x, y, this);
     }
 };
+$Inherit(AlphaTab.Platform.Svg.PathSvgCanvas, AlphaTab.Platform.Svg.SvgCanvas);
+AlphaTab.Platform.Svg.SupportedFonts = {
+    TimesNewRoman: 0,
+    Arial: 1
+};
+AlphaTab.Platform.Svg.FontSvgCanvas = function (){
+    AlphaTab.Platform.Svg.SvgCanvas.call(this);
+};
+AlphaTab.Platform.Svg.FontSvgCanvas.prototype = {
+    FillMusicFontSymbol: function (x, y, scale, symbol){
+        if (symbol == AlphaTab.Rendering.Glyphs.MusicFontSymbol.None){
+            return;
+        }
+        this.Buffer.push("<svg x=\"");
+        this.Buffer.push(x - 0.5);
+        this.Buffer.push("\" y=\"");
+        this.Buffer.push(y - 0.5);
+        this.Buffer.push("\" class=\"at\" >");
+        this.Buffer.push("<text style=\"fill:");
+        this.Buffer.push(this.get_Color().ToRgbaString());
+        this.Buffer.push("; ");
+        if (scale != 1){
+            this.Buffer.push("font-size: ");
+            this.Buffer.push(scale * 100);
+            this.Buffer.push("%");
+        }
+        this.Buffer.push("\" text-anchor=\"start\"");
+        this.Buffer.push(">&#x");
+        this.Buffer.push(AlphaTab.Platform.Std.ToHexString(symbol));
+        this.Buffer.push(";</text>\n");
+        this.Buffer.push("</svg>");
+    }
+};
+$Inherit(AlphaTab.Platform.Svg.FontSvgCanvas, AlphaTab.Platform.Svg.SvgCanvas);
 AlphaTab.Rendering.BarRendererBase = function (bar){
     this._preBeatGlyphs = null;
     this._voiceContainers = null;
@@ -10230,7 +10286,7 @@ AlphaTab.Rendering.Effects.TempoEffectInfo.prototype = {
         return true;
     },
     ShouldCreateGlyph: function (renderer, beat){
-        return beat.Index == 0 && (beat.Voice.Bar.get_MasterBar().TempoAutomation != null || beat.Voice.Bar.Index == 0);
+        return beat.Voice.Index == 0 && beat.Index == 0 && (beat.Voice.Bar.get_MasterBar().TempoAutomation != null || beat.Voice.Bar.Index == 0);
     },
     get_SizingMode: function (){
         return AlphaTab.Rendering.EffectBarGlyphSizing.SinglePreBeat;
@@ -11017,74 +11073,37 @@ AlphaTab.Rendering.Glyphs.DrumSticksGlyph.prototype = {
 };
 $Inherit(AlphaTab.Rendering.Glyphs.DrumSticksGlyph, AlphaTab.Rendering.Glyphs.MusicFontGlyph);
 AlphaTab.Rendering.Glyphs.DynamicsGlyph = function (x, y, dynamics){
-    this._dynamics = AlphaTab.Model.DynamicValue.PPP;
-    AlphaTab.Rendering.Glyphs.EffectGlyph.call(this, x, y);
-    this._dynamics = dynamics;
+    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, 0.6, AlphaTab.Rendering.Glyphs.DynamicsGlyph.GetSymbol(dynamics));
 };
 AlphaTab.Rendering.Glyphs.DynamicsGlyph.prototype = {
-    Paint: function (cx, cy, canvas){
-        var glyphs;
-        switch (this._dynamics){
-            case AlphaTab.Model.DynamicValue.PPP:
-                glyphs = [this.get_P(), this.get_P(), this.get_P()];
-                break;
-            case AlphaTab.Model.DynamicValue.PP:
-                glyphs = [this.get_P(), this.get_P()];
-                break;
-            case AlphaTab.Model.DynamicValue.P:
-                glyphs = [this.get_P()];
-                break;
-            case AlphaTab.Model.DynamicValue.MP:
-                glyphs = [this.get_M(), this.get_P()];
-                break;
-            case AlphaTab.Model.DynamicValue.MF:
-                glyphs = [this.get_M(), this.get_F()];
-                break;
-            case AlphaTab.Model.DynamicValue.F:
-                glyphs = [this.get_F()];
-                break;
-            case AlphaTab.Model.DynamicValue.FF:
-                glyphs = [this.get_F(), this.get_F()];
-                break;
-            case AlphaTab.Model.DynamicValue.FFF:
-                glyphs = [this.get_F(), this.get_F(), this.get_F()];
-                break;
-            default:
-                return;
-        }
-        var glyphWidth = 0;
-        for (var $i29 = 0,$l29 = glyphs.length,g = glyphs[$i29]; $i29 < $l29; $i29++, g = glyphs[$i29]){
-            glyphWidth += g.Width;
-        }
-        var startX = (this.Width - glyphWidth) / 2;
-        for (var $i30 = 0,$l30 = glyphs.length,g = glyphs[$i30]; $i30 < $l30; $i30++, g = glyphs[$i30]){
-            g.X = startX;
-            g.Y = 0;
-            g.Renderer = this.Renderer;
-            g.Paint(cx + this.X, cy + this.Y, canvas);
-            startX += g.Width;
-        }
-    },
-    get_P: function (){
-        var p = new AlphaTab.Rendering.Glyphs.MusicFontGlyph(0, 0, 0.8, AlphaTab.Rendering.Glyphs.MusicFontSymbol.DynamicP);
-        p.Width = 7 * this.get_Scale();
-        return p;
-    },
-    get_M: function (){
-        var m = new AlphaTab.Rendering.Glyphs.MusicFontGlyph(0, 0, 0.8, AlphaTab.Rendering.Glyphs.MusicFontSymbol.DynamicM);
-        m.Width = 7 * this.get_Scale();
-        return m;
-    },
-    get_F: function (){
-        var f = new AlphaTab.Rendering.Glyphs.MusicFontGlyph(0, 0, 0.8, AlphaTab.Rendering.Glyphs.MusicFontSymbol.DynamicF);
-        f.Width = 7 * this.get_Scale();
-        return f;
+    DoLayout: function (){
+        AlphaTab.Rendering.Glyphs.Glyph.prototype.DoLayout.call(this);
+        this.Y += this.Renderer.Height * 0.75;
     }
 };
-$StaticConstructor(function (){
-    AlphaTab.Rendering.Glyphs.DynamicsGlyph.GlyphScale = 0.8;
-});
-$Inherit(AlphaTab.Rendering.Glyphs.DynamicsGlyph, AlphaTab.Rendering.Glyphs.EffectGlyph);
+AlphaTab.Rendering.Glyphs.DynamicsGlyph.GetSymbol = function (dynamics){
+    switch (dynamics){
+        case AlphaTab.Model.DynamicValue.PPP:
+            return AlphaTab.Rendering.Glyphs.MusicFontSymbol.DynamicPPP;
+        case AlphaTab.Model.DynamicValue.PP:
+            return AlphaTab.Rendering.Glyphs.MusicFontSymbol.DynamicPP;
+        case AlphaTab.Model.DynamicValue.P:
+            return AlphaTab.Rendering.Glyphs.MusicFontSymbol.DynamicP;
+        case AlphaTab.Model.DynamicValue.MP:
+            return AlphaTab.Rendering.Glyphs.MusicFontSymbol.DynamicMP;
+        case AlphaTab.Model.DynamicValue.MF:
+            return AlphaTab.Rendering.Glyphs.MusicFontSymbol.DynamicMF;
+        case AlphaTab.Model.DynamicValue.F:
+            return AlphaTab.Rendering.Glyphs.MusicFontSymbol.DynamicF;
+        case AlphaTab.Model.DynamicValue.FF:
+            return AlphaTab.Rendering.Glyphs.MusicFontSymbol.DynamicFFF;
+        case AlphaTab.Model.DynamicValue.FFF:
+            return AlphaTab.Rendering.Glyphs.MusicFontSymbol.DynamicFFF;
+        default:
+            return AlphaTab.Rendering.Glyphs.MusicFontSymbol.None;
+    }
+};
+$Inherit(AlphaTab.Rendering.Glyphs.DynamicsGlyph, AlphaTab.Rendering.Glyphs.MusicFontGlyph);
 AlphaTab.Rendering.Glyphs.FadeInGlyph = function (x, y){
     AlphaTab.Rendering.Glyphs.EffectGlyph.call(this, x, y);
 };
@@ -11388,42 +11407,22 @@ $StaticConstructor(function (){
     AlphaTab.Rendering.Glyphs.MusicFont.FooterDownSixteenth = new AlphaTab.Rendering.Glyphs.LazySvg("M 943 -1912c 62 -135 94 -280 94 -435c 0 -202 -61 -404 -183 -605h -57c 108 233 162 430 162 590c 0 117 -26 220 -78 309c -52 89 -118 166 -198 230c -80 64 -187 137 -322 220s -220 136 -257 161v 72h -86V -8h 86c 6 -108 28 -200 65 -276s 74 -133 111 -170s 109 -106 218 -206s 190 -184 245 -252c 87 -109 151 -216 191 -319s 60 -212 60 -328C 994 -1648 977 -1764 943 -1912zM 897 -1815c 0 17 0 41 1 72s 1 53 1 68c 0 369 -266 701 -798 996c 3 -120 31 -229 83 -327s 130 -199 233 -303s 195 -195 276 -273C 776 -1659 843 -1737 897 -1815");
     AlphaTab.Rendering.Glyphs.MusicFont.FooterDownThirtySecond = new AlphaTab.Rendering.Glyphs.LazySvg("M 14 -1990V -10h 87c 11 -121 35 -216 70 -283c 35 -66 89 -134 161 -202c 72 -68 174 -164 307 -288c 235 -226 353 -494 353 -802c 0 -106 -14 -211 -43 -317c 29 -90 43 -186 43 -287c 0 -79 -12 -171 -36 -274c 57 -73 86 -191 86 -352c 0 -112 -15 -226 -46 -342s -76 -218 -137 -308h -57c 108 223 162 418 162 582c 0 104 -20 199 -62 284s -99 163 -172 232c -73 69 -153 133 -239 192s -215 142 -389 251v 64H 14zM 108 -1292c 7 -113 39 -215 96 -305c 56 -89 129 -176 218 -259s 179 -168 273 -257c 93 -88 160 -168 199 -240c 2 19 3 48 3 87C 900 -1904 636 -1579 108 -1292zM 115 -666c 0 -106 23 -197 71 -272s 129 -166 247 -274s 209 -197 276 -268s 129 -168 187 -288c 7 42 10 83 10 122c 0 146 -40 280 -120 401c -80 121 -171 221 -273 300C 411 -867 278 -774 115 -666");
     AlphaTab.Rendering.Glyphs.MusicFont.FooterDownSixtyFourth = new AlphaTab.Rendering.Glyphs.LazySvg("M 21 -2851V -564v -554h 86c 0 -140 32 -254 98 -342c 65 -87 173 -200 322 -339s 261 -271 336 -400s 113 -292 113 -490c 0 -96 -12 -208 -36 -338c 43 -83 65 -188 65 -316c 0 -122 -21 -237 -65 -345c 48 -109 72 -223 72 -342c 0 -117 -24 -222 -72 -316c 57 -85 86 -205 86 -360c 0 -218 -53 -443 -161 -673h -65c 98 280 147 498 147 652c 0 115 -22 210 -65 284s -93 130 -149 170c -56 39 -153 100 -291 183s -247 156 -327 221l 0 -87L 21 -2851zM 107 -2001c 0 -121 29 -233 89 -336s 138 -203 236 -301s 192 -190 280 -278c 88 -87 149 -166 181 -235c 11 60 17 112 17 155c 0 212 -81 405 -244 578C 505 -2246 318 -2106 107 -2001zM 114 -668c 0 -119 22 -219 68 -300s 127 -176 245 -286c 118 -109 208 -198 272 -265c 63 -66 128 -163 195 -290c 7 46 10 90 10 133c 0 166 -41 313 -124 439s -177 229 -281 308C 395 -848 267 -762 114 -668zM 114 -1338c 0 -123 24 -226 73 -309s 133 -176 252 -282s 211 -193 278 -263s 128 -164 183 -283c 9 45 14 94 14 147c 0 138 -39 270 -116 395s -177 236 -297 334S 252 -1413 114 -1338");
-    AlphaTab.Rendering.Glyphs.MusicFont.SimileMark = new AlphaTab.Rendering.Glyphs.LazySvg("M 413 1804l -446 3l 1804 -1806l 449 -3L 413 1804zM 331 434c 0 -53 20 -100 62 -142c 41 -41 91 -62 148 -62s 104 19 142 56c 38 38 56 87 56 148c 0 56 -19 105 -59 145c -39 39 -88 59 -145 59c -56 0 -105 -19 -145 -59C 351 540 331 491 331 434zM 1437 1380c 0 -56 18 -104 56 -142c 37 -37 87 -56 148 -56c 56 0 104 19 142 56c 38 38 56 85 56 142c 0 56 -19 104 -56 142c -38 38 -87 56 -148 56c -56 0 -104 -19 -142 -56C 1456 1485 1437 1437 1437 1380");
-    AlphaTab.Rendering.Glyphs.MusicFont.SimileMark2 = new AlphaTab.Rendering.Glyphs.LazySvg("M 414 1818l -446 3l 1809 -1809l 449 -6L 414 1818zM 340 439c 0 -56 18 -104 56 -142c 37 -37 87 -56 148 -56c 56 0 105 20 145 59c 39 39 59 88 59 145c 0 56 -19 104 -56 142c -38 38 -89 56 -153 56c -56 0 -104 -18 -142 -56C 359 549 340 500 340 439zM 1152 1815l -446 3l 1812 -1812l 446 -3L 1152 1815zM 2192 1391c 0 -56 18 -104 56 -142c 38 -37 87 -56 148 -56c 56 0 104 19 142 56c 37 38 56 85 56 142c 0 56 -19 104 -56 142c -38 38 -87 56 -148 56c -56 0 -104 -19 -142 -56C 2211 1495 2192 1448 2192 1391");
-    AlphaTab.Rendering.Glyphs.MusicFont.Coda = new AlphaTab.Rendering.Glyphs.LazySvg("M 697 1689v 299h -72v -299c -189 0 -349 -81 -478 -244c -129 -163 -193 -349 -193 -558h -248v -73h 248c 0 -216 63 -409 189 -581c 126 -171 287 -257 481 -257v -248h 72v 248c 189 0 345 84 467 254s 182 364 182 585h 284v 73h -284c 0 209 -60 395 -182 558C 1042 1608 887 1689 697 1689zM 624 813v -737c -126 14 -208 88 -244 222c -36 133 -54 305 -54 514H 624zM 324 886c 0 262 25 445 76 547s 125 158 222 167v -715H 324zM 697 813h 292c 0 -221 -12 -378 -36 -471c -43 -166 -129 -257 -255 -272V 813zM 989 886h -292v 715c 97 -9 170 -64 219 -164C 964 1338 989 1154 989 886");
-    AlphaTab.Rendering.Glyphs.MusicFont.Segno = new AlphaTab.Rendering.Glyphs.LazySvg("M 604 1150c -182 -112 -324 -222 -425 -329c -126 -131 -189 -256 -189 -372c 0 -116 42 -218 128 -306c 85 -87 194 -131 327 -131c 98 0 196 32 294 97c 98 64 147 141 147 229c 0 56 -9 104 -28 142c -18 38 -50 56 -94 56c -100 0 -155 -46 -164 -137c 0 -18 8 -45 25 -80c 17 -34 21 -63 11 -85c -22 -69 -86 -104 -192 -104c -67 0 -123 20 -168 61c -44 40 -67 84 -67 131c 0 135 64 248 193 339c 25 18 155 88 392 207l 571 -843l 148 0l -611 900c 196 121 334 223 415 304c 118 118 177 245 177 379c 0 112 -43 214 -130 304c -86 90 -193 136 -320 136c -102 0 -202 -34 -300 -102c -97 -68 -146 -152 -146 -251c 0 -37 13 -79 40 -125c 27 -46 57 -69 93 -69c 47 0 82 12 105 38c 22 25 38 65 47 120c 6 22 0 51 -16 87c -17 36 -22 65 -16 87c 9 31 35 56 78 75c 42 18 91 28 147 28c 58 0 105 -21 142 -65c 36 -43 55 -89 55 -139c 0 -139 -89 -263 -269 -371c -133 -68 -232 -117 -297 -148l -544 810l -152 -1L 604 1150zM 201 1091c 34 0 64 11 89 32s 37 51 37 89c 0 34 -12 64 -37 89c -25 25 -54 37 -89 37c -34 0 -64 -12 -89 -37c -25 -25 -37 -54 -37 -89C 74 1131 116 1091 201 1091zM 1291 696c 34 0 64 12 89 37c 25 25 37 54 37 89c 0 31 -12 59 -37 84c -25 25 -54 37 -89 37s -63 -11 -86 -35s -35 -52 -35 -87c 0 -34 10 -64 32 -89C 1224 708 1253 696 1291 696");
-    AlphaTab.Rendering.Glyphs.MusicFont.OttavaAbove = new AlphaTab.Rendering.Glyphs.LazySvg("M 488 562c 78 9 147 45 206 110c 59 64 88 138 88 222c 0 95 -39 171 -118 227c -78 55 -175 83 -290 83c -112 0 -208 -28 -288 -85c -80 -56 -120 -134 -120 -233c 0 -41 5 -77 15 -107c 10 -29 29 -61 56 -94c 27 -32 77 -62 149 -89c 12 -3 28 -7 49 -13c -69 -12 -127 -48 -172 -107c -45 -59 -68 -123 -68 -190c 0 -88 37 -161 113 -217s 158 -84 249 -84c 96 0 185 29 265 87c 80 58 120 131 120 220c 0 73 -22 134 -68 183c -24 24 -62 47 -113 68C 547 545 521 553 488 562zM 279 588c -66 21 -118 57 -156 108c -37 51 -56 112 -56 181c 0 72 27 141 83 206c 56 65 130 97 224 97c 90 0 166 -36 226 -108c 51 -60 77 -124 77 -190c 0 -54 -21 -101 -63 -140c -30 -27 -68 -49 -113 -68L 279 588zM 460 547c 130 -39 195 -127 195 -263c 0 -66 -25 -129 -77 -188c -51 -59 -122 -88 -213 -88c -87 0 -155 28 -202 86c -47 57 -70 119 -70 186c 0 36 14 72 43 108c 28 36 68 63 120 81L 460 547zM 842 311l -13 -9l 68 -58c 24 -21 51 -28 81 -22c 27 3 40 24 40 63c 0 36 -15 100 -47 192c -31 92 -47 149 -47 170c 0 33 13 46 40 40c 42 -3 94 -47 156 -133c 61 -86 93 -156 93 -211c 0 -12 -7 -22 -22 -31c -18 -9 -28 -16 -31 -22c -15 -30 -7 -49 22 -59c 30 -12 52 9 68 63c 18 75 -12 167 -93 274c -80 107 -147 161 -201 161c -57 0 -86 -24 -86 -72c 0 -18 4 -37 13 -59c 9 -21 23 -65 43 -133c 19 -68 29 -120 29 -156c 0 -15 -1 -25 -4 -31c -9 -18 -24 -19 -45 -4L 842 311zM 1636 683l 81 -68l -72 83c -18 19 -36 29 -54 29c -15 0 -21 -15 -18 -45l 40 -167c -3 21 -28 59 -77 113c -57 66 -109 99 -154 99c -66 0 -99 -39 -99 -118c 0 -78 28 -159 86 -242c 57 -83 122 -124 195 -124c 39 0 74 15 104 45l 9 -45h 31l -95 407c -6 18 -7 30 -4 36S 1621 692 1636 683zM 1382 683c 51 0 107 -37 167 -111c 18 -24 43 -63 77 -115l 31 -134c -33 -34 -66 -51 -99 -51c -54 0 -105 40 -152 120c -46 80 -70 154 -70 222C 1336 660 1351 683 1382 683");
-    AlphaTab.Rendering.Glyphs.MusicFont.OttavaBelow = new AlphaTab.Rendering.Glyphs.LazySvg("M 469 529c 75 6 143 41 202 107c 59 65 88 141 88 229c 0 97 -39 173 -118 229c -78 56 -175 84 -290 84c -112 0 -208 -28 -288 -86c -80 -57 -120 -136 -120 -236c 0 -33 6 -68 18 -104c 12 -36 31 -69 56 -97s 65 -55 120 -79c 18 -6 43 -15 77 -27c -69 -12 -126 -47 -170 -104s -65 -121 -65 -191c 0 -85 37 -156 113 -214c 75 -57 157 -86 245 -86c 93 0 182 28 265 86c 83 57 124 130 124 218c 0 72 -22 133 -68 182c -24 24 -62 47 -113 68C 528 512 502 520 469 529zM 251 563c -66 21 -118 57 -154 108c -36 51 -54 112 -54 181c 0 72 27 141 84 206c 55 65 130 97 224 97c 93 0 169 -36 226 -108c 48 -60 72 -124 72 -190c 0 -51 -21 -98 -63 -140c -30 -30 -66 -52 -108 -68L 251 563zM 432 522c 130 -39 195 -128 195 -265c 0 -67 -25 -130 -77 -189c -51 -59 -121 -89 -208 -89c -87 0 -155 29 -202 89c -47 59 -70 119 -70 180c 0 36 13 74 40 112s 66 66 118 84L 432 522zM 827 268h -13l 63 -45c 24 -27 52 -39 86 -36c 24 3 36 23 36 60c 0 34 -15 98 -45 191c -30 93 -45 154 -45 182c 0 34 13 49 40 46c 42 -3 94 -49 156 -138c 61 -89 93 -161 93 -218c 0 -12 -10 -25 -31 -37c -15 -6 -22 -12 -22 -18c -15 -30 -9 -50 18 -59c 33 -12 57 9 72 64c 18 76 -12 168 -93 277c -80 108 -146 162 -197 162c -63 0 -95 -28 -95 -84c 0 -8 3 -22 9 -40c 18 -47 35 -102 52 -164c 16 -62 24 -105 24 -129c 0 -17 -3 -29 -9 -35c -6 -6 -18 -4 -36 4L 827 268zM 1413 -13l -72 -9c 23 6 53 1 89 -15c 11 -3 30 -15 53 -35l -131 444c 30 -45 64 -81 102 -108c 38 -27 76 -40 116 -40c 39 0 68 11 86 34c 18 22 27 55 27 98c 0 79 -30 156 -90 231c -60 74 -137 112 -231 112c -30 0 -57 -8 -81 -24c -24 -16 -33 -36 -27 -62L 1413 -13zM 1294 635c 15 21 42 32 81 32c 78 0 146 -42 204 -128c 48 -73 72 -145 72 -215c 0 -30 -7 -50 -22 -59c -18 -9 -36 -13 -54 -13c -36 0 -77 17 -122 52c -45 35 -81 77 -108 126L 1294 635");
-    AlphaTab.Rendering.Glyphs.MusicFont.QuindicesimaAbove = new AlphaTab.Rendering.Glyphs.LazySvg("M 245 985V 270v -72c -9 -8 -30 -13 -61 -13c -25 0 -42 1 -52 4l -99 31l -4 -22l 317 -190v 980c 0 39 6 68 20 88c 13 19 31 34 52 43l 145 40v 9h -531l -4 -18l 149 -40c 24 -9 42 -24 54 -45C 241 1050 245 1024 245 985zM 685 338c 60 15 105 27 136 36c 96 27 167 53 213 77c 175 87 263 192 263 313c 0 72 -15 140 -47 204s -70 111 -115 142c -45 31 -87 53 -124 65c -37 12 -94 18 -170 18c -66 0 -128 -13 -186 -40c -57 -27 -86 -63 -86 -108c 0 -24 16 -36 49 -36c 18 0 41 5 70 15c 28 10 61 35 97 74c 36 39 69 59 99 59c 96 0 170 -39 222 -118c 42 -63 63 -131 63 -204c 0 -57 -18 -108 -56 -152c -37 -43 -79 -77 -124 -102c -45 -24 -125 -54 -240 -90c -36 -12 -87 -27 -154 -45l 154 -426h 426c 36 0 65 -4 86 -13l 45 -34l 22 -29h 9l -127 195h -449L 685 338zM 1806 561h -59l 145 -367c 0 -18 0 -30 0 -36c -6 -27 -21 -42 -45 -45c -24 -3 -51 13 -81 50c -3 6 -9 16 -18 31l -145 367h -68l 154 -379c -3 -15 -4 -26 -4 -32c -6 -21 -18 -34 -36 -37c -45 -6 -98 34 -158 121c -9 12 -21 34 -36 65h -18c 30 -47 54 -83 72 -106c 57 -71 111 -106 163 -106c 18 2 34 14 50 34c 2 5 9 17 18 34c 9 -17 16 -28 22 -34c 24 -22 60 -34 108 -34c 18 0 33 11 45 34c 2 5 7 18 13 38c 18 -21 31 -34 40 -40c 36 -27 74 -37 113 -31c 30 6 49 24 59 54c 3 9 6 25 9 49l -122 304c -3 15 -4 25 -4 31c 0 9 6 13 18 13c 18 0 39 -17 63 -52c 6 -11 16 -28 31 -52l 13 4c -15 29 -27 49 -36 61c -30 43 -56 65 -77 65c -51 0 -71 -20 -59 -62l 122 -306c 0 -17 0 -29 0 -35c -6 -23 -22 -35 -49 -35s -51 10 -72 31c -6 6 -15 18 -27 36L 1806 561zM 2555 525l 77 -63l -72 73c -18 17 -36 26 -54 26c -15 0 -21 -12 -18 -36l 40 -158c -6 31 -43 78 -113 138c -45 40 -84 60 -118 60c -66 0 -99 -38 -99 -114c 0 -79 28 -158 86 -235c 57 -77 122 -116 195 -116c 24 0 48 5 72 16c 6 2 16 9 31 20l 9 -36h 31l -95 395c -6 18 -7 30 -4 35C 2526 535 2537 534 2555 525zM 2292 525c 51 0 108 -35 172 -107c 21 -23 46 -61 77 -112l 27 -134c -30 -29 -63 -44 -99 -44c -54 0 -105 38 -152 116c -46 77 -70 149 -70 215C 2246 502 2262 525 2292 525");
-    AlphaTab.Rendering.Glyphs.MusicFont.QuindicesimaBelow = new AlphaTab.Rendering.Glyphs.LazySvg("M 2400 -200C 2376 -180 2358 -170 2346 -166C 2310 -150 2280 -144 2256 -150L 2328 -141L 2168 484C 2162 509 2172 530 2196 546C 2221 562 2247 571 2278 571C 2371 571 2448 534 2509 459C 2569 384 2600 307 2600 228C 2600 185 2590 151 2571 128C 2553 105 2526 93 2487 93C 2448 93 2409 107 2371 134C 2333 161 2299 198 2268 243L 2400 -200zM 1300 -57L 1278 -29L 1234 6C 1213 15 1183 21 1146 21L 721 21L 565 446C 632 464 685 481 721 493C 836 530 913 560 959 584C 1004 608 1046 640 1084 684C 1122 728 1143 780 1143 837C 1143 910 1120 980 1078 1043C 1026 1122 953 1159 856 1159C 825 1159 792 1139 756 1100C 719 1060 687 1035 659 1025C 630 1014 605 1009 587 1009C 554 1009 537 1022 537 1046C 537 1092 567 1129 625 1156C 682 1183 742 1196 809 1196C 884 1196 943 1190 981 1178C 1018 1166 1060 1144 1106 1112C 1151 1080 1190 1032 1221 968C 1253 905 1268 838 1268 765C 1268 644 1181 540 1006 453C 960 429 890 402 793 375C 763 365 716 352 656 337L 734 140L 1184 140L 1309 -57L 1300 -57zM 315 6L 0 196L 3 221L 103 190C 112 187 130 184 156 184C 187 184 206 187 215 196L 215 268L 215 984C 215 1023 212 1050 203 1065C 191 1086 171 1100 146 1109L 0 1150L 3 1168L 534 1168L 534 1159L 387 1118C 366 1109 351 1094 337 1075C 323 1055 315 1026 315 987L 315 6zM 1640 84C 1589 84 1535 119 1478 190C 1459 214 1436 249 1406 296L 1425 296C 1440 265 1450 246 1459 234C 1519 147 1573 106 1618 112C 1636 115 1650 128 1656 150C 1656 156 1656 165 1659 181L 1506 562L 1571 562L 1718 193C 1727 178 1734 168 1737 162C 1767 126 1794 109 1818 112C 1842 115 1856 129 1862 156L 1862 193L 1718 562L 1778 562L 1921 193C 1933 175 1943 162 1950 156C 1971 135 1994 125 2021 125C 2049 125 2065 138 2071 162L 2071 196L 1950 503C 1937 544 1957 565 2009 565C 2030 565 2057 543 2087 500C 2096 488 2106 466 2121 437L 2109 434C 2094 457 2084 475 2078 487C 2053 522 2030 537 2012 537C 2000 537 1996 534 1996 525C 1996 519 1997 508 2000 493L 2121 190C 2118 166 2115 149 2112 140C 2103 110 2083 90 2053 84C 2013 78 1976 88 1940 115C 1931 121 1918 135 1900 156C 1893 136 1890 124 1887 118C 1875 95 1858 84 1840 84C 1792 84 1755 96 1731 118C 1725 124 1718 136 1709 153C 1700 136 1693 124 1690 118C 1675 98 1658 87 1640 84zM 2490 121C 2508 121 2528 125 2546 134C 2562 143 2568 163 2568 193C 2568 264 2545 335 2496 409C 2439 495 2372 537 2293 537C 2254 537 2224 527 2209 506L 2259 300C 2286 251 2323 210 2368 175C 2414 139 2454 121 2490 121z");
-    AlphaTab.Rendering.Glyphs.MusicFont.FermataShort = new AlphaTab.Rendering.Glyphs.LazySvg("M 60 694l -110 1l 660 -713l 656 713l -66 -1l -562 -611L 60 694zM 662 488c 29 0 54 10 74 30s 30 44 30 74c 0 29 -10 54 -30 74s -44 30 -74 30c -29 0 -54 -10 -74 -30s -30 -44 -30 -74c 0 -29 10 -54 30 -74S 633 488 662 488");
-    AlphaTab.Rendering.Glyphs.MusicFont.FermataNormal = new AlphaTab.Rendering.Glyphs.LazySvg("M 871 230c -216 0 -405 69 -565 209c -160 139 -255 317 -284 531c -2 -16 -4 -32 -4 -48c 0 -21 0 -36 0 -44c 0 -228 84 -427 252 -599c 168 -171 368 -257 600 -257c 229 0 429 84 598 254c 169 169 254 370 254 603c 0 40 0 70 0 92c -26 -216 -119 -394 -278 -533C 1283 299 1093 230 871 230zM 869 767c 29 0 54 10 74 30s 30 44 30 74c 0 29 -9 53 -28 72c -18 18 -44 28 -76 28c -26 0 -50 -9 -72 -28c -21 -18 -32 -42 -32 -72c 0 -29 10 -54 30 -74S 839 767 869 767");
-    AlphaTab.Rendering.Glyphs.MusicFont.FermataLong = new AlphaTab.Rendering.Glyphs.LazySvg("M 55 702h -68v -704h 1317v 704h -68v -500h -1180V 702zM 647 494c 29 0 54 10 74 30s 30 44 30 74c 0 29 -10 54 -30 74s -44 30 -74 30c -29 0 -54 -10 -74 -30s -30 -44 -30 -74c 0 -29 10 -54 30 -74S 618 494 647 494");
     AlphaTab.Rendering.Glyphs.MusicFont.DynamicP = new AlphaTab.Rendering.Glyphs.LazySvg("M 447 894l -146 415l 92 0v 50h -364v -50h 93l 310 -797c 7 -9 10 -16 10 -21c 7 -19 7 -33 0 -43c -14 -14 -27 -21 -39 -21c -38 0 -83 48 -133 144c -14 31 -34 79 -61 144h -25c 26 -72 48 -125 64 -158c 57 -108 116 -162 176 -162c 19 0 33 2 43 7c 12 4 21 18 28 39c 2 7 4 19 7 36c 16 -26 47 -52 90 -79c 43 -26 89 -39 137 -39c 19 0 45 5 77 16c 32 10 59 37 81 78c 21 41 32 89 32 141c 0 35 -2 64 -7 86c -4 21 -13 50 -25 86c -26 64 -71 123 -133 177s -119 80 -169 80C 528 1024 481 981 447 894zM 754 425c -33 -14 -73 5 -119 58c -36 43 -67 92 -93 145c -26 53 -39 113 -39 181c 0 48 9 78 28 90c 26 14 62 0 108 -41c 45 -42 81 -92 108 -150c 9 -24 19 -56 28 -96c 9 -40 14 -74 14 -103C 790 462 778 435 754 425");
     AlphaTab.Rendering.Glyphs.MusicFont.DynamicF = new AlphaTab.Rendering.Glyphs.LazySvg("M 951 406v 39h -194l -18 90c -48 194 -97 344 -147 447c -67 141 -154 245 -259 310c -33 21 -77 32 -129 32c -77 0 -127 -21 -151 -64c -14 -26 -21 -51 -21 -75c 0 -38 13 -71 41 -97c 27 -26 57 -37 88 -32c 55 9 83 36 83 79c 0 16 -3 32 -10 46c -9 33 -32 55 -68 64c -12 2 -16 7 -14 14c 4 19 22 28 54 28c 16 -2 36 -14 57 -36c 7 -7 22 -26 47 -57c 52 -79 102 -205 147 -378c 19 -77 38 -154 57 -231l 32 -140h -137v -39h 144c -14 -55 21 -139 108 -252c 65 -84 144 -139 238 -166c 28 -7 57 -10 86 -10c 60 0 109 15 148 46c 38 31 57 72 57 122c 0 48 -14 81 -43 99c -28 18 -56 21 -83 9c -31 -14 -46 -38 -46 -72c 0 -28 10 -52 32 -72c 7 -7 22 -12 46 -14c 24 -2 37 -8 39 -18c 7 -28 -16 -43 -72 -43c -33 0 -64 6 -93 18c -77 33 -132 102 -166 205c -9 33 -20 83 -32 148H 951");
-    AlphaTab.Rendering.Glyphs.MusicFont.DynamicM = new AlphaTab.Rendering.Glyphs.LazySvg("M 553 1076l -165 1l 201 -502c 7 -12 11 -21 14 -28c 12 -26 18 -45 18 -57c 0 -21 -8 -33 -25 -36c -31 -7 -62 9 -93 50c -9 12 -22 33 -39 65l -199 508l -164 0l 212 -501c 4 -10 7 -17 7 -22c 4 -19 7 -37 7 -52c 0 -17 -3 -28 -10 -33c -9 -10 -22 -14 -39 -14c -50 0 -116 61 -198 183c -12 19 -30 47 -54 84h -18c 43 -73 78 -126 104 -160c 86 -106 165 -154 238 -142c 16 2 37 21 61 56c 7 10 18 28 32 56c 14 -26 28 -45 43 -57c 45 -40 101 -61 166 -61c 31 0 54 19 68 57c 2 12 6 32 10 61c 21 -30 39 -51 54 -62c 48 -39 101 -56 158 -49c 55 7 89 30 104 69c 2 11 3 30 3 55l -163 437c -12 19 -20 32 -22 39c -7 14 -4 22 7 25c 21 2 54 -20 97 -68c 14 -14 34 -39 61 -75h 21c -31 44 -56 78 -75 101c -62 67 -125 101 -188 101c -24 0 -43 -10 -57 -32c -14 -21 -16 -43 -7 -65l 169 -429c 4 -7 6 -11 6 -14c 10 -26 16 -47 16 -64c 0 -26 -10 -40 -32 -43c -28 -7 -58 9 -89 50c -9 12 -22 33 -39 64L 553 1076");
     AlphaTab.Rendering.Glyphs.MusicFont.Accentuation = new AlphaTab.Rendering.Glyphs.LazySvg("M 748 286C 382 365 16 445 -350 525c 0 -23 0 -46 0 -69C -58 400 234 344 526 288 233 233 -58 178 -351 124c 0 -24 0 -49 0 -74 366 78 732 157 1099 236z");
     AlphaTab.Rendering.Glyphs.MusicFont.HeavyAccentuation = new AlphaTab.Rendering.Glyphs.LazySvg("M -223 900L -275 900l 349 -1004l 353 1004l -128 0l -264 -750L -223 900");
     AlphaTab.Rendering.Glyphs.MusicFont.WaveHorizontal = new AlphaTab.Rendering.Glyphs.LazySvg("M 1382 230c -43 32 -92 69 -146 111s -104 76 -149 105c -45 28 -89 51 -134 68s -86 26 -127 28c -47 -6 -87 -19 -119 -38s -79 -51 -143 -98c -64 -46 -117 -81 -160 -102c -42 -21 -90 -32 -141 -32c -79 0 -174 55 -285 166v -112c 132 -110 241 -193 327 -249s 166 -83 244 -83c 48 0 93 11 134 34c 40 22 88 56 144 101c 55 44 103 79 143 103c 40 24 85 37 135 40c 89 -7 182 -55 278 -146V 230");
-    AlphaTab.Rendering.Glyphs.MusicFont.WaveVertical = new AlphaTab.Rendering.Glyphs.LazySvg("M 165 4h 50c 47 44 86 85 115 122s 43 75 43 114c 0 31 -9 60 -28 85c -19 25 -47 55 -85 89s -66 64 -86 90c -19 26 -30 55 -31 88h 5c 0 31 9 60 27 86c 18 25 46 56 84 93s 66 68 86 95c 19 27 28 57 28 92c 0 33 -9 62 -28 89c -19 26 -47 57 -85 92c -37 35 -65 64 -84 89c -18 24 -27 51 -27 82c 0 17 22 59 67 127h -50c -59 -57 -100 -100 -124 -130c -23 -29 -35 -67 -35 -113c 0 -33 9 -62 27 -86c 18 -24 46 -53 85 -87c 38 -33 66 -63 85 -88c 18 -25 28 -55 28 -91c 0 -17 -8 -37 -26 -61s -42 -54 -73 -89c -31 -35 -53 -60 -64 -75c -41 -64 -61 -109 -61 -135c 1 -40 20 -80 56 -119c 35 -38 72 -77 110 -117c 38 -39 58 -76 60 -112c 0 -18 -4 -35 -13 -50C 210 72 192 44 165 4");
     AlphaTab.Rendering.Glyphs.MusicFont.PickStrokeDown = new AlphaTab.Rendering.Glyphs.LazySvg("M 0 -20h 816v 844h -74v -477h -672v 477H 0V -20");
     AlphaTab.Rendering.Glyphs.MusicFont.PickStrokeUp = new AlphaTab.Rendering.Glyphs.LazySvg("M 551 -7L 289 950l -264 -956h 66l 202 759l 193 -759H 551");
     AlphaTab.Rendering.Glyphs.MusicFont.TremoloPickingThirtySecond = new AlphaTab.Rendering.Glyphs.LazySvg("M -488 787v -250l 986 -505v 253L -488 787zM -488 1200v -250l 986 -505v 253L -488 1200zM -488 1612v -250l 986 -505v 261L -488 1612");
     AlphaTab.Rendering.Glyphs.MusicFont.TremoloPickingSixteenth = new AlphaTab.Rendering.Glyphs.LazySvg("M -488 787v -250l 986 -505v 253L -488 787zM -488 1200v -250l 986 -505v 253L -488 1200");
     AlphaTab.Rendering.Glyphs.MusicFont.TremoloPickingEighth = new AlphaTab.Rendering.Glyphs.LazySvg("M -488 787v -250l 986 -505v 253L -488 787");
-    AlphaTab.Rendering.Glyphs.MusicFont.UpperMordent = new AlphaTab.Rendering.Glyphs.LazySvg("M 16 714v -195l 425 -494c 34 -22 53 -33 56 -33c 19 0 33 6 39 20l 349 306c 17 17 36 28 56 33c 19 -6 33 -12 39 -19l 264 -307c 33 -22 53 -33 59 -33c 17 0 29 6 36 20l 349 306c 20 21 39 34 55 40c 20 -7 34 -16 40 -26l 224 -264v 194l -422 494c -32 22 -54 33 -66 33c -15 0 -26 -6 -33 -19l -346 -310c -15 -15 -37 -23 -66 -23c -16 0 -26 3 -29 9l -267 310c -25 22 -46 33 -62 33c -14 0 -25 -6 -33 -19l -346 -310c -18 -19 -40 -29 -66 -29c -14 0 -25 5 -32 16L 16 714");
-    AlphaTab.Rendering.Glyphs.MusicFont.LowerMordent = new AlphaTab.Rendering.Glyphs.LazySvg("M -34 664v -195l 399 -458c 34 -37 58 -56 72 -56s 41 18 82 56l 352 310v -607h 99v 525l 191 -227c 38 -41 62 -62 72 -62c 10 0 38 16 82 50l 277 247c 64 53 99 80 102 82c 10 -2 24 -15 43 -38c 18 -23 33 -39 42 -50l 115 -142v 178l -349 412c -26 34 -51 52 -75 52c -12 0 -40 -19 -83 -59l -257 -230c -46 -46 -83 -69 -111 -69c -7 0 -12 1 -17 5c -4 3 -9 9 -16 17c -6 8 -11 14 -16 19v 607h -99v -492l -121 149c -31 34 -56 52 -75 52c -7 0 -15 -2 -22 -6c -7 -4 -18 -12 -32 -25c -14 -12 -25 -21 -33 -27l -290 -263c -35 -28 -57 -42 -66 -42c -15 0 -33 14 -56 42L -34 664");
-    AlphaTab.Rendering.Glyphs.MusicFont.Turn = new AlphaTab.Rendering.Glyphs.LazySvg("M 1141 739c -20 -17 -65 -56 -136 -115c -70 -60 -143 -117 -218 -172c -75 -54 -150 -100 -224 -136c -73 -36 -140 -54 -199 -54c -74 6 -138 45 -191 115s -82 143 -85 218c 8 119 77 179 208 179c 18 0 33 -3 45 -9c 11 -6 31 -20 59 -40c 28 -20 53 -35 75 -45c 22 -9 48 -14 79 -14c 89 0 146 39 170 117c 0 76 -31 132 -93 169c -62 36 -129 55 -202 55c -165 -8 -290 -53 -373 -135c -83 -82 -124 -182 -124 -301c 0 -85 22 -171 67 -255c 44 -84 107 -155 189 -213c 81 -57 174 -92 279 -105c 137 0 267 29 388 89c 121 59 240 137 356 232c 116 95 229 188 337 278c 42 35 97 69 165 101c 67 31 131 47 191 47c 92 -5 162 -35 210 -91c 47 -56 71 -121 71 -196c 0 -64 -18 -119 -55 -162c -36 -43 -85 -65 -146 -65c -21 0 -50 12 -89 38c -38 25 -68 43 -90 55c -22 11 -53 17 -93 17c -42 0 -79 -14 -113 -44c -33 -29 -50 -66 -50 -111c 0 -60 31 -104 95 -134c 63 -29 130 -44 200 -44c 102 0 192 24 269 72c 76 48 135 112 175 191c 40 78 60 161 60 249c 0 87 -20 168 -60 243c -40 74 -101 134 -184 179c -82 45 -185 68 -306 68c -116 0 -224 -22 -323 -66C 1375 894 1264 827 1141 739");
-    AlphaTab.Rendering.Glyphs.MusicFont.OpenNote = new AlphaTab.Rendering.Glyphs.LazySvg("M 443 922c -124 0 -229 -45 -315 -135s -128 -197 -128 -322c 0 -130 42 -239 126 -326c 84 -87 189 -130 316 -130c 122 0 225 39 310 118c 84 78 130 177 138 295c 0 145 -41 263 -125 354S 575 915 443 922zM 426 96c -101 0 -182 35 -244 107c -61 71 -92 158 -92 260c 0 101 32 185 98 252s 150 100 254 100c 113 0 201 -36 264 -109s 94 -168 94 -288C 780 204 655 96 426 96");
-    AlphaTab.Rendering.Glyphs.MusicFont.StoppedNote = new AlphaTab.Rendering.Glyphs.LazySvg("M 462 1009v -449h -445v -122h 445V -3h 118v 441h 452v 122h -452v 449H 462");
     AlphaTab.Rendering.Glyphs.MusicFont.Tempo = new AlphaTab.Rendering.Glyphs.LazySvg("M 550 1578V 30l 43 8v 1679c 0 86 -41 160 -124 220s -173 90 -272 90c -114 0 -182 -46 -203 -139c 0 -84 41 -164 125 -239s 173 -112 270 -112C 457 1539 510 1552 550 1578zM 914 1686v -76h 540v 76H 914zM 914 1850h 540v 80h -540V 1850");
     AlphaTab.Rendering.Glyphs.MusicFont.AccidentalSharp = new AlphaTab.Rendering.Glyphs.LazySvg("M 482 -275v -577h 93v 540l 135 -57v 343l -135 57v 551l 135 -62v 343l -135 57v 561h -93v -525l -223 93v 566h -93v -530l -135 52v -343l 135 -52v -551l -135 57v -348l 135 -52v -561h 93v 525L 482 -275zM 258 156v 551l 223 -93v -546L 258 156");
     AlphaTab.Rendering.Glyphs.MusicFont.AccidentalFlat = new AlphaTab.Rendering.Glyphs.LazySvg("M -23 -1273h 93v 1300c 48 -27 86 -48 114 -62c 93 -41 176 -62 249 -62c 52 0 97 13 137 39c 39 26 70 70 91 132c 10 31 15 62 15 93c 0 100 -50 204 -150 311c -72 76 -157 143 -254 202c -41 24 -97 69 -166 135c -45 41 -88 84 -130 129V -1273zM 367 17c -7 -3 -13 -6 -20 -10c -17 -6 -33 -10 -46 -10c -27 0 -59 7 -93 23c -34 15 -79 46 -135 91v 644c 65 -65 131 -131 197 -197c 128 -156 192 -284 192 -384C 460 103 429 51 367 17");
     AlphaTab.Rendering.Glyphs.MusicFont.AccidentalNatural = new AlphaTab.Rendering.Glyphs.LazySvg("M 38 472V -1283h 99v 792l 478 -132v 1738h -93v -775L 38 472zM 137 180l 385 -104v -429l -385 104V 180");
     AlphaTab.Rendering.Glyphs.MusicFont.ClefNeutral = new AlphaTab.Rendering.Glyphs.LazySvg("M 915 1887v -1875h 337v 1875H 915zM 1477 1887v -1875h 337v 1875H 1477");
     AlphaTab.Rendering.Glyphs.MusicFont.RestSixtyFourth = new AlphaTab.Rendering.Glyphs.LazySvg("M 705 -2202c 77 -26 144 -77 200 -150c 56 -73 101 -174 136 -305l 127 -547c -69 127 -197 191 -382 191c -46 0 -100 -7 -162 -23c -61 -15 -114 -46 -156 -92c -42 -46 -63 -108 -63 -185c 0 -65 23 -121 69 -168c 46 -46 104 -69 174 -69c 65 0 123 25 174 75c 50 50 75 104 75 162c 0 31 -7 63 -23 98c -15 34 -44 63 -87 87c 46 15 71 23 75 23c 7 0 27 -3 57 -11c 77 -23 148 -81 213 -174c 53 -73 86 -137 98 -191l 154 -638c -73 128 -198 192 -375 192c -30 0 -61 0 -92 0c -34 -11 -57 -19 -69 -23c -69 -19 -125 -52 -167 -98c -42 -46 -63 -106 -63 -179c 0 -69 23 -127 69 -174c 46 -46 104 -69 174 -69s 128 24 176 72c 48 48 72 103 72 165c 0 31 -7 63 -23 98c -15 34 -42 65 -81 92c 19 7 40 15 63 23c 11 0 32 -3 63 -11c 73 -23 140 -80 202 -169c 61 -89 121 -179 179 -271l 41 0l -1032 4425l -107 0l 319 -1316c -73 128 -196 192 -370 192c -19 0 -38 0 -57 0c -27 -3 -68 -13 -124 -28c -55 -15 -105 -46 -147 -92c -42 -46 -63 -106 -63 -179c 0 -65 23 -121 69 -168c 46 -46 106 -69 179 -69c 65 0 122 24 171 72c 48 48 72 103 72 165c 0 30 -7 63 -23 98c -15 34 -44 63 -87 87c 46 15 71 23 75 23c 7 0 26 -3 57 -11c 76 -23 150 -83 219 -180c 57 -77 86 -129 86 -156l 161 -667c -73 124 -198 186 -375 186c -30 0 -61 0 -92 0c -34 -11 -57 -19 -69 -22c -69 -19 -125 -51 -167 -97c -42 -45 -63 -105 -63 -177c 0 -68 23 -126 69 -172c 46 -45 106 -68 179 -68c 65 0 122 23 171 71c 48 47 72 102 72 163c 0 30 -7 63 -23 97c -15 34 -44 65 -87 91c 23 7 46 14 69 21C 653 -2190 674 -2194 705 -2202");
-    AlphaTab.Rendering.Glyphs.MusicFont.AccidentalDoubleFlat = new AlphaTab.Rendering.Glyphs.LazySvg("M 67 25c 52 -27 93 -48 124 -62c 100 -45 176 -67 228 -67c 45 0 95 12 150 36V -1275h 88v 1300c 48 -27 88 -48 119 -62c 100 -45 183 -67 249 -67c 55 0 104 13 145 39c 41 26 72 71 93 137c 10 31 15 62 15 93c 0 107 -48 212 -145 316c -72 79 -163 143 -270 192c -34 17 -78 52 -132 104c -53 51 -108 107 -163 166v -529c -38 45 -72 83 -104 115c -55 55 -121 103 -197 141c -45 20 -102 68 -171 141c -41 41 -81 85 -119 131V -1275h 88V 25zM 369 15c -7 -3 -13 -6 -20 -10c -17 -6 -33 -10 -46 -10c -31 0 -64 7 -98 23c -34 15 -79 46 -135 91v 644c 65 -65 131 -131 197 -197c 131 -159 197 -287 197 -384C 462 101 431 49 369 15zM 962 15c -3 -3 -12 -6 -26 -10c -20 -6 -36 -10 -46 -10c -31 0 -63 7 -96 23c -33 15 -77 46 -132 91v 644c 65 -65 131 -131 197 -197c 131 -159 197 -287 197 -384C 1055 101 1024 49 962 15");
-    AlphaTab.Rendering.Glyphs.MusicFont.AccidentalDoubleSharp = new AlphaTab.Rendering.Glyphs.LazySvg("M 22 243c -32 -31 -48 -68 -48 -110c 0 -38 15 -71 45 -98c 30 -27 63 -40 98 -40c 38 0 70 14 96 43c 64 57 116 124 158 199c 41 75 62 146 62 213c -83 0 -172 -30 -268 -91C 99 317 51 278 22 243zM 18 872c 25 25 59 38 100 38c 38 0 70 -14 96 -43c 44 -38 86 -86 124 -144c 64 -96 96 -187 96 -273c -70 0 -140 18 -211 55c -70 36 -137 87 -201 151c -32 31 -48 70 -48 115C -26 810 -11 843 18 872zM 848 32c -25 -25 -60 -38 -105 -38c -41 0 -76 16 -105 48c -57 67 -94 113 -110 139c -60 96 -91 185 -91 268c 92 0 182 -28 268 -86c 79 -67 124 -105 134 -115c 31 -31 48 -72 48 -120C 886 96 874 64 848 32zM 838 656c 31 31 48 70 48 115c 0 38 -14 72 -43 100s -62 43 -100 43c -38 0 -73 -16 -105 -48c -51 -57 -88 -105 -110 -144c -60 -96 -91 -187 -91 -273c 105 0 211 41 316 124C 803 622 832 650 838 656");
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup = null;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup = {};
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.ClefF] = AlphaTab.Rendering.Glyphs.MusicFont.ClefF;
@@ -11465,120 +11464,87 @@ $StaticConstructor(function (){
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.FooterDownSixteenth] = AlphaTab.Rendering.Glyphs.MusicFont.FooterDownSixteenth;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.FooterDownThirtySecond] = AlphaTab.Rendering.Glyphs.MusicFont.FooterDownThirtySecond;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.FooterDownSixtyFourth] = AlphaTab.Rendering.Glyphs.MusicFont.FooterDownSixtyFourth;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.SimileMark] = AlphaTab.Rendering.Glyphs.MusicFont.SimileMark;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.SimileMark2] = AlphaTab.Rendering.Glyphs.MusicFont.SimileMark2;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.Coda] = AlphaTab.Rendering.Glyphs.MusicFont.Coda;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.Segno] = AlphaTab.Rendering.Glyphs.MusicFont.Segno;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.OttavaAbove] = AlphaTab.Rendering.Glyphs.MusicFont.OttavaAbove;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.OttavaBelow] = AlphaTab.Rendering.Glyphs.MusicFont.OttavaBelow;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.QuindicesimaAbove] = AlphaTab.Rendering.Glyphs.MusicFont.QuindicesimaAbove;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.QuindicesimaBelow] = AlphaTab.Rendering.Glyphs.MusicFont.QuindicesimaBelow;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.FermataShort] = AlphaTab.Rendering.Glyphs.MusicFont.FermataShort;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.FermataNormal] = AlphaTab.Rendering.Glyphs.MusicFont.FermataNormal;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.FermataLong] = AlphaTab.Rendering.Glyphs.MusicFont.FermataLong;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.DynamicP] = AlphaTab.Rendering.Glyphs.MusicFont.DynamicP;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.DynamicF] = AlphaTab.Rendering.Glyphs.MusicFont.DynamicF;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.DynamicM] = AlphaTab.Rendering.Glyphs.MusicFont.DynamicM;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.Accentuation] = AlphaTab.Rendering.Glyphs.MusicFont.Accentuation;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.HeavyAccentuation] = AlphaTab.Rendering.Glyphs.MusicFont.HeavyAccentuation;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.WaveHorizontal] = AlphaTab.Rendering.Glyphs.MusicFont.WaveHorizontal;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.WaveVertical] = AlphaTab.Rendering.Glyphs.MusicFont.WaveVertical;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.PickStrokeDown] = AlphaTab.Rendering.Glyphs.MusicFont.PickStrokeDown;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.PickStrokeUp] = AlphaTab.Rendering.Glyphs.MusicFont.PickStrokeUp;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.TremoloPickingThirtySecond] = AlphaTab.Rendering.Glyphs.MusicFont.TremoloPickingThirtySecond;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.TremoloPickingSixteenth] = AlphaTab.Rendering.Glyphs.MusicFont.TremoloPickingSixteenth;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.TremoloPickingEighth] = AlphaTab.Rendering.Glyphs.MusicFont.TremoloPickingEighth;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.UpperMordent] = AlphaTab.Rendering.Glyphs.MusicFont.UpperMordent;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.LowerMordent] = AlphaTab.Rendering.Glyphs.MusicFont.LowerMordent;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.Turn] = AlphaTab.Rendering.Glyphs.MusicFont.Turn;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.OpenNote] = AlphaTab.Rendering.Glyphs.MusicFont.OpenNote;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.StoppedNote] = AlphaTab.Rendering.Glyphs.MusicFont.StoppedNote;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.Tempo] = AlphaTab.Rendering.Glyphs.MusicFont.Tempo;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.AccidentalSharp] = AlphaTab.Rendering.Glyphs.MusicFont.AccidentalSharp;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.AccidentalFlat] = AlphaTab.Rendering.Glyphs.MusicFont.AccidentalFlat;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.AccidentalNatural] = AlphaTab.Rendering.Glyphs.MusicFont.AccidentalNatural;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.ClefNeutral] = AlphaTab.Rendering.Glyphs.MusicFont.ClefNeutral;
     AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.RestSixtyFourth] = AlphaTab.Rendering.Glyphs.MusicFont.RestSixtyFourth;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.AccidentalDoubleFlat] = AlphaTab.Rendering.Glyphs.MusicFont.AccidentalDoubleFlat;
-    AlphaTab.Rendering.Glyphs.MusicFont.SymbolLookup[AlphaTab.Rendering.Glyphs.MusicFontSymbol.AccidentalDoubleSharp] = AlphaTab.Rendering.Glyphs.MusicFont.AccidentalDoubleSharp;
 });
 AlphaTab.Rendering.Glyphs.MusicFontSymbol = {
     None: -1,
-    ClefF: 32768,
-    ClefC: 32769,
-    RestThirtySecond: 32770,
-    RestQuarter: 32771,
-    GraceUp: 32772,
-    GraceDown: 32773,
-    Trill: 32774,
-    ClefG: 32775,
-    Num0: 32776,
-    Num1: 32777,
-    Num2: 32778,
-    Num3: 32779,
-    Num4: 32780,
-    Num5: 32781,
-    Num6: 32782,
-    Num7: 32783,
-    Num8: 32784,
-    Num9: 32785,
-    RestSixteenth: 32786,
-    RestEighth: 32787,
-    RestWhole: 32788,
-    NoteWhole: 32789,
-    NoteQuarter: 32790,
-    NoteHalf: 32791,
-    NoteDead: 32792,
-    NoteHarmonic: 32793,
-    NoteRideCymbal: 32794,
-    NoteHiHat: 32795,
-    NoteSideStick: 32796,
-    NoteHiHatHalf: 32797,
-    NoteChineseCymbal: 32798,
-    FooterUpEighth: 32799,
-    FooterUpSixteenth: 32800,
-    FooterUpThirtySecond: 32801,
-    FooterUpSixtyFourth: 32802,
-    FooterDownEighth: 32803,
-    FooterDownSixteenth: 32804,
-    FooterDownThirtySecond: 32805,
-    FooterDownSixtyFourth: 32806,
-    SimileMark: 32807,
-    SimileMark2: 32808,
-    Coda: 32809,
-    Segno: 32810,
-    OttavaAbove: 32811,
-    OttavaBelow: 32812,
-    QuindicesimaAbove: 32813,
-    QuindicesimaBelow: 32814,
-    FermataShort: 32815,
-    FermataNormal: 32816,
-    FermataLong: 32817,
-    DynamicP: 32818,
-    DynamicF: 32819,
-    DynamicM: 32820,
-    Accentuation: 32821,
-    HeavyAccentuation: 32822,
-    WaveHorizontal: 32823,
-    WaveVertical: 32824,
-    PickStrokeDown: 32825,
-    PickStrokeUp: 32826,
-    TremoloPickingThirtySecond: 32827,
-    TremoloPickingSixteenth: 32828,
-    TremoloPickingEighth: 32829,
-    UpperMordent: 32830,
-    LowerMordent: 32831,
-    Turn: 32832,
-    OpenNote: 32833,
-    StoppedNote: 32834,
-    Tempo: 32835,
-    AccidentalSharp: 32836,
-    AccidentalFlat: 32837,
-    AccidentalNatural: 32838,
-    ClefNeutral: 32839,
-    RestSixtyFourth: 32840,
-    AccidentalDoubleFlat: 32841,
-    AccidentalDoubleSharp: 32842
+    ClefG: 57424,
+    ClefC: 57436,
+    ClefF: 57442,
+    ClefNeutral: 57449,
+    RestWhole: 58595,
+    RestHalf: 58596,
+    RestQuarter: 58597,
+    RestEighth: 58598,
+    RestSixteenth: 58599,
+    RestThirtySecond: 58600,
+    RestSixtyFourth: 58601,
+    GraceUp: 57815,
+    GraceDown: 57816,
+    Trill: 58726,
+    Num0: 57472,
+    Num1: 57473,
+    Num2: 57474,
+    Num3: 57475,
+    Num4: 57476,
+    Num5: 57477,
+    Num6: 57478,
+    Num7: 57479,
+    Num8: 57480,
+    Num9: 57481,
+    NoteWhole: 57506,
+    NoteHalf: 57507,
+    NoteQuarter: 57508,
+    NoteDead: 57514,
+    NoteHarmonic: 57564,
+    NoteRideCymbal: 57566,
+    NoteHiHat: 57523,
+    NoteSideStick: 57513,
+    NoteHiHatHalf: 57591,
+    NoteChineseCymbal: 57593,
+    FooterUpEighth: 57920,
+    FooterDownEighth: 57921,
+    FooterUpSixteenth: 57922,
+    FooterDownSixteenth: 57923,
+    FooterUpThirtySecond: 57924,
+    FooterDownThirtySecond: 57925,
+    FooterUpSixtyFourth: 57926,
+    FooterDownSixtyFourth: 57927,
+    DynamicPPP: 58666,
+    DynamicPP: 58667,
+    DynamicP: 58656,
+    DynamicMP: 58668,
+    DynamicMF: 58669,
+    DynamicF: 58658,
+    DynamicFF: 58671,
+    DynamicFFF: 58672,
+    Accentuation: 58528,
+    HeavyAccentuation: 58540,
+    WaveHorizontal: 60068,
+    PickStrokeDown: 58896,
+    PickStrokeUp: 58898,
+    TremoloPickingThirtySecond: 57890,
+    TremoloPickingSixteenth: 57889,
+    TremoloPickingEighth: 57888,
+    Tempo: 57813,
+    AccidentalFlat: 57952,
+    AccidentalNatural: 57953,
+    AccidentalSharp: 57954
 };
 AlphaTab.Rendering.Glyphs.NaturalizeGlyph = function (x, y, isGrace){
     this._isGrace = false;
@@ -11605,7 +11571,7 @@ AlphaTab.Rendering.Glyphs.NoteHeadGlyph.prototype = {
                 this.Width = 14 * (this._isGrace ? 0.5 : 1) * this.get_Scale();
                 break;
             default:
-                this.Width = 9 * (this._isGrace ? 0.5 : 1) * this.get_Scale();
+                this.Width = 10 * (this._isGrace ? 0.5 : 1) * this.get_Scale();
                 break;
         }
     }
@@ -11827,8 +11793,9 @@ AlphaTab.Rendering.Glyphs.ScoreRestGlyph.prototype = {
 AlphaTab.Rendering.Glyphs.ScoreRestGlyph.GetSymbol = function (duration){
     switch (duration){
         case AlphaTab.Model.Duration.Whole:
-        case AlphaTab.Model.Duration.Half:
             return AlphaTab.Rendering.Glyphs.MusicFontSymbol.RestWhole;
+        case AlphaTab.Model.Duration.Half:
+            return AlphaTab.Rendering.Glyphs.MusicFontSymbol.RestHalf;
         case AlphaTab.Model.Duration.Quarter:
             return AlphaTab.Rendering.Glyphs.MusicFontSymbol.RestQuarter;
         case AlphaTab.Model.Duration.Eighth:
@@ -11926,7 +11893,7 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
                     for (var i = 0; i < this.Container.Beat.Dots; i++){
                         var group = new AlphaTab.Rendering.Glyphs.GlyphGroup(0, 0);
                         this.NoteLoop($CreateAnonymousDelegate(this, function (n){
-                            this.CreateBeatDot(sr.GetNoteLine(n), 2, group);
+                            this.CreateBeatDot(sr.GetNoteLine(n), group);
                         }));
                         this.AddGlyph(group);
                     }
@@ -11936,41 +11903,35 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
                 var dotLine = 0;
                 var line = 0;
                 var offset = 0;
-                var dotOffset = 0;
                 switch (this.Container.Beat.Duration){
                     case AlphaTab.Model.Duration.Whole:
                         line = 4;
-                        dotLine = 4;
+                        dotLine = 5;
                         break;
                     case AlphaTab.Model.Duration.Half:
-                        line = 5;
+                        line = 6;
                         dotLine = 5;
                         break;
                     case AlphaTab.Model.Duration.Quarter:
-                        line = 7;
+                        line = 6;
                         offset = -2;
-                        dotLine = 4;
-                        dotOffset = 3;
+                        dotLine = 5;
                         break;
                     case AlphaTab.Model.Duration.Eighth:
-                        line = 8;
-                        dotLine = 4;
-                        dotOffset = 3;
+                        line = 6;
+                        dotLine = 5;
                         break;
                     case AlphaTab.Model.Duration.Sixteenth:
-                        line = 10;
-                        dotLine = 4;
-                        dotOffset = 3;
+                        line = 6;
+                        dotLine = 5;
                         break;
                     case AlphaTab.Model.Duration.ThirtySecond:
-                        line = 10;
-                        dotLine = 2;
-                        dotOffset = 2;
+                        line = 6;
+                        dotLine = 3;
                         break;
                     case AlphaTab.Model.Duration.SixtyFourth:
-                        line = 12;
-                        dotLine = 2;
-                        dotOffset = 2;
+                        line = 6;
+                        dotLine = 3;
                         break;
                 }
                 var y = sr.GetScoreY(line, offset);
@@ -11985,7 +11946,7 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
                     this.AddGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 5 * this.get_Scale(), false));
                     for (var i = 0; i < this.Container.Beat.Dots; i++){
                         var group = new AlphaTab.Rendering.Glyphs.GlyphGroup(0, 0);
-                        this.CreateBeatDot(dotLine, dotOffset, group);
+                        this.CreateBeatDot(dotLine, group);
                         this.AddGlyph(group);
                     }
                 }
@@ -11993,9 +11954,9 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
         }
         AlphaTab.Rendering.Glyphs.BeatGlyphBase.prototype.DoLayout.call(this);
     },
-    CreateBeatDot: function (line, offset, group){
+    CreateBeatDot: function (line, group){
         var sr = this.Renderer;
-        group.AddGlyph(new AlphaTab.Rendering.Glyphs.CircleGlyph(0, sr.GetScoreY(line, offset + 2), 1.5 * this.get_Scale()));
+        group.AddGlyph(new AlphaTab.Rendering.Glyphs.CircleGlyph(0, sr.GetScoreY(line, 0), 1.5 * this.get_Scale()));
     },
     CreateNoteHeadGlyph: function (n){
         var isGrace = this.Container.Beat.GraceType != AlphaTab.Model.GraceType.None;
@@ -12034,7 +11995,7 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
         var noteHeadGlyph = this.CreateNoteHeadGlyph(n);
         // calculate y position
         var line = sr.GetNoteLine(n);
-        noteHeadGlyph.Y = sr.GetScoreY(line, -1);
+        noteHeadGlyph.Y = sr.GetScoreY(line, 0);
         this.NoteHeads.AddNoteGlyph(noteHeadGlyph, n, line);
         if (n.IsStaccato && !this.NoteHeads.BeatEffects.hasOwnProperty("Staccato")){
             this.NoteHeads.BeatEffects["Staccato"] = new AlphaTab.Rendering.Glyphs.CircleGlyph(0, 0, 1.5);
@@ -12098,7 +12059,7 @@ AlphaTab.Rendering.Glyphs.ScoreBeatPreNotesGlyph.prototype = {
                 accidentals.AddGlyph(new AlphaTab.Rendering.Glyphs.FlatGlyph(0, sr.GetScoreY(noteLine, 0), isGrace));
                 break;
             case AlphaTab.Model.AccidentalType.Natural:
-                accidentals.AddGlyph(new AlphaTab.Rendering.Glyphs.NaturalizeGlyph(0, sr.GetScoreY(noteLine + 1, 0), isGrace));
+                accidentals.AddGlyph(new AlphaTab.Rendering.Glyphs.NaturalizeGlyph(0, sr.GetScoreY(noteLine, 0), isGrace));
                 break;
         }
     }
@@ -12114,49 +12075,43 @@ AlphaTab.Rendering.Glyphs.ScoreBrushGlyph.prototype = {
         this.Width = 10 * this.get_Scale();
     },
     Paint: function (cx, cy, canvas){
-        var scoreBarRenderer = this.Renderer;
-        var lineSize = scoreBarRenderer.get_LineOffset();
-        var topY = cy + this.Y + scoreBarRenderer.GetNoteY(this._beat.get_MaxNote());
-        var bottomY = cy + this.Y + scoreBarRenderer.GetNoteY(this._beat.get_MinNote()) + lineSize;
-        var arrowX = cx + this.X + this.Width / 2;
-        var arrowSize = 8 * this.get_Scale();
-        if (this._beat.BrushType == AlphaTab.Model.BrushType.ArpeggioUp || this._beat.BrushType == AlphaTab.Model.BrushType.ArpeggioDown){
-            var size = 14 * this.get_Scale();
-            var waveTop = topY;
-            var waveBottom = bottomY;
-            if (this._beat.BrushType == AlphaTab.Model.BrushType.ArpeggioUp){
-                waveTop -= lineSize;
-                waveBottom -= arrowSize;
-                var steps = Math.floor((waveBottom - waveTop) / size);
-                for (var i = 0; i < steps; i++){
-                    canvas.FillMusicFontSymbol(cx + this.X + (2 * this.get_Scale()), waveBottom - ((i + 1) * size), 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.WaveVertical);
-                }
-            }
-            else {
-                waveTop += arrowSize;
-                waveBottom += lineSize;
-                var steps = Math.floor((waveBottom - waveTop) / size);
-                for (var i = 0; i < steps; i++){
-                    canvas.FillMusicFontSymbol(cx + this.X + (2 * this.get_Scale()), waveTop + (i * size), 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.WaveVertical);
-                }
-            }
-            if (this._beat.BrushType == AlphaTab.Model.BrushType.ArpeggioUp){
-                canvas.BeginPath();
-                canvas.MoveTo(arrowX, bottomY);
-                canvas.LineTo(arrowX + arrowSize / 2, bottomY - arrowSize);
-                canvas.LineTo(arrowX - arrowSize / 2, bottomY - arrowSize);
-                canvas.ClosePath();
-                canvas.Fill();
-            }
-            else if (this._beat.BrushType == AlphaTab.Model.BrushType.ArpeggioDown){
-                canvas.BeginPath();
-                canvas.MoveTo(arrowX, topY);
-                canvas.LineTo(arrowX + arrowSize / 2, topY + arrowSize);
-                canvas.LineTo(arrowX - arrowSize / 2, topY + arrowSize);
-                canvas.ClosePath();
-                canvas.Fill();
-            }
-        }
+        // TODO: Create webfont version
+        //var scoreBarRenderer = (ScoreBarRenderer)Renderer;
+        //var lineSize = scoreBarRenderer.LineOffset;
+        //var startY = cy + Y + (scoreBarRenderer.GetNoteY(_beat.MaxNote) - lineSize / 2);
+        //var endY = cy + Y + scoreBarRenderer.GetNoteY(_beat.MinNote) + lineSize;
+        //var arrowX = cx + X + Width / 2;
+        //var arrowSize = 8 * Scale;
+        //if (_beat.BrushType != BrushType.None)
+        //{
+        //    if (_beat.BrushType == BrushType.ArpeggioUp || _beat.BrushType == BrushType.ArpeggioDown)
+        //    {
+        //        var size = 15 * Scale;
+        //        var steps = Math.Abs(endY - startY) / size;
+        //        for (var i = 0; i < steps; i++)
+        //        {
+        //            canvas.FillMusicFontSymbol(cx + X + (3 * Scale), 1, startY + (i * size), MusicFontSymbol.WaveVertical);
+        //        }
+        //    }
+        //    if (_beat.BrushType == BrushType.ArpeggioUp)
+        //    {
+        //        canvas.BeginPath();
+        //        canvas.MoveTo(arrowX, endY);
+        //        canvas.LineTo(arrowX + arrowSize / 2, endY - arrowSize);
+        //        canvas.LineTo(arrowX - arrowSize / 2, endY - arrowSize);
+        //        canvas.ClosePath();
+        //        canvas.Fill();
+        //    }
+        //    else if (_beat.BrushType == BrushType.ArpeggioDown)
+        //    {
+        //        canvas.BeginPath();
+        //        canvas.MoveTo(arrowX, startY);
+        //        canvas.LineTo(arrowX + arrowSize / 2, startY + arrowSize);
+        //        canvas.LineTo(arrowX - arrowSize / 2, startY + arrowSize);
+        //        canvas.ClosePath();
+        //        canvas.Fill();
+        //    }
+        //}
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.ScoreBrushGlyph, AlphaTab.Rendering.Glyphs.Glyph);
@@ -12346,7 +12301,7 @@ AlphaTab.Rendering.Glyphs.ScoreNoteChordGlyph.prototype = {
             var l = -1;
             while (l >= this.MinNote.Line){
                 // + 1 Because we want to place the line in the center of the note, not at the top
-                var lY = cy + this.Y + scoreRenderer.GetScoreY(l + 1, -1);
+                var lY = cy + this.Y + scoreRenderer.GetScoreY(l, 0);
                 canvas.BeginPath();
                 canvas.MoveTo(cx + this.X - linePadding, lY);
                 canvas.LineTo(cx + this.X + this.Width + linePadding, lY);
@@ -12355,9 +12310,9 @@ AlphaTab.Rendering.Glyphs.ScoreNoteChordGlyph.prototype = {
             }
         }
         if (this.get_HasBottomOverflow()){
-            var l = 11;
+            var l = 12;
             while (l <= this.MaxNote.Line){
-                var lY = cy + this.Y + scoreRenderer.GetScoreY(l + 1, -1);
+                var lY = cy + this.Y + scoreRenderer.GetScoreY(l, 0);
                 canvas.BeginPath();
                 canvas.MoveTo(cx + this.X - linePadding, lY);
                 canvas.LineTo(cx + this.X + this.Width + linePadding, lY);
@@ -12725,55 +12680,50 @@ AlphaTab.Rendering.Glyphs.TabBrushGlyph.prototype = {
         this.Width = 10 * this.get_Scale();
     },
     Paint: function (cx, cy, canvas){
-        var tabBarRenderer = this.Renderer;
-        var res = this.Renderer.get_Resources();
-        var topY = cy + this.Y + tabBarRenderer.GetNoteY(this._beat.get_MaxStringNote()) - res.TablatureFont.Size / 2;
-        var bottomY = cy + this.Y + tabBarRenderer.GetNoteY(this._beat.get_MinStringNote()) + res.TablatureFont.Size / 2;
-        var arrowX = ((cx + this.X + this.Width / 2)) | 0;
-        var arrowSize = 8 * this.get_Scale();
-        if (this._beat.BrushType != AlphaTab.Model.BrushType.None){
-            if (this._beat.BrushType == AlphaTab.Model.BrushType.BrushUp || this._beat.BrushType == AlphaTab.Model.BrushType.BrushDown){
-                canvas.BeginPath();
-                canvas.MoveTo(arrowX, topY);
-                canvas.LineTo(arrowX, bottomY);
-                canvas.Stroke();
-            }
-            else {
-                var size = 14 * this.get_Scale();
-                var waveTop = topY;
-                var waveBottom = bottomY;
-                if (this._beat.BrushType == AlphaTab.Model.BrushType.BrushUp || this._beat.BrushType == AlphaTab.Model.BrushType.ArpeggioUp){
-                    waveBottom -= arrowSize;
-                    var steps = Math.floor((waveBottom - waveTop) / size);
-                    for (var i = 0; i < steps; i++){
-                        canvas.FillMusicFontSymbol(cx + this.X + (2 * this.get_Scale()), waveBottom - ((i + 1) * size), 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.WaveVertical);
-                    }
-                }
-                else {
-                    waveTop += arrowSize;
-                    var steps = Math.floor((waveBottom - waveTop) / size);
-                    for (var i = 0; i < steps; i++){
-                        canvas.FillMusicFontSymbol(cx + this.X + (2 * this.get_Scale()), waveTop + (i * size), 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.WaveVertical);
-                    }
-                }
-            }
-            if (this._beat.BrushType == AlphaTab.Model.BrushType.BrushUp || this._beat.BrushType == AlphaTab.Model.BrushType.ArpeggioUp){
-                canvas.BeginPath();
-                canvas.MoveTo(arrowX, bottomY);
-                canvas.LineTo(arrowX + arrowSize / 2, bottomY - arrowSize);
-                canvas.LineTo(arrowX - arrowSize / 2, bottomY - arrowSize);
-                canvas.ClosePath();
-                canvas.Fill();
-            }
-            else {
-                canvas.BeginPath();
-                canvas.MoveTo(arrowX, topY);
-                canvas.LineTo(arrowX + arrowSize / 2, topY + arrowSize);
-                canvas.LineTo(arrowX - arrowSize / 2, topY + arrowSize);
-                canvas.ClosePath();
-                canvas.Fill();
-            }
-        }
+        // TODO: Create webfont version
+        //var tabBarRenderer = (TabBarRenderer)Renderer;
+        //var res = Renderer.Resources;
+        //var startY = cy + X + (tabBarRenderer.GetNoteY(_beat.MaxNote) - res.TablatureFont.Size / 2);
+        //var endY = cy + Y + tabBarRenderer.GetNoteY(_beat.MinNote) + res.TablatureFont.Size / 2;
+        //var arrowX = (int)(cx + X + Width / 2);
+        //var arrowSize = 8 * Scale;
+        //if (_beat.BrushType != BrushType.None)
+        //{
+        //    if (_beat.BrushType == BrushType.BrushUp || _beat.BrushType == BrushType.BrushDown)
+        //    {
+        //        canvas.BeginPath();
+        //        canvas.MoveTo(arrowX, startY);
+        //        canvas.LineTo(arrowX, endY);
+        //        canvas.Stroke();
+        //    }
+        //    else
+        //    {
+        //        var size = 15 * Scale;
+        //        var steps = Math.Abs(endY - startY) / size;
+        //        for (var i = 0; i < steps; i++)
+        //        {
+        //            canvas.FillMusicFontSymbol(cx + X + (3 * Scale), 1, startY + (i * size), MusicFontSymbol.WaveVertical);
+        //        }
+        //    }
+        //    if (_beat.BrushType == BrushType.BrushUp || _beat.BrushType == BrushType.ArpeggioUp)
+        //    {
+        //        canvas.BeginPath();
+        //        canvas.MoveTo(arrowX, endY);
+        //        canvas.LineTo(arrowX + arrowSize / 2, endY - arrowSize);
+        //        canvas.LineTo(arrowX - arrowSize / 2, endY - arrowSize);
+        //        canvas.ClosePath();
+        //        canvas.Fill();
+        //    }
+        //    else
+        //    {
+        //        canvas.BeginPath();
+        //        canvas.MoveTo(arrowX, startY);
+        //        canvas.LineTo(arrowX + arrowSize / 2, startY + arrowSize);
+        //        canvas.LineTo(arrowX - arrowSize / 2, startY + arrowSize);
+        //        canvas.ClosePath();
+        //        canvas.Fill();
+        //    }
+        //}
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.TabBrushGlyph, AlphaTab.Rendering.Glyphs.Glyph);
@@ -13027,8 +12977,8 @@ AlphaTab.Rendering.Glyphs.TempoGlyph.prototype = {
     Paint: function (cx, cy, canvas){
         var res = this.Renderer.get_Resources();
         canvas.set_Font(res.MarkerFont);
-        canvas.FillMusicFontSymbol(cx + this.X, cy + this.Y, 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.Tempo);
-        canvas.FillText("" + this._tempo, cx + this.X + (20 * this.get_Scale()), cy + this.Y + canvas.get_Font().Size / 2);
+        canvas.FillMusicFontSymbol(cx + this.X, cy + this.Y + this.Renderer.Height * 0.75, 0.75, AlphaTab.Rendering.Glyphs.MusicFontSymbol.Tempo);
+        canvas.FillText("= " + this._tempo, cx + this.X + (15 * this.get_Scale()), cy + this.Y + canvas.get_Font().Size / 2);
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.TempoGlyph, AlphaTab.Rendering.Glyphs.EffectGlyph);
@@ -13060,8 +13010,8 @@ AlphaTab.Rendering.Glyphs.TimeSignatureGlyph = function (x, y, numerator, denomi
 };
 AlphaTab.Rendering.Glyphs.TimeSignatureGlyph.prototype = {
     DoLayout: function (){
-        var numerator = new AlphaTab.Rendering.Glyphs.NumberGlyph(0, 0, this._numerator);
-        var denominator = new AlphaTab.Rendering.Glyphs.NumberGlyph(0, 18 * this.get_Scale(), this._denominator);
+        var numerator = new AlphaTab.Rendering.Glyphs.NumberGlyph(0, 2 * this.get_Scale(), this._numerator);
+        var denominator = new AlphaTab.Rendering.Glyphs.NumberGlyph(0, 20 * this.get_Scale(), this._denominator);
         this.AddGlyph(numerator);
         this.AddGlyph(denominator);
         AlphaTab.Rendering.Glyphs.GlyphGroup.prototype.DoLayout.call(this);
@@ -14237,34 +14187,26 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
         return this.GetScoreY(size, 0);
     },
     CalculateBeamY: function (h, x){
-        var correction = 4.5;
         var stemSize = this.GetStemSize(h.MaxDuration);
         return h.CalculateBeamY(stemSize, this.get_Scale(), x, this.get_Scale(), $CreateAnonymousDelegate(this, function (n){
-            return this.GetScoreY(this.GetNoteLine(n), correction - 1);
+            return this.GetScoreY(this.GetNoteLine(n), 0);
         }));
     },
     PaintBar: function (cx, cy, canvas, h){
         for (var i = 0,j = h.Beats.length; i < j; i++){
             var beat = h.Beats[i];
-            var correction = 4.5;
             //
             // draw line 
             //
             var beatLineX = h.GetBeatLineX(beat) + this.get_Scale();
             var direction = h.get_Direction();
-            var y1 = cy + this.Y + (direction == AlphaTab.Rendering.Utils.BeamDirection.Up ? this.GetScoreY(this.GetNoteLine(beat.get_MinNote()), correction - 1) : this.GetScoreY(this.GetNoteLine(beat.get_MaxNote()), correction - 1));
+            var y1 = cy + this.Y + (direction == AlphaTab.Rendering.Utils.BeamDirection.Up ? this.GetScoreY(this.GetNoteLine(beat.get_MinNote()), 0) : this.GetScoreY(this.GetNoteLine(beat.get_MaxNote()), 0));
             var y2 = cy + this.Y + this.CalculateBeamY(h, beatLineX);
             canvas.BeginPath();
             canvas.MoveTo(cx + this.X + beatLineX, y1);
             canvas.LineTo(cx + this.X + beatLineX, y2);
             canvas.Stroke();
             var fingeringY = y2;
-            if (direction == AlphaTab.Rendering.Utils.BeamDirection.Up){
-                fingeringY -= correction * 3;
-            }
-            else {
-                fingeringY += correction * 3;
-            }
             this.PaintFingering(canvas, beat, cx + this.X + beatLineX, direction, fingeringY);
             var brokenBarOffset = 6 * this.get_Scale();
             var barSpacing = 6 * this.get_Scale();
@@ -14322,14 +14264,10 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
         // draw line 
         //
         var stemSize = this.GetStemSize(h.MaxDuration);
-        var correction = ((9 * scaleMod) / 2);
         var beatLineX = h.GetBeatLineX(beat) + this.get_Scale();
         var direction = h.get_Direction();
-        var topY = this.GetScoreY(this.GetNoteLine(beat.get_MaxNote()), correction);
-        var bottomY = this.GetScoreY(this.GetNoteLine(beat.get_MinNote()), correction);
-        if (beat.Duration == AlphaTab.Model.Duration.Whole){
-            correction += (13.5) * scaleMod;
-        }
+        var topY = this.GetScoreY(this.GetNoteLine(beat.get_MaxNote()), 0);
+        var bottomY = this.GetScoreY(this.GetNoteLine(beat.get_MinNote()), 0);
         var beamY;
         var fingeringY;
         if (direction == AlphaTab.Rendering.Utils.BeamDirection.Down){
@@ -14340,7 +14278,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
         else {
             topY -= stemSize * scaleMod;
             beamY = topY;
-            fingeringY = cy + this.Y + topY - correction;
+            fingeringY = cy + this.Y + topY;
         }
         this.PaintFingering(canvas, beat, cx + this.X + beatLineX, direction, fingeringY);
         if (beat.Duration == AlphaTab.Model.Duration.Whole){
@@ -14470,12 +14408,14 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
         // Clef
         if (this.get_IsFirstOfLine() || this.Bar.Clef != this.Bar.PreviousBar.Clef){
             var offset = 0;
+            var correction = 0;
             switch (this.Bar.Clef){
                 case AlphaTab.Model.Clef.Neutral:
-                    offset = 4;
+                    offset = 6;
                     break;
                 case AlphaTab.Model.Clef.F4:
                     offset = 4;
+                    correction = -1;
                     break;
                 case AlphaTab.Model.Clef.C3:
                     offset = 6;
@@ -14484,11 +14424,11 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
                     offset = 4;
                     break;
                 case AlphaTab.Model.Clef.G2:
-                    offset = 6;
+                    offset = 8;
                     break;
             }
             this.CreateStartSpacing();
-            this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.ClefGlyph(0, this.GetScoreY(offset, 0), this.Bar.Clef));
+            this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.ClefGlyph(0, this.GetScoreY(offset, correction), this.Bar.Clef));
         }
         // Key signature
         if ((this.Bar.PreviousBar == null && this.Bar.get_MasterBar().KeySignature != 0) || (this.Bar.PreviousBar != null && this.Bar.get_MasterBar().KeySignature != this.Bar.PreviousBar.get_MasterBar().KeySignature)){
@@ -14542,7 +14482,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
                 offsetClef = 0;
                 break;
             case AlphaTab.Model.Clef.G2:
-                offsetClef = 0;
+                offsetClef = 1;
                 break;
             case AlphaTab.Model.Clef.F4:
                 offsetClef = 2;
@@ -14578,7 +14518,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
     },
     CreateTimeSignatureGlyphs: function (){
         this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 5 * this.get_Scale(), true));
-        this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.TimeSignatureGlyph(0, 0, this.Bar.get_MasterBar().TimeSignatureNumerator, this.Bar.get_MasterBar().TimeSignatureDenominator));
+        this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.TimeSignatureGlyph(0, this.GetScoreY(2, 0), this.Bar.get_MasterBar().TimeSignatureNumerator, this.Bar.get_MasterBar().TimeSignatureDenominator));
     },
     CreateVoiceGlyphs: function (v){
         for (var i = 0,j = v.Beats.length; i < j; i++){
@@ -14603,9 +14543,9 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
     PaintBackground: function (cx, cy, canvas){
         AlphaTab.Rendering.BarRendererBase.prototype.PaintBackground.call(this, cx, cy, canvas);
         var res = this.get_Resources();
-        //var c = new Color((byte)Random.Next(255),
-        //                  (byte)Random.Next(255),
-        //                  (byte)Random.Next(255),
+        //var c = new Color((byte)Std.Random(255),
+        //                  (byte)Std.Random(255),
+        //                  (byte)Std.Random(255),
         //                  100);
         //canvas.Color = c;
         //canvas.FillRect(cx + X, cy + Y, Width, Height);
@@ -15559,11 +15499,8 @@ AlphaTab.Rendering.Utils.AccidentalHelper.prototype = {
                 break;
         }
         steps -= stepList[index];
-        // TODO: It seems note heads are always one step above the calculated line 
-        // maybe the SVG paths are wrong, need to recheck where step=0 is really placed
-        var line = steps + 1;
-        this._appliedScoreLines[this.GetNoteId(n)] = line;
-        return line;
+        this._appliedScoreLines[this.GetNoteId(n)] = steps;
+        return steps;
     },
     GetNoteLine: function (n){
         return this._appliedScoreLines[this.GetNoteId(n)];
@@ -15573,10 +15510,9 @@ $StaticConstructor(function (){
     AlphaTab.Rendering.Utils.AccidentalHelper.KeySignatureLookup = [[true, true, true, true, true, true, true, true, true, true, true, true], [true, true, true, true, true, false, true, true, true, true, true, true], [false, true, true, true, true, false, true, true, true, true, true, true], [false, true, true, true, true, false, false, false, true, true, true, true], [false, false, false, true, true, false, false, false, true, true, true, true], [false, false, false, true, true, false, false, false, false, false, true, true], [false, false, false, false, false, false, false, false, false, false, true, true], [false, false, false, false, false, false, false, false, false, false, false, false], [false, false, false, false, false, true, true, false, false, false, false, false], [true, true, false, false, false, true, true, false, false, false, false, false], [true, true, false, false, false, true, true, true, true, false, false, false], [true, true, true, true, false, true, true, true, true, false, false, false], [true, true, true, true, false, true, true, true, true, true, true, false], [true, true, true, true, true, true, true, true, true, true, true, false], [true, true, true, true, true, true, true, true, true, true, true, true]];
     AlphaTab.Rendering.Utils.AccidentalHelper.AccidentalNotes = [false, true, false, true, false, false, true, false, true, false, true, false];
     AlphaTab.Rendering.Utils.AccidentalHelper.StepsPerOctave = 7;
-    AlphaTab.Rendering.Utils.AccidentalHelper.OctaveSteps = new Int32Array([38, 32, 30, 26, 38]);
+    AlphaTab.Rendering.Utils.AccidentalHelper.OctaveSteps = new Int32Array([40, 34, 32, 28, 40]);
     AlphaTab.Rendering.Utils.AccidentalHelper.SharpNoteSteps = new Int32Array([0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6]);
     AlphaTab.Rendering.Utils.AccidentalHelper.FlatNoteSteps = new Int32Array([0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6]);
-    AlphaTab.Rendering.Utils.AccidentalHelper.NoteStepCorrection = 1;
 });
 AlphaTab.Rendering.Utils.BarHelpers = function (bar){
     this.BeamHelpers = null;

@@ -19,7 +19,6 @@
 using AlphaTab.Collections;
 using AlphaTab.Importer;
 using AlphaTab.IO;
-using AlphaTab.Model;
 using AlphaTab.Rendering;
 using SharpKit.Html;
 using SharpKit.JavaScript;
@@ -33,7 +32,7 @@ namespace AlphaTab.Platform.JavaScript
         {
         }
 
-        protected override IScoreRenderer CreateScoreRenderer(Settings settings, dynamic rawSettings, HtmlElement canvasElement)
+        protected override IScoreRenderer CreateScoreRenderer(Settings settings, HtmlElement canvasElement)
         {
             return new ScoreRenderer(settings, canvasElement);
         }

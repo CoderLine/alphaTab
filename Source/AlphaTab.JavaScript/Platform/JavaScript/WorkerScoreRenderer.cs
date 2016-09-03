@@ -14,54 +14,13 @@ namespace AlphaTab.Platform.JavaScript
     {
         private readonly Worker _worker;
 
-        public bool IsSvg
-        {
-            get { return true; }
-        }
-
         public BoundsLookup BoundsLookup { get; private set; }
         public Score Score { get; private set; }
 
-        public WorkerScoreRenderer(Settings settings, dynamic rawSettings)
+        public WorkerScoreRenderer(Settings settings)
         {
-            string alphaTabScriptFile;
-
-            // explicitly specified file/root path
-            if (rawSettings.atRoot)
-            {
-                alphaTabScriptFile = rawSettings.atRoot;
-                // append script name 
-                if (!alphaTabScriptFile.EndsWith(".js"))
-                {
-                    if (!alphaTabScriptFile.EndsWith("/"))
-                    {
-                        alphaTabScriptFile += "/";
-                    }
-                    alphaTabScriptFile += "AlphaTab.js";
-                }
-                if (!alphaTabScriptFile.StartsWith("http") && !alphaTabScriptFile.StartsWith("https"))
-                {
-                    var root = new StringBuilder();
-                    root.Append(window.location.protocol);
-                    root.Append("//");
-                    root.Append(window.location.hostname);
-                    if (window.location.port.As<bool>())
-                    {
-                        root.Append(":");
-                        root.Append(window.location.port);
-                    }
-                    root.Append(alphaTabScriptFile);
-                    alphaTabScriptFile = root.ToString();
-                }
-            }
-            // find automatically
-            else
-            {
-                alphaTabScriptFile = Environment.ScriptFile;
-            }
-
             _worker = new Worker(CreateWorkerUrl());
-            _worker.postMessage(new { cmd = "initialize", alphaTabScript = alphaTabScriptFile, settings = settings.ToJson() });
+            _worker.postMessage(new { cmd = "initialize", settings = settings.ToJson() });
             _worker.addEventListener("message", HandleWorkerMessage, false);
         }
 
@@ -69,7 +28,7 @@ namespace AlphaTab.Platform.JavaScript
         {
             var source = @"self.onmessage = function(e) {
             if(e.data.cmd == 'initialize') {
-                importScripts(e.data.alphaTabScript);
+                importScripts(e.data.settings.atRoot);
                     new AlphaTab.Platform.JavaScript.JsWorker(self, e.data.settings);
                 }
             }";

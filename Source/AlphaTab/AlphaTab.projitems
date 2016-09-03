@@ -81,7 +81,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Model\TextBaseline.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Std.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\FontSizes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\PathSvgCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\SupportedFonts.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\FontSvgCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\SvgCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\AlternateEndingsBarRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\AlternateEndingsBarRendererFactory.cs" />

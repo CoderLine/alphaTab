@@ -18,6 +18,7 @@
 
 using AlphaTab.Collections;
 using AlphaTab.Platform;
+using SharpKit.Html;
 using SharpKit.JavaScript;
 
 namespace AlphaTab
@@ -27,7 +28,10 @@ namespace AlphaTab
     /// </summary>
     public partial class Settings
     {
-       
+        public string ScriptFile
+        {
+            get; set;
+        }
 
         public dynamic ToJson()
         {
@@ -39,6 +43,8 @@ namespace AlphaTab
             json.engine = Engine;
             json.stretchForce = StretchForce;
             json.forcePianoFingering = ForcePianoFingering;
+
+            json.atRoot = ScriptFile;
 
             json.layout = Std.NewObject();
             json.layout.mode = Layout.Mode;
@@ -88,6 +94,38 @@ namespace AlphaTab
             if (Std.JsonExists(json, "engine")) settings.Engine = json.engine;
             if (Std.JsonExists(json, "stretchForce")) settings.StretchForce = json.stretchForce;
             if (Std.JsonExists(json, "forcePianoFingering")) settings.ForcePianoFingering = json.forcePianoFingering;
+
+            if (Std.JsonExists(json, "atRoot"))
+            {
+                settings.ScriptFile = json.atRoot;
+                // append script name 
+                if (!settings.ScriptFile.EndsWith(".js"))
+                {
+                    if (!settings.ScriptFile.EndsWith("/"))
+                    {
+                        settings.ScriptFile += "/";
+                    }
+                    settings.ScriptFile += "AlphaTab.js";
+                }
+                if (!settings.ScriptFile.StartsWith("http") && !settings.ScriptFile.StartsWith("https"))
+                {
+                    var root = new StringBuilder();
+                    root.Append(HtmlContext.window.location.protocol);
+                    root.Append("//");
+                    root.Append(HtmlContext.window.location.hostname);
+                    if (HtmlContext.window.location.port.As<bool>())
+                    {
+                        root.Append(":");
+                        root.Append(HtmlContext.window.location.port);
+                    }
+                    root.Append(settings.ScriptFile);
+                    settings.ScriptFile = root.ToString();
+                }
+            }
+            else
+            {
+                settings.ScriptFile = Environment.ScriptFile;
+            }
 
             if (Std.JsonExists(json, "layout"))
             {

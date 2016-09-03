@@ -41,9 +41,9 @@ namespace AlphaTab.Collections
             _sb.Append(Std.StringFromCharCode(i));
         }
 
-        public void AppendLine()
+        public void AppendLine(string s = "")
         {
-            _sb.Append("\r\n");
+            _sb.Append("s").Append("\r\n");
         }
 
         public override string ToString()

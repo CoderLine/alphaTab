@@ -19,6 +19,7 @@ using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
@@ -294,7 +295,7 @@ namespace AlphaTab.Rendering.Glyphs
                 while (l >= MinNote.Line)
                 {
                     // + 1 Because we want to place the line in the center of the note, not at the top
-                    var lY = cy + Y + scoreRenderer.GetScoreY(l + 1, -1);
+                    var lY = cy + Y + scoreRenderer.GetScoreY(l);
                     canvas.BeginPath();
                     canvas.MoveTo(cx + X - linePadding, lY);
                     canvas.LineTo(cx + X + Width + linePadding, lY);
@@ -305,10 +306,10 @@ namespace AlphaTab.Rendering.Glyphs
 
             if (HasBottomOverflow)
             {
-                var l = 11;
+                var l = 12;
                 while (l <= MaxNote.Line)
                 {
-                    var lY = cy + Y + scoreRenderer.GetScoreY(l + 1, -1);
+                    var lY = cy + Y + scoreRenderer.GetScoreY(l);
                     canvas.BeginPath();
                     canvas.MoveTo(cx + X - linePadding, lY);
                     canvas.LineTo(cx + X + Width + linePadding, lY);

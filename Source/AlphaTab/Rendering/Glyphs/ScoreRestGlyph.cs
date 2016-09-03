@@ -38,8 +38,9 @@ namespace AlphaTab.Rendering.Glyphs
             switch (duration)
             {
                 case Duration.Whole:
-                case Duration.Half:
                     return MusicFontSymbol.RestWhole;
+                case Duration.Half:
+                    return MusicFontSymbol.RestHalf;
                 case Duration.Quarter:
                     return MusicFontSymbol.RestQuarter;
                 case Duration.Eighth:

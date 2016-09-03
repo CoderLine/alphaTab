@@ -59,7 +59,7 @@ namespace AlphaTab.Rendering.Glyphs
                     accidentals.AddGlyph(new FlatGlyph(0, sr.GetScoreY(noteLine), isGrace));
                     break;
                 case AccidentalType.Natural:
-                    accidentals.AddGlyph(new NaturalizeGlyph(0, sr.GetScoreY(noteLine + 1), isGrace));
+                    accidentals.AddGlyph(new NaturalizeGlyph(0, sr.GetScoreY(noteLine), isGrace));
                     break;
             }
         }

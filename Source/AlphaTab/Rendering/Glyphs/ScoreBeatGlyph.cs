@@ -67,7 +67,7 @@ namespace AlphaTab.Rendering.Glyphs
                         for (var i = 0; i < Container.Beat.Dots; i++)
                         {
                             var group = new GlyphGroup(0, 0);
-                            NoteLoop(n => CreateBeatDot(sr.GetNoteLine(n), 2, group));
+                            NoteLoop(n => CreateBeatDot(sr.GetNoteLine(n), group));
                             AddGlyph(group);
                         }
                     }
@@ -77,43 +77,37 @@ namespace AlphaTab.Rendering.Glyphs
                     var dotLine = 0;
                     var line = 0;
                     var offset = 0;
-                    var dotOffset = 0;
 
                     switch (Container.Beat.Duration)
                     {
                         case Duration.Whole:
                             line = 4;
-                            dotLine = 4;
+                            dotLine = 5;
                             break;
                         case Duration.Half:
-                            line = 5;
+                            line = 6;
                             dotLine = 5;
                             break;
                         case Duration.Quarter:
-                            line = 7;
+                            line = 6;
                             offset = -2;
-                            dotLine = 4;
-                            dotOffset = 3;
+                            dotLine = 5;
                             break;
                         case Duration.Eighth:
-                            line = 8;
-                            dotLine = 4;
-                            dotOffset = 3;
+                            line = 6;
+                            dotLine = 5;
                             break;
                         case Duration.Sixteenth:
-                            line = 10;
-                            dotLine = 4;
-                            dotOffset = 3;
+                            line = 6;
+                            dotLine = 5;
                             break;
                         case Duration.ThirtySecond:
-                            line = 10;
-                            dotLine = 2;
-                            dotOffset = 2;
+                            line = 6;
+                            dotLine = 3;
                             break;
                         case Duration.SixtyFourth:
-                            line = 12;
-                            dotLine = 2;
-                            dotOffset = 2;
+                            line = 6;
+                            dotLine = 3;
                             break;
                     }
 
@@ -133,7 +127,7 @@ namespace AlphaTab.Rendering.Glyphs
                         for (var i = 0; i < Container.Beat.Dots; i++)
                         {
                             var group = new GlyphGroup(0, 0);
-                            CreateBeatDot(dotLine, dotOffset, group);
+                            CreateBeatDot(dotLine, group);
                             AddGlyph(group);
                         }
                     }
@@ -143,10 +137,10 @@ namespace AlphaTab.Rendering.Glyphs
             base.DoLayout();
         }
 
-        private void CreateBeatDot(int line, float offset, GlyphGroup group)
+        private void CreateBeatDot(int line, GlyphGroup group)
         {
             var sr = (ScoreBarRenderer)Renderer;
-            group.AddGlyph(new CircleGlyph(0, sr.GetScoreY(line, offset + 2), 1.5f * Scale));
+            group.AddGlyph(new CircleGlyph(0, sr.GetScoreY(line), 1.5f * Scale));
         }
 
         private static readonly FastDictionary<int, bool> NormalKeys;
@@ -222,7 +216,7 @@ namespace AlphaTab.Rendering.Glyphs
             // calculate y position
             var line = sr.GetNoteLine(n);
 
-            noteHeadGlyph.Y = sr.GetScoreY(line, -1);
+            noteHeadGlyph.Y = sr.GetScoreY(line);
             NoteHeads.AddNoteGlyph(noteHeadGlyph, n, line);
 
             if (n.IsStaccato && !NoteHeads.BeatEffects.ContainsKey("Staccato"))

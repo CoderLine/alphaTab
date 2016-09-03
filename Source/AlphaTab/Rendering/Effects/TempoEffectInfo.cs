@@ -25,7 +25,7 @@ namespace AlphaTab.Rendering.Effects
         public bool HideOnMultiTrack { get { return true; } }
         public bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat)
         {
-            return beat.Index == 0 && (beat.Voice.Bar.MasterBar.TempoAutomation != null || beat.Voice.Bar.Index == 0);
+            return beat.Voice.Index == 0 && beat.Index == 0 && (beat.Voice.Bar.MasterBar.TempoAutomation != null || beat.Voice.Bar.Index == 0);
         }
 
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SinglePreBeat; } }

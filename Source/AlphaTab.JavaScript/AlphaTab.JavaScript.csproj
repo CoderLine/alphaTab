@@ -27,7 +27,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;Minimize</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -44,6 +44,15 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MonoRelease|AnyCPU'">
     <OutputPath>bin\MonoRelease\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseNoMinimize|AnyCPU'">
+    <OutputPath>bin\ReleaseNoMinimize\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -103,6 +112,10 @@
   -->
   <Target Name="AfterBuild">
     <Copy SourceFiles="$(ProjectDir)res\$(TargetName).js" DestinationFolder="$(SolutionDir)Build\JavaScript" />
-    <Exec Command="uglifyjs &quot;$(SolutionDir)Build\JavaScript\AlphaTab.js&quot; -o &quot;$(SolutionDir)Build\JavaScript\AlphaTab.min.js&quot; -c" />
+    <ItemGroup>
+      <FontFiles Include="$(SolutionDir)Font\bravura\eot\Bravura.eot;$(SolutionDir)Font\bravura\otf\Bravura.otf;$(SolutionDir)Font\bravura\svg\Bravura.svg;$(SolutionDir)Font\bravura\woff\Bravura.woff" />
+    </ItemGroup>
+    <Copy SourceFiles="@(FontFiles)" DestinationFolder="$(SolutionDir)Build\JavaScript\Font\" />
+    <Exec Command="uglifyjs &quot;$(SolutionDir)Build\JavaScript\AlphaTab.js&quot; -o &quot;$(SolutionDir)Build\JavaScript\AlphaTab.min.js&quot; -c" Condition="$(DefineConstants.Contains('Minimize'))" />
   </Target>
 </Project>

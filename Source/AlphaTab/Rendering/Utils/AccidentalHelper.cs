@@ -73,7 +73,7 @@ namespace AlphaTab.Rendering.Utils
         /// Those are the amount of steps for the different clefs in case of a note value 0    
         /// [Neutral, C3, C4, F4, G2]
         /// </summary>
-        private static readonly int[] OctaveSteps = { 38, 32, 30, 26, 38 };
+        private static readonly int[] OctaveSteps = { 40, 34, 32, 28, 40 };
 
         /// <summary>
         /// The step offsets of the notes within an octave in case of for sharp keysignatures
@@ -86,8 +86,6 @@ namespace AlphaTab.Rendering.Utils
         private static readonly int[] FlatNoteSteps = { 0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6 };
 
         private readonly FastDictionary<int, bool> _registeredAccidentals;
-
-        private const int NoteStepCorrection = 1;
 
         private readonly FastDictionary<string, int> _appliedScoreLines;
 
@@ -184,12 +182,9 @@ namespace AlphaTab.Rendering.Utils
             }
             steps -= stepList[index];
 
-            // TODO: It seems note heads are always one step above the calculated line 
-            // maybe the SVG paths are wrong, need to recheck where step=0 is really placed
-            var line = steps + NoteStepCorrection;
-            _appliedScoreLines[GetNoteId(n)] = line;
+            _appliedScoreLines[GetNoteId(n)] = steps;
 
-            return line;
+            return steps;
         }
 
 

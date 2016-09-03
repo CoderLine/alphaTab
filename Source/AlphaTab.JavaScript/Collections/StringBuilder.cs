@@ -37,8 +37,8 @@ namespace AlphaTab.Collections
         {
         }
 
-        [JsMethod(InlineCodeExpression = "this.push('\\r\\n')", Export = false)]
-        public void AppendLine()
+        [JsMethod(InlineCodeExpression = "this.push(s + '\\r\\n')", Export = false)]
+        public void AppendLine(string s = "")
         {
         }
 

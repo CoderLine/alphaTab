@@ -48,9 +48,6 @@ namespace AlphaTab
 
             PlatformInit();
 
-            RenderEngines["svg"] = d => new SvgCanvas();
-
-
             // default layout engines
             LayoutEngines["default"] = r => new PageViewLayout(r);
             LayoutEngines["page"] = r => new PageViewLayout(r);

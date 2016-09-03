@@ -34,10 +34,10 @@ namespace AlphaTab
 
         static void PlatformInit()
         {
-            RenderEngines["default"] = d => new SvgCanvas();
+            RenderEngines["svg"] = d => new FontSvgCanvas();
+            RenderEngines["default"] = d => new FontSvgCanvas();
             RenderEngines["html5"] = d => new Platform.JavaScript.Html5Canvas();
             FileLoaders["default"] = () => new Platform.JavaScript.JsFileLoader();
-
 
             JsContext.JsCode("Math.log2 = Math.log2 || function(x) { return Math.log(x) * Math.LOG2E; };");
 

@@ -107,6 +107,8 @@ namespace AlphaTab.Platform.JavaScript
 
             #region Renderer Setup
 
+            CreateStyleElement(settings);
+
             if (element != null && AutoSize)
             {
                 var initialResizeEventInfo = new ResizeEventArgs();
@@ -117,7 +119,7 @@ namespace AlphaTab.Platform.JavaScript
                 settings.Width = initialResizeEventInfo.NewWidth;
             }
 
-            Renderer = CreateScoreRenderer(settings, options, CanvasElement);
+            Renderer = CreateScoreRenderer(settings, CanvasElement);
             Renderer.RenderFinished += o => TriggerEvent("rendered");
             Renderer.PostRenderFinished += () => TriggerEvent("post-rendered");
             Renderer.PreRender += () =>
@@ -169,7 +171,49 @@ namespace AlphaTab.Platform.JavaScript
             #endregion
         }
 
-        protected abstract IScoreRenderer CreateScoreRenderer(Settings settings, dynamic rawOptions, HtmlElement canvasElement);
+        private void CreateStyleElement(Settings settings)
+        {
+            var styleElement = (HtmlStyleElement)document.getElementById("alphaTabStyle");
+            if (styleElement == null)
+            {
+                var fontDirectory = settings.ScriptFile;
+                fontDirectory = fontDirectory.Substring(0, fontDirectory.LastIndexOf("/")) + "/Font/";
+
+                var styleUrl = "";
+                styleElement = (HtmlStyleElement)document.createElement("style");
+                styleElement.id = "alphaTabStyle";
+                styleElement.type = "text/css";
+                var css = new StringBuilder();
+                css.AppendLine("@font-face {");
+                css.AppendLine("    font-family: 'alphaTab';");
+                css.AppendLine("     src: url('" + fontDirectory + "bravura.eot');");
+                css.AppendLine("     src: url('" + fontDirectory + "bravura.eot?#iefix') format('embedded-opentype')");
+                css.AppendLine("          , url('" + fontDirectory + "bravura.woff') format('woff')");
+                css.AppendLine("          , url('" + fontDirectory + "bravura.otf') format('opentype')");
+                css.AppendLine("          , url('" + fontDirectory + "bravura.svg#Bravura') format('svg');");
+                css.AppendLine("     font-weight: normal;");
+                css.AppendLine("     font-style: normal;");
+                css.AppendLine("}");
+                css.AppendLine(".at {");
+                css.AppendLine("     font-family: 'alphaTab';");
+                css.AppendLine("     speak: none;");
+                css.AppendLine("     font-style: normal;");
+                css.AppendLine("     font-weight: normal;");
+                css.AppendLine("     font-variant: normal;");
+                css.AppendLine("     text-transform: none;");
+                css.AppendLine("     line-height: 1;");
+                css.AppendLine("     line-height: 1;");
+                css.AppendLine("     -webkit-font-smoothing: antialiased;");
+                css.AppendLine("     -moz-osx-font-smoothing: grayscale;");
+                css.AppendLine("     font-size: 34px;");
+                css.AppendLine("     overflow: visible !important;");
+                css.AppendLine("}");
+                styleElement.innerHTML = css.ToString();
+                document.getElementsByTagName("head")[0].appendChild(styleElement);
+            }
+        }
+
+        protected abstract IScoreRenderer CreateScoreRenderer(Settings settings, HtmlElement canvasElement);
 
         public IScoreRenderer Renderer { get; private set; }
         public Score Score { get; set; }

@@ -406,9 +406,19 @@
             This public class stores text widths for several fonts and allows width calculation 
             </summary>
         </member>
+        <member name="T:AlphaTab.Platform.Svg.PathSvgCanvas">
+            <summary>
+             A canvas implementation storing SVG data
+            </summary>
+        </member>
         <member name="T:AlphaTab.Platform.Svg.SupportedFonts">
             <summary>
             The supported fonts by the FontSizes public class
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.Svg.FontSvgCanvas">
+            <summary>
+             A canvas implementation storing SVG data
             </summary>
         </member>
         <member name="T:AlphaTab.Platform.Svg.SvgCanvas">

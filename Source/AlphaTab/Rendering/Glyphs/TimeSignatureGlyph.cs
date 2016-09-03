@@ -31,8 +31,8 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            var numerator = new NumberGlyph(0, 0, _numerator);
-            var denominator = new NumberGlyph(0, 18 * Scale, _denominator);
+            var numerator = new NumberGlyph(0, 2 * Scale, _numerator);
+            var denominator = new NumberGlyph(0, 20 * Scale, _denominator);
 
             AddGlyph(numerator);
             AddGlyph(denominator);
