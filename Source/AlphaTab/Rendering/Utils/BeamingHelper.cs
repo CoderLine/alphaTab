@@ -165,36 +165,40 @@ namespace AlphaTab.Rendering.Utils
             _beatLineXPositions[beat.Index] = new BeatLinePositions(up, down);
         }
 
-        public BeamDirection Direction
+        public BeamDirection Direction { get; private set; }
+
+        public void Finish()
         {
-            get
+            Direction = CalculateDirection();
+        }
+
+        private BeamDirection CalculateDirection()
+        {
+            // multivoice handling
+            if (Voice.Index > 0)
             {
-                // multivoice handling
-                if (Voice.Index > 0)
+                return Invert(BeamDirection.Down);
+            }
+            if (Voice.Bar.Voices.Count > 1)
+            {
+                for (int v = 1; v < Voice.Bar.Voices.Count; v++)
                 {
-                    return Invert(BeamDirection.Down);
-                }
-                if (Voice.Bar.Voices.Count > 1)
-                {
-                    for (int v = 1; v < Voice.Bar.Voices.Count; v++)
+                    if (!Voice.Bar.Voices[v].IsEmpty)
                     {
-                        if (!Voice.Bar.Voices[v].IsEmpty)
-                        {
-                            return Invert(BeamDirection.Up);
-                        }
+                        return Invert(BeamDirection.Up);
                     }
                 }
-                if (Beats.Count == 1 && Beats[0].Duration == Duration.Whole)
-                {
-                    return Invert(BeamDirection.Up);
-                }
-
-                // the average key is used for determination
-                //      key lowerequal than middle line -> up
-                //      key higher than middle line -> down
-                var avg = (GetValue(MaxNote) + GetValue(MinNote)) / 2;
-                return Invert(avg <= ScoreMiddleKeys[(int)_lastBeat.Voice.Bar.Clef] ? BeamDirection.Up : BeamDirection.Down);
             }
+            if (Beats.Count == 1 && Beats[0].Duration == Duration.Whole)
+            {
+                return Invert(BeamDirection.Up);
+            }
+
+            // the average key is used for determination
+            //      key lowerequal than middle line -> up
+            //      key higher than middle line -> down
+            var avg = (GetValue(MaxNote) + GetValue(MinNote)) / 2;
+            return Invert(avg <= ScoreMiddleKeys[(int)_lastBeat.Voice.Bar.Clef] ? BeamDirection.Up : BeamDirection.Down);
         }
 
         private BeamDirection Invert(BeamDirection direction)

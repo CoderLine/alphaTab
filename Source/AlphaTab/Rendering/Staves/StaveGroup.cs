@@ -379,8 +379,20 @@ namespace AlphaTab.Rendering.Staves
             var x = X + _firstStaffInAccolade.X;
 
             var staveGroupBounds = new StaveGroupBounds();
-            staveGroupBounds.VisualBounds = new Bounds(cx, cy + Y, Width, Height);
-            staveGroupBounds.RealBounds = new Bounds(cx, cy + Y, Width, Height);
+            staveGroupBounds.VisualBounds = new Bounds
+            {
+                X = cx,
+                Y = cy + Y,
+                W = Width,
+                H = Height
+            };
+            staveGroupBounds.RealBounds = new Bounds
+            {
+                X = cx,
+                Y = cy + Y,
+                W = Width,
+                H = Height
+            };
             Layout.Renderer.BoundsLookup.AddStaveGroup(staveGroupBounds);
 
             var masterBarBoundsLookup = new FastList<MasterBarBounds>();
@@ -394,8 +406,20 @@ namespace AlphaTab.Rendering.Staves
                     {
                         var masterBarBounds = new MasterBarBounds();
                         masterBarBounds.IsFirstOfLine = renderer.IsFirstOfLine;
-                        masterBarBounds.RealBounds = new Bounds(x + renderer.X, realTop, renderer.Width, realHeight);
-                        masterBarBounds.VisualBounds = new Bounds(x + renderer.X, visualTop, renderer.Width, visualHeight);
+                        masterBarBounds.RealBounds = new Bounds
+                        {
+                            X = x + renderer.X,
+                            Y = realTop,
+                            W = renderer.Width,
+                            H = realHeight
+                        };
+                        masterBarBounds.VisualBounds = new Bounds
+                        {
+                            X = x + renderer.X,
+                            Y = visualTop,
+                            W = renderer.Width,
+                            H = visualHeight
+                        };
                         Layout.Renderer.BoundsLookup.AddMasterBar(masterBarBounds);
                         masterBarBoundsLookup.Add(masterBarBounds);
                     }

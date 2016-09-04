@@ -31,27 +31,12 @@ namespace AlphaTab.Platform.Svg
                 return;
             }
 
-            Buffer.Append("<svg x=\"");
-            Buffer.Append(x - BlurCorrection);
-            Buffer.Append("\" y=\"");
-            Buffer.Append(y - BlurCorrection);
-            Buffer.Append("\" class=\"at\" >");
-
-            Buffer.Append("<text style=\"fill:");
-            Buffer.Append(Color.ToRgbaString());
-            Buffer.Append("; ");
+            Buffer.Append("<svg x=\"" + (x - BlurCorrection) + "\" y=\"" + (y - BlurCorrection) + "\" class=\"at\" ><text style=\"fill:" + Color.RGBA + "; ");
             if (scale != 1)
             {
-                Buffer.Append("font-size: ");
-                Buffer.Append(scale * 100);
-                Buffer.Append("%");
+                Buffer.Append("font-size: " + (scale * 100) + "%");
             }
-            Buffer.Append("\" text-anchor=\"start\"");
-            Buffer.Append(">&#x");
-            Buffer.Append(Std.ToHexString((int)symbol));
-            Buffer.Append(";</text>\n");
-
-            Buffer.Append("</svg>");
+            Buffer.Append("\" text-anchor=\"start\">&#" + (int)symbol + ";</text></svg>");
         }
     }
 }

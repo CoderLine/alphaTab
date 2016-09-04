@@ -54,6 +54,12 @@
             of several notes played at the same time. 
             </summary>
         </member>
+        <member name="F:AlphaTab.Model.Beat.GlobalBeatId">
+            <summary>
+            This is a global counter for all beats. We use it 
+            at several locations for lookup tables. 
+            </summary>
+        </member>
         <member name="P:AlphaTab.Model.Beat.Start">
             <summary>
             The timeline position of the voice within the current bar. (unit: midi ticks)
@@ -1114,11 +1120,6 @@
             <param name="correction"></param>
             <returns></returns>
         </member>
-        <member name="P:AlphaTab.Rendering.ScoreBarRenderer.GlyphOverflow">
-            <summary>
-            gets the padding needed to place glyphs within the bounding box
-            </summary>
-        </member>
         <member name="T:AlphaTab.Rendering.ScoreBarRendererFactory">
             <summary>
             This Factory procudes ScoreBarRenderer instances
@@ -1187,11 +1188,6 @@
             <param name="line">the amount of steps while 2 steps are one line</param>
             <param name="correction"></param>
             <returns></returns>
-        </member>
-        <member name="P:AlphaTab.Rendering.TabBarRenderer.NumberOverflow">
-            <summary>
-            gets the padding needed to place numbers within the bounding box
-            </summary>
         </member>
         <member name="T:AlphaTab.Rendering.TabBarRendererFactory">
             <summary>

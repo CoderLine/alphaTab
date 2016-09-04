@@ -49,7 +49,7 @@ namespace AlphaTab.Collections
             }
         }
 
-        public string[] Keys
+        public TKey[] Keys
         {
             [JsMethod(InlineCodeExpression = "Object.keys(this)", Export = false)]
             get { return null; }

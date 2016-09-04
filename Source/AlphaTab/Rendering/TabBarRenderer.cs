@@ -67,12 +67,18 @@ namespace AlphaTab.Rendering
         public override void DoLayout()
         {
             _helpers = Staff.StaveGroup.Helpers.Helpers[Bar.Staff.Track.Index][Bar.Staff.Index][Bar.Index];
+            var res = Resources;
+            var numberOverflow = (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2f);
+            TopPadding = numberOverflow;
+            BottomPadding = numberOverflow;
+
             base.DoLayout();
-            Height = LineOffset * (Bar.Staff.Track.Tuning.Length - 1) + (NumberOverflow * 2);
+
+            Height = LineOffset * (Bar.Staff.Track.Tuning.Length - 1) + (numberOverflow * 2);
             if (Index == 0)
             {
-                Staff.RegisterStaveTop(NumberOverflow);
-                Staff.RegisterStaveBottom(Height - NumberOverflow);
+                Staff.RegisterStaveTop(TopOverflow);
+                Staff.RegisterStaveBottom(Height - BottomOverflow);
             }
         }
 
@@ -142,16 +148,6 @@ namespace AlphaTab.Rendering
             }
         }
 
-        public override float TopPadding
-        {
-            get { return NumberOverflow; }
-        }
-
-        public override float BottomPadding
-        {
-            get { return NumberOverflow; }
-        }
-
         /// <summary>
         /// Gets the relative y position of the given steps relative to first line.
         /// </summary>
@@ -161,18 +157,6 @@ namespace AlphaTab.Rendering
         public float GetTabY(int line, float correction = 0)
         {
             return (LineOffset * line) + (correction * Scale);
-        }
-
-        /// <summary>
-        /// gets the padding needed to place numbers within the bounding box
-        /// </summary>
-        public float NumberOverflow
-        {
-            get
-            {
-                var res = Resources;
-                return (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2f);
-            }
         }
 
         protected override void PaintBackground(float cx, float cy, ICanvas canvas)
@@ -185,7 +169,7 @@ namespace AlphaTab.Rendering
             // draw string lines
             //
             canvas.Color = res.StaveLineColor;
-            var lineY = cy + Y + NumberOverflow;
+            var lineY = cy + Y + TopPadding;
 
             for (int i = 0, j = Bar.Staff.Track.Tuning.Length; i < j; i++)
             {

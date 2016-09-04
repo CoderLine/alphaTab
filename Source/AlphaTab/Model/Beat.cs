@@ -18,7 +18,6 @@
 
 using AlphaTab.Audio;
 using AlphaTab.Collections;
-using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Model
 {
@@ -31,8 +30,15 @@ namespace AlphaTab.Model
         public const int WhammyBarMaxPosition = 60;
         public const int WhammyBarMaxValue = 24;
 
+        /// <summary>
+        /// This is a global counter for all beats. We use it 
+        /// at several locations for lookup tables. 
+        /// </summary>
+        private static int GlobalBeatId = 0;
+
         public Beat PreviousBeat { get; set; }
         public Beat NextBeat { get; set; }
+        public int Id { get; set; }
         public int Index { get; set; }
 
         public Voice Voice { get; set; }
@@ -180,6 +186,7 @@ namespace AlphaTab.Model
 
         public Beat()
         {
+            Id = GlobalBeatId++;
             WhammyBarPoints = new FastList<BendPoint>();
             Notes = new FastList<Note>();
             BrushType = BrushType.None;

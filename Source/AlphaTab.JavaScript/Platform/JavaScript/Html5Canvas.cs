@@ -73,8 +73,8 @@ namespace AlphaTab.Platform.JavaScript
             set
             {
                 _color = value;
-                _context.strokeStyle = value.ToRgbaString();
-                _context.fillStyle = value.ToRgbaString();
+                _context.strokeStyle = value.RGBA;
+                _context.fillStyle = value.RGBA;
             }
         }
 
@@ -245,8 +245,6 @@ namespace AlphaTab.Platform.JavaScript
             _context.fillText(Std.StringFromCharCode((int) symbol), x, y);
             _context.textBaseline = baseLine;
             _context.font = font;
-            //SvgRenderer glyph = new SvgRenderer(MusicFont.SymbolLookup[symbol], scale, scale);
-            //glyph.Paint(x, y, this);
         }
     }
 }

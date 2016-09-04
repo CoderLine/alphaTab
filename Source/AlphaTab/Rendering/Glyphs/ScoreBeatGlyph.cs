@@ -55,7 +55,10 @@ namespace AlphaTab.Rendering.Glyphs
                     NoteHeads = new ScoreNoteChordGlyph();
                     NoteHeads.Beat = Container.Beat;
                     NoteHeads.BeamingHelper = BeamingHelper;
-                    NoteLoop(CreateNoteGlyph);
+                    foreach (var note in Container.Beat.Notes)
+                    {
+                        CreateNoteGlyph(note);
+                    }
                     AddGlyph(NoteHeads);
 
                     //
@@ -67,7 +70,10 @@ namespace AlphaTab.Rendering.Glyphs
                         for (var i = 0; i < Container.Beat.Dots; i++)
                         {
                             var group = new GlyphGroup(0, 0);
-                            NoteLoop(n => CreateBeatDot(sr.GetNoteLine(n), group));
+                            foreach (var note in Container.Beat.Notes)
+                            {
+                                CreateBeatDot(sr.GetNoteLine(note), group);
+                            }
                             AddGlyph(group);
                         }
                     }

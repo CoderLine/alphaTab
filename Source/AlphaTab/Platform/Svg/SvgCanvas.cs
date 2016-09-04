@@ -83,7 +83,7 @@ namespace AlphaTab.Platform.Svg
             Buffer.Append("\" height=\"");
             Buffer.Append(h);
             Buffer.Append("\" style=\"fill:");
-            Buffer.Append(Color.ToRgbaString());
+            Buffer.Append(Color.RGBA);
             Buffer.Append(";\" />\n");
         }
 
@@ -98,7 +98,7 @@ namespace AlphaTab.Platform.Svg
             Buffer.Append("\" height=\"");
             Buffer.Append(h);
             Buffer.Append("\" style=\"stroke:");
-            Buffer.Append(Color.ToRgbaString());
+            Buffer.Append(Color.RGBA);
             Buffer.Append("; stroke-width:");
             Buffer.Append(LineWidth);
             Buffer.Append("; fill:transparent");
@@ -194,7 +194,7 @@ namespace AlphaTab.Platform.Svg
                 Buffer.Append("<path d=\"");
                 Buffer.Append(_currentPath.ToString());
                 Buffer.Append("\" style=\"fill:");
-                Buffer.Append(Color.ToRgbaString());
+                Buffer.Append(Color.RGBA);
                 Buffer.Append("\" stroke=\"none\"/>\n");
             }
             _currentPath = new StringBuilder();
@@ -208,7 +208,7 @@ namespace AlphaTab.Platform.Svg
                 Buffer.Append("<path d=\"");
                 Buffer.Append(_currentPath.ToString());
                 Buffer.Append("\" style=\"stroke:");
-                Buffer.Append(Color.ToRgbaString());
+                Buffer.Append(Color.RGBA);
                 Buffer.Append("; stroke-width:");
                 Buffer.Append(LineWidth);
                 Buffer.Append(";\" fill=\"none\" />\n");
@@ -226,7 +226,7 @@ namespace AlphaTab.Platform.Svg
             Buffer.Append("\" style=\"font:");
             Buffer.Append(Font.ToCssString());
             Buffer.Append("; fill:");
-            Buffer.Append(Color.ToRgbaString());
+            Buffer.Append(Color.RGBA);
             Buffer.Append(";\" ");
             Buffer.Append(" dominant-baseline=\"");
             Buffer.Append(GetSvgBaseLine());

@@ -27,14 +27,6 @@ namespace AlphaTab.Rendering.Utils
         public float Y { get; set; }
         public float W { get; set; }
         public float H { get; set; }
-
-        public Bounds(float x, float y, float w, float h)
-        {
-            X = x;
-            Y = y;
-            W = w;
-            H = h;
-        }
     }
 
     public class StaveGroupBounds
@@ -197,7 +189,7 @@ namespace AlphaTab.Rendering.Utils
 
     public partial class BoundsLookup
     {
-        private FastDictionary<string, BeatBounds> _beatLookup;
+        private FastDictionary<int, BeatBounds> _beatLookup;
         private StaveGroupBounds _currentStaveGroup;
         public FastList<StaveGroupBounds> StaveGroups { get; set; }
         public bool IsFinished { get; private set; }
@@ -205,7 +197,7 @@ namespace AlphaTab.Rendering.Utils
         public BoundsLookup()
         {
             StaveGroups = new FastList<StaveGroupBounds>();
-            _beatLookup = new FastDictionary<string, BeatBounds>();
+            _beatLookup = new FastDictionary<int, BeatBounds>();
         }
 
         public void Finish()
@@ -232,21 +224,12 @@ namespace AlphaTab.Rendering.Utils
 
         public void AddBeat(BeatBounds bounds)
         {
-            _beatLookup[GetBeatId(bounds.Beat)] = bounds;
-        }
-
-        private string GetBeatId(Beat beat)
-        {
-            return beat.Voice.Bar.Staff.Track.Index
-                   + "-" + beat.Voice.Bar.Staff.Index
-                   + "-" + beat.Voice.Bar.Index
-                   + "-" + beat.Voice.Index
-                   + "-" + beat.Index;
+            _beatLookup[bounds.Beat.Id] = bounds;
         }
 
         public BeatBounds FindBeat(Beat beat)
         {
-            var id = GetBeatId(beat);
+            var id = beat.Id;
             if (_beatLookup.ContainsKey(id))
             {
                 return _beatLookup[id];

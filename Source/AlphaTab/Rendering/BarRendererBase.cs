@@ -216,24 +216,18 @@ namespace AlphaTab.Rendering
         /// Can be used to specify where i.E. the score lines of the notation start.
         /// </summary>
         /// <returns></returns>
-        public virtual float TopPadding
+        public float TopPadding
         {
-            get
-            {
-                return 0;
-            }
+            get; set;
         }
 
         /// <summary>
         /// Gets the bottom padding for the main content of the renderer. 
         /// Can be used to specify where i.E. the score lines of the notation end.
         /// </summary>
-        public virtual float BottomPadding
+        public float BottomPadding
         {
-            get
-            {
-                return 0;
-            }
+            get; set;
         }
 
         public virtual void DoLayout()
@@ -336,8 +330,20 @@ namespace AlphaTab.Rendering
         {
             var barBounds = new BarBounds();
             barBounds.Bar = Bar;
-            barBounds.VisualBounds = new Bounds(cx + X, cy + Y + TopPadding, Width, Height - TopPadding - BottomPadding);
-            barBounds.RealBounds = new Bounds(cx + X, cy + Y, Width, Height);
+            barBounds.VisualBounds = new Bounds
+            {
+                X = cx + X,
+                Y = cy + Y + TopPadding,
+                W = Width,
+                H = Height - TopPadding - BottomPadding
+            };
+            barBounds.RealBounds = new Bounds
+            {
+                X = cx + X,
+                Y = cy + Y,
+                W = Width,
+                H = Height
+            };
             masterBarBounds.AddBar(barBounds);
 
             foreach (var voice in _voiceContainers)
@@ -351,10 +357,20 @@ namespace AlphaTab.Rendering
 
                         var beatBoundings = new BeatBounds();
                         beatBoundings.Beat = bc.Beat;
-                        beatBoundings.VisualBounds = new Bounds(cx + X + c.X + bc.X + bc.OnNotes.X,
-                            barBounds.VisualBounds.Y, bc.OnNotes.Width, barBounds.VisualBounds.H);
-                        beatBoundings.RealBounds = new Bounds(cx + X + c.X + bc.X, barBounds.RealBounds.Y, bc.Width,
-                            barBounds.RealBounds.H);
+                        beatBoundings.VisualBounds = new Bounds
+                        {
+                            X = cx + X + c.X + bc.X + bc.OnNotes.X,
+                            Y = barBounds.VisualBounds.Y,
+                            W = bc.OnNotes.Width,
+                            H = barBounds.VisualBounds.H
+                        };
+                        beatBoundings.RealBounds = new Bounds
+                        {
+                            X = cx + X + c.X + bc.X,
+                            Y = barBounds.RealBounds.Y,
+                            W = bc.Width,
+                            H = barBounds.RealBounds.H
+                        };
                         barBounds.AddBeat(beatBoundings);
                     }
                 }

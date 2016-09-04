@@ -72,30 +72,30 @@ namespace AlphaTab.Rendering.Utils
             foreach (var staveGroup in staveGroups)
             {
                 var sg = new StaveGroupBounds();
-                sg.VisualBounds = BoundsFromJson(staveGroup.VisualBounds);
-                sg.RealBounds = BoundsFromJson(staveGroup.RealBounds);
+                sg.VisualBounds = staveGroup.VisualBounds;
+                sg.RealBounds = staveGroup.RealBounds;
                 lookup.AddStaveGroup(sg);
 
                 foreach (var masterBar in staveGroup.Bars)
                 {
                     var mb = new MasterBarBounds();
                     mb.IsFirstOfLine = masterBar.IsFirstOfLine;
-                    mb.VisualBounds = BoundsFromJson(masterBar.VisualBounds);
-                    mb.RealBounds = BoundsFromJson(masterBar.RealBounds);
+                    mb.VisualBounds = masterBar.VisualBounds;
+                    mb.RealBounds = masterBar.RealBounds;
                     sg.AddBar(mb);
 
                     foreach (var bar in masterBar.Bars)
                     {
                         var b = new BarBounds();
-                        b.VisualBounds = BoundsFromJson(bar.VisualBounds);
-                        b.RealBounds = BoundsFromJson(bar.RealBounds);
+                        b.VisualBounds = bar.VisualBounds;
+                        b.RealBounds = bar.RealBounds;
                         mb.AddBar(b);
 
                         foreach (var beat in bar.Beats)
                         {
                             var bb = new BeatBounds();
-                            bb.VisualBounds = BoundsFromJson(beat.VisualBounds);
-                            bb.RealBounds = BoundsFromJson(beat.RealBounds);
+                            bb.VisualBounds = beat.VisualBounds;
+                            bb.RealBounds = beat.RealBounds;
                             bb.Beat = score
                                 .Tracks[beat.Member("TrackIndex").As<int>()]
                                 .Staves[beat.Member("StaffIndex").As<int>()]
@@ -110,11 +110,6 @@ namespace AlphaTab.Rendering.Utils
             }
 
             return lookup;
-        }
-
-        private static Bounds BoundsFromJson(Bounds json)
-        {
-            return new Bounds(json.X, json.Y, json.W, json.H);
         }
 
         private Bounds BoundsToJson(Bounds bounds)

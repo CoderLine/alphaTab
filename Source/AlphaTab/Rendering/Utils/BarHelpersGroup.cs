@@ -56,6 +56,10 @@ namespace AlphaTab.Rendering.Utils
                             // try to fit beam to current beamhelper
                             if (currentBeamHelper == null || !currentBeamHelper.CheckBeat(b))
                             {
+                                if (currentBeamHelper != null)
+                                {
+                                    currentBeamHelper.Finish();
+                                }
                                 // if not possible, create the next beaming helper
                                 currentBeamHelper = new BeamingHelper(bar.Staff.Track);
                                 currentBeamHelper.CheckBeat(b);

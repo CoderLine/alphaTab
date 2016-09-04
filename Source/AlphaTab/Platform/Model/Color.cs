@@ -24,6 +24,7 @@ namespace AlphaTab.Platform.Model
         public Color(byte r, byte g, byte b, byte a = 0xFF)
         {
             Raw = (a << 24) | (r << 16) | (g << 8) | b;
+            RGBA = "rgba(" + R + "," + G + "," + B + "," + (A / 255.0) + ")";
         }
 
         public int Raw
@@ -64,9 +65,9 @@ namespace AlphaTab.Platform.Model
             }
         }
 
-        public String ToRgbaString()
+        public string RGBA
         {
-            return "rgba(" + R + "," + G + "," + B + "," + (A / 255.0) + ")";
+            get; private set;
         }
     }
 }

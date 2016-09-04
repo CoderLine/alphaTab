@@ -32,7 +32,10 @@ namespace AlphaTab.Rendering.Glyphs
             if (!Container.Beat.IsRest)
             {
                 var accidentals = new AccidentalGroupGlyph();
-                NoteLoop(n => CreateAccidentalGlyph(n, accidentals));
+                foreach (var note in Container.Beat.Notes)
+                {
+                    CreateAccidentalGlyph(note, accidentals);
+                }
 
                 if (!accidentals.IsEmpty)
                 {

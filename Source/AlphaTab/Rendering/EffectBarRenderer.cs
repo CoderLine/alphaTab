@@ -18,7 +18,6 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Layout;
 
@@ -59,13 +58,11 @@ namespace AlphaTab.Rendering
             // after all layouting and sizing place and size the effect glyphs
             IsEmpty = true;
 
-            for (int v = 0; v < Bar.Voices.Count; v++)
+            foreach (var voice in Bar.Voices)
             {
-                var voice = Bar.Voices[v];
                 foreach (var key in _effectGlyphs[voice.Index].Keys)
                 {
-                    var beatIndex = Std.ParseInt(key);
-                    AlignGlyph(_info.SizingMode, voice.Beats[beatIndex]);
+                    AlignGlyph(_info.SizingMode, voice.Beats[key]);
                     IsEmpty = false;
                 }
             }
@@ -99,9 +96,8 @@ namespace AlphaTab.Rendering
 
         protected override void CreateBeatGlyphs()
         {
-            for (int v = 0; v < Bar.Voices.Count; v++)
+            foreach (var voice in Bar.Voices)
             {
-                var voice = Bar.Voices[v];
                 _effectGlyphs.Add(new FastDictionary<int, EffectGlyph>());
                 _uniqueEffectGlyphs.Add(new FastList<EffectGlyph>());
                 CreateVoiceGlyphs(voice);
@@ -110,9 +106,8 @@ namespace AlphaTab.Rendering
 
         private void CreateVoiceGlyphs(Voice v)
         {
-            for (int i = 0, j = v.Beats.Count; i < j; i++)
+            foreach (var b in v.Beats)
             {
-                var b = v.Beats[i];
                 // we create empty glyphs as alignment references and to get the 
                 // effect bar sized
                 var container = new BeatContainerGlyph(b, GetOrCreateVoiceContainer(v), true);

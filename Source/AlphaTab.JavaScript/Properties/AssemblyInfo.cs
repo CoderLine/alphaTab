@@ -7,6 +7,7 @@ using AlphaTab.Platform.JavaScript;
 using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
+using AlphaTab.Rendering.Utils;
 using AlphaTab.Xml;
 using SharpKit.JavaScript;
 
@@ -91,6 +92,14 @@ using SharpKit.JavaScript;
 [assembly: JsMethod(TargetType = typeof(System.Console), TargetMethod = "WriteLine", InlineCodeExpression = "console.log(value)")]
 
 [assembly: JsMethod(TargetType = typeof(Nullable<>), TargetMethod = "get_Value", InlineCodeExpression = "this")]
+
+[assembly: JsType(Mode = JsMode.Json, TargetType = typeof(Bounds),
+                    AutomaticPropertiesAsFields = false,
+                    Export = false,
+                    IgnoreGenericTypeArguments = true,
+                    IgnoreGenericMethodArguments = true,
+                    OmitCasts = true
+                    )]
 
 [assembly: JsType(Mode = JsMode.Prototype, TargetType = typeof(Html5Canvas),
                     AutomaticPropertiesAsFields = false,

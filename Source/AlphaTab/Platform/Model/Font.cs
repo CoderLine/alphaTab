@@ -33,6 +33,8 @@ namespace AlphaTab.Platform.Model
     /// </summary>
     public class Font
     {
+        private string _css;
+
         public string Family { get; set; }
         public float Size { get; set; }
         public FontStyle Style { get; set; }
@@ -58,6 +60,7 @@ namespace AlphaTab.Platform.Model
             Family = family;
             Size = size;
             Style = style;
+            _css = ToCssString();
         }
 
         public Font Clone()
@@ -67,6 +70,11 @@ namespace AlphaTab.Platform.Model
 
         public string ToCssString(float scale = 1)
         {
+            if (_css != null && scale == 1)
+            {
+                return _css;
+            }
+
             var buf = new StringBuilder();
 
             if (IsBold)
@@ -86,6 +94,5 @@ namespace AlphaTab.Platform.Model
 
             return buf.ToString();
         }
-
     }
 }

@@ -82,16 +82,6 @@ namespace AlphaTab.Rendering
             return 0;
         }
 
-        public override float TopPadding
-        {
-            get { return GlyphOverflow; }
-        }
-
-        public override float BottomPadding
-        {
-            get { return GlyphOverflow; }
-        }
-
         public float LineOffset
         {
             get
@@ -103,14 +93,19 @@ namespace AlphaTab.Rendering
         public override void DoLayout()
         {
             _helpers = Staff.StaveGroup.Helpers.Helpers[Bar.Staff.Track.Index][Bar.Staff.Index][Bar.Index];
-            base.DoLayout();
 
+            var res = Resources;
+            var glyphOverflow = (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2f);
+            TopPadding = glyphOverflow;
+            BottomPadding = glyphOverflow;
+
+            base.DoLayout();
 
             Height = (LineOffset * 4) + TopPadding + BottomPadding;
             if (Index == 0)
             {
-                Staff.RegisterStaveTop(GlyphOverflow);
-                Staff.RegisterStaveBottom(Height - GlyphOverflow);
+                Staff.RegisterStaveTop(TopPadding);
+                Staff.RegisterStaveBottom(Height - BottomPadding);
             }
 
             var top = GetScoreY(0);
@@ -822,18 +817,6 @@ namespace AlphaTab.Rendering
             return ((LineOffset / 2) * steps) + (correction * Scale);
         }
 
-        /// <summary>
-        /// gets the padding needed to place glyphs within the bounding box
-        /// </summary>
-        private float GlyphOverflow
-        {
-            get
-            {
-                var res = Resources;
-                return (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2f);
-            }
-        }
-
         //private static readonly Random Random = new Random();
         protected override void PaintBackground(float cx, float cy, ICanvas canvas)
         {
@@ -852,7 +835,7 @@ namespace AlphaTab.Rendering
             // draw string lines
             //
             canvas.Color = res.StaveLineColor;
-            var lineY = cy + Y + GlyphOverflow;
+            var lineY = cy + Y + TopPadding;
 
             for (var i = 0; i < 5; i++)
             {

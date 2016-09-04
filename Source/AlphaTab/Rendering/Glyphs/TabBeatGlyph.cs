@@ -35,7 +35,10 @@ namespace AlphaTab.Rendering.Glyphs
                 NoteNumbers = new TabNoteChordGlyph(0, 0, Container.Beat.GraceType != GraceType.None);
                 NoteNumbers.Beat = Container.Beat;
                 NoteNumbers.BeamingHelper = BeamingHelper;
-                NoteLoop(CreateNoteGlyph);
+                foreach (var note in Container.Beat.Notes)
+                {
+                    CreateNoteGlyph(note);
+                }
                 AddGlyph(NoteNumbers);
 
                 //
