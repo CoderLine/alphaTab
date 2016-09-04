@@ -974,14 +974,14 @@ namespace AlphaTab.Importer
                         value = (int)_syData;
                     }
 
-                    beat.WhammyBarPoints.Add(new BendPoint(offset, value));
+                    beat.AddWhammyBarPoint(new BendPoint(offset, value));
 
                     NewSy();
                 }
 
                 while (beat.WhammyBarPoints.Count > 60)
                 {
-                    beat.WhammyBarPoints.RemoveAt(beat.WhammyBarPoints.Count - 1);
+                    beat.RemoveWhammyBarPoint(beat.WhammyBarPoints.Count - 1);
                 }
 
                 // set positions

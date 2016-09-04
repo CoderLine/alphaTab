@@ -50,11 +50,5 @@ namespace AlphaTab.Rendering.Glyphs
                     return MusicFontSymbol.None;
             }
         }
-
-        public override void DoLayout()
-        {
-            base.DoLayout();
-            Y += Renderer.Height * 0.75f;
-        }
     }
 }

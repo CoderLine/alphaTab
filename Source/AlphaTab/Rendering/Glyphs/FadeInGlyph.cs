@@ -33,11 +33,13 @@ namespace AlphaTab.Rendering.Glyphs
             var size = 6 * Scale;
             var width = Math.Max(Width, 14*Scale);
 
+            var offset = Renderer.Height/2;
+
             canvas.BeginPath();
-            canvas.MoveTo(cx + X, cy + Y);
-            canvas.QuadraticCurveTo(cx + X + (width / 2), cy + Y, cx + X + width, cy + Y - size);
-            canvas.MoveTo(cx + X, cy + Y);
-            canvas.QuadraticCurveTo(cx + X + (width / 2), cy + Y, cx + X + width, cy + Y + size);
+            canvas.MoveTo(cx + X, cy + Y + offset);
+            canvas.QuadraticCurveTo(cx + X + (width / 2), cy + Y + offset, cx + X + width, cy + Y + offset - size);
+            canvas.MoveTo(cx + X, cy + Y + offset);
+            canvas.QuadraticCurveTo(cx + X + (width / 2), cy + Y + offset, cx + X + width, cy + Y + offset + size);
             canvas.Stroke();
         }
     }

@@ -90,7 +90,7 @@ namespace AlphaTab.Rendering.Glyphs
             foreach (var beatEffectKey in BeatEffects)
             {
                 var g = BeatEffects[beatEffectKey];
-                g.Y = effectY;
+                g.Y += effectY;
                 g.X += Width / 2;
                 g.Renderer = Renderer;
                 effectY += effectSpacing;

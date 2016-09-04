@@ -18,9 +18,9 @@
 using System;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering;
-using AlphaTab.Rendering.Utils;
 using AlphaTab.Rendering.Glyphs;
 using SharpKit.Html;
+using SharpKit.JavaScript;
 
 namespace AlphaTab.Platform.JavaScript
 {
@@ -33,9 +33,18 @@ namespace AlphaTab.Platform.JavaScript
         private CanvasRenderingContext2D _context;
         private Color _color;
         private Font _font;
+        private Font _musicFont;
 
         public RenderingResources Resources { get; set; }
 
+        public Html5Canvas()
+        {
+            var fontElement = document.createElement("span");
+            fontElement.classList.add("at");
+            document.body.appendChild(fontElement);
+            var style = window.getComputedStyle(fontElement, null);
+            _musicFont = new Font(style.fontFamily, Std.ParseFloat(style.fontSize));
+        }
 
         public void BeginRender(float width, float height)
         {
@@ -188,7 +197,7 @@ namespace AlphaTab.Platform.JavaScript
                 {
                     case "top":
                         return TextBaseline.Top;
-                    case "middel":
+                    case "middle":
                         return TextBaseline.Middle;
                     case "bottom":
                         return TextBaseline.Bottom;
@@ -229,9 +238,15 @@ namespace AlphaTab.Platform.JavaScript
             {
                 return;
             }
-
-            SvgRenderer glyph = new SvgRenderer(MusicFont.SymbolLookup[symbol], scale, scale);
-            glyph.Paint(x, y, this);
+            var baseLine = _context.textBaseline;
+            var font = _context.font;
+            _context.font = _musicFont.ToCssString(scale);
+            _context.textBaseline = "middle";
+            _context.fillText(Std.StringFromCharCode((int) symbol), x, y);
+            _context.textBaseline = baseLine;
+            _context.font = font;
+            //SvgRenderer glyph = new SvgRenderer(MusicFont.SymbolLookup[symbol], scale, scale);
+            //glyph.Paint(x, y, this);
         }
     }
 }

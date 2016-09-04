@@ -42,17 +42,17 @@ namespace AlphaTab.Rendering
 
         public BoundsLookup BoundsLookup { get; set; }
 
-        public ScoreRenderer(Settings settings, object param)
+        public ScoreRenderer(Settings settings)
         {
             Settings = settings;
             RenderingResources = new RenderingResources(1);
             if (settings.Engine == null || !Environment.RenderEngines.ContainsKey(settings.Engine))
             {
-                Canvas = Environment.RenderEngines["default"](param);
+                Canvas = Environment.RenderEngines["default"]();
             }
             else
             {
-                Canvas = Environment.RenderEngines[settings.Engine](param);
+                Canvas = Environment.RenderEngines[settings.Engine]();
             }
             RecreateLayout();
         }

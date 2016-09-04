@@ -24,9 +24,9 @@ namespace AlphaTab
     {
         static void PlatformInit()
         {
-            RenderEngines["default"] = d => new Platform.CSharp.GdiCanvas();
-            RenderEngines["svg"] = d => new PathSvgCanvas();
-            RenderEngines["gdi"] = d => new Platform.CSharp.GdiCanvas();
+            RenderEngines["default"] = () => new Platform.CSharp.GdiCanvas();
+            RenderEngines["svg"] = () => new PathSvgCanvas();
+            RenderEngines["gdi"] = () => new Platform.CSharp.GdiCanvas();
             FileLoaders["default"] = () => new Platform.CSharp.CsFileLoader();
         }
     }

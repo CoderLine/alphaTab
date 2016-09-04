@@ -37,7 +37,7 @@ namespace AlphaTab.Rendering.Effects
 
         public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
-            return new DynamicsGlyph(0, 0, beat.Dynamic);
+            return new DynamicsGlyph(0, GetHeight(renderer) / 2, beat.Dynamic);
         }
 
         public bool CanExpand(EffectBarRenderer renderer, Beat @from, Beat to)

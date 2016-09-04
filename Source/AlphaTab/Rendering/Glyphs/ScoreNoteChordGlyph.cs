@@ -228,28 +228,21 @@ namespace AlphaTab.Rendering.Glyphs
                 int offset;
                 var baseNote = direction == BeamDirection.Up ? MinNote : MaxNote;
                 var tremoloX = direction == BeamDirection.Up ? displacedX : 0;
-                if (Beat.TremoloSpeed != null)
+                var speed = Beat.TremoloSpeed.Value;
+                switch (speed)
                 {
-                    var speed = Beat.TremoloSpeed.Value;
-                    switch (speed)
-                    {
-                        case Duration.ThirtySecond:
-                            offset = direction == BeamDirection.Up ? -15 : 10;
-                            break;
-                        case Duration.Sixteenth:
-                            offset = direction == BeamDirection.Up ? -12 : 10;
-                            break;
-                        case Duration.Eighth:
-                            offset = direction == BeamDirection.Up ? -10 : 10;
-                            break;
-                        default:
-                            offset = direction == BeamDirection.Up ? -15 : 15;
-                            break;
-                    }
-                }
-                else
-                {
-                    offset = direction == BeamDirection.Up ? -15 : 15;
+                    case Duration.ThirtySecond:
+                        offset = direction == BeamDirection.Up ? -15 : 15;
+                        break;
+                    case Duration.Sixteenth:
+                        offset = direction == BeamDirection.Up ? -12 : 15;
+                        break;
+                    case Duration.Eighth:
+                        offset = direction == BeamDirection.Up ? -10 : 10;
+                        break;
+                    default:
+                        offset = direction == BeamDirection.Up ? -10 : 15;
+                        break;
                 }
 
                 _tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.Glyph.Y + offset * Scale, Beat.TremoloSpeed.Value);

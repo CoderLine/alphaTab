@@ -43,13 +43,33 @@ namespace AlphaTab.Rendering.Glyphs
                 if (Container.Beat.HasWhammyBar && !NoteNumbers.BeatEffects.ContainsKey("Whammy"))
                 {
                     NoteNumbers.BeatEffects["Whammy"] = new WhammyBarGlyph(Container.Beat, Container);
+
+                    var whammyValueHeight = (WhammyBarGlyph.WhammyMaxOffset*Scale)/Beat.WhammyBarMaxValue;
+
+                    var whammyHeight = Container.Beat.MaxWhammyPoint.Value * whammyValueHeight;
+                    Renderer.RegisterOverflowTop(whammyHeight);
                 }
 
                 //
                 // Tremolo Picking
                 if (Container.Beat.IsTremolo && !NoteNumbers.BeatEffects.ContainsKey("Tremolo"))
                 {
-                    NoteNumbers.BeatEffects["Tremolo"] = new TremoloPickingGlyph(5 * Scale, 0,
+                    int offset = 0;
+                    var speed = Container.Beat.TremoloSpeed.Value;
+                    switch (speed)
+                    {
+                        case Duration.ThirtySecond:
+                            offset = 10;
+                            break;
+                        case Duration.Sixteenth:
+                            offset = 5;
+                            break;
+                        case Duration.Eighth:
+                            offset = 0;
+                            break;
+                    }
+
+                    NoteNumbers.BeatEffects["Tremolo"] = new TremoloPickingGlyph(5 * Scale, offset * Scale,
                         Container.Beat.TremoloSpeed.Value);
                 }
             }

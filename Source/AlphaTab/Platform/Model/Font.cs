@@ -65,7 +65,7 @@ namespace AlphaTab.Platform.Model
             return new Font(Family, Size, Style);
         }
 
-        public string ToCssString()
+        public string ToCssString(float scale = 1)
         {
             var buf = new StringBuilder();
 
@@ -78,7 +78,7 @@ namespace AlphaTab.Platform.Model
                 buf.Append("italic ");
             }
 
-            buf.Append(Size);
+            buf.Append(Size * scale);
             buf.Append("px ");
             buf.Append("'");
             buf.Append(Family);

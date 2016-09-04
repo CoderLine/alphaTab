@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly float _scale;
 
-        public VibratoGlyph(float x, float y, float scale = 1)
+        public VibratoGlyph(float x, float y, float scale = 1.2f)
             : base(BeatXPosition.EndBeat)
         {
             _scale = scale;
@@ -38,11 +38,12 @@ namespace AlphaTab.Rendering.Glyphs
             var width = endX - startX;
             var step = 9 * Scale * _scale;
             var loops = (int)Math.Max(1, width / step);
+            var h = Renderer.Height;
 
             var loopX = 0f;
             for (var i = 0; i < loops; i++)
             {
-                canvas.FillMusicFontSymbol(cx + X + loopX, cy + Y, _scale, MusicFontSymbol.WaveHorizontal);
+                canvas.FillMusicFontSymbol(cx + X + loopX, cy + Y + h, _scale, MusicFontSymbol.WaveHorizontal);
                 loopX += step;
             }
         }

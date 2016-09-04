@@ -42,7 +42,7 @@ namespace Alphatab.PngDump
             // render score with svg engine
             var settings = Settings.Defaults;
             settings.Engine = "gdi";
-            var renderer = new ScoreRenderer(settings, null);
+            var renderer = new ScoreRenderer(settings);
 
             // iterate tracks
             for (int i = 0, j = score.Tracks.Count; i < j; i++)

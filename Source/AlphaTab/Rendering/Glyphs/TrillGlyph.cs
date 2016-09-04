@@ -22,12 +22,10 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class TrillGlyph : EffectGlyph
     {
-        private readonly float _scale;
 
-        public TrillGlyph(float x, float y, float scale = 0.9f)
+        public TrillGlyph(float x, float y)
             : base(x, y)
         {
-            _scale = scale;
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
@@ -39,17 +37,18 @@ namespace AlphaTab.Rendering.Glyphs
             var textw = canvas.MeasureText("tr");
             canvas.FillText("tr", cx + X, cy + Y);
 
-            var startX = textw;
+            var startX = textw + 3 * Scale;
             var endX = Width - startX;
-            var step = 11 * Scale * _scale;
+            var waveScale = 1.2f;
+            var step = 11 * Scale * waveScale;
             var loops = Math.Max(1, ((endX - startX) / step));
 
 
             var loopX = startX;
-            var loopY = cy + Y + res.MarkerFont.Size / 2;
+            var loopY = cy + Y + Renderer.Height;
             for (var i = 0; i < loops; i++)
             {
-                canvas.FillMusicFontSymbol(cx + X + loopX, loopY, _scale, MusicFontSymbol.WaveHorizontal);
+                canvas.FillMusicFontSymbol(cx + X + loopX, loopY, waveScale, MusicFontSymbol.WaveHorizontal);
                 loopX += step;
             }
         }

@@ -32,9 +32,9 @@ namespace AlphaTab.Platform.JavaScript
         {
         }
 
-        protected override IScoreRenderer CreateScoreRenderer(Settings settings, HtmlElement canvasElement)
+        protected override IScoreRenderer CreateScoreRenderer(Settings settings)
         {
-            return new ScoreRenderer(settings, canvasElement);
+            return new ScoreRenderer(settings);
         }
 
         public override void Load(object data)

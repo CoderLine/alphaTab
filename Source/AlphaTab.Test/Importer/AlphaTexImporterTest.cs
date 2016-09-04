@@ -204,7 +204,7 @@ namespace AlphaTab.Test.Importer
                 new StaveSettings("harmonics")
             };
 
-            var renderer = new ScoreRenderer(settings, null);
+            var renderer = new ScoreRenderer(settings);
             var svg = "";
             renderer.PartialRenderFinished += r =>
             {
@@ -248,7 +248,7 @@ namespace AlphaTab.Test.Importer
                 new StaveSettings("tab")
             };
 
-            var renderer = new ScoreRenderer(settings, null);
+            var renderer = new ScoreRenderer(settings);
             var partials = new List<string>();
             renderer.PartialRenderFinished += r =>
             {

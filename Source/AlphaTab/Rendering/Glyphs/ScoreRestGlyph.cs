@@ -24,7 +24,6 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly Duration _duration;
 
-        public Beat Beat { get; set; }
         public BeamingHelper BeamingHelper { get; set; }
 
         public ScoreRestGlyph(float x, float y, Duration duration)

@@ -46,7 +46,7 @@ namespace AlphaTab.SvgDump
             // render score with svg engine
             Settings settings = Settings.Defaults;
             settings.Engine = "svg";
-            ScoreRenderer renderer = new ScoreRenderer(settings, null);
+            ScoreRenderer renderer = new ScoreRenderer(settings);
 
             // get iterate tracks
             for (int i = 0; i < score.Tracks.Count; i++)

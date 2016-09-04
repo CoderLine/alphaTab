@@ -118,6 +118,8 @@ namespace AlphaTab.Rendering.Utils
         /// </summary>
         public Note MaxNote { get; set; }
 
+        public bool InvertBeamDirection { get; set; }
+
 
         public BeamingHelper(Track track)
         {
@@ -170,7 +172,7 @@ namespace AlphaTab.Rendering.Utils
                 // multivoice handling
                 if (Voice.Index > 0)
                 {
-                    return BeamDirection.Down;
+                    return Invert(BeamDirection.Down);
                 }
                 if (Voice.Bar.Voices.Count > 1)
                 {
@@ -178,26 +180,44 @@ namespace AlphaTab.Rendering.Utils
                     {
                         if (!Voice.Bar.Voices[v].IsEmpty)
                         {
-                            return BeamDirection.Up;
+                            return Invert(BeamDirection.Up);
                         }
                     }
                 }
                 if (Beats.Count == 1 && Beats[0].Duration == Duration.Whole)
                 {
-                    return BeamDirection.Up;
+                    return Invert(BeamDirection.Up);
                 }
 
                 // the average key is used for determination
                 //      key lowerequal than middle line -> up
                 //      key higher than middle line -> down
                 var avg = (GetValue(MaxNote) + GetValue(MinNote)) / 2;
-                return avg <= ScoreMiddleKeys[(int)_lastBeat.Voice.Bar.Clef] ? BeamDirection.Up : BeamDirection.Down;
+                return Invert(avg <= ScoreMiddleKeys[(int)_lastBeat.Voice.Bar.Clef] ? BeamDirection.Up : BeamDirection.Down);
             }
+        }
+
+        private BeamDirection Invert(BeamDirection direction)
+        {
+            if (!InvertBeamDirection) return direction;
+            switch (direction)
+            {
+                case BeamDirection.Down:
+                    return BeamDirection.Up;
+                case BeamDirection.Up:
+                    return BeamDirection.Down;
+            }
+            return BeamDirection.Up;
         }
 
 
         public bool CheckBeat(Beat beat)
         {
+            if (beat.InvertBeamDirection)
+            {
+                InvertBeamDirection = true;
+            }
+
             if (Voice == null)
             {
                 Voice = beat.Voice;
@@ -227,7 +247,7 @@ namespace AlphaTab.Rendering.Utils
                 for (var n = 0; n < beat.Notes.Count; n++)
                 {
                     var note = beat.Notes[n];
-                    if (note.LeftHandFinger != Fingers.Unknown ||  note.RightHandFinger != Fingers.Unknown)
+                    if (note.LeftHandFinger != Fingers.Unknown || note.RightHandFinger != Fingers.Unknown)
                     {
                         fingeringCount++;
                     }

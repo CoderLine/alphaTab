@@ -16,7 +16,7 @@ namespace AlphaTab.Platform.JavaScript
         {
         }
 
-        protected override IScoreRenderer CreateScoreRenderer(Settings settings, HtmlElement canvasElement)
+        protected override IScoreRenderer CreateScoreRenderer(Settings settings)
         {
             var renderer = new WorkerScoreRenderer(settings);
             renderer.ScoreLoaded += score =>
@@ -104,7 +104,7 @@ namespace AlphaTab.Platform.JavaScript
             _main = main;
             _main.addEventListener("message", HandleMessage, false);
             Settings settings = Settings.FromJson(options);
-            _renderer = new ScoreRenderer(settings, null);
+            _renderer = new ScoreRenderer(settings);
             _renderer.PartialRenderFinished += result => PostMessage(new { cmd = "partialRenderFinished", result = result });
             _renderer.RenderFinished += result => PostMessage(new { cmd = "renderFinished", result = result });
             _renderer.PostRenderFinished += () => PostMessage(new { cmd = "postRenderFinished", boundsLookup = _renderer.BoundsLookup.ToJson() });

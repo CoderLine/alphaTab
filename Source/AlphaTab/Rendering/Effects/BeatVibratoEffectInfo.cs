@@ -36,7 +36,7 @@ namespace AlphaTab.Rendering.Effects
 
         public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
-            return new VibratoGlyph(0, 5 * renderer.Scale, 1.15f);
+            return new VibratoGlyph(0, 5 * renderer.Scale, 1.4f);
         }
 
         public bool CanExpand(EffectBarRenderer renderer, Beat @from, Beat to)

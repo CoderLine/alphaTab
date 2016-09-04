@@ -454,7 +454,7 @@ namespace AlphaTab.Test.Importer
             }
             var settings = Settings.Defaults;
             settings.Engine = "svg";
-            var renderer = new ScoreRenderer(settings, null);
+            var renderer = new ScoreRenderer(settings);
             for (int i = 0; i < score.Tracks.Count; i++)
             {
                 Track track = score.Tracks[i];

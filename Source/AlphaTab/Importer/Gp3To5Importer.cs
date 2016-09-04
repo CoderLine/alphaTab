@@ -835,7 +835,7 @@ namespace AlphaTab.Importer
                     point.Offset = ReadInt32(); // 0...60
                     point.Value = ReadInt32() / BendStep; // 0..12 (amount of quarters)
                     ReadBool(); // vibrato
-                    beat.WhammyBarPoints.Add(point);
+                    beat.AddWhammyBarPoint(point);
                 }
             }
         }

@@ -784,6 +784,9 @@ namespace AlphaTab.Importer
                         case "Properties":
                             ParseBeatProperties(c, beat);
                             break;
+                        case "XProperties":
+                            ParseBeatXProperties(c, beat);
+                            break;
                         case "FreeText":
                             beat.Text = GetValue(c);
                             break;
@@ -832,6 +835,29 @@ namespace AlphaTab.Importer
             });
 
             _beatById[beatId] = beat;
+        }
+
+        private void ParseBeatXProperties(IXmlNode node, Beat beat)
+        {
+            node.IterateChildren(c =>
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "XProperty":
+                            var id = c.Attributes.Get("id").Value;
+                            switch (id)
+                            {
+                                case "1124204545":
+                                    var val = Std.ParseInt(GetValue(FindChildElement(c, "Int")));
+                                    beat.InvertBeamDirection = val == 1;
+                                    break;
+                            }
+                            break;
+                    }
+                }
+            });
         }
 
         private void ParseBeatProperties(IXmlNode node, Beat beat)

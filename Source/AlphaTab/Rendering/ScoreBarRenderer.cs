@@ -132,7 +132,7 @@ namespace AlphaTab.Rendering
                         maxNoteY -= h.FingeringCount * Resources.GraceFont.Size;
                         if (h.HasTuplet)
                         {
-                            maxNoteY -= Resources.EffectFont.Size*2;
+                            maxNoteY -= Resources.EffectFont.Size * 2;
                         }
                     }
 
@@ -357,6 +357,14 @@ namespace AlphaTab.Rendering
                 canvas.Stroke();
 
                 float fingeringY = y2;
+                if (direction == BeamDirection.Down)
+                {
+                    fingeringY += canvas.Font.Size * 2f;
+                }
+                else if( i != 0 )
+                {
+                    fingeringY -= canvas.Font.Size * 1.5f;
+                }
                 PaintFingering(canvas, beat, cx + X + beatLineX, direction, fingeringY);
 
                 var brokenBarOffset = 6 * Scale;
@@ -525,8 +533,9 @@ namespace AlphaTab.Rendering
             else
             {
                 beatLineX += 3 * Scale;
-                topY -= canvas.Font.Size;
             }
+
+
 
             // sort notes ascending in their value to ensure 
             // we are drawing the numbers according to their order on the stave 

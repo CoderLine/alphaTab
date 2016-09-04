@@ -65,7 +65,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
             var settings = Settings.Defaults;
             settings.Engine = "gdi";
             Settings = settings;
-            _renderer = new ScoreRenderer(settings, this);
+            _renderer = new ScoreRenderer(settings);
             _renderer.PreRender += () =>
             {
                 lock (this)

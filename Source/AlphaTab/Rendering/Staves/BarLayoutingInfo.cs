@@ -251,6 +251,7 @@ namespace AlphaTab.Rendering.Staves
             {
                 return _onTimePositions;
             }
+            _onTimePositionsForce = force;
 
             var positions = _onTimePositions = new FastDictionary<int, float>();
 

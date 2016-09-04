@@ -18,7 +18,6 @@
 using System;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
@@ -145,10 +144,6 @@ namespace AlphaTab.Rendering.Glyphs
                     canvas.Stroke();
                 }
             }
-
-
-
-
 
             if (secondPt.Value != 0)
             {

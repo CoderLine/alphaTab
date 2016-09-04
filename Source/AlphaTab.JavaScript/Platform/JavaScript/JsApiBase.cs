@@ -119,7 +119,7 @@ namespace AlphaTab.Platform.JavaScript
                 settings.Width = initialResizeEventInfo.NewWidth;
             }
 
-            Renderer = CreateScoreRenderer(settings, CanvasElement);
+            Renderer = CreateScoreRenderer(settings);
             Renderer.RenderFinished += o => TriggerEvent("rendered");
             Renderer.PostRenderFinished += () => TriggerEvent("post-rendered");
             Renderer.PreRender += () =>
@@ -179,7 +179,6 @@ namespace AlphaTab.Platform.JavaScript
                 var fontDirectory = settings.ScriptFile;
                 fontDirectory = fontDirectory.Substring(0, fontDirectory.LastIndexOf("/")) + "/Font/";
 
-                var styleUrl = "";
                 styleElement = (HtmlStyleElement)document.createElement("style");
                 styleElement.id = "alphaTabStyle";
                 styleElement.type = "text/css";
@@ -213,7 +212,7 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
-        protected abstract IScoreRenderer CreateScoreRenderer(Settings settings, HtmlElement canvasElement);
+        protected abstract IScoreRenderer CreateScoreRenderer(Settings settings);
 
         public IScoreRenderer Renderer { get; private set; }
         public Score Score { get; set; }

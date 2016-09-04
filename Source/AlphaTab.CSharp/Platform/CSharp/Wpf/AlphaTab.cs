@@ -85,7 +85,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
             settings.Engine = "gdi";
             Settings = settings;
             PartialResults = new ObservableCollection<ImageSource>();
-            _renderer = new ScoreRenderer(settings, this);
+            _renderer = new ScoreRenderer(settings);
             _renderer.PreRender += () =>
             {
                 lock (this)

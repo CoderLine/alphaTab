@@ -18,6 +18,7 @@
 
 using AlphaTab.Audio;
 using AlphaTab.Collections;
+using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Model
 {
@@ -131,6 +132,7 @@ namespace AlphaTab.Model
         }
 
         public FastList<BendPoint> WhammyBarPoints { get; set; }
+        public BendPoint MaxWhammyPoint { get; set; }
 
         public bool HasWhammyBar
         {
@@ -174,6 +176,8 @@ namespace AlphaTab.Model
         }
         public DynamicValue Dynamic { get; set; }
 
+        public bool InvertBeamDirection { get; set; }
+
         public Beat()
         {
             WhammyBarPoints = new FastList<BendPoint>();
@@ -191,6 +195,7 @@ namespace AlphaTab.Model
             TupletNumerator = -1;
             Dynamic = DynamicValue.F;
             Crescendo = CrescendoType.None;
+            InvertBeamDirection = false;
         }
 
         public static void CopyTo(Beat src, Beat dst)
@@ -218,6 +223,7 @@ namespace AlphaTab.Model
             dst.Crescendo = src.Crescendo;
             dst.Start = src.Start;
             dst.Dynamic = src.Dynamic;
+            dst.InvertBeamDirection = src.InvertBeamDirection;
         }
 
         public Beat Clone()
@@ -225,7 +231,7 @@ namespace AlphaTab.Model
             var beat = new Beat();
             for (int i = 0, j = WhammyBarPoints.Count; i < j; i++)
             {
-                beat.WhammyBarPoints.Add(WhammyBarPoints[i].Clone());
+                beat.AddWhammyBarPoint(WhammyBarPoints[i].Clone());
             }
             for (int i = 0, j = Notes.Count; i < j; i++)
             {
@@ -237,6 +243,36 @@ namespace AlphaTab.Model
                 beat.Automations.Add(Automations[i].Clone());
             }
             return beat;
+        }
+
+        public void AddWhammyBarPoint(BendPoint point)
+        {
+            WhammyBarPoints.Add(point);
+            if (MaxWhammyPoint == null || point.Value > MaxWhammyPoint.Value)
+            {
+                MaxWhammyPoint = point;
+            }
+        }
+
+        public void RemoveWhammyBarPoint(int index)
+        {
+            // check index
+            if (index < 0 || index >= WhammyBarPoints.Count) return;
+
+            // remove point
+            WhammyBarPoints.RemoveAt(index);
+            var point = WhammyBarPoints[index];
+
+            // update maxWhammy point if required
+            if (point != MaxWhammyPoint) return;
+            MaxWhammyPoint = null;
+            foreach (var currentPoint in WhammyBarPoints)
+            {
+                if (MaxWhammyPoint == null || currentPoint.Value > MaxWhammyPoint.Value)
+                {
+                    MaxWhammyPoint = currentPoint;
+                }
+            }
         }
 
         /// <summary>
