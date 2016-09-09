@@ -254,6 +254,16 @@ AlphaSynth.Main.AlphaSynthApi.prototype = {
             return;
         this.RealInstance.SetMasterVolume(volume);
     },
+    GetPlaybackSpeed: function (){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.GetPlaybackSpeed();
+    },
+    SetPlaybackSpeed: function (playbackSpeed){
+        if (this.RealInstance == null)
+            return;
+        this.RealInstance.SetPlaybackSpeed(playbackSpeed);
+    },
     GetState: function (){
         if (this.RealInstance == null)
             return;
@@ -342,6 +352,7 @@ AlphaSynth.Main.AlphaSynthFlashOutput = function (alphaSynthRoot){
     this._id = null;
     this._swfId = null;
     this._swfContainer = null;
+    this._playbackSpeed = 0;
     this.SampleRequest = null;
     this.Finished = null;
     this.PositionChanged = null;
@@ -357,6 +368,7 @@ AlphaSynth.Main.AlphaSynthFlashOutput.prototype = {
         return 44100;
     },
     Open: function (){
+        this._playbackSpeed = 1;
         this._id = "alphaSynthFlashPlayer" + AlphaSynth.Main.AlphaSynthFlashOutput.NextId;
         this._swfId = this._id + "swf";
         AlphaSynth.Main.AlphaSynthFlashOutput.Lookup[this._id] = this;
@@ -375,6 +387,9 @@ AlphaSynth.Main.AlphaSynthFlashOutput.prototype = {
         }, {
             id: this._swfId
         });
+    },
+    SetPlaybackSpeed: function (playbackSpeed){
+        document.getElementById(this._swfId).AlphaSynthSetPlaybackSpeed(playbackSpeed);
     },
     SequencerFinished: function (){
         document.getElementById(this._swfId).AlphaSynthSequencerFinished();
@@ -455,12 +470,8 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput = function (){
     this._audioNode = null;
     this._circularBuffer = null;
     this._finished = false;
-    this._seekTime = null;
-    this._startTime = 0;
-    this._pauseStart = 0;
-    this._pauseTime = 0;
-    this._paused = false;
-    this._latency = 0;
+    this._currentTime = 0;
+    this._playbackSpeed = 0;
     this.SampleRequest = null;
     this.Finished = null;
     this.PositionChanged = null;
@@ -471,11 +482,12 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
         return this._context.sampleRate | 0;
     },
     Open: function (){
+        this._playbackSpeed = 1;
         this._finished = false;
         this._circularBuffer = new AlphaSynth.Ds.CircularSampleBuffer(40960);
          window.AudioContext = window.AudioContext || window.webkitAudioContext;
         this._context = new AudioContext();
-        this._latency = 4096000 / (2 * this._context.sampleRate);
+        this._currentTime = 0;
         // create an empty buffer source (silence)
         this._buffer = this._context.createBuffer(2, 4096, this._context.sampleRate);
         // create a script processor node which will replace the silence with the generated audio
@@ -486,20 +498,6 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
     Play: function (){
         this.RequestBuffers();
         this._finished = false;
-        if (this._seekTime != null){
-            this._startTime = ((this._context.currentTime * 1000 - this._seekTime)) | 0;
-            this._seekTime = null;
-            this._pauseTime = 0;
-            this._paused = false;
-        }
-        else if (this._paused){
-            this._paused = false;
-            this._pauseTime += ((this._context.currentTime * 1000 - this._pauseStart)) | 0;
-        }
-        else {
-            this._startTime = ((this._context.currentTime * 1000)) | 0;
-            this._pauseTime = 0;
-        }
         this._source = this._context.createBufferSource();
         this._source.buffer = this._buffer;
         this._source.loop = true;
@@ -512,23 +510,21 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
             this._source.stop(0);
         }
         this._source = null;
-        this._paused = true;
-        this._pauseStart = ((this._context.currentTime * 1000)) | 0;
         this._audioNode.disconnect(0);
     },
     Stop: function (){
         this._finished = true;
-        this._paused = false;
-        this._seekTime = null;
         if (this._source != null){
             this._source.stop(0);
         }
+        this._currentTime = 0;
         this._source = null;
         this._circularBuffer.Clear();
         this._audioNode.disconnect(0);
     },
     Seek: function (position){
-        this._seekTime = position;
+        this._currentTime = position;
+        this._circularBuffer.Clear();
     },
     SequencerFinished: function (){
         this._finished = true;
@@ -546,9 +542,6 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
             }
         }
     },
-    CalcPosition: function (){
-        return (this._context.currentTime * 1000 - this._startTime - this._pauseTime - this._latency);
-    },
     GenerateSound: function (e){
         var ae = e;
         var left = ae.outputBuffer.getChannelData(0);
@@ -560,10 +553,6 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
                     this.Finished();
                 this.Stop();
             }
-            else {
-                // when buffering we count it as pause time
-                this._pauseTime += ((4096000 / (2 * this._context.sampleRate))) | 0;
-            }
         }
         else {
             var buffer = new Float32Array(samples);
@@ -573,13 +562,17 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
                 left[i] = buffer[s++];
                 right[i] = buffer[s++];
             }
+            this._currentTime += (left.length / this.get_SampleRate()) * 1000 * this._playbackSpeed;
         }
         if (this.PositionChanged != null){
-            this.PositionChanged(((this.CalcPosition())) | 0);
+            this.PositionChanged(this._currentTime | 0);
         }
         if (!this._finished){
             this.RequestBuffers();
         }
+    },
+    SetPlaybackSpeed: function (playbackSpeed){
+        this._playbackSpeed = playbackSpeed;
     },
     add_SampleRequest: function (value){
         this.SampleRequest = $CombineDelegates(this.SampleRequest, value);
@@ -660,6 +653,16 @@ AlphaSynth.Main.AlphaSynthWebWorker.prototype = {
                 break;
             case "setMasterVolume":
                 this._player.set_MasterVolume(data["value"]);
+                break;
+            case "getPlaybackSpeed":
+                this._main.postMessage({
+    cmd: "getPlaybackSpeed",
+    value: this._player.Sequencer.PlaybackSpeed
+}
+);
+                break;
+            case "setPlaybackSpeed":
+                this._player.set_PlaybackSpeed(data["value"]);
                 break;
             case "playPause":
                 this.PlayPause();
@@ -758,6 +761,12 @@ AlphaSynth.Main.AlphaSynthWebWorker.prototype = {
     },
     SetMasterVolume: function (volume){
         this._player.set_MasterVolume(volume);
+    },
+    GetPlaybackSpeed: function (){
+        return this._player.get_PlaybackSpeed();
+    },
+    SetPlaybackSpeed: function (playbackSpeed){
+        this._player.set_PlaybackSpeed(playbackSpeed);
     },
     OnReady: function (){
         this._main.postMessage({
@@ -970,6 +979,17 @@ AlphaSynth.Main.AlphaSynthWebWorkerApiBase.prototype = {
             value: volume
         });
     },
+    GetPlaybackSpeed: function (){
+        this._synth.postMessage({
+            cmd: "getPlaybackSpeed"
+        });
+    },
+    SetPlaybackSpeed: function (playbackSpeed){
+        this._synth.postMessage({
+            cmd: "setPlaybackSpeed",
+            value: playbackSpeed
+        });
+    },
     IsSoundFontLoaded: function (){
         this._synth.postMessage({
             cmd: "isSoundFontLoaded"
@@ -1051,6 +1071,9 @@ AlphaSynth.Main.AlphaSynthWebWorkerApiBase.prototype = {
                 break;
             case "playerSeek":
                 this._player.Seek(data["pos"]);
+                break;
+            case "setPlaybackSpeed":
+                this._player.SetPlaybackSpeed(data["value"]);
                 break;
         }
     },
@@ -1338,6 +1361,13 @@ AlphaSynth.Player.WebWorkerOutput.prototype = {
         this._workerSelf.postMessage({
     cmd: "playerSeek",
     pos: position
+}
+);
+    },
+    SetPlaybackSpeed: function (playbackSpeed){
+        this._workerSelf.postMessage({
+    cmd: "setPlaybackSpeed",
+    value: playbackSpeed
 }
 );
     }
@@ -3982,6 +4012,7 @@ AlphaSynth.Player.SynthPlayerState = {
 AlphaSynth.Player.SynthPlayer = function (){
     this._tickPosition = 0;
     this._timePosition = 0;
+    this._playbackSpeed = 0;
     this.PositionChanged = null;
     this.PlayerStateChanged = null;
     this.Finished = null;
@@ -4031,7 +4062,7 @@ AlphaSynth.Player.SynthPlayer.prototype = {
         return this._tickPosition;
     },
     set_TickPosition: function (value){
-        this.set_TimePosition(this.Sequencer.TicksToMillis(value));
+        this.set_TimePosition(((this.Sequencer.TicksToMillis(value) / this.Sequencer.PlaybackSpeed)) | 0);
     },
     get_MasterVolume: function (){
         return this.Synth.get_MasterVolume();
@@ -4054,6 +4085,14 @@ AlphaSynth.Player.SynthPlayer.prototype = {
             this.Sequencer.Play();
             this.Output.Play();
         }
+    },
+    get_PlaybackSpeed: function (){
+        return this._playbackSpeed;
+    },
+    set_PlaybackSpeed: function (value){
+        this._playbackSpeed = AlphaSynth.Synthesis.SynthHelper.ClampF(value, 0.125, 8);
+        this.Sequencer.PlaybackSpeed = this._playbackSpeed;
+        this.Output.SetPlaybackSpeed(this._playbackSpeed);
     },
     get_IsReady: function (){
         return this.IsSoundFontLoaded && this.IsMidiLoaded;
@@ -4179,7 +4218,7 @@ AlphaSynth.Player.SynthPlayer.prototype = {
         this.OnMidiLoad(new AlphaSynth.Player.ProgressEventArgs(loaded, total));
     },
     FirePositionChanged: function (pos){
-        var endTime = (((this.Sequencer.EndTime / this.Synth.SampleRate) | 0) * 1000);
+        var endTime = ((this.Sequencer.EndTime / this.Synth.SampleRate) | 0) * 1000;
         var currentTime = pos;
         var endTick = this.Sequencer.MillisToTicks(endTime);
         var currentTick = this.Sequencer.MillisToTicks(currentTime);
@@ -4330,7 +4369,6 @@ AlphaSynth.Sequencer.MidiFileSequencer = function (synth){
     this._tempoChanges = null;
     this._finished = null;
     this._blockList = null;
-    this._playbackRate = 0;
     this._eventIndex = 0;
     this._division = 0;
     this.Synth = null;
@@ -4338,10 +4376,11 @@ AlphaSynth.Sequencer.MidiFileSequencer = function (synth){
     this.CurrentTempo = 0;
     this.CurrentTime = 0;
     this.EndTime = 0;
+    this.PlaybackSpeed = 0;
     this.Synth = synth;
     this._eventIndex = 0;
     this._division = 0;
-    this._playbackRate = 1;
+    this.PlaybackSpeed = 1;
     this.IsPlaying = false;
     this._blockList = new Array(16);
     this._finished = [];
@@ -4350,12 +4389,6 @@ AlphaSynth.Sequencer.MidiFileSequencer = function (synth){
 AlphaSynth.Sequencer.MidiFileSequencer.prototype = {
     get_IsMidiLoaded: function (){
         return this._synthData != null;
-    },
-    get_PlaySpeed: function (){
-        return this._playbackRate;
-    },
-    set_PlaySpeed: function (value){
-        this._playbackRate = AlphaSynth.Synthesis.SynthHelper.ClampF(value, 0.125, 8);
     },
     AddFinishedListener: function (listener){
         this._finished.push(listener);
@@ -4437,7 +4470,7 @@ AlphaSynth.Sequencer.MidiFileSequencer.prototype = {
             this.FireFinished();
             return;
         }
-        var newMSize = ((this.Synth.MicroBufferSize * this._playbackRate)) | 0;
+        var newMSize = ((this.Synth.MicroBufferSize * this.PlaybackSpeed)) | 0;
         var endSample = this.CurrentTime + (newMSize * this.Synth.MicroBufferCount);
         for (var x = 0; x < this.Synth.MicroBufferCount; x++){
             this.CurrentTime += newMSize;
