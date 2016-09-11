@@ -119,7 +119,7 @@ namespace AlphaTab.Platform.JavaScript
         public void LoadBinaryAsync(string path, Action<byte[]> success, Action<Exception> error)
         {
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", path, false);
+            xhr.open("GET", path);
             xhr.responseType = "arraybuffer";
             xhr.onreadystatechange = e =>
             {

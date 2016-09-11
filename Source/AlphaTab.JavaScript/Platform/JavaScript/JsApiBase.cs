@@ -1,4 +1,5 @@
-﻿using AlphaTab.Collections;
+﻿using System;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
 using SharpKit.Html;

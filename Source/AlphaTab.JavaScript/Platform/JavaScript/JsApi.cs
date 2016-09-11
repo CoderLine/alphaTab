@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Importer;
 using AlphaTab.IO;
@@ -63,7 +64,32 @@ namespace AlphaTab.Platform.JavaScript
 
         public override void Render()
         {
-            if (Renderer != null)
+            if (Renderer == null) return;
+
+            // check if font is loaded for HTML5 canvas
+            if (Renderer.As<ScoreRenderer>().Canvas is Html5Canvas)
+            {
+                Action renderAction = null;
+                renderAction = () =>
+                {
+                    // if font is not yet loaded, try again in 1 sec
+                    if (!Environment.IsFontLoaded)
+                    {
+                        HtmlContext.window.setTimeout(() =>
+                        {
+                            renderAction();
+                        }, 1000);
+                    }
+                    else
+                    {
+                        // when font is finally loaded, start rendering
+                        Renderer.As<ScoreRenderer>().RenderMultiple(Tracks);
+
+                    }
+                };
+                renderAction();
+            }
+            else
             {
                 Renderer.As<ScoreRenderer>().RenderMultiple(Tracks);
             }

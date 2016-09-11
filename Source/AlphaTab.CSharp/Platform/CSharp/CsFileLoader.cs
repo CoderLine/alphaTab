@@ -26,16 +26,11 @@ namespace AlphaTab.Platform.CSharp
     /// </summary>
     public class CsFileLoader : IFileLoader
     {
-        public byte[] LoadBinary(string path)
-        {
-            return File.ReadAllBytes(path);
-        }
-
         public void LoadBinaryAsync(string path, Action<byte[]> success, Action<Exception> error)
         {
             try
             {
-                success(LoadBinary(path));
+                success(File.ReadAllBytes(path));
             }
             catch (Exception e)
             {

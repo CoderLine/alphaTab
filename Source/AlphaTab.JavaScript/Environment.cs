@@ -130,11 +130,9 @@ namespace AlphaTab
             var cssFontLoadingModuleSupported = JsContext.JsCode("!!document.fonts && !!document.fonts.load").As<bool>();
             if (cssFontLoadingModuleSupported)
             {
-                HtmlContext.console.log("register font callback");
                 // ReSharper disable once UnusedVariable
                 JsFunc<bool> onLoaded = () =>
                 {
-                    HtmlContext.console.log("font is loaded");
                     IsFontLoaded = true;
                     return true;
                 };
@@ -149,7 +147,6 @@ namespace AlphaTab
 
                     if (testItem == null)
                     {
-                        HtmlContext.console.log("creating check element");
                         // create a hidden element with the font style set
                         testItem = HtmlContext.document.createElement("div").As<HtmlDivElement>();
                         testItem.setAttribute("id", "alphaTabFontChecker");
@@ -167,13 +164,11 @@ namespace AlphaTab
                     var width = testItem.offsetWidth;
                     if (width > 30)
                     {
-                        HtmlContext.console.log("font loaded", width);
                         IsFontLoaded = true;
                         HtmlContext.document.body.removeChild(testItem);
                     }
                     else
                     {
-                        HtmlContext.console.log("checking again", width);
                         HtmlContext.window.setTimeout(() => {
                             checkFont();
                         }, 1000);

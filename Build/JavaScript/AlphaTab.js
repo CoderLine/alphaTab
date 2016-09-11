@@ -255,10 +255,8 @@ AlphaTab.Environment.CheckFontLoad = function (){
     }
     var cssFontLoadingModuleSupported =  !!document.fonts && !!document.fonts.load;
     if (cssFontLoadingModuleSupported){
-        console.log("register font callback");
         // ReSharper disable once UnusedVariable
         var onLoaded = function (){
-            console.log("font is loaded");
             AlphaTab.Environment.IsFontLoaded = true;
             return true;
         };
@@ -269,7 +267,6 @@ AlphaTab.Environment.CheckFontLoad = function (){
         checkFont = function (){
             var testItem = document.getElementById("alphaTabFontChecker");
             if (testItem == null){
-                console.log("creating check element");
                 // create a hidden element with the font style set
                 testItem = document.createElement("div");
                 testItem.setAttribute("id", "alphaTabFontChecker");
@@ -284,12 +281,10 @@ AlphaTab.Environment.CheckFontLoad = function (){
             // get width
             var width = testItem.offsetWidth;
             if (width > 30){
-                console.log("font loaded", width);
                 AlphaTab.Environment.IsFontLoaded = true;
                 document.body.removeChild(testItem);
             }
             else {
-                console.log("checking again", width);
                 window.setTimeout(function (){
                     checkFont();
                 }, 1000);
@@ -1214,7 +1209,26 @@ AlphaTab.Platform.JavaScript.JsApi.prototype = {
         this.ScoreLoaded(parser.ReadScore(), true);
     },
     Render: function (){
-        if (this.Renderer != null){
+        if (this.Renderer == null)
+            return;
+        // check if font is loaded for HTML5 canvas
+        if (true){
+            var renderAction = null;
+            renderAction = $CreateAnonymousDelegate(this, function (){
+                // if font is not yet loaded, try again in 1 sec
+                if (!AlphaTab.Environment.IsFontLoaded){
+                    window.setTimeout($CreateAnonymousDelegate(this, function (){
+                        renderAction();
+                    }), 1000);
+                }
+                else {
+                    // when font is finally loaded, start rendering
+                    this.Renderer.RenderMultiple(this.get_Tracks());
+                }
+            });
+            renderAction();
+        }
+        else {
             this.Renderer.RenderMultiple(this.get_Tracks());
         }
     }
@@ -1266,7 +1280,7 @@ AlphaTab.Platform.JavaScript.JsFileLoader.prototype = {
     },
     LoadBinaryAsync: function (path, success, error){
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", path, false);
+        xhr.open("GET", path);
         xhr.responseType = "arraybuffer";
         xhr.onreadystatechange = $CreateAnonymousDelegate(this, function (e){
             if (xhr.readyState == 4){
