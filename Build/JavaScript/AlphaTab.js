@@ -196,21 +196,102 @@ AlphaTab.Environment.PlatformInit = function (){
     AlphaTab.Environment.FileLoaders["default"] = function (){
         return new AlphaTab.Platform.JavaScript.JsFileLoader();
     };
+    // check whether webfont is loaded
+    AlphaTab.Environment.CheckFontLoad();
      Math.log2 = Math.log2 || function(x) { return Math.log(x) * Math.LOG2E; };;
     // try to build the find the alphaTab script url in case we are not in the webworker already
     if (self.document){
         var scriptElement = document["currentScript"];
-        // fallback to script tag that has an alphatab data attribute set.
         if (!scriptElement){
-            scriptElement = document.querySelector("script[data-alphatab]");
+            // try to get javascript from exception stack
+            try{
+                var error = new Error();
+                var stack = error["stack"];
+                if (!stack){
+                    throw $CreateException(error, new Error());
+                }
+                AlphaTab.Environment.ScriptFile = AlphaTab.Environment.ScriptFileFromStack(stack);
+            }
+            catch(e){
+                var stack = e["stack"];
+                if (!stack){
+                    scriptElement = document.querySelector("script[data-alphatab]");
+                }
+                else {
+                    AlphaTab.Environment.ScriptFile = AlphaTab.Environment.ScriptFileFromStack(stack);
+                }
+            }
         }
         // failed to automatically resolve
-        if (!scriptElement){
-            console.warn("Could not automatically find alphaTab script file for worker, please add the data-alphatab attribute to the script tag that includes alphaTab or provide it when initializin alphaTab");
+        if (((AlphaTab.Environment.ScriptFile==null)||(AlphaTab.Environment.ScriptFile.length==0))){
+            if (!scriptElement){
+                console.warn("Could not automatically find alphaTab script file for worker, please add the data-alphatab attribute to the script tag that includes alphaTab or provide it when initializing alphaTab");
+            }
+            else {
+                AlphaTab.Environment.ScriptFile = scriptElement.src;
+            }
         }
-        else {
-            AlphaTab.Environment.ScriptFile = scriptElement.src;
+    }
+};
+AlphaTab.Environment.ScriptFileFromStack = function (stack){
+    var matches = stack.match("(data:text\\/javascript(?:;[^,]+)?,.+?|(?:|blob:)(?:http[s]?|file):\\/\\/[\\/]?.+?\\/[^:\\)]*?)(?::\\d+)(?::\\d+)?");
+    if (!matches){
+        matches = stack.match("^(?:|[^:@]*@|.+\\)@(?=data:text\\/javascript|blob|http[s]?|file)|.+?\\s+(?: at |@)(?:[^:\\(]+ )*[\\(]?)(data:text\\/javascript(?:;[^,]+)?,.+?|(?:|blob:)(?:http[s]?|file):\\/\\/[\\/]?.+?\\/[^:\\)]*?)(?::\\d+)(?::\\d+)?");
+        if (!matches){
+            matches = stack.match("\\)@(data:text\\/javascript(?:;[^,]+)?,.+?|(?:|blob:)(?:http[s]?|file):\\/\\/[\\/]?.+?\\/[^:\\)]*?)(?::\\d+)(?::\\d+)?");
+            if (!matches){
+                return null;
+            }
         }
+    }
+    return matches[1];
+};
+AlphaTab.Environment.CheckFontLoad = function (){
+    var isWorker =  typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+    if (isWorker){
+        // no web fonts in web worker
+        AlphaTab.Environment.IsFontLoaded = false;
+        return;
+    }
+    var cssFontLoadingModuleSupported =  !!document.fonts && !!document.fonts.load;
+    if (cssFontLoadingModuleSupported){
+        console.log("register font callback");
+        // ReSharper disable once UnusedVariable
+        var onLoaded = function (){
+            console.log("font is loaded");
+            AlphaTab.Environment.IsFontLoaded = true;
+            return true;
+        };
+         document.fonts.load('1em alphaTab').then(onLoaded);
+    }
+    else {
+        window.addEventListener("DOMContentLoaded", function (e){
+            var testItem = document.getElementById("alphaTabFontChecker");
+            if (testItem == null){
+                console.log("creating check element");
+                // create a hidden element with the font style set
+                testItem = document.createElement("div");
+                testItem.setAttribute("id", "alphaTabFontChecker");
+                testItem.style.opacity = "0";
+                testItem.style.position = "absolute";
+                testItem.style.left = "0";
+                testItem.style.top = "0";
+                testItem.classList.add("at");
+                testItem.innerHTML = "&#" + 57424 + ";";
+                document.body.appendChild(testItem);
+            }
+            // get width
+            var width = testItem.offsetWidth;
+            if (width > 10){
+                console.log("font loaded");
+                AlphaTab.Environment.IsFontLoaded = true;
+                document.body.removeChild(testItem);
+            }
+            else {
+                console.log("checking again");
+                window.setTimeout(AlphaTab.Environment.CheckFontLoad, 1000);
+            }
+        });
     }
 };
 $StaticConstructor(function (){
@@ -219,6 +300,7 @@ $StaticConstructor(function (){
     AlphaTab.Environment.LayoutEngines = null;
     AlphaTab.Environment.StaveFactories = null;
     AlphaTab.Environment.ScriptFile = null;
+    AlphaTab.Environment.IsFontLoaded = false;
     AlphaTab.Environment.RenderEngines = {};
     AlphaTab.Environment.FileLoaders = {};
     AlphaTab.Environment.LayoutEngines = {};
@@ -1262,7 +1344,7 @@ AlphaTab.Platform.JavaScript.WorkerScoreRenderer = function (settings){
 };
 AlphaTab.Platform.JavaScript.WorkerScoreRenderer.prototype = {
     CreateWorkerUrl: function (){
-        var source = "self.onmessage = function(e) {\r\n            if(e.data.cmd == \'initialize\') {\r\n                importScripts(e.data.settings.atRoot);\r\n                    new AlphaTab.Platform.JavaScript.JsWorker(self, e.data.settings);\r\n                }\r\n            }";
+        var source = "self.onmessage = function(e) {\r\n                if(e.data.cmd == \'initialize\') {\r\n                    importScripts(e.data.settings.atRoot);\r\n                    new AlphaTab.Platform.JavaScript.JsWorker(self, e.data.settings);\r\n                }\r\n            }";
          window.URL = window.URL || window.webkitURL;;
          window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder  || window.MozBlobBuilder;;
         var blob;

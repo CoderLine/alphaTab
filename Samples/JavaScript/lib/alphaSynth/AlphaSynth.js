@@ -1165,18 +1165,49 @@ AlphaSynth.Platform.Platform.PlatformInit = function (){
     // try to build the find the alphaTab script url in case we are not in the webworker already
     if (self.document){
         var scriptElement = document["currentScript"];
-        // fallback to script tag that has an alphatab data attribute set.
         if (!scriptElement){
-            scriptElement = document.querySelector("script[data-alphasynth]");
+            // try to get javascript from exception stack
+            try{
+                var error = new Error();
+                var stack = error["stack"];
+                if (!stack){
+                    throw $CreateException(error, new Error());
+                }
+                AlphaSynth.Platform.Platform.ScriptFile = AlphaSynth.Platform.Platform.ScriptFileFromStack(stack);
+            }
+            catch(e){
+                var stack = e["stack"];
+                if (!stack){
+                    scriptElement = document.querySelector("script[data-alphasynth]");
+                }
+                else {
+                    AlphaSynth.Platform.Platform.ScriptFile = AlphaSynth.Platform.Platform.ScriptFileFromStack(stack);
+                }
+            }
         }
         // failed to automatically resolve
-        if (!scriptElement){
-            console.warn("Could not automatically find alphaSynth script file for worker, please add the data-alphasynth attribute to the script tag that includes alphasynth or provide it when initializing");
-        }
-        else {
-            AlphaSynth.Platform.Platform.ScriptFile = scriptElement.src;
+        if (!((AlphaSynth.Platform.Platform.ScriptFile==null)||(AlphaSynth.Platform.Platform.ScriptFile.length==0))){
+            if (!scriptElement){
+                console.warn("Could not automatically find alphaSynth script file for worker, please add the data-alphasynth attribute to the script tag that includes alphaSynth or provide it when initializing alphaSynth");
+            }
+            else {
+                AlphaSynth.Platform.Platform.ScriptFile = scriptElement.src;
+            }
         }
     }
+};
+AlphaSynth.Platform.Platform.ScriptFileFromStack = function (stack){
+    var matches = stack.match("(data:text\\/javascript(?:;[^,]+)?,.+?|(?:|blob:)(?:http[s]?|file):\\/\\/[\\/]?.+?\\/[^:\\)]*?)(?::\\d+)(?::\\d+)?");
+    if (!matches){
+        matches = stack.match("^(?:|[^:@]*@|.+\\)@(?=data:text\\/javascript|blob|http[s]?|file)|.+?\\s+(?: at |@)(?:[^:\\(]+ )*[\\(]?)(data:text\\/javascript(?:;[^,]+)?,.+?|(?:|blob:)(?:http[s]?|file):\\/\\/[\\/]?.+?\\/[^:\\)]*?)(?::\\d+)(?::\\d+)?");
+        if (!matches){
+            matches = stack.match("\\)@(data:text\\/javascript(?:;[^,]+)?,.+?|(?:|blob:)(?:http[s]?|file):\\/\\/[\\/]?.+?\\/[^:\\)]*?)(?::\\d+)(?::\\d+)?");
+            if (!matches){
+                return null;
+            }
+        }
+    }
+    return matches[1];
 };
 AlphaSynth.Platform.Std = function (){
 };

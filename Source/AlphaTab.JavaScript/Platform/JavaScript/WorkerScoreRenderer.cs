@@ -27,8 +27,8 @@ namespace AlphaTab.Platform.JavaScript
         private string CreateWorkerUrl()
         {
             var source = @"self.onmessage = function(e) {
-            if(e.data.cmd == 'initialize') {
-                importScripts(e.data.settings.atRoot);
+                if(e.data.cmd == 'initialize') {
+                    importScripts(e.data.settings.atRoot);
                     new AlphaTab.Platform.JavaScript.JsWorker(self, e.data.settings);
                 }
             }";
