@@ -19,10 +19,13 @@ using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Utils;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
+using System.Runtime.InteropServices;
 using AlphaTab.Platform.Model;
 using Color = AlphaTab.Platform.Model.Color;
 using Font = AlphaTab.Platform.Model.Font;
@@ -33,10 +36,12 @@ using GdiColor = System.Drawing.Color;
 
 namespace AlphaTab.Platform.CSharp
 {
-    public class GdiCanvas : ICanvas, IPathCanvas
+    public class GdiCanvas : ICanvas
     {
         private static readonly Bitmap MeasurementImage;
         private static readonly Graphics MeasurementGraphics;
+        private static readonly PrivateFontCollection MusicFontCollection;
+        private static readonly StringFormat MusicFontFormat;
 
         static GdiCanvas()
         {
@@ -45,6 +50,42 @@ namespace AlphaTab.Platform.CSharp
             newGraphics.SmoothingMode = SmoothingMode.HighQuality;
             newGraphics.TextRenderingHint = TextRenderingHint.AntiAlias;
             newGraphics.Clear(GdiColor.Transparent);
+
+            MusicFontFormat = new StringFormat(StringFormat.GenericTypographic)
+            {
+                LineAlignment = StringAlignment.Center,
+                Alignment = StringAlignment.Near
+            };
+
+            MusicFontCollection = new PrivateFontCollection();
+
+            using (var bravura = typeof(GdiCanvas).Assembly.GetManifestResourceStream(typeof(GdiCanvas), "Bravura.ttf"))
+            {
+                var dataPtr = Marshal.AllocCoTaskMem((int)bravura.Length);
+                try
+                {
+                    var fontData = new byte[bravura.Length];
+                    bravura.Read(fontData, 0, fontData.Length);
+                    Marshal.Copy(fontData, 0, dataPtr, fontData.Length);
+
+                    MusicFontCollection.AddMemoryFont(dataPtr, fontData.Length);
+                }
+                finally
+                {
+                    Marshal.FreeCoTaskMem(dataPtr);
+                }
+            }
+        }
+
+        private static readonly Dictionary<float, GdiFont> FontLookup = new Dictionary<float, GdiFont>();
+        private static GdiFont GetMusicFont(float scale)
+        {
+            GdiFont font;
+            if (!FontLookup.TryGetValue(scale, out font))
+            {
+                FontLookup[scale] = font = new GdiFont(MusicFontCollection.Families[0], 34*scale, GdiFontStyle.Regular, GraphicsUnit.Pixel);
+            }
+            return font;
         }
 
 
@@ -195,6 +236,19 @@ namespace AlphaTab.Platform.CSharp
             return _image;
         }
 
+        public virtual object OnPreRender()
+        {
+            // nothing to do
+            return null;
+        }
+
+        public virtual object OnRenderFinished()
+        {
+            // nothing to do
+            return null;
+        }
+
+
         private void RecreateImage()
         {
             var newImage = new Bitmap((int)_width, (int)_height, PixelFormat.Format32bppArgb);
@@ -326,8 +380,10 @@ namespace AlphaTab.Platform.CSharp
                 return;
             }
 
-            SvgRenderer glyph = new SvgRenderer(MusicFont.SymbolLookup[symbol], scale, scale);
-            glyph.Paint(x, y, this);
+            // for whatever reason the padding on GDI font rendering is a bit messed up, there is 1px padding on the left
+            x += scale;
+
+            _graphics.DrawString(Std.StringFromCharCode((int)symbol), GetMusicFont(scale), _brush, x, y, MusicFontFormat);
         }
     }
 }

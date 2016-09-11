@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 namespace AlphaTab.Platform.Svg
 {
     /// <summary>
-    ///  A canvas implementation storing SVG data
+    /// This SVG canvas renders the music symbols by adding a CSS class 'at' to all elements. 
     /// </summary>
     public class FontSvgCanvas : SvgCanvas
     {

@@ -66,7 +66,6 @@ using SharpKit.JavaScript;
 [assembly: JsProperty(Export = false, TargetType = typeof(IXmlNode), TargetProperty = "Value", Name = "nodeValue", NativeField = true)]
 [assembly: JsProperty(Export = false, TargetType = typeof(IXmlNode), TargetProperty = "ChildNodes", Name = "childNodes", NativeField = true)]
 [assembly: JsProperty(Export = false, TargetType = typeof(IXmlNode), TargetProperty = "FirstChild", Name = "firstChild", NativeField = true)]
-[assembly: JsProperty(Export = false, TargetType = typeof(IXmlNode), TargetProperty = "Attributes", Name = "attributes", NativeField = true)]
 [assembly: JsMethod(Export = false, TargetType = typeof(IXmlNode), TargetMethod = "GetAttribute", Name = "getAttribute")]
 [assembly: JsMethod(Export = false, TargetType = typeof(IXmlNode), TargetMethod = "GetElementsByTagName", Name = "getElementsByTagName")]
 

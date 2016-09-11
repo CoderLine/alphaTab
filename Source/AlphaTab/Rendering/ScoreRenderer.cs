@@ -69,7 +69,6 @@ namespace AlphaTab.Rendering
                 {
                     Layout = Environment.LayoutEngines[Settings.Layout.Mode](this);
                 }
-                Layout.PartialRenderFinished += OnPartialRenderFinished;
                 _currentLayoutMode = Settings.Layout.Mode;
                 return true;
             }
@@ -131,12 +130,8 @@ namespace AlphaTab.Rendering
                 Settings.Width = width;
                 Layout.Resize();
                 Layout.RenderAnnotation();
-                OnRenderFinished(new RenderFinishedEventArgs
-                {
-                    TotalHeight = Layout.Height,
-                    TotalWidth = Layout.Width
-                });
-                OnPostRenderFinished();
+                OnRenderFinished();
+                OnPostRender();
             }
         }
 
@@ -144,38 +139,48 @@ namespace AlphaTab.Rendering
         {
             Layout.LayoutAndRender();
             Layout.RenderAnnotation();
-            OnRenderFinished(new RenderFinishedEventArgs
-            {
-                TotalHeight = Layout.Height,
-                TotalWidth = Layout.Width
-            });
-            OnPostRenderFinished();
+            OnRenderFinished();
+            OnPostRender();
         }
 
-        public event Action PreRender;
+        public event Action<RenderFinishedEventArgs> PreRender;
         protected virtual void OnPreRender()
         {
-            Action handler = PreRender;
-            if (handler != null) handler();
+            var result = Canvas.OnPreRender();
+            var handler = PreRender;
+            if (handler != null) handler(new RenderFinishedEventArgs
+            {
+                TotalWidth = 0,
+                TotalHeight = 0,
+                Width = 0,
+                Height = 0,
+                RenderResult = result
+            });
         }
 
         public event Action<RenderFinishedEventArgs> PartialRenderFinished;
-        protected virtual void OnPartialRenderFinished(RenderFinishedEventArgs e)
+
+        public virtual void OnPartialRenderFinished(RenderFinishedEventArgs e)
         {
             Action<RenderFinishedEventArgs> handler = PartialRenderFinished;
             if (handler != null) handler(e);
         }
 
-
         public event Action<RenderFinishedEventArgs> RenderFinished;
-        protected virtual void OnRenderFinished(RenderFinishedEventArgs e)
+        protected virtual void OnRenderFinished()
         {
+            var result = Canvas.OnRenderFinished();
             Action<RenderFinishedEventArgs> handler = RenderFinished;
-            if (handler != null) handler(e);
+            if (handler != null) handler(new RenderFinishedEventArgs
+            {
+                RenderResult = result,
+                TotalHeight = Layout.Height,
+                TotalWidth = Layout.Width
+            });
         }
 
         public event Action PostRenderFinished;
-        protected virtual void OnPostRenderFinished()
+        protected virtual void OnPostRender()
         {
             Action handler = PostRenderFinished;
             if (handler != null) handler();

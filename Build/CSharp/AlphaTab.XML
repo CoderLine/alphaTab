@@ -376,6 +376,13 @@
             This file loader loads binary files using the native apis
             </summary>
         </member>
+        <member name="T:AlphaTab.Platform.CSharp.FontEmbeddedSvgCanvas">
+            <summary>
+            This SVG canvas embedds the SVG font directly into the produced SVG.
+            Due to the SVG opening tag that is generated, before the first actual rendering, 
+            the output of this canvas is no valid XML until the music sheet is completely rendered. 
+            </summary>
+        </member>
         <member name="T:AlphaTab.Platform.ICanvas">
             <summary>
             This is the base public interface for canvas implementations on different plattforms.
@@ -412,11 +419,6 @@
             This public class stores text widths for several fonts and allows width calculation 
             </summary>
         </member>
-        <member name="T:AlphaTab.Platform.Svg.PathSvgCanvas">
-            <summary>
-             A canvas implementation storing SVG data
-            </summary>
-        </member>
         <member name="T:AlphaTab.Platform.Svg.SupportedFonts">
             <summary>
             The supported fonts by the FontSizes public class
@@ -424,7 +426,7 @@
         </member>
         <member name="T:AlphaTab.Platform.Svg.FontSvgCanvas">
             <summary>
-             A canvas implementation storing SVG data
+            This SVG canvas renders the music symbols by adding a CSS class 'at' to all elements. 
             </summary>
         </member>
         <member name="T:AlphaTab.Platform.Svg.SvgCanvas">
@@ -927,12 +929,6 @@
             <summary>
             This public class parses svg path when accessing it. 
             This ensures the SVG path data only needs to be parsed once. 
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Rendering.Glyphs.MusicFont">
-            <summary>
-            This public class contains SVG path data for musical symbols
-            which can be rendered using the SvgPainter
             </summary>
         </member>
         <member name="T:AlphaTab.Rendering.Glyphs.SpacingGlyph">
@@ -1446,6 +1442,36 @@
             <ul>
              <li><strong>rhythm</strong> - Renders rhythm beams to tablature notes</li>
             </ul>
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
             </summary>
         </member>
     </members>

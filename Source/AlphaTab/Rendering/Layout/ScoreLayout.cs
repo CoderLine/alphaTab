@@ -181,15 +181,6 @@ namespace AlphaTab.Rendering.Layout
             return null;
         }
 
-        public event Action<RenderFinishedEventArgs> PartialRenderFinished;
-        protected virtual void OnPartialRenderFinished(RenderFinishedEventArgs e)
-        {
-            if (PartialRenderFinished != null)
-            {
-                PartialRenderFinished(e);
-            }
-        }
-
         public void RenderAnnotation()
         {
             // attention, you are not allowed to remove change this notice within any version of this library without permission!
@@ -208,7 +199,7 @@ namespace AlphaTab.Rendering.Layout
             canvas.TextAlign = TextAlign.Center;
             canvas.FillText(msg, x, 0);
             var result = canvas.EndRender();
-            OnPartialRenderFinished(new RenderFinishedEventArgs
+            Renderer.OnPartialRenderFinished(new RenderFinishedEventArgs
             {
                 Width = Width,
                 Height = height,

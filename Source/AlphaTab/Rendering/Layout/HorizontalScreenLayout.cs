@@ -169,7 +169,7 @@ namespace AlphaTab.Rendering.Layout
                 }
                 _group.PaintPartial(-renderX, _group.Y, Renderer.Canvas, currentBarIndex, partial.MasterBars.Count);
                 var result = canvas.EndRender();
-                OnPartialRenderFinished(new RenderFinishedEventArgs
+                Renderer.OnPartialRenderFinished(new RenderFinishedEventArgs
                 {
                     TotalWidth = Width,
                     TotalHeight = Height,

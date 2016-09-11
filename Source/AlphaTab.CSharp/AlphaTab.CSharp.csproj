@@ -91,6 +91,7 @@
     <Compile Include="IO\StreamWrapper.cs" />
     <Compile Include="Model\TuningParser.cs" />
     <Compile Include="Platform\CSharp\CsFileLoader.cs" />
+    <Compile Include="Platform\CSharp\FontEmbeddedSvgCanvas.cs" />
     <Compile Include="Platform\CSharp\GdiCanvas.cs" />
     <Compile Include="Platform\CSharp\WinForms\AlphaTabControl.cs">
       <SubType>Component</SubType>
@@ -106,6 +107,16 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\Font\bravura\ttf\Bravura.ttf">
+      <Link>Platform\CSharp\Bravura.ttf</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\Font\bravura\svg\Bravura.svg">
+      <Link>Platform\CSharp\Bravura.svg</Link>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="..\Source\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\Source\AlphaTab\AlphaTab.projitems')" />
   <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\AlphaTab\AlphaTab.projitems')" />

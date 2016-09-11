@@ -108,7 +108,7 @@ namespace AlphaTab.Platform.JavaScript
             _renderer.PartialRenderFinished += result => PostMessage(new { cmd = "partialRenderFinished", result = result });
             _renderer.RenderFinished += result => PostMessage(new { cmd = "renderFinished", result = result });
             _renderer.PostRenderFinished += () => PostMessage(new { cmd = "postRenderFinished", boundsLookup = _renderer.BoundsLookup.ToJson() });
-            _renderer.PreRender += () => PostMessage(new { cmd = "preRender" });
+            _renderer.PreRender += result => PostMessage(new { cmd = "preRender", result = result  });
         }
 
         private void HandleMessage(DOMEvent e)

@@ -20,7 +20,6 @@ using AlphaTab.Collections;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
-using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Platform.Svg
 {
@@ -53,7 +52,7 @@ namespace AlphaTab.Platform.Svg
             TextBaseline = TextBaseline.Default;
         }
 
-        public void BeginRender(float width, float height)
+        public virtual void BeginRender(float width, float height)
         {
             Buffer = new StringBuilder();
 
@@ -66,7 +65,7 @@ namespace AlphaTab.Platform.Svg
             _currentPathIsEmpty = true;
         }
 
-        public object EndRender()
+        public virtual object EndRender()
         {
             Buffer.Append("</svg>");
             return Buffer.ToString();
@@ -107,7 +106,6 @@ namespace AlphaTab.Platform.Svg
 
         public void BeginPath()
         {
-
         }
 
         public void ClosePath()
@@ -282,5 +280,18 @@ namespace AlphaTab.Platform.Svg
         }
 
         public abstract void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol);
+
+
+        public virtual object OnPreRender()
+        {
+            // nothing to do
+            return null;
+        }
+
+        public virtual object OnRenderFinished()
+        {
+            // nothing to do
+            return null;
+        }
     }
 }

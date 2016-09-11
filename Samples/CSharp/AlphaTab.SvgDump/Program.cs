@@ -18,7 +18,9 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Threading;
+using System.Xml;
 using System.Xml.Linq;
 using AlphaTab.Importer;
 using AlphaTab.Model;
@@ -28,6 +30,64 @@ namespace AlphaTab.SvgDump
 {
     class Program
     {
+        /// <summary>
+        /// This writer properly writes escaped entities for attributes.
+        /// </summary>
+        public class EntitizingXmlWriter : XmlTextWriter
+        {
+            public EntitizingXmlWriter(TextWriter writer) :
+                base(writer)
+            { }
+
+            public override void WriteString(string text)
+            {
+                // The start index of the next substring containing only non-entitized characters.
+                int start = 0;
+
+                // The index of the current character being checked.
+                for (int curr = 0; curr < text.Length; ++curr)
+                {
+                    // Check whether the current character should be entitized.
+                    char chr = text[curr];
+                    if (Encoding.UTF8.GetBytes(new[] {chr}).Length != 1)
+                    {
+                        // Write the previous substring of non-entitized characters.
+                        if (start < curr)
+                            base.WriteString(text.Substring(start, curr - start));
+
+                        if (char.IsHighSurrogate(chr))
+                        {
+                            if (curr + 1 < text.Length)
+                            {
+                                WriteSurrogateCharEntity(text[++curr], chr);
+                            }
+                            else
+                            {
+                                throw new ArgumentException("Invalid surrogate pair");
+                            }
+                        }
+                        else if (char.IsLowSurrogate(chr))
+                        {
+                            throw new ArgumentException("Invalid surrogate pair");
+                        }
+                        else
+                        {
+                            WriteCharEntity(chr);
+                        }
+
+                        // Next substring of non-entitized characters tentatively starts
+                        // immediately beyond current character.
+                        start = curr + 1;
+                    }
+                }
+
+                // Write the trailing substring of non-entitized characters.
+                if (start < text.Length)
+                    base.WriteString(text.Substring(start, text.Length - start));
+            }
+
+        }
+
         static void Main(string[] args)
         {
             if (args.Length != 1)
@@ -56,8 +116,14 @@ namespace AlphaTab.SvgDump
                 Console.WriteLine("Rendering track {0} - {1}", i + 1, track.Name);
                 var totalWidth = 0;
                 var totalHeight = 0;
-                var merged = XDocument.Parse("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"1px\" height=\"1px\"></svg>");
+                XDocument merged = null;
                 var currentY = 0f;
+                renderer.PreRender += r =>
+                {
+                    // append the svg close tag which would be part of the RenderFinished event
+                    var svgString = r.RenderResult.ToString() + "</svg>";
+                    merged = XDocument.Parse(svgString);
+                };
                 renderer.PartialRenderFinished += r =>
                 {
                     var subSvg = XDocument.Parse(r.RenderResult.ToString());
@@ -74,15 +140,17 @@ namespace AlphaTab.SvgDump
                 };
                 renderer.Render(track);
 
-                merged.Root.Attribute("width").Value = totalWidth + "px";
-                merged.Root.Attribute("height").Value = totalHeight + "px";
+                merged.Root.SetAttributeValue("width", totalWidth + "px");
+                merged.Root.SetAttributeValue("height", totalHeight + "px");
 
-
-                string svg = merged.ToString();
+               
+                var svg = new StringWriter();
+                var xmlWriter = new EntitizingXmlWriter(svg);
+                merged.Save(xmlWriter);
 
                 FileInfo info = new FileInfo(args[0]);
                 string path = Path.Combine(info.DirectoryName, Path.GetFileNameWithoutExtension(info.Name) + "-" + i + ".svg");
-                File.WriteAllText(path, svg);
+                File.WriteAllText(path, svg.ToString());
             }
         }
     }

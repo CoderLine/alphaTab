@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:converter="clr-namespace:AlphaTab.Wpf.Converter"
-        xmlns:wpf="clr-namespace:AlphaTab.Platform.CSharp.Wpf;assembly=AlphaTab"
         xmlns:controls="clr-namespace:AlphaTab.Wpf.Controls"
+        xmlns:wpf="clr-namespace:AlphaTab.Platform.CSharp.Wpf;assembly=AlphaTab"
         Title="AlphaTab" Height="800" Width="600" WindowState="Maximized">
     <Grid Background="#4b4c4c">
         <Grid.RowDefinitions>

@@ -149,7 +149,7 @@ namespace AlphaTab.Rendering.Layout
             }
 
             var result = canvas.EndRender();
-            OnPartialRenderFinished(new RenderFinishedEventArgs
+            Renderer.OnPartialRenderFinished(new RenderFinishedEventArgs
             {
                 Width = Width,
                 Height = y,
@@ -231,7 +231,7 @@ namespace AlphaTab.Rendering.Layout
             totalHeight += height;
 
             var result = canvas.EndRender();
-            OnPartialRenderFinished(new RenderFinishedEventArgs
+            Renderer.OnPartialRenderFinished(new RenderFinishedEventArgs
             {
                 TotalWidth = Width,
                 TotalHeight = totalHeight,

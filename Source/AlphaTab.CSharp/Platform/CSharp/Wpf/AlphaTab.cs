@@ -86,13 +86,14 @@ namespace AlphaTab.Platform.CSharp.Wpf
             Settings = settings;
             PartialResults = new ObservableCollection<ImageSource>();
             _renderer = new ScoreRenderer(settings);
-            _renderer.PreRender += () =>
+            _renderer.PreRender += result =>
             {
                 lock (this)
                 {
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
                         PartialResults.Clear();
+                        AddPartialResult(result);
                     }));
                 }
             };
@@ -121,18 +122,21 @@ namespace AlphaTab.Platform.CSharp.Wpf
             {
                 Width = result.TotalWidth;
                 Height = result.TotalHeight;
-                var bitmap = (Bitmap)result.RenderResult;
-                IntPtr hBitmap = bitmap.GetHbitmap();
-                try
+                if (result.RenderResult != null)
                 {
-                    PartialResults.Add(Imaging.CreateBitmapSourceFromHBitmap(
+                    var bitmap = (Bitmap) result.RenderResult;
+                    IntPtr hBitmap = bitmap.GetHbitmap();
+                    try
+                    {
+                        PartialResults.Add(Imaging.CreateBitmapSourceFromHBitmap(
                             hBitmap,
                             IntPtr.Zero, Int32Rect.Empty,
                             BitmapSizeOptions.FromWidthAndHeight(bitmap.Width, bitmap.Height)));
-                }
-                finally
-                {
-                    DeleteObject(hBitmap);
+                    }
+                    finally
+                    {
+                        DeleteObject(hBitmap);
+                    }
                 }
             }
         }

@@ -46,6 +46,17 @@ namespace AlphaTab.Platform.JavaScript
             _musicFont = new Font(style.fontFamily, Std.ParseFloat(style.fontSize));
         }
 
+        public virtual object OnPreRender()
+        {
+            // nothing to do
+            return null;
+        }
+
+        public virtual object OnRenderFinished()
+        {
+            // nothing to do
+            return null;
+        }
         public void BeginRender(float width, float height)
         {
             _canvas = (HtmlCanvasElement) document.createElement("canvas");

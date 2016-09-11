@@ -66,11 +66,15 @@ namespace AlphaTab.Platform.CSharp.WinForms
             settings.Engine = "gdi";
             Settings = settings;
             _renderer = new ScoreRenderer(settings);
-            _renderer.PreRender += () =>
+            _renderer.PreRender += result =>
             {
                 lock (this)
                 {
                     _images = new List<Image>();
+                    BeginInvoke(new Action(() =>
+                    {
+                        AddPartialResult(result);
+                    }));
                 }
             };
             _renderer.PartialRenderFinished += result =>
@@ -92,8 +96,11 @@ namespace AlphaTab.Platform.CSharp.WinForms
             {
                 Width = (int)result.TotalWidth;
                 Height = (int)result.TotalHeight;
-                _images.Add((Image)result.RenderResult);
-                Invalidate();
+                if (result.RenderResult != null)
+                {
+                    _images.Add((Image)result.RenderResult);
+                    Invalidate();
+                }
             }
         }
 

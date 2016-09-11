@@ -46,8 +46,10 @@ namespace AlphaTab.Platform
         float MeasureText(string text);
         void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol);
 
+        object OnPreRender();
         void BeginRender(float width, float height);
         object EndRender();
+        object OnRenderFinished();
     }
 
     /// <summary>

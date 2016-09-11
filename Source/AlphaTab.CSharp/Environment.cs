@@ -16,7 +16,7 @@
  * License along with this library.
  */
 
-using AlphaTab.Platform.Svg;
+using AlphaTab.Platform.CSharp;
 
 namespace AlphaTab
 {
@@ -24,10 +24,10 @@ namespace AlphaTab
     {
         static void PlatformInit()
         {
-            RenderEngines["default"] = () => new Platform.CSharp.GdiCanvas();
-            RenderEngines["svg"] = () => new PathSvgCanvas();
-            RenderEngines["gdi"] = () => new Platform.CSharp.GdiCanvas();
-            FileLoaders["default"] = () => new Platform.CSharp.CsFileLoader();
+            RenderEngines["default"] = () => new GdiCanvas();
+            RenderEngines["svg"] = () => new FontEmbeddedSvgCanvas();
+            RenderEngines["gdi"] = () => new GdiCanvas();
+            FileLoaders["default"] = () => new CsFileLoader();
         }
     }
 }

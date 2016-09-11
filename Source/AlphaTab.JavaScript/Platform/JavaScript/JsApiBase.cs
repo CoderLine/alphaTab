@@ -63,7 +63,7 @@ namespace AlphaTab.Platform.JavaScript
 
                 #region Create context elements (wrapper, canvas etc)
 
-                CanvasElement = (HtmlElement) document.createElement("div");
+                CanvasElement = (HtmlElement)document.createElement("div");
 
                 CanvasElement.className = "alphaTabSurface";
                 CanvasElement.style.fontSize = "0";
@@ -101,7 +101,7 @@ namespace AlphaTab.Platform.JavaScript
                         }, 100);
                     });
                 }
-            
+
                 #endregion
             }
 
@@ -122,33 +122,13 @@ namespace AlphaTab.Platform.JavaScript
             Renderer = CreateScoreRenderer(settings);
             Renderer.RenderFinished += o => TriggerEvent("rendered");
             Renderer.PostRenderFinished += () => TriggerEvent("post-rendered");
-            Renderer.PreRender += () =>
+            Renderer.PreRender += result =>
             {
                 CanvasElement.innerHTML = "";
+                AppendRenderResult(result);
             };
-            Renderer.PartialRenderFinished += result =>
-            {
-                Node itemToAppend;
-                if (@typeof(result.RenderResult) == "string")
-                {
-                    var partialResult = (HtmlDivElement) document.createElement("div");
-                    partialResult.innerHTML = result.RenderResult.As<string>();
-                    itemToAppend = partialResult.firstChild;
-                }
-                else
-                {
-                    itemToAppend = (Node) result.RenderResult;
-                }
-
-                CanvasElement.style.width = result.TotalWidth + "px";
-                CanvasElement.style.height = result.TotalHeight + "px";
-                CanvasElement.appendChild(itemToAppend);
-            };
-            Renderer.RenderFinished += result =>
-            {
-                CanvasElement.style.width = result.TotalWidth + "px";
-                CanvasElement.style.height = result.TotalHeight + "px";
-            };
+            Renderer.PartialRenderFinished += AppendRenderResult;
+            Renderer.RenderFinished += AppendRenderResult;
 
             #endregion
 
@@ -169,6 +149,28 @@ namespace AlphaTab.Platform.JavaScript
 
 
             #endregion
+        }
+
+        private void AppendRenderResult(RenderFinishedEventArgs result)
+        {
+            CanvasElement.style.width = result.TotalWidth + "px";
+            CanvasElement.style.height = result.TotalHeight + "px";
+
+            if (result.RenderResult != null)
+            {
+                Node itemToAppend;
+                if (@typeof(result.RenderResult) == "string")
+                {
+                    var partialResult = (HtmlDivElement)document.createElement("div");
+                    partialResult.innerHTML = result.RenderResult.As<string>();
+                    itemToAppend = partialResult.firstChild;
+                }
+                else
+                {
+                    itemToAppend = (Node)result.RenderResult;
+                }
+                CanvasElement.appendChild(itemToAppend);
+            }
         }
 
         private void CreateStyleElement(Settings settings)
