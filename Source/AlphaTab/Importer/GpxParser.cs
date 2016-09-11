@@ -354,7 +354,7 @@ namespace AlphaTab.Importer
         private void ParseTrack(IXmlNode node)
         {
             var track = new Track(1); 
-            var trackId = node.Attributes.Get("id").Value;
+            var trackId = node.GetAttribute("id");
 
             node.IterateChildren(c =>
             {
@@ -414,16 +414,16 @@ namespace AlphaTab.Importer
         private void ParseDiagramItem(Track track, IXmlNode node)
         {
             var chord = new Chord();
-            var chordId = node.Attributes.Get("id").Value;
-            chord.Name = node.Attributes.Get("name").Value;
+            var chordId = node.GetAttribute("id");
+            chord.Name = node.GetAttribute("name");
             track.Chords[chordId] = chord;
         }
 
         private IXmlNode FindChildElement(IXmlNode node, string name)
         {
-            for (int i = 0; i < node.ChildNodes.Count; i++)
+            for (int i = 0; i < node.ChildNodes.Length; i++)
             {
-                var c = node.ChildNodes.Get(i);
+                var c = node.ChildNodes[i];
                 if (c != null && c.NodeType == XmlNodeType.Element && c.LocalName == name)
                 {
                     return c;
@@ -450,7 +450,7 @@ namespace AlphaTab.Importer
 
         private void ParseTrackProperty(Track track, IXmlNode node)
         {
-            var propertyName = node.Attributes.Get("name").Value;
+            var propertyName = node.GetAttribute("name");
             switch (propertyName)
             {
                 case "Tuning":
@@ -478,8 +478,7 @@ namespace AlphaTab.Importer
             track.PlaybackInfo.PrimaryChannel = Std.ParseInt(GetValue(FindChildElement(node, "PrimaryChannel")));
             track.PlaybackInfo.SecondaryChannel = Std.ParseInt(GetValue(FindChildElement(node, "SecondaryChannel")));
 
-            track.IsPercussion = (node.Attributes.Get("table") != null &&
-                                  node.Attributes.Get("table").Value == "Percussion");
+            track.IsPercussion = node.GetAttribute("table") == "Percussion";
         }
 
         //
@@ -525,13 +524,13 @@ namespace AlphaTab.Importer
                             masterBar.Section.Text = GetValue(FindChildElement(c, "Text"));
                             break;
                         case "Repeat":
-                            if (c.Attributes.Get("start").Value.ToLower() == "true")
+                            if (c.GetAttribute("start").ToLower() == "true")
                             {
                                 masterBar.IsRepeatStart = true;
                             }
-                            if (c.Attributes.Get("end").Value.ToLower() == "true" && c.Attributes.Get("count").Value != null)
+                            if (c.GetAttribute("end").ToLower() == "true" && c.GetAttribute("count") != null)
                             {
-                                masterBar.RepeatCount = Std.ParseInt(c.Attributes.Get("count").Value);
+                                masterBar.RepeatCount = Std.ParseInt(c.GetAttribute("count"));
                             }
                             break;
                         // TODO case "Directions": // Coda segno etc. 
@@ -619,7 +618,7 @@ namespace AlphaTab.Importer
         private void ParseBar(IXmlNode node)
         {
             var bar = new Bar();
-            var barId = node.Attributes.Get("id").Value;
+            var barId = node.GetAttribute("id");
 
             node.IterateChildren(c =>
             {
@@ -681,7 +680,7 @@ namespace AlphaTab.Importer
         private void ParseVoice(IXmlNode node)
         {
             var voice = new Voice();
-            var voiceId = node.Attributes.Get("id").Value;
+            var voiceId = node.GetAttribute("id");
 
             node.IterateChildren(c =>
             {
@@ -722,7 +721,7 @@ namespace AlphaTab.Importer
         private void ParseBeat(IXmlNode node)
         {
             var beat = new Beat();
-            var beatId = node.Attributes.Get("id").Value;
+            var beatId = node.GetAttribute("id");
 
             node.IterateChildren(c =>
             {
@@ -734,7 +733,7 @@ namespace AlphaTab.Importer
                             _notesOfBeat[beatId] = GetValue(c).Split(' ');
                             break;
                         case "Rhythm":
-                            _rhythmOfBeat[beatId] = c.Attributes.Get("ref").Value;
+                            _rhythmOfBeat[beatId] = c.GetAttribute("ref");
                             break;
                         case "Fadding":
                             if (GetValue(c) == "FadeIn")
@@ -846,7 +845,7 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "XProperty":
-                            var id = c.Attributes.Get("id").Value;
+                            var id = c.GetAttribute("id");
                             switch (id)
                             {
                                 case "1124204545":
@@ -876,7 +875,7 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "Property":
-                            var name = c.Attributes.Get("name").Value;
+                            var name = c.GetAttribute("name");
                             switch (name)
                             {
                                 case "Brush":
@@ -1011,7 +1010,7 @@ namespace AlphaTab.Importer
         private void ParseNote(IXmlNode node)
         {
             var note = new Note();
-            var noteId = node.Attributes.Get("id").Value;
+            var noteId = node.GetAttribute("id");
 
             node.IterateChildren(c =>
             {
@@ -1045,11 +1044,11 @@ namespace AlphaTab.Importer
                                 note.Accentuated = AccentuationType.Normal;
                             break;
                         case "Tie":
-                            if (c.Attributes.Get("origin").Value.ToLower() == "true")
+                            if (c.GetAttribute("origin").ToLower() == "true")
                             {
                                 note.IsTieOrigin = true;
                             }
-                            if (c.Attributes.Get("destination").Value.ToLower() == "true")
+                            if (c.GetAttribute("destination").ToLower() == "true")
                             {
                                 note.IsTieDestination = true;
                             }
@@ -1130,7 +1129,7 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "Property":
-                            var name = c.Attributes.Get("name").Value;
+                            var name = c.GetAttribute("name");
                             switch (name)
                             {
                                 case "String":
@@ -1326,7 +1325,7 @@ namespace AlphaTab.Importer
         private void ParseRhythm(IXmlNode node)
         {
             var rhythm = new GpxRhythm();
-            var rhythmId = node.Attributes.Get("id").Value;
+            var rhythmId = node.GetAttribute("id");
             node.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -1364,11 +1363,11 @@ namespace AlphaTab.Importer
                             }
                             break;
                         case "PrimaryTuplet":
-                            rhythm.TupletNumerator = Std.ParseInt(c.Attributes.Get("num").Value);
-                            rhythm.TupletDenominator = Std.ParseInt(c.Attributes.Get("den").Value);
+                            rhythm.TupletNumerator = Std.ParseInt(c.GetAttribute("num"));
+                            rhythm.TupletDenominator = Std.ParseInt(c.GetAttribute("den"));
                             break;
                         case "AugmentationDot":
-                            rhythm.Dots = Std.ParseInt(c.Attributes.Get("count").Value);
+                            rhythm.Dots = Std.ParseInt(c.GetAttribute("count"));
                             break;
                     }
                 }

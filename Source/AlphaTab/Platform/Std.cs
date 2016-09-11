@@ -69,9 +69,9 @@ namespace AlphaTab.Platform
 
         public static void IterateChildren(this IXmlNode n, Action<IXmlNode> action)
         {
-            for (int i = 0; i < n.ChildNodes.Count; i++)
+            for (int i = 0; i < n.ChildNodes.Length; i++)
             {
-                action(n.ChildNodes.Get(i));
+                action(n.ChildNodes[i]);
             }
         }
 

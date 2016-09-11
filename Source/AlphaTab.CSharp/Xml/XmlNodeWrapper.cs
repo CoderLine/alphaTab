@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Linq;
+using System.Xml;
 
 namespace AlphaTab.Xml
 {
@@ -26,11 +27,11 @@ namespace AlphaTab.Xml
             get { return _node.Value; }
         }
 
-        public IXmlNodeCollection ChildNodes
+        public IXmlNode[] ChildNodes
         {
             get
             {
-                return new XmlNodeCollectionWrapper(_node.ChildNodes);
+                return _node.ChildNodes.OfType<XmlNode>().Select(n=>new XmlNodeWrapper(n)).Cast<IXmlNode>().ToArray();
             }
         }
 
@@ -42,19 +43,18 @@ namespace AlphaTab.Xml
             }
         }
 
-        public IXmlAttributeCollection Attributes
-        {
-            get { return new XmlAttributeCollectionWrapper(_node.Attributes); }
-        }
-
         public string GetAttribute(string name)
         {
             return ((XmlElement)_node).GetAttribute(name);
         }
 
-        public IXmlNodeCollection GetElementsByTagName(string nodeName)
+        public IXmlNode[] GetElementsByTagName(string nodeName)
         {
-            return new XmlNodeCollectionWrapper(((XmlElement)_node).GetElementsByTagName(nodeName));
+            return ((XmlElement) _node).GetElementsByTagName(nodeName)
+                    .OfType<XmlElement>()
+                    .Select(n => new XmlNodeWrapper(n))
+                    .Cast<IXmlNode>()
+                    .ToArray();
         }
     }
 }

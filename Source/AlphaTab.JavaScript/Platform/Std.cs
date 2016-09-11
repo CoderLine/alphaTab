@@ -85,7 +85,7 @@ namespace AlphaTab.Platform
                 _parseXml = parseXml;
             }
 
-            return new XmlDocumentWrapper(_parseXml(xml));
+            return _parseXml(xml).As<IXmlDocument>();
         }
 
         public static sbyte ReadSignedByte(this IReadable readable)

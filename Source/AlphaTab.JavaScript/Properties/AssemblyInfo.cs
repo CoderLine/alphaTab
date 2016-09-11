@@ -57,10 +57,18 @@ using SharpKit.JavaScript;
 [assembly: JsType(Export = false, TargetType = typeof(IEffectBarRendererInfo))]
 [assembly: JsType(Export = false, TargetType = typeof(IScoreRenderer))]
 
-[assembly: JsType(Export = false, TargetType = typeof(IXmlAttributeCollection))]
-[assembly: JsType(Export = false, TargetType = typeof(IXmlDocument))]
-[assembly: JsType(Export = false, TargetType = typeof(IXmlNode))]
-[assembly: JsType(Export = false, TargetType = typeof(IXmlNodeCollection))]
+[assembly: JsType(Export = false, TargetType = typeof(IXmlDocument), Name = "Document", PropertiesAsFields = true, NativeCasts = true)]
+[assembly: JsProperty(Export = false, TargetType = typeof(IXmlDocument), TargetProperty = "DocumentElement", Name = "documentElement", NativeField = true)]
+
+[assembly: JsType(Export = false, TargetType = typeof(IXmlNode), PropertiesAsFields = true, NativeCasts = true)]
+[assembly: JsProperty(Export = false, TargetType = typeof(IXmlNode), TargetProperty = "NodeType", Name = "nodeType", NativeField = true)]
+[assembly: JsProperty(Export = false, TargetType = typeof(IXmlNode), TargetProperty = "LocalName", Name = "localName", NativeField = true)]
+[assembly: JsProperty(Export = false, TargetType = typeof(IXmlNode), TargetProperty = "Value", Name = "nodeValue", NativeField = true)]
+[assembly: JsProperty(Export = false, TargetType = typeof(IXmlNode), TargetProperty = "ChildNodes", Name = "childNodes", NativeField = true)]
+[assembly: JsProperty(Export = false, TargetType = typeof(IXmlNode), TargetProperty = "FirstChild", Name = "firstChild", NativeField = true)]
+[assembly: JsProperty(Export = false, TargetType = typeof(IXmlNode), TargetProperty = "Attributes", Name = "attributes", NativeField = true)]
+[assembly: JsMethod(Export = false, TargetType = typeof(IXmlNode), TargetMethod = "GetAttribute", Name = "getAttribute")]
+[assembly: JsMethod(Export = false, TargetType = typeof(IXmlNode), TargetMethod = "GetElementsByTagName", Name = "getElementsByTagName")]
 
 [assembly: JsType(JsMode.Prototype, TargetType = typeof(Math), Name = "Math", NativeArrayEnumerator = true, NativeEnumerator = false, Export = false)]
 
