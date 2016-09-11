@@ -146,6 +146,10 @@ namespace AlphaTab.Platform.JavaScript
             {
                 Load(dataset["file"]);
             }
+            else if (Element != null && !string.IsNullOrEmpty(Element.getAttribute("data-file")))
+            {
+                Load(Element.getAttribute("data-file"));
+            }
 
 
             #endregion

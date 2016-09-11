@@ -58,12 +58,8 @@ namespace AlphaTab.Importer
                 _score.Finish();
                 return _score;
             }
-            catch (Exception e)
+            catch 
             {
-                if (Std.IsException<AlphaTexException>(e))
-                {
-                    throw;
-                }
                 throw new UnsupportedFormatException();
             }
         }

@@ -62,8 +62,11 @@ namespace AlphaTab.Platform.JavaScript
 
         public byte[] LoadBinary(string path)
         {
-            var ie = GetIEVersion();
-            if (ie >= 0 && ie <= 9)
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", path, false);
+            xhr.responseType = "arraybuffer";
+
+            if (xhr.responseType != "arraybuffer")
             {
                 // use VB Loader to load binary array
                 dynamic vbArr = VbAjaxLoader("GET", path);
@@ -82,9 +85,6 @@ namespace AlphaTab.Platform.JavaScript
                 return reader;
             }
 
-            XMLHttpRequest xhr = new XMLHttpRequest();
-            xhr.open("GET", path, false);
-            xhr.responseType = "arraybuffer";
             xhr.send();
 
             if (xhr.status == 200)
@@ -118,8 +118,49 @@ namespace AlphaTab.Platform.JavaScript
 
         public void LoadBinaryAsync(string path, Action<byte[]> success, Action<Exception> error)
         {
-            var ie = GetIEVersion();
-            if (ie >= 0 && ie <= 9)
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", path, false);
+            xhr.responseType = "arraybuffer";
+            xhr.onreadystatechange = e =>
+            {
+                if (xhr.readyState == 4)
+                {
+                    if (xhr.status == 200)
+                    {
+                        var reader = NewUint8Array(xhr.response);
+                        success(reader);
+                    }
+                    // Error handling
+                    else if (xhr.status == 0)
+                    {
+                        error(new FileLoadException("You are offline!!\n Please Check Your Network."));
+                    }
+                    else if (xhr.status == 404)
+                    {
+                        error(new FileLoadException("Requested URL not found."));
+                    }
+                    else if (xhr.status == 500)
+                    {
+                        error(new FileLoadException("Internel Server Error."));
+                    }
+                    else if (xhr.statusText == "parsererror")
+                    {
+                        error(new FileLoadException("Error.\nParsing JSON Request failed."));
+                    }
+                    else if (xhr.statusText == "timeout")
+                    {
+                        error(new FileLoadException("Request Time out."));
+                    }
+                    else
+                    {
+                        error(new FileLoadException("Unknow Error: " + xhr.responseText));
+                    }
+                }
+            };
+            xhr.open("GET", path, true);
+            xhr.responseType = "arraybuffer";
+            // IE fallback
+            if (xhr.responseType != "arraybuffer")
             {
                 // use VB Loader to load binary array
                 dynamic vbArr = VbAjaxLoader("GET", path);
@@ -136,50 +177,9 @@ namespace AlphaTab.Platform.JavaScript
 
                 var reader = GetBytesFromString(data.ToString());
                 success(reader);
+                return;
             }
-            else
-            {
-                XMLHttpRequest xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = e =>
-                {
-                    if (xhr.readyState == 4)
-                    {
-                        if (xhr.status == 200)
-                        {
-                            var reader = NewUint8Array(xhr.response);
-                            success(reader);
-                        }
-                        // Error handling
-                        else if (xhr.status == 0)
-                        {
-                            error(new FileLoadException("You are offline!!\n Please Check Your Network."));
-                        }
-                        else if (xhr.status == 404)
-                        {
-                            error(new FileLoadException("Requested URL not found."));
-                        }
-                        else if (xhr.status == 500)
-                        {
-                            error(new FileLoadException("Internel Server Error."));
-                        }
-                        else if (xhr.statusText == "parsererror")
-                        {
-                            error(new FileLoadException("Error.\nParsing JSON Request failed."));
-                        }
-                        else if (xhr.statusText == "timeout")
-                        {
-                            error(new FileLoadException("Request Time out."));
-                        }
-                        else
-                        {
-                            error(new FileLoadException("Unknow Error: " + xhr.responseText));
-                        }
-                    }
-                };
-                xhr.open("GET", path, true);
-                xhr.responseType = "arraybuffer";
-                xhr.send();
-            }
+            xhr.send();
         }
 
         private static byte[] GetBytesFromString(string s)

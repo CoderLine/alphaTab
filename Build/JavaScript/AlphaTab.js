@@ -265,7 +265,8 @@ AlphaTab.Environment.CheckFontLoad = function (){
          document.fonts.load('1em alphaTab').then(onLoaded);
     }
     else {
-        window.addEventListener("DOMContentLoaded", function (e){
+        var checkFont = null;
+        checkFont = function (){
             var testItem = document.getElementById("alphaTabFontChecker");
             if (testItem == null){
                 console.log("creating check element");
@@ -282,15 +283,20 @@ AlphaTab.Environment.CheckFontLoad = function (){
             }
             // get width
             var width = testItem.offsetWidth;
-            if (width > 10){
-                console.log("font loaded");
+            if (width > 30){
+                console.log("font loaded", width);
                 AlphaTab.Environment.IsFontLoaded = true;
                 document.body.removeChild(testItem);
             }
             else {
-                console.log("checking again");
-                window.setTimeout(AlphaTab.Environment.CheckFontLoad, 1000);
+                console.log("checking again", width);
+                window.setTimeout(function (){
+                    checkFont();
+                }, 1000);
             }
+        };
+        window.addEventListener("DOMContentLoaded", function (e){
+            checkFont();
         });
     }
 };
@@ -721,6 +727,9 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
     }
     else if (this.Element != null && this.Element.dataset != null && !((dataset["file"]==null)||(dataset["file"].length==0))){
         this.Load(dataset["file"]);
+    }
+    else if (this.Element != null && !((this.Element.getAttribute("data-file")==null)||(this.Element.getAttribute("data-file").length==0))){
+        this.Load(this.Element.getAttribute("data-file"));
     }
 };
 AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
@@ -1215,8 +1224,10 @@ AlphaTab.Platform.JavaScript.JsFileLoader = function (){
 };
 AlphaTab.Platform.JavaScript.JsFileLoader.prototype = {
     LoadBinary: function (path){
-        var ie = AlphaTab.Platform.JavaScript.JsFileLoader.GetIEVersion();
-        if (ie >= 0 && ie <= 9){
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", path, false);
+        xhr.responseType = "arraybuffer";
+        if (xhr.responseType != "arraybuffer"){
             // use VB Loader to load binary array
             var vbArr = VbAjaxLoader("GET",path);
             var fileContents = vbArr.toArray();
@@ -1230,9 +1241,6 @@ AlphaTab.Platform.JavaScript.JsFileLoader.prototype = {
             var reader = AlphaTab.Platform.JavaScript.JsFileLoader.GetBytesFromString(data.join(''));
             return reader;
         }
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", path, false);
-        xhr.responseType = "arraybuffer";
         xhr.send();
         if (xhr.status == 200){
             var reader = new Uint8Array(xhr.response);
@@ -1257,8 +1265,39 @@ AlphaTab.Platform.JavaScript.JsFileLoader.prototype = {
         throw $CreateException(new AlphaTab.IO.FileLoadException("Unknow Error: " + xhr.responseText), new Error());
     },
     LoadBinaryAsync: function (path, success, error){
-        var ie = AlphaTab.Platform.JavaScript.JsFileLoader.GetIEVersion();
-        if (ie >= 0 && ie <= 9){
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", path, false);
+        xhr.responseType = "arraybuffer";
+        xhr.onreadystatechange = $CreateAnonymousDelegate(this, function (e){
+            if (xhr.readyState == 4){
+                if (xhr.status == 200){
+                    var reader = new Uint8Array(xhr.response);
+                    success(reader);
+                }
+                else if (xhr.status == 0){
+                    error(new AlphaTab.IO.FileLoadException("You are offline!!\n Please Check Your Network."));
+                }
+                else if (xhr.status == 404){
+                    error(new AlphaTab.IO.FileLoadException("Requested URL not found."));
+                }
+                else if (xhr.status == 500){
+                    error(new AlphaTab.IO.FileLoadException("Internel Server Error."));
+                }
+                else if (xhr.statusText == "parsererror"){
+                    error(new AlphaTab.IO.FileLoadException("Error.\nParsing JSON Request failed."));
+                }
+                else if (xhr.statusText == "timeout"){
+                    error(new AlphaTab.IO.FileLoadException("Request Time out."));
+                }
+                else {
+                    error(new AlphaTab.IO.FileLoadException("Unknow Error: " + xhr.responseText));
+                }
+            }
+        });
+        xhr.open("GET", path, true);
+        xhr.responseType = "arraybuffer";
+        // IE fallback
+        if (xhr.responseType != "arraybuffer"){
             // use VB Loader to load binary array
             var vbArr = VbAjaxLoader("GET",path);
             var fileContents = vbArr.toArray();
@@ -1271,39 +1310,9 @@ AlphaTab.Platform.JavaScript.JsFileLoader.prototype = {
             }
             var reader = AlphaTab.Platform.JavaScript.JsFileLoader.GetBytesFromString(data.join(''));
             success(reader);
+            return;
         }
-        else {
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = $CreateAnonymousDelegate(this, function (e){
-                if (xhr.readyState == 4){
-                    if (xhr.status == 200){
-                        var reader = new Uint8Array(xhr.response);
-                        success(reader);
-                    }
-                    else if (xhr.status == 0){
-                        error(new AlphaTab.IO.FileLoadException("You are offline!!\n Please Check Your Network."));
-                    }
-                    else if (xhr.status == 404){
-                        error(new AlphaTab.IO.FileLoadException("Requested URL not found."));
-                    }
-                    else if (xhr.status == 500){
-                        error(new AlphaTab.IO.FileLoadException("Internel Server Error."));
-                    }
-                    else if (xhr.statusText == "parsererror"){
-                        error(new AlphaTab.IO.FileLoadException("Error.\nParsing JSON Request failed."));
-                    }
-                    else if (xhr.statusText == "timeout"){
-                        error(new AlphaTab.IO.FileLoadException("Request Time out."));
-                    }
-                    else {
-                        error(new AlphaTab.IO.FileLoadException("Unknow Error: " + xhr.responseText));
-                    }
-                }
-            });
-            xhr.open("GET", path, true);
-            xhr.responseType = "arraybuffer";
-            xhr.send();
-        }
+        xhr.send();
     }
 };
 AlphaTab.Platform.JavaScript.JsFileLoader.GetIEVersion = function (){
@@ -3620,10 +3629,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             this._score.Finish();
             return this._score;
         }
-        catch(e){
-            if ((e.exception instanceof AlphaTab.Importer.AlphaTexException)){
-                throw $CreateException(e, new Error());
-            }
+        catch($$e3){
             throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(), new Error());
         }
     },
@@ -5878,7 +5884,7 @@ AlphaTab.Importer.GpxFileSystem.prototype = {
                 }
             }
         }
-        catch($$e3){
+        catch($$e4){
         }
         buffer = uncompressed.GetBuffer();
         var resultOffset = skipHeader ? 4 : 0;
@@ -7218,7 +7224,7 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
         try{
             dom = AlphaTab.Platform.Std.LoadXml(xml);
         }
-        catch($$e4){
+        catch($$e5){
             throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(), new Error());
         }
         this._score = new AlphaTab.Model.Score();
@@ -7873,7 +7879,7 @@ AlphaTab.IO.BitReader.prototype = {
                 all.WriteByte(this.ReadByte());
             }
         }
-        catch($$e5){
+        catch($$e6){
         }
         return all.ToArray();
     }

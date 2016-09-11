@@ -142,15 +142,16 @@ namespace AlphaTab
             }
             else
             {
-                HtmlContext.window.addEventListener("DOMContentLoaded", e =>
+                Action checkFont = null;
+                checkFont = () =>
                 {
                     var testItem = HtmlContext.document.getElementById("alphaTabFontChecker").As<HtmlDivElement>();
 
                     if (testItem == null)
                     {
                         HtmlContext.console.log("creating check element");
-                    // create a hidden element with the font style set
-                    testItem = HtmlContext.document.createElement("div").As<HtmlDivElement>();
+                        // create a hidden element with the font style set
+                        testItem = HtmlContext.document.createElement("div").As<HtmlDivElement>();
                         testItem.setAttribute("id", "alphaTabFontChecker");
                         testItem.style.opacity = "0";
                         testItem.style.position = "absolute";
@@ -162,19 +163,25 @@ namespace AlphaTab
                         HtmlContext.document.body.appendChild(testItem);
                     }
 
-                // get width
-                var width = testItem.offsetWidth;
-                    if (width > 10)
+                    // get width
+                    var width = testItem.offsetWidth;
+                    if (width > 30)
                     {
-                        HtmlContext.console.log("font loaded");
+                        HtmlContext.console.log("font loaded", width);
                         IsFontLoaded = true;
                         HtmlContext.document.body.removeChild(testItem);
                     }
                     else
                     {
-                        HtmlContext.console.log("checking again");
-                        HtmlContext.window.setTimeout(CheckFontLoad, 1000);
+                        HtmlContext.console.log("checking again", width);
+                        HtmlContext.window.setTimeout(() => {
+                            checkFont();
+                        }, 1000);
                     }
+                };
+                HtmlContext.window.addEventListener("DOMContentLoaded", e =>
+                {
+                    checkFont();
                 });
             }
         }
