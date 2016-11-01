@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>db51a01f-09da-4930-8c37-cb7d67060637</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>AlphaTab.CSharp.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\FastDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\FastList.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\StringBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Environment.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\StreamWrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\TuningParser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\CSharp\CsFileLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\CSharp\FontEmbeddedSvgCanvas.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\CSharp\GdiCanvas.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\Std.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlDocumentWrapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlNodeWrapper.cs" />
+  </ItemGroup>
+</Project>

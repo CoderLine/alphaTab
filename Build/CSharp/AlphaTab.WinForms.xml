@@ -1,9 +1,165 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>AlphaTab</name>
+        <name>AlphaTab.WinForms</name>
     </assembly>
     <members>
+        <member name="T:AlphaTab.Platform.CSharp.CsFileLoader">
+            <summary>
+            This file loader loads binary files using the native apis
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.CSharp.FontEmbeddedSvgCanvas">
+            <summary>
+            This SVG canvas embedds the SVG font directly into the produced SVG.
+            Due to the SVG opening tag that is generated, before the first actual rendering, 
+            the output of this canvas is no valid XML until the music sheet is completely rendered. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.ICanvas">
+            <summary>
+            This is the base public interface for canvas implementations on different plattforms.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.IPathCanvas">
+            <summary>
+            This is the path drawing API for canvas implementations
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.IFileLoader">
+            <summary>
+            This is the public interface which file loaders need to implement for providing 
+            files on different plattforms. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.Model.Font">
+            <summary>
+            This container public class can store the definition for a font and it's style.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.Model.TextAlign">
+            <summary>
+            This public enum lists all different text alignments
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.Model.TextBaseline">
+            <summary>
+            This public enum lists all base line modes
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Platform.Std.As``1(System.Object)">
+            <summary>
+            gen
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="s"></param>
+            <returns></returns>
+        </member>
+        <member name="T:AlphaTab.Platform.Svg.FontSizes">
+            <summary>
+            This public class stores text widths for several fonts and allows width calculation 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.Svg.SupportedFonts">
+            <summary>
+            The supported fonts by the FontSizes public class
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.Svg.FontSvgCanvas">
+            <summary>
+            This SVG canvas renders the music symbols by adding a CSS class 'at' to all elements. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Platform.Svg.SvgCanvas">
+            <summary>
+             A canvas implementation storing SVG data
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.GeneralMidi">
+            <summary>
+            This public class provides names for all general midi instruments.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Generator.IMidiFileHandler">
+            <summary>
+            A handler is responsible for writing midi events to a custom structure
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Generator.MidiFileGenerator">
+            <summary>
+            This generator creates a midi file using a score. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Generator.MidiFileHandler">
+            <summary>
+            This handler is responsible for writing midi events
+            to a MidiFile object.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.MidiUtils.QuarterTime">
+            <summary>
+            The amount of ticks per quarter note used within this midi system.
+            (Pulses Per Quarter Note)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.MidiUtils.PercussionChannel">
+            <summary>
+            The default midi channel used for percussion
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.MidiUtils.ToTicks(AlphaTab.Model.Duration)">
+            <summary>
+            Converts a duration value to its ticks equivalent.
+            </summary>
+            <param name="duration"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.Audio.MidiUtils.ValueToTicks(System.Int32)">
+            <summary>
+            Converts a numerical value to its ticks equivalent.
+            </summary>
+            <param name="duration">the numerical proportion to convert. (i.E. timesignature denominator, note duration,...)</param>
+            <returns></returns>
+        </member>
+        <member name="T:AlphaTab.Audio.Model.MidiController">
+            <summary>
+            Contains all midi controller definitions
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Model.MidiEvent">
+            <summary>
+            A midi event is a timed midi message. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Model.MidiFile">
+            <summary>
+            A midi file consists of multiple tracks including a
+            info track for multi-track messages and a track for metronome ticks. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Model.MidiFile.InfoTrack">
+            <summary>
+            Gets or sets the index of the track used for midi events
+            affecting all tracks. (like the tempo)
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Model.MidiMessage">
+            <summary>
+            Represents a midi message. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Model.MidiMessage.Data">
+            <summary>
+            The raw midi message data
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Model.MidiTrack">
+            <summary>
+            Represents a single midi track. A midi track contains
+            a linked list of midi es and supports sorted inserting of 
+            midi es into this track.
+            </summary>
+        </member>
         <member name="T:AlphaTab.Environment">
             <summary>
             This public class represents the global alphaTab environment where
@@ -11,17 +167,270 @@
             staves etc.
             </summary>
         </member>
+        <member name="T:AlphaTab.Importer.AlphaTexImporter">
+            <summary>
+            This importer can parse alphaTex markup into a score structure. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.CreateDefaultScore">
+            <summary>
+            Initializes the song with some required default values.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.ParseClef(System.String)">
+            <summary>
+            Converts a clef string into the clef value.
+            </summary>
+            <param name="str">the string to convert</param>
+            <returns>the clef value</returns>
+        </member>
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.ParseKeySignature(System.String)">
+            <summary>
+            Converts a keysignature string into the assocciated value.
+            </summary>
+            <param name="str">the string to convert</param>
+            <returns>the assocciated keysignature value</returns>
+        </member>
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.ParseTuning(System.String)">
+            <summary>
+            Converts a string into the associated tuning. 
+            </summary>
+            <param name="str">the tuning string</param>
+            <returns>the tuning value.</returns>
+        </member>
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.NextChar">
+            <summary>
+            Reads the next character of the source stream.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.NewSy">
+            <summary>
+            Reads the next terminal symbol.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.IsLetter(System.Int32)">
+            <summary>
+            Checks if the given character is a letter.
+            (no control characters, whitespaces, numbers or dots)
+            </summary>
+            <param name="code">the character</param>
+            <returns>true if the given character is a letter, otherwise false.</returns>
+        </member>
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.IsTerminal(System.Int32)">
+            <summary>
+            Checks if the given charater is a non terminal.
+            </summary>
+            <param name="ch">the character</param>
+            <returns>true if the given character is a terminal, otherwise false.</returns>
+        </member>
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.IsDigit(System.Int32)">
+            <summary>
+            Checks if the given character is a digit. 
+            </summary>
+            <param name="code">the character</param>
+            <returns>true if the given character is a digit, otherwise false.</returns>
+        </member>
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.ReadName">
+            <summary>
+            Reads a string from the stream.
+            </summary>
+            <returns>the read string.</returns>
+        </member>
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.ReadNumber">
+            <summary>
+            Reads a number from the stream.
+            </summary>
+            <returns>the read number.</returns>
+        </member>
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.ApplyBeatEffect(AlphaTab.Model.Beat)">
+            <summary>
+            Tries to apply a beat effect to the given beat.
+            </summary>
+            <returns>true if a effect could be applied, otherwise false</returns>
+        </member>
+        <member name="T:AlphaTab.Importer.AlphaTexSymbols">
+            <summary>
+            A list of terminals recognized by the alphaTex-parser
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Importer.Gp3To5Importer.ReadStringIntUnused">
+            <summary>
+             Skips an integer (4byte) and reads a string using 
+             a bytesize
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.Importer.Gp3To5Importer.ReadStringInt">
+            <summary>
+            Reads an integer as size, and then the string itself
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.Importer.Gp3To5Importer.ReadStringIntByte">
+            <summary>
+            Reads an integer as size, skips a byte and reads the string itself
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.Importer.Gp3To5Importer.ReadStringByteLength(System.Int32)">
+            <summary>
+            Reads a byte as size and the string itself.
+            Additionally it is ensured the specified amount of bytes is read. 
+            </summary>
+            <param name="length">the amount of bytes to read</param>
+            <returns></returns>
+        </member>
+        <member name="T:AlphaTab.Importer.GpxFile">
+            <summary>
+            this public class represents a file within the GpxFileSystem
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Importer.GpxFileSystem">
+            <summary>
+            This public class represents the file system structure
+            stored within a GPX container file. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Importer.GpxFileSystem.FileFilter">
+            <summary>
+            You can set a file filter method using this setter. On parsing
+            the filestructure this function can determine based on the filename 
+            whether this file will be available after loading. 
+            This way we can reduce the amount of memory we store.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Importer.GpxFileSystem.Files">
+            <summary>
+            Gets the list of files stored in this FileSystem.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Importer.GpxFileSystem.#ctor">
+            <summary>
+            Creates a new GpxFileSystem instance
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Importer.GpxFileSystem.Load(AlphaTab.IO.IReadable)">
+            <summary>
+            Load a complete FileSystem to the memory.
+            </summary>
+            <param name="s">the binary source to read from.</param>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.Importer.GpxFileSystem.ReadHeader(AlphaTab.IO.BitReader)">
+            <summary>
+            Reads the 4 byte header as a string.
+            </summary>
+            <param name="src">the BitInput to read from</param>
+            <returns>a string with 4 characters representing the header.</returns>
+        </member>
+        <member name="M:AlphaTab.Importer.GpxFileSystem.Decompress(AlphaTab.IO.BitReader,System.Boolean)">
+            <summary>
+            Decompresses the given bitinput using the GPX compression format. Only use this method
+            if you are sure the binary data is compressed using the GPX format. Otherwise unexpected
+            behavior can occure. 
+            </summary>
+            <param name="src">the bitInput to read the data from</param>
+            <param name="skipHeader">true if the header should NOT be included in the result byteset, otherwise false</param>
+            <returns>the decompressed byte data. if skipHeader is set to false the BCFS header is included.</returns>
+        </member>
+        <member name="M:AlphaTab.Importer.GpxFileSystem.ReadBlock(AlphaTab.IO.BitReader)">
+            <summary>
+            Reads a block from the given data source.
+            </summary>
+            <param name="data">the data source</param>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.Importer.GpxFileSystem.ReadUncompressedBlock(System.Byte[])">
+            <summary>
+            Reads an uncompressed data block into the model.
+            </summary>
+            <param name="data">the data store to read from.</param>
+        </member>
+        <member name="M:AlphaTab.Importer.GpxFileSystem.GetString(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Reads a zeroterminated ascii string from the given source
+            </summary>
+            <param name="data">the data source to read from</param>
+            <param name="offset">the offset to start reading from</param>
+            <param name="length">the max length to read</param>
+            <returns>the ascii string read from the datasource.</returns>
+        </member>
+        <member name="M:AlphaTab.Importer.GpxFileSystem.GetInteger(System.Byte[],System.Int32)">
+            <summary>
+            Reads an 4 byte signed integer from the given source
+            </summary>
+            <param name="data">the data source to read from </param>
+            <param name="offset">offset the offset to start reading from</param>
+            <returns></returns>
+        </member>
+        <member name="T:AlphaTab.Importer.GpxImporter">
+            <summary>
+            This ScoreImporter can read Guitar Pro 6 (gpx) files.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Importer.GpxRhythm">
+            <summary>
+            This structure represents a duration within a gpx model.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Importer.GpxParser">
+            <summary>
+            This public class can parse a score.gpif xml file into the model structure
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Importer.GpxParser.BendPointPositionFactor">
+            <summary>
+            GPX range: 0-100
+            Internal range: 0 - 60
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Importer.GpxParser.BendPointValueFactor">
+            <summary>
+            GPX Range: 0-300      
+            Internal Range: 0-12
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Importer.MixTableChange">
+            <summary>
+            A mixtablechange describes several track changes. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Importer.ScoreImporter">
+            <summary>
+            This is the base public class for creating new song importers which 
+            enable reading scores from any binary datasource
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Importer.ScoreImporter.BuildImporters">
+            Gets all default ScoreImporters
+            @return
+        </member>
+        <member name="T:AlphaTab.Importer.ScoreLoader">
+            <summary>
+            The ScoreLoader enables you easy loading of Scores using all 
+            available importers
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Importer.ScoreLoader.LoadScoreAsync(System.String,System.Action{AlphaTab.Model.Score},System.Action{System.Exception})">
+            <summary>
+            Loads a score asynchronously from the given datasource
+            </summary>
+            <param name="path">the source path to load the binary file from</param>
+            <param name="success">this function is called if the Score was successfully loaded from the datasource</param>
+            <param name="error">this function is called if any error during the loading occured.</param>
+        </member>
+        <member name="M:AlphaTab.Importer.ScoreLoader.LoadScore(System.String)">
+            <summary>
+            Loads a score synchronously from the given datasource
+            </summary>
+            <param name="path">the source path to load the binary file from</param>
+            <returns></returns>
+        </member>
         <member name="T:AlphaTab.IO.BitReader">
             <summary>
             This utility public class allows bitwise reading of a stream
             </summary>
-        </member>
-        <member name="M:AlphaTab.Model.TuningParser.IsTuning(System.String)">
-            <summary>
-            Checks if the given string is a tuning inticator.
-            </summary>Checks if the given string is a tuning inticator.
-            <param name="name"></param>
-            <returns></returns>
         </member>
         <member name="T:AlphaTab.Model.AccentuationType">
             <summary>
@@ -371,412 +780,11 @@
             that can be played during a bar. 
             </summary>
         </member>
-        <member name="T:AlphaTab.Platform.CSharp.CsFileLoader">
-            <summary>
-            This file loader loads binary files using the native apis
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.CSharp.FontEmbeddedSvgCanvas">
-            <summary>
-            This SVG canvas embedds the SVG font directly into the produced SVG.
-            Due to the SVG opening tag that is generated, before the first actual rendering, 
-            the output of this canvas is no valid XML until the music sheet is completely rendered. 
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.ICanvas">
-            <summary>
-            This is the base public interface for canvas implementations on different plattforms.
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.IPathCanvas">
-            <summary>
-            This is the path drawing API for canvas implementations
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.IFileLoader">
-            <summary>
-            This is the public interface which file loaders need to implement for providing 
-            files on different plattforms. 
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.Model.Font">
-            <summary>
-            This container public class can store the definition for a font and it's style.
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.Model.TextAlign">
-            <summary>
-            This public enum lists all different text alignments
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.Model.TextBaseline">
-            <summary>
-            This public enum lists all base line modes
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.Svg.FontSizes">
-            <summary>
-            This public class stores text widths for several fonts and allows width calculation 
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.Svg.SupportedFonts">
-            <summary>
-            The supported fonts by the FontSizes public class
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.Svg.FontSvgCanvas">
-            <summary>
-            This SVG canvas renders the music symbols by adding a CSS class 'at' to all elements. 
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Platform.Svg.SvgCanvas">
-            <summary>
-             A canvas implementation storing SVG data
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Audio.GeneralMidi">
-            <summary>
-            This public class provides names for all general midi instruments.
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Audio.Generator.IMidiFileHandler">
-            <summary>
-            A handler is responsible for writing midi events to a custom structure
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Audio.Generator.MidiFileGenerator">
-            <summary>
-            This generator creates a midi file using a score. 
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Audio.Generator.MidiFileHandler">
-            <summary>
-            This handler is responsible for writing midi events
-            to a MidiFile object.
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Audio.MidiUtils.QuarterTime">
-            <summary>
-            The amount of ticks per quarter note used within this midi system.
-            (Pulses Per Quarter Note)
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Audio.MidiUtils.PercussionChannel">
-            <summary>
-            The default midi channel used for percussion
-            </summary>
-        </member>
-        <member name="M:AlphaTab.Audio.MidiUtils.ToTicks(AlphaTab.Model.Duration)">
-            <summary>
-            Converts a duration value to its ticks equivalent.
-            </summary>
-            <param name="duration"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AlphaTab.Audio.MidiUtils.ValueToTicks(System.Int32)">
-            <summary>
-            Converts a numerical value to its ticks equivalent.
-            </summary>
-            <param name="duration">the numerical proportion to convert. (i.E. timesignature denominator, note duration,...)</param>
-            <returns></returns>
-        </member>
-        <member name="T:AlphaTab.Audio.Model.MidiController">
-            <summary>
-            Contains all midi controller definitions
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Audio.Model.MidiEvent">
-            <summary>
-            A midi event is a timed midi message. 
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Audio.Model.MidiFile">
-            <summary>
-            A midi file consists of multiple tracks including a
-            info track for multi-track messages and a track for metronome ticks. 
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Audio.Model.MidiFile.InfoTrack">
-            <summary>
-            Gets or sets the index of the track used for midi events
-            affecting all tracks. (like the tempo)
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Audio.Model.MidiMessage">
-            <summary>
-            Represents a midi message. 
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Audio.Model.MidiMessage.Data">
-            <summary>
-            The raw midi message data
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Audio.Model.MidiTrack">
-            <summary>
-            Represents a single midi track. A midi track contains
-            a linked list of midi es and supports sorted inserting of 
-            midi es into this track.
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Importer.AlphaTexImporter">
-            <summary>
-            This importer can parse alphaTex markup into a score structure. 
-            </summary>
-        </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.CreateDefaultScore">
-            <summary>
-            Initializes the song with some required default values.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.ParseClef(System.String)">
-            <summary>
-            Converts a clef string into the clef value.
-            </summary>
-            <param name="str">the string to convert</param>
-            <returns>the clef value</returns>
-        </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.ParseKeySignature(System.String)">
-            <summary>
-            Converts a keysignature string into the assocciated value.
-            </summary>
-            <param name="str">the string to convert</param>
-            <returns>the assocciated keysignature value</returns>
-        </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.ParseTuning(System.String)">
-            <summary>
-            Converts a string into the associated tuning. 
-            </summary>
-            <param name="str">the tuning string</param>
-            <returns>the tuning value.</returns>
-        </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.NextChar">
-            <summary>
-            Reads the next character of the source stream.
-            </summary>
-        </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.NewSy">
-            <summary>
-            Reads the next terminal symbol.
-            </summary>
-        </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.IsLetter(System.Int32)">
-            <summary>
-            Checks if the given character is a letter.
-            (no control characters, whitespaces, numbers or dots)
-            </summary>
-            <param name="code">the character</param>
-            <returns>true if the given character is a letter, otherwise false.</returns>
-        </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.IsTerminal(System.Int32)">
-            <summary>
-            Checks if the given charater is a non terminal.
-            </summary>
-            <param name="ch">the character</param>
-            <returns>true if the given character is a terminal, otherwise false.</returns>
-        </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.IsDigit(System.Int32)">
-            <summary>
-            Checks if the given character is a digit. 
-            </summary>
-            <param name="code">the character</param>
-            <returns>true if the given character is a digit, otherwise false.</returns>
-        </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.ReadName">
-            <summary>
-            Reads a string from the stream.
-            </summary>
-            <returns>the read string.</returns>
-        </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.ReadNumber">
-            <summary>
-            Reads a number from the stream.
-            </summary>
-            <returns>the read number.</returns>
-        </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.ApplyBeatEffect(AlphaTab.Model.Beat)">
-            <summary>
-            Tries to apply a beat effect to the given beat.
-            </summary>
-            <returns>true if a effect could be applied, otherwise false</returns>
-        </member>
-        <member name="T:AlphaTab.Importer.AlphaTexSymbols">
-            <summary>
-            A list of terminals recognized by the alphaTex-parser
-            </summary>
-        </member>
-        <member name="M:AlphaTab.Importer.Gp3To5Importer.ReadStringIntUnused">
-            <summary>
-             Skips an integer (4byte) and reads a string using 
-             a bytesize
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:AlphaTab.Importer.Gp3To5Importer.ReadStringInt">
-            <summary>
-            Reads an integer as size, and then the string itself
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:AlphaTab.Importer.Gp3To5Importer.ReadStringIntByte">
-            <summary>
-            Reads an integer as size, skips a byte and reads the string itself
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:AlphaTab.Importer.Gp3To5Importer.ReadStringByteLength(System.Int32)">
-            <summary>
-            Reads a byte as size and the string itself.
-            Additionally it is ensured the specified amount of bytes is read. 
-            </summary>
-            <param name="length">the amount of bytes to read</param>
-            <returns></returns>
-        </member>
-        <member name="T:AlphaTab.Importer.GpxFile">
-            <summary>
-            this public class represents a file within the GpxFileSystem
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Importer.GpxFileSystem">
-            <summary>
-            This public class represents the file system structure
-            stored within a GPX container file. 
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Importer.GpxFileSystem.FileFilter">
-            <summary>
-            You can set a file filter method using this setter. On parsing
-            the filestructure this function can determine based on the filename 
-            whether this file will be available after loading. 
-            This way we can reduce the amount of memory we store.
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Importer.GpxFileSystem.Files">
-            <summary>
-            Gets the list of files stored in this FileSystem.
-            </summary>
-        </member>
-        <member name="M:AlphaTab.Importer.GpxFileSystem.#ctor">
-            <summary>
-            Creates a new GpxFileSystem instance
-            </summary>
-        </member>
-        <member name="M:AlphaTab.Importer.GpxFileSystem.Load(AlphaTab.IO.IReadable)">
-            <summary>
-            Load a complete FileSystem to the memory.
-            </summary>
-            <param name="s">the binary source to read from.</param>
-            <returns></returns>
-        </member>
-        <member name="M:AlphaTab.Importer.GpxFileSystem.ReadHeader(AlphaTab.IO.BitReader)">
-            <summary>
-            Reads the 4 byte header as a string.
-            </summary>
-            <param name="src">the BitInput to read from</param>
-            <returns>a string with 4 characters representing the header.</returns>
-        </member>
-        <member name="M:AlphaTab.Importer.GpxFileSystem.Decompress(AlphaTab.IO.BitReader,System.Boolean)">
-            <summary>
-            Decompresses the given bitinput using the GPX compression format. Only use this method
-            if you are sure the binary data is compressed using the GPX format. Otherwise unexpected
-            behavior can occure. 
-            </summary>
-            <param name="src">the bitInput to read the data from</param>
-            <param name="skipHeader">true if the header should NOT be included in the result byteset, otherwise false</param>
-            <returns>the decompressed byte data. if skipHeader is set to false the BCFS header is included.</returns>
-        </member>
-        <member name="M:AlphaTab.Importer.GpxFileSystem.ReadBlock(AlphaTab.IO.BitReader)">
-            <summary>
-            Reads a block from the given data source.
-            </summary>
-            <param name="data">the data source</param>
-            <returns></returns>
-        </member>
-        <member name="M:AlphaTab.Importer.GpxFileSystem.ReadUncompressedBlock(System.Byte[])">
-            <summary>
-            Reads an uncompressed data block into the model.
-            </summary>
-            <param name="data">the data store to read from.</param>
-        </member>
-        <member name="M:AlphaTab.Importer.GpxFileSystem.GetString(System.Byte[],System.Int32,System.Int32)">
-            <summary>
-            Reads a zeroterminated ascii string from the given source
-            </summary>
-            <param name="data">the data source to read from</param>
-            <param name="offset">the offset to start reading from</param>
-            <param name="length">the max length to read</param>
-            <returns>the ascii string read from the datasource.</returns>
-        </member>
-        <member name="M:AlphaTab.Importer.GpxFileSystem.GetInteger(System.Byte[],System.Int32)">
-            <summary>
-            Reads an 4 byte signed integer from the given source
-            </summary>
-            <param name="data">the data source to read from </param>
-            <param name="offset">offset the offset to start reading from</param>
-            <returns></returns>
-        </member>
-        <member name="T:AlphaTab.Importer.GpxImporter">
-            <summary>
-            This ScoreImporter can read Guitar Pro 6 (gpx) files.
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Importer.GpxRhythm">
-            <summary>
-            This structure represents a duration within a gpx model.
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Importer.GpxParser">
-            <summary>
-            This public class can parse a score.gpif xml file into the model structure
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Importer.GpxParser.BendPointPositionFactor">
-            <summary>
-            GPX range: 0-100
-            Internal range: 0 - 60
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Importer.GpxParser.BendPointValueFactor">
-            <summary>
-            GPX Range: 0-300      
-            Internal Range: 0-12
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Importer.MixTableChange">
-            <summary>
-            A mixtablechange describes several track changes. 
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Importer.ScoreImporter">
-            <summary>
-            This is the base public class for creating new song importers which 
-            enable reading scores from any binary datasource
-            </summary>
-        </member>
-        <member name="M:AlphaTab.Importer.ScoreImporter.BuildImporters">
-            Gets all default ScoreImporters
-            @return
-        </member>
-        <member name="T:AlphaTab.Importer.ScoreLoader">
-            <summary>
-            The ScoreLoader enables you easy loading of Scores using all 
-            available importers
-            </summary>
-        </member>
-        <member name="M:AlphaTab.Importer.ScoreLoader.LoadScoreAsync(System.String,System.Action{AlphaTab.Model.Score},System.Action{System.Exception})">
-            <summary>
-            Loads a score asynchronously from the given datasource
-            </summary>
-            <param name="path">the source path to load the binary file from</param>
-            <param name="success">this function is called if the Score was successfully loaded from the datasource</param>
-            <param name="error">this function is called if any error during the loading occured.</param>
-        </member>
-        <member name="M:AlphaTab.Importer.ScoreLoader.LoadScore(System.String)">
-            <summary>
-            Loads a score synchronously from the given datasource
-            </summary>
-            <param name="path">the source path to load the binary file from</param>
+        <member name="M:AlphaTab.Model.TuningParser.IsTuning(System.String)">
+            <summary>
+            Checks if the given string is a tuning inticator.
+            </summary>Checks if the given string is a tuning inticator.
+            <param name="name"></param>
             <returns></returns>
         </member>
         <member name="T:AlphaTab.Rendering.AlternateEndingsBarRenderer">
@@ -1127,6 +1135,11 @@
             can render a single track of a score object into a notation sheet.
             </summary>
         </member>
+        <member name="E:AlphaTab.Rendering.ScoreRenderer.PreRender">
+            <summary>
+            Prerender
+            </summary>
+        </member>
         <member name="T:AlphaTab.Rendering.Staves.BarLayoutingInfo">
             <summary>
             This public class stores size information about a stave. 
@@ -1444,35 +1457,18 @@
             </ul>
             </summary>
         </member>
-        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+        <member name="T:AlphaTab.Collections.FastDictionary`2">
             <summary>
-            GeneratedInternalTypeHelper
+            A wrapper for 
             </summary>
+            <typeparam name="TKey">a</typeparam>
+            <typeparam name="TValue">b</typeparam>
         </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+        <member name="M:AlphaTab.Collections.FastDictionary`2.GetEnumerator">
             <summary>
-            CreateInstance
+            generic metho
             </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            GetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            SetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
-            <summary>
-            CreateDelegate
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
-            <summary>
-            AddEventHandler
-            </summary>
+            <returns></returns>
         </member>
     </members>
 </doc>

@@ -15,15 +15,32 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Collections.Generic;
 
-namespace AlphaTab.Collections
+using System;
+using System.IO;
+
+namespace AlphaTab.Platform.CSharp
 {
-    public class FastDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IEnumerable<TKey>
+    /// <summary>
+    /// This file loader loads binary files using the native apis
+    /// </summary>
+    public class CsFileLoader : IFileLoader
     {
-        public IEnumerator<TKey> GetEnumerator()
+        public void LoadBinaryAsync(string path, Action<byte[]> success, Action<Exception> error)
         {
-            return Keys.GetEnumerator();
+            try
+            {
+                success(File.ReadAllBytes(path));
+            }
+            catch (Exception e)
+            {
+                error(e);
+            }
+        }
+
+        public byte[] LoadBinary(string path)
+        {
+            return File.ReadAllBytes(path);
         }
     }
 }

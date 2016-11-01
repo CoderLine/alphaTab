@@ -27,6 +27,17 @@ namespace AlphaTab.Platform
 {
     public static partial class Std
     {
+        /// <summary>
+        /// gen
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static T As<T>(this object s)
+        {
+            return (T) s;
+        }
+
         public static float ParseFloat(string s)
         {
             float f;
@@ -113,11 +124,6 @@ namespace AlphaTab.Platform
         public static string NewGuid()
         {
             return Guid.NewGuid().ToString();
-        }
-
-        public static bool IsException<T>(Exception e)
-        {
-            return e is T;
         }
 
         private static readonly Random Rnd = new Random();

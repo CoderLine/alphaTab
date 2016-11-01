@@ -27,6 +27,11 @@ namespace AlphaTab.Xml
             get { return _node.Value; }
         }
 
+        public string TextContent
+        {
+            get { return _node.InnerText; }
+        }
+
         public IXmlNode[] ChildNodes
         {
             get
