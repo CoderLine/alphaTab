@@ -129,7 +129,6 @@ namespace AlphaTab.Importer
                 }
             }
 
-            var chord = false;
             var isFirstBeat = true;
             var attributesParsed = false; 
 
@@ -140,7 +139,7 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "note":
-                            chord = ParseNoteBeat(c, track, bar, chord, isFirstBeat);
+                            ParseNoteBeat(c, track, bar, isFirstBeat);
                             isFirstBeat = false;
                             break;
                         case "forward":
@@ -169,7 +168,7 @@ namespace AlphaTab.Importer
             });
         }
 
-        private bool ParseNoteBeat(IXmlNode element, Track track, Bar bar, bool chord, bool isFirstBeat)
+        private bool ParseNoteBeat(IXmlNode element, Track track, Bar bar, bool isFirstBeat)
         {
             int voiceIndex = 0;
             var voiceNodes = element.GetElementsByTagName("voice");
@@ -177,6 +176,8 @@ namespace AlphaTab.Importer
             {
                 voiceIndex = Std.ParseInt(Std.GetNodeValue(voiceNodes[0])) - 1;
             }
+
+            var chord = element.GetElementsByTagName("chord").Length > 0;
 
             Beat beat;
             var voice = GetOrCreateVoice(bar, voiceIndex);
@@ -278,9 +279,6 @@ namespace AlphaTab.Importer
                             // not supported
                             break;
                         // "full-note"
-                        case "chord":
-                            chord = true;
-                            break;
                         case "pitch":
                             ParsePitch(c, note);
                             break;
@@ -354,6 +352,14 @@ namespace AlphaTab.Importer
                 {
                     switch (c.LocalName)
                     {
+                        case "articulations":
+                            switch (c.FirstChild.LocalName)
+                            {
+                                case "accent":
+                                    note.Accentuated = AccentuationType.Normal;
+                                    break;
+                            }
+                            break;
                         case "tied":
                             ParseTied(c, note);
                             break;
@@ -493,6 +499,19 @@ namespace AlphaTab.Importer
                             tempoAutomation.Type = AutomationType.Tempo;
                             tempoAutomation.Value = Std.ParseInt(c.GetAttribute("tempo"));
                             masterBar.TempoAutomation = tempoAutomation;
+                            break;
+                        case "direction-type":
+                            var directionType = c.FirstChild;
+                            switch (directionType.LocalName)
+                            {
+                                case "words":
+                                    if (element.GetAttribute("placement") == "above")
+                                    {
+                                        masterBar.Section = new Section();
+                                        masterBar.Section.Text = Std.GetNodeValue(directionType);
+                                    }
+                                    break;
+                            }
                             break;
                     }
                 }

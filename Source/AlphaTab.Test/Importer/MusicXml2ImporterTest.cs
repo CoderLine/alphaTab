@@ -104,15 +104,17 @@ namespace AlphaTab.Test.Importer
 
             foreach (var file in files)
             {
+                bool? success = null;
                 try
                 {
                     var reference = Path.ChangeExtension(file, ".gpx");
                     Score referenceScore;
                     if (!File.Exists(reference))
                     {
-                        Console.WriteLine("{0} - Skipped", file);
+                        success = null;
                         continue;
                     }
+                    success = false;
 
                     gpxImporter.Init(ByteBuffer.FromBuffer(File.ReadAllBytes(reference)));
                     referenceScore = gpxImporter.ReadScore();
@@ -122,18 +124,29 @@ namespace AlphaTab.Test.Importer
                     var score = importer.ReadScore();
 
                     AreEqual(referenceScore, score);
-
-                    Console.WriteLine("{0} - OK", file);
+                    success = true;
                 }
                 catch (UnsupportedFormatException e)
                 {
-                    Console.WriteLine("{0} - Failed", file);
                     Assert.Fail("Failed to load file {0}: {1}", file, e);
                 }
-                catch
+                finally
                 {
-                    Console.WriteLine("{0} - Failed", file);
-                    throw;
+                    if (success.HasValue)
+                    {
+                        if (success.Value)
+                        {
+                            Console.WriteLine("{0} - OK", file);
+                        }
+                        else
+                        {
+                            Console.WriteLine("{0} - Failed", file);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("{0} - Skipped", file);
+                    }
                 }
             }
         }
@@ -177,37 +190,37 @@ namespace AlphaTab.Test.Importer
             {
                 return GetHierarchy(note.Beat) + "Note[" + note.Index + "]";
             }
-            
+
             var beat = node as Beat;
             if (beat != null)
             {
                 return GetHierarchy(beat.Voice) + "Beat[" + beat.Index + "]";
             }
-            
+
             var voice = node as Voice;
             if (voice != null)
             {
                 return GetHierarchy(voice.Bar) + "Voice[" + voice.Index + "]";
             }
-            
+
             var bar = node as Bar;
             if (bar != null)
             {
                 return GetHierarchy(bar.Staff) + "Bar[" + bar.Index + "]";
-            }       
-                 
+            }
+
             var staff = node as Staff;
             if (staff != null)
             {
                 return GetHierarchy(staff.Track) + "Staff[" + staff.Index + "]";
             }
-            
+
             var track = node as Track;
             if (track != null)
             {
                 return "Track[" + track.Index + "]";
             }
-            
+
             var mb = node as MasterBar;
             if (mb != null)
             {
@@ -218,6 +231,13 @@ namespace AlphaTab.Test.Importer
             if (score != null)
             {
                 return "Score";
+            }
+
+
+            var section = node as Section;
+            if (section != null)
+            {
+                return "Section";
             }
 
             Debug.Fail("Unknown type");
