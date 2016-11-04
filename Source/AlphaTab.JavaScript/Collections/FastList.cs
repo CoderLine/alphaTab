@@ -61,6 +61,11 @@ namespace AlphaTab.Collections
         {
         }
 
+        [JsMethod(InlineCodeExpression = "this = []", Export = false)]
+        public void Clear()
+        {
+        }
+
         [JsMethod(InlineCodeExpression = "this = this.concat(data)", Export = false)]
         public void AddRange(T[] data)
         {

@@ -55,12 +55,6 @@ namespace AlphaTab.Importer
 
         private void ParsePartwise(IXmlNode element)
         {
-            var version = element.GetAttribute("version");
-            if (!string.IsNullOrEmpty(version) && version != "2.0")
-            {
-                throw new UnsupportedFormatException();
-            }
-
             element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -224,14 +218,8 @@ namespace AlphaTab.Importer
                         case "type":
                             switch (Std.GetNodeValue(c))
                             {
-                                //case "256th":
-                                //    break;
-                                //case "128th":
-                                //    break;
-                                //case "breve":
-                                //    break;
-                                //case "long":
-                                //    break;
+                                case "256th":
+                                case "128th":
                                 case "64th":
                                     beat.Duration = Duration.SixtyFourth;
                                     break;
@@ -250,13 +238,15 @@ namespace AlphaTab.Importer
                                 case "half":
                                     beat.Duration = Duration.Half;
                                     break;
+                                case "long":
+                                case "breve":
                                 case "whole":
                                     beat.Duration = Duration.Whole;
                                     break;
                             }
                             break;
                         case "dot":
-                            note.IsStaccato = true;
+                            beat.Dots = 1;
                             break;
                         case "accidental":
                             ParseAccidental(c, note);
@@ -296,6 +286,7 @@ namespace AlphaTab.Importer
                             break;
                         case "rest":
                             beat.IsEmpty = false;
+                            beat.Notes.Clear();
                             break;
                     }
                 }
@@ -569,13 +560,20 @@ namespace AlphaTab.Importer
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
+                    var v = Std.GetNodeValue(c);
                     switch (c.LocalName)
                     {
                         case "beats":
-                            masterBar.TimeSignatureNumerator = Std.ParseInt(Std.GetNodeValue(c));
+                            if (!v.Contains("+")) // compound TS
+                            {
+                                masterBar.TimeSignatureNumerator = Std.ParseInt(v);
+                            }
                             break;
-                        case "beats-type":
-                            masterBar.TimeSignatureDenominator = Std.ParseInt(Std.GetNodeValue(c));
+                        case "beat-type":
+                            if (!v.Contains("+")) // compound TS
+                            {
+                                masterBar.TimeSignatureDenominator = Std.ParseInt(v);
+                            }
                             break;
                     }
                 }
@@ -628,6 +626,16 @@ namespace AlphaTab.Importer
             for (int i = _score.MasterBars.Count; i <= index; i++)
             {
                 var mb = new MasterBar();
+                if (_score.MasterBars.Count > 0)
+                {
+                    var prev = _score.MasterBars[_score.MasterBars.Count - 1];
+                    mb.TimeSignatureDenominator = prev.TimeSignatureDenominator;
+                    mb.TimeSignatureNumerator = prev.TimeSignatureNumerator;
+                    mb.KeySignature = prev.KeySignature;
+                    mb.KeySignatureType = prev.KeySignatureType;
+                }
+
+
                 _score.AddMasterBar(mb);
             }
 

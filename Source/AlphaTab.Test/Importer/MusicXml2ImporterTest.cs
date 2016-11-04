@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq.Expressions;
 using AlphaTab.Collections;
 using AlphaTab.Exporter;
 using AlphaTab.Importer;
@@ -108,7 +110,8 @@ namespace AlphaTab.Test.Importer
                     Score referenceScore;
                     if (!File.Exists(reference))
                     {
-                        return;
+                        Console.WriteLine("{0} - Skipped", file);
+                        continue;
                     }
 
                     gpxImporter.Init(ByteBuffer.FromBuffer(File.ReadAllBytes(reference)));
@@ -119,6 +122,8 @@ namespace AlphaTab.Test.Importer
                     var score = importer.ReadScore();
 
                     AreEqual(referenceScore, score);
+
+                    Console.WriteLine("{0} - OK", file);
                 }
                 catch (UnsupportedFormatException e)
                 {
@@ -127,27 +132,119 @@ namespace AlphaTab.Test.Importer
             }
         }
 
+        [DebuggerStepThrough]
+        private void AreEqual<T>(T expected, T actual, Expression<Func<T, object>> member)
+        {
+            var accessor = member.Compile();
+            var expectedValue = accessor(expected);
+            var actualValue = accessor(actual);
+            var memberExpr = member.Body as MemberExpression;
+            string propertyName = "";
+            if (memberExpr != null)
+            {
+                propertyName = memberExpr.Member.Name;
+            }
+            else
+            {
+                var unary = member.Body as UnaryExpression;
+                if (unary != null)
+                {
+                    memberExpr = unary.Operand as MemberExpression;
+                    if (memberExpr != null)
+                    {
+                        propertyName = memberExpr.Member.Name;
+                    }
+                }
+            }
+
+            if (!Equals(expectedValue, actualValue))
+            {
+                var hierarchy = GetHierarchy(actual);
+                Assert.Fail($"{propertyName} value differs on {hierarchy}. Actual<{actualValue}> Expected<{expectedValue}>");
+            }
+        }
+
+        private string GetHierarchy(object node)
+        {
+            var note = node as Note;
+            if (note != null)
+            {
+                return GetHierarchy(note.Beat) + "-" + note.Index;
+            }
+            
+            var beat = node as Beat;
+            if (beat != null)
+            {
+                return GetHierarchy(beat.Voice) + "-" + beat.Index;
+            }
+            
+            var voice = node as Voice;
+            if (voice != null)
+            {
+                return GetHierarchy(voice.Bar) + "-" + voice.Index;
+            }
+            
+            var bar = node as Bar;
+            if (bar != null)
+            {
+                return GetHierarchy(bar.Staff) + "-" + bar.Index;
+            }       
+                 
+            var staff = node as Staff;
+            if (staff != null)
+            {
+                return GetHierarchy(staff.Track) + "-" + staff.Index;
+            }
+            
+            var track = node as Track;
+            if (track != null)
+            {
+                return "Track:" + track.Index;
+            }
+            
+            var mb = node as MasterBar;
+            if (mb != null)
+            {
+                return "MasterBar:" + mb.Index;
+            }
+
+            var score = node as Score;
+            if (score != null)
+            {
+                return "Score";
+            }
+
+            var playbackInformation = node as PlaybackInformation;
+            if (playbackInformation != null)
+            {
+                return "PlaybackInformation";
+            }
+
+            Debug.Fail("Unknown type");
+            return "";
+        }
+
         private void AreEqual(Score expected, Score actual)
         {
-            Assert.AreEqual(expected.Album, actual.Album);
-            Assert.AreEqual(expected.Artist, actual.Artist);
-            Assert.AreEqual(expected.Copyright, actual.Copyright);
-            Assert.AreEqual(expected.Instructions, actual.Instructions);
-            Assert.AreEqual(expected.Music, actual.Music);
-            Assert.AreEqual(expected.Notices, actual.Notices);
-            Assert.AreEqual(expected.SubTitle, actual.SubTitle);
-            Assert.AreEqual(expected.Title, actual.Title);
-            Assert.AreEqual(expected.Words, actual.Words);
-            Assert.AreEqual(expected.Tab, actual.Tab);
-            Assert.AreEqual(expected.Tempo, actual.Tempo);
-            Assert.AreEqual(expected.TempoLabel, actual.TempoLabel);
-            Assert.AreEqual(expected.MasterBars.Count, actual.MasterBars.Count);
+            AreEqual(expected, actual, t => t.Album);
+            AreEqual(expected, actual, t => t.Artist);
+            AreEqual(expected, actual, t => t.Copyright);
+            AreEqual(expected, actual, t => t.Instructions);
+            AreEqual(expected, actual, t => t.Music);
+            AreEqual(expected, actual, t => t.Notices);
+            AreEqual(expected, actual, t => t.SubTitle);
+            AreEqual(expected, actual, t => t.Title);
+            AreEqual(expected, actual, t => t.Words);
+            AreEqual(expected, actual, t => t.Tab);
+            AreEqual(expected, actual, t => t.Tempo);
+            AreEqual(expected, actual, t => t.TempoLabel);
+            AreEqual(expected, actual, t => t.MasterBars.Count);
             for (int i = 0; i < expected.MasterBars.Count; i++)
             {
                 AreEqual(expected.MasterBars[i], actual.MasterBars[i]);
             }
 
-            Assert.AreEqual(expected.Tracks.Count, actual.Tracks.Count);
+            AreEqual(expected, actual, t => t.Tracks.Count);
             for (int i = 0; i < expected.Tracks.Count; i++)
             {
                 AreEqual(expected.Tracks[i], actual.Tracks[i]);
@@ -157,16 +254,16 @@ namespace AlphaTab.Test.Importer
 
         private void AreEqual(Track expected, Track actual)
         {
-            Assert.AreEqual(expected.Capo, actual.Capo);
-            Assert.AreEqual(expected.Index, actual.Index);
-            Assert.AreEqual(expected.Name, actual.Name);
-            //Assert.AreEqual(expected.ShortName, actual.ShortName);
-            Assert.AreEqual(expected.Tuning.Length, actual.Tuning.Length);
+            AreEqual(expected, actual, t => t.Capo);
+            AreEqual(expected, actual, t => t.Index);
+            AreEqual(expected, actual, t => t.Name);
+            //AreEqual(expected, actual, t => t.ShortName);
+            AreEqual(expected, actual, t => t.Tuning.Length);
             Assert.AreEqual(string.Join(",", expected.Tuning), string.Join(",", actual.Tuning));
-            Assert.AreEqual(expected.Color.Raw, actual.Color.Raw);
+            AreEqual(expected, actual, t => t.Color.Raw);
             AreEqual(expected.PlaybackInfo, actual.PlaybackInfo);
-            Assert.AreEqual(expected.IsPercussion, actual.IsPercussion);
-            Assert.AreEqual(expected.Staves.Count, actual.Staves.Count);
+            AreEqual(expected, actual, t => t.IsPercussion);
+            AreEqual(expected, actual, t => t.Staves.Count);
             for (int i = 0; i < expected.Staves.Count; i++)
             {
                 AreEqual(expected.Staves[i], actual.Staves[i]);
@@ -175,8 +272,8 @@ namespace AlphaTab.Test.Importer
 
         private void AreEqual(Staff expected, Staff actual)
         {
-            Assert.AreEqual(expected.Index, actual.Index);
-            Assert.AreEqual(expected.Bars.Count, actual.Bars.Count);
+            AreEqual(expected, actual, t => t.Index);
+            AreEqual(expected, actual, t => t.Bars.Count);
             for (int i = 0; i < expected.Bars.Count; i++)
             {
                 AreEqual(expected.Bars[i], actual.Bars[i]);
@@ -185,9 +282,9 @@ namespace AlphaTab.Test.Importer
 
         private void AreEqual(Bar expected, Bar actual)
         {
-            Assert.AreEqual(expected.Index, actual.Index);
-            Assert.AreEqual(expected.Clef, actual.Clef);
-            //Assert.AreEqual(expected.Voices.Count, actual.Voices.Count);
+            AreEqual(expected, actual, t => t.Index);
+            AreEqual(expected, actual, t => t.Clef);
+            //AreEqual(expected, actual, t => t.Voices.Count);
             for (int i = 0; i < Math.Min(expected.Voices.Count, actual.Voices.Count); i++)
             {
                 AreEqual(expected.Voices[i], actual.Voices[i]);
@@ -196,8 +293,8 @@ namespace AlphaTab.Test.Importer
 
         private void AreEqual(Voice expected, Voice actual)
         {
-            Assert.AreEqual(expected.Index, actual.Index);
-            Assert.AreEqual(expected.Beats.Count, actual.Beats.Count);
+            AreEqual(expected, actual, t => t.Index);
+            AreEqual(expected, actual, t => t.Beats.Count);
             for (int i = 0; i < expected.Beats.Count; i++)
             {
                 AreEqual(expected.Beats[i], actual.Beats[i]);
@@ -206,36 +303,36 @@ namespace AlphaTab.Test.Importer
 
         private void AreEqual(Beat expected, Beat actual)
         {
-            Assert.AreEqual(expected.Index, actual.Index);
-            Assert.AreEqual(expected.IsEmpty, actual.IsEmpty);
-            Assert.AreEqual(expected.IsRest, actual.IsRest);
-            Assert.AreEqual(expected.Dots, actual.Dots);
-            Assert.AreEqual(expected.FadeIn, actual.FadeIn);
+            AreEqual(expected, actual, t => t.Index);
+            AreEqual(expected, actual, t => t.IsEmpty);
+            AreEqual(expected, actual, t => t.IsRest);
+            AreEqual(expected, actual, t => t.Dots);
+            AreEqual(expected, actual, t => t.FadeIn);
             Assert.AreEqual(string.Join(" ", expected.Lyrics), string.Join(" ", actual.Lyrics));
-            Assert.AreEqual(expected.Pop, actual.Pop);
-            Assert.AreEqual(expected.HasChord, actual.HasChord);
-            Assert.AreEqual(expected.HasRasgueado, actual.HasRasgueado);
+            AreEqual(expected, actual, t => t.Pop);
+            AreEqual(expected, actual, t => t.HasChord);
+            AreEqual(expected, actual, t => t.HasRasgueado);
             Assert.AreEqual(expected.Slap, actual.Tap);
-            Assert.AreEqual(expected.Text, actual.Text);
-            Assert.AreEqual(expected.BrushType, actual.BrushType);
-            Assert.AreEqual(expected.BrushDuration, actual.BrushDuration);
-            Assert.AreEqual(expected.TupletDenominator, actual.TupletDenominator);
-            Assert.AreEqual(expected.TupletNumerator, actual.TupletNumerator);
+            AreEqual(expected, actual, t => t.Text);
+            AreEqual(expected, actual, t => t.BrushType);
+            AreEqual(expected, actual, t => t.BrushDuration);
+            AreEqual(expected, actual, t => t.TupletDenominator);
+            AreEqual(expected, actual, t => t.TupletNumerator);
             AreEqual(expected.WhammyBarPoints, actual.WhammyBarPoints);
-            Assert.AreEqual(expected.Vibrato, actual.Vibrato);
+            AreEqual(expected, actual, t => t.Vibrato);
             if (expected.HasChord)
             {
                 AreEqual(expected.Chord, actual.Chord);
             }
-            Assert.AreEqual(expected.GraceType, actual.GraceType);
-            Assert.AreEqual(expected.PickStroke, actual.PickStroke);
-            Assert.AreEqual(expected.TremoloSpeed, actual.TremoloSpeed);
-            Assert.AreEqual(expected.Crescendo, actual.Crescendo);
-            Assert.AreEqual(expected.Start, actual.Start);
-            //Assert.AreEqual(expected.Dynamic, actual.Dynamic);
-            Assert.AreEqual(expected.InvertBeamDirection, actual.InvertBeamDirection);
+            AreEqual(expected, actual, t => t.GraceType);
+            AreEqual(expected, actual, t => t.PickStroke);
+            AreEqual(expected, actual, t => t.TremoloSpeed);
+            AreEqual(expected, actual, t => t.Crescendo);
+            AreEqual(expected, actual, t => t.Start);
+            //AreEqual(expected, actual, t => t.Dynamic);
+            AreEqual(expected, actual, t => t.InvertBeamDirection);
 
-            Assert.AreEqual(expected.Notes.Count, actual.Notes.Count);
+            AreEqual(expected, actual, t => t.Notes.Count);
             for (int i = 0; i < expected.Notes.Count; i++)
             {
                 AreEqual(expected.Notes[i], actual.Notes[i]);
@@ -244,34 +341,34 @@ namespace AlphaTab.Test.Importer
 
         private void AreEqual(Note expected, Note actual)
         {
-            Assert.AreEqual(expected.Index, actual.Index);
-            Assert.AreEqual(expected.Accentuated, actual.Accentuated);
+            AreEqual(expected, actual, t => t.Index);
+            AreEqual(expected, actual, t => t.Accentuated);
             AreEqual(expected.BendPoints, actual.BendPoints);
-            Assert.AreEqual(expected.Fret, actual.Fret);
-            Assert.AreEqual(expected.String, actual.String);
-            Assert.AreEqual(expected.Octave, actual.Octave);
-            Assert.AreEqual(expected.Tone, actual.Tone);
+            AreEqual(expected, actual, t => t.Fret);
+            AreEqual(expected, actual, t => t.String);
+            AreEqual(expected, actual, t => t.Octave);
+            AreEqual(expected, actual, t => t.Tone);
             Assert.AreEqual(expected.Element, actual.Variation);
-            Assert.AreEqual(expected.IsHammerPullOrigin, actual.IsHammerPullOrigin);
-            Assert.AreEqual(expected.HarmonicType, actual.HarmonicType);
-            Assert.AreEqual(expected.HarmonicValue, actual.HarmonicValue);
-            Assert.AreEqual(expected.IsGhost, actual.IsGhost);
-            Assert.AreEqual(expected.IsLetRing, actual.IsLetRing);
-            Assert.AreEqual(expected.IsPalmMute, actual.IsPalmMute);
-            Assert.AreEqual(expected.IsDead, actual.IsDead);
-            Assert.AreEqual(expected.IsStaccato, actual.IsStaccato);
-            Assert.AreEqual(expected.SlideType, actual.SlideType);
-            Assert.AreEqual(expected.Vibrato, actual.Vibrato);
-            Assert.AreEqual(expected.IsTieDestination, actual.IsTieDestination);
-            Assert.AreEqual(expected.IsTieOrigin, actual.IsTieOrigin);
-            Assert.AreEqual(expected.LeftHandFinger, actual.LeftHandFinger);
-            Assert.AreEqual(expected.IsFingering, actual.IsFingering);
-            Assert.AreEqual(expected.TrillValue, actual.TrillValue);
-            Assert.AreEqual(expected.TrillSpeed, actual.TrillSpeed);
-            Assert.AreEqual(expected.DurationPercent, actual.DurationPercent);
-            Assert.AreEqual(expected.AccidentalMode, actual.AccidentalMode);
-            Assert.AreEqual(expected.Dynamic, actual.Dynamic);
-            Assert.AreEqual(expected.RealValue, actual.RealValue);
+            AreEqual(expected, actual, t => t.IsHammerPullOrigin);
+            AreEqual(expected, actual, t => t.HarmonicType);
+            AreEqual(expected, actual, t => t.HarmonicValue);
+            AreEqual(expected, actual, t => t.IsGhost);
+            AreEqual(expected, actual, t => t.IsLetRing);
+            AreEqual(expected, actual, t => t.IsPalmMute);
+            AreEqual(expected, actual, t => t.IsDead);
+            AreEqual(expected, actual, t => t.IsStaccato);
+            AreEqual(expected, actual, t => t.SlideType);
+            AreEqual(expected, actual, t => t.Vibrato);
+            AreEqual(expected, actual, t => t.IsTieDestination);
+            AreEqual(expected, actual, t => t.IsTieOrigin);
+            AreEqual(expected, actual, t => t.LeftHandFinger);
+            AreEqual(expected, actual, t => t.IsFingering);
+            AreEqual(expected, actual, t => t.TrillValue);
+            AreEqual(expected, actual, t => t.TrillSpeed);
+            AreEqual(expected, actual, t => t.DurationPercent);
+            AreEqual(expected, actual, t => t.AccidentalMode);
+            AreEqual(expected, actual, t => t.Dynamic);
+            AreEqual(expected, actual, t => t.RealValue);
         }
 
         private void AreEqual(Chord expected, Chord actual)
@@ -279,13 +376,13 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(expected == null, actual == null);
             if (expected != null)
             {
-                Assert.AreEqual(expected.Name, actual.Name);
+                AreEqual(expected, actual, t => t.Name);
             }
         }
 
         private void AreEqual(FastList<BendPoint> expected, FastList<BendPoint> actual)
         {
-            Assert.AreEqual(expected.Count, actual.Count);
+            AreEqual(expected, actual, t => t.Count);
             for (int i = 0; i < expected.Count; i++)
             {
                 Assert.AreEqual(expected[i].Value, actual[i].Value);
@@ -295,30 +392,30 @@ namespace AlphaTab.Test.Importer
 
         private void AreEqual(PlaybackInformation expected, PlaybackInformation actual)
         {
-            Assert.AreEqual(expected.Volume, actual.Volume);
-            Assert.AreEqual(expected.Balance, actual.Balance);
-            //Assert.AreEqual(expected.Port, actual.Port);
-            Assert.AreEqual(expected.Program, actual.Program);
-            //Assert.AreEqual(expected.PrimaryChannel, actual.PrimaryChannel);
-            //Assert.AreEqual(expected.SecondaryChannel, actual.SecondaryChannel);
-            Assert.AreEqual(expected.IsMute, actual.IsMute);
-            Assert.AreEqual(expected.IsSolo, actual.IsSolo);
+            AreEqual(expected, actual, t => t.Volume);
+            AreEqual(expected, actual, t => t.Balance);
+            //AreEqual(expected, actual, t => t.Port);
+            AreEqual(expected, actual, t => t.Program);
+            //AreEqual(expected, actual, t => t.PrimaryChannel);
+            //AreEqual(expected, actual, t => t.SecondaryChannel);
+            AreEqual(expected, actual, t => t.IsMute);
+            AreEqual(expected, actual, t => t.IsSolo);
         }
 
         private void AreEqual(MasterBar expected, MasterBar actual)
         {
-            Assert.AreEqual(expected.AlternateEndings, actual.AlternateEndings);
-            Assert.AreEqual(expected.Index, actual.Index);
-            Assert.AreEqual(expected.KeySignature, actual.KeySignature);
-            Assert.AreEqual(expected.KeySignatureType, actual.KeySignatureType);
-            Assert.AreEqual(expected.IsDoubleBar, actual.IsDoubleBar);
-            Assert.AreEqual(expected.IsRepeatStart, actual.IsRepeatStart);
-            Assert.AreEqual(expected.RepeatCount, actual.RepeatCount);
-            Assert.AreEqual(expected.TimeSignatureNumerator, actual.TimeSignatureNumerator);
-            Assert.AreEqual(expected.TimeSignatureDenominator, actual.TimeSignatureDenominator);
-            Assert.AreEqual(expected.TripletFeel, actual.TripletFeel);
+            AreEqual(expected, actual, t => t.AlternateEndings);
+            AreEqual(expected, actual, t => t.Index);
+            AreEqual(expected, actual, t => t.KeySignature);
+            AreEqual(expected, actual, t => t.KeySignatureType);
+            AreEqual(expected, actual, t => t.IsDoubleBar);
+            AreEqual(expected, actual, t => t.IsRepeatStart);
+            AreEqual(expected, actual, t => t.RepeatCount);
+            AreEqual(expected, actual, t => t.TimeSignatureNumerator);
+            AreEqual(expected, actual, t => t.TimeSignatureDenominator);
+            AreEqual(expected, actual, t => t.TripletFeel);
             AreEqual(expected.Section, actual.Section);
-            Assert.AreEqual(expected.Start, actual.Start);
+            AreEqual(expected, actual, t => t.Start);
         }
 
         private void AreEqual(Section expected, Section actual)
@@ -326,8 +423,8 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(expected == null, actual == null);
             if (expected != null)
             {
-                Assert.AreEqual(expected.Text, actual.Text);
-                Assert.AreEqual(expected.Marker, actual.Marker);
+                AreEqual(expected, actual, t => t.Text);
+                AreEqual(expected, actual, t => t.Marker);
             }
         }
 

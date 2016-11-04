@@ -55,6 +55,11 @@ namespace AlphaTab.Platform
 
         public static string GetNodeValue(IXmlNode n)
         {
+            if (n == null)
+            {
+                return "";
+            }
+
             if (n.NodeType == XmlNodeType.Element || n.NodeType == XmlNodeType.Document)
             {
                 var txt = new StringBuilder();
