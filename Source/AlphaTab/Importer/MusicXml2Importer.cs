@@ -129,8 +129,9 @@ namespace AlphaTab.Importer
                 }
             }
 
-            bool chord = false;
-            bool isFirstBeat = true;
+            var chord = false;
+            var isFirstBeat = true;
+            var attributesParsed = false; 
 
             element.IterateChildren(c =>
             {
@@ -148,7 +149,11 @@ namespace AlphaTab.Importer
                             ParseDirection(c, masterBar);
                             break;
                         case "attributes":
-                            ParseAttributes(c, bar, masterBar);
+                            if (!attributesParsed)
+                            {
+                                ParseAttributes(c, bar, masterBar);
+                                attributesParsed = true;
+                            }
                             break;
                         case "harmony":
                             // TODO
@@ -591,7 +596,7 @@ namespace AlphaTab.Importer
             int fifths = int.MinValue;
             int keyStep = int.MinValue;
             int keyAlter = int.MinValue;
-
+            string mode = null;
             element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -607,18 +612,31 @@ namespace AlphaTab.Importer
                         case "key-alter":
                             keyAlter = Std.ParseInt(Std.GetNodeValue(c));
                             break;
+                        case "mode":
+                            mode = Std.GetNodeValue(c);
+                            break;
                     }
                 }
             });
 
-            if (fifths != int.MinValue)
+            if (-7 <= fifths && fifths <= 7)
             {
                 // TODO: check if this is conrrect
                 masterBar.KeySignature = fifths;
             }
             else
             {
+                masterBar.KeySignature = 0;
                 // TODO: map keyStep/keyAlter to internal keysignature
+            }
+
+            if (mode == "minor")
+            {
+                masterBar.KeySignatureType = KeySignatureType.Minor;
+            }
+            else
+            {
+                masterBar.KeySignatureType = KeySignatureType.Major;
             }
         }
 

@@ -414,6 +414,15 @@
     <None Include="TestFiles\MusicXml\12b-Clefs-NoKeyOrClef.gpx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="TestFiles\MusicXml\13a-KeySignatures.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\13c-KeySignatures-NonTraditional.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\13d-KeySignatures-Microtones.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="TestFiles\MusicXml\LICENSE" />
   </ItemGroup>
   <ItemGroup>
