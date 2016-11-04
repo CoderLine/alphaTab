@@ -130,7 +130,7 @@ namespace AlphaTab.Importer
             }
 
             var isFirstBeat = true;
-            var attributesParsed = false; 
+            var attributesParsed = false;
 
             element.IterateChildren(c =>
             {
@@ -362,15 +362,7 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "articulations":
-                            switch (c.FirstChild.LocalName)
-                            {
-                                case "accent":
-                                    note.Accentuated = AccentuationType.Normal;
-                                    break;
-                                case "staccato":
-                                    note.IsStaccato = true;
-                                    break;
-                            }
+                            ParseArticulations(c, note);
                             break;
                         case "tied":
                             ParseTied(c, note);
@@ -385,6 +377,26 @@ namespace AlphaTab.Importer
                             ParseDynamics(c, beat);
                             break;
                     }
+                }
+            });
+        }
+
+        private void ParseArticulations(IXmlNode element, Note note)
+        {
+            element.IterateChildren(c =>
+            {
+                switch (c.LocalName)
+                {
+                    case "accent":
+                        note.Accentuated = AccentuationType.Normal;
+                        break;
+                    case "strong-accent":
+                        note.Accentuated = AccentuationType.Heavy;
+                        break;
+                    case "staccato":
+                    case "detached-legato":
+                        note.IsStaccato = true;
+                        break;
                 }
             });
         }
@@ -517,11 +529,8 @@ namespace AlphaTab.Importer
                             switch (directionType.LocalName)
                             {
                                 case "words":
-                                    if (element.GetAttribute("placement") == "above")
-                                    {
-                                        masterBar.Section = new Section();
-                                        masterBar.Section.Text = Std.GetNodeValue(directionType);
-                                    }
+                                    masterBar.Section = new Section();
+                                    masterBar.Section.Text = Std.GetNodeValue(directionType);
                                     break;
                             }
                             break;
