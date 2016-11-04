@@ -211,6 +211,10 @@ namespace AlphaTab.Importer
                             break;
                         case "duration":
                             beat.Duration = (Duration)Std.ParseInt(Std.GetNodeValue(c));
+                            if (beat.GraceType != GraceType.None && beat.Duration < Duration.Eighth)
+                            {
+                                beat.Duration = Duration.Eighth;
+                            }
                             break;
                         case "tie":
                             ParseTied(c, note);
@@ -249,6 +253,10 @@ namespace AlphaTab.Importer
                                 case "whole":
                                     beat.Duration = Duration.Whole;
                                     break;
+                            }
+                            if (beat.GraceType != GraceType.None && beat.Duration < Duration.Eighth)
+                            {
+                                beat.Duration = Duration.Eighth;
                             }
                             break;
                         case "dot":
@@ -334,6 +342,7 @@ namespace AlphaTab.Importer
 
         private static void ParseTied(IXmlNode element, Note note)
         {
+            if (note.Beat.GraceType != GraceType.None) return;
             if (element.GetAttribute("type") == "start")
             {
                 note.IsTieOrigin = true;
