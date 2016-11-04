@@ -266,7 +266,7 @@ namespace AlphaTab.Importer
                         case "notehead":
                             if (c.GetAttribute("parentheses") == "yes")
                             {
-                                note.IsGhost = true;
+                                //note.IsGhost = true;
                             }
                             break;
                         case "beam":
@@ -357,6 +357,9 @@ namespace AlphaTab.Importer
                             {
                                 case "accent":
                                     note.Accentuated = AccentuationType.Normal;
+                                    break;
+                                case "staccato":
+                                    note.IsStaccato = true;
                                     break;
                             }
                             break;
