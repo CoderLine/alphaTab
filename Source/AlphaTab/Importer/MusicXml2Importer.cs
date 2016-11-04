@@ -19,7 +19,7 @@ namespace AlphaTab.Importer
             _trackById = new FastDictionary<string, Track>();
 
             var xml = Std.ToString(Data.ReadAll());
-            IXmlDocument dom ;
+            IXmlDocument dom;
             try
             {
                 dom = Std.LoadXml(xml);
@@ -28,7 +28,7 @@ namespace AlphaTab.Importer
             {
                 throw new UnsupportedFormatException();
             }
-            
+
             _score = new Score();
             _score.Tempo = 120;
             ParseDom(dom);
@@ -287,7 +287,7 @@ namespace AlphaTab.Importer
                             chord = true;
                             break;
                         case "pitch":
-                            ParsePitch(c, track, beat, note);
+                            ParsePitch(c, note);
                             break;
                         case "unpitched":
                             // TODO: not yet fully supported
@@ -308,15 +308,15 @@ namespace AlphaTab.Importer
         {
             switch (Std.GetNodeValue(element))
             {
-                case "sharp":
-                    note.AccidentalMode = NoteAccidentalMode.ForceSharp;
-                    break;
-                case "natural":
-                    note.AccidentalMode = NoteAccidentalMode.ForceNatural;
-                    break;
-                case "flat":
-                    note.AccidentalMode = NoteAccidentalMode.ForceFlat;
-                    break;
+                //case "sharp":
+                //    note.AccidentalMode = NoteAccidentalMode.ForceSharp;
+                //    break;
+                //case "natural":
+                //    note.AccidentalMode = NoteAccidentalMode.ForceNatural;
+                //    break;
+                //case "flat":
+                //    note.AccidentalMode = NoteAccidentalMode.ForceFlat;
+                //    break;
                 //case "double-sharp":
                 //    break;
                 //case "sharp-sharp":
@@ -435,7 +435,7 @@ namespace AlphaTab.Importer
             });
         }
 
-        private void ParsePitch(IXmlNode element, Track track, Beat beat, Note note)
+        private void ParsePitch(IXmlNode element, Note note)
         {
             string step = null;
             int semitones = 0;
@@ -460,52 +460,10 @@ namespace AlphaTab.Importer
                 }
             });
 
-            var fullNoteName = step + octave;
-            var fullNoteValue = TuningParser.GetTuningForText(fullNoteName) + semitones;
+            var value = octave * 12 + TuningParser.GetToneForText(step) + semitones;
 
-            ApplyNoteStringFrets(track, beat, note, fullNoteValue);
-        }
-
-        private void ApplyNoteStringFrets(Track track, Beat beat, Note note, int fullNoteValue)
-        {
-            note.String = FindStringForValue(track, beat, fullNoteValue);
-            note.Fret = fullNoteValue - Note.GetStringTuning(track, note.String);
-        }
-
-        private int FindStringForValue(Track track, Beat beat, int value)
-        {
-            // find strings which are already taken
-            var takenStrings = new FastDictionary<int, bool>();
-            for (int i = 0; i < beat.Notes.Count; i++)
-            {
-                var note = beat.Notes[i];
-                takenStrings[note.String] = true;
-            }
-
-            // find a string where the note matches into 0 to <upperbound>
-
-            // first try to find a string from 0-14 (more handy to play)
-            // then try from 0-20 (guitars with high frets)
-            // then unlimited 
-            int[] steps = { 14, 20, int.MaxValue };
-            for (int i = 0; i < steps.Length; i++)
-            {
-                for (int j = 0; j < track.Tuning.Length; j++)
-                {
-                    if (!takenStrings.ContainsKey(j))
-                    {
-                        var min = track.Tuning[j];
-                        var max = track.Tuning[j] + steps[i];
-
-                        if (value >= min && value <= max)
-                        {
-                            return track.Tuning.Length - j;
-                        }
-                    }
-                }
-            }
-            // will not happen
-            return 1;
+            note.Octave = (value / 12);
+            note.Tone = value - (note.Octave * 12);
         }
 
         private Voice GetOrCreateVoice(Bar bar, int index)
@@ -740,9 +698,9 @@ namespace AlphaTab.Importer
                 }
             });
 
-            if (track.Tuning == null || track.Tuning.Length == 0)
+            if (track.Tuning == null)
             {
-                track.Tuning = Tuning.GetDefaultTuningFor(6).Tunings;
+                track.Tuning = new int[0];
             }
         }
 

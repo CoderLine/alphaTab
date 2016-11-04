@@ -203,6 +203,7 @@ namespace AlphaTab.Model
             Dynamic = DynamicValue.F;
             Crescendo = CrescendoType.None;
             InvertBeamDirection = false;
+            Lyrics = new FastList<string>();
         }
 
         public static void CopyTo(Beat src, Beat dst)

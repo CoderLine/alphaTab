@@ -48,48 +48,7 @@ namespace AlphaTab.Model
 
             if (!note.IsNullOrWhiteSpace())
             {
-                switch (note)
-                {
-                    case "c":
-                        b = 0;
-                        break;
-                    case "db":
-                        b = 1;
-                        break;
-                    case "d":
-                        b = 2;
-                        break;
-                    case "eb":
-                        b = 3;
-                        break;
-                    case "e":
-                        b = 4;
-                        break;
-                    case "f":
-                        b = 5;
-                        break;
-                    case "gb":
-                        b = 6;
-                        break;
-                    case "g":
-                        b = 7;
-                        break;
-                    case "ab":
-                        b = 8;
-                        break;
-                    case "a":
-                        b = 9;
-                        break;
-                    case "bb":
-                        b = 10;
-                        break;
-                    case "b":
-                        b = 11;
-                        break;
-                    default:
-                        return -1;
-                }
-
+                b = GetToneForText(note);
                 // add octaves
                 b += (octave * 12);
             }
@@ -97,6 +56,54 @@ namespace AlphaTab.Model
             {
                 return -1;
             }
+            return b;
+        }
+
+        public static int GetToneForText(string note)
+        {
+            int b;
+            switch (note.ToLower())
+            {
+                case "c":
+                    b = 0;
+                    break;
+                case "db":
+                    b = 1;
+                    break;
+                case "d":
+                    b = 2;
+                    break;
+                case "eb":
+                    b = 3;
+                    break;
+                case "e":
+                    b = 4;
+                    break;
+                case "f":
+                    b = 5;
+                    break;
+                case "gb":
+                    b = 6;
+                    break;
+                case "g":
+                    b = 7;
+                    break;
+                case "ab":
+                    b = 8;
+                    break;
+                case "a":
+                    b = 9;
+                    break;
+                case "bb":
+                    b = 10;
+                    break;
+                case "b":
+                    b = 11;
+                    break;
+                default:
+                    return 0;
+            }
+
             return b;
         }
 

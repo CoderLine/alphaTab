@@ -35,8 +35,8 @@ namespace AlphaTab.Importer
 
         public GpxRhythm()
         {
-            TupletDenominator = 1;
-            TupletNumerator = 1;
+            TupletDenominator = -1;
+            TupletNumerator = -1;
             Value = Duration.Quarter;
         }
     }
@@ -1550,7 +1550,10 @@ namespace AlphaTab.Importer
                         if (barId == "0") // // TODO find the correct first bar id
                         {
                             Score.Tempo = (int)(automation.Value);
-                            Score.TempoLabel = automation.Text;
+                            if (automation.Text != null)
+                            {
+                                Score.TempoLabel = automation.Text;
+                            }
                         }
 
                         bar.MasterBar.TempoAutomation = automation;
