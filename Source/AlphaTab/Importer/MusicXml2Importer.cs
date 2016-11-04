@@ -519,7 +519,7 @@ namespace AlphaTab.Importer
         private void ParseClef(IXmlNode element, Bar bar)
         {
             string sign = null;
-            string line = null;
+            int line = 0;
             element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -530,26 +530,32 @@ namespace AlphaTab.Importer
                             sign = Std.GetNodeValue(c);
                             break;
                         case "line":
-                            line = Std.GetNodeValue(c);
+                            line = Std.ParseInt(Std.GetNodeValue(c));
                             break;
                     }
                 }
             });
 
-            var clef = sign + line;
-            switch (clef)
+            switch (sign)
             {
-                case "G2":
+                case "G":
                     bar.Clef = Clef.G2;
                     break;
-                case "F4":
+                case "F":
                     bar.Clef = Clef.F4;
                     break;
-                case "C3":
-                    bar.Clef = Clef.C3;
+                case "C":
+                    if (line == 3)
+                    {
+                        bar.Clef = Clef.C3;
+                    }
+                    else
+                    {
+                        bar.Clef = Clef.C4;
+                    }
                     break;
-                case "C4":
-                    bar.Clef = Clef.C4;
+                case "percussion":
+                    bar.Clef = Clef.Neutral;
                     break;
             }
         }

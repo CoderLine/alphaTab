@@ -127,7 +127,13 @@ namespace AlphaTab.Test.Importer
                 }
                 catch (UnsupportedFormatException e)
                 {
+                    Console.WriteLine("{0} - Failed", file);
                     Assert.Fail("Failed to load file {0}: {1}", file, e);
+                }
+                catch
+                {
+                    Console.WriteLine("{0} - Failed", file);
+                    throw;
                 }
             }
         }
@@ -169,55 +175,49 @@ namespace AlphaTab.Test.Importer
             var note = node as Note;
             if (note != null)
             {
-                return GetHierarchy(note.Beat) + "-" + note.Index;
+                return GetHierarchy(note.Beat) + "Note[" + note.Index + "]";
             }
             
             var beat = node as Beat;
             if (beat != null)
             {
-                return GetHierarchy(beat.Voice) + "-" + beat.Index;
+                return GetHierarchy(beat.Voice) + "Beat[" + beat.Index + "]";
             }
             
             var voice = node as Voice;
             if (voice != null)
             {
-                return GetHierarchy(voice.Bar) + "-" + voice.Index;
+                return GetHierarchy(voice.Bar) + "Voice[" + voice.Index + "]";
             }
             
             var bar = node as Bar;
             if (bar != null)
             {
-                return GetHierarchy(bar.Staff) + "-" + bar.Index;
+                return GetHierarchy(bar.Staff) + "Bar[" + bar.Index + "]";
             }       
                  
             var staff = node as Staff;
             if (staff != null)
             {
-                return GetHierarchy(staff.Track) + "-" + staff.Index;
+                return GetHierarchy(staff.Track) + "Staff[" + staff.Index + "]";
             }
             
             var track = node as Track;
             if (track != null)
             {
-                return "Track:" + track.Index;
+                return "Track[" + track.Index + "]";
             }
             
             var mb = node as MasterBar;
             if (mb != null)
             {
-                return "MasterBar:" + mb.Index;
+                return "MasterBar[" + mb.Index + "]";
             }
 
             var score = node as Score;
             if (score != null)
             {
                 return "Score";
-            }
-
-            var playbackInformation = node as PlaybackInformation;
-            if (playbackInformation != null)
-            {
-                return "PlaybackInformation";
             }
 
             Debug.Fail("Unknown type");
