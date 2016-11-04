@@ -1135,11 +1135,6 @@
             can render a single track of a score object into a notation sheet.
             </summary>
         </member>
-        <member name="E:AlphaTab.Rendering.ScoreRenderer.PreRender">
-            <summary>
-            Prerender
-            </summary>
-        </member>
         <member name="T:AlphaTab.Rendering.Staves.BarLayoutingInfo">
             <summary>
             This public class stores size information about a stave. 

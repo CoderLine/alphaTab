@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Threading;
-using AlphaTab.Wpf.Annotations;
+using JetBrains.Annotations;
 
 namespace AlphaTab.Wpf.ViewModel
 {

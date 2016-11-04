@@ -60,9 +60,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\AlphaTab.CSharp\AlphaTab.CSharp.csproj">
-      <Project>{aba04ebe-36b2-469d-a025-16ba6131818e}</Project>
-      <Name>AlphaTab.CSharp</Name>
+    <ProjectReference Include="..\..\Source\AlphaTab.Wpf\AlphaTab.Wpf.csproj">
+      <Project>{dfe92430-1351-4b74-8306-f1620f70ac4a}</Project>
+      <Name>AlphaTab.Wpf</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

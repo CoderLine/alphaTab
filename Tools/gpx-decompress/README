@@ -1,6 +1,0 @@
-# alphaTab GPX Decompressor
-The Guitar Pro 6 File is a container file format with two modes: compressed and uncompressed data. 
-This utility can:
-	
-* convert a compressed GPX to a decompressed GPX 
-* extract any file stored within a GPX container

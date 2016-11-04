@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AlphaTab</RootNamespace>
-    <AssemblyName>AlphaTab.Wpf</AssemblyName>
+    <AssemblyName>AlphaTab</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -20,7 +20,7 @@
     <DefineConstants>TRACE;DEBUG;CSharp</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\AlphaTab.Wpf.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\AlphaTab.xml</DocumentationFile>
     <Mono>false</Mono>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -30,7 +30,7 @@
     <DefineConstants>TRACE;CSharp</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>0</WarningLevel>
-    <DocumentationFile>bin\Release\AlphaTab.Wpf.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\AlphaTab.xml</DocumentationFile>
     <Mono>false</Mono>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>

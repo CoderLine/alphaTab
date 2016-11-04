@@ -365,12 +365,6 @@
     <None Include="TestFiles\MusicXml\LICENSE" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AlphaTab.CSharp\AlphaTab.CSharp.csproj">
-      <Project>{aba04ebe-36b2-469d-a025-16ba6131818e}</Project>
-      <Name>AlphaTab.CSharp</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="TestFiles\MusicXml\01a-Pitches-Pitches.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -752,6 +746,12 @@
     <Content Include="TestFiles\MusicXml\99b-Lyrics-BeamsMelismata-IgnoreBeams.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AlphaTab.Wpf\AlphaTab.Wpf.csproj">
+      <Project>{dfe92430-1351-4b74-8306-f1620f70ac4a}</Project>
+      <Name>AlphaTab.Wpf</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
