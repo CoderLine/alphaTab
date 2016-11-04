@@ -343,11 +343,12 @@ namespace AlphaTab.Importer
         private static void ParseTied(IXmlNode element, Note note)
         {
             if (note.Beat.GraceType != GraceType.None) return;
+
             if (element.GetAttribute("type") == "start")
             {
                 note.IsTieOrigin = true;
             }
-            else
+            else 
             {
                 note.IsTieDestination = true;
             }
@@ -368,9 +369,10 @@ namespace AlphaTab.Importer
                             ParseTied(c, note);
                             break;
                         case "slide":
+                        case "glissando":
                             if (c.GetAttribute("type") == "start")
                             {
-                                note.SlideType = SlideType.Legato;
+                                note.SlideType = SlideType.Shift;
                             }
                             break;
                         case "dynamics":
