@@ -51,6 +51,23 @@
           <ul class="nav navbar-nav">
             <li><button id="playPause" disabled="disabled" class="btn btn-link navbar-btn glyphicon glyphicon-play"></button></li>
             <li><button id="stop"  disabled="disabled" class="btn btn-link navbar-btn glyphicon glyphicon-stop"></button></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Speed: <span id="playbackSpeed">100%</span> <span class="caret"></span></a>
+              <ul class="dropdown-menu" id="playbackSpeedSelector">
+                <li><a href="#" data-value="0.25">25%</a></li>
+                <li><a href="#" data-value="0.5">50%</a></li>
+                <li><a href="#" data-value="0.6">60%</a></li>
+                <li><a href="#" data-value="0.7">70%</a></li>
+                <li><a href="#" data-value="0.8">80%</a></li>
+                <li><a href="#" data-value="0.9">90%</a></li>
+                <li><a href="#" data-value="1">100%</a></li>
+                <li><a href="#" data-value="1.1">110%</a></li>
+                <li><a href="#" data-value="1.25">125%</a></li>
+                <li><a href="#" data-value="1.5">150%</a></li>
+                <li><a href="#" data-value="2">200%</a></li>
+              </ul>
+            </li>
+            
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <!-- Loading indicator for soundfont -->
@@ -117,6 +134,12 @@
         $('#stop').click(function() { 
             as.Stop(); 
         });
+        
+        $('#playbackSpeedSelector a').click(function() {
+            var playbackSpeed = $(this).data('value');
+            as.SetPlaybackSpeed(playbackSpeed);
+            $('#playbackSpeed').text($(this).text());
+        }); 
         
         function updateControls() {
             if(!playerReady) {
