@@ -11557,7 +11557,7 @@ AlphaTab.Rendering.Glyphs.NoteHeadGlyph.prototype = {
                 this.Width = 14 * (this._isGrace ? 0.6 : 1) * this.get_Scale();
                 break;
             default:
-                this.Width = 10 * (this._isGrace ? 0.6 : 1) * this.get_Scale();
+                this.Width = 9 * (this._isGrace ? 0.6 : 1) * this.get_Scale();
                 break;
         }
     }
