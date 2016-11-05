@@ -91,6 +91,7 @@ namespace AlphaTab.Rendering.Glyphs
         TremoloPickingEighth = 0xE220,
 
         Tempo = 0xE1D5,
+        NoteEighth = 0xE1D7,
 
         AccidentalFlat = 0xE260,
         AccidentalNatural = 0xE261,

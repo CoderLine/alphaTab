@@ -174,6 +174,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TimeSignatureGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TremoloPickingGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TrillGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TripletFeelGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TuningGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\VibratoGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\VoiceContainerGlyph.cs" />

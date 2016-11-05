@@ -55,7 +55,7 @@ namespace AlphaTab
 
             // default staves 
             StaveFactories["marker"] = l => new EffectBarRendererFactory(new MarkerEffectInfo());
-            //staveFactories.set("triplet-feel", functionl { return new EffectBarRendererFactory(new TripletFeelEffectInfo()); });
+            StaveFactories["triplet-feel"] = l => new EffectBarRendererFactory(new TripletFeelEffectInfo());
             StaveFactories["tempo"] = l => new EffectBarRendererFactory(new TempoEffectInfo());
             StaveFactories["text"] = l => new EffectBarRendererFactory(new TextEffectInfo());
             StaveFactories["chords"] = l => new EffectBarRendererFactory(new ChordsEffectInfo());

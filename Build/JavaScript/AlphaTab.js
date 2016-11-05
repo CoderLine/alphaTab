@@ -321,7 +321,9 @@ $StaticConstructor(function (){
     AlphaTab.Environment.StaveFactories["marker"] = function (l){
         return new AlphaTab.Rendering.EffectBarRendererFactory(new AlphaTab.Rendering.Effects.MarkerEffectInfo());
     };
-    //staveFactories.set("triplet-feel", functionl { return new EffectBarRendererFactory(new TripletFeelEffectInfo()); });
+    AlphaTab.Environment.StaveFactories["triplet-feel"] = function (l){
+        return new AlphaTab.Rendering.EffectBarRendererFactory(new AlphaTab.Rendering.Effects.TripletFeelEffectInfo());
+    };
     AlphaTab.Environment.StaveFactories["tempo"] = function (l){
         return new AlphaTab.Rendering.EffectBarRendererFactory(new AlphaTab.Rendering.Effects.TempoEffectInfo());
     };
@@ -1929,9 +1931,9 @@ AlphaTab.Settings.get_Defaults = function (){
     settings.Engine = "default";
     settings.Layout = AlphaTab.LayoutSettings.get_Defaults();
     settings.Staves = [];
-    settings.Staves.push(new AlphaTab.StaveSettings("marker"));
-    //settings.staves.Add(new StaveSettings("triplet-feel"));
     settings.Staves.push(new AlphaTab.StaveSettings("tempo"));
+    settings.Staves.push(new AlphaTab.StaveSettings("triplet-feel"));
+    settings.Staves.push(new AlphaTab.StaveSettings("marker"));
     settings.Staves.push(new AlphaTab.StaveSettings("text"));
     settings.Staves.push(new AlphaTab.StaveSettings("chords"));
     settings.Staves.push(new AlphaTab.StaveSettings("trill"));
@@ -10459,16 +10461,16 @@ AlphaTab.Rendering.Effects.TripletFeelEffectInfo.prototype = {
         return true;
     },
     ShouldCreateGlyph: function (renderer, beat){
-        return beat.Index == 0 && (beat.Voice.Bar.get_MasterBar().Index == 0 && beat.Voice.Bar.get_MasterBar().TripletFeel != AlphaTab.Model.TripletFeel.NoTripletFeel) || (beat.Voice.Bar.get_MasterBar().Index > 0 && beat.Voice.Bar.get_MasterBar().TripletFeel != beat.Voice.Bar.get_MasterBar().PreviousMasterBar.TripletFeel);
+        return beat.Index == 0 && ((beat.Voice.Bar.get_MasterBar().Index == 0 && beat.Voice.Bar.get_MasterBar().TripletFeel != AlphaTab.Model.TripletFeel.NoTripletFeel) || (beat.Voice.Bar.get_MasterBar().Index > 0 && beat.Voice.Bar.get_MasterBar().TripletFeel != beat.Voice.Bar.get_MasterBar().PreviousMasterBar.TripletFeel));
     },
     get_SizingMode: function (){
-        return AlphaTab.Rendering.EffectBarGlyphSizing.SingleOnBeat;
+        return AlphaTab.Rendering.EffectBarGlyphSizing.SinglePreBeat;
     },
     GetHeight: function (renderer){
-        return 20 * renderer.get_Scale();
+        return 25 * renderer.get_Scale();
     },
     CreateNewGlyph: function (renderer, beat){
-        return new AlphaTab.Rendering.Effects.DummyEffectGlyph(0, 0, "TripletFeel");
+        return new AlphaTab.Rendering.Glyphs.TripletFeelGlyph(beat.Voice.Bar.get_MasterBar().TripletFeel);
     },
     CanExpand: function (renderer, from, to){
         return true;
@@ -11525,6 +11527,7 @@ AlphaTab.Rendering.Glyphs.MusicFontSymbol = {
     TremoloPickingSixteenth: 57889,
     TremoloPickingEighth: 57888,
     Tempo: 57813,
+    NoteEighth: 57815,
     AccidentalFlat: 57952,
     AccidentalNatural: 57953,
     AccidentalSharp: 57954
@@ -13055,6 +13058,103 @@ AlphaTab.Rendering.Glyphs.TrillGlyph.prototype = {
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.TrillGlyph, AlphaTab.Rendering.Glyphs.EffectGlyph);
+AlphaTab.Rendering.Glyphs.TripletFeelGlyph = function (tripletFeel){
+    this._tripletFeel = AlphaTab.Model.TripletFeel.NoTripletFeel;
+    AlphaTab.Rendering.Glyphs.EffectGlyph.call(this, 0, 0);
+    this._tripletFeel = tripletFeel;
+};
+AlphaTab.Rendering.Glyphs.TripletFeelGlyph.prototype = {
+    Paint: function (cx, cy, canvas){
+        cx += this.X;
+        cy += this.Y;
+        var noteY = cy + this.Renderer.Height * 0.75;
+        canvas.set_Font(this.Renderer.get_Resources().EffectFont);
+        canvas.FillText("(", cx, cy + this.Renderer.Height * 0.3);
+        var leftNoteX = cx + (10 * this.get_Scale());
+        var rightNoteX = cx + (40 * this.get_Scale());
+        switch (this._tripletFeel){
+            case AlphaTab.Model.TripletFeel.NoTripletFeel:
+                this.RenderBarNote(leftNoteX, noteY, 0.4, canvas, [AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full]);
+                this.RenderBarNote(rightNoteX, noteY, 0.4, canvas, [AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full]);
+                break;
+            case AlphaTab.Model.TripletFeel.Triplet8th:
+                this.RenderBarNote(leftNoteX, noteY, 0.4, canvas, [AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full]);
+                canvas.FillMusicFontSymbol(rightNoteX, noteY, 0.4, AlphaTab.Rendering.Glyphs.MusicFontSymbol.Tempo);
+                canvas.FillMusicFontSymbol(rightNoteX + (12 * this.get_Scale()), noteY, 0.4, AlphaTab.Rendering.Glyphs.MusicFontSymbol.NoteEighth);
+                this.RenderTriplet(rightNoteX, cy, canvas);
+                break;
+            case AlphaTab.Model.TripletFeel.Triplet16th:
+                this.RenderBarNote(leftNoteX, noteY, 0.4, canvas, [AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full, AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full]);
+                this.RenderBarNote(rightNoteX, noteY, 0.4, canvas, [AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full, AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.PartialRight]);
+                this.RenderTriplet(rightNoteX, cy, canvas);
+                break;
+            case AlphaTab.Model.TripletFeel.Dotted8th:
+                this.RenderBarNote(leftNoteX, noteY, 0.4, canvas, [AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full]);
+                this.RenderBarNote(rightNoteX, noteY, 0.4, canvas, [AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full, AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.PartialRight]);
+                canvas.FillCircle(rightNoteX + (9 * this.get_Scale()), noteY, this.get_Scale());
+                break;
+            case AlphaTab.Model.TripletFeel.Dotted16th:
+                this.RenderBarNote(leftNoteX, noteY, 0.4, canvas, [AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full, AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full]);
+                this.RenderBarNote(rightNoteX, noteY, 0.4, canvas, [AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full, AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full, AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.PartialRight]);
+                canvas.FillCircle(rightNoteX + (9 * this.get_Scale()), noteY, this.get_Scale());
+                break;
+            case AlphaTab.Model.TripletFeel.Scottish8th:
+                this.RenderBarNote(leftNoteX, noteY, 0.4, canvas, [AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full]);
+                this.RenderBarNote(rightNoteX, noteY, 0.4, canvas, [AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full, AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.PartialLeft]);
+                canvas.FillCircle(rightNoteX + (12 * this.get_Scale()) + (8 * this.get_Scale()), noteY, this.get_Scale());
+                break;
+            case AlphaTab.Model.TripletFeel.Scottish16th:
+                this.RenderBarNote(leftNoteX, noteY, 0.4, canvas, [AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full, AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full]);
+                this.RenderBarNote(rightNoteX, noteY, 0.4, canvas, [AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full, AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full, AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.PartialLeft]);
+                canvas.FillCircle(rightNoteX + (12 * this.get_Scale()) + (8 * this.get_Scale()), noteY, this.get_Scale());
+                break;
+        }
+        canvas.FillText("=", cx + (30 * this.get_Scale()), cy + (5 * this.get_Scale()));
+        canvas.FillText(")", cx + (65 * this.get_Scale()), cy + this.Renderer.Height * 0.3);
+    },
+    RenderBarNote: function (cx, noteY, noteScale, canvas, bars){
+        canvas.FillMusicFontSymbol(cx, noteY, noteScale, AlphaTab.Rendering.Glyphs.MusicFontSymbol.Tempo);
+        var partialBarWidth = (6) * this.get_Scale();
+        for (var i = 0; i < bars.length; i++){
+            switch (bars[i]){
+                case AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.Full:
+                    canvas.FillRect(cx + (4 * this.get_Scale()), noteY - (12 * this.get_Scale()) + (3 * this.get_Scale() * i), 12 * this.get_Scale(), 2 * this.get_Scale());
+                    break;
+                case AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.PartialLeft:
+                    canvas.FillRect(cx + (4 * this.get_Scale()), noteY - (12 * this.get_Scale()) + (3 * this.get_Scale() * i), partialBarWidth, 2 * this.get_Scale());
+                    break;
+                case AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType.PartialRight:
+                    canvas.FillRect(cx + (4 * this.get_Scale()) + partialBarWidth, noteY - (12 * this.get_Scale()) + (3 * this.get_Scale() * i), partialBarWidth, 2 * this.get_Scale());
+                    break;
+            }
+        }
+        canvas.FillMusicFontSymbol(cx + (12 * this.get_Scale()), noteY, noteScale, AlphaTab.Rendering.Glyphs.MusicFontSymbol.Tempo);
+    },
+    RenderTriplet: function (cx, cy, canvas){
+        cy += 2 * this.get_Scale();
+        var font = this.Renderer.get_Resources().EffectFont;
+        canvas.set_Font(new AlphaTab.Platform.Model.Font(font.Family, font.Size * 0.8, font.Style));
+        var rightX = cx + 12 * this.get_Scale() + 3 * this.get_Scale();
+        canvas.BeginPath();
+        canvas.MoveTo(cx, cy + (3 * this.get_Scale()));
+        canvas.LineTo(cx, cy);
+        canvas.LineTo(cx + (5 * this.get_Scale()), cy);
+        canvas.MoveTo(rightX + (5 * this.get_Scale()), cy + (3 * this.get_Scale()));
+        canvas.LineTo(rightX + (5 * this.get_Scale()), cy);
+        canvas.LineTo(rightX, cy);
+        canvas.Stroke();
+        canvas.FillText("3", cx + (7 * this.get_Scale()), cy - (10 * this.get_Scale()));
+        canvas.set_Font(font);
+    }
+};
+$StaticConstructor(function (){
+    AlphaTab.Rendering.Glyphs.TripletFeelGlyph.NoteScale = 0.4;
+    AlphaTab.Rendering.Glyphs.TripletFeelGlyph.NoteHeight = 12;
+    AlphaTab.Rendering.Glyphs.TripletFeelGlyph.NoteSeparation = 12;
+    AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarHeight = 2;
+    AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarSeparation = 3;
+});
+$Inherit(AlphaTab.Rendering.Glyphs.TripletFeelGlyph, AlphaTab.Rendering.Glyphs.EffectGlyph);
 AlphaTab.Rendering.Glyphs.TuningGlyph = function (x, y, scale, resources, tuning){
     this._scale = 0;
     this._resources = null;
@@ -16380,6 +16480,12 @@ AlphaTab.Xml.XmlNodeType = {
     EndElement: 15,
     EndEntity: 16,
     XmlDeclaration: 17
+};
+AlphaTab.Rendering.Glyphs.TripletFeelGlyph = AlphaTab.Rendering.Glyphs.TripletFeelGlyph || {};
+AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType = {
+    Full: 0,
+    PartialLeft: 1,
+    PartialRight: 2
 };
 
 for(var i = 0; i < $StaticConstructors.length; i++) {

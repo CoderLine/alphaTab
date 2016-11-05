@@ -87,9 +87,9 @@ namespace AlphaTab
 
                 settings.Staves = new FastList<StaveSettings>();
 
-                settings.Staves.Add(new StaveSettings("marker"));
-                //settings.staves.Add(new StaveSettings("triplet-feel"));
                 settings.Staves.Add(new StaveSettings("tempo"));
+                settings.Staves.Add(new StaveSettings("triplet-feel"));
+                settings.Staves.Add(new StaveSettings("marker"));
                 settings.Staves.Add(new StaveSettings("text"));
                 settings.Staves.Add(new StaveSettings("chords"));
                 settings.Staves.Add(new StaveSettings("trill"));

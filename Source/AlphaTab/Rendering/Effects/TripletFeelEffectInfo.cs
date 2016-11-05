@@ -26,19 +26,21 @@ namespace AlphaTab.Rendering.Effects
         public bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat)
         {
             return beat.Index == 0 &&
-                   (beat.Voice.Bar.MasterBar.Index == 0 && beat.Voice.Bar.MasterBar.TripletFeel != TripletFeel.NoTripletFeel)
-                   || (beat.Voice.Bar.MasterBar.Index > 0 && beat.Voice.Bar.MasterBar.TripletFeel != beat.Voice.Bar.MasterBar.PreviousMasterBar.TripletFeel);
+                (
+                    (beat.Voice.Bar.MasterBar.Index == 0 && beat.Voice.Bar.MasterBar.TripletFeel != TripletFeel.NoTripletFeel)
+                    || (beat.Voice.Bar.MasterBar.Index > 0 && beat.Voice.Bar.MasterBar.TripletFeel != beat.Voice.Bar.MasterBar.PreviousMasterBar.TripletFeel)
+                );
         }
 
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SinglePreBeat; } }
         public float GetHeight(EffectBarRenderer renderer)
         {
-            return 20 * renderer.Scale;
+            return 25 * renderer.Scale;
         }
 
         public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
         {
-            return new DummyEffectGlyph(0, 0, "TripletFeel");
+            return new TripletFeelGlyph(beat.Voice.Bar.MasterBar.TripletFeel);
         }
 
         public bool CanExpand(EffectBarRenderer renderer, Beat @from, Beat to)
