@@ -240,6 +240,12 @@ namespace AlphaTab.Test.Importer
                 return "Section";
             }
 
+            var playbackInformation = node as PlaybackInformation;
+            if (playbackInformation != null)
+            {
+                return "PlaybackInformation";
+            }
+
             Debug.Fail("Unknown type");
             return "";
         }
