@@ -62,9 +62,9 @@ namespace AlphaTab.Platform
         public static int ParseInt(string s)
         {
             int f;
-            if (!Int32.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out f))
+            if (!int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out f))
             {
-                f = 0;
+                f = int.MinValue;
             }
             return f;
         }

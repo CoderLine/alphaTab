@@ -67,15 +67,18 @@ namespace AlphaTab.Model
             else if (beat.Index == 0)
             {
                 // first beat of bar
-                var previousVoice = Bar.PreviousBar.Voices[Index];
-                if (previousVoice.Beats.Count > 0)
+                if (Index < Bar.PreviousBar.Voices.Count)
                 {
-                    beat.PreviousBeat = previousVoice.Beats[previousVoice.Beats.Count - 1];
-                    beat.PreviousBeat.NextBeat = beat;
-                }
-                else
-                {
-                    beat.PreviousBeat = null;
+                    var previousVoice = Bar.PreviousBar.Voices[Index];
+                    if (previousVoice.Beats.Count > 0)
+                    {
+                        beat.PreviousBeat = previousVoice.Beats[previousVoice.Beats.Count - 1];
+                        beat.PreviousBeat.NextBeat = beat;
+                    }
+                    else
+                    {
+                        beat.PreviousBeat = null;
+                    }
                 }
             }
             else

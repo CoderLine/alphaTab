@@ -29,7 +29,8 @@ namespace AlphaTab.Platform
 
         public static int ParseInt(string s)
         {
-            return JsContext.parseInt(s);
+            var val = JsContext.parseInt(s);
+            return JsContext.isNaN(val) ? int.MinValue : (int)val;
         }
 
         [JsMethod(InlineCodeExpression = "new Int32Array(array)")]

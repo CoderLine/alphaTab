@@ -95,25 +95,41 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "measure":
-                            ParseMeasure(c, track, isFirstMeasure);
-                            isFirstMeasure = false;
+                            if (ParseMeasure(c, track, isFirstMeasure))
+                            {
+                                isFirstMeasure = false;
+                            }
                             break;
                     }
                 }
             });
         }
 
-        private void ParseMeasure(IXmlNode element, Track track, bool isFirstMeasure)
+        private bool ParseMeasure(IXmlNode element, Track track, bool isFirstMeasure)
         {
+            if (element.GetAttribute("implicit") == "yes" && element.GetElementsByTagName("note").Length == 0)
+            {
+                return false;
+            }
+
             var barIndex = 0;
             if (isFirstMeasure)
             {
                 _trackFirstMeasureNumber = Std.ParseInt(element.GetAttribute("number"));
+                if (_trackFirstMeasureNumber == int.MinValue)
+                {
+                    _trackFirstMeasureNumber = 0;
+                }
                 barIndex = 0;
             }
             else
             {
-                barIndex = Std.ParseInt(element.GetAttribute("number")) - _trackFirstMeasureNumber;
+                barIndex = Std.ParseInt(element.GetAttribute("number"));
+                if (barIndex == int.MinValue)
+                {
+                    return false;
+                }
+                barIndex -= _trackFirstMeasureNumber;
             }
 
             // create empty bars to the current index
@@ -158,7 +174,7 @@ namespace AlphaTab.Importer
                             }
                             break;
                         case "harmony":
-                            // TODO
+                            ParseHarmony(c, bar);
                             break;
                         case "sound":
                             // TODO
@@ -169,6 +185,19 @@ namespace AlphaTab.Importer
                     }
                 }
             });
+
+            return true;
+        }
+
+        private string _currentChord;
+        private void ParseHarmony(IXmlNode element, Bar bar)
+        {
+            var root = element.GetElementsByTagName("root")[0];
+            var rootStep = root.GetElementsByTagName("root-step")[0];
+            var chord = new Chord();
+            chord.Name = Std.GetNodeValue(rootStep);
+            _currentChord = Std.NewGuid();
+            bar.Staff.Track.Chords[_currentChord] = chord;
         }
 
         private void ParseBarline(IXmlNode element, Bar bar, MasterBar masterBar)
@@ -204,7 +233,7 @@ namespace AlphaTab.Importer
         {
             var direction = element.GetAttribute("direction");
             var times = Std.ParseInt(element.GetAttribute("times"));
-            if (times == 0)
+            if (times < 0)
             {
                 times = 2;
             }
@@ -212,6 +241,10 @@ namespace AlphaTab.Importer
             if (direction == "backward")
             {
                 masterBar.RepeatCount = times;
+            }
+            else if (direction == "forward")
+            {
+                masterBar.IsRepeatStart = true;
             }
         }
 
@@ -237,6 +270,9 @@ namespace AlphaTab.Importer
                 beat = new Beat();
                 voice.AddBeat(beat);
             }
+
+            beat.ChordId = _currentChord;
+            _currentChord = null;
 
             var note = new Note();
             beat.AddNote(note);

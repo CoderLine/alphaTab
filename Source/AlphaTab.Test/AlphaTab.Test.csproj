@@ -561,16 +561,19 @@
     <None Include="TestFiles\MusicXml\45c-RepeatMultipleTimes.gpx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\MusicXml\45d-Repeats-Nested-Alternatives.gpx">
+    <None Include="TestFiles\MusicXml\46a-Barlines.gpx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\MusicXml\45e-Repeats-Nested-Alternatives.gpx">
+    <None Include="TestFiles\MusicXml\46b-MidmeasureBarline.gpx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\MusicXml\45f-Repeats-InvalidEndings.gpx">
+    <None Include="TestFiles\MusicXml\46e-PickupMeasure-SecondVoiceStartsLater.gpx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="TestFiles\MusicXml\45g-Repeats-NotEnded.gpx">
+    <None Include="TestFiles\MusicXml\46f-IncompleteMeasures.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\46g-PickupMeasure-Chordnames-FiguredBass.gpx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\LICENSE" />

@@ -463,6 +463,7 @@ namespace AlphaTab.Importer
                     track.Tuning = tuning;
                     break;
                 case "DiagramCollection":
+                case "ChordCollection":
                     ParseDiagramCollection(track, node);
                     break;
                 case "CapoFret":
