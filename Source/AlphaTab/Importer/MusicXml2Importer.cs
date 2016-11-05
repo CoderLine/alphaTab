@@ -81,6 +81,11 @@ namespace AlphaTab.Importer
         private void ParsePart(IXmlNode element)
         {
             var id = element.GetAttribute("id");
+            if (!_trackById.ContainsKey(id))
+            {
+                return;
+            }
+
             var track = _trackById[id];
             var isFirstMeasure = true;
             element.IterateChildren(c =>
@@ -129,7 +134,6 @@ namespace AlphaTab.Importer
                 }
             }
 
-            var isFirstBeat = true;
             var attributesParsed = false;
 
             element.IterateChildren(c =>
@@ -139,8 +143,7 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "note":
-                            ParseNoteBeat(c, track, bar, isFirstBeat);
-                            isFirstBeat = false;
+                            ParseNoteBeat(c, track, bar);
                             break;
                         case "forward":
                             break;
@@ -161,14 +164,58 @@ namespace AlphaTab.Importer
                             // TODO
                             break;
                         case "barline":
-                            // TODO
+                            ParseBarline(c, bar, masterBar);
                             break;
                     }
                 }
             });
         }
 
-        private bool ParseNoteBeat(IXmlNode element, Track track, Bar bar, bool isFirstBeat)
+        private void ParseBarline(IXmlNode element, Bar bar, MasterBar masterBar)
+        {
+            element.IterateChildren(c =>
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "repeat":
+                            ParseRepeat(c, masterBar);
+                            break;
+                        case "ending":
+                            ParseEnding(c, masterBar);
+                            break;
+                    }
+                }
+            });
+        }
+
+        private void ParseEnding(IXmlNode element, MasterBar masterBar)
+        {
+            var number = Std.ParseInt(element.GetAttribute("number"));
+            if (number > 0)
+            {
+                --number;
+                masterBar.AlternateEndings |= (byte)(0x01 << number);
+            }
+        }
+
+        private void ParseRepeat(IXmlNode element, MasterBar masterBar)
+        {
+            var direction = element.GetAttribute("direction");
+            var times = Std.ParseInt(element.GetAttribute("times"));
+            if (times == 0)
+            {
+                times = 2;
+            }
+
+            if (direction == "backward")
+            {
+                masterBar.RepeatCount = times;
+            }
+        }
+
+        private bool ParseNoteBeat(IXmlNode element, Track track, Bar bar)
         {
             int voiceIndex = 0;
             var voiceNodes = element.GetElementsByTagName("voice");
@@ -181,7 +228,7 @@ namespace AlphaTab.Importer
 
             Beat beat;
             var voice = GetOrCreateVoice(bar, voiceIndex);
-            if (chord || (isFirstBeat && voice.Beats.Count == 1))
+            if (chord || (voice.Beats.Count == 1 && voice.IsEmpty))
             {
                 beat = voice.Beats[voice.Beats.Count - 1];
             }
@@ -348,7 +395,7 @@ namespace AlphaTab.Importer
             {
                 note.IsTieOrigin = true;
             }
-            else 
+            else
             {
                 note.IsTieDestination = true;
             }

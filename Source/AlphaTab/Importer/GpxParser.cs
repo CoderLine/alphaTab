@@ -1397,6 +1397,10 @@ namespace AlphaTab.Importer
             // add tracks to score
             foreach (var trackId in _tracksMapping)
             {
+                if (string.IsNullOrEmpty(trackId))
+                {
+                    continue;
+                }
                 var track = _tracksById[trackId];
                 Score.AddTrack(track);
             }
