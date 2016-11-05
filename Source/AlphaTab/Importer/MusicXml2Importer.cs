@@ -802,11 +802,15 @@ namespace AlphaTab.Importer
                         case "creator":
                             if (c.GetAttribute("type") == "composer")
                             {
-                                _score.Music = Std.GetNodeValue(c.FirstChild);
+                                _score.Words = Std.GetNodeValue(c.FirstChild);
                             }
                             break;
                         case "rights":
-                            _score.Artist = Std.GetNodeValue(c.FirstChild);
+                            if (!string.IsNullOrEmpty(_score.Copyright))
+                            {
+                                _score.Copyright += "\n";
+                            }
+                            _score.Copyright += Std.GetNodeValue(c.FirstChild);
                             break;
                     }
                 }

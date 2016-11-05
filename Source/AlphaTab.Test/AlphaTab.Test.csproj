@@ -576,6 +576,15 @@
     <None Include="TestFiles\MusicXml\46g-PickupMeasure-Chordnames-FiguredBass.gpx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="TestFiles\MusicXml\51b-Header-Quotes.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\51c-MultipleRights.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\51d-EmptyTitle.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="TestFiles\MusicXml\LICENSE" />
   </ItemGroup>
   <ItemGroup>
