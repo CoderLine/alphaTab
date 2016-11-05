@@ -111,7 +111,7 @@
   </Target>
   -->
   <Target Name="AfterBuild">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SolutionDir)\Build\CSharp" />
-    <Copy SourceFiles="$(TargetDir)$(TargetName).xml" DestinationFolder="$(SolutionDir)\Build\CSharp" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SolutionDir)\Build\CSharp.WinForms" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).xml" DestinationFolder="$(SolutionDir)\Build\CSharp.WinForms" />
   </Target>
 </Project>
