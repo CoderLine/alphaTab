@@ -576,7 +576,7 @@ namespace AlphaTab.Importer
                         case "notehead":
                             if (c.GetAttribute("parentheses") == "yes")
                             {
-                                //note.IsGhost = true;
+                                note.IsGhost = true;
                             }
                             break;
                         case "beam":
@@ -626,7 +626,14 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "text":
-                            beat.Text = Std.GetNodeValue(c);
+                            if (!string.IsNullOrEmpty(beat.Text))
+                            {
+                                beat.Text += " " + Std.GetNodeValue(c);
+                            }
+                            else
+                            {
+                                beat.Text = Std.GetNodeValue(c);
+                            }
                             break;
                     }
                 }

@@ -17,6 +17,7 @@
  */
 using System;
 using AlphaTab.Audio;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
@@ -750,15 +751,8 @@ namespace AlphaTab.Rendering
                     break;
             }
 
-            // naturalize previous key
-            // TODO: only naturalize the symbols needed 
-            var naturalizeSymbols = Math.Abs(previousKey);
-            var previousKeyPositions = ModelUtils.KeySignatureIsSharp(previousKey) ? SharpKsSteps : FlatKsSteps;
-
-            for (var i = 0; i < naturalizeSymbols; i++)
-            {
-                AddPreBeatGlyph(new NaturalizeGlyph(0, GetScoreY(previousKeyPositions[i] + offsetClef)));
-            }
+            var newLines = new FastDictionary<int, bool>();
+            var newGlyphs = new FastList<Glyph>();
 
             // how many symbols do we need to get from a C-keysignature
             // to the new one
@@ -768,7 +762,9 @@ namespace AlphaTab.Rendering
             {
                 for (var i = 0; i < Math.Abs(currentKey); i++)
                 {
-                    AddPreBeatGlyph(new SharpGlyph(0, GetScoreY(SharpKsSteps[i] + offsetClef)));
+                    var step = SharpKsSteps[i] + offsetClef;
+                    newGlyphs.Add(new SharpGlyph(0, GetScoreY(step)));
+                    newLines[step] = true;
                 }
             }
             // a flat signature
@@ -776,9 +772,30 @@ namespace AlphaTab.Rendering
             {
                 for (var i = 0; i < Math.Abs(currentKey); i++)
                 {
-                    AddPreBeatGlyph(new FlatGlyph(0, GetScoreY(FlatKsSteps[i] + offsetClef)));
+                    var step = FlatKsSteps[i] + offsetClef;
+                    newGlyphs.Add(new FlatGlyph(0, GetScoreY(step)));
+                    newLines[step] = true;
                 }
             }
+
+            // naturalize previous key
+            var naturalizeSymbols = Math.Abs(previousKey);
+            var previousKeyPositions = ModelUtils.KeySignatureIsSharp(previousKey) ? SharpKsSteps : FlatKsSteps;
+
+            for (var i = 0; i < naturalizeSymbols; i++)
+            {
+                var step = previousKeyPositions[i] + offsetClef;
+                if (!newLines.ContainsKey(step))
+                {
+                    AddPreBeatGlyph(new NaturalizeGlyph(0, GetScoreY(previousKeyPositions[i] + offsetClef)));
+                }
+            }
+
+            foreach (var newGlyph in newGlyphs)
+            {
+                AddPreBeatGlyph(newGlyph);
+            }
+
         }
 
         private void CreateTimeSignatureGlyphs()
