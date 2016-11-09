@@ -15,15 +15,13 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.Text.RegularExpressions;
+
 using AlphaTab.Platform;
 
 namespace AlphaTab.Model
 {
     public static class TuningParser
     {
-        public static Regex TuningRegex = new Regex("([a-g]b?)([0-9])", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
         /// <summary>
         /// Checks if the given string is a tuning inticator.
         /// </summary>Checks if the given string is a tuning inticator.
@@ -31,31 +29,71 @@ namespace AlphaTab.Model
         /// <returns></returns>
         public static bool IsTuning(string name)
         {
-            return TuningRegex.IsMatch(name);
+            return Parse(name) != null;
+        }
+
+        private static TuningParseResult Parse(string name)
+        {
+            string note = "";
+            string octave = "";
+
+            for (int i = 0; i < name.Length; i++)
+            {
+                var c = name[i];
+                if (Std.IsCharNumber(c, false))
+                {
+                    // number without note?
+                    if (string.IsNullOrEmpty(note))
+                    {
+                        return null;
+                    }
+                    octave += c;
+                }
+                else if ((c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A))
+                {
+                    // letter after number?
+                    if (!string.IsNullOrEmpty(note))
+                    {
+                        return null;
+                    }
+                    note += c;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            if (string.IsNullOrEmpty(octave) || string.IsNullOrEmpty(note))
+            {
+                return null;
+            }
+
+            var result = new TuningParseResult();
+            result.Octave = Std.ParseInt(octave);
+            result.Note = note.ToLower();
+            return result;
+        }
+
+        private class TuningParseResult
+        {
+            public string Note { get; set; }
+            public int Octave { get; set; }
         }
 
         public static int GetTuningForText(string str)
         {
             var b = 0;
-            string note = null;
-            int octave = 0;
-            Match m = TuningRegex.Match(str.ToLower());
-            if (m.Success)
-            {
-                note = m.Groups[1].Value;
-                octave = Std.ParseInt(m.Groups[2].Value);
-            }
-
-            if (!note.IsNullOrWhiteSpace())
-            {
-                b = GetToneForText(note);
-                // add octaves
-                b += (octave * 12);
-            }
-            else
+            var result = Parse(str);
+            if (result == null)
             {
                 return -1;
             }
+
+            b = GetToneForText(result.Note);
+            // add octaves
+            b += ((result.Octave + 1) * 12);
+
             return b;
         }
 

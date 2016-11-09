@@ -31,69 +31,7 @@ namespace AlphaTab.Test.Importer
             readerBase.Init(new StreamWrapper(new MemoryStream(buffer)));
             return readerBase;
         }
-
-        [TestMethod]
-        public void TestPitchesPitches()
-        {
-            var reader = PrepareImporterWithFile("01a-Pitches-Pitches.xml");
-            var score = reader.ReadScore();
-
-            Assert.AreEqual(1, score.Tracks.Count);
-            Assert.AreEqual(32, score.MasterBars.Count);
-            Assert.AreEqual(32, score.Tracks[0].Staves[0].Bars.Count);
-
-            // Bar 1
-            var bar = score.Tracks[0].Staves[0].Bars[0];
-            var masterBar = score.MasterBars[0];
-            Assert.AreEqual(0, masterBar.KeySignature);
-            Assert.AreEqual(4, masterBar.TimeSignatureDenominator);
-            Assert.AreEqual(4, masterBar.TimeSignatureNumerator);
-            Assert.AreEqual(Clef.G2, bar.Clef);
-            Assert.AreEqual(1, bar.Voices.Count);
-            Assert.AreEqual(4, bar.Voices[0].Beats.Count);
-            Assert.AreEqual(Duration.Quarter, bar.Voices[0].Beats[0].Duration);
-            Assert.AreEqual(1, bar.Voices[0].Beats[0].Notes.Count);
-            Assert.AreEqual(31, bar.Voices[0].Beats[0].Notes[0].RealValue);
-        }
-
-        [TestMethod]
-        public void TestRendering()
-        {
-            const string path = "TestFiles/MusicXml";
-            var files = Directory.EnumerateFiles(path, "*.xml");
-            Console.WriteLine(Path.GetFullPath(path));
-            var gpxImporter = new GpxImporter();
-
-            foreach (var file in files)
-            {
-                try
-                {
-                    var reference = Path.ChangeExtension(file, ".gpx");
-                    Score referenceScore;
-                    if (File.Exists(reference))
-                    {
-                        gpxImporter.Init(ByteBuffer.FromBuffer(File.ReadAllBytes(reference)));
-                        referenceScore = gpxImporter.ReadScore();
-                    }
-
-                    var buffer = Environment.FileLoaders["default"]().LoadBinary(file);
-                    var importer = PrepareImporterWithBytes(buffer);
-                    var score = importer.ReadScore();
-                    for (int i = 0; i < score.Tracks.Count; i++)
-                    {
-                        var track = score.Tracks[i];
-                        var trackFile = Path.ChangeExtension(file, "." + i + ".png");
-                        File.Delete(trackFile);
-                        Render(track, trackFile);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Assert.Fail("Failed to render file {0}: {1}", file, e);
-                }
-            }
-        }
-
+        
         [TestMethod]
         public void TestReference()
         {
@@ -227,27 +165,7 @@ namespace AlphaTab.Test.Importer
                 return "MasterBar[" + mb.Index + "]";
             }
 
-            var score = node as Score;
-            if (score != null)
-            {
-                return "Score";
-            }
-
-
-            var section = node as Section;
-            if (section != null)
-            {
-                return "Section";
-            }
-
-            var playbackInformation = node as PlaybackInformation;
-            if (playbackInformation != null)
-            {
-                return "PlaybackInformation";
-            }
-
-            Debug.Fail("Unknown type");
-            return "";
+            return node.GetType().Name;
         }
 
         private void AreEqual(Score expected, Score actual)
@@ -370,11 +288,20 @@ namespace AlphaTab.Test.Importer
             AreEqual(expected, actual, t => t.Index);
             AreEqual(expected, actual, t => t.Accentuated);
             AreEqual(expected.BendPoints, actual.BendPoints);
-            AreEqual(expected, actual, t => t.Fret);
-            AreEqual(expected, actual, t => t.String);
-            AreEqual(expected, actual, t => t.Octave);
-            AreEqual(expected, actual, t => t.Tone);
-            Assert.AreEqual(expected.Element, actual.Variation);
+            AreEqual(expected, actual, t => t.IsStringed);
+            if (actual.IsStringed)
+            {
+                AreEqual(expected, actual, t => t.Fret);
+                AreEqual(expected, actual, t => t.String);
+            }
+            AreEqual(expected, actual, t => t.IsPiano);
+            if (actual.IsPiano)
+            {
+                AreEqual(expected, actual, t => t.Octave);
+                AreEqual(expected, actual, t => t.Tone);
+            }
+            AreEqual(expected, actual, t => t.Variation);
+            AreEqual(expected, actual, t => t.Element);
             AreEqual(expected, actual, t => t.IsHammerPullOrigin);
             AreEqual(expected, actual, t => t.HarmonicType);
             AreEqual(expected, actual, t => t.HarmonicValue);
@@ -402,7 +329,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(expected == null, actual == null);
             if (expected != null)
             {
-                AreEqual(expected, actual, t => t.Name);
+                //AreEqual(expected, actual, t => t.Name);
             }
         }
 

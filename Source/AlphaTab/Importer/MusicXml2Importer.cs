@@ -189,13 +189,165 @@ namespace AlphaTab.Importer
             return true;
         }
 
+        private void ParseStaffDetails(IXmlNode element, Track track)
+        {
+            element.IterateChildren(c =>
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "staff-lines":
+                            track.Tuning = new int[Std.ParseInt(Std.GetNodeValue(c))];
+                            break;
+                        case "staff-tuning":
+                            ParseStaffTuning(c, track);
+                            break;
+                    }
+                }
+            });
+
+            if (IsEmptyTuning(track.Tuning))
+            {
+                track.Tuning = new int[0];
+            }
+        }
+
+        private void ParseStaffTuning(IXmlNode element, Track track)
+        {
+            var line = Std.ParseInt(element.GetAttribute("line"));
+            string tuningStep = "C";
+            string tuningOctave = "";
+            int tuningAlter = 0;
+            element.IterateChildren(c =>
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "tuning-step":
+                            tuningStep = Std.GetNodeValue(c);
+                            break;
+                        case "tuning-alter":
+                            tuningAlter = Std.ParseInt(Std.GetNodeValue(c));
+                            break;
+                        case "tuning-octave":
+                            tuningOctave = Std.GetNodeValue(c);
+                            break;
+                    }
+                }
+            });
+
+            track.Tuning[track.Tuning.Length - line] = TuningParser.GetTuningForText(tuningStep + tuningOctave) + tuningAlter;
+        }
+
         private string _currentChord;
         private void ParseHarmony(IXmlNode element, Bar bar)
         {
             var root = element.GetElementsByTagName("root")[0];
-            var rootStep = root.GetElementsByTagName("root-step")[0];
+            var rootStep = Std.GetNodeValue(root.GetElementsByTagName("root-step")[0]);
+            var kind = Std.GetNodeValue(element.GetElementsByTagName("kind")[0]);
+
             var chord = new Chord();
-            chord.Name = Std.GetNodeValue(rootStep);
+            chord.Name = rootStep;
+            // TODO: find proper names for the rest
+            //switch (kind)
+            //{
+            //    // triads
+            //    case "major":
+            //        break;
+            //    case "minor":
+            //        chord.Name += "m";
+            //        break;
+            //    // Sevenths
+            //    case "augmented":
+            //        break;
+            //    case "diminished":
+            //        break;
+            //    case "dominant":
+            //        break;
+            //    case "major-seventh":
+            //        chord.Name += "7M";
+            //        break;
+            //    case "minor-seventh":
+            //        chord.Name += "m7";
+            //        break;
+            //    case "diminished-seventh":
+            //        break;
+            //    case "augmented-seventh":
+            //        break;
+            //    case "half-diminished":
+            //        break;
+            //    case "major-minor":
+            //        break;
+            //    // Sixths
+            //    case "major-sixth":
+            //        break;
+            //    case "minor-sixth":
+            //        break;
+            //    // Ninths
+            //    case "dominant-ninth":
+            //        break;
+            //    case "major-ninth":
+            //        break;
+            //    case "minor-ninth":
+            //        break;
+            //    // 11ths
+            //    case "dominant-11th":
+            //        break;
+            //    case "major-11th":
+            //        break;
+            //    case "minor-11th":
+            //        break;
+            //    // 13ths
+            //    case "dominant-13th":
+            //        break;
+            //    case "major-13th":
+            //        break;
+            //    case "minor-13th":
+            //        break;
+            //    // Suspended
+            //    case "suspended-second":
+            //        break;
+            //    case "suspended-fourth":
+            //        break;
+            //    // Functional sixths
+            //    case "Neapolitan":
+            //        break;
+            //    case "Italian":
+            //        break;
+            //    case "French":
+            //        break;
+            //    case "German":
+            //        break;
+            //    // Other
+            //    case "pedal":
+            //        break;
+            //    case "power":
+            //        break;
+            //    case "Tristan":
+            //        break;
+            //}
+
+            //var degree = element.GetElementsByTagName("degree");
+            //if (degree.Length > 0)
+            //{
+            //    var degreeValue = Std.GetNodeValue(degree[0].GetElementsByTagName("degree-value")[0]);
+            //    var degreeAlter = Std.GetNodeValue(degree[0].GetElementsByTagName("degree-alter")[0]);
+            //    var degreeType = Std.GetNodeValue(degree[0].GetElementsByTagName("degree-type")[0]);
+
+            //    if (!string.IsNullOrEmpty(degreeType))
+            //    {
+            //        chord.Name += degreeType;
+            //    }
+
+            //    if (!string.IsNullOrEmpty(degreeValue))
+            //    {
+            //        chord.Name += "#" + degreeValue;
+            //    }
+            //}
+
+
             _currentChord = Std.NewGuid();
             bar.Staff.Track.Chords[_currentChord] = chord;
         }
@@ -248,7 +400,7 @@ namespace AlphaTab.Importer
             }
         }
 
-        private bool ParseNoteBeat(IXmlNode element, Track track, Bar bar)
+        private void ParseNoteBeat(IXmlNode element, Track track, Bar bar)
         {
             int voiceIndex = 0;
             var voiceNodes = element.GetElementsByTagName("voice");
@@ -386,7 +538,18 @@ namespace AlphaTab.Importer
                 }
             });
 
-            return chord;
+            // check if new note is duplicate on string
+            if (note.IsStringed)
+            {
+                for (int i = 0; i < beat.Notes.Count; i++)
+                {
+                    if (beat.Notes[i].String == note.String && beat.Notes[i] != note)
+                    {
+                        beat.RemoveNote(note);
+                        break;
+                    }
+                }
+            }
         }
 
         private void ParseAccidental(IXmlNode element, Note note)
@@ -461,9 +624,41 @@ namespace AlphaTab.Importer
                         case "dynamics":
                             ParseDynamics(c, beat);
                             break;
+                        case "technical":
+                            ParseTechnical(c, note);
+                            break;
                     }
                 }
             });
+        }
+
+        private void ParseTechnical(IXmlNode element, Note note)
+        {
+            element.IterateChildren(c =>
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "string":
+                            note.String = Std.ParseInt(Std.GetNodeValue(c));
+                            if (note.String != int.MinValue)
+                            {
+                                note.String = note.Beat.Voice.Bar.Staff.Track.Tuning.Length - note.String + 1;
+                            }
+                            break;
+                        case "fret":
+                            note.Fret = Std.ParseInt(Std.GetNodeValue(c));
+                            break;
+                    }
+                }
+            });
+
+            if (note.String == int.MinValue || note.Fret == int.MinValue)
+            {
+                note.String = -1;
+                note.Fret = -1;
+            }
         }
 
         private void ParseArticulations(IXmlNode element, Note note)
@@ -640,6 +835,9 @@ namespace AlphaTab.Importer
                             break;
                         case "clef":
                             ParseClef(c, bar);
+                            break;
+                        case "staff-details":
+                            ParseStaffDetails(c, bar.Staff.Track);
                             break;
                     }
                 }
@@ -859,10 +1057,27 @@ namespace AlphaTab.Importer
                 }
             });
 
-            if (track.Tuning == null)
+            if (IsEmptyTuning(track.Tuning))
             {
                 track.Tuning = new int[0];
             }
+        }
+
+        private bool IsEmptyTuning(int[] tuning)
+        {
+            if (tuning == null)
+            {
+                return true;
+            }
+
+            for (int i = 0; i < tuning.Length; i++)
+            {
+                if (tuning[i] != 0)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         private void ParseMidiInstrument(IXmlNode element, Track track)

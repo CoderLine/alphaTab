@@ -90,6 +90,7 @@
     <Compile Include="Importer\GpImporterTestBase.cs" />
     <Compile Include="Importer\GpxImporterTest.cs" />
     <Compile Include="Importer\MusicXml2ImporterTest.cs" />
+    <Compile Include="Model\TuningParserTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -616,6 +617,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\61k-Lyrics-SpannersExtenders.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\71c-ChordsFrets.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\71e-TabStaves.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\71f-AllChordTypes.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\71g-MultipleChordnames.gpx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\LICENSE" />

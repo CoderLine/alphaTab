@@ -34,7 +34,7 @@ namespace AlphaTab.Test.Importer
                         \tempo 200
                         \instrument 30
                         \capo 2
-                        \tuning G4 D3 G3 B3 D4 A5
+                        \tuning G3 D2 G2 B2 D3 A4
                         .
                         0.5.2 1.5.4 3.4.4 | 5.3.8 5.3.8 5.3.8 5.3.8 r.2";
 
@@ -98,6 +98,19 @@ namespace AlphaTab.Test.Importer
                 Assert.AreEqual(true, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[4].IsRest);
             }
 
+        }
+
+
+        [TestMethod]
+        public void TestTuning()
+        {
+            var tex = @"\tuning E4 B3 G3 D3 A2 E2
+                        .
+                        0.5.1";
+
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(string.Join(",", Tuning.GetDefaultTuningFor(6).Tunings), string.Join(",", score.Tracks[0].Tuning));
         }
 
         [TestMethod]

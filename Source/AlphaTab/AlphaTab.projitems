@@ -71,6 +71,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\Track.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\TripletFeel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Tuning.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\TuningParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\VibratoType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Voice.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\ICanvas.cs" />

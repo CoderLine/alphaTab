@@ -314,6 +314,20 @@ namespace AlphaTab.Model
             Notes.Add(note);
         }
 
+        public void RemoveNote(Note note)
+        {
+            var index = Notes.IndexOf(note);
+            if (index >= 0)
+            {
+                Notes.RemoveAt(index);
+            }
+
+            if (note == _minNote || note == _maxNote || note == _minStringNote || note == _maxStringNote)
+            {
+                RefreshNotes();
+            }
+        }
+
         public void RefreshNotes()
         {
             for (int i = 0, j = Notes.Count; i < j; i++)
