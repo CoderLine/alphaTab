@@ -39,10 +39,11 @@ namespace AlphaTab.Test.Importer
             var files = Directory.EnumerateFiles(path, "*.xml");
             Console.WriteLine(Path.GetFullPath(path));
             var gpxImporter = new GpxImporter();
-
+            var sw = new Stopwatch();
             foreach (var file in files)
             {
                 bool? success = null;
+                long millis = 0;
                 try
                 {
                     var reference = Path.ChangeExtension(file, ".gpx");
@@ -57,9 +58,12 @@ namespace AlphaTab.Test.Importer
                     gpxImporter.Init(ByteBuffer.FromBuffer(File.ReadAllBytes(reference)));
                     referenceScore = gpxImporter.ReadScore();
 
+                    sw.Restart();
                     var buffer = Environment.FileLoaders["default"]().LoadBinary(file);
                     var importer = PrepareImporterWithBytes(buffer);
                     var score = importer.ReadScore();
+                    sw.Stop();
+                    millis = sw.ElapsedMilliseconds;
 
                     AreEqual(referenceScore, score);
                     success = true;
@@ -74,16 +78,16 @@ namespace AlphaTab.Test.Importer
                     {
                         if (success.Value)
                         {
-                            Console.WriteLine("{0} - OK", file);
+                            Console.WriteLine("OK\t{0} ({1} ms)", file, millis);
                         }
                         else
                         {
-                            Console.WriteLine("{0} - Failed", file);
+                            Console.WriteLine("Failed\t{0}", file);
                         }
                     }
                     else
                     {
-                        Console.WriteLine("{0} - Skipped", file);
+                        Console.WriteLine("Skipped\t{0}", file);
                     }
                 }
             }

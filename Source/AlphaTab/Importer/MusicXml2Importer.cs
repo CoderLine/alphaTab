@@ -138,6 +138,11 @@ namespace AlphaTab.Importer
             for (int i = track.Staves[0].Bars.Count; i <= barIndex; i++)
             {
                 bar = new Bar();
+                if (track.Staves[0].Bars.Count > 0)
+                {
+                    var previousBar = track.Staves[0].Bars[track.Staves[0].Bars.Count - 1];
+                    bar.Clef = previousBar.Clef;
+                }
                 masterBar = GetOrCreateMasterBar(barIndex);
                 track.AddBarToStaff(0, bar);
 
@@ -526,9 +531,7 @@ namespace AlphaTab.Importer
                             ParsePitch(c, note);
                             break;
                         case "unpitched":
-                            // TODO: not yet fully supported
-                            note.String = 0;
-                            note.Fret = 0;
+                            ParseUnpitched(c, note);
                             break;
                         case "rest":
                             beat.IsEmpty = false;
@@ -741,6 +744,39 @@ namespace AlphaTab.Importer
             });
         }
 
+
+
+        private void ParseUnpitched(IXmlNode element, Note note)
+        {
+            string step = null;
+            int semitones = 0;
+            int octave = 0;
+            element.IterateChildren(c =>
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "display-step":
+                            step = Std.GetNodeValue(c);
+                            break;
+                        case "display-alter":
+                            semitones = Std.ParseInt(Std.GetNodeValue(c));
+                            break;
+                        case "display-octave":
+                            // 0-9, 4 for middle C
+                            octave = Std.ParseInt(Std.GetNodeValue(c));
+                            break;
+                    }
+                }
+            });
+
+            var value = octave * 12 + TuningParser.GetToneForText(step) + semitones;
+
+            note.Octave = (value / 12);
+            note.Tone = value - (note.Octave * 12);
+        }
+
         private void ParsePitch(IXmlNode element, Note note)
         {
             string step = null;
@@ -884,6 +920,9 @@ namespace AlphaTab.Importer
                     break;
                 case "percussion":
                     bar.Clef = Clef.Neutral;
+                    break;
+                default:
+                    bar.Clef = Clef.G2;
                     break;
             }
         }
