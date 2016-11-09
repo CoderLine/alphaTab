@@ -1007,6 +1007,7 @@ namespace AlphaTab.Test.Importer
             AreEqual(expected, actual, t => t.IsRest);
             AreEqual(expected, actual, t => t.Dots);
             AreEqual(expected, actual, t => t.FadeIn);
+            AreEqual(expected, actual, t => t.IsLegatoOrigin);
             Assert.AreEqual(string.Join(" ", expected.Lyrics), string.Join(" ", actual.Lyrics));
             AreEqual(expected, actual, t => t.Pop);
             AreEqual(expected, actual, t => t.HasChord);

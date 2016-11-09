@@ -24,17 +24,17 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class TieGlyph : Glyph
     {
-        protected Note StartNote;
-        protected Note EndNote;
+        protected Beat StartBeat;
+        protected Beat EndBeat;
         protected Glyph Parent;
         protected float YOffset;
         private readonly bool _forEnd;
 
-        public TieGlyph(Note startNote, Note endNote, Glyph parent, bool forEnd)
+        public TieGlyph(Beat startBeat, Beat endBeat, Glyph parent, bool forEnd)
             : base(0, 0)
         {
-            StartNote = startNote;
-            EndNote = endNote;
+            StartBeat = startBeat;
+            EndBeat = endBeat;
             Parent = parent;
             _forEnd = forEnd;
         }
@@ -44,12 +44,14 @@ namespace AlphaTab.Rendering.Glyphs
             Width = 0;
         }
 
+
+
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            if (EndNote == null) return;
+            if (EndBeat == null) return;
 
-            var startNoteRenderer = Renderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, StartNote.Beat.Voice.Bar);
-            var endNoteRenderer = Renderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, EndNote.Beat.Voice.Bar);
+            var startNoteRenderer = Renderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, StartBeat.Voice.Bar);
+            var endNoteRenderer = Renderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, EndBeat.Voice.Bar);
 
             float startX = 0;
             float endX = 0;
@@ -60,6 +62,7 @@ namespace AlphaTab.Rendering.Glyphs
             var shouldDraw = false;
             var parent = (BeatContainerGlyph)Parent;
 
+            var direction = GetBeamDirection(StartBeat, startNoteRenderer);
             // if we are on the tie start, we check if we 
             // either can draw till the end note, or we just can draw till the bar end
             if (!_forEnd)
@@ -67,7 +70,7 @@ namespace AlphaTab.Rendering.Glyphs
                 // line break or bar break
                 if (startNoteRenderer != endNoteRenderer)
                 {
-                    startX = cx + startNoteRenderer.GetNoteX(StartNote);
+                    startX = cx + GetStartX(startNoteRenderer);
 
                     // line break: to bar end
                     if (endNoteRenderer == null || startNoteRenderer.Staff != endNoteRenderer.Staff)
@@ -78,20 +81,18 @@ namespace AlphaTab.Rendering.Glyphs
                     // differs only by addition of EndNote X coordinate
                     else
                     {
-                        endX = cx + parent.X;
-                        endX += endNoteRenderer.GetNoteX(EndNote);
+                        endX = cx + parent.X + GetEndX(endNoteRenderer);
                     }
 
-                    startY = cy + startNoteRenderer.GetNoteY(StartNote) + YOffset;
-                    endY = startY;
+                    startY = cy + GetStartY(startNoteRenderer, direction) + YOffset;
+                    endY = cy + GetEndY(endNoteRenderer, direction) + YOffset;
                 }
                 else
                 {
-                    startX = cx + startNoteRenderer.GetNoteX(StartNote);
-                    endX = cx + endNoteRenderer.GetNoteX(EndNote, false);
-
-                    startY = cy + startNoteRenderer.GetNoteY(StartNote) + YOffset;
-                    endY = cy + endNoteRenderer.GetNoteY(EndNote) + YOffset;
+                    startX = cx + GetStartX(startNoteRenderer);
+                    endX = cx + GetEndX(endNoteRenderer);
+                    startY = cy + GetStartY(startNoteRenderer, direction) + YOffset;
+                    endY = cy + GetEndY(endNoteRenderer, direction) + YOffset;
                 }
                 shouldDraw = true;
             }
@@ -100,9 +101,9 @@ namespace AlphaTab.Rendering.Glyphs
             else if (startNoteRenderer.Staff != endNoteRenderer.Staff)
             {
                 startX = cx;
-                endX = cx + endNoteRenderer.GetNoteX(EndNote);
+                endX = cx + GetEndX(endNoteRenderer);
 
-                startY = cy + endNoteRenderer.GetNoteY(EndNote) + YOffset;
+                startY = cy + GetEndY(endNoteRenderer, direction) + YOffset;
                 endY = startY;
 
                 shouldDraw = true;
@@ -110,18 +111,37 @@ namespace AlphaTab.Rendering.Glyphs
 
             if (shouldDraw)
             {
-                PaintTie(canvas, Scale, startX, startY, endX, endY,
-                    GetBeamDirection(StartNote, startNoteRenderer) == BeamDirection.Down);
+                PaintTie(canvas, Scale, startX, startY, endX, endY, direction == BeamDirection.Down);
 
                 canvas.Fill();
             }
         }
 
-        protected virtual BeamDirection GetBeamDirection(Note note, BarRendererBase noteRenderer)
+        protected virtual BeamDirection GetBeamDirection(Beat beat, BarRendererBase noteRenderer)
         {
             return BeamDirection.Down;
         }
 
+
+        protected virtual float GetStartY(BarRendererBase noteRenderer, BeamDirection direction)
+        {
+            return 0;
+        }
+
+        protected virtual float GetEndY(BarRendererBase noteRenderer, BeamDirection direction)
+        {
+            return 0;
+        }
+
+        protected virtual float GetStartX(BarRendererBase noteRenderer)
+        {
+            return 0;
+        }
+
+        protected virtual float GetEndX(BarRendererBase noteRenderer)
+        {
+            return 0;
+        }
 
         /// <summary>
         /// paints a tie between the two given points

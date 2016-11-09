@@ -269,11 +269,15 @@ namespace AlphaTab.Rendering
                     //
                     // calculate the y positions for our bracket
 
-                    var startY = CalculateBeamY(firstBeamingHelper, startX);
-                    var offset1Y = CalculateBeamY(firstBeamingHelper, offset1X);
-                    var middleY = CalculateBeamY(firstBeamingHelper, middleX);
-                    var offset2Y = CalculateBeamY(lastBeamingHelper, offset2X);
-                    var endY = CalculateBeamY(lastBeamingHelper, endX);
+                    var startY = CalculateBeamYWithDirection(firstBeamingHelper, startX, firstBeamingHelper.Direction);
+                    var endY = CalculateBeamYWithDirection(lastBeamingHelper, endX, firstBeamingHelper.Direction);
+
+                    var k = (endY - startY) / (endX - startX);
+                    var d = startY - (k * startX);
+
+                    var offset1Y = (k * offset1X) + d;
+                    var middleY = (k * middleX) + d;
+                    var offset2Y = (k * offset2X) + d;
 
                     var offset = 10 * Scale;
                     var size = 5 * Scale;
@@ -328,11 +332,19 @@ namespace AlphaTab.Rendering
             return h.CalculateBeamY(stemSize, Scale, x, Scale, n => GetScoreY(GetNoteLine(n)));
         }
 
+        private float CalculateBeamYWithDirection(BeamingHelper h, float x, BeamDirection direction)
+        {
+            var stemSize = GetStemSize(h.MaxDuration);
+            return h.CalculateBeamYWithDirection(stemSize, Scale, x, Scale, n => GetScoreY(GetNoteLine(n)), direction);
+        }
+
         private void PaintBar(float cx, float cy, ICanvas canvas, BeamingHelper h)
         {
             for (int i = 0, j = h.Beats.Count; i < j; i++)
             {
                 var beat = h.Beats[i];
+                var isGrace = beat.GraceType != GraceType.None;
+                var scaleMod = isGrace ? NoteHeadGlyph.GraceScale : 1;
 
                 //
                 // draw line 
@@ -341,11 +353,13 @@ namespace AlphaTab.Rendering
 
                 var direction = h.Direction;
 
-                var y1 = cy + Y + (direction == BeamDirection.Up
+                var y1 = cy + Y;
+                y1 += (direction == BeamDirection.Up
                             ? GetScoreY(GetNoteLine(beat.MinNote))
                             : GetScoreY(GetNoteLine(beat.MaxNote)));
 
-                var y2 = cy + Y + CalculateBeamY(h, beatLineX);
+                var y2 = cy + Y;
+                y2 += scaleMod * CalculateBeamY(h, beatLineX);
 
                 canvas.BeginPath();
                 canvas.MoveTo(cx + X + beatLineX, y1);
@@ -363,9 +377,9 @@ namespace AlphaTab.Rendering
                 }
                 PaintFingering(canvas, beat, cx + X + beatLineX, direction, fingeringY);
 
-                var brokenBarOffset = 6 * Scale;
-                var barSpacing = 6 * Scale;
-                var barSize = 3 * Scale;
+                var brokenBarOffset = 6 * Scale * scaleMod;
+                var barSpacing = 6 * Scale * scaleMod;
+                var barSize = 3 * Scale * scaleMod;
                 var barCount = beat.Duration.GetIndex() - 2;
                 var barStart = cy + Y;
                 if (direction == BeamDirection.Down)
@@ -405,8 +419,8 @@ namespace AlphaTab.Rendering
                         {
                             continue;
                         }
-                        barStartY = barY + CalculateBeamY(h, barStartX);
-                        barEndY = barY + CalculateBeamY(h, barEndX);
+                        barStartY = barY + CalculateBeamY(h, barStartX) * scaleMod;
+                        barEndY = barY + CalculateBeamY(h, barEndX) * scaleMod;
                         PaintSingleBar(canvas, cx + X + barStartX, barStartY, cx + X + barEndX, barEndY, barSize);
                     }
                     // 
@@ -417,8 +431,8 @@ namespace AlphaTab.Rendering
                         barStartX = beatLineX - brokenBarOffset;
                         barEndX = beatLineX;
 
-                        barStartY = barY + CalculateBeamY(h, barStartX);
-                        barEndY = barY + CalculateBeamY(h, barEndX);
+                        barStartY = barY + CalculateBeamY(h, barStartX) * scaleMod;
+                        barEndY = barY + CalculateBeamY(h, barEndX) * scaleMod;
 
                         PaintSingleBar(canvas, cx + X + barStartX, barStartY, cx + X + barEndX, barEndY, barSize);
                     }

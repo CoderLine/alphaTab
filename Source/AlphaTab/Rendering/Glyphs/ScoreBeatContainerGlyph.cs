@@ -26,6 +26,19 @@ namespace AlphaTab.Rendering
         {
         }
 
+        public override void DoLayout()
+        {
+            base.DoLayout();
+            if (Beat.IsLegatoOrigin)
+            {
+                Ties.Add(new ScoreLegatoGlyph(Beat, Beat.NextBeat, this));
+            }
+            if (Beat.IsLegatoDestination)
+            {
+                Ties.Add(new ScoreLegatoGlyph(Beat, Beat.NextBeat, this, true));
+            }
+        }
+
         protected override void CreateTies(Note n)
         {
             // create a tie if any effect requires it

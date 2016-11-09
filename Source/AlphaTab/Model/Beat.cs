@@ -45,6 +45,12 @@ namespace AlphaTab.Model
         public FastList<Note> Notes { get; set; }
         public bool IsEmpty { get; set; }
 
+        public bool IsLegatoOrigin { get; set; }
+        public bool IsLegatoDestination
+        {
+            get { return PreviousBeat != null && PreviousBeat.IsLegatoOrigin; }
+        }
+
         private Note _minNote;
 
         public Note MinNote
@@ -231,6 +237,7 @@ namespace AlphaTab.Model
             dst.Crescendo = src.Crescendo;
             dst.Start = src.Start;
             dst.Dynamic = src.Dynamic;
+            dst.IsLegatoOrigin = src.IsLegatoOrigin;
             dst.InvertBeamDirection = src.InvertBeamDirection;
         }
 

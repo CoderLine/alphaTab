@@ -48,7 +48,7 @@ namespace AlphaTab.Rendering.Utils
                     for (int k = 0, l = v.Beats.Count; k < l; k++)
                     {
                         var b = v.Beats[k];
-                        var newBeamingHelper = false;
+                        var forceNewTupletHelper = false;
 
                         // if a new beaming helper was started, we close our tuplet grouping as well
                         if (!b.IsRest)
@@ -59,12 +59,16 @@ namespace AlphaTab.Rendering.Utils
                                 if (currentBeamHelper != null)
                                 {
                                     currentBeamHelper.Finish();
+                                    forceNewTupletHelper = currentBeamHelper.Beats.Count > 1;
+                                }
+                                else
+                                {
+                                    forceNewTupletHelper = true;
                                 }
                                 // if not possible, create the next beaming helper
                                 currentBeamHelper = new BeamingHelper(bar.Staff.Track);
                                 currentBeamHelper.CheckBeat(b);
                                 BeamHelpers[v.Index].Add(currentBeamHelper);
-                                newBeamingHelper = true;
                             }
                         }
 
@@ -78,7 +82,7 @@ namespace AlphaTab.Rendering.Utils
                             if (previousBeat != null && previousBeat.Voice != b.Voice) previousBeat = null;
 
                             // if a new beaming helper was started, we close our tuplet grouping as well
-                            if (newBeamingHelper && currentTupletHelper != null)
+                            if (forceNewTupletHelper && currentTupletHelper != null)
                             {
                                 currentTupletHelper.Finish();
                             }

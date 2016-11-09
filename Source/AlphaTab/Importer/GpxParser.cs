@@ -847,6 +847,12 @@ namespace AlphaTab.Importer
                                     break;
                             }
                             break;
+                        case "Legato":
+                            if (c.GetAttribute("origin") == "true")
+                            {
+                                beat.IsLegatoOrigin = true;
+                            }
+                            break;
                     }
                 }
             });

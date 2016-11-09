@@ -511,10 +511,6 @@ namespace AlphaTab.Importer
                                         beat.Duration = Duration.Quarter;
                                         break;
                                 }
-                                if (beat.GraceType != GraceType.None && beat.Duration < Duration.Eighth)
-                                {
-                                    beat.Duration = Duration.Eighth;
-                                }
                             }
                             break;
 
@@ -556,7 +552,7 @@ namespace AlphaTab.Importer
                                     beat.Duration = Duration.Whole;
                                     break;
                             }
-                            if (beat.GraceType != GraceType.None && beat.Duration < Duration.Eighth)
+                            if (beat.GraceType != GraceType.None && beat.Duration < Duration.Sixteenth)
                             {
                                 beat.Duration = Duration.Eighth;
                             }
@@ -714,6 +710,43 @@ namespace AlphaTab.Importer
                             break;
                         case "technical":
                             ParseTechnical(c, note);
+                            break;
+                        case "ornaments":
+                            ParseOrnaments(c, note);
+                            break;
+                        case "slur":
+                            if (c.GetAttribute("type") == "start")
+                            {
+                                beat.IsLegatoOrigin = true;
+                            }
+                            break;
+                    }
+                }
+            });
+        }
+
+        private void ParseOrnaments(IXmlNode element, Note note)
+        {
+            element.IterateChildren(c =>
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "tremolo":
+                            var tremoloSpeed = Std.ParseInt(Std.GetNodeValue(c));
+                            switch (tremoloSpeed)
+                            {
+                                case 1:
+                                    note.Beat.TremoloSpeed = Duration.Eighth;
+                                    break;
+                                case 2:
+                                    note.Beat.TremoloSpeed = Duration.Sixteenth;
+                                    break;
+                                case 3:
+                                    note.Beat.TremoloSpeed = Duration.ThirtySecond;
+                                    break;
+                            }
                             break;
                     }
                 }

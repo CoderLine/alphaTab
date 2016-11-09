@@ -194,6 +194,11 @@ namespace AlphaTab.Rendering.Utils
                 return Invert(BeamDirection.Up);
             }
 
+            if (Beats[0].GraceType != GraceType.None)
+            {
+                return Invert(BeamDirection.Up);
+            }
+
             // the average key is used for determination
             //      key lowerequal than middle line -> up
             //      key higher than middle line -> down
@@ -345,9 +350,12 @@ namespace AlphaTab.Rendering.Utils
 
         public float CalculateBeamY(float stemSize, float xCorrection, float xPosition, float scale, Func<Note, float> yPosition)
         {
-            // create a line between the min and max note of the group
-            var direction = Direction;
+            return CalculateBeamYWithDirection(stemSize, xCorrection, xPosition, scale, yPosition, Direction);
+        }
 
+        public float CalculateBeamYWithDirection(float stemSize, float xCorrection, float xPosition, float scale, Func<Note, float> yPosition, BeamDirection direction)
+        {
+            // create a line between the min and max note of the group
             if (Beats.Count == 1)
             {
                 if (direction == BeamDirection.Up)
@@ -402,7 +410,7 @@ namespace AlphaTab.Rendering.Utils
         private static bool CanJoin(Beat b1, Beat b2)
         {
             // is this a voice we can join with?
-            if (b1 == null || b2 == null || b1.IsRest || b2.IsRest || b1.GraceType != GraceType.None || b2.GraceType != GraceType.None)
+            if (b1 == null || b2 == null || b1.IsRest || b2.IsRest || b1.GraceType != b2.GraceType)
             {
                 return false;
             }

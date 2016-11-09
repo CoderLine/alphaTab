@@ -21,7 +21,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class NoteHeadGlyph : MusicFontGlyph
     {
-        public const float GraceScale = 0.6f;
+        public const float GraceScale = 0.75f;
         public const float NoteHeadHeight = 9;
 
         private readonly bool _isGrace;
@@ -42,7 +42,7 @@ namespace AlphaTab.Rendering.Glyphs
                     Width = 14 * (_isGrace ? GraceScale : 1) * Scale;
                     break;
                 default:
-                    Width = 10 * (_isGrace ? GraceScale : 1) * Scale;
+                    Width = 9 * (_isGrace ? GraceScale : 1) * Scale;
                     break;
             }
         }
