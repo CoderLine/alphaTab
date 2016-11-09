@@ -30,6 +30,7 @@ namespace AlphaTab.Model
         public Bar NextBar { get; set; }
         public Bar PreviousBar { get; set; }
         public Clef Clef { get; set; }
+        public ClefOttavia ClefOttavia { get; set; }
         public Staff Staff { get; set; }
         public FastList<Voice> Voices { get; set; }
 
@@ -37,12 +38,14 @@ namespace AlphaTab.Model
         {
             Voices = new FastList<Voice>();
             Clef = Clef.G2;
+            ClefOttavia = ClefOttavia.Regular;
         }
 
         public static void CopyTo(Bar src, Bar dst)
         {
             dst.Index = src.Index;
             dst.Clef = src.Clef;
+            dst.ClefOttavia = src.ClefOttavia;
         }
 
         public void AddVoice(Voice voice)

@@ -127,7 +127,9 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void Test_11a_TimeSignatures()
         {
-            TestReference();
+            var score = TestReference();
+            Assert.IsTrue(score.MasterBars[0].TimeSignatureCommon);
+            Assert.IsTrue(score.MasterBars[1].TimeSignatureCommon);
         }
 
         [TestMethod]
@@ -796,7 +798,7 @@ namespace AlphaTab.Test.Importer
             TestReference();
         }
 
-        private void TestReference([CallerMemberName] string caller = null, string renderLayout = "page")
+        private Score TestReference([CallerMemberName] string caller = null, string renderLayout = "page")
         {
             var fileId = caller.Split('_')[1];
 
@@ -824,16 +826,20 @@ namespace AlphaTab.Test.Importer
                 var score = importer.ReadScore();
                 sw.Stop();
 
-                AreEqual(referenceScore, score);
-
                 foreach (var track in score.Tracks)
                 {
                     Render(track, Path.ChangeExtension(file, "." + track.Index + ".png"), renderLayout);
                 }
+
+                AreEqual(referenceScore, score);
+
+
+                return score;
             }
             catch (UnsupportedFormatException e)
             {
                 Assert.Fail("Failed to load file {0}: {1}", file, e);
+                throw;
             }
         }
 
@@ -976,6 +982,7 @@ namespace AlphaTab.Test.Importer
         {
             AreEqual(expected, actual, t => t.Index);
             AreEqual(expected, actual, t => t.Clef);
+            AreEqual(expected, actual, t => t.ClefOttavia);
             //AreEqual(expected, actual, t => t.Voices.Count);
             for (int i = 0; i < Math.Min(expected.Voices.Count, actual.Voices.Count); i++)
             {

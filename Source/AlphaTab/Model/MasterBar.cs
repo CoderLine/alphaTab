@@ -46,6 +46,7 @@ namespace AlphaTab.Model
 
         public int TimeSignatureNumerator { get; set; }
         public int TimeSignatureDenominator { get; set; }
+        public bool TimeSignatureCommon { get; set; }
 
         public TripletFeel TripletFeel { get; set; }
 
@@ -67,7 +68,8 @@ namespace AlphaTab.Model
             TimeSignatureDenominator = 4;
             TimeSignatureNumerator = 4;
             TripletFeel = TripletFeel.NoTripletFeel;
-            KeySignatureType = KeySignatureType.Major; 
+            KeySignatureType = KeySignatureType.Major;
+            TimeSignatureCommon = false;
         }
 
         public static void CopyTo(MasterBar src, MasterBar dst)
@@ -81,6 +83,7 @@ namespace AlphaTab.Model
             dst.RepeatCount = src.RepeatCount;
             dst.TimeSignatureNumerator = src.TimeSignatureNumerator;
             dst.TimeSignatureDenominator = src.TimeSignatureDenominator;
+            dst.TimeSignatureCommon = src.TimeSignatureCommon;
             dst.TripletFeel = src.TripletFeel;
             dst.Start = src.Start;
         }

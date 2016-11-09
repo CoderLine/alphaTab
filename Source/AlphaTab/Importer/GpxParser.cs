@@ -650,6 +650,23 @@ namespace AlphaTab.Importer
                                     break;
                             }
                             break;
+                        case "Ottavia":
+                            switch (GetValue(c))
+                            {
+                                case "8va":
+                                    bar.ClefOttavia = ClefOttavia._8va;
+                                    break;
+                                case "15ma":
+                                    bar.ClefOttavia = ClefOttavia._15ma;
+                                    break;
+                                case "8vb":
+                                    bar.ClefOttavia = ClefOttavia._8vb;
+                                    break;
+                                 case "15mb":
+                                    bar.ClefOttavia = ClefOttavia._15mb;
+                                    break;
+                            }
+                            break;
                             // case "SimileMark":
                     }
                 }

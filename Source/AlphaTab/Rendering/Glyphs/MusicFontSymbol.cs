@@ -49,6 +49,8 @@ namespace AlphaTab.Rendering.Glyphs
         Num7 = 0xE087,
         Num8 = 0xE088,
         Num9 = 0xE089,
+        TimeSignatureCommon = 0xE08A,
+        TimeSignatureCutCommon = 0xE08b,
 
         NoteWhole = 0xE0A2,
         NoteHalf = 0xE0A3,

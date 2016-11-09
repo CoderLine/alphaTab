@@ -20,17 +20,19 @@ namespace AlphaTab.Rendering.Glyphs
     public class DigitGlyph : MusicFontGlyph
     {
         private readonly int _digit;
+        private readonly float _scale;
 
-        public DigitGlyph(float x, float y, int digit)
-            : base(x, y, 1, GetSymbol(digit))
+        public DigitGlyph(float x, float y, int digit, float scale)
+            : base(x, y, scale, GetSymbol(digit))
         {
             _digit = digit;
+            _scale = scale;
         }
 
         public override void DoLayout()
         {
             Y += 7 * Scale;
-            Width = GetDigitWidth(_digit) * Scale;
+            Width = GetDigitWidth(_digit) * Scale * _scale;
         }
 
         private float GetDigitWidth(int digit)

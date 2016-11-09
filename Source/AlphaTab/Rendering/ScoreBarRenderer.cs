@@ -636,7 +636,7 @@ namespace AlphaTab.Rendering
             }
 
             // Clef
-            if (IsFirstOfLine || Bar.Clef != Bar.PreviousBar.Clef)
+            if (IsFirstOfLine || Bar.Clef != Bar.PreviousBar.Clef || Bar.ClefOttavia != Bar.PreviousBar.ClefOttavia)
             {
                 var offset = 0;
                 var correction = 0;
@@ -660,7 +660,7 @@ namespace AlphaTab.Rendering
                         break;
                 }
                 CreateStartSpacing();
-                AddPreBeatGlyph(new ClefGlyph(0, GetScoreY(offset, correction), Bar.Clef));
+                AddPreBeatGlyph(new ClefGlyph(0, GetScoreY(offset, correction), Bar.Clef, Bar.ClefOttavia));
             }
 
             // Key signature
@@ -784,7 +784,7 @@ namespace AlphaTab.Rendering
         private void CreateTimeSignatureGlyphs()
         {
             AddPreBeatGlyph(new SpacingGlyph(0, 0, 5 * Scale));
-            AddPreBeatGlyph(new TimeSignatureGlyph(0, GetScoreY(2), Bar.MasterBar.TimeSignatureNumerator, Bar.MasterBar.TimeSignatureDenominator));
+            AddPreBeatGlyph(new TimeSignatureGlyph(0, GetScoreY(2), Bar.MasterBar.TimeSignatureNumerator, Bar.MasterBar.TimeSignatureDenominator, Bar.MasterBar.TimeSignatureCommon));
         }
 
         private void CreateVoiceGlyphs(Voice v)

@@ -112,6 +112,7 @@ namespace AlphaTab.Importer
                 return false;
             }
 
+            _divisions = 0;
             var barIndex = 0;
             if (isFirstMeasure)
             {
@@ -266,6 +267,8 @@ namespace AlphaTab.Importer
         }
 
         private string _currentChord;
+        private int _divisions;
+
         private void ParseHarmony(IXmlNode element, Track track)
         {
             var root = element.GetElementsByTagName("root")[0];
@@ -477,12 +480,44 @@ namespace AlphaTab.Importer
                             beat.Duration = Duration.ThirtySecond;
                             break;
                         case "duration":
-                            beat.Duration = (Duration)Std.ParseInt(Std.GetNodeValue(c));
-                            if (beat.GraceType != GraceType.None && beat.Duration < Duration.Eighth)
+                            if (beat.IsRest)
                             {
-                                beat.Duration = Duration.Eighth;
+                                // unit: divisions per quarter note
+                                var duration = Std.ParseInt(Std.GetNodeValue(c));
+                                switch (duration)
+                                {
+                                    case 1:
+                                        beat.Duration = Duration.Whole;
+                                        break;
+                                    case 2:
+                                        beat.Duration = Duration.Half;
+                                        break;
+                                    case 4:
+                                        beat.Duration = Duration.Quarter;
+                                        break;
+                                    case 8:
+                                        beat.Duration = Duration.Eighth;
+                                        break;
+                                    case 16:
+                                        beat.Duration = Duration.Sixteenth;
+                                        break;
+                                    case 32:
+                                        beat.Duration = Duration.ThirtySecond;
+                                        break;
+                                    case 64:
+                                        beat.Duration = Duration.SixtyFourth;
+                                        break;
+                                    default:
+                                        beat.Duration = Duration.Quarter;
+                                        break;
+                                }
+                                if (beat.GraceType != GraceType.None && beat.Duration < Duration.Eighth)
+                                {
+                                    beat.Duration = Duration.Eighth;
+                                }
                             }
                             break;
+
                         case "tie":
                             ParseTied(c, note);
                             break;
@@ -527,7 +562,7 @@ namespace AlphaTab.Importer
                             }
                             break;
                         case "dot":
-                            beat.Dots = 1;
+                            beat.Dots++;
                             break;
                         case "accidental":
                             ParseAccidental(c, note);
@@ -905,17 +940,22 @@ namespace AlphaTab.Importer
         private void ParseAttributes(IXmlNode element, Bar[] bars, MasterBar masterBar)
         {
             int number;
+            bool hasTime = false;
             element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
                 {
                     switch (c.LocalName)
                     {
+                        case "divisions":
+                            _divisions = Std.ParseInt(Std.GetNodeValue(c));
+                            break;
                         case "key":
                             ParseKey(c, masterBar);
                             break;
                         case "time":
                             ParseTime(c, masterBar);
+                            hasTime = true;
                             break;
                         case "clef":
                             number = Std.ParseInt(c.GetAttribute("number"));
@@ -936,12 +976,18 @@ namespace AlphaTab.Importer
                     }
                 }
             });
+
+            if (!hasTime)
+            {
+                masterBar.TimeSignatureCommon = true;
+            }
         }
 
         private void ParseClef(IXmlNode element, Bar bar)
         {
             string sign = null;
             int line = 0;
+            int octaveChange = 0;
             element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -953,6 +999,23 @@ namespace AlphaTab.Importer
                             break;
                         case "line":
                             line = Std.ParseInt(Std.GetNodeValue(c));
+                            break;
+                        case "clef-octave-change":
+                            switch (Std.ParseInt(Std.GetNodeValue(c)))
+                            {
+                                case -2:
+                                    bar.ClefOttavia = ClefOttavia._15mb;
+                                    break;
+                                case -1:
+                                    bar.ClefOttavia = ClefOttavia._8vb;
+                                    break;
+                                case 1:
+                                    bar.ClefOttavia = ClefOttavia._8va;
+                                    break;
+                                case 2:
+                                    bar.ClefOttavia = ClefOttavia._15mb;
+                                    break;
+                            }
                             break;
                     }
                 }
@@ -987,6 +1050,12 @@ namespace AlphaTab.Importer
 
         private void ParseTime(IXmlNode element, MasterBar masterBar)
         {
+            if (element.GetAttribute("symbol") == "common")
+            {
+                masterBar.TimeSignatureCommon = true;
+            }
+            bool beatsParsed = false;
+            bool beatTypeParsed = false;
             element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -995,15 +1064,31 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "beats":
-                            if (!v.Contains("+")) // compound TS
+                            if (!beatsParsed)
                             {
-                                masterBar.TimeSignatureNumerator = Std.ParseInt(v);
+                                if (!v.Contains("+")) // compound TS
+                                {
+                                    masterBar.TimeSignatureNumerator = Std.ParseInt(v);
+                                }
+                                else
+                                {
+                                    masterBar.TimeSignatureNumerator = 4;
+                                }
+                                beatsParsed = true;
                             }
                             break;
                         case "beat-type":
-                            if (!v.Contains("+")) // compound TS
+                            if (!beatTypeParsed)
                             {
-                                masterBar.TimeSignatureDenominator = Std.ParseInt(v);
+                                if (!v.Contains("+")) // compound TS
+                                {
+                                    masterBar.TimeSignatureDenominator = Std.ParseInt(v);
+                                }
+                                else
+                                {
+                                    masterBar.TimeSignatureDenominator = 4;
+                                }
+                                beatTypeParsed = true;
                             }
                             break;
                     }
