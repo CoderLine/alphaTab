@@ -26,12 +26,13 @@ namespace AlphaTab.Model
     public class Bar
     {
         public int Index { get; set; }
+
         public Bar NextBar { get; set; }
         public Bar PreviousBar { get; set; }
         public Clef Clef { get; set; }
         public Staff Staff { get; set; }
         public FastList<Voice> Voices { get; set; }
-        
+
         public Bar()
         {
             Voices = new FastList<Voice>();

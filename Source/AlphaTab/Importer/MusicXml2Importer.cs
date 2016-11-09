@@ -132,26 +132,45 @@ namespace AlphaTab.Importer
                 barIndex -= _trackFirstMeasureNumber;
             }
 
-            // create empty bars to the current index
-            Bar bar = null;
-            MasterBar masterBar = null;
-            for (int i = track.Staves[0].Bars.Count; i <= barIndex; i++)
+            // try to find out the number of staffs required 
+            if (isFirstMeasure)
             {
-                bar = new Bar();
-                if (track.Staves[0].Bars.Count > 0)
+                var attributes = element.GetElementsByTagName("attributes");
+                if (attributes.Length > 0)
                 {
-                    var previousBar = track.Staves[0].Bars[track.Staves[0].Bars.Count - 1];
-                    bar.Clef = previousBar.Clef;
+                    var stavesElements = attributes[0].GetElementsByTagName("staves");
+                    if (stavesElements.Length > 0)
+                    {
+                        var staves = Std.ParseInt(Std.GetNodeValue(stavesElements[0]));
+                        track.EnsureStaveCount(staves);
+                    }
                 }
-                masterBar = GetOrCreateMasterBar(barIndex);
-                track.AddBarToStaff(0, bar);
+            }
 
-                for (int j = 0; j < _maxVoices; j++)
+
+            // create empty bars to the current index
+            Bar[] bars = new Bar[track.Staves.Count];
+            MasterBar masterBar = null;
+            for (int b = track.Staves[0].Bars.Count; b <= barIndex; b++)
+            {
+                for (int s = 0; s < track.Staves.Count; s++)
                 {
-                    var emptyVoice = new Voice();
-                    bar.AddVoice(emptyVoice);
-                    var emptyBeat = new Beat { IsEmpty = true };
-                    emptyVoice.AddBeat(emptyBeat);
+                    var bar = bars[s] = new Bar();
+                    if (track.Staves[s].Bars.Count > 0)
+                    {
+                        var previousBar = track.Staves[s].Bars[track.Staves[s].Bars.Count - 1];
+                        bar.Clef = previousBar.Clef;
+                    }
+                    masterBar = GetOrCreateMasterBar(barIndex);
+                    track.AddBarToStaff(s, bar);
+
+                    for (int v = 0; v < _maxVoices; v++)
+                    {
+                        var emptyVoice = new Voice();
+                        bar.AddVoice(emptyVoice);
+                        var emptyBeat = new Beat { IsEmpty = true };
+                        emptyVoice.AddBeat(emptyBeat);
+                    }
                 }
             }
 
@@ -164,7 +183,7 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "note":
-                            ParseNoteBeat(c, track, bar);
+                            ParseNoteBeat(c, bars);
                             break;
                         case "forward":
                             break;
@@ -174,18 +193,18 @@ namespace AlphaTab.Importer
                         case "attributes":
                             if (!attributesParsed)
                             {
-                                ParseAttributes(c, bar, masterBar);
+                                ParseAttributes(c, bars, masterBar);
                                 attributesParsed = true;
                             }
                             break;
                         case "harmony":
-                            ParseHarmony(c, bar);
+                            ParseHarmony(c, track);
                             break;
                         case "sound":
                             // TODO
                             break;
                         case "barline":
-                            ParseBarline(c, bar, masterBar);
+                            ParseBarline(c, masterBar);
                             break;
                     }
                 }
@@ -247,7 +266,7 @@ namespace AlphaTab.Importer
         }
 
         private string _currentChord;
-        private void ParseHarmony(IXmlNode element, Bar bar)
+        private void ParseHarmony(IXmlNode element, Track track)
         {
             var root = element.GetElementsByTagName("root")[0];
             var rootStep = Std.GetNodeValue(root.GetElementsByTagName("root-step")[0]);
@@ -354,10 +373,10 @@ namespace AlphaTab.Importer
 
 
             _currentChord = Std.NewGuid();
-            bar.Staff.Track.Chords[_currentChord] = chord;
+            track.Chords[_currentChord] = chord;
         }
 
-        private void ParseBarline(IXmlNode element, Bar bar, MasterBar masterBar)
+        private void ParseBarline(IXmlNode element, MasterBar masterBar)
         {
             element.IterateChildren(c =>
             {
@@ -405,7 +424,7 @@ namespace AlphaTab.Importer
             }
         }
 
-        private void ParseNoteBeat(IXmlNode element, Track track, Bar bar)
+        private void ParseNoteBeat(IXmlNode element, Bar[] bars)
         {
             int voiceIndex = 0;
             var voiceNodes = element.GetElementsByTagName("voice");
@@ -415,6 +434,14 @@ namespace AlphaTab.Importer
             }
 
             var chord = element.GetElementsByTagName("chord").Length > 0;
+            var staffElement = element.GetElementsByTagName("staff");
+            int staff = 1;
+            if (staffElement.Length > 0)
+            {
+                staff = Std.ParseInt(Std.GetNodeValue(staffElement[0]));
+                voiceIndex -= staff - 1;
+            }
+            var bar = bars[staff - 1];
 
             Beat beat;
             var voice = GetOrCreateVoice(bar, voiceIndex);
@@ -524,7 +551,7 @@ namespace AlphaTab.Importer
                             ParseNotations(c, beat, note);
                             break;
                         case "lyric":
-                            // not supported
+                            ParseLyric(c, beat);
                             break;
                         // "full-note"
                         case "pitch":
@@ -555,37 +582,53 @@ namespace AlphaTab.Importer
             }
         }
 
+        private void ParseLyric(IXmlNode element, Beat beat)
+        {
+            element.IterateChildren(c =>
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "text":
+                            beat.Text = Std.GetNodeValue(c);
+                            break;
+                    }
+                }
+            });
+        }
+
         private void ParseAccidental(IXmlNode element, Note note)
         {
             switch (Std.GetNodeValue(element))
             {
-                //case "sharp":
-                //    note.AccidentalMode = NoteAccidentalMode.ForceSharp;
-                //    break;
-                //case "natural":
-                //    note.AccidentalMode = NoteAccidentalMode.ForceNatural;
-                //    break;
-                //case "flat":
-                //    note.AccidentalMode = NoteAccidentalMode.ForceFlat;
-                //    break;
-                //case "double-sharp":
-                //    break;
-                //case "sharp-sharp":
-                //    break;
-                //case "flat-flat":
-                //    break;
-                //case "natural-sharp":
-                //    break;
-                //case "natural-flat":
-                //    break;
-                //case "quarter-flat":
-                //    break;
-                //case "quarter-sharp":
-                //    break;
-                //case "three-quarters-flat":
-                //    break;
-                //case "three-quarters-sharp":
-                //    break;
+                case "sharp":
+                    note.AccidentalMode = NoteAccidentalMode.ForceSharp;
+                    break;
+                case "natural":
+                    note.AccidentalMode = NoteAccidentalMode.ForceNatural;
+                    break;
+                case "flat":
+                    note.AccidentalMode = NoteAccidentalMode.ForceFlat;
+                    break;
+                case "double-sharp":
+                    break;
+                case "sharp-sharp":
+                    break;
+                case "flat-flat":
+                    break;
+                case "natural-sharp":
+                    break;
+                case "natural-flat":
+                    break;
+                case "quarter-flat":
+                    break;
+                case "quarter-sharp":
+                    break;
+                case "three-quarters-flat":
+                    break;
+                case "three-quarters-sharp":
+                    break;
             }
         }
 
@@ -780,7 +823,7 @@ namespace AlphaTab.Importer
         private void ParsePitch(IXmlNode element, Note note)
         {
             string step = null;
-            int semitones = 0;
+            float semitones = 0;
             int octave = 0;
             element.IterateChildren(c =>
             {
@@ -792,7 +835,11 @@ namespace AlphaTab.Importer
                             step = Std.GetNodeValue(c);
                             break;
                         case "alter":
-                            semitones = Std.ParseInt(Std.GetNodeValue(c));
+                            semitones = Std.ParseFloat(Std.GetNodeValue(c));
+                            if (float.IsNaN(semitones))
+                            {
+                                semitones = 0;
+                            }
                             break;
                         case "octave":
                             // 0-9, 4 for middle C
@@ -802,7 +849,7 @@ namespace AlphaTab.Importer
                 }
             });
 
-            var value = octave * 12 + TuningParser.GetToneForText(step) + semitones;
+            var value = octave * 12 + TuningParser.GetToneForText(step) + (int)semitones;
 
             note.Octave = (value / 12);
             note.Tone = value - (note.Octave * 12);
@@ -855,8 +902,9 @@ namespace AlphaTab.Importer
             });
         }
 
-        private void ParseAttributes(IXmlNode element, Bar bar, MasterBar masterBar)
+        private void ParseAttributes(IXmlNode element, Bar[] bars, MasterBar masterBar)
         {
+            int number;
             element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -870,10 +918,20 @@ namespace AlphaTab.Importer
                             ParseTime(c, masterBar);
                             break;
                         case "clef":
-                            ParseClef(c, bar);
+                            number = Std.ParseInt(c.GetAttribute("number"));
+                            if (number == int.MinValue)
+                            {
+                                number = 1;
+                            }
+                            ParseClef(c, bars[number - 1]);
                             break;
                         case "staff-details":
-                            ParseStaffDetails(c, bar.Staff.Track);
+                            number = Std.ParseInt(c.GetAttribute("number"));
+                            if (number == int.MinValue)
+                            {
+                                number = 1;
+                            }
+                            ParseStaffDetails(c, bars[number - 1].Staff.Track);
                             break;
                     }
                 }

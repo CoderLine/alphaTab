@@ -365,671 +365,776 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\01a-Pitches-Pitches.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\01a-Pitches-Pitches.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\01b-Pitches-Intervals.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\01c-Pitches-NoVoiceElement.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\01e-Pitches-ParenthesizedAccidentals.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\02a-Rests-Durations.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\02b-Rests-PitchedRests.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\02c-Rests-MultiMeasureRests.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\02d-Rests-Multimeasure-TimeSignatures.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\03a-Rhythm-Durations.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\03b-Rhythm-Backup.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\03c-Rhythm-DivisionChange.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\03d-Rhythm-DottedDurations-Factors.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\11a-TimeSignatures.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\11g-TimeSignatures-SingleNumber.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\11h-TimeSignatures-SenzaMisura.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\12a-Clefs.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\12b-Clefs-NoKeyOrClef.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\13a-KeySignatures.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\13c-KeySignatures-NonTraditional.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\13d-KeySignatures-Microtones.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\14a-StaffDetails-LineChanges.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\21a-Chord-Basic.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\21b-Chords-TwoNotes.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\21c-Chords-ThreeNotesDuration.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\21d-Chords-SchubertStabatMater.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\21e-Chords-PickupMeasures.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\21f-Chord-ElementInBetween.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\22a-Noteheads.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\22b-Staff-Notestyles.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\22c-Noteheads-Chords.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\22d-Parenthesized-Noteheads.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\23a-Tuplets.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\23b-Tuplets-Styles.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\23c-Tuplet-Display-NonStandard.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\23d-Tuplets-Nested.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\23e-Tuplets-Tremolo.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\24a-GraceNotes.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\24b-ChordAsGraceNote.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\24c-GraceNote-MeasureEnd.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\24d-AfterGrace.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\24e-GraceNote-StaffChange.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\24f-GraceNote-Slur.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\31a-Directions.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\31c-MetronomeMarks.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\32a-Notations.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\32b-Articulations-Texts.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\32c-MultipleNotationChildren.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\32d-Arpeggio.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\33a-Spanners.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\33b-Spanners-Tie.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\33c-Spanners-Slurs.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\33d-Spanners-OctaveShifts.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\33e-Spanners-OctaveShifts-InvalidSize.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\33g-Slur-ChordedNotes.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\33h-Spanners-Glissando.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\41a-MultiParts-Partorder.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\41b-MultiParts-MoreThan10.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\41d-StaffGroups-Nested.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\41e-StaffGroups-InstrumentNames-Linebroken.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\41f-StaffGroups-Overlapping.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\41h-TooManyParts.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\41i-PartNameDisplay-Override.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\42a-MultiVoice-TwoVoicesOnStaff-Lyrics.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\45a-SimpleRepeat.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\45b-RepeatWithAlternatives.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\45c-RepeatMultipleTimes.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\46a-Barlines.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\46b-MidmeasureBarline.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\46e-PickupMeasure-SecondVoiceStartsLater.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\46f-IncompleteMeasures.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\46g-PickupMeasure-Chordnames-FiguredBass.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\51b-Header-Quotes.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\51c-MultipleRights.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\51d-EmptyTitle.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\52a-PageLayout.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\52b-Breaks.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\61a-Lyrics.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\61b-MultipleLyrics.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\61d-Lyrics-Melisma.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\61e-Lyrics-Chords.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\61g-Lyrics-NameNumber.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\61h-Lyrics-BeamsMelismata.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\61i-Lyrics-Chords.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\61j-Lyrics-Elisions.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\61k-Lyrics-SpannersExtenders.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\71c-ChordsFrets.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\71e-TabStaves.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\71f-AllChordTypes.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\71g-MultipleChordnames.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\73a-Percussion.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\74a-FiguredBass.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\75a-AccordionRegistrations.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\99a-Sibelius5-IgnoreBeaming.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\99b-Lyrics-BeamsMelismata-IgnoreBeams.gpx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="TestFiles\MusicXml\LICENSE" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="TestFiles\MusicXml\01a-Pitches-Pitches.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\01b-Pitches-Intervals.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\01c-Pitches-NoVoiceElement.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\01c-Pitches-NoVoiceElement.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\01d-Pitches-Microtones.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\01e-Pitches-ParenthesizedAccidentals.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\01e-Pitches-ParenthesizedAccidentals.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\01f-Pitches-ParenthesizedMicrotoneAccidentals.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\02a-Rests-Durations.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\02a-Rests-Durations.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\02b-Rests-PitchedRests.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\02b-Rests-PitchedRests.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\02c-Rests-MultiMeasureRests.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\02c-Rests-MultiMeasureRests.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\02d-Rests-Multimeasure-TimeSignatures.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\02d-Rests-Multimeasure-TimeSignatures.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\02e-Rests-NoType.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\02e-Rests-NoType.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\03a-Rhythm-Durations.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\03a-Rhythm-Durations.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\03b-Rhythm-Backup.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\03b-Rhythm-Backup.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\03c-Rhythm-DivisionChange.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\03c-Rhythm-DivisionChange.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\03d-Rhythm-DottedDurations-Factors.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\03d-Rhythm-DottedDurations-Factors.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\11a-TimeSignatures.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\11a-TimeSignatures.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\11b-TimeSignatures-NoTime.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\11b-TimeSignatures-NoTime.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\11c-TimeSignatures-CompoundSimple.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\11c-TimeSignatures-CompoundSimple.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\11d-TimeSignatures-CompoundMultiple.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\11d-TimeSignatures-CompoundMultiple.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\11e-TimeSignatures-CompoundMixed.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\11e-TimeSignatures-CompoundMixed.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\11f-TimeSignatures-SymbolMeaning.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\11f-TimeSignatures-SymbolMeaning.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\11g-TimeSignatures-SingleNumber.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\11g-TimeSignatures-SingleNumber.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\11h-TimeSignatures-SenzaMisura.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\11h-TimeSignatures-SenzaMisura.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\12a-Clefs.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\12a-Clefs.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\12b-Clefs-NoKeyOrClef.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\12b-Clefs-NoKeyOrClef.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\13a-KeySignatures.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\13a-KeySignatures.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\13b-KeySignatures-ChurchModes.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\13b-KeySignatures-ChurchModes.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\13c-KeySignatures-NonTraditional.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\13c-KeySignatures-NonTraditional.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\13d-KeySignatures-Microtones.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\13d-KeySignatures-Microtones.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\14a-StaffDetails-LineChanges.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\14a-StaffDetails-LineChanges.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\21a-Chord-Basic.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\21a-Chord-Basic.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\21b-Chords-TwoNotes.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\21b-Chords-TwoNotes.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\21c-Chords-ThreeNotesDuration.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\21c-Chords-ThreeNotesDuration.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\21d-Chords-SchubertStabatMater.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\21d-Chords-SchubertStabatMater.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\21e-Chords-PickupMeasures.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\21e-Chords-PickupMeasures.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\21f-Chord-ElementInBetween.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\21f-Chord-ElementInBetween.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\22a-Noteheads.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\22a-Noteheads.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\22b-Staff-Notestyles.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\22b-Staff-Notestyles.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\22c-Noteheads-Chords.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\22c-Noteheads-Chords.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\22d-Parenthesized-Noteheads.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\22d-Parenthesized-Noteheads.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\23a-Tuplets.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\23a-Tuplets.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\23b-Tuplets-Styles.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\23b-Tuplets-Styles.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\23c-Tuplet-Display-NonStandard.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\23c-Tuplet-Display-NonStandard.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\23d-Tuplets-Nested.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\23d-Tuplets-Nested.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\23e-Tuplets-Tremolo.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\23e-Tuplets-Tremolo.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\23f-Tuplets-DurationButNoBracket.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\23f-Tuplets-DurationButNoBracket.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\24a-GraceNotes.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\24a-GraceNotes.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\24b-ChordAsGraceNote.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\24b-ChordAsGraceNote.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\24c-GraceNote-MeasureEnd.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\24c-GraceNote-MeasureEnd.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\24d-AfterGrace.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\24d-AfterGrace.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\24e-GraceNote-StaffChange.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\24e-GraceNote-StaffChange.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\24f-GraceNote-Slur.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\24f-GraceNote-Slur.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\31a-Directions.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\31a-Directions.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\31c-MetronomeMarks.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\31c-MetronomeMarks.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\32a-Notations.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\32a-Notations.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\32b-Articulations-Texts.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\32b-Articulations-Texts.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\32c-MultipleNotationChildren.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\32c-MultipleNotationChildren.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\32d-Arpeggio.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\32d-Arpeggio.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\33a-Spanners.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\33a-Spanners.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\33b-Spanners-Tie.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\33b-Spanners-Tie.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\33c-Spanners-Slurs.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\33c-Spanners-Slurs.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\33d-Spanners-OctaveShifts.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\33d-Spanners-OctaveShifts.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\33e-Spanners-OctaveShifts-InvalidSize.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\33e-Spanners-OctaveShifts-InvalidSize.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\33f-Trill-EndingOnGraceNote.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\33f-Trill-EndingOnGraceNote.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\33g-Slur-ChordedNotes.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\33g-Slur-ChordedNotes.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\33h-Spanners-Glissando.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\33h-Spanners-Glissando.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\33i-Ties-NotEnded.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\33i-Ties-NotEnded.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\41a-MultiParts-Partorder.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\41a-MultiParts-Partorder.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\41b-MultiParts-MoreThan10.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\41b-MultiParts-MoreThan10.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\41c-StaffGroups.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\41c-StaffGroups.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\41d-StaffGroups-Nested.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\41d-StaffGroups-Nested.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\41e-StaffGroups-InstrumentNames-Linebroken.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\41e-StaffGroups-InstrumentNames-Linebroken.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\41f-StaffGroups-Overlapping.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\41f-StaffGroups-Overlapping.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\41g-PartNoId.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\41g-PartNoId.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\41h-TooManyParts.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\41h-TooManyParts.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\41i-PartNameDisplay-Override.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\41i-PartNameDisplay-Override.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\42a-MultiVoice-TwoVoicesOnStaff-Lyrics.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\42a-MultiVoice-TwoVoicesOnStaff-Lyrics.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\42b-MultiVoice-MidMeasureClefChange.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\42b-MultiVoice-MidMeasureClefChange.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\43a-PianoStaff.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\43a-PianoStaff.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\43b-MultiStaff-DifferentKeys.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\43b-MultiStaff-DifferentKeys.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\43c-MultiStaff-DifferentKeysAfterBackup.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\43c-MultiStaff-DifferentKeysAfterBackup.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\43d-MultiStaff-StaffChange.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\43d-MultiStaff-StaffChange.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\43e-Multistaff-ClefDynamics.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\43e-Multistaff-ClefDynamics.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\45a-SimpleRepeat.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\45a-SimpleRepeat.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\45b-RepeatWithAlternatives.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\45b-RepeatWithAlternatives.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\45c-RepeatMultipleTimes.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\45c-RepeatMultipleTimes.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\45d-Repeats-Nested-Alternatives.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\45d-Repeats-Nested-Alternatives.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\45e-Repeats-Nested-Alternatives.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\45e-Repeats-Nested-Alternatives.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\45f-Repeats-InvalidEndings.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\45f-Repeats-InvalidEndings.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\45g-Repeats-NotEnded.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\45g-Repeats-NotEnded.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\46a-Barlines.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\46a-Barlines.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\46b-MidmeasureBarline.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\46b-MidmeasureBarline.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\46c-Midmeasure-Clef.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\46c-Midmeasure-Clef.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\46d-PickupMeasure-ImplicitMeasures.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\46d-PickupMeasure-ImplicitMeasures.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\46e-PickupMeasure-SecondVoiceStartsLater.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\46e-PickupMeasure-SecondVoiceStartsLater.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\46f-IncompleteMeasures.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\46f-IncompleteMeasures.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\46g-PickupMeasure-Chordnames-FiguredBass.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\46g-PickupMeasure-Chordnames-FiguredBass.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\51b-Header-Quotes.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\51b-Header-Quotes.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\51c-MultipleRights.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\51c-MultipleRights.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\51d-EmptyTitle.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\51d-EmptyTitle.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\52a-PageLayout.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\52a-PageLayout.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\52b-Breaks.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\52b-Breaks.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\61a-Lyrics.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\61a-Lyrics.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\61b-MultipleLyrics.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\61b-MultipleLyrics.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\61c-Lyrics-Pianostaff.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\61c-Lyrics-Pianostaff.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\61d-Lyrics-Melisma.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\61d-Lyrics-Melisma.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\61e-Lyrics-Chords.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\61e-Lyrics-Chords.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\61f-Lyrics-GracedNotes.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\61f-Lyrics-GracedNotes.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\61g-Lyrics-NameNumber.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\61g-Lyrics-NameNumber.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\61h-Lyrics-BeamsMelismata.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\61h-Lyrics-BeamsMelismata.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\61i-Lyrics-Chords.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\61i-Lyrics-Chords.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\61j-Lyrics-Elisions.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\61j-Lyrics-Elisions.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\61k-Lyrics-SpannersExtenders.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\61k-Lyrics-SpannersExtenders.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\71a-Chordnames.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\71a-Chordnames.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\71c-ChordsFrets.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\71c-ChordsFrets.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\71d-ChordsFrets-Multistaff.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\71d-ChordsFrets-Multistaff.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\71e-TabStaves.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\71e-TabStaves.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\71f-AllChordTypes.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\71f-AllChordTypes.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\71g-MultipleChordnames.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\71g-MultipleChordnames.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\72a-TransposingInstruments.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\72a-TransposingInstruments.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\72b-TransposingInstruments-Full.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\72b-TransposingInstruments-Full.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\72c-TransposingInstruments-Change.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\72c-TransposingInstruments-Change.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\73a-Percussion.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\73a-Percussion.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\74a-FiguredBass.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\74a-FiguredBass.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\75a-AccordionRegistrations.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\75a-AccordionRegistrations.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\99a-Sibelius5-IgnoreBeaming.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\99a-Sibelius5-IgnoreBeaming.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\99b-Lyrics-BeamsMelismata-IgnoreBeams.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\MusicXml\99b-Lyrics-BeamsMelismata-IgnoreBeams.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="TestFiles\MusicXml\LICENSE" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AlphaTab.Wpf\AlphaTab.Wpf.csproj">
       <Project>{dfe92430-1351-4b74-8306-f1620f70ac4a}</Project>
       <Name>AlphaTab.Wpf</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TestFiles\MusicXml\01d-Pitches-Microtones.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\MusicXml\01f-Pitches-ParenthesizedMicrotoneAccidentals.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
