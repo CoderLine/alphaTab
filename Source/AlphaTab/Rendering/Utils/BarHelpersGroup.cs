@@ -98,6 +98,16 @@ namespace AlphaTab.Rendering.Utils
                         BeamHelperLookup[v.Index][b.Index] = currentBeamHelper;
                     }
 
+                    if (currentBeamHelper != null)
+                    {
+                        currentBeamHelper.Finish();
+                    }
+
+                    if (currentTupletHelper != null)
+                    {
+                        currentTupletHelper.Finish();
+                    }
+
                     currentBeamHelper = null;
                     currentTupletHelper = null;
                 }

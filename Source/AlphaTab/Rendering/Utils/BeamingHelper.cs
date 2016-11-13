@@ -198,12 +198,12 @@ namespace AlphaTab.Rendering.Utils
             {
                 return Invert(BeamDirection.Up);
             }
-
+            
             // the average key is used for determination
             //      key lowerequal than middle line -> up
             //      key higher than middle line -> down
             var avg = (GetValue(MaxNote) + GetValue(MinNote)) / 2;
-            return Invert(avg <= ScoreMiddleKeys[(int)_lastBeat.Voice.Bar.Clef] ? BeamDirection.Up : BeamDirection.Down);
+            return Invert(avg < ScoreMiddleKeys[(int)_lastBeat.Voice.Bar.Clef] ? BeamDirection.Up : BeamDirection.Down);
         }
 
         private BeamDirection Invert(BeamDirection direction)

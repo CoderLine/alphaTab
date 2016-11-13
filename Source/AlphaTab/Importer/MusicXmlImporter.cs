@@ -7,7 +7,7 @@ using XmlNodeType = AlphaTab.Xml.XmlNodeType;
 
 namespace AlphaTab.Importer
 {
-    public class MusicXml2Importer : ScoreImporter
+    public class MusicXmlImporter : ScoreImporter
     {
         private Score _score;
         private FastDictionary<string, Track> _trackById;
@@ -112,10 +112,10 @@ namespace AlphaTab.Importer
                 return false;
             }
 
-            _divisions = 0;
             var barIndex = 0;
             if (isFirstMeasure)
             {
+                _divisionsPerQuarterNote = 0;
                 _trackFirstMeasureNumber = Std.ParseInt(element.GetAttribute("number"));
                 if (_trackFirstMeasureNumber == int.MinValue)
                 {
@@ -187,6 +187,7 @@ namespace AlphaTab.Importer
                             ParseNoteBeat(c, bars);
                             break;
                         case "forward":
+                            ParseForward(c, bars);
                             break;
                         case "direction":
                             ParseDirection(c, masterBar);
@@ -212,6 +213,93 @@ namespace AlphaTab.Importer
             });
 
             return true;
+        }
+
+        private Beat GetOrCreateBeat(IXmlNode element, Bar[] bars, bool chord)
+        {
+            int voiceIndex = 0;
+            var voiceNodes = element.GetElementsByTagName("voice");
+            if (voiceNodes.Length > 0)
+            {
+                voiceIndex = Std.ParseInt(Std.GetNodeValue(voiceNodes[0])) - 1;
+            }
+
+            var previousBeatWasPulled = _previousBeatWasPulled;
+            _previousBeatWasPulled = false;
+            var staffElement = element.GetElementsByTagName("staff");
+            int staff = 1;
+            if (staffElement.Length > 0)
+            {
+                staff = Std.ParseInt(Std.GetNodeValue(staffElement[0]));
+
+                // in case we have a beam with a staff-jump we pull the note to the previous staff
+                if ((_isBeamContinue || previousBeatWasPulled) && _previousBeat.Voice.Bar.Staff.Index != staff - 1)
+                {
+                    staff = _previousBeat.Voice.Bar.Staff.Index + 1;
+                    _previousBeatWasPulled = true;
+                }
+
+                var staffId = bars[0].Staff.Track.Index + "-" + staff;
+                if (!_voiceOfStaff.ContainsKey(staffId))
+                {
+                    _voiceOfStaff[staffId] = voiceIndex;
+                }
+                voiceIndex -= _voiceOfStaff[staffId];
+            }
+            var bar = bars[staff - 1];
+
+            Beat beat;
+            var voice = GetOrCreateVoice(bar, voiceIndex);
+            if (chord || (voice.Beats.Count == 1 && voice.IsEmpty))
+            {
+                beat = voice.Beats[voice.Beats.Count - 1];
+            }
+            else
+            {
+                beat = new Beat();
+                voice.AddBeat(beat);
+            }
+
+            _isBeamContinue = false;
+            _previousBeat = beat;
+
+            return beat;
+        }
+
+        private void ParseForward(IXmlNode element, Bar[] bars)
+        {
+            var beat = GetOrCreateBeat(element, bars, false);
+            var durationInDivisions = Std.ParseInt(Std.GetNodeValue(element.GetElementsByTagName("duration")[0]));
+
+            var duration = (durationInDivisions * (int)Duration.Quarter) / (float)_divisionsPerQuarterNote;
+
+            var durations = new[]
+            {
+                (int) Duration.SixtyFourth,
+                (int) Duration.ThirtySecond,
+                (int) Duration.Sixteenth,
+                (int) Duration.Eighth,
+                (int) Duration.Quarter,
+                (int) Duration.Half,
+                (int) Duration.Whole
+            };
+            foreach (var d in durations)
+            {
+                if (duration >= d)
+                {
+                    beat.Duration = (Duration)d;
+                    duration -= d;
+                    break;
+                }
+            }
+
+            if (duration > 0)
+            {
+                // TODO: Handle remaining duration 
+                // (additional beats, dotted durations,...)
+            }
+
+            beat.IsEmpty = false;
         }
 
         private void ParseStaffDetails(IXmlNode element, Track track)
@@ -267,7 +355,7 @@ namespace AlphaTab.Importer
         }
 
         private string _currentChord;
-        private int _divisions;
+        private int _divisionsPerQuarterNote;
 
         private void ParseHarmony(IXmlNode element, Track track)
         {
@@ -427,36 +515,15 @@ namespace AlphaTab.Importer
             }
         }
 
+        private FastDictionary<string, int> _voiceOfStaff = new FastDictionary<string, int>();
+        private bool _isBeamContinue;
+        private bool _previousBeatWasPulled;
+        private Beat _previousBeat;
+
         private void ParseNoteBeat(IXmlNode element, Bar[] bars)
         {
-            int voiceIndex = 0;
-            var voiceNodes = element.GetElementsByTagName("voice");
-            if (voiceNodes.Length > 0)
-            {
-                voiceIndex = Std.ParseInt(Std.GetNodeValue(voiceNodes[0])) - 1;
-            }
-
             var chord = element.GetElementsByTagName("chord").Length > 0;
-            var staffElement = element.GetElementsByTagName("staff");
-            int staff = 1;
-            if (staffElement.Length > 0)
-            {
-                staff = Std.ParseInt(Std.GetNodeValue(staffElement[0]));
-                voiceIndex -= staff - 1;
-            }
-            var bar = bars[staff - 1];
-
-            Beat beat;
-            var voice = GetOrCreateVoice(bar, voiceIndex);
-            if (chord || (voice.Beats.Count == 1 && voice.IsEmpty))
-            {
-                beat = voice.Beats[voice.Beats.Count - 1];
-            }
-            else
-            {
-                beat = new Beat();
-                voice.AddBeat(beat);
-            }
+            var beat = GetOrCreateBeat(element, bars, chord);
 
             beat.ChordId = _currentChord;
             _currentChord = null;
@@ -465,6 +532,7 @@ namespace AlphaTab.Importer
             beat.AddNote(note);
             beat.IsEmpty = false;
 
+            beat.Dots = 0;
             element.IterateChildren(c =>
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -576,7 +644,11 @@ namespace AlphaTab.Importer
                             }
                             break;
                         case "beam":
-                            // not supported
+                            var beamMode = Std.GetNodeValue(c);
+                            if (beamMode == "continue")
+                            {
+                                _isBeamContinue = true;
+                            }
                             break;
                         case "notations":
                             ParseNotations(c, beat, note);
@@ -956,11 +1028,15 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "sound":
-                            var tempoAutomation = new Automation();
-                            tempoAutomation.IsLinear = true;
-                            tempoAutomation.Type = AutomationType.Tempo;
-                            tempoAutomation.Value = Std.ParseInt(c.GetAttribute("tempo"));
-                            masterBar.TempoAutomation = tempoAutomation;
+                            var tempo = c.GetAttribute("tempo");
+                            if (!string.IsNullOrEmpty(tempo))
+                            {
+                                var tempoAutomation = new Automation();
+                                tempoAutomation.IsLinear = true;
+                                tempoAutomation.Type = AutomationType.Tempo;
+                                tempoAutomation.Value = Std.ParseInt(tempo);
+                                masterBar.TempoAutomation = tempoAutomation;
+                            }
                             break;
                         case "direction-type":
                             var directionType = c.FirstChild;
@@ -988,7 +1064,7 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "divisions":
-                            _divisions = Std.ParseInt(Std.GetNodeValue(c));
+                            _divisionsPerQuarterNote = Std.ParseInt(Std.GetNodeValue(c));
                             break;
                         case "key":
                             ParseKey(c, masterBar);

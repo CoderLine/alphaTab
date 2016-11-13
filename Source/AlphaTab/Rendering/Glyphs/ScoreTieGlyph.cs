@@ -26,7 +26,7 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly Note _endNote;
 
         public ScoreTieGlyph(Note startNote, Note endNote, Glyph parent, bool forEnd = false)
-            : base(startNote.Beat, endNote.Beat, parent, forEnd)
+            : base(startNote == null ? null : startNote.Beat, endNote == null ? null : endNote.Beat, parent, forEnd)
         {
             _startNote = startNote;
             _endNote = endNote;

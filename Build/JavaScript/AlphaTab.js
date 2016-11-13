@@ -3556,7 +3556,7 @@ AlphaTab.Importer.ScoreImporter.prototype = {
     }
 };
 AlphaTab.Importer.ScoreImporter.BuildImporters = function (){
-    return [new AlphaTab.Importer.Gp3To5Importer(), new AlphaTab.Importer.GpxImporter(), new AlphaTab.Importer.AlphaTexImporter(), new AlphaTab.Importer.MusicXml2Importer()];
+    return [new AlphaTab.Importer.Gp3To5Importer(), new AlphaTab.Importer.GpxImporter(), new AlphaTab.Importer.AlphaTexImporter(), new AlphaTab.Importer.MusicXmlImporter()];
 };
 AlphaTab.Importer.AlphaTexImporter = function (){
     this._score = null;
@@ -7188,16 +7188,17 @@ AlphaTab.Importer.MixTableChange = function (){
     this.Tempo = -1;
     this.Duration = 0;
 };
-AlphaTab.Importer.MusicXml2Importer = function (){
+AlphaTab.Importer.MusicXmlImporter = function (){
     this._score = null;
     this._trackById = null;
     this._trackFirstMeasureNumber = 0;
     this._maxVoices = 0;
     this._currentChord = null;
     this._divisions = 0;
+    this._voiceOfStaff = {};
     AlphaTab.Importer.ScoreImporter.call(this);
 };
-AlphaTab.Importer.MusicXml2Importer.prototype = {
+AlphaTab.Importer.MusicXmlImporter.prototype = {
     ReadScore: function (){
         this._trackById = {};
         var xml = AlphaTab.Platform.Std.ToString(this.Data.ReadAll());
@@ -7539,7 +7540,11 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
         var staff = 1;
         if (staffElement.length > 0){
             staff = AlphaTab.Platform.Std.ParseInt(AlphaTab.Platform.Std.GetNodeValue(staffElement[0]));
-            voiceIndex -= staff - 1;
+            var staffId = bars[0].Staff.Track.Index + "-" + staff;
+            if (!this._voiceOfStaff.hasOwnProperty(staffId)){
+                this._voiceOfStaff[staffId] = voiceIndex;
+            }
+            voiceIndex -= this._voiceOfStaff[staffId];
         }
         var bar = bars[staff - 1];
         var beat;
@@ -7596,7 +7601,7 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
                     }
                         break;
                     case "tie":
-                        AlphaTab.Importer.MusicXml2Importer.ParseTied(c, note);
+                        AlphaTab.Importer.MusicXmlImporter.ParseTied(c, note);
                         break;
                     case "cue":
                         break;
@@ -7736,7 +7741,7 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
                         this.ParseArticulations(c, note);
                         break;
                     case "tied":
-                        AlphaTab.Importer.MusicXml2Importer.ParseTied(c, note);
+                        AlphaTab.Importer.MusicXmlImporter.ParseTied(c, note);
                         break;
                     case "slide":
                     case "glissando":
@@ -7931,11 +7936,14 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
             if (c.nodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.localName){
                     case "sound":
+                        var tempo = c.getAttribute("tempo");
+                        if (!((tempo==null)||(tempo.length==0))){
                         var tempoAutomation = new AlphaTab.Model.Automation();
                         tempoAutomation.IsLinear = true;
                         tempoAutomation.Type = AlphaTab.Model.AutomationType.Tempo;
-                        tempoAutomation.Value = AlphaTab.Platform.Std.ParseInt(c.getAttribute("tempo"));
+                        tempoAutomation.Value = AlphaTab.Platform.Std.ParseInt(tempo);
                         masterBar.TempoAutomation = tempoAutomation;
+                    }
                         break;
                     case "direction-type":
                         var directionType = c.firstChild;
@@ -8216,7 +8224,7 @@ AlphaTab.Importer.MusicXml2Importer.prototype = {
         }));
     }
 };
-AlphaTab.Importer.MusicXml2Importer.ParseTied = function (element, note){
+AlphaTab.Importer.MusicXmlImporter.ParseTied = function (element, note){
     if (note.Beat.GraceType != AlphaTab.Model.GraceType.None)
         return;
     if (element.getAttribute("type") == "start"){
@@ -8226,7 +8234,7 @@ AlphaTab.Importer.MusicXml2Importer.ParseTied = function (element, note){
         note.IsTieDestination = true;
     }
 };
-$Inherit(AlphaTab.Importer.MusicXml2Importer, AlphaTab.Importer.ScoreImporter);
+$Inherit(AlphaTab.Importer.MusicXmlImporter, AlphaTab.Importer.ScoreImporter);
 AlphaTab.Importer.NoCompatibleReaderFoundException = function (){
 };
 AlphaTab.Importer.ScoreLoader = function (){
@@ -12409,15 +12417,16 @@ AlphaTab.Rendering.Glyphs.TieGlyph.prototype = {
             // line break or bar break
             if (startNoteRenderer != endNoteRenderer){
                 startX = cx + this.GetStartX(startNoteRenderer);
+                startY = cy + this.GetStartY(startNoteRenderer, direction) + this.YOffset;
                 // line break: to bar end
                 if (endNoteRenderer == null || startNoteRenderer.Staff != endNoteRenderer.Staff){
                     endX = cx + parent.X;
+                    endY = startY;
                 }
                 else {
                     endX = cx + parent.X + this.GetEndX(endNoteRenderer);
+                    endY = cy + this.GetEndY(endNoteRenderer, direction) + this.YOffset;
                 }
-                startY = cy + this.GetStartY(startNoteRenderer, direction) + this.YOffset;
-                endY = cy + this.GetEndY(endNoteRenderer, direction) + this.YOffset;
             }
             else {
                 startX = cx + this.GetStartX(startNoteRenderer);
@@ -12628,7 +12637,7 @@ AlphaTab.Rendering.ScoreBeatContainerGlyph.prototype = {
             this.Ties.push(new AlphaTab.Rendering.Glyphs.ScoreLegatoGlyph(this.Beat, this.Beat.NextBeat, this, false));
         }
         if (this.Beat.get_IsLegatoDestination()){
-            this.Ties.push(new AlphaTab.Rendering.Glyphs.ScoreLegatoGlyph(this.Beat, this.Beat.NextBeat, this, true));
+            this.Ties.push(new AlphaTab.Rendering.Glyphs.ScoreLegatoGlyph(this.Beat.PreviousBeat, this.Beat, this, true));
         }
     },
     CreateTies: function (n){
@@ -13202,7 +13211,7 @@ $Inherit(AlphaTab.Rendering.Glyphs.ScoreSlideLineGlyph, AlphaTab.Rendering.Glyph
 AlphaTab.Rendering.Glyphs.ScoreTieGlyph = function (startNote, endNote, parent, forEnd){
     this._startNote = null;
     this._endNote = null;
-    AlphaTab.Rendering.Glyphs.TieGlyph.call(this, startNote.Beat, endNote.Beat, parent, forEnd);
+    AlphaTab.Rendering.Glyphs.TieGlyph.call(this, startNote == null ? null : startNote.Beat, endNote == null ? null : endNote.Beat, parent, forEnd);
     this._startNote = startNote;
     this._endNote = endNote;
 };
@@ -14141,23 +14150,23 @@ AlphaTab.Rendering.Layout.ScoreLayout.prototype = {
         }
         return group;
     },
-    GetBarRendererId: function (trackId, barId){
-        return trackId + "-" + barId;
+    GetBarRendererId: function (bar){
+        return bar.Staff.Track.Index + "-" + bar.Staff.Index + "-" + bar.Index;
     },
     RegisterBarRenderer: function (key, renderer){
         if (!this._barRendererLookup.hasOwnProperty(key)){
             this._barRendererLookup[key] = {};
         }
-        this._barRendererLookup[key][this.GetBarRendererId(renderer.Bar.Staff.Track.Index, renderer.Bar.Index)] = renderer;
+        this._barRendererLookup[key][this.GetBarRendererId(renderer.Bar)] = renderer;
     },
     UnregisterBarRenderer: function (key, renderer){
         if (this._barRendererLookup.hasOwnProperty(key)){
             var lookup = this._barRendererLookup[key];
-            delete lookup[this.GetBarRendererId(renderer.Bar.Staff.Track.Index, renderer.Bar.Index)];
+            delete lookup[this.GetBarRendererId(renderer.Bar)];
         }
     },
     GetRendererForBar: function (key, bar){
-        var barRendererId = this.GetBarRendererId(bar.Staff.Track.Index, bar.Index);
+        var barRendererId = this.GetBarRendererId(bar);
         if (this._barRendererLookup.hasOwnProperty(key) && this._barRendererLookup[key].hasOwnProperty(barRendererId)){
             return this._barRendererLookup[key][barRendererId];
         }
@@ -16347,6 +16356,12 @@ AlphaTab.Rendering.Utils.BarHelpers = function (bar){
                 }
                 this.BeamHelperLookup[v.Index][b.Index] = currentBeamHelper;
             }
+            if (currentBeamHelper != null){
+                currentBeamHelper.Finish();
+            }
+            if (currentTupletHelper != null){
+                currentTupletHelper.Finish();
+            }
             currentBeamHelper = null;
             currentTupletHelper = null;
         }
@@ -16465,7 +16480,7 @@ AlphaTab.Rendering.Utils.BeamingHelper.prototype = {
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
         var avg = ((this.GetValue(this.MaxNote) + this.GetValue(this.MinNote)) / 2) | 0;
-        return this.Invert(avg <= AlphaTab.Rendering.Utils.BeamingHelper.ScoreMiddleKeys[this._lastBeat.Voice.Bar.Clef] ? AlphaTab.Rendering.Utils.BeamDirection.Up : AlphaTab.Rendering.Utils.BeamDirection.Down);
+        return this.Invert(avg < AlphaTab.Rendering.Utils.BeamingHelper.ScoreMiddleKeys[this._lastBeat.Voice.Bar.Clef] ? AlphaTab.Rendering.Utils.BeamDirection.Up : AlphaTab.Rendering.Utils.BeamDirection.Down);
     },
     Invert: function (direction){
         if (!this.InvertBeamDirection)

@@ -71,21 +71,21 @@ namespace AlphaTab.Rendering.Glyphs
                 if (startNoteRenderer != endNoteRenderer)
                 {
                     startX = cx + GetStartX(startNoteRenderer);
-
+                    startY = cy + GetStartY(startNoteRenderer, direction) + YOffset;
+                    
                     // line break: to bar end
                     if (endNoteRenderer == null || startNoteRenderer.Staff != endNoteRenderer.Staff)
                     {
                         endX = cx + parent.X;
+                        endY = startY;
                     }
                     // bar break: to tie destination 
                     // differs only by addition of EndNote X coordinate
                     else
                     {
                         endX = cx + parent.X + GetEndX(endNoteRenderer);
+                        endY = cy + GetEndY(endNoteRenderer, direction) + YOffset;
                     }
-
-                    startY = cy + GetStartY(startNoteRenderer, direction) + YOffset;
-                    endY = cy + GetEndY(endNoteRenderer, direction) + YOffset;
                 }
                 else
                 {

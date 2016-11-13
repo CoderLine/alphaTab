@@ -35,7 +35,7 @@ namespace AlphaTab.Rendering
             }
             if (Beat.IsLegatoDestination)
             {
-                Ties.Add(new ScoreLegatoGlyph(Beat, Beat.NextBeat, this, true));
+                Ties.Add(new ScoreLegatoGlyph(Beat.PreviousBeat, Beat, this, true));
             }
         }
 
