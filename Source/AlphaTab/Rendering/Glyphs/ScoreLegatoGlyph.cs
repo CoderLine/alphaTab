@@ -23,7 +23,16 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 return BeamDirection.Up;
             }
-            return ((ScoreBarRenderer)noteRenderer).GetBeatDirection(beat);
+
+            // invert direction (if stems go up, ties go down to not cross them)
+            switch (((ScoreBarRenderer)noteRenderer).GetBeatDirection(beat))
+            {
+                case BeamDirection.Up:
+                    return BeamDirection.Down;
+                case BeamDirection.Down:
+                default:
+                    return BeamDirection.Up;
+            }
         }
 
         protected override float GetStartY(BarRendererBase noteRenderer, BeamDirection direction)

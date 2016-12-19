@@ -12625,7 +12625,14 @@ AlphaTab.Rendering.Glyphs.ScoreLegatoGlyph.prototype = {
         if (beat.get_IsRest()){
             return AlphaTab.Rendering.Utils.BeamDirection.Up;
         }
-        return (noteRenderer).GetBeatDirection(beat);
+        // invert direction (if stems go up, ties go down to not cross them)
+        switch ((noteRenderer).GetBeatDirection(beat)){
+            case AlphaTab.Rendering.Utils.BeamDirection.Up:
+                return AlphaTab.Rendering.Utils.BeamDirection.Down;
+            case AlphaTab.Rendering.Utils.BeamDirection.Down:
+            default:
+                return AlphaTab.Rendering.Utils.BeamDirection.Up;
+        }
     },
     GetStartY: function (noteRenderer, direction){
         if (this.StartBeat.get_IsRest()){
@@ -12756,10 +12763,25 @@ AlphaTab.Rendering.ScoreBeatContainerGlyph.prototype = {
     DoLayout: function (){
         AlphaTab.Rendering.Glyphs.BeatContainerGlyph.prototype.DoLayout.call(this);
         if (this.Beat.IsLegatoOrigin){
-            this.Ties.push(new AlphaTab.Rendering.Glyphs.ScoreLegatoGlyph(this.Beat, this.Beat.NextBeat, false));
+            // only create slur for very first origin of "group"
+            if (this.Beat.PreviousBeat == null || !this.Beat.PreviousBeat.IsLegatoOrigin){
+                // tie with end beat
+                var destination = this.Beat.NextBeat;
+                while (destination.NextBeat != null && destination.NextBeat.get_IsLegatoDestination()){
+                    destination = destination.NextBeat;
+                }
+                this.Ties.push(new AlphaTab.Rendering.Glyphs.ScoreLegatoGlyph(this.Beat, destination, false));
+            }
         }
-        if (this.Beat.get_IsLegatoDestination()){
-            this.Ties.push(new AlphaTab.Rendering.Glyphs.ScoreLegatoGlyph(this.Beat.PreviousBeat, this.Beat, true));
+        else if (this.Beat.get_IsLegatoDestination()){
+            // only create slur for last destination of "group"
+            if (!this.Beat.IsLegatoOrigin){
+                var origin = this.Beat.PreviousBeat;
+                while (origin.PreviousBeat != null && origin.PreviousBeat.IsLegatoOrigin){
+                    origin = origin.PreviousBeat;
+                }
+                this.Ties.push(new AlphaTab.Rendering.Glyphs.ScoreLegatoGlyph(origin, this.Beat, true));
+            }
         }
     },
     CreateTies: function (n){

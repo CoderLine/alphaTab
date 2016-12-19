@@ -31,11 +31,30 @@ namespace AlphaTab.Rendering
             base.DoLayout();
             if (Beat.IsLegatoOrigin)
             {
-                Ties.Add(new ScoreLegatoGlyph(Beat, Beat.NextBeat));
+                // only create slur for very first origin of "group"
+                if (Beat.PreviousBeat == null || !Beat.PreviousBeat.IsLegatoOrigin)
+                {
+                    // tie with end beat
+                    Beat destination = Beat.NextBeat;
+                    while (destination.NextBeat != null && destination.NextBeat.IsLegatoDestination)
+                    {
+                        destination = destination.NextBeat;
+                    }
+                    Ties.Add(new ScoreLegatoGlyph(Beat, destination));
+                }
             }
-            if (Beat.IsLegatoDestination)
+            else if (Beat.IsLegatoDestination)
             {
-                Ties.Add(new ScoreLegatoGlyph(Beat.PreviousBeat, Beat, true));
+                // only create slur for last destination of "group"
+                if (!Beat.IsLegatoOrigin)
+                {
+                    Beat origin = Beat.PreviousBeat;
+                    while (origin.PreviousBeat != null && origin.PreviousBeat.IsLegatoOrigin)
+                    {
+                        origin = origin.PreviousBeat;
+                    }
+                    Ties.Add(new ScoreLegatoGlyph(origin, Beat, true));
+                }
             }
         }
 
