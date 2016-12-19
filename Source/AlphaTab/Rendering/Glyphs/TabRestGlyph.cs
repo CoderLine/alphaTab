@@ -9,7 +9,7 @@ namespace AlphaTab.Rendering.Glyphs
         public BeamingHelper BeamingHelper { get; set; }
 
         public TabRestGlyph()
-            : base(0, 0, 0, false)
+            : base(0, 0, 0)
         {
         }
 

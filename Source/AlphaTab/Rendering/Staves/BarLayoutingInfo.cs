@@ -111,7 +111,7 @@ namespace AlphaTab.Rendering.Staves
         public FastDictionary<int, Spring> Springs { get; set; }
         public int SmallestDuration { get; set; }
 
-        public Spring AddSpring(int start, int duration, float springSize, float preSpringSize, float postSpringSize)
+        public Spring AddSpring(int start, int duration, float springSize, float preSpringSize)
         {
             Spring spring;
             if (!Springs.ContainsKey(start))
@@ -122,7 +122,6 @@ namespace AlphaTab.Rendering.Staves
                 spring.LongestDuration = duration;
                 spring.SpringWidth = springSize;
                 spring.PreSpringWidth = preSpringSize;
-                spring.PostSpringWidth = postSpringSize;
                 Springs[start] = spring;
             }
             else
@@ -135,10 +134,6 @@ namespace AlphaTab.Rendering.Staves
                 if (spring.PreSpringWidth < preSpringSize)
                 {
                     spring.PreSpringWidth = preSpringSize;
-                }
-                if (spring.PostSpringWidth < postSpringSize)
-                {
-                    spring.PostSpringWidth = postSpringSize;
                 }
                 if (duration < spring.SmallestDuration)
                 {
@@ -158,9 +153,9 @@ namespace AlphaTab.Rendering.Staves
             return spring;
         }
 
-        public Spring AddBeatSpring(Beat beat, float beatSize, float preBeatSize, float postBeatSize)
+        public Spring AddBeatSpring(Beat beat, float beatSize, float preBeatSize)
         {
-            return AddSpring(beat.AbsoluteStart, beat.CalculateDuration(), beatSize, preBeatSize, postBeatSize);
+            return AddSpring(beat.AbsoluteStart, beat.CalculateDuration(), beatSize, preBeatSize);
         }
 
         public void Finish()
@@ -211,11 +206,16 @@ namespace AlphaTab.Rendering.Staves
                 }
 
                 currentSpring.SpringConstant = CalculateSpringConstant(currentSpring, duration);
-
                 totalSpringConstant += 1 / currentSpring.SpringConstant;
             }
-
             TotalSpringConstant = 1 / totalSpringConstant;
+
+            // calculate the force required to have at least the minimum size. 
+            for (int i = 0; i < sortedSprings.Count; i++)
+            {
+                var force = sortedSprings[i].SpringWidth * sortedSprings[i].SpringConstant;
+                UpdateMinStretchForce(force);
+            }
         }
 
         private float CalculateSpringConstant(Spring spring, float duration)
@@ -280,11 +280,9 @@ namespace AlphaTab.Rendering.Staves
         public int SmallestDuration { get; set; }
 
         public float Force { get; set; }
-        public float Width { get; set; }
         public float SpringConstant { get; set; }
 
         public float SpringWidth { get; set; }
         public float PreSpringWidth { get; set; }
-        public float PostSpringWidth { get; set; }
     }
 }

@@ -192,7 +192,7 @@ namespace AlphaTab.Rendering
         {
             var beat = h.Beats[0];
 
-            if (beat.Duration == Duration.Whole)
+            if (beat.Duration == Duration.Whole || beat.Duration == Duration.DoubleWhole)
             {
                 return;
             }

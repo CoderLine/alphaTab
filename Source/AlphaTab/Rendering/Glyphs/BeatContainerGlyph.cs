@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -54,8 +55,7 @@ namespace AlphaTab.Rendering.Glyphs
         public void RegisterLayoutingInfo(BarLayoutingInfo layoutings)
         {
             var preBeatStretch = PreNotes.Width + OnNotes.Width / 2;
-            var postBeatStretch = OnNotes.Width / 2;
-            layoutings.AddBeatSpring(Beat, MinWidth, preBeatStretch, postBeatStretch);
+            layoutings.AddBeatSpring(Beat, MinWidth, preBeatStretch);
             // store sizes for special renderers like the EffectBarRenderer
             layoutings.SetPreBeatSize(Beat, PreNotes.Width);
             layoutings.SetOnBeatSize(Beat, OnNotes.Width);
@@ -90,6 +90,30 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             MinWidth = PreNotes.Width + OnNotes.Width;
+            if (!Beat.IsRest)
+            {
+                if (OnNotes.BeamingHelper.Beats.Count == 1)
+                {
+                    // make space for footer 
+                    if (Beat.Duration >= Duration.Eighth)
+                    {
+                        MinWidth += 20 * Scale;
+                    }
+                }
+                else
+                {
+                    // ensure some space for small notes
+                    switch (Beat.Duration)
+                    {
+                        case Duration.OneHundredTwentyEighth:
+                        case Duration.TwoHundredFiftySixth:
+                            MinWidth += 10 * Scale;
+                            break;
+                    }
+                }
+            }
+
+
             Width = MinWidth;
             OnTimeX = OnNotes.X + OnNotes.Width / 2;
         }
@@ -117,7 +141,7 @@ namespace AlphaTab.Rendering.Glyphs
             //if (Beat.Voice.Index == 0)
             //{
             //    canvas.Color = new Color(200, 200, 0, 100);
-            //    canvas.StrokeRect(cx + X, cy + Y + PreNotes.Y - 10, Width, 10);
+            //    canvas.StrokeRect(cx + X, cy + Y + PreNotes.Y + 30, Width, 10);
             //}
 
             PreNotes.Paint(cx + X, cy + Y, canvas);

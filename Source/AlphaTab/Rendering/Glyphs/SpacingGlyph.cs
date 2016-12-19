@@ -22,14 +22,10 @@ namespace AlphaTab.Rendering.Glyphs
     /// </summary>
     public class SpacingGlyph : Glyph
     {
-        private readonly bool _scaling;
-
-        public SpacingGlyph(float x, float y, float width, bool scaling = true)
+        public SpacingGlyph(float x, float y, float width)
             : base(x, y)
         {
-            _scaling = scaling;
             Width = width;
-            _scaling = scaling;
         }
     }
 }

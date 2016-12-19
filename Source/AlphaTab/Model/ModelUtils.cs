@@ -26,6 +26,10 @@ namespace AlphaTab.Model
         {
             var index = 0;
             var value = (int) duration;
+            if (value < 0)
+            {
+                return index;
+            }
             while ((value = (value >> 1)) > 0)
             {
                 index++;

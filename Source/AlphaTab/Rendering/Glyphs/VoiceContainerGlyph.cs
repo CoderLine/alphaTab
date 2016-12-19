@@ -16,10 +16,10 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering.Glyphs
@@ -93,7 +93,7 @@ namespace AlphaTab.Rendering.Glyphs
                 var b = BeatGlyphs[i];
                 b.ApplyLayoutingInfo(info);
             }
-            ScaleToForce(Renderer.Settings.StretchForce);
+            ScaleToForce(Math.Max(Renderer.Settings.StretchForce, info.MinStretchForce));
         }
 
         public override void AddGlyph(Glyph g)

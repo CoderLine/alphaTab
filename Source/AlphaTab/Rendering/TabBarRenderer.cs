@@ -29,8 +29,6 @@ namespace AlphaTab.Rendering
     {
         public const float LineSpacing = 10;
 
-        private BarHelpers _helpers;
-
         public TabBarRenderer(Bar bar)
             : base(bar)
         {
@@ -66,7 +64,6 @@ namespace AlphaTab.Rendering
 
         public override void DoLayout()
         {
-            _helpers = Staff.StaveGroup.Helpers.Helpers[Bar.Staff.Track.Index][Bar.Staff.Index][Bar.Index];
             var res = Resources;
             var numberOverflow = (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2f);
             TopPadding = numberOverflow;
@@ -99,7 +96,7 @@ namespace AlphaTab.Rendering
 
             if (Bar.IsEmpty)
             {
-                AddPreBeatGlyph(new SpacingGlyph(0, 0, 30 * Scale, false));
+                AddPreBeatGlyph(new SpacingGlyph(0, 0, 30 * Scale));
             }
         }
 
@@ -119,14 +116,13 @@ namespace AlphaTab.Rendering
                 var container = new TabBeatContainerGlyph(b, GetOrCreateVoiceContainer(v));
                 container.PreNotes = new TabBeatPreNotesGlyph();
                 container.OnNotes = new TabBeatGlyph();
-                container.OnNotes.Renderer = this;
-                container.OnNotes.BeamingHelper = _helpers.BeamHelperLookup[v.Index][b.Index];
                 AddBeatGlyph(container);
             }
         }
 
         protected override void CreatePostBeatGlyphs()
         {
+            base.CreatePostBeatGlyphs();
             if (Bar.MasterBar.IsRepeatEnd)
             {
                 AddPostBeatGlyph(new RepeatCloseGlyph(X, 0));
@@ -139,7 +135,7 @@ namespace AlphaTab.Rendering
             else if (Bar.MasterBar.IsDoubleBar)
             {
                 AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
-                AddPostBeatGlyph(new SpacingGlyph(0, 0, 3 * Scale, false));
+                AddPostBeatGlyph(new SpacingGlyph(0, 0, 3 * Scale));
                 AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
             }
             else if (Bar.NextBar == null || !Bar.NextBar.MasterBar.IsRepeatStart)
