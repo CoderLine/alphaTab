@@ -78,7 +78,7 @@ namespace AlphaTab.Rendering
             if (Index == 0)
             {
                 Staff.RegisterStaveTop(TopOverflow);
-                Staff.RegisterStaveBottom(Height - BottomOverflow);
+                Staff.RegisterStaveBottom(Height - BottomPadding);
             }
         }
 

@@ -68,7 +68,12 @@ namespace AlphaTab.Rendering
             ScoreBeatGlyph g = (ScoreBeatGlyph)GetOnNotesGlyphForBeat(note.Beat);
             if (g != null)
             {
-                return g.Container.X + g.Container.OnTimeX;
+                var x = g.Container.VoiceContainer.X + g.Container.X + g.X;
+                if (onEnd)
+                {
+                    x += g.Width;
+                }
+                return x;
             }
             return 0;
         }
@@ -379,7 +384,7 @@ namespace AlphaTab.Rendering
 
                 var brokenBarOffset = 6 * Scale * scaleMod;
                 var barSpacing = 6 * Scale * scaleMod;
-                var barSize = 3 * Scale * scaleMod;
+                var barSize = LineSpacing / 2 * Scale * scaleMod;
                 var barCount = beat.Duration.GetIndex() - 2;
                 var barStart = cy + Y;
                 if (direction == BeamDirection.Down)

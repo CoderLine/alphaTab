@@ -159,7 +159,7 @@ namespace AlphaTab.Rendering.Glyphs
                     s = "full";
                     dV -= 4;
                 }
-                else if (dV >= 4)
+                else if (dV >= 4 || dV <= -4)
                 {
                     int steps = dV / 4;
                     s += steps;
@@ -190,7 +190,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
         }
 
-        private string GetFractionSign(int steps)
+        public static string GetFractionSign(int steps)
         {
             switch (steps)
             {

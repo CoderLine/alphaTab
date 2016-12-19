@@ -43,7 +43,7 @@ namespace AlphaTab.Collections
 
         public void AppendLine(string s = "")
         {
-            _sb.Append("s").Append("\r\n");
+            _sb.Append(s).Append("\r\n");
         }
 
         public override string ToString()

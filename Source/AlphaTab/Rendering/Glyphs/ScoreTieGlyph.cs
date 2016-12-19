@@ -25,8 +25,8 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly Note _startNote;
         private readonly Note _endNote;
 
-        public ScoreTieGlyph(Note startNote, Note endNote, Glyph parent, bool forEnd = false)
-            : base(startNote == null ? null : startNote.Beat, endNote == null ? null : endNote.Beat, parent, forEnd)
+        public ScoreTieGlyph(Note startNote, Note endNote, bool forEnd = false)
+            : base(startNote == null ? null : startNote.Beat, endNote == null ? null : endNote.Beat, forEnd)
         {
             _startNote = startNote;
             _endNote = endNote;
@@ -60,7 +60,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         protected override float GetEndX(BarRendererBase noteRenderer)
         {
-            return noteRenderer.GetNoteX(_endNote);
+            return noteRenderer.GetNoteX(_endNote, false);
         }
     }
 }

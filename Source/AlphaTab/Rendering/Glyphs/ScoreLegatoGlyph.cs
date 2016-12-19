@@ -6,8 +6,8 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class ScoreLegatoGlyph : TieGlyph
     {
-        public ScoreLegatoGlyph(Beat startBeat, Beat endBeat, Glyph parent, bool forEnd = false)
-            : base(startBeat, endBeat, parent, forEnd)
+        public ScoreLegatoGlyph(Beat startBeat, Beat endBeat, bool forEnd = false)
+            : base(startBeat, endBeat, forEnd)
         {
         }
 
@@ -87,7 +87,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
             else
             {
-                return noteRenderer.GetNoteX(EndBeat.MinNote);
+                return noteRenderer.GetNoteX(EndBeat.MinNote, false);
             }
         }
 

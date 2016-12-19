@@ -98,8 +98,11 @@ namespace AlphaTab.Platform.Svg
             Buffer.Append(h);
             Buffer.Append("\" style=\"stroke:");
             Buffer.Append(Color.RGBA);
-            Buffer.Append("; stroke-width:");
-            Buffer.Append(LineWidth);
+            if (LineWidth != 1)
+            {
+                Buffer.Append("; stroke-width:");
+                Buffer.Append(LineWidth);
+            }
             Buffer.Append("; fill:transparent");
             Buffer.Append(";\" />\n");
         }
@@ -207,8 +210,11 @@ namespace AlphaTab.Platform.Svg
                 Buffer.Append(_currentPath.ToString());
                 Buffer.Append("\" style=\"stroke:");
                 Buffer.Append(Color.RGBA);
-                Buffer.Append("; stroke-width:");
-                Buffer.Append(LineWidth);
+                if (LineWidth != 1)
+                {
+                    Buffer.Append("; stroke-width:");
+                    Buffer.Append(LineWidth);
+                }
                 Buffer.Append(";\" fill=\"none\" />\n");
             }
             _currentPath = new StringBuilder();

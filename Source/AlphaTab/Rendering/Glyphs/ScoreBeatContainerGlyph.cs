@@ -31,11 +31,11 @@ namespace AlphaTab.Rendering
             base.DoLayout();
             if (Beat.IsLegatoOrigin)
             {
-                Ties.Add(new ScoreLegatoGlyph(Beat, Beat.NextBeat, this));
+                Ties.Add(new ScoreLegatoGlyph(Beat, Beat.NextBeat));
             }
             if (Beat.IsLegatoDestination)
             {
-                Ties.Add(new ScoreLegatoGlyph(Beat.PreviousBeat, Beat, this, true));
+                Ties.Add(new ScoreLegatoGlyph(Beat.PreviousBeat, Beat, true));
             }
         }
 
@@ -47,22 +47,22 @@ namespace AlphaTab.Rendering
             // the two notes
             if (n.IsTieOrigin) 
             {
-                var tie = new ScoreTieGlyph(n, n.TieDestination, this);
+                var tie = new ScoreTieGlyph(n, n.TieDestination);
                 Ties.Add(tie);
             }
             if (n.IsTieDestination)
             {
-                var tie = new ScoreTieGlyph(n.TieOrigin, n, this, true);
+                var tie = new ScoreTieGlyph(n.TieOrigin, n, true);
                 Ties.Add(tie);
             }
             else if (n.IsHammerPullOrigin)
             {
-                var tie = new ScoreTieGlyph(n, n.HammerPullDestination, this);
+                var tie = new ScoreTieGlyph(n, n.HammerPullDestination);
                 Ties.Add(tie);
             }
             else if (n.SlideType == SlideType.Legato)
             {
-                var tie = new ScoreTieGlyph(n, n.SlideTarget, this);
+                var tie = new ScoreTieGlyph(n, n.SlideTarget);
                 Ties.Add(tie);
             }
 

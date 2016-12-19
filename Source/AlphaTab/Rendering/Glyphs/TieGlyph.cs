@@ -26,16 +26,14 @@ namespace AlphaTab.Rendering.Glyphs
     {
         protected Beat StartBeat;
         protected Beat EndBeat;
-        protected Glyph Parent;
         protected float YOffset;
         private readonly bool _forEnd;
 
-        public TieGlyph(Beat startBeat, Beat endBeat, Glyph parent, bool forEnd)
+        public TieGlyph(Beat startBeat, Beat endBeat, bool forEnd)
             : base(0, 0)
         {
             StartBeat = startBeat;
             EndBeat = endBeat;
-            Parent = parent;
             _forEnd = forEnd;
         }
 
@@ -60,7 +58,6 @@ namespace AlphaTab.Rendering.Glyphs
             float endY = 0;
 
             var shouldDraw = false;
-            var parent = (BeatContainerGlyph)Parent;
 
             var direction = GetBeamDirection(StartBeat, startNoteRenderer);
             // if we are on the tie start, we check if we 
@@ -70,29 +67,29 @@ namespace AlphaTab.Rendering.Glyphs
                 // line break or bar break
                 if (startNoteRenderer != endNoteRenderer)
                 {
-                    startX = cx + GetStartX(startNoteRenderer);
-                    startY = cy + GetStartY(startNoteRenderer, direction) + YOffset;
-                    
+                    startX = cx + startNoteRenderer.X + GetStartX(startNoteRenderer);
+                    startY = cy + startNoteRenderer.Y + GetStartY(startNoteRenderer, direction) + YOffset;
+
                     // line break: to bar end
                     if (endNoteRenderer == null || startNoteRenderer.Staff != endNoteRenderer.Staff)
                     {
-                        endX = cx + parent.X;
+                        endX = cx + startNoteRenderer.X + startNoteRenderer.Width;
                         endY = startY;
                     }
                     // bar break: to tie destination 
                     // differs only by addition of EndNote X coordinate
                     else
                     {
-                        endX = cx + parent.X + GetEndX(endNoteRenderer);
-                        endY = cy + GetEndY(endNoteRenderer, direction) + YOffset;
+                        endX = cx + endNoteRenderer.X + GetEndX(endNoteRenderer);
+                        endY = cy + endNoteRenderer.Y + GetEndY(endNoteRenderer, direction) + YOffset;
                     }
                 }
                 else
                 {
-                    startX = cx + GetStartX(startNoteRenderer);
-                    endX = cx + GetEndX(endNoteRenderer);
-                    startY = cy + GetStartY(startNoteRenderer, direction) + YOffset;
-                    endY = cy + GetEndY(endNoteRenderer, direction) + YOffset;
+                    startX = cx + startNoteRenderer.X + GetStartX(startNoteRenderer);
+                    endX = cx + endNoteRenderer.X + GetEndX(endNoteRenderer);
+                    startY = cy + startNoteRenderer.Y + GetStartY(startNoteRenderer, direction) + YOffset;
+                    endY = cy + endNoteRenderer.Y + GetEndY(endNoteRenderer, direction) + YOffset;
                 }
                 shouldDraw = true;
             }
@@ -100,10 +97,10 @@ namespace AlphaTab.Rendering.Glyphs
             // in this case there will be a tie from bar start to the note
             else if (startNoteRenderer.Staff != endNoteRenderer.Staff)
             {
-                startX = cx;
-                endX = cx + GetEndX(endNoteRenderer);
+                startX = cx + endNoteRenderer.X;
+                endX = cx + endNoteRenderer.X + GetEndX(endNoteRenderer);
 
-                startY = cy + GetEndY(endNoteRenderer, direction) + YOffset;
+                startY = cy + endNoteRenderer.Y + GetEndY(endNoteRenderer, direction) + YOffset;
                 endY = startY;
 
                 shouldDraw = true;
@@ -156,8 +153,12 @@ namespace AlphaTab.Rendering.Glyphs
         public static void PaintTie(ICanvas canvas, float scale, float x1, float y1, float x2, float y2,
             bool down = false)
         {
+            if (x1 == x2 && y1 == y2)
+            {
+                return;
+            }
             // ensure endX > startX
-            if (x2 > x1)
+            if (x2 < x1)
             {
                 var t = x1;
                 x1 = x2;
@@ -169,8 +170,9 @@ namespace AlphaTab.Rendering.Glyphs
             //
             // calculate control points 
             //
+
             var offset = 15 * scale;
-            var size = 4 * scale;
+            var size = 6 * scale;
             // normal vector
             var normalVectorX = (y2 - y1);
             var normalVectorY = (x2 - x1);
@@ -193,6 +195,8 @@ namespace AlphaTab.Rendering.Glyphs
             var cp1Y = centerY + (offset * normalVectorY);
             var cp2X = centerX + ((offset - size) * normalVectorX);
             var cp2Y = centerY + ((offset - size) * normalVectorY);
+
+
             canvas.BeginPath();
             canvas.MoveTo(x1, y1);
             canvas.QuadraticCurveTo(cp1X, cp1Y, x2, y2);

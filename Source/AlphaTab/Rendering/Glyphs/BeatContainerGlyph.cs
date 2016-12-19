@@ -120,7 +120,6 @@ namespace AlphaTab.Rendering.Glyphs
             //    canvas.StrokeRect(cx + X, cy + Y + PreNotes.Y - 10, Width, 10);
             //}
 
-
             PreNotes.Paint(cx + X, cy + Y, canvas);
             //if (Beat.Voice.Index == 0)
             //{
@@ -134,11 +133,16 @@ namespace AlphaTab.Rendering.Glyphs
             //    canvas.StrokeRect(cx + X + OnNotes.X, cy + Y + OnNotes.Y + 10, OnNotes.Width, 10);
             //}
 
+            // paint the ties relative to the whole staff, 
+            // reason: we have possibly multiple staves involved and need to calculate the correct positions.
+            var staffX = cx - VoiceContainer.X - Renderer.X;
+            var staffY = cy - VoiceContainer.Y - Renderer.Y;
+
             for (int i = 0, j = Ties.Count; i < j; i++)
             {
                 var t = Ties[i];
                 t.Renderer = Renderer;
-                t.Paint(cx, cy + Y, canvas);
+                t.Paint(staffX, staffY, canvas);
             }
         }
 
