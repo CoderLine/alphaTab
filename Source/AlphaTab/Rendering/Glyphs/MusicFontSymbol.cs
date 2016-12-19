@@ -26,6 +26,8 @@ namespace AlphaTab.Rendering.Glyphs
         ClefF = 0xE062,
         ClefNeutral = 0xE069,
 
+        RestQuadrupleWhole = 0xE4E1,
+        RestDoubleWhole = 0xE4E2,
         RestWhole = 0xE4E3,
         RestHalf = 0xE4E4,
         RestQuarter = 0xE4E5,
@@ -33,6 +35,8 @@ namespace AlphaTab.Rendering.Glyphs
         RestSixteenth = 0xE4E7,
         RestThirtySecond = 0xE4E8,
         RestSixtyFourth = 0xE4E9,
+        RestOneHundredTwentyEighth = 0xE4EA,
+        RestTwoHundredFiftySixth = 0xE4EB,
 
         GraceUp = 0xE1D7,
         GraceDown = 0xE1D8,
@@ -50,6 +54,8 @@ namespace AlphaTab.Rendering.Glyphs
         Num8 = 0xE088,
         Num9 = 0xE089,
 
+        NoteQuadrupleWhole = 0xE0A1,
+        NoteDoubleWhole = 0xE0A0,
         NoteWhole = 0xE0A2,
         NoteHalf = 0xE0A3,
         NoteQuarter = 0xE0A4,
@@ -63,12 +69,21 @@ namespace AlphaTab.Rendering.Glyphs
 
         FooterUpEighth = 0xE240,
         FooterDownEighth = 0xE241,
+
         FooterUpSixteenth = 0xE242,
         FooterDownSixteenth = 0xE243,
+
         FooterUpThirtySecond = 0xE244,
         FooterDownThirtySecond = 0xE245,
+
         FooterUpSixtyFourth = 0xE246,
         FooterDownSixtyFourth = 0xE247,
+
+        FooterUpOneHundredTwentyEighth = 0xE248,
+        FooterDownOneHundredTwentyEighth = 0xE249,
+
+        FooterUpTwoHundredFiftySixth = 0xE24A,
+        FooterDownTwoHundredFiftySixth = 0xE24B,
 
         DynamicPPP = 0xE52A,
         DynamicPP = 0xE52B,

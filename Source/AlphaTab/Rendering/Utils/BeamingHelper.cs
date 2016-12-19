@@ -76,7 +76,7 @@ namespace AlphaTab.Rendering.Utils
 
         public Voice Voice { get; set; }
         public FastList<Beat> Beats { get; set; }
-        public Duration MaxDuration { get; set; }
+        public Duration ShortestDuration { get; set; }
 
         /// <summary>
         /// the number of fingering indicators that will be drawn
@@ -127,7 +127,7 @@ namespace AlphaTab.Rendering.Utils
 
             Beats = new FastList<Beat>();
             _beatLineXPositions = new FastDictionary<int, BeatLinePositions>();
-            MaxDuration = Duration.Whole;
+            ShortestDuration = Duration.QuadrupleWhole;
         }
 
         private int GetValue(Note n)
@@ -189,7 +189,7 @@ namespace AlphaTab.Rendering.Utils
                     }
                 }
             }
-            if (Beats.Count == 1 && Beats[0].Duration == Duration.Whole)
+            if (Beats.Count == 1 && (Beats[0].Duration == Duration.Whole || Beats[0].Duration == Duration.DoubleWhole))
             {
                 return Invert(BeamDirection.Up);
             }
@@ -264,9 +264,9 @@ namespace AlphaTab.Rendering.Utils
 
                 CheckNote(beat.MinNote);
                 CheckNote(beat.MaxNote);
-                if (MaxDuration < beat.Duration)
+                if (ShortestDuration < beat.Duration)
                 {
-                    MaxDuration = beat.Duration;
+                    ShortestDuration = beat.Duration;
                 }
 
                 if (beat.HasTuplet)

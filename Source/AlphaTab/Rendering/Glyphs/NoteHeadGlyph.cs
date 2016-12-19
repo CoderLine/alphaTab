@@ -38,6 +38,12 @@ namespace AlphaTab.Rendering.Glyphs
         {
             switch (_duration)
             {
+                case Duration.QuadrupleWhole:
+                    Width = 14 * (_isGrace ? GraceScale : 1) * Scale;
+                    break;
+                case Duration.DoubleWhole:
+                    Width = 14 * (_isGrace ? GraceScale : 1) * Scale;
+                    break;
                 case Duration.Whole:
                     Width = 14 * (_isGrace ? GraceScale : 1) * Scale;
                     break;
@@ -51,6 +57,10 @@ namespace AlphaTab.Rendering.Glyphs
         {
             switch (duration)
             {
+                case Duration.QuadrupleWhole:
+                    return MusicFontSymbol.NoteQuadrupleWhole;
+                case Duration.DoubleWhole:
+                    return MusicFontSymbol.NoteDoubleWhole;
                 case Duration.Whole:
                     return MusicFontSymbol.NoteWhole;
                 case Duration.Half:

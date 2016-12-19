@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 
@@ -35,7 +37,7 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 RestGlyph.UpdateBeamingHelper(Container.X + X);
             }
-            else if(RestGlyph != null)
+            else if (RestGlyph != null)
             {
                 RestGlyph.UpdateBeamingHelper(Container.X + X);
             }
@@ -66,7 +68,7 @@ namespace AlphaTab.Rendering.Glyphs
                     //
                     if (Container.Beat.Dots > 0)
                     {
-                        AddGlyph(new SpacingGlyph(0, 0, 5 * Scale, false));
+                        AddGlyph(new SpacingGlyph(0, 0, 5 * Scale));
                         for (var i = 0; i < Container.Beat.Dots; i++)
                         {
                             var group = new GlyphGroup(0, 0);
@@ -86,6 +88,14 @@ namespace AlphaTab.Rendering.Glyphs
 
                     switch (Container.Beat.Duration)
                     {
+                        case Duration.QuadrupleWhole:
+                            line = 6;
+                            dotLine = 5;
+                            break;
+                        case Duration.DoubleWhole:
+                            line = 6;
+                            dotLine = 5;
+                            break;
                         case Duration.Whole:
                             line = 4;
                             dotLine = 5;
@@ -115,6 +125,14 @@ namespace AlphaTab.Rendering.Glyphs
                             line = 6;
                             dotLine = 3;
                             break;
+                        case Duration.OneHundredTwentyEighth:
+                            line = 6;
+                            dotLine = 3;
+                            break;
+                        case Duration.TwoHundredFiftySixth:
+                            line = 6;
+                            dotLine = 3;
+                            break;
                     }
 
                     var y = sr.GetScoreY(line, offset);
@@ -129,7 +147,7 @@ namespace AlphaTab.Rendering.Glyphs
                     //
                     if (Container.Beat.Dots > 0)
                     {
-                        AddGlyph(new SpacingGlyph(0, 0, 5 * Scale, false));
+                        AddGlyph(new SpacingGlyph(0, 0, 5 * Scale));
                         for (var i = 0; i < Container.Beat.Dots; i++)
                         {
                             var group = new GlyphGroup(0, 0);

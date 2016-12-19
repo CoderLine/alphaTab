@@ -677,28 +677,15 @@ namespace AlphaTab.Importer
             // duration specifier?
             if (_sy == AlphaTexSymbols.DoubleDot)
             {
+                _allowNegatives = true;
                 NewSy();
+                _allowNegatives = false;
                 if (_sy != AlphaTexSymbols.Number)
                 {
                     Error("duration", AlphaTexSymbols.Number);
                 }
 
-                var duration = (int)_syData;
-                switch (duration)
-                {
-                    case 1:
-                    case 2:
-                    case 4:
-                    case 8:
-                    case 16:
-                    case 32:
-                    case 64:
-                        _currentDuration = ParseDuration((int)_syData);
-                        break;
-                    default:
-                        Error("duration", AlphaTexSymbols.Number, false);
-                        break;
-                }
+                _currentDuration = ParseDuration((int)_syData);
 
                 NewSy();
                 return;
@@ -743,29 +730,15 @@ namespace AlphaTab.Importer
             // new duration
             if (_sy == AlphaTexSymbols.Dot)
             {
+                _allowNegatives = true;
                 NewSy();
+                _allowNegatives = false;
                 if (_sy != AlphaTexSymbols.Number)
                 {
                     Error("duration", AlphaTexSymbols.Number);
                 }
 
-                var duration = (int)_syData;
-                switch (duration)
-                {
-                    case 1:
-                    case 2:
-                    case 4:
-                    case 8:
-                    case 16:
-                    case 32:
-                    case 64:
-                        _currentDuration = ParseDuration((int)_syData);
-                        break;
-                    default:
-                        Error("duration", AlphaTexSymbols.Number, false);
-                        break;
-                }
-
+                _currentDuration = ParseDuration((int)_syData);
                 NewSy();
             }
             beat.Duration = _currentDuration;
@@ -1361,6 +1334,8 @@ namespace AlphaTab.Importer
         {
             switch (duration)
             {
+                case -4: return Duration.QuadrupleWhole;
+                case -2: return Duration.DoubleWhole;
                 case 1: return Duration.Whole;
                 case 2: return Duration.Half;
                 case 4: return Duration.Quarter;
@@ -1368,6 +1343,7 @@ namespace AlphaTab.Importer
                 case 16: return Duration.Sixteenth;
                 case 32: return Duration.ThirtySecond;
                 case 64: return Duration.SixtyFourth;
+                case 128: return Duration.OneHundredTwentyEighth;
                 default: return Duration.Quarter;
             }
         }

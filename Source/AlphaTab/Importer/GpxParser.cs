@@ -1335,8 +1335,12 @@ namespace AlphaTab.Importer
                         case "NoteValue":
                             switch (GetValue(c))
                             {
-                                // case "Long":
-                                // case "DoubleWhole":
+                                case "Long":
+                                    rhythm.Value = Duration.QuadrupleWhole;
+                                    break;
+                                case "DoubleWhole":
+                                    rhythm.Value = Duration.DoubleWhole;
+                                    break;
                                 case "Whole":
                                     rhythm.Value = Duration.Whole;
                                     break;
@@ -1357,8 +1361,12 @@ namespace AlphaTab.Importer
                                     break;
                                 case "64th":
                                     rhythm.Value = Duration.SixtyFourth;
-                                    // case "128th":
-                                    // case "256th":
+                                    break;
+                                case "128th":
+                                    rhythm.Value = Duration.OneHundredTwentyEighth;
+                                    break;
+                                case "256th":
+                                    rhythm.Value = Duration.TwoHundredFiftySixth;
                                     break;
                             }
                             break;

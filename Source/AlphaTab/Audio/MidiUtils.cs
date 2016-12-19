@@ -56,7 +56,12 @@ namespace AlphaTab.Audio
         /// <returns></returns>
         public static int ValueToTicks(int duration)
         {
-            return (int)(QuarterTime * (4.0 / duration));
+            float denomninator = duration;
+            if (denomninator < 0)
+            {
+                denomninator = 1 / -denomninator;
+            }
+            return (int)(QuarterTime * (4.0 / denomninator));
         }
 
         public static int ApplyDot(int ticks, bool doubleDotted)

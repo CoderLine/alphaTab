@@ -46,6 +46,8 @@ namespace AlphaTab.Rendering.Glyphs
                     case Duration.Sixteenth: return MusicFontSymbol.FooterUpSixteenth;
                     case Duration.ThirtySecond: return MusicFontSymbol.FooterUpThirtySecond;
                     case Duration.SixtyFourth: return MusicFontSymbol.FooterUpSixtyFourth;
+                    case Duration.OneHundredTwentyEighth: return MusicFontSymbol.FooterUpOneHundredTwentyEighth;
+                    case Duration.TwoHundredFiftySixth: return MusicFontSymbol.FooterUpTwoHundredFiftySixth;
                     default: return MusicFontSymbol.FooterUpEighth;
                 }
             }
@@ -61,6 +63,8 @@ namespace AlphaTab.Rendering.Glyphs
                     case Duration.Sixteenth: return MusicFontSymbol.FooterDownSixteenth;
                     case Duration.ThirtySecond: return MusicFontSymbol.FooterDownThirtySecond;
                     case Duration.SixtyFourth: return MusicFontSymbol.FooterDownSixtyFourth;
+                    case Duration.OneHundredTwentyEighth: return MusicFontSymbol.FooterDownOneHundredTwentyEighth;
+                    case Duration.TwoHundredFiftySixth: return MusicFontSymbol.FooterDownOneHundredTwentyEighth;
                     default: return MusicFontSymbol.FooterDownEighth;
                 }
             }

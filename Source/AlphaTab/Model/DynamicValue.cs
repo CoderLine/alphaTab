@@ -21,9 +21,9 @@ namespace AlphaTab.Model
     /// <summary>
     /// Lists all dynamics.
     /// </summary>
-	public enum DynamicValue
-	{
-		PPP, 
+    public enum DynamicValue
+    {
+        PPP, 
         PP, 
         P, 
         MP, 
@@ -31,6 +31,6 @@ namespace AlphaTab.Model
         F, 
         FF, 
         FFF
-	}
+    }
     // ReSharper restore InconsistentNaming
 }

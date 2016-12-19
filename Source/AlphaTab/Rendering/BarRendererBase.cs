@@ -49,6 +49,9 @@ namespace AlphaTab.Rendering
         public float TopOverflow { get; set; }
         public float BottomOverflow { get; set; }
 
+        public BarHelpers Helpers { get; set; }
+
+
         public Bar Bar { get; set; }
 
         /// <summary>
@@ -232,6 +235,8 @@ namespace AlphaTab.Rendering
 
         public virtual void DoLayout()
         {
+            Helpers = Staff.StaveGroup.Helpers.Helpers[Bar.Staff.Track.Index][Bar.Staff.Index][Bar.Index];
+
             for (int i = 0; i < Bar.Voices.Count; i++)
             {
                 var voice = Bar.Voices[i];
@@ -270,6 +275,10 @@ namespace AlphaTab.Rendering
 
         protected void AddBeatGlyph(BeatContainerGlyph g)
         {
+            g.Renderer = this;
+            g.PreNotes.Renderer = this;
+            g.OnNotes.Renderer = this;
+            g.OnNotes.BeamingHelper = Helpers.BeamHelperLookup[g.Beat.Voice.Index][g.Beat.Index];
             GetOrCreateVoiceContainer(g.Beat.Voice).AddGlyph(g);
         }
 
@@ -395,7 +404,7 @@ namespace AlphaTab.Rendering
 
         protected virtual void CreatePostBeatGlyphs()
         {
-
+            AddPostBeatGlyph(new SpacingGlyph(0, 0, 5 * Scale));
         }
 
         public float BeatGlyphsStart

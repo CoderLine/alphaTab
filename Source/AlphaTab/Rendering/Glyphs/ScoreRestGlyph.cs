@@ -36,6 +36,10 @@ namespace AlphaTab.Rendering.Glyphs
         {
             switch (duration)
             {
+                case Duration.QuadrupleWhole:
+                    return MusicFontSymbol.RestQuadrupleWhole;
+                case Duration.DoubleWhole:
+                    return MusicFontSymbol.RestDoubleWhole;
                 case Duration.Whole:
                     return MusicFontSymbol.RestWhole;
                 case Duration.Half:
@@ -50,6 +54,10 @@ namespace AlphaTab.Rendering.Glyphs
                     return MusicFontSymbol.RestThirtySecond;
                 case Duration.SixtyFourth:
                     return MusicFontSymbol.RestSixtyFourth;
+                case Duration.OneHundredTwentyEighth:
+                    return MusicFontSymbol.RestOneHundredTwentyEighth;
+                case Duration.TwoHundredFiftySixth:
+                    return MusicFontSymbol.RestTwoHundredFiftySixth;
                 default:
                     return MusicFontSymbol.None;
             }
@@ -59,6 +67,8 @@ namespace AlphaTab.Rendering.Glyphs
         {
             switch (_duration)
             {
+                case Duration.QuadrupleWhole:
+                case Duration.DoubleWhole:
                 case Duration.Whole:
                 case Duration.Half:
                 case Duration.Quarter:
@@ -71,6 +81,10 @@ namespace AlphaTab.Rendering.Glyphs
                     break;
                 case Duration.SixtyFourth:
                     Width = 14 * Scale;
+                    break;
+                case Duration.OneHundredTwentyEighth:
+                case Duration.TwoHundredFiftySixth:
+                    Width = 20 * Scale;
                     break;
             }
         }

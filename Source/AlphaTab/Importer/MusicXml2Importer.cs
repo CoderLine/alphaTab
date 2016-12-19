@@ -224,14 +224,18 @@ namespace AlphaTab.Importer
                         case "type":
                             switch (Std.GetNodeValue(c))
                             {
-                                //case "256th":
-                                //    break;
-                                //case "128th":
-                                //    break;
-                                //case "breve":
-                                //    break;
-                                //case "long":
-                                //    break;
+                                case "256th":
+                                    beat.Duration = Duration.TwoHundredFiftySixth;
+                                    break;
+                                case "128th":
+                                    beat.Duration = Duration.OneHundredTwentyEighth;
+                                    break;
+                                case "breve":
+                                    beat.Duration = Duration.DoubleWhole;
+                                    break;
+                                case "long":
+                                    beat.Duration = Duration.QuadrupleWhole;
+                                    break;
                                 case "64th":
                                     beat.Duration = Duration.SixtyFourth;
                                     break;

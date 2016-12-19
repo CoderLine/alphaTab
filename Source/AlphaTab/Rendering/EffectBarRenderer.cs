@@ -20,6 +20,7 @@ using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Layout;
+using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering
 {
@@ -193,11 +194,6 @@ namespace AlphaTab.Rendering
             }
 
             return null;
-        }
-
-        protected override void CreatePostBeatGlyphs()
-        {
-
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
