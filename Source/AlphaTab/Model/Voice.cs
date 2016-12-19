@@ -59,33 +59,24 @@ namespace AlphaTab.Model
         private void Chain(Beat beat)
         {
             if (Bar == null) return;
-            if (Bar.Index == 0 && beat.Index == 0)
+
+            if (beat.Index < Beats.Count - 1)
             {
-                // very first beat
-                beat.PreviousBeat = null; 
+                beat.NextBeat = Beats[beat.Index + 1];
+                beat.NextBeat.PreviousBeat = beat;
             }
-            else if (beat.Index == 0)
+            else if (beat.Index == beat.Voice.Beats.Count - 1 && beat.Voice.Bar.NextBar != null)
             {
-                // first beat of bar
-                if (Index < Bar.PreviousBar.Voices.Count)
+                var nextVoice = Bar.NextBar.Voices[Index];
+                if (nextVoice.Beats.Count > 0)
                 {
-                    var previousVoice = Bar.PreviousBar.Voices[Index];
-                    if (previousVoice.Beats.Count > 0)
-                    {
-                        beat.PreviousBeat = previousVoice.Beats[previousVoice.Beats.Count - 1];
-                        beat.PreviousBeat.NextBeat = beat;
-                    }
-                    else
-                    {
-                        beat.PreviousBeat = null;
-                    }
+                    beat.NextBeat = nextVoice.Beats[0];
+                    beat.NextBeat.PreviousBeat = beat;
                 }
-            }
-            else
-            {
-                // other beats of bar
-                beat.PreviousBeat = Beats[beat.Index - 1];
-                beat.PreviousBeat.NextBeat = beat;
+                else
+                {
+                    beat.NextBeat.PreviousBeat = beat;
+                }
             }
         }
 

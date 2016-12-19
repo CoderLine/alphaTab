@@ -24,12 +24,19 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly Note _startNote;
         private readonly Note _endNote;
+        private readonly bool _forSlide;
 
-        public TabTieGlyph(Note startNote, Note endNote, bool forEnd = false)
+        public TabTieGlyph(Note startNote, Note endNote, bool forSlide, bool forEnd = false)
             : base(startNote.Beat, endNote.Beat, forEnd)
         {
             _startNote = startNote;
             _endNote = endNote;
+            _forSlide = forSlide;
+        }
+
+        private float Offset
+        {
+            get { return _forSlide ? 5 * Scale : 0; }
         }
 
         protected override BeamDirection GetBeamDirection(Beat beat, BarRendererBase noteRenderer)
@@ -41,12 +48,12 @@ namespace AlphaTab.Rendering.Glyphs
 
         protected override float GetStartY(BarRendererBase noteRenderer, BeamDirection direction)
         {
-            return noteRenderer.GetNoteY(_startNote) - 5 * Scale;
+            return noteRenderer.GetNoteY(_startNote) - Offset;
         }
 
         protected override float GetEndY(BarRendererBase noteRenderer, BeamDirection direction)
         {
-            return noteRenderer.GetNoteY(_endNote) - 5 * Scale;
+            return noteRenderer.GetNoteY(_endNote) - Offset;
         }
 
         protected override float GetStartX(BarRendererBase noteRenderer)

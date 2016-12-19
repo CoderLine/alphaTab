@@ -710,7 +710,7 @@ namespace AlphaTab.Rendering
             }
 
             // Key signature
-            if ((Bar.PreviousBar == null && Bar.MasterBar.KeySignature != 0) || (Bar.PreviousBar != null && Bar.MasterBar.KeySignature != Bar.PreviousBar.MasterBar.KeySignature))
+            if ((Index == 0 && Bar.MasterBar.KeySignature != 0) || (Bar.PreviousBar != null && Bar.MasterBar.KeySignature != Bar.PreviousBar.MasterBar.KeySignature))
             {
                 CreateStartSpacing();
                 CreateKeySignatureGlyphs();

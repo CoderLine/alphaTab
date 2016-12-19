@@ -57,8 +57,33 @@ namespace AlphaTab.Rendering
             }
             else if (n.IsHammerPullOrigin)
             {
-                var tie = new ScoreTieGlyph(n, n.HammerPullDestination);
-                Ties.Add(tie);
+                // only create tie for very first origin of "group"
+                if (n.HammerPullOrigin == null)
+                {
+                    // tie with end note
+                    Note destination = n.HammerPullDestination;
+                    while (destination.HammerPullDestination != null)
+                    {
+                        destination = destination.HammerPullDestination;
+                    }
+                    var tie = new ScoreTieGlyph(n, destination);
+                    Ties.Add(tie);
+                }
+            }
+            else if (n.IsHammerPullDestination)
+            {
+                // only create tie for last destination of "group"
+                // NOTE: HOPOs over more than 2 staffs does not work with this mechanism, but this sounds unrealistic
+                if (n.HammerPullDestination == null)
+                {
+                    Note origin = n.HammerPullOrigin;
+                    while (origin.HammerPullOrigin != null)
+                    {
+                        origin = origin.HammerPullOrigin;
+                    }
+                    var tie = new ScoreTieGlyph(origin, n, true);
+                    Ties.Add(tie);
+                }
             }
             else if (n.SlideType == SlideType.Legato)
             {

@@ -171,8 +171,8 @@ namespace AlphaTab.Rendering.Glyphs
             // calculate control points 
             //
 
-            var offset = 15 * scale;
-            var size = 6 * scale;
+            var offset = 22 * scale;
+            var size = 4 * scale;
             // normal vector
             var normalVectorX = (y2 - y1);
             var normalVectorY = (x2 - x1);

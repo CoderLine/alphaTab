@@ -114,6 +114,7 @@ namespace AlphaTab.Model
         #endregion
 
         public bool IsHammerPullOrigin { get; set; }
+        public bool IsHammerPullDestination { get { return HammerPullOrigin != null; } }
         public Note HammerPullOrigin { get; set; }
         public Note HammerPullDestination { get; set; }
 
