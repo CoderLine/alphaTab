@@ -42,6 +42,8 @@ namespace AlphaTab.Rendering.Glyphs
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var r = (TabBarRenderer)Renderer;
+            cx += r.X;
+            cy += r.Y;
 
             var sizeX = 12 * Scale;
             var sizeY = 3 * Scale;

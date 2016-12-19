@@ -41,12 +41,12 @@ namespace AlphaTab.Rendering.Glyphs
 
         protected override float GetStartY(BarRendererBase noteRenderer, BeamDirection direction)
         {
-            return noteRenderer.GetNoteY(_startNote);
+            return noteRenderer.GetNoteY(_startNote) - 5 * Scale;
         }
 
         protected override float GetEndY(BarRendererBase noteRenderer, BeamDirection direction)
         {
-            return noteRenderer.GetNoteY(_endNote);
+            return noteRenderer.GetNoteY(_endNote) - 5 * Scale;
         }
 
         protected override float GetStartX(BarRendererBase noteRenderer)
@@ -56,7 +56,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         protected override float GetEndX(BarRendererBase noteRenderer)
         {
-            return noteRenderer.GetNoteX(_endNote);
+            return noteRenderer.GetNoteX(_endNote, false);
         }
     }
 }

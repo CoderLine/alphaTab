@@ -13210,6 +13210,8 @@ AlphaTab.Rendering.Glyphs.ScoreSlideLineGlyph.prototype = {
     },
     Paint: function (cx, cy, canvas){
         var r = this.Renderer;
+        cx += r.X;
+        cy += r.Y;
         var sizeX = 12 * this.get_Scale();
         var offsetX = 1 * this.get_Scale();
         var startX;
@@ -13675,6 +13677,8 @@ AlphaTab.Rendering.Glyphs.TabSlideLineGlyph.prototype = {
     },
     Paint: function (cx, cy, canvas){
         var r = this.Renderer;
+        cx += r.X;
+        cy += r.Y;
         var sizeX = 12 * this.get_Scale();
         var sizeY = 3 * this.get_Scale();
         var startX;
@@ -13755,16 +13759,16 @@ AlphaTab.Rendering.Glyphs.TabTieGlyph.prototype = {
         return this._startNote.String > 3 ? AlphaTab.Rendering.Utils.BeamDirection.Down : AlphaTab.Rendering.Utils.BeamDirection.Up;
     },
     GetStartY: function (noteRenderer, direction){
-        return noteRenderer.GetNoteY(this._startNote);
+        return noteRenderer.GetNoteY(this._startNote) - 5 * this.get_Scale();
     },
     GetEndY: function (noteRenderer, direction){
-        return noteRenderer.GetNoteY(this._endNote);
+        return noteRenderer.GetNoteY(this._endNote) - 5 * this.get_Scale();
     },
     GetStartX: function (noteRenderer){
         return noteRenderer.GetNoteX(this._startNote, true);
     },
     GetEndX: function (noteRenderer){
-        return noteRenderer.GetNoteX(this._endNote, true);
+        return noteRenderer.GetNoteX(this._endNote, false);
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.TabTieGlyph, AlphaTab.Rendering.Glyphs.TieGlyph);
@@ -16172,7 +16176,7 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
     GetNoteX: function (note, onEnd){
         var beat = this.GetOnNotesGlyphForBeat(note.Beat);
         if (beat != null){
-            return beat.Container.X + beat.X + beat.NoteNumbers.GetNoteX(note, onEnd);
+            return beat.Container.X + beat.Container.VoiceContainer.X + beat.X + beat.NoteNumbers.GetNoteX(note, onEnd);
         }
         return 0;
     },
