@@ -20,11 +20,13 @@ namespace AlphaTab.Rendering.Glyphs
     public class NumberGlyph : GlyphGroup
     {
         private readonly int _number;
+        private readonly float _scale;
 
-        public NumberGlyph(float x, float y, int number)
+        public NumberGlyph(float x, float y, int number, float scale = 1.0f)
             : base(x, y)
         {
             _number = number;
+            _scale = scale;
         }
 
         public override void DoLayout()
@@ -33,7 +35,7 @@ namespace AlphaTab.Rendering.Glyphs
             while (i > 0)
             {
                 var num = i % 10;
-                var gl = new DigitGlyph(0, 0, num);
+                var gl = new DigitGlyph(0, 0, num, _scale);
                 AddGlyph(gl);
                 i = i / 10;
             }

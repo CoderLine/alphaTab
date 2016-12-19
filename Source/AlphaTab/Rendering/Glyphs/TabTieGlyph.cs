@@ -22,16 +22,41 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class TabTieGlyph : TieGlyph
     {
-        public TabTieGlyph(Note startNote, Note endNote, Glyph parent, bool forEnd = false)
-            : base(startNote, endNote, parent, forEnd)
+        private readonly Note _startNote;
+        private readonly Note _endNote;
+
+        public TabTieGlyph(Note startNote, Note endNote, bool forEnd = false)
+            : base(startNote.Beat, endNote.Beat, forEnd)
         {
+            _startNote = startNote;
+            _endNote = endNote;
         }
 
-        protected override BeamDirection GetBeamDirection(Note note, BarRendererBase noteRenderer)
+        protected override BeamDirection GetBeamDirection(Beat beat, BarRendererBase noteRenderer)
         {
-            return StartNote.String > 3
+            return _startNote.String > 3
                 ? BeamDirection.Down
                 : BeamDirection.Up;
+        }
+
+        protected override float GetStartY(BarRendererBase noteRenderer, BeamDirection direction)
+        {
+            return noteRenderer.GetNoteY(_startNote) - 5 * Scale;
+        }
+
+        protected override float GetEndY(BarRendererBase noteRenderer, BeamDirection direction)
+        {
+            return noteRenderer.GetNoteY(_endNote) - 5 * Scale;
+        }
+
+        protected override float GetStartX(BarRendererBase noteRenderer)
+        {
+            return noteRenderer.GetNoteX(_startNote);
+        }
+
+        protected override float GetEndX(BarRendererBase noteRenderer)
+        {
+            return noteRenderer.GetNoteX(_endNote, false);
         }
     }
 }

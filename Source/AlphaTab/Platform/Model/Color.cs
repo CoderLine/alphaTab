@@ -24,7 +24,14 @@ namespace AlphaTab.Platform.Model
         public Color(byte r, byte g, byte b, byte a = 0xFF)
         {
             Raw = (a << 24) | (r << 16) | (g << 8) | b;
-            RGBA = "rgba(" + R + "," + G + "," + B + "," + (A / 255.0) + ")";
+            if (a == 0xFF)
+            {
+                RGBA = "#" + Std.ToHexString(R, 2) + Std.ToHexString(G, 2) + Std.ToHexString(B, 2);
+            }
+            else
+            {
+                RGBA = "rgba(" + R + "," + G + "," + B + "," + (A / 255.0) + ")";
+            }
         }
 
         public int Raw

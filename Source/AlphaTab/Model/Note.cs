@@ -84,7 +84,11 @@ namespace AlphaTab.Model
 
         public bool IsPiano
         {
-            get { return Octave >= 0 && Tone >= 0; }
+            get
+            {
+                if (IsStringed) return false;
+                return Octave >= 0 && Tone >= 0;
+            }
         }
 
         public int Octave { get; set; }
@@ -96,7 +100,11 @@ namespace AlphaTab.Model
 
         public bool IsPercussion
         {
-            get { return Element >= 0 && Variation >= 0; }
+            get
+            {
+                if (IsStringed) return false;
+                return Element >= 0 && Variation >= 0;
+            }
         }
 
 

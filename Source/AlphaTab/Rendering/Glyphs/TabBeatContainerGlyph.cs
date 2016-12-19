@@ -67,12 +67,12 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (n.IsHammerPullOrigin)
             {
-                var tie = new TabTieGlyph(n, n.HammerPullDestination, this);
+                var tie = new TabTieGlyph(n, n.HammerPullDestination);
                 Ties.Add(tie);
             }
             else if (n.SlideType == SlideType.Legato)
             {
-                var tie = new TabTieGlyph(n, n.SlideTarget, this);
+                var tie = new TabTieGlyph(n, n.SlideTarget);
                 Ties.Add(tie);
             }
 

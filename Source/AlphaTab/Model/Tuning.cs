@@ -29,7 +29,7 @@ namespace AlphaTab.Model
         private static FastList<Tuning> _sixStrings;
         private static FastList<Tuning> _fiveStrings;
         private static FastList<Tuning> _fourStrings;
-        private static FastDictionary<int, Tuning> _defaultTunings; 
+        private static FastDictionary<int, Tuning> _defaultTunings;
 
         public static string GetTextForTuning(int tuning, bool includeOctave)
         {
@@ -39,7 +39,7 @@ namespace AlphaTab.Model
             var result = notes[note];
             if (includeOctave)
             {
-                result += octave;
+                result += (octave - 1);
             }
 
             return result;
@@ -83,7 +83,7 @@ namespace AlphaTab.Model
             _fourStrings = new FastList<Tuning>();
             _defaultTunings = new FastDictionary<int, Tuning>();
 
-            _defaultTunings[7] = new Tuning("Guitar 7 strings", new[] {64, 59, 55, 50, 45, 40, 35}, true);
+            _defaultTunings[7] = new Tuning("Guitar 7 strings", new[] { 64, 59, 55, 50, 45, 40, 35 }, true);
             _sevenStrings.Add(_defaultTunings[7]);
 
             _defaultTunings[6] = new Tuning("Guitar Standard Tuning", new[] { 64, 59, 55, 50, 45, 40 }, true);
@@ -172,7 +172,7 @@ namespace AlphaTab.Model
         public string Name { get; set; }
         public int[] Tunings { get; set; }
 
-        public Tuning(string name, int[] tuning, bool isStandard) 
+        public Tuning(string name, int[] tuning, bool isStandard)
         {
             IsStandard = isStandard;
             Name = name;

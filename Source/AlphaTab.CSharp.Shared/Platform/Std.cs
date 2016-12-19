@@ -61,12 +61,12 @@ namespace AlphaTab.Platform
 
         public static int ParseInt(string s)
         {
-            int f;
-            if (!Int32.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture, out f))
+            float f;
+            if (!float.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out f))
             {
-                f = 0;
+                return int.MinValue;
             }
-            return f;
+            return (int) f;
         }
 
         public static int[] CloneArray(int[] array)

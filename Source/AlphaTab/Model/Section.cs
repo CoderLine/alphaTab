@@ -28,6 +28,11 @@ namespace AlphaTab.Model
 
         public string Text { get; set; }
 
+        public Section()
+        {
+            Text = Marker = "";
+        }
+
         public static void CopyTo(Section src, Section dst)
         {
             dst.Marker = src.Marker;

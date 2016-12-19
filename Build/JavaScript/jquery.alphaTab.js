@@ -47,6 +47,10 @@
             }
         },
         
+        api: function(element, context) {
+            return context;
+        },
+        
         score: function(element, context, score) {
             if(score) {
                 context.ScoreLoaded(score);

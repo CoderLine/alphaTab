@@ -36,10 +36,6 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (direction == BeamDirection.Up)
             {
-                if (isGrace)
-                {
-                    return MusicFontSymbol.FooterUpEighth;
-                }
                 switch (duration)
                 {
                     case Duration.Eighth: return MusicFontSymbol.FooterUpEighth;
@@ -51,10 +47,6 @@ namespace AlphaTab.Rendering.Glyphs
             }
             else
             {
-                if (isGrace)
-                {
-                    return MusicFontSymbol.FooterDownEighth;
-                }
                 switch (duration)
                 {
                     case Duration.Eighth: return MusicFontSymbol.FooterDownEighth;

@@ -65,8 +65,8 @@ namespace AlphaTab.Rendering.Glyphs
             var tabTop = tabBarRenderer.GetTabY(0, -2);
             var tabBottom = tabBarRenderer.GetTabY(track.Tuning.Length, -2);
 
-            var absMinY = Y + minY + tabTop;
-            var absMaxY = Y + maxY - tabBottom;
+            var absMinY = minY + tabTop;
+            var absMaxY = maxY - tabBottom;
 
             if (absMinY < 0)
                 tabBarRenderer.RegisterOverflowTop(Math.Abs(absMinY));
@@ -82,9 +82,8 @@ namespace AlphaTab.Rendering.Glyphs
             var endX = _beat.NextBeat == null || _beat.Voice != _beat.NextBeat.Voice
                     ? cx + X + _parent.Width 
                     : cx + tabBarRenderer.GetBeatX(_beat.NextBeat);
-            var startY = cy + X;
+            var startY = cy;
             var textOffset = 3 * Scale;
-
             var sizeY = WhammyMaxOffset * Scale;
 
             var old = canvas.TextAlign;
@@ -113,30 +112,31 @@ namespace AlphaTab.Rendering.Glyphs
 
                     if (pt2.Value != 0)
                     {
-                        var dv = pt2.Value / 4.0;
-                        var up = (pt2.Value - pt1.Value) >= 0;
+                        var dv = pt2.Value;
                         var s = "";
-                        if (dv < 0) s += "-";
 
-                        if (dv >= 1 || dv <= -1)
-                            s += Math.Abs(dv) + " ";
+                        if (dv >= 4 || dv <= -4)
+                        {
+                            int steps = dv / 4;
+                            s += steps;
+                            // Quaters
+                            dv -= steps * 4;
+                        }
 
-                        dv -= (int)dv;
-                        if (dv == 0.25)
-                            s += "1/4";
-                        else if (dv == 0.5)
-                            s += "1/2";
-                        else if (dv == 0.75)
-                            s += "3/4";
+                        if (dv > 0)
+                        {
+                            s += BendGlyph.GetFractionSign(dv);
+                        }
 
-                        canvas.Font = res.GraceFont;
-                        //var size = canvas.MeasureText(s);
-                        var sy = up
-                                    ? pt2Y - res.GraceFont.Size - textOffset
-                                    : pt2Y + textOffset;
-                        var sx = pt2X;
-                        canvas.FillText(s, sx, sy);
-
+                        if (s != "")
+                        {
+                            // draw label
+                            canvas.Font = res.GraceFont;
+                            //var size = canvas.MeasureText(s);
+                            var sy = pt2Y + textOffset;
+                            var sx = pt2X;
+                            canvas.FillText(s, sx, sy);
+                        }
                     }
                 }
                 canvas.Stroke();

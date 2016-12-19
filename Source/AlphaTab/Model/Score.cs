@@ -90,6 +90,8 @@ namespace AlphaTab.Model
             MasterBars = new FastList<MasterBar>();
             Tracks = new FastList<Track>();
             _currentRepeatGroup = new RepeatGroup();
+            Album = Artist = Copyright = Instructions = Music = Notices = SubTitle = Title = Words = Tab = TempoLabel = "";
+            Tempo = 120;
         }
 
         public static void CopyTo(Score src, Score dst)

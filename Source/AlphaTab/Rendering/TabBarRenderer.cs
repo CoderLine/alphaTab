@@ -49,7 +49,7 @@ namespace AlphaTab.Rendering
             var beat = (TabBeatGlyph)GetOnNotesGlyphForBeat(note.Beat);
             if (beat != null)
             {
-                return beat.Container.X + beat.X + beat.NoteNumbers.GetNoteX(note, onEnd);
+                return beat.Container.X + beat.Container.VoiceContainer.X + beat.X + beat.NoteNumbers.GetNoteX(note, onEnd);
             }
             return 0;
         }
@@ -78,7 +78,7 @@ namespace AlphaTab.Rendering
             if (Index == 0)
             {
                 Staff.RegisterStaveTop(TopOverflow);
-                Staff.RegisterStaveBottom(Height - BottomOverflow);
+                Staff.RegisterStaveBottom(Height - BottomPadding);
             }
         }
 

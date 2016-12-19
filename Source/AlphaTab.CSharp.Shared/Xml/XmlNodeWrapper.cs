@@ -44,7 +44,7 @@ namespace AlphaTab.Xml
         {
             get
             {
-                return new XmlNodeWrapper(_node.FirstChild);
+                return _node.FirstChild == null ? null : new XmlNodeWrapper(_node.FirstChild);
             }
         }
 

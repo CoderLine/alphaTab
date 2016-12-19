@@ -45,6 +45,12 @@ namespace AlphaTab.Model
         public FastList<Note> Notes { get; set; }
         public bool IsEmpty { get; set; }
 
+        public bool IsLegatoOrigin { get; set; }
+        public bool IsLegatoDestination
+        {
+            get { return PreviousBeat != null && PreviousBeat.IsLegatoOrigin; }
+        }
+
         private Note _minNote;
 
         public Note MinNote
@@ -203,6 +209,7 @@ namespace AlphaTab.Model
             Dynamic = DynamicValue.F;
             Crescendo = CrescendoType.None;
             InvertBeamDirection = false;
+            Lyrics = new FastList<string>();
         }
 
         public static void CopyTo(Beat src, Beat dst)
@@ -230,6 +237,7 @@ namespace AlphaTab.Model
             dst.Crescendo = src.Crescendo;
             dst.Start = src.Start;
             dst.Dynamic = src.Dynamic;
+            dst.IsLegatoOrigin = src.IsLegatoOrigin;
             dst.InvertBeamDirection = src.InvertBeamDirection;
         }
 
@@ -311,6 +319,20 @@ namespace AlphaTab.Model
             note.Beat = this;
             note.Index = Notes.Count;
             Notes.Add(note);
+        }
+
+        public void RemoveNote(Note note)
+        {
+            var index = Notes.IndexOf(note);
+            if (index >= 0)
+            {
+                Notes.RemoveAt(index);
+            }
+
+            if (note == _minNote || note == _maxNote || note == _minStringNote || note == _maxStringNote)
+            {
+                RefreshNotes();
+            }
         }
 
         public void RefreshNotes()

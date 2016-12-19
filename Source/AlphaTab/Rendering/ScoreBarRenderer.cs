@@ -17,6 +17,7 @@
  */
 using System;
 using AlphaTab.Audio;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
@@ -67,7 +68,12 @@ namespace AlphaTab.Rendering
             ScoreBeatGlyph g = (ScoreBeatGlyph)GetOnNotesGlyphForBeat(note.Beat);
             if (g != null)
             {
-                return g.Container.X + g.Container.OnTimeX;
+                var x = g.Container.VoiceContainer.X + g.Container.X + g.X;
+                if (onEnd)
+                {
+                    x += g.Width;
+                }
+                return x;
             }
             return 0;
         }
@@ -268,11 +274,15 @@ namespace AlphaTab.Rendering
                     //
                     // calculate the y positions for our bracket
 
-                    var startY = CalculateBeamY(firstBeamingHelper, startX);
-                    var offset1Y = CalculateBeamY(firstBeamingHelper, offset1X);
-                    var middleY = CalculateBeamY(firstBeamingHelper, middleX);
-                    var offset2Y = CalculateBeamY(lastBeamingHelper, offset2X);
-                    var endY = CalculateBeamY(lastBeamingHelper, endX);
+                    var startY = CalculateBeamYWithDirection(firstBeamingHelper, startX, firstBeamingHelper.Direction);
+                    var endY = CalculateBeamYWithDirection(lastBeamingHelper, endX, firstBeamingHelper.Direction);
+
+                    var k = (endY - startY) / (endX - startX);
+                    var d = startY - (k * startX);
+
+                    var offset1Y = (k * offset1X) + d;
+                    var middleY = (k * middleX) + d;
+                    var offset2Y = (k * offset2X) + d;
 
                     var offset = 10 * Scale;
                     var size = 5 * Scale;
@@ -327,11 +337,19 @@ namespace AlphaTab.Rendering
             return h.CalculateBeamY(stemSize, Scale, x, Scale, n => GetScoreY(GetNoteLine(n)));
         }
 
+        private float CalculateBeamYWithDirection(BeamingHelper h, float x, BeamDirection direction)
+        {
+            var stemSize = GetStemSize(h.MaxDuration);
+            return h.CalculateBeamYWithDirection(stemSize, Scale, x, Scale, n => GetScoreY(GetNoteLine(n)), direction);
+        }
+
         private void PaintBar(float cx, float cy, ICanvas canvas, BeamingHelper h)
         {
             for (int i = 0, j = h.Beats.Count; i < j; i++)
             {
                 var beat = h.Beats[i];
+                var isGrace = beat.GraceType != GraceType.None;
+                var scaleMod = isGrace ? NoteHeadGlyph.GraceScale : 1;
 
                 //
                 // draw line 
@@ -340,11 +358,13 @@ namespace AlphaTab.Rendering
 
                 var direction = h.Direction;
 
-                var y1 = cy + Y + (direction == BeamDirection.Up
+                var y1 = cy + Y;
+                y1 += (direction == BeamDirection.Up
                             ? GetScoreY(GetNoteLine(beat.MinNote))
                             : GetScoreY(GetNoteLine(beat.MaxNote)));
 
-                var y2 = cy + Y + CalculateBeamY(h, beatLineX);
+                var y2 = cy + Y;
+                y2 += scaleMod * CalculateBeamY(h, beatLineX);
 
                 canvas.BeginPath();
                 canvas.MoveTo(cx + X + beatLineX, y1);
@@ -362,9 +382,9 @@ namespace AlphaTab.Rendering
                 }
                 PaintFingering(canvas, beat, cx + X + beatLineX, direction, fingeringY);
 
-                var brokenBarOffset = 6 * Scale;
-                var barSpacing = 6 * Scale;
-                var barSize = 3 * Scale;
+                var brokenBarOffset = 6 * Scale * scaleMod;
+                var barSpacing = 6 * Scale * scaleMod;
+                var barSize = LineSpacing / 2 * Scale * scaleMod;
                 var barCount = beat.Duration.GetIndex() - 2;
                 var barStart = cy + Y;
                 if (direction == BeamDirection.Down)
@@ -404,8 +424,8 @@ namespace AlphaTab.Rendering
                         {
                             continue;
                         }
-                        barStartY = barY + CalculateBeamY(h, barStartX);
-                        barEndY = barY + CalculateBeamY(h, barEndX);
+                        barStartY = barY + CalculateBeamY(h, barStartX) * scaleMod;
+                        barEndY = barY + CalculateBeamY(h, barEndX) * scaleMod;
                         PaintSingleBar(canvas, cx + X + barStartX, barStartY, cx + X + barEndX, barEndY, barSize);
                     }
                     // 
@@ -416,8 +436,8 @@ namespace AlphaTab.Rendering
                         barStartX = beatLineX - brokenBarOffset;
                         barEndX = beatLineX;
 
-                        barStartY = barY + CalculateBeamY(h, barStartX);
-                        barEndY = barY + CalculateBeamY(h, barEndX);
+                        barStartY = barY + CalculateBeamY(h, barStartX) * scaleMod;
+                        barEndY = barY + CalculateBeamY(h, barEndX) * scaleMod;
 
                         PaintSingleBar(canvas, cx + X + barStartX, barStartY, cx + X + barEndX, barEndY, barSize);
                     }
@@ -636,7 +656,7 @@ namespace AlphaTab.Rendering
             }
 
             // Clef
-            if (IsFirstOfLine || Bar.Clef != Bar.PreviousBar.Clef)
+            if (IsFirstOfLine || Bar.Clef != Bar.PreviousBar.Clef || Bar.ClefOttavia != Bar.PreviousBar.ClefOttavia)
             {
                 var offset = 0;
                 var correction = 0;
@@ -660,7 +680,7 @@ namespace AlphaTab.Rendering
                         break;
                 }
                 CreateStartSpacing();
-                AddPreBeatGlyph(new ClefGlyph(0, GetScoreY(offset, correction), Bar.Clef));
+                AddPreBeatGlyph(new ClefGlyph(0, GetScoreY(offset, correction), Bar.Clef, Bar.ClefOttavia));
             }
 
             // Key signature
@@ -750,15 +770,8 @@ namespace AlphaTab.Rendering
                     break;
             }
 
-            // naturalize previous key
-            // TODO: only naturalize the symbols needed 
-            var naturalizeSymbols = Math.Abs(previousKey);
-            var previousKeyPositions = ModelUtils.KeySignatureIsSharp(previousKey) ? SharpKsSteps : FlatKsSteps;
-
-            for (var i = 0; i < naturalizeSymbols; i++)
-            {
-                AddPreBeatGlyph(new NaturalizeGlyph(0, GetScoreY(previousKeyPositions[i] + offsetClef)));
-            }
+            var newLines = new FastDictionary<int, bool>();
+            var newGlyphs = new FastList<Glyph>();
 
             // how many symbols do we need to get from a C-keysignature
             // to the new one
@@ -768,7 +781,9 @@ namespace AlphaTab.Rendering
             {
                 for (var i = 0; i < Math.Abs(currentKey); i++)
                 {
-                    AddPreBeatGlyph(new SharpGlyph(0, GetScoreY(SharpKsSteps[i] + offsetClef)));
+                    var step = SharpKsSteps[i] + offsetClef;
+                    newGlyphs.Add(new SharpGlyph(0, GetScoreY(step)));
+                    newLines[step] = true;
                 }
             }
             // a flat signature
@@ -776,15 +791,36 @@ namespace AlphaTab.Rendering
             {
                 for (var i = 0; i < Math.Abs(currentKey); i++)
                 {
-                    AddPreBeatGlyph(new FlatGlyph(0, GetScoreY(FlatKsSteps[i] + offsetClef)));
+                    var step = FlatKsSteps[i] + offsetClef;
+                    newGlyphs.Add(new FlatGlyph(0, GetScoreY(step)));
+                    newLines[step] = true;
                 }
             }
+
+            // naturalize previous key
+            var naturalizeSymbols = Math.Abs(previousKey);
+            var previousKeyPositions = ModelUtils.KeySignatureIsSharp(previousKey) ? SharpKsSteps : FlatKsSteps;
+
+            for (var i = 0; i < naturalizeSymbols; i++)
+            {
+                var step = previousKeyPositions[i] + offsetClef;
+                if (!newLines.ContainsKey(step))
+                {
+                    AddPreBeatGlyph(new NaturalizeGlyph(0, GetScoreY(previousKeyPositions[i] + offsetClef)));
+                }
+            }
+
+            foreach (var newGlyph in newGlyphs)
+            {
+                AddPreBeatGlyph(newGlyph);
+            }
+
         }
 
         private void CreateTimeSignatureGlyphs()
         {
             AddPreBeatGlyph(new SpacingGlyph(0, 0, 5 * Scale));
-            AddPreBeatGlyph(new TimeSignatureGlyph(0, GetScoreY(2), Bar.MasterBar.TimeSignatureNumerator, Bar.MasterBar.TimeSignatureDenominator));
+            AddPreBeatGlyph(new TimeSignatureGlyph(0, GetScoreY(2), Bar.MasterBar.TimeSignatureNumerator, Bar.MasterBar.TimeSignatureDenominator, Bar.MasterBar.TimeSignatureCommon));
         }
 
         private void CreateVoiceGlyphs(Voice v)

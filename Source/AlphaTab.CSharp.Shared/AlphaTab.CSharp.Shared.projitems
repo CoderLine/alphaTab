@@ -14,7 +14,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Collections\StringBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Environment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\StreamWrapper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Model\TuningParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\CSharp\CsFileLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\CSharp\FontEmbeddedSvgCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\CSharp\GdiCanvas.cs" />

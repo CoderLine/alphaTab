@@ -31,7 +31,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Importer\GpxImporter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\GpxParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\MixTableChange.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Importer\MusicXml2Importer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Importer\MusicXmlImporter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\NoCompatibleReaderFoundException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\ScoreImporter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\ScoreLoader.cs" />
@@ -71,6 +71,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\Track.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\TripletFeel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Tuning.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\TuningParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\VibratoType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Voice.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\ICanvas.cs" />
@@ -148,6 +149,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\RepeatCloseGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\RepeatCountGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\RepeatOpenGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreLegatoGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreRestGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\RideCymbalGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreBeatContainerGlyph.cs" />

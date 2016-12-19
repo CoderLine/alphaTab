@@ -41,7 +41,7 @@ namespace AlphaTab.Platform
             return c == 0x20 || c == 0x0B || c == 0x0D || c == 0x0A;
         }
 
-        public static string ToHexString(int n)
+        public static string ToHexString(int n, int digits = 0)
         {
             var s = "";
             const string hexChars = "0123456789ABCDEF";
@@ -50,11 +50,22 @@ namespace AlphaTab.Platform
                 s = StringFromCharCode((int)hexChars[(n & 15)]) + s;
                 n >>= 4;
             } while (n > 0);
+
+            while (s.Length < digits)
+            {
+                s = "0" + s;
+            }
+
             return s;
         }
 
         public static string GetNodeValue(IXmlNode n)
         {
+            if (n == null)
+            {
+                return "";
+            }
+
             if (n.NodeType == XmlNodeType.Element || n.NodeType == XmlNodeType.Document)
             {
                 var txt = new StringBuilder();

@@ -35,8 +35,8 @@ namespace AlphaTab.Importer
 
         public GpxRhythm()
         {
-            TupletDenominator = 1;
-            TupletNumerator = 1;
+            TupletDenominator = -1;
+            TupletNumerator = -1;
             Value = Duration.Quarter;
         }
     }
@@ -463,6 +463,7 @@ namespace AlphaTab.Importer
                     track.Tuning = tuning;
                     break;
                 case "DiagramCollection":
+                case "ChordCollection":
                     ParseDiagramCollection(track, node);
                     break;
                 case "CapoFret":
@@ -649,6 +650,23 @@ namespace AlphaTab.Importer
                                     break;
                             }
                             break;
+                        case "Ottavia":
+                            switch (GetValue(c))
+                            {
+                                case "8va":
+                                    bar.ClefOttavia = ClefOttavia._8va;
+                                    break;
+                                case "15ma":
+                                    bar.ClefOttavia = ClefOttavia._15ma;
+                                    break;
+                                case "8vb":
+                                    bar.ClefOttavia = ClefOttavia._8vb;
+                                    break;
+                                 case "15mb":
+                                    bar.ClefOttavia = ClefOttavia._15mb;
+                                    break;
+                            }
+                            break;
                             // case "SimileMark":
                     }
                 }
@@ -827,6 +845,12 @@ namespace AlphaTab.Importer
                                 case "BeforeBeat":
                                     beat.GraceType = GraceType.BeforeBeat;
                                     break;
+                            }
+                            break;
+                        case "Legato":
+                            if (c.GetAttribute("origin") == "true")
+                            {
+                                beat.IsLegatoOrigin = true;
                             }
                             break;
                     }
@@ -1397,6 +1421,10 @@ namespace AlphaTab.Importer
             // add tracks to score
             foreach (var trackId in _tracksMapping)
             {
+                if (string.IsNullOrEmpty(trackId))
+                {
+                    continue;
+                }
                 var track = _tracksById[trackId];
                 Score.AddTrack(track);
             }
@@ -1550,7 +1578,10 @@ namespace AlphaTab.Importer
                         if (barId == "0") // // TODO find the correct first bar id
                         {
                             Score.Tempo = (int)(automation.Value);
-                            Score.TempoLabel = automation.Text;
+                            if (automation.Text != null)
+                            {
+                                Score.TempoLabel = automation.Text;
+                            }
                         }
 
                         bar.MasterBar.TempoAutomation = automation;

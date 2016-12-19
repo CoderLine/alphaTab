@@ -16,20 +16,38 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Model;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
     public class ClefGlyph : MusicFontGlyph
     {
-        public ClefGlyph(float x, float y, Clef clef)
+        private readonly Clef _clef;
+        private readonly ClefOttavia _clefOttavia;
+
+        public ClefGlyph(float x, float y, Clef clef, ClefOttavia clefOttavia)
             : base(x, y, 1, GetSymbol(clef))
         {
+            _clef = clef;
+            _clefOttavia = clefOttavia;
         }
 
         public override void DoLayout()
         {
-            Width = 28 * Scale;
+            switch (_clef)
+            {
+                case Clef.Neutral:
+                    Width = 15 * Scale;
+                    break;
+                case Clef.C3:
+                case Clef.C4:
+                case Clef.F4:
+                case Clef.G2:
+                    Width = 28 * Scale;
+                    break;
+            }
         }
 
         private static MusicFontSymbol GetSymbol(Clef clef)
@@ -49,6 +67,62 @@ namespace AlphaTab.Rendering.Glyphs
                 default:
                     return MusicFontSymbol.None;
             }
+        }
+
+        public override void Paint(float cx, float cy, ICanvas canvas)
+        {
+            base.Paint(cx, cy, canvas);
+            NumberGlyph numberGlyph;
+            bool top = false;
+            switch (_clefOttavia)
+            {
+                case ClefOttavia._15ma:
+                    numberGlyph = new NumberGlyph(Width/2, 0, 15, 0.5f);
+                    top = true;
+                    break;
+                case ClefOttavia._8va:
+                    numberGlyph = new NumberGlyph(0, 0, 8, 0.5f);
+                    top = true;
+                    break;
+                case ClefOttavia._8vb:
+                    numberGlyph = new NumberGlyph(0, 0, 8, 0.5f);
+                    break;
+                case ClefOttavia._15mb:
+                    numberGlyph = new NumberGlyph(0, 0, 15, 0.5f);
+                    break;
+                default:
+                    return;
+            }
+
+            int offset;
+
+            switch (_clef)
+            {
+                case Clef.Neutral:
+                    offset = top ? -25 : 10;
+                    break;
+                case Clef.C3:
+                    offset = top ? -30 : 20;
+                    break;
+                case Clef.C4:
+                    offset = top ? -30 : 20;
+                    break;
+                case Clef.F4:
+                    offset = top ? -25 : 20;
+                    break;
+                case Clef.G2:
+                    offset = top ? -50 : 25;
+                    break;
+                default:
+                    return;
+            }
+
+            numberGlyph.Renderer = Renderer;
+            numberGlyph.DoLayout();
+
+            var x = (Width - numberGlyph.Width)/2;
+
+            numberGlyph.Paint(cx + X + x, cy + Y + offset*Scale, canvas);
         }
     }
 }

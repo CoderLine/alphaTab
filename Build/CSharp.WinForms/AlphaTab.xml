@@ -769,6 +769,13 @@
             This public class represents a predefined string tuning.
             </summary>
         </member>
+        <member name="M:AlphaTab.Model.TuningParser.IsTuning(System.String)">
+            <summary>
+            Checks if the given string is a tuning inticator.
+            </summary>Checks if the given string is a tuning inticator.
+            <param name="name"></param>
+            <returns></returns>
+        </member>
         <member name="T:AlphaTab.Model.VibratoType">
             <summary>
             This public enum lists all vibrato types that can be performed.
@@ -779,13 +786,6 @@
             A voice represents a group of beats 
             that can be played during a bar. 
             </summary>
-        </member>
-        <member name="M:AlphaTab.Model.TuningParser.IsTuning(System.String)">
-            <summary>
-            Checks if the given string is a tuning inticator.
-            </summary>Checks if the given string is a tuning inticator.
-            <param name="name"></param>
-            <returns></returns>
         </member>
         <member name="T:AlphaTab.Rendering.AlternateEndingsBarRenderer">
             <summary>

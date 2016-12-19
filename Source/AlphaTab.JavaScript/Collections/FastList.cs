@@ -18,6 +18,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using AlphaTab.Model;
 using SharpKit.JavaScript;
 
 namespace AlphaTab.Collections
@@ -61,6 +62,11 @@ namespace AlphaTab.Collections
         {
         }
 
+        [JsMethod(InlineCodeExpression = "this = []", Export = false)]
+        public void Clear()
+        {
+        }
+
         [JsMethod(InlineCodeExpression = "this = this.concat(data)", Export = false)]
         public void AddRange(T[] data)
         {
@@ -98,9 +104,17 @@ namespace AlphaTab.Collections
             return null;
         }
 
+        [JsMethod(InlineCodeExpression = "this.indexOf(note)", Export = false)]
+        public int IndexOf(Note note)
+        {
+            return -1;
+        }
+
         public extern IEnumerator<T> GetEnumerator();
         extern IEnumerator IEnumerable.GetEnumerator();
         extern T IJsArrayEnumerable<T>.this[JsNumber index] { get; }
         public extern JsNumber length { get; }
+
+        
     }
 }
