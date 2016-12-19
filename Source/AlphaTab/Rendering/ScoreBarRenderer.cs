@@ -365,7 +365,7 @@ namespace AlphaTab.Rendering
 
         private float CalculateBeamYWithDirection(BeamingHelper h, float x, BeamDirection direction)
         {
-            var stemSize = GetStemSize(h.MaxDuration);
+            var stemSize = GetStemSize(h);
             return h.CalculateBeamYWithDirection(stemSize, Scale, x, Scale, n => GetScoreY(GetNoteLine(n)), direction);
         }
 
