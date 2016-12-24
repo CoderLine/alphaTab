@@ -89,7 +89,8 @@ namespace AlphaTab.Rendering
             // Clef
             if (IsFirstOfLine)
             {
-                AddPreBeatGlyph(new TabClefGlyph(0, 0));
+                var center = (Bar.Staff.Track.Tuning.Length + 1) / 2f;
+                AddPreBeatGlyph(new TabClefGlyph(5 * Scale, GetTabY(center)));
             }
 
             AddPreBeatGlyph(new BarNumberGlyph(0, GetTabY(-1, -3), Bar.Index + 1, !Staff.IsFirstInAccolade));
@@ -150,7 +151,7 @@ namespace AlphaTab.Rendering
         /// <param name="line">the amount of steps while 2 steps are one line</param>
         /// <param name="correction"></param>
         /// <returns></returns>
-        public float GetTabY(int line, float correction = 0)
+        public float GetTabY(float line, float correction = 0)
         {
             return (LineOffset * line) + (correction * Scale);
         }

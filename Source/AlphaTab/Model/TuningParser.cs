@@ -39,7 +39,7 @@ namespace AlphaTab.Model
 
             for (int i = 0; i < name.Length; i++)
             {
-                var c = name[i];
+                var c = (int)name[i];
                 if (Std.IsCharNumber(c, false))
                 {
                     // number without note?
@@ -47,7 +47,7 @@ namespace AlphaTab.Model
                     {
                         return null;
                     }
-                    octave += c;
+                    octave += Std.StringFromCharCode(c);
                 }
                 else if ((c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A))
                 {
@@ -56,7 +56,7 @@ namespace AlphaTab.Model
                     {
                         return null;
                     }
-                    note += c;
+                    note += Std.StringFromCharCode(c);
                 }
                 else
                 {

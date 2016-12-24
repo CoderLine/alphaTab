@@ -1185,7 +1185,7 @@
             This BarRenderer renders a bar using guitar tablature notation
             </summary>
         </member>
-        <member name="M:AlphaTab.Rendering.TabBarRenderer.GetTabY(System.Int32,System.Single)">
+        <member name="M:AlphaTab.Rendering.TabBarRenderer.GetTabY(System.Single,System.Single)">
             <summary>
             Gets the relative y position of the given steps relative to first line.
             </summary>

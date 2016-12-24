@@ -9612,14 +9612,14 @@ AlphaTab.Model.TuningParser.Parse = function (name){
             if (((note==null)||(note.length==0))){
                 return null;
             }
-            octave += c;
+            octave += String.fromCharCode(c);
         }
-        else if ((c >= "A" && c <= "Z") || (c >= "a" && c <= "z")){
+        else if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122)){
             // letter after number?
             if (!((note==null)||(note.length==0))){
                 return null;
             }
-            note += c;
+            note += String.fromCharCode(c);
         }
         else {
             return null;
@@ -11113,16 +11113,16 @@ AlphaTab.Rendering.Effects.TripletFeelEffectInfo.prototype = {
         return true;
     }
 };
-AlphaTab.Rendering.Glyphs.MusicFontGlyph = function (x, y, scale, symbol){
-    this._scale = 0;
+AlphaTab.Rendering.Glyphs.MusicFontGlyph = function (x, y, glyphScale, symbol){
+    this.GlyphScale = 0;
     this._symbol = AlphaTab.Rendering.Glyphs.MusicFontSymbol.None;
     AlphaTab.Rendering.Glyphs.EffectGlyph.call(this, x, y);
-    this._scale = scale;
+    this.GlyphScale = glyphScale;
     this._symbol = symbol;
 };
 AlphaTab.Rendering.Glyphs.MusicFontGlyph.prototype = {
     Paint: function (cx, cy, canvas){
-        canvas.FillMusicFontSymbol(cx + this.X, cy + this.Y, this._scale * this.get_Scale(), this._symbol);
+        canvas.FillMusicFontSymbol(cx + this.X, cy + this.Y, this.GlyphScale * this.get_Scale(), this._symbol);
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.MusicFontGlyph, AlphaTab.Rendering.Glyphs.EffectGlyph);
@@ -12194,6 +12194,8 @@ AlphaTab.Rendering.Glyphs.MusicFontSymbol = {
     ClefC: 57436,
     ClefF: 57442,
     ClefNeutral: 57449,
+    ClefTab: 57453,
+    ClefTabSmall: 57454,
     RestQuadrupleWhole: 58593,
     RestDoubleWhole: 58594,
     RestWhole: 58595,
@@ -13669,41 +13671,11 @@ AlphaTab.Rendering.Glyphs.TabClefGlyph.prototype = {
         this.Width = 28 * this.get_Scale();
     },
     Paint: function (cx, cy, canvas){
-        //TabBarRenderer tabBarRenderer = (TabBarRenderer)Renderer;
-        var track = this.Renderer.Bar.Staff.Track;
-        var res = this.Renderer.get_Resources();
-        var startY = cy + this.Y + 10 * this.get_Scale() * 0.6;
-        //var endY = cy + Y + tabBarRenderer.GetTabY(track.Tuning.Count, -2);
-        // TODO: Find a more generic way of calculating the font size but for now this works.
-        var fontScale = 1;
-        var correction = 0;
-        switch (track.Tuning.length){
-            case 4:
-                fontScale = 0.6;
-                break;
-            case 5:
-                fontScale = 0.8;
-                break;
-            case 6:
-                fontScale = 1.1;
-                correction = 1;
-                break;
-            case 7:
-                fontScale = 1.15;
-                break;
-            case 8:
-                fontScale = 1.35;
-                break;
-        }
-        var font = res.TabClefFont.Clone();
-        font.Size = font.Size * fontScale;
-        canvas.set_Font(font);
-        var old = canvas.get_TextAlign();
-        canvas.set_TextAlign(AlphaTab.Platform.Model.TextAlign.Center);
-        canvas.FillText("T", cx + this.X + this.Width / 2, startY);
-        canvas.FillText("A", cx + this.X + this.Width / 2, startY + font.Size - (correction * this.get_Scale()));
-        canvas.FillText("B", cx + this.X + this.Width / 2, startY + (font.Size - (correction * this.get_Scale())) * 2);
-        canvas.set_TextAlign(old);
+        var strings = this.Renderer.Bar.Staff.Track.Tuning.length;
+        var correction = strings * this.get_Scale() * 0.5;
+        var symbol = strings <= 4 ? AlphaTab.Rendering.Glyphs.MusicFontSymbol.ClefTabSmall : AlphaTab.Rendering.Glyphs.MusicFontSymbol.ClefTab;
+        var scale = strings <= 4 ? strings / 4.5 : strings / 6.5;
+        canvas.FillMusicFontSymbol(cx + this.X + 5 * this.get_Scale(), cy + this.Y - correction, scale * this.get_Scale(), symbol);
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.TabClefGlyph, AlphaTab.Rendering.Glyphs.Glyph);
@@ -16499,7 +16471,8 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
         }
         // Clef
         if (this.get_IsFirstOfLine()){
-            this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.TabClefGlyph(0, 0));
+            var center = (this.Bar.Staff.Track.Tuning.length + 1) / 2;
+            this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.TabClefGlyph(5 * this.get_Scale(), this.GetTabY(center, 0)));
         }
         this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.BarNumberGlyph(0, this.GetTabY(-1, -3), this.Bar.Index + 1, !this.Staff.IsFirstInAccolade));
         if (this.Bar.get_IsEmpty()){

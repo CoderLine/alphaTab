@@ -21,19 +21,19 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class MusicFontGlyph : EffectGlyph
     {
-        private readonly float _scale;
+        protected readonly float GlyphScale;
         private readonly MusicFontSymbol _symbol;
 
-        public MusicFontGlyph(float x, float y, float scale, MusicFontSymbol symbol)
+        public MusicFontGlyph(float x, float y, float glyphScale, MusicFontSymbol symbol)
             : base(x, y)
         {
-            _scale = scale;
+            GlyphScale = glyphScale;
             _symbol = symbol;
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            canvas.FillMusicFontSymbol(cx + X, cy + Y, _scale*Scale, _symbol);
+            canvas.FillMusicFontSymbol(cx + X, cy + Y, GlyphScale*Scale, _symbol);
         }
     }
 }

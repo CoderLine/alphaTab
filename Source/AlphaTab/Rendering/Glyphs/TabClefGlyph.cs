@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
     public class TabClefGlyph : Glyph
     {
-        public TabClefGlyph(float x, float y) 
+        public TabClefGlyph(float x, float y)
             : base(x, y)
         {
         }
@@ -31,50 +31,14 @@ namespace AlphaTab.Rendering.Glyphs
         {
             Width = 28 * Scale;
         }
-
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            //TabBarRenderer tabBarRenderer = (TabBarRenderer)Renderer;
-            var track = Renderer.Bar.Staff.Track;
-            var res = Renderer.Resources;
+            var strings = Renderer.Bar.Staff.Track.Tuning.Length;
 
-            var startY = cy + Y + TabBarRenderer.LineSpacing * Scale * 0.6f;
-            //var endY = cy + Y + tabBarRenderer.GetTabY(track.Tuning.Count, -2);
-
-            // TODO: Find a more generic way of calculating the font size but for now this works.
-            float fontScale = 1;
-            float correction = 0;
-            switch (track.Tuning.Length)
-            {
-                case 4:
-                    fontScale = 0.6f;
-                    break;
-                case 5:
-                    fontScale = 0.8f;
-                    break;
-                case 6:
-                    fontScale = 1.1f;
-                    correction = 1;
-                    break;
-                case 7:
-                    fontScale = 1.15f;
-                    break;
-                case 8:
-                    fontScale = 1.35f;
-                    break;
-            }
-
-            var font = res.TabClefFont.Clone();
-            font.Size = font.Size * fontScale;
-
-            canvas.Font = font;
-            var old = canvas.TextAlign;
-            canvas.TextAlign = TextAlign.Center;
-
-            canvas.FillText("T", cx + X + Width / 2, startY);
-            canvas.FillText("A", cx + X + Width / 2, startY + font.Size - (correction * Scale));
-            canvas.FillText("B", cx + X + Width / 2, startY + (font.Size - (correction * Scale)) * 2);
-            canvas.TextAlign = old;
+            var correction = strings * Scale * 0.5f;
+            var symbol = strings <= 4 ? MusicFontSymbol.ClefTabSmall : MusicFontSymbol.ClefTab;
+            var scale = strings <= 4 ? strings / 4.5f : strings / 6.5f;
+            canvas.FillMusicFontSymbol(cx + X + 5 * Scale, cy + Y - correction, scale * Scale, symbol);
         }
     }
 }

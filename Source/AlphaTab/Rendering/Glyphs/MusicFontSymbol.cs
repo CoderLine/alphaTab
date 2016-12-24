@@ -25,6 +25,8 @@ namespace AlphaTab.Rendering.Glyphs
         ClefC = 0xE05C,
         ClefF = 0xE062,
         ClefNeutral = 0xE069,
+        ClefTab = 0xE06D,
+        ClefTabSmall = 0xE06E,
 
         RestQuadrupleWhole = 0xE4E1,
         RestDoubleWhole = 0xE4E2,
