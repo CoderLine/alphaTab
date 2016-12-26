@@ -19,6 +19,7 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering.Glyphs
 {

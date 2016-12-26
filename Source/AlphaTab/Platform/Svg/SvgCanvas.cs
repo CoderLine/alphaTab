@@ -83,7 +83,7 @@ namespace AlphaTab.Platform.Svg
             Buffer.Append(h);
             Buffer.Append("\" style=\"fill:");
             Buffer.Append(Color.RGBA);
-            Buffer.Append(";\" />\n");
+            Buffer.Append("; shape-rendering: crispEdges;\" />\n");
         }
 
         public void StrokeRect(float x, float y, float w, float h)

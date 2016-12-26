@@ -902,10 +902,7 @@ namespace AlphaTab.Rendering
             for (var i = 0; i < 5; i++)
             {
                 if (i > 0) lineY += LineOffset;
-                canvas.BeginPath();
-                canvas.MoveTo(cx + X, (int)lineY);
-                canvas.LineTo(cx + X + Width, (int)lineY);
-                canvas.Stroke();
+                canvas.FillRect(cx + X, (int) lineY, Width, Scale);
             }
 
             canvas.Color = res.MainGlyphColor;

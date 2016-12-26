@@ -54,19 +54,13 @@ namespace AlphaTab
                 json.layout.additionalSettings[setting] = Layout.AdditionalSettings[setting];
             }
 
-            FastList<dynamic> staves = new FastList<dynamic>();
-            json.staves = staves;
+            json.staves = Std.NewObject();
+            json.staves.id = Staves.Id;
+            json.staves.additionalSettings = Std.NewObject();
 
-            foreach (var staff in Staves)
+            foreach (var additionalSetting in Staves.AdditionalSettings)
             {
-                var s = Std.NewObject();
-                s.id = staff.Id;
-                s.additionalSettings = Std.NewObject();
-                foreach (var additionalSetting in staff.AdditionalSettings)
-                {
-                    s.additionalSettings[additionalSetting] = staff.AdditionalSettings[additionalSetting];
-                }
-                staves.Add(s);
+                json.staves.additionalSettings[additionalSetting] = Staves.AdditionalSettings[additionalSetting];
             }
 
             return json;
@@ -150,30 +144,25 @@ namespace AlphaTab
 
             if (Std.JsonExists(json, "staves"))
             {
-                settings.Staves = new FastList<StaveSettings>();
-                string[] keys = Std.JsonKeys(json.staves);
-                foreach (var key in keys)
+                var val = json.staves;
+                if (JsContext.@typeof(val) == "string")
                 {
-                    var val = json.staves[key];
-                    if (JsContext.@typeof(val) == "string")
+                    settings.Staves = new StaveSettings(val);
+                }
+                else
+                {
+                    if (val.id)
                     {
-                        settings.Staves.Add(new StaveSettings(val));
-                    }
-                    else
-                    {
-                        if (val.id)
+                        var staveSettings = new StaveSettings(val.id);
+                        if (val.additionalSettings)
                         {
-                            var staveSettings = new StaveSettings(val.id);
-                            if (val.additionalSettings)
+                            string[] keys2 = Std.JsonKeys(val.additionalSettings);
+                            foreach (var key2 in keys2)
                             {
-                                string[] keys2 = Std.JsonKeys(val.additionalSettings);
-                                foreach (var key2 in keys2)
-                                {
-                                    staveSettings.AdditionalSettings[key2] = val.additionalSettings[key2];
-                                }
+                                staveSettings.AdditionalSettings[key2] = val.additionalSettings[key2];
                             }
-                            settings.Staves.Add(staveSettings);
                         }
+                        settings.Staves = staveSettings;
                     }
                 }
             }

@@ -37,22 +37,16 @@ namespace AlphaTab.Rendering.Glyphs
         public float MinWidth { get; set; }
         public float OnTimeX { get; set; }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether the sizes of the <see cref="BarLayoutingInfo"/>
-        /// should be used to size the <see cref="PreNotes"/> and <see cref="OnNotes"/> glyphs.
-        /// </summary>
-        public bool UseLayoutingInfo { get; set; }
 
-        public BeatContainerGlyph(Beat beat, VoiceContainerGlyph voiceContainer, bool useLayoutingInfo = false)
+        public BeatContainerGlyph(Beat beat, VoiceContainerGlyph voiceContainer)
             : base(0, 0)
         {
             Beat = beat;
             Ties = new FastList<Glyph>();
             VoiceContainer = voiceContainer;
-            UseLayoutingInfo = useLayoutingInfo;
         }
 
-        public void RegisterLayoutingInfo(BarLayoutingInfo layoutings)
+        public virtual void RegisterLayoutingInfo(BarLayoutingInfo layoutings)
         {
             var preBeatStretch = PreNotes.Width + OnNotes.Width / 2;
             layoutings.AddBeatSpring(Beat, MinWidth, preBeatStretch);
@@ -61,15 +55,13 @@ namespace AlphaTab.Rendering.Glyphs
             layoutings.SetOnBeatSize(Beat, OnNotes.Width);
         }
 
-        public void ApplyLayoutingInfo(BarLayoutingInfo info)
+        public virtual void ApplyLayoutingInfo(BarLayoutingInfo info)
         {
-            if (UseLayoutingInfo)
-            {
-                PreNotes.Width = info.GetPreBeatSize(Beat);
-                OnNotes.Width = info.GetOnBeatSize(Beat);
-                OnNotes.X = PreNotes.X + PreNotes.Width;
-                OnTimeX = OnNotes.X + OnNotes.Width / 2;
-            }
+            PreNotes.Width = info.GetPreBeatSize(Beat);
+            OnNotes.Width = info.GetOnBeatSize(Beat);
+            OnNotes.X = PreNotes.X + PreNotes.Width;
+            OnTimeX = OnNotes.X + OnNotes.Width / 2;
+            OnNotes.UpdateBeamingHelper();
         }
 
         public override void DoLayout()

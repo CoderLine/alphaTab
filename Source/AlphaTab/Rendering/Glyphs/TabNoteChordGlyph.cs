@@ -27,14 +27,13 @@ namespace AlphaTab.Rendering.Glyphs
     public class TabNoteChordGlyph : Glyph
     {
         private readonly FastList<NoteNumberGlyph> _notes;
-        private readonly FastDictionary<int, NoteNumberGlyph> _noteLookup;
         private Note _minNote;
         private readonly bool _isGrace;
-        private float _centerX;
 
         public Beat Beat { get; set; }
         public BeamingHelper BeamingHelper { get; set; }
         public FastDictionary<string, Glyph> BeatEffects { get; set; }
+        public FastDictionary<int, NoteNumberGlyph> NotesPerString { get; set; }
 
         public TabNoteChordGlyph(float x, float y, bool isGrace)
             : base(x, y)
@@ -42,14 +41,14 @@ namespace AlphaTab.Rendering.Glyphs
             _isGrace = isGrace;
             _notes = new FastList<NoteNumberGlyph>();
             BeatEffects = new FastDictionary<string, Glyph>();
-            _noteLookup = new FastDictionary<int, NoteNumberGlyph>();
+            NotesPerString = new FastDictionary<int, NoteNumberGlyph>();
         }
 
         public float GetNoteX(Note note, bool onEnd = true)
         {
-            if (_noteLookup.ContainsKey(note.String))
+            if (NotesPerString.ContainsKey(note.String))
             {
-                var n = _noteLookup[note.String];
+                var n = NotesPerString[note.String];
                 var pos = X + n.X;
                 if (onEnd)
                 {
@@ -62,9 +61,9 @@ namespace AlphaTab.Rendering.Glyphs
 
         public float GetNoteY(Note note)
         {
-            if (_noteLookup.ContainsKey(note.String))
+            if (NotesPerString.ContainsKey(note.String))
             {
-                return Y + _noteLookup[note.String].Y;
+                return Y + NotesPerString[note.String].Y;
             }
             return 0;
         }
@@ -97,31 +96,32 @@ namespace AlphaTab.Rendering.Glyphs
                 g.DoLayout();
             }
 
-            _centerX = 0;
-
             Width = w;
         }
 
         public void AddNoteGlyph(NoteNumberGlyph noteGlyph, Note note)
         {
             _notes.Add(noteGlyph);
-            _noteLookup[note.String] = noteGlyph;
+            NotesPerString[note.String] = noteGlyph;
             if (_minNote == null || note.String < _minNote.String) _minNote = note;
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var res = Renderer.Resources;
-            var old = canvas.TextBaseline;
+            var oldBaseLine = canvas.TextBaseline;
+            var oldAlign = canvas.TextAlign;
             canvas.TextBaseline = TextBaseline.Middle;
+            canvas.TextAlign = TextAlign.Center;
             canvas.Font = _isGrace ? res.GraceFont : res.TablatureFont;
             for (int i = 0, j = _notes.Count; i < j; i++)
             {
                 var g = _notes[i];
                 g.Renderer = Renderer;
-                g.Paint(cx + X, cy + Y, canvas);
+                g.Paint(cx + X + Width / 2, cy + Y, canvas);
             }
-            canvas.TextBaseline = old;
+            canvas.TextBaseline = oldBaseLine;
+            canvas.TextAlign = oldAlign;
 
             foreach (var beatEffectKey in BeatEffects)
             {
@@ -134,7 +134,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (BeamingHelper != null && !BeamingHelper.HasBeatLineX(Beat))
             {
-                BeamingHelper.RegisterBeatLineX(Beat, cx + X + _centerX, cx + X + _centerX);
+                BeamingHelper.RegisterBeatLineX(Beat, cx + X + Width / 2, cx + X + Width / 2);
             }
         }
     }

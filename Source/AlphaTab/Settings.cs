@@ -67,9 +67,10 @@ namespace AlphaTab
         public bool ForcePianoFingering { get; set; }
 
         /// <summary>
-        /// The staves to create for each row.
+        /// The staves that should be shown in the music sheet. 
+        /// This is one of the profiles registered in the <see cref="Environment.StaveProfiles"/>
         /// </summary>
-        public FastList<StaveSettings> Staves { get; set; }
+        public StaveSettings Staves { get; set; }
 
         public static Settings Defaults
         {
@@ -85,36 +86,7 @@ namespace AlphaTab
 
                 settings.Layout = LayoutSettings.Defaults;
 
-                settings.Staves = new FastList<StaveSettings>();
-
-                settings.Staves.Add(new StaveSettings("tempo"));
-                settings.Staves.Add(new StaveSettings("triplet-feel"));
-                settings.Staves.Add(new StaveSettings("marker"));
-                settings.Staves.Add(new StaveSettings("text"));
-                settings.Staves.Add(new StaveSettings("chords"));
-                settings.Staves.Add(new StaveSettings("trill"));
-                settings.Staves.Add(new StaveSettings("beat-vibrato"));
-                settings.Staves.Add(new StaveSettings("note-vibrato"));
-                settings.Staves.Add(new StaveSettings("alternate-endings"));
-
-                settings.Staves.Add(new StaveSettings("score"));
-
-                settings.Staves.Add(new StaveSettings("crescendo"));
-                settings.Staves.Add(new StaveSettings("dynamics"));
-                settings.Staves.Add(new StaveSettings("capo"));
-                settings.Staves.Add(new StaveSettings("trill"));
-                settings.Staves.Add(new StaveSettings("beat-vibrato"));
-                settings.Staves.Add(new StaveSettings("note-vibrato"));
-                settings.Staves.Add(new StaveSettings("tap"));
-                settings.Staves.Add(new StaveSettings("fade-in"));
-                settings.Staves.Add(new StaveSettings("harmonics"));
-                settings.Staves.Add(new StaveSettings("let-ring"));
-                settings.Staves.Add(new StaveSettings("palm-mute"));
-
-                settings.Staves.Add(new StaveSettings("tab"));
-
-                settings.Staves.Add(new StaveSettings("pick-stroke"));
-                //settings.staves.Add(new StaveSettings("fingering"));
+                settings.Staves = new StaveSettings("default");
 
                 return settings;
             }
@@ -177,37 +149,18 @@ namespace AlphaTab
     public class StaveSettings
     {
         /// <summary>
-        /// The stave identifier.
-        /// Default Staves: 
+        /// The stave profile name as it is registered in <see cref="Environment.StaveProfiles"/>
+        /// Default Profiles: 
         /// <ul>
-        ///  <li><strong>marker</strong> - Renders section markers</li>
-        ///  <li><strong>triplet-feel</strong> - Renders triplet feel indicators</li>
-        ///  <li><strong>tempo</strong> - Renders a tempo identifier</li>
-        ///  <li><strong>text</strong> - Renders custom text annotations</li>
-        ///  <li><strong>chords</strong> - Renders chord names</li>
-        ///  <li><strong>beat-vibrato</strong> - Renders beat vibrato symbols</li>
-        ///  <li><strong>note-vibrato</strong> - Renders note vibrato symbols</li>
-        ///  <li><strong>tuplet</strong> - Renders tuplet indicators</li>
-        ///  <li><strong>score</strong> - Renders default music notation</li>
-        ///  <li><strong>crescendo</strong> - Renders crescendo and decresencod</li>
-        ///  <li><strong>dynamics</strong> - Renders dynamics markers</li>
-        ///  <li><strong>tap</strong> - Renders tap/slap/pop indicators</li>
-        ///  <li><strong>fade-in</strong> - Renders fade-in indicators</li>
-        ///  <li><strong>let-ring</strong> - Renders let-ring indicators</li>
-        ///  <li><strong>palm-mute</strong> - Renders palm-mute indicators</li>
-        ///  <li><strong>tab</strong> - Renders guitar tablature</li>
-        ///  <li><strong>fingering</strong> - Renders finger indicators</li>
-        /// </ul>
-        /// Additional Staves:
-        /// <ul>
-        ///   <li><strong>rhythm-down</strong> - Renders rhythm bars that point downwards</li>
-        ///   <li><strong>rhythm-up</strong> - Renders rhythm bars that point upwards</li>
+        ///  <li><strong>score-tab</strong> - Standard music notation and guitar tablature are rendered (default)</li>
+        ///  <li><strong>score</strong> - Only standard music notation is rendered</li>
+        ///  <li><strong>tab</strong> - Only guitar tablature is rendered</li>
         /// </ul>
         /// </summary>
         public string Id { get; set; }
 
         /// <summary>
-        /// Additional stave specific settings
+        /// Additional stave sspecific settings
         /// <strong>id=tab</strong>
         /// <ul>
         ///  <li><strong>rhythm</strong> - Renders rhythm beams to tablature notes</li>

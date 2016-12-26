@@ -63,8 +63,6 @@ namespace AlphaTab.Rendering.Layout
 
         protected override void DoLayoutAndRender()
         {
-            if (Renderer.Settings.Staves.Count == 0) return;
-
             var score = Renderer.Score;
             var canvas = Renderer.Canvas;
 
@@ -86,51 +84,47 @@ namespace AlphaTab.Rendering.Layout
             var partials = new FastList<HorizontalScreenLayoutPartialInfo>();
 
             var currentPartial = new HorizontalScreenLayoutPartialInfo();
-            if (Renderer.Settings.Staves.Count > 0)
+            while (currentBarIndex <= endBarIndex)
             {
-                while (currentBarIndex <= endBarIndex)
+                var result = _group.AddBars(Renderer.Tracks, currentBarIndex);
+
+                // if we detect that the new renderer is linked to the previous
+                // renderer, we need to put it into the previous partial 
+                if (currentPartial.MasterBars.Count == 0 && result.IsLinkedToPrevious && partials.Count > 0)
                 {
-                    var result = _group.AddBars(Renderer.Tracks, currentBarIndex);
+                    var previousPartial = partials[partials.Count - 1];
+                    previousPartial.MasterBars.Add(score.MasterBars[currentBarIndex]);
+                    previousPartial.Width += result.Width;
 
-                    // if we detect that the new renderer is linked to the previous
-                    // renderer, we need to put it into the previous partial 
-                    if (currentPartial.MasterBars.Count == 0 && result.IsLinkedToPrevious && partials.Count > 0)
+                }
+                else
+                {
+                    currentPartial.MasterBars.Add(score.MasterBars[currentBarIndex]);
+                    currentPartial.Width += result.Width;
+                    // no targetPartial here because previous partials already handled this code
+                    if (currentPartial.MasterBars.Count >= countPerPartial)
                     {
-                        var previousPartial = partials[partials.Count - 1];
-                        previousPartial.MasterBars.Add(score.MasterBars[currentBarIndex]);
-                        previousPartial.Width += result.Width;
-
-                    }
-                    else
-                    {
-                        currentPartial.MasterBars.Add(score.MasterBars[currentBarIndex]);
-                        currentPartial.Width += result.Width;
-                        // no targetPartial here because previous partials already handled this code
-                        if (currentPartial.MasterBars.Count >= countPerPartial)
+                        if (partials.Count == 0)
                         {
-                            if (partials.Count == 0)
-                            {
-                                currentPartial.Width += _group.X + _group.AccoladeSpacing;
-                            }
-                            partials.Add(currentPartial);
-                            currentPartial = new HorizontalScreenLayoutPartialInfo();
+                            currentPartial.Width += _group.X + _group.AccoladeSpacing;
                         }
+                        partials.Add(currentPartial);
+                        currentPartial = new HorizontalScreenLayoutPartialInfo();
                     }
-
-                    currentBarIndex++;
                 }
 
-                // don't miss the last partial if not empty
-                if (currentPartial.MasterBars.Count > 0)
-                {
-                    if (partials.Count == 0)
-                    {
-                        currentPartial.Width += _group.X + _group.AccoladeSpacing;
-                    }
-                    partials.Add(currentPartial);
-                }
+                currentBarIndex++;
             }
 
+            // don't miss the last partial if not empty
+            if (currentPartial.MasterBars.Count > 0)
+            {
+                if (partials.Count == 0)
+                {
+                    currentPartial.Width += _group.X + _group.AccoladeSpacing;
+                }
+                partials.Add(currentPartial);
+            }
 
             _group.FinalizeGroup(this);
 

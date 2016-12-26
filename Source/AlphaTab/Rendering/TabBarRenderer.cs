@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Glyphs;
@@ -168,13 +170,56 @@ namespace AlphaTab.Rendering
             canvas.Color = res.StaveLineColor;
             var lineY = cy + Y + TopPadding;
 
+            var padding = Scale;
+
+            // collect tab note position for spaces
+            var tabNotes = new FastList<FastList<float[]>>();
+            for (int i = 0, j = Bar.Staff.Track.Tuning.Length; i < j; i++)
+            {
+                tabNotes.Add(new FastList<float[]>());
+            }
+
+            foreach (Voice voice in Bar.Voices)
+            {
+                var vc = GetOrCreateVoiceContainer(voice);
+                foreach (var bg in vc.BeatGlyphs)
+                {
+                    var notes = ((TabBeatGlyph)bg.OnNotes);
+                    var noteNumbers = notes.NoteNumbers;
+                    if (noteNumbers != null)
+                    {
+                        foreach (var s in noteNumbers.NotesPerString)
+                        {
+                            tabNotes[Bar.Staff.Track.Tuning.Length - s].Add(
+                                new []
+                                {
+                                  vc.X + bg.X + notes.X + noteNumbers.X,
+                                  noteNumbers.Width + padding
+                                });
+                        }
+                    }
+                }
+            }
+
+            // if we have multiple voices we need to sort by X-position, otherwise have a wild mix in the list 
+            // but painting relies on ascending X-position
+            foreach (var line in tabNotes)
+            {
+                line.Sort((a, b) => a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0);
+            }
+            
             for (int i = 0, j = Bar.Staff.Track.Tuning.Length; i < j; i++)
             {
                 if (i > 0) lineY += LineOffset;
-                canvas.BeginPath();
-                canvas.MoveTo(cx + X, (int)lineY);
-                canvas.LineTo(cx + X + Width, (int)lineY);
-                canvas.Stroke();
+
+                var lineX = 0f;
+                foreach (var line in tabNotes[i])
+                {
+                    canvas.FillRect(cx + X + lineX, (int)lineY, line[0] - lineX, Scale);
+                    lineX = line[0] + line[1];
+                }
+
+                canvas.FillRect(cx + X + lineX, (int)lineY, Width - lineX, Scale);
             }
 
             canvas.Color = res.MainGlyphColor;

@@ -111,7 +111,7 @@ namespace AlphaTab.Rendering
             {
                 // we create empty glyphs as alignment references and to get the 
                 // effect bar sized
-                var container = new BeatContainerGlyph(b, GetOrCreateVoiceContainer(v), true);
+                var container = new BeatContainerGlyph(b, GetOrCreateVoiceContainer(v));
                 container.PreNotes = new BeatGlyphBase();
                 container.OnNotes = new BeatOnNoteGlyphBase();
                 AddBeatGlyph(container);

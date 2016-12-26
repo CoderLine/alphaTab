@@ -210,12 +210,15 @@ namespace AlphaTab.Test.Importer
             var tex = @":8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh}";
             var score = ParseTex(tex);
 
+            Environment.StaveProfiles["harmonics"] = new[]
+            {
+                "harmonics"
+            };
+
+
             var settings = Settings.Defaults;
             settings.Engine = "svg";
-            settings.Staves = new FastList<StaveSettings>
-            {
-                new StaveSettings("harmonics")
-            };
+            settings.Staves = new StaveSettings("harmonics");
 
             var renderer = new ScoreRenderer(settings);
             var svg = "";
@@ -254,12 +257,14 @@ namespace AlphaTab.Test.Importer
             var tex = @":4 15.6{b(0 4)} 18.6{b(0 6)} 17.6{b(0 8)} 16.6{b(0 3 0)} | 15.6{b(0 8 4)} 14.6{b(4 4)} 13.6{b(4 6)} 14.6{b(4 0)}";
             var score = ParseTex(tex);
 
+            Environment.StaveProfiles["tabOnly"] = new[]
+            {
+                "tab"
+            };
+
             var settings = Settings.Defaults;
             settings.Engine = "svg";
-            settings.Staves = new FastList<StaveSettings>
-            {
-                new StaveSettings("tab")
-            };
+            settings.Staves = new StaveSettings("tabOnly");
 
             var renderer = new ScoreRenderer(settings);
             var partials = new List<string>();
@@ -287,7 +292,7 @@ namespace AlphaTab.Test.Importer
                 "2", // bar number
 
                 "15", "2", "-1",
-                "14", "full", 
+                "14", "full",
                 "13", "full", "1½",
                 "14", "full"
             };

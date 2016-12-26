@@ -193,24 +193,21 @@ namespace AlphaTab.Rendering.Layout
             endBarIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, endBarIndex));
 
             _groups = new FastList<StaveGroup>();
-            if (Renderer.Settings.Staves.Count > 0)
+            while (currentBarIndex <= endBarIndex)
             {
-                while (currentBarIndex <= endBarIndex)
-                {
-                    // create group and align set proper coordinates
-                    var group = CreateStaveGroup(currentBarIndex, endBarIndex);
-                    _groups.Add(group);
-                    group.X = x;
-                    group.Y = y;
+                // create group and align set proper coordinates
+                var group = CreateStaveGroup(currentBarIndex, endBarIndex);
+                _groups.Add(group);
+                group.X = x;
+                group.Y = y;
 
-                    currentBarIndex = group.LastBarIndex + 1;
+                currentBarIndex = group.LastBarIndex + 1;
 
-                    // finalize group (sizing etc).
-                    FitGroup(group);
-                    group.FinalizeGroup(this);
+                // finalize group (sizing etc).
+                FitGroup(group);
+                group.FinalizeGroup(this);
 
-                    y += PaintGroup(group, y, canvas);
-                }
+                y += PaintGroup(group, y, canvas);
             }
 
             return y;
