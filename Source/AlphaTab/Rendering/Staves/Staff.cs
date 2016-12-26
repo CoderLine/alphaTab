@@ -97,30 +97,41 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public void RegisterStaveTop(float offset)
+        public void RegisterStaffTop(float offset)
         {
             StaveTop = offset;
         }
 
-        public void RegisterStaveBottom(float offset)
+        public void RegisterStaffBottom(float offset)
         {
             StaveBottom = offset;
         }
 
-        public void AddBar(Bar bar)
+        public void AddBarRenderer(BarRendererBase renderer)
+        {
+            renderer.Staff = this;
+            renderer.Index = BarRenderers.Count;
+            renderer.ReLayout();
+            BarRenderers.Add(renderer);
+            StaveGroup.Layout.RegisterBarRenderer(StaveId, renderer);
+        }
+
+        public void AddBar(Bar bar, BarLayoutingInfo layoutingInfo)
         {
             BarRendererBase renderer;
             if (bar == null)
             {
-                renderer = new BarRendererBase(bar);
+                renderer = new BarRendererBase(StaveGroup.Layout.Renderer, bar);
             }
             else
             {
-                renderer = _factory.Create(bar);
+                renderer = _factory.Create(StaveGroup.Layout.Renderer, bar);
             }
             renderer.Staff = this;
             renderer.Index = BarRenderers.Count;
+            renderer.LayoutingInfo = layoutingInfo;
             renderer.DoLayout();
+            renderer.RegisterLayoutingInfo();
             BarRenderers.Add(renderer);
             if (bar != null)
             {

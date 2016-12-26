@@ -45,8 +45,8 @@ namespace AlphaTab.Rendering
 
         public AccidentalHelper AccidentalHelper { get; set; }
 
-        public ScoreBarRenderer(Bar bar)
-            : base(bar)
+        public ScoreBarRenderer(ScoreRenderer renderer, Bar bar)
+            : base(renderer, bar)
         {
             AccidentalHelper = new AccidentalHelper();
         }
@@ -100,15 +100,9 @@ namespace AlphaTab.Rendering
             var glyphOverflow = (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2f);
             TopPadding = glyphOverflow;
             BottomPadding = glyphOverflow;
+            Height = (LineOffset * 4) + TopPadding + BottomPadding;
 
             base.DoLayout();
-
-            Height = (LineOffset * 4) + TopPadding + BottomPadding;
-            if (Index == 0)
-            {
-                Staff.RegisterStaveTop(TopPadding);
-                Staff.RegisterStaveBottom(Height - BottomPadding);
-            }
 
             var top = GetScoreY(0);
             var bottom = GetScoreY(8);
@@ -747,19 +741,12 @@ namespace AlphaTab.Rendering
                 AddPostBeatGlyph(new RepeatCloseGlyph(X, 0));
                 if (Bar.MasterBar.RepeatCount > 2)
                 {
-                    var line = IsLast || IsLastOfLine ? -1 : -4;
-                    AddPostBeatGlyph(new RepeatCountGlyph(0, GetScoreY(line, -3), Bar.MasterBar.RepeatCount));
+                    AddPostBeatGlyph(new RepeatCountGlyph(0, GetScoreY(-1, -3), Bar.MasterBar.RepeatCount));
                 }
             }
-            else if (Bar.MasterBar.IsDoubleBar)
+            if (Bar.NextBar == null || !Bar.NextBar.MasterBar.IsRepeatStart)
             {
                 AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
-                AddPostBeatGlyph(new SpacingGlyph(0, 0, 3 * Scale));
-                AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
-            }
-            else if (Bar.NextBar == null || !Bar.NextBar.MasterBar.IsRepeatStart)
-            {
-                AddPostBeatGlyph(new BarSeperatorGlyph(0, 0, IsLast));
             }
         }
 

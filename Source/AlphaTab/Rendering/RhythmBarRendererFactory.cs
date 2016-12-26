@@ -31,9 +31,9 @@ namespace AlphaTab.Rendering
             HideOnMultiTrack = false;
         }
 
-        public override BarRendererBase Create(Bar bar)
+        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar)
         {
-            return new RhythmBarRenderer(bar, _direction);
+            return new RhythmBarRenderer(renderer, bar, _direction);
         }
     }
 }

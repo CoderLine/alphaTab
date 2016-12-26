@@ -60,9 +60,9 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            Renderer.Layout.Renderer.Canvas.Font = Renderer.Resources.TablatureFont;
-            _noteStringWidth = Renderer.Layout.Renderer.Canvas.MeasureText(_noteString);
-            _trillNoteStringWidth = Renderer.Layout.Renderer.Canvas.MeasureText(_trillNoteString);
+            Renderer.ScoreRenderer.Canvas.Font = Renderer.Resources.TablatureFont;
+            _noteStringWidth = Renderer.ScoreRenderer.Canvas.MeasureText(_noteString);
+            _trillNoteStringWidth = Renderer.ScoreRenderer.Canvas.MeasureText(_trillNoteString);
             Width = _noteStringWidth + _trillNoteStringWidth;
         }
 

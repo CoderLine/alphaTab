@@ -29,9 +29,9 @@ namespace AlphaTab.Rendering
             IsInAccolade = false;
         }
 
-        public override BarRendererBase Create(Bar bar)
+        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar)
         {
-            return new AlternateEndingsBarRenderer(bar);
+            return new AlternateEndingsBarRenderer(renderer, bar);
         }
     }
 }

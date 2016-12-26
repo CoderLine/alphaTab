@@ -17,12 +17,9 @@
  */
 using System;
 using AlphaTab.Collections;
-using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
-using AlphaTab.Rendering.Utils;
-using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Layout
 {
@@ -36,6 +33,7 @@ namespace AlphaTab.Rendering.Layout
         public const float GroupSpacing = 20;
 
         private FastList<StaveGroup> _groups;
+        private AddBarsToStaveGroupResult _barsFromPreviousGroup;
 
         public PageViewLayout(ScoreRenderer renderer)
             : base(renderer)
@@ -131,13 +129,15 @@ namespace AlphaTab.Rendering.Layout
                 y += musicOrWordsHeight;
             }
 
-            y += 20 * scale;
-
             if (TuningGlyph != null)
             {
+                y += 20 * scale;
                 TuningGlyph.X = x;
                 TuningGlyph.Y = y;
+                y += TuningGlyph.Height;
             }
+
+            y += 20 * scale;
 
             var canvas = Renderer.Canvas;
             canvas.BeginRender(Width, y);
@@ -146,6 +146,11 @@ namespace AlphaTab.Rendering.Layout
             foreach (var key in ScoreInfoGlyphs)
             {
                 ScoreInfoGlyphs[key].Paint(0, 0, canvas);
+            }
+
+            if (TuningGlyph != null)
+            {
+                TuningGlyph.Paint(0, 0, canvas);
             }
 
             var result = canvas.EndRender();
@@ -228,14 +233,13 @@ namespace AlphaTab.Rendering.Layout
             totalHeight += height;
 
             var result = canvas.EndRender();
-            Renderer.OnPartialRenderFinished(new RenderFinishedEventArgs
-            {
-                TotalWidth = Width,
-                TotalHeight = totalHeight,
-                Width = Width,
-                Height = height,
-                RenderResult = result
-            });
+            var args = new RenderFinishedEventArgs();
+            args.TotalWidth = Width;
+            args.TotalHeight = totalHeight;
+            args.Width = Width;
+            args.Height = height;
+            args.RenderResult = result;
+            Renderer.OnPartialRenderFinished(args);
 
             return height;
         }
@@ -264,7 +268,17 @@ namespace AlphaTab.Rendering.Layout
             var end = endIndex + 1;
             for (int i = currentBarIndex; i < end; i++)
             {
-                group.AddBars(Renderer.Tracks, i);
+                AddBarsToStaveGroupResult addResult;
+                if (_barsFromPreviousGroup != null && _barsFromPreviousGroup.MasterBar.Index == i)
+                {
+                    addResult = group.AddBarsFromResult(Renderer.Tracks, _barsFromPreviousGroup);
+                }
+                else
+                {
+                    addResult = group.AddBars(Renderer.Tracks, i);
+                }
+                _barsFromPreviousGroup = null;
+
 
                 var groupIsFull = false;
 
@@ -282,12 +296,15 @@ namespace AlphaTab.Rendering.Layout
                 {
                     group.RevertLastBar();
                     group.IsFull = true;
+                    group.IsLast = false;
+                    _barsFromPreviousGroup = addResult;
                     return group;
                 }
 
                 group.X = 0;
             }
 
+            group.IsLast = endIndex == group.LastBarIndex;
             return group;
         }
 

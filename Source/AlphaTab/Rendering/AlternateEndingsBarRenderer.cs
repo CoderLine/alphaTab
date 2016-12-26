@@ -33,8 +33,8 @@ namespace AlphaTab.Rendering
         private readonly FastList<int> _endings;
         private string _endingsString;
 
-        public AlternateEndingsBarRenderer(Bar bar)
-            : base(bar)
+        public AlternateEndingsBarRenderer(ScoreRenderer renderer, Bar bar)
+            : base(renderer, bar)
         {
             var alternateEndings = Bar.MasterBar.AlternateEndings;
             _endings = new FastList<int>();
@@ -72,13 +72,8 @@ namespace AlphaTab.Rendering
 
         public override void DoLayout()
         {
-            base.DoLayout();
-            if (Index == 0)
-            {
-                Staff.TopSpacing = 5;
-                Staff.BottomSpacing = 4;
-            }
             Height = Resources.WordsFont.Size;
+            base.DoLayout();
 
             var endingsStrings = new StringBuilder();
             for (int i = 0, j = _endings.Count; i < j; i++)

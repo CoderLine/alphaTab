@@ -77,6 +77,7 @@ namespace AlphaTab.Rendering.Layout
             endBarIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, endBarIndex));
 
             _group = CreateEmptyStaveGroup();
+            _group.IsLast = true;
             _group.X = PagePadding[0];
             _group.Y = PagePadding[1];
 

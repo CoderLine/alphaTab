@@ -16,22 +16,20 @@
  * License along with this library.
  */
 using AlphaTab.Platform;
+using AlphaTab.Rendering.Effects;
 
 namespace AlphaTab.Rendering.Glyphs
 {
     public class BarSeperatorGlyph : Glyph
     {
-        private readonly bool _isLast;
-
-        public BarSeperatorGlyph(float x, float y, bool isLast = false)
+        public BarSeperatorGlyph(float x, float y)
             : base(x, y)
         {
-            _isLast = isLast;
         }
 
         public override void DoLayout()
         {
-            Width = (_isLast ? 8 : 1) * Scale;
+            Width = 8 * Scale;
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
@@ -43,17 +41,21 @@ namespace AlphaTab.Rendering.Glyphs
             var left = (int)(cx + X);
             var h = bottom - top;
 
-            // line
-            canvas.BeginPath();
-            canvas.MoveTo(left, top);
-            canvas.LineTo(left, bottom);
-            canvas.Stroke();
-
-            if (_isLast)
+            if (Renderer.IsLast)
             {
+                // small bar
+                canvas.FillRect(left, top, Scale, h);
                 // big bar
-                left += (int)((3 * Scale) + 0.5f);
-                canvas.FillRect(left, top, blockWidth, h);
+                canvas.FillRect(left + Width - blockWidth, top, blockWidth, h);
+            }
+            else
+            {
+                // small bar
+                canvas.FillRect(left + Width, top, Scale, h);
+                if (Renderer.Bar.MasterBar.IsDoubleBar)
+                {
+                    canvas.FillRect(left + Width - 5 * Scale, top, Scale, h);
+                }
             }
         }
     }

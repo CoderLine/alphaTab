@@ -30,9 +30,9 @@ namespace AlphaTab.Rendering
             HideOnMultiTrack = info.HideOnMultiTrack;
         }
 
-        public override BarRendererBase Create(Bar bar)
+        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar)
         {
-            return new EffectBarRenderer(bar, _info);
+            return new EffectBarRenderer(renderer, bar, _info);
         }
     }
 }

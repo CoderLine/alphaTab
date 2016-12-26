@@ -38,7 +38,7 @@ namespace AlphaTab.Rendering.Glyphs
                     currentY += Height;
                     if (i == stringsPerColumn - 1)
                     {
-                        currentY = 0;
+                        currentY = Height;
                         currentX += (43 * _scale);
                     }
                 }

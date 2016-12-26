@@ -27,8 +27,8 @@ namespace AlphaTab.Rendering
         private readonly BeamDirection _direction;
         private BarHelpers _helpers;
 
-        public RhythmBarRenderer(Bar bar, BeamDirection direction)
-            : base(bar)
+        public RhythmBarRenderer(ScoreRenderer renderer, Bar bar, BeamDirection direction)
+            : base(renderer, bar)
         {
             _direction = direction;
         }
@@ -36,8 +36,8 @@ namespace AlphaTab.Rendering
         public override void DoLayout()
         {
             _helpers = Staff.StaveGroup.Helpers.Helpers[Bar.Staff.Track.Index][Bar.Staff.Index][Bar.Index];
-            base.DoLayout();
             Height = Staff.GetSetting("rhythm-height", 24) * Scale;
+            base.DoLayout();
             IsEmpty = false;
         }
 

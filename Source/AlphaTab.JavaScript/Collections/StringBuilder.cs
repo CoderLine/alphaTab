@@ -19,30 +19,30 @@ using SharpKit.JavaScript;
 
 namespace AlphaTab.Collections
 {
-    [JsType(Mode = JsMode.Prototype, Name = "Array", Export = false)]
+    [JsType(Mode = JsMode.Prototype, Name = "String", Export = false)]
     public class StringBuilder
     {
-        [JsMethod(Code = "[]")]
+        [JsMethod(Code = "''")]
         public StringBuilder()
         {
         }
 
-        [JsMethod(InlineCodeExpression = "this.push(s)", Export = false)]
+        [JsMethod(InlineCodeExpression = "this += s", Export = false)]
         public void Append(object s)
         {
         }
 
-        [JsMethod(InlineCodeExpression = "this.push(String.fromCharCode(i))", Export = false)]
+        [JsMethod(InlineCodeExpression = "this += String.fromCharCode(i)", Export = false)]
         public void AppendChar(int i)
         {
         }
 
-        [JsMethod(InlineCodeExpression = "this.push(s + '\\r\\n')", Export = false)]
+        [JsMethod(InlineCodeExpression = "this += s + '\\r\\n'", Export = false)]
         public void AppendLine(string s = "")
         {
         }
 
-        [JsMethod(InlineCodeExpression = "this.join('')", Export = false)]
+        [JsMethod(InlineCodeExpression = "this", Export = false)]
         public new string ToString()
         {
             return "";

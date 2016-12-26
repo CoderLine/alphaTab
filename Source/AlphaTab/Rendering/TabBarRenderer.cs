@@ -31,8 +31,8 @@ namespace AlphaTab.Rendering
     {
         public const float LineSpacing = 10;
 
-        public TabBarRenderer(Bar bar)
-            : base(bar)
+        public TabBarRenderer(ScoreRenderer renderer, Bar bar)
+            : base(renderer, bar)
         {
         }
 
@@ -70,15 +70,9 @@ namespace AlphaTab.Rendering
             var numberOverflow = (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2f);
             TopPadding = numberOverflow;
             BottomPadding = numberOverflow;
+            Height = LineOffset * (Bar.Staff.Track.Tuning.Length - 1) + (numberOverflow * 2);
 
             base.DoLayout();
-
-            Height = LineOffset * (Bar.Staff.Track.Tuning.Length - 1) + (numberOverflow * 2);
-            if (Index == 0)
-            {
-                Staff.RegisterStaveTop(TopOverflow);
-                Staff.RegisterStaveBottom(Height - BottomPadding);
-            }
         }
 
         protected override void CreatePreBeatGlyphs()
@@ -131,19 +125,12 @@ namespace AlphaTab.Rendering
                 AddPostBeatGlyph(new RepeatCloseGlyph(X, 0));
                 if (Bar.MasterBar.RepeatCount > 2)
                 {
-                    var line = IsLast || IsLastOfLine ? -1 : -4;
-                    AddPostBeatGlyph(new RepeatCountGlyph(0, GetTabY(line, -3), Bar.MasterBar.RepeatCount));
+                    AddPostBeatGlyph(new RepeatCountGlyph(0, GetTabY(-0.5f, -3), Bar.MasterBar.RepeatCount));
                 }
-            }
-            else if (Bar.MasterBar.IsDoubleBar)
-            {
-                AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
-                AddPostBeatGlyph(new SpacingGlyph(0, 0, 3 * Scale));
-                AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
             }
             else if (Bar.NextBar == null || !Bar.NextBar.MasterBar.IsRepeatStart)
             {
-                AddPostBeatGlyph(new BarSeperatorGlyph(0, 0, IsLast));
+                AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
             }
         }
 
@@ -207,10 +194,11 @@ namespace AlphaTab.Rendering
             {
                 line.Sort((a, b) => a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0);
             }
-            
+
+            var lineOffset = LineOffset;
             for (int i = 0, j = Bar.Staff.Track.Tuning.Length; i < j; i++)
             {
-                if (i > 0) lineY += LineOffset;
+                if (i > 0) lineY += lineOffset;
 
                 var lineX = 0f;
                 foreach (var line in tabNotes[i])

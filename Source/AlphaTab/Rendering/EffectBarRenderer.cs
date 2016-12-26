@@ -31,26 +31,21 @@ namespace AlphaTab.Rendering
     public class EffectBarRenderer : BarRendererBase
     {
         private readonly IEffectBarRendererInfo _info;
-        private readonly FastList<FastList<EffectGlyph>> _uniqueEffectGlyphs;
-        private readonly FastList<FastDictionary<int, EffectGlyph>> _effectGlyphs;
+        private FastList<FastList<EffectGlyph>> _uniqueEffectGlyphs;
+        private FastList<FastDictionary<int, EffectGlyph>> _effectGlyphs;
 
-        public EffectBarRenderer(Bar bar, IEffectBarRendererInfo info)
-            : base(bar)
+        public EffectBarRenderer(ScoreRenderer renderer, Bar bar, IEffectBarRendererInfo info)
+            : base(renderer, bar)
         {
             _info = info;
-            _uniqueEffectGlyphs = new FastList<FastList<EffectGlyph>>();
-            _effectGlyphs = new FastList<FastDictionary<int, EffectGlyph>>();
         }
 
         public override void DoLayout()
         {
-            base.DoLayout();
-            if (Index == 0)
-            {
-                Staff.TopSpacing = 5;
-                Staff.BottomSpacing = 5;
-            }
+            _uniqueEffectGlyphs = new FastList<FastList<EffectGlyph>>();
+            _effectGlyphs = new FastList<FastDictionary<int, EffectGlyph>>();
             Height = _info.GetHeight(this);
+            base.DoLayout();
         }
 
         public override void FinalizeRenderer(ScoreLayout layout)

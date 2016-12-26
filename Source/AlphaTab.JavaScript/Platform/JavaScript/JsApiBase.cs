@@ -163,18 +163,23 @@ namespace AlphaTab.Platform.JavaScript
 
             if (result.RenderResult != null)
             {
-                Node itemToAppend;
-                if (@typeof(result.RenderResult) == "string")
+                setTimeout(() =>
                 {
-                    var partialResult = (HtmlDivElement)document.createElement("div");
-                    partialResult.innerHTML = result.RenderResult.As<string>();
-                    itemToAppend = partialResult.firstChild;
-                }
-                else
-                {
-                    itemToAppend = (Node)result.RenderResult;
-                }
-                CanvasElement.appendChild(itemToAppend);
+                    Node itemToAppend;
+                    if (@typeof(result.RenderResult) == "string")
+                    {
+                        var partialResult = (HtmlDivElement)document.createElement("div");
+
+                        partialResult.innerHTML = result.RenderResult.As<string>();
+
+                        itemToAppend = partialResult.firstChild;
+                    }
+                    else
+                    {
+                        itemToAppend = (Node)result.RenderResult;
+                    }
+                    CanvasElement.appendChild(itemToAppend);
+                }, 1);
             }
         }
 

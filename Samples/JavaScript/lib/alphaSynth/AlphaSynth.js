@@ -1186,7 +1186,7 @@ AlphaSynth.Platform.Platform.PlatformInit = function (){
             }
         }
         // failed to automatically resolve
-        if (!((AlphaSynth.Platform.Platform.ScriptFile==null)||(AlphaSynth.Platform.Platform.ScriptFile.length==0))){
+        if (((AlphaSynth.Platform.Platform.ScriptFile==null)||(AlphaSynth.Platform.Platform.ScriptFile.length==0))){
             if (!scriptElement){
                 console.warn("Could not automatically find alphaSynth script file for worker, please add the data-alphasynth attribute to the script tag that includes alphaSynth or provide it when initializing alphaSynth");
             }

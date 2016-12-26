@@ -34,9 +34,9 @@ namespace AlphaTab.Rendering
             return track.Tuning.Length > 0 && base.CanCreate(track);
         }
 
-        public override BarRendererBase Create(Bar bar)
+        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar)
         {
-            return new TabBarRenderer(bar);
+            return new TabBarRenderer(renderer, bar);
         }
     }
 }

@@ -167,9 +167,10 @@ namespace AlphaTab.Rendering.Staves
         {
             var sortedSprings = _timeSortedSprings = new FastList<Spring>();
             _xMin = 0f;
-            foreach (var time in Springs)
+            var springs = Springs;
+            foreach (var time in springs)
             {
-                var spring = Springs[time];
+                var spring = springs[time];
                 sortedSprings.Add(spring);
                 if (spring.SpringWidth < _xMin)
                 {

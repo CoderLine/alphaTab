@@ -277,7 +277,7 @@ namespace AlphaTab.Rendering.Glyphs
                 effectY += effectSpacing;
             }
 
-            canvas.Color = Renderer.Layout.Renderer.RenderingResources.StaveLineColor;
+            canvas.Color = Renderer.ScoreRenderer.RenderingResources.StaveLineColor;
 
             // TODO: Take care of beateffects in overflow
 
@@ -312,8 +312,8 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             canvas.Color = Beat.Voice.Index == 0
-                ? Renderer.Layout.Renderer.RenderingResources.MainGlyphColor
-                : Renderer.Layout.Renderer.RenderingResources.SecondaryGlyphColor;
+                ? Renderer.ScoreRenderer.RenderingResources.MainGlyphColor
+                : Renderer.ScoreRenderer.RenderingResources.SecondaryGlyphColor;
 
             if (_tremoloPicking != null)
                 _tremoloPicking.Paint(cx + X, cy + Y, canvas);

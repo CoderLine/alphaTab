@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 
@@ -121,41 +122,66 @@ namespace AlphaTab.Rendering.Utils
     /// </summary>
     public class BarHelpersGroup
     {
-        public FastDictionary<int, FastList<FastDictionary<int, BarHelpers>>> Helpers { get; set; }
+        public FastDictionary<int/*TrackIndex*/, FastList</*StaveIndex*/ FastDictionary<int/*BarIndex*/, BarHelpers>>> Helpers { get; set; }
 
         public BarHelpersGroup()
         {
             Helpers = new FastDictionary<int, FastList<FastDictionary<int, BarHelpers>>>();
         }
 
-        public void BuildHelpers(Track[] tracks, int barIndex)
+        public void ImportHelpers(Track[] tracks, BarHelpersGroup helpers)
         {
-            for (int i = 0; i < tracks.Length; i++)
+            foreach (var track in tracks)
             {
-                var t = tracks[i];
-                FastList<FastDictionary<int, BarHelpers>> h;
-                if (!Helpers.ContainsKey(t.Index))
+                var h = GetOrCreateForTrack(track);
+                for (var s = 0; s < track.Staves.Count; s++)
                 {
-                    h = new FastList<FastDictionary<int, BarHelpers>>();
-                    for (int s = 0; s < t.Staves.Count; s++)
+                    foreach (var barIndex in helpers.Helpers[track.Index][s])
                     {
-                        h.Add(new FastDictionary<int, BarHelpers>());
-                    }
-                    Helpers[t.Index] = h;
-                }
-                else
-                {
-                    h = Helpers[t.Index];
-                }
-
-                for (int s = 0; s < t.Staves.Count; s++)
-                {
-                    if (!h[s].ContainsKey(barIndex))
-                    {
-                        h[s][barIndex] = new BarHelpers(t.Staves[s].Bars[barIndex]);
+                        h[s][barIndex] = helpers.Helpers[track.Index][s][barIndex];
                     }
                 }
             }
+        }
+
+        public BarHelpersGroup BuildHelpers(Track[] tracks, int barIndex)
+        {
+            var result = new BarHelpersGroup();
+            foreach (var track in tracks)
+            {
+                var resultH = result.GetOrCreateForTrack(track);
+
+                var h = GetOrCreateForTrack(track);
+                for (int s = 0; s < track.Staves.Count; s++)
+                {
+                    if (!h[s].ContainsKey(barIndex))
+                    {
+                        h[s][barIndex] = new BarHelpers(track.Staves[s].Bars[barIndex]);
+                    }
+
+                    resultH[s][barIndex] = h[s][barIndex];
+                }
+            }
+            return result;
+        }
+
+        private FastList<FastDictionary<int, BarHelpers>> GetOrCreateForTrack(Track track)
+        {
+            FastList<FastDictionary<int, BarHelpers>> h;
+            if (!Helpers.ContainsKey(track.Index))
+            {
+                h = new FastList<FastDictionary<int, BarHelpers>>();
+                for (int s = 0; s < track.Staves.Count; s++)
+                {
+                    h.Add(new FastDictionary<int, BarHelpers>());
+                }
+                Helpers[track.Index] = h;
+            }
+            else
+            {
+                h = Helpers[track.Index];
+            }
+            return h;
         }
     }
 }

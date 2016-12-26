@@ -48,8 +48,8 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (EndBeat == null) return;
 
-            var startNoteRenderer = Renderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, StartBeat.Voice.Bar);
-            var endNoteRenderer = Renderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, EndBeat.Voice.Bar);
+            var startNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, StartBeat.Voice.Bar);
+            var endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, EndBeat.Voice.Bar);
 
             float startX = 0;
             float endX = 0;

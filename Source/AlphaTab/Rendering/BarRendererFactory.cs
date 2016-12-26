@@ -40,6 +40,6 @@ namespace AlphaTab.Rendering
         {
             return !HideOnPercussionTrack || !track.IsPercussion;
         }
-        public abstract BarRendererBase Create(Bar bar);
+        public abstract BarRendererBase Create(ScoreRenderer renderer, Bar bar);
     }
 }

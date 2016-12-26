@@ -33,7 +33,8 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            Width = 10 * Scale;
+            Renderer.ScoreRenderer.Canvas.Font = Renderer.Resources.BarNumberFont;
+            Width = Renderer.ScoreRenderer.Canvas.MeasureText(_number.ToString()) + 5 * Scale;
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)

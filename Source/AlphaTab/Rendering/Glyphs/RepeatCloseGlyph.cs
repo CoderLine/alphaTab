@@ -28,7 +28,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            Width = (Renderer.IsLast ? 11 : 13) * Scale;
+            Width = 11 * Scale;
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)

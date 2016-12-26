@@ -45,7 +45,15 @@ namespace AlphaTab.Rendering.Staves
     {
         public float Width { get; set; }
         public bool IsLinkedToPrevious { get; set; }
-        public BarRendererBase Renderer { get; set; }
+        public MasterBar MasterBar { get; set; }
+        public FastList<BarRendererBase> Renderers { get; set; }
+        public BarHelpersGroup Helpers { get; set; }
+        public BarLayoutingInfo BarLayoutingInfo { get; set; }
+
+        public AddBarsToStaveGroupResult()
+        {
+            Renderers = new FastList<BarRendererBase>();
+        }
     }
 
     /// <summary>
@@ -78,6 +86,8 @@ namespace AlphaTab.Rendering.Staves
         /// </summary>
         public float Width { get; set; }
 
+        public bool IsLast { get; set; }
+
         public FastList<MasterBar> MasterBars { get; set; }
 
         public FastList<StaveTrackGroup> Staves { get; set; }
@@ -107,17 +117,88 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
+        public AddBarsToStaveGroupResult AddBarsFromResult(Track[] tracks, AddBarsToStaveGroupResult result)
+        {
+            if (tracks.Length == 0) return null;
+
+            Helpers.ImportHelpers(tracks, result.Helpers);
+            MasterBars.Add(result.MasterBar);
+            CalculateAccoladeSpacing(tracks);
+
+            var src = 0;
+
+            for (int i = 0, j = Staves.Count; i < j; i++)
+            {
+                var g = Staves[i];
+                for (int k = 0, l = g.Staves.Count; k < l; k++)
+                {
+                    var s = g.Staves[k];
+                    var renderer = result.Renderers[src++];
+                    s.AddBarRenderer(renderer);
+                }
+            }
+
+            UpdateWidth();
+
+            return result;
+        }
+
         public AddBarsToStaveGroupResult AddBars(Track[] tracks, int barIndex)
         {
             if (tracks.Length == 0) return null;
 
             var result = new AddBarsToStaveGroupResult();
-            var score = tracks[0].Score;
-            var masterBar = score.MasterBars[barIndex];
-            MasterBars.Add(masterBar);
+            result.Helpers = Helpers.BuildHelpers(tracks, barIndex);
 
-            Helpers.BuildHelpers(tracks, barIndex);
+            result.MasterBar = tracks[0].Score.MasterBars[barIndex];
+            MasterBars.Add(result.MasterBar);
 
+            CalculateAccoladeSpacing(tracks);
+           
+            // add renderers
+            result.BarLayoutingInfo = new BarLayoutingInfo();
+            for (int i = 0, j = Staves.Count; i < j; i++)
+            {
+                var g = Staves[i];
+                for (int k = 0, l = g.Staves.Count; k < l; k++)
+                {
+                    var s = g.Staves[k];
+                    s.AddBar(g.Track.Staves[s.ModelStaff.Index].Bars[barIndex], result.BarLayoutingInfo);
+                    var renderer = s.BarRenderers[s.BarRenderers.Count - 1];
+                    result.Renderers.Add(renderer);
+                    if (renderer.IsLinkedToPrevious)
+                    {
+                        result.IsLinkedToPrevious = true;
+                    }
+                }
+            }
+            result.BarLayoutingInfo.Finish();
+
+            // ensure same widths of new renderer
+            result.Width = UpdateWidth();
+
+            return result;
+        }
+
+        private float UpdateWidth()
+        {
+            var realWidth = 0f;
+            for (int i = 0, j = _allStaves.Count; i < j; i++)
+            {
+                var s = _allStaves[i];
+                s.BarRenderers[s.BarRenderers.Count - 1].ApplyLayoutingInfo();
+                if (s.BarRenderers[s.BarRenderers.Count - 1].Width > realWidth)
+                {
+                    realWidth = s.BarRenderers[s.BarRenderers.Count - 1].Width;
+                }
+            }
+
+            Width += realWidth;
+            return realWidth;
+        }
+
+        private void CalculateAccoladeSpacing(Track[] tracks)
+        {
             if (!_accoladeSpacingCalculated && Index == 0)
             {
                 _accoladeSpacingCalculated = true;
@@ -131,42 +212,6 @@ namespace AlphaTab.Rendering.Staves
                 AccoladeSpacing += (2 * AccoladeLabelSpacing);
                 Width += AccoladeSpacing;
             }
-
-            // add renderers
-            var maxSizes = new BarLayoutingInfo();
-            for (int i = 0, j = Staves.Count; i < j; i++)
-            {
-                var g = Staves[i];
-                for (int k = 0, l = g.Staves.Count; k < l; k++)
-                {
-                    var s = g.Staves[k];
-                    s.AddBar(g.Track.Staves[s.ModelStaff.Index].Bars[barIndex]);
-                    s.BarRenderers[s.BarRenderers.Count - 1].RegisterLayoutingInfo(maxSizes);
-                    if (s.BarRenderers[s.BarRenderers.Count - 1].IsLinkedToPrevious)
-                    {
-                        result.IsLinkedToPrevious = true;
-                    }
-                }
-            }
-
-            maxSizes.Finish();
-
-            // ensure same widths of new renderer
-            var realWidth = 0f;
-            for (int i = 0, j = _allStaves.Count; i < j; i++)
-            {
-                var s = _allStaves[i];
-                s.BarRenderers[s.BarRenderers.Count - 1].ApplyLayoutingInfo();
-                if (s.BarRenderers[s.BarRenderers.Count - 1].Width > realWidth)
-                {
-                    realWidth = s.BarRenderers[s.BarRenderers.Count - 1].Width;
-                }
-            }
-
-            Width += realWidth;
-            result.Width = realWidth;
-
-            return result;
         }
 
         private StaveTrackGroup GetStaveTrackGroup(Track track)
