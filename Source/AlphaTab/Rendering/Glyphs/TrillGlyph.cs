@@ -28,6 +28,12 @@ namespace AlphaTab.Rendering.Glyphs
         {
         }
 
+        public override void DoLayout()
+        {
+            base.DoLayout();
+            Height = 20*Scale;
+        }
+
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var res = Renderer.Resources;
@@ -45,7 +51,7 @@ namespace AlphaTab.Rendering.Glyphs
 
 
             var loopX = startX;
-            var loopY = cy + Y + Renderer.Height;
+            var loopY = cy + Y + Height;
             for (var i = 0; i < loops; i++)
             {
                 canvas.FillMusicFontSymbol(cx + X + loopX, loopY, waveScale, MusicFontSymbol.WaveHorizontal);

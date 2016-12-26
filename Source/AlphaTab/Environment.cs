@@ -36,7 +36,7 @@ namespace AlphaTab
         public static FastDictionary<string, Func<IFileLoader>> FileLoaders;
         public static FastDictionary<string, Func<ScoreRenderer, ScoreLayout>> LayoutEngines;
         public static FastDictionary<string, BarRendererFactory> StaveFactories;
-        public static FastDictionary<string, string[]> StaveProfiles;
+        public static FastDictionary<string, BarRendererFactory[]> StaveProfiles;
 
         static Environment()
         {
@@ -44,7 +44,7 @@ namespace AlphaTab
             FileLoaders = new FastDictionary<string, Func<IFileLoader>>();
             LayoutEngines = new FastDictionary<string, Func<ScoreRenderer, ScoreLayout>>();
             StaveFactories = new FastDictionary<string, BarRendererFactory>();
-            StaveProfiles = new FastDictionary<string, string[]>();
+            StaveProfiles = new FastDictionary<string, BarRendererFactory[]>();
 
             PlatformInit();
 
@@ -54,100 +54,93 @@ namespace AlphaTab
             LayoutEngines["horizontal"] = r => new HorizontalScreenLayout(r);
 
             // default staves 
-            StaveFactories["marker"] = new EffectBarRendererFactory(new MarkerEffectInfo());
-            StaveFactories["triplet-feel"] = new EffectBarRendererFactory(new TripletFeelEffectInfo());
-            StaveFactories["tempo"] = new EffectBarRendererFactory(new TempoEffectInfo());
-            StaveFactories["text"] = new EffectBarRendererFactory(new TextEffectInfo());
-            StaveFactories["chords"] = new EffectBarRendererFactory(new ChordsEffectInfo());
-            StaveFactories["trill"] = new EffectBarRendererFactory(new TrillEffectInfo());
-            StaveFactories["beat-vibrato"] = new EffectBarRendererFactory(new BeatVibratoEffectInfo());
-            StaveFactories["note-vibrato"] = new EffectBarRendererFactory(new NoteVibratoEffectInfo());
-            StaveFactories["alternate-endings"] = new AlternateEndingsBarRendererFactory();
-            StaveFactories["score"] = new ScoreBarRendererFactory();
-            StaveFactories["crescendo"] = new EffectBarRendererFactory(new CrescendoEffectInfo());
-            StaveFactories["dynamics"] = new EffectBarRendererFactory(new DynamicsEffectInfo());
-            StaveFactories["capo"] = new EffectBarRendererFactory(new CapoEffectInfo());
-            StaveFactories["tap"] = new EffectBarRendererFactory(new TapEffectInfo());
-            StaveFactories["fade-in"] = new EffectBarRendererFactory(new FadeInEffectInfo());
-            StaveFactories["harmonics"] = new EffectBarRendererFactory(new HarmonicsEffectInfo());
-            StaveFactories["let-ring"] = new EffectBarRendererFactory(new LetRingEffectInfo());
-            StaveFactories["palm-mute"] = new EffectBarRendererFactory(new PalmMuteEffectInfo());
-            StaveFactories["tab"] = new TabBarRendererFactory();
-            StaveFactories["pick-stroke"] = new EffectBarRendererFactory(new PickStrokeEffectInfo());
-            StaveFactories["rhythm-up"] = new RhythmBarRendererFactory(BeamDirection.Down);
-            StaveFactories["rhythm-down"] = new RhythmBarRendererFactory(BeamDirection.Up);
+            StaveFactories[AlternateEndingsBarRenderer.StaffId] = new AlternateEndingsBarRendererFactory();
+            StaveFactories[ScoreBarRenderer.StaffId] = new ScoreBarRendererFactory();
+            StaveFactories[TabBarRenderer.StaffId] = new TabBarRendererFactory();
+            StaveFactories[RhythmBarRenderer.StaffIdUp] = new RhythmBarRendererFactory(BeamDirection.Down);
+            StaveFactories[RhythmBarRenderer.StaffIdDown] = new RhythmBarRendererFactory(BeamDirection.Up);
 
             // default combinations of stave textprofiles
             StaveProfiles["default"] = StaveProfiles["score-tab"] = new[]
             {
-                "tempo",
-                "triplet-feel",
-                "marker",
-                "text",
-                "chords",
-                "trill",
-                "beat-vibrato",
-                "note-vibrato",
-                "alternate-endings",
-                "score",
-                "crescendo",
-                "dynamics",
-                "trill",
-                "beat-vibrato",
-                "note-vibrato",
-                "tap",
-                "fade-in",
-                "harmonics",
-                "let-ring",
-                "capo",
-                "palm-mute",
-                "pick-stroke",
-                "tab"
+                new EffectBarRendererFactory("score-effects", new IEffectBarRendererInfo[] {
+                    new TempoEffectInfo(),
+                    new TripletFeelEffectInfo(),
+                    new MarkerEffectInfo(),
+                    new TextEffectInfo(),
+                    new ChordsEffectInfo(),
+                    new TrillEffectInfo(),
+                    new BeatVibratoEffectInfo(),
+                    new NoteVibratoEffectInfo()
+                }), 
+                StaveFactories["alternate-endings"],
+                StaveFactories["score"],
+                new EffectBarRendererFactory("tab-effects", new IEffectBarRendererInfo[] {
+                    new CrescendoEffectInfo(),
+                    new DynamicsEffectInfo(),
+                    new TrillEffectInfo(),
+                    new BeatVibratoEffectInfo(),
+                    new NoteVibratoEffectInfo(),
+                    new TapEffectInfo(),
+                    new FadeInEffectInfo(),
+                    new HarmonicsEffectInfo(),
+                    new LetRingEffectInfo(),
+                    new CapoEffectInfo(),
+                    new PalmMuteEffectInfo(),
+                    new PickStrokeEffectInfo(),
+                }),
+                StaveFactories["tab"]
             };
 
             StaveProfiles["score"] = new[]
             {
-                "tempo",
-                "triplet-feel",
-                "marker",
-                "text",
-                "chords",
-                "trill",
-                "beat-vibrato",
-                "note-vibrato",
-                "fade-in",
-                "alternate-endings",
-                "let-ring",
-                "palm-mute",
-                "pick-stroke",
-                "score",
-                "crescendo",
-                "dynamics"
+                new EffectBarRendererFactory("score-effects", new IEffectBarRendererInfo[] {
+                    new TempoEffectInfo(), 
+                    new TripletFeelEffectInfo(),
+                    new MarkerEffectInfo(),
+                    new TextEffectInfo(),
+                    new ChordsEffectInfo(),
+                    new TrillEffectInfo(),
+                    new BeatVibratoEffectInfo(),
+                    new NoteVibratoEffectInfo(),
+                    new FadeInEffectInfo(),
+                    new LetRingEffectInfo(),
+                    new PalmMuteEffectInfo(),
+                    new PickStrokeEffectInfo()
+                }),
+                StaveFactories["alternate-endings"],
+                StaveFactories["score"],
+                new EffectBarRendererFactory("score-bottom-effects", new IEffectBarRendererInfo[] {
+                    new CrescendoEffectInfo(), 
+                    new DynamicsEffectInfo(),
+                }),
             };
 
             StaveProfiles["tab"] = new[]
             {
-                "tempo",
-                "triplet-feel",
-                "marker",
-                "text",
-                "chords",
-                "trill",
-                "beat-vibrato",
-                "note-vibrato",
-                "alternate-endings",
-                "trill",
-                "beat-vibrato",
-                "note-vibrato",
-                "tap",
-                "fade-in",
-                "harmonics",
-                "let-ring",
-                "capo",
-                "palm-mute",
-                "pick-stroke",
-                "tab",
-                "rhythm-down"
+                new EffectBarRendererFactory("tab-effects", new IEffectBarRendererInfo[] {
+                    new TempoEffectInfo(), 
+                    new TripletFeelEffectInfo(), 
+                    new MarkerEffectInfo(), 
+                    new TextEffectInfo(), 
+                    new ChordsEffectInfo(), 
+                    new TripletFeelEffectInfo(), 
+                    new BeatVibratoEffectInfo(), 
+                    new NoteVibratoEffectInfo(),
+                    new TrillEffectInfo(), 
+                    new BeatVibratoEffectInfo(), 
+                    new NoteVibratoEffectInfo(), 
+                    new TapEffectInfo(), 
+                    new FadeInEffectInfo(), 
+                    new HarmonicsEffectInfo(), 
+                    new LetRingEffectInfo(), 
+                    new CapoEffectInfo(), 
+                    new PalmMuteEffectInfo(), 
+                    new PickStrokeEffectInfo(),
+                }),
+                StaveFactories["alternate-endings"],
+                StaveFactories["tab"],
+                StaveFactories["rhythm-down"]
             };
         }
     }

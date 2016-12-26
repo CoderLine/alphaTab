@@ -35,6 +35,12 @@ namespace AlphaTab.Rendering.Glyphs
             _label = label;
         }
 
+        public override void DoLayout()
+        {
+            base.DoLayout();
+            Height = Renderer.Resources.EffectFont.Size;
+        }
+
         protected override void PaintNonGrouped(float cx, float cy, ICanvas canvas)
         {
             var res = Renderer.Resources;

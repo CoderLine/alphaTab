@@ -29,13 +29,19 @@ namespace AlphaTab.Rendering.Glyphs
             _tempo = tempo;
         }
 
+        public override void DoLayout()
+        {
+            base.DoLayout();
+            Height = 25 * Scale;
+        }
+
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var res = Renderer.Resources;
             canvas.Font = res.MarkerFont;
 
-            canvas.FillMusicFontSymbol(cx + X, cy + Y + Renderer.Height * 0.75f, 0.75f, MusicFontSymbol.Tempo);
-            canvas.FillText("= " + _tempo, cx + X + (15 * Scale), cy + Y + canvas.Font.Size / 2);
+            canvas.FillMusicFontSymbol(cx + X, cy + Y + Height * 0.8f, 0.75f, MusicFontSymbol.Tempo);
+            canvas.FillText("= " + _tempo, cx + X + (Height / 2), cy + Y + canvas.Font.Size / 2);
         }
     }
 }

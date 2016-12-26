@@ -22,24 +22,20 @@ namespace AlphaTab.Rendering.Effects
 {
     public class MarkerEffectInfo : IEffectBarRendererInfo
     {
-        public bool HideOnMultiTrack { get { return true; } }
-        public bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat)
+        public string EffectId { get { return "marker"; } }
+        public bool ShouldCreateGlyph(Beat beat)
         {
-            return beat.Index == 0 && beat.Voice.Bar.MasterBar.IsSectionStart;
+            return beat.Voice.Bar.Staff.Index == 0 && beat.Voice.Index == 0 && beat.Index == 0 && beat.Voice.Bar.MasterBar.IsSectionStart;
         }
 
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SinglePreBeat; } }
-        public float GetHeight(EffectBarRenderer renderer)
-        {
-            return 20 * renderer.Scale;
-        }
-
-        public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+       
+        public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
             return new TextGlyph(0, 0, beat.Voice.Bar.MasterBar.Section.Text, renderer.Resources.MarkerFont);
         }
 
-        public bool CanExpand(EffectBarRenderer renderer, Beat @from, Beat to)
+        public bool CanExpand(Beat @from, Beat to)
         {
             return true;
         }

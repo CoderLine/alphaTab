@@ -29,6 +29,8 @@ namespace AlphaTab.Rendering
     /// </summary>
     public class TabBarRenderer : BarRendererBase
     {
+        public const string StaffId = "tab";
+
         public const float LineSpacing = 10;
 
         public TabBarRenderer(ScoreRenderer renderer, Bar bar)
@@ -64,7 +66,7 @@ namespace AlphaTab.Rendering
             return 0;
         }
 
-        public override void DoLayout()
+        protected override void UpdateSizes()
         {
             var res = Resources;
             var numberOverflow = (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2f);
@@ -72,7 +74,7 @@ namespace AlphaTab.Rendering
             BottomPadding = numberOverflow;
             Height = LineOffset * (Bar.Staff.Track.Tuning.Length - 1) + (numberOverflow * 2);
 
-            base.DoLayout();
+            base.UpdateSizes();
         }
 
         protected override void CreatePreBeatGlyphs()
@@ -89,7 +91,7 @@ namespace AlphaTab.Rendering
                 AddPreBeatGlyph(new TabClefGlyph(5 * Scale, GetTabY(center)));
             }
 
-            AddPreBeatGlyph(new BarNumberGlyph(0, GetTabY(-1, -3), Bar.Index + 1, !Staff.IsFirstInAccolade));
+            AddPreBeatGlyph(new BarNumberGlyph(0, GetTabY(-1, -3), Bar.Index + 1));
 
             if (Bar.IsEmpty)
             {

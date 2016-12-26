@@ -24,8 +24,6 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class CrescendoGlyph : GroupedEffectGlyph
     {
-        public const float Height = 17;
-
         private readonly CrescendoType _crescendo;
 
         public CrescendoGlyph(float x, float y, CrescendoType crescendo)
@@ -34,6 +32,12 @@ namespace AlphaTab.Rendering.Glyphs
             _crescendo = crescendo;
             X = x;
             Y = y;
+        }
+
+        public override void DoLayout()
+        {
+            base.DoLayout();
+            Height = 17*Scale;
         }
 
         protected override void PaintGrouped(float cx, float cy, float endX, ICanvas canvas)

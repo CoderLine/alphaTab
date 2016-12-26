@@ -68,8 +68,10 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            canvas.FillText(_noteString, cx + X, cy + Y);
-            canvas.FillText(_trillNoteString, cx + X + _noteStringWidth, cy + Y);
+            var textWidth = _noteStringWidth + _trillNoteStringWidth;
+            var x = cx + X + (Width - textWidth) / 2;
+            canvas.FillText(_noteString, x, cy + Y);
+            canvas.FillText(_trillNoteString, x + _noteStringWidth, cy + Y);
         }
     }
 }

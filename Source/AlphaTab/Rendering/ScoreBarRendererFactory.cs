@@ -24,6 +24,8 @@ namespace AlphaTab.Rendering
     /// </summary>
     public class ScoreBarRendererFactory : BarRendererFactory
     {
+        public override string StaffId { get { return ScoreBarRenderer.StaffId; } }
+
         public override BarRendererBase Create(ScoreRenderer renderer, Bar bar)
         {
             return new ScoreBarRenderer(renderer, bar);

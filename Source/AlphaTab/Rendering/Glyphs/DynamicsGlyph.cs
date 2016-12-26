@@ -26,6 +26,13 @@ namespace AlphaTab.Rendering.Glyphs
         {
         }
 
+        public override void DoLayout()
+        {
+            base.DoLayout();
+            Height = 17 * Scale;
+            Y += Height / 2;
+        }
+
         private static MusicFontSymbol GetSymbol(DynamicValue dynamics)
         {
             switch (dynamics)

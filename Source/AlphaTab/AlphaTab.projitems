@@ -68,6 +68,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\Score.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Section.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\SlideType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Staff.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Track.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\TripletFeel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Tuning.cs" />

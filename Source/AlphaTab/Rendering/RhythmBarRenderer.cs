@@ -22,10 +22,13 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering
 {
+    // TODO: can we make this part of the TabBarRenderer?
     public class RhythmBarRenderer : BarRendererBase
     {
+        public const string StaffIdUp = "rhythm-up";
+        public const string StaffIdDown = "rhythm-down";
+
         private readonly BeamDirection _direction;
-        private BarHelpers _helpers;
 
         public RhythmBarRenderer(ScoreRenderer renderer, Bar bar, BeamDirection direction)
             : base(renderer, bar)
@@ -33,12 +36,10 @@ namespace AlphaTab.Rendering
             _direction = direction;
         }
 
-        public override void DoLayout()
+        protected override void UpdateSizes()
         {
-            _helpers = Staff.StaveGroup.Helpers.Helpers[Bar.Staff.Track.Index][Bar.Staff.Index][Bar.Index];
             Height = Staff.GetSetting("rhythm-height", 24) * Scale;
-            base.DoLayout();
-            IsEmpty = false;
+            base.UpdateSizes();
         }
 
         protected override void CreateBeatGlyphs()
@@ -67,9 +68,9 @@ namespace AlphaTab.Rendering
         {
             base.Paint(cx, cy, canvas);
 
-            for (int i = 0, j = _helpers.BeamHelpers.Count; i < j; i++)
+            for (int i = 0, j = Helpers.BeamHelpers.Count; i < j; i++)
             {
-                var v = _helpers.BeamHelpers[i];
+                var v = Helpers.BeamHelpers[i];
                 for (int k = 0, l = v.Count; k < l; k++)
                 {
                     PaintBeamHelper(cx + BeatGlyphsStart, cy, canvas, v[k]);

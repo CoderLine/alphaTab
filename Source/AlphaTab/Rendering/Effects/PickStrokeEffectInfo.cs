@@ -22,24 +22,21 @@ namespace AlphaTab.Rendering.Effects
 {
     public class PickStrokeEffectInfo : IEffectBarRendererInfo
     {
-        public bool HideOnMultiTrack { get { return false; } }
-        public bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat)
+        public string EffectId { get { return "pick-stroke"; } }
+
+        public bool ShouldCreateGlyph(Beat beat)
         {
             return beat.PickStroke != PickStrokeType.None;
         }
 
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
-        public float GetHeight(EffectBarRenderer renderer)
-        {
-            return 20 * renderer.Scale;
-        }
 
-        public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+        public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
             return new PickStrokeGlyph(0, 0, beat.PickStroke);
         }
 
-        public bool CanExpand(EffectBarRenderer renderer, Beat @from, Beat to)
+        public bool CanExpand(Beat @from, Beat to)
         {
             return true;
         }

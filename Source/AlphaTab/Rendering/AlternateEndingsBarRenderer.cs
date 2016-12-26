@@ -23,11 +23,14 @@ using AlphaTab.Rendering.Layout;
 
 namespace AlphaTab.Rendering
 {
+    // TODO: maybe we can make this as an effect band
     /// <summary>
     /// This bar renderer can render repeat endings.
     /// </summary>
     public class AlternateEndingsBarRenderer : BarRendererBase
     {
+        public const string StaffId = "alternate-endings";
+
         private const float Padding = 3;
 
         private readonly FastList<int> _endings;
@@ -45,7 +48,6 @@ namespace AlphaTab.Rendering
                     _endings.Add(i);
                 }
             }
-            IsEmpty = _endings.Count == 0;
         }
 
         protected override void CreateBeatGlyphs()
@@ -70,9 +72,14 @@ namespace AlphaTab.Rendering
             }
         }
 
+        protected override void UpdateSizes()
+        {
+            Height = _endings.Count > 0 ? Resources.WordsFont.Size : 0;
+            base.UpdateSizes();
+        }
+
         public override void DoLayout()
         {
-            Height = Resources.WordsFont.Size;
             base.DoLayout();
 
             var endingsStrings = new StringBuilder();

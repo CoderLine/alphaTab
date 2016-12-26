@@ -22,25 +22,21 @@ namespace AlphaTab.Rendering.Effects
 {
     public class DynamicsEffectInfo : IEffectBarRendererInfo
     {
-        public bool HideOnMultiTrack { get { return false; } }
-        public bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat)
+        public string EffectId { get { return "dynamics"; } }
+        public bool ShouldCreateGlyph(Beat beat)
         {
             return beat.Voice.Index == 0 &&
                    ((beat.Index == 0 && beat.Voice.Bar.Index == 0) || (beat.PreviousBeat != null && beat.Dynamic != beat.PreviousBeat.Dynamic));
         }
 
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
-        public float GetHeight(EffectBarRenderer renderer)
+        
+        public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
-            return 15 * renderer.Scale;
+            return new DynamicsGlyph(0, 0, beat.Dynamic);
         }
 
-        public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
-        {
-            return new DynamicsGlyph(0, GetHeight(renderer) / 2, beat.Dynamic);
-        }
-
-        public bool CanExpand(EffectBarRenderer renderer, Beat @from, Beat to)
+        public bool CanExpand(Beat @from, Beat to)
         {
             return true;
         }

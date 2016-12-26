@@ -38,20 +38,41 @@ namespace AlphaTab.Rendering
         private FastDictionary<int, VoiceContainerGlyph> _voiceContainers;
         private LeftToRightLayoutingGlyphGroup _postBeatGlyphs;
 
+        public BarRendererBase NextRenderer
+        {
+            get
+            {
+                if (Bar.NextBar == null)
+                {
+                    return null;
+                }
+                return ScoreRenderer.Layout.GetRendererForBar(Staff.StaveId, Bar.NextBar);
+            }
+        }
+
+        public BarRendererBase PreviousRenderer
+        {
+            get
+            {
+                if (Bar.PreviousBar == null)
+                {
+                    return null;
+                }
+                return ScoreRenderer.Layout.GetRendererForBar(Staff.StaveId, Bar.PreviousBar);
+            }
+        }
+
         public Staff Staff { get; set; }
         public float X { get; set; }
         public float Y { get; set; }
         public float Width { get; set; }
         public float Height { get; set; }
         public int Index { get; set; }
-        public bool IsEmpty { get; set; }
 
         public float TopOverflow { get; set; }
         public float BottomOverflow { get; set; }
 
         public BarHelpers Helpers { get; set; }
-
-
         public Bar Bar { get; set; }
 
         /// <summary>
@@ -193,7 +214,7 @@ namespace AlphaTab.Rendering
 
         public bool IsFinalized { get; private set; }
 
-        public virtual void FinalizeRenderer(ScoreLayout layout)
+        public virtual void FinalizeRenderer()
         {
             IsFinalized = true;
         }
@@ -219,8 +240,6 @@ namespace AlphaTab.Rendering
 
         public virtual void DoLayout()
         {
-            IsEmpty = true;
-
             _preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
             _preBeatGlyphs.Renderer = this;
             _voiceContainers = new FastDictionary<int, VoiceContainerGlyph>();
@@ -241,10 +260,10 @@ namespace AlphaTab.Rendering
             CreateBeatGlyphs();
             CreatePostBeatGlyphs();
 
-            UpdateWidth();
+            UpdateSizes();
         }
 
-        private void UpdateWidth()
+        protected virtual void UpdateSizes()
         {
             Staff.RegisterStaffTop(TopPadding);
             Staff.RegisterStaffBottom(Height - BottomPadding);
@@ -254,7 +273,7 @@ namespace AlphaTab.Rendering
             {
                 var c = _voiceContainers[voice];
                 c.X = BeatGlyphsStart;
-                //c.DoLayout();
+                c.DoLayout();
                 var x = c.X + c.Width;
                 if (postBeatStart < x)
                 {
@@ -269,7 +288,6 @@ namespace AlphaTab.Rendering
 
         protected void AddPreBeatGlyph(Glyph g)
         {
-            IsEmpty = false;
             _preBeatGlyphs.AddGlyph(g);
         }
 
@@ -388,7 +406,6 @@ namespace AlphaTab.Rendering
 
         protected void AddPostBeatGlyph(Glyph g)
         {
-            IsEmpty = false;
             _postBeatGlyphs.AddGlyph(g);
         }
 
@@ -454,7 +471,7 @@ namespace AlphaTab.Rendering
 
             CreatePreBeatGlyphs();
             CreatePostBeatGlyphs();
-            UpdateWidth();
+            UpdateSizes();
 
             RegisterLayoutingInfo();
         }

@@ -22,24 +22,20 @@ namespace AlphaTab.Rendering.Effects
 {
     public class BeatVibratoEffectInfo : IEffectBarRendererInfo
     {
-        public bool HideOnMultiTrack { get { return false; } }
-        public bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat)
+        public string EffectId { get { return "beat-vibrato"; } }
+        public bool ShouldCreateGlyph(Beat beat)
         {
-            return (beat.Vibrato != VibratoType.None);
+            return beat.Vibrato != VibratoType.None;
         }
 
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.GroupedOnBeat; } }
-        public float GetHeight(EffectBarRenderer renderer)
-        {
-            return 17 * renderer.Scale;
-        }
 
-        public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+        public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
             return new VibratoGlyph(0, 5 * renderer.Scale, 1.4f);
         }
 
-        public bool CanExpand(EffectBarRenderer renderer, Beat @from, Beat to)
+        public bool CanExpand(Beat @from, Beat to)
         {
             return true;
         }

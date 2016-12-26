@@ -32,13 +32,19 @@ namespace AlphaTab.Rendering.Glyphs
             Y = y;
         }
 
+        public override void DoLayout()
+        {
+            base.DoLayout();
+            Height = 10 * Scale * _scale;
+        }
+
         protected override void PaintGrouped(float cx, float cy, float endX, ICanvas canvas)
         {
             var startX = cx + X;
             var width = endX - startX;
             var step = 9 * Scale * _scale;
             var loops = (int)Math.Max(1, width / step);
-            var h = Renderer.Height;
+            var h = Height;
 
             var loopX = 0f;
             for (var i = 0; i < loops; i++)

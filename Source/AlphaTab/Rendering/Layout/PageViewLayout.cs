@@ -174,7 +174,7 @@ namespace AlphaTab.Rendering.Layout
             {
                 var group = _groups[i];
                 FitGroup(group);
-                group.FinalizeGroup(this);
+                group.FinalizeGroup();
 
                 y += PaintGroup(group, y, canvas);
             }
@@ -210,7 +210,7 @@ namespace AlphaTab.Rendering.Layout
 
                 // finalize group (sizing etc).
                 FitGroup(group);
-                group.FinalizeGroup(this);
+                group.FinalizeGroup();
 
                 y += PaintGroup(group, y, canvas);
             }

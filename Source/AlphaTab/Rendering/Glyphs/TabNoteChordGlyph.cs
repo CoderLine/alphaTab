@@ -110,18 +110,16 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var res = Renderer.Resources;
             var oldBaseLine = canvas.TextBaseline;
-            var oldAlign = canvas.TextAlign;
             canvas.TextBaseline = TextBaseline.Middle;
-            canvas.TextAlign = TextAlign.Center;
             canvas.Font = _isGrace ? res.GraceFont : res.TablatureFont;
             for (int i = 0, j = _notes.Count; i < j; i++)
             {
                 var g = _notes[i];
                 g.Renderer = Renderer;
-                g.Paint(cx + X + Width / 2, cy + Y, canvas);
+                g.Width = Width;
+                g.Paint(cx + X, cy + Y, canvas);
             }
             canvas.TextBaseline = oldBaseLine;
-            canvas.TextAlign = oldAlign;
 
             foreach (var beatEffectKey in BeatEffects)
             {

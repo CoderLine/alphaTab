@@ -22,13 +22,11 @@ namespace AlphaTab.Rendering.Glyphs
     public class BarNumberGlyph : Glyph
     {
         private readonly int _number;
-        private readonly bool _hidden;
 
-        public BarNumberGlyph(float x, float y, int number, bool hidden)
+        public BarNumberGlyph(float x, float y, int number)
             : base(x, y)
         {
             _number = number;
-            _hidden = hidden;
         }
 
         public override void DoLayout()
@@ -39,7 +37,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            if (_hidden)
+            if (!Renderer.Staff.IsFirstInAccolade)
             {
                 return;
             }

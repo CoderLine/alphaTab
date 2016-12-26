@@ -24,11 +24,18 @@ namespace AlphaTab.Rendering
     {
         private readonly BeamDirection _direction;
 
+        public override string StaffId
+        {
+            get
+            {
+                return _direction == BeamDirection.Up ? RhythmBarRenderer.StaffIdUp : RhythmBarRenderer.StaffIdDown;
+            }
+        }
+
         public RhythmBarRendererFactory(BeamDirection direction)
         {
             _direction = direction;
             IsInAccolade = false;
-            HideOnMultiTrack = false;
         }
 
         public override BarRendererBase Create(ScoreRenderer renderer, Bar bar)

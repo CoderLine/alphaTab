@@ -26,13 +26,12 @@ namespace AlphaTab.Rendering
     public abstract class BarRendererFactory
     {
         public bool IsInAccolade { get; set; }
-        public bool HideOnMultiTrack { get; set; }
         public bool HideOnPercussionTrack { get; set; }
+        public abstract string StaffId { get; }
 
         protected BarRendererFactory()
         {
             IsInAccolade = true;
-            HideOnMultiTrack = false;
             HideOnPercussionTrack = false;
         }
 

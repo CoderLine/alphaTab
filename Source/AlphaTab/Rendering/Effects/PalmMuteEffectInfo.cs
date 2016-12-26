@@ -22,14 +22,11 @@ namespace AlphaTab.Rendering.Effects
 {
     public class PalmMuteEffectInfo : NoteEffectInfoBase
     {
-        protected override bool ShouldCreateGlyphForNote(EffectBarRenderer renderer, Note note)
+        public override string EffectId { get { return "palm-mute"; } }
+
+        protected override bool ShouldCreateGlyphForNote(Note note)
         {
             return note.IsPalmMute;
-        }
-
-        public override float GetHeight(EffectBarRenderer renderer)
-        {
-            return 20 * renderer.Scale;
         }
 
         public override EffectBarGlyphSizing SizingMode
@@ -37,7 +34,7 @@ namespace AlphaTab.Rendering.Effects
             get { return EffectBarGlyphSizing.GroupedOnBeat; }
         }
 
-        public override EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+        public override EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
             return new LineRangedGlyph("P.M.");
         }

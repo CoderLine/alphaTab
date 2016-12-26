@@ -22,14 +22,11 @@ namespace AlphaTab.Rendering.Effects
 {
     public class NoteVibratoEffectInfo : NoteEffectInfoBase
     {
-        protected override bool ShouldCreateGlyphForNote(EffectBarRenderer renderer, Note note)
+        public override string EffectId { get { return "note-vibrato"; } }
+
+        protected override bool ShouldCreateGlyphForNote(Note note)
         {
             return note.Vibrato != VibratoType.None || (note.IsTieDestination && note.TieOrigin.Vibrato != VibratoType.None);
-        }
-
-        public override float GetHeight(EffectBarRenderer renderer)
-        {
-            return 15 * renderer.Scale;
         }
 
         public override EffectBarGlyphSizing SizingMode
@@ -37,7 +34,7 @@ namespace AlphaTab.Rendering.Effects
             get { return EffectBarGlyphSizing.GroupedOnBeat; }
         }
 
-        public override EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+        public override EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
             return new VibratoGlyph(0, 5 * renderer.Scale);
         }

@@ -23,30 +23,6 @@ using AlphaTab.Platform.Model;
 namespace AlphaTab.Model
 {
     /// <summary>
-    /// This class describes a single staff within a track. There are instruments like pianos
-    /// where a single track can contain multiple staffs. 
-    /// </summary>
-    public class Staff
-    {
-        public FastList<Bar> Bars { get; set; }
-        public Track Track { get; set; }
-        public int Index { get; set; }
-
-        public Staff()
-        {
-            Bars = new FastList<Bar>();
-        }
-
-        public void Finish()
-        {
-            for (int i = 0, j = Bars.Count; i < j; i++)
-            {
-                Bars[i].Finish();
-            }
-        }
-    }
-
-    /// <summary>
     /// This public class describes a single track or instrument of score
     /// </summary>
     public class Track

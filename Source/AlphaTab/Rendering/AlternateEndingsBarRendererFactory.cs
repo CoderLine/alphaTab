@@ -24,6 +24,8 @@ namespace AlphaTab.Rendering
     /// </summary>
     public class AlternateEndingsBarRendererFactory : BarRendererFactory
     {
+        public override string StaffId { get { return AlternateEndingsBarRenderer.StaffId; } }
+
         public AlternateEndingsBarRendererFactory()
         {
             IsInAccolade = false;

@@ -24,6 +24,8 @@ namespace AlphaTab.Rendering
     /// </summary>
     public class TabBarRendererFactory : BarRendererFactory
     {
+        public override string StaffId { get { return TabBarRenderer.StaffId; } }
+
         public TabBarRendererFactory()
         {
             HideOnPercussionTrack = true;

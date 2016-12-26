@@ -22,19 +22,16 @@ namespace AlphaTab.Rendering.Effects
 {
     public class TempoEffectInfo : IEffectBarRendererInfo
     {
-        public bool HideOnMultiTrack { get { return true; } }
-        public bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat)
+        public string EffectId { get { return "tempo"; } }
+
+        public bool ShouldCreateGlyph(Beat beat)
         {
-            return beat.Voice.Index == 0 && beat.Index == 0 && (beat.Voice.Bar.MasterBar.TempoAutomation != null || beat.Voice.Bar.Index == 0);
+            return beat.Voice.Bar.Staff.Index == 0 && beat.Voice.Index == 0 && beat.Index == 0 && (beat.Voice.Bar.MasterBar.TempoAutomation != null || beat.Voice.Bar.Index == 0);
         }
 
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SinglePreBeat; } }
-        public float GetHeight(EffectBarRenderer renderer)
-        {
-            return 25 * renderer.Scale;
-        }
-
-        public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+       
+        public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
             int tempo;
             if (beat.Voice.Bar.MasterBar.TempoAutomation != null)
@@ -48,7 +45,7 @@ namespace AlphaTab.Rendering.Effects
             return new TempoGlyph(0, 0, tempo);
         }
 
-        public bool CanExpand(EffectBarRenderer renderer, Beat @from, Beat to)
+        public bool CanExpand(Beat @from, Beat to)
         {
             return true;
         }

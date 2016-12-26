@@ -28,12 +28,18 @@ namespace AlphaTab.Rendering.Glyphs
         {
         }
 
+        public override void DoLayout()
+        {
+            base.DoLayout();
+            Height = 17 * Scale;
+        }
+
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var size = 6 * Scale;
-            var width = Math.Max(Width, 14*Scale);
+            var width = Math.Max(Width, 14 * Scale);
 
-            var offset = Renderer.Height/2;
+            var offset = Height / 2;
 
             canvas.BeginPath();
             canvas.MoveTo(cx + X, cy + Y + offset);

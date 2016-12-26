@@ -22,8 +22,9 @@ namespace AlphaTab.Rendering.Effects
 {
     public class TripletFeelEffectInfo : IEffectBarRendererInfo
     {
-        public bool HideOnMultiTrack { get { return true; } }
-        public bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat)
+        public string EffectId { get { return "triplet-feel"; } }
+
+        public bool ShouldCreateGlyph(Beat beat)
         {
             return beat.Index == 0 &&
                 (
@@ -33,17 +34,13 @@ namespace AlphaTab.Rendering.Effects
         }
 
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SinglePreBeat; } }
-        public float GetHeight(EffectBarRenderer renderer)
-        {
-            return 25 * renderer.Scale;
-        }
 
-        public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+        public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
             return new TripletFeelGlyph(beat.Voice.Bar.MasterBar.TripletFeel);
         }
 
-        public bool CanExpand(EffectBarRenderer renderer, Beat @from, Beat to)
+        public bool CanExpand(Beat @from, Beat to)
         {
             return true;
         }

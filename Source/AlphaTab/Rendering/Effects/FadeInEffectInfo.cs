@@ -22,24 +22,19 @@ namespace AlphaTab.Rendering.Effects
 {
     public class FadeInEffectInfo : IEffectBarRendererInfo
     {
-        public bool HideOnMultiTrack { get { return false; } }
-        public bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat)
+        public string EffectId { get { return "fade-in"; } }
+        public bool ShouldCreateGlyph(Beat beat)
         {
             return beat.FadeIn;
         }
 
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
-        public float GetHeight(EffectBarRenderer renderer)
-        {
-            return 20 * renderer.Scale;
-        }
-
-        public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+        public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
             return new FadeInGlyph(0, 0);
         }
 
-        public bool CanExpand(EffectBarRenderer renderer, Beat @from, Beat to)
+        public bool CanExpand(Beat @from, Beat to)
         {
             return true;
         }

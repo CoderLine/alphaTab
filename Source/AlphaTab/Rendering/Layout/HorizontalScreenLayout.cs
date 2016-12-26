@@ -127,7 +127,7 @@ namespace AlphaTab.Rendering.Layout
                 partials.Add(currentPartial);
             }
 
-            _group.FinalizeGroup(this);
+            _group.FinalizeGroup();
 
             Height = _group.Y + _group.Height + PagePadding[3];
             Width = _group.X + _group.Width + PagePadding[2];

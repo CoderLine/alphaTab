@@ -135,14 +135,10 @@ namespace AlphaTab.Rendering.Layout
                 {
                     for (var renderStaveIndex = 0; renderStaveIndex < profile.Length; renderStaveIndex++)
                     {
-                        var s = profile[renderStaveIndex];
-                        if (Environment.StaveFactories.ContainsKey(s))
+                        var factory = profile[renderStaveIndex];
+                        if (factory.CanCreate(track))
                         {
-                            var factory = Environment.StaveFactories[s];
-                            if (factory.CanCreate(track) && (isFirstTrack || !factory.HideOnMultiTrack) && (staveIndex == 0 || !factory.HideOnMultiTrack))
-                            {
-                                group.AddStave(track, new Staff(track.Staves[staveIndex], s, factory, Renderer.Settings.Staves.AdditionalSettings));
-                            }
+                            group.AddStave(track, new Staff(track.Staves[staveIndex], factory, Renderer.Settings.Staves.AdditionalSettings));
                         }
                     }
                 }

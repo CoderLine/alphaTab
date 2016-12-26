@@ -43,6 +43,8 @@ namespace AlphaTab.Rendering.Glyphs
         /// </summary>
         public EffectGlyph PreviousGlyph { get; set; }
 
+        public float Height { get; set; }
+
         protected EffectGlyph(float x, float y)
             : base(x, y)
         {

@@ -35,6 +35,12 @@ namespace AlphaTab.Rendering.Glyphs
             TextAlign = textAlign;
         }
 
+        public override void DoLayout()
+        {
+            base.DoLayout();
+            Height = Font.Size;
+        }
+
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             canvas.Font = Font;

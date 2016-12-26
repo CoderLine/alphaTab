@@ -8,7 +8,9 @@ namespace AlphaTab.Rendering.Effects
         private Beat _beat;
         private HarmonicType _beatType;
 
-        protected override bool ShouldCreateGlyphForNote(EffectBarRenderer renderer, Note note)
+        public override string EffectId { get { return "harmonics"; } }
+
+        protected override bool ShouldCreateGlyphForNote(Note note)
         {
             if (!note.IsHarmonic) return false;
             if (note.Beat != _beat || note.HarmonicType > _beatType)
@@ -19,17 +21,12 @@ namespace AlphaTab.Rendering.Effects
             return true;
         }
 
-        public override float GetHeight(EffectBarRenderer renderer)
-        {
-            return 20 * renderer.Scale;
-        }
-
         public override EffectBarGlyphSizing SizingMode
         {
             get { return EffectBarGlyphSizing.SingleOnBeat; }
         }
 
-        public override EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+        public override EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
             return new TextGlyph(0, 0, HarmonicToString(_beatType), renderer.Resources.EffectFont);
         }

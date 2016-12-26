@@ -20,15 +20,21 @@ namespace AlphaTab.Rendering.Glyphs
             _tripletFeel = tripletFeel;
         }
 
+        public override void DoLayout()
+        {
+            base.DoLayout();
+            Height = 25*Scale;
+        }
+
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             cx += X;
             cy += Y;
 
-            var noteY = cy + Renderer.Height * 0.75f;
+            var noteY = cy + Height * 0.75f;
             canvas.Font = Renderer.Resources.EffectFont;
 
-            canvas.FillText("(", cx, cy + Renderer.Height * 0.3f);
+            canvas.FillText("(", cx, cy + Height * 0.3f);
 
             var leftNoteX = cx + (10 * Scale);
             var rightNoteX = cx + (40 * Scale);
@@ -86,7 +92,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             canvas.FillText("=", cx + (30 * Scale), cy + (5 * Scale));
-            canvas.FillText(")", cx + (65 * Scale), cy + Renderer.Height * 0.3f);
+            canvas.FillText(")", cx + (65 * Scale), cy + Height * 0.3f);
         }
 
         private enum BarType

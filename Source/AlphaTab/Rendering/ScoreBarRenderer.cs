@@ -31,6 +31,8 @@ namespace AlphaTab.Rendering
     /// </summary>
     public class ScoreBarRenderer : BarRendererBase
     {
+        public const string StaffId = "score";
+
         /// <summary>
         /// The step offsets of sharp symbols for sharp key signatures.
         /// </summary>
@@ -94,14 +96,18 @@ namespace AlphaTab.Rendering
             }
         }
 
-        public override void DoLayout()
+        protected override void UpdateSizes()
         {
             var res = Resources;
             var glyphOverflow = (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2f);
             TopPadding = glyphOverflow;
             BottomPadding = glyphOverflow;
             Height = (LineOffset * 4) + TopPadding + BottomPadding;
+            base.UpdateSizes();
+        }
 
+        public override void DoLayout()
+        {
             base.DoLayout();
 
             var top = GetScoreY(0);
@@ -717,7 +723,7 @@ namespace AlphaTab.Rendering
                 CreateTimeSignatureGlyphs();
             }
 
-            AddPreBeatGlyph(new BarNumberGlyph(0, GetScoreY(-1, -3), Bar.Index + 1, !Staff.IsFirstInAccolade));
+            AddPreBeatGlyph(new BarNumberGlyph(0, GetScoreY(-1, -3), Bar.Index + 1));
 
             if (Bar.IsEmpty)
             {

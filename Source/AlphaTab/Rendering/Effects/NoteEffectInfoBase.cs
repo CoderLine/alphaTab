@@ -25,14 +25,13 @@ namespace AlphaTab.Rendering.Effects
     {
         protected FastList<Note> LastCreateInfo;
 
-        public bool HideOnMultiTrack { get { return false; } }
-        public virtual bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat)
+        public virtual bool ShouldCreateGlyph(Beat beat)
         {
             LastCreateInfo = new FastList<Note>();
             for (int i = 0, j = beat.Notes.Count; i < j; i++)
             {
                 var n = beat.Notes[i];
-                if (ShouldCreateGlyphForNote(renderer, n))
+                if (ShouldCreateGlyphForNote(n))
                 {
                     LastCreateInfo.Add(n);
                 }
@@ -40,13 +39,13 @@ namespace AlphaTab.Rendering.Effects
             return LastCreateInfo.Count > 0;
         }
 
-        protected abstract bool ShouldCreateGlyphForNote(EffectBarRenderer renderer, Note note);
+        protected abstract bool ShouldCreateGlyphForNote(Note note);
 
+        public abstract string EffectId { get; }
         public abstract EffectBarGlyphSizing SizingMode { get; }
-        public abstract float GetHeight(EffectBarRenderer renderer);
-        public abstract EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat);
+        public abstract EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat);
 
-        public virtual bool CanExpand(EffectBarRenderer renderer, Beat from, Beat to)
+        public virtual bool CanExpand(Beat @from, Beat to)
         {
             return true;
         }

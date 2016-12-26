@@ -29,6 +29,7 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             Width = 9 * Scale;
+            Height = 20 * Scale;
         }
 
         private static MusicFontSymbol GetSymbol(PickStrokeType pickStroke)

@@ -396,14 +396,14 @@ namespace AlphaTab.Rendering.Staves
         }
 
 
-        public void FinalizeGroup(ScoreLayout scoreLayout)
+        public void FinalizeGroup()
         {
             float currentY = 0;
             for (int i = 0, j = _allStaves.Count; i < j; i++)
             {
                 _allStaves[i].X = AccoladeSpacing;
                 _allStaves[i].Y = (currentY);
-                _allStaves[i].FinalizeStave(scoreLayout);
+                _allStaves[i].FinalizeStave();
                 currentY += _allStaves[i].Height;
             }
         }

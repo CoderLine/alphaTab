@@ -22,24 +22,20 @@ namespace AlphaTab.Rendering.Effects
 {
     public class ChordsEffectInfo : IEffectBarRendererInfo
     {
-        public bool HideOnMultiTrack { get { return false; } }
-        public bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat)
+        public string EffectId { get { return "chords"; } }
+        public bool ShouldCreateGlyph(Beat beat)
         {
             return beat.HasChord;
         }
 
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
-        public float GetHeight(EffectBarRenderer renderer)
-        {
-            return 20 * renderer.Scale;
-        }
-
-        public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+      
+        public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
             return new TextGlyph(0, 0, beat.Chord.Name, renderer.Resources.EffectFont);
         }
 
-        public bool CanExpand(EffectBarRenderer renderer, Beat @from, Beat to)
+        public bool CanExpand(Beat @from, Beat to)
         {
             return true;
         }

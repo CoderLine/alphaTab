@@ -22,24 +22,20 @@ namespace AlphaTab.Rendering.Effects
 {
     public class CrescendoEffectInfo : IEffectBarRendererInfo
     {
-        public bool HideOnMultiTrack { get { return false; } }
-        public bool ShouldCreateGlyph(EffectBarRenderer renderer, Beat beat)
+        public string EffectId { get { return "crescendo"; } }
+        public bool ShouldCreateGlyph(Beat beat)
         {
             return beat.Crescendo != CrescendoType.None;
         }
 
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.GroupedOnBeat; } }
-        public float GetHeight(EffectBarRenderer renderer)
-        {
-            return CrescendoGlyph.Height * renderer.Scale;
-        }
-
-        public EffectGlyph CreateNewGlyph(EffectBarRenderer renderer, Beat beat)
+       
+        public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
             return new CrescendoGlyph(0, 0, beat.Crescendo);
         }
 
-        public bool CanExpand(EffectBarRenderer renderer, Beat @from, Beat to)
+        public bool CanExpand(Beat @from, Beat to)
         {
             return from.Crescendo == to.Crescendo;
         }

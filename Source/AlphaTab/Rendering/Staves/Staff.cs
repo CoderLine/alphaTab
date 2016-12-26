@@ -45,7 +45,10 @@ namespace AlphaTab.Rendering.Staves
         public int StaffIndex { get; set; }
 
         public Model.Staff ModelStaff { get; set; }
-        public string StaveId { get; private set; }
+        public string StaveId
+        {
+            get { return _factory.StaffId; }
+        }
 
         /// <summary>
         /// This is the visual offset from top where the
@@ -65,16 +68,15 @@ namespace AlphaTab.Rendering.Staves
         public bool IsFirstInAccolade { get; set; }
         public bool IsLastInAccolade { get; set; }
 
-        public Staff(Model.Staff staff, string staveId, BarRendererFactory factory, FastDictionary<string, object> settings)
+        public Staff(Model.Staff staff, BarRendererFactory factory, FastDictionary<string, object> settings)
         {
             BarRenderers = new FastList<BarRendererBase>();
             _barRendererLookup = new FastDictionary<int, BarRendererBase>();
             ModelStaff = staff;
-            StaveId = staveId;
             _factory = factory;
             _settings = settings;
-            TopSpacing = 10;
-            BottomSpacing = 10;
+            TopSpacing = 15;
+            BottomSpacing = 5;
             StaveTop = 0;
             StaveBottom = 0;
         }
@@ -192,34 +194,25 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public void FinalizeStave(ScoreLayout layout)
+        public void FinalizeStave()
         {
             var x = 0f;
             Height = 0;
 
             var topOverflow = TopOverflow;
             var bottomOverflow = BottomOverflow;
-            var isEmpty = true;
             for (var i = 0; i < BarRenderers.Count; i++)
             {
                 BarRenderers[i].X = x;
                 BarRenderers[i].Y = TopSpacing + topOverflow;
                 Height = Math.Max(Height, BarRenderers[i].Height);
-                BarRenderers[i].FinalizeRenderer(layout);
+                BarRenderers[i].FinalizeRenderer();
                 x += BarRenderers[i].Width;
-                if (!BarRenderers[i].IsEmpty)
-                {
-                    isEmpty = false;
-                }
             }
 
-            if (!isEmpty)
+            if (Height > 0)
             {
                 Height += TopSpacing + topOverflow + bottomOverflow + BottomSpacing;
-            }
-            else
-            {
-                Height = 0;
             }
         }
 
