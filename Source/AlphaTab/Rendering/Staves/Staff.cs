@@ -31,7 +31,6 @@ namespace AlphaTab.Rendering.Staves
     {
         private readonly BarRendererFactory _factory;
         private readonly FastDictionary<string, object> _settings;
-        private readonly FastDictionary<int, BarRendererBase> _barRendererLookup;
 
         public StaveTrackGroup StaveTrackGroup { get; set; }
         public StaveGroup StaveGroup { get; set; }
@@ -44,6 +43,13 @@ namespace AlphaTab.Rendering.Staves
         public int Index { get; set; }
         public int StaffIndex { get; set; }
 
+        /// <summary>
+        /// This is the index of the track being rendered. This is not the index of the track within the model, 
+        /// but the n-th track being rendered. It is the index of the <see cref="ScoreRenderer.Tracks"/> array defining 
+        /// which tracks should be rendered. 
+        /// For single-track rendering this will always be zero.
+        /// </summary>
+        public int TrackIndex { get; set; }
         public Model.Staff ModelStaff { get; set; }
         public string StaveId
         {
@@ -68,10 +74,10 @@ namespace AlphaTab.Rendering.Staves
         public bool IsFirstInAccolade { get; set; }
         public bool IsLastInAccolade { get; set; }
 
-        public Staff(Model.Staff staff, BarRendererFactory factory, FastDictionary<string, object> settings)
+        public Staff(int trackIndex, Model.Staff staff, BarRendererFactory factory, FastDictionary<string, object> settings)
         {
             BarRenderers = new FastList<BarRendererBase>();
-            _barRendererLookup = new FastDictionary<int, BarRendererBase>();
+            TrackIndex = trackIndex;
             ModelStaff = staff;
             _factory = factory;
             _settings = settings;
@@ -127,7 +133,7 @@ namespace AlphaTab.Rendering.Staves
             }
             else
             {
-                renderer = _factory.Create(StaveGroup.Layout.Renderer, bar);
+                renderer = _factory.Create(StaveGroup.Layout.Renderer, bar, _settings);
             }
             renderer.Staff = this;
             renderer.Index = BarRenderers.Count;

@@ -27,13 +27,15 @@ namespace AlphaTab.Rendering.Glyphs
     public class TabNoteChordGlyph : Glyph
     {
         private readonly FastList<NoteNumberGlyph> _notes;
-        private Note _minNote;
         private readonly bool _isGrace;
 
         public Beat Beat { get; set; }
         public BeamingHelper BeamingHelper { get; set; }
+        public Note MinStringNote { get; set; }
         public FastDictionary<string, Glyph> BeatEffects { get; set; }
         public FastDictionary<int, NoteNumberGlyph> NotesPerString { get; set; }
+
+
 
         public TabNoteChordGlyph(float x, float y, bool isGrace)
             : base(x, y)
@@ -83,7 +85,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             var tabHeight = Renderer.Resources.TablatureFont.Size;
-            var effectY = GetNoteY(_minNote) + tabHeight / 2;
+            var effectY = GetNoteY(MinStringNote) + tabHeight / 2;
             // TODO: take care of actual glyph height
             var effectSpacing = 7 * Scale;
             foreach (var beatEffectKey in BeatEffects)
@@ -103,7 +105,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             _notes.Add(noteGlyph);
             NotesPerString[note.String] = noteGlyph;
-            if (_minNote == null || note.String < _minNote.String) _minNote = note;
+            if (MinStringNote == null || note.String < MinStringNote.String) MinStringNote = note;
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
@@ -130,9 +132,9 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void UpdateBeamingHelper(float cx)
         {
-            if (BeamingHelper != null && !BeamingHelper.HasBeatLineX(Beat))
+            if (BeamingHelper != null && BeamingHelper.IsPositionFrom(TabBarRenderer.StaffId, Beat))
             {
-                BeamingHelper.RegisterBeatLineX(Beat, cx + X + Width / 2, cx + X + Width / 2);
+                BeamingHelper.RegisterBeatLineX(TabBarRenderer.StaffId, Beat, cx + X + Width, cx + X);
             }
         }
     }

@@ -1,8 +1,6 @@
-using System.Runtime.InteropServices;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering
@@ -37,7 +35,9 @@ namespace AlphaTab.Rendering
 
         public void CreateGlyph(Beat beat)
         {
-            if (_info.ShouldCreateGlyph(beat))
+            // NOTE: the track order will never change. even if the staff behind the renderer changes, the trackIndex will not. 
+            // so it's okay to access the staff here while creating the glyphs. 
+            if (_info.ShouldCreateGlyph(beat) && (!_info.HideOnMultiTrack || Renderer.Staff.TrackIndex == 0))
             {
                 var glyph = CreateOrResizeGlyph(_info.SizingMode, beat);
                 if (glyph.Height > Height)
@@ -49,11 +49,20 @@ namespace AlphaTab.Rendering
 
         private EffectGlyph CreateOrResizeGlyph(EffectBarGlyphSizing sizing, Beat b)
         {
+            EffectGlyph g;
             switch (sizing)
             {
+                case EffectBarGlyphSizing.FullBar:
+                    g = _info.CreateNewGlyph(Renderer, b);
+                    g.Renderer = Renderer;
+                    g.Beat = b;
+                    g.DoLayout();
+                    _effectGlyphs[b.Voice.Index][b.Index] = g;
+                    _uniqueEffectGlyphs[b.Voice.Index].Add(g);
+                    return g;
                 case EffectBarGlyphSizing.SinglePreBeat:
                 case EffectBarGlyphSizing.SingleOnBeat:
-                    var g = _info.CreateNewGlyph(Renderer, b);
+                    g = _info.CreateNewGlyph(Renderer, b);
                     g.Renderer = Renderer;
                     g.Beat = b;
                     g.DoLayout();
@@ -64,7 +73,6 @@ namespace AlphaTab.Rendering
                 case EffectBarGlyphSizing.GroupedOnBeat:
                     if (b.Index > 0 || Renderer.Index > 0)
                     {
-                        // TODO: new grouping logic 
                         // check if the previous beat also had this effect
                         Beat prevBeat = b.PreviousBeat;
                         if (_info.ShouldCreateGlyph(prevBeat))
@@ -170,6 +178,10 @@ namespace AlphaTab.Rendering
                     pos = container.OnNotes;
                     g.X = Renderer.BeatGlyphsStart + pos.X + container.X;
                     g.Width = pos.Width;
+                    break;
+
+                case EffectBarGlyphSizing.FullBar:
+                    g.Width = Renderer.Width;
                     break;
             }
         }

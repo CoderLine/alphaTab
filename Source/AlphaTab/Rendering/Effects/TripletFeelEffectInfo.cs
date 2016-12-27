@@ -23,6 +23,8 @@ namespace AlphaTab.Rendering.Effects
     public class TripletFeelEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "triplet-feel"; } }
+        public bool HideOnMultiTrack { get { return true; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SinglePreBeat; } }
 
         public bool ShouldCreateGlyph(Beat beat)
         {
@@ -33,7 +35,6 @@ namespace AlphaTab.Rendering.Effects
                 );
         }
 
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SinglePreBeat; } }
 
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {

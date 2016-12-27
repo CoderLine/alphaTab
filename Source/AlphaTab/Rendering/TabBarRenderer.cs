@@ -36,6 +36,7 @@ namespace AlphaTab.Rendering
         public TabBarRenderer(ScoreRenderer renderer, Bar bar)
             : base(renderer, bar)
         {
+            RhythmHeight = 15 * renderer.Layout.Scale;
         }
 
         public float LineOffset
@@ -45,6 +46,10 @@ namespace AlphaTab.Rendering
                 return ((LineSpacing + 1) * Scale);
             }
         }
+
+        public bool RenderRhythm { get; set; }
+        public float RhythmHeight { get; set; }
+        public bool RhythmBeams { get; set; }
 
         public override float GetNoteX(Note note, bool onEnd = true)
         {
@@ -73,6 +78,12 @@ namespace AlphaTab.Rendering
             TopPadding = numberOverflow;
             BottomPadding = numberOverflow;
             Height = LineOffset * (Bar.Staff.Track.Tuning.Length - 1) + (numberOverflow * 2);
+
+            if (RenderRhythm)
+            {
+                Height += RhythmHeight;
+                BottomPadding += RhythmHeight;
+            }
 
             base.UpdateSizes();
         }
@@ -180,7 +191,7 @@ namespace AlphaTab.Rendering
                         foreach (var s in noteNumbers.NotesPerString)
                         {
                             tabNotes[Bar.Staff.Track.Tuning.Length - s].Add(
-                                new []
+                                new[]
                                 {
                                   vc.X + bg.X + notes.X + noteNumbers.X,
                                   noteNumbers.Width + padding
@@ -221,6 +232,231 @@ namespace AlphaTab.Rendering
             //DrawInfoGuide(canvas, cx, cy, stave.StaveBottom, new Color(0,255,0)); // stavebottom
             //DrawInfoGuide(canvas, cx, cy, Height, new Color(255, 0, 0)); // bottom
         }
+
+        public override void Paint(float cx, float cy, ICanvas canvas)
+        {
+            base.Paint(cx, cy, canvas);
+            if (RenderRhythm)
+            {
+                PaintBeams(cx, cy, canvas);
+            }
+        }
+
+
+        private void PaintBeams(float cx, float cy, ICanvas canvas)
+        {
+            for (int i = 0, j = Helpers.BeamHelpers.Count; i < j; i++)
+            {
+                var v = Helpers.BeamHelpers[i];
+                for (int k = 0, l = v.Count; k < l; k++)
+                {
+                    var h = v[k];
+                    PaintBeamHelper(cx + BeatGlyphsStart, cy, canvas, h);
+                }
+            }
+        }
+
+        private void PaintBeamHelper(float cx, float cy, ICanvas canvas, BeamingHelper h)
+        {
+            canvas.Color = h.Voice.Index == 0
+                ? Resources.MainGlyphColor
+                : Resources.SecondaryGlyphColor;
+
+            // check if we need to paint simple footer
+            if (h.Beats.Count == 1 || RhythmBeams)
+            {
+                PaintFooter(cx, cy, canvas, h);
+            }
+            else
+            {
+                PaintBar(cx, cy, canvas, h);
+            }
+        }
+
+        private void PaintBar(float cx, float cy, ICanvas canvas, BeamingHelper h)
+        {
+            for (int i = 0, j = h.Beats.Count; i < j; i++)
+            {
+                var beat = h.Beats[i];
+
+                if (h.HasBeatLineX(beat))
+                {
+                    //
+                    // draw line 
+                    //
+                    var beatLineX = h.GetBeatLineX(beat);
+                    var y1 = cy + Y;
+                    var y2 = cy + Y + Height;
+
+                    var startGlyph = (TabBeatGlyph)GetOnNotesGlyphForBeat(beat);
+                    if (startGlyph.NoteNumbers == null)
+                    {
+                        y1 += Height - RhythmHeight;
+                    }
+                    else
+                    {
+                        y1 += startGlyph.NoteNumbers.GetNoteY(startGlyph.NoteNumbers.MinStringNote) + LineOffset / 2;
+                    }
+
+                    if (h.Direction == BeamDirection.Up)
+                    {
+                        beatLineX -= startGlyph.Width / 2f;
+                    }
+                    else
+                    {
+                        beatLineX += startGlyph.Width / 2f;
+                    }
+
+                    canvas.BeginPath();
+                    canvas.MoveTo(cx + X + beatLineX, y1);
+                    canvas.LineTo(cx + X + beatLineX, y2);
+                    canvas.Stroke();
+
+                    var brokenBarOffset = (6 * Scale);
+                    var barSpacing = (6 * Scale);
+                    var barSize = (3 * Scale);
+                    var barCount = beat.Duration.GetIndex() - 2;
+                    var barStart = cy + Y;
+                    barSpacing = -barSpacing;
+                    barStart += Height;
+
+                    for (int barIndex = 0; barIndex < barCount; barIndex++)
+                    {
+                        float barStartX;
+                        float barEndX;
+
+                        float barStartY;
+                        float barEndY;
+
+                        var barY = barStart + (barIndex * barSpacing);
+
+                        // 
+                        // Broken Bar to Next
+                        //
+                        if (h.Beats.Count == 1)
+                        {
+                            barStartX = beatLineX;
+                            barEndX = beatLineX + brokenBarOffset;
+                            barStartY = barY;
+                            barEndY = barY;
+                            PaintSingleBar(canvas, cx + X + barStartX, barStartY, cx + X + barEndX, barEndY, barSize);
+                        }
+                        // 
+                        // Bar to Next?
+                        //
+                        else if (i < h.Beats.Count - 1)
+                        {
+                            // full bar?
+                            if (BeamingHelper.IsFullBarJoin(beat, h.Beats[i + 1], barIndex))
+                            {
+                                barStartX = beatLineX;
+                                barEndX = h.GetBeatLineX(h.Beats[i + 1]) + Scale;
+
+                                var endGlyph = GetOnNotesGlyphForBeat(h.Beats[i + 1]);
+                                if (h.Direction == BeamDirection.Up)
+                                {
+                                    barEndX -= endGlyph.Width / 2f;
+                                }
+                                else
+                                {
+                                    barEndX += endGlyph.Width / 2f;
+                                }
+
+                            }
+                            // broken bar?
+                            else if (i == 0 || !BeamingHelper.IsFullBarJoin(h.Beats[i - 1], beat, barIndex))
+                            {
+                                barStartX = beatLineX;
+                                barEndX = barStartX + brokenBarOffset;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            barStartY = barY;
+                            barEndY = barY;
+                            PaintSingleBar(canvas, cx + X + barStartX, barStartY, cx + X + barEndX, barEndY, barSize);
+                        }
+                        // 
+                        // Broken Bar to Previous?
+                        //
+                        else if (i > 0 && !BeamingHelper.IsFullBarJoin(beat, h.Beats[i - 1], barIndex))
+                        {
+                            barStartX = beatLineX - brokenBarOffset;
+                            barEndX = beatLineX;
+
+                            barStartY = barY;
+                            barEndY = barY;
+
+                            PaintSingleBar(canvas, cx + X + barStartX, barStartY, cx + X + barEndX, barEndY, barSize);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void PaintSingleBar(ICanvas canvas, float x1, float y1, float x2, float y2, float size)
+        {
+            canvas.BeginPath();
+            canvas.MoveTo(x1, y1);
+            canvas.LineTo(x2, y2);
+            canvas.LineTo(x2, y2 - size);
+            canvas.LineTo(x1, y1 - size);
+            canvas.ClosePath();
+            canvas.Fill();
+        }
+
+        private void PaintFooter(float cx, float cy, ICanvas canvas, BeamingHelper h)
+        {
+            foreach (var beat in h.Beats)
+            {
+                if (beat.Duration == Duration.Whole || beat.Duration == Duration.DoubleWhole)
+                {
+                    continue;
+                }
+
+                //
+                // draw line 
+                //
+
+                var beatLineX = h.GetBeatLineX(beat);
+                var y1 = cy + Y;
+                var y2 = cy + Y + Height;
+
+                var startGlyph = (TabBeatGlyph) GetOnNotesGlyphForBeat(beat);
+                if (startGlyph.NoteNumbers == null)
+                {
+                    y1 += Height - RhythmHeight;
+                }
+                else
+                {
+                    y1 += startGlyph.NoteNumbers.GetNoteY(startGlyph.NoteNumbers.MinStringNote) + LineOffset/2;
+                }
+
+                if (h.Direction == BeamDirection.Up)
+                {
+                    beatLineX -= startGlyph.Width/2f;
+                }
+                else
+                {
+                    beatLineX += startGlyph.Width/2f;
+                }
+
+                canvas.BeginPath();
+                canvas.MoveTo(cx + X + beatLineX, y1);
+                canvas.LineTo(cx + X + beatLineX, y2);
+                canvas.Stroke();
+
+                //
+                // Draw beam 
+                //
+                var glyph = new BeamGlyph(0, 0, beat.Duration, BeamDirection.Down, false);
+                glyph.Renderer = this;
+                glyph.DoLayout();
+                glyph.Paint(cx + X + beatLineX, y2, canvas);
+            }
+        }
+
 
         //private void DrawInfoGuide(ICanvas canvas, int cx, int cy, int y, Color c)
         //{

@@ -23,12 +23,13 @@ namespace AlphaTab.Rendering.Effects
     public class BeatVibratoEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "beat-vibrato"; } }
+        public bool HideOnMultiTrack { get { return false; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.GroupedOnBeat; } }
+
         public bool ShouldCreateGlyph(Beat beat)
         {
             return beat.Vibrato != VibratoType.None;
         }
-
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.GroupedOnBeat; } }
 
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {

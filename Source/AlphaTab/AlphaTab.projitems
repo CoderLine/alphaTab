@@ -86,8 +86,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\SupportedFonts.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\FontSvgCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\SvgCanvas.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\AlternateEndingsBarRenderer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\AlternateEndingsBarRendererFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\BarRendererBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\BarRendererFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\EffectBarGlyphSizing.cs" />
@@ -111,9 +109,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\TempoEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\TextEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\TrillEffectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\AlternateEndingsEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\TripletFeelEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\AccentuationGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\AccidentalGroupGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\AlternateEndingsGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BarNumberGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BarSeperatorGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeamGlyph.cs" />
@@ -189,8 +189,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Layout\PageViewLayout.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Layout\ScoreLayout.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\RenderingResources.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\RhythmBarRenderer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\RhythmBarRendererFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\ScoreBarRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\ScoreBarRendererFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\ScoreRenderer.cs" />

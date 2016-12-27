@@ -16,24 +16,29 @@
  * License along with this library.
  */
 using AlphaTab.Model;
+using AlphaTab.Rendering.Glyphs;
 
-namespace AlphaTab.Rendering
+namespace AlphaTab.Rendering.Effects
 {
-    /// <summary>
-    /// This Factory procudes AlternateEndingsBar instances
-    /// </summary>
-    public class AlternateEndingsBarRendererFactory : BarRendererFactory
+    public class AlternateEndingsEffectInfo : IEffectBarRendererInfo
     {
-        public override string StaffId { get { return AlternateEndingsBarRenderer.StaffId; } }
+        public string EffectId { get { return "alternate-feel"; } }
+        public bool HideOnMultiTrack { get { return true; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.FullBar; } }
 
-        public AlternateEndingsBarRendererFactory()
+        public bool ShouldCreateGlyph(Beat beat)
         {
-            IsInAccolade = false;
+            return beat.Index == 0 && beat.Voice.Bar.MasterBar.AlternateEndings != 0;
         }
 
-        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar)
+        public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
-            return new AlternateEndingsBarRenderer(renderer, bar);
+            return new AlternateEndingsGlyph(0,0, beat.Voice.Bar.MasterBar.AlternateEndings);
+        }
+
+        public bool CanExpand(Beat from, Beat to)
+        {
+            return true;
         }
     }
 }

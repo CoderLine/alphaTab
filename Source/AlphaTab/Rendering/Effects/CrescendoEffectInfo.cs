@@ -23,12 +23,14 @@ namespace AlphaTab.Rendering.Effects
     public class CrescendoEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "crescendo"; } }
+        public bool HideOnMultiTrack { get { return false; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.GroupedOnBeat; } }
+
         public bool ShouldCreateGlyph(Beat beat)
         {
             return beat.Crescendo != CrescendoType.None;
         }
 
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.GroupedOnBeat; } }
        
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {

@@ -23,19 +23,20 @@ namespace AlphaTab.Rendering.Effects
     public class CapoEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "capo"; } }
+        public bool HideOnMultiTrack { get { return false; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
+
         public bool ShouldCreateGlyph(Beat beat)
         {
             return beat.Index == 0 && beat.Voice.Bar.Index == 0 && beat.Voice.Bar.Staff.Track.Capo != 0;
         }
 
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat;} }
-       
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
             return new TextGlyph(0,0, "Capo. fret " + beat.Voice.Bar.Staff.Track.Capo, renderer.Resources.EffectFont);
         }
 
-        public bool CanExpand(Beat @from, Beat to)
+        public bool CanExpand(Beat from, Beat to)
         {
             return false;
         }

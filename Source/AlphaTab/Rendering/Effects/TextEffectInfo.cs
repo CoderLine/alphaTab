@@ -24,13 +24,14 @@ namespace AlphaTab.Rendering.Effects
     public class TextEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "text"; } }
+        public bool HideOnMultiTrack { get { return false; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
 
         public bool ShouldCreateGlyph(Beat beat)
         {
             return !beat.Text.IsNullOrWhiteSpace();
         }
 
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
 
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {

@@ -1,4 +1,6 @@
-﻿using AlphaTab.Rendering.Staves;
+﻿using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
+using AlphaTab.Rendering.Staves;
 using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs

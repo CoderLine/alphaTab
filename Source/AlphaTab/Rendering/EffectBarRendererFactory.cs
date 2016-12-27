@@ -1,3 +1,4 @@
+using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering
@@ -19,7 +20,7 @@ namespace AlphaTab.Rendering
             IsInAccolade = false;
         }
 
-        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar)
+        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar, FastDictionary<string, object> additionalSettings)
         {
             return new EffectBarRenderer(renderer, bar, _infos);
         }

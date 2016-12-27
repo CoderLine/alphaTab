@@ -32,6 +32,14 @@ namespace AlphaTab.Rendering
         string EffectId { get; }
 
         /// <summary>
+        /// Gets a value indicating whether this effect glyphs
+        /// should only be added once on the first track if multiple tracks are rendered.
+        /// (Example: this allows to render the tempo changes only once)
+        /// </summary>
+        /// <returns>true if this effect bar should only be created once for the first track, otherwise false.</returns>
+        bool HideOnMultiTrack { get; }
+
+        /// <summary>
         /// Checks whether the given beat has the appropriate effect set and
         /// needs a glyph creation 
         /// </summary>

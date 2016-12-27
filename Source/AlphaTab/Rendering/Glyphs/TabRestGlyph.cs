@@ -20,9 +20,9 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void UpdateBeamingHelper(float cx)
         {
-            if (BeamingHelper != null)
+            if (BeamingHelper != null && BeamingHelper.IsPositionFrom(TabBarRenderer.StaffId, Beat))
             {
-                BeamingHelper.RegisterBeatLineX(Beat, cx + X + Width / 2, cx + X + Width / 2);
+                BeamingHelper.RegisterBeatLineX(TabBarRenderer.StaffId, Beat, cx + X + Width, cx + X);
             }
         }
     }

@@ -23,12 +23,14 @@ namespace AlphaTab.Rendering.Effects
     public class MarkerEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "marker"; } }
+        public bool HideOnMultiTrack { get { return false; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SinglePreBeat; } }
+
         public bool ShouldCreateGlyph(Beat beat)
         {
             return beat.Voice.Bar.Staff.Index == 0 && beat.Voice.Index == 0 && beat.Index == 0 && beat.Voice.Bar.MasterBar.IsSectionStart;
         }
 
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SinglePreBeat; } }
        
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {

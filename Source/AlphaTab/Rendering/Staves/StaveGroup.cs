@@ -227,7 +227,7 @@ namespace AlphaTab.Rendering.Staves
             return null;
         }
 
-        public void AddStave(Track track, Staff staff)
+        public void AddStaff(Track track, Staff staff)
         {
             var group = GetStaveTrackGroup(track);
             if (group == null)

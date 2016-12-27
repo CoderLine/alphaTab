@@ -97,9 +97,7 @@
     
     <div id="alphaTabDetails" data-file="files/features/SongDetails.gp5"></div>
     <script type="text/javascript-lazy">
-        $('#alphaTabDetails').alphaTab({
-            staves: [] // hide content 
-        });
+        $('#alphaTabDetails').alphaTab();
     </script>
         
     <h2>HTML5 Canvas</h2>
@@ -124,7 +122,7 @@
     <div id="alphaTabRepeats" data-file="files/features/Repeats.gp5"></div>
     <script type="text/javascript-lazy">
         $('#alphaTabRepeats').alphaTab({
-            staves: ['score']
+            staves: 'score'
         });
     </script>
 
@@ -138,7 +136,7 @@
     <div id="alphaTabAlternateEndings" data-file="files/features/AlternateEndings.gp5"></div>
     <script type="text/javascript-lazy">
         $('#alphaTabAlternateEndings').alphaTab({
-            staves: ['alternate-endings', 'score']
+            staves: 'score'
         });
     </script>
     
@@ -370,35 +368,12 @@
             the tablature.
         </p>
         
-        <div id="alphaTabRhythmDown" data-file="files/features/Chords.gp5"></div>
+        <div id="alphaTabRhythm" data-file="files/features/Rhythm.gp5"></div>
         <script type="text/javascript-lazy">
-            $('#alphaTabRhythmDown').alphaTab({
-                staves: ['rhythm-down', 'tab']
+            $('#alphaTabRhythm').alphaTab({
+                staves: {id: 'tab', additionalSettings: {'rhythm': true } }
             });
-        </script>      
-        
-        <div id="alphaTabRhythmUp" data-file="files/features/Chords.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabRhythmUp').alphaTab({
-                staves: ['tab', 'rhythm-up']
-            });
-        </script>      
-        
-        <h2>Rhythm Height</h2>
-        
-        <p>
-            You might want to reduce the height of the rhythm stave. 
-        </p>
-        
-        <div id="alphaTabRhythmHeight" data-file="files/features/Chords.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabRhythmHeight').alphaTab({
-                staves: [
-                    {id: 'rhythm-down', additionalSettings: {'rhythm-height': 10 } },
-                    'tab'
-                ]
-            });
-        </script>      
+        </script>  
         
         <h2>Rhythm With Beams</h2>
         
@@ -406,13 +381,10 @@
             If you prefer beams instead of bars for single notes you can have that too. 
         </p>
         
-        <div id="alphaTabRhythmBeam" data-file="files/features/Chords.gp5"></div>
+        <div id="alphaTabRhythmBeam" data-file="files/features/Rhythm.gp5"></div>
         <script type="text/javascript-lazy">
             $('#alphaTabRhythmBeam').alphaTab({
-                staves: [
-                    {id: 'rhythm-down', additionalSettings: {'use-beams': true } },
-                    'tab'
-                ]
+                staves: {id: 'tab', additionalSettings: {'rhythm': true, 'rhythm-beams': true } }
             });
         </script>      
         

@@ -23,13 +23,13 @@ namespace AlphaTab.Rendering.Effects
     public class TempoEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "tempo"; } }
+        public bool HideOnMultiTrack { get { return true; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SinglePreBeat; } }
 
         public bool ShouldCreateGlyph(Beat beat)
         {
             return beat.Voice.Bar.Staff.Index == 0 && beat.Voice.Index == 0 && beat.Index == 0 && (beat.Voice.Bar.MasterBar.TempoAutomation != null || beat.Voice.Bar.Index == 0);
         }
-
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SinglePreBeat; } }
        
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {

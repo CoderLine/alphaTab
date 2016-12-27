@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering
@@ -26,7 +28,7 @@ namespace AlphaTab.Rendering
     {
         public override string StaffId { get { return ScoreBarRenderer.StaffId; } }
 
-        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar)
+        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar, FastDictionary<string, object> additionalSettings)
         {
             return new ScoreBarRenderer(renderer, bar);
         }

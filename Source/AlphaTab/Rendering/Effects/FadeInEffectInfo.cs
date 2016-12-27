@@ -23,12 +23,14 @@ namespace AlphaTab.Rendering.Effects
     public class FadeInEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "fade-in"; } }
+        public bool HideOnMultiTrack { get { return false; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
+
         public bool ShouldCreateGlyph(Beat beat)
         {
             return beat.FadeIn;
         }
 
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
             return new FadeInGlyph(0, 0);

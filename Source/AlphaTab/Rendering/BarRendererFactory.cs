@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering
@@ -26,6 +27,7 @@ namespace AlphaTab.Rendering
     public abstract class BarRendererFactory
     {
         public bool IsInAccolade { get; set; }
+        public bool HideOnMultiTrack { get; set; }
         public bool HideOnPercussionTrack { get; set; }
         public abstract string StaffId { get; }
 
@@ -33,12 +35,13 @@ namespace AlphaTab.Rendering
         {
             IsInAccolade = true;
             HideOnPercussionTrack = false;
+            HideOnMultiTrack = false;
         }
 
-        public virtual bool CanCreate(Track track)
+        public virtual bool CanCreate(Track track, Staff staff)
         {
             return !HideOnPercussionTrack || !track.IsPercussion;
         }
-        public abstract BarRendererBase Create(ScoreRenderer renderer, Bar bar);
+        public abstract BarRendererBase Create(ScoreRenderer renderer, Bar bar, FastDictionary<string, object> additionalSettings);
     }
 }

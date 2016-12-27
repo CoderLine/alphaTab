@@ -42,6 +42,7 @@ namespace AlphaTab.Rendering.Effects
         protected abstract bool ShouldCreateGlyphForNote(Note note);
 
         public abstract string EffectId { get; }
+        public virtual bool HideOnMultiTrack { get { return false; } }
         public abstract EffectBarGlyphSizing SizingMode { get; }
         public abstract EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat);
 

@@ -23,13 +23,14 @@ namespace AlphaTab.Rendering.Effects
     public class TapEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "tap"; } }
+        public bool HideOnMultiTrack { get { return false; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
 
         public bool ShouldCreateGlyph(Beat beat)
         {
             return (beat.Slap || beat.Pop || beat.Tap);
         }
 
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
 
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {

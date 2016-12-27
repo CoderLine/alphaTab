@@ -49,11 +49,13 @@ namespace AlphaTab.Rendering.Utils
 
     public class BeatLinePositions
     {
+        public string StaffId { get; set; }
         public float Up { get; set; }
         public float Down { get; set; }
 
-        public BeatLinePositions(float up, float down)
+        public BeatLinePositions(string staffId, float up, float down)
         {
+            StaffId = staffId;
             Up = up;
             Down = down;
         }
@@ -160,9 +162,9 @@ namespace AlphaTab.Rendering.Utils
             return _beatLineXPositions.ContainsKey(beat.Index);
         }
 
-        public void RegisterBeatLineX(Beat beat, float up, float down)
+        public void RegisterBeatLineX(string staffId, Beat beat, float up, float down)
         {
-            _beatLineXPositions[beat.Index] = new BeatLinePositions(up, down);
+            _beatLineXPositions[beat.Index] = new BeatLinePositions(staffId, up, down);
         }
 
         public BeamDirection Direction { get; private set; }
@@ -461,6 +463,27 @@ namespace AlphaTab.Rendering.Utils
                 default:
                     return true;
             }
+        }
+
+        public static bool IsFullBarJoin(Beat a, Beat b, int barIndex)
+        {
+            return (a.Duration.GetIndex() - 2 - barIndex > 0)
+                && (b.Duration.GetIndex() - 2 - barIndex > 0);
+        }
+
+        /// <summary>
+        /// Returns whether the the position of the given beat, was registered by the staff of the given ID
+        /// </summary>
+        /// <param name="staffId"></param>
+        /// <param name="beat"></param>
+        /// <returns></returns>
+        public bool IsPositionFrom(string staffId, Beat beat)
+        {
+            if (!_beatLineXPositions.ContainsKey(beat.Index))
+            {
+                return true;
+            }
+            return _beatLineXPositions[beat.Index].StaffId == staffId;
         }
     }
 }

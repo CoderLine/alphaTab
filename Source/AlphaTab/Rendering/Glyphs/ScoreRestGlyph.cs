@@ -93,7 +93,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (BeamingHelper != null)
             {
-                BeamingHelper.RegisterBeatLineX(Beat, cx + X + Width / 2, cx + X + Width / 2);
+                BeamingHelper.RegisterBeatLineX(ScoreBarRenderer.StaffId, Beat, cx + X + Width / 2, cx + X + Width / 2);
             }
         }
     }

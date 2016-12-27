@@ -35,7 +35,6 @@ namespace AlphaTab
         public static FastDictionary<string, Func<ICanvas>> RenderEngines;
         public static FastDictionary<string, Func<IFileLoader>> FileLoaders;
         public static FastDictionary<string, Func<ScoreRenderer, ScoreLayout>> LayoutEngines;
-        public static FastDictionary<string, BarRendererFactory> StaveFactories;
         public static FastDictionary<string, BarRendererFactory[]> StaveProfiles;
 
         static Environment()
@@ -43,7 +42,6 @@ namespace AlphaTab
             RenderEngines = new FastDictionary<string, Func<ICanvas>>();
             FileLoaders = new FastDictionary<string, Func<IFileLoader>>();
             LayoutEngines = new FastDictionary<string, Func<ScoreRenderer, ScoreLayout>>();
-            StaveFactories = new FastDictionary<string, BarRendererFactory>();
             StaveProfiles = new FastDictionary<string, BarRendererFactory[]>();
 
             PlatformInit();
@@ -53,15 +51,8 @@ namespace AlphaTab
             LayoutEngines["page"] = r => new PageViewLayout(r);
             LayoutEngines["horizontal"] = r => new HorizontalScreenLayout(r);
 
-            // default staves 
-            StaveFactories[AlternateEndingsBarRenderer.StaffId] = new AlternateEndingsBarRendererFactory();
-            StaveFactories[ScoreBarRenderer.StaffId] = new ScoreBarRendererFactory();
-            StaveFactories[TabBarRenderer.StaffId] = new TabBarRendererFactory();
-            StaveFactories[RhythmBarRenderer.StaffIdUp] = new RhythmBarRendererFactory(BeamDirection.Down);
-            StaveFactories[RhythmBarRenderer.StaffIdDown] = new RhythmBarRendererFactory(BeamDirection.Up);
-
             // default combinations of stave textprofiles
-            StaveProfiles["default"] = StaveProfiles["score-tab"] = new[]
+            StaveProfiles["default"] = StaveProfiles["score-tab"] = new BarRendererFactory[]
             {
                 new EffectBarRendererFactory("score-effects", new IEffectBarRendererInfo[] {
                     new TempoEffectInfo(),
@@ -71,10 +62,10 @@ namespace AlphaTab
                     new ChordsEffectInfo(),
                     new TrillEffectInfo(),
                     new BeatVibratoEffectInfo(),
-                    new NoteVibratoEffectInfo()
-                }), 
-                StaveFactories["alternate-endings"],
-                StaveFactories["score"],
+                    new NoteVibratoEffectInfo(),
+                    new AlternateEndingsEffectInfo(),
+                }),
+                new ScoreBarRendererFactory(),
                 new EffectBarRendererFactory("tab-effects", new IEffectBarRendererInfo[] {
                     new CrescendoEffectInfo(),
                     new DynamicsEffectInfo(),
@@ -89,10 +80,10 @@ namespace AlphaTab
                     new PalmMuteEffectInfo(),
                     new PickStrokeEffectInfo(),
                 }),
-                StaveFactories["tab"]
+                new TabBarRendererFactory()
             };
 
-            StaveProfiles["score"] = new[]
+            StaveProfiles["score"] = new BarRendererFactory[]
             {
                 new EffectBarRendererFactory("score-effects", new IEffectBarRendererInfo[] {
                     new TempoEffectInfo(), 
@@ -106,17 +97,17 @@ namespace AlphaTab
                     new FadeInEffectInfo(),
                     new LetRingEffectInfo(),
                     new PalmMuteEffectInfo(),
-                    new PickStrokeEffectInfo()
+                    new PickStrokeEffectInfo(),
+                    new AlternateEndingsEffectInfo(), 
                 }),
-                StaveFactories["alternate-endings"],
-                StaveFactories["score"],
+                new ScoreBarRendererFactory(),
                 new EffectBarRendererFactory("score-bottom-effects", new IEffectBarRendererInfo[] {
                     new CrescendoEffectInfo(), 
                     new DynamicsEffectInfo(),
                 }),
             };
 
-            StaveProfiles["tab"] = new[]
+            StaveProfiles["tab"] = new BarRendererFactory[]
             {
                 new EffectBarRendererFactory("tab-effects", new IEffectBarRendererInfo[] {
                     new TempoEffectInfo(), 
@@ -137,10 +128,9 @@ namespace AlphaTab
                     new CapoEffectInfo(), 
                     new PalmMuteEffectInfo(), 
                     new PickStrokeEffectInfo(),
+                    new AlternateEndingsEffectInfo()
                 }),
-                StaveFactories["alternate-endings"],
-                StaveFactories["tab"],
-                StaveFactories["rhythm-down"]
+                new TabBarRendererFactory()
             };
         }
     }

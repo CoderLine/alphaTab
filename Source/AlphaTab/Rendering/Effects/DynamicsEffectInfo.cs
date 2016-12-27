@@ -23,13 +23,14 @@ namespace AlphaTab.Rendering.Effects
     public class DynamicsEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "dynamics"; } }
+        public bool HideOnMultiTrack { get { return false; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
+
         public bool ShouldCreateGlyph(Beat beat)
         {
             return beat.Voice.Index == 0 &&
                    ((beat.Index == 0 && beat.Voice.Bar.Index == 0) || (beat.PreviousBeat != null && beat.Dynamic != beat.PreviousBeat.Dynamic));
         }
-
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
         
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {

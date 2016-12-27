@@ -136,9 +136,10 @@ namespace AlphaTab.Rendering.Layout
                     for (var renderStaveIndex = 0; renderStaveIndex < profile.Length; renderStaveIndex++)
                     {
                         var factory = profile[renderStaveIndex];
-                        if (factory.CanCreate(track))
+                        var staff = track.Staves[staveIndex];
+                        if (factory.CanCreate(track, staff))
                         {
-                            group.AddStave(track, new Staff(track.Staves[staveIndex], factory, Renderer.Settings.Staves.AdditionalSettings));
+                            group.AddStaff(track, new Staff(trackIndex, staff, factory, Renderer.Settings.Staves.AdditionalSettings));
                         }
                     }
                 }

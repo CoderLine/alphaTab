@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering
@@ -31,14 +33,31 @@ namespace AlphaTab.Rendering
             HideOnPercussionTrack = true;
         }
 
-        public override bool CanCreate(Track track)
+        public override bool CanCreate(Track track, Staff staff)
         {
-            return track.Tuning.Length > 0 && base.CanCreate(track);
+            return track.Tuning.Length > 0 && base.CanCreate(track, staff);
         }
 
-        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar)
+        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar, FastDictionary<string, object> additionalSettings)
         {
-            return new TabBarRenderer(renderer, bar);
+            var tabBarRenderer = new TabBarRenderer(renderer, bar);
+
+            if (additionalSettings.ContainsKey("rhythm"))
+            {
+                tabBarRenderer.RenderRhythm = (bool)additionalSettings["rhythm"];
+            }
+
+            if (additionalSettings.ContainsKey("rhythm-height"))
+            {
+                tabBarRenderer.RhythmHeight = (float)additionalSettings["rhythm-height"];
+            }
+
+            if (additionalSettings.ContainsKey("rhythm-beams"))
+            {
+                tabBarRenderer.RhythmBeams = (bool)additionalSettings["rhythm-beams"];
+            }
+
+            return tabBarRenderer;
         }
     }
 }

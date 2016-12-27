@@ -23,13 +23,13 @@ namespace AlphaTab.Rendering.Effects
     public class PickStrokeEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "pick-stroke"; } }
+        public bool HideOnMultiTrack { get { return false; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
 
         public bool ShouldCreateGlyph(Beat beat)
         {
             return beat.PickStroke != PickStrokeType.None;
         }
-
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
 
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {

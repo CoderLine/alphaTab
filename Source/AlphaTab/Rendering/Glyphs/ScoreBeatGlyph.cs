@@ -37,10 +37,6 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 RestGlyph.UpdateBeamingHelper(Container.X + X);
             }
-            else if (RestGlyph != null)
-            {
-                RestGlyph.UpdateBeamingHelper(Container.X + X);
-            }
         }
 
         public override void DoLayout()
