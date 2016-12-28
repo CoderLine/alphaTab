@@ -186,9 +186,6 @@ namespace AlphaTab.Platform.CSharp
                 _textBaseline = value;
                 switch (value)
                 {
-                    case TextBaseline.Default:
-                        _stringFormat.LineAlignment = StringAlignment.Near;
-                        break;
                     case TextBaseline.Top:
                         _stringFormat.LineAlignment = StringAlignment.Near;
                         break;

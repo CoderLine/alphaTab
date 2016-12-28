@@ -41,21 +41,6 @@ namespace AlphaTab.Rendering.Staves
         }
     }
 
-    public class AddBarsToStaveGroupResult
-    {
-        public float Width { get; set; }
-        public bool IsLinkedToPrevious { get; set; }
-        public MasterBar MasterBar { get; set; }
-        public FastList<BarRendererBase> Renderers { get; set; }
-        public BarHelpersGroup Helpers { get; set; }
-        public BarLayoutingInfo BarLayoutingInfo { get; set; }
-
-        public AddBarsToStaveGroupResult()
-        {
-            Renderers = new FastList<BarRendererBase>();
-        }
-    }
-
     /// <summary>
     /// A Staff consists of a list of different staves and groups
     /// them using an accolade. 
@@ -64,6 +49,7 @@ namespace AlphaTab.Rendering.Staves
     {
         private const float AccoladeLabelSpacing = 10;
 
+        private readonly FastList<Staff> _allStaves;
         private Staff _firstStaffInAccolade;
         private Staff _lastStaffInAccolade;
 
@@ -88,41 +74,36 @@ namespace AlphaTab.Rendering.Staves
 
         public bool IsLast { get; set; }
 
-        public FastList<MasterBar> MasterBars { get; set; }
+        public FastList<MasterBarsRenderers> MasterBarsRenderers { get; set; }
 
         public FastList<StaveTrackGroup> Staves { get; set; }
-        private readonly FastList<Staff> _allStaves;
 
         public ScoreLayout Layout { get; set; }
-        public BarHelpersGroup Helpers { get; set; }
 
         public StaveGroup()
         {
-            MasterBars = new FastList<MasterBar>();
+            MasterBarsRenderers = new FastList<MasterBarsRenderers>();
             Staves = new FastList<StaveTrackGroup>();
             _allStaves = new FastList<Staff>();
             Width = 0;
             Index = 0;
             _accoladeSpacingCalculated = false;
             AccoladeSpacing = 0;
-
-            Helpers = new BarHelpersGroup();
         }
 
         public int LastBarIndex
         {
             get
             {
-                return MasterBars[MasterBars.Count - 1].Index;
+                return MasterBarsRenderers[MasterBarsRenderers.Count - 1].MasterBar.Index;
             }
         }
 
-        public AddBarsToStaveGroupResult AddBarsFromResult(Track[] tracks, AddBarsToStaveGroupResult result)
+        public MasterBarsRenderers AddMasterBarRenderers(Track[] tracks, MasterBarsRenderers renderers)
         {
             if (tracks.Length == 0) return null;
 
-            Helpers.ImportHelpers(tracks, result.Helpers);
-            MasterBars.Add(result.MasterBar);
+            MasterBarsRenderers.Add(renderers);
             CalculateAccoladeSpacing(tracks);
 
             var src = 0;
@@ -133,37 +114,33 @@ namespace AlphaTab.Rendering.Staves
                 for (int k = 0, l = g.Staves.Count; k < l; k++)
                 {
                     var s = g.Staves[k];
-                    var renderer = result.Renderers[src++];
+                    var renderer = renderers.Renderers[src++];
                     s.AddBarRenderer(renderer);
                 }
             }
 
             UpdateWidth();
 
-            return result;
+            return renderers;
         }
 
-        public AddBarsToStaveGroupResult AddBars(Track[] tracks, int barIndex)
+        public MasterBarsRenderers AddBars(Track[] tracks, int barIndex)
         {
             if (tracks.Length == 0) return null;
 
-            var result = new AddBarsToStaveGroupResult();
-            result.Helpers = Helpers.BuildHelpers(tracks, barIndex);
-
+            var result = new MasterBarsRenderers();
             result.MasterBar = tracks[0].Score.MasterBars[barIndex];
-            MasterBars.Add(result.MasterBar);
+            MasterBarsRenderers.Add(result);
 
             CalculateAccoladeSpacing(tracks);
            
             // add renderers
-            result.BarLayoutingInfo = new BarLayoutingInfo();
-            for (int i = 0, j = Staves.Count; i < j; i++)
+            var barLayoutingInfo = new BarLayoutingInfo();
+            foreach (var g in Staves)
             {
-                var g = Staves[i];
-                for (int k = 0, l = g.Staves.Count; k < l; k++)
+                foreach (var s in g.Staves)
                 {
-                    var s = g.Staves[k];
-                    s.AddBar(g.Track.Staves[s.ModelStaff.Index].Bars[barIndex], result.BarLayoutingInfo);
+                    s.AddBar(g.Track.Staves[s.ModelStaff.Index].Bars[barIndex], barLayoutingInfo);
                     var renderer = s.BarRenderers[s.BarRenderers.Count - 1];
                     result.Renderers.Add(renderer);
                     if (renderer.IsLinkedToPrevious)
@@ -172,12 +149,28 @@ namespace AlphaTab.Rendering.Staves
                     }
                 }
             }
-            result.BarLayoutingInfo.Finish();
+            barLayoutingInfo.Finish();
 
             // ensure same widths of new renderer
             result.Width = UpdateWidth();
 
             return result;
+        }
+
+        public void RevertLastBar()
+        {
+            if (MasterBarsRenderers.Count > 1)
+            {
+                MasterBarsRenderers.RemoveAt(MasterBarsRenderers.Count - 1);
+                var w = 0f;
+                for (int i = 0, j = _allStaves.Count; i < j; i++)
+                {
+                    var s = _allStaves[i];
+                    w = Math.Max(w, s.BarRenderers[s.BarRenderers.Count - 1].Width);
+                    s.RevertLastBar();
+                }
+                Width -= w;
+            }
         }
 
         private float UpdateWidth()
@@ -274,22 +267,6 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public void RevertLastBar()
-        {
-            if (MasterBars.Count > 1)
-            {
-                MasterBars.RemoveAt(MasterBars.Count - 1);
-                var w = 0f;
-                for (int i = 0, j = _allStaves.Count; i < j; i++)
-                {
-                    var s = _allStaves[i];
-                    w = Math.Max(w, s.BarRenderers[s.BarRenderers.Count - 1].Width);
-                    s.RevertLastBar();
-                }
-                Width -= w;
-            }
-        }
-
         public void ScaleToWidth(float width)
         {
             for (int i = 0, j = _allStaves.Count; i < j; i++)
@@ -301,7 +278,7 @@ namespace AlphaTab.Rendering.Staves
 
         public void Paint(float cx, float cy, ICanvas canvas)
         {
-            PaintPartial(cx + X, cy + Y, canvas, 0, MasterBars.Count);
+            PaintPartial(cx + X, cy + Y, canvas, 0, MasterBarsRenderers.Count);
         }
 
         public void PaintPartial(float cx, float cy, ICanvas canvas, int startIndex, int count)

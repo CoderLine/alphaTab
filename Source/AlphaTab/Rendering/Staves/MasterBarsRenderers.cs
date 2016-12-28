@@ -15,16 +15,25 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-namespace AlphaTab.Xml
+using AlphaTab.Collections;
+using AlphaTab.Model;
+
+namespace AlphaTab.Rendering.Staves
 {
-    public interface IXmlNode
+    /// <summary>
+    /// This container represents a single column of bar renderers independent from any staves. 
+    /// This container can be used to reorganize renderers into a new staves. 
+    /// </summary>
+    public class MasterBarsRenderers
     {
-        XmlNodeType NodeType { get; }
-        string LocalName { get; }
-        string Value { get; }
-        IXmlNode[] ChildNodes { get; }
-        IXmlNode FirstChild { get; }
-        string GetAttribute(string name);
-        IXmlNode[] GetElementsByTagName(string nodeName);
+        public float Width { get; set; }
+        public bool IsLinkedToPrevious { get; set; }
+        public MasterBar MasterBar { get; set; }
+        public FastList<BarRendererBase> Renderers { get; set; }
+
+        public MasterBarsRenderers()
+        {
+            Renderers = new FastList<BarRendererBase>();
+        }
     }
 }

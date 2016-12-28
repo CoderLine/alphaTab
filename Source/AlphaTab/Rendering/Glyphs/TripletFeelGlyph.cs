@@ -1,4 +1,20 @@
-﻿using System;
+﻿/*
+ * This file is part of alphaTab.
+ * Copyright (c) 2014, Daniel Kuschny and Contributors, All rights reserved.
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3.0 of the License, or at your option any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.
+ */
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
@@ -23,7 +39,7 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             base.DoLayout();
-            Height = 25*Scale;
+            Height = 25 * Scale;
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
@@ -79,8 +95,8 @@ namespace AlphaTab.Rendering.Glyphs
                 case TripletFeel.Scottish8th:
                     RenderBarNote(leftNoteX, noteY, NoteScale, canvas, new[] { BarType.Full });
 
-                    RenderBarNote(rightNoteX, noteY, NoteScale, canvas, new[] { BarType.Full, BarType.PartialLeft,  });
-                    canvas.FillCircle(rightNoteX + (NoteSeparation * Scale)+ (8 * Scale), noteY, Scale);
+                    RenderBarNote(rightNoteX, noteY, NoteScale, canvas, new[] { BarType.Full, BarType.PartialLeft, });
+                    canvas.FillCircle(rightNoteX + (NoteSeparation * Scale) + (8 * Scale), noteY, Scale);
                     break;
 
                 case TripletFeel.Scottish16th:
@@ -126,7 +142,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         private void RenderTriplet(float cx, float cy, ICanvas canvas)
         {
-            cy += 2*Scale;
+            cy += 2 * Scale;
             var font = Renderer.Resources.EffectFont;
             canvas.Font = new Font(font.Family, font.Size * 0.8f, font.Style);
 

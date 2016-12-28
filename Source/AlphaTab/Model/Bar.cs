@@ -25,6 +25,13 @@ namespace AlphaTab.Model
     /// </summary>
     public class Bar
     {
+        /// <summary>
+        /// This is a global counter for all beats. We use it 
+        /// at several locations for lookup tables. 
+        /// </summary>
+        private static int GlobalBarId = 0;
+
+        public int Id { get; set; }
         public int Index { get; set; }
 
         public Bar NextBar { get; set; }
@@ -36,6 +43,7 @@ namespace AlphaTab.Model
 
         public Bar()
         {
+            Id = GlobalBarId++;
             Voices = new FastList<Voice>();
             Clef = Clef.G2;
             ClefOttavia = ClefOttavia.Regular;
@@ -43,6 +51,7 @@ namespace AlphaTab.Model
 
         public static void CopyTo(Bar src, Bar dst)
         {
+            dst.Id = src.Id;
             dst.Index = src.Index;
             dst.Clef = src.Clef;
             dst.ClefOttavia = src.ClefOttavia;

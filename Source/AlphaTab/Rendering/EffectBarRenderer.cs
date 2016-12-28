@@ -1,3 +1,20 @@
+/*
+ * This file is part of alphaTab.
+ * Copyright (c) 2014, Daniel Kuschny and Contributors, All rights reserved.
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3.0 of the License, or at your option any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.
+ */
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -137,9 +154,9 @@ namespace AlphaTab.Rendering
             for (int i = 0, j = _uniqueEffectGlyphs.Count; i < j; i++)
             {
                 var v = _uniqueEffectGlyphs[i];
-                canvas.Color = i == 0
-                    ? Renderer.Resources.MainGlyphColor
-                    : Renderer.Resources.SecondaryGlyphColor;
+                //canvas.Color = i == 0
+                //    ? Renderer.Resources.MainGlyphColor
+                //    : Renderer.Resources.SecondaryGlyphColor;
 
                 for (int k = 0, l = v.Count; k < l; k++)
                 {
@@ -210,11 +227,13 @@ namespace AlphaTab.Rendering
             TopPadding = 0;
             BottomPadding = 0;
 
-            Height = 0;
-            foreach (var band in _bands)
+            var h = 0f;
+            var bands = _bands;
+            foreach (var band in bands)
             {
-                Height += band.Height;
+                h += band.Height;
             }
+            Height = h;
             base.UpdateSizes();
         }
 

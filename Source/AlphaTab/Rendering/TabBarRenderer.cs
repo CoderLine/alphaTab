@@ -102,7 +102,7 @@ namespace AlphaTab.Rendering
                 AddPreBeatGlyph(new TabClefGlyph(5 * Scale, GetTabY(center)));
             }
 
-            AddPreBeatGlyph(new BarNumberGlyph(0, GetTabY(-1, -3), Bar.Index + 1));
+            AddPreBeatGlyph(new BarNumberGlyph(0, GetTabY(-0.5f), Bar.Index + 1));
 
             if (Bar.IsEmpty)
             {
@@ -190,6 +190,8 @@ namespace AlphaTab.Rendering
                     {
                         foreach (var s in noteNumbers.NotesPerString)
                         {
+                            //var noteNumber = noteNumbers.NotesPerString[s];
+                            // TOOD: skip tied notes
                             tabNotes[Bar.Staff.Track.Tuning.Length - s].Add(
                                 new[]
                                 {

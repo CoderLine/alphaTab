@@ -22,7 +22,7 @@ namespace AlphaTab.Rendering.Glyphs
     public class PickStrokeGlyph : MusicFontGlyph
     {
         public PickStrokeGlyph(float x, float y, PickStrokeType pickStroke)
-            : base(x, y, 1, GetSymbol(pickStroke))
+            : base(x, y, 0.75f, GetSymbol(pickStroke))
         {
         }
 

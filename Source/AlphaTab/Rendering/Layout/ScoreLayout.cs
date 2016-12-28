@@ -31,7 +31,7 @@ namespace AlphaTab.Rendering.Layout
     /// </summary>
     public abstract class ScoreLayout
     {
-        private readonly FastDictionary<string, FastDictionary<string, BarRendererBase>> _barRendererLookup;
+        private readonly FastDictionary<string, FastDictionary<int, BarRendererBase>> _barRendererLookup;
 
         public ScoreRenderer Renderer { get; set; }
 
@@ -45,7 +45,7 @@ namespace AlphaTab.Rendering.Layout
         protected ScoreLayout(ScoreRenderer renderer)
         {
             Renderer = renderer;
-            _barRendererLookup = new FastDictionary<string, FastDictionary<string, BarRendererBase>>();
+            _barRendererLookup = new FastDictionary<string, FastDictionary<int, BarRendererBase>>();
         }
 
 
@@ -148,19 +148,13 @@ namespace AlphaTab.Rendering.Layout
             return group;
         }
 
-        private string GetBarRendererId(Bar bar)
-        {
-            return bar.Staff.Track.Index + "-" + bar.Staff.Index + "-" + bar.Index;
-        }
-
-
         public void RegisterBarRenderer(string key, BarRendererBase renderer)
         {
             if (!_barRendererLookup.ContainsKey(key))
             {
-                _barRendererLookup[key] = new FastDictionary<string, BarRendererBase>();
+                _barRendererLookup[key] = new FastDictionary<int, BarRendererBase>();
             }
-            _barRendererLookup[key][GetBarRendererId(renderer.Bar)] = renderer;
+            _barRendererLookup[key][renderer.Bar.Id] = renderer;
         }
 
         public void UnregisterBarRenderer(string key, BarRendererBase renderer)
@@ -168,13 +162,13 @@ namespace AlphaTab.Rendering.Layout
             if (_barRendererLookup.ContainsKey(key))
             {
                 var lookup = _barRendererLookup[key];
-                lookup.Remove(GetBarRendererId(renderer.Bar));
+                lookup.Remove(renderer.Bar.Id);
             }
         }
 
         public BarRendererBase GetRendererForBar(string key, Bar bar)
         {
-            var barRendererId = GetBarRendererId(bar);
+            var barRendererId = bar.Id;
             if (_barRendererLookup.ContainsKey(key) && _barRendererLookup[key].ContainsKey(barRendererId))
             {
                 return _barRendererLookup[key][barRendererId];
@@ -198,7 +192,7 @@ namespace AlphaTab.Rendering.Layout
             canvas.Color = resources.MainGlyphColor;
             canvas.Font = resources.CopyrightFont;
             canvas.TextAlign = TextAlign.Center;
-            canvas.FillText(msg, x, 0);
+            canvas.FillText(msg, x, resources.CopyrightFont.Size);
             var result = canvas.EndRender();
             Renderer.OnPartialRenderFinished(new RenderFinishedEventArgs
             {

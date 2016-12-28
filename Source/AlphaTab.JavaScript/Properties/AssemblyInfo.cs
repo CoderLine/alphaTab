@@ -6,7 +6,6 @@ using AlphaTab.Platform;
 using AlphaTab.Platform.JavaScript;
 using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;
-using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Xml;
 using SharpKit.JavaScript;
@@ -56,6 +55,7 @@ using SharpKit.JavaScript;
 [assembly: JsType(Export = false, TargetType = typeof(IFileLoader))]
 [assembly: JsType(Export = false, TargetType = typeof(IEffectBarRendererInfo))]
 [assembly: JsType(Export = false, TargetType = typeof(IScoreRenderer))]
+[assembly: JsType(Export = false, TargetType = typeof(IBeamYCalculator))]
 
 [assembly: JsType(Export = false, TargetType = typeof(IXmlDocument), Name = "Document", PropertiesAsFields = true, NativeCasts = true)]
 [assembly: JsProperty(Export = false, TargetType = typeof(IXmlDocument), TargetProperty = "DocumentElement", Name = "documentElement", NativeField = true)]

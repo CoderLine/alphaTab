@@ -83,7 +83,6 @@ namespace AlphaTab.Rendering.Glyphs
                     ? cx + X + _parent.Width 
                     : cx + tabBarRenderer.GetBeatX(_beat.NextBeat);
             var startY = cy;
-            var textOffset = 3 * Scale;
             var sizeY = WhammyMaxOffset * Scale;
 
             var old = canvas.TextAlign;
@@ -133,7 +132,15 @@ namespace AlphaTab.Rendering.Glyphs
                             // draw label
                             canvas.Font = res.GraceFont;
                             //var size = canvas.MeasureText(s);
-                            var sy = pt2Y + textOffset;
+                            var sy = pt2Y;
+                            if (pt2Y < pt1Y)
+                            {
+                                sy -= canvas.Font.Size;
+                            }
+                            else
+                            {
+                                sy += 3*Scale;
+                            }
                             var sx = pt2X;
                             canvas.FillText(s, sx, sy);
                         }

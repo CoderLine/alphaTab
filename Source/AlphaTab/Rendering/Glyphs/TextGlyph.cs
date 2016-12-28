@@ -34,7 +34,7 @@ namespace AlphaTab.Rendering.Glyphs
             Font = font;
             TextAlign = textAlign;
         }
-
+        
         public override void DoLayout()
         {
             base.DoLayout();

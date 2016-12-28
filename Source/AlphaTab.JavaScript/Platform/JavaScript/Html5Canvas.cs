@@ -39,6 +39,7 @@ namespace AlphaTab.Platform.JavaScript
 
         public Html5Canvas()
         {
+            _color = new Color(0, 0, 0);
             var fontElement = document.createElement("span");
             fontElement.classList.add("at");
             document.body.appendChild(fontElement);
@@ -83,6 +84,7 @@ namespace AlphaTab.Platform.JavaScript
             }
             set
             {
+                if (_color.RGBA == value.RGBA) return;
                 _color = value;
                 _context.strokeStyle = value.RGBA;
                 _context.fillStyle = value.RGBA;
@@ -103,7 +105,7 @@ namespace AlphaTab.Platform.JavaScript
 
         public void FillRect(float x, float y, float w, float h)
         {
-            _context.fillRect(x - 0.5, y - 0.5, w, h);
+            _context.fillRect((int)x - 0.5, (int)y - 0.5, w, h);
         }
 
         public void StrokeRect(float x, float y, float w, float h)

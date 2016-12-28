@@ -56,6 +56,14 @@ namespace AlphaTab.Model
     /// </summary>
     public class Note
     {
+        /// <summary>
+        /// This is a global counter for all notes. We use it 
+        /// at several locations for lookup tables. 
+        /// </summary>
+        private static int GlobalNoteId = 0;
+
+
+        public int Id { get; set; }
         public int Index { get; set; }
         public AccentuationType Accentuated { get; set; }
         public FastList<BendPoint> BendPoints { get; set; }
@@ -205,6 +213,7 @@ namespace AlphaTab.Model
 
         public Note()
         {
+            Id = GlobalNoteId++;
             BendPoints = new FastList<BendPoint>();
             Dynamic = DynamicValue.F;
 
@@ -233,6 +242,7 @@ namespace AlphaTab.Model
 
         public static void CopyTo(Note src, Note dst)
         {
+            dst.Id = src.Id;
             dst.Accentuated = src.Accentuated;
             dst.Fret = src.Fret;
             dst.String = src.String;

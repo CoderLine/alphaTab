@@ -137,7 +137,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\GlyphGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\GroupedEffectGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\HiHatGlyph.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\LazySvg.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\LeftToRightLayoutingGlyphGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\LineRangedGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\MusicFontGlyph.cs" />
@@ -193,6 +192,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\ScoreBarRendererFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\ScoreRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Staves\BarLayoutingInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Staves\MasterBarsRenderers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Staves\Staff.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Staves\StaveGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\TabBarRenderer.cs" />
@@ -202,8 +202,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\BeamingHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\BoundsLookup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\PercussionMapper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\SvgPathParser.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\SvgRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\TupletHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Util\Lazy.cs" />

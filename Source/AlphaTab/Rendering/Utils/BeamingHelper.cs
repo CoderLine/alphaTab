@@ -47,6 +47,11 @@ namespace AlphaTab.Rendering.Utils
         PartRight
     }
 
+    public interface IBeamYCalculator
+    {
+        float GetYPositionForNote(Note note);
+    }
+
     public class BeatLinePositions
     {
         public string StaffId { get; set; }
@@ -350,21 +355,21 @@ namespace AlphaTab.Rendering.Utils
             }
         }
 
-        public float CalculateBeamY(float stemSize, float xCorrection, float xPosition, float scale, Func<Note, float> yPosition)
+        public float CalculateBeamY(float stemSize, float xCorrection, float xPosition, float scale, IBeamYCalculator yPosition)
         {
             return CalculateBeamYWithDirection(stemSize, xCorrection, xPosition, scale, yPosition, Direction);
         }
 
-        public float CalculateBeamYWithDirection(float stemSize, float xCorrection, float xPosition, float scale, Func<Note, float> yPosition, BeamDirection direction)
+        public float CalculateBeamYWithDirection(float stemSize, float xCorrection, float xPosition, float scale, IBeamYCalculator yPosition, BeamDirection direction)
         {
             // create a line between the min and max note of the group
             if (Beats.Count == 1)
             {
                 if (direction == BeamDirection.Up)
                 {
-                    return yPosition(MaxNote) - stemSize;
+                    return yPosition.GetYPositionForNote(MaxNote) - stemSize;
                 }
-                return yPosition(MinNote) + stemSize;
+                return yPosition.GetYPositionForNote(MinNote) + stemSize;
             }
 
             // we use the min/max notes to place the beam along their real position        
@@ -376,22 +381,22 @@ namespace AlphaTab.Rendering.Utils
             // of the min note
             if (direction == BeamDirection.Down && MinNote != FirstMinNote && MinNote != LastMinNote)
             {
-                return yPosition(MinNote) + stemSize;
+                return yPosition.GetYPositionForNote(MinNote) + stemSize;
             }
             if (direction == BeamDirection.Up && MaxNote != FirstMaxNote && MaxNote != LastMaxNote)
             {
-                return yPosition(MaxNote) - stemSize;
+                return yPosition.GetYPositionForNote(MaxNote) - stemSize;
             }
 
             float startX = GetBeatLineX(FirstMinNote.Beat) + xCorrection;
             float startY = direction == BeamDirection.Up
-                            ? yPosition(FirstMaxNote) - stemSize
-                            : yPosition(FirstMinNote) + stemSize;
+                            ? yPosition.GetYPositionForNote(FirstMaxNote) - stemSize
+                            : yPosition.GetYPositionForNote(FirstMinNote) + stemSize;
 
             float endX = GetBeatLineX(LastMaxNote.Beat) + xCorrection;
             float endY = direction == BeamDirection.Up
-                            ? yPosition(LastMaxNote) - stemSize
-                            : yPosition(LastMinNote) + stemSize;
+                            ? yPosition.GetYPositionForNote(LastMaxNote) - stemSize
+                            : yPosition.GetYPositionForNote(LastMinNote) + stemSize;
 
             // ensure the maxDistance
             if (direction == BeamDirection.Down && startY > endY && (startY - endY) > maxDistance) endY = (startY - maxDistance);
@@ -467,6 +472,7 @@ namespace AlphaTab.Rendering.Utils
 
         public static bool IsFullBarJoin(Beat a, Beat b, int barIndex)
         {
+            // TODO: this getindex call seems expensive since we call this method very often. 
             return (a.Duration.GetIndex() - 2 - barIndex > 0)
                 && (b.Duration.GetIndex() - 2 - barIndex > 0);
         }

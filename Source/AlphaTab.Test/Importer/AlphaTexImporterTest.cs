@@ -210,9 +210,9 @@ namespace AlphaTab.Test.Importer
             var tex = @":8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh}";
             var score = ParseTex(tex);
 
-            Environment.StaveProfiles["harmonics"] = new[]
+            Environment.StaveProfiles["harmonics"] = new BarRendererFactory[]
             {
-                "harmonics"
+                new EffectBarRendererFactory("harmonics", new IEffectBarRendererInfo[] {new HarmonicsEffectInfo()}),
             };
 
 
@@ -257,9 +257,9 @@ namespace AlphaTab.Test.Importer
             var tex = @":4 15.6{b(0 4)} 18.6{b(0 6)} 17.6{b(0 8)} 16.6{b(0 3 0)} | 15.6{b(0 8 4)} 14.6{b(4 4)} 13.6{b(4 6)} 14.6{b(4 0)}";
             var score = ParseTex(tex);
 
-            Environment.StaveProfiles["tabOnly"] = new[]
+            Environment.StaveProfiles["tabOnly"] = new BarRendererFactory[]
             {
-                "tab"
+                new TabBarRendererFactory(),
             };
 
             var settings = Settings.Defaults;

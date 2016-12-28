@@ -33,7 +33,8 @@ namespace AlphaTab.Rendering.Layout
         public const float GroupSpacing = 20;
 
         private FastList<StaveGroup> _groups;
-        private AddBarsToStaveGroupResult _barsFromPreviousGroup;
+        private FastList<MasterBarsRenderers> _allMasterBarRenderers;
+        private MasterBarsRenderers _barsFromPreviousGroup;
 
         public PageViewLayout(ScoreRenderer renderer)
             : base(renderer)
@@ -45,6 +46,7 @@ namespace AlphaTab.Rendering.Layout
             var x = PagePadding[0];
             var y = PagePadding[1];
             Width = Renderer.Settings.Width;
+            _allMasterBarRenderers = new FastList<MasterBarsRenderers>();
 
             // 
             // 1. Score Info
@@ -74,8 +76,8 @@ namespace AlphaTab.Rendering.Layout
 
             //
             // 2. One result per StaveGroup
-            //y = ResizeAndRenderScore(x, y);
-            y = LayoutAndRenderScore(x, y);
+            y = ResizeAndRenderScore(x, y);
+            //y = LayoutAndRenderScore(x, y);
 
             Height = y + PagePadding[3];
         }
@@ -170,12 +172,64 @@ namespace AlphaTab.Rendering.Layout
         {
             var canvas = Renderer.Canvas;
 
-            for (int i = 0; i < _groups.Count; i++)
+            // if we have a fixed number of bars per row, we only need to refit them. 
+            if (Renderer.Settings.Layout.Get("barsPerRow", -1) != -1)
             {
-                var group = _groups[i];
+                for (int i = 0; i < _groups.Count; i++)
+                {
+                    var group = _groups[i];
+                    FitGroup(group);
+                    group.FinalizeGroup();
+
+                    y += PaintGroup(group, y, canvas);
+                }
+            }
+            // if the bars per row are flexible, we need to recreate the stave groups 
+            // by readding the existing groups
+            else
+            {
+                _groups = new FastList<StaveGroup>();
+
+                var currentIndex = 0;
+                var maxWidth = MaxWidth;
+
+                var group = CreateEmptyStaveGroup();
+                group.Index = _groups.Count;
+                group.X = x;
+                group.Y = y;
+
+                while (currentIndex < _allMasterBarRenderers.Count)
+                {
+                    // if the current renderer still has space in the current group add it
+                    // also force adding in case the group is empty
+                    var renderers = _allMasterBarRenderers[currentIndex];
+                    if (group.Width + renderers.Width <= maxWidth || group.MasterBarsRenderers.Count == 0)
+                    {
+                        group.AddMasterBarRenderers(Renderer.Tracks, renderers);
+                        // move to next group
+                        currentIndex++;
+                    }
+                    else
+                    {
+                        // in case we do not have space, we create a new group
+                        group.IsFull = true;
+                        group.IsLast = false;
+                        _groups.Add(group);
+                        FitGroup(group);
+                        group.FinalizeGroup();
+                        y += PaintGroup(group, y, canvas);
+
+                        // note: we do not increase currentIndex here to have it added to the next group
+                        group = CreateEmptyStaveGroup();
+                        group.Index = _groups.Count;
+                        group.X = x;
+                        group.Y = y;
+                    }
+                }
+
+                // don't forget to finish the last group
                 FitGroup(group);
                 group.FinalizeGroup();
-
                 y += PaintGroup(group, y, canvas);
             }
 
@@ -211,7 +265,6 @@ namespace AlphaTab.Rendering.Layout
                 // finalize group (sizing etc).
                 FitGroup(group);
                 group.FinalizeGroup();
-
                 y += PaintGroup(group, y, canvas);
             }
 
@@ -268,26 +321,26 @@ namespace AlphaTab.Rendering.Layout
             var end = endIndex + 1;
             for (int i = currentBarIndex; i < end; i++)
             {
-                AddBarsToStaveGroupResult addResult;
+                MasterBarsRenderers renderers;
                 if (_barsFromPreviousGroup != null && _barsFromPreviousGroup.MasterBar.Index == i)
                 {
-                    addResult = group.AddBarsFromResult(Renderer.Tracks, _barsFromPreviousGroup);
+                    renderers = group.AddMasterBarRenderers(Renderer.Tracks, _barsFromPreviousGroup);
                 }
                 else
                 {
-                    addResult = group.AddBars(Renderer.Tracks, i);
+                    renderers = group.AddBars(Renderer.Tracks, i);
+                    _allMasterBarRenderers.Add(renderers);
                 }
                 _barsFromPreviousGroup = null;
-
 
                 var groupIsFull = false;
 
                 // can bar placed in this line?
-                if (barsPerRow == -1 && ((group.Width) >= maxWidth && group.MasterBars.Count != 0))
+                if (barsPerRow == -1 && ((group.Width) >= maxWidth && group.MasterBarsRenderers.Count != 0))
                 {
                     groupIsFull = true;
                 }
-                else if (group.MasterBars.Count == barsPerRow + 1)
+                else if (group.MasterBarsRenderers.Count == barsPerRow + 1)
                 {
                     groupIsFull = true;
                 }
@@ -297,7 +350,7 @@ namespace AlphaTab.Rendering.Layout
                     group.RevertLastBar();
                     group.IsFull = true;
                     group.IsLast = false;
-                    _barsFromPreviousGroup = addResult;
+                    _barsFromPreviousGroup = renderers;
                     return group;
                 }
 

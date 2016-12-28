@@ -22,7 +22,6 @@ namespace AlphaTab.Platform.Model
     /// </summary>
     public enum TextBaseline
     {
-        Default,
         Top,
         Middle, 
         Bottom

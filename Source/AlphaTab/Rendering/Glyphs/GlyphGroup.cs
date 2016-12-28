@@ -66,10 +66,10 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            if (Glyphs == null || Glyphs.Count == 0) return;
-            for (int i = 0, j = Glyphs.Count; i < j; i++)
+            var glyphs = Glyphs;
+            if (glyphs == null || glyphs.Count == 0) return;
+            foreach (var g in glyphs)
             {
-                var g = Glyphs[i];
                 g.Renderer = Renderer;
                 g.Paint(cx + X, cy + Y, canvas);
             }

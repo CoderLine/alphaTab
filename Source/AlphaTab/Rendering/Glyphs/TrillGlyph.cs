@@ -41,7 +41,7 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.Font = res.MarkerFont;
 
             var textw = canvas.MeasureText("tr");
-            canvas.FillText("tr", cx + X, cy + Y);
+            canvas.FillText("tr", cx + X, cy + Y + canvas.Font.Size / 2);
 
             var startX = textw + 3 * Scale;
             var endX = Width - startX;

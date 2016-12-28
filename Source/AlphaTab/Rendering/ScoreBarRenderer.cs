@@ -29,7 +29,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This BarRenderer renders a bar using standard music notation. 
     /// </summary>
-    public class ScoreBarRenderer : BarRendererBase
+    public class ScoreBarRenderer : BarRendererBase, IBeamYCalculator
     {
         public const string StaffId = "score";
 
@@ -200,6 +200,8 @@ namespace AlphaTab.Rendering
                 ? Resources.MainGlyphColor
                 : Resources.SecondaryGlyphColor;
 
+            // TODO: draw stem at least at the center of the score staff. 
+
             // check if we need to paint simple footer
             if (h.Beats.Count == 1)
             {
@@ -357,16 +359,21 @@ namespace AlphaTab.Rendering
             return GetScoreY(size);
         }
 
+        public float GetYPositionForNote(Note note)
+        {
+            return GetScoreY(GetNoteLine(note));
+        }
+
         private float CalculateBeamY(BeamingHelper h, float x)
         {
             var stemSize = GetStemSize(h);
-            return h.CalculateBeamY(stemSize, Scale, x, Scale, n => GetScoreY(GetNoteLine(n)));
+            return h.CalculateBeamY(stemSize, Scale, x, Scale, this);
         }
 
         private float CalculateBeamYWithDirection(BeamingHelper h, float x, BeamDirection direction)
         {
             var stemSize = GetStemSize(h);
-            return h.CalculateBeamYWithDirection(stemSize, Scale, x, Scale, n => GetScoreY(GetNoteLine(n)), direction);
+            return h.CalculateBeamYWithDirection(stemSize, Scale, x, Scale, this, direction);
         }
 
         private void PaintBar(float cx, float cy, ICanvas canvas, BeamingHelper h)
@@ -435,13 +442,13 @@ namespace AlphaTab.Rendering
                     if (i < h.Beats.Count - 1)
                     {
                         // full bar?
-                        if (IsFullBarJoin(beat, h.Beats[i + 1], barIndex))
+                        if (BeamingHelper.IsFullBarJoin(beat, h.Beats[i + 1], barIndex))
                         {
                             barStartX = beatLineX;
                             barEndX = h.GetBeatLineX(h.Beats[i + 1]) + Scale;
                         }
                         // broken bar?
-                        else if (i == 0 || !IsFullBarJoin(h.Beats[i - 1], beat, barIndex))
+                        else if (i == 0 || !BeamingHelper.IsFullBarJoin(h.Beats[i - 1], beat, barIndex))
                         {
                             barStartX = beatLineX;
                             barEndX = barStartX + brokenBarOffset;
@@ -457,7 +464,7 @@ namespace AlphaTab.Rendering
                     // 
                     // Broken Bar to Previous?
                     //
-                    else if (i > 0 && !IsFullBarJoin(beat, h.Beats[i - 1], barIndex))
+                    else if (i > 0 && !BeamingHelper.IsFullBarJoin(beat, h.Beats[i - 1], barIndex))
                     {
                         barStartX = beatLineX - brokenBarOffset;
                         barEndX = beatLineX;
@@ -471,11 +478,6 @@ namespace AlphaTab.Rendering
             }
         }
 
-        private bool IsFullBarJoin(Beat a, Beat b, int barIndex)
-        {
-            return (a.Duration.GetIndex() - 2 - barIndex > 0)
-                && (b.Duration.GetIndex() - 2 - barIndex > 0);
-        }
         private static void PaintSingleBar(ICanvas canvas, float x1, float y1, float x2, float y2, float size)
         {
             canvas.BeginPath();
@@ -575,8 +577,6 @@ namespace AlphaTab.Rendering
             {
                 beatLineX += 3 * Scale;
             }
-
-
 
             // sort notes ascending in their value to ensure 
             // we are drawing the numbers according to their order on the stave 
@@ -723,7 +723,7 @@ namespace AlphaTab.Rendering
                 CreateTimeSignatureGlyphs();
             }
 
-            AddPreBeatGlyph(new BarNumberGlyph(0, GetScoreY(-1, -3), Bar.Index + 1));
+            AddPreBeatGlyph(new BarNumberGlyph(0, GetScoreY(-0.5f), Bar.Index + 1));
 
             if (Bar.IsEmpty)
             {
@@ -867,7 +867,7 @@ namespace AlphaTab.Rendering
         /// <param name="steps">the amount of steps while 2 steps are one line</param>
         /// <param name="correction"></param>
         /// <returns></returns>
-        public float GetScoreY(int steps, float correction = 0)
+        public float GetScoreY(float steps, float correction = 0)
         {
             return ((LineOffset / 2) * steps) + (correction * Scale);
         }

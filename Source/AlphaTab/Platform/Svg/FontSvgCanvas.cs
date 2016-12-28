@@ -26,7 +26,7 @@ namespace AlphaTab.Platform.Svg
     {
         public override void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)
         {
-            Buffer.Append("<svg x=\"" + (x - BlurCorrection) + "\" y=\"" + (y - BlurCorrection) + "\" class=\"at\" ><text style=\"fill:" + Color.RGBA + "; ");
+            Buffer.Append("<svg x=\"" + ((int)x - BlurCorrection) + "\" y=\"" + ((int)y - BlurCorrection) + "\" class=\"at\" ><text style=\"fill:" + Color.RGBA + "; ");
             if (scale != 1)
             {
                 Buffer.Append("font-size: " + (scale * 100) + "%");

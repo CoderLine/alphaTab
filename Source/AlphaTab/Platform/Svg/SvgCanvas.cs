@@ -49,7 +49,7 @@ namespace AlphaTab.Platform.Svg
             LineWidth = 1;
             Font = new Font("Arial", 10);
             TextAlign = TextAlign.Left;
-            TextBaseline = TextBaseline.Default;
+            TextBaseline = TextBaseline.Top;
         }
 
         public virtual void BeginRender(float width, float height)
@@ -74,9 +74,9 @@ namespace AlphaTab.Platform.Svg
         public void FillRect(float x, float y, float w, float h)
         {
             Buffer.Append("<rect x=\"");
-            Buffer.Append(x - BlurCorrection);
+            Buffer.Append((int)x - BlurCorrection);
             Buffer.Append("\" y=\"");
-            Buffer.Append(y - BlurCorrection);
+            Buffer.Append((int)y - BlurCorrection);
             Buffer.Append("\" width=\"");
             Buffer.Append(w);
             Buffer.Append("\" height=\"");
@@ -89,9 +89,9 @@ namespace AlphaTab.Platform.Svg
         public void StrokeRect(float x, float y, float w, float h)
         {
             Buffer.Append("<rect x=\"");
-            Buffer.Append(x - BlurCorrection);
+            Buffer.Append((int)x - BlurCorrection);
             Buffer.Append("\" y=\"");
-            Buffer.Append(y - BlurCorrection);
+            Buffer.Append((int)y - BlurCorrection);
             Buffer.Append("\" width=\"");
             Buffer.Append(w);
             Buffer.Append("\" height=\"");
@@ -223,22 +223,11 @@ namespace AlphaTab.Platform.Svg
 
         public void FillText(string text, float x, float y)
         {
-            Buffer.Append("<text x=\"");
-            Buffer.Append(x);
-            Buffer.Append("\" y=\"");
-            Buffer.Append(y + GetSvgBaseLineOffset());
-            Buffer.Append("\" style=\"font:");
-            Buffer.Append(Font.ToCssString());
-            Buffer.Append("; fill:");
-            Buffer.Append(Color.RGBA);
-            Buffer.Append(";\" ");
-            Buffer.Append(" dominant-baseline=\"");
-            Buffer.Append(GetSvgBaseLine());
-            Buffer.Append("\" text-anchor=\"");
-            Buffer.Append(GetSvgTextAlignment());
-            Buffer.Append("\">\n");
-            Buffer.Append(text);
-            Buffer.Append("</text>\n");
+            var s = "<text x=\"" + ((int) x) + "\" y=\"" + ((int) y) + "\" style=\"font:" +
+                    Font.ToCssString() + "; fill:" + Color.RGBA + ";\" "
+                    + " dominant-baseline=\"" + GetSvgBaseLine() + "\" text-anchor=\"" + GetSvgTextAlignment() + "\">" 
+                    + text + "</text>";
+            Buffer.Append(s);
         }
 
         private string GetSvgTextAlignment()
@@ -252,25 +241,14 @@ namespace AlphaTab.Platform.Svg
             return "";
         }
 
-        protected float GetSvgBaseLineOffset()
-        {
-            switch (TextBaseline)
-            {
-                case TextBaseline.Top: return 0;
-                case TextBaseline.Middle: return 0;
-                case TextBaseline.Bottom: return 0;
-                default: return Font.Size;
-            }
-        }
-
         private string GetSvgBaseLine()
         {
             switch (TextBaseline)
             {
-                case TextBaseline.Top: return "top";
+                case TextBaseline.Top: return "hanging";
                 case TextBaseline.Middle: return "middle";
                 case TextBaseline.Bottom: return "bottom";
-                default: return "top";
+                default: return "";
             }
         }
 

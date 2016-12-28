@@ -85,6 +85,7 @@ namespace AlphaTab.Rendering
         {
             Bar = bar;
             ScoreRenderer = renderer;
+            Helpers = new BarHelpers(bar);
         }
 
         public void RegisterOverflowTop(float topOverflow)
@@ -185,8 +186,14 @@ namespace AlphaTab.Rendering
             }
         }
 
+        private int _appliedLayoutingInfo;
         public virtual void ApplyLayoutingInfo()
         {
+            if (_appliedLayoutingInfo >= LayoutingInfo.Version)
+            {
+                return;
+            }
+            _appliedLayoutingInfo = LayoutingInfo.Version;
             // if we need additional space in the preBeat group we simply
             // add a new spacer
             _preBeatGlyphs.Width = LayoutingInfo.PreBeatSize;
@@ -246,8 +253,6 @@ namespace AlphaTab.Rendering
             _postBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
             _postBeatGlyphs.Renderer = this;
 
-            Helpers = Staff.StaveGroup.Helpers.Helpers[Bar.Staff.Track.Index][Bar.Staff.Index][Bar.Index];
-
             for (int i = 0; i < Bar.Voices.Count; i++)
             {
                 var voice = Bar.Voices[i];
@@ -269,9 +274,10 @@ namespace AlphaTab.Rendering
             Staff.RegisterStaffBottom(Height - BottomPadding);
 
             var postBeatStart = 0f;
-            foreach (var voice in _voiceContainers)
+            var voiceContainers = _voiceContainers;
+            foreach (var voice in voiceContainers)
             {
-                var c = _voiceContainers[voice];
+                var c = voiceContainers[voice];
                 c.X = BeatGlyphsStart;
                 c.DoLayout();
                 var x = c.X + c.Width;
@@ -464,15 +470,12 @@ namespace AlphaTab.Rendering
 
         public void ReLayout()
         {
+            // there are some glyphs which are shown only for renderers at the line start, so we simply recreate them
             _preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
             _preBeatGlyphs.Renderer = this;
-            _postBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
-            _postBeatGlyphs.Renderer = this;
-
             CreatePreBeatGlyphs();
-            CreatePostBeatGlyphs();
-            UpdateSizes();
 
+            UpdateSizes();
             RegisterLayoutingInfo();
         }
     }

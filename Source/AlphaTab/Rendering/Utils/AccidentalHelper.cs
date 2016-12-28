@@ -87,17 +87,12 @@ namespace AlphaTab.Rendering.Utils
 
         private readonly FastDictionary<int, bool> _registeredAccidentals;
 
-        private readonly FastDictionary<string, int> _appliedScoreLines;
+        private readonly FastDictionary<int, int> _appliedScoreLines;
 
         public AccidentalHelper()
         {
             _registeredAccidentals = new FastDictionary<int, bool>();
-            _appliedScoreLines = new FastDictionary<string, int>();
-        }
-
-        private string GetNoteId(Note n)
-        {
-            return n.Beat.Index + "-" + n.Beat.Voice.Index + "-" + n.Index;
+            _appliedScoreLines = new FastDictionary<int, int>();
         }
 
         /// <summary>
@@ -182,7 +177,7 @@ namespace AlphaTab.Rendering.Utils
             }
             steps -= stepList[index];
 
-            _appliedScoreLines[GetNoteId(n)] = steps;
+            _appliedScoreLines[n.Id] = steps;
 
             return steps;
         }
@@ -190,7 +185,7 @@ namespace AlphaTab.Rendering.Utils
 
         public int GetNoteLine(Note n)
         {
-            return _appliedScoreLines[GetNoteId(n)];
+            return _appliedScoreLines[n.Id];
         }
     }
 

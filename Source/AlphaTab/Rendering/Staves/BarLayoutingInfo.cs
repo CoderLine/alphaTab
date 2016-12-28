@@ -39,7 +39,10 @@ namespace AlphaTab.Rendering.Staves
         private float _onTimePositionsForce;
         private FastDictionary<int, float> _onTimePositions;
 
-
+        /// <summary>
+        /// an internal version number that increments whenever a change was made. 
+        /// </summary>
+        public int Version { get; set; }
         public FastDictionary<int, float> PreBeatSizes { get; set; }
         public FastDictionary<int, float> OnBeatSizes { get; set; }
 
@@ -56,6 +59,7 @@ namespace AlphaTab.Rendering.Staves
             OnBeatSizes = new FastDictionary<int, float>();
             VoiceSize = 0;
             Springs = new FastDictionary<int, Spring>();
+            Version = 0;
         }
 
         public void UpdateVoiceSize(float size)
@@ -63,6 +67,7 @@ namespace AlphaTab.Rendering.Staves
             if (size > VoiceSize)
             {
                 VoiceSize = size;
+                Version++;
             }
         }
 
@@ -71,6 +76,7 @@ namespace AlphaTab.Rendering.Staves
             if (!PreBeatSizes.ContainsKey(beat.Index) || PreBeatSizes[beat.Index] < size)
             {
                 PreBeatSizes[beat.Index] = size;
+                Version++;
             }
         }
 
@@ -88,6 +94,7 @@ namespace AlphaTab.Rendering.Staves
             if (!OnBeatSizes.ContainsKey(beat.Index) || OnBeatSizes[beat.Index] < size)
             {
                 OnBeatSizes[beat.Index] = size;
+                Version++;
             }
         }
 
@@ -105,6 +112,7 @@ namespace AlphaTab.Rendering.Staves
             if (MinStretchForce < force)
             {
                 MinStretchForce = force;
+                Version++;
             }
         }
 
@@ -113,6 +121,7 @@ namespace AlphaTab.Rendering.Staves
 
         public Spring AddSpring(int start, int duration, float springSize, float preSpringSize)
         {
+            Version++;
             Spring spring;
             if (!Springs.ContainsKey(start))
             {
@@ -161,9 +170,10 @@ namespace AlphaTab.Rendering.Staves
         public void Finish()
         {
             CalculateSpringConstants();
+            Version++;
         }
 
-        public void CalculateSpringConstants()
+        private void CalculateSpringConstants()
         {
             var sortedSprings = _timeSortedSprings = new FastList<Spring>();
             _xMin = 0f;

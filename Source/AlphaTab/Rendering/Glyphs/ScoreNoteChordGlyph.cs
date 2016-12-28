@@ -255,6 +255,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
+            // TODO: this method seems to be quite heavy according to the profiler, why?
             var scoreRenderer = (ScoreBarRenderer)Renderer;
 
             //
