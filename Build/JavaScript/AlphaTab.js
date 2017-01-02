@@ -1215,7 +1215,8 @@ AlphaTab.Platform.JavaScript.JsApi.prototype = {
         if (this.Renderer == null)
             return;
         // check if font is loaded for HTML5 canvas
-        if (true){
+        var canvas = this.Renderer.Canvas;
+        if ((canvas instanceof AlphaTab.Platform.JavaScript.Html5Canvas)){
             var renderAction = null;
             renderAction = $CreateAnonymousDelegate(this, function (){
                 // if font is not yet loaded, try again in 1 sec

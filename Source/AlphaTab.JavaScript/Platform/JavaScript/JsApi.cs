@@ -67,7 +67,8 @@ namespace AlphaTab.Platform.JavaScript
             if (Renderer == null) return;
 
             // check if font is loaded for HTML5 canvas
-            if (Renderer.As<ScoreRenderer>().Canvas is Html5Canvas)
+            var canvas = Renderer.As<ScoreRenderer>().Canvas;
+            if (Std.InstanceOf<Html5Canvas>(canvas))
             {
                 Action renderAction = null;
                 renderAction = () =>
