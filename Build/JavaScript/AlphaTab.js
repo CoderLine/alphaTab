@@ -274,13 +274,14 @@ AlphaTab.Environment.CheckFontLoad = function (){
                 testItem.style.position = "absolute";
                 testItem.style.left = "0";
                 testItem.style.top = "0";
+                testItem.style.fontSize = "100px";
                 testItem.classList.add("at");
                 testItem.innerHTML = "&#" + 57424 + ";";
                 document.body.appendChild(testItem);
             }
             // get width
             var width = testItem.offsetWidth;
-            if (width > 30){
+            if (width > 30 && width < 100){
                 AlphaTab.Environment.IsFontLoaded = true;
                 document.body.removeChild(testItem);
             }
