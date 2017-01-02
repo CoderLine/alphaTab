@@ -255,6 +255,8 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
+            cx += X;
+            cy += Y;
             // TODO: this method seems to be quite heavy according to the profiler, why?
             var scoreRenderer = (ScoreBarRenderer)Renderer;
 
@@ -274,55 +276,55 @@ namespace AlphaTab.Rendering.Glyphs
                 var g = BeatEffects[effectKey];
                 g.Y = effectY;
                 g.X = Width / 2;
-                g.Paint(cx + X, cy + Y, canvas);
+                g.Paint(cx, cy, canvas);
                 effectY += effectSpacing;
             }
 
-            canvas.Color = Renderer.ScoreRenderer.RenderingResources.StaveLineColor;
 
             // TODO: Take care of beateffects in overflow
 
             var linePadding = 3 * Scale;
+            var lineWidth = Width + linePadding*2;
             if (HasTopOverflow)
             {
+                var color = canvas.Color;
+                canvas.Color = Renderer.ScoreRenderer.RenderingResources.StaveLineColor;
                 var l = -1;
                 while (l >= MinNote.Line)
                 {
                     // + 1 Because we want to place the line in the center of the note, not at the top
-                    var lY = cy + Y + scoreRenderer.GetScoreY(l);
-                    canvas.BeginPath();
-                    canvas.MoveTo(cx + X - linePadding, lY);
-                    canvas.LineTo(cx + X + Width + linePadding, lY);
-                    canvas.Stroke();
+                    var lY = cy + scoreRenderer.GetScoreY(l);
+                    canvas.FillRect(cx - linePadding, lY, lineWidth, Scale);
                     l -= 2;
                 }
+                canvas.Color = color;
             }
 
             if (HasBottomOverflow)
             {
+                var color = canvas.Color;
+                canvas.Color = Renderer.ScoreRenderer.RenderingResources.StaveLineColor;
                 var l = 12;
                 while (l <= MaxNote.Line)
                 {
-                    var lY = cy + Y + scoreRenderer.GetScoreY(l);
-                    canvas.BeginPath();
-                    canvas.MoveTo(cx + X - linePadding, lY);
-                    canvas.LineTo(cx + X + Width + linePadding, lY);
-                    canvas.Stroke();
+                    var lY = cy + scoreRenderer.GetScoreY(l);
+                    canvas.FillRect(cx - linePadding, lY, lineWidth, Scale);
                     l += 2;
                 }
+                canvas.Color = color;
             }
 
-            canvas.Color = Beat.Voice.Index == 0
-                ? Renderer.ScoreRenderer.RenderingResources.MainGlyphColor
-                : Renderer.ScoreRenderer.RenderingResources.SecondaryGlyphColor;
-
             if (_tremoloPicking != null)
-                _tremoloPicking.Paint(cx + X, cy + Y, canvas);
-            for (int i = 0, j = _infos.Count; i < j; i++)
             {
-                var g = _infos[i];
+                _tremoloPicking.Paint(cx, cy, canvas);
+            }
+
+            var infos = _infos;
+            var x = cx + _noteHeadPadding;
+            foreach (var g in infos)
+            {
                 g.Glyph.Renderer = Renderer;
-                g.Glyph.Paint(cx + X + _noteHeadPadding, cy + Y, canvas);
+                g.Glyph.Paint(x, cy, canvas);
             }
         }
     }

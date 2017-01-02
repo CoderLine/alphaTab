@@ -90,6 +90,7 @@ namespace AlphaTab.Rendering
 
         protected override void CreatePreBeatGlyphs()
         {
+            base.CreatePreBeatGlyphs();
             if (Bar.MasterBar.IsRepeatStart)
             {
                 AddPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5f, 3));
@@ -114,7 +115,11 @@ namespace AlphaTab.Rendering
         {
             for (int v = 0; v < Bar.Voices.Count; v++)
             {
-                CreateVoiceGlyphs(Bar.Voices[v]);
+                var voice = Bar.Voices[v];
+                if (!voice.IsEmpty)
+                {
+                    CreateVoiceGlyphs(Bar.Voices[v]);
+                }
             }
         }
 
@@ -181,23 +186,28 @@ namespace AlphaTab.Rendering
 
             foreach (Voice voice in Bar.Voices)
             {
-                var vc = GetOrCreateVoiceContainer(voice);
-                foreach (var bg in vc.BeatGlyphs)
+                if (!voice.IsEmpty)
                 {
-                    var notes = ((TabBeatGlyph)bg.OnNotes);
-                    var noteNumbers = notes.NoteNumbers;
-                    if (noteNumbers != null)
+                    var vc = GetOrCreateVoiceContainer(voice);
+                    foreach (var bg in vc.BeatGlyphs)
                     {
-                        foreach (var s in noteNumbers.NotesPerString)
+                        var notes = ((TabBeatGlyph) bg.OnNotes);
+                        var noteNumbers = notes.NoteNumbers;
+                        if (noteNumbers != null)
                         {
-                            //var noteNumber = noteNumbers.NotesPerString[s];
-                            // TOOD: skip tied notes
-                            tabNotes[Bar.Staff.Track.Tuning.Length - s].Add(
-                                new[]
+                            foreach (var s in noteNumbers.NotesPerString)
+                            {
+                                var noteNumber = noteNumbers.NotesPerString[s];
+                                if (!noteNumber.IsEmpty)
                                 {
-                                  vc.X + bg.X + notes.X + noteNumbers.X,
-                                  noteNumbers.Width + padding
-                                });
+                                    tabNotes[Bar.Staff.Track.Tuning.Length - s].Add(
+                                        new[]
+                                        {
+                                        vc.X + bg.X + notes.X + noteNumbers.X,
+                                        noteNumbers.Width + padding
+                                        });
+                                }
+                            }
                         }
                     }
                 }

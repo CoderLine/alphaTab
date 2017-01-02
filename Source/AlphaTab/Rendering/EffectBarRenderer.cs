@@ -247,10 +247,6 @@ namespace AlphaTab.Rendering
             }
         }
 
-        protected override void CreatePreBeatGlyphs()
-        {
-        }
-
         protected override void CreateBeatGlyphs()
         {
             _bands = new EffectBand[_infos.Length];
@@ -265,7 +261,10 @@ namespace AlphaTab.Rendering
 
             foreach (var voice in Bar.Voices)
             {
-                CreateVoiceGlyphs(voice);
+                if (!voice.IsEmpty)
+                {
+                  CreateVoiceGlyphs(voice);
+                }
             }
 
             var y = 0f;

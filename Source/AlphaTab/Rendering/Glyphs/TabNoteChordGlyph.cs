@@ -110,23 +110,27 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
+            cx += X;
+            cy += Y;
+
             var res = Renderer.Resources;
             var oldBaseLine = canvas.TextBaseline;
             canvas.TextBaseline = TextBaseline.Middle;
             canvas.Font = _isGrace ? res.GraceFont : res.TablatureFont;
-            for (int i = 0, j = _notes.Count; i < j; i++)
+            var notes = _notes;
+            var w = Width;
+            foreach (var g in notes)
             {
-                var g = _notes[i];
                 g.Renderer = Renderer;
-                g.Width = Width;
-                g.Paint(cx + X, cy + Y, canvas);
+                g.Width = w;
+                g.Paint(cx, cy, canvas);
             }
             canvas.TextBaseline = oldBaseLine;
 
             foreach (var beatEffectKey in BeatEffects)
             {
                 var g = BeatEffects[beatEffectKey];
-                g.Paint(cx + X, cy + Y, canvas);
+                g.Paint(cx, cy, canvas);
             }
         }
 

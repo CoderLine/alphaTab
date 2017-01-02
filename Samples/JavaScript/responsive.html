@@ -35,6 +35,11 @@
         background:#4040FF;
     }
     
+    .selectionWrapper div {
+        opacity: 0.1;
+        background:#4040FF;
+    }
+    
 	.alphaTabSurface { box-shadow: 0 0 10px rgba(0,0,0,0.3); background:#FFF; border-radius:3px; }
     #alphaTab {
         width:95%;
@@ -92,16 +97,6 @@
                 console.log(info.NewWidth, 'horizontal');
                 info.Settings.Layout.Mode = "horizontal";
             }
-            else if(newSize < 800) {
-                console.log(info.NewWidth, 'page-3bars');
-                info.Settings.Layout.Mode = "page";
-                delete info.Settings.Layout.AdditionalSettings['barsPerRow'];
-            }
-            else if(newSize < 1000) {
-                console.log(info.NewWidth, 'page-3bars');
-                info.Settings.Layout.Mode = "page";
-                info.Settings.Layout.AdditionalSettings['barsPerRow'] = 3;
-            }
             else {
                 console.log(info.NewWidth, 'page');
                 info.Settings.Layout.Mode = "page";
@@ -113,6 +108,8 @@
         // 2. Load alphaTab
         at.alphaTab({
             width: -1, // negative width enables auto sizing
+            resizeTimeout: 1,
+            // engine: 'html5'
             useWorker: true
         });         
         

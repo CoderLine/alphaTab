@@ -180,23 +180,20 @@ namespace AlphaTab.Platform.JavaScript
 
             if (result.RenderResult != null)
             {
-                setTimeout(() =>
+                Node itemToAppend;
+                if (@typeof(result.RenderResult) == "string")
                 {
-                    Node itemToAppend;
-                    if (@typeof(result.RenderResult) == "string")
-                    {
-                        var partialResult = (HtmlDivElement)document.createElement("div");
+                    var partialResult = (HtmlDivElement)document.createElement("div");
 
-                        partialResult.innerHTML = result.RenderResult.As<string>();
+                    partialResult.innerHTML = result.RenderResult.As<string>();
 
-                        itemToAppend = partialResult.firstChild;
-                    }
-                    else
-                    {
-                        itemToAppend = (Node)result.RenderResult;
-                    }
-                    CanvasElement.appendChild(itemToAppend);
-                }, 1);
+                    itemToAppend = partialResult.firstChild;
+                }
+                else
+                {
+                    itemToAppend = (Node)result.RenderResult;
+                }
+                CanvasElement.appendChild(itemToAppend);
             }
         }
 
@@ -221,6 +218,9 @@ namespace AlphaTab.Platform.JavaScript
                 css.AppendLine("          , url('" + fontDirectory + "bravura.svg#Bravura') format('svg');");
                 css.AppendLine("     font-weight: normal;");
                 css.AppendLine("     font-style: normal;");
+                css.AppendLine("}");
+                css.AppendLine(".alphaTabSurface * {");
+                css.AppendLine("    cursor: default;");
                 css.AppendLine("}");
                 css.AppendLine(".at {");
                 css.AppendLine("     font-family: 'alphaTab';");

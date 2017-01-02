@@ -31,6 +31,7 @@ namespace AlphaTab.Rendering.Utils
 
     public class StaveGroupBounds
     {
+        public int Index { get; set; }
         public Bounds VisualBounds { get; set; }
         public Bounds RealBounds { get; set; }
         public FastList<MasterBarBounds> Bars { get; set; }
@@ -39,6 +40,7 @@ namespace AlphaTab.Rendering.Utils
         public StaveGroupBounds()
         {
             Bars = new FastList<MasterBarBounds>();
+            Index = 0;
         }
 
         public void Finish()
@@ -211,6 +213,7 @@ namespace AlphaTab.Rendering.Utils
 
         public void AddStaveGroup(StaveGroupBounds bounds)
         {
+            bounds.Index = StaveGroups.Count;
             bounds.BoundsLookup = this;
             StaveGroups.Add(bounds);
             _currentStaveGroup = bounds;

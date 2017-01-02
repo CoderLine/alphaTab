@@ -28,6 +28,8 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly string _trillNoteString;
         private float _trillNoteStringWidth;
 
+        public bool IsEmpty { get; set; }
+
         public NoteNumberGlyph(float x, float y, Note n)
             : base(x, y)
         {
@@ -60,14 +62,19 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            Renderer.ScoreRenderer.Canvas.Font = Renderer.Resources.TablatureFont;
-            _noteStringWidth = Renderer.ScoreRenderer.Canvas.MeasureText(_noteString);
-            _trillNoteStringWidth = Renderer.ScoreRenderer.Canvas.MeasureText(_trillNoteString);
-            Width = _noteStringWidth + _trillNoteStringWidth;
+            IsEmpty = string.IsNullOrEmpty(_noteString) && string.IsNullOrEmpty(_trillNoteString);
+            if (!IsEmpty)
+            {
+                Renderer.ScoreRenderer.Canvas.Font = Renderer.Resources.TablatureFont;
+                _noteStringWidth = Renderer.ScoreRenderer.Canvas.MeasureText(_noteString);
+                _trillNoteStringWidth = Renderer.ScoreRenderer.Canvas.MeasureText(_trillNoteString);
+                Width = _noteStringWidth + _trillNoteStringWidth;
+            }
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
+            if (IsEmpty) return;
             var textWidth = _noteStringWidth + _trillNoteStringWidth;
             var x = cx + X + (Width - textWidth) / 2;
             canvas.FillText(_noteString, x, cy + Y);

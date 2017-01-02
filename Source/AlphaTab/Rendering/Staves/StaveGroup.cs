@@ -119,6 +119,7 @@ namespace AlphaTab.Rendering.Staves
                 }
             }
 
+            //Width += renderers.Width;
             UpdateWidth();
 
             return renderers;
@@ -173,7 +174,7 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        private float UpdateWidth()
+        public float UpdateWidth()
         {
             var realWidth = 0f;
             for (int i = 0, j = _allStaves.Count; i < j; i++)
@@ -376,12 +377,12 @@ namespace AlphaTab.Rendering.Staves
         public void FinalizeGroup()
         {
             float currentY = 0;
-            for (int i = 0, j = _allStaves.Count; i < j; i++)
+            foreach (var staff in _allStaves)
             {
-                _allStaves[i].X = AccoladeSpacing;
-                _allStaves[i].Y = (currentY);
-                _allStaves[i].FinalizeStave();
-                currentY += _allStaves[i].Height;
+                staff.X = AccoladeSpacing;
+                staff.Y = (currentY);
+                staff.FinalizeStave();
+                currentY += staff.Height;
             }
         }
 

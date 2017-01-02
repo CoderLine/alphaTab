@@ -126,6 +126,7 @@ namespace AlphaTab.Rendering
             }
             else if (Layout.SupportsResize)
             {
+                BoundsLookup = new BoundsLookup();
                 OnPreRender();
                 Settings.Width = width;
                 Layout.Resize();

@@ -145,6 +145,7 @@ namespace AlphaTab.Rendering
             }
         }
 
+        private bool _wasFirstOfLine;
         public bool IsFirstOfLine
         {
             get
@@ -199,7 +200,7 @@ namespace AlphaTab.Rendering
             _preBeatGlyphs.Width = LayoutingInfo.PreBeatSize;
 
             // on beat glyphs we apply the glyph spacing
-            var voiceEnd = 0f;
+            var voiceEnd = _preBeatGlyphs.X + _preBeatGlyphs.Width;
             foreach (var voice in _voiceContainers)
             {
                 var c = _voiceContainers[voice];
@@ -256,9 +257,12 @@ namespace AlphaTab.Rendering
             for (int i = 0; i < Bar.Voices.Count; i++)
             {
                 var voice = Bar.Voices[i];
-                var c = new VoiceContainerGlyph(0, 0, voice);
-                c.Renderer = this;
-                _voiceContainers[Bar.Voices[i].Index] = c;
+                if (!voice.IsEmpty)
+                {
+                    var c = new VoiceContainerGlyph(0, 0, voice);
+                    c.Renderer = this;
+                    _voiceContainers[Bar.Voices[i].Index] = c;
+                }
             }
 
             CreatePreBeatGlyphs();
@@ -273,12 +277,13 @@ namespace AlphaTab.Rendering
             Staff.RegisterStaffTop(TopPadding);
             Staff.RegisterStaffBottom(Height - BottomPadding);
 
-            var postBeatStart = 0f;
             var voiceContainers = _voiceContainers;
+            var beatGlyphsStart = BeatGlyphsStart;
+            var postBeatStart = beatGlyphsStart;
             foreach (var voice in voiceContainers)
             {
                 var c = voiceContainers[voice];
-                c.X = BeatGlyphsStart;
+                c.X = beatGlyphsStart;
                 c.DoLayout();
                 var x = c.X + c.Width;
                 if (postBeatStart < x)
@@ -305,7 +310,6 @@ namespace AlphaTab.Rendering
             g.OnNotes.BeamingHelper = Helpers.BeamHelperLookup[g.Beat.Voice.Index][g.Beat.Index];
             GetOrCreateVoiceContainer(g.Beat.Voice).AddGlyph(g);
         }
-
 
         protected VoiceContainerGlyph GetOrCreateVoiceContainer(Voice voice)
         {
@@ -417,7 +421,7 @@ namespace AlphaTab.Rendering
 
         protected virtual void CreatePreBeatGlyphs()
         {
-
+            _wasFirstOfLine = IsFirstOfLine;
         }
 
         protected virtual void CreateBeatGlyphs()
@@ -471,9 +475,14 @@ namespace AlphaTab.Rendering
         public void ReLayout()
         {
             // there are some glyphs which are shown only for renderers at the line start, so we simply recreate them
-            _preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
-            _preBeatGlyphs.Renderer = this;
-            CreatePreBeatGlyphs();
+            // but we only need to recreate them for the renderers that were the first of the line or are now the first of the line
+            if (_wasFirstOfLine ^ IsFirstOfLine)
+            {
+                _preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
+                _preBeatGlyphs.Renderer = this;
+                LayoutingInfo.PreBeatSize = 0;
+                CreatePreBeatGlyphs();
+            }
 
             UpdateSizes();
             RegisterLayoutingInfo();

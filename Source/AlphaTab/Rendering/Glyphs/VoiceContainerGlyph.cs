@@ -55,24 +55,26 @@ namespace AlphaTab.Rendering.Glyphs
         {
             Width = Renderer.LayoutingInfo.CalculateVoiceWidth(force);
             var positions = Renderer.LayoutingInfo.BuildOnTimePositions(force);
-            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
+            var beatGlyphs = BeatGlyphs;
+            for (int i = 0, j = beatGlyphs.Count; i < j; i++)
             {
-                var time = BeatGlyphs[i].Beat.AbsoluteStart;
-                BeatGlyphs[i].X = positions[time] - BeatGlyphs[i].OnTimeX;
+                var currentBeatGlyph = beatGlyphs[i];
+                var time = currentBeatGlyph.Beat.AbsoluteStart;
+                currentBeatGlyph.X = positions[time] - currentBeatGlyph.OnTimeX;
 
                 // size always previousl glyph after we know the position
                 // of the next glyph
                 if (i > 0)
                 {
-                    var beatWidth = BeatGlyphs[i].X - BeatGlyphs[i - 1].X;
-                    BeatGlyphs[i - 1].ScaleToWidth(beatWidth);
+                    var beatWidth = currentBeatGlyph.X - beatGlyphs[i - 1].X;
+                    beatGlyphs[i - 1].ScaleToWidth(beatWidth);
                 }
 
                 // for the last glyph size based on the full width
                 if (i == j - 1)
                 {
-                    float beatWidth = Width - BeatGlyphs[BeatGlyphs.Count - 1].X;
-                    BeatGlyphs[i].ScaleToWidth(beatWidth);
+                    float beatWidth = Width - beatGlyphs[beatGlyphs.Count - 1].X;
+                    currentBeatGlyph.ScaleToWidth(beatWidth);
                 }
             }
         }
@@ -80,18 +82,18 @@ namespace AlphaTab.Rendering.Glyphs
         public void RegisterLayoutingInfo(BarLayoutingInfo info)
         {
             info.UpdateVoiceSize(Width);
-            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
+            var beatGlyphs = BeatGlyphs;
+            foreach (var b in beatGlyphs)
             {
-                var b = BeatGlyphs[i];
                 b.RegisterLayoutingInfo(info);
             }
         }
 
         public void ApplyLayoutingInfo(BarLayoutingInfo info)
         {
-            for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
+            var beatGlyphs = BeatGlyphs;
+            foreach (var b in beatGlyphs)
             {
-                var b = BeatGlyphs[i];
                 b.ApplyLayoutingInfo(info);
             }
             ScaleToForce(Math.Max(Renderer.Settings.StretchForce, info.MinStretchForce));
@@ -123,6 +125,9 @@ namespace AlphaTab.Rendering.Glyphs
             //{
             //    PaintSprings(cx + X, cy + Y, canvas);
             //}
+            canvas.Color = Voice.Index == 0
+                ? Renderer.ScoreRenderer.RenderingResources.MainGlyphColor
+                : Renderer.ScoreRenderer.RenderingResources.SecondaryGlyphColor;
 
             for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {

@@ -399,10 +399,12 @@ namespace AlphaTab.Rendering
                 var y2 = cy + Y;
                 y2 += scaleMod * CalculateBeamY(h, beatLineX);
 
+                canvas.LineWidth = 1.5f*Scale;
                 canvas.BeginPath();
                 canvas.MoveTo(cx + X + beatLineX, y1);
                 canvas.LineTo(cx + X + beatLineX, y2);
                 canvas.Stroke();
+                canvas.LineWidth = Scale;
 
                 float fingeringY = y2;
                 if (direction == BeamDirection.Down)
@@ -530,10 +532,12 @@ namespace AlphaTab.Rendering
                 return;
             }
 
+            canvas.LineWidth = 1.5f * Scale;
             canvas.BeginPath();
             canvas.MoveTo(cx + X + beatLineX, cy + Y + topY);
             canvas.LineTo(cx + X + beatLineX, cy + Y + bottomY);
             canvas.Stroke();
+            canvas.LineWidth = Scale;
 
             if (isGrace)
             {
@@ -676,6 +680,8 @@ namespace AlphaTab.Rendering
 
         protected override void CreatePreBeatGlyphs()
         {
+            base.CreatePreBeatGlyphs();
+
             if (Bar.MasterBar.IsRepeatStart)
             {
                 AddPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5f, 3));
@@ -735,7 +741,11 @@ namespace AlphaTab.Rendering
         {
             for (int v = 0; v < Bar.Voices.Count; v++)
             {
-                CreateVoiceGlyphs(Bar.Voices[v]);
+                var voice = Bar.Voices[v];
+                if (!voice.IsEmpty)
+                {
+                    CreateVoiceGlyphs(voice);
+                }
             }
         }
 
@@ -750,7 +760,7 @@ namespace AlphaTab.Rendering
                     AddPostBeatGlyph(new RepeatCountGlyph(0, GetScoreY(-1, -3), Bar.MasterBar.RepeatCount));
                 }
             }
-            if (Bar.NextBar == null || !Bar.NextBar.MasterBar.IsRepeatStart)
+            else if (Bar.NextBar == null || !Bar.NextBar.MasterBar.IsRepeatStart)
             {
                 AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
             }
@@ -891,10 +901,10 @@ namespace AlphaTab.Rendering
             //
             canvas.Color = res.StaveLineColor;
             var lineY = cy + Y + TopPadding;
-
+            var lineOffset = LineOffset;
             for (var i = 0; i < 5; i++)
             {
-                if (i > 0) lineY += LineOffset;
+                if (i > 0) lineY += lineOffset;
                 canvas.FillRect(cx + X, (int) lineY, Width, Scale);
             }
 

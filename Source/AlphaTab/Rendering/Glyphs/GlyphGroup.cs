@@ -70,7 +70,6 @@ namespace AlphaTab.Rendering.Glyphs
             if (glyphs == null || glyphs.Count == 0) return;
             foreach (var g in glyphs)
             {
-                g.Renderer = Renderer;
                 g.Paint(cx + X, cy + Y, canvas);
             }
         }

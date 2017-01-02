@@ -73,38 +73,30 @@ namespace AlphaTab.Platform.Svg
 
         public void FillRect(float x, float y, float w, float h)
         {
-            Buffer.Append("<rect x=\"");
-            Buffer.Append((int)x - BlurCorrection);
-            Buffer.Append("\" y=\"");
-            Buffer.Append((int)y - BlurCorrection);
-            Buffer.Append("\" width=\"");
-            Buffer.Append(w);
-            Buffer.Append("\" height=\"");
-            Buffer.Append(h);
-            Buffer.Append("\" style=\"fill:");
-            Buffer.Append(Color.RGBA);
-            Buffer.Append("; shape-rendering: crispEdges;\" />\n");
+            if (w > 0)
+            {
+                Buffer.Append("<rect x=\"" + ((int)x - BlurCorrection) + "\" y=\"" + ((int)y - BlurCorrection) + "\" width=\"" + w + "\" height=\"" + h + "\" style=\"fill:" + Color.RGBA + "; \" />\n");
+            }
         }
 
         public void StrokeRect(float x, float y, float w, float h)
         {
-            Buffer.Append("<rect x=\"");
-            Buffer.Append((int)x - BlurCorrection);
-            Buffer.Append("\" y=\"");
-            Buffer.Append((int)y - BlurCorrection);
-            Buffer.Append("\" width=\"");
-            Buffer.Append(w);
-            Buffer.Append("\" height=\"");
-            Buffer.Append(h);
-            Buffer.Append("\" style=\"stroke:");
-            Buffer.Append(Color.RGBA);
+            Buffer.Append("<rect x=\""
+                 + ((int)x - BlurCorrection)
+                 + "\" y=\""
+                 + ((int)y - BlurCorrection)
+                 + "\" width=\""
+                 + w
+                 + "\" height=\""
+                 + h
+                 + "\" style=\"stroke:"
+                 + Color.RGBA);
             if (LineWidth != 1)
             {
                 Buffer.Append("; stroke-width:");
                 Buffer.Append(LineWidth);
             }
-            Buffer.Append("; fill:transparent");
-            Buffer.Append(";\" />\n");
+            Buffer.Append("; fill:transparent;\" />\n");
         }
 
         public void BeginPath()
@@ -118,49 +110,25 @@ namespace AlphaTab.Platform.Svg
 
         public void MoveTo(float x, float y)
         {
-            _currentPath.Append(" M");
-            _currentPath.Append(x - BlurCorrection);
-            _currentPath.Append(",");
-            _currentPath.Append(y - BlurCorrection);
+            _currentPath.Append(" M" + (x - BlurCorrection) + "," + (y - BlurCorrection));
         }
 
         public void LineTo(float x, float y)
         {
             _currentPathIsEmpty = false;
-            _currentPath.Append(" L");
-            _currentPath.Append(x - BlurCorrection);
-            _currentPath.Append(",");
-            _currentPath.Append(y - BlurCorrection);
+            _currentPath.Append(" L" + (x - BlurCorrection) + "," + (y - BlurCorrection));
         }
 
         public void QuadraticCurveTo(float cpx, float cpy, float x, float y)
         {
             _currentPathIsEmpty = false;
-            _currentPath.Append(" Q");
-            _currentPath.Append(cpx);
-            _currentPath.Append(",");
-            _currentPath.Append(cpy);
-            _currentPath.Append(",");
-            _currentPath.Append(x);
-            _currentPath.Append(",");
-            _currentPath.Append(y);
+            _currentPath.Append(" Q" + cpx + "," + cpy + "," + x + "," + y);
         }
 
         public void BezierCurveTo(float cp1x, float cp1y, float cp2x, float cp2y, float x, float y)
         {
             _currentPathIsEmpty = false;
-            _currentPath.Append(" C");
-            _currentPath.Append(cp1x);
-            _currentPath.Append(",");
-            _currentPath.Append(cp1y);
-            _currentPath.Append(",");
-            _currentPath.Append(cp2x);
-            _currentPath.Append(",");
-            _currentPath.Append(cp2y);
-            _currentPath.Append(",");
-            _currentPath.Append(x);
-            _currentPath.Append(",");
-            _currentPath.Append(y);
+            _currentPath.Append(" C" + cp1x + "," + cp1y + "," + cp2x + "," + cp2y + "," + x + "," + y);
         }
 
         public void FillCircle(float x, float y, float radius)
@@ -168,23 +136,7 @@ namespace AlphaTab.Platform.Svg
             _currentPathIsEmpty = false;
             // 
             // M0,250 A1,1 0 0,0 500,250 A1,1 0 0,0 0,250 z
-            _currentPath.Append(" M");
-            _currentPath.Append(x - radius);
-            _currentPath.Append(",");
-            _currentPath.Append(y);
-
-            _currentPath.Append(" A1,1 0 0,0 ");
-            _currentPath.Append(x + radius);
-            _currentPath.Append(",");
-            _currentPath.Append(y);
-
-            _currentPath.Append(" A1,1 0 0,0 ");
-            _currentPath.Append(x - radius);
-            _currentPath.Append(",");
-            _currentPath.Append(y);
-
-            _currentPath.Append(" z");
-
+            _currentPath.Append(" M" + (x - radius) + "," + y + " A1,1 0 0,0 " + (x + radius) + "," + y + " A1,1 0 0,0 " + (x - radius) + "," + y + " z");
             Fill();
         }
 
@@ -192,11 +144,7 @@ namespace AlphaTab.Platform.Svg
         {
             if (!_currentPathIsEmpty)
             {
-                Buffer.Append("<path d=\"");
-                Buffer.Append(_currentPath.ToString());
-                Buffer.Append("\" style=\"fill:");
-                Buffer.Append(Color.RGBA);
-                Buffer.Append("\" stroke=\"none\"/>\n");
+                Buffer.Append("<path d=\"" + _currentPath + "\" style=\"fill:" + Color.RGBA + "\" stroke=\"none\"/>\n");
             }
             _currentPath = new StringBuilder();
             _currentPathIsEmpty = true;
@@ -206,16 +154,14 @@ namespace AlphaTab.Platform.Svg
         {
             if (!_currentPathIsEmpty)
             {
-                Buffer.Append("<path d=\"");
-                Buffer.Append(_currentPath.ToString());
-                Buffer.Append("\" style=\"stroke:");
-                Buffer.Append(Color.RGBA);
+                var s = "<path d=\"" + _currentPath + "\" style=\"stroke:" + Color.RGBA;
                 if (LineWidth != 1)
                 {
-                    Buffer.Append("; stroke-width:");
-                    Buffer.Append(LineWidth);
+                    s += "; stroke-width:";
+                    s += LineWidth;
                 }
-                Buffer.Append(";\" fill=\"none\" />\n");
+                s += ";\" fill=\"none\" />\n";
+                Buffer.Append(s);
             }
             _currentPath = new StringBuilder();
             _currentPathIsEmpty = true;
@@ -223,9 +169,9 @@ namespace AlphaTab.Platform.Svg
 
         public void FillText(string text, float x, float y)
         {
-            var s = "<text x=\"" + ((int) x) + "\" y=\"" + ((int) y) + "\" style=\"font:" +
+            var s = "<text x=\"" + ((int)x) + "\" y=\"" + ((int)y) + "\" style=\"font:" +
                     Font.ToCssString() + "; fill:" + Color.RGBA + ";\" "
-                    + " dominant-baseline=\"" + GetSvgBaseLine() + "\" text-anchor=\"" + GetSvgTextAlignment() + "\">" 
+                    + " dominant-baseline=\"" + GetSvgBaseLine() + "\" text-anchor=\"" + GetSvgTextAlignment() + "\">"
                     + text + "</text>";
             Buffer.Append(s);
         }

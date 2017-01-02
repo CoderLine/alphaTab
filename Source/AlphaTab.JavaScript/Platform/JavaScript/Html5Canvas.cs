@@ -105,7 +105,10 @@ namespace AlphaTab.Platform.JavaScript
 
         public void FillRect(float x, float y, float w, float h)
         {
-            _context.fillRect((int)x - 0.5, (int)y - 0.5, w, h);
+            if (w > 0)
+            {
+                _context.fillRect((int)x - 0.5, (int)y - 0.5, w, h);
+            }
         }
 
         public void StrokeRect(float x, float y, float w, float h)
@@ -145,6 +148,7 @@ namespace AlphaTab.Platform.JavaScript
 
         public void FillCircle(float x, float y, float radius)
         {
+            _context.beginPath();
             _context.arc(x, y, radius, 0, Math.PI * 2, true);
             Fill();
         }

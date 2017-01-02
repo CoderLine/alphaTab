@@ -44,6 +44,10 @@
     //
     // Plugin 02: Cursors
     
+    var selectionStart = null;
+    var selectionEnd = null;
+    var selecting = false;
+    
 	function getTickCache(element) {
 		return element.data('alphaSynthTickCache');
 	}
@@ -60,6 +64,96 @@
                 var beat = cache.FindBeat(tracks, tick);
                 api.playerCursorUpdateBeat(element, context, beat);
             }
+        }
+    };
+    
+    api.playerCursorSelectRange = function(element, context, startBeat, endBeat) {
+        
+        var cache = getCursorCache(element);
+        if(!cache) {
+            return;
+        }
+        
+        var selectionWrapper = context.cursorOptions.selectionWrapper;
+        selectionWrapper.empty();
+        
+        if(startBeat == null || endBeat == null || startBeat.beat == endBeat.beat) {
+            return;
+        }
+        
+        if(!startBeat.bounds) {
+            startBeat.bounds = cache.FindBeat(startBeat.beat);
+        }
+        
+        if(!endBeat.bounds) {
+            endBeat.bounds = cache.FindBeat(endBeat.beat);
+        }
+                        
+        var startTick = startBeat.beat.get_AbsoluteStart();
+        var endTick = endBeat.beat.get_AbsoluteStart();
+        if(endTick < startTick) {
+            var t = startBeat;
+            startBeat = endBeat;
+            endBeat = t;
+        }
+
+        var startX = startBeat.bounds.RealBounds.X;
+        var endX = endBeat.bounds.RealBounds.X + endBeat.bounds.RealBounds.W;
+
+        // if the selection goes across multiple staves, we need a special selection highlighting
+        if(startBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds != endBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds) {
+            // from the startbeat to the end of the staff, 
+            // then fill all staffs until the end-beat staff
+            // then from staff-start to the end beat
+
+            var staffStartX = startBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.X;
+            var staffEndX = startBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.X + startBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.W;
+            
+            var startSelection = $('<div></div>').css({
+                position: 'absolute',
+                top: startBeat.bounds.BarBounds.MasterBarBounds.VisualBounds.Y + 'px', 
+                left: startX + 'px',
+                width: (staffEndX - startX) + 'px',
+                height: startBeat.bounds.BarBounds.MasterBarBounds.VisualBounds.H + 'px'
+            });    
+            selectionWrapper.append(startSelection);
+            
+            var staffStartIndex = startBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.Index + 1;
+            var staffEndIndex = endBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.Index;
+            console.log(staffStartIndex, staffEndIndex)
+            for(var staffIndex = staffStartIndex; staffIndex < staffEndIndex; staffIndex++) {
+                var staffBounds = cache.StaveGroups[staffIndex];
+                
+                var middleSelection = $('<div></div>').css({
+                    position: 'absolute',
+                    top: staffBounds.VisualBounds.Y + 'px', 
+                    left: staffStartX + 'px',
+                    width: (staffEndX - staffStartX) + 'px',
+                    height: staffBounds.VisualBounds.H + 'px'
+                });    
+                selectionWrapper.append(middleSelection);
+            }
+            
+            var endSelection = $('<div></div>').css({
+                position: 'absolute',
+                top: endBeat.bounds.BarBounds.MasterBarBounds.VisualBounds.Y + 'px', 
+                left: staffStartX + 'px',
+                width: (endX - staffStartX) + 'px',
+                height: endBeat.bounds.BarBounds.MasterBarBounds.VisualBounds.H + 'px'
+            });    
+            selectionWrapper.append(endSelection);
+        }
+        else {
+            // if the beats are on the same staff, we simply highlight from the startbeat to endbeat
+            var selection = $('<div></div>');
+            selection.css({
+                position: 'absolute',
+                top: startBeat.bounds.BarBounds.MasterBarBounds.VisualBounds.Y + 'px', 
+                left: startX + 'px',
+                width: (endX - startX) + 'px',
+                height: startBeat.bounds.BarBounds.MasterBarBounds.VisualBounds.H + 'px'
+            });    
+            selectionWrapper.append(selection);
         }
     };
     
@@ -97,38 +191,40 @@
             height: barBoundings.VisualBounds.H + 'px'
         });
         
-        if(context.cursorOptions.autoScroll == 'vertical') {
-            var padding = beatCursor.offset().top - beatBoundings.VisualBounds.Y;
-            var scrollTop = padding + beatBoundings.RealBounds.Y + context.cursorOptions.scrollOffset;
-            if(scrollTop != context.cursorOptions.lastScroll) {
-                context.cursorOptions.lastScroll = scrollTop;
-                $(context.cursorOptions.scrollElement).animate({
-                    scrollTop:scrollTop + 'px'
-                }, context.cursorOptions.scrollSpeed);
+        if(!selecting) {
+            if(context.cursorOptions.autoScroll == 'vertical') {
+                var padding = beatCursor.offset().top - beatBoundings.VisualBounds.Y;
+                var scrollTop = padding + beatBoundings.RealBounds.Y + context.cursorOptions.scrollOffset;
+                if(scrollTop != context.cursorOptions.lastScroll) {
+                    context.cursorOptions.lastScroll = scrollTop;
+                    $(context.cursorOptions.scrollElement).animate({
+                        scrollTop:scrollTop + 'px'
+                    }, context.cursorOptions.scrollSpeed);
+                }
             }
-        }
-        else if(context.cursorOptions.autoScroll == 'horizontal-bar') {
-            var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
-            if(barBoundings.VisualBounds.X != context.cursorOptions.lastScroll) {
-                var scrollLeft = padding + beatBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
-                context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
-                $(context.cursorOptions.scrollElement).animate({
-                    scrollLeft:scrollLeft + 'px'
-                }, context.cursorOptions.scrollSpeed);
+            else if(context.cursorOptions.autoScroll == 'horizontal-bar') {
+                var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
+                if(barBoundings.VisualBounds.X != context.cursorOptions.lastScroll) {
+                    var scrollLeft = padding + beatBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
+                    context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
+                    $(context.cursorOptions.scrollElement).animate({
+                        scrollLeft:scrollLeft + 'px'
+                    }, context.cursorOptions.scrollSpeed);
+                }
             }
-        }
-        else if(context.cursorOptions.autoScroll == 'horizontal-offscreen') {
-            var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
-            var elementRight = $(context.cursorOptions.scrollElement).scrollLeft() + 
-                               $(context.cursorOptions.scrollElement).width();
-            if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || 
-                 barBoundings.VisualBounds.X < $(context.cursorOptions.scrollElement).scrollLeft()
-            ) {
-                var scrollLeft = padding + beatBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
-                context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
-                $(context.cursorOptions.scrollElement).animate({
-                    scrollLeft:scrollLeft + 'px'
-                }, context.cursorOptions.scrollSpeed);
+            else if(context.cursorOptions.autoScroll == 'horizontal-offscreen') {
+                var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
+                var elementRight = $(context.cursorOptions.scrollElement).scrollLeft() + 
+                                   $(context.cursorOptions.scrollElement).width();
+                if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || 
+                     barBoundings.VisualBounds.X < $(context.cursorOptions.scrollElement).scrollLeft()
+                ) {
+                    var scrollLeft = padding + beatBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
+                    context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
+                    $(context.cursorOptions.scrollElement).animate({
+                        scrollLeft:scrollLeft + 'px'
+                    }, context.cursorOptions.scrollSpeed);
+                }
             }
         }
     };
@@ -169,6 +265,7 @@
         // Create cursors
         
         var cursorWrapper = $('<div class="cursors"></div>');
+        var selectionWrapper = $('<div class="selectionWrapper"></div>');
         var barCursor = $('<div class="barCursor"></div>');
         var beatCursor = $('<div class="beatCursor"></div>');
         var surface = $('.alphaTabSurface', element);
@@ -177,6 +274,7 @@
         element.css({position: 'relative'});
         element.css({'text-align': 'left'});
         cursorWrapper.css({position: 'absolute', "z-index": 1000, display: 'inline', 'pointer-events': 'none'});
+        selectionWrapper.css({position: 'absolute'});
         barCursor.css({position: 'absolute'});
         beatCursor.css({position: 'absolute'});
 
@@ -184,11 +282,13 @@
         context.cursorOptions.cursors = cursorWrapper;
         context.cursorOptions.barCursor = barCursor;
         context.cursorOptions.beatCursor = beatCursor;
+        context.cursorOptions.selectionWrapper = selectionWrapper;
         
         // add cursors to UI
         element.prepend(cursorWrapper);
         cursorWrapper.prepend(barCursor);
         cursorWrapper.prepend(beatCursor);
+        cursorWrapper.prepend(selectionWrapper);
         
         //
         // Hook into events
@@ -215,21 +315,77 @@
         // Click Handling
         
         if(context.cursorOptions.handleClick) {
-            $(context.CanvasElement).click(function(e) {
+            $(context.CanvasElement).on('mousedown', function(e) {
+                e.preventDefault();
+                                
                 var parentOffset = $(this).offset();
                 var relX = e.pageX - parentOffset.left;
                 var relY = e.pageY - parentOffset.top;
                 var beat = api.getBeatAtPos(element, context, relX, relY);
                 if(beat) {
-                    api.playerCursorUpdateBeat(element, context, beat);
-                    
-                    var masterBar = beat.Voice.Bar.get_MasterBar();
-                    var tickCache = getTickCache(element);
-                    var realMasterBarStart = tickCache.GetMasterBarStart(masterBar);
-                    
-                    as.SetPositionTick(realMasterBarStart + beat.Start);
+                    selectionStart = {
+                        beat: beat
+                    };
+                    selectionEnd = null;
+                    selecting = true;
                 }
             });
+            $(context.CanvasElement).on('mousemove', function(e) {
+                if(selecting) {
+                    var parentOffset = $(this).offset();
+                    var relX = e.pageX - parentOffset.left;
+                    var relY = e.pageY - parentOffset.top;
+                    var beat = api.getBeatAtPos(element, context, relX, relY);
+                    if(beat && (selectionEnd == null || selectionEnd.beat != beat)) {
+                        selectionEnd = {
+                            beat: beat
+                        };
+                        
+                        api.playerCursorSelectRange(element, context, selectionStart, selectionEnd);
+                    }
+                }
+            });
+            $(context.CanvasElement).on('mouseup', function(e) {
+                e.preventDefault();
+                                
+                // for the selection ensure start < end
+                if(selectionEnd) {
+                    var startTick = selectionStart.beat.get_AbsoluteStart();
+                    var endTick = selectionEnd.beat.get_AbsoluteStart();
+                    if(endTick < startTick) {
+                        var t = selectionStart;
+                        selectionStart = selectionEnd;
+                        selectionEnd = t;
+                    }
+                }
+                
+                // get the start and stop ticks (which consider properly repeats)
+                var tickCache = getTickCache(element);
+                var realMasterBarStart = tickCache.GetMasterBarStart(selectionStart.beat.Voice.Bar.get_MasterBar());
+                        
+                // move to selection start
+                api.playerCursorUpdateBeat(element, context, selectionStart.beat);
+                as.SetPositionTick(realMasterBarStart + selectionStart.beat.Start);
+                
+                // set playback range 
+                if(selectionEnd && selectionStart.beat != selectionEnd.beat) {
+                    var realMasterBarEnd = tickCache.GetMasterBarStart(selectionEnd.beat.Voice.Bar.get_MasterBar());
+                    as.SetPlaybackRange(realMasterBarStart + selectionStart.beat.Start, realMasterBarEnd + selectionEnd.beat.Start);
+                }
+                else {
+                    selectionStart = null;
+                    as.SetPlaybackRange(-1, -1);
+                }
+                api.playerCursorSelectRange(element, context, selectionStart, selectionEnd);
+                selecting = false;
+            });
+            
+            element.on('post-rendered', function(e, score) {
+                if(selectionStart) {
+                    api.playerCursorSelectRange(element, context, selectionStart, selectionEnd);
+                }
+            });
+            
         }        
     }
 

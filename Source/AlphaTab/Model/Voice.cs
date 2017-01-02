@@ -32,20 +32,20 @@ namespace AlphaTab.Model
 
         public bool IsEmpty
         {
-            get
-            {
-                return Beats.Count == 0 || (Beats.Count == 1 && Beats[0].IsEmpty);
-            }
+            get; private set;
+          
         }
 
         public Voice()
         {
             Beats = new FastList<Beat>();
+            IsEmpty = true;
         }
 
         public static void CopyTo(Voice src, Voice dst)
         {
             dst.Index = src.Index;
+            dst.IsEmpty = src.IsEmpty;
         }
 
         public void AddBeat(Beat beat)
@@ -54,6 +54,10 @@ namespace AlphaTab.Model
             beat.Voice = this;
             beat.Index = Beats.Count;
             Beats.Add(beat);
+            if (!beat.IsEmpty)
+            {
+                IsEmpty = false;
+            }
         }
 
         private void Chain(Beat beat)
@@ -96,6 +100,8 @@ namespace AlphaTab.Model
             AddBeat(beat);
             // reinsert last beat
             AddBeat(lastBeat);
+
+            IsEmpty = false;
         }
 
         public void Finish()

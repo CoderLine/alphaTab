@@ -15,6 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using AlphaTab.Platform;
+
 namespace AlphaTab.Model
 {
     /// <summary>
@@ -25,16 +28,13 @@ namespace AlphaTab.Model
         public static int GetIndex(this Duration duration)
         {
             var index = 0;
-            var value = (int) duration;
+            var value = (int)duration;
             if (value < 0)
             {
                 return index;
             }
-            while ((value = (value >> 1)) > 0)
-            {
-                index++;
-            }
-            return index;
+
+            return (int)Std.Log2((int)duration);
         }
 
         // TODO: Externalize this into some model public class

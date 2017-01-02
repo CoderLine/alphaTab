@@ -16,11 +16,9 @@
  * License along with this library.
  */
 
-using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering.Glyphs
@@ -124,6 +122,12 @@ namespace AlphaTab.Rendering.Glyphs
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             if (Beat.Voice.IsEmpty) return;
+
+            var oldColor = canvas.Color;
+            //canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 100);
+            //canvas.FillRect(cx + X, cy + Y, Width, Renderer.Height);
+            //canvas.Color = oldColor;
+
             //canvas.Color = new Color(200, 0, 0, 100);
             //canvas.StrokeRect(cx + X, cy + Y + 15 * Beat.Voice.Index, Width, 10);
             //canvas.Font = new Font("Arial", 10);
