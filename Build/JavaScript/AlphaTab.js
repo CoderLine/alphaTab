@@ -758,11 +758,11 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
             var css = new Array();
             css.push("@font-face {"+'\r\n');
             css.push("    font-family: \'alphaTab\';"+'\r\n');
-            css.push("     src: url(\'" + fontDirectory + "bravura.eot\');"+'\r\n');
-            css.push("     src: url(\'" + fontDirectory + "bravura.eot?#iefix\') format(\'embedded-opentype\')"+'\r\n');
-            css.push("          , url(\'" + fontDirectory + "bravura.woff\') format(\'woff\')"+'\r\n');
-            css.push("          , url(\'" + fontDirectory + "bravura.otf\') format(\'opentype\')"+'\r\n');
-            css.push("          , url(\'" + fontDirectory + "bravura.svg#Bravura\') format(\'svg\');"+'\r\n');
+            css.push("     src: url(\'" + fontDirectory + "Bravura.eot\');"+'\r\n');
+            css.push("     src: url(\'" + fontDirectory + "Bravura.eot?#iefix\') format(\'embedded-opentype\')"+'\r\n');
+            css.push("          , url(\'" + fontDirectory + "Bravura.woff\') format(\'woff\')"+'\r\n');
+            css.push("          , url(\'" + fontDirectory + "Bravura.otf\') format(\'opentype\')"+'\r\n');
+            css.push("          , url(\'" + fontDirectory + "Bravura.svg#Bravura\') format(\'svg\');"+'\r\n');
             css.push("     font-weight: normal;"+'\r\n');
             css.push("     font-style: normal;"+'\r\n');
             css.push("}"+'\r\n');

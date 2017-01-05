@@ -192,11 +192,11 @@ namespace AlphaTab.Platform.JavaScript
                 var css = new StringBuilder();
                 css.AppendLine("@font-face {");
                 css.AppendLine("    font-family: 'alphaTab';");
-                css.AppendLine("     src: url('" + fontDirectory + "bravura.eot');");
-                css.AppendLine("     src: url('" + fontDirectory + "bravura.eot?#iefix') format('embedded-opentype')");
-                css.AppendLine("          , url('" + fontDirectory + "bravura.woff') format('woff')");
-                css.AppendLine("          , url('" + fontDirectory + "bravura.otf') format('opentype')");
-                css.AppendLine("          , url('" + fontDirectory + "bravura.svg#Bravura') format('svg');");
+                css.AppendLine("     src: url('" + fontDirectory + "Bravura.eot');");
+                css.AppendLine("     src: url('" + fontDirectory + "Bravura.eot?#iefix') format('embedded-opentype')");
+                css.AppendLine("          , url('" + fontDirectory + "Bravura.woff') format('woff')");
+                css.AppendLine("          , url('" + fontDirectory + "Bravura.otf') format('opentype')");
+                css.AppendLine("          , url('" + fontDirectory + "Bravura.svg#Bravura') format('svg');");
                 css.AppendLine("     font-weight: normal;");
                 css.AppendLine("     font-style: normal;");
                 css.AppendLine("}");
