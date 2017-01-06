@@ -18,6 +18,7 @@
 
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Util;
 
 namespace AlphaTab.Importer
 {
@@ -26,13 +27,16 @@ namespace AlphaTab.Importer
     /// </summary>
     public class GpxImporter : ScoreImporter
     {
+        public override string Name { get { return "Guitar Pro 6"; } }
         public override Score ReadScore()
         {
             // at first we need to load the binary file system 
             // from the GPX container
+            Logger.Info(Name, "Loading GPX filesystem");
             var fileSystem = new GpxFileSystem();
             fileSystem.FileFilter = s => s == GpxFileSystem.ScoreGpif;
             fileSystem.Load(Data);
+            Logger.Info(Name, "GPX filesystem loaded");
 
             // convert data to string
             var data = fileSystem.Files[0].Data;
@@ -45,10 +49,11 @@ namespace AlphaTab.Importer
 
             // the score.gpif file within this filesystem stores
             // the score information as XML we need to parse.
+            Logger.Info(Name, "Start Parsing score.gpif");
             var parser = new GpxParser();
             parser.ParseXml(xml);
-
             parser.Score.Finish();
+            Logger.Info(Name, "score.gpif parsed");
 
             return parser.Score;
         }

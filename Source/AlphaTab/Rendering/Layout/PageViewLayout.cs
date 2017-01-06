@@ -23,6 +23,7 @@ using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Rendering.Glyphs;
+using AlphaTab.Util;
 
 namespace AlphaTab.Rendering.Layout
 {
@@ -37,6 +38,7 @@ namespace AlphaTab.Rendering.Layout
 
         private FastList<StaveGroup> _groups;
 
+        public override string Name { get { return "PageView"; } }
         public PageViewLayout(ScoreRenderer renderer)
             : base(renderer)
         {
@@ -84,6 +86,8 @@ namespace AlphaTab.Rendering.Layout
 
         private float LayoutAndRenderScoreInfo(float x, float y)
         {
+            Logger.Info(Name, "Layouting score info");
+
             var scale = Scale;
             var res = Renderer.RenderingResources;
 
@@ -209,6 +213,7 @@ namespace AlphaTab.Rendering.Layout
                     FitGroup(group);
                     group.FinalizeGroup(this);
 
+                    Logger.Info(Name, "Rendering partial from bar " + group.FirstBarIndex + " to " + group.LastBarIndex);
                     y += PaintGroup(group, y, canvas);
                 }
             }

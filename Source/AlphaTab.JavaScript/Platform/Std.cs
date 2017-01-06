@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using AlphaTab.Collections;
 using AlphaTab.IO;
+using AlphaTab.Util;
 using AlphaTab.Xml;
 using SharpKit.Html;
 using SharpKit.JavaScript;
@@ -13,6 +14,30 @@ namespace AlphaTab.Platform
         public static float ParseFloat(string s)
         {
             return JsContext.parseFloat(s);
+        }
+
+        [JsMethod(InlineCodeExpression = "arguments.callee.caller.caller.name", Export = false)]
+        public static extern string GetCallerName();
+
+        public static void Log(string msg, LogLevel logLevel)
+        {
+            switch (logLevel)
+            {
+                case LogLevel.None:
+                    break;
+                case LogLevel.Debug:
+                    JsContext.JsCode("console.debug(msg);");
+                    break;
+                case LogLevel.Info:
+                    JsContext.JsCode("console.info(msg);");
+                    break;
+                case LogLevel.Warning:
+                    JsContext.JsCode("console.warn(msg);");
+                    break;
+                case LogLevel.Error:
+                    JsContext.JsCode("console.err(msg);");
+                    break;
+            }
         }
 
         [JsMethod(InlineCodeExpression = "{}", Export = false)]

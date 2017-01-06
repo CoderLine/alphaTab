@@ -206,6 +206,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\TupletHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Util\Lazy.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Util\Logger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Xml\IXmlDocument.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Xml\IXmlNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlNodeType.cs" />

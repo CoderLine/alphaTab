@@ -99,6 +99,14 @@ namespace AlphaTab.Rendering.Staves
             Helpers = new BarHelpersGroup();
         }
 
+        public int FirstBarIndex
+        {
+            get
+            {
+                return MasterBars[0].Index;
+            }
+        }
+
         public int LastBarIndex
         {
             get

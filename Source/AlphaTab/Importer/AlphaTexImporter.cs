@@ -20,6 +20,7 @@ using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Util;
 
 namespace AlphaTab.Importer
 {
@@ -44,6 +45,8 @@ namespace AlphaTab.Importer
 
         private Duration _currentDuration;
 
+        public override string Name { get { return "AlphaTex"; } }
+
         public override Score ReadScore()
         {
             try
@@ -58,19 +61,29 @@ namespace AlphaTab.Importer
                 _score.Finish();
                 return _score;
             }
-            catch 
+            catch (Exception e)
             {
-                throw new UnsupportedFormatException();
+                if (Std.IsException<AlphaTexException>(e))
+                {
+                    throw new UnsupportedFormatException(e.Message);
+                }
+                throw e;
             }
         }
 
         private void Error(string nonterm, AlphaTexSymbols expected, bool symbolError = true)
         {
+            AlphaTexException e;
             if (symbolError)
             {
-                throw new AlphaTexException(_curChPos, nonterm, expected, _sy);
+                e = new AlphaTexException(_curChPos, nonterm, expected, _sy);
             }
-            throw new AlphaTexException(_curChPos, nonterm, expected, expected, _syData);
+            else
+            {
+                e = new AlphaTexException(_curChPos, nonterm, expected, expected, _syData);
+            }
+            Logger.Error(Name, e.Message);
+            throw e;
         }
 
         /// <summary>
@@ -598,7 +611,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if(anyMeta)
+                else if (anyMeta)
                 {
                     Error("metaDataTags", AlphaTexSymbols.String, false);
                 }
@@ -980,7 +993,7 @@ namespace AlphaTab.Importer
                 return true;
             }
 
-            if (syData == "gr") 
+            if (syData == "gr")
             {
                 NewSy();
                 if (_syData.ToString().ToLower() == "ob")
@@ -1086,7 +1099,7 @@ namespace AlphaTab.Importer
                 _syData = syData;
                 if (syData == "b" || syData == "be")
                 {
-                    var exact = (string) _syData == "be";
+                    var exact = (string)_syData == "be";
                     // read points
                     NewSy();
                     if (_sy != AlphaTexSymbols.LParensis)
@@ -1148,7 +1161,7 @@ namespace AlphaTab.Importer
                             i++;
                         }
                     }
-                   
+
 
                     if (_sy != AlphaTexSymbols.RParensis)
                     {

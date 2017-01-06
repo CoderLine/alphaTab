@@ -2,6 +2,7 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Util;
 using AlphaTab.Xml;
 using XmlNodeType = AlphaTab.Xml.XmlNodeType;
 
@@ -14,6 +15,7 @@ namespace AlphaTab.Importer
         private int _trackFirstMeasureNumber;
         private int _maxVoices;
 
+        public override string Name { get { return "MusicXml"; } }
         public override Score ReadScore()
         {
             _trackById = new FastDictionary<string, Track>();
@@ -43,12 +45,12 @@ namespace AlphaTab.Importer
             switch (root.LocalName)
             {
                 case "score-partwise":
+                    Logger.Info(Name, "Loading partwise MusicXML");
                     ParsePartwise(root);
                     break;
                 case "score-timewise":
-                    //ParseTimewise(root);
-                    break;
                 default:
+                    Logger.Error(Name, root.LocalName + " is no supported MusicXML root (only score-partwise is supported)");
                     throw new UnsupportedFormatException();
             }
         }

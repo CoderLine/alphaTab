@@ -20,6 +20,7 @@ using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Utils;
+using AlphaTab.Util;
 
 namespace AlphaTab.Rendering
 {
@@ -78,7 +79,7 @@ namespace AlphaTab.Rendering
         public void Render(Track track)
         {
             Score = track.Score;
-            Tracks = new []{track};
+            Tracks = new[] { track };
             Invalidate();
         }
 
@@ -94,6 +95,12 @@ namespace AlphaTab.Rendering
             }
 
             Tracks = tracks;
+            Logger.Info("Rendering", "Rendering " + tracks.Length + " tracks");
+            for (int i = 0; i < tracks.Length; i++)
+            {
+                var track = tracks[i];
+                Logger.Info("Rendering", "Track " + i + ": " + track.Name);
+            }
             Invalidate();
         }
 
@@ -116,16 +123,19 @@ namespace AlphaTab.Rendering
             OnPreRender();
             RecreateLayout();
             LayoutAndRender();
+            Logger.Info("Rendering", "Rendering finished");
         }
 
         public void Resize(int width)
         {
             if (RecreateLayout())
             {
+                Logger.Info("Rendering", "Starting full rerendering due to layout change");
                 Invalidate();
             }
             else if (Layout.SupportsResize)
             {
+                Logger.Info("Rendering", "Starting optimized rerendering for resize");
                 OnPreRender();
                 Settings.Width = width;
                 Layout.Resize();
@@ -133,10 +143,16 @@ namespace AlphaTab.Rendering
                 OnRenderFinished();
                 OnPostRender();
             }
+            else
+            {
+                Logger.Warning("Rendering", "Current layout does not support dynamic resizing, nothing was done");
+            }
+            Logger.Info("Rendering", "Resize finished");
         }
 
         private void LayoutAndRender()
         {
+            Logger.Info("Rendering", "Rendering at scale " + Settings.Scale + " with layout " + Layout.Name);
             Layout.LayoutAndRender();
             Layout.RenderAnnotation();
             OnRenderFinished();

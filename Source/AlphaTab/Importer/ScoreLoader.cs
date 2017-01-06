@@ -19,6 +19,7 @@ using System;
 using AlphaTab.IO;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Util;
 
 namespace AlphaTab.Importer
 {
@@ -37,6 +38,7 @@ namespace AlphaTab.Importer
         public static void LoadScoreAsync(string path, Action<Score> success, Action<Exception> error)
         {
             IFileLoader loader = Environment.FileLoaders["default"]();
+            Logger.Info("ScoreLoader", "Loading score from '" + path + "'");
             loader.LoadBinaryAsync(path, data =>
             {
                 Score score = null;
@@ -74,6 +76,8 @@ namespace AlphaTab.Importer
         {
             var importers = ScoreImporter.BuildImporters();
 
+            Logger.Info("ScoreLoader", "Loading score from " + data.Length + " bytes using " + importers.Length + " importers");
+
             Score score = null;
             ByteBuffer bb = ByteBuffer.FromBuffer(data);
             foreach (var importer in importers)
@@ -81,15 +85,22 @@ namespace AlphaTab.Importer
                 bb.Reset();
                 try
                 {
+                    Logger.Info("ScoreLoader", "Importing using importer " + importer.Name);
                     importer.Init(bb);
                     score = importer.ReadScore();
+                    Logger.Info("ScoreLoader", "Score imported using " + importer.Name);
                     break;
                 }
                 catch (Exception e)
                 {
                     if (!Std.IsException<UnsupportedFormatException>(e))
                     {
+                        Logger.Info("ScoreLoader", "Score import failed due to unexpected error: " + e.Message);
                         throw e;
+                    }
+                    else
+                    {
+                        Logger.Info("ScoreLoader", importer.Name + " does not support the file");
                     }
                 }
             }
@@ -98,6 +109,8 @@ namespace AlphaTab.Importer
             {
                 return score;
             }
+
+            Logger.Info("ScoreLoader", "No compatible importer found for file");
             throw new NoCompatibleReaderFoundException();
         }
     }

@@ -20,6 +20,7 @@ using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
+using AlphaTab.Util;
 
 namespace AlphaTab.Importer
 {
@@ -41,6 +42,7 @@ namespace AlphaTab.Importer
 
         private FastList<PlaybackInformation> _playbackInfos;
 
+        public override string Name { get { return "Guitar Pro 3-5"; } }
         public override Score ReadScore()
         {
             ReadVersion();
@@ -148,6 +150,8 @@ namespace AlphaTab.Importer
             int dot = version.IndexOf('.');
 
             _versionNumber = (100 * Std.ParseInt(version.Substring(0, dot))) + Std.ParseInt(version.Substring(dot + 1));
+
+            Logger.Info(Name, "Guitar Pro version " + version + " detected");
         }
 
         public void ReadScoreInformation()

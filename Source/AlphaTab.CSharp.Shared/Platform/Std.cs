@@ -17,16 +17,53 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
 using AlphaTab.IO;
+using AlphaTab.Util;
 using AlphaTab.Xml;
 
 namespace AlphaTab.Platform
 {
     public static partial class Std
     {
+        public static string GetCallerName()
+        {
+            var frame = new StackFrame(3, true);
+            var method = frame.GetMethod();
+            var lineNumber = frame.GetFileLineNumber();
+            return string.Format("{0}.{1}:{2}", method.DeclaringType.FullName, method.Name, lineNumber);
+        }
+
+
+        public static void Log(string msg, LogLevel logLevel)
+        {
+            var color = Console.ForegroundColor;
+            switch (logLevel)
+            {
+                case LogLevel.None:
+                    break;
+                case LogLevel.Debug:
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    break;
+                case LogLevel.Info:
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    break;
+                case LogLevel.Warning:
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    break;
+                case LogLevel.Error:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    break;
+            }
+
+            Console.WriteLine(msg);
+            Debug.WriteLine(msg);
+            Console.ForegroundColor = color;
+        }
+
         /// <summary>
         /// gen
         /// </summary>
