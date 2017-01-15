@@ -20,6 +20,7 @@ using System;
 using AlphaTab.Collections;
 using AlphaTab.Importer;
 using AlphaTab.IO;
+using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;
 using SharpKit.Html;
 using SharpKit.JavaScript;

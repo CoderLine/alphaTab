@@ -35,8 +35,6 @@ namespace AlphaTab.Rendering.Glyphs
         public FastDictionary<string, Glyph> BeatEffects { get; set; }
         public FastDictionary<int, NoteNumberGlyph> NotesPerString { get; set; }
 
-
-
         public TabNoteChordGlyph(float x, float y, bool isGrace)
             : base(x, y)
         {

@@ -36,6 +36,11 @@ namespace AlphaTab.Rendering
         /// The effect glyph is placed above the on-beat glyph and expaded to the 
         /// on-beat position of the next beat.
         /// </summary>
+        GroupedBeforeBeat,
+        /// <summary>
+        /// The effect glyph is placed above the on-beat glyph and expaded to the 
+        /// on-beat position of the next beat.
+        /// </summary>
         GroupedOnBeat,
         /// <summary>
         /// The effect glyph is placed on the whole bar covering the whole width

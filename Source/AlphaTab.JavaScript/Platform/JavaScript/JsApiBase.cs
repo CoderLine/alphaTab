@@ -37,6 +37,9 @@ namespace AlphaTab.Platform.JavaScript
         protected int[] TrackIndexes;
         protected bool AutoSize;
 
+        private FastList<RenderFinishedEventArgs> _renderResults;
+        private int _totalResultCount;
+
         protected JsApiBase(HtmlElement element, dynamic options)
         {
             Element = element;
@@ -84,7 +87,24 @@ namespace AlphaTab.Platform.JavaScript
 
                 CanvasElement.className = "alphaTabSurface";
                 CanvasElement.style.fontSize = "0";
+                CanvasElement.style.overflow = "hidden";
                 element.appendChild(CanvasElement);
+
+                #endregion
+
+                #region Setup scroll and resize handlers for lazy-loading
+
+                if (settings.Engine == "default" || settings.Engine == "svg")
+                {
+                    window.addEventListener("scroll", e =>
+                    {
+                        ShowSvgsInViewPort();
+                    });
+                    window.addEventListener("resize", e =>
+                    {
+                        ShowSvgsInViewPort();
+                    });
+                }
 
                 #endregion
 
@@ -100,10 +120,12 @@ namespace AlphaTab.Platform.JavaScript
                     }
                     int timeoutId = 0;
                     int timeout = options.resizeTimeout || 50;
+
                     window.addEventListener("resize", e =>
                     {
-                        window.clearTimeout(timeoutId);
-                        timeoutId = window.setTimeout(() =>
+                        clearTimeout(timeoutId);
+
+                        timeoutId = setTimeout(() =>
                         {
                             if (element.offsetWidth != settings.Width)
                             {
@@ -142,11 +164,16 @@ namespace AlphaTab.Platform.JavaScript
             Renderer.PostRenderFinished += () => TriggerEvent("post-rendered");
             Renderer.PreRender += result =>
             {
-                CanvasElement.innerHTML = "";
+                _renderResults = new FastList<RenderFinishedEventArgs>();
+                _totalResultCount = 0;
                 AppendRenderResult(result);
             };
             Renderer.PartialRenderFinished += AppendRenderResult;
-            Renderer.RenderFinished += AppendRenderResult;
+            Renderer.RenderFinished += r =>
+            {
+                AppendRenderResult(r);
+                AppendRenderResult(null); // marks last element
+            };
 
             #endregion
 
@@ -173,27 +200,107 @@ namespace AlphaTab.Platform.JavaScript
             #endregion
         }
 
+        private void ShowSvgsInViewPort()
+        {
+            var placeholders = CanvasElement.querySelectorAll("[data-lazy=true]");
+            foreach (var x in placeholders)
+            {
+                var placeholder = x.As<HtmlElement>();
+                if (IsElementVisible(placeholder))
+                {
+                    placeholder.outerHTML = placeholder.As<dynamic>().svg;
+                }
+            }
+        }
+
+        private static bool IsElementVisible(Element el)
+        {
+            var rect = el.getBoundingClientRect();
+            return 
+                (
+                    rect.top + rect.height >= 0 && rect.top <= window.innerHeight &&
+                    rect.left + rect.width >= 0 && rect.left <= window.innerWidth
+                );
+        }
+
         private void AppendRenderResult(RenderFinishedEventArgs result)
         {
-            CanvasElement.style.width = result.TotalWidth + "px";
-            CanvasElement.style.height = result.TotalHeight + "px";
-
-            if (result.RenderResult != null)
+            if (result != null)
             {
-                Node itemToAppend;
-                if (@typeof(result.RenderResult) == "string")
-                {
-                    var partialResult = (HtmlDivElement)document.createElement("div");
+                CanvasElement.style.width = result.TotalWidth + "px";
+                CanvasElement.style.height = result.TotalHeight + "px";
+            }
 
-                    partialResult.innerHTML = result.RenderResult.As<string>();
 
-                    itemToAppend = partialResult.firstChild;
-                }
-                else
+            if (result == null || result.RenderResult != null)
+            {
+                // the queue/dequeue like mechanism used here is to maintain the order within the setTimeout. 
+                // setTimeout allows to decouple the rendering from the JS processing a bit which makes the overall display faster. 
+                _renderResults.Add(result);
+
+                setTimeout(() =>
                 {
-                    itemToAppend = (Node)result.RenderResult;
-                }
-                CanvasElement.appendChild(itemToAppend);
+                    while (_renderResults.Count > 0)
+                    {
+                        var renderResult = _renderResults[0];
+                        _renderResults.RemoveAt(0);
+
+                        // null result indicates that the rendering finished
+                        if (renderResult == null)
+                        {
+                            // so we remove elements that might be from a previous render session
+                            while (CanvasElement.childElementCount > _totalResultCount)
+                            {
+                                CanvasElement.removeChild(CanvasElement.lastChild);
+                            }
+                        }
+                        // NOTE: here we try to replace existing children 
+                        else
+                        {
+                            var body = renderResult.RenderResult;
+                            if (@typeof(body) == "string")
+                            {
+                                HtmlElement placeholder;
+                                if (_totalResultCount < CanvasElement.childElementCount)
+                                {
+                                    placeholder = CanvasElement.children[_totalResultCount].As<HtmlElement>();
+                                }
+                                else
+                                {
+                                    placeholder = document.createElement("div").As<HtmlElement>();
+                                    CanvasElement.appendChild(placeholder);
+                                }
+
+                                placeholder.style.width = renderResult.Width + "px";
+                                placeholder.style.height = renderResult.Height + "px";
+                                placeholder.style.display = "inline-block";
+
+                                if (IsElementVisible(placeholder))
+                                {
+                                    placeholder.outerHTML = body.As<string>();
+                                }
+                                else
+                                {
+                                    placeholder.As<dynamic>().svg = body;
+                                    placeholder.setAttribute("data-lazy", "true");
+                                }
+                            }
+                            else
+                            {
+                                if (_totalResultCount < CanvasElement.childElementCount)
+                                {
+                                    CanvasElement.replaceChild(renderResult.As<Node>(), CanvasElement.children[_totalResultCount]);
+                                }
+                                else
+                                {
+                                    CanvasElement.appendChild(renderResult.As<Node>());
+                                }
+                            }
+                            _totalResultCount++;
+                        }
+                    }
+                }, 1);
+
             }
         }
 
@@ -211,11 +318,11 @@ namespace AlphaTab.Platform.JavaScript
                 var css = new StringBuilder();
                 css.AppendLine("@font-face {");
                 css.AppendLine("    font-family: 'alphaTab';");
-                css.AppendLine("     src: url('" + fontDirectory + "bravura.eot');");
-                css.AppendLine("     src: url('" + fontDirectory + "bravura.eot?#iefix') format('embedded-opentype')");
-                css.AppendLine("          , url('" + fontDirectory + "bravura.woff') format('woff')");
-                css.AppendLine("          , url('" + fontDirectory + "bravura.otf') format('opentype')");
-                css.AppendLine("          , url('" + fontDirectory + "bravura.svg#Bravura') format('svg');");
+                css.AppendLine("     src: url('" + fontDirectory + "Bravura.eot');");
+                css.AppendLine("     src: url('" + fontDirectory + "Bravura.eot?#iefix') format('embedded-opentype')");
+                css.AppendLine("          , url('" + fontDirectory + "Bravura.woff') format('woff')");
+                css.AppendLine("          , url('" + fontDirectory + "Bravura.otf') format('opentype')");
+                css.AppendLine("          , url('" + fontDirectory + "Bravura.svg#Bravura') format('svg');");
                 css.AppendLine("     font-weight: normal;");
                 css.AppendLine("     font-style: normal;");
                 css.AppendLine("}");

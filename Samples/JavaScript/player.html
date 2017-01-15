@@ -155,19 +155,14 @@
             else {
                 $('#loadingInfo').hide()
                 $('#playPause').prop('disabled', false);
-                $('#stop').prop('disabled', false);
+                $('#stop').prop('disabled', false).removeAttr('disabled').removeClass('disabled');
                 $('#playPause').removeAttr('disabled');
                 switch(playerState) {
-                    case 0: // stopped
+                    case 0: // stopped/paused
                     $('#playPause').removeClass('glyphicon-pause').addClass('glyphicon-play');
                     break;
                     case 1: // playing
                     $('#playPause').removeClass('glyphicon-play').addClass('glyphicon-pause');
-                    $('#stop').removeAttr('disabled').removeClass('disabled');
-                    break;
-                    case 2: // paused
-                    $('#playPause').removeClass('glyphicon-pause').addClass('glyphicon-play');
-                    $('#stop').removeAttr('disabled').removeClass('disabled');
                     break;
                 }
             }

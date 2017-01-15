@@ -26,6 +26,8 @@ namespace AlphaTab.Importer
     /// </summary>
     public class GpxImporter : ScoreImporter
     {
+        public override string Name { get { return "Guitar Pro 6"; } }
+
         public override Score ReadScore()
         {
             // at first we need to load the binary file system 

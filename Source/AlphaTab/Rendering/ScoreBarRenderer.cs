@@ -418,7 +418,7 @@ namespace AlphaTab.Rendering
                 PaintFingering(canvas, beat, cx + X + beatLineX, direction, fingeringY);
 
                 var brokenBarOffset = 6 * Scale * scaleMod;
-                var barSpacing = 6 * Scale * scaleMod;
+                var barSpacing = 7 * Scale * scaleMod;
                 var barSize = LineSpacing / 2 * Scale * scaleMod;
                 var barCount = beat.Duration.GetIndex() - 2;
                 var barStart = cy + Y;

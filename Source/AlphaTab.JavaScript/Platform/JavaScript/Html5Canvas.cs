@@ -239,6 +239,14 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
+        public void BeginGroup(string identifier)
+        {
+        }
+
+        public void EndGroup()
+        {
+        }
+
         public void FillText(string text, float x, float y)
         {
             _context.fillText(text, x, y);

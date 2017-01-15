@@ -123,6 +123,11 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (Beat.Voice.IsEmpty) return;
 
+            var isEmptyGlyph = PreNotes.IsEmpty && OnNotes.IsEmpty && Ties.Count == 0;
+            if (isEmptyGlyph) return;
+
+            canvas.BeginGroup("b" + Beat.Id);
+
             var oldColor = canvas.Color;
             //canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 100);
             //canvas.FillRect(cx + X, cy + Y, Width, Renderer.Height);
@@ -164,6 +169,8 @@ namespace AlphaTab.Rendering.Glyphs
                 t.Renderer = Renderer;
                 t.Paint(staffX, staffY, canvas);
             }
+
+            canvas.EndGroup();
         }
 
     }

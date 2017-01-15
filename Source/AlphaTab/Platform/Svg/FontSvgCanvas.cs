@@ -26,12 +26,19 @@ namespace AlphaTab.Platform.Svg
     {
         public override void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)
         {
-            Buffer.Append("<svg x=\"" + ((int)x - BlurCorrection) + "\" y=\"" + ((int)y - BlurCorrection) + "\" class=\"at\" ><text style=\"fill:" + Color.RGBA + "; ");
+            Buffer.Append("<g transform=\"translate(" + ((int) x - BlurCorrection) + " " + ((int) y - BlurCorrection) + ")\" class=\"at\" ><text");
+            //Buffer.Append("<svg x=\"" + ((int) x - BlurCorrection) + "\" y=\"" + ((int) y - BlurCorrection) +
+            //              "\" class=\"at\" >");
             if (scale != 1)
             {
-                Buffer.Append("font-size: " + (scale * 100) + "%");
+                Buffer.Append("  style=\"font-size: " + (scale * 100) + "%\"");
             }
-            Buffer.Append("\" text-anchor=\"start\">&#" + (int)symbol + ";</text></svg>");
+            if (Color.RGBA != Model.Color.BlackRgb)
+            {
+                Buffer.Append(" fill=\"" + Color.RGBA + "\"");
+            }
+            //Buffer.Append(">&#" + (int)symbol + ";</text></svg>");
+            Buffer.Append(">&#" + (int)symbol + ";</text></g>");
         }
     }
 }

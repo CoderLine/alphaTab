@@ -69,20 +69,20 @@ namespace AlphaTab.Rendering.Layout
             var x = PagePadding[0];
             var y = PagePadding[1];
             Width = Renderer.Settings.Width;
+            var oldHeight = Height;
 
             // 
             // 1. Score Info
-            y = LayoutAndRenderScoreInfo(x, y);
+            y = LayoutAndRenderScoreInfo(x, y, oldHeight);
 
             //
             // 2. One result per StaveGroup
-            y = ResizeAndRenderScore(x, y);
-            //y = LayoutAndRenderScore(x, y);
+            y = ResizeAndRenderScore(x, y, oldHeight);
 
             Height = y + PagePadding[3];
         }
 
-        private float LayoutAndRenderScoreInfo(float x, float y)
+        private float LayoutAndRenderScoreInfo(float x, float y, float totalHeight = -1)
         {
             var scale = Scale;
             var res = Renderer.RenderingResources;
@@ -162,13 +162,15 @@ namespace AlphaTab.Rendering.Layout
                 Height = y,
                 RenderResult = result,
                 TotalWidth = Width,
-                TotalHeight = y
+                TotalHeight = totalHeight < 0 ? y : totalHeight,
+                FirstMasterBarIndex = -1,
+                LastMasterBarIndex = -1
             });
 
             return y;
         }
 
-        private float ResizeAndRenderScore(float x, float y)
+        private float ResizeAndRenderScore(float x, float y, float oldHeight)
         {
             var canvas = Renderer.Canvas;
 
@@ -181,7 +183,7 @@ namespace AlphaTab.Rendering.Layout
                     FitGroup(group);
                     group.FinalizeGroup();
 
-                    y += PaintGroup(group, y, canvas);
+                    y += PaintGroup(group, oldHeight, canvas);
                 }
             }
             // if the bars per row are flexible, we need to recreate the stave groups 
@@ -217,7 +219,7 @@ namespace AlphaTab.Rendering.Layout
                         _groups.Add(group);
                         FitGroup(group);
                         group.FinalizeGroup();
-                        y += PaintGroup(group, y, canvas);
+                        y += PaintGroup(group, oldHeight, canvas);
 
                         // note: we do not increase currentIndex here to have it added to the next group
                         group = CreateEmptyStaveGroup();
@@ -230,7 +232,7 @@ namespace AlphaTab.Rendering.Layout
                 // don't forget to finish the last group
                 FitGroup(group);
                 group.FinalizeGroup();
-                y += PaintGroup(group, y, canvas);
+                y += PaintGroup(group, oldHeight, canvas);
             }
 
             return y;
@@ -292,6 +294,9 @@ namespace AlphaTab.Rendering.Layout
             args.Width = Width;
             args.Height = height;
             args.RenderResult = result;
+            args.FirstMasterBarIndex = group.FirstBarIndex;
+            args.LastMasterBarIndex = group.LastBarIndex;
+
             Renderer.OnPartialRenderFinished(args);
 
             return height;

@@ -185,6 +185,7 @@ namespace AlphaTab.Audio.Generator
             var masterBarLookup = new MasterBarTickLookup();
             masterBarLookup.MasterBar = masterBar;
             masterBarLookup.Start = currentTick;
+            masterBarLookup.Tempo = _currentTempo;
             masterBarLookup.End = masterBarLookup.Start + masterBar.CalculateDuration();
             TickLookup.AddMasterBar(masterBarLookup);
         }

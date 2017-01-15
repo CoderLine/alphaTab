@@ -170,7 +170,9 @@ namespace AlphaTab.Rendering.Layout
                     TotalHeight = Height,
                     Width = partial.Width,
                     Height = Height,
-                    RenderResult = result
+                    RenderResult = result,
+                    FirstMasterBarIndex = partial.MasterBars[0].Index,
+                    LastMasterBarIndex = partial.MasterBars[partial.MasterBars.Count - 1].Index
                 });
                 currentBarIndex += partial.MasterBars.Count;
             }

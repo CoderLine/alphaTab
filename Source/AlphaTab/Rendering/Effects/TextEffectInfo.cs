@@ -25,6 +25,7 @@ namespace AlphaTab.Rendering.Effects
     {
         public string EffectId { get { return "text"; } }
         public bool HideOnMultiTrack { get { return false; } }
+        public bool CanShareBand { get { return false; } }
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
 
         public bool ShouldCreateGlyph(Beat beat)

@@ -104,7 +104,7 @@ namespace AlphaTab.Audio.Generator
         public void FinishTrack(int track, int tick)
         {
             AddEvent(_midiFile.InfoTrack, tick, BuildMetaMessage(0x2F, new byte[0]));
-    }
+        }
 
 
         public void AddBend(int track, int tick, byte channel, byte value)

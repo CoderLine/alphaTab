@@ -200,7 +200,9 @@ namespace AlphaTab.Rendering.Layout
                 Height = height,
                 RenderResult = result,
                 TotalWidth = Width,
-                TotalHeight = Height
+                TotalHeight = Height,
+                FirstMasterBarIndex = -1,
+                LastMasterBarIndex = -1
             });
         }
     }

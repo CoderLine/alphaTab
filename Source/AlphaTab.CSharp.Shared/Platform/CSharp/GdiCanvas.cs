@@ -245,6 +245,13 @@ namespace AlphaTab.Platform.CSharp
             return null;
         }
 
+        public void BeginGroup(string identifier)
+        {
+        }
+
+        public void EndGroup()
+        {
+        }
 
         private void RecreateImage()
         {

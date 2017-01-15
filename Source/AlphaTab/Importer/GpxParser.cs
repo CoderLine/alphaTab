@@ -1555,35 +1555,41 @@ namespace AlphaTab.Importer
            
 
             // build automations
-            foreach (var barId in _automations.Keys)
-            {
-                var bar = _barsById[barId];
-                for (int i = 0, j = bar.Voices.Count; i < j; i++)
-                {
-                    var v = bar.Voices[i];
-                    if (v.Beats.Count > 0)
-                    {
-                        for (int k = 0, l = _automations[barId].Count; k < l; k++)
-                        {
-                            var automation = _automations[barId][k];
-                            v.Beats[0].Automations.Add(automation);
-                        }
-                    }
-                }
-            }
+            // TODO: automation <bar> identifies the bar index, not the bar ID. but it's not 
+            // clear which track they belong to.
+            //foreach (var barId in _automations.Keys)
+            //{
+            //    var bar = Score.MasterBars[Std.ParseInt(barId)];
+            //    for (int i = 0; i < UPPER; i++)
+            //    {
+                    
+            //    }
+            //    for (int i = 0, j = bar.Voices.Count; i < j; i++)
+            //    {
+            //        var v = bar.Voices[i];
+            //        if (v.Beats.Count > 0)
+            //        {
+            //            for (int k = 0, l = _automations[barId].Count; k < l; k++)
+            //            {
+            //                var automation = _automations[barId][k];
+            //                v.Beats[0].Automations.Add(automation);
+            //            }
+            //        }
+            //    }
+            //}
 
 
             // build automations
-            foreach (var barId in _automations.Keys)
+            foreach (var barIndex in _automations.Keys)
             {
-                var automations = _automations[barId];
-                var bar = _barsById[barId];
+                var automations = _automations[barIndex];
+                var masterBar = Score.MasterBars[Std.ParseInt(barIndex)];
                 for (int i = 0, j = automations.Count; i < j; i++)
                 {
                     var automation = automations[i];
                     if (automation.Type == AutomationType.Tempo)
                     {
-                        if (barId == "0") // // TODO find the correct first bar id
+                        if (barIndex == "0") // // TODO find the correct first bar id
                         {
                             Score.Tempo = (int)(automation.Value);
                             if (automation.Text != null)
@@ -1592,7 +1598,7 @@ namespace AlphaTab.Importer
                             }
                         }
 
-                        bar.MasterBar.TempoAutomation = automation;
+                        masterBar.TempoAutomation = automation;
                     }
                 }
             }

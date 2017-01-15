@@ -21,6 +21,8 @@ namespace AlphaTab.Platform.Model
 {
     public class Color
     {
+        public const string BlackRgb = "#000000";
+
         public Color(byte r, byte g, byte b, byte a = 0xFF)
         {
             Raw = (a << 24) | (r << 16) | (g << 8) | b;
@@ -76,5 +78,6 @@ namespace AlphaTab.Platform.Model
         {
             get; private set;
         }
+
     }
 }

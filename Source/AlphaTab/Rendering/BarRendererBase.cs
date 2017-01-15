@@ -188,11 +188,11 @@ namespace AlphaTab.Rendering
         }
 
         private int _appliedLayoutingInfo;
-        public virtual void ApplyLayoutingInfo()
+        public virtual bool ApplyLayoutingInfo()
         {
             if (_appliedLayoutingInfo >= LayoutingInfo.Version)
             {
-                return;
+                return false;
             }
             _appliedLayoutingInfo = LayoutingInfo.Version;
             // if we need additional space in the preBeat group we simply
@@ -218,6 +218,7 @@ namespace AlphaTab.Rendering
             _postBeatGlyphs.Width = LayoutingInfo.PostBeatSize;
 
             Width = _postBeatGlyphs.X + _postBeatGlyphs.Width;
+            return true;
         }
 
         public bool IsFinalized { get; private set; }

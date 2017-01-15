@@ -44,6 +44,8 @@ namespace AlphaTab.Importer
 
         private Duration _currentDuration;
 
+        public override string Name { get { return "AlphaTex"; } }
+
         public override Score ReadScore()
         {
             try
@@ -58,19 +60,29 @@ namespace AlphaTab.Importer
                 _score.Finish();
                 return _score;
             }
-            catch 
+            catch (Exception e)
             {
-                throw new UnsupportedFormatException();
+                if (Std.IsException<AlphaTexException>(e))
+                {
+                    throw new UnsupportedFormatException(e.Message);
+                }
+                throw e;
             }
         }
 
         private void Error(string nonterm, AlphaTexSymbols expected, bool symbolError = true)
         {
+            AlphaTexException e;
             if (symbolError)
             {
-                throw new AlphaTexException(_curChPos, nonterm, expected, _sy);
+                e = new AlphaTexException(_curChPos, nonterm, expected, _sy);
             }
-            throw new AlphaTexException(_curChPos, nonterm, expected, expected, _syData);
+            else
+            {
+                e = new AlphaTexException(_curChPos, nonterm, expected, expected, _syData);
+            }
+            Console.WriteLine(e.Message);
+            throw e;
         }
 
         /// <summary>

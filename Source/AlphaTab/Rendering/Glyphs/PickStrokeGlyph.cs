@@ -16,6 +16,7 @@
  * License along with this library.
  */
 using AlphaTab.Model;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
@@ -29,7 +30,12 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             Width = 9 * Scale;
-            Height = 20 * Scale;
+            Height = 10 * Scale;
+        }
+
+        public override void Paint(float cx, float cy, ICanvas canvas)
+        {
+            base.Paint(cx, cy + Height, canvas);
         }
 
         private static MusicFontSymbol GetSymbol(PickStrokeType pickStroke)

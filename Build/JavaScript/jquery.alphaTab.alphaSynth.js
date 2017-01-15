@@ -57,14 +57,18 @@
 	
     // updates the cursors to highlight the beat at the specified tick position
     api.playerCursorUpdateTick = function(element, context, tick) {
-        var cache = getTickCache(element);
-        if(cache) {
-            var tracks = api.tracks(element, context);
-            if(tracks.length > 0) {
-                var beat = cache.FindBeat(tracks, tick);
-                api.playerCursorUpdateBeat(element, context, beat);
+        requestAnimationFrame(function() {
+            var cache = getTickCache(element);
+            if(cache) {
+                var tracks = api.tracks(element, context);
+                if(tracks.length > 0) {
+                    var beat = cache.FindBeat(tracks, tick);
+                    if(beat) {
+                        api.playerCursorUpdateBeat(element, context, beat.CurrentBeat, beat.NextBeat, beat.Duration);    
+                    }                
+                }
             }
-        }
+        });
     };
     
     api.playerCursorSelectRange = function(element, context, startBeat, endBeat) {
@@ -99,12 +103,15 @@
 
         var startX = startBeat.bounds.RealBounds.X;
         var endX = endBeat.bounds.RealBounds.X + endBeat.bounds.RealBounds.W;
+        if(endBeat.beat.Index == endBeat.beat.Voice.Beats.length - 1) {
+            endX = endBeat.bounds.BarBounds.MasterBarBounds.RealBounds.X + endBeat.bounds.BarBounds.MasterBarBounds.RealBounds.W;
+        }
 
         // if the selection goes across multiple staves, we need a special selection highlighting
         if(startBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds != endBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds) {
             // from the startbeat to the end of the staff, 
             // then fill all staffs until the end-beat staff
-            // then from staff-start to the end beat
+            // then from staff-start to the end beat (or to end of bar if it's the last beat)
 
             var staffStartX = startBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.X;
             var staffEndX = startBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.X + startBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.W;
@@ -120,7 +127,6 @@
             
             var staffStartIndex = startBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.Index + 1;
             var staffEndIndex = endBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.Index;
-            console.log(staffStartIndex, staffEndIndex)
             for(var staffIndex = staffStartIndex; staffIndex < staffEndIndex; staffIndex++) {
                 var staffBounds = cache.StaveGroups[staffIndex];
                 
@@ -158,12 +164,22 @@
     };
     
     // updates the cursors to highlight the specified beat
-    api.playerCursorUpdateBeat = function(element, context, beat) {
+    api.playerCursorUpdateBeat = function(element, context, beat, nextBeat, duration) {
         if(beat == null) return;
-        context.cursorOptions.currentBeat = beat;
         
         var cache = getCursorCache(element);
         if(!cache) {
+            return;
+        }
+
+        var previousBeat = context.cursorOptions.currentBeat;
+        var previousCache = context.cursorOptions.cursorCache;
+        var previousState = context.cursorOptions.playerState;
+        context.cursorOptions.currentBeat = beat;
+        context.cursorOptions.cursorCache = cache;
+        context.cursorOptions.playerState = playerState;
+        
+        if(beat == previousBeat && cache == previousCache && previousState == playerState) {
             return;
         }
         
@@ -172,11 +188,10 @@
         var beatCursor = context.cursorOptions.beatCursor;
         
         var beatBoundings = cache.FindBeat(beat);
-        if(!beatBoundings)
-        {
+        if(!beatBoundings) {
             return;
         }        
-        
+               
         var barBoundings = beatBoundings.BarBounds.MasterBarBounds;
         barCursor.css({
             top: barBoundings.VisualBounds.Y + 'px', 
@@ -184,13 +199,35 @@
             width: barBoundings.VisualBounds.W + 'px',
             height: barBoundings.VisualBounds.H + 'px'
         });
-        beatCursor.css({
-            top: barBoundings.VisualBounds.Y + 'px', 
-            left: (beatBoundings.VisualBounds.X + beatBoundings.VisualBounds.W/2) + 'px',
-            width: context.cursorOptions.beatCursorWidth + 'px',
-            height: barBoundings.VisualBounds.H + 'px'
-        });
-        
+        beatCursor
+            .stop(true, false)    
+            .css({
+                top: barBoundings.VisualBounds.Y + 'px', 
+                left: (beatBoundings.VisualBounds.X) + 'px',
+                width: context.cursorOptions.beatCursorWidth + 'px',
+                height: barBoundings.VisualBounds.H + 'px'
+            })
+        ;
+            
+        // if playing, animate the cursor to the next beat
+        $('.atHighlight').removeClass('atHighlight');
+        if(playerState == 1) {
+            $('.b' + beat.Id).addClass('atHighlight');
+
+            var nextBeatX = barBoundings.VisualBounds.X + barBoundings.VisualBounds.W;
+            
+            // get position of next beat on same stavegroup
+            if(nextBeat) {
+                var nextBeatBoundings = cache.FindBeat(nextBeat);
+                if(nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds == barBoundings.StaveGroupBounds) {
+                    nextBeatX = nextBeatBoundings.VisualBounds.X;
+                }
+            }            
+            beatCursor.animate({
+                left: nextBeatX + 'px'
+            }, duration, 'linear');
+        }
+                
         if(!selecting) {
             if(context.cursorOptions.autoScroll == 'vertical') {
                 var padding = beatCursor.offset().top - beatBoundings.VisualBounds.Y;
@@ -293,6 +330,7 @@
         //
         // Hook into events
         var previousTick = 0;
+        var playerState = 0;
         
         // we need to update our position caches if we render a tablature
         element.on('post-rendered', function(e, score) {
@@ -306,9 +344,16 @@
         // cursor updating
         as.On('positionChanged', function(currentTime, endTime, currentTick, endTick) {
             previousTick = currentTick;
-            api.playerCursorUpdateTick(element, context, currentTick);
-                setTimeout(function() {
-                }, 0); // enqueue cursor update for later to return ExternalInterface call in case of Flash
+            console.log(currentTick);
+            setTimeout(function() {
+                api.playerCursorUpdateTick(element, context, currentTick);
+            }, 0); // enqueue cursor update for later to return ExternalInterface call in case of Flash
+        });
+        as.On('playerStateChanged', function(s) {
+            playerState = s;
+            setTimeout(function() {
+                api.playerCursorUpdateTick(element, context, previousTick);
+            }, 0); // enqueue cursor update for later to return ExternalInterface call in case of Flash
         });
         
         //
@@ -316,6 +361,9 @@
         
         if(context.cursorOptions.handleClick) {
             $(context.CanvasElement).on('mousedown', function(e) {
+                if(e.which != 1) {
+                    return;
+                }
                 e.preventDefault();
                                 
                 var parentOffset = $(this).offset();

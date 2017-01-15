@@ -31,6 +31,8 @@ namespace AlphaTab.Importer
         private int _trackFirstMeasureNumber;
         private int _maxVoices;
 
+        public override string Name { get { return "MusicXML"; } }
+
         public override Score ReadScore()
         {
             _trackById = new FastDictionary<string, Track>();

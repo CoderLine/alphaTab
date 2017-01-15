@@ -42,6 +42,9 @@ namespace AlphaTab.Platform
         TextAlign TextAlign { get; set; }
         TextBaseline TextBaseline { get; set; }
 
+        void BeginGroup(string identifier);
+        void EndGroup();
+
         void FillText(string text, float x, float y);
         float MeasureText(string text);
         void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol);

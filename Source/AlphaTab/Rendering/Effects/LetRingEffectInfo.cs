@@ -23,6 +23,7 @@ namespace AlphaTab.Rendering.Effects
     public class LetRingEffectInfo : NoteEffectInfoBase
     {
         public override string EffectId { get { return "let-ring"; } }
+        public override bool CanShareBand { get { return false; } }
 
         protected override bool ShouldCreateGlyphForNote(Note note)
         {

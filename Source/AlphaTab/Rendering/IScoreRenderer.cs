@@ -43,6 +43,8 @@ namespace AlphaTab.Rendering
         public float Height { get; set; }
         public float TotalWidth { get; set; }
         public float TotalHeight { get; set; }
+        public int FirstMasterBarIndex { get; set; }
+        public int LastMasterBarIndex { get; set; }
         public object RenderResult { get; set; }
     }
 }

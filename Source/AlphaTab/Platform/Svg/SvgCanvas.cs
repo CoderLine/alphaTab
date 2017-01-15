@@ -65,6 +65,16 @@ namespace AlphaTab.Platform.Svg
             _currentPathIsEmpty = true;
         }
 
+        public void BeginGroup(string identifier)
+        {
+            Buffer.Append("<g class=\"" + identifier + "\">");
+        }
+
+        public void EndGroup()
+        {
+            Buffer.Append("</g>");
+        }
+
         public virtual object EndRender()
         {
             Buffer.Append("</svg>");
@@ -75,7 +85,7 @@ namespace AlphaTab.Platform.Svg
         {
             if (w > 0)
             {
-                Buffer.Append("<rect x=\"" + ((int)x - BlurCorrection) + "\" y=\"" + ((int)y - BlurCorrection) + "\" width=\"" + w + "\" height=\"" + h + "\" style=\"fill:" + Color.RGBA + "; \" />\n");
+                Buffer.Append("<rect x=\"" + ((int)x - BlurCorrection) + "\" y=\"" + ((int)y - BlurCorrection) + "\" width=\"" + w + "\" height=\"" + h + "\" fill=\"" + Color.RGBA + "\" />\n");
             }
         }
 
@@ -89,14 +99,12 @@ namespace AlphaTab.Platform.Svg
                  + w
                  + "\" height=\""
                  + h
-                 + "\" style=\"stroke:"
-                 + Color.RGBA);
+                 + "\" stroke=\"" + Color.RGBA + "\"");
             if (LineWidth != 1)
             {
-                Buffer.Append("; stroke-width:");
-                Buffer.Append(LineWidth);
+                Buffer.Append(" stroke-width=\"" + LineWidth + "\"");
             }
-            Buffer.Append("; fill:transparent;\" />\n");
+            Buffer.Append(" fill=\"transparent\" />\n");
         }
 
         public void BeginPath()
@@ -144,7 +152,13 @@ namespace AlphaTab.Platform.Svg
         {
             if (!_currentPathIsEmpty)
             {
-                Buffer.Append("<path d=\"" + _currentPath + "\" style=\"fill:" + Color.RGBA + "\" stroke=\"none\"/>\n");
+                Buffer.Append("<path d=\"" + _currentPath + "\"");
+                if (Color.RGBA != Color.BlackRgb)
+                {
+                    Buffer.Append(" fill=\"" + Color.RGBA + "\"");
+                }
+                Buffer.Append(" stroke=\"none\"/>");
+
             }
             _currentPath = new StringBuilder();
             _currentPathIsEmpty = true;
@@ -154,13 +168,12 @@ namespace AlphaTab.Platform.Svg
         {
             if (!_currentPathIsEmpty)
             {
-                var s = "<path d=\"" + _currentPath + "\" style=\"stroke:" + Color.RGBA;
+                var s = "<path d=\"" + _currentPath + "\" stroke=\"" + Color.RGBA + "\"";
                 if (LineWidth != 1)
                 {
-                    s += "; stroke-width:";
-                    s += LineWidth;
+                    s += " stroke-width=\"" + LineWidth + "\"";
                 }
-                s += ";\" fill=\"none\" />\n";
+                s += " fill=\"none\" />";
                 Buffer.Append(s);
             }
             _currentPath = new StringBuilder();
@@ -169,10 +182,17 @@ namespace AlphaTab.Platform.Svg
 
         public void FillText(string text, float x, float y)
         {
-            var s = "<text x=\"" + ((int)x) + "\" y=\"" + ((int)y) + "\" style=\"font:" +
-                    Font.ToCssString() + "; fill:" + Color.RGBA + ";\" "
-                    + " dominant-baseline=\"" + GetSvgBaseLine() + "\" text-anchor=\"" + GetSvgTextAlignment() + "\">"
-                    + text + "</text>";
+            var s = "<text x=\"" + ((int)x) + "\" y=\"" + ((int)y) + "\" style=\"font:" + Font.ToCssString() + "\" "
+                    + " dominant-baseline=\"" + GetSvgBaseLine() + "\"";
+            if (Color.RGBA != Color.BlackRgb)
+            {
+                s += " fill=\"" + Color.RGBA + "\"";
+            }
+            if (TextAlign != TextAlign.Left)
+            {
+                s += " text-anchor=\"" + GetSvgTextAlignment() + "\"";
+            }
+            s+= ">" + text + "</text>";
             Buffer.Append(s);
         }
 

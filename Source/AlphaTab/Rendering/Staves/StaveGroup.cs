@@ -91,6 +91,14 @@ namespace AlphaTab.Rendering.Staves
             AccoladeSpacing = 0;
         }
 
+        public int FirstBarIndex
+        {
+            get
+            {
+                return MasterBarsRenderers[0].MasterBar.Index;
+            }
+        }
+        
         public int LastBarIndex
         {
             get

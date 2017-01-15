@@ -41,6 +41,8 @@ namespace AlphaTab.Importer
 
         private FastList<PlaybackInformation> _playbackInfos;
 
+        public override string Name { get { return "Guitar Pro 3-5"; } }
+
         public override Score ReadScore()
         {
             ReadVersion();

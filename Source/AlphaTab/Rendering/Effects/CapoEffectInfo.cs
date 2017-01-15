@@ -24,6 +24,7 @@ namespace AlphaTab.Rendering.Effects
     {
         public string EffectId { get { return "capo"; } }
         public bool HideOnMultiTrack { get { return false; } }
+        public bool CanShareBand { get { return false; } }
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
 
         public bool ShouldCreateGlyph(Beat beat)

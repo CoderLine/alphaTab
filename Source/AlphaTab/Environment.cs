@@ -116,8 +116,6 @@ namespace AlphaTab
                     new TextEffectInfo(), 
                     new ChordsEffectInfo(), 
                     new TripletFeelEffectInfo(), 
-                    new BeatVibratoEffectInfo(), 
-                    new NoteVibratoEffectInfo(),
                     new TrillEffectInfo(), 
                     new BeatVibratoEffectInfo(), 
                     new NoteVibratoEffectInfo(), 

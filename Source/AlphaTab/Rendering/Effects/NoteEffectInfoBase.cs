@@ -43,6 +43,7 @@ namespace AlphaTab.Rendering.Effects
 
         public abstract string EffectId { get; }
         public virtual bool HideOnMultiTrack { get { return false; } }
+        public virtual bool CanShareBand { get { return true; } }
         public abstract EffectBarGlyphSizing SizingMode { get; }
         public abstract EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat);
 

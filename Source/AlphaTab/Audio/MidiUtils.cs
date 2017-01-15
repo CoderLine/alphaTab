@@ -44,6 +44,18 @@ namespace AlphaTab.Audio
         /// </summary>
         /// <param name="duration"></param>
         /// <returns></returns>
+        public static int TicksToMillis(int ticks, int tempo)
+        {
+            return (int)(ticks * (60000.0 / (tempo * QuarterTime)));
+        }
+
+
+
+        /// <summary>
+        /// Converts a duration value to its ticks equivalent.
+        /// </summary>
+        /// <param name="duration"></param>
+        /// <returns></returns>
         public static int ToTicks(this Duration duration)
         {
             return ValueToTicks((int)duration);

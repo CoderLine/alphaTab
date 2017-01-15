@@ -48,6 +48,7 @@ namespace AlphaTab.Importer
             Data = data;
         }
 
+        public abstract string Name { get; }
         public abstract Score ReadScore();
     }
 }

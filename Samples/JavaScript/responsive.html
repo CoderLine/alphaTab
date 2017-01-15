@@ -26,18 +26,22 @@
     <link rel="stylesheet" href="support/demo.css" />
     <style type="text/css">
     .barCursor {
-        opacity: 0.25;
+        opacity: 0.15;
         background:#FFF200;
     }
 
     .beatCursor {
         opacity: 0.75;
-        background:#4040FF;
+        background:#0078ff;
     }
     
     .selectionWrapper div {
         opacity: 0.1;
         background:#4040FF;
+    }
+    
+    .atHighlight * {
+        fill: #0078ff;
     }
     
 	.alphaTabSurface { box-shadow: 0 0 10px rgba(0,0,0,0.3); background:#FFF; border-radius:3px; }
@@ -79,7 +83,7 @@
       </div>
     </nav>
     
-    <div id="alphaTab" data-file="files/NightWish.gp5" data-tracks="3"></div>
+    <div id="alphaTab" data-file="files/canon.gp5" data-tracks="0"></div>
     
     <script type="text/javascript">
         var playerReady = false;
@@ -109,8 +113,8 @@
         at.alphaTab({
             width: -1, // negative width enables auto sizing
             resizeTimeout: 1,
-            // engine: 'html5'
-            useWorker: true
+            engine: window.location.search.indexOf('html5') === -1 ? 'default' : 'html5',
+            //useWorker: true
         });         
         
         // 
@@ -177,7 +181,7 @@
                 
         //
         // 3. Add cursors (optional)
-        at.alphaTab('playerCursor'); 
+        //at.alphaTab('playerCursor'); 
     
     </script>
     

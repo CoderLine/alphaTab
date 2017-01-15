@@ -33,31 +33,43 @@ namespace AlphaTab.Audio.Model
     {
         public int Start { get; set; }
         public int End { get; set; }
+        public int Tempo { get; set; }
         public MasterBar MasterBar { get; set; }
-        public FastDictionary<int, FastList<BeatTickLookup>> BeatsPerTrack { get; set; }
+        //public FastDictionary<int, FastList<BeatTickLookup>> BeatsPerTrack { get; set; }
+        public FastList<BeatTickLookup> Beats { get; set; }
 
         public MasterBarTickLookup()
         {
-            BeatsPerTrack = new FastDictionary<int, FastList<BeatTickLookup>>();
+            //BeatsPerTrack = new FastDictionary<int, FastList<BeatTickLookup>>();
+            Beats = new FastList<BeatTickLookup>();
         }
 
         public void Finish()
         {
-            foreach (var track in BeatsPerTrack)
-            {
-                BeatsPerTrack[track].Sort((a, b) => a.Start - b.Start);
-            }
+            Beats.Sort((a, b) => a.Start - b.Start);
+            //foreach (var track in BeatsPerTrack)
+            //{
+            //    BeatsPerTrack[track].Sort((a, b) => a.Start - b.Start);
+            //}
         }
 
         public void AddBeat(BeatTickLookup beat)
         {
-            var track = beat.Beat.Voice.Bar.Staff.Track.Index;
-            if (!BeatsPerTrack.ContainsKey(track))
-            {
-                BeatsPerTrack[track] = new FastList<BeatTickLookup>();
-            }
-            BeatsPerTrack[track].Add(beat);
+            //var track = beat.Beat.Voice.Bar.Staff.Track.Index;
+            //if (!BeatsPerTrack.ContainsKey(track))
+            //{
+            //    BeatsPerTrack[track] = new FastList<BeatTickLookup>();
+            //}
+            //BeatsPerTrack[track].Add(beat);
+            Beats.Add(beat);
         }
+    }
+
+    public class MidiTickLookupFindBeatResult
+    {
+        public Beat CurrentBeat { get; set; }
+        public Beat NextBeat { get; set; }
+        public int Duration { get; set; }
     }
 
     public class MidiTickLookup
@@ -79,7 +91,7 @@ namespace AlphaTab.Audio.Model
             }
         }
 
-        public Beat FindBeat(Track[] tracks, int tick)
+        public MidiTickLookupFindBeatResult FindBeat(Track[] tracks, int tick)
         {
             // get all beats within the masterbar
             var masterBar = FindMasterBar(tick);
@@ -88,30 +100,37 @@ namespace AlphaTab.Audio.Model
                 return null;
             }
 
-            BeatTickLookup beat = null;
-            for (int t = 0; t < tracks.Length; t++)
+            var trackLookup = new FastDictionary<int, bool>();
+            foreach (var track in tracks)
             {
-                var beats = masterBar.BeatsPerTrack[tracks[t].Index];
-                if (beats != null)
+                trackLookup[track.Index] = true;
+            }
+
+            BeatTickLookup beat = null;
+            int index = 0;
+            var beats = masterBar.Beats;
+            for (int b = 0; b < beats.Count; b++)
+            {
+                // is the current beat played on the given tick?
+                var currentBeat = beats[b];
+                // skip non relevant beats
+                if (!trackLookup.ContainsKey(currentBeat.Beat.Voice.Bar.Staff.Track.Index))
                 {
-                    for (int b = 0; b < beats.Count; b++)
+                    continue;
+                }
+                if (currentBeat.Start <= tick && tick < currentBeat.End)
+                {
+                    // take the latest played beat we can find. (most right)
+                    if (beat == null || (beat.Start < currentBeat.Start))
                     {
-                        // is the current beat played on the given tick?
-                        var currentBeat = beats[b];
-                        if (currentBeat.Start <= tick && tick < currentBeat.End)
-                        {
-                            // take the latest played beat we can find. (most right)
-                            if (beat == null || (beat.Start < currentBeat.Start))
-                            {
-                                beat = beats[b];
-                            }
-                        }
-                        // if we are already past the tick, we can stop searching
-                        else if (currentBeat.End > tick)
-                        {
-                            break;
-                        }
+                        beat = beats[b];
+                        index = b;
                     }
+                }
+                // if we are already past the tick, we can stop searching
+                else if (currentBeat.End > tick)
+                {
+                    break;
                 }
             }
 
@@ -120,7 +139,39 @@ namespace AlphaTab.Audio.Model
                 return null;
             }
 
-            return beat.Beat;
+            // search for next relevant beat in masterbar
+            BeatTickLookup nextBeat = null;
+            for (int b = index + 1; b < beats.Count; b++)
+            {
+                var currentBeat = beats[b];
+                if (trackLookup.ContainsKey(currentBeat.Beat.Voice.Bar.Staff.Track.Index))
+                {
+                    nextBeat = currentBeat;
+                    break;
+                }
+            }
+
+            // first relevant beat in next bar
+            if (nextBeat == null && masterBar.MasterBar.NextMasterBar != null)
+            { 
+                var nextBar = GetMasterBar(masterBar.MasterBar.NextMasterBar);
+                beats = nextBar.Beats;
+                for (int b = 0; b < beats.Count; b++)
+                {
+                    var currentBeat = beats[b];
+                    if (trackLookup.ContainsKey(currentBeat.Beat.Voice.Bar.Staff.Track.Index))
+                    {
+                        nextBeat = currentBeat;
+                        break;
+                    }
+                }
+            }
+
+            var result = new MidiTickLookupFindBeatResult();
+            result.CurrentBeat = beat.Beat;
+            result.NextBeat = nextBeat == null ? null : nextBeat.Beat;
+            result.Duration = MidiUtils.TicksToMillis(beat.End - beat.Start, masterBar.Tempo);
+            return result;
         }
 
         private MasterBarTickLookup FindMasterBar(int tick)
@@ -152,6 +203,21 @@ namespace AlphaTab.Audio.Model
             }
 
             return null;
+        }
+
+        public MasterBarTickLookup GetMasterBar(MasterBar bar)
+        {
+            if (!MasterBarLookup.ContainsKey(bar.Index))
+            {
+                return new MasterBarTickLookup
+                {
+                    Start = 0,
+                    End = 0,
+                    Beats = new FastList<BeatTickLookup>(),
+                    MasterBar = bar
+                };
+            }
+            return MasterBarLookup[bar.Index];
         }
 
         public int GetMasterBarStart(MasterBar bar)

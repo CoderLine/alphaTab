@@ -214,6 +214,7 @@ namespace AlphaTab.Model
 
         public static void CopyTo(Beat src, Beat dst)
         {
+            dst.Id = src.Id;
             dst.Index = src.Index;
             dst.IsEmpty = src.IsEmpty;
             dst.Duration = src.Duration;
@@ -244,6 +245,7 @@ namespace AlphaTab.Model
         public Beat Clone()
         {
             var beat = new Beat();
+            var id = beat.Id;
             for (int i = 0, j = WhammyBarPoints.Count; i < j; i++)
             {
                 beat.AddWhammyBarPoint(WhammyBarPoints[i].Clone());
@@ -257,6 +259,7 @@ namespace AlphaTab.Model
             {
                 beat.Automations.Add(Automations[i].Clone());
             }
+            beat.Id = id;
             return beat;
         }
 

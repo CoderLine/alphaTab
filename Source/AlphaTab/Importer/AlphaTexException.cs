@@ -33,11 +33,11 @@ namespace AlphaTab.Importer
             {
                 if (SymbolData == null)
                 {
-                    return Position + ": Error on block " + NonTerm +
+                    return "MalFormed AlphaTex: @" + Position + ": Error on block " + NonTerm +
                            ", expected a " + Expected + " found a " + Symbol;
                 }
 
-                return Position + ": Error on block " + NonTerm +
+                return "MalFormed AlphaTex: @"+ Position + ": Error on block " + NonTerm +
                        ", invalid value: " + SymbolData;
             }
         }
