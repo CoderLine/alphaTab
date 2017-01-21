@@ -670,6 +670,7 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
         this.CanvasElement = document.createElement("div");
         this.CanvasElement.className = "alphaTabSurface";
         this.CanvasElement.style.fontSize = "0";
+        this.CanvasElement.style.lineHeight = "0";
         element.appendChild(this.CanvasElement);
         this.AutoSize = settings.Width < 0;
         if (this.AutoSize){

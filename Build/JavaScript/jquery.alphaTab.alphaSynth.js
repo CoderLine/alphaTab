@@ -97,38 +97,40 @@
             height: barBoundings.VisualBounds.H + 'px'
         });
         
-        if(context.cursorOptions.autoScroll == 'vertical') {
-            var padding = beatCursor.offset().top - beatBoundings.VisualBounds.Y;
-            var scrollTop = padding + beatBoundings.RealBounds.Y + context.cursorOptions.scrollOffset;
-            if(scrollTop != context.cursorOptions.lastScroll) {
-                context.cursorOptions.lastScroll = scrollTop;
-                $(context.cursorOptions.scrollElement).animate({
-                    scrollTop:scrollTop + 'px'
-                }, context.cursorOptions.scrollSpeed);
+        if(context.playerState === 1 /*playing*/) {        
+            if(context.cursorOptions.autoScroll == 'vertical') {
+                var padding = beatCursor.offset().top - beatBoundings.VisualBounds.Y;
+                var scrollTop = padding + beatBoundings.RealBounds.Y + context.cursorOptions.scrollOffset;
+                if(scrollTop != context.cursorOptions.lastScroll) {
+                    context.cursorOptions.lastScroll = scrollTop;
+                    $(context.cursorOptions.scrollElement).animate({
+                        scrollTop:scrollTop + 'px'
+                    }, context.cursorOptions.scrollSpeed);
+                }
             }
-        }
-        else if(context.cursorOptions.autoScroll == 'horizontal-bar') {
-            var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
-            if(barBoundings.VisualBounds.X != context.cursorOptions.lastScroll) {
-                var scrollLeft = padding + beatBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
-                context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
-                $(context.cursorOptions.scrollElement).animate({
-                    scrollLeft:scrollLeft + 'px'
-                }, context.cursorOptions.scrollSpeed);
+            else if(context.cursorOptions.autoScroll == 'horizontal-bar') {
+                var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
+                if(barBoundings.VisualBounds.X != context.cursorOptions.lastScroll) {
+                    var scrollLeft = padding + beatBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
+                    context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
+                    $(context.cursorOptions.scrollElement).animate({
+                        scrollLeft:scrollLeft + 'px'
+                    }, context.cursorOptions.scrollSpeed);
+                }
             }
-        }
-        else if(context.cursorOptions.autoScroll == 'horizontal-offscreen') {
-            var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
-            var elementRight = $(context.cursorOptions.scrollElement).scrollLeft() + 
-                               $(context.cursorOptions.scrollElement).width();
-            if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || 
-                 barBoundings.VisualBounds.X < $(context.cursorOptions.scrollElement).scrollLeft()
-            ) {
-                var scrollLeft = padding + beatBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
-                context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
-                $(context.cursorOptions.scrollElement).animate({
-                    scrollLeft:scrollLeft + 'px'
-                }, context.cursorOptions.scrollSpeed);
+            else if(context.cursorOptions.autoScroll == 'horizontal-offscreen') {
+                var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
+                var elementRight = $(context.cursorOptions.scrollElement).scrollLeft() + 
+                                   $(context.cursorOptions.scrollElement).width();
+                if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || 
+                     barBoundings.VisualBounds.X < $(context.cursorOptions.scrollElement).scrollLeft()
+                ) {
+                    var scrollLeft = padding + beatBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
+                    context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
+                    $(context.cursorOptions.scrollElement).animate({
+                        scrollLeft:scrollLeft + 'px'
+                    }, context.cursorOptions.scrollSpeed);
+                }
             }
         }
     };
@@ -209,6 +211,11 @@
             api.playerCursorUpdateTick(element, context, currentTick);
                 setTimeout(function() {
                 }, 0); // enqueue cursor update for later to return ExternalInterface call in case of Flash
+        });
+        
+        context.playerState = 0;
+        as.On('playerStateChanged', function(s) {
+            context.playerState = s;
         });
         
         //
