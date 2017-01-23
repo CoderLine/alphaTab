@@ -35,7 +35,7 @@ namespace AlphaTab.Util
         {
             if (logLevel < LogLevel) return;
             var caller = Std.GetCallerName();
-            Std.Log("[AlphaTab][" + category + "] " + caller + " - " + msg, LogLevel);
+            Std.Log("[AlphaTab][" + category + "] " + caller + " - " + msg, logLevel);
         }
     }
 

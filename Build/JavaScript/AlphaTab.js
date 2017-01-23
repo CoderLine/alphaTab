@@ -640,14 +640,17 @@ AlphaTab.Platform.JavaScript.ResizeEventArgs = function (){
 AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
     this.Element = null;
     this.CanvasElement = null;
+    this.Settings = null;
     this.TrackIndexes = null;
     this.AutoSize = false;
+    this._visibilityCheckerInterval = 0;
+    this._visibilityCheckerIntervalId = 0;
     this.Renderer = null;
     this.Score = null;
     this.Element = element;
     var dataset = this.Element.dataset;
     // load settings
-    var settings = AlphaTab.Settings.FromJson(options);
+    var settings = this.Settings = AlphaTab.Settings.FromJson(options);
     // get track data to parse
     var tracksData;
     if (options != null && options.tracks){
@@ -675,22 +678,13 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
         this.AutoSize = settings.Width < 0;
         if (this.AutoSize){
             settings.Width = element.offsetWidth;
-            if (options){
-                options.width = element.offsetWidth;
-            }
             var timeoutId = 0;
             window.addEventListener("resize", $CreateAnonymousDelegate(this, function (e){
+                // resize throttle
                 window.clearTimeout(timeoutId);
                 timeoutId = window.setTimeout($CreateAnonymousDelegate(this, function (){
                     if (element.offsetWidth != settings.Width){
-                        var resizeEventInfo = new AlphaTab.Platform.JavaScript.ResizeEventArgs();
-                        resizeEventInfo.OldWidth = settings.Width;
-                        resizeEventInfo.NewWidth = element.offsetWidth;
-                        resizeEventInfo.Settings = settings;
-                        this.TriggerEvent("resize", resizeEventInfo);
-                        settings.Width = resizeEventInfo.NewWidth;
-                        this.Renderer.UpdateSettings(settings);
-                        this.Renderer.Resize(element.offsetWidth);
+                        this.TriggerResize();
                     }
                 }), 100);
             }));
@@ -718,20 +712,71 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
     }));
     this.Renderer.add_PartialRenderFinished($CreateDelegate(this, this.AppendRenderResult));
     this.Renderer.add_RenderFinished($CreateDelegate(this, this.AppendRenderResult));
-    if (!((contents==null)||(contents.length==0))){
-        this.Tex(contents);
+    var initialRender = $CreateAnonymousDelegate(this, function (){
+        // rendering was possibly delayed due to invisible element
+        // in this case we need the correct width for autosize
+        if (this.AutoSize){
+            this.Settings.Width = this.Element.offsetWidth;
+            this.Renderer.UpdateSettings(settings);
+        }
+        if (!((contents==null)||(contents.length==0))){
+            this.Tex(contents);
+        }
+        else if (options && options.file){
+            this.Load(options.file);
+        }
+        else if (this.Element != null && this.Element.dataset != null && !((dataset["file"]==null)||(dataset["file"].length==0))){
+            this.Load(dataset["file"]);
+        }
+        else if (this.Element != null && !((this.Element.getAttribute("data-file")==null)||(this.Element.getAttribute("data-file").length==0))){
+            this.Load(this.Element.getAttribute("data-file"));
+        }
+    });
+    this._visibilityCheckerInterval = options.visibilityCheckInterval || 500;
+    if (this.get_IsElementVisible()){
+        // element is visible, so we start rendering
+        initialRender();
     }
-    else if (options && options.file){
-        this.Load(options.file);
-    }
-    else if (this.Element != null && this.Element.dataset != null && !((dataset["file"]==null)||(dataset["file"].length==0))){
-        this.Load(dataset["file"]);
-    }
-    else if (this.Element != null && !((this.Element.getAttribute("data-file")==null)||(this.Element.getAttribute("data-file").length==0))){
-        this.Load(this.Element.getAttribute("data-file"));
+    else {
+        // if the alphaTab element is not visible, we postpone the rendering
+        // we check in a regular interval whether it became available. 
+        AlphaTab.Util.Logger.Warning("Rendering", "AlphaTab container is invisible, checking for element visibility in " + this._visibilityCheckerInterval + "ms intervals");
+        this._visibilityCheckerIntervalId = setInterval($CreateAnonymousDelegate(this, function (){
+            if (this.get_IsElementVisible()){
+                AlphaTab.Util.Logger.Info("Rendering", "AlphaTab container became visible, triggering initial rendering");
+                initialRender();
+                clearInterval(this._visibilityCheckerIntervalId);
+                this._visibilityCheckerIntervalId = 0;
+            }
+        }), this._visibilityCheckerInterval);
     }
 };
 AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
+    get_IsElementVisible: function (){
+        return !!(this.Element.offsetWidth || this.Element.offsetHeight || this.Element.getClientRects().length);
+    },
+    TriggerResize: function (){
+        // if the element is visible, perfect, we do the update
+        if (this.get_IsElementVisible()){
+            if (this._visibilityCheckerIntervalId != 0){
+                AlphaTab.Util.Logger.Info("Rendering", "AlphaTab container became visible again, doing autosizing");
+                clearInterval(this._visibilityCheckerIntervalId);
+                this._visibilityCheckerIntervalId = 0;
+            }
+            var resizeEventInfo = new AlphaTab.Platform.JavaScript.ResizeEventArgs();
+            resizeEventInfo.OldWidth = this.Settings.Width;
+            resizeEventInfo.NewWidth = this.Element.offsetWidth;
+            resizeEventInfo.Settings = this.Settings;
+            this.TriggerEvent("resize", resizeEventInfo);
+            this.Settings.Width = resizeEventInfo.NewWidth;
+            this.Renderer.UpdateSettings(this.Settings);
+            this.Renderer.Resize(this.Element.offsetWidth);
+        }
+        else if (this._visibilityCheckerIntervalId == 0){
+            AlphaTab.Util.Logger.Warning("Rendering", "AlphaTab container was invisible while autosizing, checking for element visibility in " + this._visibilityCheckerInterval + "ms intervals");
+            this._visibilityCheckerIntervalId = setInterval($CreateDelegate(this, this.TriggerResize), this._visibilityCheckerInterval);
+        }
+    },
     AppendRenderResult: function (result){
         this.CanvasElement.style.width = result.TotalWidth + "px";
         this.CanvasElement.style.height = result.TotalHeight + "px";
@@ -14915,6 +14960,10 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
         this.Settings = settings;
     },
     Invalidate: function (){
+        if (this.Settings.Width == 0){
+            AlphaTab.Util.Logger.Warning("Rendering", "AlphaTab skipped rendering because of width=0 (element invisible)");
+            return;
+        }
         this.BoundsLookup = new AlphaTab.Rendering.Utils.BoundsLookup();
         if (this.Tracks.length == 0)
             return;
@@ -16686,7 +16735,7 @@ AlphaTab.Util.Logger.Log = function (logLevel, category, msg){
     if (logLevel < AlphaTab.Util.Logger.LogLevel)
         return;
     var caller = arguments.callee.caller.caller.name;
-    AlphaTab.Platform.Std.Log("[AlphaTab][" + category + "] " + caller + " - " + msg, AlphaTab.Util.Logger.LogLevel);
+    AlphaTab.Platform.Std.Log("[AlphaTab][" + category + "] " + caller + " - " + msg, logLevel);
 };
 AlphaTab.Util.LogLevel = {
     None: 0,

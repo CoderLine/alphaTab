@@ -112,6 +112,11 @@ namespace AlphaTab.Rendering
 
         public void Invalidate()
         {
+            if (Settings.Width == 0)
+            {
+                Logger.Warning("Rendering", "AlphaTab skipped rendering because of width=0 (element invisible)");
+                return;
+            }
             BoundsLookup = new BoundsLookup();
             if (Tracks.Length == 0) return;
             if (RenderingResources.Scale != Settings.Scale)
