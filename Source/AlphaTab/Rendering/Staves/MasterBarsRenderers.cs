@@ -30,6 +30,7 @@ namespace AlphaTab.Rendering.Staves
         public bool IsLinkedToPrevious { get; set; }
         public MasterBar MasterBar { get; set; }
         public FastList<BarRendererBase> Renderers { get; set; }
+        public BarLayoutingInfo LayoutingInfo { get; set; }
 
         public MasterBarsRenderers()
         {

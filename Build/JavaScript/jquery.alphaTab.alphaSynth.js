@@ -225,52 +225,52 @@
             }            
             beatCursor.animate({
                 left: nextBeatX + 'px'
-            }, duration, 'linear');
-        }
+            }, duration, 'linear');        
                 
-        if(!selecting) {
-            
-            // calculate position of whole music wheet within the scroll parent
-            var scrollElement = $(context.cursorOptions.scrollElement);
-            var scrollElementOffset = scrollElement.offset();
-            var elementOffset = element.offset();
-            elementOffset = {
-                top: elementOffset.top - scrollElementOffset.top,
-                left: elementOffset.left - scrollElementOffset.left,
-            };
-            if(context.cursorOptions.autoScroll == 'vertical') {
-                var scrollTop = beatBoundings.RealBounds.Y - elementOffset.top;
-                if(scrollTop != context.cursorOptions.lastScroll) {
-                    context.cursorOptions.lastScroll = scrollTop;
-                    $(context.cursorOptions.scrollElement).animate({
-                        scrollTop:scrollTop + 'px'
-                    }, context.cursorOptions.scrollSpeed);
+            if(!selecting) {
+                
+                // calculate position of whole music wheet within the scroll parent
+                var scrollElement = $(context.cursorOptions.scrollElement);
+                var scrollElementOffset = scrollElement.offset();
+                var elementOffset = element.offset();
+                elementOffset = {
+                    top: elementOffset.top - scrollElementOffset.top,
+                    left: elementOffset.left - scrollElementOffset.left,
+                };
+                if(context.cursorOptions.autoScroll == 'vertical') {
+                    var scrollTop = beatBoundings.RealBounds.Y - elementOffset.top;
+                    if(scrollTop != context.cursorOptions.lastScroll) {
+                        context.cursorOptions.lastScroll = scrollTop;
+                        $(context.cursorOptions.scrollElement).animate({
+                            scrollTop:scrollTop + 'px'
+                        }, context.cursorOptions.scrollSpeed);
+                    }
                 }
-            }
-            else if(context.cursorOptions.autoScroll == 'horizontal-bar') {
-                var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
-                if(barBoundings.VisualBounds.X != context.cursorOptions.lastScroll) {
-                    var scrollLeft = padding + beatBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
-                    context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
-                    $(context.cursorOptions.scrollElement).animate({
-                        scrollLeft:scrollLeft + 'px'
-                    }, context.cursorOptions.scrollSpeed);
+                else if(context.cursorOptions.autoScroll == 'horizontal-bar') {
+                    var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
+                    if(barBoundings.VisualBounds.X != context.cursorOptions.lastScroll) {
+                        var scrollLeft = padding + beatBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
+                        context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
+                        $(context.cursorOptions.scrollElement).animate({
+                            scrollLeft:scrollLeft + 'px'
+                        }, context.cursorOptions.scrollSpeed);
+                    }
                 }
-            }
-            else if(context.cursorOptions.autoScroll == 'horizontal-offscreen') {
-                var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
-                var elementRight = $(context.cursorOptions.scrollElement).scrollLeft() + 
-                                   $(context.cursorOptions.scrollElement).width();
-                if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || 
-                     barBoundings.VisualBounds.X < $(context.cursorOptions.scrollElement).scrollLeft()
-                ) {
-                    var scrollLeft = padding + beatBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
-                    context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
-                    $(context.cursorOptions.scrollElement).animate({
-                        scrollLeft:scrollLeft + 'px'
-                    }, context.cursorOptions.scrollSpeed);
+                else if(context.cursorOptions.autoScroll == 'horizontal-offscreen') {
+                    var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
+                    var elementRight = $(context.cursorOptions.scrollElement).scrollLeft() + 
+                                       $(context.cursorOptions.scrollElement).width();
+                    if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || 
+                         barBoundings.VisualBounds.X < $(context.cursorOptions.scrollElement).scrollLeft()
+                    ) {
+                        var scrollLeft = padding + beatBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
+                        context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
+                        $(context.cursorOptions.scrollElement).animate({
+                            scrollLeft:scrollLeft + 'px'
+                        }, context.cursorOptions.scrollSpeed);
+                    }
                 }
-            }
+            }            
         }
     };
 

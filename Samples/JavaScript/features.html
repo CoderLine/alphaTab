@@ -38,694 +38,698 @@
     </nav>
     
     <div class="container">
-    <div id="all" class="group">
-        <h1>Showcase</h1>
-        
-        <p>
-            Here is a small example what you can expect from alphaTab. 
-        </p>
-        
-        <div id="alphaTabShowcase" data-file="files/Canon.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabShowcase').alphaTab({
-                useWorker: true
-            });
-        </script>
+    
+        <div class="tab-container">
+            <div id="all" class="group">
+                <h1>Showcase</h1>
+                
+                <p>
+                    Here is a small example what you can expect from alphaTab. 
+                </p>
+                
+                <div id="alphaTabShowcase" data-file="files/Canon.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabShowcase').alphaTab({
+                        useWorker: true
+                    });
+                </script>
+                    
+            </div>
+                    
+            <div id="general" class="group">
+            <h1>General</h1>
             
-    </div>
+            <h2>Score Details</h2>
             
-    <div id="general" class="group">
-    <h1>General</h1>
-    
-    <h2>Score Details</h2>
-    
-    <p>
-        The full score details are available as object dom. This way you can read and process any
-        file like you need. 
-    </p>
-    
-    <div id="alphaTabScore" data-file="files/features/Skillet.gp5">
-        Loading...        
-    </div>
-    <script type="text/javascript-lazy">
-        var score = AlphaTab.Importer.ScoreLoader.LoadScoreAsync($('#alphaTabScore').data('file'), 
-        function(score) {
-            var info = jQuery('#alphaTabScore');
-            info.html('');
-            info.append('<p><b>Title:</b> '+score.Title+'</p>');
-            info.append('<p><b>Subtitle:</b> '+score.Subtitle+'</p>');
-            info.append('<p><b>Album:</b> '+score.Album+'</p>');
-            info.append('<p><b>Tempo:</b> '+score.Tempo+'</p>');
-            info.append('<p><b>Bars:</b> '+score.MasterBars.length+'</p>');
-            info.append('<p><b>Tracks:</b> ('+score.Tracks.length+')</p>');
-            var tracks = $('<ul></ul>');
-            for(var i = 0; i < score.Tracks.length; i++) {
-                tracks.append('<li>'+score.Tracks[i].Name+'</li>');
-            }
-            info.append(tracks);
-        },
-        function(error) {
-            jQuery('#alphaTabScore').text('Error Loading the file: ' + error);
-        });
-    </script>
-    
-    <h2>Song Details</h2>
-    
-    <p>
-        Some of the layout engines can render the song details on top of the music sheet.
-    </p>
-    
-    <div id="alphaTabDetails" data-file="files/features/SongDetails.gp5"></div>
-    <script type="text/javascript-lazy">
-        $('#alphaTabDetails').alphaTab();
-    </script>
-        
-    <h2>HTML5 Canvas</h2>
-    
-    <p>
-        Do you prefer an HTML5 canvas output instead of SVG? No problem.
-    </p>
-    
-    <div id="alphaTabHtml5" data-file="files/features/SongDetails.gp5"></div>
-    <script type="text/javascript-lazy">
-        $('#alphaTabHtml5').alphaTab({
-            engine: 'html5' 
-        });
-    </script>
-    
-    <h2>Repeats</h2>
-    
-    <p>
-        Need display repeat marks? No problem, single repeats and multiple repeats come out of the box.
-    </p>
-    
-    <div id="alphaTabRepeats" data-file="files/features/Repeats.gp5"></div>
-    <script type="text/javascript-lazy">
-        $('#alphaTabRepeats').alphaTab({
-            staves: 'score'
-        });
-    </script>
-
-    
-    <h2>Alternate Endings</h2>
-    
-    <p>
-       Even alternate repeat endings are no problem. 
-    </p>
-    
-    <div id="alphaTabAlternateEndings" data-file="files/features/AlternateEndings.gp5"></div>
-    <script type="text/javascript-lazy">
-        $('#alphaTabAlternateEndings').alphaTab({
-            staves: 'score'
-        });
-    </script>
-    
-    <h2>Tunings</h2>
-    
-    <p>
-        The guitar tuning of the current track is rendered on the top of the music notation.
-    </p>
-    
-    <div id="alphaTabTuning" data-file="files/features/Tuning.gp5"></div>
-    <script type="text/javascript-lazy">
-        $('#alphaTabTuning').alphaTab();
-    </script>
-
-    </div>
-
-    <div id="layouts" class="group">
-    <h1>Layouts</h1>
-    
-    <p>
-        alphaTab supports several different layouts which align bars in a various manner. 
-    </p>
-    
-    <h2>Page Layout</h2>
-    
-    <p>
-        All bars are aligned in rows side by side till the row is full. 
-    </p>
-    
-    <div id="alphaTabPageLayout" data-file="files/features/Skillet.gp5"></div>
-    <script type="text/javascript-lazy">
-        $('#alphaTabPageLayout').alphaTab({
-            layout: 'page'
-        });
-    </script>
-    
-    <!-- <h2>Multi Track</h2>
-    
-    <p>
-        You want to render multiple tracks at once. No Problem
-    </p>
-    
-    <div id="alphaTabPageMuliTrack" data-file="files/features/Skillet.gp5" data-tracks="[0,3]"></div>
-    <script type="text/javascript-lazy">
-        $('#alphaTabPageMuliTrack').alphaTab({
-            layout: 'page'
-        });
-    </script> -->
-    
-    <h2>Page Layout (custom width)</h2>
-    
-    <p>
-        All bars are aligned in rows side by side till the row is full. 
-    </p>
-    
-    <div id="alphaTabPageLayoutWidth" data-file="files/features/Skillet.gp5"></div>
-    <script type="text/javascript-lazy">
-        $('#alphaTabPageLayoutWidth').alphaTab({
-            width: 1280
-        });
-    </script>
-
-
-    <h2>Page Layout (5 bars per row)</h2>
-    
-    <p>
-        You can configure how many bars should be placed per row
-    </p>
-    
-    <div id="alphaTabPagePerRow" data-file="files/features/Skillet.gp5"></div>
-    <script type="text/javascript-lazy">
-        $('#alphaTabPagePerRow').alphaTab({
-            layout: {
-                mode: 'page',
-                additionalSettings: {
-                    barsPerRow: 5
-                }
-            }
-        });
-    </script>
-
-    <h2>Page Layout (bar 5 to 8)</h2>
-    
-    <p>
-        It's also possible to only render some of the bars available in a track.
-    </p>
-    
-    <div id="alphaTabPageSubSet" data-file="files/features/Skillet.gp5"></div>
-    <script type="text/javascript-lazy">
-        $('#alphaTabPageSubSet').alphaTab({
-            layout: {
-                mode: 'page',
-                additionalSettings: {
-                    start: 5,
-                    count: 4
-                }
-            }
-        });
-    </script>
-    
-    <h2>Horizontal Layout</h2>
-    
-    <p>
-        This is another layout type available. All bars are aligned horizontally.
-    </p>
-    
-    <div id="alphaTabHorizontal" data-file="files/features/Skillet.gp5"></div>
-    <script type="text/javascript-lazy">
-        $('#alphaTabHorizontal').alphaTab({
-            layout: {
-                mode: 'horizontal'
-            }
-        });
-    </script>
-
-    <h2>Horizontal Layout (bar 5 to 8)</h2>
-    
-    <p>
-        You can also filter the rendered bars using this layout.
-    </p>
-    
-    <div id="alphaTabHorizontalSubSet" data-file="files/features/Skillet.gp5"></div>
-    <script type="text/javascript-lazy">
-        $('#alphaTabHorizontalSubSet').alphaTab({
-            layout: {
-                mode: 'horizontal',
-                additionalSettings: {
-                    start: 5,
-                    count: 4
-                }
-            }
-        });
-    </script>
-    </div>   
-
-    <div id="score" class="group">
-        <h1>Music Notation</h1>
-        
-        <p>
-            Rendering standard music notation is one of the essential features of alphaTab. 
-        </p>
-               
-        <h2>Clefs</h2>
-        
-        <p>
-            Clefs are important for music notation too.
-        </p>
-        
-        <div id="alphaTabClefs" data-tex="true">
-            \title "Clefs"
-            .
-            \clef G2 | \clef F4 | \clef C3 | \clef C4
-        </div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabClefs').alphaTab({
-                staves: ['score'],
-                layout: {
-                    mode: 'page',
-                    additionalSettings: {
-                        hideInfo: true
+            <p>
+                The full score details are available as object dom. This way you can read and process any
+                file like you need. 
+            </p>
+            
+            <div id="alphaTabScore" data-file="files/features/Skillet.gp5">
+                Loading...        
+            </div>
+            <script type="text/javascript-lazy">
+                var score = AlphaTab.Importer.ScoreLoader.LoadScoreAsync($('#alphaTabScore').data('file'), 
+                function(score) {
+                    var info = jQuery('#alphaTabScore');
+                    info.html('');
+                    info.append('<p><b>Title:</b> '+score.Title+'</p>');
+                    info.append('<p><b>Subtitle:</b> '+score.Subtitle+'</p>');
+                    info.append('<p><b>Album:</b> '+score.Album+'</p>');
+                    info.append('<p><b>Tempo:</b> '+score.Tempo+'</p>');
+                    info.append('<p><b>Bars:</b> '+score.MasterBars.length+'</p>');
+                    info.append('<p><b>Tracks:</b> ('+score.Tracks.length+')</p>');
+                    var tracks = $('<ul></ul>');
+                    for(var i = 0; i < score.Tracks.length; i++) {
+                        tracks.append('<li>'+score.Tracks[i].Name+'</li>');
                     }
-                }
-            });
-        </script>
- 
-        <h2>Key Signatures</h2>
-        
-        <p>
-            Want key signatures? No problem, alphaTab will render them for you. 
-        </p>
+                    info.append(tracks);
+                },
+                function(error) {
+                    jQuery('#alphaTabScore').text('Error Loading the file: ' + error);
+                });
+            </script>
+            
+            <h2>Song Details</h2>
+            
+            <p>
+                Some of the layout engines can render the song details on top of the music sheet.
+            </p>
+            
+            <div id="alphaTabDetails" data-file="files/features/SongDetails.gp5"></div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabDetails').alphaTab();
+            </script>
+                
+            <h2>HTML5 Canvas</h2>
+            
+            <p>
+                Do you prefer an HTML5 canvas output instead of SVG? No problem.
+            </p>
+            
+            <div id="alphaTabHtml5" data-file="files/features/SongDetails.gp5"></div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabHtml5').alphaTab({
+                    engine: 'html5' 
+                });
+            </script>
+            
+            <h2>Repeats</h2>
+            
+            <p>
+                Need display repeat marks? No problem, single repeats and multiple repeats come out of the box.
+            </p>
+            
+            <div id="alphaTabRepeats" data-file="files/features/Repeats.gp5"></div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabRepeats').alphaTab({
+                    staves: 'score'
+                });
+            </script>
 
-        <div id="alphaTabKeySignatures" data-file="files/features/KeySignatures.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabKeySignatures').alphaTab({
-                staves: ['score']
-            });
-        </script>
+            
+            <h2>Alternate Endings</h2>
+            
+            <p>
+               Even alternate repeat endings are no problem. 
+            </p>
+            
+            <div id="alphaTabAlternateEndings" data-file="files/features/AlternateEndings.gp5"></div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabAlternateEndings').alphaTab({
+                    staves: 'score'
+                });
+            </script>
+            
+            <h2>Tunings</h2>
+            
+            <p>
+                The guitar tuning of the current track is rendered on the top of the music notation.
+            </p>
+            
+            <div id="alphaTabTuning" data-file="files/features/Tuning.gp5"></div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabTuning').alphaTab();
+            </script>
 
-        <h2>Time Signatures</h2>
-        
-        
-        <p>
-            Time signatures are important too.  
-        </p>
+            </div>
 
-        <div id="alphaTabTimeSignatures" data-file="files/features/TimeSignatures.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabTimeSignatures').alphaTab({
-                staves: ['score']
-            });
-        </script>
-        
-        <h2>Notes, Rests and Beams</h2>
-        
-        <p>
-            We automatically create beams for notes and ensure they are aligned in the most readable way. 
-        </p>
-
-        <div id="alphaTabBeams" data-file="files/features/Beams.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabBeams').alphaTab({
-                staves: ['score']
-            });
-        </script>
-        
-        <h2>Accidentals</h2>
-        
-        <p>
-            Accidentals are an essential element of music notation.
-        </p>
-
-        <div id="alphaTabAccidentals" data-file="files/features/Accidentals.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabAccidentals').alphaTab({
-                staves: ['score']
-            });
-        </script>
-
-    </div>
-
-    <div id="tabs" class="group">
-        <h1>Guitar Tabs</h1>
-        
-        <h2>Rhythm </h2>
-        
-        <p>
-            If you only display guitar tablatures, it might be interesting to add
-            a rhythm stave to show the durations. You can do this either above or below
-            the tablature.
-        </p>
-        
-        <div id="alphaTabRhythm" data-file="files/features/Rhythm.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabRhythm').alphaTab({
-                staves: {id: 'tab', additionalSettings: {'rhythm': true } }
-            });
-        </script>  
-        
-        <h2>Rhythm With Beams</h2>
-        
-        <p>
-            If you prefer beams instead of bars for single notes you can have that too. 
-        </p>
-        
-        <div id="alphaTabRhythmBeam" data-file="files/features/Rhythm.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabRhythmBeam').alphaTab({
-                staves: {id: 'tab', additionalSettings: {'rhythm': true, 'rhythm-beams': true } }
-            });
-        </script>      
-        
-        <h2>String Variations</h2>
-        
-        <p>
-            alphaTab will render tabs for stringed instruments. It takes care of 
-            the number of strings and displays the tabs as you would expect.
-        </p>
-        
-        <div id="alphaTabTabs" data-file="files/features/Tabs.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabTabs').alphaTab({
-                staves: ['tab']
-            });
-        </script>
-        
-    </div>
-
-    <div id="special" class="group">
-        <h1>Special Tracks</h1>
-        
-        <h2>Drum Tabs</h2>
-        
-        <p>
-            AlphaTab uses the same drum tab notation as Guitar Pro 5. Since the guitar tab staff is not meaningful on 
-            percussion track, it's hidden in case a drum tab is displayed.
-        </p>
-        
-        <div id="alphaTabDrum" data-file="files/features/Drums.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabDrum').alphaTab({
-            });
-        </script>    
-
-        <h2>Grand Staff</h2>
-        
-        <p>
-            With Guitar Pro 6 files also grand staffs can be rendered.
-        </p>
-        
-        <div id="alphaTabGs" data-file="files/features/Piano.gpx"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabGs').alphaTab({
-            });
-        </script>    
-        
-        <h2>Multiple Tracks</h2>
-        
-        <p>
-            AlphaTab can also render multiple tracks at the same time. 
-        </p>
-        
-        <div id="alphaTabMulti" data-file="files/MultiTrack.gp5" data-tracks="[0,1]"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabMulti').alphaTab({
-            });
-        </script>    
-    
-
-    </div>
+            <div id="layouts" class="group">
+            <h1>Layouts</h1>
+            
+            <p>
+                alphaTab supports several different layouts which align bars in a various manner. 
+            </p>
+            
+            <h2>Page Layout</h2>
+            
+            <p>
+                All bars are aligned in rows side by side till the row is full. 
+            </p>
+            
+            <div id="alphaTabPageLayout" data-file="files/features/Skillet.gp5"></div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabPageLayout').alphaTab({
+                    layout: 'page'
+                });
+            </script>
+            
+            <!-- <h2>Multi Track</h2>
+            
+            <p>
+                You want to render multiple tracks at once. No Problem
+            </p>
+            
+            <div id="alphaTabPageMuliTrack" data-file="files/features/Skillet.gp5" data-tracks="[0,3]"></div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabPageMuliTrack').alphaTab({
+                    layout: 'page'
+                });
+            </script> -->
+            
+            <h2>Page Layout (custom width)</h2>
+            
+            <p>
+                All bars are aligned in rows side by side till the row is full. 
+            </p>
+            
+            <div id="alphaTabPageLayoutWidth" data-file="files/features/Skillet.gp5"></div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabPageLayoutWidth').alphaTab({
+                    width: 1280
+                });
+            </script>
 
 
-    <div id="notes" class="group">
-        <h1>Special Notes</h1>
-        
-        <h2>Tied Notes</h2>
-          
-        <p>
-            Tied notes are notes which are not hit a second time, 
-            the note is being held. 
-        </p>
-        
-        <div id="alphaTabTied" data-file="files/features/TiedNotes.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabTied').alphaTab();
-        </script>  
-        
-        <h2>Grace Notes</h2>
+            <h2>Page Layout (5 bars per row)</h2>
+            
+            <p>
+                You can configure how many bars should be placed per row
+            </p>
+            
+            <div id="alphaTabPagePerRow" data-file="files/features/Skillet.gp5"></div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabPagePerRow').alphaTab({
+                    layout: {
+                        mode: 'page',
+                        additionalSettings: {
+                            barsPerRow: 5
+                        }
+                    }
+                });
+            </script>
+
+            <h2>Page Layout (bar 5 to 8)</h2>
+            
+            <p>
+                It's also possible to only render some of the bars available in a track.
+            </p>
+            
+            <div id="alphaTabPageSubSet" data-file="files/features/Skillet.gp5"></div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabPageSubSet').alphaTab({
+                    layout: {
+                        mode: 'page',
+                        additionalSettings: {
+                            start: 5,
+                            count: 4
+                        }
+                    }
+                });
+            </script>
+            
+            <h2>Horizontal Layout</h2>
+            
+            <p>
+                This is another layout type available. All bars are aligned horizontally.
+            </p>
+            
+            <div id="alphaTabHorizontal" data-file="files/features/Skillet.gp5"></div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabHorizontal').alphaTab({
+                    layout: {
+                        mode: 'horizontal'
+                    }
+                });
+            </script>
+
+            <h2>Horizontal Layout (bar 5 to 8)</h2>
+            
+            <p>
+                You can also filter the rendered bars using this layout.
+            </p>
+            
+            <div id="alphaTabHorizontalSubSet" data-file="files/features/Skillet.gp5"></div>
+            <script type="text/javascript-lazy">
+                $('#alphaTabHorizontalSubSet').alphaTab({
+                    layout: {
+                        mode: 'horizontal',
+                        additionalSettings: {
+                            start: 5,
+                            count: 4
+                        }
+                    }
+                });
+            </script>
+            </div>   
+
+            <div id="score" class="group">
+                <h1>Music Notation</h1>
+                
+                <p>
+                    Rendering standard music notation is one of the essential features of alphaTab. 
+                </p>
+                       
+                <h2>Clefs</h2>
+                
+                <p>
+                    Clefs are important for music notation too.
+                </p>
+                
+                <div id="alphaTabClefs" data-tex="true">
+                    \title "Clefs"
+                    .
+                    \clef G2 | \clef F4 | \clef C3 | \clef C4
+                </div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabClefs').alphaTab({
+                        staves: ['score'],
+                        layout: {
+                            mode: 'page',
+                            additionalSettings: {
+                                hideInfo: true
+                            }
+                        }
+                    });
+                </script>
          
-        <p>
-            Yes, alphaTab can render grace notes. 
-        </p>
-        
-        <div id="alphaTabGrace" data-file="files/features/GraceNotes.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabGrace').alphaTab();
-        </script>  
-        
-        <h2>Dead Notes</h2>
-        
-        <p>
-            Dead notes are notes without a defined note height. On stringed instruments<br />
-            they are played by hitting the string without pressing but with touching the finger on the fret.
-        </p>
-        
-        <div id="alphaTabDead" data-file="files/features/DeadNotes.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabDead').alphaTab();
-        </script>  
-        
-        <h2>Ghost Notes</h2>
-        
-        <p>
-            Ghost notes are played more slient than normal notes.
-        </p>
-        
-        <div id="alphaTabGhost" data-file="files/features/GhostNotes.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabGhost').alphaTab();
-        </script>       
-    </div>
-    
-    <div id="effects" class="group">
-        <h1>Effects and Annotations</h1>
-        
-        <h2>Markers</h2>
-        
-        <p>
-            Markers are a nice element to annotate different sections of the song. 
-        </p>
-        <div id="alphaTabMarkers" data-file="files/features/Markers.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabMarkers').alphaTab();
-        </script>
-        
-        <h2>Tempo</h2>
-        
-        <p>
-            You might already have mentioned them: Tempo markers are supported too. 
-        </p>
-        
-        <div id="alphaTabTempo" data-file="files/features/Tempo.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabTempo').alphaTab();
-        </script>
-        
-        <h2>Text</h2>
-        
-        <p>
-            Each beat can have a text attached. 
-        </p>
-        
-        <div id="alphaTabText" data-file="files/features/Text.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabText').alphaTab();
-        </script>
+                <h2>Key Signatures</h2>
+                
+                <p>
+                    Want key signatures? No problem, alphaTab will render them for you. 
+                </p>
 
-        <h2>Chords</h2>
-        
-        <p>
-            Chord names can be useful to indicate how to play a song. 
-        </p>
-        
-        <div id="alphaTabChords" data-file="files/features/Chords.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabChords').alphaTab();
-        </script>
-        
-        <h2>Vibrato</h2>
-        
-        <p>
-            Beat vibrators and note vibratos are both available.
-        </p>
-        
-        <div id="alphaTabVibrato" data-file="files/features/Vibrato.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabVibrato').alphaTab();
-        </script>
-        
-        <h2>Dynamics</h2>
-        
-        <p>
-            From piano pianissimo to forte fortissimo, they are all there
-        </p>
-        
-        <div id="alphaTabDynamics" data-file="files/features/Dynamics.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabDynamics').alphaTab();
-        </script>   
-        
-        <h2>Tap/Slap/Pop</h2>
-        
-        <p>
-            Especially bass guitar players will like this feature.
-        </p>
+                <div id="alphaTabKeySignatures" data-file="files/features/KeySignatures.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabKeySignatures').alphaTab({
+                        staves: ['score']
+                    });
+                </script>
+
+                <h2>Time Signatures</h2>
                 
-        <div id="alphaTabTap" data-file="files/features/Tap.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabTap').alphaTab();
-        </script>   
-        
-        <h2>Fade-In</h2>
-        
-        <p>
-            This annotation is shown if you need to increase the note volume from silent to normal when
-            playing it. 
-        </p>
-        
-        <div id="alphaTabFadeIn" data-file="files/features/FadeIn.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabFadeIn').alphaTab();
-        </script>   
-        
-        <h2>Let Ring</h2>
-        
-        <p>
-            If this annotation is placed on a note, you don't stop the string after the beat ends. 
-        </p>
                 
-        <div id="alphaTabLetRing" data-file="files/features/LetRing.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabLetRing').alphaTab();
-        </script>  
-        
-        <h2>Palm Mute</h2>
-        
-        <p>
-            A feature you won't miss: Palm Mute markers.
-        </p>
+                <p>
+                    Time signatures are important too.  
+                </p>
+
+                <div id="alphaTabTimeSignatures" data-file="files/features/TimeSignatures.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabTimeSignatures').alphaTab({
+                        staves: ['score']
+                    });
+                </script>
                 
-        <div id="alphaTabPalmMute" data-file="files/features/PalmMute.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabPalmMute').alphaTab();
-        </script>       
-        
-        <h2>String Bends</h2>
-        
-        <p>
-            String bendings can be rendered by alphaTab as well. 
-        </p>
-        
-        <div id="alphaTabBends" data-file="files/features/Bends.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabBends').alphaTab();
-        </script>         
-        
-        <h2>Whammy Bar</h2>
-        
-        <p>
-            A lot of electrical guitars come with whammy bars. alphaTab
-            can show whammy bar effects. 
-        </p>
-        
-        <div id="alphaTabTremoloBar" data-file="files/features/TremoloBar.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabTremoloBar').alphaTab();
-        </script>  
+                <h2>Notes, Rests and Beams</h2>
                 
-        <h2>Tremolo Picking</h2>
-        
-        <p>
-            Tremolo Pickings are rendered too. 
-        </p>
-        
-        <div id="alphaTabTremoloPicking" data-file="files/features/TremoloPicking.gp5"></div>
-        <script type="text/javascript-lazy">
-                $('#alphaTabTremoloPicking').alphaTab();
-        </script>  
+                <p>
+                    We automatically create beams for notes and ensure they are aligned in the most readable way. 
+                </p>
+
+                <div id="alphaTabBeams" data-file="files/features/Beams.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabBeams').alphaTab({
+                        staves: ['score']
+                    });
+                </script>
                 
-        <h2>Brush Strokes</h2>
+                <h2>Accidentals</h2>
+                
+                <p>
+                    Accidentals are an essential element of music notation.
+                </p>
+
+                <div id="alphaTabAccidentals" data-file="files/features/Accidentals.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabAccidentals').alphaTab({
+                        staves: ['score']
+                    });
+                </script>
+
+            </div>
+
+            <div id="tabs" class="group">
+                <h1>Guitar Tabs</h1>
+                
+                <h2>Rhythm </h2>
+                
+                <p>
+                    If you only display guitar tablatures, it might be interesting to add
+                    a rhythm stave to show the durations. You can do this either above or below
+                    the tablature.
+                </p>
+                
+                <div id="alphaTabRhythm" data-file="files/features/Rhythm.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabRhythm').alphaTab({
+                        staves: {id: 'tab', additionalSettings: {'rhythm': true } }
+                    });
+                </script>  
+                
+                <h2>Rhythm With Beams</h2>
+                
+                <p>
+                    If you prefer beams instead of bars for single notes you can have that too. 
+                </p>
+                
+                <div id="alphaTabRhythmBeam" data-file="files/features/Rhythm.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabRhythmBeam').alphaTab({
+                        staves: {id: 'tab', additionalSettings: {'rhythm': true, 'rhythm-beams': true } }
+                    });
+                </script>      
+                
+                <h2>String Variations</h2>
+                
+                <p>
+                    alphaTab will render tabs for stringed instruments. It takes care of 
+                    the number of strings and displays the tabs as you would expect.
+                </p>
+                
+                <div id="alphaTabTabs" data-file="files/features/Tabs.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabTabs').alphaTab({
+                        staves: ['tab']
+                    });
+                </script>
+                
+            </div>
+
+            <div id="special" class="group">
+                <h1>Special Tracks</h1>
+                
+                <h2>Drum Tabs</h2>
+                
+                <p>
+                    AlphaTab uses the same drum tab notation as Guitar Pro 5. Since the guitar tab staff is not meaningful on 
+                    percussion track, it's hidden in case a drum tab is displayed.
+                </p>
+                
+                <div id="alphaTabDrum" data-file="files/features/Drums.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabDrum').alphaTab({
+                    });
+                </script>    
+
+                <h2>Grand Staff</h2>
+                
+                <p>
+                    With Guitar Pro 6 files also grand staffs can be rendered.
+                </p>
+                
+                <div id="alphaTabGs" data-file="files/features/Piano.gpx"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabGs').alphaTab({
+                    });
+                </script>    
+                
+                <h2>Multiple Tracks</h2>
+                
+                <p>
+                    AlphaTab can also render multiple tracks at the same time. 
+                </p>
+                
+                <div id="alphaTabMulti" data-file="files/MultiTrack.gp5" data-tracks="[0,1]"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabMulti').alphaTab({
+                    });
+                </script>    
+            
+
+            </div>
+
+
+            <div id="notes" class="group">
+                <h1>Special Notes</h1>
+                
+                <h2>Tied Notes</h2>
+                  
+                <p>
+                    Tied notes are notes which are not hit a second time, 
+                    the note is being held. 
+                </p>
+                
+                <div id="alphaTabTied" data-file="files/features/TiedNotes.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabTied').alphaTab();
+                </script>  
+                
+                <h2>Grace Notes</h2>
+                 
+                <p>
+                    Yes, alphaTab can render grace notes. 
+                </p>
+                
+                <div id="alphaTabGrace" data-file="files/features/GraceNotes.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabGrace').alphaTab();
+                </script>  
+                
+                <h2>Dead Notes</h2>
+                
+                <p>
+                    Dead notes are notes without a defined note height. On stringed instruments<br />
+                    they are played by hitting the string without pressing but with touching the finger on the fret.
+                </p>
+                
+                <div id="alphaTabDead" data-file="files/features/DeadNotes.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabDead').alphaTab();
+                </script>  
+                
+                <h2>Ghost Notes</h2>
+                
+                <p>
+                    Ghost notes are played more slient than normal notes.
+                </p>
+                
+                <div id="alphaTabGhost" data-file="files/features/GhostNotes.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabGhost').alphaTab();
+                </script>       
+            </div>
+            
+            <div id="effects" class="group">
+                <h1>Effects and Annotations</h1>
+                
+                <h2>Markers</h2>
+                
+                <p>
+                    Markers are a nice element to annotate different sections of the song. 
+                </p>
+                <div id="alphaTabMarkers" data-file="files/features/Markers.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabMarkers').alphaTab();
+                </script>
+                
+                <h2>Tempo</h2>
+                
+                <p>
+                    You might already have mentioned them: Tempo markers are supported too. 
+                </p>
+                
+                <div id="alphaTabTempo" data-file="files/features/Tempo.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabTempo').alphaTab();
+                </script>
+                
+                <h2>Text</h2>
+                
+                <p>
+                    Each beat can have a text attached. 
+                </p>
+                
+                <div id="alphaTabText" data-file="files/features/Text.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabText').alphaTab();
+                </script>
+
+                <h2>Chords</h2>
+                
+                <p>
+                    Chord names can be useful to indicate how to play a song. 
+                </p>
+                
+                <div id="alphaTabChords" data-file="files/features/Chords.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabChords').alphaTab();
+                </script>
+                
+                <h2>Vibrato</h2>
+                
+                <p>
+                    Beat vibrators and note vibratos are both available.
+                </p>
+                
+                <div id="alphaTabVibrato" data-file="files/features/Vibrato.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabVibrato').alphaTab();
+                </script>
+                
+                <h2>Dynamics</h2>
+                
+                <p>
+                    From piano pianissimo to forte fortissimo, they are all there
+                </p>
+                
+                <div id="alphaTabDynamics" data-file="files/features/Dynamics.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabDynamics').alphaTab();
+                </script>   
+                
+                <h2>Tap/Slap/Pop</h2>
+                
+                <p>
+                    Especially bass guitar players will like this feature.
+                </p>
+                        
+                <div id="alphaTabTap" data-file="files/features/Tap.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabTap').alphaTab();
+                </script>   
+                
+                <h2>Fade-In</h2>
+                
+                <p>
+                    This annotation is shown if you need to increase the note volume from silent to normal when
+                    playing it. 
+                </p>
+                
+                <div id="alphaTabFadeIn" data-file="files/features/FadeIn.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabFadeIn').alphaTab();
+                </script>   
+                
+                <h2>Let Ring</h2>
+                
+                <p>
+                    If this annotation is placed on a note, you don't stop the string after the beat ends. 
+                </p>
+                        
+                <div id="alphaTabLetRing" data-file="files/features/LetRing.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabLetRing').alphaTab();
+                </script>  
+                
+                <h2>Palm Mute</h2>
+                
+                <p>
+                    A feature you won't miss: Palm Mute markers.
+                </p>
+                        
+                <div id="alphaTabPalmMute" data-file="files/features/PalmMute.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabPalmMute').alphaTab();
+                </script>       
+                
+                <h2>String Bends</h2>
+                
+                <p>
+                    String bendings can be rendered by alphaTab as well. 
+                </p>
+                
+                <div id="alphaTabBends" data-file="files/features/Bends.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabBends').alphaTab();
+                </script>         
+                
+                <h2>Whammy Bar</h2>
+                
+                <p>
+                    A lot of electrical guitars come with whammy bars. alphaTab
+                    can show whammy bar effects. 
+                </p>
+                
+                <div id="alphaTabTremoloBar" data-file="files/features/TremoloBar.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabTremoloBar').alphaTab();
+                </script>  
+                        
+                <h2>Tremolo Picking</h2>
+                
+                <p>
+                    Tremolo Pickings are rendered too. 
+                </p>
+                
+                <div id="alphaTabTremoloPicking" data-file="files/features/TremoloPicking.gp5"></div>
+                <script type="text/javascript-lazy">
+                        $('#alphaTabTremoloPicking').alphaTab();
+                </script>  
+                        
+                <h2>Brush Strokes</h2>
+                
+                <p>
+                    Brush Strokes are shown as arrows on the tablature stave. 
+                </p>
+                
+                <div id="alphaTabBrushes" data-file="files/features/Brush.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabBrushes').alphaTab();
+                </script>  
+                
+                <h2>Slides</h2>
+                
+                <p>
+                    There are several types of slides alphaTab can render. 
+                </p>
+                
+                <div id="alphaTabSlides" data-file="files/features/Slides.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabSlides').alphaTab();
+                </script>    
+                
+                <h2>Trill</h2>
+                
+                <p>
+                    Trill effects are rendered on the tablature stave and on an effect line. 
+                </p>
+                
+                <div id="alphaTabTrill" data-file="files/features/Trill.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabTrill').alphaTab();
+                </script>   
+                
+                <h2>Pick Stroke</h2>
+                
+                <p>
+                    Pick strokes indicate how to play the strings. 
+                </p>
+                
+                <div id="alphaTabPickStroke" data-file="files/features/PickStroke.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabPickStroke').alphaTab();
+                </script>   
+                
+                <h2>Tuplets</h2>
+                
+                <p>
+                    Tuplets are used to divide beats into equal subdivisions. 
+                </p>
+                
+                <div id="alphaTabTuplets" data-file="files/features/Tuplets.gp5"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabTuplets').alphaTab();
+                </script>   
+                
+                <h2>Fingering</h2>
+                
+                <p>
+                    Finger indicators can be used to highlight which fingers should be used to play
+                    the respective note on the instrument. 
+                </p>
+                
+                <div id="alphaTabFingering" data-file="files/features/Fingering.gpx"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabFingering').alphaTab();
+                </script>   
+                
+                <h2>Triplet-Feel</h2>
+                
+                <p>
+                    Triplet feels are used to indicate that a pair of particular notes are played with a different 
+                    durations as they are indicated by the annotations. 
+                </p>
+                
+                <div id="alphaTabTripletFeel" data-file="files/features/TripletFeel.gpx"></div>
+                <script type="text/javascript-lazy">
+                    $('#alphaTabTripletFeel').alphaTab();
+                </script>   
+                
+                
+            </div>
+        </div>
         
-        <p>
-            Brush Strokes are shown as arrows on the tablature stave. 
-        </p>
-        
-        <div id="alphaTabBrushes" data-file="files/features/Brush.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabBrushes').alphaTab();
-        </script>  
-        
-        <h2>Slides</h2>
-        
-        <p>
-            There are several types of slides alphaTab can render. 
-        </p>
-        
-        <div id="alphaTabSlides" data-file="files/features/Slides.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabSlides').alphaTab();
-        </script>    
-        
-        <h2>Trill</h2>
-        
-        <p>
-            Trill effects are rendered on the tablature stave and on an effect line. 
-        </p>
-        
-        <div id="alphaTabTrill" data-file="files/features/Trill.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabTrill').alphaTab();
-        </script>   
-        
-        <h2>Pick Stroke</h2>
-        
-        <p>
-            Pick strokes indicate how to play the strings. 
-        </p>
-        
-        <div id="alphaTabPickStroke" data-file="files/features/PickStroke.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabPickStroke').alphaTab();
-        </script>   
-        
-        <h2>Tuplets</h2>
-        
-        <p>
-            Tuplets are used to divide beats into equal subdivisions. 
-        </p>
-        
-        <div id="alphaTabTuplets" data-file="files/features/Tuplets.gp5"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabTuplets').alphaTab();
-        </script>   
-        
-        <h2>Fingering</h2>
-        
-        <p>
-            Finger indicators can be used to highlight which fingers should be used to play
-            the respective note on the instrument. 
-        </p>
-        
-        <div id="alphaTabFingering" data-file="files/features/Fingering.gpx"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabFingering').alphaTab();
-        </script>   
-        
-        <h2>Triplet-Feel</h2>
-        
-        <p>
-            Triplet feels are used to indicate that a pair of particular notes are played with a different 
-            durations as they are indicated by the annotations. 
-        </p>
-        
-        <div id="alphaTabTripletFeel" data-file="files/features/TripletFeel.gpx"></div>
-        <script type="text/javascript-lazy">
-            $('#alphaTabTripletFeel').alphaTab();
-        </script>   
-        
-        
-    </div>
     </div>
     
 </body>

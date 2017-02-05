@@ -486,7 +486,6 @@ namespace AlphaTab.Rendering
             {
                 _preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
                 _preBeatGlyphs.Renderer = this;
-                LayoutingInfo.PreBeatSize = 0;
                 CreatePreBeatGlyphs();
             }
 

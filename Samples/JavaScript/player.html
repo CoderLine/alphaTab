@@ -59,7 +59,6 @@
           <!-- Player controls -->
           <ul class="nav navbar-nav">
             <li><button id="playPause" disabled="disabled" class="btn btn-link navbar-btn glyphicon glyphicon-play"></button></li>
-            <li><button id="stop"  disabled="disabled" class="btn btn-link navbar-btn glyphicon glyphicon-stop"></button></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Speed: <span id="playbackSpeed">100%</span> <span class="caret"></span></a>
               <ul class="dropdown-menu" id="playbackSpeedSelector">
@@ -141,9 +140,6 @@
                 as.Play();
             }
         });
-        $('#stop').click(function() { 
-            as.Stop(); 
-        });
         
         $('#playbackSpeedSelector a').click(function() {
             var playbackSpeed = $(this).data('value');
@@ -159,7 +155,6 @@
             else {
                 $('#loadingInfo').hide()
                 $('#playPause').prop('disabled', false);
-                $('#stop').prop('disabled', false).removeAttr('disabled').removeClass('disabled');
                 $('#playPause').removeAttr('disabled');
                 switch(playerState) {
                     case 0: // stopped/paused

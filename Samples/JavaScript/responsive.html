@@ -75,7 +75,6 @@
           <!-- Player controls -->
           <ul class="nav navbar-nav">
             <li><button id="playPause" disabled="disabled" class="btn btn-link navbar-btn glyphicon glyphicon-play"></button></li>
-            <li><button id="stop"  disabled="disabled" class="btn btn-link navbar-btn glyphicon glyphicon-stop"></button></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <!-- Loading indicator for soundfont -->
@@ -157,9 +156,6 @@
                 as.Play();
             }
         });
-        $('#stop').click(function() { 
-            as.Stop(); 
-        });
         
         function updateControls() {
             if(!playerReady) {
@@ -169,7 +165,6 @@
             else {
                 $('#loadingInfo').hide()
                 $('#playPause').prop('disabled', false);
-                $('#stop').prop('disabled', false);
                 $('#playPause').removeAttr('disabled');
                 switch(playerState) {
                     case 0: // stopped

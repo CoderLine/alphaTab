@@ -403,6 +403,15 @@ namespace AlphaTab.Rendering
             return true;
         }
 
+        public override void ScaleToWidth(float width)
+        {
+            base.ScaleToWidth(width);
+            foreach (var effectBand in _bands)
+            {
+                effectBand.AlignGlyphs();
+            }
+        }
+
         protected override void CreateBeatGlyphs()
         {
             _bands = new EffectBand[_infos.Length];

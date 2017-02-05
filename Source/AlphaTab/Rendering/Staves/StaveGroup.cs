@@ -114,6 +114,8 @@ namespace AlphaTab.Rendering.Staves
             MasterBarsRenderers.Add(renderers);
             CalculateAccoladeSpacing(tracks);
 
+            renderers.LayoutingInfo.PreBeatSize = 0;
+
             var src = 0;
 
             for (int i = 0, j = Staves.Count; i < j; i++)
@@ -123,6 +125,7 @@ namespace AlphaTab.Rendering.Staves
                 {
                     var s = g.Staves[k];
                     var renderer = renderers.Renderers[src++];
+                    
                     s.AddBarRenderer(renderer);
                 }
             }
@@ -138,13 +141,14 @@ namespace AlphaTab.Rendering.Staves
             if (tracks.Length == 0) return null;
 
             var result = new MasterBarsRenderers();
+            result.LayoutingInfo = new BarLayoutingInfo();
             result.MasterBar = tracks[0].Score.MasterBars[barIndex];
             MasterBarsRenderers.Add(result);
 
             CalculateAccoladeSpacing(tracks);
            
             // add renderers
-            var barLayoutingInfo = new BarLayoutingInfo();
+            var barLayoutingInfo = result.LayoutingInfo;
             foreach (var g in Staves)
             {
                 foreach (var s in g.Staves)

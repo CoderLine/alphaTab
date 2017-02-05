@@ -52,10 +52,15 @@ body.features {
 }
 
 .samples { position:absolute; width: 800px;}
+.tab-container { position: relative; }
 .group { 
     display:none; 
     text-align: center; 
     font-size: 16px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
 }
 
 #alphaTabHorizontal .alphaTabSurface {

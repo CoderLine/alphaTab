@@ -46,6 +46,11 @@ namespace AlphaTab.Platform.JavaScript
         private FastList<RenderFinishedEventArgs> _renderResults;
         private int _totalResultCount;
 
+        protected bool IsElementVisible
+        {
+            get { return !!(Element.offsetWidth.As<bool>() || Element.offsetHeight.As<bool>() || Element.getClientRects().length.As<bool>()); }
+        }
+
         protected JsApiBase(HtmlElement element, dynamic options)
         {
             Element = element;
@@ -201,7 +206,7 @@ namespace AlphaTab.Platform.JavaScript
             };
 
             _visibilityCheckerInterval = options && options.visibilityCheckInterval || 500;
-            if (IsElementVisible(Element))
+            if (IsElementVisible)
             {
                 // element is visible, so we start rendering
                 initialRender();
@@ -213,7 +218,7 @@ namespace AlphaTab.Platform.JavaScript
                 Logger.Warning("Rendering", "AlphaTab container is invisible, checking for element visibility in " + _visibilityCheckerInterval + "ms intervals");
                 _visibilityCheckerIntervalId = setInterval(() =>
                 {
-                    if (IsElementVisible(Element))
+                    if (IsElementVisible)
                     {
                         Logger.Info("Rendering", "AlphaTab container became visible, triggering initial rendering");
                         initialRender();
@@ -229,7 +234,7 @@ namespace AlphaTab.Platform.JavaScript
         private void TriggerResize()
         {
             // if the element is visible, perfect, we do the update
-            if (IsElementVisible(Element))
+            if (IsElementVisible)
             {
                 if (_visibilityCheckerIntervalId != 0)
                 {
@@ -261,17 +266,17 @@ namespace AlphaTab.Platform.JavaScript
             foreach (var x in placeholders)
             {
                 var placeholder = x.As<HtmlElement>();
-                if (IsElementVisible(placeholder))
+                if (IsElementInViewPort(placeholder))
                 {
                     placeholder.outerHTML = placeholder.As<dynamic>().svg;
                 }
             }
         }
 
-        private static bool IsElementVisible(Element el)
+        private static bool IsElementInViewPort(Element el)
         {
             var rect = el.getBoundingClientRect();
-            return 
+            return
                 (
                     rect.top + rect.height >= 0 && rect.top <= window.innerHeight &&
                     rect.left + rect.width >= 0 && rect.left <= window.innerWidth
@@ -330,7 +335,7 @@ namespace AlphaTab.Platform.JavaScript
                                 placeholder.style.height = renderResult.Height + "px";
                                 placeholder.style.display = "inline-block";
 
-                                if (IsElementVisible(placeholder))
+                                if (IsElementInViewPort(placeholder))
                                 {
                                     placeholder.outerHTML = body.As<string>();
                                 }
