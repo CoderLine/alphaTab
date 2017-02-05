@@ -352,7 +352,7 @@ namespace AlphaTab.Rendering
             TopPadding = 0;
             BottomPadding = 0;
 
-             UpdateHeight();
+            UpdateHeight();
 
             base.UpdateSizes();
         }
@@ -417,7 +417,7 @@ namespace AlphaTab.Rendering
 
             foreach (var voice in Bar.Voices)
             {
-                if (!voice.IsEmpty)
+                if (HasVoiceContainer(voice))
                 {
                     CreateVoiceGlyphs(voice);
                 }
@@ -431,8 +431,7 @@ namespace AlphaTab.Rendering
                 }
             }
         }
-
-
+        
         private void CreateVoiceGlyphs(Voice v)
         {
             foreach (var b in v.Beats)

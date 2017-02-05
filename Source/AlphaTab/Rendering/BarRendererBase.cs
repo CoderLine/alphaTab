@@ -258,7 +258,7 @@ namespace AlphaTab.Rendering
             for (int i = 0; i < Bar.Voices.Count; i++)
             {
                 var voice = Bar.Voices[i];
-                if (!voice.IsEmpty)
+                if (HasVoiceContainer(voice))
                 {
                     var c = new VoiceContainerGlyph(0, 0, voice);
                     c.Renderer = this;
@@ -271,6 +271,11 @@ namespace AlphaTab.Rendering
             CreatePostBeatGlyphs();
 
             UpdateSizes();
+        }
+
+        protected virtual bool HasVoiceContainer(Voice voice)
+        {
+            return !voice.IsEmpty || voice.Index == 0;
         }
 
         protected virtual void UpdateSizes()

@@ -229,9 +229,17 @@
         }
                 
         if(!selecting) {
+            
+            // calculate position of whole music wheet within the scroll parent
+            var scrollElement = $(context.cursorOptions.scrollElement);
+            var scrollElementOffset = scrollElement.offset();
+            var elementOffset = element.offset();
+            elementOffset = {
+                top: elementOffset.top - scrollElementOffset.top,
+                left: elementOffset.left - scrollElementOffset.left,
+            };
             if(context.cursorOptions.autoScroll == 'vertical') {
-                var padding = beatCursor.offset().top - beatBoundings.VisualBounds.Y;
-                var scrollTop = padding + beatBoundings.RealBounds.Y + context.cursorOptions.scrollOffset;
+                var scrollTop = beatBoundings.RealBounds.Y - elementOffset.top;
                 if(scrollTop != context.cursorOptions.lastScroll) {
                     context.cursorOptions.lastScroll = scrollTop;
                     $(context.cursorOptions.scrollElement).animate({
@@ -269,7 +277,7 @@
     var cursorOptionsDefaults = {
         autoScroll: 'vertical',
         scrollSpeed: 300,
-        scrollOffset: -30,
+        scrollOffset: 0,
         scrollElement: 'body',
         scrollAdjustment: 0,
         beatCursorWidth: 3,

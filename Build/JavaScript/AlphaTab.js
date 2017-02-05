@@ -558,7 +558,6 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
                 options.width = element.offsetWidth;
             }
             var timeoutId = 0;
-            var timeout = options.resizeTimeout || 50;
             window.addEventListener("resize", $CreateAnonymousDelegate(this, function (e){
                 clearTimeout(timeoutId);
                 timeoutId = setTimeout($CreateAnonymousDelegate(this, function (){
@@ -572,7 +571,7 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
                         this.Renderer.UpdateSettings(settings);
                         this.Renderer.Resize(element.offsetWidth);
                     }
-                }), timeout);
+                }), 1);
             }));
         }
     }
@@ -670,10 +669,10 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
                         }
                         else {
                             if (this._totalResultCount < this.CanvasElement.childElementCount){
-                                this.CanvasElement.replaceChild(renderResult, this.CanvasElement.children[this._totalResultCount]);
+                                this.CanvasElement.replaceChild(renderResult.RenderResult, this.CanvasElement.children[this._totalResultCount]);
                             }
                             else {
-                                this.CanvasElement.appendChild(renderResult);
+                                this.CanvasElement.appendChild(renderResult.RenderResult);
                             }
                         }
                         this._totalResultCount++;
@@ -6048,7 +6047,7 @@ AlphaTab.Importer.GpxRhythm = function (){
     this.Value = AlphaTab.Model.Duration.Quarter;
 };
 AlphaTab.Importer.GpxParser = function (){
-    this._automations = null;
+    this._masterTrackAutomations = null;
     this._tracksMapping = null;
     this._tracksById = null;
     this._masterBars = null;
@@ -6067,7 +6066,7 @@ AlphaTab.Importer.GpxParser = function (){
 };
 AlphaTab.Importer.GpxParser.prototype = {
     ParseXml: function (xml){
-        this._automations = {};
+        this._masterTrackAutomations = {};
         this._tracksMapping = new Array(0);
         this._tracksById = {};
         this._masterBars = [];
@@ -6188,7 +6187,7 @@ AlphaTab.Importer.GpxParser.prototype = {
             if (c.nodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.localName){
                     case "Automations":
-                        this.ParseAutomations(c);
+                        this.ParseAutomations(c, this._masterTrackAutomations);
                         break;
                     case "Tracks":
                         this._tracksMapping = this.GetValue(c).split(" ");
@@ -6197,18 +6196,18 @@ AlphaTab.Importer.GpxParser.prototype = {
             }
         }));
     },
-    ParseAutomations: function (node){
+    ParseAutomations: function (node, automations){
         AlphaTab.Platform.Std.IterateChildren(node, $CreateAnonymousDelegate(this, function (c){
             if (c.nodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.localName){
                     case "Automation":
-                        this.ParseAutomation(c);
+                        this.ParseAutomation(c, automations);
                         break;
                 }
             }
         }));
     },
-    ParseAutomation: function (node){
+    ParseAutomation: function (node, automations){
         var type = null;
         var isLinear = false;
         var barId = null;
@@ -6254,10 +6253,10 @@ AlphaTab.Importer.GpxParser.prototype = {
             automation.Text = text;
         }
         if (barId != null){
-            if (!this._automations.hasOwnProperty(barId)){
-                this._automations[barId] = [];
+            if (!automations.hasOwnProperty(barId)){
+                automations[barId] = [];
             }
-            this._automations[barId].push(automation);
+            automations[barId].push(automation);
         }
     },
     ParseTracksNode: function (node){
@@ -7222,31 +7221,9 @@ AlphaTab.Importer.GpxParser.prototype = {
                 }
             }
         }
-        // build automations
-        // TODO: automation <bar> identifies the bar index, not the bar ID. but it's not 
-        // clear which track they belong to.
-        //foreach (var barId in _automations.Keys)
-        //{
-        //    var bar = Score.MasterBars[Std.ParseInt(barId)];
-        //    for (int i = 0; i < UPPER; i++)
-        //    {
-        //    }
-        //    for (int i = 0, j = bar.Voices.Count; i < j; i++)
-        //    {
-        //        var v = bar.Voices[i];
-        //        if (v.Beats.Count > 0)
-        //        {
-        //            for (int k = 0, l = _automations[barId].Count; k < l; k++)
-        //            {
-        //                var automation = _automations[barId][k];
-        //                v.Beats[0].Automations.Add(automation);
-        //            }
-        //        }
-        //    }
-        //}
-        // build automations
-        for (var $i25 = 0,$t25 = Object.keys(this._automations),$l25 = $t25.length,barIndex = $t25[$i25]; $i25 < $l25; $i25++, barIndex = $t25[$i25]){
-            var automations = this._automations[barIndex];
+        // build masterbar automations
+        for (var $i25 = 0,$t25 = Object.keys(this._masterTrackAutomations),$l25 = $t25.length,barIndex = $t25[$i25]; $i25 < $l25; $i25++, barIndex = $t25[$i25]){
+            var automations = this._masterTrackAutomations[barIndex];
             var masterBar = this.Score.MasterBars[AlphaTab.Platform.Std.ParseInt(barIndex)];
             for (var i = 0,j = automations.length; i < j; i++){
                 var automation = automations[i];
@@ -10332,7 +10309,7 @@ AlphaTab.Rendering.BarRendererBase.prototype = {
         this._postBeatGlyphs.Renderer = this;
         for (var i = 0; i < this.Bar.Voices.length; i++){
             var voice = this.Bar.Voices[i];
-            if (!voice.IsEmpty){
+            if (this.HasVoiceContainer(voice)){
                 var c = new AlphaTab.Rendering.Glyphs.VoiceContainerGlyph(0, 0, voice);
                 c.Renderer = this;
                 this._voiceContainers[this.Bar.Voices[i].Index] = c;
@@ -10342,6 +10319,9 @@ AlphaTab.Rendering.BarRendererBase.prototype = {
         this.CreateBeatGlyphs();
         this.CreatePostBeatGlyphs();
         this.UpdateSizes();
+    },
+    HasVoiceContainer: function (voice){
+        return !voice.IsEmpty || voice.Index == 0;
     },
     UpdateSizes: function (){
         this.Staff.RegisterStaffTop(this.TopPadding);
@@ -10816,7 +10796,7 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
             this.BandLookup[this._infos[i].get_EffectId()] = this._bands[i];
         }
         for (var $i35 = 0,$t35 = this.Bar.Voices,$l35 = $t35.length,voice = $t35[$i35]; $i35 < $l35; $i35++, voice = $t35[$i35]){
-            if (!voice.IsEmpty){
+            if (this.HasVoiceContainer(voice)){
                 this.CreateVoiceGlyphs(voice);
             }
         }
@@ -15633,7 +15613,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
     CreateBeatGlyphs: function (){
         for (var v = 0; v < this.Bar.Voices.length; v++){
             var voice = this.Bar.Voices[v];
-            if (!voice.IsEmpty){
+            if (this.HasVoiceContainer(voice)){
                 this.CreateVoiceGlyphs(voice);
             }
         }
@@ -16614,7 +16594,7 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
     CreateBeatGlyphs: function (){
         for (var v = 0; v < this.Bar.Voices.length; v++){
             var voice = this.Bar.Voices[v];
-            if (!voice.IsEmpty){
+            if (this.HasVoiceContainer(voice)){
                 this.CreateVoiceGlyphs(this.Bar.Voices[v]);
             }
         }
@@ -16658,7 +16638,7 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
             tabNotes.push([]);
         }
         for (var $i53 = 0,$t53 = this.Bar.Voices,$l53 = $t53.length,voice = $t53[$i53]; $i53 < $l53; $i53++, voice = $t53[$i53]){
-            if (!voice.IsEmpty){
+            if (this.HasVoiceContainer(voice)){
                 var vc = this.GetOrCreateVoiceContainer(voice);
                 for (var $i54 = 0,$t54 = vc.BeatGlyphs,$l54 = $t54.length,bg = $t54[$i54]; $i54 < $l54; $i54++, bg = $t54[$i54]){
                     var notes = (bg.OnNotes);

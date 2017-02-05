@@ -61,7 +61,7 @@ namespace AlphaTab.Importer
         public Score Score { get; set; }
 
 
-        private FastDictionary<string, FastList<Automation>> _automations;
+        private FastDictionary<string, FastList<Automation>> _masterTrackAutomations;
         private string[] _tracksMapping;
         private FastDictionary<string, Track> _tracksById; // contains tracks by their id
 
@@ -86,7 +86,7 @@ namespace AlphaTab.Importer
 
         public void ParseXml(string xml)
         {
-            _automations = new FastDictionary<string, FastList<Automation>>();
+            _masterTrackAutomations = new FastDictionary<string, FastList<Automation>>();
             _tracksMapping = new string[0];
             _tracksById = new FastDictionary<string, Track>();
             _masterBars = new FastList<MasterBar>();
@@ -240,7 +240,7 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "Automations":
-                            ParseAutomations(c);
+                            ParseAutomations(c, _masterTrackAutomations);
                             break;
                         case "Tracks":
                             _tracksMapping = GetValue(c).Split(' ');
@@ -250,7 +250,7 @@ namespace AlphaTab.Importer
             });
         }
 
-        private void ParseAutomations(IXmlNode node)
+        private void ParseAutomations(IXmlNode node, FastDictionary<string, FastList<Automation>> automations)
         {
             node.IterateChildren(c =>
             {
@@ -259,14 +259,14 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "Automation":
-                            ParseAutomation(c);
+                            ParseAutomation(c, automations);
                             break;
                     }
                 }
             });
         }
 
-        private void ParseAutomation(IXmlNode node)
+        private void ParseAutomation(IXmlNode node, FastDictionary<string, FastList<Automation>> automations)
         {
             string type = null;
             bool isLinear = false;
@@ -323,11 +323,11 @@ namespace AlphaTab.Importer
 
             if (barId != null)
             {
-                if (!_automations.ContainsKey(barId))
+                if (!automations.ContainsKey(barId))
                 {
-                    _automations[barId] = new FastList<Automation>();
+                    automations[barId] = new FastList<Automation>();
                 }
-                _automations[barId].Add(automation);
+                automations[barId].Add(automation);
             }
         }
 
@@ -1551,38 +1551,10 @@ namespace AlphaTab.Importer
                 }
             }
 
-
-           
-
-            // build automations
-            // TODO: automation <bar> identifies the bar index, not the bar ID. but it's not 
-            // clear which track they belong to.
-            //foreach (var barId in _automations.Keys)
-            //{
-            //    var bar = Score.MasterBars[Std.ParseInt(barId)];
-            //    for (int i = 0; i < UPPER; i++)
-            //    {
-                    
-            //    }
-            //    for (int i = 0, j = bar.Voices.Count; i < j; i++)
-            //    {
-            //        var v = bar.Voices[i];
-            //        if (v.Beats.Count > 0)
-            //        {
-            //            for (int k = 0, l = _automations[barId].Count; k < l; k++)
-            //            {
-            //                var automation = _automations[barId][k];
-            //                v.Beats[0].Automations.Add(automation);
-            //            }
-            //        }
-            //    }
-            //}
-
-
-            // build automations
-            foreach (var barIndex in _automations.Keys)
+            // build masterbar automations
+            foreach (var barIndex in _masterTrackAutomations.Keys)
             {
-                var automations = _automations[barIndex];
+                var automations = _masterTrackAutomations[barIndex];
                 var masterBar = Score.MasterBars[Std.ParseInt(barIndex)];
                 for (int i = 0, j = automations.Count; i < j; i++)
                 {

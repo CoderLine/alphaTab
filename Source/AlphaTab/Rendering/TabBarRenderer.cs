@@ -116,7 +116,7 @@ namespace AlphaTab.Rendering
             for (int v = 0; v < Bar.Voices.Count; v++)
             {
                 var voice = Bar.Voices[v];
-                if (!voice.IsEmpty)
+                if (HasVoiceContainer(voice))
                 {
                     CreateVoiceGlyphs(Bar.Voices[v]);
                 }
@@ -186,7 +186,7 @@ namespace AlphaTab.Rendering
 
             foreach (Voice voice in Bar.Voices)
             {
-                if (!voice.IsEmpty)
+                if (HasVoiceContainer(voice))
                 {
                     var vc = GetOrCreateVoiceContainer(voice);
                     foreach (var bg in vc.BeatGlyphs)

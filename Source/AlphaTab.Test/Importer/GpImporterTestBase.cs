@@ -50,7 +50,17 @@ namespace AlphaTab.Test.Importer
             // Whole Notes
             int beat = 0;
 
-            foreach (var duration in Enum.GetValues(typeof(Duration)))
+            var durationsInFile = new[]
+            {
+                Duration.Whole,
+                Duration.Half,
+                Duration.Quarter,
+                Duration.Eighth,
+                Duration.Sixteenth,
+                Duration.ThirtySecond,
+                Duration.SixtyFourth
+            };
+            foreach (var duration in durationsInFile)
             {
                 Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[beat].Notes[0].Fret);
                 Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[beat].Notes[0].String);
@@ -303,8 +313,8 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual("C", score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].Chord.Name);
             Assert.AreEqual("Text", score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].Text);
             Assert.IsTrue(score.MasterBars[4].IsDoubleBar);
-            Assert.IsTrue(score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].GetAutomation(AutomationType.Tempo) != null);
-            Assert.AreEqual(120.0, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].GetAutomation(AutomationType.Tempo).Value);
+            Assert.IsNotNull(score.MasterBars[4].TempoAutomation);
+            Assert.AreEqual(120.0, score.MasterBars[4].TempoAutomation.Value);
             if(!skipInstrumentCheck)
             {
                 Assert.IsTrue(score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].GetAutomation(AutomationType.Instrument) != null);

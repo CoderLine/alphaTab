@@ -119,8 +119,6 @@ namespace AlphaTab.Platform.JavaScript
                         options.width = element.offsetWidth;
                     }
                     int timeoutId = 0;
-                    int timeout = options.resizeTimeout || 50;
-
                     window.addEventListener("resize", e =>
                     {
                         clearTimeout(timeoutId);
@@ -138,7 +136,7 @@ namespace AlphaTab.Platform.JavaScript
                                 Renderer.UpdateSettings(settings);
                                 Renderer.Resize(element.offsetWidth);
                             }
-                        }, timeout);
+                        }, 1);
                     });
                 }
 
@@ -289,11 +287,11 @@ namespace AlphaTab.Platform.JavaScript
                             {
                                 if (_totalResultCount < CanvasElement.childElementCount)
                                 {
-                                    CanvasElement.replaceChild(renderResult.As<Node>(), CanvasElement.children[_totalResultCount]);
+                                    CanvasElement.replaceChild(renderResult.RenderResult.As<Node>(), CanvasElement.children[_totalResultCount]);
                                 }
                                 else
                                 {
-                                    CanvasElement.appendChild(renderResult.As<Node>());
+                                    CanvasElement.appendChild(renderResult.RenderResult.As<Node>());
                                 }
                             }
                             _totalResultCount++;

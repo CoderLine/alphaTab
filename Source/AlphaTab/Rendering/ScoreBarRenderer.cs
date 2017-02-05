@@ -742,7 +742,7 @@ namespace AlphaTab.Rendering
             for (int v = 0; v < Bar.Voices.Count; v++)
             {
                 var voice = Bar.Voices[v];
-                if (!voice.IsEmpty)
+                if (HasVoiceContainer(voice))
                 {
                     CreateVoiceGlyphs(voice);
                 }

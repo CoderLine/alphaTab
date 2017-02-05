@@ -50,6 +50,15 @@
         display: block;
         margin: auto;
     }    
+    
+    #wrapper {
+        position: absolute; 
+        top: 100px;
+        background: blue;
+        height: 600px;
+        width: 80%;
+        overflow: auto;
+    }
     </style>
 </head>
 <body>
@@ -83,8 +92,9 @@
       </div>
     </nav>
     
+    <div id="">
     <div id="alphaTab" data-file="files/canon.gp5" data-tracks="0"></div>
-    
+    </div>
     <script type="text/javascript">
         var playerReady = false;
         var playerState = 0;
@@ -112,9 +122,7 @@
         // 2. Load alphaTab
         at.alphaTab({
             width: -1, // negative width enables auto sizing
-            resizeTimeout: 1,
-            engine: window.location.search.indexOf('html5') === -1 ? 'default' : 'html5',
-            //useWorker: true
+            useWorker: true
         });         
         
         // 
@@ -181,7 +189,7 @@
                 
         //
         // 3. Add cursors (optional)
-        //at.alphaTab('playerCursor'); 
+        at.alphaTab('playerCursor'); 
     
     </script>
     
