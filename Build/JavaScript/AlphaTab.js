@@ -5225,11 +5225,17 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             chord.FirstFret = this.ReadInt32();
             for (var i = 0; i < 7; i++){
                 var fret = this.ReadInt32();
-                if (i < chord.Strings.length){
+                if (i < beat.Voice.Bar.Staff.Track.Tuning.length){
                     chord.Strings.push(fret);
                 }
             }
-            this.Data.Skip(32);
+            var numberOfBarres = this.Data.ReadByte();
+            var barreFrets = new Uint8Array(5);
+            this.Data.Read(barreFrets, 0, barreFrets.length);
+            for (var i = 0; i < numberOfBarres; i++){
+                chord.BarreFrets.push(barreFrets[i]);
+            }
+            this.Data.Skip(26);
         }
         else {
             if (this.Data.ReadByte() != 0){
@@ -5253,19 +5259,23 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
                     chord.FirstFret = (this.ReadInt32());
                     for (var i = 0; i < 7; i++){
                         var fret = this.ReadInt32();
-                        if (i < chord.Strings.length){
+                        if (i < beat.Voice.Bar.Staff.Track.Tuning.length){
                             chord.Strings.push(fret);
                         }
                     }
-                    // number of barres (1)
-                    // Fret of the barre (5)
+                    var numberOfBarres = this.Data.ReadByte();
+                    var barreFrets = new Uint8Array(5);
+                    this.Data.Read(barreFrets, 0, barreFrets.length);
+                    for (var i = 0; i < numberOfBarres; i++){
+                        chord.BarreFrets.push(barreFrets[i]);
+                    }
                     // Barree end (5)
                     // Omission1,3,5,7,9,11,13 (7)
                     // Unused (1)
                     // Fingering (7)
                     // Show Diagram Fingering (1)
                     // ??
-                    this.Data.Skip(32);
+                    this.Data.Skip(26);
                 }
                 else {
                     // unknown
@@ -5274,7 +5284,9 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
                     chord.FirstFret = this.ReadInt32();
                     for (var i = 0; i < 6; i++){
                         var fret = this.ReadInt32();
-                        chord.Strings.push(fret);
+                        if (i < beat.Voice.Bar.Staff.Track.Tuning.length){
+                            chord.Strings.push(fret);
+                        }
                     }
                     // unknown
                     this.Data.Skip(36);
@@ -5287,7 +5299,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
                 if (chord.FirstFret > 0){
                     for (var i = 0; i < strings; i++){
                         var fret = this.ReadInt32();
-                        if (i < chord.Strings.length){
+                        if (i < beat.Voice.Bar.Staff.Track.Tuning.length){
                             chord.Strings.push(fret);
                         }
                     }
@@ -6373,6 +6385,63 @@ AlphaTab.Importer.GpxParser.prototype = {
         var chordId = node.getAttribute("id");
         chord.Name = node.getAttribute("name");
         track.Chords[chordId] = chord;
+        var diagram = this.FindChildElement(node, "Diagram");
+        var stringCount = AlphaTab.Platform.Std.ParseInt(diagram.getAttribute("stringCount"));
+        var baseFret = AlphaTab.Platform.Std.ParseInt(diagram.getAttribute("baseFret"));
+        chord.FirstFret = baseFret + 1;
+        for (var i = 0; i < stringCount; i++){
+            chord.Strings.push(-1);
+        }
+        AlphaTab.Platform.Std.IterateChildren(diagram, $CreateAnonymousDelegate(this, function (c){
+            if (c.nodeType == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.localName){
+                    case "Fret":
+                        var guitarString = AlphaTab.Platform.Std.ParseInt(c.getAttribute("string"));
+                        chord.Strings[stringCount - guitarString - 1] = baseFret + AlphaTab.Platform.Std.ParseInt(c.getAttribute("fret"));
+                        break;
+                    case "Fingering":
+                        var existingFingers = {};
+                        AlphaTab.Platform.Std.IterateChildren(c, $CreateAnonymousDelegate(this, function (p){
+                        if (p.nodeType == AlphaTab.Xml.XmlNodeType.Element){
+                            switch (p.localName){
+                                case "Position":
+                                    var finger = AlphaTab.Model.Fingers.Unknown;
+                                    var fret = baseFret + AlphaTab.Platform.Std.ParseInt(p.getAttribute("fret"));
+                                    switch (p.getAttribute("finger")){
+                                        case "Index":
+                                        finger = AlphaTab.Model.Fingers.IndexFinger;
+                                        break;
+                                        case "Middle":
+                                        finger = AlphaTab.Model.Fingers.MiddleFinger;
+                                        break;
+                                        case "Rank":
+                                        finger = AlphaTab.Model.Fingers.AnnularFinger;
+                                        break;
+                                        case "Pinky":
+                                        finger = AlphaTab.Model.Fingers.LittleFinger;
+                                        break;
+                                        case "Thumb":
+                                        finger = AlphaTab.Model.Fingers.Thumb;
+                                        break;
+                                        case "None":
+                                        break;
+                                    }
+                                    if (finger != AlphaTab.Model.Fingers.Unknown){
+                                    if (existingFingers.hasOwnProperty(finger)){
+                                        chord.BarreFrets.push(fret);
+                                    }
+                                    else {
+                                        existingFingers[finger] = true;
+                                    }
+                                }
+                                    break;
+                            }
+                        }
+                    }));
+                        break;
+                }
+            }
+        }));
     },
     FindChildElement: function (node, name){
         for (var i = 0; i < node.childNodes.length; i++){
@@ -9020,7 +9089,9 @@ AlphaTab.Model.Chord = function (){
     this.Name = null;
     this.FirstFret = 0;
     this.Strings = null;
+    this.BarreFrets = null;
     this.Strings = [];
+    this.BarreFrets = [];
 };
 AlphaTab.Model.Chord.CopyTo = function (src, dst){
     dst.FirstFret = src.FirstFret;
