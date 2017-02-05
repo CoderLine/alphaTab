@@ -509,6 +509,23 @@
             A chord definition.
             </summary>
         </member>
+        <member name="P:AlphaTab.Model.Chord.FirstFret">
+            <summary>
+            Indicates the first fret of the chord diagram.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Chord.Strings">
+            <summary>
+            Gets or sets the frets played on the individual strings for this chord. 
+            - The order in this list goes from the highest string to the lowest string.  
+            - -1 indicates that the string is not played. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Chord.BarreFrets">
+            <summary>
+            Gets or sets a list of frets where the finger should hold a barre 
+            </summary>
+        </member>
         <member name="T:AlphaTab.Model.Clef">
             <summary>
             This public enumeration lists all supported Clefs.

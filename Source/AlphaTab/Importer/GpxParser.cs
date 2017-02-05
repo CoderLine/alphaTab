@@ -417,6 +417,80 @@ namespace AlphaTab.Importer
             var chordId = node.GetAttribute("id");
             chord.Name = node.GetAttribute("name");
             track.Chords[chordId] = chord;
+
+            var diagram = FindChildElement(node, "Diagram");
+            var stringCount = Std.ParseInt(diagram.GetAttribute("stringCount"));
+            var baseFret = Std.ParseInt(diagram.GetAttribute("baseFret"));
+            chord.FirstFret = baseFret + 1;
+            for (int i = 0; i < stringCount; i++)
+            {
+                chord.Strings.Add(-1);
+            }
+
+            diagram.IterateChildren(c =>
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Fret":
+                            var guitarString = Std.ParseInt(c.GetAttribute("string"));
+                            chord.Strings[stringCount - guitarString - 1] = baseFret + Std.ParseInt(c.GetAttribute("fret"));
+                            break;
+                        case "Fingering":
+                            var existingFingers = new FastDictionary<Fingers, bool>();
+
+                            c.IterateChildren(p =>
+                            {
+                                if (p.NodeType == XmlNodeType.Element)
+                                {
+                                    switch (p.LocalName)
+                                    {
+                                        case "Position":
+                                            var finger = Fingers.Unknown;
+                                            var fret = baseFret + Std.ParseInt(p.GetAttribute("fret"));
+                                            switch (p.GetAttribute("finger"))
+                                            {
+                                                case "Index":
+                                                    finger = Fingers.IndexFinger;
+                                                    break;
+                                                case "Middle":
+                                                    finger = Fingers.MiddleFinger;
+                                                    break;
+                                                case "Rank":
+                                                    finger = Fingers.AnnularFinger;
+                                                    break;
+                                                case "Pinky":
+                                                    finger = Fingers.LittleFinger;
+                                                    break;
+                                                case "Thumb":
+                                                    finger = Fingers.Thumb;
+                                                    break;
+                                                case "None":
+                                                    break;
+                                            }
+
+                                            if (finger != Fingers.Unknown)
+                                            {
+                                                if (existingFingers.ContainsKey(finger))
+                                                {
+                                                    chord.BarreFrets.Add(fret);
+                                                }
+                                                else
+                                                {
+                                                    existingFingers[finger] = true; 
+                                                }
+                                            }
+
+                                            break;
+                                    }
+                                }
+                            });
+
+                            break;
+                    }
+                }
+            });
         }
 
         private IXmlNode FindChildElement(IXmlNode node, string name)

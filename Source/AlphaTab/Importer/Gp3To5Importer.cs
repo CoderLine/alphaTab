@@ -636,12 +636,21 @@ namespace AlphaTab.Importer
                 for (int i = 0; i < 7; i++)
                 {
                     var fret = ReadInt32();
-                    if (i < chord.Strings.Count)
+                    if (i < beat.Voice.Bar.Staff.Track.Tuning.Length)
                     {
                         chord.Strings.Add(fret);
                     }
                 }
-                Data.Skip(32);
+
+                var numberOfBarres = Data.ReadByte();
+                var barreFrets = new byte[5];
+                Data.Read(barreFrets, 0, barreFrets.Length);
+                for (int i = 0; i < numberOfBarres; i++)
+                {
+                    chord.BarreFrets.Add(barreFrets[i]);
+                }
+
+                Data.Skip(26);
             }
             else
             {
@@ -669,20 +678,27 @@ namespace AlphaTab.Importer
                         for (int i = 0; i < 7; i++)
                         {
                             var fret = ReadInt32();
-                            if (i < chord.Strings.Count)
+                            if (i < beat.Voice.Bar.Staff.Track.Tuning.Length)
                             {
                                 chord.Strings.Add(fret);
                             }
                         }
-                        // number of barres (1)
-                        // Fret of the barre (5)
+
+                        var numberOfBarres = Data.ReadByte();
+                        var barreFrets = new byte[5];
+                        Data.Read(barreFrets, 0, barreFrets.Length);
+                        for (int i = 0; i < numberOfBarres; i++)
+                        {
+                            chord.BarreFrets.Add(barreFrets[i]);
+                        }
+
                         // Barree end (5)
                         // Omission1,3,5,7,9,11,13 (7)
                         // Unused (1)
                         // Fingering (7)
                         // Show Diagram Fingering (1)
                         // ??
-                        Data.Skip(32);
+                        Data.Skip(26);
                     }
                     else
                     {
@@ -693,7 +709,10 @@ namespace AlphaTab.Importer
                         for (int i = 0; i < 6; i++)
                         {
                             var fret = ReadInt32();
-                            chord.Strings.Add(fret);
+                            if (i < beat.Voice.Bar.Staff.Track.Tuning.Length)
+                            {
+                                chord.Strings.Add(fret);
+                            }
                         }
                         // unknown
                         Data.Skip(36);
@@ -710,7 +729,7 @@ namespace AlphaTab.Importer
                         for (int i = 0; i < strings; i++)
                         {
                             var fret = ReadInt32();
-                            if (i < chord.Strings.Count)
+                            if (i < beat.Voice.Bar.Staff.Track.Tuning.Length)
                             {
                                 chord.Strings.Add(fret);
                             }

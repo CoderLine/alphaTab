@@ -26,12 +26,28 @@ namespace AlphaTab.Model
     public class Chord
     {
         public string Name { get; set; }
+
+        /// <summary>
+        /// Indicates the first fret of the chord diagram.
+        /// </summary>
         public int FirstFret { get; set; }
+
+        /// <summary>
+        /// Gets or sets the frets played on the individual strings for this chord. 
+        /// - The order in this list goes from the highest string to the lowest string.  
+        /// - -1 indicates that the string is not played. 
+        /// </summary>
         public FastList<int> Strings { get; set; }
+
+        /// <summary>
+        /// Gets or sets a list of frets where the finger should hold a barre 
+        /// </summary>
+        public FastList<int> BarreFrets { get; set; }
 
         public Chord()
         {
             Strings = new FastList<int>();
+            BarreFrets = new FastList<int>();
         }
 
         public static void CopyTo(Chord src, Chord dst)

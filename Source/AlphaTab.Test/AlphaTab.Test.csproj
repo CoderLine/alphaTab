@@ -97,6 +97,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="TestFiles\GuitarPro5\TestChords.gp5">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="TestFiles\GuitarPro5\TestKeySignatures.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -320,6 +323,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\GuitarPro6\TestBends.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\TestChords.gpx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\GuitarPro6\TestDead.gpx">
@@ -1218,12 +1224,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AlphaTab.Wpf\AlphaTab.Wpf.csproj">
-      <Project>{dfe92430-1351-4b74-8306-f1620f70ac4a}</Project>
-      <Name>AlphaTab.Wpf</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="TestFiles\MusicXmlTestSuite\01d-Pitches-Microtones.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -1304,6 +1304,12 @@
     <Content Include="TestFiles\MusicXmlSamples\Telemann.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AlphaTab.Wpf\AlphaTab.Wpf.csproj">
+      <Project>{dfe92430-1351-4b74-8306-f1620f70ac4a}</Project>
+      <Name>AlphaTab.Wpf</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

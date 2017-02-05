@@ -19,6 +19,7 @@ using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Xml.Linq;
+using AlphaTab.Collections;
 using AlphaTab.Importer;
 using AlphaTab.IO;
 using AlphaTab.Model;
@@ -315,7 +316,7 @@ namespace AlphaTab.Test.Importer
             Assert.IsTrue(score.MasterBars[4].IsDoubleBar);
             Assert.IsNotNull(score.MasterBars[4].TempoAutomation);
             Assert.AreEqual(120.0, score.MasterBars[4].TempoAutomation.Value);
-            if(!skipInstrumentCheck)
+            if (!skipInstrumentCheck)
             {
                 Assert.IsTrue(score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].GetAutomation(AutomationType.Instrument) != null);
                 Assert.AreEqual(25.0, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].GetAutomation(AutomationType.Instrument).Value);
@@ -452,6 +453,76 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[31].KeySignatureType);
             Assert.AreEqual(0, score.MasterBars[32].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[32].KeySignatureType);
+        }
+        protected void CheckChords(Score score)
+        {
+            var track = score.Tracks[0];
+            Assert.AreEqual(8, track.Chords.Count);
+
+            CheckChord(new Chord
+            {
+                Name = "C",
+                FirstFret = 1,
+                Strings = new FastList<int> { 0, 1, 0, 2, 3, -1 }
+            }, track.Staves[0].Bars[0].Voices[0].Beats[0].Chord);
+            CheckChord(new Chord
+            {
+                Name = "Cm",
+                FirstFret = 1,
+                Strings = new FastList<int> { -1, -1, 0, 1, 3, -1 }
+            }, track.Staves[0].Bars[0].Voices[0].Beats[1].Chord);
+            CheckChord(new Chord
+            {
+                Name = "C",
+                FirstFret = 1,
+                Strings = new FastList<int> { 3, 5, 5, 5, 3, -1 },
+                BarreFrets = new FastList<int> { 3 }
+            }, track.Staves[0].Bars[0].Voices[0].Beats[2].Chord);
+
+            CheckChord(new Chord
+            {
+                Name = "Cm",
+                FirstFret = 1,
+                Strings = new FastList<int> { 3, 4, 5, 5, 3, -1 },
+                BarreFrets = new FastList<int> { 3 }
+            }, track.Staves[0].Bars[0].Voices[0].Beats[3].Chord);
+
+            CheckChord(new Chord
+            {
+                Name = "D",
+                FirstFret = 1,
+                Strings = new FastList<int> { 2, 3, 2, 0, -1, -1 },
+                BarreFrets = new FastList<int> { 2 }
+            }, track.Staves[0].Bars[1].Voices[0].Beats[0].Chord);
+            CheckChord(new Chord
+            {
+                Name = "Dm",
+                FirstFret = 1,
+                Strings = new FastList<int> { 1, 3, 2, 0, -1, -1 }
+            }, track.Staves[0].Bars[1].Voices[0].Beats[1].Chord);
+            CheckChord(new Chord
+            {
+                Name = "D",
+                FirstFret = 5,
+                Strings = new FastList<int> { 5, 7, 7, 7, 5, -1 },
+                BarreFrets = new FastList<int> { 5 }
+            }, track.Staves[0].Bars[1].Voices[0].Beats[2].Chord);
+            CheckChord(new Chord
+            {
+                Name = "Dm",
+                FirstFret = 5,
+                Strings = new FastList<int> { 5, 6, 7, 7, 5, -1 },
+                BarreFrets = new FastList<int> { 5 }
+            }, track.Staves[0].Bars[1].Voices[0].Beats[3].Chord);
+        }
+
+        private void CheckChord(Chord expected, Chord actual)
+        {
+            Assert.AreEqual(expected.Name, actual.Name);
+            Assert.AreEqual(expected.FirstFret, actual.FirstFret);
+            Assert.AreEqual(expected.Strings.Count, actual.Strings.Count);
+            Assert.AreEqual(string.Join(",", expected.Strings), string.Join(",", actual.Strings));
+            Assert.AreEqual(string.Join(",", expected.BarreFrets), string.Join(",", actual.BarreFrets));
         }
 
         #endregion
