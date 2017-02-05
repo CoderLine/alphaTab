@@ -22,6 +22,7 @@ using AlphaTab.Model;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Staves;
+using AlphaTab.Util;
 using Staff = AlphaTab.Rendering.Staves.Staff;
 
 namespace AlphaTab.Rendering.Layout
@@ -35,6 +36,7 @@ namespace AlphaTab.Rendering.Layout
 
         public ScoreRenderer Renderer { get; set; }
 
+        public abstract string Name { get; }
         public float Width { get; set; }
         public float Height { get; set; }
 
@@ -62,6 +64,8 @@ namespace AlphaTab.Rendering.Layout
 
         private void CreateScoreInfoGlyphs()
         {
+            Logger.Info("ScoreLayout", "Creating score info glyphs");
+
             var flags = Renderer.Settings.Layout.Get("hideInfo", false) ? HeaderFooterElements.None : HeaderFooterElements.All;
             var score = Renderer.Score;
             var res = Renderer.RenderingResources;

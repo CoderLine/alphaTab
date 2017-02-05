@@ -274,13 +274,14 @@ AlphaTab.Environment.CheckFontLoad = function (){
                 testItem.style.position = "absolute";
                 testItem.style.left = "0";
                 testItem.style.top = "0";
+                testItem.style.fontSize = "100px";
                 testItem.classList.add("at");
                 testItem.innerHTML = "&#" + 57424 + ";";
                 document.body.appendChild(testItem);
             }
             // get width
             var width = testItem.offsetWidth;
-            if (width > 30){
+            if (width > 30 && width < 100){
                 AlphaTab.Environment.IsFontLoaded = true;
                 document.body.removeChild(testItem);
             }
@@ -509,8 +510,11 @@ AlphaTab.Platform.JavaScript.ResizeEventArgs = function (){
 AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
     this.Element = null;
     this.CanvasElement = null;
+    this.Settings = null;
     this.TrackIndexes = null;
     this.AutoSize = false;
+    this._visibilityCheckerInterval = 0;
+    this._visibilityCheckerIntervalId = 0;
     this._renderResults = null;
     this._totalResultCount = 0;
     this.Renderer = null;
@@ -518,7 +522,7 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
     this.Element = element;
     var dataset = this.Element.dataset;
     // load settings
-    var settings = AlphaTab.Settings.FromJson(options);
+    var settings = this.Settings = AlphaTab.Settings.FromJson(options);
     // get track data to parse
     var tracksData;
     if (options != null && options.tracks){
@@ -542,6 +546,7 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
         this.CanvasElement.className = "alphaTabSurface";
         this.CanvasElement.style.fontSize = "0";
         this.CanvasElement.style.overflow = "hidden";
+        this.CanvasElement.style.lineHeight = "0";
         element.appendChild(this.CanvasElement);
         if (settings.Engine == "default" || settings.Engine == "svg"){
             window.addEventListener("scroll", $CreateAnonymousDelegate(this, function (e){
@@ -554,22 +559,12 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
         this.AutoSize = settings.Width < 0;
         if (this.AutoSize){
             settings.Width = element.offsetWidth;
-            if (options){
-                options.width = element.offsetWidth;
-            }
             var timeoutId = 0;
             window.addEventListener("resize", $CreateAnonymousDelegate(this, function (e){
                 clearTimeout(timeoutId);
                 timeoutId = setTimeout($CreateAnonymousDelegate(this, function (){
                     if (element.offsetWidth != settings.Width){
-                        var resizeEventInfo = new AlphaTab.Platform.JavaScript.ResizeEventArgs();
-                        resizeEventInfo.OldWidth = settings.Width;
-                        resizeEventInfo.NewWidth = element.offsetWidth;
-                        resizeEventInfo.Settings = settings;
-                        this.TriggerEvent("resize", resizeEventInfo);
-                        settings.Width = resizeEventInfo.NewWidth;
-                        this.Renderer.UpdateSettings(settings);
-                        this.Renderer.Resize(element.offsetWidth);
+                        this.TriggerResize();
                     }
                 }), 1);
             }));
@@ -602,20 +597,68 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
         this.AppendRenderResult(null);
         // marks last element
     }));
-    if (!((contents==null)||(contents.length==0))){
-        this.Tex(contents);
+    var initialRender = $CreateAnonymousDelegate(this, function (){
+        // rendering was possibly delayed due to invisible element
+        // in this case we need the correct width for autosize
+        if (this.AutoSize){
+            this.Settings.Width = this.Element.offsetWidth;
+            this.Renderer.UpdateSettings(settings);
+        }
+        if (!((contents==null)||(contents.length==0))){
+            this.Tex(contents);
+        }
+        else if (options && options.file){
+            this.Load(options.file);
+        }
+        else if (this.Element != null && this.Element.dataset != null && !((dataset["file"]==null)||(dataset["file"].length==0))){
+            this.Load(dataset["file"]);
+        }
+        else if (this.Element != null && !((this.Element.getAttribute("data-file")==null)||(this.Element.getAttribute("data-file").length==0))){
+            this.Load(this.Element.getAttribute("data-file"));
+        }
+    });
+    this._visibilityCheckerInterval = options && options.visibilityCheckInterval || 500;
+    if (AlphaTab.Platform.JavaScript.JsApiBase.IsElementVisible(this.Element)){
+        // element is visible, so we start rendering
+        initialRender();
     }
-    else if (options && options.file){
-        this.Load(options.file);
-    }
-    else if (this.Element != null && this.Element.dataset != null && !((dataset["file"]==null)||(dataset["file"].length==0))){
-        this.Load(dataset["file"]);
-    }
-    else if (this.Element != null && !((this.Element.getAttribute("data-file")==null)||(this.Element.getAttribute("data-file").length==0))){
-        this.Load(this.Element.getAttribute("data-file"));
+    else {
+        // if the alphaTab element is not visible, we postpone the rendering
+        // we check in a regular interval whether it became available. 
+        AlphaTab.Util.Logger.Warning("Rendering", "AlphaTab container is invisible, checking for element visibility in " + this._visibilityCheckerInterval + "ms intervals");
+        this._visibilityCheckerIntervalId = setInterval($CreateAnonymousDelegate(this, function (){
+            if (AlphaTab.Platform.JavaScript.JsApiBase.IsElementVisible(this.Element)){
+                AlphaTab.Util.Logger.Info("Rendering", "AlphaTab container became visible, triggering initial rendering");
+                initialRender();
+                clearInterval(this._visibilityCheckerIntervalId);
+                this._visibilityCheckerIntervalId = 0;
+            }
+        }), this._visibilityCheckerInterval);
     }
 };
 AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
+    TriggerResize: function (){
+        // if the element is visible, perfect, we do the update
+        if (AlphaTab.Platform.JavaScript.JsApiBase.IsElementVisible(this.Element)){
+            if (this._visibilityCheckerIntervalId != 0){
+                AlphaTab.Util.Logger.Info("Rendering", "AlphaTab container became visible again, doing autosizing");
+                clearInterval(this._visibilityCheckerIntervalId);
+                this._visibilityCheckerIntervalId = 0;
+            }
+            var resizeEventInfo = new AlphaTab.Platform.JavaScript.ResizeEventArgs();
+            resizeEventInfo.OldWidth = this.Settings.Width;
+            resizeEventInfo.NewWidth = this.Element.offsetWidth;
+            resizeEventInfo.Settings = this.Settings;
+            this.TriggerEvent("resize", resizeEventInfo);
+            this.Settings.Width = resizeEventInfo.NewWidth;
+            this.Renderer.UpdateSettings(this.Settings);
+            this.Renderer.Resize(this.Element.offsetWidth);
+        }
+        else if (this._visibilityCheckerIntervalId == 0){
+            AlphaTab.Util.Logger.Warning("Rendering", "AlphaTab container was invisible while autosizing, checking for element visibility in " + this._visibilityCheckerInterval + "ms intervals");
+            this._visibilityCheckerIntervalId = setInterval($CreateDelegate(this, this.TriggerResize), this._visibilityCheckerInterval);
+        }
+    },
     ShowSvgsInViewPort: function (){
         var placeholders = this.CanvasElement.querySelectorAll("[data-lazy=true]");
         for (var $i4 = 0,$l4 = placeholders.length,x = placeholders[$i4]; $i4 < $l4; $i4++, x = placeholders[$i4]){
@@ -1166,7 +1209,8 @@ AlphaTab.Platform.JavaScript.JsApi.prototype = {
         if (this.Renderer == null)
             return;
         // check if font is loaded for HTML5 canvas
-        if (true){
+        var canvas = this.Renderer.Canvas;
+        if ((canvas instanceof AlphaTab.Platform.JavaScript.Html5Canvas)){
             var renderAction = null;
             renderAction = $CreateAnonymousDelegate(this, function (){
                 // if font is not yet loaded, try again in 1 sec
@@ -3672,7 +3716,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
         else {
             e = new AlphaTab.Importer.AlphaTexException(this._curChPos, nonterm, expected, expected, (this._syData));
         }
-        console.log(e.get_Message());
+        AlphaTab.Util.Logger.Error(this.get_Name(), e.get_Message());
         throw $CreateException(e, new Error());
     },
     CreateDefaultScore: function (){
@@ -4815,6 +4859,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         version = version.substr("FICHIER GUITAR PRO ".length + 1);
         var dot = version.indexOf(".");
         this._versionNumber = (100 * AlphaTab.Platform.Std.ParseInt(version.substr(0, dot))) + AlphaTab.Platform.Std.ParseInt(version.substr(dot + 1));
+        AlphaTab.Util.Logger.Info(this.get_Name(), "Guitar Pro version " + version + " detected");
     },
     ReadScoreInformation: function (){
         this._score.Title = this.ReadStringIntUnused();
@@ -6016,11 +6061,13 @@ AlphaTab.Importer.GpxImporter.prototype = {
     ReadScore: function (){
         // at first we need to load the binary file system 
         // from the GPX container
+        AlphaTab.Util.Logger.Info(this.get_Name(), "Loading GPX filesystem");
         var fileSystem = new AlphaTab.Importer.GpxFileSystem();
         fileSystem.FileFilter = $CreateAnonymousDelegate(this, function (s){
             return s == "score.gpif";
         });
         fileSystem.Load(this.Data);
+        AlphaTab.Util.Logger.Info(this.get_Name(), "GPX filesystem loaded");
         // convert data to string
         var data = fileSystem.Files[0].Data;
         var xml = AlphaTab.Platform.Std.ToString(data);
@@ -6030,9 +6077,11 @@ AlphaTab.Importer.GpxImporter.prototype = {
         fileSystem = null;
         // the score.gpif file within this filesystem stores
         // the score information as XML we need to parse.
+        AlphaTab.Util.Logger.Info(this.get_Name(), "Start Parsing score.gpif");
         var parser = new AlphaTab.Importer.GpxParser();
         parser.ParseXml(xml);
         parser.Score.Finish();
+        AlphaTab.Util.Logger.Info(this.get_Name(), "score.gpif parsed");
         return parser.Score;
     }
 };
@@ -8355,7 +8404,7 @@ AlphaTab.Importer.ScoreLoader = function (){
 };
 AlphaTab.Importer.ScoreLoader.LoadScoreAsync = function (path, success, error){
     var loader = AlphaTab.Environment.FileLoaders["default"]();
-    AlphaTab.Util.Logger.Info("Loading score from \'" + path + "\'");
+    AlphaTab.Util.Logger.Info("ScoreLoader", "Loading score from \'" + path + "\'");
     loader.LoadBinaryAsync(path, function (data){
         var score = null;
         try{
@@ -8376,32 +8425,32 @@ AlphaTab.Importer.ScoreLoader.LoadScore = function (path){
 };
 AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes = function (data){
     var importers = AlphaTab.Importer.ScoreImporter.BuildImporters();
-    AlphaTab.Util.Logger.Info("Loading score from " + data.length + " bytes using " + importers.length + " importers");
+    AlphaTab.Util.Logger.Info("ScoreLoader", "Loading score from " + data.length + " bytes using " + importers.length + " importers");
     var score = null;
     var bb = AlphaTab.IO.ByteBuffer.FromBuffer(data);
     for (var $i27 = 0,$l27 = importers.length,importer = importers[$i27]; $i27 < $l27; $i27++, importer = importers[$i27]){
         bb.Reset();
         try{
-            AlphaTab.Util.Logger.Info("Importing using importer " + importer.get_Name());
+            AlphaTab.Util.Logger.Info("ScoreLoader", "Importing using importer " + importer.get_Name());
             importer.Init(bb);
             score = importer.ReadScore();
-            AlphaTab.Util.Logger.Info("Score imported using " + importer.get_Name());
+            AlphaTab.Util.Logger.Info("ScoreLoader", "Score imported using " + importer.get_Name());
             break;
         }
         catch(e){
             if (!(e.exception instanceof AlphaTab.Importer.UnsupportedFormatException)){
-                AlphaTab.Util.Logger.Info("Score import failed due to unexpected error: " + e.get_Message());
+                AlphaTab.Util.Logger.Info("ScoreLoader", "Score import failed due to unexpected error: " + e.get_Message());
                 throw $CreateException(e, new Error());
             }
             else {
-                AlphaTab.Util.Logger.Info(importer.get_Name() + " does not support the file");
+                AlphaTab.Util.Logger.Info("ScoreLoader", importer.get_Name() + " does not support the file");
             }
         }
     }
     if (score != null){
         return score;
     }
-    AlphaTab.Util.Logger.Info("No compatible importer found for file");
+    AlphaTab.Util.Logger.Info("ScoreLoader", "No compatible importer found for file");
     throw $CreateException(new AlphaTab.Importer.NoCompatibleReaderFoundException(), new Error());
 };
 AlphaTab.Importer.UnsupportedFormatException = function (message){
@@ -14556,6 +14605,7 @@ AlphaTab.Rendering.Layout.ScoreLayout.prototype = {
         this.DoLayoutAndRender();
     },
     CreateScoreInfoGlyphs: function (){
+        AlphaTab.Util.Logger.Info("ScoreLayout", "Creating score info glyphs");
         var flags = this.Renderer.Settings.Layout.Get("hideInfo", false) ? AlphaTab.Rendering.Layout.HeaderFooterElements.None : AlphaTab.Rendering.Layout.HeaderFooterElements.All;
         var score = this.Renderer.Score;
         var res = this.Renderer.RenderingResources;
@@ -14665,6 +14715,9 @@ AlphaTab.Rendering.Layout.HorizontalScreenLayout = function (renderer){
     AlphaTab.Rendering.Layout.ScoreLayout.call(this, renderer);
 };
 AlphaTab.Rendering.Layout.HorizontalScreenLayout.prototype = {
+    get_Name: function (){
+        return "HorizontalScreen";
+    },
     get_SupportsResize: function (){
         return false;
     },
@@ -14710,6 +14763,7 @@ AlphaTab.Rendering.Layout.HorizontalScreenLayout.prototype = {
                         currentPartial.Width += this._group.X + this._group.AccoladeSpacing;
                     }
                     partials.push(currentPartial);
+                    AlphaTab.Util.Logger.Info(this.get_Name(), "Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " + currentPartial.MasterBars[currentPartial.MasterBars.length - 1].Index);
                     currentPartial = new AlphaTab.Rendering.Layout.HorizontalScreenLayoutPartialInfo();
                 }
             }
@@ -14721,25 +14775,11 @@ AlphaTab.Rendering.Layout.HorizontalScreenLayout.prototype = {
                 currentPartial.Width += this._group.X + this._group.AccoladeSpacing;
             }
             partials.push(currentPartial);
+            AlphaTab.Util.Logger.Info(this.get_Name(), "Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " + currentPartial.MasterBars[currentPartial.MasterBars.length - 1].Index);
         }
         this._group.FinalizeGroup();
         this.Height = this._group.Y + this._group.get_Height() + AlphaTab.Rendering.Layout.HorizontalScreenLayout.PagePadding[3];
         this.Width = this._group.X + this._group.Width + AlphaTab.Rendering.Layout.HorizontalScreenLayout.PagePadding[2];
-        // TODO: Find a good way to render the score partwise
-        // we need to precalculate the final height somehow
-        //canvas.BeginRender(Width, Height);
-        //canvas.Color = Renderer.RenderingResources.MainGlyphColor;
-        //canvas.TextAlign = TextAlign.Left;
-        //_group.Paint(0, 0, Renderer.Canvas);
-        //var result = canvas.EndRender();
-        //OnPartialRenderFinished(new RenderFinishedEventArgs
-        //{
-        //    TotalWidth = Width,
-        //    TotalHeight = y,
-        //    Width = Width,
-        //    Height = Height,
-        //    RenderResult = result
-        //});
         currentBarIndex = 0;
         for (var i = 0; i < partials.length; i++){
             var partial = partials[i];
@@ -14750,6 +14790,7 @@ AlphaTab.Rendering.Layout.HorizontalScreenLayout.prototype = {
             if (i == 0){
                 renderX -= this._group.X + this._group.AccoladeSpacing;
             }
+            AlphaTab.Util.Logger.Info(this.get_Name(), "Rendering partial from bar " + partial.MasterBars[0].Index + " to " + partial.MasterBars[partial.MasterBars.length - 1].Index);
             this._group.PaintPartial(-renderX, this._group.Y, this.Renderer.Canvas, currentBarIndex, partial.MasterBars.length);
             var result = canvas.EndRender();
             this.Renderer.OnPartialRenderFinished((function (){
@@ -14779,6 +14820,9 @@ AlphaTab.Rendering.Layout.PageViewLayout = function (renderer){
     AlphaTab.Rendering.Layout.ScoreLayout.call(this, renderer);
 };
 AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
+    get_Name: function (){
+        return "PageView";
+    },
     DoLayoutAndRender: function (){
         var x = AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[0];
         var y = AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[1];
@@ -14809,6 +14853,7 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
         this.Height = y + AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[3];
     },
     LayoutAndRenderScoreInfo: function (x, y, totalHeight){
+        AlphaTab.Util.Logger.Info(this.get_Name(), "Layouting score info");
         var scale = this.get_Scale();
         var res = this.Renderer.RenderingResources;
         var centeredGlyphs = [AlphaTab.Rendering.Layout.HeaderFooterElements.Title, AlphaTab.Rendering.Layout.HeaderFooterElements.SubTitle, AlphaTab.Rendering.Layout.HeaderFooterElements.Artist, AlphaTab.Rendering.Layout.HeaderFooterElements.Album, AlphaTab.Rendering.Layout.HeaderFooterElements.WordsAndMusic];
@@ -14948,6 +14993,7 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
             // finalize group (sizing etc).
             this.FitGroup(group);
             group.FinalizeGroup();
+            AlphaTab.Util.Logger.Info(this.get_Name(), "Rendering partial from bar " + group.get_FirstBarIndex() + " to " + group.get_LastBarIndex());
             y += this.PaintGroup(group, y, canvas);
         }
         return y;
@@ -15810,12 +15856,21 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
             this.Score = tracks[0].Score;
         }
         this.Tracks = tracks;
+        AlphaTab.Util.Logger.Info("Rendering", "Rendering " + tracks.length + " tracks");
+        for (var i = 0; i < tracks.length; i++){
+            var track = tracks[i];
+            AlphaTab.Util.Logger.Info("Rendering", "Track " + i + ": " + track.Name);
+        }
         this.Invalidate();
     },
     UpdateSettings: function (settings){
         this.Settings = settings;
     },
     Invalidate: function (){
+        if (this.Settings.Width == 0){
+            AlphaTab.Util.Logger.Warning("Rendering", "AlphaTab skipped rendering because of width=0 (element invisible)");
+            return;
+        }
         this.BoundsLookup = new AlphaTab.Rendering.Utils.BoundsLookup();
         if (this.Tracks.length == 0)
             return;
@@ -15827,12 +15882,15 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
         this.OnPreRender();
         this.RecreateLayout();
         this.LayoutAndRender();
+        AlphaTab.Util.Logger.Info("Rendering", "Rendering finished");
     },
     Resize: function (width){
         if (this.RecreateLayout()){
+            AlphaTab.Util.Logger.Info("Rendering", "Starting full rerendering due to layout change");
             this.Invalidate();
         }
         else if (this.Layout.get_SupportsResize()){
+            AlphaTab.Util.Logger.Info("Rendering", "Starting optimized rerendering for resize");
             this.BoundsLookup = new AlphaTab.Rendering.Utils.BoundsLookup();
             this.OnPreRender();
             this.Settings.Width = width;
@@ -15841,8 +15899,13 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
             this.OnRenderFinished();
             this.OnPostRender();
         }
+        else {
+            AlphaTab.Util.Logger.Warning("Rendering", "Current layout does not support dynamic resizing, nothing was done");
+        }
+        AlphaTab.Util.Logger.Info("Rendering", "Resize finished");
     },
     LayoutAndRender: function (){
+        AlphaTab.Util.Logger.Info("Rendering", "Rendering at scale " + this.Settings.Scale + " with layout " + this.Layout.get_Name());
         this.Layout.LayoutAndRender();
         this.Layout.RenderAnnotation();
         this.OnRenderFinished();
@@ -17514,23 +17577,23 @@ $StaticConstructor(function (){
     AlphaTab.Util.Logger.LogLevel = AlphaTab.Util.LogLevel.None;
     AlphaTab.Util.Logger.LogLevel = AlphaTab.Util.LogLevel.Info;
 });
-AlphaTab.Util.Logger.Debug = function (msg){
-    AlphaTab.Util.Logger.Log(AlphaTab.Util.LogLevel.Debug, msg);
+AlphaTab.Util.Logger.Debug = function (category, msg){
+    AlphaTab.Util.Logger.Log(AlphaTab.Util.LogLevel.Debug, category, msg);
 };
-AlphaTab.Util.Logger.Warning = function (msg){
-    AlphaTab.Util.Logger.Log(AlphaTab.Util.LogLevel.Warning, msg);
+AlphaTab.Util.Logger.Warning = function (category, msg){
+    AlphaTab.Util.Logger.Log(AlphaTab.Util.LogLevel.Warning, category, msg);
 };
-AlphaTab.Util.Logger.Info = function (msg){
-    AlphaTab.Util.Logger.Log(AlphaTab.Util.LogLevel.Info, msg);
+AlphaTab.Util.Logger.Info = function (category, msg){
+    AlphaTab.Util.Logger.Log(AlphaTab.Util.LogLevel.Info, category, msg);
 };
-AlphaTab.Util.Logger.Error = function (msg){
-    AlphaTab.Util.Logger.Log(AlphaTab.Util.LogLevel.Error, msg);
+AlphaTab.Util.Logger.Error = function (category, msg){
+    AlphaTab.Util.Logger.Log(AlphaTab.Util.LogLevel.Error, category, msg);
 };
-AlphaTab.Util.Logger.Log = function (logLevel, msg){
+AlphaTab.Util.Logger.Log = function (logLevel, category, msg){
     if (logLevel < AlphaTab.Util.Logger.LogLevel)
         return;
     var caller = arguments.callee.caller.caller.name;
-    AlphaTab.Platform.Std.Log("[AlphaTab] " + caller + " - " + msg, AlphaTab.Util.Logger.LogLevel);
+    AlphaTab.Platform.Std.Log("[AlphaTab][" + category + "] " + caller + " - " + msg, logLevel);
 };
 AlphaTab.Util.LogLevel = {
     None: 0,

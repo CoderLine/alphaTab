@@ -21,6 +21,7 @@ using AlphaTab.Model;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 using AlphaTab.Rendering.Utils;
+using AlphaTab.Util;
 
 namespace AlphaTab.Rendering.Layout
 {
@@ -45,7 +46,7 @@ namespace AlphaTab.Rendering.Layout
         public const float GroupSpacing = 20;
 
         private StaveGroup _group;
-
+        public override string Name { get { return "HorizontalScreen"; } }
         public HorizontalScreenLayout(ScoreRenderer renderer)
             : base(renderer)
         {
@@ -96,7 +97,6 @@ namespace AlphaTab.Rendering.Layout
                     var previousPartial = partials[partials.Count - 1];
                     previousPartial.MasterBars.Add(score.MasterBars[currentBarIndex]);
                     previousPartial.Width += result.Width;
-
                 }
                 else
                 {
@@ -110,6 +110,9 @@ namespace AlphaTab.Rendering.Layout
                             currentPartial.Width += _group.X + _group.AccoladeSpacing;
                         }
                         partials.Add(currentPartial);
+                        Logger.Info(Name,
+                                    "Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " +
+                                    currentPartial.MasterBars[currentPartial.MasterBars.Count - 1].Index);
                         currentPartial = new HorizontalScreenLayoutPartialInfo();
                     }
                 }
@@ -125,30 +128,16 @@ namespace AlphaTab.Rendering.Layout
                     currentPartial.Width += _group.X + _group.AccoladeSpacing;
                 }
                 partials.Add(currentPartial);
+                Logger.Info(Name,
+                            "Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " +
+                            currentPartial.MasterBars[currentPartial.MasterBars.Count - 1].Index);
             }
 
             _group.FinalizeGroup();
 
             Height = _group.Y + _group.Height + PagePadding[3];
             Width = _group.X + _group.Width + PagePadding[2];
-
-            // TODO: Find a good way to render the score partwise
-            // we need to precalculate the final height somehow
-
-            //canvas.BeginRender(Width, Height);
-            //canvas.Color = Renderer.RenderingResources.MainGlyphColor;
-            //canvas.TextAlign = TextAlign.Left;
-            //_group.Paint(0, 0, Renderer.Canvas);
-            //var result = canvas.EndRender();
-            //OnPartialRenderFinished(new RenderFinishedEventArgs
-            //{
-            //    TotalWidth = Width,
-            //    TotalHeight = y,
-            //    Width = Width,
-            //    Height = Height,
-            //    RenderResult = result
-            //});
-
+            
             currentBarIndex = 0;
             for (var i = 0; i < partials.Count; i++)
             {
@@ -162,6 +151,11 @@ namespace AlphaTab.Rendering.Layout
                 {
                     renderX -= _group.X + _group.AccoladeSpacing;
                 }
+
+                Logger.Info(Name,
+                            "Rendering partial from bar " + partial.MasterBars[0].Index + " to " +
+                            partial.MasterBars[partial.MasterBars.Count - 1].Index);
+
                 _group.PaintPartial(-renderX, _group.Y, Renderer.Canvas, currentBarIndex, partial.MasterBars.Count);
                 var result = canvas.EndRender();
                 Renderer.OnPartialRenderFinished(new RenderFinishedEventArgs

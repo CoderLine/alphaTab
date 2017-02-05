@@ -15,9 +15,12 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
+using AlphaTab.Util;
 using SharpKit.Html;
 using SharpKit.JavaScript;
 
@@ -34,8 +37,11 @@ namespace AlphaTab.Platform.JavaScript
     {
         protected readonly HtmlElement Element;
         protected readonly HtmlElement CanvasElement;
+        protected readonly Settings Settings;
         protected int[] TrackIndexes;
         protected bool AutoSize;
+        private int _visibilityCheckerInterval;
+        private int _visibilityCheckerIntervalId;
 
         private FastList<RenderFinishedEventArgs> _renderResults;
         private int _totalResultCount;
@@ -46,7 +52,7 @@ namespace AlphaTab.Platform.JavaScript
             dynamic dataset = Element.dataset;
 
             // load settings
-            Settings settings = Settings.FromJson(options);
+            var settings = Settings = Settings.FromJson(options);
 
             #region build tracks array
 
@@ -88,6 +94,7 @@ namespace AlphaTab.Platform.JavaScript
                 CanvasElement.className = "alphaTabSurface";
                 CanvasElement.style.fontSize = "0";
                 CanvasElement.style.overflow = "hidden";
+                CanvasElement.style.lineHeight = "0";
                 element.appendChild(CanvasElement);
 
                 #endregion
@@ -114,27 +121,15 @@ namespace AlphaTab.Platform.JavaScript
                 if (AutoSize)
                 {
                     settings.Width = element.offsetWidth;
-                    if (options)
-                    {
-                        options.width = element.offsetWidth;
-                    }
                     int timeoutId = 0;
                     window.addEventListener("resize", e =>
                     {
                         clearTimeout(timeoutId);
-
                         timeoutId = setTimeout(() =>
                         {
                             if (element.offsetWidth != settings.Width)
                             {
-                                var resizeEventInfo = new ResizeEventArgs();
-                                resizeEventInfo.OldWidth = settings.Width;
-                                resizeEventInfo.NewWidth = element.offsetWidth;
-                                resizeEventInfo.Settings = settings;
-                                TriggerEvent("resize", resizeEventInfo);
-                                settings.Width = resizeEventInfo.NewWidth;
-                                Renderer.UpdateSettings(settings);
-                                Renderer.Resize(element.offsetWidth);
+                                TriggerResize();
                             }
                         }, 1);
                     });
@@ -177,25 +172,87 @@ namespace AlphaTab.Platform.JavaScript
 
             #region Load Default Data
 
-            if (!string.IsNullOrEmpty(contents))
+            Action initialRender = () =>
             {
-                Tex(contents);
-            }
-            else if (options && options.file)
-            {
-                Load(options.file);
-            }
-            else if (Element != null && Element.dataset != null && !string.IsNullOrEmpty(dataset["file"]))
-            {
-                Load(dataset["file"]);
-            }
-            else if (Element != null && !string.IsNullOrEmpty(Element.getAttribute("data-file")))
-            {
-                Load(Element.getAttribute("data-file"));
-            }
+                // rendering was possibly delayed due to invisible element
+                // in this case we need the correct width for autosize
+                if (AutoSize)
+                {
+                    Settings.Width = Element.offsetWidth;
+                    Renderer.UpdateSettings(settings);
+                }
 
+                if (!string.IsNullOrEmpty(contents))
+                {
+                    Tex(contents);
+                }
+                else if (options && options.file)
+                {
+                    Load(options.file);
+                }
+                else if (Element != null && Element.dataset != null && !string.IsNullOrEmpty(dataset["file"]))
+                {
+                    Load(dataset["file"]);
+                }
+                else if (Element != null && !string.IsNullOrEmpty(Element.getAttribute("data-file")))
+                {
+                    Load(Element.getAttribute("data-file"));
+                }
+            };
+
+            _visibilityCheckerInterval = options && options.visibilityCheckInterval || 500;
+            if (IsElementVisible(Element))
+            {
+                // element is visible, so we start rendering
+                initialRender();
+            }
+            else
+            {
+                // if the alphaTab element is not visible, we postpone the rendering
+                // we check in a regular interval whether it became available. 
+                Logger.Warning("Rendering", "AlphaTab container is invisible, checking for element visibility in " + _visibilityCheckerInterval + "ms intervals");
+                _visibilityCheckerIntervalId = setInterval(() =>
+                {
+                    if (IsElementVisible(Element))
+                    {
+                        Logger.Info("Rendering", "AlphaTab container became visible, triggering initial rendering");
+                        initialRender();
+                        clearInterval(_visibilityCheckerIntervalId);
+                        _visibilityCheckerIntervalId = 0;
+                    }
+                }, _visibilityCheckerInterval);
+            }
 
             #endregion
+        }
+
+        private void TriggerResize()
+        {
+            // if the element is visible, perfect, we do the update
+            if (IsElementVisible(Element))
+            {
+                if (_visibilityCheckerIntervalId != 0)
+                {
+                    Logger.Info("Rendering", "AlphaTab container became visible again, doing autosizing");
+                    clearInterval(_visibilityCheckerIntervalId);
+                    _visibilityCheckerIntervalId = 0;
+                }
+
+                var resizeEventInfo = new ResizeEventArgs();
+                resizeEventInfo.OldWidth = Settings.Width;
+                resizeEventInfo.NewWidth = Element.offsetWidth;
+                resizeEventInfo.Settings = Settings;
+                TriggerEvent("resize", resizeEventInfo);
+                Settings.Width = resizeEventInfo.NewWidth;
+                Renderer.UpdateSettings(Settings);
+                Renderer.Resize(Element.offsetWidth);
+            }
+            // if there is no "invisibility timer" we set up one, if there is already a timer scheduled, it will trigger the proper rendering. 
+            else if (_visibilityCheckerIntervalId == 0)
+            {
+                Logger.Warning("Rendering", "AlphaTab container was invisible while autosizing, checking for element visibility in " + _visibilityCheckerInterval + "ms intervals");
+                _visibilityCheckerIntervalId = setInterval(TriggerResize, _visibilityCheckerInterval);
+            }
         }
 
         private void ShowSvgsInViewPort()

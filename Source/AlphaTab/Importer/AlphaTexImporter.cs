@@ -20,6 +20,7 @@ using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Util;
 
 namespace AlphaTab.Importer
 {
@@ -81,7 +82,7 @@ namespace AlphaTab.Importer
             {
                 e = new AlphaTexException(_curChPos, nonterm, expected, expected, _syData);
             }
-            Console.WriteLine(e.Message);
+            Logger.Error(Name, e.Message);
             throw e;
         }
 
@@ -610,7 +611,7 @@ namespace AlphaTab.Importer
                     NewSy();
                     anyMeta = true;
                 }
-                else if(anyMeta)
+                else if (anyMeta)
                 {
                     Error("metaDataTags", AlphaTexSymbols.String, false);
                 }
@@ -992,7 +993,7 @@ namespace AlphaTab.Importer
                 return true;
             }
 
-            if (syData == "gr") 
+            if (syData == "gr")
             {
                 NewSy();
                 if (_syData.ToString().ToLower() == "ob")
@@ -1098,7 +1099,7 @@ namespace AlphaTab.Importer
                 _syData = syData;
                 if (syData == "b" || syData == "be")
                 {
-                    var exact = (string) _syData == "be";
+                    var exact = (string)_syData == "be";
                     // read points
                     NewSy();
                     if (_sy != AlphaTexSymbols.LParensis)
@@ -1160,7 +1161,7 @@ namespace AlphaTab.Importer
                             i++;
                         }
                     }
-                   
+
 
                     if (_sy != AlphaTexSymbols.RParensis)
                     {

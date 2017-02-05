@@ -154,6 +154,7 @@ namespace AlphaTab
                         testItem.style.position = "absolute";
                         testItem.style.left = "0";
                         testItem.style.top = "0";
+                        testItem.style.fontSize = "100px";
                         testItem.classList.add("at");
                         testItem.innerHTML = "&#" + (int)MusicFontSymbol.ClefG + ";";
 
@@ -162,7 +163,7 @@ namespace AlphaTab
 
                     // get width
                     var width = testItem.offsetWidth;
-                    if (width > 30)
+                    if (width > 30 && width < 100)
                     {
                         IsFontLoaded = true;
                         HtmlContext.document.body.removeChild(testItem);
