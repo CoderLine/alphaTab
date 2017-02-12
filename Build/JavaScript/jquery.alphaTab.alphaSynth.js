@@ -177,9 +177,9 @@
         var previousState = context.cursorOptions.playerState;
         context.cursorOptions.currentBeat = beat;
         context.cursorOptions.cursorCache = cache;
-        context.cursorOptions.playerState = playerState;
+        context.cursorOptions.playerState = context.playerState;
         
-        if(beat == previousBeat && cache == previousCache && previousState == playerState) {
+        if(beat == previousBeat && cache == previousCache && previousState == context.playerState) {
             return;
         }
         
@@ -211,7 +211,7 @@
             
         // if playing, animate the cursor to the next beat
         $('.atHighlight').removeClass('atHighlight');
-        if(playerState == 1) {
+        if(context.playerState == 1) {
             $('.b' + beat.Id).addClass('atHighlight');
 
             var nextBeatX = barBoundings.VisualBounds.X + barBoundings.VisualBounds.W;
@@ -338,7 +338,6 @@
         //
         // Hook into events
         var previousTick = 0;
-        var playerState = 0;
         
         // we need to update our position caches if we render a tablature
         element.on('post-rendered', function(e, score) {
@@ -358,7 +357,7 @@
             }, 0); // enqueue cursor update for later to return ExternalInterface call in case of Flash
         });
         as.On('playerStateChanged', function(s) {
-            playerState = s;
+            context.playerState = s;
             setTimeout(function() {
                 api.playerCursorUpdateTick(element, context, previousTick);
             }, 0); // enqueue cursor update for later to return ExternalInterface call in case of Flash
