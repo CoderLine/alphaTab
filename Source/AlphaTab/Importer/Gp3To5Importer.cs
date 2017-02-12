@@ -888,7 +888,7 @@ namespace AlphaTab.Importer
         public void ReadMixTableChange(Beat beat)
         {
             var tableChange = new MixTableChange();
-            tableChange.Instrument = Data.ReadByte();
+            tableChange.Instrument = Data.ReadSignedByte();
             if (_versionNumber >= 500)
             {
                 Data.Skip(16); // Rse Info 

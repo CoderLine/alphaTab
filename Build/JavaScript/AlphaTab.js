@@ -5409,7 +5409,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
     },
     ReadMixTableChange: function (beat){
         var tableChange = new AlphaTab.Importer.MixTableChange();
-        tableChange.Instrument = this.Data.ReadByte();
+        tableChange.Instrument = AlphaTab.Platform.Std.ReadSignedByte(this.Data);
         if (this._versionNumber >= 500){
             this.Data.Skip(16);
             // Rse Info 
