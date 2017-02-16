@@ -274,7 +274,7 @@
         }
         
         // trigger an event for others to indicate which beat/bar is played
-        context.TriggerEvent('playedBeatChanged', beat);
+        context.TriggerEvent('played-beat-changed', beat);
     };
 
     var cursorOptionsDefaults = {
