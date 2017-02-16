@@ -48,17 +48,17 @@
     var selectionEnd = null;
     var selecting = false;
     
-	function getTickCache(element) {
+	api.getTickCache = function(element) {
 		return element.data('alphaSynthTickCache');
 	}
-	function getCursorCache(element) {
+	api.getCursorCache = function(element) {
 		return element.data('alphaSynthCursorCache');
 	}
 	
     // updates the cursors to highlight the beat at the specified tick position
     api.playerCursorUpdateTick = function(element, context, tick) {
         requestAnimationFrame(function() {
-            var cache = getTickCache(element);
+            var cache = api.getTickCache(element);
             if(cache) {
                 var tracks = api.tracks(element, context);
                 if(tracks.length > 0) {
@@ -73,7 +73,7 @@
     
     api.playerCursorSelectRange = function(element, context, startBeat, endBeat) {
         
-        var cache = getCursorCache(element);
+        var cache = api.getCursorCache(element);
         if(!cache) {
             return;
         }
@@ -167,7 +167,7 @@
     api.playerCursorUpdateBeat = function(element, context, beat, nextBeat, duration) {
         if(beat == null) return;
         
-        var cache = getCursorCache(element);
+        var cache = api.getCursorCache(element);
         if(!cache) {
             return;
         }
@@ -417,7 +417,7 @@
                 }
                 
                 // get the start and stop ticks (which consider properly repeats)
-                var tickCache = getTickCache(element);
+                var tickCache = api.getTickCache(element);
                 var realMasterBarStart = tickCache.GetMasterBarStart(selectionStart.beat.Voice.Bar.get_MasterBar());
                         
                 // move to selection start
@@ -447,7 +447,7 @@
     }
 
     api.getBeatAtPos = function(element, context, x, y) {
-        var cache = getCursorCache(element);
+        var cache = api.getCursorCache(element);
         return cache.GetBeatAtPos(x, y);
     };
     
