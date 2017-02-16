@@ -272,6 +272,9 @@
                 }
             }            
         }
+        
+        // trigger an event for others to indicate which beat/bar is played
+        context.TriggerEvent('playedBeatChanged', beat);
     };
 
     var cursorOptionsDefaults = {
@@ -351,7 +354,6 @@
         // cursor updating
         as.On('positionChanged', function(currentTime, endTime, currentTick, endTick) {
             previousTick = currentTick;
-            console.log(currentTick);
             setTimeout(function() {
                 api.playerCursorUpdateTick(element, context, currentTick);
             }, 0); // enqueue cursor update for later to return ExternalInterface call in case of Flash
