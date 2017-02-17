@@ -1,4 +1,22 @@
-(function($) {
+/*
+ * This file is part of alphaTab.
+ * Copyright c 2013, Daniel Kuschny and Contributors, All rights reserved.
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3.0 of the License, or at your option any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.
+ */
+(function ($) {
+    if(!$) { return; }
     function loadMidi(element, context, as, score) {
         // invalid score
         if(score == null || !as.Ready) return;
@@ -48,13 +66,13 @@
     var selectionEnd = null;
     var selecting = false;
     
-	api.getTickCache = function(element) {
-		return element.data('alphaSynthTickCache');
-	}
-	api.getCursorCache = function(element) {
-		return element.data('alphaSynthCursorCache');
-	}
-	
+    api.getTickCache = function(element) {
+        return element.data('alphaSynthTickCache');
+    }
+    api.getCursorCache = function(element) {
+        return element.data('alphaSynthCursorCache');
+    }
+    
     // updates the cursors to highlight the beat at the specified tick position
     api.playerCursorUpdateTick = function(element, context, tick) {
         requestAnimationFrame(function() {
@@ -450,8 +468,4 @@
         var cache = api.getCursorCache(element);
         return cache.GetBeatAtPos(x, y);
     };
-    
-
-})(jQuery);
-
-
+})(typeof jQuery !== 'undefined' ? jQuery : null);

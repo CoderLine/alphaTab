@@ -369,9 +369,7 @@ namespace AlphaTab.Platform.JavaScript
             var styleElement = (HtmlStyleElement)document.getElementById("alphaTabStyle");
             if (styleElement == null)
             {
-                var fontDirectory = settings.ScriptFile;
-                fontDirectory = fontDirectory.Substring(0, fontDirectory.LastIndexOf("/")) + "/Font/";
-
+                string fontDirectory = settings.FontDirectory;
                 styleElement = (HtmlStyleElement)document.createElement("style");
                 styleElement.id = "alphaTabStyle";
                 styleElement.type = "text/css";

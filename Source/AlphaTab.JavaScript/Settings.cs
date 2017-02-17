@@ -33,6 +33,11 @@ namespace AlphaTab
             get; set;
         }
 
+        public string FontDirectory
+        {
+            get; set;
+        }
+
         public dynamic ToJson()
         {
             dynamic json = Std.NewObject();
@@ -44,7 +49,8 @@ namespace AlphaTab
             json.stretchForce = StretchForce;
             json.forcePianoFingering = ForcePianoFingering;
 
-            json.atRoot = ScriptFile;
+            json.scriptFile = ScriptFile;
+            json.fontDirectory = FontDirectory;
 
             json.layout = Std.NewObject();
             json.layout.mode = Layout.Mode;
@@ -80,6 +86,7 @@ namespace AlphaTab
 
             return settings;
         }
+
         public static void FillFromJson(Settings settings, dynamic json)
         {
             if (!json) return;
@@ -90,36 +97,42 @@ namespace AlphaTab
             if (Std.JsonExists(json, "stretchForce")) settings.StretchForce = json.stretchForce;
             if (Std.JsonExists(json, "forcePianoFingering")) settings.ForcePianoFingering = json.forcePianoFingering;
 
-            if (Std.JsonExists(json, "atRoot"))
+            if (Std.JsonExists(json, "scriptFile"))
             {
-                settings.ScriptFile = json.atRoot;
-                // append script name 
-                if (!settings.ScriptFile.EndsWith(".js"))
-                {
-                    if (!settings.ScriptFile.EndsWith("/"))
-                    {
-                        settings.ScriptFile += "/";
-                    }
-                    settings.ScriptFile += "AlphaTab.js";
-                }
-                if (!settings.ScriptFile.StartsWith("http") && !settings.ScriptFile.StartsWith("https"))
-                {
-                    var root = new StringBuilder();
-                    root.Append(HtmlContext.window.location.protocol);
-                    root.Append("//");
-                    root.Append(HtmlContext.window.location.hostname);
-                    if (HtmlContext.window.location.port.As<bool>())
-                    {
-                        root.Append(":");
-                        root.Append(HtmlContext.window.location.port);
-                    }
-                    root.Append(settings.ScriptFile);
-                    settings.ScriptFile = root.ToString();
-                }
+                settings.ScriptFile = EnsureFullUrl(settings.ScriptFile);
+                settings.ScriptFile = AppendScriptName(json.scriptFile);
+            }
+            else if (HtmlContext.self.document.As<bool>() && HtmlContext.self.window.Member("ALPHATAB_ROOT").As<bool>())
+            {
+                settings.ScriptFile = HtmlContext.self.window.Member("ALPHATAB_ROOT").As<string>();
+                settings.ScriptFile = EnsureFullUrl(settings.ScriptFile);
+                settings.ScriptFile = AppendScriptName(settings.ScriptFile);
             }
             else
             {
                 settings.ScriptFile = Environment.ScriptFile;
+            }
+
+            if (Std.JsonExists(json, "fontDirectory"))
+            {
+                settings.FontDirectory = EnsureFullUrl(json.fontDirectory);
+            }
+            else if (HtmlContext.self.document.As<bool>() && HtmlContext.self.window.Member("ALPHATAB_FONT").As<bool>())
+            {
+                settings.FontDirectory = HtmlContext.self.window.Member("ALPHATAB_FONT").As<string>();
+                settings.FontDirectory = EnsureFullUrl(settings.FontDirectory);
+            }
+            else
+            {
+                settings.FontDirectory = settings.ScriptFile;
+                if (!string.IsNullOrEmpty(settings.FontDirectory))
+                {
+                    var lastSlash = settings.FontDirectory.LastIndexOf('/');
+                    if (lastSlash >= 0)
+                    {
+                        settings.FontDirectory = settings.FontDirectory.Substring(0, lastSlash) + "/Font/";
+                    }
+                }
             }
 
             if (Std.JsonExists(json, "layout"))
@@ -166,6 +179,44 @@ namespace AlphaTab
                     }
                 }
             }
+        }
+
+        private static string AppendScriptName(string url)
+        {
+            // append script name 
+            if (!string.IsNullOrEmpty(url) && !url.EndsWith(".js"))
+            {
+                if (!url.EndsWith("/"))
+                {
+                    url += "/";
+                }
+                url += "AlphaTab.js";
+            }
+            return url;
+        }
+
+        private static string EnsureFullUrl(string relativeUrl)
+        {
+            if (!relativeUrl.StartsWith("http") && !relativeUrl.StartsWith("https"))
+            {
+                var root = new StringBuilder();
+                root.Append(HtmlContext.window.location.protocol);
+                root.Append("//");
+                root.Append(HtmlContext.window.location.hostname);
+                if (HtmlContext.window.location.port.As<bool>())
+                {
+                    root.Append(":");
+                    root.Append(HtmlContext.window.location.port);
+                }
+                root.Append(relativeUrl);
+                if (!relativeUrl.EndsWith("/"))
+                {
+                    root.Append("/");
+                }
+                return root.ToString();
+            }
+
+            return relativeUrl;
         }
     }
 }

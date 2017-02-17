@@ -16,6 +16,7 @@
  * License along with this library.
  */
 (function ($) {
+    if(!$) { return }
 
     var api = {
         init: function(element, context, options) {
@@ -105,41 +106,41 @@
     };
     // allow plugins to add methods
     $.fn.alphaTab.fn = api;
+        
+    /**
+     * VB Loader For IE 
+     * This code is based on the code of 
+     *     http://nagoon97.com/reading-binary-files-using-ajax/
+     *     Copyright (c) 2008 Andy G.P. Na <nagoon97@naver.com>
+     *     The source code is freely distributable under the terms of an MIT-style license.
+     */
+    document.write('<script type="text/vbscript">\n\
+    Function VbAjaxLoader(method, fileName)\n\
+        Dim xhr\n\
+        Set xhr = CreateObject("Microsoft.XMLHTTP")\n\
+    \n\
+        xhr.Open method, fileName, False\n\
+    \n\
+        xhr.setRequestHeader "Accept-Charset", "x-user-defined"\n\
+        xhr.send\n\
+    \n\
+        Dim byteArray()\n\
+    \n\
+        if xhr.Status = 200 Then\n\
+            Dim byteString\n\
+            Dim i\n\
+    \n\
+            byteString=xhr.responseBody\n\
+    \n\
+            ReDim byteArray(LenB(byteString))\n\
+    \n\
+            For i = 1 To LenB(byteString)\n\
+                byteArray(i-1) = AscB(MidB(byteString, i, 1))\n\
+            Next\n\
+        End If\n\
+    \n\
+        VbAjaxLoader=byteArray\n\
+    End Function\n\
+    </script>');
     
-})(jQuery);
-
-/**
- * VB Loader For IE 
- * This code is based on the code of 
- *     http://nagoon97.com/reading-binary-files-using-ajax/
- *     Copyright (c) 2008 Andy G.P. Na <nagoon97@naver.com>
- *     The source code is freely distributable under the terms of an MIT-style license.
- */
-document.write('<script type="text/vbscript">\n\
-Function VbAjaxLoader(method, fileName)\n\
-	Dim xhr\n\
-	Set xhr = CreateObject("Microsoft.XMLHTTP")\n\
-\n\
-	xhr.Open method, fileName, False\n\
-\n\
-	xhr.setRequestHeader "Accept-Charset", "x-user-defined"\n\
-	xhr.send\n\
-\n\
-	Dim byteArray()\n\
-\n\
-	if xhr.Status = 200 Then\n\
-		Dim byteString\n\
-		Dim i\n\
-\n\
-		byteString=xhr.responseBody\n\
-\n\
-		ReDim byteArray(LenB(byteString))\n\
-\n\
-		For i = 1 To LenB(byteString)\n\
-			byteArray(i-1) = AscB(MidB(byteString, i, 1))\n\
-		Next\n\
-	End If\n\
-\n\
-	VbAjaxLoader=byteArray\n\
-End Function\n\
-</script>');
+})(typeof jQuery !== 'undefined' ? jQuery : null);

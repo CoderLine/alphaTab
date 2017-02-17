@@ -625,88 +625,88 @@ AlphaSynth.Main.AlphaSynthWebWorker.prototype = {
         var data = e.data;
         var cmd = data["cmd"];
         switch (cmd){
-            case "play":
+            case "alphaSynth.play":
                 this.Play();
                 break;
-            case "pause":
+            case "alphaSynth.pause":
                 this.Pause();
                 break;
-            case "isReadyForPlay":
+            case "alphaSynth.isReadyForPlay":
                 this._main.postMessage({
-    cmd: "isReadyForPlay",
+    cmd: "alphaSynth.isReadyForPlay",
     value: this.IsReadyForPlay()
 }
 );
                 break;
-            case "getMasterVolume":
+            case "alphaSynth.getMasterVolume":
                 this._main.postMessage({
-    cmd: "getMasterVolume",
+    cmd: "alphaSynth.getMasterVolume",
     value: this._player.get_MasterVolume()
 }
 );
                 break;
-            case "setMasterVolume":
+            case "alphaSynth.setMasterVolume":
                 this._player.set_MasterVolume(data["value"]);
                 break;
-            case "getPlaybackSpeed":
+            case "alphaSynth.getPlaybackSpeed":
                 this._main.postMessage({
-    cmd: "getPlaybackSpeed",
+    cmd: "alphaSynth.getPlaybackSpeed",
     value: this._player.Sequencer.PlaybackSpeed
 }
 );
                 break;
-            case "setPlaybackSpeed":
+            case "alphaSynth.setPlaybackSpeed":
                 this._player.set_PlaybackSpeed(data["value"]);
                 break;
-            case "setPlaybackRange":
+            case "alphaSynth.setPlaybackRange":
                 this.SetPlaybackRange(data["startTick"], data["endTick"]);
                 break;
-            case "playPause":
+            case "alphaSynth.playPause":
                 this.PlayPause();
                 break;
-            case "stop":
+            case "alphaSynth.stop":
                 this.Stop();
                 break;
-            case "setPositionTick":
+            case "alphaSynth.setPositionTick":
                 this.SetPositionTick(data["tick"]);
                 break;
-            case "setPositionTime":
+            case "alphaSynth.setPositionTime":
                 this.SetPositionTime(data["time"]);
                 break;
-            case "loadSoundFontUrl":
+            case "alphaSynth.loadSoundFontUrl":
                 this.LoadSoundFontUrl(data["url"]);
                 break;
-            case "loadSoundFontBytes":
+            case "alphaSynth.loadSoundFontBytes":
                 this.LoadSoundFontBytes(data["data"]);
                 break;
-            case "loadMidiUrl":
+            case "alphaSynth.loadMidiUrl":
                 this.LoadMidiUrl(data["url"]);
                 break;
-            case "loadMidiBytes":
+            case "alphaSynth.loadMidiBytes":
                 this.LoadMidiBytes(data["data"]);
                 break;
-            case "getState":
+            case "alphaSynth.getState":
                 this._main.postMessage({
     cmd: "getState",
     value: this.GetState()
 }
 );
                 break;
-            case "isSoundFontLoaded":
+            case "alphaSynth.isSoundFontLoaded":
                 this._main.postMessage({
     cmd: "isSoundFontLoaded",
     value: this.IsSoundFontLoaded()
 }
 );
                 break;
-            case "isMidiLoaded":
+            case "alphaSynth.isMidiLoaded":
                 this._main.postMessage({
     cmd: "isMidiLoaded",
     value: this.IsMidiLoaded()
 }
 );
                 break;
-            case "setLogLevel":
+            case "alphaSynth.setLogLevel":
                 this.SetLogLevel(data["level"]);
                 break;
         }
@@ -770,13 +770,13 @@ AlphaSynth.Main.AlphaSynthWebWorker.prototype = {
     },
     OnReady: function (){
         this._main.postMessage({
-    cmd: "ready"
+    cmd: "alphaSynth.ready"
 }
 );
     },
     OnPositionChanged: function (sender, e){
         this._main.postMessage({
-    cmd: "positionChanged",
+    cmd: "alphaSynth.positionChanged",
     currentTime: e.CurrentTime,
     endTime: e.EndTime,
     currentTick: e.CurrentTick,
@@ -786,20 +786,20 @@ AlphaSynth.Main.AlphaSynthWebWorker.prototype = {
     },
     OnPlayerStateChanged: function (sender, e){
         this._main.postMessage({
-    cmd: "playerStateChanged",
+    cmd: "alphaSynth.playerStateChanged",
     state: e.State
 }
 );
     },
     OnFinished: function (sender, e){
         this._main.postMessage({
-    cmd: "finished"
+    cmd: "alphaSynth.finished"
 }
 );
     },
     OnSoundFontLoad: function (sender, e){
         this._main.postMessage({
-    cmd: "soundFontLoad",
+    cmd: "alphaSynth.soundFontLoad",
     loaded: e.Loaded,
     total: e.Total
 }
@@ -807,19 +807,19 @@ AlphaSynth.Main.AlphaSynthWebWorker.prototype = {
     },
     OnSoundFontLoaded: function (sender, e){
         this._main.postMessage({
-    cmd: "soundFontLoaded"
+    cmd: "alphaSynth.soundFontLoaded"
 }
 );
     },
     OnSoundFontLoadFailed: function (sender, e){
         this._main.postMessage({
-    cmd: "soundFontLoadFailed"
+    cmd: "alphaSynth.soundFontLoadFailed"
 }
 );
     },
     OnMidiLoad: function (sender, e){
         this._main.postMessage({
-    cmd: "midiLoad",
+    cmd: "alphaSynth.midiLoad",
     loaded: e.Loaded,
     total: e.Total
 }
@@ -827,26 +827,26 @@ AlphaSynth.Main.AlphaSynthWebWorker.prototype = {
     },
     OnMidiLoaded: function (sender, e){
         this._main.postMessage({
-    cmd: "midiFileLoaded"
+    cmd: "alphaSynth.midiFileLoaded"
 }
 );
     },
     OnMidiLoadFailed: function (sender, e){
         this._main.postMessage({
-    cmd: "midiFileLoadFailed"
+    cmd: "alphaSynth.midiFileLoadFailed"
 }
 );
     },
     OnReadyForPlay: function (sender, e){
         this._main.postMessage({
-    cmd: "readyForPlay",
+    cmd: "alphaSynth.readyForPlay",
     value: this.IsReadyForPlay()
 }
 );
     },
     SendLog: function (level, s){
         this._main.postMessage({
-    cmd: "log",
+    cmd: "alphaSynth.log",
     level: level,
     message: s
 }
@@ -856,6 +856,21 @@ AlphaSynth.Main.AlphaSynthWebWorker.prototype = {
         AlphaSynth.Util.Logger.LogLevel = level;
     }
 };
+$StaticConstructor(function (){
+    if (!self.document){
+        var main = self;
+        main.addEventListener("message", function (e){
+            var data = e.data;
+            var cmd = data["cmd"];
+            switch (cmd){
+                case "alphaSynth.playerReady":
+                    AlphaSynth.Player.WebWorkerOutput.PreferredSampleRate = data["sampleRate"];
+                    new AlphaSynth.Main.AlphaSynthWebWorker(main);
+                    break;
+            }
+        }, false);
+    }
+});
 AlphaSynth.Main.AlphaSynthWebWorkerApiBase = function (player, alphaSynthScriptFile){
     this._alphaSynthScriptFile = null;
     this._synth = null;
@@ -871,145 +886,128 @@ AlphaSynth.Main.AlphaSynthWebWorkerApiBase = function (player, alphaSynthScriptF
     this._events = {};
     this._alphaSynthScriptFile = alphaSynthScriptFile;
     // create web worker
-    this._synth = new Worker(this.CreateWorkerUrl());
+    this._synth = new Worker(this._alphaSynthScriptFile);
 };
 AlphaSynth.Main.AlphaSynthWebWorkerApiBase.prototype = {
-    CreateWorkerUrl: function (){
-        var source = "self.onmessage = function(e) {\r\n                if(e.data.cmd == \'playerReady\') {\r\n                    importScripts(e.data.alphaSynthScript);\r\n                    AlphaSynth.Player.WebWorkerOutput.PreferredSampleRate = e.data.sampleRate;\r\n                    new AlphaSynth.Main.AlphaSynthWebWorker(self);\r\n                }\r\n            }";
-         window.URL = window.URL || window.webkitURL;;
-         window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder  || window.MozBlobBuilder;;
-        var blob;
-        try{
-            blob = new Blob([source], {
-                type: "application/javascript"
-            });
-        }
-        catch($$e1){
-            var builder =  new BlobBuilder();
-            builder.append(source);
-            blob = builder.getBlob();
-        }
-        return  URL.createObjectURL(blob);
-    },
     Startup: function (){
         // start player
         this._player.Open();
         // start worker
         this._synth.addEventListener("message", $CreateDelegate(this, this.HandleWorkerMessage), false);
         this._synth.postMessage({
-            cmd: "playerReady",
+            cmd: "alphaSynth.playerReady",
             alphaSynthScript: this._alphaSynthScriptFile,
             sampleRate: this._player.get_SampleRate()
         });
     },
     IsReadyForPlay: function (){
         this._synth.postMessage({
-            cmd: "isReadyForPlay"
+            cmd: "alphaSynth.isReadyForPlay"
         });
     },
     Play: function (){
         this._synth.postMessage({
-            cmd: "play"
+            cmd: "alphaSynth.play"
         });
     },
     Pause: function (){
         this._synth.postMessage({
-            cmd: "pause"
+            cmd: "alphaSynth.pause"
         });
     },
     PlayPause: function (){
         this._synth.postMessage({
-            cmd: "playPause"
+            cmd: "alphaSynth.playPause"
         });
     },
     Stop: function (){
         this._synth.postMessage({
-            cmd: "stop"
+            cmd: "alphaSynth.stop"
         });
     },
     SetPositionTick: function (tick){
         this._synth.postMessage({
-            cmd: "setPositionTick",
+            cmd: "alphaSynth.setPositionTick",
             tick: tick
         });
     },
     SetPositionTime: function (millis){
         this._synth.postMessage({
-            cmd: "setPositionTime",
+            cmd: "alphaSynth.setPositionTime",
             time: millis
         });
     },
     LoadSoundFontUrl: function (url){
         this._synth.postMessage({
-            cmd: "loadSoundFontUrl",
+            cmd: "alphaSynth.loadSoundFontUrl",
             url: AlphaSynth.Main.AlphaSynthWebWorkerApiBase.QualifyUrl(url)
         });
     },
     LoadSoundFontBytes: function (data){
         this._synth.postMessage({
-            cmd: "loadSoundFontBytes",
+            cmd: "alphaSynth.loadSoundFontBytes",
             data: data
         });
     },
     LoadMidiUrl: function (url){
         this._synth.postMessage({
-            cmd: "loadMidiUrl",
+            cmd: "alphaSynth.loadMidiUrl",
             url: AlphaSynth.Main.AlphaSynthWebWorkerApiBase.QualifyUrl(url)
         });
     },
     LoadMidiBytes: function (data){
         this._synth.postMessage({
-            cmd: "loadMidiBytes",
+            cmd: "alphaSynth.loadMidiBytes",
             data: data
         });
     },
     GetState: function (){
         this._synth.postMessage({
-            cmd: "getState"
+            cmd: "alphaSynth.getState"
         });
     },
     GetMasterVolume: function (){
         this._synth.postMessage({
-            cmd: "getMasterVolume"
+            cmd: "alphaSynth.getMasterVolume"
         });
     },
     SetMasterVolume: function (volume){
         this._synth.postMessage({
-            cmd: "setMasterVolume",
+            cmd: "alphaSynth.setMasterVolume",
             value: volume
         });
     },
     GetPlaybackSpeed: function (){
         this._synth.postMessage({
-            cmd: "getPlaybackSpeed"
+            cmd: "alphaSynth.getPlaybackSpeed"
         });
     },
     SetPlaybackSpeed: function (playbackSpeed){
         this._synth.postMessage({
-            cmd: "setPlaybackSpeed",
+            cmd: "alphaSynth.setPlaybackSpeed",
             value: playbackSpeed
         });
     },
     SetPlaybackRange: function (startTick, endTick){
         this._synth.postMessage({
-            cmd: "setPlaybackRange",
+            cmd: "alphaSynth.setPlaybackRange",
             startTick: startTick,
             endTick: endTick
         });
     },
     IsSoundFontLoaded: function (){
         this._synth.postMessage({
-            cmd: "isSoundFontLoaded"
+            cmd: "alphaSynth.isSoundFontLoaded"
         });
     },
     IsMidiLoaded: function (){
         this._synth.postMessage({
-            cmd: "isMidiLoaded"
+            cmd: "alphaSynth.isMidiLoaded"
         });
     },
     SetLogLevel: function (level){
         this._synth.postMessage({
-            cmd: "setLogLevel",
+            cmd: "alphaSynth.setLogLevel",
             level: level
         });
     },
@@ -1017,66 +1015,74 @@ AlphaSynth.Main.AlphaSynthWebWorkerApiBase.prototype = {
         var data = e.data;
         var cmd = data["cmd"];
         switch (cmd){
-            case "isReadyForPlay":
-            case "getState":
-            case "getMasterVolume":
-            case "isSoundFontLoaded":
-            case "isMidiLoaded":
-                this.TriggerEvent(cmd, [data["value"]]);
+            case "alphaSynth.isReadyForPlay":
+                this.TriggerEvent("isReadyForPlay", [data["value"]]);
                 break;
-            case "ready":
+            case "alphaSynth.getState":
+                this.TriggerEvent("getState", [data["value"]]);
+                break;
+            case "alphaSynth.getMasterVolume":
+                this.TriggerEvent("getMasterVolume", [data["value"]]);
+                break;
+            case "alphaSynth.isSoundFontLoaded":
+                this.TriggerEvent("isSoundFontLoaded", [data["value"]]);
+                break;
+            case "alphaSynth.isMidiLoaded":
+                this.TriggerEvent("isMidiLoaded", [data["value"]]);
+                break;
+            case "alphaSynth.ready":
                 this._isWorkerReady = true;
                 this.CheckForReadyState();
                 break;
-            case "positionChanged":
-                this.TriggerEvent(cmd, [data["currentTime"], data["endTime"], data["currentTick"], data["endTick"]]);
+            case "alphaSynth.positionChanged":
+                this.TriggerEvent("positionChanged", [data["currentTime"], data["endTime"], data["currentTick"], data["endTick"]]);
                 break;
-            case "playerStateChanged":
-                this.TriggerEvent(cmd, [data["state"]]);
+            case "alphaSynth.playerStateChanged":
+                this.TriggerEvent("playerStateChanged", [data["state"]]);
                 break;
-            case "finished":
-                this.TriggerEvent(cmd, null);
+            case "alphaSynth.finished":
+                this.TriggerEvent("finished", null);
                 break;
-            case "soundFontLoad":
-                this.TriggerEvent(cmd, [data["loaded"], data["total"]]);
+            case "alphaSynth.soundFontLoad":
+                this.TriggerEvent("soundFontLoad", [data["loaded"], data["total"]]);
                 break;
-            case "soundFontLoaded":
-                this.TriggerEvent(cmd, null);
+            case "alphaSynth.soundFontLoaded":
+                this.TriggerEvent("soundFontLoaded", null);
                 break;
-            case "soundFontLoadFailed":
-                this.TriggerEvent(cmd, null);
+            case "alphaSynth.soundFontLoadFailed":
+                this.TriggerEvent("soundFontLoadFailed", null);
                 break;
-            case "midiLoad":
-                this.TriggerEvent(cmd, [data["loaded"], data["total"]]);
+            case "alphaSynth.midiLoad":
+                this.TriggerEvent("midiLoad", [data["loaded"], data["total"]]);
                 break;
-            case "midiFileLoaded":
-                this.TriggerEvent(cmd, null);
+            case "alphaSynth.midiFileLoaded":
+                this.TriggerEvent("midiFileLoaded", null);
                 break;
-            case "midiFileLoadFailed":
-                this.TriggerEvent(cmd, null);
+            case "alphaSynth.midiFileLoadFailed":
+                this.TriggerEvent("midiFileLoadFailed", null);
                 break;
-            case "readyForPlay":
-                this.TriggerEvent(cmd, [data["value"]]);
+            case "alphaSynth.readyForPlay":
+                this.TriggerEvent("readyForPlay", [data["value"]]);
                 break;
-            case "log":
+            case "alphaSynth.log":
                 this.Log(data["level"], data["message"]);
                 break;
-            case "playerSequencerFinished":
+            case "alphaSynth.playerSequencerFinished":
                 this._player.SequencerFinished();
                 break;
-            case "playerAddSamples":
+            case "alphaSynth.playerAddSamples":
                 this._player.AddSamples(data["samples"]);
                 break;
-            case "playerPlay":
+            case "alphaSynth.playerPlay":
                 this._player.Play();
                 break;
-            case "playerPause":
+            case "alphaSynth.playerPause":
                 this._player.Pause();
                 break;
-            case "playerSeek":
+            case "alphaSynth.playerSeek":
                 this._player.Seek(data["pos"]);
                 break;
-            case "setPlaybackSpeed":
+            case "alphaSynth.setPlaybackSpeed":
                 this._player.SetPlaybackSpeed(data["value"]);
                 break;
         }
@@ -1104,17 +1110,17 @@ AlphaSynth.Main.AlphaSynthWebWorkerApiBase.prototype = {
     },
     PlayerSampleRequest: function (){
         this._synth.postMessage({
-            cmd: "playerSampleRequest"
+            cmd: "alphaSynth.playerSampleRequest"
         });
     },
     PlayerFinished: function (){
         this._synth.postMessage({
-            cmd: "playerFinished"
+            cmd: "alphaSynth.playerFinished"
         });
     },
     PlayerPositionChanged: function (pos){
         this._synth.postMessage({
-            cmd: "playerPositionChanged",
+            cmd: "alphaSynth.playerPositionChanged",
             pos: pos
         });
     },
@@ -1304,13 +1310,13 @@ AlphaSynth.Player.WebWorkerOutput.prototype = {
         var data = e.data;
         var cmd = data["cmd"];
         switch (cmd){
-            case "playerSampleRequest":
+            case "alphaSynth.playerSampleRequest":
                 this.OnSampleRequest();
                 break;
-            case "playerFinished":
+            case "alphaSynth.playerFinished":
                 this.OnFinished();
                 break;
-            case "playerPositionChanged":
+            case "alphaSynth.playerPositionChanged":
                 this.OnPositionChanged(data["pos"]);
                 break;
         }
@@ -1363,39 +1369,39 @@ AlphaSynth.Player.WebWorkerOutput.prototype = {
     },
     SequencerFinished: function (){
         this._workerSelf.postMessage({
-    cmd: "playerSequencerFinished"
+    cmd: "alphaSynth.playerSequencerFinished"
 }
 );
     },
     AddSamples: function (samples){
         this._workerSelf.postMessage({
-    cmd: "playerAddSamples",
+    cmd: "alphaSynth.playerAddSamples",
     samples: samples
 }
 );
     },
     Play: function (){
         this._workerSelf.postMessage({
-    cmd: "playerPlay"
+    cmd: "alphaSynth.playerPlay"
 }
 );
     },
     Pause: function (){
         this._workerSelf.postMessage({
-    cmd: "playerPause"
+    cmd: "alphaSynth.playerPause"
 }
 );
     },
     Seek: function (position){
         this._workerSelf.postMessage({
-    cmd: "playerSeek",
+    cmd: "alphaSynth.playerSeek",
     pos: position
 }
 );
     },
     SetPlaybackSpeed: function (playbackSpeed){
         this._workerSelf.postMessage({
-    cmd: "setPlaybackSpeed",
+    cmd: "alphaSynth.setPlaybackSpeed",
     value: playbackSpeed
 }
 );
@@ -1433,7 +1439,9 @@ AlphaSynth.Util.Logger.Log = function (logLevel, msg){
     if (logLevel < AlphaSynth.Util.Logger.LogLevel)
         return;
     var caller = arguments.callee.caller.caller.name;
-    AlphaSynth.Util.Logger.LogHandler(caller + "-" + msg);
+    if (AlphaSynth.Util.Logger.LogHandler != null){
+        AlphaSynth.Util.Logger.LogHandler(caller + "-" + msg);
+    }
 };
 AlphaSynth.Util.Logger.GetCaller = function (){
     return "";
