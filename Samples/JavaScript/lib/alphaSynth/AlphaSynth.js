@@ -489,6 +489,20 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
         this._circularBuffer = new AlphaSynth.Ds.CircularSampleBuffer(40960);
          window.AudioContext = window.AudioContext || window.webkitAudioContext;
         this._context = new AudioContext();
+        // possible fix for Web Audio in iOS 9 (issue #4)
+        var ctx = this._context;
+        if (ctx.state == "suspended"){
+            var resume = null;
+            resume = $CreateAnonymousDelegate(this, function (e){
+                ctx.resume();
+                window.setTimeout($CreateAnonymousDelegate(this, function (){
+                    if (ctx.state == "running"){
+                        document.body.removeEventListener("touchend", resume, false);
+                    }
+                }), 0);
+            });
+            document.body.addEventListener("touchend", resume, false);
+        }
         this._currentTime = 0;
         // create an empty buffer source (silence)
         this._buffer = this._context.createBuffer(2, 4096, this._context.sampleRate);
