@@ -34,7 +34,7 @@ alphaTab can load music notation from various sources like Guitar Pro 3-5, Guita
 ... the guys of BrowserStack for a free plan. This allows me to test alphaTab on all browsers on all operating systems. Only with this I can ensure that alphaTab is shown to all your visitors as expected. 
 
 <p align="center">
-<a href="https://www.browserstack.com"><img src="Images/BrowserStack.png?raw=true" width="400" align="center"/></a>
+<a href="https://www.browserstack.com" target="_blank"><img src="Images/BrowserStack.png?raw=true" width="400" align="center"/></a>
 </p>
 
 ... to all you people using alphaTab providing new feature ideas and and bug reports. 
