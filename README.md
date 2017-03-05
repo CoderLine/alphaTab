@@ -17,8 +17,6 @@ Before reading further you might simply jump to our demos:
 >
 > [Player Demo](http://demo.alphatab.net/player.html) - *By integrating alphaSynth the you get a web based music sheet player* 
 >
-> [Responsive Demo](http://demo.alphatab.net/responsive.html) - *Most websites nowadays use responsive designs, alphaTab can adapt to the available width dynamically*
->
 > [alphaTex Introduction](http://demo.alphatab.net/alphatex.html) - *Learn about alphaTex, the built-in markup language for writing music notation*
 
 alphaTab can load music notation from various sources like Guitar Pro 3-5, Guitar Pro 6, AlphaTex and MusicXML (experimental) and render them into beautiful music sheets right within your browser (or application). Using [alphaSynth](http://github.com/CoderLine/alphaSynth) the music sheets can also be played in your browser without the need of any plugins (HTML5 Web Audio if available, fallback to flash) .
