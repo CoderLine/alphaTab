@@ -148,7 +148,7 @@
         //
         // 1. setup events        
         at.on('alphaTab.soundFontLoad', function(e, progress) {
-            var percentage = ((progress.loaded / progress.full) * 100)|0;
+            var percentage = ((progress.loaded / progress.total) * 100)|0;
             $('#soundFontProgress').css('width', percentage + '%').text(percentage + '%');
         });
         at.on('alphaTab.soundFontLoaded', function() {

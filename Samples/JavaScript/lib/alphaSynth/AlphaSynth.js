@@ -278,7 +278,7 @@ AlphaSynth.Main.AlphaSynthFlashOutput.prototype = {
     AddSamples: function (samples){
         var uint8 = new Uint8Array(samples.buffer);
         var fromCharCode =  String.fromCharCode;
-        var b64 = window.btoa(fromCharCode.call(null, uint8));
+        var b64 = window.btoa(fromCharCode.apply(null, uint8));
         document.getElementById(this._swfId).AlphaSynthAddSamples(b64);
     },
     ResetSamples: function (){
@@ -841,10 +841,6 @@ AlphaSynth.Main.AlphaSynthWebWorkerApi.prototype = {
                 ]);
             });
             request.send();
-            this._synth.postMessage({
-                cmd: "alphaSynth.loadMidiBytes",
-                url: data
-            });
         }
         else {
             this._synth.postMessage({
@@ -1264,7 +1260,7 @@ AlphaSynth.Util.Logger.Error = function (msg){
 AlphaSynth.Util.Logger.Log = function (logLevel, msg){
     if (logLevel < AlphaSynth.Util.Logger.LogLevel)
         return;
-    var caller = arguments.callee.caller.caller.name;
+    var caller = (arguments && arguments.callee && arguments.callee.caller && arguments.callee.caller.caller ? arguments.callee.caller.caller.name : '');
     if (AlphaSynth.Util.Logger.LogHandler != null){
         AlphaSynth.Util.Logger.LogHandler(logLevel, caller + "-" + msg);
     }
