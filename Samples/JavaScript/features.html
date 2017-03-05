@@ -49,9 +49,7 @@
                 
                 <div id="alphaTabShowcase" data-file="files/Canon.gp5"></div>
                 <script type="text/javascript-lazy">
-                    $('#alphaTabShowcase').alphaTab({
-                        useWorker: true
-                    });
+                    $('#alphaTabShowcase').alphaTab();
                 </script>
                     
             </div>
@@ -111,7 +109,8 @@
             <div id="alphaTabHtml5" data-file="files/features/SongDetails.gp5"></div>
             <script type="text/javascript-lazy">
                 $('#alphaTabHtml5').alphaTab({
-                    engine: 'html5' 
+                    engine: 'html5',
+                    useWorker: false, // html5 is not compatible with web workers
                 });
             </script>
             
