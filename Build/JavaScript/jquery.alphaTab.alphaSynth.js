@@ -19,37 +19,94 @@
     if(!$) { return; }
     function loadMidi(element, context, as, score) {
         // invalid score
-        if(score == null || !as.Ready) return;
+        if(score == null || !as.get_IsReady()) return;
        
         var midi = AlphaTab.Audio.Generator.MidiFileGenerator.GenerateMidiFile(score);
         element.data('alphaSynthTickCache', midi.TickLookup);
         var ms = new AlphaTab.IO.ByteBuffer();
         midi.WriteTo(ms);
         var bytes = ms.ToArray();
-        as.LoadMidiBytes(bytes);
+        as.LoadMidi(bytes);
+    }
+    
+    function getAlphaSynth(element){
+        var as = element.data('alphaSynth');
+        if(!as) { 
+            throw new Error('Initialize player before calling player related APIs');
+        }
+        return as;
     }
     
     // extend the api
     var api = $.fn.alphaTab.fn;
+   
+    
+    // hook into init 
+    api._oninit(function(element, context) {
+        var soundFont = element.data('player');
+        if(soundFont) {
+            var as = api.playerInit(element, context);             
+            if(element.data('cursor') != false) {
+                api.playerCursor(element, context);
+            }
+        }        
+    });
     
     //
     // Plugin 01: Player 
-    api.playerInit = function(element, context, args) {
+    api.playerInit = function(element, context) {
         var as = element.data('alphaSynth');
         if(!as) {
             // initialize alphaSynth
-            as = new AlphaSynth.Main.AlphaSynthApi();
-            as.On('ready', function(r) {
-                as.Ready = r;
-                // initial loading 
-                if(r) {
-                    loadMidi(element, context, as, api.score(element, context));            
+            as = AlphaSynth.Main.AlphaSynthApi.Create();
+            as.On('ready', function() {
+                var soundFont = element.data('player');
+                if(soundFont) {
+                    as.LoadSoundFont(soundFont);
                 }
+                loadMidi(element, context, as, api.score(element, context));
             });
+            
+            // hook into events and forward them
+            as.On('readyForPlayback', function() {
+                context.cursorOptions.playbackSpeed = as.get_PlaybackSpeed();
+                context.TriggerEvent('playerReady');
+            });
+            
+            as.On('soundFontLoad', function(data) {
+                context.TriggerEvent('soundFontLoad', data);
+            });
+            as.On('soundFontLoaded', function() {
+                context.TriggerEvent('soundFontLoaded');
+            });
+            as.On('soundFontLoadFailed', function() {
+                context.TriggerEvent('soundFontLoadFailed');
+            });
+            
+            as.On('midiLoad', function(data) {
+                context.TriggerEvent('midiLoad', data);
+            });
+            as.On('midiFileLoaded', function() {
+                context.TriggerEvent('midiFileLoaded');
+            });
+            as.On('midiFileLoadFailed', function() {
+                context.TriggerEvent('midiFileLoadFailed');
+            });
+            
+            as.On('playerStateChanged', function(data) {
+                context.TriggerEvent('playerStateChanged', data);
+            });
+            as.On('positionChanged', function(data) {
+                context.TriggerEvent('positionChanged', data);
+            });
+            as.On('finished', function(data) {
+                context.TriggerEvent('finished', data);
+            });
+                        
             element.data('alphaSynth', as);            
             
-            element.on('loaded', function() {
-                loadMidi(element, context, as, api.score(element, context));            
+            element.on('alphaTab.loaded', function(e, score) {
+                loadMidi(element, context, as, score);            
             });
         }    
         return as;        
@@ -57,6 +114,88 @@
     
     api.player = function(element, context) {
         return element.data('alphaSynth');
+    };
+    
+    //
+    // api calls which are forwarded to alphaSynth
+    
+    // properties
+    api.isReadyForPlayback = function(element, context) {
+        var as = getAlphaSynth(element);
+        return as.get_IsReadyForPlayback();        
+    };
+    
+    api.playerState = function(element, context) {
+        var as = getAlphaSynth(element);
+        return as.get_State();        
+    };
+    
+    api.masterVolume = function(element, context, value) {
+        var as = getAlphaSynth(element);
+        if(typeof value === 'undefined') {
+            return as.get_MasterVolume();
+        }
+        else {
+            as.set_MasterVolume(value);
+        }
+    };   
+    
+    api.playbackSpeed = function(element, context, value) {
+        var as = getAlphaSynth(element);
+        if(typeof value === 'undefined') {
+            return as.get_PlaybackSpeed();
+        }
+        else {
+            as.set_PlaybackSpeed(value);
+            context.cursorOptions.playbackSpeed = as.get_PlaybackSpeed();
+        }
+    };
+    
+    api.tickPosition = function(element, context, value) {
+        var as = getAlphaSynth(element);
+        if(typeof value === 'undefined') {
+            return as.get_TickPosition();
+        }
+        else {
+            as.set_TickPosition(value);
+        }
+    };
+    
+    api.playbackRange = function(element, context, value) {
+        var as = getAlphaSynth(element);
+        if(typeof value === 'undefined') {
+            return as.get_PlaybackRange();
+        }
+        else {
+            as.set_PlaybackRange(value);
+        }
+    };
+    
+    // methods
+    api.play = function(element, context) {
+        var as = getAlphaSynth(element);
+        as.Play();
+    };
+    api.pause = function(element, context) {
+        var as = getAlphaSynth(element);
+        as.Pause();
+    };
+    api.playPause = function(element, context) {
+        var as = getAlphaSynth(element);
+        as.PlayPause();
+    };
+    api.stop = function(element, context) {
+        var as = getAlphaSynth(element);
+        as.Stop();
+        api.playerCursorUpdateTick(element, context, 0, true);
+    };
+    api.loadSoundFont = function(element, context, value) {
+        var as = getAlphaSynth(element);
+        as.LoadSoundFont(value);
+    };
+    api.loadMidi = function(element, context, value) {
+        var as = getAlphaSynth(element);
+        as.LoadMidi(value);
     };
     
     //
@@ -73,8 +212,18 @@
         return element.data('alphaSynthCursorCache');
     }
     
+    api.autoScroll = function(element, context, value) {
+        if(typeof value === 'undefined') {
+            return context.cursorOptions.autoScroll;
+        }
+        else {
+            context.cursorOptions.autoScroll = value;
+            api.playerCursorUpdateBeat(element, context, context.cursorOptions.currentBeat);
+        }
+    },
+    
     // updates the cursors to highlight the beat at the specified tick position
-    api.playerCursorUpdateTick = function(element, context, tick) {
+    api.playerCursorUpdateTick = function(element, context, tick, stop) {
         requestAnimationFrame(function() {
             var cache = api.getTickCache(element);
             if(cache) {
@@ -82,15 +231,14 @@
                 if(tracks.length > 0) {
                     var beat = cache.FindBeat(tracks, tick);
                     if(beat) {
-                        api.playerCursorUpdateBeat(element, context, beat.CurrentBeat, beat.NextBeat, beat.Duration);    
+                        api.playerCursorUpdateBeat(element, context, beat.CurrentBeat, beat.NextBeat, beat.Duration, stop);    
                     }                
                 }
             }
         });
     };
     
-    api.playerCursorSelectRange = function(element, context, startBeat, endBeat) {
-        
+    api.playerCursorSelectRange = function(element, context, startBeat, endBeat) {        
         var cache = api.getCursorCache(element);
         if(!cache) {
             return;
@@ -182,7 +330,7 @@
     };
     
     // updates the cursors to highlight the specified beat
-    api.playerCursorUpdateBeat = function(element, context, beat, nextBeat, duration) {
+    api.playerCursorUpdateBeat = function(element, context, beat, nextBeat, duration, stop) {
         if(beat == null) return;
         
         var cache = api.getCursorCache(element);
@@ -229,21 +377,24 @@
             
         // if playing, animate the cursor to the next beat
         $('.atHighlight').removeClass('atHighlight');
-        if(context.playerState == 1) {
-            $('.b' + beat.Id).addClass('atHighlight');
-
-            var nextBeatX = barBoundings.VisualBounds.X + barBoundings.VisualBounds.W;
+        if(context.playerState == 1 || stop) {
+            duration /= context.cursorOptions.playbackSpeed;
             
-            // get position of next beat on same stavegroup
-            if(nextBeat) {
-                var nextBeatBoundings = cache.FindBeat(nextBeat);
-                if(nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds == barBoundings.StaveGroupBounds) {
-                    nextBeatX = nextBeatBoundings.VisualBounds.X;
-                }
+            if(!stop) {
+                $('.b' + beat.Id).addClass('atHighlight');            
+                var nextBeatX = barBoundings.VisualBounds.X + barBoundings.VisualBounds.W;
+                
+                // get position of next beat on same stavegroup
+                if(nextBeat) {
+                    var nextBeatBoundings = cache.FindBeat(nextBeat);
+                    if(nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds == barBoundings.StaveGroupBounds) {
+                        nextBeatX = nextBeatBoundings.VisualBounds.X;
+                    }
+                }            
+                beatCursor.animate({
+                    left: nextBeatX + 'px'
+                }, duration, 'linear');       
             }            
-            beatCursor.animate({
-                left: nextBeatX + 'px'
-            }, duration, 'linear');        
                 
             if(!selecting) {
                 
@@ -265,9 +416,8 @@
                     }
                 }
                 else if(context.cursorOptions.autoScroll == 'horizontal-bar') {
-                    var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
                     if(barBoundings.VisualBounds.X != context.cursorOptions.lastScroll) {
-                        var scrollLeft = padding + beatBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
+                        var scrollLeft = barBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
                         context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
                         $(context.cursorOptions.scrollElement).animate({
                             scrollLeft:scrollLeft + 'px'
@@ -275,13 +425,10 @@
                     }
                 }
                 else if(context.cursorOptions.autoScroll == 'horizontal-offscreen') {
-                    var padding = beatCursor.offset().left - beatBoundings.VisualBounds.X;
                     var elementRight = $(context.cursorOptions.scrollElement).scrollLeft() + 
                                        $(context.cursorOptions.scrollElement).width();
-                    if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || 
-                         barBoundings.VisualBounds.X < $(context.cursorOptions.scrollElement).scrollLeft()
-                    ) {
-                        var scrollLeft = padding + beatBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
+                    if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || barBoundings.VisualBounds.X < $(context.cursorOptions.scrollElement).scrollLeft() ) {
+                        var scrollLeft = barBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
                         context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
                         $(context.cursorOptions.scrollElement).animate({
                             scrollLeft:scrollLeft + 'px'
@@ -361,7 +508,7 @@
         var previousTick = 0;
         
         // we need to update our position caches if we render a tablature
-        element.on('post-rendered', function(e, score) {
+        element.on('alphaTab.postRendered', function(e) {
             var renderer = api.renderer(element, context);
             element.data('alphaSynthCursorCache', renderer.BoundsLookup);
             api.playerCursorUpdateTick(element, context, previousTick);
@@ -370,14 +517,14 @@
         });
                
         // cursor updating
-        as.On('positionChanged', function(currentTime, endTime, currentTick, endTick) {
-            previousTick = currentTick;
+        as.On('positionChanged', function(data) {
+            previousTick = data.currentTick;
             setTimeout(function() {
-                api.playerCursorUpdateTick(element, context, currentTick);
+                api.playerCursorUpdateTick(element, context, data.currentTick);
             }, 0); // enqueue cursor update for later to return ExternalInterface call in case of Flash
         });
-        as.On('playerStateChanged', function(s) {
-            context.playerState = s;
+        as.On('playerStateChanged', function(data) {
+            context.playerState = data.state;
             setTimeout(function() {
                 api.playerCursorUpdateTick(element, context, previousTick);
             }, 0); // enqueue cursor update for later to return ExternalInterface call in case of Flash
@@ -422,7 +569,7 @@
             });
             $(context.CanvasElement).on('mouseup', function(e) {
                 e.preventDefault();
-                                
+                                                
                 // for the selection ensure start < end
                 if(selectionEnd) {
                     var startTick = selectionStart.beat.get_AbsoluteStart();
@@ -434,28 +581,34 @@
                     }
                 }
                 
-                // get the start and stop ticks (which consider properly repeats)
-                var tickCache = api.getTickCache(element);
-                var realMasterBarStart = tickCache.GetMasterBarStart(selectionStart.beat.Voice.Bar.get_MasterBar());
-                        
-                // move to selection start
-                api.playerCursorUpdateBeat(element, context, selectionStart.beat);
-                as.SetPositionTick(realMasterBarStart + selectionStart.beat.Start);
-                
-                // set playback range 
-                if(selectionEnd && selectionStart.beat != selectionEnd.beat) {
-                    var realMasterBarEnd = tickCache.GetMasterBarStart(selectionEnd.beat.Voice.Bar.get_MasterBar());
-                    as.SetPlaybackRange(realMasterBarStart + selectionStart.beat.Start, realMasterBarEnd + selectionEnd.beat.Start);
+                if(selectionStart != null)
+                {
+                    // get the start and stop ticks (which consider properly repeats)
+                    var tickCache = api.getTickCache(element);
+                    var realMasterBarStart = tickCache.GetMasterBarStart(selectionStart.beat.Voice.Bar.get_MasterBar());
+                            
+                    // move to selection start
+                    api.playerCursorUpdateBeat(element, context, selectionStart.beat);
+                    as.set_TickPosition(realMasterBarStart + selectionStart.beat.Start);
+                    
+                    // set playback range 
+                    if(selectionEnd && selectionStart.beat != selectionEnd.beat) {
+                        var realMasterBarEnd = tickCache.GetMasterBarStart(selectionEnd.beat.Voice.Bar.get_MasterBar());
+                        as.set_PlaybackRange({
+                            StartTick: realMasterBarStart + selectionStart.beat.Start, 
+                            EndTick: realMasterBarEnd + selectionEnd.beat.Start
+                        });
+                    }
+                    else {
+                        selectionStart = null;
+                        as.set_PlaybackRange(null);
+                    }
+                    api.playerCursorSelectRange(element, context, selectionStart, selectionEnd);
                 }
-                else {
-                    selectionStart = null;
-                    as.SetPlaybackRange(-1, -1);
-                }
-                api.playerCursorSelectRange(element, context, selectionStart, selectionEnd);
                 selecting = false;
             });
             
-            element.on('post-rendered', function(e, score) {
+            element.on('alphaTab.postRendered', function(e) {
                 if(selectionStart) {
                     api.playerCursorSelectRange(element, context, selectionStart, selectionEnd);
                 }

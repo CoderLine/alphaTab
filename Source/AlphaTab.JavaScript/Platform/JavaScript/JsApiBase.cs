@@ -56,6 +56,8 @@ namespace AlphaTab.Platform.JavaScript
             Element = element;
             dynamic dataset = Element.dataset;
 
+            Element.classList.add("alphaTab");
+
             // load settings
             var settings = Settings = Settings.FromJson(options);
 
@@ -159,7 +161,7 @@ namespace AlphaTab.Platform.JavaScript
 
             Renderer = CreateScoreRenderer(settings);
             Renderer.RenderFinished += o => TriggerEvent("rendered");
-            Renderer.PostRenderFinished += () => TriggerEvent("post-rendered");
+            Renderer.PostRenderFinished += () => TriggerEvent("postRendered");
             Renderer.PreRender += result =>
             {
                 _renderResults = new FastList<RenderFinishedEventArgs>();
@@ -502,12 +504,26 @@ namespace AlphaTab.Platform.JavaScript
         {
             if (Element != null)
             {
+                name = "alphaTab." + name;
                 dynamic e = document.createEvent("CustomEvent");
                 e.initCustomEvent(name, false, false, details);
                 Element.dispatchEvent(e);
+
+                if (Std.JsonExists(window, "jQuery"))
+                {
+                    dynamic jquery = window["jQuery"];
+                    jquery(Element).trigger(name, details);
+                }
             }
         }
 
         public abstract void Render();
+
+        public void UpdateLayout(object json)
+        {
+            Settings.Layout = Settings.LayoutFromJson(json);
+            Renderer.UpdateSettings(Settings);
+            Renderer.Invalidate();
+        }
     }
 }

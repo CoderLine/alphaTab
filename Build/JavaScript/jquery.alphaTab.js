@@ -21,15 +21,20 @@
     var api = {
         init: function(element, context, options) {
             if (!context) {
-                if(options && options.useWorker && !!window.Worker) {
+                var useWorker = !(options && options.useWorker == false);
+                if(useWorker && !!window.Worker) {
                     context = new AlphaTab.Platform.JavaScript.JsWorkerApi(element[0], options);
                 }
                 else {
                     context = new AlphaTab.Platform.JavaScript.JsApi(element[0], options);
                 }
                 element.data('alphaTab', context);
+                
+                for(var i = 0; i < api._initListeners.length; i++) {
+                    api._initListeners[i](element, context, options);
+                }
             }
-        }, 
+        },
         
         tex: function(element, context, tex) {
             context.Tex(tex);
@@ -63,13 +68,31 @@
         
         renderer: function(element, context) {
             return context.Renderer;
-        }
+        },
+        
+        layout: function(element, context, value) {
+            if(typeof value === 'undefined') {
+                return context.Settings.Layout;
+            } 
+            else {
+                context.UpdateLayout(value);
+            }            
+        },
+               
+        _initListeners: [],
+        _oninit: function(handler) {
+            api._initListeners.push(handler);
+        },
     };
         
     var apiExec = function(element, method, args) {
         if(typeof(method) != "string") {
             args = [method];
             method = 'init';
+        }
+        
+        if(method.charAt(0) === '_') {
+            return;           
         }
         
         var $element = $(element);

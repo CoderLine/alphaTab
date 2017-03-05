@@ -521,6 +521,7 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
     this.Score = null;
     this.Element = element;
     var dataset = this.Element.dataset;
+    this.Element.classList.add("alphaTab");
     // load settings
     var settings = this.Settings = AlphaTab.Settings.FromJson(options);
     // get track data to parse
@@ -584,7 +585,7 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
         this.TriggerEvent("rendered", null);
     }));
     this.Renderer.add_PostRenderFinished($CreateAnonymousDelegate(this, function (){
-        this.TriggerEvent("post-rendered", null);
+        this.TriggerEvent("postRendered", null);
     }));
     this.Renderer.add_PreRender($CreateAnonymousDelegate(this, function (result){
         this._renderResults = [];
@@ -821,10 +822,20 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
     },
     TriggerEvent: function (name, details){
         if (this.Element != null){
+            name = "alphaTab." + name;
             var e = document.createEvent("CustomEvent");
             e.initCustomEvent(name, false, false, details);
             this.Element.dispatchEvent(e);
+            if ("jQuery"in window){
+                var jquery = window["jQuery"];
+                jquery(this.Element).trigger(name, details);
+            }
         }
+    },
+    UpdateLayout: function (json){
+        this.Settings.Layout = AlphaTab.Settings.LayoutFromJson(json);
+        this.Renderer.UpdateSettings(this.Settings);
+        this.Renderer.Invalidate();
     }
 };
 AlphaTab.Platform.JavaScript.JsApiBase.IsElementInViewPort = function (el){
@@ -1857,8 +1868,30 @@ AlphaTab.Settings.FromJson = function (json){
     return settings;
 };
 AlphaTab.Settings.FillFromJson = function (settings, json){
-    if (!json)
+    if (self.document && self.window["ALPHATAB_ROOT"]){
+        settings.ScriptFile = self.window["ALPHATAB_ROOT"];
+        settings.ScriptFile = AlphaTab.Settings.EnsureFullUrl(settings.ScriptFile);
+        settings.ScriptFile = AlphaTab.Settings.AppendScriptName(settings.ScriptFile);
+    }
+    else {
+        settings.ScriptFile = AlphaTab.Environment.ScriptFile;
+    }
+    if (self.document && self.window["ALPHATAB_FONT"]){
+        settings.FontDirectory = self.window["ALPHATAB_FONT"];
+        settings.FontDirectory = AlphaTab.Settings.EnsureFullUrl(settings.FontDirectory);
+    }
+    else {
+        settings.FontDirectory = settings.ScriptFile;
+        if (!((settings.FontDirectory==null)||(settings.FontDirectory.length==0))){
+            var lastSlash = settings.FontDirectory.lastIndexOf("/");
+            if (lastSlash >= 0){
+                settings.FontDirectory = settings.FontDirectory.substr(0, lastSlash) + "/Font/";
+            }
+        }
+    }
+    if (!json){
         return;
+    }
     if ("scale"in json)
         settings.Scale = json.scale;
     if ("width"in json)
@@ -1872,47 +1905,14 @@ AlphaTab.Settings.FillFromJson = function (settings, json){
     if ("forcePianoFingering"in json)
         settings.ForcePianoFingering = json.forcePianoFingering;
     if ("scriptFile"in json){
-        settings.ScriptFile = AlphaTab.Settings.EnsureFullUrl(settings.ScriptFile);
-        settings.ScriptFile = AlphaTab.Settings.AppendScriptName(json.scriptFile);
-    }
-    else if (self.document && self.window["ALPHATAB_ROOT"]){
-        settings.ScriptFile = self.window["ALPHATAB_ROOT"];
-        settings.ScriptFile = AlphaTab.Settings.EnsureFullUrl(settings.ScriptFile);
+        settings.ScriptFile = AlphaTab.Settings.EnsureFullUrl(json.scriptFile);
         settings.ScriptFile = AlphaTab.Settings.AppendScriptName(settings.ScriptFile);
-    }
-    else {
-        settings.ScriptFile = AlphaTab.Environment.ScriptFile;
     }
     if ("fontDirectory"in json){
         settings.FontDirectory = AlphaTab.Settings.EnsureFullUrl(json.fontDirectory);
     }
-    else if (self.document && self.window["ALPHATAB_FONT"]){
-        settings.FontDirectory = self.window["ALPHATAB_FONT"];
-        settings.FontDirectory = AlphaTab.Settings.EnsureFullUrl(settings.FontDirectory);
-    }
-    else {
-        settings.FontDirectory = settings.ScriptFile;
-        if (!((settings.FontDirectory==null)||(settings.FontDirectory.length==0))){
-            var lastSlash = settings.FontDirectory.lastIndexOf("/");
-            if (lastSlash >= 0){
-                settings.FontDirectory = settings.FontDirectory.substr(0, lastSlash) + "/Font/";
-            }
-        }
-    }
     if ("layout"in json){
-        if (typeof(json.layout) == "string"){
-            settings.Layout.Mode = json.layout;
-        }
-        else {
-            if (json.layout.mode)
-                settings.Layout.Mode = json.layout.mode;
-            if (json.layout.additionalSettings){
-                var keys = Object.keys(json.layout.additionalSettings);
-                for (var $i15 = 0,$l15 = keys.length,key = keys[$i15]; $i15 < $l15; $i15++, key = keys[$i15]){
-                    settings.Layout.AdditionalSettings[key] = json.layout.additionalSettings[key];
-                }
-            }
-        }
+        settings.Layout = AlphaTab.Settings.LayoutFromJson(json.layout);
     }
     if ("staves"in json){
         var val = json.staves;
@@ -1924,7 +1924,7 @@ AlphaTab.Settings.FillFromJson = function (settings, json){
                 var staveSettings = new AlphaTab.StaveSettings(val.id);
                 if (val.additionalSettings){
                     var keys2 = Object.keys(val.additionalSettings);
-                    for (var $i16 = 0,$l16 = keys2.length,key2 = keys2[$i16]; $i16 < $l16; $i16++, key2 = keys2[$i16]){
+                    for (var $i15 = 0,$l15 = keys2.length,key2 = keys2[$i15]; $i15 < $l15; $i15++, key2 = keys2[$i15]){
                         staveSettings.AdditionalSettings[key2] = val.additionalSettings[key2];
                     }
                 }
@@ -1932,6 +1932,23 @@ AlphaTab.Settings.FillFromJson = function (settings, json){
             }
         }
     }
+};
+AlphaTab.Settings.LayoutFromJson = function (json){
+    var layout = new AlphaTab.LayoutSettings();
+    if (typeof(json) == "string"){
+        layout.Mode = json;
+    }
+    else {
+        if (json.mode)
+            layout.Mode = json.mode;
+        if (json.additionalSettings){
+            var keys = Object.keys(json.additionalSettings);
+            for (var $i16 = 0,$l16 = keys.length,key = keys[$i16]; $i16 < $l16; $i16++, key = keys[$i16]){
+                layout.AdditionalSettings[key] = json.additionalSettings[key];
+            }
+        }
+    }
+    return layout;
 };
 AlphaTab.Settings.AppendScriptName = function (url){
     // append script name 
@@ -1965,7 +1982,7 @@ AlphaTab.Settings.get_Defaults = function (){
     var settings = new AlphaTab.Settings();
     settings.Scale = 1;
     settings.StretchForce = 1;
-    settings.Width = 950;
+    settings.Width = -1;
     settings.Height = 200;
     settings.Engine = "default";
     settings.Layout = AlphaTab.LayoutSettings.get_Defaults();

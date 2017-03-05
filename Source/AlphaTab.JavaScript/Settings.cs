@@ -89,20 +89,7 @@ namespace AlphaTab
 
         public static void FillFromJson(Settings settings, dynamic json)
         {
-            if (!json) return;
-            if (Std.JsonExists(json, "scale")) settings.Scale = json.scale;
-            if (Std.JsonExists(json, "width")) settings.Width = json.width;
-            if (Std.JsonExists(json, "height")) settings.Height = json.height;
-            if (Std.JsonExists(json, "engine")) settings.Engine = json.engine;
-            if (Std.JsonExists(json, "stretchForce")) settings.StretchForce = json.stretchForce;
-            if (Std.JsonExists(json, "forcePianoFingering")) settings.ForcePianoFingering = json.forcePianoFingering;
-
-            if (Std.JsonExists(json, "scriptFile"))
-            {
-                settings.ScriptFile = EnsureFullUrl(settings.ScriptFile);
-                settings.ScriptFile = AppendScriptName(json.scriptFile);
-            }
-            else if (HtmlContext.self.document.As<bool>() && HtmlContext.self.window.Member("ALPHATAB_ROOT").As<bool>())
+            if (HtmlContext.self.document.As<bool>() && HtmlContext.self.window.Member("ALPHATAB_ROOT").As<bool>())
             {
                 settings.ScriptFile = HtmlContext.self.window.Member("ALPHATAB_ROOT").As<string>();
                 settings.ScriptFile = EnsureFullUrl(settings.ScriptFile);
@@ -113,11 +100,7 @@ namespace AlphaTab
                 settings.ScriptFile = Environment.ScriptFile;
             }
 
-            if (Std.JsonExists(json, "fontDirectory"))
-            {
-                settings.FontDirectory = EnsureFullUrl(json.fontDirectory);
-            }
-            else if (HtmlContext.self.document.As<bool>() && HtmlContext.self.window.Member("ALPHATAB_FONT").As<bool>())
+            if (HtmlContext.self.document.As<bool>() && HtmlContext.self.window.Member("ALPHATAB_FONT").As<bool>())
             {
                 settings.FontDirectory = HtmlContext.self.window.Member("ALPHATAB_FONT").As<string>();
                 settings.FontDirectory = EnsureFullUrl(settings.FontDirectory);
@@ -135,24 +118,32 @@ namespace AlphaTab
                 }
             }
 
+            if (!json)
+            {
+                return;
+            }
+
+            if (Std.JsonExists(json, "scale")) settings.Scale = json.scale;
+            if (Std.JsonExists(json, "width")) settings.Width = json.width;
+            if (Std.JsonExists(json, "height")) settings.Height = json.height;
+            if (Std.JsonExists(json, "engine")) settings.Engine = json.engine;
+            if (Std.JsonExists(json, "stretchForce")) settings.StretchForce = json.stretchForce;
+            if (Std.JsonExists(json, "forcePianoFingering")) settings.ForcePianoFingering = json.forcePianoFingering;
+
+            if (Std.JsonExists(json, "scriptFile"))
+            {
+                settings.ScriptFile = EnsureFullUrl(json.scriptFile);
+                settings.ScriptFile = AppendScriptName(settings.ScriptFile);
+            }
+
+            if (Std.JsonExists(json, "fontDirectory"))
+            {
+                settings.FontDirectory = EnsureFullUrl(json.fontDirectory);
+            }
+
             if (Std.JsonExists(json, "layout"))
             {
-                if (JsContext.@typeof(json.layout) == "string")
-                {
-                    settings.Layout.Mode = json.layout;
-                }
-                else
-                {
-                    if (json.layout.mode) settings.Layout.Mode = json.layout.mode;
-                    if (json.layout.additionalSettings)
-                    {
-                        string[] keys = Std.JsonKeys(json.layout.additionalSettings);
-                        foreach (var key in keys)
-                        {
-                            settings.Layout.AdditionalSettings[key] = json.layout.additionalSettings[key];
-                        }
-                    }
-                }
+                settings.Layout = LayoutFromJson(json.layout);
             }
 
             if (Std.JsonExists(json, "staves"))
@@ -179,6 +170,28 @@ namespace AlphaTab
                     }
                 }
             }
+        }
+
+        public static LayoutSettings LayoutFromJson(dynamic json)
+        {
+            var layout = new LayoutSettings();
+            if (JsContext.@typeof(json) == "string")
+            {
+                layout.Mode = json;
+            }
+            else
+            {
+                if (json.mode) layout.Mode = json.mode;
+                if (json.additionalSettings)
+                {
+                    string[] keys = Std.JsonKeys(json.additionalSettings);
+                    foreach (var key in keys)
+                    {
+                        layout.AdditionalSettings[key] = json.additionalSettings[key];
+                    }
+                }
+            }
+            return layout;
         }
 
         private static string AppendScriptName(string url)

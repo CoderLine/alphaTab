@@ -9,11 +9,6 @@ body.features {
   padding-top: 100px;    
 }
 
-#alphaTab {
-    display: table;
-    margin: 0 auto;
-}
-
 .navbar-brand>img {
     max-height: 100%;
     display: inline-block;
@@ -71,6 +66,10 @@ body.features {
     box-shadow: 0 0 10px rgba(0,0,0,0.3); 
     background:#FFF; 
     border-radius:3px; 
+}
+
+body > .alphaTab:not(.horizontal) {
+    width:95%;
     margin: 0 auto;
 }
 

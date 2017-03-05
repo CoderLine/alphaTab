@@ -80,7 +80,7 @@ namespace AlphaTab
 
                 settings.Scale = 1.0f;
                 settings.StretchForce = 1;
-                settings.Width = 950;
+                settings.Width = -1;
                 settings.Height = 200;
                 settings.Engine = "default";
 

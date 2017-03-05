@@ -59,6 +59,7 @@
           <!-- Player controls -->
           <ul class="nav navbar-nav">
             <li><button id="playPause" disabled="disabled" class="btn btn-link navbar-btn glyphicon glyphicon-play"></button></li>
+            <li><button id="stop" disabled="disabled" class="btn btn-link navbar-btn glyphicon glyphicon-stop"></button></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Speed: <span id="playbackSpeed">100%</span> <span class="caret"></span></a>
               <ul class="dropdown-menu" id="playbackSpeedSelector">
@@ -96,74 +97,61 @@
       </div>
     </nav>
     
-    <div id="alphaTab" data-file="files/NightWish.gp5" data-tracks="3"></div>
+    <div id="alphaTab" data-file="files/NightWish.gp5" data-tracks="3"
+                       data-player="lib/alphaSynth/default.sf2"></div>
     
     <script type="text/javascript">
-        var playerReady = false;
-        var playerState = 0;
         var at = $('#alphaTab');
         
         //
-        // 1. Load alphaTab
-        at.alphaTab({
-        }); 
-        
-        // 
-        // 2. Initialize Player and Setup Player UI
-        var as = at.alphaTab('playerInit'); // init alphaSynth
-        
-        as.On('ready', function(r) {
-            // load default data
-            as.LoadSoundFontUrl('lib/alphaSynth/default.sf2');
-        });
-        as.On('soundFontLoad', function(loaded, full) {
-            var percentage = ((loaded / full) * 100)|0;
+        // 1. setup events        
+        at.on('alphaTab.soundFontLoad', function(e, progress) {
+            var percentage = ((progress.loaded / progress.full) * 100)|0;
             $('#soundFontProgress').css('width', percentage + '%').text(percentage + '%');
         });
-        as.On('soundFontLoaded', function() {
+        at.on('alphaTab.soundFontLoaded', function() {
             $('#soundFontProgressMenuItem').hide();
         });
-        as.On('readyForPlay', function(r) {
-            playerReady = r;
+        at.on('alphaTab.playerReady', function() {
+            $('#loadingInfo').hide();
+            $('#playPause').prop('disabled', false).removeAttr('disabled');            
+            $('#stop').prop('disabled', false).removeAttr('disabled');            
             updateControls();
         });
-        as.On('playerStateChanged', function(s) {
-            playerState = s;
+        at.on('alphaTab.playerStateChanged', function() {
             updateControls();
         });
         
+        //
+        // 2. Load alphaTab 
+        at.alphaTab(); 
+        
+        //
+        // 3. Setup UI controls and use API to control the playback 
+        
         $('#playPause').click(function() { 
-            if(playerState == 1) {
-                as.Pause();
-            }
-            else {
-                as.Play();
-            }
+            at.alphaTab('playPause');
+        });
+        
+        $('#stop').click(function() { 
+            at.alphaTab('stop');
         });
         
         $('#playbackSpeedSelector a').click(function() {
             var playbackSpeed = $(this).data('value');
-            as.SetPlaybackSpeed(playbackSpeed);
+            at.alphaTab('playbackSpeed', playbackSpeed);
             $('#playbackSpeed').text($(this).text());
         }); 
         
         function updateControls() {
-            if(!playerReady) {
-                $('#loadingInfo').show()
-                $('#controls button').attr('disabled', 'disabled');
-            }
-            else {
-                $('#loadingInfo').hide()
-                $('#playPause').prop('disabled', false);
-                $('#playPause').removeAttr('disabled');
-                switch(playerState) {
-                    case 0: // stopped/paused
-                    $('#playPause').removeClass('glyphicon-pause').addClass('glyphicon-play');
-                    break;
-                    case 1: // playing
-                    $('#playPause').removeClass('glyphicon-play').addClass('glyphicon-pause');
-                    break;
-                }
+            var playerState = at.alphaTab('playerState');
+            switch(playerState) {
+                case 0: // stopped/paused
+                $('#playPause').removeClass('glyphicon-pause').addClass('glyphicon-play');
+                break;
+                case 1: // playing
+                $('#playPause').removeClass('glyphicon-play').addClass('glyphicon-pause');
+                break;
             }
         }     
         
@@ -175,24 +163,19 @@
             
             var layout = $(this).data('layout');
             var scrollmode = $(this).data('scrollmode');
+            
+            at.removeClass('horizontal page');
+            at.addClass(layout);
+            
             // update renderer
-            var renderer = at.alphaTab('renderer');
-            renderer.Settings.Layout.Mode = layout;
-            renderer.Invalidate();
+            at.alphaTab('layout', layout);
             
             // update player
-            var cursorOptions = at.alphaTab('cursorOptions');
-            cursorOptions.autoScroll = scrollmode;
+            at.alphaTab('autoScroll', scrollmode);
             $('body,html').animate({
                 scrollTop: 0 
             }, 300);
-
-            at.alphaTab('playerCursorUpdateBeat', cursorOptions.currentBeat);
         });
-        
-        //
-        // 3. Add cursors (optional)
-        at.alphaTab('playerCursor'); 
     
     </script>
     
