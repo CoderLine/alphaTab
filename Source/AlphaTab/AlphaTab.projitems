@@ -206,8 +206,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Util\Lazy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Util\Logger.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Xml\IXmlDocument.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Xml\IXmlNode.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlDocument.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlNodeType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlParser.cs" />
   </ItemGroup>
 </Project>

@@ -19,8 +19,10 @@
     <script type="text/javascript" src="../../Build/JavaScript/jquery.alphaTab.alphaSynth.js"></script>
     
     <!-- Demo Styles and Scripts -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.2/css/bootstrap-slider.min.css" integrity="sha256-6b+gYy3DG/roKdQiHqp1FJYFQkaZdM6ohUpGyFyUAGk=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.2/bootstrap-slider.min.js" integrity="sha256-dd5QxcG/E8fb/H/iIQann2y2EDS0nEMVI56yYWFeeW4=" crossorigin="anonymous"></script>    
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="support/demo.css" />
@@ -42,6 +44,38 @@
     
     .atHighlight * { /* Defines the color of the music symbols when they are being played (svg) */
         fill: #0078ff;
+    }
+    
+    
+    /* Track selector */
+    #trackList li {
+        padding: 5px;
+    }
+    #trackList .btn {
+        background: none;
+        outline: none;
+    }
+    #trackList .solo.checked {
+        background: #426d9d;
+        color: #FFF;
+    }
+    #trackList .mute.checked {
+        background: #c9302c;
+        color: #FFF;
+    }
+    #trackList .title {
+        cursor: pointer;
+    }
+    #trackList .title:hover {
+        color: #426d9d;
+    }
+    #trackList .btn-group {
+    }
+    
+    #trackList .slider-handle {
+        -moz-transform: scale(0.5, 0.5);
+        -webkit-transform: scale(0.5, 0.5);
+        transform: scale(0.5, 0.5);
     }
     </style>
 </head>
@@ -88,6 +122,14 @@
                   </div>
                 </div>
             </li>
+            <!-- Track Selector -->
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" id="currentTrack">
+                    Tracks
+                </a>
+                <ul class="dropdown-menu" id="trackList">
+                </ul>
+            </li>            
             <!-- Buttons for changing the layout -->
             <li class="active"><a href="#" id="page" data-layout="page" data-scrollmode="vertical">Page</a></li>
             <li><a href="#" id="horizontalBarwise" data-layout="horizontal" data-scrollmode="horizontal-bar">Horizontal (Barwise)</a></li>
@@ -176,6 +218,98 @@
                 scrollTop: 0 
             }, 300);
         });
+    
+        //
+        // 4. Track selector
+        var tracks = [];
+        // keep dropdown open
+        $('#trackList').on('click', function(e) {
+            e.stopPropagation();
+        });
+        at.on('alphaTab.loaded', function(e, score) {
+            var trackList = $('#trackList');
+            trackList.empty();
+            
+            for( var i = 0; i < score.Tracks.length; i++) {
+                // build list item for track
+                var li = $('<li></li>')
+                    .data('track', score.Tracks[i].Index)
+                ;
+                
+                // show/hide button and track title
+                var title = $('<div class="title"></div>');
+                li.append(title);
+                
+                var showHide = $('<i class="glyphicon glyphicon-eye-close showHide"></i>');
+                title.append(showHide);
+                title.append(score.Tracks[i].Name);
+                title.on('click', function(e) {
+                    var track = $(this).closest('li').data('track');
+                    tracks = [track];
+                    $(this).find('.showHide').removeClass('glyphicon-eye-close').addClass('glyphicon-eye-open');
+                    
+                    // render new tracks
+                    at.alphaTab('tracks', tracks);   
+                });
+                
+                // solo and mute buttons
+                var soloMute = $('<div class="btn-group btn-group-xs"></div>');
+                var solo = $('<button type="button" class="btn btn-default solo">Solo</button>');
+                solo.on('click', function(e) {
+                    $(this).toggleClass('checked');
+                    var isSolo = $(this).hasClass('checked');
+                    var track = $(this).closest('li').data('track');
+                    at.alphaTab('soloTrack', track, isSolo);                    
+                });
+                
+                var mute = $('<button type="button" class="btn btn-default mute">Mute</button>');
+                mute.on('click', function(e) {
+                    $(this).toggleClass('checked');
+                    var isMute = $(this).hasClass('checked');
+                    var track = $(this).closest('li').data('track');
+                    at.alphaTab('muteTrack', track, isMute);                    
+                });                
+                soloMute.append(solo).append(mute);
+                li.append(soloMute);
+                
+                // volume slider
+                var volume = $('<input type="text" />')
+                    .on('slide', function(e) {
+                        var track = $(this).closest('li').data('track');
+                        at.alphaTab('trackVolume', track, e.value);
+                    });
+                li.append(volume);
+                volume.slider({
+                    min: 0,
+                    max: 16,
+                    step: 1,
+                    value: score.Tracks[i].PlaybackInfo.Volume,
+                    handle: 'square'
+                })
+                
+                trackList.append(li);
+            }
+        });
+        at.on('alphaTab.rendered', function(e) {
+            // load track indices
+            tracks = at.alphaTab('tracks');
+            for(var i = 0; i < tracks.length; i++) {
+                tracks[i] = tracks[i].Index;
+            }
+            
+            // check checkboxes 
+            $('#trackList li').each(function() {
+                var track = $(this).data('track');
+                var isSelected = tracks.indexOf(track) > -1;
+                if(isSelected) {
+                    $(this).find('.showHide').removeClass('glyphicon-eye-close').addClass('glyphicon-eye-open');
+                }
+                else {
+                    $(this).find('.showHide').removeClass('glyphicon-eye-open').addClass('glyphicon-eye-close');
+                }
+            });       
+        });
+
     
     </script>
     

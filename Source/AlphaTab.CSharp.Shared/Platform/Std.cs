@@ -134,15 +134,6 @@ namespace AlphaTab.Platform
             }
         }
 
-        public static IXmlDocument LoadXml(string xml)
-        {
-            var reader = new System.Xml.XmlTextReader(new StringReader(xml));
-            reader.DtdProcessing = System.Xml.DtdProcessing.Ignore;
-            var dom = new System.Xml.XmlDocument();
-            dom.Load(reader);
-            return new XmlDocumentWrapper(dom);
-        }
-
         public static sbyte ReadSignedByte(this IReadable readable)
         {
             return unchecked((sbyte) (byte) readable.ReadByte());

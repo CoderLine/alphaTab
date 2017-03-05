@@ -1479,6 +1479,11 @@
             </ul>
             </summary>
         </member>
+        <member name="T:AlphaTab.Xml.XmlParser.XmlState">
+            <summary>
+            faster than enum
+            </summary>
+        </member>
         <member name="T:AlphaTab.Collections.FastDictionary`2">
             <summary>
             A wrapper for 

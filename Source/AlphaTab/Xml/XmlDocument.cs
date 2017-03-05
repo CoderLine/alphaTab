@@ -15,16 +15,27 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
 namespace AlphaTab.Xml
 {
-    public interface IXmlNode
+    public class XmlDocument : XmlNode
     {
-        XmlNodeType NodeType { get; }
-        string LocalName { get; }
-        string Value { get; }
-        IXmlNode[] ChildNodes { get; }
-        IXmlNode FirstChild { get; }
-        string GetAttribute(string name);
-        IXmlNode[] GetElementsByTagName(string nodeName);
+        public XmlNode DocumentElement { get; private set; }
+
+        public XmlDocument(string xml)
+        {
+            NodeType = XmlNodeType.Document;
+            XmlParser.Parse(xml, 0, this);
+            foreach (var child in ChildNodes)
+            {
+                if (child.NodeType == XmlNodeType.Element)
+                {
+                    DocumentElement = child;
+                    break;
+                }
+            }
+        }
+
+
     }
 }

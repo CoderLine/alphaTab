@@ -196,6 +196,33 @@
     api.loadMidi = function(element, context, value) {
         var as = getAlphaSynth(element);
         as.LoadMidi(value);
+    };    
+    api.muteTrack = function(element, context, tracks, mute) {
+        var as = getAlphaSynth(element);
+        tracks = context.TrackIndexesToTracks(context.ParseTracks(tracks));
+        for(var t = 0; t < tracks.length; t++) {
+            as.SetChannelMute(tracks[t].PlaybackInfo.PrimaryChannel, mute);
+            as.SetChannelMute(tracks[t].PlaybackInfo.SecondaryChannel, mute);
+        }        
+    };
+    api.soloTrack = function(element, context, tracks, solo) {
+        var as = getAlphaSynth(element);
+        tracks = context.TrackIndexesToTracks(context.ParseTracks(tracks));
+        for(var t = 0; t < tracks.length; t++) {
+            as.SetChannelSolo(tracks[t].PlaybackInfo.PrimaryChannel, solo);
+            as.SetChannelSolo(tracks[t].PlaybackInfo.SecondaryChannel, solo);
+        }        
+    };
+    api.trackVolume = function(element, context, tracks, volume) {
+        var as = getAlphaSynth(element);
+        tracks = context.TrackIndexesToTracks(context.ParseTracks(tracks));
+        
+        volume /= 16;
+        
+        for(var t = 0; t < tracks.length; t++) {
+            as.SetChannelVolume(tracks[t].PlaybackInfo.PrimaryChannel, volume);
+            as.SetChannelVolume(tracks[t].PlaybackInfo.SecondaryChannel, volume);
+        }        
     };
     
     //

@@ -95,6 +95,7 @@
     <Compile Include="Importer\MusicXmlImporterTestSuiteTests.cs" />
     <Compile Include="Model\TuningParserTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Xml\XmlParseTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="TestFiles\GuitarPro5\TestChords.gp5">
@@ -1302,6 +1303,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestFiles\MusicXmlSamples\Telemann.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestFiles\Xml\GPIF.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

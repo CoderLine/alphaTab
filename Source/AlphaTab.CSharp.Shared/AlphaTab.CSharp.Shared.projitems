@@ -18,7 +18,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)Platform\CSharp\FontEmbeddedSvgCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\CSharp\GdiCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Std.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlDocumentWrapper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlNodeWrapper.cs" />
   </ItemGroup>
 </Project>

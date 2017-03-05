@@ -416,15 +416,7 @@ namespace AlphaTab.Platform.JavaScript
         {
             get
             {
-                var tracks = new FastList<Track>();
-
-                foreach (var track in TrackIndexes)
-                {
-                    if (track >= 0 && track < Score.Tracks.Count)
-                    {
-                        tracks.Add(Score.Tracks[track]);
-                    }
-                }
+                var tracks = TrackIndexesToTracks(TrackIndexes);
 
                 if (tracks.Count == 0 && Score.Tracks.Count > 0)
                 {
@@ -435,12 +427,35 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
-
         public abstract void Load(object data);
 
         public abstract void Tex(string contents);
 
         public void SetTracks(dynamic tracksData, bool render = true)
+        {
+            TrackIndexes = ParseTracks(tracksData);
+            if (render)
+            {
+                Render();
+            }
+        }
+
+        private FastList<Track> TrackIndexesToTracks(int[] trackIndexes)
+        {
+            var tracks = new FastList<Track>();
+
+            foreach (var track in trackIndexes)
+            {
+                if (track >= 0 && track < Score.Tracks.Count)
+                {
+                    tracks.Add(Score.Tracks[track]);
+                }
+            }
+
+            return tracks;
+        }
+
+        public int[] ParseTracks(dynamic tracksData)
         {
             FastList<int> tracks = new FastList<int>();
 
@@ -471,6 +486,10 @@ namespace AlphaTab.Platform.JavaScript
                     {
                         value = (int)tracksData[i];
                     }
+                    else if (JsTypeOf(tracksData[i].Index) == JsTypes.number)
+                    {
+                        value = (int)tracksData.Index;
+                    }
                     else
                     {
                         value = Std.ParseInt(tracksData[i].ToString());
@@ -482,12 +501,12 @@ namespace AlphaTab.Platform.JavaScript
                     }
                 }
             }
-            TrackIndexes = tracks.ToArray();
-
-            if (render)
+            else if (JsTypeOf(tracksData.Index) == JsTypes.number)
             {
-                Render();
+                tracks.Add((int)tracksData.Index);
             }
+
+            return tracks.ToArray();
         }
 
         protected void ScoreLoaded(Score score, bool render = true)

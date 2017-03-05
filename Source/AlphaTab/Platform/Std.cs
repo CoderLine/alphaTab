@@ -58,33 +58,5 @@ namespace AlphaTab.Platform
 
             return s;
         }
-
-        public static string GetNodeValue(IXmlNode n)
-        {
-            if (n == null)
-            {
-                return "";
-            }
-
-            if (n.NodeType == XmlNodeType.Element || n.NodeType == XmlNodeType.Document)
-            {
-                var txt = new StringBuilder();
-                n.IterateChildren(c =>
-                {
-                    txt.Append(GetNodeValue(c));
-                });
-                return txt.ToString().Trim();
-            }
-            return n.Value;
-        }
-
-        public static void IterateChildren(this IXmlNode n, Action<IXmlNode> action)
-        {
-            for (int i = 0; i < n.ChildNodes.Length; i++)
-            {
-                action(n.ChildNodes[i]);
-            }
-        }
-
     }
 }
