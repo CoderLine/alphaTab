@@ -6352,6 +6352,15 @@ AlphaTab.Importer.GpxParser.prototype = {
                     case "Name":
                         track.Name = c.get_InnerText();
                         break;
+                    case "Color":
+                        var parts = c.get_InnerText().split(" ");
+                        if (parts.length >= 3){
+                        var r = AlphaTab.Platform.Std.ParseInt(parts[0]);
+                        var g = AlphaTab.Platform.Std.ParseInt(parts[1]);
+                        var b = AlphaTab.Platform.Std.ParseInt(parts[2]);
+                        track.Color = new AlphaTab.Platform.Model.Color(r, g, b, 255);
+                    }
+                        break;
                     case "Instrument":
                         var instrumentName = c.GetAttribute("ref");
                         if ((instrumentName.lastIndexOf("-gs")==(instrumentName.length-"-gs".length)) || (instrumentName.lastIndexOf("GrandStaff")==(instrumentName.length-"GrandStaff".length))){

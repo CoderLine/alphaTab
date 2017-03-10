@@ -358,5 +358,17 @@ namespace AlphaTab.Test.Importer
             CheckChords(score);
             Render(score);
         }
+
+
+
+        [TestMethod]
+        public void TestColors()
+        {
+            var reader = PrepareImporterWithFile("GuitarPro6/Colors.gpx");
+            var score = reader.ReadScore();
+
+            CheckColors(score);
+            Render(score);
+        }
     }
 }

@@ -98,11 +98,20 @@
     <Compile Include="Xml\XmlParseTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="TestFiles\GuitarPro4\Colors.gp4">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro5\Colors.gp5">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="TestFiles\GuitarPro5\TestChords.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\GuitarPro5\TestKeySignatures.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\Colors.gpx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\GuitarPro6\Compressed.gpx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

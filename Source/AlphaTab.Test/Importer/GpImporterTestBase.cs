@@ -454,6 +454,19 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(0, score.MasterBars[32].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[32].KeySignatureType);
         }
+
+        protected void CheckColors(Score score)
+        {
+            Assert.AreEqual("Red", score.Tracks[0].Name);
+            Assert.AreEqual("#FF0000", score.Tracks[0].Color.RGBA);
+            Assert.AreEqual("Green", score.Tracks[1].Name);
+            Assert.AreEqual("#00FF00", score.Tracks[1].Color.RGBA);
+            Assert.AreEqual("Yellow", score.Tracks[2].Name);
+            Assert.AreEqual("#FFFF00", score.Tracks[2].Color.RGBA);
+            Assert.AreEqual("Blue", score.Tracks[3].Name);
+            Assert.AreEqual("#0000FF", score.Tracks[3].Color.RGBA);
+        }
+
         protected void CheckChords(Score score)
         {
             var track = score.Tracks[0];

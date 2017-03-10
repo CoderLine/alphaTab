@@ -20,6 +20,7 @@ using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 using AlphaTab.Xml;
 
 namespace AlphaTab.Importer
@@ -374,6 +375,16 @@ namespace AlphaTab.Importer
                     {
                         case "Name":
                             track.Name = c.InnerText;
+                            break;
+                        case "Color":
+                            var parts = c.InnerText.Split(' ');
+                            if (parts.Length >= 3)
+                            {
+                                var r = Std.ParseInt(parts[0]);
+                                var g = Std.ParseInt(parts[1]);
+                                var b = Std.ParseInt(parts[2]);
+                                track.Color = new Color((byte)r, (byte)g, (byte)b);
+                            }
                             break;
                         case "Instrument":
                             var instrumentName = c.GetAttribute("ref");

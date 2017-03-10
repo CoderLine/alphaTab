@@ -243,5 +243,15 @@ namespace AlphaTab.Test.Importer
             CheckChords(score);
             Render(score);
         }
+
+        [TestMethod]
+        public void TestColors()
+        {
+            var reader = PrepareImporterWithFile("GuitarPro5/Colors.gp5");
+            var score = reader.ReadScore();
+
+            CheckColors(score);
+            Render(score);
+        }
     }
 }

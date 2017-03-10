@@ -215,6 +215,16 @@ namespace AlphaTab.Test.Importer
             CheckStrings(score);
             Render(score);
         }
+        
+        [TestMethod]
+        public void TestColors()
+        {
+            var reader = PrepareImporterWithFile("GuitarPro4/Colors.gp4");
+            var score = reader.ReadScore();
+
+            CheckColors(score);
+            Render(score);
+        }
 
     }
 }
