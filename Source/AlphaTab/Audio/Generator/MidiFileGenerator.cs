@@ -204,7 +204,8 @@ namespace AlphaTab.Audio.Generator
 
         private void GenerateVoice(Voice voice, int barStartTick)
         {
-            if (voice.IsEmpty) return;
+            if (voice.IsEmpty && (!voice.Bar.IsEmpty || voice.Index != 0)) return;
+
             for (int i = 0, j = voice.Beats.Count; i < j; i++)
             {
                 GenerateBeat(voice.Beats[i], barStartTick);
@@ -215,11 +216,14 @@ namespace AlphaTab.Audio.Generator
         {
             // TODO: take care of tripletfeel 
             var beatStart = beat.Start;
-            var duration = beat.CalculateDuration();
+            var audioDuration = beat.Voice.Bar.IsEmpty
+                ? beat.Voice.Bar.MasterBar.CalculateDuration()
+                : beat.CalculateDuration();
 
             var beatLookup = new BeatTickLookup();
             beatLookup.Start = barStartTick + beatStart;
-            beatLookup.End = barStartTick + beatStart + duration;
+            var realTickOffset = beat.NextBeat == null ? audioDuration : beat.NextBeat.AbsoluteStart - beat.AbsoluteStart;
+            beatLookup.End = barStartTick + beatStart + (realTickOffset > audioDuration ? realTickOffset : audioDuration);
             beatLookup.Beat = beat;
             TickLookup.AddBeat(beatLookup);
 
@@ -242,7 +246,7 @@ namespace AlphaTab.Audio.Generator
                 {
                     var n = beat.Notes[i];
 
-                    GenerateNote(n, barStartTick + beatStart, duration, brushInfo);
+                    GenerateNote(n, barStartTick + beatStart, audioDuration, brushInfo);
                 }
             }
 

@@ -2216,7 +2216,7 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
         }
     },
     GenerateVoice: function (voice, barStartTick){
-        if (voice.IsEmpty)
+        if (voice.IsEmpty && (!voice.Bar.get_IsEmpty() || voice.Index != 0))
             return;
         for (var i = 0,j = voice.Beats.length; i < j; i++){
             this.GenerateBeat(voice.Beats[i], barStartTick);
@@ -2225,10 +2225,11 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
     GenerateBeat: function (beat, barStartTick){
         // TODO: take care of tripletfeel 
         var beatStart = beat.Start;
-        var duration = beat.CalculateDuration();
+        var audioDuration = beat.Voice.Bar.get_IsEmpty() ? beat.Voice.Bar.get_MasterBar().CalculateDuration() : beat.CalculateDuration();
         var beatLookup = new AlphaTab.Audio.Model.BeatTickLookup();
         beatLookup.Start = barStartTick + beatStart;
-        beatLookup.End = barStartTick + beatStart + duration;
+        var realTickOffset = beat.NextBeat == null ? audioDuration : beat.NextBeat.get_AbsoluteStart() - beat.get_AbsoluteStart();
+        beatLookup.End = barStartTick + beatStart + (realTickOffset > audioDuration ? realTickOffset : audioDuration);
         beatLookup.Beat = beat;
         this.TickLookup.AddBeat(beatLookup);
         var track = beat.Voice.Bar.Staff.Track;
@@ -2242,7 +2243,7 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
             var brushInfo = this.GetBrushInfo(beat);
             for (var i = 0,j = beat.Notes.length; i < j; i++){
                 var n = beat.Notes[i];
-                this.GenerateNote(n, barStartTick + beatStart, duration, brushInfo);
+                this.GenerateNote(n, barStartTick + beatStart, audioDuration, brushInfo);
             }
         }
         if (beat.Vibrato != AlphaTab.Model.VibratoType.None){
@@ -10530,7 +10531,7 @@ AlphaTab.Rendering.BarRendererBase.prototype = {
         masterBarBounds.AddBar(barBounds);
         for (var voice in this._voiceContainers){
             var c = this._voiceContainers[voice];
-            if (!c.Voice.IsEmpty){
+            if (!c.Voice.IsEmpty || (this.Bar.get_IsEmpty() && voice == 0)){
                 for (var i = 0,j = c.BeatGlyphs.length; i < j; i++){
                     var bc = c.BeatGlyphs[i];
                     var beatBoundings = new AlphaTab.Rendering.Utils.BeatBounds();

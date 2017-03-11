@@ -392,7 +392,7 @@ namespace AlphaTab.Rendering
             foreach (var voice in _voiceContainers)
             {
                 var c = _voiceContainers[voice];
-                if (!c.Voice.IsEmpty)
+                if (!c.Voice.IsEmpty || (Bar.IsEmpty && voice == 0))
                 {
                     for (int i = 0, j = c.BeatGlyphs.Count; i < j; i++)
                     {
