@@ -9684,7 +9684,7 @@ AlphaTab.Model.Track.CopyTo = function (src, dst){
     dst.Index = src.Index;
     dst.ShortName = src.ShortName;
     dst.Tuning = new Int32Array(src.Tuning);
-    dst.Color.Raw = src.Color.Raw;
+    dst.Color = new AlphaTab.Platform.Model.Color(src.Color.get_R(), src.Color.get_G(), src.Color.get_B(), src.Color.get_A());
     dst.IsPercussion = src.IsPercussion;
 };
 AlphaTab.Model.TripletFeel = {

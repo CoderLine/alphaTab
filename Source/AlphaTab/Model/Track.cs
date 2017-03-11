@@ -64,7 +64,7 @@ namespace AlphaTab.Model
 
         public void EnsureStaveCount(int staveCount)
         {
-            while(Staves.Count < staveCount)
+            while (Staves.Count < staveCount)
             {
                 var staff = new Staff();
                 staff.Index = Staves.Count;
@@ -80,7 +80,7 @@ namespace AlphaTab.Model
             dst.Index = src.Index;
             dst.ShortName = src.ShortName;
             dst.Tuning = Std.CloneArray(src.Tuning);
-            dst.Color.Raw = src.Color.Raw;
+            dst.Color = new Color(src.Color.R, src.Color.G, src.Color.B, src.Color.A);
             dst.IsPercussion = src.IsPercussion;
         }
 
