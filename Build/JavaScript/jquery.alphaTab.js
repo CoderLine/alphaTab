@@ -21,13 +21,7 @@
     var api = {
         init: function(element, context, options) {
             if (!context) {
-                var useWorker = !(options && options.useWorker == false);
-                if(useWorker && !!window.Worker) {
-                    context = new AlphaTab.Platform.JavaScript.JsWorkerApi(element[0], options);
-                }
-                else {
-                    context = new AlphaTab.Platform.JavaScript.JsApi(element[0], options);
-                }
+                context = new AlphaTab.Platform.JavaScript.JsApiBase.Create(element[0], options);
                 element.data('alphaTab', context);
                 
                 for(var i = 0; i < api._initListeners.length; i++) {
@@ -77,6 +71,10 @@
             else {
                 context.UpdateLayout(value);
             }            
+        },
+        
+        print: function(element, context, width) {
+            context.Print(width);
         },
                
         _initListeners: [],

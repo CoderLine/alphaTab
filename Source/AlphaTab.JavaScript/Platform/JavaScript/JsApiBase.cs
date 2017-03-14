@@ -51,6 +51,21 @@ namespace AlphaTab.Platform.JavaScript
             get { return !!(Element.offsetWidth.As<bool>() || Element.offsetHeight.As<bool>() || Element.getClientRects().length.As<bool>()); }
         }
 
+        public static JsApiBase Create(HtmlElement element, dynamic options)
+        {
+            var useWorker = !(options && options.useWorker == false);
+            var workersUnsupported = !window.Worker.As<bool>();
+            if (useWorker && !workersUnsupported)
+            {
+                return new JsWorkerApi(element, options);
+            }
+            else
+            {
+                return new JsApi(element, options);
+            }
+        }
+
+
         protected JsApiBase(HtmlElement element, dynamic options)
         {
             Element = element;
@@ -285,6 +300,66 @@ namespace AlphaTab.Platform.JavaScript
                 );
         }
 
+        public void Print(string width)
+        {
+            // prepare a popup window for printing (a4 width, window height, centered)
+
+            var preview = window.open("", "", "width=0,height=0");
+            var a4 = (HtmlDivElement)preview.document.createElement("div");
+            if (!string.IsNullOrEmpty(width))
+            {
+                a4.style.width = width;
+            }
+            else
+            {
+                a4.style.width = "210mm";
+            }
+            preview.document.As<HtmlDocument>().write("<!DOCTYPE html><html></head><body></body></html>");
+            preview.document.body.appendChild(a4);
+
+            var dualScreenLeft = JsTypeOf(window.screenLeft) != JsTypes.undefined 
+                ? window.screenLeft 
+                : screen.Member("left").As<int>();
+            var dualScreenTop = JsTypeOf(window.screenTop) != JsTypes.undefined 
+                ? window.screenTop 
+                : screen.Member("top").As<int>();
+            var screenWidth = JsTypeOf(window.innerWidth) != JsTypes.undefined 
+                ? window.innerWidth 
+                : JsTypeOf(document.documentElement.clientWidth) != JsTypes.undefined 
+                    ? document.documentElement.clientWidth 
+                    : screen.width;
+            var screenHeight = JsTypeOf(window.innerHeight) != JsTypes.undefined 
+                ? window.innerHeight 
+                : JsTypeOf(document.documentElement.clientHeight) != JsTypes.undefined 
+                    ? document.documentElement.clientHeight 
+                    : screen.height;
+
+            var w = a4.offsetWidth + 50;
+            var h = window.innerHeight;
+            var left = ((screenWidth / 2) - (w / 2)) + dualScreenLeft;
+            var top = ((screenHeight / 2) - (h / 2)) + dualScreenTop;
+            preview.resizeTo(w, h);
+            preview.moveTo(left, top);
+
+            preview.focus();
+
+            // render alphaTab
+            var settings = Settings.Defaults;
+            settings.ScriptFile = Settings.ScriptFile;
+            settings.FontDirectory = Settings.FontDirectory;
+            settings.Scale = 0.8f;
+            settings.StretchForce = 0.8f;
+            settings.DisableLazyLoading = true;
+
+            var alphaTab = Create(a4, settings);
+            alphaTab.Renderer.PostRenderFinished += () =>
+            {
+                alphaTab.CanvasElement.style.height = "100%";
+                preview.window.print();
+            };
+            alphaTab.SetTracks(Tracks);
+        }
+
         private void AppendRenderResult(RenderFinishedEventArgs result)
         {
             if (result != null)
@@ -337,7 +412,7 @@ namespace AlphaTab.Platform.JavaScript
                                 placeholder.style.height = renderResult.Height + "px";
                                 placeholder.style.display = "inline-block";
 
-                                if (IsElementInViewPort(placeholder))
+                                if (IsElementInViewPort(placeholder) || Settings.DisableLazyLoading)
                                 {
                                     placeholder.outerHTML = body.As<string>();
                                 }
@@ -368,11 +443,12 @@ namespace AlphaTab.Platform.JavaScript
 
         private void CreateStyleElement(Settings settings)
         {
-            var styleElement = (HtmlStyleElement)document.getElementById("alphaTabStyle");
+            var elementDocument = Element.ownerDocument;
+            var styleElement = (HtmlStyleElement)elementDocument.getElementById("alphaTabStyle");
             if (styleElement == null)
             {
                 string fontDirectory = settings.FontDirectory;
-                styleElement = (HtmlStyleElement)document.createElement("style");
+                styleElement = (HtmlStyleElement)elementDocument.createElement("style");
                 styleElement.id = "alphaTabStyle";
                 styleElement.type = "text/css";
                 var css = new StringBuilder();
@@ -404,7 +480,7 @@ namespace AlphaTab.Platform.JavaScript
                 css.AppendLine("     overflow: visible !important;");
                 css.AppendLine("}");
                 styleElement.innerHTML = css.ToString();
-                document.getElementsByTagName("head")[0].appendChild(styleElement);
+                elementDocument.getElementsByTagName("head")[0].appendChild(styleElement);
             }
         }
 
@@ -433,7 +509,17 @@ namespace AlphaTab.Platform.JavaScript
 
         public void SetTracks(dynamic tracksData, bool render = true)
         {
+            if (tracksData.length && JsTypeOf(tracksData[0].Index) == JsTypes.number)
+            {
+                Score = tracksData[0].Score;
+            }
+            else if (JsTypeOf(tracksData.Index) == JsTypes.number)
+            {
+                Score = tracksData.Score;
+            }
+
             TrackIndexes = ParseTracks(tracksData);
+            
             if (render)
             {
                 Render();
@@ -488,7 +574,8 @@ namespace AlphaTab.Platform.JavaScript
                     }
                     else if (JsTypeOf(tracksData[i].Index) == JsTypes.number)
                     {
-                        value = (int)tracksData.Index;
+                        Track track = tracksData[i];
+                        value = track.Index;
                     }
                     else
                     {

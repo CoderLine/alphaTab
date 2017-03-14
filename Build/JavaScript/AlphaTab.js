@@ -672,6 +672,43 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
             }
         }
     },
+    Print: function (width){
+        // prepare a popup window for printing (a4 width, window height, centered)
+        var preview = window.open("", "", "width=0,height=0");
+        var a4 = preview.document.createElement("div");
+        if (!((width==null)||(width.length==0))){
+            a4.style.width = width;
+        }
+        else {
+            a4.style.width = "210mm";
+        }
+        preview.document.write("<!DOCTYPE html><html></head><body></body></html>");
+        preview.document.body.appendChild(a4);
+        var dualScreenLeft = typeof(window.screenLeft) != "undefined" ? window.screenLeft : screen["left"];
+        var dualScreenTop = typeof(window.screenTop) != "undefined" ? window.screenTop : screen["top"];
+        var screenWidth = typeof(window.innerWidth) != "undefined" ? window.innerWidth : typeof(document.documentElement.clientWidth) != "undefined" ? document.documentElement.clientWidth : screen.width;
+        var screenHeight = typeof(window.innerHeight) != "undefined" ? window.innerHeight : typeof(document.documentElement.clientHeight) != "undefined" ? document.documentElement.clientHeight : screen.height;
+        var w = a4.offsetWidth + 50;
+        var h = window.innerHeight;
+        var left = (((screenWidth / 2) | 0) - ((w / 2) | 0)) + dualScreenLeft;
+        var top = (((screenHeight / 2) | 0) - ((h / 2) | 0)) + dualScreenTop;
+        preview.resizeTo(w, h);
+        preview.moveTo(left, top);
+        preview.focus();
+        // render alphaTab
+        var settings = AlphaTab.Settings.get_Defaults();
+        settings.ScriptFile = this.Settings.ScriptFile;
+        settings.FontDirectory = this.Settings.FontDirectory;
+        settings.Scale = 0.8;
+        settings.StretchForce = 0.8;
+        settings.DisableLazyLoading = true;
+        var alphaTab = AlphaTab.Platform.JavaScript.JsApiBase.Create(a4, settings);
+        alphaTab.Renderer.add_PostRenderFinished($CreateAnonymousDelegate(this, function (){
+            alphaTab.CanvasElement.style.height = "100%";
+            preview.window.print();
+        }));
+        alphaTab.SetTracks(this.get_Tracks(), true);
+    },
     AppendRenderResult: function (result){
         if (result != null){
             this.CanvasElement.style.width = result.TotalWidth + "px";
@@ -706,7 +743,7 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
                             placeholder.style.width = renderResult.Width + "px";
                             placeholder.style.height = renderResult.Height + "px";
                             placeholder.style.display = "inline-block";
-                            if (AlphaTab.Platform.JavaScript.JsApiBase.IsElementInViewPort(placeholder)){
+                            if (AlphaTab.Platform.JavaScript.JsApiBase.IsElementInViewPort(placeholder) || this.Settings.DisableLazyLoading){
                                 placeholder.outerHTML = body;
                             }
                             else {
@@ -729,10 +766,11 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
         }
     },
     CreateStyleElement: function (settings){
-        var styleElement = document.getElementById("alphaTabStyle");
+        var elementDocument = this.Element.ownerDocument;
+        var styleElement = elementDocument.getElementById("alphaTabStyle");
         if (styleElement == null){
             var fontDirectory = settings.FontDirectory;
-            styleElement = document.createElement("style");
+            styleElement = elementDocument.createElement("style");
             styleElement.id = "alphaTabStyle";
             styleElement.type = "text/css";
             var css = new String();
@@ -764,7 +802,7 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
             css+="     overflow: visible !important;"+'\r\n';
             css+="}"+'\r\n';
             styleElement.innerHTML = css;
-            document.getElementsByTagName("head")[0].appendChild(styleElement);
+            elementDocument.getElementsByTagName("head")[0].appendChild(styleElement);
         }
     },
     get_Tracks: function (){
@@ -775,6 +813,12 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
         return tracks.slice(0);
     },
     SetTracks: function (tracksData, render){
+        if (tracksData.length && typeof(tracksData[0].Index) == "number"){
+            this.Score = tracksData[0].Score;
+        }
+        else if (typeof(tracksData.Index) == "number"){
+            this.Score = tracksData.Score;
+        }
         this.TrackIndexes = this.ParseTracks(tracksData);
         if (render){
             this.Render();
@@ -811,7 +855,8 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
                     value = tracksData[i];
                 }
                 else if (typeof(tracksData[i].Index) == "number"){
-                    value = tracksData.Index;
+                    var track = tracksData[i];
+                    value = track.Index;
                 }
                 else {
                     value = AlphaTab.Platform.Std.ParseInt(tracksData[i].ToString());
@@ -851,6 +896,16 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
         this.Renderer.Invalidate();
     }
 };
+AlphaTab.Platform.JavaScript.JsApiBase.Create = function (element, options){
+    var useWorker = !(options && options.useWorker == false);
+    var workersUnsupported = !window.Worker;
+    if (useWorker && !workersUnsupported){
+        return new AlphaTab.Platform.JavaScript.JsWorkerApi(element, options);
+    }
+    else {
+        return new AlphaTab.Platform.JavaScript.JsApi(element, options);
+    }
+};
 AlphaTab.Platform.JavaScript.JsApiBase.IsElementInViewPort = function (el){
     var rect = el.getBoundingClientRect();
     return (rect.top + rect.height >= 0 && rect.top <= window.innerHeight && rect.left + rect.width >= 0 && rect.left <= window.innerWidth);
@@ -866,13 +921,15 @@ AlphaTab.Platform.JavaScript.JsWorker = function (main){
 AlphaTab.Platform.JavaScript.JsWorker.prototype = {
     get_Tracks: function (){
         var tracks = [];
-        for (var $i6 = 0,$t6 = this._trackIndexes,$l6 = $t6.length,track = $t6[$i6]; $i6 < $l6; $i6++, track = $t6[$i6]){
-            if (track >= 0 && track < this.Score.Tracks.length){
-                tracks.push(this.Score.Tracks[track]);
+        if (this.Score != null){
+            for (var $i6 = 0,$t6 = this._trackIndexes,$l6 = $t6.length,track = $t6[$i6]; $i6 < $l6; $i6++, track = $t6[$i6]){
+                if (track >= 0 && track < this.Score.Tracks.length){
+                    tracks.push(this.Score.Tracks[track]);
+                }
             }
-        }
-        if (tracks.length == 0 && this.Score.Tracks.length > 0){
-            tracks.push(this.Score.Tracks[0]);
+            if (tracks.length == 0 && this.Score.Tracks.length > 0){
+                tracks.push(this.Score.Tracks[0]);
+            }
         }
         return tracks.slice(0);
     },
@@ -926,6 +983,11 @@ AlphaTab.Platform.JavaScript.JsWorker.prototype = {
                 break;
             case "alphaTab.renderMultiple":
                 this.RenderMultiple(data["data"]);
+                break;
+            case "alphaTab.score":
+                var converter = new AlphaTab.Model.JsonConverter();
+                var score = converter.JsObjectToScore(data["score"]);
+                this.Score = score;
                 break;
             case "alphaTab.updateSettings":
                 this.UpdateSettings(data["settings"]);
@@ -995,12 +1057,14 @@ $StaticConstructor(function (){
     }
 });
 AlphaTab.Platform.JavaScript.JsWorkerApi = function (element, options){
+    this._workerScore = null;
     AlphaTab.Platform.JavaScript.JsApiBase.call(this, element, options);
 };
 AlphaTab.Platform.JavaScript.JsWorkerApi.prototype = {
     CreateScoreRenderer: function (settings){
         var renderer = new AlphaTab.Platform.JavaScript.WorkerScoreRenderer(settings);
         renderer.add_ScoreLoaded($CreateAnonymousDelegate(this, function (score){
+            this._workerScore = score;
             this.ScoreLoaded(score, false);
         }));
         renderer.add_PostRenderFinished($CreateAnonymousDelegate(this, function (){
@@ -1025,6 +1089,9 @@ AlphaTab.Platform.JavaScript.JsWorkerApi.prototype = {
     Render: function (){
         if (this.Renderer != null){
             this.Element.className += " rendering";
+            if (this._workerScore != this.Score){
+                this.Renderer.SetScore(this.Score);
+            }
             this.Renderer.RenderMultiple(this.TrackIndexes);
         }
     },
@@ -1518,6 +1585,14 @@ AlphaTab.Platform.JavaScript.WorkerScoreRenderer.prototype = {
             cmd: "alphaTab.tex",
             data: contents
         });
+    },
+    SetScore: function (score){
+        var converter = new AlphaTab.Model.JsonConverter();
+        this.Score = converter.ScoreToJsObject(score);
+        this._worker.postMessage({
+            cmd: "alphaTab.score",
+            score: this.Score
+        });
     }
 };
 AlphaTab.Platform.Std = function (){
@@ -1786,6 +1861,7 @@ AlphaTab.Rendering.Utils.BoundsLookup.FromJson = function (json, score){
 AlphaTab.Settings = function (){
     this.ScriptFile = null;
     this.FontDirectory = null;
+    this.DisableLazyLoading = false;
     this.Scale = 0;
     this.Width = 0;
     this.Height = 0;
@@ -1806,6 +1882,7 @@ AlphaTab.Settings.prototype = {
         json.forcePianoFingering = this.ForcePianoFingering;
         json.scriptFile = this.ScriptFile;
         json.fontDirectory = this.FontDirectory;
+        json.lazy = this.DisableLazyLoading;
         json.layout = {};
         json.layout.mode = this.Layout.Mode;
         json.layout.additionalSettings = {};
@@ -1867,6 +1944,8 @@ AlphaTab.Settings.FillFromJson = function (settings, json){
         settings.StretchForce = json.stretchForce;
     if ("forcePianoFingering"in json)
         settings.ForcePianoFingering = json.forcePianoFingering;
+    if ("lazy"in json)
+        settings.DisableLazyLoading = !json.lazy;
     if ("scriptFile"in json){
         settings.ScriptFile = AlphaTab.Settings.EnsureFullUrl(json.scriptFile);
         settings.ScriptFile = AlphaTab.Settings.AppendScriptName(settings.ScriptFile);
@@ -9684,7 +9763,8 @@ AlphaTab.Model.Track.CopyTo = function (src, dst){
     dst.Index = src.Index;
     dst.ShortName = src.ShortName;
     dst.Tuning = new Int32Array(src.Tuning);
-    dst.Color = new AlphaTab.Platform.Model.Color(src.Color.get_R(), src.Color.get_G(), src.Color.get_B(), src.Color.get_A());
+    dst.Color.Raw = src.Color.Raw;
+    dst.Color.RGBA = src.Color.RGBA;
     dst.IsPercussion = src.IsPercussion;
 };
 AlphaTab.Model.TripletFeel = {
@@ -9984,7 +10064,7 @@ AlphaTab.Platform.Model.Color = function (r, g, b, a){
     this.Raw = 0;
     this.RGBA = null;
     this.Raw = (a << 24) | (r << 16) | (g << 8) | b;
-    if (a == 255){
+    if (this.get_A() == 255){
         this.RGBA = "#" + AlphaTab.Platform.Std.ToHexString(this.get_R(), 2) + AlphaTab.Platform.Std.ToHexString(this.get_G(), 2) + AlphaTab.Platform.Std.ToHexString(this.get_B(), 2);
     }
     else {

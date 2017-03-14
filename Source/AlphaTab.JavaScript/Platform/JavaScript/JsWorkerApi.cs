@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using AlphaTab.Model;
 using AlphaTab.Rendering;
 using SharpKit.Html;
 using SharpKit.JavaScript;
@@ -24,6 +25,8 @@ namespace AlphaTab.Platform.JavaScript
 {
     public class JsWorkerApi : JsApiBase
     {
+        private Score _workerScore; 
+
         public JsWorkerApi(HtmlElement element, object options)
             : base(element, options)
         {
@@ -34,6 +37,7 @@ namespace AlphaTab.Platform.JavaScript
             var renderer = new WorkerScoreRenderer(settings);
             renderer.ScoreLoaded += score =>
             {
+                _workerScore = score;
                 ScoreLoaded(score, false);
             };
             renderer.PostRenderFinished += () =>
@@ -70,6 +74,10 @@ namespace AlphaTab.Platform.JavaScript
             if (Renderer != null)
             {
                 Element.className += " rendering";
+                if (_workerScore != Score)
+                {
+                    Renderer.As<WorkerScoreRenderer>().SetScore(Score);
+                }
                 Renderer.As<WorkerScoreRenderer>().RenderMultiple(TrackIndexes);
             }
         }

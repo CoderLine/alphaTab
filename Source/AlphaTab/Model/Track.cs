@@ -80,7 +80,8 @@ namespace AlphaTab.Model
             dst.Index = src.Index;
             dst.ShortName = src.ShortName;
             dst.Tuning = Std.CloneArray(src.Tuning);
-            dst.Color = new Color(src.Color.R, src.Color.G, src.Color.B, src.Color.A);
+            dst.Color.Raw = src.Color.Raw;
+            dst.Color.RGBA = src.Color.RGBA;
             dst.IsPercussion = src.IsPercussion;
         }
 

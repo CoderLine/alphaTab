@@ -140,5 +140,12 @@ namespace AlphaTab.Platform.JavaScript
             _worker.postMessage(new { cmd = "alphaTab.tex", data = contents });
         }
 
+
+        public void SetScore(Score score)
+        {
+            var converter = new JsonConverter();
+            Score = converter.ScoreToJsObject(score);
+            _worker.postMessage(new { cmd = "alphaTab.score", score = Score});
+        }
     }
 }

@@ -24,17 +24,20 @@ namespace AlphaTab.Platform.JavaScript
             {
                 var tracks = new FastList<Track>();
 
-                foreach (var track in _trackIndexes)
+                if (Score != null)
                 {
-                    if (track >= 0 && track < Score.Tracks.Count)
+                    foreach (var track in _trackIndexes)
                     {
-                        tracks.Add(Score.Tracks[track]);
+                        if (track >= 0 && track < Score.Tracks.Count)
+                        {
+                            tracks.Add(Score.Tracks[track]);
+                        }
                     }
-                }
 
-                if (tracks.Count == 0 && Score.Tracks.Count > 0)
-                {
-                    tracks.Add(Score.Tracks[0]);
+                    if (tracks.Count == 0 && Score.Tracks.Count > 0)
+                    {
+                        tracks.Add(Score.Tracks[0]);
+                    }
                 }
 
                 return tracks.ToArray();
@@ -84,6 +87,11 @@ namespace AlphaTab.Platform.JavaScript
                     break;
                 case "alphaTab.renderMultiple":
                     RenderMultiple(data.Member("data").As<int[]>());
+                    break;
+                case "alphaTab.score":
+                    var converter = new JsonConverter();
+                    var score = converter.JsObjectToScore(data.Member("score").As<Score>());
+                    Score = score;
                     break;
                 case "alphaTab.updateSettings":
                     UpdateSettings(data.Member("settings"));

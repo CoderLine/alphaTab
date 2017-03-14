@@ -38,6 +38,12 @@ namespace AlphaTab
             get; set;
         }
 
+
+        public bool DisableLazyLoading
+        {
+            get; set;
+        }
+
         public dynamic ToJson()
         {
             dynamic json = Std.NewObject();
@@ -51,6 +57,7 @@ namespace AlphaTab
 
             json.scriptFile = ScriptFile;
             json.fontDirectory = FontDirectory;
+            json.lazy = DisableLazyLoading;
 
             json.layout = Std.NewObject();
             json.layout.mode = Layout.Mode;
@@ -129,6 +136,7 @@ namespace AlphaTab
             if (Std.JsonExists(json, "engine")) settings.Engine = json.engine;
             if (Std.JsonExists(json, "stretchForce")) settings.StretchForce = json.stretchForce;
             if (Std.JsonExists(json, "forcePianoFingering")) settings.ForcePianoFingering = json.forcePianoFingering;
+            if (Std.JsonExists(json, "lazy")) settings.DisableLazyLoading = !json.lazy;
 
             if (Std.JsonExists(json, "scriptFile"))
             {
