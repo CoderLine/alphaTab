@@ -19,6 +19,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -69,7 +70,6 @@ namespace AlphaTab.Platform.CSharp.Wpf
             set { SetValue(SettingsProperty, value); }
         }
 
-
         public ObservableCollection<ImageSource> PartialResults
         {
             get { return (ObservableCollection<ImageSource>)GetValue(PartialResultsProperty); }
@@ -84,6 +84,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
             var settings = Settings.Defaults;
             settings.Engine = "gdi";
             Settings = settings;
+            settings.Width = 970;
             PartialResults = new ObservableCollection<ImageSource>();
             _renderer = new ScoreRenderer(settings);
             _renderer.PreRender += result =>

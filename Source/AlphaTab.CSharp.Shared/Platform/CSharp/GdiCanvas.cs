@@ -38,6 +38,8 @@ namespace AlphaTab.Platform.CSharp
 {
     public class GdiCanvas : ICanvas
     {
+        protected const float BlurCorrection = 0.5f;
+
         private static readonly Bitmap MeasurementImage;
         private static readonly Graphics MeasurementGraphics;
         private static readonly PrivateFontCollection MusicFontCollection;
@@ -83,7 +85,7 @@ namespace AlphaTab.Platform.CSharp
             GdiFont font;
             if (!FontLookup.TryGetValue(scale, out font))
             {
-                FontLookup[scale] = font = new GdiFont(MusicFontCollection.Families[0], 34*scale, GdiFontStyle.Regular, GraphicsUnit.Pixel);
+                FontLookup[scale] = font = new GdiFont(MusicFontCollection.Families[0], 34 * scale, GdiFontStyle.Regular, GraphicsUnit.Pixel);
             }
             return font;
         }
@@ -295,11 +297,15 @@ namespace AlphaTab.Platform.CSharp
 
         public void FillRect(float x, float y, float w, float h)
         {
+            x = ((int)x - BlurCorrection);
+            y = ((int)y - BlurCorrection);
             _graphics.FillRectangle(_brush, x, y, w, h);
         }
 
         public void StrokeRect(float x, float y, float w, float h)
         {
+            x = ((int)x - BlurCorrection);
+            y = ((int)y - BlurCorrection);
             _graphics.DrawRectangle(_pen, x, y, w, h);
         }
 
@@ -315,12 +321,16 @@ namespace AlphaTab.Platform.CSharp
 
         public void MoveTo(float x, float y)
         {
+            x = ((int)x - BlurCorrection);
+            y = ((int)y - BlurCorrection);
             _currentX = x;
             _currentY = y;
         }
 
         public void LineTo(float x, float y)
         {
+            x = ((int)x - BlurCorrection);
+            y = ((int)y - BlurCorrection);
             _currentPath.AddLine(_currentX, _currentY, x, y);
             _currentX = x;
             _currentY = y;
@@ -366,7 +376,7 @@ namespace AlphaTab.Platform.CSharp
 
         public void FillText(string text, float x, float y)
         {
-            _graphics.DrawString(text, _font, _brush, new PointF(x, y), _stringFormat);
+            _graphics.DrawString(text, _font, _brush, new Point((int)x, (int)y), _stringFormat);
         }
 
         public float MeasureText(string text)

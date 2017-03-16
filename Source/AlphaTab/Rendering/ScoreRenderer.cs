@@ -31,6 +31,7 @@ namespace AlphaTab.Rendering
     public class ScoreRenderer : IScoreRenderer
     {
         private string _currentLayoutMode;
+        private Track[] _renderedTracks;
 
         public ICanvas Canvas { get; set; }
         public Score Score { get; set; }
@@ -56,6 +57,7 @@ namespace AlphaTab.Rendering
                 Canvas = Environment.RenderEngines[settings.Engine]();
             }
             RecreateLayout();
+            Tracks = new Track[0];
         }
 
         private bool RecreateLayout()
@@ -128,12 +130,13 @@ namespace AlphaTab.Rendering
             OnPreRender();
             RecreateLayout();
             LayoutAndRender();
+            _renderedTracks = Tracks;
             Logger.Info("Rendering", "Rendering finished");
         }
 
         public void Resize(int width)
         {
-            if (RecreateLayout())
+            if (RecreateLayout() || _renderedTracks != Tracks || Tracks == null)
             {
                 Logger.Info("Rendering", "Starting full rerendering due to layout change");
                 Invalidate();

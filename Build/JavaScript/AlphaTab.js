@@ -15974,6 +15974,7 @@ AlphaTab.Rendering.ScoreBarRendererFactory.prototype = {
 $Inherit(AlphaTab.Rendering.ScoreBarRendererFactory, AlphaTab.Rendering.BarRendererFactory);
 AlphaTab.Rendering.ScoreRenderer = function (settings){
     this._currentLayoutMode = null;
+    this._renderedTracks = null;
     this.PreRender = null;
     this.PartialRenderFinished = null;
     this.RenderFinished = null;
@@ -15994,6 +15995,7 @@ AlphaTab.Rendering.ScoreRenderer = function (settings){
         this.Canvas = AlphaTab.Environment.RenderEngines[settings.Engine]();
     }
     this.RecreateLayout();
+    this.Tracks = new Array(0);
 };
 AlphaTab.Rendering.ScoreRenderer.prototype = {
     RecreateLayout: function (){
@@ -16048,10 +16050,11 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
         this.OnPreRender();
         this.RecreateLayout();
         this.LayoutAndRender();
+        this._renderedTracks = this.Tracks;
         AlphaTab.Util.Logger.Info("Rendering", "Rendering finished");
     },
     Resize: function (width){
-        if (this.RecreateLayout()){
+        if (this.RecreateLayout() || this._renderedTracks != this.Tracks || this.Tracks == null){
             AlphaTab.Util.Logger.Info("Rendering", "Starting full rerendering due to layout change");
             this.Invalidate();
         }
