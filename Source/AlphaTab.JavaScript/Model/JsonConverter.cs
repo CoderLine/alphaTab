@@ -169,7 +169,7 @@ namespace AlphaTab.Model
                     }
 
                     #endregion
-                    track2.Staves.Add(staff);
+                    track2.Staves.Add(staff2);
                 }
 
                 #endregion

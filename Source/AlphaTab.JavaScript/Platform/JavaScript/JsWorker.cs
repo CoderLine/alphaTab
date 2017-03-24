@@ -152,7 +152,16 @@ namespace AlphaTab.Platform.JavaScript
 
         private void Error(Exception e)
         {
-            PostMessage(new { cmd = "alphaTab.error", exception = JSON.parse(JSON.stringify(e)) });
+            dynamic error = JSON.parse(JSON.stringify(e));
+            if (e.Member("message").As<bool>())
+            {
+                error.message = e.Member("message");
+            }
+            if (e.Member("stack").As<bool>())
+            {
+                error.stack = e.Member("stack");
+            }
+            PostMessage(new { cmd = "alphaTab.error", exception = error });
         }
 
         private void ScoreLoaded(Score score)

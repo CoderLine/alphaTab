@@ -414,7 +414,7 @@ AlphaTab.Model.JsonConverter.prototype = {
                     }
                     staff2.Bars.push(bar2);
                 }
-                track2.Staves.push(staff);
+                track2.Staves.push(staff2);
             }
             score2.Tracks.push(track2);
         }
@@ -1031,9 +1031,16 @@ AlphaTab.Platform.JavaScript.JsWorker.prototype = {
         }
     },
     Error: function (e){
+        var error = JSON.parse(JSON.stringify(e));
+        if (e["message"]){
+            error.message = e["message"];
+        }
+        if (e["stack"]){
+            error.stack = e["stack"];
+        }
         this._main.postMessage({
     cmd: "alphaTab.error",
-    exception: JSON.parse(JSON.stringify(e))
+    exception: error
 }
 );
     },
