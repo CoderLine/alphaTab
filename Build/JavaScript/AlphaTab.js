@@ -2662,12 +2662,14 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
                 this._handler.AddProgramChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove, beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel, (automation.Value));
                 break;
             case AlphaTab.Model.AutomationType.Balance:
-                this._handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove, beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel, 10, (automation.Value));
-                this._handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove, beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel, 10, (automation.Value));
+                var balance = AlphaTab.Audio.Generator.MidiFileGenerator.ToChannelShort(automation.Value | 0);
+                this._handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove, beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel, 10, balance);
+                this._handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove, beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel, 10, balance);
                 break;
             case AlphaTab.Model.AutomationType.Volume:
-                this._handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove, beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel, 7, (automation.Value));
-                this._handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove, beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel, 7, (automation.Value));
+                var volume = AlphaTab.Audio.Generator.MidiFileGenerator.ToChannelShort(automation.Value | 0);
+                this._handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove, beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel, 7, volume);
+                this._handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove, beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel, 7, volume);
                 break;
         }
     }

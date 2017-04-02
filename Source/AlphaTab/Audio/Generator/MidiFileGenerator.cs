@@ -699,24 +699,27 @@ namespace AlphaTab.Audio.Generator
                                                 (byte)(automation.Value));
                     break;
                 case AutomationType.Balance:
+                    var balance = ToChannelShort((int)automation.Value);
                     _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
                                                 (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel,
                                                 (byte)MidiController.PanCoarse,
-                                                (byte)(automation.Value));
+                                                (byte)balance);
                     _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
                                                 (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel,
                                                 (byte)MidiController.PanCoarse,
-                                                (byte)(automation.Value));
+                                                (byte)balance);
                     break;
                 case AutomationType.Volume:
+                    var volume = ToChannelShort((int)automation.Value);
+
                     _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
                                                 (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel,
                                                 (byte)MidiController.VolumeCoarse,
-                                                (byte)(automation.Value));
+                                                (byte)volume);
                     _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
                                                 (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel,
                                                 (byte)MidiController.VolumeCoarse,
-                                                (byte)(automation.Value));
+                                                (byte)volume);
                     break;
             }
         }
