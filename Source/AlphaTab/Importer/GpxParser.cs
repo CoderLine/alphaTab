@@ -1607,7 +1607,7 @@ namespace AlphaTab.Importer
 
 
             // build bars
-            foreach (var barId in _barsById.Keys)
+            foreach (var barId in _barsById)
             {
                 var bar = _barsById[barId];
                 if (_voicesOfBar.ContainsKey(barId))
@@ -1635,7 +1635,7 @@ namespace AlphaTab.Importer
             }
 
             // build beats
-            foreach (var beatId in _beatById.Keys)
+            foreach (var beatId in _beatById)
             {
                 var beat = _beatById[beatId];
                 var rhythmId = _rhythmOfBeat[beatId];
@@ -1665,7 +1665,7 @@ namespace AlphaTab.Importer
             }
 
             // build voices
-            foreach (var voiceId in _voiceById.Keys)
+            foreach (var voiceId in _voiceById)
             {
                 var voice = _voiceById[voiceId];
                 if (_beatsOfVoice.ContainsKey(voiceId))
@@ -1684,7 +1684,7 @@ namespace AlphaTab.Importer
             }
 
             // build masterbar automations
-            foreach (var barIndex in _masterTrackAutomations.Keys)
+            foreach (var barIndex in _masterTrackAutomations)
             {
                 var automations = _masterTrackAutomations[barIndex];
                 var masterBar = Score.MasterBars[Std.ParseInt(barIndex)];

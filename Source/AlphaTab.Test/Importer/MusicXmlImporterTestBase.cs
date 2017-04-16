@@ -33,7 +33,7 @@ namespace AlphaTab.Test.Importer
             try
             {
                 sw.Restart();
-                var buffer = Environment.FileLoaders["default"]().LoadBinary(file);
+                var buffer = File.ReadAllBytes(file);
                 var importer = PrepareImporterWithBytes(buffer);
                 var score = importer.ReadScore();
                 sw.Stop();

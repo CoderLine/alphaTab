@@ -30,7 +30,7 @@ namespace AlphaTab.Test.Importer
         internal byte[] Load(string name)
         {
             const string path = "TestFiles/";
-            return Environment.FileLoaders["default"]().LoadBinary(Path.Combine(path, name));
+            return File.ReadAllBytes(Path.Combine(path, name));
         }
         
         internal new GpxImporter PrepareImporterWithFile(string name)

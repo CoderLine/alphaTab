@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using AlphaTab.Audio.Generator;
+using AlphaTab.Collections;
 using AlphaTab.IO;
 using AlphaTab.Platform;
 using AlphaTab.Platform.JavaScript;
@@ -52,7 +54,6 @@ using SharpKit.JavaScript;
 [assembly: JsType(Export = false, TargetType = typeof(IWriteable))]
 [assembly: JsType(Export = false, TargetType = typeof(ICanvas))]
 [assembly: JsType(Export = false, TargetType = typeof(IPathCanvas))]
-[assembly: JsType(Export = false, TargetType = typeof(IFileLoader))]
 [assembly: JsType(Export = false, TargetType = typeof(IEffectBarRendererInfo))]
 [assembly: JsType(Export = false, TargetType = typeof(IScoreRenderer))]
 [assembly: JsType(Export = false, TargetType = typeof(IBeamYCalculator))]
@@ -111,3 +112,35 @@ using SharpKit.JavaScript;
                     IgnoreGenericMethodArguments = true,
                     OmitCasts = true
                     )]
+
+[assembly: JsType(Mode = JsMode.Prototype, TargetType = typeof(FastDictionary<,>),
+                    Name = "Object",
+                    Export = false,
+                    IgnoreGenericTypeArguments = true,
+                    NativeEnumerator = true
+                    )]
+[assembly: JsMethod(TargetType = typeof(FastDictionary<,>), TargetMethod=".ctor", InlineCode = "{}")]
+[assembly: JsProperty(TargetType = typeof(FastDictionary<,>), TargetProperty= "Item", NativeIndexer = true)]
+[assembly: JsMethod(TargetType = typeof(FastDictionary<,>), TargetMethod = "get_Count", InlineCodeExpression = "Object.keys(this).length")]
+[assembly: JsMethod(TargetType = typeof(FastDictionary<,>), TargetMethod = "Remove", InlineCodeExpression = "delete this[key]")]
+[assembly: JsMethod(TargetType = typeof(FastDictionary<,>), TargetMethod = "ContainsKey", InlineCodeExpression = "this.hasOwnProperty(key)")]
+
+[assembly: JsType(Mode = JsMode.Prototype, TargetType = typeof(FastList<>),
+                    Name = "Array",
+                    Export = false,
+                    IgnoreGenericTypeArguments = true,
+                    NativeArrayEnumerator = true,
+                    NativeCasts = true,
+                    NativeEnumerator = false,
+                    NativeOperatorOverloads = true
+                    )]
+[assembly: JsMethod(TargetType = typeof(FastList<>), TargetMethod=".ctor", InlineCode = "[]")]
+[assembly: JsMethod(TargetType = typeof(FastList<>), TargetMethod = "get_Count", InlineCodeExpression = "this.length")]
+[assembly: JsProperty(TargetType = typeof(FastList<>), TargetProperty= "Item", NativeIndexer = true)]
+[assembly: JsMethod(TargetType = typeof(FastList<>), TargetMethod = "Add", InlineCodeExpression = "this.push(item)")]
+[assembly: JsMethod(TargetType = typeof(FastList<>), TargetMethod = "Sort", Name = "sort")]
+[assembly: JsMethod(TargetType = typeof(FastList<>), TargetMethod = "Clone", Name = "slice")]
+[assembly: JsMethod(TargetType = typeof(FastList<>), TargetMethod = "RemoveAt", InlineCodeExpression = "this.splice(index, 1)")]
+[assembly: JsMethod(TargetType = typeof(FastList<>), TargetMethod = "ToArray", InlineCodeExpression = "this.slice(0)")]
+[assembly: JsMethod(TargetType = typeof(FastList<>), TargetMethod = "IndexOf", Name = "indexOf")]
+[assembly: JsMethod(TargetType = typeof(FastList<>), TargetMethod = "Reverse", Name = "reverse")]

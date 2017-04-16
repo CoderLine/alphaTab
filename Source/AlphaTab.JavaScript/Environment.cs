@@ -22,7 +22,7 @@ using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering.Glyphs;
 using SharpKit.Html;
 using SharpKit.JavaScript;
-using Console = System.Console;
+using StringBuilder = AlphaTab.Collections.StringBuilder;
 
 namespace AlphaTab
 {
@@ -35,13 +35,12 @@ namespace AlphaTab
     {
         public static string ScriptFile { get; set; }
         public static bool IsFontLoaded { get; set; }
-        
+
         static void PlatformInit()
         {
             RenderEngines["svg"] = () => new FontSvgCanvas();
             RenderEngines["default"] = () => new FontSvgCanvas();
             RenderEngines["html5"] = () => new Platform.JavaScript.Html5Canvas();
-            FileLoaders["default"] = () => new Platform.JavaScript.JsFileLoader();
 
             // check whether webfont is loaded
             CheckFontLoad();
@@ -51,8 +50,35 @@ namespace AlphaTab
             // try to build the find the alphaTab script url in case we are not in the webworker already
             if (HtmlContext.self.document.As<bool>())
             {
-                
-
+                /**
+                 * VB Loader For IE 
+                 * This code is based on the code of 
+                 *     http://nagoon97.com/reading-binary-files-using-ajax/
+                 *     Copyright (c) 2008 Andy G.P. Na <nagoon97@naver.com>
+                 *     The source code is freely distributable under the terms of an MIT-style license.
+                 */
+                var vbAjaxLoader = new StringBuilder();
+                vbAjaxLoader.AppendLine("<script type=\"text/vbscript\">");
+                vbAjaxLoader.AppendLine("Function VbAjaxLoader(method, fileName)");
+                vbAjaxLoader.AppendLine("    Dim xhr");
+                vbAjaxLoader.AppendLine("    Set xhr = CreateObject(\"Microsoft.XMLHTTP\")");
+                vbAjaxLoader.AppendLine("    xhr.Open method, fileName, False");
+                vbAjaxLoader.AppendLine("    xhr.setRequestHeader \"Accept-Charset\", \"x-user-defined\"");
+                vbAjaxLoader.AppendLine("    xhr.send");
+                vbAjaxLoader.AppendLine("    Dim byteArray()");
+                vbAjaxLoader.AppendLine("    if xhr.Status = 200 Then");
+                vbAjaxLoader.AppendLine("        Dim byteString");
+                vbAjaxLoader.AppendLine("        Dim i");
+                vbAjaxLoader.AppendLine("        byteString=xhr.responseBody");
+                vbAjaxLoader.AppendLine("        ReDim byteArray(LenB(byteString))");
+                vbAjaxLoader.AppendLine("        For i = 1 To LenB(byteString)");
+                vbAjaxLoader.AppendLine("            byteArray(i-1) = AscB(MidB(byteString, i, 1))");
+                vbAjaxLoader.AppendLine("        Next");
+                vbAjaxLoader.AppendLine("    End If");
+                vbAjaxLoader.AppendLine("    VbAjaxLoader=byteArray");
+                vbAjaxLoader.AppendLine("End Function");
+                vbAjaxLoader.AppendLine("</script>");
+                HtmlContext.document.write(vbAjaxLoader.ToString());
 
                 var scriptElement = HtmlContext.document.Member("currentScript").As<HtmlScriptElement>();
                 if (!scriptElement.As<bool>())

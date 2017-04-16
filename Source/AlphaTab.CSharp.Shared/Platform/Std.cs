@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using AlphaTab.IO;
 using AlphaTab.Util;
 using AlphaTab.Xml;
@@ -29,50 +30,15 @@ namespace AlphaTab.Platform
 {
     public static partial class Std
     {
-        /// <summary>
-        /// gen
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="s"></param>
-        /// <returns></returns>
         public static T As<T>(this object s)
         {
-            return (T) s;
+            return (T)s;
         }
 
-        public static string GetCallerName()
+        public static void Log(LogLevel logLevel, string category, string msg)
         {
-            var frame = new StackFrame(3, true);
-            var method = frame.GetMethod();
-            var lineNumber = frame.GetFileLineNumber();
-            return string.Format("{0}.{1}:{2}", method.DeclaringType.FullName, method.Name, lineNumber);
-        }
-
-
-        public static void Log(string msg, LogLevel logLevel)
-        {
-            var color = Console.ForegroundColor;
-            switch (logLevel)
-            {
-                case LogLevel.None:
-                    break;
-                case LogLevel.Debug:
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    break;
-                case LogLevel.Info:
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                    break;
-                case LogLevel.Warning:
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    break;
-                case LogLevel.Error:
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    break;
-            }
-
-            Console.WriteLine(msg);
-            Debug.WriteLine(msg);
-            Console.ForegroundColor = color;
+            category = "[AlphaTab][" + category + "][" + logLevel + "]";
+            Debug.WriteLine(msg, category);
         }
 
         public static float ParseFloat(string s)
@@ -90,12 +56,6 @@ namespace AlphaTab.Platform
             return (float)Math.Log(s, 2);
         }
 
-
-        public static int ParseInt(int s)
-        {
-            return s;
-        }
-
         public static int ParseInt(string s)
         {
             float f;
@@ -103,12 +63,12 @@ namespace AlphaTab.Platform
             {
                 return int.MinValue;
             }
-            return (int) f;
+            return (int)f;
         }
 
         public static int[] CloneArray(int[] array)
         {
-            return (int[]) array.Clone();
+            return (int[])array.Clone();
         }
 
         public static void BlockCopy(byte[] src, int srcOffset, byte[] dst, int dstOffset, int count)
@@ -123,7 +83,7 @@ namespace AlphaTab.Platform
 
         public static string StringFromCharCode(int c)
         {
-            return ((char) c).ToString();
+            return ((char)c).ToString();
         }
 
         public static void Foreach<T>(IEnumerable<T> e, Action<T> c)
@@ -136,12 +96,12 @@ namespace AlphaTab.Platform
 
         public static sbyte ReadSignedByte(this IReadable readable)
         {
-            return unchecked((sbyte) (byte) readable.ReadByte());
+            return unchecked((sbyte)(byte)readable.ReadByte());
         }
 
         public static string ToString(byte[] data)
         {
-            return Encoding.UTF8.GetString(data);
+            return Encoding.UTF8.GetString(data, 0, data.Length);
         }
 
         public static bool InstanceOf<T>(object value)

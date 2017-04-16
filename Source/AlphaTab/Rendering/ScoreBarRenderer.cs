@@ -585,7 +585,7 @@ namespace AlphaTab.Rendering
             // sort notes ascending in their value to ensure 
             // we are drawing the numbers according to their order on the stave 
             var noteList = beat.Notes.Clone();
-            noteList.Sort((a, b) => b.RealValue - a.RealValue);
+            noteList.Sort((a, b) => a.RealValue - b.RealValue);
 
             for (int n = 0; n < noteList.Count; n++)
             {

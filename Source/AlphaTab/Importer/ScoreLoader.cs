@@ -27,51 +27,8 @@ namespace AlphaTab.Importer
     /// The ScoreLoader enables you easy loading of Scores using all 
     /// available importers
     /// </summary>
-    public class ScoreLoader
+    public partial class ScoreLoader
     {
-        /// <summary>
-        /// Loads a score asynchronously from the given datasource
-        /// </summary>
-        /// <param name="path">the source path to load the binary file from</param>
-        /// <param name="success">this function is called if the Score was successfully loaded from the datasource</param>
-        /// <param name="error">this function is called if any error during the loading occured.</param>
-        public static void LoadScoreAsync(string path, Action<Score> success, Action<Exception> error)
-        {
-            IFileLoader loader = Environment.FileLoaders["default"]();
-            Logger.Info("ScoreLoader", "Loading score from '" + path + "'");
-            loader.LoadBinaryAsync(path, data =>
-            {
-                Score score = null;
-                try
-                {
-                    score = LoadScoreFromBytes(data);
-                }
-                catch (Exception e)
-                {
-                    error(e);
-                }
-
-                if (score != null)
-                {
-                    success(score);
-                }
-
-            }, error);
-        }
-
-
-        /// <summary>
-        /// Loads a score synchronously from the given datasource
-        /// </summary>
-        /// <param name="path">the source path to load the binary file from</param>
-        /// <returns></returns>
-        public static Score LoadScore(string path)
-        {
-            IFileLoader loader = Environment.FileLoaders["default"]();
-            var data = loader.LoadBinary(path);
-            return LoadScoreFromBytes(data);
-        }
-
         public static Score LoadScoreFromBytes(byte[] data)
         {
             var importers = ScoreImporter.BuildImporters();

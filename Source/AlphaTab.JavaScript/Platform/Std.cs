@@ -37,9 +37,12 @@ namespace AlphaTab.Platform
         [JsMethod(InlineCodeExpression = "arguments.callee.caller.caller.name", Export = false)]
         public static extern string GetCallerName();
 
-        public static void Log(string msg, LogLevel logLevel)
+        public static void Log(LogLevel logLevel, string category, string msg)
         {
+            var caller = GetCallerName();
             // ReSharper disable once RedundantAssignment
+            msg = "[AlphaTab][" + category + "] " + caller + " - " + msg;
+
             switch (logLevel)
             {
                 case LogLevel.None:

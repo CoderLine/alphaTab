@@ -684,7 +684,7 @@ namespace AlphaTab.Importer
                             break;
                         case "rest":
                             beat.IsEmpty = false;
-                            beat.Notes.Clear();
+                            beat.Notes = new FastList<Note>();
                             break;
                     }
                 }
@@ -1120,7 +1120,6 @@ namespace AlphaTab.Importer
         {
             string sign = null;
             int line = 0;
-            int octaveChange = 0;
             foreach (var c in element.ChildNodes)
             {
                 if (c.NodeType == XmlNodeType.Element)

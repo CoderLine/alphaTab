@@ -1,0 +1,65 @@
+﻿<Window x:Class="AlphaTab.Samples.Wpf.ScoreInfoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Score Information" SizeToContent="Height" ShowInTaskbar="False" Width="400" WindowStartupLocation="CenterScreen"
+        WindowStyle="ToolWindow">
+    <Grid>
+        <Grid.Resources>
+            <Style TargetType="Label">
+                <Setter Property="Margin" Value="5" />
+            </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="Margin" Value="5" />
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="Margin" Value="5" />
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <Label Grid.Column="0" Grid.Row="0" Content="Title" />
+        <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Title}" IsEnabled="False" />
+        
+        <Label Grid.Column="0" Grid.Row="1" Content="Subtitle" />
+        <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding SubTitle}" IsEnabled="False" />
+        
+        <Label Grid.Column="0" Grid.Row="2" Content="Artist" />
+        <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Artist}" IsEnabled="False" />
+        
+        <Label Grid.Column="0" Grid.Row="3" Content="Album" />
+        <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding Album}" IsEnabled="False" />
+        
+        <Label Grid.Column="0" Grid.Row="4" Content="Lyrics" />
+        <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding Words}" IsEnabled="False" />
+        
+        <Label Grid.Column="0" Grid.Row="5" Content="Music" /> 
+        <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding Music}" IsEnabled="False" />
+        
+        <Label Grid.Column="0" Grid.Row="6" Content="Copyright" VerticalContentAlignment="Center" />
+        <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding Copyright}"  TextWrapping="Wrap" AcceptsReturn="True" Height="100"  IsEnabled="False" />
+
+        <Label Grid.Column="0" Grid.Row="7" Content="Tab" />
+        <TextBox Grid.Column="1" Grid.Row="7" Text="{Binding Tab}" IsEnabled="False" />
+
+        <Label Grid.Column="0" Grid.Row="9" Content="Notices" VerticalContentAlignment="Center" />
+        <TextBox Grid.Column="1" Grid.Row="9" Text="{Binding Notices}"  TextWrapping="Wrap" AcceptsReturn="True" Height="100"  IsEnabled="False" />
+
+        <Button Grid.Column="1" Grid.Row="10" Width="150" HorizontalAlignment="Right" IsDefault="True" Click="OnOkClick">OK</Button>
+    </Grid>
+</Window>

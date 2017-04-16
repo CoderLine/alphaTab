@@ -74,7 +74,7 @@ namespace AlphaTab.Model
                 PlaybackInformation.CopyTo(track.PlaybackInfo, track2.PlaybackInfo);
 
                 track2.Chords = new FastDictionary<string, Chord>();
-                foreach (var key in track.Chords.Keys)
+                foreach (var key in track.Chords)
                 {
                     var chord = track.Chords[key];
                     Chord chord2 = Std.NewObject();
@@ -225,7 +225,7 @@ namespace AlphaTab.Model
 
                 PlaybackInformation.CopyTo(track.PlaybackInfo, track2.PlaybackInfo);
 
-                foreach (var key in track.Chords.Keys)
+                foreach (var key in track.Chords)
                 {
                     var chord = track.Chords[key];
                     var chord2 = new Chord();

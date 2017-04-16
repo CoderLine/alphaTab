@@ -131,7 +131,6 @@ namespace AlphaTab.Rendering.Layout
                 ? Environment.StaveProfiles[Renderer.Settings.Staves.Id]
                 : Environment.StaveProfiles["default"];
 
-            var isFirstTrack = true;
             for (var trackIndex = 0; trackIndex < Renderer.Tracks.Length; trackIndex++)
             {
                 var track = Renderer.Tracks[trackIndex];
@@ -147,7 +146,6 @@ namespace AlphaTab.Rendering.Layout
                         }
                     }
                 }
-                isFirstTrack = false;
             }
             return group;
         }

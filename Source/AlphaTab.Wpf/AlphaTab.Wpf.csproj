@@ -11,13 +11,15 @@
     <AssemblyName>AlphaTab</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CSharp</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;CSharp;GDI</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\AlphaTab.xml</DocumentationFile>
@@ -27,7 +29,7 @@
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;CSharp</DefineConstants>
+    <DefineConstants>TRACE;CSharp;GDI</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>0</WarningLevel>
     <DocumentationFile>bin\Release\AlphaTab.xml</DocumentationFile>
@@ -36,8 +38,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MonoDebug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\MonoDebug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CSharp;MONO</DefineConstants>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CSharp;MONO;GDI</DefineConstants>
     <DocumentationFile>bin\Debug\AlphaTab.XML</DocumentationFile>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -46,9 +48,9 @@
     <Mono>true</Mono>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MonoRelease|AnyCPU'">
-    <OutputPath>bin\MonoRelease\</OutputPath>
-    <DefineConstants>TRACE;CSharp;MONO</DefineConstants>
-    <DocumentationFile>bin\Release\AlphaTab.Wpf.XML</DocumentationFile>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;CSharp;MONO;GDI</DefineConstants>
+    <DocumentationFile>bin\Release\AlphaTab.XML</DocumentationFile>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -57,8 +59,8 @@
     <Mono>true</Mono>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseNoMinimize|AnyCPU'">
-    <OutputPath>bin\ReleaseNoMinimize\</OutputPath>
-    <DefineConstants>TRACE;CSharp</DefineConstants>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;CSharp;GDI</DefineConstants>
     <DocumentationFile>bin\Release\AlphaTab.Wpf.XML</DocumentationFile>
     <Optimize>true</Optimize>
     <WarningLevel>0</WarningLevel>
@@ -83,6 +85,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Environment.cs" />
     <Compile Include="Platform\CSharp\Wpf\AlphaTab.cs" Condition=" '$(Mono)' == 'false' " />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -95,11 +98,6 @@
   <ItemGroup>
     <EmbeddedResource Include="..\..\Font\bravura\ttf\Bravura.ttf">
       <Link>Platform\CSharp\Bravura.ttf</Link>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="..\..\Font\bravura\svg\Bravura.svg">
-      <Link>Platform\CSharp\Bravura.svg</Link>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="..\Source\AlphaTab\AlphaTab.projitems" Label="Shared" Condition="Exists('..\Source\AlphaTab\AlphaTab.projitems')" />

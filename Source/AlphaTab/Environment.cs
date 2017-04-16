@@ -33,14 +33,12 @@ namespace AlphaTab
     public partial class Environment
     {
         public static FastDictionary<string, Func<ICanvas>> RenderEngines;
-        public static FastDictionary<string, Func<IFileLoader>> FileLoaders;
         public static FastDictionary<string, Func<ScoreRenderer, ScoreLayout>> LayoutEngines;
         public static FastDictionary<string, BarRendererFactory[]> StaveProfiles;
 
         static Environment()
         {
             RenderEngines = new FastDictionary<string, Func<ICanvas>>();
-            FileLoaders = new FastDictionary<string, Func<IFileLoader>>();
             LayoutEngines = new FastDictionary<string, Func<ScoreRenderer, ScoreLayout>>();
             StaveProfiles = new FastDictionary<string, BarRendererFactory[]>();
 

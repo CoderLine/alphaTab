@@ -1,4 +1,5 @@
-﻿/*
+﻿#if GDI
+/*
  * This file is part of alphaTab.
  * Copyright (c) 2014, Daniel Kuschny and Contributors, All rights reserved.
  * 
@@ -401,3 +402,4 @@ namespace AlphaTab.Platform.CSharp
         }
     }
 }
+#endif

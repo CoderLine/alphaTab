@@ -9,13 +9,8 @@
     <Import_RootNamespace>AlphaTab.CSharp.Shared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Collections\FastDictionary.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Collections\FastList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Collections\StringBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Environment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\StreamWrapper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Platform\CSharp\CsFileLoader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Platform\CSharp\FontEmbeddedSvgCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\CSharp\GdiCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Std.cs" />
   </ItemGroup>

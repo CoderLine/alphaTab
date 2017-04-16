@@ -28,7 +28,7 @@ namespace AlphaTab.Platform.JavaScript
     /// It uses a ajax request in case of modern browsers like Firefox or Chrome. 
     /// For IE a VBScript is used to load a binary stream. 
     /// </summary>
-    public class JsFileLoader : HtmlContext, IFileLoader
+    public class JsFileLoader : HtmlContext
     {
         // http://msdn.microsoft.com/en-us/library/ms537509(v=vs.85).aspx
         public static float GetIEVersion()

@@ -21,6 +21,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Model\MidiMessage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Model\MidiTickLookup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Model\MidiTrack.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\FastDictionary.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Collections\FastList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Environment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exporter\AlphaTexExporter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\AlphaTexException.cs" />
@@ -77,7 +79,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\VibratoType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Voice.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\ICanvas.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Platform\IFileLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Model\Color.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Model\Font.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Model\TextAlign.cs" />

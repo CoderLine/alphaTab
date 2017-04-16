@@ -61,10 +61,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Collections\FastDictionary.cs" />
-    <Compile Include="Collections\FastList.cs" />
     <Compile Include="Collections\StringBuilder.cs" />
     <Compile Include="Environment.cs" />
+    <Compile Include="Importer\ScoreLoader.cs" />
     <Compile Include="Model\JsonConverter.cs" />
     <Compile Include="Platform\JavaScript\JsApiBase.cs" />
     <Compile Include="Platform\JavaScript\JsWorker.cs" />
