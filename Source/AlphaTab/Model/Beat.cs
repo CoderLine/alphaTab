@@ -121,7 +121,7 @@ namespace AlphaTab.Model
 
         public int Dots { get; set; }
         public bool FadeIn { get; set; }
-        public FastList<string> Lyrics { get; set; }
+        public string[] Lyrics { get; set; }
         public bool Pop { get; set; }
         public bool HasRasgueado { get; set; }
         public bool Slap { get; set; }
@@ -209,7 +209,6 @@ namespace AlphaTab.Model
             Dynamic = DynamicValue.F;
             Crescendo = CrescendoType.None;
             InvertBeamDirection = false;
-            Lyrics = new FastList<string>();
         }
 
         public static void CopyTo(Beat src, Beat dst)
@@ -220,7 +219,14 @@ namespace AlphaTab.Model
             dst.Duration = src.Duration;
             dst.Dots = src.Dots;
             dst.FadeIn = src.FadeIn;
-            dst.Lyrics = src.Lyrics == null ? null : src.Lyrics.Clone();
+            if (src.Lyrics != null)
+            {
+                dst.Lyrics = new string[src.Lyrics.Length];
+                for (int i = 0; i < src.Lyrics.Length; i++)
+                {
+                    dst.Lyrics[i] = src.Lyrics[i];
+                }
+            }
             dst.Pop = src.Pop;
             dst.HasRasgueado = src.HasRasgueado;
             dst.Slap = src.Slap;

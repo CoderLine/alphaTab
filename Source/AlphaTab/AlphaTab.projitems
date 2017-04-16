@@ -59,6 +59,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\GraceType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\HarmonicType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\KeySignatureType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Lyrics.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\MasterBar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\ModelUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Note.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\PickStrokeEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\TapEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\TempoEffectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\LyricsEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\TextEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\TrillEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\AlternateEndingsEffectInfo.cs" />
@@ -139,6 +141,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\HiHatGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\LeftToRightLayoutingGlyphGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\LineRangedGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\LyricsGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\MusicFontGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\MusicFontSymbol.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\NaturalizeGlyph.cs" />

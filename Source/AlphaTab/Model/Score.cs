@@ -132,7 +132,6 @@ namespace AlphaTab.Model
             MasterBars.Add(bar);
         }
 
-
         public void AddTrack(Track track)
         {
             track.Score = this;
@@ -147,6 +146,5 @@ namespace AlphaTab.Model
                 Tracks[i].Finish();
             }
         }
-
     }
 }

@@ -69,6 +69,7 @@ namespace AlphaTab
                 new EffectBarRendererFactory("tab-effects", new IEffectBarRendererInfo[] {
                     new CrescendoEffectInfo(),
                     new DynamicsEffectInfo(),
+                    new LyricsEffectInfo(), 
                     new TrillEffectInfo(),
                     new BeatVibratoEffectInfo(),
                     new NoteVibratoEffectInfo(),
@@ -104,6 +105,7 @@ namespace AlphaTab
                 new EffectBarRendererFactory("score-bottom-effects", new IEffectBarRendererInfo[] {
                     new CrescendoEffectInfo(), 
                     new DynamicsEffectInfo(),
+                    new LyricsEffectInfo(), 
                 }),
             };
 
@@ -128,7 +130,10 @@ namespace AlphaTab
                     new PickStrokeEffectInfo(),
                     new AlternateEndingsEffectInfo()
                 }),
-                new TabBarRendererFactory()
+                new TabBarRendererFactory(),
+                new EffectBarRendererFactory("tab-bottom-effects", new IEffectBarRendererInfo[] {
+                    new LyricsEffectInfo(),
+                }),
             };
         }
     }

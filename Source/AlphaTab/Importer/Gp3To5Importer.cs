@@ -34,8 +34,8 @@ namespace AlphaTab.Importer
 
         private TripletFeel _globalTripletFeel;
 
-        private FastList<int> _lyricsIndex;
-        private FastList<string> _lyrics;
+        private int _lyricsTrack;
+        private FastList<Lyrics> _lyrics;
 
         private int _barCount;
         private int _trackCount;
@@ -135,6 +135,10 @@ namespace AlphaTab.Importer
             ReadBars();
 
             _score.Finish();
+            if (_lyrics != null && _lyricsTrack >= 0)
+            {
+                _score.Tracks[_lyricsTrack].ApplyLyrics(_lyrics);
+            }
 
             return _score;
         }
@@ -180,14 +184,15 @@ namespace AlphaTab.Importer
 
         public void ReadLyrics()
         {
-            _lyrics = new FastList<string>();
-            _lyricsIndex = new FastList<int>();
+            _lyrics = new FastList<Lyrics>();
 
-            ReadInt32();
+            _lyricsTrack = ReadInt32() - 1;
             for (int i = 0; i < 5; i++)
             {
-                _lyricsIndex.Add(ReadInt32() - 1);
-                _lyrics.Add(ReadStringInt());
+                var lyrics = new Lyrics();
+                lyrics.StartBar = ReadInt32() - 1;
+                lyrics.Text = ReadStringInt();
+                _lyrics.Add(lyrics);
             }
         }
 

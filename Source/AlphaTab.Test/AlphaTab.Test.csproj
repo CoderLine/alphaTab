@@ -93,6 +93,7 @@
     <Compile Include="Importer\MusicXmlImporterTestBase.cs" />
     <Compile Include="Importer\MusicXmlImporterSamplesTest.cs" />
     <Compile Include="Importer\MusicXmlImporterTestSuiteTests.cs" />
+    <Compile Include="Model\LyricsTest.cs" />
     <Compile Include="Model\TuningParserTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Xml\XmlParseTest.cs" />
@@ -306,6 +307,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\GuitarPro6\Effects.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="TestFiles\GuitarPro6\LyricsTemplate.gpx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="TestFiles\GuitarPro6\RepeatClose.gpx">

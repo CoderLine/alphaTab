@@ -53,7 +53,6 @@ namespace AlphaTab.Importer
             Logger.Info(Name, "Start Parsing score.gpif");
             var parser = new GpxParser();
             parser.ParseXml(xml);
-            parser.Score.Finish();
             Logger.Info(Name, "score.gpif parsed");
 
             return parser.Score;

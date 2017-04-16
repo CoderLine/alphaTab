@@ -85,6 +85,7 @@ namespace AlphaTab.Importer
         private FastDictionary<string, string[]> _notesOfBeat; // contains ids of notes stored in a beat (key = beat id);
         private FastDictionary<string, bool> _tappedNotes; // contains a flag indicating whether a note is tapped (key = note id);
 
+        private FastDictionary<string, FastList<Lyrics>> _lyricsByTrack; 
 
         public void ParseXml(string xml)
         {
@@ -103,6 +104,7 @@ namespace AlphaTab.Importer
             _notesOfBeat = new FastDictionary<string, string[]>();
             _noteById = new FastDictionary<string, Note>();
             _tappedNotes = new FastDictionary<string, bool>();
+            _lyricsByTrack= new FastDictionary<string, FastList<Lyrics>>();
 
             XmlDocument dom;
             try
@@ -114,6 +116,19 @@ namespace AlphaTab.Importer
                 throw new UnsupportedFormatException();
             }
             ParseDom(dom);
+
+            BuildModel();
+
+            Score.Finish();
+
+            if (_lyricsByTrack.Count > 0)
+            {
+                foreach (var trackId in _lyricsByTrack)
+                {
+                    var track = _tracksById[trackId];
+                    track.ApplyLyrics(_lyricsByTrack[trackId]);
+                }
+            }
         }
 
         #region Xml Parsing
@@ -173,8 +188,6 @@ namespace AlphaTab.Importer
             {
                 throw new UnsupportedFormatException();
             }
-
-            BuildModel();
         }
 
         //
@@ -396,7 +409,9 @@ namespace AlphaTab.Importer
                         case "ShortName":
                             track.ShortName = c.InnerText;
                             break;
-                        //TODO: case "Lyrics": parseLyrics(track, c);
+                        case "Lyrics":
+                            ParseLyrics(trackId, c);
+                            break;
                         case "Properties":
                             ParseTrackProperties(track, c);
                             break;
@@ -413,6 +428,45 @@ namespace AlphaTab.Importer
             }
 
             _tracksById[trackId] = track;
+        }
+
+        private void ParseLyrics(string trackId, XmlNode node)
+        {
+            var tracks = new FastList<Lyrics>();
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Line":
+                            tracks.Add(ParseLyricsLine(c));
+                            break;
+                    }
+                }
+            }
+            _lyricsByTrack[trackId] = tracks;
+        }
+
+        private Lyrics ParseLyricsLine(XmlNode node)
+        {
+            var lyrics = new Lyrics();
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Offset":
+                            lyrics.StartBar = Std.ParseInt(c.InnerText);
+                            break;
+                        case "Text":
+                            lyrics.Text = c.InnerText;
+                            break;
+                    }
+                }
+            }
+            return lyrics;
         }
 
         private void ParseDiagramCollection(Track track, XmlNode node)
