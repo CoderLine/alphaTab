@@ -1,8 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿/*
+ * This file is part of alphaTab.
+ * Copyright (c) 2014, Daniel Kuschny and Contributors, All rights reserved.
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3.0 of the License, or at your option any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.
+ */
 using System.Reflection;
-using System.Text;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
@@ -13,11 +26,12 @@ namespace AlphaTab.Platform.CSharp
     public class SkiaCanvas : ICanvas
     {
         private static readonly SKTypeface MusicFont;
+        private static readonly int MusicFontSize = 34;
 
         static SkiaCanvas()
         {
             var type = typeof(SkiaCanvas).GetTypeInfo();
-            using (var bravura = new SKManagedStream(type.Assembly.GetManifestResourceStream(type.Namespace + ".Bravura.ttf")))
+            var bravura = type.Assembly.GetManifestResourceStream(type.Namespace + ".Bravura.ttf");
             {
                 MusicFont = SKTypeface.FromStream(bravura);
             }
@@ -64,7 +78,7 @@ namespace AlphaTab.Platform.CSharp
             LineWidth = 1;
             Font = new Font("Arial", 10);
             TextAlign = TextAlign.Left;
-            TextBaseline = TextBaseline.Top;
+            TextBaseline = TextBaseline.Middle;
         }
 
         public void BeginRender(float width, float height)
@@ -228,7 +242,7 @@ namespace AlphaTab.Platform.CSharp
                 case TextBaseline.Top: // TopTextBaseline
                     return paint.FontMetrics.Ascent;
                 case TextBaseline.Middle: // MiddleTextBaseline
-                    return -paint.FontMetrics.Descent + Font.Size / 2;
+                    return -paint.FontMetrics.Descent + paint.TextSize / 2;
                 case TextBaseline.Bottom: // BottomTextBaseline
                     return -paint.FontMetrics.Descent;
                 default:
@@ -270,8 +284,8 @@ namespace AlphaTab.Platform.CSharp
             using (var paint = CreatePaint())
             {
                 paint.Typeface = MusicFont;
-                paint.TextSize = Font.Size;
-                _surface.Canvas.DrawText(Std.StringFromCharCode((int)symbol), x, y + GetFontBaseline(TextBaseline.Middle, paint), paint);
+                paint.TextSize = MusicFontSize * scale;
+                _surface.Canvas.DrawText(Std.StringFromCharCode((int)symbol), x, y, paint);
             }
         }
     }

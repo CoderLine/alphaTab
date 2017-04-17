@@ -1,14 +1,16 @@
 ﻿using System;
+using System.IO;
 using AlphaTab.Importer;
 using AlphaTab.Model;
+using Android.App;
+using Java.IO;
 using SkiaSharp;
+using Xamarin.Forms;
 
 namespace AlphaTab.Samples.XamarinForms.Android
 {
     public partial class MainPage
     {
-        private static Type Deploy = typeof(SKSurface);
-
         private Score _score;
         public MainPage()
         {
@@ -16,12 +18,14 @@ namespace AlphaTab.Samples.XamarinForms.Android
             BindingContext = this;
 
             byte[] canon;
-            using (var stream = typeof(MainPage).Assembly.GetManifestResourceStream("AlphaTab.Samples.XamarinForms.Android.Resources.Canon.gp5"))
+            using (var stream = Forms.Context.Assets.Open("Canon.gp5"))
             {
-                canon = new byte[stream.Length];
-                stream.Read(canon, 0, canon.Length);
+                using (var ms = new MemoryStream())
+                {
+                    stream.CopyTo(ms);
+                    canon = ms.ToArray();
+                }
             }
-
             LoadScore(canon);
         }
 

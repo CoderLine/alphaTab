@@ -37,8 +37,7 @@ namespace AlphaTab.Platform
 
         public static void Log(LogLevel logLevel, string category, string msg)
         {
-            category = "[AlphaTab][" + category + "][" + logLevel + "]";
-            Debug.WriteLine(msg, category);
+            Debug.WriteLine("[AlphaTab][" + category + "][" + logLevel + "] " + msg);
         }
 
         public static float ParseFloat(string s)

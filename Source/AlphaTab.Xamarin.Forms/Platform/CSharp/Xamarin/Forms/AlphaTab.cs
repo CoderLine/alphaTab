@@ -1,9 +1,23 @@
-﻿using System;
+﻿/*
+ * This file is part of alphaTab.
+ * Copyright (c) 2014, Daniel Kuschny and Contributors, All rights reserved.
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3.0 of the License, or at your option any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library.
+ */
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
@@ -14,7 +28,10 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
 {
     public class AlphaTab : ScrollView
     {
-        private StackLayout _stackLayout;
+        private readonly AlphaTabLayout _contentLayout;
+        private bool _initialRenderCompleted;
+        private bool _isRendering;
+        private bool _redrawPending;
 
         public static readonly BindableProperty SettingsProperty = BindableProperty.Create("Settings", typeof(Settings), typeof(AlphaTab));
         public Settings Settings
@@ -34,25 +51,25 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
             set { SetValue(TracksProperty, value); }
         }
 
-        private static readonly BindablePropertyKey PartialResultsPropertyKey = BindableProperty.CreateReadOnly("PartialResults", typeof(ObservableCollection<SKImage>), typeof(AlphaTab), null);
-        private static readonly BindableProperty PartialResultsProperty = PartialResultsPropertyKey.BindableProperty;
-        public ObservableCollection<SKImage> PartialResults
-        {
-            get { return (ObservableCollection<SKImage>)GetValue(PartialResultsProperty); }
-            set { SetValue(PartialResultsPropertyKey, value); }
-        }
-
         private readonly ScoreRenderer _renderer;
 
         public AlphaTab()
         {
-            _stackLayout = new StackLayout();
-            Content = _stackLayout;
+            _contentLayout = new AlphaTabLayout();
+            _contentLayout.HorizontalOptions = new LayoutOptions(LayoutAlignment.Start, true);
+            _contentLayout.VerticalOptions = new LayoutOptions(LayoutAlignment.Start, true);
+
+            Orientation = ScrollOrientation.Both;
+
+            Content = _contentLayout;
 
             var settings = Settings.Defaults;
             settings.Engine = "skia";
+            settings.Width = 970;
+            settings.Scale = 0.8f;
+            settings.StretchForce = 0.8f;
+
             Settings = settings;
-            PartialResults = new ObservableCollection<SKImage>();
             _renderer = new ScoreRenderer(settings);
             _renderer.PreRender += result =>
             {
@@ -79,6 +96,12 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
             {
                 Device.BeginInvokeOnMainThread(() =>
                 {
+                    _initialRenderCompleted = true;
+                    _isRendering = false;
+                    if (_redrawPending)
+                    {
+                        Resize((int)Width);
+                    }
                     OnRenderFinished(result);
                 });
             };
@@ -86,30 +109,27 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
 
         private void ClearPartialResults()
         {
-            var oldResults = PartialResults;
-            PartialResults = new ObservableCollection<SKImage>();
-            foreach (var oldResult in oldResults)
-            {
-                oldResult.Dispose();
-            }
-            _stackLayout.Children.Clear();
+            _contentLayout.Children.Clear();
         }
 
         private void AddPartialResult(RenderFinishedEventArgs result)
         {
             lock (this)
             {
-                WidthRequest = result.TotalWidth;
-                HeightRequest = result.TotalHeight;
+                _contentLayout.WidthRequest = result.TotalWidth;
+                _contentLayout.HeightRequest = result.TotalHeight;
+
                 if (result.RenderResult != null)
                 {
-                    PartialResults.Add((SKImage)result.RenderResult);
-                    _stackLayout.Children.Add(new Label
+                    using (var image = (SKImage)result.RenderResult)
                     {
-                        Text = _stackLayout.Children.Count.ToString(),
-                        WidthRequest = result.Width,
-                        HeightRequest = result.Height
-                    });
+                        _contentLayout.Children.Add(new Image
+                        {
+                            Source = new SkImageSource(image),
+                            WidthRequest = result.Width,
+                            HeightRequest = result.Height
+                        });
+                    }
                 }
             }
         }
@@ -117,18 +137,58 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
         private void InvalidateTracks()
         {
             if (Tracks == null) return;
-            var tracks = Tracks.ToArray();
-            Task.Factory.StartNew(() =>
+
+            if (Width > 0)
             {
-                try
+                _renderer.Settings.Width = (int) Width;
+                _initialRenderCompleted = false;
+                _isRendering = true;
+                var tracks = Tracks.ToArray();
+                Task.Factory.StartNew(() =>
                 {
                     _renderer.RenderMultiple(tracks);
-                }
-                catch (Exception e)
+                });
+            }
+            else
+            {
+                _initialRenderCompleted = false;
+                _redrawPending = true;
+            }
+        }
+
+        protected override void OnSizeAllocated(double width, double height)
+        {
+            Resize((int)width);
+            base.OnSizeAllocated(width, height);
+        }
+
+        private void Resize(int width)
+        {
+            if (_isRendering)
+            {
+                _redrawPending = true;
+            }
+            else if(width > 0)
+            {
+                _redrawPending = false;
+
+                if (!_initialRenderCompleted)
                 {
-                    Debug.WriteLine(e);
+                    InvalidateTracks();
                 }
-            });
+                else
+                {
+                    if (width != _renderer.Settings.Width)
+                    {
+                        _renderer.Settings.Width = width;
+                        _isRendering = true;
+                        Task.Factory.StartNew(() =>
+                        {
+                            _renderer.Resize(width);
+                        });
+                    }
+                }
+            }
         }
 
         public event EventHandler<RenderFinishedEventArgs> RenderFinished;

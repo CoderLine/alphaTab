@@ -40,6 +40,8 @@
     <Compile Include="Environment.cs" />
     <Compile Include="Platform\CSharp\SkiaCanvas.cs" />
     <Compile Include="Platform\CSharp\Xamarin\Forms\AlphaTab.cs" />
+    <Compile Include="Platform\CSharp\Xamarin\Forms\AlphaTabLayout.cs" />
+    <Compile Include="Platform\CSharp\Xamarin\Forms\SkImageSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

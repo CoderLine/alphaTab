@@ -7,7 +7,7 @@
     <forms:AlphaTab x:Name="AlphaTabControl" Tracks="{Binding Tracks}" 
                     HorizontalOptions="Fill"
                     VerticalOptions="Fill"
-                    BackgroundColor="DarkGray"
+                    BackgroundColor="White"
                     />
     
 </ContentPage>

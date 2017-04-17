@@ -1,7 +1,6 @@
 ﻿using Android.App;
 using Android.Content.PM;
 using Android.OS;
-using SkiaSharp;
 
 namespace AlphaTab.Samples.XamarinForms.Android
 {
@@ -14,11 +13,10 @@ namespace AlphaTab.Samples.XamarinForms.Android
 			ToolbarResource = Resource.Layout.Toolbar;
 
             base.OnCreate (bundle);
-		    var newImage = SKSurface.Create((int)30, (int)30, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
 
+            Xamarin.Forms.Forms.Init (this, bundle);
 
-            global::Xamarin.Forms.Forms.Init (this, bundle);
-			LoadApplication (new App ());
+            LoadApplication(new App ());
 		}
 	}
 }
