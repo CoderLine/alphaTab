@@ -5,12 +5,12 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{1CF9CB4A-CCA0-4319-8312-E346730440A5}</ProjectGuid>
+    <ProjectGuid>{48297892-A3F5-43B1-9001-2F3BE04F7486}</ProjectGuid>
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AlphaTab.Samples.Xamarin.Forms.Android</RootNamespace>
-    <AssemblyName>AlphaTab.Samples.Xamarin.Forms.Android</AssemblyName>
+    <RootNamespace>AlphaTab.Samples.XamarinNative.Android</RootNamespace>
+    <AssemblyName>AlphaTab.Samples.XamarinNative.Android</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <AndroidApplication>True</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
@@ -58,6 +58,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <AndroidAsset Include="..\..\JavaScript\files\Canon.gp5">
+      <Link>Assets\Canon.gp5</Link>
+    </AndroidAsset>
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
   </ItemGroup>
@@ -74,6 +77,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Source\AlphaTab.Xamarin.Android\AlphaTab.Xamarin.Android.csproj">
+      <Project>{cf20a332-7808-46ac-99f4-84580e18df8a}</Project>
+      <Name>AlphaTab.Xamarin.Android</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\values\Colors.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

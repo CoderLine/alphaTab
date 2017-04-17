@@ -15,18 +15,19 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.IO;
-using System.Threading.Tasks;
-using SkiaSharp;
-using Xamarin.Forms;
 
-namespace AlphaTab.Platform.CSharp.Xamarin.Forms
+using AlphaTab.Platform.CSharp;
+using AlphaTab.Platform.Svg;
+
+namespace AlphaTab
 {
-    class SkImageSource : StreamImageSource
+    public partial class Environment
     {
-        public SkImageSource(SKImage image)
+        static void PlatformInit()
         {
-            Stream = token => Task.FromResult((Stream)new MemoryStream(imageBytes));
+            RenderEngines["default"] = () => new SkiaCanvas();
+            RenderEngines["svg"] = () => new FontSvgCanvas();
+            RenderEngines["gdi"] = () => new SkiaCanvas();
         }
     }
 }

@@ -9,9 +9,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: global::Android.Runtime.ResourceDesignerAttribute("AlphaTab.Samples.Xamarin.Forms.Android.Resource", IsApplication=true)]
+[assembly: global::Android.Runtime.ResourceDesignerAttribute("AlphaTab.Samples.XamarinNative.Android.Resource", IsApplication=true)]
 
-namespace AlphaTab.Samples.Xamarin.Forms.Android
+namespace AlphaTab.Samples.XamarinNative.Android
 {
 	
 	
@@ -41,6 +41,22 @@ namespace AlphaTab.Samples.Xamarin.Forms.Android
 			}
 		}
 		
+		public partial class Color
+		{
+			
+			// aapt resource value: 0x7f050000
+			public const int White = 2131034112;
+			
+			static Color()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Color()
+			{
+			}
+		}
+		
 		public partial class Drawable
 		{
 			
@@ -53,6 +69,22 @@ namespace AlphaTab.Samples.Xamarin.Forms.Android
 			}
 			
 			private Drawable()
+			{
+			}
+		}
+		
+		public partial class Id
+		{
+			
+			// aapt resource value: 0x7f060000
+			public const int AlphaTabControl = 2131099648;
+			
+			static Id()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Id()
 			{
 			}
 		}

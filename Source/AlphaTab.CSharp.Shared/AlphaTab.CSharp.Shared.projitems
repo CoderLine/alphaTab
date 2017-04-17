@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Collections\StringBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\StreamWrapper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\CSharp\GdiCanvas.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\CSharp\SkiaCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Std.cs" />
   </ItemGroup>
 </Project>

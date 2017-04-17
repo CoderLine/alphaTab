@@ -22,7 +22,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;SKIA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\AlphaTab.XML</DocumentationFile>
@@ -31,14 +31,13 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;SKIA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\AlphaTab.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Environment.cs" />
-    <Compile Include="Platform\CSharp\SkiaCanvas.cs" />
     <Compile Include="Platform\CSharp\Xamarin\Forms\AlphaTab.cs" />
     <Compile Include="Platform\CSharp\Xamarin\Forms\AlphaTabLayout.cs" />
     <Compile Include="Platform\CSharp\Xamarin\Forms\SkImageSource.cs" />

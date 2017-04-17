@@ -21,40 +21,59 @@ using System.Linq;
 using System.Threading.Tasks;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
+using Android.App;
+using Android.Bluetooth;
+using Android.Content;
+using Android.Graphics;
+using Android.Util;
+using Android.Widget;
 using SkiaSharp;
-using Xamarin.Forms;
 
-namespace AlphaTab.Platform.CSharp.Xamarin.Forms
+namespace AlphaTab.Platform.CSharp.Xamarin.Android
 {
     public class AlphaTab : ScrollView
     {
-        private readonly AlphaTabLayout _contentLayout;
+        private AlphaTabLayout _contentLayout;
         private bool _initialRenderCompleted;
         private bool _isRendering;
         private bool _redrawPending;
+        private float _displayDensity;
 
-        public static readonly BindableProperty TracksProperty = BindableProperty.Create("Tracks", typeof(IEnumerable<Track>), typeof(AlphaTab), propertyChanged: OnTracksChanged);
-        private static void OnTracksChanged(BindableObject bindable, object oldvalue, object newvalue)
-        {
-            ((AlphaTab)bindable).InvalidateTracks();
-        }
         public IEnumerable<Track> Tracks
         {
-            get { return (IEnumerable<Track>)GetValue(TracksProperty); }
-            set { SetValue(TracksProperty, value); }
+            get { return _tracks; }
+            set
+            {
+                if (_tracks == value) return;
+                _tracks = value;
+                InvalidateTracks();
+            }
         }
 
-        private readonly ScoreRenderer _renderer;
+        private ScoreRenderer _renderer;
+        private IEnumerable<Track> _tracks;
 
-        public AlphaTab()
+        public AlphaTab(Context context)
+            : base(context)
         {
-            _contentLayout = new AlphaTabLayout();
-            _contentLayout.HorizontalOptions = new LayoutOptions(LayoutAlignment.Start, true);
-            _contentLayout.VerticalOptions = new LayoutOptions(LayoutAlignment.Start, true);
+            Initialize(context);
+        }
 
-            Orientation = ScrollOrientation.Both;
+        public AlphaTab(Context context, IAttributeSet attrs) 
+            : base(context, attrs)
+        {
+            Initialize(context);
+        }
 
-            Content = _contentLayout;
+        private void Initialize(Context context)
+        {
+            using (var metrics = context.Resources.DisplayMetrics)
+            {
+                _displayDensity = metrics.Density;
+            }
+
+            _contentLayout = new AlphaTabLayout(context);
+            AddView(_contentLayout);
 
             var settings = Settings.Defaults;
             settings.Engine = "skia";
@@ -67,7 +86,7 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
             {
                 lock (this)
                 {
-                    Device.BeginInvokeOnMainThread(() =>
+                    Post(() =>
                     {
                         ClearPartialResults();
                         AddPartialResult(result);
@@ -78,7 +97,7 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
             {
                 lock (this)
                 {
-                    Device.BeginInvokeOnMainThread(() =>
+                    Post(() =>
                     {
                         AddPartialResult(result);
                     });
@@ -86,7 +105,7 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
             };
             _renderer.RenderFinished += result =>
             {
-                Device.BeginInvokeOnMainThread(() =>
+                Post(() =>
                 {
                     _initialRenderCompleted = true;
                     _isRendering = false;
@@ -101,26 +120,52 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
 
         private void ClearPartialResults()
         {
-            _contentLayout.Children.Clear();
+            var childCount = _contentLayout.ChildCount;
+            while(childCount > 0)
+            {
+                var child = _contentLayout.GetChildAt(0);
+                var imageView = child as ImageView;
+                if (imageView != null)
+                {
+                    var image = imageView.Drawable;
+                    imageView.SetImageResource(0);
+                    image.Dispose();
+                    imageView.DestroyDrawingCache();
+                }
+
+                _contentLayout.RemoveView(child);
+                child.Dispose();
+
+                childCount--;
+            }
+            _contentLayout.RemoveAllViews();
         }
 
         private void AddPartialResult(RenderFinishedEventArgs result)
         {
             lock (this)
             {
-                _contentLayout.WidthRequest = result.TotalWidth;
-                _contentLayout.HeightRequest = result.TotalHeight;
+                _contentLayout.SetMinimumWidth((int)(result.TotalWidth * _displayDensity));
+                _contentLayout.SetMinimumHeight((int)(result.TotalHeight * _displayDensity));
 
                 if (result.RenderResult != null)
                 {
                     using (var image = (SKImage)result.RenderResult)
                     {
-                        _contentLayout.Children.Add(new Image
+                        byte[] imageBytes;
+                        using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
                         {
-                            Source = new SkImageSource(image),
-                            WidthRequest = result.Width,
-                            HeightRequest = result.Height
-                        });
+                            imageBytes = data.ToArray();
+                        }
+
+                        var view = new ImageView(Context);
+                        view.SetMinimumWidth((int)(result.Width * _displayDensity));
+                        view.SetMinimumHeight((int)(result.Height * _displayDensity));
+                        view.SetMaxWidth((int)(result.Width * _displayDensity));
+                        view.SetMaxHeight((int)(result.Width * _displayDensity));
+                        view.SetImageBitmap(BitmapFactory.DecodeByteArray(imageBytes, 0, imageBytes.Length));
+
+                        _contentLayout.AddView(view);
                     }
                 }
             }
@@ -132,7 +177,7 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
 
             if (Width > 0)
             {
-                _renderer.Settings.Width = (int) Width;
+                _renderer.Settings.Width = (int)(Width / _displayDensity);
                 _initialRenderCompleted = false;
                 _isRendering = true;
                 var tracks = Tracks.ToArray();
@@ -148,10 +193,10 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
             }
         }
 
-        protected override void OnSizeAllocated(double width, double height)
+        protected override void OnSizeChanged(int w, int h, int oldw, int oldh)
         {
-            Resize((int)width);
-            base.OnSizeAllocated(width, height);
+            Resize(w);
+            base.OnSizeChanged(w, h, oldw, oldh);
         }
 
         private void Resize(int width)
@@ -160,7 +205,7 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
             {
                 _redrawPending = true;
             }
-            else if(width > 0)
+            else if (width > 0)
             {
                 _redrawPending = false;
 
@@ -172,7 +217,7 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
                 {
                     if (width != _renderer.Settings.Width)
                     {
-                        _renderer.Settings.Width = width;
+                        _renderer.Settings.Width = (int)(width / _displayDensity);
                         _isRendering = true;
                         Task.Factory.StartNew(() =>
                         {
