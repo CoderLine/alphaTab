@@ -103,9 +103,10 @@ namespace AlphaTab.SvgDump
             // load score
             Score score = ScoreLoader.LoadScore(args[0]);
 
-            // render score with svg engine
+            // render score with svg engine and desired rendering width
             Settings settings = Settings.Defaults;
             settings.Engine = "svg";
+            settings.Width = 970;
             ScoreRenderer renderer = new ScoreRenderer(settings);
 
             // get iterate tracks

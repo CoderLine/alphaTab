@@ -23,6 +23,7 @@ using System.IO;
 using AlphaTab;
 using AlphaTab.Importer;
 using AlphaTab.Rendering;
+using AlphaTab.Rendering.Layout;
 
 namespace Alphatab.PngDump
 {
@@ -39,9 +40,10 @@ namespace Alphatab.PngDump
             // load score
             var score = ScoreLoader.LoadScore(args[0]);
 
-            // render score with svg engine
+            // render score with svg engine and desired rendering width
             var settings = Settings.Defaults;
             settings.Engine = "gdi";
+            settings.Width = 970;
             var renderer = new ScoreRenderer(settings);
 
             // iterate tracks
