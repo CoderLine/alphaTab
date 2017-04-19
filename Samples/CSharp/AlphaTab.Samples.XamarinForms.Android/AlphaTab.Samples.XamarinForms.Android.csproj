@@ -152,6 +152,7 @@
       <Link>Assets\Canon.gp5</Link>
     </AndroidAsset>
     <None Include="packages.config" />
+    <None Include="Readme.md" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\Drawable\Icon.png" />

@@ -76,6 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Readme.md" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Source\AlphaTab.Wpf\AlphaTab.Wpf.csproj">

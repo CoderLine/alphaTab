@@ -61,6 +61,7 @@
     <AndroidAsset Include="..\..\JavaScript\files\Canon.gp5">
       <Link>Assets\Canon.gp5</Link>
     </AndroidAsset>
+    <None Include="Readme.md" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
   </ItemGroup>
