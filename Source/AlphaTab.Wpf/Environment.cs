@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright (c) 2014, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,6 +28,7 @@ namespace AlphaTab
             RenderEngines["default"] = () => new GdiCanvas();
             RenderEngines["svg"] = () => new FontSvgCanvas();
             RenderEngines["gdi"] = () => new GdiCanvas();
+            RenderEngines["skia"] = () => new SkiaCanvas();
         }
     }
 }

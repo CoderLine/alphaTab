@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright (c) 2014, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
 {
     public class AlphaTab : ScrollView
     {
-        private readonly AlphaTabLayout _contentLayout;
+        private readonly AlphaTabLayoutPanel _contentPanel;
         private bool _initialRenderCompleted;
         private bool _isRendering;
         private bool _redrawPending;
@@ -48,13 +48,13 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
 
         public AlphaTab()
         {
-            _contentLayout = new AlphaTabLayout();
-            _contentLayout.HorizontalOptions = new LayoutOptions(LayoutAlignment.Start, true);
-            _contentLayout.VerticalOptions = new LayoutOptions(LayoutAlignment.Start, true);
+            _contentPanel = new AlphaTabLayoutPanel();
+            _contentPanel.HorizontalOptions = new LayoutOptions(LayoutAlignment.Start, true);
+            _contentPanel.VerticalOptions = new LayoutOptions(LayoutAlignment.Start, true);
 
             Orientation = ScrollOrientation.Both;
 
-            Content = _contentLayout;
+            Content = _contentPanel;
 
             var settings = Settings.Defaults;
             settings.Engine = "skia";
@@ -101,21 +101,21 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
 
         private void ClearPartialResults()
         {
-            _contentLayout.Children.Clear();
+            _contentPanel.Children.Clear();
         }
 
         private void AddPartialResult(RenderFinishedEventArgs result)
         {
             lock (this)
             {
-                _contentLayout.WidthRequest = result.TotalWidth;
-                _contentLayout.HeightRequest = result.TotalHeight;
+                _contentPanel.WidthRequest = result.TotalWidth;
+                _contentPanel.HeightRequest = result.TotalHeight;
 
                 if (result.RenderResult != null)
                 {
                     using (var image = (SKImage)result.RenderResult)
                     {
-                        _contentLayout.Children.Add(new Image
+                        _contentPanel.Children.Add(new Image
                         {
                             Source = new SkImageSource(image),
                             WidthRequest = result.Width,

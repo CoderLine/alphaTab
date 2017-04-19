@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright (c) 2014, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
 {
     public class AlphaTab : ScrollView
     {
-        private AlphaTabLayout _contentLayout;
+        private AlphaTabLayoutPanel _contentPanel;
         private bool _initialRenderCompleted;
         private bool _isRendering;
         private bool _redrawPending;
@@ -72,8 +72,8 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
                 _displayDensity = metrics.Density;
             }
 
-            _contentLayout = new AlphaTabLayout(context);
-            AddView(_contentLayout);
+            _contentPanel = new AlphaTabLayoutPanel(context);
+            AddView(_contentPanel);
 
             var settings = Settings.Defaults;
             settings.Engine = "skia";
@@ -109,21 +109,22 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
                 {
                     _initialRenderCompleted = true;
                     _isRendering = false;
+                    AddPartialResult(result);
+                    OnRenderFinished(result);
                     if (_redrawPending)
                     {
-                        Resize((int)Width);
+                        Resize((int)(Width / _displayDensity));
                     }
-                    OnRenderFinished(result);
                 });
             };
         }
 
         private void ClearPartialResults()
         {
-            var childCount = _contentLayout.ChildCount;
+            var childCount = _contentPanel.ChildCount;
             while(childCount > 0)
             {
-                var child = _contentLayout.GetChildAt(0);
+                var child = _contentPanel.GetChildAt(0);
                 var imageView = child as ImageView;
                 if (imageView != null)
                 {
@@ -133,20 +134,20 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
                     imageView.DestroyDrawingCache();
                 }
 
-                _contentLayout.RemoveView(child);
+                _contentPanel.RemoveView(child);
                 child.Dispose();
 
                 childCount--;
             }
-            _contentLayout.RemoveAllViews();
+            _contentPanel.RemoveAllViews();
         }
 
         private void AddPartialResult(RenderFinishedEventArgs result)
         {
             lock (this)
             {
-                _contentLayout.SetMinimumWidth((int)(result.TotalWidth * _displayDensity));
-                _contentLayout.SetMinimumHeight((int)(result.TotalHeight * _displayDensity));
+                _contentPanel.SetMinimumWidth((int)(result.TotalWidth * _displayDensity));
+                _contentPanel.SetMinimumHeight((int)(result.TotalHeight * _displayDensity));
 
                 if (result.RenderResult != null)
                 {
@@ -165,7 +166,7 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
                         view.SetMaxHeight((int)(result.Width * _displayDensity));
                         view.SetImageBitmap(BitmapFactory.DecodeByteArray(imageBytes, 0, imageBytes.Length));
 
-                        _contentLayout.AddView(view);
+                        _contentPanel.AddView(view);
                     }
                 }
             }
@@ -195,7 +196,7 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
 
         protected override void OnSizeChanged(int w, int h, int oldw, int oldh)
         {
-            Resize(w);
+            Resize((int)(w / _displayDensity));
             base.OnSizeChanged(w, h, oldw, oldh);
         }
 
@@ -213,17 +214,13 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
                 {
                     InvalidateTracks();
                 }
-                else
+                else if (width != _renderer.Settings.Width)
                 {
-                    if (width != _renderer.Settings.Width)
+                    _isRendering = true;
+                    Task.Factory.StartNew(() =>
                     {
-                        _renderer.Settings.Width = (int)(width / _displayDensity);
-                        _isRendering = true;
-                        Task.Factory.StartNew(() =>
-                        {
-                            _renderer.Resize(width);
-                        });
-                    }
+                        _renderer.Resize(width);
+                    });
                 }
             }
         }

@@ -15,7 +15,7 @@
     <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
-    <TargetFrameworkVersion>v7.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v7.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,14 +51,16 @@
   <ItemGroup>
     <Compile Include="Environment.cs" />
     <Compile Include="Platform\CSharp\Xamarin\Android\AlphaTab.cs" />
-    <Compile Include="Platform\CSharp\Xamarin\Android\AlphaTabLayout.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Platform\CSharp\Xamarin\Android\AlphaTabLayoutPanel.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\..\font\bravura\ttf\Bravura.ttf">
       <Link>Platform\CSharp\Bravura.ttf</Link>
     </EmbeddedResource>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" />
   <Import Project="..\AlphaTab.CSharp.Shared\AlphaTab.CSharp.Shared.projitems" Label="Shared" />

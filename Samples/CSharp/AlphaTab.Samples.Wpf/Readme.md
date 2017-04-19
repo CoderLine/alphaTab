@@ -1,3 +1,3 @@
-﻿# Alphatab.Wpf.Gdi
+﻿# AlphaTab WPF Sample
 
-This sample uses GDI+ as drawing engine and uses WPF to actually display the rendered image. 
+This sample uses GDI+ or SkiaSharp (user choice) as drawing engine and uses the WPF Control to actually display the rendered image.

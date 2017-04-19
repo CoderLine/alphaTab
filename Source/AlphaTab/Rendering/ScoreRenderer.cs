@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright (c) 2014, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,6 +31,7 @@ namespace AlphaTab.Rendering
     public class ScoreRenderer : IScoreRenderer
     {
         private string _currentLayoutMode;
+        private string _currentRenderEngine;
         private Track[] _renderedTracks;
 
         public ICanvas Canvas { get; set; }
@@ -48,16 +49,28 @@ namespace AlphaTab.Rendering
         {
             Settings = settings;
             RenderingResources = new RenderingResources(1);
-            if (settings.Engine == null || !Environment.RenderEngines.ContainsKey(settings.Engine))
-            {
-                Canvas = Environment.RenderEngines["default"]();
-            }
-            else
-            {
-                Canvas = Environment.RenderEngines[settings.Engine]();
-            }
+            RecreateCanvas();
             RecreateLayout();
             Tracks = new Track[0];
+        }
+
+
+        private bool RecreateCanvas()
+        {
+            if (_currentRenderEngine != Settings.Engine)
+            {
+                if (Settings.Engine == null || !Environment.RenderEngines.ContainsKey(Settings.Engine))
+                {
+                    Canvas = Environment.RenderEngines["default"]();
+                }
+                else
+                {
+                    Canvas = Environment.RenderEngines[Settings.Engine]();
+                }
+                _currentRenderEngine = Settings.Engine;
+                return true;
+            }
+            return false;
         }
 
         private bool RecreateLayout()
@@ -121,12 +134,15 @@ namespace AlphaTab.Rendering
             }
             BoundsLookup = new BoundsLookup();
             if (Tracks.Length == 0) return;
+
+            RecreateCanvas();
             if (RenderingResources.Scale != Settings.Scale)
             {
                 RenderingResources.Init(Settings.Scale);
                 Canvas.LineWidth = Settings.Scale;
             }
             Canvas.Resources = RenderingResources;
+
             OnPreRender();
             RecreateLayout();
             LayoutAndRender();
@@ -136,9 +152,9 @@ namespace AlphaTab.Rendering
 
         public void Resize(int width)
         {
-            if (RecreateLayout() || _renderedTracks != Tracks || Tracks == null)
+            if (RecreateLayout() || RecreateCanvas() || _renderedTracks != Tracks || Tracks == null)
             {
-                Logger.Info("Rendering", "Starting full rerendering due to layout change");
+                Logger.Info("Rendering", "Starting full rerendering due to layout or canvas change");
                 Invalidate();
             }
             else if (Layout.SupportsResize)

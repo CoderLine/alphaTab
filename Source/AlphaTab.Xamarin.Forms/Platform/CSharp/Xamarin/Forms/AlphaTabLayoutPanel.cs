@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright (c) 2014, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,17 +19,12 @@ using Xamarin.Forms;
 
 namespace AlphaTab.Platform.CSharp.Xamarin.Forms
 {
-    public class AlphaTabLayout : Layout<View>
+    class AlphaTabLayoutPanel : Layout<View>
     {
         protected override SizeRequest OnMeasure(double widthConstraint, double heightConstraint)
         {
             foreach (var child in Children)
             {
-                if (!child.IsVisible)
-                {
-                    continue;
-                }
-
                 child.Measure(double.PositiveInfinity, double.PositiveInfinity);
             }
             return new SizeRequest(new Size(WidthRequest, HeightRequest));
@@ -44,11 +39,6 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
 
             foreach (var child in Children)
             {
-                if (!child.IsVisible)
-                {
-                    continue;
-                }
-
                 LayoutChildIntoBoundingRegion(child, new Rectangle(new Point(xChild, yChild), new Size(child.WidthRequest, child.HeightRequest)));
 
                 xChild += child.WidthRequest;
@@ -61,6 +51,7 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
                 {
                     xChild = x;
                     yChild += rowHeight;
+                    rowHeight = 0;
                 }
             }
         }

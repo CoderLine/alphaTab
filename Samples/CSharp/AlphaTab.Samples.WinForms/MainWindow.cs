@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright (c) 2014, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,6 +33,7 @@ namespace AlphaTab.Samples.WinForms
         public MainWindow()
         {
             InitializeComponent();
+            cmbRenderEngine.SelectedIndex = 0;
         }
 
         private void openFileButton_Click(object sender, EventArgs e)
@@ -64,7 +65,7 @@ namespace AlphaTab.Samples.WinForms
                 var track = CurrentTrack;
                 if (track != null)
                 {
-                    alphaTabControl1.Track = track;
+                    alphaTabControl1.Tracks = new[] { track };
                 }
             }
         }
@@ -159,9 +160,9 @@ namespace AlphaTab.Samples.WinForms
             }
         }
 
-        private void panel1_MouseEnter(object sender, EventArgs e)
+        private void cmbRenderEngine_SelectedIndexChanged(object sender, EventArgs e)
         {
-            panel1.Focus();
+            alphaTabControl1.RenderEngine = cmbRenderEngine.SelectedItem.ToString();
         }
     }
 }

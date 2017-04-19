@@ -39,9 +39,8 @@
   <ItemGroup>
     <Compile Include="Environment.cs" />
     <Compile Include="Platform\CSharp\Xamarin\Forms\AlphaTab.cs" />
-    <Compile Include="Platform\CSharp\Xamarin\Forms\AlphaTabLayout.cs" />
+    <Compile Include="Platform\CSharp\Xamarin\Forms\AlphaTabLayoutPanel.cs" />
     <Compile Include="Platform\CSharp\Xamarin\Forms\SkImageSource.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\..\Font\bravura\ttf\Bravura.ttf">
@@ -50,7 +49,9 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="SkiaSharp, Version=1.57.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <HintPath>..\..\packages\SkiaSharp.1.57.0\lib\portable-net45+win8+wpa81+wp8\SkiaSharp.dll</HintPath>

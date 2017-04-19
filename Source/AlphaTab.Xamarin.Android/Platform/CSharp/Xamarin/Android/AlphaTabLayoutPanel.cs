@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright (c) 2014, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,9 +21,9 @@ using Android.Views;
 
 namespace AlphaTab.Platform.CSharp.Xamarin.Android
 {
-    public class AlphaTabLayout : ViewGroup
+    class AlphaTabLayoutPanel : ViewGroup
     {
-        public AlphaTabLayout(Context context) : base(context)
+        public AlphaTabLayoutPanel(Context context) : base(context)
         {
         }
 
@@ -33,11 +33,6 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
             for (int i = 0; i < childCount; i++)
             {
                 var child = GetChildAt(i);
-                if (child.Visibility != ViewStates.Visible)
-                {
-                    continue;
-                }
-
                 child.Measure(widthMeasureSpec, heightMeasureSpec);
             }
 
@@ -55,12 +50,6 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
             for (int i = 0; i < childCount; i++)
             {
                 var child = GetChildAt(i);
-
-                if (child.Visibility != ViewStates.Visible)
-                {
-                    continue;
-                }
-
                 child.Layout(xChild, yChild, xChild + child.MeasuredWidth, yChild + child.MeasuredHeight);
 
                 xChild += child.MeasuredWidth;
@@ -73,6 +62,7 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
                 {
                     xChild = l;
                     yChild += rowHeight;
+                    rowHeight = 0;
                 }
             }
         }

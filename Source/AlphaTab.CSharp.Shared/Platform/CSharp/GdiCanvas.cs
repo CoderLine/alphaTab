@@ -1,7 +1,7 @@
 ﻿#if GDI
 /*
  * This file is part of alphaTab.
- * Copyright (c) 2014, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -208,7 +208,7 @@ namespace AlphaTab.Platform.CSharp
             _height = 1;
 
             _currentPath = new GraphicsPath(FillMode.Winding);
-            _stringFormat = new StringFormat();
+            _stringFormat = new StringFormat(StringFormat.GenericTypographic);
             _stringFormat.LineAlignment = StringAlignment.Near;
 
             _lineWidth = 1;
@@ -258,11 +258,11 @@ namespace AlphaTab.Platform.CSharp
 
         private void RecreateImage()
         {
-            var newImage = new Bitmap((int)_width, (int)_height, PixelFormat.Format32bppArgb);
+            var newImage = new Bitmap((int)_width, (int)_height, PixelFormat.Format32bppPArgb);
             var newGraphics = Graphics.FromImage(newImage);
+            newGraphics.CompositingMode = CompositingMode.SourceOver;
             newGraphics.SmoothingMode = SmoothingMode.HighQuality;
             newGraphics.TextRenderingHint = TextRenderingHint.AntiAlias;
-            newGraphics.Clear(GdiColor.Transparent);
 
             if (_graphics != null)
                 _graphics.Dispose();

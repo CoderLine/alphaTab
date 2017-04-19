@@ -21,25 +21,28 @@
                 <Button Command="{Binding ShowScoreInfoCommand}" ToolTip="Show Score Info" Style="{StaticResource ToolbarButtonStyle}">
                     <Image Source="Images\32\information.png" Width="24" Height="24" />
                 </Button>
+                <ComboBox ItemsSource="{Binding RenderEngines}" SelectedItem="{Binding RenderEngine}"></ComboBox>
             </controls:ToolBarCustom>
         </ToolBarTray>
 
         <!-- A scroll viewer to enable the tablature scrolling -->
-        <ScrollViewer Grid.Column="0" Grid.Row="1" Background="#616362" Name="ScrollViewer" HorizontalScrollBarVisibility="Auto">
-            <Grid Margin="10" Name="TablatureGrid">
-                <!-- A Fancy Drop Shadow Effect -->
-                <Border VerticalAlignment="Top"  Background="Black" Name="TablatureShadow">
-                    <Border.Effect>
-                        <DropShadowEffect BlurRadius="10" ShadowDepth="0" ></DropShadowEffect>
-                    </Border.Effect>
-                </Border>
-                <!-- The Background of the tablature -->
-                <Border VerticalAlignment="Top" Background="#F5F5F5" Name="TablatureContainer" HorizontalAlignment="Center">
-                    <!-- The Actual AlphaTab control with a binding to a track -->
-                    <wpf:AlphaTab Name="TablatureControl" Track="{Binding CurrentTrack, IsAsync=True}" />
-                </Border>
-            </Grid>
-        </ScrollViewer>
+        <Grid Grid.Column="0" Grid.Row="1" >
+            <!-- A Fancy Drop Shadow Effect --><!--
+            <Border VerticalAlignment="Top"  Background="Black" Name="TablatureShadow">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="0" ></DropShadowEffect>
+                </Border.Effect>
+            </Border>-->
+
+            <!-- The Actual AlphaTab control with a binding to a track -->
+            <wpf:AlphaTab Name="TablatureControl" Tracks="{Binding CurrentTracks}"
+                          HorizontalAlignment="Stretch"
+                          Padding="10"
+                          Background="#616362"
+                          Foreground="#F5F5F5"
+                          RenderEngine="{Binding RenderEngine}">
+            </wpf:AlphaTab>
+        </Grid>
 
         <GridSplitter Grid.Row="2" Grid.Column="0" Height="4" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" />
 

@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright (c) 2014, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AlphaTab.Importer;
@@ -46,6 +47,8 @@ namespace AlphaTab.Samples.Wpf.ViewModel
         private IEnumerable<TrackViewModel> _trackInfos;
         private TrackViewModel _selectedTrackInfo;
         private readonly RelayCommand _showScoreInfoCommand;
+        private string[] _renderEngines;
+        private string _renderEngine;
 
         /// <summary>
         /// A command which raises the <see cref="ShowScoreInfo"/> method
@@ -53,6 +56,22 @@ namespace AlphaTab.Samples.Wpf.ViewModel
         public ICommand ShowScoreInfoCommand
         {
             get { return _showScoreInfoCommand; }
+        }
+
+        public string[] RenderEngines
+        {
+            get { return _renderEngines; }
+        }
+
+        public string RenderEngine
+        {
+            get { return _renderEngine; }
+            set
+            {
+                if (value == _renderEngine) return;
+                _renderEngine = value;
+                OnPropertyChanged();
+            }
         }
 
         /// <summary>
@@ -100,19 +119,19 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
                 // notify the ui
                 OnPropertyChanged();
-                OnPropertyChanged("CurrentTrack");
+                OnPropertyChanged(nameof(CurrentTracks));
             }
         }
 
         /// <summary>
         /// Gets the currently selected track. 
         /// </summary>
-        public Track CurrentTrack
+        public IEnumerable<Track> CurrentTracks
         {
             get
             {
                 if (Score == null || CurrentTrackIndex < 0 || CurrentTrackIndex >= _score.Tracks.Count) return null;
-                return (Track)_score.Tracks[_currentTrackIndex];
+                return new[] { _score.Tracks[_currentTrackIndex] };
             }
         }
 
@@ -158,6 +177,8 @@ namespace AlphaTab.Samples.Wpf.ViewModel
             if (_score != null)
                 _dialogService.ShowScoreInfo(_score);
         }
+
+
 
         #endregion
 
@@ -219,10 +240,10 @@ namespace AlphaTab.Samples.Wpf.ViewModel
         {
             if (_trackInfos != null)
             {
-                var currentTrack = CurrentTrack;
+                var currentTrackLookup = CurrentTracks.ToLookup(t => t.Index);
                 foreach (var trackViewModel in _trackInfos)
                 {
-                    trackViewModel.IsSelected = currentTrack == trackViewModel.Track;
+                    trackViewModel.IsSelected = currentTrackLookup.Contains(trackViewModel.Track.Index);
                 }
             }
         }
@@ -231,6 +252,8 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public MainViewModel(IDialogService dialogService, IErrorService errorService)
         {
+            _renderEngines = new[] { "gdi", "skia" };
+            _renderEngine = _renderEngines[0];
             _dialogService = dialogService;
             _errorService = errorService;
             OpenFileCommand = new RelayCommand(OpenFile);

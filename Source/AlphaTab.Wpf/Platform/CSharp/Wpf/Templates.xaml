@@ -6,19 +6,28 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:AlphaTab}">
-                    <ItemsControl ItemsSource="{TemplateBinding PartialResults}" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}"
-                                  HorizontalAlignment="Center" HorizontalContentAlignment="Center">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel Orientation="Vertical" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="ImageSource">
-                                <Image Source="{Binding}" Stretch="None" SnapsToDevicePixels="True" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <ScrollViewer x:Name="PART_ScrollView"
+                                  Background="{TemplateBinding Background}"
+                                  Margin="{TemplateBinding Margin}"
+                                  Padding="{TemplateBinding Padding}">
+                        <ItemsControl ItemsSource="{TemplateBinding RenderPartials}"
+                                      Background="{TemplateBinding Foreground}"
+                                      Width="{Binding ActualScoreWidth, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"
+                                      Height="{Binding ActualScoreHeight, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <local:AlphaTabLayoutPanel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0" Padding="0">
+                                        <Image Source="{Binding}" />
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

@@ -16271,6 +16271,7 @@ AlphaTab.Rendering.ScoreBarRendererFactory.prototype = {
 $Inherit(AlphaTab.Rendering.ScoreBarRendererFactory, AlphaTab.Rendering.BarRendererFactory);
 AlphaTab.Rendering.ScoreRenderer = function (settings){
     this._currentLayoutMode = null;
+    this._currentRenderEngine = null;
     this._renderedTracks = null;
     this.PreRender = null;
     this.PartialRenderFinished = null;
@@ -16285,16 +16286,24 @@ AlphaTab.Rendering.ScoreRenderer = function (settings){
     this.BoundsLookup = null;
     this.Settings = settings;
     this.RenderingResources = new AlphaTab.Rendering.RenderingResources(1);
-    if (settings.Engine == null || !AlphaTab.Environment.RenderEngines.hasOwnProperty(settings.Engine)){
-        this.Canvas = AlphaTab.Environment.RenderEngines["default"]();
-    }
-    else {
-        this.Canvas = AlphaTab.Environment.RenderEngines[settings.Engine]();
-    }
+    this.RecreateCanvas();
     this.RecreateLayout();
     this.Tracks = new Array(0);
 };
 AlphaTab.Rendering.ScoreRenderer.prototype = {
+    RecreateCanvas: function (){
+        if (this._currentRenderEngine != this.Settings.Engine){
+            if (this.Settings.Engine == null || !AlphaTab.Environment.RenderEngines.hasOwnProperty(this.Settings.Engine)){
+                this.Canvas = AlphaTab.Environment.RenderEngines["default"]();
+            }
+            else {
+                this.Canvas = AlphaTab.Environment.RenderEngines[this.Settings.Engine]();
+            }
+            this._currentRenderEngine = this.Settings.Engine;
+            return true;
+        }
+        return false;
+    },
     RecreateLayout: function (){
         if (this._currentLayoutMode != this.Settings.Layout.Mode){
             if (this.Settings.Layout == null || !AlphaTab.Environment.LayoutEngines.hasOwnProperty(this.Settings.Layout.Mode)){
@@ -16339,6 +16348,7 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
         this.BoundsLookup = new AlphaTab.Rendering.Utils.BoundsLookup();
         if (this.Tracks.length == 0)
             return;
+        this.RecreateCanvas();
         if (this.RenderingResources.Scale != this.Settings.Scale){
             this.RenderingResources.Init(this.Settings.Scale);
             this.Canvas.set_LineWidth(this.Settings.Scale);
@@ -16351,8 +16361,8 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
         AlphaTab.Util.Logger.Info("Rendering", "Rendering finished");
     },
     Resize: function (width){
-        if (this.RecreateLayout() || this._renderedTracks != this.Tracks || this.Tracks == null){
-            AlphaTab.Util.Logger.Info("Rendering", "Starting full rerendering due to layout change");
+        if (this.RecreateLayout() || this.RecreateCanvas() || this._renderedTracks != this.Tracks || this.Tracks == null){
+            AlphaTab.Util.Logger.Info("Rendering", "Starting full rerendering due to layout or canvas change");
             this.Invalidate();
         }
         else if (this.Layout.get_SupportsResize()){

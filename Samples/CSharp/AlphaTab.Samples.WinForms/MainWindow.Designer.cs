@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright (c) 2014, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -49,24 +49,21 @@ namespace AlphaTab.Samples.WinForms
         private void InitializeComponent()
         {
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.alphaTabControl1 = new AlphaTabControl();
+            this.alphaTabControl1 = new AlphaTab.Platform.CSharp.WinForms.AlphaTabControl();
             this.mainToolBar = new System.Windows.Forms.ToolStrip();
             this.openFileButton = new System.Windows.Forms.ToolStripButton();
             this.showScoreInfo = new System.Windows.Forms.ToolStripButton();
+            this.cmbRenderEngine = new System.Windows.Forms.ToolStripComboBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.panel2 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.trackDetails = new System.Windows.Forms.Panel();
-            this.trackHeaderControl1 = new TrackHeaderControl();
+            this.trackHeaderControl1 = new AlphaTab.Samples.WinForms.TrackHeaderControl();
             this.trackBars = new System.Windows.Forms.Panel();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
             this.toolStripContainer1.SuspendLayout();
-            this.panel1.SuspendLayout();
-            this.tableLayoutPanel1.SuspendLayout();
             this.mainToolBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -82,7 +79,7 @@ namespace AlphaTab.Samples.WinForms
             // 
             // toolStripContainer1.ContentPanel
             // 
-            this.toolStripContainer1.ContentPanel.Controls.Add(this.panel1);
+            this.toolStripContainer1.ContentPanel.Controls.Add(this.alphaTabControl1);
             this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(891, 318);
             this.toolStripContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.toolStripContainer1.LeftToolStripPanelVisible = false;
@@ -98,44 +95,17 @@ namespace AlphaTab.Samples.WinForms
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.mainToolBar);
             this.toolStripContainer1.TopToolStripPanel.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             // 
-            // panel1
-            // 
-            this.panel1.AutoScroll = true;
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(97)))), ((int)(((byte)(98)))), ((int)(((byte)(99)))));
-            this.panel1.Controls.Add(this.tableLayoutPanel1);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(891, 318);
-            this.panel1.TabIndex = 2;
-            this.panel1.MouseEnter += new System.EventHandler(this.panel1_MouseEnter);
-            // 
-            // tableLayoutPanel1
-            // 
-            this.tableLayoutPanel1.AutoSize = true;
-            this.tableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.tableLayoutPanel1.ColumnCount = 3;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Controls.Add(this.alphaTabControl1, 1, 0);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 1;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(891, 163);
-            this.tableLayoutPanel1.TabIndex = 1;
-            // 
             // alphaTabControl1
             // 
-            this.alphaTabControl1.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.alphaTabControl1.Location = new System.Drawing.Point(287, 3);
+            this.alphaTabControl1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(97)))), ((int)(((byte)(99)))), ((int)(((byte)(98)))));
+            this.alphaTabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.alphaTabControl1.ForeColor = System.Drawing.Color.WhiteSmoke;
+            this.alphaTabControl1.Location = new System.Drawing.Point(0, 0);
             this.alphaTabControl1.Name = "alphaTabControl1";
-            this.alphaTabControl1.Size = new System.Drawing.Size(316, 157);
+            this.alphaTabControl1.Padding = new System.Windows.Forms.Padding(10);
+            this.alphaTabControl1.Size = new System.Drawing.Size(891, 318);
             this.alphaTabControl1.TabIndex = 0;
             this.alphaTabControl1.Text = "alphaTabControl1";
-            this.alphaTabControl1.Track = null;
             // 
             // mainToolBar
             // 
@@ -144,13 +114,14 @@ namespace AlphaTab.Samples.WinForms
             this.mainToolBar.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.mainToolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openFileButton,
-            this.showScoreInfo});
+            this.showScoreInfo,
+            this.cmbRenderEngine});
             this.mainToolBar.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
             this.mainToolBar.Location = new System.Drawing.Point(3, 0);
             this.mainToolBar.Name = "mainToolBar";
             this.mainToolBar.Padding = new System.Windows.Forms.Padding(5);
             this.mainToolBar.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.mainToolBar.Size = new System.Drawing.Size(97, 41);
+            this.mainToolBar.Size = new System.Drawing.Size(189, 41);
             this.mainToolBar.TabIndex = 0;
             // 
             // openFileButton
@@ -173,6 +144,16 @@ namespace AlphaTab.Samples.WinForms
             this.showScoreInfo.Size = new System.Drawing.Size(28, 28);
             this.showScoreInfo.Text = "Show Score Info";
             this.showScoreInfo.Click += new System.EventHandler(this.showScoreInfo_Click);
+            // 
+            // cmbRenderEngine
+            // 
+            this.cmbRenderEngine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbRenderEngine.Items.AddRange(new object[] {
+            "gdi",
+            "skia"});
+            this.cmbRenderEngine.Name = "cmbRenderEngine";
+            this.cmbRenderEngine.Size = new System.Drawing.Size(121, 23);
+            this.cmbRenderEngine.SelectedIndexChanged += new System.EventHandler(this.cmbRenderEngine_SelectedIndexChanged);
             // 
             // splitContainer1
             // 
@@ -281,9 +262,6 @@ namespace AlphaTab.Samples.WinForms
             this.toolStripContainer1.TopToolStripPanel.PerformLayout();
             this.toolStripContainer1.ResumeLayout(false);
             this.toolStripContainer1.PerformLayout();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            this.tableLayoutPanel1.ResumeLayout(false);
             this.mainToolBar.ResumeLayout(false);
             this.mainToolBar.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);
@@ -305,9 +283,6 @@ namespace AlphaTab.Samples.WinForms
         private System.Windows.Forms.ToolStripContainer toolStripContainer1;
         private System.Windows.Forms.ToolStrip mainToolBar;
         private System.Windows.Forms.ToolStripButton showScoreInfo;
-        private AlphaTabControl alphaTabControl1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.Panel panel2;
@@ -316,6 +291,8 @@ namespace AlphaTab.Samples.WinForms
         private TrackHeaderControl trackHeaderControl1;
         private System.Windows.Forms.Panel trackBars;
         private System.Windows.Forms.ToolStripButton openFileButton;
+        private System.Windows.Forms.ToolStripComboBox cmbRenderEngine;
+        private AlphaTabControl alphaTabControl1;
     }
 }
 
