@@ -21,8 +21,16 @@ namespace AlphaTab.Importer
 {
     public class UnsupportedFormatException : Exception
     {
-        public UnsupportedFormatException(string message = "") : base(message)
+        private readonly string _message;
+
+        public override string Message
         {
+            get { return _message; }
+        }
+
+        public UnsupportedFormatException(string message = "")
+        {
+            _message = message;
         }
     }
 }

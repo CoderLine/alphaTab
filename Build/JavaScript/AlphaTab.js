@@ -185,10 +185,10 @@ AlphaTab.Environment = function (){
 };
 AlphaTab.Environment.PlatformInit = function (){
     AlphaTab.Environment.RenderEngines["svg"] = function (){
-        return new AlphaTab.Platform.Svg.FontSvgCanvas();
+        return new AlphaTab.Platform.Svg.CssFontSvgCanvas();
     };
     AlphaTab.Environment.RenderEngines["default"] = function (){
-        return new AlphaTab.Platform.Svg.FontSvgCanvas();
+        return new AlphaTab.Platform.Svg.CssFontSvgCanvas();
     };
     AlphaTab.Environment.RenderEngines["html5"] = function (){
         return new AlphaTab.Platform.JavaScript.Html5Canvas();
@@ -419,7 +419,7 @@ AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes = function (data){
         }
         catch(e){
             if (!(e.exception instanceof AlphaTab.Importer.UnsupportedFormatException)){
-                AlphaTab.Util.Logger.Info("ScoreLoader", "Score import failed due to unexpected error: " + e.get_Message());
+                AlphaTab.Util.Logger.Info("ScoreLoader", "Score import failed due to unexpected error: " + (e).get_Message());
                 throw $CreateException(e, new Error());
             }
             else {
@@ -8722,6 +8722,13 @@ $Inherit(AlphaTab.Importer.MusicXmlImporter, AlphaTab.Importer.ScoreImporter);
 AlphaTab.Importer.NoCompatibleReaderFoundException = function (){
 };
 AlphaTab.Importer.UnsupportedFormatException = function (message){
+    this._message = null;
+    this._message = message;
+};
+AlphaTab.Importer.UnsupportedFormatException.prototype = {
+    get_Message: function (){
+        return this._message;
+    }
 };
 AlphaTab.IO = AlphaTab.IO || {};
 AlphaTab.IO.BitReader = function (source){
@@ -9981,21 +9988,23 @@ AlphaTab.Model.Track.prototype = {
         var staff = this.Staves[0];
         for (var li = 0; li < lyrics.length; li++){
             var lyric = lyrics[li];
-            var beat = staff.Bars[lyric.StartBar].Voices[0].Beats[0];
-            for (var ci = 0; ci < lyric.Chunks.length && beat != null; ci++){
-                // skip rests and empty beats
-                while (beat != null && (beat.IsEmpty || beat.get_IsRest())){
-                    beat = beat.NextBeat;
-                }
-                // mismatch between chunks and beats might lead to missing beats
-                if (beat != null){
-                    // initialize lyrics list for beat if required
-                    if (beat.Lyrics == null){
-                        beat.Lyrics = new Array(lyrics.length);
+            if (lyric.StartBar >= 0){
+                var beat = staff.Bars[lyric.StartBar].Voices[0].Beats[0];
+                for (var ci = 0; ci < lyric.Chunks.length && beat != null; ci++){
+                    // skip rests and empty beats
+                    while (beat != null && (beat.IsEmpty || beat.get_IsRest())){
+                        beat = beat.NextBeat;
                     }
-                    // assign chunk
-                    beat.Lyrics[li] = lyric.Chunks[ci];
-                    beat = beat.NextBeat;
+                    // mismatch between chunks and beats might lead to missing beats
+                    if (beat != null){
+                        // initialize lyrics list for beat if required
+                        if (beat.Lyrics == null){
+                            beat.Lyrics = new Array(lyrics.length);
+                        }
+                        // assign chunk
+                        beat.Lyrics[li] = lyric.Chunks[ci];
+                        beat = beat.NextBeat;
+                    }
                 }
             }
         }
@@ -10624,10 +10633,10 @@ AlphaTab.Platform.Svg.SvgCanvas.prototype = {
 $StaticConstructor(function (){
     AlphaTab.Platform.Svg.SvgCanvas.BlurCorrection = 0.5;
 });
-AlphaTab.Platform.Svg.FontSvgCanvas = function (){
+AlphaTab.Platform.Svg.CssFontSvgCanvas = function (){
     AlphaTab.Platform.Svg.SvgCanvas.call(this);
 };
-AlphaTab.Platform.Svg.FontSvgCanvas.prototype = {
+AlphaTab.Platform.Svg.CssFontSvgCanvas.prototype = {
     FillMusicFontSymbol: function (x, y, scale, symbol){
         this.Buffer+="<g transform=\"translate(" + (x | 0 - 0.5) + " " + (y | 0 - 0.5) + ")\" class=\"at\" ><text";
         //Buffer.Append("<svg x=\"" + ((int) x - BlurCorrection) + "\" y=\"" + ((int) y - BlurCorrection) +
@@ -10642,7 +10651,7 @@ AlphaTab.Platform.Svg.FontSvgCanvas.prototype = {
         this.Buffer+=">&#" + symbol + ";</text></g>";
     }
 };
-$Inherit(AlphaTab.Platform.Svg.FontSvgCanvas, AlphaTab.Platform.Svg.SvgCanvas);
+$Inherit(AlphaTab.Platform.Svg.CssFontSvgCanvas, AlphaTab.Platform.Svg.SvgCanvas);
 AlphaTab.Rendering.BarRendererBase = function (renderer, bar){
     this._preBeatGlyphs = null;
     this._voiceContainers = null;

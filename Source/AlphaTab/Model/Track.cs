@@ -127,26 +127,29 @@ namespace AlphaTab.Model
             for (var li = 0; li < lyrics.Count; li++)
             {
                 var lyric = lyrics[li];
-                var beat = staff.Bars[lyric.StartBar].Voices[0].Beats[0];
-                for (int ci = 0; ci < lyric.Chunks.Length && beat != null; ci++)
+                if (lyric.StartBar >= 0)
                 {
-                    // skip rests and empty beats
-                    while (beat != null && (beat.IsEmpty || beat.IsRest))
+                    var beat = staff.Bars[lyric.StartBar].Voices[0].Beats[0];
+                    for (int ci = 0; ci < lyric.Chunks.Length && beat != null; ci++)
                     {
-                        beat = beat.NextBeat;
-                    }
-
-                    // mismatch between chunks and beats might lead to missing beats
-                    if (beat != null)
-                    {
-                        // initialize lyrics list for beat if required
-                        if (beat.Lyrics == null)
+                        // skip rests and empty beats
+                        while (beat != null && (beat.IsEmpty || beat.IsRest))
                         {
-                            beat.Lyrics = new string[lyrics.Count];
+                            beat = beat.NextBeat;
                         }
-                        // assign chunk
-                        beat.Lyrics[li] = lyric.Chunks[ci];
-                        beat = beat.NextBeat;
+
+                        // mismatch between chunks and beats might lead to missing beats
+                        if (beat != null)
+                        {
+                            // initialize lyrics list for beat if required
+                            if (beat.Lyrics == null)
+                            {
+                                beat.Lyrics = new string[lyrics.Count];
+                            }
+                            // assign chunk
+                            beat.Lyrics[li] = lyric.Chunks[ci];
+                            beat = beat.NextBeat;
+                        }
                     }
                 }
             }
