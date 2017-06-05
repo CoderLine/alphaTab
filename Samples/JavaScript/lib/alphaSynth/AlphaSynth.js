@@ -664,7 +664,21 @@ AlphaSynth.Main.AlphaSynthWebWorkerApi = function (player, alphaSynthScriptFile)
     this._output.add_Finished($CreateDelegate(this, this.OnOutputFinished));
     this._events = {};
     this._output.Open();
-    this._synth = new Worker(alphaSynthScriptFile);
+    try{
+        this._synth = new Worker(alphaSynthScriptFile);
+    }
+    catch($$e1){
+        // fallback to blob worker 
+        try{
+            var script = "importScripts(\'" + alphaSynthScriptFile + "\')";
+            var blob = new Blob([script]);
+            this._synth = new Worker(window.URL.createObjectURL(blob));
+        }
+        catch(e){
+            AlphaSynth.Util.Logger.Error("Failed to create WebWorker: " + e);
+            // TODO: fallback to synchronous mode
+        }
+    }
     this._synth.addEventListener("message", $CreateDelegate(this, this.HandleWorkerMessage), false);
     this._synth.postMessage({
         cmd: "alphaSynth.initialize",
