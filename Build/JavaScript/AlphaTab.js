@@ -4787,7 +4787,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             }
             this.NewSy();
             // dot done
-            if (this._sy == AlphaTab.Importer.AlphaTexSymbols.Number){
+            if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
                 this.Error("note-string", AlphaTab.Importer.AlphaTexSymbols.Number, true);
             }
             string = (this._syData);

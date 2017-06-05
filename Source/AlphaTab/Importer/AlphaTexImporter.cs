@@ -1147,7 +1147,7 @@ namespace AlphaTab.Importer
                 }
                 NewSy(); // dot done
 
-                if (_sy == AlphaTexSymbols.Number)
+                if (_sy != AlphaTexSymbols.Number)
                 {
                     Error("note-string", AlphaTexSymbols.Number);
                 }
