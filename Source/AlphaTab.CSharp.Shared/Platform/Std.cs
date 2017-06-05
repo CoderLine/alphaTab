@@ -118,7 +118,6 @@ namespace AlphaTab.Platform
             return e is T;
         }
 
-
         private static readonly Random Rnd = new Random();
         public static int Random(int max)
         {

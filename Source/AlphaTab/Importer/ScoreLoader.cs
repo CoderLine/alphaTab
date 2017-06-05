@@ -52,7 +52,7 @@ namespace AlphaTab.Importer
                 {
                     if (!Std.IsException<UnsupportedFormatException>(e))
                     {
-                        Logger.Info("ScoreLoader", "Score import failed due to unexpected error: " + e.Message);
+                        Logger.Info("ScoreLoader", "Score import failed due to unexpected error: " + e);
                         throw e;
                     }
                     else

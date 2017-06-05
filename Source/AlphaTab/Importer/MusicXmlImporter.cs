@@ -276,6 +276,7 @@ namespace AlphaTab.Importer
             else
             {
                 beat = new Beat();
+                beat.IsEmpty = false;
                 voice.AddBeat(beat);
             }
 
@@ -548,8 +549,9 @@ namespace AlphaTab.Importer
             _currentChord = null;
 
             var note = new Note();
-            beat.AddNote(note);
+            beat.Voice.IsEmpty = false;
             beat.IsEmpty = false;
+            beat.AddNote(note);
 
             beat.Dots = 0;
             foreach (var c in element.ChildNodes)
@@ -600,7 +602,6 @@ namespace AlphaTab.Importer
                                 }
                             }
                             break;
-
                         case "tie":
                             ParseTied(c, note);
                             break;
@@ -611,34 +612,7 @@ namespace AlphaTab.Importer
                             // not supported
                             break;
                         case "type":
-                            switch (c.InnerText)
-                            {
-                                case "256th":
-                                case "128th":
-                                case "64th":
-                                    beat.Duration = Duration.SixtyFourth;
-                                    break;
-                                case "32nd":
-                                    beat.Duration = Duration.ThirtySecond;
-                                    break;
-                                case "16th":
-                                    beat.Duration = Duration.Sixteenth;
-                                    break;
-                                case "eighth":
-                                    beat.Duration = Duration.Eighth;
-                                    break;
-                                case "quarter":
-                                    beat.Duration = Duration.Quarter;
-                                    break;
-                                case "half":
-                                    beat.Duration = Duration.Half;
-                                    break;
-                                case "long":
-                                case "breve":
-                                case "whole":
-                                    beat.Duration = Duration.Whole;
-                                    break;
-                            }
+                            beat.Duration = GetDuration(c.InnerText);
                             if (beat.GraceType != GraceType.None && beat.Duration < Duration.Sixteenth)
                             {
                                 beat.Duration = Duration.Eighth;
@@ -702,6 +676,33 @@ namespace AlphaTab.Importer
                     }
                 }
             }
+        }
+
+        private Duration GetDuration(string text)
+        {
+            switch (text)
+            {
+                case "256th":
+                case "128th":
+                case "64th":
+                    return Duration.SixtyFourth;
+                case "32nd":
+                    return Duration.ThirtySecond;
+                case "16th":
+                    return Duration.Sixteenth;
+                case "eighth":
+                    return Duration.Eighth;
+                case "quarter":
+                    return Duration.Quarter;
+                case "half":
+                    return Duration.Half;
+                case "long":
+                case "breve":
+                case "whole":
+                    return Duration.Whole;
+            }
+
+            return Duration.Quarter;
         }
 
         private void ParseLyric(XmlNode element, Beat beat)
@@ -1056,18 +1057,46 @@ namespace AlphaTab.Importer
                             }
                             break;
                         case "direction-type":
-                            var directionType = c.FirstChild;
+                            var directionType = c.FirstElement;
                             switch (directionType.LocalName)
                             {
                                 case "words":
                                     masterBar.Section = new Section();
                                     masterBar.Section.Text = directionType.InnerText;
                                     break;
+                                case "metronome":
+                                    ParseMetronome(c.FirstElement, masterBar);
+                                    break;
                             }
                             break;
                     }
                 }
             }
+        }
+
+        private void ParseMetronome(XmlNode element, MasterBar masterBar)
+        {
+            var unit = Duration.Quarter;
+            int perMinute = 120;
+            foreach (var c in element.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "beat-unit":
+                            unit = GetDuration(c.InnerText);
+                            break;
+                        case "per-minute":
+                            perMinute = Std.ParseInt(c.InnerText);
+                            break;
+                    }
+                }
+            }
+
+            var tempoAutomation = masterBar.TempoAutomation = new Automation();
+            tempoAutomation.Type = AutomationType.Tempo;
+            tempoAutomation.Value = perMinute * ((int) unit / 4);
         }
 
         private void ParseAttributes(XmlNode element, Bar[] bars, MasterBar masterBar)
@@ -1314,7 +1343,7 @@ namespace AlphaTab.Importer
                         case "creator":
                             if (c.GetAttribute("type") == "composer")
                             {
-                                _score.Words = c.FirstChild.InnerText;
+                                _score.Words = c.InnerText;
                             }
                             break;
                         case "rights":
@@ -1322,7 +1351,7 @@ namespace AlphaTab.Importer
                             {
                                 _score.Copyright += "\n";
                             }
-                            _score.Copyright += c.FirstChild.InnerText;
+                            _score.Copyright += c.InnerText;
                             break;
                     }
                 }
@@ -1359,10 +1388,10 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "part-name":
-                            track.Name = c.FirstChild.InnerText;
+                            track.Name = c.InnerText;
                             break;
                         case "part-abbreviation":
-                            track.ShortName = c.FirstChild.InnerText;
+                            track.ShortName = c.InnerText;
                             break;
                         case "midi-instrument":
                             ParseMidiInstrument(c, track);
@@ -1403,13 +1432,13 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "midi-channel":
-                            track.PlaybackInfo.PrimaryChannel = Std.ParseInt(c.FirstChild.InnerText);
+                            track.PlaybackInfo.PrimaryChannel = Std.ParseInt(c.InnerText);
                             break;
                         case "midi-program":
-                            track.PlaybackInfo.Program = Std.ParseInt(c.FirstChild.InnerText);
+                            track.PlaybackInfo.Program = Std.ParseInt(c.InnerText);
                             break;
                         case "midi-volume":
-                            track.PlaybackInfo.Volume = Std.ParseInt(c.FirstChild.InnerText);
+                            track.PlaybackInfo.Volume = Std.ParseInt(c.InnerText);
                             break;
                     }
                 }

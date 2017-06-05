@@ -29,6 +29,7 @@ namespace AlphaTab.Xml
         public FastList<XmlNode> ChildNodes { get; private set; }
         public FastDictionary<string, string> Attributes { get; private set; }
         public XmlNode FirstChild { get; set; }
+        public XmlNode FirstElement { get; set; }
 
         public XmlNode()
         {
@@ -40,6 +41,10 @@ namespace AlphaTab.Xml
         {
             ChildNodes.Add(node);
             FirstChild = node;
+            if (node.NodeType == XmlNodeType.Element)
+            {
+                FirstElement = node;
+            }
         }
 
         public string GetAttribute(string name)
@@ -48,7 +53,7 @@ namespace AlphaTab.Xml
             {
                 return Attributes[name];
             }
-            return string.Empty;
+            return "";
         }
 
         public XmlNode[] GetElementsByTagName(string name)

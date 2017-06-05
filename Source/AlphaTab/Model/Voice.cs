@@ -32,7 +32,7 @@ namespace AlphaTab.Model
 
         public bool IsEmpty
         {
-            get; private set;
+            get; set;
           
         }
 

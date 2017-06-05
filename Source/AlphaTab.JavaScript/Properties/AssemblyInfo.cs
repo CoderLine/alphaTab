@@ -57,10 +57,12 @@ using SharpKit.JavaScript;
 [assembly: JsMethod(TargetType = typeof(IComparable), TargetMethod = "CompareTo", InlineCodeExpression = "(this - obj)")]
 [assembly: JsMethod(TargetType = typeof(int), TargetMethod = "CompareTo", InlineCodeExpression = "(this - value)")]
 [assembly: JsMethod(TargetType = typeof(float), TargetMethod = "CompareTo", InlineCodeExpression = "(this - value)")]
+[assembly: JsMethod(TargetType = typeof(float), TargetMethod = "IsNaN", InlineCodeExpression = "isNaN(f)")]
 
 [assembly: JsMethod(TargetType = typeof(System.Console), TargetMethod = "WriteLine", InlineCodeExpression = "console.log(value)")]
 
 [assembly: JsMethod(TargetType = typeof(Nullable<>), TargetMethod = "get_Value", InlineCodeExpression = "this")]
+[assembly: JsMethod(TargetType = typeof(Exception), TargetMethod = "get_Message", InlineCodeExpression = "this.message")]
 
 [assembly: JsType(Mode = JsMode.Json, TargetType = typeof(Bounds),
                     AutomaticPropertiesAsFields = false,
