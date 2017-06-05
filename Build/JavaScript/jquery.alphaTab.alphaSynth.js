@@ -403,7 +403,7 @@
             
         // if playing, animate the cursor to the next beat
         $('.atHighlight', element).removeClass('atHighlight');
-        if(context.playerState == 1 || stop || true) {
+        if(context.playerState == 1 || stop) {
             duration /= context.cursorOptions.playbackSpeed;
             
             if(!stop) {
@@ -422,7 +422,7 @@
                 }, duration, 'linear');       
             }            
                 
-            if(!selecting || true) {
+            if(!selecting) {
                                 
                 // calculate position of whole music wheet within the scroll parent
                 var scrollElement = $(context.cursorOptions.scrollElement);
