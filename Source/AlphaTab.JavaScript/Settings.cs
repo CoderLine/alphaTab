@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Platform;
 using SharpKit.Html;
@@ -80,7 +81,7 @@ namespace AlphaTab
             return json;
         }
 
-        public static Settings FromJson(dynamic json)
+        public static Settings FromJson(dynamic json, FastDictionary<string, object> dataAttributes)
         {
             if (Std.InstanceOf<Settings>(json))
             {
@@ -90,12 +91,12 @@ namespace AlphaTab
             var settings = Defaults;
             settings.ScriptFile = Environment.ScriptFile;
 
-            FillFromJson(settings, json);
+            FillFromJson(settings, json, dataAttributes);
 
             return settings;
         }
 
-        public static void FillFromJson(Settings settings, dynamic json)
+        public static void FillFromJson(Settings settings, dynamic json, FastDictionary<string, object> dataAttributes)
         {
             if (HtmlContext.self.document.As<bool>() && HtmlContext.self.window.Member("ALPHATAB_ROOT").As<bool>())
             {
@@ -126,11 +127,6 @@ namespace AlphaTab
                 }
             }
 
-            if (!json)
-            {
-                return;
-            }
-
             if (Std.JsonExists(json, "scale")) settings.Scale = json.scale;
             if (Std.JsonExists(json, "width")) settings.Width = json.width;
             if (Std.JsonExists(json, "height")) settings.Height = json.height;
@@ -139,6 +135,14 @@ namespace AlphaTab
             if (Std.JsonExists(json, "forcePianoFingering")) settings.ForcePianoFingering = json.forcePianoFingering;
             if (Std.JsonExists(json, "lazy")) settings.DisableLazyLoading = !json.lazy;
             if (Std.JsonExists(json, "pitchOffsets")) settings.PitchOffsets = json.pitchOffsets;
+            else if(dataAttributes != null && dataAttributes.ContainsKey("pitches"))
+            {
+                var pitchOffsets = dataAttributes["pitches"];
+                if (pitchOffsets != null && Std.InstanceOf<JsArray>(pitchOffsets))
+                {
+                    settings.PitchOffsets = pitchOffsets.As<int[]>();
+                }
+            }
 
             if (Std.JsonExists(json, "scriptFile"))
             {
@@ -155,31 +159,69 @@ namespace AlphaTab
             {
                 settings.Layout = LayoutFromJson(json.layout);
             }
-
-            if (Std.JsonExists(json, "staves"))
+            else if (dataAttributes != null && dataAttributes.ContainsKey("layout"))
             {
-                var val = json.staves;
-                if (JsContext.@typeof(val) == "string")
+                settings.Layout = LayoutFromJson(dataAttributes["layout"]);
+            }
+
+            if (dataAttributes != null)
+            {
+                foreach (var key in dataAttributes)
                 {
-                    settings.Staves = new StaveSettings(val);
-                }
-                else
-                {
-                    if (val.id)
+                    if (key.StartsWith("layout"))
                     {
-                        var staveSettings = new StaveSettings(val.id);
-                        if (val.additionalSettings)
-                        {
-                            string[] keys2 = Std.JsonKeys(val.additionalSettings);
-                            foreach (var key2 in keys2)
-                            {
-                                staveSettings.AdditionalSettings[key2] = val.additionalSettings[key2];
-                            }
-                        }
-                        settings.Staves = staveSettings;
+                        var property = key.Substring(6);
+                        settings.Layout.AdditionalSettings[property.ToLower()] = dataAttributes[key];
                     }
                 }
             }
+
+            if (Std.JsonExists(json, "staves"))
+            {
+                settings.Staves = StavesFromJson(json.staves);
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("staves"))
+            {
+                settings.Staves = StavesFromJson(dataAttributes["staves"]);
+            }
+
+            if (dataAttributes != null)
+            {
+                foreach (var key in dataAttributes)
+                {
+                    if (key.StartsWith("staves"))
+                    {
+                        var property = key.Substring(6);
+                        settings.Staves.AdditionalSettings[property.ToLower()] = dataAttributes[key];
+                    }
+                }
+            }
+        }
+
+        private static StaveSettings StavesFromJson(dynamic json)
+        {
+            StaveSettings staveSettings ;
+            if (JsContext.@typeof(json) == "string")
+            {
+                staveSettings = new StaveSettings(json);
+            }
+            else if (json.id)
+            {
+                staveSettings = new StaveSettings(json.id);
+                if (json.additionalSettings)
+                {
+                    string[] keys2 = Std.JsonKeys(json.additionalSettings);
+                    foreach (var key2 in keys2)
+                    {
+                        staveSettings.AdditionalSettings[key2.ToLower()] = json.additionalSettings[key2];
+                    }
+                }
+            }
+            else
+            {
+                return new StaveSettings("score-tab");
+            }
+            return staveSettings;
         }
 
         public static LayoutSettings LayoutFromJson(dynamic json)
@@ -197,7 +239,7 @@ namespace AlphaTab
                     string[] keys = Std.JsonKeys(json.additionalSettings);
                     foreach (var key in keys)
                     {
-                        layout.AdditionalSettings[key] = json.additionalSettings[key];
+                        layout.AdditionalSettings[key.ToLower()] = json.additionalSettings[key];
                     }
                 }
             }

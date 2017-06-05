@@ -208,15 +208,22 @@ namespace AlphaTab.Rendering.Staves
             if (!_accoladeSpacingCalculated && Index == 0)
             {
                 _accoladeSpacingCalculated = true;
-                var canvas = Layout.Renderer.Canvas;
-                var res = Layout.Renderer.RenderingResources.EffectFont;
-                canvas.Font = res;
-                for (var i = 0; i < tracks.Length; i++)
+                if (Layout.Renderer.Settings.Layout.Get("hideTrackNames", false))
                 {
-                    AccoladeSpacing = Math.Max(AccoladeSpacing, canvas.MeasureText(tracks[i].ShortName));
+                    AccoladeSpacing = 0;
                 }
-                AccoladeSpacing += (2 * AccoladeLabelSpacing);
-                Width += AccoladeSpacing;
+                else
+                {
+                    var canvas = Layout.Renderer.Canvas;
+                    var res = Layout.Renderer.RenderingResources.EffectFont;
+                    canvas.Font = res;
+                    for (var i = 0; i < tracks.Length; i++)
+                    {
+                        AccoladeSpacing = Math.Max(AccoladeSpacing, canvas.MeasureText(tracks[i].ShortName));
+                    }
+                    AccoladeSpacing += (2 * AccoladeLabelSpacing);
+                    Width += AccoladeSpacing;
+                }
             }
         }
 
@@ -353,7 +360,7 @@ namespace AlphaTab.Rendering.Staves
                         var accoladeEnd = lastEnd + (barSize * 4);
 
                         // text
-                        if (Index == 0)
+                        if (Index == 0 && !Layout.Renderer.Settings.Layout.Get("hideTrackNames", false))
                         {
                             canvas.FillText(g.Track.ShortName, cx + (AccoladeLabelSpacing * Layout.Scale), firstStart);
                         }

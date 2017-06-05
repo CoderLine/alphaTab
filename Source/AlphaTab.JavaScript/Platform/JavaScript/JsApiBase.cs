@@ -66,30 +66,55 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
-        private object GetData(string name)
+        private FastDictionary<string, object> GetDataAttributes()
         {
-            string value;
+            var dataAttributes = new FastDictionary<string, object>();
+
             if (Element.dataset.As<bool>())
             {
-                value = Element.dataset.Member(name).As<string>();
+                foreach (var key in Element.dataset.As<JsObject>())
+                {
+                    object value = Element.dataset.Member(key);
+                    try
+                    {
+                        value = JSON.parse(value.As<string>());
+                    }
+                    catch
+                    {
+                        if (value == "")
+                        {
+                            value = null;
+                        }
+                    }
+                    dataAttributes[key] = value;
+                }
             }
             else
             {
-                value = Element.getAttribute("data-" + name);
-            }
-
-            try
-            {
-                return JSON.parse(value);
-            }
-            catch
-            {
-                if (value == "")
+                for (var i = 0; i < Element.attributes.length; i++)
                 {
-                    return null;
+                    var attr = Element.attributes[i];
+                    if (attr.nodeName.As<string>().StartsWith("data-"))
+                    {
+                        var key = attr.nodeName.substr(5).replace("-", "");
+                        object value = attr.nodeValue;
+                        try
+                        {
+                            value = JSON.parse(value.As<string>());
+                        }
+                        catch
+                        {
+                            if (value == "")
+                            {
+                                value = null;
+                            }
+                        }
+                        dataAttributes[key] = value;
+                    }
                 }
-                return value;
             }
+            
+            return dataAttributes;
         }
 
         protected JsApiBase(HtmlElement element, dynamic options)
@@ -99,13 +124,8 @@ namespace AlphaTab.Platform.JavaScript
             Element.classList.add("alphaTab");
 
             // load settings
-            var settings = Settings = Settings.FromJson(options);
-
-            var pitchOffsets = GetData("pitches");
-            if (pitchOffsets != null && Std.InstanceOf<JsArray>(pitchOffsets))
-            {
-                settings.PitchOffsets = pitchOffsets.As<int[]>();
-            }
+            var dataAttributes = GetDataAttributes();
+            var settings = Settings = Settings.FromJson(options, dataAttributes);
 
             #region build tracks array
 
@@ -117,10 +137,9 @@ namespace AlphaTab.Platform.JavaScript
             }
             else
             {
-                var data = GetData("tracks");
-                if (data != null)
+                if (dataAttributes.ContainsKey("tracks"))
                 {
-                    tracksData = data;
+                    tracksData = dataAttributes["tracks"];
                 }
                 else
                 {
@@ -137,7 +156,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 // get load contents
 
-                if (GetData("tex") != null && element.innerText.As<JsBoolean>())
+                if (dataAttributes.ContainsKey("tex") && element.innerText.As<JsBoolean>())
                 {
                     contents = (element.innerHTML.As<string>()).Trim();
                     element.innerHTML = "";
@@ -248,10 +267,9 @@ namespace AlphaTab.Platform.JavaScript
                 }
                 else
                 {
-                    var file = (string)GetData("file");
-                    if (!string.IsNullOrEmpty(file))
+                    if (dataAttributes.ContainsKey("file"))
                     {
-                        Load(file);
+                        Load(dataAttributes["file"]);
                     }
                 }
             };

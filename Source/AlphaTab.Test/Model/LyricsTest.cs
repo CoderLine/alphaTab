@@ -125,6 +125,15 @@ namespace AlphaTab.Test.Model
                 "DDD",
                 "EEE"
             });
+            TestLyrics("AAA  BBB   CCC", new[]
+            {
+                "AAA",
+                "",
+                "BBB",
+                "",
+                "",
+                "CCC"
+            });
         }
 
         [TestMethod]

@@ -38,24 +38,13 @@ namespace AlphaTab.Rendering
             return track.Tuning.Length > 0 && base.CanCreate(track, staff);
         }
 
-        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar, FastDictionary<string, object> additionalSettings)
+        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar, StaveSettings staveSettings)
         {
             var tabBarRenderer = new TabBarRenderer(renderer, bar);
 
-            if (additionalSettings.ContainsKey("rhythm"))
-            {
-                tabBarRenderer.RenderRhythm = (bool)additionalSettings["rhythm"];
-            }
-
-            if (additionalSettings.ContainsKey("rhythm-height"))
-            {
-                tabBarRenderer.RhythmHeight = (float)additionalSettings["rhythm-height"];
-            }
-
-            if (additionalSettings.ContainsKey("rhythm-beams"))
-            {
-                tabBarRenderer.RhythmBeams = (bool)additionalSettings["rhythm-beams"];
-            }
+            tabBarRenderer.RenderRhythm = staveSettings.Get("rhythm", tabBarRenderer.RenderRhythm);
+            tabBarRenderer.RhythmHeight = staveSettings.Get("rhythm-height", tabBarRenderer.RhythmHeight);
+            tabBarRenderer.RhythmBeams = staveSettings.Get("rhythm-beams", tabBarRenderer.RhythmBeams);
 
             return tabBarRenderer;
         }

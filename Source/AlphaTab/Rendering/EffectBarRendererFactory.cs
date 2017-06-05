@@ -37,7 +37,7 @@ namespace AlphaTab.Rendering
             IsInAccolade = false;
         }
 
-        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar, FastDictionary<string, object> additionalSettings)
+        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar, StaveSettings staveSettings)
         {
             return new EffectBarRenderer(renderer, bar, _infos);
         }

@@ -66,7 +66,7 @@ namespace AlphaTab.Platform.JavaScript
             switch (cmd)
             {
                 case "alphaTab.initialize":
-                    var settings = Settings.FromJson(data.Member("settings"));
+                    var settings = Settings.FromJson(data.Member("settings"), null);
                     _renderer = new ScoreRenderer(settings);
                     _renderer.PartialRenderFinished += result => PostMessage(new { cmd = "alphaTab.partialRenderFinished", result = result });
                     _renderer.RenderFinished += result => PostMessage(new { cmd = "alphaTab.renderFinished", result = result });
@@ -101,7 +101,7 @@ namespace AlphaTab.Platform.JavaScript
 
         private void UpdateSettings(object settings)
         {
-            _renderer.UpdateSettings(Settings.FromJson(settings));
+            _renderer.UpdateSettings(Settings.FromJson(settings, null));
         }
 
         private void RenderMultiple(int[] trackIndexes)

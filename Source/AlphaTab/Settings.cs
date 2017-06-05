@@ -117,21 +117,24 @@ namespace AlphaTab
         ///  <li><strong>barsPerRow</strong> - Limit the displayed bars per row, <em>-1 for sized based limit</em> (integer, default:-1)</li>
         ///  <li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li>
         ///  <li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li>
-        ///  <li><strong>hideInfo</strong> - Render the song information or not (boolean, default:true)</li>
+        ///  <li><strong>hideInfo</strong> - Render the song information or not (boolean, default:false)</li>
+        ///  <li><strong>hideTuning</strong> - Render the tuning information or not (boolean, default:false)</li>
+        ///  <li><strong>hideTrackNames</strong> - Render the track names or not (boolean, default:false)</li>
         /// </ul>
         /// <strong>mode=horizontal</strong>
         /// <ul>
         ///  <li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li>
         ///  <li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li>
+        ///  <li><strong>hideTrackNames</strong> - Render the track names or not (boolean, default:false)</li>
         /// </ul>
         /// </summary>
         public FastDictionary<string, object> AdditionalSettings { get; set; }
 
         public T Get<T>(string key, T def)
         {
-            if (AdditionalSettings.ContainsKey(key))
+            if (AdditionalSettings.ContainsKey(key.ToLower()))
             {
-                return (T)(AdditionalSettings[key]);
+                return (T)(AdditionalSettings[key.ToLower()]);
             }
             return def;
         }
@@ -179,5 +182,16 @@ namespace AlphaTab
             Id = id;
             AdditionalSettings = new FastDictionary<string, object>();
         }
+
+        public T Get<T>(string key, T def)
+        {
+            if (AdditionalSettings.ContainsKey(key.ToLower()))
+            {
+                return (T)(AdditionalSettings[key.ToLower()]);
+            }
+            return def;
+        }
+
+
     }
 }

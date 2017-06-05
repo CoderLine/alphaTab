@@ -42,6 +42,6 @@ namespace AlphaTab.Rendering
         {
             return !HideOnPercussionTrack || !track.IsPercussion;
         }
-        public abstract BarRendererBase Create(ScoreRenderer renderer, Bar bar, FastDictionary<string, object> additionalSettings);
+        public abstract BarRendererBase Create(ScoreRenderer renderer, Bar bar, StaveSettings staveSettings);
     }
 }

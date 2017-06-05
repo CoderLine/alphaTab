@@ -28,7 +28,7 @@ namespace AlphaTab.Rendering
     {
         public override string StaffId { get { return ScoreBarRenderer.StaffId; } }
 
-        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar, FastDictionary<string, object> additionalSettings)
+        public override BarRendererBase Create(ScoreRenderer renderer, Bar bar, StaveSettings staveSettings)
         {
             return new ScoreBarRenderer(renderer, bar);
         }

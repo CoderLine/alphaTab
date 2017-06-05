@@ -30,7 +30,6 @@ namespace AlphaTab.Rendering.Staves
     public class Staff
     {
         private readonly BarRendererFactory _factory;
-        private readonly FastDictionary<string, object> _settings;
 
         public StaveTrackGroup StaveTrackGroup { get; set; }
         public StaveGroup StaveGroup { get; set; }
@@ -74,28 +73,17 @@ namespace AlphaTab.Rendering.Staves
         public bool IsFirstInAccolade { get; set; }
         public bool IsLastInAccolade { get; set; }
 
-        public Staff(int trackIndex, Model.Staff staff, BarRendererFactory factory, FastDictionary<string, object> settings)
+        public Staff(int trackIndex, Model.Staff staff, BarRendererFactory factory)
         {
             BarRenderers = new FastList<BarRendererBase>();
             TrackIndex = trackIndex;
             ModelStaff = staff;
             _factory = factory;
-            _settings = settings;
             TopSpacing = 15;
             BottomSpacing = 5;
             StaveTop = 0;
             StaveBottom = 0;
         }
-
-        public T GetSetting<T>(string key, T def)
-        {
-            if (_settings.ContainsKey(key))
-            {
-                return (T)(_settings[key]);
-            }
-            return def;
-        }
-
 
         public bool IsInAccolade
         {
@@ -133,7 +121,7 @@ namespace AlphaTab.Rendering.Staves
             }
             else
             {
-                renderer = _factory.Create(StaveGroup.Layout.Renderer, bar, _settings);
+                renderer = _factory.Create(StaveGroup.Layout.Renderer, bar, StaveGroup.Layout.Renderer.Settings.Staves);
             }
             renderer.Staff = this;
             renderer.Index = BarRenderers.Count;

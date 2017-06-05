@@ -632,20 +632,16 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
     this.Element = element;
     this.Element.classList.add("alphaTab");
     // load settings
-    var settings = this.Settings = AlphaTab.Settings.FromJson(options);
-    var pitchOffsets = this.GetData("pitches");
-    if (pitchOffsets != null && (pitchOffsets instanceof Array)){
-        settings.PitchOffsets = pitchOffsets;
-    }
+    var dataAttributes = this.GetDataAttributes();
+    var settings = this.Settings = AlphaTab.Settings.FromJson(options, dataAttributes);
     // get track data to parse
     var tracksData;
     if (options != null && options.tracks){
         tracksData = options.tracks;
     }
     else {
-        var data = this.GetData("tracks");
-        if (data != null){
-            tracksData = data;
+        if (dataAttributes.hasOwnProperty("tracks")){
+            tracksData = dataAttributes["tracks"];
         }
         else {
             tracksData = 0;
@@ -655,7 +651,7 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
     var contents = "";
     if (element != null){
         // get load contents
-        if (this.GetData("tex") != null && element.innerText){
+        if (dataAttributes.hasOwnProperty("tex") && element.innerText){
             contents = (element.innerHTML).trim();
             element.innerHTML = "";
         }
@@ -728,9 +724,8 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
             this.Load(options.file);
         }
         else {
-            var file = this.GetData("file");
-            if (!((file==null)||(file.length==0))){
-                this.Load(file);
+            if (dataAttributes.hasOwnProperty("file")){
+                this.Load(dataAttributes["file"]);
             }
         }
     });
@@ -757,23 +752,41 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
     get_IsElementVisible: function (){
         return !!(this.Element.offsetWidth || this.Element.offsetHeight || this.Element.getClientRects().length);
     },
-    GetData: function (name){
-        var value;
+    GetDataAttributes: function (){
+        var dataAttributes = {};
         if (this.Element.dataset){
-            value = this.Element.dataset[name];
+            for (var key in this.Element.dataset){
+                var value = this.Element.dataset[key];
+                try{
+                    value = JSON.parse(value);
+                }
+                catch($$e1){
+                    if (value == ""){
+                        value = null;
+                    }
+                }
+                dataAttributes[key] = value;
+            }
         }
         else {
-            value = this.Element.getAttribute("data-" + name);
-        }
-        try{
-            return JSON.parse(value);
-        }
-        catch($$e1){
-            if (value == ""){
-                return null;
+            for (var i = 0; i < this.Element.attributes.length; i++){
+                var attr = this.Element.attributes[i];
+                if (attr.nodeName.indexOf("data-")==0){
+                    var key = attr.nodeName.substr(5).replace("-", "");
+                    var value = attr.nodeValue;
+                    try{
+                        value = JSON.parse(value);
+                    }
+                    catch($$e2){
+                        if (value == ""){
+                            value = null;
+                        }
+                    }
+                    dataAttributes[key] = value;
+                }
             }
-            return value;
         }
+        return dataAttributes;
     },
     TriggerResize: function (){
         // if the element is visible, perfect, we do the update
@@ -974,7 +987,7 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
             try{
                 tracksData = JSON.parse(tracksData);
             }
-            catch($$e2){
+            catch($$e3){
                 tracksData = new Int32Array([0]);
             }
         }
@@ -1019,7 +1032,7 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
             var e = document.createEvent("CustomEvent");
             e.initCustomEvent(name, false, false, details);
             this.Element.dispatchEvent(e);
-            if ("jQuery"in window){
+            if (window&&"jQuery"in window){
                 var jquery = window["jQuery"];
                 jquery(this.Element).trigger(name, details);
             }
@@ -1073,7 +1086,7 @@ AlphaTab.Platform.JavaScript.JsWorker.prototype = {
         var cmd = data["cmd"];
         switch (cmd){
             case "alphaTab.initialize":
-                var settings = AlphaTab.Settings.FromJson(data["settings"]);
+                var settings = AlphaTab.Settings.FromJson(data["settings"], null);
                 this._renderer = new AlphaTab.Rendering.ScoreRenderer(settings);
                 this._renderer.add_PartialRenderFinished($CreateAnonymousDelegate(this, function (result){
                 this._main.postMessage({
@@ -1130,7 +1143,7 @@ AlphaTab.Platform.JavaScript.JsWorker.prototype = {
         }
     },
     UpdateSettings: function (settings){
-        this._renderer.UpdateSettings(AlphaTab.Settings.FromJson(settings));
+        this._renderer.UpdateSettings(AlphaTab.Settings.FromJson(settings, null));
     },
     RenderMultiple: function (trackIndexes){
         this._trackIndexes = trackIndexes;
@@ -1602,7 +1615,7 @@ AlphaTab.Platform.JavaScript.WorkerScoreRenderer = function (settings){
     try{
         this._worker = new Worker(settings.ScriptFile);
     }
-    catch($$e3){
+    catch($$e4){
         // fallback to blob worker 
         try{
             var script = "importScripts(\'" + settings.ScriptFile + "\')";
@@ -2059,16 +2072,16 @@ AlphaTab.Settings.prototype = {
         return json;
     }
 };
-AlphaTab.Settings.FromJson = function (json){
+AlphaTab.Settings.FromJson = function (json, dataAttributes){
     if ((json instanceof AlphaTab.Settings)){
         return json;
     }
     var settings = AlphaTab.Settings.get_Defaults();
     settings.ScriptFile = AlphaTab.Environment.ScriptFile;
-    AlphaTab.Settings.FillFromJson(settings, json);
+    AlphaTab.Settings.FillFromJson(settings, json, dataAttributes);
     return settings;
 };
-AlphaTab.Settings.FillFromJson = function (settings, json){
+AlphaTab.Settings.FillFromJson = function (settings, json, dataAttributes){
     if (self.document && self.window["ALPHATAB_ROOT"]){
         settings.ScriptFile = self.window["ALPHATAB_ROOT"];
         settings.ScriptFile = AlphaTab.Settings.EnsureFullUrl(settings.ScriptFile);
@@ -2090,53 +2103,82 @@ AlphaTab.Settings.FillFromJson = function (settings, json){
             }
         }
     }
-    if (!json){
-        return;
-    }
-    if ("scale"in json)
+    if (json&&"scale"in json)
         settings.Scale = json.scale;
-    if ("width"in json)
+    if (json&&"width"in json)
         settings.Width = json.width;
-    if ("height"in json)
+    if (json&&"height"in json)
         settings.Height = json.height;
-    if ("engine"in json)
+    if (json&&"engine"in json)
         settings.Engine = json.engine;
-    if ("stretchForce"in json)
+    if (json&&"stretchForce"in json)
         settings.StretchForce = json.stretchForce;
-    if ("forcePianoFingering"in json)
+    if (json&&"forcePianoFingering"in json)
         settings.ForcePianoFingering = json.forcePianoFingering;
-    if ("lazy"in json)
+    if (json&&"lazy"in json)
         settings.DisableLazyLoading = !json.lazy;
-    if ("pitchOffsets"in json)
+    if (json&&"pitchOffsets"in json)
         settings.PitchOffsets = json.pitchOffsets;
-    if ("scriptFile"in json){
+    else if (dataAttributes != null && dataAttributes.hasOwnProperty("pitches")){
+        var pitchOffsets = dataAttributes["pitches"];
+        if (pitchOffsets != null && (pitchOffsets instanceof Array)){
+            settings.PitchOffsets = pitchOffsets;
+        }
+    }
+    if (json&&"scriptFile"in json){
         settings.ScriptFile = AlphaTab.Settings.EnsureFullUrl(json.scriptFile);
         settings.ScriptFile = AlphaTab.Settings.AppendScriptName(settings.ScriptFile);
     }
-    if ("fontDirectory"in json){
+    if (json&&"fontDirectory"in json){
         settings.FontDirectory = AlphaTab.Settings.EnsureFullUrl(json.fontDirectory);
     }
-    if ("layout"in json){
+    if (json&&"layout"in json){
         settings.Layout = AlphaTab.Settings.LayoutFromJson(json.layout);
     }
-    if ("staves"in json){
-        var val = json.staves;
-        if (typeof(val) == "string"){
-            settings.Staves = new AlphaTab.StaveSettings(val);
-        }
-        else {
-            if (val.id){
-                var staveSettings = new AlphaTab.StaveSettings(val.id);
-                if (val.additionalSettings){
-                    var keys2 = Object.keys(val.additionalSettings);
-                    for (var $i14 = 0,$l14 = keys2.length,key2 = keys2[$i14]; $i14 < $l14; $i14++, key2 = keys2[$i14]){
-                        staveSettings.AdditionalSettings[key2] = val.additionalSettings[key2];
-                    }
-                }
-                settings.Staves = staveSettings;
+    else if (dataAttributes != null && dataAttributes.hasOwnProperty("layout")){
+        settings.Layout = AlphaTab.Settings.LayoutFromJson(dataAttributes["layout"]);
+    }
+    if (dataAttributes != null){
+        for (var key in dataAttributes){
+            if (key.indexOf("layout")==0){
+                var property = key.substr(6);
+                settings.Layout.AdditionalSettings[property.toLowerCase()] = dataAttributes[key];
             }
         }
     }
+    if (json&&"staves"in json){
+        settings.Staves = AlphaTab.Settings.StavesFromJson(json.staves);
+    }
+    else if (dataAttributes != null && dataAttributes.hasOwnProperty("staves")){
+        settings.Staves = AlphaTab.Settings.StavesFromJson(dataAttributes["staves"]);
+    }
+    if (dataAttributes != null){
+        for (var key in dataAttributes){
+            if (key.indexOf("staves")==0){
+                var property = key.substr(6);
+                settings.Staves.AdditionalSettings[property.toLowerCase()] = dataAttributes[key];
+            }
+        }
+    }
+};
+AlphaTab.Settings.StavesFromJson = function (json){
+    var staveSettings;
+    if (typeof(json) == "string"){
+        staveSettings = new AlphaTab.StaveSettings(json);
+    }
+    else if (json.id){
+        staveSettings = new AlphaTab.StaveSettings(json.id);
+        if (json.additionalSettings){
+            var keys2 = Object.keys(json.additionalSettings);
+            for (var $i14 = 0,$l14 = keys2.length,key2 = keys2[$i14]; $i14 < $l14; $i14++, key2 = keys2[$i14]){
+                staveSettings.AdditionalSettings[key2.toLowerCase()] = json.additionalSettings[key2];
+            }
+        }
+    }
+    else {
+        return new AlphaTab.StaveSettings("score-tab");
+    }
+    return staveSettings;
 };
 AlphaTab.Settings.LayoutFromJson = function (json){
     var layout = new AlphaTab.LayoutSettings();
@@ -2149,7 +2191,7 @@ AlphaTab.Settings.LayoutFromJson = function (json){
         if (json.additionalSettings){
             var keys = Object.keys(json.additionalSettings);
             for (var $i15 = 0,$l15 = keys.length,key = keys[$i15]; $i15 < $l15; $i15++, key = keys[$i15]){
-                layout.AdditionalSettings[key] = json.additionalSettings[key];
+                layout.AdditionalSettings[key.toLowerCase()] = json.additionalSettings[key];
             }
         }
     }
@@ -6302,7 +6344,7 @@ AlphaTab.Importer.GpxFileSystem.prototype = {
                 }
             }
         }
-        catch($$e4){
+        catch($$e5){
         }
         buffer = uncompressed.GetBuffer();
         var resultOffset = skipHeader ? 4 : 0;
@@ -6487,7 +6529,7 @@ AlphaTab.Importer.GpxParser.prototype = {
         try{
             dom = new AlphaTab.Xml.XmlDocument(xml);
         }
-        catch($$e5){
+        catch($$e6){
             throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(""), new Error());
         }
         this.ParseDom(dom);
@@ -7785,7 +7827,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         try{
             dom = new AlphaTab.Xml.XmlDocument(xml);
         }
-        catch($$e6){
+        catch($$e7){
             throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(""), new Error());
         }
         this._score = new AlphaTab.Model.Score();
@@ -8918,7 +8960,7 @@ AlphaTab.IO.BitReader.prototype = {
                 all.WriteByte(this.ReadByte());
             }
         }
-        catch($$e7){
+        catch($$e8){
         }
         return all.ToArray();
     }
@@ -11463,7 +11505,7 @@ AlphaTab.Rendering.EffectBarRendererFactory.prototype = {
     get_StaffId: function (){
         return this._staffId;
     },
-    Create: function (renderer, bar, additionalSettings){
+    Create: function (renderer, bar, staveSettings){
         return new AlphaTab.Rendering.EffectBarRenderer(renderer, bar, this._infos);
     }
 };
@@ -15258,7 +15300,7 @@ AlphaTab.Rendering.Layout.ScoreLayout.prototype = {
             }
         }
         // tuning info
-        if (this.Renderer.Tracks.length == 1 && !this.Renderer.Tracks[0].IsPercussion){
+        if (this.Renderer.Tracks.length == 1 && !this.Renderer.Tracks[0].IsPercussion && !this.Renderer.Settings.Layout.Get("hideTuning", false)){
             var tuning = AlphaTab.Model.Tuning.FindTuning(this.Renderer.Tracks[0].Tuning);
             if (tuning != null){
                 this.TuningGlyph = new AlphaTab.Rendering.Glyphs.TuningGlyph(0, 0, this.get_Scale(), this.Renderer.RenderingResources, tuning);
@@ -15279,7 +15321,7 @@ AlphaTab.Rendering.Layout.ScoreLayout.prototype = {
                     var factory = profile[renderStaveIndex];
                     var staff = track.Staves[staveIndex];
                     if (factory.CanCreate(track, staff)){
-                        group.AddStaff(track, new AlphaTab.Rendering.Staves.Staff(trackIndex, staff, factory, this.Renderer.Settings.Staves.AdditionalSettings));
+                        group.AddStaff(track, new AlphaTab.Rendering.Staves.Staff(trackIndex, staff, factory));
                     }
                 }
             }
@@ -16423,7 +16465,7 @@ AlphaTab.Rendering.ScoreBarRendererFactory.prototype = {
     get_StaffId: function (){
         return "score";
     },
-    Create: function (renderer, bar, additionalSettings){
+    Create: function (renderer, bar, staveSettings){
         return new AlphaTab.Rendering.ScoreBarRenderer(renderer, bar);
     }
 };
@@ -16800,9 +16842,8 @@ AlphaTab.Rendering.Staves.MasterBarsRenderers = function (){
     this.LayoutingInfo = null;
     this.Renderers = [];
 };
-AlphaTab.Rendering.Staves.Staff = function (trackIndex, staff, factory, settings){
+AlphaTab.Rendering.Staves.Staff = function (trackIndex, staff, factory){
     this._factory = null;
-    this._settings = null;
     this.StaveTrackGroup = null;
     this.StaveGroup = null;
     this.BarRenderers = null;
@@ -16823,7 +16864,6 @@ AlphaTab.Rendering.Staves.Staff = function (trackIndex, staff, factory, settings
     this.TrackIndex = trackIndex;
     this.ModelStaff = staff;
     this._factory = factory;
-    this._settings = settings;
     this.TopSpacing = 15;
     this.BottomSpacing = 5;
     this.StaveTop = 0;
@@ -16832,12 +16872,6 @@ AlphaTab.Rendering.Staves.Staff = function (trackIndex, staff, factory, settings
 AlphaTab.Rendering.Staves.Staff.prototype = {
     get_StaveId: function (){
         return this._factory.get_StaffId();
-    },
-    GetSetting: function (key, def){
-        if (this._settings.hasOwnProperty(key)){
-            return (this._settings[key]);
-        }
-        return def;
     },
     get_IsInAccolade: function (){
         return this._factory.IsInAccolade;
@@ -16861,7 +16895,7 @@ AlphaTab.Rendering.Staves.Staff.prototype = {
             renderer = new AlphaTab.Rendering.BarRendererBase(this.StaveGroup.Layout.Renderer, bar);
         }
         else {
-            renderer = this._factory.Create(this.StaveGroup.Layout.Renderer, bar, this._settings);
+            renderer = this._factory.Create(this.StaveGroup.Layout.Renderer, bar, this.StaveGroup.Layout.Renderer.Settings.Staves);
         }
         renderer.Staff = this;
         renderer.Index = this.BarRenderers.length;
@@ -17042,14 +17076,19 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
     CalculateAccoladeSpacing: function (tracks){
         if (!this._accoladeSpacingCalculated && this.Index == 0){
             this._accoladeSpacingCalculated = true;
-            var canvas = this.Layout.Renderer.Canvas;
-            var res = this.Layout.Renderer.RenderingResources.EffectFont;
-            canvas.set_Font(res);
-            for (var i = 0; i < tracks.length; i++){
-                this.AccoladeSpacing = Math.max(this.AccoladeSpacing, canvas.MeasureText(tracks[i].ShortName));
+            if (this.Layout.Renderer.Settings.Layout.Get("hideTrackNames", false)){
+                this.AccoladeSpacing = 0;
             }
-            this.AccoladeSpacing += (20);
-            this.Width += this.AccoladeSpacing;
+            else {
+                var canvas = this.Layout.Renderer.Canvas;
+                var res = this.Layout.Renderer.RenderingResources.EffectFont;
+                canvas.set_Font(res);
+                for (var i = 0; i < tracks.length; i++){
+                    this.AccoladeSpacing = Math.max(this.AccoladeSpacing, canvas.MeasureText(tracks[i].ShortName));
+                }
+                this.AccoladeSpacing += (20);
+                this.Width += this.AccoladeSpacing;
+            }
         }
     },
     GetStaveTrackGroup: function (track){
@@ -17142,7 +17181,7 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
                     var accoladeStart = firstStart - (barSize * 4);
                     var accoladeEnd = lastEnd + (barSize * 4);
                     // text
-                    if (this.Index == 0){
+                    if (this.Index == 0 && !this.Layout.Renderer.Settings.Layout.Get("hideTrackNames", false)){
                         canvas.FillText(g.Track.ShortName, cx + (10 * this.Layout.get_Scale()), firstStart);
                     }
                     // rect
@@ -17553,17 +17592,11 @@ AlphaTab.Rendering.TabBarRendererFactory.prototype = {
     CanCreate: function (track, staff){
         return track.Tuning.length > 0 && AlphaTab.Rendering.BarRendererFactory.prototype.CanCreate.call(this, track, staff);
     },
-    Create: function (renderer, bar, additionalSettings){
+    Create: function (renderer, bar, staveSettings){
         var tabBarRenderer = new AlphaTab.Rendering.TabBarRenderer(renderer, bar);
-        if (additionalSettings.hasOwnProperty("rhythm")){
-            tabBarRenderer.RenderRhythm = additionalSettings["rhythm"];
-        }
-        if (additionalSettings.hasOwnProperty("rhythm-height")){
-            tabBarRenderer.RhythmHeight = additionalSettings["rhythm-height"];
-        }
-        if (additionalSettings.hasOwnProperty("rhythm-beams")){
-            tabBarRenderer.RhythmBeams = additionalSettings["rhythm-beams"];
-        }
+        tabBarRenderer.RenderRhythm = staveSettings.Get("rhythm", tabBarRenderer.RenderRhythm);
+        tabBarRenderer.RhythmHeight = staveSettings.Get("rhythm-height", tabBarRenderer.RhythmHeight);
+        tabBarRenderer.RhythmBeams = staveSettings.Get("rhythm-beams", tabBarRenderer.RhythmBeams);
         return tabBarRenderer;
     }
 };
@@ -18176,8 +18209,8 @@ AlphaTab.LayoutSettings = function (){
 };
 AlphaTab.LayoutSettings.prototype = {
     Get: function (key, def){
-        if (this.AdditionalSettings.hasOwnProperty(key)){
-            return (this.AdditionalSettings[key]);
+        if (this.AdditionalSettings.hasOwnProperty(key.toLowerCase())){
+            return (this.AdditionalSettings[key.toLowerCase()]);
         }
         return def;
     }
@@ -18192,6 +18225,14 @@ AlphaTab.StaveSettings = function (id){
     this.AdditionalSettings = null;
     this.Id = id;
     this.AdditionalSettings = {};
+};
+AlphaTab.StaveSettings.prototype = {
+    Get: function (key, def){
+        if (this.AdditionalSettings.hasOwnProperty(key.toLowerCase())){
+            return (this.AdditionalSettings[key.toLowerCase()]);
+        }
+        return def;
+    }
 };
 AlphaTab.Util = AlphaTab.Util || {};
 AlphaTab.Util.Lazy = function (factory){

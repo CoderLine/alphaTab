@@ -104,7 +104,7 @@ namespace AlphaTab.Rendering.Layout
             }
 
             // tuning info
-            if (Renderer.Tracks.Length == 1 && !Renderer.Tracks[0].IsPercussion)
+            if (Renderer.Tracks.Length == 1 && !Renderer.Tracks[0].IsPercussion && !Renderer.Settings.Layout.Get("hideTuning", false))
             {
                 var tuning = Tuning.FindTuning(Renderer.Tracks[0].Tuning);
                 if (tuning != null)
@@ -142,7 +142,7 @@ namespace AlphaTab.Rendering.Layout
                         var staff = track.Staves[staveIndex];
                         if (factory.CanCreate(track, staff))
                         {
-                            group.AddStaff(track, new Staff(trackIndex, staff, factory, Renderer.Settings.Staves.AdditionalSettings));
+                            group.AddStaff(track, new Staff(trackIndex, staff, factory));
                         }
                     }
                 }
