@@ -228,7 +228,6 @@
     //
     // Plugin 02: Cursors
     
-    var selectionStart = null;
     var selectionEnd = null;
     var selecting = false;
     
@@ -482,7 +481,8 @@
     
     api.cursorOptions = function(element, context, options) {
         if(options) {
-            context.cursorOptions = $.extend(cursorOptionsDefaults, options);
+            var defaults = $.extend({}, cursorOptionsDefaults);
+            context.cursorOptions = $.extend(defaults, options);
         }
         else {
             return context.cursorOptions;
@@ -499,7 +499,8 @@
         if(element.data('alphaSynthCursor')) { return; }
         element.data('alphaSynthCursor', true);
                 
-        context.cursorOptions = $.extend(cursorOptionsDefaults, options);
+        var defaults = $.extend({}, cursorOptionsDefaults);                
+        context.cursorOptions = $.extend(defaults, options);
         
         //
         // Create cursors
@@ -572,7 +573,7 @@
                 var relY = e.pageY - parentOffset.top;
                 var beat = api.getBeatAtPos(element, context, relX, relY);
                 if(beat) {
-                    selectionStart = {
+                    context.selectionStart = {
                         beat: beat
                     };
                     selectionEnd = null;
@@ -590,13 +591,15 @@
                             beat: beat
                         };
                         
-                        api.playerCursorSelectRange(element, context, selectionStart, selectionEnd);
+                        api.playerCursorSelectRange(element, context, context.selectionStart, selectionEnd);
                     }
                 }
             });
             $(context.CanvasElement).on('mouseup', function(e) {
                 e.preventDefault();
-                                                
+                                            
+                var selectionStart = context.selectionStart;
+                                            
                 // for the selection ensure start < end
                 if(selectionEnd) {
                     var startTick = selectionStart.beat.get_AbsoluteStart();
@@ -636,8 +639,8 @@
             });
             
             element.on('alphaTab.postRendered', function(e) {
-                if(selectionStart) {
-                    api.playerCursorSelectRange(element, context, selectionStart, selectionEnd);
+                if(context.selectionStart) {
+                    api.playerCursorSelectRange(element, context, context.selectionStart, selectionEnd);
                 }
             });
             
