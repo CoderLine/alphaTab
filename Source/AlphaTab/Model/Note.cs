@@ -310,6 +310,8 @@ namespace AlphaTab.Model
                     TieOrigin.IsTieOrigin = true;
                     TieOrigin.TieDestination = this;
                     Fret = TieOrigin.Fret;
+                    Octave = TieOrigin.Octave;
+                    Tone = TieOrigin.Tone;
                 }
             }
 

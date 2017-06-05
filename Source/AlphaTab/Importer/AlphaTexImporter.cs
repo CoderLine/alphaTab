@@ -44,6 +44,7 @@ namespace AlphaTab.Importer
         private bool _allowNegatives;
 
         private Duration _currentDuration;
+        private FastList<Lyrics> _lyrics;
 
         public override string Name { get { return "AlphaTex"; } }
 
@@ -54,11 +55,13 @@ namespace AlphaTab.Importer
                 CreateDefaultScore();
                 _curChPos = 0;
                 _currentDuration = Duration.Quarter;
+                _lyrics = new FastList<Lyrics>();
                 NextChar();
                 NewSy();
                 Score();
 
                 _score.Finish();
+                _track.ApplyLyrics(_lyrics);
                 return _score;
             }
             catch (Exception e)
@@ -257,10 +260,11 @@ namespace AlphaTab.Importer
                 }
                 else if (_ch == 0x22 /* " */ || _ch == 0x27 /* ' */)
                 {
+                    var startChar = _ch;
                     NextChar();
                     var s = new StringBuilder();
                     _sy = AlphaTexSymbols.String;
-                    while (_ch != 0x22 /* " */ && _ch != 0x27 /* ' */ && _ch != Eof)
+                    while (_ch != startChar && _ch != Eof)
                     {
                         s.AppendChar(_ch);
                         NextChar();
@@ -634,6 +638,34 @@ namespace AlphaTab.Importer
                         Error("instrument", AlphaTexSymbols.Number);
                     }
                     NewSy();
+                    anyMeta = true;
+                }
+                else if (syData == "lyrics")
+                {
+                    NewSy();
+
+                    var lyrics = new Lyrics();
+                    lyrics.StartBar = 0;
+                    lyrics.Text = "";
+
+                    if (_sy == AlphaTexSymbols.Number) // Name
+                    {
+                        lyrics.StartBar = (int)_syData;
+                        NewSy();
+                    }
+
+                    if (_sy == AlphaTexSymbols.String)
+                    {
+                        lyrics.Text = (string)_syData;
+                        NewSy();
+                    }
+                    else
+                    {
+                        Error("lyrics", AlphaTexSymbols.String);
+                    }
+
+                    _lyrics.Add(lyrics);
+
                     anyMeta = true;
                 }
                 else if (anyMeta)
@@ -1068,10 +1100,9 @@ namespace AlphaTab.Importer
         private void Note(Beat beat)
         {
             // fret.string
-            var syData = _syData.ToString().ToLower();
 
-            var isDead = syData == "x";
-            var isTie = syData == "-";
+            var isDead = _syData == "x";
+            var isTie = _syData == "-";
             var fret = -1;
             var octave = -1;
             var tone = -1;
@@ -1081,7 +1112,7 @@ namespace AlphaTab.Importer
                     fret = (int)_syData;
                     break;
                 case AlphaTexSymbols.String:
-                    if (syData == "x" || syData == "-")
+                    if (isTie || isDead)
                     {
                         fret = 0;
                     }
@@ -1103,8 +1134,10 @@ namespace AlphaTab.Importer
 
             NewSy(); // Fret done
 
+            var isFretted = octave == -1 && _track.Tuning.Length > 0;
+
             int @string = -1;
-            if (octave == -1)
+            if (isFretted)
             {
                 // Fret [Dot] String
 
@@ -1114,7 +1147,7 @@ namespace AlphaTab.Importer
                 }
                 NewSy(); // dot done
 
-                if (_sy != AlphaTexSymbols.Number)
+                if (_sy == AlphaTexSymbols.Number)
                 {
                     Error("note-string", AlphaTexSymbols.Number);
                 }
@@ -1129,7 +1162,7 @@ namespace AlphaTab.Importer
             // read effects
             var note = new Note();
             beat.AddNote(note);
-            if (octave == -1)
+            if (isFretted)
             {
                 note.String = _track.Tuning.Length - (@string - 1);
                 note.IsDead = isDead;
@@ -1143,6 +1176,7 @@ namespace AlphaTab.Importer
             {
                 note.Octave = octave;
                 note.Tone = tone;
+                note.IsTieDestination = isTie;
             }
 
             NoteEffects(note);
