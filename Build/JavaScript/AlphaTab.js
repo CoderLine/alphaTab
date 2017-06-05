@@ -1599,7 +1599,21 @@ AlphaTab.Platform.JavaScript.WorkerScoreRenderer = function (settings){
     this.ScoreLoaded = null;
     this.BoundsLookup = null;
     this.Score = null;
-    this._worker = new Worker(settings.ScriptFile);
+    try{
+        this._worker = new Worker(settings.ScriptFile);
+    }
+    catch($$e3){
+        // fallback to blob worker 
+        try{
+            var script = "importScripts(\'" + settings.ScriptFile + "\')";
+            var blob = new Blob([script]);
+            this._worker = new Worker(window.URL.createObjectURL(blob));
+        }
+        catch(e){
+            AlphaTab.Util.Logger.Error("Rendering", "Failed to create WebWorker: " + e);
+            // TODO: fallback to synchronous mode
+        }
+    }
     this._worker.postMessage({
         cmd: "alphaTab.initialize",
         settings: settings.ToJson()
@@ -6288,7 +6302,7 @@ AlphaTab.Importer.GpxFileSystem.prototype = {
                 }
             }
         }
-        catch($$e3){
+        catch($$e4){
         }
         buffer = uncompressed.GetBuffer();
         var resultOffset = skipHeader ? 4 : 0;
@@ -6473,7 +6487,7 @@ AlphaTab.Importer.GpxParser.prototype = {
         try{
             dom = new AlphaTab.Xml.XmlDocument(xml);
         }
-        catch($$e4){
+        catch($$e5){
             throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(""), new Error());
         }
         this.ParseDom(dom);
@@ -7771,7 +7785,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         try{
             dom = new AlphaTab.Xml.XmlDocument(xml);
         }
-        catch($$e5){
+        catch($$e6){
             throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(""), new Error());
         }
         this._score = new AlphaTab.Model.Score();
@@ -8904,7 +8918,7 @@ AlphaTab.IO.BitReader.prototype = {
                 all.WriteByte(this.ReadByte());
             }
         }
-        catch($$e6){
+        catch($$e7){
         }
         return all.ToArray();
     }

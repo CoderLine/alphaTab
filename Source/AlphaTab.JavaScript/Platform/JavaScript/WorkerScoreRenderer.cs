@@ -19,9 +19,12 @@ using System;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
+using AlphaTab.Util;
 using SharpKit.Html;
+using SharpKit.Html.fileapi;
 using SharpKit.Html.workers;
 using SharpKit.JavaScript;
+using Console = System.Console;
 using WorkerContext = SharpKit.Html.workers.WorkerContext;
 
 namespace AlphaTab.Platform.JavaScript
@@ -35,7 +38,25 @@ namespace AlphaTab.Platform.JavaScript
 
         public WorkerScoreRenderer(Settings settings)
         {
-            _worker = new Worker(settings.ScriptFile);
+            try
+            {
+                _worker = new Worker(settings.ScriptFile);
+            }
+            catch
+            {
+                // fallback to blob worker 
+                try
+                {
+                    var script = "importScripts('" + settings.ScriptFile + "')";
+                    var blob = new Blob(new[] { script });
+                    _worker = new Worker(window.URL.createObjectURL(blob));
+                }
+                catch (Exception e)
+                {
+                    Logger.Error("Rendering", "Failed to create WebWorker: " + e);
+                    // TODO: fallback to synchronous mode
+                }
+            }
             _worker.postMessage(new { cmd = "alphaTab.initialize", settings = settings.ToJson() });
             _worker.addEventListener("message", HandleWorkerMessage, false);
         }
@@ -52,7 +73,7 @@ namespace AlphaTab.Platform.JavaScript
 
         public void Resize(int width)
         {
-            _worker.postMessage(new { cmd = "alphaTab.resize", width = width  });
+            _worker.postMessage(new { cmd = "alphaTab.resize", width = width });
         }
 
         public void Load(object data, int[] trackIndexes)
@@ -145,7 +166,7 @@ namespace AlphaTab.Platform.JavaScript
         {
             var converter = new JsonConverter();
             Score = converter.ScoreToJsObject(score);
-            _worker.postMessage(new { cmd = "alphaTab.score", score = Score});
+            _worker.postMessage(new { cmd = "alphaTab.score", score = Score });
         }
     }
 }
