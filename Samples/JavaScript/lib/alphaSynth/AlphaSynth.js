@@ -509,6 +509,9 @@ AlphaSynth.Main.AlphaSynthWebWorker.prototype = {
             case "alphaSynth.setPlaybackRange":
                 this._player.set_PlaybackRange(data["value"]);
                 break;
+            case "alphaSynth.setIsLooping":
+                this._player.set_IsLooping(data["value"]);
+                break;
             case "alphaSynth.play":
                 this._player.Play();
                 break;
@@ -559,9 +562,10 @@ AlphaSynth.Main.AlphaSynthWebWorker.prototype = {
             state: e.State
         });
     },
-    OnFinished: function (sender, e){
+    OnFinished: function (isLooping){
         this._main.postMessage({
-            cmd: "alphaSynth.finished"
+            cmd: "alphaSynth.finished",
+            isLooping: isLooping
         });
     },
     OnSoundFontLoaded: function (sender, e){
@@ -606,6 +610,7 @@ $StaticConstructor(function (){
     AlphaSynth.Main.AlphaSynthWebWorker.CmdSetTickPosition = "alphaSynth.setTickPosition";
     AlphaSynth.Main.AlphaSynthWebWorker.CmdSetTimePosition = "alphaSynth.setTimePosition";
     AlphaSynth.Main.AlphaSynthWebWorker.CmdSetPlaybackRange = "alphaSynth.setPlaybackRange";
+    AlphaSynth.Main.AlphaSynthWebWorker.CmdSetIsLooping = "alphaSynth.setIsLooping";
     AlphaSynth.Main.AlphaSynthWebWorker.CmdPlay = "alphaSynth.play";
     AlphaSynth.Main.AlphaSynthWebWorker.CmdPause = "alphaSynth.pause";
     AlphaSynth.Main.AlphaSynthWebWorker.CmdPlayPause = "alphaSynth.playPause";
@@ -656,6 +661,7 @@ AlphaSynth.Main.AlphaSynthWebWorkerApi = function (player, alphaSynthScriptFile)
     this._isMidiLoaded = false;
     this._tickPosition = 0;
     this._timePosition = 0;
+    this._isLooping = false;
     this._playbackRange = null;
     this._output = player;
     this._output.add_Ready($CreateDelegate(this, this.OnOutputReady));
@@ -752,6 +758,16 @@ AlphaSynth.Main.AlphaSynthWebWorkerApi.prototype = {
         this._timePosition = value;
         this._synth.postMessage({
             cmd: "alphaSynth.setTimePosition",
+            value: value
+        });
+    },
+    get_IsLooping: function (){
+        return this._isLooping;
+    },
+    set_IsLooping: function (value){
+        this._isLooping = value;
+        this._synth.postMessage({
+            cmd: "alphaSynth.setIsLooping",
             value: value
         });
     },
@@ -1002,14 +1018,6 @@ AlphaSynth.Main.AlphaSynthWebWorkerApi.prototype = {
         this._outputIsReady = true;
         this.CheckReady();
     }
-};
-AlphaSynth.Main.AlphaSynthWebWorkerApi.QualifyUrl = function (url){
-    var img = document.createElement("a");
-    img.onerror = function (e){
-    };
-    img.href = url;
-    url = img.href;
-    return url;
 };
 AlphaSynth.Platform = AlphaSynth.Platform || {};
 AlphaSynth.Platform.Platform = function (){
@@ -1320,7 +1328,10 @@ AlphaSynth.AlphaSynth = function (){
         // stop everything
         this.Stop();
         AlphaSynth.Util.Logger.Debug("Finished playback");
-        this.OnFinished();
+        this.OnFinished(this._sequencer.IsLooping);
+        if (this._sequencer.IsLooping){
+            this.Play();
+        }
     }));
     this.Output.add_SampleRequest($CreateAnonymousDelegate(this, function (){
         // synthesize buffer
@@ -1397,6 +1408,12 @@ AlphaSynth.AlphaSynth.prototype = {
         if (value != null){
             this.set_TickPosition(value.StartTick);
         }
+    },
+    get_IsLooping: function (){
+        return this._sequencer.IsLooping;
+    },
+    set_IsLooping: function (value){
+        this._sequencer.IsLooping = value;
     },
     Play: function (){
         if (this.get_State() == AlphaSynth.PlayerState.Playing || !this.get_IsReadyForPlayback())
@@ -1509,10 +1526,10 @@ AlphaSynth.AlphaSynth.prototype = {
     remove_Finished: function (value){
         this.Finished = $RemoveDelegate(this.Finished, value);
     },
-    OnFinished: function (){
+    OnFinished: function (isLooping){
         var handler = this.Finished;
         if (handler != null)
-            handler(this, AlphaSynth.EmptyEventArgs.Instance);
+            handler(isLooping);
     },
     add_PlayerStateChanged: function (value){
         this.PlayerStateChanged = $CombineDelegates(this.PlayerStateChanged, value);
@@ -3539,6 +3556,7 @@ AlphaSynth.MidiFileSequencer = function (synthesizer){
     this._playbackRangeEndTime = 0;
     this._endTime = 0;
     this.Finished = null;
+    this.IsLooping = false;
     this.EndTick = 0;
     this.PlaybackSpeed = 0;
     this._synthesizer = synthesizer;

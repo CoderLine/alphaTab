@@ -91,3 +91,8 @@ body > .alphaTab:not(.horizontal) {
 .navbar-nocollapse .navbar-nav>li {
     float: left;
 }
+
+.navbar-nav>li>a {
+    padding-left: 5px;
+    padding-right: 5px;
+}

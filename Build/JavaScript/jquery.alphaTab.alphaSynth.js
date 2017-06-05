@@ -171,6 +171,16 @@
         }
     };
     
+    api.loop = function(element, context, value) {
+        var as = getAlphaSynth(element);
+        if(typeof value === 'undefined') {
+            return as.get_IsLooping();
+        }
+        else {
+            as.set_IsLooping(value);
+        }
+    };
+    
     // methods
     api.play = function(element, context) {
         var as = getAlphaSynth(element);
@@ -649,7 +659,7 @@
                         var realMasterBarEnd = tickCache.GetMasterBarStart(selectionEnd.beat.Voice.Bar.get_MasterBar());
                         as.set_PlaybackRange({
                             StartTick: realMasterBarStart + selectionStart.beat.Start, 
-                            EndTick: realMasterBarEnd + selectionEnd.beat.Start
+                            EndTick: realMasterBarEnd + selectionEnd.beat.Start + selectionEnd.beat.CalculateDuration() - 50
                         });
                     }
                     else {

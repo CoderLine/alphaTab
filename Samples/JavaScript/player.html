@@ -110,7 +110,8 @@
                 <li><a href="#" data-value="2">200%</a></li>
               </ul>
             </li>
-            
+            <li><a href="#" id="looping" class="glyphicon glyphicon-refresh"></a></li>
+           
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <!-- Loading indicator for soundfont -->
@@ -166,6 +167,7 @@
             $('#loadingInfo').hide();
             $('#playPause').prop('disabled', false).removeAttr('disabled');            
             $('#stop').prop('disabled', false).removeAttr('disabled');            
+            $('#looping').prop('disabled', false).removeAttr('disabled');            
             updateControls();
         });
         at.on('alphaTab.playerStateChanged', function() {
@@ -189,6 +191,18 @@
         
         $('#stop').click(function() { 
             at.alphaTab('stop');
+        });
+        
+        $('#looping').click(function(e) {
+            e.preventDefault();
+            var looping = !at.alphaTab('loop');
+            at.alphaTab('loop', looping);
+            if(looping) {
+                $('#looping').closest('li').addClass('active');
+            }
+            else {
+                $('#looping').closest('li').removeClass('active');
+            }
         });
         
         $('#playbackSpeedSelector a').click(function() {
