@@ -55,7 +55,8 @@ namespace AlphaTab
             json.engine = Engine;
             json.stretchForce = StretchForce;
             json.forcePianoFingering = ForcePianoFingering;
-            json.pitchOffsets = PitchOffsets;
+            json.transpositionPitches = TranspositionPitches;
+            json.displayTranspositionPitches = DisplayTranspositionPitches;
 
             json.scriptFile = ScriptFile;
             json.fontDirectory = FontDirectory;
@@ -134,13 +135,23 @@ namespace AlphaTab
             if (Std.JsonExists(json, "stretchForce")) settings.StretchForce = json.stretchForce;
             if (Std.JsonExists(json, "forcePianoFingering")) settings.ForcePianoFingering = json.forcePianoFingering;
             if (Std.JsonExists(json, "lazy")) settings.DisableLazyLoading = !json.lazy;
-            if (Std.JsonExists(json, "pitchOffsets")) settings.PitchOffsets = json.pitchOffsets;
-            else if(dataAttributes != null && dataAttributes.ContainsKey("pitches"))
+            if (Std.JsonExists(json, "transpositionPitches")) settings.TranspositionPitches = json.transpositionPitches;
+            else if(dataAttributes != null && dataAttributes.ContainsKey("transpositionPitches"))
             {
-                var pitchOffsets = dataAttributes["pitches"];
+                var pitchOffsets = dataAttributes["transpositionPitches"];
                 if (pitchOffsets != null && Std.InstanceOf<JsArray>(pitchOffsets))
                 {
-                    settings.PitchOffsets = pitchOffsets.As<int[]>();
+                    settings.TranspositionPitches = pitchOffsets.As<int[]>();
+                }
+            }
+
+            if (Std.JsonExists(json, "displayTranspositionPitches")) settings.DisplayTranspositionPitches = json.displayTranspositionPitches;
+            else if(dataAttributes != null && dataAttributes.ContainsKey("displayTranspositionPitches"))
+            {
+                var pitchOffsets = dataAttributes["displayTranspositionPitches"];
+                if (pitchOffsets != null && Std.InstanceOf<JsArray>(pitchOffsets))
+                {
+                    settings.DisplayTranspositionPitches = pitchOffsets.As<int[]>();
                 }
             }
 

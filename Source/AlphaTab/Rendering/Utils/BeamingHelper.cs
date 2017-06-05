@@ -145,7 +145,7 @@ namespace AlphaTab.Rendering.Utils
             }
             else
             {
-                return n.RealValue;
+                return n.RealValue - _track.DisplayTranspositionPitch;
             }
         }
 

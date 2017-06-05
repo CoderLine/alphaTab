@@ -423,6 +423,9 @@ namespace AlphaTab.Importer
                             track.PlaybackInfo.IsSolo = state == "Solo";
                             track.PlaybackInfo.IsMute = state == "Mute";
                             break;
+                        case "PartSounding":
+                            ParsePartSounding(track, c);
+                            break;
                     }
                 }
             }
@@ -617,6 +620,23 @@ namespace AlphaTab.Importer
             track.PlaybackInfo.SecondaryChannel = Std.ParseInt(node.FindChildElement("SecondaryChannel").InnerText);
 
             track.IsPercussion = node.GetAttribute("table") == "Percussion";
+        }
+
+
+        private void ParsePartSounding(Track track, XmlNode node)
+        {
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "TranspositionPitch":
+                            track.DisplayTranspositionPitch = Std.ParseInt(c.InnerText);
+                            break;
+                    }
+                }
+            }
         }
 
         //
@@ -1357,7 +1377,7 @@ namespace AlphaTab.Importer
                                 // case "Variation": 
                                 // case "Tone": 
                                 case "Octave":
-                                    note.Octave = Std.ParseInt(c.FindChildElement("Number").InnerText) - 1;
+                                    note.Octave = Std.ParseInt(c.FindChildElement("Number").InnerText);
                                     break;
                                 case "Tone":
                                     note.Tone = Std.ParseInt(c.FindChildElement("Step").InnerText);

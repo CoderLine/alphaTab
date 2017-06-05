@@ -96,7 +96,13 @@ namespace AlphaTab.Platform.JavaScript
                     var attr = Element.attributes[i];
                     if (attr.nodeName.As<string>().StartsWith("data-"))
                     {
-                        var key = attr.nodeName.substr(5).replace("-", "");
+                        var keyParts = attr.nodeName.substr(5).split("-");
+                        var key = keyParts[0];
+                        for (int j = 1; j < keyParts.length; j++)
+                        {
+                            key += keyParts[j].substr(0, 1).toUpperCase() + keyParts[j].substr(1);
+                        }
+                        
                         object value = attr.nodeValue;
                         try
                         {

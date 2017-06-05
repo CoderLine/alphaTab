@@ -141,12 +141,13 @@ namespace AlphaTab.Rendering.Utils
 
         private int RegisterNoteLine(Note n)
         {
-            var value = n.Beat.Voice.Bar.Staff.Track.IsPercussion ? PercussionMapper.MapNoteForDisplay(n) : n.RealValue;
+            var track = n.Beat.Voice.Bar.Staff.Track;
+            var value = track.IsPercussion ? PercussionMapper.MapNoteForDisplay(n) : n.RealValue - track.DisplayTranspositionPitch;
             var ks = n.Beat.Voice.Bar.MasterBar.KeySignature;
             var clef = n.Beat.Voice.Bar.Clef;
 
             var index = value % 12;
-            var octave = (value / 12);
+            var octave = (value / 12) - 1;
 
             // Initial Position
             var steps = OctaveSteps[(int)clef];

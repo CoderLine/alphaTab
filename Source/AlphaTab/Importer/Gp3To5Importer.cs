@@ -16,6 +16,7 @@
  * License along with this library.
  */
 using System;
+using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -427,6 +428,11 @@ namespace AlphaTab.Importer
                 info.IsSolo = (flags & 0x10) != 0;
                 info.IsMute = (flags & 0x20) != 0;
                 info.SecondaryChannel = effectChannel;
+
+                if (GeneralMidi.IsGuitar(info.Program))
+                {
+                    newTrack.DisplayTranspositionPitch = -12;
+                }
 
                 newTrack.PlaybackInfo = info;
             }

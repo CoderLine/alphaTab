@@ -30,7 +30,17 @@ namespace AlphaTab.Model
         private const int ShortNameMaxLength = 10;
 
         public int Capo { get; set; }
-        public int PitchOffset { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of semitones this track should be
+        /// transposed. This applies to rendering and playback.
+        /// </summary>
+        public int TranspositionPitch { get; set; }
+        /// <summary>
+        /// Gets or sets the number of semitones this track should be 
+        /// transposed. This applies only to rendering. 
+        /// </summary>
+        public int DisplayTranspositionPitch { get; set; }
 
         public int Index { get; set; }
         public string Name { get; set; }
@@ -85,7 +95,8 @@ namespace AlphaTab.Model
             dst.Color.Raw = src.Color.Raw;
             dst.Color.RGBA = src.Color.RGBA;
             dst.IsPercussion = src.IsPercussion;
-            dst.PitchOffset = src.PitchOffset;
+            dst.TranspositionPitch = src.TranspositionPitch;
+            dst.DisplayTranspositionPitch = src.DisplayTranspositionPitch;
         }
 
         public void AddBarToStaff(int staffIndex, Bar bar)

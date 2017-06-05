@@ -747,6 +747,18 @@
             This public class describes a single track or instrument of score
             </summary>
         </member>
+        <member name="P:AlphaTab.Model.Track.TranspositionPitch">
+            <summary>
+            Gets or sets the number of semitones this track should be
+            transposed. This applies to rendering and playback.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Track.DisplayTranspositionPitch">
+            <summary>
+            Gets or sets the number of semitones this track should be 
+            transposed. This applies only to rendering. 
+            </summary>
+        </member>
         <member name="P:AlphaTab.Model.Track.Tuning">
             <summary>
             Get or set the guitar tuning of the guitar. This tuning also indicates the number of strings shown in the
@@ -1392,9 +1404,16 @@
             This is one of the profiles registered in the <see cref="F:AlphaTab.Environment.StaveProfiles"/>
             </summary>
         </member>
-        <member name="P:AlphaTab.Settings.PitchOffsets">
+        <member name="P:AlphaTab.Settings.TranspositionPitches">
             <summary>
-            The pitch offsets for the individual tracks. 
+            The transposition pitch offsets for the individual tracks. 
+            They apply to rendering and playback.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Settings.DisplayTranspositionPitches">
+            <summary>
+            The transposition pitch offsets for the individual tracks. 
+            They apply to rendering only.
             </summary>
         </member>
         <member name="P:AlphaTab.LayoutSettings.Mode">

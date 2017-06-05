@@ -73,9 +73,16 @@ namespace AlphaTab
         public StaveSettings Staves { get; set; }
 
         /// <summary>
-        /// The pitch offsets for the individual tracks. 
+        /// The transposition pitch offsets for the individual tracks. 
+        /// They apply to rendering and playback.
         /// </summary>
-        public int[] PitchOffsets { get; set; }
+        public int[] TranspositionPitches { get; set; }
+
+        /// <summary>
+        /// The transposition pitch offsets for the individual tracks. 
+        /// They apply to rendering only.
+        /// </summary>
+        public int[] DisplayTranspositionPitches { get; set; }
 
         public static Settings Defaults
         {
@@ -88,7 +95,8 @@ namespace AlphaTab
                 settings.Width = -1;
                 settings.Height = 200;
                 settings.Engine = "default";
-                settings.PitchOffsets = new int[0];
+                settings.TranspositionPitches = new int[0];
+                settings.DisplayTranspositionPitches = new int[0];
 
                 settings.Layout = LayoutSettings.Defaults;
 

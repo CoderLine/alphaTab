@@ -399,7 +399,7 @@ namespace AlphaTab.Rendering
                 var y2 = cy + Y;
                 y2 += scaleMod * CalculateBeamY(h, beatLineX);
 
-                canvas.LineWidth = 1.5f*Scale;
+                canvas.LineWidth = 1.5f * Scale;
                 canvas.BeginPath();
                 canvas.MoveTo(cx + X + beatLineX, y1);
                 canvas.LineTo(cx + X + beatLineX, y2);
@@ -905,7 +905,7 @@ namespace AlphaTab.Rendering
             for (var i = 0; i < 5; i++)
             {
                 if (i > 0) lineY += lineOffset;
-                canvas.FillRect(cx + X, (int) lineY, Width, Scale);
+                canvas.FillRect(cx + X, (int)lineY, Width, Scale);
             }
 
             canvas.Color = res.MainGlyphColor;

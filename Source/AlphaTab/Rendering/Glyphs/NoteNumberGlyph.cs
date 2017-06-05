@@ -35,7 +35,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (!n.IsTieDestination)
             {
-                _noteString = n.IsDead ? "x" : (n.Fret + n.Beat.Voice.Bar.Staff.Track.PitchOffset).ToString();
+                _noteString = n.IsDead ? "x" : (n.Fret - n.Beat.Voice.Bar.Staff.Track.DisplayTranspositionPitch).ToString();
                 if (n.IsGhost)
                 {
                     _noteString = "(" + _noteString + ")";
@@ -43,7 +43,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
             else if (n.Beat.Index == 0 || n.HasBend)
             {
-                _noteString = "(" + (n.TieOrigin.Fret + n.Beat.Voice.Bar.Staff.Track.PitchOffset) + ")";
+                _noteString = "(" + (n.TieOrigin.Fret - n.Beat.Voice.Bar.Staff.Track.DisplayTranspositionPitch) + ")";
             }
             else
             {
@@ -52,7 +52,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             if (n.IsTrill)
             {
-                _trillNoteString = "(" + (n.TrillFret + n.Beat.Voice.Bar.Staff.Track.PitchOffset) + ")";
+                _trillNoteString = "(" + (n.TrillFret - n.Beat.Voice.Bar.Staff.Track.DisplayTranspositionPitch) + ")";
             }
             else
             {

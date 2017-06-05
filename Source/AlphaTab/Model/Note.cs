@@ -200,11 +200,11 @@ namespace AlphaTab.Model
                 }
                 if (IsStringed)
                 {
-                    return Fret + StringTuning + Beat.Voice.Bar.Staff.Track.PitchOffset;
+                    return Fret + StringTuning - Beat.Voice.Bar.Staff.Track.TranspositionPitch;
                 }
                 if (IsPiano)
                 {
-                    return Octave * 12 + Tone + Beat.Voice.Bar.Staff.Track.PitchOffset;
+                    return Octave * 12 + Tone - Beat.Voice.Bar.Staff.Track.TranspositionPitch;
                 }
 
                 return 0;

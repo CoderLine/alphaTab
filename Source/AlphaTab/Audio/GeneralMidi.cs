@@ -166,25 +166,12 @@ namespace AlphaTab.Audio
 
         public static bool IsPiano(int program)
         {
-            // 1 Acoustic Grand Piano
-            // 2 Bright Acoustic Piano
-            // 3 Electric Grand Piano
-            // 4 Honky - tonk Piano
-            // 5 Electric Piano 1
-            // 6 Electric Piano 2
-            // 7 Harpsichord
-            // 8 Clavi
+            return program <= 7 || (program >= 16 && program <= 23);
+        }
 
-            // 17 Drawbar Organ
-            // 18 Percussive Organ
-            // 19 Rock Organ
-            // 20 Church Organ
-            // 21 Reed Organ
-            // 22 Accordion
-            // 23 Harmonica
-            // 24 Tango Accordion
-
-            return program <= 8 || (program >= 17 && program <= 24);
+        public static bool IsGuitar(int program)
+        {
+            return (program >= 24 && program <= 39) || program == 105 || program == 43;
         }
     }
 }
