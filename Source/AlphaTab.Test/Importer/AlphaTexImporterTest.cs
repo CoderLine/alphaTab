@@ -372,5 +372,35 @@ namespace AlphaTab.Test.Importer
         }
 
 
+        [TestMethod]
+        public void TestUnstringed()
+        {
+            var tex = @"\tuning piano . c4 c#4 d4 d#4 | c4 db4 d4 eb4";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(2, score.MasterBars.Count);
+
+            Assert.AreEqual(4, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats.Count);
+            Assert.AreEqual(true, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].IsPiano);
+            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].RealValue);
+            Assert.AreEqual(true, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].IsPiano);
+            Assert.AreEqual(61, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].RealValue);
+            Assert.AreEqual(true, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].IsPiano);
+            Assert.AreEqual(62, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Notes[0].RealValue);
+            Assert.AreEqual(true, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].IsPiano);
+            Assert.AreEqual(63, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Notes[0].RealValue);
+
+
+            Assert.AreEqual(4, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats.Count);
+            Assert.AreEqual(true, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].IsPiano);
+            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].RealValue);
+            Assert.AreEqual(true, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].IsPiano);
+            Assert.AreEqual(61, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Notes[0].RealValue);
+            Assert.AreEqual(true, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].IsPiano);
+            Assert.AreEqual(62, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[2].Notes[0].RealValue);
+            Assert.AreEqual(true, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].IsPiano);
+            Assert.AreEqual(63, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[3].Notes[0].RealValue);
+        }
     }
 }

@@ -419,7 +419,7 @@ AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes = function (data){
         }
         catch(e){
             if (!(e.exception instanceof AlphaTab.Importer.UnsupportedFormatException)){
-                AlphaTab.Util.Logger.Info("ScoreLoader", "Score import failed due to unexpected error: " + (e).get_Message());
+                AlphaTab.Util.Logger.Info("ScoreLoader", "Score import failed due to unexpected error: " + e.get_Message());
                 throw $CreateException(e, new Error());
             }
             else {
@@ -3935,7 +3935,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
         this._track.Tuning = AlphaTab.Model.Tuning.GetDefaultTuningFor(6).Tunings;
         this._score.AddTrack(this._track);
     },
-    ParseClef: function (str){
+    ParseClefFromString: function (str){
         switch (str.toLowerCase()){
             case "g2":
             case "treble":
@@ -3952,6 +3952,20 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             case "n":
             case "neutral":
                 return AlphaTab.Model.Clef.Neutral;
+            default:
+                return AlphaTab.Model.Clef.G2;
+        }
+    },
+    ParseClefFromInt: function (i){
+        switch (i){
+            case 43:
+                return AlphaTab.Model.Clef.G2;
+            case 64:
+                return AlphaTab.Model.Clef.F4;
+            case 48:
+                return AlphaTab.Model.Clef.C3;
+            case 60:
+                return AlphaTab.Model.Clef.C4;
             default:
                 return AlphaTab.Model.Clef.G2;
         }
@@ -3991,13 +4005,6 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             default:
                 return 0;
         }
-    },
-    ParseTuning: function (str){
-        var tuning = AlphaTab.Model.TuningParser.GetTuningForText(str);
-        if (tuning < 0){
-            this.Error("tuning-value", AlphaTab.Importer.AlphaTexSymbols.String, false);
-        }
-        return tuning;
     },
     NextChar: function (){
         var b = this.Data.ReadByte();
@@ -4114,9 +4121,10 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             }
             else if (AlphaTab.Importer.AlphaTexImporter.IsLetter(this._ch)){
                 var name = this.ReadName();
-                if (AlphaTab.Model.TuningParser.IsTuning(name)){
+                var tuning = AlphaTab.Model.TuningParser.Parse(name);
+                if (tuning != null){
                     this._sy = AlphaTab.Importer.AlphaTexSymbols.Tuning;
-                    (this._syData) = name.toLowerCase();
+                    (this._syData) = tuning;
                 }
                 else {
                     this._sy = AlphaTab.Importer.AlphaTexSymbols.String;
@@ -4139,7 +4147,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             str+=String.fromCharCode(this._ch);
             this.NextChar();
         }
-        while (AlphaTab.Importer.AlphaTexImporter.IsLetter(this._ch) || this.IsDigit(this._ch))
+        while (AlphaTab.Importer.AlphaTexImporter.IsLetter(this._ch) || this.IsDigit(this._ch) || this._ch == 35)
         return str;
     },
     ReadNumber: function (){
@@ -4260,17 +4268,31 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             }
             else if (syData == "tuning"){
                 this.NewSy();
-                if (this._sy == AlphaTab.Importer.AlphaTexSymbols.Tuning){
-                    var tuning = [];
-                    do{
-                        tuning.push(this.ParseTuning((this._syData).toString().toLowerCase()));
+                switch (this._sy){
+                    case AlphaTab.Importer.AlphaTexSymbols.String:
+                        var text = (this._syData).toString().toLowerCase();
+                        if (text == "piano" || text == "none" || text == "voice"){
+                        // clear tuning
+                        this._track.Tuning = new Int32Array(0);
+                    }
+                        else {
+                        this.Error("tuning", AlphaTab.Importer.AlphaTexSymbols.Tuning, true);
+                    }
+                        this.NewSy();
+                        break;
+                    case AlphaTab.Importer.AlphaTexSymbols.Tuning:
+                        var tuning = [];
+                        do{
+                        var t = (this._syData);
+                        tuning.push(t.get_RealValue());
                         this.NewSy();
                     }
-                    while (this._sy == AlphaTab.Importer.AlphaTexSymbols.Tuning)
-                    this._track.Tuning = tuning.slice(0);
-                }
-                else {
-                    this.Error("tuning", AlphaTab.Importer.AlphaTexSymbols.Tuning, true);
+                        while (this._sy == AlphaTab.Importer.AlphaTexSymbols.Tuning)
+                        this._track.Tuning = tuning.slice(0);
+                        break;
+                    default:
+                        this.Error("tuning", AlphaTab.Importer.AlphaTexSymbols.Tuning, true);
+                        break;
                 }
                 anyMeta = true;
             }
@@ -4619,36 +4641,66 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
     Note: function (beat){
         // fret.string
         var syData = (this._syData).toString().toLowerCase();
-        if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number && !(this._sy == AlphaTab.Importer.AlphaTexSymbols.String && (syData == "x" || syData == "-"))){
-            this.Error("note-fret", AlphaTab.Importer.AlphaTexSymbols.Number, true);
-        }
         var isDead = syData == "x";
         var isTie = syData == "-";
-        var fret = (isDead || isTie ? 0 : (this._syData));
+        var fret = -1;
+        var octave = -1;
+        var tone = -1;
+        switch (this._sy){
+            case AlphaTab.Importer.AlphaTexSymbols.Number:
+                fret = (this._syData);
+                break;
+            case AlphaTab.Importer.AlphaTexSymbols.String:
+                if (syData == "x" || syData == "-"){
+                fret = 0;
+            }
+                else {
+                this.Error("note-fret", AlphaTab.Importer.AlphaTexSymbols.Number, true);
+            }
+                break;
+            case AlphaTab.Importer.AlphaTexSymbols.Tuning:
+                var tuning = (this._syData);
+                octave = tuning.Octave;
+                tone = tuning.NoteValue;
+                break;
+            default:
+                this.Error("note-fret", AlphaTab.Importer.AlphaTexSymbols.Number, true);
+                break;
+        }
         this.NewSy();
         // Fret done
-        if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Dot){
-            this.Error("note", AlphaTab.Importer.AlphaTexSymbols.Dot, true);
+        var string = -1;
+        if (octave == -1){
+            // Fret [Dot] String
+            if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Dot){
+                this.Error("note", AlphaTab.Importer.AlphaTexSymbols.Dot, true);
+            }
+            this.NewSy();
+            // dot done
+            if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
+                this.Error("note-string", AlphaTab.Importer.AlphaTexSymbols.Number, true);
+            }
+            string = (this._syData);
+            if (string < 1 || string > this._track.Tuning.length){
+                this.Error("note-string", AlphaTab.Importer.AlphaTexSymbols.Number, false);
+            }
+            this.NewSy();
+            // string done
         }
-        this.NewSy();
-        // dot done
-        if (this._sy != AlphaTab.Importer.AlphaTexSymbols.Number){
-            this.Error("note-string", AlphaTab.Importer.AlphaTexSymbols.Number, true);
-        }
-        var string = (this._syData);
-        if (string < 1 || string > this._track.Tuning.length){
-            this.Error("note-string", AlphaTab.Importer.AlphaTexSymbols.Number, false);
-        }
-        this.NewSy();
-        // string done
         // read effects
         var note = new AlphaTab.Model.Note();
         beat.AddNote(note);
-        note.String = this._track.Tuning.length - (string - 1);
-        note.IsDead = isDead;
-        note.IsTieDestination = isTie;
-        if (!isTie){
-            note.Fret = fret;
+        if (octave == -1){
+            note.String = this._track.Tuning.length - (string - 1);
+            note.IsDead = isDead;
+            note.IsTieDestination = isTie;
+            if (!isTie){
+                note.Fret = fret;
+            }
+        }
+        else {
+            note.Octave = octave;
+            note.Tone = tone;
         }
         this.NoteEffects(note);
     },
@@ -4915,10 +4967,17 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
             }
             else if (syData == "clef"){
                 this.NewSy();
-                if (this._sy != AlphaTab.Importer.AlphaTexSymbols.String && this._sy != AlphaTab.Importer.AlphaTexSymbols.Tuning){
-                    this.Error("clef", AlphaTab.Importer.AlphaTexSymbols.String, true);
+                switch (this._sy){
+                    case AlphaTab.Importer.AlphaTexSymbols.String:
+                        bar.Clef = this.ParseClefFromString((this._syData).toString().toLowerCase());
+                        break;
+                    case AlphaTab.Importer.AlphaTexSymbols.Number:
+                        bar.Clef = this.ParseClefFromInt((this._syData));
+                        break;
+                    default:
+                        this.Error("clef", AlphaTab.Importer.AlphaTexSymbols.String, true);
+                        break;
                 }
-                bar.Clef = this.ParseClef((this._syData).toString().toLowerCase());
             }
             else if (syData == "tempo"){
                 this.NewSy();
@@ -10153,6 +10212,16 @@ AlphaTab.Model.Tuning.FindTuning = function (strings){
     }
     return null;
 };
+AlphaTab.Model.TuningParseResult = function (){
+    this.Note = null;
+    this.NoteValue = 0;
+    this.Octave = 0;
+};
+AlphaTab.Model.TuningParseResult.prototype = {
+    get_RealValue: function (){
+        return (this.Octave * 12) + this.NoteValue;
+    }
+};
 AlphaTab.Model.TuningParser = function (){
 };
 AlphaTab.Model.TuningParser.IsTuning = function (name){
@@ -10170,11 +10239,7 @@ AlphaTab.Model.TuningParser.Parse = function (name){
             }
             octave += String.fromCharCode(c);
         }
-        else if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122)){
-            // letter after number?
-            if (!((note==null)||(note.length==0))){
-                return null;
-            }
+        else if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122) || c == 35){
             note += String.fromCharCode(c);
         }
         else {
@@ -10184,21 +10249,18 @@ AlphaTab.Model.TuningParser.Parse = function (name){
     if (((octave==null)||(octave.length==0)) || ((note==null)||(note.length==0))){
         return null;
     }
-    var result = new AlphaTab.Model.TuningParser.TuningParseResult();
-    result.Octave = AlphaTab.Platform.Std.ParseInt(octave);
+    var result = new AlphaTab.Model.TuningParseResult();
+    result.Octave = AlphaTab.Platform.Std.ParseInt(octave) + 1;
     result.Note = note.toLowerCase();
+    result.NoteValue = AlphaTab.Model.TuningParser.GetToneForText(result.Note);
     return result;
 };
 AlphaTab.Model.TuningParser.GetTuningForText = function (str){
-    var b = 0;
     var result = AlphaTab.Model.TuningParser.Parse(str);
     if (result == null){
         return -1;
     }
-    b = AlphaTab.Model.TuningParser.GetToneForText(result.Note);
-    // add octaves
-    b += ((result.Octave + 1) * 12);
-    return b;
+    return result.get_RealValue();
 };
 AlphaTab.Model.TuningParser.GetToneForText = function (note){
     var b;
@@ -10206,12 +10268,14 @@ AlphaTab.Model.TuningParser.GetToneForText = function (note){
         case "c":
             b = 0;
             break;
+        case "c#":
         case "db":
             b = 1;
             break;
         case "d":
             b = 2;
             break;
+        case "d#":
         case "eb":
             b = 3;
             break;
@@ -10221,18 +10285,21 @@ AlphaTab.Model.TuningParser.GetToneForText = function (note){
         case "f":
             b = 5;
             break;
+        case "f#":
         case "gb":
             b = 6;
             break;
         case "g":
             b = 7;
             break;
+        case "g#":
         case "ab":
             b = 8;
             break;
         case "a":
             b = 9;
             break;
+        case "a#":
         case "bb":
             b = 10;
             break;
@@ -18562,11 +18629,6 @@ $StaticConstructor(function (){
     AlphaTab.Model.Lyrics.LyricsState.COMMENT = 3;
     AlphaTab.Model.Lyrics.LyricsState.DASH = 4;
 });
-AlphaTab.Model.TuningParser = AlphaTab.Model.TuningParser || {};
-AlphaTab.Model.TuningParser.TuningParseResult = function (){
-    this.Note = null;
-    this.Octave = 0;
-};
 AlphaTab.Rendering.Glyphs.TripletFeelGlyph = AlphaTab.Rendering.Glyphs.TripletFeelGlyph || {};
 AlphaTab.Rendering.Glyphs.TripletFeelGlyph.BarType = {
     Full: 0,

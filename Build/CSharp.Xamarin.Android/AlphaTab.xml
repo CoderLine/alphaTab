@@ -159,11 +159,18 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.ParseClef(System.String)">
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.ParseClefFromString(System.String)">
             <summary>
             Converts a clef string into the clef value.
             </summary>
             <param name="str">the string to convert</param>
+            <returns>the clef value</returns>
+        </member>
+        <member name="M:AlphaTab.Importer.AlphaTexImporter.ParseClefFromInt(System.Int32)">
+            <summary>
+            Converts a clef tuning into the clef value.
+            </summary>
+            <param name="i">the tuning value to convert</param>
             <returns>the clef value</returns>
         </member>
         <member name="M:AlphaTab.Importer.AlphaTexImporter.ParseKeySignature(System.String)">
@@ -172,13 +179,6 @@
             </summary>
             <param name="str">the string to convert</param>
             <returns>the assocciated keysignature value</returns>
-        </member>
-        <member name="M:AlphaTab.Importer.AlphaTexImporter.ParseTuning(System.String)">
-            <summary>
-            Converts a string into the associated tuning. 
-            </summary>
-            <param name="str">the tuning string</param>
-            <returns>the tuning value.</returns>
         </member>
         <member name="M:AlphaTab.Importer.AlphaTexImporter.NextChar">
             <summary>

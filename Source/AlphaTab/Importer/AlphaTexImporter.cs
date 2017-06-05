@@ -110,7 +110,7 @@ namespace AlphaTab.Importer
         /// </summary>
         /// <param name="str">the string to convert</param>
         /// <returns>the clef value</returns>
-        private Clef ParseClef(string str)
+        private Clef ParseClefFromString(string str)
         {
             switch (str.ToLower())
             {
@@ -131,6 +131,29 @@ namespace AlphaTab.Importer
                     return Clef.Neutral;
                 default:
                     return Clef.G2; // error("clef-value", AlphaTexSymbols.String, false);
+            }
+        }
+
+
+        /// <summary>
+        /// Converts a clef tuning into the clef value.
+        /// </summary>
+        /// <param name="i">the tuning value to convert</param>
+        /// <returns>the clef value</returns>
+        private Clef ParseClefFromInt(int i)
+        {
+            switch (i)
+            {
+                case 43: 
+                    return Clef.G2;
+                case 64: 
+                    return Clef.F4;
+                case 48:
+                    return Clef.C3;
+                case 60:
+                    return Clef.C4;
+                default:
+                    return Clef.G2;
             }
         }
 
@@ -161,22 +184,7 @@ namespace AlphaTab.Importer
                 default: return 0; // error("keysignature-value", AlphaTexSymbols.String, false); return 0
             }
         }
-
-        /// <summary>
-        /// Converts a string into the associated tuning. 
-        /// </summary>
-        /// <param name="str">the tuning string</param>
-        /// <returns>the tuning value.</returns>
-        private int ParseTuning(String str)
-        {
-            var tuning = TuningParser.GetTuningForText(str);
-            if (tuning < 0)
-            {
-                Error("tuning-value", AlphaTexSymbols.String, false);
-            }
-            return tuning;
-        }
-
+        
         /// <summary>
         /// Reads the next character of the source stream.
         /// </summary>
@@ -331,10 +339,11 @@ namespace AlphaTab.Importer
                 else if (IsLetter(_ch))
                 {
                     var name = ReadName();
-                    if (TuningParser.IsTuning(name))
+                    var tuning = TuningParser.Parse(name);
+                    if (tuning != null)
                     {
                         _sy = AlphaTexSymbols.Tuning;
-                        _syData = name.ToLower();
+                        _syData = tuning;
                     }
                     else
                     {
@@ -406,7 +415,7 @@ namespace AlphaTab.Importer
             {
                 str.AppendChar(_ch);
                 NextChar();
-            } while (IsLetter(_ch) || IsDigit(_ch));
+            } while (IsLetter(_ch) || IsDigit(_ch) || _ch == 0x23);
             return str.ToString();
         }
 
@@ -568,19 +577,35 @@ namespace AlphaTab.Importer
                 else if (syData == "tuning")
                 {
                     NewSy();
-                    if (_sy == AlphaTexSymbols.Tuning) // we require at least one tuning
+                    switch (_sy)
                     {
-                        var tuning = new FastList<int>();
-                        do
-                        {
-                            tuning.Add(ParseTuning(_syData.ToString().ToLower()));
+                        case AlphaTexSymbols.String:
+                            var text = _syData.ToString().ToLower();
+                            if (text == "piano" || text == "none" || text == "voice")
+                            {
+                                // clear tuning
+                                _track.Tuning = new int[0];
+                            }
+                            else
+                            {
+                                Error("tuning", AlphaTexSymbols.Tuning);
+                            }
                             NewSy();
-                        } while (_sy == AlphaTexSymbols.Tuning);
-                        _track.Tuning = tuning.ToArray();
-                    }
-                    else
-                    {
-                        Error("tuning", AlphaTexSymbols.Tuning);
+                            break;
+                        case AlphaTexSymbols.Tuning:
+                            var tuning = new FastList<int>();
+                            do
+                            {
+                                var t = (TuningParseResult) _syData;
+                                tuning.Add(t.RealValue);
+                                NewSy();
+                            } while (_sy == AlphaTexSymbols.Tuning);
+
+                            _track.Tuning = tuning.ToArray();
+                            break;
+                        default:
+                            Error("tuning", AlphaTexSymbols.Tuning);
+                            break;
                     }
                     anyMeta = true;
                 }
@@ -635,6 +660,7 @@ namespace AlphaTab.Importer
                 NewSy();
             }
         }
+
 
         private void Bars()
         {
@@ -1043,43 +1069,80 @@ namespace AlphaTab.Importer
         {
             // fret.string
             var syData = _syData.ToString().ToLower();
-            if (_sy != AlphaTexSymbols.Number && !(_sy == AlphaTexSymbols.String
-                && (syData == "x" || syData == "-")))
-            {
-                Error("note-fret", AlphaTexSymbols.Number);
-            }
 
             var isDead = syData == "x";
             var isTie = syData == "-";
-            int fret = (int)(isDead || isTie ? 0 : _syData);
+            var fret = -1;
+            var octave = -1;
+            var tone = -1;
+            switch (_sy)
+            {
+                case AlphaTexSymbols.Number:
+                    fret = (int)_syData;
+                    break;
+                case AlphaTexSymbols.String:
+                    if (syData == "x" || syData == "-")
+                    {
+                        fret = 0;
+                    }
+                    else
+                    {
+                        Error("note-fret", AlphaTexSymbols.Number);
+                    }
+                    break;
+                case AlphaTexSymbols.Tuning:
+                    var tuning = (TuningParseResult) _syData;
+                    octave = tuning.Octave;
+                    tone = tuning.NoteValue;
+                    break;
+                default:
+                    Error("note-fret", AlphaTexSymbols.Number);
+                    break;
+
+            }
+
             NewSy(); // Fret done
 
-            if (_sy != AlphaTexSymbols.Dot)
+            int @string = -1;
+            if (octave == -1)
             {
-                Error("note", AlphaTexSymbols.Dot);
-            }
-            NewSy(); // dot done
+                // Fret [Dot] String
 
-            if (_sy != AlphaTexSymbols.Number)
-            {
-                Error("note-string", AlphaTexSymbols.Number);
+                if (_sy != AlphaTexSymbols.Dot)
+                {
+                    Error("note", AlphaTexSymbols.Dot);
+                }
+                NewSy(); // dot done
+
+                if (_sy != AlphaTexSymbols.Number)
+                {
+                    Error("note-string", AlphaTexSymbols.Number);
+                }
+                @string = (int) _syData;
+                if (@string < 1 || @string > _track.Tuning.Length)
+                {
+                    Error("note-string", AlphaTexSymbols.Number, false);
+                }
+                NewSy(); // string done
             }
-            int @string = (int)_syData;
-            if (@string < 1 || @string > _track.Tuning.Length)
-            {
-                Error("note-string", AlphaTexSymbols.Number, false);
-            }
-            NewSy(); // string done
 
             // read effects
             var note = new Note();
             beat.AddNote(note);
-            note.String = _track.Tuning.Length - (@string - 1);
-            note.IsDead = isDead;
-            note.IsTieDestination = isTie;
-            if (!isTie)
+            if (octave == -1)
             {
-                note.Fret = fret;
+                note.String = _track.Tuning.Length - (@string - 1);
+                note.IsDead = isDead;
+                note.IsTieDestination = isTie;
+                if (!isTie)
+                {
+                    note.Fret = fret;
+                }
+            }
+            else
+            {
+                note.Octave = octave;
+                note.Tone = tone;
             }
 
             NoteEffects(note);
@@ -1407,11 +1470,19 @@ namespace AlphaTab.Importer
                 else if (syData == "clef")
                 {
                     NewSy();
-                    if (_sy != AlphaTexSymbols.String && _sy != AlphaTexSymbols.Tuning)
+                    switch (_sy)
                     {
-                        Error("clef", AlphaTexSymbols.String);
+                        case AlphaTexSymbols.String:
+                            bar.Clef = ParseClefFromString(_syData.ToString().ToLower());
+                            break;
+                        case AlphaTexSymbols.Number:
+                            bar.Clef = ParseClefFromInt((int) _syData);
+                            break;
+                        default:
+                            Error("clef", AlphaTexSymbols.String);
+                            break;
                     }
-                    bar.Clef = ParseClef(_syData.ToString().ToLower());
+                    
                 }
                 else if (syData == "tempo")
                 {

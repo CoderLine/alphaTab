@@ -20,6 +20,21 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Model
 {
+    public class TuningParseResult
+    {
+        public string Note { get; set; }
+        public int NoteValue { get; set; }
+        public int Octave { get; set; }
+
+        public int RealValue
+        {
+            get
+            {
+                return (Octave * 12) + NoteValue;
+            }
+        }
+    }
+
     public static class TuningParser
     {
         /// <summary>
@@ -32,7 +47,7 @@ namespace AlphaTab.Model
             return Parse(name) != null;
         }
 
-        private static TuningParseResult Parse(string name)
+        public static TuningParseResult Parse(string name)
         {
             string note = "";
             string octave = "";
@@ -49,13 +64,8 @@ namespace AlphaTab.Model
                     }
                     octave += Std.StringFromCharCode(c);
                 }
-                else if ((c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A))
+                else if ((c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A) || c == 0x23)
                 {
-                    // letter after number?
-                    if (!string.IsNullOrEmpty(note))
-                    {
-                        return null;
-                    }
                     note += Std.StringFromCharCode(c);
                 }
                 else
@@ -70,31 +80,21 @@ namespace AlphaTab.Model
             }
 
             var result = new TuningParseResult();
-            result.Octave = Std.ParseInt(octave);
+            result.Octave = Std.ParseInt(octave) + 1;
             result.Note = note.ToLower();
+            result.NoteValue = GetToneForText(result.Note);
             return result;
-        }
-
-        private class TuningParseResult
-        {
-            public string Note { get; set; }
-            public int Octave { get; set; }
         }
 
         public static int GetTuningForText(string str)
         {
-            var b = 0;
             var result = Parse(str);
             if (result == null)
             {
                 return -1;
             }
 
-            b = GetToneForText(result.Note);
-            // add octaves
-            b += ((result.Octave + 1) * 12);
-
-            return b;
+            return result.RealValue;
         }
 
         public static int GetToneForText(string note)
@@ -105,12 +105,14 @@ namespace AlphaTab.Model
                 case "c":
                     b = 0;
                     break;
+                case "c#":
                 case "db":
                     b = 1;
                     break;
                 case "d":
                     b = 2;
                     break;
+                case "d#":
                 case "eb":
                     b = 3;
                     break;
@@ -120,18 +122,21 @@ namespace AlphaTab.Model
                 case "f":
                     b = 5;
                     break;
+                case "f#":
                 case "gb":
                     b = 6;
                     break;
                 case "g":
                     b = 7;
                     break;
+                case "g#":
                 case "ab":
                     b = 8;
                     break;
                 case "a":
                     b = 9;
                     break;
+                case "a#":
                 case "bb":
                     b = 10;
                     break;
