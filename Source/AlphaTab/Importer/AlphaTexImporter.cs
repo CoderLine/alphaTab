@@ -144,9 +144,9 @@ namespace AlphaTab.Importer
         {
             switch (i)
             {
-                case 43: 
+                case 43:
                     return Clef.G2;
-                case 64: 
+                case 65:
                     return Clef.F4;
                 case 48:
                     return Clef.C3;
@@ -184,7 +184,7 @@ namespace AlphaTab.Importer
                 default: return 0; // error("keysignature-value", AlphaTexSymbols.String, false); return 0
             }
         }
-        
+
         /// <summary>
         /// Reads the next character of the source stream.
         /// </summary>
@@ -596,7 +596,7 @@ namespace AlphaTab.Importer
                             var tuning = new FastList<int>();
                             do
                             {
-                                var t = (TuningParseResult) _syData;
+                                var t = (TuningParseResult)_syData;
                                 tuning.Add(t.RealValue);
                                 NewSy();
                             } while (_sy == AlphaTexSymbols.Tuning);
@@ -1091,7 +1091,7 @@ namespace AlphaTab.Importer
                     }
                     break;
                 case AlphaTexSymbols.Tuning:
-                    var tuning = (TuningParseResult) _syData;
+                    var tuning = (TuningParseResult)_syData;
                     octave = tuning.Octave;
                     tone = tuning.NoteValue;
                     break;
@@ -1118,7 +1118,7 @@ namespace AlphaTab.Importer
                 {
                     Error("note-string", AlphaTexSymbols.Number);
                 }
-                @string = (int) _syData;
+                @string = (int)_syData;
                 if (@string < 1 || @string > _track.Tuning.Length)
                 {
                     Error("note-string", AlphaTexSymbols.Number, false);
@@ -1476,13 +1476,16 @@ namespace AlphaTab.Importer
                             bar.Clef = ParseClefFromString(_syData.ToString().ToLower());
                             break;
                         case AlphaTexSymbols.Number:
-                            bar.Clef = ParseClefFromInt((int) _syData);
+                            bar.Clef = ParseClefFromInt((int)_syData);
+                            break;
+                        case AlphaTexSymbols.Tuning:
+                            bar.Clef = ParseClefFromInt(((TuningParseResult)_syData).RealValue);
                             break;
                         default:
                             Error("clef", AlphaTexSymbols.String);
                             break;
                     }
-                    
+
                 }
                 else if (syData == "tempo")
                 {

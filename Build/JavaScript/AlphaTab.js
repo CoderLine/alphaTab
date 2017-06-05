@@ -630,26 +630,32 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
     this.Renderer = null;
     this.Score = null;
     this.Element = element;
-    var dataset = this.Element.dataset;
     this.Element.classList.add("alphaTab");
     // load settings
     var settings = this.Settings = AlphaTab.Settings.FromJson(options);
+    var pitchOffsets = this.GetData("pitches");
+    if (pitchOffsets != null && (pitchOffsets instanceof Array)){
+        settings.PitchOffsets = pitchOffsets;
+    }
     // get track data to parse
     var tracksData;
     if (options != null && options.tracks){
         tracksData = options.tracks;
     }
-    else if (element != null && element.dataset != null && dataset["tracks"] != null){
-        tracksData = dataset["tracks"];
-    }
     else {
-        tracksData = 0;
+        var data = this.GetData("tracks");
+        if (data != null){
+            tracksData = data;
+        }
+        else {
+            tracksData = 0;
+        }
     }
     this.SetTracks(tracksData, false);
     var contents = "";
     if (element != null){
         // get load contents
-        if (element.dataset != null && dataset["tex"] != null && element.innerText){
+        if (this.GetData("tex") != null && element.innerText){
             contents = (element.innerHTML).trim();
             element.innerHTML = "";
         }
@@ -721,11 +727,11 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
         else if (options && options.file){
             this.Load(options.file);
         }
-        else if (this.Element != null && this.Element.dataset != null && !((dataset["file"]==null)||(dataset["file"].length==0))){
-            this.Load(dataset["file"]);
-        }
-        else if (this.Element != null && !((this.Element.getAttribute("data-file")==null)||(this.Element.getAttribute("data-file").length==0))){
-            this.Load(this.Element.getAttribute("data-file"));
+        else {
+            var file = this.GetData("file");
+            if (!((file==null)||(file.length==0))){
+                this.Load(file);
+            }
         }
     });
     this._visibilityCheckerInterval = options && options.visibilityCheckInterval || 500;
@@ -750,6 +756,24 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
 AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
     get_IsElementVisible: function (){
         return !!(this.Element.offsetWidth || this.Element.offsetHeight || this.Element.getClientRects().length);
+    },
+    GetData: function (name){
+        var value;
+        if (this.Element.dataset){
+            value = this.Element.dataset[name];
+        }
+        else {
+            value = this.Element.getAttribute("data-" + name);
+        }
+        try{
+            return JSON.parse(value);
+        }
+        catch($$e1){
+            if (value == ""){
+                return null;
+            }
+            return value;
+        }
     },
     TriggerResize: function (){
         // if the element is visible, perfect, we do the update
@@ -950,7 +974,7 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
             try{
                 tracksData = JSON.parse(tracksData);
             }
-            catch($$e1){
+            catch($$e2){
                 tracksData = new Int32Array([0]);
             }
         }
@@ -982,6 +1006,7 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
         return tracks.slice(0);
     },
     ScoreLoaded: function (score, render){
+        AlphaTab.Model.ModelUtils.ApplyPitchOffsets(this.Settings, score);
         this.Score = score;
         this.TriggerEvent("loaded", score);
         if (render){
@@ -1155,6 +1180,7 @@ AlphaTab.Platform.JavaScript.JsWorker.prototype = {
 );
     },
     ScoreLoaded: function (score){
+        AlphaTab.Model.ModelUtils.ApplyPitchOffsets(this._renderer.Settings, score);
         this.Score = score;
         var json = new AlphaTab.Model.JsonConverter();
         this._main.postMessage({
@@ -1989,6 +2015,7 @@ AlphaTab.Settings = function (){
     this.StretchForce = 0;
     this.ForcePianoFingering = false;
     this.Staves = null;
+    this.PitchOffsets = null;
 };
 AlphaTab.Settings.prototype = {
     ToJson: function (){
@@ -1999,6 +2026,7 @@ AlphaTab.Settings.prototype = {
         json.engine = this.Engine;
         json.stretchForce = this.StretchForce;
         json.forcePianoFingering = this.ForcePianoFingering;
+        json.pitchOffsets = this.PitchOffsets;
         json.scriptFile = this.ScriptFile;
         json.fontDirectory = this.FontDirectory;
         json.lazy = this.DisableLazyLoading;
@@ -2065,6 +2093,8 @@ AlphaTab.Settings.FillFromJson = function (settings, json){
         settings.ForcePianoFingering = json.forcePianoFingering;
     if ("lazy"in json)
         settings.DisableLazyLoading = !json.lazy;
+    if ("pitchOffsets"in json)
+        settings.PitchOffsets = json.pitchOffsets;
     if ("scriptFile"in json){
         settings.ScriptFile = AlphaTab.Settings.EnsureFullUrl(json.scriptFile);
         settings.ScriptFile = AlphaTab.Settings.AppendScriptName(settings.ScriptFile);
@@ -2146,6 +2176,7 @@ AlphaTab.Settings.get_Defaults = function (){
     settings.Width = -1;
     settings.Height = 200;
     settings.Engine = "default";
+    settings.PitchOffsets = new Int32Array(0);
     settings.Layout = AlphaTab.LayoutSettings.get_Defaults();
     settings.Staves = new AlphaTab.StaveSettings("default");
     return settings;
@@ -3960,7 +3991,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
         switch (i){
             case 43:
                 return AlphaTab.Model.Clef.G2;
-            case 64:
+            case 65:
                 return AlphaTab.Model.Clef.F4;
             case 48:
                 return AlphaTab.Model.Clef.C3;
@@ -4973,6 +5004,9 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
                         break;
                     case AlphaTab.Importer.AlphaTexSymbols.Number:
                         bar.Clef = this.ParseClefFromInt((this._syData));
+                        break;
+                    case AlphaTab.Importer.AlphaTexSymbols.Tuning:
+                        bar.Clef = this.ParseClefFromInt((this._syData).get_RealValue());
                         break;
                     default:
                         this.Error("clef", AlphaTab.Importer.AlphaTexSymbols.String, true);
@@ -6230,7 +6264,7 @@ AlphaTab.Importer.GpxFileSystem.prototype = {
                 }
             }
         }
-        catch($$e2){
+        catch($$e3){
         }
         buffer = uncompressed.GetBuffer();
         var resultOffset = skipHeader ? 4 : 0;
@@ -6415,7 +6449,7 @@ AlphaTab.Importer.GpxParser.prototype = {
         try{
             dom = new AlphaTab.Xml.XmlDocument(xml);
         }
-        catch($$e3){
+        catch($$e4){
             throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(""), new Error());
         }
         this.ParseDom(dom);
@@ -7713,7 +7747,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         try{
             dom = new AlphaTab.Xml.XmlDocument(xml);
         }
-        catch($$e4){
+        catch($$e5){
             throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(""), new Error());
         }
         this._score = new AlphaTab.Model.Score();
@@ -8846,7 +8880,7 @@ AlphaTab.IO.BitReader.prototype = {
                 all.WriteByte(this.ReadByte());
             }
         }
-        catch($$e5){
+        catch($$e6){
         }
         return all.ToArray();
     }
@@ -9613,6 +9647,13 @@ AlphaTab.Model.ModelUtils.KeySignatureIsNatural = function (ks){
 AlphaTab.Model.ModelUtils.KeySignatureIsSharp = function (ks){
     return ks > 0;
 };
+AlphaTab.Model.ModelUtils.ApplyPitchOffsets = function (settings, score){
+    for (var i = 0; i < score.Tracks.length; i++){
+        if (i < settings.PitchOffsets.length){
+            score.Tracks[i].PitchOffset = settings.PitchOffsets[i];
+        }
+    }
+};
 AlphaTab.Model.NoteAccidentalMode = {
     Default: 0,
     SwapAccidentals: 1,
@@ -9715,10 +9756,10 @@ AlphaTab.Model.Note.prototype = {
             return AlphaTab.Rendering.Utils.PercussionMapper.MidiFromElementVariation(this);
         }
         if (this.get_IsStringed()){
-            return this.Fret + this.get_StringTuning();
+            return this.Fret + this.get_StringTuning() + this.Beat.Voice.Bar.Staff.Track.PitchOffset;
         }
         if (this.get_IsPiano()){
-            return this.Octave * 12 + this.Tone;
+            return this.Octave * 12 + this.Tone + this.Beat.Voice.Bar.Staff.Track.PitchOffset;
         }
         return 0;
     },
@@ -9990,6 +10031,7 @@ AlphaTab.Model.Staff.prototype = {
 };
 AlphaTab.Model.Track = function (staveCount){
     this.Capo = 0;
+    this.PitchOffset = 0;
     this.Index = 0;
     this.Name = null;
     this.ShortName = null;
@@ -10081,6 +10123,7 @@ AlphaTab.Model.Track.CopyTo = function (src, dst){
     dst.Color.Raw = src.Color.Raw;
     dst.Color.RGBA = src.Color.RGBA;
     dst.IsPercussion = src.IsPercussion;
+    dst.PitchOffset = src.PitchOffset;
 };
 AlphaTab.Model.TripletFeel = {
     NoTripletFeel: 0,
@@ -13056,19 +13099,19 @@ AlphaTab.Rendering.Glyphs.NoteNumberGlyph = function (x, y, n){
     this.IsEmpty = false;
     AlphaTab.Rendering.Glyphs.Glyph.call(this, x, y);
     if (!n.IsTieDestination){
-        this._noteString = n.IsDead ? "x" : n.Fret.toString();
+        this._noteString = n.IsDead ? "x" : (n.Fret + n.Beat.Voice.Bar.Staff.Track.PitchOffset).toString();
         if (n.IsGhost){
             this._noteString = "(" + this._noteString + ")";
         }
     }
     else if (n.Beat.Index == 0 || n.get_HasBend()){
-        this._noteString = "(" + n.TieOrigin.Fret + ")";
+        this._noteString = "(" + (n.TieOrigin.Fret + n.Beat.Voice.Bar.Staff.Track.PitchOffset) + ")";
     }
     else {
         this._noteString = "";
     }
     if (n.get_IsTrill()){
-        this._trillNoteString = "(" + n.get_TrillFret() + ")";
+        this._trillNoteString = "(" + (n.get_TrillFret() + n.Beat.Voice.Bar.Staff.Track.PitchOffset) + ")";
     }
     else {
         this._trillNoteString = "";

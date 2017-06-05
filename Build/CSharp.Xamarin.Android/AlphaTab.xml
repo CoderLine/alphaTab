@@ -1392,6 +1392,11 @@
             This is one of the profiles registered in the <see cref="F:AlphaTab.Environment.StaveProfiles"/>
             </summary>
         </member>
+        <member name="P:AlphaTab.Settings.PitchOffsets">
+            <summary>
+            The pitch offsets for the individual tracks. 
+            </summary>
+        </member>
         <member name="P:AlphaTab.LayoutSettings.Mode">
             <summary>
             The layouting mode used to arrange the the notation.

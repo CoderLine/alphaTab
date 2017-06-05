@@ -23,6 +23,7 @@ using AlphaTab.Rendering;
 using AlphaTab.Util;
 using SharpKit.Html;
 using SharpKit.JavaScript;
+using Console = System.Console;
 
 namespace AlphaTab.Platform.JavaScript
 {
@@ -65,16 +66,46 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
+        private object GetData(string name)
+        {
+            string value;
+            if (Element.dataset.As<bool>())
+            {
+                value = Element.dataset.Member(name).As<string>();
+            }
+            else
+            {
+                value = Element.getAttribute("data-" + name);
+            }
+
+            try
+            {
+                return JSON.parse(value);
+            }
+            catch
+            {
+                if (value == "")
+                {
+                    return null;
+                }
+                return value;
+            }
+        }
 
         protected JsApiBase(HtmlElement element, dynamic options)
         {
             Element = element;
-            dynamic dataset = Element.dataset;
 
             Element.classList.add("alphaTab");
 
             // load settings
             var settings = Settings = Settings.FromJson(options);
+
+            var pitchOffsets = GetData("pitches");
+            if (pitchOffsets != null && Std.InstanceOf<JsArray>(pitchOffsets))
+            {
+                settings.PitchOffsets = pitchOffsets.As<int[]>();
+            }
 
             #region build tracks array
 
@@ -84,13 +115,17 @@ namespace AlphaTab.Platform.JavaScript
             {
                 tracksData = options.tracks;
             }
-            else if (element != null && element.dataset != null && dataset["tracks"] != null)
-            {
-                tracksData = dataset["tracks"];
-            }
             else
             {
-                tracksData = 0;
+                var data = GetData("tracks");
+                if (data != null)
+                {
+                    tracksData = data;
+                }
+                else
+                {
+                    tracksData = 0;
+                }
             }
 
             SetTracks(tracksData, false);
@@ -102,8 +137,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 // get load contents
 
-                if (element.dataset != null && dataset["tex"] != null &&
-                    element.innerText.As<JsBoolean>())
+                if (GetData("tex") != null && element.innerText.As<JsBoolean>())
                 {
                     contents = (element.innerHTML.As<string>()).Trim();
                     element.innerHTML = "";
@@ -212,13 +246,13 @@ namespace AlphaTab.Platform.JavaScript
                 {
                     Load(options.file);
                 }
-                else if (Element != null && Element.dataset != null && !string.IsNullOrEmpty(dataset["file"]))
+                else
                 {
-                    Load(dataset["file"]);
-                }
-                else if (Element != null && !string.IsNullOrEmpty(Element.getAttribute("data-file")))
-                {
-                    Load(Element.getAttribute("data-file"));
+                    var file = (string)GetData("file");
+                    if (!string.IsNullOrEmpty(file))
+                    {
+                        Load(file);
+                    }
                 }
             };
 
@@ -317,21 +351,21 @@ namespace AlphaTab.Platform.JavaScript
             preview.document.As<HtmlDocument>().write("<!DOCTYPE html><html></head><body></body></html>");
             preview.document.body.appendChild(a4);
 
-            var dualScreenLeft = JsTypeOf(window.screenLeft) != JsTypes.undefined 
-                ? window.screenLeft 
+            var dualScreenLeft = JsTypeOf(window.screenLeft) != JsTypes.undefined
+                ? window.screenLeft
                 : screen.Member("left").As<int>();
-            var dualScreenTop = JsTypeOf(window.screenTop) != JsTypes.undefined 
-                ? window.screenTop 
+            var dualScreenTop = JsTypeOf(window.screenTop) != JsTypes.undefined
+                ? window.screenTop
                 : screen.Member("top").As<int>();
-            var screenWidth = JsTypeOf(window.innerWidth) != JsTypes.undefined 
-                ? window.innerWidth 
-                : JsTypeOf(document.documentElement.clientWidth) != JsTypes.undefined 
-                    ? document.documentElement.clientWidth 
+            var screenWidth = JsTypeOf(window.innerWidth) != JsTypes.undefined
+                ? window.innerWidth
+                : JsTypeOf(document.documentElement.clientWidth) != JsTypes.undefined
+                    ? document.documentElement.clientWidth
                     : screen.width;
-            var screenHeight = JsTypeOf(window.innerHeight) != JsTypes.undefined 
-                ? window.innerHeight 
-                : JsTypeOf(document.documentElement.clientHeight) != JsTypes.undefined 
-                    ? document.documentElement.clientHeight 
+            var screenHeight = JsTypeOf(window.innerHeight) != JsTypes.undefined
+                ? window.innerHeight
+                : JsTypeOf(document.documentElement.clientHeight) != JsTypes.undefined
+                    ? document.documentElement.clientHeight
                     : screen.height;
 
             var w = a4.offsetWidth + 50;
@@ -519,7 +553,7 @@ namespace AlphaTab.Platform.JavaScript
             }
 
             TrackIndexes = ParseTracks(tracksData);
-            
+
             if (render)
             {
                 Render();
@@ -598,6 +632,8 @@ namespace AlphaTab.Platform.JavaScript
 
         protected void ScoreLoaded(Score score, bool render = true)
         {
+            ModelUtils.ApplyPitchOffsets(Settings, score);
+
             Score = score;
             TriggerEvent("loaded", score);
             if (render)
@@ -605,6 +641,7 @@ namespace AlphaTab.Platform.JavaScript
                 Render();
             }
         }
+
 
         public void TriggerEvent(string name, object details = null)
         {

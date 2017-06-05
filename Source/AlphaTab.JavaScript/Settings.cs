@@ -54,6 +54,7 @@ namespace AlphaTab
             json.engine = Engine;
             json.stretchForce = StretchForce;
             json.forcePianoFingering = ForcePianoFingering;
+            json.pitchOffsets = PitchOffsets;
 
             json.scriptFile = ScriptFile;
             json.fontDirectory = FontDirectory;
@@ -137,6 +138,7 @@ namespace AlphaTab
             if (Std.JsonExists(json, "stretchForce")) settings.StretchForce = json.stretchForce;
             if (Std.JsonExists(json, "forcePianoFingering")) settings.ForcePianoFingering = json.forcePianoFingering;
             if (Std.JsonExists(json, "lazy")) settings.DisableLazyLoading = !json.lazy;
+            if (Std.JsonExists(json, "pitchOffsets")) settings.PitchOffsets = json.pitchOffsets;
 
             if (Std.JsonExists(json, "scriptFile"))
             {

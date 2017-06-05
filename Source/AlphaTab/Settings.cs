@@ -72,6 +72,11 @@ namespace AlphaTab
         /// </summary>
         public StaveSettings Staves { get; set; }
 
+        /// <summary>
+        /// The pitch offsets for the individual tracks. 
+        /// </summary>
+        public int[] PitchOffsets { get; set; }
+
         public static Settings Defaults
         {
             get
@@ -83,6 +88,7 @@ namespace AlphaTab
                 settings.Width = -1;
                 settings.Height = 200;
                 settings.Engine = "default";
+                settings.PitchOffsets = new int[0];
 
                 settings.Layout = LayoutSettings.Defaults;
 

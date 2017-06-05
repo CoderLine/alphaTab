@@ -179,9 +179,15 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
             if (Width > 0)
             {
                 _renderer.Settings.Width = (int)(Width / _displayDensity);
+
                 _initialRenderCompleted = false;
                 _isRendering = true;
                 var tracks = Tracks.ToArray();
+                if (tracks.Length > 0)
+                {
+                    ModelUtils.ApplyPitchOffsets(_renderer.Settings, tracks[0].Score);
+                }
+
                 Task.Factory.StartNew(() =>
                 {
                     _renderer.RenderMultiple(tracks);

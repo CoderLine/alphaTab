@@ -331,6 +331,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
                 settings.StretchForce = StretchForce;
                 settings.Staves.Id = StavesMode;
                 Renderer.UpdateSettings(settings);
+                ModelUtils.ApplyPitchOffsets(settings, trackArray[0].Score);
 
                 _initialRenderCompleted = false;
                 _isRendering = 1;

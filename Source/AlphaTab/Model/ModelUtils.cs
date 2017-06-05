@@ -52,5 +52,16 @@ namespace AlphaTab.Model
         {
             return ks > 0;
         }
+
+        public static void ApplyPitchOffsets(Settings settings, Score score)
+        {
+            for (var i = 0; i < score.Tracks.Count; i++)
+            {
+                if (i < settings.PitchOffsets.Length)
+                {
+                    score.Tracks[i].PitchOffset = settings.PitchOffsets[i];
+                }
+            }
+        }
     }
 }

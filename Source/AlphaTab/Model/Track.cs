@@ -30,6 +30,8 @@ namespace AlphaTab.Model
         private const int ShortNameMaxLength = 10;
 
         public int Capo { get; set; }
+        public int PitchOffset { get; set; }
+
         public int Index { get; set; }
         public string Name { get; set; }
         public string ShortName { get; set; }
@@ -83,6 +85,7 @@ namespace AlphaTab.Model
             dst.Color.Raw = src.Color.Raw;
             dst.Color.RGBA = src.Color.RGBA;
             dst.IsPercussion = src.IsPercussion;
+            dst.PitchOffset = src.PitchOffset;
         }
 
         public void AddBarToStaff(int staffIndex, Bar bar)

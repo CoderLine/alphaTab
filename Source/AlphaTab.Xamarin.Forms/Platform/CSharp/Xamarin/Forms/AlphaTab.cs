@@ -136,6 +136,11 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
                 _initialRenderCompleted = false;
                 _isRendering = true;
                 var tracks = Tracks.ToArray();
+                if (tracks.Length > 0)
+                {
+                    ModelUtils.ApplyPitchOffsets(_renderer.Settings, tracks[0].Score);
+                }
+
                 Task.Factory.StartNew(() =>
                 {
                     _renderer.RenderMultiple(tracks);

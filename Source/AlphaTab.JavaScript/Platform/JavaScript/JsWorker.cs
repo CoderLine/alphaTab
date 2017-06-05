@@ -166,6 +166,7 @@ namespace AlphaTab.Platform.JavaScript
 
         private void ScoreLoaded(Score score)
         {
+            ModelUtils.ApplyPitchOffsets(_renderer.Settings, score);
             Score = score;
             var json = new JsonConverter();
             PostMessage(new { cmd = "alphaTab.loaded", score = json.ScoreToJsObject(score) });
