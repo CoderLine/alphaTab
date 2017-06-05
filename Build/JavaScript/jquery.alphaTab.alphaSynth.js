@@ -403,7 +403,7 @@
             
         // if playing, animate the cursor to the next beat
         $('.atHighlight', element).removeClass('atHighlight');
-        if(context.playerState == 1 || stop) {
+        if(context.playerState == 1 || stop || true) {
             duration /= context.cursorOptions.playbackSpeed;
             
             if(!stop) {
@@ -422,8 +422,8 @@
                 }, duration, 'linear');       
             }            
                 
-            if(!selecting) {
-                
+            if(!selecting || true) {
+                                
                 // calculate position of whole music wheet within the scroll parent
                 var scrollElement = $(context.cursorOptions.scrollElement);
                 var scrollElementOffset = scrollElement.offset();
@@ -433,7 +433,13 @@
                     left: elementOffset.left - scrollElementOffset.left,
                 };
                 if(context.cursorOptions.autoScroll == 'vertical') {
-                    var scrollTop = beatBoundings.RealBounds.Y - elementOffset.top;
+                    var scrollTop = elementOffset.top + barBoundings.RealBounds.Y;
+                    if(context.cursorOptions.scrollOffset.length) {
+                        scrollTop += context.cursorOptions.scrollOffset[1];
+                    }
+                    else if(context.cursorOptions.scrollOffset) {
+                        scrollTop += context.cursorOptions.scrollOffset;                        
+                    }
                     if(scrollTop != context.cursorOptions.lastScroll) {
                         context.cursorOptions.lastScroll = scrollTop;
                         $(context.cursorOptions.scrollElement).animate({
@@ -443,7 +449,13 @@
                 }
                 else if(context.cursorOptions.autoScroll == 'horizontal-bar') {
                     if(barBoundings.VisualBounds.X != context.cursorOptions.lastScroll) {
-                        var scrollLeft = barBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
+                        var scrollLeft = barBoundings.RealBounds.X;
+                        if(context.cursorOptions.scrollOffset.length) {
+                            scrollLeft += context.cursorOptions.scrollOffset[0];
+                        }
+                        else if(context.cursorOptions.scrollOffset) {
+                            scrollLeft += context.cursorOptions.scrollOffset;                        
+                        }                        
                         context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
                         $(context.cursorOptions.scrollElement).animate({
                             scrollLeft:scrollLeft + 'px'
@@ -454,7 +466,13 @@
                     var elementRight = $(context.cursorOptions.scrollElement).scrollLeft() + 
                                        $(context.cursorOptions.scrollElement).width();
                     if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || barBoundings.VisualBounds.X < $(context.cursorOptions.scrollElement).scrollLeft() ) {
-                        var scrollLeft = barBoundings.RealBounds.X + context.cursorOptions.scrollOffset;
+                        var scrollLeft = barBoundings.RealBounds.X;
+                        if(context.cursorOptions.scrollOffset.length) {
+                            scrollLeft += context.cursorOptions.scrollOffset[0];
+                        }
+                        else if(context.cursorOptions.scrollOffset) {
+                            scrollLeft += context.cursorOptions.scrollOffset;                        
+                        }                
                         context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
                         $(context.cursorOptions.scrollElement).animate({
                             scrollLeft:scrollLeft + 'px'
@@ -501,6 +519,11 @@
                 
         var defaults = $.extend({}, cursorOptionsDefaults);                
         context.cursorOptions = $.extend(defaults, options);
+        
+        var scrollOffset = element.data("player-offset");
+        if(scrollOffset) {
+            context.cursorOptions.scrollOffset = scrollOffset;
+        }
         
         //
         // Create cursors
