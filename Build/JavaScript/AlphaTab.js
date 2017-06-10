@@ -13226,19 +13226,19 @@ AlphaTab.Rendering.Glyphs.NoteNumberGlyph = function (x, y, n){
     this.IsEmpty = false;
     AlphaTab.Rendering.Glyphs.Glyph.call(this, x, y);
     if (!n.IsTieDestination){
-        this._noteString = n.IsDead ? "x" : (n.Fret - n.Beat.Voice.Bar.Staff.Track.DisplayTranspositionPitch).toString();
+        this._noteString = n.IsDead ? "x" : (n.Fret - n.Beat.Voice.Bar.Staff.Track.TranspositionPitch).toString();
         if (n.IsGhost){
             this._noteString = "(" + this._noteString + ")";
         }
     }
     else if (n.Beat.Index == 0 || n.get_HasBend()){
-        this._noteString = "(" + (n.TieOrigin.Fret - n.Beat.Voice.Bar.Staff.Track.DisplayTranspositionPitch) + ")";
+        this._noteString = "(" + (n.TieOrigin.Fret - n.Beat.Voice.Bar.Staff.Track.TranspositionPitch) + ")";
     }
     else {
         this._noteString = "";
     }
     if (n.get_IsTrill()){
-        this._trillNoteString = "(" + (n.get_TrillFret() - n.Beat.Voice.Bar.Staff.Track.DisplayTranspositionPitch) + ")";
+        this._trillNoteString = "(" + (n.get_TrillFret() - n.Beat.Voice.Bar.Staff.Track.TranspositionPitch) + ")";
     }
     else {
         this._trillNoteString = "";
@@ -18022,7 +18022,7 @@ AlphaTab.Rendering.Utils.BeamingHelper.prototype = {
     }
 };
 $StaticConstructor(function (){
-    AlphaTab.Rendering.Utils.BeamingHelper.ScoreMiddleKeys = new Int32Array([48, 48, 45, 38, 59]);
+    AlphaTab.Rendering.Utils.BeamingHelper.ScoreMiddleKeys = new Int32Array([60, 60, 57, 50, 71]);
 });
 AlphaTab.Rendering.Utils.BeamingHelper.CanJoin = function (b1, b2){
     // is this a voice we can join with?

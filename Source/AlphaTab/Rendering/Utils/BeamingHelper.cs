@@ -71,7 +71,7 @@ namespace AlphaTab.Rendering.Utils
     /// </summary>
     public class BeamingHelper
     {
-        private static readonly int[] ScoreMiddleKeys = { 48, 48, 45, 38, 59 };
+        private static readonly int[] ScoreMiddleKeys = { 60, 60, 57, 50, 71 };
 
         private Beat _lastBeat;
         private readonly Track _track;
