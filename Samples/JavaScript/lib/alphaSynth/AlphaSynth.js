@@ -1394,7 +1394,7 @@ AlphaSynth.AlphaSynth.prototype = {
     set_TimePosition: function (value){
         AlphaSynth.Util.Logger.Debug("Seeking to position " + value + "ms");
         // tell the sequencer to jump to the given position
-        this._sequencer.Seek(value * this._sequencer.PlaybackSpeed);
+        this._sequencer.Seek(value);
         // update the internal position 
         this.UpdateTimePosition(value);
         // tell the output to reset the already synthesized buffers and request data again 
@@ -3583,7 +3583,7 @@ AlphaSynth.MidiFileSequencer.prototype = {
             timePosition = 0;
         }
         // map to speed=1
-        timePosition /= this.PlaybackSpeed;
+        timePosition *= this.PlaybackSpeed;
         // ensure playback range
         if (this.get_PlaybackRange() != null){
             if (timePosition < this._playbackRangeStartTime){
@@ -3686,7 +3686,7 @@ AlphaSynth.MidiFileSequencer.prototype = {
         // add the missing millis
         tickPosition -= lastChange;
         timePosition += (tickPosition * (60000 / (bpm * this._division)));
-        return timePosition * playbackSpeed;
+        return timePosition / playbackSpeed;
     },
     TimePositionToTickPositionWithSpeed: function (timePosition, playbackSpeed){
         timePosition *= playbackSpeed;
