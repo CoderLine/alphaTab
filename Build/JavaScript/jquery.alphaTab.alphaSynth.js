@@ -69,7 +69,7 @@
             
             // hook into events and forward them
             as.On('readyForPlayback', function() {
-                context.cursorOptions.playbackSpeed = as.get_PlaybackSpeed();
+                context.cursors.options.playbackSpeed = as.get_PlaybackSpeed();
                 context.TriggerEvent('playerReady');
             });
             
@@ -147,7 +147,7 @@
         }
         else {
             as.set_PlaybackSpeed(value);
-            context.cursorOptions.playbackSpeed = as.get_PlaybackSpeed();
+            context.cursors.options.playbackSpeed = as.get_PlaybackSpeed();
         }
     };
     
@@ -250,11 +250,11 @@
     
     api.autoScroll = function(element, context, value) {
         if(typeof value === 'undefined') {
-            return context.cursorOptions.autoScroll;
+            return context.cursors.options.autoScroll;
         }
         else {
-            context.cursorOptions.autoScroll = value;
-            api.playerCursorUpdateBeat(element, context, context.cursorOptions.currentBeat);
+            context.cursors.options.autoScroll = value;
+            api.playerCursorUpdateBeat(element, context, context.cursors.options.currentBeat);
         }
     },
     
@@ -280,7 +280,7 @@
             return;
         }
         
-        var selectionWrapper = context.cursorOptions.selectionWrapper;
+        var selectionWrapper = context.cursors.elements.selectionWrapper;
         selectionWrapper.empty();
         
         if(startBeat == null || endBeat == null || startBeat.beat == endBeat.beat) {
@@ -374,20 +374,20 @@
             return;
         }
 
-        var previousBeat = context.cursorOptions.currentBeat;
-        var previousCache = context.cursorOptions.cursorCache;
-        var previousState = context.cursorOptions.playerState;
-        context.cursorOptions.currentBeat = beat;
-        context.cursorOptions.cursorCache = cache;
-        context.cursorOptions.playerState = context.playerState;
+        var previousBeat = context.cursors.currentBeat;
+        var previousCache = context.cursors.cursorCache;
+        var previousState = context.cursors.playerState;
+        context.cursors.currentBeat = beat;
+        context.cursors.cursorCache = cache;
+        context.cursors.playerState = context.playerState;
         
         if(beat == previousBeat && cache == previousCache && previousState == context.playerState) {
             return;
         }
         
-        var cursorWrapper = context.cursorOptions.cursors;
-        var barCursor = context.cursorOptions.barCursor;
-        var beatCursor = context.cursorOptions.beatCursor;
+        var cursorWrapper = context.cursors.elements.wrapper;
+        var barCursor = context.cursors.elements.barCursor;
+        var beatCursor = context.cursors.elements.beatCursor;
         
         var beatBoundings = cache.FindBeat(beat);
         if(!beatBoundings) {
@@ -406,7 +406,7 @@
             .css({
                 top: barBoundings.VisualBounds.Y + 'px', 
                 left: (beatBoundings.VisualBounds.X) + 'px',
-                width: context.cursorOptions.beatCursorWidth + 'px',
+                width: context.cursors.options.beatCursorWidth + 'px',
                 height: barBoundings.VisualBounds.H + 'px'
             })
         ;
@@ -414,7 +414,7 @@
         // if playing, animate the cursor to the next beat
         $('.atHighlight', element).removeClass('atHighlight');
         if(context.playerState == 1 || stop) {
-            duration /= context.cursorOptions.playbackSpeed;
+            duration /= context.cursors.options.playbackSpeed;
             
             if(!stop) {
                 $('.b' + beat.Id, element).addClass('atHighlight');            
@@ -435,58 +435,58 @@
             if(!selecting) {
                                 
                 // calculate position of whole music wheet within the scroll parent
-                var scrollElement = $(context.cursorOptions.scrollElement);
+                var scrollElement = $(context.cursors.options.scrollElement);
                 var scrollElementOffset = scrollElement.offset();
                 var elementOffset = element.offset();
                 elementOffset = {
                     top: elementOffset.top - scrollElementOffset.top,
                     left: elementOffset.left - scrollElementOffset.left,
                 };
-                if(context.cursorOptions.autoScroll == 'vertical') {
+                if(context.cursors.options.autoScroll == 'vertical') {
                     var scrollTop = elementOffset.top + barBoundings.RealBounds.Y;
-                    if(context.cursorOptions.scrollOffset.length) {
-                        scrollTop += context.cursorOptions.scrollOffset[1];
+                    if(context.cursors.options.scrollOffset.length) {
+                        scrollTop += context.cursors.options.scrollOffset[1];
                     }
-                    else if(context.cursorOptions.scrollOffset) {
-                        scrollTop += context.cursorOptions.scrollOffset;                        
+                    else if(context.cursors.options.scrollOffset) {
+                        scrollTop += context.cursors.options.scrollOffset;                        
                     }
-                    if(scrollTop != context.cursorOptions.lastScroll) {
-                        context.cursorOptions.lastScroll = scrollTop;
-                        $(context.cursorOptions.scrollElement).animate({
+                    if(scrollTop != context.cursors.options.lastScroll) {
+                        context.cursors.options.lastScroll = scrollTop;
+                        $(context.cursors.options.scrollElement).animate({
                             scrollTop:scrollTop + 'px'
-                        }, context.cursorOptions.scrollSpeed);
+                        }, context.cursors.options.scrollSpeed);
                     }
                 }
-                else if(context.cursorOptions.autoScroll == 'horizontal-bar') {
-                    if(barBoundings.VisualBounds.X != context.cursorOptions.lastScroll) {
+                else if(context.cursors.options.autoScroll == 'horizontal-bar') {
+                    if(barBoundings.VisualBounds.X != context.cursors.options.lastScroll) {
                         var scrollLeft = barBoundings.RealBounds.X;
-                        if(context.cursorOptions.scrollOffset.length) {
-                            scrollLeft += context.cursorOptions.scrollOffset[0];
+                        if(context.cursors.options.scrollOffset.length) {
+                            scrollLeft += context.cursors.options.scrollOffset[0];
                         }
-                        else if(context.cursorOptions.scrollOffset) {
-                            scrollLeft += context.cursorOptions.scrollOffset;                        
+                        else if(context.cursors.options.scrollOffset) {
+                            scrollLeft += context.cursors.options.scrollOffset;                        
                         }                        
-                        context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
-                        $(context.cursorOptions.scrollElement).animate({
+                        context.cursors.options.lastScroll = barBoundings.VisualBounds.X;
+                        $(context.cursors.options.scrollElement).animate({
                             scrollLeft:scrollLeft + 'px'
-                        }, context.cursorOptions.scrollSpeed);
+                        }, context.cursors.options.scrollSpeed);
                     }
                 }
-                else if(context.cursorOptions.autoScroll == 'horizontal-offscreen') {
-                    var elementRight = $(context.cursorOptions.scrollElement).scrollLeft() + 
-                                       $(context.cursorOptions.scrollElement).width();
-                    if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || barBoundings.VisualBounds.X < $(context.cursorOptions.scrollElement).scrollLeft() ) {
+                else if(context.cursors.options.autoScroll == 'horizontal-offscreen') {
+                    var elementRight = $(context.cursors.options.scrollElement).scrollLeft() + 
+                                       $(context.cursors.options.scrollElement).width();
+                    if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || barBoundings.VisualBounds.X < $(context.cursors.options.scrollElement).scrollLeft() ) {
                         var scrollLeft = barBoundings.RealBounds.X;
-                        if(context.cursorOptions.scrollOffset.length) {
-                            scrollLeft += context.cursorOptions.scrollOffset[0];
+                        if(context.cursors.options.scrollOffset.length) {
+                            scrollLeft += context.cursors.options.scrollOffset[0];
                         }
-                        else if(context.cursorOptions.scrollOffset) {
-                            scrollLeft += context.cursorOptions.scrollOffset;                        
+                        else if(context.cursors.options.scrollOffset) {
+                            scrollLeft += context.cursors.options.scrollOffset;                        
                         }                
-                        context.cursorOptions.lastScroll = barBoundings.VisualBounds.X;
-                        $(context.cursorOptions.scrollElement).animate({
+                        context.cursors.options.lastScroll = barBoundings.VisualBounds.X;
+                        $(context.cursors.options.scrollElement).animate({
                             scrollLeft:scrollLeft + 'px'
-                        }, context.cursorOptions.scrollSpeed);
+                        }, context.cursors.options.scrollSpeed);
                     }
                 }
             }            
@@ -510,10 +510,10 @@
     api.cursorOptions = function(element, context, options) {
         if(options) {
             var defaults = $.extend({}, cursorOptionsDefaults);
-            context.cursorOptions = $.extend(defaults, options);
+            context.cursors.options = $.extend(defaults, options);
         }
         else {
-            return context.cursorOptions;
+            return context.cursors.options;
         }
     };
     
@@ -526,13 +526,19 @@
         // prevent double initialization
         if(element.data('alphaSynthCursor')) { return; }
         element.data('alphaSynthCursor', true);
-                
-        var defaults = $.extend({}, cursorOptionsDefaults);                
-        context.cursorOptions = $.extend(defaults, options);
+        
+        var defaults = $.extend({}, cursorOptionsDefaults);                  
+        context.cursors = {
+            options: $.extend(defaults, options),
+            elements: {},
+            previousBeat: null,
+            previousCache: null,
+            previousState: null
+        };
         
         var scrollOffset = element.data("player-offset");
         if(scrollOffset) {
-            context.cursorOptions.scrollOffset = scrollOffset;
+            context.cursors.options.scrollOffset = scrollOffset;
         }
         
         //
@@ -553,10 +559,10 @@
         beatCursor.css({position: 'absolute'});
 
         // store options and created elements for fast access
-        context.cursorOptions.cursors = cursorWrapper;
-        context.cursorOptions.barCursor = barCursor;
-        context.cursorOptions.beatCursor = beatCursor;
-        context.cursorOptions.selectionWrapper = selectionWrapper;
+        context.cursors.elements.wrapper = cursorWrapper;
+        context.cursors.elements.barCursor = barCursor;
+        context.cursors.elements.beatCursor = beatCursor;
+        context.cursors.elements.selectionWrapper = selectionWrapper;
         
         // add cursors to UI
         element.prepend(cursorWrapper);
@@ -594,7 +600,7 @@
         //
         // Click Handling
         
-        if(context.cursorOptions.handleClick) {
+        if(context.cursors.options.handleClick) {
             $(context.CanvasElement).on('mousedown', function(e) {
                 if(e.which != 1) {
                     return;
