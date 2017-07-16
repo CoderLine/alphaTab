@@ -2400,16 +2400,14 @@ AlphaTab.Audio.GeneralMidi.IsGuitar = function (program){
     return (program >= 24 && program <= 39) || program == 105 || program == 43;
 };
 AlphaTab.Audio.Generator = AlphaTab.Audio.Generator || {};
-AlphaTab.Audio.Generator.MidiFileGenerator = function (score, handler, generateMetronome){
+AlphaTab.Audio.Generator.MidiFileGenerator = function (score, handler){
     this._score = null;
     this._handler = null;
     this._currentTempo = 0;
-    this.GenerateMetronome = false;
     this.TickLookup = null;
     this._score = score;
     this._currentTempo = this._score.Tempo;
     this._handler = handler;
-    this.GenerateMetronome = generateMetronome;
     this.TickLookup = new AlphaTab.Audio.Model.MidiTickLookup();
 };
 AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
@@ -2480,15 +2478,6 @@ AlphaTab.Audio.Generator.MidiFileGenerator.prototype = {
         else if (masterBar.TempoAutomation != null){
             this._handler.AddTempo(currentTick, masterBar.TempoAutomation.Value | 0);
             this._currentTempo = ((masterBar.TempoAutomation.Value)) | 0;
-        }
-        // metronome
-        if (this.GenerateMetronome){
-            var start = currentTick;
-            var length = AlphaTab.Audio.MidiUtils.ValueToTicks(masterBar.TimeSignatureDenominator);
-            for (var i = 0; i < masterBar.TimeSignatureNumerator; i++){
-                this._handler.AddMetronome(start, length);
-                start += length;
-            }
         }
         var masterBarLookup = new AlphaTab.Audio.Model.MasterBarTickLookup();
         masterBarLookup.MasterBar = masterBar;
@@ -2879,7 +2868,7 @@ $StaticConstructor(function (){
     AlphaTab.Audio.Generator.MidiFileGenerator.DefaultBend = 64;
     AlphaTab.Audio.Generator.MidiFileGenerator.DefaultBendSemitone = 2.75;
 });
-AlphaTab.Audio.Generator.MidiFileGenerator.GenerateMidiFile = function (score, generateMetronome){
+AlphaTab.Audio.Generator.MidiFileGenerator.GenerateMidiFile = function (score){
     var midiFile = new AlphaTab.Audio.Model.MidiFile();
     // create score tracks + metronometrack
     for (var i = 0,j = score.Tracks.length; i < j; i++){
@@ -2887,7 +2876,7 @@ AlphaTab.Audio.Generator.MidiFileGenerator.GenerateMidiFile = function (score, g
     }
     midiFile.InfoTrack = 0;
     var handler = new AlphaTab.Audio.Generator.MidiFileHandler(midiFile);
-    var generator = new AlphaTab.Audio.Generator.MidiFileGenerator(score, handler, generateMetronome);
+    var generator = new AlphaTab.Audio.Generator.MidiFileGenerator(score, handler);
     generator.Generate();
     midiFile.TickLookup = generator.TickLookup;
     return midiFile;
@@ -2898,9 +2887,7 @@ AlphaTab.Audio.Generator.MidiFileGenerator.ToChannelShort = function (data){
 };
 AlphaTab.Audio.Generator.MidiFileHandler = function (midiFile){
     this._midiFile = null;
-    this._metronomeTrack = 0;
     this._midiFile = midiFile;
-    this._metronomeTrack = -1;
 };
 AlphaTab.Audio.Generator.MidiFileHandler.prototype = {
     AddEvent: function (track, tick, message){
@@ -2940,13 +2927,6 @@ AlphaTab.Audio.Generator.MidiFileHandler.prototype = {
     },
     AddBend: function (track, tick, channel, value){
         this.AddEvent(track, tick, new AlphaTab.Audio.Model.MidiMessage(new Uint8Array([this.MakeCommand(224, channel), 0, AlphaTab.Audio.Generator.MidiFileHandler.FixValue(value)])));
-    },
-    AddMetronome: function (start, length){
-        if (this._metronomeTrack == -1){
-            this._midiFile.CreateTrack();
-            this._metronomeTrack = this._midiFile.Tracks.length - 1;
-        }
-        this.AddNote(this._metronomeTrack, start, length, 37, AlphaTab.Model.DynamicValue.F, 9);
     }
 };
 $StaticConstructor(function (){

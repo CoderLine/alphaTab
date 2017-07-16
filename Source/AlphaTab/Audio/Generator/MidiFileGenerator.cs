@@ -30,22 +30,19 @@ namespace AlphaTab.Audio.Generator
         private readonly IMidiFileHandler _handler;
         private int _currentTempo;
 
-        public bool GenerateMetronome { get; set; }
 
         public MidiTickLookup TickLookup { get; private set; }
 
 
-        public MidiFileGenerator(Score score, IMidiFileHandler handler, bool generateMetronome = false)
+        public MidiFileGenerator(Score score, IMidiFileHandler handler)
         {
             _score = score;
             _currentTempo = _score.Tempo;
             _handler = handler;
-            GenerateMetronome = generateMetronome;
             TickLookup = new MidiTickLookup();
-
         }
 
-        public static MidiFile GenerateMidiFile(Score score, bool generateMetronome = false)
+        public static MidiFile GenerateMidiFile(Score score)
         {
             var midiFile = new MidiFile();
             // create score tracks + metronometrack
@@ -54,9 +51,10 @@ namespace AlphaTab.Audio.Generator
                 midiFile.CreateTrack();
             }
             midiFile.InfoTrack = 0;
+            
 
             var handler = new MidiFileHandler(midiFile);
-            var generator = new MidiFileGenerator(score, handler, generateMetronome);
+            var generator = new MidiFileGenerator(score, handler);
             generator.Generate();
             midiFile.TickLookup = generator.TickLookup;
             return midiFile;
@@ -168,18 +166,6 @@ namespace AlphaTab.Audio.Generator
             {
                 _handler.AddTempo(currentTick, (int)masterBar.TempoAutomation.Value);
                 _currentTempo = (int)(masterBar.TempoAutomation.Value);
-            }
-
-            // metronome
-            if (GenerateMetronome)
-            {
-                var start = currentTick;
-                var length = MidiUtils.ValueToTicks(masterBar.TimeSignatureDenominator);
-                for (int i = 0; i < masterBar.TimeSignatureNumerator; i++)
-                {
-                    _handler.AddMetronome(start, length);
-                    start += length;
-                }
             }
 
             var masterBarLookup = new MasterBarTickLookup();

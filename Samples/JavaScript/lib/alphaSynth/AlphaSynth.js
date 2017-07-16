@@ -497,6 +497,9 @@ AlphaSynth.Main.AlphaSynthWebWorker.prototype = {
             case "alphaSynth.setMasterVolume":
                 this._player.set_MasterVolume(data["value"]);
                 break;
+            case "alphaSynth.setMetronomeVolume":
+                this._player.set_MetronomeVolume(data["value"]);
+                break;
             case "alphaSynth.setPlaybackSpeed":
                 this._player.set_PlaybackSpeed(data["value"]);
                 break;
@@ -606,6 +609,7 @@ $StaticConstructor(function (){
     AlphaSynth.Main.AlphaSynthWebWorker.CmdInitialize = "alphaSynth.initialize";
     AlphaSynth.Main.AlphaSynthWebWorker.CmdSetLogLevel = "alphaSynth.setLogLevel";
     AlphaSynth.Main.AlphaSynthWebWorker.CmdSetMasterVolume = "alphaSynth.setMasterVolume";
+    AlphaSynth.Main.AlphaSynthWebWorker.CmdSetMetronomeVolume = "alphaSynth.setMetronomeVolume";
     AlphaSynth.Main.AlphaSynthWebWorker.CmdSetPlaybackSpeed = "alphaSynth.setPlaybackSpeed";
     AlphaSynth.Main.AlphaSynthWebWorker.CmdSetTickPosition = "alphaSynth.setTickPosition";
     AlphaSynth.Main.AlphaSynthWebWorker.CmdSetTimePosition = "alphaSynth.setTimePosition";
@@ -656,6 +660,7 @@ AlphaSynth.Main.AlphaSynthWebWorkerApi = function (player, alphaSynthScriptFile)
     this._state = AlphaSynth.PlayerState.Paused;
     this._logLevel = AlphaSynth.Util.LogLevel.None;
     this._masterVolume = 0;
+    this._metronomeVolume = 0;
     this._playbackSpeed = 0;
     this._isSoundFontLoaded = false;
     this._isMidiLoaded = false;
@@ -692,6 +697,7 @@ AlphaSynth.Main.AlphaSynthWebWorkerApi = function (player, alphaSynthScriptFile)
     });
     this.set_MasterVolume(1);
     this.set_PlaybackSpeed(1);
+    this.set_MetronomeVolume(0);
 };
 AlphaSynth.Main.AlphaSynthWebWorkerApi.prototype = {
     get_IsReady: function (){
@@ -721,6 +727,17 @@ AlphaSynth.Main.AlphaSynthWebWorkerApi.prototype = {
         this._masterVolume = value;
         this._synth.postMessage({
             cmd: "alphaSynth.setMasterVolume",
+            value: value
+        });
+    },
+    get_MetronomeVolume: function (){
+        return this._metronomeVolume;
+    },
+    set_MetronomeVolume: function (value){
+        value = AlphaSynth.Synthesis.SynthHelper.ClampF(value, 0, 10);
+        this._metronomeVolume = value;
+        this._synth.postMessage({
+            cmd: "alphaSynth.setMetronomeVolume",
             value: value
         });
     },
@@ -1367,11 +1384,18 @@ AlphaSynth.AlphaSynth.prototype = {
         AlphaSynth.Util.Logger.LogLevel = value;
     },
     get_MasterVolume: function (){
-        return this._synthesizer.get_MasterVolume();
+        return this._synthesizer.MasterVolume;
     },
     set_MasterVolume: function (value){
         value = AlphaSynth.Synthesis.SynthHelper.ClampF(value, 0, 10);
-        this._synthesizer.set_MasterVolume(value);
+        this._synthesizer.MasterVolume = value;
+    },
+    get_MetronomeVolume: function (){
+        return this._synthesizer.get_MetronomeVolume();
+    },
+    set_MetronomeVolume: function (value){
+        value = AlphaSynth.Synthesis.SynthHelper.ClampF(value, 0, 10);
+        this._synthesizer.set_MetronomeVolume(value);
     },
     get_PlaybackSpeed: function (){
         return this._sequencer.PlaybackSpeed;
@@ -2678,7 +2702,7 @@ AlphaSynth.Bank.Patch.Sf2Patch.prototype = {
         var basePitchFrequency = AlphaSynth.Synthesis.SynthHelper.CentsToPitch(voiceparams.SynthParams.CurrentPitch) * this.gen.Frequency;
         var pitchWithBend = basePitchFrequency * AlphaSynth.Synthesis.SynthHelper.CentsToPitch(voiceparams.PitchOffset);
         var basePitch = pitchWithBend / voiceparams.SynthParams.Synth.SampleRate;
-        var baseVolume = isMuted ? 0 : voiceparams.SynthParams.Synth.get_MasterVolume() * voiceparams.SynthParams.CurrentVolume * 0.35 * voiceparams.SynthParams.MixVolume;
+        var baseVolume = isMuted ? 0 : voiceparams.SynthParams.Synth.MasterVolume * voiceparams.SynthParams.CurrentVolume * 0.35 * voiceparams.SynthParams.MixVolume;
         //--Main Loop
         for (var x = startIndex; x < endIndex; x += 128){
             voiceparams.Envelopes[0].Increment(64);
@@ -3618,8 +3642,6 @@ AlphaSynth.MidiFileSequencer.prototype = {
     },
     LoadMidi: function (midiFile){
         this._tempoChanges = [];
-        // Converts midi to milliseconds for easy sequencing
-        var bpm = 120;
         // Combine all tracks into 1 track that is organized from lowest to highest absolute time
         if (midiFile.Tracks.length > 1 || midiFile.Tracks[0].EndTime == 0){
             midiFile.CombineTracks();
@@ -3628,20 +3650,30 @@ AlphaSynth.MidiFileSequencer.prototype = {
         this._eventIndex = 0;
         (this._currentTime) = 0;
         // build synth events. 
-        this._synthData = new Array(midiFile.Tracks[0].MidiEvents.length);
+        this._synthData = [];
+        // Converts midi to milliseconds for easy sequencing
+        var bpm = 120;
         var absTick = 0;
         var absTime = 0;
+        var metronomeLength = 0;
+        var metronomeTick = 0;
+        var metronomeTime = 0;
         for (var x = 0; x < midiFile.Tracks[0].MidiEvents.length; x++){
             var mEvent = midiFile.Tracks[0].MidiEvents[x];
-            var synthData = this._synthData[x] = new AlphaSynth.Synthesis.SynthEvent(mEvent);
+            var synthData = new AlphaSynth.Synthesis.SynthEvent(mEvent);
+            this._synthData.push(synthData);
             absTick += mEvent.DeltaTime;
             absTime += mEvent.DeltaTime * (60000 / (bpm * midiFile.Division));
             synthData.Delta = absTime;
-            // Update tempo
             if (mEvent.get_Command() == AlphaSynth.Midi.Event.MidiEventTypeEnum.Meta && mEvent.get_Data1() == 81){
                 var meta = mEvent;
                 bpm = 60000000 / meta.Value;
                 this._tempoChanges.push(new AlphaSynth.MidiFileSequencerTempoChange(bpm, absTick, ((absTime)) | 0));
+            }
+            else if (mEvent.get_Command() == AlphaSynth.Midi.Event.MidiEventTypeEnum.Meta && mEvent.get_Data1() == 88){
+                var meta = mEvent;
+                var timeSignatureDenominator = (Math.pow(2, meta.Data[1])) | 0;
+                metronomeLength = ((this._division * (4 / timeSignatureDenominator))) | 0;
             }
             else if (mEvent.get_Command() == AlphaSynth.Midi.Event.MidiEventTypeEnum.ProgramChange){
                 var channel = mEvent.get_Channel();
@@ -3649,7 +3681,19 @@ AlphaSynth.MidiFileSequencer.prototype = {
                     this._firstProgramEventPerChannel[channel] = synthData;
                 }
             }
+            if (metronomeLength > 0){
+                while (metronomeTick < absTick){
+                    var metronome = AlphaSynth.Synthesis.SynthEvent.NewMetronomeEvent(metronomeLength);
+                    this._synthData.push(metronome);
+                    metronome.Delta = metronomeTime;
+                    metronomeTick += metronomeLength;
+                    metronomeTime += metronomeLength * (60000 / (bpm * midiFile.Division));
+                }
+            }
         }
+        this._synthData.sort($CreateAnonymousDelegate(this, function (a, b){
+    return ((a.Delta - b.Delta)) | 0;
+}));
         this._endTime = absTime;
         this.EndTick = absTick;
     },
@@ -4241,7 +4285,7 @@ AlphaSynth.Midi.MidiFile.ReadMetaMessage = function (input, delta, status){
         case AlphaSynth.Midi.Event.MetaEventTypeEnum.TimeSignature:
             if (input.ReadByte() != 4)
             throw $CreateException(new System.Exception.ctor$$String("Invalid time signature event. Expected size of 4."), new Error());
-            return new AlphaSynth.Midi.Event.MetaTextEvent(delta, status, metaStatus, input.ReadByte() + ":" + input.ReadByte() + ":" + input.ReadByte() + ":" + input.ReadByte());
+            return new AlphaSynth.Midi.Event.MetaDataEvent(delta, status, metaStatus, new Uint8Array([input.ReadByte(), input.ReadByte(), input.ReadByte(), input.ReadByte()]));
         case AlphaSynth.Midi.Event.MetaEventTypeEnum.KeySignature:
             if (input.ReadByte() != 2)
             throw $CreateException(new System.Exception.ctor$$String("Invalid key signature event. Expected size of 2."), new Error());
@@ -5258,7 +5302,7 @@ AlphaSynth.Synthesis.VoiceManager = function (voiceCount){
         this._vNodes.AddLast(new AlphaSynth.Synthesis.VoiceNode());
         this.FreeVoices.AddLast(v);
     }
-    this.Registry = new Array(16);
+    this.Registry = new Array(17);
     for (var i = 0; i < this.Registry.length; i++){
         this.Registry[i] = new Array(128);
     }
@@ -5479,30 +5523,38 @@ AlphaSynth.Synthesis.SynthHelper.CentsToPitch = function (cents){
 };
 AlphaSynth.Synthesis.SynthEvent = function (e){
     this.Event = null;
+    this.IsMetronome = false;
     this.Delta = 0;
     this.Event = e;
+};
+AlphaSynth.Synthesis.SynthEvent.NewMetronomeEvent = function (metronomeLength){
+    var x = new AlphaSynth.Synthesis.SynthEvent(null);
+    x.IsMetronome = true;
+    return x;
 };
 AlphaSynth.Synthesis.Synthesizer = function (sampleRate, audioChannels, bufferSize, bufferCount, polyphony){
     this._voiceManager = null;
     this._synthChannels = null;
-    this._masterVolume = 0;
     this._layerList = null;
     this._midiEventQueue = null;
     this._midiEventCounts = null;
+    this._metronomeChannel = 0;
     this._mutedChannels = null;
     this._soloChannels = null;
     this._isAnySolo = false;
+    this._syn = 0;
     this.MidiEventProcessed = null;
     this.MicroBufferSize = 0;
     this.MicroBufferCount = 0;
     this.SampleBuffer = null;
     this.SoundBank = null;
     this.SampleRate = 0;
+    this.MasterVolume = 0;
     var MinSampleRate = 8000;
     var MaxSampleRate = 96000;
     //
     // Setup synth parameters
-    this._masterVolume = 1;
+    this.MasterVolume = 1;
     this.SampleRate = AlphaSynth.Synthesis.SynthHelper.ClampI(sampleRate, MinSampleRate, MaxSampleRate);
     this.MicroBufferSize = AlphaSynth.Synthesis.SynthHelper.ClampI(bufferSize, ((0.001 * sampleRate)) | 0, ((0.05 * sampleRate)) | 0);
     this.MicroBufferSize = ((Math.ceil(this.MicroBufferSize / 64) * 64)) | 0;
@@ -5510,10 +5562,12 @@ AlphaSynth.Synthesis.Synthesizer = function (sampleRate, audioChannels, bufferSi
     this.MicroBufferCount = (Math.max(1, bufferCount));
     this.SampleBuffer = new Float32Array((this.MicroBufferSize * this.MicroBufferCount * audioChannels));
     // Setup Controllers
-    this._synthChannels = new Array(16);
+    this._synthChannels = new Array(17);
     for (var x = 0; x < this._synthChannels.length; x++){
         this._synthChannels[x] = new AlphaSynth.Synthesis.SynthParameters(this);
     }
+    // setup metronome channel
+    this._metronomeChannel = this._synthChannels.length - 1;
     // Create synth voices
     this._voiceManager = new AlphaSynth.Synthesis.VoiceManager(AlphaSynth.Synthesis.SynthHelper.ClampI(polyphony, 5, 250));
     // Create midi containers
@@ -5525,11 +5579,11 @@ AlphaSynth.Synthesis.Synthesizer = function (sampleRate, audioChannels, bufferSi
     this.ResetSynthControls();
 };
 AlphaSynth.Synthesis.Synthesizer.prototype = {
-    get_MasterVolume: function (){
-        return this._masterVolume;
+    get_MetronomeVolume: function (){
+        return this._synthChannels[this._metronomeChannel].MixVolume;
     },
-    set_MasterVolume: function (value){
-        this._masterVolume = AlphaSynth.Synthesis.SynthHelper.ClampF(value, 0, 10);
+    set_MetronomeVolume: function (value){
+        this._synthChannels[this._metronomeChannel].MixVolume = value;
     },
     LoadBank: function (bank){
         this.UnloadBank();
@@ -5548,6 +5602,10 @@ AlphaSynth.Synthesis.Synthesizer.prototype = {
         }
         this._synthChannels[9].BankSelect = 128;
         this.ReleaseAllHoldPedals();
+        this._synthChannels[this._metronomeChannel].Volume.set_Coarse(128);
+        this._synthChannels[this._metronomeChannel].UpdateCurrentVolumeFromVolume();
+        this._synthChannels[this._metronomeChannel].BankSelect = 128;
+        //_synthChannels[_metronomeChannel].MixVolume = 0;
     },
     ResetPrograms: function (){
         for (var $i10 = 0,$t10 = this._synthChannels,$l10 = $t10.length,parameters = $t10[$i10]; $i10 < $l10; $i10++, parameters = $t10[$i10]){
@@ -5567,7 +5625,13 @@ AlphaSynth.Synthesis.Synthesizer.prototype = {
             if (this._midiEventQueue.Length > 0){
                 for (var i = 0; i < this._midiEventCounts[x]; i++){
                     var m = this._midiEventQueue.RemoveLast();
-                    this.ProcessMidiMessage(m.Event);
+                    if (m.IsMetronome){
+                        this.NoteOff(this._metronomeChannel, 37);
+                        this.NoteOn(this._metronomeChannel, 37, 95);
+                    }
+                    else {
+                        this.ProcessMidiMessage(m.Event);
+                    }
                 }
             }
             //voice processing loop
@@ -6168,7 +6232,7 @@ $StaticConstructor(function (){
     AlphaSynth.Util.SynthConstants.SincWidth = 16;
     AlphaSynth.Util.SynthConstants.SincResolution = 64;
     AlphaSynth.Util.SynthConstants.MaxVoiceComponents = 4;
-    AlphaSynth.Util.SynthConstants.DefaultChannelCount = 16;
+    AlphaSynth.Util.SynthConstants.DefaultChannelCount = 17;
     AlphaSynth.Util.SynthConstants.DefaultKeyCount = 128;
     AlphaSynth.Util.SynthConstants.DefaultMixGain = 0.35;
     AlphaSynth.Util.SynthConstants.MinVolume = 0;

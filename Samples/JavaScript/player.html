@@ -111,6 +111,7 @@
               </ul>
             </li>
             <li><a href="#" id="looping" class="glyphicon glyphicon-refresh"></a></li>
+            <li><a href="#" id="metronome" class="glyphicon glyphicon-edit" data-toggle="tooltip" data-placement="bottom" title="Metronome"></a></li>
            
           </ul>
           <ul class="nav navbar-nav navbar-right">
@@ -168,6 +169,7 @@
             $('#playPause').prop('disabled', false).removeAttr('disabled');            
             $('#stop').prop('disabled', false).removeAttr('disabled');            
             $('#looping').prop('disabled', false).removeAttr('disabled');            
+            $('#metronome').prop('disabled', false).removeAttr('disabled');            
             updateControls();
         });
         at.on('alphaTab.playerStateChanged', function() {
@@ -202,6 +204,19 @@
             }
             else {
                 $('#looping').closest('li').removeClass('active');
+            }
+        });
+        
+        $('#metronome').click(function(e) {
+            e.preventDefault();
+            var metronomeVolume = at.alphaTab('metronomeVolume');
+            if(metronomeVolume == 0) {
+                at.alphaTab('metronomeVolume', 1);
+                $('#metronome').closest('li').addClass('active');
+            }
+            else {
+                at.alphaTab('metronomeVolume', 0);
+                $('#metronome').closest('li').removeClass('active');
             }
         });
         

@@ -27,19 +27,17 @@ namespace AlphaTab.Audio.Generator
     /// </summary>
     public class MidiFileHandler : IMidiFileHandler
     {
-        public const int DefaultMetronomeKey = 0x25;
+        public const int DefaultMetronomeKey = 37;
         public const int DefaultDurationDead = 30;
         public const int DefaultDurationPalmMute = 80;
 
         public const int RestMessage = 0x00;
 
         private readonly MidiFile _midiFile;
-        private int _metronomeTrack;
 
         public MidiFileHandler(MidiFile midiFile)
         {
             _midiFile = midiFile;
-            _metronomeTrack = -1;
         }
 
         private void AddEvent(int track, int tick, MidiMessage message)
@@ -110,16 +108,6 @@ namespace AlphaTab.Audio.Generator
         public void AddBend(int track, int tick, byte channel, byte value)
         {
             AddEvent(track, tick, new MidiMessage(new byte[] { MakeCommand(0xE0, channel), 0, FixValue(value) }));
-        }
-
-        public void AddMetronome(int start, int length)
-        {
-            if (_metronomeTrack == -1)
-            {
-                _midiFile.CreateTrack();
-                _metronomeTrack = _midiFile.Tracks.Count - 1;
-            }
-            AddNote(_metronomeTrack, start, length, DefaultMetronomeKey, DynamicValue.F, MidiUtils.PercussionChannel);
         }
 
         private static MidiMessage BuildMetaMessage(int metaType, byte[] data)

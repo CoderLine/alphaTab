@@ -23,7 +23,7 @@ namespace AlphaTab.Audio.Model
 {
     /// <summary>
     /// A midi file consists of multiple tracks including a
-    /// info track for multi-track messages and a track for metronome ticks. 
+    /// info track for multi-track messages 
     /// </summary>
     public class MidiFile
     {
