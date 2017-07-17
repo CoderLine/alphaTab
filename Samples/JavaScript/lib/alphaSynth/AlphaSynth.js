@@ -3636,7 +3636,9 @@ AlphaSynth.MidiFileSequencer.prototype = {
         (this._currentTime) += milliseconds;
         while (this._eventIndex < this._synthData.length && this._synthData[this._eventIndex].Delta < (this._currentTime)){
             var m = this._synthData[this._eventIndex];
-            this._synthesizer.ProcessMidiMessage(m.Event);
+            if (!m.IsMetronome){
+                this._synthesizer.ProcessMidiMessage(m.Event);
+            }
             this._eventIndex++;
         }
     },
