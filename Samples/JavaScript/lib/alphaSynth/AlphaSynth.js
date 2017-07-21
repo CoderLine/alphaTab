@@ -391,6 +391,7 @@ AlphaSynth.Main.AlphaSynthWebAudioOutput.prototype = {
     Pause: function (){
         if (this._source != null){
             this._source.stop(0);
+            this._source.disconnect(0);
         }
         this._source = null;
         this._audioNode.disconnect(0);
