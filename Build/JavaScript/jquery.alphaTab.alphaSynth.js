@@ -60,7 +60,7 @@
         autoScroll: 'vertical',
         scrollSpeed: 300,
         scrollOffset: 0,
-        scrollElement: 'body',
+        scrollElement: 'html,body',
         scrollAdjustment: 0,
         beatCursorWidth: 3,
         handleClick: true
