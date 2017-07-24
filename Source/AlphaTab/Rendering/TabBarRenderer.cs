@@ -33,6 +33,10 @@ namespace AlphaTab.Rendering
 
         public const float LineSpacing = 10;
 
+        public bool ShowTimeSignature { get; set; }
+        public bool ShowRests { get; set; }
+        public bool ShowTiedNotes { get; set; }
+
         public TabBarRenderer(ScoreRenderer renderer, Bar bar)
             : base(renderer, bar)
         {
@@ -104,7 +108,7 @@ namespace AlphaTab.Rendering
             }
 
             // Time Signature
-            if (!Staff.StaveTrackGroup.HasTimeSignature && 
+            if (ShowTimeSignature && 
                 ((Bar.PreviousBar == null) || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureNumerator != Bar.PreviousBar.MasterBar.TimeSignatureNumerator) || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureDenominator != Bar.PreviousBar.MasterBar.TimeSignatureDenominator)))
             {
                 CreateStartSpacing();
@@ -132,7 +136,6 @@ namespace AlphaTab.Rendering
         {
             AddPreBeatGlyph(new SpacingGlyph(0, 0, 5 * Scale));
             AddPreBeatGlyph(new TabTimeSignatureGlyph(0, GetTabY(0), Bar.MasterBar.TimeSignatureNumerator, Bar.MasterBar.TimeSignatureDenominator, Bar.MasterBar.TimeSignatureCommon));
-            Staff.StaveTrackGroup.HasTimeSignature = true;
         }
 
         protected override void CreateBeatGlyphs()
@@ -446,10 +449,11 @@ namespace AlphaTab.Rendering
         {
             foreach (var beat in h.Beats)
             {
-                if (beat.Duration == Duration.Whole || beat.Duration == Duration.DoubleWhole)
+                if (beat.Duration == Duration.Whole || beat.Duration == Duration.DoubleWhole || beat.Duration == Duration.QuadrupleWhole)
                 {
-                    continue;
+                    return;
                 }
+
 
                 //
                 // draw line 
@@ -486,10 +490,13 @@ namespace AlphaTab.Rendering
                 //
                 // Draw beam 
                 //
-                var glyph = new BeamGlyph(0, 0, beat.Duration, BeamDirection.Down, false);
-                glyph.Renderer = this;
-                glyph.DoLayout();
-                glyph.Paint(cx + X + beatLineX, y2, canvas);
+                if (beat.Duration > Duration.Quarter)
+                {
+                    var glyph = new BeamGlyph(0, 0, beat.Duration, BeamDirection.Down, false);
+                    glyph.Renderer = this;
+                    glyph.DoLayout();
+                    glyph.Paint(cx + X + beatLineX, y2, canvas);
+                }
             }
         }
 

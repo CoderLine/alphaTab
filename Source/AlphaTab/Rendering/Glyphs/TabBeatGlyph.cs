@@ -26,7 +26,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            // create glyphs
+            var tabRenderer = (TabBarRenderer)Renderer;
             if (!Container.Beat.IsRest)
             {
                 //
@@ -46,7 +46,7 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     NoteNumbers.BeatEffects["Whammy"] = new WhammyBarGlyph(Container.Beat, Container);
 
-                    var whammyValueHeight = (WhammyBarGlyph.WhammyMaxOffset*Scale)/Beat.WhammyBarMaxValue;
+                    var whammyValueHeight = (WhammyBarGlyph.WhammyMaxOffset * Scale) / Beat.WhammyBarMaxValue;
 
                     var whammyHeight = Container.Beat.MaxWhammyPoint.Value * whammyValueHeight;
                     Renderer.RegisterOverflowTop(whammyHeight);
@@ -74,13 +74,93 @@ namespace AlphaTab.Rendering.Glyphs
                     NoteNumbers.BeatEffects["Tremolo"] = new TremoloPickingGlyph(5 * Scale, offset * Scale,
                         Container.Beat.TremoloSpeed.Value);
                 }
+
+                //
+                // Note dots
+                //
+                if (Container.Beat.Dots > 0 && tabRenderer.RenderRhythm)
+                {
+                    AddGlyph(new SpacingGlyph(0, 0, 5 * Scale));
+                    for (var i = 0; i < Container.Beat.Dots; i++)
+                    {
+                        AddGlyph(new CircleGlyph(0, tabRenderer.LineOffset * tabRenderer.Bar.Staff.Track.Tuning.Length + tabRenderer.RhythmHeight, 1.5f * Scale));
+                    }
+                }
             }
             else
             {
-                RestGlyph = new TabRestGlyph();
+                var dotLine = 0f;
+                var line = 0f;
+                var offset = 0;
+
+                switch (Container.Beat.Duration)
+                {
+                    case Duration.QuadrupleWhole:
+                        line = 3;
+                        dotLine = 2;
+                        break;
+                    case Duration.DoubleWhole:
+                        line = 3;
+                        dotLine = 2;
+                        break;
+                    case Duration.Whole:
+                        line = 2;
+                        dotLine = 2;
+                        break;
+                    case Duration.Half:
+                        line = 3;
+                        dotLine = 3;
+                        break;
+                    case Duration.Quarter:
+                        line = 3;
+                        dotLine = 2.5f;
+                        break;
+                    case Duration.Eighth:
+                        line = 2;
+                        dotLine = 2.5f;
+                        offset = 5;
+                        break;
+                    case Duration.Sixteenth:
+                        line = 2;
+                        dotLine = 2.5f;
+                        offset = 5;
+                        break;
+                    case Duration.ThirtySecond:
+                        line = 3;
+                        dotLine = 2.5f;
+                        break;
+                    case Duration.SixtyFourth:
+                        line = 3;
+                        dotLine = 2.5f;
+                        break;
+                    case Duration.OneHundredTwentyEighth:
+                        line = 3;
+                        dotLine = 2.5f;
+                        break;
+                    case Duration.TwoHundredFiftySixth:
+                        line = 3;
+                        dotLine = 2.5f;
+                        break;
+                }
+
+                var y = tabRenderer.GetTabY(line, offset);
+
+                RestGlyph = new TabRestGlyph(0, y, tabRenderer.ShowRests, Container.Beat.Duration);
                 RestGlyph.Beat = Container.Beat;
                 RestGlyph.BeamingHelper = BeamingHelper;
                 AddGlyph(RestGlyph);
+
+                //
+                // Note dots
+                //
+                if (Container.Beat.Dots > 0 && tabRenderer.ShowRests)
+                {
+                    AddGlyph(new SpacingGlyph(0, 0, 5 * Scale));
+                    for (var i = 0; i < Container.Beat.Dots; i++)
+                    {
+                        AddGlyph(new CircleGlyph(0, y, 1.5f * Scale));
+                    }
+                }
             }
 
             // left to right layout

@@ -16,7 +16,6 @@
  * License along with this library.
  */
 
-using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering
@@ -26,10 +25,16 @@ namespace AlphaTab.Rendering
     /// </summary>
     public class TabBarRendererFactory : BarRendererFactory
     {
+        private readonly bool _showTimeSignature;
+        private readonly bool _showRests;
+        private readonly bool _showTiedNotes;
         public override string StaffId { get { return TabBarRenderer.StaffId; } }
 
-        public TabBarRendererFactory()
+        public TabBarRendererFactory(bool showTimeSignature, bool showRests, bool showTiedNotes)
         {
+            _showTimeSignature = showTimeSignature;
+            _showRests = showRests;
+            _showTiedNotes = showTiedNotes;
             HideOnPercussionTrack = true;
         }
 
@@ -41,7 +46,9 @@ namespace AlphaTab.Rendering
         public override BarRendererBase Create(ScoreRenderer renderer, Bar bar, StaveSettings staveSettings)
         {
             var tabBarRenderer = new TabBarRenderer(renderer, bar);
-
+            tabBarRenderer.ShowRests = _showRests;
+            tabBarRenderer.ShowTimeSignature = _showTimeSignature;
+            tabBarRenderer.ShowTiedNotes = _showTiedNotes;
             tabBarRenderer.RenderRhythm = staveSettings.Get("rhythm", tabBarRenderer.RenderRhythm);
             tabBarRenderer.RhythmHeight = staveSettings.Get("rhythm-height", tabBarRenderer.RhythmHeight);
             tabBarRenderer.RhythmBeams = staveSettings.Get("rhythm-beams", tabBarRenderer.RhythmBeams);

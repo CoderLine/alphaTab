@@ -337,9 +337,9 @@ $StaticConstructor(function (){
         return new AlphaTab.Rendering.Layout.HorizontalScreenLayout(r);
     };
     // default combinations of stave textprofiles
-    AlphaTab.Environment.StaveProfiles["default"] = AlphaTab.Environment.StaveProfiles["score-tab"] = [new AlphaTab.Rendering.EffectBarRendererFactory("score-effects", [new AlphaTab.Rendering.Effects.TempoEffectInfo(), new AlphaTab.Rendering.Effects.TripletFeelEffectInfo(), new AlphaTab.Rendering.Effects.MarkerEffectInfo(), new AlphaTab.Rendering.Effects.TextEffectInfo(), new AlphaTab.Rendering.Effects.ChordsEffectInfo(), new AlphaTab.Rendering.Effects.TrillEffectInfo(), new AlphaTab.Rendering.Effects.BeatVibratoEffectInfo(), new AlphaTab.Rendering.Effects.NoteVibratoEffectInfo(), new AlphaTab.Rendering.Effects.AlternateEndingsEffectInfo()]), new AlphaTab.Rendering.ScoreBarRendererFactory(), new AlphaTab.Rendering.EffectBarRendererFactory("tab-effects", [new AlphaTab.Rendering.Effects.CrescendoEffectInfo(), new AlphaTab.Rendering.Effects.DynamicsEffectInfo(), new AlphaTab.Rendering.Effects.LyricsEffectInfo(), new AlphaTab.Rendering.Effects.TrillEffectInfo(), new AlphaTab.Rendering.Effects.BeatVibratoEffectInfo(), new AlphaTab.Rendering.Effects.NoteVibratoEffectInfo(), new AlphaTab.Rendering.Effects.TapEffectInfo(), new AlphaTab.Rendering.Effects.FadeInEffectInfo(), new AlphaTab.Rendering.Effects.HarmonicsEffectInfo(), new AlphaTab.Rendering.Effects.LetRingEffectInfo(), new AlphaTab.Rendering.Effects.CapoEffectInfo(), new AlphaTab.Rendering.Effects.PalmMuteEffectInfo(), new AlphaTab.Rendering.Effects.PickStrokeEffectInfo()]), new AlphaTab.Rendering.TabBarRendererFactory()];
+    AlphaTab.Environment.StaveProfiles["default"] = AlphaTab.Environment.StaveProfiles["score-tab"] = [new AlphaTab.Rendering.EffectBarRendererFactory("score-effects", [new AlphaTab.Rendering.Effects.TempoEffectInfo(), new AlphaTab.Rendering.Effects.TripletFeelEffectInfo(), new AlphaTab.Rendering.Effects.MarkerEffectInfo(), new AlphaTab.Rendering.Effects.TextEffectInfo(), new AlphaTab.Rendering.Effects.ChordsEffectInfo(), new AlphaTab.Rendering.Effects.TrillEffectInfo(), new AlphaTab.Rendering.Effects.BeatVibratoEffectInfo(), new AlphaTab.Rendering.Effects.NoteVibratoEffectInfo(), new AlphaTab.Rendering.Effects.AlternateEndingsEffectInfo()]), new AlphaTab.Rendering.ScoreBarRendererFactory(), new AlphaTab.Rendering.EffectBarRendererFactory("tab-effects", [new AlphaTab.Rendering.Effects.CrescendoEffectInfo(), new AlphaTab.Rendering.Effects.DynamicsEffectInfo(), new AlphaTab.Rendering.Effects.LyricsEffectInfo(), new AlphaTab.Rendering.Effects.TrillEffectInfo(), new AlphaTab.Rendering.Effects.BeatVibratoEffectInfo(), new AlphaTab.Rendering.Effects.NoteVibratoEffectInfo(), new AlphaTab.Rendering.Effects.TapEffectInfo(), new AlphaTab.Rendering.Effects.FadeInEffectInfo(), new AlphaTab.Rendering.Effects.HarmonicsEffectInfo(), new AlphaTab.Rendering.Effects.LetRingEffectInfo(), new AlphaTab.Rendering.Effects.CapoEffectInfo(), new AlphaTab.Rendering.Effects.PalmMuteEffectInfo(), new AlphaTab.Rendering.Effects.PickStrokeEffectInfo()]), new AlphaTab.Rendering.TabBarRendererFactory(false, false, false)];
     AlphaTab.Environment.StaveProfiles["score"] = [new AlphaTab.Rendering.EffectBarRendererFactory("score-effects", [new AlphaTab.Rendering.Effects.TempoEffectInfo(), new AlphaTab.Rendering.Effects.TripletFeelEffectInfo(), new AlphaTab.Rendering.Effects.MarkerEffectInfo(), new AlphaTab.Rendering.Effects.TextEffectInfo(), new AlphaTab.Rendering.Effects.ChordsEffectInfo(), new AlphaTab.Rendering.Effects.TrillEffectInfo(), new AlphaTab.Rendering.Effects.BeatVibratoEffectInfo(), new AlphaTab.Rendering.Effects.NoteVibratoEffectInfo(), new AlphaTab.Rendering.Effects.FadeInEffectInfo(), new AlphaTab.Rendering.Effects.LetRingEffectInfo(), new AlphaTab.Rendering.Effects.PalmMuteEffectInfo(), new AlphaTab.Rendering.Effects.PickStrokeEffectInfo(), new AlphaTab.Rendering.Effects.AlternateEndingsEffectInfo()]), new AlphaTab.Rendering.ScoreBarRendererFactory(), new AlphaTab.Rendering.EffectBarRendererFactory("score-bottom-effects", [new AlphaTab.Rendering.Effects.CrescendoEffectInfo(), new AlphaTab.Rendering.Effects.DynamicsEffectInfo(), new AlphaTab.Rendering.Effects.LyricsEffectInfo()])];
-    AlphaTab.Environment.StaveProfiles["tab"] = [new AlphaTab.Rendering.EffectBarRendererFactory("tab-effects", [new AlphaTab.Rendering.Effects.TempoEffectInfo(), new AlphaTab.Rendering.Effects.TripletFeelEffectInfo(), new AlphaTab.Rendering.Effects.MarkerEffectInfo(), new AlphaTab.Rendering.Effects.TextEffectInfo(), new AlphaTab.Rendering.Effects.ChordsEffectInfo(), new AlphaTab.Rendering.Effects.TripletFeelEffectInfo(), new AlphaTab.Rendering.Effects.TrillEffectInfo(), new AlphaTab.Rendering.Effects.BeatVibratoEffectInfo(), new AlphaTab.Rendering.Effects.NoteVibratoEffectInfo(), new AlphaTab.Rendering.Effects.TapEffectInfo(), new AlphaTab.Rendering.Effects.FadeInEffectInfo(), new AlphaTab.Rendering.Effects.HarmonicsEffectInfo(), new AlphaTab.Rendering.Effects.LetRingEffectInfo(), new AlphaTab.Rendering.Effects.CapoEffectInfo(), new AlphaTab.Rendering.Effects.PalmMuteEffectInfo(), new AlphaTab.Rendering.Effects.PickStrokeEffectInfo(), new AlphaTab.Rendering.Effects.AlternateEndingsEffectInfo()]), new AlphaTab.Rendering.TabBarRendererFactory(), new AlphaTab.Rendering.EffectBarRendererFactory("tab-bottom-effects", [new AlphaTab.Rendering.Effects.LyricsEffectInfo()])];
+    AlphaTab.Environment.StaveProfiles["tab"] = [new AlphaTab.Rendering.EffectBarRendererFactory("tab-effects", [new AlphaTab.Rendering.Effects.TempoEffectInfo(), new AlphaTab.Rendering.Effects.TripletFeelEffectInfo(), new AlphaTab.Rendering.Effects.MarkerEffectInfo(), new AlphaTab.Rendering.Effects.TextEffectInfo(), new AlphaTab.Rendering.Effects.ChordsEffectInfo(), new AlphaTab.Rendering.Effects.TripletFeelEffectInfo(), new AlphaTab.Rendering.Effects.TrillEffectInfo(), new AlphaTab.Rendering.Effects.BeatVibratoEffectInfo(), new AlphaTab.Rendering.Effects.NoteVibratoEffectInfo(), new AlphaTab.Rendering.Effects.TapEffectInfo(), new AlphaTab.Rendering.Effects.FadeInEffectInfo(), new AlphaTab.Rendering.Effects.HarmonicsEffectInfo(), new AlphaTab.Rendering.Effects.LetRingEffectInfo(), new AlphaTab.Rendering.Effects.CapoEffectInfo(), new AlphaTab.Rendering.Effects.PalmMuteEffectInfo(), new AlphaTab.Rendering.Effects.PickStrokeEffectInfo(), new AlphaTab.Rendering.Effects.AlternateEndingsEffectInfo()]), new AlphaTab.Rendering.TabBarRendererFactory(true, true, true), new AlphaTab.Rendering.EffectBarRendererFactory("tab-bottom-effects", [new AlphaTab.Rendering.Effects.LyricsEffectInfo()])];
 });
 AlphaTab.Importer = AlphaTab.Importer || {};
 AlphaTab.Importer.ScoreLoader = function (){
@@ -13580,27 +13580,7 @@ AlphaTab.Rendering.Glyphs.ScoreRestGlyph = function (x, y, duration){
 };
 AlphaTab.Rendering.Glyphs.ScoreRestGlyph.prototype = {
     DoLayout: function (){
-        switch (this._duration){
-            case AlphaTab.Model.Duration.QuadrupleWhole:
-            case AlphaTab.Model.Duration.DoubleWhole:
-            case AlphaTab.Model.Duration.Whole:
-            case AlphaTab.Model.Duration.Half:
-            case AlphaTab.Model.Duration.Quarter:
-            case AlphaTab.Model.Duration.Eighth:
-            case AlphaTab.Model.Duration.Sixteenth:
-                this.Width = 9 * this.get_Scale();
-                break;
-            case AlphaTab.Model.Duration.ThirtySecond:
-                this.Width = 12 * this.get_Scale();
-                break;
-            case AlphaTab.Model.Duration.SixtyFourth:
-                this.Width = 14 * this.get_Scale();
-                break;
-            case AlphaTab.Model.Duration.OneHundredTwentyEighth:
-            case AlphaTab.Model.Duration.TwoHundredFiftySixth:
-                this.Width = 20 * this.get_Scale();
-                break;
-        }
+        this.Width = AlphaTab.Rendering.Glyphs.ScoreRestGlyph.GetSize(this._duration) * this.get_Scale();
     },
     UpdateBeamingHelper: function (cx){
         if (this.BeamingHelper != null){
@@ -13635,6 +13615,26 @@ AlphaTab.Rendering.Glyphs.ScoreRestGlyph.GetSymbol = function (duration){
         default:
             return AlphaTab.Rendering.Glyphs.MusicFontSymbol.None;
     }
+};
+AlphaTab.Rendering.Glyphs.ScoreRestGlyph.GetSize = function (duration){
+    switch (duration){
+        case AlphaTab.Model.Duration.QuadrupleWhole:
+        case AlphaTab.Model.Duration.DoubleWhole:
+        case AlphaTab.Model.Duration.Whole:
+        case AlphaTab.Model.Duration.Half:
+        case AlphaTab.Model.Duration.Quarter:
+        case AlphaTab.Model.Duration.Eighth:
+        case AlphaTab.Model.Duration.Sixteenth:
+            return 9;
+        case AlphaTab.Model.Duration.ThirtySecond:
+            return 12;
+        case AlphaTab.Model.Duration.SixtyFourth:
+            return 14;
+        case AlphaTab.Model.Duration.OneHundredTwentyEighth:
+        case AlphaTab.Model.Duration.TwoHundredFiftySixth:
+            return 20;
+    }
+    return 10;
 };
 $Inherit(AlphaTab.Rendering.Glyphs.ScoreRestGlyph, AlphaTab.Rendering.Glyphs.MusicFontGlyph);
 AlphaTab.Rendering.Glyphs.RideCymbalGlyph = function (x, y, isGrace){
@@ -14364,7 +14364,16 @@ AlphaTab.Rendering.Glyphs.TabBeatContainerGlyph.prototype = {
         }
     },
     CreateTies: function (n){
-        if (n.IsHammerPullOrigin){
+        var renderer = this.Renderer;
+        if (n.IsTieOrigin && renderer.ShowTiedNotes){
+            var tie = new AlphaTab.Rendering.Glyphs.TabTieGlyph(n, n.TieDestination, false, false);
+            this.Ties.push(tie);
+        }
+        if (n.IsTieDestination && renderer.ShowTiedNotes){
+            var tie = new AlphaTab.Rendering.Glyphs.TabTieGlyph(n.TieOrigin, n, false, true);
+            this.Ties.push(tie);
+        }
+        else if (n.IsHammerPullOrigin){
             // only create tie for very first origin of "group"
             if (n.HammerPullOrigin == null){
                 // tie with end note
@@ -14413,7 +14422,7 @@ AlphaTab.Rendering.Glyphs.TabBeatGlyph = function (){
 };
 AlphaTab.Rendering.Glyphs.TabBeatGlyph.prototype = {
     DoLayout: function (){
-        // create glyphs
+        var tabRenderer = this.Renderer;
         if (!this.Container.Beat.get_IsRest()){
             //
             // Note numbers
@@ -14450,12 +14459,82 @@ AlphaTab.Rendering.Glyphs.TabBeatGlyph.prototype = {
                 }
                 this.NoteNumbers.BeatEffects["Tremolo"] = new AlphaTab.Rendering.Glyphs.TremoloPickingGlyph(5 * this.get_Scale(), offset * this.get_Scale(), this.Container.Beat.TremoloSpeed);
             }
+            //
+            // Note dots
+            //
+            if (this.Container.Beat.Dots > 0 && tabRenderer.RenderRhythm){
+                this.AddGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 5 * this.get_Scale()));
+                for (var i = 0; i < this.Container.Beat.Dots; i++){
+                    this.AddGlyph(new AlphaTab.Rendering.Glyphs.CircleGlyph(0, tabRenderer.get_LineOffset() * tabRenderer.Bar.Staff.Track.Tuning.length + tabRenderer.RhythmHeight, 1.5 * this.get_Scale()));
+                }
+            }
         }
         else {
-            this.RestGlyph = new AlphaTab.Rendering.Glyphs.TabRestGlyph();
+            var dotLine = 0;
+            var line = 0;
+            var offset = 0;
+            switch (this.Container.Beat.Duration){
+                case AlphaTab.Model.Duration.QuadrupleWhole:
+                    line = 3;
+                    dotLine = 2;
+                    break;
+                case AlphaTab.Model.Duration.DoubleWhole:
+                    line = 3;
+                    dotLine = 2;
+                    break;
+                case AlphaTab.Model.Duration.Whole:
+                    line = 2;
+                    dotLine = 2;
+                    break;
+                case AlphaTab.Model.Duration.Half:
+                    line = 3;
+                    dotLine = 3;
+                    break;
+                case AlphaTab.Model.Duration.Quarter:
+                    line = 3;
+                    dotLine = 2.5;
+                    break;
+                case AlphaTab.Model.Duration.Eighth:
+                    line = 2;
+                    dotLine = 2.5;
+                    offset = 5;
+                    break;
+                case AlphaTab.Model.Duration.Sixteenth:
+                    line = 2;
+                    dotLine = 2.5;
+                    offset = 5;
+                    break;
+                case AlphaTab.Model.Duration.ThirtySecond:
+                    line = 3;
+                    dotLine = 2.5;
+                    break;
+                case AlphaTab.Model.Duration.SixtyFourth:
+                    line = 3;
+                    dotLine = 2.5;
+                    break;
+                case AlphaTab.Model.Duration.OneHundredTwentyEighth:
+                    line = 3;
+                    dotLine = 2.5;
+                    break;
+                case AlphaTab.Model.Duration.TwoHundredFiftySixth:
+                    line = 3;
+                    dotLine = 2.5;
+                    break;
+            }
+            var y = tabRenderer.GetTabY(line, offset);
+            this.RestGlyph = new AlphaTab.Rendering.Glyphs.TabRestGlyph(0, y, tabRenderer.ShowRests, this.Container.Beat.Duration);
             this.RestGlyph.Beat = this.Container.Beat;
             this.RestGlyph.BeamingHelper = this.BeamingHelper;
             this.AddGlyph(this.RestGlyph);
+            //
+            // Note dots
+            //
+            if (this.Container.Beat.Dots > 0 && tabRenderer.ShowRests){
+                this.AddGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 5 * this.get_Scale()));
+                for (var i = 0; i < this.Container.Beat.Dots; i++){
+                    this.AddGlyph(new AlphaTab.Rendering.Glyphs.CircleGlyph(0, y, 1.5 * this.get_Scale()));
+                }
+            }
         }
         // left to right layout
         if (this.Glyphs == null)
@@ -14659,22 +14738,35 @@ AlphaTab.Rendering.Glyphs.TabNoteChordGlyph.prototype = {
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.TabNoteChordGlyph, AlphaTab.Rendering.Glyphs.Glyph);
-AlphaTab.Rendering.Glyphs.TabRestGlyph = function (){
-    this.Beat = null;
+AlphaTab.Rendering.Glyphs.TabRestGlyph = function (x, y, isVisibleRest, duration){
+    this._isVisibleRest = false;
+    this._duration = AlphaTab.Model.Duration.QuadrupleWhole;
     this.BeamingHelper = null;
-    AlphaTab.Rendering.Glyphs.SpacingGlyph.call(this, 0, 0, 0);
+    AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, 1, AlphaTab.Rendering.Glyphs.ScoreRestGlyph.GetSymbol(duration));
+    this._isVisibleRest = isVisibleRest;
+    this._duration = duration;
 };
 AlphaTab.Rendering.Glyphs.TabRestGlyph.prototype = {
     DoLayout: function (){
-        this.Width = 10 * this.get_Scale();
+        if (this._isVisibleRest){
+            this.Width = AlphaTab.Rendering.Glyphs.ScoreRestGlyph.GetSize(this._duration) * this.get_Scale();
+        }
+        else {
+            this.Width = 10 * this.get_Scale();
+        }
     },
     UpdateBeamingHelper: function (cx){
         if (this.BeamingHelper != null && this.BeamingHelper.IsPositionFrom("tab", this.Beat)){
             this.BeamingHelper.RegisterBeatLineX("tab", this.Beat, cx + this.X + this.Width, cx + this.X);
         }
+    },
+    Paint: function (cx, cy, canvas){
+        if (this._isVisibleRest){
+            AlphaTab.Rendering.Glyphs.MusicFontGlyph.prototype.Paint.call(this, cx, cy, canvas);
+        }
     }
 };
-$Inherit(AlphaTab.Rendering.Glyphs.TabRestGlyph, AlphaTab.Rendering.Glyphs.SpacingGlyph);
+$Inherit(AlphaTab.Rendering.Glyphs.TabRestGlyph, AlphaTab.Rendering.Glyphs.MusicFontGlyph);
 AlphaTab.Rendering.Glyphs.TabSlideLineGlyph = function (type, startNote, parent){
     this._startNote = null;
     this._type = AlphaTab.Model.SlideType.None;
@@ -16232,7 +16324,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
             fingeringY = cy + this.Y + topY;
         }
         this.PaintFingering(canvas, beat, cx + this.X + beatLineX, direction, fingeringY);
-        if (beat.Duration == AlphaTab.Model.Duration.Whole || beat.Duration == AlphaTab.Model.Duration.DoubleWhole){
+        if (beat.Duration == AlphaTab.Model.Duration.Whole || beat.Duration == AlphaTab.Model.Duration.DoubleWhole || beat.Duration == AlphaTab.Model.Duration.QuadrupleWhole){
             return;
         }
         canvas.set_LineWidth(1.5 * this.get_Scale());
@@ -16389,7 +16481,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
             this.CreateKeySignatureGlyphs();
         }
         // Time Signature
-        if (!this.Staff.StaveTrackGroup.HasTimeSignature && ((this.Bar.PreviousBar == null) || (this.Bar.PreviousBar != null && this.Bar.get_MasterBar().TimeSignatureNumerator != this.Bar.PreviousBar.get_MasterBar().TimeSignatureNumerator) || (this.Bar.PreviousBar != null && this.Bar.get_MasterBar().TimeSignatureDenominator != this.Bar.PreviousBar.get_MasterBar().TimeSignatureDenominator))){
+        if ((this.Bar.PreviousBar == null) || (this.Bar.PreviousBar != null && this.Bar.get_MasterBar().TimeSignatureNumerator != this.Bar.PreviousBar.get_MasterBar().TimeSignatureNumerator) || (this.Bar.PreviousBar != null && this.Bar.get_MasterBar().TimeSignatureDenominator != this.Bar.PreviousBar.get_MasterBar().TimeSignatureDenominator)){
             this.CreateStartSpacing();
             this.CreateTimeSignatureGlyphs();
         }
@@ -16481,7 +16573,6 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
     CreateTimeSignatureGlyphs: function (){
         this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 5 * this.get_Scale()));
         this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.ScoreTimeSignatureGlyph(0, this.GetScoreY(2, 0), this.Bar.get_MasterBar().TimeSignatureNumerator, this.Bar.get_MasterBar().TimeSignatureDenominator, this.Bar.get_MasterBar().TimeSignatureCommon));
-        this.Staff.StaveTrackGroup.HasTimeSignature = true;
     },
     CreateVoiceGlyphs: function (v){
         for (var i = 0,j = v.Beats.length; i < j; i++){
@@ -17050,7 +17141,6 @@ AlphaTab.Rendering.Staves.StaveTrackGroup = function (staveGroup, track){
     this.Staves = null;
     this.FirstStaffInAccolade = null;
     this.LastStaffInAccolade = null;
-    this.HasTimeSignature = false;
     this.StaveGroup = staveGroup;
     this.Track = track;
     this.Staves = [];
@@ -17361,6 +17451,9 @@ $StaticConstructor(function (){
 });
 AlphaTab.Rendering.TabBarRenderer = function (renderer, bar){
     this._startSpacing = false;
+    this.ShowTimeSignature = false;
+    this.ShowRests = false;
+    this.ShowTiedNotes = false;
     this.RenderRhythm = false;
     this.RhythmHeight = 0;
     this.RhythmBeams = false;
@@ -17408,7 +17501,7 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
             this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.TabClefGlyph(5 * this.get_Scale(), this.GetTabY(center, 0)));
         }
         // Time Signature
-        if (!this.Staff.StaveTrackGroup.HasTimeSignature && ((this.Bar.PreviousBar == null) || (this.Bar.PreviousBar != null && this.Bar.get_MasterBar().TimeSignatureNumerator != this.Bar.PreviousBar.get_MasterBar().TimeSignatureNumerator) || (this.Bar.PreviousBar != null && this.Bar.get_MasterBar().TimeSignatureDenominator != this.Bar.PreviousBar.get_MasterBar().TimeSignatureDenominator))){
+        if (this.ShowTimeSignature && ((this.Bar.PreviousBar == null) || (this.Bar.PreviousBar != null && this.Bar.get_MasterBar().TimeSignatureNumerator != this.Bar.PreviousBar.get_MasterBar().TimeSignatureNumerator) || (this.Bar.PreviousBar != null && this.Bar.get_MasterBar().TimeSignatureDenominator != this.Bar.PreviousBar.get_MasterBar().TimeSignatureDenominator))){
             this.CreateStartSpacing();
             this.CreateTimeSignatureGlyphs();
         }
@@ -17426,7 +17519,6 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
     CreateTimeSignatureGlyphs: function (){
         this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 5 * this.get_Scale()));
         this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.TabTimeSignatureGlyph(0, this.GetTabY(0, 0), this.Bar.get_MasterBar().TimeSignatureNumerator, this.Bar.get_MasterBar().TimeSignatureDenominator, this.Bar.get_MasterBar().TimeSignatureCommon));
-        this.Staff.StaveTrackGroup.HasTimeSignature = true;
     },
     CreateBeatGlyphs: function (){
         for (var v = 0; v < this.Bar.Voices.length; v++){
@@ -17628,8 +17720,8 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
     },
     PaintFooter: function (cx, cy, canvas, h){
         for (var $i108 = 0,$t108 = h.Beats,$l108 = $t108.length,beat = $t108[$i108]; $i108 < $l108; $i108++, beat = $t108[$i108]){
-            if (beat.Duration == AlphaTab.Model.Duration.Whole || beat.Duration == AlphaTab.Model.Duration.DoubleWhole){
-                continue;
+            if (beat.Duration == AlphaTab.Model.Duration.Whole || beat.Duration == AlphaTab.Model.Duration.DoubleWhole || beat.Duration == AlphaTab.Model.Duration.QuadrupleWhole){
+                return;
             }
             //
             // draw line 
@@ -17657,10 +17749,12 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
             //
             // Draw beam 
             //
-            var glyph = new AlphaTab.Rendering.Glyphs.BeamGlyph(0, 0, beat.Duration, AlphaTab.Rendering.Utils.BeamDirection.Down, false);
-            glyph.Renderer = this;
-            glyph.DoLayout();
-            glyph.Paint(cx + this.X + beatLineX, y2, canvas);
+            if (beat.Duration > AlphaTab.Model.Duration.Quarter){
+                var glyph = new AlphaTab.Rendering.Glyphs.BeamGlyph(0, 0, beat.Duration, AlphaTab.Rendering.Utils.BeamDirection.Down, false);
+                glyph.Renderer = this;
+                glyph.DoLayout();
+                glyph.Paint(cx + this.X + beatLineX, y2, canvas);
+            }
         }
     }
 };
@@ -17678,8 +17772,14 @@ AlphaTab.Rendering.TabBarRenderer.PaintSingleBar = function (canvas, x1, y1, x2,
     canvas.Fill();
 };
 $Inherit(AlphaTab.Rendering.TabBarRenderer, AlphaTab.Rendering.BarRendererBase);
-AlphaTab.Rendering.TabBarRendererFactory = function (){
+AlphaTab.Rendering.TabBarRendererFactory = function (showTimeSignature, showRests, showTiedNotes){
+    this._showTimeSignature = false;
+    this._showRests = false;
+    this._showTiedNotes = false;
     AlphaTab.Rendering.BarRendererFactory.call(this);
+    this._showTimeSignature = showTimeSignature;
+    this._showRests = showRests;
+    this._showTiedNotes = showTiedNotes;
     this.HideOnPercussionTrack = true;
 };
 AlphaTab.Rendering.TabBarRendererFactory.prototype = {
@@ -17691,6 +17791,9 @@ AlphaTab.Rendering.TabBarRendererFactory.prototype = {
     },
     Create: function (renderer, bar, staveSettings){
         var tabBarRenderer = new AlphaTab.Rendering.TabBarRenderer(renderer, bar);
+        tabBarRenderer.ShowRests = this._showRests;
+        tabBarRenderer.ShowTimeSignature = this._showTimeSignature;
+        tabBarRenderer.ShowTiedNotes = this._showTiedNotes;
         tabBarRenderer.RenderRhythm = staveSettings.Get("rhythm", tabBarRenderer.RenderRhythm);
         tabBarRenderer.RhythmHeight = staveSettings.Get("rhythm-height", tabBarRenderer.RhythmHeight);
         tabBarRenderer.RhythmBeams = staveSettings.Get("rhythm-beams", tabBarRenderer.RhythmBeams);

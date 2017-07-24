@@ -79,7 +79,7 @@ namespace AlphaTab
                     new PalmMuteEffectInfo(),
                     new PickStrokeEffectInfo(),
                 }),
-                new TabBarRendererFactory()
+                new TabBarRendererFactory(false, false, false)
             };
 
             StaveProfiles["score"] = new BarRendererFactory[]
@@ -128,7 +128,7 @@ namespace AlphaTab
                     new PickStrokeEffectInfo(),
                     new AlternateEndingsEffectInfo()
                 }),
-                new TabBarRendererFactory(),
+                new TabBarRendererFactory(true, true, true),
                 new EffectBarRendererFactory("tab-bottom-effects", new IEffectBarRendererInfo[] {
                     new LyricsEffectInfo(),
                 }),

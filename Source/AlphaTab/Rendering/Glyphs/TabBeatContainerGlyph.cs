@@ -66,7 +66,18 @@ namespace AlphaTab.Rendering.Glyphs
 
         protected override void CreateTies(Note n)
         {
-            if (n.IsHammerPullOrigin)
+            var renderer = (TabBarRenderer) Renderer;
+            if (n.IsTieOrigin && renderer.ShowTiedNotes)
+            {
+                var tie = new TabTieGlyph(n, n.TieDestination, false);
+                Ties.Add(tie);
+            }
+            if (n.IsTieDestination && renderer.ShowTiedNotes)
+            {
+                var tie = new TabTieGlyph(n.TieOrigin, n, false, true);
+                Ties.Add(tie);
+            }
+            else if (n.IsHammerPullOrigin)
             {
                 // only create tie for very first origin of "group"
                 if (n.HammerPullOrigin == null)

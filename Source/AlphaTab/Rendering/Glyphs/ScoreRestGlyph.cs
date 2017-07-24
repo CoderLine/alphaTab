@@ -32,7 +32,7 @@ namespace AlphaTab.Rendering.Glyphs
             _duration = duration;
         }
 
-        private static MusicFontSymbol GetSymbol(Duration duration)
+        public static MusicFontSymbol GetSymbol(Duration duration)
         {
             switch (duration)
             {
@@ -62,10 +62,9 @@ namespace AlphaTab.Rendering.Glyphs
                     return MusicFontSymbol.None;
             }
         }
-
-        public override void DoLayout()
+        public static float GetSize(Duration duration)
         {
-            switch (_duration)
+            switch (duration)
             {
                 case Duration.QuadrupleWhole:
                 case Duration.DoubleWhole:
@@ -74,19 +73,22 @@ namespace AlphaTab.Rendering.Glyphs
                 case Duration.Quarter:
                 case Duration.Eighth:
                 case Duration.Sixteenth:
-                    Width = 9 * Scale;
-                    break;
+                    return 9;
                 case Duration.ThirtySecond:
-                    Width = 12 * Scale;
-                    break;
+                    return 12;
                 case Duration.SixtyFourth:
-                    Width = 14 * Scale;
-                    break;
+                    return 14;
                 case Duration.OneHundredTwentyEighth:
                 case Duration.TwoHundredFiftySixth:
-                    Width = 20 * Scale;
-                    break;
+                    return 20;
             }
+
+            return 10;
+        }
+
+        public override void DoLayout()
+        {
+            Width = GetSize(_duration) * Scale;
         }
 
         public void UpdateBeamingHelper(float cx)

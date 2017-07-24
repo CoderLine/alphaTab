@@ -527,7 +527,7 @@ namespace AlphaTab.Rendering
 
             PaintFingering(canvas, beat, cx + X + beatLineX, direction, fingeringY);
 
-            if (beat.Duration == Duration.Whole || beat.Duration == Duration.DoubleWhole)
+            if (beat.Duration == Duration.Whole || beat.Duration == Duration.DoubleWhole || beat.Duration == Duration.QuadrupleWhole)
             {
                 return;
             }
@@ -723,8 +723,7 @@ namespace AlphaTab.Rendering
             }
 
             // Time Signature
-            if (!Staff.StaveTrackGroup.HasTimeSignature &&
-                ((Bar.PreviousBar == null) || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureNumerator != Bar.PreviousBar.MasterBar.TimeSignatureNumerator) || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureDenominator != Bar.PreviousBar.MasterBar.TimeSignatureDenominator)))
+            if ((Bar.PreviousBar == null) || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureNumerator != Bar.PreviousBar.MasterBar.TimeSignatureNumerator) || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureDenominator != Bar.PreviousBar.MasterBar.TimeSignatureDenominator))
             {
                 CreateStartSpacing();
                 CreateTimeSignatureGlyphs();
@@ -852,7 +851,6 @@ namespace AlphaTab.Rendering
         {
             AddPreBeatGlyph(new SpacingGlyph(0, 0, 5 * Scale));
             AddPreBeatGlyph(new ScoreTimeSignatureGlyph(0, GetScoreY(2), Bar.MasterBar.TimeSignatureNumerator, Bar.MasterBar.TimeSignatureDenominator, Bar.MasterBar.TimeSignatureCommon));
-            Staff.StaveTrackGroup.HasTimeSignature = true;
         }
 
         private void CreateVoiceGlyphs(Voice v)

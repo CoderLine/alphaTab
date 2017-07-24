@@ -259,7 +259,7 @@ namespace AlphaTab.Test.Importer
 
             Environment.StaveProfiles["tabOnly"] = new BarRendererFactory[]
             {
-                new TabBarRendererFactory(),
+                new TabBarRendererFactory(false, false, false),
             };
 
             var settings = Settings.Defaults;
