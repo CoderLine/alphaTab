@@ -23,14 +23,14 @@ namespace AlphaTab.Rendering.Glyphs
     {
         public override void DoLayout()
         {
-            if (Container.Beat.BrushType != BrushType.None)
-            {
-                AddGlyph(new ScoreBrushGlyph(Container.Beat));
-                AddGlyph(new SpacingGlyph(0, 0, 4 * Scale));
-            }
-
             if (!Container.Beat.IsRest)
             {
+                if (Container.Beat.BrushType != BrushType.None)
+                {
+                    AddGlyph(new ScoreBrushGlyph(Container.Beat));
+                    AddGlyph(new SpacingGlyph(0, 0, 4 * Scale));
+                }
+
                 var accidentals = new AccidentalGroupGlyph();
                 foreach (var note in Container.Beat.Notes)
                 {

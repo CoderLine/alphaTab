@@ -13915,11 +13915,11 @@ AlphaTab.Rendering.Glyphs.ScoreBeatPreNotesGlyph = function (){
 };
 AlphaTab.Rendering.Glyphs.ScoreBeatPreNotesGlyph.prototype = {
     DoLayout: function (){
-        if (this.Container.Beat.BrushType != AlphaTab.Model.BrushType.None){
-            this.AddGlyph(new AlphaTab.Rendering.Glyphs.ScoreBrushGlyph(this.Container.Beat));
-            this.AddGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 4 * this.get_Scale()));
-        }
         if (!this.Container.Beat.get_IsRest()){
+            if (this.Container.Beat.BrushType != AlphaTab.Model.BrushType.None){
+                this.AddGlyph(new AlphaTab.Rendering.Glyphs.ScoreBrushGlyph(this.Container.Beat));
+                this.AddGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 4 * this.get_Scale()));
+            }
             var accidentals = new AlphaTab.Rendering.Glyphs.AccidentalGroupGlyph();
             for (var $i94 = 0,$t94 = this.Container.Beat.Notes,$l94 = $t94.length,note = $t94[$i94]; $i94 < $l94; $i94++, note = $t94[$i94]){
                 this.CreateAccidentalGlyph(note, accidentals);
@@ -14573,7 +14573,7 @@ AlphaTab.Rendering.Glyphs.TabBeatPreNotesGlyph = function (){
 };
 AlphaTab.Rendering.Glyphs.TabBeatPreNotesGlyph.prototype = {
     DoLayout: function (){
-        if (this.Container.Beat.BrushType != AlphaTab.Model.BrushType.None){
+        if (this.Container.Beat.BrushType != AlphaTab.Model.BrushType.None && !this.Container.Beat.get_IsRest()){
             this.AddGlyph(new AlphaTab.Rendering.Glyphs.TabBrushGlyph(this.Container.Beat));
             this.AddGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 4 * this.get_Scale()));
         }
