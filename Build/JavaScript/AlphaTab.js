@@ -14842,22 +14842,21 @@ AlphaTab.Rendering.Glyphs.TimeSignatureGlyph = function (x, y, numerator, denomi
 };
 AlphaTab.Rendering.Glyphs.TimeSignatureGlyph.prototype = {
     DoLayout: function (){
-        var renderer = this.Renderer;
         if (this._isCommon && this._numerator == 2 && this._denominator == 2){
-            var common = new AlphaTab.Rendering.Glyphs.MusicFontGlyph(0, renderer.GetScoreY(4, 0), 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.TimeSignatureCutCommon);
+            var common = new AlphaTab.Rendering.Glyphs.MusicFontGlyph(0, this.get_CommonY(), this.get_CommonScale(), AlphaTab.Rendering.Glyphs.MusicFontSymbol.TimeSignatureCutCommon);
             common.Width = 14 * this.get_Scale();
             this.AddGlyph(common);
             AlphaTab.Rendering.Glyphs.GlyphGroup.prototype.DoLayout.call(this);
         }
         else if (this._isCommon && this._numerator == 4 && this._denominator == 4){
-            var common = new AlphaTab.Rendering.Glyphs.MusicFontGlyph(0, renderer.GetScoreY(4, 0), 1, AlphaTab.Rendering.Glyphs.MusicFontSymbol.TimeSignatureCommon);
+            var common = new AlphaTab.Rendering.Glyphs.MusicFontGlyph(0, this.get_CommonY(), this.get_CommonScale(), AlphaTab.Rendering.Glyphs.MusicFontSymbol.TimeSignatureCommon);
             common.Width = 14 * this.get_Scale();
             this.AddGlyph(common);
             AlphaTab.Rendering.Glyphs.GlyphGroup.prototype.DoLayout.call(this);
         }
         else {
-            var numerator = new AlphaTab.Rendering.Glyphs.NumberGlyph(0, 2 * this.get_Scale(), this._numerator, 1);
-            var denominator = new AlphaTab.Rendering.Glyphs.NumberGlyph(0, 20 * this.get_Scale(), this._denominator, 1);
+            var numerator = new AlphaTab.Rendering.Glyphs.NumberGlyph(0, this.get_NumeratorY(), this._numerator, this.get_NumberScale());
+            var denominator = new AlphaTab.Rendering.Glyphs.NumberGlyph(0, this.get_DenominatorY(), this._denominator, this.get_NumberScale());
             this.AddGlyph(numerator);
             this.AddGlyph(denominator);
             AlphaTab.Rendering.Glyphs.GlyphGroup.prototype.DoLayout.call(this);
@@ -14869,6 +14868,60 @@ AlphaTab.Rendering.Glyphs.TimeSignatureGlyph.prototype = {
     }
 };
 $Inherit(AlphaTab.Rendering.Glyphs.TimeSignatureGlyph, AlphaTab.Rendering.Glyphs.GlyphGroup);
+AlphaTab.Rendering.Glyphs.ScoreTimeSignatureGlyph = function (x, y, numerator, denominator, isCommon){
+    AlphaTab.Rendering.Glyphs.TimeSignatureGlyph.call(this, x, y, numerator, denominator, isCommon);
+};
+AlphaTab.Rendering.Glyphs.ScoreTimeSignatureGlyph.prototype = {
+    get_CommonY: function (){
+        var renderer = this.Renderer;
+        return renderer.GetScoreY(4, 0);
+    },
+    get_NumeratorY: function (){
+        return 2 * this.get_Scale();
+    },
+    get_DenominatorY: function (){
+        return 20 * this.get_Scale();
+    },
+    get_CommonScale: function (){
+        return 1;
+    },
+    get_NumberScale: function (){
+        return 1;
+    }
+};
+$Inherit(AlphaTab.Rendering.Glyphs.ScoreTimeSignatureGlyph, AlphaTab.Rendering.Glyphs.TimeSignatureGlyph);
+AlphaTab.Rendering.Glyphs.TabTimeSignatureGlyph = function (x, y, numerator, denominator, isCommon){
+    AlphaTab.Rendering.Glyphs.TimeSignatureGlyph.call(this, x, y, numerator, denominator, isCommon);
+};
+AlphaTab.Rendering.Glyphs.TabTimeSignatureGlyph.prototype = {
+    get_CommonY: function (){
+        var renderer = this.Renderer;
+        return renderer.GetTabY(0, 0);
+    },
+    get_NumeratorY: function (){
+        var renderer = this.Renderer;
+        var offset = renderer.Bar.Staff.Track.Tuning.length <= 4 ? 0.25 : 0.3333333;
+        return renderer.get_LineOffset() * renderer.Bar.Staff.Track.Tuning.length * offset * this.get_Scale();
+    },
+    get_DenominatorY: function (){
+        var renderer = this.Renderer;
+        var offset = renderer.Bar.Staff.Track.Tuning.length <= 4 ? 0.6 : 0.6;
+        return renderer.get_LineOffset() * renderer.Bar.Staff.Track.Tuning.length * offset * this.get_Scale();
+    },
+    get_CommonScale: function (){
+        return 1;
+    },
+    get_NumberScale: function (){
+        var renderer = this.Renderer;
+        if (renderer.Bar.Staff.Track.Tuning.length <= 4){
+            return 0.75;
+        }
+        else {
+            return 1;
+        }
+    }
+};
+$Inherit(AlphaTab.Rendering.Glyphs.TabTimeSignatureGlyph, AlphaTab.Rendering.Glyphs.TimeSignatureGlyph);
 AlphaTab.Rendering.Glyphs.TremoloPickingGlyph = function (x, y, duration){
     AlphaTab.Rendering.Glyphs.MusicFontGlyph.call(this, x, y, 1, AlphaTab.Rendering.Glyphs.TremoloPickingGlyph.GetSymbol(duration));
 };
@@ -16336,7 +16389,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
             this.CreateKeySignatureGlyphs();
         }
         // Time Signature
-        if ((this.Bar.PreviousBar == null) || (this.Bar.PreviousBar != null && this.Bar.get_MasterBar().TimeSignatureNumerator != this.Bar.PreviousBar.get_MasterBar().TimeSignatureNumerator) || (this.Bar.PreviousBar != null && this.Bar.get_MasterBar().TimeSignatureDenominator != this.Bar.PreviousBar.get_MasterBar().TimeSignatureDenominator)){
+        if (!this.Staff.StaveTrackGroup.HasTimeSignature && ((this.Bar.PreviousBar == null) || (this.Bar.PreviousBar != null && this.Bar.get_MasterBar().TimeSignatureNumerator != this.Bar.PreviousBar.get_MasterBar().TimeSignatureNumerator) || (this.Bar.PreviousBar != null && this.Bar.get_MasterBar().TimeSignatureDenominator != this.Bar.PreviousBar.get_MasterBar().TimeSignatureDenominator))){
             this.CreateStartSpacing();
             this.CreateTimeSignatureGlyphs();
         }
@@ -16427,7 +16480,8 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
     },
     CreateTimeSignatureGlyphs: function (){
         this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 5 * this.get_Scale()));
-        this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.TimeSignatureGlyph(0, this.GetScoreY(2, 0), this.Bar.get_MasterBar().TimeSignatureNumerator, this.Bar.get_MasterBar().TimeSignatureDenominator, this.Bar.get_MasterBar().TimeSignatureCommon));
+        this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.ScoreTimeSignatureGlyph(0, this.GetScoreY(2, 0), this.Bar.get_MasterBar().TimeSignatureNumerator, this.Bar.get_MasterBar().TimeSignatureDenominator, this.Bar.get_MasterBar().TimeSignatureCommon));
+        this.Staff.StaveTrackGroup.HasTimeSignature = true;
     },
     CreateVoiceGlyphs: function (v){
         for (var i = 0,j = v.Beats.length; i < j; i++){
@@ -16996,6 +17050,7 @@ AlphaTab.Rendering.Staves.StaveTrackGroup = function (staveGroup, track){
     this.Staves = null;
     this.FirstStaffInAccolade = null;
     this.LastStaffInAccolade = null;
+    this.HasTimeSignature = false;
     this.StaveGroup = staveGroup;
     this.Track = track;
     this.Staves = [];
@@ -17305,6 +17360,7 @@ $StaticConstructor(function (){
     AlphaTab.Rendering.Staves.StaveGroup.AccoladeLabelSpacing = 10;
 });
 AlphaTab.Rendering.TabBarRenderer = function (renderer, bar){
+    this._startSpacing = false;
     this.RenderRhythm = false;
     this.RhythmHeight = 0;
     this.RhythmBeams = false;
@@ -17351,10 +17407,26 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
             var center = (this.Bar.Staff.Track.Tuning.length + 1) / 2;
             this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.TabClefGlyph(5 * this.get_Scale(), this.GetTabY(center, 0)));
         }
+        // Time Signature
+        if (!this.Staff.StaveTrackGroup.HasTimeSignature && ((this.Bar.PreviousBar == null) || (this.Bar.PreviousBar != null && this.Bar.get_MasterBar().TimeSignatureNumerator != this.Bar.PreviousBar.get_MasterBar().TimeSignatureNumerator) || (this.Bar.PreviousBar != null && this.Bar.get_MasterBar().TimeSignatureDenominator != this.Bar.PreviousBar.get_MasterBar().TimeSignatureDenominator))){
+            this.CreateStartSpacing();
+            this.CreateTimeSignatureGlyphs();
+        }
         this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.BarNumberGlyph(0, this.GetTabY(-0.5, 0), this.Bar.Index + 1));
         if (this.Bar.get_IsEmpty()){
             this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 30 * this.get_Scale()));
         }
+    },
+    CreateStartSpacing: function (){
+        if (this._startSpacing)
+            return;
+        this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 2 * this.get_Scale()));
+        this._startSpacing = true;
+    },
+    CreateTimeSignatureGlyphs: function (){
+        this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 5 * this.get_Scale()));
+        this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.TabTimeSignatureGlyph(0, this.GetTabY(0, 0), this.Bar.get_MasterBar().TimeSignatureNumerator, this.Bar.get_MasterBar().TimeSignatureDenominator, this.Bar.get_MasterBar().TimeSignatureCommon));
+        this.Staff.StaveTrackGroup.HasTimeSignature = true;
     },
     CreateBeatGlyphs: function (){
         for (var v = 0; v < this.Bar.Voices.length; v++){

@@ -33,6 +33,8 @@ namespace AlphaTab.Rendering.Staves
         public Staff FirstStaffInAccolade { get; set; }
         public Staff LastStaffInAccolade { get; set; }
 
+        public bool HasTimeSignature { get; set; }
+
         public StaveTrackGroup(StaveGroup staveGroup, Track track)
         {
             StaveGroup = staveGroup;

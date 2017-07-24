@@ -723,7 +723,8 @@ namespace AlphaTab.Rendering
             }
 
             // Time Signature
-            if ((Bar.PreviousBar == null) || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureNumerator != Bar.PreviousBar.MasterBar.TimeSignatureNumerator) || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureDenominator != Bar.PreviousBar.MasterBar.TimeSignatureDenominator))
+            if (!Staff.StaveTrackGroup.HasTimeSignature &&
+                ((Bar.PreviousBar == null) || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureNumerator != Bar.PreviousBar.MasterBar.TimeSignatureNumerator) || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureDenominator != Bar.PreviousBar.MasterBar.TimeSignatureDenominator)))
             {
                 CreateStartSpacing();
                 CreateTimeSignatureGlyphs();
@@ -850,7 +851,8 @@ namespace AlphaTab.Rendering
         private void CreateTimeSignatureGlyphs()
         {
             AddPreBeatGlyph(new SpacingGlyph(0, 0, 5 * Scale));
-            AddPreBeatGlyph(new TimeSignatureGlyph(0, GetScoreY(2), Bar.MasterBar.TimeSignatureNumerator, Bar.MasterBar.TimeSignatureDenominator, Bar.MasterBar.TimeSignatureCommon));
+            AddPreBeatGlyph(new ScoreTimeSignatureGlyph(0, GetScoreY(2), Bar.MasterBar.TimeSignatureNumerator, Bar.MasterBar.TimeSignatureDenominator, Bar.MasterBar.TimeSignatureCommon));
+            Staff.StaveTrackGroup.HasTimeSignature = true;
         }
 
         private void CreateVoiceGlyphs(Voice v)

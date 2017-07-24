@@ -103,12 +103,36 @@ namespace AlphaTab.Rendering
                 AddPreBeatGlyph(new TabClefGlyph(5 * Scale, GetTabY(center)));
             }
 
+            // Time Signature
+            if (!Staff.StaveTrackGroup.HasTimeSignature && 
+                ((Bar.PreviousBar == null) || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureNumerator != Bar.PreviousBar.MasterBar.TimeSignatureNumerator) || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureDenominator != Bar.PreviousBar.MasterBar.TimeSignatureDenominator)))
+            {
+                CreateStartSpacing();
+                CreateTimeSignatureGlyphs();
+            }
+
             AddPreBeatGlyph(new BarNumberGlyph(0, GetTabY(-0.5f), Bar.Index + 1));
 
             if (Bar.IsEmpty)
             {
                 AddPreBeatGlyph(new SpacingGlyph(0, 0, 30 * Scale));
             }
+        }
+
+        private bool _startSpacing;
+
+        private void CreateStartSpacing()
+        {
+            if (_startSpacing) return;
+            AddPreBeatGlyph(new SpacingGlyph(0, 0, 2 * Scale));
+            _startSpacing = true;
+        }
+
+        private void CreateTimeSignatureGlyphs()
+        {
+            AddPreBeatGlyph(new SpacingGlyph(0, 0, 5 * Scale));
+            AddPreBeatGlyph(new TabTimeSignatureGlyph(0, GetTabY(0), Bar.MasterBar.TimeSignatureNumerator, Bar.MasterBar.TimeSignatureDenominator, Bar.MasterBar.TimeSignatureCommon));
+            Staff.StaveTrackGroup.HasTimeSignature = true;
         }
 
         protected override void CreateBeatGlyphs()
