@@ -187,11 +187,11 @@ namespace AlphaTab.Platform.JavaScript
                     window.addEventListener("scroll", e =>
                     {
                         ShowSvgsInViewPort();
-                    });
+                    }, true);
                     window.addEventListener("resize", e =>
                     {
                         ShowSvgsInViewPort();
-                    });
+                    }, true);
                 }
 
                 #endregion

@@ -664,10 +664,10 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
         if (settings.Engine == "default" || settings.Engine == "svg"){
             window.addEventListener("scroll", $CreateAnonymousDelegate(this, function (e){
                 this.ShowSvgsInViewPort();
-            }));
+            }), true);
             window.addEventListener("resize", $CreateAnonymousDelegate(this, function (e){
                 this.ShowSvgsInViewPort();
-            }));
+            }), true);
         }
         this.AutoSize = settings.Width < 0;
         if (this.AutoSize){

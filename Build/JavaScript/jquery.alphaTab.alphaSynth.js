@@ -60,7 +60,7 @@
         autoScroll: 'vertical',
         scrollSpeed: 300,
         scrollOffset: 0,
-        scrollElement: 'body',
+        scrollElement: 'html,body',
         scrollAdjustment: 0,
         beatCursorWidth: 3,
         handleClick: true
@@ -478,14 +478,20 @@
                                 
                 // calculate position of whole music wheet within the scroll parent
                 var scrollElement = $(context.player.options.scrollElement);
-                var scrollElementOffset = scrollElement.offset();
+
                 var elementOffset = element.offset();
-                elementOffset = {
-                    top: elementOffset.top - scrollElementOffset.top,
-                    left: elementOffset.left - scrollElementOffset.left,
-                };
+                if(!scrollElement.is('html,body')) {
+                    var scrollElementOffset = scrollElement.offset();
+                    elementOffset = {
+                        top: elementOffset.top + scrollElement.scrollTop() - scrollElementOffset.top,
+                        left: elementOffset.left + scrollElement.scrollLeft() - scrollElementOffset.left,
+                    };
+                }
+                
+                
                 if(context.player.options.autoScroll == 'vertical') {
                     var scrollTop = elementOffset.top + barBoundings.RealBounds.Y;
+
                     if(context.player.options.scrollOffset.length) {
                         scrollTop += context.player.options.scrollOffset[1];
                     }
@@ -493,10 +499,12 @@
                         scrollTop += context.player.options.scrollOffset;                        
                     }
                     if(scrollTop != context.player.options.lastScroll) {
+                        console.log(scrollTop);
+                        debugger;
                         context.player.options.lastScroll = scrollTop;
-                        $(context.player.options.scrollElement).animate({
+                        scrollElement.animate({
                             scrollTop:scrollTop + 'px'
-                        }, context.player.options.scrollSpeed);
+                        });
                     }
                 }
                 else if(context.player.options.autoScroll == 'horizontal-bar') {
@@ -509,15 +517,15 @@
                             scrollLeft += context.player.options.scrollOffset;                        
                         }                        
                         context.player.options.lastScroll = barBoundings.VisualBounds.X;
-                        $(context.player.options.scrollElement).animate({
+                        scrollElement.animate({
                             scrollLeft:scrollLeft + 'px'
                         }, context.player.options.scrollSpeed);
                     }
                 }
                 else if(context.player.options.autoScroll == 'horizontal-offscreen') {
-                    var elementRight = $(context.player.options.scrollElement).scrollLeft() + 
-                                       $(context.player.options.scrollElement).width();
-                    if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || barBoundings.VisualBounds.X < $(context.player.options.scrollElement).scrollLeft() ) {
+                    var elementRight = scrollElement.scrollLeft() + 
+                                       scrollElement.width();
+                    if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || barBoundings.VisualBounds.X < scrollElement.scrollLeft() ) {
                         var scrollLeft = barBoundings.RealBounds.X;
                         if(context.player.options.scrollOffset.length) {
                             scrollLeft += context.player.options.scrollOffset[0];
@@ -526,7 +534,7 @@
                             scrollLeft += context.player.options.scrollOffset;                        
                         }                
                         context.player.options.lastScroll = barBoundings.VisualBounds.X;
-                        $(context.player.options.scrollElement).animate({
+                        scrollElement.animate({
                             scrollLeft:scrollLeft + 'px'
                         }, context.player.options.scrollSpeed);
                     }
