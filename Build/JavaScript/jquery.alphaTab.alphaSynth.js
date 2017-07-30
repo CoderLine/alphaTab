@@ -499,8 +499,6 @@
                         scrollTop += context.player.options.scrollOffset;                        
                     }
                     if(scrollTop != context.player.options.lastScroll) {
-                        console.log(scrollTop);
-                        debugger;
                         context.player.options.lastScroll = scrollTop;
                         scrollElement.animate({
                             scrollTop:scrollTop + 'px'
