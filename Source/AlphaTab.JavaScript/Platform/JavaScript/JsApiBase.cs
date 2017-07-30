@@ -102,7 +102,7 @@ namespace AlphaTab.Platform.JavaScript
                         {
                             key += keyParts[j].substr(0, 1).toUpperCase() + keyParts[j].substr(1);
                         }
-                        
+
                         object value = attr.nodeValue;
                         try
                         {
@@ -119,7 +119,7 @@ namespace AlphaTab.Platform.JavaScript
                     }
                 }
             }
-            
+
             return dataAttributes;
         }
 
@@ -666,6 +666,16 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
+
+        public void Error(string type, object details)
+        {
+            Logger.Error(type, "An unexpected error occurred", details);
+            TriggerEvent("error", new
+            {
+                type = type,
+                details = details
+            });
+        }
 
         public void TriggerEvent(string name, object details = null)
         {

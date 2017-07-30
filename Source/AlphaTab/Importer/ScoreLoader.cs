@@ -67,7 +67,7 @@ namespace AlphaTab.Importer
                 return score;
             }
 
-            Logger.Info("ScoreLoader", "No compatible importer found for file");
+            Logger.Error("ScoreLoader", "No compatible importer found for file");
             throw new NoCompatibleReaderFoundException();
         }
     }

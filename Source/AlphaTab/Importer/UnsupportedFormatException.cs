@@ -15,22 +15,13 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System;
-
 namespace AlphaTab.Importer
 {
-    public class UnsupportedFormatException : Exception
+    public class UnsupportedFormatException : AlphaTabException
     {
-        private readonly string _message;
-
-        public override string Message
-        {
-            get { return _message; }
-        }
-
         public UnsupportedFormatException(string message = "")
+            : base(message)
         {
-            _message = message;
         }
     }
 }

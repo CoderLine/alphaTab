@@ -58,7 +58,11 @@ namespace AlphaTab.Importer
         private void ParseDom(XmlDocument dom)
         {
             var root = dom.DocumentElement;
-            if (root == null) return;
+            if (root == null)
+            {
+                throw new UnsupportedFormatException();
+            }
+
             switch (root.LocalName)
             {
                 case "score-partwise":

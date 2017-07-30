@@ -17,12 +17,10 @@
  */
 using System;
 using AlphaTab.Collections;
-using AlphaTab.IO;
 using AlphaTab.Model;
-using AlphaTab.Platform;
-using AlphaTab.Util;
 using SharpKit.Html;
 using SharpKit.JavaScript;
+using Console = System.Console;
 
 namespace AlphaTab.Importer
 {
@@ -49,34 +47,41 @@ namespace AlphaTab.Importer
                 {
                     if (xhr.status == 200)
                     {
-                        var reader = new Uint8Array(xhr.response.As<ArrayBuffer>());
-                        var score = LoadScoreFromBytes(reader.As<byte[]>());
-                        success(score);
+                        try
+                        {
+                            var reader = new Uint8Array(xhr.response.As<ArrayBuffer>());
+                            var score = LoadScoreFromBytes(reader.As<byte[]>());
+                            success(score);
+                        }
+                        catch (Exception exception)
+                        {
+                            error(exception);
+                        }
                     }
                     // Error handling
                     else if (xhr.status == 0)
                     {
-                        error(new FileLoadException("You are offline!!\n Please Check Your Network."));
+                        error(new FileLoadException("You are offline!!\n Please Check Your Network.", xhr));
                     }
                     else if (xhr.status == 404)
                     {
-                        error(new FileLoadException("Requested URL not found."));
+                        error(new FileLoadException("Requested URL not found.", xhr));
                     }
                     else if (xhr.status == 500)
                     {
-                        error(new FileLoadException("Internel Server Error."));
+                        error(new FileLoadException("Internel Server Error.", xhr));
                     }
                     else if (xhr.statusText == "parsererror")
                     {
-                        error(new FileLoadException("Error.\nParsing JSON Request failed."));
+                        error(new FileLoadException("Error.\nParsing JSON Request failed.", xhr));
                     }
                     else if (xhr.statusText == "timeout")
                     {
-                        error(new FileLoadException("Request Time out."));
+                        error(new FileLoadException("Request Time out.", xhr));
                     }
                     else
                     {
-                        error(new FileLoadException("Unknow Error: " + xhr.responseText));
+                        error(new FileLoadException("Unknow Error: " + xhr.responseText, xhr));
                     }
                 }
             };

@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using AlphaTab.Importer;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
 using SharpKit.Html;
@@ -42,25 +43,24 @@ namespace AlphaTab.Platform.JavaScript
             };
             renderer.PostRenderFinished += () =>
             {
-                Element.className = Element.className.replace(" loading", "")
-                                            .replace(" rendering", "");
+                Element.classList.remove("loading");
+                Element.classList.remove("rendering");
             };
             return renderer;
         }
 
         public override void Load(object data)
         {
-            Element.className += " loading";
+            Element.classList.add("loading");
 
             if (JsTypeOf(data) == JsTypes.@string)
             {
-                var fileLoader = new JsFileLoader();
-                fileLoader.LoadBinaryAsync((string)data, b =>
+                ScoreLoader.LoadScoreAsync((string)data, b =>
                 {
                     Renderer.As<WorkerScoreRenderer>().Load(b, TrackIndexes);
                 }, e =>
                 {
-                    console.error(e);
+                    Error("import", e);
                 });
             }
             else
@@ -73,7 +73,7 @@ namespace AlphaTab.Platform.JavaScript
         {
             if (Renderer != null)
             {
-                Element.className += " rendering";
+                Element.classList.add("rendering");
                 if (_workerScore != Score)
                 {
                     Renderer.As<WorkerScoreRenderer>().SetScore(Score);
@@ -84,7 +84,7 @@ namespace AlphaTab.Platform.JavaScript
 
         public override void Tex(string contents)
         {
-            Element.className += " loading";
+            Element.classList.add("loading");
             Renderer.As<WorkerScoreRenderer>().Tex(contents);
         }
     }

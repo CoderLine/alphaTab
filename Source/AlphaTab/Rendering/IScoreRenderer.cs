@@ -34,6 +34,7 @@ namespace AlphaTab.Rendering
         event Action<RenderFinishedEventArgs> RenderFinished;
         event Action<RenderFinishedEventArgs> PartialRenderFinished;
         event Action PostRenderFinished;
+        event Action<string,Exception> Error;
         void UpdateSettings(Settings settings);
     }
 

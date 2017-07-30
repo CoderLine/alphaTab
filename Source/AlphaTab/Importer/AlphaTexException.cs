@@ -15,11 +15,10 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System;
 
 namespace AlphaTab.Importer
 {
-    public class AlphaTexException : Exception
+    public class AlphaTexException : AlphaTabException
     {
         public int Position { get; set; }
         public string NonTerm { get; set; }
@@ -27,28 +26,25 @@ namespace AlphaTab.Importer
         public AlphaTexSymbols Symbol { get; set; }
         public object SymbolData { get; set; }
 
-        public override string Message
-        {
-            get
-            {
-                if (SymbolData == null)
-                {
-                    return "MalFormed AlphaTex: @" + Position + ": Error on block " + NonTerm +
-                           ", expected a " + Expected + " found a " + Symbol;
-                }
-
-                return "MalFormed AlphaTex: @"+ Position + ": Error on block " + NonTerm +
-                       ", invalid value: " + SymbolData;
-            }
-        }
-
         public AlphaTexException(int position, string nonTerm, AlphaTexSymbols expected, AlphaTexSymbols symbol, object symbolData = null)
+            : base("")
         {
             Position = position;
             NonTerm = nonTerm;
             Expected = expected;
             Symbol = symbol;
             SymbolData = symbolData;
+
+            if (SymbolData == null)
+            {
+                Description = "MalFormed AlphaTex: @" + Position + ": Error on block " + NonTerm +
+                              ", expected a " + Expected + " found a " + Symbol;
+            }
+            else
+            {
+                Description =  "MalFormed AlphaTex: @" + Position + ": Error on block " + NonTerm +
+                       ", invalid value: " + SymbolData;
+            }
         }
     }
 }

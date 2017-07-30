@@ -101,7 +101,7 @@ namespace AlphaTab.Platform.JavaScript
                     OnPostRenderFinished();
                     break;
                 case "alphaTab.error":
-                    console.error(data.Member("exception"));
+                    OnError(data.Member("type").As<string>(), data.Member("detail").As<Exception>());
                     break;
                 case "alphaTab.loaded":
                     var score = data.Member("score").As<Score>();
@@ -124,35 +124,42 @@ namespace AlphaTab.Platform.JavaScript
         public event Action<RenderFinishedEventArgs> PreRender;
         protected virtual void OnPreRender(RenderFinishedEventArgs obj)
         {
-            Action<RenderFinishedEventArgs> handler = PreRender;
+            var handler = PreRender;
             if (handler != null) handler(obj);
         }
 
         public event Action<RenderFinishedEventArgs> PartialRenderFinished;
         protected virtual void OnPartialRenderFinished(RenderFinishedEventArgs obj)
         {
-            Action<RenderFinishedEventArgs> handler = PartialRenderFinished;
+            var handler = PartialRenderFinished;
             if (handler != null) handler(obj);
         }
 
         public event Action<RenderFinishedEventArgs> RenderFinished;
         protected virtual void OnRenderFinished(RenderFinishedEventArgs obj)
         {
-            Action<RenderFinishedEventArgs> handler = RenderFinished;
+            var handler = RenderFinished;
             if (handler != null) handler(obj);
+        }
+
+        public event Action<string, Exception> Error;
+        protected virtual void OnError(string type, Exception details)
+        {
+            var handler = Error;
+            if (handler != null) handler(type, details);
         }
 
         public event Action PostRenderFinished;
         protected virtual void OnPostRenderFinished()
         {
-            Action handler = PostRenderFinished;
+            var handler = PostRenderFinished;
             if (handler != null) handler();
         }
 
         public event Action<Score> ScoreLoaded;
         protected virtual void OnLoaded(Score score)
         {
-            Action<Score> handler = ScoreLoaded;
+            var handler = ScoreLoaded;
             if (handler != null) handler(score);
         }
 
@@ -160,8 +167,7 @@ namespace AlphaTab.Platform.JavaScript
         {
             _worker.postMessage(new { cmd = "alphaTab.tex", data = contents });
         }
-
-
+        
         public void SetScore(Score score)
         {
             var converter = new JsonConverter();

@@ -15,15 +15,18 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System;
+using SharpKit.Html;
 
-namespace AlphaTab.IO
+namespace AlphaTab.Importer
 {
-    public class FileLoadException : Exception
+    public class FileLoadException : AlphaTabException
     {
-        public FileLoadException(string message)
+        public XMLHttpRequest Xhr { get; set; }
+
+        public FileLoadException(string message, XMLHttpRequest xhr)
             : base(message)
         {
+            Xhr = xhr;
         }
     }
 }

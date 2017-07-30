@@ -19,7 +19,10 @@ using System;
 
 namespace AlphaTab.Importer
 {
-    public class NoCompatibleReaderFoundException : Exception
+    public class NoCompatibleReaderFoundException : AlphaTabException
     {
+        public NoCompatibleReaderFoundException() : base("")
+        {
+        }
     }
 }

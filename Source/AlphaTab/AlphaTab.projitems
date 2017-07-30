@@ -9,6 +9,7 @@
     <Import_RootNamespace>AlphaTab</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AlphaTabException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\GeneralMidi.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Generator\IMidiFileHandler.cs" />
@@ -40,7 +41,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Importer\ScoreLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\UnsupportedFormatException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\BitReader.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IO\FileLoadException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\EndOfReaderException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\ByteBuffer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\IReadable.cs" />

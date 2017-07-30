@@ -37,7 +37,7 @@ namespace AlphaTab.Platform
         [JsMethod(InlineCodeExpression = "arguments.callee.caller.caller.name", Export = false)]
         public static extern string GetCallerName();
 
-        public static void Log(LogLevel logLevel, string category, string msg)
+        public static void Log(LogLevel logLevel, string category, string msg, object details = null)
         {
             var caller = GetCallerName();
             // ReSharper disable once RedundantAssignment
@@ -48,16 +48,16 @@ namespace AlphaTab.Platform
                 case LogLevel.None:
                     break;
                 case LogLevel.Debug:
-                    JsContext.JsCode("console.debug(msg);");
+                    JsContext.JsCode("console.debug(msg, details);");
                     break;
                 case LogLevel.Info:
-                    JsContext.JsCode("console.info(msg);");
+                    JsContext.JsCode("console.info(msg, details);");
                     break;
                 case LogLevel.Warning:
-                    JsContext.JsCode("console.warn(msg);");
+                    JsContext.JsCode("console.warn(msg, details);");
                     break;
                 case LogLevel.Error:
-                    JsContext.JsCode("console.error(msg);");
+                    JsContext.JsCode("console.error(msg, details);");
                     break;
             }
         }

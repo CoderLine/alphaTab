@@ -93,9 +93,16 @@ namespace AlphaTab.Rendering
 
         public void Render(Track track)
         {
-            Score = track.Score;
-            Tracks = new[] { track };
-            Invalidate();
+            try
+            {
+                Score = track.Score;
+                Tracks = new[] { track };
+                Invalidate();
+            }
+            catch (Exception e)
+            {
+                OnError("render", e);
+            }
         }
 
         public void RenderMultiple(Track[] tracks)
@@ -218,6 +225,13 @@ namespace AlphaTab.Rendering
                 TotalHeight = Layout.Height,
                 TotalWidth = Layout.Width
             });
+        }
+        
+        public event Action<string, Exception> Error;
+        protected virtual void OnError(string type, Exception details)
+        {
+            var handler = Error;
+            if (handler != null) handler(type, details);
         }
 
         public event Action PostRenderFinished;

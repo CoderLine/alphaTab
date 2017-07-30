@@ -341,7 +341,17 @@ $StaticConstructor(function (){
     AlphaTab.Environment.StaveProfiles["score"] = [new AlphaTab.Rendering.EffectBarRendererFactory("score-effects", [new AlphaTab.Rendering.Effects.TempoEffectInfo(), new AlphaTab.Rendering.Effects.TripletFeelEffectInfo(), new AlphaTab.Rendering.Effects.MarkerEffectInfo(), new AlphaTab.Rendering.Effects.TextEffectInfo(), new AlphaTab.Rendering.Effects.ChordsEffectInfo(), new AlphaTab.Rendering.Effects.TrillEffectInfo(), new AlphaTab.Rendering.Effects.BeatVibratoEffectInfo(), new AlphaTab.Rendering.Effects.NoteVibratoEffectInfo(), new AlphaTab.Rendering.Effects.FadeInEffectInfo(), new AlphaTab.Rendering.Effects.LetRingEffectInfo(), new AlphaTab.Rendering.Effects.PalmMuteEffectInfo(), new AlphaTab.Rendering.Effects.PickStrokeEffectInfo(), new AlphaTab.Rendering.Effects.AlternateEndingsEffectInfo()]), new AlphaTab.Rendering.ScoreBarRendererFactory(), new AlphaTab.Rendering.EffectBarRendererFactory("score-bottom-effects", [new AlphaTab.Rendering.Effects.CrescendoEffectInfo(), new AlphaTab.Rendering.Effects.DynamicsEffectInfo(), new AlphaTab.Rendering.Effects.LyricsEffectInfo()])];
     AlphaTab.Environment.StaveProfiles["tab"] = [new AlphaTab.Rendering.EffectBarRendererFactory("tab-effects", [new AlphaTab.Rendering.Effects.TempoEffectInfo(), new AlphaTab.Rendering.Effects.TripletFeelEffectInfo(), new AlphaTab.Rendering.Effects.MarkerEffectInfo(), new AlphaTab.Rendering.Effects.TextEffectInfo(), new AlphaTab.Rendering.Effects.ChordsEffectInfo(), new AlphaTab.Rendering.Effects.TripletFeelEffectInfo(), new AlphaTab.Rendering.Effects.TrillEffectInfo(), new AlphaTab.Rendering.Effects.BeatVibratoEffectInfo(), new AlphaTab.Rendering.Effects.NoteVibratoEffectInfo(), new AlphaTab.Rendering.Effects.TapEffectInfo(), new AlphaTab.Rendering.Effects.FadeInEffectInfo(), new AlphaTab.Rendering.Effects.HarmonicsEffectInfo(), new AlphaTab.Rendering.Effects.LetRingEffectInfo(), new AlphaTab.Rendering.Effects.CapoEffectInfo(), new AlphaTab.Rendering.Effects.PalmMuteEffectInfo(), new AlphaTab.Rendering.Effects.PickStrokeEffectInfo(), new AlphaTab.Rendering.Effects.AlternateEndingsEffectInfo()]), new AlphaTab.Rendering.TabBarRendererFactory(true, true, true), new AlphaTab.Rendering.EffectBarRendererFactory("tab-bottom-effects", [new AlphaTab.Rendering.Effects.LyricsEffectInfo()])];
 });
+AlphaTab.AlphaTabException = function (message){
+    this.Description = null;
+    this.Description = message;
+};
 AlphaTab.Importer = AlphaTab.Importer || {};
+AlphaTab.Importer.FileLoadException = function (message, xhr){
+    this.Xhr = null;
+    AlphaTab.AlphaTabException.call(this, message);
+    this.Xhr = xhr;
+};
+$Inherit(AlphaTab.Importer.FileLoadException, AlphaTab.AlphaTabException);
 AlphaTab.Importer.ScoreLoader = function (){
 };
 AlphaTab.Importer.ScoreLoader.LoadScoreAsync = function (path, success, error){
@@ -351,27 +361,32 @@ AlphaTab.Importer.ScoreLoader.LoadScoreAsync = function (path, success, error){
     xhr.onreadystatechange = function (e){
         if (xhr.readyState == 4){
             if (xhr.status == 200){
-                var reader = new Uint8Array(xhr.response);
-                var score = AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(reader);
-                success(score);
+                try{
+                    var reader = new Uint8Array(xhr.response);
+                    var score = AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(reader);
+                    success(score);
+                }
+                catch(exception){
+                    error(exception);
+                }
             }
             else if (xhr.status == 0){
-                error(new AlphaTab.IO.FileLoadException("You are offline!!\n Please Check Your Network."));
+                error(new AlphaTab.Importer.FileLoadException("You are offline!!\n Please Check Your Network.", xhr));
             }
             else if (xhr.status == 404){
-                error(new AlphaTab.IO.FileLoadException("Requested URL not found."));
+                error(new AlphaTab.Importer.FileLoadException("Requested URL not found.", xhr));
             }
             else if (xhr.status == 500){
-                error(new AlphaTab.IO.FileLoadException("Internel Server Error."));
+                error(new AlphaTab.Importer.FileLoadException("Internel Server Error.", xhr));
             }
             else if (xhr.statusText == "parsererror"){
-                error(new AlphaTab.IO.FileLoadException("Error.\nParsing JSON Request failed."));
+                error(new AlphaTab.Importer.FileLoadException("Error.\nParsing JSON Request failed.", xhr));
             }
             else if (xhr.statusText == "timeout"){
-                error(new AlphaTab.IO.FileLoadException("Request Time out."));
+                error(new AlphaTab.Importer.FileLoadException("Request Time out.", xhr));
             }
             else {
-                error(new AlphaTab.IO.FileLoadException("Unknow Error: " + xhr.responseText));
+                error(new AlphaTab.Importer.FileLoadException("Unknow Error: " + xhr.responseText, xhr));
             }
         }
     };
@@ -405,32 +420,32 @@ AlphaTab.Importer.ScoreLoader.GetBytesFromString = function (s){
 };
 AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes = function (data){
     var importers = AlphaTab.Importer.ScoreImporter.BuildImporters();
-    AlphaTab.Util.Logger.Info("ScoreLoader", "Loading score from " + data.length + " bytes using " + importers.length + " importers");
+    AlphaTab.Util.Logger.Info("ScoreLoader", "Loading score from " + data.length + " bytes using " + importers.length + " importers", null);
     var score = null;
     var bb = AlphaTab.IO.ByteBuffer.FromBuffer(data);
     for (var $i2 = 0,$l2 = importers.length,importer = importers[$i2]; $i2 < $l2; $i2++, importer = importers[$i2]){
         bb.Reset();
         try{
-            AlphaTab.Util.Logger.Info("ScoreLoader", "Importing using importer " + importer.get_Name());
+            AlphaTab.Util.Logger.Info("ScoreLoader", "Importing using importer " + importer.get_Name(), null);
             importer.Init(bb);
             score = importer.ReadScore();
-            AlphaTab.Util.Logger.Info("ScoreLoader", "Score imported using " + importer.get_Name());
+            AlphaTab.Util.Logger.Info("ScoreLoader", "Score imported using " + importer.get_Name(), null);
             break;
         }
         catch(e){
             if (!(e.exception instanceof AlphaTab.Importer.UnsupportedFormatException)){
-                AlphaTab.Util.Logger.Info("ScoreLoader", "Score import failed due to unexpected error: " + e);
+                AlphaTab.Util.Logger.Info("ScoreLoader", "Score import failed due to unexpected error: " + e, null);
                 throw $CreateException(e, new Error());
             }
             else {
-                AlphaTab.Util.Logger.Info("ScoreLoader", importer.get_Name() + " does not support the file");
+                AlphaTab.Util.Logger.Info("ScoreLoader", importer.get_Name() + " does not support the file", null);
             }
         }
     }
     if (score != null){
         return score;
     }
-    AlphaTab.Util.Logger.Info("ScoreLoader", "No compatible importer found for file");
+    AlphaTab.Util.Logger.Error("ScoreLoader", "No compatible importer found for file", null);
     throw $CreateException(new AlphaTab.Importer.NoCompatibleReaderFoundException(), new Error());
 };
 AlphaTab.Model = AlphaTab.Model || {};
@@ -737,10 +752,10 @@ AlphaTab.Platform.JavaScript.JsApiBase = function (element, options){
     else {
         // if the alphaTab element is not visible, we postpone the rendering
         // we check in a regular interval whether it became available. 
-        AlphaTab.Util.Logger.Warning("Rendering", "AlphaTab container is invisible, checking for element visibility in " + this._visibilityCheckerInterval + "ms intervals");
+        AlphaTab.Util.Logger.Warning("Rendering", "AlphaTab container is invisible, checking for element visibility in " + this._visibilityCheckerInterval + "ms intervals", null);
         this._visibilityCheckerIntervalId = setInterval($CreateAnonymousDelegate(this, function (){
             if (this.get_IsElementVisible()){
-                AlphaTab.Util.Logger.Info("Rendering", "AlphaTab container became visible, triggering initial rendering");
+                AlphaTab.Util.Logger.Info("Rendering", "AlphaTab container became visible, triggering initial rendering", null);
                 initialRender();
                 clearInterval(this._visibilityCheckerIntervalId);
                 this._visibilityCheckerIntervalId = 0;
@@ -796,7 +811,7 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
         // if the element is visible, perfect, we do the update
         if (this.get_IsElementVisible()){
             if (this._visibilityCheckerIntervalId != 0){
-                AlphaTab.Util.Logger.Info("Rendering", "AlphaTab container became visible again, doing autosizing");
+                AlphaTab.Util.Logger.Info("Rendering", "AlphaTab container became visible again, doing autosizing", null);
                 clearInterval(this._visibilityCheckerIntervalId);
                 this._visibilityCheckerIntervalId = 0;
             }
@@ -810,7 +825,7 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
             this.Renderer.Resize(this.Element.offsetWidth);
         }
         else if (this._visibilityCheckerIntervalId == 0){
-            AlphaTab.Util.Logger.Warning("Rendering", "AlphaTab container was invisible while autosizing, checking for element visibility in " + this._visibilityCheckerInterval + "ms intervals");
+            AlphaTab.Util.Logger.Warning("Rendering", "AlphaTab container was invisible while autosizing, checking for element visibility in " + this._visibilityCheckerInterval + "ms intervals", null);
             this._visibilityCheckerIntervalId = setInterval($CreateDelegate(this, this.TriggerResize), this._visibilityCheckerInterval);
         }
     },
@@ -1030,6 +1045,13 @@ AlphaTab.Platform.JavaScript.JsApiBase.prototype = {
             this.Render();
         }
     },
+    Error: function (type, details){
+        AlphaTab.Util.Logger.Error(type, "An unexpected error occurred", details);
+        this.TriggerEvent("error", {
+            type: type,
+            details: details
+        });
+    },
     TriggerEvent: function (name, details){
         if (this.Element != null){
             name = "alphaTab." + name;
@@ -1162,7 +1184,7 @@ AlphaTab.Platform.JavaScript.JsWorker.prototype = {
             this.ScoreLoaded(parser.ReadScore());
         }
         catch(e){
-            this.Error(e);
+            this.Error("Import", e);
         }
     },
     Load: function (data, trackIndexes){
@@ -1174,15 +1196,13 @@ AlphaTab.Platform.JavaScript.JsWorker.prototype = {
             else if ((data instanceof Uint8Array)){
                 this.ScoreLoaded(AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(data));
             }
-            else if (typeof(data) == "string"){
-                AlphaTab.Importer.ScoreLoader.LoadScoreAsync(data, $CreateDelegate(this, this.ScoreLoaded), $CreateDelegate(this, this.Error));
-            }
+            // Ajax loading of files via string(url) is handled in main thread, not in worker. 
         }
         catch(e){
-            this.Error(e);
+            this.Error("Import", e);
         }
     },
-    Error: function (e){
+    Error: function (type, e){
         var error = JSON.parse(JSON.stringify(e));
         if (e["message"]){
             error.message = e["message"];
@@ -1190,9 +1210,15 @@ AlphaTab.Platform.JavaScript.JsWorker.prototype = {
         if (e["stack"]){
             error.stack = e["stack"];
         }
+        if (e["constructor"] && e["constructor"]["name"]){
+            error.type = e["constructor"]["name"];
+        }
         this._main.postMessage({
     cmd: "alphaTab.error",
-    exception: error
+    error: {
+        type: type,
+        detail: error
+    }
 }
 );
     },
@@ -1208,7 +1234,12 @@ AlphaTab.Platform.JavaScript.JsWorker.prototype = {
         this.Render();
     },
     Render: function (){
-        this._renderer.RenderMultiple(this.get_Tracks());
+        try{
+            this._renderer.RenderMultiple(this.get_Tracks());
+        }
+        catch(e){
+            this.Error("render", e);
+        }
     }
 };
 $StaticConstructor(function (){
@@ -1228,18 +1259,18 @@ AlphaTab.Platform.JavaScript.JsWorkerApi.prototype = {
             this.ScoreLoaded(score, false);
         }));
         renderer.add_PostRenderFinished($CreateAnonymousDelegate(this, function (){
-            this.Element.className = this.Element.className.replace(" loading", "").replace(" rendering", "");
+            this.Element.classList.remove("loading");
+            this.Element.classList.remove("rendering");
         }));
         return renderer;
     },
     Load: function (data){
-        this.Element.className += " loading";
+        this.Element.classList.add("loading");
         if (typeof(data) == "string"){
-            var fileLoader = new AlphaTab.Platform.JavaScript.JsFileLoader();
-            fileLoader.LoadBinaryAsync(data, $CreateAnonymousDelegate(this, function (b){
+            AlphaTab.Importer.ScoreLoader.LoadScoreAsync(data, $CreateAnonymousDelegate(this, function (b){
                 this.Renderer.Load(b, this.TrackIndexes);
             }), $CreateAnonymousDelegate(this, function (e){
-                console.error(e);
+                this.Error("import", e);
             }));
         }
         else {
@@ -1248,7 +1279,7 @@ AlphaTab.Platform.JavaScript.JsWorkerApi.prototype = {
     },
     Render: function (){
         if (this.Renderer != null){
-            this.Element.className += " rendering";
+            this.Element.classList.add("rendering");
             if (this._workerScore != this.Score){
                 this.Renderer.SetScore(this.Score);
             }
@@ -1256,7 +1287,7 @@ AlphaTab.Platform.JavaScript.JsWorkerApi.prototype = {
         }
     },
     Tex: function (contents){
-        this.Element.className += " loading";
+        this.Element.classList.add("loading");
         this.Renderer.Tex(contents);
     }
 };
@@ -1455,7 +1486,7 @@ AlphaTab.Platform.JavaScript.JsApi.prototype = {
             AlphaTab.Importer.ScoreLoader.LoadScoreAsync(data, $CreateAnonymousDelegate(this, function (s){
                 this.ScoreLoaded(s, true);
             }), $CreateAnonymousDelegate(this, function (e){
-                console.error(e);
+                this.Error("import", e);
             }));
         }
     },
@@ -1492,126 +1523,12 @@ AlphaTab.Platform.JavaScript.JsApi.prototype = {
     }
 };
 $Inherit(AlphaTab.Platform.JavaScript.JsApi, AlphaTab.Platform.JavaScript.JsApiBase);
-AlphaTab.Platform.JavaScript.JsFileLoader = function (){
-};
-AlphaTab.Platform.JavaScript.JsFileLoader.prototype = {
-    LoadBinary: function (path){
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", path, false);
-        xhr.responseType = "arraybuffer";
-        if (xhr.responseType != "arraybuffer"){
-            // use VB Loader to load binary array
-            var vbArr = VbAjaxLoader("GET",path);
-            var fileContents = vbArr.toArray();
-            // decode byte array to string
-            var data = new String();
-            var i = 0;
-            while (i < (fileContents.length - 1)){
-                data+=String.fromCharCode((fileContents[i]));
-                i++;
-            }
-            var reader = AlphaTab.Platform.JavaScript.JsFileLoader.GetBytesFromString(data);
-            return reader;
-        }
-        xhr.send();
-        if (xhr.status == 200){
-            var reader = new Uint8Array(xhr.response);
-            return reader;
-        }
-        // Error handling
-        if (xhr.status == 0){
-            throw $CreateException(new AlphaTab.IO.FileLoadException("You are offline!!\n Please Check Your Network."), new Error());
-        }
-        if (xhr.status == 404){
-            throw $CreateException(new AlphaTab.IO.FileLoadException("Requested URL not found."), new Error());
-        }
-        if (xhr.status == 500){
-            throw $CreateException(new AlphaTab.IO.FileLoadException("Internel Server Error."), new Error());
-        }
-        if (xhr.statusText == "parsererror"){
-            throw $CreateException(new AlphaTab.IO.FileLoadException("Error.\nParsing JSON Request failed."), new Error());
-        }
-        if (xhr.statusText == "timeout"){
-            throw $CreateException(new AlphaTab.IO.FileLoadException("Request Time out."), new Error());
-        }
-        throw $CreateException(new AlphaTab.IO.FileLoadException("Unknow Error: " + xhr.responseText), new Error());
-    },
-    LoadBinaryAsync: function (path, success, error){
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", path);
-        xhr.responseType = "arraybuffer";
-        xhr.onreadystatechange = $CreateAnonymousDelegate(this, function (e){
-            if (xhr.readyState == 4){
-                if (xhr.status == 200){
-                    var reader = new Uint8Array(xhr.response);
-                    success(reader);
-                }
-                else if (xhr.status == 0){
-                    error(new AlphaTab.IO.FileLoadException("You are offline!!\n Please Check Your Network."));
-                }
-                else if (xhr.status == 404){
-                    error(new AlphaTab.IO.FileLoadException("Requested URL not found."));
-                }
-                else if (xhr.status == 500){
-                    error(new AlphaTab.IO.FileLoadException("Internel Server Error."));
-                }
-                else if (xhr.statusText == "parsererror"){
-                    error(new AlphaTab.IO.FileLoadException("Error.\nParsing JSON Request failed."));
-                }
-                else if (xhr.statusText == "timeout"){
-                    error(new AlphaTab.IO.FileLoadException("Request Time out."));
-                }
-                else {
-                    error(new AlphaTab.IO.FileLoadException("Unknow Error: " + xhr.responseText));
-                }
-            }
-        });
-        xhr.open("GET", path, true);
-        xhr.responseType = "arraybuffer";
-        // IE fallback
-        if (xhr.responseType != "arraybuffer"){
-            // use VB Loader to load binary array
-            var vbArr = VbAjaxLoader("GET",path);
-            var fileContents = vbArr.toArray();
-            // decode byte array to string
-            var data = new String();
-            var i = 0;
-            while (i < (fileContents.length - 1)){
-                data+=(fileContents[i]);
-                i++;
-            }
-            var reader = AlphaTab.Platform.JavaScript.JsFileLoader.GetBytesFromString(data);
-            success(reader);
-            return;
-        }
-        xhr.send();
-    }
-};
-AlphaTab.Platform.JavaScript.JsFileLoader.GetIEVersion = function (){
-    var rv = -1;
-    var appName = navigator.appName;
-    var agent = navigator.userAgent;
-    if (appName == "Microsoft Internet Explorer"){
-        var r = new RegExp("MSIE ([0-9]{1,}[\\.0-9]{0,})");
-        var m = r.exec(agent);
-        if (m != null){
-            rv = AlphaTab.Platform.Std.ParseFloat(m[1]);
-        }
-    }
-    return rv;
-};
-AlphaTab.Platform.JavaScript.JsFileLoader.GetBytesFromString = function (s){
-    var b = new Uint8Array(s.length);
-    for (var i = 0; i < s.length; i++){
-        b[i] = s.charCodeAt(i);
-    }
-    return b;
-};
 AlphaTab.Platform.JavaScript.WorkerScoreRenderer = function (settings){
     this._worker = null;
     this.PreRender = null;
     this.PartialRenderFinished = null;
     this.RenderFinished = null;
+    this.Error = null;
     this.PostRenderFinished = null;
     this.ScoreLoaded = null;
     this.BoundsLookup = null;
@@ -1627,7 +1544,7 @@ AlphaTab.Platform.JavaScript.WorkerScoreRenderer = function (settings){
             this._worker = new Worker(window.URL.createObjectURL(blob));
         }
         catch(e){
-            AlphaTab.Util.Logger.Error("Rendering", "Failed to create WebWorker: " + e);
+            AlphaTab.Util.Logger.Error("Rendering", "Failed to create WebWorker: " + e, null);
             // TODO: fallback to synchronous mode
         }
     }
@@ -1680,7 +1597,7 @@ AlphaTab.Platform.JavaScript.WorkerScoreRenderer.prototype = {
                 this.OnPostRenderFinished();
                 break;
             case "alphaTab.error":
-                console.error(data["exception"]);
+                this.OnError(data["type"], data["detail"]);
                 break;
             case "alphaTab.loaded":
                 var score = data["score"];
@@ -1732,6 +1649,17 @@ AlphaTab.Platform.JavaScript.WorkerScoreRenderer.prototype = {
         if (handler != null)
             handler(obj);
     },
+    add_Error: function (value){
+        this.Error = $CombineDelegates(this.Error, value);
+    },
+    remove_Error: function (value){
+        this.Error = $RemoveDelegate(this.Error, value);
+    },
+    OnError: function (type, details){
+        var handler = this.Error;
+        if (handler != null)
+            handler(type, details);
+    },
     add_PostRenderFinished: function (value){
         this.PostRenderFinished = $CombineDelegates(this.PostRenderFinished, value);
     },
@@ -1774,7 +1702,7 @@ AlphaTab.Platform.Std = function (){
 AlphaTab.Platform.Std.ParseFloat = function (s){
     return parseFloat(s);
 };
-AlphaTab.Platform.Std.Log = function (logLevel, category, msg){
+AlphaTab.Platform.Std.Log = function (logLevel, category, msg, details){
     var caller = arguments.callee.caller.caller.name;
     // ReSharper disable once RedundantAssignment
     msg = "[AlphaTab][" + category + "] " + caller + " - " + msg;
@@ -1782,16 +1710,16 @@ AlphaTab.Platform.Std.Log = function (logLevel, category, msg){
         case AlphaTab.Util.LogLevel.None:
             break;
         case AlphaTab.Util.LogLevel.Debug:
-             console.debug(msg);;
+             console.debug(msg, details);;
             break;
         case AlphaTab.Util.LogLevel.Info:
-             console.info(msg);;
+             console.info(msg, details);;
             break;
         case AlphaTab.Util.LogLevel.Warning:
-             console.warn(msg);;
+             console.warn(msg, details);;
             break;
         case AlphaTab.Util.LogLevel.Error:
-             console.error(msg);;
+             console.error(msg, details);;
             break;
     }
 };
@@ -3924,20 +3852,20 @@ AlphaTab.Importer.AlphaTexException = function (position, nonTerm, expected, sym
     this.Expected = AlphaTab.Importer.AlphaTexSymbols.No;
     this.Symbol = AlphaTab.Importer.AlphaTexSymbols.No;
     this.SymbolData = null;
+    AlphaTab.AlphaTabException.call(this, "");
     this.Position = position;
     this.NonTerm = nonTerm;
     this.Expected = expected;
     this.Symbol = symbol;
     this.SymbolData = symbolData;
-};
-AlphaTab.Importer.AlphaTexException.prototype = {
-    get_Message: function (){
-        if (this.SymbolData == null){
-            return "MalFormed AlphaTex: @" + this.Position + ": Error on block " + this.NonTerm + ", expected a " + this.Expected + " found a " + this.Symbol;
-        }
-        return "MalFormed AlphaTex: @" + this.Position + ": Error on block " + this.NonTerm + ", invalid value: " + this.SymbolData;
+    if (this.SymbolData == null){
+        this.Description = "MalFormed AlphaTex: @" + this.Position + ": Error on block " + this.NonTerm + ", expected a " + this.Expected + " found a " + this.Symbol;
+    }
+    else {
+        this.Description = "MalFormed AlphaTex: @" + this.Position + ": Error on block " + this.NonTerm + ", invalid value: " + this.SymbolData;
     }
 };
+$Inherit(AlphaTab.Importer.AlphaTexException, AlphaTab.AlphaTabException);
 AlphaTab.Importer.ScoreImporter = function (){
     this.Data = null;
 };
@@ -3980,7 +3908,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
         }
         catch(e){
             if ((e.exception instanceof AlphaTab.Importer.AlphaTexException)){
-                throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(e.message), new Error());
+                throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException((e).Description), new Error());
             }
             throw $CreateException(e, new Error());
         }
@@ -3993,7 +3921,7 @@ AlphaTab.Importer.AlphaTexImporter.prototype = {
         else {
             e = new AlphaTab.Importer.AlphaTexException(this._curChPos, nonterm, expected, expected, (this._syData));
         }
-        AlphaTab.Util.Logger.Error(this.get_Name(), e.get_Message());
+        AlphaTab.Util.Logger.Error(this.get_Name(), e.Description, null);
         throw $CreateException(e, new Error());
     },
     CreateDefaultScore: function (){
@@ -5222,7 +5150,7 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
         version = version.substr("FICHIER GUITAR PRO ".length + 1);
         var dot = version.indexOf(".");
         this._versionNumber = (100 * AlphaTab.Platform.Std.ParseInt(version.substr(0, dot))) + AlphaTab.Platform.Std.ParseInt(version.substr(dot + 1));
-        AlphaTab.Util.Logger.Info(this.get_Name(), "Guitar Pro version " + version + " detected");
+        AlphaTab.Util.Logger.Info(this.get_Name(), "Guitar Pro version " + version + " detected", null);
     },
     ReadScoreInformation: function (){
         this._score.Title = this.ReadStringIntUnused();
@@ -6440,13 +6368,13 @@ AlphaTab.Importer.GpxImporter.prototype = {
     ReadScore: function (){
         // at first we need to load the binary file system 
         // from the GPX container
-        AlphaTab.Util.Logger.Info(this.get_Name(), "Loading GPX filesystem");
+        AlphaTab.Util.Logger.Info(this.get_Name(), "Loading GPX filesystem", null);
         var fileSystem = new AlphaTab.Importer.GpxFileSystem();
         fileSystem.FileFilter = $CreateAnonymousDelegate(this, function (s){
             return s == "score.gpif";
         });
         fileSystem.Load(this.Data);
-        AlphaTab.Util.Logger.Info(this.get_Name(), "GPX filesystem loaded");
+        AlphaTab.Util.Logger.Info(this.get_Name(), "GPX filesystem loaded", null);
         // convert data to string
         var data = fileSystem.Files[0].Data;
         var xml = AlphaTab.Platform.Std.ToString(data);
@@ -6456,10 +6384,10 @@ AlphaTab.Importer.GpxImporter.prototype = {
         fileSystem = null;
         // the score.gpif file within this filesystem stores
         // the score information as XML we need to parse.
-        AlphaTab.Util.Logger.Info(this.get_Name(), "Start Parsing score.gpif");
+        AlphaTab.Util.Logger.Info(this.get_Name(), "Start Parsing score.gpif", null);
         var parser = new AlphaTab.Importer.GpxParser();
         parser.ParseXml(xml);
-        AlphaTab.Util.Logger.Info(this.get_Name(), "score.gpif parsed");
+        AlphaTab.Util.Logger.Info(this.get_Name(), "score.gpif parsed", null);
         return parser.Score;
     }
 };
@@ -7837,8 +7765,9 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
     },
     ParseDom: function (dom){
         var root = dom.DocumentElement;
-        if (root == null)
-            return;
+        if (root == null){
+            throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(""), new Error());
+        }
         switch (root.LocalName){
             case "score-partwise":
                 this.ParsePartwise(root);
@@ -8913,16 +8842,13 @@ AlphaTab.Importer.MusicXmlImporter.ParseTied = function (element, note){
 };
 $Inherit(AlphaTab.Importer.MusicXmlImporter, AlphaTab.Importer.ScoreImporter);
 AlphaTab.Importer.NoCompatibleReaderFoundException = function (){
+    AlphaTab.AlphaTabException.call(this, "");
 };
+$Inherit(AlphaTab.Importer.NoCompatibleReaderFoundException, AlphaTab.AlphaTabException);
 AlphaTab.Importer.UnsupportedFormatException = function (message){
-    this._message = null;
-    this._message = message;
+    AlphaTab.AlphaTabException.call(this, message);
 };
-AlphaTab.Importer.UnsupportedFormatException.prototype = {
-    get_Message: function (){
-        return this._message;
-    }
-};
+$Inherit(AlphaTab.Importer.UnsupportedFormatException, AlphaTab.AlphaTabException);
 AlphaTab.IO = AlphaTab.IO || {};
 AlphaTab.IO.BitReader = function (source){
     this._currentByte = 0;
@@ -8988,10 +8914,10 @@ AlphaTab.IO.BitReader.prototype = {
 $StaticConstructor(function (){
     AlphaTab.IO.BitReader.ByteSize = 8;
 });
-AlphaTab.IO.FileLoadException = function (message){
-};
 AlphaTab.IO.EndOfReaderException = function (){
+    AlphaTab.AlphaTabException.call(this, "");
 };
+$Inherit(AlphaTab.IO.EndOfReaderException, AlphaTab.AlphaTabException);
 AlphaTab.IO.ByteBuffer = function (){
     this._buffer = null;
     this._position = 0;
@@ -15441,7 +15367,7 @@ AlphaTab.Rendering.Layout.ScoreLayout.prototype = {
         this.DoLayoutAndRender();
     },
     CreateScoreInfoGlyphs: function (){
-        AlphaTab.Util.Logger.Info("ScoreLayout", "Creating score info glyphs");
+        AlphaTab.Util.Logger.Info("ScoreLayout", "Creating score info glyphs", null);
         var flags = this.Renderer.Settings.Layout.Get("hideInfo", false) ? AlphaTab.Rendering.Layout.HeaderFooterElements.None : AlphaTab.Rendering.Layout.HeaderFooterElements.All;
         var score = this.Renderer.Score;
         var res = this.Renderer.RenderingResources;
@@ -15597,7 +15523,7 @@ AlphaTab.Rendering.Layout.HorizontalScreenLayout.prototype = {
                         currentPartial.Width += this._group.X + this._group.AccoladeSpacing;
                     }
                     partials.push(currentPartial);
-                    AlphaTab.Util.Logger.Info(this.get_Name(), "Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " + currentPartial.MasterBars[currentPartial.MasterBars.length - 1].Index);
+                    AlphaTab.Util.Logger.Info(this.get_Name(), "Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " + currentPartial.MasterBars[currentPartial.MasterBars.length - 1].Index, null);
                     currentPartial = new AlphaTab.Rendering.Layout.HorizontalScreenLayoutPartialInfo();
                 }
             }
@@ -15609,7 +15535,7 @@ AlphaTab.Rendering.Layout.HorizontalScreenLayout.prototype = {
                 currentPartial.Width += this._group.X + this._group.AccoladeSpacing;
             }
             partials.push(currentPartial);
-            AlphaTab.Util.Logger.Info(this.get_Name(), "Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " + currentPartial.MasterBars[currentPartial.MasterBars.length - 1].Index);
+            AlphaTab.Util.Logger.Info(this.get_Name(), "Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " + currentPartial.MasterBars[currentPartial.MasterBars.length - 1].Index, null);
         }
         this._group.FinalizeGroup();
         this.Height = this._group.Y + this._group.get_Height() + AlphaTab.Rendering.Layout.HorizontalScreenLayout.PagePadding[3];
@@ -15624,7 +15550,7 @@ AlphaTab.Rendering.Layout.HorizontalScreenLayout.prototype = {
             if (i == 0){
                 renderX -= this._group.X + this._group.AccoladeSpacing;
             }
-            AlphaTab.Util.Logger.Info(this.get_Name(), "Rendering partial from bar " + partial.MasterBars[0].Index + " to " + partial.MasterBars[partial.MasterBars.length - 1].Index);
+            AlphaTab.Util.Logger.Info(this.get_Name(), "Rendering partial from bar " + partial.MasterBars[0].Index + " to " + partial.MasterBars[partial.MasterBars.length - 1].Index, null);
             this._group.PaintPartial(-renderX, this._group.Y, this.Renderer.Canvas, currentBarIndex, partial.MasterBars.length);
             var result = canvas.EndRender();
             this.Renderer.OnPartialRenderFinished((function (){
@@ -15687,7 +15613,7 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
         this.Height = y + AlphaTab.Rendering.Layout.PageViewLayout.PagePadding[3];
     },
     LayoutAndRenderScoreInfo: function (x, y, totalHeight){
-        AlphaTab.Util.Logger.Info(this.get_Name(), "Layouting score info");
+        AlphaTab.Util.Logger.Info(this.get_Name(), "Layouting score info", null);
         var scale = this.get_Scale();
         var res = this.Renderer.RenderingResources;
         var centeredGlyphs = [AlphaTab.Rendering.Layout.HeaderFooterElements.Title, AlphaTab.Rendering.Layout.HeaderFooterElements.SubTitle, AlphaTab.Rendering.Layout.HeaderFooterElements.Artist, AlphaTab.Rendering.Layout.HeaderFooterElements.Album, AlphaTab.Rendering.Layout.HeaderFooterElements.WordsAndMusic];
@@ -15827,7 +15753,7 @@ AlphaTab.Rendering.Layout.PageViewLayout.prototype = {
             // finalize group (sizing etc).
             this.FitGroup(group);
             group.FinalizeGroup();
-            AlphaTab.Util.Logger.Info(this.get_Name(), "Rendering partial from bar " + group.get_FirstBarIndex() + " to " + group.get_LastBarIndex());
+            AlphaTab.Util.Logger.Info(this.get_Name(), "Rendering partial from bar " + group.get_FirstBarIndex() + " to " + group.get_LastBarIndex(), null);
             y += this.PaintGroup(group, y, canvas);
         }
         return y;
@@ -16647,6 +16573,7 @@ AlphaTab.Rendering.ScoreRenderer = function (settings){
     this.PreRender = null;
     this.PartialRenderFinished = null;
     this.RenderFinished = null;
+    this.Error = null;
     this.PostRenderFinished = null;
     this.Canvas = null;
     this.Score = null;
@@ -16689,9 +16616,14 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
         return false;
     },
     Render: function (track){
-        this.Score = track.Score;
-        this.Tracks = [track];
-        this.Invalidate();
+        try{
+            this.Score = track.Score;
+            this.Tracks = [track];
+            this.Invalidate();
+        }
+        catch(e){
+            this.OnError("render", e);
+        }
     },
     RenderMultiple: function (tracks){
         if (tracks.length == 0){
@@ -16701,10 +16633,10 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
             this.Score = tracks[0].Score;
         }
         this.Tracks = tracks;
-        AlphaTab.Util.Logger.Info("Rendering", "Rendering " + tracks.length + " tracks");
+        AlphaTab.Util.Logger.Info("Rendering", "Rendering " + tracks.length + " tracks", null);
         for (var i = 0; i < tracks.length; i++){
             var track = tracks[i];
-            AlphaTab.Util.Logger.Info("Rendering", "Track " + i + ": " + track.Name);
+            AlphaTab.Util.Logger.Info("Rendering", "Track " + i + ": " + track.Name, null);
         }
         this.Invalidate();
     },
@@ -16713,7 +16645,7 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
     },
     Invalidate: function (){
         if (this.Settings.Width == 0){
-            AlphaTab.Util.Logger.Warning("Rendering", "AlphaTab skipped rendering because of width=0 (element invisible)");
+            AlphaTab.Util.Logger.Warning("Rendering", "AlphaTab skipped rendering because of width=0 (element invisible)", null);
             return;
         }
         this.BoundsLookup = new AlphaTab.Rendering.Utils.BoundsLookup();
@@ -16729,15 +16661,15 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
         this.RecreateLayout();
         this.LayoutAndRender();
         this._renderedTracks = this.Tracks;
-        AlphaTab.Util.Logger.Info("Rendering", "Rendering finished");
+        AlphaTab.Util.Logger.Info("Rendering", "Rendering finished", null);
     },
     Resize: function (width){
         if (this.RecreateLayout() || this.RecreateCanvas() || this._renderedTracks != this.Tracks || this.Tracks == null){
-            AlphaTab.Util.Logger.Info("Rendering", "Starting full rerendering due to layout or canvas change");
+            AlphaTab.Util.Logger.Info("Rendering", "Starting full rerendering due to layout or canvas change", null);
             this.Invalidate();
         }
         else if (this.Layout.get_SupportsResize()){
-            AlphaTab.Util.Logger.Info("Rendering", "Starting optimized rerendering for resize");
+            AlphaTab.Util.Logger.Info("Rendering", "Starting optimized rerendering for resize", null);
             this.BoundsLookup = new AlphaTab.Rendering.Utils.BoundsLookup();
             this.OnPreRender();
             this.Settings.Width = width;
@@ -16747,12 +16679,12 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
             this.OnPostRender();
         }
         else {
-            AlphaTab.Util.Logger.Warning("Rendering", "Current layout does not support dynamic resizing, nothing was done");
+            AlphaTab.Util.Logger.Warning("Rendering", "Current layout does not support dynamic resizing, nothing was done", null);
         }
-        AlphaTab.Util.Logger.Info("Rendering", "Resize finished");
+        AlphaTab.Util.Logger.Info("Rendering", "Resize finished", null);
     },
     LayoutAndRender: function (){
-        AlphaTab.Util.Logger.Info("Rendering", "Rendering at scale " + this.Settings.Scale + " with layout " + this.Layout.get_Name());
+        AlphaTab.Util.Logger.Info("Rendering", "Rendering at scale " + this.Settings.Scale + " with layout " + this.Layout.get_Name(), null);
         this.Layout.LayoutAndRender();
         this.Layout.RenderAnnotation();
         this.OnRenderFinished();
@@ -16804,6 +16736,17 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
                 $v6.TotalWidth = this.Layout.Width;
                 return $v6;
             }).call(this));
+    },
+    add_Error: function (value){
+        this.Error = $CombineDelegates(this.Error, value);
+    },
+    remove_Error: function (value){
+        this.Error = $RemoveDelegate(this.Error, value);
+    },
+    OnError: function (type, details){
+        var handler = this.Error;
+        if (handler != null)
+            handler(type, details);
     },
     add_PostRenderFinished: function (value){
         this.PostRenderFinished = $CombineDelegates(this.PostRenderFinished, value);
@@ -18457,22 +18400,22 @@ $StaticConstructor(function (){
     AlphaTab.Util.Logger.LogLevel = AlphaTab.Util.LogLevel.None;
     AlphaTab.Util.Logger.LogLevel = AlphaTab.Util.LogLevel.Info;
 });
-AlphaTab.Util.Logger.Debug = function (category, msg){
-    AlphaTab.Util.Logger.Log(AlphaTab.Util.LogLevel.Debug, category, msg);
+AlphaTab.Util.Logger.Debug = function (category, msg, details){
+    AlphaTab.Util.Logger.Log(AlphaTab.Util.LogLevel.Debug, category, msg, details);
 };
-AlphaTab.Util.Logger.Warning = function (category, msg){
-    AlphaTab.Util.Logger.Log(AlphaTab.Util.LogLevel.Warning, category, msg);
+AlphaTab.Util.Logger.Warning = function (category, msg, details){
+    AlphaTab.Util.Logger.Log(AlphaTab.Util.LogLevel.Warning, category, msg, details);
 };
-AlphaTab.Util.Logger.Info = function (category, msg){
-    AlphaTab.Util.Logger.Log(AlphaTab.Util.LogLevel.Info, category, msg);
+AlphaTab.Util.Logger.Info = function (category, msg, details){
+    AlphaTab.Util.Logger.Log(AlphaTab.Util.LogLevel.Info, category, msg, details);
 };
-AlphaTab.Util.Logger.Error = function (category, msg){
-    AlphaTab.Util.Logger.Log(AlphaTab.Util.LogLevel.Error, category, msg);
+AlphaTab.Util.Logger.Error = function (category, msg, details){
+    AlphaTab.Util.Logger.Log(AlphaTab.Util.LogLevel.Error, category, msg, details);
 };
-AlphaTab.Util.Logger.Log = function (logLevel, category, msg){
+AlphaTab.Util.Logger.Log = function (logLevel, category, msg, details){
     if (logLevel < AlphaTab.Util.Logger.LogLevel)
         return;
-    AlphaTab.Platform.Std.Log(logLevel, category, msg);
+    AlphaTab.Platform.Std.Log(logLevel, category, msg, details);
 };
 AlphaTab.Util.LogLevel = {
     None: 0,
@@ -18551,9 +18494,11 @@ $Inherit(AlphaTab.Xml.XmlDocument, AlphaTab.Xml.XmlNode);
 AlphaTab.Xml.XmlException = function (message, xml, pos){
     this.Xml = null;
     this.Pos = 0;
+    AlphaTab.AlphaTabException.call(this, message);
     this.Xml = xml;
     this.Pos = pos;
 };
+$Inherit(AlphaTab.Xml.XmlException, AlphaTab.AlphaTabException);
 AlphaTab.Xml.XmlNodeType = {
     None: 0,
     Element: 1,

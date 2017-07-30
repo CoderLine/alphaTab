@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Xml
 {
-    public class XmlException : Exception
+    public class XmlException : AlphaTabException
     {
         public string Xml { get; private set; }
         public int Pos { get; private set; }

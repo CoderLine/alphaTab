@@ -122,7 +122,7 @@ namespace AlphaTab.Platform.JavaScript
             }
             catch (Exception e)
             {
-                Error(e);
+                Error("Import", e);
             }
         }
 
@@ -139,18 +139,15 @@ namespace AlphaTab.Platform.JavaScript
                 {
                     ScoreLoaded(ScoreLoader.LoadScoreFromBytes((byte[])data));
                 }
-                else if (JsContext.JsTypeOf(data) == JsTypes.@string)
-                {
-                    ScoreLoader.LoadScoreAsync((string)data, ScoreLoaded, Error);
-                }
+                // Ajax loading of files via string(url) is handled in main thread, not in worker. 
             }
             catch (Exception e)
             {
-                Error(e);
+                Error("Import", e);
             }
         }
 
-        private void Error(Exception e)
+        private void Error(string type, Exception e)
         {
             dynamic error = JSON.parse(JSON.stringify(e));
             if (e.Member("message").As<bool>())
@@ -161,7 +158,11 @@ namespace AlphaTab.Platform.JavaScript
             {
                 error.stack = e.Member("stack");
             }
-            PostMessage(new { cmd = "alphaTab.error", exception = error });
+            if (e.Member("constructor").As<bool>() && e.Member("constructor").Member("name").As<bool>())
+            {
+                error.type = e.Member("constructor").Member("name");
+            }
+            PostMessage(new { cmd = "alphaTab.error", error = new { type = type, detail = error } });
         }
 
         private void ScoreLoaded(Score score)
@@ -175,7 +176,14 @@ namespace AlphaTab.Platform.JavaScript
 
         private void Render()
         {
-            _renderer.RenderMultiple(Tracks);
+            try
+            {
+                _renderer.RenderMultiple(Tracks);
+            }
+            catch (Exception e)
+            {
+                Error("render", e);
+            }
         }
 
         [JsMethod(Export = false, InlineCodeExpression = "this._main.postMessage(o)")]

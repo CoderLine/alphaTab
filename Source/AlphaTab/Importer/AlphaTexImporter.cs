@@ -68,7 +68,7 @@ namespace AlphaTab.Importer
             {
                 if (Std.IsException<AlphaTexException>(e))
                 {
-                    throw new UnsupportedFormatException(e.Message);
+                    throw new UnsupportedFormatException(((AlphaTexException)e).Description);
                 }
                 throw e;
             }
@@ -85,7 +85,7 @@ namespace AlphaTab.Importer
             {
                 e = new AlphaTexException(_curChPos, nonterm, expected, expected, _syData);
             }
-            Logger.Error(Name, e.Message);
+            Logger.Error(Name, e.Description);
             throw e;
         }
 

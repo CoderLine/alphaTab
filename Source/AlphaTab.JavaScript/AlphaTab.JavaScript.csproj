@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="Collections\StringBuilder.cs" />
     <Compile Include="Environment.cs" />
+    <Compile Include="Importer\FileLoadException.cs" />
     <Compile Include="Importer\ScoreLoader.cs" />
     <Compile Include="Model\JsonConverter.cs" />
     <Compile Include="Platform\JavaScript\JsApiBase.cs" />
@@ -70,7 +71,6 @@
     <Compile Include="Platform\JavaScript\JsWorkerApi.cs" />
     <Compile Include="Platform\JavaScript\Html5Canvas.cs" />
     <Compile Include="Platform\JavaScript\JsApi.cs" />
-    <Compile Include="Platform\JavaScript\JsFileLoader.cs" />
     <Compile Include="Platform\JavaScript\WorkerScoreRenderer.cs" />
     <Compile Include="Platform\Std.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

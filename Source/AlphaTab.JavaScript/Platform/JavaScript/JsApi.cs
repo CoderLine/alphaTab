@@ -51,7 +51,10 @@ namespace AlphaTab.Platform.JavaScript
             }
             else if (JsTypeOf(data) == JsTypes.@string)
             {
-                ScoreLoader.LoadScoreAsync((string)data, s => ScoreLoaded(s), e => console.error(e));
+                ScoreLoader.LoadScoreAsync((string)data, s => ScoreLoaded(s), e =>
+                {
+                    Error("import", e);
+                });
             }
         }
 
@@ -86,7 +89,6 @@ namespace AlphaTab.Platform.JavaScript
                     {
                         // when font is finally loaded, start rendering
                         Renderer.As<ScoreRenderer>().RenderMultiple(Tracks);
-
                     }
                 };
                 renderAction();

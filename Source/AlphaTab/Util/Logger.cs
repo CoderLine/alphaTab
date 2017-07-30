@@ -11,30 +11,30 @@ namespace AlphaTab.Util
             LogLevel = LogLevel.Info;
         }
 
-        public static void Debug(string category, string msg)
+        public static void Debug(string category, string msg, object details = null)
         {
-            Log(LogLevel.Debug, category, msg);
+            Log(LogLevel.Debug, category, msg, details);
         }
 
-        public static void Warning(string category, string msg)
+        public static void Warning(string category, string msg, object details = null)
         {
-            Log(LogLevel.Warning, category, msg);
+            Log(LogLevel.Warning, category, msg, details);
         }
 
-        public static void Info(string category, string msg)
+        public static void Info(string category, string msg, object details = null)
         {
-            Log(LogLevel.Info, category, msg);
+            Log(LogLevel.Info, category, msg, details);
         }
 
-        public static void Error(string category, string msg)
+        public static void Error(string category, string msg, object details = null)
         {
-            Log(LogLevel.Error, category, msg);
+            Log(LogLevel.Error, category, msg, details);
         }
 
-        private static void Log(LogLevel logLevel, string category, string msg)
+        private static void Log(LogLevel logLevel, string category, string msg, object details = null)
         {
             if (logLevel < LogLevel) return;
-            Std.Log(logLevel, category, msg);
+            Std.Log(logLevel, category, msg, details);
         }
     }
 
