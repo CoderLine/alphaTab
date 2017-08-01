@@ -24,20 +24,19 @@ using SharpKit.Html;
 using SharpKit.Html.fileapi;
 using SharpKit.Html.workers;
 using SharpKit.JavaScript;
-using Console = System.Console;
-using WorkerContext = SharpKit.Html.workers.WorkerContext;
 
 namespace AlphaTab.Platform.JavaScript
 {
     public class WorkerScoreRenderer : HtmlContext, IScoreRenderer
     {
+        private readonly JsApi _api;
         private readonly Worker _worker;
 
         public BoundsLookup BoundsLookup { get; private set; }
-        public Score Score { get; private set; }
 
-        public WorkerScoreRenderer(Settings settings)
+        public WorkerScoreRenderer(JsApi api, Settings settings)
         {
+            _api = api;
             try
             {
                 _worker = new Worker(settings.ScriptFile);
@@ -61,6 +60,11 @@ namespace AlphaTab.Platform.JavaScript
             _worker.addEventListener("message", HandleWorkerMessage, false);
         }
 
+        public void Destroy()
+        {
+            _worker.terminate();
+        }
+
         public void UpdateSettings(Settings settings)
         {
             _worker.postMessage(new { cmd = "alphaTab.updateSettings", settings = settings.ToJson() });
@@ -74,11 +78,6 @@ namespace AlphaTab.Platform.JavaScript
         public void Resize(int width)
         {
             _worker.postMessage(new { cmd = "alphaTab.resize", width = width });
-        }
-
-        public void Load(object data, int[] trackIndexes)
-        {
-            _worker.postMessage(new { cmd = "alphaTab.load", data = data, indexes = trackIndexes });
         }
 
         private void HandleWorkerMessage(DOMEvent e)
@@ -97,28 +96,20 @@ namespace AlphaTab.Platform.JavaScript
                     OnRenderFinished(data.Member("result").As<RenderFinishedEventArgs>());
                     break;
                 case "alphaTab.postRenderFinished":
-                    BoundsLookup = BoundsLookup.FromJson(data.Member("boundsLookup"), Score);
+                    BoundsLookup = BoundsLookup.FromJson(data.Member("boundsLookup"), _api.Score);
                     OnPostRenderFinished();
                     break;
                 case "alphaTab.error":
                     OnError(data.Member("type").As<string>(), data.Member("detail").As<Exception>());
                     break;
-                case "alphaTab.loaded":
-                    var score = data.Member("score").As<Score>();
-                    if (score.As<bool>())
-                    {
-                        var jsonConverter = new JsonConverter();
-                        score = jsonConverter.JsObjectToScore(score);
-                    }
-                    Score = score;
-                    OnLoaded(score);
-                    break;
             }
         }
 
-        public void RenderMultiple(int[] trackIndexes)
+        public void Render(Score score, int[] trackIndexes)
         {
-            _worker.postMessage(new { cmd = "alphaTab.renderMultiple", data = trackIndexes });
+            var converter = new JsonConverter();
+            score = converter.ScoreToJsObject(score);
+            _worker.postMessage(new { cmd = "alphaTab.render", score = score, trackIndexes = trackIndexes });
         }
 
         public event Action<RenderFinishedEventArgs> PreRender;
@@ -154,25 +145,6 @@ namespace AlphaTab.Platform.JavaScript
         {
             var handler = PostRenderFinished;
             if (handler != null) handler();
-        }
-
-        public event Action<Score> ScoreLoaded;
-        protected virtual void OnLoaded(Score score)
-        {
-            var handler = ScoreLoaded;
-            if (handler != null) handler(score);
-        }
-
-        public void Tex(string contents)
-        {
-            _worker.postMessage(new { cmd = "alphaTab.tex", data = contents });
-        }
-        
-        public void SetScore(Score score)
-        {
-            var converter = new JsonConverter();
-            Score = converter.ScoreToJsObject(score);
-            _worker.postMessage(new { cmd = "alphaTab.score", score = Score });
         }
     }
 }

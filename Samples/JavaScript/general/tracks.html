@@ -1,0 +1,33 @@
+<div class="description">
+    The displayed tracks can be controlled via <code>tracks</code> option or <code>data-tracks</code>.
+    The value is a single index or an array of indexes of the tracks within the file that is loaded. 
+</div>
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#single" role="tab" data-toggle="tab">Single Track</a></li>
+    <li><a href="#multi" role="tab" data-toggle="tab">Multiple Tracks</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active example" id="single">
+        <div class="html">
+            <div id="alphaTabSingleTrack" data-file="files/Canon.gp5" data-tracks="3"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabSingleTrack').alphaTab()
+            </script>
+        </div>
+    </div>
+    <div class="tab-pane example" id="multi">
+        <div class="html">
+            <div id="alphaTabMultiple" data-file="files/Canon.gp5" data-tracks="[0,3]"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabMultiple').alphaTab()
+            </script>
+        </div>
+    </div>
+  </div>
+</div>

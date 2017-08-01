@@ -16,6 +16,7 @@
  * License along with this library.
  */
 using System;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Layout;
@@ -35,9 +36,9 @@ namespace AlphaTab.Rendering
         private Track[] _renderedTracks;
 
         public ICanvas Canvas { get; set; }
-        public Score Score { get; set; }
-        public Track[] Tracks { get; set; }
 
+        public Score Score { get; private set; }
+        public Track[] Tracks { get; private set; }
         public ScoreLayout Layout { get; set; }
 
         public RenderingResources RenderingResources { get; set; }
@@ -51,9 +52,18 @@ namespace AlphaTab.Rendering
             RenderingResources = new RenderingResources(1);
             RecreateCanvas();
             RecreateLayout();
-            Tracks = new Track[0];
         }
 
+        public void Destroy()
+        {
+            Score = null;
+            Canvas = null;
+            Layout = null;
+            RenderingResources = null;
+            Settings = null;
+            BoundsLookup = null;
+            Tracks = null;
+        }
 
         private bool RecreateCanvas()
         {
@@ -91,12 +101,25 @@ namespace AlphaTab.Rendering
             return false;
         }
 
-        public void Render(Track track)
+        public void Render(Score score, int[] trackIndexes)
         {
             try
             {
-                Score = track.Score;
-                Tracks = new[] { track };
+                Score = score;
+                var tracks = new FastList<Track>();
+                foreach (var track in trackIndexes)
+                {
+                    if (track >= 0 && track < score.Tracks.Count)
+                    {
+                        tracks.Add(score.Tracks[track]);
+                    }
+                }
+
+                if (tracks.Count == 0 && score.Tracks.Count > 0)
+                {
+                    tracks.Add(score.Tracks[0]);
+                }
+                Tracks = tracks.ToArray();
                 Invalidate();
             }
             catch (Exception e)
@@ -105,7 +128,7 @@ namespace AlphaTab.Rendering
             }
         }
 
-        public void RenderMultiple(Track[] tracks)
+        public void RenderTracks(Track[] tracks)
         {
             if (tracks.Length == 0)
             {
@@ -117,12 +140,6 @@ namespace AlphaTab.Rendering
             }
 
             Tracks = tracks;
-            Logger.Info("Rendering", "Rendering " + tracks.Length + " tracks");
-            for (int i = 0; i < tracks.Length; i++)
-            {
-                var track = tracks[i];
-                Logger.Info("Rendering", "Track " + i + ": " + track.Name);
-            }
             Invalidate();
         }
 
@@ -139,6 +156,7 @@ namespace AlphaTab.Rendering
                 Logger.Warning("Rendering", "AlphaTab skipped rendering because of width=0 (element invisible)");
                 return;
             }
+
             BoundsLookup = new BoundsLookup();
             if (Tracks.Length == 0) return;
 
@@ -149,6 +167,13 @@ namespace AlphaTab.Rendering
                 Canvas.LineWidth = Settings.Scale;
             }
             Canvas.Resources = RenderingResources;
+
+            Logger.Info("Rendering", "Rendering " + Tracks.Length + " tracks");
+            for (int i = 0; i < Tracks.Length; i++)
+            {
+                var track = Tracks[i];
+                Logger.Info("Rendering", "Track " + i + ": " + track.Name);
+            }
 
             OnPreRender();
             RecreateLayout();
@@ -226,7 +251,7 @@ namespace AlphaTab.Rendering
                 TotalWidth = Layout.Width
             });
         }
-        
+
         public event Action<string, Exception> Error;
         protected virtual void OnError(string type, Exception details)
         {

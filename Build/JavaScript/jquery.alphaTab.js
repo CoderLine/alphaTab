@@ -21,13 +21,18 @@
     var api = {
         init: function(element, context, options) {
             if (!context) {
-                context = new AlphaTab.Platform.JavaScript.JsApiBase.Create(element[0], options);
+                context = new AlphaTab.Platform.JavaScript.JsApi(element[0], options);
                 element.data('alphaTab', context);
                 
                 for(var i = 0; i < api._initListeners.length; i++) {
                     api._initListeners[i](element, context, options);
                 }
             }
+        },
+        
+        destroy: function(element, context, tex) {
+            element.removeData('alphaTab');
+            context.Destroy();
         },
         
         tex: function(element, context, tex) {
@@ -95,6 +100,9 @@
         
         var $element = $(element);
         var context = $(element).data('alphaTab');
+        if (method == 'destroy' && !context) { 
+            return;
+        }
         if (method != 'init' && !context) { 
             throw new Error('alphaTab not initialized!'); 
         }

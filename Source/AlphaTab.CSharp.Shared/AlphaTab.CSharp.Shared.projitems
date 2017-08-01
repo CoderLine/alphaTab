@@ -14,5 +14,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Platform\CSharp\GdiCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\CSharp\SkiaCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Std.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
   </ItemGroup>
 </Project>

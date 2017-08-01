@@ -249,7 +249,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public string RenderEngine
         {
-            get { return (string) GetValue(RenderEngineProperty); }
+            get { return (string)GetValue(RenderEngineProperty); }
             set { SetValue(RenderEngineProperty, value); }
         }
 
@@ -338,7 +338,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
                 Task.Factory.StartNew(() =>
                 {
-                    Renderer.RenderMultiple(trackArray);
+                    Renderer.Render(trackArray[0].Score, trackArray.Select(t => t.Index).ToArray());
                 });
             }
             else
@@ -417,7 +417,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
             }
         }
 
-#region RenderFinished
+        #region RenderFinished
 
         public static readonly RoutedEvent RenderFinishedEvent = EventManager.RegisterRoutedEvent("RenderFinished", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(AlphaTab));
         public event RoutedEventHandler RenderFinished
@@ -432,7 +432,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
             RaiseEvent(newEventArgs);
         }
 
-#endregion
+        #endregion
 
     }
 }

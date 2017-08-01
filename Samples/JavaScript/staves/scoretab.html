@@ -1,0 +1,38 @@
+<div class="description">
+    This stave configuration is the default setting. It will show the standard music notation
+    and the guitar tablature for the rendered tracks. If the instrument is not stringed, the tab 
+    staff is hidden automatically. 
+    The layout can explicitely be set via <code>staves: 'score-tab'</code> or <code>data-staves="score-tab"</code>
+</div>
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#scriptInit" role="tab" data-toggle="tab">Script Initialization</a></li>
+    <li><a href="#dataInit" role="tab" data-toggle="tab">Data Attribute Initialization</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active example" id="scriptInit">
+        <div class="html">
+            <div id="alphaTabScriptInit"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabScriptInit').alphaTab({
+                  file: 'files/Canon.gp5',
+                  staves: 'score-tab'
+                })
+            </script>
+        </div>
+    </div>
+    <div class="tab-pane example" id="dataInit">
+        <div class="html">
+            <div id="alphaTabDataInit" data-file="files/Canon.gp5" data-staves="score-tab"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabDataInit').alphaTab()
+            </script>
+        </div>
+    </div>
+  </div>
+</div>

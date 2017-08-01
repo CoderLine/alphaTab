@@ -58,14 +58,14 @@ namespace AlphaTab.Samples.PngDump
                 var totalHeight = 0;
                 renderer.PartialRenderFinished += r =>
                 {
-                    images.Add((Image) r.RenderResult);
+                    images.Add((Image)r.RenderResult);
                 };
                 renderer.RenderFinished += r =>
                 {
-                    totalWidth = (int) r.TotalWidth;
-                    totalHeight = (int) r.TotalHeight;
+                    totalWidth = (int)r.TotalWidth;
+                    totalHeight = (int)r.TotalHeight;
                 };
-                renderer.Render(track);
+                renderer.Render(score, new[] { track.Index });
 
                 // write png
                 var info = new FileInfo(args[0]);
@@ -74,7 +74,7 @@ namespace AlphaTab.Samples.PngDump
                 using (var bmp = new Bitmap(totalWidth, totalHeight))
                 {
                     int y = 0;
-                    using (var g = Graphics.FromImage(bmp)) 
+                    using (var g = Graphics.FromImage(bmp))
                     {
                         foreach (var image in images)
                         {

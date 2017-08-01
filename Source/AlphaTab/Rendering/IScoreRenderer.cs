@@ -24,11 +24,11 @@ namespace AlphaTab.Rendering
 {
     public interface IScoreRenderer
     {
-        Score Score { get; }
         BoundsLookup BoundsLookup { get; }
 
         void Invalidate();
         void Resize(int width);
+        void Render(Score score, int[] trackIndexes);
 
         event Action<RenderFinishedEventArgs> PreRender;
         event Action<RenderFinishedEventArgs> RenderFinished;
@@ -36,6 +36,7 @@ namespace AlphaTab.Rendering
         event Action PostRenderFinished;
         event Action<string,Exception> Error;
         void UpdateSettings(Settings settings);
+        void Destroy();
     }
 
     public class RenderFinishedEventArgs

@@ -59,7 +59,7 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
             Initialize(context);
         }
 
-        public AlphaTab(Context context, IAttributeSet attrs) 
+        public AlphaTab(Context context, IAttributeSet attrs)
             : base(context, attrs)
         {
             Initialize(context);
@@ -122,7 +122,7 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
         private void ClearPartialResults()
         {
             var childCount = _contentPanel.ChildCount;
-            while(childCount > 0)
+            while (childCount > 0)
             {
                 var child = _contentPanel.GetChildAt(0);
                 var imageView = child as ImageView;
@@ -186,12 +186,12 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
                 if (tracks.Length > 0)
                 {
                     ModelUtils.ApplyPitchOffsets(_renderer.Settings, tracks[0].Score);
+                    Task.Factory.StartNew(() =>
+                    {
+                        _renderer.Render(tracks[0].Score, tracks.Select(t => t.Index).ToArray());
+                    });
                 }
 
-                Task.Factory.StartNew(() =>
-                {
-                    _renderer.RenderMultiple(tracks);
-                });
             }
             else
             {

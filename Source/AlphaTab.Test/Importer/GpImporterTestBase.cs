@@ -572,7 +572,7 @@ namespace AlphaTab.Test.Importer
                     totalWidth = (int)r.TotalWidth;
                     totalHeight = (int)r.TotalHeight;
                 };
-                renderer.Render(track);
+                renderer.Render(score, new[] { track.Index });
 
                 merged.Root.Attribute("width").Value = totalWidth + "px";
                 merged.Root.Attribute("height").Value = totalHeight + "px";

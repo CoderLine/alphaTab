@@ -1,0 +1,40 @@
+<div class="description">
+    The guitar tuning is shown by default. To hide it the layout option <code>hideTuning</code> or data attribute <code>data-layout-hide-tuning</code> can be set.
+</div>
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#scriptInit" role="tab" data-toggle="tab">Script Initialization</a></li>
+    <li><a href="#dataInit" role="tab" data-toggle="tab">Data Attribute Initialization</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active example" id="scriptInit">
+        <div class="html">
+            <div id="alphaTabScriptInit"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabScriptInit').alphaTab({
+                  file: 'files/Canon.gp5',
+                  layout: {
+                    mode: 'page',
+                    additionalSettings: {
+                        hideTuning: true
+                    }
+                  }
+                })
+            </script>
+        </div>
+    </div>
+    <div class="tab-pane example" id="dataInit">
+        <div class="html">
+            <div id="alphaTabDataInit" data-file="files/Canon.gp5" data-layout-hide-tuning="true"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabDataInit').alphaTab()
+            </script>
+        </div>
+    </div>
+  </div>
+</div>

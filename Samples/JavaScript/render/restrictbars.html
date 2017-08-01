@@ -1,0 +1,43 @@
+<div class="description">
+    If you only want to render only a dedicated range of bars you can specify them as 
+    layout settings. The layout settings <code>start</code> and <code>count</code> define the range
+    and can be specified also as data attribute. 
+</div>
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#scriptInit" role="tab" data-toggle="tab">Script Initialization</a></li>
+    <li><a href="#dataInit" role="tab" data-toggle="tab">Data Attribute Initialization</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active example" id="scriptInit">
+        <div class="html">
+            <div id="alphaTabScriptInit"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabScriptInit').alphaTab({
+                  file: 'files/Canon.gp5',
+                  layout: {
+                    mode: 'page',
+                    additionalSettings: {
+                        start: 10,
+                        count: 5
+                    }
+                  }
+                })
+            </script>
+        </div>
+    </div>
+    <div class="tab-pane example" id="dataInit">
+        <div class="html">
+            <div id="alphaTabDataInit" data-file="files/Canon.gp5" data-layout-start="10" data-layout-count="5"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabDataInit').alphaTab()
+            </script>
+        </div>
+    </div>
+  </div>
+</div>

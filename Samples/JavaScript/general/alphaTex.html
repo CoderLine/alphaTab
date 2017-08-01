@@ -1,0 +1,29 @@
+<div class="description">
+    AlphaTex is a text based language for describing music notations. A full documentation
+    on the syntax can be found <a href="https://demo.alphatab.net/alphaTex.html" target="_blank">here</a>.
+    To use AlphaTex put the code into the div and enable the usage via the data attribute <code>data-tex="true"</code>
+</div>
+
+<div class="example">
+    <div class="html">
+        <div id="alphaTab" data-tex="true">
+        \title "Canon Rock"
+        \subtitle "JerryC"
+        \tempo 90
+        .
+        :2 19.2{v f} 17.2{v f} |
+        15.2{v f} 14.2{v f}|
+        12.2{v f} 10.2{v f}|
+        12.2{v f} 14.2{v f}.4 :8 15.2 17.2 |
+        14.1.2 :8 17.2 15.1 14.1{h} 17.2 |
+        15.2{v d}.4 :16 17.2{h} 15.2 :8 14.2 14.1 17.1{b(0 4 4 0)}.4 |
+        15.1.8 :16 14.1{tu 3} 15.1{tu 3} 14.1{tu 3} :8 17.2 15.1 14.1 :16 12.1{tu 3} 14.1{tu 3} 12.1{tu 3} :8 15.2 14.2 |
+        12.2 14.3 12.3 15.2 :32 14.2{h} 15.2{h} 14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}
+        </div>
+    </div>
+    <div class="js">
+        <script>
+            $('#alphaTab').alphaTab()
+        </script>
+    </div>
+</div>

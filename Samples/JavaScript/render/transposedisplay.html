@@ -1,0 +1,35 @@
+<div class="description">
+    By default standard music notation for guitar tabs is shifted by 1 octave for display. This does not have an impact on the audio. This feature can also be used manually. For all tracks the number of semitones can be specified. The option <code>displayTranspositionPitches</code> or the data attribute <code>data-display-transposition-pitches</code> define the pitches for transposition. 
+</div>
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#scriptInit" role="tab" data-toggle="tab">Script Initialization</a></li>
+    <li><a href="#dataInit" role="tab" data-toggle="tab">Data Attribute Initialization</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active example" id="scriptInit">
+        <div class="html">
+            <div id="alphaTabScriptInit"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabScriptInit').alphaTab({
+                  file: 'files/features/Skillet.gp5',
+                  displayTranspositionPitches: [12]
+                })
+            </script>
+        </div>
+    </div>
+    <div class="tab-pane example" id="dataInit">
+        <div class="html">
+            <div id="alphaTabDataInit" data-file="files/features/Skillet.gp5" data-display-transposition-pitches="[12]"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabDataInit').alphaTab()
+            </script>
+        </div>
+    </div>
+  </div>
+</div>

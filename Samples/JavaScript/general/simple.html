@@ -1,0 +1,38 @@
+<div class="description">
+    AlphaTab can be initialized on any <code>div</code> element. There are 2 main options that need to be specified: 
+    The file to load, and which tracks to render. 
+    The file can be specified via <code>file</code> option or via <code>data-file</code> attribute
+    The tracks can be specified via <code>tracks</code> option or via <code>data-tracks</code> attribute. 
+</div>
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#scriptInit" role="tab" data-toggle="tab">Script Initialization</a></li>
+    <li><a href="#dataInit" role="tab" data-toggle="tab">Data Attribute Initialization</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active example" id="scriptInit">
+        <div class="html">
+            <div id="alphaTabScriptInit"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabScriptInit').alphaTab({
+                  file: 'files/features/SongDetails.gp5',
+                  tracks: [0]
+                })
+            </script>
+        </div>
+    </div>
+    <div class="tab-pane example" id="dataInit">
+        <div class="html">
+            <div id="alphaTabDataInit" data-file="files/features/SongDetails.gp5" data-tracks="0"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabDataInit').alphaTab()
+            </script>
+        </div>
+    </div>
+  </div>
+</div>

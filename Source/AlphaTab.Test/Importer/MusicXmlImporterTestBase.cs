@@ -386,7 +386,7 @@ namespace AlphaTab.Test.Importer
                 totalWidth = (int)r.TotalWidth;
                 totalHeight = (int)r.TotalHeight;
             };
-            renderer.RenderMultiple(tracks);
+            renderer.Render(tracks[0].Score, tracks.Select(t => t.Index).ToArray());
             using (var bmp = new Bitmap(totalWidth, totalHeight))
             {
                 int y = 0;

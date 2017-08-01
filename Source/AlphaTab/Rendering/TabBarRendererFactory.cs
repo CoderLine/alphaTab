@@ -50,8 +50,8 @@ namespace AlphaTab.Rendering
             tabBarRenderer.ShowTimeSignature = _showTimeSignature;
             tabBarRenderer.ShowTiedNotes = _showTiedNotes;
             tabBarRenderer.RenderRhythm = staveSettings.Get("rhythm", tabBarRenderer.RenderRhythm);
-            tabBarRenderer.RhythmHeight = staveSettings.Get("rhythm-height", tabBarRenderer.RhythmHeight);
-            tabBarRenderer.RhythmBeams = staveSettings.Get("rhythm-beams", tabBarRenderer.RhythmBeams);
+            tabBarRenderer.RhythmHeight = staveSettings.Get("rhythmHeight", tabBarRenderer.RhythmHeight);
+            tabBarRenderer.RhythmBeams = staveSettings.Get("rhythmBeams", tabBarRenderer.RhythmBeams);
 
             return tabBarRenderer;
         }

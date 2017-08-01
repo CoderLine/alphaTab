@@ -1356,6 +1356,9 @@
             <summary>
             This public class contains instance specific settings for alphaTab
             </summary>
+            <summary>
+            This public class contains instance specific settings for alphaTab
+            </summary>
         </member>
         <member name="P:AlphaTab.Settings.Scale">
             <summary>
@@ -1377,7 +1380,7 @@
             The engine which should be used to render the the tablature. 
             <ul>
              <li><strong>default</strong> - Platform specific default engine</li>
-             <li><strong>html5</strong> - Canvas with VRML Fallback</li>
+             <li><strong>html5</strong> - HTML5 Canvas</li>
              <li><strong>svg</strong> -  SVG </li>
             </ul>
             </summary>

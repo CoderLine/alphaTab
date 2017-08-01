@@ -39,19 +39,28 @@ namespace AlphaTab
             get; set;
         }
 
-
         public bool DisableLazyLoading
         {
             get; set;
+        }
+
+        public bool UseWebWorker
+        {
+            get; set;
+        }
+
+        private static void SetDefaults(Settings settings)
+        {
+            settings.UseWebWorker = true;
         }
 
         public dynamic ToJson()
         {
             dynamic json = Std.NewObject();
 
+            json.useWorker = UseWebWorker;
             json.scale = Scale;
             json.width = Width;
-            json.height = Height;
             json.engine = Engine;
             json.stretchForce = StretchForce;
             json.forcePianoFingering = ForcePianoFingering;
@@ -128,14 +137,68 @@ namespace AlphaTab
                 }
             }
 
-            if (Std.JsonExists(json, "scale")) settings.Scale = json.scale;
-            if (Std.JsonExists(json, "width")) settings.Width = json.width;
-            if (Std.JsonExists(json, "height")) settings.Height = json.height;
-            if (Std.JsonExists(json, "engine")) settings.Engine = json.engine;
-            if (Std.JsonExists(json, "stretchForce")) settings.StretchForce = json.stretchForce;
-            if (Std.JsonExists(json, "forcePianoFingering")) settings.ForcePianoFingering = json.forcePianoFingering;
-            if (Std.JsonExists(json, "lazy")) settings.DisableLazyLoading = !json.lazy;
-            if (Std.JsonExists(json, "transpositionPitches")) settings.TranspositionPitches = json.transpositionPitches;
+
+
+            if (Std.JsonExists(json, "useWorker"))
+            {
+                settings.UseWebWorker = json.useWorker;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("useWorker"))
+            {
+                settings.UseWebWorker = dataAttributes["useWorker"].As<bool>();
+            }
+            if (Std.JsonExists(json, "scale"))
+            {
+                settings.Scale = json.scale;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("scale"))
+            {
+                settings.Scale = dataAttributes["scale"].As<float>();
+            }
+            if (Std.JsonExists(json, "width"))
+            {
+                settings.Width = json.width;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("width"))
+            {
+                settings.Width = dataAttributes["width"].As<int>();
+            }
+            if (Std.JsonExists(json, "engine"))
+            {
+                settings.Engine = json.engine;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("engine"))
+            {
+                settings.Engine = dataAttributes["engine"].As<string>();
+            }
+            if (Std.JsonExists(json, "stretchForce"))
+            {
+                settings.StretchForce = json.stretchForce;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("stretchForce"))
+            {
+                settings.StretchForce = dataAttributes["stretchForce"].As<float>();
+            }
+            if (Std.JsonExists(json, "forcePianoFingering"))
+            {
+                settings.ForcePianoFingering = json.forcePianoFingering;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("forcePianoFingering"))
+            {
+                settings.ForcePianoFingering = dataAttributes["forcePianoFingering"].As<bool>();
+            }
+            if (Std.JsonExists(json, "lazy"))
+            {
+                settings.DisableLazyLoading = !json.lazy;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("lazy"))
+            {
+                settings.DisableLazyLoading = !dataAttributes["lazy"].As<bool>();
+            }
+            if (Std.JsonExists(json, "transpositionPitches"))
+            {
+                settings.TranspositionPitches = json.transpositionPitches;
+            }
             else if(dataAttributes != null && dataAttributes.ContainsKey("transpositionPitches"))
             {
                 var pitchOffsets = dataAttributes["transpositionPitches"];
@@ -145,7 +208,10 @@ namespace AlphaTab
                 }
             }
 
-            if (Std.JsonExists(json, "displayTranspositionPitches")) settings.DisplayTranspositionPitches = json.displayTranspositionPitches;
+            if (Std.JsonExists(json, "displayTranspositionPitches"))
+            {
+                settings.DisplayTranspositionPitches = json.displayTranspositionPitches;
+            }
             else if(dataAttributes != null && dataAttributes.ContainsKey("displayTranspositionPitches"))
             {
                 var pitchOffsets = dataAttributes["displayTranspositionPitches"];

@@ -36,15 +36,10 @@ namespace AlphaTab
         public int Width { get; set; }
 
         /// <summary>
-        /// The initial size of the canvas during loading or the fixed height on some layouts. 
-        /// </summary>
-        public int Height { get; set; }
-
-        /// <summary>
         /// The engine which should be used to render the the tablature. 
         /// <ul>
         ///  <li><strong>default</strong> - Platform specific default engine</li>
-        ///  <li><strong>html5</strong> - Canvas with VRML Fallback</li>
+        ///  <li><strong>html5</strong> - HTML5 Canvas</li>
         ///  <li><strong>svg</strong> -  SVG </li>
         /// </ul>
         /// </summary>
@@ -93,7 +88,6 @@ namespace AlphaTab
                 settings.Scale = 1.0f;
                 settings.StretchForce = 1;
                 settings.Width = -1;
-                settings.Height = 200;
                 settings.Engine = "default";
                 settings.TranspositionPitches = new int[0];
                 settings.DisplayTranspositionPitches = new int[0];
@@ -101,6 +95,8 @@ namespace AlphaTab
                 settings.Layout = LayoutSettings.Defaults;
 
                 settings.Staves = new StaveSettings("default");
+
+                SetDefaults(settings);
 
                 return settings;
             }

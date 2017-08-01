@@ -1,0 +1,37 @@
+<div class="description">
+    The whole music notation can be transposed by a given number of semitones.
+    Be aware that this might lead to negative numbers for guitar tablatures since guitar tabs
+    are not recalculated to be within the fretboard. The option <code>transpositionPitches</code> or the data attribute <code>data-transposition-pitches</code> define the pitches for transposition. 
+</div>
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#scriptInit" role="tab" data-toggle="tab">Script Initialization</a></li>
+    <li><a href="#dataInit" role="tab" data-toggle="tab">Data Attribute Initialization</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active example" id="scriptInit">
+        <div class="html">
+            <div id="alphaTabScriptInit"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabScriptInit').alphaTab({
+                  file: 'files/features/Skillet.gp5',
+                  transpositionPitches: [12]
+                })
+            </script>
+        </div>
+    </div>
+    <div class="tab-pane example" id="dataInit">
+        <div class="html">
+            <div id="alphaTabDataInit" data-file="files/features/Skillet.gp5" data-transposition-pitches="[12]"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabDataInit').alphaTab()
+            </script>
+        </div>
+    </div>
+  </div>
+</div>

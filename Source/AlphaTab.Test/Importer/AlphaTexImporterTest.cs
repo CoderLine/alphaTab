@@ -226,7 +226,7 @@ namespace AlphaTab.Test.Importer
             {
                 svg += r.RenderResult.ToString();
             };
-            renderer.Render(score.Tracks[0]);
+            renderer.Render(score, new[]{0});
 
             var regexTemplate = @"<text[^>]+>\s*{0}\s*</text>";
 
@@ -272,7 +272,7 @@ namespace AlphaTab.Test.Importer
             {
                 partials.Add(r.RenderResult.ToString());
             };
-            renderer.Render(score.Tracks[0]);
+            renderer.Render(score, new[] { 0 });
 
             var tab = XDocument.Parse(partials[1]);
 

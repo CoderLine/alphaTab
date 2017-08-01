@@ -335,7 +335,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
 
                 Task.Factory.StartNew(() =>
                 {
-                    Renderer.RenderMultiple(trackArray);
+                    Renderer.Render(trackArray[0].Score, trackArray.Select(t=>t.Index).ToArray());
                 });
             }
             else

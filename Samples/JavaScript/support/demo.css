@@ -96,3 +96,113 @@ body > .alphaTab:not(.horizontal) {
     padding-left: 5px;
     padding-right: 5px;
 }
+
+#menuContainer {
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    -ms-column-count: 2;
+    -o-column-count: 2;
+    column-count: 2;
+}
+
+#menuContainer > div {
+    display: inline-block;
+    width: 100%;
+}
+
+#menuContainer ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 10px;
+    border-top: 1px solid #E4E5E6;
+}
+#menuContainer ul li a {
+    padding: 5px 0;
+    display: block;
+    border-bottom: 1px solid #E4E5E6;
+}
+
+#sampleContent {
+    display: none;
+}
+
+@font-face {
+    font-family: 'alphaTab';
+     src: url('../../../Build/JavaScript/Font/Bravura.eot');
+     src: url('../../../Build/JavaScript/Font/Bravura.eot?#iefix') format('embedded-opentype')
+          , url('../../../Build/JavaScript/Font/Bravura.woff') format('woff')
+          , url('../../../Build/JavaScript/Font/Bravura.otf') format('opentype')
+          , url('../../../Build/JavaScript/Font/Bravura.svg#Bravura') format('svg');
+     font-weight: normal;
+     font-style: normal;
+}
+
+
+@-moz-keyframes bounce { 
+    0% { -moz-transform:translateY(0%); } 
+    33% { -moz-transform:translateY(-25%); } 
+    66% { -moz-transform:translateY(25%); } 
+    100% { -moz-transform:translateY(0%); } 
+}
+@-webkit-keyframes bounce { 
+    0% { -webkit-transform:translateY(0%); } 
+    33% { -webkit-transform:translateY(-25%); } 
+    66% { -webkit-transform:translateY(25%); } 
+    100% { -webkit-transform:translateY(0%); } 
+}
+@keyframes bounce { 
+    0% { transform:translateY(0%); } 
+    33% { transform:translateY(-25%); } 
+    66% { transform:translateY(25%); } 
+    100% { transform:translateY(0%); } 
+}
+
+#loadingIndicator {
+    display:none;
+}
+
+.loading #loadingIndicator {
+    display: block;
+}
+
+#loadingIndicator i {
+    display: inline-block;
+    font: normal normal normal 14px/1 alphaTab;
+    font-size: inherit;
+    text-rendering: auto;
+}
+#loadingIndicator i:before {
+    content: '\E1D7';
+    display: inline-block;
+    -webkit-animation:bounce 1s linear infinite;
+    -moz-animation:bounce 1s linear infinite;
+    animation:bounce 1s linear infinite;
+}
+#loadingIndicator i:after {
+    content: '\E1D7';
+    display: inline-block;
+    -webkit-animation:bounce 1s linear infinite;
+    -moz-animation:bounce 1s linear infinite;
+    animation:bounce 1s linear infinite;
+    -webkit-animation-delay: -0.5s;
+    animation-delay: -0.5s;
+}
+
+.description {
+    margin: 10px 0;
+}
+
+.tab-content {
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+}
+
+.exampleSource {
+    margin-bottom: 10px;    
+}
+.wip {
+    color: #999;
+    font-size:12px;
+}

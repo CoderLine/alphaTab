@@ -1,0 +1,125 @@
+<div class="description">
+    When using the <code>tab</code> stave configuration, additionaly the rhythm 
+    can be displayed via the additional stave setting <code>rhythm: true</code> or the attribute <code>data-staves-rhythm="true"</code>
+</div>
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#scriptInit" role="tab" data-toggle="tab">Script Initialization</a></li>
+    <li><a href="#dataInit" role="tab" data-toggle="tab">Data Attribute Initialization</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active example" id="scriptInit">
+        <div class="html">
+            <div id="alphaTabScriptInit"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabScriptInit').alphaTab({
+                  file: 'files/features/Rhythm.gp5',
+                  staves: {
+                    id: 'tab',
+                    additionalSettings: {
+                        rhythm: true    
+                    }    
+                  }                
+                })
+            </script>
+        </div>
+    </div>
+    <div class="tab-pane example" id="dataInit">
+        <div class="html">
+            <div id="alphaTabDataInit" data-file="files/features/Rhythm.gp5" data-staves="tab" data-staves-rhythm="true"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabDataInit').alphaTab()
+            </script>
+        </div>
+    </div>
+  </div>
+</div>
+
+<div class="description">
+    The rhythm height can be adjusted via <code>rhythmHeight: 50</code> or <code>data-staves-rhythm-height="50"</code>
+</div>
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#scriptInit" role="tab" data-toggle="tab">Script Initialization</a></li>
+    <li><a href="#dataInit" role="tab" data-toggle="tab">Data Attribute Initialization</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active example" id="scriptInit">
+        <div class="html">
+            <div id="alphaTabScriptInit2"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabScriptInit2').alphaTab({
+                  file: 'files/features/Rhythm.gp5',
+                  staves: {
+                    id: 'tab',
+                    additionalSettings: {
+                        rhythm: true,
+                        rhythmHeight: 50
+                    }    
+                  }                
+                })
+            </script>
+        </div>
+    </div>
+    <div class="tab-pane example" id="dataInit">
+        <div class="html">
+            <div id="alphaTabDataInit2" data-file="files/features/Rhythm.gp5" data-staves="tab" data-staves-rhythm="true" data-staves-rhythm-height="50"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabDataInit2').alphaTab()
+            </script>
+        </div>
+    </div>
+  </div>
+</div>
+
+<div class="description">
+    You can prevent beaming by setting <code>rhythmBeams: false</code> or <code>data-staves-rhythm-beams="false"</code>
+</div>
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#scriptInit" role="tab" data-toggle="tab">Script Initialization</a></li>
+    <li><a href="#dataInit" role="tab" data-toggle="tab">Data Attribute Initialization</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active example" id="scriptInit">
+        <div class="html">
+            <div id="alphaTabScriptInit3"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabScriptInit3').alphaTab({
+                  file: 'files/features/Rhythm.gp5',
+                  staves: {
+                    id: 'tab',
+                    additionalSettings: {
+                        rhythm: true,
+                        rhythmBeams: false
+                    }
+                  }                
+                })
+            </script>
+        </div>
+    </div>
+    <div class="tab-pane example" id="dataInit">
+        <div class="html">
+            <div id="alphaTabDataInit3" data-file="files/features/Rhythm.gp5" data-staves="tab" data-staves-rhythm="true" data-staves-rhythm-beam="false"></div>
+        </div>
+        <div class="js">
+            <script>
+                $('#alphaTabDataInit3').alphaTab()
+            </script>
+        </div>
+    </div>
+  </div>
+</div>

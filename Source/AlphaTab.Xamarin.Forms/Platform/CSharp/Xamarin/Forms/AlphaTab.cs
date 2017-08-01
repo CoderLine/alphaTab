@@ -132,19 +132,18 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
 
             if (Width > 0)
             {
-                _renderer.Settings.Width = (int) Width;
+                _renderer.Settings.Width = (int)Width;
                 _initialRenderCompleted = false;
                 _isRendering = true;
                 var tracks = Tracks.ToArray();
                 if (tracks.Length > 0)
                 {
                     ModelUtils.ApplyPitchOffsets(_renderer.Settings, tracks[0].Score);
+                    Task.Factory.StartNew(() =>
+                    {
+                        _renderer.Render(tracks[0].Score, tracks.Select(t => t.Index).ToArray());
+                    });
                 }
-
-                Task.Factory.StartNew(() =>
-                {
-                    _renderer.RenderMultiple(tracks);
-                });
             }
             else
             {
@@ -165,7 +164,7 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
             {
                 _redrawPending = true;
             }
-            else if(width > 0)
+            else if (width > 0)
             {
                 _redrawPending = false;
 
