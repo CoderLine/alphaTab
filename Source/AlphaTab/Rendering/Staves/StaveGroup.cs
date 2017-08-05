@@ -440,6 +440,7 @@ namespace AlphaTab.Rendering.Staves
             var masterBarBoundsLookup = new FastList<MasterBarBounds>();
             for (int i = 0; i < Staves.Count; i++)
             {
+
                 for (int j = 0, k = Staves[i].FirstStaffInAccolade.BarRenderers.Count; j < k; j++)
                 {
                     var renderer = Staves[i].FirstStaffInAccolade.BarRenderers[j];

@@ -56,6 +56,7 @@ namespace AlphaTab.Model
 
         public PlaybackInformation PlaybackInfo { get; set; }
         public bool IsPercussion { get; set; }
+        public bool IsStringed { get { return Tuning.Length > 0; } }
 
         public Score Score { get; set; }
         public FastList<Staff> Staves { get; set; }

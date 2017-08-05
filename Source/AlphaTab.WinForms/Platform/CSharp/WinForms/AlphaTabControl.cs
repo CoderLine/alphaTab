@@ -38,7 +38,6 @@ namespace AlphaTab.Platform.CSharp.WinForms
         private IEnumerable<Track> _tracks;
         private float _scale;
         private int _scoreWidth;
-        private int _scoreHeight;
         private string _layoutMode;
         private float _stretchForce;
         private string _stavesMode;
@@ -104,20 +103,6 @@ namespace AlphaTab.Platform.CSharp.WinForms
                 OnPropertyChanged(nameof(ScoreAutoSize));
                 InvalidateTracks(true);
 
-            }
-        }
-
-        [DefaultValue(0)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public int ScoreHeight
-        {
-            get { return _scoreHeight; }
-            set
-            {
-                if (value == _scoreHeight) return;
-                _scoreHeight = value;
-                OnPropertyChanged();
-                InvalidateTracks(true);
             }
         }
 
@@ -223,7 +208,6 @@ namespace AlphaTab.Platform.CSharp.WinForms
             settings.Engine = "gdi";
             _scale = settings.Scale;
             _scoreWidth = settings.Width;
-            _scoreHeight = settings.Height;
             _layoutMode = settings.Layout.Mode;
             _stretchForce = settings.StretchForce;
             _stavesMode = settings.Staves.Id;
@@ -322,7 +306,6 @@ namespace AlphaTab.Platform.CSharp.WinForms
                 var settings = Renderer.Settings;
                 settings.Width = width;
                 settings.Engine = RenderEngine;
-                settings.Height = ScoreHeight;
                 settings.Scale = Scale;
                 settings.Layout.Mode = LayoutMode;
                 settings.StretchForce = StretchForce;

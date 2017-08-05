@@ -4,6 +4,7 @@ using AlphaTab.Importer;
 using AlphaTab.IO;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
+using AlphaTab.Util;
 using SharpKit.Html;
 using SharpKit.JavaScript;
 using WorkerContext = SharpKit.Html.workers.WorkerContext;
@@ -43,6 +44,7 @@ namespace AlphaTab.Platform.JavaScript
                     _renderer.RenderFinished += result => PostMessage(new { cmd = "alphaTab.renderFinished", result = result });
                     _renderer.PostRenderFinished += () => PostMessage(new { cmd = "alphaTab.postRenderFinished", boundsLookup = _renderer.BoundsLookup.ToJson() });
                     _renderer.PreRender += result => PostMessage(new { cmd = "alphaTab.preRender", result = result });
+                    _renderer.Error += Error;
                     break;
                 case "alphaTab.invalidate":
                     _renderer.Invalidate();
@@ -80,6 +82,8 @@ namespace AlphaTab.Platform.JavaScript
 
         private void Error(string type, Exception e)
         {
+            Logger.Error(type, "An unexpected error occurred in worker", e);
+
             dynamic error = JSON.parse(JSON.stringify(e));
             if (e.Member("message").As<bool>())
             {

@@ -74,6 +74,9 @@
     
     <script type="text/x-handlebars-template" id="menuBlock">
         <div class="menuBlock">
+            {{#if url}}
+                <h1><a href="{{url}}" target="_blank">{{title}}</a></h1>
+            {{else}}
             <h1>{{title}}</h1>
             <ul>
                 {{#each children}}
@@ -86,6 +89,7 @@
                 </li>
                 {{/each}}
             </ul>
+            {{/if}}
         </div>
     </script>
     
@@ -166,6 +170,10 @@
                     { title: 'Handle resize', url: 'api/resize.html', todo: true },
                     { title: 'Load event', url: 'api/loadevent.html', todo: true },
                 ]
+            },
+            {
+                title: '.net Samples',
+                url: 'https://github.com/CoderLine/alphaTab/tree/master/Samples/CSharp'
             }
         ]
         var menuBlock = Handlebars.compile($('#menuBlock').html());
@@ -173,12 +181,16 @@
             $('#menuContainer').append(menuBlock(menu[i]));
         }        
         $('#menuContainer a').on('click', function(e) {
+            var url = $(this).attr('href');
+            if(url.indexOf("http") === 0) {
+                return;
+            }
             e.preventDefault();
-            window.location.hash = $(this).attr('href');
+            window.location.hash = url;
         });        
         
         $(window).on('hashchange', function(e) {
-            var url = window.location.hash.substring(1);    
+            var url = window.location.hash.substring(1);   
             if(url) {
                 var link = $("#menuContainer a[href='"+url+"']");
                 openExample(link.text(), link.attr('href'));

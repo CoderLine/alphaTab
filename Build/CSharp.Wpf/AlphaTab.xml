@@ -1370,11 +1370,6 @@
             The initial size of the canvas during loading or the width for particular layouts (e.g. page layout).
             </summary>
         </member>
-        <member name="P:AlphaTab.Settings.Height">
-            <summary>
-            The initial size of the canvas during loading or the fixed height on some layouts. 
-            </summary>
-        </member>
         <member name="P:AlphaTab.Settings.Engine">
             <summary>
             The engine which should be used to render the the tablature. 

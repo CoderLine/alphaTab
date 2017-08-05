@@ -320,6 +320,9 @@ $StaticConstructor(function (){
     AlphaTab.Environment.RenderEngines = null;
     AlphaTab.Environment.LayoutEngines = null;
     AlphaTab.Environment.StaveProfiles = null;
+    AlphaTab.Environment.StaveProfileScoreTab = "score-tab";
+    AlphaTab.Environment.StaveProfileTab = "tab";
+    AlphaTab.Environment.StaveProfileScore = "score";
     AlphaTab.Environment.ScriptFile = null;
     AlphaTab.Environment.IsFontLoaded = false;
     AlphaTab.Environment.RenderEngines = {};
@@ -1178,6 +1181,7 @@ AlphaTab.Platform.JavaScript.JsWorker.prototype = {
 }
 );
             }));
+                this._renderer.add_Error($CreateDelegate(this, this.Error));
                 break;
             case "alphaTab.invalidate":
                 this._renderer.Invalidate();
@@ -1207,6 +1211,7 @@ AlphaTab.Platform.JavaScript.JsWorker.prototype = {
         }
     },
     Error: function (type, e){
+        AlphaTab.Util.Logger.Error(type, "An unexpected error occurred in worker", e);
         var error = JSON.parse(JSON.stringify(e));
         if (e["message"]){
             error.message = e["message"];
@@ -1553,9 +1558,10 @@ AlphaTab.Platform.Std.ParseFloat = function (s){
     return parseFloat(s);
 };
 AlphaTab.Platform.Std.Log = function (logLevel, category, msg, details){
-    var caller = arguments.callee.caller.caller.name;
+     var stack = new Error().stack;;
+     if(!stack) { try { throw new Error(); } catch(e) { stack = e.stack; } };
     // ReSharper disable once RedundantAssignment
-    msg = "[AlphaTab][" + category + "] " + caller + " - " + msg;
+    msg = "[AlphaTab][" + category + "] " + msg;
     switch (logLevel){
         case AlphaTab.Util.LogLevel.None:
             break;
@@ -1569,7 +1575,7 @@ AlphaTab.Platform.Std.Log = function (logLevel, category, msg, details){
              console.warn(msg, details);;
             break;
         case AlphaTab.Util.LogLevel.Error:
-             console.error(msg, details);;
+             console.error(msg, stack, details);;
             break;
     }
 };
@@ -9968,6 +9974,9 @@ AlphaTab.Model.Track = function (staveCount){
     this.EnsureStaveCount(staveCount);
 };
 AlphaTab.Model.Track.prototype = {
+    get_IsStringed: function (){
+        return this.Tuning.length > 0;
+    },
     EnsureStaveCount: function (staveCount){
         while (this.Staves.length < staveCount){
             var staff = new AlphaTab.Model.Staff();
@@ -11591,7 +11600,7 @@ AlphaTab.Rendering.Effects.MarkerEffectInfo.prototype = {
         return "marker";
     },
     get_HideOnMultiTrack: function (){
-        return false;
+        return true;
     },
     get_CanShareBand: function (){
         return true;
@@ -15292,9 +15301,20 @@ AlphaTab.Rendering.Layout.ScoreLayout.prototype = {
     CreateEmptyStaveGroup: function (){
         var group = new AlphaTab.Rendering.Staves.StaveGroup();
         group.Layout = this;
-        var profile = AlphaTab.Environment.StaveProfiles.hasOwnProperty(this.Renderer.Settings.Staves.Id) ? AlphaTab.Environment.StaveProfiles[this.Renderer.Settings.Staves.Id] : AlphaTab.Environment.StaveProfiles["default"];
         for (var trackIndex = 0; trackIndex < this.Renderer.Tracks.length; trackIndex++){
             var track = this.Renderer.Tracks[trackIndex];
+            var staveProfile;
+            // use optimal profile for track 
+            if (track.IsPercussion){
+                staveProfile = "score";
+            }
+            else if (track.get_IsStringed()){
+                staveProfile = this.Renderer.Settings.Staves.Id;
+            }
+            else {
+                staveProfile = "score";
+            }
+            var profile = AlphaTab.Environment.StaveProfiles.hasOwnProperty(staveProfile) ? AlphaTab.Environment.StaveProfiles[staveProfile] : AlphaTab.Environment.StaveProfiles["default"];
             for (var staveIndex = 0; staveIndex < track.Staves.length; staveIndex++){
                 for (var renderStaveIndex = 0; renderStaveIndex < profile.length; renderStaveIndex++){
                     var factory = profile[renderStaveIndex];

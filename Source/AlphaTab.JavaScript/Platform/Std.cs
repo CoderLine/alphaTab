@@ -24,6 +24,7 @@ using AlphaTab.Util;
 using AlphaTab.Xml;
 using SharpKit.Html;
 using SharpKit.JavaScript;
+using Console = System.Console;
 
 namespace AlphaTab.Platform
 {
@@ -39,9 +40,11 @@ namespace AlphaTab.Platform
 
         public static void Log(LogLevel logLevel, string category, string msg, object details = null)
         {
-            var caller = GetCallerName();
+            JsContext.JsCode("var stack = new Error().stack;");
+            JsContext.JsCode("if(!stack) { try { throw new Error(); } catch(e) { stack = e.stack; } }");
+
             // ReSharper disable once RedundantAssignment
-            msg = "[AlphaTab][" + category + "] " + caller + " - " + msg;
+            msg = "[AlphaTab][" + category + "] " + msg;
 
             switch (logLevel)
             {
@@ -57,7 +60,7 @@ namespace AlphaTab.Platform
                     JsContext.JsCode("console.warn(msg, details);");
                     break;
                 case LogLevel.Error:
-                    JsContext.JsCode("console.error(msg, details);");
+                    JsContext.JsCode("console.error(msg, stack, details);");
                     break;
             }
         }

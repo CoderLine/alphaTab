@@ -127,13 +127,28 @@ namespace AlphaTab.Rendering.Layout
             var group = new StaveGroup();
             group.Layout = this;
 
-            var profile = Environment.StaveProfiles.ContainsKey(Renderer.Settings.Staves.Id)
-                ? Environment.StaveProfiles[Renderer.Settings.Staves.Id]
-                : Environment.StaveProfiles["default"];
-
             for (var trackIndex = 0; trackIndex < Renderer.Tracks.Length; trackIndex++)
             {
                 var track = Renderer.Tracks[trackIndex];
+                string staveProfile;
+                // use optimal profile for track 
+                if (track.IsPercussion)
+                {
+                    staveProfile = Environment.StaveProfileScore;
+                }
+                else if (track.IsStringed)
+                {
+                    staveProfile = Renderer.Settings.Staves.Id;
+                }
+                else
+                {
+                    staveProfile = Environment.StaveProfileScore;
+                }
+
+                var profile = Environment.StaveProfiles.ContainsKey(staveProfile)
+                    ? Environment.StaveProfiles[staveProfile]
+                    : Environment.StaveProfiles["default"];
+
                 for (int staveIndex = 0; staveIndex < track.Staves.Count; staveIndex++)
                 {
                     for (var renderStaveIndex = 0; renderStaveIndex < profile.Length; renderStaveIndex++)
