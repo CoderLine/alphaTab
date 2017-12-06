@@ -136,10 +136,9 @@ namespace AlphaTab.Audio.Generator
             _handler.AddProgramChange(track.Index, 0, channel, (byte)playbackInfo.Program);
         }
 
-        public static int ToChannelShort(int data)
+        public static int ToChannelShort(float value)
         {
-            var value = Math.Max(-32768, Math.Min(32767, (data * 8) - 1));
-            return (Math.Max(value, -1)) + 1;
+            return (int)Math.Round(value * 127, 0);
         }
 
         #endregion

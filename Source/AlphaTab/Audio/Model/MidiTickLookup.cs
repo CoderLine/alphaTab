@@ -67,8 +67,8 @@ namespace AlphaTab.Audio.Model
 
     public class MidiTickLookupFindBeatResult
     {
-        public Beat CurrentBeat { get; set; }
-        public Beat NextBeat { get; set; }
+        public BeatTickLookup CurrentBeat { get; set; }
+        public BeatTickLookup NextBeat { get; set; }
         public int Duration { get; set; }
     }
 
@@ -168,8 +168,8 @@ namespace AlphaTab.Audio.Model
             }
 
             var result = new MidiTickLookupFindBeatResult();
-            result.CurrentBeat = beat.Beat;
-            result.NextBeat = nextBeat == null ? null : nextBeat.Beat;
+            result.CurrentBeat = beat;
+            result.NextBeat = nextBeat;
             result.Duration = MidiUtils.TicksToMillis(beat.End - beat.Start, masterBar.Tempo);
             return result;
         }

@@ -233,8 +233,8 @@ namespace AlphaTab.Importer
                 info.SecondaryChannel = i;
                 info.Program = ReadInt32();
 
-                info.Volume = Data.ReadByte();
-                info.Balance = Data.ReadByte();
+                info.Volume = Data.ReadByte() / 16f;
+                info.Balance = Data.ReadByte() / 16f;
                 Data.Skip(6);
 
                 _playbackInfos.Add(info);
@@ -978,7 +978,7 @@ namespace AlphaTab.Importer
                 var volumeAutomation = new Automation();
                 volumeAutomation.IsLinear = true;
                 volumeAutomation.Type = AutomationType.Volume;
-                volumeAutomation.Value = tableChange.Volume;
+                volumeAutomation.Value = tableChange.Volume / 16f;
                 beat.Automations.Add(volumeAutomation);
             }
 
@@ -987,7 +987,7 @@ namespace AlphaTab.Importer
                 var balanceAutomation = new Automation();
                 balanceAutomation.IsLinear = true;
                 balanceAutomation.Type = AutomationType.Balance;
-                balanceAutomation.Value = tableChange.Balance;
+                balanceAutomation.Value = tableChange.Balance / 16f;
                 beat.Automations.Add(balanceAutomation);
             }
 

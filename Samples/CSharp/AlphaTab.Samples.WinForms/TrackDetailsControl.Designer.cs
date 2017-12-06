@@ -164,7 +164,7 @@ namespace AlphaTab.Samples.WinForms
             this.volumeTrack.Dock = System.Windows.Forms.DockStyle.Fill;
             this.volumeTrack.Enabled = false;
             this.volumeTrack.Location = new System.Drawing.Point(3, 7);
-            this.volumeTrack.Maximum = 16;
+            this.volumeTrack.Maximum = 100;
             this.volumeTrack.Name = "volumeTrack";
             this.volumeTrack.Size = new System.Drawing.Size(141, 19);
             this.volumeTrack.TabIndex = 0;

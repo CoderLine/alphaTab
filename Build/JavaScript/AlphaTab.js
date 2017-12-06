@@ -2038,8 +2038,8 @@ AlphaTab.Settings.AppendScriptName = function (url){
     }
     return url;
 };
-AlphaTab.Settings.EnsureFullUrl = function (relativeUrl){
-    if (!relativeUrl.indexOf("http")==0 && !relativeUrl.indexOf("https")==0){
+AlphaTab.Settings.EnsureFullUrl = function (url){
+    if (!url.indexOf("http://")==0 && !url.indexOf("https://")==0 && !url.indexOf("file://")==0){
         var root = new String();
         root+=window.location.protocol;
         root+="//";
@@ -2048,13 +2048,13 @@ AlphaTab.Settings.EnsureFullUrl = function (relativeUrl){
             root+=":";
             root+=window.location.port;
         }
-        root+=relativeUrl;
-        if (!(relativeUrl.lastIndexOf("/")==(relativeUrl.length-"/".length))){
+        root+=url;
+        if (!(url.lastIndexOf("/")==(url.length-"/".length))){
             root+="/";
         }
         return root;
     }
-    return relativeUrl;
+    return url;
 };
 AlphaTab.Settings.get_Defaults = function (){
     var settings = new AlphaTab.Settings();
@@ -2698,9 +2698,8 @@ AlphaTab.Audio.Generator.MidiFileGenerator.GenerateMidiFile = function (score){
     midiFile.TickLookup = generator.TickLookup;
     return midiFile;
 };
-AlphaTab.Audio.Generator.MidiFileGenerator.ToChannelShort = function (data){
-    var value = Math.max(-32768, Math.min(32767, (data * 8) - 1));
-    return (Math.max(value, -1)) + 1;
+AlphaTab.Audio.Generator.MidiFileGenerator.ToChannelShort = function (value){
+    return (Math.round(value * 127, 0)) | 0;
 };
 AlphaTab.Audio.Generator.MidiFileHandler = function (midiFile){
     this._midiFile = null;
@@ -3108,8 +3107,8 @@ AlphaTab.Audio.Model.MidiTickLookup.prototype = {
             }
         }
         var result = new AlphaTab.Audio.Model.MidiTickLookupFindBeatResult();
-        result.CurrentBeat = beat.Beat;
-        result.NextBeat = nextBeat == null ? null : nextBeat.Beat;
+        result.CurrentBeat = beat;
+        result.NextBeat = nextBeat;
         result.Duration = AlphaTab.Audio.MidiUtils.TicksToMillis(beat.End - beat.Start, masterBar.Tempo);
         return result;
     },
@@ -5100,8 +5099,8 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             info.PrimaryChannel = i;
             info.SecondaryChannel = i;
             info.Program = this.ReadInt32();
-            info.Volume = this.Data.ReadByte();
-            info.Balance = this.Data.ReadByte();
+            info.Volume = this.Data.ReadByte() / 16;
+            info.Balance = this.Data.ReadByte() / 16;
             this.Data.Skip(6);
             this._playbackInfos.push(info);
         }
@@ -5648,14 +5647,14 @@ AlphaTab.Importer.Gp3To5Importer.prototype = {
             var volumeAutomation = new AlphaTab.Model.Automation();
             volumeAutomation.IsLinear = true;
             volumeAutomation.Type = AlphaTab.Model.AutomationType.Volume;
-            volumeAutomation.Value = tableChange.Volume;
+            volumeAutomation.Value = tableChange.Volume / 16;
             beat.Automations.push(volumeAutomation);
         }
         if (tableChange.Balance >= 0){
             var balanceAutomation = new AlphaTab.Model.Automation();
             balanceAutomation.IsLinear = true;
             balanceAutomation.Type = AlphaTab.Model.AutomationType.Balance;
-            balanceAutomation.Value = tableChange.Balance;
+            balanceAutomation.Value = tableChange.Balance / 16;
             beat.Automations.push(balanceAutomation);
         }
         if (tableChange.Instrument >= 0){
@@ -6539,6 +6538,9 @@ AlphaTab.Importer.GpxParser.prototype = {
                     case "Name":
                         track.Name = c.get_InnerText();
                         break;
+                    case "ShortName":
+                        track.ShortName = c.get_InnerText();
+                        break;
                     case "Color":
                         var parts = c.get_InnerText().split(" ");
                         if (parts.length >= 3){
@@ -6554,14 +6556,11 @@ AlphaTab.Importer.GpxParser.prototype = {
                         track.EnsureStaveCount(2);
                     }
                         break;
-                    case "ShortName":
-                        track.ShortName = c.get_InnerText();
+                    case "PartSounding":
+                        this.ParsePartSounding(track, c);
                         break;
-                    case "Lyrics":
-                        this.ParseLyrics(trackId, c);
-                        break;
-                    case "Properties":
-                        this.ParseTrackProperties(track, c);
+                    case "RSE":
+                        this.ParseRSE(track, c);
                         break;
                     case "GeneralMidi":
                         this.ParseGeneralMidi(track, c);
@@ -6571,17 +6570,62 @@ AlphaTab.Importer.GpxParser.prototype = {
                         track.PlaybackInfo.IsSolo = state == "Solo";
                         track.PlaybackInfo.IsMute = state == "Mute";
                         break;
-                    case "PartSounding":
-                        this.ParsePartSounding(track, c);
+                    case "Lyrics":
+                        this.ParseLyrics(trackId, c);
+                        break;
+                    case "Properties":
+                        this.ParseTrackProperties(track, c);
                         break;
                 }
             }
         }
         this._tracksById[trackId] = track;
     },
+    ParsePartSounding: function (track, node){
+        for (var $i23 = 0,$t23 = node.ChildNodes,$l23 = $t23.length,c = $t23[$i23]; $i23 < $l23; $i23++, c = $t23[$i23]){
+            if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.LocalName){
+                    case "TranspositionPitch":
+                        track.DisplayTranspositionPitch = AlphaTab.Platform.Std.ParseInt(c.get_InnerText());
+                        break;
+                }
+            }
+        }
+    },
+    ParseRSE: function (track, node){
+        for (var $i24 = 0,$t24 = node.ChildNodes,$l24 = $t24.length,c = $t24[$i24]; $i24 < $l24; $i24++, c = $t24[$i24]){
+            if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.LocalName){
+                    case "ChannelStrip":
+                        this.ParseChannelStrip(track, c);
+                        break;
+                }
+            }
+        }
+    },
+    ParseChannelStrip: function (track, node){
+        for (var $i25 = 0,$t25 = node.ChildNodes,$l25 = $t25.length,c = $t25[$i25]; $i25 < $l25; $i25++, c = $t25[$i25]){
+            if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.LocalName){
+                    case "Parameters":
+                        var parameters = c.get_InnerText().split(" ");
+                        track.PlaybackInfo.Volume = AlphaTab.Platform.Std.ParseFloat(parameters[12]);
+                        track.PlaybackInfo.Balance = AlphaTab.Platform.Std.ParseFloat(parameters[11]);
+                        break;
+                }
+            }
+        }
+    },
+    ParseGeneralMidi: function (track, node){
+        track.PlaybackInfo.Port = AlphaTab.Platform.Std.ParseInt(node.FindChildElement("Port").get_InnerText());
+        track.PlaybackInfo.Program = AlphaTab.Platform.Std.ParseInt(node.FindChildElement("Program").get_InnerText());
+        track.PlaybackInfo.PrimaryChannel = AlphaTab.Platform.Std.ParseInt(node.FindChildElement("PrimaryChannel").get_InnerText());
+        track.PlaybackInfo.SecondaryChannel = AlphaTab.Platform.Std.ParseInt(node.FindChildElement("SecondaryChannel").get_InnerText());
+        track.IsPercussion = node.GetAttribute("table") == "Percussion";
+    },
     ParseLyrics: function (trackId, node){
         var tracks = [];
-        for (var $i23 = 0,$t23 = node.ChildNodes,$l23 = $t23.length,c = $t23[$i23]; $i23 < $l23; $i23++, c = $t23[$i23]){
+        for (var $i26 = 0,$t26 = node.ChildNodes,$l26 = $t26.length,c = $t26[$i26]; $i26 < $l26; $i26++, c = $t26[$i26]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "Line":
@@ -6594,7 +6638,7 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseLyricsLine: function (node){
         var lyrics = new AlphaTab.Model.Lyrics();
-        for (var $i24 = 0,$t24 = node.ChildNodes,$l24 = $t24.length,c = $t24[$i24]; $i24 < $l24; $i24++, c = $t24[$i24]){
+        for (var $i27 = 0,$t27 = node.ChildNodes,$l27 = $t27.length,c = $t27[$i27]; $i27 < $l27; $i27++, c = $t27[$i27]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "Offset":
@@ -6608,9 +6652,40 @@ AlphaTab.Importer.GpxParser.prototype = {
         }
         return lyrics;
     },
+    ParseTrackProperties: function (track, node){
+        for (var $i28 = 0,$t28 = node.ChildNodes,$l28 = $t28.length,c = $t28[$i28]; $i28 < $l28; $i28++, c = $t28[$i28]){
+            if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
+                switch (c.LocalName){
+                    case "Property":
+                        this.ParseTrackProperty(track, c);
+                        break;
+                }
+            }
+        }
+    },
+    ParseTrackProperty: function (track, node){
+        var propertyName = node.GetAttribute("name");
+        switch (propertyName){
+            case "Tuning":
+                var tuningParts = node.FindChildElement("Pitches").get_InnerText().split(" ");
+                var tuning = new Int32Array(tuningParts.length);
+                for (var i = 0; i < tuning.length; i++){
+                tuning[tuning.length - 1 - i] = AlphaTab.Platform.Std.ParseInt(tuningParts[i]);
+            }
+                track.Tuning = tuning;
+                break;
+            case "DiagramCollection":
+            case "ChordCollection":
+                this.ParseDiagramCollection(track, node);
+                break;
+            case "CapoFret":
+                track.Capo = AlphaTab.Platform.Std.ParseInt(node.FindChildElement("Fret").get_InnerText());
+                break;
+        }
+    },
     ParseDiagramCollection: function (track, node){
         var items = node.FindChildElement("Items");
-        for (var $i25 = 0,$t25 = items.ChildNodes,$l25 = $t25.length,c = $t25[$i25]; $i25 < $l25; $i25++, c = $t25[$i25]){
+        for (var $i29 = 0,$t29 = items.ChildNodes,$l29 = $t29.length,c = $t29[$i29]; $i29 < $l29; $i29++, c = $t29[$i29]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "Item":
@@ -6632,7 +6707,7 @@ AlphaTab.Importer.GpxParser.prototype = {
         for (var i = 0; i < stringCount; i++){
             chord.Strings.push(-1);
         }
-        for (var $i26 = 0,$t26 = diagram.ChildNodes,$l26 = $t26.length,c = $t26[$i26]; $i26 < $l26; $i26++, c = $t26[$i26]){
+        for (var $i30 = 0,$t30 = diagram.ChildNodes,$l30 = $t30.length,c = $t30[$i30]; $i30 < $l30; $i30++, c = $t30[$i30]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "Fret":
@@ -6641,7 +6716,7 @@ AlphaTab.Importer.GpxParser.prototype = {
                         break;
                     case "Fingering":
                         var existingFingers = {};
-                        for (var $i27 = 0,$t27 = c.ChildNodes,$l27 = $t27.length,p = $t27[$i27]; $i27 < $l27; $i27++, p = $t27[$i27]){
+                        for (var $i31 = 0,$t31 = c.ChildNodes,$l31 = $t31.length,p = $t31[$i31]; $i31 < $l31; $i31++, p = $t31[$i31]){
                         if (p.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                             switch (p.LocalName){
                                 case "Position":
@@ -6683,57 +6758,8 @@ AlphaTab.Importer.GpxParser.prototype = {
             }
         }
     },
-    ParseTrackProperties: function (track, node){
-        for (var $i28 = 0,$t28 = node.ChildNodes,$l28 = $t28.length,c = $t28[$i28]; $i28 < $l28; $i28++, c = $t28[$i28]){
-            if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
-                switch (c.LocalName){
-                    case "Property":
-                        this.ParseTrackProperty(track, c);
-                        break;
-                }
-            }
-        }
-    },
-    ParseTrackProperty: function (track, node){
-        var propertyName = node.GetAttribute("name");
-        switch (propertyName){
-            case "Tuning":
-                var tuningParts = node.FindChildElement("Pitches").get_InnerText().split(" ");
-                var tuning = new Int32Array(tuningParts.length);
-                for (var i = 0; i < tuning.length; i++){
-                tuning[tuning.length - 1 - i] = AlphaTab.Platform.Std.ParseInt(tuningParts[i]);
-            }
-                track.Tuning = tuning;
-                break;
-            case "DiagramCollection":
-            case "ChordCollection":
-                this.ParseDiagramCollection(track, node);
-                break;
-            case "CapoFret":
-                track.Capo = AlphaTab.Platform.Std.ParseInt(node.FindChildElement("Fret").get_InnerText());
-                break;
-        }
-    },
-    ParseGeneralMidi: function (track, node){
-        track.PlaybackInfo.Port = AlphaTab.Platform.Std.ParseInt(node.FindChildElement("Port").get_InnerText());
-        track.PlaybackInfo.Program = AlphaTab.Platform.Std.ParseInt(node.FindChildElement("Program").get_InnerText());
-        track.PlaybackInfo.PrimaryChannel = AlphaTab.Platform.Std.ParseInt(node.FindChildElement("PrimaryChannel").get_InnerText());
-        track.PlaybackInfo.SecondaryChannel = AlphaTab.Platform.Std.ParseInt(node.FindChildElement("SecondaryChannel").get_InnerText());
-        track.IsPercussion = node.GetAttribute("table") == "Percussion";
-    },
-    ParsePartSounding: function (track, node){
-        for (var $i29 = 0,$t29 = node.ChildNodes,$l29 = $t29.length,c = $t29[$i29]; $i29 < $l29; $i29++, c = $t29[$i29]){
-            if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
-                switch (c.LocalName){
-                    case "TranspositionPitch":
-                        track.DisplayTranspositionPitch = AlphaTab.Platform.Std.ParseInt(c.get_InnerText());
-                        break;
-                }
-            }
-        }
-    },
     ParseMasterBarsNode: function (node){
-        for (var $i30 = 0,$t30 = node.ChildNodes,$l30 = $t30.length,c = $t30[$i30]; $i30 < $l30; $i30++, c = $t30[$i30]){
+        for (var $i32 = 0,$t32 = node.ChildNodes,$l32 = $t32.length,c = $t32[$i32]; $i32 < $l32; $i32++, c = $t32[$i32]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "MasterBar":
@@ -6745,7 +6771,7 @@ AlphaTab.Importer.GpxParser.prototype = {
     },
     ParseMasterBar: function (node){
         var masterBar = new AlphaTab.Model.MasterBar();
-        for (var $i31 = 0,$t31 = node.ChildNodes,$l31 = $t31.length,c = $t31[$i31]; $i31 < $l31; $i31++, c = $t31[$i31]){
+        for (var $i33 = 0,$t33 = node.ChildNodes,$l33 = $t33.length,c = $t33[$i33]; $i33 < $l33; $i33++, c = $t33[$i33]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "Time":
@@ -6825,7 +6851,7 @@ AlphaTab.Importer.GpxParser.prototype = {
         this._masterBars.push(masterBar);
     },
     ParseBars: function (node){
-        for (var $i32 = 0,$t32 = node.ChildNodes,$l32 = $t32.length,c = $t32[$i32]; $i32 < $l32; $i32++, c = $t32[$i32]){
+        for (var $i34 = 0,$t34 = node.ChildNodes,$l34 = $t34.length,c = $t34[$i34]; $i34 < $l34; $i34++, c = $t34[$i34]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "Bar":
@@ -6838,7 +6864,7 @@ AlphaTab.Importer.GpxParser.prototype = {
     ParseBar: function (node){
         var bar = new AlphaTab.Model.Bar();
         var barId = node.GetAttribute("id");
-        for (var $i33 = 0,$t33 = node.ChildNodes,$l33 = $t33.length,c = $t33[$i33]; $i33 < $l33; $i33++, c = $t33[$i33]){
+        for (var $i35 = 0,$t35 = node.ChildNodes,$l35 = $t35.length,c = $t35[$i35]; $i35 < $l35; $i35++, c = $t35[$i35]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "Voices":
@@ -6885,7 +6911,7 @@ AlphaTab.Importer.GpxParser.prototype = {
         this._barsById[barId] = bar;
     },
     ParseVoices: function (node){
-        for (var $i34 = 0,$t34 = node.ChildNodes,$l34 = $t34.length,c = $t34[$i34]; $i34 < $l34; $i34++, c = $t34[$i34]){
+        for (var $i36 = 0,$t36 = node.ChildNodes,$l36 = $t36.length,c = $t36[$i36]; $i36 < $l36; $i36++, c = $t36[$i36]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "Voice":
@@ -6898,7 +6924,7 @@ AlphaTab.Importer.GpxParser.prototype = {
     ParseVoice: function (node){
         var voice = new AlphaTab.Model.Voice();
         var voiceId = node.GetAttribute("id");
-        for (var $i35 = 0,$t35 = node.ChildNodes,$l35 = $t35.length,c = $t35[$i35]; $i35 < $l35; $i35++, c = $t35[$i35]){
+        for (var $i37 = 0,$t37 = node.ChildNodes,$l37 = $t37.length,c = $t37[$i37]; $i37 < $l37; $i37++, c = $t37[$i37]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "Beats":
@@ -6910,7 +6936,7 @@ AlphaTab.Importer.GpxParser.prototype = {
         this._voiceById[voiceId] = voice;
     },
     ParseBeats: function (node){
-        for (var $i36 = 0,$t36 = node.ChildNodes,$l36 = $t36.length,c = $t36[$i36]; $i36 < $l36; $i36++, c = $t36[$i36]){
+        for (var $i38 = 0,$t38 = node.ChildNodes,$l38 = $t38.length,c = $t38[$i38]; $i38 < $l38; $i38++, c = $t38[$i38]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "Beat":
@@ -6923,7 +6949,7 @@ AlphaTab.Importer.GpxParser.prototype = {
     ParseBeat: function (node){
         var beat = new AlphaTab.Model.Beat();
         var beatId = node.GetAttribute("id");
-        for (var $i37 = 0,$t37 = node.ChildNodes,$l37 = $t37.length,c = $t37[$i37]; $i37 < $l37; $i37++, c = $t37[$i37]){
+        for (var $i39 = 0,$t39 = node.ChildNodes,$l39 = $t39.length,c = $t39[$i39]; $i39 < $l39; $i39++, c = $t39[$i39]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "Notes":
@@ -7029,7 +7055,7 @@ AlphaTab.Importer.GpxParser.prototype = {
         this._beatById[beatId] = beat;
     },
     ParseBeatXProperties: function (node, beat){
-        for (var $i38 = 0,$t38 = node.ChildNodes,$l38 = $t38.length,c = $t38[$i38]; $i38 < $l38; $i38++, c = $t38[$i38]){
+        for (var $i40 = 0,$t40 = node.ChildNodes,$l40 = $t40.length,c = $t40[$i40]; $i40 < $l40; $i40++, c = $t40[$i40]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "XProperty":
@@ -7052,7 +7078,7 @@ AlphaTab.Importer.GpxParser.prototype = {
         var whammyMiddleOffset1 = null;
         var whammyMiddleOffset2 = null;
         var whammyDestination = null;
-        for (var $i39 = 0,$t39 = node.ChildNodes,$l39 = $t39.length,c = $t39[$i39]; $i39 < $l39; $i39++, c = $t39[$i39]){
+        for (var $i41 = 0,$t41 = node.ChildNodes,$l41 = $t41.length,c = $t41[$i41]; $i41 < $l41; $i41++, c = $t41[$i41]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "Property":
@@ -7152,7 +7178,7 @@ AlphaTab.Importer.GpxParser.prototype = {
         }
     },
     ParseNotes: function (node){
-        for (var $i40 = 0,$t40 = node.ChildNodes,$l40 = $t40.length,c = $t40[$i40]; $i40 < $l40; $i40++, c = $t40[$i40]){
+        for (var $i42 = 0,$t42 = node.ChildNodes,$l42 = $t42.length,c = $t42[$i42]; $i42 < $l42; $i42++, c = $t42[$i42]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "Note":
@@ -7165,7 +7191,7 @@ AlphaTab.Importer.GpxParser.prototype = {
     ParseNote: function (node){
         var note = new AlphaTab.Model.Note();
         var noteId = node.GetAttribute("id");
-        for (var $i41 = 0,$t41 = node.ChildNodes,$l41 = $t41.length,c = $t41[$i41]; $i41 < $l41; $i41++, c = $t41[$i41]){
+        for (var $i43 = 0,$t43 = node.ChildNodes,$l43 = $t43.length,c = $t43[$i43]; $i43 < $l43; $i43++, c = $t43[$i43]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "Properties":
@@ -7262,7 +7288,7 @@ AlphaTab.Importer.GpxParser.prototype = {
         var bendMiddleOffset1 = null;
         var bendMiddleOffset2 = null;
         var bendDestination = null;
-        for (var $i42 = 0,$t42 = node.ChildNodes,$l42 = $t42.length,c = $t42[$i42]; $i42 < $l42; $i42++, c = $t42[$i42]){
+        for (var $i44 = 0,$t44 = node.ChildNodes,$l44 = $t44.length,c = $t44[$i44]; $i44 < $l44; $i44++, c = $t44[$i44]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "Property":
@@ -7419,7 +7445,7 @@ AlphaTab.Importer.GpxParser.prototype = {
         return ((converted)) | 0;
     },
     ParseRhythms: function (node){
-        for (var $i43 = 0,$t43 = node.ChildNodes,$l43 = $t43.length,c = $t43[$i43]; $i43 < $l43; $i43++, c = $t43[$i43]){
+        for (var $i45 = 0,$t45 = node.ChildNodes,$l45 = $t45.length,c = $t45[$i45]; $i45 < $l45; $i45++, c = $t45[$i45]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "Rhythm":
@@ -7432,7 +7458,7 @@ AlphaTab.Importer.GpxParser.prototype = {
     ParseRhythm: function (node){
         var rhythm = new AlphaTab.Importer.GpxRhythm();
         var rhythmId = node.GetAttribute("id");
-        for (var $i44 = 0,$t44 = node.ChildNodes,$l44 = $t44.length,c = $t44[$i44]; $i44 < $l44; $i44++, c = $t44[$i44]){
+        for (var $i46 = 0,$t46 = node.ChildNodes,$l46 = $t46.length,c = $t46[$i46]; $i46 < $l46; $i46++, c = $t46[$i46]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "NoteValue":
@@ -7491,7 +7517,7 @@ AlphaTab.Importer.GpxParser.prototype = {
             this.Score.AddMasterBar(masterBar);
         }
         // add tracks to score
-        for (var $i45 = 0,$t45 = this._tracksMapping,$l45 = $t45.length,trackId = $t45[$i45]; $i45 < $l45; $i45++, trackId = $t45[$i45]){
+        for (var $i47 = 0,$t47 = this._tracksMapping,$l47 = $t47.length,trackId = $t47[$i47]; $i47 < $l47; $i47++, trackId = $t47[$i47]){
             if (((trackId==null)||(trackId.length==0))){
                 continue;
             }
@@ -7529,7 +7555,7 @@ AlphaTab.Importer.GpxParser.prototype = {
             var bar = this._barsById[barId];
             if (this._voicesOfBar.hasOwnProperty(barId)){
                 // add voices to bars
-                for (var $i46 = 0,$t46 = this._voicesOfBar[barId],$l46 = $t46.length,voiceId = $t46[$i46]; $i46 < $l46; $i46++, voiceId = $t46[$i46]){
+                for (var $i48 = 0,$t48 = this._voicesOfBar[barId],$l48 = $t48.length,voiceId = $t48[$i48]; $i48 < $l48; $i48++, voiceId = $t48[$i48]){
                     if (voiceId != "-1"){
                         bar.AddVoice(this._voiceById[voiceId]);
                     }
@@ -7557,7 +7583,7 @@ AlphaTab.Importer.GpxParser.prototype = {
             beat.TupletDenominator = rhythm.TupletDenominator;
             // add notes to beat
             if (this._notesOfBeat.hasOwnProperty(beatId)){
-                for (var $i47 = 0,$t47 = this._notesOfBeat[beatId],$l47 = $t47.length,noteId = $t47[$i47]; $i47 < $l47; $i47++, noteId = $t47[$i47]){
+                for (var $i49 = 0,$t49 = this._notesOfBeat[beatId],$l49 = $t49.length,noteId = $t49[$i49]; $i49 < $l49; $i49++, noteId = $t49[$i49]){
                     if (noteId != "-1"){
                         beat.AddNote(this._noteById[noteId]);
                         if (this._tappedNotes.hasOwnProperty(noteId)){
@@ -7572,7 +7598,7 @@ AlphaTab.Importer.GpxParser.prototype = {
             var voice = this._voiceById[voiceId];
             if (this._beatsOfVoice.hasOwnProperty(voiceId)){
                 // add beats to voices
-                for (var $i48 = 0,$t48 = this._beatsOfVoice[voiceId],$l48 = $t48.length,beatId = $t48[$i48]; $i48 < $l48; $i48++, beatId = $t48[$i48]){
+                for (var $i50 = 0,$t50 = this._beatsOfVoice[voiceId],$l50 = $t50.length,beatId = $t50[$i50]; $i50 < $l50; $i50++, beatId = $t50[$i50]){
                     if (beatId != "-1"){
                         // important! we clone the beat because beats get reused
                         // in gp6, our model needs to have unique beats.
@@ -7668,7 +7694,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         }
     },
     ParsePartwise: function (element){
-        for (var $i49 = 0,$t49 = element.ChildNodes,$l49 = $t49.length,c = $t49[$i49]; $i49 < $l49; $i49++, c = $t49[$i49]){
+        for (var $i51 = 0,$t51 = element.ChildNodes,$l51 = $t51.length,c = $t51[$i51]; $i51 < $l51; $i51++, c = $t51[$i51]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "movement-title":
@@ -7694,7 +7720,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         }
         var track = this._trackById[id];
         var isFirstMeasure = true;
-        for (var $i50 = 0,$t50 = element.ChildNodes,$l50 = $t50.length,c = $t50[$i50]; $i50 < $l50; $i50++, c = $t50[$i50]){
+        for (var $i52 = 0,$t52 = element.ChildNodes,$l52 = $t52.length,c = $t52[$i52]; $i52 < $l52; $i52++, c = $t52[$i52]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "measure":
@@ -7762,7 +7788,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
             }
         }
         var attributesParsed = false;
-        for (var $i51 = 0,$t51 = element.ChildNodes,$l51 = $t51.length,c = $t51[$i51]; $i51 < $l51; $i51++, c = $t51[$i51]){
+        for (var $i53 = 0,$t53 = element.ChildNodes,$l53 = $t53.length,c = $t53[$i53]; $i53 < $l53; $i53++, c = $t53[$i53]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "note":
@@ -7836,7 +7862,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         var durationInDivisions = AlphaTab.Platform.Std.ParseInt(element.FindChildElement("duration").get_InnerText());
         var duration = (durationInDivisions * 4) / this._divisionsPerQuarterNote;
         var durations = new Int32Array([64, 32, 16, 8, 4, 2, 1]);
-        for (var $i52 = 0,$l52 = durations.length,d = durations[$i52]; $i52 < $l52; $i52++, d = durations[$i52]){
+        for (var $i54 = 0,$l54 = durations.length,d = durations[$i54]; $i54 < $l54; $i54++, d = durations[$i54]){
             if (duration >= d){
                 beat.Duration = d;
                 duration -= d;
@@ -7850,7 +7876,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         beat.IsEmpty = false;
     },
     ParseStaffDetails: function (element, track){
-        for (var $i53 = 0,$t53 = element.ChildNodes,$l53 = $t53.length,c = $t53[$i53]; $i53 < $l53; $i53++, c = $t53[$i53]){
+        for (var $i55 = 0,$t55 = element.ChildNodes,$l55 = $t55.length,c = $t55[$i55]; $i55 < $l55; $i55++, c = $t55[$i55]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "staff-lines":
@@ -7871,7 +7897,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         var tuningStep = "C";
         var tuningOctave = "";
         var tuningAlter = 0;
-        for (var $i54 = 0,$t54 = element.ChildNodes,$l54 = $t54.length,c = $t54[$i54]; $i54 < $l54; $i54++, c = $t54[$i54]){
+        for (var $i56 = 0,$t56 = element.ChildNodes,$l56 = $t56.length,c = $t56[$i56]; $i56 < $l56; $i56++, c = $t56[$i56]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "tuning-step":
@@ -7991,7 +8017,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         track.Chords[this._currentChord] = chord;
     },
     ParseBarline: function (element, masterBar){
-        for (var $i55 = 0,$t55 = element.ChildNodes,$l55 = $t55.length,c = $t55[$i55]; $i55 < $l55; $i55++, c = $t55[$i55]){
+        for (var $i57 = 0,$t57 = element.ChildNodes,$l57 = $t57.length,c = $t57[$i57]; $i57 < $l57; $i57++, c = $t57[$i57]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "repeat":
@@ -8034,7 +8060,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         beat.IsEmpty = false;
         beat.AddNote(note);
         beat.Dots = 0;
-        for (var $i56 = 0,$t56 = element.ChildNodes,$l56 = $t56.length,c = $t56[$i56]; $i56 < $l56; $i56++, c = $t56[$i56]){
+        for (var $i58 = 0,$t58 = element.ChildNodes,$l58 = $t58.length,c = $t58[$i58]; $i58 < $l58; $i58++, c = $t58[$i58]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "grace":
@@ -8161,7 +8187,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         return AlphaTab.Model.Duration.Quarter;
     },
     ParseLyric: function (element, beat){
-        for (var $i57 = 0,$t57 = element.ChildNodes,$l57 = $t57.length,c = $t57[$i57]; $i57 < $l57; $i57++, c = $t57[$i57]){
+        for (var $i59 = 0,$t59 = element.ChildNodes,$l59 = $t59.length,c = $t59[$i59]; $i59 < $l59; $i59++, c = $t59[$i59]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "text":
@@ -8208,7 +8234,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         }
     },
     ParseNotations: function (element, beat, note){
-        for (var $i58 = 0,$t58 = element.ChildNodes,$l58 = $t58.length,c = $t58[$i58]; $i58 < $l58; $i58++, c = $t58[$i58]){
+        for (var $i60 = 0,$t60 = element.ChildNodes,$l60 = $t60.length,c = $t60[$i60]; $i60 < $l60; $i60++, c = $t60[$i60]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "articulations":
@@ -8242,7 +8268,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         }
     },
     ParseOrnaments: function (element, note){
-        for (var $i59 = 0,$t59 = element.ChildNodes,$l59 = $t59.length,c = $t59[$i59]; $i59 < $l59; $i59++, c = $t59[$i59]){
+        for (var $i61 = 0,$t61 = element.ChildNodes,$l61 = $t61.length,c = $t61[$i61]; $i61 < $l61; $i61++, c = $t61[$i61]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "tremolo":
@@ -8264,7 +8290,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         }
     },
     ParseTechnical: function (element, note){
-        for (var $i60 = 0,$t60 = element.ChildNodes,$l60 = $t60.length,c = $t60[$i60]; $i60 < $l60; $i60++, c = $t60[$i60]){
+        for (var $i62 = 0,$t62 = element.ChildNodes,$l62 = $t62.length,c = $t62[$i62]; $i62 < $l62; $i62++, c = $t62[$i62]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "string":
@@ -8285,7 +8311,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         }
     },
     ParseArticulations: function (element, note){
-        for (var $i61 = 0,$t61 = element.ChildNodes,$l61 = $t61.length,c = $t61[$i61]; $i61 < $l61; $i61++, c = $t61[$i61]){
+        for (var $i63 = 0,$t63 = element.ChildNodes,$l63 = $t63.length,c = $t63[$i63]; $i63 < $l63; $i63++, c = $t63[$i63]){
             switch (c.LocalName){
                 case "accent":
                     note.Accentuated = AlphaTab.Model.AccentuationType.Normal;
@@ -8301,7 +8327,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         }
     },
     ParseDynamics: function (element, beat){
-        for (var $i62 = 0,$t62 = element.ChildNodes,$l62 = $t62.length,c = $t62[$i62]; $i62 < $l62; $i62++, c = $t62[$i62]){
+        for (var $i64 = 0,$t64 = element.ChildNodes,$l64 = $t64.length,c = $t64[$i64]; $i64 < $l64; $i64++, c = $t64[$i64]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "p":
@@ -8333,7 +8359,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         }
     },
     ParseTimeModification: function (element, beat){
-        for (var $i63 = 0,$t63 = element.ChildNodes,$l63 = $t63.length,c = $t63[$i63]; $i63 < $l63; $i63++, c = $t63[$i63]){
+        for (var $i65 = 0,$t65 = element.ChildNodes,$l65 = $t65.length,c = $t65[$i65]; $i65 < $l65; $i65++, c = $t65[$i65]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "actual-notes":
@@ -8350,7 +8376,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         var step = null;
         var semitones = 0;
         var octave = 0;
-        for (var $i64 = 0,$t64 = element.ChildNodes,$l64 = $t64.length,c = $t64[$i64]; $i64 < $l64; $i64++, c = $t64[$i64]){
+        for (var $i66 = 0,$t66 = element.ChildNodes,$l66 = $t66.length,c = $t66[$i66]; $i66 < $l66; $i66++, c = $t66[$i66]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "display-step":
@@ -8373,7 +8399,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         var step = null;
         var semitones = 0;
         var octave = 0;
-        for (var $i65 = 0,$t65 = element.ChildNodes,$l65 = $t65.length,c = $t65[$i65]; $i65 < $l65; $i65++, c = $t65[$i65]){
+        for (var $i67 = 0,$t67 = element.ChildNodes,$l67 = $t67.length,c = $t67[$i67]; $i67 < $l67; $i67++, c = $t67[$i67]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "step":
@@ -8406,7 +8432,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         return bar.Voices[index];
     },
     ParseDirection: function (element, masterBar){
-        for (var $i66 = 0,$t66 = element.ChildNodes,$l66 = $t66.length,c = $t66[$i66]; $i66 < $l66; $i66++, c = $t66[$i66]){
+        for (var $i68 = 0,$t68 = element.ChildNodes,$l68 = $t68.length,c = $t68[$i68]; $i68 < $l68; $i68++, c = $t68[$i68]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "sound":
@@ -8438,7 +8464,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
     ParseMetronome: function (element, masterBar){
         var unit = AlphaTab.Model.Duration.Quarter;
         var perMinute = 120;
-        for (var $i67 = 0,$t67 = element.ChildNodes,$l67 = $t67.length,c = $t67[$i67]; $i67 < $l67; $i67++, c = $t67[$i67]){
+        for (var $i69 = 0,$t69 = element.ChildNodes,$l69 = $t69.length,c = $t69[$i69]; $i69 < $l69; $i69++, c = $t69[$i69]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "beat-unit":
@@ -8457,7 +8483,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
     ParseAttributes: function (element, bars, masterBar){
         var number;
         var hasTime = false;
-        for (var $i68 = 0,$t68 = element.ChildNodes,$l68 = $t68.length,c = $t68[$i68]; $i68 < $l68; $i68++, c = $t68[$i68]){
+        for (var $i70 = 0,$t70 = element.ChildNodes,$l70 = $t70.length,c = $t70[$i70]; $i70 < $l70; $i70++, c = $t70[$i70]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "divisions":
@@ -8494,7 +8520,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
     ParseClef: function (element, bar){
         var sign = null;
         var line = 0;
-        for (var $i69 = 0,$t69 = element.ChildNodes,$l69 = $t69.length,c = $t69[$i69]; $i69 < $l69; $i69++, c = $t69[$i69]){
+        for (var $i71 = 0,$t71 = element.ChildNodes,$l71 = $t71.length,c = $t71[$i71]; $i71 < $l71; $i71++, c = $t71[$i71]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "sign":
@@ -8551,7 +8577,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         }
         var beatsParsed = false;
         var beatTypeParsed = false;
-        for (var $i70 = 0,$t70 = element.ChildNodes,$l70 = $t70.length,c = $t70[$i70]; $i70 < $l70; $i70++, c = $t70[$i70]){
+        for (var $i72 = 0,$t72 = element.ChildNodes,$l72 = $t72.length,c = $t72[$i72]; $i72 < $l72; $i72++, c = $t72[$i72]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 var v = c.get_InnerText();
                 switch (c.LocalName){
@@ -8586,7 +8612,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         var keyStep = -2147483648;
         var keyAlter = -2147483648;
         var mode = null;
-        for (var $i71 = 0,$t71 = element.ChildNodes,$l71 = $t71.length,c = $t71[$i71]; $i71 < $l71; $i71++, c = $t71[$i71]){
+        for (var $i73 = 0,$t73 = element.ChildNodes,$l73 = $t73.length,c = $t73[$i73]; $i73 < $l73; $i73++, c = $t73[$i73]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "fifths":
@@ -8637,7 +8663,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         return this._score.MasterBars[index];
     },
     ParseIdentification: function (element){
-        for (var $i72 = 0,$t72 = element.ChildNodes,$l72 = $t72.length,c = $t72[$i72]; $i72 < $l72; $i72++, c = $t72[$i72]){
+        for (var $i74 = 0,$t74 = element.ChildNodes,$l74 = $t74.length,c = $t74[$i74]; $i74 < $l74; $i74++, c = $t74[$i74]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "creator":
@@ -8656,7 +8682,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         }
     },
     ParsePartList: function (element){
-        for (var $i73 = 0,$t73 = element.ChildNodes,$l73 = $t73.length,c = $t73[$i73]; $i73 < $l73; $i73++, c = $t73[$i73]){
+        for (var $i75 = 0,$t75 = element.ChildNodes,$l75 = $t75.length,c = $t75[$i75]; $i75 < $l75; $i75++, c = $t75[$i75]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "score-part":
@@ -8671,7 +8697,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         var track = new AlphaTab.Model.Track(1);
         this._trackById[id] = track;
         this._score.AddTrack(track);
-        for (var $i74 = 0,$t74 = element.ChildNodes,$l74 = $t74.length,c = $t74[$i74]; $i74 < $l74; $i74++, c = $t74[$i74]){
+        for (var $i76 = 0,$t76 = element.ChildNodes,$l76 = $t76.length,c = $t76[$i76]; $i76 < $l76; $i76++, c = $t76[$i76]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "part-name":
@@ -8702,7 +8728,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         return true;
     },
     ParseMidiInstrument: function (element, track){
-        for (var $i75 = 0,$t75 = element.ChildNodes,$l75 = $t75.length,c = $t75[$i75]; $i75 < $l75; $i75++, c = $t75[$i75]){
+        for (var $i77 = 0,$t77 = element.ChildNodes,$l77 = $t77.length,c = $t77[$i77]; $i77 < $l77; $i77++, c = $t77[$i77]){
             if (c.NodeType == AlphaTab.Xml.XmlNodeType.Element){
                 switch (c.LocalName){
                     case "midi-channel":
@@ -8711,8 +8737,11 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
                     case "midi-program":
                         track.PlaybackInfo.Program = AlphaTab.Platform.Std.ParseInt(c.get_InnerText());
                         break;
-                    case "midi-volume":
-                        track.PlaybackInfo.Volume = AlphaTab.Platform.Std.ParseInt(c.get_InnerText());
+                    case "volume":
+                        track.PlaybackInfo.Volume = AlphaTab.Platform.Std.ParseInt(c.get_InnerText()) / 100;
+                        break;
+                    case "pan":
+                        track.PlaybackInfo.Balance = (AlphaTab.Platform.Std.ParseInt(c.get_InnerText()) + 180) / 360;
                         break;
                 }
             }
@@ -9153,7 +9182,7 @@ AlphaTab.Model.Beat.prototype = {
         if (point != this.MaxWhammyPoint)
             return;
         this.MaxWhammyPoint = null;
-        for (var $i76 = 0,$t76 = this.WhammyBarPoints,$l76 = $t76.length,currentPoint = $t76[$i76]; $i76 < $l76; $i76++, currentPoint = $t76[$i76]){
+        for (var $i78 = 0,$t78 = this.WhammyBarPoints,$l78 = $t78.length,currentPoint = $t78[$i78]; $i78 < $l78; $i78++, currentPoint = $t78[$i78]){
             if (this.MaxWhammyPoint == null || currentPoint.Value > this.MaxWhammyPoint.Value){
                 this.MaxWhammyPoint = currentPoint;
             }
@@ -9812,8 +9841,8 @@ AlphaTab.Model.PlaybackInformation = function (){
     this.SecondaryChannel = 0;
     this.IsMute = false;
     this.IsSolo = false;
-    this.Volume = 15;
-    this.Balance = 8;
+    this.Volume = 1;
+    this.Balance = 0.5;
     this.Port = 1;
 };
 AlphaTab.Model.PlaybackInformation.CopyTo = function (src, dst){
@@ -10007,7 +10036,7 @@ AlphaTab.Model.Track.prototype = {
         }
     },
     ApplyLyrics: function (lyrics){
-        for (var $i77 = 0,$l77 = lyrics.length,lyric = lyrics[$i77]; $i77 < $l77; $i77++, lyric = lyrics[$i77]){
+        for (var $i79 = 0,$l79 = lyrics.length,lyric = lyrics[$i79]; $i79 < $l79; $i79++, lyric = lyrics[$i79]){
             lyric.Finish();
         }
         var staff = this.Staves[0];
@@ -11178,7 +11207,7 @@ AlphaTab.Rendering.EffectBandSizingInfo.prototype = {
             }
         }
         // find any slot that can be used
-        for (var $i78 = 0,$t78 = this.Slots,$l78 = $t78.length,slot = $t78[$i78]; $i78 < $l78; $i78++, slot = $t78[$i78]){
+        for (var $i80 = 0,$t80 = this.Slots,$l80 = $t80.length,slot = $t80[$i80]; $i80 < $l80; $i80++, slot = $t80[$i80]){
             if (slot.CanBeUsed(band)){
                 return slot;
             }
@@ -11189,13 +11218,13 @@ AlphaTab.Rendering.EffectBandSizingInfo.prototype = {
         return newSlot;
     },
     CopySlots: function (sizingInfo){
-        for (var $i79 = 0,$t79 = sizingInfo.Slots,$l79 = $t79.length,slot = $t79[$i79]; $i79 < $l79; $i79++, slot = $t79[$i79]){
+        for (var $i81 = 0,$t81 = sizingInfo.Slots,$l81 = $t81.length,slot = $t81[$i81]; $i81 < $l81; $i81++, slot = $t81[$i81]){
             var copy = new AlphaTab.Rendering.EffectBandSlot();
             copy.Y = slot.Y;
             copy.Height = slot.Height;
             copy.UniqueEffectId = slot.UniqueEffectId;
             this.Slots.push(copy);
-            for (var $i80 = 0,$t80 = slot.Bands,$l80 = $t80.length,band = $t80[$i80]; $i80 < $l80; $i80++, band = $t80[$i80]){
+            for (var $i82 = 0,$t82 = slot.Bands,$l82 = $t82.length,band = $t82[$i82]; $i82 < $l82; $i82++, band = $t82[$i82]){
                 this._effectSlot[band.Info.get_EffectId()] = copy;
             }
         }
@@ -11257,9 +11286,9 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
         if (this.SizingInfo == null)
             return;
         var y = 0;
-        for (var $i81 = 0,$t81 = this.SizingInfo.Slots,$l81 = $t81.length,slot = $t81[$i81]; $i81 < $l81; $i81++, slot = $t81[$i81]){
+        for (var $i83 = 0,$t83 = this.SizingInfo.Slots,$l83 = $t83.length,slot = $t83[$i83]; $i83 < $l83; $i83++, slot = $t83[$i83]){
             slot.Y = y;
-            for (var $i82 = 0,$t82 = slot.Bands,$l82 = $t82.length,band = $t82[$i82]; $i82 < $l82; $i82++, band = $t82[$i82]){
+            for (var $i84 = 0,$t84 = slot.Bands,$l84 = $t84.length,band = $t84[$i84]; $i84 < $l84; $i84++, band = $t84[$i84]){
                 band.Y = y;
                 band.Height = slot.Height;
             }
@@ -11276,7 +11305,7 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
             var previousRenderer = this.get_PreviousRenderer();
             this.SizingInfo.CopySlots(previousRenderer.SizingInfo);
         }
-        for (var $i83 = 0,$t83 = this._bands,$l83 = $t83.length,effectBand = $t83[$i83]; $i83 < $l83; $i83++, effectBand = $t83[$i83]){
+        for (var $i85 = 0,$t85 = this._bands,$l85 = $t85.length,effectBand = $t85[$i85]; $i85 < $l85; $i85++, effectBand = $t85[$i85]){
             effectBand.AlignGlyphs();
             if (!effectBand.IsEmpty){
                 // find a slot that ended before the start of the band
@@ -11288,7 +11317,7 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
     },
     ScaleToWidth: function (width){
         AlphaTab.Rendering.BarRendererBase.prototype.ScaleToWidth.call(this, width);
-        for (var $i84 = 0,$t84 = this._bands,$l84 = $t84.length,effectBand = $t84[$i84]; $i84 < $l84; $i84++, effectBand = $t84[$i84]){
+        for (var $i86 = 0,$t86 = this._bands,$l86 = $t86.length,effectBand = $t86[$i86]; $i86 < $l86; $i86++, effectBand = $t86[$i86]){
             effectBand.AlignGlyphs();
         }
     },
@@ -11301,26 +11330,26 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
             this._bands[i].DoLayout();
             this.BandLookup[this._infos[i].get_EffectId()] = this._bands[i];
         }
-        for (var $i85 = 0,$t85 = this.Bar.Voices,$l85 = $t85.length,voice = $t85[$i85]; $i85 < $l85; $i85++, voice = $t85[$i85]){
+        for (var $i87 = 0,$t87 = this.Bar.Voices,$l87 = $t87.length,voice = $t87[$i87]; $i87 < $l87; $i87++, voice = $t87[$i87]){
             if (this.HasVoiceContainer(voice)){
                 this.CreateVoiceGlyphs(voice);
             }
         }
-        for (var $i86 = 0,$t86 = this._bands,$l86 = $t86.length,effectBand = $t86[$i86]; $i86 < $l86; $i86++, effectBand = $t86[$i86]){
+        for (var $i88 = 0,$t88 = this._bands,$l88 = $t88.length,effectBand = $t88[$i88]; $i88 < $l88; $i88++, effectBand = $t88[$i88]){
             if (effectBand.IsLinkedToPrevious){
                 this.IsLinkedToPrevious = true;
             }
         }
     },
     CreateVoiceGlyphs: function (v){
-        for (var $i87 = 0,$t87 = v.Beats,$l87 = $t87.length,b = $t87[$i87]; $i87 < $l87; $i87++, b = $t87[$i87]){
+        for (var $i89 = 0,$t89 = v.Beats,$l89 = $t89.length,b = $t89[$i89]; $i89 < $l89; $i89++, b = $t89[$i89]){
             // we create empty glyphs as alignment references and to get the 
             // effect bar sized
             var container = new AlphaTab.Rendering.Glyphs.BeatContainerGlyph(b, this.GetOrCreateVoiceContainer(v));
             container.PreNotes = new AlphaTab.Rendering.Glyphs.BeatGlyphBase();
             container.OnNotes = new AlphaTab.Rendering.Glyphs.BeatOnNoteGlyphBase();
             this.AddBeatGlyph(container);
-            for (var $i88 = 0,$t88 = this._bands,$l88 = $t88.length,effectBand = $t88[$i88]; $i88 < $l88; $i88++, effectBand = $t88[$i88]){
+            for (var $i90 = 0,$t90 = this._bands,$l90 = $t90.length,effectBand = $t90[$i90]; $i90 < $l90; $i90++, effectBand = $t90[$i90]){
                 effectBand.CreateGlyph(b);
             }
         }
@@ -11328,7 +11357,7 @@ AlphaTab.Rendering.EffectBarRenderer.prototype = {
     Paint: function (cx, cy, canvas){
         this.PaintBackground(cx, cy, canvas);
         canvas.set_Color(this.get_Resources().MainGlyphColor);
-        for (var $i89 = 0,$t89 = this._bands,$l89 = $t89.length,effectBand = $t89[$i89]; $i89 < $l89; $i89++, effectBand = $t89[$i89]){
+        for (var $i91 = 0,$t91 = this._bands,$l91 = $t91.length,effectBand = $t91[$i91]; $i91 < $l91; $i91++, effectBand = $t91[$i91]){
             effectBand.Paint(cx + this.X, cy + this.Y, canvas);
         }
         //canvas.Color = new Color(0, 0, 200, 100);
@@ -11951,7 +11980,7 @@ AlphaTab.Rendering.Glyphs.GlyphGroup.prototype = {
         var glyphs = this.Glyphs;
         if (glyphs == null || glyphs.length == 0)
             return;
-        for (var $i90 = 0,$l90 = glyphs.length,g = glyphs[$i90]; $i90 < $l90; $i90++, g = glyphs[$i90]){
+        for (var $i92 = 0,$l92 = glyphs.length,g = glyphs[$i92]; $i92 < $l92; $i92++, g = glyphs[$i92]){
             g.Paint(cx + this.X, cy + this.Y, canvas);
         }
     }
@@ -13568,7 +13597,7 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
                 this.NoteHeads = new AlphaTab.Rendering.Glyphs.ScoreNoteChordGlyph();
                 this.NoteHeads.Beat = this.Container.Beat;
                 this.NoteHeads.BeamingHelper = this.BeamingHelper;
-                for (var $i91 = 0,$t91 = this.Container.Beat.Notes,$l91 = $t91.length,note = $t91[$i91]; $i91 < $l91; $i91++, note = $t91[$i91]){
+                for (var $i93 = 0,$t93 = this.Container.Beat.Notes,$l93 = $t93.length,note = $t93[$i93]; $i93 < $l93; $i93++, note = $t93[$i93]){
                     this.CreateNoteGlyph(note);
                 }
                 this.AddGlyph(this.NoteHeads);
@@ -13579,7 +13608,7 @@ AlphaTab.Rendering.Glyphs.ScoreBeatGlyph.prototype = {
                     this.AddGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 5 * this.get_Scale()));
                     for (var i = 0; i < this.Container.Beat.Dots; i++){
                         var group = new AlphaTab.Rendering.Glyphs.GlyphGroup(0, 0);
-                        for (var $i92 = 0,$t92 = this.Container.Beat.Notes,$l92 = $t92.length,note = $t92[$i92]; $i92 < $l92; $i92++, note = $t92[$i92]){
+                        for (var $i94 = 0,$t94 = this.Container.Beat.Notes,$l94 = $t94.length,note = $t94[$i94]; $i94 < $l94; $i94++, note = $t94[$i94]){
                             this.CreateBeatDot(sr.GetNoteLine(note), group);
                         }
                         this.AddGlyph(group);
@@ -13739,7 +13768,7 @@ AlphaTab.Rendering.Glyphs.ScoreBeatPreNotesGlyph.prototype = {
                 this.AddGlyph(new AlphaTab.Rendering.Glyphs.SpacingGlyph(0, 0, 4 * this.get_Scale()));
             }
             var accidentals = new AlphaTab.Rendering.Glyphs.AccidentalGroupGlyph();
-            for (var $i93 = 0,$t93 = this.Container.Beat.Notes,$l93 = $t93.length,note = $t93[$i93]; $i93 < $l93; $i93++, note = $t93[$i93]){
+            for (var $i95 = 0,$t95 = this.Container.Beat.Notes,$l95 = $t95.length,note = $t95[$i95]; $i95 < $l95; $i95++, note = $t95[$i95]){
                 this.CreateAccidentalGlyph(note, accidentals);
             }
             if (!accidentals.get_IsEmpty()){
@@ -14023,7 +14052,7 @@ AlphaTab.Rendering.Glyphs.ScoreNoteChordGlyph.prototype = {
         }
         var infos = this._infos;
         var x = cx + this._noteHeadPadding;
-        for (var $i94 = 0,$l94 = infos.length,g = infos[$i94]; $i94 < $l94; $i94++, g = infos[$i94]){
+        for (var $i96 = 0,$l96 = infos.length,g = infos[$i96]; $i96 < $l96; $i96++, g = infos[$i96]){
             g.Glyph.Renderer = this.Renderer;
             g.Glyph.Paint(x, cy, canvas);
         }
@@ -14247,7 +14276,7 @@ AlphaTab.Rendering.Glyphs.TabBeatGlyph.prototype = {
             this.NoteNumbers = new AlphaTab.Rendering.Glyphs.TabNoteChordGlyph(0, 0, this.Container.Beat.GraceType != AlphaTab.Model.GraceType.None);
             this.NoteNumbers.Beat = this.Container.Beat;
             this.NoteNumbers.BeamingHelper = this.BeamingHelper;
-            for (var $i95 = 0,$t95 = this.Container.Beat.Notes,$l95 = $t95.length,note = $t95[$i95]; $i95 < $l95; $i95++, note = $t95[$i95]){
+            for (var $i97 = 0,$t97 = this.Container.Beat.Notes,$l97 = $t97.length,note = $t97[$i97]; $i97 < $l97; $i97++, note = $t97[$i97]){
                 this.CreateNoteGlyph(note);
             }
             this.AddGlyph(this.NoteNumbers);
@@ -14538,7 +14567,7 @@ AlphaTab.Rendering.Glyphs.TabNoteChordGlyph.prototype = {
         canvas.set_Font(this._isGrace ? res.GraceFont : res.TablatureFont);
         var notes = this._notes;
         var w = this.Width;
-        for (var $i96 = 0,$l96 = notes.length,g = notes[$i96]; $i96 < $l96; $i96++, g = notes[$i96]){
+        for (var $i98 = 0,$l98 = notes.length,g = notes[$i98]; $i98 < $l98; $i98++, g = notes[$i98]){
             g.Renderer = this.Renderer;
             g.Width = w;
             g.Paint(cx, cy, canvas);
@@ -15077,13 +15106,13 @@ AlphaTab.Rendering.Glyphs.VoiceContainerGlyph.prototype = {
     RegisterLayoutingInfo: function (info){
         info.UpdateVoiceSize(this.Width);
         var beatGlyphs = this.BeatGlyphs;
-        for (var $i97 = 0,$l97 = beatGlyphs.length,b = beatGlyphs[$i97]; $i97 < $l97; $i97++, b = beatGlyphs[$i97]){
+        for (var $i99 = 0,$l99 = beatGlyphs.length,b = beatGlyphs[$i99]; $i99 < $l99; $i99++, b = beatGlyphs[$i99]){
             b.RegisterLayoutingInfo(info);
         }
     },
     ApplyLayoutingInfo: function (info){
         var beatGlyphs = this.BeatGlyphs;
-        for (var $i98 = 0,$l98 = beatGlyphs.length,b = beatGlyphs[$i98]; $i98 < $l98; $i98++, b = beatGlyphs[$i98]){
+        for (var $i100 = 0,$l100 = beatGlyphs.length,b = beatGlyphs[$i100]; $i100 < $l100; $i100++, b = beatGlyphs[$i100]){
             b.ApplyLayoutingInfo(info);
         }
         this.ScaleToForce(Math.max(this.Renderer.get_Settings().StretchForce, info.MinStretchForce));
@@ -16395,7 +16424,7 @@ AlphaTab.Rendering.ScoreBarRenderer.prototype = {
                 this.AddPreBeatGlyph(new AlphaTab.Rendering.Glyphs.NaturalizeGlyph(0, this.GetScoreY(previousKeyPositions[i] + offsetClef, 0), false));
             }
         }
-        for (var $i99 = 0,$l99 = newGlyphs.length,newGlyph = newGlyphs[$i99]; $i99 < $l99; $i99++, newGlyph = newGlyphs[$i99]){
+        for (var $i101 = 0,$l101 = newGlyphs.length,newGlyph = newGlyphs[$i101]; $i101 < $l101; $i101++, newGlyph = newGlyphs[$i101]){
             this.AddPreBeatGlyph(newGlyph);
         }
     },
@@ -16530,7 +16559,7 @@ AlphaTab.Rendering.ScoreRenderer.prototype = {
         try{
             this.Score = score;
             var tracks = [];
-            for (var $i100 = 0,$l100 = trackIndexes.length,track = trackIndexes[$i100]; $i100 < $l100; $i100++, track = trackIndexes[$i100]){
+            for (var $i102 = 0,$l102 = trackIndexes.length,track = trackIndexes[$i102]; $i102 < $l102; $i102++, track = trackIndexes[$i102]){
                 if (track >= 0 && track < score.Tracks.length){
                     tracks.push(score.Tracks[track]);
                 }
@@ -17067,8 +17096,8 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
         this.CalculateAccoladeSpacing(tracks);
         // add renderers
         var barLayoutingInfo = result.LayoutingInfo;
-        for (var $i101 = 0,$t101 = this.Staves,$l101 = $t101.length,g = $t101[$i101]; $i101 < $l101; $i101++, g = $t101[$i101]){
-            for (var $i102 = 0,$t102 = g.Staves,$l102 = $t102.length,s = $t102[$i102]; $i102 < $l102; $i102++, s = $t102[$i102]){
+        for (var $i103 = 0,$t103 = this.Staves,$l103 = $t103.length,g = $t103[$i103]; $i103 < $l103; $i103++, g = $t103[$i103]){
+            for (var $i104 = 0,$t104 = g.Staves,$l104 = $t104.length,s = $t104[$i104]; $i104 < $l104; $i104++, s = $t104[$i104]){
                 s.AddBar(g.Track.Staves[s.ModelStaff.Index].Bars[barIndex], barLayoutingInfo);
                 var renderer = s.BarRenderers[s.BarRenderers.length - 1];
                 result.Renderers.push(renderer);
@@ -17241,7 +17270,7 @@ AlphaTab.Rendering.Staves.StaveGroup.prototype = {
     },
     FinalizeGroup: function (){
         var currentY = 0;
-        for (var $i103 = 0,$t103 = this._allStaves,$l103 = $t103.length,staff = $t103[$i103]; $i103 < $l103; $i103++, staff = $t103[$i103]){
+        for (var $i105 = 0,$t105 = this._allStaves,$l105 = $t105.length,staff = $t105[$i105]; $i105 < $l105; $i105++, staff = $t105[$i105]){
             staff.X = this.AccoladeSpacing;
             staff.Y = (currentY);
             staff.FinalizeStave();
@@ -17430,10 +17459,10 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
         for (var i = 0,j = this.Bar.Staff.Track.Tuning.length; i < j; i++){
             tabNotes.push([]);
         }
-        for (var $i104 = 0,$t104 = this.Bar.Voices,$l104 = $t104.length,voice = $t104[$i104]; $i104 < $l104; $i104++, voice = $t104[$i104]){
+        for (var $i106 = 0,$t106 = this.Bar.Voices,$l106 = $t106.length,voice = $t106[$i106]; $i106 < $l106; $i106++, voice = $t106[$i106]){
             if (this.HasVoiceContainer(voice)){
                 var vc = this.GetOrCreateVoiceContainer(voice);
-                for (var $i105 = 0,$t105 = vc.BeatGlyphs,$l105 = $t105.length,bg = $t105[$i105]; $i105 < $l105; $i105++, bg = $t105[$i105]){
+                for (var $i107 = 0,$t107 = vc.BeatGlyphs,$l107 = $t107.length,bg = $t107[$i107]; $i107 < $l107; $i107++, bg = $t107[$i107]){
                     var notes = (bg.OnNotes);
                     var noteNumbers = notes.NoteNumbers;
                     if (noteNumbers != null){
@@ -17449,7 +17478,7 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
         }
         // if we have multiple voices we need to sort by X-position, otherwise have a wild mix in the list 
         // but painting relies on ascending X-position
-        for (var $i106 = 0,$l106 = tabNotes.length,line = tabNotes[$i106]; $i106 < $l106; $i106++, line = tabNotes[$i106]){
+        for (var $i108 = 0,$l108 = tabNotes.length,line = tabNotes[$i108]; $i108 < $l108; $i108++, line = tabNotes[$i108]){
             line.sort($CreateAnonymousDelegate(this, function (a, b){
                 return a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0;
             }));
@@ -17459,7 +17488,7 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
             if (i > 0)
                 lineY += lineOffset;
             var lineX = 0;
-            for (var $i107 = 0,$t107 = tabNotes[i],$l107 = $t107.length,line = $t107[$i107]; $i107 < $l107; $i107++, line = $t107[$i107]){
+            for (var $i109 = 0,$t109 = tabNotes[i],$l109 = $t109.length,line = $t109[$i109]; $i109 < $l109; $i109++, line = $t109[$i109]){
                 canvas.FillRect(cx + this.X + lineX, lineY | 0, line[0] - lineX, this.get_Scale());
                 lineX = line[0] + line[1];
             }
@@ -17583,7 +17612,7 @@ AlphaTab.Rendering.TabBarRenderer.prototype = {
         }
     },
     PaintFooter: function (cx, cy, canvas, h){
-        for (var $i108 = 0,$t108 = h.Beats,$l108 = $t108.length,beat = $t108[$i108]; $i108 < $l108; $i108++, beat = $t108[$i108]){
+        for (var $i110 = 0,$t110 = h.Beats,$l110 = $t110.length,beat = $t110[$i110]; $i110 < $l110; $i110++, beat = $t110[$i110]){
             if (beat.Duration == AlphaTab.Model.Duration.Whole || beat.Duration == AlphaTab.Model.Duration.DoubleWhole || beat.Duration == AlphaTab.Model.Duration.QuadrupleWhole){
                 return;
             }
@@ -18373,7 +18402,7 @@ AlphaTab.Xml.XmlNode.prototype = {
     },
     GetElementsByTagName: function (name){
         var tags = [];
-        for (var $i109 = 0,$t109 = this.ChildNodes,$l109 = $t109.length,c = $t109[$i109]; $i109 < $l109; $i109++, c = $t109[$i109]){
+        for (var $i111 = 0,$t111 = this.ChildNodes,$l111 = $t111.length,c = $t111[$i111]; $i111 < $l111; $i111++, c = $t111[$i111]){
             if (c != null && c.NodeType == AlphaTab.Xml.XmlNodeType.Element && c.LocalName == name){
                 tags.push(c);
             }
@@ -18381,7 +18410,7 @@ AlphaTab.Xml.XmlNode.prototype = {
         return tags.slice(0);
     },
     FindChildElement: function (name){
-        for (var $i110 = 0,$t110 = this.ChildNodes,$l110 = $t110.length,c = $t110[$i110]; $i110 < $l110; $i110++, c = $t110[$i110]){
+        for (var $i112 = 0,$t112 = this.ChildNodes,$l112 = $t112.length,c = $t112[$i112]; $i112 < $l112; $i112++, c = $t112[$i112]){
             if (c != null && c.NodeType == AlphaTab.Xml.XmlNodeType.Element && c.LocalName == name){
                 return c;
             }
@@ -18391,7 +18420,7 @@ AlphaTab.Xml.XmlNode.prototype = {
     get_InnerText: function (){
         if (this.NodeType == AlphaTab.Xml.XmlNodeType.Element || this.NodeType == AlphaTab.Xml.XmlNodeType.Document){
             var txt = new String();
-            for (var $i111 = 0,$t111 = this.ChildNodes,$l111 = $t111.length,c = $t111[$i111]; $i111 < $l111; $i111++, c = $t111[$i111]){
+            for (var $i113 = 0,$t113 = this.ChildNodes,$l113 = $t113.length,c = $t113[$i113]; $i113 < $l113; $i113++, c = $t113[$i113]){
                 txt+=c.get_InnerText();
             }
             return txt.trim();
@@ -18404,7 +18433,7 @@ AlphaTab.Xml.XmlDocument = function (xml){
     AlphaTab.Xml.XmlNode.call(this);
     this.NodeType = AlphaTab.Xml.XmlNodeType.Document;
     AlphaTab.Xml.XmlParser.Parse(xml, 0, this);
-    for (var $i112 = 0,$t112 = this.ChildNodes,$l112 = $t112.length,child = $t112[$i112]; $i112 < $l112; $i112++, child = $t112[$i112]){
+    for (var $i114 = 0,$t114 = this.ChildNodes,$l114 = $t114.length,child = $t114[$i114]; $i114 < $l114; $i114++, child = $t114[$i114]){
         if (child.NodeType == AlphaTab.Xml.XmlNodeType.Element){
             this.DocumentElement = child;
             break;
