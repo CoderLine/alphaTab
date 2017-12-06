@@ -16,698 +16,599 @@
  * License along with this library.
  */
 (function ($) {
-    if(!$) { return; }
-    function loadMidi(element, context, as, score) {
-        // invalid score
-        if(score == null || !as.get_IsReady()) return;
-       
-        var midi = AlphaTab.Audio.Generator.MidiFileGenerator.GenerateMidiFile(score);
-        element.data('alphaSynthTickCache', midi.TickLookup);
-        
-        var ms = new AlphaTab.IO.ByteBuffer();
-        midi.WriteTo(ms);
-        var bytes = ms.ToArray();
-        as.LoadMidi(bytes);
-    }
     
-    function getAlphaSynth(element){
-        var as = element.data('alphaSynth');
-        if(!as) { 
-            throw new Error('Initialize player before calling player related APIs');
-        }
-        return as;
-    }
-    
-    // extend the api
     var api = $.fn.alphaTab.fn;
-   
-    
-    // hook into init 
-    api._oninit(function(element, context) {
-        var soundFont = element.data('player');
-        if(soundFont) {
-            var as = api.playerInit(element, context);             
-            if(element.data('cursor') != false) {
-                api.playerCursor(element, context);
-            }
-        }        
-    });
-    
-    //
-    // Plugin 01: Player 
-    
-    var playerOptionsDefaults = {
-        autoScroll: 'vertical',
-        scrollSpeed: 300,
-        scrollOffset: 0,
-        scrollElement: 'html,body',
-        scrollAdjustment: 0,
-        beatCursorWidth: 3,
-        handleClick: true
-    };
 
-    api.playerOptions = function(element, context, options) {
-        if(options) {
-            var defaults = $.extend({}, playerOptionsDefaults);
-            context.player.options = $.extend(defaults, options);
-        }
-        else {
-            return context.player.options;
-        }
-    };
+	api._playerDefaults = {
+		autoScroll: 'vertical',
+		scrollSpeed: 300,
+		scrollOffset: 0,
+		scrollElement: 'html,body',
+		scrollAdjustment: 0,
+		cursor: true,
+		beatCursorWidth: 3,
+		handleClick: true
+	};
 
-    api.playerInit = function(element, context, options) {
-        var as = element.data('alphaSynth');
-        if(!as) {
-            
-            var defaults = $.extend({}, playerOptionsDefaults);                  
-            context.player = {
-                options: $.extend(defaults, options),
-                elements: {},
-                previousBeat: null,
-                previousCache: null,
-                previousState: null
-            };
+	api._as = null;
+	api._midiTickLookup = null;
+	api._boundsLookup = null;
+	api._cursorWrapper = null;
+	api._selectionWrapper = null;
+	api._barCursor = null;
+	api._beatCursor = null;
+	api._surface = null;
+	api._selecting = false;
+	api._selectionStart = null;
+	api._selectionEnd = null;
+	api._animationComplete = true;
+	api._beatTickLookup = null;
+	api._beatBoundings = null;
+	api._nextBeatBoundings = null;
 
-            // initialize alphaSynth
-            as = AlphaSynth.Main.AlphaSynthApi.Create();
-            as.On('ready', function() {
-                var soundFont = element.data('player');
-                if(soundFont) {
-                    as.LoadSoundFont(soundFont);
-                }
-                loadMidi(element, context, as, api.score(element, context));
-            });
-            
-            // hook into events and forward them
-            as.On('readyForPlayback', function() {
-                context.player.options.playbackSpeed = as.get_PlaybackSpeed();
-                context.TriggerEvent('playerReady');
-            });
-            
-            as.On('soundFontLoad', function(data) {
-                context.TriggerEvent('soundFontLoad', data);
-            });
-            as.On('soundFontLoaded', function() {
-                context.TriggerEvent('soundFontLoaded');
-            });
-            as.On('soundFontLoadFailed', function() {
-                context.TriggerEvent('soundFontLoadFailed');
-            });
-            
-            as.On('midiLoad', function(data) {
-                context.TriggerEvent('midiLoad', data);
-            });
-            as.On('midiFileLoaded', function() {
-                context.TriggerEvent('midiFileLoaded');
-            });
-            as.On('midiFileLoadFailed', function() {
-                context.TriggerEvent('midiFileLoadFailed');
-            });
-            
-            as.On('playerStateChanged', function(data) {
-                context.TriggerEvent('playerStateChanged', data);
-            });
-            as.On('positionChanged', function(data) {
-                context.TriggerEvent('positionChanged', data);
-            });
-            as.On('finished', function(data) {
-                context.TriggerEvent('finished', data);
-            });
-                        
-            element.data('alphaSynth', as);            
-            
-            element.on('alphaTab.loaded', function(e, score) {
-                loadMidi(element, context, as, score);            
-            });
-        }    
-        return as;        
-    };
-    
-    api.player = function(element, context) {
-        return element.data('alphaSynth');
-    };
-    
-    //
-    // api calls which are forwarded to alphaSynth
-    
-    // properties
-    api.isReadyForPlayback = function(element, context) {
-        var as = getAlphaSynth(element);
-        return as.get_IsReadyForPlayback();        
-    };
-    
-    api.playerState = function(element, context) {
-        var as = getAlphaSynth(element);
-        return as.get_State();        
-    };
-    
-    api.masterVolume = function(element, context, value) {
-        var as = getAlphaSynth(element);
-        if(typeof value === 'undefined') {
-            return as.get_MasterVolume();
-        }
-        else {
-            as.set_MasterVolume(value);
-        }
-    };   
-    
-    api.playbackSpeed = function(element, context, value) {
-        var as = getAlphaSynth(element);
-        if(typeof value === 'undefined') {
-            return as.get_PlaybackSpeed();
-        }
-        else {
-            as.set_PlaybackSpeed(value);
-            context.player.options.playbackSpeed = as.get_PlaybackSpeed();
-        }
-    };
-    
-    api.metronomeVolume = function(element, context, value) {
-        var as = getAlphaSynth(element);
-        if(typeof value === 'undefined') {
-            return as.get_MetronomeVolume(value);
-        }
-        else {
-            as.set_MetronomeVolume(value);
-        }
-    };
-    
-    api.tickPosition = function(element, context, value) {
-        var as = getAlphaSynth(element);
-        if(typeof value === 'undefined') {
-            return as.get_TickPosition();
-        }
-        else {
-            as.set_TickPosition(value);
-        }
-    };
-    
-    api.playbackRange = function(element, context, value) {
-        var as = getAlphaSynth(element);
-        if(typeof value === 'undefined') {
-            return as.get_PlaybackRange();
-        }
-        else {
-            as.set_PlaybackRange(value);
-        }
-    };
-    
-    api.loop = function(element, context, value) {
-        var as = getAlphaSynth(element);
-        if(typeof value === 'undefined') {
-            return as.get_IsLooping();
-        }
-        else {
-            as.set_IsLooping(value);
-        }
-    };
-    
-    // methods
-    api.play = function(element, context) {
-        var as = getAlphaSynth(element);
-        as.Play();
-    };
-    api.pause = function(element, context) {
-        var as = getAlphaSynth(element);
-        as.Pause();
-    };
-    api.playPause = function(element, context) {
-        var as = getAlphaSynth(element);
-        as.PlayPause();
-    };
-    api.stop = function(element, context) {
-        var as = getAlphaSynth(element);
-        as.Stop();
-        api.playerCursorUpdateTick(element, context, 0, true);
-    };
-    api.loadSoundFont = function(element, context, value) {
-        var as = getAlphaSynth(element);
-        as.LoadSoundFont(value);
-    };
-    api.loadMidi = function(element, context, value) {
-        var as = getAlphaSynth(element);
-        as.LoadMidi(value);
-    };    
-    api.muteTrack = function(element, context, tracks, mute) {
-        var as = getAlphaSynth(element);
-        tracks = context.TrackIndexesToTracks(context.ParseTracks(tracks));
-        for(var t = 0; t < tracks.length; t++) {
-            as.SetChannelMute(tracks[t].PlaybackInfo.PrimaryChannel, mute);
-            as.SetChannelMute(tracks[t].PlaybackInfo.SecondaryChannel, mute);
-        }        
-    };
-    api.soloTrack = function(element, context, tracks, solo) {
-        var as = getAlphaSynth(element);
-        tracks = context.TrackIndexesToTracks(context.ParseTracks(tracks));
-        for(var t = 0; t < tracks.length; t++) {
-            as.SetChannelSolo(tracks[t].PlaybackInfo.PrimaryChannel, solo);
-            as.SetChannelSolo(tracks[t].PlaybackInfo.SecondaryChannel, solo);
-        }        
-    };
-    api.trackVolume = function(element, context, tracks, volume) {
-        var as = getAlphaSynth(element);
-        tracks = context.TrackIndexesToTracks(context.ParseTracks(tracks));
+	api._preHook = function () {
+		var self = this;
+
+		self._options = $.extend({}, self._playerDefaults, self._options);
+
+		// handle data attributes
+		if (self._element.data('player')) {
+			self._options.soundFont = self._element.data('player');
+		}
+		if (self._element.data('player-offset')) {
+			self._options.scrollOffset = self._element.data('player-offset');
+		}
+		if (!self._options.soundFont) {
+			return;
+		}
+
+		self._as = AlphaSynth.Main.AlphaSynthApi.Create();
         
-        volume /= 16;
-        
-        for(var t = 0; t < tracks.length; t++) {
-            as.SetChannelVolume(tracks[t].PlaybackInfo.PrimaryChannel, volume);
-            as.SetChannelVolume(tracks[t].PlaybackInfo.SecondaryChannel, volume);
-        }        
-    };
-    
-    //
-    // Plugin 02: Cursors
-    
-    var selectionEnd = null;
-    var selecting = false;
-    
-    api.getTickCache = function(element) {
-        return element.data('alphaSynthTickCache');
-    }
-    api.getCursorCache = function(element) {
-        return element.data('alphaSynthCursorCache');
-    }
-    
-    api.autoScroll = function(element, context, value) {
-        if(typeof value === 'undefined') {
-            return context.player.options.autoScroll;
-        }
-        else {
-            context.player.options.autoScroll = value;
-            api.playerCursorUpdateBeat(element, context, context.player.options.currentBeat);
-        }
-    },
-    
-    // updates the cursors to highlight the beat at the specified tick position
-    api.playerCursorUpdateTick = function(element, context, tick, stop) {
-        requestAnimationFrame(function() {
-            var cache = api.getTickCache(element);
-            if(cache) {
-                var tracks = api.tracks(element, context);
-                if(tracks.length > 0) {
-                    var beat = cache.FindBeat(tracks, tick);
-                    if(beat) {
-                        api.playerCursorUpdateBeat(element, context, beat.CurrentBeat, beat.NextBeat, beat.Duration, stop);    
-                    }                
-                }
-            }
+		self._as.On('ready', function () {
+			self._as.LoadSoundFont(self._options.soundFont);
+		});
+
+		self._as.On('readyForPlayback', function () {
+            self._at.TriggerEvent('playerReady');
         });
+            
+        self._as.On('soundFontLoad', function (data) {
+			self._at.TriggerEvent('soundFontLoad', data);
+        });
+
+        self._as.On('soundFontLoaded', function () {
+            self._at.TriggerEvent('soundFontLoaded');
+        });
+
+        self._as.On('soundFontLoadFailed', function () {
+            self._at.TriggerEvent('soundFontLoadFailed');
+        });
+            
+        self._as.On('midiLoad', function (data) {
+            self._at.TriggerEvent('midiLoad', data);
+        });
+
+        self._as.On('midiFileLoaded', function () {
+            self._at.TriggerEvent('midiFileLoaded');
+        });
+
+        self._as.On('midiFileLoadFailed', function () {
+            self._at.TriggerEvent('midiFileLoadFailed');
+        });
+            
+        self._as.On('playerStateChanged', function (data) {
+            self._at.TriggerEvent('playerStateChanged', data);
+        });
+
+        self._as.On('positionChanged', function (data) {
+            self._at.TriggerEvent('positionChanged', data);
+        });
+
+        self._as.On('finished', function (data) {
+            self._at.TriggerEvent('finished', data);
+        });
+
+		self._element.on('alphaTab.loaded', function (e, score) {
+			var midi = AlphaTab.Audio.Generator.MidiFileGenerator.GenerateMidiFile(score);
+			self._midiTickLookup = midi.TickLookup;
+			var ms = new AlphaTab.IO.ByteBuffer();
+			midi.WriteTo(ms);
+			self._as.LoadMidi(ms.ToArray());
+		});
+
+		if (self._options.cursor) {
+			self._element.on('alphaTab.postRendered', function () {
+				self._boundsLookup = self._at.Renderer.BoundsLookup;
+				self._beatTickLookup = null; // to force updating cursor position
+				self._as.set_TickPosition(self._as.get_TickPosition()); // resync...
+				if (self._as.get_State() === AlphaSynth.PlayerState.Paused) {
+					self._playerCursorUpdateTick();
+				}
+			});
+		}
+	};
+
+	api._postHook = function () {
+		if (this._options.soundFont && this._options.cursor) {
+			this._playerCursor();
+		}
+	};
+
+	api._playerCursor = function () {
+		var self = this;
+
+		self._cursorWrapper = $('<div class="cursors"></div>');
+		self._selectionWrapper = $('<div class="selectionWrapper"></div>');
+		self._barCursor = $('<div class="barCursor"></div>');
+		self._beatCursor = $('<div class="beatCursor"></div>');
+		self._surface = $('.alphaTabSurface', self._element);
+
+		// required css styles 
+		self._element.css({ position: 'relative', textAlign: 'left' });
+		self._cursorWrapper.css({ position: 'absolute', zIndex: 1000, display: 'inline', pointerEvents: 'none' });
+		self._selectionWrapper.css({ position: 'absolute' });
+		self._barCursor.css({ position: 'absolute' });
+		self._beatCursor.css({ position: 'absolute' });
+
+		// add cursors to UI
+		self._element.prepend(self._cursorWrapper);
+		self._cursorWrapper.prepend(self._barCursor);
+		self._cursorWrapper.prepend(self._beatCursor);
+		self._cursorWrapper.prepend(self._selectionWrapper);
+
+		self._element.on('alphaTab.postRendered', function () {
+			self._cursorWrapper.css({ position: 'absolute', zIndex: 1000, width: self._surface.width(), height: self._surface.height() });
+		});
+
+		self._as.On('positionChanged', function () {
+			self._playerCursorUpdateTick();
+		});
+
+		self._as.On('playerStateChanged', function () {
+			if (self._beatBoundings !== null) {
+				self._animationComplete = false;
+				self._playerCursorUpdateBeat(self._beatBoundings, self._nextBeatBoundings);
+				self._animationComplete = true;
+			}
+		});
+		
+		if (self._options.handleClick) {
+			$(self._at.CanvasElement).on('mousedown', function (e) {
+				if (e.which !== 1) {
+					return;
+				}
+
+				e.preventDefault();
+
+				var parentOffset = $(this).offset();
+				var relX = e.pageX - parentOffset.left;
+				var relY = e.pageY - parentOffset.top;
+				var beat = self._boundsLookup.GetBeatAtPos(relX, relY);
+
+				if (beat) {
+					self._selectionStart = { beat: beat };
+					self._selectionEnd = null;
+					self._selecting = true;
+				}
+			});
+
+			$(self._at.CanvasElement).on('mousemove', function (e) {
+				if (self._selecting) {
+					var parentOffset = $(this).offset();
+					var relX = e.pageX - parentOffset.left;
+					var relY = e.pageY - parentOffset.top;
+					var beat = self._boundsLookup.GetBeatAtPos(relX, relY);
+
+					if (beat && (self._selectionEnd === null || self._selectionEnd.beat !== beat)) {
+						self._selectionEnd = { beat: beat };
+						self._playerCursorSelectRange();
+					}
+				}
+			});
+
+			$(self._at.CanvasElement).on('mouseup', function (e) {
+				e.preventDefault();
+
+				// for the selection ensure start < end
+				if (self._selectionEnd !== null) {
+					var startTick = self._selectionStart.beat.get_AbsoluteStart();
+					var endTick = self._selectionEnd.beat.get_AbsoluteStart();
+					if (endTick < startTick) {
+						var t = self._selectionStart;
+						self._selectionStart = self._selectionEnd;
+						self._selectionEnd = t;
+					}
+				}
+
+				if (self._selectionStart !== null) {
+					// get the start and stop ticks (which consider properly repeats)
+					var realMasterBarStart = self._midiTickLookup.GetMasterBarStart(self._selectionStart.beat.Voice.Bar.get_MasterBar());
+
+					// move to selection start
+					self._as.set_TickPosition(realMasterBarStart + self._selectionStart.beat.Start);
+
+					if (self._as.get_State() === AlphaSynth.PlayerState.Paused) {
+						self._playerCursorUpdateTick();
+					}
+
+					// set playback range 
+					if (self._selectionEnd !== null && self._selectionStart.beat !== self._selectionEnd.beat) {
+						var realMasterBarEnd = self._midiTickLookup.GetMasterBarStart(self._selectionEnd.beat.Voice.Bar.get_MasterBar());
+						self._as.set_PlaybackRange({
+							StartTick: realMasterBarStart + self._selectionStart.beat.Start,
+							EndTick: realMasterBarEnd + self._selectionEnd.beat.Start + self._selectionEnd.beat.CalculateDuration() - 50
+						});
+					} else {
+						self._selectionStart = null;
+						self._as.set_PlaybackRange(null);
+					}
+
+					self._playerCursorSelectRange();
+				}
+
+				self._selecting = false;
+			});
+
+			self._element.on('alphaTab.postRendered', function () {
+				if (self._selectionStart !== null) {
+					self._playerCursorSelectRange();
+				}
+			});
+		}
+	};
+
+	// updates the cursors to highlight the beat at the specified tick position
+	api._playerCursorUpdateTick = function () {
+		if (!this._animationComplete) {
+			return;
+		}
+		if (this._boundsLookup === null) {
+			return;
+		}
+		
+		var self = this;
+
+		requestAnimationFrame(function () {
+			self._animationComplete = false;
+
+			var tick = self._as.get_TickPosition();
+				
+			if (self._beatTickLookup === null
+				|| tick < self._beatTickLookup.CurrentBeat.Start
+				|| tick >= self._beatTickLookup.CurrentBeat.End) {
+
+				self._beatTickLookup = self._midiTickLookup.FindBeat(self._at.get_Tracks(), tick);
+
+				if (self._beatTickLookup !== null) {
+					self._beatBoundings = self._boundsLookup.FindBeat(self._beatTickLookup.CurrentBeat.Beat);
+					self._nextBeatBoundings = null;
+
+					if (self._beatBoundings !== null) {
+						if (self._beatTickLookup.NextBeat) {
+							self._nextBeatBoundings = self._boundsLookup.FindBeat(self._beatTickLookup.NextBeat.Beat);
+						}
+						self._playerCursorUpdateBeat(self._beatBoundings, self._nextBeatBoundings);
+					}
+				}
+			}
+
+			self._animationComplete = true;
+		});
+	};
+
+	// updates the cursors to highlight the specified beat
+	api._playerCursorUpdateBeat = function (beatBoundings, nextBeatBoundings) {
+		var self = this;
+
+		var barBoundings = beatBoundings.BarBounds.MasterBarBounds;
+
+		self._barCursor.css({
+			top: barBoundings.VisualBounds.Y,
+			left: barBoundings.VisualBounds.X,
+			width: barBoundings.VisualBounds.W,
+			height: barBoundings.VisualBounds.H
+		});
+
+		self._beatCursor.stop(true, false).css({
+			top: barBoundings.VisualBounds.Y,
+			left: beatBoundings.VisualBounds.X,
+			width: self._options.beatCursorWidth,
+			height: barBoundings.VisualBounds.H
+		});
+
+		// if playing, animate the cursor to the next beat
+		$('.atHighlight', self._element).removeClass('atHighlight');
+
+		$('.b' + self._beatTickLookup.CurrentBeat.Beat.Id, self._element).addClass('atHighlight');
+
+		var nextBeatX = null;
+
+		// get position of next beat on same stavegroup
+		if (nextBeatBoundings !== null && nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds == barBoundings.StaveGroupBounds) {
+			nextBeatX = nextBeatBoundings.VisualBounds.X;
+		} else {
+			nextBeatX = barBoundings.VisualBounds.X + barBoundings.VisualBounds.W;
+		}
+		
+		if (self._as.get_State() === AlphaSynth.PlayerState.Playing) {
+			self._beatCursor.animate({ left: nextBeatX }, self._beatTickLookup.Duration / self._as.get_PlaybackSpeed(), 'linear');
+		}
+
+		if (!self._selecting) {
+
+			// calculate position of whole music wheet within the scroll parent
+			var scrollElement = $(self._options.scrollElement);
+			var elementOffset = self._element.offset();
+
+			if (!scrollElement.is('html,body')) {
+				var scrollElementOffset = scrollElement.offset();
+				elementOffset = {
+					top: elementOffset.top + scrollElement.scrollTop() - scrollElementOffset.top,
+					left: elementOffset.left + scrollElement.scrollLeft() - scrollElementOffset.left,
+				};
+			}
+
+			switch (self._options.autoScroll) {
+				case 'vertical':
+					var scrollTop = elementOffset.top + barBoundings.RealBounds.Y;
+					if (self._options.scrollOffset.length) {
+						scrollTop += self._options.scrollOffset[1];
+					} else if (self._options.scrollOffset) {
+						scrollTop += self._options.scrollOffset;
+					}
+					if (scrollTop !== self._options.lastScroll) {
+						self._options.lastScroll = scrollTop;
+						scrollElement.scrollTop(scrollTop);
+					}
+					break;
+				case 'horizontal-bar':
+					if (barBoundings.VisualBounds.X !== self._options.lastScroll) {
+						var scrollLeft = barBoundings.RealBounds.X;
+						if (self._options.scrollOffset.length) {
+							scrollLeft += self._options.scrollOffset[0];
+						} else if (self._options.scrollOffset) {
+							scrollLeft += self._options.scrollOffset;
+						}
+						self._options.lastScroll = barBoundings.VisualBounds.X;
+						scrollElement.scrollLeft(scrollLeft);
+					}
+					break;
+				case 'horizontal-offscreen':
+					var elementRight = scrollElement.scrollLeft() + scrollElement.width();
+					if ((barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || barBoundings.VisualBounds.X < scrollElement.scrollLeft()) {
+						var scrollLeft = barBoundings.RealBounds.X;
+						if (self._options.scrollOffset.length) {
+							scrollLeft += self._options.scrollOffset[0];
+						} else if (self._options.scrollOffset) {
+							scrollLeft += self._options.scrollOffset;
+						}
+						self._options.lastScroll = barBoundings.VisualBounds.X;
+						scrollElement.scrollLeft(scrollLeft);
+					}
+					break;
+			}
+		}
+
+		// trigger an event for others to indicate which beat/bar is played
+		self._at.TriggerEvent('playedBeatChanged', self._beatTickLookup.CurrentBeat.Beat);
+	};
+
+	api._playerCursorSelectRange = function () {
+		var self = this;
+
+		self._selectionWrapper.empty();
+
+		if (self._selectionStart === null || self._selectionEnd === null || self._selectionStart.beat === self._selectionEnd.beat) {
+			return;
+		}
+
+		if (self._selectionStart.bounds === undefined) {
+			self._selectionStart.bounds = self._boundsLookup.FindBeat(self._selectionStart.beat);
+		}
+
+		if (self._selectionEnd.bounds === undefined) {
+			self._selectionEnd.bounds = self._boundsLookup.FindBeat(self._selectionEnd.beat);
+		}
+
+		var startTick = self._selectionStart.beat.get_AbsoluteStart();
+		var endTick = self._selectionEnd.beat.get_AbsoluteStart();
+
+		if (endTick < startTick) {
+			var t = self._selectionStart;
+			self._selectionStart = self._selectionEnd;
+			self._selectionEnd = t;
+		}
+
+		var startX = self._selectionStart.bounds.RealBounds.X;
+		var endX = self._selectionEnd.bounds.RealBounds.X + self._selectionEnd.bounds.RealBounds.W;
+
+		if (self._selectionEnd.beat.Index === (self._selectionEnd.beat.Voice.Beats.length - 1)) {
+			endX = self._selectionEnd.bounds.BarBounds.MasterBarBounds.RealBounds.X + self._selectionEnd.bounds.BarBounds.MasterBarBounds.RealBounds.W;
+		}
+
+		// if the selection goes across multiple staves, we need a special selection highlighting
+		if (self._selectionStart.bounds.BarBounds.MasterBarBounds.StaveGroupBounds !== self._selectionEnd.bounds.BarBounds.MasterBarBounds.StaveGroupBounds) {
+			// from the startbeat to the end of the staff, 
+			// then fill all staffs until the end-beat staff
+			// then from staff-start to the end beat (or to end of bar if it's the last beat)
+
+			var staffStartX = self._selectionStart.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.X;
+			var staffEndX = self._selectionStart.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.X + self._selectionStart.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.W;
+
+			var startSelection = $('<div></div>').css({
+				position: 'absolute',
+				top: self._selectionStart.bounds.BarBounds.MasterBarBounds.VisualBounds.Y + 'px',
+				left: startX + 'px',
+				width: (staffEndX - startX) + 'px',
+				height: self._selectionStart.bounds.BarBounds.MasterBarBounds.VisualBounds.H + 'px'
+			});
+
+			self._selectionWrapper.append(startSelection);
+
+			var staffStartIndex = self._selectionStart.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.Index + 1;
+			var staffEndIndex = self._selectionEnd.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.Index;
+
+			for (var staffIndex = staffStartIndex; staffIndex < staffEndIndex; staffIndex++) {
+				var staffBounds = self._boundsLookup.StaveGroups[staffIndex];
+
+				var middleSelection = $('<div></div>').css({
+					position: 'absolute',
+					top: staffBounds.VisualBounds.Y + 'px',
+					left: staffStartX + 'px',
+					width: (staffEndX - staffStartX) + 'px',
+					height: staffBounds.VisualBounds.H + 'px'
+				});
+
+				self._selectionWrapper.append(middleSelection);
+			}
+
+			var endSelection = $('<div></div>').css({
+				position: 'absolute',
+				top: self._selectionEnd.bounds.BarBounds.MasterBarBounds.VisualBounds.Y + 'px',
+				left: staffStartX + 'px',
+				width: (endX - staffStartX) + 'px',
+				height: self._selectionEnd.bounds.BarBounds.MasterBarBounds.VisualBounds.H + 'px'
+			});
+
+			self._selectionWrapper.append(endSelection);
+		} else {
+			// if the beats are on the same staff, we simply highlight from the startbeat to endbeat
+			var selection = $('<div></div>').css({
+				position: 'absolute',
+				top: self._selectionStart.bounds.BarBounds.MasterBarBounds.VisualBounds.Y + 'px',
+				left: startX + 'px',
+				width: (endX - startX) + 'px',
+				height: self._selectionStart.bounds.BarBounds.MasterBarBounds.VisualBounds.H + 'px'
+			});
+
+			self._selectionWrapper.append(selection);
+		}
+	};
+
+	api.autoScroll = function (value) {
+		if (value === undefined) {
+			return this._options.autoScroll;
+		} else {
+			this._options.autoScroll = value;
+			if (this._beatBoundings !== null) {
+				this._animationComplete = false;
+				this._playerCursorUpdateBeat(this._beatBoundings, this._nextBeatBoundings);
+				this._animationComplete = true;
+			}
+		}
+	};
+    
+    api.isReadyForPlayback = function () {
+        return this._as.get_IsReadyForPlayback();        
     };
     
-    api.playerCursorSelectRange = function(element, context, startBeat, endBeat) {        
-        var cache = api.getCursorCache(element);
-        if(!cache) {
-            return;
-        }
-        
-        var selectionWrapper = context.player.elements.selectionWrapper;
-        selectionWrapper.empty();
-        
-        if(startBeat == null || endBeat == null || startBeat.beat == endBeat.beat) {
-            return;
-        }
-        
-        if(!startBeat.bounds) {
-            startBeat.bounds = cache.FindBeat(startBeat.beat);
-        }
-        
-        if(!endBeat.bounds) {
-            endBeat.bounds = cache.FindBeat(endBeat.beat);
-        }
-                        
-        var startTick = startBeat.beat.get_AbsoluteStart();
-        var endTick = endBeat.beat.get_AbsoluteStart();
-        if(endTick < startTick) {
-            var t = startBeat;
-            startBeat = endBeat;
-            endBeat = t;
-        }
-
-        var startX = startBeat.bounds.RealBounds.X;
-        var endX = endBeat.bounds.RealBounds.X + endBeat.bounds.RealBounds.W;
-        if(endBeat.beat.Index == endBeat.beat.Voice.Beats.length - 1) {
-            endX = endBeat.bounds.BarBounds.MasterBarBounds.RealBounds.X + endBeat.bounds.BarBounds.MasterBarBounds.RealBounds.W;
-        }
-
-        // if the selection goes across multiple staves, we need a special selection highlighting
-        if(startBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds != endBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds) {
-            // from the startbeat to the end of the staff, 
-            // then fill all staffs until the end-beat staff
-            // then from staff-start to the end beat (or to end of bar if it's the last beat)
-
-            var staffStartX = startBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.X;
-            var staffEndX = startBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.X + startBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.W;
-            
-            var startSelection = $('<div></div>').css({
-                position: 'absolute',
-                top: startBeat.bounds.BarBounds.MasterBarBounds.VisualBounds.Y + 'px', 
-                left: startX + 'px',
-                width: (staffEndX - startX) + 'px',
-                height: startBeat.bounds.BarBounds.MasterBarBounds.VisualBounds.H + 'px'
-            });    
-            selectionWrapper.append(startSelection);
-            
-            var staffStartIndex = startBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.Index + 1;
-            var staffEndIndex = endBeat.bounds.BarBounds.MasterBarBounds.StaveGroupBounds.Index;
-            for(var staffIndex = staffStartIndex; staffIndex < staffEndIndex; staffIndex++) {
-                var staffBounds = cache.StaveGroups[staffIndex];
-                
-                var middleSelection = $('<div></div>').css({
-                    position: 'absolute',
-                    top: staffBounds.VisualBounds.Y + 'px', 
-                    left: staffStartX + 'px',
-                    width: (staffEndX - staffStartX) + 'px',
-                    height: staffBounds.VisualBounds.H + 'px'
-                });    
-                selectionWrapper.append(middleSelection);
-            }
-            
-            var endSelection = $('<div></div>').css({
-                position: 'absolute',
-                top: endBeat.bounds.BarBounds.MasterBarBounds.VisualBounds.Y + 'px', 
-                left: staffStartX + 'px',
-                width: (endX - staffStartX) + 'px',
-                height: endBeat.bounds.BarBounds.MasterBarBounds.VisualBounds.H + 'px'
-            });    
-            selectionWrapper.append(endSelection);
-        }
-        else {
-            // if the beats are on the same staff, we simply highlight from the startbeat to endbeat
-            var selection = $('<div></div>');
-            selection.css({
-                position: 'absolute',
-                top: startBeat.bounds.BarBounds.MasterBarBounds.VisualBounds.Y + 'px', 
-                left: startX + 'px',
-                width: (endX - startX) + 'px',
-                height: startBeat.bounds.BarBounds.MasterBarBounds.VisualBounds.H + 'px'
-            });    
-            selectionWrapper.append(selection);
+    api.playerState = function () {
+        return this._as.get_State();
+    };
+    
+    api.masterVolume = function (value) {
+        if (value === undefined) {
+            return this._as.get_MasterVolume();
+        } else {
+            this._as.set_MasterVolume(value);
         }
     };
     
-    // updates the cursors to highlight the specified beat
-    api.playerCursorUpdateBeat = function(element, context, beat, nextBeat, duration, stop) {
-        if(beat == null) return;
-        
-        var cache = api.getCursorCache(element);
-        if(!cache) {
-            return;
+    api.playbackSpeed = function (value) {
+        if (value === undefined) {
+            return this._as.get_PlaybackSpeed();
+        } else {
+            this._as.set_PlaybackSpeed(value);
         }
-
-        var previousBeat = context.player.currentBeat;
-        var previousCache = context.player.cursorCache;
-        var previousState = context.player.playerState;
-        context.player.currentBeat = beat;
-        context.player.cursorCache = cache;
-        context.player.playerState = context.playerState;
-        
-        if(beat == previousBeat && cache == previousCache && previousState == context.playerState) {
-            return;
-        }
-        
-        var cursorWrapper = context.player.elements.wrapper;
-        var barCursor = context.player.elements.barCursor;
-        var beatCursor = context.player.elements.beatCursor;
-        
-        var beatBoundings = cache.FindBeat(beat);
-        if(!beatBoundings) {
-            return;
-        }        
-               
-        var barBoundings = beatBoundings.BarBounds.MasterBarBounds;
-        barCursor.css({
-            top: barBoundings.VisualBounds.Y + 'px', 
-            left: barBoundings.VisualBounds.X + 'px',
-            width: barBoundings.VisualBounds.W + 'px',
-            height: barBoundings.VisualBounds.H + 'px'
-        });
-        beatCursor
-            .stop(true, false)    
-            .css({
-                top: barBoundings.VisualBounds.Y + 'px', 
-                left: (beatBoundings.VisualBounds.X) + 'px',
-                width: context.player.options.beatCursorWidth + 'px',
-                height: barBoundings.VisualBounds.H + 'px'
-            })
-        ;
-            
-        // if playing, animate the cursor to the next beat
-        $('.atHighlight', element).removeClass('atHighlight');
-        if(context.playerState == 1 || stop) {
-            duration /= context.player.options.playbackSpeed;
-            
-            if(!stop) {
-                $('.b' + beat.Id, element).addClass('atHighlight');            
-                var nextBeatX = barBoundings.VisualBounds.X + barBoundings.VisualBounds.W;
-                
-                // get position of next beat on same stavegroup
-                if(nextBeat) {
-                    var nextBeatBoundings = cache.FindBeat(nextBeat);
-                    if(nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds == barBoundings.StaveGroupBounds) {
-                        nextBeatX = nextBeatBoundings.VisualBounds.X;
-                    }
-                }            
-                beatCursor.animate({
-                    left: nextBeatX + 'px'
-                }, duration, 'linear');       
-            }            
-                
-            if(!selecting) {
-                                
-                // calculate position of whole music wheet within the scroll parent
-                var scrollElement = $(context.player.options.scrollElement);
-
-                var elementOffset = element.offset();
-                if(!scrollElement.is('html,body')) {
-                    var scrollElementOffset = scrollElement.offset();
-                    elementOffset = {
-                        top: elementOffset.top + scrollElement.scrollTop() - scrollElementOffset.top,
-                        left: elementOffset.left + scrollElement.scrollLeft() - scrollElementOffset.left,
-                    };
-                }
-                
-                
-                if(context.player.options.autoScroll == 'vertical') {
-                    var scrollTop = elementOffset.top + barBoundings.RealBounds.Y;
-
-                    if(context.player.options.scrollOffset.length) {
-                        scrollTop += context.player.options.scrollOffset[1];
-                    }
-                    else if(context.player.options.scrollOffset) {
-                        scrollTop += context.player.options.scrollOffset;                        
-                    }
-                    if(scrollTop != context.player.options.lastScroll) {
-                        context.player.options.lastScroll = scrollTop;
-                        scrollElement.animate({
-                            scrollTop:scrollTop + 'px'
-                        });
-                    }
-                }
-                else if(context.player.options.autoScroll == 'horizontal-bar') {
-                    if(barBoundings.VisualBounds.X != context.player.options.lastScroll) {
-                        var scrollLeft = barBoundings.RealBounds.X;
-                        if(context.player.options.scrollOffset.length) {
-                            scrollLeft += context.player.options.scrollOffset[0];
-                        }
-                        else if(context.player.options.scrollOffset) {
-                            scrollLeft += context.player.options.scrollOffset;                        
-                        }                        
-                        context.player.options.lastScroll = barBoundings.VisualBounds.X;
-                        scrollElement.animate({
-                            scrollLeft:scrollLeft + 'px'
-                        }, context.player.options.scrollSpeed);
-                    }
-                }
-                else if(context.player.options.autoScroll == 'horizontal-offscreen') {
-                    var elementRight = scrollElement.scrollLeft() + 
-                                       scrollElement.width();
-                    if( (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || barBoundings.VisualBounds.X < scrollElement.scrollLeft() ) {
-                        var scrollLeft = barBoundings.RealBounds.X;
-                        if(context.player.options.scrollOffset.length) {
-                            scrollLeft += context.player.options.scrollOffset[0];
-                        }
-                        else if(context.player.options.scrollOffset) {
-                            scrollLeft += context.player.options.scrollOffset;                        
-                        }                
-                        context.player.options.lastScroll = barBoundings.VisualBounds.X;
-                        scrollElement.animate({
-                            scrollLeft:scrollLeft + 'px'
-                        }, context.player.options.scrollSpeed);
-                    }
-                }
-            }            
-        }
-        
-        // trigger an event for others to indicate which beat/bar is played
-        context.TriggerEvent('playedBeatChanged', beat);
     };
     
-    api.cursorOptions = api.playerOptions
-    
-    api.playerCursor = function(element, context, options) {
-        var as = element.data('alphaSynth');
-        if(!as) { 
-            throw new Error('Initialize player with "playerInit" before you init the cursors');
+    api.metronomeVolume = function (value) {
+        if (value === undefined) {
+            return this._as.get_MetronomeVolume(value);
+        } else {
+            this._as.set_MetronomeVolume(value);
         }
-
-        // prevent double initialization
-        if(element.data('alphaSynthCursor')) { return; }
-        element.data('alphaSynthCursor', true);
-                
-        var scrollOffset = element.data("player-offset");
-        if(scrollOffset) {
-            context.player.options.scrollOffset = scrollOffset;
-        }
-        
-        //
-        // Create cursors
-        
-        var cursorWrapper = $('<div class="cursors"></div>');
-        var selectionWrapper = $('<div class="selectionWrapper"></div>');
-        var barCursor = $('<div class="barCursor"></div>');
-        var beatCursor = $('<div class="beatCursor"></div>');
-        var surface = $('.alphaTabSurface', element);
-                 
-        // required css styles 
-        element.css({position: 'relative'});
-        element.css({'text-align': 'left'});
-        cursorWrapper.css({position: 'absolute', "z-index": 1000, display: 'inline', 'pointer-events': 'none'});
-        selectionWrapper.css({position: 'absolute'});
-        barCursor.css({position: 'absolute'});
-        beatCursor.css({position: 'absolute'});
-
-        // store options and created elements for fast access
-        context.player.elements.wrapper = cursorWrapper;
-        context.player.elements.barCursor = barCursor;
-        context.player.elements.beatCursor = beatCursor;
-        context.player.elements.selectionWrapper = selectionWrapper;
-        
-        // add cursors to UI
-        element.prepend(cursorWrapper);
-        cursorWrapper.prepend(barCursor);
-        cursorWrapper.prepend(beatCursor);
-        cursorWrapper.prepend(selectionWrapper);
-        
-        //
-        // Hook into events
-        var previousTick = 0;
-        
-        // we need to update our position caches if we render a tablature
-        element.on('alphaTab.postRendered', function(e) {
-            var renderer = api.renderer(element, context);
-            element.data('alphaSynthCursorCache', renderer.BoundsLookup);
-            api.playerCursorUpdateTick(element, context, previousTick);
-            cursorWrapper.css({position: 'absolute', "z-index": 1000, 
-                width: surface.width(), height: surface.height()});
-        });
-               
-        // cursor updating
-        as.On('positionChanged', function(data) {
-            previousTick = data.currentTick;
-            setTimeout(function() {
-                api.playerCursorUpdateTick(element, context, data.currentTick);
-            }, 0); // enqueue cursor update for later to return ExternalInterface call in case of Flash
-        });
-        as.On('playerStateChanged', function(data) {
-            context.playerState = data.state;
-            setTimeout(function() {
-                api.playerCursorUpdateTick(element, context, previousTick);
-            }, 0); // enqueue cursor update for later to return ExternalInterface call in case of Flash
-        });
-        
-        //
-        // Click Handling
-        
-        if(context.player.options.handleClick) {
-            $(context.CanvasElement).on('mousedown', function(e) {
-                if(e.which != 1) {
-                    return;
-                }
-                e.preventDefault();
-                                
-                var parentOffset = $(this).offset();
-                var relX = e.pageX - parentOffset.left;
-                var relY = e.pageY - parentOffset.top;
-                var beat = api.getBeatAtPos(element, context, relX, relY);
-                if(beat) {
-                    context.selectionStart = {
-                        beat: beat
-                    };
-                    selectionEnd = null;
-                    selecting = true;
-                }
-            });
-            $(context.CanvasElement).on('mousemove', function(e) {
-                if(selecting) {
-                    var parentOffset = $(this).offset();
-                    var relX = e.pageX - parentOffset.left;
-                    var relY = e.pageY - parentOffset.top;
-                    var beat = api.getBeatAtPos(element, context, relX, relY);
-                    if(beat && (selectionEnd == null || selectionEnd.beat != beat)) {
-                        selectionEnd = {
-                            beat: beat
-                        };
-                        
-                        api.playerCursorSelectRange(element, context, context.selectionStart, selectionEnd);
-                    }
-                }
-            });
-            $(context.CanvasElement).on('mouseup', function(e) {
-                e.preventDefault();
-                                            
-                var selectionStart = context.selectionStart;
-                                            
-                // for the selection ensure start < end
-                if(selectionEnd) {
-                    var startTick = selectionStart.beat.get_AbsoluteStart();
-                    var endTick = selectionEnd.beat.get_AbsoluteStart();
-                    if(endTick < startTick) {
-                        var t = selectionStart;
-                        selectionStart = selectionEnd;
-                        selectionEnd = t;
-                    }
-                }
-                
-                if(selectionStart != null)
-                {
-                    // get the start and stop ticks (which consider properly repeats)
-                    var tickCache = api.getTickCache(element);
-                    var realMasterBarStart = tickCache.GetMasterBarStart(selectionStart.beat.Voice.Bar.get_MasterBar());
-                            
-                    // move to selection start
-                    api.playerCursorUpdateBeat(element, context, selectionStart.beat);
-                    as.set_TickPosition(realMasterBarStart + selectionStart.beat.Start);
-                    
-                    // set playback range 
-                    if(selectionEnd && selectionStart.beat != selectionEnd.beat) {
-                        var realMasterBarEnd = tickCache.GetMasterBarStart(selectionEnd.beat.Voice.Bar.get_MasterBar());
-                        as.set_PlaybackRange({
-                            StartTick: realMasterBarStart + selectionStart.beat.Start, 
-                            EndTick: realMasterBarEnd + selectionEnd.beat.Start + selectionEnd.beat.CalculateDuration() - 50
-                        });
-                    }
-                    else {
-                        selectionStart = null;
-                        as.set_PlaybackRange(null);
-                    }
-                    api.playerCursorSelectRange(element, context, selectionStart, selectionEnd);
-                }
-                selecting = false;
-            });
-            
-            element.on('alphaTab.postRendered', function(e) {
-                if(context.selectionStart) {
-                    api.playerCursorSelectRange(element, context, context.selectionStart, selectionEnd);
-                }
-            });
-            
-        }        
-    }
-
-    api.getBeatAtPos = function(element, context, x, y) {
-        var cache = api.getCursorCache(element);
-        return cache.GetBeatAtPos(x, y);
     };
-})(typeof jQuery !== 'undefined' ? jQuery : null);
+    
+    api.tickPosition = function (value) {
+        if (value === undefined) {
+            return this._as.get_TickPosition();
+        } else {
+            this._as.set_TickPosition(value);
+        }
+    };
+    
+    api.playbackRange = function (value) {
+        if (value === undefined) {
+            return this._as.get_PlaybackRange();
+        } else {
+            this._as.set_PlaybackRange(value);
+        }
+    };
+    
+    api.loop = function (value) {
+        if (value === undefined) {
+            return this._as.get_IsLooping();
+        } else {
+            this._as.set_IsLooping(value);
+        }
+    };
+    
+    api.play = function () {
+        this._as.Play();
+    };
+
+    api.pause = function () {
+        this._as.Pause();
+    };
+
+    api.playPause = function () {
+        this._as.PlayPause();
+    };
+
+    api.stop = function () {
+        this._as.Stop();
+    };
+
+    api.loadSoundFont = function (value) {
+        this._as.LoadSoundFont(value);
+    };
+
+    api.loadMidi = function (value) {
+        this._as.LoadMidi(value);
+    };
+
+    api.muteTrack = function (tracks, mute) {
+        tracks = this._at.TrackIndexesToTracks(this._at.ParseTracks(tracks));
+        for (var t = 0; t < tracks.length; t++) {
+            this._as.SetChannelMute(tracks[t].PlaybackInfo.PrimaryChannel, mute);
+            this._as.SetChannelMute(tracks[t].PlaybackInfo.SecondaryChannel, mute);
+        }
+    };
+
+    api.soloTrack = function (tracks, solo) {
+        tracks = this._at.TrackIndexesToTracks(this._at.ParseTracks(tracks));
+        for (var t = 0; t < tracks.length; t++) {
+            this._as.SetChannelSolo(tracks[t].PlaybackInfo.PrimaryChannel, solo);
+            this._as.SetChannelSolo(tracks[t].PlaybackInfo.SecondaryChannel, solo);
+        }
+    };
+
+    api.trackVolume = function (tracks, volume) {
+        tracks = this._at.TrackIndexesToTracks(this._at.ParseTracks(tracks));
+        for (var t = 0; t < tracks.length; t++) {
+            this._as.SetChannelVolume(tracks[t].PlaybackInfo.PrimaryChannel, volume);
+            this._as.SetChannelVolume(tracks[t].PlaybackInfo.SecondaryChannel, volume);
+        }
+    };
+
+	api.trackPan = function (tracks, pan) {
+		pan = pan * 2 - 1;
+        tracks = this._at.TrackIndexesToTracks(this._at.ParseTracks(tracks));
+        for (var t = 0; t < tracks.length; t++) {
+            this._as.SetChannelPan(tracks[t].PlaybackInfo.PrimaryChannel, pan);
+            this._as.SetChannelPan(tracks[t].PlaybackInfo.SecondaryChannel, pan);
+        }
+	};
+
+}(jQuery));

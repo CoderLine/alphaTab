@@ -337,9 +337,9 @@ namespace AlphaTab
             return url;
         }
 
-        private static string EnsureFullUrl(string relativeUrl)
+        private static string EnsureFullUrl(string url)
         {
-            if (!relativeUrl.StartsWith("http") && !relativeUrl.StartsWith("https"))
+            if (!url.StartsWith("http://") && !url.StartsWith("https://") && !url.StartsWith("file://"))
             {
                 var root = new StringBuilder();
                 root.Append(HtmlContext.window.location.protocol);
@@ -350,15 +350,15 @@ namespace AlphaTab
                     root.Append(":");
                     root.Append(HtmlContext.window.location.port);
                 }
-                root.Append(relativeUrl);
-                if (!relativeUrl.EndsWith("/"))
+                root.Append(url);
+                if (!url.EndsWith("/"))
                 {
                     root.Append("/");
                 }
                 return root.ToString();
             }
 
-            return relativeUrl;
+            return url;
         }
     }
 }

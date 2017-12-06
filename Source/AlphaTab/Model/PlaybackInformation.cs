@@ -24,8 +24,8 @@ namespace AlphaTab.Model
     /// </summary>
     public class PlaybackInformation
     {
-        public int Volume { get; set; }
-        public int Balance { get; set; }
+        public float Volume { get; set; }
+        public float Balance { get; set; }
 
         public int Port { get; set; }
         public int Program { get; set; }
@@ -37,8 +37,8 @@ namespace AlphaTab.Model
 
         public PlaybackInformation()
         {
-            Volume = 15;
-            Balance = 8;
+            Volume = 1.0f;
+            Balance = 0.5f;
             Port = 1;
         }
 

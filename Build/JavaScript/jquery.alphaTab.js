@@ -16,124 +16,104 @@
  * License along with this library.
  */
 (function ($) {
-    if(!$) { return }
 
-    var api = {
-        init: function(element, context, options) {
-            if (!context) {
-                context = new AlphaTab.Platform.JavaScript.JsApi(element[0], options);
-                element.data('alphaTab', context);
-                
-                for(var i = 0; i < api._initListeners.length; i++) {
-                    api._initListeners[i](element, context, options);
-                }
+	function Widget(element, options) {
+		this._element = element;
+		this._options = options;
+		this._preHook();
+		this._at = new AlphaTab.Platform.JavaScript.JsApi(element[0], options);
+		this._postHook();
+	}
+
+	Widget.prototype = {
+		_element: null,
+		_options: null,
+		_at: null,
+
+		_preHook: $.noop,
+		_postHook: $.noop,
+
+        destroy: function () {
+            this._element.removeData('alphaTab');
+            this._at.Destroy();
+        },
+        
+        tex: function (tex) {
+            this._at.Tex(tex);
+        },
+        
+        load: function (file) {
+            this._at.Load(file);
+        },
+
+        tracks: function (tracks) {
+            if (tracks === undefined) {
+				return this._at.get_Tracks();
+			} else {
+                this._at.SetTracks(tracks, true);
             }
         },
         
-        destroy: function(element, context, tex) {
-            element.removeData('alphaTab');
-            context.Destroy();
+        api: function () {
+            return this._at;
         },
         
-        tex: function(element, context, tex) {
-            context.Tex(tex);
-        },
-         
-        load: function(element, context, file) {
-            context.Load(file);
-        },
-       
-        tracks: function(element, context, tracks) {
-            if(tracks) {
-                context.SetTracks(tracks, true);
-            }
-            else {
-                return context.get_Tracks();
+        score: function (score) {
+            if (score === undefined) {
+				return this._at.Score;
+			} else {
+                this._at.ScoreLoaded(score);
             }
         },
         
-        api: function(element, context) {
-            return context;
+        renderer: function () {
+            return this._at.Renderer;
         },
         
-        score: function(element, context, score) {
-            if(score) {
-                context.ScoreLoaded(score);
+        layout: function (value) {
+            if (value === undefined) {
+                return this._at.Settings.Layout;
+            } else {
+                this._at.UpdateLayout(value);
             }
-            else {
-                return context.Score;
-            }
         },
         
-        renderer: function(element, context) {
-            return context.Renderer;
-        },
-        
-        layout: function(element, context, value) {
-            if(typeof value === 'undefined') {
-                return context.Settings.Layout;
-            } 
-            else {
-                context.UpdateLayout(value);
-            }            
-        },
-        
-        print: function(element, context, width) {
-            context.Print(width);
-        },
-               
-        _initListeners: [],
-        _oninit: function(handler) {
-            api._initListeners.push(handler);
-        },
-    };
-        
-    var apiExec = function(element, method, args) {
-        if(typeof(method) != "string") {
-            args = [method];
-            method = 'init';
-        }
-        
-        if(method.charAt(0) === '_') {
-            return;           
-        }
-        
-        var $element = $(element);
-        var context = $(element).data('alphaTab');
-        if (method == 'destroy' && !context) { 
-            return;
-        }
-        if (method != 'init' && !context) { 
-            throw new Error('alphaTab not initialized!'); 
-        }
-                
-        if (api[method]) {
-            var realArgs = [ $element, context ].concat(args);
-            return api[method].apply(this, realArgs);
-        }
-        else {
-            console.error('Method ' + method + ' does not exist on jQuery.alphaTab');
+        print: function (width) {
+            this._at.Print(width);
         }
     };
        
-    $.fn.alphaTab = function (method) {        
-        // if only a single element is affected, we use this
-        if(this.length == 1) {
-            return apiExec(this[0], method, Array.prototype.slice.call(arguments, 1));
-        }
-        // if multiple elements are affected we provide chaining
-        else {
-            return this.each(function() {
-                apiExec(this, method, Array.prototype.slice.call(arguments, 1));
-            });
-        }
+	$.fn.alphaTab = function () {
+		var element = $(this[0]);
+		var args = Array.prototype.slice.call(arguments);
+		var method = null;
+
+		if (typeof args[0] !== 'string') {
+			method = 'init';
+		} else {
+			method = args.shift();
+		}
+        
+		if (method === 'init') {
+			var options = args.shift();
+			if (options === undefined) {
+				options = {};
+			}
+			return element.data('alphaTab', new Widget(element, options));
+		} else {
+			var widget = element.data('alphaTab');
+			if (widget === undefined) {
+				if (method !== 'destroy') {
+					throw new Error('alphaTab not initialized!');
+				}
+			} else if (method.charAt(0) === '_' || widget[method] === undefined) {
+				throw new Error('Method ' + method + ' does not exist on jQuery.alphaTab');
+			} else {
+				return widget[method].apply(widget, args);
+			}
+		}
     };
-    $.alphaTab = {
-        restore: function(selector) {
-            $(selector).empty().removeData('alphaTab');
-        }
-    };
-    // allow plugins to add methods
-    $.fn.alphaTab.fn = api;
+
+    $.fn.alphaTab.fn = Widget.prototype;
     
-})(typeof jQuery !== 'undefined' ? jQuery : null);
+}(jQuery));

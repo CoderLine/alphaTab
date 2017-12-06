@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -226,14 +226,14 @@
         function updateControls() {
             var playerState = at.alphaTab('playerState');
             switch(playerState) {
-                case 0: // stopped/paused
-                $('#playPause').removeClass('glyphicon-pause').addClass('glyphicon-play');
-                break;
-                case 1: // playing
-                $('#playPause').removeClass('glyphicon-play').addClass('glyphicon-pause');
-                break;
+                case AlphaSynth.PlayerState.Paused:
+					$('#playPause').removeClass('glyphicon-pause').addClass('glyphicon-play');
+					break;
+                case AlphaSynth.PlayerState.Playing:
+					$('#playPause').removeClass('glyphicon-play').addClass('glyphicon-pause');
+					break;
             }
-        }     
+        }
         
         $('a[data-layout]').click(function(e) {
             $('a[data-layout]').closest('li').removeClass('active');
@@ -308,22 +308,22 @@
                     at.alphaTab('muteTrack', track, isMute);                    
                 });                
                 soloMute.append(solo).append(mute);
-                li.append(soloMute);
+				li.append(soloMute);
                 
                 // volume slider
                 var volume = $('<input type="text" />')
                     .on('slide', function(e) {
                         var track = $(this).closest('li').data('track');
                         at.alphaTab('trackVolume', track, e.value);
-                    });
+					});
                 li.append(volume);
-                volume.slider({
-                    min: 0,
-                    max: 16,
-                    step: 1,
-                    value: score.Tracks[i].PlaybackInfo.Volume,
-                    handle: 'square'
-                })
+				volume.slider({
+					min: 0,
+					max: 1,
+					step: 0.001,
+					value: score.Tracks[i].PlaybackInfo.Volume,
+					handle: 'square'
+				});
                 
                 trackList.append(li);
             }

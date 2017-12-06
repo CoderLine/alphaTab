@@ -60,7 +60,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
             }
         }
 
-        public int Volume
+        public float Volume
         {
             get { return _track.PlaybackInfo.Volume; }
             set

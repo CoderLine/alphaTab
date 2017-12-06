@@ -1441,8 +1441,11 @@ namespace AlphaTab.Importer
                         case "midi-program":
                             track.PlaybackInfo.Program = Std.ParseInt(c.InnerText);
                             break;
-                        case "midi-volume":
-                            track.PlaybackInfo.Volume = Std.ParseInt(c.InnerText);
+                        case "volume":
+                            track.PlaybackInfo.Volume = Std.ParseInt(c.InnerText) / 100f;
+                            break;
+                        case "pan":
+                            track.PlaybackInfo.Balance = (Std.ParseInt(c.InnerText) + 180) / 360f;
                             break;
                     }
                 }

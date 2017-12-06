@@ -27,7 +27,7 @@ namespace AlphaTab.Samples.WinForms
             {
                 _track = value;
                 TrackName = value.Name;
-                Volume = value.PlaybackInfo.Volume;
+                Volume = (int)Math.Round(value.PlaybackInfo.Volume * 100, 0);
                 IsSolo = value.PlaybackInfo.IsSolo;
                 IsMute = value.PlaybackInfo.IsMute;
             }
