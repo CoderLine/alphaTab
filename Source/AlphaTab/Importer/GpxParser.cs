@@ -389,6 +389,9 @@ namespace AlphaTab.Importer
                         case "Name":
                             track.Name = c.InnerText;
                             break;
+                        case "ShortName":
+                            track.ShortName = c.InnerText;
+                            break;
                         case "Color":
                             var parts = c.InnerText.Split(' ');
                             if (parts.Length >= 3)
@@ -406,14 +409,11 @@ namespace AlphaTab.Importer
                                 track.EnsureStaveCount(2);
                             }
                             break;
-                        case "ShortName":
-                            track.ShortName = c.InnerText;
+                        case "PartSounding":
+                            ParsePartSounding(track, c);
                             break;
-                        case "Lyrics":
-                            ParseLyrics(trackId, c);
-                            break;
-                        case "Properties":
-                            ParseTrackProperties(track, c);
+                        case "RSE":
+                            ParseRSE(track, c);
                             break;
                         case "GeneralMidi":
                             ParseGeneralMidi(track, c);
@@ -423,14 +423,77 @@ namespace AlphaTab.Importer
                             track.PlaybackInfo.IsSolo = state == "Solo";
                             track.PlaybackInfo.IsMute = state == "Mute";
                             break;
-                        case "PartSounding":
-                            ParsePartSounding(track, c);
+                        case "Lyrics":
+                            ParseLyrics(trackId, c);
+                            break;
+                        case "Properties":
+                            ParseTrackProperties(track, c);
                             break;
                     }
                 }
             }
 
             _tracksById[trackId] = track;
+        }
+
+        private void ParsePartSounding(Track track, XmlNode node)
+        {
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "TranspositionPitch":
+                            track.DisplayTranspositionPitch = Std.ParseInt(c.InnerText);
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void ParseRSE(Track track, XmlNode node)
+        {
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "ChannelStrip":
+                            ParseChannelStrip(track, c);
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void ParseChannelStrip(Track track, XmlNode node)
+        {
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Parameters":
+                            String[] parameters = c.InnerText.Split(' ');
+                            track.PlaybackInfo.Volume = (int)Math.Round(Std.ParseFloat(parameters[12]) * 16);
+                            track.PlaybackInfo.Balance = (int)Math.Round(Std.ParseFloat(parameters[11]) * 16);
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void ParseGeneralMidi(Track track, XmlNode node)
+        {
+            track.PlaybackInfo.Port = Std.ParseInt(node.FindChildElement("Port").InnerText);
+            track.PlaybackInfo.Program = Std.ParseInt(node.FindChildElement("Program").InnerText);
+            track.PlaybackInfo.PrimaryChannel = Std.ParseInt(node.FindChildElement("PrimaryChannel").InnerText);
+            track.PlaybackInfo.SecondaryChannel = Std.ParseInt(node.FindChildElement("SecondaryChannel").InnerText);
+
+            track.IsPercussion = node.GetAttribute("table") == "Percussion";
         }
 
         private void ParseLyrics(string trackId, XmlNode node)
@@ -470,6 +533,46 @@ namespace AlphaTab.Importer
                 }
             }
             return lyrics;
+        }
+
+        private void ParseTrackProperties(Track track, XmlNode node)
+        {
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Property":
+                            ParseTrackProperty(track, c);
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void ParseTrackProperty(Track track, XmlNode node)
+        {
+            var propertyName = node.GetAttribute("name");
+            switch (propertyName)
+            {
+                case "Tuning":
+                    var tuningParts = node.FindChildElement("Pitches").InnerText.Split(' ');
+                    var tuning = new int[tuningParts.Length];
+                    for (int i = 0; i < tuning.Length; i++)
+                    {
+                        tuning[tuning.Length - 1 - i] = Std.ParseInt(tuningParts[i]);
+                    }
+                    track.Tuning = tuning;
+                    break;
+                case "DiagramCollection":
+                case "ChordCollection":
+                    ParseDiagramCollection(track, node);
+                    break;
+                case "CapoFret":
+                    track.Capo = Std.ParseInt(node.FindChildElement("Fret").InnerText);
+                    break;
+            }
         }
 
         private void ParseDiagramCollection(Track track, XmlNode node)
@@ -565,74 +668,6 @@ namespace AlphaTab.Importer
                                 }
                             }
 
-                            break;
-                    }
-                }
-            }
-        }
-
-
-        private void ParseTrackProperties(Track track, XmlNode node)
-        {
-            foreach (var c in node.ChildNodes)
-            {
-                if (c.NodeType == XmlNodeType.Element)
-                {
-                    switch (c.LocalName)
-                    {
-                        case "Property":
-                            ParseTrackProperty(track, c);
-                            break;
-                    }
-                }
-            }
-        }
-
-        private void ParseTrackProperty(Track track, XmlNode node)
-        {
-            var propertyName = node.GetAttribute("name");
-            switch (propertyName)
-            {
-                case "Tuning":
-                    var tuningParts = node.FindChildElement("Pitches").InnerText.Split(' ');
-                    var tuning = new int[tuningParts.Length];
-                    for (int i = 0; i < tuning.Length; i++)
-                    {
-                        tuning[tuning.Length - 1 - i] = Std.ParseInt(tuningParts[i]);
-                    }
-                    track.Tuning = tuning;
-                    break;
-                case "DiagramCollection":
-                case "ChordCollection":
-                    ParseDiagramCollection(track, node);
-                    break;
-                case "CapoFret":
-                    track.Capo = Std.ParseInt(node.FindChildElement("Fret").InnerText);
-                    break;
-            }
-        }
-
-        private void ParseGeneralMidi(Track track, XmlNode node)
-        {
-            track.PlaybackInfo.Port = Std.ParseInt(node.FindChildElement("Port").InnerText);
-            track.PlaybackInfo.Program = Std.ParseInt(node.FindChildElement("Program").InnerText);
-            track.PlaybackInfo.PrimaryChannel = Std.ParseInt(node.FindChildElement("PrimaryChannel").InnerText);
-            track.PlaybackInfo.SecondaryChannel = Std.ParseInt(node.FindChildElement("SecondaryChannel").InnerText);
-
-            track.IsPercussion = node.GetAttribute("table") == "Percussion";
-        }
-
-
-        private void ParsePartSounding(Track track, XmlNode node)
-        {
-            foreach (var c in node.ChildNodes)
-            {
-                if (c.NodeType == XmlNodeType.Element)
-                {
-                    switch (c.LocalName)
-                    {
-                        case "TranspositionPitch":
-                            track.DisplayTranspositionPitch = Std.ParseInt(c.InnerText);
                             break;
                     }
                 }
