@@ -1,0 +1,112 @@
+<div class="description">
+    One of the highlight features of alphaTab is the audio playback via alphaSynth, a midi synthesizer. To enable the playback,
+    you need to specify a SoundFont2 file which is used for generating the audio. Then the playback can be controlled 
+    via a set of API methods. 
+</div>
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active"><a href="#scriptInit" role="tab" data-toggle="tab">Script Initialization</a></li>
+    <li><a href="#dataInit" role="tab" data-toggle="tab">Data Attribute Initialization</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active example" id="scriptInit">
+        <div class="html">
+            <button id="initPlayPause">Play</button><button id="initStop">Stop</button>
+            <div id="alphaTabScriptInit"></div>
+        </div>
+        <div class="css">
+            <style type="text/css">
+                /* Defines the color of the bar background when a bar is played */
+                .barCursor { 
+                    background: rgba(255, 242, 0, 0.25);
+                }
+
+                /* Defines the color of the selection background */
+                .selectionWrapper div { 
+                    background: rgba(64, 64, 255, 0.1)
+                }
+
+                 /* Defines the beat cursor */
+                .beatCursor {
+                    background: rgba(64, 64, 255, 0.75)
+                }
+                
+                /* Defines the color of the music symbols when they are being played (svg) */
+                .atHighlight * { 
+                    fill: #0078ff;
+                }            
+            </style>
+        </div>
+        <div class="js">
+            <script>
+                // initialize alphaTab
+                $('#alphaTabScriptInit').alphaTab({
+                  file: 'files/CanonShort.gpx'
+                });
+                
+                // listen for player ready and setup controls
+                $('#alphaTabScriptInit').on('alphaTab.playerReady', function() {
+                    $('#initPlayPause').on('click', function() {
+                        $('#alphaTabScriptInit').alphaTab('playPause');
+                    });
+                    $('#initStop').on('click', function() {
+                        $('#alphaTabScriptInit').alphaTab('stop');
+                    });
+                });
+                
+                // initialize alphaSynth and load soundfont
+                $('#alphaTabScriptInit').alphaTab('playerInit', {  // player itself
+                    scrollOffset: -70 // some additional offset for the menu bar on top 
+                });
+                $('#alphaTabScriptInit').alphaTab('playerCursor'); // cursors
+                $('#alphaTabScriptInit').alphaTab('loadSoundFont', 'lib/alphaSynth/default.sf2'); // load soundfont
+            </script>
+        </div>
+    </div>
+    <div class="tab-pane example" id="dataInit">
+        <div class="html">
+            <button id="dataPlayPause">Play</button><button id="dataStop">Stop</button>
+            <div id="alphaTabDataInit" data-file="files/CanonShort.gpx" data-player="lib/alphaSynth/default.sf2" data-player-offset="-70"></div>
+        </div>
+        <div class="css">
+            <style type="text/css">
+                /* Defines the color of the bar background when a bar is played */
+                .barCursor { 
+                    background: rgba(255, 242, 0, 0.25);
+                }
+
+                /* Defines the color of the selection background */
+                .selectionWrapper div { 
+                    background: rgba(64, 64, 255, 0.1)
+                }
+
+                 /* Defines the beat cursor */
+                .beatCursor {
+                    background: rgba(64, 64, 255, 0.75)
+                }
+                
+                /* Defines the color of the music symbols when they are being played (svg) */
+                .atHighlight * { 
+                    fill: #0078ff;
+                }            
+            </style>
+        </div>        
+        <div class="js">
+            <script>            
+                $('#alphaTabDataInit').alphaTab();
+                // listen for player ready and setup controls
+                $('#alphaTabDataInit').on('alphaTab.playerReady', function() {
+                    $('#dataPlayPause').on('click', function() {
+                        $('#alphaTabDataInit').alphaTab('playPause');
+                    });
+                    $('#dataStop').on('click', function() {
+                        $('#alphaTabDataInit').alphaTab('stop');
+                    });
+                });
+
+            </script>
+        </div>
+    </div>
+  </div>
+</div>

@@ -28,8 +28,9 @@ namespace AlphaTab.Rendering.Glyphs
     {
         public Glyph Glyph { get; set; }
         public int Line { get; set; }
+        public Note Note { get; set; }
 
-        public ScoreNoteGlyphInfo(Glyph glyph, int line)
+        public ScoreNoteGlyphInfo(Glyph glyph, int line, Note note)
         {
             Glyph = glyph;
             Line = line;
@@ -97,7 +98,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void AddNoteGlyph(Glyph noteGlyph, Note note, int noteLine)
         {
-            var info = new ScoreNoteGlyphInfo(noteGlyph, noteLine);
+            var info = new ScoreNoteGlyphInfo(noteGlyph, noteLine, note);
             _infos.Add(info);
             _noteLookup[note.String] = noteGlyph;
             if (MinNote == null || MinNote.Line > info.Line)

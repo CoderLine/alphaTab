@@ -141,7 +141,7 @@
             {
                 title: 'Player', 
                 children: [
-                    { title: 'Basic initialization', url: 'player/init.html', todo: true },
+                    { title: 'Basic initialization', url: 'player/init.html'},
                     { title: 'Mute/Solo individual tracks', url: 'player/mutesolo.html', todo: true },
                     { title: 'Change scroll direction', url: 'player/scrolldirection.html', todo: true },
                     { title: 'Change scroll element', url: 'player/scrollelement.html', todo: true },
@@ -217,6 +217,7 @@
             $(data).find('.example').each(function() {
                 var html = $(this).find('.html').html();
                 var js = $(this).find('.js').html();
+                var css = $(this).find('.css').html();
                 
                 var wrap = $('<div class="exampleSource"></div>');
                 var ul = $('<ul class="nav nav-tabs"></ul>').appendTo(wrap);
@@ -231,6 +232,13 @@
                 $('<div class="tab-pane"></div>')
                     .append($('<pre class="line-numbers"></pre>').append($('<code class="language-javascript"></code>').text(js)))
                     .appendTo(tabContent);
+                    
+                if(css) {
+                    $('<li><a href="#">CSS</a></li>').appendTo(ul);
+                    $('<div class="tab-pane"></div>')
+                        .append($('<pre class="line-numbers"></pre>').append($('<code class="language-css"></code>').text(css)))
+                        .appendTo(tabContent);
+                }
                     
                 $(this).prepend(wrap);
                 
