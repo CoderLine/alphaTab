@@ -92,7 +92,7 @@ namespace AlphaTab.Model
             dst.Capo = src.Capo;
             dst.Index = src.Index;
             dst.ShortName = src.ShortName;
-            dst.Tuning = Std.CloneArray(src.Tuning);
+            dst.Tuning = Platform.Platform.CloneArray(src.Tuning);
             dst.Color.Raw = src.Color.Raw;
             dst.Color.RGBA = src.Color.RGBA;
             dst.IsPercussion = src.IsPercussion;

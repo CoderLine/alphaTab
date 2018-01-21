@@ -16,18 +16,16 @@
  * License along with this library.
  */
 using System;
+using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
-using SharpKit.Html;
-using SharpKit.Html.fileapi;
-using SharpKit.Html.workers;
-using SharpKit.JavaScript;
+using Phase;
 
 namespace AlphaTab.Platform.JavaScript
 {
-    public class WorkerScoreRenderer : HtmlContext, IScoreRenderer
+    public class WorkerScoreRenderer : IScoreRenderer
     {
         private readonly JsApi _api;
         private readonly Worker _worker;
@@ -47,8 +45,8 @@ namespace AlphaTab.Platform.JavaScript
                 try
                 {
                     var script = "importScripts('" + settings.ScriptFile + "')";
-                    var blob = new Blob(new[] { script });
-                    _worker = new Worker(window.URL.createObjectURL(blob));
+                    var blob = new Blob(new [] { script });
+                    _worker = new Worker(URL.CreateObjectURL(blob));
                 }
                 catch (Exception e)
                 {
@@ -56,51 +54,51 @@ namespace AlphaTab.Platform.JavaScript
                     // TODO: fallback to synchronous mode
                 }
             }
-            _worker.postMessage(new { cmd = "alphaTab.initialize", settings = settings.ToJson() });
-            _worker.addEventListener("message", HandleWorkerMessage, false);
+            _worker.PostMessage(new { cmd = "alphaTab.initialize", settings = settings.ToJson() });
+            _worker.AddEventListener("message", (Action<Event>)(HandleWorkerMessage));
         }
 
         public void Destroy()
         {
-            _worker.terminate();
+            _worker.Terminate();
         }
 
         public void UpdateSettings(Settings settings)
         {
-            _worker.postMessage(new { cmd = "alphaTab.updateSettings", settings = settings.ToJson() });
+            _worker.PostMessage(new { cmd = "alphaTab.updateSettings", settings = settings.ToJson() });
         }
 
         public void Invalidate()
         {
-            _worker.postMessage(new { cmd = "alphaTab.invalidate" });
+            _worker.PostMessage(new { cmd = "alphaTab.invalidate" });
         }
 
         public void Resize(int width)
         {
-            _worker.postMessage(new { cmd = "alphaTab.resize", width = width });
+            _worker.PostMessage(new { cmd = "alphaTab.resize", width = width });
         }
 
-        private void HandleWorkerMessage(DOMEvent e)
+        private void HandleWorkerMessage(Event e)
         {
-            var data = e.As<MessageEvent>().data;
-            var cmd = data.Member("cmd").As<string>();
+            var data = ((MessageEvent)e).Data;
+            string cmd = data.cmd;
             switch (cmd)
             {
                 case "alphaTab.preRender":
-                    OnPreRender(data.Member("result").As<RenderFinishedEventArgs>());
+                    OnPreRender(data.result);
                     break;
                 case "alphaTab.partialRenderFinished":
-                    OnPartialRenderFinished(data.Member("result").As<RenderFinishedEventArgs>());
+                    OnPartialRenderFinished(data.result);
                     break;
                 case "alphaTab.renderFinished":
-                    OnRenderFinished(data.Member("result").As<RenderFinishedEventArgs>());
+                    OnRenderFinished(data.result);
                     break;
                 case "alphaTab.postRenderFinished":
-                    BoundsLookup = BoundsLookup.FromJson(data.Member("boundsLookup"), _api.Score);
+                    BoundsLookup = BoundsLookup.FromJson(data.boundsLookup, _api.Score);
                     OnPostRenderFinished();
                     break;
                 case "alphaTab.error":
-                    OnError(data.Member("type").As<string>(), data.Member("detail").As<Exception>());
+                    OnError(data.type, data.detail);
                     break;
             }
         }
@@ -109,7 +107,7 @@ namespace AlphaTab.Platform.JavaScript
         {
             var converter = new JsonConverter();
             score = converter.ScoreToJsObject(score);
-            _worker.postMessage(new { cmd = "alphaTab.render", score = score, trackIndexes = trackIndexes });
+            _worker.PostMessage(new { cmd = "alphaTab.render", score = score, trackIndexes = trackIndexes });
         }
 
         public event Action<RenderFinishedEventArgs> PreRender;

@@ -144,7 +144,7 @@ namespace AlphaTab.Importer
             var resultOffset = skipHeader ? 4 : 0;
             var resultSize = uncompressed.Length - resultOffset;
             var result = new byte[(int)resultSize];
-            Std.BlockCopy(buffer, resultOffset, result, 0, (int)resultSize);
+            Platform.Platform.BlockCopy(buffer, resultOffset, result, 0, (int)resultSize);
             return result;
         }
 
@@ -244,7 +244,7 @@ namespace AlphaTab.Importer
                         file.Data = new byte[(int)Math.Min(file.FileSize, fileData.Length)];
                         // we can use the getBuffer here because we are intelligent and know not to read the empty data.
                         byte[] raw = fileData.ToArray();
-                        Std.BlockCopy(raw, 0, file.Data, 0, file.Data.Length);
+                        Platform.Platform.BlockCopy(raw, 0, file.Data, 0, file.Data.Length);
                     }
                 }
 

@@ -34,7 +34,7 @@ namespace AlphaTab.Util
         private static void Log(LogLevel logLevel, string category, string msg, object details = null)
         {
             if (logLevel < LogLevel) return;
-            Std.Log(logLevel, category, msg, details);
+            Platform.Platform.Log(logLevel, category, msg, details);
         }
     }
 

@@ -85,7 +85,7 @@ namespace AlphaTab.Exporter
 
         private void StringMetaData(string key, string value)
         {
-            if (!value.IsNullOrWhiteSpace())
+            if (!string.IsNullOrWhiteSpace(value))
             {
                 _builder.Append("\\");
                 _builder.Append(key);

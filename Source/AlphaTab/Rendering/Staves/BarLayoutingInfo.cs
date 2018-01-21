@@ -236,7 +236,7 @@ namespace AlphaTab.Rendering.Staves
             {
                 minDuration = duration;
             }
-            var phi = 1 + 0.6f * Std.Log2(duration / (float)MinDuration);
+            var phi = 1 + 0.6f * Platform.Platform.Log2(duration / (float)MinDuration);
             return (minDuration / duration) * 1 / (phi * MinDurationWidth);
         }
 

@@ -15,37 +15,43 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using SharpKit.JavaScript;
+using Phase;
+using Phase.Attributes;
 
 namespace AlphaTab.Collections
 {
-    [JsType(Mode = JsMode.Prototype, Name = "String", Export = false)]
+    [Abstract("String")]
+    [NativeConstructors]
     public class StringBuilder
     {
-        [JsMethod(Code = "''")]
+        [Inline]
         public StringBuilder()
         {
+            Script.Write("this = \"\";");
         }
 
-        [JsMethod(InlineCodeExpression = "this += s", Export = false)]
+        [Inline]
         public void Append(object s)
         {
+            Script.Write("this += Std.string(s);");
         }
 
-        [JsMethod(InlineCodeExpression = "this += String.fromCharCode(i)", Export = false)]
+        [Inline]
         public void AppendChar(int i)
         {
+            Script.Write("this += String.fromCharCode(i.ToHaxeInt());");
         }
 
-        [JsMethod(InlineCodeExpression = "this += s + '\\r\\n'", Export = false)]
+        [Inline]
         public void AppendLine(string s = "")
         {
+            Script.Write("this += s + \"\\r\\n\";");
         }
 
-        [JsMethod(InlineCodeExpression = "this", Export = false)]
-        public new string ToString()
+        [Inline]
+        public override string ToString()
         {
-            return "";
+            return Script.Write<string>("this");
         }
     }
 }

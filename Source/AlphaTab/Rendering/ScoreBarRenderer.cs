@@ -889,9 +889,9 @@ namespace AlphaTab.Rendering
 
             var res = Resources;
 
-            //var c = new Color((byte)Std.Random(255),
-            //                  (byte)Std.Random(255),
-            //                  (byte)Std.Random(255),
+            //var c = new Color((byte)Platform.Random(255),
+            //                  (byte)Platform.Random(255),
+            //                  (byte)Platform.Random(255),
             //                  100);
             //canvas.Color = c;
             //canvas.FillRect(cx + X, cy + Y, Width, Height);

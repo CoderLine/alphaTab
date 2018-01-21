@@ -18,9 +18,9 @@
 using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
-using SharpKit.Html;
-using SharpKit.JavaScript;
-using Console = System.Console;
+using Haxe.Js.Html;
+using Phase;
+using Phase.Attributes;
 
 namespace AlphaTab.Importer
 {
@@ -39,17 +39,18 @@ namespace AlphaTab.Importer
         public static void LoadScoreAsync(string path, Action<Score> success, Action<Exception> error)
         {
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", path);
-            xhr.responseType = "arraybuffer";
-            xhr.onreadystatechange = e =>
+            xhr.Open("GET", path);
+            xhr.ResponseType = XMLHttpRequestResponseType.ARRAYBUFFER;
+            xhr.OnReadyStateChange = (Action)(() =>
             {
-                if (xhr.readyState == 4)
+                if (xhr.ReadyState == XMLHttpRequest.DONE)
                 {
-                    if (xhr.status == 200)
+                    if (xhr.Status == 200)
                     {
                         try
                         {
-                            var reader = new Uint8Array(xhr.response.As<ArrayBuffer>());
+                            ArrayBuffer buffer = xhr.Response;
+                            var reader = new Uint8Array(buffer);
                             var score = LoadScoreFromBytes(reader.As<byte[]>());
                             success(score);
                         }
@@ -59,40 +60,40 @@ namespace AlphaTab.Importer
                         }
                     }
                     // Error handling
-                    else if (xhr.status == 0)
+                    else if (xhr.Status == 0)
                     {
                         error(new FileLoadException("You are offline!!\n Please Check Your Network.", xhr));
                     }
-                    else if (xhr.status == 404)
+                    else if (xhr.Status == 404)
                     {
                         error(new FileLoadException("Requested URL not found.", xhr));
                     }
-                    else if (xhr.status == 500)
+                    else if (xhr.Status == 500)
                     {
                         error(new FileLoadException("Internel Server Error.", xhr));
                     }
-                    else if (xhr.statusText == "parsererror")
+                    else if (xhr.StatusText == "parsererror")
                     {
                         error(new FileLoadException("Error.\nParsing JSON Request failed.", xhr));
                     }
-                    else if (xhr.statusText == "timeout")
+                    else if (xhr.StatusText == "timeout")
                     {
                         error(new FileLoadException("Request Time out.", xhr));
                     }
                     else
                     {
-                        error(new FileLoadException("Unknow Error: " + xhr.responseText, xhr));
+                        error(new FileLoadException("Unknow Error: " + xhr.ResponseText, xhr));
                     }
                 }
-            };
+            });
 
-            xhr.open("GET", path, true);
-            xhr.responseType = "arraybuffer";
+            xhr.Open("GET", path, true);
+            xhr.ResponseType = XMLHttpRequestResponseType.ARRAYBUFFER;
             // IE fallback
-            if (xhr.responseType != "arraybuffer")
+            if (xhr.ResponseType != XMLHttpRequestResponseType.ARRAYBUFFER)
             {
                 // use VB Loader to load binary array
-                dynamic vbArr = VbAjaxLoader("GET", path);
+                dynamic vbArr = Script.Write<dynamic>("VbAjaxLoader(\"GET\", path)");
                 var fileContents = vbArr.toArray();
 
                 // decode byte array to string
@@ -105,11 +106,10 @@ namespace AlphaTab.Importer
                 }
 
                 var reader = GetBytesFromString(data.ToString());
-                var score = LoadScoreFromBytes(reader.As<byte[]>());
+                var score = LoadScoreFromBytes(reader);
                 success(score);
-                return;
             }
-            xhr.send();
+            xhr.Send();
         }
 
         private static byte[] GetBytesFromString(string s)
@@ -120,12 +120,6 @@ namespace AlphaTab.Importer
                 b[i] = (byte)s[i];
             }
             return b;
-        }
-
-        [JsMethod(InlineCodeExpression = "VbAjaxLoader(method, path)", Export = false)]
-        private static dynamic VbAjaxLoader(string method, string path)
-        {
-            return null;
         }
     }
 }

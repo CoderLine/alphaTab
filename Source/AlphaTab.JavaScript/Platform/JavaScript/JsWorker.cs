@@ -1,64 +1,62 @@
 using System;
-using AlphaTab.Collections;
-using AlphaTab.Importer;
-using AlphaTab.IO;
+using AlphaTab.Haxe;
+using AlphaTab.Haxe.Js;
+using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Util;
-using SharpKit.Html;
-using SharpKit.JavaScript;
-using WorkerContext = SharpKit.Html.workers.WorkerContext;
+using Phase;
 
 namespace AlphaTab.Platform.JavaScript
 {
     public class JsWorker
     {
         private ScoreRenderer _renderer;
-        private WorkerContext _main;
+        private readonly DedicatedWorkerGlobalScope _main;
 
-        public JsWorker(SharpKit.Html.workers.WorkerContext main)
+        public JsWorker(DedicatedWorkerGlobalScope main)
         {
             _main = main;
-            _main.addEventListener("message", HandleMessage, false);
+            _main.AddEventListener("message", (Action<Event>)HandleMessage, false);
         }
 
-        static JsWorker()
+        public static void Init()
         {
-            if (!HtmlContext.self.document.As<bool>())
+            if (!Lib.Global.document)
             {
-                new JsWorker(HtmlContext.self.As<WorkerContext>());
+                new JsWorker(Lib.Global);
             }
         }
 
 
-        private void HandleMessage(DOMEvent e)
+        private void HandleMessage(Event e)
         {
-            var data = e.As<MessageEvent>().data;
-            var cmd = data.As<bool>() ? data.Member("cmd").As<string>() : "";
+            var data = ((MessageEvent)e).Data;
+            var cmd = data ? data.cmd : "";
             switch (cmd)
             {
                 case "alphaTab.initialize":
-                    var settings = Settings.FromJson(data.Member("settings"), null);
+                    var settings = Settings.FromJson(data.settings, null);
                     _renderer = new ScoreRenderer(settings);
-                    _renderer.PartialRenderFinished += result => PostMessage(new { cmd = "alphaTab.partialRenderFinished", result = result });
-                    _renderer.RenderFinished += result => PostMessage(new { cmd = "alphaTab.renderFinished", result = result });
-                    _renderer.PostRenderFinished += () => PostMessage(new { cmd = "alphaTab.postRenderFinished", boundsLookup = _renderer.BoundsLookup.ToJson() });
-                    _renderer.PreRender += result => PostMessage(new { cmd = "alphaTab.preRender", result = result });
+                    _renderer.PartialRenderFinished += result => _main.PostMessage(new { cmd = "alphaTab.partialRenderFinished", result = result });
+                    _renderer.RenderFinished += result => _main.PostMessage(new { cmd = "alphaTab.renderFinished", result = result });
+                    _renderer.PostRenderFinished += () => _main.PostMessage(new { cmd = "alphaTab.postRenderFinished", boundsLookup = _renderer.BoundsLookup.ToJson() });
+                    _renderer.PreRender += result => _main.PostMessage(new { cmd = "alphaTab.preRender", result = result });
                     _renderer.Error += Error;
                     break;
                 case "alphaTab.invalidate":
                     _renderer.Invalidate();
                     break;
                 case "alphaTab.resize":
-                    _renderer.Resize(data.Member("width").As<int>());
+                    _renderer.Resize(data.width);
                     break;
                 case "alphaTab.render":
                     var converter = new JsonConverter();
-                    var score = converter.JsObjectToScore(data.Member("score").As<Score>());
-                    RenderMultiple(score, data.Member("trackIndexes").As<int[]>());
+                    var score = converter.JsObjectToScore(data.score);
+                    RenderMultiple(score, data.trackIndexes);
                     break;
                 case "alphaTab.updateSettings":
-                    UpdateSettings(data.Member("settings"));
+                    UpdateSettings(data.settings);
                     break;
             }
         }
@@ -84,25 +82,23 @@ namespace AlphaTab.Platform.JavaScript
         {
             Logger.Error(type, "An unexpected error occurred in worker", e);
 
-            dynamic error = JSON.parse(JSON.stringify(e));
-            if (e.Member("message").As<bool>())
-            {
-                error.message = e.Member("message");
-            }
-            if (e.Member("stack").As<bool>())
-            {
-                error.stack = e.Member("stack");
-            }
-            if (e.Member("constructor").As<bool>() && e.Member("constructor").Member("name").As<bool>())
-            {
-                error.type = e.Member("constructor").Member("name");
-            }
-            PostMessage(new { cmd = "alphaTab.error", error = new { type = type, detail = error } });
-        }
+            dynamic error = Json.Parse(Json.Stringify(e));
 
-        [JsMethod(Export = false, InlineCodeExpression = "this._main.postMessage(o)")]
-        private void PostMessage(object o)
-        {
+            dynamic e2 = e;
+
+            if (e2.message)
+            {
+                error.message = e2.message;
+            }
+            if (e2.stack)
+            {
+                error.stack = e2.stack;
+            }
+            if (e2.constructor && e2.constructor.name)
+            {
+                error.type = e2.constructor.name;
+            }
+            _main.PostMessage(new { cmd = "alphaTab.error", error = new { type = type, detail = error } });
         }
     }
 }

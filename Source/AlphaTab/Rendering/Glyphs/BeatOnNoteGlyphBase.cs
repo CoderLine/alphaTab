@@ -30,7 +30,7 @@ namespace AlphaTab.Rendering.Glyphs
         //public override void Paint(float cx, float cy, ICanvas canvas)
         //{
         //    base.Paint(cx, cy, canvas);
-        //    canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 80);
+        //    canvas.Color = new Color((byte)Platform.Random(255), (byte)Platform.Random(255), (byte)Platform.Random(255), 80);
         //    canvas.FillRect(cx + X, cy + Y, Width, 100);
         //}
     }

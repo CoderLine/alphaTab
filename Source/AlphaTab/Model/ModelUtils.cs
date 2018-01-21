@@ -34,7 +34,7 @@ namespace AlphaTab.Model
                 return index;
             }
 
-            return (int)Std.Log2((int)duration);
+            return (int)Platform.Platform.Log2((int)duration);
         }
 
         // TODO: Externalize this into some model public class

@@ -48,17 +48,14 @@ namespace AlphaTab.Importer
                     Logger.Info("ScoreLoader", "Score imported using " + importer.Name);
                     break;
                 }
+                catch (UnsupportedFormatException)
+                {
+                    Logger.Info("ScoreLoader", importer.Name + " does not support the file");
+                }
                 catch (Exception e)
                 {
-                    if (!Std.IsException<UnsupportedFormatException>(e))
-                    {
-                        Logger.Info("ScoreLoader", "Score import failed due to unexpected error: " + e);
-                        throw e;
-                    }
-                    else
-                    {
-                        Logger.Info("ScoreLoader", importer.Name + " does not support the file");
-                    }
+                    Logger.Info("ScoreLoader", "Score import failed due to unexpected error: " + e);
+                    throw;
                 }
             }
 

@@ -16,20 +16,22 @@
  * License along with this library.
  */
 using System;
+using AlphaTab.Haxe.Js;
+using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
-using SharpKit.Html;
-using SharpKit.JavaScript;
+using Phase;
+using TextAlign = AlphaTab.Platform.Model.TextAlign;
 
 namespace AlphaTab.Platform.JavaScript
 {
     /// <summary>
     /// A canvas implementation for HTML5 canvas
     /// </summary>
-    public class Html5Canvas : HtmlContext, ICanvas
+    public class Html5Canvas : ICanvas
     {
-        private HtmlCanvasElement _canvas;
+        private CanvasElement _canvas;
         private CanvasRenderingContext2D _context;
         private Color _color;
         private Font _font;
@@ -40,11 +42,11 @@ namespace AlphaTab.Platform.JavaScript
         public Html5Canvas()
         {
             _color = new Color(0, 0, 0);
-            var fontElement = document.createElement("span");
-            fontElement.classList.add("at");
-            document.body.appendChild(fontElement);
-            var style = window.getComputedStyle(fontElement, null);
-            _musicFont = new Font(style.fontFamily, Std.ParseFloat(style.fontSize));
+            var fontElement = Browser.Document.CreateElement("span");
+            fontElement.ClassList.Add("at");
+            Browser.Document.Body.AppendChild(fontElement);
+            var style = Browser.Window.GetComputedStyle(fontElement);
+            _musicFont = new Font(style.FontFamily, Platform.ParseFloat(style.FontSize));
         }
 
         public virtual object OnPreRender()
@@ -60,13 +62,13 @@ namespace AlphaTab.Platform.JavaScript
         }
         public void BeginRender(float width, float height)
         {
-            _canvas = (HtmlCanvasElement) document.createElement("canvas");
-            _canvas.width = (int) width;
-            _canvas.height = (int) height;
-            _canvas.style.width = width + "px";
-            _canvas.style.height = height + "px";
-            _context = (CanvasRenderingContext2D)_canvas.getContext("2d");
-            _context.textBaseline = "top";
+            _canvas = (CanvasElement)Browser.Document.CreateElement("canvas");
+            _canvas.Width = (int)width;
+            _canvas.Height = (int)height;
+            _canvas.Style.Width = width + "px";
+            _canvas.Style.Height = height + "px";
+            _context = (CanvasRenderingContext2D)_canvas.GetContext("2d");
+            _context.TextBaseline = "top";
         }
 
         public object EndRender()
@@ -86,8 +88,8 @@ namespace AlphaTab.Platform.JavaScript
             {
                 if (_color.RGBA == value.RGBA) return;
                 _color = value;
-                _context.strokeStyle = value.RGBA;
-                _context.fillStyle = value.RGBA;
+                _context.StrokeStyle = value.RGBA;
+                _context.FillStyle = value.RGBA;
             }
         }
 
@@ -95,11 +97,11 @@ namespace AlphaTab.Platform.JavaScript
         {
             get
             {
-                return (float)_context.lineWidth;
+                return (float)_context.LineWidth;
             }
             set
             {
-                _context.lineWidth = value;
+                _context.LineWidth = value;
             }
         }
 
@@ -107,60 +109,60 @@ namespace AlphaTab.Platform.JavaScript
         {
             if (w > 0)
             {
-                _context.fillRect((int)x - 0.5, (int)y - 0.5, w, h);
+                _context.FillRect(((int)x - 0.5), ((int)y - 0.5), w, h);
             }
         }
 
         public void StrokeRect(float x, float y, float w, float h)
         {
-            _context.strokeRect(x - 0.5, y - 0.5, w, h);
+            _context.StrokeRect((x - 0.5), (y - 0.5), w, h);
         }
 
         public void BeginPath()
         {
-            _context.beginPath();
+            _context.BeginPath();
         }
 
         public void ClosePath()
         {
-            _context.closePath();
+            _context.ClosePath();
         }
 
         public void MoveTo(float x, float y)
         {
-            _context.moveTo(x - 0.5, y - 0.5);
+            _context.MoveTo(x - 0.5, y - 0.5);
         }
 
         public void LineTo(float x, float y)
         {
-            _context.lineTo(x - 0.5, y - 0.5);
+            _context.LineTo(x - 0.5, y - 0.5);
         }
 
         public void QuadraticCurveTo(float cpx, float cpy, float x, float y)
         {
-            _context.quadraticCurveTo(cpx, cpy, x, y);
+            _context.QuadraticCurveTo(cpx, cpy, x, y);
         }
 
         public void BezierCurveTo(float cp1x, float cp1y, float cp2x, float cp2y, float x, float y)
         {
-            _context.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
+            _context.BezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
         }
 
         public void FillCircle(float x, float y, float radius)
         {
-            _context.beginPath();
-            _context.arc(x, y, radius, 0, Math.PI * 2, true);
+            _context.BeginPath();
+            _context.Arc(x, y, radius, 0, Math.PI * 2, true);
             Fill();
         }
 
         public void Fill()
         {
-            _context.fill();
+            _context.Fill();
         }
 
         public void Stroke()
         {
-            _context.stroke();
+            _context.Stroke();
         }
 
         public Font Font
@@ -169,7 +171,7 @@ namespace AlphaTab.Platform.JavaScript
             set
             {
                 _font = value;
-                _context.font = value.ToCssString();
+                _context.Font = value.ToCssString();
             }
         }
 
@@ -177,7 +179,7 @@ namespace AlphaTab.Platform.JavaScript
         {
             get
             {
-                switch (_context.textAlign)
+                switch (_context.TextAlign)
                 {
                     case "left":
                         return TextAlign.Left;
@@ -194,13 +196,13 @@ namespace AlphaTab.Platform.JavaScript
                 switch (value)
                 {
                     case TextAlign.Left:
-                        _context.textAlign = "left";
+                        _context.TextAlign = "left";
                         break;
                     case TextAlign.Center:
-                        _context.textAlign = "center";
+                        _context.TextAlign = "center";
                         break;
                     case TextAlign.Right:
-                        _context.textAlign = "right";
+                        _context.TextAlign = "right";
                         break;
                 }
             }
@@ -210,7 +212,7 @@ namespace AlphaTab.Platform.JavaScript
         {
             get
             {
-                switch (_context.textBaseline)
+                switch (_context.TextBaseline)
                 {
                     case "top":
                         return TextBaseline.Top;
@@ -227,13 +229,13 @@ namespace AlphaTab.Platform.JavaScript
                 switch (value)
                 {
                     case TextBaseline.Top:
-                        _context.textBaseline = "top";
+                        _context.TextBaseline = "top";
                         break;
                     case TextBaseline.Middle:
-                        _context.textBaseline = "middle";
+                        _context.TextBaseline = "middle";
                         break;
                     case TextBaseline.Bottom:
-                        _context.textBaseline = "bottom";
+                        _context.TextBaseline = "bottom";
                         break;
                 }
             }
@@ -249,12 +251,12 @@ namespace AlphaTab.Platform.JavaScript
 
         public void FillText(string text, float x, float y)
         {
-            _context.fillText(text, x, y);
+            _context.FillText(text, x, y);
         }
 
         public float MeasureText(string text)
         {
-            return (float)_context.measureText(text).width;
+            return (float)_context.MeasureText(text).Width;
         }
 
         public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)
@@ -263,13 +265,13 @@ namespace AlphaTab.Platform.JavaScript
             {
                 return;
             }
-            var baseLine = _context.textBaseline;
-            var font = _context.font;
-            _context.font = _musicFont.ToCssString(scale);
-            _context.textBaseline = "middle";
-            _context.fillText(Std.StringFromCharCode((int) symbol), x, y);
-            _context.textBaseline = baseLine;
-            _context.font = font;
+            var baseLine = _context.TextBaseline;
+            var font = _context.Font;
+            _context.Font = _musicFont.ToCssString(scale);
+            _context.TextBaseline = "middle";
+            _context.FillText(Platform.StringFromCharCode((int)symbol), x.As<int>(), y.As<int>());
+            _context.TextBaseline = baseLine;
+            _context.Font = font;
         }
     }
 }

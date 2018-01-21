@@ -139,7 +139,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             _infos.Sort((a, b) => a.Line.CompareTo(b.Line));
 
-            const int padding = 0; // Std.int(4 * getScale());
+            const int padding = 0; // Platform.int(4 * getScale());
 
             var displacedX = 0f;
 

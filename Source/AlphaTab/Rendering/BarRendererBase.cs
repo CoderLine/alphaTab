@@ -361,9 +361,9 @@ namespace AlphaTab.Rendering
 
         protected virtual void PaintBackground(float cx, float cy, ICanvas canvas)
         {
-            //var c = new Color((byte)Std.Random(255),
-            //      (byte)Std.Random(255),
-            //      (byte)Std.Random(255),
+            //var c = new Color((byte)Platform.Random(255),
+            //      (byte)Platform.Random(255),
+            //      (byte)Platform.Random(255),
             //      100);
             //canvas.Color = c;
             //canvas.FillRect(cx + X, cy + Y, Width, Height);
@@ -482,7 +482,7 @@ namespace AlphaTab.Rendering
         {
             // there are some glyphs which are shown only for renderers at the line start, so we simply recreate them
             // but we only need to recreate them for the renderers that were the first of the line or are now the first of the line
-            if (_wasFirstOfLine ^ IsFirstOfLine)
+            if ((_wasFirstOfLine && !IsFirstOfLine) || (!_wasFirstOfLine && IsFirstOfLine))
             {
                 _preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
                 _preBeatGlyphs.Renderer = this;

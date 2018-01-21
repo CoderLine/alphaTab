@@ -163,7 +163,7 @@ namespace AlphaTab.Rendering
         {
             base.Paint(cx, cy, canvas);
 
-            //canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 100);
+            //canvas.Color = new Color((byte)Platform.Random(255), (byte)Platform.Random(255), (byte)Platform.Random(255), 100);
             //canvas.FillRect(cx + X, cy + Y, Renderer.Width, Height);
 
             for (int i = 0, j = _uniqueEffectGlyphs.Count; i < j; i++)

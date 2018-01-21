@@ -17,14 +17,18 @@
  */
 
 using System;
+using System.Collections.Generic;
 using AlphaTab.Collections;
+using AlphaTab.Haxe;
+using AlphaTab.Haxe.Js;
+using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Importer;
 using AlphaTab.IO;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Util;
-using SharpKit.Html;
-using SharpKit.JavaScript;
+using Haxe.Js.Html;
+using Phase;
 
 namespace AlphaTab.Platform.JavaScript
 {
@@ -35,10 +39,10 @@ namespace AlphaTab.Platform.JavaScript
         public Settings Settings { get; set; }
     }
 
-    public class JsApi : HtmlContext
+    public class JsApi
     {
-        private readonly HtmlElement _element;
-        private readonly HtmlElement _canvasElement;
+        private readonly Element _element;
+        private readonly Element _canvasElement;
         private readonly Settings _settings;
         private int _visibilityCheckerInterval;
         private int _visibilityCheckerIntervalId;
@@ -48,7 +52,7 @@ namespace AlphaTab.Platform.JavaScript
 
         protected bool IsElementVisible
         {
-            get { return !!(_element.offsetWidth.As<bool>() || _element.offsetHeight.As<bool>() || _element.getClientRects().length.As<bool>()); }
+            get { return _element.OffsetWidth.IsTruthy() || _element.OffsetHeight.IsTruthy() || _element.GetClientRects().Length.IsTruthy(); }
         }
 
         public IScoreRenderer Renderer { get; private set; }
@@ -69,11 +73,11 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
-        protected JsApi(HtmlElement element, dynamic options)
+        protected JsApi(Element element, dynamic options)
         {
             _element = element;
 
-            _element.classList.add("alphaTab");
+            _element.ClassList.Add("alphaTab");
 
             // load settings
             var dataAttributes = GetDataAttributes();
@@ -109,21 +113,21 @@ namespace AlphaTab.Platform.JavaScript
             {
                 // get load contents
 
-                if (dataAttributes.ContainsKey("tex") && element.innerText.As<JsBoolean>())
+                if (dataAttributes.ContainsKey("tex") && element.InnerText.IsTruthy())
                 {
-                    contents = (element.innerHTML.As<string>()).Trim();
-                    element.innerHTML = "";
+                    contents = (element.InnerHTML.As<string>()).Trim();
+                    element.InnerHTML = "";
                 }
 
                 #region Create context elements (wrapper, canvas etc)
 
-                _canvasElement = (HtmlElement)document.createElement("div");
+                _canvasElement = Browser.Document.CreateElement("div");
 
-                _canvasElement.className = "alphaTabSurface";
-                _canvasElement.style.fontSize = "0";
-                _canvasElement.style.overflow = "hidden";
-                _canvasElement.style.lineHeight = "0";
-                element.appendChild(_canvasElement);
+                _canvasElement.ClassName = "alphaTabSurface";
+                _canvasElement.Style.FontSize = "0";
+                _canvasElement.Style.Overflow = "hidden";
+                _canvasElement.Style.LineHeight = "0";
+                element.AppendChild(_canvasElement);
 
                 #endregion
 
@@ -131,14 +135,14 @@ namespace AlphaTab.Platform.JavaScript
 
                 if (settings.Engine == "default" || settings.Engine == "svg")
                 {
-                    window.addEventListener("scroll", e =>
+                    Browser.Window.AddEventListener("scroll", (Action)(() =>
                     {
                         ShowSvgsInViewPort();
-                    }, true);
-                    window.addEventListener("resize", e =>
+                    }), true);
+                    Browser.Window.AddEventListener("resize", (Action)(() =>
                     {
                         ShowSvgsInViewPort();
-                    }, true);
+                    }), true);
                 }
 
                 #endregion
@@ -147,19 +151,19 @@ namespace AlphaTab.Platform.JavaScript
 
                 if (autoSize)
                 {
-                    settings.Width = element.offsetWidth;
+                    settings.Width = element.OffsetWidth;
                     int timeoutId = 0;
-                    window.addEventListener("resize", e =>
+                    Browser.Window.AddEventListener("resize", (Action)(() =>
                     {
-                        clearTimeout(timeoutId);
-                        timeoutId = setTimeout(() =>
+                        Browser.Window.ClearTimeout(timeoutId);
+                        timeoutId = Browser.Window.SetTimeout((Action)(() =>
                         {
-                            if (element.offsetWidth != settings.Width)
+                            if (element.OffsetWidth != settings.Width)
                             {
                                 TriggerResize();
                             }
-                        }, 1);
-                    });
+                        }), 1);
+                    }));
                 }
 
                 #endregion
@@ -168,18 +172,18 @@ namespace AlphaTab.Platform.JavaScript
             #region Renderer Setup
 
             CreateStyleElement(settings);
-            
+
             if (element != null && autoSize)
             {
                 var initialResizeEventInfo = new ResizeEventArgs();
                 initialResizeEventInfo.OldWidth = 0;
-                initialResizeEventInfo.NewWidth = element.offsetWidth;
+                initialResizeEventInfo.NewWidth = element.OffsetWidth;
                 initialResizeEventInfo.Settings = settings;
                 TriggerEvent("resize", initialResizeEventInfo);
                 settings.Width = initialResizeEventInfo.NewWidth;
             }
 
-            var workersUnsupported = !window.Worker.As<bool>();
+            var workersUnsupported = !Browser.Window.Member<bool>("Worker");
             if (settings.UseWebWorker && !workersUnsupported && settings.Engine != "html5")
             {
                 Renderer = new WorkerScoreRenderer(this, settings);
@@ -191,8 +195,8 @@ namespace AlphaTab.Platform.JavaScript
             Renderer.RenderFinished += o => TriggerEvent("rendered");
             Renderer.PostRenderFinished += () =>
             {
-                _element.classList.remove("loading");
-                _element.classList.remove("rendering");
+                _element.ClassList.Remove("loading");
+                _element.ClassList.Remove("rendering");
                 TriggerEvent("postRendered");
             };
             Renderer.PreRender += result =>
@@ -219,7 +223,7 @@ namespace AlphaTab.Platform.JavaScript
                 // in this case we need the correct width for autosize
                 if (autoSize)
                 {
-                    _settings.Width = _element.offsetWidth;
+                    _settings.Width = _element.OffsetWidth;
                     Renderer.UpdateSettings(settings);
                 }
 
@@ -248,16 +252,16 @@ namespace AlphaTab.Platform.JavaScript
                 // if the alphaTab element is not visible, we postpone the rendering
                 // we check in a regular interval whether it became available. 
                 Logger.Warning("Rendering", "AlphaTab container is invisible, checking for element visibility in " + _visibilityCheckerInterval + "ms intervals");
-                _visibilityCheckerIntervalId = setInterval(() =>
+                _visibilityCheckerIntervalId = Browser.Window.SetInterval((Action)(() =>
                 {
                     if (IsElementVisible)
                     {
                         Logger.Info("Rendering", "AlphaTab container became visible, triggering initial rendering");
                         initialRender();
-                        clearInterval(_visibilityCheckerIntervalId);
+                        Browser.Window.ClearInterval(_visibilityCheckerIntervalId);
                         _visibilityCheckerIntervalId = 0;
                     }
-                }, _visibilityCheckerInterval);
+                }), _visibilityCheckerInterval);
             }
 
             #endregion
@@ -267,14 +271,14 @@ namespace AlphaTab.Platform.JavaScript
         {
             var dataAttributes = new FastDictionary<string, object>();
 
-            if (_element.dataset.As<bool>())
+            if (_element.Dataset.As<bool>())
             {
-                foreach (var key in _element.dataset.As<JsObject>())
+                foreach (var key in Platform.JsonKeys(_element.Dataset))
                 {
-                    object value = _element.dataset.Member(key);
+                    object value = _element.Dataset.Member<object>(key);
                     try
                     {
-                        value = JSON.parse(value.As<string>());
+                        value = Json.Parse(value.As<string>());
                     }
                     catch
                     {
@@ -288,22 +292,22 @@ namespace AlphaTab.Platform.JavaScript
             }
             else
             {
-                for (var i = 0; i < _element.attributes.length; i++)
+                for (var i = 0; i < _element.Attributes.Length; i++)
                 {
-                    var attr = _element.attributes[i];
-                    if (attr.nodeName.As<string>().StartsWith("data-"))
+                    var attr = _element.Attributes.Item(i);
+                    if (attr.NodeName.As<string>().StartsWith("data-"))
                     {
-                        var keyParts = attr.nodeName.substr(5).split("-");
+                        var keyParts = attr.NodeName.Substring(5).Split('-');
                         var key = keyParts[0];
-                        for (int j = 1; j < keyParts.length; j++)
+                        for (int j = 1; j < keyParts.Length; j++)
                         {
-                            key += keyParts[j].substr(0, 1).toUpperCase() + keyParts[j].substr(1);
+                            key += keyParts[j].Substring(0, 1).ToUpper() + keyParts[j].Substring(1);
                         }
 
-                        object value = attr.nodeValue;
+                        object value = attr.NodeValue;
                         try
                         {
-                            value = JSON.parse(value.As<string>());
+                            value = Json.Parse(value.As<string>());
                         }
                         catch
                         {
@@ -329,47 +333,47 @@ namespace AlphaTab.Platform.JavaScript
                 if (_visibilityCheckerIntervalId != 0)
                 {
                     Logger.Info("Rendering", "AlphaTab container became visible again, doing autosizing");
-                    clearInterval(_visibilityCheckerIntervalId);
+                    Browser.Window.ClearInterval(_visibilityCheckerIntervalId);
                     _visibilityCheckerIntervalId = 0;
                 }
 
                 var resizeEventInfo = new ResizeEventArgs();
                 resizeEventInfo.OldWidth = _settings.Width;
-                resizeEventInfo.NewWidth = _element.offsetWidth;
+                resizeEventInfo.NewWidth = _element.OffsetWidth;
                 resizeEventInfo.Settings = _settings;
                 TriggerEvent("resize", resizeEventInfo);
                 _settings.Width = resizeEventInfo.NewWidth;
                 Renderer.UpdateSettings(_settings);
-                Renderer.Resize(_element.offsetWidth);
+                Renderer.Resize(_element.OffsetWidth);
             }
             // if there is no "invisibility timer" we set up one, if there is already a timer scheduled, it will trigger the proper rendering. 
             else if (_visibilityCheckerIntervalId == 0)
             {
                 Logger.Warning("Rendering", "AlphaTab container was invisible while autosizing, checking for element visibility in " + _visibilityCheckerInterval + "ms intervals");
-                _visibilityCheckerIntervalId = setInterval(TriggerResize, _visibilityCheckerInterval);
+                _visibilityCheckerIntervalId = Browser.Window.SetInterval((Action)(TriggerResize), _visibilityCheckerInterval);
             }
         }
 
         private void ShowSvgsInViewPort()
         {
-            var placeholders = _canvasElement.querySelectorAll("[data-lazy=true]");
-            foreach (var x in placeholders)
+            var placeholders = _canvasElement.QuerySelectorAll("[data-lazy=true]");
+            for (var i = 0; i < placeholders.Length; i++)
             {
-                var placeholder = x.As<HtmlElement>();
+                var placeholder = (Element)placeholders.Item(i);
                 if (IsElementInViewPort(placeholder))
                 {
-                    placeholder.outerHTML = placeholder.As<dynamic>().svg;
+                    placeholder.OuterHTML = placeholder.As<dynamic>().svg;
                 }
             }
         }
 
         private static bool IsElementInViewPort(Element el)
         {
-            var rect = el.getBoundingClientRect();
+            var rect = el.GetBoundingClientRect();
             return
                 (
-                    rect.top + rect.height >= 0 && rect.top <= window.innerHeight &&
-                    rect.left + rect.width >= 0 && rect.left <= window.innerWidth
+                    rect.Top + rect.Height >= 0 && rect.Top <= Browser.Window.InnerHeight &&
+                    rect.Left + rect.Width >= 0 && rect.Left <= Browser.Window.InnerWidth
                 );
         }
 
@@ -377,44 +381,44 @@ namespace AlphaTab.Platform.JavaScript
         {
             // prepare a popup window for printing (a4 width, window height, centered)
 
-            var preview = window.open("", "", "width=0,height=0");
-            var a4 = (HtmlDivElement)preview.document.createElement("div");
+            var preview = Browser.Window.Open("", "", "width=0,height=0");
+            var a4 = preview.Document.CreateElement("div");
             if (!string.IsNullOrEmpty(width))
             {
-                a4.style.width = width;
+                a4.Style.Width = width;
             }
             else
             {
-                a4.style.width = "210mm";
+                a4.Style.Width = "210mm";
             }
-            preview.document.As<HtmlDocument>().write("<!DOCTYPE html><html></head><body></body></html>");
-            preview.document.body.appendChild(a4);
+            preview.Document.Write("<!DOCTYPE html><html></head><body></body></html>");
+            preview.Document.Body.AppendChild(a4);
 
-            var dualScreenLeft = JsTypeOf(window.screenLeft) != JsTypes.undefined
-                ? window.screenLeft
-                : screen.Member("left").As<int>();
-            var dualScreenTop = JsTypeOf(window.screenTop) != JsTypes.undefined
-                ? window.screenTop
-                : screen.Member("top").As<int>();
-            var screenWidth = JsTypeOf(window.innerWidth) != JsTypes.undefined
-                ? window.innerWidth
-                : JsTypeOf(document.documentElement.clientWidth) != JsTypes.undefined
-                    ? document.documentElement.clientWidth
-                    : screen.width;
-            var screenHeight = JsTypeOf(window.innerHeight) != JsTypes.undefined
-                ? window.innerHeight
-                : JsTypeOf(document.documentElement.clientHeight) != JsTypes.undefined
-                    ? document.documentElement.clientHeight
-                    : screen.height;
+            var dualScreenLeft = Platform.TypeOf(Browser.Window.Member<int>("ScreenLeft")) != "undefined"
+                ? Browser.Window.Member<int>("ScreenLeft")
+                : Browser.Window.Screen.Left;
+            var dualScreenTop = Platform.TypeOf(Browser.Window.Member<int>("ScreenTop")) != "undefined"
+                ? Browser.Window.Member<int>("ScreenTop")
+                : Browser.Window.Screen.Top;
+            var screenWidth = Platform.TypeOf(Browser.Window.InnerWidth) != "undefined"
+                ? Browser.Window.InnerWidth
+                : Platform.TypeOf(Browser.Document.DocumentElement.ClientWidth) != "undefined"
+                    ? Browser.Document.DocumentElement.ClientWidth
+                    : Browser.Window.Screen.Width;
+            var screenHeight = Platform.TypeOf(Browser.Window.InnerHeight) != "undefined"
+                ? Browser.Window.InnerHeight
+                : Platform.TypeOf(Browser.Document.DocumentElement.ClientHeight) != "undefined"
+                    ? Browser.Document.DocumentElement.ClientHeight
+                    : Browser.Window.Screen.Height;
 
-            var w = a4.offsetWidth + 50;
-            var h = window.innerHeight;
+            var w = a4.OffsetWidth + 50;
+            var h = Browser.Window.InnerHeight;
             var left = ((screenWidth / 2) - (w / 2)) + dualScreenLeft;
             var top = ((screenHeight / 2) - (h / 2)) + dualScreenTop;
-            preview.resizeTo(w, h);
-            preview.moveTo(left, top);
+            preview.ResizeTo(w, h);
+            preview.MoveTo(left, top);
 
-            preview.focus();
+            preview.Focus();
 
             // render alphaTab
             var settings = Settings.Defaults;
@@ -428,8 +432,8 @@ namespace AlphaTab.Platform.JavaScript
             var alphaTab = new JsApi(a4, settings);
             alphaTab.Renderer.PostRenderFinished += () =>
             {
-                alphaTab._canvasElement.style.height = "100%";
-                preview.window.print();
+                alphaTab._canvasElement.Style.Height = "100%";
+                preview.Print();
             };
             alphaTab.SetTracks(Tracks);
         }
@@ -438,8 +442,8 @@ namespace AlphaTab.Platform.JavaScript
         {
             if (result != null)
             {
-                _canvasElement.style.width = result.TotalWidth + "px";
-                _canvasElement.style.height = result.TotalHeight + "px";
+                _canvasElement.Style.Width = result.TotalWidth + "px";
+                _canvasElement.Style.Height = result.TotalHeight + "px";
             }
 
 
@@ -449,7 +453,7 @@ namespace AlphaTab.Platform.JavaScript
                 // setTimeout allows to decouple the rendering from the JS processing a bit which makes the overall display faster. 
                 _renderResults.Add(result);
 
-                setTimeout(() =>
+                Browser.Window.SetTimeout((Action)(() =>
                 {
                     while (_renderResults.Count > 0)
                     {
@@ -460,71 +464,71 @@ namespace AlphaTab.Platform.JavaScript
                         if (renderResult == null)
                         {
                             // so we remove elements that might be from a previous render session
-                            while (_canvasElement.childElementCount > _totalResultCount)
+                            while (_canvasElement.ChildElementCount > _totalResultCount)
                             {
-                                _canvasElement.removeChild(_canvasElement.lastChild);
+                                _canvasElement.RemoveChild(_canvasElement.LastChild);
                             }
                         }
                         // NOTE: here we try to replace existing children 
                         else
                         {
                             var body = renderResult.RenderResult;
-                            if (@typeof(body) == "string")
+                            if (Platform.TypeOf(body) == "string")
                             {
-                                HtmlElement placeholder;
-                                if (_totalResultCount < _canvasElement.childElementCount)
+                                Element placeholder;
+                                if (_totalResultCount < _canvasElement.ChildElementCount)
                                 {
-                                    placeholder = _canvasElement.children[_totalResultCount].As<HtmlElement>();
+                                    placeholder = (Element) _canvasElement.ChildNodes.Item(_totalResultCount);
                                 }
                                 else
                                 {
-                                    placeholder = document.createElement("div").As<HtmlElement>();
-                                    _canvasElement.appendChild(placeholder);
+                                    placeholder = Browser.Document.CreateElement("div");
+                                    _canvasElement.AppendChild(placeholder);
                                 }
 
-                                placeholder.style.width = renderResult.Width + "px";
-                                placeholder.style.height = renderResult.Height + "px";
-                                placeholder.style.display = "inline-block";
+                                placeholder.Style.Width = renderResult.Width + "px";
+                                placeholder.Style.Height = renderResult.Height + "px";
+                                placeholder.Style.Display = "inline-block";
 
                                 if (IsElementInViewPort(placeholder) || _settings.DisableLazyLoading)
                                 {
-                                    placeholder.outerHTML = body.As<string>();
+                                    placeholder.OuterHTML = body.As<string>();
                                 }
                                 else
                                 {
                                     placeholder.As<dynamic>().svg = body;
-                                    placeholder.setAttribute("data-lazy", "true");
+                                    placeholder.SetAttribute("data-lazy", "true");
                                 }
                             }
                             else
                             {
-                                if (_totalResultCount < _canvasElement.childElementCount)
+                                if (_totalResultCount < _canvasElement.ChildElementCount)
                                 {
-                                    _canvasElement.replaceChild(renderResult.RenderResult.As<Node>(), _canvasElement.children[_totalResultCount]);
+                                    _canvasElement.ReplaceChild(renderResult.RenderResult.As<Node>(), _canvasElement.ChildNodes.Item(_totalResultCount));
                                 }
                                 else
                                 {
-                                    _canvasElement.appendChild(renderResult.RenderResult.As<Node>());
+                                    _canvasElement.AppendChild(renderResult.RenderResult.As<Node>());
                                 }
                             }
                             _totalResultCount++;
                         }
                     }
-                }, 1);
+                }), 1);
 
             }
         }
 
         private void CreateStyleElement(Settings settings)
         {
-            var elementDocument = _element.ownerDocument;
-            var styleElement = (HtmlStyleElement)elementDocument.getElementById("alphaTabStyle");
+            var elementDocument = _element.OwnerDocument;
+            var styleElement = (StyleElement)elementDocument.GetElementById("alphaTabStyle");
             if (styleElement == null)
             {
                 string fontDirectory = settings.FontDirectory;
-                styleElement = (HtmlStyleElement)elementDocument.createElement("style");
-                styleElement.id = "alphaTabStyle";
-                styleElement.type = "text/css";
+                styleElement = (StyleElement)elementDocument.CreateElement("style");
+                styleElement.Id = "alphaTabStyle";
+                styleElement.Type = "text/css";
                 var css = new StringBuilder();
                 css.AppendLine("@font-face {");
                 css.AppendLine("    font-family: 'alphaTab';");
@@ -553,32 +557,32 @@ namespace AlphaTab.Platform.JavaScript
                 css.AppendLine("     font-size: 34px;");
                 css.AppendLine("     overflow: visible !important;");
                 css.AppendLine("}");
-                styleElement.innerHTML = css.ToString();
-                elementDocument.getElementsByTagName("head")[0].appendChild(styleElement);
+                styleElement.InnerHTML = css.ToString();
+                elementDocument.GetElementsByTagName("head").Item(0).AppendChild(styleElement);
             }
         }
 
 
         public virtual void Destroy()
         {
-            _element.innerHTML = "";
+            _element.InnerHTML = "";
             Renderer.Destroy();
         }
 
         public void Load(object data)
         {
-            _element.classList.add("loading");
+            _element.ClassList.Add("loading");
             try
             {
-                if (Std.InstanceOf<ArrayBuffer>(data))
+                if (Platform.InstanceOf<ArrayBuffer>(data))
                 {
-                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes(Std.ArrayBufferToByteArray((ArrayBuffer)data)));
+                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes(Platform.ArrayBufferToByteArray((ArrayBuffer)data)));
                 }
-                else if (Std.InstanceOf<Uint8Array>(data))
+                else if (Platform.InstanceOf<Uint8Array>(data))
                 {
                     ScoreLoaded(ScoreLoader.LoadScoreFromBytes((byte[])data));
                 }
-                else if (JsTypeOf(data) == JsTypes.@string)
+                else if (Platform.TypeOf(data) == "string")
                 {
                     ScoreLoader.LoadScoreAsync((string)data, s => ScoreLoaded(s), e =>
                     {
@@ -595,11 +599,11 @@ namespace AlphaTab.Platform.JavaScript
 
         public void Tex(string contents)
         {
-            _element.classList.add("loading");
+            _element.ClassList.Add("loading");
             try
             {
                 var parser = new AlphaTexImporter();
-                var data = ByteBuffer.FromBuffer(Std.StringToByteArray(contents));
+                var data = ByteBuffer.FromBuffer(Platform.StringToByteArray(contents));
                 parser.Init(data);
                 ScoreLoaded(parser.ReadScore());
             }
@@ -611,11 +615,11 @@ namespace AlphaTab.Platform.JavaScript
 
         public void SetTracks(dynamic tracksData, bool render = true)
         {
-            if (tracksData.length && JsTypeOf(tracksData[0].Index) == JsTypes.number)
+            if (tracksData.length && Platform.TypeOf(tracksData[0].Index) == "number")
             {
                 Score = tracksData[0].Score;
             }
-            else if (JsTypeOf(tracksData.Index) == JsTypes.number)
+            else if (Platform.TypeOf(tracksData.Index) == "number")
             {
                 Score = tracksData.Score;
             }
@@ -648,11 +652,11 @@ namespace AlphaTab.Platform.JavaScript
             FastList<int> tracks = new FastList<int>();
 
             // decode string
-            if (JsTypeOf(tracksData) == JsTypes.@string)
+            if (Platform.TypeOf(tracksData) == "string")
             {
                 try
                 {
-                    tracksData = JSON.parse((string)tracksData);
+                    tracksData = Json.Parse(tracksData.As<string>());
                 }
                 catch
                 {
@@ -661,7 +665,7 @@ namespace AlphaTab.Platform.JavaScript
             }
 
             // decode array
-            if (JsTypeOf(tracksData) == JsTypes.number)
+            if (Platform.TypeOf(tracksData) == "number")
             {
                 tracks.Add((int)tracksData);
             }
@@ -670,18 +674,18 @@ namespace AlphaTab.Platform.JavaScript
                 for (var i = 0; i < tracksData.length; i++)
                 {
                     int value;
-                    if (JsTypeOf(tracksData[i]) == JsTypes.number)
+                    if (Platform.TypeOf(tracksData[i]) == "number")
                     {
                         value = (int)tracksData[i];
                     }
-                    else if (JsTypeOf(tracksData[i].Index) == JsTypes.number)
+                    else if (Platform.TypeOf(tracksData[i].Index) == "number")
                     {
                         Track track = tracksData[i];
                         value = track.Index;
                     }
                     else
                     {
-                        value = Std.ParseInt(tracksData[i].ToString());
+                        value = Platform.ParseInt(tracksData[i].ToString());
                     }
 
                     if (value >= 0)
@@ -690,9 +694,9 @@ namespace AlphaTab.Platform.JavaScript
                     }
                 }
             }
-            else if (JsTypeOf(tracksData.Index) == JsTypes.number)
+            else if (Platform.TypeOf(tracksData.Index) == "number")
             {
-                tracks.Add((int)tracksData.Index);
+                tracks.Add(tracksData.Index.As<int>());
             }
 
             return tracks.ToArray();
@@ -727,13 +731,13 @@ namespace AlphaTab.Platform.JavaScript
             if (_element != null)
             {
                 name = "alphaTab." + name;
-                dynamic e = document.createEvent("CustomEvent");
+                dynamic e = Browser.Document.CreateEvent("CustomEvent");
                 e.initCustomEvent(name, false, false, details);
-                _element.dispatchEvent(e);
+                _element.DispatchEvent(e);
 
-                if (Std.JsonExists(window, "jQuery"))
+                if (Platform.JsonExists(Browser.Window, "jQuery"))
                 {
-                    dynamic jquery = window["jQuery"];
+                    dynamic jquery = Browser.Window.Member<dynamic>("jQuery");
                     jquery(_element).trigger(name, details);
                 }
             }
@@ -748,10 +752,10 @@ namespace AlphaTab.Platform.JavaScript
                 // if font is not yet loaded, try again in 1 sec
                 if (!Environment.IsFontLoaded)
                 {
-                    window.setTimeout(() =>
+                    Browser.Window.SetTimeout((Action)(() =>
                     {
                         renderAction();
-                    }, 1000);
+                    }), 1000);
                 }
                 else
                 {

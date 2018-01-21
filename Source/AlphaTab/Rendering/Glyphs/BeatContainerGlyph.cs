@@ -129,7 +129,7 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.BeginGroup("b" + Beat.Id);
 
             var oldColor = canvas.Color;
-            //canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 100);
+            //canvas.Color = new Color((byte)Platform.Random(255), (byte)Platform.Random(255), (byte)Platform.Random(255), 100);
             //canvas.FillRect(cx + X, cy + Y, Width, Renderer.Height);
             //canvas.Color = oldColor;
 

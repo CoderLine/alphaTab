@@ -10,7 +10,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AlphaTabException.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\GeneralMidi.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Generator\IMidiFileHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Generator\MidiFileGenerator.cs" />
@@ -84,7 +83,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Model\Font.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Model\TextAlign.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Model\TextBaseline.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Platform\Std.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Platform\Platform.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\FontSizes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\SupportedFonts.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\CssFontSvgCanvas.cs" />

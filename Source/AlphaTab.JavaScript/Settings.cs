@@ -19,8 +19,7 @@
 using System;
 using AlphaTab.Collections;
 using AlphaTab.Platform;
-using SharpKit.Html;
-using SharpKit.JavaScript;
+using Phase;
 
 namespace AlphaTab
 {
@@ -56,7 +55,7 @@ namespace AlphaTab
 
         public dynamic ToJson()
         {
-            dynamic json = Std.NewObject();
+            dynamic json = Platform.Platform.NewObject();
 
             json.useWorker = UseWebWorker;
             json.scale = Scale;
@@ -71,17 +70,17 @@ namespace AlphaTab
             json.fontDirectory = FontDirectory;
             json.lazy = DisableLazyLoading;
 
-            json.layout = Std.NewObject();
+            json.layout = Platform.Platform.NewObject();
             json.layout.mode = Layout.Mode;
-            json.layout.additionalSettings = Std.NewObject();
+            json.layout.additionalSettings = Platform.Platform.NewObject();
             foreach (string setting in Layout.AdditionalSettings)
             {
                 json.layout.additionalSettings[setting] = Layout.AdditionalSettings[setting];
             }
 
-            json.staves = Std.NewObject();
+            json.staves = Platform.Platform.NewObject();
             json.staves.id = Staves.Id;
-            json.staves.additionalSettings = Std.NewObject();
+            json.staves.additionalSettings = Platform.Platform.NewObject();
 
             foreach (var additionalSetting in Staves.AdditionalSettings)
             {
@@ -93,7 +92,7 @@ namespace AlphaTab
 
         public static Settings FromJson(dynamic json, FastDictionary<string, object> dataAttributes)
         {
-            if (Std.InstanceOf<Settings>(json))
+            if (json is Settings)
             {
                 return (Settings)json;
             }
@@ -108,9 +107,10 @@ namespace AlphaTab
 
         public static void FillFromJson(Settings settings, dynamic json, FastDictionary<string, object> dataAttributes)
         {
-            if (HtmlContext.self.document.As<bool>() && HtmlContext.self.window.Member("ALPHATAB_ROOT").As<bool>())
+            var global = Script.Write<dynamic>("js.Lib.global");
+            if (global.document && global.ALPHATAB_ROOT)
             {
-                settings.ScriptFile = HtmlContext.self.window.Member("ALPHATAB_ROOT").As<string>();
+                settings.ScriptFile = global.ALPHATAB_ROOT;
                 settings.ScriptFile = EnsureFullUrl(settings.ScriptFile);
                 settings.ScriptFile = AppendScriptName(settings.ScriptFile);
             }
@@ -119,9 +119,9 @@ namespace AlphaTab
                 settings.ScriptFile = Environment.ScriptFile;
             }
 
-            if (HtmlContext.self.document.As<bool>() && HtmlContext.self.window.Member("ALPHATAB_FONT").As<bool>())
+            if (global.document && global.ALPHATAB_FONT)
             {
-                settings.FontDirectory = HtmlContext.self.window.Member("ALPHATAB_FONT").As<string>();
+                settings.FontDirectory = global.ALPHATAB_FONT;
                 settings.FontDirectory = EnsureFullUrl(settings.FontDirectory);
             }
             else
@@ -138,16 +138,15 @@ namespace AlphaTab
             }
 
 
-
-            if (Std.JsonExists(json, "useWorker"))
+            if (Platform.Platform.JsonExists(json, "useWorker"))
             {
                 settings.UseWebWorker = json.useWorker;
             }
             else if (dataAttributes != null && dataAttributes.ContainsKey("useWorker"))
             {
-                settings.UseWebWorker = dataAttributes["useWorker"].As<bool>();
+                settings.UseWebWorker = dataAttributes["useWorker"].IsTruthy();
             }
-            if (Std.JsonExists(json, "scale"))
+            if (Platform.Platform.JsonExists(json, "scale"))
             {
                 settings.Scale = json.scale;
             }
@@ -155,7 +154,7 @@ namespace AlphaTab
             {
                 settings.Scale = dataAttributes["scale"].As<float>();
             }
-            if (Std.JsonExists(json, "width"))
+            if (Platform.Platform.JsonExists(json, "width"))
             {
                 settings.Width = json.width;
             }
@@ -163,7 +162,7 @@ namespace AlphaTab
             {
                 settings.Width = dataAttributes["width"].As<int>();
             }
-            if (Std.JsonExists(json, "engine"))
+            if (Platform.Platform.JsonExists(json, "engine"))
             {
                 settings.Engine = json.engine;
             }
@@ -171,7 +170,7 @@ namespace AlphaTab
             {
                 settings.Engine = dataAttributes["engine"].As<string>();
             }
-            if (Std.JsonExists(json, "stretchForce"))
+            if (Platform.Platform.JsonExists(json, "stretchForce"))
             {
                 settings.StretchForce = json.stretchForce;
             }
@@ -179,7 +178,7 @@ namespace AlphaTab
             {
                 settings.StretchForce = dataAttributes["stretchForce"].As<float>();
             }
-            if (Std.JsonExists(json, "forcePianoFingering"))
+            if (Platform.Platform.JsonExists(json, "forcePianoFingering"))
             {
                 settings.ForcePianoFingering = json.forcePianoFingering;
             }
@@ -187,52 +186,52 @@ namespace AlphaTab
             {
                 settings.ForcePianoFingering = dataAttributes["forcePianoFingering"].As<bool>();
             }
-            if (Std.JsonExists(json, "lazy"))
+            if (Platform.Platform.JsonExists(json, "lazy"))
             {
                 settings.DisableLazyLoading = !json.lazy;
             }
             else if (dataAttributes != null && dataAttributes.ContainsKey("lazy"))
             {
-                settings.DisableLazyLoading = !dataAttributes["lazy"].As<bool>();
+                settings.DisableLazyLoading = !dataAttributes["lazy"].IsTruthy();
             }
-            if (Std.JsonExists(json, "transpositionPitches"))
+            if (Platform.Platform.JsonExists(json, "transpositionPitches"))
             {
                 settings.TranspositionPitches = json.transpositionPitches;
             }
-            else if(dataAttributes != null && dataAttributes.ContainsKey("transpositionPitches"))
+            else if (dataAttributes != null && dataAttributes.ContainsKey("transpositionPitches"))
             {
                 var pitchOffsets = dataAttributes["transpositionPitches"];
-                if (pitchOffsets != null && Std.InstanceOf<JsArray>(pitchOffsets))
+                if (pitchOffsets != null && pitchOffsets.Member<bool>("length"))
                 {
-                    settings.TranspositionPitches = pitchOffsets.As<int[]>();
+                    settings.TranspositionPitches = (int[])pitchOffsets;
                 }
             }
 
-            if (Std.JsonExists(json, "displayTranspositionPitches"))
+            if (Platform.Platform.JsonExists(json, "displayTranspositionPitches"))
             {
                 settings.DisplayTranspositionPitches = json.displayTranspositionPitches;
             }
-            else if(dataAttributes != null && dataAttributes.ContainsKey("displayTranspositionPitches"))
+            else if (dataAttributes != null && dataAttributes.ContainsKey("displayTranspositionPitches"))
             {
                 var pitchOffsets = dataAttributes["displayTranspositionPitches"];
-                if (pitchOffsets != null && Std.InstanceOf<JsArray>(pitchOffsets))
+                if (pitchOffsets != null && pitchOffsets.Member<bool>("length"))
                 {
                     settings.DisplayTranspositionPitches = pitchOffsets.As<int[]>();
                 }
             }
 
-            if (Std.JsonExists(json, "scriptFile"))
+            if (Platform.Platform.JsonExists(json, "scriptFile"))
             {
                 settings.ScriptFile = EnsureFullUrl(json.scriptFile);
                 settings.ScriptFile = AppendScriptName(settings.ScriptFile);
             }
 
-            if (Std.JsonExists(json, "fontDirectory"))
+            if (Platform.Platform.JsonExists(json, "fontDirectory"))
             {
                 settings.FontDirectory = EnsureFullUrl(json.fontDirectory);
             }
 
-            if (Std.JsonExists(json, "layout"))
+            if (Platform.Platform.JsonExists(json, "layout"))
             {
                 settings.Layout = LayoutFromJson(json.layout);
             }
@@ -253,7 +252,7 @@ namespace AlphaTab
                 }
             }
 
-            if (Std.JsonExists(json, "staves"))
+            if (Platform.Platform.JsonExists(json, "staves"))
             {
                 settings.Staves = StavesFromJson(json.staves);
             }
@@ -277,8 +276,8 @@ namespace AlphaTab
 
         private static StaveSettings StavesFromJson(dynamic json)
         {
-            StaveSettings staveSettings ;
-            if (JsContext.@typeof(json) == "string")
+            StaveSettings staveSettings;
+            if (Script.Write<bool>("untyped __typeof__(json) == \"string\""))
             {
                 staveSettings = new StaveSettings(json);
             }
@@ -287,7 +286,7 @@ namespace AlphaTab
                 staveSettings = new StaveSettings(json.id);
                 if (json.additionalSettings)
                 {
-                    string[] keys2 = Std.JsonKeys(json.additionalSettings);
+                    string[] keys2 = Platform.Platform.JsonKeys(json.additionalSettings);
                     foreach (var key2 in keys2)
                     {
                         staveSettings.AdditionalSettings[key2.ToLower()] = json.additionalSettings[key2];
@@ -304,7 +303,7 @@ namespace AlphaTab
         public static LayoutSettings LayoutFromJson(dynamic json)
         {
             var layout = new LayoutSettings();
-            if (JsContext.@typeof(json) == "string")
+            if (Script.Write<bool>("untyped __typeof__(json) == \"string\""))
             {
                 layout.Mode = json;
             }
@@ -313,7 +312,7 @@ namespace AlphaTab
                 if (json.mode) layout.Mode = json.mode;
                 if (json.additionalSettings)
                 {
-                    string[] keys = Std.JsonKeys(json.additionalSettings);
+                    string[] keys = Platform.Platform.JsonKeys(json.additionalSettings);
                     foreach (var key in keys)
                     {
                         layout.AdditionalSettings[key.ToLower()] = json.additionalSettings[key];
@@ -339,16 +338,17 @@ namespace AlphaTab
 
         private static string EnsureFullUrl(string relativeUrl)
         {
+            var global = Script.Write<dynamic>("js.Lib.global");
             if (!relativeUrl.StartsWith("http") && !relativeUrl.StartsWith("https"))
             {
                 var root = new StringBuilder();
-                root.Append(HtmlContext.window.location.protocol);
+                root.Append(global.location.protocol);
                 root.Append("//");
-                root.Append(HtmlContext.window.location.hostname);
-                if (HtmlContext.window.location.port.As<bool>())
+                root.Append(global.location.hostName);
+                if (global.location.port)
                 {
                     root.Append(":");
-                    root.Append(HtmlContext.window.location.port);
+                    root.Append(global.location.port);
                 }
                 root.Append(relativeUrl);
                 if (!relativeUrl.EndsWith("/"))

@@ -1,0 +1,21 @@
+{
+  "output": "..\\..\\Build\\Haxe\\src-gen",
+  "processorCount": 1, 
+  "postbuild": [
+    {
+      "name": "Building JavaScript (debug)",
+      "executable": "haxe",
+      "arguments": "-cp ..\\..\\Phase\\Mscorlib -cp ..\\..\\Build\\Haxe\\src -cp ..\\..\\Build\\Haxe\\src-gen -js ..\\..\\Build\\JavaScript\\AlphaTab.Debug.js -main alphaTab.Main -debug"
+    },
+    {
+      "name": "Building JavaScript (release)",
+      "executable": "haxe",
+      "arguments": "-cp ..\\..\\Phase\\Mscorlib -cp ..\\..\\Build\\Haxe\\src -cp ..\\..\\Build\\Haxe\\src-gen -js ..\\..\\Build\\JavaScript\\AlphaTab.js -main alphaTab.Main"
+    },
+    {
+      "name": "Minify JavaScript",
+      "executable": "cmd",
+      "arguments": "/C uglifyjs ..\\..\\Build\\JavaScript\\AlphaTab.js -o ..\\..\\Build\\JavaScript\\AlphaTab.min.js -c"
+    }
+  ]
+}

@@ -40,7 +40,12 @@ namespace AlphaTab.Rendering.Glyphs
             //
             // Determine Columns for accidentals
             //
-            Glyphs.Sort((a, b) => a.Y.CompareTo(b.Y));
+            Glyphs.Sort((a, b) =>
+            {
+                if (a.Y < b.Y) return -1;
+                if (a.Y > b.Y) return 1;
+                return 0;
+            });
 
             // defines the reserved y position of the columns
             var columns = new FastList<float>();

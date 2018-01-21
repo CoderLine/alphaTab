@@ -155,7 +155,7 @@ namespace AlphaTab.Importer
             version = version.Substring(VersionString.Length + 1);
             int dot = version.IndexOf('.');
 
-            _versionNumber = (100 * Std.ParseInt(version.Substring(0, dot))) + Std.ParseInt(version.Substring(dot + 1));
+            _versionNumber = (100 * Platform.Platform.ParseInt(version.Substring(0, dot))) + Platform.Platform.ParseInt(version.Substring(dot + 1));
 
             Logger.Info(Name, "Guitar Pro version " + version + " detected");
         }
@@ -637,7 +637,7 @@ namespace AlphaTab.Importer
         public void ReadChord(Beat beat)
         {
             var chord = new Chord();
-            var chordId = Std.NewGuid();
+            var chordId = Platform.Platform.NewGuid();
             if (_versionNumber >= 500)
             {
                 Data.Skip(17);
@@ -1507,7 +1507,7 @@ namespace AlphaTab.Importer
         {
             byte[] b = new byte[length];
             Data.Read(b, 0, b.Length);
-            return Std.ToString(b);
+            return Platform.Platform.ToString(b);
         }
 
         /// <summary>

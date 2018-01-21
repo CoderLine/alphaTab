@@ -41,7 +41,7 @@ namespace AlphaTab.Importer
 
             // convert data to string
             var data = fileSystem.Files[0].Data;
-            var xml = Std.ToString(data);
+            var xml = Platform.Platform.ToString(data);
 
             // lets set the fileSystem to null, maybe the garbage collector will come along
             // and kick the fileSystem binary data before we finish parsing

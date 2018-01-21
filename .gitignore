@@ -52,6 +52,7 @@ _ReSharper*/
 /Samples/JavaScript/test.html
 /Samples/JavaScript/test*
 /Samples/JavaScript/test/*
+/Build/Haxe/src-gen/*
 
 # temps
 .DS_Store 

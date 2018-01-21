@@ -28,7 +28,7 @@ namespace AlphaTab.Platform.Model
             Raw = (a << 24) | (r << 16) | (g << 8) | b;
             if (A == 0xFF)
             {
-                RGBA = "#" + Std.ToHexString(R, 2) + Std.ToHexString(G, 2) + Std.ToHexString(B, 2);
+                RGBA = "#" + Platform.ToHexString(R, 2) + Platform.ToHexString(G, 2) + Platform.ToHexString(B, 2);
             }
             else
             {

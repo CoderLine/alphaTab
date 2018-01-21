@@ -118,7 +118,7 @@ namespace AlphaTab.Rendering.Glyphs
         //private static Random Random = new Random();
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            //canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 80);
+            //canvas.Color = new Color((byte)Platform.Random(255), (byte)Platform.Random(255), (byte)Platform.Random(255), 80);
             //canvas.FillRect(cx + X, cy + Y, Width, 100);
 
             //if (Voice.Index == 0)
@@ -139,7 +139,7 @@ namespace AlphaTab.Rendering.Glyphs
         //{
         //    var sortedSprings = new FastList<Spring>();
         //    var xMin = 0f;
-        //    Std.Foreach(_layoutings.Springs.Values, spring =>
+        //    Platform.Foreach(_layoutings.Springs.Values, spring =>
         //    {
         //        sortedSprings.Add(spring);
         //        if (spring.SpringWidth < xMin)
@@ -169,7 +169,7 @@ namespace AlphaTab.Rendering.Glyphs
         //    canvas.Color = new Color(255, 0, 0);
         //    for (int i = 0; i < keys.Length; i++)
         //    {
-        //        var time = Std.ParseInt(keys[i]);
+        //        var time = Platform.ParseInt(keys[i]);
         //        var springX = positions[time];
         //        var spring = _layoutings.Springs[time];
 

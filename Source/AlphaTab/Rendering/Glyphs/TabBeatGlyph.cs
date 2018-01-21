@@ -89,7 +89,6 @@ namespace AlphaTab.Rendering.Glyphs
             }
             else
             {
-                var dotLine = 0f;
                 var line = 0f;
                 var offset = 0;
 
@@ -97,49 +96,38 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     case Duration.QuadrupleWhole:
                         line = 3;
-                        dotLine = 2;
                         break;
                     case Duration.DoubleWhole:
                         line = 3;
-                        dotLine = 2;
                         break;
                     case Duration.Whole:
                         line = 2;
-                        dotLine = 2;
                         break;
                     case Duration.Half:
                         line = 3;
-                        dotLine = 3;
                         break;
                     case Duration.Quarter:
                         line = 3;
-                        dotLine = 2.5f;
                         break;
                     case Duration.Eighth:
                         line = 2;
-                        dotLine = 2.5f;
                         offset = 5;
                         break;
                     case Duration.Sixteenth:
                         line = 2;
-                        dotLine = 2.5f;
                         offset = 5;
                         break;
                     case Duration.ThirtySecond:
                         line = 3;
-                        dotLine = 2.5f;
                         break;
                     case Duration.SixtyFourth:
                         line = 3;
-                        dotLine = 2.5f;
                         break;
                     case Duration.OneHundredTwentyEighth:
                         line = 3;
-                        dotLine = 2.5f;
                         break;
                     case Duration.TwoHundredFiftySixth:
                         line = 3;
-                        dotLine = 2.5f;
                         break;
                 }
 

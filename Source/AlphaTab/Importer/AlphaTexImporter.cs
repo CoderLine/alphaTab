@@ -64,13 +64,9 @@ namespace AlphaTab.Importer
                 _track.ApplyLyrics(_lyrics);
                 return _score;
             }
-            catch (Exception e)
+            catch (AlphaTexException e)
             {
-                if (Std.IsException<AlphaTexException>(e))
-                {
-                    throw new UnsupportedFormatException(((AlphaTexException)e).Description);
-                }
-                throw e;
+                throw new UnsupportedFormatException(e.Description);
             }
         }
 
@@ -217,7 +213,7 @@ namespace AlphaTab.Importer
                 {
                     _sy = AlphaTexSymbols.Eof;
                 }
-                else if (Std.IsWhiteSpace(_ch))
+                else if (Platform.Platform.IsWhiteSpace(_ch))
                 {
                     // skip whitespaces 
                     NextChar();
@@ -435,7 +431,7 @@ namespace AlphaTab.Importer
                 str.AppendChar(_ch);
                 NextChar();
             } while (IsDigit(_ch));
-            return Std.ParseInt(str.ToString());
+            return Platform.Platform.ParseInt(str.ToString());
         }
 
         #region Recursive Decent Parser

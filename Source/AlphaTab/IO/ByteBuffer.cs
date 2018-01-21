@@ -84,7 +84,7 @@ namespace AlphaTab.IO
                 if (value > 0)
                 {
                     var newBuffer = new byte[value];
-                    if (_length > 0) Std.BlockCopy(_buffer, 0, newBuffer, 0, _length);
+                    if (_length > 0) Platform.Platform.BlockCopy(_buffer, 0, newBuffer, 0, _length);
                     _buffer = newBuffer;
                 }
                 else
@@ -118,7 +118,7 @@ namespace AlphaTab.IO
                     buffer[offset + byteCount] = _buffer[_position + byteCount];
             }
             else
-                Std.BlockCopy(_buffer, _position, buffer, offset, n);
+                Platform.Platform.BlockCopy(_buffer, _position, buffer, offset, n);
             _position += n;
 
             return n;
@@ -151,7 +151,7 @@ namespace AlphaTab.IO
             }
             else
             {
-                Std.BlockCopy(buffer, offset, _buffer, _position, Math.Min(count, buffer.Length - offset));
+                Platform.Platform.BlockCopy(buffer, offset, _buffer, _position, Math.Min(count, buffer.Length - offset));
             }
             _position = i;
         }
@@ -177,7 +177,7 @@ namespace AlphaTab.IO
         public virtual byte[] ToArray()
         {
             byte[] copy = new byte[_length];
-            Std.BlockCopy(_buffer, 0, copy, 0, _length);
+            Platform.Platform.BlockCopy(_buffer, 0, copy, 0, _length);
             return copy;
         }
     }

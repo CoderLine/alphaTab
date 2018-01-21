@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class WhammyBarGlyph : Glyph
     {
-        public const float WhammyMaxOffset = 60;
+        public const float WhammyMaxOffset = 60.0f;
 
         private readonly Beat _beat;
         private readonly BeatContainerGlyph _parent;

@@ -30,7 +30,7 @@ namespace AlphaTab.Rendering.Effects
 
         public bool ShouldCreateGlyph(Beat beat)
         {
-            return !beat.Text.IsNullOrWhiteSpace();
+            return !string.IsNullOrWhiteSpace(beat.Text);
         }
 
 

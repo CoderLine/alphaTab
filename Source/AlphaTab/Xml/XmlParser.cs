@@ -361,8 +361,6 @@ namespace AlphaTab.Xml
                             default:
                                 throw new XmlException("Expected >", str, p);
                         }
-                        break;
-
                     case XmlState.CLOSE:
                         // CLOSE
                         if (!IsValidChar(c))
@@ -442,8 +440,8 @@ namespace AlphaTab.Xml
                             {
                                 // #
                                 var code = s[1] == CharCodeLowerX
-                                    ? Std.ParseInt("0" + s.Substring(1, s.Length - 1))
-                                    : Std.ParseInt(s.Substring(1, s.Length - 1));
+                                    ? Platform.Platform.ParseInt("0" + s.Substring(1, s.Length - 1))
+                                    : Platform.Platform.ParseInt(s.Substring(1, s.Length - 1));
                                 buf.AppendChar(code);
                             }
                             else if (Escapes.ContainsKey(s))
