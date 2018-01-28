@@ -27,6 +27,7 @@ using AlphaTab.IO;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Util;
+using Haxe;
 using Haxe.Js.Html;
 using Phase;
 
@@ -297,7 +298,8 @@ namespace AlphaTab.Platform.JavaScript
                     var attr = _element.Attributes.Item(i);
                     if (attr.NodeName.As<string>().StartsWith("data-"))
                     {
-                        var keyParts = attr.NodeName.Substring(5).Split('-');
+                        string nodeName = attr.NodeName;
+                        var keyParts = nodeName.Substring(5).Split('-');
                         var key = keyParts[0];
                         for (int j = 1; j < keyParts.Length; j++)
                         {
@@ -307,7 +309,7 @@ namespace AlphaTab.Platform.JavaScript
                         object value = attr.NodeValue;
                         try
                         {
-                            value = Json.Parse(value.As<string>());
+                            value = Json.Parse(value.As<HaxeString>());
                         }
                         catch
                         {
@@ -395,10 +397,10 @@ namespace AlphaTab.Platform.JavaScript
             preview.Document.Body.AppendChild(a4);
 
             var dualScreenLeft = Platform.TypeOf(Browser.Window.Member<int>("ScreenLeft")) != "undefined"
-                ? Browser.Window.Member<int>("ScreenLeft")
+                ? Browser.Window.Member<HaxeInt>("ScreenLeft")
                 : Browser.Window.Screen.Left;
             var dualScreenTop = Platform.TypeOf(Browser.Window.Member<int>("ScreenTop")) != "undefined"
-                ? Browser.Window.Member<int>("ScreenTop")
+                ? Browser.Window.Member<HaxeInt>("ScreenTop")
                 : Browser.Window.Screen.Top;
             var screenWidth = Platform.TypeOf(Browser.Window.InnerWidth) != "undefined"
                 ? Browser.Window.InnerWidth

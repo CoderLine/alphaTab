@@ -21,6 +21,7 @@ using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
+using Haxe;
 using Phase;
 using TextAlign = AlphaTab.Platform.Model.TextAlign;
 
@@ -97,7 +98,7 @@ namespace AlphaTab.Platform.JavaScript
         {
             get
             {
-                return (float)_context.LineWidth;
+                return _context.LineWidth;
             }
             set
             {
@@ -130,12 +131,12 @@ namespace AlphaTab.Platform.JavaScript
 
         public void MoveTo(float x, float y)
         {
-            _context.MoveTo(x - 0.5, y - 0.5);
+            _context.MoveTo((x - 0.5), (y - 0.5));
         }
 
         public void LineTo(float x, float y)
         {
-            _context.LineTo(x - 0.5, y - 0.5);
+            _context.LineTo((x - 0.5), (y - 0.5));
         }
 
         public void QuadraticCurveTo(float cpx, float cpy, float x, float y)
@@ -151,7 +152,7 @@ namespace AlphaTab.Platform.JavaScript
         public void FillCircle(float x, float y, float radius)
         {
             _context.BeginPath();
-            _context.Arc(x, y, radius, 0, Math.PI * 2, true);
+            _context.Arc(x, y, radius, 0, (Math.PI * 2), true);
             Fill();
         }
 

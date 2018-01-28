@@ -8,14 +8,18 @@ namespace Haxe.Js.Html
     [Name("js.html.EventTarget")]
     public class EventTarget
     {
-        [Name("addEventListener")] public extern void AddEventListener(string type, EventListener listener, bool capture = false);
-        [Name("addEventListener")] public extern void AddEventListener(string type, EventListener listener, bool capture, bool wantsUntrusted);
+        [Name("addEventListener")] public extern void AddEventListener(HaxeString type, EventListener listener);
+        [Name("addEventListener")] public extern void AddEventListener(HaxeString type, EventListener listener, HaxeBool capture);
+        [Name("addEventListener")] public extern void AddEventListener(HaxeString type, EventListener listener, HaxeBool capture, HaxeBool wantsUntrusted);
 
-        [Name("addEventListener")] public extern void AddEventListener(string type, Delegate listener, bool capture = false);
-        [Name("addEventListener")] public extern void AddEventListener(string type, Delegate listener, bool capture, bool wantsUntrusted);
+        [Name("addEventListener")] public extern void AddEventListener(HaxeString type, Delegate listener);
+        [Name("addEventListener")] public extern void AddEventListener(HaxeString type, Delegate listener, HaxeBool capture);
+        [Name("addEventListener")] public extern void AddEventListener(HaxeString type, Delegate listener, HaxeBool capture, bool wantsUntrusted);
 
-        [Name("removeEventListener")] public extern void RemoveEventListener(string type, EventListener listener, bool capture = false);
-        [Name("removeEventListener")] public extern void RemoveEventListener(string type, Delegate listener, bool capture = false);
+        [Name("removeEventListener")] public extern void RemoveEventListener(HaxeString type, EventListener listener);
+        [Name("removeEventListener")] public extern void RemoveEventListener(HaxeString type, EventListener listener, HaxeBool capture);
+        [Name("removeEventListener")] public extern void RemoveEventListener(HaxeString type, Delegate listener);
+        [Name("removeEventListener")] public extern void RemoveEventListener(HaxeString type, Delegate listener, HaxeBool capture);
 
         [Name("dispatchEvent")] public extern void DispatchEvent(Event e);
     }

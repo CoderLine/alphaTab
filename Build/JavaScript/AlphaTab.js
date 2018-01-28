@@ -154,30 +154,6 @@ alphaTab_AlphaTabException.prototype = $extend(system_Exception.prototype,{
 	}
 	,__class__: alphaTab_AlphaTabException
 });
-var alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$ = {};
-alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.__name__ = true;
-alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new = function() {
-	var this1 = {}
-	return this1;
-};
-alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.get_Count = function(this1) {
-	return Object.keys(this1).length;
-};
-alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.get_Item = function(this1,index) {
-	return this1[index];
-};
-alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.set_Item = function(this1,index,value) {
-	return this1[index] = value;
-};
-alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.ContainsKey = function(this1,index) {
-	return this1.hasOwnProperty(index);
-};
-alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.Remove = function(this1,index) {
-	return delete this1[index];
-};
-alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.GetEnumerator = function(this1) {
-	return Object.keys(this1);
-};
 var alphaTab_platform_IPathCanvas = function() { };
 alphaTab_platform_IPathCanvas.__name__ = true;
 alphaTab_platform_IPathCanvas.prototype = {
@@ -1464,7 +1440,8 @@ haxe_StackItem.Method = function(classname,method) { var $x = ["Method",3,classn
 haxe_StackItem.LocalFunction = function(v) { var $x = ["LocalFunction",4,v]; $x.__enum__ = haxe_StackItem; $x.toString = $estr; return $x; };
 var alphaTab_rendering_layout_ScoreLayout = function(renderer) {
 	this.Renderer = renderer;
-	this._barRendererLookup = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+	var this1 = {}
+	this._barRendererLookup = this1;
 };
 alphaTab_rendering_layout_ScoreLayout.__name__ = true;
 alphaTab_rendering_layout_ScoreLayout.prototype = {
@@ -1489,7 +1466,8 @@ alphaTab_rendering_layout_ScoreLayout.prototype = {
 		var flags = this.Renderer.Settings.Layout.Get("hideInfo",false) ? 0 : 511;
 		var score = this.Renderer.Score;
 		var res = this.Renderer.RenderingResources;
-		this.ScoreInfoGlyphs = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+		var this1 = {}
+		this.ScoreInfoGlyphs = this1;
 		var tmp;
 		var s = score.Title;
 		if(!(s == null || s.length == 0)) {
@@ -1611,14 +1589,16 @@ alphaTab_rendering_layout_ScoreLayout.prototype = {
 	}
 	,RegisterBarRenderer: function(key,renderer) {
 		if(!this._barRendererLookup.hasOwnProperty(key)) {
-			this._barRendererLookup[key] = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+			var this1 = this._barRendererLookup;
+			var this2 = {}
+			this1[key] = this2;
 		}
 		this._barRendererLookup[key][renderer.Bar.Id] = renderer;
 	}
 	,UnregisterBarRenderer: function(key,renderer) {
 		if(this._barRendererLookup.hasOwnProperty(key)) {
 			var lookup = this._barRendererLookup[key];
-			var index = renderer.Bar.Id;
+			var key1 = renderer.Bar.Id;
 			delete lookup[index];
 		}
 	}
@@ -1660,7 +1640,8 @@ alphaTab_rendering_layout_PageViewLayout.prototype = $extend(alphaTab_rendering_
 		var y = alphaTab_rendering_layout_PageViewLayout.PagePadding[1];
 		var this1 = this.Renderer.Settings.Width;
 		this.Width = this1;
-		this._allMasterBarRenderers = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this2 = [];
+		this._allMasterBarRenderers = this2;
 		y = this.LayoutAndRenderScoreInfo(x,y,-1);
 		y = this.LayoutAndRenderScore(x,y);
 		this.Height = y + alphaTab_rendering_layout_PageViewLayout.PagePadding[3];
@@ -1730,13 +1711,11 @@ alphaTab_rendering_layout_PageViewLayout.prototype = $extend(alphaTab_rendering_
 		canvas.BeginRender(this.Width,y);
 		canvas.set_Color(res.ScoreInfoColor);
 		canvas.set_TextAlign(1);
-		var _g = 0;
 		var this2 = this.ScoreInfoGlyphs;
-		var _g1 = Object.keys(this2);
-		while(_g < _g1.length) {
-			var key = _g1[_g];
-			++_g;
-			this.ScoreInfoGlyphs[key].Paint(0,0,canvas);
+		var key = $iterator(Object.keys(this2))();
+		while(key.hasNext()) {
+			var key1 = key.next();
+			this.ScoreInfoGlyphs[key1].Paint(0,0,canvas);
 		}
 		if(this.TuningGlyph != null) {
 			this.TuningGlyph.Paint(0,0,canvas);
@@ -1757,7 +1736,8 @@ alphaTab_rendering_layout_PageViewLayout.prototype = $extend(alphaTab_rendering_
 				++i;
 			}
 		} else {
-			this._groups = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+			var this1 = [];
+			this._groups = this1;
 			var currentIndex = 0;
 			var maxWidth = this.get_MaxWidth();
 			var group1 = this.CreateEmptyStaveGroup();
@@ -1801,7 +1781,8 @@ alphaTab_rendering_layout_PageViewLayout.prototype = $extend(alphaTab_rendering_
 		}
 		endBarIndex = startIndex + endBarIndex - 1;
 		endBarIndex = Math.min(score.MasterBars.length - 1,Math.max(0,endBarIndex));
-		this._groups = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this1 = [];
+		this._groups = this1;
 		while(currentBarIndex <= endBarIndex) {
 			var group = this.CreateStaveGroup(currentBarIndex,endBarIndex);
 			this._groups.push(group);
@@ -1912,7 +1893,8 @@ alphaTab_rendering_layout_HorizontalScreenLayout.prototype = $extend(alphaTab_re
 		this._group.X = alphaTab_rendering_layout_HorizontalScreenLayout.PagePadding[0];
 		this._group.Y = alphaTab_rendering_layout_HorizontalScreenLayout.PagePadding[1];
 		var countPerPartial = this.Renderer.Settings.Layout.Get("countPerPartial",10);
-		var partials = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this1 = [];
+		var partials = this1;
 		var currentPartial = new alphaTab_rendering_layout_HorizontalScreenLayoutPartialInfo();
 		while(currentBarIndex <= endBarIndex) {
 			var result = this._group.AddBars(this.Renderer.Tracks,currentBarIndex);
@@ -2147,7 +2129,8 @@ alphaTab_rendering_effects_NoteEffectInfoBase.__name__ = true;
 alphaTab_rendering_effects_NoteEffectInfoBase.__interfaces__ = [alphaTab_rendering_IEffectBarRendererInfo];
 alphaTab_rendering_effects_NoteEffectInfoBase.prototype = {
 	ShouldCreateGlyph: function(beat) {
-		this.LastCreateInfo = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this1 = [];
+		this.LastCreateInfo = this1;
 		var i = 0;
 		var j = beat.Notes.length;
 		while(i < j) {
@@ -2809,14 +2792,15 @@ alphaTab_Environment.CheckFontLoad = function() {
 		};
 		window.addEventListener("DOMContentLoaded",function() {
 			checkFont();
-		},false);
+		});
 	}
 };
 alphaTab_Environment.prototype = {
 	__class__: alphaTab_Environment
 };
 var alphaTab_LayoutSettings = function() {
-	this.AdditionalSettings = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+	var this1 = {}
+	this.AdditionalSettings = this1;
 };
 alphaTab_LayoutSettings.__name__ = true;
 alphaTab_LayoutSettings.get_Defaults = function() {
@@ -2827,8 +2811,8 @@ alphaTab_LayoutSettings.get_Defaults = function() {
 alphaTab_LayoutSettings.prototype = {
 	Get: function(key,def) {
 		var this1 = this.AdditionalSettings;
-		var index = key.toLowerCase();
-		if(this1.hasOwnProperty(index)) {
+		var key1 = key.toLowerCase();
+		if(this1.hasOwnProperty(key1)) {
 			return this.AdditionalSettings[key.toLowerCase()];
 		}
 		return def;
@@ -2943,14 +2927,12 @@ alphaTab_Settings.FillFromJson = function(settings,json,dataAttributes) {
 		settings.Layout = alphaTab_Settings.LayoutFromJson(dataAttributes["layout"]);
 	}
 	if(dataAttributes != null) {
-		var _g = 0;
-		var _g1 = Object.keys(dataAttributes);
-		while(_g < _g1.length) {
-			var key = _g1[_g];
-			++_g;
-			if(StringTools.startsWith(key,"layout")) {
-				var property = HxOverrides.substr(key,6,null);
-				settings.Layout.AdditionalSettings[property.toLowerCase()] = dataAttributes[key];
+		var key = $iterator(Object.keys(dataAttributes))();
+		while(key.hasNext()) {
+			var key1 = key.next();
+			if(StringTools.startsWith(key1,"layout")) {
+				var property = HxOverrides.substr(key1,6,null);
+				settings.Layout.AdditionalSettings[property.toLowerCase()] = dataAttributes[key1];
 			}
 		}
 	}
@@ -2960,14 +2942,12 @@ alphaTab_Settings.FillFromJson = function(settings,json,dataAttributes) {
 		settings.Staves = alphaTab_Settings.StavesFromJson(dataAttributes["staves"]);
 	}
 	if(dataAttributes != null) {
-		var _g2 = 0;
-		var _g11 = Object.keys(dataAttributes);
-		while(_g2 < _g11.length) {
-			var key1 = _g11[_g2];
-			++_g2;
-			if(StringTools.startsWith(key1,"staves")) {
-				var property1 = HxOverrides.substr(key1,6,null);
-				settings.Staves.AdditionalSettings[property1.toLowerCase()] = dataAttributes[key1];
+		var key2 = $iterator(Object.keys(dataAttributes))();
+		while(key2.hasNext()) {
+			var key3 = key2.next();
+			if(StringTools.startsWith(key3,"staves")) {
+				var property1 = HxOverrides.substr(key3,6,null);
+				settings.Staves.AdditionalSettings[property1.toLowerCase()] = dataAttributes[key3];
 			}
 		}
 	}
@@ -2981,7 +2961,7 @@ alphaTab_Settings.StavesFromJson = function(json) {
 		if(json.additionalSettings) {
 			var json1 = json.additionalSettings;
 			var keys2 = Object.keys(json1);
-			var key2 = $iterator(keys2)();
+			var key2 = HxOverrides.iter(keys2);
 			while(key2.hasNext()) {
 				var key21 = key2.next();
 				staveSettings.AdditionalSettings[key21.toLowerCase()] = json.additionalSettings[key21];
@@ -3003,7 +2983,7 @@ alphaTab_Settings.LayoutFromJson = function(json) {
 		if(json.additionalSettings) {
 			var json1 = json.additionalSettings;
 			var keys = Object.keys(json1);
-			var key = $iterator(keys)();
+			var key = HxOverrides.iter(keys);
 			while(key.hasNext()) {
 				var key1 = key.next();
 				layout.AdditionalSettings[key1.toLowerCase()] = json.additionalSettings[key1];
@@ -3071,24 +3051,20 @@ alphaTab_Settings.prototype = {
 		json.layout = {}
 		json.layout.mode = this.Layout.Mode;
 		json.layout.additionalSettings = {}
-		var _g = 0;
 		var this1 = this.Layout.AdditionalSettings;
-		var _g1 = Object.keys(this1);
-		while(_g < _g1.length) {
-			var setting = _g1[_g];
-			++_g;
-			json.layout.additionalSettings[setting] = this.Layout.AdditionalSettings[setting];
+		var setting = $iterator(Object.keys(this1))();
+		while(setting.hasNext()) {
+			var setting1 = setting.next();
+			json.layout.additionalSettings[setting1] = this.Layout.AdditionalSettings[setting1];
 		}
 		json.staves = {}
 		json.staves.id = this.Staves.Id;
 		json.staves.additionalSettings = {}
-		var _g2 = 0;
 		var this2 = this.Staves.AdditionalSettings;
-		var _g11 = Object.keys(this2);
-		while(_g2 < _g11.length) {
-			var additionalSetting = _g11[_g2];
-			++_g2;
-			json.staves.additionalSettings[additionalSetting] = this.Staves.AdditionalSettings[additionalSetting];
+		var additionalSetting = $iterator(Object.keys(this2))();
+		while(additionalSetting.hasNext()) {
+			var additionalSetting1 = additionalSetting.next();
+			json.staves.additionalSettings[additionalSetting1] = this.Staves.AdditionalSettings[additionalSetting1];
 		}
 		return json;
 	}
@@ -3096,14 +3072,15 @@ alphaTab_Settings.prototype = {
 };
 var alphaTab_StaveSettings = function(id) {
 	this.Id = id;
-	this.AdditionalSettings = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+	var this1 = {}
+	this.AdditionalSettings = this1;
 };
 alphaTab_StaveSettings.__name__ = true;
 alphaTab_StaveSettings.prototype = {
 	Get: function(key,def) {
 		var this1 = this.AdditionalSettings;
-		var index = key.toLowerCase();
-		if(this1.hasOwnProperty(index)) {
+		var key1 = key.toLowerCase();
+		if(this1.hasOwnProperty(key1)) {
 			return this.AdditionalSettings[key.toLowerCase()];
 		}
 		return def;
@@ -3115,7 +3092,8 @@ var alphaTab_audio_GeneralMidi = function() {
 alphaTab_audio_GeneralMidi.__name__ = true;
 alphaTab_audio_GeneralMidi.GetValue = function(name) {
 	if(alphaTab_audio_GeneralMidi._values == null) {
-		alphaTab_audio_GeneralMidi._values = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+		var this1 = {}
+		alphaTab_audio_GeneralMidi._values = this1;
 		alphaTab_audio_GeneralMidi._values["acousticgrandpiano"] = 0;
 		alphaTab_audio_GeneralMidi._values["brightacousticpiano"] = 1;
 		alphaTab_audio_GeneralMidi._values["electricgrandpiano"] = 2;
@@ -3881,16 +3859,17 @@ alphaTab_audio_model_BeatTickLookup.prototype = {
 	__class__: alphaTab_audio_model_BeatTickLookup
 };
 var alphaTab_audio_model_MasterBarTickLookup = function() {
-	this.Beats = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.Beats = this1;
 };
 alphaTab_audio_model_MasterBarTickLookup.__name__ = true;
 alphaTab_audio_model_MasterBarTickLookup.prototype = {
 	Finish: function() {
-		var f = function(a,b) {
+		var comparison = function(a,b) {
 			return a.Start - b.Start;
 		};
 		this.Beats.sort(function(a1,b1) {
-			return f(a1,b1);
+			return comparison(a1,b1);
 		});
 	}
 	,AddBeat: function(beat) {
@@ -3995,7 +3974,8 @@ alphaTab_audio_model_MidiEvent.prototype = {
 	,__class__: alphaTab_audio_model_MidiEvent
 };
 var alphaTab_audio_model_MidiFile = function() {
-	this.Tracks = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.Tracks = this1;
 };
 alphaTab_audio_model_MidiFile.__name__ = true;
 alphaTab_audio_model_MidiFile.prototype = {
@@ -4039,8 +4019,10 @@ alphaTab_audio_model_MidiMessage.prototype = {
 	,__class__: alphaTab_audio_model_MidiMessage
 };
 var alphaTab_audio_model_MidiTickLookup = function() {
-	this.MasterBars = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	this.MasterBarLookup = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+	var this1 = [];
+	this.MasterBars = this1;
+	var this2 = {}
+	this.MasterBarLookup = this2;
 };
 alphaTab_audio_model_MidiTickLookup.__name__ = true;
 alphaTab_audio_model_MidiTickLookup.prototype = {
@@ -4056,8 +4038,9 @@ alphaTab_audio_model_MidiTickLookup.prototype = {
 		if(masterBar == null) {
 			return null;
 		}
-		var trackLookup = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-		var track = $iterator(tracks)();
+		var this1 = {}
+		var trackLookup = this1;
+		var track = HxOverrides.iter(tracks);
 		while(track.hasNext()) {
 			var track1 = track.next();
 			trackLookup[track1.Index] = true;
@@ -4231,6 +4214,30 @@ alphaTab_audio_model_MidiTrack.prototype = {
 	}
 	,__class__: alphaTab_audio_model_MidiTrack
 };
+var alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$ = {};
+alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.__name__ = true;
+alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new = function() {
+	var this1 = {}
+	return this1;
+};
+alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.get_Item = function(this1,index) {
+	return this1[index];
+};
+alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.set_Item = function(this1,index,value) {
+	return this1[index] = value;
+};
+alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.get_Count = function(this1) {
+	return Object.keys(this1).length;
+};
+alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.GetEnumerator = function(this1) {
+	return Object.keys(this1);
+};
+alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.Remove = function(this1,key) {
+	delete this1[index];
+};
+alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.ContainsKey = function(this1,key) {
+	return this1.hasOwnProperty(key);
+};
 var alphaTab_collections__$FastList_FastList_$Impl_$ = {};
 alphaTab_collections__$FastList_FastList_$Impl_$.__name__ = true;
 alphaTab_collections__$FastList_FastList_$Impl_$._new = function() {
@@ -4246,8 +4253,13 @@ alphaTab_collections__$FastList_FastList_$Impl_$.get_Item = function(this1,index
 alphaTab_collections__$FastList_FastList_$Impl_$.set_Item = function(this1,index,value) {
 	return this1[index] = value;
 };
-alphaTab_collections__$FastList_FastList_$Impl_$.Add = function(this1,t) {
-	this1.push(t);
+alphaTab_collections__$FastList_FastList_$Impl_$.Add = function(this1,item) {
+	this1.push(item);
+};
+alphaTab_collections__$FastList_FastList_$Impl_$.Sort = function(this1,comparison) {
+	this1.sort(function(a,b) {
+		return comparison(a,b);
+	});
 };
 alphaTab_collections__$FastList_FastList_$Impl_$.Clone = function(this1) {
 	return this1.slice(0);
@@ -4257,25 +4269,14 @@ alphaTab_collections__$FastList_FastList_$Impl_$.RemoveAt = function(this1,index
 		this1.splice(index,1);
 	}
 };
-alphaTab_collections__$FastList_FastList_$Impl_$.Remove = function(this1,val) {
-	var index = this1.indexOf(val);
-	if(index != -1) {
-		this1.splice(index,1);
-	}
+alphaTab_collections__$FastList_FastList_$Impl_$.ToArray = function(this1) {
+	return this1;
 };
 alphaTab_collections__$FastList_FastList_$Impl_$.GetEnumerator = function(this1) {
 	return this1;
 };
-alphaTab_collections__$FastList_FastList_$Impl_$.IndexOf = function(this1,t) {
-	return this1.indexOf(t);
-};
-alphaTab_collections__$FastList_FastList_$Impl_$.ToArray = function(this1) {
-	return this1;
-};
-alphaTab_collections__$FastList_FastList_$Impl_$.Sort = function(this1,f) {
-	this1.sort(function(a,b) {
-		return f(a,b);
-	});
+alphaTab_collections__$FastList_FastList_$Impl_$.IndexOf = function(this1,item) {
+	return this1.indexOf(item);
 };
 alphaTab_collections__$FastList_FastList_$Impl_$.Reverse = function(this1) {
 	this1.reverse();
@@ -4852,7 +4853,8 @@ alphaTab_importer_AlphaTexImporter.prototype = $extend(alphaTab_importer_ScoreIm
 			this.CreateDefaultScore();
 			this._curChPos = 0;
 			this._currentDuration = 4;
-			this._lyrics = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+			var this1 = [];
+			this._lyrics = this1;
 			this.NextChar();
 			this.NewSy();
 			this.Score();
@@ -5201,7 +5203,8 @@ alphaTab_importer_AlphaTexImporter.prototype = $extend(alphaTab_importer_ScoreIm
 					this.NewSy();
 					break;
 				case 6:
-					var tuning = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+					var this1 = [];
+					var tuning = this1;
 					while(true) {
 						var t = this._syData;
 						tuning.push(t.get_RealValue());
@@ -5503,11 +5506,11 @@ alphaTab_importer_AlphaTexImporter.prototype = $extend(alphaTab_importer_ScoreIm
 					++i;
 				}
 			} else {
-				var f = function(a,b) {
+				var comparison = function(a,b) {
 					return a.Offset - b.Offset;
 				};
 				beat.WhammyBarPoints.sort(function(a1,b1) {
-					return f(a1,b1);
+					return comparison(a1,b1);
 				});
 			}
 			this._allowNegatives = false;
@@ -5656,9 +5659,9 @@ alphaTab_importer_AlphaTexImporter.prototype = $extend(alphaTab_importer_ScoreIm
 					}
 				}
 				if(exact) {
-					note.BendPoints.sort((function(f) {
+					note.BendPoints.sort((function(comparison) {
 						return function(a,b) {
-							return f[0](a,b);
+							return comparison[0](a,b);
 						};
 					})([(function() {
 						return function(a1,b1) {
@@ -6060,7 +6063,8 @@ alphaTab_importer_Gp3To5Importer.prototype = $extend(alphaTab_importer_ScoreImpo
 		this._score.Notices = notice;
 	}
 	,ReadLyrics: function() {
-		this._lyrics = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this1 = [];
+		this._lyrics = this1;
 		this._lyricsTrack = this.ReadInt32() - 1;
 		var i = 0;
 		while(i < 5) {
@@ -6080,7 +6084,8 @@ alphaTab_importer_Gp3To5Importer.prototype = $extend(alphaTab_importer_ScoreImpo
 		}
 	}
 	,ReadPlaybackInfos: function() {
-		this._playbackInfos = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this1 = [];
+		this._playbackInfos = this1;
 		var i = 0;
 		while(i < 64) {
 			var info = new alphaTab_model_PlaybackInformation();
@@ -6159,8 +6164,7 @@ alphaTab_importer_Gp3To5Importer.prototype = $extend(alphaTab_importer_ScoreImpo
 			newMasterBar.Section = section;
 		}
 		if((flags & 64) != 0) {
-			var this1 = alphaTab_platform_Platform.ReadSignedByte(this.Data);
-			newMasterBar.KeySignature = this1;
+			newMasterBar.KeySignature = alphaTab_platform_Platform.ReadSignedByte(this.Data);
 			newMasterBar.KeySignatureType = js_Boot.__cast(this.Data.ReadByte() , Int);
 		} else if(previousMasterBar != null) {
 			newMasterBar.KeySignature = previousMasterBar.KeySignature;
@@ -6204,7 +6208,8 @@ alphaTab_importer_Gp3To5Importer.prototype = $extend(alphaTab_importer_ScoreImpo
 		newTrack.Name = this.ReadStringByteLength(40);
 		newTrack.IsPercussion = (flags & 1) != 0;
 		var stringCount = this.ReadInt32();
-		var tuning = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this1 = [];
+		var tuning = this1;
 		var i = 0;
 		while(i < 7) {
 			var stringTuning = this.ReadInt32();
@@ -6552,15 +6557,12 @@ alphaTab_importer_Gp3To5Importer.prototype = $extend(alphaTab_importer_ScoreImpo
 	}
 	,ReadMixTableChange: function(beat) {
 		var tableChange = new alphaTab_importer_MixTableChange();
-		var this1 = alphaTab_platform_Platform.ReadSignedByte(this.Data);
-		tableChange.Instrument = this1;
+		tableChange.Instrument = alphaTab_platform_Platform.ReadSignedByte(this.Data);
 		if(this._versionNumber >= 500) {
 			this.Data.Skip(16);
 		}
-		var this2 = alphaTab_platform_Platform.ReadSignedByte(this.Data);
-		tableChange.Volume = this2;
-		var this3 = alphaTab_platform_Platform.ReadSignedByte(this.Data);
-		tableChange.Balance = this3;
+		tableChange.Volume = alphaTab_platform_Platform.ReadSignedByte(this.Data);
+		tableChange.Balance = alphaTab_platform_Platform.ReadSignedByte(this.Data);
 		var chorus = alphaTab_platform_Platform.ReadSignedByte(this.Data);
 		var reverb = alphaTab_platform_Platform.ReadSignedByte(this.Data);
 		var phaser = alphaTab_platform_Platform.ReadSignedByte(this.Data);
@@ -6588,8 +6590,7 @@ alphaTab_importer_Gp3To5Importer.prototype = $extend(alphaTab_importer_ScoreImpo
 			this.Data.ReadByte();
 		}
 		if(tableChange.Tempo >= 0) {
-			var this4 = alphaTab_platform_Platform.ReadSignedByte(this.Data);
-			tableChange.Duration = this4;
+			tableChange.Duration = alphaTab_platform_Platform.ReadSignedByte(this.Data);
 			if(this._versionNumber >= 510) {
 				this.Data.ReadByte();
 			}
@@ -6608,32 +6609,32 @@ alphaTab_importer_Gp3To5Importer.prototype = $extend(alphaTab_importer_ScoreImpo
 			var volumeAutomation = new alphaTab_model_Automation();
 			volumeAutomation.IsLinear = true;
 			volumeAutomation.Type = 1;
-			var this5 = tableChange.Volume;
-			volumeAutomation.Value = this5;
+			var this1 = tableChange.Volume;
+			volumeAutomation.Value = this1;
 			beat.Automations.push(volumeAutomation);
 		}
 		if(tableChange.Balance >= 0) {
 			var balanceAutomation = new alphaTab_model_Automation();
 			balanceAutomation.IsLinear = true;
 			balanceAutomation.Type = 3;
-			var this6 = tableChange.Balance;
-			balanceAutomation.Value = this6;
+			var this2 = tableChange.Balance;
+			balanceAutomation.Value = this2;
 			beat.Automations.push(balanceAutomation);
 		}
 		if(tableChange.Instrument >= 0) {
 			var instrumentAutomation = new alphaTab_model_Automation();
 			instrumentAutomation.IsLinear = true;
 			instrumentAutomation.Type = 2;
-			var this7 = tableChange.Instrument;
-			instrumentAutomation.Value = this7;
+			var this3 = tableChange.Instrument;
+			instrumentAutomation.Value = this3;
 			beat.Automations.push(instrumentAutomation);
 		}
 		if(tableChange.Tempo >= 0) {
 			var tempoAutomation = new alphaTab_model_Automation();
 			tempoAutomation.IsLinear = true;
 			tempoAutomation.Type = 0;
-			var this8 = tableChange.Tempo;
-			tempoAutomation.Value = this8;
+			var this4 = tableChange.Tempo;
+			tempoAutomation.Value = this4;
 			beat.Automations.push(tempoAutomation);
 			beat.Voice.Bar.get_MasterBar().TempoAutomation = tempoAutomation;
 		}
@@ -6666,8 +6667,7 @@ alphaTab_importer_Gp3To5Importer.prototype = $extend(alphaTab_importer_ScoreImpo
 			beat.Dynamic = newNote.Dynamic;
 		}
 		if((flags & 32) != 0) {
-			var this1 = alphaTab_platform_Platform.ReadSignedByte(this.Data);
-			newNote.Fret = this1;
+			newNote.Fret = alphaTab_platform_Platform.ReadSignedByte(this.Data);
 		}
 		if((flags & 128) != 0) {
 			newNote.LeftHandFinger = js_Boot.__cast(alphaTab_platform_Platform.ReadSignedByte(this.Data) , Int);
@@ -6772,11 +6772,9 @@ alphaTab_importer_Gp3To5Importer.prototype = $extend(alphaTab_importer_ScoreImpo
 		var graceBeat = new alphaTab_model_Beat();
 		var graceNote = new alphaTab_model_Note();
 		graceNote.String = note.String;
-		var this1 = alphaTab_platform_Platform.ReadSignedByte(this.Data);
-		graceNote.Fret = this1;
+		graceNote.Fret = alphaTab_platform_Platform.ReadSignedByte(this.Data);
 		graceBeat.Duration = 32;
-		var this2 = alphaTab_platform_Platform.ReadSignedByte(this.Data);
-		graceBeat.Dynamic = this.ToDynamicValue(this2);
+		graceBeat.Dynamic = this.ToDynamicValue(alphaTab_platform_Platform.ReadSignedByte(this.Data));
 		var transition = alphaTab_platform_Platform.ReadSignedByte(this.Data);
 		switch(transition) {
 		case 0:
@@ -7029,7 +7027,8 @@ alphaTab_importer_GpxFile.prototype = {
 	__class__: alphaTab_importer_GpxFile
 };
 var alphaTab_importer_GpxFileSystem = function() {
-	this.Files = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.Files = this1;
 	this.FileFilter = function(s) {
 		return true;
 	};
@@ -7195,22 +7194,37 @@ var alphaTab_importer_GpxParser = function() {
 alphaTab_importer_GpxParser.__name__ = true;
 alphaTab_importer_GpxParser.prototype = {
 	ParseXml: function(xml) {
-		this._masterTrackAutomations = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+		var this1 = {}
+		this._masterTrackAutomations = this1;
 		this._tracksMapping = system__$FixedArray_FixedArray_$Impl_$._new(0);
-		this._tracksById = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-		this._masterBars = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-		this._barsOfMasterBar = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-		this._voicesOfBar = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-		this._barsById = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-		this._voiceById = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-		this._beatsOfVoice = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-		this._beatById = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-		this._rhythmOfBeat = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-		this._rhythmById = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-		this._notesOfBeat = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-		this._noteById = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-		this._tappedNotes = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-		this._lyricsByTrack = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+		var this2 = {}
+		this._tracksById = this2;
+		var this3 = [];
+		this._masterBars = this3;
+		var this4 = [];
+		this._barsOfMasterBar = this4;
+		var this5 = {}
+		this._voicesOfBar = this5;
+		var this6 = {}
+		this._barsById = this6;
+		var this7 = {}
+		this._voiceById = this7;
+		var this8 = {}
+		this._beatsOfVoice = this8;
+		var this9 = {}
+		this._beatById = this9;
+		var this10 = {}
+		this._rhythmOfBeat = this10;
+		var this11 = {}
+		this._rhythmById = this11;
+		var this12 = {}
+		this._notesOfBeat = this12;
+		var this13 = {}
+		this._noteById = this13;
+		var this14 = {}
+		this._tappedNotes = this14;
+		var this15 = {}
+		this._lyricsByTrack = this15;
 		var dom;
 		try {
 			dom = new alphaTab_xml_XmlDocument(xml);
@@ -7223,15 +7237,14 @@ alphaTab_importer_GpxParser.prototype = {
 		this.ParseDom(dom);
 		this.BuildModel();
 		this.Score.Finish();
-		if(alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.get_Count(this._lyricsByTrack) > 0) {
-			var _g = 0;
-			var this1 = this._lyricsByTrack;
-			var _g1 = Object.keys(this1);
-			while(_g < _g1.length) {
-				var trackId = _g1[_g];
-				++_g;
-				var track = this._tracksById[trackId];
-				track.ApplyLyrics(this._lyricsByTrack[trackId]);
+		var this16 = this._lyricsByTrack;
+		if(Object.keys(this16).length > 0) {
+			var this17 = this._lyricsByTrack;
+			var trackId = $iterator(Object.keys(this17))();
+			while(trackId.hasNext()) {
+				var trackId1 = trackId.next();
+				var track = this._tracksById[trackId1];
+				track.ApplyLyrics(this._lyricsByTrack[trackId1]);
 			}
 		}
 	}
@@ -7445,7 +7458,8 @@ alphaTab_importer_GpxParser.prototype = {
 		}
 		if(barId != null) {
 			if(!automations.hasOwnProperty(barId)) {
-				automations[barId] = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+				var this3 = [];
+				automations[barId] = this3;
 			}
 			automations[barId].push(automation);
 		}
@@ -7519,7 +7533,8 @@ alphaTab_importer_GpxParser.prototype = {
 		this._tracksById[trackId] = track;
 	}
 	,ParseLyrics: function(trackId,node) {
-		var tracks = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this1 = [];
+		var tracks = this1;
 		var c = $iterator(node.ChildNodes)();
 		while(c.hasNext()) {
 			var c1 = c.next();
@@ -7586,7 +7601,8 @@ alphaTab_importer_GpxParser.prototype = {
 				var _g = c1.LocalName;
 				switch(_g) {
 				case "Fingering":
-					var existingFingers = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+					var this1 = {}
+					var existingFingers = this1;
 					var p = $iterator(c1.ChildNodes)();
 					while(p.hasNext()) {
 						var p1 = p.next();
@@ -8172,7 +8188,8 @@ alphaTab_importer_GpxParser.prototype = {
 			if(whammyDestination == null) {
 				whammyDestination = new alphaTab_model_BendPoint(60,0);
 			}
-			var whammy = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+			var this1 = [];
+			var whammy = this1;
 			whammy.push(whammyOrigin);
 			if(whammyMiddleOffset1 != null && whammyMiddleValue != null) {
 				whammy.push(new alphaTab_model_BendPoint(whammyMiddleOffset1,whammyMiddleValue));
@@ -8573,7 +8590,7 @@ alphaTab_importer_GpxParser.prototype = {
 			this.Score.AddMasterBar(masterBar);
 			++i;
 		}
-		var trackId = $iterator(this._tracksMapping)();
+		var trackId = HxOverrides.iter(this._tracksMapping);
 		while(trackId.hasNext()) {
 			var trackId1 = trackId.next();
 			if(trackId1 == null || trackId1.length == 0) {
@@ -8607,15 +8624,13 @@ alphaTab_importer_GpxParser.prototype = {
 			}
 			++masterBarIndex;
 		}
-		var _g = 0;
 		var this1 = this._barsById;
-		var _g1 = Object.keys(this1);
-		while(_g < _g1.length) {
-			var barId1 = _g1[_g];
-			++_g;
-			var bar1 = this._barsById[barId1];
-			if(this._voicesOfBar.hasOwnProperty(barId1)) {
-				var voiceId = $iterator(this._voicesOfBar[barId1])();
+		var barId1 = $iterator(Object.keys(this1))();
+		while(barId1.hasNext()) {
+			var barId2 = barId1.next();
+			var bar1 = this._barsById[barId2];
+			if(this._voicesOfBar.hasOwnProperty(barId2)) {
+				var voiceId = HxOverrides.iter(this._voicesOfBar[barId2]);
 				while(voiceId.hasNext()) {
 					var voiceId1 = voiceId.next();
 					if(voiceId1 != "-1") {
@@ -8631,21 +8646,19 @@ alphaTab_importer_GpxParser.prototype = {
 				}
 			}
 		}
-		var _g2 = 0;
 		var this2 = this._beatById;
-		var _g11 = Object.keys(this2);
-		while(_g2 < _g11.length) {
-			var beatId = _g11[_g2];
-			++_g2;
-			var beat1 = this._beatById[beatId];
-			var rhythmId = this._rhythmOfBeat[beatId];
+		var beatId = $iterator(Object.keys(this2))();
+		while(beatId.hasNext()) {
+			var beatId1 = beatId.next();
+			var beat1 = this._beatById[beatId1];
+			var rhythmId = this._rhythmOfBeat[beatId1];
 			var rhythm = this._rhythmById[rhythmId];
 			beat1.Duration = rhythm.Value;
 			beat1.Dots = rhythm.Dots;
 			beat1.TupletNumerator = rhythm.TupletNumerator;
 			beat1.TupletDenominator = rhythm.TupletDenominator;
-			if(this._notesOfBeat.hasOwnProperty(beatId)) {
-				var noteId = $iterator(this._notesOfBeat[beatId])();
+			if(this._notesOfBeat.hasOwnProperty(beatId1)) {
+				var noteId = HxOverrides.iter(this._notesOfBeat[beatId1]);
 				while(noteId.hasNext()) {
 					var noteId1 = noteId.next();
 					if(noteId1 != "-1") {
@@ -8657,37 +8670,33 @@ alphaTab_importer_GpxParser.prototype = {
 				}
 			}
 		}
-		var _g3 = 0;
 		var this3 = this._voiceById;
-		var _g12 = Object.keys(this3);
-		while(_g3 < _g12.length) {
-			var voiceId2 = _g12[_g3];
-			++_g3;
-			var voice1 = this._voiceById[voiceId2];
-			if(this._beatsOfVoice.hasOwnProperty(voiceId2)) {
-				var beatId1 = $iterator(this._beatsOfVoice[voiceId2])();
-				while(beatId1.hasNext()) {
-					var beatId2 = beatId1.next();
-					if(beatId2 != "-1") {
-						voice1.AddBeat(this._beatById[beatId2].Clone());
+		var voiceId2 = $iterator(Object.keys(this3))();
+		while(voiceId2.hasNext()) {
+			var voiceId3 = voiceId2.next();
+			var voice1 = this._voiceById[voiceId3];
+			if(this._beatsOfVoice.hasOwnProperty(voiceId3)) {
+				var beatId2 = HxOverrides.iter(this._beatsOfVoice[voiceId3]);
+				while(beatId2.hasNext()) {
+					var beatId3 = beatId2.next();
+					if(beatId3 != "-1") {
+						voice1.AddBeat(this._beatById[beatId3].Clone());
 					}
 				}
 			}
 		}
-		var _g4 = 0;
 		var this4 = this._masterTrackAutomations;
-		var _g13 = Object.keys(this4);
-		while(_g4 < _g13.length) {
-			var barIndex1 = _g13[_g4];
-			++_g4;
-			var automations = this._masterTrackAutomations[barIndex1];
-			var masterBar1 = this.Score.MasterBars[alphaTab_platform_Platform.ParseInt(barIndex1)];
+		var barIndex1 = $iterator(Object.keys(this4))();
+		while(barIndex1.hasNext()) {
+			var barIndex2 = barIndex1.next();
+			var automations = this._masterTrackAutomations[barIndex2];
+			var masterBar1 = this.Score.MasterBars[alphaTab_platform_Platform.ParseInt(barIndex2)];
 			var i1 = 0;
 			var j1 = automations.length;
 			while(i1 < j1) {
 				var automation = automations[i1];
 				if(automation.Type == 0) {
-					if(barIndex1 == "0") {
+					if(barIndex2 == "0") {
 						var tmp = system_Convert.ToInt32_Single(automation.Value);
 						this.Score.Tempo = tmp;
 						if(automation.Text != null) {
@@ -8724,7 +8733,8 @@ alphaTab_importer_MixTableChange.prototype = {
 	__class__: alphaTab_importer_MixTableChange
 };
 var alphaTab_importer_MusicXmlImporter = function() {
-	this._voiceOfStaff = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+	var this1 = {}
+	this._voiceOfStaff = this1;
 	alphaTab_importer_ScoreImporter.call(this);
 };
 alphaTab_importer_MusicXmlImporter.__name__ = true;
@@ -8744,7 +8754,8 @@ alphaTab_importer_MusicXmlImporter.prototype = $extend(alphaTab_importer_ScoreIm
 		return "MusicXML";
 	}
 	,ReadScore: function() {
-		this._trackById = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+		var this1 = {}
+		this._trackById = this1;
 		var xml = alphaTab_platform_Platform.ToString(this.Data.ReadAll());
 		var dom;
 		try {
@@ -8952,7 +8963,7 @@ alphaTab_importer_MusicXmlImporter.prototype = $extend(alphaTab_importer_ScoreIm
 		var durationInDivisions = alphaTab_platform_Platform.ParseInt(element.FindChildElement("duration").get_InnerText());
 		var duration = durationInDivisions * 4 / js_Boot.__cast(this._divisionsPerQuarterNote , Float);
 		var durations = [64,32,16,8,4,2,1];
-		var d = $iterator(durations)();
+		var d = HxOverrides.iter(durations);
 		while(d.hasNext()) {
 			var d1 = d.next();
 			if(duration >= d1) {
@@ -9139,7 +9150,8 @@ alphaTab_importer_MusicXmlImporter.prototype = $extend(alphaTab_importer_ScoreIm
 					break;
 				case "rest":
 					beat.IsEmpty = false;
-					beat.Notes = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+					var this1 = [];
+					beat.Notes = this1;
 					break;
 				case "stem":
 					break;
@@ -10266,7 +10278,8 @@ alphaTab_model__$AutomationType_AutomationType_$Impl_$.toString = function(this1
 };
 var alphaTab_model_Bar = function() {
 	this.Id = alphaTab_model_Bar.GlobalBarId++;
-	this.Voices = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.Voices = this1;
 	this.Clef = 4;
 	this.ClefOttavia = 2;
 };
@@ -10310,15 +10323,18 @@ alphaTab_model_Bar.prototype = {
 };
 var alphaTab_model_Beat = function() {
 	this.Id = alphaTab_model_Beat.GlobalBeatId++;
-	this.WhammyBarPoints = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	this.Notes = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.WhammyBarPoints = this1;
+	var this2 = [];
+	this.Notes = this2;
 	this.BrushType = 0;
 	this.Vibrato = 0;
 	this.GraceType = 0;
 	this.PickStroke = 0;
 	this.Duration = 4;
 	this.TremoloSpeed = null;
-	this.Automations = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this3 = [];
+	this.Automations = this3;
 	this.Dots = 0;
 	this.Start = 0;
 	this.TupletDenominator = -1;
@@ -10636,8 +10652,10 @@ alphaTab_model__$BrushType_BrushType_$Impl_$.toString = function(this1) {
 	return "";
 };
 var alphaTab_model_Chord = function() {
-	this.Strings = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	this.BarreFrets = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.Strings = this1;
+	var this2 = [];
+	this.BarreFrets = this2;
 };
 alphaTab_model_Chord.__name__ = true;
 alphaTab_model_Chord.CopyTo = function(src,dst) {
@@ -11105,8 +11123,10 @@ alphaTab_model_JsonConverter.prototype = {
 	ScoreToJsObject: function(score) {
 		var score2 = {}
 		alphaTab_model_Score.CopyTo(score,score2);
-		score2.MasterBars = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-		score2.Tracks = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this1 = [];
+		score2.MasterBars = this1;
+		var this2 = [];
+		score2.Tracks = this2;
 		var i = 0;
 		while(i < score.MasterBars.length) {
 			var masterBar = score.MasterBars[i];
@@ -11135,42 +11155,46 @@ alphaTab_model_JsonConverter.prototype = {
 			alphaTab_model_Track.CopyTo(track,track2);
 			track2.PlaybackInfo = {}
 			alphaTab_model_PlaybackInformation.CopyTo(track.PlaybackInfo,track2.PlaybackInfo);
-			track2.Chords = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-			var _g = 0;
-			var this1 = track.Chords;
-			var _g1 = Object.keys(this1);
-			while(_g < _g1.length) {
-				var key = _g1[_g];
-				++_g;
-				var chord = track.Chords[key];
+			var this3 = {}
+			track2.Chords = this3;
+			var this4 = track.Chords;
+			var key = $iterator(Object.keys(this4))();
+			while(key.hasNext()) {
+				var key1 = key.next();
+				var chord = track.Chords[key1];
 				var chord2 = {}
 				alphaTab_model_Chord.CopyTo(chord,chord2);
-				track2.Chords[key] = chord;
+				track2.Chords[key1] = chord;
 			}
-			track2.Staves = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+			var this5 = [];
+			track2.Staves = this5;
 			var s = 0;
 			while(s < track.Staves.length) {
 				var staff = track.Staves[s];
 				var staff2 = {}
-				staff2.Bars = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+				var this6 = [];
+				staff2.Bars = this6;
 				var b = 0;
 				while(b < staff.Bars.length) {
 					var bar = staff.Bars[b];
 					var bar2 = {}
 					alphaTab_model_Bar.CopyTo(bar,bar2);
-					bar2.Voices = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+					var this7 = [];
+					bar2.Voices = this7;
 					var v = 0;
 					while(v < bar.Voices.length) {
 						var voice = bar.Voices[v];
 						var voice2 = {}
 						alphaTab_model_Voice.CopyTo(voice,voice2);
-						voice2.Beats = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+						var this8 = [];
+						voice2.Beats = this8;
 						var bb = 0;
 						while(bb < voice.Beats.length) {
 							var beat = voice.Beats[bb];
 							var beat2 = {}
 							alphaTab_model_Beat.CopyTo(beat,beat2);
-							beat2.Automations = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+							var this9 = [];
+							beat2.Automations = this9;
 							var a = 0;
 							while(a < beat.Automations.length) {
 								var automation = {}
@@ -11178,7 +11202,8 @@ alphaTab_model_JsonConverter.prototype = {
 								beat2.Automations.push(automation);
 								++a;
 							}
-							beat2.WhammyBarPoints = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+							var this10 = [];
+							beat2.WhammyBarPoints = this10;
 							var i1 = 0;
 							while(i1 < beat.WhammyBarPoints.length) {
 								var point = {}
@@ -11186,13 +11211,15 @@ alphaTab_model_JsonConverter.prototype = {
 								beat2.WhammyBarPoints.push(point);
 								++i1;
 							}
-							beat2.Notes = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+							var this11 = [];
+							beat2.Notes = this11;
 							var n = 0;
 							while(n < beat.Notes.length) {
 								var note = beat.Notes[n];
 								var note2 = {}
 								alphaTab_model_Note.CopyTo(note,note2);
-								note2.BendPoints = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+								var this12 = [];
+								note2.BendPoints = this12;
 								var i2 = 0;
 								while(i2 < note.BendPoints.length) {
 									var point1 = {}
@@ -11250,16 +11277,14 @@ alphaTab_model_JsonConverter.prototype = {
 			alphaTab_model_Track.CopyTo(track,track2);
 			score2.AddTrack(track2);
 			alphaTab_model_PlaybackInformation.CopyTo(track.PlaybackInfo,track2.PlaybackInfo);
-			var _g = 0;
 			var this1 = track.Chords;
-			var _g1 = Object.keys(this1);
-			while(_g < _g1.length) {
-				var key = _g1[_g];
-				++_g;
-				var chord = track.Chords[key];
+			var key = $iterator(Object.keys(this1))();
+			while(key.hasNext()) {
+				var key1 = key.next();
+				var chord = track.Chords[key1];
 				var chord2 = new alphaTab_model_Chord();
 				alphaTab_model_Chord.CopyTo(chord,chord2);
-				track2.Chords[key] = chord2;
+				track2.Chords[key1] = chord2;
 			}
 			var s = 0;
 			while(s < track.Staves.length) {
@@ -11379,7 +11404,8 @@ var alphaTab_model_Lyrics = function() {
 alphaTab_model_Lyrics.__name__ = true;
 alphaTab_model_Lyrics.prototype = {
 	Finish: function() {
-		var chunks = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this1 = [];
+		var chunks = this1;
 		this.Parse(this.Text,0,chunks);
 		this.Chunks = chunks;
 	}
@@ -11539,7 +11565,8 @@ alphaTab_model_ModelUtils.ApplyPitchOffsets = function(settings,score) {
 };
 var alphaTab_model_Note = function() {
 	this.Id = alphaTab_model_Note.GlobalNoteId++;
-	this.BendPoints = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.BendPoints = this1;
 	this.Dynamic = 5;
 	this.Accentuated = 0;
 	this.Fret = -2147483648;
@@ -11550,8 +11577,8 @@ var alphaTab_model_Note = function() {
 	this.RightHandFinger = -2;
 	this.TrillValue = -1;
 	this.TrillSpeed = 32;
-	var this1 = 1;
-	this.DurationPercent = this1;
+	var this2 = 1;
+	this.DurationPercent = this2;
 	this.Octave = -1;
 	this.Tone = -1;
 	this.Fret = -1;
@@ -11852,9 +11879,12 @@ alphaTab_model_PlaybackInformation.prototype = {
 	__class__: alphaTab_model_PlaybackInformation
 };
 var alphaTab_model_RepeatGroup = function() {
-	this.MasterBars = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	this.Openings = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	this.Closings = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.MasterBars = this1;
+	var this2 = [];
+	this.Openings = this2;
+	var this3 = [];
+	this.Closings = this3;
 	this.IsClosed = false;
 };
 alphaTab_model_RepeatGroup.__name__ = true;
@@ -11876,8 +11906,10 @@ alphaTab_model_RepeatGroup.prototype = {
 	,__class__: alphaTab_model_RepeatGroup
 };
 var alphaTab_model_Score = function() {
-	this.MasterBars = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	this.Tracks = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.MasterBars = this1;
+	var this2 = [];
+	this.Tracks = this2;
 	this._currentRepeatGroup = new alphaTab_model_RepeatGroup();
 	this.Album = this.Artist = this.Copyright = this.Instructions = this.Music = this.Notices = this.SubTitle = this.Title = this.Words = this.Tab = this.TempoLabel = "";
 	this.Tempo = 120;
@@ -11997,7 +12029,8 @@ alphaTab_model__$SlideType_SlideType_$Impl_$.toString = function(this1) {
 	return "";
 };
 var alphaTab_model_Staff = function() {
-	this.Bars = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.Bars = this1;
 };
 alphaTab_model_Staff.__name__ = true;
 alphaTab_model_Staff.prototype = {
@@ -12015,10 +12048,12 @@ var alphaTab_model_Track = function(staveCount) {
 	this.Name = "";
 	this.ShortName = "";
 	this.Tuning = system__$FixedArray_FixedArray_$Impl_$._new(0);
-	this.Chords = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+	var this1 = {}
+	this.Chords = this1;
 	this.PlaybackInfo = new alphaTab_model_PlaybackInformation();
 	this.Color = new alphaTab_platform_model_Color(200,0,0,255);
-	this.Staves = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this2 = [];
+	this.Staves = this2;
 	this.EnsureStaveCount(staveCount);
 };
 alphaTab_model_Track.__name__ = true;
@@ -12195,14 +12230,20 @@ alphaTab_model_Tuning.GetPresetsFor = function(stringCount) {
 		return alphaTab_model_Tuning._sevenStrings;
 	default:
 	}
-	return alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	return this1;
 };
 alphaTab_model_Tuning.Initialize = function() {
-	alphaTab_model_Tuning._sevenStrings = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	alphaTab_model_Tuning._sixStrings = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	alphaTab_model_Tuning._fiveStrings = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	alphaTab_model_Tuning._fourStrings = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	alphaTab_model_Tuning._defaultTunings = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+	var this1 = [];
+	alphaTab_model_Tuning._sevenStrings = this1;
+	var this2 = [];
+	alphaTab_model_Tuning._sixStrings = this2;
+	var this3 = [];
+	alphaTab_model_Tuning._fiveStrings = this3;
+	var this4 = [];
+	alphaTab_model_Tuning._fourStrings = this4;
+	var this5 = {}
+	alphaTab_model_Tuning._defaultTunings = this5;
 	alphaTab_model_Tuning._defaultTunings[7] = new alphaTab_model_Tuning("Guitar 7 strings",[64,59,55,50,45,40,35],true);
 	alphaTab_model_Tuning._sevenStrings.push(alphaTab_model_Tuning._defaultTunings[7]);
 	alphaTab_model_Tuning._defaultTunings[6] = new alphaTab_model_Tuning("Guitar Standard Tuning",[64,59,55,50,45,40],true);
@@ -12428,7 +12469,8 @@ alphaTab_model__$VibratoType_VibratoType_$Impl_$.toString = function(this1) {
 	return "";
 };
 var alphaTab_model_Voice = function() {
-	this.Beats = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.Beats = this1;
 	this.IsEmpty = true;
 };
 alphaTab_model_Voice.__name__ = true;
@@ -12842,13 +12884,11 @@ alphaTab_rendering_BarRendererBase.prototype = {
 	}
 	,ScaleToWidth: function(width) {
 		var containerWidth = width - this._preBeatGlyphs.Width - this._postBeatGlyphs.Width;
-		var _g = 0;
 		var this1 = this._voiceContainers;
-		var _g1 = Object.keys(this1);
-		while(_g < _g1.length) {
-			var voice = _g1[_g];
-			++_g;
-			var c = this._voiceContainers[voice];
+		var voice = $iterator(Object.keys(this1))();
+		while(voice.hasNext()) {
+			var voice1 = voice.next();
+			var c = this._voiceContainers[voice1];
 			c.ScaleToWidth(containerWidth);
 		}
 		this._postBeatGlyphs.X = this._preBeatGlyphs.X + this._preBeatGlyphs.Width + containerWidth;
@@ -12879,13 +12919,11 @@ alphaTab_rendering_BarRendererBase.prototype = {
 		if(info.PreBeatSize < preSize) {
 			info.PreBeatSize = preSize;
 		}
-		var _g = 0;
 		var this1 = this._voiceContainers;
-		var _g1 = Object.keys(this1);
-		while(_g < _g1.length) {
-			var voice = _g1[_g];
-			++_g;
-			var c = this._voiceContainers[voice];
+		var voice = $iterator(Object.keys(this1))();
+		while(voice.hasNext()) {
+			var voice1 = voice.next();
+			var c = this._voiceContainers[voice1];
 			c.RegisterLayoutingInfo(info);
 		}
 		var postSize = this._postBeatGlyphs.Width;
@@ -12900,13 +12938,11 @@ alphaTab_rendering_BarRendererBase.prototype = {
 		this._appliedLayoutingInfo = this.LayoutingInfo.Version;
 		this._preBeatGlyphs.Width = this.LayoutingInfo.PreBeatSize;
 		var voiceEnd = this._preBeatGlyphs.X + this._preBeatGlyphs.Width;
-		var _g = 0;
 		var this1 = this._voiceContainers;
-		var _g1 = Object.keys(this1);
-		while(_g < _g1.length) {
-			var voice = _g1[_g];
-			++_g;
-			var c = this._voiceContainers[voice];
+		var voice = $iterator(Object.keys(this1))();
+		while(voice.hasNext()) {
+			var voice1 = voice.next();
+			var c = this._voiceContainers[voice1];
 			c.X = this._preBeatGlyphs.X + this._preBeatGlyphs.Width;
 			c.ApplyLayoutingInfo(this.LayoutingInfo);
 			var newEnd = c.X + c.Width;
@@ -12925,7 +12961,8 @@ alphaTab_rendering_BarRendererBase.prototype = {
 	,DoLayout: function() {
 		this._preBeatGlyphs = new alphaTab_rendering_glyphs_LeftToRightLayoutingGlyphGroup();
 		this._preBeatGlyphs.Renderer = this;
-		this._voiceContainers = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+		var this1 = {}
+		this._voiceContainers = this1;
 		this._postBeatGlyphs = new alphaTab_rendering_glyphs_LeftToRightLayoutingGlyphGroup();
 		this._postBeatGlyphs.Renderer = this;
 		var i = 0;
@@ -12956,12 +12993,10 @@ alphaTab_rendering_BarRendererBase.prototype = {
 		var voiceContainers = this._voiceContainers;
 		var beatGlyphsStart = this.get_BeatGlyphsStart();
 		var postBeatStart = beatGlyphsStart;
-		var _g = 0;
-		var _g1 = Object.keys(voiceContainers);
-		while(_g < _g1.length) {
-			var voice = _g1[_g];
-			++_g;
-			var c = voiceContainers[voice];
+		var voice = $iterator(Object.keys(voiceContainers))();
+		while(voice.hasNext()) {
+			var voice1 = voice.next();
+			var c = voiceContainers[voice1];
 			c.X = beatGlyphsStart;
 			c.DoLayout();
 			var x = c.X + c.Width;
@@ -12998,13 +13033,11 @@ alphaTab_rendering_BarRendererBase.prototype = {
 		this.PaintBackground(cx,cy,canvas);
 		canvas.set_Color(this.get_Resources().MainGlyphColor);
 		this._preBeatGlyphs.Paint(cx + this.X,cy + this.Y,canvas);
-		var _g = 0;
 		var this1 = this._voiceContainers;
-		var _g1 = Object.keys(this1);
-		while(_g < _g1.length) {
-			var voice = _g1[_g];
-			++_g;
-			var c = this._voiceContainers[voice];
+		var voice = $iterator(Object.keys(this1))();
+		while(voice.hasNext()) {
+			var voice1 = voice.next();
+			var c = this._voiceContainers[voice1];
 			canvas.set_Color(c.Voice.Index == 0 ? this.get_Resources().MainGlyphColor : this.get_Resources().SecondaryGlyphColor);
 			c.Paint(cx + this.X,cy + this.Y,canvas);
 		}
@@ -13019,14 +13052,12 @@ alphaTab_rendering_BarRendererBase.prototype = {
 		barBounds.VisualBounds = new alphaTab_rendering_utils_Bounds();
 		barBounds.RealBounds = new alphaTab_rendering_utils_Bounds();
 		masterBarBounds.AddBar(barBounds);
-		var _g = 0;
 		var this1 = this._voiceContainers;
-		var _g1 = Object.keys(this1);
-		while(_g < _g1.length) {
-			var voice = _g1[_g];
-			++_g;
-			var c = this._voiceContainers[voice];
-			if(!c.Voice.IsEmpty || this.Bar.get_IsEmpty() && voice == 0) {
+		var voice = $iterator(Object.keys(this1))();
+		while(voice.hasNext()) {
+			var voice1 = voice.next();
+			var c = this._voiceContainers[voice1];
+			if(!c.Voice.IsEmpty || this.Bar.get_IsEmpty() && voice1 == 0) {
 				var i = 0;
 				var j = c.BeatGlyphs.length;
 				while(i < j) {
@@ -13165,8 +13196,10 @@ alphaTab_rendering_glyphs_Glyph.prototype = {
 var alphaTab_rendering_EffectBand = function(info) {
 	alphaTab_rendering_glyphs_Glyph.call(this,0,0);
 	this.Info = info;
-	this._uniqueEffectGlyphs = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	this._effectGlyphs = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this._uniqueEffectGlyphs = this1;
+	var this2 = [];
+	this._effectGlyphs = this2;
 	this.IsEmpty = true;
 };
 alphaTab_rendering_EffectBand.__name__ = true;
@@ -13176,8 +13209,12 @@ alphaTab_rendering_EffectBand.prototype = $extend(alphaTab_rendering_glyphs_Glyp
 		alphaTab_rendering_glyphs_Glyph.prototype.DoLayout.call(this);
 		var i = 0;
 		while(i < this.Renderer.Bar.Voices.length) {
-			this._effectGlyphs.push(alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new());
-			this._uniqueEffectGlyphs.push(alphaTab_collections__$FastList_FastList_$Impl_$._new());
+			var this1 = this._effectGlyphs;
+			var this2 = {}
+			this1.push(this2);
+			var this3 = this._uniqueEffectGlyphs;
+			var this4 = [];
+			this3.push(this4);
 			++i;
 		}
 	}
@@ -13264,13 +13301,11 @@ alphaTab_rendering_EffectBand.prototype = $extend(alphaTab_rendering_glyphs_Glyp
 	,AlignGlyphs: function() {
 		var v = 0;
 		while(v < this._effectGlyphs.length) {
-			var _g = 0;
 			var this1 = this._effectGlyphs[v];
-			var _g1 = Object.keys(this1);
-			while(_g < _g1.length) {
-				var key = _g1[_g];
-				++_g;
-				this.AlignGlyph(this.Info.get_SizingMode(),this.Renderer.Bar.Voices[v].Beats[key]);
+			var key = $iterator(Object.keys(this1))();
+			while(key.hasNext()) {
+				var key1 = key.next();
+				this.AlignGlyph(this.Info.get_SizingMode(),this.Renderer.Bar.Voices[v].Beats[key1]);
 			}
 			++v;
 		}
@@ -13299,15 +13334,17 @@ alphaTab_rendering_EffectBand.prototype = $extend(alphaTab_rendering_glyphs_Glyp
 	,__class__: alphaTab_rendering_EffectBand
 });
 var alphaTab_rendering_EffectBandSizingInfo = function() {
-	this.Slots = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	this._effectSlot = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+	var this1 = [];
+	this.Slots = this1;
+	var this2 = {}
+	this._effectSlot = this2;
 };
 alphaTab_rendering_EffectBandSizingInfo.__name__ = true;
 alphaTab_rendering_EffectBandSizingInfo.prototype = {
 	GetOrCreateSlot: function(band) {
 		var this1 = this._effectSlot;
-		var index = band.Info.get_EffectId();
-		if(this1.hasOwnProperty(index)) {
+		var key = band.Info.get_EffectId();
+		if(this1.hasOwnProperty(key)) {
 			var slot = this._effectSlot[band.Info.get_EffectId()];
 			if(slot.CanBeUsed(band)) {
 				return slot;
@@ -13348,7 +13385,8 @@ alphaTab_rendering_EffectBandSizingInfo.prototype = {
 	,__class__: alphaTab_rendering_EffectBandSizingInfo
 };
 var alphaTab_rendering_EffectBandSlot = function() {
-	this.Bands = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.Bands = this1;
 };
 alphaTab_rendering_EffectBandSlot.__name__ = true;
 alphaTab_rendering_EffectBandSlot.prototype = {
@@ -13477,7 +13515,7 @@ alphaTab_rendering_EffectBarRenderer.prototype = $extend(alphaTab_rendering_BarR
 			var previousRenderer = js_Boot.__cast(this.get_PreviousRenderer() , alphaTab_rendering_EffectBarRenderer);
 			this.SizingInfo.CopySlots(previousRenderer.SizingInfo);
 		}
-		var effectBand = $iterator(this._bands)();
+		var effectBand = HxOverrides.iter(this._bands);
 		while(effectBand.hasNext()) {
 			var effectBand1 = effectBand.next();
 			effectBand1.AlignGlyphs();
@@ -13490,7 +13528,7 @@ alphaTab_rendering_EffectBarRenderer.prototype = $extend(alphaTab_rendering_BarR
 	}
 	,ScaleToWidth: function(width) {
 		alphaTab_rendering_BarRendererBase.prototype.ScaleToWidth.call(this,width);
-		var effectBand = $iterator(this._bands)();
+		var effectBand = HxOverrides.iter(this._bands);
 		while(effectBand.hasNext()) {
 			var effectBand1 = effectBand.next();
 			effectBand1.AlignGlyphs();
@@ -13498,7 +13536,8 @@ alphaTab_rendering_EffectBarRenderer.prototype = $extend(alphaTab_rendering_BarR
 	}
 	,CreateBeatGlyphs: function() {
 		this._bands = system__$FixedArray_FixedArray_$Impl_$._new(this._infos.length);
-		this.BandLookup = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+		var this1 = {}
+		this.BandLookup = this1;
 		var i = 0;
 		while(i < this._infos.length) {
 			this._bands[i] = new alphaTab_rendering_EffectBand(this._infos[i]);
@@ -13514,7 +13553,7 @@ alphaTab_rendering_EffectBarRenderer.prototype = $extend(alphaTab_rendering_BarR
 				this.CreateVoiceGlyphs(voice1);
 			}
 		}
-		var effectBand = $iterator(this._bands)();
+		var effectBand = HxOverrides.iter(this._bands);
 		while(effectBand.hasNext()) {
 			var effectBand1 = effectBand.next();
 			if(effectBand1.IsLinkedToPrevious) {
@@ -13530,7 +13569,7 @@ alphaTab_rendering_EffectBarRenderer.prototype = $extend(alphaTab_rendering_BarR
 			container.PreNotes = new alphaTab_rendering_glyphs_BeatGlyphBase();
 			container.OnNotes = new alphaTab_rendering_glyphs_BeatOnNoteGlyphBase();
 			this.AddBeatGlyph(container);
-			var effectBand = $iterator(this._bands)();
+			var effectBand = HxOverrides.iter(this._bands);
 			while(effectBand.hasNext()) {
 				var effectBand1 = effectBand.next();
 				effectBand1.CreateGlyph(b1);
@@ -13540,7 +13579,7 @@ alphaTab_rendering_EffectBarRenderer.prototype = $extend(alphaTab_rendering_BarR
 	,Paint: function(cx,cy,canvas) {
 		this.PaintBackground(cx,cy,canvas);
 		canvas.set_Color(this.get_Resources().MainGlyphColor);
-		var effectBand = $iterator(this._bands)();
+		var effectBand = HxOverrides.iter(this._bands);
 		while(effectBand.hasNext()) {
 			var effectBand1 = effectBand.next();
 			effectBand1.Paint(cx + this.X,cy + this.Y,canvas);
@@ -14047,11 +14086,11 @@ alphaTab_rendering_ScoreBarRenderer.prototype = $extend(alphaTab_rendering_BarRe
 			beatLineX = beatLineX + 3 * this.get_Scale();
 		}
 		var noteList = beat.Notes.slice(0);
-		var f = function(a,b) {
+		var comparison = function(a,b) {
 			return a.get_RealValue() - b.get_RealValue();
 		};
 		noteList.sort(function(a1,b1) {
-			return f(a1,b1);
+			return comparison(a1,b1);
 		});
 		var n = 0;
 		while(n < noteList.length) {
@@ -14221,14 +14260,16 @@ alphaTab_rendering_ScoreBarRenderer.prototype = $extend(alphaTab_rendering_BarRe
 			break;
 		default:
 		}
-		var newLines = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-		var newGlyphs = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this1 = {}
+		var newLines = this1;
+		var this2 = [];
+		var newGlyphs = this2;
 		if(alphaTab_model_ModelUtils.KeySignatureIsSharp(currentKey)) {
 			var i = 0;
 			while(i < Math.abs(currentKey)) {
 				var step = alphaTab_rendering_ScoreBarRenderer.SharpKsSteps[i] + offsetClef;
-				var this1 = step;
-				newGlyphs.push(new alphaTab_rendering_glyphs_SharpGlyph(0,this.GetScoreY(this1,0),false));
+				var this3 = step;
+				newGlyphs.push(new alphaTab_rendering_glyphs_SharpGlyph(0,this.GetScoreY(this3,0),false));
 				newLines[step] = true;
 				++i;
 			}
@@ -14236,8 +14277,8 @@ alphaTab_rendering_ScoreBarRenderer.prototype = $extend(alphaTab_rendering_BarRe
 			var i1 = 0;
 			while(i1 < Math.abs(currentKey)) {
 				var step1 = alphaTab_rendering_ScoreBarRenderer.FlatKsSteps[i1] + offsetClef;
-				var this2 = step1;
-				newGlyphs.push(new alphaTab_rendering_glyphs_FlatGlyph(0,this.GetScoreY(this2,0),false));
+				var this4 = step1;
+				newGlyphs.push(new alphaTab_rendering_glyphs_FlatGlyph(0,this.GetScoreY(this4,0),false));
 				newLines[step1] = true;
 				++i1;
 			}
@@ -14248,8 +14289,8 @@ alphaTab_rendering_ScoreBarRenderer.prototype = $extend(alphaTab_rendering_BarRe
 		while(i2 < naturalizeSymbols) {
 			var step2 = previousKeyPositions[i2] + offsetClef;
 			if(!newLines.hasOwnProperty(step2)) {
-				var this3 = previousKeyPositions[i2] + offsetClef;
-				this.AddPreBeatGlyph(new alphaTab_rendering_glyphs_NaturalizeGlyph(0,this.GetScoreY(this3,0),false));
+				var this5 = previousKeyPositions[i2] + offsetClef;
+				this.AddPreBeatGlyph(new alphaTab_rendering_glyphs_NaturalizeGlyph(0,this.GetScoreY(this5,0),false));
 			}
 			++i2;
 		}
@@ -14307,7 +14348,8 @@ alphaTab_rendering_ScoreBarRenderer.prototype = $extend(alphaTab_rendering_BarRe
 var alphaTab_rendering_glyphs_BeatContainerGlyph = function(beat,voiceContainer) {
 	alphaTab_rendering_glyphs_Glyph.call(this,0,0);
 	this.Beat = beat;
-	this.Ties = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.Ties = this1;
 	this.VoiceContainer = voiceContainer;
 };
 alphaTab_rendering_glyphs_BeatContainerGlyph.__name__ = true;
@@ -14494,8 +14536,9 @@ alphaTab_rendering_ScoreRenderer.prototype = {
 	,Render: function(score,trackIndexes) {
 		try {
 			this.Score = score;
-			var tracks = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-			var track = $iterator(trackIndexes)();
+			var this1 = [];
+			var tracks = this1;
+			var track = HxOverrides.iter(trackIndexes);
 			while(track.hasNext()) {
 				var track1 = track.next();
 				if(track1 >= 0 && track1 < score.Tracks.length) {
@@ -14789,11 +14832,13 @@ alphaTab_rendering_TabBarRenderer.prototype = $extend(alphaTab_rendering_BarRend
 		canvas.set_Color(res.StaveLineColor);
 		var lineY = cy + this.Y + this.TopPadding;
 		var padding = this.get_Scale();
-		var tabNotes = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this1 = [];
+		var tabNotes = this1;
 		var i = 0;
 		var j = this.Bar.Staff.Track.Tuning.length;
 		while(i < j) {
-			tabNotes.push(alphaTab_collections__$FastList_FastList_$Impl_$._new());
+			var this2 = [];
+			tabNotes.push(this2);
 			++i;
 		}
 		var voice = $iterator(this.Bar.Voices)();
@@ -14807,15 +14852,13 @@ alphaTab_rendering_TabBarRenderer.prototype = $extend(alphaTab_rendering_BarRend
 					var notes = js_Boot.__cast(bg1.OnNotes , alphaTab_rendering_glyphs_TabBeatGlyph);
 					var noteNumbers = notes.NoteNumbers;
 					if(noteNumbers != null) {
-						var _g = 0;
-						var this1 = noteNumbers.NotesPerString;
-						var _g1 = Object.keys(this1);
-						while(_g < _g1.length) {
-							var s = _g1[_g];
-							++_g;
-							var noteNumber = noteNumbers.NotesPerString[s];
+						var this3 = noteNumbers.NotesPerString;
+						var s = $iterator(Object.keys(this3))();
+						while(s.hasNext()) {
+							var s1 = s.next();
+							var noteNumber = noteNumbers.NotesPerString[s1];
 							if(!noteNumber.IsEmpty) {
-								tabNotes[this.Bar.Staff.Track.Tuning.length - s].push([vc.X + bg1.X + notes.X + noteNumbers.X,noteNumbers.Width + padding]);
+								tabNotes[this.Bar.Staff.Track.Tuning.length - s1].push([vc.X + bg1.X + notes.X + noteNumbers.X,noteNumbers.Width + padding]);
 							}
 						}
 					}
@@ -14825,9 +14868,9 @@ alphaTab_rendering_TabBarRenderer.prototype = $extend(alphaTab_rendering_BarRend
 		var line = $iterator(tabNotes)();
 		while(line.hasNext()) {
 			var line1 = line.next();
-			line1.sort((function(f) {
+			line1.sort((function(comparison) {
 				return function(a,b) {
-					return f[0](a,b);
+					return comparison[0](a,b);
 				};
 			})([(function() {
 				return function(a1,b1) {
@@ -14853,14 +14896,14 @@ alphaTab_rendering_TabBarRenderer.prototype = $extend(alphaTab_rendering_BarRend
 			while(line2.hasNext()) {
 				var line3 = line2.next();
 				var tmp = cx + this.X + lineX;
-				var this2 = system_Convert.ToInt32_Single(lineY);
+				var this4 = system_Convert.ToInt32_Single(lineY);
 				var tmp1 = this.get_Scale();
-				canvas.FillRect(tmp,this2,line3[0] - lineX,tmp1);
+				canvas.FillRect(tmp,this4,line3[0] - lineX,tmp1);
 				lineX = line3[0] + line3[1];
 			}
 			var tmp2 = cx + this.X + lineX;
-			var this3 = system_Convert.ToInt32_Single(lineY);
-			canvas.FillRect(tmp2,this3,this.Width - lineX,this.get_Scale());
+			var this5 = system_Convert.ToInt32_Single(lineY);
+			canvas.FillRect(tmp2,this5,this.Width - lineX,this.get_Scale());
 			++i1;
 		}
 		canvas.set_Color(res.MainGlyphColor);
@@ -15087,7 +15130,8 @@ alphaTab_rendering_glyphs_GlyphGroup.prototype = $extend(alphaTab_rendering_glyp
 	}
 	,AddGlyph: function(g) {
 		if(this.Glyphs == null) {
-			this.Glyphs = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+			var this1 = [];
+			this.Glyphs = this1;
 		}
 		this.Glyphs.push(g);
 	}
@@ -15115,7 +15159,7 @@ alphaTab_rendering_glyphs_AccidentalGroupGlyph.prototype = $extend(alphaTab_rend
 			this.Width = 0;
 			return;
 		}
-		var f = function(a,b) {
+		var comparison = function(a,b) {
 			if(a.Y < b.Y) {
 				return -1;
 			}
@@ -15125,11 +15169,12 @@ alphaTab_rendering_glyphs_AccidentalGroupGlyph.prototype = $extend(alphaTab_rend
 			return 0;
 		};
 		this.Glyphs.sort(function(a1,b1) {
-			return f(a1,b1);
+			return comparison(a1,b1);
 		});
-		var columns = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-		var this1 = -3000;
-		columns.push(this1);
+		var this1 = [];
+		var columns = this1;
+		var this2 = -3000;
+		columns.push(this2);
 		var accidentalSize = 21 * this.get_Scale();
 		var i = 0;
 		var j = this.Glyphs.length;
@@ -15141,12 +15186,12 @@ alphaTab_rendering_glyphs_AccidentalGroupGlyph.prototype = $extend(alphaTab_rend
 			while(columns[gColumn] > g.Y) {
 				++gColumn;
 				if(gColumn == columns.length) {
-					var this2 = -3000;
-					columns.push(this2);
+					var this3 = -3000;
+					columns.push(this3);
 				}
 			}
-			var this3 = gColumn;
-			g.X = this3;
+			var this4 = gColumn;
+			g.X = this4;
 			columns[gColumn] = g.Y + accidentalSize;
 			++i;
 		}
@@ -15169,7 +15214,8 @@ alphaTab_rendering_glyphs_AccidentalGroupGlyph.prototype = $extend(alphaTab_rend
 });
 var alphaTab_rendering_glyphs_AlternateEndingsGlyph = function(x,y,alternateEndings) {
 	alphaTab_rendering_glyphs_EffectGlyph.call(this,x,y);
-	this._endings = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this._endings = this1;
 	var i = 0;
 	while(i < 8) {
 		if((alternateEndings & 1 << i) != 0) {
@@ -15867,7 +15913,8 @@ alphaTab_rendering_glyphs_HiHatGlyph.prototype = $extend(alphaTab_rendering_glyp
 });
 var alphaTab_rendering_glyphs_LeftToRightLayoutingGlyphGroup = function() {
 	alphaTab_rendering_glyphs_GlyphGroup.call(this,0,0);
-	this.Glyphs = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.Glyphs = this1;
 };
 alphaTab_rendering_glyphs_LeftToRightLayoutingGlyphGroup.__name__ = true;
 alphaTab_rendering_glyphs_LeftToRightLayoutingGlyphGroup.__super__ = alphaTab_rendering_glyphs_GlyphGroup;
@@ -16857,9 +16904,12 @@ alphaTab_rendering_glyphs_ScoreLegatoGlyph.prototype = $extend(alphaTab_renderin
 });
 var alphaTab_rendering_glyphs_ScoreNoteChordGlyph = function() {
 	alphaTab_rendering_glyphs_Glyph.call(this,0,0);
-	this._infos = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	this.BeatEffects = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-	this._noteLookup = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+	var this1 = [];
+	this._infos = this1;
+	var this2 = {}
+	this.BeatEffects = this2;
+	var this3 = {}
+	this._noteLookup = this3;
 };
 alphaTab_rendering_glyphs_ScoreNoteChordGlyph.__name__ = true;
 alphaTab_rendering_glyphs_ScoreNoteChordGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
@@ -16918,11 +16968,11 @@ alphaTab_rendering_glyphs_ScoreNoteChordGlyph.prototype = $extend(alphaTab_rende
 		}
 	}
 	,DoLayout: function() {
-		var f = function(a,b) {
+		var comparison = function(a,b) {
 			return system__$Int32_Int32_$Impl_$.CompareTo_Int32(a.Line,b.Line);
 		};
 		this._infos.sort(function(a1,b1) {
-			return f(a1,b1);
+			return comparison(a1,b1);
 		});
 		var padding = 0;
 		var displacedX = 0;
@@ -16986,13 +17036,11 @@ alphaTab_rendering_glyphs_ScoreNoteChordGlyph.prototype = $extend(alphaTab_rende
 			var this3 = padding;
 			this.DownLineX = this3;
 		}
-		var _g = 0;
 		var this4 = this.BeatEffects;
-		var _g1 = Object.keys(this4);
-		while(_g < _g1.length) {
-			var effectKey = _g1[_g];
-			++_g;
-			var effect = this.BeatEffects[effectKey];
+		var effectKey = $iterator(Object.keys(this4))();
+		while(effectKey.hasNext()) {
+			var effectKey1 = effectKey.next();
+			var effect = this.BeatEffects[effectKey1];
 			effect.Renderer = this.Renderer;
 			effect.DoLayout();
 		}
@@ -17050,13 +17098,11 @@ alphaTab_rendering_glyphs_ScoreNoteChordGlyph.prototype = $extend(alphaTab_rende
 			effectY = scoreRenderer.GetScoreY(this3,-1.0 * 9);
 		}
 		var effectSpacing = this.BeamingHelper.Direction == 0 ? 7 * this.get_Scale() : -7 * this.get_Scale();
-		var _g = 0;
 		var this4 = this.BeatEffects;
-		var _g1 = Object.keys(this4);
-		while(_g < _g1.length) {
-			var effectKey = _g1[_g];
-			++_g;
-			var g = this.BeatEffects[effectKey];
+		var effectKey = $iterator(Object.keys(this4))();
+		while(effectKey.hasNext()) {
+			var effectKey1 = effectKey.next();
+			var g = this.BeatEffects[effectKey1];
 			g.Y = effectY;
 			g.X = this.Width / 2;
 			g.Paint(cx,cy,canvas);
@@ -17383,17 +17429,18 @@ alphaTab_rendering_glyphs_TabBeatContainerGlyph.__super__ = alphaTab_rendering_g
 alphaTab_rendering_glyphs_TabBeatContainerGlyph.prototype = $extend(alphaTab_rendering_glyphs_BeatContainerGlyph.prototype,{
 	DoLayout: function() {
 		alphaTab_rendering_glyphs_BeatContainerGlyph.prototype.DoLayout.call(this);
-		this._bendGlyphs = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this1 = [];
+		this._bendGlyphs = this1;
 		var i = 0;
 		while(i < this.Beat.Notes.length) {
 			var n = this.Beat.Notes[i];
 			if(n.get_HasBend()) {
 				var bendValueHeight = 6;
 				var bendHeight = n.MaxBendPoint.Value * bendValueHeight;
-				var this1 = bendHeight;
-				this.Renderer.RegisterOverflowTop(this1);
-				var this2 = bendValueHeight;
-				var bend = new alphaTab_rendering_glyphs_BendGlyph(n,this2);
+				var this2 = bendHeight;
+				this.Renderer.RegisterOverflowTop(this2);
+				var this3 = bendValueHeight;
+				var bend = new alphaTab_rendering_glyphs_BendGlyph(n,this3);
 				bend.X = this.OnNotes.X + this.OnNotes.Width;
 				bend.Renderer = this.Renderer;
 				this._bendGlyphs.push(bend);
@@ -17687,9 +17734,12 @@ alphaTab_rendering_glyphs_TabClefGlyph.prototype = $extend(alphaTab_rendering_gl
 var alphaTab_rendering_glyphs_TabNoteChordGlyph = function(x,y,isGrace) {
 	alphaTab_rendering_glyphs_Glyph.call(this,x,y);
 	this._isGrace = isGrace;
-	this._notes = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	this.BeatEffects = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-	this.NotesPerString = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+	var this1 = [];
+	this._notes = this1;
+	var this2 = {}
+	this.BeatEffects = this2;
+	var this3 = {}
+	this.NotesPerString = this3;
 };
 alphaTab_rendering_glyphs_TabNoteChordGlyph.__name__ = true;
 alphaTab_rendering_glyphs_TabNoteChordGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
@@ -17730,13 +17780,11 @@ alphaTab_rendering_glyphs_TabNoteChordGlyph.prototype = $extend(alphaTab_renderi
 		var tabHeight = this.Renderer.get_Resources().TablatureFont.Size;
 		var effectY = this.GetNoteY(this.MinStringNote) + tabHeight / 2;
 		var effectSpacing = 7 * this.get_Scale();
-		var _g = 0;
 		var this1 = this.BeatEffects;
-		var _g1 = Object.keys(this1);
-		while(_g < _g1.length) {
-			var beatEffectKey = _g1[_g];
-			++_g;
-			var g1 = this.BeatEffects[beatEffectKey];
+		var beatEffectKey = $iterator(Object.keys(this1))();
+		while(beatEffectKey.hasNext()) {
+			var beatEffectKey1 = beatEffectKey.next();
+			var g1 = this.BeatEffects[beatEffectKey1];
 			g1.Y = g1.Y + effectY;
 			g1.X = g1.X + this.Width / 2;
 			g1.Renderer = this.Renderer;
@@ -17769,13 +17817,11 @@ alphaTab_rendering_glyphs_TabNoteChordGlyph.prototype = $extend(alphaTab_renderi
 			g1.Paint(cx,cy,canvas);
 		}
 		canvas.set_TextBaseline(oldBaseLine);
-		var _g = 0;
 		var this1 = this.BeatEffects;
-		var _g1 = Object.keys(this1);
-		while(_g < _g1.length) {
-			var beatEffectKey = _g1[_g];
-			++_g;
-			var g2 = this.BeatEffects[beatEffectKey];
+		var beatEffectKey = $iterator(Object.keys(this1))();
+		while(beatEffectKey.hasNext()) {
+			var beatEffectKey1 = beatEffectKey.next();
+			var g2 = this.BeatEffects[beatEffectKey1];
 			g2.Paint(cx,cy,canvas);
 		}
 	}
@@ -18305,7 +18351,8 @@ alphaTab_rendering_glyphs_VibratoGlyph.prototype = $extend(alphaTab_rendering_gl
 var alphaTab_rendering_glyphs_VoiceContainerGlyph = function(x,y,voice) {
 	alphaTab_rendering_glyphs_GlyphGroup.call(this,x,y);
 	this.Voice = voice;
-	this.BeatGlyphs = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.BeatGlyphs = this1;
 };
 alphaTab_rendering_glyphs_VoiceContainerGlyph.__name__ = true;
 alphaTab_rendering_glyphs_VoiceContainerGlyph.__super__ = alphaTab_rendering_glyphs_GlyphGroup;
@@ -18542,17 +18589,21 @@ alphaTab_rendering_layout__$HeaderFooterElements_HeaderFooterElements_$Impl_$.to
 	return "";
 };
 var alphaTab_rendering_layout_HorizontalScreenLayoutPartialInfo = function() {
-	this.MasterBars = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.MasterBars = this1;
 };
 alphaTab_rendering_layout_HorizontalScreenLayoutPartialInfo.__name__ = true;
 alphaTab_rendering_layout_HorizontalScreenLayoutPartialInfo.prototype = {
 	__class__: alphaTab_rendering_layout_HorizontalScreenLayoutPartialInfo
 };
 var alphaTab_rendering_staves_BarLayoutingInfo = function() {
-	this.PreBeatSizes = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-	this.OnBeatSizes = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+	var this1 = {}
+	this.PreBeatSizes = this1;
+	var this2 = {}
+	this.OnBeatSizes = this2;
 	this.VoiceSize = 0;
-	this.Springs = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+	var this3 = {}
+	this.Springs = this3;
 	this.Version = 0;
 };
 alphaTab_rendering_staves_BarLayoutingInfo.__name__ = true;
@@ -18632,21 +18683,20 @@ alphaTab_rendering_staves_BarLayoutingInfo.prototype = {
 		this.Version++;
 	}
 	,CalculateSpringConstants: function() {
-		var sortedSprings = this._timeSortedSprings = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this1 = [];
+		var sortedSprings = this._timeSortedSprings = this1;
 		this._xMin = 0;
 		var springs = this.Springs;
-		var _g = 0;
-		var _g1 = Object.keys(springs);
-		while(_g < _g1.length) {
-			var time = _g1[_g];
-			++_g;
-			var spring = springs[time];
+		var time = $iterator(Object.keys(springs))();
+		while(time.hasNext()) {
+			var time1 = time.next();
+			var spring = springs[time1];
 			sortedSprings.push(spring);
 			if(spring.SpringWidth < this._xMin) {
 				this._xMin = spring.SpringWidth;
 			}
 		}
-		var f = function(a,b) {
+		var comparison = function(a,b) {
 			if(a.TimePosition < b.TimePosition) {
 				return -1;
 			}
@@ -18656,7 +18706,7 @@ alphaTab_rendering_staves_BarLayoutingInfo.prototype = {
 			return 0;
 		};
 		sortedSprings.sort(function(a1,b1) {
-			return f(a1,b1);
+			return comparison(a1,b1);
 		});
 		var totalSpringConstant = 0;
 		var i = 0;
@@ -18669,8 +18719,8 @@ alphaTab_rendering_staves_BarLayoutingInfo.prototype = {
 				var nextSpring = sortedSprings[i + 1];
 				duration = nextSpring.TimePosition - currentSpring.TimePosition;
 			}
-			var this1 = duration;
-			currentSpring.SpringConstant = this.CalculateSpringConstant(currentSpring,this1);
+			var this2 = duration;
+			currentSpring.SpringConstant = this.CalculateSpringConstant(currentSpring,this2);
 			totalSpringConstant = totalSpringConstant + 1 / currentSpring.SpringConstant;
 			++i;
 		}
@@ -18706,7 +18756,8 @@ alphaTab_rendering_staves_BarLayoutingInfo.prototype = {
 			return this._onTimePositions;
 		}
 		this._onTimePositionsForce = force;
-		var positions = this._onTimePositions = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+		var this1 = {}
+		var positions = this._onTimePositions = this1;
 		var sortedSprings = this._timeSortedSprings;
 		if(sortedSprings.length == 0) {
 			return positions;
@@ -18723,7 +18774,8 @@ alphaTab_rendering_staves_BarLayoutingInfo.prototype = {
 	,__class__: alphaTab_rendering_staves_BarLayoutingInfo
 };
 var alphaTab_rendering_staves_MasterBarsRenderers = function() {
-	this.Renderers = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.Renderers = this1;
 };
 alphaTab_rendering_staves_MasterBarsRenderers.__name__ = true;
 alphaTab_rendering_staves_MasterBarsRenderers.prototype = {
@@ -18736,7 +18788,8 @@ alphaTab_rendering_staves_Spring.prototype = {
 	__class__: alphaTab_rendering_staves_Spring
 };
 var alphaTab_rendering_staves_Staff = function(trackIndex,staff,factory) {
-	this.BarRenderers = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.BarRenderers = this1;
 	this.TrackIndex = trackIndex;
 	this.ModelStaff = staff;
 	this._factory = factory;
@@ -18859,9 +18912,12 @@ alphaTab_rendering_staves_Staff.prototype = {
 	,__class__: alphaTab_rendering_staves_Staff
 };
 var alphaTab_rendering_staves_StaveGroup = function() {
-	this.MasterBarsRenderers = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	this.Staves = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	this._allStaves = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.MasterBarsRenderers = this1;
+	var this2 = [];
+	this.Staves = this2;
+	var this3 = [];
+	this._allStaves = this3;
 	this.Width = 0;
 	this.Index = 0;
 	this._accoladeSpacingCalculated = false;
@@ -19123,7 +19179,8 @@ alphaTab_rendering_staves_StaveGroup.prototype = {
 		staveGroupBounds.VisualBounds = new alphaTab_rendering_utils_Bounds();
 		staveGroupBounds.RealBounds = new alphaTab_rendering_utils_Bounds();
 		this.Layout.Renderer.get_BoundsLookup().AddStaveGroup(staveGroupBounds);
-		var masterBarBoundsLookup = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this1 = [];
+		var masterBarBoundsLookup = this1;
 		var i = 0;
 		while(i < this.Staves.length) {
 			var j = 0;
@@ -19157,15 +19214,18 @@ alphaTab_rendering_staves_StaveGroup.prototype = {
 var alphaTab_rendering_staves_StaveTrackGroup = function(staveGroup,track) {
 	this.StaveGroup = staveGroup;
 	this.Track = track;
-	this.Staves = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.Staves = this1;
 };
 alphaTab_rendering_staves_StaveTrackGroup.__name__ = true;
 alphaTab_rendering_staves_StaveTrackGroup.prototype = {
 	__class__: alphaTab_rendering_staves_StaveTrackGroup
 };
 var alphaTab_rendering_utils_AccidentalHelper = function() {
-	this._registeredAccidentals = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-	this._appliedScoreLines = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+	var this1 = {}
+	this._registeredAccidentals = this1;
+	var this2 = {}
+	this._appliedScoreLines = this2;
 };
 alphaTab_rendering_utils_AccidentalHelper.__name__ = true;
 alphaTab_rendering_utils_AccidentalHelper.prototype = {
@@ -19190,7 +19250,7 @@ alphaTab_rendering_utils_AccidentalHelper.prototype = {
 				}
 			} else if(hasNoteAccidentalForKeySignature == isAccidentalNote && isAccidentalRegistered) {
 				var this1 = this._registeredAccidentals;
-				delete this1[line];
+				delete this1[index];
 				if(isAccidentalNote) {
 					accidentalToSet = keySignatureAccidental;
 				} else {
@@ -19223,7 +19283,8 @@ alphaTab_rendering_utils_AccidentalHelper.prototype = {
 	,__class__: alphaTab_rendering_utils_AccidentalHelper
 };
 var alphaTab_rendering_utils_BarBounds = function() {
-	this.Beats = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.Beats = this1;
 };
 alphaTab_rendering_utils_BarBounds.__name__ = true;
 alphaTab_rendering_utils_BarBounds.prototype = {
@@ -19248,9 +19309,12 @@ alphaTab_rendering_utils_BarBounds.prototype = {
 	,__class__: alphaTab_rendering_utils_BarBounds
 };
 var alphaTab_rendering_utils_BarHelpers = function(bar) {
-	this.BeamHelpers = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	this.BeamHelperLookup = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	this.TupletHelpers = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.BeamHelpers = this1;
+	var this2 = [];
+	this.BeamHelperLookup = this2;
+	var this3 = [];
+	this.TupletHelpers = this3;
 	var currentBeamHelper = null;
 	var currentTupletHelper = null;
 	if(bar != null) {
@@ -19258,9 +19322,15 @@ var alphaTab_rendering_utils_BarHelpers = function(bar) {
 		var j = bar.Voices.length;
 		while(i < j) {
 			var v = bar.Voices[i];
-			this.BeamHelpers.push(alphaTab_collections__$FastList_FastList_$Impl_$._new());
-			this.BeamHelperLookup.push(alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new());
-			this.TupletHelpers.push(alphaTab_collections__$FastList_FastList_$Impl_$._new());
+			var this4 = this.BeamHelpers;
+			var this5 = [];
+			this4.push(this5);
+			var this6 = this.BeamHelperLookup;
+			var this7 = {}
+			this6.push(this7);
+			var this8 = this.TupletHelpers;
+			var this9 = [];
+			this8.push(this9);
 			var k = 0;
 			var l = v.Beats.length;
 			while(k < l) {
@@ -19362,8 +19432,10 @@ alphaTab_rendering_utils__$BeamDirection_BeamDirection_$Impl_$.toString = functi
 };
 var alphaTab_rendering_utils_BeamingHelper = function(track) {
 	this._track = track;
-	this.Beats = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	this._beatLineXPositions = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+	var this1 = [];
+	this.Beats = this1;
+	var this2 = {}
+	this._beatLineXPositions = this2;
 	this.ShortestDuration = -4;
 };
 alphaTab_rendering_utils_BeamingHelper.__name__ = true;
@@ -19615,8 +19687,10 @@ alphaTab_rendering_utils_Bounds.prototype = {
 	__class__: alphaTab_rendering_utils_Bounds
 };
 var alphaTab_rendering_utils_BoundsLookup = function() {
-	this.StaveGroups = alphaTab_collections__$FastList_FastList_$Impl_$._new();
-	this._beatLookup = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+	var this1 = [];
+	this.StaveGroups = this1;
+	var this2 = {}
+	this._beatLookup = this2;
 };
 alphaTab_rendering_utils_BoundsLookup.__name__ = true;
 alphaTab_rendering_utils_BoundsLookup.FromJson = function(json,score) {
@@ -19661,7 +19735,8 @@ alphaTab_rendering_utils_BoundsLookup.FromJson = function(json,score) {
 alphaTab_rendering_utils_BoundsLookup.prototype = {
 	ToJson: function() {
 		var json = {}
-		var staveGroups = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this1 = [];
+		var staveGroups = this1;
 		json.StaveGroups = staveGroups;
 		var group = $iterator(this.StaveGroups)();
 		while(group.hasNext()) {
@@ -19669,21 +19744,24 @@ alphaTab_rendering_utils_BoundsLookup.prototype = {
 			var g = {}
 			g.VisualBounds = this.BoundsToJson(group1.VisualBounds);
 			g.RealBounds = this.BoundsToJson(group1.RealBounds);
-			g.Bars = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+			var this2 = [];
+			g.Bars = this2;
 			var masterBar = $iterator(group1.Bars)();
 			while(masterBar.hasNext()) {
 				var masterBar1 = masterBar.next();
 				var mb = {}
 				mb.VisualBounds = this.BoundsToJson(masterBar1.VisualBounds);
 				mb.RealBounds = this.BoundsToJson(masterBar1.RealBounds);
-				mb.Bars = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+				var this3 = [];
+				mb.Bars = this3;
 				var bar = $iterator(masterBar1.Bars)();
 				while(bar.hasNext()) {
 					var bar1 = bar.next();
 					var b = {}
 					b.VisualBounds = this.BoundsToJson(bar1.VisualBounds);
 					b.RealBounds = this.BoundsToJson(bar1.RealBounds);
-					b.Beats = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+					var this4 = [];
+					b.Beats = this4;
 					var beat = $iterator(bar1.Beats)();
 					while(beat.hasNext()) {
 						var beat1 = beat.next();
@@ -19771,7 +19849,8 @@ alphaTab_rendering_utils_BoundsLookup.prototype = {
 	,__class__: alphaTab_rendering_utils_BoundsLookup
 };
 var alphaTab_rendering_utils_MasterBarBounds = function() {
-	this.Bars = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.Bars = this1;
 };
 alphaTab_rendering_utils_MasterBarBounds.__name__ = true;
 alphaTab_rendering_utils_MasterBarBounds.prototype = {
@@ -19796,7 +19875,7 @@ alphaTab_rendering_utils_MasterBarBounds.prototype = {
 		}
 	}
 	,Finish: function() {
-		var f = function(a,b) {
+		var comparison = function(a,b) {
 			if(a.RealBounds.Y < b.RealBounds.Y) {
 				return -1;
 			}
@@ -19812,7 +19891,7 @@ alphaTab_rendering_utils_MasterBarBounds.prototype = {
 			return 0;
 		};
 		this.Bars.sort(function(a1,b1) {
-			return f(a1,b1);
+			return comparison(a1,b1);
 		});
 	}
 	,AddBeat: function(bounds) {
@@ -19855,7 +19934,8 @@ alphaTab_rendering_utils_PercussionMapper.prototype = {
 	__class__: alphaTab_rendering_utils_PercussionMapper
 };
 var alphaTab_rendering_utils_StaveGroupBounds = function() {
-	this.Bars = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.Bars = this1;
 	this.Index = 0;
 };
 alphaTab_rendering_utils_StaveGroupBounds.__name__ = true;
@@ -19888,7 +19968,8 @@ alphaTab_rendering_utils_StaveGroupBounds.prototype = {
 };
 var alphaTab_rendering_utils_TupletHelper = function(voice) {
 	this.VoiceIndex = voice;
-	this.Beats = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = [];
+	this.Beats = this1;
 };
 alphaTab_rendering_utils_TupletHelper.__name__ = true;
 alphaTab_rendering_utils_TupletHelper.prototype = {
@@ -19978,8 +20059,10 @@ alphaTab_util__$LogLevel_LogLevel_$Impl_$.toString = function(this1) {
 	return "";
 };
 var alphaTab_xml_XmlNode = function() {
-	this.Attributes = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-	this.ChildNodes = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+	var this1 = {}
+	this.Attributes = this1;
+	var this2 = [];
+	this.ChildNodes = this2;
 };
 alphaTab_xml_XmlNode.__name__ = true;
 alphaTab_xml_XmlNode.prototype = {
@@ -19997,7 +20080,8 @@ alphaTab_xml_XmlNode.prototype = {
 		return "";
 	}
 	,GetElementsByTagName: function(name) {
-		var tags = alphaTab_collections__$FastList_FastList_$Impl_$._new();
+		var this1 = [];
+		var tags = this1;
 		var c = $iterator(this.ChildNodes)();
 		while(c.hasNext()) {
 			var c1 = c.next();
@@ -21253,8 +21337,8 @@ system__$FixedArray_FixedArray_$Impl_$.get = function(this1,index) {
 system__$FixedArray_FixedArray_$Impl_$.set = function(this1,index,val) {
 	return this1[index] = val;
 };
-system__$FixedArray_FixedArray_$Impl_$.GetEnumerator = function(this1) {
-	return this1;
+system__$FixedArray_FixedArray_$Impl_$.iterator = function(this1) {
+	return HxOverrides.iter(this1);
 };
 system__$FixedArray_FixedArray_$Impl_$.empty = function(size) {
 	return system__$FixedArray_FixedArray_$Impl_$._new(size);
@@ -22025,9 +22109,12 @@ Bool.__ename__ = ["Bool"];
 var Class = { __name__ : ["Class"]};
 var Enum = { };
 alphaTab_util_Logger.LogLevel = 2;
-alphaTab_Environment.RenderEngines = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-alphaTab_Environment.LayoutEngines = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
-alphaTab_Environment.StaveProfiles = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+var this1 = {}
+alphaTab_Environment.RenderEngines = this1;
+var this2 = {}
+alphaTab_Environment.LayoutEngines = this2;
+var this3 = {}
+alphaTab_Environment.StaveProfiles = this3;
 alphaTab_Environment.PlatformInit();
 alphaTab_Environment.LayoutEngines["default"] = function(r) {
 	return new alphaTab_rendering_layout_PageViewLayout(r);
@@ -22042,21 +22129,24 @@ alphaTab_Environment.StaveProfiles["default"] = alphaTab_Environment.StaveProfil
 alphaTab_Environment.StaveProfiles["score"] = [new alphaTab_rendering_EffectBarRendererFactory("score-effects",[new alphaTab_rendering_effects_TempoEffectInfo(),new alphaTab_rendering_effects_TripletFeelEffectInfo(),new alphaTab_rendering_effects_MarkerEffectInfo(),new alphaTab_rendering_effects_TextEffectInfo(),new alphaTab_rendering_effects_ChordsEffectInfo(),new alphaTab_rendering_effects_TrillEffectInfo(),new alphaTab_rendering_effects_BeatVibratoEffectInfo(),new alphaTab_rendering_effects_NoteVibratoEffectInfo(),new alphaTab_rendering_effects_FadeInEffectInfo(),new alphaTab_rendering_effects_LetRingEffectInfo(),new alphaTab_rendering_effects_PalmMuteEffectInfo(),new alphaTab_rendering_effects_PickStrokeEffectInfo(),new alphaTab_rendering_effects_AlternateEndingsEffectInfo()]),new alphaTab_rendering_ScoreBarRendererFactory(),new alphaTab_rendering_EffectBarRendererFactory("score-bottom-effects",[new alphaTab_rendering_effects_CrescendoEffectInfo(),new alphaTab_rendering_effects_DynamicsEffectInfo(),new alphaTab_rendering_effects_LyricsEffectInfo()])];
 alphaTab_Environment.StaveProfiles["tab"] = [new alphaTab_rendering_EffectBarRendererFactory("tab-effects",[new alphaTab_rendering_effects_TempoEffectInfo(),new alphaTab_rendering_effects_TripletFeelEffectInfo(),new alphaTab_rendering_effects_MarkerEffectInfo(),new alphaTab_rendering_effects_TextEffectInfo(),new alphaTab_rendering_effects_ChordsEffectInfo(),new alphaTab_rendering_effects_TripletFeelEffectInfo(),new alphaTab_rendering_effects_TrillEffectInfo(),new alphaTab_rendering_effects_BeatVibratoEffectInfo(),new alphaTab_rendering_effects_NoteVibratoEffectInfo(),new alphaTab_rendering_effects_TapEffectInfo(),new alphaTab_rendering_effects_FadeInEffectInfo(),new alphaTab_rendering_effects_HarmonicsEffectInfo(),new alphaTab_rendering_effects_LetRingEffectInfo(),new alphaTab_rendering_effects_CapoEffectInfo(),new alphaTab_rendering_effects_PalmMuteEffectInfo(),new alphaTab_rendering_effects_PickStrokeEffectInfo(),new alphaTab_rendering_effects_AlternateEndingsEffectInfo()]),new alphaTab_rendering_TabBarRendererFactory(true,true,true),new alphaTab_rendering_EffectBarRendererFactory("tab-bottom-effects",[new alphaTab_rendering_effects_LyricsEffectInfo()])];
 alphaTab_model_Tuning.Initialize();
-alphaTab_rendering_glyphs_ScoreBeatGlyph.NormalKeys = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+var this1 = {}
+alphaTab_rendering_glyphs_ScoreBeatGlyph.NormalKeys = this1;
 var normalKeyNotes = [32,34,35,36,38,39,40,41,43,45,47,48,50,55,56,58,60,61];
 var i = 0;
 while(i < normalKeyNotes.length) {
 	alphaTab_rendering_glyphs_ScoreBeatGlyph.NormalKeys[normalKeyNotes[i]] = true;
 	++i;
 }
-alphaTab_rendering_glyphs_ScoreBeatGlyph.XKeys = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+var this2 = {}
+alphaTab_rendering_glyphs_ScoreBeatGlyph.XKeys = this2;
 var xKeyNotes = [31,33,37,42,44,54,62,63,64,65,66];
 var i1 = 0;
 while(i1 < xKeyNotes.length) {
 	alphaTab_rendering_glyphs_ScoreBeatGlyph.XKeys[xKeyNotes[i1]] = true;
 	++i1;
 }
-alphaTab_xml_XmlParser.Escapes = alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new();
+var this1 = {}
+alphaTab_xml_XmlParser.Escapes = this1;
 alphaTab_xml_XmlParser.Escapes["lt"] = "<";
 alphaTab_xml_XmlParser.Escapes["gt"] = ">";
 alphaTab_xml_XmlParser.Escapes["amp"] = "&";

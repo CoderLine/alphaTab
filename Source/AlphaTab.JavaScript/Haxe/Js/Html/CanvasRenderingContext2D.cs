@@ -8,17 +8,17 @@ namespace AlphaTab.Haxe.Js.Html
     public class CanvasRenderingContext2D
     {
         [Name("textBaseline")]
-        public extern string TextBaseline { get; set; }
+        public extern HaxeString TextBaseline { get; set; }
         [Name("strokeStyle")]
-        public extern string StrokeStyle { get; set; }
+        public extern HaxeString StrokeStyle { get; set; }
         [Name("fillStyle")]
-        public extern string FillStyle { get; set; }
+        public extern HaxeString FillStyle { get; set; }
         [Name("lineWidth")]
         public HaxeFloat LineWidth { get; set; }
         [Name("font")]
-        public extern string Font { get; set; }
+        public extern HaxeString Font { get; set; }
         [Name("textAlign")]
-        public extern string TextAlign { get; set; }
+        public extern HaxeString TextAlign { get; set; }
 
         [Name("fillRect")]
         public extern void FillRect(HaxeFloat x, HaxeFloat y, HaxeFloat w, HaxeFloat h);
@@ -39,15 +39,15 @@ namespace AlphaTab.Haxe.Js.Html
         [Name("arc")]
         public extern void Arc(HaxeFloat x, HaxeFloat y, HaxeFloat radius, HaxeFloat startAngle, HaxeFloat endAngle);
         [Name("arc")]
-        public extern void Arc(HaxeFloat x, HaxeFloat y, HaxeFloat radius, HaxeFloat startAngle, HaxeFloat endAngle, bool anticlockwise);
+        public extern void Arc(HaxeFloat x, HaxeFloat y, HaxeFloat radius, HaxeFloat startAngle, HaxeFloat endAngle, HaxeBool anticlockwise);
         [Name("fill")]
         public extern void Fill();
         [Name("stroke")]
         public extern void Stroke();
         [Name("fillText")]
-        public extern void FillText(string text, HaxeFloat x, HaxeFloat y);
+        public extern void FillText(HaxeString text, HaxeFloat x, HaxeFloat y);
         [Name("measureTet")]
-        public extern TextMetrics MeasureText(string text);
+        public extern TextMetrics MeasureText(HaxeString text);
     }
 
     [External]

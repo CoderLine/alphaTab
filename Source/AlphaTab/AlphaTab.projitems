@@ -22,8 +22,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Model\MidiMessage.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Model\MidiTickLookup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Model\MidiTrack.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Collections\FastDictionary.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Collections\FastList.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Environment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exporter\AlphaTexExporter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\AlphaTexException.cs" />
@@ -215,5 +213,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlNode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlNodeType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlParser.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Collections\" />
   </ItemGroup>
 </Project>

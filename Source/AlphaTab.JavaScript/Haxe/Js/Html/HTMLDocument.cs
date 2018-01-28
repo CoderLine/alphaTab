@@ -17,21 +17,21 @@ namespace AlphaTab.Haxe.Js.Html
         public extern FontFaceSet Fonts { get; }
 
         [Name("querySelector")]
-        public extern Element QuerySelector(string selectors);
+        public extern Element QuerySelector(HaxeString selectors);
         [Name("querySelectorAll")]
-        public extern NodeList QuerySelectorAll(string selectors);
+        public extern NodeList QuerySelectorAll(HaxeString selectors);
 
         [Name("getElementById")]
-        public extern Element GetElementById(string id);
+        public extern Element GetElementById(HaxeString id);
 
         [Name("createElement")]
-        public extern Element CreateElement(string localName);
+        public extern Element CreateElement(HaxeString localName);
         
         [Name("getElementsByTagName")]
-        public extern HTMLCollection GetElementsByTagName(string localName);
+        public extern HTMLCollection GetElementsByTagName(HaxeString localName);
 
         [Name("createEvent")]
-        public extern Event CreateEvent(string interface_);
+        public extern Event CreateEvent(HaxeString interface_);
     }
 
     [External]
@@ -39,10 +39,10 @@ namespace AlphaTab.Haxe.Js.Html
     public class HTMLCollection
     {
         [Name("length")]
-        public extern int Length { get; }
+        public extern HaxeInt Length { get; }
 
         [Name("item")]
-        public extern Element Item(int index);
+        public extern Element Item(HaxeInt index);
 
     }
 
@@ -52,9 +52,9 @@ namespace AlphaTab.Haxe.Js.Html
     public class FontFaceSet
     {
         [Name("load")]
-        public extern Promise<HaxeArray<FontFace>> Load(string font);
+        public extern Promise<HaxeArray<FontFace>> Load(HaxeString font);
         [Name("load")]
-        public extern Promise<HaxeArray<FontFace>> Load(string font, string text);
+        public extern Promise<HaxeArray<FontFace>> Load(HaxeString font, HaxeString text);
     }
 
 
@@ -69,27 +69,27 @@ namespace AlphaTab.Haxe.Js.Html
     public class CSSStyleDeclaration
     {
         [Name("opacity")]
-        public extern string Opacity { get; set; }
+        public extern HaxeString Opacity { get; set; }
         [Name("position")]
-        public extern string Position { get; set; }
+        public extern HaxeString Position { get; set; }
         [Name("left")]
-        public extern string Left { get; set; }
+        public extern HaxeString Left { get; set; }
         [Name("top")]
-        public extern string Top { get; set; }
+        public extern HaxeString Top { get; set; }
         [Name("fontSize")]
-        public extern string FontSize { get; set; }
+        public extern HaxeString FontSize { get; set; }
         [Name("fontFamily")]
-        public extern string FontFamily { get; set; }
+        public extern HaxeString FontFamily { get; set; }
         [Name("width")]
-        public string Width { get; set; }
+        public HaxeString Width { get; set; }
         [Name("height")]
-        public string Height { get; set; }
+        public HaxeString Height { get; set; }
         [Name("overflow")]
-        public string Overflow { get; set; }
+        public HaxeString Overflow { get; set; }
         [Name("lineHeight")]
-        public string LineHeight { get; set; }
+        public HaxeString LineHeight { get; set; }
         [Name("display")]
-        public string Display { get; set; }
+        public HaxeString Display { get; set; }
     }
 
     [External]
@@ -97,9 +97,9 @@ namespace AlphaTab.Haxe.Js.Html
     public class DOMTokenList
     {
         [Name("add")]
-        public extern void Add(string token);
+        public extern void Add(HaxeString token);
         [Name("remove")]
-        public extern void Remove(string token);
+        public extern void Remove(HaxeString token);
     }
 
     [External]
@@ -107,9 +107,9 @@ namespace AlphaTab.Haxe.Js.Html
     public class Node : EventTarget
     {
         [Name("nodeName")]
-        public extern string NodeName { get; }
+        public extern HaxeString NodeName { get; }
         [Name("nodeValue")]
-        public extern string NodeValue { get; }
+        public extern HaxeString NodeValue { get; }
         [Name("appendChild")]
         public extern void AppendChild(Node node);
         [Name("removeChild")]
@@ -130,10 +130,10 @@ namespace AlphaTab.Haxe.Js.Html
     public class DOMElement : Node
     {
         [Name("id")]
-        public string Id { get; set; }
+        public HaxeString Id { get; set; }
 
         [Name("childElementCount")]
-        public extern int ChildElementCount { get; }
+        public extern HaxeInt ChildElementCount { get; }
         [Name("lastChild")]
         public extern Node LastChild { get; }
         [Name("style")]
@@ -141,33 +141,33 @@ namespace AlphaTab.Haxe.Js.Html
         [Name("classList")]
         public extern DOMTokenList ClassList { get; }
         [Name("outerHTML")]
-        public extern string OuterHTML { get; set; }
+        public extern HaxeString OuterHTML { get; set; }
         [Name("innerHTML")]
-        public extern string InnerHTML { get; set; }
+        public extern HaxeString InnerHTML { get; set; }
         [Name("innerText")]
-        public extern string InnerText { get; set; }
+        public extern HaxeString InnerText { get; set; }
         [Name("setAttribute")]
-        public extern void SetAttribute(string name, string value);
+        public extern void SetAttribute(HaxeString name, HaxeString value);
         [Name("offsetWidth")]
-        public extern int OffsetWidth { get; }
+        public extern HaxeInt OffsetWidth { get; }
         [Name("offsetHeight")]
-        public extern int OffsetHeight { get; }
+        public extern HaxeInt OffsetHeight { get; }
         [Name("className")]
-        public extern string ClassName { get; set; }
+        public extern HaxeString ClassName { get; set; }
         [Name("dataset")]
         public extern DOMStringMap Dataset { get; set; }
         [Name("attributes")]
         public extern NamedNodeMap Attributes { get; set; }
         [Name("clientWidth")]
-        public extern int ClientWidth { get; set; }
+        public extern HaxeInt ClientWidth { get; set; }
         [Name("clientHeight")]
-        public extern int ClientHeight { get; set; }
+        public extern HaxeInt ClientHeight { get; set; }
 
 
         [Name("querySelector")]
-        public extern Element QuerySelector(string selectors);
+        public extern Element QuerySelector(HaxeString selectors);
         [Name("querySelectorAll")]
-        public extern NodeList QuerySelectorAll(string selectors);
+        public extern NodeList QuerySelectorAll(HaxeString selectors);
 
         [Name("getClientRects")]
         public extern DOMRectList GetClientRects();
@@ -183,11 +183,11 @@ namespace AlphaTab.Haxe.Js.Html
     public class NamedNodeMap
     {
         [Name("length")]
-        public extern int Length { get; }
+        public extern HaxeInt Length { get; }
         [Name("getNamedItem")]
-        public extern Attr GetNamedItem(string name);
+        public extern Attr GetNamedItem(HaxeString name);
         [Name("item")]
-        public extern Attr Item(int index);
+        public extern Attr Item(HaxeInt index);
     }
 
 
@@ -196,9 +196,9 @@ namespace AlphaTab.Haxe.Js.Html
     public class Attr : Node
     {
         [Name("name")]
-        public extern string Name { get; }
+        public extern HaxeString Name { get; }
         [Name("value")]
-        public extern string Value { get; }
+        public extern HaxeString Value { get; }
     }
 
 
@@ -243,7 +243,7 @@ namespace AlphaTab.Haxe.Js.Html
     public class DOMRectList 
     {
         [Name("length")]
-        public extern int Length { get; }
+        public extern HaxeInt Length { get; }
     }
 
 
@@ -252,10 +252,10 @@ namespace AlphaTab.Haxe.Js.Html
     public class NodeList 
     {
         [Name("length")]
-        public extern int Length { get; }
+        public extern HaxeInt Length { get; }
 
         [Name("item")]
-        public extern Node Item(int index);
+        public extern Node Item(HaxeInt index);
     }
 
     [External]
@@ -270,7 +270,7 @@ namespace AlphaTab.Haxe.Js.Html
     public class ScriptElement : Element
     {
         [Name("src")]
-        public extern string Src { get; set; }
+        public extern HaxeString Src { get; set; }
     }
 
     [External]
@@ -284,7 +284,7 @@ namespace AlphaTab.Haxe.Js.Html
     public class StyleElement : Element
     {
         [Name("type")]
-        public extern string Type { get; set; }
+        public extern HaxeString Type { get; set; }
     }
 
     [External]
@@ -292,7 +292,7 @@ namespace AlphaTab.Haxe.Js.Html
     public class HTMLDocument : Document
     {
         [Name("write")]
-        public extern void Write(string s);
+        public extern void Write(HaxeString s);
         [Name("body")]
         public extern BodyElement Body { get; set; }
         [Name("documentElement")]
@@ -309,33 +309,33 @@ namespace AlphaTab.Haxe.Js.Html
         public extern Screen Screen { get; }
 
         [Name("setTimeout")]
-        public extern int SetTimeout(Delegate handler, int timeout);
+        public extern HaxeInt SetTimeout(Delegate handler, HaxeInt timeout);
 
         [Name("getComputedStyle")]
         public extern CSSStyleDeclaration GetComputedStyle(Element elt);
 
         [Name("clearTimeout")]
-        public extern void ClearTimeout(int timeoutId);
+        public extern void ClearTimeout(HaxeInt timeoutId);
 
         [Name("setInterval")]
-        public extern int SetInterval(Delegate handler, int interval);
+        public extern HaxeInt SetInterval(Delegate handler, HaxeInt interval);
 
         [Name("clearInterval")]
-        public extern void ClearInterval(int intervalId);
+        public extern void ClearInterval(HaxeInt intervalId);
 
         [Name("innerHeight")]
-        public extern int InnerHeight { get; }
+        public extern HaxeInt InnerHeight { get; }
 
         [Name("innerWidth")]
-        public extern int InnerWidth { get; }
+        public extern HaxeInt InnerWidth { get; }
 
         [Name("open")]
-        public extern Window Open(string url, string target, string features);
+        public extern Window Open(HaxeString url, HaxeString target, HaxeString features);
         [Name("resizeTo")]
-        public extern void ResizeTo(int x, int y);
+        public extern void ResizeTo(HaxeInt x, HaxeInt y);
 
         [Name("moveTo")]
-        public extern void MoveTo(int x, int y);
+        public extern void MoveTo(HaxeInt x, HaxeInt y);
         [Name("focus")]
         public extern void Focus();
 
@@ -348,13 +348,13 @@ namespace AlphaTab.Haxe.Js.Html
     public class Screen
     {
         [Name("top")]
-        public extern int Top { get; }
+        public extern HaxeInt Top { get; }
         [Name("left")]
-        public extern int Left { get; }
+        public extern HaxeInt Left { get; }
         [Name("width")]
-        public extern int Width { get; }
+        public extern HaxeInt Width { get; }
         [Name("height")]
-        public extern int Height { get; }
+        public extern HaxeInt Height { get; }
 
     }
     [External]

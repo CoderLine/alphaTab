@@ -1,4 +1,5 @@
-﻿using Haxe.Js.Html;
+﻿using Haxe;
+using Haxe.Js.Html;
 using Phase.Attributes;
 
 namespace AlphaTab.Haxe.Js.Html
@@ -23,7 +24,7 @@ namespace AlphaTab.Haxe.Js.Html
     {
         [Name("data")]
         public dynamic Data { get; }
-        public extern MessageEvent(string type, dynamic eventInitDict);
+        public extern MessageEvent(HaxeString type, dynamic eventInitDict);
     }
 
 }

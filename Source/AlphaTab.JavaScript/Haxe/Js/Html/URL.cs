@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Haxe;
 using Phase.Attributes;
 
 namespace AlphaTab.Haxe.Js.Html
@@ -12,6 +13,6 @@ namespace AlphaTab.Haxe.Js.Html
     public class URL
     {
         [Name("createObjectURL")]
-        public static extern string CreateObjectURL(Blob blob);
+        public static extern HaxeString CreateObjectURL(Blob blob);
     }
 }

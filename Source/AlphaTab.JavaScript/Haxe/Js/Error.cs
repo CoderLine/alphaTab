@@ -1,4 +1,5 @@
 ﻿using System;
+using Haxe;
 using Phase.Attributes;
 
 namespace AlphaTab.Haxe.Js
@@ -9,6 +10,6 @@ namespace AlphaTab.Haxe.Js
     public class Error : Exception
     {
         [Name("stack")]
-        public extern string Stack { get;}
+        public extern HaxeString Stack { get;}
     }
 }

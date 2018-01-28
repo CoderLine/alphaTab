@@ -7,17 +7,17 @@ namespace Haxe.Js.Html
     public class ArrayBuffer
     {
         [Name("isView")]
-        public static extern bool IsView(object value);
+        public static extern HaxeBool IsView(object value);
 
         [Name("byteLength")]
-        public int ByteLength { get; }
+        public HaxeInt ByteLength { get; }
 
-        public extern ArrayBuffer(int length);
-
-        [Name("slice")]
-        public extern ArrayBuffer Slice(int begin);
+        public extern ArrayBuffer(HaxeInt length);
 
         [Name("slice")]
-        public extern ArrayBuffer Slice(int begin, int end);
+        public extern ArrayBuffer Slice(HaxeInt begin);
+
+        [Name("slice")]
+        public extern ArrayBuffer Slice(HaxeInt begin, HaxeInt end);
     }
 }

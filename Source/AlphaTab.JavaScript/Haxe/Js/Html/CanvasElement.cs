@@ -1,4 +1,5 @@
-﻿using Phase.Attributes;
+﻿using Haxe;
+using Phase.Attributes;
 
 namespace AlphaTab.Haxe.Js.Html
 {
@@ -7,10 +8,10 @@ namespace AlphaTab.Haxe.Js.Html
     public class CanvasElement : Element
     {
         [Name("width")]
-        public extern int Width { get; set; }
+        public extern HaxeInt Width { get; set; }
         [Name("height")]
-        public extern int Height { get; set; }
+        public extern HaxeInt Height { get; set; }
         [Name("getContext")]
-        public extern object GetContext(string contextId);
+        public extern object GetContext(HaxeString contextId);
     }
 }

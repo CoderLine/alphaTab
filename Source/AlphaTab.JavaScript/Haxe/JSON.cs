@@ -1,4 +1,5 @@
-﻿using Phase.Attributes;
+﻿using Haxe;
+using Phase.Attributes;
 
 namespace AlphaTab.Haxe
 {
@@ -7,8 +8,8 @@ namespace AlphaTab.Haxe
     public class Json
     {
         [Name("parse")]
-        public static extern dynamic Parse(string text);
+        public static extern dynamic Parse(HaxeString text);
         [Name("stringify")]
-        public static extern string Stringify(object value);
+        public static extern HaxeString Stringify(object value);
     }
 }

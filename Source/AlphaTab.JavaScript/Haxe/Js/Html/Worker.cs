@@ -13,7 +13,7 @@ namespace AlphaTab.Haxe.Js.Html
     [External]
     public class Worker : EventTarget
     {
-        public extern Worker(string worker);
+        public extern Worker(HaxeString worker);
         [Name("postMessage")]
         public extern void PostMessage(object message);
         [Name("terminate")]

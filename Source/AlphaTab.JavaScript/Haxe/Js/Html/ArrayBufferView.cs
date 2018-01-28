@@ -10,9 +10,9 @@ namespace Haxe.Js.Html
         public extern ArrayBuffer Buffer { get; }
 
         [Name("byteOffset")]
-        public extern int ByteOffset { get; }
+        public extern HaxeInt ByteOffset { get; }
 
         [Name("byteLength")]
-        public extern int ByteLength { get; }
+        public extern HaxeInt ByteLength { get; }
     }
 }

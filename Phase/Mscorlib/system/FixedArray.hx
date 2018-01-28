@@ -17,7 +17,8 @@ abstract FixedArray<T>(ArrayData<T>)
 	
 	@:op([]) public inline function get(index:Int32):T return this[index.ToHaxeInt()];
 	@:op([]) public inline function set(index:Int32, val:T):T return this[index.ToHaxeInt()] = val;
-	public inline function GetEnumerator() : Iterable<T> return this;
+	
+	public inline function iterator() : Iterator<T> return this.iterator();
 
 	public static inline function empty<T>(size:Int32) return new FixedArray<T>(size);
 }
