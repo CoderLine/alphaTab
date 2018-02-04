@@ -48,7 +48,7 @@ namespace AlphaTab.Collections
         [Inline]
         public IEnumerator<TKey> GetEnumerator() => Platform.Platform.JsonKeys(Script.AbstractThis).As<IEnumerator<TKey>>();
         [Inline]
-        public void Remove(TKey key) => Script.Write("untyped __js__(\"delete {0}[{1}]\", this, index)");
+        public void Remove(TKey key) => Script.Write("untyped __js__(\"delete {0}[{1}]\", this, key)");
         [Inline]
         public bool ContainsKey(TKey key) => Script.Write<bool>("untyped this.hasOwnProperty(key)");
 

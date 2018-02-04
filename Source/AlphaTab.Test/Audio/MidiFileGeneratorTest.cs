@@ -5,8 +5,8 @@ using AlphaTab.Audio;
 using AlphaTab.Audio.Generator;
 using AlphaTab.Audio.Model;
 using AlphaTab.Importer;
-using AlphaTab.IO;
 using AlphaTab.Model;
+using AlphaTab.Util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test.Audio
@@ -16,9 +16,9 @@ namespace AlphaTab.Test.Audio
     {
         private Score ParseTex(string tex)
         {
-            var import = new AlphaTexImporter();
-            import.Init(new StreamWrapper(new MemoryStream(Encoding.UTF8.GetBytes(tex))));
-            return import.ReadScore();
+            var importer = new AlphaTexImporter();
+            importer.Init(TestPlatform.CreateStringReader(tex));
+            return importer.ReadScore();
         }
 
         [TestMethod]
@@ -92,7 +92,7 @@ namespace AlphaTab.Test.Audio
 
             for (int i = 0; i < handler.MidiEvents.Count; i++)
             {
-                Console.WriteLine("i[{0}] {1}", i, handler.MidiEvents[i]);
+                Logger.Info("Test", $"i[{i}] {handler.MidiEvents[i]}");
                 if (i < expectedEvents.Length)
                 {
                     Assert.AreEqual(expectedEvents[i], handler.MidiEvents[i]);
@@ -185,7 +185,7 @@ namespace AlphaTab.Test.Audio
 
             for (int i = 0; i < handler.MidiEvents.Count; i++)
             {
-                Console.WriteLine("i[{0}] {1}", i, handler.MidiEvents[i]);
+                Logger.Info("Test", $"i[{i}] {handler.MidiEvents[i]}");
                 if (i < expectedEvents.Length)
                 {
                     Assert.AreEqual(expectedEvents[i], handler.MidiEvents[i]);

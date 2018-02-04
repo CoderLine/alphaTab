@@ -11,5 +11,8 @@ namespace AlphaTab.Haxe.Js
     {
         [Name("stack")]
         public extern HaxeString Stack { get;}
+
+        public extern Error();
+        public extern Error(string message);
     }
 }

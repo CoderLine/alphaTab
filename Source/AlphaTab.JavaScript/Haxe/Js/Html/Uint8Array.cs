@@ -3,7 +3,8 @@
 namespace Haxe.Js.Html
 {
     [External]
-    [Name("haxe.js.Uint8Array")]
+    [Name("js.html.Uint8Array")]
+    [NativeConstructors]
     public class Uint8Array : ArrayBufferView
     {
         public static readonly HaxeInt BYTES_PER_ELEMENT;

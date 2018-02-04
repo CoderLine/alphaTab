@@ -44,7 +44,6 @@ namespace AlphaTab.Platform.JavaScript
     {
         private readonly Element _element;
         private readonly Element _canvasElement;
-        private readonly Settings _settings;
         private int _visibilityCheckerInterval;
         private int _visibilityCheckerIntervalId;
 
@@ -56,6 +55,7 @@ namespace AlphaTab.Platform.JavaScript
             get { return _element.OffsetWidth.IsTruthy() || _element.OffsetHeight.IsTruthy() || _element.GetClientRects().Length.IsTruthy(); }
         }
 
+        public Settings Settings { get; private set; }
         public IScoreRenderer Renderer { get; private set; }
         public Score Score { get; set; }
         public int[] TrackIndexes { get; set; }
@@ -74,7 +74,7 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
-        protected JsApi(Element element, dynamic options)
+        public JsApi(Element element, dynamic options)
         {
             _element = element;
 
@@ -82,7 +82,7 @@ namespace AlphaTab.Platform.JavaScript
 
             // load settings
             var dataAttributes = GetDataAttributes();
-            var settings = _settings = Settings.FromJson(options, dataAttributes);
+            var settings = Settings = AlphaTab.Settings.FromJson(options, dataAttributes);
             var autoSize = settings.Width < 0;
 
             #region build tracks array
@@ -224,7 +224,7 @@ namespace AlphaTab.Platform.JavaScript
                 // in this case we need the correct width for autosize
                 if (autoSize)
                 {
-                    _settings.Width = _element.OffsetWidth;
+                    Settings.Width = _element.OffsetWidth;
                     Renderer.UpdateSettings(settings);
                 }
 
@@ -242,7 +242,11 @@ namespace AlphaTab.Platform.JavaScript
                 }
             };
 
-            _visibilityCheckerInterval = options && options.visibilityCheckInterval || 500;
+            _visibilityCheckerInterval = 500;
+            if (options && options.visibilityCheckInterval)
+            {
+                _visibilityCheckerInterval = options.visibilityCheckInterval;
+            }
             if (IsElementVisible)
             {
                 // element is visible, so we start rendering
@@ -279,7 +283,8 @@ namespace AlphaTab.Platform.JavaScript
                     object value = _element.Dataset.Member<object>(key);
                     try
                     {
-                        value = Json.Parse(value.As<string>());
+                        string stringValue = (string)value;
+                        value = Json.Parse(stringValue);
                     }
                     catch
                     {
@@ -296,9 +301,9 @@ namespace AlphaTab.Platform.JavaScript
                 for (var i = 0; i < _element.Attributes.Length; i++)
                 {
                     var attr = _element.Attributes.Item(i);
-                    if (attr.NodeName.As<string>().StartsWith("data-"))
+                    string nodeName = attr.NodeName;
+                    if (nodeName.StartsWith("data-"))
                     {
-                        string nodeName = attr.NodeName;
                         var keyParts = nodeName.Substring(5).Split('-');
                         var key = keyParts[0];
                         for (int j = 1; j < keyParts.Length; j++)
@@ -340,12 +345,12 @@ namespace AlphaTab.Platform.JavaScript
                 }
 
                 var resizeEventInfo = new ResizeEventArgs();
-                resizeEventInfo.OldWidth = _settings.Width;
+                resizeEventInfo.OldWidth = Settings.Width;
                 resizeEventInfo.NewWidth = _element.OffsetWidth;
-                resizeEventInfo.Settings = _settings;
+                resizeEventInfo.Settings = Settings;
                 TriggerEvent("resize", resizeEventInfo);
-                _settings.Width = resizeEventInfo.NewWidth;
-                Renderer.UpdateSettings(_settings);
+                Settings.Width = resizeEventInfo.NewWidth;
+                Renderer.UpdateSettings(Settings);
                 Renderer.Resize(_element.OffsetWidth);
             }
             // if there is no "invisibility timer" we set up one, if there is already a timer scheduled, it will trigger the proper rendering. 
@@ -364,7 +369,7 @@ namespace AlphaTab.Platform.JavaScript
                 var placeholder = (Element)placeholders.Item(i);
                 if (IsElementInViewPort(placeholder))
                 {
-                    placeholder.OuterHTML = placeholder.As<dynamic>().svg;
+                    placeholder.OuterHTML = placeholder.Member<HaxeString>("svg");
                 }
             }
         }
@@ -396,27 +401,27 @@ namespace AlphaTab.Platform.JavaScript
             preview.Document.Write("<!DOCTYPE html><html></head><body></body></html>");
             preview.Document.Body.AppendChild(a4);
 
-            var dualScreenLeft = Platform.TypeOf(Browser.Window.Member<int>("ScreenLeft")) != "undefined"
-                ? Browser.Window.Member<HaxeInt>("ScreenLeft")
-                : Browser.Window.Screen.Left;
-            var dualScreenTop = Platform.TypeOf(Browser.Window.Member<int>("ScreenTop")) != "undefined"
-                ? Browser.Window.Member<HaxeInt>("ScreenTop")
-                : Browser.Window.Screen.Top;
-            var screenWidth = Platform.TypeOf(Browser.Window.InnerWidth) != "undefined"
+            int dualScreenLeft = Platform.TypeOf(Browser.Window.Member<int>("ScreenLeft")) != "undefined"
+                ? Browser.Window.Member<int>("ScreenLeft")
+                : (int)Browser.Window.Screen.Left;
+            int dualScreenTop = Platform.TypeOf(Browser.Window.Member<int>("ScreenTop")) != "undefined"
+                ? Browser.Window.Member<int>("ScreenTop")
+                : (int)Browser.Window.Screen.Top;
+            int screenWidth = Platform.TypeOf(Browser.Window.InnerWidth) != "undefined"
                 ? Browser.Window.InnerWidth
                 : Platform.TypeOf(Browser.Document.DocumentElement.ClientWidth) != "undefined"
                     ? Browser.Document.DocumentElement.ClientWidth
                     : Browser.Window.Screen.Width;
-            var screenHeight = Platform.TypeOf(Browser.Window.InnerHeight) != "undefined"
+            int screenHeight = Platform.TypeOf(Browser.Window.InnerHeight) != "undefined"
                 ? Browser.Window.InnerHeight
                 : Platform.TypeOf(Browser.Document.DocumentElement.ClientHeight) != "undefined"
                     ? Browser.Document.DocumentElement.ClientHeight
                     : Browser.Window.Screen.Height;
 
-            var w = a4.OffsetWidth + 50;
-            var h = Browser.Window.InnerHeight;
-            var left = ((screenWidth / 2) - (w / 2)) + dualScreenLeft;
-            var top = ((screenHeight / 2) - (h / 2)) + dualScreenTop;
+            int w = a4.OffsetWidth + 50;
+            var h = (int)Browser.Window.InnerHeight;
+            int left = ((screenWidth / 2) - (w / 2)) + dualScreenLeft;
+            int top = ((screenHeight / 2) - (h / 2)) + dualScreenTop;
             preview.ResizeTo(w, h);
             preview.MoveTo(left, top);
 
@@ -424,8 +429,8 @@ namespace AlphaTab.Platform.JavaScript
 
             // render alphaTab
             var settings = Settings.Defaults;
-            settings.ScriptFile = _settings.ScriptFile;
-            settings.FontDirectory = _settings.FontDirectory;
+            settings.ScriptFile = Settings.ScriptFile;
+            settings.FontDirectory = Settings.FontDirectory;
             settings.Scale = 0.8f;
             settings.StretchForce = 0.8f;
             settings.DisableLazyLoading = true;
@@ -492,13 +497,15 @@ namespace AlphaTab.Platform.JavaScript
                                 placeholder.Style.Height = renderResult.Height + "px";
                                 placeholder.Style.Display = "inline-block";
 
-                                if (IsElementInViewPort(placeholder) || _settings.DisableLazyLoading)
+                                if (IsElementInViewPort(placeholder) || Settings.DisableLazyLoading)
                                 {
-                                    placeholder.OuterHTML = body.As<string>();
+                                    string bodyHtml = (string) body;
+                                    placeholder.OuterHTML = bodyHtml;
                                 }
                                 else
                                 {
-                                    placeholder.As<dynamic>().svg = body;
+
+                                    placeholder.Member("svg", body);
                                     placeholder.SetAttribute("data-lazy", "true");
                                 }
                             }
@@ -704,9 +711,9 @@ namespace AlphaTab.Platform.JavaScript
             return tracks.ToArray();
         }
 
-        protected void ScoreLoaded(Score score, bool render = true)
+        public void ScoreLoaded(Score score, bool render = true)
         {
-            ModelUtils.ApplyPitchOffsets(_settings, score);
+            ModelUtils.ApplyPitchOffsets(Settings, score);
 
             Score = score;
 
@@ -718,7 +725,7 @@ namespace AlphaTab.Platform.JavaScript
         }
 
 
-        public void Error(string type, object details)
+        public void Error(string type, Exception details)
         {
             Logger.Error(type, "An unexpected error occurred", details);
             TriggerEvent("error", new
@@ -770,8 +777,8 @@ namespace AlphaTab.Platform.JavaScript
 
         public void UpdateLayout(object json)
         {
-            _settings.Layout = Settings.LayoutFromJson(json);
-            Renderer.UpdateSettings(_settings);
+            Settings.Layout = Settings.LayoutFromJson(json);
+            Renderer.UpdateSettings(Settings);
             Renderer.Invalidate();
         }
     }

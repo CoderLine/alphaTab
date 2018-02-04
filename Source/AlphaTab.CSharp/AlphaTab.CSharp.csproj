@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>AlphaTab</RootNamespace>
+    <AssemblyName>AlphaTab</AssemblyName>
+    <TargetFrameworks>netstandard2.0;net471</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp" Version="1.59.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\Font\bravura\ttf\Bravura.ttf" Link="Platform\CSharp\Bravura.ttf" />
+  </ItemGroup>
+
+  <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" />
+</Project>

@@ -20,6 +20,7 @@ abstract UInt32(Int) from Int
 	public inline function ToSingle_IFormatProvider(provider:IFormatProvider) : system.Single return system.Convert.ToSingle_UInt32(this);
 	public inline function ToDouble_IFormatProvider(provider:IFormatProvider) : system.Double return system.Convert.ToDouble_UInt32(this);
 
+	public function GetHashCode() : system.Int32 return this;
 	
 	@:op(-A) public inline function neg() : system.Int64 return -this;
 

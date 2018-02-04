@@ -1097,8 +1097,8 @@ namespace AlphaTab.Importer
         {
             // fret.string
 
-            var isDead = _syData == "x";
-            var isTie = _syData == "-";
+            var isDead = _syData.ToString() == "x";
+            var isTie = _syData.ToString() == "-";
             var fret = -1;
             var octave = -1;
             var tone = -1;

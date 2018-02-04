@@ -41,6 +41,11 @@ namespace AlphaTab
 
         static Environment()
         {
+            Init();
+        }
+
+        public static void Init()
+        {
             RenderEngines = new FastDictionary<string, Func<ICanvas>>();
             LayoutEngines = new FastDictionary<string, Func<ScoreRenderer, ScoreLayout>>();
             StaveProfiles = new FastDictionary<string, BarRendererFactory[]>();

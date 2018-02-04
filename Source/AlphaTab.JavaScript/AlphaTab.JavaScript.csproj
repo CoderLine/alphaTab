@@ -2,6 +2,7 @@
   <PropertyGroup>
     <RootNamespace>AlphaTab</RootNamespace>
     <AssemblyName>AlphaTab</AssemblyName>
+    <PackageId>AlphaTab.JavaScript</PackageId>
     <TargetFramework>net471</TargetFramework>
     <NoWarn>$(NoWarn);0626;0824</NoWarn>
   </PropertyGroup>

@@ -260,6 +260,7 @@ namespace AlphaTab.Haxe.Js.Html
 
     [External]
     [Name("js.html.Element")]
+    [CastMode(CastMode.UnsafeCast)]
     public class Element : DOMElement
     {
     }
@@ -267,6 +268,7 @@ namespace AlphaTab.Haxe.Js.Html
 
     [External]
     [Name("js.html.ScriptElement")]
+    [CastMode(CastMode.UnsafeCast)]
     public class ScriptElement : Element
     {
         [Name("src")]
@@ -275,12 +277,14 @@ namespace AlphaTab.Haxe.Js.Html
 
     [External]
     [Name("js.html.BodyElement")]
+    [CastMode(CastMode.UnsafeCast)]
     public class BodyElement : Element
     {
     }
 
     [External]
     [Name("js.html.StyleElement")]
+    [CastMode(CastMode.UnsafeCast)]
     public class StyleElement : Element
     {
         [Name("type")]
@@ -362,12 +366,16 @@ namespace AlphaTab.Haxe.Js.Html
     public class Console
     {
         [Name("debug")]
+        [RawParams]
         public extern void Debug(params object[] data);
         [Name("info")]
+        [RawParams]
         public extern void Info(params object[] data);
         [Name("warn")]
+        [RawParams]
         public extern void Warn(params object[] data);
         [Name("error")]
+        [RawParams]
         public extern void Error(params object[] data);
     }
 }

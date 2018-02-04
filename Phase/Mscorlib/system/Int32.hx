@@ -25,6 +25,8 @@ abstract Int32(Int) from Int
 	public inline function ToSingle_IFormatProvider(provider:IFormatProvider) : system.Single return system.Convert.ToSingle_Int32(this);
 	public inline function ToDouble_IFormatProvider(provider:IFormatProvider) : system.Double return system.Convert.ToDouble_Int32(this);
 
+	public inline function GetHashCode() : system.Int32 return this;
+		
 	public function CompareTo_Int32(other:Int32) : Int32
 	{
 		if (this < other) return -1;

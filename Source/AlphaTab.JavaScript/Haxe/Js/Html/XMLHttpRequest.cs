@@ -38,7 +38,7 @@ namespace Haxe.Js.Html
         [Name("setRequestHeader")]
         public extern void SetRequestHeader(HaxeString header, HaxeString value);
 
-        [Name("Send")]
+        [Name("send")]
         public extern void Send();
 
         //[Name("Send")]

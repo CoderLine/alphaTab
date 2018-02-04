@@ -1,4 +1,4 @@
-package system;
+package system;	
 
 // TODO: actual 64bit support
 abstract Int64(Int) from Int
@@ -24,7 +24,8 @@ abstract Int64(Int) from Int
 	public inline function ToUInt64_IFormatProvider(provider:IFormatProvider) : system.UInt64 return system.Convert.ToUInt64_Int64(this);
 	public inline function ToSingle_IFormatProvider(provider:IFormatProvider) : system.Single return system.Convert.ToSingle_Int64(this);
 	public inline function ToDouble_IFormatProvider(provider:IFormatProvider) : system.Double return system.Convert.ToDouble_Int64(this);
-
+	
+	public inline function GetHashCode() : system.Int32 return this;
 	
 	@:op(-A) public inline function neg() : system.Int64 return -this;
 

@@ -5,6 +5,7 @@ abstract Char(Int) from Int
 	public inline function new(v:Int) this = system.Convert.ToUInt16(v);
 	
 	@:from public static inline function fromCode(i:Int) : Char return new Char(i);
+	public static inline function fromString(i:String) : Char return new Char(i.charCodeAt(0));
 
 	public inline function ToHaxeInt(): Int return this;	
 	public inline function ToString() : system.CsString return Std.string(this);
@@ -22,6 +23,8 @@ abstract Char(Int) from Int
 	public inline function ToSingle_IFormatProvider(provider:IFormatProvider) : system.Single return system.Convert.ToSingle_Char(this);
 	public inline function ToDouble_IFormatProvider(provider:IFormatProvider) : system.Double return system.Convert.ToDouble_Char(this);
 
+	public inline function GetHashCode() : system.Int32 return this | (this << 16);	
+	
 	@:op(-A) public inline function neg() : system.Int32 return -this;
 
     @:op(~A)public inline function not() : system.Int32 return ~this;
@@ -168,6 +171,10 @@ abstract Char(Int) from Int
     @:op(A > B) public static function gt13(lhs : system.Char, rhs : system.UInt64) : system.Boolean;	
     @:op(A > B) public static function gt14(lhs : system.Char, rhs : system.Single) : system.Boolean;	
     @:op(A > B) public static function gt15(lhs : system.Char, rhs : system.Double) : system.Boolean;	
+	
+	@:op(A > B) public static inline function gt16(lhs : system.Char, rhs : String) : system.Boolean return lhs.ToHaxeInt() > rhs.charCodeAt(0);
+    @:op(A > B) public static inline function gt17(lhs : system.Char, rhs : system.CsString) : system.Boolean return lhs.ToHaxeInt() > rhs.get_Chars(0);
+	
 
 	
     @:op(A < B) public static function lt1(lhs : system.Char, rhs : Int) : system.Boolean;
@@ -187,6 +194,8 @@ abstract Char(Int) from Int
     @:op(A < B) public static function lt14(lhs : system.Char, rhs : system.Single) : system.Boolean;	
     @:op(A < B) public static function lt15(lhs : system.Char, rhs : system.Double) : system.Boolean;	
 
+	@:op(A < B) public static inline function lt16(lhs : system.Char, rhs : String) : system.Boolean return lhs.ToHaxeInt() < rhs.charCodeAt(0);
+    @:op(A < B) public static inline function lt17(lhs : system.Char, rhs : system.CsString) : system.Boolean return lhs.ToHaxeInt() < rhs.get_Chars(0);
 	
     @:op(A >= B) public static function gte1(lhs : system.Char, rhs : Int) : system.Boolean;
     @:op(A >= B) public static function gte2(lhs : Int, rhs : system.Char) : system.Boolean;
@@ -204,6 +213,10 @@ abstract Char(Int) from Int
     @:op(A >= B) public static function gte13(lhs : system.Char, rhs : system.UInt64) : system.Boolean;	
     @:op(A >= B) public static function gte14(lhs : system.Char, rhs : system.Single) : system.Boolean;	
     @:op(A >= B) public static function gte15(lhs : system.Char, rhs : system.Double) : system.Boolean;	
+			
+	@:op(A >= B) public static inline function gte16(lhs : system.Char, rhs : String) : system.Boolean return lhs.ToHaxeInt() >= rhs.charCodeAt(0);
+    @:op(A >= B) public static inline function gte17(lhs : system.Char, rhs : system.CsString) : system.Boolean return lhs.ToHaxeInt() >= rhs.get_Chars(0);
+
 
 	
     @:op(A <= B) public static function lte1(lhs : system.Char, rhs : Int) : system.Boolean;
@@ -222,7 +235,10 @@ abstract Char(Int) from Int
     @:op(A <= B) public static function lte13(lhs : system.Char, rhs : system.UInt64) : system.Boolean;	
     @:op(A <= B) public static function lte14(lhs : system.Char, rhs : system.Single) : system.Boolean;	
     @:op(A <= B) public static function lte15(lhs : system.Char, rhs : system.Double) : system.Boolean;	
-
+		
+	@:op(A <= B) public static inline function lte16(lhs : system.Char, rhs : String) : system.Boolean return lhs.ToHaxeInt() <= rhs.charCodeAt(0);
+    @:op(A <= B) public static inline function lte17(lhs : system.Char, rhs : system.CsString) : system.Boolean return lhs.ToHaxeInt() <= rhs.get_Chars(0);
+	
 	
     @:op(A == B) public static function eq1(lhs : system.Char, rhs : Int) : system.Boolean;
     @:op(A == B) public static function eq2(lhs : Int, rhs : system.Char) : system.Boolean;
@@ -240,6 +256,9 @@ abstract Char(Int) from Int
     @:op(A == B) public static function eq13(lhs : system.Char, rhs : system.UInt64) : system.Boolean;	
     @:op(A == B) public static function eq14(lhs : system.Char, rhs : system.Single) : system.Boolean;	
     @:op(A == B) public static function eq15(lhs : system.Char, rhs : system.Double) : system.Boolean;	
+	
+    @:op(A == B) public static inline function eq16(lhs : system.Char, rhs : String) : system.Boolean return lhs.ToHaxeInt() == rhs.charCodeAt(0);
+    @:op(A == B) public static inline function eq17(lhs : system.Char, rhs : system.CsString) : system.Boolean return lhs.ToHaxeInt() == rhs.get_Chars(0);
 
 	
     @:op(A != B) public static function neq1(lhs : system.Char, rhs : Int) : system.Boolean;
@@ -258,8 +277,11 @@ abstract Char(Int) from Int
     @:op(A != B) public static function neq13(lhs : system.Char, rhs : system.UInt64) : system.Boolean;	
     @:op(A != B) public static function neq14(lhs : system.Char, rhs : system.Single) : system.Boolean;	
     @:op(A != B) public static function neq15(lhs : system.Char, rhs : system.Double) : system.Boolean;	
-
 	
+	@:op(A != B) public static inline function neq16(lhs : system.Char, rhs : String) : system.Boolean return lhs.ToHaxeInt() != rhs.charCodeAt(0);
+    @:op(A != B) public static inline function neq17(lhs : system.Char, rhs : system.CsString) : system.Boolean return lhs.ToHaxeInt() != rhs.get_Chars(0);
+	
+
     @:op(A & B) public static function and1(lhs : system.Char, rhs : Int) : system.Int32;
     @:op(A & B) public static function and2(lhs : Int, rhs : system.Char) : system.Int32;
                               		

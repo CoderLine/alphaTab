@@ -21,6 +21,7 @@ abstract SByte(Int) from Int
 	public inline function ToSingle_IFormatProvider(provider:IFormatProvider) : system.Single return system.Convert.ToSingle_SByte(this);
 	public inline function ToDouble_IFormatProvider(provider:IFormatProvider) : system.Double return system.Convert.ToDouble_SByte(this);
 
+	public inline function GetHashCode() : system.Int32 return this ^ (this << 8);
 	
 	@:op(-A) public inline function neg() : Int return -this;
 

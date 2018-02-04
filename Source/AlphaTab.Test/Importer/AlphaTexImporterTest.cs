@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,8 @@ using AlphaTab.IO;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Effects;
+using AlphaTab.Rendering.Glyphs;
+using AlphaTab.Xml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test.Importer
@@ -19,9 +22,9 @@ namespace AlphaTab.Test.Importer
     {
         private Score ParseTex(string tex)
         {
-            var import = new AlphaTexImporter();
-            import.Init(new StreamWrapper(new MemoryStream(Encoding.UTF8.GetBytes(tex))));
-            return import.ReadScore();
+            var importer = new AlphaTexImporter();
+            importer.Init(TestPlatform.CreateStringReader(tex));
+            return importer.ReadScore();
         }
 
         [TestMethod]
@@ -230,11 +233,11 @@ namespace AlphaTab.Test.Importer
 
             var regexTemplate = @"<text[^>]+>\s*{0}\s*</text>";
 
-            Assert.IsTrue(Regex.IsMatch(svg, string.Format(regexTemplate, HarmonicsEffectInfo.HarmonicToString(HarmonicType.Natural))));
-            Assert.IsTrue(Regex.IsMatch(svg, string.Format(regexTemplate, HarmonicsEffectInfo.HarmonicToString(HarmonicType.Artificial))));
-            Assert.IsTrue(Regex.IsMatch(svg, string.Format(regexTemplate, HarmonicsEffectInfo.HarmonicToString(HarmonicType.Tap))));
-            Assert.IsTrue(Regex.IsMatch(svg, string.Format(regexTemplate, HarmonicsEffectInfo.HarmonicToString(HarmonicType.Pinch))));
-            Assert.IsTrue(Regex.IsMatch(svg, string.Format(regexTemplate, HarmonicsEffectInfo.HarmonicToString(HarmonicType.Semi))));
+            Assert.IsTrue(TestPlatform.IsMatch(svg, string.Format(regexTemplate, HarmonicsEffectInfo.HarmonicToString(HarmonicType.Natural))));
+            Assert.IsTrue(TestPlatform.IsMatch(svg, string.Format(regexTemplate, HarmonicsEffectInfo.HarmonicToString(HarmonicType.Artificial))));
+            Assert.IsTrue(TestPlatform.IsMatch(svg, string.Format(regexTemplate, HarmonicsEffectInfo.HarmonicToString(HarmonicType.Tap))));
+            Assert.IsTrue(TestPlatform.IsMatch(svg, string.Format(regexTemplate, HarmonicsEffectInfo.HarmonicToString(HarmonicType.Pinch))));
+            Assert.IsTrue(TestPlatform.IsMatch(svg, string.Format(regexTemplate, HarmonicsEffectInfo.HarmonicToString(HarmonicType.Semi))));
         }
 
         [TestMethod]
@@ -264,23 +267,24 @@ namespace AlphaTab.Test.Importer
 
             var settings = Settings.Defaults;
             settings.Engine = "svg";
+            settings.Layout.Mode = "horizontal";
             settings.Staves = new StaveSettings("tabOnly");
 
             var renderer = new ScoreRenderer(settings);
-            var partials = new List<string>();
+            var partials = new FastList<string>();
             renderer.PartialRenderFinished += r =>
             {
                 partials.Add(r.RenderResult.ToString());
             };
             renderer.Render(score, new[] { 0 });
 
-            var tab = XDocument.Parse(partials[1]);
+            var tab = new XmlDocument(partials[0]);
 
-            var texts = tab.Descendants(XName.Get("text", "http://www.w3.org/2000/svg")).ToArray();
+            var texts = tab.GetElementsByTagName("text", true);
 
             var expectedTexts = new[]
             {
-                "T", "A", "B", // clef
+                Platform.Platform.StringFromCharCode((int)MusicFontSymbol.ClefTab), // clef
 
                 "1", // bar number
 
@@ -296,7 +300,6 @@ namespace AlphaTab.Test.Importer
                 "13", "full", "1½",
                 "14", "full"
             };
-            Assert.Inconclusive("There must be a better way of testing the rendered values");
 
             for (int i = 0; i < expectedTexts.Length; i++)
             {

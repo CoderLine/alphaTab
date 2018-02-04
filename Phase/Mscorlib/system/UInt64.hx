@@ -19,7 +19,8 @@ abstract UInt64(Int) from Int
 	public inline function ToUInt64_IFormatProvider(provider:IFormatProvider) : system.UInt64 return system.Convert.ToUInt64_UInt64(this);
 	public inline function ToSingle_IFormatProvider(provider:IFormatProvider) : system.Single return system.Convert.ToSingle_UInt64(this);
 	public inline function ToDouble_IFormatProvider(provider:IFormatProvider) : system.Double return system.Convert.ToDouble_UInt64(this);
-
+	
+	public function GetHashCode() : system.Int32 return this;
 	
     @:op(~A)public inline function not() : system.UInt64 return ~this;
 

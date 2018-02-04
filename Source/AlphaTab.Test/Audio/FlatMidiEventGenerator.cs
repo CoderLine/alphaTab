@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using AlphaTab.Audio.Generator;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Test.Audio
@@ -321,11 +322,11 @@ namespace AlphaTab.Test.Audio
             }
         }
 
-        public List<MidiEvent> MidiEvents { get; private set; }
+        public FastList<MidiEvent> MidiEvents { get; private set; }
 
         public FlatMidiEventGenerator()
         {
-            MidiEvents = new List<MidiEvent>();
+            MidiEvents = new FastList<MidiEvent>();
         }
 
         public void AddTimeSignature(int tick, int timeSignatureNumerator, int timeSignatureDenominator)

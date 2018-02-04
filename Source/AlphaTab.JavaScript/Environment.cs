@@ -21,6 +21,7 @@ using AlphaTab.Collections;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Platform;
+using AlphaTab.Platform.JavaScript;
 using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Util;
@@ -51,6 +52,8 @@ namespace AlphaTab
 
             // check whether webfont is loaded
             CheckFontLoad();
+
+            RegisterJQueryPlugin();
 
             Script.Write("untyped __js__(\"Math.log2 = Math.log2 || function(x) { return Math.log(x) * Math.LOG2E; };\");");
 
@@ -131,6 +134,47 @@ namespace AlphaTab
                     }
                 }
             }
+            else
+            {
+                JsWorker.Init();
+            }
+        }
+
+        private static void RegisterJQueryPlugin()
+        {
+            if (Platform.Platform.JsonExists(Lib.Global, "jQuery"))
+            {
+                dynamic jquery = Browser.Window.Member<dynamic>("jQuery");
+
+
+                var api = new JQueryAlphaTab();
+                jquery.fn.alphaTab = (Func<string, object>)(method =>
+                {
+                    var _this = Script.Write<HaxeArray<Element>>("untyped __js__(\"this\")");
+                    // if only a single element is affected, we use this
+                    if (_this.Length == 1)
+                    {
+                        return api.Exec(_this[0], method, Script.Write<string[]>("untyped __js__(\"Array.prototype.slice.call(arguments, 1)\")"));
+                    }
+                    // if multiple elements are affected we provide chaining
+                    else
+                    {
+                        return Script.Write<dynamic>("untyped __js__(\"this\")")
+                            .each((Action)(() =>
+                            {
+                                api.Exec(Script.Write<Element>("untyped __js__(\"this\")"), method,
+                                    Script.Write<string[]>("untyped __js__(\"Array.prototype.slice.call(arguments, 1)\")"));
+                            }));
+                    }
+                });
+                jquery.alphaTab = new
+                {
+                    restore = JQueryAlphaTab.Restore
+                };
+                jquery.fn.alphaTab.fn = api;
+            }
+
+
         }
 
         // based on https://github.com/JamesMGreene/currentExecutingScript

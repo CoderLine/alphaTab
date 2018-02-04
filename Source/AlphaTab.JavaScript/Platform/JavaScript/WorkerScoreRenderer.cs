@@ -21,6 +21,7 @@ using AlphaTab.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
+using Haxe;
 using Phase;
 
 namespace AlphaTab.Platform.JavaScript
@@ -44,7 +45,7 @@ namespace AlphaTab.Platform.JavaScript
                 // fallback to blob worker 
                 try
                 {
-                    var script = "importScripts('" + settings.ScriptFile + "')";
+                    HaxeString script = "importScripts('" + settings.ScriptFile + "')";
                     var blob = new Blob(new [] { script });
                     _worker = new Worker(URL.CreateObjectURL(blob));
                 }

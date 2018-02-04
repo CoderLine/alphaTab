@@ -49,21 +49,23 @@ namespace AlphaTab.Platform
             // ReSharper disable once RedundantAssignment
             msg = "[AlphaTab][" + category + "] " + msg;
 
+            Haxe.Js.Html.Console console = Lib.Global.console;
+
             switch (logLevel)
             {
                 case LogLevel.None:
                     break;
                 case LogLevel.Debug:
-                    Browser.Console.Debug(msg, details);
+                    console.Debug(msg, details);
                     break;
                 case LogLevel.Info:
-                    Browser.Console.Info(msg, details);
+                    console.Info(msg, details);
                     break;
                 case LogLevel.Warning:
-                    Browser.Console.Warn(msg, details);
+                    console.Warn(msg, details);
                     break;
                 case LogLevel.Error:
-                    Browser.Console.Error(msg, stack, details);
+                    console.Error(msg, stack, details);
                     break;
             }
         }
@@ -185,6 +187,12 @@ namespace AlphaTab.Platform
         }
 
         [Inline]
+        public static T Member<T>(this object s, string name, T value)
+        {
+            return Script.Write<T>("untyped s[name] = value");
+        }
+
+        [Inline]
         public static string[] Match(this string s, string regex)
         {
             return Script.Write<string[]>("untyped s.match(regex)");
@@ -208,7 +216,7 @@ namespace AlphaTab.Platform
         }
 
         [External]
-        [Template("untyped __typeof__(o, {T})")]
+        [Template("untyped __instanceof__({o}, {T})")]
         public static extern bool InstanceOf<T>(object o);
 
         [Inline]

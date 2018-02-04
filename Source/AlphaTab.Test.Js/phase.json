@@ -1,0 +1,11 @@
+{
+  "output": "Haxe\\src-gen",
+  "processorCount": 1, 
+  "postbuild": [
+    {
+      "name": "Building JavaScript (debug)",
+      "executable": "haxe",
+      "arguments": "-cp ..\\..\\Phase\\Mscorlib -cp ..\\..\\Build\\Haxe\\src -cp ..\\..\\Build\\Haxe\\src-gen -cp Haxe\\src -cp Haxe\\src-gen -js Haxe\\bin\\AlphaTab.Test.js -main alphaTab.test.Main -debug -lib munit"
+    }
+  ]
+}

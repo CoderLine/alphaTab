@@ -23,6 +23,9 @@ abstract Double(Float) from Float
 	public inline function ToSingle_IFormatProvider(provider:IFormatProvider) : system.Single return system.Convert.ToSingle_Double(this);
 	public inline function ToDouble_IFormatProvider(provider:IFormatProvider) : system.Double return system.Convert.ToDouble_Double(this);
 	
+	public static inline function IsNaN(v:system.Double) : system.Boolean return Math.isNaN(v.ToHaxeFloat());
+
+	public function GetHashCode() : system.Int32 return system.Convert.ToHashCode_Double(this);
 		
 	@:op(-A) public inline function neg() : system.Double return -this;
 

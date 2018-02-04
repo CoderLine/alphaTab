@@ -56,17 +56,27 @@ namespace AlphaTab.Xml
             return "";
         }
 
-        public XmlNode[] GetElementsByTagName(string name)
+        public XmlNode[] GetElementsByTagName(string name, bool recursive = false)
         {
             var tags = new FastList<XmlNode>();
-            foreach (var c in ChildNodes)
+            SearchElementsByTagName(ChildNodes, tags, name, recursive);
+            return tags.ToArray();
+        }
+
+        private void SearchElementsByTagName(FastList<XmlNode> all, FastList<XmlNode> result, string name, bool recursive = false)
+        {
+            foreach (var c in all)
             {
                 if (c != null && c.NodeType == XmlNodeType.Element && c.LocalName == name)
                 {
-                    tags.Add(c);
+                    result.Add(c);
+                }
+
+                if (recursive)
+                {
+                    SearchElementsByTagName(c.ChildNodes, result, name, true);
                 }
             }
-            return tags.ToArray();
         }
 
         public XmlNode FindChildElement(string name)

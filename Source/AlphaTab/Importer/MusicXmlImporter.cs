@@ -1005,7 +1005,7 @@ namespace AlphaTab.Importer
                             break;
                         case "alter":
                             semitones = Platform.Platform.ParseFloat(c.InnerText);
-                            if (Platform.Platform.IsNaN(semitones))
+                            if (double.IsNaN(semitones))
                             {
                                 semitones = 0;
                             }

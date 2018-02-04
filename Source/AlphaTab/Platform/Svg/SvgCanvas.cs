@@ -182,6 +182,7 @@ namespace AlphaTab.Platform.Svg
 
         public void FillText(string text, float x, float y)
         {
+            if (text == "") return;
             var s = "<text x=\"" + ((int)x) + "\" y=\"" + ((int)y) + "\" style=\"font:" + Font.ToCssString() + "\" "
                     + " dominant-baseline=\"" + GetSvgBaseLine() + "\"";
             if (Color.RGBA != Color.BlackRgb)

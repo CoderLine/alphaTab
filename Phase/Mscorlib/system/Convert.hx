@@ -7,11 +7,11 @@ import js.html.Int32Array;
 import js.html.Uint16Array;
 import js.html.Uint32Array;
 import js.html.Uint8Array;
+import js.html.Float32Array;
+import js.html.Float64Array;
 
 class Convert 
 {
-	#if js
-	
 	private static var _conversionBuffer:ArrayBuffer = new ArrayBuffer(8);
 	private static var _int8Buffer = new Int8Array(_conversionBuffer);
 	private static var _uint8Buffer = new Uint8Array(_conversionBuffer);
@@ -19,6 +19,8 @@ class Convert
 	private static var _uint16Buffer = new Uint16Array(_conversionBuffer);
 	private static var _int32Buffer = new Int32Array(_conversionBuffer);
 	private static var _uint32Buffer = new Uint32Array(_conversionBuffer);
+	private static var _float32Buffer = new Float32Array(_conversionBuffer);
+	private static var _float64Buffer = new Float64Array(_conversionBuffer);
 	
 	public static function ToInt8(v:Int) : Int
 	{
@@ -57,9 +59,20 @@ class Convert
 	{
 		_uint32Buffer[0] = v;
 		return _int32Buffer[0];
-	}	
-	#end
-	
+	}		
+
+	public static function ToHashCode_Single(v:system.Single) : system.Int32
+	{
+		_float32Buffer[0] = v.ToHaxeFloat();
+		return _int32Buffer[0];
+	}
+
+	public static function ToHashCode_Double(v:system.Double) : system.Int32
+	{
+		_float64Buffer[0] = v.ToHaxeFloat();
+		return _int32Buffer[0] ^ _int32Buffer[1];
+	}
+		
 	public static inline function ToBoolean_Byte(v:system.Byte) : system.Boolean
 	{
 		return v != 0;

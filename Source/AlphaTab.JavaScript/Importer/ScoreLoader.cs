@@ -93,7 +93,7 @@ namespace AlphaTab.Importer
             if (xhr.ResponseType != XMLHttpRequestResponseType.ARRAYBUFFER)
             {
                 // use VB Loader to load binary array
-                dynamic vbArr = Script.Write<dynamic>("VbAjaxLoader(\"GET\", path)");
+                dynamic vbArr = Script.Write<dynamic>("untyped VbAjaxLoader(\"GET\", path)");
                 var fileContents = vbArr.toArray();
 
                 // decode byte array to string

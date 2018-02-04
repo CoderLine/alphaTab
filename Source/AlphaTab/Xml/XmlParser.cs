@@ -52,7 +52,7 @@ namespace AlphaTab.Xml
         public const int CharCodeUpperA = 'A';
         public const int CharCodeUpperZ = 'Z';
         public const int CharCode0 = '0';
-        public const int CharCode9 = '0';
+        public const int CharCode9 = '9';
         public const int CharCodeColon = ':';
         public const int CharCodeDot = '.';
         public const int CharCodeUnderscore = '_';

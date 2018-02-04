@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace AlphaTab.Test.Importer
 {
     [TestClass]
+    [Ignore]
     public class MusicXmlImporterSamplesTests : MusicXmlImporterTestBase
     {
         [TestMethod]
@@ -121,7 +122,7 @@ namespace AlphaTab.Test.Importer
         {
             var fileId = caller.Split('_')[1];
             const string path = "TestFiles/MusicXmlSamples";
-            var file = Directory.EnumerateFiles(path, "*.xml").FirstOrDefault(f => f.Contains(fileId));
+            var file = path + fileId + ".xml";
             return TestReferenceFile(file, renderLayout, renderAllTracks);
         }
     }

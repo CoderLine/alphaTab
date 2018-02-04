@@ -22,6 +22,7 @@ abstract Single(Float) from Float from Int
 
 	public inline function ToHaxeFloat(): Float return this;
 	public inline function ToString() : CsString return Std.string(this);
+	public function GetHashCode() : system.Int32 return system.Convert.ToHashCode_Single(this);
 	
 	
 	@:op(-A) public inline function neg() : system.Single return -this;

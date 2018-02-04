@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>AlphaTab.Test.CSharp</RootNamespace>
+    <AssemblyName>AlphaTab.Test.CSharp</AssemblyName>
+    <TargetFramework>net471</TargetFramework>
+    <NoWarn>$(NoWarn);0626;0824</NoWarn>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.2.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AlphaTab.CSharp\AlphaTab.CSharp.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Phase.Core">
+      <HintPath>..\..\Phase\Compiler\Phase.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <Import Project="..\AlphaTab.Test\AlphaTab.Test.projitems" Label="Shared" />
+
+</Project>

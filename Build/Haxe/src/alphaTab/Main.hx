@@ -13,11 +13,14 @@ import alphaTab.audio.generator.MidiFileGenerator;
 // rendering
 import alphaTab.rendering.ScoreRenderer;
 
+// api
+import alphaTab.platform.javaScript.JsApi;
+
 
 class Main 
 {
 	static function main() 
 	{
-		alphaTab.platform.javaScript.JsWorker.Init();
+		alphaTab.Environment.Init();
 	}
 }

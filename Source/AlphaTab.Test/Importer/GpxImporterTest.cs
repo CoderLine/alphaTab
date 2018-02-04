@@ -20,6 +20,7 @@ using System.IO;
 using AlphaTab.Importer;
 using AlphaTab.IO;
 using AlphaTab.Model;
+using AlphaTab.Util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test.Importer
@@ -41,7 +42,7 @@ namespace AlphaTab.Test.Importer
         internal new GpxImporter PrepareImporterWithBytes(byte[] buffer)
         {
             var readerBase = new GpxImporter();
-            readerBase.Init(new StreamWrapper(new MemoryStream(buffer)));
+            readerBase.Init(ByteBuffer.FromBuffer(buffer));
             return readerBase;
         }
 
@@ -49,7 +50,7 @@ namespace AlphaTab.Test.Importer
         public void TestFileSystemCompressed()
         {
             GpxFileSystem fileSystem = new GpxFileSystem();
-            fileSystem.Load(new StreamWrapper(new MemoryStream(Load("GuitarPro6/Compressed.gpx"))));
+            fileSystem.Load(ByteBuffer.FromBuffer(Load("GuitarPro6/Compressed.gpx")));
 
             string[] names = {"score.gpif", "misc.xml", "BinaryStylesheet", "PartConfiguration", "LayoutConfiguration"};
             int[] sizes = {8488, 130, 12204, 20, 12};
@@ -57,7 +58,7 @@ namespace AlphaTab.Test.Importer
             for (int i = 0; i < fileSystem.Files.Count; i++)
             {
                 var file = fileSystem.Files[i];
-                Console.WriteLine("{0} - {1}", file.FileName, file.FileSize);
+                Logger.Info("Test", $"{file.FileName} - {file.FileSize}");
                 Assert.AreEqual(names[i], file.FileName);
                 Assert.AreEqual(sizes[i], file.FileSize);
             }

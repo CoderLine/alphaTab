@@ -22,10 +22,7 @@ namespace AlphaTab.Platform.JavaScript
 
         public static void Init()
         {
-            if (!Lib.Global.document)
-            {
-                new JsWorker(Lib.Global);
-            }
+            new JsWorker(Lib.Global);
         }
 
 

@@ -1,27 +1,22 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{B124E22D-BC49-4254-A641-37F1FD2B58F8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab.Test", "Source\AlphaTab.Test\AlphaTab.Test.csproj", "{5E999D26-CC10-4531-9253-88EB8B6DF0D6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CSharp", "CSharp", "{0F4187B8-D34E-475D-8656-06F739E31DB3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{25C1939B-CD65-4D67-B219-1499A6B6B90F}"
 	ProjectSection(SolutionItems) = preProject
-		Build\JavaScript\jquery.alphaTab.js = Build\JavaScript\jquery.alphaTab.js
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "AlphaTab", "Source\AlphaTab\AlphaTab.shproj", "{8083B3BC-0681-47F2-9FBF-A5C96107F538}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab.JavaScript", "Source\AlphaTab.JavaScript\AlphaTab.JavaScript.csproj", "{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaTab.JavaScript", "Source\AlphaTab.JavaScript\AlphaTab.JavaScript.csproj", "{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CSharp", "CSharp", "{9ACA48D4-4EA9-40D0-AC1E-0E50447A87D5}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "AlphaTab.CSharp.Shared", "Source\AlphaTab.CSharp.Shared\AlphaTab.CSharp.Shared.shproj", "{DB51A01F-09DA-4930-8C37-CB7D67060637}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab.Wpf", "Source\AlphaTab.Wpf\AlphaTab.Wpf.csproj", "{DFE92430-1351-4B74-8306-F1620F70AC4A}"
 EndProject
@@ -45,19 +40,26 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab.Xamarin.Android", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaTab.Samples.XamarinNative.Android", "Samples\CSharp\AlphaTab.Samples.XamarinNative.Android\AlphaTab.Samples.XamarinNative.Android.csproj", "{48297892-A3F5-43B1-9001-2F3BE04F7486}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "AlphaTab.Test", "Source\AlphaTab.Test\AlphaTab.Test.shproj", "{CE43D0C5-8A17-4F8F-9623-3A7A52AD02F4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaTab.Test.Js", "Source\AlphaTab.Test.Js\AlphaTab.Test.Js.csproj", "{CFE77A13-5BC1-4287-A5A3-CD69ECDDFAA5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaTab.Test.CSharp", "Source\AlphaTab.Test.CSharp\AlphaTab.Test.CSharp.csproj", "{B58BDC1C-566A-473E-B755-67567251D5FD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaTab.CSharp", "Source\AlphaTab.CSharp\AlphaTab.CSharp.csproj", "{BCC950EA-7465-47FC-A7AF-E733B55EC91F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{4642B107-04FE-4777-AA50-667A6A7E6C09}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Source\AlphaTab\AlphaTab.projitems*{8083b3bc-0681-47f2-9fbf-a5c96107f538}*SharedItemsImports = 13
+		Source\AlphaTab.Test\AlphaTab.Test.projitems*{ce43d0c5-8a17-4f8f-9623-3a7a52ad02f4}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5E999D26-CC10-4531-9253-88EB8B6DF0D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5E999D26-CC10-4531-9253-88EB8B6DF0D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5E999D26-CC10-4531-9253-88EB8B6DF0D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5E999D26-CC10-4531-9253-88EB8B6DF0D6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -110,13 +112,24 @@ Global
 		{48297892-A3F5-43B1-9001-2F3BE04F7486}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48297892-A3F5-43B1-9001-2F3BE04F7486}.Release|Any CPU.Build.0 = Release|Any CPU
 		{48297892-A3F5-43B1-9001-2F3BE04F7486}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{CFE77A13-5BC1-4287-A5A3-CD69ECDDFAA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFE77A13-5BC1-4287-A5A3-CD69ECDDFAA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFE77A13-5BC1-4287-A5A3-CD69ECDDFAA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFE77A13-5BC1-4287-A5A3-CD69ECDDFAA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B58BDC1C-566A-473E-B755-67567251D5FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B58BDC1C-566A-473E-B755-67567251D5FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B58BDC1C-566A-473E-B755-67567251D5FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B58BDC1C-566A-473E-B755-67567251D5FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCC950EA-7465-47FC-A7AF-E733B55EC91F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCC950EA-7465-47FC-A7AF-E733B55EC91F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCC950EA-7465-47FC-A7AF-E733B55EC91F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCC950EA-7465-47FC-A7AF-E733B55EC91F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0F4187B8-D34E-475D-8656-06F739E31DB3} = {B124E22D-BC49-4254-A641-37F1FD2B58F8}
-		{DB51A01F-09DA-4930-8C37-CB7D67060637} = {9ACA48D4-4EA9-40D0-AC1E-0E50447A87D5}
 		{DFE92430-1351-4B74-8306-F1620F70AC4A} = {9ACA48D4-4EA9-40D0-AC1E-0E50447A87D5}
 		{4E5A5117-B0AE-4FD5-9661-0C1CCAF86DEC} = {9ACA48D4-4EA9-40D0-AC1E-0E50447A87D5}
 		{67F9D3A8-F71E-4428-913F-C37AE82CDB24} = {9ACA48D4-4EA9-40D0-AC1E-0E50447A87D5}
@@ -128,6 +141,10 @@ Global
 		{A5D6838F-254F-480C-A6FB-0FAABCE659BA} = {0F4187B8-D34E-475D-8656-06F739E31DB3}
 		{CF20A332-7808-46AC-99F4-84580E18DF8A} = {9ACA48D4-4EA9-40D0-AC1E-0E50447A87D5}
 		{48297892-A3F5-43B1-9001-2F3BE04F7486} = {0F4187B8-D34E-475D-8656-06F739E31DB3}
+		{CE43D0C5-8A17-4F8F-9623-3A7A52AD02F4} = {4642B107-04FE-4777-AA50-667A6A7E6C09}
+		{CFE77A13-5BC1-4287-A5A3-CD69ECDDFAA5} = {4642B107-04FE-4777-AA50-667A6A7E6C09}
+		{B58BDC1C-566A-473E-B755-67567251D5FD} = {4642B107-04FE-4777-AA50-667A6A7E6C09}
+		{BCC950EA-7465-47FC-A7AF-E733B55EC91F} = {9ACA48D4-4EA9-40D0-AC1E-0E50447A87D5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EF4712C6-0213-4DDD-B176-D564038D0F3E}

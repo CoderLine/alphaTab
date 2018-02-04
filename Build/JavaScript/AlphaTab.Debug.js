@@ -10,7 +10,7 @@ function $extend(from, fields) {
 var EReg = function(r,opt) {
 	this.r = new RegExp(r,opt.split("u").join(""));
 };
-EReg.__name__ = true;
+EReg.__name__ = ["EReg"];
 EReg.prototype = {
 	match: function(s) {
 		if(this.r.global) {
@@ -30,7 +30,7 @@ EReg.prototype = {
 	,__class__: EReg
 };
 var HxOverrides = function() { };
-HxOverrides.__name__ = true;
+HxOverrides.__name__ = ["HxOverrides"];
 HxOverrides.cca = function(s,index) {
 	var x = s.charCodeAt(index);
 	if(x != x) {
@@ -57,9 +57,9 @@ HxOverrides.iter = function(a) {
 		return this.arr[this.cur++];
 	}};
 };
-Math.__name__ = true;
+Math.__name__ = ["Math"];
 var Std = function() { };
-Std.__name__ = true;
+Std.__name__ = ["Std"];
 Std.string = function(s) {
 	return js_Boot.__string_rec(s,"");
 };
@@ -76,12 +76,12 @@ Std.parseInt = function(x) {
 var StringBuf = function() {
 	this.b = "";
 };
-StringBuf.__name__ = true;
+StringBuf.__name__ = ["StringBuf"];
 StringBuf.prototype = {
 	__class__: StringBuf
 };
 var StringTools = function() { };
-StringTools.__name__ = true;
+StringTools.__name__ = ["StringTools"];
 StringTools.startsWith = function(s,start) {
 	if(s.length >= start.length) {
 		return HxOverrides.substr(s,0,start.length) == start;
@@ -132,9 +132,18 @@ StringTools.trim = function(s) {
 StringTools.replace = function(s,sub,by) {
 	return s.split(sub).join(by);
 };
+var Type = function() { };
+Type.__name__ = ["Type"];
+Type.getClassName = function(c) {
+	var a = c.__name__;
+	if(a == null) {
+		return null;
+	}
+	return a.join(".");
+};
 var system_Exception = function() {
 };
-system_Exception.__name__ = true;
+system_Exception.__name__ = ["system","Exception"];
 system_Exception.prototype = {
 	Exception_CsString: function(message) {
 		this.Message = message;
@@ -144,28 +153,32 @@ system_Exception.prototype = {
 var alphaTab_AlphaTabException = function() {
 	system_Exception.call(this);
 };
-alphaTab_AlphaTabException.__name__ = true;
+alphaTab_AlphaTabException.__name__ = ["alphaTab","AlphaTabException"];
 alphaTab_AlphaTabException.__super__ = system_Exception;
 alphaTab_AlphaTabException.prototype = $extend(system_Exception.prototype,{
 	AlphaTabException: function(message) {
 		this.Exception_CsString(message);
+		this.Description = null;
 		this.Description = message;
 		return this;
 	}
 	,__class__: alphaTab_AlphaTabException
 });
 var alphaTab_platform_IPathCanvas = function() { };
-alphaTab_platform_IPathCanvas.__name__ = true;
+alphaTab_platform_IPathCanvas.__name__ = ["alphaTab","platform","IPathCanvas"];
 alphaTab_platform_IPathCanvas.prototype = {
 	__class__: alphaTab_platform_IPathCanvas
 };
 var alphaTab_platform_ICanvas = function() { };
-alphaTab_platform_ICanvas.__name__ = true;
+alphaTab_platform_ICanvas.__name__ = ["alphaTab","platform","ICanvas"];
 alphaTab_platform_ICanvas.__interfaces__ = [alphaTab_platform_IPathCanvas];
 alphaTab_platform_ICanvas.prototype = {
 	__class__: alphaTab_platform_ICanvas
 };
 var alphaTab_platform_svg_SvgCanvas = function() {
+	this.Buffer = null;
+	this._currentPath = null;
+	this._currentPathIsEmpty = false;
 	var this1 = "";
 	this._currentPath = this1;
 	this._currentPathIsEmpty = true;
@@ -175,7 +188,7 @@ var alphaTab_platform_svg_SvgCanvas = function() {
 	this.set_TextAlign(0);
 	this.set_TextBaseline(0);
 };
-alphaTab_platform_svg_SvgCanvas.__name__ = true;
+alphaTab_platform_svg_SvgCanvas.__name__ = ["alphaTab","platform","svg","SvgCanvas"];
 alphaTab_platform_svg_SvgCanvas.__interfaces__ = [alphaTab_platform_IPathCanvas,alphaTab_platform_ICanvas];
 alphaTab_platform_svg_SvgCanvas.prototype = {
 	get_Color: function() {
@@ -303,6 +316,9 @@ alphaTab_platform_svg_SvgCanvas.prototype = {
 		this._currentPathIsEmpty = true;
 	}
 	,FillText: function(text,x,y) {
+		if(text == "") {
+			return;
+		}
 		var s = "<text x=\"" + system_Convert.ToInt32_Single(x) + "\" y=\"" + system_Convert.ToInt32_Single(y) + "\" style=\"font:" + this.get_Font().ToCssString(1) + "\" " + " dominant-baseline=\"" + this.GetSvgBaseLine() + "\"";
 		if(this.get_Color().RGBA != "#000000") {
 			s = s + " fill=\"" + this.get_Color().RGBA + "\"";
@@ -363,7 +379,7 @@ alphaTab_platform_svg_SvgCanvas.prototype = {
 var alphaTab_platform_svg_CssFontSvgCanvas = function() {
 	alphaTab_platform_svg_SvgCanvas.call(this);
 };
-alphaTab_platform_svg_CssFontSvgCanvas.__name__ = true;
+alphaTab_platform_svg_CssFontSvgCanvas.__name__ = ["alphaTab","platform","svg","CssFontSvgCanvas"];
 alphaTab_platform_svg_CssFontSvgCanvas.__super__ = alphaTab_platform_svg_SvgCanvas;
 alphaTab_platform_svg_CssFontSvgCanvas.prototype = $extend(alphaTab_platform_svg_SvgCanvas.prototype,{
 	FillMusicFontSymbol: function(x,y,scale,symbol) {
@@ -384,6 +400,8 @@ var alphaTab_platform_model_Color = function(r,g,b,a) {
 	if(a == null) {
 		a = 255;
 	}
+	this.Raw = 0;
+	this.RGBA = null;
 	this.Raw = a << 24 | r << 16 | g << 8 | b;
 	if(this.get_A() == 255) {
 		this.RGBA = "#" + alphaTab_platform_Platform.ToHexString(this.get_R(),2) + alphaTab_platform_Platform.ToHexString(this.get_G(),2) + alphaTab_platform_Platform.ToHexString(this.get_B(),2);
@@ -391,7 +409,7 @@ var alphaTab_platform_model_Color = function(r,g,b,a) {
 		this.RGBA = "rgba(" + this.get_R() + "," + this.get_G() + "," + this.get_B() + "," + this.get_A() / 255.0 + ")";
 	}
 };
-alphaTab_platform_model_Color.__name__ = true;
+alphaTab_platform_model_Color.__name__ = ["alphaTab","platform","model","Color"];
 alphaTab_platform_model_Color.prototype = {
 	get_A: function() {
 		return system_Convert.ToUInt8(this.Raw >> 24 & 255);
@@ -408,7 +426,7 @@ alphaTab_platform_model_Color.prototype = {
 	,__class__: alphaTab_platform_model_Color
 };
 var alphaTab_platform_Platform = function() { };
-alphaTab_platform_Platform.__name__ = true;
+alphaTab_platform_Platform.__name__ = ["alphaTab","platform","Platform"];
 alphaTab_platform_Platform.ParseFloat = function(s) {
 	return parseFloat(s);
 };
@@ -418,20 +436,21 @@ alphaTab_platform_Platform.GetCallerName = function() {
 alphaTab_platform_Platform.Log = function(logLevel,category,msg,details) {
 	var stack = haxe_CallStack.toString(haxe_CallStack.callStack());
 	msg = "[AlphaTab][" + category + "] " + msg;
+	var $console = $global.console;
 	switch(logLevel) {
 	case 0:
 		break;
 	case 1:
-		window.console.debug([msg,details]);
+		$console.debug(msg,details);
 		break;
 	case 2:
-		window.console.info([msg,details]);
+		$console.info(msg,details);
 		break;
 	case 3:
-		window.console.warn([msg,details]);
+		$console.warn(msg,details);
 		break;
 	case 4:
-		window.console.error([msg,stack,details]);
+		$console.error(msg,stack,details);
 		break;
 	default:
 	}
@@ -500,11 +519,13 @@ alphaTab_platform_Platform.ToString = function(data) {
 	return s;
 };
 alphaTab_platform_Platform.StringToByteArray = function(contents) {
-	var byteArray = system__$FixedArray_FixedArray_$Impl_$._new(contents.length);
+	var size = contents.length;
+	var this1 = new Array(size);
+	var byteArray = this1;
 	var i = 0;
 	while(i < contents.length) {
-		var this1 = system_Convert.ToUInt16(HxOverrides.cca(contents,i));
-		byteArray[i] = system_Convert.ToUInt8(this1);
+		var this2 = system_Convert.ToUInt16(HxOverrides.cca(contents,i));
+		byteArray[i] = system_Convert.ToUInt8(this2);
 		++i;
 	}
 	return byteArray;
@@ -523,8 +544,11 @@ alphaTab_platform_Platform.NewGuid = function() {
 	var this4 = system_Convert.ToUInt16(45);
 	return lhs3 + Std.string(this4) + alphaTab_platform_Platform.S4() + alphaTab_platform_Platform.S4() + alphaTab_platform_Platform.S4();
 };
-alphaTab_platform_Platform.Member = function(s,name) {
+alphaTab_platform_Platform.Member_Object_CsString1 = function(s,name) {
 	return s[name];
+};
+alphaTab_platform_Platform.Member_Object_CsString_T1 = function(s,name,value) {
+	return s[name] = value;
 };
 alphaTab_platform_Platform.Match = function(s,regex) {
 	return s.match(regex);
@@ -591,7 +615,7 @@ alphaTab_platform_Platform.ToHexString = function(n,digits) {
 	return s;
 };
 var system_Convert = function() { };
-system_Convert.__name__ = true;
+system_Convert.__name__ = ["system","Convert"];
 system_Convert.ToInt8 = function(v) {
 	system_Convert._int32Buffer[0] = v;
 	return system_Convert._int8Buffer[0];
@@ -621,6 +645,14 @@ system_Convert.ToUInt64 = function(v) {
 system_Convert.ToInt32 = function(v) {
 	system_Convert._uint32Buffer[0] = v;
 	return system_Convert._int32Buffer[0];
+};
+system_Convert.ToHashCode_Single = function(v) {
+	system_Convert._float32Buffer[0] = v;
+	return system_Convert._int32Buffer[0];
+};
+system_Convert.ToHashCode_Double = function(v) {
+	system_Convert._float64Buffer[0] = v;
+	return system_Convert._int32Buffer[0] ^ system_Convert._int32Buffer[1];
 };
 system_Convert.ToBoolean_Byte = function(v) {
 	return v != 0;
@@ -1048,12 +1080,16 @@ var alphaTab_platform_model_Font = function(family,size,style) {
 	if(style == null) {
 		style = 0;
 	}
+	this._css = null;
+	this.Family = null;
+	this.Size = 0.0;
+	this.Style = null;
 	this.Family = family;
 	this.Size = size;
 	this.Style = style;
 	this._css = this.ToCssString(1);
 };
-alphaTab_platform_model_Font.__name__ = true;
+alphaTab_platform_model_Font.__name__ = ["alphaTab","platform","model","Font"];
 alphaTab_platform_model_Font.prototype = {
 	get_IsBold: function() {
 		return (this.Style & 1) != 0;
@@ -1088,9 +1124,100 @@ alphaTab_platform_model_Font.prototype = {
 	}
 	,__class__: alphaTab_platform_model_Font
 };
+var alphaTab_platform_javaScript_JQueryAlphaTab = function() {
+	var this1 = [];
+	this._initListeners = this1;
+};
+alphaTab_platform_javaScript_JQueryAlphaTab.__name__ = ["alphaTab","platform","javaScript","JQueryAlphaTab"];
+alphaTab_platform_javaScript_JQueryAlphaTab.Restore = function(selector) {
+	$(selector).empty().removeData("alphaTab");
+};
+alphaTab_platform_javaScript_JQueryAlphaTab.prototype = {
+	Exec: function(element,method,args) {
+		if(typeof(method) != 'string') {
+			args = [method];
+			method = "init";
+		}
+		var tmp;
+		var this1 = system_Convert.ToUInt16(HxOverrides.cca(method,0));
+		if(!(this1 == 95)) {
+			tmp = method == "Exec";
+		} else {
+			tmp = true;
+		}
+		if(tmp) {
+			return null;
+		}
+		var jElement = $(element);
+		var context = jElement.data("alphaTab");
+		if(method == "destroy" && !(!(!context))) {
+			return null;
+		}
+		if(method != "init" && !(!(!context))) {
+			throw new Error("alphaTab not initialized");
+		}
+		var apiMethod = this[method];
+		if(!(!apiMethod)) {
+			var realArgs = [ jElement, context ].concat(args);
+			return apiMethod.apply(this,realArgs);
+		} else {
+			alphaTab_util_Logger.Error("Api","Method '" + method + "' does not exist on jQuery.alphaTab",null);
+			return null;
+		}
+	}
+	,init: function(element,context,options) {
+		if(!(!(!context))) {
+			context = new alphaTab_platform_javaScript_JsApi(element[0],options);
+			element.data("alphaTab",context);
+			var listener = $iterator(this._initListeners)();
+			while(listener.hasNext()) {
+				var listener1 = listener.next();
+				listener1(element,context,options);
+			}
+		}
+	}
+	,destroy: function(element,context) {
+		element.removeData("alphaTab");
+		context.Destroy();
+	}
+	,tex: function(element,context,tex) {
+		context.Tex(tex);
+	}
+	,tracks: function(element,context,tracks) {
+		if(tracks) {
+			context.SetTracks(tracks,true);
+		}
+		return context.get_Tracks();
+	}
+	,api: function(element,context) {
+		return context;
+	}
+	,score: function(element,context,score) {
+		if(!(!score)) {
+			context.ScoreLoaded(score,true);
+		}
+		return context.Score;
+	}
+	,renderer: function(element,context) {
+		return context.Renderer;
+	}
+	,layout: function(element,context,layout) {
+		if(!(!layout)) {
+			context.UpdateLayout(layout);
+		}
+		return context.Settings.Layout;
+	}
+	,print: function(element,context,width) {
+		context.Print(width);
+	}
+	,_onInit: function(listener) {
+		this._initListeners.push(listener);
+	}
+	,__class__: alphaTab_platform_javaScript_JQueryAlphaTab
+};
 var alphaTab_util_Logger = function() {
 };
-alphaTab_util_Logger.__name__ = true;
+alphaTab_util_Logger.__name__ = ["alphaTab","util","Logger"];
 alphaTab_util_Logger.Debug = function(category,msg,details) {
 	alphaTab_util_Logger.Log(1,category,msg,details);
 };
@@ -1113,7 +1240,7 @@ alphaTab_util_Logger.prototype = {
 	__class__: alphaTab_util_Logger
 };
 var haxe_CallStack = function() { };
-haxe_CallStack.__name__ = true;
+haxe_CallStack.__name__ = ["haxe","CallStack"];
 haxe_CallStack.getStack = function(e) {
 	if(e == null) {
 		return [];
@@ -1236,7 +1363,7 @@ haxe_CallStack.makeStack = function(s) {
 	}
 };
 var js_Boot = function() { };
-js_Boot.__name__ = true;
+js_Boot.__name__ = ["js","Boot"];
 js_Boot.getClass = function(o) {
 	if((o instanceof Array) && o.__enum__ == null) {
 		return Array;
@@ -1438,12 +1565,98 @@ haxe_StackItem.Module = function(m) { var $x = ["Module",1,m]; $x.__enum__ = hax
 haxe_StackItem.FilePos = function(s,file,line) { var $x = ["FilePos",2,s,file,line]; $x.__enum__ = haxe_StackItem; $x.toString = $estr; return $x; };
 haxe_StackItem.Method = function(classname,method) { var $x = ["Method",3,classname,method]; $x.__enum__ = haxe_StackItem; $x.toString = $estr; return $x; };
 haxe_StackItem.LocalFunction = function(v) { var $x = ["LocalFunction",4,v]; $x.__enum__ = haxe_StackItem; $x.toString = $estr; return $x; };
+var alphaTab_platform_javaScript_JsWorker = function(main) {
+	this._renderer = null;
+	this._main = null;
+	this._main = main;
+	this._main.addEventListener("message",$bind(this,this.HandleMessage),false);
+};
+alphaTab_platform_javaScript_JsWorker.__name__ = ["alphaTab","platform","javaScript","JsWorker"];
+alphaTab_platform_javaScript_JsWorker.Init = function() {
+	new alphaTab_platform_javaScript_JsWorker($global);
+};
+alphaTab_platform_javaScript_JsWorker.prototype = {
+	HandleMessage: function(e) {
+		var _gthis = this;
+		var data = (js_Boot.__cast(e , MessageEvent)).data;
+		var cmd = data ? data.cmd : "";
+		switch(cmd) {
+		case "alphaTab.initialize":
+			var settings = alphaTab_Settings.FromJson(data.settings,null);
+			this._renderer = new alphaTab_rendering_ScoreRenderer(settings);
+			this._renderer.PartialRenderFinished = system__$EventAction1_EventAction1_$Impl_$.add(this._renderer.PartialRenderFinished,function(result) {
+				_gthis._main.postMessage({ cmd : "alphaTab.partialRenderFinished", result : result});
+			});
+			this._renderer.RenderFinished = system__$EventAction1_EventAction1_$Impl_$.add(this._renderer.RenderFinished,function(result1) {
+				_gthis._main.postMessage({ cmd : "alphaTab.renderFinished", result : result1});
+			});
+			this._renderer.PostRenderFinished = system__$EventAction_EventAction_$Impl_$.add(this._renderer.PostRenderFinished,function() {
+				_gthis._main.postMessage({ cmd : "alphaTab.postRenderFinished", boundsLookup : _gthis._renderer.get_BoundsLookup().ToJson()});
+			});
+			this._renderer.PreRender = system__$EventAction1_EventAction1_$Impl_$.add(this._renderer.PreRender,function(result2) {
+				_gthis._main.postMessage({ cmd : "alphaTab.preRender", result : result2});
+			});
+			this._renderer.Error = system__$EventAction2_EventAction2_$Impl_$.add(this._renderer.Error,$bind(this,this.Error));
+			break;
+		case "alphaTab.invalidate":
+			this._renderer.Invalidate();
+			break;
+		case "alphaTab.render":
+			var converter = new alphaTab_model_JsonConverter();
+			var score = converter.JsObjectToScore(data.score);
+			this.RenderMultiple(score,data.trackIndexes);
+			break;
+		case "alphaTab.resize":
+			this._renderer.Resize(data.width);
+			break;
+		case "alphaTab.updateSettings":
+			this.UpdateSettings(data.settings);
+			break;
+		default:
+		}
+	}
+	,UpdateSettings: function(settings) {
+		this._renderer.UpdateSettings(alphaTab_Settings.FromJson(settings,null));
+	}
+	,RenderMultiple: function(score,trackIndexes) {
+		try {
+			this._renderer.Render(score,trackIndexes);
+		} catch( e ) {
+			if (e instanceof js__$Boot_HaxeError) e = e.val;
+			if( js_Boot.__instanceof(e,system_Exception) ) {
+				this.Error("render",e);
+			} else throw(e);
+		}
+	}
+	,Error: function(type,e) {
+		alphaTab_util_Logger.Error(type,"An unexpected error occurred in worker",e);
+		var error = JSON.parse(JSON.stringify(e));
+		var e2 = e;
+		if(e2.message) {
+			error.message = e2.message;
+		}
+		if(e2.stack) {
+			error.stack = e2.stack;
+		}
+		if(e2.constructor && e2.constructor.name) {
+			error.type = e2.constructor.name;
+		}
+		this._main.postMessage({ cmd : "alphaTab.error", error : { type : type, detail : error}});
+	}
+	,__class__: alphaTab_platform_javaScript_JsWorker
+};
 var alphaTab_rendering_layout_ScoreLayout = function(renderer) {
+	this._barRendererLookup = null;
+	this.Renderer = null;
+	this.Width = 0.0;
+	this.Height = 0.0;
+	this.ScoreInfoGlyphs = null;
+	this.TuningGlyph = null;
 	this.Renderer = renderer;
 	var this1 = {}
 	this._barRendererLookup = this1;
 };
-alphaTab_rendering_layout_ScoreLayout.__name__ = true;
+alphaTab_rendering_layout_ScoreLayout.__name__ = ["alphaTab","rendering","layout","ScoreLayout"];
 alphaTab_rendering_layout_ScoreLayout.prototype = {
 	get_Name: function() {
 		throw new js__$Boot_HaxeError("abstract");
@@ -1599,7 +1812,7 @@ alphaTab_rendering_layout_ScoreLayout.prototype = {
 		if(this._barRendererLookup.hasOwnProperty(key)) {
 			var lookup = this._barRendererLookup[key];
 			var key1 = renderer.Bar.Id;
-			delete lookup[index];
+			delete lookup[key1];
 		}
 	}
 	,GetRendererForBar: function(key,bar) {
@@ -1628,8 +1841,11 @@ alphaTab_rendering_layout_ScoreLayout.prototype = {
 };
 var alphaTab_rendering_layout_PageViewLayout = function(renderer) {
 	alphaTab_rendering_layout_ScoreLayout.call(this,renderer);
+	this._groups = null;
+	this._allMasterBarRenderers = null;
+	this._barsFromPreviousGroup = null;
 };
-alphaTab_rendering_layout_PageViewLayout.__name__ = true;
+alphaTab_rendering_layout_PageViewLayout.__name__ = ["alphaTab","rendering","layout","PageViewLayout"];
 alphaTab_rendering_layout_PageViewLayout.__super__ = alphaTab_rendering_layout_ScoreLayout;
 alphaTab_rendering_layout_PageViewLayout.prototype = $extend(alphaTab_rendering_layout_ScoreLayout.prototype,{
 	get_Name: function() {
@@ -1863,8 +2079,9 @@ alphaTab_rendering_layout_PageViewLayout.prototype = $extend(alphaTab_rendering_
 });
 var alphaTab_rendering_layout_HorizontalScreenLayout = function(renderer) {
 	alphaTab_rendering_layout_ScoreLayout.call(this,renderer);
+	this._group = null;
 };
-alphaTab_rendering_layout_HorizontalScreenLayout.__name__ = true;
+alphaTab_rendering_layout_HorizontalScreenLayout.__name__ = ["alphaTab","rendering","layout","HorizontalScreenLayout"];
 alphaTab_rendering_layout_HorizontalScreenLayout.__super__ = alphaTab_rendering_layout_ScoreLayout;
 alphaTab_rendering_layout_HorizontalScreenLayout.prototype = $extend(alphaTab_rendering_layout_ScoreLayout.prototype,{
 	get_Name: function() {
@@ -1948,13 +2165,13 @@ alphaTab_rendering_layout_HorizontalScreenLayout.prototype = $extend(alphaTab_re
 	,__class__: alphaTab_rendering_layout_HorizontalScreenLayout
 });
 var alphaTab_rendering_IEffectBarRendererInfo = function() { };
-alphaTab_rendering_IEffectBarRendererInfo.__name__ = true;
+alphaTab_rendering_IEffectBarRendererInfo.__name__ = ["alphaTab","rendering","IEffectBarRendererInfo"];
 alphaTab_rendering_IEffectBarRendererInfo.prototype = {
 	__class__: alphaTab_rendering_IEffectBarRendererInfo
 };
 var alphaTab_rendering_effects_TempoEffectInfo = function() {
 };
-alphaTab_rendering_effects_TempoEffectInfo.__name__ = true;
+alphaTab_rendering_effects_TempoEffectInfo.__name__ = ["alphaTab","rendering","effects","TempoEffectInfo"];
 alphaTab_rendering_effects_TempoEffectInfo.__interfaces__ = [alphaTab_rendering_IEffectBarRendererInfo];
 alphaTab_rendering_effects_TempoEffectInfo.prototype = {
 	get_EffectId: function() {
@@ -1996,7 +2213,7 @@ alphaTab_rendering_effects_TempoEffectInfo.prototype = {
 };
 var alphaTab_rendering_effects_TripletFeelEffectInfo = function() {
 };
-alphaTab_rendering_effects_TripletFeelEffectInfo.__name__ = true;
+alphaTab_rendering_effects_TripletFeelEffectInfo.__name__ = ["alphaTab","rendering","effects","TripletFeelEffectInfo"];
 alphaTab_rendering_effects_TripletFeelEffectInfo.__interfaces__ = [alphaTab_rendering_IEffectBarRendererInfo];
 alphaTab_rendering_effects_TripletFeelEffectInfo.prototype = {
 	get_EffectId: function() {
@@ -2036,7 +2253,7 @@ alphaTab_rendering_effects_TripletFeelEffectInfo.prototype = {
 };
 var alphaTab_rendering_effects_MarkerEffectInfo = function() {
 };
-alphaTab_rendering_effects_MarkerEffectInfo.__name__ = true;
+alphaTab_rendering_effects_MarkerEffectInfo.__name__ = ["alphaTab","rendering","effects","MarkerEffectInfo"];
 alphaTab_rendering_effects_MarkerEffectInfo.__interfaces__ = [alphaTab_rendering_IEffectBarRendererInfo];
 alphaTab_rendering_effects_MarkerEffectInfo.prototype = {
 	get_EffectId: function() {
@@ -2068,7 +2285,7 @@ alphaTab_rendering_effects_MarkerEffectInfo.prototype = {
 };
 var alphaTab_rendering_effects_TextEffectInfo = function() {
 };
-alphaTab_rendering_effects_TextEffectInfo.__name__ = true;
+alphaTab_rendering_effects_TextEffectInfo.__name__ = ["alphaTab","rendering","effects","TextEffectInfo"];
 alphaTab_rendering_effects_TextEffectInfo.__interfaces__ = [alphaTab_rendering_IEffectBarRendererInfo];
 alphaTab_rendering_effects_TextEffectInfo.prototype = {
 	get_EffectId: function() {
@@ -2097,7 +2314,7 @@ alphaTab_rendering_effects_TextEffectInfo.prototype = {
 };
 var alphaTab_rendering_effects_ChordsEffectInfo = function() {
 };
-alphaTab_rendering_effects_ChordsEffectInfo.__name__ = true;
+alphaTab_rendering_effects_ChordsEffectInfo.__name__ = ["alphaTab","rendering","effects","ChordsEffectInfo"];
 alphaTab_rendering_effects_ChordsEffectInfo.__interfaces__ = [alphaTab_rendering_IEffectBarRendererInfo];
 alphaTab_rendering_effects_ChordsEffectInfo.prototype = {
 	get_EffectId: function() {
@@ -2125,7 +2342,7 @@ alphaTab_rendering_effects_ChordsEffectInfo.prototype = {
 };
 var alphaTab_rendering_effects_NoteEffectInfoBase = function() {
 };
-alphaTab_rendering_effects_NoteEffectInfoBase.__name__ = true;
+alphaTab_rendering_effects_NoteEffectInfoBase.__name__ = ["alphaTab","rendering","effects","NoteEffectInfoBase"];
 alphaTab_rendering_effects_NoteEffectInfoBase.__interfaces__ = [alphaTab_rendering_IEffectBarRendererInfo];
 alphaTab_rendering_effects_NoteEffectInfoBase.prototype = {
 	ShouldCreateGlyph: function(beat) {
@@ -2168,7 +2385,7 @@ alphaTab_rendering_effects_NoteEffectInfoBase.prototype = {
 var alphaTab_rendering_effects_TrillEffectInfo = function() {
 	alphaTab_rendering_effects_NoteEffectInfoBase.call(this);
 };
-alphaTab_rendering_effects_TrillEffectInfo.__name__ = true;
+alphaTab_rendering_effects_TrillEffectInfo.__name__ = ["alphaTab","rendering","effects","TrillEffectInfo"];
 alphaTab_rendering_effects_TrillEffectInfo.__super__ = alphaTab_rendering_effects_NoteEffectInfoBase;
 alphaTab_rendering_effects_TrillEffectInfo.prototype = $extend(alphaTab_rendering_effects_NoteEffectInfoBase.prototype,{
 	get_EffectId: function() {
@@ -2187,7 +2404,7 @@ alphaTab_rendering_effects_TrillEffectInfo.prototype = $extend(alphaTab_renderin
 });
 var alphaTab_rendering_effects_BeatVibratoEffectInfo = function() {
 };
-alphaTab_rendering_effects_BeatVibratoEffectInfo.__name__ = true;
+alphaTab_rendering_effects_BeatVibratoEffectInfo.__name__ = ["alphaTab","rendering","effects","BeatVibratoEffectInfo"];
 alphaTab_rendering_effects_BeatVibratoEffectInfo.__interfaces__ = [alphaTab_rendering_IEffectBarRendererInfo];
 alphaTab_rendering_effects_BeatVibratoEffectInfo.prototype = {
 	get_EffectId: function() {
@@ -2216,7 +2433,7 @@ alphaTab_rendering_effects_BeatVibratoEffectInfo.prototype = {
 var alphaTab_rendering_effects_NoteVibratoEffectInfo = function() {
 	alphaTab_rendering_effects_NoteEffectInfoBase.call(this);
 };
-alphaTab_rendering_effects_NoteVibratoEffectInfo.__name__ = true;
+alphaTab_rendering_effects_NoteVibratoEffectInfo.__name__ = ["alphaTab","rendering","effects","NoteVibratoEffectInfo"];
 alphaTab_rendering_effects_NoteVibratoEffectInfo.__super__ = alphaTab_rendering_effects_NoteEffectInfoBase;
 alphaTab_rendering_effects_NoteVibratoEffectInfo.prototype = $extend(alphaTab_rendering_effects_NoteEffectInfoBase.prototype,{
 	get_EffectId: function() {
@@ -2243,7 +2460,7 @@ alphaTab_rendering_effects_NoteVibratoEffectInfo.prototype = $extend(alphaTab_re
 });
 var alphaTab_rendering_effects_AlternateEndingsEffectInfo = function() {
 };
-alphaTab_rendering_effects_AlternateEndingsEffectInfo.__name__ = true;
+alphaTab_rendering_effects_AlternateEndingsEffectInfo.__name__ = ["alphaTab","rendering","effects","AlternateEndingsEffectInfo"];
 alphaTab_rendering_effects_AlternateEndingsEffectInfo.__interfaces__ = [alphaTab_rendering_IEffectBarRendererInfo];
 alphaTab_rendering_effects_AlternateEndingsEffectInfo.prototype = {
 	get_EffectId: function() {
@@ -2274,11 +2491,14 @@ alphaTab_rendering_effects_AlternateEndingsEffectInfo.prototype = {
 	,__class__: alphaTab_rendering_effects_AlternateEndingsEffectInfo
 };
 var alphaTab_rendering_BarRendererFactory = function() {
+	this.IsInAccolade = false;
+	this.HideOnMultiTrack = false;
+	this.HideOnPercussionTrack = false;
 	this.IsInAccolade = true;
 	this.HideOnPercussionTrack = false;
 	this.HideOnMultiTrack = false;
 };
-alphaTab_rendering_BarRendererFactory.__name__ = true;
+alphaTab_rendering_BarRendererFactory.__name__ = ["alphaTab","rendering","BarRendererFactory"];
 alphaTab_rendering_BarRendererFactory.prototype = {
 	get_StaffId: function() {
 		throw new js__$Boot_HaxeError("abstract");
@@ -2297,11 +2517,13 @@ alphaTab_rendering_BarRendererFactory.prototype = {
 };
 var alphaTab_rendering_EffectBarRendererFactory = function(staffId,infos) {
 	alphaTab_rendering_BarRendererFactory.call(this);
+	this._infos = null;
+	this._staffId = null;
 	this._infos = infos;
 	this._staffId = staffId;
 	this.IsInAccolade = false;
 };
-alphaTab_rendering_EffectBarRendererFactory.__name__ = true;
+alphaTab_rendering_EffectBarRendererFactory.__name__ = ["alphaTab","rendering","EffectBarRendererFactory"];
 alphaTab_rendering_EffectBarRendererFactory.__super__ = alphaTab_rendering_BarRendererFactory;
 alphaTab_rendering_EffectBarRendererFactory.prototype = $extend(alphaTab_rendering_BarRendererFactory.prototype,{
 	get_StaffId: function() {
@@ -2315,7 +2537,7 @@ alphaTab_rendering_EffectBarRendererFactory.prototype = $extend(alphaTab_renderi
 var alphaTab_rendering_ScoreBarRendererFactory = function() {
 	alphaTab_rendering_BarRendererFactory.call(this);
 };
-alphaTab_rendering_ScoreBarRendererFactory.__name__ = true;
+alphaTab_rendering_ScoreBarRendererFactory.__name__ = ["alphaTab","rendering","ScoreBarRendererFactory"];
 alphaTab_rendering_ScoreBarRendererFactory.__super__ = alphaTab_rendering_BarRendererFactory;
 alphaTab_rendering_ScoreBarRendererFactory.prototype = $extend(alphaTab_rendering_BarRendererFactory.prototype,{
 	get_StaffId: function() {
@@ -2328,7 +2550,7 @@ alphaTab_rendering_ScoreBarRendererFactory.prototype = $extend(alphaTab_renderin
 });
 var alphaTab_rendering_effects_CrescendoEffectInfo = function() {
 };
-alphaTab_rendering_effects_CrescendoEffectInfo.__name__ = true;
+alphaTab_rendering_effects_CrescendoEffectInfo.__name__ = ["alphaTab","rendering","effects","CrescendoEffectInfo"];
 alphaTab_rendering_effects_CrescendoEffectInfo.__interfaces__ = [alphaTab_rendering_IEffectBarRendererInfo];
 alphaTab_rendering_effects_CrescendoEffectInfo.prototype = {
 	get_EffectId: function() {
@@ -2356,7 +2578,7 @@ alphaTab_rendering_effects_CrescendoEffectInfo.prototype = {
 };
 var alphaTab_rendering_effects_DynamicsEffectInfo = function() {
 };
-alphaTab_rendering_effects_DynamicsEffectInfo.__name__ = true;
+alphaTab_rendering_effects_DynamicsEffectInfo.__name__ = ["alphaTab","rendering","effects","DynamicsEffectInfo"];
 alphaTab_rendering_effects_DynamicsEffectInfo.__interfaces__ = [alphaTab_rendering_IEffectBarRendererInfo];
 alphaTab_rendering_effects_DynamicsEffectInfo.prototype = {
 	get_EffectId: function() {
@@ -2396,7 +2618,7 @@ alphaTab_rendering_effects_DynamicsEffectInfo.prototype = {
 };
 var alphaTab_rendering_effects_LyricsEffectInfo = function() {
 };
-alphaTab_rendering_effects_LyricsEffectInfo.__name__ = true;
+alphaTab_rendering_effects_LyricsEffectInfo.__name__ = ["alphaTab","rendering","effects","LyricsEffectInfo"];
 alphaTab_rendering_effects_LyricsEffectInfo.__interfaces__ = [alphaTab_rendering_IEffectBarRendererInfo];
 alphaTab_rendering_effects_LyricsEffectInfo.prototype = {
 	get_EffectId: function() {
@@ -2424,7 +2646,7 @@ alphaTab_rendering_effects_LyricsEffectInfo.prototype = {
 };
 var alphaTab_rendering_effects_TapEffectInfo = function() {
 };
-alphaTab_rendering_effects_TapEffectInfo.__name__ = true;
+alphaTab_rendering_effects_TapEffectInfo.__name__ = ["alphaTab","rendering","effects","TapEffectInfo"];
 alphaTab_rendering_effects_TapEffectInfo.__interfaces__ = [alphaTab_rendering_IEffectBarRendererInfo];
 alphaTab_rendering_effects_TapEffectInfo.prototype = {
 	get_EffectId: function() {
@@ -2463,7 +2685,7 @@ alphaTab_rendering_effects_TapEffectInfo.prototype = {
 };
 var alphaTab_rendering_effects_FadeInEffectInfo = function() {
 };
-alphaTab_rendering_effects_FadeInEffectInfo.__name__ = true;
+alphaTab_rendering_effects_FadeInEffectInfo.__name__ = ["alphaTab","rendering","effects","FadeInEffectInfo"];
 alphaTab_rendering_effects_FadeInEffectInfo.__interfaces__ = [alphaTab_rendering_IEffectBarRendererInfo];
 alphaTab_rendering_effects_FadeInEffectInfo.prototype = {
 	get_EffectId: function() {
@@ -2492,7 +2714,7 @@ alphaTab_rendering_effects_FadeInEffectInfo.prototype = {
 var alphaTab_rendering_effects_HarmonicsEffectInfo = function() {
 	alphaTab_rendering_effects_NoteEffectInfoBase.call(this);
 };
-alphaTab_rendering_effects_HarmonicsEffectInfo.__name__ = true;
+alphaTab_rendering_effects_HarmonicsEffectInfo.__name__ = ["alphaTab","rendering","effects","HarmonicsEffectInfo"];
 alphaTab_rendering_effects_HarmonicsEffectInfo.HarmonicToString = function(type) {
 	switch(type) {
 	case 1:
@@ -2537,7 +2759,7 @@ alphaTab_rendering_effects_HarmonicsEffectInfo.prototype = $extend(alphaTab_rend
 var alphaTab_rendering_effects_LetRingEffectInfo = function() {
 	alphaTab_rendering_effects_NoteEffectInfoBase.call(this);
 };
-alphaTab_rendering_effects_LetRingEffectInfo.__name__ = true;
+alphaTab_rendering_effects_LetRingEffectInfo.__name__ = ["alphaTab","rendering","effects","LetRingEffectInfo"];
 alphaTab_rendering_effects_LetRingEffectInfo.__super__ = alphaTab_rendering_effects_NoteEffectInfoBase;
 alphaTab_rendering_effects_LetRingEffectInfo.prototype = $extend(alphaTab_rendering_effects_NoteEffectInfoBase.prototype,{
 	get_EffectId: function() {
@@ -2559,7 +2781,7 @@ alphaTab_rendering_effects_LetRingEffectInfo.prototype = $extend(alphaTab_render
 });
 var alphaTab_rendering_effects_CapoEffectInfo = function() {
 };
-alphaTab_rendering_effects_CapoEffectInfo.__name__ = true;
+alphaTab_rendering_effects_CapoEffectInfo.__name__ = ["alphaTab","rendering","effects","CapoEffectInfo"];
 alphaTab_rendering_effects_CapoEffectInfo.__interfaces__ = [alphaTab_rendering_IEffectBarRendererInfo];
 alphaTab_rendering_effects_CapoEffectInfo.prototype = {
 	get_EffectId: function() {
@@ -2592,7 +2814,7 @@ alphaTab_rendering_effects_CapoEffectInfo.prototype = {
 var alphaTab_rendering_effects_PalmMuteEffectInfo = function() {
 	alphaTab_rendering_effects_NoteEffectInfoBase.call(this);
 };
-alphaTab_rendering_effects_PalmMuteEffectInfo.__name__ = true;
+alphaTab_rendering_effects_PalmMuteEffectInfo.__name__ = ["alphaTab","rendering","effects","PalmMuteEffectInfo"];
 alphaTab_rendering_effects_PalmMuteEffectInfo.__super__ = alphaTab_rendering_effects_NoteEffectInfoBase;
 alphaTab_rendering_effects_PalmMuteEffectInfo.prototype = $extend(alphaTab_rendering_effects_NoteEffectInfoBase.prototype,{
 	get_EffectId: function() {
@@ -2611,7 +2833,7 @@ alphaTab_rendering_effects_PalmMuteEffectInfo.prototype = $extend(alphaTab_rende
 });
 var alphaTab_rendering_effects_PickStrokeEffectInfo = function() {
 };
-alphaTab_rendering_effects_PickStrokeEffectInfo.__name__ = true;
+alphaTab_rendering_effects_PickStrokeEffectInfo.__name__ = ["alphaTab","rendering","effects","PickStrokeEffectInfo"];
 alphaTab_rendering_effects_PickStrokeEffectInfo.__interfaces__ = [alphaTab_rendering_IEffectBarRendererInfo];
 alphaTab_rendering_effects_PickStrokeEffectInfo.prototype = {
 	get_EffectId: function() {
@@ -2639,12 +2861,15 @@ alphaTab_rendering_effects_PickStrokeEffectInfo.prototype = {
 };
 var alphaTab_rendering_TabBarRendererFactory = function(showTimeSignature,showRests,showTiedNotes) {
 	alphaTab_rendering_BarRendererFactory.call(this);
+	this._showTimeSignature = false;
+	this._showRests = false;
+	this._showTiedNotes = false;
 	this._showTimeSignature = showTimeSignature;
 	this._showRests = showRests;
 	this._showTiedNotes = showTiedNotes;
 	this.HideOnPercussionTrack = true;
 };
-alphaTab_rendering_TabBarRendererFactory.__name__ = true;
+alphaTab_rendering_TabBarRendererFactory.__name__ = ["alphaTab","rendering","TabBarRendererFactory"];
 alphaTab_rendering_TabBarRendererFactory.__super__ = alphaTab_rendering_BarRendererFactory;
 alphaTab_rendering_TabBarRendererFactory.prototype = $extend(alphaTab_rendering_BarRendererFactory.prototype,{
 	get_StaffId: function() {
@@ -2671,7 +2896,7 @@ alphaTab_rendering_TabBarRendererFactory.prototype = $extend(alphaTab_rendering_
 });
 var alphaTab_Environment = function() {
 };
-alphaTab_Environment.__name__ = true;
+alphaTab_Environment.__name__ = ["alphaTab","Environment"];
 alphaTab_Environment.PlatformInit = function() {
 	alphaTab_Environment.RenderEngines["svg"] = function() {
 		return new alphaTab_platform_svg_CssFontSvgCanvas();
@@ -2680,6 +2905,7 @@ alphaTab_Environment.PlatformInit = function() {
 		return new alphaTab_platform_svg_CssFontSvgCanvas();
 	};
 	alphaTab_Environment.CheckFontLoad();
+	alphaTab_Environment.RegisterJQueryPlugin();
 	Math.log2 = Math.log2 || function(x) { return Math.log(x) * Math.LOG2E; };
 	if($global.document) {
 		var document = window.document;
@@ -2707,7 +2933,7 @@ alphaTab_Environment.PlatformInit = function() {
 		vbAjaxLoader = vbAjaxLoader + ("</script>" + "\r\n");
 		var s = vbAjaxLoader;
 		document.write(s);
-		var scriptElement = js_Boot.__cast(document.currentScript , HTMLScriptElement);
+		var scriptElement = document.currentScript;
 		if(!(!(!scriptElement))) {
 			try {
 				var error = new Error();
@@ -2721,7 +2947,7 @@ alphaTab_Environment.PlatformInit = function() {
 				if( js_Boot.__instanceof(e,Error) ) {
 					var stack1 = e.stack;
 					if(!(!(!stack1))) {
-						scriptElement = js_Boot.__cast(document.querySelector("script[data-alphatab]\")") , HTMLScriptElement);
+						scriptElement = document.querySelector("script[data-alphatab]\")");
 					} else {
 						alphaTab_Environment.ScriptFile = alphaTab_Environment.ScriptFileFromStack(stack1);
 					}
@@ -2736,6 +2962,30 @@ alphaTab_Environment.PlatformInit = function() {
 				alphaTab_Environment.ScriptFile = scriptElement.src;
 			}
 		}
+	} else {
+		alphaTab_platform_javaScript_JsWorker.Init();
+	}
+};
+alphaTab_Environment.RegisterJQueryPlugin = function() {
+	var json = $global;
+	if((json && "jQuery" in json)) {
+		var jquery = window["jQuery"];
+		var api = new alphaTab_platform_javaScript_JQueryAlphaTab();
+		jquery.fn.alphaTab = function(method) {
+			var _this = this;
+			if(_this.length == 1) {
+				var _this1 = _this[0];
+				var tmp = Array.prototype.slice.call(arguments, 1);
+				return api.Exec(_this1,method,tmp);
+			} else {
+				return this.each(function() {
+					var tmp1 = Array.prototype.slice.call(arguments, 1);
+					api.Exec(this,method,tmp1);
+				});
+			}
+		};
+		jquery.alphaTab = { restore : alphaTab_platform_javaScript_JQueryAlphaTab.Restore};
+		jquery.fn.alphaTab.fn = api;
 	}
 };
 alphaTab_Environment.ScriptFileFromStack = function(stack) {
@@ -2795,14 +3045,37 @@ alphaTab_Environment.CheckFontLoad = function() {
 		});
 	}
 };
+alphaTab_Environment.Init = function() {
+	var this1 = {}
+	alphaTab_Environment.RenderEngines = this1;
+	var this2 = {}
+	alphaTab_Environment.LayoutEngines = this2;
+	var this3 = {}
+	alphaTab_Environment.StaveProfiles = this3;
+	alphaTab_Environment.PlatformInit();
+	alphaTab_Environment.LayoutEngines["default"] = function(r) {
+		return new alphaTab_rendering_layout_PageViewLayout(r);
+	};
+	alphaTab_Environment.LayoutEngines["page"] = function(r1) {
+		return new alphaTab_rendering_layout_PageViewLayout(r1);
+	};
+	alphaTab_Environment.LayoutEngines["horizontal"] = function(r2) {
+		return new alphaTab_rendering_layout_HorizontalScreenLayout(r2);
+	};
+	alphaTab_Environment.StaveProfiles["default"] = alphaTab_Environment.StaveProfiles["score-tab"] = [new alphaTab_rendering_EffectBarRendererFactory("score-effects",[new alphaTab_rendering_effects_TempoEffectInfo(),new alphaTab_rendering_effects_TripletFeelEffectInfo(),new alphaTab_rendering_effects_MarkerEffectInfo(),new alphaTab_rendering_effects_TextEffectInfo(),new alphaTab_rendering_effects_ChordsEffectInfo(),new alphaTab_rendering_effects_TrillEffectInfo(),new alphaTab_rendering_effects_BeatVibratoEffectInfo(),new alphaTab_rendering_effects_NoteVibratoEffectInfo(),new alphaTab_rendering_effects_AlternateEndingsEffectInfo()]),new alphaTab_rendering_ScoreBarRendererFactory(),new alphaTab_rendering_EffectBarRendererFactory("tab-effects",[new alphaTab_rendering_effects_CrescendoEffectInfo(),new alphaTab_rendering_effects_DynamicsEffectInfo(),new alphaTab_rendering_effects_LyricsEffectInfo(),new alphaTab_rendering_effects_TrillEffectInfo(),new alphaTab_rendering_effects_BeatVibratoEffectInfo(),new alphaTab_rendering_effects_NoteVibratoEffectInfo(),new alphaTab_rendering_effects_TapEffectInfo(),new alphaTab_rendering_effects_FadeInEffectInfo(),new alphaTab_rendering_effects_HarmonicsEffectInfo(),new alphaTab_rendering_effects_LetRingEffectInfo(),new alphaTab_rendering_effects_CapoEffectInfo(),new alphaTab_rendering_effects_PalmMuteEffectInfo(),new alphaTab_rendering_effects_PickStrokeEffectInfo()]),new alphaTab_rendering_TabBarRendererFactory(false,false,false)];
+	alphaTab_Environment.StaveProfiles["score"] = [new alphaTab_rendering_EffectBarRendererFactory("score-effects",[new alphaTab_rendering_effects_TempoEffectInfo(),new alphaTab_rendering_effects_TripletFeelEffectInfo(),new alphaTab_rendering_effects_MarkerEffectInfo(),new alphaTab_rendering_effects_TextEffectInfo(),new alphaTab_rendering_effects_ChordsEffectInfo(),new alphaTab_rendering_effects_TrillEffectInfo(),new alphaTab_rendering_effects_BeatVibratoEffectInfo(),new alphaTab_rendering_effects_NoteVibratoEffectInfo(),new alphaTab_rendering_effects_FadeInEffectInfo(),new alphaTab_rendering_effects_LetRingEffectInfo(),new alphaTab_rendering_effects_PalmMuteEffectInfo(),new alphaTab_rendering_effects_PickStrokeEffectInfo(),new alphaTab_rendering_effects_AlternateEndingsEffectInfo()]),new alphaTab_rendering_ScoreBarRendererFactory(),new alphaTab_rendering_EffectBarRendererFactory("score-bottom-effects",[new alphaTab_rendering_effects_CrescendoEffectInfo(),new alphaTab_rendering_effects_DynamicsEffectInfo(),new alphaTab_rendering_effects_LyricsEffectInfo()])];
+	alphaTab_Environment.StaveProfiles["tab"] = [new alphaTab_rendering_EffectBarRendererFactory("tab-effects",[new alphaTab_rendering_effects_TempoEffectInfo(),new alphaTab_rendering_effects_TripletFeelEffectInfo(),new alphaTab_rendering_effects_MarkerEffectInfo(),new alphaTab_rendering_effects_TextEffectInfo(),new alphaTab_rendering_effects_ChordsEffectInfo(),new alphaTab_rendering_effects_TripletFeelEffectInfo(),new alphaTab_rendering_effects_TrillEffectInfo(),new alphaTab_rendering_effects_BeatVibratoEffectInfo(),new alphaTab_rendering_effects_NoteVibratoEffectInfo(),new alphaTab_rendering_effects_TapEffectInfo(),new alphaTab_rendering_effects_FadeInEffectInfo(),new alphaTab_rendering_effects_HarmonicsEffectInfo(),new alphaTab_rendering_effects_LetRingEffectInfo(),new alphaTab_rendering_effects_CapoEffectInfo(),new alphaTab_rendering_effects_PalmMuteEffectInfo(),new alphaTab_rendering_effects_PickStrokeEffectInfo(),new alphaTab_rendering_effects_AlternateEndingsEffectInfo()]),new alphaTab_rendering_TabBarRendererFactory(true,true,true),new alphaTab_rendering_EffectBarRendererFactory("tab-bottom-effects",[new alphaTab_rendering_effects_LyricsEffectInfo()])];
+};
 alphaTab_Environment.prototype = {
 	__class__: alphaTab_Environment
 };
 var alphaTab_LayoutSettings = function() {
+	this.Mode = null;
+	this.AdditionalSettings = null;
 	var this1 = {}
 	this.AdditionalSettings = this1;
 };
-alphaTab_LayoutSettings.__name__ = true;
+alphaTab_LayoutSettings.__name__ = ["alphaTab","LayoutSettings"];
 alphaTab_LayoutSettings.get_Defaults = function() {
 	var settings = new alphaTab_LayoutSettings();
 	settings.Mode = "page";
@@ -2820,13 +3093,13 @@ alphaTab_LayoutSettings.prototype = {
 	,__class__: alphaTab_LayoutSettings
 };
 var alphaTab_Main = function() { };
-alphaTab_Main.__name__ = true;
+alphaTab_Main.__name__ = ["alphaTab","Main"];
 alphaTab_Main.main = function() {
-	alphaTab_platform_javaScript_JsWorker.Init();
+	alphaTab_Environment.Init();
 };
 var alphaTab_Settings = function() {
 };
-alphaTab_Settings.__name__ = true;
+alphaTab_Settings.__name__ = ["alphaTab","Settings"];
 alphaTab_Settings.SetDefaults = function(settings) {
 	settings.UseWebWorker = true;
 };
@@ -3027,8 +3300,10 @@ alphaTab_Settings.get_Defaults = function() {
 	settings.StretchForce = 1;
 	settings.Width = -1;
 	settings.Engine = "default";
-	settings.TranspositionPitches = system__$FixedArray_FixedArray_$Impl_$._new(0);
-	settings.DisplayTranspositionPitches = system__$FixedArray_FixedArray_$Impl_$._new(0);
+	var this1 = new Array(0);
+	settings.TranspositionPitches = this1;
+	var this2 = new Array(0);
+	settings.DisplayTranspositionPitches = this2;
 	settings.Layout = alphaTab_LayoutSettings.get_Defaults();
 	settings.Staves = new alphaTab_StaveSettings("default");
 	alphaTab_Settings.SetDefaults(settings);
@@ -3071,11 +3346,13 @@ alphaTab_Settings.prototype = {
 	,__class__: alphaTab_Settings
 };
 var alphaTab_StaveSettings = function(id) {
+	this.Id = null;
+	this.AdditionalSettings = null;
 	this.Id = id;
 	var this1 = {}
 	this.AdditionalSettings = this1;
 };
-alphaTab_StaveSettings.__name__ = true;
+alphaTab_StaveSettings.__name__ = ["alphaTab","StaveSettings"];
 alphaTab_StaveSettings.prototype = {
 	Get: function(key,def) {
 		var this1 = this.AdditionalSettings;
@@ -3089,7 +3366,7 @@ alphaTab_StaveSettings.prototype = {
 };
 var alphaTab_audio_GeneralMidi = function() {
 };
-alphaTab_audio_GeneralMidi.__name__ = true;
+alphaTab_audio_GeneralMidi.__name__ = ["alphaTab","audio","GeneralMidi"];
 alphaTab_audio_GeneralMidi.GetValue = function(name) {
 	if(alphaTab_audio_GeneralMidi._values == null) {
 		var this1 = {}
@@ -3252,7 +3529,7 @@ alphaTab_audio_GeneralMidi.prototype = {
 	__class__: alphaTab_audio_GeneralMidi
 };
 var alphaTab_audio_MidiUtils = function() { };
-alphaTab_audio_MidiUtils.__name__ = true;
+alphaTab_audio_MidiUtils.__name__ = ["alphaTab","audio","MidiUtils"];
 alphaTab_audio_MidiUtils.TicksToMillis = function(ticks,tempo) {
 	return system_Convert.ToInt32_Double(ticks * (60000.0 / (tempo * 960)));
 };
@@ -3280,17 +3557,21 @@ alphaTab_audio_MidiUtils.DynamicToVelocity = function(dyn) {
 	return 15 + dyn * 16;
 };
 var alphaTab_audio_generator_IMidiFileHandler = function() { };
-alphaTab_audio_generator_IMidiFileHandler.__name__ = true;
+alphaTab_audio_generator_IMidiFileHandler.__name__ = ["alphaTab","audio","generator","IMidiFileHandler"];
 alphaTab_audio_generator_IMidiFileHandler.prototype = {
 	__class__: alphaTab_audio_generator_IMidiFileHandler
 };
 var alphaTab_audio_generator_MidiFileGenerator = function(score,handler) {
+	this._score = null;
+	this._handler = null;
+	this._currentTempo = 0;
+	this.TickLookup = null;
 	this._score = score;
 	this._currentTempo = this._score.Tempo;
 	this._handler = handler;
 	this.TickLookup = new alphaTab_audio_model_MidiTickLookup();
 };
-alphaTab_audio_generator_MidiFileGenerator.__name__ = true;
+alphaTab_audio_generator_MidiFileGenerator.__name__ = ["alphaTab","audio","generator","MidiFileGenerator"];
 alphaTab_audio_generator_MidiFileGenerator.GenerateMidiFile = function(score) {
 	var midiFile = new alphaTab_audio_model_MidiFile();
 	var i = 0;
@@ -3645,7 +3926,9 @@ alphaTab_audio_generator_MidiFileGenerator.prototype = {
 		}
 	}
 	,GetBrushInfo: function(beat) {
-		var brushInfo = system__$FixedArray_FixedArray_$Impl_$._new(beat.Voice.Bar.Staff.Track.Tuning.length);
+		var size = beat.Voice.Bar.Staff.Track.Tuning.length;
+		var this1 = new Array(size);
+		var brushInfo = this1;
 		if(beat.BrushType != 0) {
 			var stringUsed = 0;
 			var i = 0;
@@ -3653,10 +3936,9 @@ alphaTab_audio_generator_MidiFileGenerator.prototype = {
 			while(i < j) {
 				var n = beat.Notes[i];
 				if(n.IsTieDestination) {
-					continue;
+					++i;
 				}
-				stringUsed = stringUsed | 1 << n.String - 1;
-				++i;
+				continue;
 			}
 			if(beat.Notes.length > 0) {
 				var brushMove = 0;
@@ -3708,9 +3990,10 @@ alphaTab_audio_generator_MidiFileGenerator.prototype = {
 	,__class__: alphaTab_audio_generator_MidiFileGenerator
 };
 var alphaTab_audio_generator_MidiFileHandler = function(midiFile) {
+	this._midiFile = null;
 	this._midiFile = midiFile;
 };
-alphaTab_audio_generator_MidiFileHandler.__name__ = true;
+alphaTab_audio_generator_MidiFileHandler.__name__ = ["alphaTab","audio","generator","MidiFileHandler"];
 alphaTab_audio_generator_MidiFileHandler.__interfaces__ = [alphaTab_audio_generator_IMidiFileHandler];
 alphaTab_audio_generator_MidiFileHandler.FixValue = function(value) {
 	if(value > 127) {
@@ -3728,7 +4011,8 @@ alphaTab_audio_generator_MidiFileHandler.BuildMetaMessage = function(metaType,da
 };
 alphaTab_audio_generator_MidiFileHandler.WriteVarInt = function(data,v) {
 	var n = 0;
-	var array = system__$FixedArray_FixedArray_$Impl_$._new(4);
+	var this1 = new Array(4);
+	var array = this1;
 	while(true) {
 		array[n++] = system_Convert.ToUInt8(v & 127 & 255);
 		v = v >> 7;
@@ -3791,7 +4075,9 @@ alphaTab_audio_generator_MidiFileHandler.prototype = {
 		this.AddEvent(this._midiFile.InfoTrack,tick,alphaTab_audio_generator_MidiFileHandler.BuildMetaMessage(81,[system_Convert.ToUInt8(tempoInUsq >> 16 & 255),system_Convert.ToUInt8(tempoInUsq >> 8 & 255),system_Convert.ToUInt8(tempoInUsq & 255)]));
 	}
 	,FinishTrack: function(track,tick) {
-		this.AddEvent(this._midiFile.InfoTrack,tick,alphaTab_audio_generator_MidiFileHandler.BuildMetaMessage(47,system__$FixedArray_FixedArray_$Impl_$._new(0)));
+		var tmp = this._midiFile.InfoTrack;
+		var this1 = new Array(0);
+		this.AddEvent(tmp,tick,alphaTab_audio_generator_MidiFileHandler.BuildMetaMessage(47,this1));
 	}
 	,AddBend: function(track,tick,channel,value) {
 		this.AddEvent(track,tick,new alphaTab_audio_model_MidiMessage([this.MakeCommand(224,channel),0,alphaTab_audio_generator_MidiFileHandler.FixValue(value)]));
@@ -3799,12 +4085,19 @@ alphaTab_audio_generator_MidiFileHandler.prototype = {
 	,__class__: alphaTab_audio_generator_MidiFileHandler
 };
 var alphaTab_audio_generator_MidiPlaybackController = function(score) {
+	this._score = null;
+	this._repeatStartIndex = 0;
+	this._repeatNumber = 0;
+	this._repeatOpen = false;
+	this.ShouldPlay = false;
+	this.Index = 0;
+	this.CurrentTick = 0;
 	this._score = score;
 	this.ShouldPlay = true;
 	this.Index = 0;
 	this.CurrentTick = 0;
 };
-alphaTab_audio_generator_MidiPlaybackController.__name__ = true;
+alphaTab_audio_generator_MidiPlaybackController.__name__ = ["alphaTab","audio","generator","MidiPlaybackController"];
 alphaTab_audio_generator_MidiPlaybackController.prototype = {
 	get_Finished: function() {
 		return this.Index >= this._score.MasterBars.length;
@@ -3854,15 +4147,20 @@ alphaTab_audio_generator_MidiPlaybackController.prototype = {
 };
 var alphaTab_audio_model_BeatTickLookup = function() {
 };
-alphaTab_audio_model_BeatTickLookup.__name__ = true;
+alphaTab_audio_model_BeatTickLookup.__name__ = ["alphaTab","audio","model","BeatTickLookup"];
 alphaTab_audio_model_BeatTickLookup.prototype = {
 	__class__: alphaTab_audio_model_BeatTickLookup
 };
 var alphaTab_audio_model_MasterBarTickLookup = function() {
+	this.Start = 0;
+	this.End = 0;
+	this.Tempo = 0;
+	this.MasterBar = null;
+	this.Beats = null;
 	var this1 = [];
 	this.Beats = this1;
 };
-alphaTab_audio_model_MasterBarTickLookup.__name__ = true;
+alphaTab_audio_model_MasterBarTickLookup.__name__ = ["alphaTab","audio","model","MasterBarTickLookup"];
 alphaTab_audio_model_MasterBarTickLookup.prototype = {
 	Finish: function() {
 		var comparison = function(a,b) {
@@ -3878,7 +4176,7 @@ alphaTab_audio_model_MasterBarTickLookup.prototype = {
 	,__class__: alphaTab_audio_model_MasterBarTickLookup
 };
 var alphaTab_audio_model__$MidiController_MidiController_$Impl_$ = {};
-alphaTab_audio_model__$MidiController_MidiController_$Impl_$.__name__ = true;
+alphaTab_audio_model__$MidiController_MidiController_$Impl_$.__name__ = ["alphaTab","audio","model","_MidiController","MidiController_Impl_"];
 alphaTab_audio_model__$MidiController_MidiController_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -3936,10 +4234,15 @@ alphaTab_audio_model__$MidiController_MidiController_$Impl_$.toString = function
 	return "";
 };
 var alphaTab_audio_model_MidiEvent = function(tick,message) {
+	this.Track = null;
+	this.Tick = 0;
+	this.Message = null;
+	this.NextEvent = null;
+	this.PreviousEvent = null;
 	this.Tick = tick;
 	this.Message = message;
 };
-alphaTab_audio_model_MidiEvent.__name__ = true;
+alphaTab_audio_model_MidiEvent.__name__ = ["alphaTab","audio","model","MidiEvent"];
 alphaTab_audio_model_MidiEvent.prototype = {
 	get_DeltaTicks: function() {
 		if(this.PreviousEvent == null) {
@@ -3953,7 +4256,8 @@ alphaTab_audio_model_MidiEvent.prototype = {
 		this.Message.WriteTo(s);
 	}
 	,WriteVariableInt: function(s,value) {
-		var array = system__$FixedArray_FixedArray_$Impl_$._new(4);
+		var this1 = new Array(4);
+		var array = this1;
 		var n = 0;
 		while(true) {
 			array[n++] = system_Convert.ToUInt8(value & 127 & 255);
@@ -3974,10 +4278,13 @@ alphaTab_audio_model_MidiEvent.prototype = {
 	,__class__: alphaTab_audio_model_MidiEvent
 };
 var alphaTab_audio_model_MidiFile = function() {
+	this.TickLookup = null;
+	this.Tracks = null;
+	this.InfoTrack = 0;
 	var this1 = [];
 	this.Tracks = this1;
 };
-alphaTab_audio_model_MidiFile.__name__ = true;
+alphaTab_audio_model_MidiFile.__name__ = ["alphaTab","audio","model","MidiFile"];
 alphaTab_audio_model_MidiFile.prototype = {
 	CreateTrack: function() {
 		var track = new alphaTab_audio_model_MidiTrack();
@@ -4009,9 +4316,11 @@ alphaTab_audio_model_MidiFile.prototype = {
 	,__class__: alphaTab_audio_model_MidiFile
 };
 var alphaTab_audio_model_MidiMessage = function(data) {
+	this.Event = null;
+	this.Data = null;
 	this.Data = data;
 };
-alphaTab_audio_model_MidiMessage.__name__ = true;
+alphaTab_audio_model_MidiMessage.__name__ = ["alphaTab","audio","model","MidiMessage"];
 alphaTab_audio_model_MidiMessage.prototype = {
 	WriteTo: function(s) {
 		s.Write(this.Data,0,this.Data.length);
@@ -4019,12 +4328,15 @@ alphaTab_audio_model_MidiMessage.prototype = {
 	,__class__: alphaTab_audio_model_MidiMessage
 };
 var alphaTab_audio_model_MidiTickLookup = function() {
+	this.MasterBarLookup = null;
+	this.MasterBars = null;
+	this._currentMasterBar = null;
 	var this1 = [];
 	this.MasterBars = this1;
 	var this2 = {}
 	this.MasterBarLookup = this2;
 };
-alphaTab_audio_model_MidiTickLookup.__name__ = true;
+alphaTab_audio_model_MidiTickLookup.__name__ = ["alphaTab","audio","model","MidiTickLookup"];
 alphaTab_audio_model_MidiTickLookup.prototype = {
 	Finish: function() {
 		var i = 0;
@@ -4052,6 +4364,7 @@ alphaTab_audio_model_MidiTickLookup.prototype = {
 		while(b < beats.length) {
 			var currentBeat = beats[b];
 			if(!trackLookup.hasOwnProperty(currentBeat.Beat.Voice.Bar.Staff.Track.Index)) {
+				++b;
 				continue;
 			}
 			if(currentBeat.Start <= tick && tick < currentBeat.End) {
@@ -4140,13 +4453,13 @@ alphaTab_audio_model_MidiTickLookup.prototype = {
 };
 var alphaTab_audio_model_MidiTickLookupFindBeatResult = function() {
 };
-alphaTab_audio_model_MidiTickLookupFindBeatResult.__name__ = true;
+alphaTab_audio_model_MidiTickLookupFindBeatResult.__name__ = ["alphaTab","audio","model","MidiTickLookupFindBeatResult"];
 alphaTab_audio_model_MidiTickLookupFindBeatResult.prototype = {
 	__class__: alphaTab_audio_model_MidiTickLookupFindBeatResult
 };
 var alphaTab_audio_model_MidiTrack = function() {
 };
-alphaTab_audio_model_MidiTrack.__name__ = true;
+alphaTab_audio_model_MidiTrack.__name__ = ["alphaTab","audio","model","MidiTrack"];
 alphaTab_audio_model_MidiTrack.prototype = {
 	AddEvent: function(e) {
 		e.Track = this;
@@ -4215,7 +4528,7 @@ alphaTab_audio_model_MidiTrack.prototype = {
 	,__class__: alphaTab_audio_model_MidiTrack
 };
 var alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$ = {};
-alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.__name__ = true;
+alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.__name__ = ["alphaTab","collections","_FastDictionary","FastDictionary_Impl_"];
 alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$._new = function() {
 	var this1 = {}
 	return this1;
@@ -4233,13 +4546,13 @@ alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.GetEnumerator = fun
 	return Object.keys(this1);
 };
 alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.Remove = function(this1,key) {
-	delete this1[index];
+	delete this1[key];
 };
 alphaTab_collections__$FastDictionary_FastDictionary_$Impl_$.ContainsKey = function(this1,key) {
 	return this1.hasOwnProperty(key);
 };
 var alphaTab_collections__$FastList_FastList_$Impl_$ = {};
-alphaTab_collections__$FastList_FastList_$Impl_$.__name__ = true;
+alphaTab_collections__$FastList_FastList_$Impl_$.__name__ = ["alphaTab","collections","_FastList","FastList_Impl_"];
 alphaTab_collections__$FastList_FastList_$Impl_$._new = function() {
 	var this1 = [];
 	return this1;
@@ -4281,8 +4594,11 @@ alphaTab_collections__$FastList_FastList_$Impl_$.IndexOf = function(this1,item) 
 alphaTab_collections__$FastList_FastList_$Impl_$.Reverse = function(this1) {
 	this1.reverse();
 };
+alphaTab_collections__$FastList_FastList_$Impl_$.ToEnumerable = function(this1) {
+	return new system_collections_generic_IterableEnumerable(this1);
+};
 var alphaTab_collections__$StringBuilder_StringBuilder_$Impl_$ = {};
-alphaTab_collections__$StringBuilder_StringBuilder_$Impl_$.__name__ = true;
+alphaTab_collections__$StringBuilder_StringBuilder_$Impl_$.__name__ = ["alphaTab","collections","_StringBuilder","StringBuilder_Impl_"];
 alphaTab_collections__$StringBuilder_StringBuilder_$Impl_$._new = function() {
 	var this1 = "";
 	return this1;
@@ -4303,10 +4619,11 @@ alphaTab_collections__$StringBuilder_StringBuilder_$Impl_$.ToString = function(t
 	return this1;
 };
 var alphaTab_exporter_AlphaTexExporter = function() {
+	this._builder = null;
 	var this1 = "";
 	this._builder = this1;
 };
-alphaTab_exporter_AlphaTexExporter.__name__ = true;
+alphaTab_exporter_AlphaTexExporter.__name__ = ["alphaTab","exporter","AlphaTexExporter"];
 alphaTab_exporter_AlphaTexExporter.prototype = {
 	Export: function(track) {
 		this.Score(track);
@@ -4784,11 +5101,16 @@ alphaTab_exporter_AlphaTexExporter.prototype = {
 var alphaTab_importer_AlphaTexException = function() {
 	alphaTab_AlphaTabException.call(this);
 };
-alphaTab_importer_AlphaTexException.__name__ = true;
+alphaTab_importer_AlphaTexException.__name__ = ["alphaTab","importer","AlphaTexException"];
 alphaTab_importer_AlphaTexException.__super__ = alphaTab_AlphaTabException;
 alphaTab_importer_AlphaTexException.prototype = $extend(alphaTab_AlphaTabException.prototype,{
 	AlphaTexException: function(position,nonTerm,expected,symbol,symbolData) {
 		this.AlphaTabException("");
+		this.Position = 0;
+		this.NonTerm = null;
+		this.Expected = null;
+		this.Symbol = null;
+		this.SymbolData = null;
 		this.Position = position;
 		this.NonTerm = nonTerm;
 		this.Expected = expected;
@@ -4805,7 +5127,7 @@ alphaTab_importer_AlphaTexException.prototype = $extend(alphaTab_AlphaTabExcepti
 });
 var alphaTab_importer_ScoreImporter = function() {
 };
-alphaTab_importer_ScoreImporter.__name__ = true;
+alphaTab_importer_ScoreImporter.__name__ = ["alphaTab","importer","ScoreImporter"];
 alphaTab_importer_ScoreImporter.BuildImporters = function() {
 	return [new alphaTab_importer_Gp3To5Importer(),new alphaTab_importer_GpxImporter(),new alphaTab_importer_AlphaTexImporter(),new alphaTab_importer_MusicXmlImporter()];
 };
@@ -4824,7 +5146,7 @@ alphaTab_importer_ScoreImporter.prototype = {
 var alphaTab_importer_AlphaTexImporter = function() {
 	alphaTab_importer_ScoreImporter.call(this);
 };
-alphaTab_importer_AlphaTexImporter.__name__ = true;
+alphaTab_importer_AlphaTexImporter.__name__ = ["alphaTab","importer","AlphaTexImporter"];
 alphaTab_importer_AlphaTexImporter.IsLetter = function(code) {
 	if(!alphaTab_importer_AlphaTexImporter.IsTerminal(code)) {
 		if(!(code >= 33 && code <= 47 || code >= 58 && code <= 126)) {
@@ -5196,15 +5518,16 @@ alphaTab_importer_AlphaTexImporter.prototype = $extend(alphaTab_importer_ScoreIm
 				case 5:
 					var text = Std.string(this._syData).toLowerCase();
 					if(text == "piano" || text == "none" || text == "voice") {
-						this._track.Tuning = system__$FixedArray_FixedArray_$Impl_$._new(0);
+						var this1 = new Array(0);
+						this._track.Tuning = this1;
 					} else {
 						this.Error("tuning",6,true);
 					}
 					this.NewSy();
 					break;
 				case 6:
-					var this1 = [];
-					var tuning = this1;
+					var this2 = [];
+					var tuning = this2;
 					while(true) {
 						var t = this._syData;
 						tuning.push(t.get_RealValue());
@@ -5557,8 +5880,8 @@ alphaTab_importer_AlphaTexImporter.prototype = $extend(alphaTab_importer_ScoreIm
 		return false;
 	}
 	,Note: function(beat) {
-		var isDead = this._syData == "x";
-		var isTie = this._syData == "-";
+		var isDead = Std.string(this._syData) == "x";
+		var isTie = Std.string(this._syData) == "-";
 		var fret = -1;
 		var octave = -1;
 		var tone = -1;
@@ -5888,7 +6211,7 @@ alphaTab_importer_AlphaTexImporter.prototype = $extend(alphaTab_importer_ScoreIm
 	,__class__: alphaTab_importer_AlphaTexImporter
 });
 var alphaTab_importer__$AlphaTexSymbols_AlphaTexSymbols_$Impl_$ = {};
-alphaTab_importer__$AlphaTexSymbols_AlphaTexSymbols_$Impl_$.__name__ = true;
+alphaTab_importer__$AlphaTexSymbols_AlphaTexSymbols_$Impl_$.__name__ = ["alphaTab","importer","_AlphaTexSymbols","AlphaTexSymbols_Impl_"];
 alphaTab_importer__$AlphaTexSymbols_AlphaTexSymbols_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -5959,10 +6282,24 @@ alphaTab_importer__$AlphaTexSymbols_AlphaTexSymbols_$Impl_$.toString = function(
 	}
 	return "";
 };
+var alphaTab_importer_FileLoadException = function() {
+	alphaTab_AlphaTabException.call(this);
+};
+alphaTab_importer_FileLoadException.__name__ = ["alphaTab","importer","FileLoadException"];
+alphaTab_importer_FileLoadException.__super__ = alphaTab_AlphaTabException;
+alphaTab_importer_FileLoadException.prototype = $extend(alphaTab_AlphaTabException.prototype,{
+	FileLoadException: function(message,xhr) {
+		this.AlphaTabException(message);
+		this.Xhr = null;
+		this.Xhr = xhr;
+		return this;
+	}
+	,__class__: alphaTab_importer_FileLoadException
+});
 var alphaTab_importer_Gp3To5Importer = function() {
 	alphaTab_importer_ScoreImporter.call(this);
 };
-alphaTab_importer_Gp3To5Importer.__name__ = true;
+alphaTab_importer_Gp3To5Importer.__name__ = ["alphaTab","importer","Gp3To5Importer"];
 alphaTab_importer_Gp3To5Importer.ToStrokeValue = function(value) {
 	switch(value) {
 	case 1:
@@ -6393,12 +6730,13 @@ alphaTab_importer_Gp3To5Importer.prototype = $extend(alphaTab_importer_ScoreImpo
 				++i;
 			}
 			var numberOfBarres = this.Data.ReadByte();
-			var barreFrets = system__$FixedArray_FixedArray_$Impl_$._new(5);
+			var this1 = new Array(5);
+			var barreFrets = this1;
 			this.Data.Read(barreFrets,0,barreFrets.length);
 			var i1 = 0;
 			while(i1 < numberOfBarres) {
-				var this1 = barreFrets[i1];
-				chord.BarreFrets.push(this1);
+				var this2 = barreFrets[i1];
+				chord.BarreFrets.push(this2);
 				++i1;
 			}
 			this.Data.Skip(26);
@@ -6417,12 +6755,13 @@ alphaTab_importer_Gp3To5Importer.prototype = $extend(alphaTab_importer_ScoreImpo
 					++i2;
 				}
 				var numberOfBarres1 = this.Data.ReadByte();
-				var barreFrets1 = system__$FixedArray_FixedArray_$Impl_$._new(5);
+				var this3 = new Array(5);
+				var barreFrets1 = this3;
 				this.Data.Read(barreFrets1,0,barreFrets1.length);
 				var i3 = 0;
 				while(i3 < numberOfBarres1) {
-					var this2 = barreFrets1[i3];
-					chord.BarreFrets.push(this2);
+					var this4 = barreFrets1[i3];
+					chord.BarreFrets.push(this4);
 					++i3;
 				}
 				this.Data.Skip(26);
@@ -6961,7 +7300,8 @@ alphaTab_importer_Gp3To5Importer.prototype = $extend(alphaTab_importer_ScoreImpo
 		}
 	}
 	,ReadDouble: function() {
-		var bytes = system__$FixedArray_FixedArray_$Impl_$._new(8);
+		var this1 = new Array(8);
+		var bytes = this1;
 		this.Data.Read(bytes,0,bytes.length);
 		var sign = 1 - (bytes[0] >> 7 << 1);
 		var exp = (bytes[0] << 4 & 2047 | bytes[1] >> 4) - 1023;
@@ -6969,9 +7309,9 @@ alphaTab_importer_Gp3To5Importer.prototype = $extend(alphaTab_importer_ScoreImpo
 		if(sig == 0 && exp == -1023) {
 			return 0.0;
 		}
-		var this1 = exp;
-		var this2 = sign * (1.0 + Math.pow(2,-52) * sig) * Math.pow(2,this1);
-		return this2;
+		var this2 = exp;
+		var this3 = sign * (1.0 + Math.pow(2,-52) * sig) * Math.pow(2,this2);
+		return this3;
 	}
 	,GetDoubleSig: function(bytes) {
 		var this1 = bytes[3];
@@ -6989,7 +7329,8 @@ alphaTab_importer_Gp3To5Importer.prototype = $extend(alphaTab_importer_ScoreImpo
 		return this.Data.ReadByte() != 0;
 	}
 	,ReadInt32: function() {
-		var bytes = system__$FixedArray_FixedArray_$Impl_$._new(4);
+		var this1 = new Array(4);
+		var bytes = this1;
 		this.Data.Read(bytes,0,4);
 		return bytes[0] | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
 	}
@@ -7006,7 +7347,8 @@ alphaTab_importer_Gp3To5Importer.prototype = $extend(alphaTab_importer_ScoreImpo
 		return this.ReadString(length);
 	}
 	,ReadString: function(length) {
-		var b = system__$FixedArray_FixedArray_$Impl_$._new(length);
+		var this1 = new Array(length);
+		var b = this1;
 		this.Data.Read(b,0,b.length);
 		return alphaTab_platform_Platform.ToString(b);
 	}
@@ -7022,18 +7364,20 @@ alphaTab_importer_Gp3To5Importer.prototype = $extend(alphaTab_importer_ScoreImpo
 });
 var alphaTab_importer_GpxFile = function() {
 };
-alphaTab_importer_GpxFile.__name__ = true;
+alphaTab_importer_GpxFile.__name__ = ["alphaTab","importer","GpxFile"];
 alphaTab_importer_GpxFile.prototype = {
 	__class__: alphaTab_importer_GpxFile
 };
 var alphaTab_importer_GpxFileSystem = function() {
+	this.FileFilter = null;
+	this.Files = null;
 	var this1 = [];
 	this.Files = this1;
 	this.FileFilter = function(s) {
 		return true;
 	};
 };
-alphaTab_importer_GpxFileSystem.__name__ = true;
+alphaTab_importer_GpxFileSystem.__name__ = ["alphaTab","importer","GpxFileSystem"];
 alphaTab_importer_GpxFileSystem.prototype = {
 	Load: function(s) {
 		var src = new alphaTab_io_BitReader(s);
@@ -7077,7 +7421,9 @@ alphaTab_importer_GpxFileSystem.prototype = {
 		buffer = uncompressed.GetBuffer();
 		var resultOffset = skipHeader ? 4 : 0;
 		var resultSize = uncompressed.get_Length() - resultOffset;
-		var result = system__$FixedArray_FixedArray_$Impl_$._new(system_Convert.ToInt32(resultSize));
+		var size2 = system_Convert.ToInt32(resultSize);
+		var this1 = new Array(size2);
+		var result = this1;
 		var count = system_Convert.ToInt32(resultSize);
 		var i1 = 0;
 		while(i1 < count) {
@@ -7126,7 +7472,9 @@ alphaTab_importer_GpxFileSystem.prototype = {
 				if(storeFile) {
 					var a = file.FileSize;
 					var b = fileData.get_Length();
-					file.Data = system__$FixedArray_FixedArray_$Impl_$._new(system_Convert.ToInt32(a < b ? a : b));
+					var size = system_Convert.ToInt32(a < b ? a : b);
+					var this1 = new Array(size);
+					file.Data = this1;
 					var raw = fileData.ToArray();
 					var dst = file.Data;
 					var count = file.Data.length;
@@ -7163,7 +7511,7 @@ alphaTab_importer_GpxFileSystem.prototype = {
 var alphaTab_importer_GpxImporter = function() {
 	alphaTab_importer_ScoreImporter.call(this);
 };
-alphaTab_importer_GpxImporter.__name__ = true;
+alphaTab_importer_GpxImporter.__name__ = ["alphaTab","importer","GpxImporter"];
 alphaTab_importer_GpxImporter.__super__ = alphaTab_importer_ScoreImporter;
 alphaTab_importer_GpxImporter.prototype = $extend(alphaTab_importer_ScoreImporter.prototype,{
 	get_Name: function() {
@@ -7191,40 +7539,41 @@ alphaTab_importer_GpxImporter.prototype = $extend(alphaTab_importer_ScoreImporte
 });
 var alphaTab_importer_GpxParser = function() {
 };
-alphaTab_importer_GpxParser.__name__ = true;
+alphaTab_importer_GpxParser.__name__ = ["alphaTab","importer","GpxParser"];
 alphaTab_importer_GpxParser.prototype = {
 	ParseXml: function(xml) {
 		var this1 = {}
 		this._masterTrackAutomations = this1;
-		this._tracksMapping = system__$FixedArray_FixedArray_$Impl_$._new(0);
-		var this2 = {}
-		this._tracksById = this2;
-		var this3 = [];
-		this._masterBars = this3;
+		var this2 = new Array(0);
+		this._tracksMapping = this2;
+		var this3 = {}
+		this._tracksById = this3;
 		var this4 = [];
-		this._barsOfMasterBar = this4;
-		var this5 = {}
-		this._voicesOfBar = this5;
+		this._masterBars = this4;
+		var this5 = [];
+		this._barsOfMasterBar = this5;
 		var this6 = {}
-		this._barsById = this6;
+		this._voicesOfBar = this6;
 		var this7 = {}
-		this._voiceById = this7;
+		this._barsById = this7;
 		var this8 = {}
-		this._beatsOfVoice = this8;
+		this._voiceById = this8;
 		var this9 = {}
-		this._beatById = this9;
+		this._beatsOfVoice = this9;
 		var this10 = {}
-		this._rhythmOfBeat = this10;
+		this._beatById = this10;
 		var this11 = {}
-		this._rhythmById = this11;
+		this._rhythmOfBeat = this11;
 		var this12 = {}
-		this._notesOfBeat = this12;
+		this._rhythmById = this12;
 		var this13 = {}
-		this._noteById = this13;
+		this._notesOfBeat = this13;
 		var this14 = {}
-		this._tappedNotes = this14;
+		this._noteById = this14;
 		var this15 = {}
-		this._lyricsByTrack = this15;
+		this._tappedNotes = this15;
+		var this16 = {}
+		this._lyricsByTrack = this16;
 		var dom;
 		try {
 			dom = new alphaTab_xml_XmlDocument(xml);
@@ -7237,10 +7586,10 @@ alphaTab_importer_GpxParser.prototype = {
 		this.ParseDom(dom);
 		this.BuildModel();
 		this.Score.Finish();
-		var this16 = this._lyricsByTrack;
-		if(Object.keys(this16).length > 0) {
-			var this17 = this._lyricsByTrack;
-			var trackId = $iterator(Object.keys(this17))();
+		var this17 = this._lyricsByTrack;
+		if(Object.keys(this17).length > 0) {
+			var this18 = this._lyricsByTrack;
+			var trackId = $iterator(Object.keys(this18))();
 			while(trackId.hasNext()) {
 				var trackId1 = trackId.next();
 				var track = this._tracksById[trackId1];
@@ -7678,7 +8027,9 @@ alphaTab_importer_GpxParser.prototype = {
 			var this1 = system_Convert.ToUInt16(32);
 			var this2 = this1;
 			var tuningParts = system__$CsString_CsString_$Impl_$.Split_CharArray(a,[this2]);
-			var tuning = system__$FixedArray_FixedArray_$Impl_$._new(tuningParts.length);
+			var size = tuningParts.length;
+			var this3 = new Array(size);
+			var tuning = this3;
 			var i = 0;
 			while(i < tuning.length) {
 				tuning[tuning.length - 1 - i] = alphaTab_platform_Platform.ParseInt(tuningParts[i]);
@@ -8712,15 +9063,25 @@ alphaTab_importer_GpxParser.prototype = {
 	,__class__: alphaTab_importer_GpxParser
 };
 var alphaTab_importer_GpxRhythm = function() {
+	this.Dots = 0;
+	this.TupletDenominator = 0;
+	this.TupletNumerator = 0;
+	this.Value = null;
 	this.TupletDenominator = -1;
 	this.TupletNumerator = -1;
 	this.Value = 4;
 };
-alphaTab_importer_GpxRhythm.__name__ = true;
+alphaTab_importer_GpxRhythm.__name__ = ["alphaTab","importer","GpxRhythm"];
 alphaTab_importer_GpxRhythm.prototype = {
 	__class__: alphaTab_importer_GpxRhythm
 };
 var alphaTab_importer_MixTableChange = function() {
+	this.Volume = 0;
+	this.Balance = 0;
+	this.Instrument = 0;
+	this.TempoName = null;
+	this.Tempo = 0;
+	this.Duration = 0;
 	this.Volume = -1;
 	this.Balance = -1;
 	this.Instrument = -1;
@@ -8728,7 +9089,7 @@ var alphaTab_importer_MixTableChange = function() {
 	this.Tempo = -1;
 	this.Duration = 0;
 };
-alphaTab_importer_MixTableChange.__name__ = true;
+alphaTab_importer_MixTableChange.__name__ = ["alphaTab","importer","MixTableChange"];
 alphaTab_importer_MixTableChange.prototype = {
 	__class__: alphaTab_importer_MixTableChange
 };
@@ -8737,7 +9098,7 @@ var alphaTab_importer_MusicXmlImporter = function() {
 	this._voiceOfStaff = this1;
 	alphaTab_importer_ScoreImporter.call(this);
 };
-alphaTab_importer_MusicXmlImporter.__name__ = true;
+alphaTab_importer_MusicXmlImporter.__name__ = ["alphaTab","importer","MusicXmlImporter"];
 alphaTab_importer_MusicXmlImporter.ParseTied = function(element,note) {
 	if(note.Beat.GraceType != 0) {
 		return;
@@ -8833,7 +9194,7 @@ alphaTab_importer_MusicXmlImporter.prototype = $extend(alphaTab_importer_ScoreIm
 		}
 	}
 	,ParseMeasure: function(element,track,isFirstMeasure) {
-		if(element.GetAttribute("implicit") == "yes" && element.GetElementsByTagName("note").length == 0) {
+		if(element.GetAttribute("implicit") == "yes" && element.GetElementsByTagName("note",false).length == 0) {
 			return false;
 		}
 		var barIndex = 0;
@@ -8852,16 +9213,18 @@ alphaTab_importer_MusicXmlImporter.prototype = $extend(alphaTab_importer_ScoreIm
 			barIndex = barIndex - this._trackFirstMeasureNumber;
 		}
 		if(isFirstMeasure) {
-			var attributes = element.GetElementsByTagName("attributes");
+			var attributes = element.GetElementsByTagName("attributes",false);
 			if(attributes.length > 0) {
-				var stavesElements = attributes[0].GetElementsByTagName("staves");
+				var stavesElements = attributes[0].GetElementsByTagName("staves",false);
 				if(stavesElements.length > 0) {
 					var staves = alphaTab_platform_Platform.ParseInt(stavesElements[0].get_InnerText());
 					track.EnsureStaveCount(staves);
 				}
 			}
 		}
-		var bars = system__$FixedArray_FixedArray_$Impl_$._new(track.Staves.length);
+		var size = track.Staves.length;
+		var this1 = new Array(size);
+		var bars = this1;
 		var masterBar = null;
 		var b = track.Staves[0].Bars.length;
 		while(b <= barIndex) {
@@ -8924,13 +9287,13 @@ alphaTab_importer_MusicXmlImporter.prototype = $extend(alphaTab_importer_ScoreIm
 	}
 	,GetOrCreateBeat: function(element,bars,chord) {
 		var voiceIndex = 0;
-		var voiceNodes = element.GetElementsByTagName("voice");
+		var voiceNodes = element.GetElementsByTagName("voice",false);
 		if(voiceNodes.length > 0) {
 			voiceIndex = alphaTab_platform_Platform.ParseInt(voiceNodes[0].get_InnerText()) - 1;
 		}
 		var previousBeatWasPulled = this._previousBeatWasPulled;
 		this._previousBeatWasPulled = false;
-		var staffElement = element.GetElementsByTagName("staff");
+		var staffElement = element.GetElementsByTagName("staff",false);
 		var staff = 1;
 		if(staffElement.length > 0) {
 			staff = alphaTab_platform_Platform.ParseInt(staffElement[0].get_InnerText());
@@ -8983,7 +9346,9 @@ alphaTab_importer_MusicXmlImporter.prototype = $extend(alphaTab_importer_ScoreIm
 				var _g = c1.LocalName;
 				switch(_g) {
 				case "staff-lines":
-					track.Tuning = system__$FixedArray_FixedArray_$Impl_$._new(alphaTab_platform_Platform.ParseInt(c1.get_InnerText()));
+					var size = alphaTab_platform_Platform.ParseInt(c1.get_InnerText());
+					var this1 = new Array(size);
+					track.Tuning = this1;
 					break;
 				case "staff-tuning":
 					this.ParseStaffTuning(c1,track);
@@ -8993,7 +9358,8 @@ alphaTab_importer_MusicXmlImporter.prototype = $extend(alphaTab_importer_ScoreIm
 			}
 		}
 		if(this.IsEmptyTuning(track.Tuning)) {
-			track.Tuning = system__$FixedArray_FixedArray_$Impl_$._new(0);
+			var this2 = new Array(0);
+			track.Tuning = this2;
 		}
 	}
 	,ParseStaffTuning: function(element,track) {
@@ -9069,7 +9435,7 @@ alphaTab_importer_MusicXmlImporter.prototype = $extend(alphaTab_importer_ScoreIm
 		}
 	}
 	,ParseNoteBeat: function(element,bars) {
-		var chord = element.GetElementsByTagName("chord").length > 0;
+		var chord = element.GetElementsByTagName("chord",false).length > 0;
 		var beat = this.GetOrCreateBeat(element,bars,chord);
 		beat.ChordId = this._currentChord;
 		this._currentChord = null;
@@ -9454,7 +9820,8 @@ alphaTab_importer_MusicXmlImporter.prototype = $extend(alphaTab_importer_ScoreIm
 				case "alter":
 					var s = c1.get_InnerText();
 					semitones = parseFloat(s);
-					if(isNaN(semitones)) {
+					var this1 = semitones;
+					if(isNaN(this1)) {
 						semitones = 0;
 					}
 					break;
@@ -9801,7 +10168,8 @@ alphaTab_importer_MusicXmlImporter.prototype = $extend(alphaTab_importer_ScoreIm
 			}
 		}
 		if(this.IsEmptyTuning(track.Tuning)) {
-			track.Tuning = system__$FixedArray_FixedArray_$Impl_$._new(0);
+			var this1 = new Array(0);
+			track.Tuning = this1;
 		}
 	}
 	,IsEmptyTuning: function(tuning) {
@@ -9843,10 +10211,130 @@ alphaTab_importer_MusicXmlImporter.prototype = $extend(alphaTab_importer_ScoreIm
 	}
 	,__class__: alphaTab_importer_MusicXmlImporter
 });
+var alphaTab_importer_NoCompatibleReaderFoundException = function() {
+	alphaTab_AlphaTabException.call(this);
+};
+alphaTab_importer_NoCompatibleReaderFoundException.__name__ = ["alphaTab","importer","NoCompatibleReaderFoundException"];
+alphaTab_importer_NoCompatibleReaderFoundException.__super__ = alphaTab_AlphaTabException;
+alphaTab_importer_NoCompatibleReaderFoundException.prototype = $extend(alphaTab_AlphaTabException.prototype,{
+	NoCompatibleReaderFoundException: function() {
+		this.AlphaTabException("");
+		return this;
+	}
+	,__class__: alphaTab_importer_NoCompatibleReaderFoundException
+});
+var alphaTab_importer_ScoreLoader = function() {
+};
+alphaTab_importer_ScoreLoader.__name__ = ["alphaTab","importer","ScoreLoader"];
+alphaTab_importer_ScoreLoader.LoadScoreAsync = function(path,success,error) {
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET",path);
+	xhr.responseType = "arraybuffer";
+	xhr.onreadystatechange = function() {
+		if(xhr.readyState == 4) {
+			if(xhr.status == 200) {
+				try {
+					var buffer = xhr.response;
+					var reader = new Uint8Array(buffer);
+					var score = alphaTab_importer_ScoreLoader.LoadScoreFromBytes(reader);
+					success(score);
+				} catch( exception ) {
+					if (exception instanceof js__$Boot_HaxeError) exception = exception.val;
+					if( js_Boot.__instanceof(exception,system_Exception) ) {
+						error(exception);
+					} else throw(exception);
+				}
+			} else if(xhr.status == 0) {
+				var tmp = new alphaTab_importer_FileLoadException().FileLoadException("You are offline!!\n Please Check Your Network.",xhr);
+				error(tmp);
+			} else if(xhr.status == 404) {
+				var tmp1 = new alphaTab_importer_FileLoadException().FileLoadException("Requested URL not found.",xhr);
+				error(tmp1);
+			} else if(xhr.status == 500) {
+				var tmp2 = new alphaTab_importer_FileLoadException().FileLoadException("Internel Server Error.",xhr);
+				error(tmp2);
+			} else if(xhr.statusText == "parsererror") {
+				var tmp3 = new alphaTab_importer_FileLoadException().FileLoadException("Error.\nParsing JSON Request failed.",xhr);
+				error(tmp3);
+			} else if(xhr.statusText == "timeout") {
+				var tmp4 = new alphaTab_importer_FileLoadException().FileLoadException("Request Time out.",xhr);
+				error(tmp4);
+			} else {
+				var tmp5 = new alphaTab_importer_FileLoadException().FileLoadException("Unknow Error: " + xhr.responseText,xhr);
+				error(tmp5);
+			}
+		}
+	};
+	xhr.open("GET",path,true,null,null);
+	xhr.responseType = "arraybuffer";
+	if(xhr.responseType != "arraybuffer") {
+		var vbArr = VbAjaxLoader("GET",path);
+		var fileContents = vbArr.toArray();
+		var this1 = "";
+		var data = this1;
+		var i = 0;
+		while(i < fileContents.length - 1) {
+			data += Std.string(fileContents[i]);
+			++i;
+		}
+		var reader1 = alphaTab_importer_ScoreLoader.GetBytesFromString(data);
+		var score1 = alphaTab_importer_ScoreLoader.LoadScoreFromBytes(reader1);
+		success(score1);
+	}
+	xhr.send();
+};
+alphaTab_importer_ScoreLoader.GetBytesFromString = function(s) {
+	var size = s.length;
+	var this1 = new Array(size);
+	var b = this1;
+	var i = 0;
+	while(i < s.length) {
+		var this2 = system_Convert.ToUInt16(HxOverrides.cca(s,i));
+		b[i] = system_Convert.ToUInt8(this2);
+		++i;
+	}
+	return b;
+};
+alphaTab_importer_ScoreLoader.LoadScoreFromBytes = function(data) {
+	var importers = alphaTab_importer_ScoreImporter.BuildImporters();
+	alphaTab_util_Logger.Info("ScoreLoader","Loading score from " + data.length + " bytes using " + importers.length + " importers",null);
+	var score = null;
+	var bb = alphaTab_io_ByteBuffer.FromBuffer(data);
+	var importer = HxOverrides.iter(importers);
+	while(importer.hasNext()) {
+		var importer1 = importer.next();
+		bb.Reset();
+		try {
+			alphaTab_util_Logger.Info("ScoreLoader","Importing using importer " + importer1.get_Name(),null);
+			importer1.Init(bb);
+			score = importer1.ReadScore();
+			alphaTab_util_Logger.Info("ScoreLoader","Score imported using " + importer1.get_Name(),null);
+			break;
+		} catch( $e0 ) {
+			if ($e0 instanceof js__$Boot_HaxeError) $e0 = $e0.val;
+			if( js_Boot.__instanceof($e0,alphaTab_importer_UnsupportedFormatException) ) {
+				var __e = $e0;
+				alphaTab_util_Logger.Info("ScoreLoader",importer1.get_Name() + " does not support the file",null);
+			} else if( js_Boot.__instanceof($e0,system_Exception) ) {
+				var e = $e0;
+				alphaTab_util_Logger.Info("ScoreLoader","Score import failed due to unexpected error: " + Std.string(e),null);
+				throw new js__$Boot_HaxeError(e);
+			} else throw($e0);
+		}
+	}
+	if(score != null) {
+		return score;
+	}
+	alphaTab_util_Logger.Error("ScoreLoader","No compatible importer found for file",null);
+	throw new js__$Boot_HaxeError(new alphaTab_importer_NoCompatibleReaderFoundException().NoCompatibleReaderFoundException());
+};
+alphaTab_importer_ScoreLoader.prototype = {
+	__class__: alphaTab_importer_ScoreLoader
+};
 var alphaTab_importer_UnsupportedFormatException = function() {
 	alphaTab_AlphaTabException.call(this);
 };
-alphaTab_importer_UnsupportedFormatException.__name__ = true;
+alphaTab_importer_UnsupportedFormatException.__name__ = ["alphaTab","importer","UnsupportedFormatException"];
 alphaTab_importer_UnsupportedFormatException.__super__ = alphaTab_AlphaTabException;
 alphaTab_importer_UnsupportedFormatException.prototype = $extend(alphaTab_AlphaTabException.prototype,{
 	UnsupportedFormatException: function(message) {
@@ -9859,16 +10347,20 @@ alphaTab_importer_UnsupportedFormatException.prototype = $extend(alphaTab_AlphaT
 	,__class__: alphaTab_importer_UnsupportedFormatException
 });
 var alphaTab_io_BitReader = function(source) {
+	this._currentByte = 0;
+	this._position = 0;
+	this._source = null;
 	this._source = source;
 	this._position = 8;
 };
-alphaTab_io_BitReader.__name__ = true;
+alphaTab_io_BitReader.__name__ = ["alphaTab","io","BitReader"];
 alphaTab_io_BitReader.prototype = {
 	ReadByte: function() {
 		return this.ReadBits(8);
 	}
 	,ReadBytes: function(count) {
-		var bytes = system__$FixedArray_FixedArray_$Impl_$._new(count);
+		var this1 = new Array(count);
+		var bytes = this1;
 		var i = 0;
 		while(i < count) {
 			bytes[i] = system_Convert.ToUInt8(this.ReadByte());
@@ -9920,25 +10412,30 @@ alphaTab_io_BitReader.prototype = {
 	,__class__: alphaTab_io_BitReader
 };
 var alphaTab_io_IReadable = function() { };
-alphaTab_io_IReadable.__name__ = true;
+alphaTab_io_IReadable.__name__ = ["alphaTab","io","IReadable"];
 alphaTab_io_IReadable.prototype = {
 	__class__: alphaTab_io_IReadable
 };
 var alphaTab_io_IWriteable = function() { };
-alphaTab_io_IWriteable.__name__ = true;
+alphaTab_io_IWriteable.__name__ = ["alphaTab","io","IWriteable"];
 alphaTab_io_IWriteable.prototype = {
 	__class__: alphaTab_io_IWriteable
 };
 var alphaTab_io_ByteBuffer = function() {
+	this._buffer = null;
+	this._position = 0;
+	this._length = 0;
+	this._capacity = 0;
 };
-alphaTab_io_ByteBuffer.__name__ = true;
+alphaTab_io_ByteBuffer.__name__ = ["alphaTab","io","ByteBuffer"];
 alphaTab_io_ByteBuffer.__interfaces__ = [alphaTab_io_IReadable,alphaTab_io_IWriteable];
 alphaTab_io_ByteBuffer.Empty = function() {
 	return alphaTab_io_ByteBuffer.WithCapactiy(0);
 };
 alphaTab_io_ByteBuffer.WithCapactiy = function(capacity) {
 	var buffer = new alphaTab_io_ByteBuffer();
-	buffer._buffer = system__$FixedArray_FixedArray_$Impl_$._new(capacity);
+	var this1 = new Array(capacity);
+	buffer._buffer = this1;
 	buffer._capacity = capacity;
 	return buffer;
 };
@@ -9964,7 +10461,8 @@ alphaTab_io_ByteBuffer.prototype = {
 	,SetCapacity: function(value) {
 		if(value != this._capacity) {
 			if(value > 0) {
-				var newBuffer = system__$FixedArray_FixedArray_$Impl_$._new(value);
+				var this1 = new Array(value);
+				var newBuffer = this1;
 				if(this._length > 0) {
 					var src = this._buffer;
 					var count = this._length;
@@ -10019,7 +10517,8 @@ alphaTab_io_ByteBuffer.prototype = {
 		return n;
 	}
 	,WriteByte: function(value) {
-		var buffer = system__$FixedArray_FixedArray_$Impl_$._new(1);
+		var this1 = new Array(1);
+		var buffer = this1;
 		buffer[0] = value;
 		this.Write(buffer,0,1);
 	}
@@ -10068,7 +10567,9 @@ alphaTab_io_ByteBuffer.prototype = {
 		return this.ToArray();
 	}
 	,ToArray: function() {
-		var copy = system__$FixedArray_FixedArray_$Impl_$._new(this._length);
+		var size = this._length;
+		var this1 = new Array(size);
+		var copy = this1;
 		var src = this._buffer;
 		var count = this._length;
 		var i = 0;
@@ -10083,7 +10584,7 @@ alphaTab_io_ByteBuffer.prototype = {
 var alphaTab_io_EndOfReaderException = function() {
 	alphaTab_AlphaTabException.call(this);
 };
-alphaTab_io_EndOfReaderException.__name__ = true;
+alphaTab_io_EndOfReaderException.__name__ = ["alphaTab","io","EndOfReaderException"];
 alphaTab_io_EndOfReaderException.__super__ = alphaTab_AlphaTabException;
 alphaTab_io_EndOfReaderException.prototype = $extend(alphaTab_AlphaTabException.prototype,{
 	EndOfReaderException: function() {
@@ -10093,7 +10594,7 @@ alphaTab_io_EndOfReaderException.prototype = $extend(alphaTab_AlphaTabException.
 	,__class__: alphaTab_io_EndOfReaderException
 });
 var alphaTab_model__$AccentuationType_AccentuationType_$Impl_$ = {};
-alphaTab_model__$AccentuationType_AccentuationType_$Impl_$.__name__ = true;
+alphaTab_model__$AccentuationType_AccentuationType_$Impl_$.__name__ = ["alphaTab","model","_AccentuationType","AccentuationType_Impl_"];
 alphaTab_model__$AccentuationType_AccentuationType_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -10143,7 +10644,7 @@ alphaTab_model__$AccentuationType_AccentuationType_$Impl_$.toString = function(t
 	return "";
 };
 var alphaTab_model__$AccidentalType_AccidentalType_$Impl_$ = {};
-alphaTab_model__$AccidentalType_AccidentalType_$Impl_$.__name__ = true;
+alphaTab_model__$AccidentalType_AccidentalType_$Impl_$.__name__ = ["alphaTab","model","_AccidentalType","AccidentalType_Impl_"];
 alphaTab_model__$AccidentalType_AccidentalType_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -10196,7 +10697,7 @@ alphaTab_model__$AccidentalType_AccidentalType_$Impl_$.toString = function(this1
 };
 var alphaTab_model_Automation = function() {
 };
-alphaTab_model_Automation.__name__ = true;
+alphaTab_model_Automation.__name__ = ["alphaTab","model","Automation"];
 alphaTab_model_Automation.BuildTempoAutomation = function(isLinear,ratioPosition,value,reference) {
 	if(reference < 1 || reference > 5) {
 		reference = 2;
@@ -10225,7 +10726,7 @@ alphaTab_model_Automation.prototype = {
 	,__class__: alphaTab_model_Automation
 };
 var alphaTab_model__$AutomationType_AutomationType_$Impl_$ = {};
-alphaTab_model__$AutomationType_AutomationType_$Impl_$.__name__ = true;
+alphaTab_model__$AutomationType_AutomationType_$Impl_$.__name__ = ["alphaTab","model","_AutomationType","AutomationType_Impl_"];
 alphaTab_model__$AutomationType_AutomationType_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -10277,13 +10778,21 @@ alphaTab_model__$AutomationType_AutomationType_$Impl_$.toString = function(this1
 	return "";
 };
 var alphaTab_model_Bar = function() {
+	this.Id = 0;
+	this.Index = 0;
+	this.NextBar = null;
+	this.PreviousBar = null;
+	this.Clef = null;
+	this.ClefOttavia = null;
+	this.Staff = null;
+	this.Voices = null;
 	this.Id = alphaTab_model_Bar.GlobalBarId++;
 	var this1 = [];
 	this.Voices = this1;
 	this.Clef = 4;
 	this.ClefOttavia = 2;
 };
-alphaTab_model_Bar.__name__ = true;
+alphaTab_model_Bar.__name__ = ["alphaTab","model","Bar"];
 alphaTab_model_Bar.CopyTo = function(src,dst) {
 	dst.Id = src.Id;
 	dst.Index = src.Index;
@@ -10322,6 +10831,43 @@ alphaTab_model_Bar.prototype = {
 	,__class__: alphaTab_model_Bar
 };
 var alphaTab_model_Beat = function() {
+	this.PreviousBeat = null;
+	this.NextBeat = null;
+	this.Id = 0;
+	this.Index = 0;
+	this.Voice = null;
+	this.Notes = null;
+	this.IsEmpty = false;
+	this.IsLegatoOrigin = false;
+	this._minNote = null;
+	this._maxNote = null;
+	this._maxStringNote = null;
+	this._minStringNote = null;
+	this.Duration = null;
+	this.Automations = null;
+	this.Dots = 0;
+	this.FadeIn = false;
+	this.Lyrics = null;
+	this.Pop = false;
+	this.HasRasgueado = false;
+	this.Slap = false;
+	this.Tap = false;
+	this.Text = null;
+	this.BrushType = null;
+	this.BrushDuration = 0;
+	this.TupletDenominator = 0;
+	this.TupletNumerator = 0;
+	this.WhammyBarPoints = null;
+	this.MaxWhammyPoint = null;
+	this.Vibrato = null;
+	this.ChordId = null;
+	this.GraceType = null;
+	this.PickStroke = null;
+	this.TremoloSpeed = null;
+	this.Crescendo = null;
+	this.Start = 0;
+	this.Dynamic = null;
+	this.InvertBeamDirection = false;
 	this.Id = alphaTab_model_Beat.GlobalBeatId++;
 	var this1 = [];
 	this.WhammyBarPoints = this1;
@@ -10343,7 +10889,7 @@ var alphaTab_model_Beat = function() {
 	this.Crescendo = 0;
 	this.InvertBeamDirection = false;
 };
-alphaTab_model_Beat.__name__ = true;
+alphaTab_model_Beat.__name__ = ["alphaTab","model","Beat"];
 alphaTab_model_Beat.CopyTo = function(src,dst) {
 	dst.Id = src.Id;
 	dst.Index = src.Index;
@@ -10352,7 +10898,9 @@ alphaTab_model_Beat.CopyTo = function(src,dst) {
 	dst.Dots = src.Dots;
 	dst.FadeIn = src.FadeIn;
 	if(src.Lyrics != null) {
-		dst.Lyrics = system__$FixedArray_FixedArray_$Impl_$._new(src.Lyrics.length);
+		var size = src.Lyrics.length;
+		var this1 = new Array(size);
+		dst.Lyrics = this1;
 		var i = 0;
 		while(i < src.Lyrics.length) {
 			dst.Lyrics[i] = src.Lyrics[i];
@@ -10581,10 +11129,12 @@ var alphaTab_model_BendPoint = function(offset,value) {
 	if(offset == null) {
 		offset = 0;
 	}
+	this.Offset = 0;
+	this.Value = 0;
 	this.Offset = offset;
 	this.Value = value;
 };
-alphaTab_model_BendPoint.__name__ = true;
+alphaTab_model_BendPoint.__name__ = ["alphaTab","model","BendPoint"];
 alphaTab_model_BendPoint.CopyTo = function(src,dst) {
 	dst.Offset = src.Offset;
 	dst.Value = src.Value;
@@ -10598,7 +11148,7 @@ alphaTab_model_BendPoint.prototype = {
 	,__class__: alphaTab_model_BendPoint
 };
 var alphaTab_model__$BrushType_BrushType_$Impl_$ = {};
-alphaTab_model__$BrushType_BrushType_$Impl_$.__name__ = true;
+alphaTab_model__$BrushType_BrushType_$Impl_$.__name__ = ["alphaTab","model","_BrushType","BrushType_Impl_"];
 alphaTab_model__$BrushType_BrushType_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -10652,12 +11202,16 @@ alphaTab_model__$BrushType_BrushType_$Impl_$.toString = function(this1) {
 	return "";
 };
 var alphaTab_model_Chord = function() {
+	this.Name = null;
+	this.FirstFret = 0;
+	this.Strings = null;
+	this.BarreFrets = null;
 	var this1 = [];
 	this.Strings = this1;
 	var this2 = [];
 	this.BarreFrets = this2;
 };
-alphaTab_model_Chord.__name__ = true;
+alphaTab_model_Chord.__name__ = ["alphaTab","model","Chord"];
 alphaTab_model_Chord.CopyTo = function(src,dst) {
 	dst.FirstFret = src.FirstFret;
 	dst.Name = src.Name;
@@ -10667,7 +11221,7 @@ alphaTab_model_Chord.prototype = {
 	__class__: alphaTab_model_Chord
 };
 var alphaTab_model__$Clef_Clef_$Impl_$ = {};
-alphaTab_model__$Clef_Clef_$Impl_$.__name__ = true;
+alphaTab_model__$Clef_Clef_$Impl_$.__name__ = ["alphaTab","model","_Clef","Clef_Impl_"];
 alphaTab_model__$Clef_Clef_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -10721,7 +11275,7 @@ alphaTab_model__$Clef_Clef_$Impl_$.toString = function(this1) {
 	return "";
 };
 var alphaTab_model__$ClefOttavia_ClefOttavia_$Impl_$ = {};
-alphaTab_model__$ClefOttavia_ClefOttavia_$Impl_$.__name__ = true;
+alphaTab_model__$ClefOttavia_ClefOttavia_$Impl_$.__name__ = ["alphaTab","model","_ClefOttavia","ClefOttavia_Impl_"];
 alphaTab_model__$ClefOttavia_ClefOttavia_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -10775,7 +11329,7 @@ alphaTab_model__$ClefOttavia_ClefOttavia_$Impl_$.toString = function(this1) {
 	return "";
 };
 var alphaTab_model__$CrescendoType_CrescendoType_$Impl_$ = {};
-alphaTab_model__$CrescendoType_CrescendoType_$Impl_$.__name__ = true;
+alphaTab_model__$CrescendoType_CrescendoType_$Impl_$.__name__ = ["alphaTab","model","_CrescendoType","CrescendoType_Impl_"];
 alphaTab_model__$CrescendoType_CrescendoType_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -10825,7 +11379,7 @@ alphaTab_model__$CrescendoType_CrescendoType_$Impl_$.toString = function(this1) 
 	return "";
 };
 var alphaTab_model__$Duration_Duration_$Impl_$ = {};
-alphaTab_model__$Duration_Duration_$Impl_$.__name__ = true;
+alphaTab_model__$Duration_Duration_$Impl_$.__name__ = ["alphaTab","model","_Duration","Duration_Impl_"];
 alphaTab_model__$Duration_Duration_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -10891,7 +11445,7 @@ alphaTab_model__$Duration_Duration_$Impl_$.toString = function(this1) {
 	return "";
 };
 var alphaTab_model__$DynamicValue_DynamicValue_$Impl_$ = {};
-alphaTab_model__$DynamicValue_DynamicValue_$Impl_$.__name__ = true;
+alphaTab_model__$DynamicValue_DynamicValue_$Impl_$.__name__ = ["alphaTab","model","_DynamicValue","DynamicValue_Impl_"];
 alphaTab_model__$DynamicValue_DynamicValue_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -10951,7 +11505,7 @@ alphaTab_model__$DynamicValue_DynamicValue_$Impl_$.toString = function(this1) {
 	return "";
 };
 var alphaTab_model__$Fingers_Fingers_$Impl_$ = {};
-alphaTab_model__$Fingers_Fingers_$Impl_$.__name__ = true;
+alphaTab_model__$Fingers_Fingers_$Impl_$.__name__ = ["alphaTab","model","_Fingers","Fingers_Impl_"];
 alphaTab_model__$Fingers_Fingers_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -11009,7 +11563,7 @@ alphaTab_model__$Fingers_Fingers_$Impl_$.toString = function(this1) {
 	return "";
 };
 var alphaTab_model__$GraceType_GraceType_$Impl_$ = {};
-alphaTab_model__$GraceType_GraceType_$Impl_$.__name__ = true;
+alphaTab_model__$GraceType_GraceType_$Impl_$.__name__ = ["alphaTab","model","_GraceType","GraceType_Impl_"];
 alphaTab_model__$GraceType_GraceType_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -11059,7 +11613,7 @@ alphaTab_model__$GraceType_GraceType_$Impl_$.toString = function(this1) {
 	return "";
 };
 var alphaTab_model__$HarmonicType_HarmonicType_$Impl_$ = {};
-alphaTab_model__$HarmonicType_HarmonicType_$Impl_$.__name__ = true;
+alphaTab_model__$HarmonicType_HarmonicType_$Impl_$.__name__ = ["alphaTab","model","_HarmonicType","HarmonicType_Impl_"];
 alphaTab_model__$HarmonicType_HarmonicType_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -11118,7 +11672,7 @@ alphaTab_model__$HarmonicType_HarmonicType_$Impl_$.toString = function(this1) {
 };
 var alphaTab_model_JsonConverter = function() {
 };
-alphaTab_model_JsonConverter.__name__ = true;
+alphaTab_model_JsonConverter.__name__ = ["alphaTab","model","JsonConverter"];
 alphaTab_model_JsonConverter.prototype = {
 	ScoreToJsObject: function(score) {
 		var score2 = {}
@@ -11352,7 +11906,7 @@ alphaTab_model_JsonConverter.prototype = {
 	,__class__: alphaTab_model_JsonConverter
 };
 var alphaTab_model__$KeySignatureType_KeySignatureType_$Impl_$ = {};
-alphaTab_model__$KeySignatureType_KeySignatureType_$Impl_$.__name__ = true;
+alphaTab_model__$KeySignatureType_KeySignatureType_$Impl_$.__name__ = ["alphaTab","model","_KeySignatureType","KeySignatureType_Impl_"];
 alphaTab_model__$KeySignatureType_KeySignatureType_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -11401,7 +11955,7 @@ alphaTab_model__$KeySignatureType_KeySignatureType_$Impl_$.toString = function(t
 };
 var alphaTab_model_Lyrics = function() {
 };
-alphaTab_model_Lyrics.__name__ = true;
+alphaTab_model_Lyrics.__name__ = ["alphaTab","model","Lyrics"];
 alphaTab_model_Lyrics.prototype = {
 	Finish: function() {
 		var this1 = [];
@@ -11493,18 +12047,37 @@ alphaTab_model_Lyrics.prototype = {
 };
 var alphaTab_model_Lyrics_$LyricsState = function() {
 };
-alphaTab_model_Lyrics_$LyricsState.__name__ = true;
+alphaTab_model_Lyrics_$LyricsState.__name__ = ["alphaTab","model","Lyrics_LyricsState"];
 alphaTab_model_Lyrics_$LyricsState.prototype = {
 	__class__: alphaTab_model_Lyrics_$LyricsState
 };
 var alphaTab_model_MasterBar = function() {
+	this.AlternateEndings = 0;
+	this.NextMasterBar = null;
+	this.PreviousMasterBar = null;
+	this.Index = 0;
+	this.KeySignature = 0;
+	this.KeySignatureType = null;
+	this.IsDoubleBar = false;
+	this.IsRepeatStart = false;
+	this.RepeatCount = 0;
+	this.RepeatGroup = null;
+	this.TimeSignatureNumerator = 0;
+	this.TimeSignatureDenominator = 0;
+	this.TimeSignatureCommon = false;
+	this.TripletFeel = null;
+	this.Section = null;
+	this.TempoAutomation = null;
+	this.VolumeAutomation = null;
+	this.Score = null;
+	this.Start = 0;
 	this.TimeSignatureDenominator = 4;
 	this.TimeSignatureNumerator = 4;
 	this.TripletFeel = 0;
 	this.KeySignatureType = 0;
 	this.TimeSignatureCommon = false;
 };
-alphaTab_model_MasterBar.__name__ = true;
+alphaTab_model_MasterBar.__name__ = ["alphaTab","model","MasterBar"];
 alphaTab_model_MasterBar.CopyTo = function(src,dst) {
 	dst.AlternateEndings = src.AlternateEndings;
 	dst.Index = src.Index;
@@ -11532,7 +12105,7 @@ alphaTab_model_MasterBar.prototype = {
 	,__class__: alphaTab_model_MasterBar
 };
 var alphaTab_model_ModelUtils = function() { };
-alphaTab_model_ModelUtils.__name__ = true;
+alphaTab_model_ModelUtils.__name__ = ["alphaTab","model","ModelUtils"];
 alphaTab_model_ModelUtils.GetIndex = function(duration) {
 	var index = 0;
 	var value = duration;
@@ -11564,6 +12137,43 @@ alphaTab_model_ModelUtils.ApplyPitchOffsets = function(settings,score) {
 	}
 };
 var alphaTab_model_Note = function() {
+	this.Id = 0;
+	this.Index = 0;
+	this.Accentuated = null;
+	this.BendPoints = null;
+	this.MaxBendPoint = null;
+	this.Fret = 0;
+	this.String = 0;
+	this.Octave = 0;
+	this.Tone = 0;
+	this.Element = 0;
+	this.Variation = 0;
+	this.IsHammerPullOrigin = false;
+	this.HammerPullOrigin = null;
+	this.HammerPullDestination = null;
+	this.HarmonicValue = 0.0;
+	this.HarmonicType = null;
+	this.IsGhost = false;
+	this.IsLetRing = false;
+	this.IsPalmMute = false;
+	this.IsDead = false;
+	this.IsStaccato = false;
+	this.SlideType = null;
+	this.SlideTarget = null;
+	this.Vibrato = null;
+	this.TieOrigin = null;
+	this.TieDestination = null;
+	this.IsTieDestination = false;
+	this.IsTieOrigin = false;
+	this.LeftHandFinger = null;
+	this.RightHandFinger = null;
+	this.IsFingering = false;
+	this.TrillValue = 0;
+	this.TrillSpeed = null;
+	this.DurationPercent = 0.0;
+	this.AccidentalMode = null;
+	this.Beat = null;
+	this.Dynamic = null;
 	this.Id = alphaTab_model_Note.GlobalNoteId++;
 	var this1 = [];
 	this.BendPoints = this1;
@@ -11586,7 +12196,7 @@ var alphaTab_model_Note = function() {
 	this.Element = -1;
 	this.Variation = -1;
 };
-alphaTab_model_Note.__name__ = true;
+alphaTab_model_Note.__name__ = ["alphaTab","model","Note"];
 alphaTab_model_Note.GetStringTuning = function(track,noteString) {
 	if(track.Tuning.length > 0) {
 		return track.Tuning[track.Tuning.length - (noteString - 1) - 1];
@@ -11756,7 +12366,7 @@ alphaTab_model_Note.prototype = {
 	,__class__: alphaTab_model_Note
 };
 var alphaTab_model__$NoteAccidentalMode_NoteAccidentalMode_$Impl_$ = {};
-alphaTab_model__$NoteAccidentalMode_NoteAccidentalMode_$Impl_$.__name__ = true;
+alphaTab_model__$NoteAccidentalMode_NoteAccidentalMode_$Impl_$.__name__ = ["alphaTab","model","_NoteAccidentalMode","NoteAccidentalMode_Impl_"];
 alphaTab_model__$NoteAccidentalMode_NoteAccidentalMode_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -11810,7 +12420,7 @@ alphaTab_model__$NoteAccidentalMode_NoteAccidentalMode_$Impl_$.toString = functi
 	return "";
 };
 var alphaTab_model__$PickStrokeType_PickStrokeType_$Impl_$ = {};
-alphaTab_model__$PickStrokeType_PickStrokeType_$Impl_$.__name__ = true;
+alphaTab_model__$PickStrokeType_PickStrokeType_$Impl_$.__name__ = ["alphaTab","model","_PickStrokeType","PickStrokeType_Impl_"];
 alphaTab_model__$PickStrokeType_PickStrokeType_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -11860,11 +12470,19 @@ alphaTab_model__$PickStrokeType_PickStrokeType_$Impl_$.toString = function(this1
 	return "";
 };
 var alphaTab_model_PlaybackInformation = function() {
+	this.Volume = 0;
+	this.Balance = 0;
+	this.Port = 0;
+	this.Program = 0;
+	this.PrimaryChannel = 0;
+	this.SecondaryChannel = 0;
+	this.IsMute = false;
+	this.IsSolo = false;
 	this.Volume = 15;
 	this.Balance = 8;
 	this.Port = 1;
 };
-alphaTab_model_PlaybackInformation.__name__ = true;
+alphaTab_model_PlaybackInformation.__name__ = ["alphaTab","model","PlaybackInformation"];
 alphaTab_model_PlaybackInformation.CopyTo = function(src,dst) {
 	dst.Volume = src.Volume;
 	dst.Balance = src.Balance;
@@ -11879,6 +12497,10 @@ alphaTab_model_PlaybackInformation.prototype = {
 	__class__: alphaTab_model_PlaybackInformation
 };
 var alphaTab_model_RepeatGroup = function() {
+	this.MasterBars = null;
+	this.Openings = null;
+	this.Closings = null;
+	this.IsClosed = false;
 	var this1 = [];
 	this.MasterBars = this1;
 	var this2 = [];
@@ -11887,7 +12509,7 @@ var alphaTab_model_RepeatGroup = function() {
 	this.Closings = this3;
 	this.IsClosed = false;
 };
-alphaTab_model_RepeatGroup.__name__ = true;
+alphaTab_model_RepeatGroup.__name__ = ["alphaTab","model","RepeatGroup"];
 alphaTab_model_RepeatGroup.prototype = {
 	AddMasterBar: function(masterBar) {
 		if(this.Openings.length == 0) {
@@ -11906,6 +12528,21 @@ alphaTab_model_RepeatGroup.prototype = {
 	,__class__: alphaTab_model_RepeatGroup
 };
 var alphaTab_model_Score = function() {
+	this._currentRepeatGroup = null;
+	this.Album = null;
+	this.Artist = null;
+	this.Copyright = null;
+	this.Instructions = null;
+	this.Music = null;
+	this.Notices = null;
+	this.SubTitle = null;
+	this.Title = null;
+	this.Words = null;
+	this.Tab = null;
+	this.Tempo = 0;
+	this.TempoLabel = null;
+	this.MasterBars = null;
+	this.Tracks = null;
 	var this1 = [];
 	this.MasterBars = this1;
 	var this2 = [];
@@ -11914,7 +12551,7 @@ var alphaTab_model_Score = function() {
 	this.Album = this.Artist = this.Copyright = this.Instructions = this.Music = this.Notices = this.SubTitle = this.Title = this.Words = this.Tab = this.TempoLabel = "";
 	this.Tempo = 120;
 };
-alphaTab_model_Score.__name__ = true;
+alphaTab_model_Score.__name__ = ["alphaTab","model","Score"];
 alphaTab_model_Score.CopyTo = function(src,dst) {
 	dst.Album = src.Album;
 	dst.Artist = src.Artist;
@@ -11960,9 +12597,11 @@ alphaTab_model_Score.prototype = {
 	,__class__: alphaTab_model_Score
 };
 var alphaTab_model_Section = function() {
+	this.Marker = null;
+	this.Text = null;
 	this.Text = this.Marker = "";
 };
-alphaTab_model_Section.__name__ = true;
+alphaTab_model_Section.__name__ = ["alphaTab","model","Section"];
 alphaTab_model_Section.CopyTo = function(src,dst) {
 	dst.Marker = src.Marker;
 	dst.Text = src.Text;
@@ -11971,7 +12610,7 @@ alphaTab_model_Section.prototype = {
 	__class__: alphaTab_model_Section
 };
 var alphaTab_model__$SlideType_SlideType_$Impl_$ = {};
-alphaTab_model__$SlideType_SlideType_$Impl_$.__name__ = true;
+alphaTab_model__$SlideType_SlideType_$Impl_$.__name__ = ["alphaTab","model","_SlideType","SlideType_Impl_"];
 alphaTab_model__$SlideType_SlideType_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -12029,10 +12668,13 @@ alphaTab_model__$SlideType_SlideType_$Impl_$.toString = function(this1) {
 	return "";
 };
 var alphaTab_model_Staff = function() {
+	this.Bars = null;
+	this.Track = null;
+	this.Index = 0;
 	var this1 = [];
 	this.Bars = this1;
 };
-alphaTab_model_Staff.__name__ = true;
+alphaTab_model_Staff.__name__ = ["alphaTab","model","Staff"];
 alphaTab_model_Staff.prototype = {
 	Finish: function() {
 		var i = 0;
@@ -12045,18 +12687,33 @@ alphaTab_model_Staff.prototype = {
 	,__class__: alphaTab_model_Staff
 };
 var alphaTab_model_Track = function(staveCount) {
+	this.Capo = 0;
+	this.TranspositionPitch = 0;
+	this.DisplayTranspositionPitch = 0;
+	this.Index = 0;
+	this.Name = null;
+	this.ShortName = null;
+	this.Tuning = null;
+	this.TuningName = null;
+	this.Color = null;
+	this.PlaybackInfo = null;
+	this.IsPercussion = false;
+	this.Score = null;
+	this.Staves = null;
+	this.Chords = null;
 	this.Name = "";
 	this.ShortName = "";
-	this.Tuning = system__$FixedArray_FixedArray_$Impl_$._new(0);
-	var this1 = {}
-	this.Chords = this1;
+	var this1 = new Array(0);
+	this.Tuning = this1;
+	var this2 = {}
+	this.Chords = this2;
 	this.PlaybackInfo = new alphaTab_model_PlaybackInformation();
 	this.Color = new alphaTab_platform_model_Color(200,0,0,255);
-	var this2 = [];
-	this.Staves = this2;
+	var this3 = [];
+	this.Staves = this3;
 	this.EnsureStaveCount(staveCount);
 };
-alphaTab_model_Track.__name__ = true;
+alphaTab_model_Track.__name__ = ["alphaTab","model","Track"];
 alphaTab_model_Track.CopyTo = function(src,dst) {
 	dst.Name = src.Name;
 	dst.Capo = src.Capo;
@@ -12125,7 +12782,9 @@ alphaTab_model_Track.prototype = {
 					while(beat != null && (beat.IsEmpty || beat.get_IsRest())) beat = beat.NextBeat;
 					if(beat != null) {
 						if(beat.Lyrics == null) {
-							beat.Lyrics = system__$FixedArray_FixedArray_$Impl_$._new(lyrics.length);
+							var size = lyrics.length;
+							var this1 = new Array(size);
+							beat.Lyrics = this1;
 						}
 						beat.Lyrics[li] = lyric2.Chunks[ci];
 						beat = beat.NextBeat;
@@ -12139,7 +12798,7 @@ alphaTab_model_Track.prototype = {
 	,__class__: alphaTab_model_Track
 };
 var alphaTab_model__$TripletFeel_TripletFeel_$Impl_$ = {};
-alphaTab_model__$TripletFeel_TripletFeel_$Impl_$.__name__ = true;
+alphaTab_model__$TripletFeel_TripletFeel_$Impl_$.__name__ = ["alphaTab","model","_TripletFeel","TripletFeel_Impl_"];
 alphaTab_model__$TripletFeel_TripletFeel_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -12197,11 +12856,14 @@ alphaTab_model__$TripletFeel_TripletFeel_$Impl_$.toString = function(this1) {
 	return "";
 };
 var alphaTab_model_Tuning = function(name,tuning,isStandard) {
+	this.IsStandard = false;
+	this.Name = null;
+	this.Tunings = null;
 	this.IsStandard = isStandard;
 	this.Name = name;
 	this.Tunings = tuning;
 };
-alphaTab_model_Tuning.__name__ = true;
+alphaTab_model_Tuning.__name__ = ["alphaTab","model","Tuning"];
 alphaTab_model_Tuning.GetTextForTuning = function(tuning,includeOctave) {
 	var octave = tuning / 12 | 0;
 	var note = tuning % 12;
@@ -12326,7 +12988,7 @@ alphaTab_model_Tuning.prototype = {
 };
 var alphaTab_model_TuningParseResult = function() {
 };
-alphaTab_model_TuningParseResult.__name__ = true;
+alphaTab_model_TuningParseResult.__name__ = ["alphaTab","model","TuningParseResult"];
 alphaTab_model_TuningParseResult.prototype = {
 	get_RealValue: function() {
 		return this.Octave * 12 + this.NoteValue;
@@ -12334,7 +12996,7 @@ alphaTab_model_TuningParseResult.prototype = {
 	,__class__: alphaTab_model_TuningParseResult
 };
 var alphaTab_model_TuningParser = function() { };
-alphaTab_model_TuningParser.__name__ = true;
+alphaTab_model_TuningParser.__name__ = ["alphaTab","model","TuningParser"];
 alphaTab_model_TuningParser.IsTuning = function(name) {
 	return alphaTab_model_TuningParser.Parse(name) != null;
 };
@@ -12419,7 +13081,7 @@ alphaTab_model_TuningParser.GetToneForText = function(note) {
 	return b;
 };
 var alphaTab_model__$VibratoType_VibratoType_$Impl_$ = {};
-alphaTab_model__$VibratoType_VibratoType_$Impl_$.__name__ = true;
+alphaTab_model__$VibratoType_VibratoType_$Impl_$.__name__ = ["alphaTab","model","_VibratoType","VibratoType_Impl_"];
 alphaTab_model__$VibratoType_VibratoType_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -12469,11 +13131,15 @@ alphaTab_model__$VibratoType_VibratoType_$Impl_$.toString = function(this1) {
 	return "";
 };
 var alphaTab_model_Voice = function() {
+	this.Index = 0;
+	this.Bar = null;
+	this.Beats = null;
+	this.IsEmpty = false;
 	var this1 = [];
 	this.Beats = this1;
 	this.IsEmpty = true;
 };
-alphaTab_model_Voice.__name__ = true;
+alphaTab_model_Voice.__name__ = ["alphaTab","model","Voice"];
 alphaTab_model_Voice.CopyTo = function(src,dst) {
 	dst.Index = src.Index;
 	dst.IsEmpty = src.IsEmpty;
@@ -12536,88 +13202,722 @@ alphaTab_model_Voice.prototype = {
 	}
 	,__class__: alphaTab_model_Voice
 };
-var alphaTab_platform_javaScript_JsWorker = function(main) {
-	this._main = main;
-	this._main.addEventListener("message",$bind(this,this.HandleMessage),false);
-};
-alphaTab_platform_javaScript_JsWorker.__name__ = true;
-alphaTab_platform_javaScript_JsWorker.Init = function() {
-	if(!$global.document) {
-		new alphaTab_platform_javaScript_JsWorker($global);
+var alphaTab_platform_javaScript_JsApi = function(element,options) {
+	var _gthis = this;
+	this._element = null;
+	this._canvasElement = null;
+	this._visibilityCheckerInterval = 0;
+	this._visibilityCheckerIntervalId = 0;
+	this._renderResults = null;
+	this._totalResultCount = 0;
+	this.Settings = null;
+	this.Renderer = null;
+	this.Score = null;
+	this.TrackIndexes = null;
+	this._element = element;
+	this._element.classList.add("alphaTab");
+	var dataAttributes = this.GetDataAttributes();
+	var settings = this.Settings = alphaTab_Settings.FromJson(options,dataAttributes);
+	var autoSize = settings.Width < 0;
+	var tracksData;
+	if(options != null && options.tracks) {
+		tracksData = options.tracks;
+	} else if(dataAttributes.hasOwnProperty("tracks")) {
+		tracksData = dataAttributes["tracks"];
+	} else {
+		tracksData = 0;
+	}
+	this.SetTracks(tracksData,false);
+	var contents = "";
+	if(element != null) {
+		if(dataAttributes.hasOwnProperty("tex") && !(!element.innerText)) {
+			contents = element.innerHTML.Trim();
+			element.innerHTML = "";
+		}
+		this._canvasElement = window.document.createElement("div");
+		this._canvasElement.className = "alphaTabSurface";
+		this._canvasElement.style.fontSize = "0";
+		this._canvasElement.style.overflow = "hidden";
+		this._canvasElement.style.lineHeight = "0";
+		element.appendChild(this._canvasElement);
+		if(settings.Engine == "default" || settings.Engine == "svg") {
+			window.addEventListener("scroll",function() {
+				_gthis.ShowSvgsInViewPort();
+			},true);
+			window.addEventListener("resize",function() {
+				_gthis.ShowSvgsInViewPort();
+			},true);
+		}
+		if(autoSize) {
+			settings.Width = element.offsetWidth;
+			var timeoutId = 0;
+			window.addEventListener("resize",function() {
+				window.clearTimeout(timeoutId);
+				timeoutId = window.setTimeout(function() {
+					if(element.offsetWidth != settings.Width) {
+						_gthis.TriggerResize();
+					}
+				},1);
+			});
+		}
+	}
+	this.CreateStyleElement(settings);
+	if(element != null && autoSize) {
+		var initialResizeEventInfo = new alphaTab_platform_javaScript_ResizeEventArgs();
+		initialResizeEventInfo.OldWidth = 0;
+		initialResizeEventInfo.NewWidth = element.offsetWidth;
+		initialResizeEventInfo.Settings = settings;
+		this.TriggerEvent("resize",initialResizeEventInfo);
+		settings.Width = initialResizeEventInfo.NewWidth;
+	}
+	var workersUnsupported = !window["Worker"];
+	if(settings.UseWebWorker && !workersUnsupported && settings.Engine != "html5") {
+		this.Renderer = new alphaTab_platform_javaScript_WorkerScoreRenderer(this,settings);
+	} else {
+		this.Renderer = new alphaTab_rendering_ScoreRenderer(settings);
+	}
+	this.Renderer.RenderFinished = system__$EventAction1_EventAction1_$Impl_$.add(this.Renderer.RenderFinished,function(o) {
+		_gthis.TriggerEvent("rendered",null);
+	});
+	this.Renderer.PostRenderFinished = system__$EventAction_EventAction_$Impl_$.add(this.Renderer.PostRenderFinished,function() {
+		_gthis._element.classList.remove("loading");
+		_gthis._element.classList.remove("rendering");
+		_gthis.TriggerEvent("postRendered",null);
+	});
+	this.Renderer.PreRender = system__$EventAction1_EventAction1_$Impl_$.add(this.Renderer.PreRender,function(result) {
+		var this1 = [];
+		_gthis._renderResults = this1;
+		_gthis._totalResultCount = 0;
+		_gthis.AppendRenderResult(result);
+	});
+	this.Renderer.PartialRenderFinished = system__$EventAction1_EventAction1_$Impl_$.add(this.Renderer.PartialRenderFinished,$bind(this,this.AppendRenderResult));
+	this.Renderer.RenderFinished = system__$EventAction1_EventAction1_$Impl_$.add(this.Renderer.RenderFinished,function(r) {
+		_gthis.AppendRenderResult(r);
+		_gthis.AppendRenderResult(null);
+	});
+	this.Renderer.Error = system__$EventAction2_EventAction2_$Impl_$.add(this.Renderer.Error,$bind(this,this.Error));
+	var initialRender = function() {
+		if(autoSize) {
+			_gthis.Settings.Width = _gthis._element.offsetWidth;
+			_gthis.Renderer.UpdateSettings(settings);
+		}
+		if(!(contents == null || contents.length == 0)) {
+			_gthis.Tex(contents);
+		} else if(options && options.file) {
+			_gthis.Load(options.file);
+		} else if(dataAttributes.hasOwnProperty("file")) {
+			_gthis.Load(dataAttributes["file"]);
+		}
+	};
+	this._visibilityCheckerInterval = 500;
+	if(options && options.visibilityCheckInterval) {
+		this._visibilityCheckerInterval = options.visibilityCheckInterval;
+	}
+	if(this.get_IsElementVisible()) {
+		initialRender();
+	} else {
+		alphaTab_util_Logger.Warning("Rendering","AlphaTab container is invisible, checking for element visibility in " + this._visibilityCheckerInterval + "ms intervals",null);
+		this._visibilityCheckerIntervalId = window.setInterval(function() {
+			if(_gthis.get_IsElementVisible()) {
+				alphaTab_util_Logger.Info("Rendering","AlphaTab container became visible, triggering initial rendering",null);
+				initialRender();
+				window.clearInterval(_gthis._visibilityCheckerIntervalId);
+				_gthis._visibilityCheckerIntervalId = 0;
+			}
+		},this._visibilityCheckerInterval);
 	}
 };
-alphaTab_platform_javaScript_JsWorker.prototype = {
-	HandleMessage: function(e) {
+alphaTab_platform_javaScript_JsApi.__name__ = ["alphaTab","platform","javaScript","JsApi"];
+alphaTab_platform_javaScript_JsApi.IsElementInViewPort = function(el) {
+	var rect = el.getBoundingClientRect();
+	if(rect.top + rect.height >= 0 && rect.top <= window.innerHeight && rect.left + rect.width >= 0) {
+		return rect.left <= window.innerWidth;
+	} else {
+		return false;
+	}
+};
+alphaTab_platform_javaScript_JsApi.prototype = {
+	get_IsElementVisible: function() {
+		if(!(!(!this._element.offsetWidth) || !(!this._element.offsetHeight))) {
+			return !(!this._element.getClientRects().length);
+		} else {
+			return true;
+		}
+	}
+	,get_Tracks: function() {
+		var tracks = this.TrackIndexesToTracks(this.TrackIndexes);
+		if(tracks.length == 0 && this.Score.Tracks.length > 0) {
+			tracks.push(this.Score.Tracks[0]);
+		}
+		return tracks;
+	}
+	,GetDataAttributes: function() {
+		var this1 = {}
+		var dataAttributes = this1;
+		if(this._element.dataset) {
+			var json = this._element.dataset;
+			var key = HxOverrides.iter(Object.keys(json));
+			while(key.hasNext()) {
+				var key1 = key.next();
+				var value = this._element.dataset[key1];
+				try {
+					var stringValue = value;
+					value = JSON.parse(stringValue);
+				} catch( __e ) {
+					if(value == "") {
+						value = null;
+					}
+				}
+				dataAttributes[key1] = value;
+			}
+		} else {
+			var i = 0;
+			while(i < this._element.attributes.length) {
+				var attr = this._element.attributes.item(i);
+				var nodeName = attr.nodeName;
+				if(StringTools.startsWith(nodeName,"data-")) {
+					var a = HxOverrides.substr(nodeName,5,null);
+					var this2 = system_Convert.ToUInt16(45);
+					var this3 = this2;
+					var keyParts = system__$CsString_CsString_$Impl_$.Split_CharArray(a,[this3]);
+					var key2 = keyParts[0];
+					var j = 1;
+					while(j < keyParts.length) {
+						key2 = key2 + HxOverrides.substr(keyParts[j],0,1).toUpperCase() + HxOverrides.substr(keyParts[j],1,null);
+						++j;
+					}
+					var value1 = attr.nodeValue;
+					try {
+						value1 = JSON.parse(value1);
+					} catch( __e1 ) {
+						if(value1 == "") {
+							value1 = null;
+						}
+					}
+					dataAttributes[key2] = value1;
+				}
+				++i;
+			}
+		}
+		return dataAttributes;
+	}
+	,TriggerResize: function() {
+		if(this.get_IsElementVisible()) {
+			if(this._visibilityCheckerIntervalId != 0) {
+				alphaTab_util_Logger.Info("Rendering","AlphaTab container became visible again, doing autosizing",null);
+				window.clearInterval(this._visibilityCheckerIntervalId);
+				this._visibilityCheckerIntervalId = 0;
+			}
+			var resizeEventInfo = new alphaTab_platform_javaScript_ResizeEventArgs();
+			resizeEventInfo.OldWidth = this.Settings.Width;
+			resizeEventInfo.NewWidth = this._element.offsetWidth;
+			resizeEventInfo.Settings = this.Settings;
+			this.TriggerEvent("resize",resizeEventInfo);
+			this.Settings.Width = resizeEventInfo.NewWidth;
+			this.Renderer.UpdateSettings(this.Settings);
+			this.Renderer.Resize(this._element.offsetWidth);
+		} else if(this._visibilityCheckerIntervalId == 0) {
+			alphaTab_util_Logger.Warning("Rendering","AlphaTab container was invisible while autosizing, checking for element visibility in " + this._visibilityCheckerInterval + "ms intervals",null);
+			this._visibilityCheckerIntervalId = window.setInterval($bind(this,this.TriggerResize),this._visibilityCheckerInterval);
+		}
+	}
+	,ShowSvgsInViewPort: function() {
+		var placeholders = this._canvasElement.querySelectorAll("[data-lazy=true]");
+		var i = 0;
+		while(i < placeholders.length) {
+			var placeholder = placeholders.item(i);
+			if(alphaTab_platform_javaScript_JsApi.IsElementInViewPort(placeholder)) {
+				placeholder.outerHTML = placeholder["svg"];
+			}
+			++i;
+		}
+	}
+	,Print: function(width) {
 		var _gthis = this;
+		var preview = window.open("","","width=0,height=0");
+		var a4 = preview.document.createElement("div");
+		if(!(width == null || width.length == 0)) {
+			a4.style.width = width;
+		} else {
+			a4.style.width = "210mm";
+		}
+		preview.document.write("<!DOCTYPE html><html></head><body></body></html>");
+		preview.document.body.appendChild(a4);
+		var dualScreenLeft;
+		var o = window["ScreenLeft"];
+		if(typeof(o) != "undefined") {
+			dualScreenLeft = window["ScreenLeft"];
+		} else {
+			dualScreenLeft = window.screen.left;
+		}
+		var dualScreenTop;
+		var o1 = window["ScreenTop"];
+		if(typeof(o1) != "undefined") {
+			dualScreenTop = window["ScreenTop"];
+		} else {
+			dualScreenTop = window.screen.top;
+		}
+		var screenWidth;
+		var o2 = window.innerWidth;
+		if(typeof(o2) != "undefined") {
+			screenWidth = window.innerWidth;
+		} else {
+			var o3 = window.document.documentElement.clientWidth;
+			if(typeof(o3) != "undefined") {
+				screenWidth = window.document.documentElement.clientWidth;
+			} else {
+				screenWidth = window.screen.width;
+			}
+		}
+		var screenHeight;
+		var o4 = window.innerHeight;
+		if(typeof(o4) != "undefined") {
+			screenHeight = window.innerHeight;
+		} else {
+			var o5 = window.document.documentElement.clientHeight;
+			if(typeof(o5) != "undefined") {
+				screenHeight = window.document.documentElement.clientHeight;
+			} else {
+				screenHeight = window.screen.height;
+			}
+		}
+		var w = a4.offsetWidth + 50;
+		var h = window.innerHeight;
+		var left = (screenWidth / 2 | 0) - (w / 2 | 0) + dualScreenLeft;
+		var top = (screenHeight / 2 | 0) - (h / 2 | 0) + dualScreenTop;
+		preview.resizeTo(w,h);
+		preview.moveTo(left,top);
+		preview.focus();
+		var settings = alphaTab_Settings.get_Defaults();
+		settings.ScriptFile = this.Settings.ScriptFile;
+		settings.FontDirectory = this.Settings.FontDirectory;
+		settings.Scale = 0.8;
+		settings.StretchForce = 0.8;
+		settings.DisableLazyLoading = true;
+		settings.UseWebWorker = false;
+		var alphaTab1 = new alphaTab_platform_javaScript_JsApi(a4,settings);
+		alphaTab1.Renderer.PostRenderFinished = system__$EventAction_EventAction_$Impl_$.add(alphaTab1.Renderer.PostRenderFinished,function() {
+			_gthis._canvasElement.style.height = "100%";
+			preview.print();
+		});
+		alphaTab1.SetTracks(this.get_Tracks(),true);
+	}
+	,AppendRenderResult: function(result) {
+		var _gthis = this;
+		if(result != null) {
+			this._canvasElement.style.width = Std.string(result.TotalWidth) + "px";
+			this._canvasElement.style.height = Std.string(result.TotalHeight) + "px";
+		}
+		if(result == null || result.RenderResult != null) {
+			this._renderResults.push(result);
+			window.setTimeout(function() {
+				while(_gthis._renderResults.length > 0) {
+					var renderResult = _gthis._renderResults[0];
+					if(true) {
+						_gthis._renderResults.splice(0,1);
+					}
+					if(renderResult == null) {
+						while(_gthis._canvasElement.childElementCount > _gthis._totalResultCount) _gthis._canvasElement.removeChild(_gthis._canvasElement.lastChild);
+					} else {
+						var body = renderResult.RenderResult;
+						if(typeof(body) == "string") {
+							var placeholder;
+							if(_gthis._totalResultCount < _gthis._canvasElement.childElementCount) {
+								placeholder = _gthis._canvasElement.childNodes.item(_gthis._totalResultCount);
+							} else {
+								placeholder = window.document.createElement("div");
+								_gthis._canvasElement.appendChild(placeholder);
+							}
+							placeholder.style.width = Std.string(renderResult.Width) + "px";
+							placeholder.style.height = Std.string(renderResult.Height) + "px";
+							placeholder.style.display = "inline-block";
+							if(alphaTab_platform_javaScript_JsApi.IsElementInViewPort(placeholder) || _gthis.Settings.DisableLazyLoading) {
+								var bodyHtml = body;
+								placeholder.outerHTML = bodyHtml;
+							} else {
+								placeholder["svg"] = body;
+								placeholder.setAttribute("data-lazy","true");
+							}
+						} else if(_gthis._totalResultCount < _gthis._canvasElement.childElementCount) {
+							_gthis._canvasElement.replaceChild(renderResult.RenderResult,_gthis._canvasElement.childNodes.item(_gthis._totalResultCount));
+						} else {
+							_gthis._canvasElement.appendChild(renderResult.RenderResult);
+						}
+						_gthis._totalResultCount++;
+					}
+				}
+			},1);
+		}
+	}
+	,CreateStyleElement: function(settings) {
+		var elementDocument = this._element.ownerDocument;
+		var styleElement = elementDocument.getElementById("alphaTabStyle");
+		if(styleElement == null) {
+			var fontDirectory = settings.FontDirectory;
+			styleElement = elementDocument.createElement("style");
+			styleElement.id = "alphaTabStyle";
+			styleElement.type = "text/css";
+			var this1 = "";
+			var css = this1;
+			css = css + ("@font-face {" + "\r\n");
+			css = css + ("    font-family: 'alphaTab';" + "\r\n");
+			css = css + ("     src: url('" + fontDirectory + "Bravura.eot');" + "\r\n");
+			css = css + ("     src: url('" + fontDirectory + "Bravura.eot?#iefix') format('embedded-opentype')" + "\r\n");
+			css = css + ("          , url('" + fontDirectory + "Bravura.woff') format('woff')" + "\r\n");
+			css = css + ("          , url('" + fontDirectory + "Bravura.otf') format('opentype')" + "\r\n");
+			css = css + ("          , url('" + fontDirectory + "Bravura.svg#Bravura') format('svg');" + "\r\n");
+			css = css + ("     font-weight: normal;" + "\r\n");
+			css = css + ("     font-style: normal;" + "\r\n");
+			css = css + ("}" + "\r\n");
+			css = css + (".alphaTabSurface * {" + "\r\n");
+			css = css + ("    cursor: default;" + "\r\n");
+			css = css + ("}" + "\r\n");
+			css = css + (".at {" + "\r\n");
+			css = css + ("     font-family: 'alphaTab';" + "\r\n");
+			css = css + ("     speak: none;" + "\r\n");
+			css = css + ("     font-style: normal;" + "\r\n");
+			css = css + ("     font-weight: normal;" + "\r\n");
+			css = css + ("     font-variant: normal;" + "\r\n");
+			css = css + ("     text-transform: none;" + "\r\n");
+			css = css + ("     line-height: 1;" + "\r\n");
+			css = css + ("     line-height: 1;" + "\r\n");
+			css = css + ("     -webkit-font-smoothing: antialiased;" + "\r\n");
+			css = css + ("     -moz-osx-font-smoothing: grayscale;" + "\r\n");
+			css = css + ("     font-size: 34px;" + "\r\n");
+			css = css + ("     overflow: visible !important;" + "\r\n");
+			css = css + ("}" + "\r\n");
+			styleElement.innerHTML = css;
+			elementDocument.getElementsByTagName("head").item(0).appendChild(styleElement);
+		}
+	}
+	,Destroy: function() {
+		this._element.innerHTML = "";
+		this.Renderer.Destroy();
+	}
+	,Load: function(data) {
+		var _gthis = this;
+		this._element.classList.add("loading");
+		try {
+			if((data instanceof ArrayBuffer)) {
+				this.ScoreLoaded(alphaTab_importer_ScoreLoader.LoadScoreFromBytes(new Uint8Array(data)),true);
+			} else if((data instanceof Uint8Array)) {
+				this.ScoreLoaded(alphaTab_importer_ScoreLoader.LoadScoreFromBytes(data),true);
+			} else if(typeof(data) == "string") {
+				alphaTab_importer_ScoreLoader.LoadScoreAsync(data,function(s) {
+					_gthis.ScoreLoaded(s,true);
+				},function(e) {
+					_gthis.Error("import",e);
+				});
+			}
+		} catch( e1 ) {
+			if (e1 instanceof js__$Boot_HaxeError) e1 = e1.val;
+			if( js_Boot.__instanceof(e1,system_Exception) ) {
+				this.Error("import",e1);
+			} else throw(e1);
+		}
+	}
+	,Tex: function(contents) {
+		this._element.classList.add("loading");
+		try {
+			var parser = new alphaTab_importer_AlphaTexImporter();
+			var data = alphaTab_io_ByteBuffer.FromBuffer(alphaTab_platform_Platform.StringToByteArray(contents));
+			parser.Init(data);
+			this.ScoreLoaded(parser.ReadScore(),true);
+		} catch( e ) {
+			if (e instanceof js__$Boot_HaxeError) e = e.val;
+			if( js_Boot.__instanceof(e,system_Exception) ) {
+				this.Error("import",e);
+			} else throw(e);
+		}
+	}
+	,SetTracks: function(tracksData,render) {
+		if(render == null) {
+			render = true;
+		}
+		var tmp;
+		if(tracksData.length) {
+			var o = tracksData[0].Index;
+			tmp = typeof(o) == "number";
+		} else {
+			tmp = false;
+		}
+		if(tmp) {
+			this.Score = tracksData[0].Score;
+		} else {
+			var o1 = tracksData.Index;
+			if(typeof(o1) == "number") {
+				this.Score = tracksData.Score;
+			}
+		}
+		this.TrackIndexes = this.ParseTracks(tracksData);
+		if(render) {
+			this.Render();
+		}
+	}
+	,TrackIndexesToTracks: function(trackIndexes) {
+		var this1 = [];
+		var tracks = this1;
+		var track = HxOverrides.iter(trackIndexes);
+		while(track.hasNext()) {
+			var track1 = track.next();
+			if(track1 >= 0 && track1 < this.Score.Tracks.length) {
+				tracks.push(this.Score.Tracks[track1]);
+			}
+		}
+		return tracks;
+	}
+	,ParseTracks: function(tracksData) {
+		var this1 = [];
+		var tracks = this1;
+		if(typeof(tracksData) == "string") {
+			try {
+				tracksData = JSON.parse(tracksData.As());
+			} catch( __e ) {
+				tracksData = [0];
+			}
+		}
+		if(typeof(tracksData) == "number") {
+			tracks.push(tracksData);
+		} else if(tracksData.length) {
+			var i = 0;
+			while(i < tracksData.length) {
+				var value;
+				if(typeof(tracksData[i]) == "number") {
+					value = tracksData[i];
+				} else {
+					var o = tracksData[i].Index;
+					if(typeof(o) == "number") {
+						var track = tracksData[i];
+						value = track.Index;
+					} else {
+						value = alphaTab_platform_Platform.ParseInt(tracksData[i].ToString());
+					}
+				}
+				if(value >= 0) {
+					tracks.push(value);
+				}
+				++i;
+			}
+		} else {
+			var o1 = tracksData.Index;
+			if(typeof(o1) == "number") {
+				tracks.push(tracksData.Index.As());
+			}
+		}
+		return tracks;
+	}
+	,ScoreLoaded: function(score,render) {
+		if(render == null) {
+			render = true;
+		}
+		alphaTab_model_ModelUtils.ApplyPitchOffsets(this.Settings,score);
+		this.Score = score;
+		this.TriggerEvent("loaded",score);
+		if(render) {
+			this.Render();
+		}
+	}
+	,Error: function(type,details) {
+		alphaTab_util_Logger.Error(type,"An unexpected error occurred",details);
+		this.TriggerEvent("error",{ type : type, details : details});
+	}
+	,TriggerEvent: function(name,details) {
+		if(this._element != null) {
+			name = "alphaTab." + name;
+			var e = window.document.createEvent("CustomEvent");
+			e.initCustomEvent(name,false,false,details);
+			this._element.dispatchEvent(e);
+			var json = window;
+			if((json && "jQuery" in json)) {
+				var jquery = window["jQuery"];
+				jquery(this._element).trigger(name,details);
+			}
+		}
+	}
+	,Render: function() {
+		var _gthis = this;
+		if(this.Renderer == null) {
+			return;
+		}
+		var renderAction = null;
+		renderAction = function() {
+			if(!alphaTab_Environment.IsFontLoaded) {
+				window.setTimeout(function() {
+					renderAction();
+				},1000);
+			} else {
+				_gthis.Renderer.Render(_gthis.Score,_gthis.TrackIndexes);
+			}
+		};
+		renderAction();
+	}
+	,UpdateLayout: function(json) {
+		this.Settings.Layout = alphaTab_Settings.LayoutFromJson(json);
+		this.Renderer.UpdateSettings(this.Settings);
+		this.Renderer.Invalidate();
+	}
+	,__class__: alphaTab_platform_javaScript_JsApi
+};
+var alphaTab_platform_javaScript_ResizeEventArgs = function() {
+};
+alphaTab_platform_javaScript_ResizeEventArgs.__name__ = ["alphaTab","platform","javaScript","ResizeEventArgs"];
+alphaTab_platform_javaScript_ResizeEventArgs.prototype = {
+	__class__: alphaTab_platform_javaScript_ResizeEventArgs
+};
+var alphaTab_rendering_IScoreRenderer = function() { };
+alphaTab_rendering_IScoreRenderer.__name__ = ["alphaTab","rendering","IScoreRenderer"];
+alphaTab_rendering_IScoreRenderer.prototype = {
+	__class__: alphaTab_rendering_IScoreRenderer
+};
+var alphaTab_platform_javaScript_WorkerScoreRenderer = function(api,settings) {
+	this._api = null;
+	this._worker = null;
+	this._api = api;
+	try {
+		this._worker = new Worker(settings.ScriptFile);
+	} catch( __e ) {
+		try {
+			var script = "importScripts('" + settings.ScriptFile + "')";
+			var blob = new Blob([script]);
+			this._worker = new Worker(URL.createObjectURL(blob));
+		} catch( e ) {
+			if (e instanceof js__$Boot_HaxeError) e = e.val;
+			if( js_Boot.__instanceof(e,system_Exception) ) {
+				alphaTab_util_Logger.Error("Rendering","Failed to create WebWorker: " + Std.string(e),null);
+			} else throw(e);
+		}
+	}
+	this._worker.postMessage({ cmd : "alphaTab.initialize", settings : settings.ToJson()});
+	this._worker.addEventListener("message",$bind(this,this.HandleWorkerMessage));
+};
+alphaTab_platform_javaScript_WorkerScoreRenderer.__name__ = ["alphaTab","platform","javaScript","WorkerScoreRenderer"];
+alphaTab_platform_javaScript_WorkerScoreRenderer.__interfaces__ = [alphaTab_rendering_IScoreRenderer];
+alphaTab_platform_javaScript_WorkerScoreRenderer.prototype = {
+	get_BoundsLookup: function() {
+		return this.__BoundsLookup;
+	}
+	,set_BoundsLookup: function(value) {
+		return this.__BoundsLookup = value;
+	}
+	,Destroy: function() {
+		this._worker.terminate();
+	}
+	,UpdateSettings: function(settings) {
+		this._worker.postMessage({ cmd : "alphaTab.updateSettings", settings : settings.ToJson()});
+	}
+	,Invalidate: function() {
+		this._worker.postMessage({ cmd : "alphaTab.invalidate"});
+	}
+	,Resize: function(width) {
+		this._worker.postMessage({ cmd : "alphaTab.resize", width : width});
+	}
+	,HandleWorkerMessage: function(e) {
 		var data = (js_Boot.__cast(e , MessageEvent)).data;
-		var cmd = data ? data.cmd : "";
+		var cmd = data.cmd;
 		switch(cmd) {
-		case "alphaTab.initialize":
-			var settings = alphaTab_Settings.FromJson(data.settings,null);
-			this._renderer = new alphaTab_rendering_ScoreRenderer(settings);
-			this._renderer.PartialRenderFinished = system__$EventAction1_EventAction1_$Impl_$.add(this._renderer.PartialRenderFinished,function(result) {
-				_gthis._main.postMessage({ cmd : "alphaTab.partialRenderFinished", result : result});
-			});
-			this._renderer.RenderFinished = system__$EventAction1_EventAction1_$Impl_$.add(this._renderer.RenderFinished,function(result1) {
-				_gthis._main.postMessage({ cmd : "alphaTab.renderFinished", result : result1});
-			});
-			this._renderer.PostRenderFinished = system__$EventAction_EventAction_$Impl_$.add(this._renderer.PostRenderFinished,function() {
-				_gthis._main.postMessage({ cmd : "alphaTab.postRenderFinished", boundsLookup : _gthis._renderer.get_BoundsLookup().ToJson()});
-			});
-			this._renderer.PreRender = system__$EventAction1_EventAction1_$Impl_$.add(this._renderer.PreRender,function(result2) {
-				_gthis._main.postMessage({ cmd : "alphaTab.preRender", result : result2});
-			});
-			this._renderer.Error = system__$EventAction2_EventAction2_$Impl_$.add(this._renderer.Error,$bind(this,this.Error));
+		case "alphaTab.error":
+			this.OnError(data.type,data.detail);
 			break;
-		case "alphaTab.invalidate":
-			this._renderer.Invalidate();
+		case "alphaTab.partialRenderFinished":
+			this.OnPartialRenderFinished(data.result);
 			break;
-		case "alphaTab.render":
-			var converter = new alphaTab_model_JsonConverter();
-			var score = converter.JsObjectToScore(data.score);
-			this.RenderMultiple(score,data.trackIndexes);
+		case "alphaTab.postRenderFinished":
+			this.set_BoundsLookup(alphaTab_rendering_utils_BoundsLookup.FromJson(data.boundsLookup,this._api.Score));
+			this.OnPostRenderFinished();
 			break;
-		case "alphaTab.resize":
-			this._renderer.Resize(data.width);
+		case "alphaTab.preRender":
+			this.OnPreRender(data.result);
 			break;
-		case "alphaTab.updateSettings":
-			this.UpdateSettings(data.settings);
+		case "alphaTab.renderFinished":
+			this.OnRenderFinished(data.result);
 			break;
 		default:
 		}
 	}
-	,UpdateSettings: function(settings) {
-		this._renderer.UpdateSettings(alphaTab_Settings.FromJson(settings,null));
+	,Render: function(score,trackIndexes) {
+		var converter = new alphaTab_model_JsonConverter();
+		score = converter.ScoreToJsObject(score);
+		this._worker.postMessage({ cmd : "alphaTab.render", score : score, trackIndexes : trackIndexes});
 	}
-	,RenderMultiple: function(score,trackIndexes) {
-		try {
-			this._renderer.Render(score,trackIndexes);
-		} catch( e ) {
-			if (e instanceof js__$Boot_HaxeError) e = e.val;
-			if( js_Boot.__instanceof(e,system_Exception) ) {
-				this.Error("render",e);
-			} else throw(e);
+	,add_PreRender: function(value) {
+		return this.PreRender = system__$EventAction1_EventAction1_$Impl_$.add(this.PreRender,value);
+	}
+	,remove_PreRender: function(value) {
+		return this.PreRender = system__$EventAction1_EventAction1_$Impl_$.sub(this.PreRender,value);
+	}
+	,OnPreRender: function(obj) {
+		var _e = this.PreRender;
+		var handler = function(p) {
+			system__$EventAction1_EventAction1_$Impl_$.Invoke(_e,p);
+		};
+		if(handler != null) {
+			handler(obj);
 		}
 	}
-	,Error: function(type,e) {
-		alphaTab_util_Logger.Error(type,"An unexpected error occurred in worker",e);
-		var error = JSON.parse(JSON.stringify(e));
-		var e2 = e;
-		if(e2.message) {
-			error.message = e2.message;
-		}
-		if(e2.stack) {
-			error.stack = e2.stack;
-		}
-		if(e2.constructor && e2.constructor.name) {
-			error.type = e2.constructor.name;
-		}
-		this._main.postMessage({ cmd : "alphaTab.error", error : { type : type, detail : error}});
+	,add_PartialRenderFinished: function(value) {
+		return this.PartialRenderFinished = system__$EventAction1_EventAction1_$Impl_$.add(this.PartialRenderFinished,value);
 	}
-	,__class__: alphaTab_platform_javaScript_JsWorker
+	,remove_PartialRenderFinished: function(value) {
+		return this.PartialRenderFinished = system__$EventAction1_EventAction1_$Impl_$.sub(this.PartialRenderFinished,value);
+	}
+	,OnPartialRenderFinished: function(obj) {
+		var _e = this.PartialRenderFinished;
+		var handler = function(p) {
+			system__$EventAction1_EventAction1_$Impl_$.Invoke(_e,p);
+		};
+		if(handler != null) {
+			handler(obj);
+		}
+	}
+	,add_RenderFinished: function(value) {
+		return this.RenderFinished = system__$EventAction1_EventAction1_$Impl_$.add(this.RenderFinished,value);
+	}
+	,remove_RenderFinished: function(value) {
+		return this.RenderFinished = system__$EventAction1_EventAction1_$Impl_$.sub(this.RenderFinished,value);
+	}
+	,OnRenderFinished: function(obj) {
+		var _e = this.RenderFinished;
+		var handler = function(p) {
+			system__$EventAction1_EventAction1_$Impl_$.Invoke(_e,p);
+		};
+		if(handler != null) {
+			handler(obj);
+		}
+	}
+	,add_Error: function(value) {
+		return this.Error = system__$EventAction2_EventAction2_$Impl_$.add(this.Error,value);
+	}
+	,remove_Error: function(value) {
+		return this.Error = system__$EventAction2_EventAction2_$Impl_$.sub(this.Error,value);
+	}
+	,OnError: function(type,details) {
+		var _e = this.Error;
+		var handler = function(p1,p2) {
+			system__$EventAction2_EventAction2_$Impl_$.Invoke(_e,p1,p2);
+		};
+		if(handler != null) {
+			handler(type,details);
+		}
+	}
+	,add_PostRenderFinished: function(value) {
+		return this.PostRenderFinished = system__$EventAction_EventAction_$Impl_$.add(this.PostRenderFinished,value);
+	}
+	,remove_PostRenderFinished: function(value) {
+		return this.PostRenderFinished = system__$EventAction_EventAction_$Impl_$.sub(this.PostRenderFinished,value);
+	}
+	,OnPostRenderFinished: function() {
+		var _e = this.PostRenderFinished;
+		var handler = function() {
+			system__$EventAction_EventAction_$Impl_$.Invoke(_e);
+		};
+		if(handler != null) {
+			handler();
+		}
+	}
+	,__class__: alphaTab_platform_javaScript_WorkerScoreRenderer
 };
 var alphaTab_platform_model__$FontStyle_FontStyle_$Impl_$ = {};
-alphaTab_platform_model__$FontStyle_FontStyle_$Impl_$.__name__ = true;
+alphaTab_platform_model__$FontStyle_FontStyle_$Impl_$.__name__ = ["alphaTab","platform","model","_FontStyle","FontStyle_Impl_"];
 alphaTab_platform_model__$FontStyle_FontStyle_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -12667,7 +13967,7 @@ alphaTab_platform_model__$FontStyle_FontStyle_$Impl_$.toString = function(this1)
 	return "";
 };
 var alphaTab_platform_model__$TextAlign_TextAlign_$Impl_$ = {};
-alphaTab_platform_model__$TextAlign_TextAlign_$Impl_$.__name__ = true;
+alphaTab_platform_model__$TextAlign_TextAlign_$Impl_$.__name__ = ["alphaTab","platform","model","_TextAlign","TextAlign_Impl_"];
 alphaTab_platform_model__$TextAlign_TextAlign_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -12717,7 +14017,7 @@ alphaTab_platform_model__$TextAlign_TextAlign_$Impl_$.toString = function(this1)
 	return "";
 };
 var alphaTab_platform_model__$TextBaseline_TextBaseline_$Impl_$ = {};
-alphaTab_platform_model__$TextBaseline_TextBaseline_$Impl_$.__name__ = true;
+alphaTab_platform_model__$TextBaseline_TextBaseline_$Impl_$.__name__ = ["alphaTab","platform","model","_TextBaseline","TextBaseline_Impl_"];
 alphaTab_platform_model__$TextBaseline_TextBaseline_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -12768,7 +14068,7 @@ alphaTab_platform_model__$TextBaseline_TextBaseline_$Impl_$.toString = function(
 };
 var alphaTab_platform_svg_FontSizes = function() {
 };
-alphaTab_platform_svg_FontSizes.__name__ = true;
+alphaTab_platform_svg_FontSizes.__name__ = ["alphaTab","platform","svg","FontSizes"];
 alphaTab_platform_svg_FontSizes.MeasureString = function(s,f,size,style) {
 	var data;
 	var dataSize;
@@ -12806,7 +14106,7 @@ alphaTab_platform_svg_FontSizes.prototype = {
 	__class__: alphaTab_platform_svg_FontSizes
 };
 var alphaTab_platform_svg__$SupportedFonts_SupportedFonts_$Impl_$ = {};
-alphaTab_platform_svg__$SupportedFonts_SupportedFonts_$Impl_$.__name__ = true;
+alphaTab_platform_svg__$SupportedFonts_SupportedFonts_$Impl_$.__name__ = ["alphaTab","platform","svg","_SupportedFonts","SupportedFonts_Impl_"];
 alphaTab_platform_svg__$SupportedFonts_SupportedFonts_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -12854,11 +14154,32 @@ alphaTab_platform_svg__$SupportedFonts_SupportedFonts_$Impl_$.toString = functio
 	return "";
 };
 var alphaTab_rendering_BarRendererBase = function(renderer,bar) {
+	this._preBeatGlyphs = null;
+	this._voiceContainers = null;
+	this._postBeatGlyphs = null;
+	this.Staff = null;
+	this.X = 0.0;
+	this.Y = 0.0;
+	this.Width = 0.0;
+	this.Height = 0.0;
+	this.Index = 0;
+	this.TopOverflow = 0.0;
+	this.BottomOverflow = 0.0;
+	this.Helpers = null;
+	this.Bar = null;
+	this.IsLinkedToPrevious = false;
+	this.ScoreRenderer = null;
+	this._wasFirstOfLine = false;
+	this.LayoutingInfo = null;
+	this._appliedLayoutingInfo = 0;
+	this.IsFinalized = false;
+	this.TopPadding = 0.0;
+	this.BottomPadding = 0.0;
 	this.Bar = bar;
 	this.ScoreRenderer = renderer;
 	this.Helpers = new alphaTab_rendering_utils_BarHelpers(bar);
 };
-alphaTab_rendering_BarRendererBase.__name__ = true;
+alphaTab_rendering_BarRendererBase.__name__ = ["alphaTab","rendering","BarRendererBase"];
 alphaTab_rendering_BarRendererBase.prototype = {
 	get_NextRenderer: function() {
 		if(this.Bar.NextBar == null) {
@@ -13127,7 +14448,7 @@ alphaTab_rendering_BarRendererBase.prototype = {
 	,__class__: alphaTab_rendering_BarRendererBase
 };
 var alphaTab_rendering__$BeatXPosition_BeatXPosition_$Impl_$ = {};
-alphaTab_rendering__$BeatXPosition_BeatXPosition_$Impl_$.__name__ = true;
+alphaTab_rendering__$BeatXPosition_BeatXPosition_$Impl_$.__name__ = ["alphaTab","rendering","_BeatXPosition","BeatXPosition_Impl_"];
 alphaTab_rendering__$BeatXPosition_BeatXPosition_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -13179,10 +14500,14 @@ alphaTab_rendering__$BeatXPosition_BeatXPosition_$Impl_$.toString = function(thi
 	return "";
 };
 var alphaTab_rendering_glyphs_Glyph = function(x,y) {
+	this.X = 0.0;
+	this.Y = 0.0;
+	this.Width = 0.0;
+	this.Renderer = null;
 	this.X = x;
 	this.Y = y;
 };
-alphaTab_rendering_glyphs_Glyph.__name__ = true;
+alphaTab_rendering_glyphs_Glyph.__name__ = ["alphaTab","rendering","glyphs","Glyph"];
 alphaTab_rendering_glyphs_Glyph.prototype = {
 	get_Scale: function() {
 		return this.Renderer.get_Scale();
@@ -13195,6 +14520,15 @@ alphaTab_rendering_glyphs_Glyph.prototype = {
 };
 var alphaTab_rendering_EffectBand = function(info) {
 	alphaTab_rendering_glyphs_Glyph.call(this,0,0);
+	this._uniqueEffectGlyphs = null;
+	this._effectGlyphs = null;
+	this.IsEmpty = false;
+	this.PreviousBand = null;
+	this.IsLinkedToPrevious = false;
+	this.FirstBeat = null;
+	this.LastBeat = null;
+	this.Height = 0.0;
+	this.Info = null;
 	this.Info = info;
 	var this1 = [];
 	this._uniqueEffectGlyphs = this1;
@@ -13202,7 +14536,7 @@ var alphaTab_rendering_EffectBand = function(info) {
 	this._effectGlyphs = this2;
 	this.IsEmpty = true;
 };
-alphaTab_rendering_EffectBand.__name__ = true;
+alphaTab_rendering_EffectBand.__name__ = ["alphaTab","rendering","EffectBand"];
 alphaTab_rendering_EffectBand.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_EffectBand.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	DoLayout: function() {
@@ -13334,12 +14668,14 @@ alphaTab_rendering_EffectBand.prototype = $extend(alphaTab_rendering_glyphs_Glyp
 	,__class__: alphaTab_rendering_EffectBand
 });
 var alphaTab_rendering_EffectBandSizingInfo = function() {
+	this._effectSlot = null;
+	this.Slots = null;
 	var this1 = [];
 	this.Slots = this1;
 	var this2 = {}
 	this._effectSlot = this2;
 };
-alphaTab_rendering_EffectBandSizingInfo.__name__ = true;
+alphaTab_rendering_EffectBandSizingInfo.__name__ = ["alphaTab","rendering","EffectBandSizingInfo"];
 alphaTab_rendering_EffectBandSizingInfo.prototype = {
 	GetOrCreateSlot: function(band) {
 		var this1 = this._effectSlot;
@@ -13385,10 +14721,16 @@ alphaTab_rendering_EffectBandSizingInfo.prototype = {
 	,__class__: alphaTab_rendering_EffectBandSizingInfo
 };
 var alphaTab_rendering_EffectBandSlot = function() {
+	this.Y = 0.0;
+	this.Height = 0.0;
+	this.FirstBeat = null;
+	this.LastBeat = null;
+	this.Bands = null;
+	this.UniqueEffectId = null;
 	var this1 = [];
 	this.Bands = this1;
 };
-alphaTab_rendering_EffectBandSlot.__name__ = true;
+alphaTab_rendering_EffectBandSlot.__name__ = ["alphaTab","rendering","EffectBandSlot"];
 alphaTab_rendering_EffectBandSlot.prototype = {
 	Update: function(effectBand) {
 		if(!effectBand.Info.get_CanShareBand()) {
@@ -13419,7 +14761,7 @@ alphaTab_rendering_EffectBandSlot.prototype = {
 	,__class__: alphaTab_rendering_EffectBandSlot
 };
 var alphaTab_rendering__$EffectBarGlyphSizing_EffectBarGlyphSizing_$Impl_$ = {};
-alphaTab_rendering__$EffectBarGlyphSizing_EffectBarGlyphSizing_$Impl_$.__name__ = true;
+alphaTab_rendering__$EffectBarGlyphSizing_EffectBarGlyphSizing_$Impl_$.__name__ = ["alphaTab","rendering","_EffectBarGlyphSizing","EffectBarGlyphSizing_Impl_"];
 alphaTab_rendering__$EffectBarGlyphSizing_EffectBarGlyphSizing_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -13474,9 +14816,13 @@ alphaTab_rendering__$EffectBarGlyphSizing_EffectBarGlyphSizing_$Impl_$.toString 
 };
 var alphaTab_rendering_EffectBarRenderer = function(renderer,bar,infos) {
 	alphaTab_rendering_BarRendererBase.call(this,renderer,bar);
+	this._infos = null;
+	this._bands = null;
+	this.BandLookup = null;
+	this.SizingInfo = null;
 	this._infos = infos;
 };
-alphaTab_rendering_EffectBarRenderer.__name__ = true;
+alphaTab_rendering_EffectBarRenderer.__name__ = ["alphaTab","rendering","EffectBarRenderer"];
 alphaTab_rendering_EffectBarRenderer.__super__ = alphaTab_rendering_BarRendererBase;
 alphaTab_rendering_EffectBarRenderer.prototype = $extend(alphaTab_rendering_BarRendererBase.prototype,{
 	UpdateSizes: function() {
@@ -13535,9 +14881,11 @@ alphaTab_rendering_EffectBarRenderer.prototype = $extend(alphaTab_rendering_BarR
 		}
 	}
 	,CreateBeatGlyphs: function() {
-		this._bands = system__$FixedArray_FixedArray_$Impl_$._new(this._infos.length);
-		var this1 = {}
-		this.BandLookup = this1;
+		var size = this._infos.length;
+		var this1 = new Array(size);
+		this._bands = this1;
+		var this2 = {}
+		this.BandLookup = this2;
 		var i = 0;
 		while(i < this._infos.length) {
 			this._bands[i] = new alphaTab_rendering_EffectBand(this._infos[i]);
@@ -13587,21 +14935,33 @@ alphaTab_rendering_EffectBarRenderer.prototype = $extend(alphaTab_rendering_BarR
 	}
 	,__class__: alphaTab_rendering_EffectBarRenderer
 });
-var alphaTab_rendering_IScoreRenderer = function() { };
-alphaTab_rendering_IScoreRenderer.__name__ = true;
-alphaTab_rendering_IScoreRenderer.prototype = {
-	__class__: alphaTab_rendering_IScoreRenderer
-};
 var alphaTab_rendering_RenderFinishedEventArgs = function() {
 };
-alphaTab_rendering_RenderFinishedEventArgs.__name__ = true;
+alphaTab_rendering_RenderFinishedEventArgs.__name__ = ["alphaTab","rendering","RenderFinishedEventArgs"];
 alphaTab_rendering_RenderFinishedEventArgs.prototype = {
 	__class__: alphaTab_rendering_RenderFinishedEventArgs
 };
 var alphaTab_rendering_RenderingResources = function(scale) {
+	this.CopyrightFont = null;
+	this.TitleFont = null;
+	this.SubTitleFont = null;
+	this.WordsFont = null;
+	this.EffectFont = null;
+	this.TablatureFont = null;
+	this.GraceFont = null;
+	this.StaveLineColor = null;
+	this.BarSeperatorColor = null;
+	this.BarNumberFont = null;
+	this.BarNumberColor = null;
+	this.MarkerFont = null;
+	this.TabClefFont = null;
+	this.MainGlyphColor = null;
+	this.SecondaryGlyphColor = null;
+	this.Scale = 0.0;
+	this.ScoreInfoColor = null;
 	this.Init(scale);
 };
-alphaTab_rendering_RenderingResources.__name__ = true;
+alphaTab_rendering_RenderingResources.__name__ = ["alphaTab","rendering","RenderingResources"];
 alphaTab_rendering_RenderingResources.prototype = {
 	Init: function(scale) {
 		this.Scale = scale;
@@ -13627,15 +14987,17 @@ alphaTab_rendering_RenderingResources.prototype = {
 	,__class__: alphaTab_rendering_RenderingResources
 };
 var alphaTab_rendering_utils_IBeamYCalculator = function() { };
-alphaTab_rendering_utils_IBeamYCalculator.__name__ = true;
+alphaTab_rendering_utils_IBeamYCalculator.__name__ = ["alphaTab","rendering","utils","IBeamYCalculator"];
 alphaTab_rendering_utils_IBeamYCalculator.prototype = {
 	__class__: alphaTab_rendering_utils_IBeamYCalculator
 };
 var alphaTab_rendering_ScoreBarRenderer = function(renderer,bar) {
 	alphaTab_rendering_BarRendererBase.call(this,renderer,bar);
+	this.AccidentalHelper = null;
+	this._startSpacing = false;
 	this.AccidentalHelper = new alphaTab_rendering_utils_AccidentalHelper();
 };
-alphaTab_rendering_ScoreBarRenderer.__name__ = true;
+alphaTab_rendering_ScoreBarRenderer.__name__ = ["alphaTab","rendering","ScoreBarRenderer"];
 alphaTab_rendering_ScoreBarRenderer.__interfaces__ = [alphaTab_rendering_utils_IBeamYCalculator];
 alphaTab_rendering_ScoreBarRenderer.PaintSingleBar = function(canvas,x1,y1,x2,y2,size) {
 	canvas.BeginPath();
@@ -13784,21 +15146,9 @@ alphaTab_rendering_ScoreBarRenderer.prototype = $extend(alphaTab_rendering_BarRe
 				var beat = h.Beats[i];
 				var beamingHelper = this.Helpers.BeamHelperLookup[h.VoiceIndex][beat.Index];
 				if(beamingHelper == null) {
-					continue;
+					++i;
 				}
-				var direction = beamingHelper.Direction;
-				var tupletX = beamingHelper.GetBeatLineX(beat) + this.get_Scale();
-				var tupletY = cy + this.Y + this.CalculateBeamY(beamingHelper,tupletX);
-				var offset;
-				if(direction == 0) {
-					var this1 = 1.8;
-					offset = res.EffectFont.Size * this1;
-				} else {
-					offset = -3 * this.get_Scale();
-				}
-				canvas.set_Font(res.EffectFont);
-				canvas.FillText(Std.string(h.Tuplet),cx + this.X + tupletX,tupletY - offset);
-				++i;
+				continue;
 			}
 		} else {
 			var firstBeat = h.Beats[0];
@@ -13806,7 +15156,7 @@ alphaTab_rendering_ScoreBarRenderer.prototype = $extend(alphaTab_rendering_BarRe
 			var firstBeamingHelper = this.Helpers.BeamHelperLookup[h.VoiceIndex][firstBeat.Index];
 			var lastBeamingHelper = this.Helpers.BeamHelperLookup[h.VoiceIndex][lastBeat.Index];
 			if(firstBeamingHelper != null && lastBeamingHelper != null) {
-				var direction1 = firstBeamingHelper.Direction;
+				var direction = firstBeamingHelper.Direction;
 				var startX = firstBeamingHelper.GetBeatLineX(firstBeat) + this.get_Scale();
 				var endX = lastBeamingHelper.GetBeatLineX(lastBeat) + this.get_Scale();
 				canvas.set_Font(res.EffectFont);
@@ -13823,35 +15173,35 @@ alphaTab_rendering_ScoreBarRenderer.prototype = $extend(alphaTab_rendering_BarRe
 				var offset1Y = k * offset1X + d;
 				var middleY = k * middleX + d;
 				var offset2Y = k * offset2X + d;
-				var offset1 = 10 * this.get_Scale();
+				var offset = 10 * this.get_Scale();
 				var size = 5 * this.get_Scale();
-				if(direction1 == 1) {
-					offset1 = offset1 * -1;
+				if(direction == 1) {
+					offset = offset * -1;
 					size = size * -1;
 				}
 				canvas.BeginPath();
 				var tmp = cx + this.X + startX;
-				var this2 = system_Convert.ToInt32_Single(cy + this.Y + startY - offset1);
-				canvas.MoveTo(tmp,this2);
+				var this1 = system_Convert.ToInt32_Single(cy + this.Y + startY - offset);
+				canvas.MoveTo(tmp,this1);
 				var tmp1 = cx + this.X + startX;
-				var this3 = system_Convert.ToInt32_Single(cy + this.Y + startY - offset1 - size);
-				canvas.LineTo(tmp1,this3);
+				var this2 = system_Convert.ToInt32_Single(cy + this.Y + startY - offset - size);
+				canvas.LineTo(tmp1,this2);
 				var tmp2 = cx + this.X + offset1X;
-				var this4 = system_Convert.ToInt32_Single(cy + this.Y + offset1Y - offset1 - size);
-				canvas.LineTo(tmp2,this4);
+				var this3 = system_Convert.ToInt32_Single(cy + this.Y + offset1Y - offset - size);
+				canvas.LineTo(tmp2,this3);
 				canvas.Stroke();
 				canvas.BeginPath();
 				var tmp3 = cx + this.X + offset2X;
-				var this5 = system_Convert.ToInt32_Single(cy + this.Y + offset2Y - offset1 - size);
-				canvas.MoveTo(tmp3,this5);
+				var this4 = system_Convert.ToInt32_Single(cy + this.Y + offset2Y - offset - size);
+				canvas.MoveTo(tmp3,this4);
 				var tmp4 = cx + this.X + endX;
-				var this6 = system_Convert.ToInt32_Single(cy + this.Y + endY - offset1 - size);
-				canvas.LineTo(tmp4,this6);
+				var this5 = system_Convert.ToInt32_Single(cy + this.Y + endY - offset - size);
+				canvas.LineTo(tmp4,this5);
 				var tmp5 = cx + this.X + endX;
-				var this7 = system_Convert.ToInt32_Single(cy + this.Y + endY - offset1);
-				canvas.LineTo(tmp5,this7);
+				var this6 = system_Convert.ToInt32_Single(cy + this.Y + endY - offset);
+				canvas.LineTo(tmp5,this6);
 				canvas.Stroke();
-				canvas.FillText(s,cx + this.X + middleX,cy + this.Y + middleY - offset1 - size - res.EffectFont.Size);
+				canvas.FillText(s,cx + this.X + middleX,cy + this.Y + middleY - offset - size - res.EffectFont.Size);
 			}
 		}
 		canvas.set_TextAlign(oldAlign);
@@ -14008,6 +15358,7 @@ alphaTab_rendering_ScoreBarRenderer.prototype = $extend(alphaTab_rendering_BarRe
 						barStartX = beatLineX;
 						barEndX = barStartX + brokenBarOffset;
 					} else {
+						++barIndex;
 						continue;
 					}
 					barStartY = barY + this.CalculateBeamY(h,barStartX) * scaleMod;
@@ -14102,6 +15453,7 @@ alphaTab_rendering_ScoreBarRenderer.prototype = $extend(alphaTab_rendering_BarRe
 				text = this.FingerToString(beat,note.RightHandFinger,false);
 			}
 			if(text == null) {
+				++n;
 				continue;
 			}
 			canvas.FillText(text,beatLineX,topY);
@@ -14347,12 +15699,19 @@ alphaTab_rendering_ScoreBarRenderer.prototype = $extend(alphaTab_rendering_BarRe
 });
 var alphaTab_rendering_glyphs_BeatContainerGlyph = function(beat,voiceContainer) {
 	alphaTab_rendering_glyphs_Glyph.call(this,0,0);
+	this.VoiceContainer = null;
+	this.Beat = null;
+	this.PreNotes = null;
+	this.OnNotes = null;
+	this.Ties = null;
+	this.MinWidth = 0.0;
+	this.OnTimeX = 0.0;
 	this.Beat = beat;
 	var this1 = [];
 	this.Ties = this1;
 	this.VoiceContainer = voiceContainer;
 };
-alphaTab_rendering_glyphs_BeatContainerGlyph.__name__ = true;
+alphaTab_rendering_glyphs_BeatContainerGlyph.__name__ = ["alphaTab","rendering","glyphs","BeatContainerGlyph"];
 alphaTab_rendering_glyphs_BeatContainerGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_BeatContainerGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	RegisterLayoutingInfo: function(layoutings) {
@@ -14433,7 +15792,7 @@ alphaTab_rendering_glyphs_BeatContainerGlyph.prototype = $extend(alphaTab_render
 var alphaTab_rendering_ScoreBeatContainerGlyph = function(beat,voiceContainer) {
 	alphaTab_rendering_glyphs_BeatContainerGlyph.call(this,beat,voiceContainer);
 };
-alphaTab_rendering_ScoreBeatContainerGlyph.__name__ = true;
+alphaTab_rendering_ScoreBeatContainerGlyph.__name__ = ["alphaTab","rendering","ScoreBeatContainerGlyph"];
 alphaTab_rendering_ScoreBeatContainerGlyph.__super__ = alphaTab_rendering_glyphs_BeatContainerGlyph;
 alphaTab_rendering_ScoreBeatContainerGlyph.prototype = $extend(alphaTab_rendering_glyphs_BeatContainerGlyph.prototype,{
 	DoLayout: function() {
@@ -14486,12 +15845,21 @@ alphaTab_rendering_ScoreBeatContainerGlyph.prototype = $extend(alphaTab_renderin
 	,__class__: alphaTab_rendering_ScoreBeatContainerGlyph
 });
 var alphaTab_rendering_ScoreRenderer = function(settings) {
+	this._currentLayoutMode = null;
+	this._currentRenderEngine = null;
+	this._renderedTracks = null;
+	this.Canvas = null;
+	this.Score = null;
+	this.Tracks = null;
+	this.Layout = null;
+	this.RenderingResources = null;
+	this.Settings = null;
 	this.Settings = settings;
 	this.RenderingResources = new alphaTab_rendering_RenderingResources(1);
 	this.RecreateCanvas();
 	this.RecreateLayout();
 };
-alphaTab_rendering_ScoreRenderer.__name__ = true;
+alphaTab_rendering_ScoreRenderer.__name__ = ["alphaTab","rendering","ScoreRenderer"];
 alphaTab_rendering_ScoreRenderer.__interfaces__ = [alphaTab_rendering_IScoreRenderer];
 alphaTab_rendering_ScoreRenderer.prototype = {
 	get_BoundsLookup: function() {
@@ -14709,10 +16077,17 @@ alphaTab_rendering_ScoreRenderer.prototype = {
 };
 var alphaTab_rendering_TabBarRenderer = function(renderer,bar) {
 	alphaTab_rendering_BarRendererBase.call(this,renderer,bar);
+	this.ShowTimeSignature = false;
+	this.ShowRests = false;
+	this.ShowTiedNotes = false;
+	this.RenderRhythm = false;
+	this.RhythmHeight = 0.0;
+	this.RhythmBeams = false;
+	this._startSpacing = false;
 	this.RhythmHeight = 15 * renderer.Layout.get_Scale();
 	this.RhythmBeams = true;
 };
-alphaTab_rendering_TabBarRenderer.__name__ = true;
+alphaTab_rendering_TabBarRenderer.__name__ = ["alphaTab","rendering","TabBarRenderer"];
 alphaTab_rendering_TabBarRenderer.PaintSingleBar = function(canvas,x1,y1,x2,y2,size) {
 	canvas.BeginPath();
 	canvas.MoveTo(x1,y1);
@@ -14999,6 +16374,7 @@ alphaTab_rendering_TabBarRenderer.prototype = $extend(alphaTab_rendering_BarRend
 							barStartX = beatLineX;
 							barEndX = barStartX + brokenBarOffset;
 						} else {
+							++barIndex;
 							continue;
 						}
 						barStartY = barY;
@@ -15056,18 +16432,24 @@ alphaTab_rendering_TabBarRenderer.prototype = $extend(alphaTab_rendering_BarRend
 });
 var alphaTab_rendering_glyphs_EffectGlyph = function(x,y) {
 	alphaTab_rendering_glyphs_Glyph.call(this,x,y);
+	this.Beat = null;
+	this.NextGlyph = null;
+	this.PreviousGlyph = null;
+	this.Height = 0.0;
 };
-alphaTab_rendering_glyphs_EffectGlyph.__name__ = true;
+alphaTab_rendering_glyphs_EffectGlyph.__name__ = ["alphaTab","rendering","glyphs","EffectGlyph"];
 alphaTab_rendering_glyphs_EffectGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_EffectGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	__class__: alphaTab_rendering_glyphs_EffectGlyph
 });
 var alphaTab_rendering_glyphs_MusicFontGlyph = function(x,y,glyphScale,symbol) {
 	alphaTab_rendering_glyphs_EffectGlyph.call(this,x,y);
+	this.GlyphScale = 0.0;
+	this._symbol = null;
 	this.GlyphScale = glyphScale;
 	this._symbol = symbol;
 };
-alphaTab_rendering_glyphs_MusicFontGlyph.__name__ = true;
+alphaTab_rendering_glyphs_MusicFontGlyph.__name__ = ["alphaTab","rendering","glyphs","MusicFontGlyph"];
 alphaTab_rendering_glyphs_MusicFontGlyph.__super__ = alphaTab_rendering_glyphs_EffectGlyph;
 alphaTab_rendering_glyphs_MusicFontGlyph.prototype = $extend(alphaTab_rendering_glyphs_EffectGlyph.prototype,{
 	Paint: function(cx,cy,canvas) {
@@ -15078,7 +16460,7 @@ alphaTab_rendering_glyphs_MusicFontGlyph.prototype = $extend(alphaTab_rendering_
 var alphaTab_rendering_glyphs_AccentuationGlyph = function(x,y,accentuation) {
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,1,alphaTab_rendering_glyphs_AccentuationGlyph.GetSymbol(accentuation));
 };
-alphaTab_rendering_glyphs_AccentuationGlyph.__name__ = true;
+alphaTab_rendering_glyphs_AccentuationGlyph.__name__ = ["alphaTab","rendering","glyphs","AccentuationGlyph"];
 alphaTab_rendering_glyphs_AccentuationGlyph.GetSymbol = function(accentuation) {
 	switch(accentuation) {
 	case 0:
@@ -15100,8 +16482,9 @@ alphaTab_rendering_glyphs_AccentuationGlyph.prototype = $extend(alphaTab_renderi
 });
 var alphaTab_rendering_glyphs_GlyphGroup = function(x,y) {
 	alphaTab_rendering_glyphs_Glyph.call(this,x,y);
+	this.Glyphs = null;
 };
-alphaTab_rendering_glyphs_GlyphGroup.__name__ = true;
+alphaTab_rendering_glyphs_GlyphGroup.__name__ = ["alphaTab","rendering","glyphs","GlyphGroup"];
 alphaTab_rendering_glyphs_GlyphGroup.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_GlyphGroup.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	get_IsEmpty: function() {
@@ -15151,7 +16534,7 @@ alphaTab_rendering_glyphs_GlyphGroup.prototype = $extend(alphaTab_rendering_glyp
 var alphaTab_rendering_glyphs_AccidentalGroupGlyph = function() {
 	alphaTab_rendering_glyphs_GlyphGroup.call(this,0,0);
 };
-alphaTab_rendering_glyphs_AccidentalGroupGlyph.__name__ = true;
+alphaTab_rendering_glyphs_AccidentalGroupGlyph.__name__ = ["alphaTab","rendering","glyphs","AccidentalGroupGlyph"];
 alphaTab_rendering_glyphs_AccidentalGroupGlyph.__super__ = alphaTab_rendering_glyphs_GlyphGroup;
 alphaTab_rendering_glyphs_AccidentalGroupGlyph.prototype = $extend(alphaTab_rendering_glyphs_GlyphGroup.prototype,{
 	DoLayout: function() {
@@ -15214,6 +16597,8 @@ alphaTab_rendering_glyphs_AccidentalGroupGlyph.prototype = $extend(alphaTab_rend
 });
 var alphaTab_rendering_glyphs_AlternateEndingsGlyph = function(x,y,alternateEndings) {
 	alphaTab_rendering_glyphs_EffectGlyph.call(this,x,y);
+	this._endings = null;
+	this._endingsString = null;
 	var this1 = [];
 	this._endings = this1;
 	var i = 0;
@@ -15224,7 +16609,7 @@ var alphaTab_rendering_glyphs_AlternateEndingsGlyph = function(x,y,alternateEndi
 		++i;
 	}
 };
-alphaTab_rendering_glyphs_AlternateEndingsGlyph.__name__ = true;
+alphaTab_rendering_glyphs_AlternateEndingsGlyph.__name__ = ["alphaTab","rendering","glyphs","AlternateEndingsGlyph"];
 alphaTab_rendering_glyphs_AlternateEndingsGlyph.__super__ = alphaTab_rendering_glyphs_EffectGlyph;
 alphaTab_rendering_glyphs_AlternateEndingsGlyph.prototype = $extend(alphaTab_rendering_glyphs_EffectGlyph.prototype,{
 	DoLayout: function() {
@@ -15257,9 +16642,10 @@ alphaTab_rendering_glyphs_AlternateEndingsGlyph.prototype = $extend(alphaTab_ren
 });
 var alphaTab_rendering_glyphs_BarNumberGlyph = function(x,y,number) {
 	alphaTab_rendering_glyphs_Glyph.call(this,x,y);
+	this._number = 0;
 	this._number = number;
 };
-alphaTab_rendering_glyphs_BarNumberGlyph.__name__ = true;
+alphaTab_rendering_glyphs_BarNumberGlyph.__name__ = ["alphaTab","rendering","glyphs","BarNumberGlyph"];
 alphaTab_rendering_glyphs_BarNumberGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_BarNumberGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	DoLayout: function() {
@@ -15281,7 +16667,7 @@ alphaTab_rendering_glyphs_BarNumberGlyph.prototype = $extend(alphaTab_rendering_
 var alphaTab_rendering_glyphs_BarSeperatorGlyph = function(x,y) {
 	alphaTab_rendering_glyphs_Glyph.call(this,x,y);
 };
-alphaTab_rendering_glyphs_BarSeperatorGlyph.__name__ = true;
+alphaTab_rendering_glyphs_BarSeperatorGlyph.__name__ = ["alphaTab","rendering","glyphs","BarSeperatorGlyph"];
 alphaTab_rendering_glyphs_BarSeperatorGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_BarSeperatorGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	DoLayout: function() {
@@ -15309,7 +16695,7 @@ alphaTab_rendering_glyphs_BarSeperatorGlyph.prototype = $extend(alphaTab_renderi
 var alphaTab_rendering_glyphs_BeamGlyph = function(x,y,duration,direction,isGrace) {
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,isGrace ? 0.75 : 1,alphaTab_rendering_glyphs_BeamGlyph.GetSymbol(duration,direction,isGrace));
 };
-alphaTab_rendering_glyphs_BeamGlyph.__name__ = true;
+alphaTab_rendering_glyphs_BeamGlyph.__name__ = ["alphaTab","rendering","glyphs","BeamGlyph"];
 alphaTab_rendering_glyphs_BeamGlyph.GetSymbol = function(duration,direction,isGrace) {
 	if(direction == 0) {
 		switch(duration) {
@@ -15356,8 +16742,9 @@ alphaTab_rendering_glyphs_BeamGlyph.prototype = $extend(alphaTab_rendering_glyph
 });
 var alphaTab_rendering_glyphs_BeatGlyphBase = function() {
 	alphaTab_rendering_glyphs_GlyphGroup.call(this,0,0);
+	this.Container = null;
 };
-alphaTab_rendering_glyphs_BeatGlyphBase.__name__ = true;
+alphaTab_rendering_glyphs_BeatGlyphBase.__name__ = ["alphaTab","rendering","glyphs","BeatGlyphBase"];
 alphaTab_rendering_glyphs_BeatGlyphBase.__super__ = alphaTab_rendering_glyphs_GlyphGroup;
 alphaTab_rendering_glyphs_BeatGlyphBase.prototype = $extend(alphaTab_rendering_glyphs_GlyphGroup.prototype,{
 	DoLayout: function() {
@@ -15388,7 +16775,7 @@ alphaTab_rendering_glyphs_BeatGlyphBase.prototype = $extend(alphaTab_rendering_g
 var alphaTab_rendering_glyphs_BeatOnNoteGlyphBase = function() {
 	alphaTab_rendering_glyphs_BeatGlyphBase.call(this);
 };
-alphaTab_rendering_glyphs_BeatOnNoteGlyphBase.__name__ = true;
+alphaTab_rendering_glyphs_BeatOnNoteGlyphBase.__name__ = ["alphaTab","rendering","glyphs","BeatOnNoteGlyphBase"];
 alphaTab_rendering_glyphs_BeatOnNoteGlyphBase.__super__ = alphaTab_rendering_glyphs_BeatGlyphBase;
 alphaTab_rendering_glyphs_BeatOnNoteGlyphBase.prototype = $extend(alphaTab_rendering_glyphs_BeatGlyphBase.prototype,{
 	UpdateBeamingHelper: function() {
@@ -15397,10 +16784,12 @@ alphaTab_rendering_glyphs_BeatOnNoteGlyphBase.prototype = $extend(alphaTab_rende
 });
 var alphaTab_rendering_glyphs_BendGlyph = function(n,bendValueHeight) {
 	alphaTab_rendering_glyphs_Glyph.call(this,0,0);
+	this._note = null;
+	this._bendValueHeight = 0.0;
 	this._note = n;
 	this._bendValueHeight = bendValueHeight;
 };
-alphaTab_rendering_glyphs_BendGlyph.__name__ = true;
+alphaTab_rendering_glyphs_BendGlyph.__name__ = ["alphaTab","rendering","glyphs","BendGlyph"];
 alphaTab_rendering_glyphs_BendGlyph.GetFractionSign = function(steps) {
 	switch(steps) {
 	case 1:
@@ -15438,10 +16827,9 @@ alphaTab_rendering_glyphs_BendGlyph.prototype = $extend(alphaTab_rendering_glyph
 				this.PaintBend(new alphaTab_model_BendPoint(0,0),firstPt,cx,cy,dX,canvas);
 			}
 			if(firstPt.Value == secondPt.Value && i1 == this._note.BendPoints.length - 2) {
-				continue;
+				++i1;
 			}
-			this.PaintBend(firstPt,secondPt,cx,cy,dX,canvas);
-			++i1;
+			continue;
 		}
 	}
 	,PaintBend: function(firstPt,secondPt,cx,cy,dX,canvas) {
@@ -15531,9 +16919,10 @@ alphaTab_rendering_glyphs_BendGlyph.prototype = $extend(alphaTab_rendering_glyph
 });
 var alphaTab_rendering_glyphs_ChineseCymbalGlyph = function(x,y,isGrace) {
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,isGrace ? 0.75 : 1,57564);
+	this._isGrace = false;
 	this._isGrace = isGrace;
 };
-alphaTab_rendering_glyphs_ChineseCymbalGlyph.__name__ = true;
+alphaTab_rendering_glyphs_ChineseCymbalGlyph.__name__ = ["alphaTab","rendering","glyphs","ChineseCymbalGlyph"];
 alphaTab_rendering_glyphs_ChineseCymbalGlyph.__super__ = alphaTab_rendering_glyphs_MusicFontGlyph;
 alphaTab_rendering_glyphs_ChineseCymbalGlyph.prototype = $extend(alphaTab_rendering_glyphs_MusicFontGlyph.prototype,{
 	DoLayout: function() {
@@ -15543,9 +16932,10 @@ alphaTab_rendering_glyphs_ChineseCymbalGlyph.prototype = $extend(alphaTab_render
 });
 var alphaTab_rendering_glyphs_CircleGlyph = function(x,y,size) {
 	alphaTab_rendering_glyphs_Glyph.call(this,x,y);
+	this._size = 0.0;
 	this._size = size;
 };
-alphaTab_rendering_glyphs_CircleGlyph.__name__ = true;
+alphaTab_rendering_glyphs_CircleGlyph.__name__ = ["alphaTab","rendering","glyphs","CircleGlyph"];
 alphaTab_rendering_glyphs_CircleGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_CircleGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	DoLayout: function() {
@@ -15558,10 +16948,12 @@ alphaTab_rendering_glyphs_CircleGlyph.prototype = $extend(alphaTab_rendering_gly
 });
 var alphaTab_rendering_glyphs_ClefGlyph = function(x,y,clef,clefOttavia) {
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,1,alphaTab_rendering_glyphs_ClefGlyph.GetSymbol(clef));
+	this._clef = null;
+	this._clefOttavia = null;
 	this._clef = clef;
 	this._clefOttavia = clefOttavia;
 };
-alphaTab_rendering_glyphs_ClefGlyph.__name__ = true;
+alphaTab_rendering_glyphs_ClefGlyph.__name__ = ["alphaTab","rendering","glyphs","ClefGlyph"];
 alphaTab_rendering_glyphs_ClefGlyph.GetSymbol = function(clef) {
 	switch(clef) {
 	case 0:
@@ -15665,9 +17057,10 @@ alphaTab_rendering_glyphs_ClefGlyph.prototype = $extend(alphaTab_rendering_glyph
 });
 var alphaTab_rendering_glyphs_GroupedEffectGlyph = function(endPosition) {
 	alphaTab_rendering_glyphs_EffectGlyph.call(this,0,0);
+	this._endPosition = null;
 	this._endPosition = endPosition;
 };
-alphaTab_rendering_glyphs_GroupedEffectGlyph.__name__ = true;
+alphaTab_rendering_glyphs_GroupedEffectGlyph.__name__ = ["alphaTab","rendering","glyphs","GroupedEffectGlyph"];
 alphaTab_rendering_glyphs_GroupedEffectGlyph.__super__ = alphaTab_rendering_glyphs_EffectGlyph;
 alphaTab_rendering_glyphs_GroupedEffectGlyph.prototype = $extend(alphaTab_rendering_glyphs_EffectGlyph.prototype,{
 	get_IsLinkedWithPrevious: function() {
@@ -15712,11 +17105,12 @@ alphaTab_rendering_glyphs_GroupedEffectGlyph.prototype = $extend(alphaTab_render
 });
 var alphaTab_rendering_glyphs_CrescendoGlyph = function(x,y,crescendo) {
 	alphaTab_rendering_glyphs_GroupedEffectGlyph.call(this,3);
+	this._crescendo = null;
 	this._crescendo = crescendo;
 	this.X = x;
 	this.Y = y;
 };
-alphaTab_rendering_glyphs_CrescendoGlyph.__name__ = true;
+alphaTab_rendering_glyphs_CrescendoGlyph.__name__ = ["alphaTab","rendering","glyphs","CrescendoGlyph"];
 alphaTab_rendering_glyphs_CrescendoGlyph.__super__ = alphaTab_rendering_glyphs_GroupedEffectGlyph;
 alphaTab_rendering_glyphs_CrescendoGlyph.prototype = $extend(alphaTab_rendering_glyphs_GroupedEffectGlyph.prototype,{
 	DoLayout: function() {
@@ -15742,9 +17136,10 @@ alphaTab_rendering_glyphs_CrescendoGlyph.prototype = $extend(alphaTab_rendering_
 });
 var alphaTab_rendering_glyphs_DeadNoteHeadGlyph = function(x,y,isGrace) {
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,isGrace ? 0.75 : 1,57514);
+	this._isGrace = false;
 	this._isGrace = isGrace;
 };
-alphaTab_rendering_glyphs_DeadNoteHeadGlyph.__name__ = true;
+alphaTab_rendering_glyphs_DeadNoteHeadGlyph.__name__ = ["alphaTab","rendering","glyphs","DeadNoteHeadGlyph"];
 alphaTab_rendering_glyphs_DeadNoteHeadGlyph.__super__ = alphaTab_rendering_glyphs_MusicFontGlyph;
 alphaTab_rendering_glyphs_DeadNoteHeadGlyph.prototype = $extend(alphaTab_rendering_glyphs_MusicFontGlyph.prototype,{
 	DoLayout: function() {
@@ -15754,9 +17149,10 @@ alphaTab_rendering_glyphs_DeadNoteHeadGlyph.prototype = $extend(alphaTab_renderi
 });
 var alphaTab_rendering_glyphs_DiamondNoteHeadGlyph = function(x,y,isGrace) {
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,isGrace ? 0.75 : 1,57564);
+	this._isGrace = false;
 	this._isGrace = isGrace;
 };
-alphaTab_rendering_glyphs_DiamondNoteHeadGlyph.__name__ = true;
+alphaTab_rendering_glyphs_DiamondNoteHeadGlyph.__name__ = ["alphaTab","rendering","glyphs","DiamondNoteHeadGlyph"];
 alphaTab_rendering_glyphs_DiamondNoteHeadGlyph.__super__ = alphaTab_rendering_glyphs_MusicFontGlyph;
 alphaTab_rendering_glyphs_DiamondNoteHeadGlyph.prototype = $extend(alphaTab_rendering_glyphs_MusicFontGlyph.prototype,{
 	DoLayout: function() {
@@ -15766,10 +17162,12 @@ alphaTab_rendering_glyphs_DiamondNoteHeadGlyph.prototype = $extend(alphaTab_rend
 });
 var alphaTab_rendering_glyphs_DigitGlyph = function(x,y,digit,scale) {
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,scale,alphaTab_rendering_glyphs_DigitGlyph.GetSymbol(digit));
+	this._digit = 0;
+	this._scale = 0.0;
 	this._digit = digit;
 	this._scale = scale;
 };
-alphaTab_rendering_glyphs_DigitGlyph.__name__ = true;
+alphaTab_rendering_glyphs_DigitGlyph.__name__ = ["alphaTab","rendering","glyphs","DigitGlyph"];
 alphaTab_rendering_glyphs_DigitGlyph.GetSymbol = function(digit) {
 	switch(digit) {
 	case 0:
@@ -15816,9 +17214,10 @@ alphaTab_rendering_glyphs_DigitGlyph.prototype = $extend(alphaTab_rendering_glyp
 });
 var alphaTab_rendering_glyphs_DrumSticksGlyph = function(x,y,isGrace) {
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,isGrace ? 0.75 : 1,57513);
+	this._isGrace = false;
 	this._isGrace = isGrace;
 };
-alphaTab_rendering_glyphs_DrumSticksGlyph.__name__ = true;
+alphaTab_rendering_glyphs_DrumSticksGlyph.__name__ = ["alphaTab","rendering","glyphs","DrumSticksGlyph"];
 alphaTab_rendering_glyphs_DrumSticksGlyph.__super__ = alphaTab_rendering_glyphs_MusicFontGlyph;
 alphaTab_rendering_glyphs_DrumSticksGlyph.prototype = $extend(alphaTab_rendering_glyphs_MusicFontGlyph.prototype,{
 	DoLayout: function() {
@@ -15829,7 +17228,7 @@ alphaTab_rendering_glyphs_DrumSticksGlyph.prototype = $extend(alphaTab_rendering
 var alphaTab_rendering_glyphs_DynamicsGlyph = function(x,y,dynamics) {
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,0.6,alphaTab_rendering_glyphs_DynamicsGlyph.GetSymbol(dynamics));
 };
-alphaTab_rendering_glyphs_DynamicsGlyph.__name__ = true;
+alphaTab_rendering_glyphs_DynamicsGlyph.__name__ = ["alphaTab","rendering","glyphs","DynamicsGlyph"];
 alphaTab_rendering_glyphs_DynamicsGlyph.GetSymbol = function(dynamics) {
 	switch(dynamics) {
 	case 0:
@@ -15864,7 +17263,7 @@ alphaTab_rendering_glyphs_DynamicsGlyph.prototype = $extend(alphaTab_rendering_g
 var alphaTab_rendering_glyphs_FadeInGlyph = function(x,y) {
 	alphaTab_rendering_glyphs_EffectGlyph.call(this,x,y);
 };
-alphaTab_rendering_glyphs_FadeInGlyph.__name__ = true;
+alphaTab_rendering_glyphs_FadeInGlyph.__name__ = ["alphaTab","rendering","glyphs","FadeInGlyph"];
 alphaTab_rendering_glyphs_FadeInGlyph.__super__ = alphaTab_rendering_glyphs_EffectGlyph;
 alphaTab_rendering_glyphs_FadeInGlyph.prototype = $extend(alphaTab_rendering_glyphs_EffectGlyph.prototype,{
 	DoLayout: function() {
@@ -15889,9 +17288,10 @@ var alphaTab_rendering_glyphs_FlatGlyph = function(x,y,isGrace) {
 		isGrace = false;
 	}
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,isGrace ? 0.75 : 1,57952);
+	this._isGrace = false;
 	this._isGrace = isGrace;
 };
-alphaTab_rendering_glyphs_FlatGlyph.__name__ = true;
+alphaTab_rendering_glyphs_FlatGlyph.__name__ = ["alphaTab","rendering","glyphs","FlatGlyph"];
 alphaTab_rendering_glyphs_FlatGlyph.__super__ = alphaTab_rendering_glyphs_MusicFontGlyph;
 alphaTab_rendering_glyphs_FlatGlyph.prototype = $extend(alphaTab_rendering_glyphs_MusicFontGlyph.prototype,{
 	DoLayout: function() {
@@ -15901,9 +17301,10 @@ alphaTab_rendering_glyphs_FlatGlyph.prototype = $extend(alphaTab_rendering_glyph
 });
 var alphaTab_rendering_glyphs_HiHatGlyph = function(x,y,isGrace) {
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,isGrace ? 0.75 : 1,57523);
+	this._isGrace = false;
 	this._isGrace = isGrace;
 };
-alphaTab_rendering_glyphs_HiHatGlyph.__name__ = true;
+alphaTab_rendering_glyphs_HiHatGlyph.__name__ = ["alphaTab","rendering","glyphs","HiHatGlyph"];
 alphaTab_rendering_glyphs_HiHatGlyph.__super__ = alphaTab_rendering_glyphs_MusicFontGlyph;
 alphaTab_rendering_glyphs_HiHatGlyph.prototype = $extend(alphaTab_rendering_glyphs_MusicFontGlyph.prototype,{
 	DoLayout: function() {
@@ -15916,7 +17317,7 @@ var alphaTab_rendering_glyphs_LeftToRightLayoutingGlyphGroup = function() {
 	var this1 = [];
 	this.Glyphs = this1;
 };
-alphaTab_rendering_glyphs_LeftToRightLayoutingGlyphGroup.__name__ = true;
+alphaTab_rendering_glyphs_LeftToRightLayoutingGlyphGroup.__name__ = ["alphaTab","rendering","glyphs","LeftToRightLayoutingGlyphGroup"];
 alphaTab_rendering_glyphs_LeftToRightLayoutingGlyphGroup.__super__ = alphaTab_rendering_glyphs_GlyphGroup;
 alphaTab_rendering_glyphs_LeftToRightLayoutingGlyphGroup.prototype = $extend(alphaTab_rendering_glyphs_GlyphGroup.prototype,{
 	AddGlyph: function(g) {
@@ -15930,9 +17331,10 @@ alphaTab_rendering_glyphs_LeftToRightLayoutingGlyphGroup.prototype = $extend(alp
 });
 var alphaTab_rendering_glyphs_LineRangedGlyph = function(label) {
 	alphaTab_rendering_glyphs_GroupedEffectGlyph.call(this,2);
+	this._label = null;
 	this._label = label;
 };
-alphaTab_rendering_glyphs_LineRangedGlyph.__name__ = true;
+alphaTab_rendering_glyphs_LineRangedGlyph.__name__ = ["alphaTab","rendering","glyphs","LineRangedGlyph"];
 alphaTab_rendering_glyphs_LineRangedGlyph.__super__ = alphaTab_rendering_glyphs_GroupedEffectGlyph;
 alphaTab_rendering_glyphs_LineRangedGlyph.prototype = $extend(alphaTab_rendering_glyphs_GroupedEffectGlyph.prototype,{
 	DoLayout: function() {
@@ -15979,11 +17381,14 @@ var alphaTab_rendering_glyphs_LyricsGlyph = function(x,y,lines,font,textAlign) {
 		textAlign = 1;
 	}
 	alphaTab_rendering_glyphs_EffectGlyph.call(this,x,y);
+	this._lines = null;
+	this.Font = null;
+	this.TextAlign = null;
 	this._lines = lines;
 	this.Font = font;
 	this.TextAlign = textAlign;
 };
-alphaTab_rendering_glyphs_LyricsGlyph.__name__ = true;
+alphaTab_rendering_glyphs_LyricsGlyph.__name__ = ["alphaTab","rendering","glyphs","LyricsGlyph"];
 alphaTab_rendering_glyphs_LyricsGlyph.__super__ = alphaTab_rendering_glyphs_EffectGlyph;
 alphaTab_rendering_glyphs_LyricsGlyph.prototype = $extend(alphaTab_rendering_glyphs_EffectGlyph.prototype,{
 	DoLayout: function() {
@@ -16006,7 +17411,7 @@ alphaTab_rendering_glyphs_LyricsGlyph.prototype = $extend(alphaTab_rendering_gly
 	,__class__: alphaTab_rendering_glyphs_LyricsGlyph
 });
 var alphaTab_rendering_glyphs__$MusicFontSymbol_MusicFontSymbol_$Impl_$ = {};
-alphaTab_rendering_glyphs__$MusicFontSymbol_MusicFontSymbol_$Impl_$.__name__ = true;
+alphaTab_rendering_glyphs__$MusicFontSymbol_MusicFontSymbol_$Impl_$.__name__ = ["alphaTab","rendering","glyphs","_MusicFontSymbol","MusicFontSymbol_Impl_"];
 alphaTab_rendering_glyphs__$MusicFontSymbol_MusicFontSymbol_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -16208,9 +17613,10 @@ var alphaTab_rendering_glyphs_NaturalizeGlyph = function(x,y,isGrace) {
 		isGrace = false;
 	}
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,isGrace ? 0.75 : 1,57953);
+	this._isGrace = false;
 	this._isGrace = isGrace;
 };
-alphaTab_rendering_glyphs_NaturalizeGlyph.__name__ = true;
+alphaTab_rendering_glyphs_NaturalizeGlyph.__name__ = ["alphaTab","rendering","glyphs","NaturalizeGlyph"];
 alphaTab_rendering_glyphs_NaturalizeGlyph.__super__ = alphaTab_rendering_glyphs_MusicFontGlyph;
 alphaTab_rendering_glyphs_NaturalizeGlyph.prototype = $extend(alphaTab_rendering_glyphs_MusicFontGlyph.prototype,{
 	DoLayout: function() {
@@ -16220,10 +17626,12 @@ alphaTab_rendering_glyphs_NaturalizeGlyph.prototype = $extend(alphaTab_rendering
 });
 var alphaTab_rendering_glyphs_NoteHeadGlyph = function(x,y,duration,isGrace) {
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,isGrace ? 0.75 : 1,alphaTab_rendering_glyphs_NoteHeadGlyph.GetSymbol(duration));
+	this._isGrace = false;
+	this._duration = null;
 	this._isGrace = isGrace;
 	this._duration = duration;
 };
-alphaTab_rendering_glyphs_NoteHeadGlyph.__name__ = true;
+alphaTab_rendering_glyphs_NoteHeadGlyph.__name__ = ["alphaTab","rendering","glyphs","NoteHeadGlyph"];
 alphaTab_rendering_glyphs_NoteHeadGlyph.GetSymbol = function(duration) {
 	switch(duration) {
 	case -4:
@@ -16260,6 +17668,11 @@ alphaTab_rendering_glyphs_NoteHeadGlyph.prototype = $extend(alphaTab_rendering_g
 });
 var alphaTab_rendering_glyphs_NoteNumberGlyph = function(x,y,n) {
 	alphaTab_rendering_glyphs_Glyph.call(this,x,y);
+	this._noteString = null;
+	this._noteStringWidth = 0.0;
+	this._trillNoteString = null;
+	this._trillNoteStringWidth = 0.0;
+	this.IsEmpty = false;
 	if(!n.IsTieDestination) {
 		this._noteString = n.IsDead ? "x" : Std.string(n.Fret - n.Beat.Voice.Bar.Staff.Track.TranspositionPitch);
 		if(n.IsGhost) {
@@ -16276,7 +17689,7 @@ var alphaTab_rendering_glyphs_NoteNumberGlyph = function(x,y,n) {
 		this._trillNoteString = "";
 	}
 };
-alphaTab_rendering_glyphs_NoteNumberGlyph.__name__ = true;
+alphaTab_rendering_glyphs_NoteNumberGlyph.__name__ = ["alphaTab","rendering","glyphs","NoteNumberGlyph"];
 alphaTab_rendering_glyphs_NoteNumberGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_NoteNumberGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	DoLayout: function() {
@@ -16316,10 +17729,12 @@ var alphaTab_rendering_glyphs_NumberGlyph = function(x,y,number,scale) {
 		scale = 1.0;
 	}
 	alphaTab_rendering_glyphs_GlyphGroup.call(this,x,y);
+	this._number = 0;
+	this._scale = 0.0;
 	this._number = number;
 	this._scale = scale;
 };
-alphaTab_rendering_glyphs_NumberGlyph.__name__ = true;
+alphaTab_rendering_glyphs_NumberGlyph.__name__ = ["alphaTab","rendering","glyphs","NumberGlyph"];
 alphaTab_rendering_glyphs_NumberGlyph.__super__ = alphaTab_rendering_glyphs_GlyphGroup;
 alphaTab_rendering_glyphs_NumberGlyph.prototype = $extend(alphaTab_rendering_glyphs_GlyphGroup.prototype,{
 	DoLayout: function() {
@@ -16350,7 +17765,7 @@ alphaTab_rendering_glyphs_NumberGlyph.prototype = $extend(alphaTab_rendering_gly
 var alphaTab_rendering_glyphs_PickStrokeGlyph = function(x,y,pickStroke) {
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,0.75,alphaTab_rendering_glyphs_PickStrokeGlyph.GetSymbol(pickStroke));
 };
-alphaTab_rendering_glyphs_PickStrokeGlyph.__name__ = true;
+alphaTab_rendering_glyphs_PickStrokeGlyph.__name__ = ["alphaTab","rendering","glyphs","PickStrokeGlyph"];
 alphaTab_rendering_glyphs_PickStrokeGlyph.GetSymbol = function(pickStroke) {
 	switch(pickStroke) {
 	case 1:
@@ -16375,7 +17790,7 @@ alphaTab_rendering_glyphs_PickStrokeGlyph.prototype = $extend(alphaTab_rendering
 var alphaTab_rendering_glyphs_RepeatCloseGlyph = function(x,y) {
 	alphaTab_rendering_glyphs_Glyph.call(this,x,y);
 };
-alphaTab_rendering_glyphs_RepeatCloseGlyph.__name__ = true;
+alphaTab_rendering_glyphs_RepeatCloseGlyph.__name__ = ["alphaTab","rendering","glyphs","RepeatCloseGlyph"];
 alphaTab_rendering_glyphs_RepeatCloseGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_RepeatCloseGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	DoLayout: function() {
@@ -16406,9 +17821,10 @@ alphaTab_rendering_glyphs_RepeatCloseGlyph.prototype = $extend(alphaTab_renderin
 });
 var alphaTab_rendering_glyphs_RepeatCountGlyph = function(x,y,count) {
 	alphaTab_rendering_glyphs_Glyph.call(this,x,y);
+	this._count = 0;
 	this._count = count;
 };
-alphaTab_rendering_glyphs_RepeatCountGlyph.__name__ = true;
+alphaTab_rendering_glyphs_RepeatCountGlyph.__name__ = ["alphaTab","rendering","glyphs","RepeatCountGlyph"];
 alphaTab_rendering_glyphs_RepeatCountGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_RepeatCountGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	DoLayout: function() {
@@ -16429,10 +17845,12 @@ alphaTab_rendering_glyphs_RepeatCountGlyph.prototype = $extend(alphaTab_renderin
 });
 var alphaTab_rendering_glyphs_RepeatOpenGlyph = function(x,y,circleSize,dotOffset) {
 	alphaTab_rendering_glyphs_Glyph.call(this,x,y);
+	this._dotOffset = 0.0;
+	this._circleSize = 0.0;
 	this._dotOffset = dotOffset;
 	this._circleSize = circleSize;
 };
-alphaTab_rendering_glyphs_RepeatOpenGlyph.__name__ = true;
+alphaTab_rendering_glyphs_RepeatOpenGlyph.__name__ = ["alphaTab","rendering","glyphs","RepeatOpenGlyph"];
 alphaTab_rendering_glyphs_RepeatOpenGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_RepeatOpenGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	DoLayout: function() {
@@ -16462,9 +17880,10 @@ alphaTab_rendering_glyphs_RepeatOpenGlyph.prototype = $extend(alphaTab_rendering
 });
 var alphaTab_rendering_glyphs_RideCymbalGlyph = function(x,y,isGrace) {
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,isGrace ? 0.75 : 1,57566);
+	this._isGrace = false;
 	this._isGrace = isGrace;
 };
-alphaTab_rendering_glyphs_RideCymbalGlyph.__name__ = true;
+alphaTab_rendering_glyphs_RideCymbalGlyph.__name__ = ["alphaTab","rendering","glyphs","RideCymbalGlyph"];
 alphaTab_rendering_glyphs_RideCymbalGlyph.__super__ = alphaTab_rendering_glyphs_MusicFontGlyph;
 alphaTab_rendering_glyphs_RideCymbalGlyph.prototype = $extend(alphaTab_rendering_glyphs_MusicFontGlyph.prototype,{
 	DoLayout: function() {
@@ -16475,7 +17894,7 @@ alphaTab_rendering_glyphs_RideCymbalGlyph.prototype = $extend(alphaTab_rendering
 var alphaTab_rendering_glyphs_ScoreBeatGlyph = function() {
 	alphaTab_rendering_glyphs_BeatOnNoteGlyphBase.call(this);
 };
-alphaTab_rendering_glyphs_ScoreBeatGlyph.__name__ = true;
+alphaTab_rendering_glyphs_ScoreBeatGlyph.__name__ = ["alphaTab","rendering","glyphs","ScoreBeatGlyph"];
 alphaTab_rendering_glyphs_ScoreBeatGlyph.__super__ = alphaTab_rendering_glyphs_BeatOnNoteGlyphBase;
 alphaTab_rendering_glyphs_ScoreBeatGlyph.prototype = $extend(alphaTab_rendering_glyphs_BeatOnNoteGlyphBase.prototype,{
 	UpdateBeamingHelper: function() {
@@ -16646,7 +18065,7 @@ alphaTab_rendering_glyphs_ScoreBeatGlyph.prototype = $extend(alphaTab_rendering_
 var alphaTab_rendering_glyphs_ScoreBeatPreNotesGlyph = function() {
 	alphaTab_rendering_glyphs_BeatGlyphBase.call(this);
 };
-alphaTab_rendering_glyphs_ScoreBeatPreNotesGlyph.__name__ = true;
+alphaTab_rendering_glyphs_ScoreBeatPreNotesGlyph.__name__ = ["alphaTab","rendering","glyphs","ScoreBeatPreNotesGlyph"];
 alphaTab_rendering_glyphs_ScoreBeatPreNotesGlyph.__super__ = alphaTab_rendering_glyphs_BeatGlyphBase;
 alphaTab_rendering_glyphs_ScoreBeatPreNotesGlyph.prototype = $extend(alphaTab_rendering_glyphs_BeatGlyphBase.prototype,{
 	DoLayout: function() {
@@ -16693,9 +18112,10 @@ alphaTab_rendering_glyphs_ScoreBeatPreNotesGlyph.prototype = $extend(alphaTab_re
 });
 var alphaTab_rendering_glyphs_ScoreBrushGlyph = function(beat) {
 	alphaTab_rendering_glyphs_Glyph.call(this,0,0);
+	this._beat = null;
 	this._beat = beat;
 };
-alphaTab_rendering_glyphs_ScoreBrushGlyph.__name__ = true;
+alphaTab_rendering_glyphs_ScoreBrushGlyph.__name__ = ["alphaTab","rendering","glyphs","ScoreBrushGlyph"];
 alphaTab_rendering_glyphs_ScoreBrushGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_ScoreBrushGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	DoLayout: function() {
@@ -16730,11 +18150,15 @@ alphaTab_rendering_glyphs_ScoreBrushGlyph.prototype = $extend(alphaTab_rendering
 });
 var alphaTab_rendering_glyphs_TieGlyph = function(startBeat,endBeat,forEnd) {
 	alphaTab_rendering_glyphs_Glyph.call(this,0,0);
+	this.StartBeat = null;
+	this.EndBeat = null;
+	this.YOffset = 0.0;
+	this._forEnd = false;
 	this.StartBeat = startBeat;
 	this.EndBeat = endBeat;
 	this._forEnd = forEnd;
 };
-alphaTab_rendering_glyphs_TieGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TieGlyph.__name__ = ["alphaTab","rendering","glyphs","TieGlyph"];
 alphaTab_rendering_glyphs_TieGlyph.PaintTie = function(canvas,scale,x1,y1,x2,y2,down) {
 	if(down == null) {
 		down = false;
@@ -16844,7 +18268,7 @@ var alphaTab_rendering_glyphs_ScoreLegatoGlyph = function(startBeat,endBeat,forE
 	}
 	alphaTab_rendering_glyphs_TieGlyph.call(this,startBeat,endBeat,forEnd);
 };
-alphaTab_rendering_glyphs_ScoreLegatoGlyph.__name__ = true;
+alphaTab_rendering_glyphs_ScoreLegatoGlyph.__name__ = ["alphaTab","rendering","glyphs","ScoreLegatoGlyph"];
 alphaTab_rendering_glyphs_ScoreLegatoGlyph.__super__ = alphaTab_rendering_glyphs_TieGlyph;
 alphaTab_rendering_glyphs_ScoreLegatoGlyph.prototype = $extend(alphaTab_rendering_glyphs_TieGlyph.prototype,{
 	DoLayout: function() {
@@ -16904,6 +18328,18 @@ alphaTab_rendering_glyphs_ScoreLegatoGlyph.prototype = $extend(alphaTab_renderin
 });
 var alphaTab_rendering_glyphs_ScoreNoteChordGlyph = function() {
 	alphaTab_rendering_glyphs_Glyph.call(this,0,0);
+	this._infos = null;
+	this._noteLookup = null;
+	this._tremoloPicking = null;
+	this._noteHeadPadding = 0.0;
+	this.MinNote = null;
+	this.MaxNote = null;
+	this.SpacingChanged = null;
+	this.UpLineX = 0.0;
+	this.DownLineX = 0.0;
+	this.BeatEffects = null;
+	this.Beat = null;
+	this.BeamingHelper = null;
 	var this1 = [];
 	this._infos = this1;
 	var this2 = {}
@@ -16911,7 +18347,7 @@ var alphaTab_rendering_glyphs_ScoreNoteChordGlyph = function() {
 	var this3 = {}
 	this._noteLookup = this3;
 };
-alphaTab_rendering_glyphs_ScoreNoteChordGlyph.__name__ = true;
+alphaTab_rendering_glyphs_ScoreNoteChordGlyph.__name__ = ["alphaTab","rendering","glyphs","ScoreNoteChordGlyph"];
 alphaTab_rendering_glyphs_ScoreNoteChordGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_ScoreNoteChordGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	get_Direction: function() {
@@ -17149,18 +18585,23 @@ alphaTab_rendering_glyphs_ScoreNoteChordGlyph.prototype = $extend(alphaTab_rende
 	,__class__: alphaTab_rendering_glyphs_ScoreNoteChordGlyph
 });
 var alphaTab_rendering_glyphs_ScoreNoteGlyphInfo = function(glyph,line,note) {
+	this.Glyph = null;
+	this.Line = 0;
+	this.Note = null;
 	this.Glyph = glyph;
 	this.Line = line;
 };
-alphaTab_rendering_glyphs_ScoreNoteGlyphInfo.__name__ = true;
+alphaTab_rendering_glyphs_ScoreNoteGlyphInfo.__name__ = ["alphaTab","rendering","glyphs","ScoreNoteGlyphInfo"];
 alphaTab_rendering_glyphs_ScoreNoteGlyphInfo.prototype = {
 	__class__: alphaTab_rendering_glyphs_ScoreNoteGlyphInfo
 };
 var alphaTab_rendering_glyphs_ScoreRestGlyph = function(x,y,duration) {
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,1,alphaTab_rendering_glyphs_ScoreRestGlyph.GetSymbol(duration));
+	this._duration = null;
+	this.BeamingHelper = null;
 	this._duration = duration;
 };
-alphaTab_rendering_glyphs_ScoreRestGlyph.__name__ = true;
+alphaTab_rendering_glyphs_ScoreRestGlyph.__name__ = ["alphaTab","rendering","glyphs","ScoreRestGlyph"];
 alphaTab_rendering_glyphs_ScoreRestGlyph.GetSymbol = function(duration) {
 	switch(duration) {
 	case -4:
@@ -17217,11 +18658,14 @@ alphaTab_rendering_glyphs_ScoreRestGlyph.prototype = $extend(alphaTab_rendering_
 });
 var alphaTab_rendering_glyphs_ScoreSlideLineGlyph = function(type,startNote,parent) {
 	alphaTab_rendering_glyphs_Glyph.call(this,0,0);
+	this._startNote = null;
+	this._type = null;
+	this._parent = null;
 	this._type = type;
 	this._startNote = startNote;
 	this._parent = parent;
 };
-alphaTab_rendering_glyphs_ScoreSlideLineGlyph.__name__ = true;
+alphaTab_rendering_glyphs_ScoreSlideLineGlyph.__name__ = ["alphaTab","rendering","glyphs","ScoreSlideLineGlyph"];
 alphaTab_rendering_glyphs_ScoreSlideLineGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_ScoreSlideLineGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	DoLayout: function() {
@@ -17289,10 +18733,12 @@ var alphaTab_rendering_glyphs_ScoreTieGlyph = function(startNote,endNote,forEnd)
 		forEnd = false;
 	}
 	alphaTab_rendering_glyphs_TieGlyph.call(this,startNote == null ? null : startNote.Beat,endNote == null ? null : endNote.Beat,forEnd);
+	this._startNote = null;
+	this._endNote = null;
 	this._startNote = startNote;
 	this._endNote = endNote;
 };
-alphaTab_rendering_glyphs_ScoreTieGlyph.__name__ = true;
+alphaTab_rendering_glyphs_ScoreTieGlyph.__name__ = ["alphaTab","rendering","glyphs","ScoreTieGlyph"];
 alphaTab_rendering_glyphs_ScoreTieGlyph.__super__ = alphaTab_rendering_glyphs_TieGlyph;
 alphaTab_rendering_glyphs_ScoreTieGlyph.prototype = $extend(alphaTab_rendering_glyphs_TieGlyph.prototype,{
 	DoLayout: function() {
@@ -17323,11 +18769,14 @@ alphaTab_rendering_glyphs_ScoreTieGlyph.prototype = $extend(alphaTab_rendering_g
 });
 var alphaTab_rendering_glyphs_TimeSignatureGlyph = function(x,y,numerator,denominator,isCommon) {
 	alphaTab_rendering_glyphs_GlyphGroup.call(this,x,y);
+	this._numerator = 0;
+	this._denominator = 0;
+	this._isCommon = false;
 	this._numerator = numerator;
 	this._denominator = denominator;
 	this._isCommon = isCommon;
 };
-alphaTab_rendering_glyphs_TimeSignatureGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TimeSignatureGlyph.__name__ = ["alphaTab","rendering","glyphs","TimeSignatureGlyph"];
 alphaTab_rendering_glyphs_TimeSignatureGlyph.__super__ = alphaTab_rendering_glyphs_GlyphGroup;
 alphaTab_rendering_glyphs_TimeSignatureGlyph.prototype = $extend(alphaTab_rendering_glyphs_GlyphGroup.prototype,{
 	get_CommonY: function() {
@@ -17376,7 +18825,7 @@ alphaTab_rendering_glyphs_TimeSignatureGlyph.prototype = $extend(alphaTab_render
 var alphaTab_rendering_glyphs_ScoreTimeSignatureGlyph = function(x,y,numerator,denominator,isCommon) {
 	alphaTab_rendering_glyphs_TimeSignatureGlyph.call(this,x,y,numerator,denominator,isCommon);
 };
-alphaTab_rendering_glyphs_ScoreTimeSignatureGlyph.__name__ = true;
+alphaTab_rendering_glyphs_ScoreTimeSignatureGlyph.__name__ = ["alphaTab","rendering","glyphs","ScoreTimeSignatureGlyph"];
 alphaTab_rendering_glyphs_ScoreTimeSignatureGlyph.__super__ = alphaTab_rendering_glyphs_TimeSignatureGlyph;
 alphaTab_rendering_glyphs_ScoreTimeSignatureGlyph.prototype = $extend(alphaTab_rendering_glyphs_TimeSignatureGlyph.prototype,{
 	get_CommonY: function() {
@@ -17402,9 +18851,10 @@ var alphaTab_rendering_glyphs_SharpGlyph = function(x,y,isGrace) {
 		isGrace = false;
 	}
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,isGrace ? 0.75 : 1,57954);
+	this._isGrace = false;
 	this._isGrace = isGrace;
 };
-alphaTab_rendering_glyphs_SharpGlyph.__name__ = true;
+alphaTab_rendering_glyphs_SharpGlyph.__name__ = ["alphaTab","rendering","glyphs","SharpGlyph"];
 alphaTab_rendering_glyphs_SharpGlyph.__super__ = alphaTab_rendering_glyphs_MusicFontGlyph;
 alphaTab_rendering_glyphs_SharpGlyph.prototype = $extend(alphaTab_rendering_glyphs_MusicFontGlyph.prototype,{
 	DoLayout: function() {
@@ -17416,15 +18866,16 @@ var alphaTab_rendering_glyphs_SpacingGlyph = function(x,y,width) {
 	alphaTab_rendering_glyphs_Glyph.call(this,x,y);
 	this.Width = width;
 };
-alphaTab_rendering_glyphs_SpacingGlyph.__name__ = true;
+alphaTab_rendering_glyphs_SpacingGlyph.__name__ = ["alphaTab","rendering","glyphs","SpacingGlyph"];
 alphaTab_rendering_glyphs_SpacingGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_SpacingGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	__class__: alphaTab_rendering_glyphs_SpacingGlyph
 });
 var alphaTab_rendering_glyphs_TabBeatContainerGlyph = function(beat,voiceContainer) {
 	alphaTab_rendering_glyphs_BeatContainerGlyph.call(this,beat,voiceContainer);
+	this._bendGlyphs = null;
 };
-alphaTab_rendering_glyphs_TabBeatContainerGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TabBeatContainerGlyph.__name__ = ["alphaTab","rendering","glyphs","TabBeatContainerGlyph"];
 alphaTab_rendering_glyphs_TabBeatContainerGlyph.__super__ = alphaTab_rendering_glyphs_BeatContainerGlyph;
 alphaTab_rendering_glyphs_TabBeatContainerGlyph.prototype = $extend(alphaTab_rendering_glyphs_BeatContainerGlyph.prototype,{
 	DoLayout: function() {
@@ -17503,7 +18954,7 @@ alphaTab_rendering_glyphs_TabBeatContainerGlyph.prototype = $extend(alphaTab_ren
 var alphaTab_rendering_glyphs_TabBeatGlyph = function() {
 	alphaTab_rendering_glyphs_BeatOnNoteGlyphBase.call(this);
 };
-alphaTab_rendering_glyphs_TabBeatGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TabBeatGlyph.__name__ = ["alphaTab","rendering","glyphs","TabBeatGlyph"];
 alphaTab_rendering_glyphs_TabBeatGlyph.__super__ = alphaTab_rendering_glyphs_BeatOnNoteGlyphBase;
 alphaTab_rendering_glyphs_TabBeatGlyph.prototype = $extend(alphaTab_rendering_glyphs_BeatOnNoteGlyphBase.prototype,{
 	DoLayout: function() {
@@ -17646,7 +19097,7 @@ alphaTab_rendering_glyphs_TabBeatGlyph.prototype = $extend(alphaTab_rendering_gl
 var alphaTab_rendering_glyphs_TabBeatPreNotesGlyph = function() {
 	alphaTab_rendering_glyphs_BeatGlyphBase.call(this);
 };
-alphaTab_rendering_glyphs_TabBeatPreNotesGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TabBeatPreNotesGlyph.__name__ = ["alphaTab","rendering","glyphs","TabBeatPreNotesGlyph"];
 alphaTab_rendering_glyphs_TabBeatPreNotesGlyph.__super__ = alphaTab_rendering_glyphs_BeatGlyphBase;
 alphaTab_rendering_glyphs_TabBeatPreNotesGlyph.prototype = $extend(alphaTab_rendering_glyphs_BeatGlyphBase.prototype,{
 	DoLayout: function() {
@@ -17660,9 +19111,10 @@ alphaTab_rendering_glyphs_TabBeatPreNotesGlyph.prototype = $extend(alphaTab_rend
 });
 var alphaTab_rendering_glyphs_TabBrushGlyph = function(beat) {
 	alphaTab_rendering_glyphs_Glyph.call(this,0,0);
+	this._beat = null;
 	this._beat = beat;
 };
-alphaTab_rendering_glyphs_TabBrushGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TabBrushGlyph.__name__ = ["alphaTab","rendering","glyphs","TabBrushGlyph"];
 alphaTab_rendering_glyphs_TabBrushGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_TabBrushGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	DoLayout: function() {
@@ -17708,7 +19160,7 @@ alphaTab_rendering_glyphs_TabBrushGlyph.prototype = $extend(alphaTab_rendering_g
 var alphaTab_rendering_glyphs_TabClefGlyph = function(x,y) {
 	alphaTab_rendering_glyphs_Glyph.call(this,x,y);
 };
-alphaTab_rendering_glyphs_TabClefGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TabClefGlyph.__name__ = ["alphaTab","rendering","glyphs","TabClefGlyph"];
 alphaTab_rendering_glyphs_TabClefGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_TabClefGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	DoLayout: function() {
@@ -17733,6 +19185,13 @@ alphaTab_rendering_glyphs_TabClefGlyph.prototype = $extend(alphaTab_rendering_gl
 });
 var alphaTab_rendering_glyphs_TabNoteChordGlyph = function(x,y,isGrace) {
 	alphaTab_rendering_glyphs_Glyph.call(this,x,y);
+	this._notes = null;
+	this._isGrace = false;
+	this.Beat = null;
+	this.BeamingHelper = null;
+	this.MinStringNote = null;
+	this.BeatEffects = null;
+	this.NotesPerString = null;
 	this._isGrace = isGrace;
 	var this1 = [];
 	this._notes = this1;
@@ -17741,7 +19200,7 @@ var alphaTab_rendering_glyphs_TabNoteChordGlyph = function(x,y,isGrace) {
 	var this3 = {}
 	this.NotesPerString = this3;
 };
-alphaTab_rendering_glyphs_TabNoteChordGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TabNoteChordGlyph.__name__ = ["alphaTab","rendering","glyphs","TabNoteChordGlyph"];
 alphaTab_rendering_glyphs_TabNoteChordGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_TabNoteChordGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	GetNoteX: function(note,onEnd) {
@@ -17834,10 +19293,13 @@ alphaTab_rendering_glyphs_TabNoteChordGlyph.prototype = $extend(alphaTab_renderi
 });
 var alphaTab_rendering_glyphs_TabRestGlyph = function(x,y,isVisibleRest,duration) {
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,1,alphaTab_rendering_glyphs_ScoreRestGlyph.GetSymbol(duration));
+	this._isVisibleRest = false;
+	this._duration = null;
+	this.BeamingHelper = null;
 	this._isVisibleRest = isVisibleRest;
 	this._duration = duration;
 };
-alphaTab_rendering_glyphs_TabRestGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TabRestGlyph.__name__ = ["alphaTab","rendering","glyphs","TabRestGlyph"];
 alphaTab_rendering_glyphs_TabRestGlyph.__super__ = alphaTab_rendering_glyphs_MusicFontGlyph;
 alphaTab_rendering_glyphs_TabRestGlyph.prototype = $extend(alphaTab_rendering_glyphs_MusicFontGlyph.prototype,{
 	DoLayout: function() {
@@ -17861,11 +19323,14 @@ alphaTab_rendering_glyphs_TabRestGlyph.prototype = $extend(alphaTab_rendering_gl
 });
 var alphaTab_rendering_glyphs_TabSlideLineGlyph = function(type,startNote,parent) {
 	alphaTab_rendering_glyphs_Glyph.call(this,0,0);
+	this._startNote = null;
+	this._type = null;
+	this._parent = null;
 	this._type = type;
 	this._startNote = startNote;
 	this._parent = parent;
 };
-alphaTab_rendering_glyphs_TabSlideLineGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TabSlideLineGlyph.__name__ = ["alphaTab","rendering","glyphs","TabSlideLineGlyph"];
 alphaTab_rendering_glyphs_TabSlideLineGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_TabSlideLineGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	DoLayout: function() {
@@ -17945,11 +19410,14 @@ var alphaTab_rendering_glyphs_TabTieGlyph = function(startNote,endNote,forSlide,
 		forEnd = false;
 	}
 	alphaTab_rendering_glyphs_TieGlyph.call(this,startNote.Beat,endNote.Beat,forEnd);
+	this._startNote = null;
+	this._endNote = null;
+	this._forSlide = false;
 	this._startNote = startNote;
 	this._endNote = endNote;
 	this._forSlide = forSlide;
 };
-alphaTab_rendering_glyphs_TabTieGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TabTieGlyph.__name__ = ["alphaTab","rendering","glyphs","TabTieGlyph"];
 alphaTab_rendering_glyphs_TabTieGlyph.__super__ = alphaTab_rendering_glyphs_TieGlyph;
 alphaTab_rendering_glyphs_TabTieGlyph.prototype = $extend(alphaTab_rendering_glyphs_TieGlyph.prototype,{
 	get_Offset: function() {
@@ -17983,7 +19451,7 @@ alphaTab_rendering_glyphs_TabTieGlyph.prototype = $extend(alphaTab_rendering_gly
 var alphaTab_rendering_glyphs_TabTimeSignatureGlyph = function(x,y,numerator,denominator,isCommon) {
 	alphaTab_rendering_glyphs_TimeSignatureGlyph.call(this,x,y,numerator,denominator,isCommon);
 };
-alphaTab_rendering_glyphs_TabTimeSignatureGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TabTimeSignatureGlyph.__name__ = ["alphaTab","rendering","glyphs","TabTimeSignatureGlyph"];
 alphaTab_rendering_glyphs_TabTimeSignatureGlyph.__super__ = alphaTab_rendering_glyphs_TimeSignatureGlyph;
 alphaTab_rendering_glyphs_TabTimeSignatureGlyph.prototype = $extend(alphaTab_rendering_glyphs_TimeSignatureGlyph.prototype,{
 	get_CommonY: function() {
@@ -18029,9 +19497,10 @@ alphaTab_rendering_glyphs_TabTimeSignatureGlyph.prototype = $extend(alphaTab_ren
 });
 var alphaTab_rendering_glyphs_TempoGlyph = function(x,y,tempo) {
 	alphaTab_rendering_glyphs_EffectGlyph.call(this,x,y);
+	this._tempo = 0;
 	this._tempo = tempo;
 };
-alphaTab_rendering_glyphs_TempoGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TempoGlyph.__name__ = ["alphaTab","rendering","glyphs","TempoGlyph"];
 alphaTab_rendering_glyphs_TempoGlyph.__super__ = alphaTab_rendering_glyphs_EffectGlyph;
 alphaTab_rendering_glyphs_TempoGlyph.prototype = $extend(alphaTab_rendering_glyphs_EffectGlyph.prototype,{
 	DoLayout: function() {
@@ -18052,11 +19521,14 @@ var alphaTab_rendering_glyphs_TextGlyph = function(x,y,text,font,textAlign) {
 		textAlign = 0;
 	}
 	alphaTab_rendering_glyphs_EffectGlyph.call(this,x,y);
+	this._text = null;
+	this.Font = null;
+	this.TextAlign = null;
 	this._text = text;
 	this.Font = font;
 	this.TextAlign = textAlign;
 };
-alphaTab_rendering_glyphs_TextGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TextGlyph.__name__ = ["alphaTab","rendering","glyphs","TextGlyph"];
 alphaTab_rendering_glyphs_TextGlyph.__super__ = alphaTab_rendering_glyphs_EffectGlyph;
 alphaTab_rendering_glyphs_TextGlyph.prototype = $extend(alphaTab_rendering_glyphs_EffectGlyph.prototype,{
 	DoLayout: function() {
@@ -18075,7 +19547,7 @@ alphaTab_rendering_glyphs_TextGlyph.prototype = $extend(alphaTab_rendering_glyph
 var alphaTab_rendering_glyphs_TremoloPickingGlyph = function(x,y,duration) {
 	alphaTab_rendering_glyphs_MusicFontGlyph.call(this,x,y,1,alphaTab_rendering_glyphs_TremoloPickingGlyph.GetSymbol(duration));
 };
-alphaTab_rendering_glyphs_TremoloPickingGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TremoloPickingGlyph.__name__ = ["alphaTab","rendering","glyphs","TremoloPickingGlyph"];
 alphaTab_rendering_glyphs_TremoloPickingGlyph.GetSymbol = function(duration) {
 	switch(duration) {
 	case 8:
@@ -18098,7 +19570,7 @@ alphaTab_rendering_glyphs_TremoloPickingGlyph.prototype = $extend(alphaTab_rende
 var alphaTab_rendering_glyphs_TrillGlyph = function(x,y) {
 	alphaTab_rendering_glyphs_EffectGlyph.call(this,x,y);
 };
-alphaTab_rendering_glyphs_TrillGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TrillGlyph.__name__ = ["alphaTab","rendering","glyphs","TrillGlyph"];
 alphaTab_rendering_glyphs_TrillGlyph.__super__ = alphaTab_rendering_glyphs_EffectGlyph;
 alphaTab_rendering_glyphs_TrillGlyph.prototype = $extend(alphaTab_rendering_glyphs_EffectGlyph.prototype,{
 	DoLayout: function() {
@@ -18128,9 +19600,10 @@ alphaTab_rendering_glyphs_TrillGlyph.prototype = $extend(alphaTab_rendering_glyp
 });
 var alphaTab_rendering_glyphs_TripletFeelGlyph = function(tripletFeel) {
 	alphaTab_rendering_glyphs_EffectGlyph.call(this,0,0);
+	this._tripletFeel = null;
 	this._tripletFeel = tripletFeel;
 };
-alphaTab_rendering_glyphs_TripletFeelGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TripletFeelGlyph.__name__ = ["alphaTab","rendering","glyphs","TripletFeelGlyph"];
 alphaTab_rendering_glyphs_TripletFeelGlyph.__super__ = alphaTab_rendering_glyphs_EffectGlyph;
 alphaTab_rendering_glyphs_TripletFeelGlyph.prototype = $extend(alphaTab_rendering_glyphs_EffectGlyph.prototype,{
 	DoLayout: function() {
@@ -18233,7 +19706,7 @@ alphaTab_rendering_glyphs_TripletFeelGlyph.prototype = $extend(alphaTab_renderin
 	,__class__: alphaTab_rendering_glyphs_TripletFeelGlyph
 });
 var alphaTab_rendering_glyphs__$TripletFeelGlyph_$BarType_TripletFeelGlyph_$BarType_$Impl_$ = {};
-alphaTab_rendering_glyphs__$TripletFeelGlyph_$BarType_TripletFeelGlyph_$BarType_$Impl_$.__name__ = true;
+alphaTab_rendering_glyphs__$TripletFeelGlyph_$BarType_TripletFeelGlyph_$BarType_$Impl_$.__name__ = ["alphaTab","rendering","glyphs","_TripletFeelGlyph_BarType","TripletFeelGlyph_BarType_Impl_"];
 alphaTab_rendering_glyphs__$TripletFeelGlyph_$BarType_TripletFeelGlyph_$BarType_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -18284,11 +19757,14 @@ alphaTab_rendering_glyphs__$TripletFeelGlyph_$BarType_TripletFeelGlyph_$BarType_
 };
 var alphaTab_rendering_glyphs_TuningGlyph = function(x,y,scale,resources,tuning) {
 	alphaTab_rendering_glyphs_GlyphGroup.call(this,x,y);
+	this._scale = 0.0;
+	this._resources = null;
+	this.Height = 0.0;
 	this._scale = scale;
 	this._resources = resources;
 	this.CreateGlyphs(tuning);
 };
-alphaTab_rendering_glyphs_TuningGlyph.__name__ = true;
+alphaTab_rendering_glyphs_TuningGlyph.__name__ = ["alphaTab","rendering","glyphs","TuningGlyph"];
 alphaTab_rendering_glyphs_TuningGlyph.__super__ = alphaTab_rendering_glyphs_GlyphGroup;
 alphaTab_rendering_glyphs_TuningGlyph.prototype = $extend(alphaTab_rendering_glyphs_GlyphGroup.prototype,{
 	CreateGlyphs: function(tuning) {
@@ -18321,11 +19797,12 @@ var alphaTab_rendering_glyphs_VibratoGlyph = function(x,y,scale) {
 		scale = 1.2;
 	}
 	alphaTab_rendering_glyphs_GroupedEffectGlyph.call(this,3);
+	this._scale = 0.0;
 	this._scale = scale;
 	this.X = x;
 	this.Y = y;
 };
-alphaTab_rendering_glyphs_VibratoGlyph.__name__ = true;
+alphaTab_rendering_glyphs_VibratoGlyph.__name__ = ["alphaTab","rendering","glyphs","VibratoGlyph"];
 alphaTab_rendering_glyphs_VibratoGlyph.__super__ = alphaTab_rendering_glyphs_GroupedEffectGlyph;
 alphaTab_rendering_glyphs_VibratoGlyph.prototype = $extend(alphaTab_rendering_glyphs_GroupedEffectGlyph.prototype,{
 	DoLayout: function() {
@@ -18350,11 +19827,14 @@ alphaTab_rendering_glyphs_VibratoGlyph.prototype = $extend(alphaTab_rendering_gl
 });
 var alphaTab_rendering_glyphs_VoiceContainerGlyph = function(x,y,voice) {
 	alphaTab_rendering_glyphs_GlyphGroup.call(this,x,y);
+	this.BeatGlyphs = null;
+	this.Voice = null;
+	this.MinWidth = 0.0;
 	this.Voice = voice;
 	var this1 = [];
 	this.BeatGlyphs = this1;
 };
-alphaTab_rendering_glyphs_VoiceContainerGlyph.__name__ = true;
+alphaTab_rendering_glyphs_VoiceContainerGlyph.__name__ = ["alphaTab","rendering","glyphs","VoiceContainerGlyph"];
 alphaTab_rendering_glyphs_VoiceContainerGlyph.__super__ = alphaTab_rendering_glyphs_GlyphGroup;
 alphaTab_rendering_glyphs_VoiceContainerGlyph.prototype = $extend(alphaTab_rendering_glyphs_GlyphGroup.prototype,{
 	ScaleToWidth: function(width) {
@@ -18423,10 +19903,12 @@ alphaTab_rendering_glyphs_VoiceContainerGlyph.prototype = $extend(alphaTab_rende
 });
 var alphaTab_rendering_glyphs_WhammyBarGlyph = function(beat,parent) {
 	alphaTab_rendering_glyphs_Glyph.call(this,0,0);
+	this._beat = null;
+	this._parent = null;
 	this._beat = beat;
 	this._parent = parent;
 };
-alphaTab_rendering_glyphs_WhammyBarGlyph.__name__ = true;
+alphaTab_rendering_glyphs_WhammyBarGlyph.__name__ = ["alphaTab","rendering","glyphs","WhammyBarGlyph"];
 alphaTab_rendering_glyphs_WhammyBarGlyph.__super__ = alphaTab_rendering_glyphs_Glyph;
 alphaTab_rendering_glyphs_WhammyBarGlyph.prototype = $extend(alphaTab_rendering_glyphs_Glyph.prototype,{
 	DoLayout: function() {
@@ -18483,38 +19965,9 @@ alphaTab_rendering_glyphs_WhammyBarGlyph.prototype = $extend(alphaTab_rendering_
 				var pt1 = this._beat.WhammyBarPoints[i];
 				var pt2 = this._beat.WhammyBarPoints[i + 1];
 				if(pt1.Value == pt2.Value && i == this._beat.WhammyBarPoints.length - 2) {
-					continue;
+					++i;
 				}
-				var pt1X = startX + dx * pt1.Offset;
-				var pt1Y = startY - dy * pt1.Value;
-				var pt2X = startX + dx * pt2.Offset;
-				var pt2Y = startY - dy * pt2.Value;
-				canvas.MoveTo(pt1X,pt1Y);
-				canvas.LineTo(pt2X,pt2Y);
-				if(pt2.Value != 0) {
-					var dv = pt2.Value;
-					var s = "";
-					if(dv >= 4 || dv <= -4) {
-						var steps = dv / 4 | 0;
-						s = s + Std.string(steps);
-						dv = dv - steps * 4;
-					}
-					if(dv > 0) {
-						s = s + alphaTab_rendering_glyphs_BendGlyph.GetFractionSign(dv);
-					}
-					if(s != "") {
-						canvas.set_Font(res.GraceFont);
-						var sy = pt2Y;
-						if(pt2Y < pt1Y) {
-							sy = sy - canvas.get_Font().Size;
-						} else {
-							sy = sy + 3 * this.get_Scale();
-						}
-						var sx = pt2X;
-						canvas.FillText(s,sx,sy);
-					}
-				}
-				++i;
+				continue;
 			}
 			canvas.Stroke();
 		}
@@ -18523,7 +19976,7 @@ alphaTab_rendering_glyphs_WhammyBarGlyph.prototype = $extend(alphaTab_rendering_
 	,__class__: alphaTab_rendering_glyphs_WhammyBarGlyph
 });
 var alphaTab_rendering_layout__$HeaderFooterElements_HeaderFooterElements_$Impl_$ = {};
-alphaTab_rendering_layout__$HeaderFooterElements_HeaderFooterElements_$Impl_$.__name__ = true;
+alphaTab_rendering_layout__$HeaderFooterElements_HeaderFooterElements_$Impl_$.__name__ = ["alphaTab","rendering","layout","_HeaderFooterElements","HeaderFooterElements_Impl_"];
 alphaTab_rendering_layout__$HeaderFooterElements_HeaderFooterElements_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -18589,14 +20042,30 @@ alphaTab_rendering_layout__$HeaderFooterElements_HeaderFooterElements_$Impl_$.to
 	return "";
 };
 var alphaTab_rendering_layout_HorizontalScreenLayoutPartialInfo = function() {
+	this.Width = 0.0;
+	this.MasterBars = null;
 	var this1 = [];
 	this.MasterBars = this1;
 };
-alphaTab_rendering_layout_HorizontalScreenLayoutPartialInfo.__name__ = true;
+alphaTab_rendering_layout_HorizontalScreenLayoutPartialInfo.__name__ = ["alphaTab","rendering","layout","HorizontalScreenLayoutPartialInfo"];
 alphaTab_rendering_layout_HorizontalScreenLayoutPartialInfo.prototype = {
 	__class__: alphaTab_rendering_layout_HorizontalScreenLayoutPartialInfo
 };
 var alphaTab_rendering_staves_BarLayoutingInfo = function() {
+	this._timeSortedSprings = null;
+	this._xMin = 0.0;
+	this._onTimePositionsForce = 0.0;
+	this._onTimePositions = null;
+	this.Version = 0;
+	this.PreBeatSizes = null;
+	this.OnBeatSizes = null;
+	this.PreBeatSize = 0.0;
+	this.PostBeatSize = 0.0;
+	this.VoiceSize = 0.0;
+	this.MinStretchForce = 0.0;
+	this.TotalSpringConstant = 0.0;
+	this.Springs = null;
+	this.SmallestDuration = 0;
 	var this1 = {}
 	this.PreBeatSizes = this1;
 	var this2 = {}
@@ -18606,7 +20075,7 @@ var alphaTab_rendering_staves_BarLayoutingInfo = function() {
 	this.Springs = this3;
 	this.Version = 0;
 };
-alphaTab_rendering_staves_BarLayoutingInfo.__name__ = true;
+alphaTab_rendering_staves_BarLayoutingInfo.__name__ = ["alphaTab","rendering","staves","BarLayoutingInfo"];
 alphaTab_rendering_staves_BarLayoutingInfo.prototype = {
 	UpdateVoiceSize: function(size) {
 		if(size > this.VoiceSize) {
@@ -18774,20 +20243,42 @@ alphaTab_rendering_staves_BarLayoutingInfo.prototype = {
 	,__class__: alphaTab_rendering_staves_BarLayoutingInfo
 };
 var alphaTab_rendering_staves_MasterBarsRenderers = function() {
+	this.Width = 0.0;
+	this.IsLinkedToPrevious = false;
+	this.MasterBar = null;
+	this.Renderers = null;
+	this.LayoutingInfo = null;
 	var this1 = [];
 	this.Renderers = this1;
 };
-alphaTab_rendering_staves_MasterBarsRenderers.__name__ = true;
+alphaTab_rendering_staves_MasterBarsRenderers.__name__ = ["alphaTab","rendering","staves","MasterBarsRenderers"];
 alphaTab_rendering_staves_MasterBarsRenderers.prototype = {
 	__class__: alphaTab_rendering_staves_MasterBarsRenderers
 };
 var alphaTab_rendering_staves_Spring = function() {
 };
-alphaTab_rendering_staves_Spring.__name__ = true;
+alphaTab_rendering_staves_Spring.__name__ = ["alphaTab","rendering","staves","Spring"];
 alphaTab_rendering_staves_Spring.prototype = {
 	__class__: alphaTab_rendering_staves_Spring
 };
 var alphaTab_rendering_staves_Staff = function(trackIndex,staff,factory) {
+	this._factory = null;
+	this.StaveTrackGroup = null;
+	this.StaveGroup = null;
+	this.BarRenderers = null;
+	this.X = 0.0;
+	this.Y = 0.0;
+	this.Height = 0.0;
+	this.Index = 0;
+	this.StaffIndex = 0;
+	this.TrackIndex = 0;
+	this.ModelStaff = null;
+	this.StaveTop = 0.0;
+	this.TopSpacing = 0.0;
+	this.BottomSpacing = 0.0;
+	this.StaveBottom = 0.0;
+	this.IsFirstInAccolade = false;
+	this.IsLastInAccolade = false;
 	var this1 = [];
 	this.BarRenderers = this1;
 	this.TrackIndex = trackIndex;
@@ -18798,7 +20289,7 @@ var alphaTab_rendering_staves_Staff = function(trackIndex,staff,factory) {
 	this.StaveTop = 0;
 	this.StaveBottom = 0;
 };
-alphaTab_rendering_staves_Staff.__name__ = true;
+alphaTab_rendering_staves_Staff.__name__ = ["alphaTab","rendering","staves","Staff"];
 alphaTab_rendering_staves_Staff.prototype = {
 	get_StaveId: function() {
 		return this._factory.get_StaffId();
@@ -18912,6 +20403,20 @@ alphaTab_rendering_staves_Staff.prototype = {
 	,__class__: alphaTab_rendering_staves_Staff
 };
 var alphaTab_rendering_staves_StaveGroup = function() {
+	this._allStaves = null;
+	this._firstStaffInAccolade = null;
+	this._lastStaffInAccolade = null;
+	this.X = 0.0;
+	this.Y = 0.0;
+	this.Index = 0;
+	this._accoladeSpacingCalculated = false;
+	this.AccoladeSpacing = 0.0;
+	this.IsFull = false;
+	this.Width = 0.0;
+	this.IsLast = false;
+	this.MasterBarsRenderers = null;
+	this.Staves = null;
+	this.Layout = null;
 	var this1 = [];
 	this.MasterBarsRenderers = this1;
 	var this2 = [];
@@ -18923,7 +20428,7 @@ var alphaTab_rendering_staves_StaveGroup = function() {
 	this._accoladeSpacingCalculated = false;
 	this.AccoladeSpacing = 0;
 };
-alphaTab_rendering_staves_StaveGroup.__name__ = true;
+alphaTab_rendering_staves_StaveGroup.__name__ = ["alphaTab","rendering","staves","StaveGroup"];
 alphaTab_rendering_staves_StaveGroup.prototype = {
 	get_FirstBarIndex: function() {
 		return this.MasterBarsRenderers[0].MasterBar.Index;
@@ -19212,22 +20717,29 @@ alphaTab_rendering_staves_StaveGroup.prototype = {
 	,__class__: alphaTab_rendering_staves_StaveGroup
 };
 var alphaTab_rendering_staves_StaveTrackGroup = function(staveGroup,track) {
+	this.Track = null;
+	this.StaveGroup = null;
+	this.Staves = null;
+	this.FirstStaffInAccolade = null;
+	this.LastStaffInAccolade = null;
 	this.StaveGroup = staveGroup;
 	this.Track = track;
 	var this1 = [];
 	this.Staves = this1;
 };
-alphaTab_rendering_staves_StaveTrackGroup.__name__ = true;
+alphaTab_rendering_staves_StaveTrackGroup.__name__ = ["alphaTab","rendering","staves","StaveTrackGroup"];
 alphaTab_rendering_staves_StaveTrackGroup.prototype = {
 	__class__: alphaTab_rendering_staves_StaveTrackGroup
 };
 var alphaTab_rendering_utils_AccidentalHelper = function() {
+	this._registeredAccidentals = null;
+	this._appliedScoreLines = null;
 	var this1 = {}
 	this._registeredAccidentals = this1;
 	var this2 = {}
 	this._appliedScoreLines = this2;
 };
-alphaTab_rendering_utils_AccidentalHelper.__name__ = true;
+alphaTab_rendering_utils_AccidentalHelper.__name__ = ["alphaTab","rendering","utils","AccidentalHelper"];
 alphaTab_rendering_utils_AccidentalHelper.prototype = {
 	ApplyAccidental: function(note) {
 		var noteValue = note.get_RealValue();
@@ -19250,7 +20762,7 @@ alphaTab_rendering_utils_AccidentalHelper.prototype = {
 				}
 			} else if(hasNoteAccidentalForKeySignature == isAccidentalNote && isAccidentalRegistered) {
 				var this1 = this._registeredAccidentals;
-				delete this1[index];
+				delete this1[line];
 				if(isAccidentalNote) {
 					accidentalToSet = keySignatureAccidental;
 				} else {
@@ -19283,10 +20795,15 @@ alphaTab_rendering_utils_AccidentalHelper.prototype = {
 	,__class__: alphaTab_rendering_utils_AccidentalHelper
 };
 var alphaTab_rendering_utils_BarBounds = function() {
+	this.MasterBarBounds = null;
+	this.VisualBounds = null;
+	this.RealBounds = null;
+	this.Bar = null;
+	this.Beats = null;
 	var this1 = [];
 	this.Beats = this1;
 };
-alphaTab_rendering_utils_BarBounds.__name__ = true;
+alphaTab_rendering_utils_BarBounds.__name__ = ["alphaTab","rendering","utils","BarBounds"];
 alphaTab_rendering_utils_BarBounds.prototype = {
 	AddBeat: function(bounds) {
 		bounds.BarBounds = this;
@@ -19309,6 +20826,9 @@ alphaTab_rendering_utils_BarBounds.prototype = {
 	,__class__: alphaTab_rendering_utils_BarBounds
 };
 var alphaTab_rendering_utils_BarHelpers = function(bar) {
+	this.BeamHelpers = null;
+	this.BeamHelperLookup = null;
+	this.TupletHelpers = null;
 	var this1 = [];
 	this.BeamHelpers = this1;
 	var this2 = [];
@@ -19378,12 +20898,12 @@ var alphaTab_rendering_utils_BarHelpers = function(bar) {
 		}
 	}
 };
-alphaTab_rendering_utils_BarHelpers.__name__ = true;
+alphaTab_rendering_utils_BarHelpers.__name__ = ["alphaTab","rendering","utils","BarHelpers"];
 alphaTab_rendering_utils_BarHelpers.prototype = {
 	__class__: alphaTab_rendering_utils_BarHelpers
 };
 var alphaTab_rendering_utils__$BeamDirection_BeamDirection_$Impl_$ = {};
-alphaTab_rendering_utils__$BeamDirection_BeamDirection_$Impl_$.__name__ = true;
+alphaTab_rendering_utils__$BeamDirection_BeamDirection_$Impl_$.__name__ = ["alphaTab","rendering","utils","_BeamDirection","BeamDirection_Impl_"];
 alphaTab_rendering_utils__$BeamDirection_BeamDirection_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -19431,6 +20951,22 @@ alphaTab_rendering_utils__$BeamDirection_BeamDirection_$Impl_$.toString = functi
 	return "";
 };
 var alphaTab_rendering_utils_BeamingHelper = function(track) {
+	this._lastBeat = null;
+	this._track = null;
+	this._beatLineXPositions = null;
+	this.Voice = null;
+	this.Beats = null;
+	this.ShortestDuration = null;
+	this.FingeringCount = 0;
+	this.HasTuplet = false;
+	this.FirstMinNote = null;
+	this.FirstMaxNote = null;
+	this.LastMinNote = null;
+	this.LastMaxNote = null;
+	this.MinNote = null;
+	this.MaxNote = null;
+	this.InvertBeamDirection = false;
+	this.Direction = null;
 	this._track = track;
 	var this1 = [];
 	this.Beats = this1;
@@ -19438,7 +20974,7 @@ var alphaTab_rendering_utils_BeamingHelper = function(track) {
 	this._beatLineXPositions = this2;
 	this.ShortestDuration = -4;
 };
-alphaTab_rendering_utils_BeamingHelper.__name__ = true;
+alphaTab_rendering_utils_BeamingHelper.__name__ = ["alphaTab","rendering","utils","BeamingHelper"];
 alphaTab_rendering_utils_BeamingHelper.CanJoin = function(b1,b2) {
 	if(b1 == null || b2 == null || b1.get_IsRest() || b2.get_IsRest() || b1.GraceType != b2.GraceType) {
 		return false;
@@ -19667,32 +21203,39 @@ alphaTab_rendering_utils_BeamingHelper.prototype = {
 };
 var alphaTab_rendering_utils_BeatBounds = function() {
 };
-alphaTab_rendering_utils_BeatBounds.__name__ = true;
+alphaTab_rendering_utils_BeatBounds.__name__ = ["alphaTab","rendering","utils","BeatBounds"];
 alphaTab_rendering_utils_BeatBounds.prototype = {
 	__class__: alphaTab_rendering_utils_BeatBounds
 };
 var alphaTab_rendering_utils_BeatLinePositions = function(staffId,up,down) {
+	this.StaffId = null;
+	this.Up = 0.0;
+	this.Down = 0.0;
 	this.StaffId = staffId;
 	this.Up = up;
 	this.Down = down;
 };
-alphaTab_rendering_utils_BeatLinePositions.__name__ = true;
+alphaTab_rendering_utils_BeatLinePositions.__name__ = ["alphaTab","rendering","utils","BeatLinePositions"];
 alphaTab_rendering_utils_BeatLinePositions.prototype = {
 	__class__: alphaTab_rendering_utils_BeatLinePositions
 };
 var alphaTab_rendering_utils_Bounds = function() {
 };
-alphaTab_rendering_utils_Bounds.__name__ = true;
+alphaTab_rendering_utils_Bounds.__name__ = ["alphaTab","rendering","utils","Bounds"];
 alphaTab_rendering_utils_Bounds.prototype = {
 	__class__: alphaTab_rendering_utils_Bounds
 };
 var alphaTab_rendering_utils_BoundsLookup = function() {
+	this._beatLookup = null;
+	this._currentStaveGroup = null;
+	this.StaveGroups = null;
+	this.IsFinished = false;
 	var this1 = [];
 	this.StaveGroups = this1;
 	var this2 = {}
 	this._beatLookup = this2;
 };
-alphaTab_rendering_utils_BoundsLookup.__name__ = true;
+alphaTab_rendering_utils_BoundsLookup.__name__ = ["alphaTab","rendering","utils","BoundsLookup"];
 alphaTab_rendering_utils_BoundsLookup.FromJson = function(json,score) {
 	var lookup = new alphaTab_rendering_utils_BoundsLookup();
 	var staveGroups = json["StaveGroups"];
@@ -19849,10 +21392,15 @@ alphaTab_rendering_utils_BoundsLookup.prototype = {
 	,__class__: alphaTab_rendering_utils_BoundsLookup
 };
 var alphaTab_rendering_utils_MasterBarBounds = function() {
+	this.IsFirstOfLine = false;
+	this.VisualBounds = null;
+	this.RealBounds = null;
+	this.Bars = null;
+	this.StaveGroupBounds = null;
 	var this1 = [];
 	this.Bars = this1;
 };
-alphaTab_rendering_utils_MasterBarBounds.__name__ = true;
+alphaTab_rendering_utils_MasterBarBounds.__name__ = ["alphaTab","rendering","utils","MasterBarBounds"];
 alphaTab_rendering_utils_MasterBarBounds.prototype = {
 	AddBar: function(bounds) {
 		bounds.MasterBarBounds = this;
@@ -19901,7 +21449,7 @@ alphaTab_rendering_utils_MasterBarBounds.prototype = {
 };
 var alphaTab_rendering_utils_PercussionMapper = function() {
 };
-alphaTab_rendering_utils_PercussionMapper.__name__ = true;
+alphaTab_rendering_utils_PercussionMapper.__name__ = ["alphaTab","rendering","utils","PercussionMapper"];
 alphaTab_rendering_utils_PercussionMapper.MidiFromElementVariation = function(note) {
 	return alphaTab_rendering_utils_PercussionMapper.ElementVariationToMidi[note.Element][note.Variation];
 };
@@ -19934,11 +21482,16 @@ alphaTab_rendering_utils_PercussionMapper.prototype = {
 	__class__: alphaTab_rendering_utils_PercussionMapper
 };
 var alphaTab_rendering_utils_StaveGroupBounds = function() {
+	this.Index = 0;
+	this.VisualBounds = null;
+	this.RealBounds = null;
+	this.Bars = null;
+	this.BoundsLookup = null;
 	var this1 = [];
 	this.Bars = this1;
 	this.Index = 0;
 };
-alphaTab_rendering_utils_StaveGroupBounds.__name__ = true;
+alphaTab_rendering_utils_StaveGroupBounds.__name__ = ["alphaTab","rendering","utils","StaveGroupBounds"];
 alphaTab_rendering_utils_StaveGroupBounds.prototype = {
 	Finish: function() {
 		var i = 0;
@@ -19967,11 +21520,15 @@ alphaTab_rendering_utils_StaveGroupBounds.prototype = {
 	,__class__: alphaTab_rendering_utils_StaveGroupBounds
 };
 var alphaTab_rendering_utils_TupletHelper = function(voice) {
+	this._isFinished = false;
+	this.Beats = null;
+	this.VoiceIndex = 0;
+	this.Tuplet = 0;
 	this.VoiceIndex = voice;
 	var this1 = [];
 	this.Beats = this1;
 };
-alphaTab_rendering_utils_TupletHelper.__name__ = true;
+alphaTab_rendering_utils_TupletHelper.__name__ = ["alphaTab","rendering","utils","TupletHelper"];
 alphaTab_rendering_utils_TupletHelper.prototype = {
 	get_IsFull: function() {
 		return this.Beats.length == this.Tuplet;
@@ -19991,9 +21548,12 @@ alphaTab_rendering_utils_TupletHelper.prototype = {
 	,__class__: alphaTab_rendering_utils_TupletHelper
 };
 var alphaTab_util_Lazy = function(factory) {
+	this._factory = null;
+	this._created = false;
+	this._value = null;
 	this._factory = factory;
 };
-alphaTab_util_Lazy.__name__ = true;
+alphaTab_util_Lazy.__name__ = ["alphaTab","util","Lazy"];
 alphaTab_util_Lazy.prototype = {
 	get_Value: function() {
 		if(!this._created) {
@@ -20005,7 +21565,7 @@ alphaTab_util_Lazy.prototype = {
 	,__class__: alphaTab_util_Lazy
 };
 var alphaTab_util__$LogLevel_LogLevel_$Impl_$ = {};
-alphaTab_util__$LogLevel_LogLevel_$Impl_$.__name__ = true;
+alphaTab_util__$LogLevel_LogLevel_$Impl_$.__name__ = ["alphaTab","util","_LogLevel","LogLevel_Impl_"];
 alphaTab_util__$LogLevel_LogLevel_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -20059,12 +21619,19 @@ alphaTab_util__$LogLevel_LogLevel_$Impl_$.toString = function(this1) {
 	return "";
 };
 var alphaTab_xml_XmlNode = function() {
+	this.NodeType = null;
+	this.LocalName = null;
+	this.Value = null;
+	this.ChildNodes = null;
+	this.Attributes = null;
+	this.FirstChild = null;
+	this.FirstElement = null;
 	var this1 = {}
 	this.Attributes = this1;
 	var this2 = [];
 	this.ChildNodes = this2;
 };
-alphaTab_xml_XmlNode.__name__ = true;
+alphaTab_xml_XmlNode.__name__ = ["alphaTab","xml","XmlNode"];
 alphaTab_xml_XmlNode.prototype = {
 	AddChild: function(node) {
 		this.ChildNodes.push(node);
@@ -20079,17 +21646,29 @@ alphaTab_xml_XmlNode.prototype = {
 		}
 		return "";
 	}
-	,GetElementsByTagName: function(name) {
+	,GetElementsByTagName: function(name,recursive) {
+		if(recursive == null) {
+			recursive = false;
+		}
 		var this1 = [];
 		var tags = this1;
-		var c = $iterator(this.ChildNodes)();
+		this.SearchElementsByTagName(this.ChildNodes,tags,name,recursive);
+		return tags;
+	}
+	,SearchElementsByTagName: function(all,result,name,recursive) {
+		if(recursive == null) {
+			recursive = false;
+		}
+		var c = $iterator(all)();
 		while(c.hasNext()) {
 			var c1 = c.next();
 			if(c1 != null && c1.NodeType == 1 && c1.LocalName == name) {
-				tags.push(c1);
+				result.push(c1);
+			}
+			if(recursive) {
+				this.SearchElementsByTagName(c1.ChildNodes,result,name,true);
 			}
 		}
-		return tags;
 	}
 	,FindChildElement: function(name) {
 		var c = $iterator(this.ChildNodes)();
@@ -20118,6 +21697,7 @@ alphaTab_xml_XmlNode.prototype = {
 };
 var alphaTab_xml_XmlDocument = function(xml) {
 	alphaTab_xml_XmlNode.call(this);
+	this.DocumentElement = null;
 	this.NodeType = 9;
 	alphaTab_xml_XmlParser.Parse(xml,0,this);
 	var child = $iterator(this.ChildNodes)();
@@ -20129,7 +21709,7 @@ var alphaTab_xml_XmlDocument = function(xml) {
 		}
 	}
 };
-alphaTab_xml_XmlDocument.__name__ = true;
+alphaTab_xml_XmlDocument.__name__ = ["alphaTab","xml","XmlDocument"];
 alphaTab_xml_XmlDocument.__super__ = alphaTab_xml_XmlNode;
 alphaTab_xml_XmlDocument.prototype = $extend(alphaTab_xml_XmlNode.prototype,{
 	__class__: alphaTab_xml_XmlDocument
@@ -20137,11 +21717,13 @@ alphaTab_xml_XmlDocument.prototype = $extend(alphaTab_xml_XmlNode.prototype,{
 var alphaTab_xml_XmlException = function() {
 	alphaTab_AlphaTabException.call(this);
 };
-alphaTab_xml_XmlException.__name__ = true;
+alphaTab_xml_XmlException.__name__ = ["alphaTab","xml","XmlException"];
 alphaTab_xml_XmlException.__super__ = alphaTab_AlphaTabException;
 alphaTab_xml_XmlException.prototype = $extend(alphaTab_AlphaTabException.prototype,{
 	XmlException: function(message,xml,pos) {
 		this.AlphaTabException(message);
+		this.Xml = null;
+		this.Pos = 0;
 		this.Xml = xml;
 		this.Pos = pos;
 		return this;
@@ -20149,7 +21731,7 @@ alphaTab_xml_XmlException.prototype = $extend(alphaTab_AlphaTabException.prototy
 	,__class__: alphaTab_xml_XmlException
 });
 var alphaTab_xml__$XmlNodeType_XmlNodeType_$Impl_$ = {};
-alphaTab_xml__$XmlNodeType_XmlNodeType_$Impl_$.__name__ = true;
+alphaTab_xml__$XmlNodeType_XmlNodeType_$Impl_$.__name__ = ["alphaTab","xml","_XmlNodeType","XmlNodeType_Impl_"];
 alphaTab_xml__$XmlNodeType_XmlNodeType_$Impl_$.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
@@ -20230,7 +21812,7 @@ alphaTab_xml__$XmlNodeType_XmlNodeType_$Impl_$.toString = function(this1) {
 };
 var alphaTab_xml_XmlParser = function() {
 };
-alphaTab_xml_XmlParser.__name__ = true;
+alphaTab_xml_XmlParser.__name__ = ["alphaTab","xml","XmlParser"];
 alphaTab_xml_XmlParser.Parse = function(str,p,parent) {
 	var this1 = system_Convert.ToUInt16(HxOverrides.cca(str,p));
 	var this2 = this1;
@@ -20247,8 +21829,7 @@ alphaTab_xml_XmlParser.Parse = function(str,p,parent) {
 	var attrValQuote = 0;
 	while(p < str.length) {
 		var this4 = system_Convert.ToUInt16(HxOverrides.cca(str,p));
-		var this5 = this4;
-		c = this5;
+		c = this4;
 		switch(state) {
 		case 0:
 			switch(c) {
@@ -20272,8 +21853,8 @@ alphaTab_xml_XmlParser.Parse = function(str,p,parent) {
 		case 2:
 			switch(c) {
 			case 33:
-				var this6 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 1));
-				if(this6 == 91) {
+				var this5 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 1));
+				if(this5 == 91) {
 					p = p + 2;
 					if(HxOverrides.substr(str,p,6).toUpperCase() != "CDATA[") {
 						throw new js__$Boot_HaxeError(new alphaTab_xml_XmlException().XmlException("Expected <![CDATA[",str,p));
@@ -20283,10 +21864,10 @@ alphaTab_xml_XmlParser.Parse = function(str,p,parent) {
 					start = p + 1;
 				} else {
 					var tmp;
-					var this7 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 1));
-					if(!(this7 == 68)) {
-						var this8 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 1));
-						tmp = this8 == 100;
+					var this6 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 1));
+					if(!(this6 == 68)) {
+						var this7 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 1));
+						tmp = this7 == 100;
 					} else {
 						tmp = true;
 					}
@@ -20299,10 +21880,10 @@ alphaTab_xml_XmlParser.Parse = function(str,p,parent) {
 						start = p + 1;
 					} else {
 						var tmp1;
-						var this9 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 1));
-						if(!(this9 != 45)) {
-							var this10 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 2));
-							tmp1 = this10 != 45;
+						var this8 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 1));
+						if(!(this8 != 45)) {
+							var this9 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 2));
+							tmp1 = this9 != 45;
 						} else {
 							tmp1 = true;
 						}
@@ -20388,8 +21969,8 @@ alphaTab_xml_XmlParser.Parse = function(str,p,parent) {
 		case 7:
 			switch(c) {
 			case 34:case 39:
-				var this11 = "";
-				buf = this11;
+				var this10 = "";
+				buf = this10;
 				state = 8;
 				start = p + 1;
 				attrValQuote = c;
@@ -20406,8 +21987,8 @@ alphaTab_xml_XmlParser.Parse = function(str,p,parent) {
 			} else if(c == attrValQuote) {
 				buf += Std.string(HxOverrides.substr(str,start,p - start));
 				var val = buf;
-				var this12 = "";
-				buf = this12;
+				var this11 = "";
+				buf = this11;
 				xml.Attributes[aname] = val;
 				state = 0;
 				next = 4;
@@ -20453,8 +22034,8 @@ alphaTab_xml_XmlParser.Parse = function(str,p,parent) {
 				var child = new alphaTab_xml_XmlNode();
 				child.NodeType = 3;
 				child.Value = buf;
-				var this13 = "";
-				buf = this13;
+				var this12 = "";
+				buf = this12;
 				parent.AddChild(child);
 				state = 0;
 				next = 2;
@@ -20468,8 +22049,8 @@ alphaTab_xml_XmlParser.Parse = function(str,p,parent) {
 		case 14:
 			var tmp4;
 			if(c == 63) {
-				var this14 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 1));
-				tmp4 = this14 == 62;
+				var this13 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 1));
+				tmp4 = this13 == 62;
 			} else {
 				tmp4 = false;
 			}
@@ -20482,14 +22063,14 @@ alphaTab_xml_XmlParser.Parse = function(str,p,parent) {
 			var tmp5;
 			var tmp6;
 			if(c == 45) {
-				var this15 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 1));
-				tmp6 = this15 == 45;
+				var this14 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 1));
+				tmp6 = this14 == 45;
 			} else {
 				tmp6 = false;
 			}
 			if(tmp6) {
-				var this16 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 2));
-				tmp5 = this16 == 62;
+				var this15 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 2));
+				tmp5 = this15 == 62;
 			} else {
 				tmp5 = false;
 			}
@@ -20515,14 +22096,14 @@ alphaTab_xml_XmlParser.Parse = function(str,p,parent) {
 			var tmp7;
 			var tmp8;
 			if(c == 93) {
-				var this17 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 1));
-				tmp8 = this17 == 93;
+				var this16 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 1));
+				tmp8 = this16 == 93;
 			} else {
 				tmp8 = false;
 			}
 			if(tmp8) {
-				var this18 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 2));
-				tmp7 = this18 == 62;
+				var this17 = system_Convert.ToUInt16(HxOverrides.cca(str,p + 2));
+				tmp7 = this17 == 62;
 			} else {
 				tmp7 = false;
 			}
@@ -20536,14 +22117,14 @@ alphaTab_xml_XmlParser.Parse = function(str,p,parent) {
 			}
 			break;
 		case 18:
-			var this19 = system_Convert.ToUInt16(59);
-			if(c == this19) {
+			var this18 = system_Convert.ToUInt16(59);
+			if(c == this18) {
 				var s = HxOverrides.substr(str,start,p - start);
-				var this20 = system_Convert.ToUInt16(HxOverrides.cca(s,0));
-				if(this20 == 35) {
+				var this19 = system_Convert.ToUInt16(HxOverrides.cca(s,0));
+				if(this19 == 35) {
 					var code;
-					var this21 = system_Convert.ToUInt16(HxOverrides.cca(s,1));
-					if(this21 == 120) {
+					var this20 = system_Convert.ToUInt16(HxOverrides.cca(s,1));
+					if(this20 == 120) {
 						code = alphaTab_platform_Platform.ParseInt("0" + HxOverrides.substr(s,1,s.length - 1));
 					} else {
 						code = alphaTab_platform_Platform.ParseInt(HxOverrides.substr(s,1,s.length - 1));
@@ -20594,7 +22175,7 @@ alphaTab_xml_XmlParser.Parse = function(str,p,parent) {
 	throw new js__$Boot_HaxeError(new alphaTab_xml_XmlException().XmlException("Unexpected end",str,p));
 };
 alphaTab_xml_XmlParser.IsValidChar = function(c) {
-	if(!(c >= 97 && c <= 122 || c >= 65 && c <= 90 || c >= 48 && c <= 48 || c == 58 || c == 46 || c == 95)) {
+	if(!(c >= 97 && c <= 122 || c >= 65 && c <= 90 || c >= 48 && c <= 57 || c == 58 || c == 46 || c == 95)) {
 		return c == 45;
 	} else {
 		return true;
@@ -20605,9 +22186,79 @@ alphaTab_xml_XmlParser.prototype = {
 };
 var alphaTab_xml_XmlParser_$XmlState = function() {
 };
-alphaTab_xml_XmlParser_$XmlState.__name__ = true;
+alphaTab_xml_XmlParser_$XmlState.__name__ = ["alphaTab","xml","XmlParser_XmlState"];
 alphaTab_xml_XmlParser_$XmlState.prototype = {
 	__class__: alphaTab_xml_XmlParser_$XmlState
+};
+var haxe__$Int64__$_$_$Int64 = function(high,low) {
+	this.high = high;
+	this.low = low;
+};
+haxe__$Int64__$_$_$Int64.__name__ = ["haxe","_Int64","___Int64"];
+haxe__$Int64__$_$_$Int64.prototype = {
+	__class__: haxe__$Int64__$_$_$Int64
+};
+var haxe_io_FPHelper = function() { };
+haxe_io_FPHelper.__name__ = ["haxe","io","FPHelper"];
+haxe_io_FPHelper.i32ToFloat = function(i) {
+	var sign = 1 - (i >>> 31 << 1);
+	var exp = i >>> 23 & 255;
+	var sig = i & 8388607;
+	if(sig == 0 && exp == 0) {
+		return 0.0;
+	}
+	return sign * (1 + Math.pow(2,-23) * sig) * Math.pow(2,exp - 127);
+};
+haxe_io_FPHelper.floatToI32 = function(f) {
+	if(f == 0) {
+		return 0;
+	}
+	var af = f < 0 ? -f : f;
+	var exp = Math.floor(Math.log(af) / 0.6931471805599453);
+	if(exp < -127) {
+		exp = -127;
+	} else if(exp > 128) {
+		exp = 128;
+	}
+	var sig = Math.round((af / Math.pow(2,exp) - 1) * 8388608);
+	if(sig == 8388608 && exp < 128) {
+		sig = 0;
+		++exp;
+	}
+	return (f < 0 ? -2147483648 : 0) | exp + 127 << 23 | sig;
+};
+haxe_io_FPHelper.i64ToDouble = function(low,high) {
+	var sign = 1 - (high >>> 31 << 1);
+	var exp = (high >> 20 & 2047) - 1023;
+	var sig = (high & 1048575) * 4294967296. + (low >>> 31) * 2147483648. + (low & 2147483647);
+	if(sig == 0 && exp == -1023) {
+		return 0.0;
+	}
+	return sign * (1.0 + Math.pow(2,-52) * sig) * Math.pow(2,exp);
+};
+haxe_io_FPHelper.doubleToI64 = function(v) {
+	var i64 = haxe_io_FPHelper.i64tmp;
+	if(v == 0) {
+		i64.low = 0;
+		i64.high = 0;
+	} else if(!isFinite(v)) {
+		if(v > 0) {
+			i64.low = 0;
+			i64.high = 2146435072;
+		} else {
+			i64.low = 0;
+			i64.high = -1048576;
+		}
+	} else {
+		var av = v < 0 ? -v : v;
+		var exp = Math.floor(Math.log(av) / 0.6931471805599453);
+		var sig = Math.round((av / Math.pow(2,exp) - 1) * 4503599627370496.);
+		var sig_l = sig | 0;
+		var sig_h = sig / 4294967296.0 | 0;
+		i64.low = sig_l;
+		i64.high = (v < 0 ? -2147483648 : 0) | exp + 1023 << 20 | sig_h;
+	}
+	return i64;
 };
 var js__$Boot_HaxeError = function(val) {
 	Error.call(this);
@@ -20617,7 +22268,7 @@ var js__$Boot_HaxeError = function(val) {
 		Error.captureStackTrace(this,js__$Boot_HaxeError);
 	}
 };
-js__$Boot_HaxeError.__name__ = true;
+js__$Boot_HaxeError.__name__ = ["js","_Boot","HaxeError"];
 js__$Boot_HaxeError.wrap = function(val) {
 	if((val instanceof Error)) {
 		return val;
@@ -20645,7 +22296,7 @@ var js_html_compat_ArrayBuffer = function(a) {
 		this.byteLength = len;
 	}
 };
-js_html_compat_ArrayBuffer.__name__ = true;
+js_html_compat_ArrayBuffer.__name__ = ["js","html","compat","ArrayBuffer"];
 js_html_compat_ArrayBuffer.sliceImpl = function(begin,end) {
 	var u = new Uint8Array(this,begin,end == null ? null : end - begin);
 	var result = new ArrayBuffer(u.byteLength);
@@ -20659,8 +22310,207 @@ js_html_compat_ArrayBuffer.prototype = {
 	}
 	,__class__: js_html_compat_ArrayBuffer
 };
+var js_html_compat_Float32Array = function() { };
+js_html_compat_Float32Array.__name__ = ["js","html","compat","Float32Array"];
+js_html_compat_Float32Array._new = function(arg1,offset,length) {
+	var arr;
+	if(typeof(arg1) == "number") {
+		arr = [];
+		var _g1 = 0;
+		var _g = arg1;
+		while(_g1 < _g) {
+			var i = _g1++;
+			arr[i] = 0;
+		}
+		arr.byteLength = arr.length << 2;
+		arr.byteOffset = 0;
+		var _g2 = [];
+		var _g21 = 0;
+		var _g11 = arr.length << 2;
+		while(_g21 < _g11) {
+			var i1 = _g21++;
+			_g2.push(0);
+		}
+		arr.buffer = new js_html_compat_ArrayBuffer(_g2);
+	} else if(js_Boot.__instanceof(arg1,js_html_compat_ArrayBuffer)) {
+		var buffer = arg1;
+		if(offset == null) {
+			offset = 0;
+		}
+		if(length == null) {
+			length = buffer.byteLength - offset >> 2;
+		}
+		arr = [];
+		var _g12 = 0;
+		var _g3 = length;
+		while(_g12 < _g3) {
+			var i2 = _g12++;
+			var val = buffer.a[offset++] | buffer.a[offset++] << 8 | buffer.a[offset++] << 16 | buffer.a[offset++] << 24;
+			arr.push(haxe_io_FPHelper.i32ToFloat(val));
+		}
+		arr.byteLength = arr.length << 2;
+		arr.byteOffset = offset;
+		arr.buffer = buffer;
+	} else if((arg1 instanceof Array) && arg1.__enum__ == null) {
+		arr = arg1.slice();
+		var buffer1 = [];
+		var _g4 = 0;
+		while(_g4 < arr.length) {
+			var f = arr[_g4];
+			++_g4;
+			var i3 = haxe_io_FPHelper.floatToI32(f);
+			buffer1.push(i3 & 255);
+			buffer1.push(i3 >> 8 & 255);
+			buffer1.push(i3 >> 16 & 255);
+			buffer1.push(i3 >>> 24);
+		}
+		arr.byteLength = arr.length << 2;
+		arr.byteOffset = 0;
+		arr.buffer = new js_html_compat_ArrayBuffer(buffer1);
+	} else {
+		throw new js__$Boot_HaxeError("TODO " + Std.string(arg1));
+	}
+	arr.subarray = js_html_compat_Float32Array._subarray;
+	arr.set = js_html_compat_Float32Array._set;
+	return arr;
+};
+js_html_compat_Float32Array._set = function(arg,offset) {
+	if(js_Boot.__instanceof(arg.buffer,js_html_compat_ArrayBuffer)) {
+		var a = arg;
+		if(arg.byteLength + offset > this.byteLength) {
+			throw new js__$Boot_HaxeError("set() outside of range");
+		}
+		var _g1 = 0;
+		var _g = arg.byteLength;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this[i + offset] = a[i];
+		}
+	} else if((arg instanceof Array) && arg.__enum__ == null) {
+		var a1 = arg;
+		if(a1.length + offset > this.byteLength) {
+			throw new js__$Boot_HaxeError("set() outside of range");
+		}
+		var _g11 = 0;
+		var _g2 = a1.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			this[i1 + offset] = a1[i1];
+		}
+	} else {
+		throw new js__$Boot_HaxeError("TODO");
+	}
+};
+js_html_compat_Float32Array._subarray = function(start,end) {
+	var a = js_html_compat_Float32Array._new(this.slice(start,end));
+	a.byteOffset = start * 4;
+	return a;
+};
+var js_html_compat_Float64Array = function() { };
+js_html_compat_Float64Array.__name__ = ["js","html","compat","Float64Array"];
+js_html_compat_Float64Array._new = function(arg1,offset,length) {
+	var arr;
+	if(typeof(arg1) == "number") {
+		arr = [];
+		var _g1 = 0;
+		var _g = arg1;
+		while(_g1 < _g) {
+			var i = _g1++;
+			arr[i] = 0;
+		}
+		arr.byteLength = arr.length << 3;
+		arr.byteOffset = 0;
+		var _g2 = [];
+		var _g21 = 0;
+		var _g11 = arr.length << 3;
+		while(_g21 < _g11) {
+			var i1 = _g21++;
+			_g2.push(0);
+		}
+		arr.buffer = new js_html_compat_ArrayBuffer(_g2);
+	} else if(js_Boot.__instanceof(arg1,js_html_compat_ArrayBuffer)) {
+		var buffer = arg1;
+		if(offset == null) {
+			offset = 0;
+		}
+		if(length == null) {
+			length = buffer.byteLength - offset >> 3;
+		}
+		arr = [];
+		var _g12 = 0;
+		var _g3 = length;
+		while(_g12 < _g3) {
+			var i2 = _g12++;
+			var val1 = buffer.a[offset++] | buffer.a[offset++] << 8 | buffer.a[offset++] << 16 | buffer.a[offset++] << 24;
+			var val2 = buffer.a[offset++] | buffer.a[offset++] << 8 | buffer.a[offset++] << 16 | buffer.a[offset++] << 24;
+			arr.push(haxe_io_FPHelper.i64ToDouble(val1,val2));
+		}
+		arr.byteLength = arr.length << 3;
+		arr.byteOffset = offset;
+		arr.buffer = buffer;
+	} else if((arg1 instanceof Array) && arg1.__enum__ == null) {
+		arr = arg1.slice();
+		var buffer1 = [];
+		var _g4 = 0;
+		while(_g4 < arr.length) {
+			var f = arr[_g4];
+			++_g4;
+			var v = haxe_io_FPHelper.doubleToI64(f);
+			var i3 = v.low;
+			buffer1.push(i3 & 255);
+			buffer1.push(i3 >> 8 & 255);
+			buffer1.push(i3 >> 16 & 255);
+			buffer1.push(i3 >>> 24);
+			var i4 = v.high;
+			buffer1.push(i4 & 255);
+			buffer1.push(i4 >> 8 & 255);
+			buffer1.push(i4 >> 16 & 255);
+			buffer1.push(i4 >>> 24);
+		}
+		arr.byteLength = arr.length << 3;
+		arr.byteOffset = 0;
+		arr.buffer = new js_html_compat_ArrayBuffer(buffer1);
+	} else {
+		throw new js__$Boot_HaxeError("TODO " + Std.string(arg1));
+	}
+	arr.subarray = js_html_compat_Float64Array._subarray;
+	arr.set = js_html_compat_Float64Array._set;
+	return arr;
+};
+js_html_compat_Float64Array._set = function(arg,offset) {
+	if(js_Boot.__instanceof(arg.buffer,js_html_compat_ArrayBuffer)) {
+		var a = arg;
+		if(arg.byteLength + offset > this.byteLength) {
+			throw new js__$Boot_HaxeError("set() outside of range");
+		}
+		var _g1 = 0;
+		var _g = arg.byteLength;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this[i + offset] = a[i];
+		}
+	} else if((arg instanceof Array) && arg.__enum__ == null) {
+		var a1 = arg;
+		if(a1.length + offset > this.byteLength) {
+			throw new js__$Boot_HaxeError("set() outside of range");
+		}
+		var _g11 = 0;
+		var _g2 = a1.length;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			this[i1 + offset] = a1[i1];
+		}
+	} else {
+		throw new js__$Boot_HaxeError("TODO");
+	}
+};
+js_html_compat_Float64Array._subarray = function(start,end) {
+	var a = js_html_compat_Float64Array._new(this.slice(start,end));
+	a.byteOffset = start * 8;
+	return a;
+};
 var js_html_compat_Uint8Array = function() { };
-js_html_compat_Uint8Array.__name__ = true;
+js_html_compat_Uint8Array.__name__ = ["js","html","compat","Uint8Array"];
 js_html_compat_Uint8Array._new = function(arg1,offset,length) {
 	var arr;
 	if(typeof(arg1) == "number") {
@@ -20735,7 +22585,7 @@ js_html_compat_Uint8Array._subarray = function(start,end) {
 	return a;
 };
 var system__$Boolean_Boolean_$Impl_$ = {};
-system__$Boolean_Boolean_$Impl_$.__name__ = true;
+system__$Boolean_Boolean_$Impl_$.__name__ = ["system","_Boolean","Boolean_Impl_"];
 system__$Boolean_Boolean_$Impl_$._new = function(v) {
 	var this1 = v;
 	return this1;
@@ -20754,7 +22604,7 @@ system__$Boolean_Boolean_$Impl_$.not = function(this1) {
 	return !this1;
 };
 var system__$Byte_Byte_$Impl_$ = {};
-system__$Byte_Byte_$Impl_$.__name__ = true;
+system__$Byte_Byte_$Impl_$.__name__ = ["system","_Byte","Byte_Impl_"];
 system__$Byte_Byte_$Impl_$._new = function(i) {
 	var this1 = system_Convert.ToUInt8(i);
 	return this1;
@@ -20806,6 +22656,9 @@ system__$Byte_Byte_$Impl_$.ToDouble_IFormatProvider = function(this1,provider) {
 	var this2 = this1;
 	return this2;
 };
+system__$Byte_Byte_$Impl_$.GetHashCode = function(this1) {
+	return this1;
+};
 system__$Byte_Byte_$Impl_$.neg = function(this1) {
 	return -this1;
 };
@@ -20840,7 +22693,7 @@ system__$Byte_Byte_$Impl_$.add17 = function(lhs,rhs) {
 	return Std.string(lhs) + rhs;
 };
 var system__$Char_Char_$Impl_$ = {};
-system__$Char_Char_$Impl_$.__name__ = true;
+system__$Char_Char_$Impl_$.__name__ = ["system","_Char","Char_Impl_"];
 system__$Char_Char_$Impl_$._new = function(v) {
 	var this1 = system_Convert.ToUInt16(v);
 	return this1;
@@ -20895,6 +22748,9 @@ system__$Char_Char_$Impl_$.ToSingle_IFormatProvider = function(this1,provider) {
 system__$Char_Char_$Impl_$.ToDouble_IFormatProvider = function(this1,provider) {
 	return system_Convert.ToDouble_Char(this1);
 };
+system__$Char_Char_$Impl_$.GetHashCode = function(this1) {
+	return this1 | this1 << 16;
+};
 system__$Char_Char_$Impl_$.neg = function(this1) {
 	return -this1;
 };
@@ -20926,7 +22782,7 @@ system__$Char_Char_$Impl_$.add17 = function(lhs,rhs) {
 	return Std.string(lhs) + rhs;
 };
 var system_CsMath = function() { };
-system_CsMath.__name__ = true;
+system_CsMath.__name__ = ["system","CsMath"];
 system_CsMath.Min_Int32_Int32 = function(a,b) {
 	return Math.min(a,b);
 };
@@ -20976,7 +22832,7 @@ system_CsMath.Sqrt = function(v) {
 	return Math.sqrt(v);
 };
 var system__$CsString_CsString_$Impl_$ = {};
-system__$CsString_CsString_$Impl_$.__name__ = true;
+system__$CsString_CsString_$Impl_$.__name__ = ["system","_CsString","CsString_Impl_"];
 system__$CsString_CsString_$Impl_$._new = function(s) {
 	var this1 = s;
 	return this1;
@@ -21052,6 +22908,25 @@ system__$CsString_CsString_$Impl_$.IsNullOrWhiteSpace = function(s) {
 system__$CsString_CsString_$Impl_$.FromCharCode = function(s) {
 	return String.fromCharCode(s);
 };
+system__$CsString_CsString_$Impl_$.Format = function(format,$arguments) {
+	return format;
+};
+system__$CsString_CsString_$Impl_$.Format_CsString_Object = function(format,arg) {
+	return format;
+};
+system__$CsString_CsString_$Impl_$.Join_CsString_IEnumerable_T1 = function(separator,v) {
+	var s = "";
+	var enumerator = v.GetEnumerator();
+	var first = true;
+	while(enumerator.MoveNext()) {
+		if(!first) {
+			s = s + separator;
+		}
+		s += Std.string(enumerator.get_Current());
+		first = false;
+	}
+	return s;
+};
 system__$CsString_CsString_$Impl_$.StartsWith_CsString = function(this1,s) {
 	return StringTools.startsWith(this1,s);
 };
@@ -21115,8 +22990,20 @@ system__$CsString_CsString_$Impl_$.add17 = function(lhs,rhs) {
 system__$CsString_CsString_$Impl_$.add18 = function(lhs,rhs) {
 	return lhs + rhs;
 };
+var system__$CsType_CsType_$Impl_$ = {};
+system__$CsType_CsType_$Impl_$.__name__ = ["system","_CsType","CsType_Impl_"];
+system__$CsType_CsType_$Impl_$._new = function(cls) {
+	var this1 = cls;
+	return this1;
+};
+system__$CsType_CsType_$Impl_$.eq = function(lhs,rhs) {
+	return Type.getClassName(lhs) == Type.getClassName(rhs);
+};
+system__$CsType_CsType_$Impl_$.neq = function(lhs,rhs) {
+	return Type.getClassName(lhs) != Type.getClassName(rhs);
+};
 var system__$Double_Double_$Impl_$ = {};
-system__$Double_Double_$Impl_$.__name__ = true;
+system__$Double_Double_$Impl_$.__name__ = ["system","_Double","Double_Impl_"];
 system__$Double_Double_$Impl_$._new = function(i) {
 	var this1 = i;
 	return this1;
@@ -21175,6 +23062,12 @@ system__$Double_Double_$Impl_$.ToSingle_IFormatProvider = function(this1,provide
 system__$Double_Double_$Impl_$.ToDouble_IFormatProvider = function(this1,provider) {
 	return this1;
 };
+system__$Double_Double_$Impl_$.IsNaN = function(v) {
+	return isNaN(v);
+};
+system__$Double_Double_$Impl_$.GetHashCode = function(this1) {
+	return system_Convert.ToHashCode_Double(this1);
+};
 system__$Double_Double_$Impl_$.neg = function(this1) {
 	return -this1;
 };
@@ -21191,7 +23084,7 @@ system__$Double_Double_$Impl_$.predec = function(this1) {
 	return --this1;
 };
 var system__$EventAction_EventAction_$Impl_$ = {};
-system__$EventAction_EventAction_$Impl_$.__name__ = true;
+system__$EventAction_EventAction_$Impl_$.__name__ = ["system","_EventAction","EventAction_Impl_"];
 system__$EventAction_EventAction_$Impl_$._new = function(v) {
 	var this1 = v == null ? null : [v];
 	return this1;
@@ -21234,7 +23127,7 @@ system__$EventAction_EventAction_$Impl_$.Invoke = function(this1) {
 	}
 };
 var system__$EventAction1_EventAction1_$Impl_$ = {};
-system__$EventAction1_EventAction1_$Impl_$.__name__ = true;
+system__$EventAction1_EventAction1_$Impl_$.__name__ = ["system","_EventAction1","EventAction1_Impl_"];
 system__$EventAction1_EventAction1_$Impl_$._new = function(v) {
 	var this1 = v == null ? null : [v];
 	return this1;
@@ -21277,7 +23170,7 @@ system__$EventAction1_EventAction1_$Impl_$.Invoke = function(this1,p) {
 	}
 };
 var system__$EventAction2_EventAction2_$Impl_$ = {};
-system__$EventAction2_EventAction2_$Impl_$.__name__ = true;
+system__$EventAction2_EventAction2_$Impl_$.__name__ = ["system","_EventAction2","EventAction2_Impl_"];
 system__$EventAction2_EventAction2_$Impl_$._new = function(v) {
 	var this1 = v == null ? null : [v];
 	return this1;
@@ -21320,7 +23213,7 @@ system__$EventAction2_EventAction2_$Impl_$.Invoke = function(this1,p1,p2) {
 	}
 };
 var system__$FixedArray_FixedArray_$Impl_$ = {};
-system__$FixedArray_FixedArray_$Impl_$.__name__ = true;
+system__$FixedArray_FixedArray_$Impl_$.__name__ = ["system","_FixedArray","FixedArray_Impl_"];
 system__$FixedArray_FixedArray_$Impl_$._new = function(length) {
 	var this1 = new Array(length);
 	return this1;
@@ -21340,13 +23233,28 @@ system__$FixedArray_FixedArray_$Impl_$.set = function(this1,index,val) {
 system__$FixedArray_FixedArray_$Impl_$.iterator = function(this1) {
 	return HxOverrides.iter(this1);
 };
+system__$FixedArray_FixedArray_$Impl_$.ToEnumerable = function(this1) {
+	return new system_collections_generic_IterableEnumerable(this1);
+};
 system__$FixedArray_FixedArray_$Impl_$.empty = function(size) {
-	return system__$FixedArray_FixedArray_$Impl_$._new(size);
+	var this1 = new Array(size);
+	return this1;
+};
+var system_HaxeExtensions = function() { };
+system_HaxeExtensions.__name__ = ["system","HaxeExtensions"];
+system_HaxeExtensions.ToHaxeString = function(s) {
+	return s;
+};
+system_HaxeExtensions.ToHaxeInt = function(i) {
+	return i;
+};
+system_HaxeExtensions.ToHaxeFloat = function(f) {
+	return f;
 };
 var system_IFormatProvider = function() { };
-system_IFormatProvider.__name__ = true;
+system_IFormatProvider.__name__ = ["system","IFormatProvider"];
 var system__$Int16_Int16_$Impl_$ = {};
-system__$Int16_Int16_$Impl_$.__name__ = true;
+system__$Int16_Int16_$Impl_$.__name__ = ["system","_Int16","Int16_Impl_"];
 system__$Int16_Int16_$Impl_$._new = function(i) {
 	var this1 = system_Convert.ToInt16(i);
 	return this1;
@@ -21402,6 +23310,9 @@ system__$Int16_Int16_$Impl_$.ToDouble_IFormatProvider = function(this1,provider)
 	var this2 = this1;
 	return this2;
 };
+system__$Int16_Int16_$Impl_$.GetHashCode = function(this1) {
+	return this1 | this1 << 16;
+};
 system__$Int16_Int16_$Impl_$.neg = function(this1) {
 	return -this1;
 };
@@ -21436,7 +23347,7 @@ system__$Int16_Int16_$Impl_$.add17 = function(lhs,rhs) {
 	return Std.string(lhs) + rhs;
 };
 var system__$Int32_Int32_$Impl_$ = {};
-system__$Int32_Int32_$Impl_$.__name__ = true;
+system__$Int32_Int32_$Impl_$.__name__ = ["system","_Int32","Int32_Impl_"];
 system__$Int32_Int32_$Impl_$._new = function(i) {
 	var this1 = i;
 	return this1;
@@ -21504,6 +23415,9 @@ system__$Int32_Int32_$Impl_$.ToDouble_IFormatProvider = function(this1,provider)
 	var this2 = this1;
 	return this2;
 };
+system__$Int32_Int32_$Impl_$.GetHashCode = function(this1) {
+	return this1;
+};
 system__$Int32_Int32_$Impl_$.CompareTo_Int32 = function(this1,other) {
 	if(this1 < other) {
 		return -1;
@@ -21547,7 +23461,7 @@ system__$Int32_Int32_$Impl_$.add17 = function(lhs,rhs) {
 	return Std.string(lhs) + rhs;
 };
 var system__$Int64_Int64_$Impl_$ = {};
-system__$Int64_Int64_$Impl_$.__name__ = true;
+system__$Int64_Int64_$Impl_$.__name__ = ["system","_Int64","Int64_Impl_"];
 system__$Int64_Int64_$Impl_$._new = function(i) {
 	var this1 = i;
 	return this1;
@@ -21611,6 +23525,9 @@ system__$Int64_Int64_$Impl_$.ToDouble_IFormatProvider = function(this1,provider)
 	var this2 = this1;
 	return this2;
 };
+system__$Int64_Int64_$Impl_$.GetHashCode = function(this1) {
+	return this1;
+};
 system__$Int64_Int64_$Impl_$.neg = function(this1) {
 	return -this1;
 };
@@ -21651,13 +23568,13 @@ var system_InvalidCastException = function(message) {
 	system_Exception.call(this);
 	this.Exception_CsString(message);
 };
-system_InvalidCastException.__name__ = true;
+system_InvalidCastException.__name__ = ["system","InvalidCastException"];
 system_InvalidCastException.__super__ = system_Exception;
 system_InvalidCastException.prototype = $extend(system_Exception.prototype,{
 	__class__: system_InvalidCastException
 });
 var system__$Nullable_Nullable_$Impl_$ = {};
-system__$Nullable_Nullable_$Impl_$.__name__ = true;
+system__$Nullable_Nullable_$Impl_$.__name__ = ["system","_Nullable","Nullable_Impl_"];
 system__$Nullable_Nullable_$Impl_$._new = function(t) {
 	var this1 = t;
 	return this1;
@@ -21666,9 +23583,15 @@ system__$Nullable_Nullable_$Impl_$.get_Value = function(this1) {
 	return this1;
 };
 var system_ObjectExtensions = function() { };
-system_ObjectExtensions.__name__ = true;
+system_ObjectExtensions.__name__ = ["system","ObjectExtensions"];
 system_ObjectExtensions.ToString = function(v) {
 	return Std.string(v);
+};
+system_ObjectExtensions.ReferenceEquals = function(a,b) {
+	return a == b;
+};
+system_ObjectExtensions.GetType = function(a) {
+	return system__$CsType_CsType_$Impl_$._new(a == null ? null : js_Boot.getClass(a));
 };
 var system_OverflowException = function(message) {
 	if(message == null) {
@@ -21677,13 +23600,13 @@ var system_OverflowException = function(message) {
 	system_Exception.call(this);
 	this.Exception_CsString(message);
 };
-system_OverflowException.__name__ = true;
+system_OverflowException.__name__ = ["system","OverflowException"];
 system_OverflowException.__super__ = system_Exception;
 system_OverflowException.prototype = $extend(system_Exception.prototype,{
 	__class__: system_OverflowException
 });
 var system__$SByte_SByte_$Impl_$ = {};
-system__$SByte_SByte_$Impl_$.__name__ = true;
+system__$SByte_SByte_$Impl_$.__name__ = ["system","_SByte","SByte_Impl_"];
 system__$SByte_SByte_$Impl_$._new = function(i) {
 	var this1 = system_Convert.ToInt8(i);
 	return this1;
@@ -21735,6 +23658,9 @@ system__$SByte_SByte_$Impl_$.ToDouble_IFormatProvider = function(this1,provider)
 	var this2 = this1;
 	return this2;
 };
+system__$SByte_SByte_$Impl_$.GetHashCode = function(this1) {
+	return this1 ^ this1 << 8;
+};
 system__$SByte_SByte_$Impl_$.neg = function(this1) {
 	return -this1;
 };
@@ -21769,7 +23695,7 @@ system__$SByte_SByte_$Impl_$.add17 = function(lhs,rhs) {
 	return Std.string(lhs) + rhs;
 };
 var system__$Single_Single_$Impl_$ = {};
-system__$Single_Single_$Impl_$.__name__ = true;
+system__$Single_Single_$Impl_$.__name__ = ["system","_Single","Single_Impl_"];
 system__$Single_Single_$Impl_$._new = function(i) {
 	var this1 = i;
 	return this1;
@@ -21824,6 +23750,9 @@ system__$Single_Single_$Impl_$.ToString = function(this1) {
 		return "" + this1;
 	}
 };
+system__$Single_Single_$Impl_$.GetHashCode = function(this1) {
+	return system_Convert.ToHashCode_Single(this1);
+};
 system__$Single_Single_$Impl_$.neg = function(this1) {
 	return -this1;
 };
@@ -21846,7 +23775,7 @@ system__$Single_Single_$Impl_$.add17 = function(lhs,rhs) {
 	return Std.string(lhs) + rhs;
 };
 var system__$UInt16_UInt16_$Impl_$ = {};
-system__$UInt16_UInt16_$Impl_$.__name__ = true;
+system__$UInt16_UInt16_$Impl_$.__name__ = ["system","_UInt16","UInt16_Impl_"];
 system__$UInt16_UInt16_$Impl_$._new = function(i) {
 	var this1 = system_Convert.ToUInt16(i);
 	return this1;
@@ -21898,6 +23827,9 @@ system__$UInt16_UInt16_$Impl_$.ToDouble_IFormatProvider = function(this1,provide
 	var this2 = this1;
 	return this2;
 };
+system__$UInt16_UInt16_$Impl_$.GetHashCode = function(this1) {
+	return this1;
+};
 system__$UInt16_UInt16_$Impl_$.neg = function(this1) {
 	return -this1;
 };
@@ -21932,7 +23864,7 @@ system__$UInt16_UInt16_$Impl_$.add17 = function(lhs,rhs) {
 	return Std.string(lhs) + rhs;
 };
 var system__$UInt32_UInt32_$Impl_$ = {};
-system__$UInt32_UInt32_$Impl_$.__name__ = true;
+system__$UInt32_UInt32_$Impl_$.__name__ = ["system","_UInt32","UInt32_Impl_"];
 system__$UInt32_UInt32_$Impl_$._new = function(i) {
 	var this1 = system_Convert.ToUInt32(i);
 	return this1;
@@ -21984,6 +23916,9 @@ system__$UInt32_UInt32_$Impl_$.ToDouble_IFormatProvider = function(this1,provide
 	var this2 = this1;
 	return this2;
 };
+system__$UInt32_UInt32_$Impl_$.GetHashCode = function(this1) {
+	return this1;
+};
 system__$UInt32_UInt32_$Impl_$.neg = function(this1) {
 	return -this1;
 };
@@ -22018,7 +23953,7 @@ system__$UInt32_UInt32_$Impl_$.add17 = function(lhs,rhs) {
 	return Std.string(lhs) + rhs;
 };
 var system__$UInt64_UInt64_$Impl_$ = {};
-system__$UInt64_UInt64_$Impl_$.__name__ = true;
+system__$UInt64_UInt64_$Impl_$.__name__ = ["system","_UInt64","UInt64_Impl_"];
 system__$UInt64_UInt64_$Impl_$._new = function(i) {
 	var this1 = system_Convert.ToUInt64(i);
 	return this1;
@@ -22070,6 +24005,9 @@ system__$UInt64_UInt64_$Impl_$.ToDouble_IFormatProvider = function(this1,provide
 	var this2 = this1;
 	return this2;
 };
+system__$UInt64_UInt64_$Impl_$.GetHashCode = function(this1) {
+	return this1;
+};
 system__$UInt64_UInt64_$Impl_$.not = function(this1) {
 	return ~this1;
 };
@@ -22094,12 +24032,54 @@ system__$UInt64_UInt64_$Impl_$.add16 = function(lhs,rhs) {
 system__$UInt64_UInt64_$Impl_$.add17 = function(lhs,rhs) {
 	return Std.string(lhs) + rhs;
 };
+var system_collections_generic_IEnumerable = function() { };
+system_collections_generic_IEnumerable.__name__ = ["system","collections","generic","IEnumerable"];
+system_collections_generic_IEnumerable.prototype = {
+	__class__: system_collections_generic_IEnumerable
+};
+var system_collections_generic_IEnumerator = function() { };
+system_collections_generic_IEnumerator.__name__ = ["system","collections","generic","IEnumerator"];
+system_collections_generic_IEnumerator.prototype = {
+	__class__: system_collections_generic_IEnumerator
+};
+var system_collections_generic_IterableEnumerable = function(i) {
+	this._iterable = i;
+};
+system_collections_generic_IterableEnumerable.__name__ = ["system","collections","generic","IterableEnumerable"];
+system_collections_generic_IterableEnumerable.__interfaces__ = [system_collections_generic_IEnumerable];
+system_collections_generic_IterableEnumerable.prototype = {
+	GetEnumerator: function() {
+		return new system_collections_generic_IteratorEnumerator($iterator(this._iterable)());
+	}
+	,__class__: system_collections_generic_IterableEnumerable
+};
+var system_collections_generic_IteratorEnumerator = function(i) {
+	this._it = i;
+};
+system_collections_generic_IteratorEnumerator.__name__ = ["system","collections","generic","IteratorEnumerator"];
+system_collections_generic_IteratorEnumerator.__interfaces__ = [system_collections_generic_IEnumerator];
+system_collections_generic_IteratorEnumerator.prototype = {
+	get_Current: function() {
+		return this._current;
+	}
+	,MoveNext: function() {
+		if(this._it.hasNext()) {
+			this._current = this._it.next();
+			return true;
+		}
+		return false;
+	}
+	,Reset: function() {
+		throw new js__$Boot_HaxeError("not supported");
+	}
+	,__class__: system_collections_generic_IteratorEnumerator
+};
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
 String.prototype.__class__ = String;
-String.__name__ = true;
-Array.__name__ = true;
+String.__name__ = ["String"];
+Array.__name__ = ["Array"];
 var Int = { __name__ : ["Int"]};
 var Dynamic = { __name__ : ["Dynamic"]};
 var Float = Number;
@@ -22108,27 +24088,22 @@ var Bool = Boolean;
 Bool.__ename__ = ["Bool"];
 var Class = { __name__ : ["Class"]};
 var Enum = { };
+alphaTab_util_Logger.LogLevel = null;
 alphaTab_util_Logger.LogLevel = 2;
-var this1 = {}
-alphaTab_Environment.RenderEngines = this1;
-var this2 = {}
-alphaTab_Environment.LayoutEngines = this2;
-var this3 = {}
-alphaTab_Environment.StaveProfiles = this3;
-alphaTab_Environment.PlatformInit();
-alphaTab_Environment.LayoutEngines["default"] = function(r) {
-	return new alphaTab_rendering_layout_PageViewLayout(r);
-};
-alphaTab_Environment.LayoutEngines["page"] = function(r1) {
-	return new alphaTab_rendering_layout_PageViewLayout(r1);
-};
-alphaTab_Environment.LayoutEngines["horizontal"] = function(r2) {
-	return new alphaTab_rendering_layout_HorizontalScreenLayout(r2);
-};
-alphaTab_Environment.StaveProfiles["default"] = alphaTab_Environment.StaveProfiles["score-tab"] = [new alphaTab_rendering_EffectBarRendererFactory("score-effects",[new alphaTab_rendering_effects_TempoEffectInfo(),new alphaTab_rendering_effects_TripletFeelEffectInfo(),new alphaTab_rendering_effects_MarkerEffectInfo(),new alphaTab_rendering_effects_TextEffectInfo(),new alphaTab_rendering_effects_ChordsEffectInfo(),new alphaTab_rendering_effects_TrillEffectInfo(),new alphaTab_rendering_effects_BeatVibratoEffectInfo(),new alphaTab_rendering_effects_NoteVibratoEffectInfo(),new alphaTab_rendering_effects_AlternateEndingsEffectInfo()]),new alphaTab_rendering_ScoreBarRendererFactory(),new alphaTab_rendering_EffectBarRendererFactory("tab-effects",[new alphaTab_rendering_effects_CrescendoEffectInfo(),new alphaTab_rendering_effects_DynamicsEffectInfo(),new alphaTab_rendering_effects_LyricsEffectInfo(),new alphaTab_rendering_effects_TrillEffectInfo(),new alphaTab_rendering_effects_BeatVibratoEffectInfo(),new alphaTab_rendering_effects_NoteVibratoEffectInfo(),new alphaTab_rendering_effects_TapEffectInfo(),new alphaTab_rendering_effects_FadeInEffectInfo(),new alphaTab_rendering_effects_HarmonicsEffectInfo(),new alphaTab_rendering_effects_LetRingEffectInfo(),new alphaTab_rendering_effects_CapoEffectInfo(),new alphaTab_rendering_effects_PalmMuteEffectInfo(),new alphaTab_rendering_effects_PickStrokeEffectInfo()]),new alphaTab_rendering_TabBarRendererFactory(false,false,false)];
-alphaTab_Environment.StaveProfiles["score"] = [new alphaTab_rendering_EffectBarRendererFactory("score-effects",[new alphaTab_rendering_effects_TempoEffectInfo(),new alphaTab_rendering_effects_TripletFeelEffectInfo(),new alphaTab_rendering_effects_MarkerEffectInfo(),new alphaTab_rendering_effects_TextEffectInfo(),new alphaTab_rendering_effects_ChordsEffectInfo(),new alphaTab_rendering_effects_TrillEffectInfo(),new alphaTab_rendering_effects_BeatVibratoEffectInfo(),new alphaTab_rendering_effects_NoteVibratoEffectInfo(),new alphaTab_rendering_effects_FadeInEffectInfo(),new alphaTab_rendering_effects_LetRingEffectInfo(),new alphaTab_rendering_effects_PalmMuteEffectInfo(),new alphaTab_rendering_effects_PickStrokeEffectInfo(),new alphaTab_rendering_effects_AlternateEndingsEffectInfo()]),new alphaTab_rendering_ScoreBarRendererFactory(),new alphaTab_rendering_EffectBarRendererFactory("score-bottom-effects",[new alphaTab_rendering_effects_CrescendoEffectInfo(),new alphaTab_rendering_effects_DynamicsEffectInfo(),new alphaTab_rendering_effects_LyricsEffectInfo()])];
-alphaTab_Environment.StaveProfiles["tab"] = [new alphaTab_rendering_EffectBarRendererFactory("tab-effects",[new alphaTab_rendering_effects_TempoEffectInfo(),new alphaTab_rendering_effects_TripletFeelEffectInfo(),new alphaTab_rendering_effects_MarkerEffectInfo(),new alphaTab_rendering_effects_TextEffectInfo(),new alphaTab_rendering_effects_ChordsEffectInfo(),new alphaTab_rendering_effects_TripletFeelEffectInfo(),new alphaTab_rendering_effects_TrillEffectInfo(),new alphaTab_rendering_effects_BeatVibratoEffectInfo(),new alphaTab_rendering_effects_NoteVibratoEffectInfo(),new alphaTab_rendering_effects_TapEffectInfo(),new alphaTab_rendering_effects_FadeInEffectInfo(),new alphaTab_rendering_effects_HarmonicsEffectInfo(),new alphaTab_rendering_effects_LetRingEffectInfo(),new alphaTab_rendering_effects_CapoEffectInfo(),new alphaTab_rendering_effects_PalmMuteEffectInfo(),new alphaTab_rendering_effects_PickStrokeEffectInfo(),new alphaTab_rendering_effects_AlternateEndingsEffectInfo()]),new alphaTab_rendering_TabBarRendererFactory(true,true,true),new alphaTab_rendering_EffectBarRendererFactory("tab-bottom-effects",[new alphaTab_rendering_effects_LyricsEffectInfo()])];
+alphaTab_Environment.ScriptFile = null;
+alphaTab_Environment.IsFontLoaded = false;
+alphaTab_Environment.RenderEngines = null;
+alphaTab_Environment.LayoutEngines = null;
+alphaTab_Environment.StaveProfiles = null;
+alphaTab_Environment.Init();
+alphaTab_model_Tuning._sevenStrings = null;
+alphaTab_model_Tuning._sixStrings = null;
+alphaTab_model_Tuning._fiveStrings = null;
+alphaTab_model_Tuning._fourStrings = null;
+alphaTab_model_Tuning._defaultTunings = null;
 alphaTab_model_Tuning.Initialize();
+alphaTab_rendering_glyphs_ScoreBeatGlyph.NormalKeys = null;
+alphaTab_rendering_glyphs_ScoreBeatGlyph.XKeys = null;
 var this1 = {}
 alphaTab_rendering_glyphs_ScoreBeatGlyph.NormalKeys = this1;
 var normalKeyNotes = [32,34,35,36,38,39,40,41,43,45,47,48,50,55,56,58,60,61];
@@ -22145,6 +24120,7 @@ while(i1 < xKeyNotes.length) {
 	alphaTab_rendering_glyphs_ScoreBeatGlyph.XKeys[xKeyNotes[i1]] = true;
 	++i1;
 }
+alphaTab_xml_XmlParser.Escapes = null;
 var this1 = {}
 alphaTab_xml_XmlParser.Escapes = this1;
 alphaTab_xml_XmlParser.Escapes["lt"] = "<";
@@ -22156,6 +24132,8 @@ var ArrayBuffer = $global.ArrayBuffer || js_html_compat_ArrayBuffer;
 if(ArrayBuffer.prototype.slice == null) {
 	ArrayBuffer.prototype.slice = js_html_compat_ArrayBuffer.sliceImpl;
 }
+var Float32Array = $global.Float32Array || js_html_compat_Float32Array._new;
+var Float64Array = $global.Float64Array || ($global.Float32Array ? "notsupported" : null) || js_html_compat_Float64Array._new;
 var Uint8Array = $global.Uint8Array || js_html_compat_Uint8Array._new;
 alphaTab_platform_svg_SvgCanvas.BlurCorrection = 0.5;
 alphaTab_platform_model_Color.BlackRgb = "#000000";
@@ -22166,6 +24144,8 @@ system_Convert._int16Buffer = new Int16Array(system_Convert._conversionBuffer);
 system_Convert._uint16Buffer = new Uint16Array(system_Convert._conversionBuffer);
 system_Convert._int32Buffer = new Int32Array(system_Convert._conversionBuffer);
 system_Convert._uint32Buffer = new Uint32Array(system_Convert._conversionBuffer);
+system_Convert._float32Buffer = new Float32Array(system_Convert._conversionBuffer);
+system_Convert._float64Buffer = new Float64Array(system_Convert._conversionBuffer);
 js_Boot.__toStr = ({ }).toString;
 alphaTab_rendering_layout_PageViewLayout.PagePadding = [40,40,40,40];
 alphaTab_rendering_layout_PageViewLayout.GroupSpacing = 20;
@@ -22527,7 +24507,7 @@ alphaTab_xml_XmlParser.CharCodeLowerZ = 122;
 alphaTab_xml_XmlParser.CharCodeUpperA = 65;
 alphaTab_xml_XmlParser.CharCodeUpperZ = 90;
 alphaTab_xml_XmlParser.CharCode0 = 48;
-alphaTab_xml_XmlParser.CharCode9 = 48;
+alphaTab_xml_XmlParser.CharCode9 = 57;
 alphaTab_xml_XmlParser.CharCodeColon = 58;
 alphaTab_xml_XmlParser.CharCodeDot = 46;
 alphaTab_xml_XmlParser.CharCodeUnderscore = 95;
@@ -22550,6 +24530,14 @@ alphaTab_xml_XmlParser_$XmlState.COMMENT = 15;
 alphaTab_xml_XmlParser_$XmlState.DOCTYPE = 16;
 alphaTab_xml_XmlParser_$XmlState.CDATA = 17;
 alphaTab_xml_XmlParser_$XmlState.ESCAPE = 18;
+haxe_io_FPHelper.i64tmp = (function($this) {
+	var $r;
+	var this1 = new haxe__$Int64__$_$_$Int64(0,0);
+	$r = this1;
+	return $r;
+}(this));
+js_html_compat_Float32Array.BYTES_PER_ELEMENT = 4;
+js_html_compat_Float64Array.BYTES_PER_ELEMENT = 8;
 js_html_compat_Uint8Array.BYTES_PER_ELEMENT = 1;
 alphaTab_Main.main();
 })(typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);

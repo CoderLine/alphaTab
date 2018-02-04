@@ -78,6 +78,9 @@ namespace AlphaTab.Collections
         [Inline]
         public void Reverse() => Script.This<HaxeArray<T>>().Reverse();
 
+        [Inline]
+        public IEnumerable<T> ToEnumerable() => new IterableEnumerable<T>(this);
+
         [External]
         IEnumerator IEnumerable.GetEnumerator()
         {

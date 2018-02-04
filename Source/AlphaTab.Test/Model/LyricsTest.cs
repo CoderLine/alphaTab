@@ -13,7 +13,7 @@ namespace AlphaTab.Test.Model
         internal Score LoadLyricsTemplateFile()
         {
             const string path = "TestFiles/GuitarPro6/LyricsTemplate.gpx";
-            var buffer = ByteBuffer.FromBuffer(File.ReadAllBytes(path));
+            var buffer = ByteBuffer.FromBuffer(TestPlatform.LoadFile(path));
             var importer = new GpxImporter();
             importer.Init(buffer);
             return importer.ReadScore();
