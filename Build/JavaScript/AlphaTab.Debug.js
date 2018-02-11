@@ -375,7 +375,7 @@ alphaTab.platform.svg.SvgCanvas.prototype = {
 		if(!this._currentPathIsEmpty) {
 			var s = "<path d=\"" + this._currentPath + "\" stroke=\"" + this.get_Color().RGBA + "\"";
 			if(this.get_LineWidth() != 1) {
-				s = s + " stroke-width=\"" + Std.string(this.get_LineWidth()) + "\"";
+				s = s + (" stroke-width=\"" + this.get_LineWidth() + "\"");
 			}
 			s = s + " fill=\"none\" />";
 			this.Buffer += Std.string(s);
@@ -390,12 +390,12 @@ alphaTab.platform.svg.SvgCanvas.prototype = {
 		}
 		var s = "<text x=\"" + system.Convert.ToInt32_Single(x) + "\" y=\"" + system.Convert.ToInt32_Single(y) + "\" style=\"font:" + this.get_Font().ToCssString(1) + "\" " + " dominant-baseline=\"" + this.GetSvgBaseLine() + "\"";
 		if(this.get_Color().RGBA != "#000000") {
-			s = s + " fill=\"" + this.get_Color().RGBA + "\"";
+			s = s + (" fill=\"" + this.get_Color().RGBA + "\"");
 		}
 		if(this.get_TextAlign() != 0) {
-			s = s + " text-anchor=\"" + this.GetSvgTextAlignment() + "\"";
+			s = s + (" text-anchor=\"" + this.GetSvgTextAlignment() + "\"");
 		}
-		s = s + ">" + text + "</text>";
+		s = s + (">" + text + "</text>");
 		this.Buffer += Std.string(s);
 	}
 	,GetSvgTextAlignment: function() {
@@ -504,7 +504,6 @@ alphaTab.platform.Platform.GetCallerName = function() {
 	return arguments.callee.caller.caller.name;
 };
 alphaTab.platform.Platform.Log = function(logLevel,category,msg,details) {
-	var stack = haxe.CallStack.toString(haxe.CallStack.callStack());
 	msg = "[AlphaTab][" + category + "] " + msg;
 	var $console = $global.console;
 	switch(logLevel) {
@@ -520,6 +519,7 @@ alphaTab.platform.Platform.Log = function(logLevel,category,msg,details) {
 		$console.warn(msg,details);
 		break;
 	case 4:
+		var stack = haxe.CallStack.toString(haxe.CallStack.callStack());
 		$console.error(msg,stack,details);
 		break;
 	default:
@@ -1188,6 +1188,197 @@ alphaTab.platform.model.Font.prototype = {
 	,__class__: alphaTab.platform.model.Font
 };
 alphaTab.platform.javaScript = {};
+alphaTab.platform.javaScript.Html5Canvas = $hx_exports["alphaTab"]["platform"]["javaScript"]["Html5Canvas"] = function() {
+	this._canvas = null;
+	this._context = null;
+	this._color = null;
+	this._font = null;
+	this._musicFont = null;
+	this._color = new alphaTab.platform.model.Color(0,0,0,255);
+	var fontElement = window.document.createElement("span");
+	fontElement.classList.add("at");
+	window.document.body.appendChild(fontElement);
+	var style = window.getComputedStyle(fontElement);
+	var s = style.fontSize;
+	this._musicFont = new alphaTab.platform.model.Font(style.fontFamily,parseFloat(s),0);
+};
+alphaTab.platform.javaScript.Html5Canvas.__name__ = ["alphaTab","platform","javaScript","Html5Canvas"];
+alphaTab.platform.javaScript.Html5Canvas.__interfaces__ = [alphaTab.platform.ICanvas];
+alphaTab.platform.javaScript.Html5Canvas.prototype = {
+	get_Resources: function() {
+		return this.__Resources;
+	}
+	,set_Resources: function(value) {
+		return this.__Resources = value;
+	}
+	,OnPreRender: function() {
+		return null;
+	}
+	,OnRenderFinished: function() {
+		return null;
+	}
+	,BeginRender: function(width,height) {
+		this._canvas = js.Boot.__cast(window.document.createElement("canvas") , HTMLCanvasElement);
+		var tmp = system.Convert.ToInt32_Single(width);
+		this._canvas.width = tmp;
+		var tmp1 = system.Convert.ToInt32_Single(height);
+		this._canvas.height = tmp1;
+		this._canvas.style.width = Std.string(width) + "px";
+		this._canvas.style.height = Std.string(height) + "px";
+		this._context = this._canvas.getContext("2d");
+		this._context.textBaseline = "top";
+	}
+	,EndRender: function() {
+		var result = this._canvas;
+		this._canvas = null;
+		return result;
+	}
+	,get_Color: function() {
+		return this._color;
+	}
+	,set_Color: function(value) {
+		if(this._color.RGBA == value.RGBA) {
+			return this.get_Color();
+		}
+		this._color = value;
+		this._context.strokeStyle = value.RGBA;
+		this._context.fillStyle = value.RGBA;
+		return this.get_Color();
+	}
+	,get_LineWidth: function() {
+		return this._context.lineWidth;
+	}
+	,set_LineWidth: function(value) {
+		this._context.lineWidth = value;
+		return this.get_LineWidth();
+	}
+	,FillRect: function(x,y,w,h) {
+		if(w > 0) {
+			this._context.fillRect(system.Convert.ToInt32_Single(x) - 0.5,system.Convert.ToInt32_Single(y) - 0.5,w,h);
+		}
+	}
+	,StrokeRect: function(x,y,w,h) {
+		this._context.strokeRect(x - 0.5,y - 0.5,w,h);
+	}
+	,BeginPath: function() {
+		this._context.beginPath();
+	}
+	,ClosePath: function() {
+		this._context.closePath();
+	}
+	,MoveTo: function(x,y) {
+		this._context.moveTo(x - 0.5,y - 0.5);
+	}
+	,LineTo: function(x,y) {
+		this._context.lineTo(x - 0.5,y - 0.5);
+	}
+	,QuadraticCurveTo: function(cpx,cpy,x,y) {
+		this._context.quadraticCurveTo(cpx,cpy,x,y);
+	}
+	,BezierCurveTo: function(cp1x,cp1y,cp2x,cp2y,x,y) {
+		this._context.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,x,y);
+	}
+	,FillCircle: function(x,y,radius) {
+		this._context.beginPath();
+		this._context.arc(x,y,radius,0,6.28318530717958,true);
+		this.Fill();
+	}
+	,Fill: function() {
+		this._context.fill();
+	}
+	,Stroke: function() {
+		this._context.stroke();
+	}
+	,get_Font: function() {
+		return this._font;
+	}
+	,set_Font: function(value) {
+		this._font = value;
+		var tmp = value.ToCssString(1);
+		this._context.font = tmp;
+		return this.get_Font();
+	}
+	,get_TextAlign: function() {
+		var _g = this._context.textAlign;
+		switch(_g) {
+		case "center":
+			return 1;
+		case "left":
+			return 0;
+		case "right":
+			return 2;
+		default:
+			return 0;
+		}
+	}
+	,set_TextAlign: function(value) {
+		switch(value) {
+		case 0:
+			this._context.textAlign = "left";
+			break;
+		case 1:
+			this._context.textAlign = "center";
+			break;
+		case 2:
+			this._context.textAlign = "right";
+			break;
+		default:
+		}
+		return this.get_TextAlign();
+	}
+	,get_TextBaseline: function() {
+		var _g = this._context.textBaseline;
+		switch(_g) {
+		case "bottom":
+			return 2;
+		case "middle":
+			return 1;
+		case "top":
+			return 0;
+		default:
+			return 0;
+		}
+	}
+	,set_TextBaseline: function(value) {
+		switch(value) {
+		case 0:
+			this._context.textBaseline = "top";
+			break;
+		case 1:
+			this._context.textBaseline = "middle";
+			break;
+		case 2:
+			this._context.textBaseline = "bottom";
+			break;
+		default:
+		}
+		return this.get_TextBaseline();
+	}
+	,BeginGroup: function(identifier) {
+	}
+	,EndGroup: function() {
+	}
+	,FillText: function(text,x,y) {
+		this._context.fillText(text,x,y);
+	}
+	,MeasureText: function(text) {
+		return js.Boot.__cast(this._context.measureText(text).width , Float);
+	}
+	,FillMusicFontSymbol: function(x,y,scale,symbol) {
+		if(symbol == -1) {
+			return;
+		}
+		var baseLine = this._context.textBaseline;
+		var font = this._context.font;
+		var tmp = this._musicFont.ToCssString(scale);
+		this._context.font = tmp;
+		this._context.textBaseline = "middle";
+		this._context.fillText(String.fromCharCode(symbol),x,y);
+		this._context.textBaseline = baseLine;
+		this._context.font = font;
+	}
+	,__class__: alphaTab.platform.javaScript.Html5Canvas
+};
 alphaTab.platform.javaScript.JQueryAlphaTab = $hx_exports["alphaTab"]["platform"]["javaScript"]["JQueryAlphaTab"] = function() {
 	var this1 = [];
 	this._initListeners = this1;
@@ -2214,7 +2405,7 @@ alphaTab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphaTab.re
 				currentPartial.Width = currentPartial.Width + result.Width;
 				if(currentPartial.MasterBars.length >= countPerPartial) {
 					if(partials.length == 0) {
-						currentPartial.Width = currentPartial.Width + this._group.X + this._group.AccoladeSpacing;
+						currentPartial.Width = currentPartial.Width + (this._group.X + this._group.AccoladeSpacing);
 					}
 					partials.push(currentPartial);
 					alphaTab.util.Logger.Info(this.get_Name(),"Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " + currentPartial.MasterBars[currentPartial.MasterBars.length - 1].Index,null);
@@ -2225,7 +2416,7 @@ alphaTab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphaTab.re
 		}
 		if(currentPartial.MasterBars.length > 0) {
 			if(partials.length == 0) {
-				currentPartial.Width = currentPartial.Width + this._group.X + this._group.AccoladeSpacing;
+				currentPartial.Width = currentPartial.Width + (this._group.X + this._group.AccoladeSpacing);
 			}
 			partials.push(currentPartial);
 			alphaTab.util.Logger.Info(this.get_Name(),"Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " + currentPartial.MasterBars[currentPartial.MasterBars.length - 1].Index,null);
@@ -2242,7 +2433,7 @@ alphaTab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphaTab.re
 			canvas.set_TextAlign(0);
 			var renderX = this._group.GetBarX(partial.MasterBars[0].Index) + this._group.AccoladeSpacing;
 			if(i == 0) {
-				renderX = renderX - this._group.X + this._group.AccoladeSpacing;
+				renderX = renderX - (this._group.X + this._group.AccoladeSpacing);
 			}
 			alphaTab.util.Logger.Info(this.get_Name(),"Rendering partial from bar " + partial.MasterBars[0].Index + " to " + partial.MasterBars[partial.MasterBars.length - 1].Index,null);
 			this._group.PaintPartial(-renderX,this._group.Y,this.Renderer.Canvas,currentBarIndex,partial.MasterBars.length);
@@ -3003,6 +3194,9 @@ alphaTab.Environment.PlatformInit = function() {
 	};
 	alphaTab.Environment.RenderEngines["default"] = function() {
 		return new alphaTab.platform.svg.CssFontSvgCanvas();
+	};
+	alphaTab.Environment.RenderEngines["html5"] = function() {
+		return new alphaTab.platform.javaScript.Html5Canvas();
 	};
 	alphaTab.Environment.CheckFontLoad();
 	alphaTab.Environment.RegisterJQueryPlugin();
@@ -9689,7 +9883,7 @@ alphaTab.importer.MusicXmlImporter.prototype = $extend(alphaTab.importer.ScoreIm
 				if(_g == "text") {
 					var s = beat.Text;
 					if(!(s == null || s.length == 0)) {
-						beat.Text = beat.Text + " " + c1.get_InnerText();
+						beat.Text = beat.Text + (" " + c1.get_InnerText());
 					} else {
 						beat.Text = c1.get_InnerText();
 					}
@@ -11991,7 +12185,7 @@ alphaTab.model.JsonConverter.prototype = {
 							while(i1 < beat.WhammyBarPoints.length) {
 								var point = new alphaTab.model.BendPoint(0,0);
 								alphaTab.model.BendPoint.CopyTo(beat.WhammyBarPoints[i1],point);
-								beat2.WhammyBarPoints.push(point);
+								beat2.AddWhammyBarPoint(point);
 								++i1;
 							}
 							var n = 0;
@@ -13509,7 +13703,7 @@ alphaTab.platform.javaScript.JsApi.prototype = {
 					var key2 = keyParts[0];
 					var j = 1;
 					while(j < keyParts.length) {
-						key2 = key2 + HxOverrides.substr(keyParts[j],0,1).toUpperCase() + HxOverrides.substr(keyParts[j],1,null);
+						key2 = key2 + (HxOverrides.substr(keyParts[j],0,1).toUpperCase() + HxOverrides.substr(keyParts[j],1,null));
 						++j;
 					}
 					var value1 = attr.nodeValue;
@@ -16496,9 +16690,9 @@ alphaTab.rendering.TabBarRenderer.prototype = $extend(alphaTab.rendering.BarRend
 				var y2 = cy + this.Y + this.Height;
 				var startGlyph = js.Boot.__cast(this.GetOnNotesGlyphForBeat(beat) , alphaTab.rendering.glyphs.TabBeatGlyph);
 				if(startGlyph.NoteNumbers == null) {
-					y1 = y1 + this.Height - this.RhythmHeight;
+					y1 = y1 + (this.Height - this.RhythmHeight);
 				} else {
-					y1 = y1 + startGlyph.NoteNumbers.GetNoteY(startGlyph.NoteNumbers.MinStringNote) + this.get_LineOffset() / 2;
+					y1 = y1 + (startGlyph.NoteNumbers.GetNoteY(startGlyph.NoteNumbers.MinStringNote) + this.get_LineOffset() / 2);
 				}
 				if(h.Direction == 0) {
 					var this1 = 2;
@@ -16578,9 +16772,9 @@ alphaTab.rendering.TabBarRenderer.prototype = $extend(alphaTab.rendering.BarRend
 			var y2 = cy + this.Y + this.Height;
 			var startGlyph = js.Boot.__cast(this.GetOnNotesGlyphForBeat(beat1) , alphaTab.rendering.glyphs.TabBeatGlyph);
 			if(startGlyph.NoteNumbers == null) {
-				y1 = y1 + this.Height - this.RhythmHeight;
+				y1 = y1 + (this.Height - this.RhythmHeight);
 			} else {
-				y1 = y1 + startGlyph.NoteNumbers.GetNoteY(startGlyph.NoteNumbers.MinStringNote) + this.get_LineOffset() / 2;
+				y1 = y1 + (startGlyph.NoteNumbers.GetNoteY(startGlyph.NoteNumbers.MinStringNote) + this.get_LineOffset() / 2);
 			}
 			if(h.Direction == 0) {
 				var this1 = 2;
@@ -17538,7 +17732,7 @@ alphaTab.rendering.glyphs.LineRangedGlyph.prototype = $extend(alphaTab.rendering
 				var tmp = Math.min(lineX + lineSize,endX);
 				var this2 = system.Convert.ToInt32_Single(lineY);
 				canvas.LineTo(tmp,this2);
-				lineX = lineX + lineSize + lineSpacing;
+				lineX = lineX + (lineSize + lineSpacing);
 				canvas.Stroke();
 			}
 			canvas.BeginPath();
@@ -17990,7 +18184,7 @@ alphaTab.rendering.glyphs.RepeatCloseGlyph.prototype = $extend(alphaTab.renderin
 		canvas.LineTo(left,bottom);
 		canvas.Stroke();
 		var this2 = 0.5;
-		left = left + 3 * this.get_Scale() + this2;
+		left = left + (3 * this.get_Scale() + this2);
 		canvas.FillRect(left,top,blockWidth,h);
 	}
 	,__class__: alphaTab.rendering.glyphs.RepeatCloseGlyph
@@ -18041,7 +18235,7 @@ alphaTab.rendering.glyphs.RepeatOpenGlyph.prototype = $extend(alphaTab.rendering
 		var h = bottom - top;
 		canvas.FillRect(left,top,blockWidth,h);
 		var this2 = 0.5;
-		left = left + blockWidth * 2 - this2;
+		left = left + (blockWidth * 2 - this2);
 		canvas.BeginPath();
 		canvas.MoveTo(left,top);
 		canvas.LineTo(left,bottom);
@@ -20595,7 +20789,7 @@ alphaTab.rendering.staves.Staff.prototype = {
 			++i;
 		}
 		if(this.Height > 0) {
-			this.Height = this.Height + this.TopSpacing + topOverflow + bottomOverflow + this.BottomSpacing;
+			this.Height = this.Height + (this.TopSpacing + topOverflow + bottomOverflow + this.BottomSpacing);
 		}
 	}
 	,Paint: function(cx,cy,canvas,startIndex,count) {
@@ -23017,7 +23211,7 @@ system.ByteArrayIterator = function(array) {
 system.ByteArrayIterator.__name__ = ["system","ByteArrayIterator"];
 system.ByteArrayIterator.prototype = {
 	hasNext: function() {
-		return this._i < this._array.length - 1;
+		return this._i < this._array.length;
 	}
 	,next: function() {
 		return this._array[this._i++];
@@ -24199,7 +24393,7 @@ system.Int32ArrayIterator = function(array) {
 system.Int32ArrayIterator.__name__ = ["system","Int32ArrayIterator"];
 system.Int32ArrayIterator.prototype = {
 	hasNext: function() {
-		return this._i < this._array.length - 1;
+		return this._i < this._array.length;
 	}
 	,next: function() {
 		return this._array[this._i++];
@@ -24607,7 +24801,7 @@ system.SingleArrayIterator = function(array) {
 system.SingleArrayIterator.__name__ = ["system","SingleArrayIterator"];
 system.SingleArrayIterator.prototype = {
 	hasNext: function() {
-		return this._i < this._array.length - 1;
+		return this._i < this._array.length;
 	}
 	,next: function() {
 		return this._array[this._i++];

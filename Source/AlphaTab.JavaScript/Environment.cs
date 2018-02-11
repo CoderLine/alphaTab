@@ -48,7 +48,7 @@ namespace AlphaTab
         {
             RenderEngines["svg"] = () => new CssFontSvgCanvas();
             RenderEngines["default"] = () => new CssFontSvgCanvas();
-            //RenderEngines["html5"] = () => new Platform.JavaScript.Html5Canvas();
+            RenderEngines["html5"] = () => new Platform.JavaScript.Html5Canvas();
 
             // check whether webfont is loaded
             CheckFontLoad();

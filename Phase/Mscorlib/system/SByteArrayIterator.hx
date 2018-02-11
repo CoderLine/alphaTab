@@ -11,7 +11,7 @@ class SByteArrayIterator
 		_i = 0;
 	}
 
-	public function hasNext() return _i < _array.length - 1;
+	public function hasNext() return _i < _array.length;
 	public function next() : SByte
 	{
 		return _array[_i++];

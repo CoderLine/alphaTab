@@ -11,7 +11,7 @@ class Int16ArrayIterator
 		_i = 0;
 	}
 
-	public function hasNext() return _i < _array.length - 1;
+	public function hasNext() return _i < _array.length;
 	public function next() : Int16
 	{
 		return _array[_i++];

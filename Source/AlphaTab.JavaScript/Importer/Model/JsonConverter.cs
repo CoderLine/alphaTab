@@ -275,7 +275,7 @@ namespace AlphaTab.Model
                                 {
                                     var point = new BendPoint();
                                     BendPoint.CopyTo(beat.WhammyBarPoints[i], point);
-                                    beat2.WhammyBarPoints.Add(point);
+                                    beat2.AddWhammyBarPoint(point);
                                 }
 
                                 #region Notes

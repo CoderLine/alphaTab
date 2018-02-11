@@ -44,8 +44,6 @@ namespace AlphaTab.Platform
 
         public static void Log(LogLevel logLevel, string category, string msg, object details = null)
         {
-            var stack = CallStack.ToString(CallStack.Get());
-
             // ReSharper disable once RedundantAssignment
             msg = "[AlphaTab][" + category + "] " + msg;
 
@@ -65,6 +63,7 @@ namespace AlphaTab.Platform
                     console.Warn(msg, details);
                     break;
                 case LogLevel.Error:
+                    var stack = CallStack.ToString(CallStack.Get());
                     console.Error(msg, stack, details);
                     break;
             }

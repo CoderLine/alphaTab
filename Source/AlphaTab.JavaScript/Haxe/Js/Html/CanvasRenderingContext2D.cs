@@ -46,7 +46,7 @@ namespace AlphaTab.Haxe.Js.Html
         public extern void Stroke();
         [Name("fillText")]
         public extern void FillText(HaxeString text, HaxeFloat x, HaxeFloat y);
-        [Name("measureTet")]
+        [Name("measureText")]
         public extern TextMetrics MeasureText(HaxeString text);
     }
 
