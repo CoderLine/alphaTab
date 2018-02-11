@@ -17,73 +17,121 @@ class LyricsTest
     public function TestApplySingleLineFirstBar() : Void 
     {
         var score : alphaTab.model.Score = LoadLyricsTemplateFile();
-        score.Tracks.get_Item(0).ApplyLyrics(new alphaTab.collections.FastList<alphaTab.model.Lyrics>());
-        massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Lyrics.Length);
-        massive.munit.Assert.areEqual("AAA", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Lyrics[0]);
-        massive.munit.Assert.areEqual("BBB", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Lyrics[0]);
-        massive.munit.Assert.areEqual(null, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Lyrics);
-        massive.munit.Assert.areEqual("CCC", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Lyrics[0]);
-        massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Lyrics.Length);
-        massive.munit.Assert.areEqual("DDD", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Lyrics[0]);
-        massive.munit.Assert.areEqual("EEE", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Lyrics[0]);
+        score.Tracks.get_Item(0).ApplyLyrics((function (){
+    var _tmp = new alphaTab.collections.FastList<alphaTab.model.Lyrics>();
+    _tmp.Add((function (){
+        var _tmp1 = new alphaTab.model.Lyrics();
+        _tmp1.Text = "AAA BBB CCC DDD EEE";
+        _tmp1.StartBar = 0;
+        return _tmp1;
+    })());
+    return _tmp;
+})());
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Lyrics.Length);
+        alphaTab.test.Assert.AreEqual_T1_T22("AAA", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Lyrics[0]);
+        alphaTab.test.Assert.AreEqual_T1_T22("BBB", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Lyrics[0]);
+        massive.munit.Assert.isNull(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Lyrics);
+        alphaTab.test.Assert.AreEqual_T1_T22("CCC", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Lyrics[0]);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Lyrics.Length);
+        alphaTab.test.Assert.AreEqual_T1_T22("DDD", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Lyrics[0]);
+        alphaTab.test.Assert.AreEqual_T1_T22("EEE", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Lyrics[0]);
     }
 
     @Test
     public function TestApplySingleLineBarOffset() : Void 
     {
         var score : alphaTab.model.Score = LoadLyricsTemplateFile();
-        score.Tracks.get_Item(0).ApplyLyrics(new alphaTab.collections.FastList<alphaTab.model.Lyrics>());
-        massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(0).Lyrics.Length);
-        massive.munit.Assert.areEqual("AAA", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(0).Lyrics[0]);
-        massive.munit.Assert.areEqual("BBB", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(1).Lyrics[0]);
-        massive.munit.Assert.areEqual(null, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(2).Lyrics);
-        massive.munit.Assert.areEqual("CCC", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(3).Lyrics[0]);
-        massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(3).Voices.get_Item(0).Beats.get_Item(0).Lyrics.Length);
-        massive.munit.Assert.areEqual("DDD", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(3).Voices.get_Item(0).Beats.get_Item(0).Lyrics[0]);
-        massive.munit.Assert.areEqual("EEE", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(3).Voices.get_Item(0).Beats.get_Item(1).Lyrics[0]);
+        score.Tracks.get_Item(0).ApplyLyrics((function (){
+    var _tmp = new alphaTab.collections.FastList<alphaTab.model.Lyrics>();
+    _tmp.Add((function (){
+        var _tmp1 = new alphaTab.model.Lyrics();
+        _tmp1.Text = "AAA BBB CCC DDD EEE";
+        _tmp1.StartBar = 2;
+        return _tmp1;
+    })());
+    return _tmp;
+})());
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(0).Lyrics.Length);
+        alphaTab.test.Assert.AreEqual_T1_T22("AAA", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(0).Lyrics[0]);
+        alphaTab.test.Assert.AreEqual_T1_T22("BBB", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(1).Lyrics[0]);
+        massive.munit.Assert.isNull(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(2).Lyrics);
+        alphaTab.test.Assert.AreEqual_T1_T22("CCC", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(3).Lyrics[0]);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(3).Voices.get_Item(0).Beats.get_Item(0).Lyrics.Length);
+        alphaTab.test.Assert.AreEqual_T1_T22("DDD", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(3).Voices.get_Item(0).Beats.get_Item(0).Lyrics[0]);
+        alphaTab.test.Assert.AreEqual_T1_T22("EEE", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(3).Voices.get_Item(0).Beats.get_Item(1).Lyrics[0]);
     }
 
     @Test
     public function TestApplyMultiLineFirstBar() : Void 
     {
         var score : alphaTab.model.Score = LoadLyricsTemplateFile();
-        score.Tracks.get_Item(0).ApplyLyrics(new alphaTab.collections.FastList<alphaTab.model.Lyrics>());
-        massive.munit.Assert.areEqual(2, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Lyrics.Length);
-        massive.munit.Assert.areEqual("AAA", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Lyrics[0]);
-        massive.munit.Assert.areEqual("111", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Lyrics[1]);
-        massive.munit.Assert.areEqual("BBB", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Lyrics[0]);
-        massive.munit.Assert.areEqual("222", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Lyrics[1]);
-        massive.munit.Assert.areEqual(null, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Lyrics);
-        massive.munit.Assert.areEqual("CCC", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Lyrics[0]);
-        massive.munit.Assert.areEqual("333", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Lyrics[1]);
-        massive.munit.Assert.areEqual(2, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Lyrics.Length);
-        massive.munit.Assert.areEqual("DDD", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Lyrics[0]);
-        massive.munit.Assert.areEqual("444", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Lyrics[1]);
-        massive.munit.Assert.areEqual("EEE", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Lyrics[0]);
-        massive.munit.Assert.areEqual("555", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Lyrics[1]);
+        score.Tracks.get_Item(0).ApplyLyrics((function (){
+    var _tmp = new alphaTab.collections.FastList<alphaTab.model.Lyrics>();
+    _tmp.Add((function (){
+        var _tmp1 = new alphaTab.model.Lyrics();
+        _tmp1.Text = "AAA BBB CCC DDD EEE";
+        _tmp1.StartBar = 0;
+        return _tmp1;
+    })());
+    _tmp.Add((function (){
+        var _tmp1 = new alphaTab.model.Lyrics();
+        _tmp1.Text = "111 222 333 444 555";
+        _tmp1.StartBar = 0;
+        return _tmp1;
+    })());
+    return _tmp;
+})());
+        alphaTab.test.Assert.AreEqual_T1_T22(2, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Lyrics.Length);
+        alphaTab.test.Assert.AreEqual_T1_T22("AAA", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Lyrics[0]);
+        alphaTab.test.Assert.AreEqual_T1_T22("111", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Lyrics[1]);
+        alphaTab.test.Assert.AreEqual_T1_T22("BBB", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Lyrics[0]);
+        alphaTab.test.Assert.AreEqual_T1_T22("222", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Lyrics[1]);
+        massive.munit.Assert.isNull(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Lyrics);
+        alphaTab.test.Assert.AreEqual_T1_T22("CCC", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Lyrics[0]);
+        alphaTab.test.Assert.AreEqual_T1_T22("333", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Lyrics[1]);
+        alphaTab.test.Assert.AreEqual_T1_T22(2, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Lyrics.Length);
+        alphaTab.test.Assert.AreEqual_T1_T22("DDD", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Lyrics[0]);
+        alphaTab.test.Assert.AreEqual_T1_T22("444", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Lyrics[1]);
+        alphaTab.test.Assert.AreEqual_T1_T22("EEE", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Lyrics[0]);
+        alphaTab.test.Assert.AreEqual_T1_T22("555", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Lyrics[1]);
     }
 
     @Test
     public function TestApplyMultiLineBarOffset() : Void 
     {
         var score : alphaTab.model.Score = LoadLyricsTemplateFile();
-        score.Tracks.get_Item(0).ApplyLyrics(new alphaTab.collections.FastList<alphaTab.model.Lyrics>());
-        massive.munit.Assert.areEqual(2, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Lyrics.Length);
-        massive.munit.Assert.areEqual(null, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Lyrics[0]);
-        massive.munit.Assert.areEqual("111", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Lyrics[1]);
-        massive.munit.Assert.areEqual(null, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Lyrics[0]);
-        massive.munit.Assert.areEqual("222", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Lyrics[1]);
-        massive.munit.Assert.areEqual(null, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(2).Lyrics);
-        massive.munit.Assert.areEqual(null, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(3).Lyrics[0]);
-        massive.munit.Assert.areEqual("333", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(3).Lyrics[1]);
-        massive.munit.Assert.areEqual(2, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(0).Lyrics.Length);
-        massive.munit.Assert.areEqual("AAA", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(0).Lyrics[0]);
-        massive.munit.Assert.areEqual("444", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(0).Lyrics[1]);
-        massive.munit.Assert.areEqual("BBB", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(1).Lyrics[0]);
-        massive.munit.Assert.areEqual("555", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(1).Lyrics[1]);
-        massive.munit.Assert.areEqual(null, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(2).Lyrics);
-        massive.munit.Assert.areEqual("CCC", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(3).Lyrics[0]);
-        massive.munit.Assert.areEqual(null, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(3).Lyrics[1]);
+        score.Tracks.get_Item(0).ApplyLyrics((function (){
+    var _tmp = new alphaTab.collections.FastList<alphaTab.model.Lyrics>();
+    _tmp.Add((function (){
+        var _tmp1 = new alphaTab.model.Lyrics();
+        _tmp1.Text = "AAA BBB CCC DDD EEE";
+        _tmp1.StartBar = 2;
+        return _tmp1;
+    })());
+    _tmp.Add((function (){
+        var _tmp1 = new alphaTab.model.Lyrics();
+        _tmp1.Text = "111 222 333 444 555";
+        _tmp1.StartBar = 1;
+        return _tmp1;
+    })());
+    return _tmp;
+})());
+        alphaTab.test.Assert.AreEqual_T1_T22(2, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Lyrics.Length);
+        massive.munit.Assert.isNull(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Lyrics[0]);
+        alphaTab.test.Assert.AreEqual_T1_T22("111", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Lyrics[1]);
+        massive.munit.Assert.isNull(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Lyrics[0]);
+        alphaTab.test.Assert.AreEqual_T1_T22("222", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Lyrics[1]);
+        massive.munit.Assert.isNull(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(2).Lyrics);
+        massive.munit.Assert.isNull(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(3).Lyrics[0]);
+        alphaTab.test.Assert.AreEqual_T1_T22("333", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(3).Lyrics[1]);
+        alphaTab.test.Assert.AreEqual_T1_T22(2, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(0).Lyrics.Length);
+        alphaTab.test.Assert.AreEqual_T1_T22("AAA", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(0).Lyrics[0]);
+        alphaTab.test.Assert.AreEqual_T1_T22("444", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(0).Lyrics[1]);
+        alphaTab.test.Assert.AreEqual_T1_T22("BBB", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(1).Lyrics[0]);
+        alphaTab.test.Assert.AreEqual_T1_T22("555", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(1).Lyrics[1]);
+        massive.munit.Assert.isNull(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(2).Lyrics);
+        alphaTab.test.Assert.AreEqual_T1_T22("CCC", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(3).Lyrics[0]);
+        massive.munit.Assert.isNull(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(3).Lyrics[1]);
     }
 
     @Test
@@ -126,7 +174,7 @@ class LyricsTest
         var lyrics : alphaTab.model.Lyrics = new alphaTab.model.Lyrics();
         lyrics.Text = text;
         lyrics.Finish();
-        massive.munit.Assert.areEqual(system.CsString.Join_CsString_CsStringArray(", ", chunks), system.CsString.Join_CsString_CsStringArray(", ", lyrics.Chunks));
+        alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_CsStringArray(", ", chunks), system.CsString.Join_CsString_CsStringArray(", ", lyrics.Chunks));
     }
 
     public function new() 

@@ -30,7 +30,7 @@ namespace AlphaTab.Test.Model
             Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Lyrics.Length);
             Assert.AreEqual("AAA", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Lyrics[0]);
             Assert.AreEqual("BBB", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Lyrics[0]);
-            Assert.AreEqual(null,  score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Lyrics);
+            Assert.IsNull(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Lyrics);
             Assert.AreEqual("CCC", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Lyrics[0]);
 
             Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics.Length);
@@ -50,7 +50,7 @@ namespace AlphaTab.Test.Model
             Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Lyrics.Length);
             Assert.AreEqual("AAA", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Lyrics[0]);
             Assert.AreEqual("BBB", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Lyrics[0]);
-            Assert.AreEqual(null,  score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[2].Lyrics);
+            Assert.IsNull(score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[2].Lyrics);
             Assert.AreEqual("CCC", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[3].Lyrics[0]);
 
             Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].Lyrics.Length);
@@ -73,7 +73,7 @@ namespace AlphaTab.Test.Model
             Assert.AreEqual("111", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Lyrics[1]);
             Assert.AreEqual("BBB", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Lyrics[0]);
             Assert.AreEqual("222", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Lyrics[1]);
-            Assert.AreEqual(null,  score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Lyrics);
+            Assert.IsNull(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Lyrics);
             Assert.AreEqual("CCC", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Lyrics[0]);
             Assert.AreEqual("333", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Lyrics[1]);
 
@@ -96,12 +96,12 @@ namespace AlphaTab.Test.Model
 
             Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics.Length);
 
-            Assert.AreEqual(null, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics[0]);
+            Assert.IsNull(score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics[0]);
             Assert.AreEqual("111", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics[1]);
-            Assert.AreEqual(null, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Lyrics[0]);
+            Assert.IsNull(score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Lyrics[0]);
             Assert.AreEqual("222", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Lyrics[1]);
-            Assert.AreEqual(null,  score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[2].Lyrics);
-            Assert.AreEqual(null, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[3].Lyrics[0]);
+            Assert.IsNull(score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[2].Lyrics);
+            Assert.IsNull(score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[3].Lyrics[0]);
             Assert.AreEqual("333", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[3].Lyrics[1]);
 
             Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Lyrics.Length);
@@ -109,9 +109,9 @@ namespace AlphaTab.Test.Model
             Assert.AreEqual("444", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Lyrics[1]);
             Assert.AreEqual("BBB", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Lyrics[0]);
             Assert.AreEqual("555", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Lyrics[1]);
-            Assert.AreEqual(null,  score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[2].Lyrics);
+            Assert.IsNull(score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[2].Lyrics);
             Assert.AreEqual("CCC", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[3].Lyrics[0]);
-            Assert.AreEqual(null, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[3].Lyrics[1]);
+            Assert.IsNull(score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[3].Lyrics[1]);
         }
 
         [TestMethod]

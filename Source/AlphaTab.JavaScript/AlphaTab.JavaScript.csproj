@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>AlphaTab</RootNamespace>
-    <AssemblyName>AlphaTab</AssemblyName>
-    <PackageId>AlphaTab.JavaScript</PackageId>
+    <AssemblyName>AlphaTab.JavaScript</AssemblyName>
     <TargetFramework>net471</TargetFramework>
     <NoWarn>$(NoWarn);0626;0824</NoWarn>
   </PropertyGroup>

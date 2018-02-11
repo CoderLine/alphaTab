@@ -8,20 +8,20 @@ class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/Test01.gp3");
         var score : alphaTab.model.Score = reader.ReadScore();
-        massive.munit.Assert.areEqual("Title", score.Title);
-        massive.munit.Assert.areEqual("Subtitle", score.SubTitle);
-        massive.munit.Assert.areEqual("Artist", score.Artist);
-        massive.munit.Assert.areEqual("Album", score.Album);
-        massive.munit.Assert.areEqual("Music", score.Words);// no words in gp4
+        alphaTab.test.Assert.AreEqual_T1_T22("Title", score.Title);
+        alphaTab.test.Assert.AreEqual_T1_T22("Subtitle", score.SubTitle);
+        alphaTab.test.Assert.AreEqual_T1_T22("Artist", score.Artist);
+        alphaTab.test.Assert.AreEqual_T1_T22("Album", score.Album);
+        alphaTab.test.Assert.AreEqual_T1_T22("Music", score.Words);// no words in gp4
 
-        massive.munit.Assert.areEqual("Music", score.Music);
-        massive.munit.Assert.areEqual("Copyright", score.Copyright);
-        massive.munit.Assert.areEqual("Tab", score.Tab);
-        massive.munit.Assert.areEqual("Instructions", score.Instructions);
-        massive.munit.Assert.areEqual("Notice1\r\nNotice2", score.Notices);
-        massive.munit.Assert.areEqual(5, score.MasterBars.Count);
-        massive.munit.Assert.areEqual(1, score.Tracks.Count);
-        massive.munit.Assert.areEqual("Track 1", score.Tracks.get_Item(0).Name);
+        alphaTab.test.Assert.AreEqual_T1_T22("Music", score.Music);
+        alphaTab.test.Assert.AreEqual_T1_T22("Copyright", score.Copyright);
+        alphaTab.test.Assert.AreEqual_T1_T22("Tab", score.Tab);
+        alphaTab.test.Assert.AreEqual_T1_T22("Instructions", score.Instructions);
+        alphaTab.test.Assert.AreEqual_T1_T22("Notice1\r\nNotice2", score.Notices);
+        alphaTab.test.Assert.AreEqual_T1_T22(5, score.MasterBars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22("Track 1", score.Tracks.get_Item(0).Name);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestScoreInfo");
     }
 
@@ -59,7 +59,7 @@ class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         var score : alphaTab.model.Score = reader.ReadScore();
         massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsGhost);
         // it seems accentuation is handled as Forte Fortissimo
-        massive.munit.Assert.areEqual(alphaTab.model.DynamicValue.FFF, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).Dynamic);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.DynamicValue.FFF, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).Dynamic);
         massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).IsLetRing);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestAccentuation");
     }
@@ -92,8 +92,8 @@ class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/TestSlides.gp3");
         var score : alphaTab.model.Score = reader.ReadScore();
-        massive.munit.Assert.areEqual(alphaTab.model.SlideType.Shift, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).GetNoteOnString(5).SlideType);
-        massive.munit.Assert.areEqual(alphaTab.model.SlideType.Shift, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).GetNoteOnString(2).SlideType);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.SlideType.Shift, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).GetNoteOnString(5).SlideType);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.SlideType.Shift, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).GetNoteOnString(2).SlideType);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestSlides");
     }
 
@@ -117,12 +117,12 @@ class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Pop);
         massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).FadeIn);
         massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(3).Voices.get_Item(0).Beats.get_Item(0).HasChord);
-        massive.munit.Assert.areEqual("C", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(3).Voices.get_Item(0).Beats.get_Item(0).Chord.Name);
-        massive.munit.Assert.areEqual("Text", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(3).Voices.get_Item(0).Beats.get_Item(1).Text);
+        alphaTab.test.Assert.AreEqual_T1_T22("C", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(3).Voices.get_Item(0).Beats.get_Item(0).Chord.Name);
+        alphaTab.test.Assert.AreEqual_T1_T22("Text", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(3).Voices.get_Item(0).Beats.get_Item(1).Text);
         massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(4).Voices.get_Item(0).Beats.get_Item(0).GetAutomation(alphaTab.model.AutomationType.Tempo) != null);
-        massive.munit.Assert.areEqual(120.0, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(4).Voices.get_Item(0).Beats.get_Item(0).GetAutomation(alphaTab.model.AutomationType.Tempo).Value);
+        alphaTab.test.Assert.AreEqual_T1_T22(120.0, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(4).Voices.get_Item(0).Beats.get_Item(0).GetAutomation(alphaTab.model.AutomationType.Tempo).Value);
         massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(4).Voices.get_Item(0).Beats.get_Item(0).GetAutomation(alphaTab.model.AutomationType.Instrument) != null);
-        massive.munit.Assert.areEqual(25.0, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(4).Voices.get_Item(0).Beats.get_Item(0).GetAutomation(alphaTab.model.AutomationType.Instrument).Value);
+        alphaTab.test.Assert.AreEqual_T1_T22(25.0, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(4).Voices.get_Item(0).Beats.get_Item(0).GetAutomation(alphaTab.model.AutomationType.Instrument).Value);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestOtherEffects");
     }
 
@@ -131,8 +131,8 @@ class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/TestStrokes.gp3");
         var score : alphaTab.model.Score = reader.ReadScore();
-        massive.munit.Assert.areEqual(alphaTab.model.BrushType.BrushDown, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).BrushType);
-        massive.munit.Assert.areEqual(alphaTab.model.BrushType.BrushUp, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).BrushType);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.BrushType.BrushDown, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).BrushType);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.BrushType.BrushUp, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).BrushType);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestStroke");
     }
 

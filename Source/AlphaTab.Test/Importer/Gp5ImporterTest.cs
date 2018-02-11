@@ -253,5 +253,34 @@ namespace AlphaTab.Test.Importer
             CheckColors(score);
             Render(score);
         }
+
+        [TestMethod]
+        public void TestCanon()
+        {
+            var reader = PrepareImporterWithFile("GuitarPro5/Canon.gp5");
+            var score = reader.ReadScore();
+
+            Assert.AreEqual("Canon Rock", score.Title);
+            Assert.AreEqual("", score.SubTitle);
+            Assert.AreEqual("JerryC", score.Artist);
+            Assert.AreEqual("", score.Album);
+            Assert.AreEqual("", score.Words);
+            Assert.AreEqual("JerryC", score.Music);
+            Assert.AreEqual("", score.Copyright);
+            Assert.AreEqual("", score.Tab);
+            Assert.AreEqual("", score.Instructions);
+            Assert.AreEqual("", score.Notices);
+            Assert.AreEqual(224, score.MasterBars.Count);
+            Assert.AreEqual(9, score.Tracks.Count);
+            Assert.AreEqual("Guitar Player", score.Tracks[0].Name);
+            Assert.AreEqual("Low Bassy Sound", score.Tracks[1].Name);
+            Assert.AreEqual("High Soundy Thing", score.Tracks[2].Name);
+            Assert.AreEqual("Second Guitar", score.Tracks[3].Name);
+            Assert.AreEqual("Drums", score.Tracks[4].Name);
+            Assert.AreEqual("Harmonizer", score.Tracks[5].Name);
+            Assert.AreEqual("The clean guitar", score.Tracks[6].Name);
+            Assert.AreEqual("Track 8", score.Tracks[7].Name);
+            Assert.AreEqual("Percussion", score.Tracks[8].Name);
+        }
     }
 }

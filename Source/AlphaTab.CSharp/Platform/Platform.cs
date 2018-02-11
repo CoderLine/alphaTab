@@ -123,5 +123,10 @@ namespace AlphaTab.Platform
         {
             return Rnd.Next(max);
         }
+
+        public static double ToDouble(byte[] bytes)
+        {
+            return BitConverter.ToDouble(bytes, 0);
+        }
     }
 }

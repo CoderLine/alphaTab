@@ -1,0 +1,285 @@
+/*
+  spritemapper.output_css = css/printclient.css
+*/
+
+html, body, di
+{
+    margin:0;
+    padding:0;
+    font-family: monaco, Andale Mono, Courier New, monospace;
+    font-size:12px; 
+}
+html
+{
+	height: 100%;
+}
+body
+{
+	height: 100%;
+}
+
+hr
+{
+	margin:0;
+	padding:0;
+}
+#swfContainer {position: absolute;}
+
+.munit
+{
+	padding: 0;
+	min-height: 100%;
+
+}
+
+.munit-header
+{
+	padding: 8px 8px 8px 8px;
+	margin: 0;
+	background-color: #dddddd;
+}
+
+.munit-tests
+{
+	padding: 8px 8px 8px 8px;
+	margin: 0;
+	background-color: #eeeeee;
+}
+
+.munit-coverage
+{
+	padding: 8px 8px 8px 8px;
+	margin: 0;
+	background-color: #dddddd;
+}
+
+.munit-summary
+{
+	padding: 20px 8px 50px 8px;
+	margin: 0;
+	height: 100%;
+	
+}
+
+/* Top level warnings or errors */
+.munit div.line
+{
+	padding:10px;
+	background-color: #f9d5ab;
+	font-weight: bold;
+	color: #212121;
+}
+
+.line
+{
+	white-space: nowrap;
+}
+
+
+.debug
+{
+	font-family: monospace;
+}
+
+
+.munit-test
+{
+	margin: 2px;
+	padding: 2px 0 2px 0;
+	white-space: nowrap;
+}
+
+.munit-test-header, .test-coverage-header, .munit-coverage-header
+{
+	padding: 0 0 0 8px;
+	display: inline-block;
+}
+
+.munit-test-header-parent, .test-coverage-header-parent, .munit-coverage-header-parent
+{
+	white-space: nowrap;
+}
+
+.munit-test-contents, .test-coverage-contents, .munit-coverage-contents
+{
+	padding: 2px 2px 5px 10px;
+	margin: 2px 0 0px 18px;
+}
+
+.munit-coverage-contents
+{
+	padding-left:20px;
+	margin-left:0;
+}
+
+.munit-coverage-breakdown-header
+{
+	padding: 4px 4px 4px 8px;
+	display: inline-block;
+}
+.munit-coverage-breakdown-header-parent
+{
+	white-space: nowrap;
+}
+.munit-coverage-breakdown-contents
+{
+	padding: 8px;
+	margin: 0;
+	background-color: #CDCDCD;
+	white-space: nowrap;
+}
+
+.icon, .icon-busy, .icon-failed, .icon-error, .icon-passed, .icon-coverage
+{
+	padding: 0;
+	margin: -4px 0px -4px 0px;
+	width: 16px;
+	height: 16px;
+	display: inline-block;
+}
+
+.icon
+{
+	
+}
+
+.icon-busy
+{
+	background-image: url("../img/spinner.gif");
+}
+
+.icon-passed
+{
+	background:url(../img/icons.png) no-repeat -112px 0px;
+}
+
+.icon-failed
+{
+	background:url(../img/icons.png) no-repeat -96px 0px;
+}
+
+.icon-error
+{
+	background:url(../img/icons.png) no-repeat -80px 0px;
+}
+
+
+.test-coverage-header-parent > .icon
+{
+	background:url(../img/icons.png) no-repeat -64px 0px;
+}
+
+.munit-coverage-header-parent > .icon
+{
+	background:url(../img/icons.png) no-repeat -64px 0px;
+}
+
+
+#munit-coverage .icon
+{
+	background:url(../img/icons.png) no-repeat -64px 0px;
+}
+
+
+.arrow-open, .arrow-closed, .arrow-none
+{
+	padding: 0;
+	margin: -4px 0px -4px 5px;
+	width: 16px;
+	height: 16px;
+	display: inline-block;
+	background:url(../img/icons.png) no-repeat 0 0;
+}
+.arrow-open
+{
+	background-position:-16px 0px; 
+}
+
+.arrow-closed
+{
+	
+}
+
+.arrow-none
+{
+	background: url("");
+}
+
+.trace, .pass, .fail, .error, .ignore, .coverage, .test-coverage
+{
+	padding: 5px;
+	margin: 0 0 0 18px;
+	border: 1px dotted #FFFFFF;
+}
+
+.trace
+{
+	padding: 5px 0 5px 5px;
+	color:#5a5a5a;
+	font-style:italic;
+	background-color: #DEDEDE;
+}
+.pass
+{
+	background-color: #058c3e;
+}
+.fail
+{
+	background-color: #f9a9a1;
+}
+.error
+{
+	background-color: #e69797;
+}
+.ignore
+{
+	background-color: #f9d5ab;
+}
+.coverage
+{
+	background-color: #afe3ea;
+	
+}
+
+.test-coverage
+{
+
+	background-color: #bfeaed;
+}
+
+
+.test-coverage-header
+{
+	display: inline-block;
+}
+
+
+.missing-coverage-item
+{
+	padding: 5px;
+	margin: 0 0 0 10px;
+}
+
+.missing-coverage-item-header
+{
+	padding: 0 0 1px 6px;
+
+	display: inline-block;
+}
+
+.missing-coverage-item-header-parent
+{
+	white-space: nowrap;
+}
+
+.missing-coverage-item-contents
+{
+	padding: 2px 2px 5px 10px;
+	margin: 2px 0 0px 10px;
+}
+
+
+.coverage-summary
+{
+	white-space: nowrap;
+}

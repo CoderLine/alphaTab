@@ -8,7 +8,7 @@ class MidiPlaybackControllerTest extends alphaTab.test.importer.GpImporterTestBa
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro5\\RepeatClose.gp5");
         var score : alphaTab.model.Score = reader.ReadScore();
-        var expectedIndexes : system.FixedArray<system.Int32> = [0, 1, 0, 1, 2];
+        var expectedIndexes : system.Int32Array = [0, 1, 0, 1, 2];
         TestRepeat(score, expectedIndexes);
     }
 
@@ -17,7 +17,7 @@ class MidiPlaybackControllerTest extends alphaTab.test.importer.GpImporterTestBa
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro5\\RepeatCloseMulti.gp5");
         var score : alphaTab.model.Score = reader.ReadScore();
-        var expectedIndexes : system.FixedArray<system.Int32> = [0, 1, 0, 1, 0, 1, 0, 1, 2];
+        var expectedIndexes : system.Int32Array = [0, 1, 0, 1, 0, 1, 0, 1, 2];
         TestRepeat(score, expectedIndexes);
     }
 
@@ -26,7 +26,7 @@ class MidiPlaybackControllerTest extends alphaTab.test.importer.GpImporterTestBa
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro5\\RepeatCloseWithoutStartAtBeginning.gp5");
         var score : alphaTab.model.Score = reader.ReadScore();
-        var expectedIndexes : system.FixedArray<system.Int32> = [0, 1, 0, 1];
+        var expectedIndexes : system.Int32Array = [0, 1, 0, 1];
         TestRepeat(score, expectedIndexes);
     }
 
@@ -35,11 +35,11 @@ class MidiPlaybackControllerTest extends alphaTab.test.importer.GpImporterTestBa
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro5\\RepeatCloseAlternateEndings.gp5");
         var score : alphaTab.model.Score = reader.ReadScore();
-        var expectedIndexes : system.FixedArray<system.Int32> = [0, 1, 0, 2, 3, 0, 1, 0, 4];
+        var expectedIndexes : system.Int32Array = [0, 1, 0, 2, 3, 0, 1, 0, 4];
         TestRepeat(score, expectedIndexes);
     }
 
-    private function TestRepeat(score : alphaTab.model.Score, expectedIndexes : system.FixedArray<system.Int32>) : Void 
+    private function TestRepeat(score : alphaTab.model.Score, expectedIndexes : system.Int32Array) : Void 
     {
         var controller : alphaTab.audio.generator.MidiPlaybackController = new alphaTab.audio.generator.MidiPlaybackController(score);
         var i : system.Int32 = 0;
@@ -50,12 +50,12 @@ class MidiPlaybackControllerTest extends alphaTab.test.importer.GpImporterTestBa
             if (controller.ShouldPlay)
             {
                 alphaTab.util.Logger.Debug("Test", system.CsString.Format("Checking index {0}, expected[{1}]", [i, expectedIndexes[i]]), null);
-                massive.munit.Assert.areEqual(expectedIndexes[i], index);
+                alphaTab.test.Assert.AreEqual_T1_T22(expectedIndexes[i], index);
                 i++;
             }
             controller.MoveNext();
         }
-        massive.munit.Assert.areEqual(expectedIndexes.Length, i);
+        alphaTab.test.Assert.AreEqual_T1_T22(expectedIndexes.Length, i);
         massive.munit.Assert.isTrue(controller.Finished);
     }
 

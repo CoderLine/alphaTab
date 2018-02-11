@@ -8,20 +8,20 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/Test01.gp4");
         var score : alphaTab.model.Score = reader.ReadScore();
-        massive.munit.Assert.areEqual("Title", score.Title);
-        massive.munit.Assert.areEqual("Subtitle", score.SubTitle);
-        massive.munit.Assert.areEqual("Artist", score.Artist);
-        massive.munit.Assert.areEqual("Album", score.Album);
-        massive.munit.Assert.areEqual("Music", score.Words);// no words in gp4
+        alphaTab.test.Assert.AreEqual_T1_T22("Title", score.Title);
+        alphaTab.test.Assert.AreEqual_T1_T22("Subtitle", score.SubTitle);
+        alphaTab.test.Assert.AreEqual_T1_T22("Artist", score.Artist);
+        alphaTab.test.Assert.AreEqual_T1_T22("Album", score.Album);
+        alphaTab.test.Assert.AreEqual_T1_T22("Music", score.Words);// no words in gp4
 
-        massive.munit.Assert.areEqual("Music", score.Music);
-        massive.munit.Assert.areEqual("Copyright", score.Copyright);
-        massive.munit.Assert.areEqual("Tab", score.Tab);
-        massive.munit.Assert.areEqual("Instructions", score.Instructions);
-        massive.munit.Assert.areEqual("Notice1\r\nNotice2", score.Notices);
-        massive.munit.Assert.areEqual(5, score.MasterBars.Count);
-        massive.munit.Assert.areEqual(1, score.Tracks.Count);
-        massive.munit.Assert.areEqual("Track 1", score.Tracks.get_Item(0).Name);
+        alphaTab.test.Assert.AreEqual_T1_T22("Music", score.Music);
+        alphaTab.test.Assert.AreEqual_T1_T22("Copyright", score.Copyright);
+        alphaTab.test.Assert.AreEqual_T1_T22("Tab", score.Tab);
+        alphaTab.test.Assert.AreEqual_T1_T22("Instructions", score.Instructions);
+        alphaTab.test.Assert.AreEqual_T1_T22("Notice1\r\nNotice2", score.Notices);
+        alphaTab.test.Assert.AreEqual_T1_T22(5, score.MasterBars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22("Track 1", score.Tracks.get_Item(0).Name);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestScoreInfo");
     }
 

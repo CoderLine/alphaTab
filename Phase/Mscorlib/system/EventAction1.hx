@@ -39,6 +39,7 @@ abstract EventAction1<T1>(Array<T1->Void>)
 	
 	public function Invoke(p:T1) : Void
 	{
+		if(this == null) return;
 		for (x in this)
 		{
 			x(p);

@@ -29,7 +29,7 @@ abstract CsString(String) from String to String
 			var cc = this.charCodeAt(i);
 			if (chars.indexOf(cc) >= 0)
 			{
-				var endPos = i - 1;
+				var endPos = i;
 				if (endPos < startPos)
 				{
 					strings.push("");
@@ -40,6 +40,10 @@ abstract CsString(String) from String to String
 				}
 				startPos = i + 1;
 			}
+		}
+		if(startPos < this.length)
+		{
+			strings.push(this.substring(startPos, this.length));
 		}
 		return strings;
 	}
@@ -274,6 +278,10 @@ abstract CsString(String) from String to String
 	public static function Format_CsString_Object(format:CsString, arg:system.Object) : CsString
 	{
 		return Format(format, [arg]);
+	}
+	public static function Format_CsString_ObjectArray(format:CsString, args:system.FixedArray<system.Object>) : CsString
+	{
+		return Format(format, args);
 	}
 	public static function Join_CsString_IEnumerable_T1<T>(separator:CsString, v:system.collections.generic.IEnumerable<T>) : CsString
 	{

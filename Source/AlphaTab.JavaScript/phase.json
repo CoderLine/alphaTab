@@ -5,12 +5,12 @@
     {
       "name": "Building JavaScript (debug)",
       "executable": "haxe",
-      "arguments": "-cp ..\\..\\Phase\\Mscorlib -cp ..\\..\\Build\\Haxe\\src -cp ..\\..\\Build\\Haxe\\src-gen -js ..\\..\\Build\\JavaScript\\AlphaTab.Debug.js -main alphaTab.Main -debug"
+      "arguments": "-cp ..\\..\\Phase\\Mscorlib -cp ..\\..\\Build\\Haxe\\src -cp ..\\..\\Build\\Haxe\\src-gen -js ..\\..\\Build\\JavaScript\\AlphaTab.Debug.js -main alphaTab.Main -debug -D js-unflatten --macro addGlobalMetadata('alphaTab','@:expose')"
     },
     {
       "name": "Building JavaScript (release)",
       "executable": "haxe",
-      "arguments": "-cp ..\\..\\Phase\\Mscorlib -cp ..\\..\\Build\\Haxe\\src -cp ..\\..\\Build\\Haxe\\src-gen -js ..\\..\\Build\\JavaScript\\AlphaTab.js -main alphaTab.Main"
+      "arguments": "-cp ..\\..\\Phase\\Mscorlib -cp ..\\..\\Build\\Haxe\\src -cp ..\\..\\Build\\Haxe\\src-gen -js ..\\..\\Build\\JavaScript\\AlphaTab.js -main alphaTab.Main -D js-unflatten --macro addGlobalMetadata('alphaTab','@:expose')"
     },
     {
       "name": "Minify JavaScript",

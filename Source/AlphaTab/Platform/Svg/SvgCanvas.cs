@@ -28,7 +28,7 @@ namespace AlphaTab.Platform.Svg
     /// </summary>
     public abstract class SvgCanvas : ICanvas, IPathCanvas
     {
-        protected const float BlurCorrection = 0.5f;
+        protected const float BlurCorrection = 0;
 
         protected StringBuilder Buffer;
         private StringBuilder _currentPath;

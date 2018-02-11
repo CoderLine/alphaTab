@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AlphaTab.Importer;
 using AlphaTab.IO;
 using Haxe.Js.Html;
 using Phase;
@@ -24,12 +25,14 @@ namespace AlphaTab.Test
 
         public static byte[] LoadFile(string path)
         {
-            return null;
+            path = path.Replace("\\", "/");
+            return new Uint8Array(Script.Write<ArrayBuffer>("haxe.Resource.getBytes(path).getData()")).As<byte[]>();
         }
 
-        public static string LoadFileAsString(string testfilesXmlGpifXml)
+        public static string LoadFileAsString(string path)
         {
-            return null;
+            path = path.Replace("\\", "/");
+            return Script.Write<string>("haxe.Resource.getString(path)");
         }
 
         public static bool IsMatch(string value, string regex)

@@ -19,15 +19,17 @@ class TestPlatform
 
     }
 
-    public static function LoadFile(path : system.CsString) : system.FixedArray<system.Byte> 
+    public static function LoadFile(path : system.CsString) : system.ByteArray 
     {
-        return null;
+        path = path.Replace_CsString_CsString("\\", "/");
+        return cast (new js.html.Uint8Array(haxe.Resource.getBytes(path).getData()));
 
     }
 
-    public static function LoadFileAsString(testfilesXmlGpifXml : system.CsString) : system.CsString 
+    public static function LoadFileAsString(path : system.CsString) : system.CsString 
     {
-        return null;
+        path = path.Replace_CsString_CsString("\\", "/");
+        return haxe.Resource.getString(path);
 
     }
 

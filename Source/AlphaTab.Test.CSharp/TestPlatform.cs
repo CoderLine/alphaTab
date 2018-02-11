@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using AlphaTab.IO;
@@ -12,16 +13,16 @@ namespace AlphaTab.Test
             return ByteBuffer.FromBuffer(Encoding.UTF8.GetBytes(tex));
         }
 
+        public static byte[] LoadFile(string fileName)
+        {
+            return File.ReadAllBytes(fileName);
+        }
+
         public static string LoadFileAsString(string fileName)
         {
             return File.ReadAllText(fileName);
         }
 
-        public static byte[] LoadFile(string fileName)
-        {
-            return File.ReadAllBytes(fileName);
-        }
-        
         public static bool IsMatch(string value, string regex)
         {
             return Regex.IsMatch(value, regex);

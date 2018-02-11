@@ -10,6 +10,8 @@ abstract FixedArray<T>(ArrayData<T>)
 {
 	public inline function new(length:Int32) this = untyped __new__(Array, length.ToHaxeInt());
 	
+	public inline function ToHaxeArray<T>() : Array<T> return this;
+	
 	@:from public static inline function fromArray<T>(a:Array<T>):FixedArray<T> return cast a;
 	
 	public var Length(get, never):Int32;

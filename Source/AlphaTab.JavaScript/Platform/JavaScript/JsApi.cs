@@ -116,8 +116,9 @@ namespace AlphaTab.Platform.JavaScript
 
                 if (dataAttributes.ContainsKey("tex") && element.InnerText.IsTruthy())
                 {
-                    contents = (element.InnerHTML.As<string>()).Trim();
+                    contents = element.InnerHTML;
                     element.InnerHTML = "";
+                    contents = contents.Trim();
                 }
 
                 #region Create context elements (wrapper, canvas etc)

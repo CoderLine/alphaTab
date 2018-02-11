@@ -3,7 +3,7 @@ package alphaTab.test.importer;
 using system.HaxeExtensions;
 class MusicXmlImporterTestBase
 {
-    private function PrepareImporterWithBytes(buffer : system.FixedArray<system.Byte>) : alphaTab.importer.MusicXmlImporter 
+    private function PrepareImporterWithBytes(buffer : system.ByteArray) : alphaTab.importer.MusicXmlImporter 
     {
         var readerBase : alphaTab.importer.MusicXmlImporter = new alphaTab.importer.MusicXmlImporter();
         readerBase.Init(alphaTab.io.ByteBuffer.FromBuffer(buffer));
@@ -16,7 +16,7 @@ class MusicXmlImporterTestBase
         var gpxImporter : alphaTab.importer.GpxImporter = new alphaTab.importer.GpxImporter();
         try
         {
-            var buffer : system.FixedArray<system.Byte> = alphaTab.test.TestPlatform.LoadFile(file);
+            var buffer : system.ByteArray = alphaTab.test.TestPlatform.LoadFile(file);
             var importer : alphaTab.importer.MusicXmlImporter = PrepareImporterWithBytes(buffer);
             var score : alphaTab.model.Score = importer.ReadScore();
             var reference : system.CsString = alphaTab.test.TestPlatform.ChangeExtension(file, ".gpx");
@@ -83,19 +83,19 @@ class MusicXmlImporterTestBase
 
     private function AreEqual_Score_Score(expected : alphaTab.model.Score, actual : alphaTab.model.Score) : Void 
     {
-        massive.munit.Assert.areEqual(expected.Album, actual.Album);
-        massive.munit.Assert.areEqual(expected.Artist, actual.Artist);
-        massive.munit.Assert.areEqual(expected.Copyright, actual.Copyright);
-        massive.munit.Assert.areEqual(expected.Instructions, actual.Instructions);
-        massive.munit.Assert.areEqual(expected.Music, actual.Music);
-        massive.munit.Assert.areEqual(expected.Notices, actual.Notices);
-        massive.munit.Assert.areEqual(expected.SubTitle, actual.SubTitle);
-        massive.munit.Assert.areEqual(expected.Title, actual.Title);
-        massive.munit.Assert.areEqual(expected.Words, actual.Words);
-        massive.munit.Assert.areEqual(expected.Tab, actual.Tab);
-        massive.munit.Assert.areEqual(expected.Tempo, actual.Tempo);
-        massive.munit.Assert.areEqual(expected.TempoLabel, actual.TempoLabel);
-        massive.munit.Assert.areEqual(expected.MasterBars.Count, actual.MasterBars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Album, actual.Album, "Mismatch on Album");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Artist, actual.Artist, "Mismatch on Artist");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Copyright, actual.Copyright, "Mismatch on Copyright");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Instructions, actual.Instructions, "Mismatch on Instructions");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Music, actual.Music, "Mismatch on Music");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Notices, actual.Notices, "Mismatch on Notices");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.SubTitle, actual.SubTitle, "Mismatch on SubTitle");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Title, actual.Title, "Mismatch on Title");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Words, actual.Words, "Mismatch on Words");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Tab, actual.Tab, "Mismatch on Tab");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Tempo, actual.Tempo, "Mismatch on Tempo");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.TempoLabel, actual.TempoLabel, "Mismatch on TempoLabel");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.MasterBars.Count, actual.MasterBars.Count, "Mismatch on MasterBars.Count");
         {
             var i: system.Int32 = 0;
             while (i < expected.MasterBars.Count)
@@ -104,7 +104,7 @@ class MusicXmlImporterTestBase
                 i++;
             }
         }
-        massive.munit.Assert.areEqual(expected.Tracks.Count, actual.Tracks.Count);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Tracks.Count, actual.Tracks.Count, "Mismatch on Tracks.Count");
         {
             var i: system.Int32 = 0;
             while (i < expected.Tracks.Count)
@@ -117,16 +117,16 @@ class MusicXmlImporterTestBase
 
     private function AreEqual_Track_Track(expected : alphaTab.model.Track, actual : alphaTab.model.Track) : Void 
     {
-        massive.munit.Assert.areEqual(expected.Capo, actual.Capo);
-        massive.munit.Assert.areEqual(expected.Index, actual.Index);
-        massive.munit.Assert.areEqual(expected.Name, actual.Name);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Capo, actual.Capo, "Mismatch on Capo");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Index, actual.Index, "Mismatch on Index");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Name, actual.Name, "Mismatch on Name");
         //Assert.AreEqual(expected.ShortName, actual.ShortName, "Mismatch on ShortName");
-        massive.munit.Assert.areEqual(expected.Tuning.Length, actual.Tuning.Length);
-        massive.munit.Assert.areEqual(system.CsString.Join_CsString_IEnumerable_T1(",", expected.Tuning.ToEnumerable()), system.CsString.Join_CsString_IEnumerable_T1(",", actual.Tuning.ToEnumerable()));
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Tuning.Length, actual.Tuning.Length, "Mismatch on Tuning.Length");
+        alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_IEnumerable_T1(",", expected.Tuning.ToEnumerable()), system.CsString.Join_CsString_IEnumerable_T1(",", actual.Tuning.ToEnumerable()));
         //Assert.AreEqual(expected.Color.Raw, actual.Color.Raw, "Mismatch on Color.Raw");
         AreEqual_PlaybackInformation_PlaybackInformation(expected.PlaybackInfo, actual.PlaybackInfo);
-        massive.munit.Assert.areEqual(expected.IsPercussion, actual.IsPercussion);
-        massive.munit.Assert.areEqual(expected.Staves.Count, actual.Staves.Count);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsPercussion, actual.IsPercussion, "Mismatch on IsPercussion");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Staves.Count, actual.Staves.Count, "Mismatch on Staves.Count");
         {
             var i: system.Int32 = 0;
             while (i < expected.Staves.Count)
@@ -139,8 +139,8 @@ class MusicXmlImporterTestBase
 
     private function AreEqual_Staff_Staff(expected : alphaTab.model.Staff, actual : alphaTab.model.Staff) : Void 
     {
-        massive.munit.Assert.areEqual(expected.Index, actual.Index);
-        massive.munit.Assert.areEqual(expected.Bars.Count, actual.Bars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Index, actual.Index, "Mismatch on Index");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Bars.Count, actual.Bars.Count, "Mismatch on Bars.Count");
         {
             var i: system.Int32 = 0;
             while (i < expected.Bars.Count)
@@ -153,9 +153,9 @@ class MusicXmlImporterTestBase
 
     private function AreEqual_Bar_Bar(expected : alphaTab.model.Bar, actual : alphaTab.model.Bar) : Void 
     {
-        massive.munit.Assert.areEqual(expected.Index, actual.Index);
-        massive.munit.Assert.areEqual(expected.Clef, actual.Clef);
-        massive.munit.Assert.areEqual(expected.ClefOttavia, actual.ClefOttavia);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Index, actual.Index, "Mismatch on Index");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Clef, actual.Clef, "Mismatch on Clef");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.ClefOttavia, actual.ClefOttavia, "Mismatch on ClefOttavia");
         //Assert.AreEqual(expected.Voices.Count, actual.Voices.Count, "Mismatch on Voices.Count");
         {
             var i: system.Int32 = 0;
@@ -169,8 +169,8 @@ class MusicXmlImporterTestBase
 
     private function AreEqual_Voice_Voice(expected : alphaTab.model.Voice, actual : alphaTab.model.Voice) : Void 
     {
-        massive.munit.Assert.areEqual(expected.Index, actual.Index);
-        massive.munit.Assert.areEqual(expected.Beats.Count, actual.Beats.Count);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Index, actual.Index, "Mismatch on Index");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Beats.Count, actual.Beats.Count, "Mismatch on Beats.Count");
         {
             var i: system.Int32 = 0;
             while (i < expected.Beats.Count)
@@ -183,36 +183,36 @@ class MusicXmlImporterTestBase
 
     private function AreEqual_Beat_Beat(expected : alphaTab.model.Beat, actual : alphaTab.model.Beat) : Void 
     {
-        massive.munit.Assert.areEqual(expected.Index, actual.Index);
-        massive.munit.Assert.areEqual(expected.IsEmpty, actual.IsEmpty);
-        massive.munit.Assert.areEqual(expected.IsRest, actual.IsRest);
-        massive.munit.Assert.areEqual(expected.Dots, actual.Dots);
-        massive.munit.Assert.areEqual(expected.FadeIn, actual.FadeIn);
-        massive.munit.Assert.areEqual(expected.IsLegatoOrigin, actual.IsLegatoOrigin);
-        massive.munit.Assert.areEqual(system.CsString.Join_CsString_CsStringArray(" ", expected.Lyrics), system.CsString.Join_CsString_CsStringArray(" ", actual.Lyrics));
-        massive.munit.Assert.areEqual(expected.Pop, actual.Pop);
-        massive.munit.Assert.areEqual(expected.HasChord, actual.HasChord);
-        massive.munit.Assert.areEqual(expected.HasRasgueado, actual.HasRasgueado);
-        massive.munit.Assert.areEqual(expected.Slap, actual.Tap);
-        massive.munit.Assert.areEqual(expected.Text, actual.Text);
-        massive.munit.Assert.areEqual(expected.BrushType, actual.BrushType);
-        massive.munit.Assert.areEqual(expected.BrushDuration, actual.BrushDuration);
-        massive.munit.Assert.areEqual(expected.TupletDenominator, actual.TupletDenominator);
-        massive.munit.Assert.areEqual(expected.TupletNumerator, actual.TupletNumerator);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Index, actual.Index, "Mismatch on Index");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsEmpty, actual.IsEmpty, "Mismatch on IsEmpty");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsRest, actual.IsRest, "Mismatch on IsRest");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Dots, actual.Dots, "Mismatch on Dots");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.FadeIn, actual.FadeIn, "Mismatch on FadeIn");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsLegatoOrigin, actual.IsLegatoOrigin, "Mismatch on IsLegatoOrigin");
+        alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_CsStringArray(" ", expected.Lyrics), system.CsString.Join_CsString_CsStringArray(" ", actual.Lyrics));
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Pop, actual.Pop, "Mismatch on Pop");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.HasChord, actual.HasChord, "Mismatch on HasChord");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.HasRasgueado, actual.HasRasgueado, "Mismatch on HasRasgueado");
+        alphaTab.test.Assert.AreEqual_T1_T22(expected.Slap, actual.Tap);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Text, actual.Text, "Mismatch on Text");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.BrushType, actual.BrushType, "Mismatch on BrushType");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.BrushDuration, actual.BrushDuration, "Mismatch on BrushDuration");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.TupletDenominator, actual.TupletDenominator, "Mismatch on TupletDenominator");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.TupletNumerator, actual.TupletNumerator, "Mismatch on TupletNumerator");
         AreEqual_FastList_BendPoint_FastList_BendPoint(expected.WhammyBarPoints, actual.WhammyBarPoints);
-        massive.munit.Assert.areEqual(expected.Vibrato, actual.Vibrato);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Vibrato, actual.Vibrato, "Mismatch on Vibrato");
         if (expected.HasChord)
         {
             AreEqual_Chord_Chord(expected.Chord, actual.Chord);
         }
-        massive.munit.Assert.areEqual(expected.GraceType, actual.GraceType);
-        massive.munit.Assert.areEqual(expected.PickStroke, actual.PickStroke);
-        massive.munit.Assert.areEqual(expected.TremoloSpeed, actual.TremoloSpeed);
-        massive.munit.Assert.areEqual(expected.Crescendo, actual.Crescendo);
-        massive.munit.Assert.areEqual(expected.Start, actual.Start);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.GraceType, actual.GraceType, "Mismatch on GraceType");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.PickStroke, actual.PickStroke, "Mismatch on PickStroke");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.TremoloSpeed, actual.TremoloSpeed, "Mismatch on TremoloSpeed");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Crescendo, actual.Crescendo, "Mismatch on Crescendo");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Start, actual.Start, "Mismatch on Start");
         //Assert.AreEqual(expected.Dynamic, actual.Dynamic, "Mismatch on Dynamic");
-        massive.munit.Assert.areEqual(expected.InvertBeamDirection, actual.InvertBeamDirection);
-        massive.munit.Assert.areEqual(expected.Notes.Count, actual.Notes.Count);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.InvertBeamDirection, actual.InvertBeamDirection, "Mismatch on InvertBeamDirection");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Notes.Count, actual.Notes.Count, "Mismatch on Notes.Count");
         {
             var i: system.Int32 = 0;
             while (i < expected.Notes.Count)
@@ -225,48 +225,48 @@ class MusicXmlImporterTestBase
 
     private function AreEqual_Note_Note(expected : alphaTab.model.Note, actual : alphaTab.model.Note) : Void 
     {
-        massive.munit.Assert.areEqual(expected.Index, actual.Index);
-        massive.munit.Assert.areEqual(expected.Accentuated, actual.Accentuated);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Index, actual.Index, "Mismatch on Index");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Accentuated, actual.Accentuated, "Mismatch on Accentuated");
         AreEqual_FastList_BendPoint_FastList_BendPoint(expected.BendPoints, actual.BendPoints);
-        massive.munit.Assert.areEqual(expected.IsStringed, actual.IsStringed);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsStringed, actual.IsStringed, "Mismatch on IsStringed");
         if (actual.IsStringed)
         {
-            massive.munit.Assert.areEqual(expected.Fret, actual.Fret);
-            massive.munit.Assert.areEqual(expected.String, actual.String);
+            alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Fret, actual.Fret, "Mismatch on Fret");
+            alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.String, actual.String, "Mismatch on String");
         }
-        massive.munit.Assert.areEqual(expected.IsPiano, actual.IsPiano);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsPiano, actual.IsPiano, "Mismatch on IsPiano");
         if (actual.IsPiano)
         {
-            massive.munit.Assert.areEqual(expected.Octave, actual.Octave);
-            massive.munit.Assert.areEqual(expected.Tone, actual.Tone);
+            alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Octave, actual.Octave, "Mismatch on Octave");
+            alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Tone, actual.Tone, "Mismatch on Tone");
         }
-        massive.munit.Assert.areEqual(expected.Variation, actual.Variation);
-        massive.munit.Assert.areEqual(expected.Element, actual.Element);
-        massive.munit.Assert.areEqual(expected.IsHammerPullOrigin, actual.IsHammerPullOrigin);
-        massive.munit.Assert.areEqual(expected.HarmonicType, actual.HarmonicType);
-        massive.munit.Assert.areEqual(expected.HarmonicValue, actual.HarmonicValue);
-        massive.munit.Assert.areEqual(expected.IsGhost, actual.IsGhost);
-        massive.munit.Assert.areEqual(expected.IsLetRing, actual.IsLetRing);
-        massive.munit.Assert.areEqual(expected.IsPalmMute, actual.IsPalmMute);
-        massive.munit.Assert.areEqual(expected.IsDead, actual.IsDead);
-        massive.munit.Assert.areEqual(expected.IsStaccato, actual.IsStaccato);
-        massive.munit.Assert.areEqual(expected.SlideType, actual.SlideType);
-        massive.munit.Assert.areEqual(expected.Vibrato, actual.Vibrato);
-        massive.munit.Assert.areEqual(expected.IsTieDestination, actual.IsTieDestination);
-        massive.munit.Assert.areEqual(expected.IsTieOrigin, actual.IsTieOrigin);
-        massive.munit.Assert.areEqual(expected.LeftHandFinger, actual.LeftHandFinger);
-        massive.munit.Assert.areEqual(expected.IsFingering, actual.IsFingering);
-        massive.munit.Assert.areEqual(expected.TrillValue, actual.TrillValue);
-        massive.munit.Assert.areEqual(expected.TrillSpeed, actual.TrillSpeed);
-        massive.munit.Assert.areEqual(expected.DurationPercent, actual.DurationPercent);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Variation, actual.Variation, "Mismatch on Variation");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Element, actual.Element, "Mismatch on Element");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsHammerPullOrigin, actual.IsHammerPullOrigin, "Mismatch on IsHammerPullOrigin");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.HarmonicType, actual.HarmonicType, "Mismatch on HarmonicType");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.HarmonicValue, actual.HarmonicValue, "Mismatch on HarmonicValue");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsGhost, actual.IsGhost, "Mismatch on IsGhost");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsLetRing, actual.IsLetRing, "Mismatch on IsLetRing");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsPalmMute, actual.IsPalmMute, "Mismatch on IsPalmMute");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsDead, actual.IsDead, "Mismatch on IsDead");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsStaccato, actual.IsStaccato, "Mismatch on IsStaccato");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.SlideType, actual.SlideType, "Mismatch on SlideType");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Vibrato, actual.Vibrato, "Mismatch on Vibrato");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsTieDestination, actual.IsTieDestination, "Mismatch on IsTieDestination");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsTieOrigin, actual.IsTieOrigin, "Mismatch on IsTieOrigin");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.LeftHandFinger, actual.LeftHandFinger, "Mismatch on LeftHandFinger");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsFingering, actual.IsFingering, "Mismatch on IsFingering");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.TrillValue, actual.TrillValue, "Mismatch on TrillValue");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.TrillSpeed, actual.TrillSpeed, "Mismatch on TrillSpeed");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.DurationPercent, actual.DurationPercent, "Mismatch on DurationPercent");
         //Assert.AreEqual(expected.AccidentalMode, actual.AccidentalMode, "Mismatch on AccidentalMode");
-        massive.munit.Assert.areEqual(expected.Dynamic, actual.Dynamic);
-        massive.munit.Assert.areEqual(expected.RealValue, actual.RealValue);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Dynamic, actual.Dynamic, "Mismatch on Dynamic");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.RealValue, actual.RealValue, "Mismatch on RealValue");
     }
 
     private function AreEqual_Chord_Chord(expected : alphaTab.model.Chord, actual : alphaTab.model.Chord) : Void 
     {
-        massive.munit.Assert.areEqual(expected == null, actual == null);
+        alphaTab.test.Assert.AreEqual_T1_T22(expected == null, actual == null);
         if (expected != null)
         {
         }
@@ -274,13 +274,13 @@ class MusicXmlImporterTestBase
 
     private function AreEqual_FastList_BendPoint_FastList_BendPoint(expected : alphaTab.collections.FastList<alphaTab.model.BendPoint>, actual : alphaTab.collections.FastList<alphaTab.model.BendPoint>) : Void 
     {
-        massive.munit.Assert.areEqual(expected.Count, actual.Count);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Count, actual.Count, "Mismatch on Count");
         {
             var i: system.Int32 = 0;
             while (i < expected.Count)
             {
-                massive.munit.Assert.areEqual(expected.get_Item(i).Value, actual.get_Item(i).Value);
-                massive.munit.Assert.areEqual(expected.get_Item(i).Offset, actual.get_Item(i).Offset);
+                alphaTab.test.Assert.AreEqual_T1_T22(expected.get_Item(i).Value, actual.get_Item(i).Value);
+                alphaTab.test.Assert.AreEqual_T1_T22(expected.get_Item(i).Offset, actual.get_Item(i).Offset);
                 i++;
             }
         }
@@ -288,39 +288,39 @@ class MusicXmlImporterTestBase
 
     private function AreEqual_PlaybackInformation_PlaybackInformation(expected : alphaTab.model.PlaybackInformation, actual : alphaTab.model.PlaybackInformation) : Void 
     {
-        massive.munit.Assert.areEqual(expected.Volume, actual.Volume);
-        massive.munit.Assert.areEqual(expected.Balance, actual.Balance);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Volume, actual.Volume, "Mismatch on Volume");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Balance, actual.Balance, "Mismatch on Balance");
         //Assert.AreEqual(expected.Port, actual.Port, "Mismatch on Port");
-        massive.munit.Assert.areEqual(expected.Program, actual.Program);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Program, actual.Program, "Mismatch on Program");
         //Assert.AreEqual(expected.PrimaryChannel, actual.PrimaryChannel, "Mismatch on PrimaryChannel");
         //Assert.AreEqual(expected.SecondaryChannel, actual.SecondaryChannel, "Mismatch on SecondaryChannel");
-        massive.munit.Assert.areEqual(expected.IsMute, actual.IsMute);
-        massive.munit.Assert.areEqual(expected.IsSolo, actual.IsSolo);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsMute, actual.IsMute, "Mismatch on IsMute");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsSolo, actual.IsSolo, "Mismatch on IsSolo");
     }
 
     private function AreEqual_MasterBar_MasterBar(expected : alphaTab.model.MasterBar, actual : alphaTab.model.MasterBar) : Void 
     {
-        massive.munit.Assert.areEqual(expected.AlternateEndings, actual.AlternateEndings);
-        massive.munit.Assert.areEqual(expected.Index, actual.Index);
-        massive.munit.Assert.areEqual(expected.KeySignature, actual.KeySignature);
-        massive.munit.Assert.areEqual(expected.KeySignatureType, actual.KeySignatureType);
-        massive.munit.Assert.areEqual(expected.IsDoubleBar, actual.IsDoubleBar);
-        massive.munit.Assert.areEqual(expected.IsRepeatStart, actual.IsRepeatStart);
-        massive.munit.Assert.areEqual(expected.RepeatCount, actual.RepeatCount);
-        massive.munit.Assert.areEqual(expected.TimeSignatureNumerator, actual.TimeSignatureNumerator);
-        massive.munit.Assert.areEqual(expected.TimeSignatureDenominator, actual.TimeSignatureDenominator);
-        massive.munit.Assert.areEqual(expected.TripletFeel, actual.TripletFeel);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.AlternateEndings, actual.AlternateEndings, "Mismatch on AlternateEndings");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Index, actual.Index, "Mismatch on Index");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.KeySignature, actual.KeySignature, "Mismatch on KeySignature");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.KeySignatureType, actual.KeySignatureType, "Mismatch on KeySignatureType");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsDoubleBar, actual.IsDoubleBar, "Mismatch on IsDoubleBar");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsRepeatStart, actual.IsRepeatStart, "Mismatch on IsRepeatStart");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.RepeatCount, actual.RepeatCount, "Mismatch on RepeatCount");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.TimeSignatureNumerator, actual.TimeSignatureNumerator, "Mismatch on TimeSignatureNumerator");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.TimeSignatureDenominator, actual.TimeSignatureDenominator, "Mismatch on TimeSignatureDenominator");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.TripletFeel, actual.TripletFeel, "Mismatch on TripletFeel");
         AreEqual_Section_Section(expected.Section, actual.Section);
-        massive.munit.Assert.areEqual(expected.Start, actual.Start);
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Start, actual.Start, "Mismatch on Start");
     }
 
     private function AreEqual_Section_Section(expected : alphaTab.model.Section, actual : alphaTab.model.Section) : Void 
     {
-        massive.munit.Assert.areEqual(expected == null, actual == null);
+        alphaTab.test.Assert.AreEqual_T1_T22(expected == null, actual == null);
         if (expected != null)
         {
-            massive.munit.Assert.areEqual(expected.Text, actual.Text);
-            massive.munit.Assert.areEqual(expected.Marker, actual.Marker);
+            alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Text, actual.Text, "Mismatch on Text");
+            alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Marker, actual.Marker, "Mismatch on Marker");
         }
     }
 

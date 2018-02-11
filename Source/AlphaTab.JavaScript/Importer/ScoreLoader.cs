@@ -39,7 +39,7 @@ namespace AlphaTab.Importer
         public static void LoadScoreAsync(string path, Action<Score> success, Action<Exception> error)
         {
             var xhr = new XMLHttpRequest();
-            xhr.Open("GET", path);
+            xhr.Open("GET", path, true);
             xhr.ResponseType = XMLHttpRequestResponseType.ARRAYBUFFER;
             xhr.OnReadyStateChange = (Action)(() =>
             {
@@ -86,9 +86,6 @@ namespace AlphaTab.Importer
                     }
                 }
             });
-
-            xhr.Open("GET", path, true);
-            xhr.ResponseType = XMLHttpRequestResponseType.ARRAYBUFFER;
             // IE fallback
             if (xhr.ResponseType != XMLHttpRequestResponseType.ARRAYBUFFER)
             {

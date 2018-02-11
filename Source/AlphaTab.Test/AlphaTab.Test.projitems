@@ -143,6 +143,9 @@
     <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro4\TestVibrato.gp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro5\Canon.gp5">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro5\Colors.gp5">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

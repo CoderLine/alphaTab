@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AlphaTab</RootNamespace>
-    <AssemblyName>AlphaTab</AssemblyName>
+    <AssemblyName>AlphaTab.Xamarin.Android</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Profile49</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>

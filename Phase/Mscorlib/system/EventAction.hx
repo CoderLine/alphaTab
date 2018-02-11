@@ -37,6 +37,7 @@ abstract EventAction(Array<Void->Void>)
 	
 	public function Invoke() : Void
 	{
+		if(this == null) return;
 		for (x in this)
 		{
 			x();

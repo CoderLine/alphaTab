@@ -303,7 +303,7 @@ namespace AlphaTab.Test.Importer
 
             for (int i = 0; i < expectedTexts.Length; i++)
             {
-                var text = texts[i].Value.Trim();
+                var text = texts[i].InnerText.Trim();
                 Assert.AreEqual(expectedTexts[i], text, "Mismatch at index {0}", i);
             }
         }

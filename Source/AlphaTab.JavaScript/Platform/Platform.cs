@@ -224,5 +224,11 @@ namespace AlphaTab.Platform
         {
             return Script.Write<byte[]>("untyped __js__(\"new Uint8Array({0})\", data)");
         }
+
+        public static double ToDouble(byte[] bytes)
+        {
+            var array = new Float64Array(Script.Write<ArrayBuffer>("untyped __js__(\"{0}.buffer\", bytes)"));
+            return array[0];
+        }
     }
 }

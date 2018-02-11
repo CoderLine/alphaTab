@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+	<title>Massive Unit Test Runner</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<link rel="stylesheet" type="text/css" href="css/printclient.css" />
+	
+	<script type="text/JavaScript" language="JavaScript" src="js/swfobject.js"></script>
+	<script type="text/JavaScript" language="JavaScript" src="js/printclient.js"></script>
+	
+  
+	<style type="text/css">
+		html, body, div { margin:0; padding:0; font-family: monaco, Andale Mono, Courier New, monospace; font-size:12px;}
+		.output
+		{
+			padding:20px;
+		}
+		
+	</style>
+  </head>
+  <body>
+	<div id="swfContainer" ></div>
+	<div id="haxe:trace" ></div>
+	<div id="munit" class="munit" >
+<!--   		<div id="munit-header"  ></div>
+		<div id="munit-tests"  ></div>
+		<div id="munit-coverage"  ></div>
+		<div id="munit-results"  ></div>
+		<div id="munit-summary" ></div> -->
+	</div>
+
+<script language='JavaScript' type='text/JavaScript' >
+	
+function mockTest(name, doTrace, doError, doCoverage, doIgnore, result)
+{
+	createTestClass(name);
+	updateTestSummary("Class " + name + ".......");
+
+	if(doError) updateTestSummary("!");
+
+	if(doIgnore) updateTestSummary(",");
+
+	if(doCoverage) updateTestSummary(" [34%]");
+	else updateTestSummary(" [100%]");
+	
+
+	if(doTrace) addTestTrace("tracing hello world");
+	if(doError)
+	{
+		addTestFail("failed test");
+		addTestError("error thrown");
+	}
+
+	if(doIgnore)
+	{
+		addTestIgnore("ignored test");	
+	}
+	if(doCoverage)
+	{
+		addTestCoverageClass(name.split("Test")[0], "55");
+		addTestCoverageItem("coverage is bad");
+	}
+	if(result) setTestClassResult(result);
+}
+
+function mockCoverageClass(name)
+{
+	addMissingCoverageClass(name, 45);
+	addTestCoverageItem("coverage is bad");
+}
+
+munitPrintLine("WARNING: Bad thing may happened.");
+
+mockTest("com.example.Item1Test", false, false, false, false, "0")
+mockTest("com.example.Item2Test", true, false, false,true,  "0");
+mockTest("com.example.Item99Test", true, true, true, true, "1");
+mockTest("com.example.Item3Test", true, true, false, true, "2");
+mockTest("com.example.Item4Test", true, false, true, false, "3");
+mockTest("com.example.Item5Test", true, true, true, false, "1");
+mockTest("com.example.Item6Test", false, true, false, false, "2");
+mockTest("com.example.Item7Test", false, true, true, false, "1");
+mockTest("com.example.Item8Test", false, false, true, false, "3");
+mockTest("com.example.Item9Test", false, false, false, false);
+
+createCoverageReport(65);
+mockCoverageClass("com.example.Foo");
+mockCoverageClass("com.example.Barry");
+
+addCoverageSummary("Classes: 5/6   Methods: 12/15   Blocks: 24/45");
+
+printSummary("PASSED<br/>Tests 100 Passed 50 Failed 50 Ignored 2");
+
+setResult(false);
+	
+ </script>
+
+
+  </body>
+</html>

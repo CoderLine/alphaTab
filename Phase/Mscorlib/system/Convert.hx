@@ -203,20 +203,22 @@ class Convert
 		{
 			if (v < 2147483647.5)
 			{
-				var result = Std.int(v.ToHaxeFloat());
-				var dif = v - result;
-				if (dif > 0.5 || dif == 0.5 && (result & 1) != 0) result++;
-				return result;
+				return Std.int(v.ToHaxeFloat());
+				//var result = Std.int(v.ToHaxeFloat());
+				//var dif = v - result;
+				//if (dif > 0.5 || dif == 0.5 && (result & 1) != 0) result++;
+				//return result;
 			}
 		}
 		else
 		{
 			if (v >= -2147483648.5)
 			{
-				var result = Std.int(v.ToHaxeFloat());
-				var dif = v - result;
-				if (dif < -0.5 || dif == -0.5 && (result & 1) != 0) result--;
-				return result;
+				return Std.int(v.ToHaxeFloat());
+				// var result = Std.int(v.ToHaxeFloat());
+				// var dif = v - result;
+				// if (dif < -0.5 || dif == -0.5 && (result & 1) != 0) result--;
+				// return result;
 			}
 		}
 		throw new OverflowException("Value was either too large or too small for a Int32.");

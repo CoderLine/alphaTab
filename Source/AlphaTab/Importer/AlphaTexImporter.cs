@@ -1509,7 +1509,8 @@ namespace AlphaTab.Importer
                             bar.Clef = ParseClefFromInt((int)_syData);
                             break;
                         case AlphaTexSymbols.Tuning:
-                            bar.Clef = ParseClefFromInt(((TuningParseResult)_syData).RealValue);
+                            TuningParseResult parseResult = (TuningParseResult) _syData;
+                            bar.Clef = ParseClefFromInt(parseResult.RealValue);
                             break;
                         default:
                             Error("clef", AlphaTexSymbols.String);

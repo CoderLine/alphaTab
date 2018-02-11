@@ -1,185 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5FFAB560-4428-43B6-B893-C869E9220D76}</ProjectGuid>
+    <TargetFramework>net471</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AlphaTab.Samples.WinForms</RootNamespace>
-    <AssemblyName>AlphaTab.Samples.WinForms</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MonoDebug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\MonoDebug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MonoRelease|AnyCPU'">
-    <OutputPath>bin\MonoRelease\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseNoMinimize|AnyCPU'">
-    <OutputPath>bin\ReleaseNoMinimize\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="SkiaSharp, Version=1.57.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\SkiaSharp.1.57.0\lib\net45\SkiaSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="**\*.Designer.cs" SubType="Designer" DependentUpon="%(Filename)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="ColorTools.cs" />
-    <Compile Include="MainWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="MainWindow.Designer.cs">
-      <DependentUpon>MainWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScoreInfoWindow.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ScoreInfoWindow.Designer.cs">
-      <DependentUpon>ScoreInfoWindow.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TrackBarsControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="TrackHeaderControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TrackHeaderControl.Designer.cs">
-      <DependentUpon>TrackHeaderControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="TrackDetailsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TrackDetailsControl.Designer.cs">
-      <DependentUpon>TrackDetailsControl.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="MainWindow.resx">
-      <DependentUpon>MainWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <EmbeddedResource Include="ScoreInfoWindow.resx">
-      <DependentUpon>ScoreInfoWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TrackHeaderControl.resx">
-      <DependentUpon>TrackHeaderControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="TrackDetailsControl.resx">
-      <DependentUpon>TrackDetailsControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
+    <ProjectReference Include="..\..\..\Source\AlphaTab.CSharp\AlphaTab.CSharp.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Readme.md" />
-    <None Include="Resources\folder_page_white.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\information.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\control_pause.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\control_play.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\control_stop.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Source\AlphaTab.WinForms\AlphaTab.WinForms.csproj">
-      <Project>{4e5a5117-b0ae-4fd5-9661-0c1ccaf86dec}</Project>
-      <Name>AlphaTab.WinForms</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\..\packages\SkiaSharp.1.57.0\build\net45\SkiaSharp.targets" Condition="Exists('..\..\..\packages\SkiaSharp.1.57.0\build\net45\SkiaSharp.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\..\packages\SkiaSharp.1.57.0\build\net45\SkiaSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\packages\SkiaSharp.1.57.0\build\net45\SkiaSharp.targets'))" />
-  </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

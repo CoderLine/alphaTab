@@ -37,6 +37,7 @@ abstract EventAction2<T1, T2>(Array<T1->T2->Void>)
 	
 	public function Invoke(p1:T1, p2:T2) : Void
 	{
+		if(this == null) return;
 		for (x in this)
 		{
 			x(p1, p2);

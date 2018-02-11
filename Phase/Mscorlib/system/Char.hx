@@ -8,7 +8,7 @@ abstract Char(Int) from Int
 	public static inline function fromString(i:String) : Char return new Char(i.charCodeAt(0));
 
 	public inline function ToHaxeInt(): Int return this;	
-	public inline function ToString() : system.CsString return Std.string(this);
+	public inline function ToString() : system.CsString return String.fromCharCode(this);
 			
 	public inline function ToBoolean_IFormatProvider(provider:IFormatProvider) : system.Boolean return system.Convert.ToBoolean_Char(this);
 	public inline function ToChar_IFormatProvider(provider:IFormatProvider) : system.Char return system.Convert.ToChar_Char(this);

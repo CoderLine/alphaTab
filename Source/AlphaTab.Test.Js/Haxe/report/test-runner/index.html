@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+		<meta charset="utf-8">
+		<title>Massive Unit Test Runner</title>
+		<script language='JavaScript' type='text/JavaScript' src="tests-complete.js"></script>
+		<script language='JavaScript' type='text/JavaScript'>
+			var MAX_TESTS = 1;
+			var i = 0;
+			
+			function testComplete()
+			{
+				if (++i == MAX_TESTS)
+					BrowserTestsCompleteReporter.sendReport(shutdown, shutdown);
+			}
+			
+			function shutdown()
+			{
+				
+			}
+		</script>
+		
+		<style type="text/css">
+			html, body, div { margin:0; padding:0; height:100%; background:#eee;}
+		</style>
+		
+	</head>
+	<frameset rows="83,*" border="1" bordercolor="#ccc">
+		<frame src="target_headers.html"/>
+		<frameset cols="*" border="1">
+			<frame src="js.html" scrolling="auto" noresize="noresize"/>
+
+		</frameset>
+	</frameset>
+</html>

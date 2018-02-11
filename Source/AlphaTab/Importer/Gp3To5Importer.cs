@@ -1433,13 +1433,7 @@ namespace AlphaTab.Importer
         {
             var bytes = new byte[8];
             Data.Read(bytes, 0, bytes.Length);
-
-            var sign = 1 - ((bytes[0] >> 7) << 1); // sign = bit 0
-            var exp = (((bytes[0] << 4) & 0x7FF) | (bytes[1] >> 4)) - 1023; // exponent = bits 1..11
-            var sig = GetDoubleSig(bytes);
-            if (sig == 0 && exp == -1023)
-                return 0.0;
-            return sign * (1.0 + Math.Pow(2, -52) * sig) * Math.Pow(2, exp);
+            return Platform.Platform.ToDouble(bytes);
         }
 
         public int GetDoubleSig(byte[] bytes)

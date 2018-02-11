@@ -16,52 +16,52 @@ class AlphaTexImporterTest
     {
         var tex : system.CsString = "\\title Test\r\n                        \\words test\r\n                        \\music alphaTab\r\n                        \\copyright test\r\n                        \\tempo 200\r\n                        \\instrument 30\r\n                        \\capo 2\r\n                        \\tuning G3 D2 G2 B2 D3 A4\r\n                        .\r\n                        0.5.2 1.5.4 3.4.4 | 5.3.8 5.3.8 5.3.8 5.3.8 r.2";
         var score : alphaTab.model.Score = ParseTex(tex);
-        massive.munit.Assert.areEqual("Test", score.Title);
-        massive.munit.Assert.areEqual("test", score.Words);
-        massive.munit.Assert.areEqual("alphaTab", score.Music);
-        massive.munit.Assert.areEqual("test", score.Copyright);
-        massive.munit.Assert.areEqual(200, score.Tempo);
-        massive.munit.Assert.areEqual(1, score.Tracks.Count);
-        massive.munit.Assert.areEqual(30, score.Tracks.get_Item(0).PlaybackInfo.Program);
-        massive.munit.Assert.areEqual(2, score.Tracks.get_Item(0).Capo);
-        massive.munit.Assert.areEqual("55,38,43,47,50,69", system.CsString.Join_CsString_IEnumerable_T1(",", score.Tracks.get_Item(0).Tuning.ToEnumerable()));
-        massive.munit.Assert.areEqual(2, score.MasterBars.Count);
-        massive.munit.Assert.areEqual(3, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22("Test", score.Title);
+        alphaTab.test.Assert.AreEqual_T1_T22("test", score.Words);
+        alphaTab.test.Assert.AreEqual_T1_T22("alphaTab", score.Music);
+        alphaTab.test.Assert.AreEqual_T1_T22("test", score.Copyright);
+        alphaTab.test.Assert.AreEqual_T1_T22(200, score.Tempo);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(30, score.Tracks.get_Item(0).PlaybackInfo.Program);
+        alphaTab.test.Assert.AreEqual_T1_T22(2, score.Tracks.get_Item(0).Capo);
+        alphaTab.test.Assert.AreEqual_T1_T22("55,38,43,47,50,69", system.CsString.Join_CsString_IEnumerable_T1(",", score.Tracks.get_Item(0).Tuning.ToEnumerable()));
+        alphaTab.test.Assert.AreEqual_T1_T22(2, score.MasterBars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(3, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
         {
-            massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.Count);
-            massive.munit.Assert.areEqual(alphaTab.model.Duration.Half, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Duration);
-            massive.munit.Assert.areEqual(0, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Fret);
-            massive.munit.Assert.areEqual(2, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).String);
-            massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.Count);
-            massive.munit.Assert.areEqual(alphaTab.model.Duration.Quarter, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Duration);
-            massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).Fret);
-            massive.munit.Assert.areEqual(2, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).String);
-            massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Notes.Count);
-            massive.munit.Assert.areEqual(alphaTab.model.Duration.Quarter, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Duration);
-            massive.munit.Assert.areEqual(3, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).Fret);
-            massive.munit.Assert.areEqual(3, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).String);
+            alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.Count);
+            alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Duration.Half, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Duration);
+            alphaTab.test.Assert.AreEqual_T1_T22(0, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Fret);
+            alphaTab.test.Assert.AreEqual_T1_T22(2, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).String);
+            alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.Count);
+            alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Duration.Quarter, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Duration);
+            alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).Fret);
+            alphaTab.test.Assert.AreEqual_T1_T22(2, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).String);
+            alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Notes.Count);
+            alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Duration.Quarter, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Duration);
+            alphaTab.test.Assert.AreEqual_T1_T22(3, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).Fret);
+            alphaTab.test.Assert.AreEqual_T1_T22(3, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).String);
         }
-        massive.munit.Assert.areEqual(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.Count);
         {
-            massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.Count);
-            massive.munit.Assert.areEqual(alphaTab.model.Duration.Eighth, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Duration);
-            massive.munit.Assert.areEqual(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Fret);
-            massive.munit.Assert.areEqual(4, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).String);
-            massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Notes.Count);
-            massive.munit.Assert.areEqual(alphaTab.model.Duration.Eighth, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Duration);
-            massive.munit.Assert.areEqual(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).Fret);
-            massive.munit.Assert.areEqual(4, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).String);
-            massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(2).Notes.Count);
-            massive.munit.Assert.areEqual(alphaTab.model.Duration.Eighth, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(2).Duration);
-            massive.munit.Assert.areEqual(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).Fret);
-            massive.munit.Assert.areEqual(4, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).String);
-            massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(3).Notes.Count);
-            massive.munit.Assert.areEqual(alphaTab.model.Duration.Eighth, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(3).Duration);
-            massive.munit.Assert.areEqual(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).Fret);
-            massive.munit.Assert.areEqual(4, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).String);
-            massive.munit.Assert.areEqual(0, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(4).Notes.Count);
-            massive.munit.Assert.areEqual(alphaTab.model.Duration.Half, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(4).Duration);
-            massive.munit.Assert.areEqual(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(4).IsRest);
+            alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.Count);
+            alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Duration.Eighth, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Duration);
+            alphaTab.test.Assert.AreEqual_T1_T22(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Fret);
+            alphaTab.test.Assert.AreEqual_T1_T22(4, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).String);
+            alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Notes.Count);
+            alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Duration.Eighth, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Duration);
+            alphaTab.test.Assert.AreEqual_T1_T22(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).Fret);
+            alphaTab.test.Assert.AreEqual_T1_T22(4, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).String);
+            alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(2).Notes.Count);
+            alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Duration.Eighth, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(2).Duration);
+            alphaTab.test.Assert.AreEqual_T1_T22(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).Fret);
+            alphaTab.test.Assert.AreEqual_T1_T22(4, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).String);
+            alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(3).Notes.Count);
+            alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Duration.Eighth, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(3).Duration);
+            alphaTab.test.Assert.AreEqual_T1_T22(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).Fret);
+            alphaTab.test.Assert.AreEqual_T1_T22(4, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).String);
+            alphaTab.test.Assert.AreEqual_T1_T22(0, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(4).Notes.Count);
+            alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Duration.Half, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(4).Duration);
+            alphaTab.test.Assert.AreEqual_T1_T22(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(4).IsRest);
         }
     }
 
@@ -70,7 +70,7 @@ class AlphaTexImporterTest
     {
         var tex : system.CsString = "\\tuning E4 B3 G3 D3 A2 E2\r\n                        .\r\n                        0.5.1";
         var score : alphaTab.model.Score = ParseTex(tex);
-        massive.munit.Assert.areEqual(system.CsString.Join_CsString_IEnumerable_T1(",", alphaTab.model.Tuning.GetDefaultTuningFor(6).Tunings.ToEnumerable()), system.CsString.Join_CsString_IEnumerable_T1(",", score.Tracks.get_Item(0).Tuning.ToEnumerable()));
+        alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_IEnumerable_T1(",", alphaTab.model.Tuning.GetDefaultTuningFor(6).Tunings.ToEnumerable()), system.CsString.Join_CsString_IEnumerable_T1(",", score.Tracks.get_Item(0).Tuning.ToEnumerable()));
     }
 
     @Test
@@ -78,11 +78,11 @@ class AlphaTexImporterTest
     {
         var tex : system.CsString = ":4 x.3";
         var score : alphaTab.model.Score = ParseTex(tex);
-        massive.munit.Assert.areEqual(1, score.Tracks.Count);
-        massive.munit.Assert.areEqual(1, score.MasterBars.Count);
-        massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
-        massive.munit.Assert.areEqual(0, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Fret);
-        massive.munit.Assert.areEqual(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsDead);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.MasterBars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(0, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Fret);
+        alphaTab.test.Assert.AreEqual_T1_T22(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsDead);
     }
 
     @Test
@@ -90,11 +90,11 @@ class AlphaTexImporterTest
     {
         var tex : system.CsString = ":4 3.3{x}";
         var score : alphaTab.model.Score = ParseTex(tex);
-        massive.munit.Assert.areEqual(1, score.Tracks.Count);
-        massive.munit.Assert.areEqual(1, score.MasterBars.Count);
-        massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
-        massive.munit.Assert.areEqual(0, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Fret);
-        massive.munit.Assert.areEqual(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsDead);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.MasterBars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(0, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Fret);
+        alphaTab.test.Assert.AreEqual_T1_T22(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsDead);
     }
 
     @Test
@@ -102,13 +102,13 @@ class AlphaTexImporterTest
     {
         var tex : system.CsString = ":4 3.3{tr 5 16}";
         var score : alphaTab.model.Score = ParseTex(tex);
-        massive.munit.Assert.areEqual(1, score.Tracks.Count);
-        massive.munit.Assert.areEqual(1, score.MasterBars.Count);
-        massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
-        massive.munit.Assert.areEqual(3, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Fret);
-        massive.munit.Assert.areEqual(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsTrill);
-        massive.munit.Assert.areEqual(alphaTab.model.Duration.Sixteenth, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).TrillSpeed);
-        massive.munit.Assert.areEqual(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).TrillFret);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.MasterBars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(3, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Fret);
+        alphaTab.test.Assert.AreEqual_T1_T22(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsTrill);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Duration.Sixteenth, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).TrillSpeed);
+        alphaTab.test.Assert.AreEqual_T1_T22(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).TrillFret);
     }
 
     @Test
@@ -116,13 +116,13 @@ class AlphaTexImporterTest
     {
         var tex : system.CsString = ":4 3.3{tr 5 16}";
         var score : alphaTab.model.Score = ParseTex(tex);
-        massive.munit.Assert.areEqual(1, score.Tracks.Count);
-        massive.munit.Assert.areEqual(1, score.MasterBars.Count);
-        massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
-        massive.munit.Assert.areEqual(3, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Fret);
-        massive.munit.Assert.areEqual(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsTrill);
-        massive.munit.Assert.areEqual(alphaTab.model.Duration.Sixteenth, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).TrillSpeed);
-        massive.munit.Assert.areEqual(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).TrillFret);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.MasterBars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(3, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Fret);
+        alphaTab.test.Assert.AreEqual_T1_T22(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsTrill);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Duration.Sixteenth, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).TrillSpeed);
+        alphaTab.test.Assert.AreEqual_T1_T22(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).TrillFret);
     }
 
     @Test
@@ -130,12 +130,12 @@ class AlphaTexImporterTest
     {
         var tex : system.CsString = ":4 3.3{tp 16}";
         var score : alphaTab.model.Score = ParseTex(tex);
-        massive.munit.Assert.areEqual(1, score.Tracks.Count);
-        massive.munit.Assert.areEqual(1, score.MasterBars.Count);
-        massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
-        massive.munit.Assert.areEqual(3, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Fret);
-        massive.munit.Assert.areEqual(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).IsTremolo);
-        massive.munit.Assert.areEqual(alphaTab.model.Duration.Sixteenth, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).TremoloSpeed.Value);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.MasterBars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(3, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Fret);
+        alphaTab.test.Assert.AreEqual_T1_T22(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).IsTremolo);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Duration.Sixteenth, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).TremoloSpeed.Value);
     }
 
     @Test
@@ -143,14 +143,14 @@ class AlphaTexImporterTest
     {
         var tex : system.CsString = ":8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh}";
         var score : alphaTab.model.Score = ParseTex(tex);
-        massive.munit.Assert.areEqual(1, score.Tracks.Count);
-        massive.munit.Assert.areEqual(1, score.MasterBars.Count);
-        massive.munit.Assert.areEqual(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
-        massive.munit.Assert.areEqual(alphaTab.model.HarmonicType.Natural, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).HarmonicType);
-        massive.munit.Assert.areEqual(alphaTab.model.HarmonicType.Artificial, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).HarmonicType);
-        massive.munit.Assert.areEqual(alphaTab.model.HarmonicType.Tap, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).HarmonicType);
-        massive.munit.Assert.areEqual(alphaTab.model.HarmonicType.Pinch, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).HarmonicType);
-        massive.munit.Assert.areEqual(alphaTab.model.HarmonicType.Semi, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(4).Notes.get_Item(0).HarmonicType);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.MasterBars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.HarmonicType.Natural, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).HarmonicType);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.HarmonicType.Artificial, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).HarmonicType);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.HarmonicType.Tap, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).HarmonicType);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.HarmonicType.Pinch, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).HarmonicType);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.HarmonicType.Semi, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(4).Notes.get_Item(0).HarmonicType);
     }
 
     @Test
@@ -182,11 +182,11 @@ class AlphaTexImporterTest
     {
         var tex : system.CsString = ":8 3.3{gr} 3.3{gr ob}";
         var score : alphaTab.model.Score = ParseTex(tex);
-        massive.munit.Assert.areEqual(1, score.Tracks.Count);
-        massive.munit.Assert.areEqual(1, score.MasterBars.Count);
-        massive.munit.Assert.areEqual(2, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
-        massive.munit.Assert.areEqual(alphaTab.model.GraceType.BeforeBeat, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).GraceType);
-        massive.munit.Assert.areEqual(alphaTab.model.GraceType.OnBeat, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).GraceType);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.MasterBars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(2, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.GraceType.BeforeBeat, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).GraceType);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.GraceType.OnBeat, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).GraceType);
     }
 
     @Test
@@ -213,8 +213,8 @@ class AlphaTexImporterTest
             var i: system.Int32 = 0;
             while (i < expectedTexts.Length)
             {
-                var text : system.CsString = texts[i].Value.Trim();
-                massive.munit.Assert.areEqual(expectedTexts[i], text);
+                var text : system.CsString = texts[i].InnerText.Trim();
+                alphaTab.test.Assert.AreEqual_T1_T2_CsString_ObjectArray2(expectedTexts[i], text, "Mismatch at index {0}", [i]);
                 i++;
             }
         }
@@ -225,14 +225,14 @@ class AlphaTexImporterTest
     {
         var tex : system.CsString = ":8 3.3{lf 1} 3.3{lf 2} 3.3{lf 3} 3.3{lf 4} 3.3{lf 5}";
         var score : alphaTab.model.Score = ParseTex(tex);
-        massive.munit.Assert.areEqual(1, score.Tracks.Count);
-        massive.munit.Assert.areEqual(1, score.MasterBars.Count);
-        massive.munit.Assert.areEqual(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.Thumb, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).LeftHandFinger);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.IndexFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).LeftHandFinger);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.MiddleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).LeftHandFinger);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.AnnularFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).LeftHandFinger);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.LittleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(4).Notes.get_Item(0).LeftHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.MasterBars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.Thumb, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).LeftHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.IndexFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).LeftHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.MiddleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).LeftHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.AnnularFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).LeftHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.LittleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(4).Notes.get_Item(0).LeftHandFinger);
     }
 
     @Test
@@ -240,14 +240,14 @@ class AlphaTexImporterTest
     {
         var tex : system.CsString = ":8 3.3{rf 1} 3.3{rf 2} 3.3{rf 3} 3.3{rf 4} 3.3{rf 5}";
         var score : alphaTab.model.Score = ParseTex(tex);
-        massive.munit.Assert.areEqual(1, score.Tracks.Count);
-        massive.munit.Assert.areEqual(1, score.MasterBars.Count);
-        massive.munit.Assert.areEqual(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.Thumb, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).RightHandFinger);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.IndexFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).RightHandFinger);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.MiddleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).RightHandFinger);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.AnnularFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).RightHandFinger);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.LittleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(4).Notes.get_Item(0).RightHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.MasterBars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.Thumb, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).RightHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.IndexFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).RightHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.MiddleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).RightHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.AnnularFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).RightHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.LittleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(4).Notes.get_Item(0).RightHandFinger);
     }
 
     @Test
@@ -255,15 +255,15 @@ class AlphaTexImporterTest
     {
         var tex : system.CsString = ":8 (3.1{lf 1} 3.2{lf 2} 3.3{lf 3} 3.4{lf 4} 3.5{lf 5})";
         var score : alphaTab.model.Score = ParseTex(tex);
-        massive.munit.Assert.areEqual(1, score.Tracks.Count);
-        massive.munit.Assert.areEqual(1, score.MasterBars.Count);
-        massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
-        massive.munit.Assert.areEqual(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.Count);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.Thumb, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).LeftHandFinger);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.IndexFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(1).LeftHandFinger);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.MiddleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(2).LeftHandFinger);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.AnnularFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(3).LeftHandFinger);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.LittleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(4).LeftHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.MasterBars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.Thumb, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).LeftHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.IndexFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(1).LeftHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.MiddleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(2).LeftHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.AnnularFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(3).LeftHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.LittleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(4).LeftHandFinger);
     }
 
     @Test
@@ -271,15 +271,15 @@ class AlphaTexImporterTest
     {
         var tex : system.CsString = ":8 (3.1{rf 1} 3.2{rf 2} 3.3{rf 3} 3.4{rf 4} 3.5{rf 5})";
         var score : alphaTab.model.Score = ParseTex(tex);
-        massive.munit.Assert.areEqual(1, score.Tracks.Count);
-        massive.munit.Assert.areEqual(1, score.MasterBars.Count);
-        massive.munit.Assert.areEqual(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
-        massive.munit.Assert.areEqual(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.Count);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.Thumb, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).RightHandFinger);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.IndexFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(1).RightHandFinger);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.MiddleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(2).RightHandFinger);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.AnnularFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(3).RightHandFinger);
-        massive.munit.Assert.areEqual(alphaTab.model.Fingers.LittleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(4).RightHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.MasterBars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.Thumb, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).RightHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.IndexFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(1).RightHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.MiddleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(2).RightHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.AnnularFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(3).RightHandFinger);
+        alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.LittleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(4).RightHandFinger);
     }
 
     @Test
@@ -287,26 +287,26 @@ class AlphaTexImporterTest
     {
         var tex : system.CsString = "\\tuning piano . c4 c#4 d4 d#4 | c4 db4 d4 eb4";
         var score : alphaTab.model.Score = ParseTex(tex);
-        massive.munit.Assert.areEqual(1, score.Tracks.Count);
-        massive.munit.Assert.areEqual(2, score.MasterBars.Count);
-        massive.munit.Assert.areEqual(4, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
-        massive.munit.Assert.areEqual(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsPiano);
-        massive.munit.Assert.areEqual(60, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).RealValue);
-        massive.munit.Assert.areEqual(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsPiano);
-        massive.munit.Assert.areEqual(61, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).RealValue);
-        massive.munit.Assert.areEqual(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsPiano);
-        massive.munit.Assert.areEqual(62, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).RealValue);
-        massive.munit.Assert.areEqual(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsPiano);
-        massive.munit.Assert.areEqual(63, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).RealValue);
-        massive.munit.Assert.areEqual(4, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.Count);
-        massive.munit.Assert.areEqual(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsPiano);
-        massive.munit.Assert.areEqual(60, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).RealValue);
-        massive.munit.Assert.areEqual(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsPiano);
-        massive.munit.Assert.areEqual(61, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).RealValue);
-        massive.munit.Assert.areEqual(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsPiano);
-        massive.munit.Assert.areEqual(62, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).RealValue);
-        massive.munit.Assert.areEqual(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsPiano);
-        massive.munit.Assert.areEqual(63, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).RealValue);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(2, score.MasterBars.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(4, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsPiano);
+        alphaTab.test.Assert.AreEqual_T1_T22(60, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).RealValue);
+        alphaTab.test.Assert.AreEqual_T1_T22(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsPiano);
+        alphaTab.test.Assert.AreEqual_T1_T22(61, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).RealValue);
+        alphaTab.test.Assert.AreEqual_T1_T22(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsPiano);
+        alphaTab.test.Assert.AreEqual_T1_T22(62, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).RealValue);
+        alphaTab.test.Assert.AreEqual_T1_T22(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsPiano);
+        alphaTab.test.Assert.AreEqual_T1_T22(63, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).RealValue);
+        alphaTab.test.Assert.AreEqual_T1_T22(4, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.Count);
+        alphaTab.test.Assert.AreEqual_T1_T22(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsPiano);
+        alphaTab.test.Assert.AreEqual_T1_T22(60, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).RealValue);
+        alphaTab.test.Assert.AreEqual_T1_T22(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsPiano);
+        alphaTab.test.Assert.AreEqual_T1_T22(61, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).RealValue);
+        alphaTab.test.Assert.AreEqual_T1_T22(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsPiano);
+        alphaTab.test.Assert.AreEqual_T1_T22(62, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).RealValue);
+        alphaTab.test.Assert.AreEqual_T1_T22(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsPiano);
+        alphaTab.test.Assert.AreEqual_T1_T22(63, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).RealValue);
     }
 
     public function new() 
