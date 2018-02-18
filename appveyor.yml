@@ -31,7 +31,6 @@ install:
   - haxelib list
   #
   # Npm/Uglifyjs installation
-  - ps: Install-Product node $env:nodejs_version $env:platform
   - npm install -g uglify-js
   - RefreshEnv
 
