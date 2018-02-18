@@ -1,5 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <LanguageTargets Condition="Exists('$(MSBuildExtensionsPath)\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets')" >$(MSBuildExtensionsPath)\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
+    <LanguageTargets Condition="Exists('C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets')" >C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
+    <LanguageTargets Condition="Exists('C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets')" >C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
     <TargetFramework>net471</TargetFramework>
     <OutputType>WinExe</OutputType>
     <StartupObject />
@@ -7,42 +10,19 @@
 
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <TransformOnBuild>True</TransformOnBuild>
     <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
   </PropertyGroup>
-
-  <Import Project="$(VSToolsPath)\TextTemplating\Microsoft.TextTemplating.targets" />
 
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- App.xaml -->
-    <ApplicationDefinition Include="App.xaml" SubType="Designer" Generator="MSBuild:UpdateDesignTimeXaml" />
-
-    <!-- XAML elements -->
-    <Page Include="**\*.xaml" SubType="Designer" Generator="MSBuild:UpdateDesignTimeXaml" Exclude="App.xaml" />
-    <Compile Update="**\*.xaml.cs" SubType="Designer" DependentUpon="%(Filename)" />
-    <Compile Include="$(IntermediateOutputPath)**\*.g.cs" Visible="false" />
-    <None Include="$(ProjectDir)obj" Visible="false" />
-
-    <!-- Resources -->
-    <EmbeddedResource Update="Properties\Resources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="Resources.Designer.cs" />
-    <Compile Update="Properties\Resources.Designer.cs" AutoGen="True" DependentUpon="Resources.resx" DesignTime="True" />
-
-    <!-- Settings -->
-    <None Update="Properties\Settings.settings" Generator="SettingsSingleFileGenerator" LastGenOutput="Settings.Designer.cs" />
-    <Compile Update="Properties\Settings.Designer.cs" AutoGen="True" DependentUpon="Settings.settings" />
-    <None Update="App.Debug.config">
-      <IsTransformFile>True</IsTransformFile>
-    </None>
-    <None Update="App.Release.config">
-      <IsTransformFile>True</IsTransformFile>
-    </None>
+    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
+    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.2.0" PrivateAssets="All" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -51,17 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Publish\**" />
-    <EmbeddedResource Remove="Publish\**" />
-    <None Remove="Publish\**" />
-    <Page Remove="Publish\**" />
-  </ItemGroup>
-
-  <PropertyGroup>
-    <AssemblySearchPaths>$(AssemblySearchPaths);{GAC}</AssemblySearchPaths>
-  </PropertyGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\..\Source\AlphaTab.CSharp\AlphaTab.CSharp.csproj" />
   </ItemGroup>
+
+  <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
 </Project>
