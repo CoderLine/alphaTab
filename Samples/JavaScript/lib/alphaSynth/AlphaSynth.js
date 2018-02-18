@@ -3663,7 +3663,7 @@ AlphaSynth.MidiFileSequencer.prototype = {
         var metronomeTime = 0;
         for (var x = 0; x < midiFile.Tracks[0].MidiEvents.length; x++){
             var mEvent = midiFile.Tracks[0].MidiEvents[x];
-            var synthData = new AlphaSynth.Synthesis.SynthEvent(mEvent);
+            var synthData = new AlphaSynth.Synthesis.SynthEvent(this._synthData.length, mEvent);
             this._synthData.push(synthData);
             absTick += mEvent.DeltaTime;
             absTime += mEvent.DeltaTime * (60000 / (bpm * midiFile.Division));
@@ -3686,7 +3686,7 @@ AlphaSynth.MidiFileSequencer.prototype = {
             }
             if (metronomeLength > 0){
                 while (metronomeTick < absTick){
-                    var metronome = AlphaSynth.Synthesis.SynthEvent.NewMetronomeEvent(metronomeLength);
+                    var metronome = AlphaSynth.Synthesis.SynthEvent.NewMetronomeEvent(this._synthData.length, metronomeLength);
                     this._synthData.push(metronome);
                     metronome.Delta = metronomeTime;
                     metronomeTick += metronomeLength;
@@ -3695,7 +3695,13 @@ AlphaSynth.MidiFileSequencer.prototype = {
             }
         }
         this._synthData.sort($CreateAnonymousDelegate(this, function (a, b){
-    return ((a.Delta - b.Delta)) | 0;
+    if (a.Delta > b.Delta){
+        return 1;
+    }
+    else if (a.Delta < b.Delta){
+        return -1;
+    }
+    return a.EventIndex - b.EventIndex;
 }));
         this._endTime = absTime;
         this.EndTick = absTick;
@@ -5524,14 +5530,16 @@ AlphaSynth.Synthesis.SynthHelper.CentsToPitch = function (cents){
         key = 127;
     return AlphaSynth.Util.Tables.SemitoneTable(127 + key) * AlphaSynth.Util.Tables.CentTable(100 + cents);
 };
-AlphaSynth.Synthesis.SynthEvent = function (e){
+AlphaSynth.Synthesis.SynthEvent = function (eventIndex, e){
+    this.EventIndex = 0;
     this.Event = null;
     this.IsMetronome = false;
     this.Delta = 0;
+    this.EventIndex = eventIndex;
     this.Event = e;
 };
-AlphaSynth.Synthesis.SynthEvent.NewMetronomeEvent = function (metronomeLength){
-    var x = new AlphaSynth.Synthesis.SynthEvent(null);
+AlphaSynth.Synthesis.SynthEvent.NewMetronomeEvent = function (eventIndex, metronomeLength){
+    var x = new AlphaSynth.Synthesis.SynthEvent(eventIndex, null);
     x.IsMetronome = true;
     return x;
 };
