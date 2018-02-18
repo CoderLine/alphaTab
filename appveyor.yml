@@ -49,6 +49,7 @@ build:
   verbosity: minimal
 
 before_build:
+- nuget restore
 - dotnet restore
   
 test:
