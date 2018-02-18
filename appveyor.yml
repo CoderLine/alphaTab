@@ -11,6 +11,10 @@ environment:
   nodejs_version: '8'
   global:
     HAXELIB_ROOT: C:\projects\haxelib
+  access_token:
+    secure: ig+MHQrCziKIZzGkDBsOTuusdSATGEXh79QCG8b4guSHAcM0+uYy0zGoVTKG446Q
+skip_commits:
+  author: AlphaTab Build Agent
 
 install:
   #
@@ -80,4 +84,12 @@ deploy:
     on:
       branch: master
       appveyor_repo_tag: true
-    
+      
+on_success:
+  - git config --global credential.helper store
+  - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
+  - git config --global user.email "appveyor@alphatab.net"
+  - git config --global user.name "AlphaTab Build Agent"
+  - git add Directory.Build.props
+  - git commit -m '$(env:APPVEYOR_REPO_COMMIT_MESSAGE) (build: $(env:APPVEYOR_BUILD_VERSION))' 
+  - git push origin $(env:APPVEYOR_REPO_BRANCH)
