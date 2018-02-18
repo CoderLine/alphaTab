@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <LanguageTargets>$(MSBuildExtensionsPath)\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
+    <LanguageTargets Condition="Exists('$(MSBuildExtensionsPath)\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets')" >$(MSBuildExtensionsPath)\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
+    <LanguageTargets Condition="Exists('C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets')" >C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
+    <LanguageTargets Condition="Exists('C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets')" >C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
     <TargetFramework>net471</TargetFramework>
     <OutputType>WinExe</OutputType>
     <StartupObject />
