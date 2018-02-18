@@ -1,0 +1,46 @@
+version: 0.9.1.{build}
+# branches to build
+branches:
+  only:
+    - develop
+    
+image: Visual Studio 2017
+configuration: Release
+platform: Any CPU
+
+dotnet_csproj:
+  patch: true
+  file: 'Directory.Build.props'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+
+build:
+  parallel: true
+  publish_nuget: true
+  publish_nuget_symbols: true
+  verbosity: minimal
+
+before_build:
+- dotnet restore
+  
+test:
+  assemblies:
+    only: 
+      - Source\AlphaTab.Test.CSharp\bin\Release\net471\AlphaTab.Test.CSharp.dll
+  
+artifacts:
+  # JavaScript Output
+  - path: JavaScript\*.*
+    name: JavaScript
+  # NuGet package output 
+  - path: Source\AlphaTab.CSharp\Bin\$(configuration)\*.nupkg
+    name: NuGet
+
+deploy:
+  - provider: NuGet
+    server: https://www.myget.org/F/coderline/api/v3/index.json
+    api_key:
+      secure: sQI+q8oHDFwWAWOy/pvP4zHehqNASufniwX7aOpN03YlcKt44ZX/55guh2kGoJ2n
+    artifact: NuGet
