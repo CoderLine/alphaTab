@@ -37,18 +37,18 @@ namespace AlphaTab.Platform.JavaScript
 
     public class JsApi : HtmlContext
     {
-        private readonly HtmlElement _element;
-        private readonly HtmlElement _canvasElement;
-        private readonly Settings _settings;
         private int _visibilityCheckerInterval;
         private int _visibilityCheckerIntervalId;
 
         private FastList<RenderFinishedEventArgs> _renderResults;
         private int _totalResultCount;
-
+    
+        public HtmlElement Element { get; set; }
+        public HtmlElement CanvasElement { get; set; }
+        public Settings Settings { get; set; }
         protected bool IsElementVisible
         {
-            get { return !!(_element.offsetWidth.As<bool>() || _element.offsetHeight.As<bool>() || _element.getClientRects().length.As<bool>()); }
+            get { return !!(Element.offsetWidth.As<bool>() || Element.offsetHeight.As<bool>() || Element.getClientRects().length.As<bool>()); }
         }
 
         public IScoreRenderer Renderer { get; private set; }
@@ -71,13 +71,13 @@ namespace AlphaTab.Platform.JavaScript
 
         protected JsApi(HtmlElement element, dynamic options)
         {
-            _element = element;
+            Element = element;
 
-            _element.classList.add("alphaTab");
+            Element.classList.add("alphaTab");
 
             // load settings
             var dataAttributes = GetDataAttributes();
-            var settings = _settings = Settings.FromJson(options, dataAttributes);
+            var settings = Settings = AlphaTab.Settings.FromJson(options, dataAttributes);
             var autoSize = settings.Width < 0;
 
             #region build tracks array
@@ -117,13 +117,13 @@ namespace AlphaTab.Platform.JavaScript
 
                 #region Create context elements (wrapper, canvas etc)
 
-                _canvasElement = (HtmlElement)document.createElement("div");
+                CanvasElement = (HtmlElement)document.createElement("div");
 
-                _canvasElement.className = "alphaTabSurface";
-                _canvasElement.style.fontSize = "0";
-                _canvasElement.style.overflow = "hidden";
-                _canvasElement.style.lineHeight = "0";
-                element.appendChild(_canvasElement);
+                CanvasElement.className = "alphaTabSurface";
+                CanvasElement.style.fontSize = "0";
+                CanvasElement.style.overflow = "hidden";
+                CanvasElement.style.lineHeight = "0";
+                element.appendChild(CanvasElement);
 
                 #endregion
 
@@ -191,8 +191,8 @@ namespace AlphaTab.Platform.JavaScript
             Renderer.RenderFinished += o => TriggerEvent("rendered");
             Renderer.PostRenderFinished += () =>
             {
-                _element.classList.remove("loading");
-                _element.classList.remove("rendering");
+                Element.classList.remove("loading");
+                Element.classList.remove("rendering");
                 TriggerEvent("postRendered");
             };
             Renderer.PreRender += result =>
@@ -219,7 +219,7 @@ namespace AlphaTab.Platform.JavaScript
                 // in this case we need the correct width for autosize
                 if (autoSize)
                 {
-                    _settings.Width = _element.offsetWidth;
+                    Settings.Width = Element.offsetWidth;
                     Renderer.UpdateSettings(settings);
                 }
 
@@ -267,11 +267,11 @@ namespace AlphaTab.Platform.JavaScript
         {
             var dataAttributes = new FastDictionary<string, object>();
 
-            if (_element.dataset.As<bool>())
+            if (Element.dataset.As<bool>())
             {
-                foreach (var key in _element.dataset.As<JsObject>())
+                foreach (var key in Element.dataset.As<JsObject>())
                 {
-                    object value = _element.dataset.Member(key);
+                    object value = Element.dataset.Member(key);
                     try
                     {
                         value = JSON.parse(value.As<string>());
@@ -288,9 +288,9 @@ namespace AlphaTab.Platform.JavaScript
             }
             else
             {
-                for (var i = 0; i < _element.attributes.length; i++)
+                for (var i = 0; i < Element.attributes.length; i++)
                 {
-                    var attr = _element.attributes[i];
+                    var attr = Element.attributes[i];
                     if (attr.nodeName.As<string>().StartsWith("data-"))
                     {
                         var keyParts = attr.nodeName.substr(5).split("-");
@@ -334,13 +334,13 @@ namespace AlphaTab.Platform.JavaScript
                 }
 
                 var resizeEventInfo = new ResizeEventArgs();
-                resizeEventInfo.OldWidth = _settings.Width;
-                resizeEventInfo.NewWidth = _element.offsetWidth;
-                resizeEventInfo.Settings = _settings;
+                resizeEventInfo.OldWidth = Settings.Width;
+                resizeEventInfo.NewWidth = Element.offsetWidth;
+                resizeEventInfo.Settings = Settings;
                 TriggerEvent("resize", resizeEventInfo);
-                _settings.Width = resizeEventInfo.NewWidth;
-                Renderer.UpdateSettings(_settings);
-                Renderer.Resize(_element.offsetWidth);
+                Settings.Width = resizeEventInfo.NewWidth;
+                Renderer.UpdateSettings(Settings);
+                Renderer.Resize(Element.offsetWidth);
             }
             // if there is no "invisibility timer" we set up one, if there is already a timer scheduled, it will trigger the proper rendering. 
             else if (_visibilityCheckerIntervalId == 0)
@@ -352,7 +352,7 @@ namespace AlphaTab.Platform.JavaScript
 
         private void ShowSvgsInViewPort()
         {
-            var placeholders = _canvasElement.querySelectorAll("[data-lazy=true]");
+            var placeholders = CanvasElement.querySelectorAll("[data-lazy=true]");
             foreach (var x in placeholders)
             {
                 var placeholder = x.As<HtmlElement>();
@@ -418,8 +418,8 @@ namespace AlphaTab.Platform.JavaScript
 
             // render alphaTab
             var settings = Settings.Defaults;
-            settings.ScriptFile = _settings.ScriptFile;
-            settings.FontDirectory = _settings.FontDirectory;
+            settings.ScriptFile = Settings.ScriptFile;
+            settings.FontDirectory = Settings.FontDirectory;
             settings.Scale = 0.8f;
             settings.StretchForce = 0.8f;
             settings.DisableLazyLoading = true;
@@ -428,7 +428,7 @@ namespace AlphaTab.Platform.JavaScript
             var alphaTab = new JsApi(a4, settings);
             alphaTab.Renderer.PostRenderFinished += () =>
             {
-                alphaTab._canvasElement.style.height = "100%";
+                alphaTab.CanvasElement.style.height = "100%";
                 preview.window.print();
             };
             alphaTab.SetTracks(Tracks);
@@ -438,8 +438,8 @@ namespace AlphaTab.Platform.JavaScript
         {
             if (result != null)
             {
-                _canvasElement.style.width = result.TotalWidth + "px";
-                _canvasElement.style.height = result.TotalHeight + "px";
+                CanvasElement.style.width = result.TotalWidth + "px";
+                CanvasElement.style.height = result.TotalHeight + "px";
             }
 
 
@@ -460,9 +460,9 @@ namespace AlphaTab.Platform.JavaScript
                         if (renderResult == null)
                         {
                             // so we remove elements that might be from a previous render session
-                            while (_canvasElement.childElementCount > _totalResultCount)
+                            while (CanvasElement.childElementCount > _totalResultCount)
                             {
-                                _canvasElement.removeChild(_canvasElement.lastChild);
+                                CanvasElement.removeChild(CanvasElement.lastChild);
                             }
                         }
                         // NOTE: here we try to replace existing children 
@@ -472,21 +472,21 @@ namespace AlphaTab.Platform.JavaScript
                             if (@typeof(body) == "string")
                             {
                                 HtmlElement placeholder;
-                                if (_totalResultCount < _canvasElement.childElementCount)
+                                if (_totalResultCount < CanvasElement.childElementCount)
                                 {
-                                    placeholder = _canvasElement.children[_totalResultCount].As<HtmlElement>();
+                                    placeholder = CanvasElement.children[_totalResultCount].As<HtmlElement>();
                                 }
                                 else
                                 {
                                     placeholder = document.createElement("div").As<HtmlElement>();
-                                    _canvasElement.appendChild(placeholder);
+                                    CanvasElement.appendChild(placeholder);
                                 }
 
                                 placeholder.style.width = renderResult.Width + "px";
                                 placeholder.style.height = renderResult.Height + "px";
                                 placeholder.style.display = "inline-block";
 
-                                if (IsElementInViewPort(placeholder) || _settings.DisableLazyLoading)
+                                if (IsElementInViewPort(placeholder) || Settings.DisableLazyLoading)
                                 {
                                     placeholder.outerHTML = body.As<string>();
                                 }
@@ -498,13 +498,13 @@ namespace AlphaTab.Platform.JavaScript
                             }
                             else
                             {
-                                if (_totalResultCount < _canvasElement.childElementCount)
+                                if (_totalResultCount < CanvasElement.childElementCount)
                                 {
-                                    _canvasElement.replaceChild(renderResult.RenderResult.As<Node>(), _canvasElement.children[_totalResultCount]);
+                                    CanvasElement.replaceChild(renderResult.RenderResult.As<Node>(), CanvasElement.children[_totalResultCount]);
                                 }
                                 else
                                 {
-                                    _canvasElement.appendChild(renderResult.RenderResult.As<Node>());
+                                    CanvasElement.appendChild(renderResult.RenderResult.As<Node>());
                                 }
                             }
                             _totalResultCount++;
@@ -517,7 +517,7 @@ namespace AlphaTab.Platform.JavaScript
 
         private void CreateStyleElement(Settings settings)
         {
-            var elementDocument = _element.ownerDocument;
+            var elementDocument = Element.ownerDocument;
             var styleElement = (HtmlStyleElement)elementDocument.getElementById("alphaTabStyle");
             if (styleElement == null)
             {
@@ -561,13 +561,13 @@ namespace AlphaTab.Platform.JavaScript
 
         public virtual void Destroy()
         {
-            _element.innerHTML = "";
+            Element.innerHTML = "";
             Renderer.Destroy();
         }
 
         public void Load(object data)
         {
-            _element.classList.add("loading");
+            Element.classList.add("loading");
             try
             {
                 if (Std.InstanceOf<ArrayBuffer>(data))
@@ -595,7 +595,7 @@ namespace AlphaTab.Platform.JavaScript
 
         public void Tex(string contents)
         {
-            _element.classList.add("loading");
+            Element.classList.add("loading");
             try
             {
                 var parser = new AlphaTexImporter();
@@ -700,7 +700,7 @@ namespace AlphaTab.Platform.JavaScript
 
         protected void ScoreLoaded(Score score, bool render = true)
         {
-            ModelUtils.ApplyPitchOffsets(_settings, score);
+            ModelUtils.ApplyPitchOffsets(Settings, score);
 
             Score = score;
 
@@ -724,17 +724,17 @@ namespace AlphaTab.Platform.JavaScript
 
         public void TriggerEvent(string name, object details = null)
         {
-            if (_element != null)
+            if (Element != null)
             {
                 name = "alphaTab." + name;
                 dynamic e = document.createEvent("CustomEvent");
                 e.initCustomEvent(name, false, false, details);
-                _element.dispatchEvent(e);
+                Element.dispatchEvent(e);
 
                 if (Std.JsonExists(window, "jQuery"))
                 {
                     dynamic jquery = window["jQuery"];
-                    jquery(_element).trigger(name, details);
+                    jquery(Element).trigger(name, details);
                 }
             }
         }
@@ -764,8 +764,8 @@ namespace AlphaTab.Platform.JavaScript
 
         public void UpdateLayout(object json)
         {
-            _settings.Layout = Settings.LayoutFromJson(json);
-            Renderer.UpdateSettings(_settings);
+            Settings.Layout = Settings.LayoutFromJson(json);
+            Renderer.UpdateSettings(Settings);
             Renderer.Invalidate();
         }
     }

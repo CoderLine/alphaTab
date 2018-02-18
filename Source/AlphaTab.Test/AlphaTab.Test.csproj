@@ -96,6 +96,7 @@
     <Compile Include="Model\LyricsTest.cs" />
     <Compile Include="Model\TuningParserTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rendering\AccidentalHelperTest.cs" />
     <Compile Include="Xml\XmlParseTest.cs" />
   </ItemGroup>
   <ItemGroup>

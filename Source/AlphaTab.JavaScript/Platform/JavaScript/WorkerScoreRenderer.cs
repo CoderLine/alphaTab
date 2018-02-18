@@ -37,25 +37,21 @@ namespace AlphaTab.Platform.JavaScript
         public WorkerScoreRenderer(JsApi api, Settings settings)
         {
             _api = api;
+
+            // Bug #172: FireFox silently does not start the worker when script is on a different domain
+            // we use blob workers always since they seem to work always
             try
             {
-                _worker = new Worker(settings.ScriptFile);
+                var script = "importScripts('" + settings.ScriptFile + "')";
+                var blob = new Blob(new[] { script });
+                _worker = new Worker(window.URL.createObjectURL(blob));
             }
-            catch
+            catch (Exception e)
             {
-                // fallback to blob worker 
-                try
-                {
-                    var script = "importScripts('" + settings.ScriptFile + "')";
-                    var blob = new Blob(new[] { script });
-                    _worker = new Worker(window.URL.createObjectURL(blob));
-                }
-                catch (Exception e)
-                {
-                    Logger.Error("Rendering", "Failed to create WebWorker: " + e);
-                    // TODO: fallback to synchronous mode
-                }
+                Logger.Error("Rendering", "Failed to create WebWorker: " + e);
+                // TODO: fallback to synchronous mode
             }
+
             _worker.postMessage(new { cmd = "alphaTab.initialize", settings = settings.ToJson() });
             _worker.addEventListener("message", HandleWorkerMessage, false);
         }

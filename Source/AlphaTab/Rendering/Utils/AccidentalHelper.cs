@@ -103,7 +103,9 @@ namespace AlphaTab.Rendering.Utils
         /// <returns></returns>
         public AccidentalType ApplyAccidental(Note note)
         {
-            var noteValue = note.RealValue;
+            var track = note.Beat.Voice.Bar.Staff.Track;
+            var noteValue = track.IsPercussion ? PercussionMapper.MapNoteForDisplay(note) : note.RealValue - track.DisplayTranspositionPitch;
+
             var ks = note.Beat.Voice.Bar.MasterBar.KeySignature;
             var ksi = (ks + 7);
             var index = (noteValue % 12);
