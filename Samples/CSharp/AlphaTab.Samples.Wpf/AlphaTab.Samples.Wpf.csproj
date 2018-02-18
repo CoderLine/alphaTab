@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <LanguageTargets>$(MSBuildExtensionsPath)\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
     <TargetFramework>net471</TargetFramework>
     <OutputType>WinExe</OutputType>
     <StartupObject />
@@ -16,30 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- App.xaml -->
-    <ApplicationDefinition Include="App.xaml" SubType="Designer" Generator="MSBuild:UpdateDesignTimeXaml" />
-
-    <!-- XAML elements -->
-    <Page Include="**\*.xaml" SubType="Designer" Generator="MSBuild:UpdateDesignTimeXaml" Exclude="App.xaml" />
-    <Compile Update="**\*.xaml.cs" SubType="Designer" DependentUpon="%(Filename)" />
-    <Compile Include="$(IntermediateOutputPath)**\*.g.cs" Visible="false" />
-    <None Include="$(ProjectDir)obj" Visible="false" />
-
-    <!-- Resources -->
-    <EmbeddedResource Update="Properties\Resources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="Resources.Designer.cs" />
-    <Compile Update="Properties\Resources.Designer.cs" AutoGen="True" DependentUpon="Resources.resx" DesignTime="True" />
-
-    <!-- Settings -->
-    <None Update="Properties\Settings.settings" Generator="SettingsSingleFileGenerator" LastGenOutput="Settings.Designer.cs" />
-    <Compile Update="Properties\Settings.Designer.cs" AutoGen="True" DependentUpon="Settings.settings" />
-    <None Update="App.Debug.config">
-      <IsTransformFile>True</IsTransformFile>
-    </None>
-    <None Update="App.Release.config">
-      <IsTransformFile>True</IsTransformFile>
-    </None>
+    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
+    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.2.0" PrivateAssets="All" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -48,17 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Publish\**" />
-    <EmbeddedResource Remove="Publish\**" />
-    <None Remove="Publish\**" />
-    <Page Remove="Publish\**" />
-  </ItemGroup>
-
-  <PropertyGroup>
-    <AssemblySearchPaths>$(AssemblySearchPaths);{GAC}</AssemblySearchPaths>
-  </PropertyGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\..\Source\AlphaTab.CSharp\AlphaTab.CSharp.csproj" />
   </ItemGroup>
+
+  <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
 </Project>
