@@ -91,5 +91,5 @@ on_success:
   - git config --global user.email "appveyor@alphatab.net"
   - git config --global user.name "AlphaTab Build Agent"
   - git add Directory.Build.props
-  - git commit -m '$(env:APPVEYOR_REPO_COMMIT_MESSAGE) (build: $(env:APPVEYOR_BUILD_VERSION))' 
-  - git push origin "$(env:APPVEYOR_REPO_BRANCH)"
+  - git commit -m '$env:APPVEYOR_REPO_COMMIT_MESSAGE (build: $env:APPVEYOR_BUILD_VERSION)' 
+  - git push origin "$env:APPVEYOR_REPO_BRANCH"
