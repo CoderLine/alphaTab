@@ -9,7 +9,6 @@
 	<Authors>Danielku15</Authors>
 	<Company>CoderLine</Company>
 	<Product>AlphaTab</Product>
-	<PackageId>AlphaTab</PackageId>
 	<NeutralLanguage>en</NeutralLanguage>
 	<Description>alphaTab is a cross platform music notation and guitar tablature rendering library.</Description>
 	<Copyright>Copyright © 2017, Daniel Kuschny and Contributors</Copyright>

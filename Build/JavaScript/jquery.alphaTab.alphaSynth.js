@@ -21,10 +21,10 @@
         // invalid score
         if(score == null || !as.get_IsReady()) return;
        
-        var midi = AlphaTab.Audio.Generator.MidiFileGenerator.GenerateMidiFile(score);
+        var midi = alphaTab.audio.generator.MidiFileGenerator.GenerateMidiFile(score);
         element.data('alphaSynthTickCache', midi.TickLookup);
         
-        var ms = new AlphaTab.IO.ByteBuffer();
+        var ms = new alphaTab.io.ByteBuffer();
         midi.WriteTo(ms);
         var bytes = ms.ToArray();
         as.LoadMidi(bytes);
@@ -597,7 +597,7 @@
         // we need to update our position caches if we render a tablature
         element.on('alphaTab.postRendered', function(e) {
             var renderer = api.renderer(element, context);
-            element.data('alphaSynthCursorCache', renderer.BoundsLookup);
+            element.data('alphaSynthCursorCache', renderer.get_BoundsLookup());
             api.playerCursorUpdateTick(element, context, previousTick);
             cursorWrapper.css({position: 'absolute', "z-index": 1000, 
                 width: surface.width(), height: surface.height()});

@@ -1,21 +1,27 @@
 {
   "output": "..\\..\\Build\\Haxe\\src-gen",
-  //"processorCount": 1, 
+  //"processorCount": 1,
   "postbuild": [
     {
       "name": "Building JavaScript (debug)",
       "executable": "haxe",
-      "arguments": "-cp ..\\..\\Phase\\Mscorlib -cp ..\\..\\Build\\Haxe\\src -cp ..\\..\\Build\\Haxe\\src-gen -js ..\\..\\Build\\JavaScript\\AlphaTab.Debug.js -main alphaTab.Main -debug -D js-unflatten --macro addGlobalMetadata('alphaTab','@:expose')"
+      "arguments": "-cp ..\\..\\Phase\\Mscorlib -cp ..\\..\\Build\\Haxe\\src -cp ..\\..\\Build\\Haxe\\src-gen -js ..\\..\\Build\\JavaScript\\AlphaTab.Debug.js -main alphaTab.Main -debug -D js-unflatten --macro addGlobalMetadata('alphaTab','@:expose') -D source-header="
     },
     {
       "name": "Building JavaScript (release)",
       "executable": "haxe",
-      "arguments": "-cp ..\\..\\Phase\\Mscorlib -cp ..\\..\\Build\\Haxe\\src -cp ..\\..\\Build\\Haxe\\src-gen -js ..\\..\\Build\\JavaScript\\AlphaTab.js -main alphaTab.Main -D js-unflatten --macro addGlobalMetadata('alphaTab','@:expose')"
+      "arguments": "-cp ..\\..\\Phase\\Mscorlib -cp ..\\..\\Build\\Haxe\\src -cp ..\\..\\Build\\Haxe\\src-gen -js ..\\..\\Build\\JavaScript\\AlphaTab.js -main alphaTab.Main -D js-unflatten -dce full --macro addGlobalMetadata('alphaTab','@:expose') --macro keep('alphaTab',null,true) -D source-header="
     },
     {
       "name": "Minify JavaScript",
       "executable": "cmd",
       "arguments": "/C uglifyjs ..\\..\\Build\\JavaScript\\AlphaTab.js -o ..\\..\\Build\\JavaScript\\AlphaTab.min.js -c"
+    },
+    {
+      "name": "Add Source Headers",
+      "executable": "node",
+      "arguments": "tools\\addSourceHeader.js Tools\\header.js Build\\JavaScript\\AlphaTab.Debug.js Build\\JavaScript\\AlphaTab.js Build\\JavaScript\\AlphaTab.min.js",
+      "workingDirectory":  "..\\..\\" 
     }
   ]
 }

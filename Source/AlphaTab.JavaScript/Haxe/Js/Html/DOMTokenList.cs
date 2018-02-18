@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -15,23 +15,18 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System.IO;
-using System.Threading.Tasks;
-using SkiaSharp;
-using Xamarin.Forms;
+using Haxe;
+using Phase.Attributes;
 
-namespace AlphaTab.Platform.CSharp.Xamarin.Forms
+namespace AlphaTab.Haxe.Js.Html
 {
-    class SkImageSource : StreamImageSource
+    [External]
+    [Name("js.html.DOMTokenList")]
+    public class DOMTokenList
     {
-        public SkImageSource(SKImage image)
-        {
-            byte[] imageBytes;
-            using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
-            {
-                imageBytes = data.ToArray();
-            }
-            Stream = token => Task.FromResult((Stream)new MemoryStream(imageBytes));
-        }
+        [Name("add")]
+        public extern void Add(HaxeString token);
+        [Name("remove")]
+        public extern void Remove(HaxeString token);
     }
 }

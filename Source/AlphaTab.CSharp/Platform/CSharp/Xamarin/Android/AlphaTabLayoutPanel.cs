@@ -1,4 +1,5 @@
-﻿/*
+﻿#if ANDROID
+/*
  * This file is part of alphaTab.
  * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
  * 
@@ -68,3 +69,4 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
         }
     }
 }
+#endif

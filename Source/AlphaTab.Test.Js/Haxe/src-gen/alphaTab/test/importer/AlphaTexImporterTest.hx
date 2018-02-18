@@ -165,7 +165,7 @@ class AlphaTexImporterTest
         var renderer : alphaTab.rendering.ScoreRenderer = new alphaTab.rendering.ScoreRenderer(settings);
         var svg : system.CsString = "";
         renderer.PartialRenderFinished += function (r){
-    svg = svg + system.ObjectExtensions.ToString(r.RenderResult);
+    svg = svg + (system.ObjectExtensions.ToString(r.RenderResult));
 }
 ;
         renderer.Render(score, [0]);

@@ -127,7 +127,7 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         private readonly FastList<Action<JQuery, JsApi, dynamic>> _initListeners = new FastList<Action<JQuery, JsApi, dynamic>>();
-        [Name("_onInit")]
+        [Name("_oninit")]
         public void OnInit(Action<JQuery, JsApi, dynamic> listener)
         {
             _initListeners.Add(listener);
