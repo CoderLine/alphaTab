@@ -176,8 +176,9 @@
       <Name>AlphaTab.CSharp</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="..\AlphaTab.Samples.XamarinForms\AlphaTab.Samples.XamarinForms.projitems" Label="Shared" Condition="Exists('..\AlphaTab.Samples.XamarinForms\AlphaTab.Samples.XamarinForms.projitems')" />
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" Condition="Exists('$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets')" />
+  <Import Project="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\Xamarin\Android\Xamarin.Android.CSharp.targets" Condition="Exists('C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\Xamarin\Android\Xamarin.Android.CSharp.targets')" />
+  <Import Project="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\Xamarin\Android\Xamarin.Android.CSharp.targets" Condition="Exists('C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\Xamarin\Android\Xamarin.Android.CSharp.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
