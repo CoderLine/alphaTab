@@ -1423,20 +1423,16 @@ AlphaTab.Platform.JavaScript.WorkerScoreRenderer = function (api, settings){
     this.PostRenderFinished = null;
     this.BoundsLookup = null;
     this._api = api;
+    // Bug #172: FireFox silently does not start the worker when script is on a different domain
+    // we use blob workers always since they seem to work always
     try{
-        this._worker = new Worker(settings.ScriptFile);
+        var script = "importScripts(\'" + settings.ScriptFile + "\')";
+        var blob = new Blob([script]);
+        this._worker = new Worker(window.URL.createObjectURL(blob));
     }
-    catch($$e4){
-        // fallback to blob worker 
-        try{
-            var script = "importScripts(\'" + settings.ScriptFile + "\')";
-            var blob = new Blob([script]);
-            this._worker = new Worker(window.URL.createObjectURL(blob));
-        }
-        catch(e){
-            AlphaTab.Util.Logger.Error("Rendering", "Failed to create WebWorker: " + e, null);
-            // TODO: fallback to synchronous mode
-        }
+    catch(e){
+        AlphaTab.Util.Logger.Error("Rendering", "Failed to create WebWorker: " + e, null);
+        // TODO: fallback to synchronous mode
     }
     this._worker.postMessage({
         cmd: "alphaTab.initialize",
@@ -6146,7 +6142,7 @@ AlphaTab.Importer.GpxFileSystem.prototype = {
                 }
             }
         }
-        catch($$e5){
+        catch($$e4){
         }
         buffer = uncompressed.GetBuffer();
         var resultOffset = skipHeader ? 4 : 0;
@@ -6331,7 +6327,7 @@ AlphaTab.Importer.GpxParser.prototype = {
         try{
             dom = new AlphaTab.Xml.XmlDocument(xml);
         }
-        catch($$e6){
+        catch($$e5){
             throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(""), new Error());
         }
         this.ParseDom(dom);
@@ -7643,7 +7639,7 @@ AlphaTab.Importer.MusicXmlImporter.prototype = {
         try{
             dom = new AlphaTab.Xml.XmlDocument(xml);
         }
-        catch($$e7){
+        catch($$e6){
             throw $CreateException(new AlphaTab.Importer.UnsupportedFormatException(""), new Error());
         }
         this._score = new AlphaTab.Model.Score();
@@ -8795,7 +8791,7 @@ AlphaTab.IO.BitReader.prototype = {
                 all.WriteByte(this.ReadByte());
             }
         }
-        catch($$e8){
+        catch($$e7){
         }
         return all.ToArray();
     }
