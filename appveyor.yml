@@ -65,8 +65,18 @@ artifacts:
     name: NuGet
 
 deploy:
+  # My Get (Every Build)
   - provider: NuGet
     server: https://www.myget.org/F/coderline/api/v3/index.json
     api_key:
       secure: sQI+q8oHDFwWAWOy/pvP4zHehqNASufniwX7aOpN03YlcKt44ZX/55guh2kGoJ2n
+    artifact: NuGet  
+  # NuGet.org (Only Tagged on Master)
+  - provider: NuGet
+    api_key:
+      secure: 89W5Zsv2maiKx7/Bmn5zFFlKjPC2J7NnDRhPrpeH9hEnVvtDlWt04xR+kYi52dPt
     artifact: NuGet
+    on:
+      branch: master
+      appveyor_repo_tag: true
+    
