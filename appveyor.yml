@@ -13,7 +13,8 @@ environment:
     HAXELIB_ROOT: C:\projects\haxelib
 
 install:
-  # http://help.appveyor.com/discussions/problems/5616-not-able-to-build-due-to-problem-in-chocolateyinstallps1
+  #
+  # Haxe installation
   - ps: Set-Service wuauserv -StartupType Manual
   # Install the neko chocolatey package (https://chocolatey.org/packages/neko)
   - cinst neko --version 2.2.0 -y
@@ -28,7 +29,10 @@ install:
   - haxelib install munit  > log.txt || type log.txt && cmd /C exit 1
   - haxelib install hamcrest  > log.txt || type log.txt && cmd /C exit 1
   - haxelib list
-  - npm install -g uglifyjs
+  #
+  # Npm/Uglifyjs installation
+  - ps: Install-Product node $env:nodejs_version $env:platform
+  - npm install -g uglify-js
   - RefreshEnv
 
 dotnet_csproj:
