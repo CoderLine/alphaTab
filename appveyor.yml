@@ -63,7 +63,7 @@ test:
   
 artifacts:
   # JavaScript Output
-  - path: JavaScript\*.*
+  - path: Build\JavaScript\*.*
     name: JavaScript
   # NuGet package output 
   - path: Source\AlphaTab.CSharp\Bin\$(configuration)\*.nupkg
@@ -72,7 +72,7 @@ artifacts:
 deploy:
   # My Get (Every Build)
   - provider: NuGet
-    server: https://www.myget.org/F/coderline/api/v3/index.json
+    server: https://www.myget.org/F/coderline/api/v2
     api_key:
       secure: sQI+q8oHDFwWAWOy/pvP4zHehqNASufniwX7aOpN03YlcKt44ZX/55guh2kGoJ2n
     artifact: NuGet  
