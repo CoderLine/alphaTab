@@ -1654,7 +1654,7 @@ AlphaTab.Platform.Std.IsCharNumber = function (c, allowSign){
     return (allowSign && c == 45) || (c >= 48 && c <= 57);
 };
 AlphaTab.Platform.Std.IsWhiteSpace = function (c){
-    return c == 32 || c == 11 || c == 13 || c == 10;
+    return c == 32 || c == 11 || c == 13 || c == 10 || c == 9;
 };
 AlphaTab.Platform.Std.ToHexString = function (n, digits){
     var s = "";
@@ -17673,7 +17673,8 @@ AlphaTab.Rendering.Utils.AccidentalHelper = function (){
 };
 AlphaTab.Rendering.Utils.AccidentalHelper.prototype = {
     ApplyAccidental: function (note){
-        var noteValue = note.get_RealValue();
+        var track = note.Beat.Voice.Bar.Staff.Track;
+        var noteValue = track.IsPercussion ? AlphaTab.Rendering.Utils.PercussionMapper.MapNoteForDisplay(note) : note.get_RealValue() - track.DisplayTranspositionPitch;
         var ks = note.Beat.Voice.Bar.get_MasterBar().KeySignature;
         var ksi = (ks + 7);
         var index = (noteValue % 12);
