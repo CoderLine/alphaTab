@@ -48,8 +48,8 @@ dotnet_csproj:
 
 build:
   parallel: true
-  publish_nuget: true
-  publish_nuget_symbols: true
+  publish_nuget: false
+  publish_nuget_symbols: false
   verbosity: minimal
 
 before_build:
