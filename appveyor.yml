@@ -8,6 +8,7 @@ image: Visual Studio 2017
 configuration: Release
 platform: Any CPU
 environment:
+  nodejs_version: '8'
   global:
     HAXELIB_ROOT: C:\projects\haxelib
 
@@ -27,7 +28,8 @@ install:
   - haxelib install munit  > log.txt || type log.txt && cmd /C exit 1
   - haxelib install hamcrest  > log.txt || type log.txt && cmd /C exit 1
   - haxelib list
-    
+  - npm install -g uglifyjs
+  - RefreshEnv
 
 dotnet_csproj:
   patch: true
