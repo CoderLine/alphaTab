@@ -57,12 +57,24 @@ namespace AlphaTab.Haxe.Js.Html
         public extern HaxeInt ClientWidth { get; set; }
         [Name("clientHeight")]
         public extern HaxeInt ClientHeight { get; set; }
+        [Name("clientTop")]
+        public extern HaxeInt ClientTop { get; set; }
+        [Name("clientLeft")]
+        public extern HaxeInt ClientLeft { get; set; }
+
+        [Name("scrollTop")]
+        public HaxeInt ScrollTop { get; set; }
+        [Name("scrollLeft")]
+        public HaxeInt ScrollLeft { get; set; }
 
 
         [Name("querySelector")]
         public extern Element QuerySelector(HaxeString selectors);
         [Name("querySelectorAll")]
         public extern NodeList QuerySelectorAll(HaxeString selectors);
+
+        [Name("getElementsByClassName")]
+        public extern HTMLCollection GetElementsByClassName(HaxeString className);
 
         [Name("getClientRects")]
         public extern DOMRectList GetClientRects();

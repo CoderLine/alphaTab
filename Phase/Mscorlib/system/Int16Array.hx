@@ -11,7 +11,7 @@ abstract Int16Array(js.html.Int16Array)
 	public inline function get_Length() : Int32 return this.length;
 	
 	@:op([]) public inline function get(index:Int32):Int16 return this[index.ToHaxeInt()];
-	@:op([]) public inline function set(index:Int32, val:Int16):Int16 return this[index.ToHaxeInt()] = val.ToHaxeFloat();
+	@:op([]) public inline function set(index:Int32, val:Int16):Int16 return this[index.ToHaxeInt()] = val.ToHaxeInt();
 	
 	public inline function iterator() : Iterator<Int16> return new Int16ArrayIterator(this);
 	

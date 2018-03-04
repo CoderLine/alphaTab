@@ -7,6 +7,7 @@ class Exception
 	public function Exception_CsString(message:String)
 	{
 		Message = message;
+		return this;
 	}
 	
 	public function new() 

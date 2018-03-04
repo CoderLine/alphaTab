@@ -46,5 +46,13 @@ namespace AlphaTab.Haxe.Js.Html
         public HaxeString LineHeight { get; set; }
         [Name("display")]
         public HaxeString Display { get; set; }
+        [Name("textAlign")]
+        public HaxeString TextAlign { get; set; }
+        [Name("zIndex")]
+        public HaxeString ZIndex { get; set; }
+        [Name("transition")]
+        public HaxeString Transition { get; set; }
+        [Name("transitionDuration")]
+        public HaxeString TransitionDuration { get; set; }
     }
 }

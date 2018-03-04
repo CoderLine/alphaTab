@@ -46,5 +46,8 @@ namespace AlphaTab.Haxe.Js.Html
 
         [Name("createEvent")]
         public extern Event CreateEvent(HaxeString interface_);
+
+        [Name("defaultView")]
+        public Window DefaultView { get; set; }
     }
 }

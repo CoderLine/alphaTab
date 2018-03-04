@@ -102,7 +102,8 @@ namespace AlphaTab.Xml
                     {
                         txt.Append(c.InnerText);
                     }
-                    return txt.ToString().Trim();
+                    string s = txt.ToString();
+                    return s.Trim();
                 }
                 return Value;
             }

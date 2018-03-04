@@ -1,4 +1,6 @@
 ﻿using System;
+using AlphaTab.Audio.Synth;
+using AlphaTab.Audio.Synth.Synthesis;
 using AlphaTab.Collections;
 using AlphaTab.Haxe.jQuery;
 using AlphaTab.Haxe.Js;
@@ -27,7 +29,7 @@ namespace AlphaTab.Platform.JavaScript
             }
 
             var jElement = new JQuery(element);
-            JsApi context = (JsApi)jElement.Data("alphaTab");
+            AlphaTabApi context = (AlphaTabApi)jElement.Data("alphaTab");
             if (method == "destroy" && !context.IsTruthy())
             {
                 return null;
@@ -51,11 +53,11 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         [Name("init")]
-        public void Init(JQuery element, JsApi context, dynamic options)
+        public void Init(JQuery element, AlphaTabApi context, dynamic options)
         {
             if (!context.IsTruthy())
             {
-                context = new JsApi(element[0], options);
+                context = new AlphaTabApi(element[0], options);
                 element.Data("alphaTab", context);
                 foreach (var listener in _initListeners)
                 {
@@ -65,20 +67,20 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         [Name("destroy")]
-        public void Destroy(JQuery element, JsApi context)
+        public void Destroy(JQuery element, AlphaTabApi context)
         {
             element.RemoveData("alphaTab");
             context.Destroy();
         }
 
         [Name("tex")]
-        public void Tex(JQuery element, JsApi context, string tex)
+        public void Tex(JQuery element, AlphaTabApi context, string tex)
         {
             context.Tex(tex);
         }
 
         [Name("tracks")]
-        public Track[] Tracks(JQuery element, JsApi context, dynamic tracks)
+        public Track[] Tracks(JQuery element, AlphaTabApi context, dynamic tracks)
         {
             if (tracks)
             {
@@ -89,13 +91,13 @@ namespace AlphaTab.Platform.JavaScript
 
 
         [Name("api")]
-        public JsApi Api(JQuery element, JsApi context)
+        public AlphaTabApi Api(JQuery element, AlphaTabApi context)
         {
             return context;
         }
 
         [Name("score")]
-        public Score Score(JQuery element, JsApi context, Score score)
+        public Score Score(JQuery element, AlphaTabApi context, Score score)
         {
             if (score.IsTruthy())
             {
@@ -105,13 +107,13 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         [Name("renderer")]
-        public IScoreRenderer Renderer(JQuery element, JsApi context)
+        public IScoreRenderer Renderer(JQuery element, AlphaTabApi context)
         {
             return context.Renderer;
         }
 
         [Name("layout")]
-        public LayoutSettings Layout(JQuery element, JsApi context, object layout)
+        public LayoutSettings Layout(JQuery element, AlphaTabApi context, object layout)
         {
             if (layout.IsTruthy())
             {
@@ -121,14 +123,216 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         [Name("print")]
-        public void Print(JQuery element, JsApi context, string width)
+        public void Print(JQuery element, AlphaTabApi context, string width)
         {
             context.Print(width);
         }
 
-        private readonly FastList<Action<JQuery, JsApi, dynamic>> _initListeners = new FastList<Action<JQuery, JsApi, dynamic>>();
+        #region Player
+        [Name("player")]
+        public AlphaSynthWebWorkerApi Player(JQuery element, AlphaTabApi context)
+        {
+            return context.Player;
+        }
+
+        [Name("playerOptions")]
+        public Settings PlayerOptions(JQuery element, AlphaTabApi context, object options)
+        {
+            if (options.IsTruthy())
+            {
+                Settings.FillPlayerOptions(context.Settings, options, false);
+            }
+            return context.Settings;
+        }
+
+        [Name("cursorOptions")]
+        public Settings CursorOptions(JQuery element, AlphaTabApi context, object options)
+        {
+            return PlayerOptions(element, context, options);
+        }
+
+        [Name("playerState")]
+        public PlayerState PlayerState(JQuery element, AlphaTabApi context)
+        {
+            if (context.Player == null)
+            {
+                return Audio.Synth.PlayerState.Paused;
+            }
+            return context.Player.State;
+        }
+
+        [Name("masterVolume")]
+        public float MasterVolume(JQuery element, AlphaTabApi context, float masterVolume)
+        {
+            if (context.Player == null)
+            {
+                return 0;
+            }
+
+            if (masterVolume.IsTruthy())
+            {
+                context.Player.MasterVolume = masterVolume;
+            }
+
+            return context.Player.MasterVolume;
+        }
+
+        [Name("playbackSpeed")]
+        public double PlaybackSpeed(JQuery element, AlphaTabApi context, double playbackSpeed)
+        {
+            if (context.Player == null)
+            {
+                return 0;
+            }
+
+            if (playbackSpeed.IsTruthy())
+            {
+                context.Player.PlaybackSpeed = playbackSpeed;
+            }
+
+            return context.Player.PlaybackSpeed;
+        }
+
+        [Name("metronomeVolume")]
+        public float MetronomeVolume(JQuery element, AlphaTabApi context, float metronomeVolume)
+        {
+            if (context.Player == null)
+            {
+                return 0;
+            }
+
+            if (metronomeVolume.IsTruthy())
+            {
+                context.Player.MetronomeVolume = metronomeVolume;
+            }
+
+            return context.Player.MetronomeVolume;
+        }
+
+        [Name("tickPosition")]
+        public int TickPosition(JQuery element, AlphaTabApi context, int tickPosition)
+        {
+            if (context.Player == null)
+            {
+                return 0;
+            }
+
+            if (tickPosition.IsTruthy())
+            {
+                context.Player.TickPosition = tickPosition;
+            }
+
+            return context.Player.TickPosition;
+        }
+
+        [Name("playbackRange")]
+        public PlaybackRange PlaybackRange(JQuery element, AlphaTabApi context, PlaybackRange playbackRange)
+        {
+            if (context.Player == null)
+            {
+                return null;
+            }
+
+            if (playbackRange.IsTruthy())
+            {
+                context.Player.PlaybackRange = playbackRange;
+            }
+
+            return context.Player.PlaybackRange;
+        }
+
+        [Name("loop")]
+        public bool PlaybackRange(JQuery element, AlphaTabApi context, bool loop)
+        {
+            if (context.Player == null)
+            {
+                return false;
+            }
+
+            if (loop.IsTruthy())
+            {
+                context.Player.IsLooping = loop;
+            }
+
+            return context.Player.IsLooping;
+        }
+
+        [Name("autoScroll")]
+        public string AutoScroll(JQuery element, AlphaTabApi context, string autoScroll)
+        {
+            if (context.Player == null)
+            {
+                return null;
+            }
+
+            if (autoScroll.IsTruthy())
+            {
+                context.Settings.ScrollMode = autoScroll;
+            }
+
+            return context.Settings.ScrollMode;
+        }
+
+        [Name("play")]
+        public void Play(JQuery element, AlphaTabApi context)
+        {
+            context.Play();
+        }
+
+        [Name("pause")]
+        public void Pause(JQuery element, AlphaTabApi context)
+        {
+            context.Pause();
+        }
+
+        [Name("playPause")]
+        public void PlayPause(JQuery element, AlphaTabApi context)
+        {
+            context.PlayPause();
+        }
+
+        [Name("stop")]
+        public void Stop(JQuery element, AlphaTabApi context)
+        {
+            context.Stop();
+        }
+
+        [Name("loadSoundFont")]
+        public void LoadSoundFont(JQuery element, AlphaTabApi context, object value)
+        {
+            context.LoadSoundFont(value);
+        }
+
+        [Name("loadMidi")]
+        public void LoadMidi(JQuery element, AlphaTabApi context, object value)
+        {
+            context.LoadMidi(value);
+        }
+
+        [Name("muteTrack")]
+        public void MuteTrack(JQuery element, AlphaTabApi context, object tracks, bool mute)
+        {
+            context.SetTrackMute(tracks, mute);
+        }
+
+        [Name("soloTrack")]
+        public void SoloTrack(JQuery element, AlphaTabApi context, object tracks, bool solo)
+        {
+            context.SetTrackSolo(tracks, solo);
+        }
+
+
+        [Name("trackVolume")]
+        public void TrackVolume(JQuery element, AlphaTabApi context, object tracks, float volume)
+        {
+            context.SetTrackVolume(tracks, volume);
+        }
+
+        #endregion
+
+        private readonly FastList<Action<JQuery, AlphaTabApi, dynamic>> _initListeners = new FastList<Action<JQuery, AlphaTabApi, dynamic>>();
         [Name("_oninit")]
-        public void OnInit(Action<JQuery, JsApi, dynamic> listener)
+        public void OnInit(Action<JQuery, AlphaTabApi, dynamic> listener)
         {
             _initListeners.Add(listener);
         }

@@ -4,8 +4,16 @@ abstract Single(Float) from Float from Int
 {
 	public inline function new(i:Float) this = i;
 
+	@:from public static inline function FromInt(i:Int) : Single return new Single(i);
+	@:from public static inline function FromByte(i:system.Byte) : Single return new Single(i.ToHaxeInt());
+	@:from public static inline function FromInt16(i:system.Int16) : Single return new Single(i.ToHaxeInt());
 	@:from public static inline function FromInt32(i:system.Int32) : Single return new Single(i.ToHaxeInt());
-	
+	@:from public static inline function FromInt64(i:system.Int64) : Single return new Single(i.ToHaxeInt());
+	@:from public static inline function FromSByte(i:system.Byte) : Single return new Single(i.ToHaxeInt());
+	@:from public static inline function FromUInt16(i:system.UInt16) : Single return new Single(i.ToHaxeInt());
+	@:from public static inline function FromUInt32(i:system.UInt32) : Single return new Single(i.ToHaxeInt());
+	@:from public static inline function FromUInt64(i:system.UInt64) : Single return new Single(i.ToHaxeInt());
+
 	public inline function ToBoolean_IFormatProvider(provider:IFormatProvider) : system.Boolean return system.Convert.ToBoolean_Single(this);
 	public inline function ToChar_IFormatProvider(provider:IFormatProvider) : system.Char return system.Convert.ToChar_Single(this);
 	public inline function ToSByte_IFormatProvider(provider:IFormatProvider) : system.SByte return system.Convert.ToSByte_Single(this);

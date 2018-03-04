@@ -11,7 +11,7 @@ abstract Boolean(Bool) from Bool to Bool
 	
     @:op(A == B) public static function eq(lhs : system.Boolean, rhs : system.Boolean) : system.Boolean;
     @:op(A != B) public static function neq(lhs : system.Boolean, rhs : system.Boolean) : system.Boolean;
-    @:op(A & B) public static function and(lhs : system.Boolean, rhs : system.Boolean) : system.Boolean;
-    @:op(A | B) public static function or(lhs : system.Boolean, rhs : system.Boolean) : system.Boolean;
-    @:op(A ^ B) public static function xor(lhs : system.Boolean, rhs : system.Boolean) : system.Boolean;
+    @:op(A & B) public static inline function and(lhs : system.Boolean, rhs : system.Boolean) : system.Boolean return lhs && rhs;
+    @:op(A | B) public static inline function or(lhs : system.Boolean, rhs : system.Boolean) : system.Boolean return lhs || rhs;
+    @:op(A ^ B) public static inline function xor(lhs : system.Boolean, rhs : system.Boolean) : system.Boolean return lhs != rhs;
 }

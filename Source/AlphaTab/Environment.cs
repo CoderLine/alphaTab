@@ -39,11 +39,6 @@ namespace AlphaTab
         public const string StaveProfileTab = "tab";
         public const string StaveProfileScore = "score";
 
-        static Environment()
-        {
-            Init();
-        }
-
         public static void Init()
         {
             RenderEngines = new FastDictionary<string, Func<ICanvas>>();

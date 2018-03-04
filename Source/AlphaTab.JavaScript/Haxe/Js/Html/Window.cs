@@ -30,6 +30,8 @@ namespace AlphaTab.Haxe.Js.Html
         public extern HTMLDocument Document { get; }
         [Name("screen")]
         public extern Screen Screen { get; }
+        [Name("location")]
+        public extern Location Location { get; }
 
         [Name("setTimeout")]
         public extern HaxeInt SetTimeout(Delegate handler, HaxeInt timeout);
@@ -52,6 +54,12 @@ namespace AlphaTab.Haxe.Js.Html
         [Name("innerWidth")]
         public extern HaxeInt InnerWidth { get; }
 
+        [Name("pageYOffset")]
+        public HaxeInt PageYOffset { get; }
+
+        [Name("pageXOffset")]
+        public HaxeInt PageXOffset { get; }
+
         [Name("open")]
         public extern Window Open(HaxeString url, HaxeString target, HaxeString features);
         [Name("resizeTo")]
@@ -64,5 +72,8 @@ namespace AlphaTab.Haxe.Js.Html
 
         [Name("print")]
         public extern void Print();
+
+        [Name("requestAnimationFrame")]
+        public extern void RequestAnimationFrame(Action<HaxeFloat> function);
     }
 }

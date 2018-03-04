@@ -12,8 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "AlphaTab.Shared", "Source\AlphaTab\AlphaTab.Shared.shproj", "{8083B3BC-0681-47F2-9FBF-A5C96107F538}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaTab.JavaScript", "Source\AlphaTab.JavaScript\AlphaTab.JavaScript.csproj", "{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaTab.Samples.MidiDump", "Samples\CSharp\AlphaTab.Samples.MidiDump\AlphaTab.Samples.MidiDump.csproj", "{4DF96479-E5B5-4F2F-AE14-C10AE0834934}"
@@ -39,6 +37,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaTab.CSharp", "Source\AlphaTab.CSharp\AlphaTab.CSharp.csproj", "{BCC950EA-7465-47FC-A7AF-E733B55EC91F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{4642B107-04FE-4777-AA50-667A6A7E6C09}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "AlphaTab", "Source\AlphaTab\AlphaTab.shproj", "{8083B3BC-0681-47F2-9FBF-A5C96107F538}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

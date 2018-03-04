@@ -35,11 +35,17 @@ namespace AlphaTab.Haxe.Js.Html
         public extern void RemoveChild(Node node);
         [Name("childNodes")]
         public extern NodeList ChildNodes { get; }
+        [Name("firstChild")]
+        public extern Node FirstChild { get; set; }
+
 
         [Name("ownerDocument")]
-        public HTMLDocument OwnerDocument { get; set; }
+        public extern HTMLDocument OwnerDocument { get; set; }
 
         [Name("replaceChild")]
         public extern void ReplaceChild(Node node, Node child);
+
+        [Name("insertBefore")]
+        public extern void InsertBefore(Node node, Node child);
     }
 }

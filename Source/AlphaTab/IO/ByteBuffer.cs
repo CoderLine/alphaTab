@@ -17,7 +17,6 @@
  */
 
 using System;
-using AlphaTab.Platform;
 
 namespace AlphaTab.IO
 {
@@ -34,6 +33,12 @@ namespace AlphaTab.IO
             {
                 return _length;
             }
+        }
+
+        public int Position
+        {
+            get { return _position; }
+            set { _position = value; }
         }
 
         public virtual byte[] GetBuffer()

@@ -23,7 +23,7 @@ namespace Haxe.Js.Html
     [External]
     [Name("js.html.XMLHttpRequest")]
     [NativeConstructors]
-    public class XMLHttpRequest
+    public class XMLHttpRequest : XMLHttpRequestEventTarget
     {
         public static readonly HaxeInt UNSENT;
         public static readonly HaxeInt OPENED;

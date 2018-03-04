@@ -48,9 +48,137 @@ namespace AlphaTab
             get; set;
         }
 
+        public bool EnablePlayer
+        {
+            get; set;
+        }
+
+        public string SoundFontFile
+        {
+            get; set;
+        }
+
+        public bool EnableCursor
+        {
+            get; set;
+        }
+
+        public int ScrollOffsetX
+        {
+            get; set;
+        }
+
+        public int ScrollOffsetY
+        {
+            get; set;
+        }
+
+        public bool EnableSeekByClick
+        {
+            get; set;
+        }
+
+        public string ScrollMode
+        {
+            get; set;
+        }
+
+        public int ScrollSpeed
+        {
+            get; set;
+        }
+
+        public string ScrollElement
+        {
+            get; set;
+        }
+
+
+        public int BeatCursorWidth
+        {
+            get; set;
+        }
+
         private static void SetDefaults(Settings settings)
         {
             settings.UseWebWorker = true;
+            settings.ScrollMode = "vertical";
+            settings.ScrollSpeed = 300;
+            settings.ScrollElement = "html,body";
+            settings.BeatCursorWidth = 3;
+        }
+
+        public static void FillPlayerOptions(Settings settings, dynamic json, bool setDefaults, FastDictionary<string, object> dataAttributes = null)
+        {
+            if (Platform.Platform.JsonExists(json, "cursor"))
+            {
+                settings.EnableCursor = json.cursor;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("cursor"))
+            {
+                settings.EnableCursor = (bool)dataAttributes["cursor"];
+            }
+            else if(setDefaults)
+            {
+                settings.EnableCursor = true;
+            }
+
+            if (settings.EnableCursor)
+            {
+                if (Platform.Platform.JsonExists(json, "playerOffset"))
+                {
+                    FillCursorOffset(settings, json.playerOffset);
+                }
+                else if (dataAttributes != null && dataAttributes.ContainsKey("playerOffset"))
+                {
+                    FillCursorOffset(settings, dataAttributes["playerOffset"]);
+                }
+            }
+
+            if (Platform.Platform.JsonExists(json, "handleClick"))
+            {
+                settings.EnableSeekByClick = json.handleClick;
+            }
+            else if(setDefaults)
+            {
+                settings.EnableSeekByClick = true;
+            }
+
+            if (Platform.Platform.JsonExists(json, "autoScroll"))
+            {
+                settings.ScrollMode = json.autoScroll;
+            }
+            else if(setDefaults)
+            {
+                settings.ScrollMode = "vertical";
+            }
+
+            if (Platform.Platform.JsonExists(json, "scrollSpeed"))
+            {
+                settings.ScrollSpeed = json.scrollSpeed;
+            }
+            else if(setDefaults)
+            {
+                settings.ScrollSpeed = 300;
+            }
+
+            if (Platform.Platform.JsonExists(json, "scrollSpeed"))
+            {
+                settings.ScrollElement = json.scrollSpeed;
+            }
+            else if(setDefaults)
+            {
+                settings.ScrollElement = "html,body";
+            }
+
+            if (Platform.Platform.JsonExists(json, "beatCursorWidth"))
+            {
+                settings.BeatCursorWidth = json.beatCursorWidth;
+            }
+            else if(setDefaults)
+            {
+                settings.BeatCursorWidth = 3;
+            }
         }
 
         public dynamic ToJson()
@@ -216,7 +344,7 @@ namespace AlphaTab
                 var pitchOffsets = dataAttributes["displayTranspositionPitches"];
                 if (pitchOffsets != null && pitchOffsets.Member<bool>("length"))
                 {
-                    settings.DisplayTranspositionPitches = pitchOffsets.As<int[]>();
+                    settings.DisplayTranspositionPitches = (int[])pitchOffsets;
                 }
             }
 
@@ -271,6 +399,37 @@ namespace AlphaTab
                         settings.Staves.AdditionalSettings[property.ToLower()] = dataAttributes[key];
                     }
                 }
+            }
+
+            if (Platform.Platform.JsonExists(json, "player"))
+            {
+                settings.EnablePlayer = true;
+                settings.SoundFontFile = json.player;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("player"))
+            {
+                settings.EnablePlayer = true;
+                settings.SoundFontFile = (string)dataAttributes["player"];
+            }
+
+            if (settings.EnablePlayer)
+            {
+                FillPlayerOptions(settings, json, true, dataAttributes);
+            }
+        }
+
+        private static void FillCursorOffset(Settings settings, object playerOffset)
+        {
+            if (Platform.Platform.TypeOf(playerOffset) == "number")
+            {
+                settings.ScrollOffsetX = (int)playerOffset;
+                settings.ScrollOffsetY = (int)playerOffset;
+            }
+            else if (Platform.Platform.JsonExists(playerOffset, "length"))
+            {
+                var offsets = (int[])playerOffset;
+                settings.ScrollOffsetX = offsets[0];
+                settings.ScrollOffsetY = offsets[1];
             }
         }
 

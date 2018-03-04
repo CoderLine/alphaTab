@@ -1,12 +1,10 @@
 package system;
 
-private typedef ArrayData<T> = Array<T>;
-
 /**
  * ...
  * @author Danielku15
  */
-abstract FixedArray<T>(ArrayData<T>) 
+abstract FixedArray<T>(Array<T>) to Array<T>
 {
 	public inline function new(length:Int32) this = untyped __new__(Array, length.ToHaxeInt());
 	
@@ -25,4 +23,5 @@ abstract FixedArray<T>(ArrayData<T>)
 	public inline function ToEnumerable() : system.collections.generic.IEnumerable<T> return new system.collections.generic.IterableEnumerable(this);
 
 	public static inline function empty<T>(size:Int32) return new FixedArray<T>(size);
+	public static inline function empty2<T>(size:Int32) return new FixedArray<FixedArray<T>>(size);
 }

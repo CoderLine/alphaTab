@@ -19,6 +19,30 @@
 $hx_exports["alphaTab"] = $hx_exports["alphaTab"] || {};
 $hx_exports["alphaTab"]["xml"] = $hx_exports["alphaTab"]["xml"] || {};
 $hx_exports["alphaTab"]["xml"]["_XmlNodeType"] = $hx_exports["alphaTab"]["xml"]["_XmlNodeType"] || {};
+;$hx_exports["alphaTab"]["utils"] = $hx_exports["alphaTab"]["utils"] || {};
+$hx_exports["alphaTab"]["utils"]["_UnionData"] = $hx_exports["alphaTab"]["utils"]["_UnionData"] || {};
+;$hx_exports["alphaTab"]["util"] = $hx_exports["alphaTab"]["util"] || {};
+$hx_exports["alphaTab"]["util"]["_LogLevel"] = $hx_exports["alphaTab"]["util"]["_LogLevel"] || {};
+;$hx_exports["alphaTab"]["rendering"] = $hx_exports["alphaTab"]["rendering"] || {};
+$hx_exports["alphaTab"]["rendering"]["staves"] = $hx_exports["alphaTab"]["rendering"]["staves"] || {};
+;$hx_exports["alphaTab"]["rendering"]["layout"] = $hx_exports["alphaTab"]["rendering"]["layout"] || {};
+$hx_exports["alphaTab"]["rendering"]["layout"]["_HeaderFooterElements"] = $hx_exports["alphaTab"]["rendering"]["layout"]["_HeaderFooterElements"] || {};
+;$hx_exports["alphaTab"]["rendering"]["effects"] = $hx_exports["alphaTab"]["rendering"]["effects"] || {};
+;$hx_exports["alphaTab"]["rendering"]["utils"] = $hx_exports["alphaTab"]["rendering"]["utils"] || {};
+$hx_exports["alphaTab"]["rendering"]["utils"]["_BeamDirection"] = $hx_exports["alphaTab"]["rendering"]["utils"]["_BeamDirection"] || {};
+;$hx_exports["alphaTab"]["rendering"]["_EffectBarGlyphSizing"] = $hx_exports["alphaTab"]["rendering"]["_EffectBarGlyphSizing"] || {};
+;$hx_exports["alphaTab"]["rendering"]["glyphs"] = $hx_exports["alphaTab"]["rendering"]["glyphs"] || {};
+$hx_exports["alphaTab"]["rendering"]["glyphs"]["_TripletFeelGlyph_BarType"] = $hx_exports["alphaTab"]["rendering"]["glyphs"]["_TripletFeelGlyph_BarType"] || {};
+;$hx_exports["alphaTab"]["rendering"]["glyphs"]["_MusicFontSymbol"] = $hx_exports["alphaTab"]["rendering"]["glyphs"]["_MusicFontSymbol"] || {};
+;$hx_exports["alphaTab"]["rendering"]["_BeatXPosition"] = $hx_exports["alphaTab"]["rendering"]["_BeatXPosition"] || {};
+;$hx_exports["alphaTab"]["platform"] = $hx_exports["alphaTab"]["platform"] || {};
+$hx_exports["alphaTab"]["platform"]["svg"] = $hx_exports["alphaTab"]["platform"]["svg"] || {};
+$hx_exports["alphaTab"]["platform"]["svg"]["_SupportedFonts"] = $hx_exports["alphaTab"]["platform"]["svg"]["_SupportedFonts"] || {};
+;$hx_exports["alphaTab"]["platform"]["model"] = $hx_exports["alphaTab"]["platform"]["model"] || {};
+$hx_exports["alphaTab"]["platform"]["model"]["_TextBaseline"] = $hx_exports["alphaTab"]["platform"]["model"]["_TextBaseline"] || {};
+;$hx_exports["alphaTab"]["platform"]["model"]["_TextAlign"] = $hx_exports["alphaTab"]["platform"]["model"]["_TextAlign"] || {};
+;$hx_exports["alphaTab"]["platform"]["model"]["_FontStyle"] = $hx_exports["alphaTab"]["platform"]["model"]["_FontStyle"] || {};
+;$hx_exports["alphaTab"]["platform"]["javaScript"] = $hx_exports["alphaTab"]["platform"]["javaScript"] || {};
 ;$hx_exports["alphaTab"]["model"] = $hx_exports["alphaTab"]["model"] || {};
 $hx_exports["alphaTab"]["model"]["_VibratoType"] = $hx_exports["alphaTab"]["model"]["_VibratoType"] || {};
 ;$hx_exports["alphaTab"]["model"]["_TripletFeel"] = $hx_exports["alphaTab"]["model"]["_TripletFeel"] || {};
@@ -50,28 +74,6 @@ $hx_exports["alphaTab"]["collections"]["_StringBuilder"] = $hx_exports["alphaTab
 $hx_exports["alphaTab"]["audio"]["model"] = $hx_exports["alphaTab"]["audio"]["model"] || {};
 $hx_exports["alphaTab"]["audio"]["model"]["_MidiController"] = $hx_exports["alphaTab"]["audio"]["model"]["_MidiController"] || {};
 ;$hx_exports["alphaTab"]["audio"]["generator"] = $hx_exports["alphaTab"]["audio"]["generator"] || {};
-;$hx_exports["alphaTab"]["rendering"] = $hx_exports["alphaTab"]["rendering"] || {};
-$hx_exports["alphaTab"]["rendering"]["staves"] = $hx_exports["alphaTab"]["rendering"]["staves"] || {};
-;$hx_exports["alphaTab"]["rendering"]["utils"] = $hx_exports["alphaTab"]["rendering"]["utils"] || {};
-$hx_exports["alphaTab"]["rendering"]["utils"]["_BeamDirection"] = $hx_exports["alphaTab"]["rendering"]["utils"]["_BeamDirection"] || {};
-;$hx_exports["alphaTab"]["rendering"]["_EffectBarGlyphSizing"] = $hx_exports["alphaTab"]["rendering"]["_EffectBarGlyphSizing"] || {};
-;$hx_exports["alphaTab"]["rendering"]["glyphs"] = $hx_exports["alphaTab"]["rendering"]["glyphs"] || {};
-$hx_exports["alphaTab"]["rendering"]["glyphs"]["_TripletFeelGlyph_BarType"] = $hx_exports["alphaTab"]["rendering"]["glyphs"]["_TripletFeelGlyph_BarType"] || {};
-;$hx_exports["alphaTab"]["rendering"]["glyphs"]["_MusicFontSymbol"] = $hx_exports["alphaTab"]["rendering"]["glyphs"]["_MusicFontSymbol"] || {};
-;$hx_exports["alphaTab"]["rendering"]["_BeatXPosition"] = $hx_exports["alphaTab"]["rendering"]["_BeatXPosition"] || {};
-;$hx_exports["alphaTab"]["rendering"]["effects"] = $hx_exports["alphaTab"]["rendering"]["effects"] || {};
-;$hx_exports["alphaTab"]["rendering"]["layout"] = $hx_exports["alphaTab"]["rendering"]["layout"] || {};
-$hx_exports["alphaTab"]["rendering"]["layout"]["_HeaderFooterElements"] = $hx_exports["alphaTab"]["rendering"]["layout"]["_HeaderFooterElements"] || {};
-;$hx_exports["alphaTab"]["util"] = $hx_exports["alphaTab"]["util"] || {};
-$hx_exports["alphaTab"]["util"]["_LogLevel"] = $hx_exports["alphaTab"]["util"]["_LogLevel"] || {};
-;$hx_exports["alphaTab"]["platform"] = $hx_exports["alphaTab"]["platform"] || {};
-$hx_exports["alphaTab"]["platform"]["javaScript"] = $hx_exports["alphaTab"]["platform"]["javaScript"] || {};
-;$hx_exports["alphaTab"]["platform"]["model"] = $hx_exports["alphaTab"]["platform"]["model"] || {};
-$hx_exports["alphaTab"]["platform"]["model"]["_TextBaseline"] = $hx_exports["alphaTab"]["platform"]["model"]["_TextBaseline"] || {};
-;$hx_exports["alphaTab"]["platform"]["model"]["_TextAlign"] = $hx_exports["alphaTab"]["platform"]["model"]["_TextAlign"] || {};
-;$hx_exports["alphaTab"]["platform"]["model"]["_FontStyle"] = $hx_exports["alphaTab"]["platform"]["model"]["_FontStyle"] || {};
-;$hx_exports["alphaTab"]["platform"]["svg"] = $hx_exports["alphaTab"]["platform"]["svg"] || {};
-$hx_exports["alphaTab"]["platform"]["svg"]["_SupportedFonts"] = $hx_exports["alphaTab"]["platform"]["svg"]["_SupportedFonts"] || {};
 var $estr = function() { return js.Boot.__string_rec(this,''); };
 function $extend(from, fields) {
 	function Inherit() {} Inherit.prototype = from; var proto = new Inherit();
@@ -222,6 +224,6840 @@ Type.getClassName = function(c) {
 	}
 	return a.join(".");
 };
+var alphaSynth = {};
+alphaSynth.IAlphaSynth = function() { };
+alphaSynth.IAlphaSynth.__name__ = ["alphaSynth","IAlphaSynth"];
+alphaSynth.IAlphaSynth.prototype = {
+	__class__: alphaSynth.IAlphaSynth
+};
+alphaSynth.AlphaSynth = function() {
+	var _gthis = this;
+	this._sequencer = null;
+	this._synthesizer = null;
+	this._outputIsReady = false;
+	this._state = null;
+	this._logLevel = null;
+	this._isSoundFontLoaded = false;
+	this._isMidiLoaded = false;
+	this._tickPosition = 0;
+	this._timePosition = 0.0;
+	this.Output = null;
+	alphaTab.util.Logger.Debug("AlphaSynth","Initializing player",null);
+	this._state = 0;
+	alphaTab.util.Logger.Debug("AlphaSynth","Creating output",null);
+	this.Output = alphaTab.platform.Platform.CreateOutput();
+	this.Output.Ready = system._EventAction.EventAction_Impl_.add(this.Output.Ready,function() {
+		_gthis._outputIsReady = true;
+		_gthis.CheckReadyForPlayback();
+	});
+	this.Output.Finished = system._EventAction.EventAction_Impl_.add(this.Output.Finished,function() {
+		_gthis.Stop();
+		alphaTab.util.Logger.Debug("AlphaSynth","Finished playback",null);
+		_gthis.OnFinished(_gthis._sequencer.IsLooping);
+		if(_gthis._sequencer.IsLooping) {
+			_gthis.Play();
+		}
+	});
+	this.Output.SampleRequest = system._EventAction.EventAction_Impl_.add(this.Output.SampleRequest,function() {
+		_gthis._sequencer.FillMidiEventQueue();
+		_gthis._synthesizer.Synthesize();
+		_gthis.Output.AddSamples(_gthis._synthesizer.SampleBuffer);
+		_gthis._sequencer.CheckForStop();
+	});
+	this.Output.SamplesPlayed = system._EventAction1.EventAction1_Impl_.add(this.Output.SamplesPlayed,$bind(this,this.OnSamplesPlayed));
+	alphaTab.util.Logger.Debug("AlphaSynth","Creating synthesizer",null);
+	this._synthesizer = new alphaSynth.synthesis.Synthesizer(this.Output.get_SampleRate(),2,441,3,100);
+	this._sequencer = new alphaSynth.MidiFileSequencer(this._synthesizer);
+	this._sequencer.Finished = system._EventAction.EventAction_Impl_.add(this._sequencer.Finished,($_=this.Output,$bind($_,$_.SequencerFinished)));
+	alphaTab.util.Logger.Debug("AlphaSynth","Opening output",null);
+	this.Output.Open();
+};
+alphaSynth.AlphaSynth.__name__ = ["alphaSynth","AlphaSynth"];
+alphaSynth.AlphaSynth.__interfaces__ = [alphaSynth.IAlphaSynth];
+alphaSynth.AlphaSynth.prototype = {
+	get_IsReady: function() {
+		return this._outputIsReady;
+	}
+	,get_IsReadyForPlayback: function() {
+		if(this.get_IsReady() && this._isSoundFontLoaded) {
+			return this._isMidiLoaded;
+		} else {
+			return false;
+		}
+	}
+	,get_State: function() {
+		return this._state;
+	}
+	,get_LogLevel: function() {
+		return alphaTab.util.Logger.LogLevel;
+	}
+	,set_LogLevel: function(value) {
+		alphaTab.util.Logger.LogLevel = value;
+		return this.get_LogLevel();
+	}
+	,get_MasterVolume: function() {
+		return this._synthesizer.MasterVolume;
+	}
+	,set_MasterVolume: function(value) {
+		value = alphaSynth.util.SynthHelper.ClampF(value,0,10);
+		this._synthesizer.MasterVolume = value;
+		return this.get_MasterVolume();
+	}
+	,get_MetronomeVolume: function() {
+		return this._synthesizer.get_MetronomeVolume();
+	}
+	,set_MetronomeVolume: function(value) {
+		value = alphaSynth.util.SynthHelper.ClampF(value,0,10);
+		this._synthesizer.set_MetronomeVolume(value);
+		return this.get_MetronomeVolume();
+	}
+	,get_PlaybackSpeed: function() {
+		return this._sequencer.PlaybackSpeed;
+	}
+	,set_PlaybackSpeed: function(value) {
+		value = alphaSynth.util.SynthHelper.ClampD(value,0.125,8);
+		var oldSpeed = this._sequencer.PlaybackSpeed;
+		this._sequencer.PlaybackSpeed = value;
+		this.UpdateTimePosition(this._timePosition * (oldSpeed / value));
+		return this.get_PlaybackSpeed();
+	}
+	,get_TickPosition: function() {
+		return this._tickPosition;
+	}
+	,set_TickPosition: function(value) {
+		this.set_TimePosition(this._sequencer.TickPositionToTimePosition(value));
+		return this.get_TickPosition();
+	}
+	,get_TimePosition: function() {
+		return this._timePosition;
+	}
+	,set_TimePosition: function(value) {
+		alphaTab.util.Logger.Debug("AlphaSynth","Seeking to position " + value + "ms",null);
+		this._sequencer.Seek(value);
+		this.UpdateTimePosition(value);
+		this.Output.ResetSamples();
+		return this.get_TimePosition();
+	}
+	,get_PlaybackRange: function() {
+		return this._sequencer.get_PlaybackRange();
+	}
+	,set_PlaybackRange: function(value) {
+		this._sequencer.set_PlaybackRange(value);
+		if(value != null) {
+			this.set_TickPosition(value.StartTick);
+		}
+		return this.get_PlaybackRange();
+	}
+	,get_IsLooping: function() {
+		return this._sequencer.IsLooping;
+	}
+	,set_IsLooping: function(value) {
+		this._sequencer.IsLooping = value;
+		return this.get_IsLooping();
+	}
+	,Play: function() {
+		if(this.get_State() == 1 || !this.get_IsReadyForPlayback()) {
+			return;
+		}
+		alphaTab.util.Logger.Debug("AlphaSynth","Starting playback",null);
+		this._state = 1;
+		this.OnPlayerStateChanged(new alphaSynth.PlayerStateChangedEventArgs(this._state));
+		this.Output.Play();
+	}
+	,Pause: function() {
+		if(this.get_State() == 0 || !this.get_IsReadyForPlayback()) {
+			return;
+		}
+		alphaTab.util.Logger.Debug("AlphaSynth","Pausing playback",null);
+		this._state = 0;
+		this.OnPlayerStateChanged(new alphaSynth.PlayerStateChangedEventArgs(this._state));
+		this.Output.Pause();
+		this._synthesizer.NoteOffAll(false);
+	}
+	,PlayPause: function() {
+		if(this.get_State() == 1 || !this.get_IsReadyForPlayback()) {
+			this.Pause();
+		} else {
+			this.Play();
+		}
+	}
+	,Stop: function() {
+		if(!this.get_IsReadyForPlayback()) {
+			return;
+		}
+		alphaTab.util.Logger.Debug("AlphaSynth","Stopping playback",null);
+		this.Pause();
+		this.set_TickPosition(this._sequencer.get_PlaybackRange() != null ? this._sequencer.get_PlaybackRange().StartTick : 0);
+	}
+	,LoadSoundFont: function(data) {
+		this.Pause();
+		var input = alphaTab.io.ByteBuffer.FromBuffer(data);
+		try {
+			alphaTab.util.Logger.Info("AlphaSynth","Loading soundfont from bytes",null);
+			var bank = new alphaSynth.bank.PatchBank();
+			bank.LoadSf2(input);
+			this._synthesizer.LoadBank(bank);
+			this._isSoundFontLoaded = true;
+			this.OnSoundFontLoaded();
+			alphaTab.util.Logger.Info("AlphaSynth","soundFont successfully loaded",null);
+			this.CheckReadyForPlayback();
+		} catch( e ) {
+			if (e instanceof js._Boot.HaxeError) e = e.val;
+			if( js.Boot.__instanceof(e,system.Exception) ) {
+				alphaTab.util.Logger.Error("AlphaSynth","Could not load soundfont from bytes " + Std.string(e),null);
+				this.OnSoundFontLoadFailed();
+			} else throw(e);
+		}
+	}
+	,CheckReadyForPlayback: function() {
+		if(this.get_IsReadyForPlayback()) {
+			this.OnReadyForPlayback();
+		}
+	}
+	,LoadMidi: function(data) {
+		this.Stop();
+		var input = alphaTab.io.ByteBuffer.FromBuffer(data);
+		try {
+			alphaTab.util.Logger.Info("AlphaSynth","Loading midi from bytes",null);
+			var midi = new alphaSynth.midi.MidiFile();
+			midi.Load(input);
+			this._sequencer.LoadMidi(midi);
+			this._isMidiLoaded = true;
+			this.OnMidiLoaded();
+			alphaTab.util.Logger.Info("AlphaSynth","Midi successfully loaded",null);
+			this.CheckReadyForPlayback();
+			this.set_TickPosition(0);
+		} catch( e ) {
+			if (e instanceof js._Boot.HaxeError) e = e.val;
+			if( js.Boot.__instanceof(e,system.Exception) ) {
+				alphaTab.util.Logger.Error("AlphaSynth","Could not load midi from bytes " + Std.string(e),null);
+				this.OnMidiLoadFailed();
+			} else throw(e);
+		}
+	}
+	,SetChannelMute: function(channel,mute) {
+		this._synthesizer.SetChannelMute(channel,mute);
+	}
+	,ResetChannelStates: function() {
+		this._synthesizer.ResetChannelStates();
+	}
+	,SetChannelSolo: function(channel,solo) {
+		this._synthesizer.SetChannelSolo(channel,solo);
+	}
+	,SetChannelVolume: function(channel,volume) {
+		var this1 = 0;
+		var this2 = 10;
+		volume = alphaSynth.util.SynthHelper.ClampD(volume,this1,this2);
+		this._synthesizer.SetChannelVolume(channel,volume);
+	}
+	,SetChannelProgram: function(channel,program) {
+		program = alphaSynth.util.SynthHelper.ClampB(program,0,127);
+		this._sequencer.SetChannelProgram(channel,program);
+		this._synthesizer.SetChannelProgram(channel,program);
+	}
+	,On: function(events,action) {
+	}
+	,OnSamplesPlayed: function(sampleCount) {
+		var playedMillis = sampleCount / js.Boot.__cast(this._synthesizer.SampleRate , Float) * 1000;
+		this.UpdateTimePosition(this._timePosition + playedMillis);
+	}
+	,UpdateTimePosition: function(timePosition) {
+		var currentTime = this._timePosition = timePosition;
+		var currentTick = this._tickPosition = this._sequencer.TimePositionToTickPosition(currentTime);
+		var endTime = this._sequencer.get_EndTime();
+		var endTick = this._sequencer.EndTick;
+		alphaTab.util.Logger.Debug("AlphaSynth","Position changed: (time: " + currentTime + "/" + endTime + ", tick: " + currentTick + "/" + endTime + ")",null);
+		this.OnPositionChanged(new alphaSynth.PositionChangedEventArgs(currentTime,endTime,currentTick,endTick));
+	}
+	,OnFinished: function(isLooping) {
+		var _e = this.Finished;
+		var handler = function(p) {
+			system._EventAction1.EventAction1_Impl_.Invoke(_e,p);
+		};
+		if(handler != null) {
+			handler(isLooping);
+		}
+	}
+	,OnPlayerStateChanged: function(e) {
+		var _e = this.PlayerStateChanged;
+		var handler = function(p) {
+			system._EventAction1.EventAction1_Impl_.Invoke(_e,p);
+		};
+		if(handler != null) {
+			handler(e);
+		}
+	}
+	,OnSoundFontLoaded: function() {
+		var _e = this.SoundFontLoaded;
+		var handler = function() {
+			system._EventAction.EventAction_Impl_.Invoke(_e);
+		};
+		if(handler != null) {
+			handler();
+		}
+	}
+	,OnReadyForPlayback: function() {
+		var _e = this.ReadyForPlayback;
+		var handler = function() {
+			system._EventAction.EventAction_Impl_.Invoke(_e);
+		};
+		if(handler != null) {
+			handler();
+		}
+	}
+	,OnSoundFontLoadFailed: function() {
+		var _e = this.SoundFontLoadFailed;
+		var handler = function() {
+			system._EventAction.EventAction_Impl_.Invoke(_e);
+		};
+		if(handler != null) {
+			handler();
+		}
+	}
+	,OnMidiLoaded: function() {
+		var _e = this.MidiLoaded;
+		var handler = function() {
+			system._EventAction.EventAction_Impl_.Invoke(_e);
+		};
+		if(handler != null) {
+			handler();
+		}
+	}
+	,OnMidiLoadFailed: function() {
+		var _e = this.MidiLoadFailed;
+		var handler = function() {
+			system._EventAction.EventAction_Impl_.Invoke(_e);
+		};
+		if(handler != null) {
+			handler();
+		}
+	}
+	,OnPositionChanged: function(e) {
+		var _e = this.PositionChanged;
+		var handler = function(p) {
+			system._EventAction1.EventAction1_Impl_.Invoke(_e,p);
+		};
+		if(handler != null) {
+			handler(e);
+		}
+	}
+	,__class__: alphaSynth.AlphaSynth
+};
+alphaSynth.ISynthOutput = function() { };
+alphaSynth.ISynthOutput.__name__ = ["alphaSynth","ISynthOutput"];
+alphaSynth.ISynthOutput.prototype = {
+	__class__: alphaSynth.ISynthOutput
+};
+alphaSynth.MidiFileSequencer = function(synthesizer) {
+	this._synthesizer = null;
+	this._tempoChanges = null;
+	this._firstProgramEventPerChannel = null;
+	this._synthData = null;
+	this._division = 0;
+	this._eventIndex = 0;
+	this._currentTime = 0.0;
+	this._playbackRange = null;
+	this._playbackRangeStartTime = 0.0;
+	this._playbackRangeEndTime = 0.0;
+	this._endTime = 0.0;
+	this.IsLooping = false;
+	this.EndTick = 0;
+	this.PlaybackSpeed = 0.0;
+	this._synthesizer = synthesizer;
+	var this1 = {}
+	this._firstProgramEventPerChannel = this1;
+	var this2 = [];
+	this._tempoChanges = this2;
+	this.PlaybackSpeed = 1;
+};
+alphaSynth.MidiFileSequencer.__name__ = ["alphaSynth","MidiFileSequencer"];
+alphaSynth.MidiFileSequencer.prototype = {
+	get_PlaybackRange: function() {
+		return this._playbackRange;
+	}
+	,set_PlaybackRange: function(value) {
+		this._playbackRange = value;
+		if(value != null) {
+			this._playbackRangeStartTime = this.TickPositionToTimePositionWithSpeed(value.StartTick,1);
+			this._playbackRangeEndTime = this.TickPositionToTimePositionWithSpeed(value.EndTick,1);
+		}
+		return this.get_PlaybackRange();
+	}
+	,get_EndTime: function() {
+		return this._endTime / this.PlaybackSpeed;
+	}
+	,Seek: function(timePosition) {
+		if(timePosition < 0) {
+			timePosition = 0;
+		}
+		timePosition = timePosition * this.PlaybackSpeed;
+		if(this.get_PlaybackRange() != null) {
+			if(timePosition < this._playbackRangeStartTime) {
+				timePosition = this._playbackRangeStartTime;
+			} else if(timePosition > this._playbackRangeEndTime) {
+				timePosition = this._playbackRangeEndTime;
+			}
+		}
+		if(timePosition > this._currentTime) {
+			this.SilentProcess(timePosition - this._currentTime);
+		} else if(timePosition < this._currentTime) {
+			this._currentTime = 0;
+			this._eventIndex = 0;
+			this._synthesizer.NoteOffAll(true);
+			this._synthesizer.ResetPrograms();
+			this._synthesizer.ResetSynthControls();
+			this.SilentProcess(timePosition);
+		}
+	}
+	,SilentProcess: function(milliseconds) {
+		if(milliseconds <= 0) {
+			return;
+		}
+		this._currentTime = this._currentTime + milliseconds;
+		while(this._eventIndex < this._synthData.length && this._synthData[this._eventIndex].Delta < this._currentTime) {
+			var m = this._synthData[this._eventIndex];
+			if(!m.IsMetronome) {
+				this._synthesizer.ProcessMidiMessage(m.Event);
+			}
+			this._eventIndex++;
+		}
+	}
+	,LoadMidi: function(midiFile) {
+		var this1 = [];
+		this._tempoChanges = this1;
+		if(midiFile.Tracks.length > 1 || midiFile.Tracks[0].EndTime == 0) {
+			midiFile.CombineTracks();
+		}
+		this._division = midiFile.Division;
+		this._eventIndex = 0;
+		this._currentTime = 0;
+		var this2 = [];
+		this._synthData = this2;
+		var bpm = 120;
+		var absTick = 0;
+		var absTime = 0.0;
+		var metronomeLength = 0;
+		var metronomeTick = 0;
+		var metronomeTime = 0.0;
+		var x = 0;
+		while(x < midiFile.Tracks[0].MidiEvents.length) {
+			var mEvent = midiFile.Tracks[0].MidiEvents[x];
+			var synthData = new alphaSynth.synthesis.SynthEvent(this._synthData.length,mEvent);
+			this._synthData.push(synthData);
+			absTick = absTick + mEvent.DeltaTime;
+			absTime = absTime + mEvent.DeltaTime * (60000.0 / (bpm * midiFile.Division));
+			synthData.Delta = absTime;
+			if(mEvent.get_Command() == 255 && mEvent.get_Data1() == 81) {
+				var meta = js.Boot.__cast(mEvent , alphaSynth.midi.event.MetaNumberEvent);
+				bpm = 60000000 / js.Boot.__cast(meta.Value , Float);
+				this._tempoChanges.push(new alphaSynth.MidiFileSequencerTempoChange(bpm,absTick,system.Convert.ToInt32_Double(absTime)));
+			} else if(mEvent.get_Command() == 255 && mEvent.get_Data1() == 88) {
+				var meta1 = js.Boot.__cast(mEvent , alphaSynth.midi.event.MetaDataEvent);
+				var this3 = meta1.Data[1];
+				var timeSignatureDenominator = system.Convert.ToInt32_Double(Math.pow(2,this3));
+				metronomeLength = system.Convert.ToInt32_Double(this._division * (4.0 / timeSignatureDenominator));
+			} else if(mEvent.get_Command() == 192) {
+				var channel = mEvent.get_Channel();
+				if(!this._firstProgramEventPerChannel.hasOwnProperty(channel)) {
+					this._firstProgramEventPerChannel[channel] = synthData;
+				}
+			}
+			if(metronomeLength > 0) {
+				while(metronomeTick < absTick) {
+					var metronome = alphaSynth.synthesis.SynthEvent.NewMetronomeEvent(this._synthData.length,metronomeLength);
+					this._synthData.push(metronome);
+					metronome.Delta = metronomeTime;
+					metronomeTick = metronomeTick + metronomeLength;
+					metronomeTime = metronomeTime + metronomeLength * (60000.0 / (bpm * midiFile.Division));
+				}
+			}
+			++x;
+		}
+		var comparison = function(a,b) {
+			if(a.Delta > b.Delta) {
+				return 1;
+			} else if(a.Delta < b.Delta) {
+				return -1;
+			}
+			return a.EventIndex - b.EventIndex;
+		};
+		this._synthData.sort(function(a1,b1) {
+			return comparison(a1,b1);
+		});
+		this._endTime = absTime;
+		this.EndTick = absTick;
+	}
+	,FillMidiEventQueue: function() {
+		var millisecondsPerBuffer = this._synthesizer.MicroBufferSize / js.Boot.__cast(this._synthesizer.SampleRate , Float) * 1000 * this.PlaybackSpeed;
+		var i = 0;
+		while(i < this._synthesizer.MicroBufferCount) {
+			this._currentTime = this._currentTime + millisecondsPerBuffer;
+			while(this._eventIndex < this._synthData.length && this._synthData[this._eventIndex].Delta < this._currentTime) {
+				this._synthesizer.DispatchEvent(i,this._synthData[this._eventIndex]);
+				this._eventIndex++;
+			}
+			++i;
+		}
+	}
+	,TickPositionToTimePosition: function(tickPosition) {
+		return this.TickPositionToTimePositionWithSpeed(tickPosition,this.PlaybackSpeed);
+	}
+	,TimePositionToTickPosition: function(timePosition) {
+		return this.TimePositionToTickPositionWithSpeed(timePosition,this.PlaybackSpeed);
+	}
+	,TickPositionToTimePositionWithSpeed: function(tickPosition,playbackSpeed) {
+		var timePosition = 0.0;
+		var bpm = 120.0;
+		var lastChange = 0;
+		var i = 0;
+		while(i < this._tempoChanges.length) {
+			var c = this._tempoChanges[i];
+			if(tickPosition < c.Ticks) {
+				break;
+			}
+			var this1 = c.Time;
+			timePosition = this1;
+			bpm = c.Bpm;
+			lastChange = c.Ticks;
+			++i;
+		}
+		tickPosition = tickPosition - lastChange;
+		timePosition = timePosition + tickPosition * (60000.0 / (bpm * this._division));
+		return timePosition / playbackSpeed;
+	}
+	,TimePositionToTickPositionWithSpeed: function(timePosition,playbackSpeed) {
+		timePosition = timePosition * playbackSpeed;
+		var ticks = 0;
+		var bpm = 120.0;
+		var lastChange = 0;
+		var i = 0;
+		while(i < this._tempoChanges.length) {
+			var c = this._tempoChanges[i];
+			if(timePosition < c.Time) {
+				break;
+			}
+			ticks = c.Ticks;
+			bpm = c.Bpm;
+			lastChange = c.Time;
+			++i;
+		}
+		timePosition = timePosition - lastChange;
+		ticks = ticks + system.Convert.ToInt32_Double(timePosition / (60000.0 / (bpm * this._division)));
+		return ticks + 1;
+	}
+	,OnFinished: function() {
+		var _e = this.Finished;
+		var finished = function() {
+			system._EventAction.EventAction_Impl_.Invoke(_e);
+		};
+		if(finished != null) {
+			finished();
+		}
+	}
+	,CheckForStop: function() {
+		if(this.get_PlaybackRange() == null && this._currentTime >= this._endTime) {
+			this._currentTime = 0;
+			this._eventIndex = 0;
+			this._synthesizer.NoteOffAll(true);
+			this._synthesizer.ResetPrograms();
+			this._synthesizer.ResetSynthControls();
+			this.OnFinished();
+		} else if(this.get_PlaybackRange() != null && this._currentTime >= this._playbackRangeEndTime) {
+			var this1 = this.get_PlaybackRange().StartTick;
+			this._currentTime = this1;
+			this._eventIndex = 0;
+			this._synthesizer.NoteOffAll(true);
+			this._synthesizer.ResetPrograms();
+			this._synthesizer.ResetSynthControls();
+			this.OnFinished();
+		}
+	}
+	,SetChannelProgram: function(channel,program) {
+		if(this._firstProgramEventPerChannel.hasOwnProperty(channel)) {
+			this._firstProgramEventPerChannel[channel].Event.set_Data1(program);
+		}
+	}
+	,__class__: alphaSynth.MidiFileSequencer
+};
+alphaSynth.MidiFileSequencerTempoChange = function(bpm,ticks,time) {
+	this.Bpm = 0.0;
+	this.Ticks = 0;
+	this.Time = 0;
+	this.Bpm = bpm;
+	this.Ticks = ticks;
+	this.Time = time;
+};
+alphaSynth.MidiFileSequencerTempoChange.__name__ = ["alphaSynth","MidiFileSequencerTempoChange"];
+alphaSynth.MidiFileSequencerTempoChange.prototype = {
+	__class__: alphaSynth.MidiFileSequencerTempoChange
+};
+alphaSynth._PlayerState = {};
+alphaSynth._PlayerState.PlayerState_Impl_ = {};
+alphaSynth._PlayerState.PlayerState_Impl_.__name__ = ["alphaSynth","_PlayerState","PlayerState_Impl_"];
+alphaSynth._PlayerState.PlayerState_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth._PlayerState.PlayerState_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth._PlayerState.PlayerState_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth._PlayerState.PlayerState_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth._PlayerState.PlayerState_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth._PlayerState.PlayerState_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth._PlayerState.PlayerState_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth._PlayerState.PlayerState_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth._PlayerState.PlayerState_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth._PlayerState.PlayerState_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth._PlayerState.PlayerState_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth._PlayerState.PlayerState_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth._PlayerState.PlayerState_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "Paused";
+	case 1:
+		return "Playing";
+	}
+	return "";
+};
+alphaSynth.PlayerStateChangedEventArgs = function(state) {
+	this.State = null;
+	this.State = state;
+};
+alphaSynth.PlayerStateChangedEventArgs.__name__ = ["alphaSynth","PlayerStateChangedEventArgs"];
+alphaSynth.PlayerStateChangedEventArgs.prototype = {
+	__class__: alphaSynth.PlayerStateChangedEventArgs
+};
+alphaSynth.PositionChangedEventArgs = function(currentTime,endTime,currentTick,endTick) {
+	this.CurrentTime = 0.0;
+	this.EndTime = 0.0;
+	this.CurrentTick = 0;
+	this.EndTick = 0;
+	this.CurrentTime = currentTime;
+	this.EndTime = endTime;
+	this.CurrentTick = currentTick;
+	this.EndTick = endTick;
+};
+alphaSynth.PositionChangedEventArgs.__name__ = ["alphaSynth","PositionChangedEventArgs"];
+alphaSynth.PositionChangedEventArgs.prototype = {
+	__class__: alphaSynth.PositionChangedEventArgs
+};
+alphaSynth.bank = {};
+alphaSynth.bank.AssetManager = function() {
+	this.PatchAssets = null;
+	this.SampleAssets = null;
+	var this1 = [];
+	this.PatchAssets = this1;
+	var this2 = [];
+	this.SampleAssets = this2;
+};
+alphaSynth.bank.AssetManager.__name__ = ["alphaSynth","bank","AssetManager"];
+alphaSynth.bank.AssetManager.prototype = {
+	FindPatch: function(name) {
+		var patchAsset = $iterator(this.PatchAssets)();
+		while(patchAsset.hasNext()) {
+			var patchAsset1 = patchAsset.next();
+			if(patchAsset1.Name == name) {
+				return patchAsset1;
+			}
+		}
+		return null;
+	}
+	,FindSample: function(name) {
+		var sampleDataAsset = $iterator(this.SampleAssets)();
+		while(sampleDataAsset.hasNext()) {
+			var sampleDataAsset1 = sampleDataAsset.next();
+			if(sampleDataAsset1.Name == name) {
+				return sampleDataAsset1;
+			}
+		}
+		return null;
+	}
+	,__class__: alphaSynth.bank.AssetManager
+};
+alphaSynth.bank.PatchAsset = function(name,patch) {
+	this.Name = null;
+	this.Patch = null;
+	this.Name = name;
+	this.Patch = patch;
+};
+alphaSynth.bank.PatchAsset.__name__ = ["alphaSynth","bank","PatchAsset"];
+alphaSynth.bank.PatchAsset.prototype = {
+	__class__: alphaSynth.bank.PatchAsset
+};
+alphaSynth.bank.PatchBank = function() {
+	this._bank = null;
+	this._assets = null;
+	this.Name = null;
+	this.Comments = null;
+	this.Reset();
+};
+alphaSynth.bank.PatchBank.__name__ = ["alphaSynth","bank","PatchBank"];
+alphaSynth.bank.PatchBank.prototype = {
+	Reset: function() {
+		var this1 = {}
+		this._bank = this1;
+		this._assets = new alphaSynth.bank.AssetManager();
+		this.Name = "";
+		this.Comments = "";
+	}
+	,get_LoadedBanks: function() {
+		var this1 = [];
+		var banks = this1;
+		var this2 = this._bank;
+		var bank = $iterator(Object.keys(this2))();
+		while(bank.hasNext()) {
+			var bank1 = bank.next();
+			banks.push(bank1);
+		}
+		return new Int32Array(banks);
+	}
+	,GetBank: function(bankNumber) {
+		if(this._bank.hasOwnProperty(bankNumber)) {
+			return this._bank[bankNumber];
+		} else {
+			return null;
+		}
+	}
+	,GetPatchByNumber: function(bankNumber,patchNumber) {
+		if(this._bank.hasOwnProperty(bankNumber)) {
+			return this._bank[bankNumber][patchNumber];
+		} else {
+			return null;
+		}
+	}
+	,GetPatchByName: function(bankNumber,name) {
+		if(this._bank.hasOwnProperty(bankNumber)) {
+			var patches = this._bank[bankNumber];
+			var patch = HxOverrides.iter(patches);
+			while(patch.hasNext()) {
+				var patch1 = patch.next();
+				if(patch1 != null && patch1.Name == name) {
+					return patch1;
+				}
+			}
+		}
+		return null;
+	}
+	,IsBankLoaded: function(bankNumber) {
+		return this._bank.hasOwnProperty(bankNumber);
+	}
+	,LoadSf2: function(input) {
+		this.Reset();
+		alphaTab.util.Logger.Debug("PatchBank","Reading SF2",null);
+		var sf = new alphaSynth.sf2.SoundFont();
+		sf.Load(input);
+		alphaTab.util.Logger.Debug("PatchBank","Building patchbank",null);
+		this.Name = sf.Info.BankName;
+		this.Comments = sf.Info.Comments;
+		var sampleHeader = HxOverrides.iter(sf.Presets.SampleHeaders);
+		while(sampleHeader.hasNext()) {
+			var sampleHeader1 = sampleHeader.next();
+			this._assets.SampleAssets.push(new alphaSynth.bank.SampleDataAsset(sampleHeader1,sf.SampleData));
+		}
+		var sfinsts = this.ReadSf2Instruments(sf.Presets.Instruments);
+		var p = HxOverrides.iter(sf.Presets.PresetHeaders);
+		while(p.hasNext()) {
+			var p1 = p.next();
+			var globalGens = null;
+			var i;
+			if(p1.Zones[0].Generators.length == 0 || p1.Zones[0].Generators[p1.Zones[0].Generators.length - 1].GeneratorType != 41) {
+				globalGens = p1.Zones[0].Generators;
+				i = 1;
+			} else {
+				i = 0;
+			}
+			var this1 = [];
+			var regionList = this1;
+			while(i < p1.Zones.length) {
+				var presetLoKey = 0;
+				var presetHiKey = 127;
+				var presetLoVel = 0;
+				var presetHiVel = 127;
+				if(p1.Zones[i].Generators[0].GeneratorType == 43) {
+					if(true) {
+						presetLoKey = alphaTab.platform.Platform.ToUInt8(p1.Zones[i].Generators[0].get_AmountInt16() & 255);
+						presetHiKey = alphaTab.platform.Platform.ToUInt8(p1.Zones[i].Generators[0].get_AmountInt16() >> 8 & 255);
+					} else {
+						presetHiKey = alphaTab.platform.Platform.ToUInt8(p1.Zones[i].Generators[0].get_AmountInt16() & 255);
+						presetLoKey = alphaTab.platform.Platform.ToUInt8(p1.Zones[i].Generators[0].get_AmountInt16() >> 8 & 255);
+					}
+					if(p1.Zones[i].Generators.length > 1 && p1.Zones[i].Generators[1].GeneratorType == 44) {
+						if(true) {
+							presetLoVel = alphaTab.platform.Platform.ToUInt8(p1.Zones[i].Generators[1].get_AmountInt16() & 255);
+							presetHiVel = alphaTab.platform.Platform.ToUInt8(p1.Zones[i].Generators[1].get_AmountInt16() >> 8 & 255);
+						} else {
+							presetHiVel = alphaTab.platform.Platform.ToUInt8(p1.Zones[i].Generators[1].get_AmountInt16() & 255);
+							presetLoVel = alphaTab.platform.Platform.ToUInt8(p1.Zones[i].Generators[1].get_AmountInt16() >> 8 & 255);
+						}
+					}
+				} else if(p1.Zones[i].Generators[0].GeneratorType == 44) {
+					if(true) {
+						presetLoVel = alphaTab.platform.Platform.ToUInt8(p1.Zones[i].Generators[0].get_AmountInt16() & 255);
+						presetHiVel = alphaTab.platform.Platform.ToUInt8(p1.Zones[i].Generators[0].get_AmountInt16() >> 8 & 255);
+					} else {
+						presetHiVel = alphaTab.platform.Platform.ToUInt8(p1.Zones[i].Generators[0].get_AmountInt16() & 255);
+						presetLoVel = alphaTab.platform.Platform.ToUInt8(p1.Zones[i].Generators[0].get_AmountInt16() >> 8 & 255);
+					}
+				}
+				if(p1.Zones[i].Generators[p1.Zones[i].Generators.length - 1].GeneratorType == 41) {
+					var insts = sfinsts[p1.Zones[i].Generators[p1.Zones[i].Generators.length - 1].get_AmountInt16()];
+					var inst = HxOverrides.iter(insts);
+					while(inst.hasNext()) {
+						var inst1 = inst.next();
+						var instLoKey;
+						var instHiKey;
+						var instLoVel;
+						var instHiVel;
+						if(true) {
+							instLoKey = alphaTab.platform.Platform.ToUInt8(inst1.Generators[43] & 255);
+							instHiKey = alphaTab.platform.Platform.ToUInt8(inst1.Generators[43] >> 8 & 255);
+							instLoVel = alphaTab.platform.Platform.ToUInt8(inst1.Generators[44] & 255);
+							instHiVel = alphaTab.platform.Platform.ToUInt8(inst1.Generators[44] >> 8 & 255);
+						} else {
+							instHiKey = alphaTab.platform.Platform.ToUInt8(inst1.Generators[43] & 255);
+							instLoKey = alphaTab.platform.Platform.ToUInt8(inst1.Generators[43] >> 8 & 255);
+							instHiVel = alphaTab.platform.Platform.ToUInt8(inst1.Generators[44] & 255);
+							instLoVel = alphaTab.platform.Platform.ToUInt8(inst1.Generators[44] >> 8 & 255);
+						}
+						if(instLoKey <= presetHiKey && presetLoKey <= instHiKey && (instLoVel <= presetHiVel && presetLoVel <= instHiVel)) {
+							var r = new alphaSynth.sf2.Sf2Region();
+							alphaTab.platform.Platform.ArrayCopy_Int16Array_Int32_Int16Array_Int32_Int32(inst1.Generators,0,r.Generators,0,r.Generators.length);
+							this.ReadSf2Region(r,globalGens,p1.Zones[i].Generators,true);
+							regionList.push(r);
+						}
+					}
+				}
+				++i;
+			}
+			var mp = new alphaSynth.bank.patch.MultiPatch(p1.Name);
+			mp.LoadSf2(regionList,this._assets);
+			this._assets.PatchAssets.push(new alphaSynth.bank.PatchAsset(mp.Name,mp));
+			this.AssignPatchToBank(mp,p1.BankNumber,p1.PatchNumber,p1.PatchNumber);
+		}
+	}
+	,ReadSf2Instruments: function(instruments) {
+		var size = instruments.length;
+		var this1 = new Array(size);
+		var regions = this1;
+		var x = 0;
+		while(x < instruments.length) {
+			var globalGens = null;
+			var i;
+			if(instruments[x].Zones[0].Generators.length == 0 || instruments[x].Zones[0].Generators[instruments[x].Zones[0].Generators.length - 1].GeneratorType != 53) {
+				globalGens = instruments[x].Zones[0].Generators;
+				i = 1;
+			} else {
+				i = 0;
+			}
+			var size1 = instruments[x].Zones.length - i;
+			var this2 = new Array(size1);
+			regions[x] = this2;
+			var j = 0;
+			while(j < regions[x].length) {
+				var r = new alphaSynth.sf2.Sf2Region();
+				r.ApplyDefaultValues();
+				this.ReadSf2Region(r,globalGens,instruments[x].Zones[j + i].Generators,false);
+				regions[x][j] = r;
+				++j;
+			}
+			++x;
+		}
+		return regions;
+	}
+	,ReadSf2Region: function(region,globals,gens,isRelative) {
+		if(!isRelative) {
+			if(globals != null) {
+				var x = 0;
+				while(x < globals.length) {
+					region.Generators[globals[x].GeneratorType] = globals[x].get_AmountInt16();
+					++x;
+				}
+			}
+			var x1 = 0;
+			while(x1 < gens.length) {
+				region.Generators[gens[x1].GeneratorType] = gens[x1].get_AmountInt16();
+				++x1;
+			}
+		} else {
+			var this1 = [];
+			var genList = this1;
+			var generator = HxOverrides.iter(gens);
+			while(generator.hasNext()) {
+				var generator1 = generator.next();
+				genList.push(generator1);
+			}
+			if(globals != null) {
+				var x2 = 0;
+				while(x2 < globals.length) {
+					var found = false;
+					var i = 0;
+					while(i < genList.length) {
+						if(genList[i].GeneratorType == globals[x2].GeneratorType) {
+							found = true;
+							break;
+						}
+						++i;
+					}
+					if(!found) {
+						genList.push(globals[x2]);
+					}
+					++x2;
+				}
+			}
+			var x3 = 0;
+			while(x3 < genList.length) {
+				var value = genList[x3].GeneratorType;
+				if(value < 5 || value == 12 || value == 45 || value == 46 || value == 47 || value == 50 || value == 54 || value == 57 || value == 58) {
+					++x3;
+					continue;
+				} else if(value == 43 || value == 44) {
+					var lo_a;
+					var hi_a;
+					var lo_b;
+					var hi_b;
+					if(true) {
+						lo_a = alphaTab.platform.Platform.ToUInt8(region.Generators[value] & 255);
+						hi_a = alphaTab.platform.Platform.ToUInt8(region.Generators[value] >> 8 & 255);
+						lo_b = alphaTab.platform.Platform.ToUInt8(genList[x3].get_AmountInt16() & 255);
+						hi_b = alphaTab.platform.Platform.ToUInt8(genList[x3].get_AmountInt16() >> 8 & 255);
+					} else {
+						hi_a = alphaTab.platform.Platform.ToUInt8(region.Generators[value] & 255);
+						lo_a = alphaTab.platform.Platform.ToUInt8(region.Generators[value] >> 8 & 255);
+						hi_b = alphaTab.platform.Platform.ToUInt8(genList[x3].get_AmountInt16() & 255);
+						lo_b = alphaTab.platform.Platform.ToUInt8(genList[x3].get_AmountInt16() >> 8 & 255);
+					}
+					lo_a = Math.max(lo_a,lo_b);
+					hi_a = Math.min(hi_a,hi_b);
+					if(lo_a > hi_a) {
+						throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid sf2 region. The range generators do not intersect."));
+					}
+					if(true) {
+						region.Generators[value] = alphaTab.platform.Platform.ToInt16(lo_a | hi_a << 8);
+					} else {
+						region.Generators[value] = alphaTab.platform.Platform.ToInt16(lo_a << 8 | hi_a);
+					}
+				} else {
+					region.Generators[value] = alphaTab.platform.Platform.ToInt16(region.Generators[value] + genList[x3].get_AmountInt16());
+				}
+				++x3;
+			}
+		}
+	}
+	,AssignPatchToBank: function(patch,bankNumber,startRange,endRange) {
+		if(bankNumber < 0) {
+			return;
+		}
+		if(startRange > endRange) {
+			var range = startRange;
+			startRange = endRange;
+			endRange = range;
+		}
+		if(startRange < 0 || startRange >= 128) {
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("startRange out of range"));
+		}
+		if(endRange < 0 || endRange >= 128) {
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("endRange out of range"));
+		}
+		var patches;
+		if(this._bank.hasOwnProperty(bankNumber)) {
+			patches = this._bank[bankNumber];
+		} else {
+			var this1 = new Array(128);
+			patches = this1;
+			this._bank[bankNumber] = patches;
+		}
+		var x = startRange;
+		while(x <= endRange) {
+			patches[x] = patch;
+			++x;
+		}
+	}
+	,__class__: alphaSynth.bank.PatchBank
+};
+alphaSynth.bank.PcmData = function(bits,pcmData,isDataInLittleEndianFormat) {
+	this.Data = null;
+	this.Length = 0;
+	this.BytesPerSample = 0;
+	this.BytesPerSample = system.Convert.ToUInt8(bits / 8 | 0);
+	this.Data = pcmData;
+	this.Length = this.Data.length / this.BytesPerSample | 0;
+	if(true != isDataInLittleEndianFormat) {
+		alphaSynth.util.SynthHelper.SwapEndianess(this.Data,bits);
+	}
+};
+alphaSynth.bank.PcmData.__name__ = ["alphaSynth","bank","PcmData"];
+alphaSynth.bank.PcmData.Create = function(bits,pcmData,isDataInLittleEndianFormat) {
+	switch(bits) {
+	case 8:
+		return new alphaSynth.bank.PcmData8Bit(bits,pcmData,isDataInLittleEndianFormat);
+	case 16:
+		return new alphaSynth.bank.PcmData16Bit(bits,pcmData,isDataInLittleEndianFormat);
+	case 24:
+		return new alphaSynth.bank.PcmData24Bit(bits,pcmData,isDataInLittleEndianFormat);
+	case 32:
+		return new alphaSynth.bank.PcmData32Bit(bits,pcmData,isDataInLittleEndianFormat);
+	default:
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid PCM format. " + bits + "bit pcm data is not supported."));
+	}
+};
+alphaSynth.bank.PcmData.prototype = {
+	get_BitsPerSample: function() {
+		return this.BytesPerSample * 8;
+	}
+	,get_Item: function(index) {
+		throw new js._Boot.HaxeError("abstract");
+	}
+	,__class__: alphaSynth.bank.PcmData
+};
+alphaSynth.bank.PcmData16Bit = function(bits,pcmData,isDataInLittleEndianFormat) {
+	alphaSynth.bank.PcmData.call(this,bits,pcmData,isDataInLittleEndianFormat);
+};
+alphaSynth.bank.PcmData16Bit.__name__ = ["alphaSynth","bank","PcmData16Bit"];
+alphaSynth.bank.PcmData16Bit.__super__ = alphaSynth.bank.PcmData;
+alphaSynth.bank.PcmData16Bit.prototype = $extend(alphaSynth.bank.PcmData.prototype,{
+	get_Item: function(index) {
+		index = index * 2;
+		var this1 = 32768;
+		return ((this.Data[index] | this.Data[index + 1] << 8) << 16 >> 16) / this1;
+	}
+	,__class__: alphaSynth.bank.PcmData16Bit
+});
+alphaSynth.bank.PcmData24Bit = function(bits,pcmData,isDataInLittleEndianFormat) {
+	alphaSynth.bank.PcmData.call(this,bits,pcmData,isDataInLittleEndianFormat);
+};
+alphaSynth.bank.PcmData24Bit.__name__ = ["alphaSynth","bank","PcmData24Bit"];
+alphaSynth.bank.PcmData24Bit.__super__ = alphaSynth.bank.PcmData;
+alphaSynth.bank.PcmData24Bit.prototype = $extend(alphaSynth.bank.PcmData.prototype,{
+	get_Item: function(index) {
+		index = index * 3;
+		var this1 = 8388608;
+		return ((this.Data[index] | this.Data[index + 1] << 8 | this.Data[index + 2] << 16) << 12 >> 12) / this1;
+	}
+	,__class__: alphaSynth.bank.PcmData24Bit
+});
+alphaSynth.bank.PcmData32Bit = function(bits,pcmData,isDataInLittleEndianFormat) {
+	alphaSynth.bank.PcmData.call(this,bits,pcmData,isDataInLittleEndianFormat);
+};
+alphaSynth.bank.PcmData32Bit.__name__ = ["alphaSynth","bank","PcmData32Bit"];
+alphaSynth.bank.PcmData32Bit.__super__ = alphaSynth.bank.PcmData;
+alphaSynth.bank.PcmData32Bit.prototype = $extend(alphaSynth.bank.PcmData.prototype,{
+	get_Item: function(index) {
+		index = index * 4;
+		var this1 = 2147483648;
+		return (this.Data[index] | this.Data[index + 1] << 8 | this.Data[index + 2] << 16 | this.Data[index + 3] << 24) / this1;
+	}
+	,__class__: alphaSynth.bank.PcmData32Bit
+});
+alphaSynth.bank.PcmData8Bit = function(bits,pcmData,isDataInLittleEndianFormat) {
+	alphaSynth.bank.PcmData.call(this,bits,pcmData,isDataInLittleEndianFormat);
+};
+alphaSynth.bank.PcmData8Bit.__name__ = ["alphaSynth","bank","PcmData8Bit"];
+alphaSynth.bank.PcmData8Bit.__super__ = alphaSynth.bank.PcmData;
+alphaSynth.bank.PcmData8Bit.prototype = $extend(alphaSynth.bank.PcmData.prototype,{
+	get_Item: function(index) {
+		var this1 = 255;
+		var this2 = 2;
+		var this3 = 1;
+		return this.Data[index] / this1 * this2 - this3;
+	}
+	,__class__: alphaSynth.bank.PcmData8Bit
+});
+alphaSynth.bank.SampleDataAsset = function(sample,sampleData) {
+	this.Name = null;
+	this.Channels = 0;
+	this.SampleRate = 0;
+	this.RootKey = 0;
+	this.Tune = 0;
+	this.Start = 0.0;
+	this.End = 0.0;
+	this.LoopStart = 0.0;
+	this.LoopEnd = 0.0;
+	this.SampleData = null;
+	this.Channels = 1;
+	this.Name = sample.Name;
+	this.SampleRate = sample.SampleRate;
+	this.RootKey = sample.RootKey;
+	this.Tune = sample.Tune;
+	var this1 = sample.Start;
+	this.Start = this1;
+	var this2 = sample.End;
+	this.End = this2;
+	var this3 = sample.StartLoop;
+	this.LoopStart = this3;
+	var this4 = sample.EndLoop;
+	this.LoopEnd = this4;
+	if((sample.SoundFontSampleLink & 16) != 0) {
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Ogg Vobis encoded soundfonts not supported"));
+	} else {
+		this.SampleData = alphaSynth.bank.PcmData.Create(sampleData.BitsPerSample,sampleData.SampleData,true);
+	}
+};
+alphaSynth.bank.SampleDataAsset.__name__ = ["alphaSynth","bank","SampleDataAsset"];
+alphaSynth.bank.SampleDataAsset.prototype = {
+	__class__: alphaSynth.bank.SampleDataAsset
+};
+alphaSynth.bank.components = {};
+alphaSynth.bank.components.Envelope = function() {
+	this._stages = null;
+	this._index = 0;
+	this._stage = null;
+	this.Value = 0.0;
+	this.CurrentStage = null;
+	this.Depth = 0.0;
+	this.Value = 0;
+	this.Depth = 0;
+	var this1 = new Array(7);
+	this._stages = this1;
+	var x = 0;
+	while(x < this._stages.length) {
+		this._stages[x] = new alphaSynth.bank.components.EnvelopeStage();
+		this._stages[x].Graph = alphaSynth.util.Tables.EnvelopeTables(0);
+		++x;
+	}
+	this._stages[3].Reverse = true;
+	this._stages[5].Reverse = true;
+	this._stages[6].Time = 100000000;
+	this.CurrentStage = 0;
+	this._stage = this._stages[this.CurrentStage];
+};
+alphaSynth.bank.components.Envelope.__name__ = ["alphaSynth","bank","components","Envelope"];
+alphaSynth.bank.components.Envelope.prototype = {
+	QuickSetupSf2: function(sampleRate,note,keyNumToHold,keyNumToDecay,isVolumeEnvelope,envelopeInfo) {
+		this.Depth = envelopeInfo.Depth;
+		this._stages[0].Offset = 0;
+		this._stages[0].Scale = 0;
+		this._stages[0].Time = Math.max(0,system.Convert.ToInt32_Single(sampleRate * envelopeInfo.DelayTime));
+		this._stages[1].Offset = envelopeInfo.StartLevel;
+		this._stages[1].Scale = envelopeInfo.PeakLevel - envelopeInfo.StartLevel;
+		this._stages[1].Time = Math.max(0,system.Convert.ToInt32_Single(sampleRate * envelopeInfo.AttackTime));
+		this._stages[1].Graph = alphaSynth.util.Tables.EnvelopeTables(envelopeInfo.AttackGraph);
+		this._stages[2].Offset = 0;
+		this._stages[2].Scale = envelopeInfo.PeakLevel;
+		var this1 = sampleRate * envelopeInfo.HoldTime * Math.pow(2,(60 - note) * keyNumToHold / 1200.0);
+		this._stages[2].Time = system.Convert.ToInt32_Double(Math.max(0,this1));
+		this._stages[3].Offset = envelopeInfo.SustainLevel;
+		this._stages[3].Scale = envelopeInfo.PeakLevel - envelopeInfo.SustainLevel;
+		if(envelopeInfo.SustainLevel == envelopeInfo.PeakLevel) {
+			this._stages[3].Time = 0;
+		} else {
+			this._stages[3].Time = Math.max(0,system.Convert.ToInt32_Single(sampleRate * envelopeInfo.DecayTime * Math.pow(2,(60 - note) * keyNumToDecay / 1200.0)));
+		}
+		this._stages[3].Graph = alphaSynth.util.Tables.EnvelopeTables(envelopeInfo.DecayGraph);
+		this._stages[4].Offset = 0;
+		this._stages[4].Scale = envelopeInfo.SustainLevel;
+		this._stages[4].Time = system.Convert.ToInt32_Single(sampleRate * envelopeInfo.SustainTime);
+		this._stages[5].Scale = this._stages[3].Time == 0 && this._stages[4].Time == 0 ? envelopeInfo.PeakLevel : this._stages[4].Scale;
+		if(isVolumeEnvelope) {
+			this._stages[5].Offset = -100;
+			this._stages[5].Scale = this._stages[5].Scale + 100;
+			this._stages[6].Scale = -100;
+		} else {
+			this._stages[5].Offset = 0;
+			this._stages[6].Scale = 0;
+		}
+		this._stages[5].Time = Math.max(0,system.Convert.ToInt32_Single(sampleRate * envelopeInfo.ReleaseTime));
+		this._stages[5].Graph = alphaSynth.util.Tables.EnvelopeTables(envelopeInfo.ReleaseGraph);
+		this._index = 0;
+		this.Value = 0;
+		this.CurrentStage = 0;
+		while(this._stages[this.CurrentStage].Time == 0) this.CurrentStage++;
+		this._stage = this._stages[this.CurrentStage];
+	}
+	,Increment: function(samples) {
+		while(true) {
+			var neededSamples = this._stage.Time - this._index;
+			if(neededSamples > samples) {
+				this._index = this._index + samples;
+				samples = 0;
+			} else {
+				this._index = 0;
+				if(this.CurrentStage != 6) {
+					while(true) {
+						this._stage = this._stages[++this.CurrentStage | 0];
+						if(!(this._stage.Time == 0)) {
+							break;
+						}
+					}
+				}
+				samples = samples - neededSamples;
+			}
+			if(!(samples > 0)) {
+				break;
+			}
+		}
+		var i = system.Convert.ToInt32_Double(this._stage.Graph.length * (this._index / js.Boot.__cast(this._stage.Time , Float)));
+		if(this._stage.Reverse) {
+			var this1 = 1;
+			this.Value = (this1 - this._stage.Graph[i]) * this._stage.Scale + this._stage.Offset;
+		} else {
+			this.Value = this._stage.Graph[i] * this._stage.Scale + this._stage.Offset;
+		}
+	}
+	,Release: function(lowerLimit) {
+		if(this.Value <= lowerLimit) {
+			this._index = 0;
+			this.CurrentStage = 6;
+			this._stage = this._stages[this.CurrentStage];
+		} else if(this.CurrentStage < 5) {
+			this._index = 0;
+			this.CurrentStage = 5;
+			this._stage = this._stages[this.CurrentStage];
+			this._stage.Scale = this.Value;
+		}
+	}
+	,ReleaseSf2VolumeEnvelope: function() {
+		if(this.Value <= -100) {
+			this._index = 0;
+			this.CurrentStage = 6;
+			this._stage = this._stages[this.CurrentStage];
+		} else if(this.CurrentStage < 5) {
+			this._index = 0;
+			this.CurrentStage = 5;
+			this._stage = this._stages[this.CurrentStage];
+			this._stage.Offset = -100;
+			this._stage.Scale = 100 + this.Value;
+		}
+	}
+	,__class__: alphaSynth.bank.components.Envelope
+};
+alphaSynth.bank.components.EnvelopeStage = function() {
+	this.Time = 0;
+	this.Graph = null;
+	this.Scale = 0.0;
+	this.Offset = 0.0;
+	this.Reverse = false;
+	this.Time = 0;
+	this.Graph = null;
+	this.Scale = 0;
+	this.Offset = 0;
+	this.Reverse = false;
+};
+alphaSynth.bank.components.EnvelopeStage.__name__ = ["alphaSynth","bank","components","EnvelopeStage"];
+alphaSynth.bank.components.EnvelopeStage.prototype = {
+	__class__: alphaSynth.bank.components.EnvelopeStage
+};
+alphaSynth.bank.components._EnvelopeState = {};
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_ = {};
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.__name__ = ["alphaSynth","bank","components","_EnvelopeState","EnvelopeState_Impl_"];
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "Delay";
+	case 1:
+		return "Attack";
+	case 2:
+		return "Hold";
+	case 3:
+		return "Decay";
+	case 4:
+		return "Sustain";
+	case 5:
+		return "Release";
+	case 6:
+		return "None";
+	}
+	return "";
+};
+alphaSynth.bank.components.Filter = function() {
+	this._a1 = 0.0;
+	this._a2 = 0.0;
+	this._b1 = 0.0;
+	this._b2 = 0.0;
+	this._m1 = 0.0;
+	this._m2 = 0.0;
+	this._m3 = 0.0;
+	this._cutOff = 0.0;
+	this._resonance = 0.0;
+	this.FilterMethod = null;
+	this.CoeffNeedsUpdating = false;
+	this._a1 = 0;
+	this._a2 = 0;
+	this._b1 = 0;
+	this._b2 = 0;
+	this._m1 = 0;
+	this._m2 = 0;
+	this._m3 = 0;
+	this.FilterMethod = 0;
+	this.set_CutOff(0);
+	this.set_Resonance(0);
+};
+alphaSynth.bank.components.Filter.__name__ = ["alphaSynth","bank","components","Filter"];
+alphaSynth.bank.components.Filter.prototype = {
+	get_CutOff: function() {
+		return this._cutOff;
+	}
+	,set_CutOff: function(value) {
+		this._cutOff = value;
+		this.CoeffNeedsUpdating = true;
+		return this.get_CutOff();
+	}
+	,get_Resonance: function() {
+		return this._resonance;
+	}
+	,set_Resonance: function(value) {
+		this._resonance = value;
+		this.CoeffNeedsUpdating = true;
+		return this.get_Resonance();
+	}
+	,get_Enabled: function() {
+		return this.FilterMethod != 0;
+	}
+	,Disable: function() {
+		this.FilterMethod = 0;
+	}
+	,QuickSetup: function(sampleRate,note,velocity,filterInfo) {
+		this.CoeffNeedsUpdating = false;
+		var this1 = filterInfo.CutOff;
+		this.set_CutOff(this1);
+		var this2 = filterInfo.Resonance;
+		this.set_Resonance(this2);
+		this.FilterMethod = filterInfo.FilterMethod;
+		this._a1 = 0;
+		this._a2 = 0;
+		this._b1 = 0;
+		this._b2 = 0;
+		this._m1 = 0;
+		this._m2 = 0;
+		this._m3 = 0;
+		if(this.get_CutOff() <= 0 || this.get_Resonance() <= 0) {
+			this.FilterMethod = 0;
+		}
+		if(this.FilterMethod != 0) {
+			this.set_CutOff(this.get_CutOff() * alphaSynth.util.SynthHelper.CentsToPitch((note - filterInfo.RootKey) * filterInfo.KeyTrack + system.Convert.ToInt32_Single(velocity * filterInfo.VelTrack)));
+			this.UpdateCoefficients(sampleRate);
+		}
+	}
+	,ApplyFilter_Single: function(sample) {
+		var _g = this.FilterMethod;
+		switch(_g) {
+		case 1:case 2:
+			this._m3 = sample - this._a1 * this._m1 - this._a2 * this._m2;
+			sample = this._b2 * (this._m3 + this._m2) + this._b1 * this._m1;
+			this._m2 = this._m1;
+			this._m1 = this._m3;
+			return sample;
+		case 3:
+			this._m1 = this._m1 + this._a1 * (sample - this._m1);
+			return this._m1;
+		default:
+			return 0;
+		}
+	}
+	,ApplyFilter_SampleArray: function(data) {
+		var _g = this.FilterMethod;
+		switch(_g) {
+		case 1:case 2:
+			var x = 0;
+			while(x < data.length) {
+				this._m3 = data[x] - this._a1 * this._m1 - this._a2 * this._m2;
+				data[x] = this._b2 * (this._m3 + this._m2) + this._b1 * this._m1;
+				this._m2 = this._m1;
+				this._m1 = this._m3;
+				++x;
+			}
+			break;
+		case 3:
+			var x1 = 0;
+			while(x1 < data.length) {
+				this._m1 = this._m1 + this._a1 * (data[x1] - this._m1);
+				data[x1] = this._m1;
+				++x1;
+			}
+			break;
+		default:
+		}
+	}
+	,ApplyFilterInterp: function(data,sampleRate) {
+		var ic = this.GenerateFilterCoeff(this.get_CutOff() / sampleRate,this.get_Resonance());
+		var a1_inc = (ic[0] - this._a1) / data.length;
+		var a2_inc = (ic[1] - this._a2) / data.length;
+		var b1_inc = (ic[2] - this._b1) / data.length;
+		var b2_inc = (ic[3] - this._b2) / data.length;
+		var _g = this.FilterMethod;
+		switch(_g) {
+		case 1:case 2:
+			var x = 0;
+			while(x < data.length) {
+				this._a1 = this._a1 + a1_inc;
+				this._a2 = this._a2 + a2_inc;
+				this._b1 = this._b1 + b1_inc;
+				this._b2 = this._b2 + b2_inc;
+				this._m3 = data[x] - this._a1 * this._m1 - this._a2 * this._m2;
+				data[x] = this._b2 * (this._m3 + this._m2) + this._b1 * this._m1;
+				this._m2 = this._m1;
+				this._m1 = this._m3;
+				++x;
+			}
+			this._a1 = ic[0];
+			this._a2 = ic[1];
+			this._b1 = ic[2];
+			this._b2 = ic[3];
+			break;
+		case 3:
+			var x1 = 0;
+			while(x1 < data.length) {
+				this._a1 = this._a1 + a1_inc;
+				this._m1 = this._m1 + this._a1 * (data[x1] - this._m1);
+				data[x1] = this._m1;
+				++x1;
+			}
+			this._a1 = ic[0];
+			break;
+		default:
+		}
+		this.CoeffNeedsUpdating = false;
+	}
+	,UpdateCoefficients: function(sampleRate) {
+		var coeff = this.GenerateFilterCoeff(this.get_CutOff() / sampleRate,this.get_Resonance());
+		this._a1 = coeff[0];
+		this._a2 = coeff[1];
+		this._b1 = coeff[2];
+		this._b2 = coeff[3];
+		this.CoeffNeedsUpdating = false;
+	}
+	,GenerateFilterCoeff: function(fc,q) {
+		fc = alphaSynth.util.SynthHelper.ClampD(fc,1e-38,.49);
+		var this1 = new Float32Array(4);
+		var coeff = this1;
+		var _g = this.FilterMethod;
+		switch(_g) {
+		case 1:
+			var w0 = 2.0 * 3.14159265358979 * fc;
+			var cosw0 = Math.cos(w0);
+			var alpha = Math.sin(w0) / (2.0 * q);
+			var a0inv = 1.0 / (1.0 + alpha);
+			coeff[0] = js.Boot.__cast(-2.0 * cosw0 * a0inv , Float);
+			coeff[1] = js.Boot.__cast((1.0 - alpha) * a0inv , Float);
+			coeff[2] = js.Boot.__cast((1.0 - cosw0) * a0inv * (1.0 / Math.sqrt(q)) , Float);
+			var this2 = 0.5;
+			coeff[3] = this._b1 * this2;
+			break;
+		case 2:
+			var w01 = 2.0 * 3.14159265358979 * fc;
+			var cosw01 = Math.cos(w01);
+			var alpha1 = Math.sin(w01) / (2.0 * q);
+			var a0inv1 = 1.0 / (1.0 + alpha1);
+			var qinv = 1.0 / Math.sqrt(q);
+			coeff[0] = js.Boot.__cast(-2.0 * cosw01 * a0inv1 , Float);
+			coeff[1] = js.Boot.__cast((1.0 - alpha1) * a0inv1 , Float);
+			coeff[2] = js.Boot.__cast((-1.0 - cosw01) * a0inv1 * qinv , Float);
+			coeff[3] = js.Boot.__cast((1.0 + cosw01) * a0inv1 * qinv * 0.5 , Float);
+			break;
+		case 3:
+			var this3 = 1.0;
+			coeff[0] = this3 - js.Boot.__cast(Math.exp(-6.28318530717958 * fc) , Float);
+			break;
+		default:
+		}
+		return coeff;
+	}
+	,__class__: alphaSynth.bank.components.Filter
+};
+alphaSynth.bank.components._FilterType = {};
+alphaSynth.bank.components._FilterType.FilterType_Impl_ = {};
+alphaSynth.bank.components._FilterType.FilterType_Impl_.__name__ = ["alphaSynth","bank","components","_FilterType","FilterType_Impl_"];
+alphaSynth.bank.components._FilterType.FilterType_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.bank.components._FilterType.FilterType_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.components._FilterType.FilterType_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.bank.components._FilterType.FilterType_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.bank.components._FilterType.FilterType_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.bank.components._FilterType.FilterType_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.components._FilterType.FilterType_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components._FilterType.FilterType_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.components._FilterType.FilterType_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components._FilterType.FilterType_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.components._FilterType.FilterType_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components._FilterType.FilterType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components._FilterType.FilterType_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "None";
+	case 1:
+		return "BiquadLowpass";
+	case 2:
+		return "BiquadHighpass";
+	case 3:
+		return "OnePoleLowpass";
+	}
+	return "";
+};
+alphaSynth.bank.components.Lfo = function() {
+	this._phase = 0.0;
+	this._increment = 0.0;
+	this._delayTime = 0;
+	this._generator = null;
+	this.Frequency = 0.0;
+	this.CurrentState = null;
+	this.Value = 0.0;
+	this.Depth = 0.0;
+	this.CurrentState = 0;
+	this._generator = alphaSynth.bank.components.generators.DefaultGenerators.DefaultSine;
+	this._delayTime = 0;
+	this._increment = 0;
+	this._phase = 0;
+	this.Frequency = 0;
+	this.CurrentState = 0;
+	this.Value = 0;
+	this.Depth = 0;
+};
+alphaSynth.bank.components.Lfo.__name__ = ["alphaSynth","bank","components","Lfo"];
+alphaSynth.bank.components.Lfo.prototype = {
+	QuickSetup: function(sampleRate,lfoInfo) {
+		this._generator = lfoInfo.Generator;
+		this._delayTime = system.Convert.ToInt32_Single(sampleRate * lfoInfo.DelayTime);
+		this.Frequency = lfoInfo.Frequency;
+		this._increment = this._generator.Period * this.Frequency / sampleRate;
+		var this1 = lfoInfo.Depth;
+		this.Depth = this1;
+		this.Reset();
+	}
+	,Increment: function(amount) {
+		if(this.CurrentState == 0) {
+			this._phase = this._phase - amount;
+			if(this._phase <= 0.0) {
+				this._phase = this._generator.LoopStartPhase + this._increment * -this._phase;
+				var this1 = this._generator.GetValue(this._phase);
+				this.Value = this1;
+				this.CurrentState = 1;
+			}
+		} else {
+			this._phase = this._phase + this._increment * amount;
+			if(this._phase >= this._generator.LoopEndPhase) {
+				this._phase = this._generator.LoopStartPhase + (this._phase - this._generator.LoopEndPhase) % (this._generator.LoopEndPhase - this._generator.LoopStartPhase);
+			}
+			var this2 = this._generator.GetValue(this._phase);
+			this.Value = this2;
+		}
+	}
+	,Reset: function() {
+		this.Value = 0;
+		if(this._delayTime > 0) {
+			var this1 = this._delayTime;
+			this._phase = this1;
+			this.CurrentState = 0;
+		} else {
+			this._phase = 0.0;
+			this.CurrentState = 1;
+		}
+	}
+	,__class__: alphaSynth.bank.components.Lfo
+};
+alphaSynth.bank.components._LfoState = {};
+alphaSynth.bank.components._LfoState.LfoState_Impl_ = {};
+alphaSynth.bank.components._LfoState.LfoState_Impl_.__name__ = ["alphaSynth","bank","components","_LfoState","LfoState_Impl_"];
+alphaSynth.bank.components._LfoState.LfoState_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.bank.components._LfoState.LfoState_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.components._LfoState.LfoState_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.bank.components._LfoState.LfoState_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.bank.components._LfoState.LfoState_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.bank.components._LfoState.LfoState_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.components._LfoState.LfoState_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components._LfoState.LfoState_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.components._LfoState.LfoState_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components._LfoState.LfoState_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.components._LfoState.LfoState_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components._LfoState.LfoState_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components._LfoState.LfoState_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "Delay";
+	case 1:
+		return "Sustain";
+	}
+	return "";
+};
+alphaSynth.bank.components.PanComponent = function() {
+};
+alphaSynth.bank.components.PanComponent.__name__ = ["alphaSynth","bank","components","PanComponent"];
+alphaSynth.bank.components.PanComponent.prototype = {
+	SetValue: function(value,formula) {
+		value = alphaSynth.util.SynthHelper.ClampF(value,-1,1);
+		var dvalue;
+		switch(formula) {
+		case 0:
+			dvalue = 3.14159265358979 / 2.0 * (value + 1) / 2.0;
+			this.Left = js.Boot.__cast(Math.cos(dvalue) , Float);
+			this.Right = js.Boot.__cast(Math.sin(dvalue) , Float);
+			break;
+		case 1:
+			this.Left = js.Boot.__cast(.5 + value * -.5 , Float);
+			this.Right = js.Boot.__cast(.5 + value * .5 , Float);
+			break;
+		case 2:
+			dvalue = 3.14159265358979 / 2.0 * (value + 1.0) / 2.0;
+			this.Left = js.Boot.__cast(Math.cos(dvalue) / 0.707106781186 , Float);
+			this.Right = js.Boot.__cast(Math.sin(dvalue) / 0.707106781186 , Float);
+			break;
+		default:
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid pan law selected."));
+		}
+	}
+	,__class__: alphaSynth.bank.components.PanComponent
+};
+alphaSynth.bank.components._PanFormulaEnum = {};
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_ = {};
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.__name__ = ["alphaSynth","bank","components","_PanFormulaEnum","PanFormulaEnum_Impl_"];
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "Neg3dBCenter";
+	case 1:
+		return "Neg6dBCenter";
+	case 2:
+		return "ZeroCenter";
+	}
+	return "";
+};
+alphaSynth.bank.descriptors = {};
+alphaSynth.bank.descriptors.GeneratorDescriptor = function() {
+	this.LoopMethod = null;
+	this.SamplerType = null;
+	this.AssetName = null;
+	this.EndPhase = 0.0;
+	this.StartPhase = 0.0;
+	this.LoopEndPhase = 0.0;
+	this.LoopStartPhase = 0.0;
+	this.Offset = 0.0;
+	this.Period = 0.0;
+	this.RootKey = 0;
+	this.KeyTrack = 0;
+	this.VelTrack = 0;
+	this.Tune = 0;
+	this.LoopMethod = 0;
+	this.SamplerType = 0;
+	this.AssetName = "null";
+	this.EndPhase = -1;
+	this.StartPhase = -1;
+	this.LoopEndPhase = -1;
+	this.LoopStartPhase = -1;
+	this.Offset = 0;
+	this.Period = -1;
+	this.RootKey = -1 | 0;
+	this.KeyTrack = 100;
+	this.VelTrack = 0;
+	this.Tune = 0;
+};
+alphaSynth.bank.descriptors.GeneratorDescriptor.__name__ = ["alphaSynth","bank","descriptors","GeneratorDescriptor"];
+alphaSynth.bank.descriptors.GeneratorDescriptor.prototype = {
+	__class__: alphaSynth.bank.descriptors.GeneratorDescriptor
+};
+alphaSynth.bank.components.generators = {};
+alphaSynth.bank.components.generators.Generator = function(description) {
+	this.LoopMode = null;
+	this.LoopStartPhase = 0.0;
+	this.LoopEndPhase = 0.0;
+	this.StartPhase = 0.0;
+	this.EndPhase = 0.0;
+	this.Offset = 0.0;
+	this.Period = 0.0;
+	this.Frequency = 0.0;
+	this.RootKey = 0;
+	this.KeyTrack = 0;
+	this.VelocityTrack = 0;
+	this.Tune = 0;
+	this.LoopMode = description.LoopMethod;
+	this.LoopStartPhase = description.LoopStartPhase;
+	this.LoopEndPhase = description.LoopEndPhase;
+	this.StartPhase = description.StartPhase;
+	this.EndPhase = description.EndPhase;
+	this.Offset = description.Offset;
+	this.Period = description.Period;
+	this.Frequency = 0;
+	this.RootKey = description.RootKey;
+	this.KeyTrack = description.KeyTrack;
+	this.VelocityTrack = description.VelTrack;
+	this.Tune = description.Tune;
+};
+alphaSynth.bank.components.generators.Generator.__name__ = ["alphaSynth","bank","components","generators","Generator"];
+alphaSynth.bank.components.generators.Generator.prototype = {
+	Release: function(generatorParams) {
+		if(this.LoopMode == 3) {
+			generatorParams.CurrentState = 2;
+			generatorParams.CurrentStart = this.StartPhase;
+			generatorParams.CurrentEnd = this.EndPhase;
+		}
+	}
+	,GetValue: function(phase) {
+		throw new js._Boot.HaxeError("abstract");
+	}
+	,GetValues: function(generatorParams,blockBuffer,increment) {
+		var proccessed = 0;
+		while(true) {
+			var samplesAvailable = system.Convert.ToInt32_Double(Math.ceil((generatorParams.CurrentEnd - generatorParams.Phase) / increment));
+			if(samplesAvailable > blockBuffer.length - proccessed) {
+				while(proccessed < blockBuffer.length) {
+					var index = proccessed++;
+					blockBuffer[index] = this.GetValue(generatorParams.Phase);
+					generatorParams.Phase = generatorParams.Phase + increment;
+				}
+			} else {
+				var endProccessed = proccessed + samplesAvailable;
+				while(proccessed < endProccessed) {
+					var index1 = proccessed++;
+					blockBuffer[index1] = this.GetValue(generatorParams.Phase);
+					generatorParams.Phase = generatorParams.Phase + increment;
+				}
+				var _g = generatorParams.CurrentState;
+				switch(_g) {
+				case 0:
+					generatorParams.CurrentStart = this.LoopStartPhase;
+					generatorParams.CurrentEnd = this.LoopEndPhase;
+					generatorParams.CurrentState = 1;
+					break;
+				case 1:
+					generatorParams.Phase = generatorParams.Phase + (generatorParams.CurrentStart - generatorParams.CurrentEnd);
+					break;
+				case 2:
+					generatorParams.CurrentState = 3;
+					while(proccessed < blockBuffer.length) {
+						var index2 = proccessed++;
+						blockBuffer[index2] = 0;
+					}
+					break;
+				default:
+				}
+			}
+			if(!(proccessed < blockBuffer.length)) {
+				break;
+			}
+		}
+	}
+	,__class__: alphaSynth.bank.components.generators.Generator
+};
+alphaSynth.bank.components.generators.SawGenerator = function(description) {
+	alphaSynth.bank.components.generators.Generator.call(this,description);
+	if(this.EndPhase < 0) {
+		this.EndPhase = 1;
+	}
+	if(this.StartPhase < 0) {
+		this.StartPhase = 0;
+	}
+	if(this.LoopEndPhase < 0) {
+		this.LoopEndPhase = this.EndPhase;
+	}
+	if(this.LoopStartPhase < 0) {
+		this.LoopStartPhase = this.StartPhase;
+	}
+	if(this.Period < 0) {
+		this.Period = 1;
+	}
+	if(this.RootKey < 0) {
+		this.RootKey = 69;
+	}
+	this.Frequency = 440;
+};
+alphaSynth.bank.components.generators.SawGenerator.__name__ = ["alphaSynth","bank","components","generators","SawGenerator"];
+alphaSynth.bank.components.generators.SawGenerator.__super__ = alphaSynth.bank.components.generators.Generator;
+alphaSynth.bank.components.generators.SawGenerator.prototype = $extend(alphaSynth.bank.components.generators.Generator.prototype,{
+	GetValue: function(phase) {
+		return js.Boot.__cast(2.0 * (phase - Math.floor(phase + 0.5)) , Float);
+	}
+	,__class__: alphaSynth.bank.components.generators.SawGenerator
+});
+alphaSynth.bank.components.generators.SineGenerator = function(description) {
+	alphaSynth.bank.components.generators.Generator.call(this,description);
+	if(this.EndPhase < 0) {
+		this.EndPhase = 2.0 * 3.14159265358979;
+	}
+	if(this.StartPhase < 0) {
+		this.StartPhase = 0;
+	}
+	if(this.LoopEndPhase < 0) {
+		this.LoopEndPhase = this.EndPhase;
+	}
+	if(this.LoopStartPhase < 0) {
+		this.LoopStartPhase = this.StartPhase;
+	}
+	if(this.Period < 0) {
+		this.Period = 2.0 * 3.14159265358979;
+	}
+	if(this.RootKey < 0) {
+		this.RootKey = 69;
+	}
+	this.Frequency = 440;
+};
+alphaSynth.bank.components.generators.SineGenerator.__name__ = ["alphaSynth","bank","components","generators","SineGenerator"];
+alphaSynth.bank.components.generators.SineGenerator.__super__ = alphaSynth.bank.components.generators.Generator;
+alphaSynth.bank.components.generators.SineGenerator.prototype = $extend(alphaSynth.bank.components.generators.Generator.prototype,{
+	GetValue: function(phase) {
+		return js.Boot.__cast(Math.sin(phase) , Float);
+	}
+	,__class__: alphaSynth.bank.components.generators.SineGenerator
+});
+alphaSynth.bank.components.generators.SquareGenerator = function(description) {
+	alphaSynth.bank.components.generators.Generator.call(this,description);
+	if(this.EndPhase < 0) {
+		this.EndPhase = 2.0 * 3.14159265358979;
+	}
+	if(this.StartPhase < 0) {
+		this.StartPhase = 0;
+	}
+	if(this.LoopEndPhase < 0) {
+		this.LoopEndPhase = this.EndPhase;
+	}
+	if(this.LoopStartPhase < 0) {
+		this.LoopStartPhase = this.StartPhase;
+	}
+	if(this.Period < 0) {
+		this.Period = 2.0 * 3.14159265358979;
+	}
+	if(this.RootKey < 0) {
+		this.RootKey = 69;
+	}
+	this.Frequency = 440;
+};
+alphaSynth.bank.components.generators.SquareGenerator.__name__ = ["alphaSynth","bank","components","generators","SquareGenerator"];
+alphaSynth.bank.components.generators.SquareGenerator.__super__ = alphaSynth.bank.components.generators.Generator;
+alphaSynth.bank.components.generators.SquareGenerator.prototype = $extend(alphaSynth.bank.components.generators.Generator.prototype,{
+	GetValue: function(phase) {
+		var v = Math.sin(phase);
+		var this1 = v < 0 ? -1 : v > 0 ? 1 : 0;
+		return this1;
+	}
+	,__class__: alphaSynth.bank.components.generators.SquareGenerator
+});
+alphaSynth.bank.components.generators.TriangleGenerator = function(description) {
+	alphaSynth.bank.components.generators.Generator.call(this,description);
+	if(this.EndPhase < 0) {
+		this.EndPhase = 1.25;
+	}
+	if(this.StartPhase < 0) {
+		this.StartPhase = 0.25;
+	}
+	if(this.LoopEndPhase < 0) {
+		this.LoopEndPhase = this.EndPhase;
+	}
+	if(this.LoopStartPhase < 0) {
+		this.LoopStartPhase = this.StartPhase;
+	}
+	if(this.Period < 0) {
+		this.Period = 1;
+	}
+	if(this.RootKey < 0) {
+		this.RootKey = 69;
+	}
+	this.Frequency = 440;
+};
+alphaSynth.bank.components.generators.TriangleGenerator.__name__ = ["alphaSynth","bank","components","generators","TriangleGenerator"];
+alphaSynth.bank.components.generators.TriangleGenerator.__super__ = alphaSynth.bank.components.generators.Generator;
+alphaSynth.bank.components.generators.TriangleGenerator.prototype = $extend(alphaSynth.bank.components.generators.Generator.prototype,{
+	GetValue: function(phase) {
+		return js.Boot.__cast(Math.abs(phase - Math.floor(phase + 0.5)) * 4.0 - 1.0 , Float);
+	}
+	,__class__: alphaSynth.bank.components.generators.TriangleGenerator
+});
+alphaSynth.bank.components.generators.DefaultGenerators = function() {
+};
+alphaSynth.bank.components.generators.DefaultGenerators.__name__ = ["alphaSynth","bank","components","generators","DefaultGenerators"];
+alphaSynth.bank.components.generators.DefaultGenerators.prototype = {
+	__class__: alphaSynth.bank.components.generators.DefaultGenerators
+};
+alphaSynth.bank.components.generators.GeneratorParameters = function() {
+	this.Phase = 0.0;
+	this.CurrentStart = 0.0;
+	this.CurrentEnd = 0.0;
+	this.CurrentState = null;
+	this.Phase = 0;
+	this.CurrentStart = 0;
+	this.CurrentEnd = 0;
+	this.CurrentState = 0;
+};
+alphaSynth.bank.components.generators.GeneratorParameters.__name__ = ["alphaSynth","bank","components","generators","GeneratorParameters"];
+alphaSynth.bank.components.generators.GeneratorParameters.prototype = {
+	QuickSetup: function(generator) {
+		this.CurrentStart = generator.StartPhase;
+		this.Phase = this.CurrentStart + generator.Offset;
+		var _g = generator.LoopMode;
+		switch(_g) {
+		case 2:case 3:
+			if(this.Phase >= generator.EndPhase) {
+				this.CurrentState = 3;
+			} else if(this.Phase >= generator.LoopEndPhase) {
+				this.CurrentState = 2;
+				this.CurrentEnd = generator.EndPhase;
+			} else if(this.Phase >= generator.LoopStartPhase) {
+				this.CurrentState = 1;
+				this.CurrentEnd = generator.LoopEndPhase;
+				this.CurrentStart = generator.LoopStartPhase;
+			} else {
+				this.CurrentState = 0;
+				this.CurrentEnd = generator.LoopStartPhase;
+			}
+			break;
+		default:
+			this.CurrentEnd = generator.EndPhase;
+			if(this.Phase >= this.CurrentEnd) {
+				this.CurrentState = 3;
+			} else {
+				this.CurrentState = 2;
+			}
+		}
+	}
+	,__class__: alphaSynth.bank.components.generators.GeneratorParameters
+};
+alphaSynth.bank.components.generators._GeneratorState = {};
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_ = {};
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.__name__ = ["alphaSynth","bank","components","generators","_GeneratorState","GeneratorState_Impl_"];
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "PreLoop";
+	case 1:
+		return "Loop";
+	case 2:
+		return "PostLoop";
+	case 3:
+		return "Finished";
+	}
+	return "";
+};
+alphaSynth.bank.components.generators._Interpolation = {};
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_ = {};
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.__name__ = ["alphaSynth","bank","components","generators","_Interpolation","Interpolation_Impl_"];
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "None";
+	case 1:
+		return "Linear";
+	case 2:
+		return "Cosine";
+	case 3:
+		return "CubicSpline";
+	case 4:
+		return "Sinc";
+	}
+	return "";
+};
+alphaSynth.bank.components.generators._LoopMode = {};
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_ = {};
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.__name__ = ["alphaSynth","bank","components","generators","_LoopMode","LoopMode_Impl_"];
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "NoLoop";
+	case 1:
+		return "OneShot";
+	case 2:
+		return "Continuous";
+	case 3:
+		return "LoopUntilNoteOff";
+	}
+	return "";
+};
+alphaSynth.bank.components.generators.SampleGenerator = function() {
+	alphaSynth.bank.components.generators.Generator.call(this,new alphaSynth.bank.descriptors.GeneratorDescriptor());
+	this.Samples = null;
+};
+alphaSynth.bank.components.generators.SampleGenerator.__name__ = ["alphaSynth","bank","components","generators","SampleGenerator"];
+alphaSynth.bank.components.generators.SampleGenerator.__super__ = alphaSynth.bank.components.generators.Generator;
+alphaSynth.bank.components.generators.SampleGenerator.prototype = $extend(alphaSynth.bank.components.generators.Generator.prototype,{
+	GetValue: function(phase) {
+		return this.Samples.get_Item(system.Convert.ToInt32_Double(phase));
+	}
+	,GetValues: function(generatorParams,blockBuffer,increment) {
+		var proccessed = 0;
+		while(true) {
+			var samplesAvailable = system.Convert.ToInt32_Double(Math.ceil((generatorParams.CurrentEnd - generatorParams.Phase) / increment));
+			if(samplesAvailable > blockBuffer.length - proccessed) {
+				this.Interpolate(generatorParams,blockBuffer,increment,proccessed,blockBuffer.length);
+				return;
+			} else {
+				var endProccessed = proccessed + samplesAvailable;
+				this.Interpolate(generatorParams,blockBuffer,increment,proccessed,endProccessed);
+				proccessed = endProccessed;
+				var _g = generatorParams.CurrentState;
+				switch(_g) {
+				case 0:
+					generatorParams.CurrentStart = this.LoopStartPhase;
+					generatorParams.CurrentEnd = this.LoopEndPhase;
+					generatorParams.CurrentState = 1;
+					break;
+				case 1:
+					generatorParams.Phase = generatorParams.Phase + (generatorParams.CurrentStart - generatorParams.CurrentEnd);
+					break;
+				case 2:
+					generatorParams.CurrentState = 3;
+					while(proccessed < blockBuffer.length) {
+						var index = proccessed++;
+						blockBuffer[index] = 0;
+					}
+					break;
+				default:
+				}
+			}
+			if(!(proccessed < blockBuffer.length)) {
+				break;
+			}
+		}
+	}
+	,Interpolate: function(generatorParams,blockBuffer,increment,start,end) {
+		var _g = 1;
+		switch(_g) {
+		case 1:
+			var _end = generatorParams.CurrentState == 1 ? this.LoopEndPhase - 1 : this.EndPhase - 1;
+			var index;
+			var s1;
+			var s2;
+			var mu;
+			while(start < end && generatorParams.Phase < _end) {
+				index = system.Convert.ToInt32_Double(generatorParams.Phase);
+				s1 = this.Samples.get_Item(index);
+				s2 = this.Samples.get_Item(index + 1);
+				mu = js.Boot.__cast(generatorParams.Phase - index , Float);
+				var index1 = start++;
+				blockBuffer[index1] = s1 + mu * (s2 - s1);
+				generatorParams.Phase = generatorParams.Phase + increment;
+			}
+			while(start < end) {
+				index = system.Convert.ToInt32_Double(generatorParams.Phase);
+				s1 = this.Samples.get_Item(index);
+				if(generatorParams.CurrentState == 1) {
+					s2 = this.Samples.get_Item(system.Convert.ToInt32_Double(generatorParams.CurrentStart));
+				} else {
+					s2 = s1;
+				}
+				mu = js.Boot.__cast(generatorParams.Phase - index , Float);
+				var index2 = start++;
+				blockBuffer[index2] = s1 + mu * (s2 - s1);
+				generatorParams.Phase = generatorParams.Phase + increment;
+			}
+			break;
+		case 2:
+			var _end1 = generatorParams.CurrentState == 1 ? this.LoopEndPhase - 1 : this.EndPhase - 1;
+			var index3;
+			var s11;
+			var s21;
+			var mu1;
+			while(start < end && generatorParams.Phase < _end1) {
+				index3 = system.Convert.ToInt32_Double(generatorParams.Phase);
+				s11 = this.Samples.get_Item(index3);
+				s21 = this.Samples.get_Item(index3 + 1);
+				var this1 = 1;
+				var this2 = 0.5;
+				mu1 = (this1 - js.Boot.__cast(Math.cos((generatorParams.Phase - index3) * 3.14159265358979) , Float)) * this2;
+				var index4 = start++;
+				var this3 = 1;
+				blockBuffer[index4] = s11 * (this3 - mu1) + s21 * mu1;
+				generatorParams.Phase = generatorParams.Phase + increment;
+			}
+			while(start < end) {
+				index3 = system.Convert.ToInt32_Double(generatorParams.Phase);
+				s11 = this.Samples.get_Item(index3);
+				if(generatorParams.CurrentState == 1) {
+					s21 = this.Samples.get_Item(system.Convert.ToInt32_Double(generatorParams.CurrentStart));
+				} else {
+					s21 = s11;
+				}
+				var this4 = 1;
+				var this5 = 0.5;
+				mu1 = (this4 - js.Boot.__cast(Math.cos((generatorParams.Phase - index3) * 3.14159265358979) , Float)) * this5;
+				var index5 = start++;
+				var this6 = 1;
+				blockBuffer[index5] = s11 * (this6 - mu1) + s21 * mu1;
+				generatorParams.Phase = generatorParams.Phase + increment;
+			}
+			break;
+		case 3:
+			var _end2 = generatorParams.CurrentState == 1 ? this.LoopStartPhase + 1 : this.StartPhase + 1;
+			var index6;
+			var s0;
+			var s12;
+			var s22;
+			var s3;
+			var mu2;
+			while(start < end && generatorParams.Phase < _end2) {
+				index6 = system.Convert.ToInt32_Double(generatorParams.Phase);
+				if(generatorParams.CurrentState == 1) {
+					s0 = this.Samples.get_Item(system.Convert.ToInt32_Double(generatorParams.CurrentEnd) - 1);
+				} else {
+					s0 = this.Samples.get_Item(index6);
+				}
+				s12 = this.Samples.get_Item(index6);
+				s22 = this.Samples.get_Item(index6 + 1);
+				s3 = this.Samples.get_Item(index6 + 2);
+				mu2 = js.Boot.__cast(generatorParams.Phase - index6 , Float);
+				var index7 = start++;
+				var this7 = 1.5;
+				var this8 = 1.5;
+				var this9 = 0.5;
+				var this10 = 2.5;
+				var this11 = 2;
+				var this12 = 0.5;
+				var this13 = 0.5;
+				blockBuffer[index7] = (-0.5 * s0 + this7 * s12 - this8 * s22 + this9 * s3) * mu2 * mu2 * mu2 + (s0 - this10 * s12 + this11 * s22 - this12 * s3) * mu2 * mu2 + (-0.5 * s0 + this13 * s22) * mu2 + s12;
+				generatorParams.Phase = generatorParams.Phase + increment;
+			}
+			if(generatorParams.CurrentState == 1) {
+				_end2 = this.LoopEndPhase - 2;
+			} else {
+				_end2 = this.EndPhase - 2;
+			}
+			while(start < end && generatorParams.Phase < _end2) {
+				index6 = system.Convert.ToInt32_Double(generatorParams.Phase);
+				s0 = this.Samples.get_Item(index6 - 1);
+				s12 = this.Samples.get_Item(index6);
+				s22 = this.Samples.get_Item(index6 + 1);
+				s3 = this.Samples.get_Item(index6 + 2);
+				mu2 = js.Boot.__cast(generatorParams.Phase - index6 , Float);
+				var index8 = start++;
+				var this14 = 1.5;
+				var this15 = 1.5;
+				var this16 = 0.5;
+				var this17 = 2.5;
+				var this18 = 2;
+				var this19 = 0.5;
+				var this20 = 0.5;
+				blockBuffer[index8] = (-0.5 * s0 + this14 * s12 - this15 * s22 + this16 * s3) * mu2 * mu2 * mu2 + (s0 - this17 * s12 + this18 * s22 - this19 * s3) * mu2 * mu2 + (-0.5 * s0 + this20 * s22) * mu2 + s12;
+				generatorParams.Phase = generatorParams.Phase + increment;
+			}
+			_end2 = _end2 + 1;
+			while(start < end) {
+				index6 = system.Convert.ToInt32_Double(generatorParams.Phase);
+				s0 = this.Samples.get_Item(index6 - 1);
+				s12 = this.Samples.get_Item(index6);
+				if(generatorParams.Phase < _end2) {
+					s22 = this.Samples.get_Item(index6 + 1);
+					if(generatorParams.CurrentState == 1) {
+						s3 = this.Samples.get_Item(system.Convert.ToInt32_Double(generatorParams.CurrentStart));
+					} else {
+						s3 = s22;
+					}
+				} else if(generatorParams.CurrentState == 1) {
+					s22 = this.Samples.get_Item(system.Convert.ToInt32_Double(generatorParams.CurrentStart));
+					s3 = this.Samples.get_Item(system.Convert.ToInt32_Double(generatorParams.CurrentStart) + 1);
+				} else {
+					s22 = s12;
+					s3 = s12;
+				}
+				mu2 = js.Boot.__cast(generatorParams.Phase - index6 , Float);
+				var index9 = start++;
+				var this21 = 1.5;
+				var this22 = 1.5;
+				var this23 = 0.5;
+				var this24 = 2.5;
+				var this25 = 2;
+				var this26 = 0.5;
+				var this27 = 0.5;
+				blockBuffer[index9] = (-0.5 * s0 + this21 * s12 - this22 * s22 + this23 * s3) * mu2 * mu2 * mu2 + (s0 - this24 * s12 + this25 * s22 - this26 * s3) * mu2 * mu2 + (-0.5 * s0 + this27 * s22) * mu2 + s12;
+				generatorParams.Phase = generatorParams.Phase + increment;
+			}
+			break;
+		default:
+			while(start < end) {
+				var index10 = start++;
+				blockBuffer[index10] = this.Samples.get_Item(system.Convert.ToInt32_Double(generatorParams.Phase));
+				generatorParams.Phase = generatorParams.Phase + increment;
+			}
+		}
+	}
+	,__class__: alphaSynth.bank.components.generators.SampleGenerator
+});
+alphaSynth.bank.descriptors.EnvelopeDescriptor = function() {
+	this.DelayTime = 0.0;
+	this.AttackTime = 0.0;
+	this.AttackGraph = 0;
+	this.HoldTime = 0.0;
+	this.DecayTime = 0.0;
+	this.DecayGraph = 0;
+	this.SustainTime = 0.0;
+	this.ReleaseTime = 0.0;
+	this.ReleaseGraph = 0;
+	this.SustainLevel = 0.0;
+	this.PeakLevel = 0.0;
+	this.StartLevel = 0.0;
+	this.Depth = 0.0;
+	this.Vel2Delay = 0.0;
+	this.Vel2Attack = 0.0;
+	this.Vel2Hold = 0.0;
+	this.Vel2Decay = 0.0;
+	this.Vel2Sustain = 0.0;
+	this.Vel2Release = 0.0;
+	this.Vel2Depth = 0.0;
+	this.DelayTime = 0;
+	this.AttackTime = 0;
+	this.AttackGraph = 1;
+	this.HoldTime = 0;
+	this.DecayTime = 0;
+	this.DecayGraph = 1;
+	this.SustainTime = 3600;
+	this.ReleaseTime = 0;
+	this.ReleaseGraph = 1;
+	this.SustainLevel = 0;
+	this.PeakLevel = 1;
+	this.StartLevel = 0;
+	this.Depth = 1;
+	this.Vel2Delay = 0;
+	this.Vel2Attack = 0;
+	this.Vel2Hold = 0;
+	this.Vel2Decay = 0;
+	this.Vel2Sustain = 0;
+	this.Vel2Release = 0;
+	this.Vel2Depth = 0;
+};
+alphaSynth.bank.descriptors.EnvelopeDescriptor.__name__ = ["alphaSynth","bank","descriptors","EnvelopeDescriptor"];
+alphaSynth.bank.descriptors.EnvelopeDescriptor.prototype = {
+	__class__: alphaSynth.bank.descriptors.EnvelopeDescriptor
+};
+alphaSynth.bank.descriptors.FilterDescriptor = function() {
+	this.FilterMethod = null;
+	this.CutOff = 0.0;
+	this.Resonance = 0.0;
+	this.RootKey = 0;
+	this.KeyTrack = 0;
+	this.VelTrack = 0;
+	this.FilterMethod = 0;
+	this.CutOff = -1;
+	this.Resonance = 1;
+	this.RootKey = 60;
+	this.KeyTrack = 0;
+	this.VelTrack = 0;
+};
+alphaSynth.bank.descriptors.FilterDescriptor.__name__ = ["alphaSynth","bank","descriptors","FilterDescriptor"];
+alphaSynth.bank.descriptors.FilterDescriptor.prototype = {
+	__class__: alphaSynth.bank.descriptors.FilterDescriptor
+};
+alphaSynth.bank.descriptors.LfoDescriptor = function() {
+	this.DelayTime = 0.0;
+	this.Frequency = 0.0;
+	this.Depth = 0.0;
+	this.Generator = null;
+	this.DelayTime = 0;
+	this.Frequency = 8.0;
+	this.Depth = 1;
+	this.Generator = alphaSynth.bank.components.generators.DefaultGenerators.DefaultSine;
+};
+alphaSynth.bank.descriptors.LfoDescriptor.__name__ = ["alphaSynth","bank","descriptors","LfoDescriptor"];
+alphaSynth.bank.descriptors.LfoDescriptor.prototype = {
+	__class__: alphaSynth.bank.descriptors.LfoDescriptor
+};
+alphaSynth.bank.descriptors._Waveform = {};
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_ = {};
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.__name__ = ["alphaSynth","bank","descriptors","_Waveform","Waveform_Impl_"];
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "Sine";
+	case 1:
+		return "Square";
+	case 2:
+		return "Saw";
+	case 3:
+		return "Triangle";
+	case 4:
+		return "SampleData";
+	case 5:
+		return "WhiteNoise";
+	}
+	return "";
+};
+alphaSynth.bank.patch = {};
+alphaSynth.bank.patch._IntervalType = {};
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_ = {};
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.__name__ = ["alphaSynth","bank","patch","_IntervalType","IntervalType_Impl_"];
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "ChannelKeyVelocity";
+	case 1:
+		return "ChannelKey";
+	case 2:
+		return "KeyVelocity";
+	case 3:
+		return "Key";
+	}
+	return "";
+};
+alphaSynth.bank.patch.Patch = function(name) {
+	this.ExclusiveGroupTarget = 0;
+	this.ExclusiveGroup = 0;
+	this.Name = null;
+	this.Name = name;
+	this.ExclusiveGroup = 0;
+	this.ExclusiveGroupTarget = 0;
+};
+alphaSynth.bank.patch.Patch.__name__ = ["alphaSynth","bank","patch","Patch"];
+alphaSynth.bank.patch.Patch.prototype = {
+	Start: function(voiceparams) {
+		throw new js._Boot.HaxeError("abstract");
+	}
+	,Process: function(voiceparams,startIndex,endIndex,isMuted) {
+		throw new js._Boot.HaxeError("abstract");
+	}
+	,Stop: function(voiceparams) {
+		throw new js._Boot.HaxeError("abstract");
+	}
+	,__class__: alphaSynth.bank.patch.Patch
+};
+alphaSynth.bank.patch.MultiPatch = function(name) {
+	alphaSynth.bank.patch.Patch.call(this,name);
+	this._intervalType = null;
+	this._intervalList = null;
+	this._intervalType = 0;
+};
+alphaSynth.bank.patch.MultiPatch.__name__ = ["alphaSynth","bank","patch","MultiPatch"];
+alphaSynth.bank.patch.MultiPatch.__super__ = alphaSynth.bank.patch.Patch;
+alphaSynth.bank.patch.MultiPatch.prototype = $extend(alphaSynth.bank.patch.Patch.prototype,{
+	FindPatches: function(channel,key,velocity,layers) {
+		var count = 0;
+		var _g = this._intervalType;
+		switch(_g) {
+		case 0:
+			var x = 0;
+			while(x < this._intervalList.length) {
+				if(this._intervalList[x].CheckAllIntervals(channel,key,velocity)) {
+					layers[count++] = this._intervalList[x].Patch;
+					if(count == layers.length) {
+						break;
+					}
+				}
+				++x;
+			}
+			break;
+		case 1:
+			var x1 = 0;
+			while(x1 < this._intervalList.length) {
+				if(this._intervalList[x1].CheckChannelAndKey(channel,key)) {
+					layers[count++] = this._intervalList[x1].Patch;
+					if(count == layers.length) {
+						break;
+					}
+				}
+				++x1;
+			}
+			break;
+		case 2:
+			var x2 = 0;
+			while(x2 < this._intervalList.length) {
+				if(this._intervalList[x2].CheckKeyAndVelocity(key,velocity)) {
+					layers[count++] = this._intervalList[x2].Patch;
+					if(count == layers.length) {
+						break;
+					}
+				}
+				++x2;
+			}
+			break;
+		case 3:
+			var x3 = 0;
+			while(x3 < this._intervalList.length) {
+				if(this._intervalList[x3].CheckKey(key)) {
+					layers[count++] = this._intervalList[x3].Patch;
+					if(count == layers.length) {
+						break;
+					}
+				}
+				++x3;
+			}
+			break;
+		default:
+		}
+		return count;
+	}
+	,Start: function(voiceparams) {
+		return false;
+	}
+	,Process: function(voiceparams,startIndex,endIndex,isMuted) {
+	}
+	,Stop: function(voiceparams) {
+	}
+	,LoadSf2: function(regions,assets) {
+		var size = regions.length;
+		var this1 = new Array(size);
+		this._intervalList = this1;
+		var x = 0;
+		while(x < regions.length) {
+			var loKey;
+			var hiKey;
+			var loVel;
+			var hiVel;
+			if(true) {
+				loKey = alphaTab.platform.Platform.ToUInt8(regions[x].Generators[43] & 255);
+				hiKey = alphaTab.platform.Platform.ToUInt8(regions[x].Generators[43] >> 8 & 255);
+				loVel = alphaTab.platform.Platform.ToUInt8(regions[x].Generators[44] & 255);
+				hiVel = alphaTab.platform.Platform.ToUInt8(regions[x].Generators[44] >> 8 & 255);
+			} else {
+				hiKey = alphaTab.platform.Platform.ToUInt8(regions[x].Generators[43] & 255);
+				loKey = alphaTab.platform.Platform.ToUInt8(regions[x].Generators[43] >> 8 & 255);
+				hiVel = alphaTab.platform.Platform.ToUInt8(regions[x].Generators[44] & 255);
+				loVel = alphaTab.platform.Platform.ToUInt8(regions[x].Generators[44] >> 8 & 255);
+			}
+			var sf2 = new alphaSynth.bank.patch.Sf2Patch(this.Name + "_" + Std.string(x));
+			sf2.Load(regions[x],assets);
+			this._intervalList[x] = new alphaSynth.bank.patch.PatchInterval(sf2,0,15,loKey,hiKey,loVel,hiVel);
+			++x;
+		}
+		this.DetermineIntervalType();
+	}
+	,DetermineIntervalType: function() {
+		var checkChannel = false;
+		var checkVelocity = false;
+		var x = 0;
+		while(x < this._intervalList.length) {
+			if(this._intervalList[x].StartChannel != 0 || this._intervalList[x].EndChannel != 15) {
+				checkChannel = true;
+				if(checkChannel && checkVelocity) {
+					break;
+				}
+			}
+			if(this._intervalList[x].StartVelocity != 0 || this._intervalList[x].EndVelocity != 127) {
+				checkVelocity = true;
+				if(checkChannel && checkVelocity) {
+					break;
+				}
+			}
+			++x;
+		}
+		if(checkChannel && checkVelocity) {
+			this._intervalType = 0;
+		} else if(checkChannel) {
+			this._intervalType = 1;
+		} else if(checkVelocity) {
+			this._intervalType = 2;
+		} else {
+			this._intervalType = 3;
+		}
+	}
+	,__class__: alphaSynth.bank.patch.MultiPatch
+});
+alphaSynth.bank.patch.PatchInterval = function(patch,startChannel,endChannel,startKey,endKey,startVelocity,endVelocity) {
+	this.Patch = null;
+	this.StartChannel = 0;
+	this.StartKey = 0;
+	this.StartVelocity = 0;
+	this.EndChannel = 0;
+	this.EndKey = 0;
+	this.EndVelocity = 0;
+	this.Patch = patch;
+	this.StartChannel = startChannel;
+	this.EndChannel = endChannel;
+	this.StartKey = startKey;
+	this.EndKey = endKey;
+	this.StartVelocity = startVelocity;
+	this.EndVelocity = endVelocity;
+};
+alphaSynth.bank.patch.PatchInterval.__name__ = ["alphaSynth","bank","patch","PatchInterval"];
+alphaSynth.bank.patch.PatchInterval.prototype = {
+	CheckAllIntervals: function(channel,key,velocity) {
+		if(channel >= this.StartChannel && channel <= this.EndChannel && (key >= this.StartKey && key <= this.EndKey)) {
+			if(velocity >= this.StartVelocity) {
+				return velocity <= this.EndVelocity;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	,CheckChannelAndKey: function(channel,key) {
+		if(channel >= this.StartChannel && channel <= this.EndChannel) {
+			if(key >= this.StartKey) {
+				return key <= this.EndKey;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	,CheckKeyAndVelocity: function(key,velocity) {
+		if(key >= this.StartKey && key <= this.EndKey) {
+			if(velocity >= this.StartVelocity) {
+				return velocity <= this.EndVelocity;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	,CheckKey: function(key) {
+		if(key >= this.StartKey) {
+			return key <= this.EndKey;
+		} else {
+			return false;
+		}
+	}
+	,__class__: alphaSynth.bank.patch.PatchInterval
+};
+alphaSynth.bank.patch.Sf2Patch = function(name) {
+	alphaSynth.bank.patch.Patch.call(this,name);
+	this.iniFilterFc = 0;
+	this.filterQ = 0.0;
+	this.initialAttn = 0.0;
+	this.keyOverride = 0;
+	this.velOverride = 0;
+	this.keynumToModEnvHold = 0;
+	this.keynumToModEnvDecay = 0;
+	this.keynumToVolEnvHold = 0;
+	this.keynumToVolEnvDecay = 0;
+	this.pan = null;
+	this.modLfoToPitch = 0;
+	this.vibLfoToPitch = 0;
+	this.modEnvToPitch = 0;
+	this.modLfoToFilterFc = 0;
+	this.modEnvToFilterFc = 0;
+	this.modLfoToVolume = 0.0;
+	this.gen = null;
+	this.mod_env = null;
+	this.vel_env = null;
+	this.mod_lfo = null;
+	this.vib_lfo = null;
+	this.fltr = null;
+};
+alphaSynth.bank.patch.Sf2Patch.__name__ = ["alphaSynth","bank","patch","Sf2Patch"];
+alphaSynth.bank.patch.Sf2Patch.CalculateModulator = function(s,t,d,p,value,min,max) {
+	var output = 0;
+	var i;
+	value = value - min;
+	max = max - min;
+	if(d == 1) {
+		value = max - value;
+	}
+	switch(s) {
+	case 0:
+		var this1 = value / max | 0;
+		output = this1;
+		break;
+	case 1:
+		i = 127 - value;
+		output = -0.20833333333333334 * (Math.log(i * i / js.Boot.__cast(max * max , Float)) / Math.log(10));
+		break;
+	case 2:
+		i = value;
+		output = 1 + 0.20833333333333334 * (Math.log(i * i / js.Boot.__cast(max * max , Float)) / Math.log(10));
+		break;
+	case 3:
+		if(value <= (max / 2 | 0)) {
+			output = 0;
+		} else {
+			output = 1;
+		}
+		break;
+	default:
+	}
+	if(p == 1) {
+		output = output * 2 - 1;
+	}
+	if(t == 2) {
+		output = Math.abs(output);
+	}
+	return output;
+};
+alphaSynth.bank.patch.Sf2Patch.__super__ = alphaSynth.bank.patch.Patch;
+alphaSynth.bank.patch.Sf2Patch.prototype = $extend(alphaSynth.bank.patch.Patch.prototype,{
+	Start: function(voiceparams) {
+		var note = this.keyOverride > -1 ? this.keyOverride : voiceparams.Note;
+		var vel = this.velOverride > -1 ? this.velOverride : voiceparams.Velocity;
+		voiceparams.GeneratorParams[0].QuickSetup(this.gen);
+		voiceparams.Envelopes[0].QuickSetupSf2(voiceparams.SynthParams.Synth.SampleRate,note,this.keynumToModEnvHold,this.keynumToModEnvDecay,false,this.mod_env);
+		voiceparams.Envelopes[1].QuickSetupSf2(voiceparams.SynthParams.Synth.SampleRate,note,this.keynumToVolEnvHold,this.keynumToVolEnvDecay,true,this.vel_env);
+		voiceparams.Filters[0].Disable();
+		voiceparams.Lfos[0].QuickSetup(voiceparams.SynthParams.Synth.SampleRate,this.mod_lfo);
+		voiceparams.Lfos[1].QuickSetup(voiceparams.SynthParams.Synth.SampleRate,this.vib_lfo);
+		voiceparams.PitchOffset = (note - this.gen.RootKey) * this.gen.KeyTrack + this.gen.Tune;
+		voiceparams.PitchOffset = voiceparams.PitchOffset + (100.0 * (voiceparams.SynthParams.MasterCoarseTune + (voiceparams.SynthParams.MasterFineTune.get_Combined() - 8192.0) / 8192.0) | 0);
+		voiceparams.VolOffset = this.initialAttn;
+		var this1 = 96.0;
+		voiceparams.VolOffset = voiceparams.VolOffset - this1 * js.Boot.__cast(alphaSynth.bank.patch.Sf2Patch.CalculateModulator(1,0,1,0,voiceparams.Velocity,0,127) , Float);
+		var this2 = 96.0;
+		voiceparams.VolOffset = voiceparams.VolOffset - this2 * js.Boot.__cast(alphaSynth.bank.patch.Sf2Patch.CalculateModulator(1,0,1,0,voiceparams.SynthParams.Volume.get_Coarse(),0,127) , Float);
+		if(voiceparams.GeneratorParams[0].CurrentState != 3) {
+			return voiceparams.Envelopes[1].CurrentStage != 6;
+		} else {
+			return false;
+		}
+	}
+	,Stop: function(voiceparams) {
+		this.gen.Release(voiceparams.GeneratorParams[0]);
+		if(this.gen.LoopMode != 1) {
+			voiceparams.Envelopes[0].Release(1e-38);
+			voiceparams.Envelopes[1].ReleaseSf2VolumeEnvelope();
+		}
+	}
+	,Process: function(voiceparams,startIndex,endIndex,isMuted) {
+		var basePitchFrequency = alphaSynth.util.SynthHelper.CentsToPitch(voiceparams.SynthParams.CurrentPitch) * this.gen.Frequency;
+		var pitchWithBend = basePitchFrequency * alphaSynth.util.SynthHelper.CentsToPitch(voiceparams.PitchOffset);
+		var basePitch = pitchWithBend / voiceparams.SynthParams.Synth.SampleRate;
+		var baseVolume = isMuted ? 0 : voiceparams.SynthParams.Synth.MasterVolume * voiceparams.SynthParams.CurrentVolume * 0.35 * voiceparams.SynthParams.MixVolume;
+		var x = startIndex;
+		while(x < endIndex) {
+			voiceparams.Envelopes[0].Increment(64);
+			voiceparams.Envelopes[1].Increment(64);
+			voiceparams.Lfos[0].Increment(64);
+			voiceparams.Lfos[1].Increment(64);
+			this.gen.GetValues(voiceparams.GeneratorParams[0],voiceparams.BlockBuffer,basePitch * alphaSynth.util.SynthHelper.CentsToPitch(system.Convert.ToInt32_Single(voiceparams.Envelopes[0].Value * this.modEnvToPitch + voiceparams.Lfos[0].Value * this.modLfoToPitch + voiceparams.Lfos[1].Value * this.vibLfoToPitch)));
+			if(voiceparams.Filters[0].get_Enabled()) {
+				var centsFc = voiceparams.PData[0].getInt32(0,true) + voiceparams.Lfos[0].Value * this.modLfoToFilterFc + voiceparams.Envelopes[0].Value * this.modEnvToFilterFc;
+				if(centsFc > 13500) {
+					centsFc = 13500;
+				}
+				voiceparams.Filters[0].set_CutOff(alphaSynth.util.SynthHelper.KeyToFrequency(centsFc / 100.0,69));
+				if(voiceparams.Filters[0].CoeffNeedsUpdating) {
+					voiceparams.Filters[0].ApplyFilterInterp(voiceparams.BlockBuffer,voiceparams.SynthParams.Synth.SampleRate);
+				} else {
+					voiceparams.Filters[0].ApplyFilter_SampleArray(voiceparams.BlockBuffer);
+				}
+			}
+			var this1 = voiceparams.VolOffset + voiceparams.Envelopes[1].Value + voiceparams.Lfos[0].Value * this.modLfoToVolume;
+			var volume = js.Boot.__cast(alphaSynth.util.SynthHelper.DBtoLinear(this1) , Float) * baseVolume;
+			if(2 == 2) {
+				voiceparams.MixMonoToStereoInterp(x,volume * this.pan.Left * voiceparams.SynthParams.CurrentPan.Left,volume * this.pan.Right * voiceparams.SynthParams.CurrentPan.Right);
+			} else {
+				voiceparams.MixMonoToMonoInterp(x,volume);
+			}
+			if(voiceparams.Envelopes[1].CurrentStage > 2 && volume <= 1e-5 || voiceparams.GeneratorParams[0].CurrentState == 3) {
+				voiceparams.State = 0;
+				return;
+			}
+			x = x + 64 * 2;
+		}
+	}
+	,Load: function(region,assets) {
+		this.ExclusiveGroup = region.Generators[57];
+		this.ExclusiveGroupTarget = this.ExclusiveGroup;
+		this.iniFilterFc = region.Generators[8];
+		this.filterQ = alphaSynth.util.SynthHelper.DBtoLinear(region.Generators[9] / 10.0);
+		var this1 = 10;
+		this.initialAttn = -region.Generators[48] / this1;
+		this.keyOverride = region.Generators[46];
+		this.velOverride = region.Generators[47];
+		this.keynumToModEnvHold = region.Generators[31];
+		this.keynumToModEnvDecay = region.Generators[32];
+		this.keynumToVolEnvHold = region.Generators[39];
+		this.keynumToVolEnvDecay = region.Generators[40];
+		this.pan = new alphaSynth.bank.components.PanComponent();
+		var this2 = 500;
+		this.pan.SetValue(region.Generators[17] / this2,0);
+		this.modLfoToPitch = region.Generators[5];
+		this.vibLfoToPitch = region.Generators[6];
+		this.modEnvToPitch = region.Generators[7];
+		this.modLfoToFilterFc = region.Generators[10];
+		this.modEnvToFilterFc = region.Generators[11];
+		var this3 = 10;
+		this.modLfoToVolume = region.Generators[13] / this3;
+		this.LoadGen(region,assets);
+		this.LoadEnvelopes(region);
+		this.LoadLfos(region);
+		this.LoadFilter(region);
+	}
+	,LoadGen: function(region,assets) {
+		var this1 = region.Generators[53];
+		var sda = assets.SampleAssets[this1];
+		this.gen = new alphaSynth.bank.components.generators.SampleGenerator();
+		var this2 = sda.End + region.Generators[1] + 32768 * region.Generators[12];
+		this.gen.EndPhase = this2;
+		var this3 = sda.SampleRate;
+		this.gen.Frequency = this3;
+		this.gen.KeyTrack = region.Generators[56];
+		var this4 = sda.LoopEnd + region.Generators[3] + 32768 * region.Generators[50];
+		this.gen.LoopEndPhase = this4;
+		var _g = region.Generators[54] & 3;
+		switch(_g) {
+		case 1:
+			this.gen.LoopMode = 2;
+			break;
+		case 0:case 2:
+			this.gen.LoopMode = 0;
+			break;
+		case 3:
+			this.gen.LoopMode = 3;
+			break;
+		default:
+		}
+		var this5 = sda.LoopStart + region.Generators[2] + 32768 * region.Generators[45];
+		this.gen.LoopStartPhase = this5;
+		this.gen.Offset = 0;
+		this.gen.Period = 1.0;
+		if(region.Generators[58] > -1) {
+			this.gen.RootKey = region.Generators[58];
+		} else {
+			this.gen.RootKey = sda.RootKey;
+		}
+		var this6 = sda.Start + region.Generators[0] + 32768 * region.Generators[4];
+		this.gen.StartPhase = this6;
+		var this7 = region.Generators[52];
+		var tmp = system.Convert.ToInt16(sda.Tune + this7 + 100 * region.Generators[51]);
+		this.gen.Tune = tmp;
+		this.gen.VelocityTrack = 0;
+		(js.Boot.__cast(this.gen , alphaSynth.bank.components.generators.SampleGenerator)).Samples = sda.SampleData;
+	}
+	,LoadEnvelopes: function(region) {
+		this.mod_env = new alphaSynth.bank.descriptors.EnvelopeDescriptor();
+		this.mod_env.AttackTime = js.Boot.__cast(Math.pow(2,region.Generators[26] / 1200.0) , Float);
+		this.mod_env.AttackGraph = 3;
+		this.mod_env.DecayTime = js.Boot.__cast(Math.pow(2,region.Generators[28] / 1200.0) , Float);
+		this.mod_env.DelayTime = js.Boot.__cast(Math.pow(2,region.Generators[25] / 1200.0) , Float);
+		this.mod_env.HoldTime = js.Boot.__cast(Math.pow(2,region.Generators[27] / 1200.0) , Float);
+		this.mod_env.PeakLevel = 1;
+		this.mod_env.ReleaseTime = js.Boot.__cast(Math.pow(2,region.Generators[30] / 1200.0) , Float);
+		this.mod_env.StartLevel = 0;
+		var this1 = 1;
+		var tmp = alphaSynth.util.SynthHelper.ClampS(region.Generators[29],0 | 0,1000 | 0);
+		var this2 = 1000;
+		this.mod_env.SustainLevel = this1 - tmp / this2;
+		var this3 = 0.001;
+		if(this.mod_env.AttackTime < this3) {
+			this.mod_env.AttackTime = 0.001;
+		} else {
+			var this4 = 100;
+			if(this.mod_env.AttackTime > this4) {
+				this.mod_env.AttackTime = 100;
+			}
+		}
+		var this5 = 0.001;
+		if(this.mod_env.DecayTime < this5) {
+			this.mod_env.DecayTime = 0;
+		} else {
+			var this6 = 100;
+			if(this.mod_env.DecayTime > this6) {
+				this.mod_env.DecayTime = 100;
+			}
+		}
+		var this7 = 0.001;
+		if(this.mod_env.DelayTime < this7) {
+			this.mod_env.DelayTime = 0;
+		} else {
+			var this8 = 20;
+			if(this.mod_env.DelayTime > this8) {
+				this.mod_env.DelayTime = 20;
+			}
+		}
+		var this9 = 0.001;
+		if(this.mod_env.HoldTime < this9) {
+			this.mod_env.HoldTime = 0;
+		} else {
+			var this10 = 20;
+			if(this.mod_env.HoldTime > this10) {
+				this.mod_env.HoldTime = 20;
+			}
+		}
+		var this11 = 0.001;
+		if(this.mod_env.ReleaseTime < this11) {
+			this.mod_env.ReleaseTime = 0.001;
+		} else {
+			var this12 = 100;
+			if(this.mod_env.ReleaseTime > this12) {
+				this.mod_env.ReleaseTime = 100;
+			}
+		}
+		this.vel_env = new alphaSynth.bank.descriptors.EnvelopeDescriptor();
+		this.vel_env.AttackTime = js.Boot.__cast(Math.pow(2,region.Generators[34] / 1200.0) , Float);
+		this.vel_env.AttackGraph = 3;
+		this.vel_env.DecayTime = js.Boot.__cast(Math.pow(2,region.Generators[36] / 1200.0) , Float);
+		this.vel_env.DelayTime = js.Boot.__cast(Math.pow(2,region.Generators[33] / 1200.0) , Float);
+		this.vel_env.HoldTime = js.Boot.__cast(Math.pow(2,region.Generators[35] / 1200.0) , Float);
+		this.vel_env.PeakLevel = 0;
+		this.vel_env.ReleaseTime = js.Boot.__cast(Math.pow(2,region.Generators[38] / 1200.0) , Float);
+		this.vel_env.StartLevel = -100;
+		var this13 = alphaSynth.util.SynthHelper.ClampS(region.Generators[37],0 | 0,1000 | 0) / -10 | 0;
+		this.vel_env.SustainLevel = this13;
+		var this14 = 0.001;
+		if(this.vel_env.AttackTime < this14) {
+			this.vel_env.AttackTime = 0.001;
+		} else {
+			var this15 = 100;
+			if(this.vel_env.AttackTime > this15) {
+				this.vel_env.AttackTime = 100;
+			}
+		}
+		var this16 = 0.001;
+		if(this.vel_env.DecayTime < this16) {
+			this.vel_env.DecayTime = 0;
+		} else {
+			var this17 = 100;
+			if(this.vel_env.DecayTime > this17) {
+				this.vel_env.DecayTime = 100;
+			}
+		}
+		var this18 = 0.001;
+		if(this.vel_env.DelayTime < this18) {
+			this.vel_env.DelayTime = 0;
+		} else {
+			var this19 = 20;
+			if(this.vel_env.DelayTime > this19) {
+				this.vel_env.DelayTime = 20;
+			}
+		}
+		var this20 = 0.001;
+		if(this.vel_env.HoldTime < this20) {
+			this.vel_env.HoldTime = 0;
+		} else {
+			var this21 = 20;
+			if(this.vel_env.HoldTime > this21) {
+				this.vel_env.HoldTime = 20;
+			}
+		}
+		var this22 = 0.001;
+		if(this.vel_env.ReleaseTime < this22) {
+			this.vel_env.ReleaseTime = 0.001;
+		} else {
+			var this23 = 100;
+			if(this.vel_env.ReleaseTime > this23) {
+				this.vel_env.ReleaseTime = 100;
+			}
+		}
+	}
+	,LoadLfos: function(region) {
+		this.mod_lfo = new alphaSynth.bank.descriptors.LfoDescriptor();
+		this.mod_lfo.DelayTime = js.Boot.__cast(Math.pow(2,region.Generators[21] / 1200.0) , Float);
+		this.mod_lfo.Frequency = js.Boot.__cast(Math.pow(2,region.Generators[22] / 1200.0) * 8.176 , Float);
+		this.mod_lfo.Generator = alphaSynth.bank.components.generators.DefaultGenerators.DefaultSine;
+		this.vib_lfo = new alphaSynth.bank.descriptors.LfoDescriptor();
+		this.vib_lfo.DelayTime = js.Boot.__cast(Math.pow(2,region.Generators[23] / 1200.0) , Float);
+		this.vib_lfo.Frequency = js.Boot.__cast(Math.pow(2,region.Generators[24] / 1200.0) * 8.176 , Float);
+		this.vib_lfo.Generator = alphaSynth.bank.components.generators.DefaultGenerators.DefaultSine;
+	}
+	,LoadFilter: function(region) {
+		this.fltr = new alphaSynth.bank.descriptors.FilterDescriptor();
+		this.fltr.FilterMethod = 1;
+		this.fltr.CutOff = js.Boot.__cast(alphaSynth.util.SynthHelper.KeyToFrequency(region.Generators[8] / 100.0,69) , Float);
+		this.fltr.Resonance = js.Boot.__cast(alphaSynth.util.SynthHelper.DBtoLinear(region.Generators[9] / 10.0) , Float);
+	}
+	,__class__: alphaSynth.bank.patch.Sf2Patch
+});
+alphaSynth.ds = {};
+alphaSynth.ds.CircularSampleBuffer = function(size) {
+	this._buffer = null;
+	this._writePosition = 0;
+	this._readPosition = 0;
+	this._sampleCount = 0;
+	var this1 = new Float32Array(size);
+	this._buffer = this1;
+	this._writePosition = 0;
+	this._readPosition = 0;
+	this._sampleCount = 0;
+};
+alphaSynth.ds.CircularSampleBuffer.__name__ = ["alphaSynth","ds","CircularSampleBuffer"];
+alphaSynth.ds.CircularSampleBuffer.prototype = {
+	get_Count: function() {
+		return this._sampleCount;
+	}
+	,Clear: function() {
+		this._readPosition = 0;
+		this._writePosition = 0;
+		this._sampleCount = 0;
+		var this1 = new Float32Array(this._buffer.length);
+		this._buffer = this1;
+	}
+	,Write: function(data,offset,count) {
+		var samplesWritten = 0;
+		if(count > this._buffer.length - this._sampleCount) {
+			count = this._buffer.length - this._sampleCount;
+		}
+		var writeToEnd = Math.min(this._buffer.length - this._writePosition,count);
+		var destPos = this._writePosition;
+		alphaSynth.ds._SampleArray.SampleArray_Impl_.ToFloat32Array(this._buffer).set(alphaSynth.ds._SampleArray.SampleArray_Impl_.ToFloat32Array(data).subarray(offset,offset + writeToEnd),destPos);
+		this._writePosition = this._writePosition + writeToEnd;
+		this._writePosition = this._writePosition % this._buffer.length;
+		samplesWritten = samplesWritten + writeToEnd;
+		if(samplesWritten < count) {
+			var srcPos = offset + samplesWritten;
+			var destPos1 = this._writePosition;
+			alphaSynth.ds._SampleArray.SampleArray_Impl_.ToFloat32Array(this._buffer).set(alphaSynth.ds._SampleArray.SampleArray_Impl_.ToFloat32Array(data).subarray(srcPos,srcPos + (count - samplesWritten)),destPos1);
+			this._writePosition = this._writePosition + (count - samplesWritten);
+			samplesWritten = count;
+		}
+		this._sampleCount = this._sampleCount + samplesWritten;
+		return samplesWritten;
+	}
+	,Read: function(data,offset,count) {
+		if(count > this._sampleCount) {
+			count = this._sampleCount;
+		}
+		var samplesRead = 0;
+		var readToEnd = Math.min(this._buffer.length - this._readPosition,count);
+		var src = this._buffer;
+		var srcPos = this._readPosition;
+		alphaSynth.ds._SampleArray.SampleArray_Impl_.ToFloat32Array(data).set(alphaSynth.ds._SampleArray.SampleArray_Impl_.ToFloat32Array(src).subarray(srcPos,srcPos + readToEnd),offset);
+		samplesRead = samplesRead + readToEnd;
+		this._readPosition = this._readPosition + readToEnd;
+		this._readPosition = this._readPosition % this._buffer.length;
+		if(samplesRead < count) {
+			var src1 = this._buffer;
+			var srcPos1 = this._readPosition;
+			alphaSynth.ds._SampleArray.SampleArray_Impl_.ToFloat32Array(data).set(alphaSynth.ds._SampleArray.SampleArray_Impl_.ToFloat32Array(src1).subarray(srcPos1,srcPos1 + (count - samplesRead)),offset + samplesRead);
+			this._readPosition = this._readPosition + (count - samplesRead);
+			samplesRead = count;
+		}
+		this._sampleCount = this._sampleCount - samplesRead;
+		return samplesRead;
+	}
+	,__class__: alphaSynth.ds.CircularSampleBuffer
+};
+alphaSynth.ds.LinkedList = function() {
+	this.First = null;
+	this.Length = 0;
+	this.Length = 0;
+};
+alphaSynth.ds.LinkedList.__name__ = ["alphaSynth","ds","LinkedList"];
+alphaSynth.ds.LinkedList.prototype = {
+	AddFirst: function(value) {
+		var node = new alphaSynth.ds.LinkedListNode();
+		node.Value = value;
+		if(this.First == null) {
+			this.InsertNodeToEmptyList(node);
+		} else {
+			this.InsertNodeBefore(this.First,node);
+			this.First = node;
+		}
+	}
+	,AddLast: function(value) {
+		var node = new alphaSynth.ds.LinkedListNode();
+		node.Value = value;
+		if(this.First == null) {
+			this.InsertNodeToEmptyList(node);
+		} else {
+			this.InsertNodeBefore(this.First,node);
+		}
+	}
+	,RemoveFirst: function() {
+		if(this.First == null) {
+			return null;
+		}
+		var v = this.First.Value;
+		this.Remove(this.First);
+		return v;
+	}
+	,RemoveLast: function() {
+		if(this.First == null) {
+			return null;
+		}
+		var v = this.First._prev != null ? this.First._prev.Value : null;
+		this.Remove(this.First._prev);
+		return v;
+	}
+	,Remove: function(n) {
+		if(n._next == n) {
+			this.First = null;
+		} else {
+			n._next._prev = n._prev;
+			n._prev._next = n._next;
+			if(this.First == n) {
+				this.First = n._next;
+			}
+		}
+		n.Invalidate();
+		this.Length--;
+	}
+	,InsertNodeBefore: function(node,newNode) {
+		newNode._next = node;
+		newNode._prev = node._prev;
+		node._prev._next = newNode;
+		node._prev = newNode;
+		newNode._list = this;
+		this.Length++;
+	}
+	,InsertNodeToEmptyList: function(node) {
+		node._next = node;
+		node._prev = node;
+		node._list = this;
+		this.First = node;
+		this.Length++;
+	}
+	,__class__: alphaSynth.ds.LinkedList
+};
+alphaSynth.ds.LinkedListNode = function() {
+};
+alphaSynth.ds.LinkedListNode.__name__ = ["alphaSynth","ds","LinkedListNode"];
+alphaSynth.ds.LinkedListNode.prototype = {
+	get_Next: function() {
+		if(this._next == null || this._list.First == this._next) {
+			return null;
+		} else {
+			return this._next;
+		}
+	}
+	,get_Prev: function() {
+		if(this._prev == null || this == this._list.First) {
+			return null;
+		} else {
+			return this._prev;
+		}
+	}
+	,Invalidate: function() {
+		this._list = null;
+		this._next = null;
+		this._prev = null;
+	}
+	,__class__: alphaSynth.ds.LinkedListNode
+};
+alphaSynth.ds._SampleArray = {};
+alphaSynth.ds._SampleArray.SampleArray_Impl_ = {};
+alphaSynth.ds._SampleArray.SampleArray_Impl_.__name__ = ["alphaSynth","ds","_SampleArray","SampleArray_Impl_"];
+alphaSynth.ds._SampleArray.SampleArray_Impl_._new = function(length) {
+	var this1 = new Float32Array(length);
+	return this1;
+};
+alphaSynth.ds._SampleArray.SampleArray_Impl_.ToFloat32Array = function(this1) {
+	return this1;
+};
+alphaSynth.ds._SampleArray.SampleArray_Impl_.get_Item = function(this1,index) {
+	return this1[index];
+};
+alphaSynth.ds._SampleArray.SampleArray_Impl_.set_Item = function(this1,index,value) {
+	this1[index] = value;
+	return this1[index];
+};
+alphaSynth.ds._SampleArray.SampleArray_Impl_.get_Length = function(this1) {
+	return this1.length;
+};
+alphaSynth.ds._SampleArray.SampleArray_Impl_.Clear = function(this1) {
+	this1 = new Float32Array(this1.length);
+};
+alphaSynth.ds._SampleArray.SampleArray_Impl_.Blit = function(src,srcPos,dest,destPos,len) {
+	alphaSynth.ds._SampleArray.SampleArray_Impl_.ToFloat32Array(dest).set(alphaSynth.ds._SampleArray.SampleArray_Impl_.ToFloat32Array(src).subarray(srcPos,srcPos + len),destPos);
+};
+alphaSynth.io = {};
+alphaSynth.io.IOHelper = function() { };
+alphaSynth.io.IOHelper.__name__ = ["alphaSynth","io","IOHelper"];
+alphaSynth.io.IOHelper.ReadInt32LE = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	var ch3 = input.ReadByte();
+	var ch4 = input.ReadByte();
+	return ch4 << 24 | ch3 << 16 | ch2 << 8 | ch1;
+};
+alphaSynth.io.IOHelper.ReadUInt16LE = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	return alphaTab.platform.Platform.ToUInt16(ch2 << 8 | ch1);
+};
+alphaSynth.io.IOHelper.ReadInt16LE = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	return alphaTab.platform.Platform.ToInt16(ch2 << 8 | ch1);
+};
+alphaSynth.io.IOHelper.ReadInt32BE = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	var ch3 = input.ReadByte();
+	var ch4 = input.ReadByte();
+	return ch1 << 24 | ch2 << 16 | ch3 << 8 | ch4;
+};
+alphaSynth.io.IOHelper.ReadUInt16BE = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	return alphaTab.platform.Platform.ToUInt16(ch1 << 8 | ch2);
+};
+alphaSynth.io.IOHelper.ReadInt16BE = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	return alphaTab.platform.Platform.ToInt16(ch1 << 8 | ch2);
+};
+alphaSynth.io.IOHelper.ReadByteArray = function(input,length) {
+	var this1 = new Uint8Array(length);
+	var v = this1;
+	input.Read(v,0,length);
+	return v;
+};
+alphaSynth.io.IOHelper.Read8BitChars = function(input,length) {
+	var this1 = new Uint8Array(length);
+	var b = this1;
+	input.Read(b,0,b.length);
+	return alphaTab.platform.Platform.ToString(b);
+};
+alphaSynth.io.IOHelper.Read8BitString = function(input) {
+	var this1 = "";
+	var s = this1;
+	var c = input.ReadByte();
+	while(c != 0) {
+		s += String.fromCharCode(c);
+		c = input.ReadByte();
+	}
+	return s;
+};
+alphaSynth.io.IOHelper.Read8BitStringLength = function(input,length) {
+	var this1 = "";
+	var s = this1;
+	var z = -1;
+	var i = 0;
+	while(i < length) {
+		var c = input.ReadByte();
+		if(c == 0 && z == -1) {
+			z = i;
+		}
+		s += String.fromCharCode(c);
+		++i;
+	}
+	var t = s;
+	if(z >= 0) {
+		return HxOverrides.substr(t,0,z);
+	}
+	return t;
+};
+alphaSynth.io.IOHelper.ReadSInt8 = function(input) {
+	var v = input.ReadByte();
+	return ((v & 255) >> 7) * -256 + (v & 255);
+};
+alphaSynth.io.IOHelper.ReadUInt32 = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	var ch3 = input.ReadByte();
+	var ch4 = input.ReadByte();
+	return alphaTab.platform.Platform.ToUInt32(ch1 << 24 | ch2 << 16 | ch3 << 8 | ch4);
+};
+alphaSynth.io.IOHelper.ReadInt24 = function(input,index) {
+	var i = input[index] | input[index + 1] << 8 | input[index + 2] << 16;
+	if((i & 8388608) == 8388608) {
+		i = i | -16777216;
+	}
+	return i;
+};
+alphaSynth.io.IOHelper.ReadInt16 = function(input,index) {
+	return alphaTab.platform.Platform.ToInt16(input[index] | input[index + 1] << 8);
+};
+alphaSynth.midi = {};
+alphaSynth.midi.MidiFile = function() {
+	this.Division = 0;
+	this.TrackFormat = null;
+	this.TimingStandard = null;
+	this.Tracks = null;
+	this.Division = 0;
+	this.TrackFormat = 0;
+	this.TimingStandard = 0;
+};
+alphaSynth.midi.MidiFile.__name__ = ["alphaSynth","midi","MidiFile"];
+alphaSynth.midi.MidiFile.ReadMetaMessage = function(input,delta,status) {
+	var metaStatus = input.ReadByte();
+	var _g = js.Boot.__cast(metaStatus , Int);
+	switch(_g) {
+	case 0:
+		var count = input.ReadByte();
+		if(count == 0) {
+			return new alphaSynth.midi.event.MetaNumberEvent(delta,status,system.Convert.ToUInt8(metaStatus),-1);
+		} else if(count == 2) {
+			return new alphaSynth.midi.event.MetaNumberEvent(delta,status,system.Convert.ToUInt8(metaStatus),alphaSynth.io.IOHelper.ReadInt16BE(input));
+		} else {
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid sequence number event."));
+		}
+		break;
+	case 1:
+		return new alphaSynth.midi.event.MetaTextEvent(delta,status,system.Convert.ToUInt8(metaStatus),alphaSynth.midi.MidiFile.ReadString(input));
+	case 2:
+		return new alphaSynth.midi.event.MetaTextEvent(delta,status,system.Convert.ToUInt8(metaStatus),alphaSynth.midi.MidiFile.ReadString(input));
+	case 3:
+		return new alphaSynth.midi.event.MetaTextEvent(delta,status,system.Convert.ToUInt8(metaStatus),alphaSynth.midi.MidiFile.ReadString(input));
+	case 4:
+		return new alphaSynth.midi.event.MetaTextEvent(delta,status,system.Convert.ToUInt8(metaStatus),alphaSynth.midi.MidiFile.ReadString(input));
+	case 5:
+		return new alphaSynth.midi.event.MetaTextEvent(delta,status,system.Convert.ToUInt8(metaStatus),alphaSynth.midi.MidiFile.ReadString(input));
+	case 6:
+		return new alphaSynth.midi.event.MetaTextEvent(delta,status,system.Convert.ToUInt8(metaStatus),alphaSynth.midi.MidiFile.ReadString(input));
+	case 7:
+		return new alphaSynth.midi.event.MetaTextEvent(delta,status,system.Convert.ToUInt8(metaStatus),alphaSynth.midi.MidiFile.ReadString(input));
+	case 8:
+		return new alphaSynth.midi.event.MetaTextEvent(delta,status,system.Convert.ToUInt8(metaStatus),alphaSynth.midi.MidiFile.ReadString(input));
+	case 9:
+		return new alphaSynth.midi.event.MetaTextEvent(delta,status,system.Convert.ToUInt8(metaStatus),alphaSynth.midi.MidiFile.ReadString(input));
+	case 32:
+		if(input.ReadByte() != 1) {
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid midi channel event. Expected size of 1."));
+		}
+		return new alphaSynth.midi.event.MetaEvent(delta,status,system.Convert.ToUInt8(metaStatus),system.Convert.ToUInt8(input.ReadByte()));
+	case 33:
+		if(input.ReadByte() != 1) {
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid midi port event. Expected size of 1."));
+		}
+		return new alphaSynth.midi.event.MetaEvent(delta,status,system.Convert.ToUInt8(metaStatus),system.Convert.ToUInt8(input.ReadByte()));
+	case 47:
+		return new alphaSynth.midi.event.MetaEvent(delta,status,system.Convert.ToUInt8(metaStatus),system.Convert.ToUInt8(input.ReadByte()));
+	case 81:
+		if(input.ReadByte() != 3) {
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid tempo event. Expected size of 3."));
+		}
+		return new alphaSynth.midi.event.MetaNumberEvent(delta,status,system.Convert.ToUInt8(metaStatus),input.ReadByte() << 16 | input.ReadByte() << 8 | input.ReadByte());
+	case 84:
+		if(input.ReadByte() != 5) {
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid smpte event. Expected size of 5."));
+		}
+		return new alphaSynth.midi.event.MetaTextEvent(delta,status,system.Convert.ToUInt8(metaStatus),Std.string(input.ReadByte()) + ":" + Std.string(input.ReadByte()) + ":" + Std.string(input.ReadByte()) + ":" + Std.string(input.ReadByte()) + ":" + Std.string(input.ReadByte()));
+	case 88:
+		if(input.ReadByte() != 4) {
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid time signature event. Expected size of 4."));
+		}
+		return new alphaSynth.midi.event.MetaDataEvent(delta,status,system.Convert.ToUInt8(metaStatus),new Uint8Array([system.Convert.ToUInt8(input.ReadByte()),system.Convert.ToUInt8(input.ReadByte()),system.Convert.ToUInt8(input.ReadByte()),system.Convert.ToUInt8(input.ReadByte())]));
+	case 89:
+		if(input.ReadByte() != 2) {
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid key signature event. Expected size of 2."));
+		}
+		return new alphaSynth.midi.event.MetaTextEvent(delta,status,system.Convert.ToUInt8(metaStatus),Std.string(input.ReadByte()) + ":" + Std.string(input.ReadByte()));
+	case 127:
+		var length = alphaSynth.midi.MidiFile.ReadVariableLength(input);
+		var data = alphaSynth.io.IOHelper.ReadByteArray(input,length);
+		return new alphaSynth.midi.event.MetaDataEvent(delta,status,system.Convert.ToUInt8(metaStatus),data);
+	default:
+	}
+	throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Not a valid meta message Status: " + status + " Meta: " + metaStatus));
+};
+alphaSynth.midi.MidiFile.ReadRealTimeMessage = function(input,delta,status) {
+	var _g = js.Boot.__cast(status , Int);
+	switch(_g) {
+	case 248:
+		return new alphaSynth.midi.event.RealTimeEvent(delta,status,0,0);
+	case 249:
+		return new alphaSynth.midi.event.RealTimeEvent(delta,status,0,0);
+	case 250:
+		return new alphaSynth.midi.event.RealTimeEvent(delta,status,0,0);
+	case 252:
+		return new alphaSynth.midi.event.RealTimeEvent(delta,status,0,0);
+	case 253:
+		return new alphaSynth.midi.event.RealTimeEvent(delta,status,0,0);
+	case 254:
+		return new alphaSynth.midi.event.RealTimeEvent(delta,status,0,0);
+	case 255:
+		return alphaSynth.midi.MidiFile.ReadMetaMessage(input,delta,status);
+	default:
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("The real time message was invalid or unsupported : " + status));
+	}
+};
+alphaSynth.midi.MidiFile.ReadSystemCommonMessage = function(input,delta,status) {
+	var _g = js.Boot.__cast(status , Int);
+	switch(_g) {
+	case 241:
+		return new alphaSynth.midi.event.SystemCommonEvent(delta,status,system.Convert.ToUInt8(input.ReadByte()),0);
+	case 242:
+		return new alphaSynth.midi.event.SystemCommonEvent(delta,status,system.Convert.ToUInt8(input.ReadByte()),system.Convert.ToUInt8(input.ReadByte()));
+	case 243:
+		return new alphaSynth.midi.event.SystemCommonEvent(delta,status,system.Convert.ToUInt8(input.ReadByte()),0);
+	case 246:
+		return new alphaSynth.midi.event.SystemCommonEvent(delta,status,0,0);
+	case 240:case 247:
+		var maker = alphaSynth.io.IOHelper.ReadInt16BE(input);
+		if(maker == 0) {
+			maker = alphaSynth.io.IOHelper.ReadInt16BE(input);
+		} else if(maker == 247) {
+			return null;
+		}
+		var this1 = [];
+		var data = this1;
+		var b = input.ReadByte();
+		while(b != 247) {
+			data.push(system.Convert.ToUInt8(b));
+			b = input.ReadByte();
+		}
+		return new alphaSynth.midi.event.SystemExclusiveEvent(delta,status,maker,new Uint8Array(data));
+	default:
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("The system common message was invalid or unsupported : " + status));
+	}
+};
+alphaSynth.midi.MidiFile.ReadVoiceMessage = function(input,delta,status,data1) {
+	var _g = js.Boot.__cast(status & 240 , Int);
+	switch(_g) {
+	case 128:
+		return new alphaSynth.midi.event.MidiEvent(delta,status,data1,system.Convert.ToUInt8(input.ReadByte()));
+	case 144:
+		var velocity = input.ReadByte();
+		if(velocity == 0) {
+			status = system.Convert.ToUInt8(status & 15 | 128);
+		}
+		return new alphaSynth.midi.event.MidiEvent(delta,status,data1,system.Convert.ToUInt8(velocity));
+	case 160:
+		return new alphaSynth.midi.event.MidiEvent(delta,status,data1,system.Convert.ToUInt8(input.ReadByte()));
+	case 176:
+		return new alphaSynth.midi.event.MidiEvent(delta,status,data1,system.Convert.ToUInt8(input.ReadByte()));
+	case 192:
+		return new alphaSynth.midi.event.MidiEvent(delta,status,data1,0);
+	case 208:
+		return new alphaSynth.midi.event.MidiEvent(delta,status,data1,0);
+	case 224:
+		return new alphaSynth.midi.event.MidiEvent(delta,status,data1,system.Convert.ToUInt8(input.ReadByte()));
+	default:
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("The status provided was not that of a voice message."));
+	}
+};
+alphaSynth.midi.MidiFile.TrackVoiceStats = function(midiEvent,instList,drumList,channelList,noteOnCount) {
+	if(midiEvent.get_Command() == 144) {
+		var chan = midiEvent.get_Channel();
+		if(channelList.indexOf(system.Convert.ToUInt8(chan)) == -1) {
+			channelList.push(system.Convert.ToUInt8(chan));
+		}
+		++noteOnCount;
+	} else if(midiEvent.get_Command() == 192) {
+		var chan1 = midiEvent.get_Channel();
+		var prog = midiEvent.get_Data1();
+		if(chan1 == 9) {
+			if(drumList.indexOf(system.Convert.ToUInt8(prog)) == -1) {
+				drumList.push(system.Convert.ToUInt8(prog));
+			}
+		} else if(instList.indexOf(system.Convert.ToUInt8(prog)) == -1) {
+			instList.push(system.Convert.ToUInt8(prog));
+		}
+	}
+	return noteOnCount;
+};
+alphaSynth.midi.MidiFile.ReadVariableLength = function(input) {
+	var value = 0;
+	var next;
+	while(true) {
+		next = input.ReadByte();
+		value = value << 7;
+		value = value | next & 127;
+		if(!((next & 128) == 128)) {
+			break;
+		}
+	}
+	return value;
+};
+alphaSynth.midi.MidiFile.ReadString = function(input) {
+	var length = alphaSynth.midi.MidiFile.ReadVariableLength(input);
+	return alphaSynth.io.IOHelper.Read8BitChars(input,length);
+};
+alphaSynth.midi.MidiFile.prototype = {
+	CombineTracks: function() {
+		var finalTrack = this.MergeTracks();
+		var size = this.Tracks.length;
+		var this1 = new Array(size);
+		var absEvents = this1;
+		var i = 0;
+		while(i < this.Tracks.length) {
+			var size1 = this.Tracks[i].MidiEvents.length;
+			var this2 = new Array(size1);
+			absEvents[i] = this2;
+			var totalDeltaTime = 0;
+			var j = 0;
+			while(j < this.Tracks[i].MidiEvents.length) {
+				absEvents[i][j] = this.Tracks[i].MidiEvents[j];
+				totalDeltaTime = totalDeltaTime + absEvents[i][j].DeltaTime;
+				absEvents[i][j].DeltaTime = totalDeltaTime;
+				++j;
+			}
+			++i;
+		}
+		var eventCount = 0;
+		var delta = 0;
+		var nextdelta = 2147483647;
+		var this3 = new Int32Array(absEvents.length);
+		var counters = this3;
+		alphaTab.platform.Platform.ClearIntArray(counters);
+		while(eventCount < finalTrack.MidiEvents.length) {
+			var x = 0;
+			while(x < absEvents.length) {
+				while(counters[x] < absEvents[x].length && absEvents[x][counters[x]].DeltaTime == delta) {
+					finalTrack.MidiEvents[eventCount] = absEvents[x][counters[x]];
+					++eventCount;
+					var tmp = x;
+					var tmp1 = counters[tmp];
+					counters[tmp] = tmp1 + 1;
+				}
+				if(counters[x] < absEvents[x].length && absEvents[x][counters[x]].DeltaTime < nextdelta) {
+					nextdelta = absEvents[x][counters[x]].DeltaTime;
+				}
+				++x;
+			}
+			delta = nextdelta;
+			nextdelta = 2147483647;
+		}
+		finalTrack.EndTime = finalTrack.MidiEvents[finalTrack.MidiEvents.length - 1].DeltaTime;
+		var deltaDiff = 0;
+		var x1 = 0;
+		while(x1 < finalTrack.MidiEvents.length) {
+			var oldTime = finalTrack.MidiEvents[x1].DeltaTime;
+			finalTrack.MidiEvents[x1].DeltaTime = finalTrack.MidiEvents[x1].DeltaTime - deltaDiff;
+			deltaDiff = oldTime;
+			++x1;
+		}
+		this.Tracks = [finalTrack];
+		this.TrackFormat = 0;
+	}
+	,MergeTracks: function() {
+		var eventCount = 0;
+		var notesPlayed = 0;
+		var this1 = [];
+		var programsUsed = this1;
+		var this2 = [];
+		var drumProgramsUsed = this2;
+		var this3 = [];
+		var channelsUsed = this3;
+		var x = 0;
+		while(x < this.Tracks.length) {
+			eventCount = eventCount + this.Tracks[x].MidiEvents.length;
+			notesPlayed = notesPlayed + this.Tracks[x].NoteOnCount;
+			var i = 0;
+			while(i < this.Tracks[x].Instruments.length) {
+				var p = this.Tracks[x].Instruments[i];
+				if(programsUsed.indexOf(p) == -1) {
+					programsUsed.push(p);
+				}
+				++i;
+			}
+			var i1 = 0;
+			while(i1 < this.Tracks[x].DrumInstruments.length) {
+				var p1 = this.Tracks[x].DrumInstruments[i1];
+				if(drumProgramsUsed.indexOf(p1) == -1) {
+					drumProgramsUsed.push(p1);
+				}
+				++i1;
+			}
+			var i2 = 0;
+			while(i2 < this.Tracks[x].ActiveChannels.length) {
+				var p2 = this.Tracks[x].ActiveChannels[i2];
+				if(channelsUsed.indexOf(p2) == -1) {
+					channelsUsed.push(p2);
+				}
+				++i2;
+			}
+			++x;
+		}
+		var track = new Uint8Array(programsUsed);
+		var track1 = new Uint8Array(drumProgramsUsed);
+		var track2 = new Uint8Array(channelsUsed);
+		var this4 = new Array(eventCount);
+		var track3 = new alphaSynth.midi.MidiTrack(track,track1,track2,this4);
+		track3.NoteOnCount = notesPlayed;
+		return track3;
+	}
+	,Load: function(input) {
+		if(!this.FindHead(input,500)) {
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid midi file : MThd chunk could not be found."));
+		}
+		this.ReadHeader(input);
+		var x = 0;
+		while(x < this.Tracks.length) {
+			this.Tracks[x] = this.ReadTrack(input);
+			++x;
+		}
+	}
+	,FindHead: function(input,attempts) {
+		var match = 0;
+		while(attempts > 0) {
+			var _g = input.ReadByte();
+			switch(_g) {
+			case 77:
+				match = 1;
+				break;
+			case 84:
+				if(match == 1) {
+					match = 2;
+				} else {
+					match = 0;
+				}
+				break;
+			case 100:
+				if(match == 3) {
+					return true;
+				}
+				match = 0;
+				break;
+			case 104:
+				if(match == 2) {
+					match = 3;
+				} else {
+					match = 0;
+				}
+				break;
+			default:
+			}
+			--attempts;
+		}
+		return false;
+	}
+	,ReadHeader: function(input) {
+		if(alphaSynth.io.IOHelper.ReadInt32BE(input) != 6) {
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Midi header is invalid."));
+		}
+		this.TrackFormat = js.Boot.__cast(alphaSynth.io.IOHelper.ReadInt16BE(input) , Int);
+		var size = alphaSynth.io.IOHelper.ReadInt16BE(input);
+		var this1 = new Array(size);
+		this.Tracks = this1;
+		var div = alphaSynth.io.IOHelper.ReadInt16BE(input);
+		this.Division = div & 32767;
+		this.TimingStandard = (div & 32768) > 0 ? 1 : 0;
+	}
+	,ReadTrack: function(input) {
+		var this1 = [];
+		var instList = this1;
+		var this2 = [];
+		var drumList = this2;
+		var this3 = [];
+		var channelList = this3;
+		var this4 = [];
+		var eventList = this4;
+		var noteOnCount = 0;
+		var totalTime = 0;
+		while(alphaSynth.io.IOHelper.Read8BitChars(input,4) != "MTrk") {
+			var length = alphaSynth.io.IOHelper.ReadInt32BE(input);
+			while(length > 0) {
+				--length;
+				input.ReadByte();
+			}
+		}
+		var endPosition = alphaSynth.io.IOHelper.ReadInt32BE(input) + input.get_Position();
+		var prevStatus = 0;
+		while(input.get_Position() < endPosition) {
+			var delta = alphaSynth.midi.MidiFile.ReadVariableLength(input);
+			totalTime = totalTime + delta;
+			var status = input.ReadByte();
+			if(status >= 128 && status <= 239) {
+				prevStatus = status;
+				eventList.push(alphaSynth.midi.MidiFile.ReadVoiceMessage(input,delta,system.Convert.ToUInt8(status),system.Convert.ToUInt8(input.ReadByte())));
+				noteOnCount = alphaSynth.midi.MidiFile.TrackVoiceStats(eventList[eventList.length - 1],instList,drumList,channelList,noteOnCount);
+			} else if(status >= 240 && status <= 247) {
+				prevStatus = 0;
+				eventList.push(alphaSynth.midi.MidiFile.ReadSystemCommonMessage(input,delta,system.Convert.ToUInt8(status)));
+			} else if(status >= 248 && status <= 255) {
+				eventList.push(alphaSynth.midi.MidiFile.ReadRealTimeMessage(input,delta,system.Convert.ToUInt8(status)));
+			} else if(prevStatus == 0) {
+				while((status & 128) != 128) status = input.ReadByte();
+				if(status >= 128 && status <= 239) {
+					prevStatus = status;
+					eventList.push(alphaSynth.midi.MidiFile.ReadVoiceMessage(input,delta,system.Convert.ToUInt8(status),system.Convert.ToUInt8(input.ReadByte())));
+					noteOnCount = alphaSynth.midi.MidiFile.TrackVoiceStats(eventList[eventList.length - 1],instList,drumList,channelList,noteOnCount);
+				} else if(status >= 240 && status <= 247) {
+					eventList.push(alphaSynth.midi.MidiFile.ReadSystemCommonMessage(input,delta,system.Convert.ToUInt8(status)));
+				} else if(status >= 248 && status <= 255) {
+					eventList.push(alphaSynth.midi.MidiFile.ReadRealTimeMessage(input,delta,system.Convert.ToUInt8(status)));
+				}
+			} else {
+				eventList.push(alphaSynth.midi.MidiFile.ReadVoiceMessage(input,delta,system.Convert.ToUInt8(prevStatus),system.Convert.ToUInt8(status)));
+				noteOnCount = alphaSynth.midi.MidiFile.TrackVoiceStats(eventList[eventList.length - 1],instList,drumList,channelList,noteOnCount);
+			}
+		}
+		if(input.get_Position() != endPosition) {
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("The track length was invalid for the current MTrk chunk."));
+		}
+		if(channelList.indexOf(system.Convert.ToUInt8(9)) != -1) {
+			if(drumList.indexOf(0) == -1) {
+				drumList.push(0);
+			}
+		} else if(instList.indexOf(0) == -1) {
+			instList.push(0);
+		}
+		var track = new alphaSynth.midi.MidiTrack(new Uint8Array(instList),new Uint8Array(drumList),new Uint8Array(channelList),eventList);
+		track.NoteOnCount = noteOnCount;
+		track.EndTime = totalTime;
+		return track;
+	}
+	,__class__: alphaSynth.midi.MidiFile
+};
+alphaSynth.midi.MidiHelper = function() { };
+alphaSynth.midi.MidiHelper.__name__ = ["alphaSynth","midi","MidiHelper"];
+alphaSynth.midi._MidiTimeFormat = {};
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_ = {};
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_.__name__ = ["alphaSynth","midi","_MidiTimeFormat","MidiTimeFormat_Impl_"];
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "TicksPerBeat";
+	case 1:
+		return "FramesPerSecond";
+	}
+	return "";
+};
+alphaSynth.midi.MidiTrack = function(instPrograms,drumPrograms,activeChannels,midiEvents) {
+	this.Instruments = null;
+	this.DrumInstruments = null;
+	this.ActiveChannels = null;
+	this.MidiEvents = null;
+	this.NoteOnCount = 0;
+	this.EndTime = 0;
+	this.Instruments = instPrograms;
+	this.DrumInstruments = drumPrograms;
+	this.ActiveChannels = activeChannels;
+	this.MidiEvents = midiEvents;
+	this.NoteOnCount = 0;
+	this.EndTime = 0;
+};
+alphaSynth.midi.MidiTrack.__name__ = ["alphaSynth","midi","MidiTrack"];
+alphaSynth.midi.MidiTrack.prototype = {
+	__class__: alphaSynth.midi.MidiTrack
+};
+alphaSynth.midi._MidiTrackFormat = {};
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_ = {};
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.__name__ = ["alphaSynth","midi","_MidiTrackFormat","MidiTrackFormat_Impl_"];
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "SingleTrack";
+	case 1:
+		return "MultiTrack";
+	case 2:
+		return "MultiSong";
+	}
+	return "";
+};
+alphaSynth.midi.event = {};
+alphaSynth.midi.event._ControllerTypeEnum = {};
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_ = {};
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.__name__ = ["alphaSynth","midi","event","_ControllerTypeEnum","ControllerTypeEnum_Impl_"];
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "BankSelectCoarse";
+	case 1:
+		return "ModulationCoarse";
+	case 2:
+		return "BreathControllerCoarse";
+	case 4:
+		return "FootControllerCoarse";
+	case 5:
+		return "PortamentoTimeCoarse";
+	case 6:
+		return "DataEntryCoarse";
+	case 7:
+		return "VolumeCoarse";
+	case 8:
+		return "BalanceCoarse";
+	case 10:
+		return "PanCoarse";
+	case 11:
+		return "ExpressionControllerCoarse";
+	case 12:
+		return "EffectControl1Coarse";
+	case 13:
+		return "EffectControl2Coarse";
+	case 16:
+		return "GeneralPurposeSlider1";
+	case 17:
+		return "GeneralPurposeSlider2";
+	case 18:
+		return "GeneralPurposeSlider3";
+	case 19:
+		return "GeneralPurposeSlider4";
+	case 32:
+		return "BankSelectFine";
+	case 33:
+		return "ModulationFine";
+	case 34:
+		return "BreathControllerFine";
+	case 36:
+		return "FootControllerFine";
+	case 37:
+		return "PortamentoTimeFine";
+	case 38:
+		return "DataEntryFine";
+	case 39:
+		return "VolumeFine";
+	case 40:
+		return "BalanceFine";
+	case 42:
+		return "PanFine";
+	case 43:
+		return "ExpressionControllerFine";
+	case 44:
+		return "EffectControl1Fine";
+	case 45:
+		return "EffectControl2Fine";
+	case 64:
+		return "HoldPedal";
+	case 65:
+		return "Portamento";
+	case 66:
+		return "SostenutoPedal";
+	case 67:
+		return "SoftPedal";
+	case 68:
+		return "LegatoPedal";
+	case 69:
+		return "Hold2Pedal";
+	case 70:
+		return "SoundVariation";
+	case 71:
+		return "SoundTimbre";
+	case 72:
+		return "SoundReleaseTime";
+	case 73:
+		return "SoundAttackTime";
+	case 74:
+		return "SoundBrightness";
+	case 75:
+		return "SoundControl6";
+	case 76:
+		return "SoundControl7";
+	case 77:
+		return "SoundControl8";
+	case 78:
+		return "SoundControl9";
+	case 79:
+		return "SoundControl10";
+	case 80:
+		return "GeneralPurposeButton1";
+	case 81:
+		return "GeneralPurposeButton2";
+	case 82:
+		return "GeneralPurposeButton3";
+	case 83:
+		return "GeneralPurposeButton4";
+	case 91:
+		return "EffectsLevel";
+	case 92:
+		return "TremuloLevel";
+	case 93:
+		return "ChorusLevel";
+	case 94:
+		return "CelesteLevel";
+	case 95:
+		return "PhaseLevel";
+	case 96:
+		return "DataButtonIncrement";
+	case 97:
+		return "DataButtonDecrement";
+	case 98:
+		return "NonRegisteredParameterFine";
+	case 99:
+		return "NonRegisteredParameterCourse";
+	case 100:
+		return "RegisteredParameterFine";
+	case 101:
+		return "RegisteredParameterCourse";
+	case 120:
+		return "AllSoundOff";
+	case 121:
+		return "ResetControllers";
+	case 122:
+		return "LocalKeyboard";
+	case 123:
+		return "AllNotesOff";
+	case 124:
+		return "OmniModeOff";
+	case 125:
+		return "OmniModeOn";
+	case 126:
+		return "MonoMode";
+	case 127:
+		return "PolyMode";
+	}
+	return "";
+};
+alphaSynth.midi.event.MidiEvent = function(delta,status,data1,data2) {
+	this.Message = 0;
+	this.DeltaTime = 0;
+	this.DeltaTime = delta;
+	this.Message = status | data1 << 8 | data2 << 16;
+};
+alphaSynth.midi.event.MidiEvent.__name__ = ["alphaSynth","midi","event","MidiEvent"];
+alphaSynth.midi.event.MidiEvent.prototype = {
+	get_Channel: function() {
+		return this.Message & 15;
+	}
+	,get_Command: function() {
+		return js.Boot.__cast(this.Message & 240 , Int);
+	}
+	,get_Data1: function() {
+		return (this.Message & 65280) >> 8;
+	}
+	,set_Data1: function(value) {
+		this.Message = this.Message & -65281;
+		this.Message = this.Message | value << 8;
+		return this.get_Data1();
+	}
+	,get_Data2: function() {
+		return (this.Message & 16711680) >> 16;
+	}
+	,set_Data2: function(value) {
+		this.Message = this.Message & -16711681;
+		this.Message = this.Message | value << 16;
+		return this.get_Data2();
+	}
+	,__class__: alphaSynth.midi.event.MidiEvent
+};
+alphaSynth.midi.event.MetaEvent = function(delta,status,data1,data2) {
+	alphaSynth.midi.event.MidiEvent.call(this,delta,status,data1,data2);
+};
+alphaSynth.midi.event.MetaEvent.__name__ = ["alphaSynth","midi","event","MetaEvent"];
+alphaSynth.midi.event.MetaEvent.__super__ = alphaSynth.midi.event.MidiEvent;
+alphaSynth.midi.event.MetaEvent.prototype = $extend(alphaSynth.midi.event.MidiEvent.prototype,{
+	get_Channel: function() {
+		return -1;
+	}
+	,get_Command: function() {
+		return js.Boot.__cast(this.Message & 255 , Int);
+	}
+	,get_MetaStatus: function() {
+		return this.get_Data1();
+	}
+	,__class__: alphaSynth.midi.event.MetaEvent
+});
+alphaSynth.midi.event.MetaDataEvent = function(delta,status,metaId,data) {
+	alphaSynth.midi.event.MetaEvent.call(this,delta,status,metaId,0);
+	this.Data = null;
+	this.Data = data;
+};
+alphaSynth.midi.event.MetaDataEvent.__name__ = ["alphaSynth","midi","event","MetaDataEvent"];
+alphaSynth.midi.event.MetaDataEvent.__super__ = alphaSynth.midi.event.MetaEvent;
+alphaSynth.midi.event.MetaDataEvent.prototype = $extend(alphaSynth.midi.event.MetaEvent.prototype,{
+	__class__: alphaSynth.midi.event.MetaDataEvent
+});
+alphaSynth.midi.event._MetaEventTypeEnum = {};
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_ = {};
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.__name__ = ["alphaSynth","midi","event","_MetaEventTypeEnum","MetaEventTypeEnum_Impl_"];
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "SequenceNumber";
+	case 1:
+		return "TextEvent";
+	case 2:
+		return "CopyrightNotice";
+	case 3:
+		return "SequenceOrTrackName";
+	case 4:
+		return "InstrumentName";
+	case 5:
+		return "LyricText";
+	case 6:
+		return "MarkerText";
+	case 7:
+		return "CuePoint";
+	case 8:
+		return "PatchName";
+	case 9:
+		return "PortName";
+	case 32:
+		return "MidiChannel";
+	case 33:
+		return "MidiPort";
+	case 47:
+		return "EndOfTrack";
+	case 81:
+		return "Tempo";
+	case 84:
+		return "SmpteOffset";
+	case 88:
+		return "TimeSignature";
+	case 89:
+		return "KeySignature";
+	case 127:
+		return "SequencerSpecific";
+	}
+	return "";
+};
+alphaSynth.midi.event.MetaNumberEvent = function(delta,status,metaId,number) {
+	alphaSynth.midi.event.MetaEvent.call(this,delta,status,metaId,0);
+	this.Value = 0;
+	this.Value = number;
+};
+alphaSynth.midi.event.MetaNumberEvent.__name__ = ["alphaSynth","midi","event","MetaNumberEvent"];
+alphaSynth.midi.event.MetaNumberEvent.__super__ = alphaSynth.midi.event.MetaEvent;
+alphaSynth.midi.event.MetaNumberEvent.prototype = $extend(alphaSynth.midi.event.MetaEvent.prototype,{
+	__class__: alphaSynth.midi.event.MetaNumberEvent
+});
+alphaSynth.midi.event.MetaTextEvent = function(delta,status,metaId,text) {
+	alphaSynth.midi.event.MetaEvent.call(this,delta,status,metaId,0);
+	this.Text = null;
+	this.Text = text;
+};
+alphaSynth.midi.event.MetaTextEvent.__name__ = ["alphaSynth","midi","event","MetaTextEvent"];
+alphaSynth.midi.event.MetaTextEvent.__super__ = alphaSynth.midi.event.MetaEvent;
+alphaSynth.midi.event.MetaTextEvent.prototype = $extend(alphaSynth.midi.event.MetaEvent.prototype,{
+	__class__: alphaSynth.midi.event.MetaTextEvent
+});
+alphaSynth.midi.event._MidiEventTypeEnum = {};
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_ = {};
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.__name__ = ["alphaSynth","midi","event","_MidiEventTypeEnum","MidiEventTypeEnum_Impl_"];
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 128:
+		return "NoteOff";
+	case 144:
+		return "NoteOn";
+	case 160:
+		return "NoteAftertouch";
+	case 176:
+		return "Controller";
+	case 192:
+		return "ProgramChange";
+	case 208:
+		return "ChannelAftertouch";
+	case 224:
+		return "PitchBend";
+	case 255:
+		return "Meta";
+	}
+	return "";
+};
+alphaSynth.midi.event.RealTimeEvent = function(delta,status,data1,data2) {
+	alphaSynth.midi.event.MidiEvent.call(this,delta,status,data1,data2);
+};
+alphaSynth.midi.event.RealTimeEvent.__name__ = ["alphaSynth","midi","event","RealTimeEvent"];
+alphaSynth.midi.event.RealTimeEvent.__super__ = alphaSynth.midi.event.MidiEvent;
+alphaSynth.midi.event.RealTimeEvent.prototype = $extend(alphaSynth.midi.event.MidiEvent.prototype,{
+	get_Channel: function() {
+		return -1;
+	}
+	,get_Command: function() {
+		return js.Boot.__cast(this.Message & 255 , Int);
+	}
+	,__class__: alphaSynth.midi.event.RealTimeEvent
+});
+alphaSynth.midi.event._RealTimeTypeEnum = {};
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_ = {};
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.__name__ = ["alphaSynth","midi","event","_RealTimeTypeEnum","RealTimeTypeEnum_Impl_"];
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 248:
+		return "MidiClock";
+	case 249:
+		return "MidiTick";
+	case 250:
+		return "MidiStart";
+	case 252:
+		return "MidiContinue";
+	case 253:
+		return "MidiStop";
+	case 254:
+		return "ActiveSense";
+	case 255:
+		return "Reset";
+	}
+	return "";
+};
+alphaSynth.midi.event.SystemCommonEvent = function(delta,status,data1,data2) {
+	alphaSynth.midi.event.MidiEvent.call(this,delta,status,data1,data2);
+};
+alphaSynth.midi.event.SystemCommonEvent.__name__ = ["alphaSynth","midi","event","SystemCommonEvent"];
+alphaSynth.midi.event.SystemCommonEvent.__super__ = alphaSynth.midi.event.MidiEvent;
+alphaSynth.midi.event.SystemCommonEvent.prototype = $extend(alphaSynth.midi.event.MidiEvent.prototype,{
+	get_Channel: function() {
+		return -1;
+	}
+	,get_Command: function() {
+		return js.Boot.__cast(this.Message & 255 , Int);
+	}
+	,__class__: alphaSynth.midi.event.SystemCommonEvent
+});
+alphaSynth.midi.event._SystemCommonTypeEnum = {};
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_ = {};
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.__name__ = ["alphaSynth","midi","event","_SystemCommonTypeEnum","SystemCommonTypeEnum_Impl_"];
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 240:
+		return "SystemExclusive";
+	case 241:
+		return "MtcQuarterFrame";
+	case 242:
+		return "SongPosition";
+	case 243:
+		return "SongSelect";
+	case 246:
+		return "TuneRequest";
+	case 247:
+		return "SystemExclusive2";
+	}
+	return "";
+};
+alphaSynth.midi.event.SystemExclusiveEvent = function(delta,status,id,data) {
+	alphaSynth.midi.event.SystemCommonEvent.call(this,delta,status,system.Convert.ToUInt8(id & 255),system.Convert.ToUInt8(id >> 8));
+	this.Data = null;
+	this.Data = data;
+};
+alphaSynth.midi.event.SystemExclusiveEvent.__name__ = ["alphaSynth","midi","event","SystemExclusiveEvent"];
+alphaSynth.midi.event.SystemExclusiveEvent.__super__ = alphaSynth.midi.event.SystemCommonEvent;
+alphaSynth.midi.event.SystemExclusiveEvent.prototype = $extend(alphaSynth.midi.event.SystemCommonEvent.prototype,{
+	get_ManufacturerId: function() {
+		return this.Message >> 8;
+	}
+	,__class__: alphaSynth.midi.event.SystemExclusiveEvent
+});
+alphaSynth.sf2 = {};
+alphaSynth.sf2._DirectionEnum = {};
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_ = {};
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_.__name__ = ["alphaSynth","sf2","_DirectionEnum","DirectionEnum_Impl_"];
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "MinToMax";
+	case 1:
+		return "MaxToMin";
+	}
+	return "";
+};
+alphaSynth.sf2.Generator = function(input) {
+	this._rawAmount = 0;
+	this.GeneratorType = null;
+	this.GeneratorType = js.Boot.__cast(alphaSynth.io.IOHelper.ReadUInt16LE(input) , Int);
+	this._rawAmount = alphaSynth.io.IOHelper.ReadUInt16LE(input);
+};
+alphaSynth.sf2.Generator.__name__ = ["alphaSynth","sf2","Generator"];
+alphaSynth.sf2.Generator.prototype = {
+	get_AmountInt16: function() {
+		return alphaTab.platform.Platform.ToInt16(this._rawAmount);
+	}
+	,set_AmountInt16: function(value) {
+		this._rawAmount = alphaTab.platform.Platform.ToUInt16(value);
+		return this.get_AmountInt16();
+	}
+	,get_LowByteAmount: function() {
+		return alphaTab.platform.Platform.ToUInt8(this._rawAmount & 255);
+	}
+	,set_LowByteAmount: function(value) {
+		this._rawAmount = alphaTab.platform.Platform.ToUInt16((this._rawAmount & 65280) + alphaTab.platform.Platform.ToUInt8(value));
+		return this.get_LowByteAmount();
+	}
+	,get_HighByteAmount: function() {
+		return alphaTab.platform.Platform.ToUInt8((this._rawAmount & 65280) >> 8);
+	}
+	,set_HighByteAmount: function(value) {
+		this._rawAmount = alphaTab.platform.Platform.ToUInt16((this._rawAmount & 255) + (alphaTab.platform.Platform.ToUInt8(value) << 8));
+		return this.get_HighByteAmount();
+	}
+	,__class__: alphaSynth.sf2.Generator
+};
+alphaSynth.sf2._GeneratorEnum = {};
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_ = {};
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.__name__ = ["alphaSynth","sf2","_GeneratorEnum","GeneratorEnum_Impl_"];
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "StartAddressOffset";
+	case 1:
+		return "EndAddressOffset";
+	case 2:
+		return "StartLoopAddressOffset";
+	case 3:
+		return "EndLoopAddressOffset";
+	case 4:
+		return "StartAddressCoarseOffset";
+	case 5:
+		return "ModulationLFOToPitch";
+	case 6:
+		return "VibratoLFOToPitch";
+	case 7:
+		return "ModulationEnvelopeToPitch";
+	case 8:
+		return "InitialFilterCutoffFrequency";
+	case 9:
+		return "InitialFilterQ";
+	case 10:
+		return "ModulationLFOToFilterCutoffFrequency";
+	case 11:
+		return "ModulationEnvelopeToFilterCutoffFrequency";
+	case 12:
+		return "EndAddressCoarseOffset";
+	case 13:
+		return "ModulationLFOToVolume";
+	case 14:
+		return "Unused1";
+	case 15:
+		return "ChorusEffectsSend";
+	case 16:
+		return "ReverbEffectsSend";
+	case 17:
+		return "Pan";
+	case 18:
+		return "Unused2";
+	case 19:
+		return "Unused3";
+	case 20:
+		return "Unused4";
+	case 21:
+		return "DelayModulationLFO";
+	case 22:
+		return "FrequencyModulationLFO";
+	case 23:
+		return "DelayVibratoLFO";
+	case 24:
+		return "FrequencyVibratoLFO";
+	case 25:
+		return "DelayModulationEnvelope";
+	case 26:
+		return "AttackModulationEnvelope";
+	case 27:
+		return "HoldModulationEnvelope";
+	case 28:
+		return "DecayModulationEnvelope";
+	case 29:
+		return "SustainModulationEnvelope";
+	case 30:
+		return "ReleaseModulationEnvelope";
+	case 31:
+		return "KeyNumberToModulationEnvelopeHold";
+	case 32:
+		return "KeyNumberToModulationEnvelopeDecay";
+	case 33:
+		return "DelayVolumeEnvelope";
+	case 34:
+		return "AttackVolumeEnvelope";
+	case 35:
+		return "HoldVolumeEnvelope";
+	case 36:
+		return "DecayVolumeEnvelope";
+	case 37:
+		return "SustainVolumeEnvelope";
+	case 38:
+		return "ReleaseVolumeEnvelope";
+	case 39:
+		return "KeyNumberToVolumeEnvelopeHold";
+	case 40:
+		return "KeyNumberToVolumeEnvelopeDecay";
+	case 41:
+		return "Instrument";
+	case 42:
+		return "Reserved1";
+	case 43:
+		return "KeyRange";
+	case 44:
+		return "VelocityRange";
+	case 45:
+		return "StartLoopAddressCoarseOffset";
+	case 46:
+		return "KeyNumber";
+	case 47:
+		return "Velocity";
+	case 48:
+		return "InitialAttenuation";
+	case 49:
+		return "Reserved2";
+	case 50:
+		return "EndLoopAddressCoarseOffset";
+	case 51:
+		return "CoarseTune";
+	case 52:
+		return "FineTune";
+	case 53:
+		return "SampleID";
+	case 54:
+		return "SampleModes";
+	case 55:
+		return "Reserved3";
+	case 56:
+		return "ScaleTuning";
+	case 57:
+		return "ExclusiveClass";
+	case 58:
+		return "OverridingRootKey";
+	case 59:
+		return "Unused5";
+	case 60:
+		return "UnusedEnd";
+	}
+	return "";
+};
+alphaSynth.sf2.Instrument = function() {
+};
+alphaSynth.sf2.Instrument.__name__ = ["alphaSynth","sf2","Instrument"];
+alphaSynth.sf2.Instrument.prototype = {
+	__class__: alphaSynth.sf2.Instrument
+};
+alphaSynth.sf2.Modulator = function(input) {
+	this._sourceModulationData = null;
+	this._destinationGenerator = 0;
+	this._amount = 0;
+	this._sourceModulationAmount = null;
+	this._sourceTransform = 0;
+	this._sourceModulationData = new alphaSynth.sf2.ModulatorType(input);
+	this._destinationGenerator = alphaSynth.io.IOHelper.ReadUInt16LE(input);
+	this._amount = alphaSynth.io.IOHelper.ReadInt16LE(input);
+	this._sourceModulationAmount = new alphaSynth.sf2.ModulatorType(input);
+	this._sourceTransform = alphaSynth.io.IOHelper.ReadUInt16LE(input);
+};
+alphaSynth.sf2.Modulator.__name__ = ["alphaSynth","sf2","Modulator"];
+alphaSynth.sf2.Modulator.prototype = {
+	__class__: alphaSynth.sf2.Modulator
+};
+alphaSynth.sf2.ModulatorType = function(input) {
+	this._controllerSource = 0;
+	this.Polarity = null;
+	this.Direction = null;
+	this.SourceType = 0;
+	this.IsMidiContinuousController = false;
+	var raw = alphaSynth.io.IOHelper.ReadUInt16LE(input);
+	this.Polarity = (raw & 512) == 512 ? 1 : 0;
+	this.Direction = (raw & 256) == 256 ? 1 : 0;
+	this.IsMidiContinuousController = (raw & 128) == 128;
+	this.SourceType = (raw & 64512) >> 10;
+	this._controllerSource = alphaTab.platform.Platform.ToUInt16(raw & 127);
+};
+alphaSynth.sf2.ModulatorType.__name__ = ["alphaSynth","sf2","ModulatorType"];
+alphaSynth.sf2.ModulatorType.prototype = {
+	__class__: alphaSynth.sf2.ModulatorType
+};
+alphaSynth.sf2._PolarityEnum = {};
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_ = {};
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_.__name__ = ["alphaSynth","sf2","_PolarityEnum","PolarityEnum_Impl_"];
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "Unipolar";
+	case 1:
+		return "Bipolar";
+	}
+	return "";
+};
+alphaSynth.sf2.PresetHeader = function() {
+};
+alphaSynth.sf2.PresetHeader.__name__ = ["alphaSynth","sf2","PresetHeader"];
+alphaSynth.sf2.PresetHeader.prototype = {
+	__class__: alphaSynth.sf2.PresetHeader
+};
+alphaSynth.sf2._SFSampleLink = {};
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_ = {};
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.__name__ = ["alphaSynth","sf2","_SFSampleLink","SFSampleLink_Impl_"];
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 1:
+		return "MonoSample";
+	case 2:
+		return "RightSample";
+	case 4:
+		return "LeftSample";
+	case 8:
+		return "LinkedSample";
+	case 16:
+		return "OggVobis";
+	case 32769:
+		return "RomMonoSample";
+	case 32770:
+		return "RomRightSample";
+	case 32772:
+		return "RomLeftSample";
+	case 32776:
+		return "RomLinkedSample";
+	}
+	return "";
+};
+alphaSynth.sf2.SampleHeader = function(input) {
+	this.Name = null;
+	this.Start = 0;
+	this.End = 0;
+	this.StartLoop = 0;
+	this.EndLoop = 0;
+	this.SampleRate = 0;
+	this.RootKey = 0;
+	this.Tune = 0;
+	this.SampleLink = 0;
+	this.SoundFontSampleLink = null;
+	this.Name = alphaSynth.io.IOHelper.Read8BitStringLength(input,20);
+	this.Start = alphaSynth.io.IOHelper.ReadInt32LE(input);
+	this.End = alphaSynth.io.IOHelper.ReadInt32LE(input);
+	this.StartLoop = alphaSynth.io.IOHelper.ReadInt32LE(input);
+	this.EndLoop = alphaSynth.io.IOHelper.ReadInt32LE(input);
+	this.SampleRate = alphaSynth.io.IOHelper.ReadInt32LE(input);
+	this.RootKey = system.Convert.ToUInt8(input.ReadByte());
+	this.Tune = alphaTab.platform.Platform.ToInt16(input.ReadByte());
+	this.SampleLink = alphaSynth.io.IOHelper.ReadUInt16LE(input);
+	this.SoundFontSampleLink = js.Boot.__cast(alphaSynth.io.IOHelper.ReadUInt16LE(input) , Int);
+};
+alphaSynth.sf2.SampleHeader.__name__ = ["alphaSynth","sf2","SampleHeader"];
+alphaSynth.sf2.SampleHeader.prototype = {
+	__class__: alphaSynth.sf2.SampleHeader
+};
+alphaSynth.sf2.Sf2Region = function() {
+	this.Generators = null;
+	var this1 = new Int16Array(61);
+	this.Generators = this1;
+};
+alphaSynth.sf2.Sf2Region.__name__ = ["alphaSynth","sf2","Sf2Region"];
+alphaSynth.sf2.Sf2Region.prototype = {
+	ApplyDefaultValues: function() {
+		this.Generators[0] = 0;
+		this.Generators[1] = 0;
+		this.Generators[2] = 0;
+		this.Generators[3] = 0;
+		this.Generators[4] = 0;
+		this.Generators[5] = 0;
+		this.Generators[6] = 0;
+		this.Generators[7] = 0;
+		this.Generators[8] = 13500;
+		this.Generators[9] = 0;
+		this.Generators[10] = 0;
+		this.Generators[11] = 0;
+		this.Generators[12] = 0;
+		this.Generators[13] = 0;
+		this.Generators[15] = 0;
+		this.Generators[16] = 0;
+		this.Generators[17] = 0;
+		this.Generators[21] = -12000 | 0;
+		this.Generators[22] = 0;
+		this.Generators[23] = -12000 | 0;
+		this.Generators[24] = 0;
+		this.Generators[25] = -12000 | 0;
+		this.Generators[26] = -12000 | 0;
+		this.Generators[27] = -12000 | 0;
+		this.Generators[28] = -12000 | 0;
+		this.Generators[29] = 0;
+		this.Generators[30] = -12000 | 0;
+		this.Generators[31] = 0;
+		this.Generators[32] = 0;
+		this.Generators[33] = -12000 | 0;
+		this.Generators[34] = -12000 | 0;
+		this.Generators[35] = -12000 | 0;
+		this.Generators[36] = -12000 | 0;
+		this.Generators[37] = 0;
+		this.Generators[38] = -12000 | 0;
+		this.Generators[39] = 0;
+		this.Generators[40] = 0;
+		this.Generators[43] = 32512;
+		this.Generators[44] = 32512;
+		this.Generators[45] = 0;
+		this.Generators[46] = -1 | 0;
+		this.Generators[47] = -1 | 0;
+		this.Generators[48] = 0;
+		this.Generators[50] = 0;
+		this.Generators[51] = 0;
+		this.Generators[52] = 0;
+		this.Generators[54] = 0;
+		this.Generators[56] = 100;
+		this.Generators[57] = 0;
+		this.Generators[58] = -1 | 0;
+	}
+	,__class__: alphaSynth.sf2.Sf2Region
+};
+alphaSynth.sf2.SoundFont = function() {
+};
+alphaSynth.sf2.SoundFont.__name__ = ["alphaSynth","sf2","SoundFont"];
+alphaSynth.sf2.SoundFont.prototype = {
+	Load: function(input) {
+		var id = alphaSynth.io.IOHelper.Read8BitChars(input,4);
+		var size = alphaSynth.io.IOHelper.ReadInt32LE(input);
+		if(id.toLowerCase() != "riff") {
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. Could not find RIFF header."));
+		}
+		id = alphaSynth.io.IOHelper.Read8BitChars(input,4);
+		if(id.toLowerCase() != "sfbk") {
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. Riff type is invalid."));
+		}
+		alphaTab.util.Logger.Debug("SF2","Reading info chunk",null);
+		this.Info = new alphaSynth.sf2.SoundFontInfo(input);
+		alphaTab.util.Logger.Debug("SF2","Reading sampledata chunk",null);
+		this.SampleData = new alphaSynth.sf2.SoundFontSampleData(input);
+		alphaTab.util.Logger.Debug("SF2","Reading preset chunk",null);
+		this.Presets = new alphaSynth.sf2.SoundFontPresets(input);
+	}
+	,__class__: alphaSynth.sf2.SoundFont
+};
+alphaSynth.sf2.SoundFontInfo = function(input) {
+	this.RomVersionMajor = 0;
+	this.RomVersionMinor = 0;
+	this.SfVersionMajor = 0;
+	this.SfVersionMinor = 0;
+	this.SoundEngine = null;
+	this.BankName = null;
+	this.DataRom = null;
+	this.CreationDate = null;
+	this.Author = null;
+	this.TargetProduct = null;
+	this.Copyright = null;
+	this.Comments = null;
+	this.Tools = null;
+	this.Tools = "";
+	this.Comments = "";
+	this.Copyright = "";
+	this.TargetProduct = "";
+	this.Author = "";
+	this.DataRom = "";
+	this.CreationDate = "";
+	this.BankName = "";
+	this.SoundEngine = "";
+	var id = alphaSynth.io.IOHelper.Read8BitChars(input,4);
+	var size = alphaSynth.io.IOHelper.ReadInt32LE(input);
+	if(id.toLowerCase() != "list") {
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. Could not find INFO LIST chunk."));
+	}
+	var readTo = input.get_Position() + size;
+	id = alphaSynth.io.IOHelper.Read8BitChars(input,4);
+	if(id.toLowerCase() != "info") {
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. The LIST chunk is not of type INFO."));
+	}
+	while(input.get_Position() < readTo) {
+		id = alphaSynth.io.IOHelper.Read8BitChars(input,4);
+		size = alphaSynth.io.IOHelper.ReadInt32LE(input);
+		var _g = id.toLowerCase();
+		switch(_g) {
+		case "icmt":
+			this.Comments = alphaSynth.io.IOHelper.Read8BitStringLength(input,size);
+			break;
+		case "icop":
+			this.Copyright = alphaSynth.io.IOHelper.Read8BitStringLength(input,size);
+			break;
+		case "icrd":
+			this.CreationDate = alphaSynth.io.IOHelper.Read8BitStringLength(input,size);
+			break;
+		case "ieng":
+			this.Author = alphaSynth.io.IOHelper.Read8BitStringLength(input,size);
+			break;
+		case "ifil":
+			this.SfVersionMajor = alphaSynth.io.IOHelper.ReadInt16LE(input);
+			this.SfVersionMinor = alphaSynth.io.IOHelper.ReadInt16LE(input);
+			break;
+		case "inam":
+			this.BankName = alphaSynth.io.IOHelper.Read8BitStringLength(input,size);
+			break;
+		case "iprd":
+			this.TargetProduct = alphaSynth.io.IOHelper.Read8BitStringLength(input,size);
+			break;
+		case "irom":
+			this.DataRom = alphaSynth.io.IOHelper.Read8BitStringLength(input,size);
+			break;
+		case "isft":
+			this.Tools = alphaSynth.io.IOHelper.Read8BitStringLength(input,size);
+			break;
+		case "isng":
+			this.SoundEngine = alphaSynth.io.IOHelper.Read8BitStringLength(input,size);
+			break;
+		case "iver":
+			this.RomVersionMajor = alphaSynth.io.IOHelper.ReadInt16LE(input);
+			this.RomVersionMinor = alphaSynth.io.IOHelper.ReadInt16LE(input);
+			break;
+		default:
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. The Chunk: " + id + " was not expected."));
+		}
+	}
+};
+alphaSynth.sf2.SoundFontInfo.__name__ = ["alphaSynth","sf2","SoundFontInfo"];
+alphaSynth.sf2.SoundFontInfo.prototype = {
+	__class__: alphaSynth.sf2.SoundFontInfo
+};
+alphaSynth.sf2.SoundFontPresets = function(input) {
+	this.SampleHeaders = null;
+	this.PresetHeaders = null;
+	this.Instruments = null;
+	var id = alphaSynth.io.IOHelper.Read8BitChars(input,4);
+	var size = alphaSynth.io.IOHelper.ReadInt32LE(input);
+	if(id.toLowerCase() != "list") {
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. Could not find pdta LIST chunk."));
+	}
+	var readTo = input.get_Position() + size;
+	id = alphaSynth.io.IOHelper.Read8BitChars(input,4);
+	if(id.toLowerCase() != "pdta") {
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. The LIST chunk is not of type pdta."));
+	}
+	var presetModulators = null;
+	var presetGenerators = null;
+	var instrumentModulators = null;
+	var instrumentGenerators = null;
+	var pbag = null;
+	var ibag = null;
+	var phdr = null;
+	var inst = null;
+	while(input.get_Position() < readTo) {
+		id = alphaSynth.io.IOHelper.Read8BitChars(input,4);
+		size = alphaSynth.io.IOHelper.ReadInt32LE(input);
+		var _g = id.toLowerCase();
+		switch(_g) {
+		case "ibag":
+			ibag = new alphaSynth.sf2.chunks.ZoneChunk(id,size,input);
+			break;
+		case "igen":
+			instrumentGenerators = new alphaSynth.sf2.chunks.GeneratorChunk(id,size,input).Generators;
+			break;
+		case "imod":
+			instrumentModulators = new alphaSynth.sf2.chunks.ModulatorChunk(id,size,input).Modulators;
+			break;
+		case "inst":
+			inst = new alphaSynth.sf2.chunks.InstrumentChunk(id,size,input);
+			break;
+		case "pbag":
+			pbag = new alphaSynth.sf2.chunks.ZoneChunk(id,size,input);
+			break;
+		case "pgen":
+			presetGenerators = new alphaSynth.sf2.chunks.GeneratorChunk(id,size,input).Generators;
+			break;
+		case "phdr":
+			phdr = new alphaSynth.sf2.chunks.PresetHeaderChunk(id,size,input);
+			break;
+		case "pmod":
+			presetModulators = new alphaSynth.sf2.chunks.ModulatorChunk(id,size,input).Modulators;
+			break;
+		case "shdr":
+			this.SampleHeaders = new alphaSynth.sf2.chunks.SampleHeaderChunk(id,size,input).SampleHeaders;
+			break;
+		default:
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. Unrecognized sub chunk: " + id));
+		}
+	}
+	var pZones = pbag.ToZones(presetModulators,presetGenerators);
+	this.PresetHeaders = phdr.ToPresets(pZones);
+	var iZones = ibag.ToZones(instrumentModulators,instrumentGenerators);
+	this.Instruments = inst.ToInstruments(iZones);
+};
+alphaSynth.sf2.SoundFontPresets.__name__ = ["alphaSynth","sf2","SoundFontPresets"];
+alphaSynth.sf2.SoundFontPresets.prototype = {
+	__class__: alphaSynth.sf2.SoundFontPresets
+};
+alphaSynth.sf2.SoundFontSampleData = function(input) {
+	this.BitsPerSample = 0;
+	this.SampleData = null;
+	var id = alphaSynth.io.IOHelper.Read8BitChars(input,4);
+	var size = alphaSynth.io.IOHelper.ReadInt32LE(input);
+	if(id.toLowerCase() != "list") {
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. Could not find sdta LIST chunk."));
+	}
+	var readTo = input.get_Position() + size;
+	id = alphaSynth.io.IOHelper.Read8BitChars(input,4);
+	if(id.toLowerCase() != "sdta") {
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. The LIST chunk is not of type sdta."));
+	}
+	this.BitsPerSample = 0;
+	var rawSampleData = null;
+	while(input.get_Position() < readTo) {
+		var subID = alphaSynth.io.IOHelper.Read8BitChars(input,4);
+		size = alphaSynth.io.IOHelper.ReadInt32LE(input);
+		var _g = subID.toLowerCase();
+		switch(_g) {
+		case "sm24":
+			if(rawSampleData == null || size != Math.ceil(this.SampleData.length / 2.0)) {
+				input.Skip(size);
+			} else {
+				this.BitsPerSample = 24;
+				var x = 0;
+				while(x < this.SampleData.length) {
+					var this1 = new Uint8Array(3);
+					var b = this1;
+					b[0] = system.Convert.ToUInt8(input.ReadByte());
+					b[1] = rawSampleData[2 * x];
+					b[2] = rawSampleData[2 * x + 1];
+					++x;
+				}
+			}
+			if(size % 2 == 1) {
+				if(input.ReadByte() != 0) {
+					var _g1 = input;
+					var _g11 = _g1.get_Position();
+					_g1.set_Position(_g11 - 1);
+				}
+			}
+			break;
+		case "smpl":
+			this.BitsPerSample = 16;
+			rawSampleData = alphaSynth.io.IOHelper.ReadByteArray(input,size);
+			break;
+		default:
+			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. Unknown chunk id: " + subID + "."));
+		}
+	}
+	if(this.BitsPerSample == 16) {
+		this.SampleData = rawSampleData;
+	} else if(this.BitsPerSample != 24) {
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Only 16 and 24 bit samples are supported."));
+	}
+};
+alphaSynth.sf2.SoundFontSampleData.__name__ = ["alphaSynth","sf2","SoundFontSampleData"];
+alphaSynth.sf2.SoundFontSampleData.prototype = {
+	__class__: alphaSynth.sf2.SoundFontSampleData
+};
+alphaSynth.sf2._SourceTypeEnum = {};
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_ = {};
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.__name__ = ["alphaSynth","sf2","_SourceTypeEnum","SourceTypeEnum_Impl_"];
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "Linear";
+	case 1:
+		return "Concave";
+	case 2:
+		return "Convex";
+	case 3:
+		return "Switch";
+	}
+	return "";
+};
+alphaSynth.sf2._TransformEnum = {};
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_ = {};
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_.__name__ = ["alphaSynth","sf2","_TransformEnum","TransformEnum_Impl_"];
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "Linear";
+	case 2:
+		return "AbsoluteValue";
+	}
+	return "";
+};
+alphaSynth.sf2.Zone = function() {
+};
+alphaSynth.sf2.Zone.__name__ = ["alphaSynth","sf2","Zone"];
+alphaSynth.sf2.Zone.prototype = {
+	__class__: alphaSynth.sf2.Zone
+};
+alphaSynth.sf2.chunks = {};
+alphaSynth.sf2.chunks.Chunk = function(id,size) {
+	this.Id = null;
+	this.Size = 0;
+	this.Id = id;
+	this.Size = size;
+};
+alphaSynth.sf2.chunks.Chunk.__name__ = ["alphaSynth","sf2","chunks","Chunk"];
+alphaSynth.sf2.chunks.Chunk.prototype = {
+	__class__: alphaSynth.sf2.chunks.Chunk
+};
+alphaSynth.sf2.chunks.GeneratorChunk = function(id,size,input) {
+	alphaSynth.sf2.chunks.Chunk.call(this,id,size);
+	this.Generators = null;
+	if(size % 4 != 0) {
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid SoundFont. The presetzone chunk was invalid"));
+	}
+	var size1 = system.Convert.ToInt32_Double(size / 4.0 - 1);
+	var this1 = new Array(size1);
+	this.Generators = this1;
+	var x = 0;
+	while(x < this.Generators.length) {
+		this.Generators[x] = new alphaSynth.sf2.Generator(input);
+		++x;
+	}
+	new alphaSynth.sf2.Generator(input);
+};
+alphaSynth.sf2.chunks.GeneratorChunk.__name__ = ["alphaSynth","sf2","chunks","GeneratorChunk"];
+alphaSynth.sf2.chunks.GeneratorChunk.__super__ = alphaSynth.sf2.chunks.Chunk;
+alphaSynth.sf2.chunks.GeneratorChunk.prototype = $extend(alphaSynth.sf2.chunks.Chunk.prototype,{
+	__class__: alphaSynth.sf2.chunks.GeneratorChunk
+});
+alphaSynth.sf2.chunks.InstrumentChunk = function(id,size,input) {
+	alphaSynth.sf2.chunks.Chunk.call(this,id,size);
+	this._rawInstruments = null;
+	if(size % 22 != 0) {
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid SoundFont. The preset chunk was invalid."));
+	}
+	var size1 = system.Convert.ToInt32_Double(size / 22.0);
+	var this1 = new Array(size1);
+	this._rawInstruments = this1;
+	var lastInstrument = null;
+	var x = 0;
+	while(x < this._rawInstruments.length) {
+		var i = new alphaSynth.sf2.chunks.RawInstrument();
+		i.Name = alphaSynth.io.IOHelper.Read8BitStringLength(input,20);
+		i.StartInstrumentZoneIndex = alphaSynth.io.IOHelper.ReadUInt16LE(input);
+		if(lastInstrument != null) {
+			lastInstrument.EndInstrumentZoneIndex = alphaTab.platform.Platform.ToUInt16(i.StartInstrumentZoneIndex - 1);
+		}
+		this._rawInstruments[x] = i;
+		lastInstrument = i;
+		++x;
+	}
+};
+alphaSynth.sf2.chunks.InstrumentChunk.__name__ = ["alphaSynth","sf2","chunks","InstrumentChunk"];
+alphaSynth.sf2.chunks.InstrumentChunk.__super__ = alphaSynth.sf2.chunks.Chunk;
+alphaSynth.sf2.chunks.InstrumentChunk.prototype = $extend(alphaSynth.sf2.chunks.Chunk.prototype,{
+	ToInstruments: function(zones) {
+		var size = this._rawInstruments.length - 1;
+		var this1 = new Array(size);
+		var inst = this1;
+		var x = 0;
+		while(x < inst.length) {
+			var rawInst = this._rawInstruments[x];
+			var i = new alphaSynth.sf2.Instrument();
+			i.Name = rawInst.Name;
+			var size1 = rawInst.EndInstrumentZoneIndex - rawInst.StartInstrumentZoneIndex + 1;
+			var this2 = new Array(size1);
+			i.Zones = this2;
+			alphaTab.platform.Platform.ArrayCopy_TArray_Int32_TArray_Int32_Int321(zones,rawInst.StartInstrumentZoneIndex,i.Zones,0,i.Zones.length);
+			inst[x] = i;
+			++x;
+		}
+		return inst;
+	}
+	,__class__: alphaSynth.sf2.chunks.InstrumentChunk
+});
+alphaSynth.sf2.chunks.ModulatorChunk = function(id,size,input) {
+	alphaSynth.sf2.chunks.Chunk.call(this,id,size);
+	this.Modulators = null;
+	if(size % 10 != 0) {
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid SoundFont. The presetzone chunk was invalid."));
+	}
+	var this1 = new Array((size / 10 | 0) - 1);
+	this.Modulators = this1;
+	var x = 0;
+	while(x < this.Modulators.length) {
+		this.Modulators[x] = new alphaSynth.sf2.Modulator(input);
+		++x;
+	}
+	new alphaSynth.sf2.Modulator(input);
+};
+alphaSynth.sf2.chunks.ModulatorChunk.__name__ = ["alphaSynth","sf2","chunks","ModulatorChunk"];
+alphaSynth.sf2.chunks.ModulatorChunk.__super__ = alphaSynth.sf2.chunks.Chunk;
+alphaSynth.sf2.chunks.ModulatorChunk.prototype = $extend(alphaSynth.sf2.chunks.Chunk.prototype,{
+	__class__: alphaSynth.sf2.chunks.ModulatorChunk
+});
+alphaSynth.sf2.chunks.PresetHeaderChunk = function(id,size,input) {
+	alphaSynth.sf2.chunks.Chunk.call(this,id,size);
+	this._rawPresets = null;
+	if(size % 38 != 0) {
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid SoundFont. The preset chunk was invalid."));
+	}
+	var size1 = system.Convert.ToInt32_Double(size / 38.0);
+	var this1 = new Array(size1);
+	this._rawPresets = this1;
+	var lastPreset = null;
+	var x = 0;
+	while(x < this._rawPresets.length) {
+		var p = new alphaSynth.sf2.chunks.RawPreset();
+		p.Name = alphaSynth.io.IOHelper.Read8BitStringLength(input,20);
+		p.PatchNumber = alphaSynth.io.IOHelper.ReadUInt16LE(input);
+		p.BankNumber = alphaSynth.io.IOHelper.ReadUInt16LE(input);
+		p.StartPresetZoneIndex = alphaSynth.io.IOHelper.ReadUInt16LE(input);
+		p.Library = alphaSynth.io.IOHelper.ReadInt32LE(input);
+		p.Genre = alphaSynth.io.IOHelper.ReadInt32LE(input);
+		p.Morphology = alphaSynth.io.IOHelper.ReadInt32LE(input);
+		if(lastPreset != null) {
+			lastPreset.EndPresetZoneIndex = alphaTab.platform.Platform.ToUInt16(p.StartPresetZoneIndex - 1);
+		}
+		this._rawPresets[x] = p;
+		lastPreset = p;
+		++x;
+	}
+};
+alphaSynth.sf2.chunks.PresetHeaderChunk.__name__ = ["alphaSynth","sf2","chunks","PresetHeaderChunk"];
+alphaSynth.sf2.chunks.PresetHeaderChunk.__super__ = alphaSynth.sf2.chunks.Chunk;
+alphaSynth.sf2.chunks.PresetHeaderChunk.prototype = $extend(alphaSynth.sf2.chunks.Chunk.prototype,{
+	ToPresets: function(presetZones) {
+		var size = this._rawPresets.length - 1;
+		var this1 = new Array(size);
+		var presets = this1;
+		var x = 0;
+		while(x < presets.length) {
+			var rawPreset = this._rawPresets[x];
+			var p = new alphaSynth.sf2.PresetHeader();
+			p.BankNumber = rawPreset.BankNumber;
+			p.Genre = rawPreset.Genre;
+			p.Library = rawPreset.Library;
+			p.Morphology = rawPreset.Morphology;
+			p.Name = rawPreset.Name;
+			p.PatchNumber = rawPreset.PatchNumber;
+			var size1 = rawPreset.EndPresetZoneIndex - rawPreset.StartPresetZoneIndex + 1;
+			var this2 = new Array(size1);
+			p.Zones = this2;
+			alphaTab.platform.Platform.ArrayCopy_TArray_Int32_TArray_Int32_Int321(presetZones,rawPreset.StartPresetZoneIndex,p.Zones,0,p.Zones.length);
+			presets[x] = p;
+			++x;
+		}
+		return presets;
+	}
+	,__class__: alphaSynth.sf2.chunks.PresetHeaderChunk
+});
+alphaSynth.sf2.chunks.RawInstrument = function() {
+};
+alphaSynth.sf2.chunks.RawInstrument.__name__ = ["alphaSynth","sf2","chunks","RawInstrument"];
+alphaSynth.sf2.chunks.RawInstrument.prototype = {
+	__class__: alphaSynth.sf2.chunks.RawInstrument
+};
+alphaSynth.sf2.chunks.RawPreset = function() {
+};
+alphaSynth.sf2.chunks.RawPreset.__name__ = ["alphaSynth","sf2","chunks","RawPreset"];
+alphaSynth.sf2.chunks.RawPreset.prototype = {
+	__class__: alphaSynth.sf2.chunks.RawPreset
+};
+alphaSynth.sf2.chunks.RawZoneData = function() {
+};
+alphaSynth.sf2.chunks.RawZoneData.__name__ = ["alphaSynth","sf2","chunks","RawZoneData"];
+alphaSynth.sf2.chunks.RawZoneData.prototype = {
+	__class__: alphaSynth.sf2.chunks.RawZoneData
+};
+alphaSynth.sf2.chunks.SampleHeaderChunk = function(id,size,input) {
+	alphaSynth.sf2.chunks.Chunk.call(this,id,size);
+	this.SampleHeaders = null;
+	if(size % 46 != 0) {
+		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid SoundFont. The sample header chunk was invalid."));
+	}
+	var size1 = system.Convert.ToInt32_Double(size / 46.0 - 1);
+	var this1 = new Array(size1);
+	this.SampleHeaders = this1;
+	var x = 0;
+	while(x < this.SampleHeaders.length) {
+		this.SampleHeaders[x] = new alphaSynth.sf2.SampleHeader(input);
+		++x;
+	}
+	new alphaSynth.sf2.SampleHeader(input);
+};
+alphaSynth.sf2.chunks.SampleHeaderChunk.__name__ = ["alphaSynth","sf2","chunks","SampleHeaderChunk"];
+alphaSynth.sf2.chunks.SampleHeaderChunk.__super__ = alphaSynth.sf2.chunks.Chunk;
+alphaSynth.sf2.chunks.SampleHeaderChunk.prototype = $extend(alphaSynth.sf2.chunks.Chunk.prototype,{
+	__class__: alphaSynth.sf2.chunks.SampleHeaderChunk
+});
+alphaSynth.sf2.chunks.ZoneChunk = function(id,size,input) {
+	alphaSynth.sf2.chunks.Chunk.call(this,id,size);
+	this._zoneData = null;
+	var size1 = system.Convert.ToInt32_Double(size / 4.0);
+	var this1 = new Array(size1);
+	this._zoneData = this1;
+	var lastZone = null;
+	var x = 0;
+	while(x < this._zoneData.length) {
+		var z = new alphaSynth.sf2.chunks.RawZoneData();
+		z.GeneratorIndex = alphaSynth.io.IOHelper.ReadUInt16LE(input);
+		z.ModulatorIndex = alphaSynth.io.IOHelper.ReadUInt16LE(input);
+		if(lastZone != null) {
+			lastZone.GeneratorCount = alphaTab.platform.Platform.ToUInt16(z.GeneratorIndex - lastZone.GeneratorIndex);
+			lastZone.ModulatorCount = alphaTab.platform.Platform.ToUInt16(z.ModulatorIndex - lastZone.ModulatorIndex);
+		}
+		this._zoneData[x] = z;
+		lastZone = z;
+		++x;
+	}
+};
+alphaSynth.sf2.chunks.ZoneChunk.__name__ = ["alphaSynth","sf2","chunks","ZoneChunk"];
+alphaSynth.sf2.chunks.ZoneChunk.__super__ = alphaSynth.sf2.chunks.Chunk;
+alphaSynth.sf2.chunks.ZoneChunk.prototype = $extend(alphaSynth.sf2.chunks.Chunk.prototype,{
+	ToZones: function(modulators,generators) {
+		var size = this._zoneData.length - 1;
+		var this1 = new Array(size);
+		var zones = this1;
+		var x = 0;
+		while(x < zones.length) {
+			var rawZone = this._zoneData[x];
+			var zone = new alphaSynth.sf2.Zone();
+			var size1 = rawZone.GeneratorCount;
+			var this2 = new Array(size1);
+			zone.Generators = this2;
+			alphaTab.platform.Platform.ArrayCopy_TArray_Int32_TArray_Int32_Int321(generators,rawZone.GeneratorIndex,zone.Generators,0,rawZone.GeneratorCount);
+			var size2 = rawZone.ModulatorCount;
+			var this3 = new Array(size2);
+			zone.Modulators = this3;
+			alphaTab.platform.Platform.ArrayCopy_TArray_Int32_TArray_Int32_Int321(modulators,rawZone.ModulatorIndex,zone.Modulators,0,rawZone.ModulatorCount);
+			zones[x] = zone;
+			++x;
+		}
+		return zones;
+	}
+	,__class__: alphaSynth.sf2.chunks.ZoneChunk
+});
+alphaSynth.synthesis = {};
+alphaSynth.synthesis.CCValue = function() {
+};
+alphaSynth.synthesis.CCValue.__name__ = ["alphaSynth","synthesis","CCValue"];
+alphaSynth.synthesis.CCValue.prototype = {
+	get_Coarse: function() {
+		return this._coarseValue;
+	}
+	,set_Coarse: function(value) {
+		this._coarseValue = value;
+		this.UpdateCombined();
+		return this.get_Coarse();
+	}
+	,get_Fine: function() {
+		return this._fineValue;
+	}
+	,set_Fine: function(value) {
+		this._fineValue = value;
+		this.UpdateCombined();
+		return this.get_Fine();
+	}
+	,get_Combined: function() {
+		return this._combined;
+	}
+	,set_Combined: function(value) {
+		this._combined = value;
+		this.UpdateCoarseFinePair();
+		return this.get_Combined();
+	}
+	,CCValue_Byte_Byte: function(coarse,fine) {
+		this._coarseValue = 0;
+		this._fineValue = 0;
+		this._combined = 0;
+		this._coarseValue = coarse;
+		this._fineValue = fine;
+		this._combined = 0;
+		this.UpdateCombined();
+		return this;
+	}
+	,CCValue_Int16: function(combined) {
+		this._coarseValue = 0;
+		this._fineValue = 0;
+		this._combined = 0;
+		this._coarseValue = 0;
+		this._fineValue = 0;
+		this._combined = combined;
+		this.UpdateCoarseFinePair();
+		return this;
+	}
+	,UpdateCombined: function() {
+		if(true) {
+			this._combined = system.Convert.ToInt16(this._coarseValue << 7 | this._fineValue);
+		} else {
+			this._combined = system.Convert.ToInt16(this._fineValue << 7 | this._coarseValue);
+		}
+	}
+	,UpdateCoarseFinePair: function() {
+		if(true) {
+			this._coarseValue = system.Convert.ToUInt8(this._combined >> 7);
+			this._fineValue = system.Convert.ToUInt8(this._combined & 127);
+		} else {
+			this._fineValue = system.Convert.ToUInt8(this._combined >> 7);
+			this._coarseValue = system.Convert.ToUInt8(this._combined & 127);
+		}
+	}
+	,__class__: alphaSynth.synthesis.CCValue
+};
+alphaSynth.synthesis.PlaybackRange = function() {
+};
+alphaSynth.synthesis.PlaybackRange.__name__ = ["alphaSynth","synthesis","PlaybackRange"];
+alphaSynth.synthesis.PlaybackRange.prototype = {
+	__class__: alphaSynth.synthesis.PlaybackRange
+};
+alphaSynth.synthesis.SynthEvent = function(eventIndex,e) {
+	this.EventIndex = 0;
+	this.Event = null;
+	this.IsMetronome = false;
+	this.Delta = 0.0;
+	this.EventIndex = eventIndex;
+	this.Event = e;
+};
+alphaSynth.synthesis.SynthEvent.__name__ = ["alphaSynth","synthesis","SynthEvent"];
+alphaSynth.synthesis.SynthEvent.NewMetronomeEvent = function(eventIndex,metronomeLength) {
+	var x = new alphaSynth.synthesis.SynthEvent(eventIndex,null);
+	x.IsMetronome = true;
+	return x;
+};
+alphaSynth.synthesis.SynthEvent.prototype = {
+	__class__: alphaSynth.synthesis.SynthEvent
+};
+alphaSynth.synthesis.SynthParameters = function(synth) {
+	this.Program = 0;
+	this.BankSelect = 0;
+	this.ChannelAfterTouch = 0;
+	this.Pan = null;
+	this.Volume = null;
+	this.Expression = null;
+	this.ModRange = null;
+	this.PitchBend = null;
+	this.PitchBendRangeCoarse = 0;
+	this.PitchBendRangeFine = 0;
+	this.MasterCoarseTune = 0;
+	this.MasterFineTune = null;
+	this.HoldPedal = false;
+	this.LegatoPedal = false;
+	this.Rpn = null;
+	this.Synth = null;
+	this.CurrentVolume = 0.0;
+	this.CurrentPitch = 0;
+	this.CurrentMod = 0;
+	this.CurrentPan = null;
+	this.MixVolume = 0.0;
+	this.Synth = synth;
+	this.Pan = new alphaSynth.synthesis.CCValue().CCValue_Int16(0);
+	this.Volume = new alphaSynth.synthesis.CCValue().CCValue_Int16(0);
+	this.Expression = new alphaSynth.synthesis.CCValue().CCValue_Int16(0);
+	this.ModRange = new alphaSynth.synthesis.CCValue().CCValue_Int16(0);
+	this.PitchBend = new alphaSynth.synthesis.CCValue().CCValue_Int16(0);
+	this.MasterFineTune = new alphaSynth.synthesis.CCValue().CCValue_Int16(0);
+	this.Rpn = new alphaSynth.synthesis.CCValue().CCValue_Int16(0);
+	this.MixVolume = 1;
+	this.CurrentPan = new alphaSynth.bank.components.PanComponent();
+	this.ResetControllers();
+};
+alphaSynth.synthesis.SynthParameters.__name__ = ["alphaSynth","synthesis","SynthParameters"];
+alphaSynth.synthesis.SynthParameters.prototype = {
+	ResetControllers: function() {
+		this.Program = 0;
+		this.BankSelect = 0;
+		this.ChannelAfterTouch = 0;
+		this.Pan.set_Combined(8192);
+		this.Volume.set_Fine(0);
+		this.Volume.set_Coarse(100);
+		this.Expression.set_Combined(16383);
+		this.ModRange.set_Combined(0);
+		this.PitchBend.set_Combined(8192);
+		this.PitchBendRangeCoarse = 2;
+		this.PitchBendRangeFine = 0;
+		this.MasterCoarseTune = 0;
+		this.MasterFineTune.set_Combined(8192);
+		this.HoldPedal = false;
+		this.LegatoPedal = false;
+		this.Rpn.set_Combined(16383);
+		this.UpdateCurrentPan();
+		this.UpdateCurrentPitch();
+		this.UpdateCurrentVolumeFromExpression();
+	}
+	,UpdateCurrentPitch: function() {
+		this.CurrentPitch = system.Convert.ToInt32_Double((this.PitchBend.get_Combined() - 8192.0) / 8192.0 * (100 * this.PitchBendRangeCoarse + this.PitchBendRangeFine));
+	}
+	,UpdateCurrentMod: function() {
+		this.CurrentMod = system.Convert.ToInt32_Double(100 * (this.ModRange.get_Combined() / 16383.0));
+	}
+	,UpdateCurrentPan: function() {
+		var value = 3.14159265358979 / 2.0 * (this.Pan.get_Combined() / 16383.0);
+		this.CurrentPan.Left = js.Boot.__cast(Math.cos(value) , Float);
+		this.CurrentPan.Right = js.Boot.__cast(Math.sin(value) , Float);
+	}
+	,UpdateCurrentVolumeFromVolume: function() {
+		var this1 = 16383;
+		this.CurrentVolume = this.Volume.get_Combined() / this1;
+		this.CurrentVolume = this.CurrentVolume * this.CurrentVolume;
+	}
+	,UpdateCurrentVolumeFromExpression: function() {
+		var this1 = 16383;
+		this.CurrentVolume = this.Expression.get_Combined() / this1;
+		this.CurrentVolume = this.CurrentVolume * this.CurrentVolume;
+	}
+	,__class__: alphaSynth.synthesis.SynthParameters
+};
+alphaSynth.synthesis.Synthesizer = function(sampleRate,audioChannels,bufferSize,bufferCount,polyphony) {
+	this._voiceManager = null;
+	this._synthChannels = null;
+	this._layerList = null;
+	this._midiEventQueue = null;
+	this._midiEventCounts = null;
+	this._metronomeChannel = 0;
+	this._mutedChannels = null;
+	this._soloChannels = null;
+	this._isAnySolo = false;
+	this._syn = 0.0;
+	this.MicroBufferSize = 0;
+	this.MicroBufferCount = 0;
+	this.SampleBuffer = null;
+	this.SoundBank = null;
+	this.SampleRate = 0;
+	this.MasterVolume = 0.0;
+	var MinSampleRate = 8000;
+	var MaxSampleRate = 96000;
+	this.MasterVolume = 1;
+	this.SampleRate = alphaSynth.util.SynthHelper.ClampI(sampleRate,MinSampleRate,MaxSampleRate);
+	this.MicroBufferSize = alphaSynth.util.SynthHelper.ClampI(bufferSize,system.Convert.ToInt32_Double(0.001 * sampleRate),system.Convert.ToInt32_Double(0.05 * sampleRate));
+	this.MicroBufferSize = system.Convert.ToInt32_Double(Math.ceil(this.MicroBufferSize / js.Boot.__cast(64 , Float)) * 64);
+	this.MicroBufferCount = Math.max(1,bufferCount);
+	var this1 = new Float32Array(this.MicroBufferSize * this.MicroBufferCount * audioChannels);
+	this.SampleBuffer = this1;
+	var this2 = new Array(17);
+	this._synthChannels = this2;
+	var x = 0;
+	while(x < this._synthChannels.length) {
+		this._synthChannels[x] = new alphaSynth.synthesis.SynthParameters(this);
+		++x;
+	}
+	this._metronomeChannel = this._synthChannels.length - 1;
+	this._voiceManager = new alphaSynth.synthesis.VoiceManager(alphaSynth.util.SynthHelper.ClampI(polyphony,5,250));
+	this._midiEventQueue = new alphaSynth.ds.LinkedList();
+	var this3 = new Int32Array(this.MicroBufferCount);
+	this._midiEventCounts = this3;
+	var this4 = new Array(15);
+	this._layerList = this4;
+	var this5 = {}
+	this._mutedChannels = this5;
+	var this6 = {}
+	this._soloChannels = this6;
+	this.ResetSynthControls();
+};
+alphaSynth.synthesis.Synthesizer.__name__ = ["alphaSynth","synthesis","Synthesizer"];
+alphaSynth.synthesis.Synthesizer.prototype = {
+	get_MetronomeVolume: function() {
+		return this._synthChannels[this._metronomeChannel].MixVolume;
+	}
+	,set_MetronomeVolume: function(value) {
+		this._synthChannels[this._metronomeChannel].MixVolume = value;
+		return this.get_MetronomeVolume();
+	}
+	,LoadBank: function(bank) {
+		this.UnloadBank();
+		this.SoundBank = bank;
+	}
+	,UnloadBank: function() {
+		if(this.SoundBank != null) {
+			this.NoteOffAll(true);
+			this._voiceManager.UnloadPatches();
+			this.SoundBank = null;
+		}
+	}
+	,ResetSynthControls: function() {
+		var parameters = HxOverrides.iter(this._synthChannels);
+		while(parameters.hasNext()) {
+			var parameters1 = parameters.next();
+			parameters1.ResetControllers();
+		}
+		this._synthChannels[9].BankSelect = system.Convert.ToUInt8(128);
+		this.ReleaseAllHoldPedals();
+		this._synthChannels[this._metronomeChannel].Volume.set_Coarse(128);
+		this._synthChannels[this._metronomeChannel].UpdateCurrentVolumeFromVolume();
+		this._synthChannels[this._metronomeChannel].BankSelect = system.Convert.ToUInt8(128);
+	}
+	,ResetPrograms: function() {
+		var parameters = HxOverrides.iter(this._synthChannels);
+		while(parameters.hasNext()) {
+			var parameters1 = parameters.next();
+			parameters1.Program = 0;
+		}
+	}
+	,Synthesize: function() {
+		this.SampleBuffer = new Float32Array(this.SampleBuffer.length);
+		this.FillWorkingBuffer();
+	}
+	,FillWorkingBuffer: function() {
+		var sampleIndex = 0;
+		var anySolo = this._isAnySolo;
+		var x = 0;
+		while(x < this.MicroBufferCount) {
+			if(this._midiEventQueue.Length > 0) {
+				var i = 0;
+				while(i < this._midiEventCounts[x]) {
+					var m = this._midiEventQueue.RemoveLast();
+					if(m.IsMetronome) {
+						this.NoteOff(this._metronomeChannel,37);
+						this.NoteOn(this._metronomeChannel,37,95);
+					} else {
+						this.ProcessMidiMessage(m.Event);
+					}
+					++i;
+				}
+			}
+			var node = this._voiceManager.ActiveVoices.First;
+			while(node != null) {
+				var channel = node.Value.VoiceParams.Channel;
+				var isChannelMuted = this._mutedChannels.hasOwnProperty(channel) || anySolo && !this._soloChannels.hasOwnProperty(channel);
+				node.Value.Process(sampleIndex,sampleIndex + this.MicroBufferSize * 2,isChannelMuted);
+				if(node.Value.VoiceParams.State == 0) {
+					var delnode = node;
+					node = node.get_Next();
+					this._voiceManager.RemoveVoiceFromRegistry(delnode.Value);
+					this._voiceManager.ActiveVoices.Remove(delnode);
+					this._voiceManager.FreeVoices.AddFirst(delnode.Value);
+				} else {
+					node = node.get_Next();
+				}
+			}
+			sampleIndex = sampleIndex + this.MicroBufferSize * 2;
+			++x;
+		}
+		alphaTab.platform.Platform.ClearIntArray(this._midiEventCounts);
+	}
+	,NoteOn: function(channel,note,velocity) {
+		var sChan = this._synthChannels[channel];
+		var inst = this.SoundBank.GetPatchByNumber(sChan.BankSelect,sChan.Program);
+		if(inst == null) {
+			return;
+		}
+		var layerCount;
+		if(js.Boot.__instanceof(inst,alphaSynth.bank.patch.MultiPatch)) {
+			layerCount = (js.Boot.__cast(inst , alphaSynth.bank.patch.MultiPatch)).FindPatches(channel,note,velocity,this._layerList);
+		} else {
+			layerCount = 1;
+			this._layerList[0] = inst;
+		}
+		if(this._voiceManager.Registry[channel][note] != null) {
+			var node = this._voiceManager.Registry[channel][note];
+			while(node != null) {
+				node.Value.Stop();
+				node = node.Next;
+			}
+			this._voiceManager.RemoveFromRegistry(channel,note);
+		}
+		var x = 0;
+		while(x < layerCount) {
+			var notseen = true;
+			var i = x - 1;
+			while(i >= 0) {
+				if(this._layerList[x].ExclusiveGroupTarget == this._layerList[i].ExclusiveGroupTarget) {
+					notseen = false;
+					break;
+				}
+				--i;
+			}
+			if(this._layerList[x].ExclusiveGroupTarget != 0 && notseen) {
+				var node1 = this._voiceManager.ActiveVoices.First;
+				while(node1 != null) {
+					if(this._layerList[x].ExclusiveGroupTarget == node1.Value.Patch.ExclusiveGroup) {
+						node1.Value.Stop();
+						this._voiceManager.RemoveVoiceFromRegistry(node1.Value);
+					}
+					node1 = node1.get_Next();
+				}
+			}
+			++x;
+		}
+		var x1 = 0;
+		while(x1 < layerCount) {
+			var voice = this._voiceManager.GetFreeVoice();
+			if(voice == null) {
+				break;
+			}
+			voice.Configure(channel,note,velocity,this._layerList[x1],this._synthChannels[channel]);
+			this._voiceManager.AddToRegistry(voice);
+			this._voiceManager.ActiveVoices.AddLast(voice);
+			voice.Start();
+			++x1;
+		}
+		var x2 = 0;
+		while(x2 < layerCount) {
+			this._layerList[x2] = null;
+			++x2;
+		}
+	}
+	,NoteOff: function(channel,note) {
+		if(this._synthChannels[channel].HoldPedal) {
+			var node = this._voiceManager.Registry[channel][note];
+			while(node != null) {
+				node.Value.VoiceParams.NoteOffPending = true;
+				node = node.Next;
+			}
+		} else {
+			var node1 = this._voiceManager.Registry[channel][note];
+			while(node1 != null) {
+				node1.Value.Stop();
+				node1 = node1.Next;
+			}
+			this._voiceManager.RemoveFromRegistry(channel,note);
+		}
+	}
+	,NoteOffAll: function(immediate) {
+		var node = this._voiceManager.ActiveVoices.First;
+		if(immediate) {
+			this._voiceManager.ClearRegistry();
+			while(node != null) {
+				node.Value.StopImmediately();
+				var delnode = node;
+				node = node.get_Next();
+				this._voiceManager.ActiveVoices.Remove(delnode);
+				this._voiceManager.FreeVoices.AddFirst(delnode.Value);
+			}
+		} else {
+			while(node != null) {
+				var voiceParams = node.Value.VoiceParams;
+				if(voiceParams.State == 2) {
+					if(this._synthChannels[voiceParams.Channel].HoldPedal) {
+						voiceParams.NoteOffPending = true;
+					} else {
+						node.Value.Stop();
+						this._voiceManager.RemoveVoiceFromRegistry(node.Value);
+					}
+				}
+				node = node.get_Next();
+			}
+		}
+	}
+	,NoteOffAllChannel: function(channel,immediate) {
+		var node = this._voiceManager.ActiveVoices.First;
+		while(node != null) if(channel == node.Value.VoiceParams.Channel) {
+			if(immediate) {
+				node.Value.StopImmediately();
+				var delnode = node;
+				node = node.get_Next();
+				this._voiceManager.ActiveVoices.Remove(delnode);
+				this._voiceManager.FreeVoices.AddFirst(delnode.Value);
+			} else {
+				if(this._synthChannels[channel].HoldPedal) {
+					node.Value.VoiceParams.NoteOffPending = true;
+				} else {
+					node.Value.Stop();
+				}
+				node = node.get_Next();
+			}
+		}
+	}
+	,ProcessMidiMessage: function(e) {
+		var command = e.get_Command();
+		var channel = e.get_Channel();
+		var data1 = e.get_Data1();
+		var data2 = e.get_Data2();
+		switch(command) {
+		case 128:
+			this.NoteOff(channel,data1);
+			break;
+		case 144:
+			if(data2 == 0) {
+				this.NoteOff(channel,data1);
+			} else {
+				this.NoteOn(channel,data1,data2);
+			}
+			break;
+		case 160:
+			break;
+		case 176:
+			var _g = js.Boot.__cast(data1 , Int);
+			switch(_g) {
+			case 0:
+				if(channel == 9) {
+					data2 = data2 + 128;
+				}
+				if(this.SoundBank.IsBankLoaded(data2)) {
+					this._synthChannels[channel].BankSelect = system.Convert.ToUInt8(data2);
+				} else {
+					this._synthChannels[channel].BankSelect = system.Convert.ToUInt8(channel == 9 ? 128 : 0);
+				}
+				break;
+			case 1:
+				this._synthChannels[channel].ModRange.set_Coarse(system.Convert.ToUInt8(data2));
+				this._synthChannels[channel].UpdateCurrentMod();
+				break;
+			case 6:
+				var _g1 = this._synthChannels[channel].Rpn.get_Combined();
+				switch(_g1) {
+				case 0:
+					this._synthChannels[channel].PitchBendRangeCoarse = system.Convert.ToUInt8(data2);
+					this._synthChannels[channel].UpdateCurrentPitch();
+					break;
+				case 1:
+					this._synthChannels[channel].MasterFineTune.set_Coarse(system.Convert.ToUInt8(data2));
+					break;
+				case 2:
+					this._synthChannels[channel].MasterCoarseTune = system.Convert.ToInt16(data2 - 64);
+					break;
+				default:
+				}
+				break;
+			case 7:
+				this._synthChannels[channel].Volume.set_Coarse(system.Convert.ToUInt8(data2));
+				this._synthChannels[channel].UpdateCurrentVolumeFromVolume();
+				break;
+			case 10:
+				this._synthChannels[channel].Pan.set_Coarse(system.Convert.ToUInt8(data2));
+				this._synthChannels[channel].UpdateCurrentPan();
+				break;
+			case 11:
+				this._synthChannels[channel].Expression.set_Coarse(system.Convert.ToUInt8(data2));
+				this._synthChannels[channel].UpdateCurrentVolumeFromExpression();
+				break;
+			case 33:
+				this._synthChannels[channel].ModRange.set_Fine(system.Convert.ToUInt8(data2));
+				this._synthChannels[channel].UpdateCurrentMod();
+				break;
+			case 38:
+				var _g2 = this._synthChannels[channel].Rpn.get_Combined();
+				switch(_g2) {
+				case 0:
+					this._synthChannels[channel].PitchBendRangeFine = system.Convert.ToUInt8(data2);
+					this._synthChannels[channel].UpdateCurrentPitch();
+					break;
+				case 1:
+					this._synthChannels[channel].MasterFineTune.set_Fine(system.Convert.ToUInt8(data2));
+					break;
+				default:
+				}
+				break;
+			case 39:
+				this._synthChannels[channel].Volume.set_Fine(system.Convert.ToUInt8(data2));
+				this._synthChannels[channel].UpdateCurrentVolumeFromVolume();
+				break;
+			case 42:
+				this._synthChannels[channel].Pan.set_Fine(system.Convert.ToUInt8(data2));
+				this._synthChannels[channel].UpdateCurrentPan();
+				break;
+			case 43:
+				this._synthChannels[channel].Expression.set_Fine(system.Convert.ToUInt8(data2));
+				this._synthChannels[channel].UpdateCurrentVolumeFromExpression();
+				break;
+			case 64:
+				if(this._synthChannels[channel].HoldPedal && !(data2 > 63)) {
+					this.ReleaseHoldPedal(channel);
+				}
+				this._synthChannels[channel].HoldPedal = data2 > 63;
+				break;
+			case 68:
+				this._synthChannels[channel].LegatoPedal = data2 > 63;
+				break;
+			case 98:
+				this._synthChannels[channel].Rpn.set_Combined(16383);
+				break;
+			case 99:
+				this._synthChannels[channel].Rpn.set_Combined(16383);
+				break;
+			case 100:
+				this._synthChannels[channel].Rpn.set_Fine(system.Convert.ToUInt8(data2));
+				break;
+			case 101:
+				this._synthChannels[channel].Rpn.set_Coarse(system.Convert.ToUInt8(data2));
+				break;
+			case 121:
+				this._synthChannels[channel].Expression.set_Combined(16383);
+				this._synthChannels[channel].ModRange.set_Combined(0);
+				if(this._synthChannels[channel].HoldPedal) {
+					this.ReleaseHoldPedal(channel);
+				}
+				this._synthChannels[channel].HoldPedal = false;
+				this._synthChannels[channel].LegatoPedal = false;
+				this._synthChannels[channel].Rpn.set_Combined(16383);
+				this._synthChannels[channel].PitchBend.set_Combined(8192);
+				this._synthChannels[channel].ChannelAfterTouch = 0;
+				this._synthChannels[channel].UpdateCurrentPitch();
+				this._synthChannels[channel].UpdateCurrentVolumeFromExpression();
+				break;
+			case 123:
+				this.NoteOffAll(false);
+				break;
+			default:
+				return;
+			}
+			break;
+		case 192:
+			this._synthChannels[channel].Program = system.Convert.ToUInt8(data1);
+			break;
+		case 208:
+			this._synthChannels[channel].ChannelAfterTouch = system.Convert.ToUInt8(data2);
+			break;
+		case 224:
+			this._synthChannels[channel].PitchBend.set_Coarse(system.Convert.ToUInt8(data2));
+			this._synthChannels[channel].PitchBend.set_Fine(system.Convert.ToUInt8(data1));
+			this._synthChannels[channel].UpdateCurrentPitch();
+			break;
+		default:
+		}
+		this.OnMidiEventProcessed(e);
+	}
+	,OnMidiEventProcessed: function(e) {
+		var _e = this.MidiEventProcessed;
+		var handler = function(p) {
+			system._EventAction1.EventAction1_Impl_.Invoke(_e,p);
+		};
+		if(handler != null) {
+			handler(e);
+		}
+	}
+	,ReleaseAllHoldPedals: function() {
+		var node = this._voiceManager.ActiveVoices.First;
+		while(node != null) {
+			if(node.Value.VoiceParams.NoteOffPending) {
+				node.Value.Stop();
+				this._voiceManager.RemoveVoiceFromRegistry(node.Value);
+			}
+			node = node.get_Next();
+		}
+	}
+	,ReleaseHoldPedal: function(channel) {
+		var node = this._voiceManager.ActiveVoices.First;
+		while(node != null) {
+			if(node.Value.VoiceParams.Channel == channel && node.Value.VoiceParams.NoteOffPending) {
+				node.Value.Stop();
+				this._voiceManager.RemoveVoiceFromRegistry(node.Value);
+			}
+			node = node.get_Next();
+		}
+	}
+	,DispatchEvent: function(i,synthEvent) {
+		this._midiEventQueue.AddFirst(synthEvent);
+		var tmp = i;
+		var tmp1 = this._midiEventCounts[tmp];
+		this._midiEventCounts[tmp] = tmp1 + 1;
+	}
+	,SetChannelMute: function(channel,mute) {
+		if(mute) {
+			this._mutedChannels[channel] = true;
+		} else {
+			var this1 = this._mutedChannels;
+			delete this1[channel];
+		}
+	}
+	,ResetChannelStates: function() {
+		var this1 = {}
+		this._mutedChannels = this1;
+		var this2 = {}
+		this._soloChannels = this2;
+		this._isAnySolo = false;
+	}
+	,SetChannelSolo: function(channel,solo) {
+		if(solo) {
+			this._soloChannels[channel] = true;
+		} else {
+			var this1 = this._soloChannels;
+			delete this1[channel];
+		}
+		var this2 = this._soloChannels;
+		this._isAnySolo = Object.keys(this2).length > 0;
+	}
+	,SetChannelProgram: function(channel,program) {
+		if(channel < 0 || channel >= this._synthChannels.length) {
+			return;
+		}
+		this._synthChannels[channel].Program = program;
+	}
+	,SetChannelVolume: function(channel,volume) {
+		if(channel < 0 || channel >= this._synthChannels.length) {
+			return;
+		}
+		this._synthChannels[channel].MixVolume = js.Boot.__cast(volume , Float);
+	}
+	,__class__: alphaSynth.synthesis.Synthesizer
+};
+alphaSynth.synthesis.Voice = function() {
+	this.Patch = null;
+	this.VoiceParams = null;
+	this.VoiceParams = new alphaSynth.synthesis.VoiceParameters();
+};
+alphaSynth.synthesis.Voice.__name__ = ["alphaSynth","synthesis","Voice"];
+alphaSynth.synthesis.Voice.prototype = {
+	Start: function() {
+		if(this.VoiceParams.State != 0) {
+			return;
+		}
+		if(this.Patch.Start(this.VoiceParams)) {
+			this.VoiceParams.State = 2;
+		}
+	}
+	,Stop: function() {
+		if(this.VoiceParams.State != 2) {
+			return;
+		}
+		this.VoiceParams.State = 1;
+		this.Patch.Stop(this.VoiceParams);
+	}
+	,StopImmediately: function() {
+		this.VoiceParams.State = 0;
+	}
+	,Process: function(startIndex,endIndex,isMuted) {
+		if(this.VoiceParams.State == 0) {
+			return;
+		}
+		this.Patch.Process(this.VoiceParams,startIndex,endIndex,isMuted);
+	}
+	,Configure: function(channel,note,velocity,patch,synthParams) {
+		this.VoiceParams.Reset();
+		this.VoiceParams.Channel = channel;
+		this.VoiceParams.Note = note;
+		this.VoiceParams.Velocity = velocity;
+		this.VoiceParams.SynthParams = synthParams;
+		this.Patch = patch;
+	}
+	,__class__: alphaSynth.synthesis.Voice
+};
+alphaSynth.synthesis.VoiceManager = function(voiceCount) {
+	this._voicePool = null;
+	this._vNodes = null;
+	this.Polyphony = 0;
+	this.FreeVoices = null;
+	this.ActiveVoices = null;
+	this.Registry = null;
+	this.Polyphony = voiceCount;
+	var this1 = new Array(voiceCount);
+	this._voicePool = this1;
+	this._vNodes = new alphaSynth.ds.LinkedList();
+	this.FreeVoices = new alphaSynth.ds.LinkedList();
+	this.ActiveVoices = new alphaSynth.ds.LinkedList();
+	var i = 0;
+	while(i < voiceCount) {
+		var v = new alphaSynth.synthesis.Voice();
+		this._voicePool[i] = v;
+		this._vNodes.AddLast(new alphaSynth.synthesis.VoiceNode());
+		this.FreeVoices.AddLast(v);
+		++i;
+	}
+	var this2 = new Array(17);
+	this.Registry = this2;
+	var i1 = 0;
+	while(i1 < this.Registry.length) {
+		var this3 = this.Registry;
+		var this4 = new Array(128);
+		this3[i1] = this4;
+		++i1;
+	}
+};
+alphaSynth.synthesis.VoiceManager.__name__ = ["alphaSynth","synthesis","VoiceManager"];
+alphaSynth.synthesis.VoiceManager.prototype = {
+	GetFreeVoice: function() {
+		if(this.FreeVoices.Length > 0) {
+			var voice = this.FreeVoices.First.Value;
+			this.FreeVoices.RemoveFirst();
+			return voice;
+		}
+		return this.StealQuietestVoice();
+	}
+	,AddToRegistry: function(voice) {
+		var node = this._vNodes.RemoveLast();
+		node.Value = voice;
+		node.Next = this.Registry[voice.VoiceParams.Channel][voice.VoiceParams.Note];
+		this.Registry[voice.VoiceParams.Channel][voice.VoiceParams.Note] = node;
+	}
+	,RemoveFromRegistry: function(channel,note) {
+		var node = this.Registry[channel][note];
+		while(node != null) {
+			this._vNodes.AddLast(node);
+			node = node.Next;
+		}
+		this.Registry[channel][note] = null;
+	}
+	,RemoveVoiceFromRegistry: function(voice) {
+		var node = this.Registry[voice.VoiceParams.Channel][voice.VoiceParams.Note];
+		if(node == null) {
+			return;
+		}
+		if(node.Value == voice) {
+			this.Registry[voice.VoiceParams.Channel][voice.VoiceParams.Note] = node.Next;
+			this._vNodes.AddLast(node);
+		} else {
+			var node2 = node;
+			node = node.Next;
+			while(node != null) {
+				if(node.Value == voice) {
+					node2.Next = node.Next;
+					this._vNodes.AddLast(node);
+					return;
+				}
+				node2 = node;
+				node = node.Next;
+			}
+		}
+	}
+	,ClearRegistry: function() {
+		var node = this.ActiveVoices.First;
+		while(node != null) {
+			var vnode = this.Registry[node.Value.VoiceParams.Channel][node.Value.VoiceParams.Note];
+			while(vnode != null) {
+				this._vNodes.AddLast(vnode);
+				vnode = vnode.Next;
+			}
+			this.Registry[node.Value.VoiceParams.Channel][node.Value.VoiceParams.Note] = null;
+			node = node.get_Next();
+		}
+	}
+	,UnloadPatches: function() {
+		var v = HxOverrides.iter(this._voicePool);
+		while(v.hasNext()) {
+			var v1 = v.next();
+			v1.Configure(0,0,0,null,null);
+			var current = this._vNodes.First;
+			while(current != null) {
+				current.Value.Value = null;
+				current = current.get_Next();
+			}
+		}
+	}
+	,StealQuietestVoice: function() {
+		var voiceVolume = 1000.0;
+		var quietest = null;
+		var node = this.ActiveVoices.First;
+		while(node != null) {
+			if(node.Value.VoiceParams.State != 2) {
+				var volume = node.Value.VoiceParams.get_CombinedVolume();
+				if(volume < voiceVolume) {
+					quietest = node;
+					var this1 = volume;
+					voiceVolume = this1;
+				}
+			}
+			node = node.get_Next();
+		}
+		if(quietest == null) {
+			quietest = this.ActiveVoices.First;
+		}
+		this.RemoveVoiceFromRegistry(quietest.Value);
+		this.ActiveVoices.Remove(quietest);
+		quietest.Value.VoiceParams.State = 0;
+		return quietest.Value;
+	}
+	,__class__: alphaSynth.synthesis.VoiceManager
+};
+alphaSynth.synthesis.VoiceNode = function() {
+};
+alphaSynth.synthesis.VoiceNode.__name__ = ["alphaSynth","synthesis","VoiceNode"];
+alphaSynth.synthesis.VoiceNode.prototype = {
+	__class__: alphaSynth.synthesis.VoiceNode
+};
+alphaSynth.synthesis.VoiceParameters = function() {
+	this.mix1 = 0.0;
+	this.mix2 = 0.0;
+	this.Channel = 0;
+	this.Note = 0;
+	this.Velocity = 0;
+	this.NoteOffPending = false;
+	this.State = null;
+	this.PitchOffset = 0;
+	this.VolOffset = 0.0;
+	this.BlockBuffer = null;
+	this.PData = null;
+	this.SynthParams = null;
+	this.GeneratorParams = null;
+	this.Envelopes = null;
+	this.Filters = null;
+	this.Lfos = null;
+	var this1 = new Float32Array(64);
+	this.BlockBuffer = this1;
+	var this2 = new Array(4);
+	this.PData = this2;
+	var this3 = new Array(4);
+	this.GeneratorParams = this3;
+	var this4 = new Array(4);
+	this.Envelopes = this4;
+	var this5 = new Array(4);
+	this.Filters = this5;
+	var this6 = new Array(4);
+	this.Lfos = this6;
+	var x = 0;
+	while(x < 4) {
+		this.GeneratorParams[x] = new alphaSynth.bank.components.generators.GeneratorParameters();
+		this.Envelopes[x] = new alphaSynth.bank.components.Envelope();
+		this.Filters[x] = new alphaSynth.bank.components.Filter();
+		this.Lfos[x] = new alphaSynth.bank.components.Lfo();
+		++x;
+	}
+};
+alphaSynth.synthesis.VoiceParameters.__name__ = ["alphaSynth","synthesis","VoiceParameters"];
+alphaSynth.synthesis.VoiceParameters.prototype = {
+	get_CombinedVolume: function() {
+		return this.mix1 + this.mix2;
+	}
+	,Reset: function() {
+		this.NoteOffPending = false;
+		this.PitchOffset = 0;
+		this.VolOffset = 0;
+		var i = 0;
+		while(i < this.PData.length) {
+			var this1 = this.PData;
+			var this2 = new DataView(new ArrayBuffer(8));
+			this1[i] = this2;
+			++i;
+		}
+		this.mix1 = 0;
+		this.mix2 = 0;
+	}
+	,MixMonoToMonoInterp: function(startIndex,volume) {
+		var inc = (volume - this.mix1) / 64;
+		var i = 0;
+		while(i < this.BlockBuffer.length) {
+			this.mix1 = this.mix1 + inc;
+			var this1 = this.SynthParams.Synth.SampleBuffer;
+			var index = startIndex + i;
+			this1[index] = this.SynthParams.Synth.SampleBuffer[startIndex + i] + this.BlockBuffer[i] * this.mix1;
+			++i;
+		}
+		this.mix1 = volume;
+	}
+	,MixMonoToStereoInterp: function(startIndex,leftVol,rightVol) {
+		var inc_l = (leftVol - this.mix1) / 64;
+		var inc_r = (rightVol - this.mix2) / 64;
+		var i = 0;
+		while(i < this.BlockBuffer.length) {
+			this.mix1 = this.mix1 + inc_l;
+			this.mix2 = this.mix2 + inc_r;
+			var this1 = this.SynthParams.Synth.SampleBuffer;
+			this1[startIndex] = this.SynthParams.Synth.SampleBuffer[startIndex] + this.BlockBuffer[i] * this.mix1;
+			var this2 = this.SynthParams.Synth.SampleBuffer;
+			var index = startIndex + 1;
+			this2[index] = this.SynthParams.Synth.SampleBuffer[startIndex + 1] + this.BlockBuffer[i] * this.mix2;
+			startIndex = startIndex + 2;
+			++i;
+		}
+		this.mix1 = leftVol;
+		this.mix2 = rightVol;
+	}
+	,MixStereoToStereoInterp: function(startIndex,leftVol,rightVol) {
+		var inc_l = (leftVol - this.mix1) / 64;
+		var inc_r = (rightVol - this.mix2) / 64;
+		var i = 0;
+		while(i < this.BlockBuffer.length) {
+			this.mix1 = this.mix1 + inc_l;
+			this.mix2 = this.mix2 + inc_r;
+			var this1 = this.SynthParams.Synth.SampleBuffer;
+			var index = startIndex + i;
+			this1[index] = this.SynthParams.Synth.SampleBuffer[startIndex + i] + this.BlockBuffer[i] * this.mix1;
+			++i;
+			var this2 = this.SynthParams.Synth.SampleBuffer;
+			var index1 = startIndex + i;
+			this2[index1] = this.SynthParams.Synth.SampleBuffer[startIndex + i] + this.BlockBuffer[i] * this.mix2;
+			++i;
+		}
+		this.mix1 = leftVol;
+		this.mix2 = rightVol;
+	}
+	,__class__: alphaSynth.synthesis.VoiceParameters
+};
+alphaSynth.synthesis._VoiceStateEnum = {};
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_ = {};
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.__name__ = ["alphaSynth","synthesis","_VoiceStateEnum","VoiceStateEnum_Impl_"];
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "Stopped";
+	case 1:
+		return "Stopping";
+	case 2:
+		return "Playing";
+	}
+	return "";
+};
+alphaSynth.util = {};
+alphaSynth.util.SynthConstants = function() { };
+alphaSynth.util.SynthConstants.__name__ = ["alphaSynth","util","SynthConstants"];
+alphaSynth.util.SynthHelper = function() {
+};
+alphaSynth.util.SynthHelper.__name__ = ["alphaSynth","util","SynthHelper"];
+alphaSynth.util.SynthHelper.SwapEndianess = function(data,bits) {
+	bits = bits / 8 | 0;
+	var this1 = new Uint8Array(bits);
+	var swapArray = this1;
+	var x = 0;
+	while(x < data.length) {
+		var i = 0;
+		while(i < bits) {
+			swapArray[0 + i] = data[x + i];
+			++i;
+		}
+		alphaTab.platform.Platform.Reverse(swapArray);
+		var i1 = 0;
+		while(i1 < bits) {
+			data[x + i1] = swapArray[0 + i1];
+			++i1;
+		}
+		x = x + bits;
+	}
+};
+alphaSynth.util.SynthHelper.ClampB = function(value,min,max) {
+	if(value <= min) {
+		return min;
+	} else if(value >= max) {
+		return max;
+	} else {
+		return value;
+	}
+};
+alphaSynth.util.SynthHelper.ClampD = function(value,min,max) {
+	if(value <= min) {
+		return min;
+	} else if(value >= max) {
+		return max;
+	} else {
+		return value;
+	}
+};
+alphaSynth.util.SynthHelper.ClampF = function(value,min,max) {
+	if(value <= min) {
+		return min;
+	} else if(value >= max) {
+		return max;
+	} else {
+		return value;
+	}
+};
+alphaSynth.util.SynthHelper.ClampI = function(value,min,max) {
+	if(value <= min) {
+		return min;
+	} else if(value >= max) {
+		return max;
+	} else {
+		return value;
+	}
+};
+alphaSynth.util.SynthHelper.ClampS = function(value,min,max) {
+	if(value <= min) {
+		return min;
+	} else if(value >= max) {
+		return max;
+	} else {
+		return value;
+	}
+};
+alphaSynth.util.SynthHelper.NearestPowerOfTwo = function(value) {
+	return Math.pow(2,Math.round(Math.log(value) / Math.log(2)));
+};
+alphaSynth.util.SynthHelper.SamplesFromTime = function(sampleRate,seconds) {
+	return sampleRate * seconds;
+};
+alphaSynth.util.SynthHelper.TimeFromSamples = function(sampleRate,samples) {
+	return samples / js.Boot.__cast(sampleRate , Float);
+};
+alphaSynth.util.SynthHelper.DBtoLinear = function(dBvalue) {
+	return Math.pow(10.0,dBvalue / 20.0);
+};
+alphaSynth.util.SynthHelper.LineartoDB = function(linearvalue) {
+	return 20.0 * (Math.log(linearvalue) / Math.log(10));
+};
+alphaSynth.util.SynthHelper.FrequencyToKey = function(frequency,rootkey) {
+	return 12.0 * (Math.log(frequency / 440.0) / Math.log(2.0)) + rootkey;
+};
+alphaSynth.util.SynthHelper.KeyToFrequency = function(key,rootkey) {
+	return Math.pow(2.0,(key - rootkey) / 12.0) * 440.0;
+};
+alphaSynth.util.SynthHelper.SemitoneToPitch = function(key) {
+	if(key < -127) {
+		key = -127;
+	} else if(key > 127) {
+		key = 127;
+	}
+	var this1 = alphaSynth.util.Tables.SemitoneTable(127 + key);
+	return this1;
+};
+alphaSynth.util.SynthHelper.CentsToPitch = function(cents) {
+	var key = cents / 100 | 0;
+	cents = cents - key * 100;
+	if(key < -127) {
+		key = -127;
+	} else if(key > 127) {
+		key = 127;
+	}
+	var this1 = alphaSynth.util.Tables.SemitoneTable(127 + key) * alphaSynth.util.Tables.CentTable(100 + cents);
+	return this1;
+};
+alphaSynth.util.SynthHelper.prototype = {
+	__class__: alphaSynth.util.SynthHelper
+};
+alphaSynth.util.Tables = function() {
+};
+alphaSynth.util.Tables.__name__ = ["alphaSynth","util","Tables"];
+alphaSynth.util.Tables.EnvelopeTables = function(index) {
+	if(!alphaSynth.util.Tables._isInitialized) {
+		alphaSynth.util.Tables.Init();
+	}
+	return alphaSynth.util.Tables._envelopeTables[index];
+};
+alphaSynth.util.Tables.SemitoneTable = function(index) {
+	if(!alphaSynth.util.Tables._isInitialized) {
+		alphaSynth.util.Tables.Init();
+	}
+	return alphaSynth.util.Tables._semitoneTable[index];
+};
+alphaSynth.util.Tables.CentTable = function(index) {
+	if(!alphaSynth.util.Tables._isInitialized) {
+		alphaSynth.util.Tables.Init();
+	}
+	return alphaSynth.util.Tables._centTable[index];
+};
+alphaSynth.util.Tables.SincTable = function(index) {
+	if(!alphaSynth.util.Tables._isInitialized) {
+		alphaSynth.util.Tables.Init();
+	}
+	return alphaSynth.util.Tables._sincTable[index];
+};
+alphaSynth.util.Tables.Init = function() {
+	var EnvelopeSize = 64;
+	var ExponentialCoeff = .09;
+	var this1 = new Array(4);
+	alphaSynth.util.Tables._envelopeTables = this1;
+	alphaSynth.util.Tables._envelopeTables[0] = alphaSynth.util.Tables.RemoveDenormals(alphaSynth.util.Tables.CreateSustainTable(EnvelopeSize));
+	alphaSynth.util.Tables._envelopeTables[1] = alphaSynth.util.Tables.RemoveDenormals(alphaSynth.util.Tables.CreateLinearTable(EnvelopeSize));
+	alphaSynth.util.Tables._envelopeTables[2] = alphaSynth.util.Tables.RemoveDenormals(alphaSynth.util.Tables.CreateExponentialTable(EnvelopeSize,ExponentialCoeff));
+	alphaSynth.util.Tables._envelopeTables[3] = alphaSynth.util.Tables.RemoveDenormals(alphaSynth.util.Tables.CreateSineTable(EnvelopeSize));
+	alphaSynth.util.Tables._centTable = alphaSynth.util.Tables.CreateCentTable();
+	alphaSynth.util.Tables._semitoneTable = alphaSynth.util.Tables.CreateSemitoneTable();
+	alphaSynth.util.Tables._sincTable = alphaSynth.util.Tables.CreateSincTable(16,64,.43,alphaSynth.util.Tables.HammingWindow);
+	alphaSynth.util.Tables._isInitialized = true;
+};
+alphaSynth.util.Tables.CreateSquareTable = function(size,k) {
+	var FourOverPi = 1.2732395447351641;
+	var this1 = new Float32Array(size);
+	var squaretable = this1;
+	var inc = 1.0 / size;
+	var phase = 0.0;
+	var x = 0;
+	while(x < size) {
+		var value = 0.0;
+		var i = 1;
+		while(i < k + 1) {
+			var twokminus1 = 2 * i - 1;
+			value = value + Math.sin(2.0 * 3.14159265358979 * twokminus1 * phase) / twokminus1;
+			++i;
+		}
+		squaretable[x] = alphaSynth.util.SynthHelper.ClampF(js.Boot.__cast(FourOverPi * value , Float),-1,1);
+		phase = phase + inc;
+		++x;
+	}
+	return squaretable;
+};
+alphaSynth.util.Tables.CreateCentTable = function() {
+	var this1 = new Float32Array(201);
+	var cents = this1;
+	var x = 0;
+	while(x < cents.length) {
+		cents[x] = js.Boot.__cast(Math.pow(2.0,(x - 100.0) / 1200.0) , Float);
+		++x;
+	}
+	return cents;
+};
+alphaSynth.util.Tables.CreateSemitoneTable = function() {
+	var this1 = new Float32Array(255);
+	var table = this1;
+	var x = 0;
+	while(x < table.length) {
+		table[x] = js.Boot.__cast(Math.pow(2.0,(x - 127.0) / 12.0) , Float);
+		++x;
+	}
+	return table;
+};
+alphaSynth.util.Tables.CreateSustainTable = function(size) {
+	var this1 = new Float32Array(size);
+	var table = this1;
+	var x = 0;
+	while(x < size) {
+		table[x] = 1;
+		++x;
+	}
+	return table;
+};
+alphaSynth.util.Tables.CreateLinearTable = function(size) {
+	var this1 = new Float32Array(size);
+	var table = this1;
+	var x = 0;
+	while(x < size) {
+		table[x] = x / js.Boot.__cast(size - 1 , Float);
+		++x;
+	}
+	return table;
+};
+alphaSynth.util.Tables.CreateExponentialTable = function(size,coeff) {
+	coeff = alphaSynth.util.SynthHelper.ClampF(coeff,.001,.9);
+	var this1 = new Float32Array(size);
+	var graph = this1;
+	var val = 0.0;
+	var x = 0;
+	while(x < size) {
+		graph[x] = js.Boot.__cast(val , Float);
+		val = val + coeff * (1.5873015873015872 - val);
+		++x;
+	}
+	var x1 = 0;
+	while(x1 < size) {
+		graph[x1] = graph[x1] / graph[graph.length - 1];
+		++x1;
+	}
+	return graph;
+};
+alphaSynth.util.Tables.CreateSineTable = function(size) {
+	var this1 = new Float32Array(size);
+	var graph = this1;
+	var inc = js.Boot.__cast(4.7123889803846852 , Float) / (size - 1);
+	var phase = 0.0;
+	var x = 0;
+	while(x < size) {
+		graph[x] = js.Boot.__cast(Math.abs(Math.sin(phase)) , Float);
+		phase = phase + inc;
+		++x;
+	}
+	return graph;
+};
+alphaSynth.util.Tables.RemoveDenormals = function(data) {
+	var x = 0;
+	while(x < data.length) {
+		if(Math.abs(data[x]) < 1e-38) {
+			data[x] = 0;
+		}
+		++x;
+	}
+	return data;
+};
+alphaSynth.util.Tables.VonHannWindow = function(i,size) {
+	return js.Boot.__cast(0.5 - 0.5 * Math.cos(2.0 * 3.14159265358979 * (0.5 + i / size)) , Float);
+};
+alphaSynth.util.Tables.HammingWindow = function(i,size) {
+	return js.Boot.__cast(0.54 - 0.46 * Math.cos(2.0 * 3.14159265358979 * i / size) , Float);
+};
+alphaSynth.util.Tables.BlackmanWindow = function(i,size) {
+	var this1 = 12.56637061435916 * i / size;
+	return js.Boot.__cast(0.42659 - 0.49656 * Math.cos(2.0 * 3.14159265358979 * i / size) + 0.076849 * Math.cos(this1) , Float);
+};
+alphaSynth.util.Tables.CreateSincTable = function(windowSize,resolution,cornerRatio,windowFunction) {
+	var subWindow = (windowSize / 2 | 0) + 1;
+	var this1 = new Float32Array(subWindow * resolution);
+	var table = this1;
+	var this2 = 2.0 * cornerRatio;
+	var gain = this2;
+	var x = 0;
+	while(x < subWindow) {
+		var y = 0;
+		while(y < resolution) {
+			var a = x + y / js.Boot.__cast(resolution , Float);
+			var sinc = 2.0 * 3.14159265358979 * cornerRatio * a;
+			if(Math.abs(sinc) > 0.00001) {
+				sinc = Math.sin(sinc) / sinc;
+			} else {
+				sinc = 1.0;
+			}
+			var index = x * 64 + y;
+			table[index] = js.Boot.__cast(gain * sinc * windowFunction(a,windowSize) , Float);
+			++y;
+		}
+		++x;
+	}
+	return table;
+};
+alphaSynth.util.Tables.prototype = {
+	__class__: alphaSynth.util.Tables
+};
 var system = {};
 system.Exception = function() {
 };
@@ -229,6 +7065,7 @@ system.Exception.__name__ = ["system","Exception"];
 system.Exception.prototype = {
 	Exception_CsString: function(message) {
 		this.Message = message;
+		return this;
 	}
 	,__class__: system.Exception
 };
@@ -247,2960 +7084,6 @@ alphaTab.AlphaTabException.prototype = $extend(system.Exception.prototype,{
 	}
 	,__class__: alphaTab.AlphaTabException
 });
-alphaTab.platform = {};
-alphaTab.platform.IPathCanvas = $hx_exports["alphaTab"]["platform"]["IPathCanvas"] = function() { };
-alphaTab.platform.IPathCanvas.__name__ = ["alphaTab","platform","IPathCanvas"];
-alphaTab.platform.IPathCanvas.prototype = {
-	__class__: alphaTab.platform.IPathCanvas
-};
-alphaTab.platform.ICanvas = $hx_exports["alphaTab"]["platform"]["ICanvas"] = function() { };
-alphaTab.platform.ICanvas.__name__ = ["alphaTab","platform","ICanvas"];
-alphaTab.platform.ICanvas.__interfaces__ = [alphaTab.platform.IPathCanvas];
-alphaTab.platform.ICanvas.prototype = {
-	__class__: alphaTab.platform.ICanvas
-};
-alphaTab.platform.svg = {};
-alphaTab.platform.svg.SvgCanvas = $hx_exports["alphaTab"]["platform"]["svg"]["SvgCanvas"] = function() {
-	this.Buffer = null;
-	this._currentPath = null;
-	this._currentPathIsEmpty = false;
-	var this1 = "";
-	this._currentPath = this1;
-	this._currentPathIsEmpty = true;
-	this.set_Color(new alphaTab.platform.model.Color(255,255,255,255));
-	this.set_LineWidth(1);
-	this.set_Font(new alphaTab.platform.model.Font("Arial",10,0));
-	this.set_TextAlign(0);
-	this.set_TextBaseline(0);
-};
-alphaTab.platform.svg.SvgCanvas.__name__ = ["alphaTab","platform","svg","SvgCanvas"];
-alphaTab.platform.svg.SvgCanvas.__interfaces__ = [alphaTab.platform.IPathCanvas,alphaTab.platform.ICanvas];
-alphaTab.platform.svg.SvgCanvas.prototype = {
-	get_Color: function() {
-		return this.__Color;
-	}
-	,set_Color: function(value) {
-		return this.__Color = value;
-	}
-	,get_LineWidth: function() {
-		return this.__LineWidth;
-	}
-	,set_LineWidth: function(value) {
-		return this.__LineWidth = value;
-	}
-	,get_Font: function() {
-		return this.__Font;
-	}
-	,set_Font: function(value) {
-		return this.__Font = value;
-	}
-	,get_TextAlign: function() {
-		return this.__TextAlign;
-	}
-	,set_TextAlign: function(value) {
-		return this.__TextAlign = value;
-	}
-	,get_TextBaseline: function() {
-		return this.__TextBaseline;
-	}
-	,set_TextBaseline: function(value) {
-		return this.__TextBaseline = value;
-	}
-	,get_Resources: function() {
-		return this.__Resources;
-	}
-	,set_Resources: function(value) {
-		return this.__Resources = value;
-	}
-	,BeginRender: function(width,height) {
-		var this1 = "";
-		this.Buffer = this1;
-		this.Buffer += Std.string("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
-		this.Buffer += Std.string(width);
-		this.Buffer += Std.string("px\" height=\"");
-		this.Buffer += Std.string(height);
-		this.Buffer += Std.string("px\" class=\"alphaTabSurfaceSvg\">\n");
-		var this2 = "";
-		this._currentPath = this2;
-		this._currentPathIsEmpty = true;
-	}
-	,BeginGroup: function(identifier) {
-		this.Buffer += Std.string("<g class=\"" + identifier + "\">");
-	}
-	,EndGroup: function() {
-		this.Buffer += Std.string("</g>");
-	}
-	,EndRender: function() {
-		this.Buffer += Std.string("</svg>");
-		return this.Buffer;
-	}
-	,FillRect: function(x,y,w,h) {
-		if(w > 0) {
-			var s = "<rect x=\"" + (system.Convert.ToInt32_Single(x) - 0) + "\" y=\"" + (system.Convert.ToInt32_Single(y) - 0) + "\" width=\"" + w + "\" height=\"" + h + "\" fill=\"" + this.get_Color().RGBA + "\" />\n";
-			this.Buffer += Std.string(s);
-		}
-	}
-	,StrokeRect: function(x,y,w,h) {
-		var s = "<rect x=\"" + (system.Convert.ToInt32_Single(x) - 0) + "\" y=\"" + (system.Convert.ToInt32_Single(y) - 0) + "\" width=\"" + w + "\" height=\"" + h + "\" stroke=\"" + this.get_Color().RGBA + "\"";
-		this.Buffer += Std.string(s);
-		if(this.get_LineWidth() != 1) {
-			var s1 = " stroke-width=\"" + this.get_LineWidth() + "\"";
-			this.Buffer += Std.string(s1);
-		}
-		this.Buffer += Std.string(" fill=\"transparent\" />\n");
-	}
-	,BeginPath: function() {
-	}
-	,ClosePath: function() {
-		this._currentPath += Std.string(" z");
-	}
-	,MoveTo: function(x,y) {
-		this._currentPath += Std.string(" M" + (x - 0) + "," + (y - 0));
-	}
-	,LineTo: function(x,y) {
-		this._currentPathIsEmpty = false;
-		this._currentPath += Std.string(" L" + (x - 0) + "," + (y - 0));
-	}
-	,QuadraticCurveTo: function(cpx,cpy,x,y) {
-		this._currentPathIsEmpty = false;
-		this._currentPath += Std.string(" Q" + cpx + "," + cpy + "," + x + "," + y);
-	}
-	,BezierCurveTo: function(cp1x,cp1y,cp2x,cp2y,x,y) {
-		this._currentPathIsEmpty = false;
-		this._currentPath += Std.string(" C" + cp1x + "," + cp1y + "," + cp2x + "," + cp2y + "," + x + "," + y);
-	}
-	,FillCircle: function(x,y,radius) {
-		this._currentPathIsEmpty = false;
-		this._currentPath += Std.string(" M" + (x - radius) + "," + y + " A1,1 0 0,0 " + (x + radius) + "," + y + " A1,1 0 0,0 " + (x - radius) + "," + y + " z");
-		this.Fill();
-	}
-	,Fill: function() {
-		if(!this._currentPathIsEmpty) {
-			this.Buffer += Std.string("<path d=\"" + this._currentPath + "\"");
-			if(this.get_Color().RGBA != "#000000") {
-				var s = " fill=\"" + this.get_Color().RGBA + "\"";
-				this.Buffer += Std.string(s);
-			}
-			this.Buffer += Std.string(" stroke=\"none\"/>");
-		}
-		var this1 = "";
-		this._currentPath = this1;
-		this._currentPathIsEmpty = true;
-	}
-	,Stroke: function() {
-		if(!this._currentPathIsEmpty) {
-			var s = "<path d=\"" + this._currentPath + "\" stroke=\"" + this.get_Color().RGBA + "\"";
-			if(this.get_LineWidth() != 1) {
-				s = s + (" stroke-width=\"" + this.get_LineWidth() + "\"");
-			}
-			s = s + " fill=\"none\" />";
-			this.Buffer += Std.string(s);
-		}
-		var this1 = "";
-		this._currentPath = this1;
-		this._currentPathIsEmpty = true;
-	}
-	,FillText: function(text,x,y) {
-		if(text == "") {
-			return;
-		}
-		var s = "<text x=\"" + system.Convert.ToInt32_Single(x) + "\" y=\"" + system.Convert.ToInt32_Single(y) + "\" style=\"font:" + this.get_Font().ToCssString(1) + "\" " + " dominant-baseline=\"" + this.GetSvgBaseLine() + "\"";
-		if(this.get_Color().RGBA != "#000000") {
-			s = s + (" fill=\"" + this.get_Color().RGBA + "\"");
-		}
-		if(this.get_TextAlign() != 0) {
-			s = s + (" text-anchor=\"" + this.GetSvgTextAlignment() + "\"");
-		}
-		s = s + (">" + text + "</text>");
-		this.Buffer += Std.string(s);
-	}
-	,GetSvgTextAlignment: function() {
-		var _g = this.get_TextAlign();
-		switch(_g) {
-		case 0:
-			return "start";
-		case 1:
-			return "middle";
-		case 2:
-			return "end";
-		default:
-		}
-		return "";
-	}
-	,GetSvgBaseLine: function() {
-		var _g = this.get_TextBaseline();
-		switch(_g) {
-		case 0:
-			return "hanging";
-		case 1:
-			return "middle";
-		case 2:
-			return "bottom";
-		default:
-			return "";
-		}
-	}
-	,MeasureText: function(text) {
-		if(text == null || text.length == 0) {
-			return 0;
-		}
-		var font = 1;
-		if(this.get_Font().Family.indexOf("Times") != -1) {
-			font = 0;
-		}
-		return alphaTab.platform.svg.FontSizes.MeasureString(text,font,this.get_Font().Size,this.get_Font().Style);
-	}
-	,FillMusicFontSymbol: function(x,y,scale,symbol) {
-		throw new js._Boot.HaxeError("abstract");
-	}
-	,OnPreRender: function() {
-		return null;
-	}
-	,OnRenderFinished: function() {
-		return null;
-	}
-	,__class__: alphaTab.platform.svg.SvgCanvas
-};
-alphaTab.platform.svg.CssFontSvgCanvas = $hx_exports["alphaTab"]["platform"]["svg"]["CssFontSvgCanvas"] = function() {
-	alphaTab.platform.svg.SvgCanvas.call(this);
-};
-alphaTab.platform.svg.CssFontSvgCanvas.__name__ = ["alphaTab","platform","svg","CssFontSvgCanvas"];
-alphaTab.platform.svg.CssFontSvgCanvas.__super__ = alphaTab.platform.svg.SvgCanvas;
-alphaTab.platform.svg.CssFontSvgCanvas.prototype = $extend(alphaTab.platform.svg.SvgCanvas.prototype,{
-	FillMusicFontSymbol: function(x,y,scale,symbol) {
-		var s = "<g transform=\"translate(" + (system.Convert.ToInt32_Single(x) - 0) + " " + (system.Convert.ToInt32_Single(y) - 0) + ")\" class=\"at\" ><text";
-		this.Buffer += Std.string(s);
-		if(scale != 1) {
-			this.Buffer += Std.string("  style=\"font-size: " + scale * 100 + "%\"");
-		}
-		if(this.get_Color().RGBA != "#000000") {
-			var s1 = " fill=\"" + this.get_Color().RGBA + "\"";
-			this.Buffer += Std.string(s1);
-		}
-		this.Buffer += Std.string(">&#" + symbol + ";</text></g>");
-	}
-	,__class__: alphaTab.platform.svg.CssFontSvgCanvas
-});
-alphaTab.platform.model = {};
-alphaTab.platform.model.Color = $hx_exports["alphaTab"]["platform"]["model"]["Color"] = function(r,g,b,a) {
-	if(a == null) {
-		a = 255;
-	}
-	this.Raw = 0;
-	this.RGBA = null;
-	this.Raw = a << 24 | r << 16 | g << 8 | b;
-	if(this.get_A() == 255) {
-		this.RGBA = "#" + alphaTab.platform.Platform.ToHexString(this.get_R(),2) + alphaTab.platform.Platform.ToHexString(this.get_G(),2) + alphaTab.platform.Platform.ToHexString(this.get_B(),2);
-	} else {
-		this.RGBA = "rgba(" + this.get_R() + "," + this.get_G() + "," + this.get_B() + "," + this.get_A() / 255.0 + ")";
-	}
-};
-alphaTab.platform.model.Color.__name__ = ["alphaTab","platform","model","Color"];
-alphaTab.platform.model.Color.prototype = {
-	get_A: function() {
-		return system.Convert.ToUInt8(this.Raw >> 24 & 255);
-	}
-	,get_R: function() {
-		return system.Convert.ToUInt8(this.Raw >> 16 & 255);
-	}
-	,get_G: function() {
-		return system.Convert.ToUInt8(this.Raw >> 8 & 255);
-	}
-	,get_B: function() {
-		return system.Convert.ToUInt8(this.Raw & 255);
-	}
-	,__class__: alphaTab.platform.model.Color
-};
-alphaTab.platform.Platform = $hx_exports["alphaTab"]["platform"]["Platform"] = function() { };
-alphaTab.platform.Platform.__name__ = ["alphaTab","platform","Platform"];
-alphaTab.platform.Platform.ParseFloat = function(s) {
-	return parseFloat(s);
-};
-alphaTab.platform.Platform.GetCallerName = function() {
-	return arguments.callee.caller.caller.name;
-};
-alphaTab.platform.Platform.Log = function(logLevel,category,msg,details) {
-	msg = "[AlphaTab][" + category + "] " + msg;
-	var $console = $global.console;
-	switch(logLevel) {
-	case 0:
-		break;
-	case 1:
-		$console.debug(msg,details);
-		break;
-	case 2:
-		$console.info(msg,details);
-		break;
-	case 3:
-		$console.warn(msg,details);
-		break;
-	case 4:
-		var stack = haxe.CallStack.toString(haxe.CallStack.callStack());
-		$console.error(msg,stack,details);
-		break;
-	default:
-	}
-};
-alphaTab.platform.Platform.NewObject = function() {
-	return {}
-};
-alphaTab.platform.Platform.JsonExists = function(json,property) {
-	return (json && property in json);
-};
-alphaTab.platform.Platform.JsonKeys = function(json) {
-	return Object.keys(json);
-};
-alphaTab.platform.Platform.Log2 = function(f) {
-	return Math.log2(f);
-};
-alphaTab.platform.Platform.ParseInt = function(s) {
-	var val = parseInt(s);
-	if(isNaN(val)) {
-		return -2147483648;
-	} else {
-		return val;
-	}
-};
-alphaTab.platform.Platform.CloneArray = function(array) {
-	return new Int32Array(array);
-};
-alphaTab.platform.Platform.BlockCopy = function(src,srcOffset,dst,dstOffset,count) {
-	var i = 0;
-	while(i < count) {
-		dst[dstOffset + i] = src[srcOffset + i];
-		++i;
-	}
-};
-alphaTab.platform.Platform.StringFromCharCode = function(c) {
-	return String.fromCharCode(c);
-};
-alphaTab.platform.Platform.ReadSignedByte = function(readable) {
-	var n = readable.ReadByte();
-	if(n >= 128) {
-		return system.Convert.ToInt8(n - 256);
-	}
-	return system.Convert.ToInt8(n);
-};
-alphaTab.platform.Platform.ToString = function(data) {
-	var this1 = "";
-	var s = this1;
-	var i = 0;
-	while(i < data.length) {
-		var c = data[i++];
-		if(c < 128) {
-			if(c == 0) {
-				break;
-			}
-			s += String.fromCharCode(c);
-		} else if(c < 224) {
-			s += String.fromCharCode((c & 63) << 6 | data[i++] & 127);
-		} else if(c < 240) {
-			s += String.fromCharCode((c & 31) << 12 | (data[i++] & 127) << 6 | data[i++] & 127);
-		} else {
-			var u = (c & 15) << 18 | (data[i++] & 127) << 12 | (data[i++] & 127) << 6 | data[i++] & 127;
-			s += String.fromCharCode((u >> 18) + 55232);
-			s += String.fromCharCode(u & 1023 | 56320);
-		}
-	}
-	return s;
-};
-alphaTab.platform.Platform.StringToByteArray = function(contents) {
-	var this1 = new Uint8Array(contents.length);
-	var byteArray = this1;
-	var i = 0;
-	while(i < contents.length) {
-		var this2 = system.Convert.ToUInt16(HxOverrides.cca(contents,i));
-		byteArray[i] = system.Convert.ToUInt8(this2);
-		++i;
-	}
-	return byteArray;
-};
-alphaTab.platform.Platform.S4 = function() {
-	return Math.floor((1 + Math.random()) * 65536).toString(16).substring(1);
-};
-alphaTab.platform.Platform.NewGuid = function() {
-	var lhs = alphaTab.platform.Platform.S4() + alphaTab.platform.Platform.S4();
-	var this1 = system.Convert.ToUInt16(45);
-	var lhs1 = lhs + String.fromCharCode(this1) + alphaTab.platform.Platform.S4();
-	var this2 = system.Convert.ToUInt16(45);
-	var lhs2 = lhs1 + String.fromCharCode(this2) + alphaTab.platform.Platform.S4();
-	var this3 = system.Convert.ToUInt16(45);
-	var lhs3 = lhs2 + String.fromCharCode(this3) + alphaTab.platform.Platform.S4();
-	var this4 = system.Convert.ToUInt16(45);
-	return lhs3 + String.fromCharCode(this4) + alphaTab.platform.Platform.S4() + alphaTab.platform.Platform.S4() + alphaTab.platform.Platform.S4();
-};
-alphaTab.platform.Platform.Member_Object_CsString1 = function(s,name) {
-	return s[name];
-};
-alphaTab.platform.Platform.Member_Object_CsString_T1 = function(s,name,value) {
-	return s[name] = value;
-};
-alphaTab.platform.Platform.Match = function(s,regex) {
-	return s.match(regex);
-};
-alphaTab.platform.Platform.IsTruthy = function(o) {
-	return !(!o);
-};
-alphaTab.platform.Platform.IsNaN = function(v) {
-	return isNaN(v);
-};
-alphaTab.platform.Platform.TypeOf = function(o) {
-	return typeof(o);
-};
-alphaTab.platform.Platform.ArrayBufferToByteArray = function(data) {
-	return new Uint8Array(data);
-};
-alphaTab.platform.Platform.ToDouble = function(bytes) {
-	var array = new Float64Array(bytes.buffer);
-	return array[0];
-};
-alphaTab.platform.Platform.IsStringNumber = function(s,allowSign) {
-	if(allowSign == null) {
-		allowSign = true;
-	}
-	if(s.length == 0) {
-		return false;
-	}
-	var this1 = system.Convert.ToUInt16(HxOverrides.cca(s,0));
-	var c = this1;
-	return alphaTab.platform.Platform.IsCharNumber(c,allowSign);
-};
-alphaTab.platform.Platform.IsCharNumber = function(c,allowSign) {
-	if(allowSign == null) {
-		allowSign = true;
-	}
-	if(!(allowSign && c == 45)) {
-		if(c >= 48) {
-			return c <= 57;
-		} else {
-			return false;
-		}
-	} else {
-		return true;
-	}
-};
-alphaTab.platform.Platform.IsWhiteSpace = function(c) {
-	if(!(c == 32 || c == 11 || c == 13)) {
-		return c == 10;
-	} else {
-		return true;
-	}
-};
-alphaTab.platform.Platform.ToHexString = function(n,digits) {
-	if(digits == null) {
-		digits = 0;
-	}
-	var s = "";
-	var hexChars = "0123456789ABCDEF";
-	while(true) {
-		var this1 = system.Convert.ToUInt16(HxOverrides.cca(hexChars,n & 15));
-		s = String.fromCharCode(this1) + s;
-		n = n >> 4;
-		if(!(n > 0)) {
-			break;
-		}
-	}
-	while(s.length < digits) s = "0" + s;
-	return s;
-};
-system.Convert = function() { };
-system.Convert.__name__ = ["system","Convert"];
-system.Convert.ToInt8 = function(v) {
-	system.Convert._int32Buffer[0] = v;
-	return system.Convert._int8Buffer[0];
-};
-system.Convert.ToUInt8 = function(v) {
-	system.Convert._int32Buffer[0] = v;
-	return system.Convert._uint8Buffer[0];
-};
-system.Convert.ToInt16 = function(v) {
-	system.Convert._int32Buffer[0] = v;
-	return system.Convert._int16Buffer[0];
-};
-system.Convert.ToUInt16 = function(v) {
-	system.Convert._int32Buffer[0] = v;
-	return system.Convert._uint16Buffer[0];
-};
-system.Convert.ToUInt32 = function(v) {
-	system.Convert._int32Buffer[0] = v;
-	return system.Convert._uint32Buffer[0];
-};
-system.Convert.ToInt64 = function(v) {
-	return v;
-};
-system.Convert.ToUInt64 = function(v) {
-	return system.Convert.ToUInt32(v);
-};
-system.Convert.ToInt32 = function(v) {
-	system.Convert._uint32Buffer[0] = v;
-	return system.Convert._int32Buffer[0];
-};
-system.Convert.ToHashCode_Single = function(v) {
-	system.Convert._float32Buffer[0] = v;
-	return system.Convert._int32Buffer[0];
-};
-system.Convert.ToHashCode_Double = function(v) {
-	system.Convert._float64Buffer[0] = v;
-	return system.Convert._int32Buffer[0] ^ system.Convert._int32Buffer[1];
-};
-system.Convert.ToBoolean_Byte = function(v) {
-	return v != 0;
-};
-system.Convert.ToChar_Byte = function(v) {
-	return v;
-};
-system.Convert.ToSByte_Byte = function(v) {
-	return system.Convert.ToInt8(v);
-};
-system.Convert.ToByte_Byte = function(v) {
-	return v;
-};
-system.Convert.ToInt16_Byte = function(v) {
-	return v;
-};
-system.Convert.ToUInt16_Byte = function(v) {
-	return v;
-};
-system.Convert.ToInt32_Byte = function(v) {
-	return v;
-};
-system.Convert.ToUInt32_Byte = function(v) {
-	return v;
-};
-system.Convert.ToInt64_Byte = function(v) {
-	return v;
-};
-system.Convert.ToUInt64_Byte = function(v) {
-	return v;
-};
-system.Convert.ToSingle_Byte = function(v) {
-	return v;
-};
-system.Convert.ToDouble_Byte = function(v) {
-	var this1 = v;
-	return this1;
-};
-system.Convert.ToBoolean_Char = function(v) {
-	throw new js._Boot.HaxeError(new system.InvalidCastException("cannot cast system.Char to system.Boolean"));
-};
-system.Convert.ToChar_Char = function(v) {
-	return v;
-};
-system.Convert.ToByte_Char = function(v) {
-	return system.Convert.ToUInt8(v);
-};
-system.Convert.ToSByte_Char = function(v) {
-	return system.Convert.ToInt8(v);
-};
-system.Convert.ToInt16_Char = function(v) {
-	return system.Convert.ToInt16(v);
-};
-system.Convert.ToUInt16_Char = function(v) {
-	return v;
-};
-system.Convert.ToInt32_Char = function(v) {
-	return v;
-};
-system.Convert.ToUInt32_Char = function(v) {
-	return v;
-};
-system.Convert.ToInt64_Char = function(v) {
-	return v;
-};
-system.Convert.ToUInt64_Char = function(v) {
-	return v;
-};
-system.Convert.ToSingle_Char = function(v) {
-	throw new js._Boot.HaxeError(new system.InvalidCastException("cannot cast system.Char to system.Single"));
-};
-system.Convert.ToDouble_Char = function(v) {
-	throw new js._Boot.HaxeError(new system.InvalidCastException("cannot cast system.Char to system.Double"));
-};
-system.Convert.ToBoolean_Double = function(v) {
-	return v != 0;
-};
-system.Convert.ToChar_Double = function(v) {
-	throw new js._Boot.HaxeError(new system.InvalidCastException("cannot cast system.Double to system.Char"));
-};
-system.Convert.ToByte_Double = function(v) {
-	return system.Convert.ToUInt8(system.Convert.ToInt32_Double(v));
-};
-system.Convert.ToSByte_Double = function(v) {
-	return system.Convert.ToInt8(system.Convert.ToInt32_Double(v));
-};
-system.Convert.ToInt16_Double = function(v) {
-	return system.Convert.ToInt16(system.Convert.ToInt32_Double(v));
-};
-system.Convert.ToUInt16_Double = function(v) {
-	return system.Convert.ToUInt16(system.Convert.ToInt32_Double(v));
-};
-system.Convert.ToInt32_Double = function(v) {
-	if(v >= 0) {
-		if(v < 2147483647.5) {
-			return v | 0;
-		}
-	} else if(v >= -2147483648.5) {
-		return v | 0;
-	}
-	throw new js._Boot.HaxeError(new system.OverflowException("Value was either too large or too small for a Int32."));
-};
-system.Convert.ToUInt32_Double = function(v) {
-	return system.Convert.ToUInt32(system.Convert.ToInt32_Double(v));
-};
-system.Convert.ToInt64_Double = function(v) {
-	return v | 0;
-};
-system.Convert.ToUInt64_Double = function(v) {
-	return system.Convert.ToInt64(v | 0);
-};
-system.Convert.ToSingle_Double = function(v) {
-	return v;
-};
-system.Convert.ToDouble_Double = function(v) {
-	return v;
-};
-system.Convert.ToBoolean_Int16 = function(v) {
-	return v != 0;
-};
-system.Convert.ToChar_Int16 = function(v) {
-	return system.Convert.ToUInt16(v);
-};
-system.Convert.ToSByte_Int16 = function(v) {
-	return system.Convert.ToInt8(v);
-};
-system.Convert.ToByte_Int16 = function(v) {
-	return system.Convert.ToUInt8(v);
-};
-system.Convert.ToInt16_Int16 = function(v) {
-	return v;
-};
-system.Convert.ToUInt16_Int16 = function(v) {
-	return system.Convert.ToUInt16(v);
-};
-system.Convert.ToInt32_Int16 = function(v) {
-	return v;
-};
-system.Convert.ToUInt32_Int16 = function(v) {
-	return system.Convert.ToUInt32(v);
-};
-system.Convert.ToInt64_Int16 = function(v) {
-	return v;
-};
-system.Convert.ToUInt64_Int16 = function(v) {
-	return system.Convert.ToUInt32(v);
-};
-system.Convert.ToSingle_Int16 = function(v) {
-	return v;
-};
-system.Convert.ToDouble_Int16 = function(v) {
-	var this1 = v;
-	return this1;
-};
-system.Convert.ToBoolean_Int32 = function(v) {
-	return v != 0;
-};
-system.Convert.ToChar_Int32 = function(v) {
-	return system.Convert.ToUInt16(v);
-};
-system.Convert.ToSByte_Int32 = function(v) {
-	return system.Convert.ToInt8(v);
-};
-system.Convert.ToByte_Int32 = function(v) {
-	return system.Convert.ToUInt8(v);
-};
-system.Convert.ToInt16_Int32 = function(v) {
-	return system.Convert.ToInt16(v);
-};
-system.Convert.ToUInt16_Int32 = function(v) {
-	return system.Convert.ToUInt16(v);
-};
-system.Convert.ToInt32_Int32 = function(v) {
-	return v;
-};
-system.Convert.ToUInt32_Int32 = function(v) {
-	return system.Convert.ToUInt32(v);
-};
-system.Convert.ToInt64_Int32 = function(v) {
-	return v;
-};
-system.Convert.ToUInt64_Int32 = function(v) {
-	return system.Convert.ToUInt32(v);
-};
-system.Convert.ToSingle_Int32 = function(v) {
-	return v;
-};
-system.Convert.ToDouble_Int32 = function(v) {
-	var this1 = v;
-	return this1;
-};
-system.Convert.ToBoolean_Int64 = function(v) {
-	return v != 0;
-};
-system.Convert.ToChar_Int64 = function(v) {
-	return system.Convert.ToUInt16(v);
-};
-system.Convert.ToSByte_Int64 = function(v) {
-	return system.Convert.ToInt8(v);
-};
-system.Convert.ToByte_Int64 = function(v) {
-	return system.Convert.ToUInt8(v);
-};
-system.Convert.ToInt16_Int64 = function(v) {
-	return system.Convert.ToInt16(v);
-};
-system.Convert.ToUInt16_Int64 = function(v) {
-	return system.Convert.ToUInt16(v);
-};
-system.Convert.ToInt32_Int64 = function(v) {
-	return system.Convert.ToInt32(v);
-};
-system.Convert.ToUInt32_Int64 = function(v) {
-	return system.Convert.ToUInt32(v);
-};
-system.Convert.ToInt64_Int64 = function(v) {
-	return v;
-};
-system.Convert.ToUInt64_Int64 = function(v) {
-	return system.Convert.ToUInt32(v);
-};
-system.Convert.ToSingle_Int64 = function(v) {
-	return v;
-};
-system.Convert.ToDouble_Int64 = function(v) {
-	var this1 = v;
-	return this1;
-};
-system.Convert.ToBoolean_SByte = function(v) {
-	return v != 0;
-};
-system.Convert.ToChar_SByte = function(v) {
-	return system.Convert.ToUInt16(v);
-};
-system.Convert.ToSByte_SByte = function(v) {
-	return v;
-};
-system.Convert.ToByte_SByte = function(v) {
-	return system.Convert.ToUInt8(v);
-};
-system.Convert.ToInt16_SByte = function(v) {
-	return v;
-};
-system.Convert.ToUInt16_SByte = function(v) {
-	return system.Convert.ToUInt16(v);
-};
-system.Convert.ToInt32_SByte = function(v) {
-	return v;
-};
-system.Convert.ToUInt32_SByte = function(v) {
-	return system.Convert.ToUInt32(v);
-};
-system.Convert.ToInt64_SByte = function(v) {
-	return v;
-};
-system.Convert.ToUInt64_SByte = function(v) {
-	return system.Convert.ToUInt32(v);
-};
-system.Convert.ToSingle_SByte = function(v) {
-	return v;
-};
-system.Convert.ToDouble_SByte = function(v) {
-	var this1 = v;
-	return this1;
-};
-system.Convert.ToBoolean_Single = function(v) {
-	return v != 0;
-};
-system.Convert.ToChar_Single = function(v) {
-	throw new js._Boot.HaxeError(new system.InvalidCastException("cannot cast system.Single to system.Char"));
-};
-system.Convert.ToByte_Single = function(v) {
-	return system.Convert.ToUInt8(system.Convert.ToInt32_Single(v));
-};
-system.Convert.ToSByte_Single = function(v) {
-	return system.Convert.ToInt8(system.Convert.ToInt32_Single(v));
-};
-system.Convert.ToInt16_Single = function(v) {
-	return system.Convert.ToInt16(system.Convert.ToInt32_Single(v));
-};
-system.Convert.ToUInt16_Single = function(v) {
-	return system.Convert.ToUInt16(system.Convert.ToInt32_Single(v));
-};
-system.Convert.ToInt32_Single = function(v) {
-	var this1 = v;
-	return system.Convert.ToInt32_Double(this1);
-};
-system.Convert.ToUInt32_Single = function(v) {
-	return system.Convert.ToUInt32(system.Convert.ToInt32_Single(v));
-};
-system.Convert.ToInt64_Single = function(v) {
-	return v | 0;
-};
-system.Convert.ToUInt64_Single = function(v) {
-	return system.Convert.ToInt64(v | 0);
-};
-system.Convert.ToSingle_Single = function(v) {
-	return v;
-};
-system.Convert.ToDouble_Single = function(v) {
-	return v;
-};
-system.Convert.ToBoolean_UInt16 = function(v) {
-	return v != 0;
-};
-system.Convert.ToChar_UInt16 = function(v) {
-	return v;
-};
-system.Convert.ToSByte_UInt16 = function(v) {
-	return system.Convert.ToInt8(v);
-};
-system.Convert.ToByte_UInt16 = function(v) {
-	return system.Convert.ToUInt8(v);
-};
-system.Convert.ToInt16_UInt16 = function(v) {
-	return system.Convert.ToInt16(v);
-};
-system.Convert.ToUInt16_UInt16 = function(v) {
-	return v;
-};
-system.Convert.ToInt32_UInt16 = function(v) {
-	return v;
-};
-system.Convert.ToUInt32_UInt16 = function(v) {
-	return v;
-};
-system.Convert.ToInt64_UInt16 = function(v) {
-	return v;
-};
-system.Convert.ToUInt64_UInt16 = function(v) {
-	return v;
-};
-system.Convert.ToSingle_UInt16 = function(v) {
-	return v;
-};
-system.Convert.ToDouble_UInt16 = function(v) {
-	var this1 = v;
-	return this1;
-};
-system.Convert.ToBoolean_UInt32 = function(v) {
-	return v != 0;
-};
-system.Convert.ToChar_UInt32 = function(v) {
-	return system.Convert.ToUInt16(v);
-};
-system.Convert.ToSByte_UInt32 = function(v) {
-	return system.Convert.ToInt8(v);
-};
-system.Convert.ToByte_UInt32 = function(v) {
-	return system.Convert.ToUInt8(v);
-};
-system.Convert.ToInt16_UInt32 = function(v) {
-	return system.Convert.ToInt16(v);
-};
-system.Convert.ToUInt16_UInt32 = function(v) {
-	return system.Convert.ToUInt16(v);
-};
-system.Convert.ToInt32_UInt32 = function(v) {
-	return system.Convert.ToInt32(v);
-};
-system.Convert.ToUInt32_UInt32 = function(v) {
-	return v;
-};
-system.Convert.ToInt64_UInt32 = function(v) {
-	return v;
-};
-system.Convert.ToUInt64_UInt32 = function(v) {
-	return v;
-};
-system.Convert.ToSingle_UInt32 = function(v) {
-	return v;
-};
-system.Convert.ToDouble_UInt32 = function(v) {
-	var this1 = v;
-	return this1;
-};
-system.Convert.ToBoolean_UInt64 = function(v) {
-	return v != 0;
-};
-system.Convert.ToChar_UInt64 = function(v) {
-	return system.Convert.ToUInt16(v);
-};
-system.Convert.ToSByte_UInt64 = function(v) {
-	return system.Convert.ToInt8(v);
-};
-system.Convert.ToByte_UInt64 = function(v) {
-	return system.Convert.ToUInt8(v);
-};
-system.Convert.ToInt16_UInt64 = function(v) {
-	return system.Convert.ToInt16(v);
-};
-system.Convert.ToUInt16_UInt64 = function(v) {
-	return system.Convert.ToUInt16(v);
-};
-system.Convert.ToInt32_UInt64 = function(v) {
-	return system.Convert.ToInt32(v);
-};
-system.Convert.ToUInt32_UInt64 = function(v) {
-	return system.Convert.ToUInt32(v);
-};
-system.Convert.ToInt64_UInt64 = function(v) {
-	return system.Convert.ToInt32(v);
-};
-system.Convert.ToUInt64_UInt64 = function(v) {
-	return v;
-};
-system.Convert.ToSingle_UInt64 = function(v) {
-	return v;
-};
-system.Convert.ToDouble_UInt64 = function(v) {
-	var this1 = v;
-	return this1;
-};
-alphaTab.platform.model.Font = $hx_exports["alphaTab"]["platform"]["model"]["Font"] = function(family,size,style) {
-	if(style == null) {
-		style = 0;
-	}
-	this._css = null;
-	this.Family = null;
-	this.Size = 0.0;
-	this.Style = null;
-	this.Family = family;
-	this.Size = size;
-	this.Style = style;
-	this._css = this.ToCssString(1);
-};
-alphaTab.platform.model.Font.__name__ = ["alphaTab","platform","model","Font"];
-alphaTab.platform.model.Font.prototype = {
-	get_IsBold: function() {
-		return (this.Style & 1) != 0;
-	}
-	,get_IsItalic: function() {
-		return (this.Style & 2) != 0;
-	}
-	,Clone: function() {
-		return new alphaTab.platform.model.Font(this.Family,this.Size,this.Style);
-	}
-	,ToCssString: function(scale) {
-		if(scale == null) {
-			scale = 1;
-		}
-		if(this._css != null && scale == 1) {
-			return this._css;
-		}
-		var this1 = "";
-		var buf = this1;
-		if(this.get_IsBold()) {
-			buf += Std.string("bold ");
-		}
-		if(this.get_IsItalic()) {
-			buf += Std.string("italic ");
-		}
-		buf += Std.string(this.Size * scale);
-		buf += Std.string("px ");
-		buf += Std.string("'");
-		buf += Std.string(this.Family);
-		buf += Std.string("'");
-		return buf;
-	}
-	,__class__: alphaTab.platform.model.Font
-};
-alphaTab.platform.javaScript = {};
-alphaTab.platform.javaScript.Html5Canvas = $hx_exports["alphaTab"]["platform"]["javaScript"]["Html5Canvas"] = function() {
-	this._canvas = null;
-	this._context = null;
-	this._color = null;
-	this._font = null;
-	this._musicFont = null;
-	this._color = new alphaTab.platform.model.Color(0,0,0,255);
-	var fontElement = window.document.createElement("span");
-	fontElement.classList.add("at");
-	window.document.body.appendChild(fontElement);
-	var style = window.getComputedStyle(fontElement);
-	var s = style.fontSize;
-	this._musicFont = new alphaTab.platform.model.Font(style.fontFamily,parseFloat(s),0);
-};
-alphaTab.platform.javaScript.Html5Canvas.__name__ = ["alphaTab","platform","javaScript","Html5Canvas"];
-alphaTab.platform.javaScript.Html5Canvas.__interfaces__ = [alphaTab.platform.ICanvas];
-alphaTab.platform.javaScript.Html5Canvas.prototype = {
-	get_Resources: function() {
-		return this.__Resources;
-	}
-	,set_Resources: function(value) {
-		return this.__Resources = value;
-	}
-	,OnPreRender: function() {
-		return null;
-	}
-	,OnRenderFinished: function() {
-		return null;
-	}
-	,BeginRender: function(width,height) {
-		this._canvas = js.Boot.__cast(window.document.createElement("canvas") , HTMLCanvasElement);
-		var tmp = system.Convert.ToInt32_Single(width);
-		this._canvas.width = tmp;
-		var tmp1 = system.Convert.ToInt32_Single(height);
-		this._canvas.height = tmp1;
-		this._canvas.style.width = Std.string(width) + "px";
-		this._canvas.style.height = Std.string(height) + "px";
-		this._context = this._canvas.getContext("2d");
-		this._context.textBaseline = "top";
-	}
-	,EndRender: function() {
-		var result = this._canvas;
-		this._canvas = null;
-		return result;
-	}
-	,get_Color: function() {
-		return this._color;
-	}
-	,set_Color: function(value) {
-		if(this._color.RGBA == value.RGBA) {
-			return this.get_Color();
-		}
-		this._color = value;
-		this._context.strokeStyle = value.RGBA;
-		this._context.fillStyle = value.RGBA;
-		return this.get_Color();
-	}
-	,get_LineWidth: function() {
-		return this._context.lineWidth;
-	}
-	,set_LineWidth: function(value) {
-		this._context.lineWidth = value;
-		return this.get_LineWidth();
-	}
-	,FillRect: function(x,y,w,h) {
-		if(w > 0) {
-			this._context.fillRect(system.Convert.ToInt32_Single(x) - 0.5,system.Convert.ToInt32_Single(y) - 0.5,w,h);
-		}
-	}
-	,StrokeRect: function(x,y,w,h) {
-		this._context.strokeRect(x - 0.5,y - 0.5,w,h);
-	}
-	,BeginPath: function() {
-		this._context.beginPath();
-	}
-	,ClosePath: function() {
-		this._context.closePath();
-	}
-	,MoveTo: function(x,y) {
-		this._context.moveTo(x - 0.5,y - 0.5);
-	}
-	,LineTo: function(x,y) {
-		this._context.lineTo(x - 0.5,y - 0.5);
-	}
-	,QuadraticCurveTo: function(cpx,cpy,x,y) {
-		this._context.quadraticCurveTo(cpx,cpy,x,y);
-	}
-	,BezierCurveTo: function(cp1x,cp1y,cp2x,cp2y,x,y) {
-		this._context.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,x,y);
-	}
-	,FillCircle: function(x,y,radius) {
-		this._context.beginPath();
-		this._context.arc(x,y,radius,0,6.28318530717958,true);
-		this.Fill();
-	}
-	,Fill: function() {
-		this._context.fill();
-	}
-	,Stroke: function() {
-		this._context.stroke();
-	}
-	,get_Font: function() {
-		return this._font;
-	}
-	,set_Font: function(value) {
-		this._font = value;
-		var tmp = value.ToCssString(1);
-		this._context.font = tmp;
-		return this.get_Font();
-	}
-	,get_TextAlign: function() {
-		var _g = this._context.textAlign;
-		switch(_g) {
-		case "center":
-			return 1;
-		case "left":
-			return 0;
-		case "right":
-			return 2;
-		default:
-			return 0;
-		}
-	}
-	,set_TextAlign: function(value) {
-		switch(value) {
-		case 0:
-			this._context.textAlign = "left";
-			break;
-		case 1:
-			this._context.textAlign = "center";
-			break;
-		case 2:
-			this._context.textAlign = "right";
-			break;
-		default:
-		}
-		return this.get_TextAlign();
-	}
-	,get_TextBaseline: function() {
-		var _g = this._context.textBaseline;
-		switch(_g) {
-		case "bottom":
-			return 2;
-		case "middle":
-			return 1;
-		case "top":
-			return 0;
-		default:
-			return 0;
-		}
-	}
-	,set_TextBaseline: function(value) {
-		switch(value) {
-		case 0:
-			this._context.textBaseline = "top";
-			break;
-		case 1:
-			this._context.textBaseline = "middle";
-			break;
-		case 2:
-			this._context.textBaseline = "bottom";
-			break;
-		default:
-		}
-		return this.get_TextBaseline();
-	}
-	,BeginGroup: function(identifier) {
-	}
-	,EndGroup: function() {
-	}
-	,FillText: function(text,x,y) {
-		this._context.fillText(text,x,y);
-	}
-	,MeasureText: function(text) {
-		return js.Boot.__cast(this._context.measureText(text).width , Float);
-	}
-	,FillMusicFontSymbol: function(x,y,scale,symbol) {
-		if(symbol == -1) {
-			return;
-		}
-		var baseLine = this._context.textBaseline;
-		var font = this._context.font;
-		var tmp = this._musicFont.ToCssString(scale);
-		this._context.font = tmp;
-		this._context.textBaseline = "middle";
-		this._context.fillText(String.fromCharCode(symbol),x,y);
-		this._context.textBaseline = baseLine;
-		this._context.font = font;
-	}
-	,__class__: alphaTab.platform.javaScript.Html5Canvas
-};
-alphaTab.platform.javaScript.JQueryAlphaTab = $hx_exports["alphaTab"]["platform"]["javaScript"]["JQueryAlphaTab"] = function() {
-	var this1 = [];
-	this._initListeners = this1;
-};
-alphaTab.platform.javaScript.JQueryAlphaTab.__name__ = ["alphaTab","platform","javaScript","JQueryAlphaTab"];
-alphaTab.platform.javaScript.JQueryAlphaTab.Restore = function(selector) {
-	$(selector).empty().removeData("alphaTab");
-};
-alphaTab.platform.javaScript.JQueryAlphaTab.prototype = {
-	Exec: function(element,method,args) {
-		if(typeof(method) != 'string') {
-			args = [method];
-			method = "init";
-		}
-		var tmp;
-		var this1 = system.Convert.ToUInt16(HxOverrides.cca(method,0));
-		if(!(this1 == 95)) {
-			tmp = method == "Exec";
-		} else {
-			tmp = true;
-		}
-		if(tmp) {
-			return null;
-		}
-		var jElement = $(element);
-		var context = jElement.data("alphaTab");
-		if(method == "destroy" && !(!(!context))) {
-			return null;
-		}
-		if(method != "init" && !(!(!context))) {
-			throw new Error("alphaTab not initialized");
-		}
-		var apiMethod = this[method];
-		if(!(!apiMethod)) {
-			var realArgs = [ jElement, context ].concat(args);
-			return apiMethod.apply(this,realArgs);
-		} else {
-			alphaTab.util.Logger.Error("Api","Method '" + method + "' does not exist on jQuery.alphaTab",null);
-			return null;
-		}
-	}
-	,init: function(element,context,options) {
-		if(!(!(!context))) {
-			context = new alphaTab.platform.javaScript.JsApi(element[0],options);
-			element.data("alphaTab",context);
-			var listener = $iterator(this._initListeners)();
-			while(listener.hasNext()) {
-				var listener1 = listener.next();
-				listener1(element,context,options);
-			}
-		}
-	}
-	,destroy: function(element,context) {
-		element.removeData("alphaTab");
-		context.Destroy();
-	}
-	,tex: function(element,context,tex) {
-		context.Tex(tex);
-	}
-	,tracks: function(element,context,tracks) {
-		if(tracks) {
-			context.SetTracks(tracks,true);
-		}
-		return context.get_Tracks();
-	}
-	,api: function(element,context) {
-		return context;
-	}
-	,score: function(element,context,score) {
-		if(!(!score)) {
-			context.ScoreLoaded(score,true);
-		}
-		return context.Score;
-	}
-	,renderer: function(element,context) {
-		return context.Renderer;
-	}
-	,layout: function(element,context,layout) {
-		if(!(!layout)) {
-			context.UpdateLayout(layout);
-		}
-		return context.Settings.Layout;
-	}
-	,print: function(element,context,width) {
-		context.Print(width);
-	}
-	,_oninit: function(listener) {
-		this._initListeners.push(listener);
-	}
-	,__class__: alphaTab.platform.javaScript.JQueryAlphaTab
-};
-alphaTab.util = {};
-alphaTab.util.Logger = $hx_exports["alphaTab"]["util"]["Logger"] = function() {
-};
-alphaTab.util.Logger.__name__ = ["alphaTab","util","Logger"];
-alphaTab.util.Logger.Debug = function(category,msg,details) {
-	alphaTab.util.Logger.Log(1,category,msg,details);
-};
-alphaTab.util.Logger.Warning = function(category,msg,details) {
-	alphaTab.util.Logger.Log(3,category,msg,details);
-};
-alphaTab.util.Logger.Info = function(category,msg,details) {
-	alphaTab.util.Logger.Log(2,category,msg,details);
-};
-alphaTab.util.Logger.Error = function(category,msg,details) {
-	alphaTab.util.Logger.Log(4,category,msg,details);
-};
-alphaTab.util.Logger.Log = function(logLevel,category,msg,details) {
-	if(logLevel < alphaTab.util.Logger.LogLevel) {
-		return;
-	}
-	alphaTab.platform.Platform.Log(logLevel,category,msg,details);
-};
-alphaTab.util.Logger.prototype = {
-	__class__: alphaTab.util.Logger
-};
-var haxe = {};
-haxe.CallStack = function() { };
-haxe.CallStack.__name__ = ["haxe","CallStack"];
-haxe.CallStack.getStack = function(e) {
-	if(e == null) {
-		return [];
-	}
-	var oldValue = Error.prepareStackTrace;
-	Error.prepareStackTrace = function(error,callsites) {
-		var stack = [];
-		var _g = 0;
-		while(_g < callsites.length) {
-			var site = callsites[_g];
-			++_g;
-			if(haxe.CallStack.wrapCallSite != null) {
-				site = haxe.CallStack.wrapCallSite(site);
-			}
-			var method = null;
-			var fullName = site.getFunctionName();
-			if(fullName != null) {
-				var idx = fullName.lastIndexOf(".");
-				if(idx >= 0) {
-					var className = HxOverrides.substr(fullName,0,idx);
-					var methodName = HxOverrides.substr(fullName,idx + 1,null);
-					method = haxe.StackItem.Method(className,methodName);
-				}
-			}
-			stack.push(haxe.StackItem.FilePos(method,site.getFileName(),site.getLineNumber()));
-		}
-		return stack;
-	};
-	var a = haxe.CallStack.makeStack(e.stack);
-	Error.prepareStackTrace = oldValue;
-	return a;
-};
-haxe.CallStack.callStack = function() {
-	try {
-		throw new Error();
-	} catch( e ) {
-		if (e instanceof js._Boot.HaxeError) e = e.val;
-		var a = haxe.CallStack.getStack(e);
-		a.shift();
-		return a;
-	}
-};
-haxe.CallStack.toString = function(stack) {
-	var b = new StringBuf();
-	var _g = 0;
-	while(_g < stack.length) {
-		var s = stack[_g];
-		++_g;
-		b.b += "\nCalled from ";
-		haxe.CallStack.itemToString(b,s);
-	}
-	return b.b;
-};
-haxe.CallStack.itemToString = function(b,s) {
-	switch(s[1]) {
-	case 0:
-		b.b += "a C function";
-		break;
-	case 1:
-		var m = s[2];
-		b.b += "module ";
-		b.b += m == null ? "null" : "" + m;
-		break;
-	case 2:
-		var line = s[4];
-		var file = s[3];
-		var s1 = s[2];
-		if(s1 != null) {
-			haxe.CallStack.itemToString(b,s1);
-			b.b += " (";
-		}
-		b.b += file == null ? "null" : "" + file;
-		b.b += " line ";
-		b.b += line == null ? "null" : "" + line;
-		if(s1 != null) {
-			b.b += ")";
-		}
-		break;
-	case 3:
-		var meth = s[3];
-		var cname = s[2];
-		b.b += cname == null ? "null" : "" + cname;
-		b.b += ".";
-		b.b += meth == null ? "null" : "" + meth;
-		break;
-	case 4:
-		var n = s[2];
-		b.b += "local function #";
-		b.b += n == null ? "null" : "" + n;
-		break;
-	}
-};
-haxe.CallStack.makeStack = function(s) {
-	if(s == null) {
-		return [];
-	} else if(typeof(s) == "string") {
-		var stack = s.split("\n");
-		if(stack[0] == "Error") {
-			stack.shift();
-		}
-		var m = [];
-		var rie10 = new EReg("^   at ([A-Za-z0-9_. ]+) \\(([^)]+):([0-9]+):([0-9]+)\\)$","");
-		var _g = 0;
-		while(_g < stack.length) {
-			var line = stack[_g];
-			++_g;
-			if(rie10.match(line)) {
-				var path = rie10.matched(1).split(".");
-				var meth = path.pop();
-				var file = rie10.matched(2);
-				var line1 = Std.parseInt(rie10.matched(3));
-				m.push(haxe.StackItem.FilePos(meth == "Anonymous function" ? haxe.StackItem.LocalFunction() : meth == "Global code" ? null : haxe.StackItem.Method(path.join("."),meth),file,line1));
-			} else {
-				m.push(haxe.StackItem.Module(StringTools.trim(line)));
-			}
-		}
-		return m;
-	} else {
-		return s;
-	}
-};
-var js = {};
-js.Boot = function() { };
-js.Boot.__name__ = ["js","Boot"];
-js.Boot.getClass = function(o) {
-	if((o instanceof Array) && o.__enum__ == null) {
-		return Array;
-	} else {
-		var cl = o.__class__;
-		if(cl != null) {
-			return cl;
-		}
-		var name = js.Boot.__nativeClassName(o);
-		if(name != null) {
-			return js.Boot.__resolveNativeClass(name);
-		}
-		return null;
-	}
-};
-js.Boot.__string_rec = function(o,s) {
-	if(o == null) {
-		return "null";
-	}
-	if(s.length >= 5) {
-		return "<...>";
-	}
-	var t = typeof(o);
-	if(t == "function" && (o.__name__ || o.__ename__)) {
-		t = "object";
-	}
-	switch(t) {
-	case "function":
-		return "<function>";
-	case "object":
-		if(o instanceof Array) {
-			if(o.__enum__) {
-				if(o.length == 2) {
-					return o[0];
-				}
-				var str = o[0] + "(";
-				s += "\t";
-				var _g1 = 2;
-				var _g = o.length;
-				while(_g1 < _g) {
-					var i = _g1++;
-					if(i != 2) {
-						str += "," + js.Boot.__string_rec(o[i],s);
-					} else {
-						str += js.Boot.__string_rec(o[i],s);
-					}
-				}
-				return str + ")";
-			}
-			var l = o.length;
-			var i1;
-			var str1 = "[";
-			s += "\t";
-			var _g11 = 0;
-			var _g2 = l;
-			while(_g11 < _g2) {
-				var i2 = _g11++;
-				str1 += (i2 > 0 ? "," : "") + js.Boot.__string_rec(o[i2],s);
-			}
-			str1 += "]";
-			return str1;
-		}
-		var tostr;
-		try {
-			tostr = o.toString;
-		} catch( e ) {
-			return "???";
-		}
-		if(tostr != null && tostr != Object.toString && typeof(tostr) == "function") {
-			var s2 = o.toString();
-			if(s2 != "[object Object]") {
-				return s2;
-			}
-		}
-		var k = null;
-		var str2 = "{\n";
-		s += "\t";
-		var hasp = o.hasOwnProperty != null;
-		for( var k in o ) {
-		if(hasp && !o.hasOwnProperty(k)) {
-			continue;
-		}
-		if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__" || k == "__properties__") {
-			continue;
-		}
-		if(str2.length != 2) {
-			str2 += ", \n";
-		}
-		str2 += s + k + " : " + js.Boot.__string_rec(o[k],s);
-		}
-		s = s.substring(1);
-		str2 += "\n" + s + "}";
-		return str2;
-	case "string":
-		return o;
-	default:
-		return String(o);
-	}
-};
-js.Boot.__interfLoop = function(cc,cl) {
-	if(cc == null) {
-		return false;
-	}
-	if(cc == cl) {
-		return true;
-	}
-	var intf = cc.__interfaces__;
-	if(intf != null) {
-		var _g1 = 0;
-		var _g = intf.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var i1 = intf[i];
-			if(i1 == cl || js.Boot.__interfLoop(i1,cl)) {
-				return true;
-			}
-		}
-	}
-	return js.Boot.__interfLoop(cc.__super__,cl);
-};
-js.Boot.__instanceof = function(o,cl) {
-	if(cl == null) {
-		return false;
-	}
-	switch(cl) {
-	case Array:
-		if((o instanceof Array)) {
-			return o.__enum__ == null;
-		} else {
-			return false;
-		}
-		break;
-	case Bool:
-		return typeof(o) == "boolean";
-	case Dynamic:
-		return true;
-	case Float:
-		return typeof(o) == "number";
-	case Int:
-		if(typeof(o) == "number") {
-			return (o|0) === o;
-		} else {
-			return false;
-		}
-		break;
-	case String:
-		return typeof(o) == "string";
-	default:
-		if(o != null) {
-			if(typeof(cl) == "function") {
-				if(o instanceof cl) {
-					return true;
-				}
-				if(js.Boot.__interfLoop(js.Boot.getClass(o),cl)) {
-					return true;
-				}
-			} else if(typeof(cl) == "object" && js.Boot.__isNativeObj(cl)) {
-				if(o instanceof cl) {
-					return true;
-				}
-			}
-		} else {
-			return false;
-		}
-		if(cl == Class ? o.__name__ != null : false) {
-			return true;
-		}
-		if(cl == Enum ? o.__ename__ != null : false) {
-			return true;
-		}
-		return o.__enum__ == cl;
-	}
-};
-js.Boot.__cast = function(o,t) {
-	if(js.Boot.__instanceof(o,t)) {
-		return o;
-	} else {
-		throw new js._Boot.HaxeError("Cannot cast " + Std.string(o) + " to " + Std.string(t));
-	}
-};
-js.Boot.__nativeClassName = function(o) {
-	var name = js.Boot.__toStr.call(o).slice(8,-1);
-	if(name == "Object" || name == "Function" || name == "Math" || name == "JSON") {
-		return null;
-	}
-	return name;
-};
-js.Boot.__isNativeObj = function(o) {
-	return js.Boot.__nativeClassName(o) != null;
-};
-js.Boot.__resolveNativeClass = function(name) {
-	return $global[name];
-};
-haxe.StackItem = { __ename__ : true, __constructs__ : ["CFunction","Module","FilePos","Method","LocalFunction"] };
-haxe.StackItem.CFunction = ["CFunction",0];
-haxe.StackItem.CFunction.toString = $estr;
-haxe.StackItem.CFunction.__enum__ = haxe.StackItem;
-haxe.StackItem.Module = function(m) { var $x = ["Module",1,m]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; };
-haxe.StackItem.FilePos = function(s,file,line) { var $x = ["FilePos",2,s,file,line]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; };
-haxe.StackItem.Method = function(classname,method) { var $x = ["Method",3,classname,method]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; };
-haxe.StackItem.LocalFunction = function(v) { var $x = ["LocalFunction",4,v]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; };
-alphaTab.platform.javaScript.JsWorker = $hx_exports["alphaTab"]["platform"]["javaScript"]["JsWorker"] = function(main) {
-	this._renderer = null;
-	this._main = null;
-	this._main = main;
-	this._main.addEventListener("message",$bind(this,this.HandleMessage),false);
-};
-alphaTab.platform.javaScript.JsWorker.__name__ = ["alphaTab","platform","javaScript","JsWorker"];
-alphaTab.platform.javaScript.JsWorker.Init = function() {
-	new alphaTab.platform.javaScript.JsWorker($global);
-};
-alphaTab.platform.javaScript.JsWorker.prototype = {
-	HandleMessage: function(e) {
-		var _gthis = this;
-		var data = (js.Boot.__cast(e , MessageEvent)).data;
-		var cmd = data ? data.cmd : "";
-		switch(cmd) {
-		case "alphaTab.initialize":
-			var settings = alphaTab.Settings.FromJson(data.settings,null);
-			this._renderer = new alphaTab.rendering.ScoreRenderer(settings);
-			this._renderer.PartialRenderFinished = system._EventAction1.EventAction1_Impl_.add(this._renderer.PartialRenderFinished,function(result) {
-				_gthis._main.postMessage({ cmd : "alphaTab.partialRenderFinished", result : result});
-			});
-			this._renderer.RenderFinished = system._EventAction1.EventAction1_Impl_.add(this._renderer.RenderFinished,function(result1) {
-				_gthis._main.postMessage({ cmd : "alphaTab.renderFinished", result : result1});
-			});
-			this._renderer.PostRenderFinished = system._EventAction.EventAction_Impl_.add(this._renderer.PostRenderFinished,function() {
-				_gthis._main.postMessage({ cmd : "alphaTab.postRenderFinished", boundsLookup : _gthis._renderer.get_BoundsLookup().ToJson()});
-			});
-			this._renderer.PreRender = system._EventAction1.EventAction1_Impl_.add(this._renderer.PreRender,function(result2) {
-				_gthis._main.postMessage({ cmd : "alphaTab.preRender", result : result2});
-			});
-			this._renderer.Error = system._EventAction2.EventAction2_Impl_.add(this._renderer.Error,$bind(this,this.Error));
-			break;
-		case "alphaTab.invalidate":
-			this._renderer.Invalidate();
-			break;
-		case "alphaTab.render":
-			var converter = new alphaTab.model.JsonConverter();
-			var score = converter.JsObjectToScore(data.score);
-			this.RenderMultiple(score,data.trackIndexes);
-			break;
-		case "alphaTab.resize":
-			this._renderer.Resize(data.width);
-			break;
-		case "alphaTab.updateSettings":
-			this.UpdateSettings(data.settings);
-			break;
-		default:
-		}
-	}
-	,UpdateSettings: function(settings) {
-		this._renderer.UpdateSettings(alphaTab.Settings.FromJson(settings,null));
-	}
-	,RenderMultiple: function(score,trackIndexes) {
-		try {
-			this._renderer.Render(score,trackIndexes);
-		} catch( e ) {
-			if (e instanceof js._Boot.HaxeError) e = e.val;
-			if( js.Boot.__instanceof(e,system.Exception) ) {
-				this.Error("render",e);
-			} else throw(e);
-		}
-	}
-	,Error: function(type,e) {
-		alphaTab.util.Logger.Error(type,"An unexpected error occurred in worker",e);
-		var error = JSON.parse(JSON.stringify(e));
-		var e2 = e;
-		if(e2.message) {
-			error.message = e2.message;
-		}
-		if(e2.stack) {
-			error.stack = e2.stack;
-		}
-		if(e2.constructor && e2.constructor.name) {
-			error.type = e2.constructor.name;
-		}
-		this._main.postMessage({ cmd : "alphaTab.error", error : { type : type, detail : error}});
-	}
-	,__class__: alphaTab.platform.javaScript.JsWorker
-};
-alphaTab.rendering = {};
-alphaTab.rendering.layout = {};
-alphaTab.rendering.layout.ScoreLayout = $hx_exports["alphaTab"]["rendering"]["layout"]["ScoreLayout"] = function(renderer) {
-	this._barRendererLookup = null;
-	this.Renderer = null;
-	this.Width = 0.0;
-	this.Height = 0.0;
-	this.ScoreInfoGlyphs = null;
-	this.TuningGlyph = null;
-	this.Renderer = renderer;
-	var this1 = {}
-	this._barRendererLookup = this1;
-};
-alphaTab.rendering.layout.ScoreLayout.__name__ = ["alphaTab","rendering","layout","ScoreLayout"];
-alphaTab.rendering.layout.ScoreLayout.prototype = {
-	get_Name: function() {
-		throw new js._Boot.HaxeError("abstract");
-	}
-	,get_SupportsResize: function() {
-		throw new js._Boot.HaxeError("abstract");
-	}
-	,Resize: function() {
-		throw new js._Boot.HaxeError("abstract");
-	}
-	,LayoutAndRender: function() {
-		this.CreateScoreInfoGlyphs();
-		this.DoLayoutAndRender();
-	}
-	,DoLayoutAndRender: function() {
-		throw new js._Boot.HaxeError("abstract");
-	}
-	,CreateScoreInfoGlyphs: function() {
-		alphaTab.util.Logger.Info("ScoreLayout","Creating score info glyphs",null);
-		var flags = this.Renderer.Settings.Layout.Get("hideInfo",false) ? 0 : 511;
-		var score = this.Renderer.Score;
-		var res = this.Renderer.RenderingResources;
-		var this1 = {}
-		this.ScoreInfoGlyphs = this1;
-		var tmp;
-		var s = score.Title;
-		if(!(s == null || s.length == 0)) {
-			tmp = (flags & 1) != 0;
-		} else {
-			tmp = false;
-		}
-		if(tmp) {
-			this.ScoreInfoGlyphs[1] = new alphaTab.rendering.glyphs.TextGlyph(0,0,score.Title,res.TitleFont,1);
-		}
-		var tmp1;
-		var s1 = score.SubTitle;
-		if(!(s1 == null || s1.length == 0)) {
-			tmp1 = (flags & 2) != 0;
-		} else {
-			tmp1 = false;
-		}
-		if(tmp1) {
-			this.ScoreInfoGlyphs[2] = new alphaTab.rendering.glyphs.TextGlyph(0,0,score.SubTitle,res.SubTitleFont,1);
-		}
-		var tmp2;
-		var s2 = score.Artist;
-		if(!(s2 == null || s2.length == 0)) {
-			tmp2 = (flags & 4) != 0;
-		} else {
-			tmp2 = false;
-		}
-		if(tmp2) {
-			this.ScoreInfoGlyphs[4] = new alphaTab.rendering.glyphs.TextGlyph(0,0,score.Artist,res.SubTitleFont,1);
-		}
-		var tmp3;
-		var s3 = score.Album;
-		if(!(s3 == null || s3.length == 0)) {
-			tmp3 = (flags & 8) != 0;
-		} else {
-			tmp3 = false;
-		}
-		if(tmp3) {
-			this.ScoreInfoGlyphs[8] = new alphaTab.rendering.glyphs.TextGlyph(0,0,score.Album,res.SubTitleFont,1);
-		}
-		var tmp4;
-		var tmp5;
-		var s4 = score.Music;
-		if(!(s4 == null || s4.length == 0)) {
-			tmp5 = score.Music == score.Words;
-		} else {
-			tmp5 = false;
-		}
-		if(tmp5) {
-			tmp4 = (flags & 64) != 0;
-		} else {
-			tmp4 = false;
-		}
-		if(tmp4) {
-			this.ScoreInfoGlyphs[64] = new alphaTab.rendering.glyphs.TextGlyph(0,0,"Music and Words by " + score.Words,res.WordsFont,1);
-		} else {
-			var tmp6;
-			var s5 = score.Music;
-			if(!(s5 == null || s5.length == 0)) {
-				tmp6 = (flags & 32) != 0;
-			} else {
-				tmp6 = false;
-			}
-			if(tmp6) {
-				this.ScoreInfoGlyphs[32] = new alphaTab.rendering.glyphs.TextGlyph(0,0,"Music by " + score.Music,res.WordsFont,2);
-			}
-			var tmp7;
-			var s6 = score.Words;
-			if(!(s6 == null || s6.length == 0)) {
-				tmp7 = (flags & 16) != 0;
-			} else {
-				tmp7 = false;
-			}
-			if(tmp7) {
-				this.ScoreInfoGlyphs[16] = new alphaTab.rendering.glyphs.TextGlyph(0,0,"Words by " + score.Music,res.WordsFont,0);
-			}
-		}
-		if(this.Renderer.Tracks.length == 1 && !this.Renderer.Tracks[0].IsPercussion && !this.Renderer.Settings.Layout.Get("hideTuning",false)) {
-			var tuning = alphaTab.model.Tuning.FindTuning(this.Renderer.Tracks[0].Tuning);
-			if(tuning != null) {
-				this.TuningGlyph = new alphaTab.rendering.glyphs.TuningGlyph(0,0,this.get_Scale(),this.Renderer.RenderingResources,tuning);
-			}
-		}
-	}
-	,get_Scale: function() {
-		return this.Renderer.Settings.Scale;
-	}
-	,CreateEmptyStaveGroup: function() {
-		var group = new alphaTab.rendering.staves.StaveGroup();
-		group.Layout = this;
-		var trackIndex = 0;
-		while(trackIndex < this.Renderer.Tracks.length) {
-			var track = this.Renderer.Tracks[trackIndex];
-			var staveProfile;
-			if(track.IsPercussion) {
-				staveProfile = "score";
-			} else if(track.get_IsStringed()) {
-				staveProfile = this.Renderer.Settings.Staves.Id;
-			} else {
-				staveProfile = "score";
-			}
-			var profile = alphaTab.Environment.StaveProfiles.hasOwnProperty(staveProfile) ? alphaTab.Environment.StaveProfiles[staveProfile] : alphaTab.Environment.StaveProfiles["default"];
-			var staveIndex = 0;
-			while(staveIndex < track.Staves.length) {
-				var renderStaveIndex = 0;
-				while(renderStaveIndex < profile.length) {
-					var factory = profile[renderStaveIndex];
-					var staff = track.Staves[staveIndex];
-					if(factory.CanCreate(track,staff)) {
-						group.AddStaff(track,new alphaTab.rendering.staves.Staff(trackIndex,staff,factory));
-					}
-					++renderStaveIndex;
-				}
-				++staveIndex;
-			}
-			++trackIndex;
-		}
-		return group;
-	}
-	,RegisterBarRenderer: function(key,renderer) {
-		if(!this._barRendererLookup.hasOwnProperty(key)) {
-			var this1 = this._barRendererLookup;
-			var this2 = {}
-			this1[key] = this2;
-		}
-		this._barRendererLookup[key][renderer.Bar.Id] = renderer;
-	}
-	,UnregisterBarRenderer: function(key,renderer) {
-		if(this._barRendererLookup.hasOwnProperty(key)) {
-			var lookup = this._barRendererLookup[key];
-			var key1 = renderer.Bar.Id;
-			delete lookup[key1];
-		}
-	}
-	,GetRendererForBar: function(key,bar) {
-		var barRendererId = bar.Id;
-		if(this._barRendererLookup.hasOwnProperty(key) && this._barRendererLookup[key].hasOwnProperty(barRendererId)) {
-			return this._barRendererLookup[key][barRendererId];
-		}
-		return null;
-	}
-	,RenderAnnotation: function() {
-		var _gthis = this;
-		var msg = "Rendered using alphaTab (http://www.alphaTab.net)";
-		var canvas = this.Renderer.Canvas;
-		var resources = this.Renderer.RenderingResources;
-		var height = resources.CopyrightFont.Size * 2;
-		this.Height = this.Height + height;
-		var x = this.Width / 2;
-		canvas.BeginRender(this.Width,height);
-		canvas.set_Color(resources.MainGlyphColor);
-		canvas.set_Font(resources.CopyrightFont);
-		canvas.set_TextAlign(1);
-		canvas.FillText(msg,x,resources.CopyrightFont.Size);
-		var result = canvas.EndRender();
-		var tmp = this.Renderer;
-		var _tmp = new alphaTab.rendering.RenderFinishedEventArgs();
-		_tmp.Width = _gthis.Width;
-		_tmp.Height = height;
-		_tmp.RenderResult = result;
-		_tmp.TotalWidth = _gthis.Width;
-		_tmp.TotalHeight = _gthis.Height;
-		_tmp.FirstMasterBarIndex = -1;
-		_tmp.LastMasterBarIndex = -1;
-		tmp.OnPartialRenderFinished(_tmp);
-	}
-	,__class__: alphaTab.rendering.layout.ScoreLayout
-};
-alphaTab.rendering.layout.PageViewLayout = $hx_exports["alphaTab"]["rendering"]["layout"]["PageViewLayout"] = function(renderer) {
-	alphaTab.rendering.layout.ScoreLayout.call(this,renderer);
-	this._groups = null;
-	this._allMasterBarRenderers = null;
-	this._barsFromPreviousGroup = null;
-};
-alphaTab.rendering.layout.PageViewLayout.__name__ = ["alphaTab","rendering","layout","PageViewLayout"];
-alphaTab.rendering.layout.PageViewLayout.__super__ = alphaTab.rendering.layout.ScoreLayout;
-alphaTab.rendering.layout.PageViewLayout.prototype = $extend(alphaTab.rendering.layout.ScoreLayout.prototype,{
-	get_Name: function() {
-		return "PageView";
-	}
-	,DoLayoutAndRender: function() {
-		var x = alphaTab.rendering.layout.PageViewLayout.PagePadding[0];
-		var y = alphaTab.rendering.layout.PageViewLayout.PagePadding[1];
-		var this1 = this.Renderer.Settings.Width;
-		this.Width = this1;
-		var this2 = [];
-		this._allMasterBarRenderers = this2;
-		y = this.LayoutAndRenderScoreInfo(x,y,-1);
-		y = this.LayoutAndRenderScore(x,y);
-		this.Height = y + alphaTab.rendering.layout.PageViewLayout.PagePadding[3];
-	}
-	,get_SupportsResize: function() {
-		return true;
-	}
-	,Resize: function() {
-		var x = alphaTab.rendering.layout.PageViewLayout.PagePadding[0];
-		var y = alphaTab.rendering.layout.PageViewLayout.PagePadding[1];
-		var this1 = this.Renderer.Settings.Width;
-		this.Width = this1;
-		var oldHeight = this.Height;
-		y = this.LayoutAndRenderScoreInfo(x,y,oldHeight);
-		y = this.ResizeAndRenderScore(x,y,oldHeight);
-		this.Height = y + alphaTab.rendering.layout.PageViewLayout.PagePadding[3];
-	}
-	,LayoutAndRenderScoreInfo: function(x,y,totalHeight) {
-		if(totalHeight == null) {
-			totalHeight = -1;
-		}
-		var _gthis = this;
-		alphaTab.util.Logger.Info(this.get_Name(),"Layouting score info",null);
-		var scale = this.get_Scale();
-		var res = this.Renderer.RenderingResources;
-		var centeredGlyphs = [1,2,4,8,64];
-		var i = 0;
-		while(i < centeredGlyphs.length) {
-			if(this.ScoreInfoGlyphs.hasOwnProperty(centeredGlyphs[i])) {
-				var glyph = this.ScoreInfoGlyphs[centeredGlyphs[i]];
-				var this1 = 2;
-				glyph.X = this.Width / this1;
-				glyph.Y = y;
-				glyph.TextAlign = 1;
-				y = y + glyph.Font.Size;
-			}
-			++i;
-		}
-		var musicOrWords = false;
-		var musicOrWordsHeight = 0;
-		if(this.ScoreInfoGlyphs.hasOwnProperty(32)) {
-			var glyph1 = this.ScoreInfoGlyphs[32];
-			glyph1.X = this.Width - alphaTab.rendering.layout.PageViewLayout.PagePadding[2];
-			glyph1.Y = y;
-			glyph1.TextAlign = 2;
-			musicOrWords = true;
-			musicOrWordsHeight = glyph1.Font.Size;
-		}
-		if(this.ScoreInfoGlyphs.hasOwnProperty(16)) {
-			var glyph2 = this.ScoreInfoGlyphs[16];
-			glyph2.X = x;
-			glyph2.Y = y;
-			glyph2.TextAlign = 0;
-			musicOrWords = true;
-			musicOrWordsHeight = glyph2.Font.Size;
-		}
-		if(musicOrWords) {
-			y = y + musicOrWordsHeight;
-		}
-		if(this.TuningGlyph != null) {
-			y = y + 20 * scale;
-			this.TuningGlyph.X = x;
-			this.TuningGlyph.Y = y;
-			y = y + this.TuningGlyph.Height;
-		}
-		y = y + 20 * scale;
-		var canvas = this.Renderer.Canvas;
-		canvas.BeginRender(this.Width,y);
-		canvas.set_Color(res.ScoreInfoColor);
-		canvas.set_TextAlign(1);
-		var this2 = this.ScoreInfoGlyphs;
-		var key = $iterator(Object.keys(this2))();
-		while(key.hasNext()) {
-			var key1 = key.next();
-			this.ScoreInfoGlyphs[key1].Paint(0,0,canvas);
-		}
-		if(this.TuningGlyph != null) {
-			this.TuningGlyph.Paint(0,0,canvas);
-		}
-		var result = canvas.EndRender();
-		var tmp = this.Renderer;
-		var _tmp = new alphaTab.rendering.RenderFinishedEventArgs();
-		_tmp.Width = _gthis.Width;
-		_tmp.Height = y;
-		_tmp.RenderResult = result;
-		_tmp.TotalWidth = _gthis.Width;
-		_tmp.TotalHeight = totalHeight < 0 ? y : totalHeight;
-		_tmp.FirstMasterBarIndex = -1;
-		_tmp.LastMasterBarIndex = -1;
-		tmp.OnPartialRenderFinished(_tmp);
-		return y;
-	}
-	,ResizeAndRenderScore: function(x,y,oldHeight) {
-		var canvas = this.Renderer.Canvas;
-		if(this.Renderer.Settings.Layout.Get("barsPerRow",-1) != -1) {
-			var i = 0;
-			while(i < this._groups.length) {
-				var group = this._groups[i];
-				this.FitGroup(group);
-				group.FinalizeGroup();
-				y = y + this.PaintGroup(group,oldHeight,canvas);
-				++i;
-			}
-		} else {
-			var this1 = [];
-			this._groups = this1;
-			var currentIndex = 0;
-			var maxWidth = this.get_MaxWidth();
-			var group1 = this.CreateEmptyStaveGroup();
-			group1.Index = this._groups.length;
-			group1.X = x;
-			group1.Y = y;
-			while(currentIndex < this._allMasterBarRenderers.length) {
-				var renderers = this._allMasterBarRenderers[currentIndex];
-				if(group1.Width + renderers.Width <= maxWidth || group1.MasterBarsRenderers.length == 0) {
-					group1.AddMasterBarRenderers(this.Renderer.Tracks,renderers);
-					++currentIndex;
-				} else {
-					group1.IsFull = true;
-					group1.IsLast = false;
-					this._groups.push(group1);
-					this.FitGroup(group1);
-					group1.FinalizeGroup();
-					y = y + this.PaintGroup(group1,oldHeight,canvas);
-					group1 = this.CreateEmptyStaveGroup();
-					group1.Index = this._groups.length;
-					group1.X = x;
-					group1.Y = y;
-				}
-			}
-			this.FitGroup(group1);
-			group1.FinalizeGroup();
-			y = y + this.PaintGroup(group1,oldHeight,canvas);
-		}
-		return y;
-	}
-	,LayoutAndRenderScore: function(x,y) {
-		var score = this.Renderer.Score;
-		var canvas = this.Renderer.Canvas;
-		var startIndex = this.Renderer.Settings.Layout.Get("start",1);
-		--startIndex;
-		startIndex = Math.min(score.MasterBars.length - 1,Math.max(0,startIndex));
-		var currentBarIndex = startIndex;
-		var endBarIndex = this.Renderer.Settings.Layout.Get("count",score.MasterBars.length);
-		if(endBarIndex < 0) {
-			endBarIndex = score.MasterBars.length;
-		}
-		endBarIndex = startIndex + endBarIndex - 1;
-		endBarIndex = Math.min(score.MasterBars.length - 1,Math.max(0,endBarIndex));
-		var this1 = [];
-		this._groups = this1;
-		while(currentBarIndex <= endBarIndex) {
-			var group = this.CreateStaveGroup(currentBarIndex,endBarIndex);
-			this._groups.push(group);
-			group.X = x;
-			group.Y = y;
-			currentBarIndex = group.get_LastBarIndex() + 1;
-			this.FitGroup(group);
-			group.FinalizeGroup();
-			alphaTab.util.Logger.Info(this.get_Name(),"Rendering partial from bar " + group.get_FirstBarIndex() + " to " + group.get_LastBarIndex(),null);
-			y = y + this.PaintGroup(group,y,canvas);
-		}
-		return y;
-	}
-	,PaintGroup: function(group,totalHeight,canvas) {
-		var height = group.get_Height() + 20 * this.get_Scale();
-		canvas.BeginRender(this.Width,height);
-		this.Renderer.Canvas.set_Color(this.Renderer.RenderingResources.MainGlyphColor);
-		this.Renderer.Canvas.set_TextAlign(0);
-		group.Paint(0,-group.Y,canvas);
-		totalHeight = totalHeight + height;
-		var result = canvas.EndRender();
-		var args = new alphaTab.rendering.RenderFinishedEventArgs();
-		args.TotalWidth = this.Width;
-		args.TotalHeight = totalHeight;
-		args.Width = this.Width;
-		args.Height = height;
-		args.RenderResult = result;
-		args.FirstMasterBarIndex = group.get_FirstBarIndex();
-		args.LastMasterBarIndex = group.get_LastBarIndex();
-		this.Renderer.OnPartialRenderFinished(args);
-		return height;
-	}
-	,FitGroup: function(group) {
-		if(group.IsFull || group.Width > this.get_MaxWidth()) {
-			group.ScaleToWidth(this.get_MaxWidth());
-		}
-		this.Width = Math.max(this.Width,group.Width);
-	}
-	,CreateStaveGroup: function(currentBarIndex,endIndex) {
-		var group = this.CreateEmptyStaveGroup();
-		group.Index = this._groups.length;
-		var barsPerRow = this.Renderer.Settings.Layout.Get("barsPerRow",-1);
-		var maxWidth = this.get_MaxWidth();
-		var end = endIndex + 1;
-		var i = currentBarIndex;
-		while(i < end) {
-			var renderers;
-			if(this._barsFromPreviousGroup != null && this._barsFromPreviousGroup.MasterBar.Index == i) {
-				renderers = group.AddMasterBarRenderers(this.Renderer.Tracks,this._barsFromPreviousGroup);
-			} else {
-				renderers = group.AddBars(this.Renderer.Tracks,i);
-				this._allMasterBarRenderers.push(renderers);
-			}
-			this._barsFromPreviousGroup = null;
-			var groupIsFull = false;
-			if(barsPerRow == -1 && (group.Width >= maxWidth && group.MasterBarsRenderers.length != 0)) {
-				groupIsFull = true;
-			} else if(group.MasterBarsRenderers.length == barsPerRow + 1) {
-				groupIsFull = true;
-			}
-			if(groupIsFull) {
-				group.RevertLastBar();
-				group.IsFull = true;
-				group.IsLast = false;
-				this._barsFromPreviousGroup = renderers;
-				return group;
-			}
-			group.X = 0;
-			++i;
-		}
-		group.IsLast = endIndex == group.get_LastBarIndex();
-		return group;
-	}
-	,get_MaxWidth: function() {
-		return this.Renderer.Settings.Width - alphaTab.rendering.layout.PageViewLayout.PagePadding[0] - alphaTab.rendering.layout.PageViewLayout.PagePadding[2];
-	}
-	,__class__: alphaTab.rendering.layout.PageViewLayout
-});
-alphaTab.rendering.layout.HorizontalScreenLayout = $hx_exports["alphaTab"]["rendering"]["layout"]["HorizontalScreenLayout"] = function(renderer) {
-	alphaTab.rendering.layout.ScoreLayout.call(this,renderer);
-	this._group = null;
-};
-alphaTab.rendering.layout.HorizontalScreenLayout.__name__ = ["alphaTab","rendering","layout","HorizontalScreenLayout"];
-alphaTab.rendering.layout.HorizontalScreenLayout.__super__ = alphaTab.rendering.layout.ScoreLayout;
-alphaTab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphaTab.rendering.layout.ScoreLayout.prototype,{
-	get_Name: function() {
-		return "HorizontalScreen";
-	}
-	,get_SupportsResize: function() {
-		return false;
-	}
-	,Resize: function() {
-	}
-	,DoLayoutAndRender: function() {
-		var _gthis = this;
-		var score = this.Renderer.Score;
-		var canvas = this.Renderer.Canvas;
-		var startIndex = this.Renderer.Settings.Layout.Get("start",1);
-		--startIndex;
-		startIndex = Math.min(score.MasterBars.length - 1,Math.max(0,startIndex));
-		var currentBarIndex = startIndex;
-		var endBarIndex = this.Renderer.Settings.Layout.Get("count",score.MasterBars.length);
-		if(endBarIndex < 0) {
-			endBarIndex = score.MasterBars.length;
-		}
-		endBarIndex = startIndex + endBarIndex - 1;
-		endBarIndex = Math.min(score.MasterBars.length - 1,Math.max(0,endBarIndex));
-		this._group = this.CreateEmptyStaveGroup();
-		this._group.IsLast = true;
-		this._group.X = alphaTab.rendering.layout.HorizontalScreenLayout.PagePadding[0];
-		this._group.Y = alphaTab.rendering.layout.HorizontalScreenLayout.PagePadding[1];
-		var countPerPartial = this.Renderer.Settings.Layout.Get("countPerPartial",10);
-		var this1 = [];
-		var partials = this1;
-		var currentPartial = new alphaTab.rendering.layout.HorizontalScreenLayoutPartialInfo();
-		while(currentBarIndex <= endBarIndex) {
-			var result = this._group.AddBars(this.Renderer.Tracks,currentBarIndex);
-			if(currentPartial.MasterBars.length == 0 && result.IsLinkedToPrevious && partials.length > 0) {
-				var previousPartial = partials[partials.length - 1];
-				previousPartial.MasterBars.push(score.MasterBars[currentBarIndex]);
-				previousPartial.Width = previousPartial.Width + result.Width;
-			} else {
-				currentPartial.MasterBars.push(score.MasterBars[currentBarIndex]);
-				currentPartial.Width = currentPartial.Width + result.Width;
-				if(currentPartial.MasterBars.length >= countPerPartial) {
-					if(partials.length == 0) {
-						currentPartial.Width = currentPartial.Width + (this._group.X + this._group.AccoladeSpacing);
-					}
-					partials.push(currentPartial);
-					alphaTab.util.Logger.Info(this.get_Name(),"Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " + currentPartial.MasterBars[currentPartial.MasterBars.length - 1].Index,null);
-					currentPartial = new alphaTab.rendering.layout.HorizontalScreenLayoutPartialInfo();
-				}
-			}
-			++currentBarIndex;
-		}
-		if(currentPartial.MasterBars.length > 0) {
-			if(partials.length == 0) {
-				currentPartial.Width = currentPartial.Width + (this._group.X + this._group.AccoladeSpacing);
-			}
-			partials.push(currentPartial);
-			alphaTab.util.Logger.Info(this.get_Name(),"Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " + currentPartial.MasterBars[currentPartial.MasterBars.length - 1].Index,null);
-		}
-		this._group.FinalizeGroup();
-		this.Height = this._group.Y + this._group.get_Height() + alphaTab.rendering.layout.HorizontalScreenLayout.PagePadding[3];
-		this.Width = this._group.X + this._group.Width + alphaTab.rendering.layout.HorizontalScreenLayout.PagePadding[2];
-		currentBarIndex = 0;
-		var i = 0;
-		while(i < partials.length) {
-			var partial = partials[i];
-			canvas.BeginRender(partial.Width,this.Height);
-			canvas.set_Color(this.Renderer.RenderingResources.MainGlyphColor);
-			canvas.set_TextAlign(0);
-			var renderX = this._group.GetBarX(partial.MasterBars[0].Index) + this._group.AccoladeSpacing;
-			if(i == 0) {
-				renderX = renderX - (this._group.X + this._group.AccoladeSpacing);
-			}
-			alphaTab.util.Logger.Info(this.get_Name(),"Rendering partial from bar " + partial.MasterBars[0].Index + " to " + partial.MasterBars[partial.MasterBars.length - 1].Index,null);
-			this._group.PaintPartial(-renderX,this._group.Y,this.Renderer.Canvas,currentBarIndex,partial.MasterBars.length);
-			var result1 = canvas.EndRender();
-			var tmp = this.Renderer;
-			var _tmp = new alphaTab.rendering.RenderFinishedEventArgs();
-			_tmp.TotalWidth = _gthis.Width;
-			_tmp.TotalHeight = _gthis.Height;
-			_tmp.Width = partial.Width;
-			_tmp.Height = _gthis.Height;
-			_tmp.RenderResult = result1;
-			_tmp.FirstMasterBarIndex = partial.MasterBars[0].Index;
-			_tmp.LastMasterBarIndex = partial.MasterBars[partial.MasterBars.length - 1].Index;
-			tmp.OnPartialRenderFinished(_tmp);
-			currentBarIndex = currentBarIndex + partial.MasterBars.length;
-			++i;
-		}
-	}
-	,__class__: alphaTab.rendering.layout.HorizontalScreenLayout
-});
-alphaTab.rendering.IEffectBarRendererInfo = $hx_exports["alphaTab"]["rendering"]["IEffectBarRendererInfo"] = function() { };
-alphaTab.rendering.IEffectBarRendererInfo.__name__ = ["alphaTab","rendering","IEffectBarRendererInfo"];
-alphaTab.rendering.IEffectBarRendererInfo.prototype = {
-	__class__: alphaTab.rendering.IEffectBarRendererInfo
-};
-alphaTab.rendering.effects = {};
-alphaTab.rendering.effects.TempoEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["TempoEffectInfo"] = function() {
-};
-alphaTab.rendering.effects.TempoEffectInfo.__name__ = ["alphaTab","rendering","effects","TempoEffectInfo"];
-alphaTab.rendering.effects.TempoEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
-alphaTab.rendering.effects.TempoEffectInfo.prototype = {
-	get_EffectId: function() {
-		return "tempo";
-	}
-	,get_HideOnMultiTrack: function() {
-		return true;
-	}
-	,get_CanShareBand: function() {
-		return false;
-	}
-	,get_SizingMode: function() {
-		return 0;
-	}
-	,ShouldCreateGlyph: function(beat) {
-		if(beat.Voice.Bar.Staff.Index == 0 && beat.Voice.Index == 0 && beat.Index == 0) {
-			if(beat.Voice.Bar.get_MasterBar().TempoAutomation == null) {
-				return beat.Voice.Bar.Index == 0;
-			} else {
-				return true;
-			}
-		} else {
-			return false;
-		}
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		var tempo;
-		if(beat.Voice.Bar.get_MasterBar().TempoAutomation != null) {
-			tempo = system.Convert.ToInt32_Single(beat.Voice.Bar.get_MasterBar().TempoAutomation.Value);
-		} else {
-			tempo = beat.Voice.Bar.Staff.Track.Score.Tempo;
-		}
-		return new alphaTab.rendering.glyphs.TempoGlyph(0,0,tempo);
-	}
-	,CanExpand: function(from,to) {
-		return true;
-	}
-	,__class__: alphaTab.rendering.effects.TempoEffectInfo
-};
-alphaTab.rendering.effects.TripletFeelEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["TripletFeelEffectInfo"] = function() {
-};
-alphaTab.rendering.effects.TripletFeelEffectInfo.__name__ = ["alphaTab","rendering","effects","TripletFeelEffectInfo"];
-alphaTab.rendering.effects.TripletFeelEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
-alphaTab.rendering.effects.TripletFeelEffectInfo.prototype = {
-	get_EffectId: function() {
-		return "triplet-feel";
-	}
-	,get_HideOnMultiTrack: function() {
-		return true;
-	}
-	,get_CanShareBand: function() {
-		return false;
-	}
-	,get_SizingMode: function() {
-		return 0;
-	}
-	,ShouldCreateGlyph: function(beat) {
-		if(beat.Index == 0) {
-			if(!(beat.Voice.Bar.get_MasterBar().Index == 0 && beat.Voice.Bar.get_MasterBar().TripletFeel != 0)) {
-				if(beat.Voice.Bar.get_MasterBar().Index > 0) {
-					return beat.Voice.Bar.get_MasterBar().TripletFeel != beat.Voice.Bar.get_MasterBar().PreviousMasterBar.TripletFeel;
-				} else {
-					return false;
-				}
-			} else {
-				return true;
-			}
-		} else {
-			return false;
-		}
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.TripletFeelGlyph(beat.Voice.Bar.get_MasterBar().TripletFeel);
-	}
-	,CanExpand: function(from,to) {
-		return true;
-	}
-	,__class__: alphaTab.rendering.effects.TripletFeelEffectInfo
-};
-alphaTab.rendering.effects.MarkerEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["MarkerEffectInfo"] = function() {
-};
-alphaTab.rendering.effects.MarkerEffectInfo.__name__ = ["alphaTab","rendering","effects","MarkerEffectInfo"];
-alphaTab.rendering.effects.MarkerEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
-alphaTab.rendering.effects.MarkerEffectInfo.prototype = {
-	get_EffectId: function() {
-		return "marker";
-	}
-	,get_HideOnMultiTrack: function() {
-		return true;
-	}
-	,get_CanShareBand: function() {
-		return true;
-	}
-	,get_SizingMode: function() {
-		return 0;
-	}
-	,ShouldCreateGlyph: function(beat) {
-		if(beat.Voice.Bar.Staff.Index == 0 && beat.Voice.Index == 0 && beat.Index == 0) {
-			return beat.Voice.Bar.get_MasterBar().get_IsSectionStart();
-		} else {
-			return false;
-		}
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.TextGlyph(0,0,beat.Voice.Bar.get_MasterBar().Section.Text,renderer.get_Resources().MarkerFont,0);
-	}
-	,CanExpand: function(from,to) {
-		return true;
-	}
-	,__class__: alphaTab.rendering.effects.MarkerEffectInfo
-};
-alphaTab.rendering.effects.TextEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["TextEffectInfo"] = function() {
-};
-alphaTab.rendering.effects.TextEffectInfo.__name__ = ["alphaTab","rendering","effects","TextEffectInfo"];
-alphaTab.rendering.effects.TextEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
-alphaTab.rendering.effects.TextEffectInfo.prototype = {
-	get_EffectId: function() {
-		return "text";
-	}
-	,get_HideOnMultiTrack: function() {
-		return false;
-	}
-	,get_CanShareBand: function() {
-		return false;
-	}
-	,get_SizingMode: function() {
-		return 1;
-	}
-	,ShouldCreateGlyph: function(beat) {
-		var s = beat.Text;
-		return !(s == null || StringTools.trim(s).length == 0);
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.TextGlyph(0,0,beat.Text,renderer.get_Resources().EffectFont,0);
-	}
-	,CanExpand: function(from,to) {
-		return true;
-	}
-	,__class__: alphaTab.rendering.effects.TextEffectInfo
-};
-alphaTab.rendering.effects.ChordsEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["ChordsEffectInfo"] = function() {
-};
-alphaTab.rendering.effects.ChordsEffectInfo.__name__ = ["alphaTab","rendering","effects","ChordsEffectInfo"];
-alphaTab.rendering.effects.ChordsEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
-alphaTab.rendering.effects.ChordsEffectInfo.prototype = {
-	get_EffectId: function() {
-		return "chords";
-	}
-	,get_HideOnMultiTrack: function() {
-		return false;
-	}
-	,get_CanShareBand: function() {
-		return true;
-	}
-	,get_SizingMode: function() {
-		return 1;
-	}
-	,ShouldCreateGlyph: function(beat) {
-		return beat.get_HasChord();
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.TextGlyph(0,0,beat.get_Chord().Name,renderer.get_Resources().EffectFont,0);
-	}
-	,CanExpand: function(from,to) {
-		return false;
-	}
-	,__class__: alphaTab.rendering.effects.ChordsEffectInfo
-};
-alphaTab.rendering.effects.NoteEffectInfoBase = $hx_exports["alphaTab"]["rendering"]["effects"]["NoteEffectInfoBase"] = function() {
-};
-alphaTab.rendering.effects.NoteEffectInfoBase.__name__ = ["alphaTab","rendering","effects","NoteEffectInfoBase"];
-alphaTab.rendering.effects.NoteEffectInfoBase.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
-alphaTab.rendering.effects.NoteEffectInfoBase.prototype = {
-	ShouldCreateGlyph: function(beat) {
-		var this1 = [];
-		this.LastCreateInfo = this1;
-		var i = 0;
-		var j = beat.Notes.length;
-		while(i < j) {
-			var n = beat.Notes[i];
-			if(this.ShouldCreateGlyphForNote(n)) {
-				this.LastCreateInfo.push(n);
-			}
-			++i;
-		}
-		return this.LastCreateInfo.length > 0;
-	}
-	,ShouldCreateGlyphForNote: function(note) {
-		throw new js._Boot.HaxeError("abstract");
-	}
-	,get_EffectId: function() {
-		throw new js._Boot.HaxeError("abstract");
-	}
-	,get_HideOnMultiTrack: function() {
-		return false;
-	}
-	,get_CanShareBand: function() {
-		return true;
-	}
-	,get_SizingMode: function() {
-		throw new js._Boot.HaxeError("abstract");
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		throw new js._Boot.HaxeError("abstract");
-	}
-	,CanExpand: function(from,to) {
-		return true;
-	}
-	,__class__: alphaTab.rendering.effects.NoteEffectInfoBase
-};
-alphaTab.rendering.effects.TrillEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["TrillEffectInfo"] = function() {
-	alphaTab.rendering.effects.NoteEffectInfoBase.call(this);
-};
-alphaTab.rendering.effects.TrillEffectInfo.__name__ = ["alphaTab","rendering","effects","TrillEffectInfo"];
-alphaTab.rendering.effects.TrillEffectInfo.__super__ = alphaTab.rendering.effects.NoteEffectInfoBase;
-alphaTab.rendering.effects.TrillEffectInfo.prototype = $extend(alphaTab.rendering.effects.NoteEffectInfoBase.prototype,{
-	get_EffectId: function() {
-		return "trill";
-	}
-	,ShouldCreateGlyphForNote: function(note) {
-		return note.get_IsTrill();
-	}
-	,get_SizingMode: function() {
-		return 1;
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.TrillGlyph(0,0);
-	}
-	,__class__: alphaTab.rendering.effects.TrillEffectInfo
-});
-alphaTab.rendering.effects.BeatVibratoEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["BeatVibratoEffectInfo"] = function() {
-};
-alphaTab.rendering.effects.BeatVibratoEffectInfo.__name__ = ["alphaTab","rendering","effects","BeatVibratoEffectInfo"];
-alphaTab.rendering.effects.BeatVibratoEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
-alphaTab.rendering.effects.BeatVibratoEffectInfo.prototype = {
-	get_EffectId: function() {
-		return "beat-vibrato";
-	}
-	,get_HideOnMultiTrack: function() {
-		return false;
-	}
-	,get_CanShareBand: function() {
-		return true;
-	}
-	,get_SizingMode: function() {
-		return 3;
-	}
-	,ShouldCreateGlyph: function(beat) {
-		return beat.Vibrato != 0;
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.VibratoGlyph(0,5 * renderer.get_Scale(),1.4);
-	}
-	,CanExpand: function(from,to) {
-		return true;
-	}
-	,__class__: alphaTab.rendering.effects.BeatVibratoEffectInfo
-};
-alphaTab.rendering.effects.NoteVibratoEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["NoteVibratoEffectInfo"] = function() {
-	alphaTab.rendering.effects.NoteEffectInfoBase.call(this);
-};
-alphaTab.rendering.effects.NoteVibratoEffectInfo.__name__ = ["alphaTab","rendering","effects","NoteVibratoEffectInfo"];
-alphaTab.rendering.effects.NoteVibratoEffectInfo.__super__ = alphaTab.rendering.effects.NoteEffectInfoBase;
-alphaTab.rendering.effects.NoteVibratoEffectInfo.prototype = $extend(alphaTab.rendering.effects.NoteEffectInfoBase.prototype,{
-	get_EffectId: function() {
-		return "note-vibrato";
-	}
-	,ShouldCreateGlyphForNote: function(note) {
-		if(!(note.Vibrato != 0)) {
-			if(note.IsTieDestination) {
-				return note.TieOrigin.Vibrato != 0;
-			} else {
-				return false;
-			}
-		} else {
-			return true;
-		}
-	}
-	,get_SizingMode: function() {
-		return 3;
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.VibratoGlyph(0,5 * renderer.get_Scale(),1.2);
-	}
-	,__class__: alphaTab.rendering.effects.NoteVibratoEffectInfo
-});
-alphaTab.rendering.effects.AlternateEndingsEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["AlternateEndingsEffectInfo"] = function() {
-};
-alphaTab.rendering.effects.AlternateEndingsEffectInfo.__name__ = ["alphaTab","rendering","effects","AlternateEndingsEffectInfo"];
-alphaTab.rendering.effects.AlternateEndingsEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
-alphaTab.rendering.effects.AlternateEndingsEffectInfo.prototype = {
-	get_EffectId: function() {
-		return "alternate-feel";
-	}
-	,get_HideOnMultiTrack: function() {
-		return true;
-	}
-	,get_CanShareBand: function() {
-		return false;
-	}
-	,get_SizingMode: function() {
-		return 4;
-	}
-	,ShouldCreateGlyph: function(beat) {
-		if(beat.Index == 0) {
-			return beat.Voice.Bar.get_MasterBar().AlternateEndings != 0;
-		} else {
-			return false;
-		}
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.AlternateEndingsGlyph(0,0,beat.Voice.Bar.get_MasterBar().AlternateEndings);
-	}
-	,CanExpand: function(from,to) {
-		return true;
-	}
-	,__class__: alphaTab.rendering.effects.AlternateEndingsEffectInfo
-};
-alphaTab.rendering.BarRendererFactory = $hx_exports["alphaTab"]["rendering"]["BarRendererFactory"] = function() {
-	this.IsInAccolade = false;
-	this.HideOnMultiTrack = false;
-	this.HideOnPercussionTrack = false;
-	this.IsInAccolade = true;
-	this.HideOnPercussionTrack = false;
-	this.HideOnMultiTrack = false;
-};
-alphaTab.rendering.BarRendererFactory.__name__ = ["alphaTab","rendering","BarRendererFactory"];
-alphaTab.rendering.BarRendererFactory.prototype = {
-	get_StaffId: function() {
-		throw new js._Boot.HaxeError("abstract");
-	}
-	,CanCreate: function(track,staff) {
-		if(!(!this.HideOnPercussionTrack)) {
-			return !track.IsPercussion;
-		} else {
-			return true;
-		}
-	}
-	,Create: function(renderer,bar,staveSettings) {
-		throw new js._Boot.HaxeError("abstract");
-	}
-	,__class__: alphaTab.rendering.BarRendererFactory
-};
-alphaTab.rendering.EffectBarRendererFactory = $hx_exports["alphaTab"]["rendering"]["EffectBarRendererFactory"] = function(staffId,infos) {
-	alphaTab.rendering.BarRendererFactory.call(this);
-	this._infos = null;
-	this._staffId = null;
-	this._infos = infos;
-	this._staffId = staffId;
-	this.IsInAccolade = false;
-};
-alphaTab.rendering.EffectBarRendererFactory.__name__ = ["alphaTab","rendering","EffectBarRendererFactory"];
-alphaTab.rendering.EffectBarRendererFactory.__super__ = alphaTab.rendering.BarRendererFactory;
-alphaTab.rendering.EffectBarRendererFactory.prototype = $extend(alphaTab.rendering.BarRendererFactory.prototype,{
-	get_StaffId: function() {
-		return this._staffId;
-	}
-	,Create: function(renderer,bar,staveSettings) {
-		return new alphaTab.rendering.EffectBarRenderer(renderer,bar,this._infos);
-	}
-	,__class__: alphaTab.rendering.EffectBarRendererFactory
-});
-alphaTab.rendering.ScoreBarRendererFactory = $hx_exports["alphaTab"]["rendering"]["ScoreBarRendererFactory"] = function() {
-	alphaTab.rendering.BarRendererFactory.call(this);
-};
-alphaTab.rendering.ScoreBarRendererFactory.__name__ = ["alphaTab","rendering","ScoreBarRendererFactory"];
-alphaTab.rendering.ScoreBarRendererFactory.__super__ = alphaTab.rendering.BarRendererFactory;
-alphaTab.rendering.ScoreBarRendererFactory.prototype = $extend(alphaTab.rendering.BarRendererFactory.prototype,{
-	get_StaffId: function() {
-		return "score";
-	}
-	,Create: function(renderer,bar,staveSettings) {
-		return new alphaTab.rendering.ScoreBarRenderer(renderer,bar);
-	}
-	,__class__: alphaTab.rendering.ScoreBarRendererFactory
-});
-alphaTab.rendering.effects.CrescendoEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["CrescendoEffectInfo"] = function() {
-};
-alphaTab.rendering.effects.CrescendoEffectInfo.__name__ = ["alphaTab","rendering","effects","CrescendoEffectInfo"];
-alphaTab.rendering.effects.CrescendoEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
-alphaTab.rendering.effects.CrescendoEffectInfo.prototype = {
-	get_EffectId: function() {
-		return "crescendo";
-	}
-	,get_HideOnMultiTrack: function() {
-		return false;
-	}
-	,get_CanShareBand: function() {
-		return true;
-	}
-	,get_SizingMode: function() {
-		return 3;
-	}
-	,ShouldCreateGlyph: function(beat) {
-		return beat.Crescendo != 0;
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.CrescendoGlyph(0,0,beat.Crescendo);
-	}
-	,CanExpand: function(from,to) {
-		return from.Crescendo == to.Crescendo;
-	}
-	,__class__: alphaTab.rendering.effects.CrescendoEffectInfo
-};
-alphaTab.rendering.effects.DynamicsEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["DynamicsEffectInfo"] = function() {
-};
-alphaTab.rendering.effects.DynamicsEffectInfo.__name__ = ["alphaTab","rendering","effects","DynamicsEffectInfo"];
-alphaTab.rendering.effects.DynamicsEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
-alphaTab.rendering.effects.DynamicsEffectInfo.prototype = {
-	get_EffectId: function() {
-		return "dynamics";
-	}
-	,get_HideOnMultiTrack: function() {
-		return false;
-	}
-	,get_CanShareBand: function() {
-		return false;
-	}
-	,get_SizingMode: function() {
-		return 1;
-	}
-	,ShouldCreateGlyph: function(beat) {
-		if(beat.Voice.Index == 0) {
-			if(!(beat.Index == 0 && beat.Voice.Bar.Index == 0)) {
-				if(beat.PreviousBeat != null) {
-					return beat.Dynamic != beat.PreviousBeat.Dynamic;
-				} else {
-					return false;
-				}
-			} else {
-				return true;
-			}
-		} else {
-			return false;
-		}
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.DynamicsGlyph(0,0,beat.Dynamic);
-	}
-	,CanExpand: function(from,to) {
-		return true;
-	}
-	,__class__: alphaTab.rendering.effects.DynamicsEffectInfo
-};
-alphaTab.rendering.effects.LyricsEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["LyricsEffectInfo"] = function() {
-};
-alphaTab.rendering.effects.LyricsEffectInfo.__name__ = ["alphaTab","rendering","effects","LyricsEffectInfo"];
-alphaTab.rendering.effects.LyricsEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
-alphaTab.rendering.effects.LyricsEffectInfo.prototype = {
-	get_EffectId: function() {
-		return "lyrics";
-	}
-	,get_HideOnMultiTrack: function() {
-		return false;
-	}
-	,get_CanShareBand: function() {
-		return false;
-	}
-	,get_SizingMode: function() {
-		return 1;
-	}
-	,ShouldCreateGlyph: function(beat) {
-		return beat.Lyrics != null;
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.LyricsGlyph(0,0,beat.Lyrics,renderer.get_Resources().EffectFont,1);
-	}
-	,CanExpand: function(from,to) {
-		return true;
-	}
-	,__class__: alphaTab.rendering.effects.LyricsEffectInfo
-};
-alphaTab.rendering.effects.TapEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["TapEffectInfo"] = function() {
-};
-alphaTab.rendering.effects.TapEffectInfo.__name__ = ["alphaTab","rendering","effects","TapEffectInfo"];
-alphaTab.rendering.effects.TapEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
-alphaTab.rendering.effects.TapEffectInfo.prototype = {
-	get_EffectId: function() {
-		return "tap";
-	}
-	,get_HideOnMultiTrack: function() {
-		return false;
-	}
-	,get_CanShareBand: function() {
-		return true;
-	}
-	,get_SizingMode: function() {
-		return 1;
-	}
-	,ShouldCreateGlyph: function(beat) {
-		if(!(beat.Slap || beat.Pop)) {
-			return beat.Tap;
-		} else {
-			return true;
-		}
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		var res = renderer.get_Resources();
-		if(beat.Slap) {
-			return new alphaTab.rendering.glyphs.TextGlyph(0,0,"S",res.EffectFont,0);
-		}
-		if(beat.Pop) {
-			return new alphaTab.rendering.glyphs.TextGlyph(0,0,"P",res.EffectFont,0);
-		}
-		return new alphaTab.rendering.glyphs.TextGlyph(0,0,"T",res.EffectFont,0);
-	}
-	,CanExpand: function(from,to) {
-		return true;
-	}
-	,__class__: alphaTab.rendering.effects.TapEffectInfo
-};
-alphaTab.rendering.effects.FadeInEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["FadeInEffectInfo"] = function() {
-};
-alphaTab.rendering.effects.FadeInEffectInfo.__name__ = ["alphaTab","rendering","effects","FadeInEffectInfo"];
-alphaTab.rendering.effects.FadeInEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
-alphaTab.rendering.effects.FadeInEffectInfo.prototype = {
-	get_EffectId: function() {
-		return "fade-in";
-	}
-	,get_HideOnMultiTrack: function() {
-		return false;
-	}
-	,get_CanShareBand: function() {
-		return true;
-	}
-	,get_SizingMode: function() {
-		return 1;
-	}
-	,ShouldCreateGlyph: function(beat) {
-		return beat.FadeIn;
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.FadeInGlyph(0,0);
-	}
-	,CanExpand: function(from,to) {
-		return true;
-	}
-	,__class__: alphaTab.rendering.effects.FadeInEffectInfo
-};
-alphaTab.rendering.effects.HarmonicsEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["HarmonicsEffectInfo"] = function() {
-	alphaTab.rendering.effects.NoteEffectInfoBase.call(this);
-};
-alphaTab.rendering.effects.HarmonicsEffectInfo.__name__ = ["alphaTab","rendering","effects","HarmonicsEffectInfo"];
-alphaTab.rendering.effects.HarmonicsEffectInfo.HarmonicToString = function(type) {
-	switch(type) {
-	case 1:
-		return "N.H.";
-	case 2:
-		return "A.H.";
-	case 3:
-		return "P.H.";
-	case 4:
-		return "T.H.";
-	case 5:
-		return "S.H.";
-	case 6:
-		return "Fdbk.";
-	default:
-	}
-	return "";
-};
-alphaTab.rendering.effects.HarmonicsEffectInfo.__super__ = alphaTab.rendering.effects.NoteEffectInfoBase;
-alphaTab.rendering.effects.HarmonicsEffectInfo.prototype = $extend(alphaTab.rendering.effects.NoteEffectInfoBase.prototype,{
-	get_EffectId: function() {
-		return "harmonics";
-	}
-	,ShouldCreateGlyphForNote: function(note) {
-		if(!note.get_IsHarmonic()) {
-			return false;
-		}
-		if(note.Beat != this._beat || note.HarmonicType > this._beatType) {
-			this._beat = note.Beat;
-			this._beatType = note.HarmonicType;
-		}
-		return true;
-	}
-	,get_SizingMode: function() {
-		return 1;
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.TextGlyph(0,0,alphaTab.rendering.effects.HarmonicsEffectInfo.HarmonicToString(this._beatType),renderer.get_Resources().EffectFont,0);
-	}
-	,__class__: alphaTab.rendering.effects.HarmonicsEffectInfo
-});
-alphaTab.rendering.effects.LetRingEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["LetRingEffectInfo"] = function() {
-	alphaTab.rendering.effects.NoteEffectInfoBase.call(this);
-};
-alphaTab.rendering.effects.LetRingEffectInfo.__name__ = ["alphaTab","rendering","effects","LetRingEffectInfo"];
-alphaTab.rendering.effects.LetRingEffectInfo.__super__ = alphaTab.rendering.effects.NoteEffectInfoBase;
-alphaTab.rendering.effects.LetRingEffectInfo.prototype = $extend(alphaTab.rendering.effects.NoteEffectInfoBase.prototype,{
-	get_EffectId: function() {
-		return "let-ring";
-	}
-	,get_CanShareBand: function() {
-		return false;
-	}
-	,ShouldCreateGlyphForNote: function(note) {
-		return note.IsLetRing;
-	}
-	,get_SizingMode: function() {
-		return 3;
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.LineRangedGlyph("LetRing");
-	}
-	,__class__: alphaTab.rendering.effects.LetRingEffectInfo
-});
-alphaTab.rendering.effects.CapoEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["CapoEffectInfo"] = function() {
-};
-alphaTab.rendering.effects.CapoEffectInfo.__name__ = ["alphaTab","rendering","effects","CapoEffectInfo"];
-alphaTab.rendering.effects.CapoEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
-alphaTab.rendering.effects.CapoEffectInfo.prototype = {
-	get_EffectId: function() {
-		return "capo";
-	}
-	,get_HideOnMultiTrack: function() {
-		return false;
-	}
-	,get_CanShareBand: function() {
-		return false;
-	}
-	,get_SizingMode: function() {
-		return 1;
-	}
-	,ShouldCreateGlyph: function(beat) {
-		if(beat.Index == 0 && beat.Voice.Bar.Index == 0) {
-			return beat.Voice.Bar.Staff.Track.Capo != 0;
-		} else {
-			return false;
-		}
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.TextGlyph(0,0,"Capo. fret " + beat.Voice.Bar.Staff.Track.Capo,renderer.get_Resources().EffectFont,0);
-	}
-	,CanExpand: function(from,to) {
-		return false;
-	}
-	,__class__: alphaTab.rendering.effects.CapoEffectInfo
-};
-alphaTab.rendering.effects.PalmMuteEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["PalmMuteEffectInfo"] = function() {
-	alphaTab.rendering.effects.NoteEffectInfoBase.call(this);
-};
-alphaTab.rendering.effects.PalmMuteEffectInfo.__name__ = ["alphaTab","rendering","effects","PalmMuteEffectInfo"];
-alphaTab.rendering.effects.PalmMuteEffectInfo.__super__ = alphaTab.rendering.effects.NoteEffectInfoBase;
-alphaTab.rendering.effects.PalmMuteEffectInfo.prototype = $extend(alphaTab.rendering.effects.NoteEffectInfoBase.prototype,{
-	get_EffectId: function() {
-		return "palm-mute";
-	}
-	,ShouldCreateGlyphForNote: function(note) {
-		return note.IsPalmMute;
-	}
-	,get_SizingMode: function() {
-		return 3;
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.LineRangedGlyph("P.M.");
-	}
-	,__class__: alphaTab.rendering.effects.PalmMuteEffectInfo
-});
-alphaTab.rendering.effects.PickStrokeEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["PickStrokeEffectInfo"] = function() {
-};
-alphaTab.rendering.effects.PickStrokeEffectInfo.__name__ = ["alphaTab","rendering","effects","PickStrokeEffectInfo"];
-alphaTab.rendering.effects.PickStrokeEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
-alphaTab.rendering.effects.PickStrokeEffectInfo.prototype = {
-	get_EffectId: function() {
-		return "pick-stroke";
-	}
-	,get_HideOnMultiTrack: function() {
-		return false;
-	}
-	,get_CanShareBand: function() {
-		return true;
-	}
-	,get_SizingMode: function() {
-		return 1;
-	}
-	,ShouldCreateGlyph: function(beat) {
-		return beat.PickStroke != 0;
-	}
-	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.PickStrokeGlyph(0,0,beat.PickStroke);
-	}
-	,CanExpand: function(from,to) {
-		return true;
-	}
-	,__class__: alphaTab.rendering.effects.PickStrokeEffectInfo
-};
-alphaTab.rendering.TabBarRendererFactory = $hx_exports["alphaTab"]["rendering"]["TabBarRendererFactory"] = function(showTimeSignature,showRests,showTiedNotes) {
-	alphaTab.rendering.BarRendererFactory.call(this);
-	this._showTimeSignature = false;
-	this._showRests = false;
-	this._showTiedNotes = false;
-	this._showTimeSignature = showTimeSignature;
-	this._showRests = showRests;
-	this._showTiedNotes = showTiedNotes;
-	this.HideOnPercussionTrack = true;
-};
-alphaTab.rendering.TabBarRendererFactory.__name__ = ["alphaTab","rendering","TabBarRendererFactory"];
-alphaTab.rendering.TabBarRendererFactory.__super__ = alphaTab.rendering.BarRendererFactory;
-alphaTab.rendering.TabBarRendererFactory.prototype = $extend(alphaTab.rendering.BarRendererFactory.prototype,{
-	get_StaffId: function() {
-		return "tab";
-	}
-	,CanCreate: function(track,staff) {
-		if(track.Tuning.length > 0) {
-			return alphaTab.rendering.BarRendererFactory.prototype.CanCreate.call(this,track,staff);
-		} else {
-			return false;
-		}
-	}
-	,Create: function(renderer,bar,staveSettings) {
-		var tabBarRenderer = new alphaTab.rendering.TabBarRenderer(renderer,bar);
-		tabBarRenderer.ShowRests = this._showRests;
-		tabBarRenderer.ShowTimeSignature = this._showTimeSignature;
-		tabBarRenderer.ShowTiedNotes = this._showTiedNotes;
-		tabBarRenderer.RenderRhythm = staveSettings.Get("rhythm",tabBarRenderer.RenderRhythm);
-		tabBarRenderer.RhythmHeight = staveSettings.Get("rhythmHeight",tabBarRenderer.RhythmHeight);
-		tabBarRenderer.RhythmBeams = staveSettings.Get("rhythmBeams",tabBarRenderer.RhythmBeams);
-		return tabBarRenderer;
-	}
-	,__class__: alphaTab.rendering.TabBarRendererFactory
-});
 alphaTab.Environment = $hx_exports["alphaTab"]["Environment"] = function() {
 };
 alphaTab.Environment.__name__ = ["alphaTab","Environment"];
@@ -3218,6 +7101,7 @@ alphaTab.Environment.PlatformInit = function() {
 	alphaTab.Environment.RegisterJQueryPlugin();
 	Math.log2 = Math.log2 || function(x) { return Math.log(x) * Math.LOG2E; };
 	if($global.document) {
+		window.AudioContext = window.AudioContext || window.webkitAudioContext;
 		var document = window.document;
 		var this1 = "";
 		var vbAjaxLoader = this1;
@@ -3273,7 +7157,8 @@ alphaTab.Environment.PlatformInit = function() {
 			}
 		}
 	} else {
-		alphaTab.platform.javaScript.JsWorker.Init();
+		alphaTab.platform.javaScript.AlphaTabWebWorker.Init();
+		alphaTab.platform.javaScript.AlphaSynthWebWorker.Init();
 	}
 };
 alphaTab.Environment.RegisterJQueryPlugin = function() {
@@ -3412,6 +7297,51 @@ alphaTab.Settings = $hx_exports["alphaTab"]["Settings"] = function() {
 alphaTab.Settings.__name__ = ["alphaTab","Settings"];
 alphaTab.Settings.SetDefaults = function(settings) {
 	settings.UseWebWorker = true;
+	settings.ScrollMode = "vertical";
+	settings.ScrollSpeed = 300;
+	settings.ScrollElement = "html,body";
+	settings.BeatCursorWidth = 3;
+};
+alphaTab.Settings.FillPlayerOptions = function(settings,json,setDefaults,dataAttributes) {
+	if((json && "cursor" in json)) {
+		settings.EnableCursor = json.cursor;
+	} else if(dataAttributes != null && dataAttributes.hasOwnProperty("cursor")) {
+		settings.EnableCursor = dataAttributes["cursor"];
+	} else if(setDefaults) {
+		settings.EnableCursor = true;
+	}
+	if(settings.EnableCursor) {
+		if((json && "playerOffset" in json)) {
+			alphaTab.Settings.FillCursorOffset(settings,json.playerOffset);
+		} else if(dataAttributes != null && dataAttributes.hasOwnProperty("playerOffset")) {
+			alphaTab.Settings.FillCursorOffset(settings,dataAttributes["playerOffset"]);
+		}
+	}
+	if((json && "handleClick" in json)) {
+		settings.EnableSeekByClick = json.handleClick;
+	} else if(setDefaults) {
+		settings.EnableSeekByClick = true;
+	}
+	if((json && "autoScroll" in json)) {
+		settings.ScrollMode = json.autoScroll;
+	} else if(setDefaults) {
+		settings.ScrollMode = "vertical";
+	}
+	if((json && "scrollSpeed" in json)) {
+		settings.ScrollSpeed = json.scrollSpeed;
+	} else if(setDefaults) {
+		settings.ScrollSpeed = 300;
+	}
+	if((json && "scrollSpeed" in json)) {
+		settings.ScrollElement = json.scrollSpeed;
+	} else if(setDefaults) {
+		settings.ScrollElement = "html,body";
+	}
+	if((json && "beatCursorWidth" in json)) {
+		settings.BeatCursorWidth = json.beatCursorWidth;
+	} else if(setDefaults) {
+		settings.BeatCursorWidth = 3;
+	}
 };
 alphaTab.Settings.FromJson = function(json,dataAttributes) {
 	if(js.Boot.__instanceof(json,alphaTab.Settings)) {
@@ -3533,6 +7463,26 @@ alphaTab.Settings.FillFromJson = function(settings,json,dataAttributes) {
 				settings.Staves.AdditionalSettings[property1.toLowerCase()] = dataAttributes[key3];
 			}
 		}
+	}
+	if((json && "player" in json)) {
+		settings.EnablePlayer = true;
+		settings.SoundFontFile = json.player;
+	} else if(dataAttributes != null && dataAttributes.hasOwnProperty("player")) {
+		settings.EnablePlayer = true;
+		settings.SoundFontFile = dataAttributes["player"];
+	}
+	if(settings.EnablePlayer) {
+		alphaTab.Settings.FillPlayerOptions(settings,json,true,dataAttributes);
+	}
+};
+alphaTab.Settings.FillCursorOffset = function(settings,playerOffset) {
+	if(typeof(playerOffset) == "number") {
+		settings.ScrollOffsetX = playerOffset;
+		settings.ScrollOffsetY = playerOffset;
+	} else if((playerOffset && "length" in playerOffset)) {
+		var offsets = playerOffset;
+		settings.ScrollOffsetX = offsets[0];
+		settings.ScrollOffsetY = offsets[1];
 	}
 };
 alphaTab.Settings.StavesFromJson = function(json) {
@@ -4184,25 +8134,15 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			var tick = noteStart + ticksPerPosition * currentPoint.Offset;
 			if(currentBendValue < nextBendValue) {
 				while(currentBendValue <= nextBendValue) {
-					var tmp = this._handler;
-					var track1 = track.Index;
-					var tmp1 = system.Convert.ToInt32_Double(tick);
-					var tmp2 = system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel);
 					var this1 = currentBendValue;
-					var this2 = Math.round(this1);
-					tmp.AddBend(track1,tmp1,tmp2,system.Convert.ToUInt8(system.Convert.ToInt32_Double(this2)));
+					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this1))));
 					++currentBendValue;
 					tick = tick + ticksPerValue;
 				}
 			} else if(currentBendValue > nextBendValue) {
 				while(currentBendValue >= nextBendValue) {
-					var tmp3 = this._handler;
-					var track2 = track.Index;
-					var tmp4 = system.Convert.ToInt32_Double(tick);
-					var tmp5 = system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel);
-					var this3 = currentBendValue;
-					var this4 = Math.round(this3);
-					tmp3.AddBend(track2,tmp4,tmp5,system.Convert.ToUInt8(system.Convert.ToInt32_Double(this4)));
+					var this2 = currentBendValue;
+					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this2))));
 					--currentBendValue;
 					tick = tick + ticksPerValue;
 				}
@@ -4526,8 +8466,7 @@ alphaTab.audio.model._MidiController.MidiController_Impl_.ToSingle_IFormatProvid
 	return this1;
 };
 alphaTab.audio.model._MidiController.MidiController_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.audio.model._MidiController.MidiController_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -6575,8 +10514,7 @@ alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.ToSingle_IFormatProvide
 	return this1;
 };
 alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -10766,6 +14704,13 @@ alphaTab.io.ByteBuffer.prototype = {
 	get_Length: function() {
 		return this._length;
 	}
+	,get_Position: function() {
+		return this._position;
+	}
+	,set_Position: function(value) {
+		this._position = value;
+		return this.get_Position();
+	}
 	,GetBuffer: function() {
 		return this._buffer;
 	}
@@ -10947,8 +14892,7 @@ alphaTab.model._AccentuationType.AccentuationType_Impl_.ToSingle_IFormatProvider
 	return this1;
 };
 alphaTab.model._AccentuationType.AccentuationType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._AccentuationType.AccentuationType_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -10998,8 +14942,7 @@ alphaTab.model._AccidentalType.AccidentalType_Impl_.ToSingle_IFormatProvider = f
 	return this1;
 };
 alphaTab.model._AccidentalType.AccidentalType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._AccidentalType.AccidentalType_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -11081,8 +15024,7 @@ alphaTab.model._AutomationType.AutomationType_Impl_.ToSingle_IFormatProvider = f
 	return this1;
 };
 alphaTab.model._AutomationType.AutomationType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._AutomationType.AutomationType_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -11504,8 +15446,7 @@ alphaTab.model._BrushType.BrushType_Impl_.ToSingle_IFormatProvider = function(th
 	return this1;
 };
 alphaTab.model._BrushType.BrushType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._BrushType.BrushType_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -11578,8 +15519,7 @@ alphaTab.model._Clef.Clef_Impl_.ToSingle_IFormatProvider = function(this1,provid
 	return this1;
 };
 alphaTab.model._Clef.Clef_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._Clef.Clef_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -11633,8 +15573,7 @@ alphaTab.model._ClefOttavia.ClefOttavia_Impl_.ToSingle_IFormatProvider = functio
 	return this1;
 };
 alphaTab.model._ClefOttavia.ClefOttavia_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._ClefOttavia.ClefOttavia_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -11688,8 +15627,7 @@ alphaTab.model._CrescendoType.CrescendoType_Impl_.ToSingle_IFormatProvider = fun
 	return this1;
 };
 alphaTab.model._CrescendoType.CrescendoType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._CrescendoType.CrescendoType_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -11739,8 +15677,7 @@ alphaTab.model._Duration.Duration_Impl_.ToSingle_IFormatProvider = function(this
 	return this1;
 };
 alphaTab.model._Duration.Duration_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._Duration.Duration_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -11806,8 +15743,7 @@ alphaTab.model._DynamicValue.DynamicValue_Impl_.ToSingle_IFormatProvider = funct
 	return this1;
 };
 alphaTab.model._DynamicValue.DynamicValue_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._DynamicValue.DynamicValue_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -11867,8 +15803,7 @@ alphaTab.model._Fingers.Fingers_Impl_.ToSingle_IFormatProvider = function(this1,
 	return this1;
 };
 alphaTab.model._Fingers.Fingers_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._Fingers.Fingers_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -11926,8 +15861,7 @@ alphaTab.model._GraceType.GraceType_Impl_.ToSingle_IFormatProvider = function(th
 	return this1;
 };
 alphaTab.model._GraceType.GraceType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._GraceType.GraceType_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -11977,8 +15911,7 @@ alphaTab.model._HarmonicType.HarmonicType_Impl_.ToSingle_IFormatProvider = funct
 	return this1;
 };
 alphaTab.model._HarmonicType.HarmonicType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._HarmonicType.HarmonicType_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -12271,8 +16204,7 @@ alphaTab.model._KeySignatureType.KeySignatureType_Impl_.ToSingle_IFormatProvider
 	return this1;
 };
 alphaTab.model._KeySignatureType.KeySignatureType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._KeySignatureType.KeySignatureType_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -12517,8 +16449,7 @@ alphaTab.model.Note = $hx_exports["alphaTab"]["model"]["Note"] = function() {
 	this.RightHandFinger = -2;
 	this.TrillValue = -1;
 	this.TrillSpeed = 32;
-	var this2 = 1;
-	this.DurationPercent = this2;
+	this.DurationPercent = 1;
 	this.Octave = -1;
 	this.Tone = -1;
 	this.Fret = -1;
@@ -12732,8 +16663,7 @@ alphaTab.model._NoteAccidentalMode.NoteAccidentalMode_Impl_.ToSingle_IFormatProv
 	return this1;
 };
 alphaTab.model._NoteAccidentalMode.NoteAccidentalMode_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._NoteAccidentalMode.NoteAccidentalMode_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -12787,8 +16717,7 @@ alphaTab.model._PickStrokeType.PickStrokeType_Impl_.ToSingle_IFormatProvider = f
 	return this1;
 };
 alphaTab.model._PickStrokeType.PickStrokeType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._PickStrokeType.PickStrokeType_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -12978,8 +16907,7 @@ alphaTab.model._SlideType.SlideType_Impl_.ToSingle_IFormatProvider = function(th
 	return this1;
 };
 alphaTab.model._SlideType.SlideType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._SlideType.SlideType_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -13167,8 +17095,7 @@ alphaTab.model._TripletFeel.TripletFeel_Impl_.ToSingle_IFormatProvider = functio
 	return this1;
 };
 alphaTab.model._TripletFeel.TripletFeel_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._TripletFeel.TripletFeel_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -13451,8 +17378,7 @@ alphaTab.model._VibratoType.VibratoType_Impl_.ToSingle_IFormatProvider = functio
 	return this1;
 };
 alphaTab.model._VibratoType.VibratoType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.model._VibratoType.VibratoType_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -13537,7 +17463,963 @@ alphaTab.model.Voice.prototype = {
 	}
 	,__class__: alphaTab.model.Voice
 };
-alphaTab.platform.javaScript.JsApi = $hx_exports["alphaTab"]["platform"]["javaScript"]["JsApi"] = function(element,options) {
+alphaTab.platform = {};
+alphaTab.platform.IPathCanvas = $hx_exports["alphaTab"]["platform"]["IPathCanvas"] = function() { };
+alphaTab.platform.IPathCanvas.__name__ = ["alphaTab","platform","IPathCanvas"];
+alphaTab.platform.IPathCanvas.prototype = {
+	__class__: alphaTab.platform.IPathCanvas
+};
+alphaTab.platform.ICanvas = $hx_exports["alphaTab"]["platform"]["ICanvas"] = function() { };
+alphaTab.platform.ICanvas.__name__ = ["alphaTab","platform","ICanvas"];
+alphaTab.platform.ICanvas.__interfaces__ = [alphaTab.platform.IPathCanvas];
+alphaTab.platform.ICanvas.prototype = {
+	__class__: alphaTab.platform.ICanvas
+};
+alphaTab.platform.Platform = $hx_exports["alphaTab"]["platform"]["Platform"] = function() { };
+alphaTab.platform.Platform.__name__ = ["alphaTab","platform","Platform"];
+alphaTab.platform.Platform.ParseFloat = function(s) {
+	return parseFloat(s);
+};
+alphaTab.platform.Platform.GetCallerName = function() {
+	return arguments.callee.caller.caller.name;
+};
+alphaTab.platform.Platform.Log = function(logLevel,category,msg,details) {
+	msg = "[AlphaTab][" + category + "] " + msg;
+	var $console = $global.console;
+	switch(logLevel) {
+	case 0:
+		break;
+	case 1:
+		$console.debug(msg,details);
+		break;
+	case 2:
+		$console.info(msg,details);
+		break;
+	case 3:
+		$console.warn(msg,details);
+		break;
+	case 4:
+		var stack = haxe.CallStack.toString(haxe.CallStack.callStack());
+		$console.error(msg,stack,details);
+		break;
+	default:
+	}
+};
+alphaTab.platform.Platform.NewObject = function() {
+	return {}
+};
+alphaTab.platform.Platform.JsonExists = function(json,property) {
+	return (json && property in json);
+};
+alphaTab.platform.Platform.JsonKeys = function(json) {
+	return Object.keys(json);
+};
+alphaTab.platform.Platform.Log2 = function(f) {
+	return Math.log2(f);
+};
+alphaTab.platform.Platform.ParseInt = function(s) {
+	var val = parseInt(s);
+	if(isNaN(val)) {
+		return -2147483648;
+	} else {
+		return val;
+	}
+};
+alphaTab.platform.Platform.CloneArray = function(array) {
+	return new Int32Array(array);
+};
+alphaTab.platform.Platform.BlockCopy = function(src,srcOffset,dst,dstOffset,count) {
+	var i = 0;
+	while(i < count) {
+		dst[dstOffset + i] = src[srcOffset + i];
+		++i;
+	}
+};
+alphaTab.platform.Platform.StringFromCharCode = function(c) {
+	return String.fromCharCode(c);
+};
+alphaTab.platform.Platform.ReadSignedByte = function(readable) {
+	var n = readable.ReadByte();
+	if(n >= 128) {
+		return system.Convert.ToInt8(n - 256);
+	}
+	return system.Convert.ToInt8(n);
+};
+alphaTab.platform.Platform.ToString = function(data) {
+	var this1 = "";
+	var s = this1;
+	var i = 0;
+	while(i < data.length) {
+		var c = data[i++];
+		if(c < 128) {
+			if(c == 0) {
+				break;
+			}
+			s += String.fromCharCode(c);
+		} else if(c < 224) {
+			s += String.fromCharCode((c & 63) << 6 | data[i++] & 127);
+		} else if(c < 240) {
+			s += String.fromCharCode((c & 31) << 12 | (data[i++] & 127) << 6 | data[i++] & 127);
+		} else {
+			var u = (c & 15) << 18 | (data[i++] & 127) << 12 | (data[i++] & 127) << 6 | data[i++] & 127;
+			s += String.fromCharCode((u >> 18) + 55232);
+			s += String.fromCharCode(u & 1023 | 56320);
+		}
+	}
+	return s;
+};
+alphaTab.platform.Platform.StringToByteArray = function(contents) {
+	var this1 = new Uint8Array(contents.length);
+	var byteArray = this1;
+	var i = 0;
+	while(i < contents.length) {
+		var this2 = system.Convert.ToUInt16(HxOverrides.cca(contents,i));
+		byteArray[i] = system.Convert.ToUInt8(this2);
+		++i;
+	}
+	return byteArray;
+};
+alphaTab.platform.Platform.S4 = function() {
+	return Math.floor((1 + Math.random()) * 65536).toString(16).substring(1);
+};
+alphaTab.platform.Platform.NewGuid = function() {
+	var lhs = alphaTab.platform.Platform.S4() + alphaTab.platform.Platform.S4();
+	var this1 = system.Convert.ToUInt16(45);
+	var lhs1 = lhs + String.fromCharCode(this1) + alphaTab.platform.Platform.S4();
+	var this2 = system.Convert.ToUInt16(45);
+	var lhs2 = lhs1 + String.fromCharCode(this2) + alphaTab.platform.Platform.S4();
+	var this3 = system.Convert.ToUInt16(45);
+	var lhs3 = lhs2 + String.fromCharCode(this3) + alphaTab.platform.Platform.S4();
+	var this4 = system.Convert.ToUInt16(45);
+	return lhs3 + String.fromCharCode(this4) + alphaTab.platform.Platform.S4() + alphaTab.platform.Platform.S4() + alphaTab.platform.Platform.S4();
+};
+alphaTab.platform.Platform.Member_Object_CsString1 = function(s,name) {
+	return s[name];
+};
+alphaTab.platform.Platform.Member_Object_CsString_T1 = function(s,name,value) {
+	return s[name] = value;
+};
+alphaTab.platform.Platform.Match = function(s,regex) {
+	return s.match(regex);
+};
+alphaTab.platform.Platform.IsTruthy = function(o) {
+	return !(!o);
+};
+alphaTab.platform.Platform.IsNaN = function(v) {
+	return isNaN(v);
+};
+alphaTab.platform.Platform.TypeOf = function(o) {
+	return typeof(o);
+};
+alphaTab.platform.Platform.ArrayBufferToByteArray = function(data) {
+	return new Uint8Array(data);
+};
+alphaTab.platform.Platform.ToDouble = function(bytes) {
+	var array = new Float64Array(bytes.buffer);
+	return array[0];
+};
+alphaTab.platform.Platform.ClearIntArray = function(array) {
+	var i = 0;
+	while(i < array.length) {
+		array[i] = 0;
+		++i;
+	}
+};
+alphaTab.platform.Platform.ClearShortArray = function(array) {
+	var i = 0;
+	while(i < array.length) {
+		array[i] = 0;
+		++i;
+	}
+};
+alphaTab.platform.Platform.CreateOutput = function() {
+	return new alphaTab.platform.javaScript.WorkerSynthOutput();
+};
+alphaTab.platform.Platform.RandomDouble = function() {
+	return Math.random();
+};
+alphaTab.platform.Platform.get_SupportsWebAudio = function() {
+	return !!window.ScriptProcessorNode;
+};
+alphaTab.platform.Platform.get_SupportsWebWorkers = function() {
+	return !!window.Worker;
+};
+alphaTab.platform.Platform.get_ForceFlash = function() {
+	return !!window.ForceFlash;
+};
+alphaTab.platform.Platform.ArrayCopy_Int32Array_Int32_Int32Array_Int32_Int32 = function(src,srcOffset,dst,dstOffset,count) {
+	var i = 0;
+	while(i < count) {
+		dst[dstOffset + i] = src[srcOffset + i];
+		++i;
+	}
+};
+alphaTab.platform.Platform.ArrayCopy_Int16Array_Int32_Int16Array_Int32_Int32 = function(src,srcOffset,dst,dstOffset,count) {
+	var i = 0;
+	while(i < count) {
+		dst[dstOffset + i] = src[srcOffset + i];
+		++i;
+	}
+};
+alphaTab.platform.Platform.ArrayCopy_TArray_Int32_TArray_Int32_Int321 = function(src,srcOffset,dst,dstOffset,count) {
+	var i = 0;
+	while(i < count) {
+		dst[dstOffset + i] = src[srcOffset + i];
+		++i;
+	}
+};
+alphaTab.platform.Platform.Reverse = function(array) {
+	var i = 0;
+	var j = array.length - 1;
+	while(i < j) {
+		var t = array[i];
+		array[i] = array[j];
+		array[j] = t;
+		++i;
+		--j;
+	}
+};
+alphaTab.platform.Platform.IsStringNumber = function(s,allowSign) {
+	if(allowSign == null) {
+		allowSign = true;
+	}
+	if(s.length == 0) {
+		return false;
+	}
+	var this1 = system.Convert.ToUInt16(HxOverrides.cca(s,0));
+	var c = this1;
+	return alphaTab.platform.Platform.IsCharNumber(c,allowSign);
+};
+alphaTab.platform.Platform.IsCharNumber = function(c,allowSign) {
+	if(allowSign == null) {
+		allowSign = true;
+	}
+	if(!(allowSign && c == 45)) {
+		if(c >= 48) {
+			return c <= 57;
+		} else {
+			return false;
+		}
+	} else {
+		return true;
+	}
+};
+alphaTab.platform.Platform.IsWhiteSpace = function(c) {
+	if(!(c == 32 || c == 11 || c == 13)) {
+		return c == 10;
+	} else {
+		return true;
+	}
+};
+alphaTab.platform.Platform.ToHexString = function(n,digits) {
+	if(digits == null) {
+		digits = 0;
+	}
+	var s = "";
+	var hexChars = "0123456789ABCDEF";
+	while(true) {
+		var this1 = system.Convert.ToUInt16(HxOverrides.cca(hexChars,n & 15));
+		s = String.fromCharCode(this1) + s;
+		n = n >> 4;
+		if(!(n > 0)) {
+			break;
+		}
+	}
+	while(s.length < digits) s = "0" + s;
+	return s;
+};
+alphaTab.platform.Platform.ToUInt32 = function(i) {
+	return system.Convert.ToUInt32(i);
+};
+alphaTab.platform.Platform.ToInt16 = function(i) {
+	return system.Convert.ToInt16(i);
+};
+alphaTab.platform.Platform.ToUInt16 = function(i) {
+	return system.Convert.ToUInt16(i);
+};
+alphaTab.platform.Platform.ToUInt8 = function(i) {
+	return system.Convert.ToUInt8(i);
+};
+alphaTab.platform.javaScript = {};
+alphaTab.platform.javaScript.AlphaSynthFlashOutput = $hx_exports["alphaTab"]["platform"]["javaScript"]["AlphaSynthFlashOutput"] = function(alphaSynthRoot) {
+	this._alphaSynthRoot = null;
+	this._id = null;
+	this._swfId = null;
+	this._swfContainer = null;
+	this._playbackSpeed = 0.0;
+	this._alphaSynthRoot = alphaSynthRoot;
+	var lastSlash = this._alphaSynthRoot.lastIndexOf("/");
+	if(lastSlash != -1) {
+		this._alphaSynthRoot = HxOverrides.substr(this._alphaSynthRoot,0,lastSlash + 1);
+	}
+};
+alphaTab.platform.javaScript.AlphaSynthFlashOutput.__name__ = ["alphaTab","platform","javaScript","AlphaSynthFlashOutput"];
+alphaTab.platform.javaScript.AlphaSynthFlashOutput.__interfaces__ = [alphaSynth.ISynthOutput];
+alphaTab.platform.javaScript.AlphaSynthFlashOutput.OnReady = function(id) {
+	if(alphaTab.platform.javaScript.AlphaSynthFlashOutput.Lookup.hasOwnProperty(id)) {
+		system._EventAction.EventAction_Impl_.Invoke(alphaTab.platform.javaScript.AlphaSynthFlashOutput.Lookup[id].Ready);
+	}
+};
+alphaTab.platform.javaScript.AlphaSynthFlashOutput.OnSampleRequest = function(id) {
+	if(alphaTab.platform.javaScript.AlphaSynthFlashOutput.Lookup.hasOwnProperty(id)) {
+		system._EventAction.EventAction_Impl_.Invoke(alphaTab.platform.javaScript.AlphaSynthFlashOutput.Lookup[id].SampleRequest);
+	}
+};
+alphaTab.platform.javaScript.AlphaSynthFlashOutput.OnFinished = function(id) {
+	if(alphaTab.platform.javaScript.AlphaSynthFlashOutput.Lookup.hasOwnProperty(id) && alphaTab.platform.javaScript.AlphaSynthFlashOutput.Lookup[id].Finished != null) {
+		system._EventAction.EventAction_Impl_.Invoke(alphaTab.platform.javaScript.AlphaSynthFlashOutput.Lookup[id].Finished);
+	}
+};
+alphaTab.platform.javaScript.AlphaSynthFlashOutput.OnSamplesPlayed = function(id,samples) {
+	if(alphaTab.platform.javaScript.AlphaSynthFlashOutput.Lookup.hasOwnProperty(id)) {
+		system._EventAction1.EventAction1_Impl_.Invoke(alphaTab.platform.javaScript.AlphaSynthFlashOutput.Lookup[id].SamplesPlayed,samples);
+	}
+};
+alphaTab.platform.javaScript.AlphaSynthFlashOutput.prototype = {
+	get_SampleRate: function() {
+		return 44100;
+	}
+	,Open: function() {
+		this._playbackSpeed = 1;
+		this._id = "alphaSynthFlashPlayer" + Std.string(alphaTab.platform.javaScript.AlphaSynthFlashOutput.NextId);
+		this._swfId = this._id + "swf";
+		alphaTab.platform.javaScript.AlphaSynthFlashOutput.Lookup[this._id] = this;
+		alphaTab.platform.javaScript.AlphaSynthFlashOutput.NextId++;
+		var document = window.document;
+		this._swfContainer = document.createElement("div");
+		this._swfContainer.className = "alphaSynthFlashPlayer";
+		this._swfContainer.setAttribute("id",this._id);
+		document.body.appendChild(this._swfContainer);
+		var swf = $global.swfobject;
+		var embedSwf = swf.embedSWF;
+		embedSwf(this._alphaSynthRoot + "AlphaSynth.FlashOutput.swf",this._id,"1px","1px","9.0.0",null,{ id : this._id, sampleRate : 44100},{ allowScriptAccess : "always"},{ id : this._swfId});
+	}
+	,get_FlashOutput: function() {
+		var element = this._swfId;
+		var element1 = window.document.getElementById(element);
+		return element1;
+	}
+	,Play: function() {
+		var element = this._swfId;
+		var element1 = window.document.getElementById(element);
+		element1.AlphaSynthPlay();
+	}
+	,Pause: function() {
+		var element = this._swfId;
+		var element1 = window.document.getElementById(element);
+		element1.AlphaSynthPause();
+	}
+	,SequencerFinished: function() {
+		var element = this._swfId;
+		var element1 = window.document.getElementById(element);
+		element1.AlphaSynthSequencerFinished();
+	}
+	,AddSamples: function(samples) {
+		var uint8 = new Uint8Array(alphaSynth.ds._SampleArray.SampleArray_Impl_.ToFloat32Array(samples).buffer);
+		var b64 = window.btoa(String.fromCharCode.apply(null, uint8));
+		var element = this._swfId;
+		var element1 = window.document.getElementById(element);
+		element1.AlphaSynthAddSamples(b64);
+	}
+	,ResetSamples: function() {
+		var element = this._swfId;
+		var element1 = window.document.getElementById(element);
+		element1.AlphaSynthResetSamples();
+	}
+	,add_Ready: function(value) {
+		return this.Ready = system._EventAction.EventAction_Impl_.add(this.Ready,value);
+	}
+	,remove_Ready: function(value) {
+		return this.Ready = system._EventAction.EventAction_Impl_.sub(this.Ready,value);
+	}
+	,add_SampleRequest: function(value) {
+		return this.SampleRequest = system._EventAction.EventAction_Impl_.add(this.SampleRequest,value);
+	}
+	,remove_SampleRequest: function(value) {
+		return this.SampleRequest = system._EventAction.EventAction_Impl_.sub(this.SampleRequest,value);
+	}
+	,add_Finished: function(value) {
+		return this.Finished = system._EventAction.EventAction_Impl_.add(this.Finished,value);
+	}
+	,remove_Finished: function(value) {
+		return this.Finished = system._EventAction.EventAction_Impl_.sub(this.Finished,value);
+	}
+	,add_SamplesPlayed: function(value) {
+		return this.SamplesPlayed = system._EventAction1.EventAction1_Impl_.add(this.SamplesPlayed,value);
+	}
+	,remove_SamplesPlayed: function(value) {
+		return this.SamplesPlayed = system._EventAction1.EventAction1_Impl_.sub(this.SamplesPlayed,value);
+	}
+	,__class__: alphaTab.platform.javaScript.AlphaSynthFlashOutput
+};
+alphaTab.platform.javaScript.AlphaSynthWebAudioOutput = $hx_exports["alphaTab"]["platform"]["javaScript"]["AlphaSynthWebAudioOutput"] = function() {
+};
+alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.__name__ = ["alphaTab","platform","javaScript","AlphaSynthWebAudioOutput"];
+alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.__interfaces__ = [alphaSynth.ISynthOutput];
+alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.prototype = {
+	get_SampleRate: function() {
+		return this._context.sampleRate;
+	}
+	,Open: function() {
+		this._finished = false;
+		this._circularBuffer = new alphaSynth.ds.CircularSampleBuffer(4096 * 10);
+		this._context = new AudioContext();
+		var ctx = this._context;
+		if(ctx.state == "suspended") {
+			var resume = null;
+			resume = function(e) {
+				ctx.resume();
+				window.setTimeout(function() {
+					if(ctx.state == "running") {
+						window.document.body.removeEventListener("touchend",resume,false);
+					}
+				},0);
+			};
+			window.document.body.addEventListener("touchend",resume,false);
+		}
+		this._buffer = this._context.createBuffer(2,4096,this._context.sampleRate);
+		this._audioNode = this._context.createScriptProcessor(4096,0,2);
+		this._audioNode.onaudioprocess = $bind(this,this.GenerateSound);
+		system._EventAction.EventAction_Impl_.Invoke(this.Ready);
+	}
+	,Play: function() {
+		this.RequestBuffers();
+		this._finished = false;
+		this._source = this._context.createBufferSource();
+		this._source.buffer = this._buffer;
+		this._source.loop = true;
+		this._source.connect(this._audioNode,0,0);
+		this._source.start(0);
+		this._audioNode.connect(this._context.destination,0,0);
+	}
+	,Pause: function() {
+		if(this._source != null) {
+			this._source.stop(0);
+			this._source.disconnect(0);
+		}
+		this._source = null;
+		this._audioNode.disconnect(0);
+	}
+	,SequencerFinished: function() {
+		this._finished = true;
+	}
+	,AddSamples: function(f) {
+		this._circularBuffer.Write(f,0,f.length);
+	}
+	,ResetSamples: function() {
+		this._circularBuffer.Clear();
+	}
+	,RequestBuffers: function() {
+		var count = (10 / 2 | 0) * 4096;
+		if(this._circularBuffer.get_Count() < count && this.SampleRequest != null) {
+			var i = 0;
+			while(i < (10 / 2 | 0)) {
+				system._EventAction.EventAction_Impl_.Invoke(this.SampleRequest);
+				++i;
+			}
+		}
+	}
+	,GenerateSound: function(e) {
+		var left = e.outputBuffer.getChannelData(0);
+		var right = e.outputBuffer.getChannelData(1);
+		var samples = left.length + right.length;
+		if(this._circularBuffer.get_Count() < samples) {
+			if(this._finished) {
+				system._EventAction.EventAction_Impl_.Invoke(this.Finished);
+			}
+		} else {
+			var this1 = new Float32Array(samples);
+			var buffer = this1;
+			this._circularBuffer.Read(buffer,0,buffer.length);
+			var s = 0;
+			var i = 0;
+			while(i < left.length) {
+				left[i] = buffer[s++];
+				right[i] = buffer[s++];
+				++i;
+			}
+			system._EventAction1.EventAction1_Impl_.Invoke(this.SamplesPlayed,left.length);
+		}
+		if(!this._finished) {
+			this.RequestBuffers();
+		}
+	}
+	,add_Ready: function(value) {
+		return this.Ready = system._EventAction.EventAction_Impl_.add(this.Ready,value);
+	}
+	,remove_Ready: function(value) {
+		return this.Ready = system._EventAction.EventAction_Impl_.sub(this.Ready,value);
+	}
+	,add_SamplesPlayed: function(value) {
+		return this.SamplesPlayed = system._EventAction1.EventAction1_Impl_.add(this.SamplesPlayed,value);
+	}
+	,remove_SamplesPlayed: function(value) {
+		return this.SamplesPlayed = system._EventAction1.EventAction1_Impl_.sub(this.SamplesPlayed,value);
+	}
+	,add_SampleRequest: function(value) {
+		return this.SampleRequest = system._EventAction.EventAction_Impl_.add(this.SampleRequest,value);
+	}
+	,remove_SampleRequest: function(value) {
+		return this.SampleRequest = system._EventAction.EventAction_Impl_.sub(this.SampleRequest,value);
+	}
+	,add_Finished: function(value) {
+		return this.Finished = system._EventAction.EventAction_Impl_.add(this.Finished,value);
+	}
+	,remove_Finished: function(value) {
+		return this.Finished = system._EventAction.EventAction_Impl_.sub(this.Finished,value);
+	}
+	,__class__: alphaTab.platform.javaScript.AlphaSynthWebAudioOutput
+};
+alphaTab.platform.javaScript.AlphaSynthWebWorker = $hx_exports["alphaTab"]["platform"]["javaScript"]["AlphaSynthWebWorker"] = function(main,id) {
+	this._player = null;
+	this._main = null;
+	this._main = main;
+	this._main.addEventListener("message",$bind(this,this.HandleMessage));
+	this._player = new alphaSynth.AlphaSynth();
+	this._player.PositionChanged = system._EventAction1.EventAction1_Impl_.add(this._player.PositionChanged,$bind(this,this.OnPositionChanged));
+	this._player.PlayerStateChanged = system._EventAction1.EventAction1_Impl_.add(this._player.PlayerStateChanged,$bind(this,this.OnPlayerStateChanged));
+	this._player.Finished = system._EventAction1.EventAction1_Impl_.add(this._player.Finished,$bind(this,this.OnFinished));
+	this._player.SoundFontLoaded = system._EventAction.EventAction_Impl_.add(this._player.SoundFontLoaded,$bind(this,this.OnSoundFontLoaded));
+	this._player.SoundFontLoadFailed = system._EventAction.EventAction_Impl_.add(this._player.SoundFontLoadFailed,$bind(this,this.OnSoundFontLoadFailed));
+	this._player.SoundFontLoadFailed = system._EventAction.EventAction_Impl_.add(this._player.SoundFontLoadFailed,$bind(this,this.OnSoundFontLoadFailed));
+	this._player.MidiLoaded = system._EventAction.EventAction_Impl_.add(this._player.MidiLoaded,$bind(this,this.OnMidiLoaded));
+	this._player.MidiLoadFailed = system._EventAction.EventAction_Impl_.add(this._player.MidiLoadFailed,$bind(this,this.OnMidiLoadFailed));
+	this._player.ReadyForPlayback = system._EventAction.EventAction_Impl_.add(this._player.ReadyForPlayback,$bind(this,this.OnReadyForPlayback));
+	this._main.postMessage({ cmd : "alphaSynth." + "ready"});
+};
+alphaTab.platform.javaScript.AlphaSynthWebWorker.__name__ = ["alphaTab","platform","javaScript","AlphaSynthWebWorker"];
+alphaTab.platform.javaScript.AlphaSynthWebWorker.Init = function() {
+	var main = $global;
+	main.addEventListener("message",function(e) {
+		var data = e.data;
+		var cmd = data.cmd;
+		if(cmd == "alphaSynth.initialize") {
+			alphaTab.platform.javaScript.WorkerSynthOutput.PreferredSampleRate = data.sampleRate;
+			new alphaTab.platform.javaScript.AlphaSynthWebWorker(main,data.id);
+		}
+	});
+};
+alphaTab.platform.javaScript.AlphaSynthWebWorker.prototype = {
+	HandleMessage: function(e) {
+		var data = e.data;
+		var cmd = data.cmd;
+		switch(cmd) {
+		case "alphaSynth.loadMidiBytes":
+			this._player.LoadMidi(data.data);
+			break;
+		case "alphaSynth.loadSoundFontBytes":
+			this._player.LoadSoundFont(data.data);
+			break;
+		case "alphaSynth.pause":
+			this._player.Pause();
+			break;
+		case "alphaSynth.play":
+			this._player.Play();
+			break;
+		case "alphaSynth.playPause":
+			this._player.PlayPause();
+			break;
+		case "alphaSynth.resetChannelStates":
+			this._player.ResetChannelStates();
+			break;
+		case "alphaSynth.setChannelMute":
+			this._player.SetChannelMute(data.channel,data.mute);
+			break;
+		case "alphaSynth.setChannelProgram":
+			this._player.SetChannelProgram(data.channel,data.program);
+			break;
+		case "alphaSynth.setChannelSolo":
+			this._player.SetChannelSolo(data.channel,data.solo);
+			break;
+		case "alphaSynth.setChannelVolume":
+			this._player.SetChannelVolume(data.channel,data.volume);
+			break;
+		case "alphaSynth.setIsLooping":
+			this._player.set_IsLooping(data.value);
+			break;
+		case "alphaSynth.setLogLevel":
+			alphaTab.util.Logger.LogLevel = data.value;
+			break;
+		case "alphaSynth.setMasterVolume":
+			this._player.set_MasterVolume(data.value);
+			break;
+		case "alphaSynth.setMetronomeVolume":
+			this._player.set_MetronomeVolume(data.value);
+			break;
+		case "alphaSynth.setPlaybackRange":
+			this._player.set_PlaybackRange(data.value);
+			break;
+		case "alphaSynth.setPlaybackSpeed":
+			this._player.set_PlaybackSpeed(data.value);
+			break;
+		case "alphaSynth.setTickPosition":
+			this._player.set_TickPosition(data.value);
+			break;
+		case "alphaSynth.setTimePosition":
+			this._player.set_TimePosition(data.value);
+			break;
+		case "alphaSynth.stop":
+			this._player.Stop();
+			break;
+		default:
+		}
+	}
+	,OnPositionChanged: function(e) {
+		this._main.postMessage({ cmd : "alphaSynth." + "positionChanged", currentTime : e.CurrentTime, endTime : e.EndTime, currentTick : e.CurrentTick, endTick : e.EndTick});
+	}
+	,OnPlayerStateChanged: function(e) {
+		this._main.postMessage({ cmd : "alphaSynth." + "playerStateChanged", state : e.State});
+	}
+	,OnFinished: function(isLooping) {
+		this._main.postMessage({ cmd : "alphaSynth." + "finished", isLooping : isLooping});
+	}
+	,OnSoundFontLoaded: function() {
+		this._main.postMessage({ cmd : "alphaSynth." + "soundFontLoaded"});
+	}
+	,OnSoundFontLoadFailed: function() {
+		this._main.postMessage({ cmd : "alphaSynth." + "soundFontLoadFailed"});
+	}
+	,OnMidiLoaded: function() {
+		this._main.postMessage({ cmd : "alphaSynth." + "midiLoaded"});
+	}
+	,OnMidiLoadFailed: function() {
+		this._main.postMessage({ cmd : "alphaSynth." + "midiLoaded"});
+	}
+	,OnReadyForPlayback: function() {
+		this._main.postMessage({ cmd : "alphaSynth." + "readyForPlayback"});
+	}
+	,SendLog: function(level,s) {
+		this._main.postMessage({ cmd : "alphaSynth." + "log", level : level, message : s});
+	}
+	,__class__: alphaTab.platform.javaScript.AlphaSynthWebWorker
+};
+alphaTab.platform.javaScript.AlphaSynthWebWorkerApi = $hx_exports["alphaTab"]["platform"]["javaScript"]["AlphaSynthWebWorkerApi"] = function(player,alphaSynthScriptFile) {
+	this._synth = null;
+	this._output = null;
+	this._events = null;
+	this._workerIsReadyForPlayback = false;
+	this._workerIsReady = false;
+	this._outputIsReady = false;
+	this._state = null;
+	this._logLevel = null;
+	this._masterVolume = 0.0;
+	this._metronomeVolume = 0.0;
+	this._playbackSpeed = 0.0;
+	this._isSoundFontLoaded = false;
+	this._isMidiLoaded = false;
+	this._tickPosition = 0;
+	this._timePosition = 0.0;
+	this._isLooping = false;
+	this._playbackRange = null;
+	this._output = player;
+	this._output.Ready = system._EventAction.EventAction_Impl_.add(this._output.Ready,$bind(this,this.OnOutputReady));
+	this._output.SamplesPlayed = system._EventAction1.EventAction1_Impl_.add(this._output.SamplesPlayed,$bind(this,this.OnOutputSamplesPlayed));
+	this._output.SampleRequest = system._EventAction.EventAction_Impl_.add(this._output.SampleRequest,$bind(this,this.OnOutputSampleRequest));
+	this._output.Finished = system._EventAction.EventAction_Impl_.add(this._output.Finished,$bind(this,this.OnOutputFinished));
+	var this1 = {}
+	this._events = this1;
+	this._output.Open();
+	try {
+		this._synth = new Worker(alphaSynthScriptFile);
+	} catch( __e ) {
+		try {
+			var script = "importScripts('" + alphaSynthScriptFile + "')";
+			var blob = new Blob([script]);
+			this._synth = new Worker(URL.createObjectURL(blob));
+		} catch( e ) {
+			if (e instanceof js._Boot.HaxeError) e = e.val;
+			if( js.Boot.__instanceof(e,system.Exception) ) {
+				alphaTab.util.Logger.Error("AlphaSynth","Failed to create WebWorker: " + Std.string(e),null);
+			} else throw(e);
+		}
+	}
+	this._synth.addEventListener("message",$bind(this,this.HandleWorkerMessage),false);
+	this._synth.postMessage({ cmd : "alphaSynth." + "initialize", sampleRate : this._output.get_SampleRate()});
+	this.set_MasterVolume(1);
+	this.set_PlaybackSpeed(1);
+	this.set_MetronomeVolume(0);
+};
+alphaTab.platform.javaScript.AlphaSynthWebWorkerApi.__name__ = ["alphaTab","platform","javaScript","AlphaSynthWebWorkerApi"];
+alphaTab.platform.javaScript.AlphaSynthWebWorkerApi.__interfaces__ = [alphaSynth.IAlphaSynth];
+alphaTab.platform.javaScript.AlphaSynthWebWorkerApi.prototype = {
+	get_IsReady: function() {
+		if(this._workerIsReady) {
+			return this._outputIsReady;
+		} else {
+			return false;
+		}
+	}
+	,get_IsReadyForPlayback: function() {
+		return this._workerIsReadyForPlayback;
+	}
+	,get_State: function() {
+		return this._state;
+	}
+	,get_LogLevel: function() {
+		return alphaTab.util.Logger.LogLevel;
+	}
+	,set_LogLevel: function(value) {
+		alphaTab.util.Logger.LogLevel = value;
+		this._synth.postMessage({ cmd : "alphaSynth." + "setLogLevel", value : value});
+		return this.get_LogLevel();
+	}
+	,get_MasterVolume: function() {
+		return this._masterVolume;
+	}
+	,set_MasterVolume: function(value) {
+		value = alphaSynth.util.SynthHelper.ClampF(value,0,10);
+		this._masterVolume = value;
+		this._synth.postMessage({ cmd : "alphaSynth." + "setMasterVolume", value : value});
+		return this.get_MasterVolume();
+	}
+	,get_MetronomeVolume: function() {
+		return this._metronomeVolume;
+	}
+	,set_MetronomeVolume: function(value) {
+		value = alphaSynth.util.SynthHelper.ClampF(value,0,10);
+		this._metronomeVolume = value;
+		this._synth.postMessage({ cmd : "alphaSynth." + "setMetronomeVolume", value : value});
+		return this.get_MetronomeVolume();
+	}
+	,get_PlaybackSpeed: function() {
+		return this._playbackSpeed;
+	}
+	,set_PlaybackSpeed: function(value) {
+		value = alphaSynth.util.SynthHelper.ClampD(value,0.125,8);
+		this._playbackSpeed = value;
+		this._synth.postMessage({ cmd : "alphaSynth." + "setPlaybackSpeed", value : value});
+		return this.get_PlaybackSpeed();
+	}
+	,get_TickPosition: function() {
+		return this._tickPosition;
+	}
+	,set_TickPosition: function(value) {
+		if(value < 0) {
+			value = 0;
+		}
+		this._tickPosition = value;
+		this._synth.postMessage({ cmd : "alphaSynth." + "setTickPosition", value : value});
+		return this.get_TickPosition();
+	}
+	,get_TimePosition: function() {
+		return this._timePosition;
+	}
+	,set_TimePosition: function(value) {
+		if(value < 0) {
+			value = 0;
+		}
+		this._timePosition = value;
+		this._synth.postMessage({ cmd : "alphaSynth." + "setTimePosition", value : value});
+		return this.get_TimePosition();
+	}
+	,get_IsLooping: function() {
+		return this._isLooping;
+	}
+	,set_IsLooping: function(value) {
+		this._isLooping = value;
+		this._synth.postMessage({ cmd : "alphaSynth." + "setIsLooping", value : value});
+		return this.get_IsLooping();
+	}
+	,get_PlaybackRange: function() {
+		return this._playbackRange;
+	}
+	,set_PlaybackRange: function(value) {
+		if(value != null) {
+			if(value.StartTick < 0) {
+				value.StartTick = 0;
+			}
+			if(value.EndTick < 0) {
+				value.EndTick = 0;
+			}
+		}
+		this._playbackRange = value;
+		this._synth.postMessage({ cmd : "alphaSynth." + "setPlaybackRange", value : value});
+		return this.get_PlaybackRange();
+	}
+	,Play: function() {
+		this._synth.postMessage({ cmd : "alphaSynth." + "play"});
+	}
+	,Pause: function() {
+		this._synth.postMessage({ cmd : "alphaSynth." + "pause"});
+	}
+	,PlayPause: function() {
+		this._synth.postMessage({ cmd : "alphaSynth." + "playPause"});
+	}
+	,Stop: function() {
+		this._synth.postMessage({ cmd : "alphaSynth." + "stop"});
+	}
+	,LoadSoundFont: function(data) {
+		this._synth.postMessage({ cmd : "alphaSynth." + "loadSoundFontBytes", data : data});
+	}
+	,LoadSoundFontFromUrl: function(data) {
+		var _gthis = this;
+		var url = data;
+		alphaTab.util.Logger.Info("AlphaSynth","Start loading Soundfont from url " + url,null);
+		var request = new XMLHttpRequest();
+		request.open("GET",url,true,null,null);
+		request.responseType = "arraybuffer";
+		request.onload = function(e) {
+			var buffer = new Uint8Array(request.response);
+			_gthis._synth.postMessage({ cmd : "alphaSynth." + "loadSoundFontBytes", data : buffer});
+		};
+		request.onerror = function(e1) {
+			alphaTab.util.Logger.Error("AlphaSynth","Loading failed: " + e1["message"],null);
+			_gthis.TriggerEvent("soundFontLoadFailed",null);
+		};
+		request.onprogress = function(e2) {
+			alphaTab.util.Logger.Debug("AlphaSynth","Soundfont downloading: " + e2["loaded"] + "/" + e2["total"] + " bytes",null);
+			_gthis.TriggerEvent("soundFontLoad",[{ loaded : e2["loaded"], total : e2["total"]}]);
+		};
+		request.send();
+	}
+	,LoadMidi: function(data) {
+		this._synth.postMessage({ cmd : "alphaSynth." + "loadMidiBytes", data : data});
+	}
+	,LoadMidiFromUrl: function(url) {
+		var _gthis = this;
+		alphaTab.util.Logger.Info("AlphaSynth","Start loading midi from url " + url,null);
+		var request = new XMLHttpRequest();
+		request.open("GET",url,true,null,null);
+		request.responseType = "arraybuffer";
+		request.onload = function(e) {
+			var buffer = new Uint8Array(request.response);
+			_gthis._synth.postMessage({ cmd : "alphaSynth." + "loadMidiBytes", data : buffer});
+		};
+		request.onerror = function(e1) {
+			alphaTab.util.Logger.Error("AlphaSynth","Loading failed: " + e1["message"],null);
+			_gthis.TriggerEvent("midiLoadFailed",null);
+		};
+		request.onprogress = function(e2) {
+			alphaTab.util.Logger.Debug("AlphaSynth","Midi downloading: " + e2["loaded"] + "/" + e2["total"] + " bytes",null);
+			_gthis.TriggerEvent("midiLoad",[{ loaded : e2["loaded"], total : e2["total"]}]);
+		};
+		request.send();
+	}
+	,SetChannelMute: function(channel,mute) {
+		this._synth.postMessage({ cmd : "alphaSynth." + "setChannelMute", channel : channel, mute : mute});
+	}
+	,ResetChannelStates: function() {
+		this._synth.postMessage({ cmd : "alphaSynth." + "resetChannelStates"});
+	}
+	,SetChannelSolo: function(channel,solo) {
+		this._synth.postMessage({ cmd : "alphaSynth." + "setChannelSolo", channel : channel, solo : solo});
+	}
+	,SetChannelVolume: function(channel,volume) {
+		var this1 = 0;
+		var this2 = 10;
+		volume = alphaSynth.util.SynthHelper.ClampD(volume,this1,this2);
+		this._synth.postMessage({ cmd : "alphaSynth." + "setChannelVolume", channel : channel, volume : volume});
+	}
+	,SetChannelProgram: function(channel,program) {
+		program = alphaSynth.util.SynthHelper.ClampB(program,0,127);
+		this._synth.postMessage({ cmd : "alphaSynth." + "setChannelProgram", channel : channel, program : program});
+	}
+	,HandleWorkerMessage: function(e) {
+		var data = e.data;
+		var cmd = data.cmd;
+		switch(cmd) {
+		case "alphaSynth.finished":
+			this.TriggerEvent("finished",null);
+			break;
+		case "alphaSynth.log":
+			alphaTab.util.Logger.Log(data.level,"AlphaSynth",data.message,null);
+			break;
+		case "alphaSynth.midiLoadFailed":
+			this._isSoundFontLoaded = true;
+			this.CheckReadyForPlayback();
+			this.TriggerEvent("midiFileLoadFailed",null);
+			break;
+		case "alphaSynth.midiLoaded":
+			this._isMidiLoaded = true;
+			this.CheckReadyForPlayback();
+			this.TriggerEvent("midiFileLoaded",null);
+			break;
+		case "alphaSynth.output.addSamples":
+			this._output.AddSamples(data.samples);
+			break;
+		case "alphaSynth.output.pause":
+			this._output.Pause();
+			break;
+		case "alphaSynth.output.play":
+			this._output.Play();
+			break;
+		case "alphaSynth.output.resetSamples":
+			this._output.ResetSamples();
+			break;
+		case "alphaSynth.output.sequencerFinished":
+			this._output.SequencerFinished();
+			break;
+		case "alphaSynth.playerStateChanged":
+			this._state = data.state;
+			this.TriggerEvent("playerStateChanged",[new alphaSynth.PlayerStateChangedEventArgs(data.state)]);
+			break;
+		case "alphaSynth.positionChanged":
+			this._timePosition = data.currentTime;
+			this._tickPosition = data.currentTick;
+			this.TriggerEvent("positionChanged",[new alphaSynth.PositionChangedEventArgs(data.currentTime,data.endTime,data.currentTick,data.endTick)]);
+			break;
+		case "alphaSynth.ready":
+			this._workerIsReady = true;
+			this.CheckReady();
+			break;
+		case "alphaSynth.readyForPlayback":
+			this._workerIsReadyForPlayback = true;
+			this.CheckReadyForPlayback();
+			break;
+		case "alphaSynth.soundFontLoadFailed":
+			this.TriggerEvent("soundFontLoadFailed",null);
+			break;
+		case "alphaSynth.soundFontLoaded":
+			this.TriggerEvent("soundFontLoaded",null);
+			break;
+		default:
+		}
+	}
+	,CheckReady: function() {
+		if(this.get_IsReady()) {
+			this.TriggerEvent("ready",null);
+		}
+	}
+	,CheckReadyForPlayback: function() {
+		if(this.get_IsReadyForPlayback()) {
+			this.TriggerEvent("readyForPlayback",null);
+		}
+	}
+	,On: function(events,action) {
+		if(!this._events.hasOwnProperty(events)) {
+			var this1 = this._events;
+			var this2 = [];
+			this1[events] = this2;
+		}
+		this._events[events].push(action);
+	}
+	,TriggerEvent: function(name,args) {
+		var events = this._events[name];
+		if(events != null) {
+			var i = 0;
+			while(i < events.length) {
+				var action = events[i];
+				action.apply(null, args);
+				++i;
+			}
+		}
+	}
+	,OnOutputSampleRequest: function() {
+		this._synth.postMessage({ cmd : "alphaSynth." + "output." + "sampleRequest"});
+	}
+	,OnOutputFinished: function() {
+		this._synth.postMessage({ cmd : "alphaSynth." + "output." + "finished"});
+	}
+	,OnOutputSamplesPlayed: function(samples) {
+		this._synth.postMessage({ cmd : "alphaSynth." + "output." + "samplesPlayed", samples : samples});
+	}
+	,OnOutputReady: function() {
+		this._outputIsReady = true;
+		this.CheckReady();
+	}
+	,__class__: alphaTab.platform.javaScript.AlphaSynthWebWorkerApi
+};
+alphaTab.platform.javaScript.AlphaTabApi = $hx_exports["alphaTab"]["platform"]["javaScript"]["AlphaTabApi"] = function(element,options) {
 	var _gthis = this;
 	this._element = null;
 	this._canvasElement = null;
@@ -13549,6 +18431,22 @@ alphaTab.platform.javaScript.JsApi = $hx_exports["alphaTab"]["platform"]["javaSc
 	this.Renderer = null;
 	this.Score = null;
 	this.TrackIndexes = null;
+	this.Player = null;
+	this._playbackSpeed = 0.0;
+	this._tickCache = null;
+	this._cursorWrapper = null;
+	this._beatCursor = null;
+	this._barCursor = null;
+	this._selectionWrapper = null;
+	this._previousTick = 0;
+	this._cursorCache = null;
+	this._playerState = null;
+	this._selectionStart = null;
+	this._selectionEnd = null;
+	this._selecting = false;
+	this._currentBeat = null;
+	this._previousStateForCursor = null;
+	this._lastScroll = 0;
 	this._element = element;
 	this._element.classList.add("alphaTab");
 	var dataAttributes = this.GetDataAttributes();
@@ -13632,6 +18530,9 @@ alphaTab.platform.javaScript.JsApi = $hx_exports["alphaTab"]["platform"]["javaSc
 		_gthis.AppendRenderResult(null);
 	});
 	this.Renderer.Error = system._EventAction2.EventAction2_Impl_.add(this.Renderer.Error,$bind(this,this.Error));
+	if(settings.EnablePlayer) {
+		this.SetupPlayer();
+	}
 	var initialRender = function() {
 		if(autoSize) {
 			_gthis.Settings.Width = _gthis._element.offsetWidth;
@@ -13663,8 +18564,8 @@ alphaTab.platform.javaScript.JsApi = $hx_exports["alphaTab"]["platform"]["javaSc
 		},this._visibilityCheckerInterval);
 	}
 };
-alphaTab.platform.javaScript.JsApi.__name__ = ["alphaTab","platform","javaScript","JsApi"];
-alphaTab.platform.javaScript.JsApi.IsElementInViewPort = function(el) {
+alphaTab.platform.javaScript.AlphaTabApi.__name__ = ["alphaTab","platform","javaScript","AlphaTabApi"];
+alphaTab.platform.javaScript.AlphaTabApi.IsElementInViewPort = function(el) {
 	var rect = el.getBoundingClientRect();
 	if(rect.top + rect.height >= 0 && rect.top <= window.innerHeight && rect.left + rect.width >= 0) {
 		return rect.left <= window.innerWidth;
@@ -13672,7 +18573,7 @@ alphaTab.platform.javaScript.JsApi.IsElementInViewPort = function(el) {
 		return false;
 	}
 };
-alphaTab.platform.javaScript.JsApi.prototype = {
+alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 	get_IsElementVisible: function() {
 		if(!(!(!this._element.offsetWidth) || !(!this._element.offsetHeight))) {
 			return !(!this._element.getClientRects().length);
@@ -13762,14 +18663,13 @@ alphaTab.platform.javaScript.JsApi.prototype = {
 		var i = 0;
 		while(i < placeholders.length) {
 			var placeholder = placeholders.item(i);
-			if(alphaTab.platform.javaScript.JsApi.IsElementInViewPort(placeholder)) {
+			if(alphaTab.platform.javaScript.AlphaTabApi.IsElementInViewPort(placeholder)) {
 				placeholder.outerHTML = placeholder["svg"];
 			}
 			++i;
 		}
 	}
 	,Print: function(width) {
-		var _gthis = this;
 		var preview = window.open("","","width=0,height=0");
 		var a4 = preview.document.createElement("div");
 		if(!(width == null || width.length == 0)) {
@@ -13831,12 +18731,13 @@ alphaTab.platform.javaScript.JsApi.prototype = {
 		settings.StretchForce = 0.8;
 		settings.DisableLazyLoading = true;
 		settings.UseWebWorker = false;
-		var alphaTab1 = new alphaTab.platform.javaScript.JsApi(a4,settings);
+		var alphaTab1 = new alphaTab.platform.javaScript.AlphaTabApi(a4,settings);
 		alphaTab1.Renderer.PostRenderFinished = system._EventAction.EventAction_Impl_.add(alphaTab1.Renderer.PostRenderFinished,function() {
-			_gthis._canvasElement.style.height = "100%";
+			alphaTab1._canvasElement.style.height = "100%";
 			preview.print();
 		});
-		alphaTab1.SetTracks(this.get_Tracks(),true);
+		var tmp = this.get_Tracks();
+		alphaTab1.SetTracks(tmp,true);
 	}
 	,AppendRenderResult: function(result) {
 		var _gthis = this;
@@ -13867,7 +18768,7 @@ alphaTab.platform.javaScript.JsApi.prototype = {
 							placeholder.style.width = Std.string(renderResult.Width) + "px";
 							placeholder.style.height = Std.string(renderResult.Height) + "px";
 							placeholder.style.display = "inline-block";
-							if(alphaTab.platform.javaScript.JsApi.IsElementInViewPort(placeholder) || _gthis.Settings.DisableLazyLoading) {
+							if(alphaTab.platform.javaScript.AlphaTabApi.IsElementInViewPort(placeholder) || _gthis.Settings.DisableLazyLoading) {
 								var bodyHtml = body;
 								placeholder.outerHTML = bodyHtml;
 							} else {
@@ -14048,6 +18949,7 @@ alphaTab.platform.javaScript.JsApi.prototype = {
 		}
 		alphaTab.model.ModelUtils.ApplyPitchOffsets(this.Settings,score);
 		this.Score = score;
+		this.LoadMidiForScore();
 		this.TriggerEvent("loaded",score);
 		if(render) {
 			this.Render();
@@ -14092,7 +18994,984 @@ alphaTab.platform.javaScript.JsApi.prototype = {
 		this.Renderer.UpdateSettings(this.Settings);
 		this.Renderer.Invalidate();
 	}
-	,__class__: alphaTab.platform.javaScript.JsApi
+	,SetupPlayer: function() {
+		var _gthis = this;
+		var supportsWebAudio = !!window.ScriptProcessorNode;
+		var supportsWebWorkers = !!window.Worker;
+		var forceFlash = !!window.ForceFlash;
+		var alphaSynthScriptFile = alphaTab.Environment.ScriptFile;
+		if(supportsWebAudio && !forceFlash) {
+			alphaTab.util.Logger.Info("Player","Will use webworkers for synthesizing and web audio api for playback",null);
+			this.Player = new alphaTab.platform.javaScript.AlphaSynthWebWorkerApi(new alphaTab.platform.javaScript.AlphaSynthWebAudioOutput(),alphaSynthScriptFile);
+		} else if(supportsWebWorkers) {
+			alphaTab.util.Logger.Info("Player","Will use webworkers for synthesizing and flash for playback",null);
+			this.Player = new alphaTab.platform.javaScript.AlphaSynthWebWorkerApi(new alphaTab.platform.javaScript.AlphaSynthFlashOutput(alphaSynthScriptFile),alphaSynthScriptFile);
+		}
+		if(this.Player == null) {
+			alphaTab.util.Logger.Error("Player","Player requires webworkers and web audio api or flash, browser unsupported",null);
+		} else {
+			this.Player.On("ready",function() {
+				_gthis.LoadSoundFont(_gthis.Settings.SoundFontFile);
+				_gthis.LoadMidiForScore();
+			});
+			this.Player.On("readyForPlayback",function() {
+				_gthis._playbackSpeed = _gthis.Player.get_PlaybackSpeed();
+				_gthis.TriggerEvent("playerReady",null);
+			});
+			this.Player.On("soundFontLoad",function(data) {
+				_gthis.TriggerEvent("soundFontLoad",data);
+			});
+			this.Player.On("soundFontLoaded",function() {
+				_gthis.TriggerEvent("soundFontLoaded",null);
+			});
+			this.Player.On("soundFontLoadFailed",function() {
+				_gthis.TriggerEvent("soundFontLoadFailed",null);
+			});
+			this.Player.On("midiLoad",function(data1) {
+				_gthis.TriggerEvent("midiLoad",data1);
+			});
+			this.Player.On("midiFileLoaded",function() {
+				_gthis.TriggerEvent("midiFileLoaded",null);
+			});
+			this.Player.On("midiFileLoadFailed",function() {
+				_gthis.TriggerEvent("midiFileLoadFailed",null);
+			});
+			this.Player.On("playerStateChanged",function(data2) {
+				_gthis.TriggerEvent("playerStateChanged",data2);
+			});
+			this.Player.On("positionChanged",function(data3) {
+				_gthis.TriggerEvent("positionChanged",data3);
+			});
+			this.Player.On("finished",function(data4) {
+				_gthis.TriggerEvent("finished",data4);
+			});
+			if(this.Settings.EnableCursor) {
+				this.SetupCursor();
+			}
+		}
+	}
+	,LoadMidiForScore: function() {
+		if(this.Player == null || this.Score == null || !this.Player.get_IsReady()) {
+			return;
+		}
+		alphaTab.util.Logger.Info("AlphaTab","Generating Midi",null);
+		var midi = alphaTab.audio.generator.MidiFileGenerator.GenerateMidiFile(this.Score);
+		this._tickCache = midi.TickLookup;
+		var ms = alphaTab.io.ByteBuffer.Empty();
+		midi.WriteTo(ms);
+		var bytes = ms.ToArray();
+		this.Player.LoadMidi(bytes);
+	}
+	,SetTrackVolume: function(tracks,volume) {
+		if(this.Player == null) {
+			return;
+		}
+		var trackList = this.TrackIndexesToTracks(this.ParseTracks(tracks));
+		var track = $iterator(trackList)();
+		while(track.hasNext()) {
+			var track1 = track.next();
+			var this1 = volume;
+			this.Player.SetChannelVolume(track1.PlaybackInfo.PrimaryChannel,this1);
+			var this2 = volume;
+			this.Player.SetChannelVolume(track1.PlaybackInfo.SecondaryChannel,this2);
+		}
+	}
+	,SetTrackSolo: function(tracks,solo) {
+		if(this.Player == null) {
+			return;
+		}
+		var trackList = this.TrackIndexesToTracks(this.ParseTracks(tracks));
+		var track = $iterator(trackList)();
+		while(track.hasNext()) {
+			var track1 = track.next();
+			this.Player.SetChannelSolo(track1.PlaybackInfo.PrimaryChannel,solo);
+			this.Player.SetChannelSolo(track1.PlaybackInfo.SecondaryChannel,solo);
+		}
+	}
+	,SetTrackMute: function(tracks,mute) {
+		if(this.Player == null) {
+			return;
+		}
+		var trackList = this.TrackIndexesToTracks(this.ParseTracks(tracks));
+		var track = $iterator(trackList)();
+		while(track.hasNext()) {
+			var track1 = track.next();
+			this.Player.SetChannelMute(track1.PlaybackInfo.PrimaryChannel,mute);
+			this.Player.SetChannelMute(track1.PlaybackInfo.SecondaryChannel,mute);
+		}
+	}
+	,LoadMidi: function(value) {
+		if(this.Player == null) {
+			return;
+		}
+		if(typeof(value) == "string") {
+			this.Player.LoadMidiFromUrl(value);
+		} else {
+			this.Player.LoadMidi(value);
+		}
+	}
+	,LoadSoundFont: function(value) {
+		if(this.Player == null) {
+			return;
+		}
+		if(typeof(value) == "string") {
+			this.Player.LoadSoundFontFromUrl(value);
+		} else {
+			this.Player.LoadSoundFont(value);
+		}
+	}
+	,Play: function() {
+		if(this.Player == null) {
+			return;
+		}
+		this.Player.Play();
+	}
+	,Pause: function() {
+		if(this.Player == null) {
+			return;
+		}
+		this.Player.Pause();
+	}
+	,PlayPause: function() {
+		if(this.Player == null) {
+			return;
+		}
+		this.Player.PlayPause();
+	}
+	,Stop: function() {
+		if(this.Player == null) {
+			return;
+		}
+		this.Player.Stop();
+		this.CursorUpdateTick(0,true);
+	}
+	,SetupCursor: function() {
+		var _gthis = this;
+		var cursorWrapper = window.document.createElement("div");
+		cursorWrapper.classList.add("cursors");
+		var selectionWrapper = window.document.createElement("div");
+		selectionWrapper.classList.add("selectionWrapper");
+		var barCursor = window.document.createElement("div");
+		barCursor.classList.add("barCursor");
+		var beatCursor = window.document.createElement("div");
+		beatCursor.classList.add("beatCursor");
+		var surface = this._element.querySelector(".alphaTabSurface");
+		this._element.style.position = "relative";
+		this._element.style.textAlign = "left";
+		cursorWrapper.style.position = "absolute";
+		cursorWrapper.style.zIndex = "1000";
+		cursorWrapper.style.display = "inline";
+		cursorWrapper.style.pointerEvents = 'none';
+		selectionWrapper.style.position = "absolute";
+		barCursor.style.position = "absolute";
+		beatCursor.style.position = "absolute";
+		beatCursor.style.transition = "all 0s linear";
+		this._cursorWrapper = cursorWrapper;
+		this._barCursor = barCursor;
+		this._beatCursor = beatCursor;
+		this._selectionWrapper = selectionWrapper;
+		this._element.insertBefore(cursorWrapper,this._element.firstChild);
+		cursorWrapper.appendChild(selectionWrapper);
+		cursorWrapper.appendChild(barCursor);
+		cursorWrapper.appendChild(beatCursor);
+		this._previousTick = 0;
+		this._playerState = 0;
+		this.Renderer.PostRenderFinished = system._EventAction.EventAction_Impl_.add(this.Renderer.PostRenderFinished,function() {
+			_gthis._cursorCache = _gthis.Renderer.get_BoundsLookup();
+			_gthis.CursorUpdateTick(_gthis._previousTick,false);
+			var surfaceSite = surface.getBoundingClientRect();
+			cursorWrapper.style.width = surfaceSite.width + "px";
+			cursorWrapper.style.height = surfaceSite.height + "px";
+		});
+		this.Player.On("positionChanged",function(data) {
+			_gthis._previousTick = data.CurrentTick;
+			window.setTimeout(function() {
+				_gthis.CursorUpdateTick(data.CurrentTick,false);
+			},0);
+		});
+		this.Player.On("playerStateChanged",function(data1) {
+			_gthis._playerState = data1.State;
+			window.setTimeout(function() {
+				_gthis.CursorUpdateTick(_gthis._previousTick,false);
+			},0);
+		});
+		if(this.Settings.EnableSeekByClick) {
+			this.SetupClickHandling();
+		}
+	}
+	,SetupClickHandling: function() {
+		var _gthis = this;
+		this._canvasElement.addEventListener("mousedown",function(e) {
+			if(e.button != 1) {
+				return;
+			}
+			e.preventDefault();
+			var parentOffset = _gthis.GetOffset(_gthis._canvasElement);
+			var relX = e.pageX - parentOffset.X;
+			var relY = e.pageY - parentOffset.Y;
+			var beat = _gthis._cursorCache.GetBeatAtPos(relX,relY);
+			if(beat != null) {
+				_gthis._selectionStart = new alphaTab.platform.javaScript.SelectionInfo(beat);
+				_gthis._selectionEnd = null;
+				_gthis._selecting = true;
+			}
+		});
+		this._canvasElement.addEventListener("mousemove",function(e1) {
+			if(_gthis._selecting) {
+				var parentOffset1 = _gthis.GetOffset(_gthis._canvasElement);
+				var relX1 = e1.pageX - parentOffset1.X;
+				var relY1 = e1.pageY - parentOffset1.Y;
+				var beat1 = _gthis._cursorCache.GetBeatAtPos(relX1,relY1);
+				if(beat1 != null && (_gthis._selectionEnd == null || _gthis._selectionEnd.Beat != beat1)) {
+					_gthis._selectionEnd = new alphaTab.platform.javaScript.SelectionInfo(beat1);
+					_gthis.CursorSelectRange(_gthis._selectionStart,_gthis._selectionEnd);
+				}
+			}
+		});
+		this._canvasElement.addEventListener("mouseup",function(e2) {
+			e2.preventDefault();
+			if(_gthis._selectionEnd != null) {
+				var startTick = _gthis._selectionStart.Beat.get_AbsoluteStart();
+				var endTick = _gthis._selectionStart.Beat.get_AbsoluteStart();
+				if(endTick < startTick) {
+					var t = _gthis._selectionStart;
+					_gthis._selectionStart = _gthis._selectionEnd;
+					_gthis._selectionEnd = t;
+				}
+			}
+			if(_gthis._selectionStart != null) {
+				var tickCache = _gthis._tickCache;
+				var realMasterBarStart = tickCache.GetMasterBarStart(_gthis._selectionStart.Beat.Voice.Bar.get_MasterBar());
+				_gthis.CursorUpdateBeat(_gthis._selectionStart.Beat,null,0,false);
+				_gthis.Player.set_TickPosition(realMasterBarStart + _gthis._selectionStart.Beat.Start);
+				if(_gthis._selectionEnd != null && _gthis._selectionStart.Beat != _gthis._selectionEnd.Beat) {
+					var realMasterBarEnd = tickCache.GetMasterBarStart(_gthis._selectionEnd.Beat.Voice.Bar.get_MasterBar());
+					var _gthis1 = _gthis.Player;
+					var _tmp = new alphaSynth.synthesis.PlaybackRange();
+					_tmp.StartTick = realMasterBarStart + _gthis._selectionStart.Beat.Start;
+					_tmp.EndTick = realMasterBarEnd + _gthis._selectionEnd.Beat.Start + _gthis._selectionEnd.Beat.CalculateDuration() - 50;
+					_gthis1.set_PlaybackRange(_tmp);
+				} else {
+					_gthis._selectionStart = null;
+					_gthis.Player.set_PlaybackRange(null);
+					_gthis.CursorSelectRange(_gthis._selectionStart,_gthis._selectionEnd);
+				}
+			}
+			_gthis._selecting = false;
+		});
+		this.Renderer.PostRenderFinished = system._EventAction.EventAction_Impl_.add(this.Renderer.PostRenderFinished,function() {
+			if(_gthis._selectionStart != null) {
+				_gthis.CursorSelectRange(_gthis._selectionStart,_gthis._selectionEnd);
+			}
+		});
+	}
+	,GetOffset: function(element) {
+		var bounds = element.getBoundingClientRect();
+		var top = bounds.top + element.ownerDocument.defaultView.pageYOffset;
+		var left = bounds.left + element.ownerDocument.defaultView.pageXOffset;
+		var _tmp = new alphaTab.rendering.utils.Bounds();
+		_tmp.X = left;
+		_tmp.Y = top;
+		_tmp.W = bounds.width;
+		_tmp.H = bounds.height;
+		return _tmp;
+	}
+	,CursorUpdateTick: function(tick,stop) {
+		if(stop == null) {
+			stop = false;
+		}
+		var _gthis = this;
+		window.requestAnimationFrame(function(f) {
+			var cache = _gthis._tickCache;
+			if(cache != null) {
+				var tracks = _gthis.get_Tracks();
+				if(tracks.length > 0) {
+					var beat = cache.FindBeat(tracks,tick);
+					if(beat != null) {
+						var this1 = beat.Duration;
+						_gthis.CursorUpdateBeat(beat.CurrentBeat,beat.NextBeat,this1,stop);
+					}
+				}
+			}
+		});
+	}
+	,CursorUpdateBeat: function(beat,nextBeat,duration,stop) {
+		if(beat == null) {
+			return;
+		}
+		var cache = this._cursorCache;
+		if(cache == null) {
+			return;
+		}
+		var previousBeat = this._currentBeat;
+		var previousCache = this._cursorCache;
+		var previousState = this._previousStateForCursor;
+		this._currentBeat = beat;
+		this._cursorCache = cache;
+		this._previousStateForCursor = this._playerState;
+		if(beat == previousBeat && cache == previousCache && previousState == this._playerState) {
+			return;
+		}
+		var barCursor = this._barCursor;
+		var beatCursor = this._beatCursor;
+		var beatBoundings = cache.FindBeat(beat);
+		if(beatBoundings == null) {
+			return;
+		}
+		var barBoundings = beatBoundings.BarBounds.MasterBarBounds;
+		barCursor.style.top = Std.string(barBoundings.VisualBounds.Y) + "px";
+		barCursor.style.left = Std.string(barBoundings.VisualBounds.X) + "px";
+		barCursor.style.width = Std.string(barBoundings.VisualBounds.W) + "px";
+		barCursor.style.height = Std.string(barBoundings.VisualBounds.H) + "px";
+		beatCursor.style.transitionDuration = "0ms";
+		beatCursor.style.top = Std.string(barBoundings.VisualBounds.Y) + "px";
+		beatCursor.style.left = Std.string(beatBoundings.VisualBounds.X) + "px";
+		beatCursor.style.width = Std.string(this.Settings.BeatCursorWidth) + "px";
+		beatCursor.style.height = Std.string(barBoundings.VisualBounds.H) + "px";
+		var elements = this._element.getElementsByClassName("atHighlight");
+		while(elements.length > 0) elements.item(0).classList.remove("atHighlight");
+		if(this._playerState == 1 || stop) {
+			duration = duration / this._playbackSpeed;
+			if(!stop) {
+				var className = "b" + beat.Id;
+				var elementsToHighlight = this._element.getElementsByClassName(className);
+				var i = 0;
+				while(i < elementsToHighlight.length) {
+					elementsToHighlight.item(i).classList.add("atHighlight");
+					++i;
+				}
+				var nextBeatX = barBoundings.VisualBounds.X + barBoundings.VisualBounds.W;
+				if(nextBeat != null) {
+					var nextBeatBoundings = cache.FindBeat(nextBeat);
+					if(nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds == barBoundings.StaveGroupBounds) {
+						nextBeatX = nextBeatBoundings.VisualBounds.X;
+					}
+				}
+				beatCursor.style.transition = "all 0s linear";
+				beatCursor.style.transitionDuration = duration + "ms";
+				beatCursor.style.left = Std.string(nextBeatX) + "px";
+			}
+			if(!this._selecting) {
+				var scrollElement = this.Settings.ScrollElement;
+				var scrollElement1 = window.document.querySelector(scrollElement);
+				var elementOffset = this.GetOffset(this._element);
+				var nodeName = scrollElement1.nodeName.toLowerCase();
+				if(nodeName != "html" && nodeName != "body") {
+					var scrollElementOffset = this.GetOffset(scrollElement1);
+					elementOffset.Y = elementOffset.Y + scrollElement1.scrollTop - scrollElementOffset.Y;
+					elementOffset.X = elementOffset.X + scrollElement1.scrollLeft - scrollElementOffset.X;
+				} else {
+					scrollElement1 = window.document.documentElement;
+				}
+				if(this.Settings.ScrollMode == "vertical") {
+					var scrollTop = system.Convert.ToInt32_Single(elementOffset.Y + barBoundings.RealBounds.Y + this.Settings.ScrollOffsetY);
+					if(scrollTop != this._lastScroll) {
+						this._lastScroll = scrollTop;
+						var this1 = this.Settings.ScrollSpeed;
+						this.ScrollToY(scrollElement1,scrollTop,this1);
+					}
+				} else if(this.Settings.ScrollMode == "horizontal-bar") {
+					var x = system.Convert.ToInt32_Single(barBoundings.VisualBounds.X);
+					if(x != this._lastScroll) {
+						var scrollLeft = system.Convert.ToInt32_Single(barBoundings.RealBounds.X + this.Settings.ScrollOffsetX);
+						this._lastScroll = system.Convert.ToInt32_Single(barBoundings.VisualBounds.X);
+						this.ScrollToX(scrollElement1,scrollLeft,this.Settings.ScrollSpeed);
+					}
+				} else if(this.Settings.ScrollMode == "horizontal-offscreen") {
+					var elementRight = scrollElement1.scrollLeft + this.GetOffset(scrollElement1).W;
+					if(barBoundings.VisualBounds.X + barBoundings.VisualBounds.W >= elementRight || barBoundings.VisualBounds.X < scrollElement1.scrollLeft) {
+						var scrollLeft1 = barBoundings.RealBounds.X + this.Settings.ScrollOffsetX;
+						this._lastScroll = system.Convert.ToInt32_Single(barBoundings.VisualBounds.X);
+						this.ScrollToX(scrollElement1,system.Convert.ToInt32_Single(scrollLeft1),this.Settings.ScrollSpeed);
+					}
+				}
+			}
+			this.TriggerEvent("playedBeatChanged",beat);
+		}
+	}
+	,ScrollToY: function(element,scrollTargetY,speed) {
+		var startY = element.scrollTop;
+		var diff = scrollTargetY - startY;
+		var start = 0;
+		var step = null;
+		step = function(x) {
+			if(start == 0) {
+				start = x;
+			}
+			var time = x - start;
+			var percent = Math.min(time / speed,1);
+			var step1 = system.Convert.ToInt32_Double(startY + diff * percent);
+			element.scrollTop = step1;
+			if(time < speed) {
+				window.requestAnimationFrame(step);
+			}
+		};
+		window.requestAnimationFrame(step);
+	}
+	,ScrollToX: function(element,scrollTargetX,speed) {
+		var startX = element.scrollLeft;
+		var diff = scrollTargetX - startX;
+		var start = 0;
+		var step = null;
+		step = function(t) {
+			if(start == 0) {
+				start = t;
+			}
+			var time = t - start;
+			var percent = Math.min(time / speed,1);
+			var step1 = system.Convert.ToInt32_Double(startX + diff * percent);
+			element.scrollLeft = step1;
+			if(time < speed) {
+				window.requestAnimationFrame(step);
+			}
+		};
+		window.requestAnimationFrame(step);
+	}
+	,CursorSelectRange: function(startBeat,endBeat) {
+		var cache = this._cursorCache;
+		if(cache == null) {
+			return;
+		}
+		var selectionWrapper = this._selectionWrapper;
+		selectionWrapper.innerHTML = "";
+		if(startBeat == null || endBeat == null || startBeat.Beat == endBeat.Beat) {
+			return;
+		}
+		if(startBeat.Bounds == null) {
+			startBeat.Bounds = cache.FindBeat(startBeat.Beat);
+		}
+		if(endBeat.Bounds == null) {
+			endBeat.Bounds = cache.FindBeat(endBeat.Beat);
+		}
+		var startTick = startBeat.Beat.get_AbsoluteStart();
+		var endTick = endBeat.Beat.get_AbsoluteStart();
+		if(endTick < startTick) {
+			var t = startBeat;
+			startBeat = endBeat;
+			endBeat = t;
+		}
+		var startX = startBeat.Bounds.RealBounds.X;
+		var endX = endBeat.Bounds.RealBounds.X + endBeat.Bounds.RealBounds.W;
+		if(endBeat.Beat.Index == endBeat.Beat.Voice.Beats.length - 1) {
+			endX = endBeat.Bounds.BarBounds.MasterBarBounds.RealBounds.X + endBeat.Bounds.BarBounds.MasterBarBounds.RealBounds.W;
+		}
+		if(startBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds != endBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds) {
+			var staffStartX = startBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.X;
+			var staffEndX = startBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.X + startBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.W;
+			var startSelection = window.document.createElement("div");
+			startSelection.style.position = "absolute";
+			startSelection.style.top = Std.string(startBeat.Bounds.BarBounds.MasterBarBounds.VisualBounds.Y) + "px";
+			startSelection.style.left = Std.string(startX) + "px";
+			startSelection.style.width = Std.string(staffEndX - startX) + "px";
+			startSelection.style.height = Std.string(startBeat.Bounds.BarBounds.MasterBarBounds.VisualBounds.H) + "px";
+			selectionWrapper.appendChild(startSelection);
+			var staffStartIndex = startBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds.Index + 1;
+			var staffEndIndex = endBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds.Index;
+			var staffIndex = staffStartIndex;
+			while(staffIndex < staffEndIndex) {
+				var staffBounds = cache.StaveGroups[staffIndex];
+				var middleSelection = window.document.createElement("div");
+				middleSelection.style.position = "absolute";
+				middleSelection.style.top = Std.string(staffBounds.VisualBounds.Y) + "px";
+				middleSelection.style.left = Std.string(staffStartX) + "px";
+				middleSelection.style.width = Std.string(staffEndX - staffStartX) + "px";
+				middleSelection.style.height = Std.string(staffBounds.VisualBounds.H) + "px";
+				selectionWrapper.appendChild(middleSelection);
+				++staffIndex;
+			}
+			var endSelection = window.document.createElement("div");
+			endSelection.style.position = "absolute";
+			endSelection.style.top = Std.string(endBeat.Bounds.BarBounds.MasterBarBounds.VisualBounds.Y) + "px";
+			endSelection.style.left = Std.string(staffStartX) + "px";
+			endSelection.style.width = Std.string(endX - staffStartX) + "px";
+			endSelection.style.height = Std.string(endBeat.Bounds.BarBounds.MasterBarBounds.VisualBounds.H) + "px";
+			selectionWrapper.appendChild(endSelection);
+		} else {
+			var selection = window.document.createElement("div");
+			selection.style.position = "absolute";
+			selection.style.top = Std.string(startBeat.Bounds.BarBounds.MasterBarBounds.VisualBounds.Y) + "px";
+			selection.style.left = Std.string(startX) + "px";
+			selection.style.width = Std.string(endX - startX) + "px";
+			selection.style.height = Std.string(startBeat.Bounds.BarBounds.MasterBarBounds.VisualBounds.H) + "px";
+			selectionWrapper.appendChild(selection);
+		}
+	}
+	,__class__: alphaTab.platform.javaScript.AlphaTabApi
+};
+alphaTab.platform.javaScript.AlphaTabWebWorker = $hx_exports["alphaTab"]["platform"]["javaScript"]["AlphaTabWebWorker"] = function(main) {
+	this._renderer = null;
+	this._main = null;
+	this._main = main;
+	this._main.addEventListener("message",$bind(this,this.HandleMessage),false);
+};
+alphaTab.platform.javaScript.AlphaTabWebWorker.__name__ = ["alphaTab","platform","javaScript","AlphaTabWebWorker"];
+alphaTab.platform.javaScript.AlphaTabWebWorker.Init = function() {
+	new alphaTab.platform.javaScript.AlphaTabWebWorker($global);
+};
+alphaTab.platform.javaScript.AlphaTabWebWorker.prototype = {
+	HandleMessage: function(e) {
+		var _gthis = this;
+		var data = (js.Boot.__cast(e , MessageEvent)).data;
+		var cmd = data ? data.cmd : "";
+		switch(cmd) {
+		case "alphaTab.initialize":
+			var settings = alphaTab.Settings.FromJson(data.settings,null);
+			this._renderer = new alphaTab.rendering.ScoreRenderer(settings);
+			this._renderer.PartialRenderFinished = system._EventAction1.EventAction1_Impl_.add(this._renderer.PartialRenderFinished,function(result) {
+				_gthis._main.postMessage({ cmd : "alphaTab.partialRenderFinished", result : result});
+			});
+			this._renderer.RenderFinished = system._EventAction1.EventAction1_Impl_.add(this._renderer.RenderFinished,function(result1) {
+				_gthis._main.postMessage({ cmd : "alphaTab.renderFinished", result : result1});
+			});
+			this._renderer.PostRenderFinished = system._EventAction.EventAction_Impl_.add(this._renderer.PostRenderFinished,function() {
+				_gthis._main.postMessage({ cmd : "alphaTab.postRenderFinished", boundsLookup : _gthis._renderer.get_BoundsLookup().ToJson()});
+			});
+			this._renderer.PreRender = system._EventAction1.EventAction1_Impl_.add(this._renderer.PreRender,function(result2) {
+				_gthis._main.postMessage({ cmd : "alphaTab.preRender", result : result2});
+			});
+			this._renderer.Error = system._EventAction2.EventAction2_Impl_.add(this._renderer.Error,$bind(this,this.Error));
+			break;
+		case "alphaTab.invalidate":
+			this._renderer.Invalidate();
+			break;
+		case "alphaTab.render":
+			var converter = new alphaTab.model.JsonConverter();
+			var score = converter.JsObjectToScore(data.score);
+			this.RenderMultiple(score,data.trackIndexes);
+			break;
+		case "alphaTab.resize":
+			this._renderer.Resize(data.width);
+			break;
+		case "alphaTab.updateSettings":
+			this.UpdateSettings(data.settings);
+			break;
+		default:
+		}
+	}
+	,UpdateSettings: function(settings) {
+		this._renderer.UpdateSettings(alphaTab.Settings.FromJson(settings,null));
+	}
+	,RenderMultiple: function(score,trackIndexes) {
+		try {
+			this._renderer.Render(score,trackIndexes);
+		} catch( e ) {
+			if (e instanceof js._Boot.HaxeError) e = e.val;
+			if( js.Boot.__instanceof(e,system.Exception) ) {
+				this.Error("render",e);
+			} else throw(e);
+		}
+	}
+	,Error: function(type,e) {
+		alphaTab.util.Logger.Error(type,"An unexpected error occurred in worker",e);
+		var error = JSON.parse(JSON.stringify(e));
+		var e2 = e;
+		if(e2.message) {
+			error.message = e2.message;
+		}
+		if(e2.stack) {
+			error.stack = e2.stack;
+		}
+		if(e2.constructor && e2.constructor.name) {
+			error.type = e2.constructor.name;
+		}
+		this._main.postMessage({ cmd : "alphaTab.error", error : { type : type, detail : error}});
+	}
+	,__class__: alphaTab.platform.javaScript.AlphaTabWebWorker
+};
+alphaTab.platform.javaScript.Html5Canvas = $hx_exports["alphaTab"]["platform"]["javaScript"]["Html5Canvas"] = function() {
+	this._canvas = null;
+	this._context = null;
+	this._color = null;
+	this._font = null;
+	this._musicFont = null;
+	this._color = new alphaTab.platform.model.Color(0,0,0,255);
+	var fontElement = window.document.createElement("span");
+	fontElement.classList.add("at");
+	window.document.body.appendChild(fontElement);
+	var style = window.getComputedStyle(fontElement);
+	var s = style.fontSize;
+	this._musicFont = new alphaTab.platform.model.Font(style.fontFamily,parseFloat(s),0);
+};
+alphaTab.platform.javaScript.Html5Canvas.__name__ = ["alphaTab","platform","javaScript","Html5Canvas"];
+alphaTab.platform.javaScript.Html5Canvas.__interfaces__ = [alphaTab.platform.ICanvas];
+alphaTab.platform.javaScript.Html5Canvas.prototype = {
+	get_Resources: function() {
+		return this.__Resources;
+	}
+	,set_Resources: function(value) {
+		return this.__Resources = value;
+	}
+	,OnPreRender: function() {
+		return null;
+	}
+	,OnRenderFinished: function() {
+		return null;
+	}
+	,BeginRender: function(width,height) {
+		this._canvas = js.Boot.__cast(window.document.createElement("canvas") , HTMLCanvasElement);
+		var tmp = system.Convert.ToInt32_Single(width);
+		this._canvas.width = tmp;
+		var tmp1 = system.Convert.ToInt32_Single(height);
+		this._canvas.height = tmp1;
+		this._canvas.style.width = Std.string(width) + "px";
+		this._canvas.style.height = Std.string(height) + "px";
+		this._context = this._canvas.getContext("2d");
+		this._context.textBaseline = "top";
+	}
+	,EndRender: function() {
+		var result = this._canvas;
+		this._canvas = null;
+		return result;
+	}
+	,get_Color: function() {
+		return this._color;
+	}
+	,set_Color: function(value) {
+		if(this._color.RGBA == value.RGBA) {
+			return this.get_Color();
+		}
+		this._color = value;
+		this._context.strokeStyle = value.RGBA;
+		this._context.fillStyle = value.RGBA;
+		return this.get_Color();
+	}
+	,get_LineWidth: function() {
+		return this._context.lineWidth;
+	}
+	,set_LineWidth: function(value) {
+		this._context.lineWidth = value;
+		return this.get_LineWidth();
+	}
+	,FillRect: function(x,y,w,h) {
+		if(w > 0) {
+			this._context.fillRect(system.Convert.ToInt32_Single(x) - 0.5,system.Convert.ToInt32_Single(y) - 0.5,w,h);
+		}
+	}
+	,StrokeRect: function(x,y,w,h) {
+		this._context.strokeRect(x - 0.5,y - 0.5,w,h);
+	}
+	,BeginPath: function() {
+		this._context.beginPath();
+	}
+	,ClosePath: function() {
+		this._context.closePath();
+	}
+	,MoveTo: function(x,y) {
+		this._context.moveTo(x - 0.5,y - 0.5);
+	}
+	,LineTo: function(x,y) {
+		this._context.lineTo(x - 0.5,y - 0.5);
+	}
+	,QuadraticCurveTo: function(cpx,cpy,x,y) {
+		this._context.quadraticCurveTo(cpx,cpy,x,y);
+	}
+	,BezierCurveTo: function(cp1x,cp1y,cp2x,cp2y,x,y) {
+		this._context.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,x,y);
+	}
+	,FillCircle: function(x,y,radius) {
+		this._context.beginPath();
+		this._context.arc(x,y,radius,0,6.28318530717958,true);
+		this.Fill();
+	}
+	,Fill: function() {
+		this._context.fill();
+	}
+	,Stroke: function() {
+		this._context.stroke();
+	}
+	,get_Font: function() {
+		return this._font;
+	}
+	,set_Font: function(value) {
+		this._font = value;
+		var tmp = value.ToCssString(1);
+		this._context.font = tmp;
+		return this.get_Font();
+	}
+	,get_TextAlign: function() {
+		var _g = this._context.textAlign;
+		switch(_g) {
+		case "center":
+			return 1;
+		case "left":
+			return 0;
+		case "right":
+			return 2;
+		default:
+			return 0;
+		}
+	}
+	,set_TextAlign: function(value) {
+		switch(value) {
+		case 0:
+			this._context.textAlign = "left";
+			break;
+		case 1:
+			this._context.textAlign = "center";
+			break;
+		case 2:
+			this._context.textAlign = "right";
+			break;
+		default:
+		}
+		return this.get_TextAlign();
+	}
+	,get_TextBaseline: function() {
+		var _g = this._context.textBaseline;
+		switch(_g) {
+		case "bottom":
+			return 2;
+		case "middle":
+			return 1;
+		case "top":
+			return 0;
+		default:
+			return 0;
+		}
+	}
+	,set_TextBaseline: function(value) {
+		switch(value) {
+		case 0:
+			this._context.textBaseline = "top";
+			break;
+		case 1:
+			this._context.textBaseline = "middle";
+			break;
+		case 2:
+			this._context.textBaseline = "bottom";
+			break;
+		default:
+		}
+		return this.get_TextBaseline();
+	}
+	,BeginGroup: function(identifier) {
+	}
+	,EndGroup: function() {
+	}
+	,FillText: function(text,x,y) {
+		this._context.fillText(text,x,y);
+	}
+	,MeasureText: function(text) {
+		return js.Boot.__cast(this._context.measureText(text).width , Float);
+	}
+	,FillMusicFontSymbol: function(x,y,scale,symbol) {
+		if(symbol == -1) {
+			return;
+		}
+		var baseLine = this._context.textBaseline;
+		var font = this._context.font;
+		var tmp = this._musicFont.ToCssString(scale);
+		this._context.font = tmp;
+		this._context.textBaseline = "middle";
+		this._context.fillText(String.fromCharCode(symbol),x,y);
+		this._context.textBaseline = baseLine;
+		this._context.font = font;
+	}
+	,__class__: alphaTab.platform.javaScript.Html5Canvas
+};
+alphaTab.platform.javaScript.IFlashSynthOutput = $hx_exports["alphaTab"]["platform"]["javaScript"]["IFlashSynthOutput"] = function() { };
+alphaTab.platform.javaScript.IFlashSynthOutput.__name__ = ["alphaTab","platform","javaScript","IFlashSynthOutput"];
+alphaTab.platform.javaScript.IFlashSynthOutput.prototype = {
+	__class__: alphaTab.platform.javaScript.IFlashSynthOutput
+};
+alphaTab.platform.javaScript.JQueryAlphaTab = $hx_exports["alphaTab"]["platform"]["javaScript"]["JQueryAlphaTab"] = function() {
+	var this1 = [];
+	this._initListeners = this1;
+};
+alphaTab.platform.javaScript.JQueryAlphaTab.__name__ = ["alphaTab","platform","javaScript","JQueryAlphaTab"];
+alphaTab.platform.javaScript.JQueryAlphaTab.Restore = function(selector) {
+	$(selector).empty().removeData("alphaTab");
+};
+alphaTab.platform.javaScript.JQueryAlphaTab.prototype = {
+	Exec: function(element,method,args) {
+		if(typeof(method) != 'string') {
+			args = [method];
+			method = "init";
+		}
+		var tmp;
+		var this1 = system.Convert.ToUInt16(HxOverrides.cca(method,0));
+		if(!(this1 == 95)) {
+			tmp = method == "Exec";
+		} else {
+			tmp = true;
+		}
+		if(tmp) {
+			return null;
+		}
+		var jElement = $(element);
+		var context = jElement.data("alphaTab");
+		if(method == "destroy" && !(!(!context))) {
+			return null;
+		}
+		if(method != "init" && !(!(!context))) {
+			throw new Error("alphaTab not initialized");
+		}
+		var apiMethod = this[method];
+		if(!(!apiMethod)) {
+			var realArgs = [ jElement, context ].concat(args);
+			return apiMethod.apply(this,realArgs);
+		} else {
+			alphaTab.util.Logger.Error("Api","Method '" + method + "' does not exist on jQuery.alphaTab",null);
+			return null;
+		}
+	}
+	,init: function(element,context,options) {
+		if(!(!(!context))) {
+			context = new alphaTab.platform.javaScript.AlphaTabApi(element[0],options);
+			element.data("alphaTab",context);
+			var listener = $iterator(this._initListeners)();
+			while(listener.hasNext()) {
+				var listener1 = listener.next();
+				listener1(element,context,options);
+			}
+		}
+	}
+	,destroy: function(element,context) {
+		element.removeData("alphaTab");
+		context.Destroy();
+	}
+	,tex: function(element,context,tex) {
+		context.Tex(tex);
+	}
+	,tracks: function(element,context,tracks) {
+		if(tracks) {
+			context.SetTracks(tracks,true);
+		}
+		return context.get_Tracks();
+	}
+	,api: function(element,context) {
+		return context;
+	}
+	,score: function(element,context,score) {
+		if(!(!score)) {
+			context.ScoreLoaded(score,true);
+		}
+		return context.Score;
+	}
+	,renderer: function(element,context) {
+		return context.Renderer;
+	}
+	,layout: function(element,context,layout) {
+		if(!(!layout)) {
+			context.UpdateLayout(layout);
+		}
+		return context.Settings.Layout;
+	}
+	,print: function(element,context,width) {
+		context.Print(width);
+	}
+	,player: function(element,context) {
+		return context.Player;
+	}
+	,playerOptions: function(element,context,options) {
+		if(!(!options)) {
+			alphaTab.Settings.FillPlayerOptions(context.Settings,options,false,null);
+		}
+		return context.Settings;
+	}
+	,cursorOptions: function(element,context,options) {
+		return this.playerOptions(element,context,options);
+	}
+	,playerState: function(element,context) {
+		if(context.Player == null) {
+			return 0;
+		}
+		return context.Player.get_State();
+	}
+	,masterVolume: function(element,context,masterVolume) {
+		if(context.Player == null) {
+			return 0;
+		}
+		if(!(!masterVolume)) {
+			context.Player.set_MasterVolume(masterVolume);
+		}
+		return context.Player.get_MasterVolume();
+	}
+	,playbackSpeed: function(element,context,playbackSpeed) {
+		if(context.Player == null) {
+			return 0;
+		}
+		if(!(!playbackSpeed)) {
+			context.Player.set_PlaybackSpeed(playbackSpeed);
+		}
+		return context.Player.get_PlaybackSpeed();
+	}
+	,metronomeVolume: function(element,context,metronomeVolume) {
+		if(context.Player == null) {
+			return 0;
+		}
+		if(!(!metronomeVolume)) {
+			context.Player.set_MetronomeVolume(metronomeVolume);
+		}
+		return context.Player.get_MetronomeVolume();
+	}
+	,tickPosition: function(element,context,tickPosition) {
+		if(context.Player == null) {
+			return 0;
+		}
+		if(!(!tickPosition)) {
+			context.Player.set_TickPosition(tickPosition);
+		}
+		return context.Player.get_TickPosition();
+	}
+	,playbackRange: function(element,context,playbackRange) {
+		if(context.Player == null) {
+			return null;
+		}
+		if(!(!playbackRange)) {
+			context.Player.set_PlaybackRange(playbackRange);
+		}
+		return context.Player.get_PlaybackRange();
+	}
+	,loop: function(element,context,loop) {
+		if(context.Player == null) {
+			return false;
+		}
+		if(!(!loop)) {
+			context.Player.set_IsLooping(loop);
+		}
+		return context.Player.get_IsLooping();
+	}
+	,autoScroll: function(element,context,autoScroll) {
+		if(context.Player == null) {
+			return null;
+		}
+		if(!(!autoScroll)) {
+			context.Settings.ScrollMode = autoScroll;
+		}
+		return context.Settings.ScrollMode;
+	}
+	,play: function(element,context) {
+		context.Play();
+	}
+	,pause: function(element,context) {
+		context.Pause();
+	}
+	,playPause: function(element,context) {
+		context.PlayPause();
+	}
+	,stop: function(element,context) {
+		context.Stop();
+	}
+	,loadSoundFont: function(element,context,value) {
+		context.LoadSoundFont(value);
+	}
+	,loadMidi: function(element,context,value) {
+		context.LoadMidi(value);
+	}
+	,muteTrack: function(element,context,tracks,mute) {
+		context.SetTrackMute(tracks,mute);
+	}
+	,soloTrack: function(element,context,tracks,solo) {
+		context.SetTrackSolo(tracks,solo);
+	}
+	,trackVolume: function(element,context,tracks,volume) {
+		context.SetTrackVolume(tracks,volume);
+	}
+	,_oninit: function(listener) {
+		this._initListeners.push(listener);
+	}
+	,__class__: alphaTab.platform.javaScript.JQueryAlphaTab
 };
 alphaTab.platform.javaScript.ResizeEventArgs = $hx_exports["alphaTab"]["platform"]["javaScript"]["ResizeEventArgs"] = function() {
 };
@@ -14100,6 +19979,16 @@ alphaTab.platform.javaScript.ResizeEventArgs.__name__ = ["alphaTab","platform","
 alphaTab.platform.javaScript.ResizeEventArgs.prototype = {
 	__class__: alphaTab.platform.javaScript.ResizeEventArgs
 };
+alphaTab.platform.javaScript.SelectionInfo = $hx_exports["alphaTab"]["platform"]["javaScript"]["SelectionInfo"] = function(beat) {
+	this.Beat = null;
+	this.Bounds = null;
+	this.Beat = beat;
+};
+alphaTab.platform.javaScript.SelectionInfo.__name__ = ["alphaTab","platform","javaScript","SelectionInfo"];
+alphaTab.platform.javaScript.SelectionInfo.prototype = {
+	__class__: alphaTab.platform.javaScript.SelectionInfo
+};
+alphaTab.rendering = {};
 alphaTab.rendering.IScoreRenderer = $hx_exports["alphaTab"]["rendering"]["IScoreRenderer"] = function() { };
 alphaTab.rendering.IScoreRenderer.__name__ = ["alphaTab","rendering","IScoreRenderer"];
 alphaTab.rendering.IScoreRenderer.prototype = {
@@ -14252,6 +20141,155 @@ alphaTab.platform.javaScript.WorkerScoreRenderer.prototype = {
 	}
 	,__class__: alphaTab.platform.javaScript.WorkerScoreRenderer
 };
+alphaTab.platform.javaScript.WorkerSynthOutput = $hx_exports["alphaTab"]["platform"]["javaScript"]["WorkerSynthOutput"] = function() {
+};
+alphaTab.platform.javaScript.WorkerSynthOutput.__name__ = ["alphaTab","platform","javaScript","WorkerSynthOutput"];
+alphaTab.platform.javaScript.WorkerSynthOutput.__interfaces__ = [alphaSynth.ISynthOutput];
+alphaTab.platform.javaScript.WorkerSynthOutput.prototype = {
+	get_SampleRate: function() {
+		return alphaTab.platform.javaScript.WorkerSynthOutput.PreferredSampleRate;
+	}
+	,Open: function() {
+		alphaTab.util.Logger.Debug("AlphaSynth","Initializing webworker worker",null);
+		this._worker = $global;
+		this._worker.addEventListener("message",$bind(this,this.HandleMessage));
+		system._EventAction.EventAction_Impl_.Invoke(this.Ready);
+	}
+	,HandleMessage: function(e) {
+		var data = e.data;
+		var cmd = data.cmd;
+		switch(cmd) {
+		case "alphaSynth.output.finished":
+			system._EventAction.EventAction_Impl_.Invoke(this.Finished);
+			break;
+		case "alphaSynth.output.sampleRequest":
+			system._EventAction.EventAction_Impl_.Invoke(this.SampleRequest);
+			break;
+		case "alphaSynth.output.samplesPlayed":
+			system._EventAction1.EventAction1_Impl_.Invoke(this.SamplesPlayed,data.samples);
+			break;
+		default:
+		}
+	}
+	,add_Ready: function(value) {
+		return this.Ready = system._EventAction.EventAction_Impl_.add(this.Ready,value);
+	}
+	,remove_Ready: function(value) {
+		return this.Ready = system._EventAction.EventAction_Impl_.sub(this.Ready,value);
+	}
+	,add_SamplesPlayed: function(value) {
+		return this.SamplesPlayed = system._EventAction1.EventAction1_Impl_.add(this.SamplesPlayed,value);
+	}
+	,remove_SamplesPlayed: function(value) {
+		return this.SamplesPlayed = system._EventAction1.EventAction1_Impl_.sub(this.SamplesPlayed,value);
+	}
+	,add_SampleRequest: function(value) {
+		return this.SampleRequest = system._EventAction.EventAction_Impl_.add(this.SampleRequest,value);
+	}
+	,remove_SampleRequest: function(value) {
+		return this.SampleRequest = system._EventAction.EventAction_Impl_.sub(this.SampleRequest,value);
+	}
+	,add_Finished: function(value) {
+		return this.Finished = system._EventAction.EventAction_Impl_.add(this.Finished,value);
+	}
+	,remove_Finished: function(value) {
+		return this.Finished = system._EventAction.EventAction_Impl_.sub(this.Finished,value);
+	}
+	,SequencerFinished: function() {
+		this._worker.postMessage({ cmd : "alphaSynth." + "output." + "sequencerFinished"});
+	}
+	,AddSamples: function(samples) {
+		this._worker.postMessage({ cmd : "alphaSynth." + "output." + "addSamples", samples : samples});
+	}
+	,Play: function() {
+		this._worker.postMessage({ cmd : "alphaSynth." + "output." + "play"});
+	}
+	,Pause: function() {
+		this._worker.postMessage({ cmd : "alphaSynth." + "output." + "pause"});
+	}
+	,ResetSamples: function() {
+		this._worker.postMessage({ cmd : "alphaSynth." + "output." + "resetSamples"});
+	}
+	,__class__: alphaTab.platform.javaScript.WorkerSynthOutput
+};
+alphaTab.platform.model = {};
+alphaTab.platform.model.Color = $hx_exports["alphaTab"]["platform"]["model"]["Color"] = function(r,g,b,a) {
+	if(a == null) {
+		a = 255;
+	}
+	this.Raw = 0;
+	this.RGBA = null;
+	this.Raw = a << 24 | r << 16 | g << 8 | b;
+	if(this.get_A() == 255) {
+		this.RGBA = "#" + alphaTab.platform.Platform.ToHexString(this.get_R(),2) + alphaTab.platform.Platform.ToHexString(this.get_G(),2) + alphaTab.platform.Platform.ToHexString(this.get_B(),2);
+	} else {
+		this.RGBA = "rgba(" + this.get_R() + "," + this.get_G() + "," + this.get_B() + "," + this.get_A() / 255.0 + ")";
+	}
+};
+alphaTab.platform.model.Color.__name__ = ["alphaTab","platform","model","Color"];
+alphaTab.platform.model.Color.prototype = {
+	get_A: function() {
+		return system.Convert.ToUInt8(this.Raw >> 24 & 255);
+	}
+	,get_R: function() {
+		return system.Convert.ToUInt8(this.Raw >> 16 & 255);
+	}
+	,get_G: function() {
+		return system.Convert.ToUInt8(this.Raw >> 8 & 255);
+	}
+	,get_B: function() {
+		return system.Convert.ToUInt8(this.Raw & 255);
+	}
+	,__class__: alphaTab.platform.model.Color
+};
+alphaTab.platform.model.Font = $hx_exports["alphaTab"]["platform"]["model"]["Font"] = function(family,size,style) {
+	if(style == null) {
+		style = 0;
+	}
+	this._css = null;
+	this.Family = null;
+	this.Size = 0.0;
+	this.Style = null;
+	this.Family = family;
+	this.Size = size;
+	this.Style = style;
+	this._css = this.ToCssString(1);
+};
+alphaTab.platform.model.Font.__name__ = ["alphaTab","platform","model","Font"];
+alphaTab.platform.model.Font.prototype = {
+	get_IsBold: function() {
+		return (this.Style & 1) != 0;
+	}
+	,get_IsItalic: function() {
+		return (this.Style & 2) != 0;
+	}
+	,Clone: function() {
+		return new alphaTab.platform.model.Font(this.Family,this.Size,this.Style);
+	}
+	,ToCssString: function(scale) {
+		if(scale == null) {
+			scale = 1;
+		}
+		if(this._css != null && scale == 1) {
+			return this._css;
+		}
+		var this1 = "";
+		var buf = this1;
+		if(this.get_IsBold()) {
+			buf += Std.string("bold ");
+		}
+		if(this.get_IsItalic()) {
+			buf += Std.string("italic ");
+		}
+		buf += Std.string(this.Size * scale);
+		buf += Std.string("px ");
+		buf += Std.string("'");
+		buf += Std.string(this.Family);
+		buf += Std.string("'");
+		return buf;
+	}
+	,__class__: alphaTab.platform.model.Font
+};
 alphaTab.platform.model._FontStyle = {};
 alphaTab.platform.model._FontStyle.FontStyle_Impl_ = $hx_exports["alphaTab"]["platform"]["model"]["_FontStyle"]["FontStyle_Impl_"] = {};
 alphaTab.platform.model._FontStyle.FontStyle_Impl_.__name__ = ["alphaTab","platform","model","_FontStyle","FontStyle_Impl_"];
@@ -14289,8 +20327,7 @@ alphaTab.platform.model._FontStyle.FontStyle_Impl_.ToSingle_IFormatProvider = fu
 	return this1;
 };
 alphaTab.platform.model._FontStyle.FontStyle_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.platform.model._FontStyle.FontStyle_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -14340,8 +20377,7 @@ alphaTab.platform.model._TextAlign.TextAlign_Impl_.ToSingle_IFormatProvider = fu
 	return this1;
 };
 alphaTab.platform.model._TextAlign.TextAlign_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.platform.model._TextAlign.TextAlign_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -14391,8 +20427,7 @@ alphaTab.platform.model._TextBaseline.TextBaseline_Impl_.ToSingle_IFormatProvide
 	return this1;
 };
 alphaTab.platform.model._TextBaseline.TextBaseline_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.platform.model._TextBaseline.TextBaseline_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -14405,6 +20440,228 @@ alphaTab.platform.model._TextBaseline.TextBaseline_Impl_.toString = function(thi
 	}
 	return "";
 };
+alphaTab.platform.svg = {};
+alphaTab.platform.svg.SvgCanvas = $hx_exports["alphaTab"]["platform"]["svg"]["SvgCanvas"] = function() {
+	this.Buffer = null;
+	this._currentPath = null;
+	this._currentPathIsEmpty = false;
+	var this1 = "";
+	this._currentPath = this1;
+	this._currentPathIsEmpty = true;
+	this.set_Color(new alphaTab.platform.model.Color(255,255,255,255));
+	this.set_LineWidth(1);
+	this.set_Font(new alphaTab.platform.model.Font("Arial",10,0));
+	this.set_TextAlign(0);
+	this.set_TextBaseline(0);
+};
+alphaTab.platform.svg.SvgCanvas.__name__ = ["alphaTab","platform","svg","SvgCanvas"];
+alphaTab.platform.svg.SvgCanvas.__interfaces__ = [alphaTab.platform.IPathCanvas,alphaTab.platform.ICanvas];
+alphaTab.platform.svg.SvgCanvas.prototype = {
+	get_Color: function() {
+		return this.__Color;
+	}
+	,set_Color: function(value) {
+		return this.__Color = value;
+	}
+	,get_LineWidth: function() {
+		return this.__LineWidth;
+	}
+	,set_LineWidth: function(value) {
+		return this.__LineWidth = value;
+	}
+	,get_Font: function() {
+		return this.__Font;
+	}
+	,set_Font: function(value) {
+		return this.__Font = value;
+	}
+	,get_TextAlign: function() {
+		return this.__TextAlign;
+	}
+	,set_TextAlign: function(value) {
+		return this.__TextAlign = value;
+	}
+	,get_TextBaseline: function() {
+		return this.__TextBaseline;
+	}
+	,set_TextBaseline: function(value) {
+		return this.__TextBaseline = value;
+	}
+	,get_Resources: function() {
+		return this.__Resources;
+	}
+	,set_Resources: function(value) {
+		return this.__Resources = value;
+	}
+	,BeginRender: function(width,height) {
+		var this1 = "";
+		this.Buffer = this1;
+		this.Buffer += Std.string("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
+		this.Buffer += Std.string(width);
+		this.Buffer += Std.string("px\" height=\"");
+		this.Buffer += Std.string(height);
+		this.Buffer += Std.string("px\" class=\"alphaTabSurfaceSvg\">\n");
+		var this2 = "";
+		this._currentPath = this2;
+		this._currentPathIsEmpty = true;
+	}
+	,BeginGroup: function(identifier) {
+		this.Buffer += Std.string("<g class=\"" + identifier + "\">");
+	}
+	,EndGroup: function() {
+		this.Buffer += Std.string("</g>");
+	}
+	,EndRender: function() {
+		this.Buffer += Std.string("</svg>");
+		return this.Buffer;
+	}
+	,FillRect: function(x,y,w,h) {
+		if(w > 0) {
+			var s = "<rect x=\"" + (system.Convert.ToInt32_Single(x) - 0) + "\" y=\"" + (system.Convert.ToInt32_Single(y) - 0) + "\" width=\"" + w + "\" height=\"" + h + "\" fill=\"" + this.get_Color().RGBA + "\" />\n";
+			this.Buffer += Std.string(s);
+		}
+	}
+	,StrokeRect: function(x,y,w,h) {
+		var s = "<rect x=\"" + (system.Convert.ToInt32_Single(x) - 0) + "\" y=\"" + (system.Convert.ToInt32_Single(y) - 0) + "\" width=\"" + w + "\" height=\"" + h + "\" stroke=\"" + this.get_Color().RGBA + "\"";
+		this.Buffer += Std.string(s);
+		if(this.get_LineWidth() != 1) {
+			var s1 = " stroke-width=\"" + this.get_LineWidth() + "\"";
+			this.Buffer += Std.string(s1);
+		}
+		this.Buffer += Std.string(" fill=\"transparent\" />\n");
+	}
+	,BeginPath: function() {
+	}
+	,ClosePath: function() {
+		this._currentPath += Std.string(" z");
+	}
+	,MoveTo: function(x,y) {
+		this._currentPath += Std.string(" M" + (x - 0) + "," + (y - 0));
+	}
+	,LineTo: function(x,y) {
+		this._currentPathIsEmpty = false;
+		this._currentPath += Std.string(" L" + (x - 0) + "," + (y - 0));
+	}
+	,QuadraticCurveTo: function(cpx,cpy,x,y) {
+		this._currentPathIsEmpty = false;
+		this._currentPath += Std.string(" Q" + cpx + "," + cpy + "," + x + "," + y);
+	}
+	,BezierCurveTo: function(cp1x,cp1y,cp2x,cp2y,x,y) {
+		this._currentPathIsEmpty = false;
+		this._currentPath += Std.string(" C" + cp1x + "," + cp1y + "," + cp2x + "," + cp2y + "," + x + "," + y);
+	}
+	,FillCircle: function(x,y,radius) {
+		this._currentPathIsEmpty = false;
+		this._currentPath += Std.string(" M" + (x - radius) + "," + y + " A1,1 0 0,0 " + (x + radius) + "," + y + " A1,1 0 0,0 " + (x - radius) + "," + y + " z");
+		this.Fill();
+	}
+	,Fill: function() {
+		if(!this._currentPathIsEmpty) {
+			this.Buffer += Std.string("<path d=\"" + this._currentPath + "\"");
+			if(this.get_Color().RGBA != "#000000") {
+				var s = " fill=\"" + this.get_Color().RGBA + "\"";
+				this.Buffer += Std.string(s);
+			}
+			this.Buffer += Std.string(" stroke=\"none\"/>");
+		}
+		var this1 = "";
+		this._currentPath = this1;
+		this._currentPathIsEmpty = true;
+	}
+	,Stroke: function() {
+		if(!this._currentPathIsEmpty) {
+			var s = "<path d=\"" + this._currentPath + "\" stroke=\"" + this.get_Color().RGBA + "\"";
+			if(this.get_LineWidth() != 1) {
+				s = s + (" stroke-width=\"" + this.get_LineWidth() + "\"");
+			}
+			s = s + " fill=\"none\" />";
+			this.Buffer += Std.string(s);
+		}
+		var this1 = "";
+		this._currentPath = this1;
+		this._currentPathIsEmpty = true;
+	}
+	,FillText: function(text,x,y) {
+		if(text == "") {
+			return;
+		}
+		var s = "<text x=\"" + system.Convert.ToInt32_Single(x) + "\" y=\"" + system.Convert.ToInt32_Single(y) + "\" style=\"font:" + this.get_Font().ToCssString(1) + "\" " + " dominant-baseline=\"" + this.GetSvgBaseLine() + "\"";
+		if(this.get_Color().RGBA != "#000000") {
+			s = s + (" fill=\"" + this.get_Color().RGBA + "\"");
+		}
+		if(this.get_TextAlign() != 0) {
+			s = s + (" text-anchor=\"" + this.GetSvgTextAlignment() + "\"");
+		}
+		s = s + (">" + text + "</text>");
+		this.Buffer += Std.string(s);
+	}
+	,GetSvgTextAlignment: function() {
+		var _g = this.get_TextAlign();
+		switch(_g) {
+		case 0:
+			return "start";
+		case 1:
+			return "middle";
+		case 2:
+			return "end";
+		default:
+		}
+		return "";
+	}
+	,GetSvgBaseLine: function() {
+		var _g = this.get_TextBaseline();
+		switch(_g) {
+		case 0:
+			return "hanging";
+		case 1:
+			return "middle";
+		case 2:
+			return "bottom";
+		default:
+			return "";
+		}
+	}
+	,MeasureText: function(text) {
+		if(text == null || text.length == 0) {
+			return 0;
+		}
+		var font = 1;
+		if(this.get_Font().Family.indexOf("Times") != -1) {
+			font = 0;
+		}
+		return alphaTab.platform.svg.FontSizes.MeasureString(text,font,this.get_Font().Size,this.get_Font().Style);
+	}
+	,FillMusicFontSymbol: function(x,y,scale,symbol) {
+		throw new js._Boot.HaxeError("abstract");
+	}
+	,OnPreRender: function() {
+		return null;
+	}
+	,OnRenderFinished: function() {
+		return null;
+	}
+	,__class__: alphaTab.platform.svg.SvgCanvas
+};
+alphaTab.platform.svg.CssFontSvgCanvas = $hx_exports["alphaTab"]["platform"]["svg"]["CssFontSvgCanvas"] = function() {
+	alphaTab.platform.svg.SvgCanvas.call(this);
+};
+alphaTab.platform.svg.CssFontSvgCanvas.__name__ = ["alphaTab","platform","svg","CssFontSvgCanvas"];
+alphaTab.platform.svg.CssFontSvgCanvas.__super__ = alphaTab.platform.svg.SvgCanvas;
+alphaTab.platform.svg.CssFontSvgCanvas.prototype = $extend(alphaTab.platform.svg.SvgCanvas.prototype,{
+	FillMusicFontSymbol: function(x,y,scale,symbol) {
+		var s = "<g transform=\"translate(" + (system.Convert.ToInt32_Single(x) - 0) + " " + (system.Convert.ToInt32_Single(y) - 0) + ")\" class=\"at\" ><text";
+		this.Buffer += Std.string(s);
+		if(scale != 1) {
+			this.Buffer += Std.string("  style=\"font-size: " + scale * 100 + "%\"");
+		}
+		if(this.get_Color().RGBA != "#000000") {
+			var s1 = " fill=\"" + this.get_Color().RGBA + "\"";
+			this.Buffer += Std.string(s1);
+		}
+		this.Buffer += Std.string(">&#" + symbol + ";</text></g>");
+	}
+	,__class__: alphaTab.platform.svg.CssFontSvgCanvas
+});
 alphaTab.platform.svg.FontSizes = $hx_exports["alphaTab"]["platform"]["svg"]["FontSizes"] = function() {
 };
 alphaTab.platform.svg.FontSizes.__name__ = ["alphaTab","platform","svg","FontSizes"];
@@ -14481,8 +20738,7 @@ alphaTab.platform.svg._SupportedFonts.SupportedFonts_Impl_.ToSingle_IFormatProvi
 	return this1;
 };
 alphaTab.platform.svg._SupportedFonts.SupportedFonts_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.platform.svg._SupportedFonts.SupportedFonts_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -14808,6 +21064,31 @@ alphaTab.rendering.BarRendererBase.prototype = {
 	}
 	,__class__: alphaTab.rendering.BarRendererBase
 };
+alphaTab.rendering.BarRendererFactory = $hx_exports["alphaTab"]["rendering"]["BarRendererFactory"] = function() {
+	this.IsInAccolade = false;
+	this.HideOnMultiTrack = false;
+	this.HideOnPercussionTrack = false;
+	this.IsInAccolade = true;
+	this.HideOnPercussionTrack = false;
+	this.HideOnMultiTrack = false;
+};
+alphaTab.rendering.BarRendererFactory.__name__ = ["alphaTab","rendering","BarRendererFactory"];
+alphaTab.rendering.BarRendererFactory.prototype = {
+	get_StaffId: function() {
+		throw new js._Boot.HaxeError("abstract");
+	}
+	,CanCreate: function(track,staff) {
+		if(!(!this.HideOnPercussionTrack)) {
+			return !track.IsPercussion;
+		} else {
+			return true;
+		}
+	}
+	,Create: function(renderer,bar,staveSettings) {
+		throw new js._Boot.HaxeError("abstract");
+	}
+	,__class__: alphaTab.rendering.BarRendererFactory
+};
 alphaTab.rendering._BeatXPosition = {};
 alphaTab.rendering._BeatXPosition.BeatXPosition_Impl_ = $hx_exports["alphaTab"]["rendering"]["_BeatXPosition"]["BeatXPosition_Impl_"] = {};
 alphaTab.rendering._BeatXPosition.BeatXPosition_Impl_.__name__ = ["alphaTab","rendering","_BeatXPosition","BeatXPosition_Impl_"];
@@ -14845,8 +21126,7 @@ alphaTab.rendering._BeatXPosition.BeatXPosition_Impl_.ToSingle_IFormatProvider =
 	return this1;
 };
 alphaTab.rendering._BeatXPosition.BeatXPosition_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.rendering._BeatXPosition.BeatXPosition_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -15160,8 +21440,7 @@ alphaTab.rendering._EffectBarGlyphSizing.EffectBarGlyphSizing_Impl_.ToSingle_IFo
 	return this1;
 };
 alphaTab.rendering._EffectBarGlyphSizing.EffectBarGlyphSizing_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.rendering._EffectBarGlyphSizing.EffectBarGlyphSizing_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -15299,6 +21578,30 @@ alphaTab.rendering.EffectBarRenderer.prototype = $extend(alphaTab.rendering.BarR
 	}
 	,__class__: alphaTab.rendering.EffectBarRenderer
 });
+alphaTab.rendering.EffectBarRendererFactory = $hx_exports["alphaTab"]["rendering"]["EffectBarRendererFactory"] = function(staffId,infos) {
+	alphaTab.rendering.BarRendererFactory.call(this);
+	this._infos = null;
+	this._staffId = null;
+	this._infos = infos;
+	this._staffId = staffId;
+	this.IsInAccolade = false;
+};
+alphaTab.rendering.EffectBarRendererFactory.__name__ = ["alphaTab","rendering","EffectBarRendererFactory"];
+alphaTab.rendering.EffectBarRendererFactory.__super__ = alphaTab.rendering.BarRendererFactory;
+alphaTab.rendering.EffectBarRendererFactory.prototype = $extend(alphaTab.rendering.BarRendererFactory.prototype,{
+	get_StaffId: function() {
+		return this._staffId;
+	}
+	,Create: function(renderer,bar,staveSettings) {
+		return new alphaTab.rendering.EffectBarRenderer(renderer,bar,this._infos);
+	}
+	,__class__: alphaTab.rendering.EffectBarRendererFactory
+});
+alphaTab.rendering.IEffectBarRendererInfo = $hx_exports["alphaTab"]["rendering"]["IEffectBarRendererInfo"] = function() { };
+alphaTab.rendering.IEffectBarRendererInfo.__name__ = ["alphaTab","rendering","IEffectBarRendererInfo"];
+alphaTab.rendering.IEffectBarRendererInfo.prototype = {
+	__class__: alphaTab.rendering.IEffectBarRendererInfo
+};
 alphaTab.rendering.RenderFinishedEventArgs = $hx_exports["alphaTab"]["rendering"]["RenderFinishedEventArgs"] = function() {
 };
 alphaTab.rendering.RenderFinishedEventArgs.__name__ = ["alphaTab","rendering","RenderFinishedEventArgs"];
@@ -16075,6 +22378,20 @@ alphaTab.rendering.ScoreBarRenderer.prototype = $extend(alphaTab.rendering.BarRe
 	}
 	,__class__: alphaTab.rendering.ScoreBarRenderer
 });
+alphaTab.rendering.ScoreBarRendererFactory = $hx_exports["alphaTab"]["rendering"]["ScoreBarRendererFactory"] = function() {
+	alphaTab.rendering.BarRendererFactory.call(this);
+};
+alphaTab.rendering.ScoreBarRendererFactory.__name__ = ["alphaTab","rendering","ScoreBarRendererFactory"];
+alphaTab.rendering.ScoreBarRendererFactory.__super__ = alphaTab.rendering.BarRendererFactory;
+alphaTab.rendering.ScoreBarRendererFactory.prototype = $extend(alphaTab.rendering.BarRendererFactory.prototype,{
+	get_StaffId: function() {
+		return "score";
+	}
+	,Create: function(renderer,bar,staveSettings) {
+		return new alphaTab.rendering.ScoreBarRenderer(renderer,bar);
+	}
+	,__class__: alphaTab.rendering.ScoreBarRendererFactory
+});
 alphaTab.rendering.glyphs.BeatContainerGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["BeatContainerGlyph"] = function(beat,voiceContainer) {
 	alphaTab.rendering.glyphs.Glyph.call(this,0,0);
 	this.VoiceContainer = null;
@@ -16813,6 +23130,674 @@ alphaTab.rendering.TabBarRenderer.prototype = $extend(alphaTab.rendering.BarRend
 	}
 	,__class__: alphaTab.rendering.TabBarRenderer
 });
+alphaTab.rendering.TabBarRendererFactory = $hx_exports["alphaTab"]["rendering"]["TabBarRendererFactory"] = function(showTimeSignature,showRests,showTiedNotes) {
+	alphaTab.rendering.BarRendererFactory.call(this);
+	this._showTimeSignature = false;
+	this._showRests = false;
+	this._showTiedNotes = false;
+	this._showTimeSignature = showTimeSignature;
+	this._showRests = showRests;
+	this._showTiedNotes = showTiedNotes;
+	this.HideOnPercussionTrack = true;
+};
+alphaTab.rendering.TabBarRendererFactory.__name__ = ["alphaTab","rendering","TabBarRendererFactory"];
+alphaTab.rendering.TabBarRendererFactory.__super__ = alphaTab.rendering.BarRendererFactory;
+alphaTab.rendering.TabBarRendererFactory.prototype = $extend(alphaTab.rendering.BarRendererFactory.prototype,{
+	get_StaffId: function() {
+		return "tab";
+	}
+	,CanCreate: function(track,staff) {
+		if(track.Tuning.length > 0) {
+			return alphaTab.rendering.BarRendererFactory.prototype.CanCreate.call(this,track,staff);
+		} else {
+			return false;
+		}
+	}
+	,Create: function(renderer,bar,staveSettings) {
+		var tabBarRenderer = new alphaTab.rendering.TabBarRenderer(renderer,bar);
+		tabBarRenderer.ShowRests = this._showRests;
+		tabBarRenderer.ShowTimeSignature = this._showTimeSignature;
+		tabBarRenderer.ShowTiedNotes = this._showTiedNotes;
+		tabBarRenderer.RenderRhythm = staveSettings.Get("rhythm",tabBarRenderer.RenderRhythm);
+		tabBarRenderer.RhythmHeight = staveSettings.Get("rhythmHeight",tabBarRenderer.RhythmHeight);
+		tabBarRenderer.RhythmBeams = staveSettings.Get("rhythmBeams",tabBarRenderer.RhythmBeams);
+		return tabBarRenderer;
+	}
+	,__class__: alphaTab.rendering.TabBarRendererFactory
+});
+alphaTab.rendering.effects = {};
+alphaTab.rendering.effects.AlternateEndingsEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["AlternateEndingsEffectInfo"] = function() {
+};
+alphaTab.rendering.effects.AlternateEndingsEffectInfo.__name__ = ["alphaTab","rendering","effects","AlternateEndingsEffectInfo"];
+alphaTab.rendering.effects.AlternateEndingsEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.AlternateEndingsEffectInfo.prototype = {
+	get_EffectId: function() {
+		return "alternate-feel";
+	}
+	,get_HideOnMultiTrack: function() {
+		return true;
+	}
+	,get_CanShareBand: function() {
+		return false;
+	}
+	,get_SizingMode: function() {
+		return 4;
+	}
+	,ShouldCreateGlyph: function(beat) {
+		if(beat.Index == 0) {
+			return beat.Voice.Bar.get_MasterBar().AlternateEndings != 0;
+		} else {
+			return false;
+		}
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.AlternateEndingsGlyph(0,0,beat.Voice.Bar.get_MasterBar().AlternateEndings);
+	}
+	,CanExpand: function(from,to) {
+		return true;
+	}
+	,__class__: alphaTab.rendering.effects.AlternateEndingsEffectInfo
+};
+alphaTab.rendering.effects.BeatVibratoEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["BeatVibratoEffectInfo"] = function() {
+};
+alphaTab.rendering.effects.BeatVibratoEffectInfo.__name__ = ["alphaTab","rendering","effects","BeatVibratoEffectInfo"];
+alphaTab.rendering.effects.BeatVibratoEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.BeatVibratoEffectInfo.prototype = {
+	get_EffectId: function() {
+		return "beat-vibrato";
+	}
+	,get_HideOnMultiTrack: function() {
+		return false;
+	}
+	,get_CanShareBand: function() {
+		return true;
+	}
+	,get_SizingMode: function() {
+		return 3;
+	}
+	,ShouldCreateGlyph: function(beat) {
+		return beat.Vibrato != 0;
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.VibratoGlyph(0,5 * renderer.get_Scale(),1.4);
+	}
+	,CanExpand: function(from,to) {
+		return true;
+	}
+	,__class__: alphaTab.rendering.effects.BeatVibratoEffectInfo
+};
+alphaTab.rendering.effects.CapoEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["CapoEffectInfo"] = function() {
+};
+alphaTab.rendering.effects.CapoEffectInfo.__name__ = ["alphaTab","rendering","effects","CapoEffectInfo"];
+alphaTab.rendering.effects.CapoEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.CapoEffectInfo.prototype = {
+	get_EffectId: function() {
+		return "capo";
+	}
+	,get_HideOnMultiTrack: function() {
+		return false;
+	}
+	,get_CanShareBand: function() {
+		return false;
+	}
+	,get_SizingMode: function() {
+		return 1;
+	}
+	,ShouldCreateGlyph: function(beat) {
+		if(beat.Index == 0 && beat.Voice.Bar.Index == 0) {
+			return beat.Voice.Bar.Staff.Track.Capo != 0;
+		} else {
+			return false;
+		}
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.TextGlyph(0,0,"Capo. fret " + beat.Voice.Bar.Staff.Track.Capo,renderer.get_Resources().EffectFont,0);
+	}
+	,CanExpand: function(from,to) {
+		return false;
+	}
+	,__class__: alphaTab.rendering.effects.CapoEffectInfo
+};
+alphaTab.rendering.effects.ChordsEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["ChordsEffectInfo"] = function() {
+};
+alphaTab.rendering.effects.ChordsEffectInfo.__name__ = ["alphaTab","rendering","effects","ChordsEffectInfo"];
+alphaTab.rendering.effects.ChordsEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.ChordsEffectInfo.prototype = {
+	get_EffectId: function() {
+		return "chords";
+	}
+	,get_HideOnMultiTrack: function() {
+		return false;
+	}
+	,get_CanShareBand: function() {
+		return true;
+	}
+	,get_SizingMode: function() {
+		return 1;
+	}
+	,ShouldCreateGlyph: function(beat) {
+		return beat.get_HasChord();
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.TextGlyph(0,0,beat.get_Chord().Name,renderer.get_Resources().EffectFont,0);
+	}
+	,CanExpand: function(from,to) {
+		return false;
+	}
+	,__class__: alphaTab.rendering.effects.ChordsEffectInfo
+};
+alphaTab.rendering.effects.CrescendoEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["CrescendoEffectInfo"] = function() {
+};
+alphaTab.rendering.effects.CrescendoEffectInfo.__name__ = ["alphaTab","rendering","effects","CrescendoEffectInfo"];
+alphaTab.rendering.effects.CrescendoEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.CrescendoEffectInfo.prototype = {
+	get_EffectId: function() {
+		return "crescendo";
+	}
+	,get_HideOnMultiTrack: function() {
+		return false;
+	}
+	,get_CanShareBand: function() {
+		return true;
+	}
+	,get_SizingMode: function() {
+		return 3;
+	}
+	,ShouldCreateGlyph: function(beat) {
+		return beat.Crescendo != 0;
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.CrescendoGlyph(0,0,beat.Crescendo);
+	}
+	,CanExpand: function(from,to) {
+		return from.Crescendo == to.Crescendo;
+	}
+	,__class__: alphaTab.rendering.effects.CrescendoEffectInfo
+};
+alphaTab.rendering.effects.DynamicsEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["DynamicsEffectInfo"] = function() {
+};
+alphaTab.rendering.effects.DynamicsEffectInfo.__name__ = ["alphaTab","rendering","effects","DynamicsEffectInfo"];
+alphaTab.rendering.effects.DynamicsEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.DynamicsEffectInfo.prototype = {
+	get_EffectId: function() {
+		return "dynamics";
+	}
+	,get_HideOnMultiTrack: function() {
+		return false;
+	}
+	,get_CanShareBand: function() {
+		return false;
+	}
+	,get_SizingMode: function() {
+		return 1;
+	}
+	,ShouldCreateGlyph: function(beat) {
+		if(beat.Voice.Index == 0) {
+			if(!(beat.Index == 0 && beat.Voice.Bar.Index == 0)) {
+				if(beat.PreviousBeat != null) {
+					return beat.Dynamic != beat.PreviousBeat.Dynamic;
+				} else {
+					return false;
+				}
+			} else {
+				return true;
+			}
+		} else {
+			return false;
+		}
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.DynamicsGlyph(0,0,beat.Dynamic);
+	}
+	,CanExpand: function(from,to) {
+		return true;
+	}
+	,__class__: alphaTab.rendering.effects.DynamicsEffectInfo
+};
+alphaTab.rendering.effects.FadeInEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["FadeInEffectInfo"] = function() {
+};
+alphaTab.rendering.effects.FadeInEffectInfo.__name__ = ["alphaTab","rendering","effects","FadeInEffectInfo"];
+alphaTab.rendering.effects.FadeInEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.FadeInEffectInfo.prototype = {
+	get_EffectId: function() {
+		return "fade-in";
+	}
+	,get_HideOnMultiTrack: function() {
+		return false;
+	}
+	,get_CanShareBand: function() {
+		return true;
+	}
+	,get_SizingMode: function() {
+		return 1;
+	}
+	,ShouldCreateGlyph: function(beat) {
+		return beat.FadeIn;
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.FadeInGlyph(0,0);
+	}
+	,CanExpand: function(from,to) {
+		return true;
+	}
+	,__class__: alphaTab.rendering.effects.FadeInEffectInfo
+};
+alphaTab.rendering.effects.NoteEffectInfoBase = $hx_exports["alphaTab"]["rendering"]["effects"]["NoteEffectInfoBase"] = function() {
+};
+alphaTab.rendering.effects.NoteEffectInfoBase.__name__ = ["alphaTab","rendering","effects","NoteEffectInfoBase"];
+alphaTab.rendering.effects.NoteEffectInfoBase.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.NoteEffectInfoBase.prototype = {
+	ShouldCreateGlyph: function(beat) {
+		var this1 = [];
+		this.LastCreateInfo = this1;
+		var i = 0;
+		var j = beat.Notes.length;
+		while(i < j) {
+			var n = beat.Notes[i];
+			if(this.ShouldCreateGlyphForNote(n)) {
+				this.LastCreateInfo.push(n);
+			}
+			++i;
+		}
+		return this.LastCreateInfo.length > 0;
+	}
+	,ShouldCreateGlyphForNote: function(note) {
+		throw new js._Boot.HaxeError("abstract");
+	}
+	,get_EffectId: function() {
+		throw new js._Boot.HaxeError("abstract");
+	}
+	,get_HideOnMultiTrack: function() {
+		return false;
+	}
+	,get_CanShareBand: function() {
+		return true;
+	}
+	,get_SizingMode: function() {
+		throw new js._Boot.HaxeError("abstract");
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		throw new js._Boot.HaxeError("abstract");
+	}
+	,CanExpand: function(from,to) {
+		return true;
+	}
+	,__class__: alphaTab.rendering.effects.NoteEffectInfoBase
+};
+alphaTab.rendering.effects.HarmonicsEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["HarmonicsEffectInfo"] = function() {
+	alphaTab.rendering.effects.NoteEffectInfoBase.call(this);
+};
+alphaTab.rendering.effects.HarmonicsEffectInfo.__name__ = ["alphaTab","rendering","effects","HarmonicsEffectInfo"];
+alphaTab.rendering.effects.HarmonicsEffectInfo.HarmonicToString = function(type) {
+	switch(type) {
+	case 1:
+		return "N.H.";
+	case 2:
+		return "A.H.";
+	case 3:
+		return "P.H.";
+	case 4:
+		return "T.H.";
+	case 5:
+		return "S.H.";
+	case 6:
+		return "Fdbk.";
+	default:
+	}
+	return "";
+};
+alphaTab.rendering.effects.HarmonicsEffectInfo.__super__ = alphaTab.rendering.effects.NoteEffectInfoBase;
+alphaTab.rendering.effects.HarmonicsEffectInfo.prototype = $extend(alphaTab.rendering.effects.NoteEffectInfoBase.prototype,{
+	get_EffectId: function() {
+		return "harmonics";
+	}
+	,ShouldCreateGlyphForNote: function(note) {
+		if(!note.get_IsHarmonic()) {
+			return false;
+		}
+		if(note.Beat != this._beat || note.HarmonicType > this._beatType) {
+			this._beat = note.Beat;
+			this._beatType = note.HarmonicType;
+		}
+		return true;
+	}
+	,get_SizingMode: function() {
+		return 1;
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.TextGlyph(0,0,alphaTab.rendering.effects.HarmonicsEffectInfo.HarmonicToString(this._beatType),renderer.get_Resources().EffectFont,0);
+	}
+	,__class__: alphaTab.rendering.effects.HarmonicsEffectInfo
+});
+alphaTab.rendering.effects.LetRingEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["LetRingEffectInfo"] = function() {
+	alphaTab.rendering.effects.NoteEffectInfoBase.call(this);
+};
+alphaTab.rendering.effects.LetRingEffectInfo.__name__ = ["alphaTab","rendering","effects","LetRingEffectInfo"];
+alphaTab.rendering.effects.LetRingEffectInfo.__super__ = alphaTab.rendering.effects.NoteEffectInfoBase;
+alphaTab.rendering.effects.LetRingEffectInfo.prototype = $extend(alphaTab.rendering.effects.NoteEffectInfoBase.prototype,{
+	get_EffectId: function() {
+		return "let-ring";
+	}
+	,get_CanShareBand: function() {
+		return false;
+	}
+	,ShouldCreateGlyphForNote: function(note) {
+		return note.IsLetRing;
+	}
+	,get_SizingMode: function() {
+		return 3;
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.LineRangedGlyph("LetRing");
+	}
+	,__class__: alphaTab.rendering.effects.LetRingEffectInfo
+});
+alphaTab.rendering.effects.LyricsEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["LyricsEffectInfo"] = function() {
+};
+alphaTab.rendering.effects.LyricsEffectInfo.__name__ = ["alphaTab","rendering","effects","LyricsEffectInfo"];
+alphaTab.rendering.effects.LyricsEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.LyricsEffectInfo.prototype = {
+	get_EffectId: function() {
+		return "lyrics";
+	}
+	,get_HideOnMultiTrack: function() {
+		return false;
+	}
+	,get_CanShareBand: function() {
+		return false;
+	}
+	,get_SizingMode: function() {
+		return 1;
+	}
+	,ShouldCreateGlyph: function(beat) {
+		return beat.Lyrics != null;
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.LyricsGlyph(0,0,beat.Lyrics,renderer.get_Resources().EffectFont,1);
+	}
+	,CanExpand: function(from,to) {
+		return true;
+	}
+	,__class__: alphaTab.rendering.effects.LyricsEffectInfo
+};
+alphaTab.rendering.effects.MarkerEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["MarkerEffectInfo"] = function() {
+};
+alphaTab.rendering.effects.MarkerEffectInfo.__name__ = ["alphaTab","rendering","effects","MarkerEffectInfo"];
+alphaTab.rendering.effects.MarkerEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.MarkerEffectInfo.prototype = {
+	get_EffectId: function() {
+		return "marker";
+	}
+	,get_HideOnMultiTrack: function() {
+		return true;
+	}
+	,get_CanShareBand: function() {
+		return true;
+	}
+	,get_SizingMode: function() {
+		return 0;
+	}
+	,ShouldCreateGlyph: function(beat) {
+		if(beat.Voice.Bar.Staff.Index == 0 && beat.Voice.Index == 0 && beat.Index == 0) {
+			return beat.Voice.Bar.get_MasterBar().get_IsSectionStart();
+		} else {
+			return false;
+		}
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.TextGlyph(0,0,beat.Voice.Bar.get_MasterBar().Section.Text,renderer.get_Resources().MarkerFont,0);
+	}
+	,CanExpand: function(from,to) {
+		return true;
+	}
+	,__class__: alphaTab.rendering.effects.MarkerEffectInfo
+};
+alphaTab.rendering.effects.NoteVibratoEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["NoteVibratoEffectInfo"] = function() {
+	alphaTab.rendering.effects.NoteEffectInfoBase.call(this);
+};
+alphaTab.rendering.effects.NoteVibratoEffectInfo.__name__ = ["alphaTab","rendering","effects","NoteVibratoEffectInfo"];
+alphaTab.rendering.effects.NoteVibratoEffectInfo.__super__ = alphaTab.rendering.effects.NoteEffectInfoBase;
+alphaTab.rendering.effects.NoteVibratoEffectInfo.prototype = $extend(alphaTab.rendering.effects.NoteEffectInfoBase.prototype,{
+	get_EffectId: function() {
+		return "note-vibrato";
+	}
+	,ShouldCreateGlyphForNote: function(note) {
+		if(!(note.Vibrato != 0)) {
+			if(note.IsTieDestination) {
+				return note.TieOrigin.Vibrato != 0;
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+	,get_SizingMode: function() {
+		return 3;
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.VibratoGlyph(0,5 * renderer.get_Scale(),1.2);
+	}
+	,__class__: alphaTab.rendering.effects.NoteVibratoEffectInfo
+});
+alphaTab.rendering.effects.PalmMuteEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["PalmMuteEffectInfo"] = function() {
+	alphaTab.rendering.effects.NoteEffectInfoBase.call(this);
+};
+alphaTab.rendering.effects.PalmMuteEffectInfo.__name__ = ["alphaTab","rendering","effects","PalmMuteEffectInfo"];
+alphaTab.rendering.effects.PalmMuteEffectInfo.__super__ = alphaTab.rendering.effects.NoteEffectInfoBase;
+alphaTab.rendering.effects.PalmMuteEffectInfo.prototype = $extend(alphaTab.rendering.effects.NoteEffectInfoBase.prototype,{
+	get_EffectId: function() {
+		return "palm-mute";
+	}
+	,ShouldCreateGlyphForNote: function(note) {
+		return note.IsPalmMute;
+	}
+	,get_SizingMode: function() {
+		return 3;
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.LineRangedGlyph("P.M.");
+	}
+	,__class__: alphaTab.rendering.effects.PalmMuteEffectInfo
+});
+alphaTab.rendering.effects.PickStrokeEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["PickStrokeEffectInfo"] = function() {
+};
+alphaTab.rendering.effects.PickStrokeEffectInfo.__name__ = ["alphaTab","rendering","effects","PickStrokeEffectInfo"];
+alphaTab.rendering.effects.PickStrokeEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.PickStrokeEffectInfo.prototype = {
+	get_EffectId: function() {
+		return "pick-stroke";
+	}
+	,get_HideOnMultiTrack: function() {
+		return false;
+	}
+	,get_CanShareBand: function() {
+		return true;
+	}
+	,get_SizingMode: function() {
+		return 1;
+	}
+	,ShouldCreateGlyph: function(beat) {
+		return beat.PickStroke != 0;
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.PickStrokeGlyph(0,0,beat.PickStroke);
+	}
+	,CanExpand: function(from,to) {
+		return true;
+	}
+	,__class__: alphaTab.rendering.effects.PickStrokeEffectInfo
+};
+alphaTab.rendering.effects.TapEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["TapEffectInfo"] = function() {
+};
+alphaTab.rendering.effects.TapEffectInfo.__name__ = ["alphaTab","rendering","effects","TapEffectInfo"];
+alphaTab.rendering.effects.TapEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.TapEffectInfo.prototype = {
+	get_EffectId: function() {
+		return "tap";
+	}
+	,get_HideOnMultiTrack: function() {
+		return false;
+	}
+	,get_CanShareBand: function() {
+		return true;
+	}
+	,get_SizingMode: function() {
+		return 1;
+	}
+	,ShouldCreateGlyph: function(beat) {
+		if(!(beat.Slap || beat.Pop)) {
+			return beat.Tap;
+		} else {
+			return true;
+		}
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		var res = renderer.get_Resources();
+		if(beat.Slap) {
+			return new alphaTab.rendering.glyphs.TextGlyph(0,0,"S",res.EffectFont,0);
+		}
+		if(beat.Pop) {
+			return new alphaTab.rendering.glyphs.TextGlyph(0,0,"P",res.EffectFont,0);
+		}
+		return new alphaTab.rendering.glyphs.TextGlyph(0,0,"T",res.EffectFont,0);
+	}
+	,CanExpand: function(from,to) {
+		return true;
+	}
+	,__class__: alphaTab.rendering.effects.TapEffectInfo
+};
+alphaTab.rendering.effects.TempoEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["TempoEffectInfo"] = function() {
+};
+alphaTab.rendering.effects.TempoEffectInfo.__name__ = ["alphaTab","rendering","effects","TempoEffectInfo"];
+alphaTab.rendering.effects.TempoEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.TempoEffectInfo.prototype = {
+	get_EffectId: function() {
+		return "tempo";
+	}
+	,get_HideOnMultiTrack: function() {
+		return true;
+	}
+	,get_CanShareBand: function() {
+		return false;
+	}
+	,get_SizingMode: function() {
+		return 0;
+	}
+	,ShouldCreateGlyph: function(beat) {
+		if(beat.Voice.Bar.Staff.Index == 0 && beat.Voice.Index == 0 && beat.Index == 0) {
+			if(beat.Voice.Bar.get_MasterBar().TempoAutomation == null) {
+				return beat.Voice.Bar.Index == 0;
+			} else {
+				return true;
+			}
+		} else {
+			return false;
+		}
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		var tempo;
+		if(beat.Voice.Bar.get_MasterBar().TempoAutomation != null) {
+			tempo = system.Convert.ToInt32_Single(beat.Voice.Bar.get_MasterBar().TempoAutomation.Value);
+		} else {
+			tempo = beat.Voice.Bar.Staff.Track.Score.Tempo;
+		}
+		return new alphaTab.rendering.glyphs.TempoGlyph(0,0,tempo);
+	}
+	,CanExpand: function(from,to) {
+		return true;
+	}
+	,__class__: alphaTab.rendering.effects.TempoEffectInfo
+};
+alphaTab.rendering.effects.TextEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["TextEffectInfo"] = function() {
+};
+alphaTab.rendering.effects.TextEffectInfo.__name__ = ["alphaTab","rendering","effects","TextEffectInfo"];
+alphaTab.rendering.effects.TextEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.TextEffectInfo.prototype = {
+	get_EffectId: function() {
+		return "text";
+	}
+	,get_HideOnMultiTrack: function() {
+		return false;
+	}
+	,get_CanShareBand: function() {
+		return false;
+	}
+	,get_SizingMode: function() {
+		return 1;
+	}
+	,ShouldCreateGlyph: function(beat) {
+		var s = beat.Text;
+		return !(s == null || StringTools.trim(s).length == 0);
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.TextGlyph(0,0,beat.Text,renderer.get_Resources().EffectFont,0);
+	}
+	,CanExpand: function(from,to) {
+		return true;
+	}
+	,__class__: alphaTab.rendering.effects.TextEffectInfo
+};
+alphaTab.rendering.effects.TrillEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["TrillEffectInfo"] = function() {
+	alphaTab.rendering.effects.NoteEffectInfoBase.call(this);
+};
+alphaTab.rendering.effects.TrillEffectInfo.__name__ = ["alphaTab","rendering","effects","TrillEffectInfo"];
+alphaTab.rendering.effects.TrillEffectInfo.__super__ = alphaTab.rendering.effects.NoteEffectInfoBase;
+alphaTab.rendering.effects.TrillEffectInfo.prototype = $extend(alphaTab.rendering.effects.NoteEffectInfoBase.prototype,{
+	get_EffectId: function() {
+		return "trill";
+	}
+	,ShouldCreateGlyphForNote: function(note) {
+		return note.get_IsTrill();
+	}
+	,get_SizingMode: function() {
+		return 1;
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.TrillGlyph(0,0);
+	}
+	,__class__: alphaTab.rendering.effects.TrillEffectInfo
+});
+alphaTab.rendering.effects.TripletFeelEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["TripletFeelEffectInfo"] = function() {
+};
+alphaTab.rendering.effects.TripletFeelEffectInfo.__name__ = ["alphaTab","rendering","effects","TripletFeelEffectInfo"];
+alphaTab.rendering.effects.TripletFeelEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.TripletFeelEffectInfo.prototype = {
+	get_EffectId: function() {
+		return "triplet-feel";
+	}
+	,get_HideOnMultiTrack: function() {
+		return true;
+	}
+	,get_CanShareBand: function() {
+		return false;
+	}
+	,get_SizingMode: function() {
+		return 0;
+	}
+	,ShouldCreateGlyph: function(beat) {
+		if(beat.Index == 0) {
+			if(!(beat.Voice.Bar.get_MasterBar().Index == 0 && beat.Voice.Bar.get_MasterBar().TripletFeel != 0)) {
+				if(beat.Voice.Bar.get_MasterBar().Index > 0) {
+					return beat.Voice.Bar.get_MasterBar().TripletFeel != beat.Voice.Bar.get_MasterBar().PreviousMasterBar.TripletFeel;
+				} else {
+					return false;
+				}
+			} else {
+				return true;
+			}
+		} else {
+			return false;
+		}
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.TripletFeelGlyph(beat.Voice.Bar.get_MasterBar().TripletFeel);
+	}
+	,CanExpand: function(from,to) {
+		return true;
+	}
+	,__class__: alphaTab.rendering.effects.TripletFeelEffectInfo
+};
 alphaTab.rendering.glyphs.EffectGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["EffectGlyph"] = function(x,y) {
 	alphaTab.rendering.glyphs.Glyph.call(this,x,y);
 	this.Beat = null;
@@ -17832,8 +24817,7 @@ alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.ToSingle_IForma
 	return this1;
 };
 alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -18564,7 +25548,8 @@ alphaTab.rendering.glyphs.TieGlyph.PaintTie = function(canvas,scale,x1,y1,x2,y2,
 	var size = 4 * scale;
 	var normalVectorX = y2 - y1;
 	var normalVectorY = x2 - x1;
-	var length = js.Boot.__cast(Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY) , Float);
+	var this1 = normalVectorX * normalVectorX + normalVectorY * normalVectorY;
+	var length = js.Boot.__cast(Math.sqrt(this1) , Float);
 	if(down) {
 		normalVectorX = normalVectorX * -1;
 	} else {
@@ -20128,8 +27113,7 @@ alphaTab.rendering.glyphs._TripletFeelGlyph_BarType.TripletFeelGlyph_BarType_Imp
 	return this1;
 };
 alphaTab.rendering.glyphs._TripletFeelGlyph_BarType.TripletFeelGlyph_BarType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.rendering.glyphs._TripletFeelGlyph_BarType.TripletFeelGlyph_BarType_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -20158,8 +27142,7 @@ alphaTab.rendering.glyphs.TuningGlyph.prototype = $extend(alphaTab.rendering.gly
 		this.AddGlyph(new alphaTab.rendering.glyphs.TextGlyph(0,0,tuning.Name,this._resources.EffectFont,0));
 		this.Height = this.Height + 15 * this._scale;
 		if(!tuning.IsStandard) {
-			var this1 = Math.ceil(tuning.Tunings.length / 2.0);
-			var stringsPerColumn = system.Convert.ToInt32_Double(this1);
+			var stringsPerColumn = system.Convert.ToInt32_Double(Math.ceil(tuning.Tunings.length / 2.0));
 			var currentX = 0;
 			var currentY = this.Height;
 			var i = 0;
@@ -20392,6 +27375,7 @@ alphaTab.rendering.glyphs.WhammyBarGlyph.prototype = $extend(alphaTab.rendering.
 	}
 	,__class__: alphaTab.rendering.glyphs.WhammyBarGlyph
 });
+alphaTab.rendering.layout = {};
 alphaTab.rendering.layout._HeaderFooterElements = {};
 alphaTab.rendering.layout._HeaderFooterElements.HeaderFooterElements_Impl_ = $hx_exports["alphaTab"]["rendering"]["layout"]["_HeaderFooterElements"]["HeaderFooterElements_Impl_"] = {};
 alphaTab.rendering.layout._HeaderFooterElements.HeaderFooterElements_Impl_.__name__ = ["alphaTab","rendering","layout","_HeaderFooterElements","HeaderFooterElements_Impl_"];
@@ -20429,8 +27413,7 @@ alphaTab.rendering.layout._HeaderFooterElements.HeaderFooterElements_Impl_.ToSin
 	return this1;
 };
 alphaTab.rendering.layout._HeaderFooterElements.HeaderFooterElements_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.rendering.layout._HeaderFooterElements.HeaderFooterElements_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -20459,6 +27442,307 @@ alphaTab.rendering.layout._HeaderFooterElements.HeaderFooterElements_Impl_.toStr
 	}
 	return "";
 };
+alphaTab.rendering.layout.ScoreLayout = $hx_exports["alphaTab"]["rendering"]["layout"]["ScoreLayout"] = function(renderer) {
+	this._barRendererLookup = null;
+	this.Renderer = null;
+	this.Width = 0.0;
+	this.Height = 0.0;
+	this.ScoreInfoGlyphs = null;
+	this.TuningGlyph = null;
+	this.Renderer = renderer;
+	var this1 = {}
+	this._barRendererLookup = this1;
+};
+alphaTab.rendering.layout.ScoreLayout.__name__ = ["alphaTab","rendering","layout","ScoreLayout"];
+alphaTab.rendering.layout.ScoreLayout.prototype = {
+	get_Name: function() {
+		throw new js._Boot.HaxeError("abstract");
+	}
+	,get_SupportsResize: function() {
+		throw new js._Boot.HaxeError("abstract");
+	}
+	,Resize: function() {
+		throw new js._Boot.HaxeError("abstract");
+	}
+	,LayoutAndRender: function() {
+		this.CreateScoreInfoGlyphs();
+		this.DoLayoutAndRender();
+	}
+	,DoLayoutAndRender: function() {
+		throw new js._Boot.HaxeError("abstract");
+	}
+	,CreateScoreInfoGlyphs: function() {
+		alphaTab.util.Logger.Info("ScoreLayout","Creating score info glyphs",null);
+		var flags = this.Renderer.Settings.Layout.Get("hideInfo",false) ? 0 : 511;
+		var score = this.Renderer.Score;
+		var res = this.Renderer.RenderingResources;
+		var this1 = {}
+		this.ScoreInfoGlyphs = this1;
+		var tmp;
+		var s = score.Title;
+		if(!(s == null || s.length == 0)) {
+			tmp = (flags & 1) != 0;
+		} else {
+			tmp = false;
+		}
+		if(tmp) {
+			this.ScoreInfoGlyphs[1] = new alphaTab.rendering.glyphs.TextGlyph(0,0,score.Title,res.TitleFont,1);
+		}
+		var tmp1;
+		var s1 = score.SubTitle;
+		if(!(s1 == null || s1.length == 0)) {
+			tmp1 = (flags & 2) != 0;
+		} else {
+			tmp1 = false;
+		}
+		if(tmp1) {
+			this.ScoreInfoGlyphs[2] = new alphaTab.rendering.glyphs.TextGlyph(0,0,score.SubTitle,res.SubTitleFont,1);
+		}
+		var tmp2;
+		var s2 = score.Artist;
+		if(!(s2 == null || s2.length == 0)) {
+			tmp2 = (flags & 4) != 0;
+		} else {
+			tmp2 = false;
+		}
+		if(tmp2) {
+			this.ScoreInfoGlyphs[4] = new alphaTab.rendering.glyphs.TextGlyph(0,0,score.Artist,res.SubTitleFont,1);
+		}
+		var tmp3;
+		var s3 = score.Album;
+		if(!(s3 == null || s3.length == 0)) {
+			tmp3 = (flags & 8) != 0;
+		} else {
+			tmp3 = false;
+		}
+		if(tmp3) {
+			this.ScoreInfoGlyphs[8] = new alphaTab.rendering.glyphs.TextGlyph(0,0,score.Album,res.SubTitleFont,1);
+		}
+		var tmp4;
+		var tmp5;
+		var s4 = score.Music;
+		if(!(s4 == null || s4.length == 0)) {
+			tmp5 = score.Music == score.Words;
+		} else {
+			tmp5 = false;
+		}
+		if(tmp5) {
+			tmp4 = (flags & 64) != 0;
+		} else {
+			tmp4 = false;
+		}
+		if(tmp4) {
+			this.ScoreInfoGlyphs[64] = new alphaTab.rendering.glyphs.TextGlyph(0,0,"Music and Words by " + score.Words,res.WordsFont,1);
+		} else {
+			var tmp6;
+			var s5 = score.Music;
+			if(!(s5 == null || s5.length == 0)) {
+				tmp6 = (flags & 32) != 0;
+			} else {
+				tmp6 = false;
+			}
+			if(tmp6) {
+				this.ScoreInfoGlyphs[32] = new alphaTab.rendering.glyphs.TextGlyph(0,0,"Music by " + score.Music,res.WordsFont,2);
+			}
+			var tmp7;
+			var s6 = score.Words;
+			if(!(s6 == null || s6.length == 0)) {
+				tmp7 = (flags & 16) != 0;
+			} else {
+				tmp7 = false;
+			}
+			if(tmp7) {
+				this.ScoreInfoGlyphs[16] = new alphaTab.rendering.glyphs.TextGlyph(0,0,"Words by " + score.Music,res.WordsFont,0);
+			}
+		}
+		if(this.Renderer.Tracks.length == 1 && !this.Renderer.Tracks[0].IsPercussion && !this.Renderer.Settings.Layout.Get("hideTuning",false)) {
+			var tuning = alphaTab.model.Tuning.FindTuning(this.Renderer.Tracks[0].Tuning);
+			if(tuning != null) {
+				this.TuningGlyph = new alphaTab.rendering.glyphs.TuningGlyph(0,0,this.get_Scale(),this.Renderer.RenderingResources,tuning);
+			}
+		}
+	}
+	,get_Scale: function() {
+		return this.Renderer.Settings.Scale;
+	}
+	,CreateEmptyStaveGroup: function() {
+		var group = new alphaTab.rendering.staves.StaveGroup();
+		group.Layout = this;
+		var trackIndex = 0;
+		while(trackIndex < this.Renderer.Tracks.length) {
+			var track = this.Renderer.Tracks[trackIndex];
+			var staveProfile;
+			if(track.IsPercussion) {
+				staveProfile = "score";
+			} else if(track.get_IsStringed()) {
+				staveProfile = this.Renderer.Settings.Staves.Id;
+			} else {
+				staveProfile = "score";
+			}
+			var profile = alphaTab.Environment.StaveProfiles.hasOwnProperty(staveProfile) ? alphaTab.Environment.StaveProfiles[staveProfile] : alphaTab.Environment.StaveProfiles["default"];
+			var staveIndex = 0;
+			while(staveIndex < track.Staves.length) {
+				var renderStaveIndex = 0;
+				while(renderStaveIndex < profile.length) {
+					var factory = profile[renderStaveIndex];
+					var staff = track.Staves[staveIndex];
+					if(factory.CanCreate(track,staff)) {
+						group.AddStaff(track,new alphaTab.rendering.staves.Staff(trackIndex,staff,factory));
+					}
+					++renderStaveIndex;
+				}
+				++staveIndex;
+			}
+			++trackIndex;
+		}
+		return group;
+	}
+	,RegisterBarRenderer: function(key,renderer) {
+		if(!this._barRendererLookup.hasOwnProperty(key)) {
+			var this1 = this._barRendererLookup;
+			var this2 = {}
+			this1[key] = this2;
+		}
+		this._barRendererLookup[key][renderer.Bar.Id] = renderer;
+	}
+	,UnregisterBarRenderer: function(key,renderer) {
+		if(this._barRendererLookup.hasOwnProperty(key)) {
+			var lookup = this._barRendererLookup[key];
+			var key1 = renderer.Bar.Id;
+			delete lookup[key1];
+		}
+	}
+	,GetRendererForBar: function(key,bar) {
+		var barRendererId = bar.Id;
+		if(this._barRendererLookup.hasOwnProperty(key) && this._barRendererLookup[key].hasOwnProperty(barRendererId)) {
+			return this._barRendererLookup[key][barRendererId];
+		}
+		return null;
+	}
+	,RenderAnnotation: function() {
+		var _gthis = this;
+		var msg = "Rendered using alphaTab (http://www.alphaTab.net)";
+		var canvas = this.Renderer.Canvas;
+		var resources = this.Renderer.RenderingResources;
+		var height = resources.CopyrightFont.Size * 2;
+		this.Height = this.Height + height;
+		var x = this.Width / 2;
+		canvas.BeginRender(this.Width,height);
+		canvas.set_Color(resources.MainGlyphColor);
+		canvas.set_Font(resources.CopyrightFont);
+		canvas.set_TextAlign(1);
+		canvas.FillText(msg,x,resources.CopyrightFont.Size);
+		var result = canvas.EndRender();
+		var tmp = this.Renderer;
+		var _tmp = new alphaTab.rendering.RenderFinishedEventArgs();
+		_tmp.Width = _gthis.Width;
+		_tmp.Height = height;
+		_tmp.RenderResult = result;
+		_tmp.TotalWidth = _gthis.Width;
+		_tmp.TotalHeight = _gthis.Height;
+		_tmp.FirstMasterBarIndex = -1;
+		_tmp.LastMasterBarIndex = -1;
+		tmp.OnPartialRenderFinished(_tmp);
+	}
+	,__class__: alphaTab.rendering.layout.ScoreLayout
+};
+alphaTab.rendering.layout.HorizontalScreenLayout = $hx_exports["alphaTab"]["rendering"]["layout"]["HorizontalScreenLayout"] = function(renderer) {
+	alphaTab.rendering.layout.ScoreLayout.call(this,renderer);
+	this._group = null;
+};
+alphaTab.rendering.layout.HorizontalScreenLayout.__name__ = ["alphaTab","rendering","layout","HorizontalScreenLayout"];
+alphaTab.rendering.layout.HorizontalScreenLayout.__super__ = alphaTab.rendering.layout.ScoreLayout;
+alphaTab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphaTab.rendering.layout.ScoreLayout.prototype,{
+	get_Name: function() {
+		return "HorizontalScreen";
+	}
+	,get_SupportsResize: function() {
+		return false;
+	}
+	,Resize: function() {
+	}
+	,DoLayoutAndRender: function() {
+		var _gthis = this;
+		var score = this.Renderer.Score;
+		var canvas = this.Renderer.Canvas;
+		var startIndex = this.Renderer.Settings.Layout.Get("start",1);
+		--startIndex;
+		startIndex = Math.min(score.MasterBars.length - 1,Math.max(0,startIndex));
+		var currentBarIndex = startIndex;
+		var endBarIndex = this.Renderer.Settings.Layout.Get("count",score.MasterBars.length);
+		if(endBarIndex < 0) {
+			endBarIndex = score.MasterBars.length;
+		}
+		endBarIndex = startIndex + endBarIndex - 1;
+		endBarIndex = Math.min(score.MasterBars.length - 1,Math.max(0,endBarIndex));
+		this._group = this.CreateEmptyStaveGroup();
+		this._group.IsLast = true;
+		this._group.X = alphaTab.rendering.layout.HorizontalScreenLayout.PagePadding[0];
+		this._group.Y = alphaTab.rendering.layout.HorizontalScreenLayout.PagePadding[1];
+		var countPerPartial = this.Renderer.Settings.Layout.Get("countPerPartial",10);
+		var this1 = [];
+		var partials = this1;
+		var currentPartial = new alphaTab.rendering.layout.HorizontalScreenLayoutPartialInfo();
+		while(currentBarIndex <= endBarIndex) {
+			var result = this._group.AddBars(this.Renderer.Tracks,currentBarIndex);
+			if(currentPartial.MasterBars.length == 0 && result.IsLinkedToPrevious && partials.length > 0) {
+				var previousPartial = partials[partials.length - 1];
+				previousPartial.MasterBars.push(score.MasterBars[currentBarIndex]);
+				previousPartial.Width = previousPartial.Width + result.Width;
+			} else {
+				currentPartial.MasterBars.push(score.MasterBars[currentBarIndex]);
+				currentPartial.Width = currentPartial.Width + result.Width;
+				if(currentPartial.MasterBars.length >= countPerPartial) {
+					if(partials.length == 0) {
+						currentPartial.Width = currentPartial.Width + (this._group.X + this._group.AccoladeSpacing);
+					}
+					partials.push(currentPartial);
+					alphaTab.util.Logger.Info(this.get_Name(),"Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " + currentPartial.MasterBars[currentPartial.MasterBars.length - 1].Index,null);
+					currentPartial = new alphaTab.rendering.layout.HorizontalScreenLayoutPartialInfo();
+				}
+			}
+			++currentBarIndex;
+		}
+		if(currentPartial.MasterBars.length > 0) {
+			if(partials.length == 0) {
+				currentPartial.Width = currentPartial.Width + (this._group.X + this._group.AccoladeSpacing);
+			}
+			partials.push(currentPartial);
+			alphaTab.util.Logger.Info(this.get_Name(),"Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " + currentPartial.MasterBars[currentPartial.MasterBars.length - 1].Index,null);
+		}
+		this._group.FinalizeGroup();
+		this.Height = this._group.Y + this._group.get_Height() + alphaTab.rendering.layout.HorizontalScreenLayout.PagePadding[3];
+		this.Width = this._group.X + this._group.Width + alphaTab.rendering.layout.HorizontalScreenLayout.PagePadding[2];
+		currentBarIndex = 0;
+		var i = 0;
+		while(i < partials.length) {
+			var partial = partials[i];
+			canvas.BeginRender(partial.Width,this.Height);
+			canvas.set_Color(this.Renderer.RenderingResources.MainGlyphColor);
+			canvas.set_TextAlign(0);
+			var renderX = this._group.GetBarX(partial.MasterBars[0].Index) + this._group.AccoladeSpacing;
+			if(i == 0) {
+				renderX = renderX - (this._group.X + this._group.AccoladeSpacing);
+			}
+			alphaTab.util.Logger.Info(this.get_Name(),"Rendering partial from bar " + partial.MasterBars[0].Index + " to " + partial.MasterBars[partial.MasterBars.length - 1].Index,null);
+			this._group.PaintPartial(-renderX,this._group.Y,this.Renderer.Canvas,currentBarIndex,partial.MasterBars.length);
+			var result1 = canvas.EndRender();
+			var tmp = this.Renderer;
+			var _tmp = new alphaTab.rendering.RenderFinishedEventArgs();
+			_tmp.TotalWidth = _gthis.Width;
+			_tmp.TotalHeight = _gthis.Height;
+			_tmp.Width = partial.Width;
+			_tmp.Height = _gthis.Height;
+			_tmp.RenderResult = result1;
+			_tmp.FirstMasterBarIndex = partial.MasterBars[0].Index;
+			_tmp.LastMasterBarIndex = partial.MasterBars[partial.MasterBars.length - 1].Index;
+			tmp.OnPartialRenderFinished(_tmp);
+			currentBarIndex = currentBarIndex + partial.MasterBars.length;
+			++i;
+		}
+	}
+	,__class__: alphaTab.rendering.layout.HorizontalScreenLayout
+});
 alphaTab.rendering.layout.HorizontalScreenLayoutPartialInfo = $hx_exports["alphaTab"]["rendering"]["layout"]["HorizontalScreenLayoutPartialInfo"] = function() {
 	this.Width = 0.0;
 	this.MasterBars = null;
@@ -20469,6 +27753,254 @@ alphaTab.rendering.layout.HorizontalScreenLayoutPartialInfo.__name__ = ["alphaTa
 alphaTab.rendering.layout.HorizontalScreenLayoutPartialInfo.prototype = {
 	__class__: alphaTab.rendering.layout.HorizontalScreenLayoutPartialInfo
 };
+alphaTab.rendering.layout.PageViewLayout = $hx_exports["alphaTab"]["rendering"]["layout"]["PageViewLayout"] = function(renderer) {
+	alphaTab.rendering.layout.ScoreLayout.call(this,renderer);
+	this._groups = null;
+	this._allMasterBarRenderers = null;
+	this._barsFromPreviousGroup = null;
+};
+alphaTab.rendering.layout.PageViewLayout.__name__ = ["alphaTab","rendering","layout","PageViewLayout"];
+alphaTab.rendering.layout.PageViewLayout.__super__ = alphaTab.rendering.layout.ScoreLayout;
+alphaTab.rendering.layout.PageViewLayout.prototype = $extend(alphaTab.rendering.layout.ScoreLayout.prototype,{
+	get_Name: function() {
+		return "PageView";
+	}
+	,DoLayoutAndRender: function() {
+		var x = alphaTab.rendering.layout.PageViewLayout.PagePadding[0];
+		var y = alphaTab.rendering.layout.PageViewLayout.PagePadding[1];
+		var this1 = this.Renderer.Settings.Width;
+		this.Width = this1;
+		var this2 = [];
+		this._allMasterBarRenderers = this2;
+		y = this.LayoutAndRenderScoreInfo(x,y,-1);
+		y = this.LayoutAndRenderScore(x,y);
+		this.Height = y + alphaTab.rendering.layout.PageViewLayout.PagePadding[3];
+	}
+	,get_SupportsResize: function() {
+		return true;
+	}
+	,Resize: function() {
+		var x = alphaTab.rendering.layout.PageViewLayout.PagePadding[0];
+		var y = alphaTab.rendering.layout.PageViewLayout.PagePadding[1];
+		var this1 = this.Renderer.Settings.Width;
+		this.Width = this1;
+		var oldHeight = this.Height;
+		y = this.LayoutAndRenderScoreInfo(x,y,oldHeight);
+		y = this.ResizeAndRenderScore(x,y,oldHeight);
+		this.Height = y + alphaTab.rendering.layout.PageViewLayout.PagePadding[3];
+	}
+	,LayoutAndRenderScoreInfo: function(x,y,totalHeight) {
+		if(totalHeight == null) {
+			totalHeight = -1;
+		}
+		var _gthis = this;
+		alphaTab.util.Logger.Info(this.get_Name(),"Layouting score info",null);
+		var scale = this.get_Scale();
+		var res = this.Renderer.RenderingResources;
+		var centeredGlyphs = [1,2,4,8,64];
+		var i = 0;
+		while(i < centeredGlyphs.length) {
+			if(this.ScoreInfoGlyphs.hasOwnProperty(centeredGlyphs[i])) {
+				var glyph = this.ScoreInfoGlyphs[centeredGlyphs[i]];
+				var this1 = 2;
+				glyph.X = this.Width / this1;
+				glyph.Y = y;
+				glyph.TextAlign = 1;
+				y = y + glyph.Font.Size;
+			}
+			++i;
+		}
+		var musicOrWords = false;
+		var musicOrWordsHeight = 0;
+		if(this.ScoreInfoGlyphs.hasOwnProperty(32)) {
+			var glyph1 = this.ScoreInfoGlyphs[32];
+			glyph1.X = this.Width - alphaTab.rendering.layout.PageViewLayout.PagePadding[2];
+			glyph1.Y = y;
+			glyph1.TextAlign = 2;
+			musicOrWords = true;
+			musicOrWordsHeight = glyph1.Font.Size;
+		}
+		if(this.ScoreInfoGlyphs.hasOwnProperty(16)) {
+			var glyph2 = this.ScoreInfoGlyphs[16];
+			glyph2.X = x;
+			glyph2.Y = y;
+			glyph2.TextAlign = 0;
+			musicOrWords = true;
+			musicOrWordsHeight = glyph2.Font.Size;
+		}
+		if(musicOrWords) {
+			y = y + musicOrWordsHeight;
+		}
+		if(this.TuningGlyph != null) {
+			y = y + 20 * scale;
+			this.TuningGlyph.X = x;
+			this.TuningGlyph.Y = y;
+			y = y + this.TuningGlyph.Height;
+		}
+		y = y + 20 * scale;
+		var canvas = this.Renderer.Canvas;
+		canvas.BeginRender(this.Width,y);
+		canvas.set_Color(res.ScoreInfoColor);
+		canvas.set_TextAlign(1);
+		var this2 = this.ScoreInfoGlyphs;
+		var key = $iterator(Object.keys(this2))();
+		while(key.hasNext()) {
+			var key1 = key.next();
+			this.ScoreInfoGlyphs[key1].Paint(0,0,canvas);
+		}
+		if(this.TuningGlyph != null) {
+			this.TuningGlyph.Paint(0,0,canvas);
+		}
+		var result = canvas.EndRender();
+		var tmp = this.Renderer;
+		var _tmp = new alphaTab.rendering.RenderFinishedEventArgs();
+		_tmp.Width = _gthis.Width;
+		_tmp.Height = y;
+		_tmp.RenderResult = result;
+		_tmp.TotalWidth = _gthis.Width;
+		_tmp.TotalHeight = totalHeight < 0 ? y : totalHeight;
+		_tmp.FirstMasterBarIndex = -1;
+		_tmp.LastMasterBarIndex = -1;
+		tmp.OnPartialRenderFinished(_tmp);
+		return y;
+	}
+	,ResizeAndRenderScore: function(x,y,oldHeight) {
+		var canvas = this.Renderer.Canvas;
+		if(this.Renderer.Settings.Layout.Get("barsPerRow",-1) != -1) {
+			var i = 0;
+			while(i < this._groups.length) {
+				var group = this._groups[i];
+				this.FitGroup(group);
+				group.FinalizeGroup();
+				y = y + this.PaintGroup(group,oldHeight,canvas);
+				++i;
+			}
+		} else {
+			var this1 = [];
+			this._groups = this1;
+			var currentIndex = 0;
+			var maxWidth = this.get_MaxWidth();
+			var group1 = this.CreateEmptyStaveGroup();
+			group1.Index = this._groups.length;
+			group1.X = x;
+			group1.Y = y;
+			while(currentIndex < this._allMasterBarRenderers.length) {
+				var renderers = this._allMasterBarRenderers[currentIndex];
+				if(group1.Width + renderers.Width <= maxWidth || group1.MasterBarsRenderers.length == 0) {
+					group1.AddMasterBarRenderers(this.Renderer.Tracks,renderers);
+					++currentIndex;
+				} else {
+					group1.IsFull = true;
+					group1.IsLast = false;
+					this._groups.push(group1);
+					this.FitGroup(group1);
+					group1.FinalizeGroup();
+					y = y + this.PaintGroup(group1,oldHeight,canvas);
+					group1 = this.CreateEmptyStaveGroup();
+					group1.Index = this._groups.length;
+					group1.X = x;
+					group1.Y = y;
+				}
+			}
+			this.FitGroup(group1);
+			group1.FinalizeGroup();
+			y = y + this.PaintGroup(group1,oldHeight,canvas);
+		}
+		return y;
+	}
+	,LayoutAndRenderScore: function(x,y) {
+		var score = this.Renderer.Score;
+		var canvas = this.Renderer.Canvas;
+		var startIndex = this.Renderer.Settings.Layout.Get("start",1);
+		--startIndex;
+		startIndex = Math.min(score.MasterBars.length - 1,Math.max(0,startIndex));
+		var currentBarIndex = startIndex;
+		var endBarIndex = this.Renderer.Settings.Layout.Get("count",score.MasterBars.length);
+		if(endBarIndex < 0) {
+			endBarIndex = score.MasterBars.length;
+		}
+		endBarIndex = startIndex + endBarIndex - 1;
+		endBarIndex = Math.min(score.MasterBars.length - 1,Math.max(0,endBarIndex));
+		var this1 = [];
+		this._groups = this1;
+		while(currentBarIndex <= endBarIndex) {
+			var group = this.CreateStaveGroup(currentBarIndex,endBarIndex);
+			this._groups.push(group);
+			group.X = x;
+			group.Y = y;
+			currentBarIndex = group.get_LastBarIndex() + 1;
+			this.FitGroup(group);
+			group.FinalizeGroup();
+			alphaTab.util.Logger.Info(this.get_Name(),"Rendering partial from bar " + group.get_FirstBarIndex() + " to " + group.get_LastBarIndex(),null);
+			y = y + this.PaintGroup(group,y,canvas);
+		}
+		return y;
+	}
+	,PaintGroup: function(group,totalHeight,canvas) {
+		var height = group.get_Height() + 20 * this.get_Scale();
+		canvas.BeginRender(this.Width,height);
+		this.Renderer.Canvas.set_Color(this.Renderer.RenderingResources.MainGlyphColor);
+		this.Renderer.Canvas.set_TextAlign(0);
+		group.Paint(0,-group.Y,canvas);
+		totalHeight = totalHeight + height;
+		var result = canvas.EndRender();
+		var args = new alphaTab.rendering.RenderFinishedEventArgs();
+		args.TotalWidth = this.Width;
+		args.TotalHeight = totalHeight;
+		args.Width = this.Width;
+		args.Height = height;
+		args.RenderResult = result;
+		args.FirstMasterBarIndex = group.get_FirstBarIndex();
+		args.LastMasterBarIndex = group.get_LastBarIndex();
+		this.Renderer.OnPartialRenderFinished(args);
+		return height;
+	}
+	,FitGroup: function(group) {
+		if(group.IsFull || group.Width > this.get_MaxWidth()) {
+			group.ScaleToWidth(this.get_MaxWidth());
+		}
+		this.Width = Math.max(this.Width,group.Width);
+	}
+	,CreateStaveGroup: function(currentBarIndex,endIndex) {
+		var group = this.CreateEmptyStaveGroup();
+		group.Index = this._groups.length;
+		var barsPerRow = this.Renderer.Settings.Layout.Get("barsPerRow",-1);
+		var maxWidth = this.get_MaxWidth();
+		var end = endIndex + 1;
+		var i = currentBarIndex;
+		while(i < end) {
+			var renderers;
+			if(this._barsFromPreviousGroup != null && this._barsFromPreviousGroup.MasterBar.Index == i) {
+				renderers = group.AddMasterBarRenderers(this.Renderer.Tracks,this._barsFromPreviousGroup);
+			} else {
+				renderers = group.AddBars(this.Renderer.Tracks,i);
+				this._allMasterBarRenderers.push(renderers);
+			}
+			this._barsFromPreviousGroup = null;
+			var groupIsFull = false;
+			if(barsPerRow == -1 && (group.Width >= maxWidth && group.MasterBarsRenderers.length != 0)) {
+				groupIsFull = true;
+			} else if(group.MasterBarsRenderers.length == barsPerRow + 1) {
+				groupIsFull = true;
+			}
+			if(groupIsFull) {
+				group.RevertLastBar();
+				group.IsFull = true;
+				group.IsLast = false;
+				this._barsFromPreviousGroup = renderers;
+				return group;
+			}
+			group.X = 0;
+			++i;
+		}
+		group.IsLast = endIndex == group.get_LastBarIndex();
+		return group;
+	}
+	,get_MaxWidth: function() {
+		return this.Renderer.Settings.Width - alphaTab.rendering.layout.PageViewLayout.PagePadding[0] - alphaTab.rendering.layout.PageViewLayout.PagePadding[2];
+	}
+	,__class__: alphaTab.rendering.layout.PageViewLayout
+});
 alphaTab.rendering.staves = {};
 alphaTab.rendering.staves.BarLayoutingInfo = $hx_exports["alphaTab"]["rendering"]["staves"]["BarLayoutingInfo"] = function() {
 	this._timeSortedSprings = null;
@@ -21379,8 +28911,7 @@ alphaTab.rendering.utils._BeamDirection.BeamDirection_Impl_.ToSingle_IFormatProv
 	return this1;
 };
 alphaTab.rendering.utils._BeamDirection.BeamDirection_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.rendering.utils._BeamDirection.BeamDirection_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -21988,6 +29519,7 @@ alphaTab.rendering.utils.TupletHelper.prototype = {
 	}
 	,__class__: alphaTab.rendering.utils.TupletHelper
 };
+alphaTab.util = {};
 alphaTab.util.Lazy = $hx_exports["alphaTab"]["util"]["Lazy"] = function(factory) {
 	this._factory = null;
 	this._created = false;
@@ -22042,8 +29574,7 @@ alphaTab.util._LogLevel.LogLevel_Impl_.ToSingle_IFormatProvider = function(this1
 	return this1;
 };
 alphaTab.util._LogLevel.LogLevel_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.util._LogLevel.LogLevel_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -22059,6 +29590,53 @@ alphaTab.util._LogLevel.LogLevel_Impl_.toString = function(this1) {
 		return "Error";
 	}
 	return "";
+};
+alphaTab.util.Logger = $hx_exports["alphaTab"]["util"]["Logger"] = function() {
+};
+alphaTab.util.Logger.__name__ = ["alphaTab","util","Logger"];
+alphaTab.util.Logger.Debug = function(category,msg,details) {
+	alphaTab.util.Logger.Log(1,category,msg,details);
+};
+alphaTab.util.Logger.Warning = function(category,msg,details) {
+	alphaTab.util.Logger.Log(3,category,msg,details);
+};
+alphaTab.util.Logger.Info = function(category,msg,details) {
+	alphaTab.util.Logger.Log(2,category,msg,details);
+};
+alphaTab.util.Logger.Error = function(category,msg,details) {
+	alphaTab.util.Logger.Log(4,category,msg,details);
+};
+alphaTab.util.Logger.Log = function(logLevel,category,msg,details) {
+	if(logLevel < alphaTab.util.Logger.LogLevel) {
+		return;
+	}
+	alphaTab.platform.Platform.Log(logLevel,category,msg,details);
+};
+alphaTab.util.Logger.prototype = {
+	__class__: alphaTab.util.Logger
+};
+alphaTab.utils = {};
+alphaTab.utils._UnionData = {};
+alphaTab.utils._UnionData.UnionData_Impl_ = $hx_exports["alphaTab"]["utils"]["_UnionData"]["UnionData_Impl_"] = {};
+alphaTab.utils._UnionData.UnionData_Impl_.__name__ = ["alphaTab","utils","_UnionData","UnionData_Impl_"];
+alphaTab.utils._UnionData.UnionData_Impl_._new = function() {
+	var this1 = new DataView(new ArrayBuffer(8));
+	return this1;
+};
+alphaTab.utils._UnionData.UnionData_Impl_.get_Double1 = function(this1) {
+	return this1.getFloat64(0,true);
+};
+alphaTab.utils._UnionData.UnionData_Impl_.get_Float1 = function(this1) {
+	return this1.getFloat32(0,true);
+};
+alphaTab.utils._UnionData.UnionData_Impl_.get_Float2 = function(this1) {
+	return this1.getFloat32(4,true);
+};
+alphaTab.utils._UnionData.UnionData_Impl_.get_Int1 = function(this1) {
+	return this1.getInt32(0,true);
+};
+alphaTab.utils._UnionData.UnionData_Impl_.get_Int2 = function(this1) {
+	return this1.getInt32(4,true);
 };
 alphaTab.xml = {};
 alphaTab.xml.XmlNode = $hx_exports["alphaTab"]["xml"]["XmlNode"] = function() {
@@ -22132,7 +29710,8 @@ alphaTab.xml.XmlNode.prototype = {
 				var c1 = c.next();
 				txt += Std.string(c1.get_InnerText());
 			}
-			return StringTools.trim(txt);
+			var s = txt;
+			return StringTools.trim(s);
 		}
 		return this.Value;
 	}
@@ -22210,8 +29789,7 @@ alphaTab.xml._XmlNodeType.XmlNodeType_Impl_.ToSingle_IFormatProvider = function(
 	return this1;
 };
 alphaTab.xml._XmlNodeType.XmlNodeType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 alphaTab.xml._XmlNodeType.XmlNodeType_Impl_.toString = function(this1) {
 	switch(this1) {
@@ -22634,6 +30212,138 @@ alphaTab.xml.XmlParser_XmlState.__name__ = ["alphaTab","xml","XmlParser_XmlState
 alphaTab.xml.XmlParser_XmlState.prototype = {
 	__class__: alphaTab.xml.XmlParser_XmlState
 };
+var haxe = {};
+haxe.StackItem = { __ename__ : true, __constructs__ : ["CFunction","Module","FilePos","Method","LocalFunction"] };
+haxe.StackItem.CFunction = ["CFunction",0];
+haxe.StackItem.CFunction.toString = $estr;
+haxe.StackItem.CFunction.__enum__ = haxe.StackItem;
+haxe.StackItem.Module = function(m) { var $x = ["Module",1,m]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; };
+haxe.StackItem.FilePos = function(s,file,line) { var $x = ["FilePos",2,s,file,line]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; };
+haxe.StackItem.Method = function(classname,method) { var $x = ["Method",3,classname,method]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; };
+haxe.StackItem.LocalFunction = function(v) { var $x = ["LocalFunction",4,v]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; };
+haxe.CallStack = function() { };
+haxe.CallStack.__name__ = ["haxe","CallStack"];
+haxe.CallStack.getStack = function(e) {
+	if(e == null) {
+		return [];
+	}
+	var oldValue = Error.prepareStackTrace;
+	Error.prepareStackTrace = function(error,callsites) {
+		var stack = [];
+		var _g = 0;
+		while(_g < callsites.length) {
+			var site = callsites[_g];
+			++_g;
+			if(haxe.CallStack.wrapCallSite != null) {
+				site = haxe.CallStack.wrapCallSite(site);
+			}
+			var method = null;
+			var fullName = site.getFunctionName();
+			if(fullName != null) {
+				var idx = fullName.lastIndexOf(".");
+				if(idx >= 0) {
+					var className = HxOverrides.substr(fullName,0,idx);
+					var methodName = HxOverrides.substr(fullName,idx + 1,null);
+					method = haxe.StackItem.Method(className,methodName);
+				}
+			}
+			stack.push(haxe.StackItem.FilePos(method,site.getFileName(),site.getLineNumber()));
+		}
+		return stack;
+	};
+	var a = haxe.CallStack.makeStack(e.stack);
+	Error.prepareStackTrace = oldValue;
+	return a;
+};
+haxe.CallStack.callStack = function() {
+	try {
+		throw new Error();
+	} catch( e ) {
+		if (e instanceof js._Boot.HaxeError) e = e.val;
+		var a = haxe.CallStack.getStack(e);
+		a.shift();
+		return a;
+	}
+};
+haxe.CallStack.toString = function(stack) {
+	var b = new StringBuf();
+	var _g = 0;
+	while(_g < stack.length) {
+		var s = stack[_g];
+		++_g;
+		b.b += "\nCalled from ";
+		haxe.CallStack.itemToString(b,s);
+	}
+	return b.b;
+};
+haxe.CallStack.itemToString = function(b,s) {
+	switch(s[1]) {
+	case 0:
+		b.b += "a C function";
+		break;
+	case 1:
+		var m = s[2];
+		b.b += "module ";
+		b.b += m == null ? "null" : "" + m;
+		break;
+	case 2:
+		var line = s[4];
+		var file = s[3];
+		var s1 = s[2];
+		if(s1 != null) {
+			haxe.CallStack.itemToString(b,s1);
+			b.b += " (";
+		}
+		b.b += file == null ? "null" : "" + file;
+		b.b += " line ";
+		b.b += line == null ? "null" : "" + line;
+		if(s1 != null) {
+			b.b += ")";
+		}
+		break;
+	case 3:
+		var meth = s[3];
+		var cname = s[2];
+		b.b += cname == null ? "null" : "" + cname;
+		b.b += ".";
+		b.b += meth == null ? "null" : "" + meth;
+		break;
+	case 4:
+		var n = s[2];
+		b.b += "local function #";
+		b.b += n == null ? "null" : "" + n;
+		break;
+	}
+};
+haxe.CallStack.makeStack = function(s) {
+	if(s == null) {
+		return [];
+	} else if(typeof(s) == "string") {
+		var stack = s.split("\n");
+		if(stack[0] == "Error") {
+			stack.shift();
+		}
+		var m = [];
+		var rie10 = new EReg("^   at ([A-Za-z0-9_. ]+) \\(([^)]+):([0-9]+):([0-9]+)\\)$","");
+		var _g = 0;
+		while(_g < stack.length) {
+			var line = stack[_g];
+			++_g;
+			if(rie10.match(line)) {
+				var path = rie10.matched(1).split(".");
+				var meth = path.pop();
+				var file = rie10.matched(2);
+				var line1 = Std.parseInt(rie10.matched(3));
+				m.push(haxe.StackItem.FilePos(meth == "Anonymous function" ? haxe.StackItem.LocalFunction() : meth == "Global code" ? null : haxe.StackItem.Method(path.join("."),meth),file,line1));
+			} else {
+				m.push(haxe.StackItem.Module(StringTools.trim(line)));
+			}
+		}
+		return m;
+	} else {
+		return s;
+	}
+};
 haxe._Int64 = {};
 haxe._Int64.___Int64 = function(high,low) {
 	this.high = high;
@@ -22644,6 +30354,17 @@ haxe._Int64.___Int64.prototype = {
 	__class__: haxe._Int64.___Int64
 };
 haxe.io = {};
+haxe.io.Error = { __ename__ : true, __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] };
+haxe.io.Error.Blocked = ["Blocked",0];
+haxe.io.Error.Blocked.toString = $estr;
+haxe.io.Error.Blocked.__enum__ = haxe.io.Error;
+haxe.io.Error.Overflow = ["Overflow",1];
+haxe.io.Error.Overflow.toString = $estr;
+haxe.io.Error.Overflow.__enum__ = haxe.io.Error;
+haxe.io.Error.OutsideBounds = ["OutsideBounds",2];
+haxe.io.Error.OutsideBounds.toString = $estr;
+haxe.io.Error.OutsideBounds.__enum__ = haxe.io.Error;
+haxe.io.Error.Custom = function(e) { var $x = ["Custom",3,e]; $x.__enum__ = haxe.io.Error; $x.toString = $estr; return $x; };
 haxe.io.FPHelper = function() { };
 haxe.io.FPHelper.__name__ = ["haxe","io","FPHelper"];
 haxe.io.FPHelper.i32ToFloat = function(i) {
@@ -22706,6 +30427,7 @@ haxe.io.FPHelper.doubleToI64 = function(v) {
 	}
 	return i64;
 };
+var js = {};
 js._Boot = {};
 js._Boot.HaxeError = function(val) {
 	Error.call(this);
@@ -22727,6 +30449,201 @@ js._Boot.HaxeError.__super__ = Error;
 js._Boot.HaxeError.prototype = $extend(Error.prototype,{
 	__class__: js._Boot.HaxeError
 });
+js.Boot = function() { };
+js.Boot.__name__ = ["js","Boot"];
+js.Boot.getClass = function(o) {
+	if((o instanceof Array) && o.__enum__ == null) {
+		return Array;
+	} else {
+		var cl = o.__class__;
+		if(cl != null) {
+			return cl;
+		}
+		var name = js.Boot.__nativeClassName(o);
+		if(name != null) {
+			return js.Boot.__resolveNativeClass(name);
+		}
+		return null;
+	}
+};
+js.Boot.__string_rec = function(o,s) {
+	if(o == null) {
+		return "null";
+	}
+	if(s.length >= 5) {
+		return "<...>";
+	}
+	var t = typeof(o);
+	if(t == "function" && (o.__name__ || o.__ename__)) {
+		t = "object";
+	}
+	switch(t) {
+	case "function":
+		return "<function>";
+	case "object":
+		if(o instanceof Array) {
+			if(o.__enum__) {
+				if(o.length == 2) {
+					return o[0];
+				}
+				var str = o[0] + "(";
+				s += "\t";
+				var _g1 = 2;
+				var _g = o.length;
+				while(_g1 < _g) {
+					var i = _g1++;
+					if(i != 2) {
+						str += "," + js.Boot.__string_rec(o[i],s);
+					} else {
+						str += js.Boot.__string_rec(o[i],s);
+					}
+				}
+				return str + ")";
+			}
+			var l = o.length;
+			var i1;
+			var str1 = "[";
+			s += "\t";
+			var _g11 = 0;
+			var _g2 = l;
+			while(_g11 < _g2) {
+				var i2 = _g11++;
+				str1 += (i2 > 0 ? "," : "") + js.Boot.__string_rec(o[i2],s);
+			}
+			str1 += "]";
+			return str1;
+		}
+		var tostr;
+		try {
+			tostr = o.toString;
+		} catch( e ) {
+			return "???";
+		}
+		if(tostr != null && tostr != Object.toString && typeof(tostr) == "function") {
+			var s2 = o.toString();
+			if(s2 != "[object Object]") {
+				return s2;
+			}
+		}
+		var k = null;
+		var str2 = "{\n";
+		s += "\t";
+		var hasp = o.hasOwnProperty != null;
+		for( var k in o ) {
+		if(hasp && !o.hasOwnProperty(k)) {
+			continue;
+		}
+		if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__" || k == "__properties__") {
+			continue;
+		}
+		if(str2.length != 2) {
+			str2 += ", \n";
+		}
+		str2 += s + k + " : " + js.Boot.__string_rec(o[k],s);
+		}
+		s = s.substring(1);
+		str2 += "\n" + s + "}";
+		return str2;
+	case "string":
+		return o;
+	default:
+		return String(o);
+	}
+};
+js.Boot.__interfLoop = function(cc,cl) {
+	if(cc == null) {
+		return false;
+	}
+	if(cc == cl) {
+		return true;
+	}
+	var intf = cc.__interfaces__;
+	if(intf != null) {
+		var _g1 = 0;
+		var _g = intf.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var i1 = intf[i];
+			if(i1 == cl || js.Boot.__interfLoop(i1,cl)) {
+				return true;
+			}
+		}
+	}
+	return js.Boot.__interfLoop(cc.__super__,cl);
+};
+js.Boot.__instanceof = function(o,cl) {
+	if(cl == null) {
+		return false;
+	}
+	switch(cl) {
+	case Array:
+		if((o instanceof Array)) {
+			return o.__enum__ == null;
+		} else {
+			return false;
+		}
+		break;
+	case Bool:
+		return typeof(o) == "boolean";
+	case Dynamic:
+		return true;
+	case Float:
+		return typeof(o) == "number";
+	case Int:
+		if(typeof(o) == "number") {
+			return (o|0) === o;
+		} else {
+			return false;
+		}
+		break;
+	case String:
+		return typeof(o) == "string";
+	default:
+		if(o != null) {
+			if(typeof(cl) == "function") {
+				if(o instanceof cl) {
+					return true;
+				}
+				if(js.Boot.__interfLoop(js.Boot.getClass(o),cl)) {
+					return true;
+				}
+			} else if(typeof(cl) == "object" && js.Boot.__isNativeObj(cl)) {
+				if(o instanceof cl) {
+					return true;
+				}
+			}
+		} else {
+			return false;
+		}
+		if(cl == Class ? o.__name__ != null : false) {
+			return true;
+		}
+		if(cl == Enum ? o.__ename__ != null : false) {
+			return true;
+		}
+		return o.__enum__ == cl;
+	}
+};
+js.Boot.__cast = function(o,t) {
+	if(js.Boot.__instanceof(o,t)) {
+		return o;
+	} else {
+		throw new js._Boot.HaxeError("Cannot cast " + Std.string(o) + " to " + Std.string(t));
+	}
+};
+js.Boot.__nativeClassName = function(o) {
+	var name = js.Boot.__toStr.call(o).slice(8,-1);
+	if(name == "Object" || name == "Function" || name == "Math" || name == "JSON") {
+		return null;
+	}
+	return name;
+};
+js.Boot.__isNativeObj = function(o) {
+	return js.Boot.__nativeClassName(o) != null;
+};
+js.Boot.__resolveNativeClass = function(name) {
+	return $global[name];
+};
 js.html = {};
 js.html.compat = {};
 js.html.compat.ArrayBuffer = function(a) {
@@ -22758,6 +30675,124 @@ js.html.compat.ArrayBuffer.prototype = {
 		return new js.html.compat.ArrayBuffer(this.a.slice(begin,end));
 	}
 	,__class__: js.html.compat.ArrayBuffer
+};
+js.html.compat.DataView = function(buffer,byteOffset,byteLength) {
+	this.buf = buffer;
+	this.offset = byteOffset == null ? 0 : byteOffset;
+	this.length = byteLength == null ? buffer.byteLength - this.offset : byteLength;
+	if(this.offset < 0 || this.length < 0 || this.offset + this.length > buffer.byteLength) {
+		throw new js._Boot.HaxeError(haxe.io.Error.OutsideBounds);
+	}
+	this.byteLength = this.length;
+	this.byteOffset = this.offset;
+	this.buffer = this.buf;
+};
+js.html.compat.DataView.__name__ = ["js","html","compat","DataView"];
+js.html.compat.DataView.prototype = {
+	getInt8: function(byteOffset) {
+		var v = this.buf.a[this.offset + byteOffset];
+		if(v >= 128) {
+			return v - 256;
+		} else {
+			return v;
+		}
+	}
+	,getUint8: function(byteOffset) {
+		return this.buf.a[this.offset + byteOffset];
+	}
+	,getInt16: function(byteOffset,littleEndian) {
+		var v = this.getUint16(byteOffset,littleEndian);
+		if(v >= 32768) {
+			return v - 65536;
+		} else {
+			return v;
+		}
+	}
+	,getUint16: function(byteOffset,littleEndian) {
+		if(littleEndian) {
+			return this.buf.a[this.offset + byteOffset] | this.buf.a[this.offset + byteOffset + 1] << 8;
+		} else {
+			return this.buf.a[this.offset + byteOffset] << 8 | this.buf.a[this.offset + byteOffset + 1];
+		}
+	}
+	,getInt32: function(byteOffset,littleEndian) {
+		var p = this.offset + byteOffset;
+		var a = this.buf.a[p++];
+		var b = this.buf.a[p++];
+		var c = this.buf.a[p++];
+		var d = this.buf.a[p++];
+		if(littleEndian) {
+			return a | b << 8 | c << 16 | d << 24;
+		} else {
+			return d | c << 8 | b << 16 | a << 24;
+		}
+	}
+	,getUint32: function(byteOffset,littleEndian) {
+		var v = this.getInt32(byteOffset,littleEndian);
+		if(v < 0) {
+			return v + 4294967296.;
+		} else {
+			return v;
+		}
+	}
+	,getFloat32: function(byteOffset,littleEndian) {
+		return haxe.io.FPHelper.i32ToFloat(this.getInt32(byteOffset,littleEndian));
+	}
+	,getFloat64: function(byteOffset,littleEndian) {
+		var a = this.getInt32(byteOffset,littleEndian);
+		var b = this.getInt32(byteOffset + 4,littleEndian);
+		return haxe.io.FPHelper.i64ToDouble(littleEndian ? a : b,littleEndian ? b : a);
+	}
+	,setInt8: function(byteOffset,value) {
+		this.buf.a[byteOffset + this.offset] = value < 0 ? value + 128 & 255 : value & 255;
+	}
+	,setUint8: function(byteOffset,value) {
+		this.buf.a[byteOffset + this.offset] = value & 255;
+	}
+	,setInt16: function(byteOffset,value,littleEndian) {
+		this.setUint16(byteOffset,value < 0 ? value + 65536 : value,littleEndian);
+	}
+	,setUint16: function(byteOffset,value,littleEndian) {
+		var p = byteOffset + this.offset;
+		if(littleEndian) {
+			this.buf.a[p] = value & 255;
+			this.buf.a[p++] = value >> 8 & 255;
+		} else {
+			this.buf.a[p++] = value >> 8 & 255;
+			this.buf.a[p] = value & 255;
+		}
+	}
+	,setInt32: function(byteOffset,value,littleEndian) {
+		this.setUint32(byteOffset,value,littleEndian);
+	}
+	,setUint32: function(byteOffset,value,littleEndian) {
+		var p = byteOffset + this.offset;
+		if(littleEndian) {
+			this.buf.a[p++] = value & 255;
+			this.buf.a[p++] = value >> 8 & 255;
+			this.buf.a[p++] = value >> 16 & 255;
+			this.buf.a[p++] = value >>> 24;
+		} else {
+			this.buf.a[p++] = value >>> 24;
+			this.buf.a[p++] = value >> 16 & 255;
+			this.buf.a[p++] = value >> 8 & 255;
+			this.buf.a[p++] = value & 255;
+		}
+	}
+	,setFloat32: function(byteOffset,value,littleEndian) {
+		this.setUint32(byteOffset,haxe.io.FPHelper.floatToI32(value),littleEndian);
+	}
+	,setFloat64: function(byteOffset,value,littleEndian) {
+		var i64 = haxe.io.FPHelper.doubleToI64(value);
+		if(littleEndian) {
+			this.setUint32(byteOffset,i64.low);
+			this.setUint32(byteOffset,i64.high);
+		} else {
+			this.setUint32(byteOffset,i64.high);
+			this.setUint32(byteOffset,i64.low);
+		}
+	}
+	,__class__: js.html.compat.DataView
 };
 js.html.compat.Float32Array = function() { };
 js.html.compat.Float32Array.__name__ = ["js","html","compat","Float32Array"];
@@ -23053,6 +31088,23 @@ system._Boolean.Boolean_Impl_.ToString = function(this1) {
 system._Boolean.Boolean_Impl_.not = function(this1) {
 	return !this1;
 };
+system._Boolean.Boolean_Impl_.and = function(lhs,rhs) {
+	if(lhs) {
+		return rhs;
+	} else {
+		return false;
+	}
+};
+system._Boolean.Boolean_Impl_.or = function(lhs,rhs) {
+	if(!lhs) {
+		return rhs;
+	} else {
+		return true;
+	}
+};
+system._Boolean.Boolean_Impl_.xor = function(lhs,rhs) {
+	return lhs != rhs;
+};
 system._Byte = {};
 system._Byte.Byte_Impl_ = {};
 system._Byte.Byte_Impl_.__name__ = ["system","_Byte","Byte_Impl_"];
@@ -23104,8 +31156,7 @@ system._Byte.Byte_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
 	return this1;
 };
 system._Byte.Byte_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 system._Byte.Byte_Impl_.GetHashCode = function(this1) {
 	return this1;
@@ -23366,12 +31417,465 @@ system._Char.Char_Impl_.neq17 = function(lhs,rhs) {
 	var this1 = system.Convert.ToUInt16(HxOverrides.cca(rhs,0));
 	return lhs != this1;
 };
+system.Convert = function() { };
+system.Convert.__name__ = ["system","Convert"];
+system.Convert.ToInt8 = function(v) {
+	system.Convert._int32Buffer[0] = v;
+	return system.Convert._int8Buffer[0];
+};
+system.Convert.ToUInt8 = function(v) {
+	system.Convert._int32Buffer[0] = v;
+	return system.Convert._uint8Buffer[0];
+};
+system.Convert.ToInt16 = function(v) {
+	system.Convert._int32Buffer[0] = v;
+	return system.Convert._int16Buffer[0];
+};
+system.Convert.ToUInt16 = function(v) {
+	system.Convert._int32Buffer[0] = v;
+	return system.Convert._uint16Buffer[0];
+};
+system.Convert.ToUInt32 = function(v) {
+	system.Convert._int32Buffer[0] = v;
+	return system.Convert._uint32Buffer[0];
+};
+system.Convert.ToInt64 = function(v) {
+	return v;
+};
+system.Convert.ToUInt64 = function(v) {
+	return system.Convert.ToUInt32(v);
+};
+system.Convert.ToInt32 = function(v) {
+	system.Convert._uint32Buffer[0] = v;
+	return system.Convert._int32Buffer[0];
+};
+system.Convert.ToHashCode_Single = function(v) {
+	system.Convert._float32Buffer[0] = v;
+	return system.Convert._int32Buffer[0];
+};
+system.Convert.ToHashCode_Double = function(v) {
+	system.Convert._float64Buffer[0] = v;
+	return system.Convert._int32Buffer[0] ^ system.Convert._int32Buffer[1];
+};
+system.Convert.ToBoolean_Byte = function(v) {
+	return v != 0;
+};
+system.Convert.ToChar_Byte = function(v) {
+	return v;
+};
+system.Convert.ToSByte_Byte = function(v) {
+	return system.Convert.ToInt8(v);
+};
+system.Convert.ToByte_Byte = function(v) {
+	return v;
+};
+system.Convert.ToInt16_Byte = function(v) {
+	return v;
+};
+system.Convert.ToUInt16_Byte = function(v) {
+	return v;
+};
+system.Convert.ToInt32_Byte = function(v) {
+	return v;
+};
+system.Convert.ToUInt32_Byte = function(v) {
+	return v;
+};
+system.Convert.ToInt64_Byte = function(v) {
+	return v;
+};
+system.Convert.ToUInt64_Byte = function(v) {
+	return v;
+};
+system.Convert.ToSingle_Byte = function(v) {
+	return v;
+};
+system.Convert.ToDouble_Byte = function(v) {
+	return v;
+};
+system.Convert.ToBoolean_Char = function(v) {
+	throw new js._Boot.HaxeError(new system.InvalidCastException("cannot cast system.Char to system.Boolean"));
+};
+system.Convert.ToChar_Char = function(v) {
+	return v;
+};
+system.Convert.ToByte_Char = function(v) {
+	return system.Convert.ToUInt8(v);
+};
+system.Convert.ToSByte_Char = function(v) {
+	return system.Convert.ToInt8(v);
+};
+system.Convert.ToInt16_Char = function(v) {
+	return system.Convert.ToInt16(v);
+};
+system.Convert.ToUInt16_Char = function(v) {
+	return v;
+};
+system.Convert.ToInt32_Char = function(v) {
+	return v;
+};
+system.Convert.ToUInt32_Char = function(v) {
+	return v;
+};
+system.Convert.ToInt64_Char = function(v) {
+	return v;
+};
+system.Convert.ToUInt64_Char = function(v) {
+	return v;
+};
+system.Convert.ToSingle_Char = function(v) {
+	throw new js._Boot.HaxeError(new system.InvalidCastException("cannot cast system.Char to system.Single"));
+};
+system.Convert.ToDouble_Char = function(v) {
+	throw new js._Boot.HaxeError(new system.InvalidCastException("cannot cast system.Char to system.Double"));
+};
+system.Convert.ToBoolean_Double = function(v) {
+	return v != 0;
+};
+system.Convert.ToChar_Double = function(v) {
+	throw new js._Boot.HaxeError(new system.InvalidCastException("cannot cast system.Double to system.Char"));
+};
+system.Convert.ToByte_Double = function(v) {
+	return system.Convert.ToUInt8(system.Convert.ToInt32_Double(v));
+};
+system.Convert.ToSByte_Double = function(v) {
+	return system.Convert.ToInt8(system.Convert.ToInt32_Double(v));
+};
+system.Convert.ToInt16_Double = function(v) {
+	return system.Convert.ToInt16(system.Convert.ToInt32_Double(v));
+};
+system.Convert.ToUInt16_Double = function(v) {
+	return system.Convert.ToUInt16(system.Convert.ToInt32_Double(v));
+};
+system.Convert.ToInt32_Double = function(v) {
+	if(v >= 0) {
+		if(v < 2147483647.5) {
+			return v | 0;
+		}
+	} else if(v >= -2147483648.5) {
+		return v | 0;
+	}
+	throw new js._Boot.HaxeError(new system.OverflowException("Value was either too large or too small for a Int32."));
+};
+system.Convert.ToUInt32_Double = function(v) {
+	return system.Convert.ToUInt32(system.Convert.ToInt32_Double(v));
+};
+system.Convert.ToInt64_Double = function(v) {
+	return v | 0;
+};
+system.Convert.ToUInt64_Double = function(v) {
+	return system.Convert.ToInt64(v | 0);
+};
+system.Convert.ToSingle_Double = function(v) {
+	return v;
+};
+system.Convert.ToDouble_Double = function(v) {
+	return v;
+};
+system.Convert.ToBoolean_Int16 = function(v) {
+	return v != 0;
+};
+system.Convert.ToChar_Int16 = function(v) {
+	return system.Convert.ToUInt16(v);
+};
+system.Convert.ToSByte_Int16 = function(v) {
+	return system.Convert.ToInt8(v);
+};
+system.Convert.ToByte_Int16 = function(v) {
+	return system.Convert.ToUInt8(v);
+};
+system.Convert.ToInt16_Int16 = function(v) {
+	return v;
+};
+system.Convert.ToUInt16_Int16 = function(v) {
+	return system.Convert.ToUInt16(v);
+};
+system.Convert.ToInt32_Int16 = function(v) {
+	return v;
+};
+system.Convert.ToUInt32_Int16 = function(v) {
+	return system.Convert.ToUInt32(v);
+};
+system.Convert.ToInt64_Int16 = function(v) {
+	return v;
+};
+system.Convert.ToUInt64_Int16 = function(v) {
+	return system.Convert.ToUInt32(v);
+};
+system.Convert.ToSingle_Int16 = function(v) {
+	return v;
+};
+system.Convert.ToDouble_Int16 = function(v) {
+	return v;
+};
+system.Convert.ToBoolean_Int32 = function(v) {
+	return v != 0;
+};
+system.Convert.ToChar_Int32 = function(v) {
+	return system.Convert.ToUInt16(v);
+};
+system.Convert.ToSByte_Int32 = function(v) {
+	return system.Convert.ToInt8(v);
+};
+system.Convert.ToByte_Int32 = function(v) {
+	return system.Convert.ToUInt8(v);
+};
+system.Convert.ToInt16_Int32 = function(v) {
+	return system.Convert.ToInt16(v);
+};
+system.Convert.ToUInt16_Int32 = function(v) {
+	return system.Convert.ToUInt16(v);
+};
+system.Convert.ToInt32_Int32 = function(v) {
+	return v;
+};
+system.Convert.ToUInt32_Int32 = function(v) {
+	return system.Convert.ToUInt32(v);
+};
+system.Convert.ToInt64_Int32 = function(v) {
+	return v;
+};
+system.Convert.ToUInt64_Int32 = function(v) {
+	return system.Convert.ToUInt32(v);
+};
+system.Convert.ToSingle_Int32 = function(v) {
+	return v;
+};
+system.Convert.ToDouble_Int32 = function(v) {
+	return v;
+};
+system.Convert.ToBoolean_Int64 = function(v) {
+	return v != 0;
+};
+system.Convert.ToChar_Int64 = function(v) {
+	return system.Convert.ToUInt16(v);
+};
+system.Convert.ToSByte_Int64 = function(v) {
+	return system.Convert.ToInt8(v);
+};
+system.Convert.ToByte_Int64 = function(v) {
+	return system.Convert.ToUInt8(v);
+};
+system.Convert.ToInt16_Int64 = function(v) {
+	return system.Convert.ToInt16(v);
+};
+system.Convert.ToUInt16_Int64 = function(v) {
+	return system.Convert.ToUInt16(v);
+};
+system.Convert.ToInt32_Int64 = function(v) {
+	return system.Convert.ToInt32(v);
+};
+system.Convert.ToUInt32_Int64 = function(v) {
+	return system.Convert.ToUInt32(v);
+};
+system.Convert.ToInt64_Int64 = function(v) {
+	return v;
+};
+system.Convert.ToUInt64_Int64 = function(v) {
+	return system.Convert.ToUInt32(v);
+};
+system.Convert.ToSingle_Int64 = function(v) {
+	return v;
+};
+system.Convert.ToDouble_Int64 = function(v) {
+	return v;
+};
+system.Convert.ToBoolean_SByte = function(v) {
+	return v != 0;
+};
+system.Convert.ToChar_SByte = function(v) {
+	return system.Convert.ToUInt16(v);
+};
+system.Convert.ToSByte_SByte = function(v) {
+	return v;
+};
+system.Convert.ToByte_SByte = function(v) {
+	return system.Convert.ToUInt8(v);
+};
+system.Convert.ToInt16_SByte = function(v) {
+	return v;
+};
+system.Convert.ToUInt16_SByte = function(v) {
+	return system.Convert.ToUInt16(v);
+};
+system.Convert.ToInt32_SByte = function(v) {
+	return v;
+};
+system.Convert.ToUInt32_SByte = function(v) {
+	return system.Convert.ToUInt32(v);
+};
+system.Convert.ToInt64_SByte = function(v) {
+	return v;
+};
+system.Convert.ToUInt64_SByte = function(v) {
+	return system.Convert.ToUInt32(v);
+};
+system.Convert.ToSingle_SByte = function(v) {
+	return v;
+};
+system.Convert.ToDouble_SByte = function(v) {
+	return v;
+};
+system.Convert.ToBoolean_Single = function(v) {
+	return v != 0;
+};
+system.Convert.ToChar_Single = function(v) {
+	throw new js._Boot.HaxeError(new system.InvalidCastException("cannot cast system.Single to system.Char"));
+};
+system.Convert.ToByte_Single = function(v) {
+	return system.Convert.ToUInt8(system.Convert.ToInt32_Single(v));
+};
+system.Convert.ToSByte_Single = function(v) {
+	return system.Convert.ToInt8(system.Convert.ToInt32_Single(v));
+};
+system.Convert.ToInt16_Single = function(v) {
+	return system.Convert.ToInt16(system.Convert.ToInt32_Single(v));
+};
+system.Convert.ToUInt16_Single = function(v) {
+	return system.Convert.ToUInt16(system.Convert.ToInt32_Single(v));
+};
+system.Convert.ToInt32_Single = function(v) {
+	var this1 = v;
+	return system.Convert.ToInt32_Double(this1);
+};
+system.Convert.ToUInt32_Single = function(v) {
+	return system.Convert.ToUInt32(system.Convert.ToInt32_Single(v));
+};
+system.Convert.ToInt64_Single = function(v) {
+	return v | 0;
+};
+system.Convert.ToUInt64_Single = function(v) {
+	return system.Convert.ToInt64(v | 0);
+};
+system.Convert.ToSingle_Single = function(v) {
+	return v;
+};
+system.Convert.ToDouble_Single = function(v) {
+	return v;
+};
+system.Convert.ToBoolean_UInt16 = function(v) {
+	return v != 0;
+};
+system.Convert.ToChar_UInt16 = function(v) {
+	return v;
+};
+system.Convert.ToSByte_UInt16 = function(v) {
+	return system.Convert.ToInt8(v);
+};
+system.Convert.ToByte_UInt16 = function(v) {
+	return system.Convert.ToUInt8(v);
+};
+system.Convert.ToInt16_UInt16 = function(v) {
+	return system.Convert.ToInt16(v);
+};
+system.Convert.ToUInt16_UInt16 = function(v) {
+	return v;
+};
+system.Convert.ToInt32_UInt16 = function(v) {
+	return v;
+};
+system.Convert.ToUInt32_UInt16 = function(v) {
+	return v;
+};
+system.Convert.ToInt64_UInt16 = function(v) {
+	return v;
+};
+system.Convert.ToUInt64_UInt16 = function(v) {
+	return v;
+};
+system.Convert.ToSingle_UInt16 = function(v) {
+	return v;
+};
+system.Convert.ToDouble_UInt16 = function(v) {
+	return v;
+};
+system.Convert.ToBoolean_UInt32 = function(v) {
+	return v != 0;
+};
+system.Convert.ToChar_UInt32 = function(v) {
+	return system.Convert.ToUInt16(v);
+};
+system.Convert.ToSByte_UInt32 = function(v) {
+	return system.Convert.ToInt8(v);
+};
+system.Convert.ToByte_UInt32 = function(v) {
+	return system.Convert.ToUInt8(v);
+};
+system.Convert.ToInt16_UInt32 = function(v) {
+	return system.Convert.ToInt16(v);
+};
+system.Convert.ToUInt16_UInt32 = function(v) {
+	return system.Convert.ToUInt16(v);
+};
+system.Convert.ToInt32_UInt32 = function(v) {
+	return system.Convert.ToInt32(v);
+};
+system.Convert.ToUInt32_UInt32 = function(v) {
+	return v;
+};
+system.Convert.ToInt64_UInt32 = function(v) {
+	return v;
+};
+system.Convert.ToUInt64_UInt32 = function(v) {
+	return v;
+};
+system.Convert.ToSingle_UInt32 = function(v) {
+	return v;
+};
+system.Convert.ToDouble_UInt32 = function(v) {
+	return v;
+};
+system.Convert.ToBoolean_UInt64 = function(v) {
+	return v != 0;
+};
+system.Convert.ToChar_UInt64 = function(v) {
+	return system.Convert.ToUInt16(v);
+};
+system.Convert.ToSByte_UInt64 = function(v) {
+	return system.Convert.ToInt8(v);
+};
+system.Convert.ToByte_UInt64 = function(v) {
+	return system.Convert.ToUInt8(v);
+};
+system.Convert.ToInt16_UInt64 = function(v) {
+	return system.Convert.ToInt16(v);
+};
+system.Convert.ToUInt16_UInt64 = function(v) {
+	return system.Convert.ToUInt16(v);
+};
+system.Convert.ToInt32_UInt64 = function(v) {
+	return system.Convert.ToInt32(v);
+};
+system.Convert.ToUInt32_UInt64 = function(v) {
+	return system.Convert.ToUInt32(v);
+};
+system.Convert.ToInt64_UInt64 = function(v) {
+	return system.Convert.ToInt32(v);
+};
+system.Convert.ToUInt64_UInt64 = function(v) {
+	return v;
+};
+system.Convert.ToSingle_UInt64 = function(v) {
+	return v;
+};
+system.Convert.ToDouble_UInt64 = function(v) {
+	return v;
+};
 system.CsMath = function() { };
 system.CsMath.__name__ = ["system","CsMath"];
+system.CsMath.Min_Byte_Byte = function(a,b) {
+	return Math.min(a,b);
+};
 system.CsMath.Min_Int32_Int32 = function(a,b) {
 	return Math.min(a,b);
 };
+system.CsMath.Min_Double_Double = function(a,b) {
+	return Math.min(a,b);
+};
 system.CsMath.Max_Int32_Int32 = function(a,b) {
+	return Math.max(a,b);
+};
+system.CsMath.Max_Byte_Byte = function(a,b) {
 	return Math.max(a,b);
 };
 system.CsMath.Min_Int64_Int64 = function(a,b) {
@@ -23384,6 +31888,9 @@ system.CsMath.Min_Int64_Int64 = function(a,b) {
 system.CsMath.Max_Single_Single = function(a,b) {
 	return Math.max(a,b);
 };
+system.CsMath.Max_Double_Double = function(a,b) {
+	return Math.max(a,b);
+};
 system.CsMath.Min_Single_Single = function(a,b) {
 	return Math.min(a,b);
 };
@@ -23394,14 +31901,16 @@ system.CsMath.Abs_Int32 = function(a) {
 	return Math.abs(a);
 };
 system.CsMath.Round_Double = function(a) {
-	var this1 = Math.round(a);
-	return this1;
+	return Math.round(a);
 };
 system.CsMath.Round_Single = function(a) {
 	return Math.round(a);
 };
 system.CsMath.Sin = function(a) {
 	return Math.sin(a);
+};
+system.CsMath.Cos = function(a) {
+	return Math.cos(a);
 };
 system.CsMath.Pow = function(v,exp) {
 	return Math.pow(v,exp);
@@ -23410,11 +31919,40 @@ system.CsMath.Ceiling_Single = function(v) {
 	return Math.ceil(v);
 };
 system.CsMath.Ceiling_Double = function(v) {
-	var this1 = Math.ceil(v);
-	return this1;
+	return Math.ceil(v);
+};
+system.CsMath.Floor_Single = function(v) {
+	return Math.floor(v);
+};
+system.CsMath.Floor_Double = function(v) {
+	return Math.floor(v);
+};
+system.CsMath.Sign_Single = function(v) {
+	return Math.floor(v);
+};
+system.CsMath.Sign_Double = function(v) {
+	if(v < 0) {
+		return -1;
+	} else if(v > 0) {
+		return 1;
+	} else {
+		return 0;
+	}
+};
+system.CsMath.Log_Double_Double = function(a,newBase) {
+	return Math.log(a) / Math.log(newBase);
+};
+system.CsMath.Log10 = function(a) {
+	return Math.log(a) / Math.log(10);
+};
+system.CsMath.Abs_Double = function(v) {
+	return Math.abs(v);
 };
 system.CsMath.Sqrt = function(v) {
 	return Math.sqrt(v);
+};
+system.CsMath.Exp = function(v) {
+	return Math.exp(v);
 };
 system._CsString = {};
 system._CsString.CsString_Impl_ = {};
@@ -23859,6 +32397,38 @@ system._Double.Double_Impl_.FromInt = function(i) {
 	var this1 = i;
 	return this1;
 };
+system._Double.Double_Impl_.FromByte = function(i) {
+	var this1 = i;
+	return this1;
+};
+system._Double.Double_Impl_.FromInt16 = function(i) {
+	var this1 = i;
+	return this1;
+};
+system._Double.Double_Impl_.FromInt32 = function(i) {
+	var this1 = i;
+	return this1;
+};
+system._Double.Double_Impl_.FromInt64 = function(i) {
+	var this1 = i;
+	return this1;
+};
+system._Double.Double_Impl_.FromSByte = function(i) {
+	var this1 = i;
+	return this1;
+};
+system._Double.Double_Impl_.FromUInt16 = function(i) {
+	var this1 = i;
+	return this1;
+};
+system._Double.Double_Impl_.FromUInt32 = function(i) {
+	var this1 = i;
+	return this1;
+};
+system._Double.Double_Impl_.FromUInt64 = function(i) {
+	var this1 = i;
+	return this1;
+};
 system._Double.Double_Impl_.FromSingle = function(i) {
 	var this1 = i;
 	return this1;
@@ -24103,6 +32673,10 @@ system._FixedArray.FixedArray_Impl_.empty = function(size) {
 	var this1 = new Array(size);
 	return this1;
 };
+system._FixedArray.FixedArray_Impl_.empty2 = function(size) {
+	var this1 = new Array(size);
+	return this1;
+};
 system.FormatException = function() {
 	system.Exception.call(this);
 };
@@ -24115,16 +32689,86 @@ system.FormatException.prototype = $extend(system.Exception.prototype,{
 	}
 	,__class__: system.FormatException
 });
-system.HaxeExtensions = function() { };
-system.HaxeExtensions.__name__ = ["system","HaxeExtensions"];
-system.HaxeExtensions.ToHaxeString = function(s) {
+system.StringExtensions = function() { };
+system.StringExtensions.__name__ = ["system","StringExtensions"];
+system.StringExtensions.ToHaxeString = function(s) {
 	return s;
 };
-system.HaxeExtensions.ToHaxeInt = function(i) {
+system.IntExtensions = function() { };
+system.IntExtensions.__name__ = ["system","IntExtensions"];
+system.IntExtensions.ToHaxeInt = function(i) {
 	return i;
 };
-system.HaxeExtensions.ToHaxeFloat = function(f) {
+system.IntExtensions.ToChar_IFormatProvider = function(i,provider) {
+	return i;
+};
+system.IntExtensions.ToSByte_IFormatProvider = function(i,provider) {
+	return i;
+};
+system.IntExtensions.ToByte_IFormatProvider = function(i,provider) {
+	return i;
+};
+system.IntExtensions.ToInt16_IFormatProvider = function(i,provider) {
+	return i;
+};
+system.IntExtensions.ToUInt16_IFormatProvider = function(i,provider) {
+	return i;
+};
+system.IntExtensions.ToInt32_IFormatProvider = function(i,provider) {
+	return i;
+};
+system.IntExtensions.ToUInt32_IFormatProvider = function(i,provider) {
+	return i;
+};
+system.IntExtensions.ToInt64_IFormatProvider = function(i,provider) {
+	return i;
+};
+system.IntExtensions.ToUInt64_IFormatProvider = function(i,provider) {
+	return i;
+};
+system.IntExtensions.ToSingle_IFormatProvider = function(i,provider) {
+	return i;
+};
+system.IntExtensions.ToDouble_IFormatProvider = function(i,provider) {
+	return i;
+};
+system.FloatExtensions = function() { };
+system.FloatExtensions.__name__ = ["system","FloatExtensions"];
+system.FloatExtensions.ToHaxeFloat = function(f) {
 	return f;
+};
+system.FloatExtensions.ToChar_IFormatProvider = function(i,provider) {
+	return i | 0;
+};
+system.FloatExtensions.ToSByte_IFormatProvider = function(i,provider) {
+	return i | 0;
+};
+system.FloatExtensions.ToByte_IFormatProvider = function(i,provider) {
+	return i | 0;
+};
+system.FloatExtensions.ToInt16_IFormatProvider = function(i,provider) {
+	return i | 0;
+};
+system.FloatExtensions.ToUInt16_IFormatProvider = function(i,provider) {
+	return i | 0;
+};
+system.FloatExtensions.ToInt32_IFormatProvider = function(i,provider) {
+	return i | 0;
+};
+system.FloatExtensions.ToUInt32_IFormatProvider = function(i,provider) {
+	return i | 0;
+};
+system.FloatExtensions.ToInt64_IFormatProvider = function(i,provider) {
+	return i | 0;
+};
+system.FloatExtensions.ToUInt64_IFormatProvider = function(i,provider) {
+	return i | 0;
+};
+system.FloatExtensions.ToSingle_IFormatProvider = function(i,provider) {
+	return i | 0;
+};
+system.FloatExtensions.ToDouble_IFormatProvider = function(i,provider) {
+	return i | 0;
 };
 system.IFormatProvider = function() { };
 system.IFormatProvider.__name__ = ["system","IFormatProvider"];
@@ -24183,8 +32827,7 @@ system._Int16.Int16_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
 	return this1;
 };
 system._Int16.Int16_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 system._Int16.Int16_Impl_.GetHashCode = function(this1) {
 	return this1 | this1 << 16;
@@ -24221,6 +32864,85 @@ system._Int16.Int16_Impl_.add16 = function(lhs,rhs) {
 };
 system._Int16.Int16_Impl_.add17 = function(lhs,rhs) {
 	return Std.string(lhs) + rhs;
+};
+system._Int16Array = {};
+system._Int16Array.Int16Array_Impl_ = {};
+system._Int16Array.Int16Array_Impl_.__name__ = ["system","_Int16Array","Int16Array_Impl_"];
+system._Int16Array.Int16Array_Impl_._new = function(length) {
+	var this1 = new Int16Array(length);
+	return this1;
+};
+system._Int16Array.Int16Array_Impl_.fromArray = function(a) {
+	return new Int16Array(a);
+};
+system._Int16Array.Int16Array_Impl_.fromFixedArray = function(a) {
+	return new Int16Array(a);
+};
+system._Int16Array.Int16Array_Impl_.get_Length = function(this1) {
+	return this1.length;
+};
+system._Int16Array.Int16Array_Impl_.get = function(this1,index) {
+	return this1[index];
+};
+system._Int16Array.Int16Array_Impl_.set = function(this1,index,val) {
+	return this1[index] = val;
+};
+system._Int16Array.Int16Array_Impl_.iterator = function(this1) {
+	return new system.Int16ArrayIterator(this1);
+};
+system._Int16Array.Int16Array_Impl_.ToEnumerable = function(this1) {
+	return new system.Int16ArrayEnumerable(this1);
+};
+system._Int16Array.Int16Array_Impl_.empty = function(size) {
+	var this1 = new Int16Array(size);
+	return this1;
+};
+system.Int16ArrayEnumerable = function(array) {
+	this._array = array;
+};
+system.Int16ArrayEnumerable.__name__ = ["system","Int16ArrayEnumerable"];
+system.Int16ArrayEnumerable.__interfaces__ = [system.collections.generic.IEnumerable];
+system.Int16ArrayEnumerable.prototype = {
+	GetEnumerator: function() {
+		return new system.Int16ArrayEnumerator(this._array);
+	}
+	,__class__: system.Int16ArrayEnumerable
+};
+system.Int16ArrayEnumerator = function(array) {
+	this._array = array;
+	this._i = -1;
+};
+system.Int16ArrayEnumerator.__name__ = ["system","Int16ArrayEnumerator"];
+system.Int16ArrayEnumerator.__interfaces__ = [system.collections.generic.IEnumerator];
+system.Int16ArrayEnumerator.prototype = {
+	get_Current: function() {
+		return this._array[this._i];
+	}
+	,MoveNext: function() {
+		if(this._i >= this._array.length - 1) {
+			return false;
+		}
+		this._i++;
+		return true;
+	}
+	,Reset: function() {
+		this._i = -1;
+	}
+	,__class__: system.Int16ArrayEnumerator
+};
+system.Int16ArrayIterator = function(array) {
+	this._array = array;
+	this._i = 0;
+};
+system.Int16ArrayIterator.__name__ = ["system","Int16ArrayIterator"];
+system.Int16ArrayIterator.prototype = {
+	hasNext: function() {
+		return this._i < this._array.length;
+	}
+	,next: function() {
+		return this._array[this._i++];
+	}
+	,__class__: system.Int16ArrayIterator
 };
 system._Int32 = {};
 system._Int32.Int32_Impl_ = {};
@@ -24289,8 +33011,7 @@ system._Int32.Int32_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
 	return this1;
 };
 system._Int32.Int32_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 system._Int32.Int32_Impl_.GetHashCode = function(this1) {
 	return this1;
@@ -24479,8 +33200,7 @@ system._Int64.Int64_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
 	return this1;
 };
 system._Int64.Int64_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 system._Int64.Int64_Impl_.GetHashCode = function(this1) {
 	return this1;
@@ -24625,8 +33345,7 @@ system._SByte.SByte_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
 	return this1;
 };
 system._SByte.SByte_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 system._SByte.SByte_Impl_.GetHashCode = function(this1) {
 	return this1 ^ this1 << 8;
@@ -24671,7 +33390,39 @@ system._Single.Single_Impl_._new = function(i) {
 	var this1 = i;
 	return this1;
 };
+system._Single.Single_Impl_.FromInt = function(i) {
+	var this1 = i;
+	return this1;
+};
+system._Single.Single_Impl_.FromByte = function(i) {
+	var this1 = i;
+	return this1;
+};
+system._Single.Single_Impl_.FromInt16 = function(i) {
+	var this1 = i;
+	return this1;
+};
 system._Single.Single_Impl_.FromInt32 = function(i) {
+	var this1 = i;
+	return this1;
+};
+system._Single.Single_Impl_.FromInt64 = function(i) {
+	var this1 = i;
+	return this1;
+};
+system._Single.Single_Impl_.FromSByte = function(i) {
+	var this1 = i;
+	return this1;
+};
+system._Single.Single_Impl_.FromUInt16 = function(i) {
+	var this1 = i;
+	return this1;
+};
+system._Single.Single_Impl_.FromUInt32 = function(i) {
+	var this1 = i;
+	return this1;
+};
+system._Single.Single_Impl_.FromUInt64 = function(i) {
 	var this1 = i;
 	return this1;
 };
@@ -24875,8 +33626,7 @@ system._UInt16.UInt16_Impl_.ToSingle_IFormatProvider = function(this1,provider) 
 	return this1;
 };
 system._UInt16.UInt16_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 system._UInt16.UInt16_Impl_.GetHashCode = function(this1) {
 	return this1;
@@ -24965,8 +33715,7 @@ system._UInt32.UInt32_Impl_.ToSingle_IFormatProvider = function(this1,provider) 
 	return this1;
 };
 system._UInt32.UInt32_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 system._UInt32.UInt32_Impl_.GetHashCode = function(this1) {
 	return this1;
@@ -25055,8 +33804,7 @@ system._UInt64.UInt64_Impl_.ToSingle_IFormatProvider = function(this1,provider) 
 	return this1;
 };
 system._UInt64.UInt64_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	var this2 = this1;
-	return this2;
+	return this1;
 };
 system._UInt64.UInt64_Impl_.GetHashCode = function(this1) {
 	return this1;
@@ -25131,20 +33879,16 @@ var Bool = Boolean;
 Bool.__ename__ = ["Bool"];
 var Class = { __name__ : ["Class"]};
 var Enum = { };
-alphaTab.util.Logger.LogLevel = null;
-alphaTab.util.Logger.LogLevel = 2;
-alphaTab.Environment.ScriptFile = null;
-alphaTab.Environment.IsFontLoaded = false;
-alphaTab.Environment.RenderEngines = null;
-alphaTab.Environment.LayoutEngines = null;
-alphaTab.Environment.StaveProfiles = null;
-alphaTab.Environment.Init();
 alphaTab.model.Tuning._sevenStrings = null;
 alphaTab.model.Tuning._sixStrings = null;
 alphaTab.model.Tuning._fiveStrings = null;
 alphaTab.model.Tuning._fourStrings = null;
 alphaTab.model.Tuning._defaultTunings = null;
 alphaTab.model.Tuning.Initialize();
+alphaTab.platform.javaScript.AlphaSynthFlashOutput.Lookup = null;
+alphaTab.platform.javaScript.AlphaSynthFlashOutput.NextId = 0;
+var this1 = {}
+alphaTab.platform.javaScript.AlphaSynthFlashOutput.Lookup = this1;
 alphaTab.rendering.glyphs.ScoreBeatGlyph.NormalKeys = null;
 alphaTab.rendering.glyphs.ScoreBeatGlyph.XKeys = null;
 var this1 = {}
@@ -25163,6 +33907,8 @@ while(i1 < xKeyNotes.length) {
 	alphaTab.rendering.glyphs.ScoreBeatGlyph.XKeys[xKeyNotes[i1]] = true;
 	++i1;
 }
+alphaTab.util.Logger.LogLevel = null;
+alphaTab.util.Logger.LogLevel = 2;
 alphaTab.xml.XmlParser.Escapes = null;
 var this1 = {}
 alphaTab.xml.XmlParser.Escapes = this1;
@@ -25175,25 +33921,283 @@ var ArrayBuffer = $global.ArrayBuffer || js.html.compat.ArrayBuffer;
 if(ArrayBuffer.prototype.slice == null) {
 	ArrayBuffer.prototype.slice = js.html.compat.ArrayBuffer.sliceImpl;
 }
+var DataView = $global.DataView || js.html.compat.DataView;
 var Float32Array = $global.Float32Array || js.html.compat.Float32Array._new;
 var Float64Array = $global.Float64Array || ($global.Float32Array ? "notsupported" : null) || js.html.compat.Float64Array._new;
 var Uint8Array = $global.Uint8Array || js.html.compat.Uint8Array._new;
-alphaTab.platform.svg.SvgCanvas.BlurCorrection = 0;
-alphaTab.platform.model.Color.BlackRgb = "#000000";
-system.Convert._conversionBuffer = new ArrayBuffer(8);
-system.Convert._int8Buffer = new Int8Array(system.Convert._conversionBuffer);
-system.Convert._uint8Buffer = new Uint8Array(system.Convert._conversionBuffer);
-system.Convert._int16Buffer = new Int16Array(system.Convert._conversionBuffer);
-system.Convert._uint16Buffer = new Uint16Array(system.Convert._conversionBuffer);
-system.Convert._int32Buffer = new Int32Array(system.Convert._conversionBuffer);
-system.Convert._uint32Buffer = new Uint32Array(system.Convert._conversionBuffer);
-system.Convert._float32Buffer = new Float32Array(system.Convert._conversionBuffer);
-system.Convert._float64Buffer = new Float64Array(system.Convert._conversionBuffer);
-js.Boot.__toStr = ({ }).toString;
-alphaTab.rendering.layout.PageViewLayout.PagePadding = new Float32Array([40,40,40,40]);
-alphaTab.rendering.layout.PageViewLayout.GroupSpacing = 20;
-alphaTab.rendering.layout.HorizontalScreenLayout.PagePadding = new Float32Array([20,20,20,20]);
-alphaTab.rendering.layout.HorizontalScreenLayout.GroupSpacing = 20;
+alphaSynth._PlayerState.PlayerState_Impl_.Paused = 0;
+alphaSynth._PlayerState.PlayerState_Impl_.Playing = 1;
+alphaSynth.bank.PatchBank.DrumBank = 128;
+alphaSynth.bank.PatchBank.BankSize = 128;
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.Delay = 0;
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.Attack = 1;
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.Hold = 2;
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.Decay = 3;
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.Sustain = 4;
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.Release = 5;
+alphaSynth.bank.components._EnvelopeState.EnvelopeState_Impl_.None = 6;
+alphaSynth.bank.components._FilterType.FilterType_Impl_.None = 0;
+alphaSynth.bank.components._FilterType.FilterType_Impl_.BiquadLowpass = 1;
+alphaSynth.bank.components._FilterType.FilterType_Impl_.BiquadHighpass = 2;
+alphaSynth.bank.components._FilterType.FilterType_Impl_.OnePoleLowpass = 3;
+alphaSynth.bank.components._LfoState.LfoState_Impl_.Delay = 0;
+alphaSynth.bank.components._LfoState.LfoState_Impl_.Sustain = 1;
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.Neg3dBCenter = 0;
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.Neg6dBCenter = 1;
+alphaSynth.bank.components._PanFormulaEnum.PanFormulaEnum_Impl_.ZeroCenter = 2;
+alphaSynth.bank.components.generators.DefaultGenerators.DefaultSine = new alphaSynth.bank.components.generators.SineGenerator(new alphaSynth.bank.descriptors.GeneratorDescriptor());
+alphaSynth.bank.components.generators.DefaultGenerators.DefaultSaw = new alphaSynth.bank.components.generators.SawGenerator(new alphaSynth.bank.descriptors.GeneratorDescriptor());
+alphaSynth.bank.components.generators.DefaultGenerators.DefaultSquare = new alphaSynth.bank.components.generators.SquareGenerator(new alphaSynth.bank.descriptors.GeneratorDescriptor());
+alphaSynth.bank.components.generators.DefaultGenerators.DefaultTriangle = new alphaSynth.bank.components.generators.TriangleGenerator(new alphaSynth.bank.descriptors.GeneratorDescriptor());
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.PreLoop = 0;
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.Loop = 1;
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.PostLoop = 2;
+alphaSynth.bank.components.generators._GeneratorState.GeneratorState_Impl_.Finished = 3;
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.None = 0;
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.Linear = 1;
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.Cosine = 2;
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.CubicSpline = 3;
+alphaSynth.bank.components.generators._Interpolation.Interpolation_Impl_.Sinc = 4;
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.NoLoop = 0;
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.OneShot = 1;
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.Continuous = 2;
+alphaSynth.bank.components.generators._LoopMode.LoopMode_Impl_.LoopUntilNoteOff = 3;
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.Sine = 0;
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.Square = 1;
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.Saw = 2;
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.Triangle = 3;
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.SampleData = 4;
+alphaSynth.bank.descriptors._Waveform.Waveform_Impl_.WhiteNoise = 5;
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.ChannelKeyVelocity = 0;
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.ChannelKey = 1;
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.KeyVelocity = 2;
+alphaSynth.bank.patch._IntervalType.IntervalType_Impl_.Key = 3;
+alphaSynth.midi.MidiHelper.MicroSecondsPerMinute = 60000000;
+alphaSynth.midi.MidiHelper.MinChannel = 0;
+alphaSynth.midi.MidiHelper.MaxChannel = 15;
+alphaSynth.midi.MidiHelper.DrumChannel = 9;
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_.TicksPerBeat = 0;
+alphaSynth.midi._MidiTimeFormat.MidiTimeFormat_Impl_.FramesPerSecond = 1;
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.SingleTrack = 0;
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.MultiTrack = 1;
+alphaSynth.midi._MidiTrackFormat.MidiTrackFormat_Impl_.MultiSong = 2;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.BankSelectCoarse = 0;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ModulationCoarse = 1;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.BreathControllerCoarse = 2;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.FootControllerCoarse = 4;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.PortamentoTimeCoarse = 5;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.DataEntryCoarse = 6;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.VolumeCoarse = 7;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.BalanceCoarse = 8;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.PanCoarse = 10;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ExpressionControllerCoarse = 11;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.EffectControl1Coarse = 12;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.EffectControl2Coarse = 13;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.GeneralPurposeSlider1 = 16;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.GeneralPurposeSlider2 = 17;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.GeneralPurposeSlider3 = 18;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.GeneralPurposeSlider4 = 19;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.BankSelectFine = 32;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ModulationFine = 33;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.BreathControllerFine = 34;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.FootControllerFine = 36;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.PortamentoTimeFine = 37;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.DataEntryFine = 38;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.VolumeFine = 39;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.BalanceFine = 40;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.PanFine = 42;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ExpressionControllerFine = 43;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.EffectControl1Fine = 44;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.EffectControl2Fine = 45;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.HoldPedal = 64;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.Portamento = 65;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.SostenutoPedal = 66;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.SoftPedal = 67;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.LegatoPedal = 68;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.Hold2Pedal = 69;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.SoundVariation = 70;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.SoundTimbre = 71;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.SoundReleaseTime = 72;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.SoundAttackTime = 73;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.SoundBrightness = 74;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.SoundControl6 = 75;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.SoundControl7 = 76;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.SoundControl8 = 77;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.SoundControl9 = 78;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.SoundControl10 = 79;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.GeneralPurposeButton1 = 80;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.GeneralPurposeButton2 = 81;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.GeneralPurposeButton3 = 82;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.GeneralPurposeButton4 = 83;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.EffectsLevel = 91;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.TremuloLevel = 92;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ChorusLevel = 93;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.CelesteLevel = 94;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.PhaseLevel = 95;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.DataButtonIncrement = 96;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.DataButtonDecrement = 97;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.NonRegisteredParameterFine = 98;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.NonRegisteredParameterCourse = 99;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.RegisteredParameterFine = 100;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.RegisteredParameterCourse = 101;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.AllSoundOff = 120;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.ResetControllers = 121;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.LocalKeyboard = 122;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.AllNotesOff = 123;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.OmniModeOff = 124;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.OmniModeOn = 125;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.MonoMode = 126;
+alphaSynth.midi.event._ControllerTypeEnum.ControllerTypeEnum_Impl_.PolyMode = 127;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.SequenceNumber = 0;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.TextEvent = 1;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.CopyrightNotice = 2;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.SequenceOrTrackName = 3;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.InstrumentName = 4;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.LyricText = 5;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.MarkerText = 6;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.CuePoint = 7;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.PatchName = 8;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.PortName = 9;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.MidiChannel = 32;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.MidiPort = 33;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.EndOfTrack = 47;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.Tempo = 81;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.SmpteOffset = 84;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.TimeSignature = 88;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.KeySignature = 89;
+alphaSynth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_.SequencerSpecific = 127;
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.NoteOff = 128;
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.NoteOn = 144;
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.NoteAftertouch = 160;
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.Controller = 176;
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.ProgramChange = 192;
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.ChannelAftertouch = 208;
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.PitchBend = 224;
+alphaSynth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_.Meta = 255;
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.MidiClock = 248;
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.MidiTick = 249;
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.MidiStart = 250;
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.MidiContinue = 252;
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.MidiStop = 253;
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.ActiveSense = 254;
+alphaSynth.midi.event._RealTimeTypeEnum.RealTimeTypeEnum_Impl_.Reset = 255;
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.SystemExclusive = 240;
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.MtcQuarterFrame = 241;
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.SongPosition = 242;
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.SongSelect = 243;
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.TuneRequest = 246;
+alphaSynth.midi.event._SystemCommonTypeEnum.SystemCommonTypeEnum_Impl_.SystemExclusive2 = 247;
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_.MinToMax = 0;
+alphaSynth.sf2._DirectionEnum.DirectionEnum_Impl_.MaxToMin = 1;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.StartAddressOffset = 0;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.EndAddressOffset = 1;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.StartLoopAddressOffset = 2;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.EndLoopAddressOffset = 3;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.StartAddressCoarseOffset = 4;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ModulationLFOToPitch = 5;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.VibratoLFOToPitch = 6;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ModulationEnvelopeToPitch = 7;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.InitialFilterCutoffFrequency = 8;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.InitialFilterQ = 9;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ModulationLFOToFilterCutoffFrequency = 10;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ModulationEnvelopeToFilterCutoffFrequency = 11;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.EndAddressCoarseOffset = 12;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ModulationLFOToVolume = 13;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.Unused1 = 14;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ChorusEffectsSend = 15;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ReverbEffectsSend = 16;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.Pan = 17;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.Unused2 = 18;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.Unused3 = 19;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.Unused4 = 20;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.DelayModulationLFO = 21;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.FrequencyModulationLFO = 22;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.DelayVibratoLFO = 23;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.FrequencyVibratoLFO = 24;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.DelayModulationEnvelope = 25;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.AttackModulationEnvelope = 26;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.HoldModulationEnvelope = 27;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.DecayModulationEnvelope = 28;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.SustainModulationEnvelope = 29;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ReleaseModulationEnvelope = 30;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.KeyNumberToModulationEnvelopeHold = 31;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.KeyNumberToModulationEnvelopeDecay = 32;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.DelayVolumeEnvelope = 33;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.AttackVolumeEnvelope = 34;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.HoldVolumeEnvelope = 35;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.DecayVolumeEnvelope = 36;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.SustainVolumeEnvelope = 37;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ReleaseVolumeEnvelope = 38;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.KeyNumberToVolumeEnvelopeHold = 39;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.KeyNumberToVolumeEnvelopeDecay = 40;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.Instrument = 41;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.Reserved1 = 42;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.KeyRange = 43;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.VelocityRange = 44;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.StartLoopAddressCoarseOffset = 45;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.KeyNumber = 46;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.Velocity = 47;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.InitialAttenuation = 48;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.Reserved2 = 49;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.EndLoopAddressCoarseOffset = 50;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.CoarseTune = 51;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.FineTune = 52;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.SampleID = 53;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.SampleModes = 54;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.Reserved3 = 55;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ScaleTuning = 56;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.ExclusiveClass = 57;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.OverridingRootKey = 58;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.Unused5 = 59;
+alphaSynth.sf2._GeneratorEnum.GeneratorEnum_Impl_.UnusedEnd = 60;
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_.Unipolar = 0;
+alphaSynth.sf2._PolarityEnum.PolarityEnum_Impl_.Bipolar = 1;
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.MonoSample = 1;
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.RightSample = 2;
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.LeftSample = 4;
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.LinkedSample = 8;
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.OggVobis = 16;
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.RomMonoSample = 32769;
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.RomRightSample = 32770;
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.RomLeftSample = 32772;
+alphaSynth.sf2._SFSampleLink.SFSampleLink_Impl_.RomLinkedSample = 32776;
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.Linear = 0;
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.Concave = 1;
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.Convex = 2;
+alphaSynth.sf2._SourceTypeEnum.SourceTypeEnum_Impl_.Switch = 3;
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_.Linear = 0;
+alphaSynth.sf2._TransformEnum.TransformEnum_Impl_.AbsoluteValue = 2;
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.Stopped = 0;
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.Stopping = 1;
+alphaSynth.synthesis._VoiceStateEnum.VoiceStateEnum_Impl_.Playing = 2;
+alphaSynth.util.SynthConstants.InterpolationMode = 1;
+alphaSynth.util.SynthConstants.AudioChannels = 2;
+alphaSynth.util.SynthConstants.Pi = 3.14159265358979;
+alphaSynth.util.SynthConstants.TwoPi = 2.0 * 3.14159265358979;
+alphaSynth.util.SynthConstants.HalfPi = 3.14159265358979 / 2.0;
+alphaSynth.util.SynthConstants.InverseSqrtOfTwo = 0.707106781186;
+alphaSynth.util.SynthConstants.DefaultLfoFrequency = 8.0;
+alphaSynth.util.SynthConstants.DefaultModDepth = 100;
+alphaSynth.util.SynthConstants.DefaultPolyphony = 40;
+alphaSynth.util.SynthConstants.MinPolyphony = 5;
+alphaSynth.util.SynthConstants.MaxPolyphony = 250;
+alphaSynth.util.SynthConstants.DefaultBlockSize = 64;
+alphaSynth.util.SynthConstants.MaxBufferSize = 0.05;
+alphaSynth.util.SynthConstants.MinBufferSize = 0.001;
+alphaSynth.util.SynthConstants.DenormLimit = 1e-38;
+alphaSynth.util.SynthConstants.NonAudible = 1e-5;
+alphaSynth.util.SynthConstants.SincWidth = 16;
+alphaSynth.util.SynthConstants.SincResolution = 64;
+alphaSynth.util.SynthConstants.MaxVoiceComponents = 4;
+alphaSynth.util.SynthConstants.DefaultChannelCount = 17;
+alphaSynth.util.SynthConstants.DefaultKeyCount = 128;
+alphaSynth.util.SynthConstants.DefaultMixGain = 0.35;
+alphaSynth.util.SynthConstants.MinVolume = 0;
+alphaSynth.util.SynthConstants.MaxVolume = 10;
+alphaSynth.util.SynthConstants.MinProgram = 0;
+alphaSynth.util.SynthConstants.MaxProgram = 127;
+alphaSynth.util.SynthConstants.MinPlaybackSpeed = 0.125;
+alphaSynth.util.SynthConstants.MaxPlaybackSpeed = 8;
 alphaTab.Environment.StaveProfileScoreTab = "score-tab";
 alphaTab.Environment.StaveProfileTab = "tab";
 alphaTab.Environment.StaveProfileScore = "score";
@@ -25353,6 +34357,52 @@ alphaTab.model._TripletFeel.TripletFeel_Impl_.Scottish8th = 6;
 alphaTab.model._VibratoType.VibratoType_Impl_.None = 0;
 alphaTab.model._VibratoType.VibratoType_Impl_.Slight = 1;
 alphaTab.model._VibratoType.VibratoType_Impl_.Wide = 2;
+alphaTab.platform.Platform.IsLittleEndian = true;
+alphaTab.platform.javaScript.AlphaSynthFlashOutput.PreferredSampleRate = 44100;
+alphaTab.platform.javaScript.AlphaSynthFlashOutput.Id = "alphaSynthFlashPlayer";
+alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.BufferSize = 4096;
+alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.BufferCount = 10;
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdPrefix = "alphaSynth.";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdInitialize = "alphaSynth." + "initialize";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdSetLogLevel = "alphaSynth." + "setLogLevel";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdSetMasterVolume = "alphaSynth." + "setMasterVolume";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdSetMetronomeVolume = "alphaSynth." + "setMetronomeVolume";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdSetPlaybackSpeed = "alphaSynth." + "setPlaybackSpeed";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdSetTickPosition = "alphaSynth." + "setTickPosition";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdSetTimePosition = "alphaSynth." + "setTimePosition";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdSetPlaybackRange = "alphaSynth." + "setPlaybackRange";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdSetIsLooping = "alphaSynth." + "setIsLooping";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdPlay = "alphaSynth." + "play";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdPause = "alphaSynth." + "pause";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdPlayPause = "alphaSynth." + "playPause";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdStop = "alphaSynth." + "stop";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdLoadSoundFontBytes = "alphaSynth." + "loadSoundFontBytes";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdLoadMidiBytes = "alphaSynth." + "loadMidiBytes";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdSetChannelMute = "alphaSynth." + "setChannelMute";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdSetChannelSolo = "alphaSynth." + "setChannelSolo";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdSetChannelVolume = "alphaSynth." + "setChannelVolume";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdSetChannelProgram = "alphaSynth." + "setChannelProgram";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdResetChannelStates = "alphaSynth." + "resetChannelStates";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdReady = "alphaSynth." + "ready";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdReadyForPlayback = "alphaSynth." + "readyForPlayback";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdPositionChanged = "alphaSynth." + "positionChanged";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdPlayerStateChanged = "alphaSynth." + "playerStateChanged";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdFinished = "alphaSynth." + "finished";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdSoundFontLoaded = "alphaSynth." + "soundFontLoaded";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdSoundFontLoadFailed = "alphaSynth." + "soundFontLoadFailed";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdMidiLoaded = "alphaSynth." + "midiLoaded";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdMidiLoadFailed = "alphaSynth." + "midiLoadFailed";
+alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdLog = "alphaSynth." + "log";
+alphaTab.platform.javaScript.WorkerSynthOutput.CmdOutputPrefix = "alphaSynth." + "output.";
+alphaTab.platform.javaScript.WorkerSynthOutput.CmdOutputSequencerFinished = "alphaSynth." + "output." + "sequencerFinished";
+alphaTab.platform.javaScript.WorkerSynthOutput.CmdOutputAddSamples = "alphaSynth." + "output." + "addSamples";
+alphaTab.platform.javaScript.WorkerSynthOutput.CmdOutputPlay = "alphaSynth." + "output." + "play";
+alphaTab.platform.javaScript.WorkerSynthOutput.CmdOutputPause = "alphaSynth." + "output." + "pause";
+alphaTab.platform.javaScript.WorkerSynthOutput.CmdOutputResetSamples = "alphaSynth." + "output." + "resetSamples";
+alphaTab.platform.javaScript.WorkerSynthOutput.CmdOutputSampleRequest = "alphaSynth." + "output." + "sampleRequest";
+alphaTab.platform.javaScript.WorkerSynthOutput.CmdOutputFinished = "alphaSynth." + "output." + "finished";
+alphaTab.platform.javaScript.WorkerSynthOutput.CmdOutputSamplesPlayed = "alphaSynth." + "output." + "samplesPlayed";
+alphaTab.platform.model.Color.BlackRgb = "#000000";
 alphaTab.platform.model._FontStyle.FontStyle_Impl_.Plain = 0;
 alphaTab.platform.model._FontStyle.FontStyle_Impl_.Bold = 1;
 alphaTab.platform.model._FontStyle.FontStyle_Impl_.Italic = 2;
@@ -25362,6 +34412,7 @@ alphaTab.platform.model._TextAlign.TextAlign_Impl_.Right = 2;
 alphaTab.platform.model._TextBaseline.TextBaseline_Impl_.Top = 0;
 alphaTab.platform.model._TextBaseline.TextBaseline_Impl_.Middle = 1;
 alphaTab.platform.model._TextBaseline.TextBaseline_Impl_.Bottom = 2;
+alphaTab.platform.svg.SvgCanvas.BlurCorrection = 0;
 alphaTab.platform.svg.FontSizes.TimesNewRoman = new Uint8Array([3,4,5,6,6,9,9,2,4,4,6,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,5,10,8,7,7,8,7,6,7,8,4,4,8,7,10,8,8,7,8,7,5,8,8,7,11,8,8,7,4,3,4,5,6,4,5,5,5,5,5,4,5,6,3,3,6,3,9,6,6,6,5,4,4,4,5,6,7,6,6,5,5,2,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,6,6,6,6,2,5,4,8,4,6,6,0,8,6,4,6,3,3,4,5,5,4,4,3,3,6,8,8,8,5,8,8,8,8,8,8,11,7,7,7,7,7,4,4,4,4,8,8,8,8,8,8,8,6,8,8,8,8,8,8,6,5,5,5,5,5,5,5,8,5,5,5,5,5,3,3,3,3,6,6,6,6,6,6,6,6,6,5,5,5,5,6,6]);
 alphaTab.platform.svg.FontSizes.Arial11Pt = new Uint8Array([3,3,4,6,6,10,7,2,4,4,4,6,3,4,3,3,6,6,6,6,6,6,6,6,6,6,3,3,6,6,6,6,11,7,7,8,8,7,7,9,8,3,6,7,6,9,8,9,7,9,8,7,7,8,7,10,7,7,7,3,3,3,5,6,4,6,6,6,6,6,3,6,6,2,2,6,2,9,6,6,6,6,4,6,3,6,6,8,6,6,6,4,3,4,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,4,6,6,6,6,3,6,4,8,4,6,6,0,8,6,4,6,4,4,4,6,6,4,4,4,4,6,9,9,9,7,7,7,7,7,7,7,11,8,7,7,7,7,3,3,3,3,8,8,9,9,9,9,9,6,9,8,8,8,8,7,7,7,6,6,6,6,6,6,10,6,6,6,6,6,3,3,3,3,6,6,6,6,6,6,6,6,7,6,6,6,6,6,6]);
 alphaTab.platform.svg.FontSizes.ControlChars = 32;
@@ -25489,6 +34540,10 @@ alphaTab.rendering.layout._HeaderFooterElements.HeaderFooterElements_Impl_.Words
 alphaTab.rendering.layout._HeaderFooterElements.HeaderFooterElements_Impl_.Copyright = 128;
 alphaTab.rendering.layout._HeaderFooterElements.HeaderFooterElements_Impl_.PageNumber = 256;
 alphaTab.rendering.layout._HeaderFooterElements.HeaderFooterElements_Impl_.All = 511;
+alphaTab.rendering.layout.HorizontalScreenLayout.PagePadding = new Float32Array([20,20,20,20]);
+alphaTab.rendering.layout.HorizontalScreenLayout.GroupSpacing = 20;
+alphaTab.rendering.layout.PageViewLayout.PagePadding = new Float32Array([40,40,40,40]);
+alphaTab.rendering.layout.PageViewLayout.GroupSpacing = 20;
 alphaTab.rendering.staves.BarLayoutingInfo.MinDuration = 30;
 alphaTab.rendering.staves.BarLayoutingInfo.MinDurationWidth = 10;
 alphaTab.rendering.staves.StaveGroup.AccoladeLabelSpacing = 10;
@@ -25579,9 +34634,19 @@ haxe.io.FPHelper.i64tmp = (function($this) {
 	$r = this1;
 	return $r;
 }(this));
+js.Boot.__toStr = ({ }).toString;
 js.html.compat.Float32Array.BYTES_PER_ELEMENT = 4;
 js.html.compat.Float64Array.BYTES_PER_ELEMENT = 8;
 js.html.compat.Uint8Array.BYTES_PER_ELEMENT = 1;
+system.Convert._conversionBuffer = new ArrayBuffer(8);
+system.Convert._int8Buffer = new Int8Array(system.Convert._conversionBuffer);
+system.Convert._uint8Buffer = new Uint8Array(system.Convert._conversionBuffer);
+system.Convert._int16Buffer = new Int16Array(system.Convert._conversionBuffer);
+system.Convert._uint16Buffer = new Uint16Array(system.Convert._conversionBuffer);
+system.Convert._int32Buffer = new Int32Array(system.Convert._conversionBuffer);
+system.Convert._uint32Buffer = new Uint32Array(system.Convert._conversionBuffer);
+system.Convert._float32Buffer = new Float32Array(system.Convert._conversionBuffer);
+system.Convert._float64Buffer = new Float64Array(system.Convert._conversionBuffer);
 alphaTab.Main.main();
 })(typeof exports != "undefined" ? exports : typeof window != "undefined" ? window : typeof self != "undefined" ? self : this, typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);
 

@@ -60,6 +60,8 @@ namespace AlphaTab
             // try to build the find the alphaTab script url in case we are not in the webworker already
             if (Lib.Global.document)
             {
+                Script.Write("untyped __js__(\"window.AudioContext = window.AudioContext || window.webkitAudioContext;\");");
+
                 var document = Browser.Document;
                 /**
                  * VB Loader For IE 
@@ -136,7 +138,8 @@ namespace AlphaTab
             }
             else
             {
-                JsWorker.Init();
+                AlphaTabWebWorker.Init();
+                AlphaSynthWebWorker.Init();
             }
         }
 

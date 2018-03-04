@@ -1,10 +1,18 @@
 package system;
 
-abstract Double(Float) from Float
+abstract Double(Float) from Float from Int
 {
 	public inline function new(i:Float) this = i;
 	
 	@:from public static inline function FromInt(i:Int) : Double return new Double(i);
+	@:from public static inline function FromByte(i:system.Byte) : Double return new Double(i.ToHaxeInt());
+	@:from public static inline function FromInt16(i:system.Int16) : Double return new Double(i.ToHaxeInt());
+	@:from public static inline function FromInt32(i:system.Int32) : Double return new Double(i.ToHaxeInt());
+	@:from public static inline function FromInt64(i:system.Int64) : Double return new Double(i.ToHaxeInt());
+	@:from public static inline function FromSByte(i:system.Byte) : Double return new Double(i.ToHaxeInt());
+	@:from public static inline function FromUInt16(i:system.UInt16) : Double return new Double(i.ToHaxeInt());
+	@:from public static inline function FromUInt32(i:system.UInt32) : Double return new Double(i.ToHaxeInt());
+	@:from public static inline function FromUInt64(i:system.UInt64) : Double return new Double(i.ToHaxeInt());
 	@:from public static inline function FromSingle(i:Single) : Double return new Double(i.ToHaxeFloat());
 
 	public inline function ToHaxeFloat(): Float return this;

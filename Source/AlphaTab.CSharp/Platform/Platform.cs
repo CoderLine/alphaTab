@@ -22,6 +22,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using AlphaTab.Audio.Synth;
 using AlphaTab.IO;
 using AlphaTab.Util;
 using AlphaTab.Xml;
@@ -30,6 +31,12 @@ namespace AlphaTab.Platform
 {
     public static partial class Platform
     {
+        public static Func<ISynthOutput> OutputFactory { get; set; }
+        public static ISynthOutput CreateOutput()
+        {
+            return OutputFactory != null ? OutputFactory() : null;
+        }
+
         public static T As<T>(this object s)
         {
             return (T)s;
@@ -124,9 +131,36 @@ namespace AlphaTab.Platform
             return Rnd.Next(max);
         }
 
+        public static double RandomDouble()
+        {
+            return Rnd.NextDouble();
+        }
+
         public static double ToDouble(byte[] bytes)
         {
             return BitConverter.ToDouble(bytes, 0);
+        }
+
+        public static readonly bool IsLittleEndian = BitConverter.IsLittleEndian;
+
+        public static void ClearIntArray(int[] array)
+        {
+            Array.Clear(array, 0, array.Length);
+        }
+
+        public static void ClearShortArray(short[] array)
+        {
+            Array.Clear(array, 0, array.Length);
+        }
+
+        public static void ArrayCopy<T>(T[] src, int srcOffset, T[] dst, int dstOffset, int count)
+        {
+            Array.Copy(src, srcOffset, dst, dstOffset, count);
+        }
+
+        public static void Reverse(byte[] array)
+        {
+            Array.Reverse(array);
         }
     }
 }

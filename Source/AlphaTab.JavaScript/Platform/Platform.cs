@@ -17,9 +17,11 @@
  */
 
 using System;
+using AlphaTab.Audio.Synth;
 using AlphaTab.Collections;
 using AlphaTab.Haxe.Js;
 using AlphaTab.IO;
+using AlphaTab.Platform.JavaScript;
 using AlphaTab.Util;
 using Haxe;
 using Haxe.Js.Html;
@@ -108,10 +110,7 @@ namespace AlphaTab.Platform
         [Inline]
         public static void BlockCopy(byte[] src, int srcOffset, byte[] dst, int dstOffset, int count)
         {
-            for (int i = 0; i < count; i++)
-            {
-                dst[dstOffset + i] = src[srcOffset + i];
-            }
+            ArrayCopy(src, srcOffset, dst, dstOffset, count);
         }
 
         [Inline]
@@ -228,6 +227,95 @@ namespace AlphaTab.Platform
         {
             var array = new Float64Array(Script.Write<ArrayBuffer>("untyped __js__(\"{0}.buffer\", bytes)"));
             return array[0];
+        }
+
+
+        public static void ClearIntArray(int[] array)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = 0;
+            }
+        }
+
+        public static void ClearShortArray(short[] array)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = 0;
+            }
+        }
+
+        public static ISynthOutput CreateOutput()
+        {
+            return new AlphaSynthWorkerSynthOutput();
+        }
+
+        public const bool IsLittleEndian = true;
+
+        [Inline]
+        public static double RandomDouble()
+        {
+            return Script.Write<double>("Math.random()");
+        }
+
+        public static bool SupportsWebAudio
+        {
+            [Inline]
+            get
+            {
+                return Script.Write<bool>("untyped __js__(\"!!window.ScriptProcessorNode\")");
+            }
+        }
+
+        public static bool SupportsWebWorkers
+        {
+            [Inline]
+            get
+            {
+                return Script.Write<bool>("untyped __js__(\"!!window.Worker\")");
+            }
+        }
+
+        public static bool ForceFlash
+        {
+            [Inline]
+            get
+            {
+                return Script.Write<bool>("untyped __js__(\"!!window.ForceFlash\")");
+            }
+        }
+
+        [Inline]
+        public static void ArrayCopy(int[] src, int srcOffset, int[] dst, int dstOffset, int count)
+        {
+            Script.Write("untyped __js__(\"{2}.set({0}.subarray({1},{4}), {3})\", src, srcOffset, dst, dstOffset, count);");
+        }
+
+        [Inline]
+        public static void ArrayCopy(short[] src, int srcOffset, short[] dst, int dstOffset, int count)
+        {
+            Script.Write("untyped __js__(\"{2}.set({0}.subarray({1},{4}), {3})\", src, srcOffset, dst, dstOffset, count);");
+        }
+
+        [Inline]
+        public static void ArrayCopy(byte[] src, int srcOffset, byte[] dst, int dstOffset, int count)
+        {
+            Script.Write("untyped __js__(\"{2}.set({0}.subarray({1},{4}), {3})\", src, srcOffset, dst, dstOffset, count);");
+        }
+
+        public static void ArrayCopy<T>(T[] src, int srcOffset, T[] dst, int dstOffset, int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                dst[dstOffset + i] = src[srcOffset + i];
+            }
+        }
+
+        [Inline]
+        public static void Reverse(byte[] array)
+        {
+            Script.Write("untyped __js__(\"{0}.reverse()\", array)");
         }
     }
 }

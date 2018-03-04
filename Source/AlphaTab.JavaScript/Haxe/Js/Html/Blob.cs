@@ -24,6 +24,6 @@ namespace AlphaTab.Haxe.Js.Html
     [External]
     public class Blob
     {
-        public extern Blob(HaxeArray<object> worker);
+        public extern Blob(object worker);
     }
 }

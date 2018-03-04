@@ -24,6 +24,12 @@ namespace AlphaTab.IO
     {
         private readonly Stream _stream;
 
+        public int Position
+        {
+            get { return (int)_stream.Position; }
+            set { _stream.Position = value; }
+        }
+
         public StreamWrapper(Stream stream)
         {
             _stream = stream;

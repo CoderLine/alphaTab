@@ -14,7 +14,7 @@ import alphaTab.audio.generator.MidiFileGenerator;
 import alphaTab.rendering.ScoreRenderer;
 
 // api
-import alphaTab.platform.javaScript.JsApi;
+import alphaTab.platform.javaScript.AlphaTabApi;
 
 
 class Main 

@@ -21,7 +21,6 @@ using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
-using Haxe;
 using Phase;
 using TextAlign = AlphaTab.Platform.Model.TextAlign;
 

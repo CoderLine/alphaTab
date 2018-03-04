@@ -58,5 +58,25 @@ namespace AlphaTab.Platform
 
             return s;
         }
+
+        public static uint ToUInt32(int i)
+        {
+            return (uint)i;
+        }
+
+        public static short ToInt16(int i)
+        {
+            return (short)i;
+        }
+
+        public static ushort ToUInt16(int i)
+        {
+            return (ushort)i;
+        }
+
+        public static byte ToUInt8(int i)
+        {
+            return (byte)i;
+        }
     }
 }
