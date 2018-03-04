@@ -42,7 +42,7 @@ class FlatMidiEventGenerator_NoteEvent extends alphaTab.test.audio.FlatMidiEvent
             var hashCode : system.Int32 = super.GetHashCode();
             hashCode = (hashCode * 397) ^ Length;
             hashCode = (hashCode * 397) ^ Key.GetHashCode();
-            hashCode = (hashCode * 397) ^ DynamicValue.ToInt32_IFormatProvider(null);
+            hashCode = (hashCode * 397) ^ (DynamicValue).ToInt32_IFormatProvider(null);
             return hashCode;
 
         }

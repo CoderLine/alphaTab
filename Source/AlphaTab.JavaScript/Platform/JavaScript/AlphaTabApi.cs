@@ -16,10 +16,11 @@
  * License along with this library.
  */
 using System;
+using AlphaTab.Audio;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Synthesis;
 using AlphaTab.Audio.Generator;
-using AlphaTab.Audio.Model;
+using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Collections;
 using AlphaTab.Haxe;
 using AlphaTab.Haxe.Js;
@@ -914,13 +915,12 @@ namespace AlphaTab.Platform.JavaScript
             }
 
             Logger.Info("AlphaTab", "Generating Midi");
-            var midi = MidiFileGenerator.GenerateMidiFile(Score);
-            _tickCache = midi.TickLookup;
-
-            var ms = ByteBuffer.Empty();
-            midi.WriteTo(ms);
-            var bytes = ms.ToArray();
-            Player.LoadMidi(bytes);
+            var midiFile = new MidiFile();
+            var handler = new AlphaSynthMidiFileHandler(midiFile);
+            var generator = new MidiFileGenerator(Score, handler);
+            generator.Generate();
+            _tickCache = generator.TickLookup;
+            Player.LoadMidiFile(midiFile);
         }
 
         public void SetTrackVolume(object tracks, float volume)
@@ -966,23 +966,6 @@ namespace AlphaTab.Platform.JavaScript
             {
                 Player.SetChannelMute(track.PlaybackInfo.PrimaryChannel, mute);
                 Player.SetChannelMute(track.PlaybackInfo.SecondaryChannel, mute);
-            }
-        }
-
-        public void LoadMidi(object value)
-        {
-            if (Player == null)
-            {
-                return;
-            }
-
-            if (Platform.TypeOf(value) == "string")
-            {
-                Player.LoadMidiFromUrl((string)value);
-            }
-            else
-            {
-                Player.LoadMidi((byte[])value);
             }
         }
 

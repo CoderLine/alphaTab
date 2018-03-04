@@ -1,8 +1,10 @@
 ﻿using System;
 using AlphaTab.Audio.Synth;
+using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Audio.Synth.Synthesis;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
+using AlphaTab.Model;
 using AlphaTab.Util;
 using Phase;
 
@@ -35,7 +37,7 @@ namespace AlphaTab.Platform.JavaScript
         public const string CmdPlayPause = CmdPrefix + "playPause";
         public const string CmdStop = CmdPrefix + "stop";
         public const string CmdLoadSoundFontBytes = CmdPrefix + "loadSoundFontBytes";
-        public const string CmdLoadMidiBytes = CmdPrefix + "loadMidiBytes";
+        public const string CmdLoadMidi = CmdPrefix + "loadMidi";
         public const string CmdSetChannelMute = CmdPrefix + "setChannelMute";
         public const string CmdSetChannelSolo = CmdPrefix + "setChannelSolo";
         public const string CmdSetChannelVolume = CmdPrefix + "setChannelVolume";
@@ -64,7 +66,7 @@ namespace AlphaTab.Platform.JavaScript
             _main = main;
             _main.AddEventListener("message", (Action<MessageEvent>)HandleMessage);
 
-            _player = new Audio.Synth.AlphaSynth();
+            _player = new Audio.Synth.AlphaSynth(new AlphaSynthWorkerSynthOutput());
             _player.PositionChanged += OnPositionChanged;
             _player.PlayerStateChanged += OnPlayerStateChanged;
             _player.Finished += OnFinished;
@@ -140,8 +142,8 @@ namespace AlphaTab.Platform.JavaScript
                 case CmdLoadSoundFontBytes:
                     _player.LoadSoundFont(data.data);
                     break;
-                case CmdLoadMidiBytes:
-                    _player.LoadMidi(data.data);
+                case CmdLoadMidi:
+                    _player.LoadMidi(JsonConverter.JsObjectToMidiFile(data.midi));
                     break;
                 case CmdSetChannelMute:
                     _player.SetChannelMute(data.channel, data.mute);

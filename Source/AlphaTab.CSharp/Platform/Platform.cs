@@ -31,12 +31,6 @@ namespace AlphaTab.Platform
 {
     public static partial class Platform
     {
-        public static Func<ISynthOutput> OutputFactory { get; set; }
-        public static ISynthOutput CreateOutput()
-        {
-            return OutputFactory != null ? OutputFactory() : null;
-        }
-
         public static T As<T>(this object s)
         {
             return (T)s;

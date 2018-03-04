@@ -28,7 +28,7 @@ class MusicXmlImporterTestBase
         }
         catch(e: alphaTab.importer.UnsupportedFormatException)
         {
-            massive.munit.Assert.fail(system.CsString.Format("Failed to load file {0}: {1}", [file, file]).ToHaxeString());
+            alphaTab.test.Assert.Fail_CsString_ObjectArray("Failed to load file {0}: {1}", [file, e]);
             throw e;
         }
     }
@@ -122,7 +122,7 @@ class MusicXmlImporterTestBase
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Name, actual.Name, "Mismatch on Name");
         //Assert.AreEqual(expected.ShortName, actual.ShortName, "Mismatch on ShortName");
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Tuning.Length, actual.Tuning.Length, "Mismatch on Tuning.Length");
-        alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_IEnumerable_T1(",", expected.Tuning.ToEnumerable()), system.CsString.Join_CsString_IEnumerable_T1(",", actual.Tuning.ToEnumerable()));
+        alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_IEnumerable_T1(",", expected.Tuning), system.CsString.Join_CsString_IEnumerable_T1(",", actual.Tuning));
         //Assert.AreEqual(expected.Color.Raw, actual.Color.Raw, "Mismatch on Color.Raw");
         AreEqual_PlaybackInformation_PlaybackInformation(expected.PlaybackInfo, actual.PlaybackInfo);
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsPercussion, actual.IsPercussion, "Mismatch on IsPercussion");

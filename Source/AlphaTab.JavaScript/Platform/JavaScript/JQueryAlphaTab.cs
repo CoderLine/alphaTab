@@ -303,12 +303,6 @@ namespace AlphaTab.Platform.JavaScript
             context.LoadSoundFont(value);
         }
 
-        [Name("loadMidi")]
-        public void LoadMidi(JQuery element, AlphaTabApi context, object value)
-        {
-            context.LoadMidi(value);
-        }
-
         [Name("muteTrack")]
         public void MuteTrack(JQuery element, AlphaTabApi context, object tracks, bool mute)
         {

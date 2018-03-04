@@ -2,6 +2,7 @@ package alphaTab.test;
 
 import alphaTab.test.audio.MidiFileGeneratorTest;
 import alphaTab.test.audio.MidiPlaybackControllerTest;
+import alphaTab.test.audio.AlphaSynthTests;
 
 import alphaTab.test.importer.AlphaTexImporterTest;
 import alphaTab.test.importer.Gp3ImporterTest;
@@ -22,6 +23,7 @@ class Main
 	{
 		var allresources = haxe.Resource.listNames();
 		var loaded = 0;
+		
 		trace('Loading resources ('+loaded+'/' + allresources.length + ')');
 		
 		var resourceContent : Array<{ name : String, data : String, str : String }> = Reflect.getProperty(haxe.Resource, "content");
@@ -40,6 +42,11 @@ class Main
 				{
 					loaded++;
 					trace('Loading resources ('+loaded+'/' + allresources.length + ')');
+					var e:js.html.CustomEvent = cast js.Browser.document.createEvent("CustomEvent");
+					e.initCustomEvent("alphaTab.test.status", false, false, {
+						message: 'Loading resources ('+loaded+'/' + allresources.length + ')'
+					});
+					js.Browser.document.dispatchEvent(e);
 					
 					var response:js.html.ArrayBuffer = xhr.response;
 					var resourceData = haxe.crypto.Base64.encode(haxe.io.Bytes.ofData(response));
@@ -55,7 +62,9 @@ class Main
 					if(loaded == allresources.length)
 					{	
 						trace('Launching tests');
-						new TestMain();
+						e = cast js.Browser.document.createEvent("CustomEvent");
+						e.initCustomEvent("alphaTab.test.run", false, false, null);
+						js.Browser.document.dispatchEvent(e);
 					}
 				}
 			};

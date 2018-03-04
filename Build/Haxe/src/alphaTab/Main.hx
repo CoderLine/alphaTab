@@ -21,6 +21,5 @@ class Main
 {
 	static function main() 
 	{
-		alphaTab.Environment.Init();
 	}
 }

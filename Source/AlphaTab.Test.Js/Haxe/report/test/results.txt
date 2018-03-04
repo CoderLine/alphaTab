@@ -1,2 +1,0 @@
-Tests ERROR under js using summary client
-END

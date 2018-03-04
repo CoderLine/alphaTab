@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestTools.UnitTesting
 {
     [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
     [External]
-    [Meta("@Test")]
+    [Meta("@:testMethod")]
     sealed class TestMethodAttribute : Attribute
     {
     }

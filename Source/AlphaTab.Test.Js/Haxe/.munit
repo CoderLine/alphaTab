@@ -1,6 +1,0 @@
-version=2.1.2
-src=src-gen
-bin=bin
-report=report
-hxml=test.hxml
-classPaths=src-gen,..\..\..\Phase\Mscorlib,..\..\..\Build\Haxe\src,..\..\..\Build\Haxe\src-gen

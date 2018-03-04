@@ -8,8 +8,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Haxe\**" />
+    <Compile Remove="test\TestFiles\**" />
     <EmbeddedResource Remove="Haxe\**" />
+    <EmbeddedResource Remove="test\TestFiles\**" />
     <None Remove="Haxe\**" />
+    <None Remove="test\TestFiles\**" />
   </ItemGroup>
 
   <ItemGroup>

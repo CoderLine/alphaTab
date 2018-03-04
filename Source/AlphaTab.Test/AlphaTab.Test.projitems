@@ -9,6 +9,7 @@
     <Import_RootNamespace>AlphaTab.Test</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Audio\AlphaSynthTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\FlatMidiEventGenerator.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\MidiFileGeneratorTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\MidiPlaybackControllerTest.cs" />
@@ -26,6 +27,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlParseTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\Audio\default.sf2">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro3\Effects.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

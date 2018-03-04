@@ -16,8 +16,6 @@
  * License along with this library.
  */
 
-using AlphaTab.Audio.Generator;
-using AlphaTab.Audio.Model;
 using AlphaTab.Model;
 
 namespace AlphaTab.Audio

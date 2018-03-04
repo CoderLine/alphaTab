@@ -143,13 +143,13 @@ namespace AlphaTab.Audio.Synth
             }
         }
 
-        public AlphaSynth()
+        public AlphaSynth(ISynthOutput output)
         {
             Logger.Debug("AlphaSynth", "Initializing player");
             _state = PlayerState.Paused;
 
             Logger.Debug("AlphaSynth", "Creating output");
-            Output = Platform.Platform.CreateOutput();
+            Output = output;
             Output.Ready += () =>
             {
                 _outputIsReady = true;
@@ -270,20 +270,15 @@ namespace AlphaTab.Audio.Synth
             }
         }
 
-        /// <inheritdoc />
-        public void LoadMidi(byte[] data)
+        public void LoadMidi(MidiFile midiFile)
         {
             Stop();
 
-            var input = ByteBuffer.FromBuffer(data);
             try
             {
-                Logger.Info("AlphaSynth", "Loading midi from bytes");
+                Logger.Info("AlphaSynth", "Loading midi from model");
 
-                var midi = new MidiFile();
-                midi.Load(input);
-
-                _sequencer.LoadMidi(midi);
+                _sequencer.LoadMidi(midiFile);
                 _isMidiLoaded = true;
                 OnMidiLoaded();
                 Logger.Info("AlphaSynth", "Midi successfully loaded");
@@ -293,7 +288,7 @@ namespace AlphaTab.Audio.Synth
             }
             catch (Exception e)
             {
-                Logger.Error("AlphaSynth", "Could not load midi from bytes " + e);
+                Logger.Error("AlphaSynth", "Could not load midi from model " + e);
                 OnMidiLoadFailed();
             }
         }

@@ -59,6 +59,7 @@ namespace AlphaTab.Audio.Synth.Bank
                 {
                     banks.Add(bank);
                 }
+                banks.Sort((a, b) => a - b);
                 return banks.ToArray();
             }
         }

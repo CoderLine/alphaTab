@@ -1,9 +1,10 @@
 package alphaTab.test.importer;
 
 using system.HaxeExtensions;
+@:testClass
 class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
 {
-    @Test
+    @:testMethod
     public function TestScoreInfo() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/Test01.gp4");
@@ -25,7 +26,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestScoreInfo");
     }
 
-    @Test
+    @:testMethod
     public function TestNotes() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/Test02.gp4");
@@ -34,7 +35,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestNotes");
     }
 
-    @Test
+    @:testMethod
     public function TestTimeSignatures() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/Test03.gp4");
@@ -43,7 +44,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestTimeSignatures");
     }
 
-    @Test
+    @:testMethod
     public function TestDead() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/TestDead.gp4");
@@ -52,7 +53,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestDead");
     }
 
-    @Test
+    @:testMethod
     public function TestGrace() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/TestGrace.gp4");
@@ -61,7 +62,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestGrace");
     }
 
-    @Test
+    @:testMethod
     public function TestAccentuation() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/TestAccentuations.gp4");
@@ -70,7 +71,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestAccentuation");
     }
 
-    @Test
+    @:testMethod
     public function TestHarmonics() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/TestHarmonics.gp4");
@@ -79,7 +80,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestHarmonics");
     }
 
-    @Test
+    @:testMethod
     public function TestHammer() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/TestHammer.gp4");
@@ -88,7 +89,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestHammer");
     }
 
-    @Test
+    @:testMethod
     public function TestBend() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/TestBends.gp4");
@@ -97,7 +98,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestBend");
     }
 
-    @Test
+    @:testMethod
     public function TestTremolo() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/TestTremolo.gp4");
@@ -106,7 +107,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestTremolo");
     }
 
-    @Test
+    @:testMethod
     public function TestSlides() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/TestSlides.gp4");
@@ -115,7 +116,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestSlides");
     }
 
-    @Test
+    @:testMethod
     public function TestVibrato() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/TestVibrato.gp4");
@@ -124,7 +125,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestVibrato");
     }
 
-    @Test
+    @:testMethod
     public function TestTrills() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/TestTrills.gp4");
@@ -133,7 +134,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestTrills");
     }
 
-    @Test
+    @:testMethod
     public function TestOtherEffects() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/TestOtherEffects.gp4");
@@ -142,7 +143,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestOtherEffects");
     }
 
-    @Test
+    @:testMethod
     public function TestFingering() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/TestFingering.gp4");
@@ -151,7 +152,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestFingering");
     }
 
-    @Test
+    @:testMethod
     public function TestStroke() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/TestStrokes.gp4");
@@ -160,7 +161,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestStroke");
     }
 
-    @Test
+    @:testMethod
     public function TestTuplets() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/TestTuplets.gp4");
@@ -169,7 +170,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestTuplets");
     }
 
-    @Test
+    @:testMethod
     public function TestRanges() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/TestRanges.gp4");
@@ -178,7 +179,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestRanges");
     }
 
-    @Test
+    @:testMethod
     public function TestEffects() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/Effects.gp4");
@@ -187,7 +188,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestEffects");
     }
 
-    @Test
+    @:testMethod
     public function TestStrings() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/TestStrings.gp4");
@@ -196,7 +197,7 @@ class Gp4ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp4ImporterTest.cs", "TestStrings");
     }
 
-    @Test
+    @:testMethod
     public function TestColors() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro4/Colors.gp4");

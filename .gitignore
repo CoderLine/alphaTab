@@ -53,6 +53,9 @@ _ReSharper*/
 /Samples/JavaScript/test*
 /Samples/JavaScript/test/*
 /Build/Haxe/src-gen/*
+/Source/AlphaTab.Test.Js/test/TestFiles*
+/Source/AlphaTab.Test.Js/test/alphaTab.tests.js
+/Source/AlphaTab.Test.Js/test/alphaTab.tests.js.map
 
 # temps
 .DS_Store 

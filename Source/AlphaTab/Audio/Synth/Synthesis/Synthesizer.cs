@@ -32,7 +32,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
         public int EventIndex { get; set; }
         public MidiEvent Event { get; set; }
         public bool IsMetronome { get; set; }
-        public double Delta { get; set; }
+        public double Time { get; set; }
 
         public SynthEvent(int eventIndex, MidiEvent e)
         {

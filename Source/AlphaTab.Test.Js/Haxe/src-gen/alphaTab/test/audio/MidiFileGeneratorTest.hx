@@ -1,6 +1,7 @@
 package alphaTab.test.audio;
 
 using system.HaxeExtensions;
+@:testClass
 class MidiFileGeneratorTest
 {
     private function ParseTex(tex : system.CsString) : alphaTab.model.Score 
@@ -11,7 +12,23 @@ class MidiFileGeneratorTest
 
     }
 
-    @Test
+    @:testMethod
+    public function TestCorrectMidiOrder() : Void 
+    {
+        var midiFile : alphaTab.audio.synth.midi.MidiFile = new alphaTab.audio.synth.midi.MidiFile();
+        midiFile.AddEvent(new alphaTab.audio.synth.midi.event.MidiEvent(0, 0, 0, 0));
+        midiFile.AddEvent(new alphaTab.audio.synth.midi.event.MidiEvent(0, 0, 1, 0));
+        midiFile.AddEvent(new alphaTab.audio.synth.midi.event.MidiEvent(100, 0, 2, 0));
+        midiFile.AddEvent(new alphaTab.audio.synth.midi.event.MidiEvent(50, 0, 3, 0));
+        midiFile.AddEvent(new alphaTab.audio.synth.midi.event.MidiEvent(50, 0, 4, 0));
+        alphaTab.test.Assert.AreEqual_T1_T22(0, midiFile.Events.get_Item(0).Data1);
+        alphaTab.test.Assert.AreEqual_T1_T22(1, midiFile.Events.get_Item(1).Data1);
+        alphaTab.test.Assert.AreEqual_T1_T22(3, midiFile.Events.get_Item(2).Data1);
+        alphaTab.test.Assert.AreEqual_T1_T22(4, midiFile.Events.get_Item(3).Data1);
+        alphaTab.test.Assert.AreEqual_T1_T22(2, midiFile.Events.get_Item(4).Data1);
+    }
+
+    @:testMethod
     public function TestBend() : Void 
     {
         var tex : system.CsString = ":4 15.6{b(0 4)} 15.6";
@@ -32,7 +49,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.VolumeCoarse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.VolumeCoarse).ToByte_IFormatProvider(null);
             _tmp.Value = 120;
             return _tmp;
         })(), (function (){
@@ -40,7 +57,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.PanCoarse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.PanCoarse).ToByte_IFormatProvider(null);
             _tmp.Value = 64;
             return _tmp;
         })(), (function (){
@@ -48,7 +65,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.ExpressionControllerCoarse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.ExpressionControllerCoarse).ToByte_IFormatProvider(null);
             _tmp.Value = 127;
             return _tmp;
         })(), (function (){
@@ -56,7 +73,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.RegisteredParameterFine.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.RegisteredParameterFine).ToByte_IFormatProvider(null);
             _tmp.Value = 0;
             return _tmp;
         })(), (function (){
@@ -64,7 +81,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.RegisteredParameterCourse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.RegisteredParameterCourse).ToByte_IFormatProvider(null);
             _tmp.Value = 0;
             return _tmp;
         })(), (function (){
@@ -72,7 +89,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.DataEntryFine.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.DataEntryFine).ToByte_IFormatProvider(null);
             _tmp.Value = 0;
             return _tmp;
         })(), (function (){
@@ -80,7 +97,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.DataEntryCoarse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.DataEntryCoarse).ToByte_IFormatProvider(null);
             _tmp.Value = 12;
             return _tmp;
         })(), (function (){
@@ -88,14 +105,14 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
-            _tmp.Program = info.Program.ToByte_IFormatProvider(null);
+            _tmp.Program = (info.Program).ToByte_IFormatProvider(null);
             return _tmp;
         })(), (function (){
             var _tmp = new alphaTab.test.audio.FlatMidiEventGenerator_ControlChangeEvent();
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.SecondaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.VolumeCoarse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.VolumeCoarse).ToByte_IFormatProvider(null);
             _tmp.Value = 120;
             return _tmp;
         })(), (function (){
@@ -103,7 +120,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.SecondaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.PanCoarse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.PanCoarse).ToByte_IFormatProvider(null);
             _tmp.Value = 64;
             return _tmp;
         })(), (function (){
@@ -111,7 +128,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.SecondaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.ExpressionControllerCoarse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.ExpressionControllerCoarse).ToByte_IFormatProvider(null);
             _tmp.Value = 127;
             return _tmp;
         })(), (function (){
@@ -119,7 +136,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.SecondaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.RegisteredParameterFine.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.RegisteredParameterFine).ToByte_IFormatProvider(null);
             _tmp.Value = 0;
             return _tmp;
         })(), (function (){
@@ -127,7 +144,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.SecondaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.RegisteredParameterCourse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.RegisteredParameterCourse).ToByte_IFormatProvider(null);
             _tmp.Value = 0;
             return _tmp;
         })(), (function (){
@@ -135,7 +152,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.SecondaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.DataEntryFine.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.DataEntryFine).ToByte_IFormatProvider(null);
             _tmp.Value = 0;
             return _tmp;
         })(), (function (){
@@ -143,7 +160,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.SecondaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.DataEntryCoarse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.DataEntryCoarse).ToByte_IFormatProvider(null);
             _tmp.Value = 12;
             return _tmp;
         })(), (function (){
@@ -151,7 +168,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.SecondaryChannel;
-            _tmp.Program = info.Program.ToByte_IFormatProvider(null);
+            _tmp.Program = (info.Program).ToByte_IFormatProvider(null);
             return _tmp;
         })(), (function (){
             var _tmp = new alphaTab.test.audio.FlatMidiEventGenerator_TimeSignatureEvent();
@@ -254,7 +271,7 @@ class MidiFileGeneratorTest
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
             _tmp.DynamicValue = note.Dynamic;
-            _tmp.Key = note.RealValue.ToByte_IFormatProvider(null);
+            _tmp.Key = (note.RealValue).ToByte_IFormatProvider(null);
             _tmp.Length = alphaTab.audio.MidiUtils.ToTicks(note.Beat.Duration);
             return _tmp;
         })(), (function (){
@@ -270,7 +287,7 @@ class MidiFileGeneratorTest
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
             _tmp.DynamicValue = note.Dynamic;
-            _tmp.Key = note.RealValue.ToByte_IFormatProvider(null);
+            _tmp.Key = (note.RealValue).ToByte_IFormatProvider(null);
             _tmp.Length = alphaTab.audio.MidiUtils.ToTicks(note.Beat.Duration);
             return _tmp;
         })(), (function (){
@@ -294,7 +311,7 @@ class MidiFileGeneratorTest
         alphaTab.test.Assert.AreEqual_T1_T22(expectedEvents.Length, handler.MidiEvents.Count);
     }
 
-    @Test
+    @:testMethod
     public function TestBendMultiPoint() : Void 
     {
         var tex : system.CsString = ":4 15.6{b(0 4 0)} 15.6";
@@ -315,7 +332,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.VolumeCoarse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.VolumeCoarse).ToByte_IFormatProvider(null);
             _tmp.Value = 120;
             return _tmp;
         })(), (function (){
@@ -323,7 +340,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.PanCoarse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.PanCoarse).ToByte_IFormatProvider(null);
             _tmp.Value = 64;
             return _tmp;
         })(), (function (){
@@ -331,7 +348,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.ExpressionControllerCoarse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.ExpressionControllerCoarse).ToByte_IFormatProvider(null);
             _tmp.Value = 127;
             return _tmp;
         })(), (function (){
@@ -339,7 +356,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.RegisteredParameterFine.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.RegisteredParameterFine).ToByte_IFormatProvider(null);
             _tmp.Value = 0;
             return _tmp;
         })(), (function (){
@@ -347,7 +364,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.RegisteredParameterCourse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.RegisteredParameterCourse).ToByte_IFormatProvider(null);
             _tmp.Value = 0;
             return _tmp;
         })(), (function (){
@@ -355,7 +372,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.DataEntryFine.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.DataEntryFine).ToByte_IFormatProvider(null);
             _tmp.Value = 0;
             return _tmp;
         })(), (function (){
@@ -363,7 +380,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.DataEntryCoarse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.DataEntryCoarse).ToByte_IFormatProvider(null);
             _tmp.Value = 12;
             return _tmp;
         })(), (function (){
@@ -371,14 +388,14 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
-            _tmp.Program = info.Program.ToByte_IFormatProvider(null);
+            _tmp.Program = (info.Program).ToByte_IFormatProvider(null);
             return _tmp;
         })(), (function (){
             var _tmp = new alphaTab.test.audio.FlatMidiEventGenerator_ControlChangeEvent();
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.SecondaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.VolumeCoarse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.VolumeCoarse).ToByte_IFormatProvider(null);
             _tmp.Value = 120;
             return _tmp;
         })(), (function (){
@@ -386,7 +403,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.SecondaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.PanCoarse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.PanCoarse).ToByte_IFormatProvider(null);
             _tmp.Value = 64;
             return _tmp;
         })(), (function (){
@@ -394,7 +411,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.SecondaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.ExpressionControllerCoarse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.ExpressionControllerCoarse).ToByte_IFormatProvider(null);
             _tmp.Value = 127;
             return _tmp;
         })(), (function (){
@@ -402,7 +419,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.SecondaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.RegisteredParameterFine.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.RegisteredParameterFine).ToByte_IFormatProvider(null);
             _tmp.Value = 0;
             return _tmp;
         })(), (function (){
@@ -410,7 +427,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.SecondaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.RegisteredParameterCourse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.RegisteredParameterCourse).ToByte_IFormatProvider(null);
             _tmp.Value = 0;
             return _tmp;
         })(), (function (){
@@ -418,7 +435,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.SecondaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.DataEntryFine.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.DataEntryFine).ToByte_IFormatProvider(null);
             _tmp.Value = 0;
             return _tmp;
         })(), (function (){
@@ -426,7 +443,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.SecondaryChannel;
-            _tmp.Controller = alphaTab.audio.model.MidiController.DataEntryCoarse.ToByte_IFormatProvider(null);
+            _tmp.Controller = (alphaTab.audio.synth.midi.event.ControllerTypeEnum.DataEntryCoarse).ToByte_IFormatProvider(null);
             _tmp.Value = 12;
             return _tmp;
         })(), (function (){
@@ -434,7 +451,7 @@ class MidiFileGeneratorTest
             _tmp.Tick = 0;
             _tmp.Track = 0;
             _tmp.Channel = info.SecondaryChannel;
-            _tmp.Program = info.Program.ToByte_IFormatProvider(null);
+            _tmp.Program = (info.Program).ToByte_IFormatProvider(null);
             return _tmp;
         })(), (function (){
             var _tmp = new alphaTab.test.audio.FlatMidiEventGenerator_TimeSignatureEvent();
@@ -621,7 +638,7 @@ class MidiFileGeneratorTest
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
             _tmp.DynamicValue = note.Dynamic;
-            _tmp.Key = note.RealValue.ToByte_IFormatProvider(null);
+            _tmp.Key = (note.RealValue).ToByte_IFormatProvider(null);
             _tmp.Length = alphaTab.audio.MidiUtils.ToTicks(note.Beat.Duration);
             return _tmp;
         })(), (function (){
@@ -637,7 +654,7 @@ class MidiFileGeneratorTest
             _tmp.Track = 0;
             _tmp.Channel = info.PrimaryChannel;
             _tmp.DynamicValue = note.Dynamic;
-            _tmp.Key = note.RealValue.ToByte_IFormatProvider(null);
+            _tmp.Key = (note.RealValue).ToByte_IFormatProvider(null);
             _tmp.Length = alphaTab.audio.MidiUtils.ToTicks(note.Beat.Duration);
             return _tmp;
         })(), (function (){

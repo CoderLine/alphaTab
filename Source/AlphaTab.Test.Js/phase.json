@@ -1,29 +1,16 @@
 {
   "output": "Haxe\\src-gen",
-  "processorCount": 1,
+  //"processorCount": 1,
   "postbuild": [
     {
       "name": "Building JavaScript (debug)",
       "executable": "haxe",
-      "arguments": "test.hxml",
-      "workingDirectory": "Haxe"
+      "arguments": "-cp ..\\..\\Phase\\Mscorlib -cp ..\\..\\Build\\Haxe\\src -cp ..\\..\\Build\\Haxe\\src-gen -cp Haxe\\src -cp Haxe\\src-gen -js test\\alphaTab.tests.js -main alphaTab.test.Main -debug -D js-unflatten --macro addGlobalMetadata('alphaTab','@:expose') --macro keep('alphaTab',null,true) --macro alphaTab.test.AddResources.run() --macro alphaTab.test.Jasmine.generateJasmineSuites()"
     },
     {
-      "name": "Updating unit tests",
-      "executable": "haxelib",
-      "arguments": "run munit gen",
-      "workingDirectory": "Haxe"
-    },
-    {
-      "name": "Copying output to runner directory",
+      "name": "Copying testfiles to runner directory",
       "executable": "cmd.exe",
-      "arguments": "/C copy bin\\js_test.js report\\test-runner\\js_test.js",
-      "workingDirectory": "Haxe"
-    },
-    {
-      "name": "Copying output to runner directory",
-      "executable": "cmd.exe",
-      "arguments": "/C xcopy ..\\AlphaTab.Test\\TestFiles Haxe\\report\\test-runner\\TestFiles\\ /Y /S /D"
+      "arguments": "/C xcopy ..\\AlphaTab.Test\\TestFiles test\\TestFiles\\ /Y /S /D"
     }
   ]
 }

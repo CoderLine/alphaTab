@@ -11,17 +11,12 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AlphaTabException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\GeneralMidi.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Audio\Generator\AlphaSynthMidiFileHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Generator\IMidiFileHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Generator\MidiFileGenerator.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Audio\Generator\MidiFileHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Generator\MidiPlaybackController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\MidiUtils.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Audio\Model\MidiController.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Audio\Model\MidiEvent.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Audio\Model\MidiFile.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Audio\Model\MidiMessage.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Audio\Model\MidiTickLookup.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Audio\Model\MidiTrack.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Audio\MidiTickLookup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\AlphaSynth.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Bank\AssetManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Bank\Components\Envelope.cs" />
@@ -62,7 +57,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\SystemExclusiveEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\MidiFile.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\MidiHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\MidiTrack.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\PlayerState.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Sf2\Chunks\Chunk.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Sf2\Chunks\GeneratorChunk.cs" />

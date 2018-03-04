@@ -103,9 +103,9 @@ namespace AlphaTab.Audio.Synth.Midi.Event
 
     public class MidiEvent
     {
-        protected int Message;
+        public int Message { get; set; }
 
-        public int DeltaTime { get; set; }
+        public int Tick { get; set; }
 
         public virtual int Channel
         {
@@ -137,9 +137,9 @@ namespace AlphaTab.Audio.Synth.Midi.Event
             }
         }
 
-        public MidiEvent(int delta, int status, byte data1, byte data2)
+        public MidiEvent(int tick, int status, byte data1, byte data2)
         {
-            DeltaTime = delta;
+            Tick = tick;
             Message = status | (data1 << 8) | (data2 << 16);
         }
     }

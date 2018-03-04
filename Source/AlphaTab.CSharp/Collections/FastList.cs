@@ -20,6 +20,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using AlphaTab.Audio.Synth.Midi.Event;
 
 namespace AlphaTab.Collections
 {
@@ -91,6 +92,11 @@ namespace AlphaTab.Collections
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public void InsertAt(int insertPos, T item)
+        {
+            _list.Insert(insertPos, item);
         }
     }
 }

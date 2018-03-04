@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{B124E22D-BC49-4254-A641-37F1FD2B58F8}"
 EndProject
@@ -13,8 +13,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaTab.JavaScript", "Source\AlphaTab.JavaScript\AlphaTab.JavaScript.csproj", "{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaTab.Samples.MidiDump", "Samples\CSharp\AlphaTab.Samples.MidiDump\AlphaTab.Samples.MidiDump.csproj", "{4DF96479-E5B5-4F2F-AE14-C10AE0834934}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaTab.Samples.PngDump", "Samples\CSharp\AlphaTab.Samples.PngDump\AlphaTab.Samples.PngDump.csproj", "{CE8D9CE7-CC4F-403D-BA8E-7480138F6C23}"
 EndProject
@@ -54,10 +52,6 @@ Global
 		{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CFB12FE-A2FC-4688-ACB8-D68C2849F456}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4DF96479-E5B5-4F2F-AE14-C10AE0834934}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4DF96479-E5B5-4F2F-AE14-C10AE0834934}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4DF96479-E5B5-4F2F-AE14-C10AE0834934}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4DF96479-E5B5-4F2F-AE14-C10AE0834934}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CE8D9CE7-CC4F-403D-BA8E-7480138F6C23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CE8D9CE7-CC4F-403D-BA8E-7480138F6C23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE8D9CE7-CC4F-403D-BA8E-7480138F6C23}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -104,7 +98,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0F4187B8-D34E-475D-8656-06F739E31DB3} = {B124E22D-BC49-4254-A641-37F1FD2B58F8}
-		{4DF96479-E5B5-4F2F-AE14-C10AE0834934} = {0F4187B8-D34E-475D-8656-06F739E31DB3}
 		{CE8D9CE7-CC4F-403D-BA8E-7480138F6C23} = {0F4187B8-D34E-475D-8656-06F739E31DB3}
 		{C4C50EF4-3B08-4602-A776-846830FBF510} = {0F4187B8-D34E-475D-8656-06F739E31DB3}
 		{5FFAB560-4428-43B6-B893-C869E9220D76} = {0F4187B8-D34E-475D-8656-06F739E31DB3}

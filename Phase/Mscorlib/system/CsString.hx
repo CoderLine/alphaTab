@@ -298,6 +298,22 @@ abstract CsString(String) from String to String
 		
 		return s;
 	}
+	
+	public static function Join_CsString_IEnumerable_CsString<T>(separator:CsString, v:system.collections.generic.IEnumerable<CsString>) : CsString
+	{
+		var s = "";
+
+		var enumerator = v.GetEnumerator();
+		var first = true;
+		while(enumerator.MoveNext())
+		{
+			if(!first) s += separator;
+			s += enumerator.Current;
+			first = false;
+		}
+		
+		return s;
+	}
 
 	public static function Join_CsString_CsStringArray(separator:CsString, args: system.FixedArray<CsString> ) : CsString
 	{

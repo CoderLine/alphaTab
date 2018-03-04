@@ -15,7 +15,11 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using AlphaTab.Audio.Synth.Midi;
+using AlphaTab.Audio.Synth.Midi.Event;
 using AlphaTab.Collections;
+using AlphaTab.Haxe;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Model
@@ -26,7 +30,7 @@ namespace AlphaTab.Model
     /// </summary>
     public class JsonConverter
     {
-        public Score ScoreToJsObject(Score score)
+        public static Score ScoreToJsObject(Score score)
         {
             Score score2 = Platform.Platform.NewObject();
             Score.CopyTo(score, score2);
@@ -181,7 +185,7 @@ namespace AlphaTab.Model
             return score2;
         }
 
-        public Score JsObjectToScore(Score score)
+        public static Score JsObjectToScore(Score score)
         {
             var score2 = new Score();
             Score.CopyTo(score, score2);
@@ -314,6 +318,99 @@ namespace AlphaTab.Model
 
             score2.Finish();
             return score2;
+        }
+
+        public static MidiFile JsObjectToMidiFile(dynamic midi)
+        {
+            var midi2 = new MidiFile();
+            midi2.Division = midi.Division;
+            midi2.TimingStandard = midi.TimingStandard;
+            midi2.TrackFormat = midi.TrackFormat;
+
+            FastList<dynamic> midiEvents = midi.Events;
+            foreach (var midiEvent in midiEvents)
+            {
+                int tick = midiEvent.Tick;
+                int message = midiEvent.Message;
+                MidiEvent midiEvent2;
+                switch (midiEvent.Type)
+                {
+                    case "alphaTab.audio.synth.midi.event.MetaEvent":
+                        midiEvent2 = new MetaEvent(tick, 0, 0, 0);
+                        midiEvent2.Message = message;
+                        break;
+                    case "alphaTab.audio.synth.midi.event.SystemCommonEvent":
+                        midiEvent2 = new SystemCommonEvent(tick, 0, 0, 0);
+                        midiEvent2.Message = message;
+                        break;
+                    case "alphaTab.audio.synth.midi.event.SystemExclusiveEvent":
+                        midiEvent2 = new SystemExclusiveEvent(tick, 0, 0, midiEvent.Data);
+                        midiEvent2.Message = message;
+                        break;
+                    case "alphaTab.audio.synth.midi.event.MetaDataEvent":
+                        midiEvent2 = new MetaDataEvent(tick, 0, 0, midiEvent.Data);
+                        midiEvent2.Message = message;
+                        break;
+                    case "alphaTab.audio.synth.midi.event.MetaNumberEvent":
+                        midiEvent2 = new MetaNumberEvent(tick, 0, 0, midiEvent.Value);
+                        midiEvent2.Message = message;
+                        break;
+                    case "alphaTab.audio.synth.midi.event.MetaTextEvent":
+                        midiEvent2 = new MetaTextEvent(tick, 0, 0, midiEvent.Text);
+                        midiEvent2.Message = message;
+                        break;
+                    default:
+                        midiEvent2 = new MidiEvent(tick, 0, 0, 0);
+                        midiEvent2.Message = message;
+                        break;
+                }
+                midi2.Events.Add(midiEvent2);
+            }
+
+            return midi2;
+        }
+
+        public static object MidiFileToJsObject(MidiFile midi)
+        {
+            var midi2 = Platform.Platform.NewObject();
+            midi2.Division = midi.Division;
+            midi2.TimingStandard = midi.TimingStandard;
+            midi2.TrackFormat = midi.TrackFormat;
+            var midiEvents = new FastList<object>();
+            midi2.Events = midiEvents;
+            foreach (var midiEvent in midi.Events)
+            {
+                var midiEvent2 = Platform.Platform.NewObject();
+                midiEvents.Add(midiEvent2);
+                midiEvent2.Type = Platform.Platform.GetTypeName(midiEvent);
+                midiEvent2.Tick = midiEvent.Tick;
+                midiEvent2.Message = midiEvent.Message;
+                switch (midiEvent2.Type)
+                {
+                    case "alphaTab.audio.synth.midi.event.MetaEvent":
+                    case "alphaTab.audio.synth.midi.event.SystemCommonEvent":
+                        // no additional fields
+                        break;
+                    case "alphaTab.audio.synth.midi.event.SystemExclusiveEvent":
+                        SystemExclusiveEvent sysex = (SystemExclusiveEvent)midiEvent;
+                        midiEvent2.Data = sysex.Data;
+                        break;
+                    case "alphaTab.audio.synth.midi.event.MetaDataEvent":
+                        MetaDataEvent metadata = (MetaDataEvent)midiEvent;
+                        midiEvent2.Data = metadata.Data;
+                        break;
+                    case "alphaTab.audio.synth.midi.event.MetaNumberEvent":
+                        MetaNumberEvent metanumber = (MetaNumberEvent)midiEvent;
+                        midiEvent2.Value = metanumber.Value;
+                        break;
+                    case "alphaTab.audio.synth.midi.event.MetaTextEvent":
+                        MetaTextEvent metatext = (MetaTextEvent)midiEvent;
+                        midiEvent2.Text = metatext.Text;
+                        break;
+                }
+            }
+
+            return midi2;
         }
     }
 }

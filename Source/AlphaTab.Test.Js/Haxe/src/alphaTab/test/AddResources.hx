@@ -2,12 +2,12 @@ package alphaTab.test;
 
 class AddResources
 {
-	private static var Extensions = [".gp3", ".gp4", ".gp5", ".gpx", ".xml"];
+	private static var Extensions = [".gp3", ".gp4", ".gp5", ".gpx", ".xml", ".sf2"];
 	public static macro function run()
 	{
-		trace('Adding resources');
+		var sourceDir = haxe.io.Path.join([Sys.getCwd(), "..", "AlphaTab.Test", "TestFiles"]);
+		trace('Adding resources from '+ sourceDir);
 		
-		var sourceDir = haxe.io.Path.join([Sys.getCwd(), "..", "..", "AlphaTab.Test", "TestFiles"]);
 		var resourcePrefix = "TestFiles";
 		
 		importRecursive(sourceDir, resourcePrefix);

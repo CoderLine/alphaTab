@@ -1,9 +1,10 @@
 package alphaTab.test.importer;
 
 using system.HaxeExtensions;
+@:testClass
 class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
 {
-    @Test
+    @:testMethod
     public function TestScoreInfo() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/Test01.gp3");
@@ -25,7 +26,7 @@ class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestScoreInfo");
     }
 
-    @Test
+    @:testMethod
     public function TestNotes() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/Test02.gp3");
@@ -34,7 +35,7 @@ class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestNotes");
     }
 
-    @Test
+    @:testMethod
     public function TestTimeSignatures() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/Test03.gp3");
@@ -43,7 +44,7 @@ class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestTimeSignatures");
     }
 
-    @Test
+    @:testMethod
     public function TestDead() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/TestDead.gp3");
@@ -52,24 +53,24 @@ class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestDead");
     }
 
-    @Test
+    @:testMethod
     public function TestAccentuation() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/TestAccentuations.gp3");
         var score : alphaTab.model.Score = reader.ReadScore();
-        massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsGhost);
+        alphaTab.test.Assert.IsTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsGhost);
         // it seems accentuation is handled as Forte Fortissimo
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.DynamicValue.FFF, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).Dynamic);
-        massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).IsLetRing);
+        alphaTab.test.Assert.IsTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).IsLetRing);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestAccentuation");
     }
 
-    @Test
+    @:testMethod
     public function TestGuitarPro3Harmonics() : Void 
     {
     }
 
-    @Test
+    @:testMethod
     public function TestHammer() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/TestHammer.gp3");
@@ -78,7 +79,7 @@ class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestHammer");
     }
 
-    @Test
+    @:testMethod
     public function TestBend() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/TestBends.gp3");
@@ -87,7 +88,7 @@ class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestBend");
     }
 
-    @Test
+    @:testMethod
     public function TestSlides() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/TestSlides.gp3");
@@ -97,7 +98,7 @@ class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestSlides");
     }
 
-    @Test
+    @:testMethod
     public function TestGuitarPro3Vibrato() : Void 
     {
         // TODO: Check why this vibrato is not recognized
@@ -107,26 +108,26 @@ class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestGuitarPro3Vibrato");
     }
 
-    @Test
+    @:testMethod
     public function TestOtherEffects() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/TestOtherEffects.gp3");
         var score : alphaTab.model.Score = reader.ReadScore();
-        massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Tap);
-        massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Slap);
-        massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Pop);
-        massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).FadeIn);
-        massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(3).Voices.get_Item(0).Beats.get_Item(0).HasChord);
+        alphaTab.test.Assert.IsTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(2).Tap);
+        alphaTab.test.Assert.IsTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(3).Slap);
+        alphaTab.test.Assert.IsTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Pop);
+        alphaTab.test.Assert.IsTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).FadeIn);
+        alphaTab.test.Assert.IsTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(3).Voices.get_Item(0).Beats.get_Item(0).HasChord);
         alphaTab.test.Assert.AreEqual_T1_T22("C", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(3).Voices.get_Item(0).Beats.get_Item(0).Chord.Name);
         alphaTab.test.Assert.AreEqual_T1_T22("Text", score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(3).Voices.get_Item(0).Beats.get_Item(1).Text);
-        massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(4).Voices.get_Item(0).Beats.get_Item(0).GetAutomation(alphaTab.model.AutomationType.Tempo) != null);
+        alphaTab.test.Assert.IsTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(4).Voices.get_Item(0).Beats.get_Item(0).GetAutomation(alphaTab.model.AutomationType.Tempo) != null);
         alphaTab.test.Assert.AreEqual_T1_T22(120.0, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(4).Voices.get_Item(0).Beats.get_Item(0).GetAutomation(alphaTab.model.AutomationType.Tempo).Value);
-        massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(4).Voices.get_Item(0).Beats.get_Item(0).GetAutomation(alphaTab.model.AutomationType.Instrument) != null);
+        alphaTab.test.Assert.IsTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(4).Voices.get_Item(0).Beats.get_Item(0).GetAutomation(alphaTab.model.AutomationType.Instrument) != null);
         alphaTab.test.Assert.AreEqual_T1_T22(25.0, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(4).Voices.get_Item(0).Beats.get_Item(0).GetAutomation(alphaTab.model.AutomationType.Instrument).Value);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestOtherEffects");
     }
 
-    @Test
+    @:testMethod
     public function TestStroke() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/TestStrokes.gp3");
@@ -136,7 +137,7 @@ class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestStroke");
     }
 
-    @Test
+    @:testMethod
     public function TestTuplets() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/TestTuplets.gp3");
@@ -145,19 +146,19 @@ class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestTuplets");
     }
 
-    @Test
+    @:testMethod
     public function TestRanges() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/TestRanges.gp3");
         var score : alphaTab.model.Score = reader.ReadScore();
-        massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).IsLetRing);
-        massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).IsLetRing);
-        massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).IsLetRing);
-        massive.munit.Assert.isTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsLetRing);
+        alphaTab.test.Assert.IsTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(1).Notes.get_Item(0).IsLetRing);
+        alphaTab.test.Assert.IsTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(2).Notes.get_Item(0).IsLetRing);
+        alphaTab.test.Assert.IsTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(3).Notes.get_Item(0).IsLetRing);
+        alphaTab.test.Assert.IsTrue(score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(2).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsLetRing);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestRanges");
     }
 
-    @Test
+    @:testMethod
     public function TestEffects() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/Effects.gp3");
@@ -166,7 +167,7 @@ class Gp3ImporterTest extends alphaTab.test.importer.GpImporterTestBase
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp3ImporterTest.cs", "TestEffects");
     }
 
-    @Test
+    @:testMethod
     public function TestStrings() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro3/TestStrings.gp3");

@@ -46,8 +46,7 @@ namespace AlphaTab.Platform.JavaScript
                     _renderer.Resize(data.width);
                     break;
                 case "alphaTab.render":
-                    var converter = new JsonConverter();
-                    var score = converter.JsObjectToScore(data.score);
+                    var score = JsonConverter.JsObjectToScore(data.score);
                     RenderMultiple(score, data.trackIndexes);
                     break;
                 case "alphaTab.updateSettings":

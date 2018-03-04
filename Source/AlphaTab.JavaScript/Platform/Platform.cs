@@ -18,6 +18,8 @@
 
 using System;
 using AlphaTab.Audio.Synth;
+using AlphaTab.Audio.Synth.Midi;
+using AlphaTab.Audio.Synth.Midi.Event;
 using AlphaTab.Collections;
 using AlphaTab.Haxe.Js;
 using AlphaTab.IO;
@@ -246,11 +248,6 @@ namespace AlphaTab.Platform
             }
         }
 
-        public static ISynthOutput CreateOutput()
-        {
-            return new AlphaSynthWorkerSynthOutput();
-        }
-
         public const bool IsLittleEndian = true;
 
         [Inline]
@@ -289,19 +286,19 @@ namespace AlphaTab.Platform
         [Inline]
         public static void ArrayCopy(int[] src, int srcOffset, int[] dst, int dstOffset, int count)
         {
-            Script.Write("untyped __js__(\"{2}.set({0}.subarray({1},{4}), {3})\", src, srcOffset, dst, dstOffset, count);");
+            Script.Write("untyped __js__(\"{2}.set({0}.subarray({1},{1}+{4}), {3})\", src, srcOffset, dst, dstOffset, count);");
         }
 
         [Inline]
         public static void ArrayCopy(short[] src, int srcOffset, short[] dst, int dstOffset, int count)
         {
-            Script.Write("untyped __js__(\"{2}.set({0}.subarray({1},{4}), {3})\", src, srcOffset, dst, dstOffset, count);");
+            Script.Write("untyped __js__(\"{2}.set({0}.subarray({1},{1}+{4}), {3})\", src, srcOffset, dst, dstOffset, count);");
         }
 
         [Inline]
         public static void ArrayCopy(byte[] src, int srcOffset, byte[] dst, int dstOffset, int count)
         {
-            Script.Write("untyped __js__(\"{2}.set({0}.subarray({1},{4}), {3})\", src, srcOffset, dst, dstOffset, count);");
+            Script.Write("untyped __js__(\"{2}.set({0}.subarray({1},{1}+{4}), {3})\", src, srcOffset, dst, dstOffset, count);");
         }
 
         public static void ArrayCopy<T>(T[] src, int srcOffset, T[] dst, int dstOffset, int count)
@@ -315,7 +312,13 @@ namespace AlphaTab.Platform
         [Inline]
         public static void Reverse(byte[] array)
         {
-            Script.Write("untyped __js__(\"{0}.reverse()\", array)");
+            Script.Write("untyped __js__(\"{0}.reverse()\", array);");
+        }
+
+        [Inline]
+        public static string GetTypeName<T>(T obj)
+        {
+            return Script.Write<string>("Type.getClassName(Type.getClass(obj))");
         }
     }
 }

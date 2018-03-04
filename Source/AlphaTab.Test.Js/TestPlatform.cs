@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AlphaTab.Importer;
-using AlphaTab.IO;
+﻿using AlphaTab.IO;
 using Haxe.Js.Html;
 using Phase;
 

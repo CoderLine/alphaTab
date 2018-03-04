@@ -139,7 +139,7 @@ namespace AlphaTab.Audio.Synth
             if (milliseconds <= 0) return;
 
             _currentTime += milliseconds;
-            while (_eventIndex < _synthData.Count && _synthData[_eventIndex].Delta < (_currentTime))
+            while (_eventIndex < _synthData.Count && _synthData[_eventIndex].Time < (_currentTime))
             {
                 var m = _synthData[_eventIndex];
                 if (!m.IsMetronome)
@@ -155,12 +155,6 @@ namespace AlphaTab.Audio.Synth
         {
             _tempoChanges = new FastList<MidiFileSequencerTempoChange>();
 
-
-            // Combine all tracks into 1 track that is organized from lowest to highest absolute time
-            if (midiFile.Tracks.Length > 1 || midiFile.Tracks[0].EndTime == 0)
-            {
-                midiFile.CombineTracks();
-            }
             _division = midiFile.Division;
             _eventIndex = 0;
             _currentTime = 0;
@@ -176,15 +170,14 @@ namespace AlphaTab.Audio.Synth
             var metronomeLength = 0;
             var metronomeTick = 0;
             var metronomeTime = 0.0;
-            for (int x = 0; x < midiFile.Tracks[0].MidiEvents.Length; x++)
-            {
-                var mEvent = midiFile.Tracks[0].MidiEvents[x];
 
+            foreach(var mEvent in midiFile.Events)
+            {
                 var synthData = new SynthEvent(_synthData.Count, mEvent);
                 _synthData.Add(synthData);
-                absTick += mEvent.DeltaTime;
-                absTime += mEvent.DeltaTime * (60000.0 / (bpm * midiFile.Division));
-                synthData.Delta = absTime;
+                absTick = mEvent.Tick;
+                absTime = mEvent.Tick * (60000.0 / (bpm * midiFile.Division));
+                synthData.Time = absTime;
 
                 if (mEvent.Command == MidiEventTypeEnum.Meta && mEvent.Data1 == (int)MetaEventTypeEnum.Tempo)
                 {
@@ -213,7 +206,7 @@ namespace AlphaTab.Audio.Synth
                     {
                         var metronome = SynthEvent.NewMetronomeEvent(_synthData.Count, metronomeLength);
                         _synthData.Add(metronome);
-                        metronome.Delta = metronomeTime;
+                        metronome.Time = metronomeTime;
 
                         metronomeTick += metronomeLength;
                         metronomeTime += metronomeLength * (60000.0 / (bpm * midiFile.Division));
@@ -223,11 +216,11 @@ namespace AlphaTab.Audio.Synth
 
             _synthData.Sort((a, b) =>
             {
-                if (a.Delta > b.Delta)
+                if (a.Time > b.Time)
                 {
                     return 1;
                 }
-                else if (a.Delta < b.Delta)
+                else if (a.Time < b.Time)
                 {
                     return -1;
                 }
@@ -244,7 +237,7 @@ namespace AlphaTab.Audio.Synth
             for (int i = 0; i < _synthesizer.MicroBufferCount; i++)
             {
                 _currentTime += millisecondsPerBuffer;
-                while (_eventIndex < _synthData.Count && _synthData[_eventIndex].Delta < _currentTime)
+                while (_eventIndex < _synthData.Count && _synthData[_eventIndex].Time < _currentTime)
                 {
                     _synthesizer.DispatchEvent(i, _synthData[_eventIndex]);
                     _eventIndex++;

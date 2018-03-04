@@ -1,6 +1,6 @@
 package system;
 
-abstract Int32Array(js.html.Int32Array) 
+abstract Int32Array(js.html.Int32Array)
 {
 	public inline function new(length:Int32) this = new js.html.Int32Array(length.ToHaxeInt());
 	
@@ -15,7 +15,7 @@ abstract Int32Array(js.html.Int32Array)
 	
 	public inline function iterator() : Iterator<Int32> return new Int32ArrayIterator(this);
 	
-	public inline function ToEnumerable() : system.collections.generic.IEnumerable<Int32> return new Int32ArrayEnumerable(this);
+	@:to public inline function ToEnumerable() : system.collections.generic.IEnumerable<Int32> return new Int32ArrayEnumerable(this);
 
 	public static inline function empty(size:Int32) return new Int32Array(size);
 }

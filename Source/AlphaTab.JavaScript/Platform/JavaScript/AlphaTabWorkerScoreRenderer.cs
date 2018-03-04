@@ -106,8 +106,7 @@ namespace AlphaTab.Platform.JavaScript
 
         public void Render(Score score, int[] trackIndexes)
         {
-            var converter = new JsonConverter();
-            score = converter.ScoreToJsObject(score);
+            score = JsonConverter.ScoreToJsObject(score);
             _worker.PostMessage(new { cmd = "alphaTab.render", score = score, trackIndexes = trackIndexes });
         }
 

@@ -1,9 +1,10 @@
 package alphaTab.test.audio;
 
 using system.HaxeExtensions;
+@:testClass
 class MidiPlaybackControllerTest extends alphaTab.test.importer.GpImporterTestBase
 {
-    @Test
+    @:testMethod
     public function TestRepeatClose() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro5\\RepeatClose.gp5");
@@ -12,7 +13,7 @@ class MidiPlaybackControllerTest extends alphaTab.test.importer.GpImporterTestBa
         TestRepeat(score, expectedIndexes);
     }
 
-    @Test
+    @:testMethod
     public function TestRepeatCloseMulti() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro5\\RepeatCloseMulti.gp5");
@@ -21,7 +22,7 @@ class MidiPlaybackControllerTest extends alphaTab.test.importer.GpImporterTestBa
         TestRepeat(score, expectedIndexes);
     }
 
-    @Test
+    @:testMethod
     public function TestRepeatCloseWithoutStartAtBeginning() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro5\\RepeatCloseWithoutStartAtBeginning.gp5");
@@ -30,7 +31,7 @@ class MidiPlaybackControllerTest extends alphaTab.test.importer.GpImporterTestBa
         TestRepeat(score, expectedIndexes);
     }
 
-    @Test
+    @:testMethod
     public function TestRepeatCloseAlternateEndings() : Void 
     {
         var reader : alphaTab.importer.Gp3To5Importer = PrepareImporterWithFile("GuitarPro5\\RepeatCloseAlternateEndings.gp5");
@@ -56,7 +57,7 @@ class MidiPlaybackControllerTest extends alphaTab.test.importer.GpImporterTestBa
             controller.MoveNext();
         }
         alphaTab.test.Assert.AreEqual_T1_T22(expectedIndexes.Length, i);
-        massive.munit.Assert.isTrue(controller.Finished);
+        alphaTab.test.Assert.IsTrue(controller.Finished);
     }
 
     public function new() 

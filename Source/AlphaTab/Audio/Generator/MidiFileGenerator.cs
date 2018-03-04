@@ -16,7 +16,7 @@
  * License along with this library.
  */
 using System;
-using AlphaTab.Audio.Model;
+using AlphaTab.Audio.Synth.Midi.Event;
 using AlphaTab.Model;
 
 namespace AlphaTab.Audio.Generator
@@ -30,6 +30,9 @@ namespace AlphaTab.Audio.Generator
         private readonly IMidiFileHandler _handler;
         private int _currentTempo;
 
+        public const int DefaultMetronomeKey = 37;
+        public const int DefaultDurationDead = 30;
+        public const int DefaultDurationPalmMute = 80;
 
         public MidiTickLookup TickLookup { get; private set; }
 
@@ -40,24 +43,6 @@ namespace AlphaTab.Audio.Generator
             _currentTempo = _score.Tempo;
             _handler = handler;
             TickLookup = new MidiTickLookup();
-        }
-
-        public static MidiFile GenerateMidiFile(Score score)
-        {
-            var midiFile = new MidiFile();
-            // create score tracks + metronometrack
-            for (int i = 0, j = score.Tracks.Count; i < j; i++)
-            {
-                midiFile.CreateTrack();
-            }
-            midiFile.InfoTrack = 0;
-            
-
-            var handler = new MidiFileHandler(midiFile);
-            var generator = new MidiFileGenerator(score, handler);
-            generator.Generate();
-            midiFile.TickLookup = generator.TickLookup;
-            return midiFile;
         }
 
         public void Generate()
@@ -121,17 +106,17 @@ namespace AlphaTab.Audio.Generator
         {
             var volume = ToChannelShort(playbackInfo.Volume);
             var balance = ToChannelShort(playbackInfo.Balance);
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.VolumeCoarse, (byte)volume);
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.PanCoarse, (byte)balance);
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.ExpressionControllerCoarse, 127);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)ControllerTypeEnum.VolumeCoarse, (byte)volume);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)ControllerTypeEnum.PanCoarse, (byte)balance);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)ControllerTypeEnum.ExpressionControllerCoarse, 127);
 
             // set parameter that is being updated (0) -> PitchBendRangeCoarse
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.RegisteredParameterFine, 0);
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.RegisteredParameterCourse, 0);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)ControllerTypeEnum.RegisteredParameterFine, 0);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)ControllerTypeEnum.RegisteredParameterCourse, 0);
 
             // Set PitchBendRangeCoarse to 12
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.DataEntryFine, 0);
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.DataEntryCoarse, 12);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)ControllerTypeEnum.DataEntryFine, 0);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)ControllerTypeEnum.DataEntryCoarse, 12);
 
             _handler.AddProgramChange(track.Index, 0, channel, (byte)playbackInfo.Program);
         }
@@ -387,11 +372,11 @@ namespace AlphaTab.Audio.Generator
         {
             if (note.IsDead)
             {
-                return ApplyStaticDuration(MidiFileHandler.DefaultDurationDead, duration);
+                return ApplyStaticDuration(DefaultDurationDead, duration);
             }
             if (note.IsPalmMute)
             {
-                return ApplyStaticDuration(MidiFileHandler.DefaultDurationPalmMute, duration);
+                return ApplyStaticDuration(DefaultDurationPalmMute, duration);
             }
             if (note.IsStaccato)
             {
@@ -474,11 +459,11 @@ namespace AlphaTab.Audio.Generator
                 var volume = (tick - noteStart) * volumeFactor;
                 if (i == steps - 1)
                 {
-                    _handler.AddControlChange(track.Index, noteStart, (byte)track.PlaybackInfo.PrimaryChannel, (byte)MidiController.VolumeCoarse, (byte)volume);
-                    _handler.AddControlChange(track.Index, noteStart, (byte)track.PlaybackInfo.SecondaryChannel, (byte)MidiController.VolumeCoarse, (byte)volume);
+                    _handler.AddControlChange(track.Index, noteStart, (byte)track.PlaybackInfo.PrimaryChannel, (byte)ControllerTypeEnum.VolumeCoarse, (byte)volume);
+                    _handler.AddControlChange(track.Index, noteStart, (byte)track.PlaybackInfo.SecondaryChannel, (byte)ControllerTypeEnum.VolumeCoarse, (byte)volume);
                 }
-                _handler.AddControlChange(track.Index, tick, (byte)track.PlaybackInfo.PrimaryChannel, (byte)MidiController.VolumeCoarse, (byte)volume);
-                _handler.AddControlChange(track.Index, tick, (byte)track.PlaybackInfo.SecondaryChannel, (byte)MidiController.VolumeCoarse, (byte)volume);
+                _handler.AddControlChange(track.Index, tick, (byte)track.PlaybackInfo.PrimaryChannel, (byte)ControllerTypeEnum.VolumeCoarse, (byte)volume);
+                _handler.AddControlChange(track.Index, tick, (byte)track.PlaybackInfo.SecondaryChannel, (byte)ControllerTypeEnum.VolumeCoarse, (byte)volume);
             }
         }
 
@@ -688,11 +673,11 @@ namespace AlphaTab.Audio.Generator
                     var balance = ToChannelShort((int)automation.Value);
                     _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
                                                 (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel,
-                                                (byte)MidiController.PanCoarse,
+                                                (byte)ControllerTypeEnum.PanCoarse,
                                                 (byte)balance);
                     _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
                                                 (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel,
-                                                (byte)MidiController.PanCoarse,
+                                                (byte)ControllerTypeEnum.PanCoarse,
                                                 (byte)balance);
                     break;
                 case AutomationType.Volume:
@@ -700,11 +685,11 @@ namespace AlphaTab.Audio.Generator
 
                     _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
                                                 (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel,
-                                                (byte)MidiController.VolumeCoarse,
+                                                (byte)ControllerTypeEnum.VolumeCoarse,
                                                 (byte)volume);
                     _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
                                                 (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel,
-                                                (byte)MidiController.VolumeCoarse,
+                                                (byte)ControllerTypeEnum.VolumeCoarse,
                                                 (byte)volume);
                     break;
             }

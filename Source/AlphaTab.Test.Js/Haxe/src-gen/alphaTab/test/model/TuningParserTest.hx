@@ -1,9 +1,10 @@
 package alphaTab.test.model;
 
 using system.HaxeExtensions;
+@:testClass
 class TuningParserTest
 {
-    @Test
+    @:testMethod
     public function TestStandard() : Void 
     {
         var standard : alphaTab.model.Tuning = alphaTab.model.Tuning.GetDefaultTuningFor(6);
@@ -19,7 +20,7 @@ class TuningParserTest
                 i++;
             }
         }
-        alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_IEnumerable_T1(",", standard.Tunings.ToEnumerable()), system.CsString.Join_CsString_IEnumerable_T1(",", tuning.ToEnumerable()));
+        alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_IEnumerable_T1(",", standard.Tunings), system.CsString.Join_CsString_IEnumerable_T1(",", tuning));
         alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_CsStringArray(",", tuningText), system.CsString.Join_CsString_CsStringArray(",", tuningText2));
     }
 

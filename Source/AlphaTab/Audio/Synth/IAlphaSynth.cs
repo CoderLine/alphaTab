@@ -123,12 +123,6 @@ namespace AlphaTab.Audio.Synth
         void LoadSoundFont(byte[] data);
 
         /// <summary>
-        ///Loads a midi from the given data
-        /// </summary>
-        /// <param name="data">a byte array to load the data from </param>
-        void LoadMidi(byte[] data);
-
-        /// <summary>
         /// Gets the mute state of a channel.
         /// </summary>
         /// <param name="channel">The channel number</param>

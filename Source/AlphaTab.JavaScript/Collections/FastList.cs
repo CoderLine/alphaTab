@@ -81,6 +81,9 @@ namespace AlphaTab.Collections
         [Inline]
         public IEnumerable<T> ToEnumerable() => new IterableEnumerable<T>(this);
 
+        [Inline]
+        public void InsertAt(int insertPos, T item) => Script.This<HaxeArray<T>>().Insert(insertPos, item);
+
         [External]
         IEnumerator IEnumerable.GetEnumerator()
         {

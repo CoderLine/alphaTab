@@ -1,10 +1,12 @@
 ﻿using System;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Ds;
+using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Audio.Synth.Synthesis;
 using AlphaTab.Audio.Synth.Util;
 using AlphaTab.Collections;
 using AlphaTab.Haxe.Js.Html;
+using AlphaTab.Model;
 using AlphaTab.Util;
 using Haxe;
 using Haxe.Js.Html;
@@ -271,39 +273,9 @@ namespace AlphaTab.Platform.JavaScript
             request.Send();
         }
 
-        /// <inheritdoc />
-        public void LoadMidi(byte[] data)
+        public void LoadMidiFile(MidiFile midi)
         {
-          _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdLoadMidiBytes, data = data });
-        }
-
-        public void LoadMidiFromUrl(string url)
-        {
-            Logger.Info("AlphaSynth", "Start loading midi from url " + url);
-
-            var request = new XMLHttpRequest();
-            request.Open("GET", url, true);
-            request.ResponseType = XMLHttpRequestResponseType.ARRAYBUFFER;
-            request.OnLoad = (Action<Event>)(e =>
-            {
-                var buffer = new Uint8Array(request.Response);
-                _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdLoadMidiBytes, data = buffer });
-            });
-            request.OnError = (Action<Event>)(e =>
-            {
-                Logger.Error("AlphaSynth", "Loading failed: " + e.Member<string>("message"));
-                TriggerEvent("midiLoadFailed");
-            });
-            request.OnProgress = (Action<Event>)(e =>
-            {
-                Logger.Debug("AlphaSynth", "Midi downloading: " + e.Member<int>("loaded") + "/" + e.Member<int>("total") + " bytes");
-                TriggerEvent("midiLoad", new object[] { new
-                {
-                    loaded = e.Member<int>("loaded"),
-                    total = e.Member<int>("total")
-                }});
-            });
-            request.Send();
+            _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdLoadMidi, midi = JsonConverter.MidiFileToJsObject(midi) });
         }
 
         /// <inheritdoc />

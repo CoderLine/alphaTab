@@ -1,6 +1,7 @@
 package alphaTab.test.importer;
 
 using system.HaxeExtensions;
+@:testClass
 class AlphaTexImporterTest
 {
     private function ParseTex(tex : system.CsString) : alphaTab.model.Score 
@@ -11,7 +12,7 @@ class AlphaTexImporterTest
 
     }
 
-    @Test
+    @:testMethod
     public function EnsureMetadataParsing_Issue73() : Void 
     {
         var tex : system.CsString = "\\title Test\r\n                        \\words test\r\n                        \\music alphaTab\r\n                        \\copyright test\r\n                        \\tempo 200\r\n                        \\instrument 30\r\n                        \\capo 2\r\n                        \\tuning G3 D2 G2 B2 D3 A4\r\n                        .\r\n                        0.5.2 1.5.4 3.4.4 | 5.3.8 5.3.8 5.3.8 5.3.8 r.2";
@@ -24,7 +25,7 @@ class AlphaTexImporterTest
         alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
         alphaTab.test.Assert.AreEqual_T1_T22(30, score.Tracks.get_Item(0).PlaybackInfo.Program);
         alphaTab.test.Assert.AreEqual_T1_T22(2, score.Tracks.get_Item(0).Capo);
-        alphaTab.test.Assert.AreEqual_T1_T22("55,38,43,47,50,69", system.CsString.Join_CsString_IEnumerable_T1(",", score.Tracks.get_Item(0).Tuning.ToEnumerable()));
+        alphaTab.test.Assert.AreEqual_T1_T22("55,38,43,47,50,69", system.CsString.Join_CsString_IEnumerable_T1(",", score.Tracks.get_Item(0).Tuning));
         alphaTab.test.Assert.AreEqual_T1_T22(2, score.MasterBars.Count);
         alphaTab.test.Assert.AreEqual_T1_T22(3, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
         {
@@ -65,15 +66,15 @@ class AlphaTexImporterTest
         }
     }
 
-    @Test
+    @:testMethod
     public function TestTuning() : Void 
     {
         var tex : system.CsString = "\\tuning E4 B3 G3 D3 A2 E2\r\n                        .\r\n                        0.5.1";
         var score : alphaTab.model.Score = ParseTex(tex);
-        alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_IEnumerable_T1(",", alphaTab.model.Tuning.GetDefaultTuningFor(6).Tunings.ToEnumerable()), system.CsString.Join_CsString_IEnumerable_T1(",", score.Tracks.get_Item(0).Tuning.ToEnumerable()));
+        alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_IEnumerable_T1(",", alphaTab.model.Tuning.GetDefaultTuningFor(6).Tunings), system.CsString.Join_CsString_IEnumerable_T1(",", score.Tracks.get_Item(0).Tuning));
     }
 
-    @Test
+    @:testMethod
     public function DeadNotes1_Issue79() : Void 
     {
         var tex : system.CsString = ":4 x.3";
@@ -85,7 +86,7 @@ class AlphaTexImporterTest
         alphaTab.test.Assert.AreEqual_T1_T22(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsDead);
     }
 
-    @Test
+    @:testMethod
     public function DeadNotes2_Issue79() : Void 
     {
         var tex : system.CsString = ":4 3.3{x}";
@@ -97,7 +98,7 @@ class AlphaTexImporterTest
         alphaTab.test.Assert.AreEqual_T1_T22(true, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).IsDead);
     }
 
-    @Test
+    @:testMethod
     public function Trill_Issue79() : Void 
     {
         var tex : system.CsString = ":4 3.3{tr 5 16}";
@@ -111,7 +112,7 @@ class AlphaTexImporterTest
         alphaTab.test.Assert.AreEqual_T1_T22(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).TrillFret);
     }
 
-    @Test
+    @:testMethod
     public function Tremolo_Issue79() : Void 
     {
         var tex : system.CsString = ":4 3.3{tr 5 16}";
@@ -125,7 +126,7 @@ class AlphaTexImporterTest
         alphaTab.test.Assert.AreEqual_T1_T22(5, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).TrillFret);
     }
 
-    @Test
+    @:testMethod
     public function TremoloPicking_Issue79() : Void 
     {
         var tex : system.CsString = ":4 3.3{tp 16}";
@@ -138,7 +139,7 @@ class AlphaTexImporterTest
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Duration.Sixteenth, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).TremoloSpeed.Value);
     }
 
-    @Test
+    @:testMethod
     public function Hamonics_Issue79() : Void 
     {
         var tex : system.CsString = ":8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh}";
@@ -153,7 +154,7 @@ class AlphaTexImporterTest
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.HarmonicType.Semi, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(4).Notes.get_Item(0).HarmonicType);
     }
 
-    @Test
+    @:testMethod
     public function HamonicsRenderingText_Issue79() : Void 
     {
         var tex : system.CsString = ":8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh}";
@@ -170,14 +171,14 @@ class AlphaTexImporterTest
 ;
         renderer.Render(score, [0]);
         var regexTemplate : system.CsString = "<text[^>]+>\\s*{0}\\s*</text>";
-        massive.munit.Assert.isTrue(alphaTab.test.TestPlatform.IsMatch(svg, system.CsString.Format_CsString_Object(regexTemplate, alphaTab.rendering.effects.HarmonicsEffectInfo.HarmonicToString(alphaTab.model.HarmonicType.Natural))));
-        massive.munit.Assert.isTrue(alphaTab.test.TestPlatform.IsMatch(svg, system.CsString.Format_CsString_Object(regexTemplate, alphaTab.rendering.effects.HarmonicsEffectInfo.HarmonicToString(alphaTab.model.HarmonicType.Artificial))));
-        massive.munit.Assert.isTrue(alphaTab.test.TestPlatform.IsMatch(svg, system.CsString.Format_CsString_Object(regexTemplate, alphaTab.rendering.effects.HarmonicsEffectInfo.HarmonicToString(alphaTab.model.HarmonicType.Tap))));
-        massive.munit.Assert.isTrue(alphaTab.test.TestPlatform.IsMatch(svg, system.CsString.Format_CsString_Object(regexTemplate, alphaTab.rendering.effects.HarmonicsEffectInfo.HarmonicToString(alphaTab.model.HarmonicType.Pinch))));
-        massive.munit.Assert.isTrue(alphaTab.test.TestPlatform.IsMatch(svg, system.CsString.Format_CsString_Object(regexTemplate, alphaTab.rendering.effects.HarmonicsEffectInfo.HarmonicToString(alphaTab.model.HarmonicType.Semi))));
+        alphaTab.test.Assert.IsTrue(alphaTab.test.TestPlatform.IsMatch(svg, system.CsString.Format_CsString_Object(regexTemplate, alphaTab.rendering.effects.HarmonicsEffectInfo.HarmonicToString(alphaTab.model.HarmonicType.Natural))));
+        alphaTab.test.Assert.IsTrue(alphaTab.test.TestPlatform.IsMatch(svg, system.CsString.Format_CsString_Object(regexTemplate, alphaTab.rendering.effects.HarmonicsEffectInfo.HarmonicToString(alphaTab.model.HarmonicType.Artificial))));
+        alphaTab.test.Assert.IsTrue(alphaTab.test.TestPlatform.IsMatch(svg, system.CsString.Format_CsString_Object(regexTemplate, alphaTab.rendering.effects.HarmonicsEffectInfo.HarmonicToString(alphaTab.model.HarmonicType.Tap))));
+        alphaTab.test.Assert.IsTrue(alphaTab.test.TestPlatform.IsMatch(svg, system.CsString.Format_CsString_Object(regexTemplate, alphaTab.rendering.effects.HarmonicsEffectInfo.HarmonicToString(alphaTab.model.HarmonicType.Pinch))));
+        alphaTab.test.Assert.IsTrue(alphaTab.test.TestPlatform.IsMatch(svg, system.CsString.Format_CsString_Object(regexTemplate, alphaTab.rendering.effects.HarmonicsEffectInfo.HarmonicToString(alphaTab.model.HarmonicType.Semi))));
     }
 
-    @Test
+    @:testMethod
     public function Grace_Issue79() : Void 
     {
         var tex : system.CsString = ":8 3.3{gr} 3.3{gr ob}";
@@ -189,7 +190,7 @@ class AlphaTexImporterTest
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.GraceType.OnBeat, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).GraceType);
     }
 
-    @Test
+    @:testMethod
     public function BendRendering_Issue79() : Void 
     {
         var tex : system.CsString = ":4 15.6{b(0 4)} 18.6{b(0 6)} 17.6{b(0 8)} 16.6{b(0 3 0)} | 15.6{b(0 8 4)} 14.6{b(4 4)} 13.6{b(4 6)} 14.6{b(4 0)}";
@@ -208,7 +209,7 @@ class AlphaTexImporterTest
         renderer.Render(score, [0]);
         var tab : alphaTab.xml.XmlDocument = new alphaTab.xml.XmlDocument(partials.get_Item(0));
         var texts : system.FixedArray<alphaTab.xml.XmlNode> = tab.GetElementsByTagName("text", true);
-        var expectedTexts : system.FixedArray<system.CsString> = [alphaTab.platform.Platform.StringFromCharCode(alphaTab.rendering.glyphs.MusicFontSymbol.ClefTab.ToInt32_IFormatProvider(null)), "1", "15", "full", "18", "1½", "17", "2", "16", "¾", "2", "15", "2", "-1", "14", "full", "13", "full", "1½", "14", "full"];
+        var expectedTexts : system.FixedArray<system.CsString> = [alphaTab.platform.Platform.StringFromCharCode((alphaTab.rendering.glyphs.MusicFontSymbol.ClefTab).ToInt32_IFormatProvider(null)), "1", "15", "full", "18", "1½", "17", "2", "16", "¾", "2", "15", "2", "-1", "14", "full", "13", "full", "1½", "14", "full"];
         {
             var i: system.Int32 = 0;
             while (i < expectedTexts.Length)
@@ -220,7 +221,7 @@ class AlphaTexImporterTest
         }
     }
 
-    @Test
+    @:testMethod
     public function TestLeftHandFingerSingleNote() : Void 
     {
         var tex : system.CsString = ":8 3.3{lf 1} 3.3{lf 2} 3.3{lf 3} 3.3{lf 4} 3.3{lf 5}";
@@ -235,7 +236,7 @@ class AlphaTexImporterTest
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.LittleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(4).Notes.get_Item(0).LeftHandFinger);
     }
 
-    @Test
+    @:testMethod
     public function TestRightHandFingerSingleNote() : Void 
     {
         var tex : system.CsString = ":8 3.3{rf 1} 3.3{rf 2} 3.3{rf 3} 3.3{rf 4} 3.3{rf 5}";
@@ -250,7 +251,7 @@ class AlphaTexImporterTest
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.LittleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(4).Notes.get_Item(0).RightHandFinger);
     }
 
-    @Test
+    @:testMethod
     public function TestLeftHandFingerChord() : Void 
     {
         var tex : system.CsString = ":8 (3.1{lf 1} 3.2{lf 2} 3.3{lf 3} 3.4{lf 4} 3.5{lf 5})";
@@ -266,7 +267,7 @@ class AlphaTexImporterTest
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.LittleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(4).LeftHandFinger);
     }
 
-    @Test
+    @:testMethod
     public function TestRightHandFingerChord() : Void 
     {
         var tex : system.CsString = ":8 (3.1{rf 1} 3.2{rf 2} 3.3{rf 3} 3.4{rf 4} 3.5{rf 5})";
@@ -282,7 +283,7 @@ class AlphaTexImporterTest
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Fingers.LittleFinger, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(4).RightHandFinger);
     }
 
-    @Test
+    @:testMethod
     public function TestUnstringed() : Void 
     {
         var tex : system.CsString = "\\tuning piano . c4 c#4 d4 d#4 | c4 db4 d4 eb4";
