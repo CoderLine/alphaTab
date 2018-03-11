@@ -99,17 +99,38 @@ namespace AlphaTab.Rendering.Layout
                 }
                 if (!string.IsNullOrEmpty(score.Words) && (flags & HeaderFooterElements.Words) != 0)
                 {
-                    ScoreInfoGlyphs[HeaderFooterElements.Words] = new TextGlyph(0, 0, "Words by " + score.Music, res.WordsFont, TextAlign.Left);
+                    ScoreInfoGlyphs[HeaderFooterElements.Words] = new TextGlyph(0, 0, "Words by " + score.Words, res.WordsFont, TextAlign.Left);
                 }
             }
 
-            // tuning info
-            if (Renderer.Tracks.Length == 1 && !Renderer.Tracks[0].IsPercussion && !Renderer.Settings.Layout.Get("hideTuning", false))
+            if (!Renderer.Settings.Layout.Get("hideTuning", false))
             {
-                var tuning = Tuning.FindTuning(Renderer.Tracks[0].Tuning);
-                if (tuning != null)
+                Model.Staff staffWithTuning = null;
+                foreach (var track in Renderer.Tracks)
                 {
-                    TuningGlyph = new TuningGlyph(0, 0, Scale, Renderer.RenderingResources, tuning);
+                    foreach (var staff in track.Staves)
+                    {
+                        if (staff.StaffKind != StaffKind.Percussion && staff.IsStringed && staff.Tuning.Length > 0)
+                        {
+                            staffWithTuning = staff;
+                            break;
+                        }
+                    }
+
+                    if (staffWithTuning != null)
+                    {
+                        break;
+                    }
+                }
+
+                // tuning info
+                if (staffWithTuning != null)
+                {
+                    var tuning = Tuning.FindTuning(staffWithTuning.Tuning);
+                    if (tuning != null)
+                    {
+                        TuningGlyph = new TuningGlyph(0, 0, Scale, Renderer.RenderingResources, tuning);
+                    }
                 }
             }
         }
@@ -130,31 +151,35 @@ namespace AlphaTab.Rendering.Layout
             for (var trackIndex = 0; trackIndex < Renderer.Tracks.Length; trackIndex++)
             {
                 var track = Renderer.Tracks[trackIndex];
-                string staveProfile;
-                // use optimal profile for track 
-                if (track.IsPercussion)
+                for (int staffIndex = 0; staffIndex < track.Staves.Count; staffIndex++)
                 {
-                    staveProfile = Environment.StaveProfileScore;
-                }
-                else if (track.IsStringed)
-                {
-                    staveProfile = Renderer.Settings.Staves.Id;
-                }
-                else
-                {
-                    staveProfile = Environment.StaveProfileScore;
-                }
+                    var staff = track.Staves[staffIndex];
 
-                var profile = Environment.StaveProfiles.ContainsKey(staveProfile)
-                    ? Environment.StaveProfiles[staveProfile]
-                    : Environment.StaveProfiles["default"];
-
-                for (int staveIndex = 0; staveIndex < track.Staves.Count; staveIndex++)
-                {
-                    for (var renderStaveIndex = 0; renderStaveIndex < profile.Length; renderStaveIndex++)
+                    // use optimal profile for track 
+                    string staveProfile;
+                    if (staff.StaffKind == StaffKind.Percussion)
                     {
-                        var factory = profile[renderStaveIndex];
-                        var staff = track.Staves[staveIndex];
+                        staveProfile = Environment.StaveProfileScore;
+                    }
+                    else if (staff.IsStringed)
+                    {
+                        staveProfile = Renderer.Settings.Staves.Id;
+                    }
+                    else if (staff.StaffKind == StaffKind.Tablature)
+                    {
+                        staveProfile = Environment.StaveProfileTab;
+                    }
+                    else // if(staff.StaffKind == StaffKind.Score)
+                    {
+                        staveProfile = Environment.StaveProfileScore;
+                    }
+
+                    var profile = Environment.StaveProfiles.ContainsKey(staveProfile)
+                        ? Environment.StaveProfiles[staveProfile]
+                        : Environment.StaveProfiles["default"];
+
+                    foreach (var factory in profile)
+                    {
                         if (factory.CanCreate(track, staff))
                         {
                             group.AddStaff(track, new Staff(trackIndex, staff, factory));

@@ -400,10 +400,14 @@ namespace AlphaTab.Importer
             var newTrack = new Track(1);
             _score.AddTrack(newTrack);
 
+            var mainStaff = newTrack.Staves[0];
 
             var flags = Data.ReadByte();
             newTrack.Name = ReadStringByteLength(40);
-            newTrack.IsPercussion = (flags & 0x01) != 0;
+            if ((flags & 0x01) != 0)
+            {
+                mainStaff.StaffKind = StaffKind.Percussion;
+            }
 
             var stringCount = ReadInt32();
             var tuning = new FastList<int>();
@@ -415,7 +419,7 @@ namespace AlphaTab.Importer
                     tuning.Add(stringTuning);
                 }
             }
-            newTrack.Tuning = tuning.ToArray();
+            mainStaff.Tuning = tuning.ToArray();
 
             var port = ReadInt32();
             var index = ReadInt32() - 1;
@@ -431,13 +435,13 @@ namespace AlphaTab.Importer
 
                 if (GeneralMidi.IsGuitar(info.Program))
                 {
-                    newTrack.DisplayTranspositionPitch = -12;
+                    mainStaff.DisplayTranspositionPitch = -12;
                 }
 
                 newTrack.PlaybackInfo = info;
             }
 
-            newTrack.Capo = ReadInt32();
+            mainStaff.Capo = ReadInt32();
             newTrack.Color = ReadColor();
 
             if (_versionNumber >= 500)
@@ -478,11 +482,14 @@ namespace AlphaTab.Importer
         public void ReadBar(Track track)
         {
             var newBar = new Bar();
-            if (track.IsPercussion)
+            var mainStaff = track.Staves[0];
+
+            if (mainStaff.StaffKind == StaffKind.Percussion)
             {
                 newBar.Clef = Clef.Neutral;
             }
-            track.AddBarToStaff(0, newBar);
+
+            mainStaff.AddBar(newBar);
 
             var voiceCount = 1;
             if (_versionNumber >= 500)
@@ -617,7 +624,7 @@ namespace AlphaTab.Importer
             var stringFlags = Data.ReadByte();
             for (int i = 6; i >= 0; i--)
             {
-                if ((stringFlags & (1 << i)) != 0 && (6 - i) < track.Tuning.Length)
+                if ((stringFlags & (1 << i)) != 0 && (6 - i) < bar.Staff.Tuning.Length)
                 {
                     ReadNote(track, bar, voice, newBeat, (6 - i));
                 }
@@ -647,7 +654,7 @@ namespace AlphaTab.Importer
                 for (int i = 0; i < 7; i++)
                 {
                     var fret = ReadInt32();
-                    if (i < beat.Voice.Bar.Staff.Track.Tuning.Length)
+                    if (i < beat.Voice.Bar.Staff.Tuning.Length)
                     {
                         chord.Strings.Add(fret);
                     }
@@ -689,7 +696,7 @@ namespace AlphaTab.Importer
                         for (int i = 0; i < 7; i++)
                         {
                             var fret = ReadInt32();
-                            if (i < beat.Voice.Bar.Staff.Track.Tuning.Length)
+                            if (i < beat.Voice.Bar.Staff.Tuning.Length)
                             {
                                 chord.Strings.Add(fret);
                             }
@@ -720,7 +727,7 @@ namespace AlphaTab.Importer
                         for (int i = 0; i < 6; i++)
                         {
                             var fret = ReadInt32();
-                            if (i < beat.Voice.Bar.Staff.Track.Tuning.Length)
+                            if (i < beat.Voice.Bar.Staff.Tuning.Length)
                             {
                                 chord.Strings.Add(fret);
                             }
@@ -740,7 +747,7 @@ namespace AlphaTab.Importer
                         for (int i = 0; i < strings; i++)
                         {
                             var fret = ReadInt32();
-                            if (i < beat.Voice.Bar.Staff.Track.Tuning.Length)
+                            if (i < beat.Voice.Bar.Staff.Tuning.Length)
                             {
                                 chord.Strings.Add(fret);
                             }
@@ -753,7 +760,7 @@ namespace AlphaTab.Importer
             if (!string.IsNullOrEmpty(chord.Name))
             {
                 beat.ChordId = chordId;
-                beat.Voice.Bar.Staff.Track.Chords[beat.ChordId] = chord;
+                beat.Voice.Bar.Staff.Chords[beat.ChordId] = chord;
             }
         }
 
@@ -1015,7 +1022,7 @@ namespace AlphaTab.Importer
         public void ReadNote(Track track, Bar bar, Voice voice, Beat beat, int stringIndex)
         {
             var newNote = new Note();
-            newNote.String = track.Tuning.Length - stringIndex;
+            newNote.String = bar.Staff.Tuning.Length - stringIndex;
 
             var flags = Data.ReadByte();
             if ((flags & 0x02) != 0)

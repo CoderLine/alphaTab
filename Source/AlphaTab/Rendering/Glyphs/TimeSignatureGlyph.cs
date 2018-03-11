@@ -137,8 +137,8 @@ namespace AlphaTab.Rendering.Glyphs
             get
             {
                 var renderer = (TabBarRenderer)Renderer;
-                var offset = renderer.Bar.Staff.Track.Tuning.Length <= 4 ? 1 / 4f : 1 / 3f;
-                return renderer.LineOffset * renderer.Bar.Staff.Track.Tuning.Length * offset * Scale;
+                var offset = renderer.Bar.Staff.Tuning.Length <= 4 ? 1 / 4f : 1 / 3f;
+                return renderer.LineOffset * renderer.Bar.Staff.Tuning.Length * offset * Scale;
 
             }
         }
@@ -148,8 +148,8 @@ namespace AlphaTab.Rendering.Glyphs
             get
             {
                 var renderer = (TabBarRenderer)Renderer;
-                var offset = renderer.Bar.Staff.Track.Tuning.Length <= 4 ? 3 / 5f : 3 / 5f;
-                return renderer.LineOffset * renderer.Bar.Staff.Track.Tuning.Length * offset * Scale;
+                var offset = renderer.Bar.Staff.Tuning.Length <= 4 ? 3 / 5f : 3 / 5f;
+                return renderer.LineOffset * renderer.Bar.Staff.Tuning.Length * offset * Scale;
             }
         }
 
@@ -166,7 +166,7 @@ namespace AlphaTab.Rendering.Glyphs
             get
             {
                 var renderer = (TabBarRenderer)Renderer;
-                if (renderer.Bar.Staff.Track.Tuning.Length <= 4)
+                if (renderer.Bar.Staff.Tuning.Length <= 4)
                 {
                     return 0.75f;
                 }

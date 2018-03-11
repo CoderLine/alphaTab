@@ -40,7 +40,7 @@ namespace AlphaTab.Rendering
 
         public override bool CanCreate(Track track, Staff staff)
         {
-            return track.Tuning.Length > 0 && base.CanCreate(track, staff);
+            return staff.Tuning.Length > 0 && base.CanCreate(track, staff);
         }
 
         public override BarRendererBase Create(ScoreRenderer renderer, Bar bar, StaveSettings staveSettings)

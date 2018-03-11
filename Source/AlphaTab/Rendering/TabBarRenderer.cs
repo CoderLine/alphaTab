@@ -82,7 +82,7 @@ namespace AlphaTab.Rendering
             var numberOverflow = (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2f);
             TopPadding = numberOverflow;
             BottomPadding = numberOverflow;
-            Height = LineOffset * (Bar.Staff.Track.Tuning.Length - 1) + (numberOverflow * 2);
+            Height = LineOffset * (Bar.Staff.Tuning.Length - 1) + (numberOverflow * 2);
 
             if (RenderRhythm)
             {
@@ -104,7 +104,7 @@ namespace AlphaTab.Rendering
             // Clef
             if (IsFirstOfLine)
             {
-                var center = (Bar.Staff.Track.Tuning.Length + 1) / 2f;
+                var center = (Bar.Staff.Tuning.Length + 1) / 2f;
                 AddPreBeatGlyph(new TabClefGlyph(5 * Scale, GetTabY(center)));
             }
 
@@ -207,7 +207,7 @@ namespace AlphaTab.Rendering
 
             // collect tab note position for spaces
             var tabNotes = new FastList<FastList<float[]>>();
-            for (int i = 0, j = Bar.Staff.Track.Tuning.Length; i < j; i++)
+            for (int i = 0, j = Bar.Staff.Tuning.Length; i < j; i++)
             {
                 tabNotes.Add(new FastList<float[]>());
             }
@@ -228,7 +228,7 @@ namespace AlphaTab.Rendering
                                 var noteNumber = noteNumbers.NotesPerString[s];
                                 if (!noteNumber.IsEmpty)
                                 {
-                                    tabNotes[Bar.Staff.Track.Tuning.Length - s].Add(
+                                    tabNotes[Bar.Staff.Tuning.Length - s].Add(
                                         new[]
                                         {
                                         vc.X + bg.X + notes.X + noteNumbers.X,
@@ -249,7 +249,7 @@ namespace AlphaTab.Rendering
             }
 
             var lineOffset = LineOffset;
-            for (int i = 0, j = Bar.Staff.Track.Tuning.Length; i < j; i++)
+            for (int i = 0, j = Bar.Staff.Tuning.Length; i < j; i++)
             {
                 if (i > 0) lineY += lineOffset;
 

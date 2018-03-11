@@ -179,14 +179,14 @@ namespace AlphaTab.Model
         {
             get
             {
-                return Beat.Voice.Bar.Staff.Track.Capo + GetStringTuning(Beat.Voice.Bar.Staff.Track, String);
+                return Beat.Voice.Bar.Staff.Capo + GetStringTuning(Beat.Voice.Bar.Staff, String);
             }
         }
 
-        public static int GetStringTuning(Track track, int noteString)
+        public static int GetStringTuning(Staff staff, int noteString)
         {
-            if (track.Tuning.Length > 0)
-                return track.Tuning[track.Tuning.Length - (noteString - 1) - 1];
+            if (staff.Tuning.Length > 0)
+                return staff.Tuning[staff.Tuning.Length - (noteString - 1) - 1];
             return 0;
         }
 
@@ -200,11 +200,11 @@ namespace AlphaTab.Model
                 }
                 if (IsStringed)
                 {
-                    return Fret + StringTuning - Beat.Voice.Bar.Staff.Track.TranspositionPitch;
+                    return Fret + StringTuning - Beat.Voice.Bar.Staff.TranspositionPitch;
                 }
                 if (IsPiano)
                 {
-                    return Octave * 12 + Tone - Beat.Voice.Bar.Staff.Track.TranspositionPitch;
+                    return Octave * 12 + Tone - Beat.Voice.Bar.Staff.TranspositionPitch;
                 }
 
                 return 0;

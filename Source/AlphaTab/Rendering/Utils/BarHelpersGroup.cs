@@ -67,7 +67,7 @@ namespace AlphaTab.Rendering.Utils
                                     forceNewTupletHelper = true;
                                 }
                                 // if not possible, create the next beaming helper
-                                currentBeamHelper = new BeamingHelper(bar.Staff.Track);
+                                currentBeamHelper = new BeamingHelper(bar.Staff);
                                 currentBeamHelper.CheckBeat(b);
                                 BeamHelpers[v.Index].Add(currentBeamHelper);
                             }

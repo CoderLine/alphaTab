@@ -188,7 +188,7 @@ namespace AlphaTab.Rendering.Glyphs
         private Glyph CreateNoteHeadGlyph(Note n)
         {
             var isGrace = Container.Beat.GraceType != GraceType.None;
-            if (n.Beat.Voice.Bar.Staff.Track.IsPercussion)
+            if (n.Beat.Voice.Bar.Staff.StaffKind == StaffKind.Percussion)
             {
                 var value = n.RealValue;
 

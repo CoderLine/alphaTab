@@ -233,6 +233,7 @@ namespace AlphaTab.Audio.Generator
         private void GenerateNote(Note note, int beatStart, int beatDuration, int[] brushInfo)
         {
             var track = note.Beat.Voice.Bar.Staff.Track;
+            var staff = note.Beat.Voice.Bar.Staff;
             var noteKey = note.RealValue;
             var brushOffset = note.IsStringed && note.String <= brushInfo.Length ? brushInfo[note.String - 1] : 0;
             var noteStart = beatStart + brushOffset;
@@ -257,7 +258,7 @@ namespace AlphaTab.Audio.Generator
 
             //
             // Trill
-            if (note.IsTrill && !track.IsPercussion)
+            if (note.IsTrill && staff.StaffKind != StaffKind.Percussion)
             {
                 GenerateTrill(note, noteStart, noteDuration, noteKey, dynamicValue);
                 // no further generation needed
@@ -387,17 +388,20 @@ namespace AlphaTab.Audio.Generator
                 var endNote = note.TieDestination;
 
                 // for the initial start of the tie calculate absolute duration from start to end note
-                if (!note.IsTieDestination)
+                if (endNote != null)
                 {
-                    var startTick = note.Beat.AbsoluteStart;
-                    var endTick = endNote.Beat.AbsoluteStart + GetNoteDuration(endNote, endNote.Beat.CalculateDuration());
-                    return endTick - startTick;
-                }
-                else
-                {
-                    // for continuing ties, take the current duration + the one from the destination 
-                    // this branch will be entered as part of the recusion of the if branch
-                    return duration + GetNoteDuration(endNote, endNote.Beat.CalculateDuration());
+                    if (!note.IsTieDestination)
+                    {
+                        var startTick = note.Beat.AbsoluteStart;
+                        var endTick = endNote.Beat.AbsoluteStart + GetNoteDuration(endNote, endNote.Beat.CalculateDuration());
+                        return endTick - startTick;
+                    }
+                    else
+                    {
+                        // for continuing ties, take the current duration + the one from the destination 
+                        // this branch will be entered as part of the recusion of the if branch
+                        return duration + GetNoteDuration(endNote, endNote.Beat.CalculateDuration());
+                    }
                 }
             }
             return duration;
@@ -414,7 +418,7 @@ namespace AlphaTab.Audio.Generator
             var dynamicValue = note.Dynamic;
 
             // more silent on hammer destination
-            if (!note.Beat.Voice.Bar.Staff.Track.IsPercussion && note.HammerPullOrigin != null)
+            if (note.Beat.Voice.Bar.Staff.StaffKind != StaffKind.Percussion && note.HammerPullOrigin != null)
             {
                 dynamicValue--;
             }
@@ -605,7 +609,7 @@ namespace AlphaTab.Audio.Generator
 
         private int[] GetBrushInfo(Beat beat)
         {
-            var brushInfo = new int[beat.Voice.Bar.Staff.Track.Tuning.Length];
+            var brushInfo = new int[beat.Voice.Bar.Staff.Tuning.Length];
 
             if (beat.BrushType != BrushType.None)
             {
@@ -628,7 +632,7 @@ namespace AlphaTab.Audio.Generator
                 {
                     int brushMove = 0;
                     var brushIncrement = GetBrushIncrement(beat);
-                    for (int i = 0, j = beat.Voice.Bar.Staff.Track.Tuning.Length; i < j; i++)
+                    for (int i = 0, j = beat.Voice.Bar.Staff.Tuning.Length; i < j; i++)
                     {
                         var index = (beat.BrushType == BrushType.ArpeggioDown || beat.BrushType == BrushType.BrushDown)
                                     ? i

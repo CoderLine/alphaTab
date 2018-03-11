@@ -153,7 +153,8 @@ namespace AlphaTab.Rendering.Staves
             {
                 foreach (var s in g.Staves)
                 {
-                    s.AddBar(g.Track.Staves[s.ModelStaff.Index].Bars[barIndex], barLayoutingInfo);
+                    var bar = g.Track.Staves[s.ModelStaff.Index].Bars[barIndex];
+                    s.AddBar(bar, barLayoutingInfo);
                     var renderer = s.BarRenderers[s.BarRenderers.Count - 1];
                     result.Renderers.Add(renderer);
                     if (renderer.IsLinkedToPrevious)
@@ -217,9 +218,9 @@ namespace AlphaTab.Rendering.Staves
                     var canvas = Layout.Renderer.Canvas;
                     var res = Layout.Renderer.RenderingResources.EffectFont;
                     canvas.Font = res;
-                    for (var i = 0; i < tracks.Length; i++)
+                    foreach (var t in tracks)
                     {
-                        AccoladeSpacing = Math.Max(AccoladeSpacing, canvas.MeasureText(tracks[i].ShortName));
+                        AccoladeSpacing = Math.Max(AccoladeSpacing, canvas.MeasureText(t.ShortName));
                     }
                     AccoladeSpacing += (2 * AccoladeLabelSpacing);
                     Width += AccoladeSpacing;

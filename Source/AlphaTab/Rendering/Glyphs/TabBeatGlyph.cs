@@ -83,7 +83,7 @@ namespace AlphaTab.Rendering.Glyphs
                     AddGlyph(new SpacingGlyph(0, 0, 5 * Scale));
                     for (var i = 0; i < Container.Beat.Dots; i++)
                     {
-                        AddGlyph(new CircleGlyph(0, tabRenderer.LineOffset * tabRenderer.Bar.Staff.Track.Tuning.Length + tabRenderer.RhythmHeight, 1.5f * Scale));
+                        AddGlyph(new CircleGlyph(0, tabRenderer.LineOffset * tabRenderer.Bar.Staff.Tuning.Length + tabRenderer.RhythmHeight, 1.5f * Scale));
                     }
                 }
             }
@@ -181,7 +181,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var tr = (TabBarRenderer)Renderer;
             var noteNumberGlyph = new NoteNumberGlyph(0, 0, n);
-            var l = n.Beat.Voice.Bar.Staff.Track.Tuning.Length - n.String + 1;
+            var l = n.Beat.Voice.Bar.Staff.Tuning.Length - n.String + 1;
             noteNumberGlyph.Y = tr.GetTabY(l, -2);
             noteNumberGlyph.Renderer = Renderer;
             noteNumberGlyph.DoLayout();

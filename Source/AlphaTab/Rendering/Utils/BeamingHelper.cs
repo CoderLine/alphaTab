@@ -74,7 +74,7 @@ namespace AlphaTab.Rendering.Utils
         private static readonly int[] ScoreMiddleKeys = { 60, 60, 57, 50, 71 };
 
         private Beat _lastBeat;
-        private readonly Track _track;
+        private readonly Staff _staff;
 
         /// <summary>
         /// stores the X-positions for beat indices
@@ -128,9 +128,9 @@ namespace AlphaTab.Rendering.Utils
         public bool InvertBeamDirection { get; set; }
 
 
-        public BeamingHelper(Track track)
+        public BeamingHelper(Staff staff)
         {
-            _track = track;
+            _staff = staff;
 
             Beats = new FastList<Beat>();
             _beatLineXPositions = new FastDictionary<int, BeatLinePositions>();
@@ -139,13 +139,13 @@ namespace AlphaTab.Rendering.Utils
 
         private int GetValue(Note n)
         {
-            if (_track.IsPercussion)
+            if (_staff.StaffKind== StaffKind.Percussion)
             {
                 return PercussionMapper.MapNoteForDisplay(n);
             }
             else
             {
-                return n.RealValue - _track.DisplayTranspositionPitch;
+                return n.RealValue - _staff.DisplayTranspositionPitch;
             }
         }
 

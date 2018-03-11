@@ -59,11 +59,17 @@ namespace AlphaTab.Model
             {
                 if (i < settings.DisplayTranspositionPitches.Length)
                 {
-                    score.Tracks[i].DisplayTranspositionPitch = -settings.DisplayTranspositionPitches[i];
+                    foreach (var staff in score.Tracks[i].Staves)
+                    {
+                        staff.DisplayTranspositionPitch = -settings.DisplayTranspositionPitches[i];
+                    }
                 }
                 if (i < settings.TranspositionPitches.Length)
                 {
-                    score.Tracks[i].TranspositionPitch = -settings.TranspositionPitches[i];
+                    foreach (var staff in score.Tracks[i].Staves)
+                    {
+                        staff.TranspositionPitch = -settings.TranspositionPitches[i];
+                    }
                 }
             }
         }

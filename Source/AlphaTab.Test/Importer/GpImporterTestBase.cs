@@ -471,7 +471,8 @@ namespace AlphaTab.Test.Importer
         protected void CheckChords(Score score)
         {
             var track = score.Tracks[0];
-            Assert.AreEqual(8, track.Chords.Count);
+            var staff = track.Staves[0];
+            Assert.AreEqual(8, staff.Chords.Count);
 
             CheckChord(new Chord
             {

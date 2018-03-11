@@ -35,6 +35,7 @@ namespace AlphaTab.Importer
         RBrace,
         Pipe,
         MetaCommand,
-        Multiply
+        Multiply,
+        LowerThan
     }
 }

@@ -85,7 +85,7 @@ namespace AlphaTab.Importer
         private FastDictionary<string, string[]> _notesOfBeat; // contains ids of notes stored in a beat (key = beat id);
         private FastDictionary<string, bool> _tappedNotes; // contains a flag indicating whether a note is tapped (key = note id);
 
-        private FastDictionary<string, FastList<Lyrics>> _lyricsByTrack; 
+        private FastDictionary<string, FastList<Lyrics>> _lyricsByTrack;
 
         public void ParseXml(string xml)
         {
@@ -104,7 +104,7 @@ namespace AlphaTab.Importer
             _notesOfBeat = new FastDictionary<string, string[]>();
             _noteById = new FastDictionary<string, Note>();
             _tappedNotes = new FastDictionary<string, bool>();
-            _lyricsByTrack= new FastDictionary<string, FastList<Lyrics>>();
+            _lyricsByTrack = new FastDictionary<string, FastList<Lyrics>>();
 
             XmlDocument dom;
             try
@@ -378,6 +378,8 @@ namespace AlphaTab.Importer
         private void ParseTrack(XmlNode node)
         {
             var track = new Track(1);
+            var staff = track.Staves[0];
+            staff.StaffKind = StaffKind.Score;
             var trackId = node.GetAttribute("id");
 
             foreach (var c in node.ChildNodes)
@@ -404,6 +406,7 @@ namespace AlphaTab.Importer
                             if (instrumentName.EndsWith("-gs") || instrumentName.EndsWith("GrandStaff"))
                             {
                                 track.EnsureStaveCount(2);
+                                track.Staves[1].StaffKind = StaffKind.Score;
                             }
                             break;
                         case "ShortName":
@@ -494,7 +497,10 @@ namespace AlphaTab.Importer
             var chord = new Chord();
             var chordId = node.GetAttribute("id");
             chord.Name = node.GetAttribute("name");
-            track.Chords[chordId] = chord;
+            foreach (var staff in track.Staves)
+            {
+                staff.Chords[chordId] = chord;
+            }
 
             var diagram = node.FindChildElement("Diagram");
             var stringCount = Platform.Platform.ParseInt(diagram.GetAttribute("stringCount"));
@@ -600,26 +606,48 @@ namespace AlphaTab.Importer
                     {
                         tuning[tuning.Length - 1 - i] = Platform.Platform.ParseInt(tuningParts[i]);
                     }
-                    track.Tuning = tuning;
+
+                    foreach (var staff in track.Staves)
+                    {
+                        staff.Tuning = tuning;
+                        staff.StaffKind = StaffKind.Mixed;
+                    }
                     break;
                 case "DiagramCollection":
                 case "ChordCollection":
                     ParseDiagramCollection(track, node);
                     break;
                 case "CapoFret":
-                    track.Capo = Platform.Platform.ParseInt(node.FindChildElement("Fret").InnerText);
+                    var capo = Platform.Platform.ParseInt(node.FindChildElement("Fret").InnerText);
+                    foreach (var staff in track.Staves)
+                    {
+                        staff.Capo = capo;
+                    }
                     break;
             }
         }
 
         private void ParseGeneralMidi(Track track, XmlNode node)
         {
-            track.PlaybackInfo.Port = Platform.Platform.ParseInt(node.FindChildElement("Port").InnerText);
-            track.PlaybackInfo.Program = Platform.Platform.ParseInt(node.FindChildElement("Program").InnerText);
-            track.PlaybackInfo.PrimaryChannel = Platform.Platform.ParseInt(node.FindChildElement("PrimaryChannel").InnerText);
-            track.PlaybackInfo.SecondaryChannel = Platform.Platform.ParseInt(node.FindChildElement("SecondaryChannel").InnerText);
+            var port = Platform.Platform.ParseInt(node.FindChildElement("Port").InnerText);
+            var program = Platform.Platform.ParseInt(node.FindChildElement("Program").InnerText);
+            var primaryChannel = Platform.Platform.ParseInt(node.FindChildElement("PrimaryChannel").InnerText);
+            var pecondaryChannel = Platform.Platform.ParseInt(node.FindChildElement("SecondaryChannel").InnerText);
+            var isPercussion = node.GetAttribute("table") == "Percussion";
 
-            track.IsPercussion = node.GetAttribute("table") == "Percussion";
+            track.PlaybackInfo.Port = port;
+            track.PlaybackInfo.Program = program;
+            track.PlaybackInfo.PrimaryChannel = primaryChannel;
+            track.PlaybackInfo.SecondaryChannel = pecondaryChannel;
+
+            if (isPercussion)
+            {
+                foreach (var staff in track.Staves)
+                {
+
+                    staff.StaffKind = StaffKind.Percussion;
+                }
+            }
         }
 
 
@@ -632,7 +660,10 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "TranspositionPitch":
-                            track.DisplayTranspositionPitch = Platform.Platform.ParseInt(c.InnerText);
+                            foreach (var staff in track.Staves)
+                            {
+                                staff.DisplayTranspositionPitch = Platform.Platform.ParseInt(c.InnerText);
+                            }
                             break;
                     }
                 }
@@ -1595,7 +1626,7 @@ namespace AlphaTab.Importer
                 var barIds = _barsOfMasterBar[masterBarIndex];
 
                 // add all bars of masterbar vertically to all tracks
-                int staveIndex = 0;
+                int staffIndex = 0;
                 for (int barIndex = 0, trackIndex = 0; barIndex < barIds.Length && trackIndex < Score.Tracks.Count; barIndex++)
                 {
                     var barId = barIds[barIndex];
@@ -1603,17 +1634,18 @@ namespace AlphaTab.Importer
                     {
                         var bar = _barsById[barId];
                         var track = Score.Tracks[trackIndex];
-                        track.AddBarToStaff(staveIndex, bar);
+                        var staff = track.Staves[staffIndex];
+                        staff.AddBar(bar);
 
                         // stave is full? -> next track
-                        if (staveIndex == track.Staves.Count - 1)
+                        if (staffIndex == track.Staves.Count - 1)
                         {
                             trackIndex++;
-                            staveIndex = 0;
+                            staffIndex = 0;
                         }
                         else
                         {
-                            staveIndex++;
+                            staffIndex++;
                         }
                     }
                     else

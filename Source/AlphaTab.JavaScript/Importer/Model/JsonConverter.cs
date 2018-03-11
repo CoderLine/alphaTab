@@ -76,14 +76,6 @@ namespace AlphaTab.Model
                 track2.PlaybackInfo = Platform.Platform.NewObject();
                 PlaybackInformation.CopyTo(track.PlaybackInfo, track2.PlaybackInfo);
 
-                track2.Chords = new FastDictionary<string, Chord>();
-                foreach (var key in track.Chords)
-                {
-                    var chord = track.Chords[key];
-                    Chord chord2 = Platform.Platform.NewObject();
-                    Chord.CopyTo(chord, chord2);
-                    track2.Chords[key] = chord;
-                }
 
                 #region Staves
                 track2.Staves = new FastList<Staff>();
@@ -92,6 +84,16 @@ namespace AlphaTab.Model
                 {
                     var staff = track.Staves[s];
                     Staff staff2 = Platform.Platform.NewObject();
+                    Staff.CopyTo(staff, staff2);
+
+                    staff2.Chords = new FastDictionary<string, Chord>();
+                    foreach (var key in staff.Chords)
+                    {
+                        var chord = staff.Chords[key];
+                        Chord chord2 = Platform.Platform.NewObject();
+                        Chord.CopyTo(chord, chord2);
+                        staff2.Chords[key] = chord;
+                    }
 
                     #region Bars
 
@@ -228,19 +230,23 @@ namespace AlphaTab.Model
 
                 PlaybackInformation.CopyTo(track.PlaybackInfo, track2.PlaybackInfo);
 
-                foreach (var key in track.Chords)
-                {
-                    var chord = track.Chords[key];
-                    var chord2 = new Chord();
-                    Chord.CopyTo(chord, chord2);
-                    track2.Chords[key] = chord2;
-                }
 
                 #region Staves
 
                 for (var s = 0; s < track.Staves.Count; s++)
                 {
                     var staff = track.Staves[s];
+                    var staff2 = track2.Staves[s];
+                    Staff.CopyTo(staff, staff2);
+
+
+                    foreach (var key in staff.Chords)
+                    {
+                        var chord = staff.Chords[key];
+                        var chord2 = new Chord();
+                        Chord.CopyTo(chord, chord2);
+                        staff2.Chords[key] = chord2;
+                    }
                     #region Bars
 
                     for (int b = 0; b < staff.Bars.Count; b++)
@@ -248,7 +254,7 @@ namespace AlphaTab.Model
                         var bar = staff.Bars[b];
                         var bar2 = new Bar();
                         Bar.CopyTo(bar, bar2);
-                        track2.AddBarToStaff(s, bar2);
+                        staff2.AddBar(bar2);
 
                         #region Voices
 

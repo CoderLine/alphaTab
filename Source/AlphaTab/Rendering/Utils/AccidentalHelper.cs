@@ -112,7 +112,7 @@ namespace AlphaTab.Rendering.Utils
 
             var line = RegisterNoteLine(note);
 
-            if (!note.Beat.Voice.Bar.Staff.Track.IsPercussion)
+            if (note.Beat.Voice.Bar.Staff.StaffKind != StaffKind.Percussion)
             {
                 // the key signature symbol required according to 
                 var keySignatureAccidental = ksi < 7 ? AccidentalType.Flat : AccidentalType.Sharp;
@@ -141,8 +141,9 @@ namespace AlphaTab.Rendering.Utils
 
         private int RegisterNoteLine(Note n)
         {
-            var track = n.Beat.Voice.Bar.Staff.Track;
-            var value = track.IsPercussion ? PercussionMapper.MapNoteForDisplay(n) : n.RealValue - track.DisplayTranspositionPitch;
+            var staff = n.Beat.Voice.Bar.Staff;
+            var track = staff.Track;
+            var value = staff.StaffKind == StaffKind.Percussion ? PercussionMapper.MapNoteForDisplay(n) : n.RealValue - staff.DisplayTranspositionPitch;
             var ks = n.Beat.Voice.Bar.MasterBar.KeySignature;
             var clef = n.Beat.Voice.Bar.Clef;
 

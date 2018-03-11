@@ -33,7 +33,7 @@ namespace AlphaTab.Rendering.Glyphs
         }
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            var strings = Renderer.Bar.Staff.Track.Tuning.Length;
+            var strings = Renderer.Bar.Staff.Tuning.Length;
 
             var correction = strings * Scale * 0.5f;
             var symbol = strings <= 4 ? MusicFontSymbol.ClefTabSmall : MusicFontSymbol.ClefTab;

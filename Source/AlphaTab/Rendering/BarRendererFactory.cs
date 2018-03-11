@@ -40,7 +40,7 @@ namespace AlphaTab.Rendering
 
         public virtual bool CanCreate(Track track, Staff staff)
         {
-            return !HideOnPercussionTrack || !track.IsPercussion;
+            return !HideOnPercussionTrack || staff.StaffKind != StaffKind.Percussion;
         }
         public abstract BarRendererBase Create(ScoreRenderer renderer, Bar bar, StaveSettings staveSettings);
     }

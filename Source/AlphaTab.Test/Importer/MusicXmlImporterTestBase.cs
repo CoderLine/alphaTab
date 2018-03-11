@@ -141,20 +141,15 @@ namespace AlphaTab.Test.Importer
             {
                 AreEqual(expected.Tracks[i], actual.Tracks[i]);
             }
-
         }
 
         protected void AreEqual(Track expected, Track actual)
         {
-            Assert.AreEqual(expected.Capo, actual.Capo, "Mismatch on Capo");
             Assert.AreEqual(expected.Index, actual.Index, "Mismatch on Index");
             Assert.AreEqual(expected.Name, actual.Name, "Mismatch on Name");
             //Assert.AreEqual(expected.ShortName, actual.ShortName, "Mismatch on ShortName");
-            Assert.AreEqual(expected.Tuning.Length, actual.Tuning.Length, "Mismatch on Tuning.Length");
-            Assert.AreEqual(string.Join(",", expected.Tuning), string.Join(",", actual.Tuning));
             //Assert.AreEqual(expected.Color.Raw, actual.Color.Raw, "Mismatch on Color.Raw");
             AreEqual(expected.PlaybackInfo, actual.PlaybackInfo);
-            Assert.AreEqual(expected.IsPercussion, actual.IsPercussion, "Mismatch on IsPercussion");
             Assert.AreEqual(expected.Staves.Count, actual.Staves.Count, "Mismatch on Staves.Count");
             for (int i = 0; i < expected.Staves.Count; i++)
             {
@@ -164,6 +159,10 @@ namespace AlphaTab.Test.Importer
 
         protected void AreEqual(Staff expected, Staff actual)
         {
+            Assert.AreEqual(expected.Capo, actual.Capo, "Mismatch on Capo");
+            Assert.AreEqual(expected.StaffKind, actual.StaffKind, "Mismatch on StaffKind");
+            Assert.AreEqual(string.Join(",", expected.Tuning), string.Join(",", actual.Tuning));
+            Assert.AreEqual(expected.Tuning.Length, actual.Tuning.Length, "Mismatch on Tuning.Length");
             Assert.AreEqual(expected.Index, actual.Index, "Mismatch on Index");
             Assert.AreEqual(expected.Bars.Count, actual.Bars.Count, "Mismatch on Bars.Count");
             for (int i = 0; i < expected.Bars.Count; i++)

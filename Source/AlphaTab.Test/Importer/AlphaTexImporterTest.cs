@@ -51,8 +51,8 @@ namespace AlphaTab.Test.Importer
 
             Assert.AreEqual(1, score.Tracks.Count);
             Assert.AreEqual(30, score.Tracks[0].PlaybackInfo.Program);
-            Assert.AreEqual(2, score.Tracks[0].Capo);
-            Assert.AreEqual("55,38,43,47,50,69", string.Join(",", score.Tracks[0].Tuning));
+            Assert.AreEqual(2, score.Tracks[0].Staves[0].Capo);
+            Assert.AreEqual("55,38,43,47,50,69", string.Join(",", score.Tracks[0].Staves[0].Tuning));
 
             Assert.AreEqual(2, score.MasterBars.Count);
 
@@ -113,7 +113,7 @@ namespace AlphaTab.Test.Importer
 
             var score = ParseTex(tex);
 
-            Assert.AreEqual(string.Join(",", Tuning.GetDefaultTuningFor(6).Tunings), string.Join(",", score.Tracks[0].Tuning));
+            Assert.AreEqual(string.Join(",", Tuning.GetDefaultTuningFor(6).Tunings), string.Join(",", score.Tracks[0].Staves[0].Tuning));
         }
 
         [TestMethod]

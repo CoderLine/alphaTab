@@ -61,9 +61,9 @@ namespace AlphaTab.Rendering.Glyphs
             //
             // calculate the overflow 
             var tabBarRenderer = (TabBarRenderer)Renderer;
-            var track = Renderer.Bar.Staff.Track;
+            var staff = Renderer.Bar.Staff;
             var tabTop = tabBarRenderer.GetTabY(0, -2);
-            var tabBottom = tabBarRenderer.GetTabY(track.Tuning.Length, -2);
+            var tabBottom = tabBarRenderer.GetTabY(staff.Tuning.Length, -2);
 
             var absMinY = minY + tabTop;
             var absMaxY = maxY - tabBottom;

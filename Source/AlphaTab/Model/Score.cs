@@ -110,6 +110,24 @@ namespace AlphaTab.Model
             dst.TempoLabel = src.TempoLabel;
         }
 
+
+
+        public void RebuildRepeatGroups()
+        {
+            var currentGroup = new RepeatGroup();
+            foreach (var bar in MasterBars)
+            {
+                // if the group is closed only the next upcoming header can
+                // reopen the group in case of a repeat alternative, so we 
+                // remove the current group 
+                if (bar.IsRepeatStart || (_currentRepeatGroup.IsClosed && bar.AlternateEndings <= 0))
+                {
+                    currentGroup = new RepeatGroup();
+                }
+                currentGroup.AddMasterBar(bar);
+            }
+        }
+
         public void AddMasterBar(MasterBar bar)
         {
             bar.Score = this;
