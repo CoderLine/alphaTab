@@ -779,8 +779,8 @@ alphaTab.platform.Platform.IsCharNumber = function(c,allowSign) {
 	}
 };
 alphaTab.platform.Platform.IsWhiteSpace = function(c) {
-	if(!(c == 32 || c == 11 || c == 13)) {
-		return c == 10;
+	if(!(c == 32 || c == 11 || c == 13 || c == 10)) {
+		return c == 9;
 	} else {
 		return true;
 	}
@@ -4773,6 +4773,7 @@ alphaTab.rendering.layout.PageViewLayout = $hx_exports["alphaTab"]["rendering"][
 	this._groups = null;
 	this._allMasterBarRenderers = null;
 	this._barsFromPreviousGroup = null;
+	this._endBarIndex = 0;
 };
 alphaTab.rendering.layout.PageViewLayout.__name__ = ["alphaTab","rendering","layout","PageViewLayout"];
 alphaTab.rendering.layout.PageViewLayout.__super__ = alphaTab.rendering.layout.ScoreLayout;
@@ -4906,7 +4907,7 @@ alphaTab.rendering.layout.PageViewLayout.prototype = $extend(alphaTab.rendering.
 					++currentIndex;
 				} else {
 					group1.IsFull = true;
-					group1.IsLast = false;
+					group1.IsLast = this._endBarIndex == group1.get_LastBarIndex();
 					this._groups.push(group1);
 					this.FitGroup(group1);
 					group1.FinalizeGroup();
@@ -4917,6 +4918,7 @@ alphaTab.rendering.layout.PageViewLayout.prototype = $extend(alphaTab.rendering.
 					group1.Y = y;
 				}
 			}
+			group1.IsLast = this._endBarIndex == group1.get_LastBarIndex();
 			this.FitGroup(group1);
 			group1.FinalizeGroup();
 			y = y + this.PaintGroup(group1,oldHeight,canvas);
@@ -4930,16 +4932,16 @@ alphaTab.rendering.layout.PageViewLayout.prototype = $extend(alphaTab.rendering.
 		--startIndex;
 		startIndex = Math.min(score.MasterBars.length - 1,Math.max(0,startIndex));
 		var currentBarIndex = startIndex;
-		var endBarIndex = this.Renderer.Settings.Layout.Get("count",score.MasterBars.length);
-		if(endBarIndex < 0) {
-			endBarIndex = score.MasterBars.length;
+		this._endBarIndex = this.Renderer.Settings.Layout.Get("count",score.MasterBars.length);
+		if(this._endBarIndex < 0) {
+			this._endBarIndex = score.MasterBars.length;
 		}
-		endBarIndex = startIndex + endBarIndex - 1;
-		endBarIndex = Math.min(score.MasterBars.length - 1,Math.max(0,endBarIndex));
+		this._endBarIndex = startIndex + this._endBarIndex - 1;
+		this._endBarIndex = Math.min(score.MasterBars.length - 1,Math.max(0,this._endBarIndex));
 		var this1 = [];
 		this._groups = this1;
-		while(currentBarIndex <= endBarIndex) {
-			var group = this.CreateStaveGroup(currentBarIndex,endBarIndex);
+		while(currentBarIndex <= this._endBarIndex) {
+			var group = this.CreateStaveGroup(currentBarIndex,this._endBarIndex);
 			this._groups.push(group);
 			group.X = x;
 			group.Y = y;
@@ -16009,14 +16011,9 @@ alphaTab.importer.MusicXmlImporter.prototype = $extend(alphaTab.importer.ScoreIm
 		var voiceNodes = element.GetElementsByTagName("voice",false);
 		if(voiceNodes.length > 0) {
 			voiceIndex = alphaTab.platform.Platform.ParseInt(voiceNodes[0].get_InnerText()) - 1;
-			if(this._firstVoice == -1)
-			{
+			if(this._firstVoice == -1) {
 				this._firstVoice = voiceIndex;
 				voiceIndex = 0;
-			}
-			else
-			{
-				voiceIndex -= this._firstVoice;
 			}
 		}
 		var previousBeatWasPulled = this._previousBeatWasPulled;
@@ -27662,10 +27659,12 @@ alphaTab.rendering.glyphs.TextGlyph = $hx_exports["alphaTab"]["rendering"]["glyp
 		textAlign = 0;
 	}
 	alphaTab.rendering.glyphs.EffectGlyph.call(this,x,y);
-	this._text = null;
+	this._lines = null;
 	this.Font = null;
 	this.TextAlign = null;
-	this._text = text;
+	var this1 = system.Convert.ToUInt16(10);
+	var this2 = this1;
+	this._lines = system._CsString.CsString_Impl_.Split_CharArray(text,[this2]);
 	this.Font = font;
 	this.TextAlign = textAlign;
 };
@@ -27674,14 +27673,20 @@ alphaTab.rendering.glyphs.TextGlyph.__super__ = alphaTab.rendering.glyphs.Effect
 alphaTab.rendering.glyphs.TextGlyph.prototype = $extend(alphaTab.rendering.glyphs.EffectGlyph.prototype,{
 	DoLayout: function() {
 		alphaTab.rendering.glyphs.EffectGlyph.prototype.DoLayout.call(this);
-		this.Height = this.Font.Size;
+		this.Height = this.Font.Size * this._lines.length;
 	}
 	,Paint: function(cx,cy,canvas) {
 		canvas.set_Font(this.Font);
 		var old = canvas.get_TextAlign();
-		canvas.set_TextAlign(this.TextAlign);
-		canvas.FillText(this._text,cx + this.X,cy + this.Y);
-		canvas.set_TextAlign(old);
+		var y = cy + this.Y;
+		var line = HxOverrides.iter(this._lines);
+		while(line.hasNext()) {
+			var line1 = line.next();
+			canvas.set_TextAlign(this.TextAlign);
+			canvas.FillText(line1,cx + this.X,y);
+			canvas.set_TextAlign(old);
+			y = y + this.Font.Size;
+		}
 	}
 	,__class__: alphaTab.rendering.glyphs.TextGlyph
 });

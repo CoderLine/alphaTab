@@ -38,7 +38,7 @@ namespace AlphaTab.Platform
 
         public static bool IsWhiteSpace(int c)
         {
-            return c == 0x20 || c == 0x0B || c == 0x0D || c == 0x0A;
+            return c == 0x20 || c == 0x0B || c == 0x0D || c == 0x0A || c == 0x09;
         }
 
         public static string ToHexString(int n, int digits = 0)
