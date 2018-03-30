@@ -70,9 +70,11 @@ namespace AlphaTab.Platform
                 case LogLevel.None:
                     break;
                 case LogLevel.Debug:
+                    msg = "[Debug]" + msg;
                     console.Debug(msg, details);
                     break;
                 case LogLevel.Info:
+                    msg = "[Info]" + msg;
                     console.Info(msg, details);
                     break;
                 case LogLevel.Warning:

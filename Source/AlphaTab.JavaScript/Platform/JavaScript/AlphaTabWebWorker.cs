@@ -31,7 +31,8 @@ namespace AlphaTab.Platform.JavaScript
             switch (cmd)
             {
                 case "alphaTab.initialize":
-                    var settings = Settings.FromJson(data.settings, null);
+                    Settings settings = Settings.FromJson(data.settings, null);
+                    Logger.LogLevel = settings.LogLevel;
                     _renderer = new ScoreRenderer(settings);
                     _renderer.PartialRenderFinished += result => _main.PostMessage(new { cmd = "alphaTab.partialRenderFinished", result = result });
                     _renderer.RenderFinished += result => _main.PostMessage(new { cmd = "alphaTab.renderFinished", result = result });

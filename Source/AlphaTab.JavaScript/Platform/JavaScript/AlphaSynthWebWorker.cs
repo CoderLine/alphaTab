@@ -91,6 +91,7 @@ namespace AlphaTab.Platform.JavaScript
                 {
                     case CmdInitialize:
                         AlphaSynthWorkerSynthOutput.PreferredSampleRate = data.sampleRate;
+                        Logger.LogLevel = data.logLevel;
                         new AlphaSynthWebWorker(main, data.id);
                         break;
                 }

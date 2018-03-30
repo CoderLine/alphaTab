@@ -38,6 +38,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{4642B107-0
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "AlphaTab", "Source\AlphaTab\AlphaTab.shproj", "{8083B3BC-0681-47F2-9FBF-A5C96107F538}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaTab.Samples.Player", "Samples\CSharp\AlphaTab.Samples.Player\AlphaTab.Samples.Player.csproj", "{52B2CA3F-0CCF-45E2-96C6-223F6CE01070}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Source\AlphaTab\AlphaTab.projitems*{8083b3bc-0681-47f2-9fbf-a5c96107f538}*SharedItemsImports = 13
@@ -92,6 +94,10 @@ Global
 		{BCC950EA-7465-47FC-A7AF-E733B55EC91F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCC950EA-7465-47FC-A7AF-E733B55EC91F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCC950EA-7465-47FC-A7AF-E733B55EC91F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52B2CA3F-0CCF-45E2-96C6-223F6CE01070}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52B2CA3F-0CCF-45E2-96C6-223F6CE01070}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52B2CA3F-0CCF-45E2-96C6-223F6CE01070}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52B2CA3F-0CCF-45E2-96C6-223F6CE01070}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -107,6 +113,7 @@ Global
 		{CE43D0C5-8A17-4F8F-9623-3A7A52AD02F4} = {4642B107-04FE-4777-AA50-667A6A7E6C09}
 		{CFE77A13-5BC1-4287-A5A3-CD69ECDDFAA5} = {4642B107-04FE-4777-AA50-667A6A7E6C09}
 		{B58BDC1C-566A-473E-B755-67567251D5FD} = {4642B107-04FE-4777-AA50-667A6A7E6C09}
+		{52B2CA3F-0CCF-45E2-96C6-223F6CE01070} = {0F4187B8-D34E-475D-8656-06F739E31DB3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EF4712C6-0213-4DDD-B176-D564038D0F3E}

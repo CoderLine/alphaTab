@@ -557,9 +557,11 @@ alphaTab.platform.Platform.Log = function(logLevel,category,msg,details) {
 	case 0:
 		break;
 	case 1:
+		msg = "[Debug]" + msg;
 		$console.debug(msg,details);
 		break;
 	case 2:
+		msg = "[Info]" + msg;
 		$console.info(msg,details);
 		break;
 	case 3:
@@ -861,7 +863,7 @@ alphaTab.platform.model.Font = $hx_exports["alphaTab"]["platform"]["model"]["Fon
 	this._css = null;
 	this.Family = null;
 	this.Size = 0.0;
-	this.Style = null;
+	this.Style = 0;
 	this.Family = family;
 	this.Size = size;
 	this.Style = style;
@@ -1661,6 +1663,7 @@ alphaTab.platform.javaScript.AlphaTabWebWorker.prototype = {
 		switch(cmd) {
 		case "alphaTab.initialize":
 			var settings = alphaTab.Settings.FromJson(data.settings,null);
+			alphaTab.util.Logger.LogLevel = settings.LogLevel;
 			this._renderer = new alphaTab.rendering.ScoreRenderer(settings);
 			this._renderer.PartialRenderFinished = system._EventAction1.EventAction1_Impl_.add(this._renderer.PartialRenderFinished,function(result) {
 				_gthis._main.postMessage({ cmd : "alphaTab.partialRenderFinished", result : result});
@@ -1747,6 +1750,7 @@ alphaTab.platform.javaScript.AlphaSynthWebWorker.Init = function() {
 		var cmd = data.cmd;
 		if(cmd == "alphaSynth.initialize") {
 			alphaTab.platform.javaScript.AlphaSynthWorkerSynthOutput.PreferredSampleRate = data.sampleRate;
+			alphaTab.util.Logger.LogLevel = data.logLevel;
 			new alphaTab.platform.javaScript.AlphaSynthWebWorker(main,data.id);
 		}
 	});
@@ -1933,8 +1937,8 @@ alphaTab.audio.synth.AlphaSynth = $hx_exports["alphaTab"]["audio"]["synth"]["Alp
 	this._sequencer = null;
 	this._synthesizer = null;
 	this._outputIsReady = false;
-	this._state = null;
-	this._logLevel = null;
+	this._state = 0;
+	this._logLevel = 0;
 	this._isSoundFontLoaded = false;
 	this._isMidiLoaded = false;
 	this._tickPosition = 0;
@@ -2161,7 +2165,7 @@ alphaTab.audio.synth.AlphaSynth.prototype = {
 		var currentTick = this._tickPosition = this._sequencer.TimePositionToTickPosition(currentTime);
 		var endTime = this._sequencer.get_EndTime();
 		var endTick = this._sequencer.EndTick;
-		alphaTab.util.Logger.Debug("AlphaSynth","Position changed: (time: " + currentTime + "/" + endTime + ", tick: " + currentTick + "/" + endTime + ")",null);
+		alphaTab.util.Logger.Debug("AlphaSynth","Position changed: (time: " + currentTime + "/" + endTime + ", tick: " + currentTick + "/" + endTime + ", Active Voices: " + this._synthesizer.get_ActiveVoices() + ", Free Voices: " + this._synthesizer.get_FreeVoices() + ")",null);
 		this.OnPositionChanged(new alphaTab.audio.synth.PositionChangedEventArgs(currentTime,endTime,currentTick,endTick));
 	}
 	,OnFinished: function(isLooping) {
@@ -2355,7 +2359,13 @@ alphaTab.audio.synth.synthesis.Synthesizer = $hx_exports["alphaTab"]["audio"]["s
 };
 alphaTab.audio.synth.synthesis.Synthesizer.__name__ = ["alphaTab","audio","synth","synthesis","Synthesizer"];
 alphaTab.audio.synth.synthesis.Synthesizer.prototype = {
-	get_MetronomeVolume: function() {
+	get_ActiveVoices: function() {
+		return this._voiceManager.ActiveVoices.Length;
+	}
+	,get_FreeVoices: function() {
+		return this._voiceManager.FreeVoices.Length;
+	}
+	,get_MetronomeVolume: function() {
 		return this._synthChannels[this._metronomeChannel].MixVolume;
 	}
 	,set_MetronomeVolume: function(value) {
@@ -2558,6 +2568,7 @@ alphaTab.audio.synth.synthesis.Synthesizer.prototype = {
 		}
 	}
 	,ProcessMidiMessage: function(e) {
+		alphaTab.util.Logger.Debug("Midi","Processing midi " + e.get_Command(),null);
 		var command = e.get_Command();
 		var channel = e.get_Channel();
 		var data1 = e.get_Data1();
@@ -3320,7 +3331,7 @@ alphaTab.audio.synth.synthesis.VoiceParameters = $hx_exports["alphaTab"]["audio"
 	this.Note = 0;
 	this.Velocity = 0;
 	this.NoteOffPending = false;
-	this.State = null;
+	this.State = 0;
 	this.PitchOffset = 0;
 	this.VolOffset = 0.0;
 	this.BlockBuffer = null;
@@ -3426,7 +3437,7 @@ alphaTab.audio.synth.bank.components.generators.GeneratorParameters = $hx_export
 	this.Phase = 0.0;
 	this.CurrentStart = 0.0;
 	this.CurrentEnd = 0.0;
-	this.CurrentState = null;
+	this.CurrentState = 0;
 	this.Phase = 0;
 	this.CurrentStart = 0;
 	this.CurrentEnd = 0;
@@ -3470,7 +3481,7 @@ alphaTab.audio.synth.bank.components.Envelope = $hx_exports["alphaTab"]["audio"]
 	this._index = 0;
 	this._stage = null;
 	this.Value = 0.0;
-	this.CurrentStage = null;
+	this.CurrentStage = 0;
 	this.Depth = 0.0;
 	this.Value = 0;
 	this.Depth = 0;
@@ -3795,7 +3806,7 @@ alphaTab.audio.synth.bank.components.Filter = $hx_exports["alphaTab"]["audio"]["
 	this._m3 = 0.0;
 	this._cutOff = 0.0;
 	this._resonance = 0.0;
-	this.FilterMethod = null;
+	this.FilterMethod = 0;
 	this.CoeffNeedsUpdating = false;
 	this._a1 = 0;
 	this._a2 = 0;
@@ -3986,7 +3997,7 @@ alphaTab.audio.synth.bank.components.Lfo = $hx_exports["alphaTab"]["audio"]["syn
 	this._delayTime = 0;
 	this._generator = null;
 	this.Frequency = 0.0;
-	this.CurrentState = null;
+	this.CurrentState = 0;
 	this.Value = 0.0;
 	this.Depth = 0.0;
 	this.CurrentState = 0;
@@ -4043,8 +4054,8 @@ alphaTab.audio.synth.bank.components.Lfo.prototype = {
 };
 alphaTab.audio.synth.bank.descriptors = {};
 alphaTab.audio.synth.bank.descriptors.GeneratorDescriptor = $hx_exports["alphaTab"]["audio"]["synth"]["bank"]["descriptors"]["GeneratorDescriptor"] = function() {
-	this.LoopMethod = null;
-	this.SamplerType = null;
+	this.LoopMethod = 0;
+	this.SamplerType = 0;
 	this.AssetName = null;
 	this.EndPhase = 0.0;
 	this.StartPhase = 0.0;
@@ -4075,7 +4086,7 @@ alphaTab.audio.synth.bank.descriptors.GeneratorDescriptor.prototype = {
 	__class__: alphaTab.audio.synth.bank.descriptors.GeneratorDescriptor
 };
 alphaTab.audio.synth.bank.components.generators.Generator = $hx_exports["alphaTab"]["audio"]["synth"]["bank"]["components"]["generators"]["Generator"] = function(description) {
-	this.LoopMode = null;
+	this.LoopMode = 0;
 	this.LoopStartPhase = 0.0;
 	this.LoopEndPhase = 0.0;
 	this.StartPhase = 0.0;
@@ -6138,6 +6149,11 @@ alphaTab.Settings.FillFromJson = function(settings,json,dataAttributes) {
 			}
 		}
 	}
+	if((json && "logging" in json)) {
+		settings.LogLevel = alphaTab.Settings.DecodeLogLevel(json.log);
+	} else if(dataAttributes != null && dataAttributes.hasOwnProperty("logging")) {
+		settings.LogLevel = alphaTab.Settings.DecodeLogLevel(dataAttributes["logging"]);
+	}
 	if((json && "useWorker" in json)) {
 		settings.UseWebWorker = json.useWorker;
 	} else if(dataAttributes != null && dataAttributes.hasOwnProperty("useWorker")) {
@@ -6255,6 +6271,29 @@ alphaTab.Settings.FillFromJson = function(settings,json,dataAttributes) {
 		}
 	}
 };
+alphaTab.Settings.DecodeLogLevel = function(log) {
+	if(typeof(log) == "number") {
+		return log;
+	}
+	if(typeof(log) == "string") {
+		var s = log;
+		var _g = s.toLowerCase();
+		switch(_g) {
+		case "debug":
+			return 1;
+		case "error":
+			return 4;
+		case "info":
+			return 2;
+		case "none":
+			return 0;
+		case "warning":
+			return 3;
+		default:
+		}
+	}
+	return 2;
+};
 alphaTab.Settings.FillCursorOffset = function(settings,playerOffset) {
 	if(typeof(playerOffset) == "number") {
 		settings.ScrollOffsetX = playerOffset;
@@ -6348,6 +6387,7 @@ alphaTab.Settings.get_Defaults = function() {
 	settings.ImporterSettings = this3;
 	settings.Layout = alphaTab.LayoutSettings.get_Defaults();
 	settings.Staves = new alphaTab.StaveSettings("default");
+	settings.LogLevel = 2;
 	alphaTab.Settings.SetDefaults(settings);
 	return settings;
 };
@@ -6362,6 +6402,7 @@ alphaTab.Settings.prototype = {
 		json.forcePianoFingering = this.ForcePianoFingering;
 		json.transpositionPitches = this.TranspositionPitches;
 		json.displayTranspositionPitches = this.DisplayTranspositionPitches;
+		json.logging = this.LogLevel;
 		json.scriptFile = this.ScriptFile;
 		json.fontDirectory = this.FontDirectory;
 		json.lazy = this.DisableLazyLoading;
@@ -7370,7 +7411,7 @@ alphaTab.audio.synth._PlayerState.PlayerState_Impl_.toString = function(this1) {
 	return "";
 };
 alphaTab.audio.synth.PlayerStateChangedEventArgs = $hx_exports["alphaTab"]["audio"]["synth"]["PlayerStateChangedEventArgs"] = function(state) {
-	this.State = null;
+	this.State = 0;
 	this.State = state;
 };
 alphaTab.audio.synth.PlayerStateChangedEventArgs.__name__ = ["alphaTab","audio","synth","PlayerStateChangedEventArgs"];
@@ -8475,7 +8516,7 @@ alphaTab.audio.synth.bank.descriptors.EnvelopeDescriptor.prototype = {
 	__class__: alphaTab.audio.synth.bank.descriptors.EnvelopeDescriptor
 };
 alphaTab.audio.synth.bank.descriptors.FilterDescriptor = $hx_exports["alphaTab"]["audio"]["synth"]["bank"]["descriptors"]["FilterDescriptor"] = function() {
-	this.FilterMethod = null;
+	this.FilterMethod = 0;
 	this.CutOff = 0.0;
 	this.Resonance = 0.0;
 	this.RootKey = 0;
@@ -8638,7 +8679,7 @@ alphaTab.audio.synth.bank.patch.Patch.prototype = {
 };
 alphaTab.audio.synth.bank.patch.MultiPatch = $hx_exports["alphaTab"]["audio"]["synth"]["bank"]["patch"]["MultiPatch"] = function(name) {
 	alphaTab.audio.synth.bank.patch.Patch.call(this,name);
-	this._intervalType = null;
+	this._intervalType = 0;
 	this._intervalList = null;
 	this._intervalType = 0;
 };
@@ -9384,8 +9425,8 @@ alphaTab.audio.synth.io.IOHelper.ReadInt16 = function(input,index) {
 alphaTab.audio.synth.midi = {};
 alphaTab.audio.synth.midi.MidiFile = $hx_exports["alphaTab"]["audio"]["synth"]["midi"]["MidiFile"] = function() {
 	this.Division = 0;
-	this.TrackFormat = null;
-	this.TimingStandard = null;
+	this.TrackFormat = 0;
+	this.TimingStandard = 0;
 	this.Events = null;
 	this.Division = 960;
 	this.TrackFormat = 0;
@@ -10045,7 +10086,7 @@ alphaTab.audio.synth.sf2._DirectionEnum.DirectionEnum_Impl_.toString = function(
 };
 alphaTab.audio.synth.sf2.Generator = $hx_exports["alphaTab"]["audio"]["synth"]["sf2"]["Generator"] = function(input) {
 	this._rawAmount = 0;
-	this.GeneratorType = null;
+	this.GeneratorType = 0;
 	this.GeneratorType = js.Boot.__cast(alphaTab.audio.synth.io.IOHelper.ReadUInt16LE(input) , Int);
 	this._rawAmount = alphaTab.audio.synth.io.IOHelper.ReadUInt16LE(input);
 };
@@ -10264,8 +10305,8 @@ alphaTab.audio.synth.sf2.Modulator.prototype = {
 };
 alphaTab.audio.synth.sf2.ModulatorType = $hx_exports["alphaTab"]["audio"]["synth"]["sf2"]["ModulatorType"] = function(input) {
 	this._controllerSource = 0;
-	this.Polarity = null;
-	this.Direction = null;
+	this.Polarity = 0;
+	this.Direction = 0;
 	this.SourceType = 0;
 	this.IsMidiContinuousController = false;
 	var raw = alphaTab.audio.synth.io.IOHelper.ReadUInt16LE(input);
@@ -10405,7 +10446,7 @@ alphaTab.audio.synth.sf2.SampleHeader = $hx_exports["alphaTab"]["audio"]["synth"
 	this.RootKey = 0;
 	this.Tune = 0;
 	this.SampleLink = 0;
-	this.SoundFontSampleLink = null;
+	this.SoundFontSampleLink = 1;
 	this.Name = alphaTab.audio.synth.io.IOHelper.Read8BitStringLength(input,20);
 	this.Start = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
 	this.End = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
@@ -11727,8 +11768,8 @@ alphaTab.importer.AlphaTexException.prototype = $extend(alphaTab.AlphaTabExcepti
 		this.AlphaTabException("");
 		this.Position = 0;
 		this.NonTerm = null;
-		this.Expected = null;
-		this.Symbol = null;
+		this.Expected = 0;
+		this.Symbol = 0;
 		this.SymbolData = null;
 		this.Position = position;
 		this.NonTerm = nonTerm;
@@ -15729,7 +15770,7 @@ alphaTab.importer.GpxRhythm = $hx_exports["alphaTab"]["importer"]["GpxRhythm"] =
 	this.Dots = 0;
 	this.TupletDenominator = 0;
 	this.TupletNumerator = 0;
-	this.Value = null;
+	this.Value = -4;
 	this.TupletDenominator = -1;
 	this.TupletNumerator = -1;
 	this.Value = 4;
@@ -17645,8 +17686,8 @@ alphaTab.model.Bar = $hx_exports["alphaTab"]["model"]["Bar"] = function() {
 	this.Index = 0;
 	this.NextBar = null;
 	this.PreviousBar = null;
-	this.Clef = null;
-	this.ClefOttavia = null;
+	this.Clef = 0;
+	this.ClefOttavia = 0;
 	this.Staff = null;
 	this.Voices = null;
 	this.Id = alphaTab.model.Bar.GlobalBarId++;
@@ -17706,7 +17747,7 @@ alphaTab.model.Beat = $hx_exports["alphaTab"]["model"]["Beat"] = function() {
 	this._maxNote = null;
 	this._maxStringNote = null;
 	this._minStringNote = null;
-	this.Duration = null;
+	this.Duration = -4;
 	this.Automations = null;
 	this.Dots = 0;
 	this.FadeIn = false;
@@ -17716,20 +17757,20 @@ alphaTab.model.Beat = $hx_exports["alphaTab"]["model"]["Beat"] = function() {
 	this.Slap = false;
 	this.Tap = false;
 	this.Text = null;
-	this.BrushType = null;
+	this.BrushType = 0;
 	this.BrushDuration = 0;
 	this.TupletDenominator = 0;
 	this.TupletNumerator = 0;
 	this.WhammyBarPoints = null;
 	this.MaxWhammyPoint = null;
-	this.Vibrato = null;
+	this.Vibrato = 0;
 	this.ChordId = null;
-	this.GraceType = null;
-	this.PickStroke = null;
+	this.GraceType = 0;
+	this.PickStroke = 0;
 	this.TremoloSpeed = null;
-	this.Crescendo = null;
+	this.Crescendo = 0;
 	this.Start = 0;
-	this.Dynamic = null;
+	this.Dynamic = 0;
 	this.InvertBeamDirection = false;
 	this.Id = alphaTab.model.Beat.GlobalBeatId++;
 	var this1 = [];
@@ -19010,7 +19051,7 @@ alphaTab.model.MasterBar = $hx_exports["alphaTab"]["model"]["MasterBar"] = funct
 	this.PreviousMasterBar = null;
 	this.Index = 0;
 	this.KeySignature = 0;
-	this.KeySignatureType = null;
+	this.KeySignatureType = 0;
 	this.IsDoubleBar = false;
 	this.IsRepeatStart = false;
 	this.RepeatCount = 0;
@@ -19018,7 +19059,7 @@ alphaTab.model.MasterBar = $hx_exports["alphaTab"]["model"]["MasterBar"] = funct
 	this.TimeSignatureNumerator = 0;
 	this.TimeSignatureDenominator = 0;
 	this.TimeSignatureCommon = false;
-	this.TripletFeel = null;
+	this.TripletFeel = 0;
 	this.Section = null;
 	this.TempoAutomation = null;
 	this.VolumeAutomation = null;
@@ -19100,7 +19141,7 @@ alphaTab.model.ModelUtils.ApplyPitchOffsets = function(settings,score) {
 alphaTab.model.Note = $hx_exports["alphaTab"]["model"]["Note"] = function() {
 	this.Id = 0;
 	this.Index = 0;
-	this.Accentuated = null;
+	this.Accentuated = 0;
 	this.BendPoints = null;
 	this.MaxBendPoint = null;
 	this.Fret = 0;
@@ -19113,28 +19154,28 @@ alphaTab.model.Note = $hx_exports["alphaTab"]["model"]["Note"] = function() {
 	this.HammerPullOrigin = null;
 	this.HammerPullDestination = null;
 	this.HarmonicValue = 0.0;
-	this.HarmonicType = null;
+	this.HarmonicType = 0;
 	this.IsGhost = false;
 	this.IsLetRing = false;
 	this.IsPalmMute = false;
 	this.IsDead = false;
 	this.IsStaccato = false;
-	this.SlideType = null;
+	this.SlideType = 0;
 	this.SlideTarget = null;
-	this.Vibrato = null;
+	this.Vibrato = 0;
 	this.TieOrigin = null;
 	this.TieDestination = null;
 	this.IsTieDestination = false;
 	this.IsTieOrigin = false;
-	this.LeftHandFinger = null;
-	this.RightHandFinger = null;
+	this.LeftHandFinger = 0;
+	this.RightHandFinger = 0;
 	this.IsFingering = false;
 	this.TrillValue = 0;
-	this.TrillSpeed = null;
+	this.TrillSpeed = -4;
 	this.DurationPercent = 0.0;
-	this.AccidentalMode = null;
+	this.AccidentalMode = 0;
 	this.Beat = null;
-	this.Dynamic = null;
+	this.Dynamic = 0;
 	this.Id = alphaTab.model.Note.GlobalNoteId++;
 	var this1 = [];
 	this.BendPoints = this1;
@@ -19653,7 +19694,7 @@ alphaTab.model.Staff = $hx_exports["alphaTab"]["model"]["Staff"] = function() {
 	this.DisplayTranspositionPitch = 0;
 	this.Tuning = null;
 	this.TuningName = null;
-	this.StaffKind = null;
+	this.StaffKind = 0;
 	var this1 = [];
 	this.Bars = this1;
 	var this2 = new Int32Array(0);
@@ -20462,15 +20503,15 @@ alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.prototype = {
 	}
 	,__class__: alphaTab.platform.javaScript.AlphaSynthWebAudioOutput
 };
-alphaTab.platform.javaScript.AlphaSynthWebWorkerApi = $hx_exports["alphaTab"]["platform"]["javaScript"]["AlphaSynthWebWorkerApi"] = function(player,alphaSynthScriptFile) {
+alphaTab.platform.javaScript.AlphaSynthWebWorkerApi = $hx_exports["alphaTab"]["platform"]["javaScript"]["AlphaSynthWebWorkerApi"] = function(player,alphaSynthScriptFile,logLevel) {
 	this._synth = null;
 	this._output = null;
 	this._events = null;
 	this._workerIsReadyForPlayback = false;
 	this._workerIsReady = false;
 	this._outputIsReady = false;
-	this._state = null;
-	this._logLevel = null;
+	this._state = 0;
+	this._logLevel = 0;
 	this._masterVolume = 0.0;
 	this._metronomeVolume = 0.0;
 	this._playbackSpeed = 0.0;
@@ -20503,7 +20544,7 @@ alphaTab.platform.javaScript.AlphaSynthWebWorkerApi = $hx_exports["alphaTab"]["p
 		}
 	}
 	this._synth.addEventListener("message",$bind(this,this.HandleWorkerMessage),false);
-	this._synth.postMessage({ cmd : "alphaSynth." + "initialize", sampleRate : this._output.get_SampleRate()});
+	this._synth.postMessage({ cmd : "alphaSynth." + "initialize", sampleRate : this._output.get_SampleRate(), logLevel : logLevel});
 	this.set_MasterVolume(1);
 	this.set_PlaybackSpeed(1);
 	this.set_MetronomeVolume(0);
@@ -20789,18 +20830,19 @@ alphaTab.platform.javaScript.AlphaTabApi = $hx_exports["alphaTab"]["platform"]["
 	this._selectionWrapper = null;
 	this._previousTick = 0;
 	this._cursorCache = null;
-	this._playerState = null;
+	this._playerState = 0;
 	this._selectionStart = null;
 	this._selectionEnd = null;
 	this._selecting = false;
 	this._currentBeat = null;
-	this._previousStateForCursor = null;
+	this._previousStateForCursor = 0;
 	this._lastScroll = 0;
 	this._element = element;
 	this._element.classList.add("alphaTab");
 	var dataAttributes = this.GetDataAttributes();
 	var settings = this.Settings = alphaTab.Settings.FromJson(options,dataAttributes);
 	var autoSize = settings.Width < 0;
+	alphaTab.util.Logger.LogLevel = settings.LogLevel;
 	var tracksData;
 	if(options != null && options.tracks) {
 		tracksData = options.tracks;
@@ -21353,10 +21395,10 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		var alphaSynthScriptFile = alphaTab.Environment.ScriptFile;
 		if(supportsWebAudio && !forceFlash) {
 			alphaTab.util.Logger.Info("Player","Will use webworkers for synthesizing and web audio api for playback",null);
-			this.Player = new alphaTab.platform.javaScript.AlphaSynthWebWorkerApi(new alphaTab.platform.javaScript.AlphaSynthWebAudioOutput(),alphaSynthScriptFile);
+			this.Player = new alphaTab.platform.javaScript.AlphaSynthWebWorkerApi(new alphaTab.platform.javaScript.AlphaSynthWebAudioOutput(),alphaSynthScriptFile,this.Settings.LogLevel);
 		} else if(supportsWebWorkers) {
 			alphaTab.util.Logger.Info("Player","Will use webworkers for synthesizing and flash for playback",null);
-			this.Player = new alphaTab.platform.javaScript.AlphaSynthWebWorkerApi(new alphaTab.platform.javaScript.AlphaSynthFlashOutput(alphaSynthScriptFile),alphaSynthScriptFile);
+			this.Player = new alphaTab.platform.javaScript.AlphaSynthWebWorkerApi(new alphaTab.platform.javaScript.AlphaSynthFlashOutput(alphaSynthScriptFile),alphaSynthScriptFile,this.Settings.LogLevel);
 		}
 		if(this.Player == null) {
 			alphaTab.util.Logger.Error("Player","Player requires webworkers and web audio api or flash, browser unsupported",null);
@@ -24580,7 +24622,7 @@ alphaTab.rendering.glyphs.EffectGlyph.prototype = $extend(alphaTab.rendering.gly
 alphaTab.rendering.glyphs.MusicFontGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["MusicFontGlyph"] = function(x,y,glyphScale,symbol) {
 	alphaTab.rendering.glyphs.EffectGlyph.call(this,x,y);
 	this.GlyphScale = 0.0;
-	this._symbol = null;
+	this._symbol = -1;
 	this.GlyphScale = glyphScale;
 	this._symbol = symbol;
 };
@@ -25085,8 +25127,8 @@ alphaTab.rendering.glyphs.CircleGlyph.prototype = $extend(alphaTab.rendering.gly
 });
 alphaTab.rendering.glyphs.ClefGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["ClefGlyph"] = function(x,y,clef,clefOttavia) {
 	alphaTab.rendering.glyphs.MusicFontGlyph.call(this,x,y,1,alphaTab.rendering.glyphs.ClefGlyph.GetSymbol(clef));
-	this._clef = null;
-	this._clefOttavia = null;
+	this._clef = 0;
+	this._clefOttavia = 0;
 	this._clef = clef;
 	this._clefOttavia = clefOttavia;
 };
@@ -25194,7 +25236,7 @@ alphaTab.rendering.glyphs.ClefGlyph.prototype = $extend(alphaTab.rendering.glyph
 });
 alphaTab.rendering.glyphs.GroupedEffectGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["GroupedEffectGlyph"] = function(endPosition) {
 	alphaTab.rendering.glyphs.EffectGlyph.call(this,0,0);
-	this._endPosition = null;
+	this._endPosition = 0;
 	this._endPosition = endPosition;
 };
 alphaTab.rendering.glyphs.GroupedEffectGlyph.__name__ = ["alphaTab","rendering","glyphs","GroupedEffectGlyph"];
@@ -25242,7 +25284,7 @@ alphaTab.rendering.glyphs.GroupedEffectGlyph.prototype = $extend(alphaTab.render
 });
 alphaTab.rendering.glyphs.CrescendoGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["CrescendoGlyph"] = function(x,y,crescendo) {
 	alphaTab.rendering.glyphs.GroupedEffectGlyph.call(this,3);
-	this._crescendo = null;
+	this._crescendo = 0;
 	this._crescendo = crescendo;
 	this.X = x;
 	this.Y = y;
@@ -25520,7 +25562,7 @@ alphaTab.rendering.glyphs.LyricsGlyph = $hx_exports["alphaTab"]["rendering"]["gl
 	alphaTab.rendering.glyphs.EffectGlyph.call(this,x,y);
 	this._lines = null;
 	this.Font = null;
-	this.TextAlign = null;
+	this.TextAlign = 0;
 	this._lines = lines;
 	this.Font = font;
 	this.TextAlign = textAlign;
@@ -25764,7 +25806,7 @@ alphaTab.rendering.glyphs.NaturalizeGlyph.prototype = $extend(alphaTab.rendering
 alphaTab.rendering.glyphs.NoteHeadGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["NoteHeadGlyph"] = function(x,y,duration,isGrace) {
 	alphaTab.rendering.glyphs.MusicFontGlyph.call(this,x,y,isGrace ? 0.75 : 1,alphaTab.rendering.glyphs.NoteHeadGlyph.GetSymbol(duration));
 	this._isGrace = false;
-	this._duration = null;
+	this._duration = -4;
 	this._isGrace = isGrace;
 	this._duration = duration;
 };
@@ -26735,7 +26777,7 @@ alphaTab.rendering.glyphs.ScoreNoteGlyphInfo.prototype = {
 };
 alphaTab.rendering.glyphs.ScoreRestGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["ScoreRestGlyph"] = function(x,y,duration) {
 	alphaTab.rendering.glyphs.MusicFontGlyph.call(this,x,y,1,alphaTab.rendering.glyphs.ScoreRestGlyph.GetSymbol(duration));
-	this._duration = null;
+	this._duration = -4;
 	this.BeamingHelper = null;
 	this._duration = duration;
 };
@@ -26797,7 +26839,7 @@ alphaTab.rendering.glyphs.ScoreRestGlyph.prototype = $extend(alphaTab.rendering.
 alphaTab.rendering.glyphs.ScoreSlideLineGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["ScoreSlideLineGlyph"] = function(type,startNote,parent) {
 	alphaTab.rendering.glyphs.Glyph.call(this,0,0);
 	this._startNote = null;
-	this._type = null;
+	this._type = 0;
 	this._parent = null;
 	this._type = type;
 	this._startNote = startNote;
@@ -27432,7 +27474,7 @@ alphaTab.rendering.glyphs.TabNoteChordGlyph.prototype = $extend(alphaTab.renderi
 alphaTab.rendering.glyphs.TabRestGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["TabRestGlyph"] = function(x,y,isVisibleRest,duration) {
 	alphaTab.rendering.glyphs.MusicFontGlyph.call(this,x,y,1,alphaTab.rendering.glyphs.ScoreRestGlyph.GetSymbol(duration));
 	this._isVisibleRest = false;
-	this._duration = null;
+	this._duration = -4;
 	this.BeamingHelper = null;
 	this._isVisibleRest = isVisibleRest;
 	this._duration = duration;
@@ -27462,7 +27504,7 @@ alphaTab.rendering.glyphs.TabRestGlyph.prototype = $extend(alphaTab.rendering.gl
 alphaTab.rendering.glyphs.TabSlideLineGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["TabSlideLineGlyph"] = function(type,startNote,parent) {
 	alphaTab.rendering.glyphs.Glyph.call(this,0,0);
 	this._startNote = null;
-	this._type = null;
+	this._type = 0;
 	this._parent = null;
 	this._type = type;
 	this._startNote = startNote;
@@ -27661,7 +27703,7 @@ alphaTab.rendering.glyphs.TextGlyph = $hx_exports["alphaTab"]["rendering"]["glyp
 	alphaTab.rendering.glyphs.EffectGlyph.call(this,x,y);
 	this._lines = null;
 	this.Font = null;
-	this.TextAlign = null;
+	this.TextAlign = 0;
 	var this1 = system.Convert.ToUInt16(10);
 	var this2 = this1;
 	this._lines = system._CsString.CsString_Impl_.Split_CharArray(text,[this2]);
@@ -27746,7 +27788,7 @@ alphaTab.rendering.glyphs.TrillGlyph.prototype = $extend(alphaTab.rendering.glyp
 });
 alphaTab.rendering.glyphs.TripletFeelGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["TripletFeelGlyph"] = function(tripletFeel) {
 	alphaTab.rendering.glyphs.EffectGlyph.call(this,0,0);
-	this._tripletFeel = null;
+	this._tripletFeel = 0;
 	this._tripletFeel = tripletFeel;
 };
 alphaTab.rendering.glyphs.TripletFeelGlyph.__name__ = ["alphaTab","rendering","glyphs","TripletFeelGlyph"];
@@ -29155,7 +29197,7 @@ alphaTab.rendering.utils.BeamingHelper = $hx_exports["alphaTab"]["rendering"]["u
 	this._beatLineXPositions = null;
 	this.Voice = null;
 	this.Beats = null;
-	this.ShortestDuration = null;
+	this.ShortestDuration = -4;
 	this.FingeringCount = 0;
 	this.HasTuplet = false;
 	this.FirstMinNote = null;
@@ -29165,7 +29207,7 @@ alphaTab.rendering.utils.BeamingHelper = $hx_exports["alphaTab"]["rendering"]["u
 	this.MinNote = null;
 	this.MaxNote = null;
 	this.InvertBeamDirection = false;
-	this.Direction = null;
+	this.Direction = 0;
 	this._staff = staff;
 	var this1 = [];
 	this.Beats = this1;
@@ -29842,7 +29884,7 @@ alphaTab.utils._UnionData.UnionData_Impl_.get_Int2 = function(this1) {
 };
 alphaTab.xml = {};
 alphaTab.xml.XmlNode = $hx_exports["alphaTab"]["xml"]["XmlNode"] = function() {
-	this.NodeType = null;
+	this.NodeType = 0;
 	this.LocalName = null;
 	this.Value = null;
 	this.ChildNodes = null;
@@ -31076,7 +31118,7 @@ var Bool = Boolean;
 Bool.__ename__ = ["Bool"];
 var Class = { __name__ : ["Class"]};
 var Enum = { };
-alphaTab.util.Logger.LogLevel = null;
+alphaTab.util.Logger.LogLevel = 0;
 alphaTab.util.Logger.LogLevel = 2;
 alphaTab.Environment.ScriptFile = null;
 alphaTab.Environment.IsFontLoaded = false;

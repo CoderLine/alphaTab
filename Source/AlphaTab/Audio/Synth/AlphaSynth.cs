@@ -346,7 +346,7 @@ namespace AlphaTab.Audio.Synth
             var endTime = _sequencer.EndTime;
             var endTick = _sequencer.EndTick;
 
-            Logger.Debug("AlphaSynth", "Position changed: (time: " + currentTime + "/" + endTime + ", tick: " + currentTick + "/" + endTime + ")");
+            Logger.Debug("AlphaSynth", "Position changed: (time: " + currentTime + "/" + endTime + ", tick: " + currentTick + "/" + endTime + ", Active Voices: " + _synthesizer.ActiveVoices + ", Free Voices: " + _synthesizer.FreeVoices + ")");
             OnPositionChanged(new PositionChangedEventArgs(currentTime, endTime, currentTick, endTick));
         }
 
@@ -436,7 +436,7 @@ namespace AlphaTab.Audio.Synth
         }
     }
 
-    public class PositionChangedEventArgs 
+    public class PositionChangedEventArgs
     {
         public double CurrentTime { get; private set; }
         public double EndTime { get; private set; }

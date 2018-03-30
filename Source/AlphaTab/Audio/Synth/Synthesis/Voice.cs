@@ -63,7 +63,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
             //do not process if the voice is stopped
             if (VoiceParams.State == VoiceStateEnum.Stopped)
                 return;
-            
+
             //process using the patch's algorithm
             Patch.Process(VoiceParams, startIndex, endIndex, isMuted);
         }

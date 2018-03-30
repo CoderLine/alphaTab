@@ -168,7 +168,7 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
-        public AlphaSynthWebWorkerApi(ISynthOutput player, string alphaSynthScriptFile)
+        public AlphaSynthWebWorkerApi(ISynthOutput player, string alphaSynthScriptFile, LogLevel logLevel)
         {
             _output = player;
             _output.Ready += OnOutputReady;
@@ -203,7 +203,8 @@ namespace AlphaTab.Platform.JavaScript
             _synth.AddEventListener("message", (Action<MessageEvent>)HandleWorkerMessage, false);
 
             _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdInitialize,
-                sampleRate = _output.SampleRate
+                sampleRate = _output.SampleRate,
+                logLevel = logLevel
             });
 
             MasterVolume = 1;

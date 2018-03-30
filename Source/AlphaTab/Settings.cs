@@ -17,6 +17,7 @@
  */
 
 using AlphaTab.Collections;
+using AlphaTab.Util;
 
 namespace AlphaTab
 {
@@ -88,6 +89,11 @@ namespace AlphaTab
         /// </summary>
         public int[] DisplayTranspositionPitches { get; set; }
 
+        /// <summary>
+        /// The log level to use within alphaTab
+        /// </summary>
+        public LogLevel LogLevel { get; set; }
+
         public static Settings Defaults
         {
             get
@@ -106,6 +112,7 @@ namespace AlphaTab
                 settings.Layout = LayoutSettings.Defaults;
 
                 settings.Staves = new StaveSettings("default");
+                settings.LogLevel = LogLevel.Info;
 
                 SetDefaults(settings);
 

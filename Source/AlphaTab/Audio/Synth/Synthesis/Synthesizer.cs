@@ -24,6 +24,7 @@ using AlphaTab.Audio.Synth.Midi.Event;
 using AlphaTab.Audio.Synth.Util;
 using AlphaTab.Collections;
 using AlphaTab.Platform;
+using AlphaTab.Util;
 
 namespace AlphaTab.Audio.Synth.Synthesis
 {
@@ -62,6 +63,18 @@ namespace AlphaTab.Audio.Synth.Synthesis
         private FastDictionary<int, bool> _soloChannels;
         private bool _isAnySolo;
         private float _syn;
+
+
+        public int ActiveVoices
+        {
+            get { return _voiceManager.ActiveVoices.Length; }
+        }
+
+        public int FreeVoices
+        {
+            get { return _voiceManager.FreeVoices.Length; }
+        }
+
 
         /// <summary>
         /// The size of the individual sub buffers in samples
@@ -404,6 +417,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
 
         public void ProcessMidiMessage(MidiEvent e)
         {
+            Logger.Debug("Midi", "Processing midi " + e.Command);
             var command = e.Command;
             var channel = e.Channel;
             var data1 = e.Data1;

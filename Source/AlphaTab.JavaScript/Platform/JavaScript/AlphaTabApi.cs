@@ -89,6 +89,8 @@ namespace AlphaTab.Platform.JavaScript
             var settings = Settings = AlphaTab.Settings.FromJson(options, dataAttributes);
             var autoSize = settings.Width < 0;
 
+            Logger.LogLevel = settings.LogLevel;
+
             #region build tracks array
 
             // get track data to parse
@@ -844,12 +846,12 @@ namespace AlphaTab.Platform.JavaScript
             if (supportsWebAudio && !forceFlash)
             {
                 Logger.Info("Player", "Will use webworkers for synthesizing and web audio api for playback");
-                Player = new AlphaSynthWebWorkerApi(new AlphaSynthWebAudioOutput(), alphaSynthScriptFile);
+                Player = new AlphaSynthWebWorkerApi(new AlphaSynthWebAudioOutput(), alphaSynthScriptFile, Settings.LogLevel);
             }
             else if (supportsWebWorkers)
             {
                 Logger.Info("Player", "Will use webworkers for synthesizing and flash for playback");
-                Player = new AlphaSynthWebWorkerApi(new AlphaSynthFlashOutput(alphaSynthScriptFile), alphaSynthScriptFile);
+                Player = new AlphaSynthWebWorkerApi(new AlphaSynthFlashOutput(alphaSynthScriptFile), alphaSynthScriptFile, Settings.LogLevel);
             }
 
             if (Player == null)

@@ -19,6 +19,7 @@
 using System;
 using AlphaTab.Collections;
 using AlphaTab.Platform;
+using AlphaTab.Util;
 using Phase;
 
 namespace AlphaTab
@@ -193,6 +194,8 @@ namespace AlphaTab
             json.forcePianoFingering = ForcePianoFingering;
             json.transpositionPitches = TranspositionPitches;
             json.displayTranspositionPitches = DisplayTranspositionPitches;
+            json.logging = LogLevel;
+
 
             json.scriptFile = ScriptFile;
             json.fontDirectory = FontDirectory;
@@ -271,6 +274,15 @@ namespace AlphaTab
                 }
             }
 
+
+            if (Platform.Platform.JsonExists(json, "logging"))
+            {
+                settings.LogLevel = DecodeLogLevel(json.log);
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("logging"))
+            {
+                settings.LogLevel = DecodeLogLevel(dataAttributes["logging"]);
+            }
 
             if (Platform.Platform.JsonExists(json, "useWorker"))
             {
@@ -442,6 +454,34 @@ namespace AlphaTab
                     }
                 }
             }
+        }
+
+        private static LogLevel DecodeLogLevel(object log)
+        {
+            if (Platform.Platform.TypeOf(log) == "number")
+            {
+                return (LogLevel) log;
+            }
+
+            if (Platform.Platform.TypeOf(log) == "string")
+            {
+                var s = (string) log;
+                switch (s.ToLower())
+                {
+                    case "none":
+                        return LogLevel.None;
+                    case "debug":
+                        return LogLevel.Debug;
+                    case "info":
+                        return LogLevel.Info;
+                    case "warning":
+                        return LogLevel.Warning;
+                    case "error":
+                        return LogLevel.Error;
+                }
+            }
+
+            return LogLevel.Info;
         }
 
         private static void FillCursorOffset(Settings settings, object playerOffset)
