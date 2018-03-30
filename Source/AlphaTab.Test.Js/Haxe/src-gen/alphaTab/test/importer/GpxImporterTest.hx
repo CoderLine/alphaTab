@@ -20,7 +20,7 @@ class GpxImporterTest extends alphaTab.test.importer.GpImporterTestBase
     public function PrepareGpxImporterWithBytes(buffer : system.ByteArray) : alphaTab.importer.GpxImporter 
     {
         var readerBase : alphaTab.importer.GpxImporter = new alphaTab.importer.GpxImporter();
-        readerBase.Init(alphaTab.io.ByteBuffer.FromBuffer(buffer));
+        readerBase.Init(alphaTab.io.ByteBuffer.FromBuffer(buffer), null);
         return readerBase;
 
     }

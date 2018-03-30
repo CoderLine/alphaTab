@@ -32,7 +32,7 @@ class AlphaSynthTests
     {
         var tex : system.CsString = "\\tempo 102 \\tuning E4 B3 G3 D3 A2 E2 \\instrument 25 . r.8 (0.4 0.3 ).8 " + "(-.3 -.4 ).2 {d } | (0.4 0.3 ).8 r.8 (3.3 3.4 ).8 r.8 (5.4 5.3 ).4 r.8 (0.4 0.3 ).8 |" + " r.8 (3.4 3.3 ).8 r.8 (6.3 6.4 ).8 (5.4 5.3 ).4 {d }r.8 |" + " (0.4 0.3).8 r.8(3.4 3.3).8 r.8(5.4 5.3).4 r.8(3.4 3.3).8 | " + "r.8(0.4 0.3).8(-.3 - .4).2 { d } | ";
         var importer : alphaTab.importer.AlphaTexImporter = new alphaTab.importer.AlphaTexImporter();
-        importer.Init(alphaTab.test.TestPlatform.CreateStringReader(tex));
+        importer.Init(alphaTab.test.TestPlatform.CreateStringReader(tex), null);
         var score : alphaTab.model.Score = importer.ReadScore();
         var midi : alphaTab.audio.synth.midi.MidiFile = new alphaTab.audio.synth.midi.MidiFile();
         var gen : alphaTab.audio.generator.MidiFileGenerator = new alphaTab.audio.generator.MidiFileGenerator(score, new alphaTab.audio.generator.AlphaSynthMidiFileHandler(midi));

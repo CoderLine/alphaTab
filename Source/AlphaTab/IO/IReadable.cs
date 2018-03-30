@@ -20,6 +20,7 @@ namespace AlphaTab.IO
     public interface IReadable
     {
         int Position { get; set; }
+        int Length { get; }
         void Reset();
         void Skip(int offset);
         int ReadByte();

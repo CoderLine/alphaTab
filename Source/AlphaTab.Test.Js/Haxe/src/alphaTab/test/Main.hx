@@ -9,6 +9,7 @@ import alphaTab.test.importer.Gp3ImporterTest;
 import alphaTab.test.importer.Gp4ImporterTest;
 import alphaTab.test.importer.Gp5ImporterTest;
 import alphaTab.test.importer.GpxImporterTest;
+import alphaTab.test.importer.Gp7ImporterTest;
 import alphaTab.test.importer.MusicXmlImporterSamplesTests;
 import alphaTab.test.importer.MusicXmlImporterTestSuiteTests;
 

@@ -13,7 +13,7 @@ class ArgumentNullException extends ArgumentException
 	}
 	public function ArgumentNullException_CsString_CsString(message:CsString, paramName:CsString) 
 	{
-		ArgumentNullException_CsString_CsString(message, paramName);
+		ArgumentException_CsString_CsString(message, paramName);
 		return this;
 	}
 }

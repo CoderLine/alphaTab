@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.Diagnostics;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -26,16 +27,16 @@ using AlphaTab.Xml;
 namespace AlphaTab.Importer
 {
     /// <summary>
-    /// This structure represents a duration within a gpx model.
+    /// This structure represents a duration within a gpif model.
     /// </summary>
-    public class GpxRhythm
+    public class GpifRhythm
     {
         public int Dots { get; set; }
         public int TupletDenominator { get; set; }
         public int TupletNumerator { get; set; }
         public Duration Value { get; set; }
 
-        public GpxRhythm()
+        public GpifRhythm()
         {
             TupletDenominator = -1;
             TupletNumerator = -1;
@@ -46,7 +47,7 @@ namespace AlphaTab.Importer
     /// <summary>
     /// This public class can parse a score.gpif xml file into the model structure
     /// </summary>
-    public class GpxParser
+    public class GpifParser
     {
         private const string InvalidId = "-1";
         /// <summary>
@@ -79,7 +80,7 @@ namespace AlphaTab.Importer
         private FastDictionary<string, string> _rhythmOfBeat; // contains ids of rhythm used by a beat (key = beat id)
         private FastDictionary<string, Beat> _beatById; // contains beats by their id
 
-        private FastDictionary<string, GpxRhythm> _rhythmById; // contains rhythms by their id
+        private FastDictionary<string, GpifRhythm> _rhythmById; // contains rhythms by their id
 
         private FastDictionary<string, Note> _noteById; // contains notes by their id
         private FastDictionary<string, string[]> _notesOfBeat; // contains ids of notes stored in a beat (key = beat id);
@@ -100,7 +101,7 @@ namespace AlphaTab.Importer
             _beatsOfVoice = new FastDictionary<string, string[]>();
             _beatById = new FastDictionary<string, Beat>();
             _rhythmOfBeat = new FastDictionary<string, string>();
-            _rhythmById = new FastDictionary<string, GpxRhythm>();
+            _rhythmById = new FastDictionary<string, GpifRhythm>();
             _notesOfBeat = new FastDictionary<string, string[]>();
             _noteById = new FastDictionary<string, Note>();
             _tappedNotes = new FastDictionary<string, bool>();
@@ -429,11 +430,94 @@ namespace AlphaTab.Importer
                         case "PartSounding":
                             ParsePartSounding(track, c);
                             break;
+                        case "Staves":
+                            ParseStaves(track, c);
+                            break;
                     }
                 }
             }
 
             _tracksById[trackId] = track;
+        }
+
+        private void ParseStaves(Track track, XmlNode node)
+        {
+            int staffIndex = 0;
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Staff":
+                            track.EnsureStaveCount(staffIndex + 1);
+                            var staff = track.Staves[staffIndex];
+                            ParseStaff(staff, c);
+                            staffIndex++;
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void ParseStaff(Staff staff, XmlNode node)
+        {
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Properties":
+                            ParseStaffProperties(staff, c);
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void ParseStaffProperties(Staff staff, XmlNode node)
+        {
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Property":
+                            ParseStaffProperty(staff, c);
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void ParseStaffProperty(Staff staff, XmlNode node)
+        {
+            var propertyName = node.GetAttribute("name");
+            switch (propertyName)
+            {
+                case "Tuning":
+                    var tuningParts = node.FindChildElement("Pitches").InnerText.Split(' ');
+                    var tuning = new int[tuningParts.Length];
+                    for (int i = 0; i < tuning.Length; i++)
+                    {
+                        tuning[tuning.Length - 1 - i] = Platform.Platform.ParseInt(tuningParts[i]);
+                    }
+
+                    staff.Tuning = tuning;
+                    staff.StaffKind = StaffKind.Mixed;
+                    break;
+                case "DiagramCollection":
+                case "ChordCollection":
+                    ParseDiagramCollection(staff, node);
+                    break;
+                case "CapoFret":
+                    var capo = Platform.Platform.ParseInt(node.FindChildElement("Fret").InnerText);
+                    staff.Capo = capo;
+                    break;
+            }
+
         }
 
         private void ParseLyrics(string trackId, XmlNode node)
@@ -491,16 +575,45 @@ namespace AlphaTab.Importer
                 }
             }
         }
+        private void ParseDiagramCollection(Staff staff, XmlNode node)
+        {
+            var items = node.FindChildElement("Items");
+            foreach (var c in items.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Item":
+                            ParseDiagramItem(staff, c);
+                            break;
+                    }
+                }
+            }
+        }
 
         private void ParseDiagramItem(Track track, XmlNode node)
         {
             var chord = new Chord();
             var chordId = node.GetAttribute("id");
-            chord.Name = node.GetAttribute("name");
             foreach (var staff in track.Staves)
             {
                 staff.Chords[chordId] = chord;
             }
+            ParseDiagramItem(chord, node);
+        }
+
+        private void ParseDiagramItem(Staff staff, XmlNode node)
+        {
+            var chord = new Chord();
+            var chordId = node.GetAttribute("id");
+            staff.Chords[chordId] = chord;
+            ParseDiagramItem(chord, node);
+        }
+
+        private void ParseDiagramItem(Chord chord, XmlNode node)
+        {
+            chord.Name = node.GetAttribute("name");
 
             var diagram = node.FindChildElement("Diagram");
             var stringCount = Platform.Platform.ParseInt(diagram.GetAttribute("stringCount"));
@@ -1041,6 +1154,36 @@ namespace AlphaTab.Importer
                                 beat.IsLegatoOrigin = true;
                             }
                             break;
+                        case "Whammy":
+
+                            var whammy = new FastList<BendPoint>();
+
+                            var whammyOrigin = new BendPoint();
+                            whammyOrigin.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("originValue")));
+                            whammyOrigin.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("originOffset")));
+                            whammy.Add(whammyOrigin);
+
+                            var whammyMiddle1 = new BendPoint();
+                            whammyMiddle1.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("middleValue")));
+                            whammyMiddle1.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("middleOffset1")));
+                            whammy.Add(whammyMiddle1);
+
+                            
+                            var whammyMiddle2 = new BendPoint();
+                            whammyMiddle2.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("middleValue")));
+                            whammyMiddle2.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("middleOffset2")));
+                            if (whammyMiddle2.Offset != whammyMiddle1.Offset)
+                            {
+                                whammy.Add(whammyMiddle2);
+                            }
+
+                            var whammyDestination = new BendPoint();
+                            whammyDestination.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("destinationValue")));
+                            whammyDestination.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("destinationOffset")));
+                            whammy.Add(whammyDestination);
+
+                            beat.WhammyBarPoints = whammy;
+                            break;
                     }
                 }
             }
@@ -1137,6 +1280,7 @@ namespace AlphaTab.Importer
                                 case "WhammyBarExtend":
                                     // not clear what this is used for
                                     break;
+                               
                                 case "WhammyBarOriginValue":
                                     if (whammyOrigin == null) whammyOrigin = new BendPoint();
                                     whammyOrigin.Value = ToBendValue(Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
@@ -1490,7 +1634,7 @@ namespace AlphaTab.Importer
                 {
                     note.AddBendPoint(new BendPoint(bendMiddleOffset1.Value, bendMiddleValue.Value));
                 }
-                if (bendMiddleOffset2 != null && bendMiddleValue != null)
+                if (bendMiddleOffset2 != null && bendMiddleValue != null && bendMiddleOffset2 != bendMiddleOffset1)
                 {
                     note.AddBendPoint(new BendPoint(bendMiddleOffset2.Value, bendMiddleValue.Value));
                 }
@@ -1536,7 +1680,7 @@ namespace AlphaTab.Importer
 
         private void ParseRhythm(XmlNode node)
         {
-            var rhythm = new GpxRhythm();
+            var rhythm = new GpifRhythm();
             var rhythmId = node.GetAttribute("id");
             foreach (var c in node.ChildNodes)
             {

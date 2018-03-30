@@ -16,7 +16,6 @@
  * License along with this library.
  */
 
-using AlphaTab.Audio.Synth.IO;
 using AlphaTab.Audio.Synth.Util;
 using AlphaTab.IO;
 

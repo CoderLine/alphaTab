@@ -102,8 +102,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Importer\AlphaTexSymbols.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\Gp3To5Importer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\GpxFileSystem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Importer\Gp7Importer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\GpxImporter.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Importer\GpxParser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Importer\GpifParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\MixTableChange.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\MusicXmlImporter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\NoCompatibleReaderFoundException.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)IO\ByteBuffer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\IReadable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\IWriteable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IO\ZipFile.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\AccentuationType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\AccidentalType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Automation.cs" />

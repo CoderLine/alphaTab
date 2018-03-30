@@ -27,7 +27,7 @@ namespace AlphaTab.IO
         private int _length;
         private int _capacity;
 
-        public long Length
+        public int Length
         {
             get
             {

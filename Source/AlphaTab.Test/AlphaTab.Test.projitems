@@ -18,6 +18,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Importer\Gp4ImporterTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\Gp5ImporterTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\GpImporterTestBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Importer\Gp7ImporterTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\GpxImporterTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\MusicXmlImporterSamplesTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\MusicXmlImporterTestBase.cs" />
@@ -319,6 +320,93 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro6\TestVibrato.gpx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\Colors.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\Compressed.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\Effects.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\LyricsTemplate.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\RepeatClose.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\RepeatCloseAlternateEndings.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\RepeatCloseMulti.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\Serenade.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\Test01.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\Test02.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\Test03.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestAccentuations.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestBends.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestChords.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestDead.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestFingering.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestGrace.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestHammer.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestHarmonics.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestKeySignatures.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestOtherEffects.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestRanges.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestSlides.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestStrings.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestStrokes.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestTremolo.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestTrills.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestTuplets.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestVibrato.gp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="$(MSBuildThisFileDirectory)TestFiles\MusicXmlSamples\ActorPreludeSample.mxl">

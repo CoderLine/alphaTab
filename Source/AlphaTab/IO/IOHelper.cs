@@ -17,10 +17,8 @@
  */
 
 using AlphaTab.Collections;
-using AlphaTab.IO;
-using AlphaTab.Platform;
 
-namespace AlphaTab.Audio.Synth.IO
+namespace AlphaTab.IO
 {
     public static class IOHelper
     {

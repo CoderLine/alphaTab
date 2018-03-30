@@ -22,61 +22,63 @@ namespace AlphaTab.IO
 {
     public sealed class StreamWrapper : IReadable, IWriteable, IDisposable
     {
-        private readonly Stream _stream;
+        public Stream Stream { get; }
 
         public int Position
         {
-            get { return (int)_stream.Position; }
-            set { _stream.Position = value; }
+            get { return (int)Stream.Position; }
+            set { Stream.Position = value; }
         }
+
+        public int Length => (int)Stream.Length;
 
         public StreamWrapper(Stream stream)
         {
-            _stream = stream;
+            Stream = stream;
         }
 
         public void Reset()
         {
-            _stream.Seek(0, SeekOrigin.Begin);
+            Stream.Seek(0, SeekOrigin.Begin);
         }
 
         public void Skip(int offset)
         {
-            _stream.Seek(offset, SeekOrigin.Current);
+            Stream.Seek(offset, SeekOrigin.Current);
         }
 
         public int ReadByte()
         {
-            return _stream.ReadByte();
+            return Stream.ReadByte();
         }
 
         public int Read(byte[] buffer, int offset, int count)
         {
-            return _stream.Read(buffer, offset, count);
+            return Stream.Read(buffer, offset, count);
         }
 
         public void WriteByte(byte value)
         {
-            _stream.WriteByte(value);
+            Stream.WriteByte(value);
         }
 
         public void Write(byte[] buffer, int offset, int count)
         {
-            _stream.Write(buffer, offset, count);
+            Stream.Write(buffer, offset, count);
         }
 
         public byte[] ReadAll()
         {
             using (var ms = new MemoryStream())
             {
-                _stream.CopyTo(ms);
+                Stream.CopyTo(ms);
                 return ms.ToArray();
             }
         }
 
         public void Dispose()
         {
-            _stream.Dispose();
+            Stream.Dispose();
         }
     }
 }

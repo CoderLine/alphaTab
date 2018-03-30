@@ -7,7 +7,7 @@ class AlphaTexImporterTest
     private function ParseTex(tex : system.CsString) : alphaTab.model.Score 
     {
         var importer : alphaTab.importer.AlphaTexImporter = new alphaTab.importer.AlphaTexImporter();
-        importer.Init(alphaTab.test.TestPlatform.CreateStringReader(tex));
+        importer.Init(alphaTab.test.TestPlatform.CreateStringReader(tex), null);
         return importer.ReadScore();
 
     }
@@ -24,8 +24,8 @@ class AlphaTexImporterTest
         alphaTab.test.Assert.AreEqual_T1_T22(200, score.Tempo);
         alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.Count);
         alphaTab.test.Assert.AreEqual_T1_T22(30, score.Tracks.get_Item(0).PlaybackInfo.Program);
-        alphaTab.test.Assert.AreEqual_T1_T22(2, score.Tracks.get_Item(0).Capo);
-        alphaTab.test.Assert.AreEqual_T1_T22("55,38,43,47,50,69", system.CsString.Join_CsString_IEnumerable_T1(",", score.Tracks.get_Item(0).Tuning));
+        alphaTab.test.Assert.AreEqual_T1_T22(2, score.Tracks.get_Item(0).Staves.get_Item(0).Capo);
+        alphaTab.test.Assert.AreEqual_T1_T22("55,38,43,47,50,69", system.CsString.Join_CsString_IEnumerable_T1(",", score.Tracks.get_Item(0).Staves.get_Item(0).Tuning));
         alphaTab.test.Assert.AreEqual_T1_T22(2, score.MasterBars.Count);
         alphaTab.test.Assert.AreEqual_T1_T22(3, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.Count);
         {
@@ -71,7 +71,7 @@ class AlphaTexImporterTest
     {
         var tex : system.CsString = "\\tuning E4 B3 G3 D3 A2 E2\r\n                        .\r\n                        0.5.1";
         var score : alphaTab.model.Score = ParseTex(tex);
-        alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_IEnumerable_T1(",", alphaTab.model.Tuning.GetDefaultTuningFor(6).Tunings), system.CsString.Join_CsString_IEnumerable_T1(",", score.Tracks.get_Item(0).Tuning));
+        alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_IEnumerable_T1(",", alphaTab.model.Tuning.GetDefaultTuningFor(6).Tunings), system.CsString.Join_CsString_IEnumerable_T1(",", score.Tracks.get_Item(0).Staves.get_Item(0).Tuning));
     }
 
     @:testMethod

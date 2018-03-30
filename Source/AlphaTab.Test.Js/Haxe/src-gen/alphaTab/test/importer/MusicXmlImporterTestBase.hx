@@ -6,7 +6,7 @@ class MusicXmlImporterTestBase
     private function PrepareImporterWithBytes(buffer : system.ByteArray) : alphaTab.importer.MusicXmlImporter 
     {
         var readerBase : alphaTab.importer.MusicXmlImporter = new alphaTab.importer.MusicXmlImporter();
-        readerBase.Init(alphaTab.io.ByteBuffer.FromBuffer(buffer));
+        readerBase.Init(alphaTab.io.ByteBuffer.FromBuffer(buffer), null);
         return readerBase;
 
     }
@@ -20,7 +20,7 @@ class MusicXmlImporterTestBase
             var importer : alphaTab.importer.MusicXmlImporter = PrepareImporterWithBytes(buffer);
             var score : alphaTab.model.Score = importer.ReadScore();
             var reference : system.CsString = alphaTab.test.TestPlatform.ChangeExtension(file, ".gpx");
-            gpxImporter.Init(alphaTab.io.ByteBuffer.FromBuffer(alphaTab.test.TestPlatform.LoadFile(reference)));
+            gpxImporter.Init(alphaTab.io.ByteBuffer.FromBuffer(alphaTab.test.TestPlatform.LoadFile(reference)), null);
             var referenceScore : alphaTab.model.Score = gpxImporter.ReadScore();
             AreEqual_Score_Score(referenceScore, score);
             return score;
@@ -117,15 +117,11 @@ class MusicXmlImporterTestBase
 
     private function AreEqual_Track_Track(expected : alphaTab.model.Track, actual : alphaTab.model.Track) : Void 
     {
-        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Capo, actual.Capo, "Mismatch on Capo");
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Index, actual.Index, "Mismatch on Index");
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Name, actual.Name, "Mismatch on Name");
         //Assert.AreEqual(expected.ShortName, actual.ShortName, "Mismatch on ShortName");
-        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Tuning.Length, actual.Tuning.Length, "Mismatch on Tuning.Length");
-        alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_IEnumerable_T1(",", expected.Tuning), system.CsString.Join_CsString_IEnumerable_T1(",", actual.Tuning));
         //Assert.AreEqual(expected.Color.Raw, actual.Color.Raw, "Mismatch on Color.Raw");
         AreEqual_PlaybackInformation_PlaybackInformation(expected.PlaybackInfo, actual.PlaybackInfo);
-        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsPercussion, actual.IsPercussion, "Mismatch on IsPercussion");
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Staves.Count, actual.Staves.Count, "Mismatch on Staves.Count");
         {
             var i: system.Int32 = 0;
@@ -139,6 +135,10 @@ class MusicXmlImporterTestBase
 
     private function AreEqual_Staff_Staff(expected : alphaTab.model.Staff, actual : alphaTab.model.Staff) : Void 
     {
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Capo, actual.Capo, "Mismatch on Capo");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.StaffKind, actual.StaffKind, "Mismatch on StaffKind");
+        alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_IEnumerable_T1(",", expected.Tuning), system.CsString.Join_CsString_IEnumerable_T1(",", actual.Tuning));
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Tuning.Length, actual.Tuning.Length, "Mismatch on Tuning.Length");
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Index, actual.Index, "Mismatch on Index");
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Bars.Count, actual.Bars.Count, "Mismatch on Bars.Count");
         {

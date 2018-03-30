@@ -14,7 +14,7 @@ class GpImporterTestBase
     public function PrepareImporterWithBytes(buffer : system.ByteArray) : alphaTab.importer.Gp3To5Importer 
     {
         var readerBase : alphaTab.importer.Gp3To5Importer = new alphaTab.importer.Gp3To5Importer();
-        readerBase.Init(alphaTab.io.ByteBuffer.FromBuffer(buffer));
+        readerBase.Init(alphaTab.io.ByteBuffer.FromBuffer(buffer), null);
         return readerBase;
 
     }
@@ -383,7 +383,8 @@ class GpImporterTestBase
     private function CheckChords(score : alphaTab.model.Score) : Void 
     {
         var track : alphaTab.model.Track = score.Tracks.get_Item(0);
-        alphaTab.test.Assert.AreEqual_T1_T22(8, track.Chords.Count);
+        var staff : alphaTab.model.Staff = track.Staves.get_Item(0);
+        alphaTab.test.Assert.AreEqual_T1_T22(8, staff.Chords.Count);
         CheckChord((function (){
     var _tmp = new alphaTab.model.Chord();
     _tmp.Name = "C";

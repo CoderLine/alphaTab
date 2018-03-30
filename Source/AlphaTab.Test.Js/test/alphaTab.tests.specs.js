@@ -281,6 +281,81 @@ describe("alphaTab.test.importer.Gp5ImporterTest", function() {
         __instance.TestCanon();
     });
 });
+describe("alphaTab.test.importer.Gp7ImporterTest", function() {
+    var __instance = new alphaTab.test.importer.Gp7ImporterTest();
+    it("TestScoreInfo", function() {
+        __instance.TestScoreInfo();
+    });
+    it("TestNotes", function() {
+        __instance.TestNotes();
+    });
+    it("TestTimeSignatures", function() {
+        __instance.TestTimeSignatures();
+    });
+    it("TestDead", function() {
+        __instance.TestDead();
+    });
+    it("TestGrace", function() {
+        __instance.TestGrace();
+    });
+    it("TestAccentuation", function() {
+        __instance.TestAccentuation();
+    });
+    it("TestHarmonics", function() {
+        __instance.TestHarmonics();
+    });
+    it("TestHammer", function() {
+        __instance.TestHammer();
+    });
+    it("TestBend", function() {
+        __instance.TestBend();
+    });
+    it("TestTremolo", function() {
+        __instance.TestTremolo();
+    });
+    it("TestSlides", function() {
+        __instance.TestSlides();
+    });
+    it("TestVibrato", function() {
+        __instance.TestVibrato();
+    });
+    it("TestTrills", function() {
+        __instance.TestTrills();
+    });
+    it("TestOtherEffects", function() {
+        __instance.TestOtherEffects();
+    });
+    it("TestFingering", function() {
+        __instance.TestFingering();
+    });
+    it("TestStroke", function() {
+        __instance.TestStroke();
+    });
+    it("TestTuplets", function() {
+        __instance.TestTuplets();
+    });
+    it("TestRanges", function() {
+        __instance.TestRanges();
+    });
+    it("TestEffects", function() {
+        __instance.TestEffects();
+    });
+    it("TestSerenade", function() {
+        __instance.TestSerenade();
+    });
+    it("TestStrings", function() {
+        __instance.TestStrings();
+    });
+    it("TestKeySignatures", function() {
+        __instance.TestKeySignatures();
+    });
+    it("TestChords", function() {
+        __instance.TestChords();
+    });
+    it("TestColors", function() {
+        __instance.TestColors();
+    });
+});
 describe("alphaTab.test.importer.GpxImporterTest", function() {
     var __instance = new alphaTab.test.importer.GpxImporterTest();
     it("TestFileSystemCompressed", function() {

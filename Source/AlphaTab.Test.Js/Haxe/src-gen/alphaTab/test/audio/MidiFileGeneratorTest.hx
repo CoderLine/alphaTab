@@ -7,7 +7,7 @@ class MidiFileGeneratorTest
     private function ParseTex(tex : system.CsString) : alphaTab.model.Score 
     {
         var importer : alphaTab.importer.AlphaTexImporter = new alphaTab.importer.AlphaTexImporter();
-        importer.Init(alphaTab.test.TestPlatform.CreateStringReader(tex));
+        importer.Init(alphaTab.test.TestPlatform.CreateStringReader(tex), null);
         return importer.ReadScore();
 
     }

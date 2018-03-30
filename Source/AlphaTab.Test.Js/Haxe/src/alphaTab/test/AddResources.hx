@@ -2,7 +2,7 @@ package alphaTab.test;
 
 class AddResources
 {
-	private static var Extensions = [".gp3", ".gp4", ".gp5", ".gpx", ".xml", ".sf2"];
+	private static var Extensions = [".gp3", ".gp4", ".gp5", ".gpx", ".gp", ".xml", ".sf2"];
 	public static macro function run()
 	{
 		var sourceDir = haxe.io.Path.join([Sys.getCwd(), "..", "AlphaTab.Test", "TestFiles"]);
@@ -18,6 +18,7 @@ class AddResources
 	public static function importRecursive(sourceDir:String, sourcePrefix:String)
 	{
 		var files = sys.FileSystem.readDirectory(sourceDir);
+		trace('Adding resources from '+ sourceDir);
 		for(file in files)
 		{
 			var fullName = haxe.io.Path.join([sourceDir, file]);

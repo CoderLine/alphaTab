@@ -16,7 +16,6 @@
  * License along with this library.
  */
 
-using System.Collections.Generic;
 using AlphaTab.Collections;
 using AlphaTab.IO;
 using AlphaTab.Model;
@@ -42,6 +41,7 @@ namespace AlphaTab.Importer
             {
                 new Gp3To5Importer(),
                 new GpxImporter(),
+                new Gp7Importer(), 
                 new AlphaTexImporter(),
                 new MusicXmlImporter()
             };

@@ -80,7 +80,6 @@ $hx_exports["alphaTab"]["audio"]["synth"]["midi"]["event"]["_SystemCommonTypeEnu
 ;$hx_exports["alphaTab"]["audio"]["synth"]["midi"]["event"]["_ControllerTypeEnum"] = $hx_exports["alphaTab"]["audio"]["synth"]["midi"]["event"]["_ControllerTypeEnum"] || {};
 ;$hx_exports["alphaTab"]["audio"]["synth"]["midi"]["_MidiTrackFormat"] = $hx_exports["alphaTab"]["audio"]["synth"]["midi"]["_MidiTrackFormat"] || {};
 ;$hx_exports["alphaTab"]["audio"]["synth"]["midi"]["_MidiTimeFormat"] = $hx_exports["alphaTab"]["audio"]["synth"]["midi"]["_MidiTimeFormat"] || {};
-;$hx_exports["alphaTab"]["audio"]["synth"]["io"] = $hx_exports["alphaTab"]["audio"]["synth"]["io"] || {};
 ;$hx_exports["alphaTab"]["audio"]["synth"]["_PlayerState"] = $hx_exports["alphaTab"]["audio"]["synth"]["_PlayerState"] || {};
 ;$hx_exports["alphaTab"]["audio"]["synth"]["ds"] = $hx_exports["alphaTab"]["audio"]["synth"]["ds"] || {};
 $hx_exports["alphaTab"]["audio"]["synth"]["ds"]["_SampleArray"] = $hx_exports["alphaTab"]["audio"]["synth"]["ds"]["_SampleArray"] || {};
@@ -167,6 +166,40 @@ HxOverrides.iter = function(a) {
 	}, next : function() {
 		return this.arr[this.cur++];
 	}};
+};
+var List = function() {
+	this.length = 0;
+};
+List.__name__ = ["List"];
+List.prototype = {
+	add: function(item) {
+		var x = new _List.ListNode(item,null);
+		if(this.h == null) {
+			this.h = x;
+		} else {
+			this.q.next = x;
+		}
+		this.q = x;
+		this.length++;
+	}
+	,push: function(item) {
+		var x = new _List.ListNode(item,this.h);
+		this.h = x;
+		if(this.q == null) {
+			this.q = x;
+		}
+		this.length++;
+	}
+	,__class__: List
+};
+var _List = {};
+_List.ListNode = function(item,next) {
+	this.item = item;
+	this.next = next;
+};
+_List.ListNode.__name__ = ["_List","ListNode"];
+_List.ListNode.prototype = {
+	__class__: _List.ListNode
 };
 Math.__name__ = ["Math"];
 var Std = function() { };
@@ -837,10 +870,6 @@ system.Convert.ToUInt16 = function(v) {
 system.Convert.ToUInt32 = function(v) {
 	system.Convert._int32Buffer[0] = v;
 	return system.Convert._uint32Buffer[0];
-};
-system.Convert.ToInt32 = function(v) {
-	system.Convert._uint32Buffer[0] = v;
-	return system.Convert._int32Buffer[0];
 };
 system.Convert.ToInt32_Double = function(v) {
 	if(v >= 0) {
@@ -9323,105 +9352,6 @@ alphaTab.audio.synth.ds._SampleArray.SampleArray_Impl_.Clear = function(this1) {
 alphaTab.audio.synth.ds._SampleArray.SampleArray_Impl_.Blit = function(src,srcPos,dest,destPos,len) {
 	alphaTab.audio.synth.ds._SampleArray.SampleArray_Impl_.ToFloat32Array(dest).set(alphaTab.audio.synth.ds._SampleArray.SampleArray_Impl_.ToFloat32Array(src).subarray(srcPos,srcPos + len),destPos);
 };
-alphaTab.audio.synth.io = {};
-alphaTab.audio.synth.io.IOHelper = $hx_exports["alphaTab"]["audio"]["synth"]["io"]["IOHelper"] = function() { };
-alphaTab.audio.synth.io.IOHelper.__name__ = ["alphaTab","audio","synth","io","IOHelper"];
-alphaTab.audio.synth.io.IOHelper.ReadInt32LE = function(input) {
-	var ch1 = input.ReadByte();
-	var ch2 = input.ReadByte();
-	var ch3 = input.ReadByte();
-	var ch4 = input.ReadByte();
-	return ch4 << 24 | ch3 << 16 | ch2 << 8 | ch1;
-};
-alphaTab.audio.synth.io.IOHelper.ReadUInt16LE = function(input) {
-	var ch1 = input.ReadByte();
-	var ch2 = input.ReadByte();
-	return alphaTab.platform.Platform.ToUInt16(ch2 << 8 | ch1);
-};
-alphaTab.audio.synth.io.IOHelper.ReadInt16LE = function(input) {
-	var ch1 = input.ReadByte();
-	var ch2 = input.ReadByte();
-	return alphaTab.platform.Platform.ToInt16(ch2 << 8 | ch1);
-};
-alphaTab.audio.synth.io.IOHelper.ReadInt32BE = function(input) {
-	var ch1 = input.ReadByte();
-	var ch2 = input.ReadByte();
-	var ch3 = input.ReadByte();
-	var ch4 = input.ReadByte();
-	return ch1 << 24 | ch2 << 16 | ch3 << 8 | ch4;
-};
-alphaTab.audio.synth.io.IOHelper.ReadUInt16BE = function(input) {
-	var ch1 = input.ReadByte();
-	var ch2 = input.ReadByte();
-	return alphaTab.platform.Platform.ToUInt16(ch1 << 8 | ch2);
-};
-alphaTab.audio.synth.io.IOHelper.ReadInt16BE = function(input) {
-	var ch1 = input.ReadByte();
-	var ch2 = input.ReadByte();
-	return alphaTab.platform.Platform.ToInt16(ch1 << 8 | ch2);
-};
-alphaTab.audio.synth.io.IOHelper.ReadByteArray = function(input,length) {
-	var this1 = new Uint8Array(length);
-	var v = this1;
-	input.Read(v,0,length);
-	return v;
-};
-alphaTab.audio.synth.io.IOHelper.Read8BitChars = function(input,length) {
-	var this1 = new Uint8Array(length);
-	var b = this1;
-	input.Read(b,0,b.length);
-	return alphaTab.platform.Platform.ToString(b);
-};
-alphaTab.audio.synth.io.IOHelper.Read8BitString = function(input) {
-	var this1 = "";
-	var s = this1;
-	var c = input.ReadByte();
-	while(c != 0) {
-		s += String.fromCharCode(c);
-		c = input.ReadByte();
-	}
-	return s;
-};
-alphaTab.audio.synth.io.IOHelper.Read8BitStringLength = function(input,length) {
-	var this1 = "";
-	var s = this1;
-	var z = -1;
-	var i = 0;
-	while(i < length) {
-		var c = input.ReadByte();
-		if(c == 0 && z == -1) {
-			z = i;
-		}
-		s += String.fromCharCode(c);
-		++i;
-	}
-	var t = s;
-	if(z >= 0) {
-		return HxOverrides.substr(t,0,z);
-	}
-	return t;
-};
-alphaTab.audio.synth.io.IOHelper.ReadSInt8 = function(input) {
-	var v = input.ReadByte();
-	return ((v & 255) >> 7) * -256 + (v & 255);
-};
-alphaTab.audio.synth.io.IOHelper.ReadUInt32 = function(input) {
-	var ch1 = input.ReadByte();
-	var ch2 = input.ReadByte();
-	var ch3 = input.ReadByte();
-	var ch4 = input.ReadByte();
-	return alphaTab.platform.Platform.ToUInt32(ch1 << 24 | ch2 << 16 | ch3 << 8 | ch4);
-};
-alphaTab.audio.synth.io.IOHelper.ReadInt24 = function(input,index) {
-	var i = input[index] | input[index + 1] << 8 | input[index + 2] << 16;
-	if((i & 8388608) == 8388608) {
-		i = i | -16777216;
-	}
-	return i;
-};
-alphaTab.audio.synth.io.IOHelper.ReadInt16 = function(input,index) {
-	return alphaTab.platform.Platform.ToInt16(input[index] | input[index + 1] << 8);
-};
 alphaTab.audio.synth.midi = {};
 alphaTab.audio.synth.midi.MidiFile = $hx_exports["alphaTab"]["audio"]["synth"]["midi"]["MidiFile"] = function() {
 	this.Division = 0;
@@ -10087,8 +10017,8 @@ alphaTab.audio.synth.sf2._DirectionEnum.DirectionEnum_Impl_.toString = function(
 alphaTab.audio.synth.sf2.Generator = $hx_exports["alphaTab"]["audio"]["synth"]["sf2"]["Generator"] = function(input) {
 	this._rawAmount = 0;
 	this.GeneratorType = 0;
-	this.GeneratorType = js.Boot.__cast(alphaTab.audio.synth.io.IOHelper.ReadUInt16LE(input) , Int);
-	this._rawAmount = alphaTab.audio.synth.io.IOHelper.ReadUInt16LE(input);
+	this.GeneratorType = js.Boot.__cast(alphaTab.io.IOHelper.ReadUInt16LE(input) , Int);
+	this._rawAmount = alphaTab.io.IOHelper.ReadUInt16LE(input);
 };
 alphaTab.audio.synth.sf2.Generator.__name__ = ["alphaTab","audio","synth","sf2","Generator"];
 alphaTab.audio.synth.sf2.Generator.prototype = {
@@ -10294,10 +10224,10 @@ alphaTab.audio.synth.sf2.Modulator = $hx_exports["alphaTab"]["audio"]["synth"]["
 	this._sourceModulationAmount = null;
 	this._sourceTransform = 0;
 	this._sourceModulationData = new alphaTab.audio.synth.sf2.ModulatorType(input);
-	this._destinationGenerator = alphaTab.audio.synth.io.IOHelper.ReadUInt16LE(input);
-	this._amount = alphaTab.audio.synth.io.IOHelper.ReadInt16LE(input);
+	this._destinationGenerator = alphaTab.io.IOHelper.ReadUInt16LE(input);
+	this._amount = alphaTab.io.IOHelper.ReadInt16LE(input);
 	this._sourceModulationAmount = new alphaTab.audio.synth.sf2.ModulatorType(input);
-	this._sourceTransform = alphaTab.audio.synth.io.IOHelper.ReadUInt16LE(input);
+	this._sourceTransform = alphaTab.io.IOHelper.ReadUInt16LE(input);
 };
 alphaTab.audio.synth.sf2.Modulator.__name__ = ["alphaTab","audio","synth","sf2","Modulator"];
 alphaTab.audio.synth.sf2.Modulator.prototype = {
@@ -10309,7 +10239,7 @@ alphaTab.audio.synth.sf2.ModulatorType = $hx_exports["alphaTab"]["audio"]["synth
 	this.Direction = 0;
 	this.SourceType = 0;
 	this.IsMidiContinuousController = false;
-	var raw = alphaTab.audio.synth.io.IOHelper.ReadUInt16LE(input);
+	var raw = alphaTab.io.IOHelper.ReadUInt16LE(input);
 	this.Polarity = (raw & 512) == 512 ? 1 : 0;
 	this.Direction = (raw & 256) == 256 ? 1 : 0;
 	this.IsMidiContinuousController = (raw & 128) == 128;
@@ -10447,16 +10377,16 @@ alphaTab.audio.synth.sf2.SampleHeader = $hx_exports["alphaTab"]["audio"]["synth"
 	this.Tune = 0;
 	this.SampleLink = 0;
 	this.SoundFontSampleLink = 1;
-	this.Name = alphaTab.audio.synth.io.IOHelper.Read8BitStringLength(input,20);
-	this.Start = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
-	this.End = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
-	this.StartLoop = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
-	this.EndLoop = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
-	this.SampleRate = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
+	this.Name = alphaTab.io.IOHelper.Read8BitStringLength(input,20);
+	this.Start = alphaTab.io.IOHelper.ReadInt32LE(input);
+	this.End = alphaTab.io.IOHelper.ReadInt32LE(input);
+	this.StartLoop = alphaTab.io.IOHelper.ReadInt32LE(input);
+	this.EndLoop = alphaTab.io.IOHelper.ReadInt32LE(input);
+	this.SampleRate = alphaTab.io.IOHelper.ReadInt32LE(input);
 	this.RootKey = system.Convert.ToUInt8(input.ReadByte());
 	this.Tune = alphaTab.platform.Platform.ToInt16(input.ReadByte());
-	this.SampleLink = alphaTab.audio.synth.io.IOHelper.ReadUInt16LE(input);
-	this.SoundFontSampleLink = js.Boot.__cast(alphaTab.audio.synth.io.IOHelper.ReadUInt16LE(input) , Int);
+	this.SampleLink = alphaTab.io.IOHelper.ReadUInt16LE(input);
+	this.SoundFontSampleLink = js.Boot.__cast(alphaTab.io.IOHelper.ReadUInt16LE(input) , Int);
 };
 alphaTab.audio.synth.sf2.SampleHeader.__name__ = ["alphaTab","audio","synth","sf2","SampleHeader"];
 alphaTab.audio.synth.sf2.SampleHeader.prototype = {
@@ -10528,12 +10458,12 @@ alphaTab.audio.synth.sf2.SoundFont = $hx_exports["alphaTab"]["audio"]["synth"]["
 alphaTab.audio.synth.sf2.SoundFont.__name__ = ["alphaTab","audio","synth","sf2","SoundFont"];
 alphaTab.audio.synth.sf2.SoundFont.prototype = {
 	Load: function(input) {
-		var id = alphaTab.audio.synth.io.IOHelper.Read8BitChars(input,4);
-		var size = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
+		var id = alphaTab.io.IOHelper.Read8BitChars(input,4);
+		var size = alphaTab.io.IOHelper.ReadInt32LE(input);
 		if(id.toLowerCase() != "riff") {
 			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. Could not find RIFF header."));
 		}
-		id = alphaTab.audio.synth.io.IOHelper.Read8BitChars(input,4);
+		id = alphaTab.io.IOHelper.Read8BitChars(input,4);
 		if(id.toLowerCase() != "sfbk") {
 			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. Riff type is invalid."));
 		}
@@ -10569,55 +10499,55 @@ alphaTab.audio.synth.sf2.SoundFontInfo = $hx_exports["alphaTab"]["audio"]["synth
 	this.CreationDate = "";
 	this.BankName = "";
 	this.SoundEngine = "";
-	var id = alphaTab.audio.synth.io.IOHelper.Read8BitChars(input,4);
-	var size = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
+	var id = alphaTab.io.IOHelper.Read8BitChars(input,4);
+	var size = alphaTab.io.IOHelper.ReadInt32LE(input);
 	if(id.toLowerCase() != "list") {
 		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. Could not find INFO LIST chunk."));
 	}
 	var readTo = input.get_Position() + size;
-	id = alphaTab.audio.synth.io.IOHelper.Read8BitChars(input,4);
+	id = alphaTab.io.IOHelper.Read8BitChars(input,4);
 	if(id.toLowerCase() != "info") {
 		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. The LIST chunk is not of type INFO."));
 	}
 	while(input.get_Position() < readTo) {
-		id = alphaTab.audio.synth.io.IOHelper.Read8BitChars(input,4);
-		size = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
+		id = alphaTab.io.IOHelper.Read8BitChars(input,4);
+		size = alphaTab.io.IOHelper.ReadInt32LE(input);
 		var _g = id.toLowerCase();
 		switch(_g) {
 		case "icmt":
-			this.Comments = alphaTab.audio.synth.io.IOHelper.Read8BitStringLength(input,size);
+			this.Comments = alphaTab.io.IOHelper.Read8BitStringLength(input,size);
 			break;
 		case "icop":
-			this.Copyright = alphaTab.audio.synth.io.IOHelper.Read8BitStringLength(input,size);
+			this.Copyright = alphaTab.io.IOHelper.Read8BitStringLength(input,size);
 			break;
 		case "icrd":
-			this.CreationDate = alphaTab.audio.synth.io.IOHelper.Read8BitStringLength(input,size);
+			this.CreationDate = alphaTab.io.IOHelper.Read8BitStringLength(input,size);
 			break;
 		case "ieng":
-			this.Author = alphaTab.audio.synth.io.IOHelper.Read8BitStringLength(input,size);
+			this.Author = alphaTab.io.IOHelper.Read8BitStringLength(input,size);
 			break;
 		case "ifil":
-			this.SfVersionMajor = alphaTab.audio.synth.io.IOHelper.ReadInt16LE(input);
-			this.SfVersionMinor = alphaTab.audio.synth.io.IOHelper.ReadInt16LE(input);
+			this.SfVersionMajor = alphaTab.io.IOHelper.ReadInt16LE(input);
+			this.SfVersionMinor = alphaTab.io.IOHelper.ReadInt16LE(input);
 			break;
 		case "inam":
-			this.BankName = alphaTab.audio.synth.io.IOHelper.Read8BitStringLength(input,size);
+			this.BankName = alphaTab.io.IOHelper.Read8BitStringLength(input,size);
 			break;
 		case "iprd":
-			this.TargetProduct = alphaTab.audio.synth.io.IOHelper.Read8BitStringLength(input,size);
+			this.TargetProduct = alphaTab.io.IOHelper.Read8BitStringLength(input,size);
 			break;
 		case "irom":
-			this.DataRom = alphaTab.audio.synth.io.IOHelper.Read8BitStringLength(input,size);
+			this.DataRom = alphaTab.io.IOHelper.Read8BitStringLength(input,size);
 			break;
 		case "isft":
-			this.Tools = alphaTab.audio.synth.io.IOHelper.Read8BitStringLength(input,size);
+			this.Tools = alphaTab.io.IOHelper.Read8BitStringLength(input,size);
 			break;
 		case "isng":
-			this.SoundEngine = alphaTab.audio.synth.io.IOHelper.Read8BitStringLength(input,size);
+			this.SoundEngine = alphaTab.io.IOHelper.Read8BitStringLength(input,size);
 			break;
 		case "iver":
-			this.RomVersionMajor = alphaTab.audio.synth.io.IOHelper.ReadInt16LE(input);
-			this.RomVersionMinor = alphaTab.audio.synth.io.IOHelper.ReadInt16LE(input);
+			this.RomVersionMajor = alphaTab.io.IOHelper.ReadInt16LE(input);
+			this.RomVersionMinor = alphaTab.io.IOHelper.ReadInt16LE(input);
 			break;
 		default:
 			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. The Chunk: " + id + " was not expected."));
@@ -10632,13 +10562,13 @@ alphaTab.audio.synth.sf2.SoundFontPresets = $hx_exports["alphaTab"]["audio"]["sy
 	this.SampleHeaders = null;
 	this.PresetHeaders = null;
 	this.Instruments = null;
-	var id = alphaTab.audio.synth.io.IOHelper.Read8BitChars(input,4);
-	var size = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
+	var id = alphaTab.io.IOHelper.Read8BitChars(input,4);
+	var size = alphaTab.io.IOHelper.ReadInt32LE(input);
 	if(id.toLowerCase() != "list") {
 		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. Could not find pdta LIST chunk."));
 	}
 	var readTo = input.get_Position() + size;
-	id = alphaTab.audio.synth.io.IOHelper.Read8BitChars(input,4);
+	id = alphaTab.io.IOHelper.Read8BitChars(input,4);
 	if(id.toLowerCase() != "pdta") {
 		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. The LIST chunk is not of type pdta."));
 	}
@@ -10651,8 +10581,8 @@ alphaTab.audio.synth.sf2.SoundFontPresets = $hx_exports["alphaTab"]["audio"]["sy
 	var phdr = null;
 	var inst = null;
 	while(input.get_Position() < readTo) {
-		id = alphaTab.audio.synth.io.IOHelper.Read8BitChars(input,4);
-		size = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
+		id = alphaTab.io.IOHelper.Read8BitChars(input,4);
+		size = alphaTab.io.IOHelper.ReadInt32LE(input);
 		var _g = id.toLowerCase();
 		switch(_g) {
 		case "ibag":
@@ -10698,21 +10628,21 @@ alphaTab.audio.synth.sf2.SoundFontPresets.prototype = {
 alphaTab.audio.synth.sf2.SoundFontSampleData = $hx_exports["alphaTab"]["audio"]["synth"]["sf2"]["SoundFontSampleData"] = function(input) {
 	this.BitsPerSample = 0;
 	this.SampleData = null;
-	var id = alphaTab.audio.synth.io.IOHelper.Read8BitChars(input,4);
-	var size = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
+	var id = alphaTab.io.IOHelper.Read8BitChars(input,4);
+	var size = alphaTab.io.IOHelper.ReadInt32LE(input);
 	if(id.toLowerCase() != "list") {
 		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. Could not find sdta LIST chunk."));
 	}
 	var readTo = input.get_Position() + size;
-	id = alphaTab.audio.synth.io.IOHelper.Read8BitChars(input,4);
+	id = alphaTab.io.IOHelper.Read8BitChars(input,4);
 	if(id.toLowerCase() != "sdta") {
 		throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. The LIST chunk is not of type sdta."));
 	}
 	this.BitsPerSample = 0;
 	var rawSampleData = null;
 	while(input.get_Position() < readTo) {
-		var subID = alphaTab.audio.synth.io.IOHelper.Read8BitChars(input,4);
-		size = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
+		var subID = alphaTab.io.IOHelper.Read8BitChars(input,4);
+		size = alphaTab.io.IOHelper.ReadInt32LE(input);
 		var _g = subID.toLowerCase();
 		switch(_g) {
 		case "sm24":
@@ -10740,7 +10670,7 @@ alphaTab.audio.synth.sf2.SoundFontSampleData = $hx_exports["alphaTab"]["audio"][
 			break;
 		case "smpl":
 			this.BitsPerSample = 16;
-			rawSampleData = alphaTab.audio.synth.io.IOHelper.ReadByteArray(input,size);
+			rawSampleData = alphaTab.io.IOHelper.ReadByteArray(input,size);
 			break;
 		default:
 			throw new js._Boot.HaxeError(new system.Exception().Exception_CsString("Invalid soundfont. Unknown chunk id: " + subID + "."));
@@ -10907,8 +10837,8 @@ alphaTab.audio.synth.sf2.chunks.InstrumentChunk = $hx_exports["alphaTab"]["audio
 	var x = 0;
 	while(x < this._rawInstruments.length) {
 		var i = new alphaTab.audio.synth.sf2.chunks.RawInstrument();
-		i.Name = alphaTab.audio.synth.io.IOHelper.Read8BitStringLength(input,20);
-		i.StartInstrumentZoneIndex = alphaTab.audio.synth.io.IOHelper.ReadUInt16LE(input);
+		i.Name = alphaTab.io.IOHelper.Read8BitStringLength(input,20);
+		i.StartInstrumentZoneIndex = alphaTab.io.IOHelper.ReadUInt16LE(input);
 		if(lastInstrument != null) {
 			lastInstrument.EndInstrumentZoneIndex = alphaTab.platform.Platform.ToUInt16(i.StartInstrumentZoneIndex - 1);
 		}
@@ -10973,13 +10903,13 @@ alphaTab.audio.synth.sf2.chunks.PresetHeaderChunk = $hx_exports["alphaTab"]["aud
 	var x = 0;
 	while(x < this._rawPresets.length) {
 		var p = new alphaTab.audio.synth.sf2.chunks.RawPreset();
-		p.Name = alphaTab.audio.synth.io.IOHelper.Read8BitStringLength(input,20);
-		p.PatchNumber = alphaTab.audio.synth.io.IOHelper.ReadUInt16LE(input);
-		p.BankNumber = alphaTab.audio.synth.io.IOHelper.ReadUInt16LE(input);
-		p.StartPresetZoneIndex = alphaTab.audio.synth.io.IOHelper.ReadUInt16LE(input);
-		p.Library = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
-		p.Genre = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
-		p.Morphology = alphaTab.audio.synth.io.IOHelper.ReadInt32LE(input);
+		p.Name = alphaTab.io.IOHelper.Read8BitStringLength(input,20);
+		p.PatchNumber = alphaTab.io.IOHelper.ReadUInt16LE(input);
+		p.BankNumber = alphaTab.io.IOHelper.ReadUInt16LE(input);
+		p.StartPresetZoneIndex = alphaTab.io.IOHelper.ReadUInt16LE(input);
+		p.Library = alphaTab.io.IOHelper.ReadInt32LE(input);
+		p.Genre = alphaTab.io.IOHelper.ReadInt32LE(input);
+		p.Morphology = alphaTab.io.IOHelper.ReadInt32LE(input);
 		if(lastPreset != null) {
 			lastPreset.EndPresetZoneIndex = alphaTab.platform.Platform.ToUInt16(p.StartPresetZoneIndex - 1);
 		}
@@ -11065,8 +10995,8 @@ alphaTab.audio.synth.sf2.chunks.ZoneChunk = $hx_exports["alphaTab"]["audio"]["sy
 	var x = 0;
 	while(x < this._zoneData.length) {
 		var z = new alphaTab.audio.synth.sf2.chunks.RawZoneData();
-		z.GeneratorIndex = alphaTab.audio.synth.io.IOHelper.ReadUInt16LE(input);
-		z.ModulatorIndex = alphaTab.audio.synth.io.IOHelper.ReadUInt16LE(input);
+		z.GeneratorIndex = alphaTab.io.IOHelper.ReadUInt16LE(input);
+		z.ModulatorIndex = alphaTab.io.IOHelper.ReadUInt16LE(input);
 		if(lastZone != null) {
 			lastZone.GeneratorCount = alphaTab.platform.Platform.ToUInt16(z.GeneratorIndex - lastZone.GeneratorIndex);
 			lastZone.ModulatorCount = alphaTab.platform.Platform.ToUInt16(z.ModulatorIndex - lastZone.ModulatorIndex);
@@ -11789,7 +11719,7 @@ alphaTab.importer.ScoreImporter = $hx_exports["alphaTab"]["importer"]["ScoreImpo
 };
 alphaTab.importer.ScoreImporter.__name__ = ["alphaTab","importer","ScoreImporter"];
 alphaTab.importer.ScoreImporter.BuildImporters = function() {
-	return [new alphaTab.importer.Gp3To5Importer(),new alphaTab.importer.GpxImporter(),new alphaTab.importer.AlphaTexImporter(),new alphaTab.importer.MusicXmlImporter()];
+	return [new alphaTab.importer.Gp3To5Importer(),new alphaTab.importer.GpxImporter(),new alphaTab.importer.Gp7Importer(),new alphaTab.importer.AlphaTexImporter(),new alphaTab.importer.MusicXmlImporter()];
 };
 alphaTab.importer.ScoreImporter.prototype = {
 	Init: function(data,importSettings) {
@@ -14048,175 +13978,46 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 	}
 	,__class__: alphaTab.importer.Gp3To5Importer
 });
-alphaTab.importer.GpxFile = $hx_exports["alphaTab"]["importer"]["GpxFile"] = function() {
-};
-alphaTab.importer.GpxFile.__name__ = ["alphaTab","importer","GpxFile"];
-alphaTab.importer.GpxFile.prototype = {
-	__class__: alphaTab.importer.GpxFile
-};
-alphaTab.importer.GpxFileSystem = $hx_exports["alphaTab"]["importer"]["GpxFileSystem"] = function() {
-	this.FileFilter = null;
-	this.Files = null;
-	var this1 = [];
-	this.Files = this1;
-	this.FileFilter = function(s) {
-		return true;
-	};
-};
-alphaTab.importer.GpxFileSystem.__name__ = ["alphaTab","importer","GpxFileSystem"];
-alphaTab.importer.GpxFileSystem.prototype = {
-	Load: function(s) {
-		var src = new alphaTab.io.BitReader(s);
-		this.ReadBlock(src);
-	}
-	,ReadHeader: function(src) {
-		return this.GetString(src.ReadBytes(4),0,4);
-	}
-	,Decompress: function(src,skipHeader) {
-		if(skipHeader == null) {
-			skipHeader = false;
-		}
-		var uncompressed = alphaTab.io.ByteBuffer.Empty();
-		var buffer;
-		var expectedLength = this.GetInteger(src.ReadBytes(4),0);
-		try {
-			while(uncompressed.get_Length() < expectedLength) {
-				var flag = src.ReadBits(1);
-				if(flag == 1) {
-					var wordSize = src.ReadBits(4);
-					var offset = src.ReadBitsReversed(wordSize);
-					var size = src.ReadBitsReversed(wordSize);
-					var sourcePosition = uncompressed.get_Length() - offset;
-					var toRead = Math.min(offset,size);
-					buffer = uncompressed.GetBuffer();
-					uncompressed.Write(buffer,system.Convert.ToInt32(sourcePosition),toRead);
-				} else {
-					var size1 = src.ReadBitsReversed(2);
-					var i = 0;
-					while(i < size1) {
-						uncompressed.WriteByte(system.Convert.ToUInt8(src.ReadByte()));
-						++i;
-					}
-				}
-			}
-		} catch( __e ) {
-			if (__e instanceof js._Boot.HaxeError) __e = __e.val;
-			if( js.Boot.__instanceof(__e,alphaTab.io.EndOfReaderException) ) {
-			} else throw(__e);
-		}
-		buffer = uncompressed.GetBuffer();
-		var resultOffset = skipHeader ? 4 : 0;
-		var resultSize = uncompressed.get_Length() - resultOffset;
-		var this1 = new Uint8Array(system.Convert.ToInt32(resultSize));
-		var result = this1;
-		var count = system.Convert.ToInt32(resultSize);
-		result.set(buffer.subarray(resultOffset,resultOffset+count), 0);
-		return result;
-	}
-	,ReadBlock: function(data) {
-		var header = this.ReadHeader(data);
-		if(header == "BCFZ") {
-			this.ReadUncompressedBlock(this.Decompress(data,true));
-		} else if(header == "BCFS") {
-			this.ReadUncompressedBlock(data.ReadAll());
-		} else {
-			throw new js._Boot.HaxeError(new alphaTab.importer.UnsupportedFormatException().UnsupportedFormatException(""));
-		}
-	}
-	,ReadUncompressedBlock: function(data) {
-		var sectorSize = 4096;
-		var offset = sectorSize;
-		while(offset + 3 < data.length) {
-			var entryType = this.GetInteger(data,offset);
-			if(entryType == 2) {
-				var file = new alphaTab.importer.GpxFile();
-				file.FileName = this.GetString(data,offset + 4,127);
-				file.FileSize = this.GetInteger(data,offset + 140);
-				var storeFile = this.FileFilter == null || this.FileFilter(file.FileName);
-				if(storeFile) {
-					this.Files.push(file);
-				}
-				var dataPointerOffset = offset + 148;
-				var sector = 0;
-				var sectorCount = 0;
-				var fileData = storeFile ? alphaTab.io.ByteBuffer.WithCapactiy(file.FileSize) : null;
-				while(true) {
-					sector = this.GetInteger(data,dataPointerOffset + 4 * sectorCount++);
-					if(!(sector != 0)) {
-						break;
-					}
-					offset = sector * sectorSize;
-					if(storeFile) {
-						fileData.Write(data,offset,sectorSize);
-					}
-				}
-				if(storeFile) {
-					var a = file.FileSize;
-					var b = fileData.get_Length();
-					var this1 = new Uint8Array(system.Convert.ToInt32(a < b ? a : b));
-					file.Data = this1;
-					var raw = fileData.ToArray();
-					var dst = file.Data;
-					var count = file.Data.length;
-					dst.set(raw.subarray(0,0+count), 0);
-				}
-			}
-			offset = offset + sectorSize;
-		}
-	}
-	,GetString: function(data,offset,length) {
-		var this1 = "";
-		var buf = this1;
-		var i = 0;
-		while(i < length) {
-			var code = data[offset + i] & 255;
-			if(code == 0) {
-				break;
-			}
-			buf += String.fromCharCode(code);
-			++i;
-		}
-		return buf;
-	}
-	,GetInteger: function(data,offset) {
-		var this1 = data[offset];
-		return data[offset + 3] << 24 | data[offset + 2] << 16 | data[offset + 1] << 8 | this1;
-	}
-	,__class__: alphaTab.importer.GpxFileSystem
-};
-alphaTab.importer.GpxImporter = $hx_exports["alphaTab"]["importer"]["GpxImporter"] = function() {
+alphaTab.importer.Gp7Importer = $hx_exports["alphaTab"]["importer"]["Gp7Importer"] = function() {
 	alphaTab.importer.ScoreImporter.call(this);
 };
-alphaTab.importer.GpxImporter.__name__ = ["alphaTab","importer","GpxImporter"];
-alphaTab.importer.GpxImporter.__super__ = alphaTab.importer.ScoreImporter;
-alphaTab.importer.GpxImporter.prototype = $extend(alphaTab.importer.ScoreImporter.prototype,{
+alphaTab.importer.Gp7Importer.__name__ = ["alphaTab","importer","Gp7Importer"];
+alphaTab.importer.Gp7Importer.__super__ = alphaTab.importer.ScoreImporter;
+alphaTab.importer.Gp7Importer.prototype = $extend(alphaTab.importer.ScoreImporter.prototype,{
 	get_Name: function() {
-		return "Guitar Pro 6";
+		return "Guitar Pro 7";
 	}
 	,ReadScore: function() {
-		alphaTab.util.Logger.Info(this.get_Name(),"Loading GPX filesystem",null);
-		var fileSystem = new alphaTab.importer.GpxFileSystem();
+		alphaTab.util.Logger.Info(this.get_Name(),"Loading ZIP entries",null);
+		var fileSystem = new alphaTab.io.ZipFile();
 		fileSystem.FileFilter = function(s) {
-			return s == "score.gpif";
+			return StringTools.endsWith(s,"score.gpif");
 		};
-		fileSystem.Load(this.Data);
-		alphaTab.util.Logger.Info(this.get_Name(),"GPX filesystem loaded",null);
-		var data = fileSystem.Files[0].Data;
+		try {
+			fileSystem.Load(this.Data);
+		} catch( e ) {
+			if (e instanceof js._Boot.HaxeError) e = e.val;
+			if( js.Boot.__instanceof(e,system.Exception) ) {
+				throw new js._Boot.HaxeError(new alphaTab.importer.UnsupportedFormatException().UnsupportedFormatException(e.Message));
+			} else throw(e);
+		}
+		alphaTab.util.Logger.Info(this.get_Name(),"Zip entries loaded",null);
+		var data = fileSystem.Entries[0].Data;
 		var xml = alphaTab.platform.Platform.ToString(data);
-		fileSystem.Files = null;
+		fileSystem.Entries = null;
 		fileSystem = null;
 		alphaTab.util.Logger.Info(this.get_Name(),"Start Parsing score.gpif",null);
-		var parser = new alphaTab.importer.GpxParser();
+		var parser = new alphaTab.importer.GpifParser();
 		parser.ParseXml(xml);
 		alphaTab.util.Logger.Info(this.get_Name(),"score.gpif parsed",null);
 		return parser.Score;
 	}
-	,__class__: alphaTab.importer.GpxImporter
+	,__class__: alphaTab.importer.Gp7Importer
 });
-alphaTab.importer.GpxParser = $hx_exports["alphaTab"]["importer"]["GpxParser"] = function() {
+alphaTab.importer.GpifParser = $hx_exports["alphaTab"]["importer"]["GpifParser"] = function() {
 };
-alphaTab.importer.GpxParser.__name__ = ["alphaTab","importer","GpxParser"];
-alphaTab.importer.GpxParser.prototype = {
+alphaTab.importer.GpifParser.__name__ = ["alphaTab","importer","GpifParser"];
+alphaTab.importer.GpifParser.prototype = {
 	ParseXml: function(xml) {
 		var this1 = {}
 		this._masterTrackAutomations = this1;
@@ -14554,11 +14355,82 @@ alphaTab.importer.GpxParser.prototype = {
 				case "ShortName":
 					track.ShortName = c1.get_InnerText();
 					break;
+				case "Staves":
+					this.ParseStaves(track,c1);
+					break;
 				default:
 				}
 			}
 		}
 		this._tracksById[trackId] = track;
+	}
+	,ParseStaves: function(track,node) {
+		var staffIndex = 0;
+		var c = $iterator(node.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				if(_g == "Staff") {
+					track.EnsureStaveCount(staffIndex + 1);
+					var staff = track.Staves[staffIndex];
+					this.ParseStaff(staff,c1);
+					++staffIndex;
+				}
+			}
+		}
+	}
+	,ParseStaff: function(staff,node) {
+		var c = $iterator(node.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				if(_g == "Properties") {
+					this.ParseStaffProperties(staff,c1);
+				}
+			}
+		}
+	}
+	,ParseStaffProperties: function(staff,node) {
+		var c = $iterator(node.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				if(_g == "Property") {
+					this.ParseStaffProperty(staff,c1);
+				}
+			}
+		}
+	}
+	,ParseStaffProperty: function(staff,node) {
+		var propertyName = node.GetAttribute("name");
+		switch(propertyName) {
+		case "CapoFret":
+			var capo = alphaTab.platform.Platform.ParseInt(node.FindChildElement("Fret").get_InnerText());
+			staff.Capo = capo;
+			break;
+		case "ChordCollection":case "DiagramCollection":
+			this.ParseDiagramCollection_Staff_XmlNode(staff,node);
+			break;
+		case "Tuning":
+			var a = node.FindChildElement("Pitches").get_InnerText();
+			var this1 = system.Convert.ToUInt16(32);
+			var this2 = this1;
+			var tuningParts = system._CsString.CsString_Impl_.Split_CharArray(a,[this2]);
+			var this3 = new Int32Array(tuningParts.length);
+			var tuning = this3;
+			var i = 0;
+			while(i < tuning.length) {
+				tuning[tuning.length - 1 - i] = alphaTab.platform.Platform.ParseInt(tuningParts[i]);
+				++i;
+			}
+			staff.Tuning = tuning;
+			staff.StaffKind = 3;
+			break;
+		default:
+		}
 	}
 	,ParseLyrics: function(trackId,node) {
 		var this1 = [];
@@ -14595,7 +14467,7 @@ alphaTab.importer.GpxParser.prototype = {
 		}
 		return lyrics;
 	}
-	,ParseDiagramCollection: function(track,node) {
+	,ParseDiagramCollection_Track_XmlNode: function(track,node) {
 		var items = node.FindChildElement("Items");
 		var c = $iterator(items.ChildNodes)();
 		while(c.hasNext()) {
@@ -14603,20 +14475,42 @@ alphaTab.importer.GpxParser.prototype = {
 			if(c1.NodeType == 1) {
 				var _g = c1.LocalName;
 				if(_g == "Item") {
-					this.ParseDiagramItem(track,c1);
+					this.ParseDiagramItem_Track_XmlNode(track,c1);
 				}
 			}
 		}
 	}
-	,ParseDiagramItem: function(track,node) {
+	,ParseDiagramCollection_Staff_XmlNode: function(staff,node) {
+		var items = node.FindChildElement("Items");
+		var c = $iterator(items.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				if(_g == "Item") {
+					this.ParseDiagramItem_Staff_XmlNode(staff,c1);
+				}
+			}
+		}
+	}
+	,ParseDiagramItem_Track_XmlNode: function(track,node) {
 		var chord = new alphaTab.model.Chord();
 		var chordId = node.GetAttribute("id");
-		chord.Name = node.GetAttribute("name");
 		var staff = $iterator(track.Staves)();
 		while(staff.hasNext()) {
 			var staff1 = staff.next();
 			staff1.Chords[chordId] = chord;
 		}
+		this.ParseDiagramItem_Chord_XmlNode(chord,node);
+	}
+	,ParseDiagramItem_Staff_XmlNode: function(staff,node) {
+		var chord = new alphaTab.model.Chord();
+		var chordId = node.GetAttribute("id");
+		staff.Chords[chordId] = chord;
+		this.ParseDiagramItem_Chord_XmlNode(chord,node);
+	}
+	,ParseDiagramItem_Chord_XmlNode: function(chord,node) {
+		chord.Name = node.GetAttribute("name");
 		var diagram = node.FindChildElement("Diagram");
 		var stringCount = alphaTab.platform.Platform.ParseInt(diagram.GetAttribute("stringCount"));
 		var baseFret = alphaTab.platform.Platform.ParseInt(diagram.GetAttribute("baseFret"));
@@ -14708,7 +14602,7 @@ alphaTab.importer.GpxParser.prototype = {
 			}
 			break;
 		case "ChordCollection":case "DiagramCollection":
-			this.ParseDiagramCollection(track,node);
+			this.ParseDiagramCollection_Track_XmlNode(track,node);
 			break;
 		case "Tuning":
 			var a = node.FindChildElement("Pitches").get_InnerText();
@@ -15108,6 +15002,37 @@ alphaTab.importer.GpxParser.prototype = {
 						break;
 					default:
 					}
+					break;
+				case "Whammy":
+					var this4 = [];
+					var whammy = this4;
+					var whammyOrigin = new alphaTab.model.BendPoint(0,0);
+					var s = c1.GetAttribute("originValue");
+					whammyOrigin.Value = this.ToBendValue(parseFloat(s));
+					var s1 = c1.GetAttribute("originOffset");
+					whammyOrigin.Offset = this.ToBendOffset(parseFloat(s1));
+					whammy.push(whammyOrigin);
+					var whammyMiddle1 = new alphaTab.model.BendPoint(0,0);
+					var s2 = c1.GetAttribute("middleValue");
+					whammyMiddle1.Value = this.ToBendValue(parseFloat(s2));
+					var s3 = c1.GetAttribute("middleOffset1");
+					whammyMiddle1.Offset = this.ToBendOffset(parseFloat(s3));
+					whammy.push(whammyMiddle1);
+					var whammyMiddle2 = new alphaTab.model.BendPoint(0,0);
+					var s4 = c1.GetAttribute("middleValue");
+					whammyMiddle2.Value = this.ToBendValue(parseFloat(s4));
+					var s5 = c1.GetAttribute("middleOffset2");
+					whammyMiddle2.Offset = this.ToBendOffset(parseFloat(s5));
+					if(whammyMiddle2.Offset != whammyMiddle1.Offset) {
+						whammy.push(whammyMiddle2);
+					}
+					var whammyDestination = new alphaTab.model.BendPoint(0,0);
+					var s6 = c1.GetAttribute("destinationValue");
+					whammyDestination.Value = this.ToBendValue(parseFloat(s6));
+					var s7 = c1.GetAttribute("destinationOffset");
+					whammyDestination.Offset = this.ToBendOffset(parseFloat(s7));
+					whammy.push(whammyDestination);
+					beat.WhammyBarPoints = whammy;
 					break;
 				case "XProperties":
 					this.ParseBeatXProperties(c1,beat);
@@ -15546,7 +15471,7 @@ alphaTab.importer.GpxParser.prototype = {
 			if(bendMiddleOffset1 != null && bendMiddleValue != null) {
 				note.AddBendPoint(new alphaTab.model.BendPoint(bendMiddleOffset1,bendMiddleValue));
 			}
-			if(bendMiddleOffset2 != null && bendMiddleValue != null) {
+			if(bendMiddleOffset2 != null && bendMiddleValue != null && bendMiddleOffset2 != bendMiddleOffset1) {
 				note.AddBendPoint(new alphaTab.model.BendPoint(bendMiddleOffset2,bendMiddleValue));
 			}
 			if(bendMiddleOffset1 == null && bendMiddleOffset2 == null && bendMiddleValue != null) {
@@ -15576,7 +15501,7 @@ alphaTab.importer.GpxParser.prototype = {
 		}
 	}
 	,ParseRhythm: function(node) {
-		var rhythm = new alphaTab.importer.GpxRhythm();
+		var rhythm = new alphaTab.importer.GpifRhythm();
 		var rhythmId = node.GetAttribute("id");
 		var c = $iterator(node.ChildNodes)();
 		while(c.hasNext()) {
@@ -15764,9 +15689,9 @@ alphaTab.importer.GpxParser.prototype = {
 			}
 		}
 	}
-	,__class__: alphaTab.importer.GpxParser
+	,__class__: alphaTab.importer.GpifParser
 };
-alphaTab.importer.GpxRhythm = $hx_exports["alphaTab"]["importer"]["GpxRhythm"] = function() {
+alphaTab.importer.GpifRhythm = $hx_exports["alphaTab"]["importer"]["GpifRhythm"] = function() {
 	this.Dots = 0;
 	this.TupletDenominator = 0;
 	this.TupletNumerator = 0;
@@ -15775,10 +15700,172 @@ alphaTab.importer.GpxRhythm = $hx_exports["alphaTab"]["importer"]["GpxRhythm"] =
 	this.TupletNumerator = -1;
 	this.Value = 4;
 };
-alphaTab.importer.GpxRhythm.__name__ = ["alphaTab","importer","GpxRhythm"];
-alphaTab.importer.GpxRhythm.prototype = {
-	__class__: alphaTab.importer.GpxRhythm
+alphaTab.importer.GpifRhythm.__name__ = ["alphaTab","importer","GpifRhythm"];
+alphaTab.importer.GpifRhythm.prototype = {
+	__class__: alphaTab.importer.GpifRhythm
 };
+alphaTab.importer.GpxFile = $hx_exports["alphaTab"]["importer"]["GpxFile"] = function() {
+};
+alphaTab.importer.GpxFile.__name__ = ["alphaTab","importer","GpxFile"];
+alphaTab.importer.GpxFile.prototype = {
+	__class__: alphaTab.importer.GpxFile
+};
+alphaTab.importer.GpxFileSystem = $hx_exports["alphaTab"]["importer"]["GpxFileSystem"] = function() {
+	this.FileFilter = null;
+	this.Files = null;
+	var this1 = [];
+	this.Files = this1;
+	this.FileFilter = function(s) {
+		return true;
+	};
+};
+alphaTab.importer.GpxFileSystem.__name__ = ["alphaTab","importer","GpxFileSystem"];
+alphaTab.importer.GpxFileSystem.prototype = {
+	Load: function(s) {
+		var src = new alphaTab.io.BitReader(s);
+		this.ReadBlock(src);
+	}
+	,ReadHeader: function(src) {
+		return this.GetString(src.ReadBytes(4),0,4);
+	}
+	,Decompress: function(src,skipHeader) {
+		if(skipHeader == null) {
+			skipHeader = false;
+		}
+		var uncompressed = alphaTab.io.ByteBuffer.Empty();
+		var buffer;
+		var expectedLength = this.GetInteger(src.ReadBytes(4),0);
+		try {
+			while(uncompressed.get_Length() < expectedLength) {
+				var flag = src.ReadBits(1);
+				if(flag == 1) {
+					var wordSize = src.ReadBits(4);
+					var offset = src.ReadBitsReversed(wordSize);
+					var size = src.ReadBitsReversed(wordSize);
+					var sourcePosition = uncompressed.get_Length() - offset;
+					var toRead = Math.min(offset,size);
+					buffer = uncompressed.GetBuffer();
+					uncompressed.Write(buffer,sourcePosition,toRead);
+				} else {
+					var size1 = src.ReadBitsReversed(2);
+					var i = 0;
+					while(i < size1) {
+						uncompressed.WriteByte(system.Convert.ToUInt8(src.ReadByte()));
+						++i;
+					}
+				}
+			}
+		} catch( __e ) {
+			if (__e instanceof js._Boot.HaxeError) __e = __e.val;
+			if( js.Boot.__instanceof(__e,alphaTab.io.EndOfReaderException) ) {
+			} else throw(__e);
+		}
+		buffer = uncompressed.GetBuffer();
+		var resultOffset = skipHeader ? 4 : 0;
+		var resultSize = uncompressed.get_Length() - resultOffset;
+		var this1 = new Uint8Array(resultSize);
+		var result = this1;
+		result.set(buffer.subarray(resultOffset,resultOffset+resultSize), 0);
+		return result;
+	}
+	,ReadBlock: function(data) {
+		var header = this.ReadHeader(data);
+		if(header == "BCFZ") {
+			this.ReadUncompressedBlock(this.Decompress(data,true));
+		} else if(header == "BCFS") {
+			this.ReadUncompressedBlock(data.ReadAll());
+		} else {
+			throw new js._Boot.HaxeError(new alphaTab.importer.UnsupportedFormatException().UnsupportedFormatException(""));
+		}
+	}
+	,ReadUncompressedBlock: function(data) {
+		var sectorSize = 4096;
+		var offset = sectorSize;
+		while(offset + 3 < data.length) {
+			var entryType = this.GetInteger(data,offset);
+			if(entryType == 2) {
+				var file = new alphaTab.importer.GpxFile();
+				file.FileName = this.GetString(data,offset + 4,127);
+				file.FileSize = this.GetInteger(data,offset + 140);
+				var storeFile = this.FileFilter == null || this.FileFilter(file.FileName);
+				if(storeFile) {
+					this.Files.push(file);
+				}
+				var dataPointerOffset = offset + 148;
+				var sector = 0;
+				var sectorCount = 0;
+				var fileData = storeFile ? alphaTab.io.ByteBuffer.WithCapactiy(file.FileSize) : null;
+				while(true) {
+					sector = this.GetInteger(data,dataPointerOffset + 4 * sectorCount++);
+					if(!(sector != 0)) {
+						break;
+					}
+					offset = sector * sectorSize;
+					if(storeFile) {
+						fileData.Write(data,offset,sectorSize);
+					}
+				}
+				if(storeFile) {
+					var this1 = new Uint8Array(Math.min(file.FileSize,fileData.get_Length()));
+					file.Data = this1;
+					var raw = fileData.ToArray();
+					var dst = file.Data;
+					var count = file.Data.length;
+					dst.set(raw.subarray(0,0+count), 0);
+				}
+			}
+			offset = offset + sectorSize;
+		}
+	}
+	,GetString: function(data,offset,length) {
+		var this1 = "";
+		var buf = this1;
+		var i = 0;
+		while(i < length) {
+			var code = data[offset + i] & 255;
+			if(code == 0) {
+				break;
+			}
+			buf += String.fromCharCode(code);
+			++i;
+		}
+		return buf;
+	}
+	,GetInteger: function(data,offset) {
+		var this1 = data[offset];
+		return data[offset + 3] << 24 | data[offset + 2] << 16 | data[offset + 1] << 8 | this1;
+	}
+	,__class__: alphaTab.importer.GpxFileSystem
+};
+alphaTab.importer.GpxImporter = $hx_exports["alphaTab"]["importer"]["GpxImporter"] = function() {
+	alphaTab.importer.ScoreImporter.call(this);
+};
+alphaTab.importer.GpxImporter.__name__ = ["alphaTab","importer","GpxImporter"];
+alphaTab.importer.GpxImporter.__super__ = alphaTab.importer.ScoreImporter;
+alphaTab.importer.GpxImporter.prototype = $extend(alphaTab.importer.ScoreImporter.prototype,{
+	get_Name: function() {
+		return "Guitar Pro 6";
+	}
+	,ReadScore: function() {
+		alphaTab.util.Logger.Info(this.get_Name(),"Loading GPX filesystem",null);
+		var fileSystem = new alphaTab.importer.GpxFileSystem();
+		fileSystem.FileFilter = function(s) {
+			return s == "score.gpif";
+		};
+		fileSystem.Load(this.Data);
+		alphaTab.util.Logger.Info(this.get_Name(),"GPX filesystem loaded",null);
+		var data = fileSystem.Files[0].Data;
+		var xml = alphaTab.platform.Platform.ToString(data);
+		fileSystem.Files = null;
+		fileSystem = null;
+		alphaTab.util.Logger.Info(this.get_Name(),"Start Parsing score.gpif",null);
+		var parser = new alphaTab.importer.GpifParser();
+		parser.ParseXml(xml);
+		alphaTab.util.Logger.Info(this.get_Name(),"score.gpif parsed",null);
+		return parser.Score;
+	}
+	,__class__: alphaTab.importer.GpxImporter
+});
 alphaTab.importer.MixTableChange = $hx_exports["alphaTab"]["importer"]["MixTableChange"] = function() {
 	this.Volume = 0;
 	this.Balance = 0;
@@ -17496,6 +17583,247 @@ alphaTab.io.EndOfReaderException.prototype = $extend(alphaTab.AlphaTabException.
 	}
 	,__class__: alphaTab.io.EndOfReaderException
 });
+alphaTab.io.IOHelper = $hx_exports["alphaTab"]["io"]["IOHelper"] = function() { };
+alphaTab.io.IOHelper.__name__ = ["alphaTab","io","IOHelper"];
+alphaTab.io.IOHelper.ReadInt32LE = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	var ch3 = input.ReadByte();
+	var ch4 = input.ReadByte();
+	return ch4 << 24 | ch3 << 16 | ch2 << 8 | ch1;
+};
+alphaTab.io.IOHelper.ReadUInt16LE = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	return alphaTab.platform.Platform.ToUInt16(ch2 << 8 | ch1);
+};
+alphaTab.io.IOHelper.ReadInt16LE = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	return alphaTab.platform.Platform.ToInt16(ch2 << 8 | ch1);
+};
+alphaTab.io.IOHelper.ReadInt32BE = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	var ch3 = input.ReadByte();
+	var ch4 = input.ReadByte();
+	return ch1 << 24 | ch2 << 16 | ch3 << 8 | ch4;
+};
+alphaTab.io.IOHelper.ReadUInt16BE = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	return alphaTab.platform.Platform.ToUInt16(ch1 << 8 | ch2);
+};
+alphaTab.io.IOHelper.ReadInt16BE = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	return alphaTab.platform.Platform.ToInt16(ch1 << 8 | ch2);
+};
+alphaTab.io.IOHelper.ReadByteArray = function(input,length) {
+	var this1 = new Uint8Array(length);
+	var v = this1;
+	input.Read(v,0,length);
+	return v;
+};
+alphaTab.io.IOHelper.Read8BitChars = function(input,length) {
+	var this1 = new Uint8Array(length);
+	var b = this1;
+	input.Read(b,0,b.length);
+	return alphaTab.platform.Platform.ToString(b);
+};
+alphaTab.io.IOHelper.Read8BitString = function(input) {
+	var this1 = "";
+	var s = this1;
+	var c = input.ReadByte();
+	while(c != 0) {
+		s += String.fromCharCode(c);
+		c = input.ReadByte();
+	}
+	return s;
+};
+alphaTab.io.IOHelper.Read8BitStringLength = function(input,length) {
+	var this1 = "";
+	var s = this1;
+	var z = -1;
+	var i = 0;
+	while(i < length) {
+		var c = input.ReadByte();
+		if(c == 0 && z == -1) {
+			z = i;
+		}
+		s += String.fromCharCode(c);
+		++i;
+	}
+	var t = s;
+	if(z >= 0) {
+		return HxOverrides.substr(t,0,z);
+	}
+	return t;
+};
+alphaTab.io.IOHelper.ReadSInt8 = function(input) {
+	var v = input.ReadByte();
+	return ((v & 255) >> 7) * -256 + (v & 255);
+};
+alphaTab.io.IOHelper.ReadUInt32 = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	var ch3 = input.ReadByte();
+	var ch4 = input.ReadByte();
+	return alphaTab.platform.Platform.ToUInt32(ch1 << 24 | ch2 << 16 | ch3 << 8 | ch4);
+};
+alphaTab.io.IOHelper.ReadInt24 = function(input,index) {
+	var i = input[index] | input[index + 1] << 8 | input[index + 2] << 16;
+	if((i & 8388608) == 8388608) {
+		i = i | -16777216;
+	}
+	return i;
+};
+alphaTab.io.IOHelper.ReadInt16 = function(input,index) {
+	return alphaTab.platform.Platform.ToInt16(input[index] | input[index + 1] << 8);
+};
+haxe.io = {};
+haxe.io.Input = function() { };
+haxe.io.Input.__name__ = ["haxe","io","Input"];
+haxe.io.Input.prototype = {
+	readByte: function() {
+		throw new js._Boot.HaxeError("Not implemented");
+	}
+	,readBytes: function(s,pos,len) {
+		var k = len;
+		var b = s.b;
+		if(pos < 0 || len < 0 || pos + len > s.length) {
+			throw new js._Boot.HaxeError(haxe.io.Error.OutsideBounds);
+		}
+		try {
+			while(k > 0) {
+				b[pos] = this.readByte();
+				++pos;
+				--k;
+			}
+		} catch( eof ) {
+			if (eof instanceof js._Boot.HaxeError) eof = eof.val;
+			if( js.Boot.__instanceof(eof,haxe.io.Eof) ) {
+			} else throw(eof);
+		}
+		return len - k;
+	}
+	,readFullBytes: function(s,pos,len) {
+		while(len > 0) {
+			var k = this.readBytes(s,pos,len);
+			if(k == 0) {
+				throw new js._Boot.HaxeError(haxe.io.Error.Blocked);
+			}
+			pos += k;
+			len -= k;
+		}
+	}
+	,read: function(nbytes) {
+		var s = new haxe.io.Bytes(new ArrayBuffer(nbytes));
+		var p = 0;
+		while(nbytes > 0) {
+			var k = this.readBytes(s,p,nbytes);
+			if(k == 0) {
+				throw new js._Boot.HaxeError(haxe.io.Error.Blocked);
+			}
+			p += k;
+			nbytes -= k;
+		}
+		return s;
+	}
+	,readInt16: function() {
+		var ch1 = this.readByte();
+		var ch2 = this.readByte();
+		var n = this.bigEndian ? ch2 | ch1 << 8 : ch1 | ch2 << 8;
+		if((n & 32768) != 0) {
+			return n - 65536;
+		}
+		return n;
+	}
+	,readUInt16: function() {
+		var ch1 = this.readByte();
+		var ch2 = this.readByte();
+		if(this.bigEndian) {
+			return ch2 | ch1 << 8;
+		} else {
+			return ch1 | ch2 << 8;
+		}
+	}
+	,readInt32: function() {
+		var ch1 = this.readByte();
+		var ch2 = this.readByte();
+		var ch3 = this.readByte();
+		var ch4 = this.readByte();
+		if(this.bigEndian) {
+			return ch4 | ch3 << 8 | ch2 << 16 | ch1 << 24;
+		} else {
+			return ch1 | ch2 << 8 | ch3 << 16 | ch4 << 24;
+		}
+	}
+	,readString: function(len) {
+		var b = new haxe.io.Bytes(new ArrayBuffer(len));
+		this.readFullBytes(b,0,len);
+		return b.toString();
+	}
+	,__class__: haxe.io.Input
+};
+alphaTab.io.ReadableInput = $hx_exports["alphaTab"]["io"]["ReadableInput"] = function(readable) {
+	this._readable = null;
+	this._readable = readable;
+};
+alphaTab.io.ReadableInput.__name__ = ["alphaTab","io","ReadableInput"];
+alphaTab.io.ReadableInput.__super__ = haxe.io.Input;
+alphaTab.io.ReadableInput.prototype = $extend(haxe.io.Input.prototype,{
+	readByte: function() {
+		return this._readable.ReadByte();
+	}
+	,readBytes: function(s,pos,len) {
+		var data = new Uint8Array(s.b.bufferValue);
+		return this._readable.Read(data,pos,len);
+	}
+	,__class__: alphaTab.io.ReadableInput
+});
+alphaTab.io.ZipEntry = $hx_exports["alphaTab"]["io"]["ZipEntry"] = function() {
+};
+alphaTab.io.ZipEntry.__name__ = ["alphaTab","io","ZipEntry"];
+alphaTab.io.ZipEntry.prototype = {
+	__class__: alphaTab.io.ZipEntry
+};
+alphaTab.io.ZipFile = $hx_exports["alphaTab"]["io"]["ZipFile"] = function() {
+	this.FileFilter = null;
+	this.Entries = null;
+	var this1 = [];
+	this.Entries = this1;
+	this.FileFilter = function(s) {
+		return true;
+	};
+};
+alphaTab.io.ZipFile.__name__ = ["alphaTab","io","ZipFile"];
+alphaTab.io.ZipFile.prototype = {
+	Load: function(s) {
+		var haxeInput = new alphaTab.io.ReadableInput(s);
+		var reader = new haxe.zip.Reader(haxeInput);
+		var entries = reader.read();
+		var _g_head = entries.h;
+		while(_g_head != null) {
+			var val = _g_head.item;
+			_g_head = _g_head.next;
+			var entry = val;
+			var fullName = entry.fileName;
+			if(this.FileFilter == null || this.FileFilter(fullName)) {
+				var i = fullName.lastIndexOf("/");
+				var name = i >= 0 ? HxOverrides.substr(fullName,i + 1,null) : fullName;
+				var data = entry.data.b.bufferValue;
+				var this1 = this.Entries;
+				var _tmp = new alphaTab.io.ZipEntry();
+				_tmp.FullName = fullName;
+				_tmp.FileName = name;
+				_tmp.Data = new Uint8Array(data);
+				this1.push(_tmp);
+			}
+		}
+	}
+	,__class__: alphaTab.io.ZipFile
+};
 alphaTab.model = {};
 alphaTab.model._AccentuationType = {};
 alphaTab.model._AccentuationType.AccentuationType_Impl_ = $hx_exports["alphaTab"]["model"]["_AccentuationType"]["AccentuationType_Impl_"] = {};
@@ -30457,6 +30785,8 @@ alphaTab.xml.XmlParser_XmlState.__name__ = ["alphaTab","xml","XmlParser_XmlState
 alphaTab.xml.XmlParser_XmlState.prototype = {
 	__class__: alphaTab.xml.XmlParser_XmlState
 };
+haxe.IMap = function() { };
+haxe.IMap.__name__ = ["haxe","IMap"];
 haxe._Int64 = {};
 haxe._Int64.___Int64 = function(high,low) {
 	this.high = high;
@@ -30466,7 +30796,131 @@ haxe._Int64.___Int64.__name__ = ["haxe","_Int64","___Int64"];
 haxe._Int64.___Int64.prototype = {
 	__class__: haxe._Int64.___Int64
 };
-haxe.io = {};
+haxe.crypto = {};
+haxe.crypto.Adler32 = function() {
+	this.a1 = 1;
+	this.a2 = 0;
+};
+haxe.crypto.Adler32.__name__ = ["haxe","crypto","Adler32"];
+haxe.crypto.Adler32.read = function(i) {
+	var a = new haxe.crypto.Adler32();
+	var a2a = i.readByte();
+	var a2b = i.readByte();
+	var a1a = i.readByte();
+	var a1b = i.readByte();
+	a.a1 = a1a << 8 | a1b;
+	a.a2 = a2a << 8 | a2b;
+	return a;
+};
+haxe.crypto.Adler32.prototype = {
+	update: function(b,pos,len) {
+		var a1 = this.a1;
+		var a2 = this.a2;
+		var _g1 = pos;
+		var _g = pos + len;
+		while(_g1 < _g) {
+			var p = _g1++;
+			var c = b.b[p];
+			a1 = (a1 + c) % 65521;
+			a2 = (a2 + a1) % 65521;
+		}
+		this.a1 = a1;
+		this.a2 = a2;
+	}
+	,equals: function(a) {
+		if(a.a1 == this.a1) {
+			return a.a2 == this.a2;
+		} else {
+			return false;
+		}
+	}
+	,__class__: haxe.crypto.Adler32
+};
+haxe.ds = {};
+haxe.ds.IntMap = function() {
+	this.h = { };
+};
+haxe.ds.IntMap.__name__ = ["haxe","ds","IntMap"];
+haxe.ds.IntMap.__interfaces__ = [haxe.IMap];
+haxe.ds.IntMap.prototype = {
+	__class__: haxe.ds.IntMap
+};
+haxe.io.Bytes = function(data) {
+	this.length = data.byteLength;
+	this.b = new Uint8Array(data);
+	this.b.bufferValue = data;
+	data.hxBytes = this;
+	data.bytes = this.b;
+};
+haxe.io.Bytes.__name__ = ["haxe","io","Bytes"];
+haxe.io.Bytes.prototype = {
+	blit: function(pos,src,srcpos,len) {
+		if(pos < 0 || srcpos < 0 || len < 0 || pos + len > this.length || srcpos + len > src.length) {
+			throw new js._Boot.HaxeError(haxe.io.Error.OutsideBounds);
+		}
+		if(srcpos == 0 && len == src.b.byteLength) {
+			this.b.set(src.b,pos);
+		} else {
+			this.b.set(src.b.subarray(srcpos,srcpos + len),pos);
+		}
+	}
+	,getString: function(pos,len) {
+		if(pos < 0 || len < 0 || pos + len > this.length) {
+			throw new js._Boot.HaxeError(haxe.io.Error.OutsideBounds);
+		}
+		var s = "";
+		var b = this.b;
+		var fcc = String.fromCharCode;
+		var i = pos;
+		var max = pos + len;
+		while(i < max) {
+			var c = b[i++];
+			if(c < 128) {
+				if(c == 0) {
+					break;
+				}
+				s += fcc(c);
+			} else if(c < 224) {
+				s += fcc((c & 63) << 6 | b[i++] & 127);
+			} else if(c < 240) {
+				var c2 = b[i++];
+				s += fcc((c & 31) << 12 | (c2 & 127) << 6 | b[i++] & 127);
+			} else {
+				var c21 = b[i++];
+				var c3 = b[i++];
+				var u = (c & 15) << 18 | (c21 & 127) << 12 | (c3 & 127) << 6 | b[i++] & 127;
+				s += fcc((u >> 10) + 55232);
+				s += fcc(u & 1023 | 56320);
+			}
+		}
+		return s;
+	}
+	,toString: function() {
+		return this.getString(0,this.length);
+	}
+	,__class__: haxe.io.Bytes
+};
+haxe.io.BytesBuffer = function() {
+	this.b = [];
+};
+haxe.io.BytesBuffer.__name__ = ["haxe","io","BytesBuffer"];
+haxe.io.BytesBuffer.prototype = {
+	getBytes: function() {
+		var bytes = new haxe.io.Bytes(new Uint8Array(this.b).buffer);
+		this.b = null;
+		return bytes;
+	}
+	,__class__: haxe.io.BytesBuffer
+};
+haxe.io.Eof = function() {
+};
+haxe.io.Eof.__name__ = ["haxe","io","Eof"];
+haxe.io.Eof.prototype = {
+	toString: function() {
+		return "Eof";
+	}
+	,__class__: haxe.io.Eof
+};
 haxe.io.Error = { __ename__ : true, __constructs__ : ["Blocked","Overflow","OutsideBounds","Custom"] };
 haxe.io.Error.Blocked = ["Blocked",0];
 haxe.io.Error.Blocked.toString = $estr;
@@ -30539,6 +30993,660 @@ haxe.io.FPHelper.doubleToI64 = function(v) {
 		i64.high = (v < 0 ? -2147483648 : 0) | exp + 1023 << 20 | sig_h;
 	}
 	return i64;
+};
+haxe.zip = {};
+haxe.zip.ExtraField = { __ename__ : true, __constructs__ : ["FUnknown","FInfoZipUnicodePath","FUtf8"] };
+haxe.zip.ExtraField.FUnknown = function(tag,bytes) { var $x = ["FUnknown",0,tag,bytes]; $x.__enum__ = haxe.zip.ExtraField; $x.toString = $estr; return $x; };
+haxe.zip.ExtraField.FInfoZipUnicodePath = function(name,crc) { var $x = ["FInfoZipUnicodePath",1,name,crc]; $x.__enum__ = haxe.zip.ExtraField; $x.toString = $estr; return $x; };
+haxe.zip.ExtraField.FUtf8 = ["FUtf8",2];
+haxe.zip.ExtraField.FUtf8.toString = $estr;
+haxe.zip.ExtraField.FUtf8.__enum__ = haxe.zip.ExtraField;
+haxe.zip.Huffman = { __ename__ : true, __constructs__ : ["Found","NeedBit","NeedBits"] };
+haxe.zip.Huffman.Found = function(i) { var $x = ["Found",0,i]; $x.__enum__ = haxe.zip.Huffman; $x.toString = $estr; return $x; };
+haxe.zip.Huffman.NeedBit = function(left,right) { var $x = ["NeedBit",1,left,right]; $x.__enum__ = haxe.zip.Huffman; $x.toString = $estr; return $x; };
+haxe.zip.Huffman.NeedBits = function(n,table) { var $x = ["NeedBits",2,n,table]; $x.__enum__ = haxe.zip.Huffman; $x.toString = $estr; return $x; };
+haxe.zip.HuffTools = function() {
+};
+haxe.zip.HuffTools.__name__ = ["haxe","zip","HuffTools"];
+haxe.zip.HuffTools.prototype = {
+	treeDepth: function(t) {
+		switch(t[1]) {
+		case 0:
+			return 0;
+		case 1:
+			var b = t[3];
+			var a = t[2];
+			var da = this.treeDepth(a);
+			var db = this.treeDepth(b);
+			return 1 + (da < db ? da : db);
+		case 2:
+			throw new js._Boot.HaxeError("assert");
+			break;
+		}
+	}
+	,treeCompress: function(t) {
+		var d = this.treeDepth(t);
+		if(d == 0) {
+			return t;
+		}
+		if(d == 1) {
+			if(t[1] == 1) {
+				var b = t[3];
+				var a = t[2];
+				return haxe.zip.Huffman.NeedBit(this.treeCompress(a),this.treeCompress(b));
+			} else {
+				throw new js._Boot.HaxeError("assert");
+			}
+		}
+		var size = 1 << d;
+		var table = [];
+		var _g1 = 0;
+		var _g = size;
+		while(_g1 < _g) {
+			var i = _g1++;
+			table.push(haxe.zip.Huffman.Found(-1));
+		}
+		this.treeWalk(table,0,0,d,t);
+		return haxe.zip.Huffman.NeedBits(d,table);
+	}
+	,treeWalk: function(table,p,cd,d,t) {
+		if(t[1] == 1) {
+			var b = t[3];
+			var a = t[2];
+			if(d > 0) {
+				this.treeWalk(table,p,cd + 1,d - 1,a);
+				this.treeWalk(table,p | 1 << cd,cd + 1,d - 1,b);
+			} else {
+				table[p] = this.treeCompress(t);
+			}
+		} else {
+			table[p] = this.treeCompress(t);
+		}
+	}
+	,treeMake: function(bits,maxbits,v,len) {
+		if(len > maxbits) {
+			throw new js._Boot.HaxeError("Invalid huffman");
+		}
+		var idx = v << 5 | len;
+		if(bits.h.hasOwnProperty(idx)) {
+			return haxe.zip.Huffman.Found(bits.h[idx]);
+		}
+		v <<= 1;
+		++len;
+		return haxe.zip.Huffman.NeedBit(this.treeMake(bits,maxbits,v,len),this.treeMake(bits,maxbits,v | 1,len));
+	}
+	,make: function(lengths,pos,nlengths,maxbits) {
+		var counts = [];
+		var tmp = [];
+		if(maxbits > 32) {
+			throw new js._Boot.HaxeError("Invalid huffman");
+		}
+		var _g1 = 0;
+		var _g = maxbits;
+		while(_g1 < _g) {
+			var i = _g1++;
+			counts.push(0);
+			tmp.push(0);
+		}
+		var _g11 = 0;
+		var _g2 = nlengths;
+		while(_g11 < _g2) {
+			var i1 = _g11++;
+			var p = lengths[i1 + pos];
+			if(p >= maxbits) {
+				throw new js._Boot.HaxeError("Invalid huffman");
+			}
+			counts[p]++;
+		}
+		var code = 0;
+		var _g12 = 1;
+		var _g3 = maxbits - 1;
+		while(_g12 < _g3) {
+			var i2 = _g12++;
+			code = code + counts[i2] << 1;
+			tmp[i2] = code;
+		}
+		var bits = new haxe.ds.IntMap();
+		var _g13 = 0;
+		var _g4 = nlengths;
+		while(_g13 < _g4) {
+			var i3 = _g13++;
+			var l = lengths[i3 + pos];
+			if(l != 0) {
+				var n = tmp[l - 1];
+				tmp[l - 1] = n + 1;
+				bits.h[n << 5 | l] = i3;
+			}
+		}
+		return this.treeCompress(haxe.zip.Huffman.NeedBit(this.treeMake(bits,maxbits,0,1),this.treeMake(bits,maxbits,1,1)));
+	}
+	,__class__: haxe.zip.HuffTools
+};
+haxe.zip._InflateImpl = {};
+haxe.zip._InflateImpl.Window = function(hasCrc) {
+	this.buffer = new haxe.io.Bytes(new ArrayBuffer(65536));
+	this.pos = 0;
+	if(hasCrc) {
+		this.crc = new haxe.crypto.Adler32();
+	}
+};
+haxe.zip._InflateImpl.Window.__name__ = ["haxe","zip","_InflateImpl","Window"];
+haxe.zip._InflateImpl.Window.prototype = {
+	slide: function() {
+		if(this.crc != null) {
+			this.crc.update(this.buffer,0,32768);
+		}
+		var b = new haxe.io.Bytes(new ArrayBuffer(65536));
+		this.pos -= 32768;
+		b.blit(0,this.buffer,32768,this.pos);
+		this.buffer = b;
+	}
+	,addBytes: function(b,p,len) {
+		if(this.pos + len > 65536) {
+			this.slide();
+		}
+		this.buffer.blit(this.pos,b,p,len);
+		this.pos += len;
+	}
+	,addByte: function(c) {
+		if(this.pos == 65536) {
+			this.slide();
+		}
+		this.buffer.b[this.pos] = c & 255;
+		this.pos++;
+	}
+	,getLastChar: function() {
+		return this.buffer.b[this.pos - 1];
+	}
+	,available: function() {
+		return this.pos;
+	}
+	,checksum: function() {
+		if(this.crc != null) {
+			this.crc.update(this.buffer,0,this.pos);
+		}
+		return this.crc;
+	}
+	,__class__: haxe.zip._InflateImpl.Window
+};
+haxe.zip._InflateImpl.State = { __ename__ : true, __constructs__ : ["Head","Block","CData","Flat","Crc","Dist","DistOne","Done"] };
+haxe.zip._InflateImpl.State.Head = ["Head",0];
+haxe.zip._InflateImpl.State.Head.toString = $estr;
+haxe.zip._InflateImpl.State.Head.__enum__ = haxe.zip._InflateImpl.State;
+haxe.zip._InflateImpl.State.Block = ["Block",1];
+haxe.zip._InflateImpl.State.Block.toString = $estr;
+haxe.zip._InflateImpl.State.Block.__enum__ = haxe.zip._InflateImpl.State;
+haxe.zip._InflateImpl.State.CData = ["CData",2];
+haxe.zip._InflateImpl.State.CData.toString = $estr;
+haxe.zip._InflateImpl.State.CData.__enum__ = haxe.zip._InflateImpl.State;
+haxe.zip._InflateImpl.State.Flat = ["Flat",3];
+haxe.zip._InflateImpl.State.Flat.toString = $estr;
+haxe.zip._InflateImpl.State.Flat.__enum__ = haxe.zip._InflateImpl.State;
+haxe.zip._InflateImpl.State.Crc = ["Crc",4];
+haxe.zip._InflateImpl.State.Crc.toString = $estr;
+haxe.zip._InflateImpl.State.Crc.__enum__ = haxe.zip._InflateImpl.State;
+haxe.zip._InflateImpl.State.Dist = ["Dist",5];
+haxe.zip._InflateImpl.State.Dist.toString = $estr;
+haxe.zip._InflateImpl.State.Dist.__enum__ = haxe.zip._InflateImpl.State;
+haxe.zip._InflateImpl.State.DistOne = ["DistOne",6];
+haxe.zip._InflateImpl.State.DistOne.toString = $estr;
+haxe.zip._InflateImpl.State.DistOne.__enum__ = haxe.zip._InflateImpl.State;
+haxe.zip._InflateImpl.State.Done = ["Done",7];
+haxe.zip._InflateImpl.State.Done.toString = $estr;
+haxe.zip._InflateImpl.State.Done.__enum__ = haxe.zip._InflateImpl.State;
+haxe.zip.InflateImpl = function(i,header,crc) {
+	if(crc == null) {
+		crc = true;
+	}
+	if(header == null) {
+		header = true;
+	}
+	this["final"] = false;
+	this.htools = new haxe.zip.HuffTools();
+	this.huffman = this.buildFixedHuffman();
+	this.huffdist = null;
+	this.len = 0;
+	this.dist = 0;
+	this.state = header ? haxe.zip._InflateImpl.State.Head : haxe.zip._InflateImpl.State.Block;
+	this.input = i;
+	this.bits = 0;
+	this.nbits = 0;
+	this.needed = 0;
+	this.output = null;
+	this.outpos = 0;
+	this.lengths = [];
+	var _g = 0;
+	while(_g < 19) {
+		var i1 = _g++;
+		this.lengths.push(-1);
+	}
+	this.window = new haxe.zip._InflateImpl.Window(crc);
+};
+haxe.zip.InflateImpl.__name__ = ["haxe","zip","InflateImpl"];
+haxe.zip.InflateImpl.prototype = {
+	buildFixedHuffman: function() {
+		if(haxe.zip.InflateImpl.FIXED_HUFFMAN != null) {
+			return haxe.zip.InflateImpl.FIXED_HUFFMAN;
+		}
+		var a = [];
+		var _g = 0;
+		while(_g < 288) {
+			var n = _g++;
+			a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
+		}
+		haxe.zip.InflateImpl.FIXED_HUFFMAN = this.htools.make(a,0,288,10);
+		return haxe.zip.InflateImpl.FIXED_HUFFMAN;
+	}
+	,readBytes: function(b,pos,len) {
+		this.needed = len;
+		this.outpos = pos;
+		this.output = b;
+		if(len > 0) {
+			while(this.inflateLoop()) {
+			}
+		}
+		return len - this.needed;
+	}
+	,getBits: function(n) {
+		while(this.nbits < n) {
+			this.bits |= this.input.readByte() << this.nbits;
+			this.nbits += 8;
+		}
+		var b = this.bits & (1 << n) - 1;
+		this.nbits -= n;
+		this.bits >>= n;
+		return b;
+	}
+	,getBit: function() {
+		if(this.nbits == 0) {
+			this.nbits = 8;
+			this.bits = this.input.readByte();
+		}
+		var b = (this.bits & 1) == 1;
+		this.nbits--;
+		this.bits >>= 1;
+		return b;
+	}
+	,getRevBits: function(n) {
+		if(n == 0) {
+			return 0;
+		} else if(this.getBit()) {
+			return 1 << n - 1 | this.getRevBits(n - 1);
+		} else {
+			return this.getRevBits(n - 1);
+		}
+	}
+	,resetBits: function() {
+		this.bits = 0;
+		this.nbits = 0;
+	}
+	,addBytes: function(b,p,len) {
+		this.window.addBytes(b,p,len);
+		this.output.blit(this.outpos,b,p,len);
+		this.needed -= len;
+		this.outpos += len;
+	}
+	,addByte: function(b) {
+		this.window.addByte(b);
+		this.output.b[this.outpos] = b & 255;
+		this.needed--;
+		this.outpos++;
+	}
+	,addDistOne: function(n) {
+		var c = this.window.getLastChar();
+		var _g1 = 0;
+		var _g = n;
+		while(_g1 < _g) {
+			var i = _g1++;
+			this.addByte(c);
+		}
+	}
+	,addDist: function(d,len) {
+		this.addBytes(this.window.buffer,this.window.pos - d,len);
+	}
+	,applyHuffman: function(h) {
+		switch(h[1]) {
+		case 0:
+			var n = h[2];
+			return n;
+		case 1:
+			var b = h[3];
+			var a = h[2];
+			return this.applyHuffman(this.getBit() ? b : a);
+		case 2:
+			var tbl = h[3];
+			var n1 = h[2];
+			return this.applyHuffman(tbl[this.getBits(n1)]);
+		}
+	}
+	,inflateLengths: function(a,max) {
+		var i = 0;
+		var prev = 0;
+		while(i < max) {
+			var n = this.applyHuffman(this.huffman);
+			switch(n) {
+			case 0:case 1:case 2:case 3:case 4:case 5:case 6:case 7:case 8:case 9:case 10:case 11:case 12:case 13:case 14:case 15:
+				prev = n;
+				a[i] = n;
+				++i;
+				break;
+			case 16:
+				var end = i + 3 + this.getBits(2);
+				if(end > max) {
+					throw new js._Boot.HaxeError("Invalid data");
+				}
+				while(i < end) {
+					a[i] = prev;
+					++i;
+				}
+				break;
+			case 17:
+				i += 3 + this.getBits(3);
+				if(i > max) {
+					throw new js._Boot.HaxeError("Invalid data");
+				}
+				break;
+			case 18:
+				i += 11 + this.getBits(7);
+				if(i > max) {
+					throw new js._Boot.HaxeError("Invalid data");
+				}
+				break;
+			default:
+				throw new js._Boot.HaxeError("Invalid data");
+			}
+		}
+	}
+	,inflateLoop: function() {
+		var _g = this.state;
+		switch(_g[1]) {
+		case 0:
+			var cmf = this.input.readByte();
+			var cm = cmf & 15;
+			var cinfo = cmf >> 4;
+			if(cm != 8) {
+				throw new js._Boot.HaxeError("Invalid data");
+			}
+			var flg = this.input.readByte();
+			var fdict = (flg & 32) != 0;
+			if(((cmf << 8) + flg) % 31 != 0) {
+				throw new js._Boot.HaxeError("Invalid data");
+			}
+			if(fdict) {
+				throw new js._Boot.HaxeError("Unsupported dictionary");
+			}
+			this.state = haxe.zip._InflateImpl.State.Block;
+			return true;
+		case 1:
+			this["final"] = this.getBit();
+			var _g1 = this.getBits(2);
+			switch(_g1) {
+			case 0:
+				this.len = this.input.readUInt16();
+				var nlen = this.input.readUInt16();
+				if(nlen != 65535 - this.len) {
+					throw new js._Boot.HaxeError("Invalid data");
+				}
+				this.state = haxe.zip._InflateImpl.State.Flat;
+				var r = this.inflateLoop();
+				this.resetBits();
+				return r;
+			case 1:
+				this.huffman = this.buildFixedHuffman();
+				this.huffdist = null;
+				this.state = haxe.zip._InflateImpl.State.CData;
+				return true;
+			case 2:
+				var hlit = this.getBits(5) + 257;
+				var hdist = this.getBits(5) + 1;
+				var hclen = this.getBits(4) + 4;
+				var _g11 = 0;
+				var _g2 = hclen;
+				while(_g11 < _g2) {
+					var i = _g11++;
+					this.lengths[haxe.zip.InflateImpl.CODE_LENGTHS_POS[i]] = this.getBits(3);
+				}
+				var _g3 = hclen;
+				while(_g3 < 19) {
+					var i1 = _g3++;
+					this.lengths[haxe.zip.InflateImpl.CODE_LENGTHS_POS[i1]] = 0;
+				}
+				this.huffman = this.htools.make(this.lengths,0,19,8);
+				var lengths = [];
+				var _g12 = 0;
+				var _g4 = hlit + hdist;
+				while(_g12 < _g4) {
+					var i2 = _g12++;
+					lengths.push(0);
+				}
+				this.inflateLengths(lengths,hlit + hdist);
+				this.huffdist = this.htools.make(lengths,hlit,hdist,16);
+				this.huffman = this.htools.make(lengths,0,hlit,16);
+				this.state = haxe.zip._InflateImpl.State.CData;
+				return true;
+			default:
+				throw new js._Boot.HaxeError("Invalid data");
+			}
+			break;
+		case 2:
+			var n = this.applyHuffman(this.huffman);
+			if(n < 256) {
+				this.addByte(n);
+				return this.needed > 0;
+			} else if(n == 256) {
+				this.state = this["final"] ? haxe.zip._InflateImpl.State.Crc : haxe.zip._InflateImpl.State.Block;
+				return true;
+			} else {
+				n -= 257;
+				var extra_bits = haxe.zip.InflateImpl.LEN_EXTRA_BITS_TBL[n];
+				if(extra_bits == -1) {
+					throw new js._Boot.HaxeError("Invalid data");
+				}
+				this.len = haxe.zip.InflateImpl.LEN_BASE_VAL_TBL[n] + this.getBits(extra_bits);
+				var dist_code = this.huffdist == null ? this.getRevBits(5) : this.applyHuffman(this.huffdist);
+				extra_bits = haxe.zip.InflateImpl.DIST_EXTRA_BITS_TBL[dist_code];
+				if(extra_bits == -1) {
+					throw new js._Boot.HaxeError("Invalid data");
+				}
+				this.dist = haxe.zip.InflateImpl.DIST_BASE_VAL_TBL[dist_code] + this.getBits(extra_bits);
+				if(this.dist > this.window.available()) {
+					throw new js._Boot.HaxeError("Invalid data");
+				}
+				this.state = this.dist == 1 ? haxe.zip._InflateImpl.State.DistOne : haxe.zip._InflateImpl.State.Dist;
+				return true;
+			}
+			break;
+		case 3:
+			var rlen = this.len < this.needed ? this.len : this.needed;
+			var bytes = this.input.read(rlen);
+			this.len -= rlen;
+			this.addBytes(bytes,0,rlen);
+			if(this.len == 0) {
+				this.state = this["final"] ? haxe.zip._InflateImpl.State.Crc : haxe.zip._InflateImpl.State.Block;
+			}
+			return this.needed > 0;
+		case 4:
+			var calc = this.window.checksum();
+			if(calc == null) {
+				this.state = haxe.zip._InflateImpl.State.Done;
+				return true;
+			}
+			var crc = haxe.crypto.Adler32.read(this.input);
+			if(!calc.equals(crc)) {
+				throw new js._Boot.HaxeError("Invalid CRC");
+			}
+			this.state = haxe.zip._InflateImpl.State.Done;
+			return true;
+		case 5:
+			while(this.len > 0 && this.needed > 0) {
+				var rdist = this.len < this.dist ? this.len : this.dist;
+				var rlen1 = this.needed < rdist ? this.needed : rdist;
+				this.addDist(this.dist,rlen1);
+				this.len -= rlen1;
+			}
+			if(this.len == 0) {
+				this.state = haxe.zip._InflateImpl.State.CData;
+			}
+			return this.needed > 0;
+		case 6:
+			var rlen2 = this.len < this.needed ? this.len : this.needed;
+			this.addDistOne(rlen2);
+			this.len -= rlen2;
+			if(this.len == 0) {
+				this.state = haxe.zip._InflateImpl.State.CData;
+			}
+			return this.needed > 0;
+		case 7:
+			return false;
+		}
+	}
+	,__class__: haxe.zip.InflateImpl
+};
+haxe.zip.Reader = function(i) {
+	this.i = i;
+};
+haxe.zip.Reader.__name__ = ["haxe","zip","Reader"];
+haxe.zip.Reader.prototype = {
+	readZipDate: function() {
+		var t = this.i.readUInt16();
+		var hour = t >> 11 & 31;
+		var min = t >> 5 & 63;
+		var sec = t & 31;
+		var d = this.i.readUInt16();
+		var year = d >> 9;
+		var month = d >> 5 & 15;
+		var day = d & 31;
+		return new Date(year + 1980,month - 1,day,hour,min,sec << 1);
+	}
+	,readExtraFields: function(length) {
+		var fields = new List();
+		while(length > 0) {
+			if(length < 4) {
+				throw new js._Boot.HaxeError("Invalid extra fields data");
+			}
+			var tag = this.i.readUInt16();
+			var len = this.i.readUInt16();
+			if(length < len) {
+				throw new js._Boot.HaxeError("Invalid extra fields data");
+			}
+			if(tag == 28789) {
+				var version = this.i.readByte();
+				if(version != 1) {
+					var data = new haxe.io.BytesBuffer();
+					data.b.push(version);
+					var src = this.i.read(len - 1);
+					var b1 = data.b;
+					var b2 = src.b;
+					var _g1 = 0;
+					var _g = src.length;
+					while(_g1 < _g) {
+						var i = _g1++;
+						data.b.push(b2[i]);
+					}
+					fields.add(haxe.zip.ExtraField.FUnknown(tag,data.getBytes()));
+				} else {
+					var crc = this.i.readInt32();
+					var name = this.i.read(len - 5).toString();
+					fields.add(haxe.zip.ExtraField.FInfoZipUnicodePath(name,crc));
+				}
+			} else {
+				fields.add(haxe.zip.ExtraField.FUnknown(tag,this.i.read(len)));
+			}
+			length -= 4 + len;
+		}
+		return fields;
+	}
+	,readEntryHeader: function() {
+		var i = this.i;
+		var h = i.readInt32();
+		if(h == 33639248 || h == 101010256) {
+			return null;
+		}
+		if(h != 67324752) {
+			throw new js._Boot.HaxeError("Invalid Zip Data");
+		}
+		var version = i.readUInt16();
+		var flags = i.readUInt16();
+		var utf8 = (flags & 2048) != 0;
+		if((flags & 63473) != 0) {
+			throw new js._Boot.HaxeError("Unsupported flags " + flags);
+		}
+		var compression = i.readUInt16();
+		var compressed = compression != 0;
+		if(compressed && compression != 8) {
+			throw new js._Boot.HaxeError("Unsupported compression " + compression);
+		}
+		var mtime = this.readZipDate();
+		var crc32 = i.readInt32();
+		var csize = i.readInt32();
+		var usize = i.readInt32();
+		var fnamelen = i.readInt16();
+		var elen = i.readInt16();
+		var fname = i.readString(fnamelen);
+		var fields = this.readExtraFields(elen);
+		if(utf8) {
+			fields.push(haxe.zip.ExtraField.FUtf8);
+		}
+		var data = null;
+		if((flags & 8) != 0) {
+			crc32 = null;
+		}
+		return { fileName : fname, fileSize : usize, fileTime : mtime, compressed : compressed, dataSize : csize, data : data, crc32 : crc32, extraFields : fields};
+	}
+	,read: function() {
+		var l = new List();
+		var buf = null;
+		var tmp = null;
+		while(true) {
+			var e = this.readEntryHeader();
+			if(e == null) {
+				break;
+			}
+			if(e.crc32 == null) {
+				if(e.compressed) {
+					var bufSize = 65536;
+					if(tmp == null) {
+						tmp = new haxe.io.Bytes(new ArrayBuffer(bufSize));
+					}
+					var out = new haxe.io.BytesBuffer();
+					var z = new haxe.zip.InflateImpl(this.i,false,false);
+					while(true) {
+						var n = z.readBytes(tmp,0,bufSize);
+						if(n < 0 || n > tmp.length) {
+							throw new js._Boot.HaxeError(haxe.io.Error.OutsideBounds);
+						}
+						var b1 = out.b;
+						var b2 = tmp.b;
+						var _g1 = 0;
+						var _g = n;
+						while(_g1 < _g) {
+							var i = _g1++;
+							out.b.push(b2[i]);
+						}
+						if(n < bufSize) {
+							break;
+						}
+					}
+					e.data = out.getBytes();
+				} else {
+					e.data = this.i.read(e.dataSize);
+				}
+				e.crc32 = this.i.readInt32();
+				if(e.crc32 == 134695760) {
+					e.crc32 = this.i.readInt32();
+				}
+				e.dataSize = this.i.readInt32();
+				e.fileSize = this.i.readInt32();
+				e.dataSize = e.fileSize;
+				e.compressed = false;
+			} else {
+				e.data = this.i.read(e.dataSize);
+			}
+			l.add(e);
+		}
+		return l;
+	}
+	,__class__: haxe.zip.Reader
 };
 js._Boot = {};
 js._Boot.HaxeError = function(val) {
@@ -31111,6 +32219,8 @@ function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id
 String.prototype.__class__ = String;
 String.__name__ = ["String"];
 Array.__name__ = ["Array"];
+Date.prototype.__class__ = Date;
+Date.__name__ = ["Date"];
 var Int = { __name__ : ["Int"]};
 var Dynamic = { __name__ : ["Dynamic"]};
 var Float = Number;
@@ -31524,12 +32634,12 @@ alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.Multiply = 13;
 alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.LowerThan = 14;
 alphaTab.importer.Gp3To5Importer.VersionString = "FICHIER GUITAR PRO ";
 alphaTab.importer.Gp3To5Importer.BendStep = 25;
+alphaTab.importer.GpifParser.InvalidId = "-1";
+alphaTab.importer.GpifParser.BendPointPositionFactor = 0.6;
+alphaTab.importer.GpifParser.BendPointValueFactor = 0.04;
 alphaTab.importer.GpxFileSystem.HeaderBcFs = "BCFS";
 alphaTab.importer.GpxFileSystem.HeaderBcFz = "BCFZ";
 alphaTab.importer.GpxFileSystem.ScoreGpif = "score.gpif";
-alphaTab.importer.GpxParser.InvalidId = "-1";
-alphaTab.importer.GpxParser.BendPointPositionFactor = 0.6;
-alphaTab.importer.GpxParser.BendPointValueFactor = 0.04;
 alphaTab.importer.MusicXmlImporter.MergePartGroupsSetting = "musicXMLMergePartGroups";
 alphaTab.io.BitReader.ByteSize = 8;
 alphaTab.model._AccentuationType.AccentuationType_Impl_.None = 0;
@@ -31880,6 +32990,11 @@ haxe.io.FPHelper.i64tmp = (function($this) {
 	$r = this1;
 	return $r;
 }(this));
+haxe.zip.InflateImpl.LEN_EXTRA_BITS_TBL = [0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0,-1,-1];
+haxe.zip.InflateImpl.LEN_BASE_VAL_TBL = [3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258];
+haxe.zip.InflateImpl.DIST_EXTRA_BITS_TBL = [0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13,-1,-1];
+haxe.zip.InflateImpl.DIST_BASE_VAL_TBL = [1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577];
+haxe.zip.InflateImpl.CODE_LENGTHS_POS = [16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15];
 js.html.compat.Float32Array.BYTES_PER_ELEMENT = 4;
 js.html.compat.Float64Array.BYTES_PER_ELEMENT = 8;
 js.html.compat.Uint8Array.BYTES_PER_ELEMENT = 1;

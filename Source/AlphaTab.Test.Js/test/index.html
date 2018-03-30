@@ -163,7 +163,10 @@
 	  }, false);
 	  
 	  document.addEventListener('alphaTab.test.status', function(e) {
-		document.querySelector('#loadingResources .message').innerText = e.detail.message
+		var msg = document.querySelector('#loadingResources .message');
+		if(msg != null) {
+			msg.innerText = e.detail.message;
+		}
 	  }, false);
 	  
 	  window.onload = function() {

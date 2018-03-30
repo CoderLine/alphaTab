@@ -16,7 +16,6 @@
  * License along with this library.
  */
 using System;
-using AlphaTab.Audio.Synth.IO;
 using AlphaTab.Audio.Synth.Util;
 using AlphaTab.Audio.Synth.Sf2.Chunks;
 using AlphaTab.IO;

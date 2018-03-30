@@ -9,7 +9,7 @@ class LyricsTest
         var path : system.CsString = "TestFiles/GuitarPro6/LyricsTemplate.gpx";
         var buffer : alphaTab.io.ByteBuffer = alphaTab.io.ByteBuffer.FromBuffer(alphaTab.test.TestPlatform.LoadFile(path));
         var importer : alphaTab.importer.GpxImporter = new alphaTab.importer.GpxImporter();
-        importer.Init(buffer);
+        importer.Init(buffer, null);
         return importer.ReadScore();
 
     }

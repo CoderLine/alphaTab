@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GPIF>
+<GPVersion>7</GPVersion>
+<GPRevision>12020</GPRevision>
+<Encoding>
+<EncodingDescription>GP7</EncodingDescription>
+</Encoding>
+<Score>
+<Title><![CDATA[]]></Title>
+<SubTitle><![CDATA[]]></SubTitle>
+<Artist><![CDATA[]]></Artist>
+<Album><![CDATA[]]></Album>
+<Words><![CDATA[]]></Words>
+<Music><![CDATA[]]></Music>
+<WordsAndMusic><![CDATA[]]></WordsAndMusic>
+<Copyright><![CDATA[]]></Copyright>
+<Tabber><![CDATA[]]></Tabber>
+<Instructions><![CDATA[]]></Instructions>
+<Notices><![CDATA[]]></Notices>
+<FirstPageHeader><![CDATA[<html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Times New Roman'; font-size:16pt; font-weight:400; font-style:normal;"><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;"><span style=" font-family:'Times New Roman'; font-size:35pt;">%TITLE%</span></p><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;"><span style=" font-family:'Times New Roman'; font-size:16pt;">%SUBTITLE%</span></p><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;"><span style=" font-family:'Times New Roman'; font-size:16pt;">%ARTIST%</span></p><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;"><span style=" font-family:'Times New Roman'; font-size:16pt;">%ALBUM%</span></p><p align="center" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:10pt;"><span style=" font-family:'Times New Roman'; font-size:12pt;">%WORDS&MUSIC%</span></p></body></html>]]></FirstPageHeader>
+<FirstPageFooter><![CDATA[<html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Lucida Grande'; font-size:13pt; font-weight:400; font-style:normal;"><p align="right" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Times'; font-size:14pt;">Page %page%/%pages%</p></body></html>]]></FirstPageFooter>
+<PageHeader><![CDATA[]]></PageHeader>
+<PageFooter><![CDATA[<html><head><meta name="qrichtext" content="1" /><style type="text/css">p, li { white-space: pre-wrap; }</style></head><body style=" font-family:'Lucida Grande'; font-size:13pt; font-weight:400; font-style:normal;"><p align="right" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Times'; font-size:14pt;">Page %page%/%pages%</p></body></html>]]></PageFooter>
+<ScoreSystemsDefaultLayout>3</ScoreSystemsDefaultLayout>
+<ScoreSystemsLayout>2</ScoreSystemsLayout>
+<ScoreZoomPolicy>Value</ScoreZoomPolicy>
+<ScoreZoom>1</ScoreZoom>
+<MultiVoice>0></MultiVoice>
+</Score>
+<MasterTrack>
+<Tracks>0</Tracks>
+<Automations>
+<Automation>
+<Type>Tempo</Type>
+<Linear>false</Linear>
+<Bar>0</Bar>
+<Position>0</Position>
+<Visible>true</Visible>
+<Value>120 2</Value>
+</Automation>
+</Automations>
+<RSE>
+<Master>
+<Effect id="M06_DynamicAnalogDynamic">
+<ByPass />
+<Parameters>0 0 0.8 0 0.4 0.6 0.5 0.5</Parameters>
+</Effect>
+<Effect id="M03_StudioReverbRoomStudioA">
+<ByPass />
+<Parameters>1 0.6 0.4 0.5 0.2</Parameters>
+</Effect>
+<Effect id="M08_GraphicEQ10Band">
+<Parameters>0 0 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5</Parameters>
+</Effect>
+<Effect id="I01_VolumeAndPan">
+<Parameters>0.76 0.5</Parameters>
+<Automations>
+<Automation>
+<Type>DSPParam_00</Type>
+<Linear>false</Linear>
+<Bar>0</Bar>
+<Position>0</Position>
+<Visible>false</Visible>
+<Value>0.76</Value>
+</Automation>
+<Automation>
+<Type>DSPParam_01</Type>
+<Linear>false</Linear>
+<Bar>0</Bar>
+<Position>0</Position>
+<Visible>false</Visible>
+<Value>0.5</Value>
+</Automation>
+</Automations>
+</Effect>
+</Master>
+</RSE>
+</MasterTrack>
+<AudioTracks>
+</AudioTracks>
+<Tracks>
+<Track id="0">
+<Name><![CDATA[Track 1]]></Name>
+<ShortName><![CDATA[S-Gt]]></ShortName>
+<Color>246 74 38</Color>
+<SystemsDefautLayout>3</SystemsDefautLayout>
+<SystemsLayout>2</SystemsLayout>
+<PalmMute>0</PalmMute>
+<PlayingStyle>Default</PlayingStyle>
+<UseOneChannelPerString />
+<IconId>1</IconId>
+<InstrumentSet>
+<Name>Steel Guitar</Name>
+<Type>steelGuitar</Type>
+<LineCount>5</LineCount>
+<Elements>
+<Element>
+<Name>Pitched</Name>
+<Type>pitched</Type>
+<SoundbankName></SoundbankName>
+<Articulations>
+<Articulation>
+<Name></Name>
+<StaffLine>0</StaffLine>
+<Noteheads>noteheadBlack noteheadHalf noteheadWhole</Noteheads>
+<TechniquePlacement>outside</TechniquePlacement>
+<TechniqueSymbol></TechniqueSymbol>
+<InputMidiNumbers></InputMidiNumbers>
+<OutputRSESound></OutputRSESound>
+<OutputMidiNumber>0</OutputMidiNumber>
+</Articulation>
+</Articulations>
+</Element>
+</Elements>
+</InstrumentSet>
+
+<Transpose>
+<Chromatic>0</Chromatic>
+<Octave>-1</Octave>
+</Transpose>
+<RSE>
+<ChannelStrip version="E56">
+<Parameters>0.6 0.68 1 0.62 0.75 0.5 0.66 0.18 0.6 1 0.5 0.5 0.755 0.5 0.5 0.5</Parameters>
+<Automations>
+<Automation>
+<Type>DSPParam_11</Type>
+<Linear>false</Linear>
+<Bar>0</Bar>
+<Position>0</Position>
+<Visible>false</Visible>
+<Value>0.5</Value>
+</Automation>
+<Automation>
+<Type>DSPParam_12</Type>
+<Linear>false</Linear>
+<Bar>0</Bar>
+<Position>0</Position>
+<Visible>false</Visible>
+<Value>0.755</Value>
+</Automation>
+</Automations>
+</ChannelStrip>
+</RSE>
+<ForcedSound>-1</ForcedSound>
+<Sounds>
+<Sound>
+<Name><![CDATA[Acoustic Guitar (Steel)]]></Name>
+<Label><![CDATA[Acoustic Guitar (Steel)]]></Label>
+<Path>Stringed/Acoustic Guitars/Steel Guitar</Path>
+<Role>User</Role>
+<MIDI>
+<LSB>0</LSB>
+<MSB>0</MSB>
+<Program>25</Program>
+</MIDI>
+<RSE>
+<SoundbankPatch>D-Steel</SoundbankPatch>
+<Pickups>
+<OverloudPosition>0</OverloudPosition>
+<Volumes>1 1</Volumes>
+<Tones>1 1</Tones>
+</Pickups>
+<EffectChain>
+<Effect id="E30_EqGEq">
+<Parameters>0.78 0.76 0.49 0.53 0.29 0.82 0.9 0.314286</Parameters>
+</Effect>
+<Effect />
+<Effect />
+<Effect />
+<Effect />
+<Effect />
+</EffectChain>
+</RSE>
+</Sound>
+</Sounds>
+<MidiConnection>
+<Port>0</Port>
+<PrimaryChannel>0</PrimaryChannel>
+<SecondaryChannel>1</SecondaryChannel>
+<ForeOneChannelPerString>false</ForeOneChannelPerString>
+</MidiConnection>
+<PlaybackState>Default</PlaybackState>
+<AudioEngineState>RSE</AudioEngineState>
+<Lyrics dispatched="true">
+<Line>
+<Text><![CDATA[]]></Text>
+<Offset>0</Offset>
+</Line>
+<Line>
+<Text><![CDATA[]]></Text>
+<Offset>0</Offset>
+</Line>
+<Line>
+<Text><![CDATA[]]></Text>
+<Offset>0</Offset>
+</Line>
+<Line>
+<Text><![CDATA[]]></Text>
+<Offset>0</Offset>
+</Line>
+<Line>
+<Text><![CDATA[]]></Text>
+<Offset>0</Offset>
+</Line>
+</Lyrics>
+<Staves>
+<Staff>
+<Properties>
+<Property name="CapoFret">
+<Fret>0</Fret>
+</Property>
+<Property name="FretCount">
+<Number>24</Number>
+</Property>
+<Property name="PartialCapoFret">
+<Fret>0</Fret>
+</Property>
+<Property name="PartialCapoStringFlags">
+<Flags>0</Flags>
+</Property>
+<Property name="Tuning">
+<Pitches>40 45 50 55 59 64</Pitches>
+<Instrument>1</Instrument>
+
+</Property>
+<Property name="ChordCollection">
+<Items/>
+
+</Property>
+<Property name="ChordWorkingSet">
+<Items/>
+
+</Property>
+<Property name="DiagramCollection">
+<Items/>
+
+</Property>
+<Property name="DiagramWorkingSet">
+<Items/>
+
+</Property>
+<Name><![CDATA[Standard]]></Name>
+</Properties>
+</Staff>
+</Staves>
+<Automations>
+<Automation>
+<Type>Sound</Type>
+<Linear>false</Linear>
+<Bar>0</Bar>
+<Position>0</Position>
+<Visible>true</Visible>
+<Value><![CDATA[Stringed/Acoustic Guitars/Steel Guitar;Acoustic Guitar (Steel);User]]></Value>
+</Automation>
+</Automations>
+</Track>
+</Tracks>
+<MasterBars>
+<!-- order is important here -->
+<MasterBar>
+<Key>
+<AccidentalCount>0</AccidentalCount>
+<Mode>Major</Mode>
+<TransposeAs>Flats</TransposeAs>
+</Key>
+<Time>4/4</Time>
+<Bars>0</Bars>
+<XProperties>
+<XProperty id="1124139010">
+<Int>8</Int>
+</XProperty>
+<XProperty id="1124139264">
+<Int>2</Int>
+</XProperty>
+<XProperty id="1124139265">
+<Int>2</Int>
+</XProperty>
+<XProperty id="1124139266">
+<Int>2</Int>
+</XProperty>
+<XProperty id="1124139267">
+<Int>2</Int>
+</XProperty>
+</XProperties>
+</MasterBar>
+<MasterBar>
+<Key>
+<AccidentalCount>0</AccidentalCount>
+<Mode>Major</Mode>
+<TransposeAs>Flats</TransposeAs>
+</Key>
+<Time>4/4</Time>
+<DoubleBar />
+<Bars>1</Bars>
+<XProperties>
+<XProperty id="1124139010">
+<Int>8</Int>
+</XProperty>
+<XProperty id="1124139264">
+<Int>2</Int>
+</XProperty>
+<XProperty id="1124139265">
+<Int>2</Int>
+</XProperty>
+<XProperty id="1124139266">
+<Int>2</Int>
+</XProperty>
+<XProperty id="1124139267">
+<Int>2</Int>
+</XProperty>
+</XProperties>
+</MasterBar>
+</MasterBars>
+<Bars>
+<Bar id="0">
+<Clef>G2</Clef>
+<Voices>0 -1 -1 -1</Voices>
+</Bar>
+<Bar id="1">
+<Clef>G2</Clef>
+<Voices>1 -1 -1 -1</Voices>
+</Bar>
+</Bars>
+<Voices>
+<Voice id="0">
+<Beats>0 1</Beats>
+</Voice>
+<Voice id="1">
+<Beats>2</Beats>
+</Voice>
+</Voices>
+<Beats>
+<Beat id="0">
+<Dynamic>F</Dynamic>
+<Rhythm ref="0" />
+<TransposedPitchStemOrientation>Upward</TransposedPitchStemOrientation>
+<ConcertPitchStemOrientation>Undefined</ConcertPitchStemOrientation>
+<Notes>0</Notes>
+<Properties>
+<Property name="PrimaryPickupVolume">
+<Float>0.500000</Float>
+</Property>
+<Property name="PrimaryPickupTone">
+<Float>0.500000</Float>
+</Property>
+</Properties>
+</Beat>
+<Beat id="1">
+<Dynamic>F</Dynamic>
+<Rhythm ref="0" />
+<TransposedPitchStemOrientation>Upward</TransposedPitchStemOrientation>
+<ConcertPitchStemOrientation>Undefined</ConcertPitchStemOrientation>
+<Notes>1</Notes>
+<Properties>
+<Property name="PrimaryPickupVolume">
+<Float>0.500000</Float>
+</Property>
+<Property name="PrimaryPickupTone">
+<Float>0.500000</Float>
+</Property>
+</Properties>
+</Beat>
+<Beat id="2">
+<Dynamic>F</Dynamic>
+<Rhythm ref="1" />
+<TransposedPitchStemOrientation>Downward</TransposedPitchStemOrientation>
+<ConcertPitchStemOrientation>Undefined</ConcertPitchStemOrientation>
+<Notes>2</Notes>
+<Properties>
+<Property name="PrimaryPickupVolume">
+<Float>0.500000</Float>
+</Property>
+<Property name="PrimaryPickupTone">
+<Float>0.500000</Float>
+</Property>
+</Properties>
+</Beat>
+</Beats>
+<Notes>
+<Note id="0">
+<InstrumentArticulation>0</InstrumentArticulation>
+<Properties>
+<Property name="Bended">
+<Enable />
+
+</Property>
+<Property name="BendDestinationOffset">
+<Float>100.000000</Float>
+</Property>
+<Property name="BendDestinationValue">
+<Float>100.000000</Float>
+</Property>
+<Property name="BendMiddleOffset1">
+<Float>50.000000</Float>
+</Property>
+<Property name="BendMiddleOffset2">
+<Float>50.000000</Float>
+</Property>
+<Property name="BendMiddleValue">
+<Float>50.000000</Float>
+</Property>
+<Property name="BendOriginOffset">
+<Float>0.000000</Float>
+</Property>
+<Property name="BendOriginValue">
+<Float>0.000000</Float>
+</Property>
+<Property name="ConcertPitch">
+<Pitch><Step>A</Step><Accidental>#</Accidental><Octave>4</Octave></Pitch></Property><Property name="Fret">
+<Fret>3</Fret>
+</Property>
+<Property name="Midi">
+<Number>58</Number>
+</Property>
+<Property name="String">
+<String>3</String>
+</Property>
+<Property name="TransposedPitch">
+<Pitch><Step>A</Step><Accidental>#</Accidental><Octave>5</Octave></Pitch></Property></Properties>
+</Note>
+<Note id="1">
+<InstrumentArticulation>0</InstrumentArticulation>
+<Properties>
+<Property name="Bended">
+<Enable />
+
+</Property>
+<Property name="BendDestinationOffset">
+<Float>100.000000</Float>
+</Property>
+<Property name="BendDestinationValue">
+<Float>100.000000</Float>
+</Property>
+<Property name="BendMiddleOffset1">
+<Float>50.000000</Float>
+</Property>
+<Property name="BendMiddleOffset2">
+<Float>50.000000</Float>
+</Property>
+<Property name="BendMiddleValue">
+<Float>50.000000</Float>
+</Property>
+<Property name="BendOriginOffset">
+<Float>0.000000</Float>
+</Property>
+<Property name="BendOriginValue">
+<Float>0.000000</Float>
+</Property>
+<Property name="ConcertPitch">
+<Pitch><Step>A</Step><Accidental>#</Accidental><Octave>4</Octave></Pitch></Property><Property name="Fret">
+<Fret>3</Fret>
+</Property>
+<Property name="Midi">
+<Number>58</Number>
+</Property>
+<Property name="String">
+<String>3</String>
+</Property>
+<Property name="TransposedPitch">
+<Pitch><Step>A</Step><Accidental>#</Accidental><Octave>5</Octave></Pitch></Property></Properties>
+</Note>
+<Note id="2">
+<InstrumentArticulation>0</InstrumentArticulation>
+<Properties>
+<Property name="Bended">
+<Enable />
+
+</Property>
+<Property name="BendDestinationOffset">
+<Float>100.000000</Float>
+</Property>
+<Property name="BendDestinationValue">
+<Float>150.000000</Float>
+</Property>
+<Property name="BendMiddleOffset1">
+<Float>50.000000</Float>
+</Property>
+<Property name="BendMiddleOffset2">
+<Float>50.000000</Float>
+</Property>
+<Property name="BendMiddleValue">
+<Float>300.000000</Float>
+</Property>
+<Property name="BendOriginOffset">
+<Float>0.000000</Float>
+</Property>
+<Property name="BendOriginValue">
+<Float>0.000000</Float>
+</Property>
+<Property name="ConcertPitch">
+<Pitch><Step>F</Step><Accidental></Accidental><Octave>5</Octave></Pitch></Property><Property name="Fret">
+<Fret>10</Fret>
+</Property>
+<Property name="Midi">
+<Number>65</Number>
+</Property>
+<Property name="String">
+<String>3</String>
+</Property>
+<Property name="TransposedPitch">
+<Pitch><Step>F</Step><Accidental></Accidental><Octave>6</Octave></Pitch></Property></Properties>
+</Note>
+</Notes>
+<Rhythms>
+<Rhythm id="0">
+<NoteValue>Half</NoteValue>
+</Rhythm>
+<Rhythm id="1">
+<NoteValue>Whole</NoteValue>
+</Rhythm>
+</Rhythms>
+</GPIF>
