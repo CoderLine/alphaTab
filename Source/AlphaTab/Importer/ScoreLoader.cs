@@ -16,6 +16,7 @@
  * License along with this library.
  */
 using System;
+using AlphaTab.Collections;
 using AlphaTab.IO;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -29,7 +30,7 @@ namespace AlphaTab.Importer
     /// </summary>
     public partial class ScoreLoader
     {
-        public static Score LoadScoreFromBytes(byte[] data)
+        public static Score LoadScoreFromBytes(byte[] data, FastDictionary<string, object> importSettings = null)
         {
             var importers = ScoreImporter.BuildImporters();
 
@@ -43,7 +44,7 @@ namespace AlphaTab.Importer
                 try
                 {
                     Logger.Info("ScoreLoader", "Importing using importer " + importer.Name);
-                    importer.Init(bb);
+                    importer.Init(bb, importSettings);
                     score = importer.ReadScore();
                     Logger.Info("ScoreLoader", "Score imported using " + importer.Name);
                     break;

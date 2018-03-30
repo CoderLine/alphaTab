@@ -406,7 +406,14 @@ namespace AlphaTab.Platform.JavaScript
             }
             else
             {
-                a4.Style.Width = "210mm";
+                if (Settings.Layout.Mode == "horizontal")
+                {
+                    a4.Style.Width = "297mm";
+                }
+                else
+                {
+                    a4.Style.Width = "210mm";
+                }
             }
             preview.Document.Write("<!DOCTYPE html><html></head><body></body></html>");
             preview.Document.Body.AppendChild(a4);
@@ -595,18 +602,18 @@ namespace AlphaTab.Platform.JavaScript
             {
                 if (Platform.InstanceOf<ArrayBuffer>(data))
                 {
-                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes(Platform.ArrayBufferToByteArray((ArrayBuffer)data)));
+                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes(Platform.ArrayBufferToByteArray((ArrayBuffer)data), Settings.ImporterSettings));
                 }
                 else if (Platform.InstanceOf<Uint8Array>(data))
                 {
-                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes((byte[])data));
+                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes((byte[])data, Settings.ImporterSettings));
                 }
                 else if (Platform.TypeOf(data) == "string")
                 {
                     ScoreLoader.LoadScoreAsync((string)data, s => ScoreLoaded(s), e =>
                     {
                         Error("import", e);
-                    });
+                    }, Settings.ImporterSettings);
                 }
             }
             catch (Exception e)
@@ -623,7 +630,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 var parser = new AlphaTexImporter();
                 var data = ByteBuffer.FromBuffer(Platform.StringToByteArray(contents));
-                parser.Init(data);
+                parser.Init(data, Settings.ImporterSettings);
                 ScoreLoaded(parser.ReadScore());
             }
             catch (Exception e)

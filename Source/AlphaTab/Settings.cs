@@ -51,6 +51,15 @@ namespace AlphaTab
         public LayoutSettings Layout { get; set; }
 
         /// <summary>
+        /// Specific settings for importers. Keys are specific for the importers. 
+        /// <strong>MusicXML</strong>
+        /// <ul>
+        ///  <li><strong>musicxmlMergePartGroups</strong> - If part-groups should be merged into a single track (boolean, default:false)</li>
+        /// </ul>
+        /// </summary>
+        public FastDictionary<string, object> ImporterSettings { get; set; }
+
+        /// <summary>
         /// The default stretch force to use for layouting. 
         /// </summary>
         public float StretchForce { get; set; }
@@ -91,6 +100,8 @@ namespace AlphaTab
                 settings.Engine = "default";
                 settings.TranspositionPitches = new int[0];
                 settings.DisplayTranspositionPitches = new int[0];
+
+                settings.ImporterSettings = new FastDictionary<string, object>();
 
                 settings.Layout = LayoutSettings.Defaults;
 

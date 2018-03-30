@@ -22,7 +22,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class TextGlyph : EffectGlyph
     {
-        private readonly string _text;
+        private readonly string[] _lines;
 
         public Font Font { get; set; }
         public TextAlign TextAlign { get; set; }
@@ -30,7 +30,7 @@ namespace AlphaTab.Rendering.Glyphs
         public TextGlyph(float x, float y, string text, Font font, TextAlign textAlign = TextAlign.Left)
             : base(x, y)
         {
-            _text = text;
+            _lines = text.Split('\n');
             Font = font;
             TextAlign = textAlign;
         }
@@ -38,16 +38,21 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             base.DoLayout();
-            Height = Font.Size;
+            Height = Font.Size * _lines.Length;
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             canvas.Font = Font;
             var old = canvas.TextAlign;
-            canvas.TextAlign = TextAlign;
-            canvas.FillText(_text, cx + X, cy + Y);
-            canvas.TextAlign = old;
+            var y = cy + Y;
+            foreach (var line in _lines)
+            {
+                canvas.TextAlign = TextAlign;
+                canvas.FillText(line, cx + X, y);
+                canvas.TextAlign = old;
+                y += Font.Size;
+            }
         }
     }
 }

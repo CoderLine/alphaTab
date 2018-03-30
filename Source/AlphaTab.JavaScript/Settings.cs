@@ -206,6 +206,12 @@ namespace AlphaTab
                 json.layout.additionalSettings[setting] = Layout.AdditionalSettings[setting];
             }
 
+            json.importer = Platform.Platform.NewObject();
+            foreach (string setting in ImporterSettings)
+            {
+                json.importer[setting] = ImporterSettings[setting];
+            }
+
             json.staves = Platform.Platform.NewObject();
             json.staves.id = Staves.Id;
             json.staves.additionalSettings = Platform.Platform.NewObject();
@@ -415,6 +421,26 @@ namespace AlphaTab
             if (settings.EnablePlayer)
             {
                 FillPlayerOptions(settings, json, true, dataAttributes);
+            }
+
+            if (Platform.Platform.JsonExists(json, "importer"))
+            {
+                string[] keys2 = Platform.Platform.JsonKeys(json.importer);
+                foreach (var key2 in keys2)
+                {
+                    settings.ImporterSettings[key2.ToLower()] = json.importer[key2];
+                }
+            }
+            else if (dataAttributes != null)
+            {
+                foreach (var key in dataAttributes)
+                {
+                    if (key.StartsWith("importer"))
+                    {
+                        var property = key.Substring(8);
+                        settings.ImporterSettings[property.ToLower()] = dataAttributes[key];
+                    }
+                }
             }
         }
 

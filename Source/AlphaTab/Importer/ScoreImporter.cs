@@ -15,6 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System.Collections.Generic;
+using AlphaTab.Collections;
 using AlphaTab.IO;
 using AlphaTab.Model;
 
@@ -27,6 +30,7 @@ namespace AlphaTab.Importer
     public abstract class ScoreImporter
     {
         protected IReadable Data;
+        protected FastDictionary<string,object> ImportSettings;
 
         /**
          * Gets all default ScoreImporters
@@ -43,9 +47,21 @@ namespace AlphaTab.Importer
             };
         }
 
-        public virtual void Init(IReadable data)
+        public virtual void Init(IReadable data, FastDictionary<string, object> importSettings = null)
         {
             Data = data;
+            ImportSettings = importSettings;
+        }
+
+        protected T GetSetting<T>(string key, T defaultValue = default(T))
+        {
+            key = key.ToLower();
+            if (ImportSettings == null || !ImportSettings.ContainsKey(key))
+            {
+                return defaultValue;
+            }
+
+            return (T)ImportSettings[key];
         }
 
         public abstract string Name { get; }

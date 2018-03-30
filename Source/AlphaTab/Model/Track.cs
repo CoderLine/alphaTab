@@ -52,11 +52,16 @@ namespace AlphaTab.Model
         {
             while (Staves.Count < staveCount)
             {
-                var staff = new Staff();
-                staff.Index = Staves.Count;
-                staff.Track = this;
-                Staves.Add(staff);
+                AddStaff(new Staff());
             }
+        }
+
+
+        public void AddStaff(Staff staff)
+        {
+            staff.Index = Staves.Count;
+            staff.Track = this;
+            Staves.Add(staff);
         }
 
         public static void CopyTo(Track src, Track dst)

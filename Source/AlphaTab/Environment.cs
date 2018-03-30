@@ -37,6 +37,7 @@ namespace AlphaTab
         public static FastDictionary<string, BarRendererFactory[]> StaveProfiles;
         public const string StaveProfileScoreTab = "score-tab";
         public const string StaveProfileTab = "tab";
+        public const string StaveProfileTabMixed = "tab-mixed";
         public const string StaveProfileScore = "score";
 
         static Environment()
@@ -58,7 +59,7 @@ namespace AlphaTab
             LayoutEngines["horizontal"] = r => new HorizontalScreenLayout(r);
 
             // default combinations of stave textprofiles
-            StaveProfiles["default"] = StaveProfiles["score-tab"] = new BarRendererFactory[]
+            StaveProfiles["default"] = StaveProfiles[StaveProfileScoreTab] = new BarRendererFactory[]
             {
                 new EffectBarRendererFactory("score-effects", new IEffectBarRendererInfo[] {
                     new TempoEffectInfo(),
@@ -90,7 +91,7 @@ namespace AlphaTab
                 new TabBarRendererFactory(false, false, false)
             };
 
-            StaveProfiles["score"] = new BarRendererFactory[]
+            StaveProfiles[StaveProfileScore] = new BarRendererFactory[]
             {
                 new EffectBarRendererFactory("score-effects", new IEffectBarRendererInfo[] {
                     new TempoEffectInfo(), 
@@ -115,7 +116,7 @@ namespace AlphaTab
                 }),
             };
 
-            StaveProfiles["tab"] = new BarRendererFactory[]
+            StaveProfiles[StaveProfileTab] = new BarRendererFactory[]
             {
                 new EffectBarRendererFactory("tab-effects", new IEffectBarRendererInfo[] {
                     new TempoEffectInfo(), 
@@ -137,6 +138,33 @@ namespace AlphaTab
                     new AlternateEndingsEffectInfo()
                 }),
                 new TabBarRendererFactory(true, true, true),
+                new EffectBarRendererFactory("tab-bottom-effects", new IEffectBarRendererInfo[] {
+                    new LyricsEffectInfo(),
+                }),
+            };
+
+            StaveProfiles[StaveProfileTabMixed] = new BarRendererFactory[]
+            {
+                new EffectBarRendererFactory("tab-effects", new IEffectBarRendererInfo[] {
+                    new TempoEffectInfo(), 
+                    new TripletFeelEffectInfo(), 
+                    new MarkerEffectInfo(), 
+                    new TextEffectInfo(), 
+                    new ChordsEffectInfo(), 
+                    new TripletFeelEffectInfo(), 
+                    new TrillEffectInfo(), 
+                    new BeatVibratoEffectInfo(), 
+                    new NoteVibratoEffectInfo(), 
+                    new TapEffectInfo(), 
+                    new FadeInEffectInfo(), 
+                    new HarmonicsEffectInfo(), 
+                    new LetRingEffectInfo(), 
+                    new CapoEffectInfo(), 
+                    new PalmMuteEffectInfo(), 
+                    new PickStrokeEffectInfo(),
+                    new AlternateEndingsEffectInfo()
+                }),
+                new TabBarRendererFactory(false, false, false),
                 new EffectBarRendererFactory("tab-bottom-effects", new IEffectBarRendererInfo[] {
                     new LyricsEffectInfo(),
                 }),

@@ -32,6 +32,18 @@ using Phase.Attributes;
 
 namespace AlphaTab.Platform
 {
+    [Name("js.html.TextDecoder")]
+    [External]
+    public class TextDecoder
+    {
+        public extern TextDecoder(HaxeString label);
+
+        [Name("decode")]
+        public extern HaxeString Decode(ArrayBuffer data);
+        [Name("decode")]
+        public extern HaxeString Decode(ArrayBufferView data);
+    }
+
     public static partial class Platform
     {
         [Inline]
@@ -130,33 +142,65 @@ namespace AlphaTab.Platform
 
         public static string ToString(byte[] data)
         {
-            var s = new StringBuilder();
-            int i = 0;
-            while (i < data.Length)
+            if (SupportsTextDecoder)
             {
-                var c = data[i++];
-                if (c < 0x80)
-                {
-                    if (c == 0) break;
-                    s.AppendChar(c);
-                }
-                else if (c < 0xE0)
-                {
-                    s.AppendChar(((c & 0x3F) << 6) | (data[i++] & 0x7F));
-                }
-                else if (c < 0xF0)
-                {
-                    s.AppendChar(((c & 0x1F) << 12) | ((data[i++] & 0x7F) << 6) | (data[i++] & 0x7F));
-                }
-                else
-                {
-                    var u = ((c & 0x0F) << 18) | ((data[i++] & 0x7F) << 12) |
-                            ((data[i++] & 0x7F) << 6) | (data[i++] & 0x7F);
-                    s.AppendChar((u >> 18) + 0xD7C0);
-                    s.AppendChar((u & 0x3FF) | 0xDC00);
-                }
+            var encoding = DetectEncoding(data);
+                var decoder = new TextDecoder(encoding);
+                return decoder.Decode(data.As<ArrayBuffer>());
             }
-            return s.ToString();
+            else
+            {
+                // manual UTF8 decoding for older browsers
+                var s = new StringBuilder();
+                int i = 0;
+                while (i < data.Length)
+                {
+                    var c = data[i++];
+                    if (c < 0x80)
+                    {
+                        if (c == 0) break;
+                        s.AppendChar(c);
+                    }
+                    else if (c < 0xE0)
+                    {
+                        s.AppendChar(((c & 0x3F) << 6) | (data[i++] & 0x7F));
+                    }
+                    else if (c < 0xF0)
+                    {
+                        s.AppendChar(((c & 0x1F) << 12) | ((data[i++] & 0x7F) << 6) | (data[i++] & 0x7F));
+                    }
+                    else
+                    {
+                        var u = ((c & 0x0F) << 18) | ((data[i++] & 0x7F) << 12) |
+                                ((data[i++] & 0x7F) << 6) | (data[i++] & 0x7F);
+                        s.AppendChar((u >> 18) + 0xD7C0);
+                        s.AppendChar((u & 0x3FF) | 0xDC00);
+                    }
+                }
+                return s.ToString();
+            }
+        }
+
+        private static string DetectEncoding(byte[] data)
+        {
+            if (data[0] == 0xFE && data[1] == 0xFF)
+            {
+                return "utf-16be";
+            }
+            if (data[0] == 0xFF && data[1] == 0xFE)
+            {
+                return "utf-16le";
+            }
+            if (data[0] == 0x00 && data[1] == 0x00 && data[2] == 0xFE && data[3] == 0xFF)
+            {
+                return "utf-32be";
+            }
+            if (data[0] == 0xFF && data[1] == 0xFE && data[2] == 0x00 && data[3] == 0x00)
+            {
+                return "utf-32le";
+            }
+
+            return "utf-8";
         }
 
         public static byte[] StringToByteArray(string contents)
@@ -280,6 +324,16 @@ namespace AlphaTab.Platform
             get
             {
                 return Script.Write<bool>("untyped __js__(\"!!window.ForceFlash\")");
+            }
+        }
+
+
+        public static bool SupportsTextDecoder
+        {
+            [Inline]
+            get
+            {
+                return Script.Write<bool>("untyped __js__(\"!!self.TextDecoder\")");
             }
         }
 

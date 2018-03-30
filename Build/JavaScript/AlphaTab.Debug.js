@@ -618,27 +618,48 @@ alphaTab.platform.Platform.ReadSignedByte = function(readable) {
 	return system.Convert.ToInt8(n);
 };
 alphaTab.platform.Platform.ToString = function(data) {
-	var this1 = "";
-	var s = this1;
-	var i = 0;
-	while(i < data.length) {
-		var c = data[i++];
-		if(c < 128) {
-			if(c == 0) {
-				break;
+	if(!!self.TextDecoder) {
+		var encoding = alphaTab.platform.Platform.DetectEncoding(data);
+		var decoder = new TextDecoder(encoding);
+		return decoder.decode(data);
+	} else {
+		var this1 = "";
+		var s = this1;
+		var i = 0;
+		while(i < data.length) {
+			var c = data[i++];
+			if(c < 128) {
+				if(c == 0) {
+					break;
+				}
+				s += String.fromCharCode(c);
+			} else if(c < 224) {
+				s += String.fromCharCode((c & 63) << 6 | data[i++] & 127);
+			} else if(c < 240) {
+				s += String.fromCharCode((c & 31) << 12 | (data[i++] & 127) << 6 | data[i++] & 127);
+			} else {
+				var u = (c & 15) << 18 | (data[i++] & 127) << 12 | (data[i++] & 127) << 6 | data[i++] & 127;
+				s += String.fromCharCode((u >> 18) + 55232);
+				s += String.fromCharCode(u & 1023 | 56320);
 			}
-			s += String.fromCharCode(c);
-		} else if(c < 224) {
-			s += String.fromCharCode((c & 63) << 6 | data[i++] & 127);
-		} else if(c < 240) {
-			s += String.fromCharCode((c & 31) << 12 | (data[i++] & 127) << 6 | data[i++] & 127);
-		} else {
-			var u = (c & 15) << 18 | (data[i++] & 127) << 12 | (data[i++] & 127) << 6 | data[i++] & 127;
-			s += String.fromCharCode((u >> 18) + 55232);
-			s += String.fromCharCode(u & 1023 | 56320);
 		}
+		return s;
 	}
-	return s;
+};
+alphaTab.platform.Platform.DetectEncoding = function(data) {
+	if(data[0] == 254 && data[1] == 255) {
+		return "utf-16be";
+	}
+	if(data[0] == 255 && data[1] == 254) {
+		return "utf-16le";
+	}
+	if(data[0] == 0 && data[1] == 0 && data[2] == 254 && data[3] == 255) {
+		return "utf-32be";
+	}
+	if(data[0] == 255 && data[1] == 254 && data[2] == 0 && data[3] == 0) {
+		return "utf-32le";
+	}
+	return "utf-8";
 };
 alphaTab.platform.Platform.StringToByteArray = function(contents) {
 	var this1 = new Uint8Array(contents.length);
@@ -715,6 +736,9 @@ alphaTab.platform.Platform.get_SupportsWebWorkers = function() {
 };
 alphaTab.platform.Platform.get_ForceFlash = function() {
 	return !!window.ForceFlash;
+};
+alphaTab.platform.Platform.get_SupportsTextDecoder = function() {
+	return !!self.TextDecoder;
 };
 alphaTab.platform.Platform.ArrayCopy_Int32Array_Int32_Int32Array_Int32_Int32 = function(src,srcOffset,dst,dstOffset,count) {
 	dst.set(src.subarray(srcOffset,srcOffset+count), dstOffset);
@@ -5081,16 +5105,42 @@ alphaTab.rendering.layout.ScoreLayout.prototype = {
 		var trackIndex = 0;
 		while(trackIndex < this.Renderer.Tracks.length) {
 			var track = this.Renderer.Tracks[trackIndex];
+			var hasScore = false;
+			var hasTab = false;
+			var staff = $iterator(track.Staves)();
+			while(staff.hasNext()) {
+				var staff1 = staff.next();
+				var _g = staff1.StaffKind;
+				switch(_g) {
+				case 0:
+					hasTab = true;
+					break;
+				case 1:
+					hasScore = true;
+					break;
+				case 2:
+					break;
+				case 3:
+					hasScore = true;
+					hasTab = true;
+					break;
+				default:
+				}
+			}
 			var staffIndex = 0;
 			while(staffIndex < track.Staves.length) {
-				var staff = track.Staves[staffIndex];
+				var staff2 = track.Staves[staffIndex];
 				var staveProfile;
-				if(staff.StaffKind == 2) {
+				if(staff2.StaffKind == 2) {
 					staveProfile = "score";
-				} else if(staff.get_IsStringed()) {
+				} else if(staff2.StaffKind == 0) {
+					if(hasScore) {
+						staveProfile = "tab-mixed";
+					} else {
+						staveProfile = "tab";
+					}
+				} else if(staff2.get_IsStringed()) {
 					staveProfile = this.Renderer.Settings.Staves.Id;
-				} else if(staff.StaffKind == 0) {
-					staveProfile = "tab";
 				} else {
 					staveProfile = "score";
 				}
@@ -5098,8 +5148,8 @@ alphaTab.rendering.layout.ScoreLayout.prototype = {
 				var factory = HxOverrides.iter(profile);
 				while(factory.hasNext()) {
 					var factory1 = factory.next();
-					if(factory1.CanCreate(track,staff)) {
-						group.AddStaff(track,new alphaTab.rendering.staves.Staff(trackIndex,staff,factory1));
+					if(factory1.CanCreate(track,staff2)) {
+						group.AddStaff(track,new alphaTab.rendering.staves.Staff(trackIndex,staff2,factory1));
 					}
 				}
 				++staffIndex;
@@ -6409,6 +6459,7 @@ alphaTab.Environment.Init = function() {
 	alphaTab.Environment.StaveProfiles["default"] = alphaTab.Environment.StaveProfiles["score-tab"] = [new alphaTab.rendering.EffectBarRendererFactory("score-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.BeatVibratoEffectInfo(),new alphaTab.rendering.effects.NoteVibratoEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.ScoreBarRendererFactory(),new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.CrescendoEffectInfo(),new alphaTab.rendering.effects.DynamicsEffectInfo(),new alphaTab.rendering.effects.LyricsEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.BeatVibratoEffectInfo(),new alphaTab.rendering.effects.NoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(false,false,false)];
 	alphaTab.Environment.StaveProfiles["score"] = [new alphaTab.rendering.EffectBarRendererFactory("score-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.BeatVibratoEffectInfo(),new alphaTab.rendering.effects.NoteVibratoEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.ScoreBarRendererFactory(),new alphaTab.rendering.EffectBarRendererFactory("score-bottom-effects",[new alphaTab.rendering.effects.CrescendoEffectInfo(),new alphaTab.rendering.effects.DynamicsEffectInfo(),new alphaTab.rendering.effects.LyricsEffectInfo()])];
 	alphaTab.Environment.StaveProfiles["tab"] = [new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.BeatVibratoEffectInfo(),new alphaTab.rendering.effects.NoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(true,true,true),new alphaTab.rendering.EffectBarRendererFactory("tab-bottom-effects",[new alphaTab.rendering.effects.LyricsEffectInfo()])];
+	alphaTab.Environment.StaveProfiles["tab-mixed"] = [new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.BeatVibratoEffectInfo(),new alphaTab.rendering.effects.NoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(false,false,false),new alphaTab.rendering.EffectBarRendererFactory("tab-bottom-effects",[new alphaTab.rendering.effects.LyricsEffectInfo()])];
 };
 alphaTab.Environment.prototype = {
 	__class__: alphaTab.Environment
@@ -6622,6 +6673,24 @@ alphaTab.Settings.FillFromJson = function(settings,json,dataAttributes) {
 	if(settings.EnablePlayer) {
 		alphaTab.Settings.FillPlayerOptions(settings,json,true,dataAttributes);
 	}
+	if((json && "importer" in json)) {
+		var json1 = json.importer;
+		var keys2 = Object.keys(json1);
+		var key21 = HxOverrides.iter(keys2);
+		while(key21.hasNext()) {
+			var key22 = key21.next();
+			settings.ImporterSettings[key22.toLowerCase()] = json.importer[key22];
+		}
+	} else if(dataAttributes != null) {
+		var key4 = $iterator(Object.keys(dataAttributes))();
+		while(key4.hasNext()) {
+			var key5 = key4.next();
+			if(StringTools.startsWith(key5,"importer")) {
+				var property2 = HxOverrides.substr(key5,8,null);
+				settings.ImporterSettings[property2.toLowerCase()] = dataAttributes[key5];
+			}
+		}
+	}
 };
 alphaTab.Settings.FillCursorOffset = function(settings,playerOffset) {
 	if(typeof(playerOffset) == "number") {
@@ -6712,6 +6781,8 @@ alphaTab.Settings.get_Defaults = function() {
 	settings.TranspositionPitches = this1;
 	var this2 = new Int32Array(0);
 	settings.DisplayTranspositionPitches = this2;
+	var this3 = {}
+	settings.ImporterSettings = this3;
 	settings.Layout = alphaTab.LayoutSettings.get_Defaults();
 	settings.Staves = new alphaTab.StaveSettings("default");
 	alphaTab.Settings.SetDefaults(settings);
@@ -6740,11 +6811,18 @@ alphaTab.Settings.prototype = {
 			var setting1 = setting.next();
 			json.layout.additionalSettings[setting1] = this.Layout.AdditionalSettings[setting1];
 		}
+		json.importer = {}
+		var this2 = this.ImporterSettings;
+		var setting2 = $iterator(Object.keys(this2))();
+		while(setting2.hasNext()) {
+			var setting3 = setting2.next();
+			json.importer[setting3] = this.ImporterSettings[setting3];
+		}
 		json.staves = {}
 		json.staves.id = this.Staves.Id;
 		json.staves.additionalSettings = {}
-		var this2 = this.Staves.AdditionalSettings;
-		var additionalSetting = $iterator(Object.keys(this2))();
+		var this3 = this.Staves.AdditionalSettings;
+		var additionalSetting = $iterator(Object.keys(this3))();
 		while(additionalSetting.hasNext()) {
 			var additionalSetting1 = additionalSetting.next();
 			json.staves.additionalSettings[additionalSetting1] = this.Staves.AdditionalSettings[additionalSetting1];
@@ -12110,8 +12188,16 @@ alphaTab.importer.ScoreImporter.BuildImporters = function() {
 	return [new alphaTab.importer.Gp3To5Importer(),new alphaTab.importer.GpxImporter(),new alphaTab.importer.AlphaTexImporter(),new alphaTab.importer.MusicXmlImporter()];
 };
 alphaTab.importer.ScoreImporter.prototype = {
-	Init: function(data) {
+	Init: function(data,importSettings) {
 		this.Data = data;
+		this.ImportSettings = importSettings;
+	}
+	,GetSetting: function(key,defaultValue) {
+		key = key.toLowerCase();
+		if(this.ImportSettings == null || !this.ImportSettings.hasOwnProperty(key)) {
+			return defaultValue;
+		}
+		return this.ImportSettings[key];
 	}
 	,get_Name: function() {
 		throw new js._Boot.HaxeError("abstract");
@@ -16108,6 +16194,8 @@ alphaTab.importer.MixTableChange.prototype = {
 	__class__: alphaTab.importer.MixTableChange
 };
 alphaTab.importer.MusicXmlImporter = $hx_exports["alphaTab"]["importer"]["MusicXmlImporter"] = function() {
+	var this1 = {}
+	this._voiceOfStaff = this1;
 	alphaTab.importer.ScoreImporter.call(this);
 };
 alphaTab.importer.MusicXmlImporter.__name__ = ["alphaTab","importer","MusicXmlImporter"];
@@ -16117,7 +16205,1315 @@ alphaTab.importer.MusicXmlImporter.prototype = $extend(alphaTab.importer.ScoreIm
 		return "MusicXML";
 	}
 	,ReadScore: function() {
-		throw new js._Boot.HaxeError(new alphaTab.importer.UnsupportedFormatException().UnsupportedFormatException(""));
+		var this1 = {}
+		this._trackById = this1;
+		var this2 = {}
+		this._partGroups = this2;
+		var this3 = [];
+		this._tieStarts = this3;
+		var xml = alphaTab.platform.Platform.ToString(this.Data.ReadAll());
+		var dom;
+		try {
+			dom = new alphaTab.xml.XmlDocument(xml);
+		} catch( __e ) {
+			if (__e instanceof js._Boot.HaxeError) __e = __e.val;
+			if( js.Boot.__instanceof(__e,system.Exception) ) {
+				throw new js._Boot.HaxeError(new alphaTab.importer.UnsupportedFormatException().UnsupportedFormatException(""));
+			} else throw(__e);
+		}
+		this._score = new alphaTab.model.Score();
+		this._score.Tempo = 120;
+		this.ParseDom(dom);
+		if(this.GetSetting("musicXMLMergePartGroups",false)) {
+			this.MergePartGroups();
+		}
+		this._score.Finish();
+		this._score.RebuildRepeatGroups();
+		return this._score;
+	}
+	,MergePartGroups: function() {
+		var anyMerged = false;
+		var this1 = this._partGroups;
+		var groupId = $iterator(Object.keys(this1))();
+		while(groupId.hasNext()) {
+			var groupId1 = groupId.next();
+			var tracks = this._partGroups[groupId1];
+			if(tracks.length > 1) {
+				this.MergeGroup(tracks);
+				anyMerged = true;
+			}
+		}
+		if(anyMerged) {
+			var i = 0;
+			while(i < this._score.Tracks.length) {
+				this._score.Tracks[i].Index = i;
+				++i;
+			}
+		}
+	}
+	,MergeGroup: function(partGroup) {
+		var primaryTrack = partGroup[0];
+		var i = 1;
+		while(i < partGroup.length) {
+			var secondaryTrack = partGroup[i];
+			var staff = $iterator(secondaryTrack.Staves)();
+			while(staff.hasNext()) {
+				var staff1 = staff.next();
+				primaryTrack.AddStaff(staff1);
+			}
+			var trackIndex = this._score.Tracks.indexOf(secondaryTrack);
+			if(trackIndex != -1) {
+				this._score.Tracks.splice(trackIndex,1);
+			}
+			++i;
+		}
+	}
+	,ParseDom: function(dom) {
+		var root = dom.DocumentElement;
+		if(root == null) {
+			throw new js._Boot.HaxeError(new alphaTab.importer.UnsupportedFormatException().UnsupportedFormatException(""));
+		}
+		var _g = root.LocalName;
+		switch(_g) {
+		case "score-partwise":
+			this.ParsePartwise(root);
+			break;
+		case "score-timewise":
+			break;
+		default:
+			throw new js._Boot.HaxeError(new alphaTab.importer.UnsupportedFormatException().UnsupportedFormatException(""));
+		}
+	}
+	,ParsePartwise: function(element) {
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "identification":
+					this.ParseIdentification(c1);
+					break;
+				case "movement-title":
+					this._score.Title = c1.get_InnerText();
+					break;
+				case "part":
+					this.ParsePart(c1);
+					break;
+				case "part-list":
+					this.ParsePartList(c1);
+					break;
+				case "work":
+					this.ParseWork(c1);
+					break;
+				default:
+				}
+			}
+		}
+	}
+	,ParseWork: function(element) {
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				if(_g == "work-title") {
+					this._score.Title = c1.get_InnerText();
+				}
+			}
+		}
+	}
+	,ParsePart: function(element) {
+		var id = element.GetAttribute("id");
+		if(!this._trackById.hasOwnProperty(id)) {
+			return;
+		}
+		var track = this._trackById[id];
+		var isFirstMeasure = true;
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				if(_g == "measure") {
+					if(this.ParseMeasure(c1,track,isFirstMeasure)) {
+						isFirstMeasure = false;
+					}
+				}
+			}
+		}
+	}
+	,ParseMeasure: function(element,track,isFirstMeasure) {
+		if(element.GetAttribute("implicit") == "yes" && element.GetElementsByTagName("note",false).length == 0) {
+			return false;
+		}
+		var barIndex = 0;
+		var barWidth = alphaTab.platform.Platform.ParseInt(element.GetAttribute("width"));
+		if(barWidth == -2147483648) {
+			barWidth = 0;
+		}
+		if(isFirstMeasure) {
+			this._divisionsPerQuarterNote = 0;
+			this._trackFirstMeasureNumber = alphaTab.platform.Platform.ParseInt(element.GetAttribute("number"));
+			if(this._trackFirstMeasureNumber == -2147483648) {
+				this._trackFirstMeasureNumber = 0;
+			}
+			barIndex = 0;
+		} else {
+			barIndex = alphaTab.platform.Platform.ParseInt(element.GetAttribute("number"));
+			if(barIndex == -2147483648) {
+				return false;
+			}
+			barIndex = barIndex - this._trackFirstMeasureNumber;
+		}
+		if(isFirstMeasure) {
+			var attributes = element.GetElementsByTagName("attributes",false);
+			if(attributes.length > 0) {
+				var stavesElements = attributes[0].GetElementsByTagName("staves",false);
+				if(stavesElements.length > 0) {
+					var staves = alphaTab.platform.Platform.ParseInt(stavesElements[0].get_InnerText());
+					track.EnsureStaveCount(staves);
+				}
+			}
+		}
+		var size = track.Staves.length;
+		var this1 = new Array(size);
+		var bars = this1;
+		var masterBar = null;
+		var b = track.Staves[0].Bars.length;
+		while(b <= barIndex) {
+			var s = 0;
+			while(s < track.Staves.length) {
+				var bar = bars[s] = new alphaTab.model.Bar();
+				if(track.Staves[s].Bars.length > 0) {
+					var previousBar = track.Staves[s].Bars[track.Staves[s].Bars.length - 1];
+					bar.Clef = previousBar.Clef;
+				}
+				masterBar = this.GetOrCreateMasterBar(barIndex);
+				track.Staves[s].AddBar(bar);
+				var v = 0;
+				while(v < this._maxVoices) {
+					var emptyVoice = new alphaTab.model.Voice();
+					bar.AddVoice(emptyVoice);
+					var _tmp = new alphaTab.model.Beat();
+					_tmp.IsEmpty = true;
+					var emptyBeat = _tmp;
+					emptyBeat.ChordId = this._currentChord;
+					emptyVoice.AddBeat(emptyBeat);
+					++v;
+				}
+				++s;
+			}
+			++b;
+		}
+		var attributesParsed = false;
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "attributes":
+					if(!attributesParsed) {
+						this.ParseAttributes(c1,bars,masterBar,track);
+						attributesParsed = true;
+					}
+					break;
+				case "barline":
+					this.ParseBarline(c1,masterBar);
+					break;
+				case "direction":
+					this.ParseDirection(c1,masterBar);
+					break;
+				case "forward":
+					this.ParseForward(c1,bars);
+					break;
+				case "harmony":
+					this.ParseHarmony(c1,track);
+					break;
+				case "note":
+					this.ParseNoteBeat(c1,bars);
+					break;
+				case "sound":
+					break;
+				default:
+				}
+			}
+		}
+		return true;
+	}
+	,GetOrCreateBeat: function(element,bars,chord) {
+		var voiceIndex = 0;
+		var voiceNodes = element.GetElementsByTagName("voice",false);
+		if(voiceNodes.length > 0) {
+			voiceIndex = alphaTab.platform.Platform.ParseInt(voiceNodes[0].get_InnerText()) - 1;
+		}
+		var previousBeatWasPulled = this._previousBeatWasPulled;
+		this._previousBeatWasPulled = false;
+		var staffElement = element.GetElementsByTagName("staff",false);
+		var staff = 1;
+		if(staffElement.length > 0) {
+			staff = alphaTab.platform.Platform.ParseInt(staffElement[0].get_InnerText());
+			if((this._isBeamContinue || previousBeatWasPulled) && this._previousBeat.Voice.Bar.Staff.Index != staff - 1) {
+				staff = this._previousBeat.Voice.Bar.Staff.Index + 1;
+				this._previousBeatWasPulled = true;
+			}
+			var staffId = Std.string(bars[0].Staff.Track.Index) + "-" + Std.string(staff);
+			if(!this._voiceOfStaff.hasOwnProperty(staffId)) {
+				this._voiceOfStaff[staffId] = voiceIndex;
+			}
+			voiceIndex = voiceIndex - this._voiceOfStaff[staffId];
+		}
+		var bar = bars[staff - 1];
+		var beat;
+		var voice = this.GetOrCreateVoice(bar,voiceIndex);
+		if(chord || voice.Beats.length == 1 && voice.IsEmpty) {
+			beat = voice.Beats[voice.Beats.length - 1];
+		} else {
+			beat = new alphaTab.model.Beat();
+			beat.IsEmpty = false;
+			voice.AddBeat(beat);
+		}
+		this._isBeamContinue = false;
+		this._previousBeat = beat;
+		return beat;
+	}
+	,ParseForward: function(element,bars) {
+		var beat = this.GetOrCreateBeat(element,bars,false);
+		var durationInDivisions = alphaTab.platform.Platform.ParseInt(element.FindChildElement("duration").get_InnerText());
+		var duration = durationInDivisions * 4 / js.Boot.__cast(this._divisionsPerQuarterNote , Float);
+		var durations = new Int32Array([64,32,16,8,4,2,1]);
+		var d = new system.Int32ArrayIterator(durations);
+		while(d.hasNext()) {
+			var d1 = d.next();
+			if(duration >= d1) {
+				beat.Duration = js.Boot.__cast(d1 , Int);
+				duration = duration - d1;
+				break;
+			}
+		}
+		var tmp = duration > 0;
+		beat.IsEmpty = false;
+	}
+	,ParseStaffDetails: function(element,track) {
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "staff-lines":
+					var staff = $iterator(track.Staves)();
+					while(staff.hasNext()) {
+						var staff1 = staff.next();
+						var this1 = new Int32Array(alphaTab.platform.Platform.ParseInt(c1.get_InnerText()));
+						staff1.Tuning = this1;
+					}
+					break;
+				case "staff-tuning":
+					this.ParseStaffTuning(c1,track);
+					break;
+				default:
+				}
+			}
+		}
+		var staff2 = $iterator(track.Staves)();
+		while(staff2.hasNext()) {
+			var staff3 = staff2.next();
+			if(this.IsEmptyTuning(staff3.Tuning)) {
+				var this2 = new Int32Array(0);
+				staff3.Tuning = this2;
+			}
+		}
+	}
+	,ParseStaffTuning: function(element,track) {
+		var line = alphaTab.platform.Platform.ParseInt(element.GetAttribute("line"));
+		var tuningStep = "C";
+		var tuningOctave = "";
+		var tuningAlter = 0;
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "tuning-alter":
+					tuningAlter = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					break;
+				case "tuning-octave":
+					tuningOctave = c1.get_InnerText();
+					break;
+				case "tuning-step":
+					tuningStep = c1.get_InnerText();
+					break;
+				default:
+				}
+			}
+		}
+		var tuning = alphaTab.model.TuningParser.GetTuningForText(tuningStep + tuningOctave) + tuningAlter;
+		var staff = $iterator(track.Staves)();
+		while(staff.hasNext()) {
+			var staff1 = staff.next();
+			staff1.Tuning[staff1.Tuning.length - line] = tuning;
+		}
+	}
+	,ParseHarmony: function(element,track) {
+		var rootStep = null;
+		var rootAlter = "";
+		var kind = null;
+		var kindText = null;
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "kind":
+					kindText = c1.GetAttribute("text");
+					kind = c1.get_InnerText();
+					break;
+				case "root":
+					var rootChild = $iterator(c1.ChildNodes)();
+					while(rootChild.hasNext()) {
+						var rootChild1 = rootChild.next();
+						if(rootChild1.NodeType == 1) {
+							var _g1 = rootChild1.LocalName;
+							switch(_g1) {
+							case "root-alter":
+								var _g2 = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+								switch(_g2) {
+								case -2:
+									rootAlter = " bb";
+									break;
+								case -1:
+									rootAlter = " b";
+									break;
+								case 0:
+									rootAlter = "";
+									break;
+								case 1:
+									rootAlter = " #";
+									break;
+								case 2:
+									rootAlter = " ##";
+									break;
+								default:
+								}
+								break;
+							case "root-step":
+								rootStep = rootChild1.get_InnerText();
+								break;
+							default:
+							}
+						}
+					}
+					break;
+				default:
+				}
+			}
+		}
+		var chord = new alphaTab.model.Chord();
+		chord.Name = rootStep + rootAlter;
+		this._currentChord = alphaTab.platform.Platform.NewGuid();
+		var staff = $iterator(track.Staves)();
+		while(staff.hasNext()) {
+			var staff1 = staff.next();
+			staff1.Chords[this._currentChord] = chord;
+		}
+	}
+	,ParseBarline: function(element,masterBar) {
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "ending":
+					this.ParseEnding(c1,masterBar);
+					break;
+				case "repeat":
+					this.ParseRepeat(c1,masterBar);
+					break;
+				default:
+				}
+			}
+		}
+	}
+	,ParseEnding: function(element,masterBar) {
+		var number = alphaTab.platform.Platform.ParseInt(element.GetAttribute("number"));
+		if(number > 0) {
+			--number;
+			masterBar.AlternateEndings = system.Convert.ToUInt8(masterBar.AlternateEndings | system.Convert.ToUInt8(1 << number));
+		}
+	}
+	,ParseRepeat: function(element,masterBar) {
+		var direction = element.GetAttribute("direction");
+		var times = alphaTab.platform.Platform.ParseInt(element.GetAttribute("times"));
+		if(times < 0) {
+			times = 2;
+		}
+		if(direction == "backward") {
+			masterBar.RepeatCount = times;
+		} else if(direction == "forward") {
+			masterBar.IsRepeatStart = true;
+		}
+	}
+	,ParseNoteBeat: function(element,bars) {
+		var chord = element.GetElementsByTagName("chord",false).length > 0;
+		var beat = this.GetOrCreateBeat(element,bars,chord);
+		if(beat.ChordId == null && this._currentChord != null) {
+			beat.ChordId = this._currentChord;
+			this._currentChord = null;
+		}
+		if(this._currentDirection != null) {
+			beat.Text = this._currentDirection;
+			this._currentDirection = null;
+		}
+		var note = new alphaTab.model.Note();
+		beat.Voice.IsEmpty = false;
+		beat.IsEmpty = false;
+		beat.AddNote(note);
+		beat.Dots = 0;
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "accidental":
+					this.ParseAccidental(c1,note);
+					break;
+				case "beam":
+					var beamMode = c1.get_InnerText();
+					if(beamMode == "continue") {
+						this._isBeamContinue = true;
+					}
+					break;
+				case "cue":
+					break;
+				case "dot":
+					beat.Dots++;
+					break;
+				case "duration":
+					if(beat.get_IsRest()) {
+						var duration = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+						switch(duration) {
+						case 1:
+							beat.Duration = 1;
+							break;
+						case 2:
+							beat.Duration = 2;
+							break;
+						case 4:
+							beat.Duration = 4;
+							break;
+						case 8:
+							beat.Duration = 8;
+							break;
+						case 16:
+							beat.Duration = 16;
+							break;
+						case 32:
+							beat.Duration = 32;
+							break;
+						case 64:
+							beat.Duration = 64;
+							break;
+						default:
+							beat.Duration = 4;
+						}
+					}
+					break;
+				case "grace":
+					beat.GraceType = 2;
+					beat.Duration = 32;
+					break;
+				case "instrument":
+					break;
+				case "lyric":
+					this.ParseLyric(c1,beat);
+					break;
+				case "notations":
+					this.ParseNotations(c1,beat,note);
+					break;
+				case "notehead":
+					if(c1.GetAttribute("parentheses") == "yes") {
+						note.IsGhost = true;
+					}
+					break;
+				case "pitch":
+					this.ParsePitch(c1,note);
+					break;
+				case "rest":
+					beat.IsEmpty = false;
+					var this1 = [];
+					beat.Notes = this1;
+					break;
+				case "stem":
+					break;
+				case "tie":
+					this.ParseTied(c1,note);
+					break;
+				case "time-modification":
+					this.ParseTimeModification(c1,beat);
+					break;
+				case "type":
+					beat.Duration = this.GetDuration(c1.get_InnerText());
+					if(beat.GraceType != 0 && beat.Duration < 16) {
+						beat.Duration = 8;
+					}
+					break;
+				case "unpitched":
+					this.ParseUnpitched(c1,note);
+					break;
+				default:
+				}
+			}
+		}
+		if(note.get_IsStringed()) {
+			var i = 0;
+			while(i < beat.Notes.length) {
+				if(beat.Notes[i].String == note.String && beat.Notes[i] != note) {
+					beat.RemoveNote(note);
+					break;
+				}
+				++i;
+			}
+		}
+	}
+	,GetDuration: function(text) {
+		switch(text) {
+		case "128th":case "256th":case "64th":
+			return 64;
+		case "16th":
+			return 16;
+		case "32nd":
+			return 32;
+		case "breve":case "long":case "whole":
+			return 1;
+		case "eighth":
+			return 8;
+		case "half":
+			return 2;
+		case "quarter":
+			return 4;
+		default:
+		}
+		return 4;
+	}
+	,ParseLyric: function(element,beat) {
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				if(_g == "text") {
+					var s = beat.Text;
+					if(!(s == null || s.length == 0)) {
+						beat.Text = beat.Text + (" " + c1.get_InnerText());
+					} else {
+						beat.Text = c1.get_InnerText();
+					}
+				}
+			}
+		}
+	}
+	,ParseAccidental: function(element,note) {
+		var _g = element.get_InnerText();
+		switch(_g) {
+		case "double-sharp":
+			break;
+		case "flat":
+			note.AccidentalMode = 4;
+			break;
+		case "flat-flat":
+			break;
+		case "natural":
+			note.AccidentalMode = 2;
+			break;
+		case "natural-flat":
+			break;
+		case "natural-sharp":
+			break;
+		case "quarter-flat":
+			break;
+		case "quarter-sharp":
+			break;
+		case "sharp":
+			note.AccidentalMode = 3;
+			break;
+		case "sharp-sharp":
+			break;
+		case "three-quarters-flat":
+			break;
+		case "three-quarters-sharp":
+			break;
+		default:
+		}
+	}
+	,ParseTied: function(element,note) {
+		if(note.Beat.GraceType != 0) {
+			return;
+		}
+		if(element.GetAttribute("type") == "start") {
+			note.IsTieOrigin = true;
+			this._tieStarts.push(note);
+		} else if(element.GetAttribute("type") == "stop" && this._tieStarts.length > 0) {
+			note.TieDestination = this._tieStarts[0];
+			note.IsTieDestination = true;
+			if(true) {
+				this._tieStarts.splice(0,1);
+			}
+		}
+	}
+	,ParseNotations: function(element,beat,note) {
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "articulations":
+					this.ParseArticulations(c1,note);
+					break;
+				case "dynamics":
+					this.ParseDynamics(c1,beat);
+					break;
+				case "glissando":case "slide":
+					if(c1.GetAttribute("type") == "start") {
+						note.SlideType = 1;
+					}
+					break;
+				case "ornaments":
+					this.ParseOrnaments(c1,note);
+					break;
+				case "slur":
+					if(c1.GetAttribute("type") == "start") {
+						beat.IsLegatoOrigin = true;
+					}
+					break;
+				case "technical":
+					this.ParseTechnical(c1,note);
+					break;
+				case "tied":
+					this.ParseTied(c1,note);
+					break;
+				default:
+				}
+			}
+		}
+	}
+	,ParseOrnaments: function(element,note) {
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				if(_g == "tremolo") {
+					var tremoloSpeed = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					switch(tremoloSpeed) {
+					case 1:
+						note.Beat.TremoloSpeed = 8;
+						break;
+					case 2:
+						note.Beat.TremoloSpeed = 16;
+						break;
+					case 3:
+						note.Beat.TremoloSpeed = 32;
+						break;
+					default:
+					}
+				}
+			}
+		}
+	}
+	,ParseTechnical: function(element,note) {
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "down-bow":
+					note.Beat.PickStroke = 2;
+					break;
+				case "fret":
+					note.Fret = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					break;
+				case "string":
+					note.String = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					if(note.String != -2147483648) {
+						note.String = note.Beat.Voice.Bar.Staff.Tuning.length - note.String + 1;
+					}
+					break;
+				case "up-bow":
+					note.Beat.PickStroke = 1;
+					break;
+				default:
+				}
+			}
+		}
+		if(note.String == -2147483648 || note.Fret == -2147483648) {
+			note.String = -1;
+			note.Fret = -1;
+		}
+	}
+	,ParseArticulations: function(element,note) {
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			var _g = c1.LocalName;
+			switch(_g) {
+			case "accent":
+				note.Accentuated = 1;
+				break;
+			case "detached-legato":case "staccato":
+				note.IsStaccato = true;
+				break;
+			case "strong-accent":
+				note.Accentuated = 2;
+				break;
+			default:
+			}
+		}
+	}
+	,ParseDynamics: function(element,beat) {
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "f":
+					beat.Dynamic = 5;
+					break;
+				case "ff":
+					beat.Dynamic = 6;
+					break;
+				case "fff":
+					beat.Dynamic = 7;
+					break;
+				case "mf":
+					beat.Dynamic = 4;
+					break;
+				case "mp":
+					beat.Dynamic = 3;
+					break;
+				case "p":
+					beat.Dynamic = 2;
+					break;
+				case "pp":
+					beat.Dynamic = 1;
+					break;
+				case "ppp":
+					beat.Dynamic = 0;
+					break;
+				default:
+				}
+			}
+		}
+	}
+	,ParseTimeModification: function(element,beat) {
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "actual-notes":
+					beat.TupletNumerator = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					break;
+				case "normal-notes":
+					beat.TupletDenominator = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					break;
+				default:
+				}
+			}
+		}
+	}
+	,ParseUnpitched: function(element,note) {
+		var step = null;
+		var semitones = 0;
+		var octave = 0;
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "display-alter":
+					semitones = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					break;
+				case "display-octave":
+					octave = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					break;
+				case "display-step":
+					step = c1.get_InnerText();
+					break;
+				default:
+				}
+			}
+		}
+		var value = octave * 12 + alphaTab.model.TuningParser.GetToneForText(step) + semitones;
+		note.Octave = value / 12 | 0;
+		note.Tone = value - note.Octave * 12;
+	}
+	,ParsePitch: function(element,note) {
+		var step = null;
+		var semitones = 0;
+		var octave = 0;
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "alter":
+					var s = c1.get_InnerText();
+					semitones = parseFloat(s);
+					var this1 = semitones;
+					if(isNaN(this1)) {
+						semitones = 0;
+					}
+					break;
+				case "octave":
+					octave = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					break;
+				case "step":
+					step = c1.get_InnerText();
+					break;
+				default:
+				}
+			}
+		}
+		var value = octave * 12 + alphaTab.model.TuningParser.GetToneForText(step) + system.Convert.ToInt32_Single(semitones);
+		note.Octave = value / 12 | 0;
+		note.Tone = value - note.Octave * 12;
+	}
+	,GetOrCreateVoice: function(bar,index) {
+		if(index < bar.Voices.length) {
+			return bar.Voices[index];
+		}
+		var i = bar.Voices.length;
+		while(i <= index) {
+			bar.AddVoice(new alphaTab.model.Voice());
+			++i;
+		}
+		this._maxVoices = Math.max(this._maxVoices,bar.Voices.length);
+		return bar.Voices[index];
+	}
+	,ParseDirection: function(element,masterBar) {
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "direction-type":
+					var directionType = c1.FirstElement;
+					var _g1 = directionType.LocalName;
+					switch(_g1) {
+					case "metronome":
+						this.ParseMetronome(c1.FirstElement,masterBar);
+						break;
+					case "words":
+						this._currentDirection = directionType.get_InnerText();
+						break;
+					default:
+					}
+					break;
+				case "sound":
+					var tempo = c1.GetAttribute("tempo");
+					if(!(tempo == null || tempo.length == 0)) {
+						var tempoAutomation = new alphaTab.model.Automation();
+						tempoAutomation.IsLinear = true;
+						tempoAutomation.Type = 0;
+						var this1 = alphaTab.platform.Platform.ParseInt(tempo);
+						tempoAutomation.Value = this1;
+						masterBar.TempoAutomation = tempoAutomation;
+					}
+					break;
+				default:
+				}
+			}
+		}
+	}
+	,ParseMetronome: function(element,masterBar) {
+		var unit = 4;
+		var perMinute = 120;
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "beat-unit":
+					unit = this.GetDuration(c1.get_InnerText());
+					break;
+				case "per-minute":
+					perMinute = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					break;
+				default:
+				}
+			}
+		}
+		var tempoAutomation = masterBar.TempoAutomation = new alphaTab.model.Automation();
+		tempoAutomation.Type = 0;
+		var this1 = perMinute * (unit / 4 | 0);
+		tempoAutomation.Value = this1;
+	}
+	,ParseAttributes: function(element,bars,masterBar,track) {
+		var number;
+		var hasTime = false;
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "clef":
+					number = alphaTab.platform.Platform.ParseInt(c1.GetAttribute("number"));
+					if(number == -2147483648) {
+						number = 1;
+					}
+					this.ParseClef(c1,bars[number - 1]);
+					break;
+				case "divisions":
+					this._divisionsPerQuarterNote = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					break;
+				case "key":
+					this.ParseKey(c1,masterBar);
+					break;
+				case "staff-details":
+					this.ParseStaffDetails(c1,track);
+					break;
+				case "time":
+					this.ParseTime(c1,masterBar);
+					hasTime = true;
+					break;
+				case "transpose":
+					this.ParseTranspose(c1,track);
+					break;
+				default:
+				}
+			}
+		}
+		if(!hasTime) {
+			masterBar.TimeSignatureCommon = true;
+		}
+	}
+	,ParseTranspose: function(element,track) {
+		var semitones = 0;
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "chromatic":
+					semitones = semitones + alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					break;
+				case "octave-change":
+					semitones = semitones + alphaTab.platform.Platform.ParseInt(c1.get_InnerText()) * 12;
+					break;
+				default:
+				}
+			}
+		}
+		var staff = $iterator(track.Staves)();
+		while(staff.hasNext()) {
+			var staff1 = staff.next();
+			staff1.TranspositionPitch = semitones;
+		}
+	}
+	,ParseClef: function(element,bar) {
+		var sign = null;
+		var line = 0;
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "clef-octave-change":
+					var _g1 = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					switch(_g1) {
+					case -2:
+						bar.ClefOttavia = 4;
+						break;
+					case -1:
+						bar.ClefOttavia = 3;
+						break;
+					case 1:
+						bar.ClefOttavia = 1;
+						break;
+					case 2:
+						bar.ClefOttavia = 4;
+						break;
+					default:
+					}
+					break;
+				case "line":
+					line = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					break;
+				case "sign":
+					sign = c1.get_InnerText().toLowerCase();
+					break;
+				default:
+				}
+			}
+		}
+		switch(sign) {
+		case "C":
+			if(line == 3) {
+				bar.Clef = 1;
+			} else {
+				bar.Clef = 2;
+			}
+			break;
+		case "F":
+			bar.Clef = 3;
+			break;
+		case "G":
+			bar.Clef = 4;
+			break;
+		case "percussion":
+			bar.Clef = 0;
+			bar.Staff.StaffKind = 2;
+			break;
+		case "tab":
+			bar.Clef = 4;
+			bar.Staff.StaffKind = 0;
+			break;
+		default:
+			bar.Clef = 4;
+		}
+	}
+	,ParseTime: function(element,masterBar) {
+		if(element.GetAttribute("symbol") == "common") {
+			masterBar.TimeSignatureCommon = true;
+		}
+		var beatsParsed = false;
+		var beatTypeParsed = false;
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var v = c1.get_InnerText();
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "beat-type":
+					if(!beatTypeParsed) {
+						if(!(v.indexOf("+") != -1)) {
+							masterBar.TimeSignatureDenominator = alphaTab.platform.Platform.ParseInt(v);
+						} else {
+							masterBar.TimeSignatureDenominator = 4;
+						}
+						beatTypeParsed = true;
+					}
+					break;
+				case "beats":
+					if(!beatsParsed) {
+						if(!(v.indexOf("+") != -1)) {
+							masterBar.TimeSignatureNumerator = alphaTab.platform.Platform.ParseInt(v);
+						} else {
+							masterBar.TimeSignatureNumerator = 4;
+						}
+						beatsParsed = true;
+					}
+					break;
+				default:
+				}
+			}
+		}
+	}
+	,ParseKey: function(element,masterBar) {
+		var fifths = -2147483648;
+		var keyStep = -2147483648;
+		var keyAlter = -2147483648;
+		var mode = null;
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "fifths":
+					fifths = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					break;
+				case "key-alter":
+					keyAlter = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					break;
+				case "key-step":
+					keyStep = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					break;
+				case "mode":
+					mode = c1.get_InnerText();
+					break;
+				default:
+				}
+			}
+		}
+		if(-7 <= fifths && fifths <= 7) {
+			masterBar.KeySignature = fifths;
+		} else {
+			masterBar.KeySignature = 0;
+		}
+		if(mode == "minor") {
+			masterBar.KeySignatureType = 1;
+		} else {
+			masterBar.KeySignatureType = 0;
+		}
+	}
+	,GetOrCreateMasterBar: function(index) {
+		if(index < this._score.MasterBars.length) {
+			return this._score.MasterBars[index];
+		}
+		var i = this._score.MasterBars.length;
+		while(i <= index) {
+			var mb = new alphaTab.model.MasterBar();
+			if(this._score.MasterBars.length > 0) {
+				var prev = this._score.MasterBars[this._score.MasterBars.length - 1];
+				mb.TimeSignatureDenominator = prev.TimeSignatureDenominator;
+				mb.TimeSignatureNumerator = prev.TimeSignatureNumerator;
+				mb.KeySignature = prev.KeySignature;
+				mb.KeySignatureType = prev.KeySignatureType;
+			}
+			this._score.AddMasterBar(mb);
+			++i;
+		}
+		return this._score.MasterBars[index];
+	}
+	,ParseIdentification: function(element) {
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "creator":
+					if(c1.GetAttribute("type") == "composer") {
+						this._score.Music = c1.get_InnerText();
+					}
+					break;
+				case "rights":
+					var s = this._score.Copyright;
+					if(!(s == null || s.length == 0)) {
+						this._score.Copyright = this._score.Copyright + "\n";
+					}
+					var tmp = this._score.Copyright + c1.get_InnerText();
+					this._score.Copyright = tmp;
+					break;
+				default:
+				}
+			}
+		}
+	}
+	,ParsePartList: function(element) {
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "part-group":
+					this.ParsePartGroup(c1);
+					break;
+				case "score-part":
+					this.ParseScorePart(c1);
+					break;
+				default:
+				}
+			}
+		}
+	}
+	,ParsePartGroup: function(element) {
+		var type = element.GetAttribute("type");
+		switch(type) {
+		case "start":
+			this._currentPartGroup = element.GetAttribute("number");
+			var this1 = this._partGroups;
+			var index = this._currentPartGroup;
+			var this2 = [];
+			this1[index] = this2;
+			break;
+		case "stop":
+			this._currentPartGroup = null;
+			break;
+		default:
+		}
+	}
+	,ParseScorePart: function(element) {
+		var id = element.GetAttribute("id");
+		var track = new alphaTab.model.Track(1);
+		var staff = track.Staves[0];
+		staff.StaffKind = 1;
+		this._trackById[id] = track;
+		this._score.AddTrack(track);
+		if(this._currentPartGroup != null) {
+			this._partGroups[this._currentPartGroup].push(track);
+		}
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "midi-instrument":
+					this.ParseMidiInstrument(c1,track);
+					break;
+				case "part-abbreviation":
+					track.ShortName = c1.get_InnerText();
+					break;
+				case "part-name":
+					track.Name = c1.get_InnerText();
+					break;
+				default:
+				}
+			}
+		}
+		if(this.IsEmptyTuning(track.Staves[0].Tuning)) {
+			var tmp = track.Staves[0];
+			var this1 = new Int32Array(0);
+			tmp.Tuning = this1;
+		}
+	}
+	,IsEmptyTuning: function(tuning) {
+		if(tuning == null) {
+			return true;
+		}
+		var i = 0;
+		while(i < tuning.length) {
+			if(tuning[i] != 0) {
+				return false;
+			}
+			++i;
+		}
+		return true;
+	}
+	,ParseMidiInstrument: function(element,track) {
+		var c = $iterator(element.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "midi-channel":
+					var tmp = c1.get_InnerText();
+					track.PlaybackInfo.PrimaryChannel = alphaTab.platform.Platform.ParseInt(tmp);
+					break;
+				case "midi-program":
+					var tmp1 = c1.get_InnerText();
+					track.PlaybackInfo.Program = alphaTab.platform.Platform.ParseInt(tmp1);
+					break;
+				case "midi-volume":
+					var tmp2 = c1.get_InnerText();
+					track.PlaybackInfo.Volume = alphaTab.platform.Platform.ParseInt(tmp2);
+					break;
+				default:
+				}
+			}
+		}
 	}
 	,__class__: alphaTab.importer.MusicXmlImporter
 });
@@ -16136,7 +17532,7 @@ alphaTab.importer.NoCompatibleReaderFoundException.prototype = $extend(alphaTab.
 alphaTab.importer.ScoreLoader = $hx_exports["alphaTab"]["importer"]["ScoreLoader"] = function() {
 };
 alphaTab.importer.ScoreLoader.__name__ = ["alphaTab","importer","ScoreLoader"];
-alphaTab.importer.ScoreLoader.LoadScoreAsync = function(path,success,error) {
+alphaTab.importer.ScoreLoader.LoadScoreAsync = function(path,success,error,importSettings) {
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET",path,true,null,null);
 	xhr.responseType = "arraybuffer";
@@ -16146,7 +17542,7 @@ alphaTab.importer.ScoreLoader.LoadScoreAsync = function(path,success,error) {
 				try {
 					var buffer = xhr.response;
 					var reader = new Uint8Array(buffer);
-					var score = alphaTab.importer.ScoreLoader.LoadScoreFromBytes(reader);
+					var score = alphaTab.importer.ScoreLoader.LoadScoreFromBytes(reader,importSettings);
 					success(score);
 				} catch( exception ) {
 					if (exception instanceof js._Boot.HaxeError) exception = exception.val;
@@ -16186,7 +17582,7 @@ alphaTab.importer.ScoreLoader.LoadScoreAsync = function(path,success,error) {
 			++i;
 		}
 		var reader1 = alphaTab.importer.ScoreLoader.GetBytesFromString(data);
-		var score1 = alphaTab.importer.ScoreLoader.LoadScoreFromBytes(reader1);
+		var score1 = alphaTab.importer.ScoreLoader.LoadScoreFromBytes(reader1,importSettings);
 		success(score1);
 	}
 	xhr.send();
@@ -16202,7 +17598,7 @@ alphaTab.importer.ScoreLoader.GetBytesFromString = function(s) {
 	}
 	return b;
 };
-alphaTab.importer.ScoreLoader.LoadScoreFromBytes = function(data) {
+alphaTab.importer.ScoreLoader.LoadScoreFromBytes = function(data,importSettings) {
 	var importers = alphaTab.importer.ScoreImporter.BuildImporters();
 	alphaTab.util.Logger.Info("ScoreLoader","Loading score from " + data.length + " bytes using " + importers.length + " importers",null);
 	var score = null;
@@ -16213,7 +17609,7 @@ alphaTab.importer.ScoreLoader.LoadScoreFromBytes = function(data) {
 		bb.Reset();
 		try {
 			alphaTab.util.Logger.Info("ScoreLoader","Importing using importer " + importer1.get_Name(),null);
-			importer1.Init(bb);
+			importer1.Init(bb,importSettings);
 			score = importer1.ReadScore();
 			alphaTab.util.Logger.Info("ScoreLoader","Score imported using " + importer1.get_Name(),null);
 			break;
@@ -18810,12 +20206,12 @@ alphaTab.model.Track.CopyTo = function(src,dst) {
 };
 alphaTab.model.Track.prototype = {
 	EnsureStaveCount: function(staveCount) {
-		while(this.Staves.length < staveCount) {
-			var staff = new alphaTab.model.Staff();
-			staff.Index = this.Staves.length;
-			staff.Track = this;
-			this.Staves.push(staff);
-		}
+		while(this.Staves.length < staveCount) this.AddStaff(new alphaTab.model.Staff());
+	}
+	,AddStaff: function(staff) {
+		staff.Index = this.Staves.length;
+		staff.Track = this;
+		this.Staves.push(staff);
 	}
 	,Finish: function() {
 		var s = this.ShortName;
@@ -20059,6 +21455,8 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		var a4 = preview.document.createElement("div");
 		if(!(width == null || width.length == 0)) {
 			a4.style.width = width;
+		} else if(this.Settings.Layout.Mode == "horizontal") {
+			a4.style.width = "297mm";
 		} else {
 			a4.style.width = "210mm";
 		}
@@ -20221,15 +21619,15 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		this._element.classList.add("loading");
 		try {
 			if((data instanceof ArrayBuffer)) {
-				this.ScoreLoaded(alphaTab.importer.ScoreLoader.LoadScoreFromBytes(new Uint8Array(data)),true);
+				this.ScoreLoaded(alphaTab.importer.ScoreLoader.LoadScoreFromBytes(new Uint8Array(data),this.Settings.ImporterSettings),true);
 			} else if((data instanceof Uint8Array)) {
-				this.ScoreLoaded(alphaTab.importer.ScoreLoader.LoadScoreFromBytes(data),true);
+				this.ScoreLoaded(alphaTab.importer.ScoreLoader.LoadScoreFromBytes(data,this.Settings.ImporterSettings),true);
 			} else if(typeof(data) == "string") {
 				alphaTab.importer.ScoreLoader.LoadScoreAsync(data,function(s) {
 					_gthis.ScoreLoaded(s,true);
 				},function(e) {
 					_gthis.Error("import",e);
-				});
+				},this.Settings.ImporterSettings);
 			}
 		} catch( e1 ) {
 			if (e1 instanceof js._Boot.HaxeError) e1 = e1.val;
@@ -20243,7 +21641,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		try {
 			var parser = new alphaTab.importer.AlphaTexImporter();
 			var data = alphaTab.io.ByteBuffer.FromBuffer(alphaTab.platform.Platform.StringToByteArray(contents));
-			parser.Init(data);
+			parser.Init(data,this.Settings.ImporterSettings);
 			this.ScoreLoaded(parser.ReadScore(),true);
 		} catch( e ) {
 			if (e instanceof js._Boot.HaxeError) e = e.val;
@@ -32357,6 +33755,7 @@ alphaTab.rendering.layout.HorizontalScreenLayout.PagePadding = new Float32Array(
 alphaTab.rendering.layout.HorizontalScreenLayout.GroupSpacing = 20;
 alphaTab.Environment.StaveProfileScoreTab = "score-tab";
 alphaTab.Environment.StaveProfileTab = "tab";
+alphaTab.Environment.StaveProfileTabMixed = "tab-mixed";
 alphaTab.Environment.StaveProfileScore = "score";
 alphaTab.audio.MidiUtils.QuarterTime = 960;
 alphaTab.audio.MidiUtils.PercussionChannel = 9;
@@ -32654,6 +34053,7 @@ alphaTab.importer.GpxFileSystem.ScoreGpif = "score.gpif";
 alphaTab.importer.GpxParser.InvalidId = "-1";
 alphaTab.importer.GpxParser.BendPointPositionFactor = 0.6;
 alphaTab.importer.GpxParser.BendPointValueFactor = 0.04;
+alphaTab.importer.MusicXmlImporter.MergePartGroupsSetting = "musicXMLMergePartGroups";
 alphaTab.io.BitReader.ByteSize = 8;
 alphaTab.model._AccentuationType.AccentuationType_Impl_.None = 0;
 alphaTab.model._AccentuationType.AccentuationType_Impl_.Normal = 1;

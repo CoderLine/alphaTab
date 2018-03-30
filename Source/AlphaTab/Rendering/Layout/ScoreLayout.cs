@@ -151,6 +151,28 @@ namespace AlphaTab.Rendering.Layout
             for (var trackIndex = 0; trackIndex < Renderer.Tracks.Length; trackIndex++)
             {
                 var track = Renderer.Tracks[trackIndex];
+                var hasScore = false;
+                var hasTab = false;
+                foreach (var staff in track.Staves)
+                {
+                    switch (staff.StaffKind)
+                    {
+                        case StaffKind.Tablature:
+                            hasTab = true;
+                            break;
+                        case StaffKind.Score:
+                            hasScore = true;
+                            break;
+                        case StaffKind.Percussion:
+                            break;
+                        case StaffKind.Mixed:
+                            hasScore = true;
+                            hasTab = true;
+                            break;
+                    }
+                }
+
+
                 for (int staffIndex = 0; staffIndex < track.Staves.Count; staffIndex++)
                 {
                     var staff = track.Staves[staffIndex];
@@ -161,13 +183,20 @@ namespace AlphaTab.Rendering.Layout
                     {
                         staveProfile = Environment.StaveProfileScore;
                     }
+                    else if (staff.StaffKind == StaffKind.Tablature)
+                    {
+                        if (hasScore)
+                        {
+                            staveProfile = Environment.StaveProfileTabMixed;
+                        }
+                        else
+                        {
+                            staveProfile = Environment.StaveProfileTab;
+                        }
+                    }
                     else if (staff.IsStringed)
                     {
                         staveProfile = Renderer.Settings.Staves.Id;
-                    }
-                    else if (staff.StaffKind == StaffKind.Tablature)
-                    {
-                        staveProfile = Environment.StaveProfileTab;
                     }
                     else // if(staff.StaffKind == StaffKind.Score)
                     {
