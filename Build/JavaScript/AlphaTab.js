@@ -21585,7 +21585,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 	,SetupClickHandling: function() {
 		var _gthis = this;
 		this._canvasElement.addEventListener("mousedown",function(e) {
-			if(e.button != 1) {
+			if(e.button != 0) {
 				return;
 			}
 			e.preventDefault();
@@ -21706,6 +21706,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		barCursor.style.left = Std.string(barBoundings.VisualBounds.X) + "px";
 		barCursor.style.width = Std.string(barBoundings.VisualBounds.W) + "px";
 		barCursor.style.height = Std.string(barBoundings.VisualBounds.H) + "px";
+		beatCursor.style.transition = "all 0s linear";
 		beatCursor.style.transitionDuration = "0ms";
 		beatCursor.style.top = Std.string(barBoundings.VisualBounds.Y) + "px";
 		beatCursor.style.left = Std.string(beatBoundings.VisualBounds.X) + "px";

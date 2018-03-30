@@ -1119,7 +1119,7 @@ namespace AlphaTab.Platform.JavaScript
         {
             _canvasElement.AddEventListener("mousedown", (Action<MouseEvent>)(e =>
             {
-                if (e.Button != 1)
+                if (e.Button != 0)
                 {
                     return;
                 }
@@ -1292,6 +1292,7 @@ namespace AlphaTab.Platform.JavaScript
             barCursor.Style.Height = barBoundings.VisualBounds.H + "px";
 
             // move beat to start position immediately
+            beatCursor.Style.Transition = "all 0s linear";
             beatCursor.Style.TransitionDuration = "0ms";
             beatCursor.Style.Top = barBoundings.VisualBounds.Y + "px";
             beatCursor.Style.Left = beatBoundings.VisualBounds.X + "px";
