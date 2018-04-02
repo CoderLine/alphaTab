@@ -66,12 +66,12 @@ namespace AlphaTab.Rendering
             return 0;
         }
 
-        public override float GetNoteY(Note note)
+        public override float GetNoteY(Note note, bool aboveNote = false)
         {
             var beat = (TabBeatGlyph)GetOnNotesGlyphForBeat(note.Beat);
             if (beat != null)
             {
-                return beat.NoteNumbers.GetNoteY(note);
+                return beat.NoteNumbers.GetNoteY(note, aboveNote);
             }
             return 0;
         }

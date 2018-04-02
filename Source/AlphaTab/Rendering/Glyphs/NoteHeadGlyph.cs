@@ -48,7 +48,7 @@ namespace AlphaTab.Rendering.Glyphs
                     Width = 14 * (_isGrace ? GraceScale : 1) * Scale;
                     break;
                 default:
-                    Width = 9 * (_isGrace ? GraceScale : 1) * Scale;
+                    Width = 8f * (_isGrace ? GraceScale : 1) * Scale;
                     break;
             }
         }

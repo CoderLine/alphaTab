@@ -18,6 +18,7 @@
 
 using AlphaTab.Collections;
 using AlphaTab.Rendering.Utils;
+using AlphaTab.Util;
 
 namespace AlphaTab.Model
 {
@@ -48,6 +49,52 @@ namespace AlphaTab.Model
         ForceFlat,
     }
 
+    /// <summary>
+    /// Lists all types of bends 
+    /// </summary>
+    public enum BendType
+    {
+        /// <summary>
+        /// No bend at all
+        /// </summary>
+        None,
+        /// <summary>
+        /// Individual points define the bends in a flexible manner. 
+        /// This system was mainly used in Guitar Pro 3-5
+        /// </summary>
+        Custom,
+        /// <summary>
+        /// Simple Bend from an unbended string to a higher note. 
+        /// </summary>
+        Bend,
+        /// <summary>
+        /// Release of a bend that was started on an earlier note.
+        /// </summary>
+        Release,
+        /// <summary>
+        /// A bend that starts from an unbended string, 
+        /// and also releases the bend after some time.
+        /// </summary>
+        BendRelease,
+        /// <summary>
+        /// Holds a bend that was started on an earlier note
+        /// </summary>
+        Hold,
+        /// <summary>
+        /// A bend that is already started before the note is played then it is held until the end. 
+        /// </summary>
+        Prebend,
+        /// <summary>
+        /// A bend that is already started before the note is played and
+        /// bends even further, then it is held until the end. 
+        /// </summary>
+        PrebendBend,
+        /// <summary>
+        /// A bend that is already started before the note is played and
+        /// then releases the bend to a lower note where it is held until the end.
+        /// </summary>
+        PrebendRelease,
+    }
 
     /// <summary>
     /// A note is a single played sound on a fretted instrument. 
@@ -66,9 +113,11 @@ namespace AlphaTab.Model
         public int Id { get; set; }
         public int Index { get; set; }
         public AccentuationType Accentuated { get; set; }
+        public BendType BendType { get; set; }
+        public bool IsContinuedBend { get; set; }
         public FastList<BendPoint> BendPoints { get; set; }
         public BendPoint MaxBendPoint { get; set; }
-        public bool HasBend { get { return BendPoints.Count > 0; } }
+        public bool HasBend { get { return BendType != BendType.None; } }
 
         #region Stringed Instruments
 
@@ -214,6 +263,7 @@ namespace AlphaTab.Model
         public Note()
         {
             Id = GlobalNoteId++;
+            BendType = BendType.None;
             BendPoints = new FastList<BendPoint>();
             Dynamic = DynamicValue.F;
 
@@ -269,6 +319,7 @@ namespace AlphaTab.Model
             dst.Tone = src.Tone;
             dst.Element = src.Element;
             dst.Variation = src.Variation;
+            dst.BendType = src.BendType;
         }
 
         public Note Clone()
@@ -289,8 +340,8 @@ namespace AlphaTab.Model
             {
                 MaxBendPoint = point;
             }
+            BendType = BendType.Custom;
         }
-
 
         public void Finish()
         {
@@ -333,6 +384,128 @@ namespace AlphaTab.Model
             if (SlideType != SlideType.None)
             {
                 SlideTarget = nextNoteOnLine.Value;
+            }
+
+            // try to detect what kind of bend was used and cleans unneeded points if required
+            // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all bends
+            if (BendPoints.Count > 0 && BendType == BendType.Custom)
+            {
+                var isContinuedBend = IsContinuedBend = TieOrigin != null && TieOrigin.HasBend;
+                if (BendPoints.Count == 4)
+                {
+                    var origin = BendPoints[0];
+                    var middle1 = BendPoints[1];
+                    BendPoint middle2 = BendPoints[2];
+                    BendPoint destination = BendPoints[3];
+
+                    // the middle points are used for holds, anything else is a new feature we do not support yet
+                    if (middle1.Value == middle2.Value)
+                    {
+                        // bend higher?
+                        if (destination.Value > origin.Value)
+                        {
+                            if (middle1.Value > destination.Value)
+                            {
+                                BendType = BendType.BendRelease;
+                            }
+                            else if (!isContinuedBend && origin.Value > 0)
+                            {
+                                BendType = BendType.PrebendBend;
+                                BendPoints.RemoveAt(2);
+                                // bug in Guitar Pro? even though after the bend we hold 
+                                // the note it bends up slightly more. 
+                                destination.Value = middle1.Value;
+                            }
+                            else
+                            {
+                                BendType = BendType.Bend;
+                                BendPoints.RemoveAt(2);
+                                BendPoints.RemoveAt(1);
+                            }
+                        }
+                        // release?
+                        else if (destination.Value < origin.Value)
+                        {
+                            // origin must be > 0 otherwise it's no release, we cannot bend negative 
+                            if (isContinuedBend)
+                            {
+                                BendType = BendType.Release;
+                                BendPoints.RemoveAt(2);
+                                BendPoints.RemoveAt(1);
+                            }
+                            else
+                            {
+                                BendType = BendType.PrebendRelease;
+                                BendPoints.RemoveAt(2);
+                                BendPoints.RemoveAt(1);
+                            }
+                        }
+                        // hold?
+                        else
+                        {
+                            if (middle1.Value > origin.Value)
+                            {
+                                BendType = BendType.BendRelease;
+                            }
+                            else if (origin.Value > 0 && !isContinuedBend)
+                            {
+                                BendType = BendType.Prebend;
+                                BendPoints.RemoveAt(2);
+                                BendPoints.RemoveAt(1);
+                            }
+                            else
+                            {
+                                BendType = BendType.Hold;
+                                BendPoints.RemoveAt(2);
+                                BendPoints.RemoveAt(1);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Logger.Warning("Model", "Unsupported bend type detected, fallback to custom");
+                    }
+                }
+                else if (BendPoints.Count == 2)
+                {
+                    var origin = BendPoints[0];
+                    var destination = BendPoints[1];
+
+                    // bend higher?
+                    if (destination.Value > origin.Value)
+                    {
+                        if (!isContinuedBend && origin.Value > 0)
+                        {
+                            BendType = BendType.PrebendBend;
+                        }
+                        else
+                        {
+                            BendType = BendType.Bend;
+                        }
+                    }
+                    // release?
+                    else if (destination.Value < origin.Value)
+                    {
+                        // origin must be > 0 otherwise it's no release, we cannot bend negative 
+                        if (isContinuedBend)
+                        {
+                            BendType = BendType.Release;
+                        }
+                        else
+                        {
+                            BendType = BendType.PrebendRelease;
+                        }
+                    }
+                    // hold?
+                    else
+                    {
+                        BendType = BendType.Hold;
+                    }
+                }
+            }
+            else if(BendPoints.Count == 0)
+            {
+                BendType = BendType.None;
             }
         }
 

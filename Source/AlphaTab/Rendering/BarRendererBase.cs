@@ -473,7 +473,7 @@ namespace AlphaTab.Rendering
             return 0;
         }
 
-        public virtual float GetNoteY(Note note)
+        public virtual float GetNoteY(Note note, bool aboveNote = false)
         {
             return 0;
         }

@@ -29,6 +29,7 @@ namespace AlphaTab.Rendering.Glyphs
         private float _trillNoteStringWidth;
 
         public bool IsEmpty { get; set; }
+        public float Height { get; set; }
 
         public NoteNumberGlyph(float x, float y, Note n)
             : base(x, y)
@@ -41,7 +42,7 @@ namespace AlphaTab.Rendering.Glyphs
                     _noteString = "(" + _noteString + ")";
                 }
             }
-            else if (n.Beat.Index == 0 || n.HasBend)
+            else if (n.Beat.Index == 0 || (n.HasBend))
             {
                 _noteString = "(" + (n.TieOrigin.Fret - n.Beat.Voice.Bar.Staff.TranspositionPitch) + ")";
             }
@@ -69,6 +70,7 @@ namespace AlphaTab.Rendering.Glyphs
                 _noteStringWidth = Renderer.ScoreRenderer.Canvas.MeasureText(_noteString);
                 _trillNoteStringWidth = Renderer.ScoreRenderer.Canvas.MeasureText(_trillNoteString);
                 Width = _noteStringWidth + _trillNoteStringWidth;
+                Height = Renderer.ScoreRenderer.Canvas.Font.Size;
             }
         }
 

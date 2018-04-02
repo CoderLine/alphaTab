@@ -1630,11 +1630,13 @@ namespace AlphaTab.Importer
                 if (bendOrigin == null) bendOrigin = new BendPoint();
                 if (bendDestination == null) bendDestination = new BendPoint(BendPoint.MaxPosition);
                 note.AddBendPoint(bendOrigin);
+
                 if (bendMiddleOffset1 != null && bendMiddleValue != null)
                 {
                     note.AddBendPoint(new BendPoint(bendMiddleOffset1.Value, bendMiddleValue.Value));
                 }
-                if (bendMiddleOffset2 != null && bendMiddleValue != null && bendMiddleOffset2 != bendMiddleOffset1)
+
+                if (bendMiddleOffset2 != null && bendMiddleValue != null)
                 {
                     note.AddBendPoint(new BendPoint(bendMiddleOffset2.Value, bendMiddleValue.Value));
                 }

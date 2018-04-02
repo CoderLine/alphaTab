@@ -87,11 +87,11 @@ namespace AlphaTab.Rendering.Glyphs
             return 0;
         }
 
-        public float GetNoteY(Note note)
+        public float GetNoteY(Note note, bool aboveNote = false)
         {
             if (_noteLookup.ContainsKey(note.String))
             {
-                return Y + _noteLookup[note.String].Y;
+                return Y + _noteLookup[note.String].Y + (aboveNote ? -(NoteHeadGlyph.NoteHeadHeight * Scale) / 2 : 0);
             }
             return 0;
         }

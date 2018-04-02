@@ -310,6 +310,9 @@ describe("alphaTab.test.importer.Gp7ImporterTest", function() {
     it("TestBend", function() {
         __instance.TestBend();
     });
+    it("TestBendAdvanced", function() {
+        __instance.TestBendAdvanced();
+    });
     it("TestTremolo", function() {
         __instance.TestTremolo();
     });
@@ -386,11 +389,9 @@ describe("alphaTab.test.importer.GpxImporterTest", function() {
         __instance.TestHammer();
     });
     it("TestBend", function() {
-         pending("appveyor fails for some reason, locally everything is fine?");
         __instance.TestBend();
     });
     it("TestTremolo", function() {
-         pending("Test ignored");
         __instance.TestTremolo();
     });
     it("TestSlides", function() {

@@ -155,9 +155,9 @@ namespace AlphaTab.Rendering.Utils
             {
                 if (Direction == BeamDirection.Up)
                 {
-                    return _beatLineXPositions[beat.Index].Up;
+                    return (int)_beatLineXPositions[beat.Index].Up;
                 }
-                return _beatLineXPositions[beat.Index].Down;
+                return (int)_beatLineXPositions[beat.Index].Down;
             }
             return 0;
         }

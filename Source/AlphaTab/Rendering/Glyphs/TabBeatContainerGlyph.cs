@@ -36,9 +36,8 @@ namespace AlphaTab.Rendering.Glyphs
             base.DoLayout();
 
             _bendGlyphs = new FastList<BendGlyph>();
-            for (int i = 0; i < Beat.Notes.Count; i++)
+            foreach (var n in Beat.Notes)
             {
-                var n = Beat.Notes[i];
                 if (n.HasBend)
                 {
                     var bendValueHeight = 6;
@@ -46,7 +45,16 @@ namespace AlphaTab.Rendering.Glyphs
                     Renderer.RegisterOverflowTop(bendHeight);
 
                     var bend = new BendGlyph(n, bendValueHeight);
-                    bend.X = OnNotes.X + OnNotes.Width;
+
+                    if (n.IsContinuedBend || n.BendType == BendType.PrebendBend || n.BendType == BendType.Prebend || n.BendType == BendType.PrebendRelease)
+                    {
+                        bend.X = OnNotes.X + OnNotes.Width / 2;
+                    }
+                    else
+                    {
+                        bend.X = OnNotes.X + OnNotes.Width;
+                    }
+
                     bend.Renderer = Renderer;
                     _bendGlyphs.Add(bend);
                 }
@@ -66,7 +74,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         protected override void CreateTies(Note n)
         {
-            var renderer = (TabBarRenderer) Renderer;
+            var renderer = (TabBarRenderer)Renderer;
             if (n.IsTieOrigin && renderer.ShowTiedNotes)
             {
                 var tie = new TabTieGlyph(n, n.TieDestination, false);

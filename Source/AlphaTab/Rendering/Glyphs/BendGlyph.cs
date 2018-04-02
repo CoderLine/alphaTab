@@ -16,14 +16,19 @@
  * License along with this library.
  */
 using System;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
     public class BendGlyph : Glyph
     {
+        private const int ArrowSize = 6;
+        private const int DashSize = 3;
         private readonly Note _note;
+        private FastList<BendPoint> _renderPoints;
         private readonly float _bendValueHeight;
 
         public BendGlyph(Note n, float bendValueHeight)
@@ -31,29 +36,72 @@ namespace AlphaTab.Rendering.Glyphs
         {
             _note = n;
             _bendValueHeight = bendValueHeight;
+
+            _renderPoints = CreateRenderingPoints(n);
+        }
+
+        private FastList<BendPoint> CreateRenderingPoints(Note note)
+        {
+            // advanced rendering
+            if (note.BendType == BendType.Custom)
+            {
+                return note.BendPoints;
+            }
+
+            var renderingPoints = new FastList<BendPoint>();
+
+            // Guitar Pro Rendering Note: 
+            // Last point of bend is always at end of the note even 
+            // though it might not be 100% correct from timing perspective. 
+
+            switch (note.BendType)
+            {
+                case BendType.BendRelease:
+                    renderingPoints.Add(new BendPoint(0, note.BendPoints[0].Value));
+                    renderingPoints.Add(new BendPoint(BendPoint.MaxPosition / 2, note.BendPoints[1].Value));
+                    renderingPoints.Add(new BendPoint(BendPoint.MaxPosition, note.BendPoints[1].Value));
+                    break;
+                case BendType.Bend:
+                case BendType.Hold:
+                case BendType.Prebend:
+                case BendType.PrebendBend:
+                case BendType.PrebendRelease:
+                case BendType.Release:
+                    renderingPoints.Add(new BendPoint(0, note.BendPoints[0].Value));
+                    renderingPoints.Add(new BendPoint(BendPoint.MaxPosition, note.BendPoints[1].Value));
+                    break;
+            }
+
+            return renderingPoints;
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
+            
+            // we need some pixels for the arrow. otherwise we might draw into the next 
+            // note
+            var width = Width - (ArrowSize * Scale) / 2;
+
+            //var bendHeight = _note.MaxBendPoint.Value * _bendValueHeight;
+            //var c = new Color((byte)(Platform.Platform.RandomDouble() * 255),
+            //        (byte)(Platform.Platform.RandomDouble() * 255),
+            //        (byte)(Platform.Platform.RandomDouble() * 255),
+            //      100);
+            //canvas.Color = c;
+            //canvas.FillRect(cx + X, cy + Y - bendHeight, width, bendHeight);
+
             // calculate offsets per step
-            var dX = Width / BendPoint.MaxPosition;
-            var maxValue = 0;
-            for (int i = 0, j = _note.BendPoints.Count; i < j; i++)
-            {
-                if (_note.BendPoints[i].Value > maxValue)
-                {
-                    maxValue = _note.BendPoints[i].Value;
-                }
-            }
+
+            var dX = width / BendPoint.MaxPosition;
 
             cx += X;
             cy += Y;
 
             canvas.BeginPath();
-            for (int i = 0, j = _note.BendPoints.Count - 1; i < j; i++)
+            for (int i = 0, j = _renderPoints.Count - 1; i < j; i++)
             {
-                var firstPt = _note.BendPoints[i];
-                var secondPt = _note.BendPoints[i + 1];
+                var firstPt = _renderPoints[i];
+                var secondPt = _renderPoints[i + 1];
 
                 // draw pre-bend if previous 
                 if (i == 0 && firstPt.Value != 0 && !_note.IsTieDestination)
@@ -79,7 +127,14 @@ namespace AlphaTab.Rendering.Glyphs
             var y1 = cy - (_bendValueHeight * firstPt.Value);
             if (firstPt.Value == 0)
             {
-                y1 += r.GetNoteY(_note);
+                if (secondPt.Offset == firstPt.Offset)
+                {
+                    y1 += r.GetNoteY(_note.Beat.MaxStringNote, true);
+                }
+                else
+                {
+                    y1 += r.GetNoteY(_note);
+                }
             }
             else
             {
@@ -98,7 +153,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             // what type of arrow? (up/down)
             var arrowOffset = 0f;
-            var arrowSize = 6 * Scale;
+            var arrowSize = ArrowSize * Scale;
             if (secondPt.Value > firstPt.Value)
             {
                 canvas.BeginPath();
@@ -123,9 +178,28 @@ namespace AlphaTab.Rendering.Glyphs
 
             if (firstPt.Value == secondPt.Value)
             {
-                // draw horizontal line
-                canvas.MoveTo(x1, y1);
-                canvas.LineTo(x2, y2);
+                // draw horizontal dashed line 
+                // to really have the line ending at the right position
+                // we draw from right to left. it's okay if the space is at the beginning
+                var dashX = x2;
+                var dashSize = DashSize * Scale;
+                var end = (x1 + dashSize);
+                var dashes = (dashX - x1) / (dashSize * 2);
+                if (dashes < 1)
+                {
+                    canvas.MoveTo(dashX, y1);
+                    canvas.LineTo(x1, y1);
+                }
+                else
+                {
+                    while (dashX > end)
+                    {
+                        canvas.MoveTo(dashX, y1);
+                        canvas.LineTo(dashX - dashSize, y1);
+                        dashX -= dashSize * 2;
+                    }
+                }
+
                 canvas.Stroke();
             }
             else
@@ -145,7 +219,7 @@ namespace AlphaTab.Rendering.Glyphs
                 }
             }
 
-            if (secondPt.Value != 0)
+            if (secondPt.Value != 0 && secondPt.Value != firstPt.Value)
             {
                 var dV = secondPt.Value;
                 var up = secondPt.Value > firstPt.Value;

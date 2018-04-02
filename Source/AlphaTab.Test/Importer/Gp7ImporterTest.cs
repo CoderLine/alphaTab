@@ -15,8 +15,12 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
+using System.Linq;
 using AlphaTab.Importer;
 using AlphaTab.IO;
+using AlphaTab.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test.Importer
@@ -136,29 +140,26 @@ namespace AlphaTab.Test.Importer
             var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestBends.gp");
             var score = reader.ReadScore();
 
-            Assert.AreEqual(3, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints.Count);
+            Assert.AreEqual(BendType.Bend, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendType);
+            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints.Count);
 
             Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints[0].Offset);
             Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints[0].Value);
 
-            Assert.AreEqual(30, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints[1].Offset);
-            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints[1].Value);
+            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints[1].Offset);
+            Assert.AreEqual(4, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints[1].Value);
 
-            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints[2].Offset);
-            Assert.AreEqual(4, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints[2].Value);
-
-            Assert.AreEqual(3, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints.Count);
+            Assert.AreEqual(BendType.Bend, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendType);
+            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints.Count);
 
             Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints[0].Offset);
             Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints[0].Value);
 
-            Assert.AreEqual(30, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints[1].Offset);
-            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints[1].Value);
+            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints[1].Offset);
+            Assert.AreEqual(4, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints[1].Value);
 
-            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints[2].Offset);
-            Assert.AreEqual(4, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints[2].Value);
-
-            Assert.AreEqual(3, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints.Count);
+            Assert.AreEqual(BendType.BendRelease, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendType);
+            Assert.AreEqual(4, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints.Count);
 
             Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[0].Offset);
             Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[0].Value);
@@ -166,8 +167,376 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(30, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[1].Offset);
             Assert.AreEqual(12, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[1].Value);
 
-            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[2].Offset);
-            Assert.AreEqual(6, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[2].Value);
+            Assert.AreEqual(30, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[2].Offset);
+            Assert.AreEqual(12, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[2].Value);
+
+            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[3].Offset);
+            Assert.AreEqual(6, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[3].Value);
+            Render(score);
+        }
+
+        [TestMethod]
+        public void TestBendAdvanced()
+        {
+            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/BendsAdvanced.gp");
+            var score = reader.ReadScore();
+
+            #region Simple Standalone Bends
+
+            #region Bar 1
+
+            var note = score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0];
+            Assert.AreEqual(BendType.Bend, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(0, note.BendPoints[0].Value);
+            Assert.AreEqual(15, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+
+            note = score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0];
+            Assert.AreEqual(BendType.BendRelease, note.BendType);
+            Assert.AreEqual(4, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(0, note.BendPoints[0].Value);
+            Assert.AreEqual(10, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+            Assert.AreEqual(20, note.BendPoints[2].Offset);
+            Assert.AreEqual(4, note.BendPoints[2].Value);
+            Assert.AreEqual(30, note.BendPoints[3].Offset);
+            Assert.AreEqual(0, note.BendPoints[3].Value);
+
+            #endregion
+
+            #region Bar 2
+
+            note = score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0];
+            Assert.AreEqual(BendType.Bend, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(0, note.BendPoints[0].Value);
+            Assert.AreEqual(59, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+
+            note = score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Notes[0];
+            Assert.AreEqual(BendType.BendRelease, note.BendType);
+            Assert.AreEqual(4, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(0, note.BendPoints[0].Value);
+            Assert.AreEqual(10, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+            Assert.AreEqual(45, note.BendPoints[2].Offset);
+            Assert.AreEqual(4, note.BendPoints[2].Value);
+            Assert.AreEqual(59, note.BendPoints[3].Offset);
+            Assert.AreEqual(0, note.BendPoints[3].Value);
+
+            #endregion
+
+            #region Bar 3
+
+            note = score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Notes[0];
+            Assert.AreEqual(BendType.Prebend, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(4, note.BendPoints[0].Value);
+            Assert.AreEqual(60, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+
+            note = score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Notes[0];
+            Assert.AreEqual(BendType.PrebendBend, note.BendType);
+            Assert.AreEqual(3, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(4, note.BendPoints[0].Value);
+            Assert.AreEqual(7, note.BendPoints[1].Offset);
+            Assert.AreEqual(5, note.BendPoints[1].Value);
+            Assert.AreEqual(15, note.BendPoints[2].Offset);
+            Assert.AreEqual(5, note.BendPoints[2].Value);
+
+            #endregion
+
+            #region Bar 4
+
+            note = score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].Notes[0];
+            Assert.AreEqual(BendType.PrebendRelease, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(4, note.BendPoints[0].Value);
+            Assert.AreEqual(15, note.BendPoints[1].Offset);
+            Assert.AreEqual(0, note.BendPoints[1].Value);
+
+            #endregion
+
+            #region Bar 5
+
+            note = score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].Notes[0];
+            Assert.AreEqual(BendType.Bend, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(0, note.BendPoints[0].Value);
+            Assert.AreEqual(14, note.BendPoints[1].Offset);
+            Assert.AreEqual(8, note.BendPoints[1].Value);
+
+            note = score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[1].Notes[0];
+            Assert.AreEqual(BendType.BendRelease, note.BendType);
+            Assert.AreEqual(4, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(0, note.BendPoints[0].Value);
+            Assert.AreEqual(9, note.BendPoints[1].Offset);
+            Assert.AreEqual(8, note.BendPoints[1].Value);
+            Assert.AreEqual(20, note.BendPoints[2].Offset);
+            Assert.AreEqual(8, note.BendPoints[2].Value);
+            Assert.AreEqual(31, note.BendPoints[3].Offset);
+            Assert.AreEqual(4, note.BendPoints[3].Value);
+
+            #endregion
+
+            #region Bar 6
+
+            note = score.Tracks[0].Staves[0].Bars[5].Voices[0].Beats[0].Notes[0];
+            Assert.AreEqual(BendType.Prebend, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(8, note.BendPoints[0].Value);
+            Assert.AreEqual(60, note.BendPoints[1].Offset);
+            Assert.AreEqual(8, note.BendPoints[1].Value);
+
+            note = score.Tracks[0].Staves[0].Bars[5].Voices[0].Beats[1].Notes[0];
+            Assert.AreEqual(BendType.PrebendBend, note.BendType);
+            Assert.AreEqual(3, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(8, note.BendPoints[0].Value);
+            Assert.AreEqual(7, note.BendPoints[1].Offset);
+            Assert.AreEqual(10, note.BendPoints[1].Value);
+            Assert.AreEqual(16, note.BendPoints[2].Offset);
+            Assert.AreEqual(10, note.BendPoints[2].Value);
+
+            #endregion
+
+            #region Bar 7
+
+            note = score.Tracks[0].Staves[0].Bars[6].Voices[0].Beats[0].Notes[0];
+            Assert.AreEqual(BendType.PrebendRelease, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(8, note.BendPoints[0].Value);
+            Assert.AreEqual(14, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+
+            #endregion
+
+            #region Bar 8
+
+            note = score.Tracks[0].Staves[0].Bars[7].Voices[0].Beats[0].Notes[0];
+            Assert.AreEqual(BendType.Bend, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(0, note.BendPoints[0].Value);
+            Assert.AreEqual(15, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+
+            #endregion
+
+            #region Bar 9
+
+            note = score.Tracks[0].Staves[0].Bars[8].Voices[0].Beats[0].Notes[0];
+            Assert.AreEqual(BendType.BendRelease, note.BendType);
+            Assert.AreEqual(4, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(0, note.BendPoints[0].Value);
+            Assert.AreEqual(10, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+            Assert.AreEqual(20, note.BendPoints[2].Offset);
+            Assert.AreEqual(4, note.BendPoints[2].Value);
+            Assert.AreEqual(30, note.BendPoints[3].Offset);
+            Assert.AreEqual(0, note.BendPoints[3].Value);
+
+            #endregion
+
+            #endregion
+
+            #region Combined Bends
+
+            #region Bar 10
+
+            note = score.Tracks[0].Staves[0].Bars[9].Voices[0].Beats[0].Notes[0];
+            Assert.AreEqual(BendType.Bend, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(0, note.BendPoints[0].Value);
+            Assert.AreEqual(15, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+
+            note = score.Tracks[0].Staves[0].Bars[9].Voices[0].Beats[1].Notes[0];
+            Assert.AreEqual(BendType.Release, note.BendType);
+            Assert.IsTrue(note.IsContinuedBend);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(4, note.BendPoints[0].Value);
+            Assert.AreEqual(15, note.BendPoints[1].Offset);
+            Assert.AreEqual(0, note.BendPoints[1].Value);
+
+            note = score.Tracks[0].Staves[0].Bars[9].Voices[0].Beats[2].Notes[0];
+            Assert.AreEqual(BendType.Bend, note.BendType);
+            Assert.IsFalse(note.IsContinuedBend);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(0, note.BendPoints[0].Value);
+            Assert.AreEqual(15, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+
+            #endregion
+
+
+            #region Bar 11
+
+            note = score.Tracks[0].Staves[0].Bars[10].Voices[0].Beats[0].Notes[0];
+            Assert.AreEqual(BendType.Bend, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(0, note.BendPoints[0].Value);
+            Assert.AreEqual(15, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+
+            note = score.Tracks[0].Staves[0].Bars[10].Voices[0].Beats[1].Notes[0];
+            Assert.AreEqual(BendType.Bend, note.BendType);
+            Assert.IsTrue(note.IsContinuedBend);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(4, note.BendPoints[0].Value);
+            Assert.AreEqual(15, note.BendPoints[1].Offset);
+            Assert.AreEqual(8, note.BendPoints[1].Value);
+
+            note = score.Tracks[0].Staves[0].Bars[10].Voices[0].Beats[2].Notes[0];
+            Assert.AreEqual(BendType.Release, note.BendType);
+            Assert.IsTrue(note.IsContinuedBend);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(8, note.BendPoints[0].Value);
+            Assert.AreEqual(15, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+
+            note = score.Tracks[0].Staves[0].Bars[10].Voices[0].Beats[3].Notes[0];
+            Assert.AreEqual(BendType.Release, note.BendType);
+            Assert.IsTrue(note.IsContinuedBend);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(4, note.BendPoints[0].Value);
+            Assert.AreEqual(15, note.BendPoints[1].Offset);
+            Assert.AreEqual(0, note.BendPoints[1].Value);
+
+            #endregion
+
+
+            #endregion
+
+            #region Grace Bends
+
+            #region Bar 12
+
+            note = score.Tracks[0].Staves[0].Bars[11].Voices[0].Beats[0].Notes[0];
+            Assert.AreEqual(GraceType.BeforeBeat, note.Beat.GraceType);
+            Assert.AreEqual(BendType.Bend, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(0, note.BendPoints[0].Value);
+            Assert.AreEqual(15, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+
+            #endregion
+
+            #region Bar 13
+
+            note = score.Tracks[0].Staves[0].Bars[12].Voices[0].Beats[0].Notes[0];
+            Assert.AreEqual(GraceType.BeforeBeat, note.Beat.GraceType);
+            Assert.AreEqual(BendType.Bend, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(0, note.BendPoints[0].Value);
+            Assert.AreEqual(15, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+
+            note = score.Tracks[0].Staves[0].Bars[12].Voices[0].Beats[1].Notes[0];
+            Assert.IsTrue(note.IsContinuedBend);
+            Assert.AreEqual(BendType.Hold, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(4, note.BendPoints[0].Value);
+            Assert.AreEqual(60, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+
+            #endregion
+
+            #region Bar 14
+
+            note = score.Tracks[0].Staves[0].Bars[13].Voices[0].Beats[0].Notes[0];
+            Assert.AreEqual(GraceType.OnBeat, note.Beat.GraceType);
+            Assert.AreEqual(BendType.Bend, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(0, note.BendPoints[0].Value);
+            Assert.AreEqual(18, note.BendPoints[1].Offset);
+            Assert.AreEqual(1, note.BendPoints[1].Value);
+
+            note = score.Tracks[0].Staves[0].Bars[13].Voices[0].Beats[1].Notes[0];
+            Assert.IsTrue(note.IsContinuedBend);
+            Assert.AreEqual(BendType.Hold, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(1, note.BendPoints[0].Value);
+            Assert.AreEqual(60, note.BendPoints[1].Offset);
+            Assert.AreEqual(1, note.BendPoints[1].Value);
+
+            #endregion
+
+            #region Bar 15
+
+            note = score.Tracks[0].Staves[0].Bars[14].Voices[0].Beats[0].Notes[0];
+            Assert.AreEqual(GraceType.BeforeBeat, note.Beat.GraceType);
+            Assert.AreEqual(BendType.Bend, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(0, note.BendPoints[0].Value);
+            Assert.AreEqual(15, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+
+            note = score.Tracks[0].Staves[0].Bars[14].Voices[0].Beats[1].Notes[0];
+            Assert.AreEqual(12, note.Fret);
+            Assert.IsTrue(note.IsTieDestination);
+            Assert.IsTrue(note.IsContinuedBend);
+            Assert.AreEqual(BendType.Hold, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(4, note.BendPoints[0].Value);
+            Assert.AreEqual(60, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+
+            note = score.Tracks[0].Staves[0].Bars[14].Voices[0].Beats[1].Notes[1];
+            Assert.AreEqual(10, note.Fret);
+            Assert.IsFalse(note.IsContinuedBend);
+            Assert.IsFalse(note.HasBend);
+            Assert.AreEqual(BendType.None, note.BendType);
+
+            #endregion
+
+            #region Bar 16
+
+            note = score.Tracks[0].Staves[0].Bars[15].Voices[0].Beats[0].Notes[0];
+            Assert.AreEqual(10, note.Fret);
+            Assert.AreEqual(BendType.None, note.BendType);
+
+            note = score.Tracks[0].Staves[0].Bars[15].Voices[0].Beats[0].Notes[1];
+            Assert.AreEqual(BendType.Bend, note.BendType);
+            Assert.AreEqual(2, note.BendPoints.Count);
+            Assert.AreEqual(0, note.BendPoints[0].Offset);
+            Assert.AreEqual(0, note.BendPoints[0].Value);
+            Assert.AreEqual(15, note.BendPoints[1].Offset);
+            Assert.AreEqual(4, note.BendPoints[1].Value);
+
+            #endregion
+
+
+
+            #endregion
+
             Render(score);
         }
 

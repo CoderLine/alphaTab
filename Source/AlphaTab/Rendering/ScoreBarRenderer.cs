@@ -44,6 +44,7 @@ namespace AlphaTab.Rendering
         private static readonly int[] FlatKsSteps = { 5, 2, 6, 3, 7, 4, 8 };
 
         private const float LineSpacing = 8;
+        private const float StemWidth = 1.3f;
 
         public AccidentalHelper AccidentalHelper { get; set; }
 
@@ -78,12 +79,12 @@ namespace AlphaTab.Rendering
             return 0;
         }
 
-        public override float GetNoteY(Note note)
+        public override float GetNoteY(Note note, bool aboveNote = false)
         {
             ScoreBeatGlyph beat = (ScoreBeatGlyph)GetOnNotesGlyphForBeat(note.Beat);
             if (beat != null)
             {
-                return beat.NoteHeads.GetNoteY(note);
+                return beat.NoteHeads.GetNoteY(note, aboveNote);
             }
             return 0;
         }
@@ -399,7 +400,7 @@ namespace AlphaTab.Rendering
                 var y2 = cy + Y;
                 y2 += scaleMod * CalculateBeamY(h, beatLineX);
 
-                canvas.LineWidth = 1.5f * Scale;
+                canvas.LineWidth = StemWidth * Scale;
                 canvas.BeginPath();
                 canvas.MoveTo(cx + X + beatLineX, y1);
                 canvas.LineTo(cx + X + beatLineX, y2);
@@ -532,7 +533,7 @@ namespace AlphaTab.Rendering
                 return;
             }
 
-            canvas.LineWidth = 1.5f * Scale;
+            canvas.LineWidth = StemWidth * Scale;
             canvas.BeginPath();
             canvas.MoveTo(cx + X + beatLineX, cy + Y + topY);
             canvas.LineTo(cx + X + beatLineX, cy + Y + bottomY);

@@ -131,7 +131,6 @@ class GpxImporterTest extends alphaTab.test.importer.GpImporterTestBase
     }
 
     @:testMethod
-    @:testIgnore("appveyor fails for some reason, locally everything is fine?")
     public function TestBend() : Void 
     {
         var reader : alphaTab.importer.GpxImporter = PrepareGpxImporterWithFile("GuitarPro6/TestBends.gpx");
@@ -159,7 +158,6 @@ class GpxImporterTest extends alphaTab.test.importer.GpImporterTestBase
     }
 
     @:testMethod
-    @:testIgnore
     public function TestTremolo() : Void 
     {
         var reader : alphaTab.importer.GpxImporter = PrepareGpxImporterWithFile("GuitarPro6/TestTremolo.gpx");

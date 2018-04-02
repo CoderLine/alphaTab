@@ -1,5 +1,5 @@
 @echo off
 echo Starting HTTP Server
-start "AlphaTab Sample HTTP Server" ..\..\..\Tools\miniweb.exe -r . -p 8002
+start http-server -p 8001
 echo Opening Feature Sample
-start http://localhost:8002/
+start http://localhost:8001/

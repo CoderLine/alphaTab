@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using System.Linq;
 using AlphaTab.Model;
 
 namespace AlphaTab.Samples.Wpf.ViewModel
@@ -115,7 +116,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
             _track = track;
 
             // general midi Programs
-            if (track.IsPercussion)
+            if (track.Staves.Any(s=>s.StaffKind == StaffKind.Percussion))
             {
                 TrackType = TrackType.Drums;
             }
