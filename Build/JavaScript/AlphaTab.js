@@ -19726,7 +19726,9 @@ alphaTab.model.Note.prototype = {
 		if(this.MaxBendPoint == null || point.Value > this.MaxBendPoint.Value) {
 			this.MaxBendPoint = point;
 		}
-		this.BendType = 1;
+		if(this.BendType == 0) {
+			this.BendType = 1;
+		}
 	}
 	,Finish: function() {
 		var _gthis = this;
@@ -25486,7 +25488,7 @@ alphaTab.rendering.glyphs.BendGlyph.prototype = $extend(alphaTab.rendering.glyph
 		case 4:
 			renderingPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
 			renderingPoints.push(new alphaTab.model.BendPoint(60 / 2 | 0,note.BendPoints[1].Value));
-			renderingPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[1].Value));
+			renderingPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[3].Value));
 			break;
 		case 2:case 3:case 5:case 6:case 7:case 8:
 			renderingPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
@@ -25594,7 +25596,7 @@ alphaTab.rendering.glyphs.BendGlyph.prototype = $extend(alphaTab.rendering.glyph
 			var up = secondPt.Value > firstPt.Value;
 			dV = Math.abs(dV);
 			var s = "";
-			if(dV == 4 && up) {
+			if(dV == 4) {
 				s = "full";
 				dV = dV - 4;
 			} else if(dV >= 4 || dV <= -4) {
@@ -25606,7 +25608,7 @@ alphaTab.rendering.glyphs.BendGlyph.prototype = $extend(alphaTab.rendering.glyph
 				s = s + alphaTab.rendering.glyphs.BendGlyph.GetFractionSign(dV);
 			}
 			if(s != "") {
-				if(!up) {
+				if(!up && s != "full") {
 					s = "-" + s;
 				}
 				canvas.set_Font(res.TablatureFont);

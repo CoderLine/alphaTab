@@ -59,7 +59,7 @@ namespace AlphaTab.Rendering.Glyphs
                 case BendType.BendRelease:
                     renderingPoints.Add(new BendPoint(0, note.BendPoints[0].Value));
                     renderingPoints.Add(new BendPoint(BendPoint.MaxPosition / 2, note.BendPoints[1].Value));
-                    renderingPoints.Add(new BendPoint(BendPoint.MaxPosition, note.BendPoints[1].Value));
+                    renderingPoints.Add(new BendPoint(BendPoint.MaxPosition, note.BendPoints[3].Value));
                     break;
                 case BendType.Bend:
                 case BendType.Hold:
@@ -228,7 +228,7 @@ namespace AlphaTab.Rendering.Glyphs
                 // calculate label
                 var s = "";
                 // Full Steps
-                if (dV == 4 && up)
+                if (dV == 4)
                 {
                     s = "full";
                     dV -= 4;
@@ -248,7 +248,7 @@ namespace AlphaTab.Rendering.Glyphs
 
                 if (s != "")
                 {
-                    if (!up)
+                    if (!up && s != "full")
                     {
                         s = "-" + s;
                     }

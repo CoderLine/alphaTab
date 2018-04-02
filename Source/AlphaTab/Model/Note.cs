@@ -340,7 +340,11 @@ namespace AlphaTab.Model
             {
                 MaxBendPoint = point;
             }
-            BendType = BendType.Custom;
+
+            if (BendType == BendType.None)
+            {
+                BendType = BendType.Custom;
+            }
         }
 
         public void Finish()
