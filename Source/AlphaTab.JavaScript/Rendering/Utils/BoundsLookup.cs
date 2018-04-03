@@ -45,7 +45,7 @@ namespace AlphaTab.Rendering.Utils
                     MasterBarBounds mb = Platform.Platform.NewObject();
                     mb.VisualBounds = BoundsToJson(masterBar.VisualBounds);
                     mb.RealBounds = BoundsToJson(masterBar.RealBounds);
-
+                    mb.Index = masterBar.Index;
                     mb.Bars = new FastList<BarBounds>();
 
                     foreach (var bar in masterBar.Bars)
@@ -98,6 +98,7 @@ namespace AlphaTab.Rendering.Utils
                 foreach (var masterBar in staveGroup.Bars)
                 {
                     var mb = new MasterBarBounds();
+                    mb.Index = masterBar.Index;
                     mb.IsFirstOfLine = masterBar.IsFirstOfLine;
                     mb.VisualBounds = masterBar.VisualBounds;
                     mb.RealBounds = masterBar.RealBounds;

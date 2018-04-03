@@ -29489,6 +29489,7 @@ alphaTab.rendering.staves.StaveGroup.prototype = {
 				var renderer = this.Staves[i].FirstStaffInAccolade.BarRenderers[j];
 				if(i == 0) {
 					var masterBarBounds = new alphaTab.rendering.utils.MasterBarBounds();
+					masterBarBounds.Index = renderer.Bar.get_MasterBar().Index;
 					masterBarBounds.IsFirstOfLine = renderer.get_IsFirstOfLine();
 					var _tmp2 = new alphaTab.rendering.utils.Bounds();
 					_tmp2.X = x + renderer.X;
@@ -29502,7 +29503,7 @@ alphaTab.rendering.staves.StaveGroup.prototype = {
 					_tmp3.W = renderer.Width;
 					_tmp3.H = visualHeight;
 					masterBarBounds.VisualBounds = _tmp3;
-					this.Layout.Renderer.get_BoundsLookup().AddMasterBar(renderer.Bar.get_MasterBar(),masterBarBounds);
+					this.Layout.Renderer.get_BoundsLookup().AddMasterBar(masterBarBounds);
 					masterBarBoundsLookup.push(masterBarBounds);
 				}
 				renderer.BuildBoundingsLookup(masterBarBoundsLookup[j],x,cy + this.Y + this._firstStaffInAccolade.Y);
@@ -30061,6 +30062,7 @@ alphaTab.rendering.utils.BoundsLookup.FromJson = function(json,score) {
 		while(masterBar.hasNext()) {
 			var masterBar1 = masterBar.next();
 			var mb = new alphaTab.rendering.utils.MasterBarBounds();
+			mb.Index = masterBar1.Index;
 			mb.IsFirstOfLine = masterBar1.IsFirstOfLine;
 			mb.VisualBounds = masterBar1.VisualBounds;
 			mb.RealBounds = masterBar1.RealBounds;
@@ -30106,6 +30108,7 @@ alphaTab.rendering.utils.BoundsLookup.prototype = {
 				var mb = {}
 				mb.VisualBounds = this.BoundsToJson(masterBar1.VisualBounds);
 				mb.RealBounds = this.BoundsToJson(masterBar1.RealBounds);
+				mb.Index = masterBar1.Index;
 				var this3 = [];
 				mb.Bars = this3;
 				var bar = $iterator(masterBar1.Bars)();
@@ -30159,10 +30162,14 @@ alphaTab.rendering.utils.BoundsLookup.prototype = {
 		this.StaveGroups.push(bounds);
 		this._currentStaveGroup = bounds;
 	}
-	,AddMasterBar: function(masterBar,bounds) {
-		bounds.StaveGroupBounds = this._currentStaveGroup;
-		this._masterBarLookup[masterBar.Index] = bounds;
-		this._currentStaveGroup.AddBar(bounds);
+	,AddMasterBar: function(bounds) {
+		if(bounds.StaveGroupBounds == null) {
+			bounds.StaveGroupBounds = this._currentStaveGroup;
+			this._masterBarLookup[bounds.Index] = bounds;
+			this._currentStaveGroup.AddBar(bounds);
+		} else {
+			this._masterBarLookup[bounds.Index] = bounds;
+		}
 	}
 	,AddBeat: function(bounds) {
 		this._beatLookup[bounds.Beat.Id] = bounds;
@@ -30217,6 +30224,7 @@ alphaTab.rendering.utils.BoundsLookup.prototype = {
 	,__class__: alphaTab.rendering.utils.BoundsLookup
 };
 alphaTab.rendering.utils.MasterBarBounds = $hx_exports["alphaTab"]["rendering"]["utils"]["MasterBarBounds"] = function() {
+	this.Index = 0;
 	this.IsFirstOfLine = false;
 	this.VisualBounds = null;
 	this.RealBounds = null;
@@ -30326,6 +30334,7 @@ alphaTab.rendering.utils.StaveGroupBounds.prototype = {
 		}
 	}
 	,AddBar: function(bounds) {
+		this.BoundsLookup.AddMasterBar(bounds);
 		bounds.StaveGroupBounds = this;
 		this.Bars.push(bounds);
 	}

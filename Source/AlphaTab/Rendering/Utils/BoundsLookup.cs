@@ -53,6 +53,7 @@ namespace AlphaTab.Rendering.Utils
 
         public void AddBar(MasterBarBounds bounds)
         {
+            BoundsLookup.AddMasterBar(bounds);
             bounds.StaveGroupBounds = this;
             Bars.Add(bounds);
         }
@@ -79,6 +80,7 @@ namespace AlphaTab.Rendering.Utils
 
     public class MasterBarBounds
     {
+        public int Index { get; set; }
         public bool IsFirstOfLine { get; set; }
         public Bounds VisualBounds { get; set; }
         public Bounds RealBounds { get; set; }
@@ -222,11 +224,18 @@ namespace AlphaTab.Rendering.Utils
             _currentStaveGroup = bounds;
         }
 
-        public void AddMasterBar(MasterBar masterBar, MasterBarBounds bounds)
+        public void AddMasterBar(MasterBarBounds bounds)
         {
-            bounds.StaveGroupBounds = _currentStaveGroup;
-            _masterBarLookup[masterBar.Index] = bounds;
-            _currentStaveGroup.AddBar(bounds);
+            if (bounds.StaveGroupBounds == null)
+            {
+                bounds.StaveGroupBounds = _currentStaveGroup;
+                _masterBarLookup[bounds.Index] = bounds;
+                _currentStaveGroup.AddBar(bounds);
+            }
+            else
+            {
+                _masterBarLookup[bounds.Index] = bounds;
+            }
         }
 
         public void AddBeat(BeatBounds bounds)
