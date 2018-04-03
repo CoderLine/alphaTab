@@ -14359,6 +14359,9 @@ alphaTab.importer.GpifParser.prototype = {
 				case "Staves":
 					this.ParseStaves(track,c1);
 					break;
+				case "Transpose":
+					this.ParseTranspose(track,c1);
+					break;
 				default:
 				}
 			}
@@ -14659,6 +14662,31 @@ alphaTab.importer.GpifParser.prototype = {
 					}
 				}
 			}
+		}
+	}
+	,ParseTranspose: function(track,node) {
+		var octave = 0;
+		var chromatic = 0;
+		var c = $iterator(node.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "Chromatic":
+					chromatic = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					break;
+				case "Octave":
+					octave = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					break;
+				default:
+				}
+			}
+		}
+		var staff = $iterator(track.Staves)();
+		while(staff.hasNext()) {
+			var staff1 = staff.next();
+			staff1.DisplayTranspositionPitch = octave * 12 + chromatic;
 		}
 	}
 	,ParseMasterBarsNode: function(node) {
@@ -29474,7 +29502,7 @@ alphaTab.rendering.staves.StaveGroup.prototype = {
 					_tmp3.W = renderer.Width;
 					_tmp3.H = visualHeight;
 					masterBarBounds.VisualBounds = _tmp3;
-					this.Layout.Renderer.get_BoundsLookup().AddMasterBar(masterBarBounds);
+					this.Layout.Renderer.get_BoundsLookup().AddMasterBar(renderer.Bar.get_MasterBar(),masterBarBounds);
 					masterBarBoundsLookup.push(masterBarBounds);
 				}
 				renderer.BuildBoundingsLookup(masterBarBoundsLookup[j],x,cy + this.Y + this._firstStaffInAccolade.Y);
@@ -30007,6 +30035,7 @@ alphaTab.rendering.utils.Bounds.prototype = {
 };
 alphaTab.rendering.utils.BoundsLookup = $hx_exports["alphaTab"]["rendering"]["utils"]["BoundsLookup"] = function() {
 	this._beatLookup = null;
+	this._masterBarLookup = null;
 	this._currentStaveGroup = null;
 	this.StaveGroups = null;
 	this.IsFinished = false;
@@ -30014,6 +30043,8 @@ alphaTab.rendering.utils.BoundsLookup = $hx_exports["alphaTab"]["rendering"]["ut
 	this.StaveGroups = this1;
 	var this2 = {}
 	this._beatLookup = this2;
+	var this3 = {}
+	this._masterBarLookup = this3;
 };
 alphaTab.rendering.utils.BoundsLookup.__name__ = ["alphaTab","rendering","utils","BoundsLookup"];
 alphaTab.rendering.utils.BoundsLookup.FromJson = function(json,score) {
@@ -30128,12 +30159,26 @@ alphaTab.rendering.utils.BoundsLookup.prototype = {
 		this.StaveGroups.push(bounds);
 		this._currentStaveGroup = bounds;
 	}
-	,AddMasterBar: function(bounds) {
+	,AddMasterBar: function(masterBar,bounds) {
 		bounds.StaveGroupBounds = this._currentStaveGroup;
+		this._masterBarLookup[masterBar.Index] = bounds;
 		this._currentStaveGroup.AddBar(bounds);
 	}
 	,AddBeat: function(bounds) {
 		this._beatLookup[bounds.Beat.Id] = bounds;
+	}
+	,FindMasterBarByIndex: function(index) {
+		if(this._masterBarLookup.hasOwnProperty(index)) {
+			return this._masterBarLookup[index];
+		}
+		return null;
+	}
+	,FindMasterBar: function(bar) {
+		var id = bar.Index;
+		if(this._masterBarLookup.hasOwnProperty(id)) {
+			return this._masterBarLookup[id];
+		}
+		return null;
 	}
 	,FindBeat: function(beat) {
 		var id = beat.Id;

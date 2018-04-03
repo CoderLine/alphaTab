@@ -192,14 +192,17 @@ namespace AlphaTab.Rendering.Utils
     public partial class BoundsLookup
     {
         private FastDictionary<int, BeatBounds> _beatLookup;
+        private FastDictionary<int, MasterBarBounds> _masterBarLookup;
         private StaveGroupBounds _currentStaveGroup;
         public FastList<StaveGroupBounds> StaveGroups { get; set; }
         public bool IsFinished { get; private set; }
+
 
         public BoundsLookup()
         {
             StaveGroups = new FastList<StaveGroupBounds>();
             _beatLookup = new FastDictionary<int, BeatBounds>();
+            _masterBarLookup = new FastDictionary<int, MasterBarBounds>();
         }
 
         public void Finish()
@@ -219,15 +222,35 @@ namespace AlphaTab.Rendering.Utils
             _currentStaveGroup = bounds;
         }
 
-        public void AddMasterBar(MasterBarBounds bounds)
+        public void AddMasterBar(MasterBar masterBar, MasterBarBounds bounds)
         {
             bounds.StaveGroupBounds = _currentStaveGroup;
+            _masterBarLookup[masterBar.Index] = bounds;
             _currentStaveGroup.AddBar(bounds);
         }
 
         public void AddBeat(BeatBounds bounds)
         {
             _beatLookup[bounds.Beat.Id] = bounds;
+        }
+
+        public MasterBarBounds FindMasterBarByIndex(int index)
+        {
+            if (_masterBarLookup.ContainsKey(index))
+            {
+                return _masterBarLookup[index];
+            }
+            return null;
+        }
+
+        public MasterBarBounds FindMasterBar(MasterBar bar)
+        {
+            var id = bar.Index;
+            if (_masterBarLookup.ContainsKey(id))
+            {
+                return _masterBarLookup[id];
+            }
+            return null;
         }
 
         public BeatBounds FindBeat(Beat beat)

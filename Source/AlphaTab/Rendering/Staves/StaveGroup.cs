@@ -464,7 +464,7 @@ namespace AlphaTab.Rendering.Staves
                             W = renderer.Width,
                             H = visualHeight
                         };
-                        Layout.Renderer.BoundsLookup.AddMasterBar(masterBarBounds);
+                        Layout.Renderer.BoundsLookup.AddMasterBar(renderer.Bar.MasterBar, masterBarBounds);
                         masterBarBoundsLookup.Add(masterBarBounds);
                     }
 

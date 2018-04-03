@@ -433,6 +433,9 @@ namespace AlphaTab.Importer
                         case "Staves":
                             ParseStaves(track, c);
                             break;
+                        case "Transpose":
+                            ParseTranspose(track, c);
+                            break;
                     }
                 }
             }
@@ -780,6 +783,32 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
+            }
+        }
+
+        private void ParseTranspose(Track track, XmlNode node)
+        {
+            int octave = 0;
+            int chromatic = 0;
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Chromatic":
+                            chromatic = Platform.Platform.ParseInt(c.InnerText);
+                            break;
+                        case "Octave":
+                            octave = Platform.Platform.ParseInt(c.InnerText);
+                            break;
+                    }
+                }
+            }
+
+            foreach (var staff in track.Staves)
+            {
+                staff.DisplayTranspositionPitch = octave * 12 + chromatic;
             }
         }
 
