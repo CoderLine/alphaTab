@@ -77,10 +77,80 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            
+            var startNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, _note.Beat.Voice.Bar);
+
+            Note endNote = _note;
+            bool isMultiBeatBend = false;
+            BarRendererBase endNoteRenderer;
+            bool endNoteHasBend = false;
+
+            Beat endBeat = null;
+
+            while (endNote.IsTieOrigin)
+            {
+                var nextNote = endNote.TieDestination;
+
+                endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, nextNote.Beat.Voice.Bar);
+
+                if (endNoteRenderer == null || startNoteRenderer.Staff != endNoteRenderer.Staff)
+                {
+                    break;
+                }
+
+                endNote = nextNote;
+                isMultiBeatBend = true;
+                if (endNote.HasBend)
+                {
+                    endNoteHasBend = true;
+                    break;
+                }
+            }
+
+            endBeat = endNote.Beat;
+            endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, endBeat.Voice.Bar);
+
+            if (endBeat.Index == endBeat.Voice.Beats.Count - 1 && !endNote.HasBend)
+            {
+                endBeat = null;
+            }
+
+            float startX = 0;
+            float endX = 0;
+
+            float topY = cy + startNoteRenderer.Y;
+            float bottomY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_note);
+
+            startX = cx + startNoteRenderer.X;
+            if (_renderPoints[0].Value > 0 || _note.IsContinuedBend)
+            {
+                startX += startNoteRenderer.GetBeatX(_note.Beat, BeatXPosition.MiddleNotes);
+            }
+            else
+            {
+                startX += startNoteRenderer.GetNoteX(_note);
+            }
+
+            var endXPositionType = endNoteHasBend
+                ? BeatXPosition.MiddleNotes 
+                : BeatXPosition.EndBeat;
+
+            if (endBeat == null || (endBeat.Index == endBeat.Voice.Beats.Count - 1 && !endNoteHasBend))
+            {
+                endX = cx + endNoteRenderer.X + endNoteRenderer.Width;
+            }
+            else
+            {
+                endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat, endXPositionType);
+            }
+
+            if (!isMultiBeatBend)
+            {
+                endX -= (ArrowSize * Scale) / 2;
+            }
+
             // we need some pixels for the arrow. otherwise we might draw into the next 
             // note
-            var width = Width - (ArrowSize * Scale) / 2;
+            var width = endX - startX;
 
             //var bendHeight = _note.MaxBendPoint.Value * _bendValueHeight;
             //var c = new Color((byte)(Platform.Platform.RandomDouble() * 255),
@@ -88,14 +158,11 @@ namespace AlphaTab.Rendering.Glyphs
             //        (byte)(Platform.Platform.RandomDouble() * 255),
             //      100);
             //canvas.Color = c;
-            //canvas.FillRect(cx + X, cy + Y - bendHeight, width, bendHeight);
+            //canvas.FillRect(startX, topY - bendHeight, width, bottomY - (topY - bendHeight));
 
             // calculate offsets per step
 
             var dX = width / BendPoint.MaxPosition;
-
-            cx += X;
-            cy += Y;
 
             canvas.BeginPath();
             for (int i = 0, j = _renderPoints.Count - 1; i < j; i++)
@@ -106,13 +173,13 @@ namespace AlphaTab.Rendering.Glyphs
                 // draw pre-bend if previous 
                 if (i == 0 && firstPt.Value != 0 && !_note.IsTieDestination)
                 {
-                    PaintBend(new BendPoint(), firstPt, cx, cy, dX, canvas);
+                    PaintBend(new BendPoint(), firstPt, startX, topY, dX, canvas);
                 }
 
-                // don't draw a line if there's no offset and it's the last point
-                if (firstPt.Value == secondPt.Value && i == _note.BendPoints.Count - 2) continue;
-
-                PaintBend(firstPt, secondPt,  cx, cy, dX, canvas);
+                if (_note.BendType != BendType.Prebend)
+                {
+                    PaintBend(firstPt, secondPt, startX, topY, dX, canvas);
+                }
             }
         }
 
@@ -253,10 +320,16 @@ namespace AlphaTab.Rendering.Glyphs
                         s = "-" + s;
                     }
 
+                    var startY = y2;
+                    if (!up)
+                    {
+                        startY = y1 + Math.Abs(y2 - y1) * 1f / 3;
+                    }
+
                     // draw label
                     canvas.Font = res.TablatureFont;
                     var size = canvas.MeasureText(s);
-                    var y = up ? y2 - res.TablatureFont.Size - (2 * Scale) : y2 + (2 * Scale);
+                    var y = startY - res.TablatureFont.Size - (2 * Scale);
                     var x = x2 - size / 2;
 
                     canvas.FillText(s, x, y);

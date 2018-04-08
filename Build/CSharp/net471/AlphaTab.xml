@@ -4,11 +4,495 @@
         <name>AlphaTab</name>
     </assembly>
     <members>
+        <member name="P:AlphaTab.Audio.Synth.AlphaSynth.IsReady">
+            <inheritdoc />
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.AlphaSynth.IsReadyForPlayback">
+            <inheritdoc />
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.AlphaSynth.State">
+            <inheritdoc />
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.AlphaSynth.LogLevel">
+            <inheritdoc />
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.AlphaSynth.MasterVolume">
+            <inheritdoc />
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.AlphaSynth.MetronomeVolume">
+            <inheritdoc />
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.AlphaSynth.PlaybackSpeed">
+            <inheritdoc />
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.AlphaSynth.TickPosition">
+            <inheritdoc />
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.AlphaSynth.TimePosition">
+            <inheritdoc />
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.AlphaSynth.PlaybackRange">
+            <inheritdoc />
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.AlphaSynth.IsLooping">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.AlphaSynth.Play">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.AlphaSynth.Pause">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.AlphaSynth.PlayPause">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.AlphaSynth.Stop">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.AlphaSynth.LoadSoundFont(System.Byte[])">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.AlphaSynth.SetChannelMute(System.Int32,System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.AlphaSynth.ResetChannelStates">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.AlphaSynth.SetChannelSolo(System.Int32,System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.AlphaSynth.SetChannelVolume(System.Int32,System.Double)">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.AlphaSynth.SetChannelProgram(System.Int32,System.Byte)">
+            <inheritdoc />
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.IAlphaSynth.IsReady">
+            <summary>
+            Gets or sets whether the synthesizer is ready for interaction. (output and worker are initialized)
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.IAlphaSynth.IsReadyForPlayback">
+            <summary>
+            Gets or sets whether the synthesizer is ready for playback. (output, worker are initialized, soundfont and midi are loaded)
+            </summary>p
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.IAlphaSynth.State">
+            <summary>
+            Gets the current player state.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.IAlphaSynth.LogLevel">
+            <summary>
+            Gets or sets the loging level. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.IAlphaSynth.MasterVolume">
+            <summary>
+            Gets or sets the current master volume as percentage. (range: 0.0-3.0, default 1.0)
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.IAlphaSynth.MetronomeVolume">
+            <summary>
+            Gets or sets the metronome volume. (range: 0.0-3.0, default 0.0)
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.IAlphaSynth.PlaybackSpeed">
+            <summary>
+            Gets or sets the current playback speed as percentage. (range: 0.125-8.0, default: 1.0)
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.IAlphaSynth.TickPosition">
+            <summary>
+            Gets or sets the position within the song in midi ticks.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.IAlphaSynth.TimePosition">
+            <summary>
+            Gets or sets the position within the song in milliseconds.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.IAlphaSynth.PlaybackRange">
+            <summary>
+            Gets or sets the range of the song that should be played. Set this to null
+            to play the whole song. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.IAlphaSynth.IsLooping">
+            <summary>
+            Gets or sets whether the playback should automatically restart after it finished. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.IAlphaSynth.Play">
+            <summary>
+            Starts the playback if possible
+            </summary>  
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.IAlphaSynth.Pause">
+            <summary>
+            Pauses the playback if was running
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.IAlphaSynth.PlayPause">
+            <summary>
+            Starts the playback if possible, pauses the playback if was running
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.IAlphaSynth.Stop">
+            <summary>
+            Stopps the playback
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.IAlphaSynth.LoadSoundFont(System.Byte[])">
+             <summary>
+            Loads a soundfont from the given data
+             </summary>
+             <param name="data">a byte array to load the data from </param>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.IAlphaSynth.SetChannelMute(System.Int32,System.Boolean)">
+            <summary>
+            Gets the mute state of a channel.
+            </summary>
+            <param name="channel">The channel number</param>
+            <param name="mute">true if the channel should be muted, otherwise false.</param>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.IAlphaSynth.ResetChannelStates">
+            <summary>
+            Resets the mute/solo state of all channels
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.IAlphaSynth.SetChannelSolo(System.Int32,System.Boolean)">
+            <summary>
+            Gets the solo state of a channel.
+            </summary>
+            <param name="channel">The channel number</param>
+            <param name="solo">true if the channel should be played solo, otherwise false.</param>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.IAlphaSynth.SetChannelVolume(System.Int32,System.Double)">
+            <summary>
+            Gets or sets the current and initial volume of the given channel.
+            </summary>
+            <param name="channel">The channel number.</param>
+            <param name="volume">The volume of of the channel (0.0-3.0)</param>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.IAlphaSynth.SetChannelProgram(System.Int32,System.Byte)">
+            <summary>
+            Gets or sets the current and initial program of the given channel.
+            </summary>
+            <param name="channel">The channel number.</param>
+            <param name="program">The midi program.</param>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.ISynthOutput.SampleRate">
+            <summary>
+            Gets the sample rate required by the output.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.ISynthOutput.Open">
+            <summary>
+            Called when the output should be opened.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.ISynthOutput.SequencerFinished">
+            <summary>
+            Called when the sequencer finished the playback. 
+            This tells the output not to request any samples anymore after the existing buffers are finished. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.ISynthOutput.Play">
+            <summary>
+            Called when the output should start the playback. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.ISynthOutput.Pause">
+            <summary>
+            Called when the output should stop the playback.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.ISynthOutput.AddSamples(AlphaTab.Audio.Synth.Ds.SampleArray)">
+            <summary>
+            Called when samples have been synthesized and should be added to the playback buffer.
+            </summary>
+            <param name="samples"></param>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.ISynthOutput.ResetSamples">
+            <summary>
+            Called when the samples in the output buffer should be reset. This is neeed for instance when seeking to another position. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.ISynthOutput.Ready">
+            <summary>
+            Fired when the output has been successfully opened and is ready to play samples.
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.ISynthOutput.SamplesPlayed">
+            <summary>
+            Fired when a certain number of samples have been played. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.ISynthOutput.SampleRequest">
+            <summary>
+            Fired when the output needs more samples to be played. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.ISynthOutput.Finished">
+            <summary>
+            Fired when the last samples after calling SequencerFinished have been played. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Synth.MidiFileSequencer">
+            <summary>
+            This sequencer dispatches midi events to the synthesizer based on the current
+            synthesize position. The sequencer does not consider the playback speed. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.MidiFileSequencer._currentTime">
+            <remarks>
+            Note that this is not the actual playback position. It's the position where we are currently synthesizing at. 
+            Depending on the buffer size of the output, this position is after the actual playback. 
+            </remarks>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.MidiFileSequencer.EndTick">
+            <summary>
+            Gets the duration of the song in ticks. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.MidiFileSequencer.EndTime">
+            <summary>
+            Gets the duration of the song in milliseconds. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.MidiFileSequencer.PlaybackSpeed">
+            <summary>
+            Gets or sets the playback speed. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Synth.Synthesis.PlaybackRange">
+            <summary>
+            Represents a range of the song that should be played.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.PlaybackRange.StartTick">
+            <summary>
+            The position in midi ticks from where the song should start.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.PlaybackRange.EndTick">
+            <summary>
+            The position in midi ticks to where the song should be played.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.Synthesizer.MicroBufferSize">
+            <summary>
+            The size of the individual sub buffers in samples
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.Synthesizer.MicroBufferCount">
+            <summary>
+            The number of sub buffers
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.Synthesizer.SampleBuffer">
+            <summary>
+            Gets or sets the overall buffer of samples consisting of multiple microbuffers. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.Synthesizer.SoundBank">
+            <summary>
+            The patch bank that holds all of the currently loaded instrument patches
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.Synthesizer.SampleRate">
+            <summary>
+            The number of samples per second produced per channel
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.Synthesizer.MasterVolume">
+            <summary>
+            The master volume 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.Synthesizer.MetronomeVolume">
+            <summary>
+            The metronome volume 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Synth.Synthesis.SynthParameters">
+            <summary>
+            Parameters for a single synth channel including its program, bank, and cc list.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.SynthParameters.Program">
+            <summary>
+            program number
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.SynthParameters.BankSelect">
+            <summary>
+            bank number
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.SynthParameters.ChannelAfterTouch">
+            <summary>
+            channel pressure event
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.SynthParameters.Pan">
+            <summary>
+            (vol) pan positions controlling both right and left output levels
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.SynthParameters.Volume">
+            <summary>
+            (vol) channel volume controller
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.SynthParameters.Expression">
+            <summary>
+            (vol) expression controller
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.SynthParameters.ModRange">
+            <summary>
+            (pitch) mod wheel pitch modifier in partial cents ie. 22.3
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.SynthParameters.PitchBend">
+            <summary>
+            (pitch) pitch bend including both semitones and cents
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.SynthParameters.PitchBendRangeCoarse">
+            <summary>
+            controls max and min pitch bend range semitones
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.SynthParameters.PitchBendRangeFine">
+            <summary>
+            controls max and min pitch bend range cents
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.SynthParameters.MasterCoarseTune">
+            <summary>
+            (pitch) transposition in semitones
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.SynthParameters.MasterFineTune">
+            <summary>
+            (pitch) transposition in cents
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.SynthParameters.HoldPedal">
+            <summary>
+            hold pedal status (true) for active
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.SynthParameters.LegatoPedal">
+            <summary>
+            legato pedal status (true) for active
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Synthesis.SynthParameters.Rpn">
+            <summary>
+            registered parameter number
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.Synthesis.SynthParameters.ResetControllers">
+            <summary>
+            Resets all of the channel's controllers to initial first power on values. Not the same as CC-121.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.GeneralMidi">
+            <summary>
+            This public class provides names for all general midi instruments.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Generator.IMidiFileHandler">
+            <summary>
+            A handler is responsible for writing midi events to a custom structure
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Generator.MidiFileGenerator">
+            <summary>
+            This generator creates a midi file using a score. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.MidiUtils.QuarterTime">
+            <summary>
+            The amount of ticks per quarter note used within this midi system.
+            (Pulses Per Quarter Note)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.MidiUtils.PercussionChannel">
+            <summary>
+            The default midi channel used for percussion
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.MidiUtils.TicksToMillis(System.Int32,System.Int32)">
+            <summary>
+            Converts a duration value to its ticks equivalent.
+            </summary>
+            <param name="duration"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.Audio.MidiUtils.ToTicks(AlphaTab.Model.Duration)">
+            <summary>
+            Converts a duration value to its ticks equivalent.
+            </summary>
+            <param name="duration"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.Audio.MidiUtils.ValueToTicks(System.Int32)">
+            <summary>
+            Converts a numerical value to its ticks equivalent.
+            </summary>
+            <param name="duration">the numerical proportion to convert. (i.E. timesignature denominator, note duration,...)</param>
+            <returns></returns>
+        </member>
         <member name="T:AlphaTab.Environment">
             <summary>
             This public class represents the global alphaTab environment where
             alphaTab looks for information like available layout engines
             staves etc.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.IO.ZipFile">
+            <summary>
+            This class allows reading zip files.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.IO.ZipFile.Load(AlphaTab.IO.IReadable)">
+            <summary>
+            Load a complete ZipFile to the memory.
+            </summary>
+            <param name="s">the binary source to read from.</param>
+            <returns></returns>
+        </member>
+        <member name="P:AlphaTab.IO.ZipFile.FileFilter">
+            <summary>
+            You can set a file filter method using this setter. On parsing
+            the filestructure this function can determine based on the filename 
+            whether this file will be available after loading. 
+            This way we can reduce the amount of memory we store.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.IO.ZipFile.Entries">
+            <summary>
+            Gets the list of entries stored in this Zip File.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.IO.ZipFile.#ctor">
+            <summary>
+            Creates a new GpxFileSystem instance
+            </summary>
+        </member>
+        <member name="T:AlphaTab.IO.BitReader">
+            <summary>
+            This utility public class allows bitwise reading of a stream
+            </summary>
+        </member>
+        <member name="T:AlphaTab.IO.ZipEntry">
+            <summary>
+            this public class represents a file within the GpxFileSystem
             </summary>
         </member>
         <member name="T:AlphaTab.Platform.ICanvas">
@@ -56,96 +540,80 @@
              A canvas implementation storing SVG data
             </summary>
         </member>
-        <member name="T:AlphaTab.Audio.GeneralMidi">
+        <member name="T:AlphaTab.Settings">
             <summary>
-            This public class provides names for all general midi instruments.
+            This public class contains instance specific settings for alphaTab
+            </summary>
+            <summary>
+            This public class contains instance specific settings for alphaTab
             </summary>
         </member>
-        <member name="T:AlphaTab.Audio.Generator.IMidiFileHandler">
+        <member name="P:AlphaTab.Settings.Scale">
             <summary>
-            A handler is responsible for writing midi events to a custom structure
+            Sets the zoom level of the rendered notation
             </summary>
         </member>
-        <member name="T:AlphaTab.Audio.Generator.MidiFileGenerator">
+        <member name="P:AlphaTab.Settings.Width">
             <summary>
-            This generator creates a midi file using a score. 
+            The initial size of the canvas during loading or the width for particular layouts (e.g. page layout).
             </summary>
         </member>
-        <member name="T:AlphaTab.Audio.Generator.MidiFileHandler">
+        <member name="P:AlphaTab.Settings.Engine">
             <summary>
-            This handler is responsible for writing midi events
-            to a MidiFile object.
+            The engine which should be used to render the the tablature. 
+            <ul>
+             <li><strong>default</strong> - Platform specific default engine</li>
+             <li><strong>html5</strong> - HTML5 Canvas</li>
+             <li><strong>svg</strong> -  SVG </li>
+            </ul>
             </summary>
         </member>
-        <member name="F:AlphaTab.Audio.MidiUtils.QuarterTime">
+        <member name="P:AlphaTab.Settings.Layout">
             <summary>
-            The amount of ticks per quarter note used within this midi system.
-            (Pulses Per Quarter Note)
+            The layout specific settings
             </summary>
         </member>
-        <member name="F:AlphaTab.Audio.MidiUtils.PercussionChannel">
+        <member name="P:AlphaTab.Settings.ImporterSettings">
             <summary>
-            The default midi channel used for percussion
+            Specific settings for importers. Keys are specific for the importers. 
+            <strong>MusicXML</strong>
+            <ul>
+             <li><strong>musicxmlMergePartGroups</strong> - If part-groups should be merged into a single track (boolean, default:false)</li>
+            </ul>
             </summary>
         </member>
-        <member name="M:AlphaTab.Audio.MidiUtils.TicksToMillis(System.Int32,System.Int32)">
+        <member name="P:AlphaTab.Settings.StretchForce">
             <summary>
-            Converts a duration value to its ticks equivalent.
-            </summary>
-            <param name="duration"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AlphaTab.Audio.MidiUtils.ToTicks(AlphaTab.Model.Duration)">
-            <summary>
-            Converts a duration value to its ticks equivalent.
-            </summary>
-            <param name="duration"></param>
-            <returns></returns>
-        </member>
-        <member name="M:AlphaTab.Audio.MidiUtils.ValueToTicks(System.Int32)">
-            <summary>
-            Converts a numerical value to its ticks equivalent.
-            </summary>
-            <param name="duration">the numerical proportion to convert. (i.E. timesignature denominator, note duration,...)</param>
-            <returns></returns>
-        </member>
-        <member name="T:AlphaTab.Audio.Model.MidiController">
-            <summary>
-            Contains all midi controller definitions
+            The default stretch force to use for layouting. 
             </summary>
         </member>
-        <member name="T:AlphaTab.Audio.Model.MidiEvent">
+        <member name="P:AlphaTab.Settings.ForcePianoFingering">
             <summary>
-            A midi event is a timed midi message. 
+            Forces the fingering rendering to use always the piano finger stýle where 
+            fingers are rendered as 1-5 instead of p,i,m,a,c and T,1,2,3,4.
             </summary>
         </member>
-        <member name="T:AlphaTab.Audio.Model.MidiFile">
+        <member name="P:AlphaTab.Settings.Staves">
             <summary>
-            A midi file consists of multiple tracks including a
-            info track for multi-track messages 
+            The staves that should be shown in the music sheet. 
+            This is one of the profiles registered in the <see cref="F:AlphaTab.Environment.StaveProfiles"/>
             </summary>
         </member>
-        <member name="P:AlphaTab.Audio.Model.MidiFile.InfoTrack">
+        <member name="P:AlphaTab.Settings.TranspositionPitches">
             <summary>
-            Gets or sets the index of the track used for midi events
-            affecting all tracks. (like the tempo)
+            The transposition pitch offsets for the individual tracks. 
+            They apply to rendering and playback.
             </summary>
         </member>
-        <member name="T:AlphaTab.Audio.Model.MidiMessage">
+        <member name="P:AlphaTab.Settings.DisplayTranspositionPitches">
             <summary>
-            Represents a midi message. 
+            The transposition pitch offsets for the individual tracks. 
+            They apply to rendering only.
             </summary>
         </member>
-        <member name="P:AlphaTab.Audio.Model.MidiMessage.Data">
+        <member name="P:AlphaTab.Settings.LogLevel">
             <summary>
-            The raw midi message data
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Audio.Model.MidiTrack">
-            <summary>
-            Represents a single midi track. A midi track contains
-            a linked list of midi es and supports sorted inserting of 
-            midi es into this track.
+            The log level to use within alphaTab
             </summary>
         </member>
         <member name="T:AlphaTab.Importer.AlphaTexImporter">
@@ -345,31 +813,36 @@
             <param name="offset">offset the offset to start reading from</param>
             <returns></returns>
         </member>
+        <member name="T:AlphaTab.Importer.Gp7Importer">
+            <summary>
+            This ScoreImporter can read Guitar Pro 7 (gp) files.
+            </summary>
+        </member>
         <member name="T:AlphaTab.Importer.GpxImporter">
             <summary>
             This ScoreImporter can read Guitar Pro 6 (gpx) files.
             </summary>
         </member>
-        <member name="T:AlphaTab.Importer.GpxRhythm">
+        <member name="T:AlphaTab.Importer.GpifRhythm">
             <summary>
-            This structure represents a duration within a gpx model.
+            This structure represents a duration within a gpif model.
             </summary>
         </member>
-        <member name="T:AlphaTab.Importer.GpxParser">
+        <member name="T:AlphaTab.Importer.GpifParser">
             <summary>
             This public class can parse a score.gpif xml file into the model structure
             </summary>
         </member>
-        <member name="F:AlphaTab.Importer.GpxParser.BendPointPositionFactor">
+        <member name="F:AlphaTab.Importer.GpifParser.BendPointPositionFactor">
             <summary>
             GPX range: 0-100
             Internal range: 0 - 60
             </summary>
         </member>
-        <member name="F:AlphaTab.Importer.GpxParser.BendPointValueFactor">
+        <member name="F:AlphaTab.Importer.GpifParser.BendPointValueFactor">
             <summary>
-            GPX Range: 0-300      
-            Internal Range: 0-12
+            GPIF: 25 per quarternote
+            Internal Range: 1 per quarter note
             </summary>
         </member>
         <member name="T:AlphaTab.Importer.MixTableChange">
@@ -391,11 +864,6 @@
             <summary>
             The ScoreLoader enables you easy loading of Scores using all 
             available importers
-            </summary>
-        </member>
-        <member name="T:AlphaTab.IO.BitReader">
-            <summary>
-            This utility public class allows bitwise reading of a stream
             </summary>
         </member>
         <member name="T:AlphaTab.Model.AccentuationType">
@@ -612,6 +1080,60 @@
             This will move the note one line up and applies a Flat. 
             </summary>
         </member>
+        <member name="T:AlphaTab.Model.BendType">
+            <summary>
+            Lists all types of bends 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.BendType.None">
+            <summary>
+            No bend at all
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.BendType.Custom">
+            <summary>
+            Individual points define the bends in a flexible manner. 
+            This system was mainly used in Guitar Pro 3-5
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.BendType.Bend">
+            <summary>
+            Simple Bend from an unbended string to a higher note. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.BendType.Release">
+            <summary>
+            Release of a bend that was started on an earlier note.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.BendType.BendRelease">
+            <summary>
+            A bend that starts from an unbended string, 
+            and also releases the bend after some time.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.BendType.Hold">
+            <summary>
+            Holds a bend that was started on an earlier note
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.BendType.Prebend">
+            <summary>
+            A bend that is already started before the note is played then it is held until the end. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.BendType.PrebendBend">
+            <summary>
+            A bend that is already started before the note is played and
+            bends even further, then it is held until the end. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.BendType.PrebendRelease">
+            <summary>
+            A bend that is already started before the note is played and
+            then releases the bend to a lower note where it is held until the end.
+            </summary>
+        </member>
         <member name="T:AlphaTab.Model.Note">
             <summary>
             A note is a single played sound on a fretted instrument. 
@@ -661,6 +1183,11 @@
         <member name="P:AlphaTab.Model.RepeatGroup.Closings">
             <summary>
             a list of masterbars which close the group. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.RepeatGroup.IsOpened">
+            <summary>
+             true if the repeat group was opened well
             </summary>
         </member>
         <member name="P:AlphaTab.Model.RepeatGroup.IsClosed">
@@ -736,34 +1263,40 @@
             This public enum lists all different types of finger slides on a string.
             </summary>
         </member>
+        <member name="T:AlphaTab.Model.StaffKind">
+            <summary>
+            Represents the different kinds of staffs.
+            </summary>
+        </member>
         <member name="T:AlphaTab.Model.Staff">
             <summary>
             This class describes a single staff within a track. There are instruments like pianos
             where a single track can contain multiple staffs. 
             </summary>
         </member>
-        <member name="T:AlphaTab.Model.Track">
-            <summary>
-            This public class describes a single track or instrument of score
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Model.Track.TranspositionPitch">
+        <member name="P:AlphaTab.Model.Staff.TranspositionPitch">
             <summary>
             Gets or sets the number of semitones this track should be
             transposed. This applies to rendering and playback.
             </summary>
         </member>
-        <member name="P:AlphaTab.Model.Track.DisplayTranspositionPitch">
+        <member name="P:AlphaTab.Model.Staff.DisplayTranspositionPitch">
             <summary>
             Gets or sets the number of semitones this track should be 
             transposed. This applies only to rendering. 
             </summary>
         </member>
-        <member name="P:AlphaTab.Model.Track.Tuning">
+        <member name="P:AlphaTab.Model.Staff.Tuning">
             <summary>
             Get or set the guitar tuning of the guitar. This tuning also indicates the number of strings shown in the
             guitar tablature. Unlike the <see cref="P:AlphaTab.Model.Note.String"/> property this array directly represents
             the order of the tracks shown in the tablature. The first item is the most top tablature line. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.Track">
+            <summary>
+            This public class describes a single track or instrument of score.
+            It is bascially a list of staffs containing individual music notation kinds.
             </summary>
         </member>
         <member name="T:AlphaTab.Model.TripletFeel">
@@ -831,6 +1364,11 @@
         <member name="F:AlphaTab.Rendering.BeatXPosition.OnNotes">
             <summary>
             Gets the on-notes position which is located after the accidentals but before the note heads. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Rendering.BeatXPosition.MiddleNotes">
+            <summary>
+            Gets the middel-notes position which is located after in the middle the note heads. 
             </summary>
         </member>
         <member name="F:AlphaTab.Rendering.BeatXPosition.PostNotes">
@@ -1352,68 +1890,6 @@
             <param name="note"></param>
             <returns></returns>
         </member>
-        <member name="T:AlphaTab.Settings">
-            <summary>
-            This public class contains instance specific settings for alphaTab
-            </summary>
-            <summary>
-            This public class contains instance specific settings for alphaTab
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Settings.Scale">
-            <summary>
-            Sets the zoom level of the rendered notation
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Settings.Width">
-            <summary>
-            The initial size of the canvas during loading or the width for particular layouts (e.g. page layout).
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Settings.Engine">
-            <summary>
-            The engine which should be used to render the the tablature. 
-            <ul>
-             <li><strong>default</strong> - Platform specific default engine</li>
-             <li><strong>html5</strong> - HTML5 Canvas</li>
-             <li><strong>svg</strong> -  SVG </li>
-            </ul>
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Settings.Layout">
-            <summary>
-            The layout specific settings
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Settings.StretchForce">
-            <summary>
-            The default stretch force to use for layouting. 
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Settings.ForcePianoFingering">
-            <summary>
-            Forces the fingering rendering to use always the piano finger stýle where 
-            fingers are rendered as 1-5 instead of p,i,m,a,c and T,1,2,3,4.
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Settings.Staves">
-            <summary>
-            The staves that should be shown in the music sheet. 
-            This is one of the profiles registered in the <see cref="F:AlphaTab.Environment.StaveProfiles"/>
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Settings.TranspositionPitches">
-            <summary>
-            The transposition pitch offsets for the individual tracks. 
-            They apply to rendering and playback.
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Settings.DisplayTranspositionPitches">
-            <summary>
-            The transposition pitch offsets for the individual tracks. 
-            They apply to rendering only.
-            </summary>
-        </member>
         <member name="P:AlphaTab.LayoutSettings.Mode">
             <summary>
             The layouting mode used to arrange the the notation.
@@ -1466,36 +1942,6 @@
         <member name="T:AlphaTab.Xml.XmlParser.XmlState">
             <summary>
             faster than enum
-            </summary>
-        </member>
-        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
-            <summary>
-            GeneratedInternalTypeHelper
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
-            <summary>
-            CreateInstance
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            GetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            SetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
-            <summary>
-            CreateDelegate
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
-            <summary>
-            AddEventHandler
             </summary>
         </member>
     </members>

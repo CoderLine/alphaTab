@@ -19,6 +19,7 @@
 using System;
 using AlphaTab.Collections;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 using AlphaTab.Util;
 using Phase;
 
@@ -196,7 +197,6 @@ namespace AlphaTab
             json.displayTranspositionPitches = DisplayTranspositionPitches;
             json.logging = LogLevel;
 
-
             json.scriptFile = ScriptFile;
             json.fontDirectory = FontDirectory;
             json.lazy = DisableLazyLoading;
@@ -273,7 +273,6 @@ namespace AlphaTab
                     }
                 }
             }
-
 
             if (Platform.Platform.JsonExists(json, "logging"))
             {

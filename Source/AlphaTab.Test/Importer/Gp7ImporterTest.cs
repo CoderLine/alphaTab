@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.IO;
 using System.Linq;
 using AlphaTab.Importer;
 using AlphaTab.IO;
@@ -243,13 +244,11 @@ namespace AlphaTab.Test.Importer
 
             note = score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Notes[0];
             Assert.AreEqual(BendType.PrebendBend, note.BendType);
-            Assert.AreEqual(3, note.BendPoints.Count);
+            Assert.AreEqual(2, note.BendPoints.Count);
             Assert.AreEqual(0, note.BendPoints[0].Offset);
             Assert.AreEqual(4, note.BendPoints[0].Value);
-            Assert.AreEqual(7, note.BendPoints[1].Offset);
-            Assert.AreEqual(5, note.BendPoints[1].Value);
-            Assert.AreEqual(15, note.BendPoints[2].Offset);
-            Assert.AreEqual(5, note.BendPoints[2].Value);
+            Assert.AreEqual(15, note.BendPoints[1].Offset);
+            Assert.AreEqual(6, note.BendPoints[1].Value);
 
             #endregion
 
@@ -301,13 +300,11 @@ namespace AlphaTab.Test.Importer
 
             note = score.Tracks[0].Staves[0].Bars[5].Voices[0].Beats[1].Notes[0];
             Assert.AreEqual(BendType.PrebendBend, note.BendType);
-            Assert.AreEqual(3, note.BendPoints.Count);
+            Assert.AreEqual(2, note.BendPoints.Count);
             Assert.AreEqual(0, note.BendPoints[0].Offset);
             Assert.AreEqual(8, note.BendPoints[0].Value);
-            Assert.AreEqual(7, note.BendPoints[1].Offset);
-            Assert.AreEqual(10, note.BendPoints[1].Value);
-            Assert.AreEqual(16, note.BendPoints[2].Offset);
-            Assert.AreEqual(10, note.BendPoints[2].Value);
+            Assert.AreEqual(16, note.BendPoints[1].Offset);
+            Assert.AreEqual(12, note.BendPoints[1].Value);
 
             #endregion
 

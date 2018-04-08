@@ -416,9 +416,7 @@ namespace AlphaTab.Model
                             {
                                 BendType = BendType.PrebendBend;
                                 BendPoints.RemoveAt(2);
-                                // bug in Guitar Pro? even though after the bend we hold 
-                                // the note it bends up slightly more. 
-                                destination.Value = middle1.Value;
+                                BendPoints.RemoveAt(1);
                             }
                             else
                             {

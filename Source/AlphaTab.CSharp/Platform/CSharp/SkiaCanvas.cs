@@ -41,6 +41,8 @@ namespace AlphaTab.Platform.CSharp
         private SKPath _path;
         private string _typeFaceCache;
         private SKTypeface _typeFace;
+        private float _width;
+        private float _height;
 
         public Color Color { get; set; }
         public float LineWidth { get; set; }
@@ -83,6 +85,8 @@ namespace AlphaTab.Platform.CSharp
 
         public void BeginRender(float width, float height)
         {
+            _width = width;
+            _height = height;
             var newImage = SKSurface.Create((int)width, (int)height, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
             _surface = newImage;
             if (_path != null)

@@ -464,6 +464,8 @@ namespace AlphaTab.Rendering
                         return container.VoiceContainer.X + container.X + container.PreNotes.X;
                     case BeatXPosition.OnNotes:
                         return container.VoiceContainer.X + container.X + container.OnNotes.X;
+                    case BeatXPosition.MiddleNotes:
+                        return container.VoiceContainer.X + container.X + container.OnNotes.X + (container.OnNotes.Width / 2.0f);
                     case BeatXPosition.PostNotes:
                         return container.VoiceContainer.X + container.X + container.OnNotes.X + container.OnNotes.Width;
                     case BeatXPosition.EndBeat:
@@ -508,6 +510,11 @@ namespace AlphaTab.Rendering
         /// Gets the on-notes position which is located after the accidentals but before the note heads. 
         /// </summary>
         OnNotes,
+
+        /// <summary>
+        /// Gets the middel-notes position which is located after in the middle the note heads. 
+        /// </summary>
+        MiddleNotes,
 
         /// <summary>
         /// Get the post-notes position which is located at after the note heads. 

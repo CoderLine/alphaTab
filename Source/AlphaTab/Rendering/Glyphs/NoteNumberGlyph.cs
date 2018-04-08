@@ -17,7 +17,6 @@
  */
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
@@ -42,7 +41,7 @@ namespace AlphaTab.Rendering.Glyphs
                     _noteString = "(" + _noteString + ")";
                 }
             }
-            else if (n.Beat.Index == 0 || (n.HasBend))
+            else if (n.Beat.Index == 0 || (n.HasBend && (!n.TieOrigin.HasBend || !n.TieOrigin.IsTieDestination)))
             {
                 _noteString = "(" + (n.TieOrigin.Fret - n.Beat.Voice.Bar.Staff.TranspositionPitch) + ")";
             }

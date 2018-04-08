@@ -56,10 +56,10 @@ namespace AlphaTab.Importer
         /// </summary>
         private const float BendPointPositionFactor = 60.0f / 100.0f;
         /// <summary>
-        /// GPX Range: 0-300      
-        /// Internal Range: 0-12
+        /// GPIF: 25 per quarternote
+        /// Internal Range: 1 per quarter note
         /// </summary>
-        private const float BendPointValueFactor = 12f / 300f;
+        private const float BendPointValueFactor = 1 / 25f;
 
         public Score Score { get; set; }
 

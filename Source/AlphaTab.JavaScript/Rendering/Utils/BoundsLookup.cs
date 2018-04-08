@@ -20,7 +20,6 @@ using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using Phase;
 
 namespace AlphaTab.Rendering.Utils
 {
