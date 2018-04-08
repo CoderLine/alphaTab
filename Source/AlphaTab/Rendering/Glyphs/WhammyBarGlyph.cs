@@ -124,7 +124,7 @@ namespace AlphaTab.Rendering.Glyphs
 
                         if (dv > 0)
                         {
-                            s += BendGlyph.GetFractionSign(dv);
+                            s += TabBendGlyph.GetFractionSign(dv);
                         }
 
                         if (s != "")

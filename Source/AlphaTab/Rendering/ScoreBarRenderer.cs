@@ -51,7 +51,7 @@ namespace AlphaTab.Rendering
         public ScoreBarRenderer(ScoreRenderer renderer, Bar bar)
             : base(renderer, bar)
         {
-            AccidentalHelper = new AccidentalHelper();
+            AccidentalHelper = new AccidentalHelper(bar);
         }
 
         public BeamDirection GetBeatDirection(Beat beat)

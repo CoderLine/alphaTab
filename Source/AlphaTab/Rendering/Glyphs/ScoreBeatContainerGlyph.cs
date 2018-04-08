@@ -64,12 +64,12 @@ namespace AlphaTab.Rendering
 
             // NOTE: we create 2 tie glyphs if we have a line break inbetween 
             // the two notes
-            if (n.IsTieOrigin) 
+            if (n.IsTieOrigin && !n.HasBend) 
             {
                 var tie = new ScoreTieGlyph(n, n.TieDestination);
                 Ties.Add(tie);
             }
-            if (n.IsTieDestination)
+            if (n.IsTieDestination && !n.TieOrigin.HasBend)
             {
                 var tie = new ScoreTieGlyph(n.TieOrigin, n, true);
                 Ties.Add(tie);
@@ -116,6 +116,18 @@ namespace AlphaTab.Rendering
             {
                 var l = new ScoreSlideLineGlyph(n.SlideType, n, this);
                 Ties.Add(l);
+            }
+
+            if (n.HasBend)
+            {
+                // TODO: register needed overflow for bend
+                //var bendValueHeight = 6;
+                //var bendHeight = n.MaxBendPoint.Value * bendValueHeight;
+                //Renderer.RegisterOverflowTop(bendHeight);
+
+                var bend = new ScoreBendGlyph(n);
+                bend.Renderer = Renderer;
+                Ties.Add(bend);
             }
         }
     }

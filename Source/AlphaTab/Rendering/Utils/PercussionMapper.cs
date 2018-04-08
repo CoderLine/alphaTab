@@ -53,9 +53,8 @@ namespace AlphaTab.Rendering.Utils
         /// </summary>
         /// <param name="note"></param>
         /// <returns></returns>
-        public static int MapNoteForDisplay(Note note)
+        public static int MapNoteForDisplay(int value)
         {
-            var value = note.RealValue;
             if (value == 61 || value == 66)
             {
                 return 50;

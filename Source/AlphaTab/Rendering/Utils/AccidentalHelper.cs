@@ -27,6 +27,8 @@ namespace AlphaTab.Rendering.Utils
     /// </summary>
     public class AccidentalHelper
     {
+        private readonly Bar _bar;
+
         /// <summary>
         /// a lookup list containing an info whether the notes within an octave 
         /// need an accidental rendered. the accidental symbol is determined based on the type of key signature. 
@@ -88,11 +90,14 @@ namespace AlphaTab.Rendering.Utils
         private readonly FastDictionary<int, bool> _registeredAccidentals;
 
         private readonly FastDictionary<int, int> _appliedScoreLines;
+        private readonly FastDictionary<int, int> _appliedScoreLinesByValue;
 
-        public AccidentalHelper()
+        public AccidentalHelper(Bar bar)
         {
+            _bar = bar;
             _registeredAccidentals = new FastDictionary<int, bool>();
             _appliedScoreLines = new FastDictionary<int, int>();
+            _appliedScoreLinesByValue = new FastDictionary<int, int>();
         }
 
         /// <summary>
@@ -103,17 +108,31 @@ namespace AlphaTab.Rendering.Utils
         /// <returns></returns>
         public AccidentalType ApplyAccidental(Note note)
         {
-            var noteValue = note.RealValue;
-            var ks = note.Beat.Voice.Bar.MasterBar.KeySignature;
-            var ksi = (ks + 7);
-            var index = (noteValue % 12);
-
-            var accidentalToSet = AccidentalType.None;
-
             var line = RegisterNoteLine(note);
+            return GetAccidental(line, note.RealValue);
+        }
 
-            if (note.Beat.Voice.Bar.Staff.StaffKind != StaffKind.Percussion)
+        /// <summary>
+        /// Calculates the accidental for the given note value and assignes the value to it. 
+        /// The new accidental type is also registered within the current scope
+        /// </summary>
+        /// <param name="note"></param>
+        /// <returns></returns>
+        public AccidentalType ApplyAccidentalForValue(int noteValue)
+        {
+            var line = RegisterNoteValueLine(noteValue);
+            return GetAccidental(line, noteValue);
+        }
+
+        private AccidentalType GetAccidental(int line, int noteValue)
+        { 
+            var accidentalToSet = AccidentalType.None;
+            if (_bar.Staff.StaffKind != StaffKind.Percussion)
             {
+                var ks = _bar.MasterBar.KeySignature;
+                var ksi = (ks + 7);
+                var index = (noteValue % 12);
+
                 // the key signature symbol required according to 
                 var keySignatureAccidental = ksi < 7 ? AccidentalType.Flat : AccidentalType.Sharp;
 
@@ -141,11 +160,24 @@ namespace AlphaTab.Rendering.Utils
 
         private int RegisterNoteLine(Note n)
         {
-            var staff = n.Beat.Voice.Bar.Staff;
-            var track = staff.Track;
-            var value = staff.StaffKind == StaffKind.Percussion ? PercussionMapper.MapNoteForDisplay(n) : n.RealValue - staff.DisplayTranspositionPitch;
-            var ks = n.Beat.Voice.Bar.MasterBar.KeySignature;
-            var clef = n.Beat.Voice.Bar.Clef;
+            var steps = CalculateNoteLine(n.RealValue, n.AccidentalMode);
+            _appliedScoreLines[n.Id] = steps;
+            return steps;
+        }
+
+        private int RegisterNoteValueLine(int noteValue)
+        {
+            var steps = CalculateNoteLine(noteValue, NoteAccidentalMode.Default);
+            _appliedScoreLinesByValue[noteValue] = steps;
+            return steps;
+        }
+
+        private int CalculateNoteLine(int noteValue, NoteAccidentalMode mode)
+        {
+            var staff = _bar.Staff;
+            var value = staff.StaffKind == StaffKind.Percussion ? PercussionMapper.MapNoteForDisplay(noteValue) : noteValue - staff.DisplayTranspositionPitch;
+            var ks = _bar.MasterBar.KeySignature;
+            var clef = _bar.Clef;
 
             var index = value % 12;
             var octave = (value / 12) - 1;
@@ -163,7 +195,7 @@ namespace AlphaTab.Rendering.Utils
 
             //Add offset for note itself
             int offset = 0;
-            switch (n.AccidentalMode)
+            switch (mode)
             {
                 // TODO: provide line according to accidentalMode
                 case NoteAccidentalMode.Default:
@@ -179,8 +211,6 @@ namespace AlphaTab.Rendering.Utils
             }
             steps -= stepList[index];
 
-            _appliedScoreLines[n.Id] = steps;
-
             return steps;
         }
 
@@ -188,6 +218,11 @@ namespace AlphaTab.Rendering.Utils
         public int GetNoteLine(Note n)
         {
             return _appliedScoreLines[n.Id];
+        }
+
+        public float GetNoteLineForValue(int rawValue)
+        {
+            return _appliedScoreLinesByValue[rawValue];
         }
     }
 

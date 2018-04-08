@@ -141,7 +141,7 @@ namespace AlphaTab.Rendering.Utils
         {
             if (_staff.StaffKind== StaffKind.Percussion)
             {
-                return PercussionMapper.MapNoteForDisplay(n);
+                return PercussionMapper.MapNoteForDisplay(n.RealValue);
             }
             else
             {

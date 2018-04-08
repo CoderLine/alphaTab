@@ -91,7 +91,7 @@ namespace AlphaTab.Rendering.Glyphs
                 var bendHeight = n.MaxBendPoint.Value * bendValueHeight;
                 renderer.RegisterOverflowTop(bendHeight);
 
-                var bend = new BendGlyph(n, bendValueHeight);
+                var bend = new TabBendGlyph(n, bendValueHeight);
                 bend.Renderer = renderer;
                 Ties.Add(bend);
             }

@@ -36,19 +36,24 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
+                    var scale = (_isGrace ? GraceScale : 1) * Scale;
             switch (_duration)
             {
                 case Duration.QuadrupleWhole:
-                    Width = 14 * (_isGrace ? GraceScale : 1) * Scale;
+                    Width = 14 * scale;
+                    Height = NoteHeadHeight * scale;
                     break;
                 case Duration.DoubleWhole:
                     Width = 14 * (_isGrace ? GraceScale : 1) * Scale;
+                    Height = NoteHeadHeight * scale;
                     break;
                 case Duration.Whole:
                     Width = 14 * (_isGrace ? GraceScale : 1) * Scale;
+                    Height = NoteHeadHeight * scale;
                     break;
                 default:
                     Width = 8f * (_isGrace ? GraceScale : 1) * Scale;
+                    Height = NoteHeadHeight * scale;
                     break;
             }
         }

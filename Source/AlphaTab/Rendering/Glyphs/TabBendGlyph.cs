@@ -23,7 +23,7 @@ using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class BendGlyph : Glyph
+    public class TabBendGlyph : Glyph
     {
         private const int ArrowSize = 6;
         private const int DashSize = 3;
@@ -31,7 +31,7 @@ namespace AlphaTab.Rendering.Glyphs
         private FastList<BendPoint> _renderPoints;
         private readonly float _bendValueHeight;
 
-        public BendGlyph(Note n, float bendValueHeight)
+        public TabBendGlyph(Note n, float bendValueHeight)
             : base(0, 0)
         {
             _note = n;
@@ -146,6 +146,7 @@ namespace AlphaTab.Rendering.Glyphs
             if (!isMultiBeatBend)
             {
                 endX -= (ArrowSize * Scale) / 2;
+                endX -= ScoreBendGlyph.EndPadding * Scale;
             }
 
             // we need some pixels for the arrow. otherwise we might draw into the next 
@@ -248,26 +249,29 @@ namespace AlphaTab.Rendering.Glyphs
                 // draw horizontal dashed line 
                 // to really have the line ending at the right position
                 // we draw from right to left. it's okay if the space is at the beginning
-                var dashX = x2;
-                var dashSize = DashSize * Scale;
-                var end = (x1 + dashSize);
-                var dashes = (dashX - x1) / (dashSize * 2);
-                if (dashes < 1)
+                if (firstPt.Value > 0)
                 {
-                    canvas.MoveTo(dashX, y1);
-                    canvas.LineTo(x1, y1);
-                }
-                else
-                {
-                    while (dashX > end)
+                    var dashX = x2;
+                    var dashSize = DashSize * Scale;
+                    var end = (x1 + dashSize);
+                    var dashes = (dashX - x1) / (dashSize * 2);
+                    if (dashes < 1)
                     {
                         canvas.MoveTo(dashX, y1);
-                        canvas.LineTo(dashX - dashSize, y1);
-                        dashX -= dashSize * 2;
+                        canvas.LineTo(x1, y1);
                     }
-                }
+                    else
+                    {
+                        while (dashX > end)
+                        {
+                            canvas.MoveTo(dashX, y1);
+                            canvas.LineTo(dashX - dashSize, y1);
+                            dashX -= dashSize * 2;
+                        }
+                    }
 
-                canvas.Stroke();
+                    canvas.Stroke();
+                }
             }
             else
             {
