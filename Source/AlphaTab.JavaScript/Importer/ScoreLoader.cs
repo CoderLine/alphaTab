@@ -18,6 +18,7 @@
 using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
+using AlphaTab.Platform;
 using Haxe.Js.Html;
 using Phase;
 using Phase.Attributes;
@@ -46,7 +47,8 @@ namespace AlphaTab.Importer
             {
                 if (xhr.ReadyState == XMLHttpRequest.DONE)
                 {
-                    if (xhr.Status == 200)
+                    object response = xhr.Response;
+                    if (xhr.Status == 200 || (xhr.Status == 0 && response.IsTruthy()))
                     {
                         try
                         {

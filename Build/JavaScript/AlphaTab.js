@@ -6389,7 +6389,7 @@ alphaTab.Settings.AppendScriptName = function(url) {
 };
 alphaTab.Settings.EnsureFullUrl = function(relativeUrl) {
 	var global = $global;
-	if(!StringTools.startsWith(relativeUrl,"http") && !StringTools.startsWith(relativeUrl,"https")) {
+	if(!StringTools.startsWith(relativeUrl,"http") && !StringTools.startsWith(relativeUrl,"https") && !StringTools.startsWith(relativeUrl,"file")) {
 		var this1 = "";
 		var root = this1;
 		root += Std.string(global.location.protocol);
@@ -17267,7 +17267,8 @@ alphaTab.importer.ScoreLoader.LoadScoreAsync = function(path,success,error,impor
 	xhr.responseType = "arraybuffer";
 	xhr.onreadystatechange = function() {
 		if(xhr.readyState == 4) {
-			if(xhr.status == 200) {
+			var response = xhr.response;
+			if(xhr.status == 200 || xhr.status == 0 && !(!response)) {
 				try {
 					var buffer = xhr.response;
 					var reader = new Uint8Array(buffer);

@@ -1882,6 +1882,18 @@
             the overall max note within this group
             </summary>
         </member>
+        <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.MinNoteValue">
+            <summary>
+            the overall min note value within this group. 
+            This includes values caused by bends. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.MaxNoteValue">
+            <summary>
+            the overall max note value within this group
+            This includes values caused by bends. 
+            </summary>
+        </member>
         <member name="M:AlphaTab.Rendering.Utils.BeamingHelper.IsPositionFrom(System.String,AlphaTab.Model.Beat)">
             <summary>
             Returns whether the the position of the given beat, was registered by the staff of the given ID
