@@ -1291,8 +1291,7 @@ namespace AlphaTab.Platform.JavaScript
             barCursor.Style.Height = barBoundings.VisualBounds.H + "px";
 
             // move beat to start position immediately
-            beatCursor.Style.Transition = "all 0s linear";
-            beatCursor.Style.TransitionDuration = "0ms";
+            beatCursor.Style.Transition = "none";
             beatCursor.Style.Top = barBoundings.VisualBounds.Y + "px";
             beatCursor.Style.Left = beatBoundings.VisualBounds.X + "px";
             beatCursor.Style.Width = Settings.BeatCursorWidth + "px";
@@ -1329,9 +1328,12 @@ namespace AlphaTab.Platform.JavaScript
                         }
                     }
 
-                    beatCursor.Style.Transition = "all 0s linear";
-                    beatCursor.Style.TransitionDuration = duration + "ms";
-                    beatCursor.Style.Left = nextBeatX + "px";
+                    Browser.Window.RequestAnimationFrame(f =>
+                    {
+                        beatCursor.Style.Transition = "all 0s linear";
+                        beatCursor.Style.TransitionDuration = duration + "ms";
+                        beatCursor.Style.Left = nextBeatX + "px";
+                    });
                 }
 
                 if (!_selecting)

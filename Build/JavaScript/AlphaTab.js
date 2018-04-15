@@ -22246,8 +22246,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		barCursor.style.left = Std.string(barBoundings.VisualBounds.X) + "px";
 		barCursor.style.width = Std.string(barBoundings.VisualBounds.W) + "px";
 		barCursor.style.height = Std.string(barBoundings.VisualBounds.H) + "px";
-		beatCursor.style.transition = "all 0s linear";
-		beatCursor.style.transitionDuration = "0ms";
+		beatCursor.style.transition = "none";
 		beatCursor.style.top = Std.string(barBoundings.VisualBounds.Y) + "px";
 		beatCursor.style.left = Std.string(beatBoundings.VisualBounds.X) + "px";
 		beatCursor.style.width = Std.string(this.Settings.BeatCursorWidth) + "px";
@@ -22271,9 +22270,11 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 						nextBeatX = nextBeatBoundings.VisualBounds.X;
 					}
 				}
-				beatCursor.style.transition = "all 0s linear";
-				beatCursor.style.transitionDuration = duration + "ms";
-				beatCursor.style.left = Std.string(nextBeatX) + "px";
+				window.requestAnimationFrame(function(f) {
+					beatCursor.style.transition = "all 0s linear";
+					beatCursor.style.transitionDuration = duration + "ms";
+					beatCursor.style.left = Std.string(nextBeatX) + "px";
+				});
 			}
 			if(!this._selecting) {
 				var scrollElement = this.Settings.ScrollElement;
