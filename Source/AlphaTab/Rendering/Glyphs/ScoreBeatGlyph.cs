@@ -52,11 +52,22 @@ namespace AlphaTab.Rendering.Glyphs
                     NoteHeads = new ScoreNoteChordGlyph();
                     NoteHeads.Beat = Container.Beat;
                     NoteHeads.BeamingHelper = BeamingHelper;
+
+                    var ghost = new GhostNoteContainerGlyph(false);
+                    ghost.Renderer = Renderer;
+
                     foreach (var note in Container.Beat.Notes)
                     {
                         CreateNoteGlyph(note);
+                        ghost.AddParenthesis(note);
                     }
                     AddGlyph(NoteHeads);
+
+                    if (!ghost.IsEmpty)
+                    {
+                        AddGlyph(new SpacingGlyph(0, 0, 4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
+                        AddGlyph(ghost);
+                    }
 
                     //
                     // Note dots

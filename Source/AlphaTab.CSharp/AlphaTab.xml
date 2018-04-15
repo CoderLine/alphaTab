@@ -1478,7 +1478,7 @@
             This simple glyph allows to put an empty region in to a BarRenderer.
             </summary>
         </member>
-        <member name="M:AlphaTab.Rendering.Glyphs.TieGlyph.PaintTie(AlphaTab.Platform.ICanvas,System.Single,System.Single,System.Single,System.Single,System.Single,System.Boolean)">
+        <member name="M:AlphaTab.Rendering.Glyphs.TieGlyph.PaintTie(AlphaTab.Platform.ICanvas,System.Single,System.Single,System.Single,System.Single,System.Single,System.Boolean,System.Single,System.Single)">
             <summary>
             paints a tie between the two given points
             </summary>

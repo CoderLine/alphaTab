@@ -22,7 +22,6 @@ namespace AlphaTab.Rendering.Glyphs
     public class ScoreBeatPreNotesGlyph : BeatGlyphBase
     {
         private BendNoteHeadGroupGlyph _prebends;
-
         public float PrebendNoteHeadOffset => _prebends.X + _prebends.NoteHeadOffset;
 
         public override void DoLayout()
@@ -30,6 +29,8 @@ namespace AlphaTab.Rendering.Glyphs
             if (!Container.Beat.IsRest)
             {
                 var accidentals = new AccidentalGroupGlyph();
+                var ghost = new GhostNoteContainerGlyph(true);
+                ghost.Renderer = Renderer;
                 _prebends = new BendNoteHeadGroupGlyph();
                 _prebends.Renderer = Renderer;
                 foreach (var note in Container.Beat.Notes)
@@ -46,6 +47,7 @@ namespace AlphaTab.Rendering.Glyphs
                         }
                     }
                     CreateAccidentalGlyph(note, accidentals);
+                    ghost.AddParenthesis(note);
                 }
 
                 if (!_prebends.IsEmpty)
@@ -60,6 +62,12 @@ namespace AlphaTab.Rendering.Glyphs
                     AddGlyph(new SpacingGlyph(0, 0, 4 * Scale));
                 }
 
+                if (!ghost.IsEmpty)
+                {
+                    AddGlyph(ghost);
+                    AddGlyph(new SpacingGlyph(0, 0, 4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
+                }
+
                 if (!accidentals.IsEmpty)
                 {
                     AddGlyph(accidentals);
@@ -69,6 +77,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             base.DoLayout();
         }
+
         private void CreateAccidentalGlyph(Note n, AccidentalGroupGlyph accidentals)
         {
             var sr = (ScoreBarRenderer)Renderer;

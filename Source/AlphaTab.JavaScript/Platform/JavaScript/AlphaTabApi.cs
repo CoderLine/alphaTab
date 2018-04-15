@@ -1141,22 +1141,21 @@ namespace AlphaTab.Platform.JavaScript
 
             _canvasElement.AddEventListener("mousemove", (Action<MouseEvent>)(e =>
             {
-                if (_selecting)
+                if (!_selecting) return;
+                var parentOffset = GetOffset(_canvasElement);
+                var relX = e.PageX - parentOffset.X;
+                var relY = e.PageY - parentOffset.Y;
+                var beat = _cursorCache.GetBeatAtPos(relX, relY);
+                if (beat != null && (_selectionEnd == null || _selectionEnd.Beat != beat))
                 {
-                    var parentOffset = GetOffset(_canvasElement);
-                    var relX = e.PageX - parentOffset.X;
-                    var relY = e.PageY - parentOffset.Y;
-                    var beat = _cursorCache.GetBeatAtPos(relX, relY);
-                    if (beat != null && (_selectionEnd == null || _selectionEnd.Beat != beat))
-                    {
-                        _selectionEnd = new SelectionInfo(beat);
-                        CursorSelectRange(_selectionStart, _selectionEnd);
-                    }
+                    _selectionEnd = new SelectionInfo(beat);
+                    CursorSelectRange(_selectionStart, _selectionEnd);
                 }
             }));
 
             _canvasElement.AddEventListener("mouseup", (Action<MouseEvent>)(e =>
             {
+                if (!_selecting) return;
                 e.PreventDefault();
 
                 // for the selection ensure start < end

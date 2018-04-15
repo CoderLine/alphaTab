@@ -22124,18 +22124,22 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 			}
 		});
 		this._canvasElement.addEventListener("mousemove",function(e1) {
-			if(_gthis._selecting) {
-				var parentOffset1 = _gthis.GetOffset(_gthis._canvasElement);
-				var relX1 = e1.pageX - parentOffset1.X;
-				var relY1 = e1.pageY - parentOffset1.Y;
-				var beat1 = _gthis._cursorCache.GetBeatAtPos(relX1,relY1);
-				if(beat1 != null && (_gthis._selectionEnd == null || _gthis._selectionEnd.Beat != beat1)) {
-					_gthis._selectionEnd = new alphaTab.platform.javaScript.SelectionInfo(beat1);
-					_gthis.CursorSelectRange(_gthis._selectionStart,_gthis._selectionEnd);
-				}
+			if(!_gthis._selecting) {
+				return;
+			}
+			var parentOffset1 = _gthis.GetOffset(_gthis._canvasElement);
+			var relX1 = e1.pageX - parentOffset1.X;
+			var relY1 = e1.pageY - parentOffset1.Y;
+			var beat1 = _gthis._cursorCache.GetBeatAtPos(relX1,relY1);
+			if(beat1 != null && (_gthis._selectionEnd == null || _gthis._selectionEnd.Beat != beat1)) {
+				_gthis._selectionEnd = new alphaTab.platform.javaScript.SelectionInfo(beat1);
+				_gthis.CursorSelectRange(_gthis._selectionStart,_gthis._selectionEnd);
 			}
 		});
 		this._canvasElement.addEventListener("mouseup",function(e2) {
+			if(!_gthis._selecting) {
+				return;
+			}
 			e2.preventDefault();
 			if(_gthis._selectionEnd != null) {
 				var startTick = _gthis._selectionStart.Beat.get_AbsoluteStart();
@@ -26126,6 +26130,109 @@ alphaTab.rendering.glyphs.FlatGlyph.prototype = $extend(alphaTab.rendering.glyph
 	}
 	,__class__: alphaTab.rendering.glyphs.FlatGlyph
 });
+alphaTab.rendering.glyphs.GhostNoteContainerGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["GhostNoteContainerGlyph"] = function(isOpen) {
+	alphaTab.rendering.glyphs.Glyph.call(this,0,0);
+	this._isOpen = false;
+	this._infos = null;
+	this._glyphs = null;
+	this.IsEmpty = false;
+	this._isOpen = isOpen;
+	var this1 = [];
+	this._infos = this1;
+	var this2 = [];
+	this._glyphs = this2;
+};
+alphaTab.rendering.glyphs.GhostNoteContainerGlyph.__name__ = ["alphaTab","rendering","glyphs","GhostNoteContainerGlyph"];
+alphaTab.rendering.glyphs.GhostNoteContainerGlyph.__super__ = alphaTab.rendering.glyphs.Glyph;
+alphaTab.rendering.glyphs.GhostNoteContainerGlyph.prototype = $extend(alphaTab.rendering.glyphs.Glyph.prototype,{
+	AddParenthesis: function(n) {
+		var sr = js.Boot.__cast(this.Renderer , alphaTab.rendering.ScoreBarRenderer);
+		var line = sr.GetNoteLine(n);
+		var info = new alphaTab.rendering.glyphs.GhostNoteInfo(line,n.IsGhost);
+		this._infos.push(info);
+		if(n.IsGhost) {
+			this.IsEmpty = false;
+		}
+	}
+	,DoLayout: function() {
+		var sr = js.Boot.__cast(this.Renderer , alphaTab.rendering.ScoreBarRenderer);
+		var comparison = function(a,b) {
+			return system._Int32.Int32_Impl_.CompareTo_Int32(a.Line,b.Line);
+		};
+		this._infos.sort(function(a1,b1) {
+			return comparison(a1,b1);
+		});
+		var previousGlyph = null;
+		var sizePerLine = sr.GetScoreY(1,0);
+		var i = 0;
+		var j = this._infos.length;
+		while(i < j) {
+			var g;
+			if(!this._infos[i].IsGhost) {
+				previousGlyph = null;
+			} else if(previousGlyph == null) {
+				g = new alphaTab.rendering.glyphs.GhostParenthesisGlyph(this._isOpen);
+				g.Renderer = this.Renderer;
+				var this1 = this._infos[i].Line;
+				g.Y = sr.GetScoreY(this1,0) - sizePerLine;
+				g.Height = sizePerLine * 2;
+				g.DoLayout();
+				this._glyphs.push(g);
+				previousGlyph = g;
+			} else {
+				var this2 = this._infos[i].Line;
+				var y = sr.GetScoreY(this2,0) + sizePerLine;
+				previousGlyph.Height = y - previousGlyph.Y;
+			}
+			++i;
+		}
+		this.Width = this._glyphs.length > 0 ? this._glyphs[0].Width : 0;
+	}
+	,Paint: function(cx,cy,canvas) {
+		alphaTab.rendering.glyphs.Glyph.prototype.Paint.call(this,cx,cy,canvas);
+		var g = $iterator(this._glyphs)();
+		while(g.hasNext()) {
+			var g1 = g.next();
+			g1.Paint(cx + this.X,cy + this.Y,canvas);
+		}
+	}
+	,__class__: alphaTab.rendering.glyphs.GhostNoteContainerGlyph
+});
+alphaTab.rendering.glyphs.GhostNoteInfo = $hx_exports["alphaTab"]["rendering"]["glyphs"]["GhostNoteInfo"] = function(line,isGhost) {
+	this.Line = 0;
+	this.IsGhost = false;
+	this.Line = line;
+	this.IsGhost = isGhost;
+};
+alphaTab.rendering.glyphs.GhostNoteInfo.__name__ = ["alphaTab","rendering","glyphs","GhostNoteInfo"];
+alphaTab.rendering.glyphs.GhostNoteInfo.prototype = {
+	__class__: alphaTab.rendering.glyphs.GhostNoteInfo
+};
+alphaTab.rendering.glyphs.GhostParenthesisGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["GhostParenthesisGlyph"] = function(isOpen) {
+	alphaTab.rendering.glyphs.Glyph.call(this,0,0);
+	this._isOpen = false;
+	this.Height = 0.0;
+	this._isOpen = isOpen;
+};
+alphaTab.rendering.glyphs.GhostParenthesisGlyph.__name__ = ["alphaTab","rendering","glyphs","GhostParenthesisGlyph"];
+alphaTab.rendering.glyphs.GhostParenthesisGlyph.__super__ = alphaTab.rendering.glyphs.Glyph;
+alphaTab.rendering.glyphs.GhostParenthesisGlyph.prototype = $extend(alphaTab.rendering.glyphs.Glyph.prototype,{
+	DoLayout: function() {
+		alphaTab.rendering.glyphs.Glyph.prototype.DoLayout.call(this);
+		this.Width = 10 * this.get_Scale();
+	}
+	,Paint: function(cx,cy,canvas) {
+		if(this._isOpen) {
+			var this1 = 10;
+			alphaTab.rendering.glyphs.TieGlyph.PaintTie(canvas,this.get_Scale(),cx + this.X + this.Width,cy + this.Y + this.Height,cx + this.X + this.Width,cy + this.Y,false,this1,3);
+		} else {
+			var this2 = 10;
+			alphaTab.rendering.glyphs.TieGlyph.PaintTie(canvas,this.get_Scale(),cx + this.X,cy + this.Y,cx + this.X,cy + this.Y + this.Height,false,this2,3);
+		}
+		canvas.Fill();
+	}
+	,__class__: alphaTab.rendering.glyphs.GhostParenthesisGlyph
+});
 alphaTab.rendering.glyphs.HiHatGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["HiHatGlyph"] = function(x,y,isGrace) {
 	alphaTab.rendering.glyphs.MusicFontGlyph.call(this,x,y,isGrace ? 0.75 : 1,57523);
 	this._isGrace = false;
@@ -26745,12 +26852,20 @@ alphaTab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphaTab.rendering.
 				this.NoteHeads = new alphaTab.rendering.glyphs.ScoreNoteChordGlyph();
 				this.NoteHeads.Beat = this.Container.Beat;
 				this.NoteHeads.BeamingHelper = this.BeamingHelper;
+				var ghost = new alphaTab.rendering.glyphs.GhostNoteContainerGlyph(false);
+				ghost.Renderer = this.Renderer;
 				var note = $iterator(this.Container.Beat.Notes)();
 				while(note.hasNext()) {
 					var note1 = note.next();
 					this.CreateNoteGlyph(note1);
+					ghost.AddParenthesis(note1);
 				}
 				this.AddGlyph(this.NoteHeads);
+				if(!ghost.IsEmpty) {
+					this.AddGlyph(new alphaTab.rendering.glyphs.SpacingGlyph(0,0,4 * (this.Container.Beat.GraceType != 0 ? 0.75 : 1) * this.get_Scale()));
+					this.AddGlyph(ghost);
+					this.AddGlyph(new alphaTab.rendering.glyphs.SpacingGlyph(0,0,4 * (this.Container.Beat.GraceType != 0 ? 0.75 : 1) * this.get_Scale()));
+				}
 				if(this.Container.Beat.Dots > 0) {
 					this.AddGlyph(new alphaTab.rendering.glyphs.SpacingGlyph(0,0,5 * this.get_Scale()));
 					var i = 0;
@@ -26908,6 +27023,8 @@ alphaTab.rendering.glyphs.ScoreBeatPreNotesGlyph.prototype = $extend(alphaTab.re
 	,DoLayout: function() {
 		if(!this.Container.Beat.get_IsRest()) {
 			var accidentals = new alphaTab.rendering.glyphs.AccidentalGroupGlyph();
+			var ghost = new alphaTab.rendering.glyphs.GhostNoteContainerGlyph(true);
+			ghost.Renderer = this.Renderer;
 			this._prebends = new alphaTab.rendering.glyphs.BendNoteHeadGroupGlyph();
 			this._prebends.Renderer = this.Renderer;
 			var note = $iterator(this.Container.Beat.Notes)();
@@ -26923,6 +27040,7 @@ alphaTab.rendering.glyphs.ScoreBeatPreNotesGlyph.prototype = $extend(alphaTab.re
 					}
 				}
 				this.CreateAccidentalGlyph(note1,accidentals);
+				ghost.AddParenthesis(note1);
 			}
 			if(!this._prebends.IsEmpty) {
 				this.AddGlyph(this._prebends);
@@ -26931,6 +27049,10 @@ alphaTab.rendering.glyphs.ScoreBeatPreNotesGlyph.prototype = $extend(alphaTab.re
 			if(this.Container.Beat.BrushType != 0) {
 				this.AddGlyph(new alphaTab.rendering.glyphs.ScoreBrushGlyph(this.Container.Beat));
 				this.AddGlyph(new alphaTab.rendering.glyphs.SpacingGlyph(0,0,4 * this.get_Scale()));
+			}
+			if(!ghost.IsEmpty) {
+				this.AddGlyph(ghost);
+				this.AddGlyph(new alphaTab.rendering.glyphs.SpacingGlyph(0,0,4 * (this.Container.Beat.GraceType != 0 ? 0.75 : 1) * this.get_Scale()));
 			}
 			if(!accidentals.get_IsEmpty()) {
 				this.AddGlyph(accidentals);
@@ -27186,7 +27308,13 @@ alphaTab.rendering.glyphs.TieGlyph = $hx_exports["alphaTab"]["rendering"]["glyph
 	this._forEnd = forEnd;
 };
 alphaTab.rendering.glyphs.TieGlyph.__name__ = ["alphaTab","rendering","glyphs","TieGlyph"];
-alphaTab.rendering.glyphs.TieGlyph.PaintTie = function(canvas,scale,x1,y1,x2,y2,down) {
+alphaTab.rendering.glyphs.TieGlyph.PaintTie = function(canvas,scale,x1,y1,x2,y2,down,offset,size) {
+	if(size == null) {
+		size = 4;
+	}
+	if(offset == null) {
+		offset = 22;
+	}
 	if(down == null) {
 		down = false;
 	}
@@ -27201,8 +27329,8 @@ alphaTab.rendering.glyphs.TieGlyph.PaintTie = function(canvas,scale,x1,y1,x2,y2,
 		y1 = y2;
 		y2 = t;
 	}
-	var offset = 22 * scale;
-	var size = 4 * scale;
+	offset = offset * scale;
+	size = size * scale;
 	var normalVectorX = y2 - y1;
 	var normalVectorY = x2 - x1;
 	var this1 = normalVectorX * normalVectorX + normalVectorY * normalVectorY;
@@ -27269,7 +27397,7 @@ alphaTab.rendering.glyphs.TieGlyph.prototype = $extend(alphaTab.rendering.glyphs
 			shouldDraw = true;
 		}
 		if(shouldDraw) {
-			alphaTab.rendering.glyphs.TieGlyph.PaintTie(canvas,this.get_Scale(),startX,startY,endX,endY,direction == 1);
+			alphaTab.rendering.glyphs.TieGlyph.PaintTie(canvas,this.get_Scale(),startX,startY,endX,endY,direction == 1,22,4);
 			canvas.Fill();
 		}
 	}
@@ -33463,6 +33591,7 @@ alphaTab.rendering.TabBarRenderer.LineSpacing = 10;
 alphaTab.rendering.glyphs.AccidentalGroupGlyph.NonReserved = -3000;
 alphaTab.rendering.glyphs.AlternateEndingsGlyph.Padding = 3;
 alphaTab.rendering.glyphs.BendNoteHeadGroupGlyph.AccidentalPadding = 3;
+alphaTab.rendering.glyphs.GhostParenthesisGlyph.Size = 10;
 alphaTab.rendering.glyphs.LineRangedGlyph.LineSpacing = 3;
 alphaTab.rendering.glyphs.LineRangedGlyph.LineTopPadding = 8;
 alphaTab.rendering.glyphs.LineRangedGlyph.LineTopOffset = 6;
