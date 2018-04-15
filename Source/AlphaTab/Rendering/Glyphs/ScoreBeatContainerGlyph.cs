@@ -17,11 +17,14 @@
  */
 using AlphaTab.Model;
 using AlphaTab.Rendering.Glyphs;
+using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering
 {
     public class ScoreBeatContainerGlyph : BeatContainerGlyph
     {
+        private ScoreBendGlyph _bend;
+
         public ScoreBeatContainerGlyph(Beat beat, VoiceContainerGlyph voiceContainer) : base(beat, voiceContainer)
         {
         }
@@ -125,9 +128,10 @@ namespace AlphaTab.Rendering
                 //var bendHeight = n.MaxBendPoint.Value * bendValueHeight;
                 //Renderer.RegisterOverflowTop(bendHeight);
 
-                var bend = new ScoreBendGlyph(n);
-                bend.Renderer = Renderer;
-                Ties.Add(bend);
+                _bend = new ScoreBendGlyph(n);
+                _bend.Renderer = Renderer;
+                _bend.DoLayout();
+                Ties.Add(_bend);
             }
         }
     }

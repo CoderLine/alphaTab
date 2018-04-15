@@ -108,8 +108,13 @@ namespace AlphaTab.Rendering.Utils
         /// <returns></returns>
         public AccidentalType ApplyAccidental(Note note)
         {
-            var line = RegisterNoteLine(note);
-            return GetAccidental(line, note.RealValue);
+            var noteValue = note.RealValue;
+            if (note.HasBend)
+            {
+                noteValue += note.BendPoints[0].Value / 2;
+            }
+            var line = RegisterNoteLine(note, noteValue);
+            return GetAccidental(line, noteValue);
         }
 
         /// <summary>
@@ -158,9 +163,9 @@ namespace AlphaTab.Rendering.Utils
             return accidentalToSet;
         }
 
-        private int RegisterNoteLine(Note n)
+        private int RegisterNoteLine(Note n, int noteValue)
         {
-            var steps = CalculateNoteLine(n.RealValue, n.AccidentalMode);
+            var steps = CalculateNoteLine(noteValue, n.AccidentalMode);
             _appliedScoreLines[n.Id] = steps;
             return steps;
         }
@@ -220,9 +225,16 @@ namespace AlphaTab.Rendering.Utils
             return _appliedScoreLines[n.Id];
         }
 
-        public float GetNoteLineForValue(int rawValue)
+        public int GetNoteLineForValue(int rawValue)
         {
-            return _appliedScoreLinesByValue[rawValue];
+            if (_appliedScoreLinesByValue.ContainsKey(rawValue))
+            {
+                return _appliedScoreLinesByValue[rawValue];
+            }
+            else
+            {
+                return int.MinValue;
+            }
         }
     }
 

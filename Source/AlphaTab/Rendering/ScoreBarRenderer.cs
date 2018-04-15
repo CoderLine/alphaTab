@@ -124,6 +124,19 @@ namespace AlphaTab.Rendering
                     // max note (highest) -> top overflow
                     // 
                     var maxNoteY = GetScoreY(GetNoteLine(h.MaxNote));
+                    {
+                        var maxNoteLineValue = AccidentalHelper.GetNoteLineForValue(h.MaxNoteValue);
+                        if (maxNoteLineValue != int.MinValue)
+                        {
+                            var maxNoteValueY = GetScoreY(maxNoteLineValue);
+                            if (maxNoteValueY < maxNoteY)
+                            {
+                                maxNoteY = maxNoteValueY;
+                            }
+                        }
+                    }
+
+
                     if (h.Direction == BeamDirection.Up)
                     {
                         maxNoteY -= GetStemSize(h);
@@ -148,6 +161,19 @@ namespace AlphaTab.Rendering
                     // min note (lowest) -> bottom overflow
                     //t
                     var minNoteY = GetScoreY(GetNoteLine(h.MinNote));
+                    {
+                        var minNoteValueLine = AccidentalHelper.GetNoteLineForValue(h.MinNoteValue);
+                        if (minNoteValueLine != int.MinValue)
+                        {
+                            var minNoteValueY = GetScoreY(minNoteValueLine);
+                            if (minNoteValueY > minNoteY)
+                            {
+                                minNoteY = minNoteValueY;
+                            }
+                        }
+                    }
+
+
                     if (h.Direction == BeamDirection.Down)
                     {
                         minNoteY += GetStemSize(h);

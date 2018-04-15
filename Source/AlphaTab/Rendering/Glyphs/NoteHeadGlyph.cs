@@ -23,6 +23,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         public const float GraceScale = 0.75f;
         public const float NoteHeadHeight = 9;
+        public const int QuarterNoteHeadWidth = 8;
 
         private readonly bool _isGrace;
         private readonly Duration _duration;
@@ -36,7 +37,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-                    var scale = (_isGrace ? GraceScale : 1) * Scale;
+            var scale = (_isGrace ? GraceScale : 1) * Scale;
             switch (_duration)
             {
                 case Duration.QuadrupleWhole:
@@ -52,7 +53,7 @@ namespace AlphaTab.Rendering.Glyphs
                     Height = NoteHeadHeight * scale;
                     break;
                 default:
-                    Width = 8f * (_isGrace ? GraceScale : 1) * Scale;
+                    Width = QuarterNoteHeadWidth * (_isGrace ? GraceScale : 1) * Scale;
                     Height = NoteHeadHeight * scale;
                     break;
             }

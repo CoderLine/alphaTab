@@ -1804,6 +1804,14 @@
             <param name="note"></param>
             <returns></returns>
         </member>
+        <member name="M:AlphaTab.Rendering.Utils.AccidentalHelper.ApplyAccidentalForValue(System.Int32)">
+            <summary>
+            Calculates the accidental for the given note value and assignes the value to it. 
+            The new accidental type is also registered within the current scope
+            </summary>
+            <param name="note"></param>
+            <returns></returns>
+        </member>
         <member name="T:AlphaTab.Rendering.Utils.BeamBarType">
             <summary>
             Lists all types how two voices can be joined with bars.
@@ -1882,7 +1890,7 @@
             <param name="beat"></param>
             <returns></returns>
         </member>
-        <member name="M:AlphaTab.Rendering.Utils.PercussionMapper.MapNoteForDisplay(AlphaTab.Model.Note)">
+        <member name="M:AlphaTab.Rendering.Utils.PercussionMapper.MapNoteForDisplay(System.Int32)">
             <summary>
             Maps the given note to a normal note value to place the note at the 
             correct line on score notation

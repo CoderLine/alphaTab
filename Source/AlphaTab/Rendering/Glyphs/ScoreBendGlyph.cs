@@ -1,4 +1,5 @@
 ﻿using System;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Utils;
@@ -9,12 +10,67 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private readonly Note _note;
         private const int SlurHeight = 11;
-        public const int EndPadding = 4;
+        public const int EndPadding = (NoteHeadGlyph.QuarterNoteHeadWidth / 2) + 3;
+
+        private FastList<BendNoteHeadGroupGlyph> _bendNoteHeads;
 
         public ScoreBendGlyph(Note n)
             : base(0, 0)
         {
             _note = n;
+            _bendNoteHeads = new FastList<BendNoteHeadGroupGlyph>();
+        }
+
+        public override void DoLayout()
+        {
+            base.DoLayout();
+            switch (_note.BendType)
+            {
+                case BendType.None:
+                case BendType.Custom:
+                case BendType.Hold:
+                    return;
+            }
+
+            if (_note.IsTieOrigin)
+            {
+                return;
+            }
+
+            switch (_note.BendType)
+            {
+                case BendType.Bend:
+                case BendType.PrebendRelease:
+                case BendType.PrebendBend:
+                    {
+                        var endGlyphs = new BendNoteHeadGroupGlyph();
+                        endGlyphs.Renderer = Renderer;
+                        endGlyphs.AddGlyph(GetBendNoteValue(_note.BendPoints[_note.BendPoints.Count - 1]));
+                        endGlyphs.DoLayout();
+
+                        _bendNoteHeads.Add(endGlyphs);
+                    }
+
+                    break;
+                case BendType.BendRelease:
+                    {
+                        var middleGlyphs = new BendNoteHeadGroupGlyph();
+                        middleGlyphs.Renderer = Renderer;
+                        middleGlyphs.AddGlyph(GetBendNoteValue(_note.BendPoints[1]));
+                        middleGlyphs.DoLayout();
+
+                        _bendNoteHeads.Add(middleGlyphs);
+
+                        var endGlyphs = new BendNoteHeadGroupGlyph();
+                        endGlyphs.Renderer = Renderer;
+                        endGlyphs.AddGlyph(GetBendNoteValue(_note.BendPoints[_note.BendPoints.Count - 1]));
+                        endGlyphs.DoLayout();
+
+                        _bendNoteHeads.Add(endGlyphs);
+                    }
+
+                    break;
+            }
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
@@ -32,6 +88,10 @@ namespace AlphaTab.Rendering.Glyphs
             var startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_note, true);
             var startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_note.Beat, BeatXPosition.MiddleNotes);
             var direction = GetBeamDirection(_note.Beat, startNoteRenderer);
+            if (direction == BeamDirection.Down)
+            {
+                startY += NoteHeadGlyph.NoteHeadHeight * Scale;
+            }
 
             if (_note.IsTieOrigin)
             {
@@ -54,6 +114,10 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     var endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endNote.Beat, BeatXPosition.MiddleNotes);
                     var endY = cy + endNoteRenderer.Y + endNoteRenderer.GetNoteY(endNote, true);
+                    if (direction == BeamDirection.Down)
+                    {
+                        endY += NoteHeadGlyph.NoteHeadHeight * Scale;
+                    }
                     DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale);
                 }
             }
@@ -70,87 +134,62 @@ namespace AlphaTab.Rendering.Glyphs
                 }
                 endX -= EndPadding * Scale;
 
+                var heightOffset = (NoteHeadGlyph.NoteHeadHeight * Scale * NoteHeadGlyph.GraceScale) * 0.5f;
+                if (direction == BeamDirection.Up) heightOffset = -heightOffset;
+                int endValue;
                 float endY;
-                AccidentalType accidental;
-                Bounds noteHeadBounds;
-                int noteValueToDraw;
-                var heightOffsetFactor = direction == BeamDirection.Down ? -0.5f : 0.5f;
 
                 switch (_note.BendType)
                 {
                     case BendType.Bend:
+                        _bendNoteHeads[0].X = endX - _bendNoteHeads[0].NoteHeadOffset;
+                        _bendNoteHeads[0].Y = cy + startNoteRenderer.Y;
+                        _bendNoteHeads[0].Paint(0, 0, canvas);
 
-                        // Draw slur to end bend
-                        noteValueToDraw = GetBendNoteValue(_note.BendPoints[_note.BendPoints.Count - 1]);
-                        accidental = startNoteRenderer.AccidentalHelper.ApplyAccidentalForValue(noteValueToDraw);
-                        endY = cy + startNoteRenderer.Y + startNoteRenderer.GetScoreY(startNoteRenderer.AccidentalHelper.GetNoteLineForValue(noteValueToDraw));
-
-                        noteHeadBounds = PaintNoteHead(endX, endY, accidental, canvas);
-                        endX = noteHeadBounds.X + noteHeadBounds.W / 2f;
-
-                        endY -= noteHeadBounds.H * heightOffsetFactor;
-
+                        endValue = GetBendNoteValue(_note.BendPoints[_note.BendPoints.Count - 1]);
+                        endY = _bendNoteHeads[0].GetNoteValueY(endValue) + heightOffset;
                         DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale);
 
                         break;
                     case BendType.BendRelease:
-
-                        noteValueToDraw = GetBendNoteValue(_note.BendPoints[1]);
-                        accidental = startNoteRenderer.AccidentalHelper.ApplyAccidentalForValue(noteValueToDraw);
-                        var middleY = cy + startNoteRenderer.Y + startNoteRenderer.GetScoreY(startNoteRenderer.AccidentalHelper.GetNoteLineForValue(noteValueToDraw));
-
                         var middleX = (startX + endX) / 2;
-                        noteHeadBounds = PaintNoteHead(middleX, middleY, accidental, canvas);
-                        middleX = noteHeadBounds.X + noteHeadBounds.W / 2f;
-                        middleY -= noteHeadBounds.H * heightOffsetFactor;
+
+                        _bendNoteHeads[0].X = middleX - _bendNoteHeads[0].NoteHeadOffset;
+                        _bendNoteHeads[0].Y = cy + startNoteRenderer.Y;
+                        _bendNoteHeads[0].Paint(0, 0, canvas);
+                        var middleValue = GetBendNoteValue(_note.BendPoints[1]);
+                        var middleY = _bendNoteHeads[0].GetNoteValueY(middleValue) + heightOffset;
                         DrawBendSlur(canvas, startX, startY, middleX, middleY, direction == BeamDirection.Down, Scale);
 
-
-                        noteValueToDraw = GetBendNoteValue(_note.BendPoints[_note.BendPoints.Count - 1]);
-                        accidental = startNoteRenderer.AccidentalHelper.ApplyAccidentalForValue(noteValueToDraw);
-                        endY = cy + startNoteRenderer.Y + startNoteRenderer.GetScoreY(startNoteRenderer.AccidentalHelper.GetNoteLineForValue(noteValueToDraw));
-
-                        noteHeadBounds = PaintNoteHead(endX, endY, accidental, canvas);
-                        endX = noteHeadBounds.X + noteHeadBounds.W / 2f;
-                        endY -= noteHeadBounds.H * heightOffsetFactor;
+                        _bendNoteHeads[1].X = endX - _bendNoteHeads[1].NoteHeadOffset;
+                        _bendNoteHeads[1].Y = cy + startNoteRenderer.Y;
+                        _bendNoteHeads[1].Paint(0, 0, canvas);
+                        endValue = GetBendNoteValue(_note.BendPoints[_note.BendPoints.Count - 1]);
+                        endY = _bendNoteHeads[1].GetNoteValueY(endValue) + heightOffset;
                         DrawBendSlur(canvas, middleX, middleY, endX, endY, direction == BeamDirection.Down, Scale);
 
                         break;
                     case BendType.Prebend:
-
-                        // TODO: slur from a prebeat glyph to current note
-
-                        break;
                     case BendType.PrebendBend:
-
-                        // TODO: slur from a prebeat glyph to current note
-
-                        // Draw slur to end bend
-                        noteValueToDraw = GetBendNoteValue(_note.BendPoints[_note.BendPoints.Count - 1]);
-                        accidental = startNoteRenderer.AccidentalHelper.ApplyAccidentalForValue(noteValueToDraw);
-                        endY = cy + startNoteRenderer.Y + startNoteRenderer.GetScoreY(startNoteRenderer.AccidentalHelper.GetNoteLineForValue(noteValueToDraw));
-
-                        noteHeadBounds = PaintNoteHead(endX, endY, accidental, canvas);
-                        endX = noteHeadBounds.X + noteHeadBounds.W / 2f;
-                        endY -= noteHeadBounds.H * heightOffsetFactor;
-                        DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale);
-
-
-                        break;
                     case BendType.PrebendRelease:
 
-                        // TODO: slur from a prebeat glyph to current note
+                        var preX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_note.Beat, BeatXPosition.PreNotes);
+                        preX += ((ScoreBeatPreNotesGlyph)startNoteRenderer.GetBeatContainer(_note.Beat).PreNotes).PrebendNoteHeadOffset;
 
-                        // Draw slur to end bend
-                        noteValueToDraw = GetBendNoteValue(_note.BendPoints[_note.BendPoints.Count - 1]);
-                        accidental = startNoteRenderer.AccidentalHelper.ApplyAccidentalForValue(noteValueToDraw);
-                        endY = cy + startNoteRenderer.Y + startNoteRenderer.GetScoreY(startNoteRenderer.AccidentalHelper.GetNoteLineForValue(noteValueToDraw));
+                        var preY = cy + startNoteRenderer.Y + startNoteRenderer.GetScoreY(startNoteRenderer.AccidentalHelper.GetNoteLineForValue(_note.RealValue)) + heightOffset;
 
-                        noteHeadBounds = PaintNoteHead(endX, endY, accidental, canvas);
-                        endX = noteHeadBounds.X + noteHeadBounds.W / 2f;
-                        endY -= noteHeadBounds.H * heightOffsetFactor;
+                        DrawBendSlur(canvas, preX, preY, startX, startY, direction == BeamDirection.Down, Scale);
 
-                        DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale);
+                        if (_bendNoteHeads.Count > 0)
+                        {
+                            _bendNoteHeads[0].X = endX - _bendNoteHeads[0].NoteHeadOffset;
+                            _bendNoteHeads[0].Y = cy + startNoteRenderer.Y;
+                            _bendNoteHeads[0].Paint(0, 0, canvas);
+
+                            endValue = GetBendNoteValue(_note.BendPoints[_note.BendPoints.Count - 1]);
+                            endY = _bendNoteHeads[0].GetNoteValueY(endValue) + heightOffset;
+                            DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale);
+                        }
 
                         break;
                 }
@@ -161,45 +200,6 @@ namespace AlphaTab.Rendering.Glyphs
         {
             // NOTE: bendpoints are in 1/4 tones, but the note values are in 1/2 notes. 
             return _note.RealValue + bendPoint.Value / 2;
-        }
-
-        private Bounds PaintNoteHead(float endX, float endY, AccidentalType accidental, ICanvas canvas)
-        {
-            var bounds = new Bounds();
-            var noteHead = new NoteHeadGlyph(0, 0, Duration.Quarter, true);
-            noteHead.Renderer = Renderer;
-            noteHead.DoLayout();
-            bounds.X = endX - noteHead.Width;
-            bounds.Y = endY;
-            bounds.W = noteHead.Width;
-            bounds.H = noteHead.Height;
-            noteHead.Paint(bounds.X, bounds.Y, canvas);
-
-            if (accidental != AccidentalType.None)
-            {
-                Glyph accidentalGlyph = null;
-                switch (accidental)
-                {
-                    case AccidentalType.Natural:
-                        accidentalGlyph = new NaturalizeGlyph(0, 0, true);
-                        break;
-                    case AccidentalType.Sharp:
-                        accidentalGlyph = new SharpGlyph(0, 0, true);
-                        break;
-                    case AccidentalType.Flat:
-                        accidentalGlyph = new FlatGlyph(0, 0, true);
-                        break;
-                }
-
-                if (accidentalGlyph != null)
-                {
-                    accidentalGlyph.Renderer = Renderer;
-                    accidentalGlyph.DoLayout();
-                    accidentalGlyph.Paint(endX - noteHead.Width - accidentalGlyph.Width, endY, canvas);
-                }
-            }
-
-            return bounds;
         }
 
         protected BeamDirection GetBeamDirection(Beat beat, ScoreBarRenderer noteRenderer)
@@ -244,21 +244,6 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.LineTo(cp1X, cp1Y);
             canvas.LineTo(x2, y2);
             canvas.Stroke();
-        }
-
-        public static string GetFractionSign(int steps)
-        {
-            switch (steps)
-            {
-                case 1:
-                    return "¼";
-                case 2:
-                    return "½";
-                case 3:
-                    return "¾";
-                default:
-                    return steps + "/ 4";
-            }
         }
     }
 }

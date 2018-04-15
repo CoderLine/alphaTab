@@ -125,6 +125,18 @@ namespace AlphaTab.Rendering.Utils
         /// </summary>
         public Note MaxNote { get; set; }
 
+        /// <summary>
+        /// the overall min note value within this group. 
+        /// This includes values caused by bends. 
+        /// </summary>
+        public int MinNoteValue { get; set; }
+
+        /// <summary>
+        /// the overall max note value within this group
+        /// This includes values caused by bends. 
+        /// </summary>
+        public int MaxNoteValue { get; set; }
+
         public bool InvertBeamDirection { get; set; }
 
 
@@ -135,6 +147,8 @@ namespace AlphaTab.Rendering.Utils
             Beats = new FastList<Beat>();
             _beatLineXPositions = new FastDictionary<int, BeatLinePositions>();
             ShortestDuration = Duration.QuadrupleWhole;
+            MaxNoteValue = int.MinValue;
+            MinNoteValue = int.MinValue;
         }
 
         private int GetValue(Note n)
@@ -148,6 +162,25 @@ namespace AlphaTab.Rendering.Utils
                 return n.RealValue - _staff.DisplayTranspositionPitch;
             }
         }
+
+        private int GetMaxValue(Note n)
+        {
+            int value = GetValue(n);
+            if (n.HasBend)
+            {
+                value += n.MaxBendPoint.Value / 2;
+            }
+            return value;
+        }
+
+        private int GetMinValue(Note n)
+        {
+            int value = GetValue(n);
+            // we do not need to consider bends here as bends always can go up
+            // whammy bar might need to considered here once it's rendered like bends. 
+            return value;
+        }
+
 
         public float GetBeatLineX(Beat beat)
         {
@@ -352,6 +385,18 @@ namespace AlphaTab.Rendering.Utils
             if (MinNote == null || value < GetValue(MinNote))
             {
                 MinNote = note;
+            }
+
+            var minValue = GetMinValue(MaxNote);
+            if (MinNoteValue == int.MinValue || MinNoteValue > minValue)
+            {
+                MinNoteValue = minValue;
+            }
+
+            var maxValue = GetMaxValue(MaxNote);
+            if (MaxNoteValue == int.MinValue || MaxNoteValue > maxValue)
+            {
+                MaxNoteValue = maxValue;
             }
         }
 

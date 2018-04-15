@@ -196,7 +196,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeatContainerGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeatGlyphBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeatOnNoteGlyphBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BendNoteHeadGroupGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreBendGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreNoteChordGlyphBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TabBendGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ChineseCymbalGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\CircleGlyph.cs" />
