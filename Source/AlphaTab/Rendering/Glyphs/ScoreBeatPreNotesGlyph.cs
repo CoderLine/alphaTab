@@ -31,7 +31,7 @@ namespace AlphaTab.Rendering.Glyphs
                 var accidentals = new AccidentalGroupGlyph();
                 var ghost = new GhostNoteContainerGlyph(true);
                 ghost.Renderer = Renderer;
-                _prebends = new BendNoteHeadGroupGlyph();
+                _prebends = new BendNoteHeadGroupGlyph(true);
                 _prebends.Renderer = Renderer;
                 foreach (var note in Container.Beat.Notes)
                 {
@@ -84,17 +84,10 @@ namespace AlphaTab.Rendering.Glyphs
             var accidental = sr.AccidentalHelper.ApplyAccidental(n);
             var noteLine = sr.GetNoteLine(n);
             var isGrace = Container.Beat.GraceType != GraceType.None;
-            switch (accidental)
+
+            if (accidental != AccidentalType.None)
             {
-                case AccidentalType.Sharp:
-                    accidentals.AddGlyph(new SharpGlyph(0, sr.GetScoreY(noteLine), isGrace));
-                    break;
-                case AccidentalType.Flat:
-                    accidentals.AddGlyph(new FlatGlyph(0, sr.GetScoreY(noteLine), isGrace));
-                    break;
-                case AccidentalType.Natural:
-                    accidentals.AddGlyph(new NaturalizeGlyph(0, sr.GetScoreY(noteLine), isGrace));
-                    break;
+                accidentals.AddGlyph(new AccidentalGlyph(0, sr.GetScoreY(noteLine), accidental, isGrace));
             }
         }
     }

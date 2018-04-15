@@ -839,7 +839,7 @@ namespace AlphaTab.Rendering
                 for (var i = 0; i < Math.Abs(currentKey); i++)
                 {
                     var step = SharpKsSteps[i] + offsetClef;
-                    newGlyphs.Add(new SharpGlyph(0, GetScoreY(step)));
+                    newGlyphs.Add(new AccidentalGlyph(0, GetScoreY(step), AccidentalType.Sharp));
                     newLines[step] = true;
                 }
             }
@@ -849,7 +849,7 @@ namespace AlphaTab.Rendering
                 for (var i = 0; i < Math.Abs(currentKey); i++)
                 {
                     var step = FlatKsSteps[i] + offsetClef;
-                    newGlyphs.Add(new FlatGlyph(0, GetScoreY(step)));
+                    newGlyphs.Add(new AccidentalGlyph(0, GetScoreY(step), AccidentalType.Flat));
                     newLines[step] = true;
                 }
             }
@@ -863,7 +863,7 @@ namespace AlphaTab.Rendering
                 var step = previousKeyPositions[i] + offsetClef;
                 if (!newLines.ContainsKey(step))
                 {
-                    AddPreBeatGlyph(new NaturalizeGlyph(0, GetScoreY(previousKeyPositions[i] + offsetClef)));
+                    AddPreBeatGlyph(new AccidentalGlyph(0, GetScoreY(previousKeyPositions[i] + offsetClef), AccidentalType.Natural));
                 }
             }
 

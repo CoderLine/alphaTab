@@ -37,12 +37,28 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var sr = (ScoreBarRenderer)Renderer;
             var line = sr.GetNoteLine(n);
-            var info = new GhostNoteInfo(line, n.IsGhost);
+            var hasParenthesis = n.IsGhost || IsTiedBend(n);
+            AddParenthesisOnLine(line, hasParenthesis);
+        }
+
+        public void AddParenthesisOnLine(int line, bool hasParenthesis)
+        {
+            var info = new GhostNoteInfo(line, hasParenthesis);
             _infos.Add(info);
-            if (n.IsGhost)
+            if (hasParenthesis)
             {
                 IsEmpty = false;
             }
+        }
+
+        private bool IsTiedBend(Note note)
+        {
+            if (note.IsTieDestination)
+            {
+                if (note.TieOrigin.HasBend) return true;
+                return IsTiedBend(note.TieOrigin);
+            }
+            return false;
         }
 
         public override void DoLayout()

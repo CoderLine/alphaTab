@@ -195,6 +195,8 @@ namespace AlphaTab.Model
         public bool IsTieDestination { get; set; }
         public bool IsTieOrigin { get; set; }
 
+        public Note BendOrigin { get; set; }
+
         public Fingers LeftHandFinger { get; set; }
         public Fingers RightHandFinger { get; set; }
         public bool IsFingering { get; set; }
@@ -259,6 +261,7 @@ namespace AlphaTab.Model
                 return 0;
             }
         }
+
 
         public Note()
         {
@@ -367,6 +370,15 @@ namespace AlphaTab.Model
                     Fret = TieOrigin.Fret;
                     Octave = TieOrigin.Octave;
                     Tone = TieOrigin.Tone;
+
+                    if (TieOrigin.BendOrigin != null)
+                    {
+                        BendOrigin = TieOrigin.BendOrigin;
+                    }
+                    else if(TieOrigin.HasBend)
+                    {
+                        BendOrigin = TieOrigin;
+                    }
                 }
             }
 

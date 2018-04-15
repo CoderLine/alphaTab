@@ -45,10 +45,27 @@ namespace AlphaTab.Rendering.Glyphs
                     {
                         var endGlyphs = new BendNoteHeadGroupGlyph();
                         endGlyphs.Renderer = Renderer;
-                        endGlyphs.AddGlyph(GetBendNoteValue(_note.BendPoints[_note.BendPoints.Count - 1]));
+
+                        var lastBendPoint = _note.BendPoints[_note.BendPoints.Count - 1];
+                        endGlyphs.AddGlyph(GetBendNoteValue(lastBendPoint), (lastBendPoint.Value % 2) != 0);
                         endGlyphs.DoLayout();
 
                         _bendNoteHeads.Add(endGlyphs);
+                    }
+
+                    break;
+                case BendType.Release:
+                    {
+                        if (!_note.IsTieOrigin)
+                        {
+                            var endGlyphs = new BendNoteHeadGroupGlyph();
+                            endGlyphs.Renderer = Renderer;
+                            var lastBendPoint = _note.BendPoints[_note.BendPoints.Count - 1];
+                            endGlyphs.AddGlyph(GetBendNoteValue(lastBendPoint), (lastBendPoint.Value % 2) != 0);
+                            endGlyphs.DoLayout();
+
+                            _bendNoteHeads.Add(endGlyphs);
+                        }
                     }
 
                     break;
@@ -56,14 +73,16 @@ namespace AlphaTab.Rendering.Glyphs
                     {
                         var middleGlyphs = new BendNoteHeadGroupGlyph();
                         middleGlyphs.Renderer = Renderer;
-                        middleGlyphs.AddGlyph(GetBendNoteValue(_note.BendPoints[1]));
+                        var middleBendPoint = _note.BendPoints[1];
+                        middleGlyphs.AddGlyph(GetBendNoteValue(_note.BendPoints[1]), (middleBendPoint.Value % 2) != 0);
                         middleGlyphs.DoLayout();
 
                         _bendNoteHeads.Add(middleGlyphs);
 
                         var endGlyphs = new BendNoteHeadGroupGlyph();
                         endGlyphs.Renderer = Renderer;
-                        endGlyphs.AddGlyph(GetBendNoteValue(_note.BendPoints[_note.BendPoints.Count - 1]));
+                        var lastBendPoint = _note.BendPoints[_note.BendPoints.Count - 1];
+                        endGlyphs.AddGlyph(GetBendNoteValue(lastBendPoint), (lastBendPoint.Value % 2) != 0);
                         endGlyphs.DoLayout();
 
                         _bendNoteHeads.Add(endGlyphs);
@@ -104,7 +123,7 @@ namespace AlphaTab.Rendering.Glyphs
                     var endX = cx + startNoteRenderer.X + startNoteRenderer.Width;
                     var noteValueToDraw = _note.TieDestination.RealValue;
 
-                    var accidental = startNoteRenderer.AccidentalHelper.ApplyAccidentalForValue(noteValueToDraw);
+                    var accidental = startNoteRenderer.AccidentalHelper.ApplyAccidentalForValue(noteValueToDraw, false);
                     var endY = cy + startNoteRenderer.Y + startNoteRenderer.GetScoreY(startNoteRenderer.AccidentalHelper.GetNoteLineForValue(noteValueToDraw));
 
                     DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale);
@@ -168,6 +187,17 @@ namespace AlphaTab.Rendering.Glyphs
                         endY = _bendNoteHeads[1].GetNoteValueY(endValue) + heightOffset;
                         DrawBendSlur(canvas, middleX, middleY, endX, endY, direction == BeamDirection.Down, Scale);
 
+                        break;
+                    case BendType.Release:
+                        if (_bendNoteHeads.Count > 0)
+                        {
+                            _bendNoteHeads[0].X = endX - _bendNoteHeads[0].NoteHeadOffset;
+                            _bendNoteHeads[0].Y = cy + startNoteRenderer.Y;
+                            _bendNoteHeads[0].Paint(0, 0, canvas);
+                            endValue = GetBendNoteValue(_note.BendPoints[_note.BendPoints.Count - 1]);
+                            endY = _bendNoteHeads[0].GetNoteValueY(endValue) + heightOffset;
+                            DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale);
+                        }
                         break;
                     case BendType.Prebend:
                     case BendType.PrebendBend:

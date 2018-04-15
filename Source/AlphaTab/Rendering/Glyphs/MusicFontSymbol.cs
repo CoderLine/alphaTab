@@ -114,6 +114,9 @@ namespace AlphaTab.Rendering.Glyphs
 
         AccidentalFlat = 0xE260,
         AccidentalNatural = 0xE261,
-        AccidentalSharp = 0xE262
+        AccidentalSharp = 0xE262,
+        AccidentalQuarterToneFlatArrowUp = 0xE270,
+        AccidentalQuarterToneSharpArrowUp = 0xE274,
+        AccidentalQuarterToneNaturalArrowUp = 0xE272
     }
 }

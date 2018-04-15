@@ -9,19 +9,28 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class BendNoteHeadGroupGlyph : ScoreNoteChordGlyphBase
     {
+        private readonly bool _showParenthesis;
         private readonly FastDictionary<int, Glyph> _noteValueLookup;
 
-        private const int AccidentalPadding = 3;
+        private const int ElementPadding = 2;
         private AccidentalGroupGlyph _accidentals;
+        private GhostNoteContainerGlyph _preNoteParenthesis;
+        private GhostNoteContainerGlyph _postNoteParenthesis;
         public bool IsEmpty { get; set; }
         public override BeamDirection Direction => BeamDirection.Up;
         public float NoteHeadOffset { get; set; }
 
-        public BendNoteHeadGroupGlyph()
+        public BendNoteHeadGroupGlyph(bool showParenthesis = false)
         {
+            _showParenthesis = showParenthesis;
             IsEmpty = true;
             _accidentals = new AccidentalGroupGlyph();
             _noteValueLookup = new FastDictionary<int, Glyph>();
+            if (showParenthesis)
+            {
+                _preNoteParenthesis = new GhostNoteContainerGlyph(true);
+                _postNoteParenthesis = new GhostNoteContainerGlyph(false);
+            }
         }
 
         public float GetNoteValueY(int noteValue, bool aboveNote = false)
@@ -48,25 +57,25 @@ namespace AlphaTab.Rendering.Glyphs
             return 0;
         }
 
-        public void AddGlyph(int noteValue)
+        public void AddGlyph(int noteValue, bool quarterBend = false)
         {
             var sr = (ScoreBarRenderer)Renderer;
             var noteHeadGlyph = new NoteHeadGlyph(0, 0, Duration.Quarter, true);
-            var accidental = sr.AccidentalHelper.ApplyAccidentalForValue(noteValue);
+            var accidental = sr.AccidentalHelper.ApplyAccidentalForValue(noteValue, quarterBend);
             var line = sr.AccidentalHelper.GetNoteLineForValue(noteValue);
             noteHeadGlyph.Y = sr.GetScoreY(line);
 
-            switch (accidental)
+            if (_showParenthesis)
             {
-                case AccidentalType.Natural:
-                    _accidentals.AddGlyph(new NaturalizeGlyph(0, noteHeadGlyph.Y, true));
-                    break;
-                case AccidentalType.Sharp:
-                    _accidentals.AddGlyph(new SharpGlyph(0, noteHeadGlyph.Y, true));
-                    break;
-                case AccidentalType.Flat:
-                    _accidentals.AddGlyph(new FlatGlyph(0, noteHeadGlyph.Y, true));
-                    break;
+                _preNoteParenthesis.Renderer = Renderer;
+                _postNoteParenthesis.Renderer = Renderer;
+                _preNoteParenthesis.AddParenthesisOnLine(line, true);
+                _postNoteParenthesis.AddParenthesisOnLine(line, true);
+            }
+
+            if (accidental != AccidentalType.None)
+            {
+                _accidentals.AddGlyph(new AccidentalGlyph(0, noteHeadGlyph.Y, accidental, true));
             }
 
             _noteValueLookup[noteValue] = noteHeadGlyph;
@@ -77,21 +86,36 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
+            var x = 0f;
+
+            if (_showParenthesis)
+            {
+                _preNoteParenthesis.Renderer = Renderer;
+                _preNoteParenthesis.DoLayout();
+                x += _preNoteParenthesis.Width + ElementPadding * Scale;
+            }
+
             if (!_accidentals.IsEmpty)
             {
+                _accidentals.X = x;
                 _accidentals.Renderer = Renderer;
                 _accidentals.DoLayout();
-                NoteStartX = _accidentals.Width + AccidentalPadding * Scale;
+                x += _accidentals.Width + ElementPadding * Scale;
             }
-            else
-            {
-                NoteStartX = 0;
-            }
+
+            NoteStartX = x;
 
             base.DoLayout();
 
             NoteHeadOffset = NoteStartX + (Width - NoteStartX) / 2;
 
+            if (_showParenthesis)
+            {
+                _postNoteParenthesis.X = Width + ElementPadding * Scale;
+                _postNoteParenthesis.Renderer = Renderer;
+                _postNoteParenthesis.DoLayout();
+                Width += _postNoteParenthesis.Width + ElementPadding * Scale;
+            }
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
@@ -99,6 +123,12 @@ namespace AlphaTab.Rendering.Glyphs
             if (!_accidentals.IsEmpty)
             {
                 _accidentals.Paint(cx + X, cy + Y, canvas);
+            }
+
+            if (_showParenthesis)
+            {
+                _preNoteParenthesis.Paint(cx + X, cy + Y, canvas);
+                _postNoteParenthesis.Paint(cx + X, cy + Y, canvas);
             }
 
             base.Paint(cx, cy, canvas);

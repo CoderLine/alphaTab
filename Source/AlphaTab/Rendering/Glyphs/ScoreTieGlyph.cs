@@ -65,7 +65,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         protected override float GetStartX(BarRendererBase noteRenderer)
         {
-            return noteRenderer.GetNoteX(_startNote);
+            return noteRenderer.GetBeatX(_startNote.Beat, BeatXPosition.MiddleNotes);
         }
 
         protected override float GetEndX(BarRendererBase noteRenderer)

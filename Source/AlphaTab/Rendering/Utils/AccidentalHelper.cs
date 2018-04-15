@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 
@@ -109,12 +110,19 @@ namespace AlphaTab.Rendering.Utils
         public AccidentalType ApplyAccidental(Note note)
         {
             var noteValue = note.RealValue;
+            bool quarterBend = false;
             if (note.HasBend)
             {
                 noteValue += note.BendPoints[0].Value / 2;
+                quarterBend = (note.BendPoints[0].Value % 2) != 0;
+            }
+            else if (note.BendOrigin != null)
+            {
+                noteValue += note.BendOrigin.BendPoints[note.BendOrigin.BendPoints.Count - 1].Value;
+                quarterBend = (note.BendOrigin.BendPoints[note.BendOrigin.BendPoints.Count - 1].Value % 2) != 0;
             }
             var line = RegisterNoteLine(note, noteValue);
-            return GetAccidental(line, noteValue);
+            return GetAccidental(line, noteValue, quarterBend);
         }
 
         /// <summary>
@@ -123,13 +131,13 @@ namespace AlphaTab.Rendering.Utils
         /// </summary>
         /// <param name="note"></param>
         /// <returns></returns>
-        public AccidentalType ApplyAccidentalForValue(int noteValue)
+        public AccidentalType ApplyAccidentalForValue(int noteValue, bool quarterBend)
         {
             var line = RegisterNoteValueLine(noteValue);
-            return GetAccidental(line, noteValue);
+            return GetAccidental(line, noteValue, quarterBend);
         }
 
-        private AccidentalType GetAccidental(int line, int noteValue)
+        private AccidentalType GetAccidental(int line, int noteValue, bool quarterBend)
         { 
             var accidentalToSet = AccidentalType.None;
             if (_bar.Staff.StaffKind != StaffKind.Percussion)
@@ -145,20 +153,40 @@ namespace AlphaTab.Rendering.Utils
                 var hasNoteAccidentalForKeySignature = KeySignatureLookup[ksi][index];
                 var isAccidentalNote = AccidentalNotes[index];
 
-                var isAccidentalRegistered = _registeredAccidentals.ContainsKey(line);
-                if (hasNoteAccidentalForKeySignature != isAccidentalNote && !isAccidentalRegistered)
+                if (quarterBend)
                 {
-                    _registeredAccidentals[line] = true;
                     accidentalToSet = isAccidentalNote ? keySignatureAccidental : AccidentalType.Natural;
                 }
-                else if (hasNoteAccidentalForKeySignature == isAccidentalNote && isAccidentalRegistered)
+                else
                 {
-                    _registeredAccidentals.Remove(line);
-                    accidentalToSet = isAccidentalNote ? keySignatureAccidental : AccidentalType.Natural;
+                    var isAccidentalRegistered = _registeredAccidentals.ContainsKey(line);
+                    if (hasNoteAccidentalForKeySignature != isAccidentalNote && !isAccidentalRegistered)
+                    {
+                        _registeredAccidentals[line] = true;
+                        accidentalToSet = isAccidentalNote ? keySignatureAccidental : AccidentalType.Natural;
+                    }
+                    else if (hasNoteAccidentalForKeySignature == isAccidentalNote && isAccidentalRegistered)
+                    {
+                        _registeredAccidentals.Remove(line);
+                        accidentalToSet = isAccidentalNote ? keySignatureAccidental : AccidentalType.Natural;
+                    }
                 }
             }
 
             // TODO: change accidentalToSet according to note.AccidentalMode
+
+            if (quarterBend)
+            {
+                switch (accidentalToSet)
+                {
+                    case AccidentalType.Natural:
+                        return AccidentalType.NaturalQuarterNoteUp;
+                    case AccidentalType.Sharp:
+                        return AccidentalType.SharpQuarterNoteUp;
+                    case AccidentalType.Flat:
+                        return AccidentalType.FlatQuarterNoteUp;
+                }
+            }
 
             return accidentalToSet;
         }

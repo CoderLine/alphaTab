@@ -223,7 +223,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\LyricsGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\MusicFontGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\MusicFontSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\NaturalizeGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\NoteHeadGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\NoteNumberGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\NumberGlyph.cs" />
@@ -241,7 +240,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreNoteChordGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreSlideLineGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreTieGlyph.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\SharpGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\SpacingGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TabBeatContainerGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TabBeatGlyph.cs" />

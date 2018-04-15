@@ -190,7 +190,7 @@ namespace AlphaTab.Rendering.Glyphs
                 while (l <= MaxNote.Line)
                 {
                     var lY = cy + scoreRenderer.GetScoreY(l);
-                    canvas.FillRect(cx - linePadding, lY, lineWidth, Scale);
+                    canvas.FillRect(cx - linePadding + NoteStartX, lY, lineWidth, Scale);
                     l += 2;
                 }
                 canvas.Color = color;
