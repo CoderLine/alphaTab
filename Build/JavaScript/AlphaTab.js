@@ -329,6 +329,7 @@ alphaTab.platform.svg.SvgCanvas = $hx_exports["alphaTab"]["platform"]["svg"]["Sv
 	this.Buffer = null;
 	this._currentPath = null;
 	this._currentPathIsEmpty = false;
+	this._suspendBuffer = null;
 	var this1 = "";
 	this._currentPath = this1;
 	this._currentPathIsEmpty = true;
@@ -446,7 +447,7 @@ alphaTab.platform.svg.SvgCanvas.prototype = {
 				var s = " fill=\"" + this.get_Color().RGBA + "\"";
 				this.Buffer += Std.string(s);
 			}
-			this.Buffer += Std.string(" stroke=\"none\"/>");
+			this.Buffer += Std.string(" style=\"stroke: none\"/>");
 		}
 		var this1 = "";
 		this._currentPath = this1;
@@ -458,7 +459,7 @@ alphaTab.platform.svg.SvgCanvas.prototype = {
 			if(this.get_LineWidth() != 1) {
 				s = s + (" stroke-width=\"" + this.get_LineWidth() + "\"");
 			}
-			s = s + " fill=\"none\" />";
+			s = s + " style=\"fill: none\" />";
 			this.Buffer += Std.string(s);
 		}
 		var this1 = "";
@@ -469,7 +470,7 @@ alphaTab.platform.svg.SvgCanvas.prototype = {
 		if(text == "") {
 			return;
 		}
-		var s = "<text x=\"" + system.Convert.ToInt32_Single(x) + "\" y=\"" + system.Convert.ToInt32_Single(y) + "\" style=\"font:" + this.get_Font().ToCssString(1) + "\" " + " dominant-baseline=\"" + this.GetSvgBaseLine() + "\"";
+		var s = "<text x=\"" + system.Convert.ToInt32_Single(x) + "\" y=\"" + system.Convert.ToInt32_Single(y) + "\" style=\"stroke: none; font:" + this.get_Font().ToCssString(1) + "\" " + " dominant-baseline=\"" + this.GetSvgBaseLine() + "\"";
 		if(this.get_Color().RGBA != "#000000") {
 			s = s + (" fill=\"" + this.get_Color().RGBA + "\"");
 		}
@@ -536,7 +537,9 @@ alphaTab.platform.svg.CssFontSvgCanvas.prototype = $extend(alphaTab.platform.svg
 		var s = "<g transform=\"translate(" + (system.Convert.ToInt32_Single(x) - 0) + " " + (system.Convert.ToInt32_Single(y) - 0) + ")\" class=\"at\" ><text";
 		this.Buffer += Std.string(s);
 		if(scale != 1) {
-			this.Buffer += Std.string("  style=\"font-size: " + scale * 100 + "%\"");
+			this.Buffer += Std.string(" style=\"font-size: " + scale * 100 + "%; stroke:none\"");
+		} else {
+			this.Buffer += Std.string(" style=\"stroke:none\"");
 		}
 		if(this.get_Color().RGBA != "#000000") {
 			var s1 = " fill=\"" + this.get_Color().RGBA + "\"";
@@ -7072,7 +7075,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		var noteStart = beatStart + brushOffset;
 		var noteDuration = this.GetNoteDuration(note,beatDuration) - brushOffset;
 		var dynamicValue = this.GetDynamicValue(note);
-		if(!note.get_HasBend()) {
+		if(!note.get_HasBend() && !note.IsTieDestination && !note.Beat.get_HasWhammyBar()) {
 			this._handler.AddBend(track.Index,noteStart,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(64));
 		}
 		if(note.Beat.FadeIn) {
@@ -7087,9 +7090,9 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			return;
 		}
 		if(note.get_HasBend()) {
-			this.GenerateBend(note,noteStart,noteDuration,noteKey,dynamicValue);
-		} else if(note.Beat.get_HasWhammyBar()) {
-			this.GenerateWhammyBar(note,noteStart,noteDuration,noteKey,dynamicValue);
+			this.GenerateBend(note,note.BendPoints,noteStart,noteDuration,noteKey,dynamicValue);
+		} else if(note.Beat.get_HasWhammyBar() && note.Index == 0) {
+			this.GenerateBend(note,note.Beat.WhammyBarPoints,noteStart,noteDuration,noteKey,dynamicValue);
 		} else if(note.SlideType != 0) {
 			this.GenerateSlide(note,noteStart,noteDuration,noteKey,dynamicValue);
 		} else if(note.Vibrato != 0) {
@@ -7201,13 +7204,13 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 	}
 	,GenerateWhammyBar: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
 	}
-	,GenerateBend: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
+	,GenerateBend: function(note,bendPoints,noteStart,noteDuration,noteKey,dynamicValue) {
 		var track = note.Beat.Voice.Bar.Staff.Track;
 		var ticksPerPosition = js.Boot.__cast(noteDuration , Float) / 60;
 		var i = 0;
-		while(i < note.BendPoints.length - 1) {
-			var currentPoint = note.BendPoints[i];
-			var nextPoint = note.BendPoints[i + 1];
+		while(i < bendPoints.length - 1) {
+			var currentPoint = bendPoints[i];
+			var nextPoint = bendPoints[i + 1];
 			var currentBendValue = 64 + currentPoint.Value * 2.75;
 			var nextBendValue = 64 + nextPoint.Value * 2.75;
 			var ticksBetweenPoints = ticksPerPosition * (nextPoint.Offset - currentPoint.Offset);

@@ -31,7 +31,11 @@ namespace AlphaTab.Platform.Svg
             //              "\" class=\"at\" >");
             if (scale != 1)
             {
-                Buffer.Append("  style=\"font-size: " + (scale * 100) + "%\"");
+                Buffer.Append(" style=\"font-size: " + (scale * 100) + "%; stroke:none\"");
+            }
+            else
+            {
+                Buffer.Append(" style=\"stroke:none\"");
             }
             if (Color.RGBA != Model.Color.BlackRgb)
             {

@@ -17,6 +17,7 @@
  */
 using System;
 using AlphaTab.Audio.Synth.Midi.Event;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Audio.Generator
@@ -240,8 +241,7 @@ namespace AlphaTab.Audio.Generator
             var noteDuration = GetNoteDuration(note, beatDuration) - brushOffset;
             var dynamicValue = GetDynamicValue(note);
 
-            // TODO: enable second condition after whammy generation is implemented
-            if (!note.HasBend /* && !note.Beat.HasWhammyBar */)
+            if (!note.HasBend && !note.IsTieDestination && !note.Beat.HasWhammyBar)
             {
                 // reset bend 
                 _handler.AddBend(track.Index, noteStart, (byte)track.PlaybackInfo.PrimaryChannel, DefaultBend);
@@ -278,11 +278,11 @@ namespace AlphaTab.Audio.Generator
             // All String Bending/Variation effects
             if (note.HasBend)
             {
-                GenerateBend(note, noteStart, noteDuration, noteKey, dynamicValue);
+                GenerateBend(note, note.BendPoints, noteStart, noteDuration, noteKey, dynamicValue);
             }
-            else if (note.Beat.HasWhammyBar)
+            else if (note.Beat.HasWhammyBar && note.Index == 0)
             {
-                GenerateWhammyBar(note, noteStart, noteDuration, noteKey, dynamicValue);
+                GenerateBend(note, note.Beat.WhammyBarPoints, noteStart, noteDuration, noteKey, dynamicValue);
             }
             else if (note.SlideType != SlideType.None)
             {
@@ -526,14 +526,14 @@ namespace AlphaTab.Audio.Generator
         private const int DefaultBend = 0x40;
         private const float DefaultBendSemitone = 2.75f;
 
-        private void GenerateBend(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
+        private void GenerateBend(Note note, FastList<BendPoint> bendPoints, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
         {
             var track = note.Beat.Voice.Bar.Staff.Track;
             var ticksPerPosition = ((double)noteDuration) / BendPoint.MaxPosition;
-            for (int i = 0; i < note.BendPoints.Count - 1; i++)
+            for (int i = 0; i < bendPoints.Count - 1; i++)
             {
-                var currentPoint = note.BendPoints[i];
-                var nextPoint = note.BendPoints[i + 1];
+                var currentPoint = bendPoints[i];
+                var nextPoint = bendPoints[i + 1];
 
                 // calculate the midi pitchbend values start and end values
                 var currentBendValue = DefaultBend + (currentPoint.Value * DefaultBendSemitone);

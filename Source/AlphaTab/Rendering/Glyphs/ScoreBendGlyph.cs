@@ -240,9 +240,11 @@ namespace AlphaTab.Rendering.Glyphs
             var cp1Y = centerY + (offset * normalVectorY);
 
             canvas.BeginPath();
+
             canvas.MoveTo(x1, y1);
             canvas.LineTo(cp1X, cp1Y);
             canvas.LineTo(x2, y2);
+
             canvas.Stroke();
         }
     }
