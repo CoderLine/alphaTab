@@ -295,7 +295,7 @@ namespace AlphaTab.Test.Importer
 
                 "2", // bar number
 
-                "15", "2", "-1",
+                "15", "2", "full",
                 "14", "full",
                 "13", "full", "1½",
                 "14", "full"
