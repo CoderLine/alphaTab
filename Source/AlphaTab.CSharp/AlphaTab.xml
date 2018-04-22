@@ -1154,6 +1154,22 @@
             It then increases the the number of strings on available on the track. 
             </summary>
         </member>
+        <member name="P:AlphaTab.Model.Note.RealValue">
+            <summary>
+            Gets the absolute value of this note for playback. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.RealValueWithBend">
+            <summary>
+            Gets the absolute value of this note considering
+            offsets by bends.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.HasQuarterToneOffset">
+            <summary>
+            Gets or sets whether the note has a offset of a quartertone caused by bends.
+            </summary>
+        </member>
         <member name="T:AlphaTab.Model.PickStrokeType">
             <summary>
             Lists all types of pick strokes.
@@ -1804,7 +1820,7 @@
             <param name="note"></param>
             <returns></returns>
         </member>
-        <member name="M:AlphaTab.Rendering.Utils.AccidentalHelper.ApplyAccidentalForValue(System.Int32)">
+        <member name="M:AlphaTab.Rendering.Utils.AccidentalHelper.ApplyAccidentalForValue(System.Int32,System.Boolean)">
             <summary>
             Calculates the accidental for the given note value and assignes the value to it. 
             The new accidental type is also registered within the current scope

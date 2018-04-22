@@ -19753,6 +19753,24 @@ alphaTab.model.Note.prototype = {
 		}
 		return 0;
 	}
+	,get_RealValueWithBend: function() {
+		var noteValue = this.get_RealValue();
+		if(this.get_HasBend()) {
+			noteValue = noteValue + (this.BendPoints[0].Value / 2 | 0);
+		} else if(this.BendOrigin != null) {
+			noteValue = noteValue + (this.BendOrigin.BendPoints[this.BendOrigin.BendPoints.length - 1].Value / 2 | 0);
+		}
+		return noteValue;
+	}
+	,get_HasQuarterToneOffset: function() {
+		if(this.get_HasBend()) {
+			return this.BendPoints[0].Value % 2 != 0;
+		}
+		if(this.BendOrigin != null) {
+			return this.BendOrigin.BendPoints[this.BendOrigin.BendPoints.length - 1].Value % 2 != 0;
+		}
+		return false;
+	}
 	,Clone: function() {
 		var n = new alphaTab.model.Note();
 		alphaTab.model.Note.CopyTo(this,n);
@@ -23124,8 +23142,7 @@ alphaTab.rendering.BarRendererBase.prototype = {
 			case 1:
 				return container.VoiceContainer.X + container.X + container.OnNotes.X;
 			case 2:
-				var this1 = 2.0;
-				return container.VoiceContainer.X + container.X + container.OnNotes.X + container.OnNotes.Width / this1;
+				return container.VoiceContainer.X + container.X + container.OnNotes.X + container.OnNotes.CenterX;
 			case 3:
 				return container.VoiceContainer.X + container.X + container.OnNotes.X + container.OnNotes.Width;
 			case 4:
@@ -27015,6 +27032,13 @@ alphaTab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphaTab.rendering.
 			}
 		}
 		alphaTab.rendering.glyphs.BeatOnNoteGlyphBase.prototype.DoLayout.call(this);
+		if(this.Container.Beat.IsEmpty) {
+			this.CenterX = this.Width / 2;
+		} else if(this.Container.Beat.get_IsRest()) {
+			this.CenterX = this.RestGlyph.X + this.RestGlyph.Width / 2;
+		} else {
+			this.CenterX = this.NoteHeads.X + this.NoteHeads.Width / 2;
+		}
 	}
 	,CreateBeatDot: function(line,group) {
 		var sr = js.Boot.__cast(this.Renderer , alphaTab.rendering.ScoreBarRenderer);
@@ -28128,6 +28152,13 @@ alphaTab.rendering.glyphs.TabBeatGlyph.prototype = $extend(alphaTab.rendering.gl
 			++i2;
 		}
 		this.Width = w;
+		if(this.Container.Beat.IsEmpty) {
+			this.CenterX = this.Width / 2;
+		} else if(this.Container.Beat.get_IsRest()) {
+			this.CenterX = this.RestGlyph.X + this.RestGlyph.Width / 2;
+		} else {
+			this.CenterX = this.NoteNumbers.X + this.NoteNumbers.Width / 2;
+		}
 	}
 	,UpdateBeamingHelper: function() {
 		if(!this.Container.Beat.get_IsRest()) {
@@ -28250,8 +28281,7 @@ alphaTab.rendering.glyphs.TabBendGlyph.prototype = $extend(alphaTab.rendering.gl
 			endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat,endXPositionType);
 		}
 		if(!isMultiBeatBend) {
-			endX = endX - 6 * this.get_Scale() / 2;
-			endX = endX - ((8 / 2 | 0) + 3) * this.get_Scale();
+			endX = endX - 6 * this.get_Scale();
 		}
 		var width = endX - startX;
 		var dX = width / 60;
@@ -30080,15 +30110,8 @@ alphaTab.rendering.utils.AccidentalHelper = $hx_exports["alphaTab"]["rendering"]
 alphaTab.rendering.utils.AccidentalHelper.__name__ = ["alphaTab","rendering","utils","AccidentalHelper"];
 alphaTab.rendering.utils.AccidentalHelper.prototype = {
 	ApplyAccidental: function(note) {
-		var noteValue = note.get_RealValue();
-		var quarterBend = false;
-		if(note.get_HasBend()) {
-			noteValue = noteValue + (note.BendPoints[0].Value / 2 | 0);
-			quarterBend = note.BendPoints[0].Value % 2 != 0;
-		} else if(note.BendOrigin != null) {
-			noteValue = noteValue + note.BendOrigin.BendPoints[note.BendOrigin.BendPoints.length - 1].Value;
-			quarterBend = note.BendOrigin.BendPoints[note.BendOrigin.BendPoints.length - 1].Value % 2 != 0;
-		}
+		var noteValue = note.get_RealValueWithBend();
+		var quarterBend = note.get_HasQuarterToneOffset();
 		var line = this.RegisterNoteLine(note,noteValue);
 		return this.GetAccidental(line,noteValue,quarterBend);
 	}
@@ -30411,7 +30434,7 @@ alphaTab.rendering.utils.BeamingHelper.prototype = {
 		if(this._staff.StaffKind == 2) {
 			return alphaTab.rendering.utils.PercussionMapper.MapNoteForDisplay(n.get_RealValue());
 		} else {
-			return n.get_RealValue() - this._staff.DisplayTranspositionPitch;
+			return n.get_RealValueWithBend() - this._staff.DisplayTranspositionPitch;
 		}
 	}
 	,GetMaxValue: function(n) {

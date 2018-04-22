@@ -241,6 +241,9 @@ namespace AlphaTab.Model
             return 0;
         }
 
+        /// <summary>
+        /// Gets the absolute value of this note for playback. 
+        /// </summary>
         public int RealValue
         {
             get
@@ -259,6 +262,46 @@ namespace AlphaTab.Model
                 }
 
                 return 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets the absolute value of this note considering
+        /// offsets by bends.
+        /// </summary>
+        public int RealValueWithBend
+        {
+            get
+            {
+                var noteValue = RealValue;
+                if (HasBend)
+                {
+                    noteValue += BendPoints[0].Value / 2;
+                }
+                else if (BendOrigin != null)
+                {
+                    noteValue += BendOrigin.BendPoints[BendOrigin.BendPoints.Count - 1].Value / 2;
+                }
+                return noteValue;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the note has a offset of a quartertone caused by bends.
+        /// </summary>
+        public bool HasQuarterToneOffset
+        {
+            get
+            {
+                if (HasBend)
+                {
+                    return (BendPoints[0].Value % 2) != 0;
+                }
+                if (BendOrigin != null)
+                {
+                    return (BendOrigin.BendPoints[BendOrigin.BendPoints.Count - 1].Value % 2) != 0;
+                }
+                return false;
             }
         }
 

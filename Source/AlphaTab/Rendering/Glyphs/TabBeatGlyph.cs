@@ -163,6 +163,19 @@ namespace AlphaTab.Rendering.Glyphs
                 w += g.Width;
             }
             Width = w;
+
+            if (Container.Beat.IsEmpty)
+            {
+                CenterX = Width / 2;
+            }
+            else if (Container.Beat.IsRest)
+            {
+                CenterX = RestGlyph.X + RestGlyph.Width / 2;
+            }
+            else
+            {
+                CenterX = NoteNumbers.X + NoteNumbers.Width / 2;
+            }
         }
 
         public override void UpdateBeamingHelper()

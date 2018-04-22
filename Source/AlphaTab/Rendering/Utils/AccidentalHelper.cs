@@ -109,18 +109,8 @@ namespace AlphaTab.Rendering.Utils
         /// <returns></returns>
         public AccidentalType ApplyAccidental(Note note)
         {
-            var noteValue = note.RealValue;
-            bool quarterBend = false;
-            if (note.HasBend)
-            {
-                noteValue += note.BendPoints[0].Value / 2;
-                quarterBend = (note.BendPoints[0].Value % 2) != 0;
-            }
-            else if (note.BendOrigin != null)
-            {
-                noteValue += note.BendOrigin.BendPoints[note.BendOrigin.BendPoints.Count - 1].Value;
-                quarterBend = (note.BendOrigin.BendPoints[note.BendOrigin.BendPoints.Count - 1].Value % 2) != 0;
-            }
+            var noteValue = note.RealValueWithBend;
+            bool quarterBend = note.HasQuarterToneOffset;
             var line = RegisterNoteLine(note, noteValue);
             return GetAccidental(line, noteValue, quarterBend);
         }

@@ -22,6 +22,7 @@ namespace AlphaTab.Rendering.Glyphs
     public class BeatOnNoteGlyphBase : BeatGlyphBase
     {
         public BeamingHelper BeamingHelper { get; set; }
+        public float CenterX { get; set; }
 
         public virtual void UpdateBeamingHelper()
         {

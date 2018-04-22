@@ -165,6 +165,19 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             base.DoLayout();
+
+            if (Container.Beat.IsEmpty)
+            {
+                CenterX = Width / 2;
+            }
+            else if (Container.Beat.IsRest)
+            {
+                CenterX = RestGlyph.X + RestGlyph.Width / 2;
+            }
+            else
+            {
+                CenterX = NoteHeads.X + NoteHeads.Width / 2;
+            }
         }
 
         private void CreateBeatDot(int line, GlyphGroup group)

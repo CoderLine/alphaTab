@@ -145,8 +145,8 @@ namespace AlphaTab.Rendering.Glyphs
 
             if (!isMultiBeatBend)
             {
-                endX -= (ArrowSize * Scale) / 2;
-                endX -= ScoreBendGlyph.EndPadding * Scale;
+                endX -= (ArrowSize * Scale);
+                //endX -= ScoreBendGlyph.EndPadding * Scale;
             }
 
             // we need some pixels for the arrow. otherwise we might draw into the next 

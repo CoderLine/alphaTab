@@ -465,7 +465,7 @@ namespace AlphaTab.Rendering
                     case BeatXPosition.OnNotes:
                         return container.VoiceContainer.X + container.X + container.OnNotes.X;
                     case BeatXPosition.MiddleNotes:
-                        return container.VoiceContainer.X + container.X + container.OnNotes.X + (container.OnNotes.Width / 2.0f);
+                        return container.VoiceContainer.X + container.X + container.OnNotes.X + container.OnNotes.CenterX;
                     case BeatXPosition.PostNotes:
                         return container.VoiceContainer.X + container.X + container.OnNotes.X + container.OnNotes.Width;
                     case BeatXPosition.EndBeat:
