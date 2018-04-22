@@ -28,5 +28,7 @@ namespace AlphaTab.Haxe.Js.Html
         public extern Promise<HaxeArray<FontFace>> Load(HaxeString font);
         [Name("load")]
         public extern Promise<HaxeArray<FontFace>> Load(HaxeString font, HaxeString text);
+        [Name("check")]
+        public extern bool Check(HaxeString font);
     }
 }

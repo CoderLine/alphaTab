@@ -212,11 +212,27 @@ namespace AlphaTab
             var cssFontLoadingModuleSupported = Browser.Document.Fonts.IsTruthy() && Browser.Document.Fonts.Member<object>("load").IsTruthy();
             if (cssFontLoadingModuleSupported)
             {
-                Browser.Document.Fonts.Load("1em alphaTab").Then(_ =>
+                Action checkFont = null;
+                checkFont = () =>
                 {
-                    IsFontLoaded = true;
-                    return true;
-                });
+                    Browser.Document.Fonts.Load("1em alphaTab").Then(_ =>
+                    {
+                        if (Browser.Document.Fonts.Check("1em alphaTab"))
+                        {
+                            IsFontLoaded = true;
+                        }
+                        else
+                        {
+                            Browser.Window.SetTimeout((Action)(() =>
+                            {
+                                checkFont();
+                            }), 250);
+
+                        }
+                        return true;
+                    });
+                };
+                checkFont();
             }
             else
             {
@@ -254,7 +270,7 @@ namespace AlphaTab
                         Browser.Window.SetTimeout((Action)(() =>
                         {
                             checkFont();
-                        }), 1000);
+                        }), 250);
                     }
                 };
                 Browser.Window.AddEventListener("DOMContentLoaded", (Action)(() =>

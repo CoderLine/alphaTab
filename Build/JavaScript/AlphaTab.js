@@ -6007,13 +6007,23 @@ alphaTab.Environment.CheckFontLoad = function() {
 	}
 	var cssFontLoadingModuleSupported = !(!window.document.fonts) && !(!window.document.fonts["load"]);
 	if(cssFontLoadingModuleSupported) {
-		window.document.fonts.load("1em alphaTab").then(function(_) {
-			alphaTab.Environment.IsFontLoaded = true;
-			return true;
-		});
-	} else {
 		var checkFont = null;
 		checkFont = function() {
+			window.document.fonts.load("1em alphaTab").then(function(_) {
+				if(window.document.fonts.check("1em alphaTab")) {
+					alphaTab.Environment.IsFontLoaded = true;
+				} else {
+					window.setTimeout(function() {
+						checkFont();
+					},250);
+				}
+				return true;
+			});
+		};
+		checkFont();
+	} else {
+		var checkFont1 = null;
+		checkFont1 = function() {
 			var document = window.document;
 			var testItem = document.getElementById("alphaTabFontChecker");
 			if(testItem == null) {
@@ -6034,12 +6044,12 @@ alphaTab.Environment.CheckFontLoad = function() {
 				document.body.removeChild(testItem);
 			} else {
 				window.setTimeout(function() {
-					checkFont();
-				},1000);
+					checkFont1();
+				},250);
 			}
 		};
 		window.addEventListener("DOMContentLoaded",function() {
-			checkFont();
+			checkFont1();
 		});
 	}
 };
