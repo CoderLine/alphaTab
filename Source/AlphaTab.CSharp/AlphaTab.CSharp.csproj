@@ -18,6 +18,7 @@
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="1.59.3" />
     <PackageReference Include="MSBuild.Sdk.Extras" Version="1.1.0" PrivateAssets="All" />
+    <PackageReference Include="Wyam" Version="1.4.1" />
   </ItemGroup>
 
   <ItemGroup>

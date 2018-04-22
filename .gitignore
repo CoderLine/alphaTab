@@ -47,6 +47,7 @@ _ReSharper*/
 /Tools/fontconverter/font/*
 /Tools/gpx-decompress/test/*
 /Tools/gpx-decompress/bin/*
+/Documentation/output/*
 /Private
 /Samples/JavaScript/files/Test.gp5
 /Samples/JavaScript/test.html

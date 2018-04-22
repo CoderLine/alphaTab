@@ -13,6 +13,9 @@ environment:
     HAXELIB_ROOT: C:\projects\haxelib
   access_token:
     secure: ig+MHQrCziKIZzGkDBsOTuusdSATGEXh79QCG8b4guSHAcM0+uYy0zGoVTKG446Q
+  deployment_token:
+    secure: F3tqGIN2guX5kU5B6q89HGPDAgI0g//DwtqRQL0oVeaJU6oBkgbQeJfiproA3yFi
+    
 skip_commits:
   author: AlphaTab Build Agent
 
@@ -60,7 +63,11 @@ test:
   assemblies:
     only: 
       - Source\AlphaTab.Test.CSharp\bin\Release\net471\AlphaTab.Test.CSharp.dll
-  
+
+after_test:
+  - Documentation\generate.bat
+  - 7z a -r Documentation\documentation.zip Documentation\output\*
+
 artifacts:
   # JavaScript Output
   - path: Build\JavaScript\*.*
@@ -68,6 +75,9 @@ artifacts:
   # NuGet package output 
   - path: Source\AlphaTab.CSharp\Bin\$(configuration)\*.nupkg
     name: NuGet
+  # Documentation 
+  - path: Documentation\documentation.zip
+    name: Documentation
 
 deploy:
   # My Get (Every Build)
@@ -84,7 +94,12 @@ deploy:
     on:
       branch: master
       appveyor_repo_tag: true
-      
+  # Documentation
+  - deploy:
+      provider: Webhook
+      url: https://docs.alphaTab.net/deploy.php
+      authorization: Basic aabbcc==
+  
 on_success:
   - git config --global credential.helper store
   - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
