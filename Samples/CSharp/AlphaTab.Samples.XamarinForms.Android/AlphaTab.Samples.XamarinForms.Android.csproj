@@ -145,7 +145,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidAsset Include="..\..\JavaScript\files\Canon.gp5">
+    <AndroidAsset Include="..\..\..\Documentation\input\assets\files\Canon.gp5">
       <Link>Assets\Canon.gp5</Link>
     </AndroidAsset>
     <None Include="packages.config" />
