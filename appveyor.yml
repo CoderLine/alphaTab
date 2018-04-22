@@ -95,10 +95,9 @@ deploy:
       branch: master
       appveyor_repo_tag: true
   # Documentation
-  - deploy:
-      provider: Webhook
-      url: https://docs.alphaTab.net/deploy.php
-      authorization: Basic aabbcc==
+  - provider: Webhook
+    url: https://docs.alphaTab.net/deploy.php
+    authorization: Basic aabbcc==
   
 on_success:
   - git config --global credential.helper store
