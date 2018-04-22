@@ -13,6 +13,8 @@ environment:
     HAXELIB_ROOT: C:\projects\haxelib
   access_token:
     secure: ig+MHQrCziKIZzGkDBsOTuusdSATGEXh79QCG8b4guSHAcM0+uYy0zGoVTKG446Q
+  deployment_token:
+    secure: F3tqGIN2guX5kU5B6q89HGPDAgI0g//DwtqRQL0oVeaJU6oBkgbQeJfiproA3yFi
     
 skip_commits:
   author: AlphaTab Build Agent
