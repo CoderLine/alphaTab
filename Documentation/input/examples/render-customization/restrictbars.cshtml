@@ -21,7 +21,7 @@ Order: 2
         <div class="js">
             <script type="text/x-alphatab">
                 $('#alphaTabScriptInit').alphaTab({
-                  file: '/assets/files/Canon.gp5',
+                  file: '@Context.GetLink("/assets/files/Canon.gp5")',
                   layout: {
                     mode: 'page',
                     additionalSettings: {
@@ -35,7 +35,7 @@ Order: 2
     </div>
     <div class="tab-pane example" id="dataInit">
         <div class="html">
-            <div id="alphaTabDataInit" data-file="/assets/files/Canon.gp5" data-layout-start="10" data-layout-count="5"></div>
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/Canon.gp5")" data-layout-start="10" data-layout-count="5"></div>
         </div>
         <div class="js">
             <script type="text/x-alphatab">

@@ -9,8 +9,8 @@ Order: 4
 	percussion track, it's hidden in case a drum tab is displayed.
 </p>
 
-<div id="alphaTabDrum" data-file="/assets/files/features/Drums.gp5"></div>
-<script type="text/javascript2">
+<div id="alphaTabDrum" data-file="@Context.GetLink("/assets/files/features/Drums.gp5")"></div>
+<script type="text/javascript">
 	$('#alphaTabDrum').alphaTab({
 	});
 </script>    
@@ -21,8 +21,8 @@ Order: 4
 	With Guitar Pro 6 files also grand staffs can be rendered.
 </p>
 
-<div id="alphaTabGs" data-file="/assets/files/features/Piano.gpx"></div>
-<script type="text/javascript2">
+<div id="alphaTabGs" data-file="@Context.GetLink("/assets/files/features/Piano.gpx")"></div>
+<script type="text/javascript">
 	$('#alphaTabGs').alphaTab({
 	});
 </script>    
@@ -33,7 +33,7 @@ Order: 4
 	AlphaTab can also render multiple tracks at the same time. 
 </p>
 
-<div id="alphaTabMulti" data-file="/assets/files/MultiTrack.gp5" data-tracks="[0,1]"></div>
+<div id="alphaTabMulti" data-file="@Context.GetLink("/assets/files/MultiTrack.gp5")" data-tracks="[0,1]"></div>
 <script type="text/javascript">
 	$('#alphaTabMulti').alphaTab({
 	});

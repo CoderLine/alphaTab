@@ -779,12 +779,13 @@ namespace AlphaTab.Platform.JavaScript
             renderAction = () =>
             {
                 // if font is not yet loaded, try again in 1 sec
-                if (!Environment.IsFontLoaded)
+                if (!Environment.IsFontLoaded && Settings.Engine == "html5")
                 {
+                    // TODO: trigger event in environment. 
                     Browser.Window.SetTimeout((Action)(() =>
                     {
                         renderAction();
-                    }), 1000);
+                    }), 500);
                 }
                 else
                 {

@@ -19,7 +19,7 @@ Order: 8
         <div class="js">
             <script type="text/x-alphatab">
                 $('#alphaTabScriptInit').alphaTab({
-                  file: '/assets/files/features/Skillet.gp5',
+                  file: '@Context.GetLink("/assets/files/features/Skillet.gp5")',
                   displayTranspositionPitches: [12]
                 })
             </script>
@@ -27,7 +27,7 @@ Order: 8
     </div>
     <div class="tab-pane example" id="dataInit">
         <div class="html">
-            <div id="alphaTabDataInit" data-file="/assets/files/features/Skillet.gp5" data-display-transposition-pitches="[12]"></div>
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/features/Skillet.gp5")" data-display-transposition-pitches="[12]"></div>
         </div>
         <div class="js">
             <script type="text/x-alphatab">

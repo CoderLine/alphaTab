@@ -7,6 +7,7 @@ Settings[DocsKeys.Logo] = "/assets/img/alphaTab.png";
 Settings[DocsKeys.BaseEditUrl] = "https://github.com/CoderLine/alphaTab/tree/develop/Documentation/input/";
 Settings[DocsKeys.ImplicitInheritDoc] = true;
 Settings[DocsKeys.ProjectFiles] = null;
+Settings[DocsKeys.ProjectFiles] = null;
 //Settings[DocsKeys.SourceFiles] = @"../../Source/**/{!bin,!obj,!packages,!*.Tests,!Haxe*,!Microsoft*,}/**/*.cs";
 
 // Add any pipeline customizations here

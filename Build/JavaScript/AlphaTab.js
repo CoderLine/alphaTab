@@ -21896,10 +21896,10 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		}
 		var renderAction = null;
 		renderAction = function() {
-			if(!alphaTab.Environment.IsFontLoaded) {
+			if(!alphaTab.Environment.IsFontLoaded && _gthis.Settings.Engine == "html5") {
 				window.setTimeout(function() {
 					renderAction();
-				},1000);
+				},500);
 			} else {
 				_gthis.Renderer.Render(_gthis.Score,_gthis.TrackIndexes);
 			}

@@ -20,7 +20,7 @@ Order: 1
         <div class="js">
             <script type="text/x-alphatab">
                 $('#alphaTabScriptInit').alphaTab({
-                  file: '/assets/files/Canon.gp5',
+                  file: '@Context.GetLink("/assets/files/Canon.gp5")',
                   width: 800
                 })
             </script>
@@ -28,7 +28,7 @@ Order: 1
     </div>
     <div class="tab-pane example" id="dataInit">
         <div class="html">
-            <div id="alphaTabDataInit" data-file="/assets/files/Canon.gp5" data-width="800"></div>
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/Canon.gp5")" data-width="800"></div>
         </div>
         <div class="js">
             <script type="text/x-alphatab">

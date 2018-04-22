@@ -19,7 +19,7 @@ Order: 7
         <div class="js">
             <script type="text/x-alphatab">
                 $('#alphaTabScriptInit').alphaTab({
-                  file: '/assets/files/features/Fingering.gpx',
+                  file: '@Context.GetLink("/assets/files/features/Fingering.gpx")',
                   forcePianoFingering: true
                 })
             </script>
@@ -27,7 +27,7 @@ Order: 7
     </div>
     <div class="tab-pane example" id="dataInit">
         <div class="html">
-            <div id="alphaTabDataInit" data-file="/assets/files/features/Fingering.gpx" data-force-piano-fingering="true"></div>
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/features/Fingering.gpx")" data-force-piano-fingering="true"></div>
         </div>
         <div class="js">
             <script type="text/x-alphatab">

@@ -10,7 +10,7 @@ Order: 3
 	the tablature.
 </p>
 
-<div id="alphaTabRhythm" data-file="/assets/files/features/Rhythm.gp5"></div>
+<div id="alphaTabRhythm" data-file="@Context.GetLink("/assets/files/features/Rhythm.gp5")"></div>
 <script type="text/javascript">
 	$('#alphaTabRhythm').alphaTab({
 		staves: {id: 'tab', additionalSettings: {'rhythm': true } }
@@ -23,7 +23,7 @@ Order: 3
 	If you prefer beams instead of bars for single notes you can have that too. 
 </p>
 
-<div id="alphaTabRhythmBeam" data-file="/assets/files/features/Rhythm.gp5"></div>
+<div id="alphaTabRhythmBeam" data-file="@Context.GetLink("/assets/files/features/Rhythm.gp5")"></div>
 <script type="text/javascript">
 	$('#alphaTabRhythmBeam').alphaTab({
 		staves: {id: 'tab', additionalSettings: {'rhythm': true, 'rhythm-beams': true } }
@@ -37,7 +37,7 @@ Order: 3
 	the number of strings and displays the tabs as you would expect.
 </p>
 
-<div id="alphaTabTabs" data-file="/assets/files/features/Tabs.gp5"></div>
+<div id="alphaTabTabs" data-file="@Context.GetLink("/assets/files/features/Tabs.gp5")"></div>
 <script type="text/javascript">
 	$('#alphaTabTabs').alphaTab({
 		staves: ['tab']

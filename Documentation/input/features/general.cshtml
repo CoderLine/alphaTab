@@ -9,7 +9,7 @@ Order: 0
 	file like you need. 
 </p>
 
-<div id="alphaTabScore" data-file="/assets/files/features/Skillet.gp5">
+<div id="alphaTabScore" data-file="@Context.GetLink("/assets/files/features/Skillet.gp5")">
 	Loading...        
 </div>
 <script type="text/javascript">
@@ -40,7 +40,7 @@ Order: 0
 	Some of the layout engines can render the song details on top of the music sheet.
 </p>
 
-<div id="alphaTabDetails" data-file="/assets/files/features/SongDetails.gp5"></div>
+<div id="alphaTabDetails" data-file="@Context.GetLink("/assets/files/features/SongDetails.gp5")"></div>
 <script type="text/javascript">
 	$('#alphaTabDetails').alphaTab();
 </script>
@@ -51,7 +51,7 @@ Order: 0
 	Do you prefer an HTML5 canvas output instead of SVG? No problem.
 </p>
 
-<div id="alphaTabHtml5" data-file="/assets/files/features/SongDetails.gp5"></div>
+<div id="alphaTabHtml5" data-file="@Context.GetLink("/assets/files/features/SongDetails.gp5")"></div>
 <script type="text/javascript">
 	$('#alphaTabHtml5').alphaTab({
 		engine: 'html5',
@@ -65,7 +65,7 @@ Order: 0
 	Need display repeat marks? No problem, single repeats and multiple repeats come out of the box.
 </p>
 
-<div id="alphaTabRepeats" data-file="/assets/files/features/Repeats.gp5"></div>
+<div id="alphaTabRepeats" data-file="@Context.GetLink("/assets/files/features/Repeats.gp5")"></div>
 <script type="text/javascript">
 	$('#alphaTabRepeats').alphaTab({
 		staves: 'score'
@@ -79,7 +79,7 @@ Order: 0
    Even alternate repeat endings are no problem. 
 </p>
 
-<div id="alphaTabAlternateEndings" data-file="/assets/files/features/AlternateEndings.gp5"></div>
+<div id="alphaTabAlternateEndings" data-file="@Context.GetLink("/assets/files/features/AlternateEndings.gp5")"></div>
 <script type="text/javascript">
 	$('#alphaTabAlternateEndings').alphaTab({
 		staves: 'score'
@@ -92,7 +92,7 @@ Order: 0
 	The guitar tuning of the current track is rendered on the top of the music notation.
 </p>
 
-<div id="alphaTabTuning" data-file="/assets/files/features/Tuning.gp5"></div>
+<div id="alphaTabTuning" data-file="@Context.GetLink("/assets/files/features/Tuning.gp5")"></div>
 <script type="text/javascript">
 	$('#alphaTabTuning').alphaTab();
 </script>
