@@ -1,4 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
+  <PropertyGroup>
+    <_SdkLanguageName>CSharp</_SdkLanguageName>
+  </PropertyGroup>
+
   <PropertyGroup>
     <RootNamespace>AlphaTab</RootNamespace>
     <AssemblyName>AlphaTab</AssemblyName>
@@ -18,7 +22,6 @@
 
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="1.59.3" />
-    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.1.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,15 +40,7 @@
     <PackageReference Include="Xamarin.Forms" Version="2.3.4.231" PrivateAssets="All" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Platform\CSharp\Wpf\Templates.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </None>
-  </ItemGroup>
-
   <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" />
-
-  <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)Build\CSharp\$(TargetFramework)\ /Y&#xD;&#xA;xcopy $(OutDir)$(TargetName).pdb $(SolutionDir)Build\CSharp\$(TargetFramework)\ /Y&#xD;&#xA;xcopy $(OutDir)$(TargetName).xml $(SolutionDir)Build\CSharp\$(TargetFramework)\ /Y" />

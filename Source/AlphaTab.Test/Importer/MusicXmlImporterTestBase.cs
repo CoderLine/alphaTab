@@ -201,7 +201,14 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(expected.Dots, actual.Dots, "Mismatch on Dots");
             Assert.AreEqual(expected.FadeIn, actual.FadeIn, "Mismatch on FadeIn");
             Assert.AreEqual(expected.IsLegatoOrigin, actual.IsLegatoOrigin, "Mismatch on IsLegatoOrigin");
-            Assert.AreEqual(string.Join(" ", expected.Lyrics), string.Join(" ", actual.Lyrics));
+            if (expected.Lyrics == null)
+            {
+                Assert.IsNull(actual.Lyrics);
+            }
+            else
+            {
+                Assert.AreEqual(string.Join(" ", expected.Lyrics), string.Join(" ", actual.Lyrics));
+            }
             Assert.AreEqual(expected.Pop, actual.Pop, "Mismatch on Pop");
             Assert.AreEqual(expected.HasChord, actual.HasChord, "Mismatch on HasChord");
             Assert.AreEqual(expected.HasRasgueado, actual.HasRasgueado, "Mismatch on HasRasgueado");

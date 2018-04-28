@@ -92,6 +92,7 @@ namespace AlphaTab
                     new CapoEffectInfo(),
                     new PalmMuteEffectInfo(),
                     new PickStrokeEffectInfo(),
+                    new PickSlideEffectInfo()
                 }),
                 new TabBarRendererFactory(false, false, false)
             };
@@ -114,6 +115,7 @@ namespace AlphaTab
                     new LetRingEffectInfo(),
                     new PalmMuteEffectInfo(),
                     new PickStrokeEffectInfo(),
+                    new PickSlideEffectInfo(),
                     new AlternateEndingsEffectInfo(), 
                 }),
                 new ScoreBarRendererFactory(),
@@ -145,6 +147,7 @@ namespace AlphaTab
                     new CapoEffectInfo(), 
                     new PalmMuteEffectInfo(), 
                     new PickStrokeEffectInfo(),
+                    new PickSlideEffectInfo(), 
                     new AlternateEndingsEffectInfo()
                 }),
                 new TabBarRendererFactory(true, true, true),
@@ -174,6 +177,7 @@ namespace AlphaTab
                     new CapoEffectInfo(), 
                     new PalmMuteEffectInfo(), 
                     new PickStrokeEffectInfo(),
+                    new PickSlideEffectInfo(),
                     new AlternateEndingsEffectInfo()
                 }),
                 new TabBarRendererFactory(false, false, false),

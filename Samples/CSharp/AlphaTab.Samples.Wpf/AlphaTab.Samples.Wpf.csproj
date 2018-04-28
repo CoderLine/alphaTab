@@ -1,17 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="MSBuild.Sdk.Extras">
   <PropertyGroup>
-    <LanguageTargets Condition="Exists('$(MSBuildExtensionsPath)\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets')">$(MSBuildExtensionsPath)\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
-    <LanguageTargets Condition="Exists('C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets')">C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
-    <LanguageTargets Condition="Exists('C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets')">C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
     <TargetFramework>net471</TargetFramework>
     <OutputType>WinExe</OutputType>
     <StartupObject />
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
-    <TransformOnBuild>True</TransformOnBuild>
-    <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +11,6 @@
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" />
-    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.2.0" PrivateAssets="All" />
   </ItemGroup>
   
   <ItemGroup>
@@ -34,20 +24,4 @@
     <ProjectReference Include="..\..\..\Source\AlphaTab.CSharp\AlphaTab.CSharp.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
 </Project>

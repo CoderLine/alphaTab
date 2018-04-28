@@ -5944,6 +5944,30 @@ alphaTab.rendering.effects.PickStrokeEffectInfo.prototype = {
 	}
 	,__class__: alphaTab.rendering.effects.PickStrokeEffectInfo
 };
+alphaTab.rendering.effects.PickSlideEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["PickSlideEffectInfo"] = function() {
+	alphaTab.rendering.effects.NoteEffectInfoBase.call(this);
+};
+alphaTab.rendering.effects.PickSlideEffectInfo.__name__ = ["alphaTab","rendering","effects","PickSlideEffectInfo"];
+alphaTab.rendering.effects.PickSlideEffectInfo.__super__ = alphaTab.rendering.effects.NoteEffectInfoBase;
+alphaTab.rendering.effects.PickSlideEffectInfo.prototype = $extend(alphaTab.rendering.effects.NoteEffectInfoBase.prototype,{
+	get_EffectId: function() {
+		return "pick-slide";
+	}
+	,ShouldCreateGlyphForNote: function(note) {
+		if(!(note.SlideType == 7)) {
+			return note.SlideType == 8;
+		} else {
+			return true;
+		}
+	}
+	,get_SizingMode: function() {
+		return 4;
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.LineRangedGlyph("P.S.");
+	}
+	,__class__: alphaTab.rendering.effects.PickSlideEffectInfo
+});
 alphaTab.rendering.TabBarRendererFactory = $hx_exports["alphaTab"]["rendering"]["TabBarRendererFactory"] = function(showTimeSignature,showRests,showTiedNotes) {
 	alphaTab.rendering.BarRendererFactory.call(this);
 	this._showTimeSignature = false;
@@ -6152,10 +6176,10 @@ alphaTab.Environment.Init = function() {
 	alphaTab.Environment.LayoutEngines["horizontal"] = function(r2) {
 		return new alphaTab.rendering.layout.HorizontalScreenLayout(r2);
 	};
-	alphaTab.Environment.StaveProfiles["default"] = alphaTab.Environment.StaveProfiles["score-tab"] = [new alphaTab.rendering.EffectBarRendererFactory("score-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.WhammyBarEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.ScoreBarRendererFactory(),new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.CrescendoEffectInfo(),new alphaTab.rendering.effects.DynamicsEffectInfo(),new alphaTab.rendering.effects.LyricsEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(false,false,false)];
-	alphaTab.Environment.StaveProfiles["score"] = [new alphaTab.rendering.EffectBarRendererFactory("score-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.WhammyBarEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.ScoreBarRendererFactory(),new alphaTab.rendering.EffectBarRendererFactory("score-bottom-effects",[new alphaTab.rendering.effects.CrescendoEffectInfo(),new alphaTab.rendering.effects.DynamicsEffectInfo(),new alphaTab.rendering.effects.LyricsEffectInfo()])];
-	alphaTab.Environment.StaveProfiles["tab"] = [new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(true,true,true),new alphaTab.rendering.EffectBarRendererFactory("tab-bottom-effects",[new alphaTab.rendering.effects.LyricsEffectInfo()])];
-	alphaTab.Environment.StaveProfiles["tab-mixed"] = [new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(false,false,false),new alphaTab.rendering.EffectBarRendererFactory("tab-bottom-effects",[new alphaTab.rendering.effects.LyricsEffectInfo()])];
+	alphaTab.Environment.StaveProfiles["default"] = alphaTab.Environment.StaveProfiles["score-tab"] = [new alphaTab.rendering.EffectBarRendererFactory("score-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.WhammyBarEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.ScoreBarRendererFactory(),new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.CrescendoEffectInfo(),new alphaTab.rendering.effects.DynamicsEffectInfo(),new alphaTab.rendering.effects.LyricsEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(false,false,false)];
+	alphaTab.Environment.StaveProfiles["score"] = [new alphaTab.rendering.EffectBarRendererFactory("score-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.WhammyBarEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.ScoreBarRendererFactory(),new alphaTab.rendering.EffectBarRendererFactory("score-bottom-effects",[new alphaTab.rendering.effects.CrescendoEffectInfo(),new alphaTab.rendering.effects.DynamicsEffectInfo(),new alphaTab.rendering.effects.LyricsEffectInfo()])];
+	alphaTab.Environment.StaveProfiles["tab"] = [new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(true,true,true),new alphaTab.rendering.EffectBarRendererFactory("tab-bottom-effects",[new alphaTab.rendering.effects.LyricsEffectInfo()])];
+	alphaTab.Environment.StaveProfiles["tab-mixed"] = [new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(false,false,false),new alphaTab.rendering.EffectBarRendererFactory("tab-bottom-effects",[new alphaTab.rendering.effects.LyricsEffectInfo()])];
 };
 alphaTab.Environment.prototype = {
 	__class__: alphaTab.Environment
@@ -15555,6 +15579,12 @@ alphaTab.importer.GpifParser.prototype = {
 						if((slideFlags & 32) != 0) {
 							note.SlideType = 4;
 						}
+						if((slideFlags & 64) != 0) {
+							note.SlideType = 7;
+						}
+						if((slideFlags & 128) != 0) {
+							note.SlideType = 8;
+						}
 						break;
 					case "String":
 						note.String = alphaTab.platform.Platform.ParseInt(c1.FindChildElement("String").get_InnerText()) + 1;
@@ -20413,6 +20443,10 @@ alphaTab.model._SlideType.SlideType_Impl_.toString = function(this1) {
 		return "OutUp";
 	case 6:
 		return "OutDown";
+	case 7:
+		return "PickSlideDown";
+	case 8:
+		return "PickSlideUp";
 	}
 	return "";
 };
@@ -34270,6 +34304,8 @@ alphaTab.model._SlideType.SlideType_Impl_.IntoFromBelow = 3;
 alphaTab.model._SlideType.SlideType_Impl_.IntoFromAbove = 4;
 alphaTab.model._SlideType.SlideType_Impl_.OutUp = 5;
 alphaTab.model._SlideType.SlideType_Impl_.OutDown = 6;
+alphaTab.model._SlideType.SlideType_Impl_.PickSlideDown = 7;
+alphaTab.model._SlideType.SlideType_Impl_.PickSlideUp = 8;
 alphaTab.model._StaffKind.StaffKind_Impl_.Tablature = 0;
 alphaTab.model._StaffKind.StaffKind_Impl_.Score = 1;
 alphaTab.model._StaffKind.StaffKind_Impl_.Percussion = 2;

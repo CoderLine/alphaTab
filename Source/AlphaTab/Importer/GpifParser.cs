@@ -1626,18 +1626,22 @@ namespace AlphaTab.Importer
                                     break;
                                 case "Slide":
                                     var slideFlags = Platform.Platform.ParseInt(c.FindChildElement("Flags").InnerText);
-                                    if ((slideFlags & 0x01) != 0)
+                                    if ((slideFlags & 1) != 0)
                                         note.SlideType = SlideType.Shift;
-                                    if ((slideFlags & 0x02) != 0)
+                                    if ((slideFlags & 2) != 0)
                                         note.SlideType = SlideType.Legato;
-                                    if ((slideFlags & 0x04) != 0)
+                                    if ((slideFlags & 4) != 0)
                                         note.SlideType = SlideType.OutDown;
-                                    if ((slideFlags & 0x08) != 0)
+                                    if ((slideFlags & 8) != 0)
                                         note.SlideType = SlideType.OutUp;
-                                    if ((slideFlags & 0x10) != 0)
+                                    if ((slideFlags & 16) != 0)
                                         note.SlideType = SlideType.IntoFromBelow;
-                                    if ((slideFlags & 0x20) != 0)
+                                    if ((slideFlags & 32) != 0)
                                         note.SlideType = SlideType.IntoFromAbove;
+                                    if ((slideFlags & 64) != 0)
+                                        note.SlideType = SlideType.PickSlideDown;
+                                    if ((slideFlags & 128) != 0)
+                                        note.SlideType = SlideType.PickSlideUp;
                                     break;
                             }
                             break;
