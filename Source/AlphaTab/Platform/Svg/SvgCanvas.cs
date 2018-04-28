@@ -194,7 +194,7 @@ namespace AlphaTab.Platform.Svg
             {
                 s += " text-anchor=\"" + GetSvgTextAlignment() + "\"";
             }
-            s+= ">" + text + "</text>";
+            s += ">" + text + "</text>";
             Buffer.Append(s);
         }
 
@@ -244,6 +244,16 @@ namespace AlphaTab.Platform.Svg
         {
             // nothing to do
             return null;
+        }
+
+        public void BeginRotate(float centerX, float centerY, float angle)
+        {
+            Buffer.Append("<g transform=\"translate(" + centerX + " ," + centerY + ") rotate( " + angle + ")\">");
+        }
+
+        public void EndRotate()
+        {
+            Buffer.Append("</g>");
         }
     }
 }

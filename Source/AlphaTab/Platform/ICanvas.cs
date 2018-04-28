@@ -53,6 +53,9 @@ namespace AlphaTab.Platform
         void BeginRender(float width, float height);
         object EndRender();
         object OnRenderFinished();
+
+        void BeginRotate(float centerX, float centerY, float angle);
+        void EndRotate();
     }
 
     /// <summary>

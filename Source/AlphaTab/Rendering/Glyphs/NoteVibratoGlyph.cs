@@ -23,6 +23,9 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class NoteVibratoGlyph : GroupedEffectGlyph
     {
+        public const int SlightWaveOffset = 10;
+        public const float SlightWaveSize = 8.5f;
+
         private readonly VibratoType _type;
         private readonly float _scale;
         private MusicFontSymbol _symbol;
@@ -47,8 +50,8 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 case VibratoType.Slight:
                     _symbol = MusicFontSymbol.WaveHorizontalSlight;
-                    _symbolSize = 8.5f * _scale;
-                    _symbolOffset = 10 * _scale;
+                    _symbolSize = SlightWaveSize * _scale;
+                    _symbolOffset = SlightWaveOffset * _scale;
                     symbolHeight = 6 * _scale;
                     break;
                 case VibratoType.Wide:

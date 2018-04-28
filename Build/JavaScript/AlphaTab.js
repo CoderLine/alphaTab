@@ -526,6 +526,12 @@ alphaTab.platform.svg.SvgCanvas.prototype = {
 	,OnRenderFinished: function() {
 		return null;
 	}
+	,BeginRotate: function(centerX,centerY,angle) {
+		this.Buffer += Std.string("<g transform=\"translate(" + centerX + " ," + centerY + ") rotate( " + angle + ")\">");
+	}
+	,EndRotate: function() {
+		this.Buffer += Std.string("</g>");
+	}
 	,__class__: alphaTab.platform.svg.SvgCanvas
 };
 alphaTab.platform.svg.CssFontSvgCanvas = $hx_exports["alphaTab"]["platform"]["svg"]["CssFontSvgCanvas"] = function() {
@@ -1009,11 +1015,11 @@ alphaTab.platform.javaScript.Html5Canvas.prototype = {
 	}
 	,FillRect: function(x,y,w,h) {
 		if(w > 0) {
-			this._context.fillRect(system.Convert.ToInt32_Single(x) - 0.5,system.Convert.ToInt32_Single(y) - 0.5,w,h);
+			this._context.fillRect(system.Convert.ToInt32_Single(x) - 0,system.Convert.ToInt32_Single(y) - 0,w,h);
 		}
 	}
 	,StrokeRect: function(x,y,w,h) {
-		this._context.strokeRect(x - 0.5,y - 0.5,w,h);
+		this._context.strokeRect(x - 0,y - 0,w,h);
 	}
 	,BeginPath: function() {
 		this._context.beginPath();
@@ -1022,10 +1028,10 @@ alphaTab.platform.javaScript.Html5Canvas.prototype = {
 		this._context.closePath();
 	}
 	,MoveTo: function(x,y) {
-		this._context.moveTo(x - 0.5,y - 0.5);
+		this._context.moveTo(x - 0,y - 0);
 	}
 	,LineTo: function(x,y) {
-		this._context.lineTo(x - 0.5,y - 0.5);
+		this._context.lineTo(x - 0,y - 0);
 	}
 	,QuadraticCurveTo: function(cpx,cpy,x,y) {
 		this._context.quadraticCurveTo(cpx,cpy,x,y);
@@ -1114,6 +1120,10 @@ alphaTab.platform.javaScript.Html5Canvas.prototype = {
 	,EndGroup: function() {
 	}
 	,FillText: function(text,x,y) {
+		var this1 = system.Convert.ToInt32_Single(x);
+		x = this1;
+		var this2 = system.Convert.ToInt32_Single(y);
+		y = this2;
 		this._context.fillText(text,x,y);
 	}
 	,MeasureText: function(text) {
@@ -1123,6 +1133,10 @@ alphaTab.platform.javaScript.Html5Canvas.prototype = {
 		if(symbol == -1) {
 			return;
 		}
+		var this1 = system.Convert.ToInt32_Single(x);
+		x = this1;
+		var this2 = system.Convert.ToInt32_Single(y);
+		y = this2;
 		var baseLine = this._context.textBaseline;
 		var font = this._context.font;
 		var tmp = this._musicFont.ToCssString(scale);
@@ -1131,6 +1145,15 @@ alphaTab.platform.javaScript.Html5Canvas.prototype = {
 		this._context.fillText(String.fromCharCode(symbol),x,y);
 		this._context.textBaseline = baseLine;
 		this._context.font = font;
+	}
+	,BeginRotate: function(centerX,centerY,angle) {
+		this._context.save();
+		this._context.translate(centerX,centerY);
+		var this1 = 180.0;
+		this._context.rotate(angle * 3.14159265358979 / this1);
+	}
+	,EndRotate: function() {
+		this._context.restore();
 	}
 	,__class__: alphaTab.platform.javaScript.Html5Canvas
 };
@@ -27133,8 +27156,7 @@ alphaTab.rendering.glyphs.NoteVibratoGlyph.prototype = $extend(alphaTab.renderin
 		switch(_g) {
 		case 1:
 			this._symbol = 60068;
-			var this1 = 8.5;
-			this._symbolSize = this1 * this._scale;
+			this._symbolSize = 8.5 * this._scale;
 			this._symbolOffset = 10 * this._scale;
 			symbolHeight = 6 * this._scale;
 			break;
@@ -28257,6 +28279,7 @@ alphaTab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphaTab.rende
 		var startY;
 		var endX;
 		var endY;
+		var waves = false;
 		var _g = this._type;
 		switch(_g) {
 		case 1:case 2:
@@ -28294,13 +28317,44 @@ alphaTab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphaTab.rende
 			endX = startX + sizeX;
 			endY = cy + r.GetNoteY(this._startNote,false) + 9;
 			break;
+		case 7:
+			startX = cx + r.GetNoteX(this._startNote,true);
+			startY = cy + r.GetNoteY(this._startNote,false) - 9 / 2;
+			endX = cx + r.GetBeatX(this._startNote.Beat,4);
+			endY = cy + r.GetNoteY(this._startNote,false) + 9;
+			waves = true;
+			break;
+		case 8:
+			startX = cx + r.GetNoteX(this._startNote,true);
+			startY = cy + r.GetNoteY(this._startNote,false) + 9 / 2;
+			endX = cx + r.GetBeatX(this._startNote.Beat,4);
+			endY = cy + r.GetNoteY(this._startNote,false) - 9;
+			waves = true;
+			break;
 		default:
 			return;
 		}
-		canvas.BeginPath();
-		canvas.MoveTo(startX,startY);
-		canvas.LineTo(endX,endY);
-		canvas.Stroke();
+		if(waves) {
+			var b = endX - startX;
+			var a = endY - startY;
+			var this1 = a;
+			var this2 = b;
+			var c = Math.sqrt(Math.pow(this1,2) + Math.pow(this2,2));
+			var this3 = a / c;
+			var angle = js.Boot.__cast(Math.asin(this3) * 57.29577951308238 , Float);
+			canvas.BeginRotate(startX,startY,angle);
+			var glyph = new alphaTab.rendering.glyphs.NoteVibratoGlyph(0,0,1,1.2);
+			glyph.Renderer = this.Renderer;
+			glyph.DoLayout();
+			glyph.Width = b;
+			glyph.Paint(0,0,canvas);
+			canvas.EndRotate();
+		} else {
+			canvas.BeginPath();
+			canvas.MoveTo(startX,startY);
+			canvas.LineTo(endX,endY);
+			canvas.Stroke();
+		}
 	}
 	,__class__: alphaTab.rendering.glyphs.ScoreSlideLineGlyph
 });
@@ -29236,6 +29290,7 @@ alphaTab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphaTab.renderi
 		var startY;
 		var endX;
 		var endY;
+		var waves = false;
 		var _g = this._type;
 		switch(_g) {
 		case 1:case 2:
@@ -29285,13 +29340,44 @@ alphaTab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphaTab.renderi
 			endX = startX + sizeX;
 			endY = cy + r.GetNoteY(this._startNote,false) + sizeY;
 			break;
+		case 7:
+			startX = cx + r.GetNoteX(this._startNote,true);
+			startY = cy + r.GetNoteY(this._startNote,false) - sizeY * 2;
+			endX = cx + r.GetBeatX(this._startNote.Beat,4);
+			endY = startY + sizeY * 3;
+			waves = true;
+			break;
+		case 8:
+			startX = cx + r.GetNoteX(this._startNote,true);
+			startY = cy + r.GetNoteY(this._startNote,false) + sizeY;
+			endX = cx + r.GetBeatX(this._startNote.Beat,4);
+			endY = startY - sizeY * 3;
+			waves = true;
+			break;
 		default:
 			return;
 		}
-		canvas.BeginPath();
-		canvas.MoveTo(startX,startY);
-		canvas.LineTo(endX,endY);
-		canvas.Stroke();
+		if(waves) {
+			var b = endX - startX;
+			var a = endY - startY;
+			var this1 = a;
+			var this2 = b;
+			var c = Math.sqrt(Math.pow(this1,2) + Math.pow(this2,2));
+			var this3 = a / c;
+			var angle = js.Boot.__cast(Math.asin(this3) * 57.29577951308238 , Float);
+			canvas.BeginRotate(startX,startY,angle);
+			var glyph = new alphaTab.rendering.glyphs.NoteVibratoGlyph(0,0,1,1.2);
+			glyph.Renderer = this.Renderer;
+			glyph.DoLayout();
+			glyph.Width = b;
+			glyph.Paint(0,0,canvas);
+			canvas.EndRotate();
+		} else {
+			canvas.BeginPath();
+			canvas.MoveTo(startX,startY);
+			canvas.LineTo(endX,endY);
+			canvas.Stroke();
+		}
 	}
 	,__class__: alphaTab.rendering.glyphs.TabSlideLineGlyph
 });
@@ -33838,6 +33924,7 @@ system.Convert._int16Buffer = new Int16Array(system.Convert._conversionBuffer);
 system.Convert._uint16Buffer = new Uint16Array(system.Convert._conversionBuffer);
 system.Convert._int32Buffer = new Int32Array(system.Convert._conversionBuffer);
 system.Convert._uint32Buffer = new Uint32Array(system.Convert._conversionBuffer);
+alphaTab.platform.javaScript.Html5Canvas.BlurCorrection = 0;
 js.Boot.__toStr = ({ }).toString;
 alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdPrefix = "alphaSynth.";
 alphaTab.platform.javaScript.AlphaSynthWebWorker.CmdInitialize = "alphaSynth." + "initialize";
@@ -34458,6 +34545,8 @@ alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.AccidentalQuart
 alphaTab.rendering.glyphs.NoteHeadGlyph.GraceScale = 0.75;
 alphaTab.rendering.glyphs.NoteHeadGlyph.NoteHeadHeight = 9;
 alphaTab.rendering.glyphs.NoteHeadGlyph.QuarterNoteHeadWidth = 8;
+alphaTab.rendering.glyphs.NoteVibratoGlyph.SlightWaveOffset = 10;
+alphaTab.rendering.glyphs.NoteVibratoGlyph.SlightWaveSize = 8.5;
 alphaTab.rendering.glyphs.ScoreHelperNotesBaseGlyph.SlurHeight = 11;
 alphaTab.rendering.glyphs.ScoreHelperNotesBaseGlyph.EndPadding = (8 / 2 | 0) + 3;
 alphaTab.rendering.glyphs.TabBendGlyph.ArrowSize = 6;

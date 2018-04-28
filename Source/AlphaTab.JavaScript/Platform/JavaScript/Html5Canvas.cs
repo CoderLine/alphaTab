@@ -31,6 +31,8 @@ namespace AlphaTab.Platform.JavaScript
     /// </summary>
     public class Html5Canvas : ICanvas
     {
+        protected const float BlurCorrection = 0;
+
         private CanvasElement _canvas;
         private CanvasRenderingContext2D _context;
         private Color _color;
@@ -109,13 +111,13 @@ namespace AlphaTab.Platform.JavaScript
         {
             if (w > 0)
             {
-                _context.FillRect(((int)x - 0.5), ((int)y - 0.5), w, h);
+                _context.FillRect(((int)x - BlurCorrection), ((int)y - BlurCorrection), w, h);
             }
         }
 
         public void StrokeRect(float x, float y, float w, float h)
         {
-            _context.StrokeRect((x - 0.5), (y - 0.5), w, h);
+            _context.StrokeRect((x - BlurCorrection), (y - BlurCorrection), w, h);
         }
 
         public void BeginPath()
@@ -130,12 +132,12 @@ namespace AlphaTab.Platform.JavaScript
 
         public void MoveTo(float x, float y)
         {
-            _context.MoveTo((x - 0.5), (y - 0.5));
+            _context.MoveTo((x - BlurCorrection), (y - BlurCorrection));
         }
 
         public void LineTo(float x, float y)
         {
-            _context.LineTo((x - 0.5), (y - 0.5));
+            _context.LineTo((x - BlurCorrection), (y - BlurCorrection));
         }
 
         public void QuadraticCurveTo(float cpx, float cpy, float x, float y)
@@ -251,6 +253,8 @@ namespace AlphaTab.Platform.JavaScript
 
         public void FillText(string text, float x, float y)
         {
+            x = (int)x;
+            y = (int)y;
             _context.FillText(text, x, y);
         }
 
@@ -265,13 +269,29 @@ namespace AlphaTab.Platform.JavaScript
             {
                 return;
             }
+
+            x = (int)x;
+            y = (int)y;
             var baseLine = _context.TextBaseline;
             var font = _context.Font;
             _context.Font = _musicFont.ToCssString(scale);
             _context.TextBaseline = "middle";
-            _context.FillText(Platform.StringFromCharCode((int)symbol), x.As<int>(), y.As<int>());
+            _context.FillText(Platform.StringFromCharCode((int)symbol), x, y);
             _context.TextBaseline = baseLine;
             _context.Font = font;
         }
+
+        public void BeginRotate(float centerX, float centerY, float angle)
+        {
+            _context.Save();
+            _context.Translate(centerX, centerY);
+            _context.Rotate(angle * Math.PI / 180.0f);
+        }
+
+        public void EndRotate()
+        {
+            _context.Restore();
+        }
+
     }
 }

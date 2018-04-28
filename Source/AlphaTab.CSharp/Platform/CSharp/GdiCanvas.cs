@@ -400,6 +400,17 @@ namespace AlphaTab.Platform.CSharp
 
             _graphics.DrawString(Platform.StringFromCharCode((int)symbol), GetMusicFont(scale), _brush, x, y, MusicFontFormat);
         }
+
+        public void BeginRotate(float centerX, float centerY, float angle)
+        {
+            _graphics.TranslateTransform(centerX, centerY);
+            _graphics.RotateTransform(angle);
+        }
+
+        public void EndRotate()
+        {
+            _graphics.ResetTransform();
+        }
     }
 }
 #endif

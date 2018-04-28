@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 
@@ -50,6 +52,8 @@ namespace AlphaTab.Rendering.Glyphs
             float startY;
             float endX;
             float endY;
+            bool waves = false;
+
             switch (_type)
             {
                 case SlideType.Shift:
@@ -94,14 +98,47 @@ namespace AlphaTab.Rendering.Glyphs
                     endX = startX + sizeX;
                     endY = cy + r.GetNoteY(_startNote) + NoteHeadGlyph.NoteHeadHeight;
                     break;
+                case SlideType.PickSlideUp:
+                    startX = cx + r.GetNoteX(_startNote);
+                    startY = cy + r.GetNoteY(_startNote) + NoteHeadGlyph.NoteHeadHeight / 2;
+                    endX = cx + r.GetBeatX(_startNote.Beat, BeatXPosition.EndBeat);
+                    endY = cy + r.GetNoteY(_startNote) - NoteHeadGlyph.NoteHeadHeight;
+                    waves = true;
+                    break;
+                case SlideType.PickSlideDown:
+                    startX = cx + r.GetNoteX(_startNote);
+                    startY = cy + r.GetNoteY(_startNote) - NoteHeadGlyph.NoteHeadHeight / 2;
+                    endX = cx + r.GetBeatX(_startNote.Beat, BeatXPosition.EndBeat);
+                    endY = cy + r.GetNoteY(_startNote) + NoteHeadGlyph.NoteHeadHeight;
+                    waves = true;
+                    break;
                 default:
                     return;
             }
 
-            canvas.BeginPath();
-            canvas.MoveTo(startX, startY);
-            canvas.LineTo(endX, endY);
-            canvas.Stroke();
+            if (waves)
+            {
+                var b = endX - startX;
+                var a = endY - startY;
+                var c = Math.Sqrt(Math.Pow(a, 2) + Math.Pow(b, 2));
+                var angle = (float)(Math.Asin(a / c) * (180 / Math.PI));
+                canvas.BeginRotate(startX, startY, angle);
+
+                var glyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight);
+                glyph.Renderer = Renderer;
+                glyph.DoLayout();
+                glyph.Width = b;
+                glyph.Paint(0, 0, canvas);
+
+                canvas.EndRotate();
+            }
+            else
+            {
+                canvas.BeginPath();
+                canvas.MoveTo(startX, startY);
+                canvas.LineTo(endX, endY);
+                canvas.Stroke();
+            }
         }
     }
 }

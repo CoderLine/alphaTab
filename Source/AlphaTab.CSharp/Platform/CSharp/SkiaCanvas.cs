@@ -292,5 +292,18 @@ namespace AlphaTab.Platform.CSharp
                 _surface.Canvas.DrawText(Platform.StringFromCharCode((int)symbol), x, y, paint);
             }
         }
+
+        public void BeginRotate(float centerX, float centerY, float angle)
+        {
+            _surface.Canvas.Save();
+            _surface.Canvas.Translate(centerX, centerY);
+            _surface.Canvas.RotateDegrees(angle);
+        }
+
+        public void EndRotate()
+        {
+            _surface.Canvas.Restore();
+        }
+
     }
 }
