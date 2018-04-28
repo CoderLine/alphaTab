@@ -19849,6 +19849,8 @@ alphaTab.model.Note.prototype = {
 			noteValue = noteValue + (this.BendPoints[0].Value / 2 | 0);
 		} else if(this.BendOrigin != null) {
 			noteValue = noteValue + (this.BendOrigin.BendPoints[this.BendOrigin.BendPoints.length - 1].Value / 2 | 0);
+		} else if(this.Beat.get_HasWhammyBar()) {
+			noteValue = noteValue + (this.Beat.WhammyBarPoints[0].Value / 2 | 0);
 		} else if(this.Beat.IsContinuedWhammy) {
 			noteValue = noteValue + (this.Beat.PreviousBeat.WhammyBarPoints[this.Beat.PreviousBeat.WhammyBarPoints.length - 1].Value / 2 | 0);
 		}
@@ -19860,6 +19862,9 @@ alphaTab.model.Note.prototype = {
 		}
 		if(this.BendOrigin != null) {
 			return this.BendOrigin.BendPoints[this.BendOrigin.BendPoints.length - 1].Value % 2 != 0;
+		}
+		if(this.Beat.get_HasWhammyBar()) {
+			return this.Beat.WhammyBarPoints[0].Value % 2 != 0;
 		}
 		if(this.Beat.IsContinuedWhammy) {
 			return this.Beat.PreviousBeat.WhammyBarPoints[this.Beat.PreviousBeat.WhammyBarPoints.length - 1].Value % 2 != 0;
