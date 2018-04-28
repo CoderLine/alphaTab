@@ -131,38 +131,29 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var startNoteRenderer = Renderer;
 
-            Beat endBeat = _beat.NextBeat == null ? _beat : _beat.NextBeat;
-            BarRendererBase endNoteRenderer;
-            var endBeatHasWhammy = false;
-            BeatXPosition endXPositionType;
-            if (_beat.NextBeat == null)
+            Beat endBeat = _beat.NextBeat;
+            BarRendererBase endNoteRenderer = null;
+            BeatXPosition endXPositionType = BeatXPosition.PreNotes;
+            if (endBeat != null)
             {
-                endBeat = _beat;
-                endNoteRenderer = startNoteRenderer;
-                endXPositionType = BeatXPosition.EndBeat;
-            }
-            else
-            {
-                endBeat = _beat.NextBeat;
                 endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, endBeat.Voice.Bar);
-
                 if (endNoteRenderer == null || endNoteRenderer.Staff != startNoteRenderer.Staff)
                 {
-                    endBeat = _beat;
-                    endNoteRenderer = startNoteRenderer;
-                    endXPositionType = BeatXPosition.EndBeat;
+                    endBeat = null;
+                    endNoteRenderer = null;
                 }
                 else
                 {
-                    endBeatHasWhammy = endBeat.HasWhammyBar;
-                    endXPositionType = endBeatHasWhammy
+                    endXPositionType = endBeat.HasWhammyBar
                         ? BeatXPosition.MiddleNotes
                         : BeatXPosition.PreNotes;
                 }
             }
 
             float startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_beat, BeatXPosition.MiddleNotes);
-            float endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat, endXPositionType);
+            float endX = endNoteRenderer == null
+                ? cx + startNoteRenderer.X + startNoteRenderer.Width
+                : cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat, endXPositionType);
 
             var old = canvas.TextAlign;
             canvas.TextAlign = TextAlign.Center;
@@ -254,13 +245,18 @@ namespace AlphaTab.Rendering.Glyphs
                 canvas.LineTo(x2, y2);
             }
 
-            var dV = secondPt.Value;
+            var dV = Math.Abs(secondPt.Value);
             if (dV != 0 && firstPt.Value != secondPt.Value)
             {
                 var res = canvas.Resources;
 
                 var s = "";
-                if (dV >= 4 || dV <= -4)
+                if (secondPt.Value < 0)
+                {
+                    s += "-";
+                }
+
+                if (dV >= 4)
                 {
                     int steps = dV / 4;
                     s += steps;
