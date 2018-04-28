@@ -27,17 +27,24 @@ namespace AlphaTab.Rendering.Glyphs
     {
         private const int ArrowSize = 6;
         private const int DashSize = 3;
+        private const int BendValueHeight = 6;
         private readonly Note _note;
         private FastList<BendPoint> _renderPoints;
-        private readonly float _bendValueHeight;
 
-        public TabBendGlyph(Note n, float bendValueHeight)
+        public TabBendGlyph(Note n)
             : base(0, 0)
         {
             _note = n;
-            _bendValueHeight = bendValueHeight;
 
             _renderPoints = CreateRenderingPoints(n);
+        }
+
+        public override void DoLayout()
+        {
+            base.DoLayout();
+
+            var bendHeight = _note.MaxBendPoint.Value * BendValueHeight * Scale;
+            Renderer.RegisterOverflowTop(bendHeight);
         }
 
         private FastList<BendPoint> CreateRenderingPoints(Note note)
@@ -77,7 +84,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            var startNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, _note.Beat.Voice.Bar);
+            var startNoteRenderer = Renderer;
 
             Note endNote = _note;
             bool isMultiBeatBend = false;
@@ -192,7 +199,8 @@ namespace AlphaTab.Rendering.Glyphs
             var overflowOffset = r.LineOffset / 2;
 
             var x1 = cx + (dX * firstPt.Offset);
-            var y1 = cy - (_bendValueHeight * firstPt.Value);
+            var bendValueHeight = BendValueHeight * Scale;
+            var y1 = cy - (bendValueHeight * firstPt.Value);
             if (firstPt.Value == 0)
             {
                 if (secondPt.Offset == firstPt.Offset)
@@ -209,7 +217,7 @@ namespace AlphaTab.Rendering.Glyphs
                 y1 += overflowOffset;
             }
             var x2 = cx + (dX * secondPt.Offset);
-            var y2 = cy - (_bendValueHeight * secondPt.Value);
+            var y2 = cy - (bendValueHeight * secondPt.Value);
             if (secondPt.Value == 0)
             {
                 y2 += r.GetNoteY(_note);

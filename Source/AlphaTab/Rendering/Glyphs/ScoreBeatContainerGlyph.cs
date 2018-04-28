@@ -123,11 +123,6 @@ namespace AlphaTab.Rendering
 
             if (n.HasBend)
             {
-                // TODO: register needed overflow for bend
-                //var bendValueHeight = 6;
-                //var bendHeight = n.MaxBendPoint.Value * bendValueHeight;
-                //Renderer.RegisterOverflowTop(bendHeight);
-
                 _bend = new ScoreBendGlyph(n);
                 _bend.Renderer = Renderer;
                 _bend.DoLayout();

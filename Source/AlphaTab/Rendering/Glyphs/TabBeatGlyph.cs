@@ -21,6 +21,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class TabBeatGlyph : BeatOnNoteGlyphBase
     {
+        private TabWhammyBarGlyph _whammyBarGlyph;
         public TabNoteChordGlyph NoteNumbers { get; set; }
         public TabRestGlyph RestGlyph { get; set; }
 
@@ -44,13 +45,13 @@ namespace AlphaTab.Rendering.Glyphs
                 // Whammy Bar
                 if (Container.Beat.HasWhammyBar && !NoteNumbers.BeatEffects.ContainsKey("Whammy"))
                 {
-                    NoteNumbers.BeatEffects["Whammy"] = new WhammyBarGlyph(Container.Beat, Container);
+                    var whammy = _whammyBarGlyph = new TabWhammyBarGlyph(Container.Beat);
+                    whammy.Renderer = Renderer;
+                    whammy.DoLayout();
 
-                    var whammyValueHeight = (WhammyBarGlyph.WhammyMaxOffset * Scale) / Beat.WhammyBarMaxValue;
-
-                    var whammyHeight = Container.Beat.MaxWhammyPoint.Value * whammyValueHeight;
-                    Renderer.RegisterOverflowTop(whammyHeight);
+                    Container.Ties.Add(whammy);
                 }
+
 
                 //
                 // Tremolo Picking

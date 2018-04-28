@@ -260,7 +260,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TuningGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\VibratoGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\VoiceContainerGlyph.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\WhammyBarGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TabWhammyBarGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\IEffectBarRendererInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\IScoreRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Layout\HeaderFooterElements.cs" />

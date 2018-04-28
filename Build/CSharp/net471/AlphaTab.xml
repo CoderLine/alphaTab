@@ -897,6 +897,48 @@
             at several locations for lookup tables. 
             </summary>
         </member>
+        <member name="T:AlphaTab.Model.WhammyType">
+            <summary>
+            Lists all types of whammy bars
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.WhammyType.None">
+            <summary>
+            No whammy at all
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.WhammyType.Custom">
+            <summary>
+            Individual points define the whammy in a flexible manner. 
+            This system was mainly used in Guitar Pro 3-5
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.WhammyType.Dive">
+            <summary>
+            Simple dive to a lower or higher note.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.WhammyType.Dip">
+            <summary>
+            A dive to a lower or higher note and releasing it back to normal. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.WhammyType.Hold">
+            <summary>
+            Continue to hold the whammy at the position from a previous whammy. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.WhammyType.Predive">
+            <summary>
+            Dive to a lower or higher note before playing it. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.WhammyType.PrediveDive">
+            <summary>
+            Dive to a lower or higher note before playing it, then change to another
+            note. 
+            </summary>
+        </member>
         <member name="T:AlphaTab.Model.Beat">
             <summary>
             A beat is a single block within a bar. A beat is a combination
@@ -1963,4 +2005,22 @@
              <li><strong>score-tab</strong> - Standard music notation and guitar tablature are rendered (default)</li>
              <li><strong>score</strong> - Only standard music notation is rendered</li>
              <li><strong>tab</strong> - Only guitar tablature is rendered</li>
-          
+            </ul>
+            </summary>
+        </member>
+        <member name="P:AlphaTab.StaveSettings.AdditionalSettings">
+            <summary>
+            Additional stave sspecific settings
+            <strong>id=tab</strong>
+            <ul>
+             <li><strong>rhythm</strong> - Renders rhythm beams to tablature notes</li>
+            </ul>
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Xml.XmlParser.XmlState">
+            <summary>
+            faster than enum
+            </summary>
+        </member>
+    </members>
+</doc>

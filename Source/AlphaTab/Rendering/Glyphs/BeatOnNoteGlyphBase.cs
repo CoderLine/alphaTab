@@ -24,6 +24,11 @@ namespace AlphaTab.Rendering.Glyphs
         public BeamingHelper BeamingHelper { get; set; }
         public float CenterX { get; set; }
 
+        public BeatOnNoteGlyphBase()
+        {
+            CenterX = 0;
+        }
+
         public virtual void UpdateBeamingHelper()
         {
         }

@@ -33,7 +33,7 @@ namespace AlphaTab.Rendering.Glyphs
         public FastList<Glyph> Ties { get; set; }
 
         public float MinWidth { get; set; }
-        public float OnTimeX { get; set; }
+        public float OnTimeX => OnNotes.X + OnNotes.CenterX;
 
 
         public BeatContainerGlyph(Beat beat, VoiceContainerGlyph voiceContainer)
@@ -51,14 +51,15 @@ namespace AlphaTab.Rendering.Glyphs
             // store sizes for special renderers like the EffectBarRenderer
             layoutings.SetPreBeatSize(Beat, PreNotes.Width);
             layoutings.SetOnBeatSize(Beat, OnNotes.Width);
+            layoutings.SetBeatCenterX(Beat, OnNotes.CenterX);
         }
 
         public virtual void ApplyLayoutingInfo(BarLayoutingInfo info)
         {
             PreNotes.Width = info.GetPreBeatSize(Beat);
             OnNotes.Width = info.GetOnBeatSize(Beat);
+            OnNotes.CenterX = info.GetBeatCenterX(Beat);
             OnNotes.X = PreNotes.X + PreNotes.Width;
-            OnTimeX = OnNotes.X + OnNotes.Width / 2;
             OnNotes.UpdateBeamingHelper();
         }
 
@@ -105,12 +106,15 @@ namespace AlphaTab.Rendering.Glyphs
 
 
             Width = MinWidth;
-            OnTimeX = OnNotes.X + OnNotes.Width / 2;
         }
 
 
         public virtual void ScaleToWidth(float beatWidth)
         {
+            foreach (var tie in Ties)
+            {
+                tie.DoLayout();
+            }
             OnNotes.UpdateBeamingHelper();
             Width = beatWidth;
         }

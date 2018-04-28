@@ -45,6 +45,7 @@ namespace AlphaTab.Rendering.Staves
         public int Version { get; set; }
         public FastDictionary<int, float> PreBeatSizes { get; set; }
         public FastDictionary<int, float> OnBeatSizes { get; set; }
+        public FastDictionary<int, float> OnBeatCenterX { get; set; }
 
         public float PreBeatSize { get; set; }
         public float PostBeatSize { get; set; }
@@ -57,6 +58,7 @@ namespace AlphaTab.Rendering.Staves
         {
             PreBeatSizes = new FastDictionary<int, float>();
             OnBeatSizes = new FastDictionary<int, float>();
+            OnBeatCenterX = new FastDictionary<int, float>();
             VoiceSize = 0;
             Springs = new FastDictionary<int, Spring>();
             Version = 0;
@@ -105,6 +107,25 @@ namespace AlphaTab.Rendering.Staves
                 return OnBeatSizes[beat.Index];
             }
             return 0;
+        }
+
+
+        public float GetBeatCenterX(Beat beat)
+        {
+            if (OnBeatCenterX.ContainsKey(beat.Index))
+            {
+                return OnBeatCenterX[beat.Index];
+            }
+            return 0;
+        }
+
+        public void SetBeatCenterX(Beat beat, float x)
+        {
+            if (!OnBeatCenterX.ContainsKey(beat.Index) || OnBeatCenterX[beat.Index] < x)
+            {
+                OnBeatCenterX[beat.Index] = x;
+                Version++;
+            }
         }
 
         public void UpdateMinStretchForce(float force)

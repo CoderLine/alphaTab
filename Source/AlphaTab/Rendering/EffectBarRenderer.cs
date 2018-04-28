@@ -34,7 +34,9 @@ namespace AlphaTab.Rendering
         public Beat FirstBeat { get; set; }
         public Beat LastBeat { get; set; }
         public float Height { get; set; }
+
         public IEffectBarRendererInfo Info { get; set; }
+
 
         public EffectBand(IEffectBarRendererInfo info)
             : base(0, 0)
@@ -163,15 +165,9 @@ namespace AlphaTab.Rendering
         {
             base.Paint(cx, cy, canvas);
 
-            //canvas.Color = new Color((byte)Platform.Random(255), (byte)Platform.Random(255), (byte)Platform.Random(255), 100);
-            //canvas.FillRect(cx + X, cy + Y, Renderer.Width, Height);
-
             for (int i = 0, j = _uniqueEffectGlyphs.Count; i < j; i++)
             {
                 var v = _uniqueEffectGlyphs[i];
-                //canvas.Color = i == 0
-                //    ? Renderer.Resources.MainGlyphColor
-                //    : Renderer.Resources.SecondaryGlyphColor;
 
                 for (int k = 0, l = v.Count; k < l; k++)
                 {
@@ -280,10 +276,12 @@ namespace AlphaTab.Rendering
             _effectSlot[effectBand.Info.EffectId] = freeSlot;
         }
     }
+
     public class EffectBandSlot
     {
         public float Y { get; set; }
         public float Height { get; set; }
+
         public Beat FirstBeat { get; set; }
         public Beat LastBeat { get; set; }
         public FastList<EffectBand> Bands { get; set; }
@@ -301,7 +299,9 @@ namespace AlphaTab.Rendering
             {
                 UniqueEffectId = effectBand.Info.EffectId;
             }
+
             Bands.Add(effectBand);
+
             if (effectBand.Height > Height)
             {
                 Height = effectBand.Height;
@@ -339,6 +339,7 @@ namespace AlphaTab.Rendering
 
         public EffectBandSizingInfo SizingInfo { get; set; }
 
+
         public EffectBarRenderer(ScoreRenderer renderer, Bar bar, IEffectBarRendererInfo[] infos)
             : base(renderer, bar)
         {
@@ -370,11 +371,13 @@ namespace AlphaTab.Rendering
                     band.Y = y;
                     band.Height = slot.Height;
                 }
+
                 y += slot.Height;
             }
 
             Height = y;
         }
+
 
         public override bool ApplyLayoutingInfo()
         {
@@ -440,7 +443,7 @@ namespace AlphaTab.Rendering
                 }
             }
         }
-        
+
         private void CreateVoiceGlyphs(Voice v)
         {
             foreach (var b in v.Beats)

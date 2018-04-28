@@ -31,6 +31,8 @@ namespace AlphaTab.Rendering.Staves
     {
         private readonly BarRendererFactory _factory;
 
+        private FastDictionary<string, object> _sharedLayoutData;
+
         public StaveTrackGroup StaveTrackGroup { get; set; }
         public StaveGroup StaveGroup { get; set; }
 
@@ -83,6 +85,22 @@ namespace AlphaTab.Rendering.Staves
             BottomSpacing = 5;
             StaveTop = 0;
             StaveBottom = 0;
+            _sharedLayoutData = new FastDictionary<string, object>();
+        }
+
+        public T GetSharedLayoutData<T>(string key, T def)
+        {
+            if (_sharedLayoutData.ContainsKey(key))
+            {
+                return (T)_sharedLayoutData[key];
+            }
+
+            return def;
+        }
+
+        public void SetSharedLayoutData<T>(string key, T def)
+        {
+            _sharedLayoutData[key] = def;
         }
 
         public bool IsInAccolade
@@ -144,6 +162,7 @@ namespace AlphaTab.Rendering.Staves
 
         public void ScaleToWidth(float width)
         {
+            _sharedLayoutData = new FastDictionary<string, object>();
             // Note: here we could do some "intelligent" distribution of 
             // the space over the bar renderers, for now we evenly apply the space to all bars
             var difference = width - StaveGroup.Width;
@@ -188,7 +207,7 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public void FinalizeStave()
+        public void FinalizeStaff()
         {
             var x = 0f;
             Height = 0;

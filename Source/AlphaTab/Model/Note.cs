@@ -366,6 +366,7 @@ namespace AlphaTab.Model
             dst.Element = src.Element;
             dst.Variation = src.Variation;
             dst.BendType = src.BendType;
+            dst.IsContinuedBend = src.IsContinuedBend;
         }
 
         public Note Clone()
@@ -454,8 +455,8 @@ namespace AlphaTab.Model
                 {
                     var origin = BendPoints[0];
                     var middle1 = BendPoints[1];
-                    BendPoint middle2 = BendPoints[2];
-                    BendPoint destination = BendPoints[3];
+                    var middle2 = BendPoints[2];
+                    var destination = BendPoints[3];
 
                     // the middle points are used for holds, anything else is a new feature we do not support yet
                     if (middle1.Value == middle2.Value)

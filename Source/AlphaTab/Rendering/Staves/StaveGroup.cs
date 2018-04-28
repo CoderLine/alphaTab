@@ -401,7 +401,7 @@ namespace AlphaTab.Rendering.Staves
             {
                 staff.X = AccoladeSpacing;
                 staff.Y = (currentY);
-                staff.FinalizeStave();
+                staff.FinalizeStaff();
                 currentY += staff.Height;
             }
         }

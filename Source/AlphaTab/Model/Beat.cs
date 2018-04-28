@@ -18,9 +18,46 @@
 
 using AlphaTab.Audio;
 using AlphaTab.Collections;
+using AlphaTab.Util;
 
 namespace AlphaTab.Model
 {
+    /// <summary>
+    /// Lists all types of whammy bars
+    /// </summary>
+    public enum WhammyType
+    {
+        /// <summary>
+        /// No whammy at all
+        /// </summary>
+        None,
+        /// <summary>
+        /// Individual points define the whammy in a flexible manner. 
+        /// This system was mainly used in Guitar Pro 3-5
+        /// </summary>
+        Custom,
+        /// <summary>
+        /// Simple dive to a lower or higher note.
+        /// </summary>
+        Dive,
+        /// <summary>
+        /// A dive to a lower or higher note and releasing it back to normal. 
+        /// </summary>
+        Dip,
+        /// <summary>
+        /// Continue to hold the whammy at the position from a previous whammy. 
+        /// </summary>
+        Hold,
+        /// <summary>
+        /// Dive to a lower or higher note before playing it. 
+        /// </summary>
+        Predive,
+        /// <summary>
+        /// Dive to a lower or higher note before playing it, then change to another
+        /// note. 
+        /// </summary>
+        PrediveDive
+    }
     /// <summary>
     /// A beat is a single block within a bar. A beat is a combination
     /// of several notes played at the same time. 
@@ -143,12 +180,15 @@ namespace AlphaTab.Model
             }
         }
 
+        public bool IsContinuedWhammy { get; set; }
+        public WhammyType WhammyBarType { get; set; }
         public FastList<BendPoint> WhammyBarPoints { get; set; }
         public BendPoint MaxWhammyPoint { get; set; }
+        public BendPoint MinWhammyPoint { get; set; }
 
         public bool HasWhammyBar
         {
-            get { return WhammyBarPoints.Count > 0; }
+            get { return WhammyBarType != WhammyType.None; }
         }
 
         public VibratoType Vibrato { get; set; }
@@ -193,6 +233,7 @@ namespace AlphaTab.Model
         public Beat()
         {
             Id = GlobalBeatId++;
+            WhammyBarType = WhammyType.None;
             WhammyBarPoints = new FastList<BendPoint>();
             Notes = new FastList<Note>();
             BrushType = BrushType.None;
@@ -246,6 +287,8 @@ namespace AlphaTab.Model
             dst.Dynamic = src.Dynamic;
             dst.IsLegatoOrigin = src.IsLegatoOrigin;
             dst.InvertBeamDirection = src.InvertBeamDirection;
+            dst.WhammyBarType = src.WhammyBarType;
+            dst.IsContinuedWhammy = src.IsContinuedWhammy;
         }
 
         public Beat Clone()
@@ -276,6 +319,15 @@ namespace AlphaTab.Model
             {
                 MaxWhammyPoint = point;
             }
+            if (MinWhammyPoint == null || point.Value < MinWhammyPoint.Value)
+            {
+                MinWhammyPoint = point;
+            }
+
+            if (WhammyBarType == WhammyType.None)
+            {
+                WhammyBarType = WhammyType.Custom;
+            }
         }
 
         public void RemoveWhammyBarPoint(int index)
@@ -288,13 +340,26 @@ namespace AlphaTab.Model
             var point = WhammyBarPoints[index];
 
             // update maxWhammy point if required
-            if (point != MaxWhammyPoint) return;
-            MaxWhammyPoint = null;
-            foreach (var currentPoint in WhammyBarPoints)
+            if (point == MaxWhammyPoint)
             {
-                if (MaxWhammyPoint == null || currentPoint.Value > MaxWhammyPoint.Value)
+                MaxWhammyPoint = null;
+                foreach (var currentPoint in WhammyBarPoints)
                 {
-                    MaxWhammyPoint = currentPoint;
+                    if (MaxWhammyPoint == null || currentPoint.Value > MaxWhammyPoint.Value)
+                    {
+                        MaxWhammyPoint = currentPoint;
+                    }
+                }
+            }
+            if (point == MinWhammyPoint)
+            {
+                MinWhammyPoint = null;
+                foreach (var currentPoint in WhammyBarPoints)
+                {
+                    if (MinWhammyPoint == null || currentPoint.Value < MinWhammyPoint.Value)
+                    {
+                        MinWhammyPoint = currentPoint;
+                    }
                 }
             }
         }
@@ -409,6 +474,72 @@ namespace AlphaTab.Model
             for (int i = 0, j = Notes.Count; i < j; i++)
             {
                 Notes[i].Finish();
+            }
+
+            // try to detect what kind of bend was used and cleans unneeded points if required
+            // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all whammys
+            if (WhammyBarPoints.Count > 0 && WhammyBarType == WhammyType.Custom)
+            {
+                var isContinuedWhammy = IsContinuedWhammy = PreviousBeat != null && PreviousBeat.HasWhammyBar;
+                if (WhammyBarPoints.Count == 4)
+                {
+                    var origin = WhammyBarPoints[0];
+                    var middle1 = WhammyBarPoints[1];
+                    var middle2 = WhammyBarPoints[2];
+                    var destination = WhammyBarPoints[3];
+
+                    // the middle points are used for holds, anything else is a new feature we do not support yet
+                    if (middle1.Value == middle2.Value)
+                    {
+                        // constant decrease or increase
+                        if (origin.Value < middle1.Value && middle1.Value < destination.Value ||
+                            origin.Value > middle1.Value && middle1.Value > destination.Value)
+                        {
+                            if (origin.Value != 0 && !isContinuedWhammy)
+                            {
+                                WhammyBarType = WhammyType.PrediveDive;
+                            }
+                            else
+                            {
+                                WhammyBarType = WhammyType.Dive;
+                            }
+
+                            WhammyBarPoints.RemoveAt(2);
+                            WhammyBarPoints.RemoveAt(1);
+                        }
+                        // down-up or up-down
+                        else if (origin.Value > middle1.Value && middle1.Value < destination.Value ||
+                                origin.Value < middle1.Value && middle1.Value > destination.Value)
+                        {
+                            WhammyBarType = WhammyType.Dip;
+                            if (middle1.Offset == middle2.Offset)
+                            {
+                                WhammyBarPoints.RemoveAt(2);
+                            }
+                        }
+                        else if (origin.Value == middle1.Value && middle1.Value == destination.Value)
+                        {
+                            if (origin.Value != 0 && !isContinuedWhammy)
+                            {
+                                WhammyBarType = WhammyType.Predive;
+                            }
+                            else
+                            {
+                                WhammyBarType = WhammyType.Hold;
+                            }
+                            WhammyBarPoints.RemoveAt(2);
+                            WhammyBarPoints.RemoveAt(1);
+                        }
+                        else
+                        {
+                            Logger.Warning("Model", "Unsupported whammy type detected, fallback to custom");
+                        }
+                    }
+                    else
+                    {
+                        Logger.Warning("Model", "Unsupported whammy type detected, fallback to custom");
+                    }
+                }
             }
         }
     }

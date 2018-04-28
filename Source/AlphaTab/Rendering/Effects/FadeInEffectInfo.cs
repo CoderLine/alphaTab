@@ -37,7 +37,7 @@ namespace AlphaTab.Rendering.Effects
             return new FadeInGlyph(0, 0);
         }
 
-        public bool CanExpand(Beat @from, Beat to)
+        public bool CanExpand(Beat from, Beat to)
         {
             return true;
         }

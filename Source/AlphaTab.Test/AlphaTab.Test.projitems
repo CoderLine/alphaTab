@@ -412,6 +412,9 @@
     <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestVibrato.gp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\WhammyAdvanced.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="$(MSBuildThisFileDirectory)TestFiles\MusicXmlSamples\ActorPreludeSample.mxl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

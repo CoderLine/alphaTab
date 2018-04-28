@@ -1185,33 +1185,26 @@ namespace AlphaTab.Importer
                             break;
                         case "Whammy":
 
-                            var whammy = new FastList<BendPoint>();
-
                             var whammyOrigin = new BendPoint();
                             whammyOrigin.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("originValue")));
                             whammyOrigin.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("originOffset")));
-                            whammy.Add(whammyOrigin);
+                            beat.AddWhammyBarPoint(whammyOrigin);
 
                             var whammyMiddle1 = new BendPoint();
                             whammyMiddle1.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("middleValue")));
                             whammyMiddle1.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("middleOffset1")));
-                            whammy.Add(whammyMiddle1);
+                            beat.AddWhammyBarPoint(whammyMiddle1);
 
                             
                             var whammyMiddle2 = new BendPoint();
                             whammyMiddle2.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("middleValue")));
                             whammyMiddle2.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("middleOffset2")));
-                            if (whammyMiddle2.Offset != whammyMiddle1.Offset)
-                            {
-                                whammy.Add(whammyMiddle2);
-                            }
+                            beat.AddWhammyBarPoint(whammyMiddle2);
 
                             var whammyDestination = new BendPoint();
                             whammyDestination.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("destinationValue")));
                             whammyDestination.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("destinationOffset")));
-                            whammy.Add(whammyDestination);
-
-                            beat.WhammyBarPoints = whammy;
+                            beat.AddWhammyBarPoint(whammyDestination);
                             break;
                     }
                 }
@@ -1351,24 +1344,22 @@ namespace AlphaTab.Importer
             {
                 if (whammyOrigin == null) whammyOrigin = new BendPoint();
                 if (whammyDestination == null) whammyDestination = new BendPoint(BendPoint.MaxPosition);
-                var whammy = new FastList<BendPoint>();
-                whammy.Add(whammyOrigin);
+                beat.AddWhammyBarPoint(whammyOrigin);
 
                 if (whammyMiddleOffset1 != null && whammyMiddleValue != null)
                 {
-                    whammy.Add(new BendPoint(whammyMiddleOffset1.Value, whammyMiddleValue.Value));
+                    beat.AddWhammyBarPoint(new BendPoint(whammyMiddleOffset1.Value, whammyMiddleValue.Value));
                 }
                 if (whammyMiddleOffset2 != null && whammyMiddleValue != null)
                 {
-                    whammy.Add(new BendPoint(whammyMiddleOffset2.Value, whammyMiddleValue.Value));
+                    beat.AddWhammyBarPoint(new BendPoint(whammyMiddleOffset2.Value, whammyMiddleValue.Value));
                 }
 
                 if (whammyMiddleOffset1 == null && whammyMiddleOffset2 == null && whammyMiddleValue != null)
                 {
-                    whammy.Add(new BendPoint(BendPoint.MaxPosition / 2, whammyMiddleValue.Value));
+                    beat.AddWhammyBarPoint(new BendPoint(BendPoint.MaxPosition / 2, whammyMiddleValue.Value));
                 }
-                whammy.Add(whammyDestination);
-                beat.WhammyBarPoints = whammy;
+                beat.AddWhammyBarPoint(whammyDestination);
             }
         }
 
