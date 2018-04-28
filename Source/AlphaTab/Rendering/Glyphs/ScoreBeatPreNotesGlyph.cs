@@ -46,6 +46,16 @@ namespace AlphaTab.Rendering.Glyphs
                                 break;
                         }
                     }
+                    else if (note.Beat.HasWhammyBar)
+                    {
+                        switch (note.Beat.WhammyBarType)
+                        {
+                            case WhammyType.PrediveDive:
+                            case WhammyType.Predive:
+                                _prebends.AddGlyph(note.RealValue);
+                                break;
+                        }
+                    }
                     CreateAccidentalGlyph(note, accidentals);
                     ghost.AddParenthesis(note);
                 }

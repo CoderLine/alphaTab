@@ -282,6 +282,10 @@ namespace AlphaTab.Model
                 {
                     noteValue += BendOrigin.BendPoints[BendOrigin.BendPoints.Count - 1].Value / 2;
                 }
+                else if (Beat.IsContinuedWhammy)
+                {
+                    noteValue += Beat.PreviousBeat.WhammyBarPoints[Beat.PreviousBeat.WhammyBarPoints.Count - 1].Value / 2;
+                }
                 return noteValue;
             }
         }
@@ -300,6 +304,10 @@ namespace AlphaTab.Model
                 if (BendOrigin != null)
                 {
                     return (BendOrigin.BendPoints[BendOrigin.BendPoints.Count - 1].Value % 2) != 0;
+                }
+                if (Beat.IsContinuedWhammy)
+                {
+                    return (Beat.PreviousBeat.WhammyBarPoints[Beat.PreviousBeat.WhammyBarPoints.Count - 1].Value % 2) != 0;
                 }
                 return false;
             }

@@ -70,6 +70,17 @@ namespace AlphaTab.Rendering.Glyphs
                     }
 
                     //
+                    // Whammy Bar
+                    if (Container.Beat.HasWhammyBar)
+                    {
+                        var whammy = new ScoreWhammyBarGlyph(Container.Beat);
+                        whammy.Renderer = Renderer;
+                        whammy.DoLayout();
+
+                        Container.Ties.Add(whammy);
+                    }
+
+                    //
                     // Note dots
                     //
                     if (Container.Beat.Dots > 0)

@@ -19,6 +19,7 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering.Glyphs
@@ -47,6 +48,15 @@ namespace AlphaTab.Rendering.Glyphs
         public virtual void RegisterLayoutingInfo(BarLayoutingInfo layoutings)
         {
             var preBeatStretch = PreNotes.Width + OnNotes.Width / 2;
+            var postBeatStretch = 0f;
+            foreach (var tie in Ties)
+            {
+                if (tie.Width > postBeatStretch)
+                {
+                    postBeatStretch = tie.Width;
+                }
+            }
+
             layoutings.AddBeatSpring(Beat, MinWidth, preBeatStretch);
             // store sizes for special renderers like the EffectBarRenderer
             layoutings.SetPreBeatSize(Beat, PreNotes.Width);
@@ -104,6 +114,16 @@ namespace AlphaTab.Rendering.Glyphs
                 }
             }
 
+            var tieWidth = 0f;
+            foreach (var tie in Ties)
+            {
+                if (tie.Width > tieWidth)
+                {
+                    tieWidth = tie.Width;
+                }
+            }
+            MinWidth += tieWidth;
+
 
             Width = MinWidth;
         }
@@ -132,8 +152,8 @@ namespace AlphaTab.Rendering.Glyphs
 
             canvas.BeginGroup("b" + Beat.Id);
 
-            var oldColor = canvas.Color;
-            //canvas.Color = new Color((byte)Platform.Random(255), (byte)Platform.Random(255), (byte)Platform.Random(255), 100);
+            //var oldColor = canvas.Color;
+            //canvas.Color = new Color((byte)Platform.Platform.Random(255), (byte)Platform.Platform.Random(255), (byte)Platform.Platform.Random(255), 100);
             //canvas.FillRect(cx + X, cy + Y, Width, Renderer.Height);
             //canvas.Color = oldColor;
 
