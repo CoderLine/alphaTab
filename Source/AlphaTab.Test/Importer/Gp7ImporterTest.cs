@@ -930,5 +930,16 @@ namespace AlphaTab.Test.Importer
             CheckColors(score);
             Render(score);
         }
+
+
+        [TestMethod]
+        public void TestTremoloVibrato()
+        {
+            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TremoloVibrato.gp");
+            var score = reader.ReadScore();
+
+            CheckColors(score);
+            Render(score);
+        }
     }
 }

@@ -962,6 +962,20 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:AlphaTab.Model.Beat.IsBefore(AlphaTab.Model.Beat)">
+            <summary>
+            Checks whether the current beat is timewise before the given beat. 
+            </summary>
+            <param name="beat"></param>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.Model.Beat.IsAfter(AlphaTab.Model.Beat)">
+            <summary>
+            Checks whether the current beat is timewise after the given beat. 
+            </summary>
+            <param name="beat"></param>
+            <returns></returns>
+        </member>
         <member name="T:AlphaTab.Model.BendPoint">
             <summary>
             A single point of a bending graph. Used to 
@@ -1462,6 +1476,13 @@
             the actual note head glyphs are placed. 
             </summary>
         </member>
+        <member name="F:AlphaTab.Rendering.EffectBarGlyphSizing.SingleOnBeatToEnd">
+            <summary>
+            The effect glyph is placed above the on-beat glyph which is where
+            the actual note head glyphs are placed. The glyph will size to the end of
+            the applied beat.
+            </summary>
+        </member>
         <member name="F:AlphaTab.Rendering.EffectBarGlyphSizing.GroupedBeforeBeat">
             <summary>
             The effect glyph is placed above the on-beat glyph and expaded to the 
@@ -1472,6 +1493,13 @@
             <summary>
             The effect glyph is placed above the on-beat glyph and expaded to the 
             on-beat position of the next beat.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Rendering.EffectBarGlyphSizing.GroupedOnBeatToEnd">
+            <summary>
+            The effect glyph is placed above the on-beat glyph and expaded to the 
+            on-beat position of the next beat. The glyph will size to the end of
+            the applied beat.
             </summary>
         </member>
         <member name="F:AlphaTab.Rendering.EffectBarGlyphSizing.FullBar">

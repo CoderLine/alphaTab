@@ -192,6 +192,7 @@ namespace AlphaTab.Model
         }
 
         public VibratoType Vibrato { get; set; }
+
         public string ChordId { get; set; }
         public bool HasChord
         {
@@ -541,6 +542,28 @@ namespace AlphaTab.Model
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Checks whether the current beat is timewise before the given beat. 
+        /// </summary>
+        /// <param name="beat"></param>
+        /// <returns></returns>
+        public bool IsBefore(Beat beat)
+        {
+            return Voice.Bar.Index < beat.Voice.Bar.Index ||
+                   (beat.Voice.Bar.Index == Voice.Bar.Index && Index < beat.Index);
+        }
+
+        /// <summary>
+        /// Checks whether the current beat is timewise after the given beat. 
+        /// </summary>
+        /// <param name="beat"></param>
+        /// <returns></returns>
+        public bool IsAfter(Beat beat)
+        {
+            return Voice.Bar.Index > beat.Voice.Bar.Index ||
+                   (beat.Voice.Bar.Index == Voice.Bar.Index && Index > beat.Index);
         }
     }
 }

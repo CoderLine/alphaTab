@@ -54,7 +54,7 @@ namespace AlphaTab.Rendering.Glyphs
             var loopY = cy + Y + Height;
             for (var i = 0; i < loops; i++)
             {
-                canvas.FillMusicFontSymbol(cx + X + loopX, loopY, waveScale, MusicFontSymbol.WaveHorizontal);
+                canvas.FillMusicFontSymbol(cx + X + loopX, loopY, waveScale, MusicFontSymbol.WaveHorizontalSlight);
                 loopX += step;
             }
         }

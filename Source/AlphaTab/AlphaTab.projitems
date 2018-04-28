@@ -166,7 +166,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\EffectBarGlyphSizing.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\EffectBarRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\EffectBarRendererFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\BeatVibratoEffectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\WideBeatVibratoEffectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\SlightBeatVibratoEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\ChordsEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\CrescendoEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\DummyEffectGlyph.cs" />
@@ -176,7 +177,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\LetRingEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\MarkerEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\NoteEffectInfoBase.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\NoteVibratoEffectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\WideNoteVibratoEffectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\SlightNoteVibratoEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\CapoEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\WhammyBarEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\PalmMuteEffectInfo.cs" />
@@ -261,7 +263,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TrillGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TripletFeelGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TuningGlyph.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\VibratoGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\NoteVibratoGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\VoiceContainerGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TabWhammyBarGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\IEffectBarRendererInfo.cs" />

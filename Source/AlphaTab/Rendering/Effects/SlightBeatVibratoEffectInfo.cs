@@ -20,27 +20,26 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class CrescendoEffectInfo : IEffectBarRendererInfo
+    public class SlightBeatVibratoEffectInfo : IEffectBarRendererInfo
     {
-        public string EffectId { get { return "crescendo"; } }
+        public string EffectId { get { return "slight-beat-vibrato"; } }
         public bool HideOnMultiTrack { get { return false; } }
         public bool CanShareBand { get { return true; } }
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.GroupedOnBeatToEnd; } }
 
         public bool ShouldCreateGlyph(Beat beat)
         {
-            return beat.Crescendo != CrescendoType.None;
+            return beat.Vibrato == VibratoType.Slight;
         }
 
-       
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
-            return new CrescendoGlyph(0, 0, beat.Crescendo);
+            return new BeatVibratoGlyph(VibratoType.Slight);
         }
 
-        public bool CanExpand(Beat @from, Beat to)
+        public bool CanExpand(Beat from, Beat to)
         {
-            return from.Crescendo == to.Crescendo;
+            return true;
         }
     }
 }

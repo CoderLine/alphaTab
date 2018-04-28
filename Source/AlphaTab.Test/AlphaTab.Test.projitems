@@ -403,6 +403,9 @@
     <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestTremolo.gp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestTremoloVibrato.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestTrills.gp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

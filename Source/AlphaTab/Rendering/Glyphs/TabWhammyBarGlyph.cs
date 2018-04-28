@@ -137,24 +137,24 @@ namespace AlphaTab.Rendering.Glyphs
             if (endBeat != null)
             {
                 endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, endBeat.Voice.Bar);
-                if (endNoteRenderer == null || endNoteRenderer.Staff != startNoteRenderer.Staff)
-                {
-                    endBeat = null;
-                    endNoteRenderer = null;
-                }
-                else
+                if (endBeat.IsContinuedWhammy || endNoteRenderer == startNoteRenderer)
                 {
                     endXPositionType = endBeat.HasWhammyBar
                         ? BeatXPosition.MiddleNotes
                         : BeatXPosition.PreNotes;
                 }
+                else
+                {
+                    endBeat = null;
+                    endNoteRenderer = null;
+                }
             }
 
             float startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_beat, BeatXPosition.MiddleNotes);
             float endX = endNoteRenderer == null
-                ? cx + startNoteRenderer.X + startNoteRenderer.Width
+                ? cx + startNoteRenderer.X + startNoteRenderer.Width - ScoreHelperNotesBaseGlyph.EndPadding * Scale
                 : cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat, endXPositionType);
-
+            
             var old = canvas.TextAlign;
             canvas.TextAlign = TextAlign.Center;
             if (_renderPoints.Count >= 2)

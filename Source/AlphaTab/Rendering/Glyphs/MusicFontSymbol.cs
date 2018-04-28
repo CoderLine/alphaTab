@@ -101,7 +101,8 @@ namespace AlphaTab.Rendering.Glyphs
         Accentuation = 0xE4A0,
         HeavyAccentuation = 0xE4AC,
 
-        WaveHorizontal = 0xEAA4,
+        WaveHorizontalSlight = 0xEAA4,
+        WaveHorizontalWide = 0xEADE,
 
         PickStrokeDown = 0xE610,
         PickStrokeUp = 0xE612,

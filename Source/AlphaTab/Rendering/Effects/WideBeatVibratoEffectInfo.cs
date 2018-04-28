@@ -20,23 +20,26 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class NoteVibratoEffectInfo : NoteEffectInfoBase
+    public class WideBeatVibratoEffectInfo : IEffectBarRendererInfo
     {
-        public override string EffectId { get { return "note-vibrato"; } }
+        public string EffectId { get { return "wide-beat-vibrato"; } }
+        public bool HideOnMultiTrack { get { return false; } }
+        public bool CanShareBand { get { return true; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.GroupedOnBeatToEnd; } }
 
-        protected override bool ShouldCreateGlyphForNote(Note note)
+        public bool ShouldCreateGlyph(Beat beat)
         {
-            return note.Vibrato != VibratoType.None || (note.IsTieDestination && note.TieOrigin.Vibrato != VibratoType.None);
+            return beat.Vibrato == VibratoType.Wide;
         }
 
-        public override EffectBarGlyphSizing SizingMode
+        public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
-            get { return EffectBarGlyphSizing.GroupedOnBeat; }
+            return new BeatVibratoGlyph(VibratoType.Wide);
         }
 
-        public override EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
+        public bool CanExpand(Beat from, Beat to)
         {
-            return new VibratoGlyph(0, 5 * renderer.Scale);
+            return true;
         }
     }
 }

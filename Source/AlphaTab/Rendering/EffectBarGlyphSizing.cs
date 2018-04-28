@@ -33,6 +33,12 @@ namespace AlphaTab.Rendering
         /// </summary>
         SingleOnBeat,
         /// <summary>
+        /// The effect glyph is placed above the on-beat glyph which is where
+        /// the actual note head glyphs are placed. The glyph will size to the end of
+        /// the applied beat.
+        /// </summary>
+        SingleOnBeatToEnd,
+        /// <summary>
         /// The effect glyph is placed above the on-beat glyph and expaded to the 
         /// on-beat position of the next beat.
         /// </summary>
@@ -42,6 +48,12 @@ namespace AlphaTab.Rendering
         /// on-beat position of the next beat.
         /// </summary>
         GroupedOnBeat,
+        /// <summary>
+        /// The effect glyph is placed above the on-beat glyph and expaded to the 
+        /// on-beat position of the next beat. The glyph will size to the end of
+        /// the applied beat.
+        /// </summary>
+        GroupedOnBeatToEnd,
         /// <summary>
         /// The effect glyph is placed on the whole bar covering the whole width
         /// </summary>

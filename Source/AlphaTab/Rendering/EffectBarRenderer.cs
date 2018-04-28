@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -64,14 +66,27 @@ namespace AlphaTab.Rendering
             if (Info.ShouldCreateGlyph(beat) && (!Info.HideOnMultiTrack || Renderer.Staff.TrackIndex == 0))
             {
                 IsEmpty = false;
-                if (FirstBeat == null || FirstBeat.Index > beat.Index)
+                if (FirstBeat == null || beat.IsBefore(FirstBeat))
                 {
                     FirstBeat = beat;
                 }
-                if (LastBeat == null || LastBeat.Index < beat.Index)
+                if (LastBeat == null || beat.IsAfter(LastBeat))
                 {
                     LastBeat = beat;
+
+                    // for "toEnd" sizing occupy until next follow-up-beat
+                    switch (Info.SizingMode)
+                    {
+                        case EffectBarGlyphSizing.SingleOnBeatToEnd:
+                        case EffectBarGlyphSizing.GroupedOnBeatToEnd:
+                            if (LastBeat.NextBeat != null)
+                            {
+                                LastBeat = LastBeat.NextBeat;
+                            }
+                            break;
+                    }
                 }
+
 
                 var glyph = CreateOrResizeGlyph(Info.SizingMode, beat);
                 if (glyph.Height > Height)
@@ -96,6 +111,7 @@ namespace AlphaTab.Rendering
                     return g;
                 case EffectBarGlyphSizing.SinglePreBeat:
                 case EffectBarGlyphSizing.SingleOnBeat:
+                case EffectBarGlyphSizing.SingleOnBeatToEnd:
                     g = Info.CreateNewGlyph(Renderer, b);
                     g.Renderer = Renderer;
                     g.Beat = b;
@@ -105,6 +121,12 @@ namespace AlphaTab.Rendering
                     return g;
 
                 case EffectBarGlyphSizing.GroupedOnBeat:
+                case EffectBarGlyphSizing.GroupedOnBeatToEnd:
+
+                    var singleSizing = sizing == EffectBarGlyphSizing.GroupedOnBeat
+                        ? EffectBarGlyphSizing.SingleOnBeat
+                        : EffectBarGlyphSizing.SingleOnBeatToEnd;
+
                     if (b.Index > 0 || Renderer.Index > 0)
                     {
                         // check if the previous beat also had this effect
@@ -134,7 +156,7 @@ namespace AlphaTab.Rendering
                             // if the effect cannot be expanded, create a new glyph
                             // in case of expansion also create a new glyph, but also link the glyphs together 
                             // so for rendering it might be expanded. 
-                            EffectGlyph newGlyph = CreateOrResizeGlyph(EffectBarGlyphSizing.SingleOnBeat, b);
+                            EffectGlyph newGlyph = CreateOrResizeGlyph(singleSizing, b);
 
                             if (prevEffect != null && Info.CanExpand(prevBeat, b))
                             {
@@ -150,11 +172,11 @@ namespace AlphaTab.Rendering
                         }
 
                         // in case the previous beat did not have the same effect, we simply create a new glyph
-                        return CreateOrResizeGlyph(EffectBarGlyphSizing.SingleOnBeat, b);
+                        return CreateOrResizeGlyph(singleSizing, b);
                     }
 
                     // in case of the very first beat, we simply create the glyph. 
-                    return CreateOrResizeGlyph(EffectBarGlyphSizing.SingleOnBeat, b);
+                    return CreateOrResizeGlyph(singleSizing, b);
             }
 
             return null;
@@ -206,6 +228,20 @@ namespace AlphaTab.Rendering
                     pos = container.OnNotes;
                     g.X = Renderer.BeatGlyphsStart + pos.X + container.X;
                     g.Width = pos.Width;
+                    break;
+
+                case EffectBarGlyphSizing.SingleOnBeatToEnd:
+                case EffectBarGlyphSizing.GroupedOnBeatToEnd: // grouping is achieved by linking the normaly aligned glyphs
+                    pos = container.OnNotes;
+                    g.X = Renderer.BeatGlyphsStart + pos.X + container.X;
+                    if (container.Beat.Index == container.Beat.Voice.Beats.Count - 1)
+                    {
+                        g.Width = Renderer.Width - g.X;
+                    }
+                    else
+                    {
+                        g.Width = container.Width - container.PreNotes.Width - container.PreNotes.X;
+                    }
                     break;
 
                 case EffectBarGlyphSizing.FullBar:
@@ -261,6 +297,8 @@ namespace AlphaTab.Rendering
                 copy.Y = slot.Y;
                 copy.Height = slot.Height;
                 copy.UniqueEffectId = slot.UniqueEffectId;
+                copy.FirstBeat = slot.FirstBeat;
+                copy.LastBeat = slot.LastBeat;
                 Slots.Add(copy);
                 foreach (var band in slot.Bands)
                 {
@@ -306,11 +344,11 @@ namespace AlphaTab.Rendering
             {
                 Height = effectBand.Height;
             }
-            if (FirstBeat == null || FirstBeat.Index > effectBand.FirstBeat.Index)
+            if (FirstBeat == null || effectBand.FirstBeat.IsBefore(FirstBeat))
             {
                 FirstBeat = effectBand.FirstBeat;
             }
-            if (LastBeat == null || LastBeat.Index < effectBand.LastBeat.Index)
+            if (LastBeat == null || effectBand.LastBeat.IsAfter(LastBeat))
             {
                 LastBeat = effectBand.LastBeat;
             }
@@ -323,7 +361,7 @@ namespace AlphaTab.Rendering
                 // if the current band is shared, only merge with same effect 
                 ((UniqueEffectId == null && band.Info.CanShareBand) || band.Info.EffectId == UniqueEffectId)
                 // only merge if there is space for the new band before or after the current beat
-                && (FirstBeat == null || LastBeat.Index < band.FirstBeat.Index || band.LastBeat.Index < FirstBeat.Index);
+                && (FirstBeat == null || LastBeat.IsBefore(band.FirstBeat) || LastBeat.IsBefore(FirstBeat));
         }
     }
 
