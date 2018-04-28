@@ -28271,14 +28271,15 @@ alphaTab.rendering.glyphs.ScoreWhammyBarGlyph.prototype = $extend(alphaTab.rende
 				var preY = cy + startNoteRenderer.Y;
 				var this2 = startNoteRenderer.AccidentalHelper.GetNoteLineForValue(note1.get_RealValue());
 				var preY1 = preY + startNoteRenderer.GetScoreY(this2,0) + heightOffset;
-				this.DrawBendSlur(canvas,preX,preY1,startX,startY,direction == 1,this.get_Scale());
 				if(this._bendNoteHeads.length > 0) {
 					this._bendNoteHeads[0].X = endX - this._bendNoteHeads[0].NoteHeadOffset;
 					this._bendNoteHeads[0].Y = cy + startNoteRenderer.Y;
 					this._bendNoteHeads[0].Paint(0,0,canvas);
 					endValue = this.GetBendNoteValue(note1,beat.WhammyBarPoints[beat.WhammyBarPoints.length - 1]);
 					endY = this._bendNoteHeads[0].GetNoteValueY(endValue,false) + heightOffset;
-					this.DrawBendSlur(canvas,startX,startY,endX,endY,direction == 1,this.get_Scale());
+					this.DrawBendSlur(canvas,preX,preY1,endX,endY,direction == 1,this.get_Scale());
+				} else {
+					this.DrawBendSlur(canvas,preX,preY1,startX,startY,direction == 1,this.get_Scale());
 				}
 				break;
 			default:

@@ -441,7 +441,6 @@ namespace AlphaTab.Rendering.Glyphs
 
                         var preY = cy + startNoteRenderer.Y + startNoteRenderer.GetScoreY(startNoteRenderer.AccidentalHelper.GetNoteLineForValue(note.RealValue)) + heightOffset;
 
-                        DrawBendSlur(canvas, preX, preY, startX, startY, direction == BeamDirection.Down, Scale);
 
                         if (_bendNoteHeads.Count > 0)
                         {
@@ -451,7 +450,11 @@ namespace AlphaTab.Rendering.Glyphs
 
                             endValue = GetBendNoteValue(note, beat.WhammyBarPoints[beat.WhammyBarPoints.Count - 1]);
                             endY = _bendNoteHeads[0].GetNoteValueY(endValue) + heightOffset;
-                            DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale);
+                            DrawBendSlur(canvas, preX, preY, endX, endY, direction == BeamDirection.Down, Scale);
+                        }
+                        else
+                        {
+                            DrawBendSlur(canvas, preX, preY, startX, startY, direction == BeamDirection.Down, Scale);
                         }
 
                         break;
