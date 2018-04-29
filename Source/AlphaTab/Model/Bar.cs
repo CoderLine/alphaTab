@@ -21,6 +21,31 @@ using AlphaTab.Collections;
 namespace AlphaTab.Model
 {
     /// <summary>
+    /// Lists all simile mark types as they are assigned to bars. 
+    /// </summary>
+    public enum SimileMark
+    {
+        /// <summary>
+        /// No simile mark is applied
+        /// </summary>
+        None,
+        /// <summary>
+        /// A simple simile mark. The previous bar is repeated. 
+        /// </summary>
+        Simple,
+        /// <summary>
+        /// A double simile mark. This value is assigned to the first
+        /// bar of the 2 repeat bars. 
+        /// </summary>
+        FirstOfDouble,
+        /// <summary>
+        /// A double simile mark. This value is assigned to the second
+        /// bar of the 2 repeat bars. 
+        /// </summary>
+        SecondOfDouble
+    }
+
+    /// <summary>
     /// A bar is a single block within a track, also known as Measure.
     /// </summary>
     public class Bar
@@ -41,12 +66,15 @@ namespace AlphaTab.Model
         public Staff Staff { get; set; }
         public FastList<Voice> Voices { get; set; }
 
+        public SimileMark SimileMark { get; set; }
+
         public Bar()
         {
             Id = GlobalBarId++;
             Voices = new FastList<Voice>();
             Clef = Clef.G2;
             ClefOttava = Ottavia.Regular;
+            SimileMark = SimileMark.None;
         }
 
         public static void CopyTo(Bar src, Bar dst)
@@ -55,6 +83,7 @@ namespace AlphaTab.Model
             dst.Index = src.Index;
             dst.Clef = src.Clef;
             dst.ClefOttava = src.ClefOttava;
+            dst.SimileMark = src.SimileMark;
         }
 
         public void AddVoice(Voice voice)
@@ -71,7 +100,6 @@ namespace AlphaTab.Model
                 return Staff.Track.Score.MasterBars[Index];
             }
         }
-
 
         public bool IsEmpty
         {

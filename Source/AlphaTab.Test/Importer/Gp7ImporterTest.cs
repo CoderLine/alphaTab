@@ -969,6 +969,23 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(Ottavia._15mb, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[3].Ottava);
         }
 
+
+        [TestMethod]
+        public void TestSimileMark()
+        {
+            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestSimileMark.gp");
+            var score = reader.ReadScore();
+
+            Assert.AreEqual(SimileMark.None, score.Tracks[0].Staves[0].Bars[0].SimileMark);
+            Assert.AreEqual(SimileMark.Simple, score.Tracks[0].Staves[0].Bars[1].SimileMark);
+
+            Assert.AreEqual(SimileMark.None, score.Tracks[0].Staves[0].Bars[2].SimileMark);
+            Assert.AreEqual(SimileMark.None, score.Tracks[0].Staves[0].Bars[3].SimileMark);
+
+            Assert.AreEqual(SimileMark.FirstOfDouble, score.Tracks[0].Staves[0].Bars[4].SimileMark);
+            Assert.AreEqual(SimileMark.SecondOfDouble, score.Tracks[0].Staves[0].Bars[5].SimileMark);
+        }
+
         [TestMethod]
         public void TestPickSlide()
         {

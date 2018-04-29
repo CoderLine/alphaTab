@@ -397,6 +397,9 @@
     <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestRanges.gp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestSimileMark.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\TestSlides.gp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

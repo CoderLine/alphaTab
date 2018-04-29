@@ -997,7 +997,20 @@ namespace AlphaTab.Importer
                                     break;
                             }
                             break;
-                            // case "SimileMark":
+                        case "SimileMark":
+                            switch (c.InnerText)
+                            {
+                                case "Simple":
+                                    bar.SimileMark = SimileMark.Simple;
+                                    break;
+                                case "FirstOfDouble":
+                                    bar.SimileMark = SimileMark.FirstOfDouble;
+                                    break;
+                                case "SecondOfDouble":
+                                    bar.SimileMark = SimileMark.SecondOfDouble;
+                                    break;
+                            }
+                            break;
                     }
                 }
             }
