@@ -69,6 +69,7 @@ namespace AlphaTab
                     new ChordsEffectInfo(),
                     new WhammyBarEffectInfo(),
                     new TrillEffectInfo(),
+                    new OttaviaEffectInfo(true), 
                     new WideBeatVibratoEffectInfo(),
                     new SlightBeatVibratoEffectInfo(),
                     new WideNoteVibratoEffectInfo(),
@@ -78,6 +79,7 @@ namespace AlphaTab
                 new ScoreBarRendererFactory(),
                 new EffectBarRendererFactory("tab-effects", new IEffectBarRendererInfo[] {
                     new CrescendoEffectInfo(),
+                    new OttaviaEffectInfo(false),
                     new DynamicsEffectInfo(),
                     new LyricsEffectInfo(), 
                     new TrillEffectInfo(),
@@ -107,6 +109,7 @@ namespace AlphaTab
                     new ChordsEffectInfo(),
                     new WhammyBarEffectInfo(),
                     new TrillEffectInfo(),
+                    new OttaviaEffectInfo(true),
                     new WideBeatVibratoEffectInfo(),
                     new SlightBeatVibratoEffectInfo(),
                     new WideNoteVibratoEffectInfo(),
@@ -120,7 +123,8 @@ namespace AlphaTab
                 }),
                 new ScoreBarRendererFactory(),
                 new EffectBarRendererFactory("score-bottom-effects", new IEffectBarRendererInfo[] {
-                    new CrescendoEffectInfo(), 
+                    new CrescendoEffectInfo(),
+                    new OttaviaEffectInfo(false),
                     new DynamicsEffectInfo(),
                     new LyricsEffectInfo(), 
                 }),

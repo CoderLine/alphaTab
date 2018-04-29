@@ -175,7 +175,7 @@ namespace AlphaTab.Test.Importer
         {
             Assert.AreEqual(expected.Index, actual.Index, "Mismatch on Index");
             Assert.AreEqual(expected.Clef, actual.Clef, "Mismatch on Clef");
-            Assert.AreEqual(expected.ClefOttavia, actual.ClefOttavia, "Mismatch on ClefOttavia");
+            Assert.AreEqual(expected.ClefOttava, actual.ClefOttava, "Mismatch on ClefOttavia");
             //Assert.AreEqual(expected.Voices.Count, actual.Voices.Count, "Mismatch on Voices.Count");
             for (int i = 0; i < Math.Min(expected.Voices.Count, actual.Voices.Count); i++)
             {

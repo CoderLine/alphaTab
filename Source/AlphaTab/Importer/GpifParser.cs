@@ -984,16 +984,16 @@ namespace AlphaTab.Importer
                             switch (c.InnerText)
                             {
                                 case "8va":
-                                    bar.ClefOttavia = ClefOttavia._8va;
+                                    bar.ClefOttava = Ottavia._8va;
                                     break;
                                 case "15ma":
-                                    bar.ClefOttavia = ClefOttavia._15ma;
+                                    bar.ClefOttava = Ottavia._15ma;
                                     break;
                                 case "8vb":
-                                    bar.ClefOttavia = ClefOttavia._8vb;
+                                    bar.ClefOttava = Ottavia._8vb;
                                     break;
                                 case "15mb":
-                                    bar.ClefOttavia = ClefOttavia._15mb;
+                                    bar.ClefOttava = Ottavia._15mb;
                                     break;
                             }
                             break;
@@ -1205,6 +1205,23 @@ namespace AlphaTab.Importer
                             whammyDestination.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("destinationValue")));
                             whammyDestination.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("destinationOffset")));
                             beat.AddWhammyBarPoint(whammyDestination);
+                            break;
+                        case "Ottavia":
+                            switch (c.InnerText)
+                            {
+                                case "8va":
+                                    beat.Ottava = Ottavia._8va;
+                                    break;
+                                case "8vb":
+                                    beat.Ottava = Ottavia._8vb;
+                                    break;
+                                case "15ma":
+                                    beat.Ottava = Ottavia._15ma;
+                                    break;
+                                case "15mb":
+                                    beat.Ottava = Ottavia._15mb;
+                                    break;
+                            }
                             break;
                     }
                 }

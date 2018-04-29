@@ -281,6 +281,29 @@ namespace AlphaTab.Platform.JavaScript
             _context.Font = font;
         }
 
+        public void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols)
+        {
+            x = (int)x;
+            y = (int)y;
+            var baseLine = _context.TextBaseline;
+            var font = _context.Font;
+            _context.Font = _musicFont.ToCssString(scale);
+            _context.TextBaseline = "middle";
+
+            var s = "";
+            foreach (var symbol in symbols)
+            {
+                if (symbol != MusicFontSymbol.None)
+                {
+                    s += Platform.StringFromCharCode((int)symbol);
+                }
+            }
+
+            _context.FillText(s, x, y);
+            _context.TextBaseline = baseLine;
+            _context.Font = font;
+        }
+
         public void BeginRotate(float centerX, float centerY, float angle)
         {
             _context.Save();

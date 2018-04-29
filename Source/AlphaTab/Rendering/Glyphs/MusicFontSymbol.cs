@@ -118,6 +118,14 @@ namespace AlphaTab.Rendering.Glyphs
         AccidentalSharp = 0xE262,
         AccidentalQuarterToneFlatArrowUp = 0xE270,
         AccidentalQuarterToneSharpArrowUp = 0xE274,
-        AccidentalQuarterToneNaturalArrowUp = 0xE272
+        AccidentalQuarterToneNaturalArrowUp = 0xE272,
+
+        Ottava8 = 0xE510,
+        Ottava8va = 0xE511,
+        Ottava8vb = 0xE51C,
+        Ottava15 = 0xE514,
+        Ottava15ma = 0xE515,
+        OttavaMBaseline = 0xEC95,
+        OttavaBBaseline = 0xEC93,
     }
 }

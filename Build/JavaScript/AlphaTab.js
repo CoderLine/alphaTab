@@ -28,6 +28,7 @@ $hx_exports["alphaTab"]["model"]["_WhammyType"] = $hx_exports["alphaTab"]["model
 ;$hx_exports["alphaTab"]["model"]["_StaffKind"] = $hx_exports["alphaTab"]["model"]["_StaffKind"] || {};
 ;$hx_exports["alphaTab"]["model"]["_SlideType"] = $hx_exports["alphaTab"]["model"]["_SlideType"] || {};
 ;$hx_exports["alphaTab"]["model"]["_PickStrokeType"] = $hx_exports["alphaTab"]["model"]["_PickStrokeType"] || {};
+;$hx_exports["alphaTab"]["model"]["_Ottavia"] = $hx_exports["alphaTab"]["model"]["_Ottavia"] || {};
 ;$hx_exports["alphaTab"]["model"]["_NoteAccidentalMode"] = $hx_exports["alphaTab"]["model"]["_NoteAccidentalMode"] || {};
 ;$hx_exports["alphaTab"]["model"]["_KeySignatureType"] = $hx_exports["alphaTab"]["model"]["_KeySignatureType"] || {};
 ;$hx_exports["alphaTab"]["model"]["_HarmonicType"] = $hx_exports["alphaTab"]["model"]["_HarmonicType"] || {};
@@ -36,7 +37,6 @@ $hx_exports["alphaTab"]["model"]["_WhammyType"] = $hx_exports["alphaTab"]["model
 ;$hx_exports["alphaTab"]["model"]["_DynamicValue"] = $hx_exports["alphaTab"]["model"]["_DynamicValue"] || {};
 ;$hx_exports["alphaTab"]["model"]["_Duration"] = $hx_exports["alphaTab"]["model"]["_Duration"] || {};
 ;$hx_exports["alphaTab"]["model"]["_CrescendoType"] = $hx_exports["alphaTab"]["model"]["_CrescendoType"] || {};
-;$hx_exports["alphaTab"]["model"]["_ClefOttavia"] = $hx_exports["alphaTab"]["model"]["_ClefOttavia"] || {};
 ;$hx_exports["alphaTab"]["model"]["_Clef"] = $hx_exports["alphaTab"]["model"]["_Clef"] || {};
 ;$hx_exports["alphaTab"]["model"]["_BrushType"] = $hx_exports["alphaTab"]["model"]["_BrushType"] || {};
 ;$hx_exports["alphaTab"]["model"]["_BendType"] = $hx_exports["alphaTab"]["model"]["_BendType"] || {};
@@ -520,6 +520,9 @@ alphaTab.platform.svg.SvgCanvas.prototype = {
 	,FillMusicFontSymbol: function(x,y,scale,symbol) {
 		throw new js._Boot.HaxeError("abstract");
 	}
+	,FillMusicFontSymbols: function(x,y,scale,symbols) {
+		throw new js._Boot.HaxeError("abstract");
+	}
 	,OnPreRender: function() {
 		return null;
 	}
@@ -554,6 +557,28 @@ alphaTab.platform.svg.CssFontSvgCanvas.prototype = $extend(alphaTab.platform.svg
 		}
 		this.Buffer += Std.string(">&#" + symbol + ";</text></g>");
 	}
+	,FillMusicFontSymbols: function(x,y,scale,symbols) {
+		var s = "";
+		var symbol = HxOverrides.iter(symbols);
+		while(symbol.hasNext()) {
+			var symbol1 = symbol.next();
+			if(symbol1 != -1) {
+				s = s + ("&#" + symbol1 + ";");
+			}
+		}
+		var s1 = "<g transform=\"translate(" + (system.Convert.ToInt32_Single(x) - 0) + " " + (system.Convert.ToInt32_Single(y) - 0) + ")\" class=\"at\" ><text";
+		this.Buffer += Std.string(s1);
+		if(scale != 1) {
+			this.Buffer += Std.string(" style=\"font-size: " + scale * 100 + "%; stroke:none\"");
+		} else {
+			this.Buffer += Std.string(" style=\"stroke:none\"");
+		}
+		if(this.get_Color().RGBA != "#000000") {
+			var s2 = " fill=\"" + this.get_Color().RGBA + "\"";
+			this.Buffer += Std.string(s2);
+		}
+		this.Buffer += Std.string(">" + s + "</text></g>");
+	}
 	,__class__: alphaTab.platform.svg.CssFontSvgCanvas
 });
 alphaTab.platform.model = {};
@@ -571,6 +596,12 @@ alphaTab.platform.model.Color = $hx_exports["alphaTab"]["platform"]["model"]["Co
 	}
 };
 alphaTab.platform.model.Color.__name__ = ["alphaTab","platform","model","Color"];
+alphaTab.platform.model.Color.Random = function(opacity) {
+	if(opacity == null) {
+		opacity = 100;
+	}
+	return new alphaTab.platform.model.Color(system.Convert.ToUInt8(alphaTab.platform.Platform.Random(255)),system.Convert.ToUInt8(alphaTab.platform.Platform.Random(255)),system.Convert.ToUInt8(alphaTab.platform.Platform.Random(255)),opacity);
+};
 alphaTab.platform.model.Color.prototype = {
 	get_A: function() {
 		return system.Convert.ToUInt8(this.Raw >> 24 & 255);
@@ -1143,6 +1174,28 @@ alphaTab.platform.javaScript.Html5Canvas.prototype = {
 		this._context.font = tmp;
 		this._context.textBaseline = "middle";
 		this._context.fillText(String.fromCharCode(symbol),x,y);
+		this._context.textBaseline = baseLine;
+		this._context.font = font;
+	}
+	,FillMusicFontSymbols: function(x,y,scale,symbols) {
+		var this1 = system.Convert.ToInt32_Single(x);
+		x = this1;
+		var this2 = system.Convert.ToInt32_Single(y);
+		y = this2;
+		var baseLine = this._context.textBaseline;
+		var font = this._context.font;
+		var tmp = this._musicFont.ToCssString(scale);
+		this._context.font = tmp;
+		this._context.textBaseline = "middle";
+		var s = "";
+		var symbol = HxOverrides.iter(symbols);
+		while(symbol.hasNext()) {
+			var symbol1 = symbol.next();
+			if(symbol1 != -1) {
+				s = s + String.fromCharCode(symbol1);
+			}
+		}
+		this._context.fillText(s,x,y);
 		this._context.textBaseline = baseLine;
 		this._context.font = font;
 	}
@@ -5454,6 +5507,48 @@ alphaTab.rendering.effects.TrillEffectInfo.prototype = $extend(alphaTab.renderin
 	}
 	,__class__: alphaTab.rendering.effects.TrillEffectInfo
 });
+alphaTab.rendering.effects.OttaviaEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["OttaviaEffectInfo"] = function(aboveStaff) {
+	this._aboveStaff = false;
+	this._aboveStaff = aboveStaff;
+};
+alphaTab.rendering.effects.OttaviaEffectInfo.__name__ = ["alphaTab","rendering","effects","OttaviaEffectInfo"];
+alphaTab.rendering.effects.OttaviaEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.OttaviaEffectInfo.prototype = {
+	get_EffectId: function() {
+		return "ottavia-" + (this._aboveStaff ? "above" : "below");
+	}
+	,get_HideOnMultiTrack: function() {
+		return false;
+	}
+	,get_CanShareBand: function() {
+		return true;
+	}
+	,get_SizingMode: function() {
+		return 4;
+	}
+	,ShouldCreateGlyph: function(beat) {
+		var _g = beat.Ottava;
+		switch(_g) {
+		case 0:
+			return this._aboveStaff;
+		case 1:
+			return this._aboveStaff;
+		case 3:
+			return !this._aboveStaff;
+		case 4:
+			return !this._aboveStaff;
+		default:
+		}
+		return false;
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.OttavaGlyph(beat.Ottava,this._aboveStaff);
+	}
+	,CanExpand: function(from,to) {
+		return true;
+	}
+	,__class__: alphaTab.rendering.effects.OttaviaEffectInfo
+};
 alphaTab.rendering.effects.WideBeatVibratoEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["WideBeatVibratoEffectInfo"] = function() {
 };
 alphaTab.rendering.effects.WideBeatVibratoEffectInfo.__name__ = ["alphaTab","rendering","effects","WideBeatVibratoEffectInfo"];
@@ -6199,8 +6294,8 @@ alphaTab.Environment.Init = function() {
 	alphaTab.Environment.LayoutEngines["horizontal"] = function(r2) {
 		return new alphaTab.rendering.layout.HorizontalScreenLayout(r2);
 	};
-	alphaTab.Environment.StaveProfiles["default"] = alphaTab.Environment.StaveProfiles["score-tab"] = [new alphaTab.rendering.EffectBarRendererFactory("score-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.WhammyBarEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.ScoreBarRendererFactory(),new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.CrescendoEffectInfo(),new alphaTab.rendering.effects.DynamicsEffectInfo(),new alphaTab.rendering.effects.LyricsEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(false,false,false)];
-	alphaTab.Environment.StaveProfiles["score"] = [new alphaTab.rendering.EffectBarRendererFactory("score-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.WhammyBarEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.ScoreBarRendererFactory(),new alphaTab.rendering.EffectBarRendererFactory("score-bottom-effects",[new alphaTab.rendering.effects.CrescendoEffectInfo(),new alphaTab.rendering.effects.DynamicsEffectInfo(),new alphaTab.rendering.effects.LyricsEffectInfo()])];
+	alphaTab.Environment.StaveProfiles["default"] = alphaTab.Environment.StaveProfiles["score-tab"] = [new alphaTab.rendering.EffectBarRendererFactory("score-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.WhammyBarEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.OttaviaEffectInfo(true),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.ScoreBarRendererFactory(),new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.CrescendoEffectInfo(),new alphaTab.rendering.effects.OttaviaEffectInfo(false),new alphaTab.rendering.effects.DynamicsEffectInfo(),new alphaTab.rendering.effects.LyricsEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(false,false,false)];
+	alphaTab.Environment.StaveProfiles["score"] = [new alphaTab.rendering.EffectBarRendererFactory("score-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.WhammyBarEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.OttaviaEffectInfo(true),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.ScoreBarRendererFactory(),new alphaTab.rendering.EffectBarRendererFactory("score-bottom-effects",[new alphaTab.rendering.effects.CrescendoEffectInfo(),new alphaTab.rendering.effects.OttaviaEffectInfo(false),new alphaTab.rendering.effects.DynamicsEffectInfo(),new alphaTab.rendering.effects.LyricsEffectInfo()])];
 	alphaTab.Environment.StaveProfiles["tab"] = [new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(true,true,true),new alphaTab.rendering.EffectBarRendererFactory("tab-bottom-effects",[new alphaTab.rendering.effects.LyricsEffectInfo()])];
 	alphaTab.Environment.StaveProfiles["tab-mixed"] = [new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(false,false,false),new alphaTab.rendering.EffectBarRendererFactory("tab-bottom-effects",[new alphaTab.rendering.effects.LyricsEffectInfo()])];
 };
@@ -14987,16 +15082,16 @@ alphaTab.importer.GpifParser.prototype = {
 					var _g2 = c1.get_InnerText();
 					switch(_g2) {
 					case "15ma":
-						bar.ClefOttavia = 0;
+						bar.ClefOttava = 0;
 						break;
 					case "15mb":
-						bar.ClefOttavia = 4;
+						bar.ClefOttava = 4;
 						break;
 					case "8va":
-						bar.ClefOttavia = 1;
+						bar.ClefOttava = 1;
 						break;
 					case "8vb":
-						bar.ClefOttavia = 3;
+						bar.ClefOttava = 3;
 						break;
 					default:
 					}
@@ -15150,6 +15245,24 @@ alphaTab.importer.GpifParser.prototype = {
 					var this3 = this2;
 					this1[beatId] = system._CsString.CsString_Impl_.Split_CharArray(a,[this3]);
 					break;
+				case "Ottavia":
+					var _g4 = c1.get_InnerText();
+					switch(_g4) {
+					case "15ma":
+						beat.Ottava = 0;
+						break;
+					case "15mb":
+						beat.Ottava = 4;
+						break;
+					case "8va":
+						beat.Ottava = 1;
+						break;
+					case "8vb":
+						beat.Ottava = 3;
+						break;
+					default:
+					}
+					break;
 				case "Properties":
 					this.ParseBeatProperties(c1,beat);
 					break;
@@ -15157,8 +15270,8 @@ alphaTab.importer.GpifParser.prototype = {
 					this._rhythmOfBeat[beatId] = c1.GetAttribute("ref");
 					break;
 				case "Tremolo":
-					var _g4 = c1.get_InnerText();
-					switch(_g4) {
+					var _g5 = c1.get_InnerText();
+					switch(_g5) {
 					case "1/2":
 						beat.TremoloSpeed = 8;
 						break;
@@ -17101,16 +17214,16 @@ alphaTab.importer.MusicXmlImporter.prototype = $extend(alphaTab.importer.ScoreIm
 					var _g1 = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
 					switch(_g1) {
 					case -2:
-						bar.ClefOttavia = 4;
+						bar.ClefOttava = 4;
 						break;
 					case -1:
-						bar.ClefOttavia = 3;
+						bar.ClefOttava = 3;
 						break;
 					case 1:
-						bar.ClefOttavia = 1;
+						bar.ClefOttava = 1;
 						break;
 					case 2:
-						bar.ClefOttavia = 4;
+						bar.ClefOttava = 4;
 						break;
 					default:
 					}
@@ -18188,21 +18301,21 @@ alphaTab.model.Bar = $hx_exports["alphaTab"]["model"]["Bar"] = function() {
 	this.NextBar = null;
 	this.PreviousBar = null;
 	this.Clef = 0;
-	this.ClefOttavia = 0;
+	this.ClefOttava = 0;
 	this.Staff = null;
 	this.Voices = null;
 	this.Id = alphaTab.model.Bar.GlobalBarId++;
 	var this1 = [];
 	this.Voices = this1;
 	this.Clef = 4;
-	this.ClefOttavia = 2;
+	this.ClefOttava = 2;
 };
 alphaTab.model.Bar.__name__ = ["alphaTab","model","Bar"];
 alphaTab.model.Bar.CopyTo = function(src,dst) {
 	dst.Id = src.Id;
 	dst.Index = src.Index;
 	dst.Clef = src.Clef;
-	dst.ClefOttavia = src.ClefOttavia;
+	dst.ClefOttava = src.ClefOttava;
 };
 alphaTab.model.Bar.prototype = {
 	AddVoice: function(voice) {
@@ -18243,6 +18356,7 @@ alphaTab.model.Beat = $hx_exports["alphaTab"]["model"]["Beat"] = function() {
 	this.Voice = null;
 	this.Notes = null;
 	this.IsEmpty = false;
+	this.Ottava = 0;
 	this.IsLegatoOrigin = false;
 	this._minNote = null;
 	this._maxNote = null;
@@ -18297,6 +18411,7 @@ alphaTab.model.Beat = $hx_exports["alphaTab"]["model"]["Beat"] = function() {
 	this.Dynamic = 5;
 	this.Crescendo = 0;
 	this.InvertBeamDirection = false;
+	this.Ottava = 2;
 };
 alphaTab.model.Beat.__name__ = ["alphaTab","model","Beat"];
 alphaTab.model.Beat.CopyTo = function(src,dst) {
@@ -18337,6 +18452,7 @@ alphaTab.model.Beat.CopyTo = function(src,dst) {
 	dst.InvertBeamDirection = src.InvertBeamDirection;
 	dst.WhammyBarType = src.WhammyBarType;
 	dst.IsContinuedWhammy = src.IsContinuedWhammy;
+	dst.Ottava = src.Ottava;
 };
 alphaTab.model.Beat.prototype = {
 	get_IsLegatoDestination: function() {
@@ -18828,60 +18944,6 @@ alphaTab.model._Clef.Clef_Impl_.toString = function(this1) {
 		return "F4";
 	case 4:
 		return "G2";
-	}
-	return "";
-};
-alphaTab.model._ClefOttavia = {};
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_ = $hx_exports["alphaTab"]["model"]["_ClefOttavia"]["ClefOttavia_Impl_"] = {};
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_.__name__ = ["alphaTab","model","_ClefOttavia","ClefOttavia_Impl_"];
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
-	return this1 != 0;
-};
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_.ToChar_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToUInt16(this1);
-};
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToInt8(this1);
-};
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_.ToByte_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToUInt8(this1);
-};
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToInt16(this1);
-};
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToUInt16(this1);
-};
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
-	return this1;
-};
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToUInt32(this1);
-};
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
-	return this1;
-};
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToUInt32(this1);
-};
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
-	return this1;
-};
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	return this1;
-};
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_.toString = function(this1) {
-	switch(this1) {
-	case 0:
-		return "_15ma";
-	case 1:
-		return "_8va";
-	case 2:
-		return "Regular";
-	case 3:
-		return "_8vb";
-	case 4:
-		return "_15mb";
 	}
 	return "";
 };
@@ -19974,7 +20036,7 @@ alphaTab.model.Note.prototype = {
 		}
 		return 0;
 	}
-	,get_RealValueWithBend: function() {
+	,get_RealValueWithEffects: function() {
 		var noteValue = this.get_RealValue();
 		if(this.get_HasBend()) {
 			noteValue = noteValue + (this.BendPoints[0].Value / 2 | 0);
@@ -19984,6 +20046,42 @@ alphaTab.model.Note.prototype = {
 			noteValue = noteValue + (this.Beat.WhammyBarPoints[0].Value / 2 | 0);
 		} else if(this.Beat.IsContinuedWhammy) {
 			noteValue = noteValue + (this.Beat.PreviousBeat.WhammyBarPoints[this.Beat.PreviousBeat.WhammyBarPoints.length - 1].Value / 2 | 0);
+		}
+		var _g = this.Beat.Ottava;
+		switch(_g) {
+		case 0:
+			noteValue = noteValue - 24;
+			break;
+		case 1:
+			noteValue = noteValue - 12;
+			break;
+		case 2:
+			break;
+		case 3:
+			noteValue = noteValue + 12;
+			break;
+		case 4:
+			noteValue = noteValue + 24;
+			break;
+		default:
+		}
+		var _g1 = this.Beat.Voice.Bar.ClefOttava;
+		switch(_g1) {
+		case 0:
+			noteValue = noteValue - 24;
+			break;
+		case 1:
+			noteValue = noteValue - 12;
+			break;
+		case 2:
+			break;
+		case 3:
+			noteValue = noteValue + 12;
+			break;
+		case 4:
+			noteValue = noteValue + 24;
+			break;
+		default:
 		}
 		return noteValue;
 	}
@@ -20202,6 +20300,60 @@ alphaTab.model._NoteAccidentalMode.NoteAccidentalMode_Impl_.toString = function(
 		return "ForceSharp";
 	case 4:
 		return "ForceFlat";
+	}
+	return "";
+};
+alphaTab.model._Ottavia = {};
+alphaTab.model._Ottavia.Ottavia_Impl_ = $hx_exports["alphaTab"]["model"]["_Ottavia"]["Ottavia_Impl_"] = {};
+alphaTab.model._Ottavia.Ottavia_Impl_.__name__ = ["alphaTab","model","_Ottavia","Ottavia_Impl_"];
+alphaTab.model._Ottavia.Ottavia_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaTab.model._Ottavia.Ottavia_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaTab.model._Ottavia.Ottavia_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaTab.model._Ottavia.Ottavia_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaTab.model._Ottavia.Ottavia_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaTab.model._Ottavia.Ottavia_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaTab.model._Ottavia.Ottavia_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaTab.model._Ottavia.Ottavia_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaTab.model._Ottavia.Ottavia_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaTab.model._Ottavia.Ottavia_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaTab.model._Ottavia.Ottavia_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaTab.model._Ottavia.Ottavia_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaTab.model._Ottavia.Ottavia_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "_15ma";
+	case 1:
+		return "_8va";
+	case 2:
+		return "Regular";
+	case 3:
+		return "_8vb";
+	case 4:
+		return "_15mb";
 	}
 	return "";
 };
@@ -24594,7 +24746,7 @@ alphaTab.rendering.ScoreBarRenderer.prototype = $extend(alphaTab.rendering.BarRe
 		if(this.Bar.get_MasterBar().IsRepeatStart) {
 			this.AddPreBeatGlyph(new alphaTab.rendering.glyphs.RepeatOpenGlyph(0,0,1.5,3));
 		}
-		if(this.get_IsFirstOfLine() || this.Bar.Clef != this.Bar.PreviousBar.Clef || this.Bar.ClefOttavia != this.Bar.PreviousBar.ClefOttavia) {
+		if(this.get_IsFirstOfLine() || this.Bar.Clef != this.Bar.PreviousBar.Clef || this.Bar.ClefOttava != this.Bar.PreviousBar.ClefOttava) {
 			var offset = 0;
 			var correction = 0;
 			var _g = this.Bar.Clef;
@@ -24620,7 +24772,7 @@ alphaTab.rendering.ScoreBarRenderer.prototype = $extend(alphaTab.rendering.BarRe
 			this.CreateStartSpacing();
 			var this1 = offset;
 			var this2 = correction;
-			this.AddPreBeatGlyph(new alphaTab.rendering.glyphs.ClefGlyph(0,this.GetScoreY(this1,this2),this.Bar.Clef,this.Bar.ClefOttavia));
+			this.AddPreBeatGlyph(new alphaTab.rendering.glyphs.ClefGlyph(0,this.GetScoreY(this1,this2),this.Bar.Clef,this.Bar.ClefOttava));
 		}
 		if(this.Index == 0 && this.Bar.get_MasterBar().KeySignature != 0 || this.Bar.PreviousBar != null && this.Bar.get_MasterBar().KeySignature != this.Bar.PreviousBar.get_MasterBar().KeySignature) {
 			this.CreateStartSpacing();
@@ -26302,12 +26454,12 @@ alphaTab.rendering.glyphs.CircleGlyph.prototype = $extend(alphaTab.rendering.gly
 	}
 	,__class__: alphaTab.rendering.glyphs.CircleGlyph
 });
-alphaTab.rendering.glyphs.ClefGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["ClefGlyph"] = function(x,y,clef,clefOttavia) {
+alphaTab.rendering.glyphs.ClefGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["ClefGlyph"] = function(x,y,clef,clefOttava) {
 	alphaTab.rendering.glyphs.MusicFontGlyph.call(this,x,y,1,alphaTab.rendering.glyphs.ClefGlyph.GetSymbol(clef));
 	this._clef = 0;
-	this._clefOttavia = 0;
+	this._clefOttava = 0;
 	this._clef = clef;
-	this._clefOttavia = clefOttavia;
+	this._clefOttava = clefOttava;
 };
 alphaTab.rendering.glyphs.ClefGlyph.__name__ = ["alphaTab","rendering","glyphs","ClefGlyph"];
 alphaTab.rendering.glyphs.ClefGlyph.GetSymbol = function(clef) {
@@ -26344,70 +26496,76 @@ alphaTab.rendering.glyphs.ClefGlyph.prototype = $extend(alphaTab.rendering.glyph
 		alphaTab.rendering.glyphs.MusicFontGlyph.prototype.Paint.call(this,cx,cy,canvas);
 		var numberGlyph;
 		var top = false;
-		var _g = this._clefOttavia;
+		var _g = this._clefOttava;
 		switch(_g) {
 		case 0:
-			numberGlyph = new alphaTab.rendering.glyphs.NumberGlyph(this.Width / 2,0,15,0.5);
+			numberGlyph = new alphaTab.rendering.glyphs.MusicFontGlyph(-4 * this.get_Scale(),0,0.5,58644);
 			top = true;
 			break;
 		case 1:
-			numberGlyph = new alphaTab.rendering.glyphs.NumberGlyph(0,0,8,0.5);
+			numberGlyph = new alphaTab.rendering.glyphs.MusicFontGlyph(-2 * this.get_Scale(),0,0.5,58640);
 			top = true;
 			break;
 		case 3:
-			numberGlyph = new alphaTab.rendering.glyphs.NumberGlyph(0,0,8,0.5);
+			numberGlyph = new alphaTab.rendering.glyphs.MusicFontGlyph(-6 * this.get_Scale(),0,0.5,58640);
 			break;
 		case 4:
-			numberGlyph = new alphaTab.rendering.glyphs.NumberGlyph(0,0,15,0.5);
+			numberGlyph = new alphaTab.rendering.glyphs.MusicFontGlyph(-8 * this.get_Scale(),0,0.5,58644);
 			break;
 		default:
 			return;
 		}
-		var offset;
+		var offsetY;
+		var offsetX;
 		var _g1 = this._clef;
 		switch(_g1) {
 		case 0:
 			if(top) {
-				offset = -25;
+				offsetY = -12;
 			} else {
-				offset = 10;
+				offsetY = 15;
 			}
+			offsetX = 0;
 			break;
 		case 1:
 			if(top) {
-				offset = -30;
+				offsetY = -19;
 			} else {
-				offset = 20;
+				offsetY = 27;
 			}
+			offsetX = 0;
 			break;
 		case 2:
 			if(top) {
-				offset = -30;
+				offsetY = -19;
 			} else {
-				offset = 20;
+				offsetY = 27;
 			}
+			offsetX = 0;
 			break;
 		case 3:
 			if(top) {
-				offset = -25;
+				offsetY = -9;
 			} else {
-				offset = 20;
+				offsetY = 27;
 			}
+			offsetX = -4;
 			break;
 		case 4:
 			if(top) {
-				offset = -50;
+				offsetY = -37;
 			} else {
-				offset = 25;
+				offsetY = 30;
 			}
+			offsetX = 0;
 			break;
 		default:
 			return;
 		}
 		numberGlyph.Renderer = this.Renderer;
 		numberGlyph.DoLayout();
-		var x = (this.Width - numberGlyph.Width) / 2;
-		numberGlyph.Paint(cx + this.X + x,cy + this.Y + offset * this.get_Scale(),canvas);
+		var x = this.Width / 2;
+		numberGlyph.Paint(cx + this.X + x + offsetX * this.get_Scale(),cy + this.Y + offsetY * this.get_Scale(),canvas);
 	}
 	,__class__: alphaTab.rendering.glyphs.ClefGlyph
 });
@@ -26995,6 +27153,16 @@ alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.toString = func
 		return "RestOneHundredTwentyEighth";
 	case 58603:
 		return "RestTwoHundredFiftySixth";
+	case 58640:
+		return "Ottava8";
+	case 58641:
+		return "Ottava8va";
+	case 58644:
+		return "Ottava15";
+	case 58645:
+		return "Ottava15ma";
+	case 58652:
+		return "Ottava8vb";
 	case 58656:
 		return "DynamicP";
 	case 58658:
@@ -27021,6 +27189,10 @@ alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.toString = func
 		return "WaveHorizontalSlight";
 	case 60126:
 		return "WaveHorizontalWide";
+	case 60563:
+		return "OttavaBBaseline";
+	case 60565:
+		return "OttavaMBaseline";
 	}
 	return "";
 };
@@ -27222,6 +27394,79 @@ alphaTab.rendering.glyphs.NumberGlyph.prototype = $extend(alphaTab.rendering.gly
 		this.Width = cx;
 	}
 	,__class__: alphaTab.rendering.glyphs.NumberGlyph
+});
+alphaTab.rendering.glyphs.OttavaGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["OttavaGlyph"] = function(ottava,aboveStaff) {
+	alphaTab.rendering.glyphs.GroupedEffectGlyph.call(this,3);
+	this._ottava = 0;
+	this._aboveStaff = false;
+	this._ottava = ottava;
+	this._aboveStaff = aboveStaff;
+};
+alphaTab.rendering.glyphs.OttavaGlyph.__name__ = ["alphaTab","rendering","glyphs","OttavaGlyph"];
+alphaTab.rendering.glyphs.OttavaGlyph.__super__ = alphaTab.rendering.glyphs.GroupedEffectGlyph;
+alphaTab.rendering.glyphs.OttavaGlyph.prototype = $extend(alphaTab.rendering.glyphs.GroupedEffectGlyph.prototype,{
+	DoLayout: function() {
+		alphaTab.rendering.glyphs.GroupedEffectGlyph.prototype.DoLayout.call(this);
+		this.Height = 13 * this.get_Scale();
+	}
+	,PaintNonGrouped: function(cx,cy,canvas) {
+		this.PaintOttava(cx,cy,canvas);
+	}
+	,PaintOttava: function(cx,cy,canvas) {
+		var size = 0;
+		var _g = this._ottava;
+		switch(_g) {
+		case 0:
+			size = 37 * this.get_Scale();
+			canvas.FillMusicFontSymbol(cx + this.X - size / 2,cy + this.Y + this.Height,0.8,58645);
+			break;
+		case 1:
+			size = 26 * this.get_Scale();
+			canvas.FillMusicFontSymbol(cx + this.X - size / 2,cy + this.Y + this.Height,0.8,58641);
+			break;
+		case 3:
+			size = 23 * this.get_Scale();
+			canvas.FillMusicFontSymbol(cx + this.X - size / 2,cy + this.Y + this.Height,0.8,58652);
+			break;
+		case 4:
+			size = 36 * this.get_Scale();
+			canvas.FillMusicFontSymbols(cx + this.X - size / 2,cy + this.Y + this.Height,0.8,[58644,60565,60563]);
+			break;
+		default:
+		}
+		return size / 2;
+	}
+	,PaintGrouped: function(cx,cy,endX,canvas) {
+		var size = this.PaintOttava(cx,cy,canvas);
+		var lineSpacing = 3 * this.get_Scale();
+		var startX = cx + this.X + size + lineSpacing;
+		var lineY = cy + this.Y;
+		lineY = lineY + (this._aboveStaff ? 2 * this.get_Scale() : this.Height - 2 * this.get_Scale());
+		var lineSize = 8 * this.get_Scale();
+		if(endX > startX) {
+			var lineX = startX;
+			while(lineX < endX) {
+				canvas.BeginPath();
+				var this1 = system.Convert.ToInt32_Single(lineY);
+				canvas.MoveTo(lineX,this1);
+				var tmp = Math.min(lineX + lineSize,endX);
+				var this2 = system.Convert.ToInt32_Single(lineY);
+				canvas.LineTo(tmp,this2);
+				lineX = lineX + (lineSize + lineSpacing);
+				canvas.Stroke();
+			}
+			canvas.BeginPath();
+			if(this._aboveStaff) {
+				canvas.MoveTo(endX,lineY);
+				canvas.LineTo(endX,cy + this.Y + this.Height);
+			} else {
+				canvas.MoveTo(endX,lineY);
+				canvas.LineTo(endX,cy + this.Y);
+			}
+			canvas.Stroke();
+		}
+	}
+	,__class__: alphaTab.rendering.glyphs.OttavaGlyph
 });
 alphaTab.rendering.glyphs.PickStrokeGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["PickStrokeGlyph"] = function(x,y,pickStroke) {
 	alphaTab.rendering.glyphs.MusicFontGlyph.call(this,x,y,0.75,alphaTab.rendering.glyphs.PickStrokeGlyph.GetSymbol(pickStroke));
@@ -30854,7 +31099,7 @@ alphaTab.rendering.utils.AccidentalHelper = $hx_exports["alphaTab"]["rendering"]
 alphaTab.rendering.utils.AccidentalHelper.__name__ = ["alphaTab","rendering","utils","AccidentalHelper"];
 alphaTab.rendering.utils.AccidentalHelper.prototype = {
 	ApplyAccidental: function(note) {
-		var noteValue = note.get_RealValueWithBend();
+		var noteValue = note.get_RealValueWithEffects();
 		var quarterBend = note.get_HasQuarterToneOffset();
 		var line = this.RegisterNoteLine(note,noteValue);
 		return this.GetAccidental(line,noteValue,quarterBend);
@@ -31178,7 +31423,7 @@ alphaTab.rendering.utils.BeamingHelper.prototype = {
 		if(this._staff.StaffKind == 2) {
 			return alphaTab.rendering.utils.PercussionMapper.MapNoteForDisplay(n.get_RealValue());
 		} else {
-			return n.get_RealValueWithBend() - this._staff.DisplayTranspositionPitch;
+			return n.get_RealValueWithEffects() - this._staff.DisplayTranspositionPitch;
 		}
 	}
 	,GetMaxValue: function(n) {
@@ -34315,11 +34560,6 @@ alphaTab.model._Clef.Clef_Impl_.C3 = 1;
 alphaTab.model._Clef.Clef_Impl_.C4 = 2;
 alphaTab.model._Clef.Clef_Impl_.F4 = 3;
 alphaTab.model._Clef.Clef_Impl_.G2 = 4;
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_._15ma = 0;
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_._8va = 1;
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_.Regular = 2;
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_._8vb = 3;
-alphaTab.model._ClefOttavia.ClefOttavia_Impl_._15mb = 4;
 alphaTab.model._CrescendoType.CrescendoType_Impl_.None = 0;
 alphaTab.model._CrescendoType.CrescendoType_Impl_.Crescendo = 1;
 alphaTab.model._CrescendoType.CrescendoType_Impl_.Decrescendo = 2;
@@ -34381,6 +34621,11 @@ alphaTab.model._NoteAccidentalMode.NoteAccidentalMode_Impl_.SwapAccidentals = 1;
 alphaTab.model._NoteAccidentalMode.NoteAccidentalMode_Impl_.ForceNatural = 2;
 alphaTab.model._NoteAccidentalMode.NoteAccidentalMode_Impl_.ForceSharp = 3;
 alphaTab.model._NoteAccidentalMode.NoteAccidentalMode_Impl_.ForceFlat = 4;
+alphaTab.model._Ottavia.Ottavia_Impl_._15ma = 0;
+alphaTab.model._Ottavia.Ottavia_Impl_._8va = 1;
+alphaTab.model._Ottavia.Ottavia_Impl_.Regular = 2;
+alphaTab.model._Ottavia.Ottavia_Impl_._8vb = 3;
+alphaTab.model._Ottavia.Ottavia_Impl_._15mb = 4;
 alphaTab.model._PickStrokeType.PickStrokeType_Impl_.None = 0;
 alphaTab.model._PickStrokeType.PickStrokeType_Impl_.Up = 1;
 alphaTab.model._PickStrokeType.PickStrokeType_Impl_.Down = 2;
@@ -34542,6 +34787,13 @@ alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.AccidentalSharp
 alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.AccidentalQuarterToneFlatArrowUp = 57968;
 alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.AccidentalQuarterToneSharpArrowUp = 57972;
 alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.AccidentalQuarterToneNaturalArrowUp = 57970;
+alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.Ottava8 = 58640;
+alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.Ottava8va = 58641;
+alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.Ottava8vb = 58652;
+alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.Ottava15 = 58644;
+alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.Ottava15ma = 58645;
+alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.OttavaMBaseline = 60565;
+alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.OttavaBBaseline = 60563;
 alphaTab.rendering.glyphs.NoteHeadGlyph.GraceScale = 0.75;
 alphaTab.rendering.glyphs.NoteHeadGlyph.NoteHeadHeight = 9;
 alphaTab.rendering.glyphs.NoteHeadGlyph.QuarterNoteHeadWidth = 8;

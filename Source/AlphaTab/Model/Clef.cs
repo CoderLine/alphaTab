@@ -27,14 +27,5 @@ namespace AlphaTab.Model
         C4, 
         F4, 
         G2
-	}    
-    
-    public enum ClefOttavia
-    {
-		_15ma, 
-		_8va, 
-		Regular,
-        _8vb,
-        _15mb
-    }
+	}
 }

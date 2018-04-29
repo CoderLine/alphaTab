@@ -109,7 +109,7 @@ namespace AlphaTab.Rendering.Utils
         /// <returns></returns>
         public AccidentalType ApplyAccidental(Note note)
         {
-            var noteValue = note.RealValueWithBend;
+            var noteValue = note.RealValueWithEffects;
             bool quarterBend = note.HasQuarterToneOffset;
             var line = RegisterNoteLine(note, noteValue);
             return GetAccidental(line, noteValue, quarterBend);
@@ -198,7 +198,9 @@ namespace AlphaTab.Rendering.Utils
         private int CalculateNoteLine(int noteValue, NoteAccidentalMode mode)
         {
             var staff = _bar.Staff;
-            var value = staff.StaffKind == StaffKind.Percussion ? PercussionMapper.MapNoteForDisplay(noteValue) : noteValue - staff.DisplayTranspositionPitch;
+            var value = staff.StaffKind == StaffKind.Percussion 
+                ? PercussionMapper.MapNoteForDisplay(noteValue) 
+                : noteValue - staff.DisplayTranspositionPitch;
             var ks = _bar.MasterBar.KeySignature;
             var clef = _bar.Clef;
 

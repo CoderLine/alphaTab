@@ -58,6 +58,7 @@ namespace AlphaTab.Model
         /// </summary>
         PrediveDive
     }
+
     /// <summary>
     /// A beat is a single block within a bar. A beat is a combination
     /// of several notes played at the same time. 
@@ -81,6 +82,8 @@ namespace AlphaTab.Model
         public Voice Voice { get; set; }
         public FastList<Note> Notes { get; set; }
         public bool IsEmpty { get; set; }
+
+        public Ottavia Ottava { get; set; }
 
         public bool IsLegatoOrigin { get; set; }
         public bool IsLegatoDestination
@@ -251,6 +254,7 @@ namespace AlphaTab.Model
             Dynamic = DynamicValue.F;
             Crescendo = CrescendoType.None;
             InvertBeamDirection = false;
+            Ottava = Ottavia.Regular;
         }
 
         public static void CopyTo(Beat src, Beat dst)
@@ -290,6 +294,7 @@ namespace AlphaTab.Model
             dst.InvertBeamDirection = src.InvertBeamDirection;
             dst.WhammyBarType = src.WhammyBarType;
             dst.IsContinuedWhammy = src.IsContinuedWhammy;
+            dst.Ottava = src.Ottava;
         }
 
         public Beat Clone()

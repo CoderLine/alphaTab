@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
@@ -267,9 +268,9 @@ namespace AlphaTab.Model
 
         /// <summary>
         /// Gets the absolute value of this note considering
-        /// offsets by bends.
+        /// offsets by bends and ottavia
         /// </summary>
-        public int RealValueWithBend
+        public int RealValueWithEffects
         {
             get
             {
@@ -290,6 +291,43 @@ namespace AlphaTab.Model
                 {
                     noteValue += Beat.PreviousBeat.WhammyBarPoints[Beat.PreviousBeat.WhammyBarPoints.Count - 1].Value / 2;
                 }
+
+                switch (Beat.Ottava)
+                {
+                    case Ottavia._15ma:
+                        noteValue -= 24;
+                        break;
+                    case Ottavia._8va:
+                        noteValue -= 12;
+                        break;
+                    case Ottavia.Regular:
+                        break;
+                    case Ottavia._8vb:
+                        noteValue += 12;
+                        break;
+                    case Ottavia._15mb:
+                        noteValue += 24;
+                        break;
+                }
+
+                switch (Beat.Voice.Bar.ClefOttava)
+                {
+                    case Ottavia._15ma:
+                        noteValue -= 24;
+                        break;
+                    case Ottavia._8va:
+                        noteValue -= 12;
+                        break;
+                    case Ottavia.Regular:
+                        break;
+                    case Ottavia._8vb:
+                        noteValue += 12;
+                        break;
+                    case Ottavia._15mb:
+                        noteValue += 24;
+                        break;
+                }
+
                 return noteValue;
             }
         }

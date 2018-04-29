@@ -292,6 +292,24 @@ namespace AlphaTab.Platform.CSharp
                 _surface.Canvas.DrawText(Platform.StringFromCharCode((int)symbol), x, y, paint);
             }
         }
+        public void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols)
+        {
+            var s = "";
+            foreach (var symbol in symbols)
+            {
+                if (symbol != MusicFontSymbol.None)
+                {
+                    s += Platform.StringFromCharCode((int)symbol);
+                }
+            }
+
+            using (var paint = CreatePaint())
+            {
+                paint.Typeface = MusicFont;
+                paint.TextSize = MusicFontSize * scale;
+                _surface.Canvas.DrawText(s, x, y, paint);
+            }
+        }
 
         public void BeginRotate(float centerX, float centerY, float angle)
         {

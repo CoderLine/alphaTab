@@ -1226,6 +1226,11 @@
             Gets or sets whether the note has a offset of a quartertone caused by bends.
             </summary>
         </member>
+        <member name="T:AlphaTab.Model.Ottavia">
+            <summary>
+            Lists all ottavia.  
+            </summary>
+        </member>
         <member name="T:AlphaTab.Model.PickStrokeType">
             <summary>
             Lists all types of pick strokes.

@@ -79,5 +79,12 @@ namespace AlphaTab.Platform.Model
             get; internal set;
         }
 
+        public static Color Random(byte opacity = 100)
+        { 
+            return new Color((byte)Platform.Random(255),
+                (byte)Platform.Random(255),
+                (byte)Platform.Random(255),
+                opacity);
+        }
     }
 }

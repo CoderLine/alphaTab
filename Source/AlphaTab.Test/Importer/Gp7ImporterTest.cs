@@ -952,6 +952,24 @@ namespace AlphaTab.Test.Importer
         }
 
         [TestMethod]
+        public void TestOttavia()
+        {
+            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestOttavia.gp");
+            var score = reader.ReadScore();
+
+            Assert.AreEqual(Ottavia._8va, score.Tracks[0].Staves[0].Bars[0].ClefOttava);
+            Assert.AreEqual(Ottavia._8vb, score.Tracks[0].Staves[0].Bars[1].ClefOttava);
+            Assert.AreEqual(Ottavia._15ma, score.Tracks[0].Staves[0].Bars[2].ClefOttava);
+            Assert.AreEqual(Ottavia._15mb, score.Tracks[0].Staves[0].Bars[3].ClefOttava);
+
+
+            Assert.AreEqual(Ottavia._8va, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].Ottava);
+            Assert.AreEqual(Ottavia._8vb, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[1].Ottava);
+            Assert.AreEqual(Ottavia._15ma, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[2].Ottava);
+            Assert.AreEqual(Ottavia._15mb, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[3].Ottava);
+        }
+
+        [TestMethod]
         public void TestPickSlide()
         {
             var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestPickSlide.gp");

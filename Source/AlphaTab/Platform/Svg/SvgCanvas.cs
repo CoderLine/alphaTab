@@ -232,6 +232,7 @@ namespace AlphaTab.Platform.Svg
         }
 
         public abstract void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol);
+        public abstract void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols);
 
 
         public virtual object OnPreRender()

@@ -138,6 +138,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\MasterBar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\ModelUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Note.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Ottavia.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\PickStrokeType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\PlaybackInformation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\RepeatGroup.cs" />
@@ -166,6 +167,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\EffectBarGlyphSizing.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\EffectBarRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\EffectBarRendererFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\OttaviaEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\PickSlideEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\WideBeatVibratoEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\SlightBeatVibratoEffectInfo.cs" />

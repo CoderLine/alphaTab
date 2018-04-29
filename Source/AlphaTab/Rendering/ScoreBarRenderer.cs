@@ -715,7 +715,7 @@ namespace AlphaTab.Rendering
             }
 
             // Clef
-            if (IsFirstOfLine || Bar.Clef != Bar.PreviousBar.Clef || Bar.ClefOttavia != Bar.PreviousBar.ClefOttavia)
+            if (IsFirstOfLine || Bar.Clef != Bar.PreviousBar.Clef || Bar.ClefOttava != Bar.PreviousBar.ClefOttava)
             {
                 var offset = 0;
                 var correction = 0;
@@ -739,7 +739,7 @@ namespace AlphaTab.Rendering
                         break;
                 }
                 CreateStartSpacing();
-                AddPreBeatGlyph(new ClefGlyph(0, GetScoreY(offset, correction), Bar.Clef, Bar.ClefOttavia));
+                AddPreBeatGlyph(new ClefGlyph(0, GetScoreY(offset, correction), Bar.Clef, Bar.ClefOttava));
             }
 
             // Key signature
