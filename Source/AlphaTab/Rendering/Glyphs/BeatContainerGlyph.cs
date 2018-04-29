@@ -143,6 +143,11 @@ namespace AlphaTab.Rendering.Glyphs
         {
         }
 
+        public static string GetGroupId(Beat beat)
+        {
+            return "b" + beat.Id;
+        }
+
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             if (Beat.Voice.IsEmpty) return;
@@ -150,7 +155,7 @@ namespace AlphaTab.Rendering.Glyphs
             var isEmptyGlyph = PreNotes.IsEmpty && OnNotes.IsEmpty && Ties.Count == 0;
             if (isEmptyGlyph) return;
 
-            canvas.BeginGroup("b" + Beat.Id);
+            canvas.BeginGroup(GetGroupId(Beat));
 
             //var oldColor = canvas.Color;
             //canvas.Color = new Color((byte)Platform.Platform.Random(255), (byte)Platform.Platform.Random(255), (byte)Platform.Platform.Random(255), 100);

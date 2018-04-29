@@ -30,6 +30,7 @@ namespace AlphaTab.Audio.Generator
         private readonly Score _score;
         private readonly IMidiFileHandler _handler;
         private int _currentTempo;
+        private BeatTickLookup _currentBarRepeatLookup;
 
         public const int DefaultMetronomeKey = 37;
         public const int DefaultDurationDead = 30;
@@ -168,23 +169,53 @@ namespace AlphaTab.Audio.Generator
 
         public void GenerateBar(Bar bar, int barStartTick)
         {
-            for (int i = 0, j = bar.Voices.Count; i < j; i++)
+            var playbackBar = GetPlaybackBar(bar);
+            _currentBarRepeatLookup = null;
+
+            for (int i = 0, j = playbackBar.Voices.Count; i < j; i++)
             {
-                GenerateVoice(bar.Voices[i], barStartTick);
+                GenerateVoice(playbackBar.Voices[i], barStartTick, bar);
             }
         }
 
-        private void GenerateVoice(Voice voice, int barStartTick)
+        private Bar GetPlaybackBar(Bar bar)
+        {
+            switch (bar.SimileMark)
+            {
+                case SimileMark.Simple:
+                    if (bar.PreviousBar != null)
+                    {
+                        bar = GetPlaybackBar(bar.PreviousBar);
+                    }
+                    break;
+                case SimileMark.FirstOfDouble:
+                    if (bar.PreviousBar != null && bar.PreviousBar.PreviousBar != null)
+                    {
+                        bar = GetPlaybackBar(bar.PreviousBar.PreviousBar);
+                    }
+                    break;
+                case SimileMark.SecondOfDouble:
+                    if (bar.PreviousBar != null && bar.PreviousBar.PreviousBar != null)
+                    {
+                        bar = GetPlaybackBar(bar.PreviousBar.PreviousBar);
+                    }
+                    break;
+            }
+
+            return bar;
+        }
+
+        private void GenerateVoice(Voice voice, int barStartTick, Bar realBar)
         {
             if (voice.IsEmpty && (!voice.Bar.IsEmpty || voice.Index != 0)) return;
 
             for (int i = 0, j = voice.Beats.Count; i < j; i++)
             {
-                GenerateBeat(voice.Beats[i], barStartTick);
+                GenerateBeat(voice.Beats[i], barStartTick, realBar);
             }
         }
 
-        private void GenerateBeat(Beat beat, int barStartTick)
+        private void GenerateBeat(Beat beat, int barStartTick, Bar realBar)
         {
             // TODO: take care of tripletfeel 
             var beatStart = beat.Start;
@@ -196,8 +227,28 @@ namespace AlphaTab.Audio.Generator
             beatLookup.Start = barStartTick + beatStart;
             var realTickOffset = beat.NextBeat == null ? audioDuration : beat.NextBeat.AbsoluteStart - beat.AbsoluteStart;
             beatLookup.End = barStartTick + beatStart + (realTickOffset > audioDuration ? realTickOffset : audioDuration);
-            beatLookup.Beat = beat;
-            TickLookup.AddBeat(beatLookup);
+
+            // in case of normal playback register playback
+            if (realBar == beat.Voice.Bar)
+            {
+                beatLookup.Beat = beat;
+                TickLookup.AddBeat(beatLookup);
+            }
+            // in case of bar repeats register empty beat
+            else
+            {
+                beatLookup.IsEmptyBar = true;
+                beatLookup.Beat = realBar.Voices[0].Beats[0];
+                if (_currentBarRepeatLookup == null)
+                {
+                    _currentBarRepeatLookup = beatLookup;
+                    TickLookup.AddBeat(_currentBarRepeatLookup);
+                }
+                else
+                {
+                    _currentBarRepeatLookup.End = beatLookup.End;
+                }
+            }
 
             var track = beat.Voice.Bar.Staff.Track;
 

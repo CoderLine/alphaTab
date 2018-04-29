@@ -29,6 +29,7 @@ using AlphaTab.Importer;
 using AlphaTab.IO;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
+using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
 using Haxe;
@@ -805,7 +806,6 @@ namespace AlphaTab.Platform.JavaScript
         #region Player
 
         public AlphaSynthWebWorkerApi Player { get; private set; }
-        private double _playbackSpeed;
         private MidiTickLookup _tickCache;
         private Element _cursorWrapper;
         private Element _beatCursor;
@@ -867,7 +867,6 @@ namespace AlphaTab.Platform.JavaScript
                 }));
                 Player.On("readyForPlayback", (Action)(() =>
                 {
-                    _playbackSpeed = Player.PlaybackSpeed;
                     TriggerEvent("playerReady");
                 }));
                 Player.On("soundFontLoad", (Action<object>)(data =>
@@ -1275,6 +1274,7 @@ namespace AlphaTab.Platform.JavaScript
                 return;
             }
 
+
             var barCursor = _barCursor;
             var beatCursor = _beatCursor;
 
@@ -1306,11 +1306,11 @@ namespace AlphaTab.Platform.JavaScript
 
             if (_playerState == PlayerState.Playing || stop)
             {
-                duration /= _playbackSpeed;
+                duration /= Player.PlaybackSpeed;
 
                 if (!stop)
                 {
-                    var className = "b" + beat.Id;
+                    var className = BeatContainerGlyph.GetGroupId(beat);
                     var elementsToHighlight = _element.GetElementsByClassName(className);
                     for (int i = 0; i < elementsToHighlight.Length; i++)
                     {
@@ -1321,15 +1321,25 @@ namespace AlphaTab.Platform.JavaScript
                     // get position of next beat on same stavegroup
                     if (nextBeat != null)
                     {
-                        var nextBeatBoundings = cache.FindBeat(nextBeat);
-                        if (nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds == barBoundings.StaveGroupBounds)
+                        // if we are moving within the same bar or to the next bar
+                        // transition to the next beat, otherwise transition to the end of the bar. 
+                        if (nextBeat.Voice.Bar.Index == beat.Voice.Bar.Index ||
+                            nextBeat.Voice.Bar.Index == beat.Voice.Bar.Index + 1)
                         {
-                            nextBeatX = nextBeatBoundings.VisualBounds.X;
+                            var nextBeatBoundings = cache.FindBeat(nextBeat);
+                            if (nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds ==
+                                barBoundings.StaveGroupBounds)
+                            {
+                                nextBeatX = nextBeatBoundings.VisualBounds.X;
+                            }
                         }
                     }
-
+                    
                     Browser.Window.RequestAnimationFrame(f =>
                     {
+                        Logger.Info("Player",
+                            "Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration +
+                            "(" + Player.PlaybackRange + ")");
                         beatCursor.Style.Transition = "all 0s linear";
                         beatCursor.Style.TransitionDuration = duration + "ms";
                         beatCursor.Style.Left = nextBeatX + "px";

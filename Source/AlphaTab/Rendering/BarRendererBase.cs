@@ -419,7 +419,8 @@ namespace AlphaTab.Rendering
             foreach (var voice in _voiceContainers)
             {
                 var c = _voiceContainers[voice];
-                if (!c.Voice.IsEmpty || (Bar.IsEmpty && voice == 0))
+                var isEmptyBar = (Bar.IsEmpty && voice == 0);
+                if (!c.Voice.IsEmpty || isEmptyBar)
                 {
                     for (int i = 0, j = c.BeatGlyphs.Count; i < j; i++)
                     {
@@ -441,6 +442,13 @@ namespace AlphaTab.Rendering
                             W = bc.Width,
                             H = barBounds.RealBounds.H
                         };
+
+                        if (isEmptyBar)
+                        {
+                            beatBoundings.VisualBounds.X = cx + X;
+                            beatBoundings.RealBounds.X = beatBoundings.VisualBounds.X;
+                        }
+
                         barBounds.AddBeat(beatBoundings);
                     }
                 }

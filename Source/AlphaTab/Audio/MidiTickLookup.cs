@@ -19,6 +19,7 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Util;
 
 namespace AlphaTab.Audio
 {
@@ -27,6 +28,7 @@ namespace AlphaTab.Audio
         public int Start { get; set; }
         public int End { get; set; }
         public Beat Beat { get; set; }
+        public bool IsEmptyBar { get; set; }
     }
 
     public class MasterBarTickLookup
@@ -37,6 +39,7 @@ namespace AlphaTab.Audio
         public MasterBar MasterBar { get; set; }
         //public FastDictionary<int, FastList<BeatTickLookup>> BeatsPerTrack { get; set; }
         public FastList<BeatTickLookup> Beats { get; set; }
+        public MasterBarTickLookup NextMasterBar { get; set; }
 
         public MasterBarTickLookup()
         {
@@ -85,9 +88,15 @@ namespace AlphaTab.Audio
 
         public void Finish()
         {
-            for (int i = 0; i < MasterBars.Count; i++)
+            MasterBarTickLookup previous = null;
+            foreach (var bar in MasterBars)
             {
-                MasterBars[i].Finish();
+                bar.Finish();
+                if (previous != null)
+                {
+                    previous.NextMasterBar = bar;
+                }
+                previous = bar;
             }
         }
 
@@ -152,9 +161,9 @@ namespace AlphaTab.Audio
             }
 
             // first relevant beat in next bar
-            if (nextBeat == null && masterBar.MasterBar.NextMasterBar != null)
-            { 
-                var nextBar = GetMasterBar(masterBar.MasterBar.NextMasterBar);
+            if (nextBeat == null && masterBar.NextMasterBar != null)
+            {
+                var nextBar = masterBar.NextMasterBar;
                 beats = nextBar.Beats;
                 for (int b = 0; b < beats.Count; b++)
                 {

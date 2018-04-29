@@ -37,13 +37,14 @@ namespace AlphaTab.Rendering.Layout
 
         private FastList<StaveGroup> _groups;
         private FastList<MasterBarsRenderers> _allMasterBarRenderers;
-        private MasterBarsRenderers _barsFromPreviousGroup;
+        private FastList<MasterBarsRenderers> _barsFromPreviousGroup;
         private int _endBarIndex;
 
         public override string Name { get { return "PageView"; } }
         public PageViewLayout(ScoreRenderer renderer)
             : base(renderer)
         {
+            _barsFromPreviousGroup = new FastList<MasterBarsRenderers>();
         }
 
         protected override void DoLayoutAndRender()
@@ -344,17 +345,20 @@ namespace AlphaTab.Rendering.Layout
             var end = endIndex + 1;
             for (int i = currentBarIndex; i < end; i++)
             {
-                MasterBarsRenderers renderers;
-                if (_barsFromPreviousGroup != null && _barsFromPreviousGroup.MasterBar.Index == i)
+                if (_barsFromPreviousGroup.Count > 0)
                 {
-                    renderers = group.AddMasterBarRenderers(Renderer.Tracks, _barsFromPreviousGroup);
+                    foreach (var renderer in _barsFromPreviousGroup)
+                    {
+                        group.AddMasterBarRenderers(Renderer.Tracks, renderer);
+                        i = renderer.MasterBar.Index;
+                    }
                 }
                 else
                 {
-                    renderers = group.AddBars(Renderer.Tracks, i);
+                    var renderers = group.AddBars(Renderer.Tracks, i);
                     _allMasterBarRenderers.Add(renderers);
                 }
-                _barsFromPreviousGroup = null;
+                _barsFromPreviousGroup = new FastList<MasterBarsRenderers>();
 
                 var groupIsFull = false;
 
@@ -371,13 +375,17 @@ namespace AlphaTab.Rendering.Layout
                 if (groupIsFull)
                 {
                     MasterBarsRenderers reverted = group.RevertLastBar();
+                    _barsFromPreviousGroup.Add(reverted);
+
                     while (reverted != null && !reverted.CanWrap && group.MasterBarsRenderers.Count > 1)
                     {
                         reverted = group.RevertLastBar();
+                        _barsFromPreviousGroup.Add(reverted);
                     }
                     group.IsFull = true;
                     group.IsLast = false;
-                    _barsFromPreviousGroup = renderers;
+
+                    _barsFromPreviousGroup.Reverse();
                     return group;
                 }
 

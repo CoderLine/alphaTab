@@ -4900,6 +4900,8 @@ alphaTab.rendering.layout.PageViewLayout = $hx_exports["alphaTab"]["rendering"][
 	this._allMasterBarRenderers = null;
 	this._barsFromPreviousGroup = null;
 	this._endBarIndex = 0;
+	var this1 = [];
+	this._barsFromPreviousGroup = this1;
 };
 alphaTab.rendering.layout.PageViewLayout.__name__ = ["alphaTab","rendering","layout","PageViewLayout"];
 alphaTab.rendering.layout.PageViewLayout.__super__ = alphaTab.rendering.layout.ScoreLayout;
@@ -5116,14 +5118,19 @@ alphaTab.rendering.layout.PageViewLayout.prototype = $extend(alphaTab.rendering.
 		var end = endIndex + 1;
 		var i = currentBarIndex;
 		while(i < end) {
-			var renderers;
-			if(this._barsFromPreviousGroup != null && this._barsFromPreviousGroup.MasterBar.Index == i) {
-				renderers = group.AddMasterBarRenderers(this.Renderer.Tracks,this._barsFromPreviousGroup);
+			if(this._barsFromPreviousGroup.length > 0) {
+				var renderer = $iterator(this._barsFromPreviousGroup)();
+				while(renderer.hasNext()) {
+					var renderer1 = renderer.next();
+					group.AddMasterBarRenderers(this.Renderer.Tracks,renderer1);
+					i = renderer1.MasterBar.Index;
+				}
 			} else {
-				renderers = group.AddBars(this.Renderer.Tracks,i);
+				var renderers = group.AddBars(this.Renderer.Tracks,i);
 				this._allMasterBarRenderers.push(renderers);
 			}
-			this._barsFromPreviousGroup = null;
+			var this1 = [];
+			this._barsFromPreviousGroup = this1;
 			var groupIsFull = false;
 			if(barsPerRow == -1 && (group.Width >= maxWidth && group.MasterBarsRenderers.length != 0)) {
 				groupIsFull = true;
@@ -5132,10 +5139,14 @@ alphaTab.rendering.layout.PageViewLayout.prototype = $extend(alphaTab.rendering.
 			}
 			if(groupIsFull) {
 				var reverted = group.RevertLastBar();
-				while(reverted != null && !reverted.CanWrap && group.MasterBarsRenderers.length > 1) reverted = group.RevertLastBar();
+				this._barsFromPreviousGroup.push(reverted);
+				while(reverted != null && !reverted.CanWrap && group.MasterBarsRenderers.length > 1) {
+					reverted = group.RevertLastBar();
+					this._barsFromPreviousGroup.push(reverted);
+				}
 				group.IsFull = true;
 				group.IsLast = false;
-				this._barsFromPreviousGroup = renderers;
+				this._barsFromPreviousGroup.reverse();
 				return group;
 			}
 			group.X = 0;
@@ -6900,6 +6911,7 @@ alphaTab.audio.MasterBarTickLookup = $hx_exports["alphaTab"]["audio"]["MasterBar
 	this.Tempo = 0;
 	this.MasterBar = null;
 	this.Beats = null;
+	this.NextMasterBar = null;
 	var this1 = [];
 	this.Beats = this1;
 };
@@ -6930,10 +6942,15 @@ alphaTab.audio.MidiTickLookup = $hx_exports["alphaTab"]["audio"]["MidiTickLookup
 alphaTab.audio.MidiTickLookup.__name__ = ["alphaTab","audio","MidiTickLookup"];
 alphaTab.audio.MidiTickLookup.prototype = {
 	Finish: function() {
-		var i = 0;
-		while(i < this.MasterBars.length) {
-			this.MasterBars[i].Finish();
-			++i;
+		var previous = null;
+		var bar = $iterator(this.MasterBars)();
+		while(bar.hasNext()) {
+			var bar1 = bar.next();
+			bar1.Finish();
+			if(previous != null) {
+				previous.NextMasterBar = bar1;
+			}
+			previous = bar1;
 		}
 	}
 	,FindBeat: function(tracks,tick) {
@@ -6981,8 +6998,8 @@ alphaTab.audio.MidiTickLookup.prototype = {
 			}
 			++b1;
 		}
-		if(nextBeat == null && masterBar.MasterBar.NextMasterBar != null) {
-			var nextBar = this.GetMasterBar(masterBar.MasterBar.NextMasterBar);
+		if(nextBeat == null && masterBar.NextMasterBar != null) {
+			var nextBar = masterBar.NextMasterBar;
 			beats = nextBar.Beats;
 			var b2 = 0;
 			while(b2 < beats.length) {
@@ -7156,6 +7173,7 @@ alphaTab.audio.generator.MidiFileGenerator = $hx_exports["alphaTab"]["audio"]["g
 	this._score = null;
 	this._handler = null;
 	this._currentTempo = 0;
+	this._currentBarRepeatLookup = null;
 	this.TickLookup = null;
 	this._score = score;
 	this._currentTempo = this._score.Tempo;
@@ -7248,33 +7266,68 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		this.TickLookup.AddMasterBar(masterBarLookup);
 	}
 	,GenerateBar: function(bar,barStartTick) {
+		var playbackBar = this.GetPlaybackBar(bar);
+		this._currentBarRepeatLookup = null;
 		var i = 0;
-		var j = bar.Voices.length;
+		var j = playbackBar.Voices.length;
 		while(i < j) {
-			this.GenerateVoice(bar.Voices[i],barStartTick);
+			this.GenerateVoice(playbackBar.Voices[i],barStartTick,bar);
 			++i;
 		}
 	}
-	,GenerateVoice: function(voice,barStartTick) {
+	,GetPlaybackBar: function(bar) {
+		var _g = bar.SimileMark;
+		switch(_g) {
+		case 1:
+			if(bar.PreviousBar != null) {
+				bar = this.GetPlaybackBar(bar.PreviousBar);
+			}
+			break;
+		case 2:
+			if(bar.PreviousBar != null && bar.PreviousBar.PreviousBar != null) {
+				bar = this.GetPlaybackBar(bar.PreviousBar.PreviousBar);
+			}
+			break;
+		case 3:
+			if(bar.PreviousBar != null && bar.PreviousBar.PreviousBar != null) {
+				bar = this.GetPlaybackBar(bar.PreviousBar.PreviousBar);
+			}
+			break;
+		default:
+		}
+		return bar;
+	}
+	,GenerateVoice: function(voice,barStartTick,realBar) {
 		if(voice.IsEmpty && (!voice.Bar.get_IsEmpty() || voice.Index != 0)) {
 			return;
 		}
 		var i = 0;
 		var j = voice.Beats.length;
 		while(i < j) {
-			this.GenerateBeat(voice.Beats[i],barStartTick);
+			this.GenerateBeat(voice.Beats[i],barStartTick,realBar);
 			++i;
 		}
 	}
-	,GenerateBeat: function(beat,barStartTick) {
+	,GenerateBeat: function(beat,barStartTick,realBar) {
 		var beatStart = beat.Start;
 		var audioDuration = beat.Voice.Bar.get_IsEmpty() ? beat.Voice.Bar.get_MasterBar().CalculateDuration() : beat.CalculateDuration();
 		var beatLookup = new alphaTab.audio.BeatTickLookup();
 		beatLookup.Start = barStartTick + beatStart;
 		var realTickOffset = beat.NextBeat == null ? audioDuration : beat.NextBeat.get_AbsoluteStart() - beat.get_AbsoluteStart();
 		beatLookup.End = barStartTick + beatStart + (realTickOffset > audioDuration ? realTickOffset : audioDuration);
-		beatLookup.Beat = beat;
-		this.TickLookup.AddBeat(beatLookup);
+		if(realBar == beat.Voice.Bar) {
+			beatLookup.Beat = beat;
+			this.TickLookup.AddBeat(beatLookup);
+		} else {
+			beatLookup.IsEmptyBar = true;
+			beatLookup.Beat = realBar.Voices[0].Beats[0];
+			if(this._currentBarRepeatLookup == null) {
+				this._currentBarRepeatLookup = beatLookup;
+				this.TickLookup.AddBeat(this._currentBarRepeatLookup);
+			} else {
+				this._currentBarRepeatLookup.End = beatLookup.End;
+			}
+		}
 		var track = beat.Voice.Bar.Staff.Track;
 		var i = 0;
 		var j = beat.Automations.length;
@@ -21897,7 +21950,6 @@ alphaTab.platform.javaScript.AlphaTabApi = $hx_exports["alphaTab"]["platform"]["
 	this.Score = null;
 	this.TrackIndexes = null;
 	this.Player = null;
-	this._playbackSpeed = 0.0;
 	this._tickCache = null;
 	this._cursorWrapper = null;
 	this._beatCursor = null;
@@ -22483,7 +22535,6 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 				_gthis.LoadMidiForScore();
 			});
 			this.Player.On("readyForPlayback",function() {
-				_gthis._playbackSpeed = _gthis.Player.get_PlaybackSpeed();
 				_gthis.TriggerEvent("playerReady",null);
 			});
 			this.Player.On("soundFontLoad",function(data) {
@@ -22758,6 +22809,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		});
 	}
 	,CursorUpdateBeat: function(beat,nextBeat,duration,stop) {
+		var _gthis = this;
 		if(beat == null) {
 			return;
 		}
@@ -22793,9 +22845,10 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		var elements = this._element.getElementsByClassName("atHighlight");
 		while(elements.length > 0) elements.item(0).classList.remove("atHighlight");
 		if(this._playerState == 1 || stop) {
-			duration = duration / this._playbackSpeed;
+			var duration1 = this.Player.get_PlaybackSpeed();
+			duration = duration / duration1;
 			if(!stop) {
-				var className = "b" + beat.Id;
+				var className = alphaTab.rendering.glyphs.BeatContainerGlyph.GetGroupId(beat);
 				var elementsToHighlight = this._element.getElementsByClassName(className);
 				var i = 0;
 				while(i < elementsToHighlight.length) {
@@ -22804,12 +22857,15 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 				}
 				var nextBeatX = barBoundings.VisualBounds.X + barBoundings.VisualBounds.W;
 				if(nextBeat != null) {
-					var nextBeatBoundings = cache.FindBeat(nextBeat);
-					if(nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds == barBoundings.StaveGroupBounds) {
-						nextBeatX = nextBeatBoundings.VisualBounds.X;
+					if(nextBeat.Voice.Bar.Index == beat.Voice.Bar.Index || nextBeat.Voice.Bar.Index == beat.Voice.Bar.Index + 1) {
+						var nextBeatBoundings = cache.FindBeat(nextBeat);
+						if(nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds == barBoundings.StaveGroupBounds) {
+							nextBeatX = nextBeatBoundings.VisualBounds.X;
+						}
 					}
 				}
 				window.requestAnimationFrame(function(f) {
+					alphaTab.util.Logger.Info("Player","Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration + "(" + Std.string(_gthis.Player.get_PlaybackRange()) + ")",null);
 					beatCursor.style.transition = "all 0s linear";
 					beatCursor.style.transitionDuration = duration + "ms";
 					beatCursor.style.left = Std.string(nextBeatX) + "px";
@@ -23623,7 +23679,8 @@ alphaTab.rendering.BarRendererBase.prototype = {
 		while(voice.hasNext()) {
 			var voice1 = voice.next();
 			var c = this._voiceContainers[voice1];
-			if(!c.Voice.IsEmpty || this.Bar.get_IsEmpty() && voice1 == 0) {
+			var isEmptyBar = this.Bar.get_IsEmpty() && voice1 == 0;
+			if(!c.Voice.IsEmpty || isEmptyBar) {
 				var i = 0;
 				var j = c.BeatGlyphs.length;
 				while(i < j) {
@@ -23642,6 +23699,10 @@ alphaTab.rendering.BarRendererBase.prototype = {
 					_tmp3.W = bc.Width;
 					_tmp3.H = barBounds.RealBounds.H;
 					beatBoundings.RealBounds = _tmp3;
+					if(isEmptyBar) {
+						beatBoundings.VisualBounds.X = cx + this.X;
+						beatBoundings.RealBounds.X = beatBoundings.VisualBounds.X;
+					}
 					barBounds.AddBeat(beatBoundings);
 					++i;
 				}
@@ -25031,6 +25092,9 @@ alphaTab.rendering.glyphs.BeatContainerGlyph = $hx_exports["alphaTab"]["renderin
 	this.VoiceContainer = voiceContainer;
 };
 alphaTab.rendering.glyphs.BeatContainerGlyph.__name__ = ["alphaTab","rendering","glyphs","BeatContainerGlyph"];
+alphaTab.rendering.glyphs.BeatContainerGlyph.GetGroupId = function(beat) {
+	return "b" + beat.Id;
+};
 alphaTab.rendering.glyphs.BeatContainerGlyph.__super__ = alphaTab.rendering.glyphs.Glyph;
 alphaTab.rendering.glyphs.BeatContainerGlyph.prototype = $extend(alphaTab.rendering.glyphs.Glyph.prototype,{
 	get_OnTimeX: function() {
@@ -25115,7 +25179,7 @@ alphaTab.rendering.glyphs.BeatContainerGlyph.prototype = $extend(alphaTab.render
 		if(isEmptyGlyph) {
 			return;
 		}
-		canvas.BeginGroup("b" + this.Beat.Id);
+		canvas.BeginGroup(alphaTab.rendering.glyphs.BeatContainerGlyph.GetGroupId(this.Beat));
 		this.PreNotes.Paint(cx + this.X,cy + this.Y,canvas);
 		this.OnNotes.Paint(cx + this.X,cy + this.Y,canvas);
 		var staffX = cx - this.VoiceContainer.X - this.Renderer.X;
