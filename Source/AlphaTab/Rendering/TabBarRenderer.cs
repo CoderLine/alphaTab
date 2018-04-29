@@ -174,7 +174,7 @@ namespace AlphaTab.Rendering
                     AddPostBeatGlyph(new RepeatCountGlyph(0, GetTabY(-0.5f, -3), Bar.MasterBar.RepeatCount));
                 }
             }
-            else if (Bar.NextBar == null || !Bar.NextBar.MasterBar.IsRepeatStart)
+            else
             {
                 AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
             }
@@ -264,6 +264,7 @@ namespace AlphaTab.Rendering
             }
 
             canvas.Color = res.MainGlyphColor;
+            PaintSimileMark(cx, cy, canvas);
 
             // Info guides for debugging
 
@@ -272,6 +273,7 @@ namespace AlphaTab.Rendering
             //DrawInfoGuide(canvas, cx, cy, stave.StaveBottom, new Color(0,255,0)); // stavebottom
             //DrawInfoGuide(canvas, cx, cy, Height, new Color(255, 0, 0)); // bottom
         }
+
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {

@@ -161,6 +161,11 @@ namespace AlphaTab.Rendering.Staves
                     {
                         result.IsLinkedToPrevious = true;
                     }
+
+                    if (!renderer.CanWrap)
+                    {
+                        result.CanWrap = false;
+                    }
                 }
             }
             barLayoutingInfo.Finish();
@@ -171,20 +176,24 @@ namespace AlphaTab.Rendering.Staves
             return result;
         }
 
-        public void RevertLastBar()
+        public MasterBarsRenderers RevertLastBar()
         {
             if (MasterBarsRenderers.Count > 1)
             {
+                var toRemove = MasterBarsRenderers[MasterBarsRenderers.Count - 1];
                 MasterBarsRenderers.RemoveAt(MasterBarsRenderers.Count - 1);
                 var w = 0f;
                 for (int i = 0, j = _allStaves.Count; i < j; i++)
                 {
                     var s = _allStaves[i];
-                    w = Math.Max(w, s.BarRenderers[s.BarRenderers.Count - 1].Width);
-                    s.RevertLastBar();
+                    var lastBar = s.RevertLastBar();
+                    w = Math.Max(w, lastBar.Width);
                 }
                 Width -= w;
+
+                return toRemove;
             }
+            return null;
         }
 
         public float UpdateWidth()

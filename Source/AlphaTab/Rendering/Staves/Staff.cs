@@ -153,11 +153,12 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public void RevertLastBar()
+        public BarRendererBase RevertLastBar()
         {
             var lastBar = BarRenderers[BarRenderers.Count - 1];
             BarRenderers.RemoveAt(BarRenderers.Count - 1);
             StaveGroup.Layout.UnregisterBarRenderer(StaveId, lastBar);
+            return lastBar;
         }
 
         public void ScaleToWidth(float width)

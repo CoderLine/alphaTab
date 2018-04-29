@@ -81,11 +81,19 @@ namespace AlphaTab.Rendering
         /// </summary>
         public bool IsLinkedToPrevious { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether this renderer can wrap to the next line
+        /// or it needs to stay connected to the previous one. 
+        /// (e.g. when having double bar repeats we must not separate the 2 bars)
+        /// </summary>
+        public bool CanWrap { get; set; }
+
         public BarRendererBase(ScoreRenderer renderer, Bar bar)
         {
             Bar = bar;
             ScoreRenderer = renderer;
             Helpers = new BarHelpers(bar);
+            CanWrap = true;
         }
 
         public void RegisterOverflowTop(float topOverflow)
@@ -266,6 +274,11 @@ namespace AlphaTab.Rendering
                 }
             }
 
+            if (Bar.SimileMark == SimileMark.SecondOfDouble)
+            {
+                CanWrap = false;
+            }
+
             CreatePreBeatGlyphs();
             CreateBeatGlyphs();
             CreatePostBeatGlyphs();
@@ -369,6 +382,20 @@ namespace AlphaTab.Rendering
             //canvas.FillRect(cx + X, cy + Y, Width, Height);
         }
 
+        protected void PaintSimileMark(float cx, float cy, ICanvas canvas)
+        {
+            switch (Bar.SimileMark)
+            {
+                case SimileMark.Simple:
+                    canvas.FillMusicFontSymbol(cx + X + (Width - 20 * Scale) / 2, cy + Y + Height / 2, 1,
+                        MusicFontSymbol.SimileMarkSimple);
+                    break;
+                case SimileMark.SecondOfDouble:
+                    canvas.FillMusicFontSymbol(cx + X - (28 * Scale) / 2, cy + Y + Height / 2, 1,
+                        MusicFontSymbol.SimileMarkDouble);
+                    break;
+            }
+        }
         public virtual void BuildBoundingsLookup(MasterBarBounds masterBarBounds, float cx, float cy)
         {
             var barBounds = new BarBounds();

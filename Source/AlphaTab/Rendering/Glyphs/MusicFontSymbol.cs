@@ -127,5 +127,8 @@ namespace AlphaTab.Rendering.Glyphs
         Ottava15ma = 0xE515,
         OttavaMBaseline = 0xEC95,
         OttavaBBaseline = 0xEC93,
+
+        SimileMarkSimple = 0xE500,
+        SimileMarkDouble = 0xE501
     }
 }

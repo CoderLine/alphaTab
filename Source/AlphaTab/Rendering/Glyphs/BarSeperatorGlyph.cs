@@ -48,7 +48,7 @@ namespace AlphaTab.Rendering.Glyphs
                 // big bar
                 canvas.FillRect(left + Width - blockWidth, top, blockWidth, h);
             }
-            else
+            else if(Renderer.NextRenderer == null || Renderer.NextRenderer.Staff != Renderer.Staff || !Renderer.NextRenderer.Bar.MasterBar.IsRepeatStart)
             {
                 // small bar
                 canvas.FillRect(left + Width, top, Scale, h);

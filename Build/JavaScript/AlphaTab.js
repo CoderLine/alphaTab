@@ -27,6 +27,7 @@ $hx_exports["alphaTab"]["model"]["_WhammyType"] = $hx_exports["alphaTab"]["model
 ;$hx_exports["alphaTab"]["model"]["_TripletFeel"] = $hx_exports["alphaTab"]["model"]["_TripletFeel"] || {};
 ;$hx_exports["alphaTab"]["model"]["_StaffKind"] = $hx_exports["alphaTab"]["model"]["_StaffKind"] || {};
 ;$hx_exports["alphaTab"]["model"]["_SlideType"] = $hx_exports["alphaTab"]["model"]["_SlideType"] || {};
+;$hx_exports["alphaTab"]["model"]["_SimileMark"] = $hx_exports["alphaTab"]["model"]["_SimileMark"] || {};
 ;$hx_exports["alphaTab"]["model"]["_PickStrokeType"] = $hx_exports["alphaTab"]["model"]["_PickStrokeType"] || {};
 ;$hx_exports["alphaTab"]["model"]["_Ottavia"] = $hx_exports["alphaTab"]["model"]["_Ottavia"] || {};
 ;$hx_exports["alphaTab"]["model"]["_NoteAccidentalMode"] = $hx_exports["alphaTab"]["model"]["_NoteAccidentalMode"] || {};
@@ -5031,6 +5032,10 @@ alphaTab.rendering.layout.PageViewLayout.prototype = $extend(alphaTab.rendering.
 					group1.AddMasterBarRenderers(this.Renderer.Tracks,renderers);
 					++currentIndex;
 				} else {
+					while(renderers != null && !renderers.CanWrap) {
+						renderers = group1.RevertLastBar();
+						--currentIndex;
+					}
 					group1.IsFull = true;
 					group1.IsLast = this._endBarIndex == group1.get_LastBarIndex();
 					this._groups.push(group1);
@@ -5126,7 +5131,8 @@ alphaTab.rendering.layout.PageViewLayout.prototype = $extend(alphaTab.rendering.
 				groupIsFull = true;
 			}
 			if(groupIsFull) {
-				group.RevertLastBar();
+				var reverted = group.RevertLastBar();
+				while(reverted != null && !reverted.CanWrap) reverted = group.RevertLastBar();
 				group.IsFull = true;
 				group.IsLast = false;
 				this._barsFromPreviousGroup = renderers;
@@ -15096,6 +15102,21 @@ alphaTab.importer.GpifParser.prototype = {
 					default:
 					}
 					break;
+				case "SimileMark":
+					var _g3 = c1.get_InnerText();
+					switch(_g3) {
+					case "FirstOfDouble":
+						bar.SimileMark = 2;
+						break;
+					case "SecondOfDouble":
+						bar.SimileMark = 3;
+						break;
+					case "Simple":
+						bar.SimileMark = 1;
+						break;
+					default:
+					}
+					break;
 				case "Voices":
 					var this1 = this._voicesOfBar;
 					var a = c1.get_InnerText();
@@ -18304,11 +18325,13 @@ alphaTab.model.Bar = $hx_exports["alphaTab"]["model"]["Bar"] = function() {
 	this.ClefOttava = 0;
 	this.Staff = null;
 	this.Voices = null;
+	this.SimileMark = 0;
 	this.Id = alphaTab.model.Bar.GlobalBarId++;
 	var this1 = [];
 	this.Voices = this1;
 	this.Clef = 4;
 	this.ClefOttava = 2;
+	this.SimileMark = 0;
 };
 alphaTab.model.Bar.__name__ = ["alphaTab","model","Bar"];
 alphaTab.model.Bar.CopyTo = function(src,dst) {
@@ -18316,6 +18339,7 @@ alphaTab.model.Bar.CopyTo = function(src,dst) {
 	dst.Index = src.Index;
 	dst.Clef = src.Clef;
 	dst.ClefOttava = src.ClefOttava;
+	dst.SimileMark = src.SimileMark;
 };
 alphaTab.model.Bar.prototype = {
 	AddVoice: function(voice) {
@@ -20562,6 +20586,58 @@ alphaTab.model.Section.CopyTo = function(src,dst) {
 };
 alphaTab.model.Section.prototype = {
 	__class__: alphaTab.model.Section
+};
+alphaTab.model._SimileMark = {};
+alphaTab.model._SimileMark.SimileMark_Impl_ = $hx_exports["alphaTab"]["model"]["_SimileMark"]["SimileMark_Impl_"] = {};
+alphaTab.model._SimileMark.SimileMark_Impl_.__name__ = ["alphaTab","model","_SimileMark","SimileMark_Impl_"];
+alphaTab.model._SimileMark.SimileMark_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaTab.model._SimileMark.SimileMark_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaTab.model._SimileMark.SimileMark_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaTab.model._SimileMark.SimileMark_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaTab.model._SimileMark.SimileMark_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaTab.model._SimileMark.SimileMark_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaTab.model._SimileMark.SimileMark_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaTab.model._SimileMark.SimileMark_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaTab.model._SimileMark.SimileMark_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaTab.model._SimileMark.SimileMark_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaTab.model._SimileMark.SimileMark_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaTab.model._SimileMark.SimileMark_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaTab.model._SimileMark.SimileMark_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "None";
+	case 1:
+		return "Simple";
+	case 2:
+		return "FirstOfDouble";
+	case 3:
+		return "SecondOfDouble";
+	}
+	return "";
 };
 alphaTab.model._SlideType = {};
 alphaTab.model._SlideType.SlideType_Impl_ = $hx_exports["alphaTab"]["model"]["_SlideType"]["SlideType_Impl_"] = {};
@@ -23309,6 +23385,7 @@ alphaTab.rendering.BarRendererBase = $hx_exports["alphaTab"]["rendering"]["BarRe
 	this.Helpers = null;
 	this.Bar = null;
 	this.IsLinkedToPrevious = false;
+	this.CanWrap = false;
 	this.ScoreRenderer = null;
 	this._wasFirstOfLine = false;
 	this.LayoutingInfo = null;
@@ -23319,6 +23396,7 @@ alphaTab.rendering.BarRendererBase = $hx_exports["alphaTab"]["rendering"]["BarRe
 	this.Bar = bar;
 	this.ScoreRenderer = renderer;
 	this.Helpers = new alphaTab.rendering.utils.BarHelpers(bar);
+	this.CanWrap = true;
 };
 alphaTab.rendering.BarRendererBase.__name__ = ["alphaTab","rendering","BarRendererBase"];
 alphaTab.rendering.BarRendererBase.prototype = {
@@ -23437,6 +23515,9 @@ alphaTab.rendering.BarRendererBase.prototype = {
 			}
 			++i;
 		}
+		if(this.Bar.SimileMark == 3) {
+			this.CanWrap = false;
+		}
 		this.CreatePreBeatGlyphs();
 		this.CreateBeatGlyphs();
 		this.CreatePostBeatGlyphs();
@@ -23507,6 +23588,18 @@ alphaTab.rendering.BarRendererBase.prototype = {
 		this._postBeatGlyphs.Paint(cx + this.X,cy + this.Y,canvas);
 	}
 	,PaintBackground: function(cx,cy,canvas) {
+	}
+	,PaintSimileMark: function(cx,cy,canvas) {
+		var _g = this.Bar.SimileMark;
+		switch(_g) {
+		case 1:
+			canvas.FillMusicFontSymbol(cx + this.X + (this.Width - 20 * this.get_Scale()) / 2,cy + this.Y + this.Height / 2,1,58624);
+			break;
+		case 3:
+			canvas.FillMusicFontSymbol(cx + this.X - 28 * this.get_Scale() / 2,cy + this.Y + this.Height / 2,1,58625);
+			break;
+		default:
+		}
 	}
 	,BuildBoundingsLookup: function(masterBarBounds,cx,cy) {
 		var _gthis = this;
@@ -24804,7 +24897,7 @@ alphaTab.rendering.ScoreBarRenderer.prototype = $extend(alphaTab.rendering.BarRe
 			if(this.Bar.get_MasterBar().RepeatCount > 2) {
 				this.AddPostBeatGlyph(new alphaTab.rendering.glyphs.RepeatCountGlyph(0,this.GetScoreY(-1,-3),this.Bar.get_MasterBar().RepeatCount));
 			}
-		} else if(this.Bar.NextBar == null || !this.Bar.NextBar.get_MasterBar().IsRepeatStart) {
+		} else {
 			this.AddPostBeatGlyph(new alphaTab.rendering.glyphs.BarSeperatorGlyph(0,0));
 		}
 	}
@@ -24920,6 +25013,7 @@ alphaTab.rendering.ScoreBarRenderer.prototype = $extend(alphaTab.rendering.BarRe
 			++i;
 		}
 		canvas.set_Color(res.MainGlyphColor);
+		this.PaintSimileMark(cx,cy,canvas);
 	}
 	,__class__: alphaTab.rendering.ScoreBarRenderer
 });
@@ -25455,7 +25549,7 @@ alphaTab.rendering.TabBarRenderer.prototype = $extend(alphaTab.rendering.BarRend
 			if(this.Bar.get_MasterBar().RepeatCount > 2) {
 				this.AddPostBeatGlyph(new alphaTab.rendering.glyphs.RepeatCountGlyph(0,this.GetTabY(-0.5,-3),this.Bar.get_MasterBar().RepeatCount));
 			}
-		} else if(this.Bar.NextBar == null || !this.Bar.NextBar.get_MasterBar().IsRepeatStart) {
+		} else {
 			this.AddPostBeatGlyph(new alphaTab.rendering.glyphs.BarSeperatorGlyph(0,0));
 		}
 	}
@@ -25546,6 +25640,7 @@ alphaTab.rendering.TabBarRenderer.prototype = $extend(alphaTab.rendering.BarRend
 			++i1;
 		}
 		canvas.set_Color(res.MainGlyphColor);
+		this.PaintSimileMark(cx,cy,canvas);
 	}
 	,Paint: function(cx,cy,canvas) {
 		alphaTab.rendering.BarRendererBase.prototype.Paint.call(this,cx,cy,canvas);
@@ -25981,7 +26076,7 @@ alphaTab.rendering.glyphs.BarSeperatorGlyph.prototype = $extend(alphaTab.renderi
 			var this1 = left;
 			canvas.FillRect(this1,top,this.get_Scale(),h);
 			canvas.FillRect(left + this.Width - blockWidth,top,blockWidth,h);
-		} else {
+		} else if(this.Renderer.get_NextRenderer() == null || this.Renderer.get_NextRenderer().Staff != this.Renderer.Staff || !this.Renderer.get_NextRenderer().Bar.get_MasterBar().IsRepeatStart) {
 			canvas.FillRect(left + this.Width,top,this.get_Scale(),h);
 			if(this.Renderer.Bar.get_MasterBar().IsDoubleBar) {
 				canvas.FillRect(left + this.Width - 5 * this.get_Scale(),top,this.get_Scale(),h);
@@ -27153,6 +27248,10 @@ alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.toString = func
 		return "RestOneHundredTwentyEighth";
 	case 58603:
 		return "RestTwoHundredFiftySixth";
+	case 58624:
+		return "SimileMarkSimple";
+	case 58625:
+		return "SimileMarkDouble";
 	case 58640:
 		return "Ottava8";
 	case 58641:
@@ -30560,11 +30659,13 @@ alphaTab.rendering.staves.BarLayoutingInfo.prototype = {
 alphaTab.rendering.staves.MasterBarsRenderers = $hx_exports["alphaTab"]["rendering"]["staves"]["MasterBarsRenderers"] = function() {
 	this.Width = 0.0;
 	this.IsLinkedToPrevious = false;
+	this.CanWrap = false;
 	this.MasterBar = null;
 	this.Renderers = null;
 	this.LayoutingInfo = null;
 	var this1 = [];
 	this.Renderers = this1;
+	this.CanWrap = true;
 };
 alphaTab.rendering.staves.MasterBarsRenderers.__name__ = ["alphaTab","rendering","staves","MasterBarsRenderers"];
 alphaTab.rendering.staves.MasterBarsRenderers.prototype = {
@@ -30661,6 +30762,7 @@ alphaTab.rendering.staves.Staff.prototype = {
 			this.BarRenderers.splice(index,1);
 		}
 		this.StaveGroup.Layout.UnregisterBarRenderer(this.get_StaveId(),lastBar);
+		return lastBar;
 	}
 	,ScaleToWidth: function(width) {
 		var this1 = {}
@@ -30813,6 +30915,9 @@ alphaTab.rendering.staves.StaveGroup.prototype = {
 				if(renderer.IsLinkedToPrevious) {
 					result.IsLinkedToPrevious = true;
 				}
+				if(!renderer.CanWrap) {
+					result.CanWrap = false;
+				}
 			}
 		}
 		barLayoutingInfo.Finish();
@@ -30821,6 +30926,7 @@ alphaTab.rendering.staves.StaveGroup.prototype = {
 	}
 	,RevertLastBar: function() {
 		if(this.MasterBarsRenderers.length > 1) {
+			var toRemove = this.MasterBarsRenderers[this.MasterBarsRenderers.length - 1];
 			var index = this.MasterBarsRenderers.length - 1;
 			if(index != -1) {
 				this.MasterBarsRenderers.splice(index,1);
@@ -30830,12 +30936,14 @@ alphaTab.rendering.staves.StaveGroup.prototype = {
 			var j = this._allStaves.length;
 			while(i < j) {
 				var s = this._allStaves[i];
-				w = Math.max(w,s.BarRenderers[s.BarRenderers.length - 1].Width);
-				s.RevertLastBar();
+				var lastBar = s.RevertLastBar();
+				w = Math.max(w,lastBar.Width);
 				++i;
 			}
 			this.Width = this.Width - w;
+			return toRemove;
 		}
+		return null;
 	}
 	,UpdateWidth: function() {
 		var realWidth = 0;
@@ -34629,6 +34737,10 @@ alphaTab.model._Ottavia.Ottavia_Impl_._15mb = 4;
 alphaTab.model._PickStrokeType.PickStrokeType_Impl_.None = 0;
 alphaTab.model._PickStrokeType.PickStrokeType_Impl_.Up = 1;
 alphaTab.model._PickStrokeType.PickStrokeType_Impl_.Down = 2;
+alphaTab.model._SimileMark.SimileMark_Impl_.None = 0;
+alphaTab.model._SimileMark.SimileMark_Impl_.Simple = 1;
+alphaTab.model._SimileMark.SimileMark_Impl_.FirstOfDouble = 2;
+alphaTab.model._SimileMark.SimileMark_Impl_.SecondOfDouble = 3;
 alphaTab.model._SlideType.SlideType_Impl_.None = 0;
 alphaTab.model._SlideType.SlideType_Impl_.Shift = 1;
 alphaTab.model._SlideType.SlideType_Impl_.Legato = 2;
@@ -34794,6 +34906,8 @@ alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.Ottava15 = 5864
 alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.Ottava15ma = 58645;
 alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.OttavaMBaseline = 60565;
 alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.OttavaBBaseline = 60563;
+alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.SimileMarkSimple = 58624;
+alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.SimileMarkDouble = 58625;
 alphaTab.rendering.glyphs.NoteHeadGlyph.GraceScale = 0.75;
 alphaTab.rendering.glyphs.NoteHeadGlyph.NoteHeadHeight = 9;
 alphaTab.rendering.glyphs.NoteHeadGlyph.QuarterNoteHeadWidth = 8;

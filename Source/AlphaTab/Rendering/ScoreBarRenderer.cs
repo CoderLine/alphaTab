@@ -787,7 +787,7 @@ namespace AlphaTab.Rendering
                     AddPostBeatGlyph(new RepeatCountGlyph(0, GetScoreY(-1, -3), Bar.MasterBar.RepeatCount));
                 }
             }
-            else if (Bar.NextBar == null || !Bar.NextBar.MasterBar.IsRepeatStart)
+            else
             {
                 AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
             }
@@ -936,6 +936,8 @@ namespace AlphaTab.Rendering
             }
 
             canvas.Color = res.MainGlyphColor;
+
+            PaintSimileMark(cx, cy, canvas);
         }
     }
 }
