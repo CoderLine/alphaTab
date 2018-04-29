@@ -5032,7 +5032,7 @@ alphaTab.rendering.layout.PageViewLayout.prototype = $extend(alphaTab.rendering.
 					group1.AddMasterBarRenderers(this.Renderer.Tracks,renderers);
 					++currentIndex;
 				} else {
-					while(renderers != null && !renderers.CanWrap) {
+					while(renderers != null && !renderers.CanWrap && group1.MasterBarsRenderers.length > 1) {
 						renderers = group1.RevertLastBar();
 						--currentIndex;
 					}
@@ -5132,7 +5132,7 @@ alphaTab.rendering.layout.PageViewLayout.prototype = $extend(alphaTab.rendering.
 			}
 			if(groupIsFull) {
 				var reverted = group.RevertLastBar();
-				while(reverted != null && !reverted.CanWrap) reverted = group.RevertLastBar();
+				while(reverted != null && !reverted.CanWrap && group.MasterBarsRenderers.length > 1) reverted = group.RevertLastBar();
 				group.IsFull = true;
 				group.IsLast = false;
 				this._barsFromPreviousGroup = renderers;

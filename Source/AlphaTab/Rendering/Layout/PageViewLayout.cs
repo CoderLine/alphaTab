@@ -222,7 +222,7 @@ namespace AlphaTab.Rendering.Layout
                     {
                         // if we cannot wrap on the current bar, we remove the last bar
                         // (this might even remove multiple ones until we reach a bar that can wrap);
-                        while (renderers != null && !renderers.CanWrap)
+                        while (renderers != null && !renderers.CanWrap && group.MasterBarsRenderers.Count > 1)
                         {
                             renderers = group.RevertLastBar();
                             currentIndex--;
@@ -371,7 +371,7 @@ namespace AlphaTab.Rendering.Layout
                 if (groupIsFull)
                 {
                     MasterBarsRenderers reverted = group.RevertLastBar();
-                    while (reverted != null && !reverted.CanWrap)
+                    while (reverted != null && !reverted.CanWrap && group.MasterBarsRenderers.Count > 1)
                     {
                         reverted = group.RevertLastBar();
                     }
