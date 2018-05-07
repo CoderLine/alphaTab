@@ -46,7 +46,7 @@ namespace AlphaTab.Importer
             {
                 if (xhr.ReadyState == XMLHttpRequest.DONE)
                 {
-                    if (xhr.Status == 200)
+                    if (xhr.Status == 200 || (xhr.Status == 0 && xhr.Response))
                     {
                         try
                         {

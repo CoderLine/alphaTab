@@ -1,20 +1,3 @@
-/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
 (function ($hx_exports, $global) { "use strict";
 $hx_exports["alphaTab"] = $hx_exports["alphaTab"] || {};
 $hx_exports["alphaTab"]["xml"] = $hx_exports["alphaTab"]["xml"] || {};
@@ -3755,7 +3738,7 @@ alphaTab.audio.synth.util.Tables.CreateExponentialTable = function(size,coeff) {
 	var x = 0;
 	while(x < size) {
 		graph[x] = js.Boot.__cast(val , Float);
-		val = val + coeff * (1.5873015873015872 - val);
+		val = val + coeff * (1.58730158730158721 - val);
 		++x;
 	}
 	var x1 = 0;
@@ -3768,7 +3751,7 @@ alphaTab.audio.synth.util.Tables.CreateExponentialTable = function(size,coeff) {
 alphaTab.audio.synth.util.Tables.CreateSineTable = function(size) {
 	var this1 = new Float32Array(size);
 	var graph = this1;
-	var inc = js.Boot.__cast(4.7123889803846852 , Float) / (size - 1);
+	var inc = js.Boot.__cast(4.71238898038468523 , Float) / (size - 1);
 	var phase = 0.0;
 	var x = 0;
 	while(x < size) {
@@ -6395,18 +6378,21 @@ alphaTab.Settings.AppendScriptName = function(url) {
 };
 alphaTab.Settings.EnsureFullUrl = function(relativeUrl) {
 	var global = $global;
-	if(!StringTools.startsWith(relativeUrl,"http") && !StringTools.startsWith(relativeUrl,"https")) {
+	if(!StringTools.startsWith(relativeUrl,"http") && !StringTools.startsWith(relativeUrl,"https") && !StringTools.startsWith(relativeUrl,"file")) {
 		var this1 = "";
 		var root = this1;
 		root += Std.string(global.location.protocol);
 		root += Std.string("//");
-		root += Std.string(global.location.hostName);
+		if(global.location.hostname) {
+			root += Std.string(global.location.hostname);
+		}
 		if(global.location.port) {
 			root += Std.string(":");
 			root += Std.string(global.location.port);
 		}
+		root += Std.string(global.location.pathname.split("/").slice(0,-1).join("/"));
 		root += Std.string(relativeUrl);
-		if(!StringTools.endsWith(relativeUrl,"/")) {
+		if(!StringTools.endsWith(root,"/")) {
 			root += Std.string("/");
 		}
 		return root;
@@ -8949,11 +8935,11 @@ alphaTab.audio.synth.bank.patch.Sf2Patch.CalculateModulator = function(s,t,d,p,v
 		break;
 	case 1:
 		i = 127 - value;
-		output = -0.20833333333333334 * (Math.log(i * i / js.Boot.__cast(max * max , Float)) / Math.log(10));
+		output = -0.208333333333333343 * (Math.log(i * i / js.Boot.__cast(max * max , Float)) / Math.log(10));
 		break;
 	case 2:
 		i = value;
-		output = 1 + 0.20833333333333334 * (Math.log(i * i / js.Boot.__cast(max * max , Float)) / Math.log(10));
+		output = 1 + 0.208333333333333343 * (Math.log(i * i / js.Boot.__cast(max * max , Float)) / Math.log(10));
 		break;
 	case 3:
 		if(value <= (max / 2 | 0)) {
@@ -11215,6 +11201,9 @@ alphaTab.collections._StringBuilder.StringBuilder_Impl_.AppendLine = function(th
 };
 alphaTab.collections._StringBuilder.StringBuilder_Impl_.ToString = function(this1) {
 	return this1;
+};
+alphaTab.collections._StringBuilder.StringBuilder_Impl_.EndsWith = function(this1,s) {
+	return StringTools.endsWith(this1,s);
 };
 alphaTab.exporter = {};
 alphaTab.exporter.AlphaTexExporter = $hx_exports["alphaTab"]["exporter"]["AlphaTexExporter"] = function() {
@@ -17273,7 +17262,7 @@ alphaTab.importer.ScoreLoader.LoadScoreAsync = function(path,success,error,impor
 	xhr.responseType = "arraybuffer";
 	xhr.onreadystatechange = function() {
 		if(xhr.readyState == 4) {
-			if(xhr.status == 200) {
+			if(xhr.status == 200 || xhr.status == 0 && xhr.response) {
 				try {
 					var buffer = xhr.response;
 					var reader = new Uint8Array(buffer);

@@ -564,19 +564,23 @@ namespace AlphaTab
         private static string EnsureFullUrl(string relativeUrl)
         {
             var global = Script.Write<dynamic>("js.Lib.global");
-            if (!relativeUrl.StartsWith("http") && !relativeUrl.StartsWith("https"))
+            if (!relativeUrl.StartsWith("http") && !relativeUrl.StartsWith("https") && !relativeUrl.StartsWith("file"))
             {
                 var root = new StringBuilder();
                 root.Append(global.location.protocol);
                 root.Append("//");
-                root.Append(global.location.hostName);
+                if (global.location.hostname)
+                {
+                    root.Append(global.location.hostname);
+                }
                 if (global.location.port)
                 {
                     root.Append(":");
                     root.Append(global.location.port);
                 }
+                root.Append(global.location.pathname.split("/").slice(0,-1).join("/"));
                 root.Append(relativeUrl);
-                if (!relativeUrl.EndsWith("/"))
+                if (!root.EndsWith("/"))
                 {
                     root.Append("/");
                 }

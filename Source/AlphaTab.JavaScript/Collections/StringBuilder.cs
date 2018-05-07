@@ -53,5 +53,11 @@ namespace AlphaTab.Collections
         {
             return Script.Write<string>("this");
         }
+              
+        [Inline]
+        public bool EndsWith(string s)
+        {
+            return Script.Write<bool>("StringTools.endsWith(this, s)");
+        }
     }
 }
