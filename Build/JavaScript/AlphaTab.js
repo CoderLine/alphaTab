@@ -24009,6 +24009,18 @@ alphaTab.rendering.BarRendererBase.prototype = {
 		this.UpdateSizes();
 		this.RegisterLayoutingInfo();
 	}
+	,PaintSimileMark: function(cx,cy,canvas) {
+		var _g = this.Bar.SimileMark;
+		switch(_g) {
+		case 1:
+			canvas.FillMusicFontSymbol(cx + this.X + (this.Width - 20 * this.get_Scale()) / 2,cy + this.Y + this.Height / 2,1,58624);
+			break;
+		case 3:
+			canvas.FillMusicFontSymbol(cx + this.X - 28 * this.get_Scale() / 2,cy + this.Y + this.Height / 2,1,58625);
+			break;
+		default:
+		}
+	}
 	,__class__: alphaTab.rendering.BarRendererBase
 };
 alphaTab.rendering._BeatXPosition = {};
@@ -25321,16 +25333,7 @@ alphaTab.rendering.ScoreBarRenderer.prototype = $extend(alphaTab.rendering.BarRe
 			++i;
 		}
 		canvas.set_Color(res.MainGlyphColor);
-		var _g = this.Bar.SimileMark;
-		switch(_g) {
-		case 1:
-			canvas.FillMusicFontSymbol(cx + this.X + (this.Width - 20 * this.get_Scale()) / 2,cy + this.Y + this.Height / 2,1,58624);
-			break;
-		case 3:
-			canvas.FillMusicFontSymbol(cx + this.X - 28 * this.get_Scale() / 2,cy + this.Y + this.Height / 2,1,58625);
-			break;
-		default:
-		}
+		this.PaintSimileMark(cx,cy,canvas);
 	}
 	,__class__: alphaTab.rendering.ScoreBarRenderer
 });
@@ -25970,44 +25973,7 @@ alphaTab.rendering.TabBarRenderer.prototype = $extend(alphaTab.rendering.BarRend
 			++i1;
 		}
 		canvas.set_Color(res.MainGlyphColor);
-		if(this.Bar.Staff.Tuning.length < 5) {
-			var simileScale = 1;
-			var _g = this.Bar.SimileMark;
-			switch(_g) {
-			case 1:
-				var this6 = simileScale;
-				canvas.FillMusicFontSymbol(cx + this.X + (this.Width - 20 * this.get_Scale() * simileScale) / 2,cy + this.Y + this.Height / 2,this6,58624);
-				break;
-			case 3:
-				var this7 = simileScale;
-				canvas.FillMusicFontSymbol(cx + this.X - 28 * this.get_Scale() * simileScale / 2,cy + this.Y + this.Height / 2,this7,58625);
-				break;
-			default:
-			}
-		} else if(this.Bar.SimileMark == 1) {
-			var startX = cx + this.X + (this.Width - 20 * this.get_Scale()) / 2;
-			var endX = startX + 20 * this.get_Scale();
-			var startLine = 2;
-			var endLine = this.Bar.Staff.Tuning.length - 1;
-			var this8 = startLine;
-			var startY = cy + this.Y + this.GetTabY(this8,0) - this.get_Scale();
-			var this9 = endLine;
-			var endY = cy + this.Y + this.GetTabY(this9,0) - this.get_Scale();
-			var barWidth = 4 * this.get_Scale();
-			var this10 = 2.5;
-			var circleRadius = this10 * this.get_Scale();
-			canvas.BeginPath();
-			canvas.MoveTo(startX,endY);
-			canvas.LineTo(endX - barWidth,startY);
-			canvas.LineTo(endX,startY);
-			canvas.LineTo(startX + barWidth,endY);
-			canvas.ClosePath();
-			canvas.Fill();
-			var this11 = 0.5;
-			var halfLine = lineOffset * this11 - this.get_Scale();
-			canvas.FillCircle(startX,startY + halfLine,circleRadius);
-			canvas.FillCircle(endX,endY - lineOffset + halfLine,circleRadius);
-		}
+		this.PaintSimileMark(cx,cy,canvas);
 	}
 	,Paint: function(cx,cy,canvas) {
 		alphaTab.rendering.BarRendererBase.prototype.Paint.call(this,cx,cy,canvas);

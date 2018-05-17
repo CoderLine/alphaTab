@@ -265,53 +265,7 @@ namespace AlphaTab.Rendering
 
             canvas.Color = res.MainGlyphColor;
 
-            // the Simile Mark glyph has ~19px height. 
-            // It should span from the second to the second-last line
-            if (Bar.Staff.Tuning.Length < 5)
-            {
-                var simileScale = 1;
-                switch (Bar.SimileMark)
-                {
-                    case SimileMark.Simple:
-                        canvas.FillMusicFontSymbol(cx + X + (Width - 20 * Scale * simileScale) / 2, cy + Y + Height / 2, simileScale,
-                            MusicFontSymbol.SimileMarkSimple);
-                        break;
-                    case SimileMark.SecondOfDouble:
-                        canvas.FillMusicFontSymbol(cx + X - (28 * Scale * simileScale) / 2, cy + Y + Height / 2, simileScale,
-                            MusicFontSymbol.SimileMarkDouble);
-                        break;
-                }
-            }
-            else if(Bar.SimileMark == SimileMark.Simple)
-            {
-                var startX = cx + X + (Width - 20 * Scale) / 2;
-                var endX = startX + 20 * Scale;
-
-                var startLine = 2;
-                var endLine = Bar.Staff.Tuning.Length - 1;
-
-
-                var startY = cy + Y + GetTabY(startLine) - Scale;
-                var endY = cy + Y + GetTabY(endLine) - Scale;
-
-                var barWidth = 4 * Scale;
-                var circleRadius = 2.5f * Scale;
-
-                canvas.BeginPath();
-                canvas.MoveTo(startX, endY);
-                canvas.LineTo(endX - barWidth, startY);
-                canvas.LineTo(endX, startY);
-                canvas.LineTo(startX + barWidth, endY);
-                canvas.ClosePath();
-                canvas.Fill();
-
-                var halfLine = lineOffset * 0.5f - Scale;
-                canvas.FillCircle(startX, startY + halfLine, circleRadius);
-                canvas.FillCircle(endX, endY - lineOffset + halfLine, circleRadius);
-
-
-            }
-
+            PaintSimileMark(cx, cy, canvas);
 
             // Info guides for debugging
 

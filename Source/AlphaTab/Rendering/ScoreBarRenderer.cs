@@ -941,17 +941,7 @@ namespace AlphaTab.Rendering
 
             canvas.Color = res.MainGlyphColor;
 
-            switch (Bar.SimileMark)
-            {
-                case SimileMark.Simple:
-                    canvas.FillMusicFontSymbol(cx + X + (Width - 20 * Scale) / 2, cy + Y + Height / 2, 1,
-                        MusicFontSymbol.SimileMarkSimple);
-                    break;
-                case SimileMark.SecondOfDouble:
-                    canvas.FillMusicFontSymbol(cx + X - (28 * Scale) / 2, cy + Y + Height / 2, 1,
-                        MusicFontSymbol.SimileMarkDouble);
-                    break;
-            }
+            PaintSimileMark(cx, cy, canvas);
         }
     }
 }
