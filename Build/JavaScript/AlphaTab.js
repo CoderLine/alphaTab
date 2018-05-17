@@ -14366,6 +14366,9 @@ alphaTab.importer.GpifParser.prototype = {
 				case "ShortName":
 					track.ShortName = c1.get_InnerText();
 					break;
+				case "Sounds":
+					this.ParseSounds(track,c1);
+					break;
 				case "Staves":
 					this.ParseStaves(track,c1);
 					break;
@@ -14655,6 +14658,43 @@ alphaTab.importer.GpifParser.prototype = {
 			while(staff.hasNext()) {
 				var staff1 = staff.next();
 				staff1.StaffKind = 2;
+			}
+		}
+	}
+	,ParseSounds: function(track,node) {
+		var c = $iterator(node.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				if(_g == "Sound") {
+					this.ParseSound(track,c1);
+				}
+			}
+		}
+	}
+	,ParseSound: function(track,node) {
+		var c = $iterator(node.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				if(_g == "MIDI") {
+					this.ParseSoundMidi(track,c1);
+				}
+			}
+		}
+	}
+	,ParseSoundMidi: function(track,node) {
+		var c = $iterator(node.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				if(_g == "Program") {
+					var tmp = c1.get_InnerText();
+					track.PlaybackInfo.Program = alphaTab.platform.Platform.ParseInt(tmp);
+				}
 			}
 		}
 	}

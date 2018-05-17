@@ -422,6 +422,9 @@ namespace AlphaTab.Importer
                         case "GeneralMidi":
                             ParseGeneralMidi(track, c);
                             break;
+                        case "Sounds":
+                            ParseSounds(track, c);
+                            break;
                         case "PlaybackState":
                             var state = c.InnerText;
                             track.PlaybackInfo.IsSolo = state == "Solo";
@@ -765,6 +768,57 @@ namespace AlphaTab.Importer
                 }
             }
         }
+
+        private void ParseSounds(Track track, XmlNode node)
+        {
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Sound":
+                            ParseSound(track, c);
+                            break;
+                    }
+                }
+            }
+        }
+
+
+        private void ParseSound(Track track, XmlNode node)
+        {
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "MIDI":
+                            ParseSoundMidi(track, c);
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void ParseSoundMidi(Track track, XmlNode node)
+        {
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Program":
+                            track.PlaybackInfo.Program = Platform.Platform.ParseInt(c.InnerText);
+                            break;
+                    }
+                }
+            }
+        }
+
+
 
 
         private void ParsePartSounding(Track track, XmlNode node)
@@ -1197,7 +1251,7 @@ namespace AlphaTab.Importer
                             whammyMiddle1.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("middleOffset1")));
                             whammy.Add(whammyMiddle1);
 
-                            
+
                             var whammyMiddle2 = new BendPoint();
                             whammyMiddle2.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("middleValue")));
                             whammyMiddle2.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("middleOffset2")));
@@ -1309,7 +1363,7 @@ namespace AlphaTab.Importer
                                 case "WhammyBarExtend":
                                     // not clear what this is used for
                                     break;
-                               
+
                                 case "WhammyBarOriginValue":
                                     if (whammyOrigin == null) whammyOrigin = new BendPoint();
                                     whammyOrigin.Value = ToBendValue(Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
