@@ -15,11 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-
-using System;
 using AlphaTab.Collections;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 using AlphaTab.Util;
 using Phase;
 
@@ -196,6 +193,11 @@ namespace AlphaTab
             json.transpositionPitches = TranspositionPitches;
             json.displayTranspositionPitches = DisplayTranspositionPitches;
             json.logging = LogLevel;
+            json.smallGraceTabNotes = SmallGraceTabNotes;
+            json.extendBendArrowsOnTiedNotes = ExtendBendArrowsOnTiedNotes;
+            json.showGraceFlagOnBendHelperNotes = ShowGraceFlagOnBendHelperNotes;
+            json.showParenthesisForTiedBends = ShowParenthesisForTiedBends;
+            json.showTabNoteOnTiedBend = ShowTabNoteOnTiedBend;
 
             json.scriptFile = ScriptFile;
             json.fontDirectory = FontDirectory;
@@ -374,6 +376,51 @@ namespace AlphaTab
             if (Platform.Platform.JsonExists(json, "fontDirectory"))
             {
                 settings.FontDirectory = EnsureFullUrl(json.fontDirectory);
+            }
+
+            if (Platform.Platform.JsonExists(json, "smallGraceTabNotes"))
+            {
+                settings.SmallGraceTabNotes = json.smallGraceTabNotes;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("smallGraceTabNotes"))
+            {
+                settings.SmallGraceTabNotes = (bool)dataAttributes["smallGraceTabNotes"];
+            }
+
+            if (Platform.Platform.JsonExists(json, "extendBendArrowsOnTiedNotes"))
+            {
+                settings.ExtendBendArrowsOnTiedNotes = json.extendBendArrowsOnTiedNotes;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("extendBendArrowsOnTiedNotes"))
+            {
+                settings.ExtendBendArrowsOnTiedNotes = (bool)dataAttributes["extendBendArrowsOnTiedNotes"];
+            }
+
+            if (Platform.Platform.JsonExists(json, "showGraceFlagOnBendHelperNotes"))
+            {
+                settings.ShowGraceFlagOnBendHelperNotes = json.showGraceFlagOnBendHelperNotes;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("showGraceFlagOnBendHelperNotes"))
+            {
+                settings.ShowGraceFlagOnBendHelperNotes = (bool)dataAttributes["showGraceFlagOnBendHelperNotes"];
+            }
+
+            if (Platform.Platform.JsonExists(json, "showParenthesisForTiedBends"))
+            {
+                settings.ShowParenthesisForTiedBends = json.showParenthesisForTiedBends;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("showParenthesisForTiedBends"))
+            {
+                settings.ShowParenthesisForTiedBends = (bool)dataAttributes["showParenthesisForTiedBends"];
+            }
+
+            if (Platform.Platform.JsonExists(json, "showTabNoteOnTiedBend"))
+            {
+                settings.ShowTabNoteOnTiedBend = json.showTabNoteOnTiedBend;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("showTabNoteOnTiedBend"))
+            {
+                settings.ShowTabNoteOnTiedBend = (bool)dataAttributes["showTabNoteOnTiedBend"];
             }
 
             if (Platform.Platform.JsonExists(json, "layout"))
