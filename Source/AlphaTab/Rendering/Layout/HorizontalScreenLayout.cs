@@ -46,6 +46,8 @@ namespace AlphaTab.Rendering.Layout
         public const float GroupSpacing = 20;
 
         private StaveGroup _group;
+        private float[] _pagePadding;
+
         public override string Name { get { return "HorizontalScreen"; } }
         public HorizontalScreenLayout(ScoreRenderer renderer)
             : base(renderer)
@@ -64,6 +66,28 @@ namespace AlphaTab.Rendering.Layout
 
         protected override void DoLayoutAndRender()
         {
+            _pagePadding = Renderer.Settings.Layout.Get("padding", PagePadding);
+            if (_pagePadding.Length == 1)
+            {
+                _pagePadding = new[]
+                {
+                    _pagePadding[0],
+                    _pagePadding[0],
+                    _pagePadding[0],
+                    _pagePadding[0]
+                };
+            }
+            else if (_pagePadding.Length == 2)
+            {
+                _pagePadding = new[]
+                {
+                    _pagePadding[0],
+                    _pagePadding[1],
+                    _pagePadding[0],
+                    _pagePadding[1]
+                };
+            }
+
             var score = Renderer.Score;
             var canvas = Renderer.Canvas;
 
@@ -79,8 +103,8 @@ namespace AlphaTab.Rendering.Layout
 
             _group = CreateEmptyStaveGroup();
             _group.IsLast = true;
-            _group.X = PagePadding[0];
-            _group.Y = PagePadding[1];
+            _group.X = _pagePadding[0];
+            _group.Y = _pagePadding[1];
 
             var countPerPartial = Renderer.Settings.Layout.Get("countPerPartial", 10);
             var partials = new FastList<HorizontalScreenLayoutPartialInfo>();
@@ -135,8 +159,8 @@ namespace AlphaTab.Rendering.Layout
 
             _group.FinalizeGroup();
 
-            Height = _group.Y + _group.Height + PagePadding[3];
-            Width = _group.X + _group.Width + PagePadding[2];
+            Height = _group.Y + _group.Height + _pagePadding[3];
+            Width = _group.X + _group.Width + _pagePadding[2];
             
             currentBarIndex = 0;
             for (var i = 0; i < partials.Count; i++)

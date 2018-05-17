@@ -39,6 +39,7 @@ namespace AlphaTab.Rendering.Layout
         private FastList<MasterBarsRenderers> _allMasterBarRenderers;
         private FastList<MasterBarsRenderers> _barsFromPreviousGroup;
         private int _endBarIndex;
+        private float[] _pagePadding;
 
         public override string Name { get { return "PageView"; } }
         public PageViewLayout(ScoreRenderer renderer)
@@ -49,8 +50,30 @@ namespace AlphaTab.Rendering.Layout
 
         protected override void DoLayoutAndRender()
         {
-            var x = PagePadding[0];
-            var y = PagePadding[1];
+            _pagePadding = Renderer.Settings.Layout.Get("padding", PagePadding);
+            if (_pagePadding.Length == 1)
+            {
+                _pagePadding = new[]
+                {
+                    _pagePadding[0],
+                    _pagePadding[0],
+                    _pagePadding[0],
+                    _pagePadding[0]
+                };
+            }
+            else if (_pagePadding.Length == 2)
+            {
+                _pagePadding = new[]
+                {
+                    _pagePadding[0],
+                    _pagePadding[1],
+                    _pagePadding[0],
+                    _pagePadding[1]
+                };
+            }
+
+            var x = _pagePadding[0];
+            var y = _pagePadding[1];
             Width = Renderer.Settings.Width;
             _allMasterBarRenderers = new FastList<MasterBarsRenderers>();
 
@@ -62,7 +85,7 @@ namespace AlphaTab.Rendering.Layout
             // 2. One result per StaveGroup
             y = LayoutAndRenderScore(x, y);
 
-            Height = y + PagePadding[3];
+            Height = y + _pagePadding[3];
         }
 
         public override bool SupportsResize
@@ -72,8 +95,8 @@ namespace AlphaTab.Rendering.Layout
 
         public override void Resize()
         {
-            var x = PagePadding[0];
-            var y = PagePadding[1];
+            var x = _pagePadding[0];
+            var y = _pagePadding[1];
             Width = Renderer.Settings.Width;
             var oldHeight = Height;
 
@@ -85,7 +108,7 @@ namespace AlphaTab.Rendering.Layout
             // 2. One result per StaveGroup
             y = ResizeAndRenderScore(x, y, oldHeight);
 
-            Height = y + PagePadding[3];
+            Height = y + _pagePadding[3];
         }
 
         private float LayoutAndRenderScoreInfo(float x, float y, float totalHeight = -1)
@@ -118,7 +141,7 @@ namespace AlphaTab.Rendering.Layout
             if (ScoreInfoGlyphs.ContainsKey(HeaderFooterElements.Music))
             {
                 var glyph = ScoreInfoGlyphs[HeaderFooterElements.Music];
-                glyph.X = Width - PagePadding[2];
+                glyph.X = Width - _pagePadding[2];
                 glyph.Y = y;
                 glyph.TextAlign = TextAlign.Right;
                 musicOrWords = true;
@@ -400,7 +423,7 @@ namespace AlphaTab.Rendering.Layout
         {
             get
             {
-                return Renderer.Settings.Width - PagePadding[0] - PagePadding[2];
+                return Renderer.Settings.Width - _pagePadding[0] - _pagePadding[2];
             }
         }
     }
