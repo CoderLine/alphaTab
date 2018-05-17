@@ -29,7 +29,7 @@ namespace AlphaTab.Importer
     public abstract class ScoreImporter
     {
         protected IReadable Data;
-        protected FastDictionary<string,object> ImportSettings;
+        protected Settings Settings;
 
         /**
          * Gets all default ScoreImporters
@@ -47,21 +47,21 @@ namespace AlphaTab.Importer
             };
         }
 
-        public virtual void Init(IReadable data, FastDictionary<string, object> importSettings = null)
+        public virtual void Init(IReadable data, Settings settings = null)
         {
             Data = data;
-            ImportSettings = importSettings;
+            Settings = settings;
         }
 
         protected T GetSetting<T>(string key, T defaultValue = default(T))
         {
             key = key.ToLower();
-            if (ImportSettings == null || !ImportSettings.ContainsKey(key))
+            if (Settings == null || Settings.ImporterSettings == null || !Settings.ImporterSettings.ContainsKey(key))
             {
                 return defaultValue;
             }
 
-            return (T)ImportSettings[key];
+            return (T)Settings.ImporterSettings[key];
         }
 
         public abstract string Name { get; }

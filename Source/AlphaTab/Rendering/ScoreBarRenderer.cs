@@ -521,6 +521,10 @@ namespace AlphaTab.Rendering
         private void PaintFooter(float cx, float cy, ICanvas canvas, BeamingHelper h)
         {
             var beat = h.Beats[0];
+            if (beat.GraceType == GraceType.BendGrace)
+            {
+                return;
+            }
 
             var isGrace = beat.GraceType != GraceType.None;
             var scaleMod = isGrace ? NoteHeadGlyph.GraceScale : 1;
@@ -589,7 +593,7 @@ namespace AlphaTab.Rendering
             //
             // Draw beam 
             //
-            if (beat.Duration > Duration.Quarter)
+            if (beat.Duration > Duration.Quarter || isGrace)
             {
                 var glyph = new BeamGlyph(beatLineX - Scale / 2f, beamY, beat.Duration, direction, isGrace);
                 glyph.Renderer = this;

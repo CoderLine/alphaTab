@@ -67,7 +67,7 @@ namespace AlphaTab.Importer
                 }
                 Score();
 
-                _score.Finish();
+                _score.Finish(Settings);
                 _track.ApplyLyrics(_lyrics);
                 return _score;
             }
@@ -1068,6 +1068,11 @@ namespace AlphaTab.Importer
                 if (_syData.ToString().ToLower() == "ob")
                 {
                     beat.GraceType = GraceType.OnBeat;
+                    NewSy();
+                }
+                else if (_syData.ToString().ToLower() == "b")
+                {
+                    beat.GraceType = GraceType.BendGrace;
                     NewSy();
                 }
                 else

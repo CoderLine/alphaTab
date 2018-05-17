@@ -37,8 +37,8 @@ namespace AlphaTab.Importer
         /// <param name="path">the source path to load the binary file from</param>
         /// <param name="success">this function is called if the Score was successfully loaded from the datasource</param>
         /// <param name="error">this function is called if any error during the loading occured.</param>
-        /// <param name="importSettings">special settings for the score import</param>
-        public static void LoadScoreAsync(string path, Action<Score> success, Action<Exception> error, FastDictionary<string, object> importSettings = null)
+        /// <param name="settings">settings for the score import</param>
+        public static void LoadScoreAsync(string path, Action<Score> success, Action<Exception> error, Settings settings = null)
         {
             var xhr = new XMLHttpRequest();
             xhr.Open("GET", path, true);
@@ -54,7 +54,7 @@ namespace AlphaTab.Importer
                         {
                             ArrayBuffer buffer = xhr.Response;
                             var reader = new Uint8Array(buffer);
-                            var score = LoadScoreFromBytes(reader.As<byte[]>(), importSettings);
+                            var score = LoadScoreFromBytes(reader.As<byte[]>(), settings);
                             success(score);
                         }
                         catch (Exception exception)
@@ -106,7 +106,7 @@ namespace AlphaTab.Importer
                 }
 
                 var reader = GetBytesFromString(data.ToString());
-                var score = LoadScoreFromBytes(reader, importSettings);
+                var score = LoadScoreFromBytes(reader, settings);
                 success(score);
             }
             xhr.Send();

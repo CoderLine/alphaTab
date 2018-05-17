@@ -197,6 +197,7 @@ namespace AlphaTab
             json.extendBendArrowsOnTiedNotes = ExtendBendArrowsOnTiedNotes;
             json.showParenthesisForTiedBends = ShowParenthesisForTiedBends;
             json.showTabNoteOnTiedBend = ShowTabNoteOnTiedBend;
+            json.bendMode = BendMode;
 
             json.scriptFile = ScriptFile;
             json.fontDirectory = FontDirectory;
@@ -386,6 +387,15 @@ namespace AlphaTab
                 settings.SmallGraceTabNotes = (bool)dataAttributes["smallGraceTabNotes"];
             }
 
+            if (Platform.Platform.JsonExists(json, "bendMode"))
+            {
+                settings.BendMode = DecodeBendMode(json.bendMode);
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("bendMode"))
+            {
+                settings.BendMode = DecodeBendMode(dataAttributes["bendMode"]);
+            }
+
             if (Platform.Platform.JsonExists(json, "extendBendArrowsOnTiedNotes"))
             {
                 settings.ExtendBendArrowsOnTiedNotes = json.extendBendArrowsOnTiedNotes;
@@ -490,6 +500,28 @@ namespace AlphaTab
                     }
                 }
             }
+        }
+
+        private static BendMode DecodeBendMode(object mode)
+        {
+            if (Platform.Platform.TypeOf(mode) == "number")
+            {
+                return (BendMode)mode;
+            }
+
+            if (Platform.Platform.TypeOf(mode) == "string")
+            {
+                var s = (string)mode;
+                switch (s.ToLower())
+                {
+                    case "songbook":
+                        return BendMode.SongBook;
+                    case "guitarpro":
+                        return BendMode.GuitarPro;
+                }
+            }
+
+            return BendMode.GuitarPro;
         }
 
         private static LogLevel DecodeLogLevel(object log)

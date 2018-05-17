@@ -18,7 +18,7 @@ namespace AlphaTab.Rendering.Glyphs
             _bendNoteHeads = new FastList<BendNoteHeadGroupGlyph>();
         }
 
-        protected void DrawBendSlur(ICanvas canvas, float x1, float y1, float x2, float y2, bool down, float scale)
+        protected void DrawBendSlur(ICanvas canvas, float x1, float y1, float x2, float y2, bool down, float scale, string slurText = null)
         {
             var normalVectorX = (y2 - y1);
             var normalVectorY = (x2 - x1);
@@ -52,6 +52,13 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.LineTo(x2, y2);
 
             canvas.Stroke();
+
+            if (!string.IsNullOrEmpty(slurText))
+            {
+                var w = canvas.MeasureText(slurText);
+                var textOffset = down ? 0 : -canvas.Font.Size;
+                canvas.FillText(slurText, cp1X - w / 2, cp1Y + textOffset);
+            }
         }
 
         public override void DoLayout()

@@ -322,7 +322,7 @@ namespace AlphaTab.Model
 
             #endregion
 
-            score2.Finish();
+            score2.Finish(null);
             return score2;
         }
 

@@ -61,7 +61,7 @@ namespace AlphaTab.Importer
             // the score information as XML we need to parse.
             Logger.Info(Name, "Start Parsing score.gpif");
             var parser = new GpifParser();
-            parser.ParseXml(xml);
+            parser.ParseXml(xml, Settings);
             Logger.Info(Name, "score.gpif parsed");
 
             return parser.Score;

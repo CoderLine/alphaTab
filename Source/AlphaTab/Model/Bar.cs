@@ -116,12 +116,12 @@ namespace AlphaTab.Model
             }
         }
 
-        public void Finish()
+        public void Finish(Settings settings)
         {
             for (int i = 0, j = Voices.Count; i < j; i++)
             {
                 var voice = Voices[i];
-                voice.Finish();
+                voice.Finish(settings);
             }
         }
     }

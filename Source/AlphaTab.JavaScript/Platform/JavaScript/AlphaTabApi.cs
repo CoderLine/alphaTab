@@ -47,7 +47,6 @@ namespace AlphaTab.Platform.JavaScript
 
     public class AlphaTabApi
     {
-        private readonly Element _element;
         private readonly Element _canvasElement;
         private int _visibilityCheckerInterval;
         private int _visibilityCheckerIntervalId;
@@ -57,13 +56,14 @@ namespace AlphaTab.Platform.JavaScript
 
         protected bool IsElementVisible
         {
-            get { return _element.OffsetWidth.IsTruthy() || _element.OffsetHeight.IsTruthy() || _element.GetClientRects().Length.IsTruthy(); }
+            get { return Element.OffsetWidth.IsTruthy() || Element.OffsetHeight.IsTruthy() || Element.GetClientRects().Length.IsTruthy(); }
         }
 
         public Settings Settings { get; private set; }
         public IScoreRenderer Renderer { get; private set; }
         public Score Score { get; set; }
         public int[] TrackIndexes { get; set; }
+        public Element Element { get; set; }
         public Track[] Tracks
         {
             get
@@ -81,9 +81,9 @@ namespace AlphaTab.Platform.JavaScript
 
         public AlphaTabApi(Element element, dynamic options)
         {
-            _element = element;
+            Element = element;
 
-            _element.ClassList.Add("alphaTab");
+            Element.ClassList.Add("alphaTab");
 
             // load settings
             var dataAttributes = GetDataAttributes();
@@ -204,8 +204,8 @@ namespace AlphaTab.Platform.JavaScript
             Renderer.RenderFinished += o => TriggerEvent("rendered");
             Renderer.PostRenderFinished += () =>
             {
-                _element.ClassList.Remove("loading");
-                _element.ClassList.Remove("rendering");
+                Element.ClassList.Remove("loading");
+                Element.ClassList.Remove("rendering");
                 TriggerEvent("postRendered");
             };
             Renderer.PreRender += result =>
@@ -237,7 +237,7 @@ namespace AlphaTab.Platform.JavaScript
                 // in this case we need the correct width for autosize
                 if (autoSize)
                 {
-                    Settings.Width = _element.OffsetWidth;
+                    Settings.Width = Element.OffsetWidth;
                     Renderer.UpdateSettings(settings);
                 }
 
@@ -289,11 +289,11 @@ namespace AlphaTab.Platform.JavaScript
         {
             var dataAttributes = new FastDictionary<string, object>();
 
-            if (_element.Dataset.As<bool>())
+            if (Element.Dataset.As<bool>())
             {
-                foreach (var key in Platform.JsonKeys(_element.Dataset))
+                foreach (var key in Platform.JsonKeys(Element.Dataset))
                 {
-                    object value = _element.Dataset.Member<object>(key);
+                    object value = Element.Dataset.Member<object>(key);
                     try
                     {
                         string stringValue = (string)value;
@@ -311,9 +311,9 @@ namespace AlphaTab.Platform.JavaScript
             }
             else
             {
-                for (var i = 0; i < _element.Attributes.Length; i++)
+                for (var i = 0; i < Element.Attributes.Length; i++)
                 {
-                    var attr = _element.Attributes.Item(i);
+                    var attr = Element.Attributes.Item(i);
                     string nodeName = attr.NodeName;
                     if (nodeName.StartsWith("data-"))
                     {
@@ -359,12 +359,12 @@ namespace AlphaTab.Platform.JavaScript
 
                 var resizeEventInfo = new ResizeEventArgs();
                 resizeEventInfo.OldWidth = Settings.Width;
-                resizeEventInfo.NewWidth = _element.OffsetWidth;
+                resizeEventInfo.NewWidth = Element.OffsetWidth;
                 resizeEventInfo.Settings = Settings;
                 TriggerEvent("resize", resizeEventInfo);
                 Settings.Width = resizeEventInfo.NewWidth;
                 Renderer.UpdateSettings(Settings);
-                Renderer.Resize(_element.OffsetWidth);
+                Renderer.Resize(Element.OffsetWidth);
             }
             // if there is no "invisibility timer" we set up one, if there is already a timer scheduled, it will trigger the proper rendering. 
             else if (_visibilityCheckerIntervalId == 0)
@@ -550,7 +550,7 @@ namespace AlphaTab.Platform.JavaScript
 
         private void CreateStyleElement(Settings settings)
         {
-            var elementDocument = _element.OwnerDocument;
+            var elementDocument = Element.OwnerDocument;
             var styleElement = (StyleElement)elementDocument.GetElementById("alphaTabStyle");
             if (styleElement == null)
             {
@@ -594,29 +594,29 @@ namespace AlphaTab.Platform.JavaScript
 
         public virtual void Destroy()
         {
-            _element.InnerHTML = "";
+            Element.InnerHTML = "";
             Renderer.Destroy();
         }
 
         public void Load(object data)
         {
-            _element.ClassList.Add("loading");
+            Element.ClassList.Add("loading");
             try
             {
                 if (Platform.InstanceOf<ArrayBuffer>(data))
                 {
-                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes(Platform.ArrayBufferToByteArray((ArrayBuffer)data), Settings.ImporterSettings));
+                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes(Platform.ArrayBufferToByteArray((ArrayBuffer)data), Settings));
                 }
                 else if (Platform.InstanceOf<Uint8Array>(data))
                 {
-                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes((byte[])data, Settings.ImporterSettings));
+                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes((byte[])data, Settings));
                 }
                 else if (Platform.TypeOf(data) == "string")
                 {
                     ScoreLoader.LoadScoreAsync((string)data, s => ScoreLoaded(s), e =>
                     {
                         Error("import", e);
-                    }, Settings.ImporterSettings);
+                    }, Settings);
                 }
             }
             catch (Exception e)
@@ -628,12 +628,12 @@ namespace AlphaTab.Platform.JavaScript
 
         public void Tex(string contents)
         {
-            _element.ClassList.Add("loading");
+            Element.ClassList.Add("loading");
             try
             {
                 var parser = new AlphaTexImporter();
                 var data = ByteBuffer.FromBuffer(Platform.StringToByteArray(contents));
-                parser.Init(data, Settings.ImporterSettings);
+                parser.Init(data, Settings);
                 ScoreLoaded(parser.ReadScore());
             }
             catch (Exception e)
@@ -758,17 +758,17 @@ namespace AlphaTab.Platform.JavaScript
 
         public void TriggerEvent(string name, object details = null)
         {
-            if (_element != null)
+            if (Element != null)
             {
                 name = "alphaTab." + name;
                 dynamic e = Browser.Document.CreateEvent("CustomEvent");
                 e.initCustomEvent(name, false, false, details);
-                _element.DispatchEvent(e);
+                Element.DispatchEvent(e);
 
                 if (Platform.JsonExists(Browser.Window, "jQuery"))
                 {
                     dynamic jquery = Browser.Window.Member<dynamic>("jQuery");
-                    jquery(_element).trigger(name, details);
+                    jquery(Element).trigger(name, details);
                 }
             }
         }
@@ -1046,11 +1046,11 @@ namespace AlphaTab.Platform.JavaScript
             var beatCursor = Browser.Document.CreateElement("div");
             beatCursor.ClassList.Add("beatCursor");
 
-            var surface = _element.QuerySelector(".alphaTabSurface");
+            var surface = Element.QuerySelector(".alphaTabSurface");
 
             // required css styles 
-            _element.Style.Position = "relative";
-            _element.Style.TextAlign = "left";
+            Element.Style.Position = "relative";
+            Element.Style.TextAlign = "left";
 
             cursorWrapper.Style.Position = "absolute";
             cursorWrapper.Style.ZIndex = "1000";
@@ -1069,7 +1069,7 @@ namespace AlphaTab.Platform.JavaScript
             _selectionWrapper = selectionWrapper;
 
             // add cursors to UI
-            _element.InsertBefore(cursorWrapper, _element.FirstChild);
+            Element.InsertBefore(cursorWrapper, Element.FirstChild);
             cursorWrapper.AppendChild(selectionWrapper);
             cursorWrapper.AppendChild(barCursor);
             cursorWrapper.AppendChild(beatCursor);
@@ -1298,7 +1298,7 @@ namespace AlphaTab.Platform.JavaScript
             beatCursor.Style.Height = barBoundings.VisualBounds.H + "px";
 
             // if playing, animate the cursor to the next beat
-            var elements = _element.GetElementsByClassName("atHighlight");
+            var elements = Element.GetElementsByClassName("atHighlight");
             while(elements.Length > 0)
             {
                 elements.Item(0).ClassList.Remove("atHighlight");
@@ -1311,7 +1311,7 @@ namespace AlphaTab.Platform.JavaScript
                 if (!stop)
                 {
                     var className = BeatContainerGlyph.GetGroupId(beat);
-                    var elementsToHighlight = _element.GetElementsByClassName(className);
+                    var elementsToHighlight = Element.GetElementsByClassName(className);
                     for (int i = 0; i < elementsToHighlight.Length; i++)
                     {
                         elementsToHighlight.Item(i).ClassList.Add("atHighlight");
@@ -1351,7 +1351,7 @@ namespace AlphaTab.Platform.JavaScript
                     // calculate position of whole music wheet within the scroll parent
                     var scrollElement = Browser.Document.QuerySelector(Settings.ScrollElement);
 
-                    var elementOffset = GetOffset(_element);
+                    var elementOffset = GetOffset(Element);
                     var nodeName = scrollElement.NodeName.ToLowerCase();
                     if (nodeName != "html" && nodeName != "body")
                     {

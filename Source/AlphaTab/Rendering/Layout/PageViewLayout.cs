@@ -398,13 +398,17 @@ namespace AlphaTab.Rendering.Layout
                 if (groupIsFull)
                 {
                     MasterBarsRenderers reverted = group.RevertLastBar();
-                    _barsFromPreviousGroup.Add(reverted);
-
-                    while (reverted != null && !reverted.CanWrap && group.MasterBarsRenderers.Count > 1)
+                    if (reverted != null)
                     {
-                        reverted = group.RevertLastBar();
                         _barsFromPreviousGroup.Add(reverted);
+
+                        while (reverted != null && !reverted.CanWrap && group.MasterBarsRenderers.Count > 1)
+                        {
+                            reverted = group.RevertLastBar();
+                            _barsFromPreviousGroup.Add(reverted);
+                        }
                     }
+                   
                     group.IsFull = true;
                     group.IsLast = false;
 

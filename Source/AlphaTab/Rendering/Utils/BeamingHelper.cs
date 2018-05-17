@@ -229,10 +229,6 @@ namespace AlphaTab.Rendering.Utils
                     }
                 }
             }
-            if (Beats.Count == 1 && (Beats[0].Duration == Duration.Whole || Beats[0].Duration == Duration.DoubleWhole))
-            {
-                return Invert(BeamDirection.Up);
-            }
 
             if (Beats[0].GraceType != GraceType.None)
             {
@@ -462,7 +458,7 @@ namespace AlphaTab.Rendering.Utils
         private static bool CanJoin(Beat b1, Beat b2)
         {
             // is this a voice we can join with?
-            if (b1 == null || b2 == null || b1.IsRest || b2.IsRest || b1.GraceType != b2.GraceType)
+            if (b1 == null || b2 == null || b1.IsRest || b2.IsRest || b1.GraceType != b2.GraceType || b1.GraceType == GraceType.BendGrace || b2.GraceType == GraceType.BendGrace)
             {
                 return false;
             }

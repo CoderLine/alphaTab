@@ -51,6 +51,25 @@ namespace AlphaTab.Model
     }
 
     /// <summary>
+    /// Lists the different bend styles
+    /// </summary>
+    public enum BendStyle
+    {
+        /// <summary>
+        /// The bends are as described by the bend points 
+        /// </summary>
+        Default,
+        /// <summary>
+        /// The bends are gradual over the beat duration. 
+        /// </summary>
+        Gradual,
+        /// <summary>
+        /// The bends are done fast before the next note. 
+        /// </summary>
+        Fast
+    }
+
+    /// <summary>
     /// Lists all types of bends 
     /// </summary>
     public enum BendType
@@ -115,6 +134,7 @@ namespace AlphaTab.Model
         public int Index { get; set; }
         public AccentuationType Accentuated { get; set; }
         public BendType BendType { get; set; }
+        public BendStyle BendStyle { get; set; }
         public bool IsContinuedBend { get; set; }
         public FastList<BendPoint> BendPoints { get; set; }
         public BendPoint MaxBendPoint { get; set; }
@@ -364,6 +384,7 @@ namespace AlphaTab.Model
         {
             Id = GlobalNoteId++;
             BendType = BendType.None;
+            BendStyle = BendStyle.Default;
             BendPoints = new FastList<BendPoint>();
             Dynamic = DynamicValue.F;
 
@@ -406,6 +427,7 @@ namespace AlphaTab.Model
             dst.IsStaccato = src.IsStaccato;
             dst.SlideType = src.SlideType;
             dst.Vibrato = src.Vibrato;
+            dst.IsTieOrigin = src.IsTieOrigin;
             dst.IsTieDestination = src.IsTieDestination;
             dst.LeftHandFinger = src.LeftHandFinger;
             dst.RightHandFinger = src.RightHandFinger;
@@ -420,17 +442,20 @@ namespace AlphaTab.Model
             dst.Element = src.Element;
             dst.Variation = src.Variation;
             dst.BendType = src.BendType;
+            dst.BendStyle = src.BendStyle;
             dst.IsContinuedBend = src.IsContinuedBend;
         }
 
         public Note Clone()
         {
             var n = new Note();
+            var id = n.Id;
             CopyTo(this, n);
             for (int i = 0, j = BendPoints.Count; i < j; i++)
             {
                 n.AddBendPoint(BendPoints[i].Clone());
             }
+            n.Id = id;
             return n;
         }
 
@@ -448,7 +473,7 @@ namespace AlphaTab.Model
             }
         }
 
-        public void Finish()
+        public void Finish(Settings settings)
         {
             var nextNoteOnLine = new Util.Lazy<Note>(() => NextNoteOnSameLine(this));
             var prevNoteOnLine = new Util.Lazy<Note>(() => PreviousNoteOnSameLine(this));

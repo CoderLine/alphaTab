@@ -22,6 +22,27 @@ using AlphaTab.Util;
 namespace AlphaTab
 {
     /// <summary>
+    /// Lists all modes on how bends should be handled.
+    /// </summary>
+    public enum BendMode
+    {
+        /// <summary>
+        /// Bends will be displayed and played as in GuitarPro.
+        /// Note heads are shown after the bended note to show the target note. 
+        /// Playback will follow the defined BendPoints. 
+        /// </summary>
+        GuitarPro,
+        /// <summary>
+        /// Bends will be displayed and played in a traditional SongBook manner. 
+        /// For bends additional grace beats are introduced. 
+        /// Bends are categorized into gradual and fast bends. 
+        /// - Gradual bends are indicated by beat text "grad" or "grad.". Bend will sound along the beat duration. 
+        /// - Fast bends are done right before the next note. If the next note is tied even on-beat of the next note. 
+        /// </summary>
+        SongBook
+    }
+
+    /// <summary>
     /// This public class contains instance specific settings for alphaTab
     /// </summary>
     public partial class Settings
@@ -117,6 +138,11 @@ namespace AlphaTab
         /// </summary>
         public bool ShowTabNoteOnTiedBend { get; set; }
 
+        /// <summary>
+        /// Gets or sets the bend mode to use for display and playback of bends. 
+        /// </summary>
+        public BendMode BendMode { get; set; }
+
         public static Settings Defaults
         {
             get
@@ -133,6 +159,7 @@ namespace AlphaTab
                 settings.ExtendBendArrowsOnTiedNotes = true;
                 settings.ShowParenthesisForTiedBends = true;
                 settings.ShowTabNoteOnTiedBend = true;
+                settings.BendMode = BendMode.GuitarPro;
 
                 settings.ImporterSettings = new FastDictionary<string, object>();
 

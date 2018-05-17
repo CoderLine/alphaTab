@@ -135,7 +135,7 @@ namespace AlphaTab.Importer
             ReadTracks();
             ReadBars();
 
-            _score.Finish();
+            _score.Finish(Settings);
             if (_lyrics != null && _lyricsTrack >= 0)
             {
                 _score.Tracks[_lyricsTrack].ApplyLyrics(_lyrics);

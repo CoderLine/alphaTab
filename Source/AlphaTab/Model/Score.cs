@@ -157,11 +157,11 @@ namespace AlphaTab.Model
             Tracks.Add(track);
         }
 
-        public void Finish()
+        public void Finish(Settings settings)
         {
             for (int i = 0, j = Tracks.Count; i < j; i++)
             {
-                Tracks[i].Finish();
+                Tracks[i].Finish(settings);
             }
         }
     }

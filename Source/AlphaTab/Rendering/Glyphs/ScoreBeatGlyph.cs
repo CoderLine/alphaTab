@@ -255,6 +255,10 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 return new DeadNoteHeadGlyph(0, 0, isGrace);
             }
+            if (n.Beat.GraceType == GraceType.BendGrace)
+            {
+                return new NoteHeadGlyph(0, 0, Duration.Quarter, true);
+            }
             if (n.HarmonicType == HarmonicType.None)
             {
                 return new NoteHeadGlyph(0, 0, n.Beat.Duration, isGrace);
@@ -264,8 +268,14 @@ namespace AlphaTab.Rendering.Glyphs
 
         private void CreateNoteGlyph(Note n)
         {
+            if (n.Beat.GraceType == GraceType.BendGrace && !n.HasBend)
+            {
+                return;
+            }
+
             var sr = (ScoreBarRenderer)Renderer;
             var noteHeadGlyph = CreateNoteHeadGlyph(n);
+
 
             // calculate y position
             var line = sr.GetNoteLine(n);

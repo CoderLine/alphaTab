@@ -88,7 +88,7 @@ namespace AlphaTab.Importer
 
         private FastDictionary<string, FastList<Lyrics>> _lyricsByTrack;
 
-        public void ParseXml(string xml)
+        public void ParseXml(string xml, Settings settings)
         {
             _masterTrackAutomations = new FastDictionary<string, FastList<Automation>>();
             _tracksMapping = new string[0];
@@ -120,7 +120,7 @@ namespace AlphaTab.Importer
 
             BuildModel();
 
-            Score.Finish();
+            Score.Finish(settings);
 
             if (_lyricsByTrack.Count > 0)
             {
@@ -421,6 +421,9 @@ namespace AlphaTab.Importer
                             break;
                         case "GeneralMidi":
                             ParseGeneralMidi(track, c);
+                            break;
+                        case "Sounds":
+                            ParseSounds(track, c);
                             break;
                         case "PlaybackState":
                             var state = c.InnerText;
@@ -760,8 +763,57 @@ namespace AlphaTab.Importer
             {
                 foreach (var staff in track.Staves)
                 {
-
                     staff.StaffKind = StaffKind.Percussion;
+                }
+            }
+        }
+
+
+        private void ParseSounds(Track track, XmlNode node)
+        {
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Sound":
+                            ParseSound(track, c);
+                            break;
+                    }
+                }
+            }
+        }
+
+
+        private void ParseSound(Track track, XmlNode node)
+        {
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "MIDI":
+                            ParseSoundMidi(track, c);
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void ParseSoundMidi(Track track, XmlNode node)
+        {
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Program":
+                            track.PlaybackInfo.Program = Platform.Platform.ParseInt(c.InnerText);
+                            break;
+                    }
                 }
             }
         }

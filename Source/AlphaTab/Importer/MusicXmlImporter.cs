@@ -69,7 +69,7 @@ namespace AlphaTab.Importer
                 MergePartGroups();
             }
 
-            _score.Finish();
+            _score.Finish(Settings);
             // the structure of MusicXML does not allow live creation of the groups,
             _score.RebuildRepeatGroups();
 

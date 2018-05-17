@@ -30,6 +30,7 @@ namespace AlphaTab.Rendering.Glyphs
         private const int BendValueHeight = 6;
         private readonly Note _note;
         private FastList<BendPoint> _renderPoints;
+        private string _slurText;
 
         public TabBendGlyph(Note n)
             : base(0, 0)
@@ -45,6 +46,8 @@ namespace AlphaTab.Rendering.Glyphs
 
             var bendHeight = _note.MaxBendPoint.Value * BendValueHeight * Scale;
             Renderer.RegisterOverflowTop(bendHeight);
+
+            _slurText = _note.BendStyle == BendStyle.Gradual ? "grad." : "";
         }
 
         private FastList<BendPoint> CreateRenderingPoints(Note note)
@@ -116,7 +119,7 @@ namespace AlphaTab.Rendering.Glyphs
             endBeat = endNote.Beat;
             endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, endBeat.Voice.Bar);
 
-            if (endBeat.Index == endBeat.Voice.Beats.Count - 1 && !endNote.HasBend)
+            if (endBeat.Index == endBeat.Voice.Beats.Count - 1 && !endNote.HasBend && Renderer.Settings.ExtendBendArrowsOnTiedNotes)
             {
                 endBeat = null;
             }
@@ -297,6 +300,28 @@ namespace AlphaTab.Rendering.Glyphs
                     canvas.Stroke();
                 }
             }
+
+            if (!string.IsNullOrEmpty(_slurText) && firstPt.Offset < secondPt.Offset)
+            {
+                canvas.Font = res.GraceFont;
+                var size = canvas.MeasureText(_slurText);
+                var h = Math.Abs(y1 - y2);
+                float y;
+                float x;
+                if (y1 > y2)
+                {
+                    y = h > canvas.Font.Size * 1.3f ? y1 - h / 2 : y1;
+                    x = (x1 + x2 - size) / 2;
+                }
+                else
+                {
+                    y = y1;
+                    x = x2 - size;
+                }
+
+                canvas.FillText(_slurText, x, y);
+            }
+
 
             if (secondPt.Value != 0 && secondPt.Value != firstPt.Value)
             {

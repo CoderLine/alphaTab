@@ -465,7 +465,7 @@ namespace AlphaTab.Model
             return null;
         }
 
-        public void Finish()
+        public void Finish(Settings settings)
         {
             // start
             if (Index == 0)
@@ -477,9 +477,38 @@ namespace AlphaTab.Model
                 Start = PreviousBeat.Start + PreviousBeat.CalculateDuration();
             }
 
+           
+
+            var bendMode = settings == null ? BendMode.GuitarPro : settings.BendMode;
+            var isGradual = Text == "grad" || Text == "grad.";
+            if (isGradual && bendMode == BendMode.SongBook)
+            {
+                Text = "";
+            }
+
+            var needCopyBeatForBend = false;
             for (int i = 0, j = Notes.Count; i < j; i++)
             {
-                Notes[i].Finish();
+                var note = Notes[i];
+                note.Finish(settings);
+
+                if (bendMode == BendMode.SongBook && note.HasBend)
+                {
+                    if (note.BendType == BendType.Bend && !note.IsTieOrigin)
+                    {
+                        needCopyBeatForBend = true;
+                    }
+
+                    if (isGradual)
+                    {
+                        note.BendStyle = BendStyle.Gradual;
+                        needCopyBeatForBend = false;
+                    }
+                    else
+                    {
+                        note.BendStyle = BendStyle.Fast;
+                    }
+                }
             }
 
             // try to detect what kind of bend was used and cleans unneeded points if required
@@ -546,6 +575,24 @@ namespace AlphaTab.Model
                         Logger.Warning("Model", "Unsupported whammy type detected, fallback to custom");
                     }
                 }
+            }
+
+            if (needCopyBeatForBend)
+            {
+                // if this beat is a simple bend convert it to a grace beat 
+                // and generate a placeholder beat with tied notes
+                var cloneBeat = Clone();
+                for (int i = 0, j = cloneBeat.Notes.Count; i < j; i++)
+                {
+                    var cloneNote = cloneBeat.Notes[i];
+                    // remove bend on cloned note
+                    cloneNote.BendPoints = new FastList<BendPoint>();
+                    // mark as tied note
+                    cloneNote.IsTieDestination = true;
+                }
+
+                GraceType = GraceType.BendGrace;
+                Voice.InsertBeat(this, cloneBeat);
             }
         }
 
