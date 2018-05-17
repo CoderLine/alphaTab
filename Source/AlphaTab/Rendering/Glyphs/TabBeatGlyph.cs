@@ -31,7 +31,8 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 //
                 // Note numbers
-                NoteNumbers = new TabNoteChordGlyph(0, 0, Container.Beat.GraceType != GraceType.None);
+                var isGrace = Renderer.Settings.SmallGraceTabNotes && Container.Beat.GraceType != GraceType.None;
+                NoteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
                 NoteNumbers.Beat = Container.Beat;
                 NoteNumbers.BeamingHelper = BeamingHelper;
                 foreach (var note in Container.Beat.Notes)

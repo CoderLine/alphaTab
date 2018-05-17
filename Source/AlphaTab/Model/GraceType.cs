@@ -24,6 +24,7 @@ namespace AlphaTab.Model
     {
         None, 
         OnBeat, 
-        BeforeBeat
+        BeforeBeat,
+        BendGrace
     }
 }
