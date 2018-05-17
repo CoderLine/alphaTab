@@ -38,7 +38,7 @@ namespace AlphaTab.Rendering
         public float Height { get; set; }
 
         public IEffectBarRendererInfo Info { get; set; }
-
+        public EffectBandSlot Slot { get; set; }
 
         public EffectBand(IEffectBarRendererInfo info)
             : base(0, 0)
@@ -187,6 +187,10 @@ namespace AlphaTab.Rendering
         {
             base.Paint(cx, cy, canvas);
 
+            //canvas.LineWidth = 1;
+            //canvas.StrokeRect(cx + X, cy + Y, Renderer.Width, Slot.Shared.Height);
+            //canvas.LineWidth = 1.5f;
+
             for (int i = 0, j = _uniqueEffectGlyphs.Count; i < j; i++)
             {
                 var v = _uniqueEffectGlyphs[i];
@@ -289,24 +293,6 @@ namespace AlphaTab.Rendering
             return newSlot;
         }
 
-        public void CopySlots(EffectBandSizingInfo sizingInfo)
-        {
-            foreach (var slot in sizingInfo.Slots)
-            {
-                var copy = new EffectBandSlot();
-                copy.Y = slot.Y;
-                copy.Height = slot.Height;
-                copy.UniqueEffectId = slot.UniqueEffectId;
-                copy.FirstBeat = slot.FirstBeat;
-                copy.LastBeat = slot.LastBeat;
-                Slots.Add(copy);
-                foreach (var band in slot.Bands)
-                {
-                    _effectSlot[band.Info.EffectId] = copy;
-                }
-            }
-        }
-
         public void Register(EffectBand effectBand)
         {
             var freeSlot = GetOrCreateSlot(effectBand);
@@ -315,19 +301,30 @@ namespace AlphaTab.Rendering
         }
     }
 
-    public class EffectBandSlot
+    public class EffectBandSlotShared
     {
+        public string UniqueEffectId { get; set; }
         public float Y { get; set; }
         public float Height { get; set; }
-
         public Beat FirstBeat { get; set; }
         public Beat LastBeat { get; set; }
+
+        public EffectBandSlotShared()
+        {
+            Y = 0;
+            Height = 0;
+        }
+    }
+
+    public class EffectBandSlot
+    {
         public FastList<EffectBand> Bands { get; set; }
-        public string UniqueEffectId { get; set; }
+        public EffectBandSlotShared Shared { get; set; }
 
         public EffectBandSlot()
         {
             Bands = new FastList<EffectBand>();
+            Shared = new EffectBandSlotShared();
         }
 
         public void Update(EffectBand effectBand)
@@ -335,22 +332,23 @@ namespace AlphaTab.Rendering
             // lock band to particular effect if needed
             if (!effectBand.Info.CanShareBand)
             {
-                UniqueEffectId = effectBand.Info.EffectId;
+                Shared.UniqueEffectId = effectBand.Info.EffectId;
             }
 
+            effectBand.Slot = this;
             Bands.Add(effectBand);
 
-            if (effectBand.Height > Height)
+            if (effectBand.Height > Shared.Height)
             {
-                Height = effectBand.Height;
+                Shared.Height = effectBand.Height;
             }
-            if (FirstBeat == null || effectBand.FirstBeat.IsBefore(FirstBeat))
+            if (Shared.FirstBeat == null || effectBand.FirstBeat.IsBefore(Shared.FirstBeat))
             {
-                FirstBeat = effectBand.FirstBeat;
+                Shared.FirstBeat = effectBand.FirstBeat;
             }
-            if (LastBeat == null || effectBand.LastBeat.IsAfter(LastBeat))
+            if (Shared.LastBeat == null || effectBand.LastBeat.IsAfter(Shared.LastBeat))
             {
-                LastBeat = effectBand.LastBeat;
+                Shared.LastBeat = effectBand.LastBeat;
             }
         }
 
@@ -359,9 +357,9 @@ namespace AlphaTab.Rendering
             return
                 // if the current band is marked as unique, only merge with same effect, 
                 // if the current band is shared, only merge with same effect 
-                ((UniqueEffectId == null && band.Info.CanShareBand) || band.Info.EffectId == UniqueEffectId)
+                ((Shared.UniqueEffectId == null && band.Info.CanShareBand) || band.Info.EffectId == Shared.UniqueEffectId)
                 // only merge if there is space for the new band before or after the current beat
-                && (FirstBeat == null || LastBeat.IsBefore(band.FirstBeat) || LastBeat.IsBefore(FirstBeat));
+                && (Shared.FirstBeat == null || Shared.LastBeat.IsBefore(band.FirstBeat) || Shared.LastBeat.IsBefore(Shared.FirstBeat));
         }
     }
 
@@ -396,6 +394,12 @@ namespace AlphaTab.Rendering
             base.UpdateSizes();
         }
 
+        public override void FinalizeRenderer()
+        {
+            base.FinalizeRenderer();
+            UpdateHeight();
+        }
+
         private void UpdateHeight()
         {
             if (SizingInfo == null) return;
@@ -403,14 +407,14 @@ namespace AlphaTab.Rendering
             var y = 0f;
             foreach (var slot in SizingInfo.Slots)
             {
-                slot.Y = y;
+                slot.Shared.Y = y;
                 foreach (var band in slot.Bands)
                 {
                     band.Y = y;
-                    band.Height = slot.Height;
+                    band.Height = slot.Shared.Height;
                 }
 
-                y += slot.Height;
+                y += slot.Shared.Height;
             }
 
             Height = y;
@@ -421,12 +425,15 @@ namespace AlphaTab.Rendering
         {
             if (!base.ApplyLayoutingInfo()) return false;
 
-            SizingInfo = new EffectBandSizingInfo();
             // we create empty slots for the same group
             if (Index > 0)
             {
                 var previousRenderer = (EffectBarRenderer)PreviousRenderer;
-                SizingInfo.CopySlots(previousRenderer.SizingInfo);
+                SizingInfo = previousRenderer.SizingInfo;
+            }
+            else
+            {
+                SizingInfo = new EffectBandSizingInfo();
             }
 
             foreach (var effectBand in _bands)
@@ -506,7 +513,10 @@ namespace AlphaTab.Rendering
             canvas.Color = Resources.MainGlyphColor;
             foreach (var effectBand in _bands)
             {
-                effectBand.Paint(cx + X, cy + Y, canvas);
+                if (!effectBand.IsEmpty)
+                {
+                    effectBand.Paint(cx + X, cy + Y, canvas);
+                }
             }
 
             //canvas.Color = new Color(0, 0, 200, 100);

@@ -94,6 +94,35 @@ namespace AlphaTab
         /// </summary>
         public LogLevel LogLevel { get; set; }
 
+        /// <summary>
+        /// If set to true the guitar tabs on grace beats are rendered smaller.
+        /// </summary>
+        public bool SmallGraceTabNotes { get; set; }
+
+        /// <summary>
+        /// If set to true bend arrows expand to the end of the last tied note
+        /// of the string. Otherwise they end on the next beat. 
+        /// </summary>
+        public bool ExtendBendArrowsOnTiedNotes { get; set; }
+
+        /// <summary>
+        /// If set to true the striked out grace note flag is shown
+        /// for bend helper notes. Otherwise only note heads are shown.
+        /// </summary>
+        public bool ShowGraceFlagOnBendHelperNotes { get; set; }
+
+        /// <summary>
+        /// If set to true the note heads on tied notes
+        /// will have parenthesis if they are preceeded by bends. 
+        /// </summary>
+        public bool ShowParenthesisForTiedBends { get; set; }
+
+        /// <summary>
+        /// If set to true a tab number will be shown in case
+        /// a bend is increased on a tied note. 
+        /// </summary>
+        public bool ShowTabNoteOnTiedBend { get; set; }
+
         public static Settings Defaults
         {
             get
@@ -106,6 +135,11 @@ namespace AlphaTab
                 settings.Engine = "default";
                 settings.TranspositionPitches = new int[0];
                 settings.DisplayTranspositionPitches = new int[0];
+                settings.SmallGraceTabNotes = true;
+                settings.ExtendBendArrowsOnTiedNotes = true;
+                settings.ShowGraceFlagOnBendHelperNotes = false;
+                settings.ShowParenthesisForTiedBends = true;
+                settings.ShowTabNoteOnTiedBend = true;
 
                 settings.ImporterSettings = new FastDictionary<string, object>();
 

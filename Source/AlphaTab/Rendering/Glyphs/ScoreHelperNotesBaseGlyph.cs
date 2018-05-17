@@ -61,7 +61,7 @@ namespace AlphaTab.Rendering.Glyphs
             Width = 0;
             foreach (var noteHeads in _bendNoteHeads)
             {
-                Width += noteHeads.Width + 15 * Scale;
+                Width += noteHeads.Width + 10 * Scale;
             }
         }
 

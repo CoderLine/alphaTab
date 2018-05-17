@@ -374,28 +374,10 @@ namespace AlphaTab.Rendering
 
         protected virtual void PaintBackground(float cx, float cy, ICanvas canvas)
         {
-            //var c = new Color((byte)Platform.Random(255),
-            //      (byte)Platform.Random(255),
-            //      (byte)Platform.Random(255),
-            //      100);
-            //canvas.Color = c;
-            //canvas.FillRect(cx + X, cy + Y, Width, Height);
+            //canvas.Color = Color.Random();
+            //canvas.FillRect(cx + X, cy + Y - TopOverflow - TopPadding, Width, Height + TopOverflow + BottomOverflow + TopPadding + BottomPadding);
         }
 
-        protected void PaintSimileMark(float cx, float cy, ICanvas canvas)
-        {
-            switch (Bar.SimileMark)
-            {
-                case SimileMark.Simple:
-                    canvas.FillMusicFontSymbol(cx + X + (Width - 20 * Scale) / 2, cy + Y + Height / 2, 1,
-                        MusicFontSymbol.SimileMarkSimple);
-                    break;
-                case SimileMark.SecondOfDouble:
-                    canvas.FillMusicFontSymbol(cx + X - (28 * Scale) / 2, cy + Y + Height / 2, 1,
-                        MusicFontSymbol.SimileMarkDouble);
-                    break;
-            }
-        }
         public virtual void BuildBoundingsLookup(MasterBarBounds masterBarBounds, float cx, float cy)
         {
             var barBounds = new BarBounds();

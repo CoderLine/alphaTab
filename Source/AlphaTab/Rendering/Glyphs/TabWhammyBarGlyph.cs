@@ -137,7 +137,7 @@ namespace AlphaTab.Rendering.Glyphs
             if (endBeat != null)
             {
                 endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, endBeat.Voice.Bar);
-                if (endBeat.IsContinuedWhammy || endNoteRenderer == startNoteRenderer)
+                if (endBeat.IsContinuedWhammy || endNoteRenderer == startNoteRenderer || endNoteRenderer.Staff != startNoteRenderer.Staff)
                 {
                     endXPositionType = endBeat.HasWhammyBar
                         ? BeatXPosition.MiddleNotes

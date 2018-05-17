@@ -109,6 +109,25 @@ namespace AlphaTab.Rendering.Glyphs
             Height = 18 * Scale;
         }
 
+        protected override float CalculateEndX(BarRendererBase renderer, float cx, GroupedEffectGlyph lastGlyph, BeatXPosition endPosition)
+        {
+            var endBeat = lastGlyph.Beat.NextBeat;
+            if (endBeat == null)
+            {
+                return base.CalculateEndX(renderer, cx, lastGlyph, endPosition);
+            }
+
+            // get the start position of the next beat
+            var endBeatRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, endBeat.Voice.Bar);
+            if (endBeatRenderer == null)
+            {
+                return base.CalculateEndX(renderer, cx, lastGlyph, endPosition);
+            }
+
+            var endBeatX = endBeatRenderer.GetBeatX(endBeat, BeatXPosition.MiddleNotes);
+            return cx + endBeatRenderer.X + endBeatX;
+        }
+
         protected override void PaintGrouped(float cx, float cy, float endX, ICanvas canvas)
         {
             var startX = cx + X;

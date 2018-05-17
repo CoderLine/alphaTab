@@ -80,20 +80,23 @@ namespace AlphaTab.Rendering.Glyphs
             var cxRenderer = cx - Renderer.X;
 
             var endRenderer = lastLinkedGlyph.Renderer;
-            var endBeatX = _endPosition == BeatXPosition.EndBeat
-                ? lastLinkedGlyph.X + lastLinkedGlyph.Width
-                : endRenderer.GetBeatX(lastLinkedGlyph.Beat, _endPosition);
-            var endX = cxRenderer + endRenderer.X + endBeatX;
+            var endX = CalculateEndX(endRenderer, cxRenderer, lastLinkedGlyph, _endPosition);
 
             PaintGrouped(cx, cy, endX, canvas);
         }
 
+        protected virtual float CalculateEndX(BarRendererBase renderer, float cx, GroupedEffectGlyph lastGlyph, BeatXPosition endPosition)
+        {
+            var endBeatX = endPosition == BeatXPosition.EndBeat
+                ? lastGlyph.X + lastGlyph.Width
+                : renderer.GetBeatX(lastGlyph.Beat, _endPosition);
+            return cx + renderer.X + endBeatX;
+        }
+
         protected virtual void PaintNonGrouped(float cx, float cy, ICanvas canvas)
         {
-            var endBeatX = _endPosition == BeatXPosition.EndBeat
-                ? X + Width
-                : Renderer.GetBeatX(Beat, _endPosition);
-            var endX = cx + endBeatX;
+            var cxRenderer = cx - Renderer.X;
+            var endX = CalculateEndX(Renderer, cxRenderer, this, _endPosition);
             PaintGrouped(cx, cy, endX, canvas);
         }
 

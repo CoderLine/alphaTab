@@ -26,7 +26,7 @@ namespace AlphaTab.Rendering.Effects
 
         protected override bool ShouldCreateGlyphForNote(Note note)
         {
-            return note.Vibrato == VibratoType.Slight || (note.IsTieDestination && note.TieOrigin.Vibrato != VibratoType.Slight);
+            return note.Vibrato == VibratoType.Slight || (note.IsTieDestination && note.TieOrigin.Vibrato == VibratoType.Slight);
         }
 
         public override EffectBarGlyphSizing SizingMode
