@@ -22,17 +22,24 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class NoteNumberGlyph : Glyph
     {
-        private readonly string _noteString;
+        private readonly Note _note;
+        private string _noteString;
         private float _noteStringWidth;
-        private readonly string _trillNoteString;
+        private string _trillNoteString;
         private float _trillNoteStringWidth;
 
         public bool IsEmpty { get; set; }
         public float Height { get; set; }
 
-        public NoteNumberGlyph(float x, float y, Note n)
+        public NoteNumberGlyph(float x, float y, Note note)
             : base(x, y)
         {
+            _note = note;
+        }
+
+        public override void DoLayout()
+        {
+            var n = _note;
             if (!n.IsTieDestination)
             {
                 _noteString = n.IsDead ? "x" : (n.Fret - n.Beat.Voice.Bar.Staff.TranspositionPitch).ToString();
@@ -41,7 +48,7 @@ namespace AlphaTab.Rendering.Glyphs
                     _noteString = "(" + _noteString + ")";
                 }
             }
-            else if (n.Beat.Index == 0 || (n.HasBend && (!n.TieOrigin.HasBend || !n.TieOrigin.IsTieDestination)))
+            else if (n.Beat.Index == 0 || (n.BendType == BendType.Bend && Renderer.Settings.ShowTabNoteOnTiedBend && n.IsTieOrigin))
             {
                 _noteString = "(" + (n.TieOrigin.Fret - n.Beat.Voice.Bar.Staff.TranspositionPitch) + ")";
             }
@@ -58,10 +65,7 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 _trillNoteString = "";
             }
-        }
 
-        public override void DoLayout()
-        {
             IsEmpty = string.IsNullOrEmpty(_noteString) && string.IsNullOrEmpty(_trillNoteString);
             if (!IsEmpty)
             {

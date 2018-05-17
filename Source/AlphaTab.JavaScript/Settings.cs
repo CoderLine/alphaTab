@@ -195,7 +195,6 @@ namespace AlphaTab
             json.logging = LogLevel;
             json.smallGraceTabNotes = SmallGraceTabNotes;
             json.extendBendArrowsOnTiedNotes = ExtendBendArrowsOnTiedNotes;
-            json.showGraceFlagOnBendHelperNotes = ShowGraceFlagOnBendHelperNotes;
             json.showParenthesisForTiedBends = ShowParenthesisForTiedBends;
             json.showTabNoteOnTiedBend = ShowTabNoteOnTiedBend;
 
@@ -394,15 +393,6 @@ namespace AlphaTab
             else if (dataAttributes != null && dataAttributes.ContainsKey("extendBendArrowsOnTiedNotes"))
             {
                 settings.ExtendBendArrowsOnTiedNotes = (bool)dataAttributes["extendBendArrowsOnTiedNotes"];
-            }
-
-            if (Platform.Platform.JsonExists(json, "showGraceFlagOnBendHelperNotes"))
-            {
-                settings.ShowGraceFlagOnBendHelperNotes = json.showGraceFlagOnBendHelperNotes;
-            }
-            else if (dataAttributes != null && dataAttributes.ContainsKey("showGraceFlagOnBendHelperNotes"))
-            {
-                settings.ShowGraceFlagOnBendHelperNotes = (bool)dataAttributes["showGraceFlagOnBendHelperNotes"];
             }
 
             if (Platform.Platform.JsonExists(json, "showParenthesisForTiedBends"))

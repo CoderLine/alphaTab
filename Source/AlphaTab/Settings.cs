@@ -106,12 +106,6 @@ namespace AlphaTab
         public bool ExtendBendArrowsOnTiedNotes { get; set; }
 
         /// <summary>
-        /// If set to true the striked out grace note flag is shown
-        /// for bend helper notes. Otherwise only note heads are shown.
-        /// </summary>
-        public bool ShowGraceFlagOnBendHelperNotes { get; set; }
-
-        /// <summary>
         /// If set to true the note heads on tied notes
         /// will have parenthesis if they are preceeded by bends. 
         /// </summary>
@@ -137,7 +131,6 @@ namespace AlphaTab
                 settings.DisplayTranspositionPitches = new int[0];
                 settings.SmallGraceTabNotes = true;
                 settings.ExtendBendArrowsOnTiedNotes = true;
-                settings.ShowGraceFlagOnBendHelperNotes = false;
                 settings.ShowParenthesisForTiedBends = true;
                 settings.ShowTabNoteOnTiedBend = true;
 

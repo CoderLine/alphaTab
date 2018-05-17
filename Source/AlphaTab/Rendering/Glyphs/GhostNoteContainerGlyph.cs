@@ -37,7 +37,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var sr = (ScoreBarRenderer)Renderer;
             var line = sr.GetNoteLine(n);
-            var hasParenthesis = n.IsGhost || IsTiedBend(n);
+            var hasParenthesis = n.IsGhost || (IsTiedBend(n) && sr.Settings.ShowParenthesisForTiedBends);
             AddParenthesisOnLine(line, hasParenthesis);
         }
 

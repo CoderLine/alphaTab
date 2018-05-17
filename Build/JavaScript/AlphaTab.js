@@ -6517,11 +6517,6 @@ alphaTab.Settings.FillFromJson = function(settings,json,dataAttributes) {
 	} else if(dataAttributes != null && dataAttributes.hasOwnProperty("extendBendArrowsOnTiedNotes")) {
 		settings.ExtendBendArrowsOnTiedNotes = dataAttributes["extendBendArrowsOnTiedNotes"];
 	}
-	if((json && "showGraceFlagOnBendHelperNotes" in json)) {
-		settings.ShowGraceFlagOnBendHelperNotes = json.showGraceFlagOnBendHelperNotes;
-	} else if(dataAttributes != null && dataAttributes.hasOwnProperty("showGraceFlagOnBendHelperNotes")) {
-		settings.ShowGraceFlagOnBendHelperNotes = dataAttributes["showGraceFlagOnBendHelperNotes"];
-	}
 	if((json && "showParenthesisForTiedBends" in json)) {
 		settings.ShowParenthesisForTiedBends = json.showParenthesisForTiedBends;
 	} else if(dataAttributes != null && dataAttributes.hasOwnProperty("showParenthesisForTiedBends")) {
@@ -6705,7 +6700,6 @@ alphaTab.Settings.get_Defaults = function() {
 	settings.DisplayTranspositionPitches = this2;
 	settings.SmallGraceTabNotes = true;
 	settings.ExtendBendArrowsOnTiedNotes = true;
-	settings.ShowGraceFlagOnBendHelperNotes = false;
 	settings.ShowParenthesisForTiedBends = true;
 	settings.ShowTabNoteOnTiedBend = true;
 	var this3 = {}
@@ -6730,7 +6724,6 @@ alphaTab.Settings.prototype = {
 		json.logging = this.LogLevel;
 		json.smallGraceTabNotes = this.SmallGraceTabNotes;
 		json.extendBendArrowsOnTiedNotes = this.ExtendBendArrowsOnTiedNotes;
-		json.showGraceFlagOnBendHelperNotes = this.ShowGraceFlagOnBendHelperNotes;
 		json.showParenthesisForTiedBends = this.ShowParenthesisForTiedBends;
 		json.showTabNoteOnTiedBend = this.ShowTabNoteOnTiedBend;
 		json.scriptFile = this.ScriptFile;
@@ -27040,7 +27033,7 @@ alphaTab.rendering.glyphs.GhostNoteContainerGlyph.prototype = $extend(alphaTab.r
 	AddParenthesis: function(n) {
 		var sr = js.Boot.__cast(this.Renderer , alphaTab.rendering.ScoreBarRenderer);
 		var line = sr.GetNoteLine(n);
-		var hasParenthesis = n.IsGhost || this.IsTiedBend(n);
+		var hasParenthesis = n.IsGhost || this.IsTiedBend(n) && sr.get_Settings().ShowParenthesisForTiedBends;
 		this.AddParenthesisOnLine(line,hasParenthesis);
 	}
 	,AddParenthesisOnLine: function(line,hasParenthesis) {
@@ -27524,34 +27517,37 @@ alphaTab.rendering.glyphs.NoteHeadGlyph.prototype = $extend(alphaTab.rendering.g
 	}
 	,__class__: alphaTab.rendering.glyphs.NoteHeadGlyph
 });
-alphaTab.rendering.glyphs.NoteNumberGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["NoteNumberGlyph"] = function(x,y,n) {
+alphaTab.rendering.glyphs.NoteNumberGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["NoteNumberGlyph"] = function(x,y,note) {
 	alphaTab.rendering.glyphs.Glyph.call(this,x,y);
+	this._note = null;
 	this._noteString = null;
 	this._noteStringWidth = 0.0;
 	this._trillNoteString = null;
 	this._trillNoteStringWidth = 0.0;
 	this.IsEmpty = false;
 	this.Height = 0.0;
-	if(!n.IsTieDestination) {
-		this._noteString = n.IsDead ? "x" : Std.string(n.Fret - n.Beat.Voice.Bar.Staff.TranspositionPitch);
-		if(n.IsGhost) {
-			this._noteString = "(" + this._noteString + ")";
-		}
-	} else if(n.Beat.Index == 0 || n.get_HasBend() && (!n.TieOrigin.get_HasBend() || !n.TieOrigin.IsTieDestination)) {
-		this._noteString = "(" + (n.TieOrigin.Fret - n.Beat.Voice.Bar.Staff.TranspositionPitch) + ")";
-	} else {
-		this._noteString = "";
-	}
-	if(n.get_IsTrill()) {
-		this._trillNoteString = "(" + (n.get_TrillFret() - n.Beat.Voice.Bar.Staff.TranspositionPitch) + ")";
-	} else {
-		this._trillNoteString = "";
-	}
+	this._note = note;
 };
 alphaTab.rendering.glyphs.NoteNumberGlyph.__name__ = ["alphaTab","rendering","glyphs","NoteNumberGlyph"];
 alphaTab.rendering.glyphs.NoteNumberGlyph.__super__ = alphaTab.rendering.glyphs.Glyph;
 alphaTab.rendering.glyphs.NoteNumberGlyph.prototype = $extend(alphaTab.rendering.glyphs.Glyph.prototype,{
 	DoLayout: function() {
+		var n = this._note;
+		if(!n.IsTieDestination) {
+			this._noteString = n.IsDead ? "x" : Std.string(n.Fret - n.Beat.Voice.Bar.Staff.TranspositionPitch);
+			if(n.IsGhost) {
+				this._noteString = "(" + this._noteString + ")";
+			}
+		} else if(n.Beat.Index == 0 || n.BendType == 2 && this.Renderer.get_Settings().ShowTabNoteOnTiedBend && n.IsTieOrigin) {
+			this._noteString = "(" + (n.TieOrigin.Fret - n.Beat.Voice.Bar.Staff.TranspositionPitch) + ")";
+		} else {
+			this._noteString = "";
+		}
+		if(n.get_IsTrill()) {
+			this._trillNoteString = "(" + (n.get_TrillFret() - n.Beat.Voice.Bar.Staff.TranspositionPitch) + ")";
+		} else {
+			this._trillNoteString = "";
+		}
 		var tmp;
 		var s = this._noteString;
 		if(s == null || s.length == 0) {
