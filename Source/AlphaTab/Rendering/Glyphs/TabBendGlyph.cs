@@ -92,7 +92,6 @@ namespace AlphaTab.Rendering.Glyphs
             bool endNoteHasBend = false;
 
             Beat endBeat = null;
-
             while (endNote.IsTieOrigin)
             {
                 var nextNote = endNote.TieDestination;
@@ -106,7 +105,8 @@ namespace AlphaTab.Rendering.Glyphs
 
                 endNote = nextNote;
                 isMultiBeatBend = true;
-                if (endNote.HasBend)
+
+                if (endNote.HasBend || !Renderer.Settings.ExtendBendArrowsOnTiedNotes)
                 {
                     endNoteHasBend = true;
                     break;

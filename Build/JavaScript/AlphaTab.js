@@ -5170,6 +5170,7 @@ alphaTab.rendering.layout.PageViewLayout.prototype = $extend(alphaTab.rendering.
 alphaTab.rendering.layout.HorizontalScreenLayout = $hx_exports["alphaTab"]["rendering"]["layout"]["HorizontalScreenLayout"] = function(renderer) {
 	alphaTab.rendering.layout.ScoreLayout.call(this,renderer);
 	this._group = null;
+	this._pagePadding = null;
 };
 alphaTab.rendering.layout.HorizontalScreenLayout.__name__ = ["alphaTab","rendering","layout","HorizontalScreenLayout"];
 alphaTab.rendering.layout.HorizontalScreenLayout.__super__ = alphaTab.rendering.layout.ScoreLayout;
@@ -5184,6 +5185,12 @@ alphaTab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphaTab.re
 	}
 	,DoLayoutAndRender: function() {
 		var _gthis = this;
+		this._pagePadding = this.Renderer.Settings.Layout.Get("padding",alphaTab.rendering.layout.HorizontalScreenLayout.PagePadding);
+		if(this._pagePadding.length == 1) {
+			this._pagePadding = new Float32Array([this._pagePadding[0],this._pagePadding[0],this._pagePadding[0],this._pagePadding[0]]);
+		} else if(this._pagePadding.length == 2) {
+			this._pagePadding = new Float32Array([this._pagePadding[0],this._pagePadding[1],this._pagePadding[0],this._pagePadding[1]]);
+		}
 		var score = this.Renderer.Score;
 		var canvas = this.Renderer.Canvas;
 		var startIndex = this.Renderer.Settings.Layout.Get("start",1);
@@ -5198,8 +5205,8 @@ alphaTab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphaTab.re
 		endBarIndex = Math.min(score.MasterBars.length - 1,Math.max(0,endBarIndex));
 		this._group = this.CreateEmptyStaveGroup();
 		this._group.IsLast = true;
-		this._group.X = alphaTab.rendering.layout.HorizontalScreenLayout.PagePadding[0];
-		this._group.Y = alphaTab.rendering.layout.HorizontalScreenLayout.PagePadding[1];
+		this._group.X = this._pagePadding[0];
+		this._group.Y = this._pagePadding[1];
 		var countPerPartial = this.Renderer.Settings.Layout.Get("countPerPartial",10);
 		var this1 = [];
 		var partials = this1;
@@ -5232,8 +5239,8 @@ alphaTab.rendering.layout.HorizontalScreenLayout.prototype = $extend(alphaTab.re
 			alphaTab.util.Logger.Info(this.get_Name(),"Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " + currentPartial.MasterBars[currentPartial.MasterBars.length - 1].Index,null);
 		}
 		this._group.FinalizeGroup();
-		this.Height = this._group.Y + this._group.get_Height() + alphaTab.rendering.layout.HorizontalScreenLayout.PagePadding[3];
-		this.Width = this._group.X + this._group.Width + alphaTab.rendering.layout.HorizontalScreenLayout.PagePadding[2];
+		this.Height = this._group.Y + this._group.get_Height() + this._pagePadding[3];
+		this.Width = this._group.X + this._group.Width + this._pagePadding[2];
 		currentBarIndex = 0;
 		var i = 0;
 		while(i < partials.length) {
@@ -29401,7 +29408,7 @@ alphaTab.rendering.glyphs.TabBendGlyph.prototype = $extend(alphaTab.rendering.gl
 			}
 			endNote = nextNote;
 			isMultiBeatBend = true;
-			if(endNote.get_HasBend()) {
+			if(endNote.get_HasBend() || !this.Renderer.get_Settings().ExtendBendArrowsOnTiedNotes) {
 				endNoteHasBend = true;
 				break;
 			}
