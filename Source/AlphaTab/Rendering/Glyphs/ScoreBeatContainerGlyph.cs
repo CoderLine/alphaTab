@@ -59,6 +59,12 @@ namespace AlphaTab.Rendering
                     Ties.Add(new ScoreLegatoGlyph(origin, Beat, true));
                 }
             }
+            if (_bend != null)
+            {
+                _bend.Renderer = Renderer;
+                _bend.DoLayout();
+                UpdateWidth();
+            }
         }
 
         protected override void CreateTies(Note n)
@@ -123,10 +129,13 @@ namespace AlphaTab.Rendering
 
             if (n.HasBend)
             {
-                _bend = new ScoreBendGlyph(n);
-                _bend.Renderer = Renderer;
-                _bend.DoLayout();
-                Ties.Add(_bend);
+                if (_bend == null)
+                {
+                    _bend = new ScoreBendGlyph(n.Beat);
+                    _bend.Renderer = Renderer;
+                    Ties.Add(_bend);
+                }
+                _bend.AddBends(n);
             }
         }
     }

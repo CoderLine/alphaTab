@@ -120,6 +120,10 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
+            //canvas.Color = Color.Random();
+            //canvas.FillRect(cx + X, cy + Y, Width, 10);
+            //canvas.Color = Renderer.Resources.MainGlyphColor;
+
             if (!_accidentals.IsEmpty)
             {
                 _accidentals.Paint(cx + X, cy + Y, canvas);

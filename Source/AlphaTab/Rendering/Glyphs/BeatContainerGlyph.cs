@@ -90,6 +90,11 @@ namespace AlphaTab.Rendering.Glyphs
                 CreateTies(Beat.Notes[i--]);
             }
 
+            UpdateWidth();
+        }
+
+        protected virtual void UpdateWidth()
+        {
             MinWidth = PreNotes.Width + OnNotes.Width;
             if (!Beat.IsRest)
             {
@@ -127,7 +132,6 @@ namespace AlphaTab.Rendering.Glyphs
 
             Width = MinWidth;
         }
-
 
         public virtual void ScaleToWidth(float beatWidth)
         {

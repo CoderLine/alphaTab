@@ -16,6 +16,7 @@
  * License along with this library.
  */
 using AlphaTab.Model;
+using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
@@ -33,6 +34,12 @@ namespace AlphaTab.Rendering.Glyphs
         {
             _isGrace = isGrace;
             _duration = duration;
+        }
+
+        public override void Paint(float cx, float cy, ICanvas canvas)
+        {
+            var offset = _isGrace ? Scale : 0;
+            canvas.FillMusicFontSymbol(cx + X, cy + Y + offset, GlyphScale * Scale, Symbol);
         }
 
         public override void DoLayout()

@@ -71,7 +71,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            _infos.Sort((a, b) => a.Line.CompareTo(b.Line));
+            _infos.Sort((a, b) => b.Line.CompareTo(a.Line));
 
             var displacedX = 0f;
 
