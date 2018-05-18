@@ -17,6 +17,7 @@
  */
 
 using System;
+using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -32,6 +33,7 @@ namespace AlphaTab.Rendering.Staves
     {
         private const int MinDuration = 30;
         private const int MinDurationWidth = 10;
+        private const float MidiTimeToFraction = MidiUtils.QuarterTime * 4;
 
         private FastList<Spring> _timeSortedSprings;
         private float _xMin;
@@ -245,7 +247,7 @@ namespace AlphaTab.Rendering.Staves
             // calculate the force required to have at least the minimum size. 
             for (int i = 0; i < sortedSprings.Count; i++)
             {
-                var force = sortedSprings[i].SpringWidth * sortedSprings[i].SpringConstant;
+                var force = SpaceToForce(sortedSprings[i].SpringWidth);
                 UpdateMinStretchForce(force);
             }
         }
@@ -258,9 +260,8 @@ namespace AlphaTab.Rendering.Staves
                 minDuration = duration;
             }
             var phi = 1 + 0.6f * Platform.Platform.Log2(duration / (float)MinDuration);
-            return (minDuration / duration) * 1 / (phi * MinDurationWidth);
+            return (minDuration / duration) * (1 / (phi * MinDurationWidth));
         }
-
 
         public float SpaceToForce(float space)
         {

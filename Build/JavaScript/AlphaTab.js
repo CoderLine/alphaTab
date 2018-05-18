@@ -31031,7 +31031,7 @@ alphaTab.rendering.staves.BarLayoutingInfo.prototype = {
 		this.TotalSpringConstant = 1 / totalSpringConstant;
 		var i1 = 0;
 		while(i1 < sortedSprings.length) {
-			var force = sortedSprings[i1].SpringWidth * sortedSprings[i1].SpringConstant;
+			var force = this.SpaceToForce(sortedSprings[i1].SpringWidth);
 			this.UpdateMinStretchForce(force);
 			++i1;
 		}
@@ -31044,7 +31044,7 @@ alphaTab.rendering.staves.BarLayoutingInfo.prototype = {
 		}
 		var this2 = 0.6;
 		var phi = 1 + this2 * Math.log2(duration / js.Boot.__cast(30 , Float));
-		return minDuration / duration / (phi * 10);
+		return minDuration / duration * (1 / (phi * 10));
 	}
 	,SpaceToForce: function(space) {
 		return space * this.TotalSpringConstant;
@@ -35367,6 +35367,7 @@ alphaTab.rendering.layout._HeaderFooterElements.HeaderFooterElements_Impl_.PageN
 alphaTab.rendering.layout._HeaderFooterElements.HeaderFooterElements_Impl_.All = 511;
 alphaTab.rendering.staves.BarLayoutingInfo.MinDuration = 30;
 alphaTab.rendering.staves.BarLayoutingInfo.MinDurationWidth = 10;
+alphaTab.rendering.staves.BarLayoutingInfo.MidiTimeToFraction = 3840;
 alphaTab.rendering.staves.StaveGroup.AccoladeLabelSpacing = 10;
 alphaTab.rendering.utils.AccidentalHelper.KeySignatureLookup = [[true,true,true,true,true,true,true,true,true,true,true,true],[true,true,true,true,true,false,true,true,true,true,true,true],[false,true,true,true,true,false,true,true,true,true,true,true],[false,true,true,true,true,false,false,false,true,true,true,true],[false,false,false,true,true,false,false,false,true,true,true,true],[false,false,false,true,true,false,false,false,false,false,true,true],[false,false,false,false,false,false,false,false,false,false,true,true],[false,false,false,false,false,false,false,false,false,false,false,false],[false,false,false,false,false,true,true,false,false,false,false,false],[true,true,false,false,false,true,true,false,false,false,false,false],[true,true,false,false,false,true,true,true,true,false,false,false],[true,true,true,true,false,true,true,true,true,false,false,false],[true,true,true,true,false,true,true,true,true,true,true,false],[true,true,true,true,true,true,true,true,true,true,true,false],[true,true,true,true,true,true,true,true,true,true,true,true]];
 alphaTab.rendering.utils.AccidentalHelper.AccidentalNotes = [false,true,false,true,false,false,true,false,true,false,true,false];
