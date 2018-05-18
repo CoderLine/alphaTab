@@ -84,6 +84,7 @@ namespace AlphaTab.Rendering.Utils
         public bool IsFirstOfLine { get; set; }
         public Bounds VisualBounds { get; set; }
         public Bounds RealBounds { get; set; }
+        public Bounds LineAlignedBounds { get; set; }
         public FastList<BarBounds> Bars { get; set; }
         public StaveGroupBounds StaveGroupBounds { get; set; }
 

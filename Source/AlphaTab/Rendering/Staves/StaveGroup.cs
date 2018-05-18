@@ -420,12 +420,23 @@ namespace AlphaTab.Rendering.Staves
             if (Layout.Renderer.BoundsLookup.IsFinished) return;
             if (_firstStaffInAccolade == null || _lastStaffInAccolade == null) return;
 
+            var lastStaff = _allStaves[_allStaves.Count - 1];
+
             var visualTop = cy + Y + _firstStaffInAccolade.Y;
             var visualBottom = cy + Y + _lastStaffInAccolade.Y + _lastStaffInAccolade.Height;
             var realTop = cy + Y + _allStaves[0].Y;
-            var realBottom = cy + Y + _allStaves[_allStaves.Count - 1].Y + _allStaves[_allStaves.Count - 1].Height;
+            var realBottom = cy + Y + lastStaff.Y + lastStaff.Height;
+            var lineTop = cy + Y + _firstStaffInAccolade.Y 
+                          + _firstStaffInAccolade.TopSpacing 
+                          + _firstStaffInAccolade.TopOverflow
+                          + (_firstStaffInAccolade.BarRenderers.Count > 0 ? _firstStaffInAccolade.BarRenderers[0].TopPadding : 0);
+            var lineBottom = cy + Y + lastStaff.Y + lastStaff.Height 
+                             - lastStaff.BottomSpacing
+                             - lastStaff.BottomOverflow
+                             - (lastStaff.BarRenderers.Count > 0 ? lastStaff.BarRenderers[0].BottomPadding : 0);
 
             var visualHeight = visualBottom - visualTop;
+            var lineHeight = lineBottom - lineTop;
             var realHeight = realBottom - realTop;
 
             var x = X + _firstStaffInAccolade.X;
@@ -473,6 +484,13 @@ namespace AlphaTab.Rendering.Staves
                             Y = visualTop,
                             W = renderer.Width,
                             H = visualHeight
+                        };
+                        masterBarBounds.LineAlignedBounds = new Bounds
+                        {
+                            X = x + renderer.X,
+                            Y = lineTop,
+                            W = renderer.Width,
+                            H = lineHeight
                         };
                         Layout.Renderer.BoundsLookup.AddMasterBar(masterBarBounds);
                         masterBarBoundsLookup.Add(masterBarBounds);

@@ -23089,15 +23089,16 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 			return;
 		}
 		var barBoundings = beatBoundings.BarBounds.MasterBarBounds;
-		barCursor.style.top = Std.string(barBoundings.VisualBounds.Y) + "px";
-		barCursor.style.left = Std.string(barBoundings.VisualBounds.X) + "px";
-		barCursor.style.width = Std.string(barBoundings.VisualBounds.W) + "px";
-		barCursor.style.height = Std.string(barBoundings.VisualBounds.H) + "px";
+		var barBounds = barBoundings.VisualBounds;
+		barCursor.style.top = Std.string(barBounds.Y) + "px";
+		barCursor.style.left = Std.string(barBounds.X) + "px";
+		barCursor.style.width = Std.string(barBounds.W) + "px";
+		barCursor.style.height = Std.string(barBounds.H) + "px";
 		beatCursor.style.transition = "none";
-		beatCursor.style.top = Std.string(barBoundings.VisualBounds.Y) + "px";
+		beatCursor.style.top = Std.string(barBounds.Y) + "px";
 		beatCursor.style.left = Std.string(beatBoundings.VisualBounds.X) + "px";
 		beatCursor.style.width = Std.string(this.Settings.BeatCursorWidth) + "px";
-		beatCursor.style.height = Std.string(barBoundings.VisualBounds.H) + "px";
+		beatCursor.style.height = Std.string(barBounds.H) + "px";
 		var elements = this.Element.getElementsByClassName("atHighlight");
 		while(elements.length > 0) elements.item(0).classList.remove("atHighlight");
 		if(this._playerState == 1 || stop) {
@@ -31566,11 +31567,15 @@ alphaTab.rendering.staves.StaveGroup.prototype = {
 		if(this._firstStaffInAccolade == null || this._lastStaffInAccolade == null) {
 			return;
 		}
+		var lastStaff = this._allStaves[this._allStaves.length - 1];
 		var visualTop = cy + this.Y + this._firstStaffInAccolade.Y;
 		var visualBottom = cy + this.Y + this._lastStaffInAccolade.Y + this._lastStaffInAccolade.Height;
 		var realTop = cy + this.Y + this._allStaves[0].Y;
-		var realBottom = cy + this.Y + this._allStaves[this._allStaves.length - 1].Y + this._allStaves[this._allStaves.length - 1].Height;
+		var realBottom = cy + this.Y + lastStaff.Y + lastStaff.Height;
+		var lineTop = cy + this.Y + this._firstStaffInAccolade.Y + this._firstStaffInAccolade.TopSpacing + this._firstStaffInAccolade.get_TopOverflow() + (this._firstStaffInAccolade.BarRenderers.length > 0 ? this._firstStaffInAccolade.BarRenderers[0].TopPadding : 0);
+		var lineBottom = cy + this.Y + lastStaff.Y + lastStaff.Height - lastStaff.BottomSpacing - lastStaff.get_BottomOverflow() - (lastStaff.BarRenderers.length > 0 ? lastStaff.BarRenderers[0].BottomPadding : 0);
 		var visualHeight = visualBottom - visualTop;
+		var lineHeight = lineBottom - lineTop;
 		var realHeight = realBottom - realTop;
 		var x = this.X + this._firstStaffInAccolade.X;
 		var staveGroupBounds = new alphaTab.rendering.utils.StaveGroupBounds();
@@ -31611,6 +31616,12 @@ alphaTab.rendering.staves.StaveGroup.prototype = {
 					_tmp3.W = renderer.Width;
 					_tmp3.H = visualHeight;
 					masterBarBounds.VisualBounds = _tmp3;
+					var _tmp4 = new alphaTab.rendering.utils.Bounds();
+					_tmp4.X = x + renderer.X;
+					_tmp4.Y = lineTop;
+					_tmp4.W = renderer.Width;
+					_tmp4.H = lineHeight;
+					masterBarBounds.LineAlignedBounds = _tmp4;
 					this.Layout.Renderer.get_BoundsLookup().AddMasterBar(masterBarBounds);
 					masterBarBoundsLookup.push(masterBarBounds);
 				}
@@ -32238,6 +32249,7 @@ alphaTab.rendering.utils.BoundsLookup.FromJson = function(json,score) {
 			var mb = new alphaTab.rendering.utils.MasterBarBounds();
 			mb.Index = masterBar1.Index;
 			mb.IsFirstOfLine = masterBar1.IsFirstOfLine;
+			mb.LineAlignedBounds = masterBar1.LineAlignedBounds;
 			mb.VisualBounds = masterBar1.VisualBounds;
 			mb.RealBounds = masterBar1.RealBounds;
 			sg.AddBar(mb);
@@ -32280,6 +32292,7 @@ alphaTab.rendering.utils.BoundsLookup.prototype = {
 			while(masterBar.hasNext()) {
 				var masterBar1 = masterBar.next();
 				var mb = {}
+				mb.LineAlignedBounds = this.BoundsToJson(masterBar1.LineAlignedBounds);
 				mb.VisualBounds = this.BoundsToJson(masterBar1.VisualBounds);
 				mb.RealBounds = this.BoundsToJson(masterBar1.RealBounds);
 				mb.Index = masterBar1.Index;
@@ -32402,6 +32415,7 @@ alphaTab.rendering.utils.MasterBarBounds = $hx_exports["alphaTab"]["rendering"][
 	this.IsFirstOfLine = false;
 	this.VisualBounds = null;
 	this.RealBounds = null;
+	this.LineAlignedBounds = null;
 	this.Bars = null;
 	this.StaveGroupBounds = null;
 	var this1 = [];

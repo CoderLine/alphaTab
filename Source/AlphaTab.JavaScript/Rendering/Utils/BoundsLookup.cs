@@ -42,6 +42,7 @@ namespace AlphaTab.Rendering.Utils
                 foreach (var masterBar in group.Bars)
                 {
                     MasterBarBounds mb = Platform.Platform.NewObject();
+                    mb.LineAlignedBounds = BoundsToJson(masterBar.LineAlignedBounds);
                     mb.VisualBounds = BoundsToJson(masterBar.VisualBounds);
                     mb.RealBounds = BoundsToJson(masterBar.RealBounds);
                     mb.Index = masterBar.Index;
@@ -99,6 +100,7 @@ namespace AlphaTab.Rendering.Utils
                     var mb = new MasterBarBounds();
                     mb.Index = masterBar.Index;
                     mb.IsFirstOfLine = masterBar.IsFirstOfLine;
+                    mb.LineAlignedBounds = masterBar.LineAlignedBounds;
                     mb.VisualBounds = masterBar.VisualBounds;
                     mb.RealBounds = masterBar.RealBounds;
                     sg.AddBar(mb);

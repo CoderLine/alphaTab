@@ -1285,17 +1285,18 @@ namespace AlphaTab.Platform.JavaScript
             }
 
             var barBoundings = beatBoundings.BarBounds.MasterBarBounds;
-            barCursor.Style.Top = barBoundings.VisualBounds.Y + "px";
-            barCursor.Style.Left = barBoundings.VisualBounds.X + "px";
-            barCursor.Style.Width = barBoundings.VisualBounds.W + "px";
-            barCursor.Style.Height = barBoundings.VisualBounds.H + "px";
+            var barBounds = barBoundings.VisualBounds;
+            barCursor.Style.Top = barBounds.Y + "px";
+            barCursor.Style.Left = barBounds.X + "px";
+            barCursor.Style.Width = barBounds.W + "px";
+            barCursor.Style.Height = barBounds.H + "px";
 
             // move beat to start position immediately
             beatCursor.Style.Transition = "none";
-            beatCursor.Style.Top = barBoundings.VisualBounds.Y + "px";
+            beatCursor.Style.Top = barBounds.Y + "px";
             beatCursor.Style.Left = beatBoundings.VisualBounds.X + "px";
             beatCursor.Style.Width = Settings.BeatCursorWidth + "px";
-            beatCursor.Style.Height = barBoundings.VisualBounds.H + "px";
+            beatCursor.Style.Height = barBounds.H + "px";
 
             // if playing, animate the cursor to the next beat
             var elements = Element.GetElementsByClassName("atHighlight");
