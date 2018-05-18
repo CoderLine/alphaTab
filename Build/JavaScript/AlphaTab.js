@@ -434,12 +434,13 @@ alphaTab.platform.svg.SvgCanvas.prototype = {
 		var this1 = "";
 		this.Buffer = this1;
 		this.Buffer += Std.string("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
-		this.Buffer += Std.string(width);
+		var this2 = width;
+		this.Buffer += Std.string(Math.ceil(this2));
 		this.Buffer += Std.string("px\" height=\"");
 		this.Buffer += Std.string(height);
 		this.Buffer += Std.string("px\" class=\"alphaTabSurfaceSvg\">\n");
-		var this2 = "";
-		this._currentPath = this2;
+		var this3 = "";
+		this._currentPath = this3;
 		this._currentPathIsEmpty = true;
 	}
 	,BeginGroup: function(identifier) {
