@@ -29724,6 +29724,7 @@ alphaTab.rendering.glyphs.TabBendGlyph.prototype = $extend(alphaTab.rendering.gl
 		} else {
 			y2 = y2 + overflowOffset;
 		}
+		var h = Math.abs(y1 - y2);
 		var arrowOffset = 0;
 		var arrowSize = 6 * this.get_Scale();
 		if(secondPt.Value > firstPt.Value) {
@@ -29768,7 +29769,7 @@ alphaTab.rendering.glyphs.TabBendGlyph.prototype = $extend(alphaTab.rendering.gl
 			}
 		} else if(x2 > x1) {
 			canvas.MoveTo(x1,y1);
-			canvas.BezierCurveTo(x2,y1,x2,y2 + arrowOffset,x2,y2 + arrowOffset);
+			canvas.BezierCurveTo((x1 + x2) / 2,y1,x2,y1,x2,y2 + arrowOffset);
 			canvas.Stroke();
 		} else {
 			canvas.MoveTo(x1,y1);
@@ -29785,7 +29786,6 @@ alphaTab.rendering.glyphs.TabBendGlyph.prototype = $extend(alphaTab.rendering.gl
 		if(tmp) {
 			canvas.set_Font(res.GraceFont);
 			var size = canvas.MeasureText(this._slurText);
-			var h = Math.abs(y1 - y2);
 			var y;
 			var x;
 			if(y1 > y2) {

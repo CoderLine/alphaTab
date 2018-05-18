@@ -233,6 +233,7 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 y2 += overflowOffset;
             }
+            var h = Math.Abs(y1 - y2);
 
             // what type of arrow? (up/down)
             var arrowOffset = 0f;
@@ -294,7 +295,7 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     // draw bezier lien from first to second point
                     canvas.MoveTo(x1, y1);
-                    canvas.BezierCurveTo(x2, y1, x2, y2 + arrowOffset, x2, y2 + arrowOffset);
+                    canvas.BezierCurveTo((x1 + x2) / 2, y1, x2, y1, x2, y2 + arrowOffset);
                     canvas.Stroke();
                 }
                 else
@@ -309,7 +310,6 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 canvas.Font = res.GraceFont;
                 var size = canvas.MeasureText(_slurText);
-                var h = Math.Abs(y1 - y2);
                 float y;
                 float x;
                 if (y1 > y2)
