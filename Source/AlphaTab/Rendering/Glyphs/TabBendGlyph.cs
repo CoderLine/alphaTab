@@ -89,6 +89,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var startNoteRenderer = Renderer;
 
+
             Note endNote = _note;
             bool isMultiBeatBend = false;
             BarRendererBase endNoteRenderer;
@@ -140,36 +141,39 @@ namespace AlphaTab.Rendering.Glyphs
                 startX += startNoteRenderer.GetNoteX(_note);
             }
 
-            var endXPositionType = endNoteHasBend
-                ? BeatXPosition.MiddleNotes 
-                : BeatXPosition.EndBeat;
+            //canvas.Color = Color.Random();
+            //canvas.FillRect(
+            //    cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_note.Beat, BeatXPosition.MiddleNotes),
+            //    cy + startNoteRenderer.Y, 10, 10);
+            //canvas.FillRect(
+            //    cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_note.Beat, BeatXPosition.EndBeat),
+            //    cy + startNoteRenderer.Y + 10, 10, 10);
 
             if (endBeat == null || (endBeat.Index == endBeat.Voice.Beats.Count - 1 && !endNoteHasBend))
             {
                 endX = cx + endNoteRenderer.X + endNoteRenderer.Width;
             }
+            else if(endNoteHasBend || endBeat.NextBeat == null)
+            {
+                endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat, BeatXPosition.MiddleNotes);
+            }
+            else if(_note.BendType == BendType.Hold)
+            {
+                endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat.NextBeat, BeatXPosition.OnNotes);
+            }
             else
             {
-                endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat, endXPositionType);
+                endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat.NextBeat, BeatXPosition.PreNotes);
             }
 
             if (!isMultiBeatBend)
             {
                 endX -= (ArrowSize * Scale);
-                //endX -= ScoreBendGlyph.EndPadding * Scale;
             }
 
             // we need some pixels for the arrow. otherwise we might draw into the next 
             // note
             var width = endX - startX;
-
-            //var bendHeight = _note.MaxBendPoint.Value * _bendValueHeight;
-            //var c = new Color((byte)(Platform.Platform.RandomDouble() * 255),
-            //        (byte)(Platform.Platform.RandomDouble() * 255),
-            //        (byte)(Platform.Platform.RandomDouble() * 255),
-            //      100);
-            //canvas.Color = c;
-            //canvas.FillRect(startX, topY - bendHeight, width, bottomY - (topY - bendHeight));
 
             // calculate offsets per step
 

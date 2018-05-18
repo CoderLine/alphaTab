@@ -90,6 +90,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             if (_showParenthesis)
             {
+                _preNoteParenthesis.X = x;
                 _preNoteParenthesis.Renderer = Renderer;
                 _preNoteParenthesis.DoLayout();
                 x += _preNoteParenthesis.Width + ElementPadding * Scale;
@@ -116,10 +117,15 @@ namespace AlphaTab.Rendering.Glyphs
                 _postNoteParenthesis.DoLayout();
                 Width += _postNoteParenthesis.Width + ElementPadding * Scale;
             }
+
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
+            var x = 0f;
+            if (!_accidentals.IsEmpty) x = _accidentals.X;
+            else if (_showParenthesis) x = _preNoteParenthesis.X;
+
             //canvas.Color = Color.Random();
             //canvas.FillRect(cx + X, cy + Y, Width, 10);
             //canvas.Color = Renderer.Resources.MainGlyphColor;

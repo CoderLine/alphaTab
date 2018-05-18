@@ -161,6 +161,9 @@ namespace AlphaTab.Rendering.Glyphs
 
             canvas.BeginGroup(GetGroupId(Beat));
 
+            //canvas.Color = Color.Random();
+            //canvas.FillRect(cx + X, cy + Y, Width, Renderer.Height);
+
             //var oldColor = canvas.Color;
             //canvas.Color = new Color((byte)Platform.Platform.Random(255), (byte)Platform.Platform.Random(255), (byte)Platform.Platform.Random(255), 100);
             //canvas.FillRect(cx + X, cy + Y, Width, Renderer.Height);

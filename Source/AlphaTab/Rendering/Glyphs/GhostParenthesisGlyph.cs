@@ -5,7 +5,7 @@ namespace AlphaTab.Rendering.Glyphs
     public class GhostParenthesisGlyph : Glyph
     {
         private readonly bool _isOpen;
-        private const int Size = 10;
+        private const int Size = 6;
         public GhostParenthesisGlyph(bool isOpen) : base(0, 0)
         {
             _isOpen = isOpen;

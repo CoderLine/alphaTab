@@ -26838,6 +26838,7 @@ alphaTab.rendering.glyphs.BendNoteHeadGroupGlyph.prototype = $extend(alphaTab.re
 	,DoLayout: function() {
 		var x = 0;
 		if(this._showParenthesis) {
+			this._preNoteParenthesis.X = x;
 			this._preNoteParenthesis.Renderer = this.Renderer;
 			this._preNoteParenthesis.DoLayout();
 			x = x + (this._preNoteParenthesis.Width + 2 * this.get_Scale());
@@ -26861,6 +26862,12 @@ alphaTab.rendering.glyphs.BendNoteHeadGroupGlyph.prototype = $extend(alphaTab.re
 		}
 	}
 	,Paint: function(cx,cy,canvas) {
+		var x = 0;
+		if(!this._accidentals.get_IsEmpty()) {
+			x = this._accidentals.X;
+		} else if(this._showParenthesis) {
+			x = this._preNoteParenthesis.X;
+		}
 		if(!this._accidentals.get_IsEmpty()) {
 			this._accidentals.Paint(cx + this.X,cy + this.Y,canvas);
 		}
@@ -27298,14 +27305,14 @@ alphaTab.rendering.glyphs.GhostParenthesisGlyph.__super__ = alphaTab.rendering.g
 alphaTab.rendering.glyphs.GhostParenthesisGlyph.prototype = $extend(alphaTab.rendering.glyphs.Glyph.prototype,{
 	DoLayout: function() {
 		alphaTab.rendering.glyphs.Glyph.prototype.DoLayout.call(this);
-		this.Width = 10 * this.get_Scale();
+		this.Width = 6 * this.get_Scale();
 	}
 	,Paint: function(cx,cy,canvas) {
 		if(this._isOpen) {
-			var this1 = 10;
+			var this1 = 6;
 			alphaTab.rendering.glyphs.TieGlyph.PaintTie(canvas,this.get_Scale(),cx + this.X + this.Width,cy + this.Y + this.Height,cx + this.X + this.Width,cy + this.Y,false,this1,3);
 		} else {
-			var this2 = 10;
+			var this2 = 6;
 			alphaTab.rendering.glyphs.TieGlyph.PaintTie(canvas,this.get_Scale(),cx + this.X,cy + this.Y,cx + this.X,cy + this.Y + this.Height,false,this2,3);
 		}
 		canvas.Fill();
@@ -29654,11 +29661,14 @@ alphaTab.rendering.glyphs.TabBendGlyph.prototype = $extend(alphaTab.rendering.gl
 		} else {
 			startX = startX + startNoteRenderer.GetNoteX(this._note,true);
 		}
-		var endXPositionType = endNoteHasBend ? 2 : 4;
 		if(endBeat == null || endBeat.Index == endBeat.Voice.Beats.length - 1 && !endNoteHasBend) {
 			endX = cx + endNoteRenderer.X + endNoteRenderer.Width;
+		} else if(endNoteHasBend || endBeat.NextBeat == null) {
+			endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat,2);
+		} else if(this._note.BendType == 5) {
+			endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat.NextBeat,1);
 		} else {
-			endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat,endXPositionType);
+			endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat.NextBeat,0);
 		}
 		if(!isMultiBeatBend) {
 			endX = endX - 6 * this.get_Scale();
@@ -30887,7 +30897,6 @@ alphaTab.rendering.staves.BarLayoutingInfo = $hx_exports["alphaTab"]["rendering"
 	this.MinStretchForce = 0.0;
 	this.TotalSpringConstant = 0.0;
 	this.Springs = null;
-	this.SmallestDuration = 0;
 	var this1 = {}
 	this.PreBeatSizes = this1;
 	var this2 = {}
@@ -30898,6 +30907,8 @@ alphaTab.rendering.staves.BarLayoutingInfo = $hx_exports["alphaTab"]["rendering"
 	var this4 = {}
 	this.Springs = this4;
 	this.Version = 0;
+	var this5 = [];
+	this._timeSortedSprings = this5;
 };
 alphaTab.rendering.staves.BarLayoutingInfo.__name__ = ["alphaTab","rendering","staves","BarLayoutingInfo"];
 alphaTab.rendering.staves.BarLayoutingInfo.prototype = {
@@ -30955,11 +30966,29 @@ alphaTab.rendering.staves.BarLayoutingInfo.prototype = {
 		if(!this.Springs.hasOwnProperty(start)) {
 			spring = new alphaTab.rendering.staves.Spring();
 			spring.TimePosition = start;
-			spring.SmallestDuration = duration;
+			spring.AllDurations.push(duration);
+			if(this._timeSortedSprings.length > 0) {
+				var smallestDuration = duration;
+				var previousSpring = this._timeSortedSprings[this._timeSortedSprings.length - 1];
+				var prevDuration = $iterator(previousSpring.AllDurations)();
+				while(prevDuration.hasNext()) {
+					var prevDuration1 = prevDuration.next();
+					var end = previousSpring.TimePosition + prevDuration1;
+					if(end >= start && prevDuration1 < smallestDuration) {
+						smallestDuration = prevDuration1;
+					}
+				}
+			} else {
+				spring.SmallestDuration = duration;
+			}
 			spring.LongestDuration = duration;
 			spring.SpringWidth = springSize;
 			spring.PreSpringWidth = preSpringSize;
 			this.Springs[start] = spring;
+			var timeSorted = this._timeSortedSprings;
+			var insertPos = timeSorted.length - 1;
+			while(insertPos > 0 && timeSorted[insertPos].TimePosition > start) --insertPos;
+			this._timeSortedSprings.splice(insertPos + 1,0,spring);
 		} else {
 			spring = this.Springs[start];
 			if(spring.SpringWidth < springSize) {
@@ -30974,9 +31003,7 @@ alphaTab.rendering.staves.BarLayoutingInfo.prototype = {
 			if(duration > spring.LongestDuration) {
 				spring.LongestDuration = duration;
 			}
-		}
-		if(duration < this.SmallestDuration) {
-			this.SmallestDuration = duration;
+			spring.AllDurations.push(duration);
 		}
 		return spring;
 	}
@@ -30988,32 +31015,18 @@ alphaTab.rendering.staves.BarLayoutingInfo.prototype = {
 		this.Version++;
 	}
 	,CalculateSpringConstants: function() {
-		var this1 = [];
-		var sortedSprings = this._timeSortedSprings = this1;
 		this._xMin = 0;
 		var springs = this.Springs;
 		var time = $iterator(Object.keys(springs))();
 		while(time.hasNext()) {
 			var time1 = time.next();
 			var spring = springs[time1];
-			sortedSprings.push(spring);
 			if(spring.SpringWidth < this._xMin) {
 				this._xMin = spring.SpringWidth;
 			}
 		}
-		var comparison = function(a,b) {
-			if(a.TimePosition < b.TimePosition) {
-				return -1;
-			}
-			if(a.TimePosition > b.TimePosition) {
-				return 1;
-			}
-			return 0;
-		};
-		sortedSprings.sort(function(a1,b1) {
-			return comparison(a1,b1);
-		});
 		var totalSpringConstant = 0;
+		var sortedSprings = this._timeSortedSprings;
 		var i = 0;
 		while(i < sortedSprings.length) {
 			var currentSpring = sortedSprings[i];
@@ -31024,25 +31037,24 @@ alphaTab.rendering.staves.BarLayoutingInfo.prototype = {
 				var nextSpring = sortedSprings[i + 1];
 				duration = nextSpring.TimePosition - currentSpring.TimePosition;
 			}
-			var this2 = duration;
-			currentSpring.SpringConstant = this.CalculateSpringConstant(currentSpring,this2);
+			currentSpring.SpringConstant = this.CalculateSpringConstant(currentSpring,duration);
 			totalSpringConstant = totalSpringConstant + 1 / currentSpring.SpringConstant;
 			++i;
 		}
 		this.TotalSpringConstant = 1 / totalSpringConstant;
 		var i1 = 0;
 		while(i1 < sortedSprings.length) {
-			var force = this.SpaceToForce(sortedSprings[i1].SpringWidth);
+			var force = sortedSprings[i1].SpringWidth * sortedSprings[i1].SpringConstant;
 			this.UpdateMinStretchForce(force);
 			++i1;
 		}
 	}
 	,CalculateSpringConstant: function(spring,duration) {
+		if(spring.SmallestDuration == 0) {
+			spring.SmallestDuration = duration;
+		}
 		var this1 = spring.SmallestDuration;
 		var minDuration = this1;
-		if(spring.SmallestDuration == 0) {
-			minDuration = duration;
-		}
 		var this2 = 0.6;
 		var phi = 1 + this2 * Math.log2(duration / js.Boot.__cast(30 , Float));
 		return minDuration / duration * (1 / (phi * 10));
@@ -31094,6 +31106,16 @@ alphaTab.rendering.staves.MasterBarsRenderers.prototype = {
 	__class__: alphaTab.rendering.staves.MasterBarsRenderers
 };
 alphaTab.rendering.staves.Spring = $hx_exports["alphaTab"]["rendering"]["staves"]["Spring"] = function() {
+	this.TimePosition = 0;
+	this.LongestDuration = 0;
+	this.SmallestDuration = 0;
+	this.Force = 0.0;
+	this.SpringConstant = 0.0;
+	this.SpringWidth = 0.0;
+	this.PreSpringWidth = 0.0;
+	this.AllDurations = null;
+	var this1 = [];
+	this.AllDurations = this1;
 };
 alphaTab.rendering.staves.Spring.__name__ = ["alphaTab","rendering","staves","Spring"];
 alphaTab.rendering.staves.Spring.prototype = {
@@ -35237,7 +35259,7 @@ alphaTab.rendering.TabBarRenderer.LineSpacing = 10;
 alphaTab.rendering.glyphs.AccidentalGroupGlyph.NonReserved = -3000;
 alphaTab.rendering.glyphs.AlternateEndingsGlyph.Padding = 3;
 alphaTab.rendering.glyphs.BendNoteHeadGroupGlyph.ElementPadding = 2;
-alphaTab.rendering.glyphs.GhostParenthesisGlyph.Size = 10;
+alphaTab.rendering.glyphs.GhostParenthesisGlyph.Size = 6;
 alphaTab.rendering.glyphs.LineRangedGlyph.LineSpacing = 3;
 alphaTab.rendering.glyphs.LineRangedGlyph.LineTopPadding = 8;
 alphaTab.rendering.glyphs.LineRangedGlyph.LineTopOffset = 6;
