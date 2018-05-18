@@ -7279,6 +7279,7 @@ alphaTab.audio.generator.AlphaSynthMidiFileHandler.prototype = {
 	,AddBend: function(track,tick,channel,value) {
 		var message = new alphaTab.audio.synth.midi.event.MidiEvent(tick,this.MakeCommand(system.Convert.ToUInt8(224),channel),0,alphaTab.audio.generator.AlphaSynthMidiFileHandler.FixValue(value));
 		this._midiFile.Events.push(message);
+		alphaTab.util.Logger.Info("Midi","Bend at " + tick + " : " + value,null);
 	}
 	,FinishTrack: function(track,tick) {
 		var message = system.Convert.ToUInt8(47);
@@ -7478,7 +7479,9 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		var noteKey = note.get_RealValue();
 		var brushOffset = note.get_IsStringed() && note.String <= brushInfo.length ? brushInfo[note.String - 1] : 0;
 		var noteStart = beatStart + brushOffset;
-		var noteDuration = this.GetNoteDuration(note,beatDuration) - brushOffset;
+		var noteDuration = this.GetNoteDuration(note,beatDuration);
+		noteDuration.UntilTieEnd = noteDuration.UntilTieEnd - brushOffset;
+		noteDuration.NoteOnly = noteDuration.NoteOnly - brushOffset;
 		var dynamicValue = this.GetDynamicValue(note);
 		if(!note.get_HasBend() && !note.IsTieDestination && !note.Beat.get_HasWhammyBar()) {
 			this._handler.AddBend(track.Index,noteStart,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(64));
@@ -7507,35 +7510,46 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			this.GenerateHarmonic(note,noteStart,noteDuration,noteKey,dynamicValue);
 		}
 		if(!note.IsTieDestination) {
-			this._handler.AddNote(track.Index,noteStart,noteDuration,system.Convert.ToUInt8(noteKey),dynamicValue,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel));
+			this._handler.AddNote(track.Index,noteStart,noteDuration.UntilTieEnd,system.Convert.ToUInt8(noteKey),dynamicValue,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel));
 		}
 	}
 	,GetNoteDuration: function(note,beatDuration) {
 		return this.ApplyDurationEffects(note,beatDuration);
 	}
 	,ApplyDurationEffects: function(note,duration) {
+		var durationWithEffects = new alphaTab.audio.generator.MidiNoteDuration();
+		durationWithEffects.NoteOnly = duration;
+		durationWithEffects.UntilTieEnd = duration;
 		if(note.IsDead) {
-			return this.ApplyStaticDuration(30,duration);
+			durationWithEffects.NoteOnly = this.ApplyStaticDuration(30,duration);
+			durationWithEffects.UntilTieEnd = durationWithEffects.NoteOnly;
+			return durationWithEffects;
 		}
 		if(note.IsPalmMute) {
-			return this.ApplyStaticDuration(80,duration);
+			durationWithEffects.NoteOnly = this.ApplyStaticDuration(80,duration);
+			durationWithEffects.UntilTieEnd = durationWithEffects.NoteOnly;
+			return durationWithEffects;
 		}
 		if(note.IsStaccato) {
-			return duration / 2 | 0;
+			durationWithEffects.NoteOnly = duration / 2 | 0;
+			durationWithEffects.UntilTieEnd = durationWithEffects.NoteOnly;
+			return durationWithEffects;
 		}
 		if(note.IsTieOrigin) {
 			var endNote = note.TieDestination;
 			if(endNote != null) {
 				if(!note.IsTieDestination) {
 					var startTick = note.Beat.get_AbsoluteStart();
-					var endTick = endNote.Beat.get_AbsoluteStart() + this.GetNoteDuration(endNote,endNote.Beat.CalculateDuration());
-					return endTick - startTick;
+					var tieDestinationDuration = this.GetNoteDuration(endNote,endNote.Beat.CalculateDuration());
+					var endTick = endNote.Beat.get_AbsoluteStart() + tieDestinationDuration.UntilTieEnd;
+					durationWithEffects.UntilTieEnd = endTick - startTick;
 				} else {
-					return duration + this.GetNoteDuration(endNote,endNote.Beat.CalculateDuration());
+					var tieDestinationDuration1 = this.GetNoteDuration(endNote,endNote.Beat.CalculateDuration());
+					durationWithEffects.UntilTieEnd = duration + tieDestinationDuration1.UntilTieEnd;
 				}
 			}
 		}
-		return duration;
+		return durationWithEffects;
 	}
 	,ApplyStaticDuration: function(duration,maximum) {
 		var value = this._currentTempo * duration / 60 | 0;
@@ -7564,10 +7578,10 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 	,GenerateFadeIn: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
 		var track = note.Beat.Voice.Bar.Staff.Track;
 		var endVolume = alphaTab.audio.generator.MidiFileGenerator.ToChannelShort(track.PlaybackInfo.Volume);
-		var volumeFactor = js.Boot.__cast(endVolume , Float) / noteDuration;
+		var volumeFactor = js.Boot.__cast(endVolume , Float) / noteDuration.NoteOnly;
 		var tickStep = 120;
-		var steps = noteDuration / tickStep | 0;
-		var endTick = noteStart + noteDuration;
+		var steps = noteDuration.NoteOnly / tickStep | 0;
+		var endTick = noteStart + noteDuration.NoteOnly;
 		var i = steps - 1;
 		while(i >= 0) {
 			var tick = endTick - i * tickStep;
@@ -7587,7 +7601,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		var phaseLength = 480;
 		var bendAmplitude = 2;
 		var track = note.Beat.Voice.Bar.Staff.Track;
-		this.GenerateVibratorWithParams(track,noteStart,noteDuration,phaseLength,bendAmplitude);
+		this.GenerateVibratorWithParams(track,noteStart,noteDuration.NoteOnly,phaseLength,bendAmplitude);
 	}
 	,GenerateVibratorWithParams: function(track,noteStart,noteDuration,phaseLength,bendAmplitude) {
 		var resolution = 16;
@@ -7611,7 +7625,18 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 	}
 	,GenerateBend: function(note,bendPoints,noteStart,noteDuration,noteKey,dynamicValue) {
 		var track = note.Beat.Voice.Bar.Staff.Track;
-		var ticksPerPosition = js.Boot.__cast(noteDuration , Float) / 60;
+		var duration;
+		if(note.IsTieOrigin) {
+			var endNote = note;
+			while(endNote.IsTieOrigin && !endNote.get_HasBend()) endNote = endNote.TieDestination;
+			duration = endNote.Beat.get_AbsoluteStart() - note.Beat.get_AbsoluteStart() + this.GetNoteDuration(endNote,endNote.Beat.CalculateDuration()).NoteOnly;
+		} else {
+			duration = noteDuration.NoteOnly;
+		}
+		if(bendPoints[0].Value > 0 && !note.IsContinuedBend) {
+			--noteStart;
+		}
+		var ticksPerPosition = js.Boot.__cast(duration , Float) / 60;
 		var i = 0;
 		while(i < bendPoints.length - 1) {
 			var currentPoint = bendPoints[i];
@@ -7635,6 +7660,9 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 					--currentBendValue;
 					tick = tick + ticksPerValue;
 				}
+			} else {
+				var this3 = currentBendValue;
+				this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this3))));
 			}
 			++i;
 		}
@@ -7645,9 +7673,10 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		var trillLength = alphaTab.audio.MidiUtils.ToTicks(note.TrillSpeed);
 		var realKey = true;
 		var tick = noteStart;
-		while(tick + 10 < noteStart + noteDuration) {
-			if(tick + trillLength >= noteStart + noteDuration) {
-				trillLength = noteStart + noteDuration - tick;
+		var end = noteStart + noteDuration.UntilTieEnd;
+		while(tick + 10 < end) {
+			if(tick + trillLength >= end) {
+				trillLength = end - tick;
 			}
 			this._handler.AddNote(track.Index,tick,trillLength,system.Convert.ToUInt8(realKey ? trillKey : noteKey),dynamicValue,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel));
 			realKey = !realKey;
@@ -7658,9 +7687,10 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		var track = note.Beat.Voice.Bar.Staff.Track;
 		var tpLength = alphaTab.audio.MidiUtils.ToTicks(note.Beat.TremoloSpeed);
 		var tick = noteStart;
-		while(tick + 10 < noteStart + noteDuration) {
-			if(tick + tpLength >= noteStart + noteDuration) {
-				tpLength = noteStart + noteDuration - tick;
+		var end = noteStart + noteDuration.UntilTieEnd;
+		while(tick + 10 < end) {
+			if(tick + tpLength >= end) {
+				tpLength = end - tick;
 			}
 			this._handler.AddNote(track.Index,tick,tpLength,system.Convert.ToUInt8(noteKey),dynamicValue,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel));
 			tick = tick + tpLength;
@@ -7730,6 +7760,12 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		}
 	}
 	,__class__: alphaTab.audio.generator.MidiFileGenerator
+};
+alphaTab.audio.generator.MidiNoteDuration = $hx_exports["alphaTab"]["audio"]["generator"]["MidiNoteDuration"] = function() {
+};
+alphaTab.audio.generator.MidiNoteDuration.__name__ = ["alphaTab","audio","generator","MidiNoteDuration"];
+alphaTab.audio.generator.MidiNoteDuration.prototype = {
+	__class__: alphaTab.audio.generator.MidiNoteDuration
 };
 alphaTab.audio.generator.MidiPlaybackController = $hx_exports["alphaTab"]["audio"]["generator"]["MidiPlaybackController"] = function(score) {
 	this._score = null;
