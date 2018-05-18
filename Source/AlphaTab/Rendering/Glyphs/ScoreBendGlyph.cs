@@ -119,8 +119,6 @@ namespace AlphaTab.Rendering.Glyphs
 
             var middleX = (startX + endBeatX) / 2;
 
-            var direction = GetBeamDirection(_beat, startNoteRenderer);
-
             if (_middleNoteGlyph != null)
             {
                 _middleNoteGlyph.X = middleX - _bendNoteHeads[0].NoteHeadOffset;
@@ -135,10 +133,19 @@ namespace AlphaTab.Rendering.Glyphs
                 _endNoteGlyph.Paint(0, 0, canvas);
             }
 
+            _notes.Sort((a, b) => b.RealValueWithEffects - a.RealValueWithEffects);
+
+            var direction = _notes.Count == 1 ? GetBeamDirection(_beat, startNoteRenderer) : BeamDirection.Up;
 
             // draw slurs
-            foreach (var note in _notes)
+            for (var i = 0; i < _notes.Count; i++)
             {
+                var note = _notes[i];
+                if (i > 0 && i >= _notes.Count / 2)
+                {
+                    direction = BeamDirection.Down;
+                }
+
                 var startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(note, true);
                 var heightOffset = (NoteHeadGlyph.NoteHeadHeight * Scale * NoteHeadGlyph.GraceScale) * 0.5f;
                 if (direction == BeamDirection.Down)
@@ -151,7 +158,10 @@ namespace AlphaTab.Rendering.Glyphs
                 if (note.IsTieOrigin)
                 {
                     var endNote = note.TieDestination;
-                    var endNoteRenderer = endNote == null ? null : Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, endNote.Beat.Voice.Bar);
+                    var endNoteRenderer = endNote == null
+                        ? null
+                        : Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId,
+                            endNote.Beat.Voice.Bar);
 
                     // if we have a line break we draw only a line until the end
                     if (endNoteRenderer == null || endNoteRenderer.Staff != startNoteRenderer.Staff)
@@ -159,21 +169,28 @@ namespace AlphaTab.Rendering.Glyphs
                         var endX = cx + startNoteRenderer.X + startNoteRenderer.Width;
                         var noteValueToDraw = note.TieDestination.RealValue;
 
-                        var accidental = startNoteRenderer.AccidentalHelper.ApplyAccidentalForValue(noteValueToDraw, false);
-                        var endY = cy + startNoteRenderer.Y + startNoteRenderer.GetScoreY(startNoteRenderer.AccidentalHelper.GetNoteLineForValue(noteValueToDraw));
+                        var accidental =
+                            startNoteRenderer.AccidentalHelper.ApplyAccidentalForValue(noteValueToDraw, false);
+                        var endY = cy + startNoteRenderer.Y +
+                                   startNoteRenderer.GetScoreY(
+                                       startNoteRenderer.AccidentalHelper.GetNoteLineForValue(noteValueToDraw));
 
-                        DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale, slurText);
+                        DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale,
+                            slurText);
                     }
                     // otherwise we draw a line to the target note
                     else
                     {
-                        var endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endNote.Beat, BeatXPosition.MiddleNotes);
+                        var endX = cx + endNoteRenderer.X +
+                                   endNoteRenderer.GetBeatX(endNote.Beat, BeatXPosition.MiddleNotes);
                         var endY = cy + endNoteRenderer.Y + endNoteRenderer.GetNoteY(endNote, true);
                         if (direction == BeamDirection.Down)
                         {
                             endY += NoteHeadGlyph.NoteHeadHeight * Scale;
                         }
-                        DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale, slurText);
+
+                        DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale,
+                            slurText);
                     }
 
                     switch (note.BendType)
@@ -181,10 +198,15 @@ namespace AlphaTab.Rendering.Glyphs
                         case BendType.Prebend:
                         case BendType.PrebendBend:
                         case BendType.PrebendRelease:
-                            var preX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(note.Beat, BeatXPosition.PreNotes);
-                            preX += ((ScoreBeatPreNotesGlyph)startNoteRenderer.GetBeatContainer(note.Beat).PreNotes).PrebendNoteHeadOffset;
+                            var preX = cx + startNoteRenderer.X +
+                                       startNoteRenderer.GetBeatX(note.Beat, BeatXPosition.PreNotes);
+                            preX += ((ScoreBeatPreNotesGlyph) startNoteRenderer.GetBeatContainer(note.Beat).PreNotes)
+                                .PrebendNoteHeadOffset;
 
-                            var preY = cy + startNoteRenderer.Y + startNoteRenderer.GetScoreY(startNoteRenderer.AccidentalHelper.GetNoteLineForValue(note.RealValue)) + heightOffset;
+                            var preY = cy + startNoteRenderer.Y +
+                                       startNoteRenderer.GetScoreY(
+                                           startNoteRenderer.AccidentalHelper.GetNoteLineForValue(note.RealValue)) +
+                                       heightOffset;
 
                             DrawBendSlur(canvas, preX, preY, startX, startY, direction == BeamDirection.Down, Scale);
                             break;
@@ -201,17 +223,20 @@ namespace AlphaTab.Rendering.Glyphs
                         case BendType.Bend:
                             endValue = GetBendNoteValue(note, note.BendPoints[note.BendPoints.Count - 1]);
                             endY = _endNoteGlyph.GetNoteValueY(endValue) + heightOffset;
-                            DrawBendSlur(canvas, startX, startY, endBeatX, endY, direction == BeamDirection.Down, Scale, slurText);
+                            DrawBendSlur(canvas, startX, startY, endBeatX, endY, direction == BeamDirection.Down, Scale,
+                                slurText);
 
                             break;
                         case BendType.BendRelease:
                             var middleValue = GetBendNoteValue(note, note.BendPoints[1]);
                             var middleY = _middleNoteGlyph.GetNoteValueY(middleValue) + heightOffset;
-                            DrawBendSlur(canvas, startX, startY, middleX, middleY, direction == BeamDirection.Down, Scale, slurText);
+                            DrawBendSlur(canvas, startX, startY, middleX, middleY, direction == BeamDirection.Down,
+                                Scale, slurText);
 
                             endValue = GetBendNoteValue(note, note.BendPoints[note.BendPoints.Count - 1]);
                             endY = _endNoteGlyph.GetNoteValueY(endValue) + heightOffset;
-                            DrawBendSlur(canvas, middleX, middleY, endBeatX, endY, direction == BeamDirection.Down, Scale, slurText);
+                            DrawBendSlur(canvas, middleX, middleY, endBeatX, endY, direction == BeamDirection.Down,
+                                Scale, slurText);
 
                             break;
                         case BendType.Release:
@@ -219,17 +244,24 @@ namespace AlphaTab.Rendering.Glyphs
                             {
                                 endValue = GetBendNoteValue(note, note.BendPoints[note.BendPoints.Count - 1]);
                                 endY = _bendNoteHeads[0].GetNoteValueY(endValue) + heightOffset;
-                                DrawBendSlur(canvas, startX, startY, endBeatX, endY, direction == BeamDirection.Down, Scale, slurText);
+                                DrawBendSlur(canvas, startX, startY, endBeatX, endY, direction == BeamDirection.Down,
+                                    Scale, slurText);
                             }
+
                             break;
                         case BendType.Prebend:
                         case BendType.PrebendBend:
                         case BendType.PrebendRelease:
 
-                            var preX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(note.Beat, BeatXPosition.PreNotes);
-                            preX += ((ScoreBeatPreNotesGlyph)startNoteRenderer.GetBeatContainer(note.Beat).PreNotes).PrebendNoteHeadOffset;
+                            var preX = cx + startNoteRenderer.X +
+                                       startNoteRenderer.GetBeatX(note.Beat, BeatXPosition.PreNotes);
+                            preX += ((ScoreBeatPreNotesGlyph) startNoteRenderer.GetBeatContainer(note.Beat).PreNotes)
+                                .PrebendNoteHeadOffset;
 
-                            var preY = cy + startNoteRenderer.Y + startNoteRenderer.GetScoreY(startNoteRenderer.AccidentalHelper.GetNoteLineForValue(note.RealValue)) + heightOffset;
+                            var preY = cy + startNoteRenderer.Y +
+                                       startNoteRenderer.GetScoreY(
+                                           startNoteRenderer.AccidentalHelper.GetNoteLineForValue(note.RealValue)) +
+                                       heightOffset;
 
                             DrawBendSlur(canvas, preX, preY, startX, startY, direction == BeamDirection.Down, Scale);
 
@@ -237,7 +269,8 @@ namespace AlphaTab.Rendering.Glyphs
                             {
                                 endValue = GetBendNoteValue(note, note.BendPoints[note.BendPoints.Count - 1]);
                                 endY = _bendNoteHeads[0].GetNoteValueY(endValue) + heightOffset;
-                                DrawBendSlur(canvas, startX, startY, endBeatX, endY, direction == BeamDirection.Down, Scale, slurText);
+                                DrawBendSlur(canvas, startX, startY, endBeatX, endY, direction == BeamDirection.Down,
+                                    Scale, slurText);
                             }
 
                             break;

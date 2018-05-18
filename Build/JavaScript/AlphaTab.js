@@ -28471,7 +28471,6 @@ alphaTab.rendering.glyphs.ScoreBendGlyph.prototype = $extend(alphaTab.rendering.
 		}
 		endBeatX = endBeatX - ((8 / 2 | 0) + 3) * this.get_Scale();
 		var middleX = (startX + endBeatX) / 2;
-		var direction = this.GetBeamDirection(this._beat,startNoteRenderer);
 		if(this._middleNoteGlyph != null) {
 			this._middleNoteGlyph.X = middleX - this._bendNoteHeads[0].NoteHeadOffset;
 			this._middleNoteGlyph.Y = cy + startNoteRenderer.Y;
@@ -28482,22 +28481,32 @@ alphaTab.rendering.glyphs.ScoreBendGlyph.prototype = $extend(alphaTab.rendering.
 			this._endNoteGlyph.Y = cy + startNoteRenderer.Y;
 			this._endNoteGlyph.Paint(0,0,canvas);
 		}
-		var note = $iterator(this._notes)();
-		while(note.hasNext()) {
-			var note1 = note.next();
-			var startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(note1,true);
+		var comparison = function(a,b) {
+			return b.get_RealValueWithEffects() - a.get_RealValueWithEffects();
+		};
+		this._notes.sort(function(a1,b1) {
+			return comparison(a1,b1);
+		});
+		var direction = this._notes.length == 1 ? this.GetBeamDirection(this._beat,startNoteRenderer) : 0;
+		var i = 0;
+		while(i < this._notes.length) {
+			var note = this._notes[i];
+			if(i > 0 && i >= (this._notes.length / 2 | 0)) {
+				direction = 1;
+			}
+			var startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(note,true);
 			var this1 = 0.5;
 			var heightOffset = 9 * this.get_Scale() * 0.75 * this1;
 			if(direction == 1) {
 				startY = startY + 9 * this.get_Scale();
 			}
-			var slurText = note1.BendStyle == 1 ? "grad." : "";
-			if(note1.IsTieOrigin) {
-				var endNote = note1.TieDestination;
+			var slurText = note.BendStyle == 1 ? "grad." : "";
+			if(note.IsTieOrigin) {
+				var endNote = note.TieDestination;
 				var endNoteRenderer = endNote == null ? null : this.Renderer.ScoreRenderer.Layout.GetRendererForBar(this.Renderer.Staff.get_StaveId(),endNote.Beat.Voice.Bar);
 				if(endNoteRenderer == null || endNoteRenderer.Staff != startNoteRenderer.Staff) {
 					var endX = cx + startNoteRenderer.X + startNoteRenderer.Width;
-					var noteValueToDraw = note1.TieDestination.get_RealValue();
+					var noteValueToDraw = note.TieDestination.get_RealValue();
 					var accidental = startNoteRenderer.AccidentalHelper.ApplyAccidentalForValue(noteValueToDraw,false);
 					var endY = cy + startNoteRenderer.Y;
 					var this2 = startNoteRenderer.AccidentalHelper.GetNoteLineForValue(noteValueToDraw);
@@ -28511,13 +28520,13 @@ alphaTab.rendering.glyphs.ScoreBendGlyph.prototype = $extend(alphaTab.rendering.
 					}
 					this.DrawBendSlur(canvas,startX,startY,endX1,endY2,direction == 1,this.get_Scale(),slurText);
 				}
-				var _g = note1.BendType;
+				var _g = note.BendType;
 				switch(_g) {
 				case 6:case 7:case 8:
-					var preX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(note1.Beat,0);
-					preX = preX + (js.Boot.__cast(startNoteRenderer.GetBeatContainer(note1.Beat).PreNotes , alphaTab.rendering.glyphs.ScoreBeatPreNotesGlyph)).get_PrebendNoteHeadOffset();
+					var preX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(note.Beat,0);
+					preX = preX + (js.Boot.__cast(startNoteRenderer.GetBeatContainer(note.Beat).PreNotes , alphaTab.rendering.glyphs.ScoreBeatPreNotesGlyph)).get_PrebendNoteHeadOffset();
 					var preY = cy + startNoteRenderer.Y;
-					var this3 = startNoteRenderer.AccidentalHelper.GetNoteLineForValue(note1.get_RealValue());
+					var this3 = startNoteRenderer.AccidentalHelper.GetNoteLineForValue(note.get_RealValue());
 					var preY1 = preY + startNoteRenderer.GetScoreY(this3,0) + heightOffset;
 					this.DrawBendSlur(canvas,preX,preY1,startX,startY,direction == 1,this.get_Scale(),null);
 					break;
@@ -28529,37 +28538,37 @@ alphaTab.rendering.glyphs.ScoreBendGlyph.prototype = $extend(alphaTab.rendering.
 				}
 				var endValue;
 				var endY3;
-				var _g1 = note1.BendType;
+				var _g1 = note.BendType;
 				switch(_g1) {
 				case 2:
-					endValue = this.GetBendNoteValue(note1,note1.BendPoints[note1.BendPoints.length - 1]);
+					endValue = this.GetBendNoteValue(note,note.BendPoints[note.BendPoints.length - 1]);
 					endY3 = this._endNoteGlyph.GetNoteValueY(endValue,false) + heightOffset;
 					this.DrawBendSlur(canvas,startX,startY,endBeatX,endY3,direction == 1,this.get_Scale(),slurText);
 					break;
 				case 3:
 					if(this._bendNoteHeads.length > 0) {
-						endValue = this.GetBendNoteValue(note1,note1.BendPoints[note1.BendPoints.length - 1]);
+						endValue = this.GetBendNoteValue(note,note.BendPoints[note.BendPoints.length - 1]);
 						endY3 = this._bendNoteHeads[0].GetNoteValueY(endValue,false) + heightOffset;
 						this.DrawBendSlur(canvas,startX,startY,endBeatX,endY3,direction == 1,this.get_Scale(),slurText);
 					}
 					break;
 				case 4:
-					var middleValue = this.GetBendNoteValue(note1,note1.BendPoints[1]);
+					var middleValue = this.GetBendNoteValue(note,note.BendPoints[1]);
 					var middleY = this._middleNoteGlyph.GetNoteValueY(middleValue,false) + heightOffset;
 					this.DrawBendSlur(canvas,startX,startY,middleX,middleY,direction == 1,this.get_Scale(),slurText);
-					endValue = this.GetBendNoteValue(note1,note1.BendPoints[note1.BendPoints.length - 1]);
+					endValue = this.GetBendNoteValue(note,note.BendPoints[note.BendPoints.length - 1]);
 					endY3 = this._endNoteGlyph.GetNoteValueY(endValue,false) + heightOffset;
 					this.DrawBendSlur(canvas,middleX,middleY,endBeatX,endY3,direction == 1,this.get_Scale(),slurText);
 					break;
 				case 6:case 7:case 8:
-					var preX1 = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(note1.Beat,0);
-					preX1 = preX1 + (js.Boot.__cast(startNoteRenderer.GetBeatContainer(note1.Beat).PreNotes , alphaTab.rendering.glyphs.ScoreBeatPreNotesGlyph)).get_PrebendNoteHeadOffset();
+					var preX1 = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(note.Beat,0);
+					preX1 = preX1 + (js.Boot.__cast(startNoteRenderer.GetBeatContainer(note.Beat).PreNotes , alphaTab.rendering.glyphs.ScoreBeatPreNotesGlyph)).get_PrebendNoteHeadOffset();
 					var preY2 = cy + startNoteRenderer.Y;
-					var this4 = startNoteRenderer.AccidentalHelper.GetNoteLineForValue(note1.get_RealValue());
+					var this4 = startNoteRenderer.AccidentalHelper.GetNoteLineForValue(note.get_RealValue());
 					var preY3 = preY2 + startNoteRenderer.GetScoreY(this4,0) + heightOffset;
 					this.DrawBendSlur(canvas,preX1,preY3,startX,startY,direction == 1,this.get_Scale(),null);
 					if(this._bendNoteHeads.length > 0) {
-						endValue = this.GetBendNoteValue(note1,note1.BendPoints[note1.BendPoints.length - 1]);
+						endValue = this.GetBendNoteValue(note,note.BendPoints[note.BendPoints.length - 1]);
 						endY3 = this._bendNoteHeads[0].GetNoteValueY(endValue,false) + heightOffset;
 						this.DrawBendSlur(canvas,startX,startY,endBeatX,endY3,direction == 1,this.get_Scale(),slurText);
 					}
@@ -28567,6 +28576,7 @@ alphaTab.rendering.glyphs.ScoreBendGlyph.prototype = $extend(alphaTab.rendering.
 				default:
 				}
 			}
+			++i;
 		}
 	}
 	,GetBendNoteValue: function(note,bendPoint) {
