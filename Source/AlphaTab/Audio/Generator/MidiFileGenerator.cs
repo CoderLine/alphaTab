@@ -27,6 +27,7 @@ namespace AlphaTab.Audio.Generator
     {
         public int NoteOnly { get; set; }
         public int UntilTieEnd { get; set; }
+        public int LetRingEnd { get; set; }
     }
 
     /// <summary>
@@ -362,75 +363,14 @@ namespace AlphaTab.Audio.Generator
 
             if (!note.IsTieDestination)
             {
-                Logger.Info("Midi", "Note " + note.Beat.Voice.Bar.Index + "/" + note.Beat.Index + " from " + noteStart + " to " + (noteStart + noteDuration.UntilTieEnd));
+                var noteSoundDuration = Math.Max(noteDuration.UntilTieEnd, noteDuration.LetRingEnd);
+                Logger.Info("Midi", "Note " + note.Beat.Voice.Bar.Index + "/" + note.Beat.Index + " from " + noteStart + " to " + (noteStart + noteSoundDuration));
 
-                _handler.AddNote(track.Index, noteStart, noteDuration.UntilTieEnd, (byte)noteKey, dynamicValue, (byte)track.PlaybackInfo.PrimaryChannel);
+                _handler.AddNote(track.Index, noteStart, noteSoundDuration, (byte)noteKey, dynamicValue, (byte)track.PlaybackInfo.PrimaryChannel);
             }
         }
 
-        private MidiNoteDuration GetNoteDuration(Note note, int beatDuration)
-        {
-            return ApplyDurationEffects(note, beatDuration);
-            // a bit buggy:
-            /*
-            var lastNoteEnd = note.beat.start - note.beat.calculateDuration();
-            var noteDuration = beatDuration;
-            var currentBeat = note.beat.nextBeat;
-        
-            var letRingSuspend = false;
-        
-            // find the real note duration (let ring)
-            while (currentBeat != null)
-            {
-                if (currentBeat.isRest())
-                {
-                    return applyDurationEffects(note, noteDuration);
-                }
-            
-                var letRing = currentBeat.voice == note.beat.voice && note.isLetRing;
-                var letRingApplied = false;
-            
-                // we look for a note which still has let ring on or is a tie destination
-                // in this case we increate the first played note
-                var noteOnSameString = currentBeat.getNoteOnString(note.string);
-                if (noteOnSameString != null)
-                {
-                    // quit letring?
-                    if (!noteOnSameString.isTieDestination)
-                    {
-                        letRing = false; 
-                        letRingSuspend = true;
-                    
-                        // no let ring anymore, we are done
-                        if (!noteOnSameString.isLetRing)
-                        {
-                            return applyDurationEffects(note, noteDuration);
-                        }
-                    }
-                
-                    // increase duration 
-                    letRingApplied = true;
-                    noteDuration += (currentBeat.start - lastNoteEnd) + noteOnSameString.beat.calculateDuration();
-                    lastNoteEnd = currentBeat.start + currentBeat.calculateDuration();
-                }
-            
-                // if letRing is still active? (no note on the same string found)
-                // and we didn't apply it already and of course it's not already stopped 
-                // then we increase our duration as well
-                if (letRing && !letRingApplied && !letRingSuspend)
-                {
-                    noteDuration += (currentBeat.start - lastNoteEnd) + currentBeat.calculateDuration();
-                    lastNoteEnd = currentBeat.start + currentBeat.calculateDuration();
-                }
-            
-            
-                currentBeat = currentBeat.nextBeat;
-            }
-        
-            return applyDurationEffects(note, noteDuration);*/
-        }
-
-        private MidiNoteDuration ApplyDurationEffects(Note note, int duration)
+        private MidiNoteDuration GetNoteDuration(Note note, int duration)
         {
             var durationWithEffects = new MidiNoteDuration();
             durationWithEffects.NoteOnly = duration;
@@ -477,6 +417,43 @@ namespace AlphaTab.Audio.Generator
                     }
                 }
             }
+
+            if (note.IsLetRing)
+            {
+                // LetRing ends when:  
+                // - a note on the same line appears 
+                // - at the end of the bar    
+                Beat lastLetRingBeat = note.Beat;
+                while (lastLetRingBeat.NextBeat != null)
+                {
+                    var next = lastLetRingBeat.NextBeat;
+                    // Bar break
+                    if (next.Voice.Bar.Index != note.Beat.Voice.Bar.Index)
+                    {
+                        break;
+                    }
+                    // note on the same string 
+                    if (note.IsStringed && next.HasNoteOnString(note.String))
+                    {
+                        break;
+                    }
+                    lastLetRingBeat = lastLetRingBeat.NextBeat;
+                }
+
+                if (lastLetRingBeat == note.Beat)
+                {
+                    durationWithEffects.LetRingEnd += duration;
+                }
+                else
+                {
+                    durationWithEffects.LetRingEnd = (lastLetRingBeat.AbsoluteStart - note.Beat.AbsoluteStart) + lastLetRingBeat.CalculateDuration();
+                }
+            }
+            else
+            {
+                durationWithEffects.LetRingEnd = durationWithEffects.UntilTieEnd;
+            }
+
             return durationWithEffects;
         }
 

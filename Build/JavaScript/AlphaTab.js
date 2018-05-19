@@ -5012,7 +5012,7 @@ alphaTab.rendering.layout.PageViewLayout.prototype = $extend(alphaTab.rendering.
 			totalHeight = -1;
 		}
 		var _gthis = this;
-		alphaTab.util.Logger.Info(this.get_Name(),"Layouting score info",null);
+		alphaTab.util.Logger.Debug(this.get_Name(),"Layouting score info",null);
 		var scale = this.get_Scale();
 		var res = this.Renderer.RenderingResources;
 		var centeredGlyphs = [1,2,4,8,64];
@@ -6052,19 +6052,21 @@ alphaTab.rendering.effects.HarmonicsEffectInfo.prototype = $extend(alphaTab.rend
 	,__class__: alphaTab.rendering.effects.HarmonicsEffectInfo
 });
 alphaTab.rendering.effects.LetRingEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["LetRingEffectInfo"] = function() {
-	alphaTab.rendering.effects.NoteEffectInfoBase.call(this);
 };
 alphaTab.rendering.effects.LetRingEffectInfo.__name__ = ["alphaTab","rendering","effects","LetRingEffectInfo"];
-alphaTab.rendering.effects.LetRingEffectInfo.__super__ = alphaTab.rendering.effects.NoteEffectInfoBase;
-alphaTab.rendering.effects.LetRingEffectInfo.prototype = $extend(alphaTab.rendering.effects.NoteEffectInfoBase.prototype,{
+alphaTab.rendering.effects.LetRingEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.LetRingEffectInfo.prototype = {
 	get_EffectId: function() {
 		return "let-ring";
 	}
 	,get_CanShareBand: function() {
 		return false;
 	}
-	,ShouldCreateGlyphForNote: function(note) {
-		return note.IsLetRing;
+	,get_HideOnMultiTrack: function() {
+		return false;
+	}
+	,ShouldCreateGlyph: function(beat) {
+		return beat.IsLetRing;
 	}
 	,get_SizingMode: function() {
 		return 4;
@@ -6072,8 +6074,11 @@ alphaTab.rendering.effects.LetRingEffectInfo.prototype = $extend(alphaTab.render
 	,CreateNewGlyph: function(renderer,beat) {
 		return new alphaTab.rendering.glyphs.LineRangedGlyph("LetRing");
 	}
+	,CanExpand: function(from,to) {
+		return true;
+	}
 	,__class__: alphaTab.rendering.effects.LetRingEffectInfo
-});
+};
 alphaTab.rendering.effects.CapoEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["CapoEffectInfo"] = function() {
 };
 alphaTab.rendering.effects.CapoEffectInfo.__name__ = ["alphaTab","rendering","effects","CapoEffectInfo"];
@@ -7517,14 +7522,12 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			this.GenerateHarmonic(note,noteStart,noteDuration,noteKey,dynamicValue);
 		}
 		if(!note.IsTieDestination) {
-			alphaTab.util.Logger.Info("Midi","Note " + note.Beat.Voice.Bar.Index + "/" + note.Beat.Index + " from " + noteStart + " to " + (noteStart + noteDuration.UntilTieEnd),null);
-			this._handler.AddNote(track.Index,noteStart,noteDuration.UntilTieEnd,system.Convert.ToUInt8(noteKey),dynamicValue,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel));
+			var noteSoundDuration = Math.max(noteDuration.UntilTieEnd,noteDuration.LetRingEnd);
+			alphaTab.util.Logger.Info("Midi","Note " + note.Beat.Voice.Bar.Index + "/" + note.Beat.Index + " from " + noteStart + " to " + (noteStart + noteSoundDuration),null);
+			this._handler.AddNote(track.Index,noteStart,noteSoundDuration,system.Convert.ToUInt8(noteKey),dynamicValue,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel));
 		}
 	}
-	,GetNoteDuration: function(note,beatDuration) {
-		return this.ApplyDurationEffects(note,beatDuration);
-	}
-	,ApplyDurationEffects: function(note,duration) {
+	,GetNoteDuration: function(note,duration) {
 		var durationWithEffects = new alphaTab.audio.generator.MidiNoteDuration();
 		durationWithEffects.NoteOnly = duration;
 		durationWithEffects.UntilTieEnd = duration;
@@ -7556,6 +7559,26 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 					durationWithEffects.UntilTieEnd = duration + tieDestinationDuration1.UntilTieEnd;
 				}
 			}
+		}
+		if(note.IsLetRing) {
+			var lastLetRingBeat = note.Beat;
+			while(lastLetRingBeat.NextBeat != null) {
+				var next = lastLetRingBeat.NextBeat;
+				if(next.Voice.Bar.Index != note.Beat.Voice.Bar.Index) {
+					break;
+				}
+				if(note.get_IsStringed() && next.HasNoteOnString(note.String)) {
+					break;
+				}
+				lastLetRingBeat = lastLetRingBeat.NextBeat;
+			}
+			if(lastLetRingBeat == note.Beat) {
+				durationWithEffects.LetRingEnd = durationWithEffects.LetRingEnd + duration;
+			} else {
+				durationWithEffects.LetRingEnd = lastLetRingBeat.get_AbsoluteStart() - note.Beat.get_AbsoluteStart() + lastLetRingBeat.CalculateDuration();
+			}
+		} else {
+			durationWithEffects.LetRingEnd = durationWithEffects.UntilTieEnd;
 		}
 		return durationWithEffects;
 	}
@@ -18695,6 +18718,7 @@ alphaTab.model.Beat = $hx_exports["alphaTab"]["model"]["Beat"] = function() {
 	this.Index = 0;
 	this.Voice = null;
 	this.Notes = null;
+	this.NoteStringLookup = null;
 	this.IsEmpty = false;
 	this.Ottava = 0;
 	this.IsLegatoOrigin = false;
@@ -18703,6 +18727,8 @@ alphaTab.model.Beat = $hx_exports["alphaTab"]["model"]["Beat"] = function() {
 	this._maxStringNote = null;
 	this._minStringNote = null;
 	this.Duration = -4;
+	this.IsLetRing = false;
+	this.IsPalmMute = false;
 	this.Automations = null;
 	this.Dots = 0;
 	this.FadeIn = false;
@@ -18752,6 +18778,8 @@ alphaTab.model.Beat = $hx_exports["alphaTab"]["model"]["Beat"] = function() {
 	this.Crescendo = 0;
 	this.InvertBeamDirection = false;
 	this.Ottava = 2;
+	var this4 = {}
+	this.NoteStringLookup = this4;
 };
 alphaTab.model.Beat.__name__ = ["alphaTab","model","Beat"];
 alphaTab.model.Beat.CopyTo = function(src,dst) {
@@ -18944,6 +18972,9 @@ alphaTab.model.Beat.prototype = {
 		note.Beat = this;
 		note.Index = this.Notes.length;
 		this.Notes.push(note);
+		if(note.get_IsStringed()) {
+			this.NoteStringLookup[note.String] = note;
+		}
 	}
 	,RemoveNote: function(note) {
 		var index = this.Notes.indexOf(note);
@@ -18989,14 +19020,8 @@ alphaTab.model.Beat.prototype = {
 		return null;
 	}
 	,GetNoteOnString: function(string) {
-		var i = 0;
-		var j = this.Notes.length;
-		while(i < j) {
-			var note = this.Notes[i];
-			if(note.String == string) {
-				return note;
-			}
-			++i;
+		if(this.NoteStringLookup.hasOwnProperty(string)) {
+			return this.NoteStringLookup[string];
 		}
 		return null;
 	}
@@ -19020,6 +19045,12 @@ alphaTab.model.Beat.prototype = {
 		while(i < j) {
 			var note = this.Notes[i];
 			note.Finish(settings);
+			if(note.IsLetRing) {
+				this.IsLetRing = true;
+			}
+			if(note.IsPalmMute) {
+				this.IsPalmMute = true;
+			}
 			if(bendMode == 1 && note.get_HasBend()) {
 				if(note.BendType == 2 && !note.IsTieOrigin) {
 					needCopyBeatForBend = true;
@@ -19032,6 +19063,25 @@ alphaTab.model.Beat.prototype = {
 				}
 			}
 			++i;
+		}
+		if(!this.get_IsRest() && (!this.IsLetRing || !this.IsPalmMute)) {
+			var currentBeat = this.PreviousBeat;
+			while(currentBeat != null && currentBeat.get_IsRest()) {
+				if(!this.IsLetRing) {
+					currentBeat.IsLetRing = false;
+				}
+				if(!this.IsPalmMute) {
+					currentBeat.IsPalmMute = false;
+				}
+				currentBeat = currentBeat.PreviousBeat;
+			}
+		} else if(this.get_IsRest() && this.PreviousBeat != null) {
+			if(this.PreviousBeat.IsLetRing) {
+				this.IsLetRing = true;
+			}
+			if(this.PreviousBeat.IsPalmMute) {
+				this.IsPalmMute = true;
+			}
 		}
 		if(this.WhammyBarPoints.length > 0 && this.WhammyBarType == 1) {
 			var isContinuedWhammy = this.IsContinuedWhammy = this.PreviousBeat != null && this.PreviousBeat.get_HasWhammyBar();
@@ -19129,6 +19179,9 @@ alphaTab.model.Beat.prototype = {
 		} else {
 			return true;
 		}
+	}
+	,HasNoteOnString: function(noteString) {
+		return this.NoteStringLookup.hasOwnProperty(noteString);
 	}
 	,__class__: alphaTab.model.Beat
 };
@@ -20326,7 +20379,9 @@ alphaTab.model.Note = $hx_exports["alphaTab"]["model"]["Note"] = function() {
 	this.HarmonicType = 0;
 	this.IsGhost = false;
 	this.IsLetRing = false;
+	this.LetRingDestination = null;
 	this.IsPalmMute = false;
+	this.PalmMuteDestination = null;
 	this.IsDead = false;
 	this.IsStaccato = false;
 	this.SlideType = 0;
@@ -20386,7 +20441,9 @@ alphaTab.model.Note.CopyTo = function(src,dst) {
 	dst.HarmonicType = src.HarmonicType;
 	dst.IsGhost = src.IsGhost;
 	dst.IsLetRing = src.IsLetRing;
+	dst.LetRingDestination = src.LetRingDestination;
 	dst.IsPalmMute = src.IsPalmMute;
+	dst.PalmMuteDestination = src.PalmMuteDestination;
 	dst.IsDead = src.IsDead;
 	dst.IsStaccato = src.IsStaccato;
 	dst.SlideType = src.SlideType;
@@ -20600,6 +20657,20 @@ alphaTab.model.Note.prototype = {
 				} else if(this.TieOrigin.get_HasBend()) {
 					this.BendOrigin = this.TieOrigin;
 				}
+			}
+		}
+		if(this.IsLetRing) {
+			if(nextNoteOnLine.get_Value() == null || !nextNoteOnLine.get_Value().IsLetRing) {
+				this.LetRingDestination = this;
+			} else {
+				this.LetRingDestination = nextNoteOnLine.get_Value();
+			}
+		}
+		if(this.IsPalmMute) {
+			if(nextNoteOnLine.get_Value() == null || !nextNoteOnLine.get_Value().IsPalmMute) {
+				this.PalmMuteDestination = this;
+			} else {
+				this.PalmMuteDestination = nextNoteOnLine.get_Value();
 			}
 		}
 		if(this.IsHammerPullOrigin) {
@@ -25819,7 +25890,7 @@ alphaTab.rendering.ScoreRenderer.prototype = {
 		} else {
 			alphaTab.util.Logger.Warning("Rendering","Current layout does not support dynamic resizing, nothing was done",null);
 		}
-		alphaTab.util.Logger.Info("Rendering","Resize finished",null);
+		alphaTab.util.Logger.Debug("Rendering","Resize finished",null);
 	}
 	,LayoutAndRender: function() {
 		alphaTab.util.Logger.Info("Rendering","Rendering at scale " + this.Settings.Scale + " with layout " + this.Layout.get_Name(),null);

@@ -202,7 +202,11 @@ namespace AlphaTab.Model
 
         public bool IsGhost { get; set; }
         public bool IsLetRing { get; set; }
+        public Note LetRingDestination { get; set; }
+
         public bool IsPalmMute { get; set; }
+        public Note PalmMuteDestination { get; set; }
+
         public bool IsDead { get; set; }
         public bool IsStaccato { get; set; }
 
@@ -422,7 +426,9 @@ namespace AlphaTab.Model
             dst.HarmonicType = src.HarmonicType;
             dst.IsGhost = src.IsGhost;
             dst.IsLetRing = src.IsLetRing;
+            dst.LetRingDestination = src.LetRingDestination;
             dst.IsPalmMute = src.IsPalmMute;
+            dst.PalmMuteDestination = src.PalmMuteDestination;
             dst.IsDead = src.IsDead;
             dst.IsStaccato = src.IsStaccato;
             dst.SlideType = src.SlideType;
@@ -502,6 +508,32 @@ namespace AlphaTab.Model
                     {
                         BendOrigin = TieOrigin;
                     }
+                }
+            }
+
+            // connect letring
+            if (IsLetRing)
+            {
+                if (nextNoteOnLine.Value == null || !nextNoteOnLine.Value.IsLetRing)
+                {
+                    LetRingDestination = this;
+                }
+                else
+                {
+                    LetRingDestination = nextNoteOnLine.Value;
+                }
+            }
+
+            // connect palmmute
+            if (IsPalmMute)
+            {
+                if (nextNoteOnLine.Value == null || !nextNoteOnLine.Value.IsPalmMute)
+                {
+                    PalmMuteDestination = this;
+                }
+                else
+                {
+                    PalmMuteDestination = nextNoteOnLine.Value;
                 }
             }
 

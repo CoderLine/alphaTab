@@ -112,7 +112,7 @@ namespace AlphaTab.Rendering.Layout
 
         private float LayoutAndRenderScoreInfo(float x, float y, float totalHeight = -1)
         {
-            Logger.Info(Name, "Layouting score info");
+            Logger.Debug(Name, "Layouting score info");
 
             var scale = Scale;
             var res = Renderer.RenderingResources;

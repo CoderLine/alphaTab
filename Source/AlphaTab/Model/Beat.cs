@@ -81,6 +81,7 @@ namespace AlphaTab.Model
 
         public Voice Voice { get; set; }
         public FastList<Note> Notes { get; set; }
+        public FastDictionary<int, Note> NoteStringLookup { get; set; }
         public bool IsEmpty { get; set; }
 
         public Ottavia Ottava { get; set; }
@@ -156,6 +157,9 @@ namespace AlphaTab.Model
                 return Notes.Count == 0;
             }
         }
+
+        public bool IsLetRing { get; set; }
+        public bool IsPalmMute { get; set; }
 
         public FastList<Automation> Automations { get; set; }
 
@@ -255,6 +259,7 @@ namespace AlphaTab.Model
             Crescendo = CrescendoType.None;
             InvertBeamDirection = false;
             Ottava = Ottavia.Regular;
+            NoteStringLookup = new FastDictionary<int, Note>();
         }
 
         public static void CopyTo(Beat src, Beat dst)
@@ -420,6 +425,10 @@ namespace AlphaTab.Model
             note.Beat = this;
             note.Index = Notes.Count;
             Notes.Add(note);
+            if (note.IsStringed)
+            {
+                NoteStringLookup[note.String] = note;
+            }
         }
 
         public void RemoveNote(Note note)
@@ -475,13 +484,9 @@ namespace AlphaTab.Model
 
         public Note GetNoteOnString(int @string)
         {
-            for (int i = 0, j = Notes.Count; i < j; i++)
+            if (NoteStringLookup.ContainsKey(@string))
             {
-                var note = Notes[i];
-                if (note.String == @string)
-                {
-                    return note;
-                }
+                return NoteStringLookup[@string];
             }
             return null;
         }
@@ -515,7 +520,14 @@ namespace AlphaTab.Model
             {
                 var note = Notes[i];
                 note.Finish(settings);
-
+                if (note.IsLetRing)
+                {
+                    IsLetRing = true;
+                }
+                if (note.IsPalmMute)
+                {
+                    IsPalmMute = true;
+                }
                 if (bendMode == BendMode.SongBook && note.HasBend)
                 {
                     if (note.BendType == BendType.Bend && !note.IsTieOrigin)
@@ -534,6 +546,41 @@ namespace AlphaTab.Model
                     }
                 }
             }
+
+            // we need to clean al letring/palmmute flags for rests
+            // in case the effect is not continued on this beat
+            if (!IsRest && (!IsLetRing || !IsPalmMute))
+            {
+                var currentBeat = PreviousBeat;
+                while (currentBeat != null && currentBeat.IsRest)
+                {
+                    if (!IsLetRing)
+                    {
+                        currentBeat.IsLetRing = false;
+                    }
+                    if (!IsPalmMute)
+                    {
+                        currentBeat.IsPalmMute = false;
+                    }
+
+                    currentBeat = currentBeat.PreviousBeat;
+                }
+            }
+            // if beat is a rest implicitely take over letring/palmmute
+            // from the previous beat gets cleaned later in case we flagged it wrong. 
+            else if (IsRest && PreviousBeat != null)
+            {
+                if (PreviousBeat.IsLetRing)
+                {
+                    IsLetRing = true;
+                }
+
+                if (PreviousBeat.IsPalmMute)
+                {
+                    IsPalmMute = true;
+                }
+            }
+
 
             // try to detect what kind of bend was used and cleans unneeded points if required
             // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all whammys
@@ -663,6 +710,11 @@ namespace AlphaTab.Model
         {
             return Voice.Bar.Index > beat.Voice.Bar.Index ||
                    (beat.Voice.Bar.Index == Voice.Bar.Index && Index > beat.Index);
+        }
+
+        public bool HasNoteOnString(int noteString)
+        {
+            return NoteStringLookup.ContainsKey(noteString);
         }
     }
 }
