@@ -570,7 +570,7 @@ namespace AlphaTab.Rendering
             canvas.Stroke();
             canvas.LineWidth = Scale;
 
-            if (isGrace)
+            if (beat.GraceType == GraceType.BeforeBeat)
             {
                 var graceSizeY = 15 * Scale;
                 var graceSizeX = 12 * Scale;

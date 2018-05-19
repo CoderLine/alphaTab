@@ -16,6 +16,8 @@
  * License along with this library.
  */
 
+using AlphaTab.IO;
+
 namespace AlphaTab.Audio.Synth.Midi.Event
 {
     public enum MidiEventTypeEnum

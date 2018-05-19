@@ -931,6 +931,32 @@ namespace AlphaTab.Platform.JavaScript
             Player.LoadMidiFile(midiFile);
         }
 
+        public void DownloadMidi()
+        {
+            var midiFile = new MidiFile();
+            var handler = new AlphaSynthMidiFileHandler(midiFile);
+            var generator = new MidiFileGenerator(Score, handler);
+            generator.Generate();
+
+            var binary = midiFile.ToBinary();
+
+            Uint8Array uint8Array = Script.Write<Uint8Array>("binary.toUint8Array()");
+            var fileName = string.IsNullOrEmpty(Score.Title) ? "File.mid" : Score.Title + ".mid";
+            var dlLink = (AnchorElement)Browser.Document.CreateElement("a");
+            dlLink.Download = fileName;
+
+            var blob = new Blob(new[] { uint8Array }, new
+            {
+                type = "audio/midi"
+            });
+            var url = URL.CreateObjectURL(blob);
+            dlLink.Href = url;
+            dlLink.Style.Display = "none";
+            Browser.Document.Body.AppendChild(dlLink);
+            dlLink.Click();
+            Browser.Document.Body.RemoveChild(dlLink);
+        }
+
         public void SetTrackVolume(object tracks, float volume)
         {
             if (Player == null)
@@ -1300,7 +1326,7 @@ namespace AlphaTab.Platform.JavaScript
 
             // if playing, animate the cursor to the next beat
             var elements = Element.GetElementsByClassName("atHighlight");
-            while(elements.Length > 0)
+            while (elements.Length > 0)
             {
                 elements.Item(0).ClassList.Remove("atHighlight");
             }
@@ -1335,7 +1361,7 @@ namespace AlphaTab.Platform.JavaScript
                             }
                         }
                     }
-                    
+
                     Browser.Window.RequestAnimationFrame(f =>
                     {
                         Logger.Info("Player",

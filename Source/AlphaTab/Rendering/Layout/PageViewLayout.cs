@@ -38,7 +38,6 @@ namespace AlphaTab.Rendering.Layout
         private FastList<StaveGroup> _groups;
         private FastList<MasterBarsRenderers> _allMasterBarRenderers;
         private FastList<MasterBarsRenderers> _barsFromPreviousGroup;
-        private int _endBarIndex;
         private float[] _pagePadding;
 
         public override string Name { get { return "PageView"; } }
@@ -254,7 +253,7 @@ namespace AlphaTab.Rendering.Layout
 
                         // in case we do not have space, we create a new group
                         group.IsFull = true;
-                        group.IsLast = _endBarIndex == group.LastBarIndex;
+                        group.IsLast = LastBarIndex == group.LastBarIndex;
                         _groups.Add(group);
                         FitGroup(group);
                         group.FinalizeGroup();
@@ -267,7 +266,7 @@ namespace AlphaTab.Rendering.Layout
                         group.Y = y;
                     }
                 }
-                group.IsLast = _endBarIndex == group.LastBarIndex;
+                group.IsLast = LastBarIndex == group.LastBarIndex;
 
                 // don't forget to finish the last group
                 FitGroup(group);
@@ -280,24 +279,18 @@ namespace AlphaTab.Rendering.Layout
 
         private float LayoutAndRenderScore(float x, float y)
         {
-            var score = Renderer.Score;
             var canvas = Renderer.Canvas;
 
-            var startIndex = Renderer.Settings.Layout.Get("start", 1);
-            startIndex--; // map to array index
-            startIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, startIndex));
+            var startIndex = FirstBarIndex;
             var currentBarIndex = startIndex;
 
-            _endBarIndex = Renderer.Settings.Layout.Get("count", score.MasterBars.Count);
-            if (_endBarIndex < 0) _endBarIndex = score.MasterBars.Count;
-            _endBarIndex = startIndex + _endBarIndex - 1; // map count to array index
-            _endBarIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, _endBarIndex));
+            var endBarIndex = LastBarIndex;
 
             _groups = new FastList<StaveGroup>();
-            while (currentBarIndex <= _endBarIndex)
+            while (currentBarIndex <= endBarIndex)
             {
                 // create group and align set proper coordinates
-                var group = CreateStaveGroup(currentBarIndex, _endBarIndex);
+                var group = CreateStaveGroup(currentBarIndex, endBarIndex);
                 _groups.Add(group);
                 group.X = x;
                 group.Y = y;

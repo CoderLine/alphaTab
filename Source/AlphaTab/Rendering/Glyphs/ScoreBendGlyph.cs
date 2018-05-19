@@ -23,14 +23,6 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void AddBends(Note note)
         {
-            switch (note.BendType)
-            {
-                case BendType.None:
-                case BendType.Custom:
-                case BendType.Hold:
-                    return;
-            }
-
             _notes.Add(note);
             if (note.IsTieOrigin)
             {
@@ -109,7 +101,7 @@ namespace AlphaTab.Rendering.Glyphs
             var endBeatX = cx + startNoteRenderer.X;
             if (_beat.Index == _beat.Voice.Beats.Count - 1)
             {
-                endBeatX += startNoteRenderer.Width;
+                endBeatX += startNoteRenderer.PostBeatGlyphsStart;
             }
             else
             {
@@ -135,7 +127,8 @@ namespace AlphaTab.Rendering.Glyphs
 
             _notes.Sort((a, b) => b.RealValueWithEffects - a.RealValueWithEffects);
 
-            var direction = _notes.Count == 1 ? GetBeamDirection(_beat, startNoteRenderer) : BeamDirection.Up;
+            var directionBeat = _beat.GraceType == GraceType.BendGrace ? _beat.NextBeat : _beat;
+            var direction = _notes.Count == 1 ? GetBeamDirection(directionBeat, startNoteRenderer) : BeamDirection.Up;
 
             // draw slurs
             for (var i = 0; i < _notes.Count; i++)

@@ -647,7 +647,7 @@ namespace AlphaTab.Model
         }
 
         private const int MaxOffsetForSameLineSearch = 3;
-        private static Note NextNoteOnSameLine(Note note)
+        public static Note NextNoteOnSameLine(Note note)
         {
             var nextBeat = note.Beat.NextBeat;
             // keep searching in same bar
@@ -667,7 +667,7 @@ namespace AlphaTab.Model
             return null;
         }
 
-        private static Note PreviousNoteOnSameLine(Note note)
+        public static Note PreviousNoteOnSameLine(Note note)
         {
             var previousBeat = note.Beat.PreviousBeat;
 

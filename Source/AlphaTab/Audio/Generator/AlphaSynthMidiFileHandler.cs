@@ -86,7 +86,6 @@ namespace AlphaTab.Audio.Generator
         {
             var message = new MidiEvent(tick, MakeCommand((byte)MidiEventTypeEnum.PitchBend, channel), 0, FixValue(value));
             _midiFile.Events.Add(message);
-            Logger.Info("Midi", "Bend at " + tick + " : " + value);
         }
 
         public void FinishTrack(int track, int tick)

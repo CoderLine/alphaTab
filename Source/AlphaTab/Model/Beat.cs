@@ -391,6 +391,23 @@ namespace AlphaTab.Model
                 ticks = MidiUtils.ApplyTuplet(ticks, TupletNumerator, TupletDenominator);
             }
 
+            if (PreviousBeat != null && PreviousBeat.GraceType == GraceType.OnBeat)
+            {
+                ticks -= PreviousBeat.CalculateDuration();
+            }
+
+            // truncate if next beat starts earlier (like for grace notes)
+            if (NextBeat != null)
+            {
+                var thisStart = AbsoluteStart;
+                var end = thisStart + ticks;
+                var nextStart = NextBeat.AbsoluteStart;
+                if (nextStart < end)
+                {
+                    ticks = nextStart - thisStart;
+                }
+            }
+
             return ticks;
         }
 
@@ -477,7 +494,10 @@ namespace AlphaTab.Model
                 Start = PreviousBeat.Start + PreviousBeat.CalculateDuration();
             }
 
-           
+            if (GraceType == GraceType.BeforeBeat)
+            {
+                Start -= CalculateDuration();
+            }
 
             var bendMode = settings == null ? BendMode.GuitarPro : settings.BendMode;
             var isGradual = Text == "grad" || Text == "grad.";
@@ -581,17 +601,40 @@ namespace AlphaTab.Model
             {
                 // if this beat is a simple bend convert it to a grace beat 
                 // and generate a placeholder beat with tied notes
+
                 var cloneBeat = Clone();
                 for (int i = 0, j = cloneBeat.Notes.Count; i < j; i++)
                 {
                     var cloneNote = cloneBeat.Notes[i];
+
                     // remove bend on cloned note
+                    cloneNote.BendType = BendType.None;
+                    cloneNote.MaxBendPoint = null;
                     cloneNote.BendPoints = new FastList<BendPoint>();
+                    cloneNote.BendStyle = BendStyle.Default;
+
+                    // if the note has a bend which is continued on the next note
+                    // we need to convert this note into a hold bend
+                    var note = Notes[i];
+                    if (note.HasBend && note.IsTieOrigin)
+                    {
+                        var tieDestination = Note.NextNoteOnSameLine(note);
+                        if (tieDestination != null && tieDestination.HasBend)
+                        {
+                            cloneNote.BendType = BendType.Hold;
+                            var lastPoint = note.BendPoints[note.BendPoints.Count - 1];
+                            cloneNote.AddBendPoint(new BendPoint(0, lastPoint.Value));
+                            cloneNote.AddBendPoint(new BendPoint(BendPoint.MaxPosition, lastPoint.Value));
+                        }
+                    }
+
                     // mark as tied note
                     cloneNote.IsTieDestination = true;
                 }
 
                 GraceType = GraceType.BendGrace;
+                
+
                 Voice.InsertBeat(this, cloneBeat);
             }
         }

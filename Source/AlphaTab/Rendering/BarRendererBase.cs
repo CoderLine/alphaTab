@@ -166,7 +166,7 @@ namespace AlphaTab.Rendering
         {
             get
             {
-                return Staff.StaveGroup.IsLast && Index == Staff.BarRenderers.Count - 1;
+                return Bar.Index == ScoreRenderer.Layout.LastBarIndex;
             }
         }
 
@@ -454,7 +454,6 @@ namespace AlphaTab.Rendering
 
         protected virtual void CreatePostBeatGlyphs()
         {
-            AddPostBeatGlyph(new SpacingGlyph(0, 0, 5 * Scale));
         }
 
         public float BeatGlyphsStart
@@ -462,6 +461,14 @@ namespace AlphaTab.Rendering
             get
             {
                 return _preBeatGlyphs.X + _preBeatGlyphs.Width;
+            }
+        }
+
+        public float PostBeatGlyphsStart
+        {
+            get
+            {
+                return _postBeatGlyphs.X;
             }
         }
 

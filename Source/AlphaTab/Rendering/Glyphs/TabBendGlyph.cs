@@ -151,7 +151,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             if (endBeat == null || (endBeat.Index == endBeat.Voice.Beats.Count - 1 && !endNoteHasBend))
             {
-                endX = cx + endNoteRenderer.X + endNoteRenderer.Width;
+                endX = cx + endNoteRenderer.X + endNoteRenderer.PostBeatGlyphsStart;
             }
             else if(endNoteHasBend || endBeat.NextBeat == null)
             {

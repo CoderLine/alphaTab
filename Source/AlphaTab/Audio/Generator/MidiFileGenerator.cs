@@ -19,6 +19,7 @@ using System;
 using AlphaTab.Audio.Synth.Midi.Event;
 using AlphaTab.Collections;
 using AlphaTab.Model;
+using AlphaTab.Util;
 
 namespace AlphaTab.Audio.Generator
 {
@@ -361,6 +362,8 @@ namespace AlphaTab.Audio.Generator
 
             if (!note.IsTieDestination)
             {
+                Logger.Info("Midi", "Note " + note.Beat.Voice.Bar.Index + "/" + note.Beat.Index + " from " + noteStart + " to " + (noteStart + noteDuration.UntilTieEnd));
+
                 _handler.AddNote(track.Index, noteStart, noteDuration.UntilTieEnd, (byte)noteKey, dynamicValue, (byte)track.PlaybackInfo.PrimaryChannel);
             }
         }
@@ -605,7 +608,7 @@ namespace AlphaTab.Audio.Generator
             if (note.IsTieOrigin)
             {
                 var endNote = note;
-                while (endNote.IsTieOrigin && !endNote.HasBend)
+                while (endNote.IsTieOrigin && !endNote.TieDestination.HasBend)
                 {
                     endNote = endNote.TieDestination;
                 }

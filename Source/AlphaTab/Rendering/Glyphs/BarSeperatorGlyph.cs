@@ -16,6 +16,7 @@
  * License along with this library.
  */
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Effects;
 
 namespace AlphaTab.Rendering.Glyphs
@@ -29,7 +30,22 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
-            Width = 8 * Scale;
+            if (Renderer.IsLast)
+            {
+                Width = 8 * Scale;
+            }
+            else if (Renderer.NextRenderer == null || Renderer.NextRenderer.Staff != Renderer.Staff || !Renderer.NextRenderer.Bar.MasterBar.IsRepeatStart)
+            {
+                Width = 2 * Scale;
+                if (Renderer.Bar.MasterBar.IsDoubleBar)
+                {
+                    Width += 2 * Scale;
+                }
+            }
+            else
+            {
+                Width = 2 * Scale;
+            }
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)

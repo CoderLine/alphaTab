@@ -322,6 +322,12 @@ namespace AlphaTab.Platform.JavaScript
             context.SetTrackVolume(tracks, volume);
         }
 
+        [Name("downloadMidi")]
+        public void DownloadMidi(JQuery element, AlphaTabApi context, object tracks, float volume)
+        {
+            context.DownloadMidi();
+        }
+
         #endregion
 
         private readonly FastList<Action<JQuery, AlphaTabApi, dynamic>> _initListeners = new FastList<Action<JQuery, AlphaTabApi, dynamic>>();
