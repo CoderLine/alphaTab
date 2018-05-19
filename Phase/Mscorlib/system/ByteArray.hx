@@ -8,6 +8,8 @@ abstract ByteArray(js.html.Uint8Array)
 	@:from public static inline function fromFixedArray(a:FixedArray<Byte>):ByteArray return cast new js.html.Uint8Array(untyped a.ToHaxeArray());
 	@:from public static inline function fromArrayBuffer(a:js.html.ArrayBuffer):ByteArray return cast new js.html.Uint8Array(a);
 	
+	public inline function toUint8Array():js.html.Uint8Array return this;
+	
 	public var Length(get, never):Int32;
 	public inline function get_Length() : Int32 return this.length;
 	

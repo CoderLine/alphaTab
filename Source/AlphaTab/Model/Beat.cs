@@ -396,12 +396,16 @@ namespace AlphaTab.Model
                 ticks -= PreviousBeat.CalculateDuration();
             }
 
-            // truncate if next beat starts earlier (like for grace notes)
-            if (NextBeat != null)
+            // It can happen that the first beat of the next bar shifts into this
+            // beat due to before-beat grace. In this case we need to 
+            // reduce the duration of this beat. 
+            // Within the same bar the start of the next beat is always directly after the current. 
+            if (NextBeat != null && NextBeat.Voice.Bar != Voice.Bar)
             {
                 var thisStart = AbsoluteStart;
                 var end = thisStart + ticks;
-                var nextStart = NextBeat.AbsoluteStart;
+                // we cannot use AbsoluteStart yet as the next bar might not have it's actual start time. (e.g. during model finish)
+                var nextStart = Voice.Bar.MasterBar.Start + Voice.Bar.MasterBar.CalculateDuration() + NextBeat.Start;
                 if (nextStart < end)
                 {
                     ticks = nextStart - thisStart;

@@ -121,6 +121,11 @@ namespace AlphaTab.Model
                 var beat = Beats[index];
                 beat.Index = index;
                 Chain(beat);
+            }
+            for (var index = 0; index < Beats.Count; index++)
+            {
+                var beat = Beats[index];
+                beat.Index = index;
                 beat.Finish(settings);
             }
         }

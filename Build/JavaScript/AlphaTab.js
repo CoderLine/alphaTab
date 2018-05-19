@@ -18930,10 +18930,10 @@ alphaTab.model.Beat.prototype = {
 		if(this.PreviousBeat != null && this.PreviousBeat.GraceType == 1) {
 			ticks = ticks - this.PreviousBeat.CalculateDuration();
 		}
-		if(this.NextBeat != null) {
+		if(this.NextBeat != null && this.NextBeat.Voice.Bar != this.Voice.Bar) {
 			var thisStart = this.get_AbsoluteStart();
 			var end = thisStart + ticks;
-			var nextStart = this.NextBeat.get_AbsoluteStart();
+			var nextStart = this.Voice.Bar.get_MasterBar().Start + this.Voice.Bar.get_MasterBar().CalculateDuration() + this.NextBeat.Start;
 			if(nextStart < end) {
 				ticks = nextStart - thisStart;
 			}
@@ -21719,8 +21719,14 @@ alphaTab.model.Voice.prototype = {
 			var beat = this.Beats[index];
 			beat.Index = index;
 			this.Chain(beat);
-			beat.Finish(settings);
 			++index;
+		}
+		var index1 = 0;
+		while(index1 < this.Beats.length) {
+			var beat1 = this.Beats[index1];
+			beat1.Index = index1;
+			beat1.Finish(settings);
+			++index1;
 		}
 	}
 	,__class__: alphaTab.model.Voice
