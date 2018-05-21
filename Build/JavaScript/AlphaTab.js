@@ -7275,7 +7275,7 @@ alphaTab.audio.generator.AlphaSynthMidiFileHandler.prototype = {
 		this._midiFile.AddEvent(noteOn);
 		var noteOff = new alphaTab.audio.synth.midi.event.MidiEvent(start + length,this.MakeCommand(system.Convert.ToUInt8(128),channel),alphaTab.audio.generator.AlphaSynthMidiFileHandler.FixValue(key),alphaTab.audio.generator.AlphaSynthMidiFileHandler.FixValue(system.Convert.ToUInt8(velocity)));
 		this._midiFile.AddEvent(noteOff);
-		alphaTab.util.Logger.Info("Midi",Std.string(start + length) + "/NoteOff:" + Std.string(key) + "/" + Std.string(channel),null);
+		alphaTab.util.Logger.Info("Midi","Note: " + start + "/" + (start + length),null);
 	}
 	,MakeCommand: function(command,channel) {
 		return system.Convert.ToUInt8(command & 240 | channel & 15);
@@ -7296,6 +7296,7 @@ alphaTab.audio.generator.AlphaSynthMidiFileHandler.prototype = {
 	,AddBend: function(track,tick,channel,value) {
 		var message = new alphaTab.audio.synth.midi.event.MidiEvent(tick,this.MakeCommand(system.Convert.ToUInt8(224),channel),0,alphaTab.audio.generator.AlphaSynthMidiFileHandler.FixValue(value));
 		this._midiFile.AddEvent(message);
+		alphaTab.util.Logger.Info("Midi","Bend: " + tick + "/" + value,null);
 	}
 	,FinishTrack: function(track,tick) {
 		var message = system.Convert.ToUInt8(47);
@@ -7305,13 +7306,15 @@ alphaTab.audio.generator.AlphaSynthMidiFileHandler.prototype = {
 	}
 	,__class__: alphaTab.audio.generator.AlphaSynthMidiFileHandler
 };
-alphaTab.audio.generator.MidiFileGenerator = $hx_exports["alphaTab"]["audio"]["generator"]["MidiFileGenerator"] = function(score,handler) {
+alphaTab.audio.generator.MidiFileGenerator = $hx_exports["alphaTab"]["audio"]["generator"]["MidiFileGenerator"] = function(score,settings,handler) {
 	this._score = null;
+	this._settings = null;
 	this._handler = null;
 	this._currentTempo = 0;
 	this._currentBarRepeatLookup = null;
 	this.TickLookup = null;
 	this._score = score;
+	this._settings = settings;
 	this._currentTempo = this._score.Tempo;
 	this._handler = handler;
 	this.TickLookup = new alphaTab.audio.MidiTickLookup();
@@ -7445,23 +7448,26 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		}
 	}
 	,GenerateBeat: function(beat,barStartTick,realBar) {
-		var beatStart = beat.Start;
-		var audioDuration = beat.Voice.Bar.get_IsEmpty() ? beat.Voice.Bar.get_MasterBar().CalculateDuration() : beat.CalculateDuration(true);
+		var beatStart = beat.PlaybackStart;
+		var audioDuration = beat.Voice.Bar.get_IsEmpty() ? beat.Voice.Bar.get_MasterBar().CalculateDuration() : beat.PlaybackDuration;
 		var beatLookup = new alphaTab.audio.BeatTickLookup();
 		beatLookup.Start = barStartTick + beatStart;
-		var realTickOffset = beat.NextBeat == null ? audioDuration : beat.NextBeat.get_AbsoluteStart() - beat.get_AbsoluteStart();
-		beatLookup.End = barStartTick + beatStart + (realTickOffset > audioDuration ? realTickOffset : audioDuration);
-		if(realBar == beat.Voice.Bar) {
-			beatLookup.Beat = beat;
-			this.TickLookup.AddBeat(beatLookup);
-		} else {
-			beatLookup.IsEmptyBar = true;
-			beatLookup.Beat = realBar.Voices[0].Beats[0];
-			if(this._currentBarRepeatLookup == null) {
-				this._currentBarRepeatLookup = beatLookup;
-				this.TickLookup.AddBeat(this._currentBarRepeatLookup);
+		var realTickOffset = beat.NextBeat == null ? audioDuration : beat.NextBeat.get_AbsolutePlaybackStart() - beat.get_AbsolutePlaybackStart();
+		beatLookup.End = barStartTick + beatStart;
+		if(beat.GraceType == 3 || beat.PreviousBeat == null || beat.PreviousBeat.GraceType != 3) {
+			beatLookup.End = beatLookup.End + (realTickOffset > audioDuration ? realTickOffset : audioDuration);
+			if(realBar == beat.Voice.Bar) {
+				beatLookup.Beat = beat;
+				this.TickLookup.AddBeat(beatLookup);
 			} else {
-				this._currentBarRepeatLookup.End = beatLookup.End;
+				beatLookup.IsEmptyBar = true;
+				beatLookup.Beat = realBar.Voices[0].Beats[0];
+				if(this._currentBarRepeatLookup == null) {
+					this._currentBarRepeatLookup = beatLookup;
+					this.TickLookup.AddBeat(this._currentBarRepeatLookup);
+				} else {
+					this._currentBarRepeatLookup.End = beatLookup.End;
+				}
 			}
 		}
 		var track = beat.Voice.Bar.Staff.Track;
@@ -7486,7 +7492,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		if(beat.Vibrato != 0) {
 			var phaseLength = 240;
 			var bendAmplitude = 3;
-			this.GenerateVibratorWithParams(beat.Voice.Bar.Staff.Track,barStartTick + beatStart,beat.CalculateDuration(false),phaseLength,bendAmplitude);
+			this.GenerateVibratorWithParams(beat.Voice.Bar.Staff.Track,barStartTick + beatStart,beat.PlaybackDuration,phaseLength,bendAmplitude);
 		}
 	}
 	,GenerateNote: function(note,beatStart,beatDuration,brushInfo) {
@@ -7499,8 +7505,19 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		noteDuration.UntilTieEnd = noteDuration.UntilTieEnd - brushOffset;
 		noteDuration.NoteOnly = noteDuration.NoteOnly - brushOffset;
 		var dynamicValue = this.GetDynamicValue(note);
-		if(!note.get_HasBend() && !note.IsTieDestination && !note.Beat.get_HasWhammyBar()) {
-			this._handler.AddBend(track.Index,noteStart,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(64));
+		var initialBend = 64;
+		if(note.get_HasBend()) {
+			var this1 = note.BendPoints[0].Value * 2.75;
+			initialBend = initialBend + system.Convert.ToInt32_Double(Math.round(this1));
+		} else if(note.Beat.get_HasWhammyBar()) {
+			var this2 = note.Beat.WhammyBarPoints[0].Value * 2.75;
+			initialBend = initialBend + system.Convert.ToInt32_Double(Math.round(this2));
+		} else if(note.IsTieDestination) {
+			initialBend = 0;
+		}
+		if(initialBend > 0) {
+			alphaTab.util.Logger.Info("Midi","ResetBend",null);
+			this._handler.AddBend(track.Index,noteStart,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(initialBend));
 		}
 		if(note.Beat.FadeIn) {
 			this.GenerateFadeIn(note,noteStart,noteDuration,noteKey,dynamicValue);
@@ -7554,12 +7571,12 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			var endNote = note.TieDestination;
 			if(endNote != null) {
 				if(!note.IsTieDestination) {
-					var startTick = note.Beat.get_AbsoluteStart();
-					var tieDestinationDuration = this.GetNoteDuration(endNote,endNote.Beat.CalculateDuration(true));
-					var endTick = endNote.Beat.get_AbsoluteStart() + tieDestinationDuration.UntilTieEnd;
+					var startTick = note.Beat.get_AbsolutePlaybackStart();
+					var tieDestinationDuration = this.GetNoteDuration(endNote,endNote.Beat.PlaybackDuration);
+					var endTick = endNote.Beat.get_AbsolutePlaybackStart() + tieDestinationDuration.UntilTieEnd;
 					durationWithEffects.UntilTieEnd = endTick - startTick;
 				} else {
-					var tieDestinationDuration1 = this.GetNoteDuration(endNote,endNote.Beat.CalculateDuration(true));
+					var tieDestinationDuration1 = this.GetNoteDuration(endNote,endNote.Beat.PlaybackDuration);
 					durationWithEffects.UntilTieEnd = duration + tieDestinationDuration1.UntilTieEnd;
 				}
 			}
@@ -7579,7 +7596,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			if(lastLetRingBeat == note.Beat) {
 				durationWithEffects.LetRingEnd = durationWithEffects.LetRingEnd + duration;
 			} else {
-				durationWithEffects.LetRingEnd = lastLetRingBeat.get_AbsoluteStart() - note.Beat.get_AbsoluteStart() + lastLetRingBeat.CalculateDuration(true);
+				durationWithEffects.LetRingEnd = lastLetRingBeat.get_AbsolutePlaybackStart() - note.Beat.get_AbsolutePlaybackStart() + lastLetRingBeat.PlaybackDuration;
 			}
 		} else {
 			durationWithEffects.LetRingEnd = durationWithEffects.UntilTieEnd;
@@ -7661,21 +7678,112 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 	,GenerateBend: function(note,bendPoints,noteStart,noteDuration,noteKey,dynamicValue) {
 		var track = note.Beat.Voice.Bar.Staff.Track;
 		var duration;
-		if(note.IsTieOrigin) {
+		if(note.IsTieOrigin && this._settings.ExtendBendArrowsOnTiedNotes) {
 			var endNote = note;
 			while(endNote.IsTieOrigin && !endNote.TieDestination.get_HasBend()) endNote = endNote.TieDestination;
-			duration = endNote.Beat.get_AbsoluteStart() - note.Beat.get_AbsoluteStart() + this.GetNoteDuration(endNote,endNote.Beat.CalculateDuration(true)).NoteOnly;
+			var this1 = endNote.Beat.get_AbsolutePlaybackStart() - note.Beat.get_AbsolutePlaybackStart() + this.GetNoteDuration(endNote,endNote.Beat.PlaybackDuration).NoteOnly;
+			duration = this1;
 		} else {
-			duration = noteDuration.NoteOnly;
+			var this2 = noteDuration.NoteOnly;
+			duration = this2;
 		}
 		if(bendPoints[0].Value > 0 && !note.IsContinuedBend) {
 			--noteStart;
 		}
-		var ticksPerPosition = js.Boot.__cast(duration , Float) / 60;
+		var this3 = [];
+		var playedBendPoints = this3;
+		var _g = note.BendType;
+		switch(_g) {
+		case 1:
+			playedBendPoints = bendPoints;
+			break;
+		case 2:case 3:
+			var _g1 = note.BendStyle;
+			switch(_g1) {
+			case 0:
+				playedBendPoints = bendPoints;
+				break;
+			case 1:
+				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[1].Value));
+				break;
+			case 2:
+				playedBendPoints.push(new alphaTab.model.BendPoint(30,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[1].Value));
+				break;
+			default:
+			}
+			break;
+		case 4:
+			var _g2 = note.BendStyle;
+			switch(_g2) {
+			case 0:
+				playedBendPoints = bendPoints;
+				break;
+			case 1:
+				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60 / 2 | 0,note.BendPoints[1].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[2].Value));
+				break;
+			case 2:
+				playedBendPoints.push(new alphaTab.model.BendPoint(30,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[1].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[2].Value));
+				break;
+			default:
+			}
+			break;
+		case 5:
+			playedBendPoints = bendPoints;
+			break;
+		case 6:
+			playedBendPoints = bendPoints;
+			break;
+		case 7:
+			var _g3 = note.BendStyle;
+			switch(_g3) {
+			case 0:
+				playedBendPoints = bendPoints;
+				break;
+			case 1:
+				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60 / 2 | 0,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[1].Value));
+				break;
+			case 2:
+				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(30,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[1].Value));
+				break;
+			default:
+			}
+			break;
+		case 8:
+			var _g4 = note.BendStyle;
+			switch(_g4) {
+			case 0:
+				playedBendPoints = bendPoints;
+				break;
+			case 1:
+				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60 / 2 | 0,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[1].Value));
+				break;
+			case 2:
+				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(30,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[1].Value));
+				break;
+			default:
+			}
+			break;
+		default:
+		}
+		var ticksPerPosition = duration / 60;
 		var i = 0;
-		while(i < bendPoints.length - 1) {
-			var currentPoint = bendPoints[i];
-			var nextPoint = bendPoints[i + 1];
+		while(i < playedBendPoints.length - 1) {
+			var currentPoint = playedBendPoints[i];
+			var nextPoint = playedBendPoints[i + 1];
 			var currentBendValue = 64 + currentPoint.Value * 2.75;
 			var nextBendValue = 64 + nextPoint.Value * 2.75;
 			var ticksBetweenPoints = ticksPerPosition * (nextPoint.Offset - currentPoint.Offset);
@@ -7683,21 +7791,21 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			var tick = noteStart + ticksPerPosition * currentPoint.Offset;
 			if(currentBendValue < nextBendValue) {
 				while(currentBendValue <= nextBendValue) {
-					var this1 = currentBendValue;
-					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this1))));
+					var this4 = currentBendValue;
+					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this4))));
 					++currentBendValue;
 					tick = tick + ticksPerValue;
 				}
 			} else if(currentBendValue > nextBendValue) {
 				while(currentBendValue >= nextBendValue) {
-					var this2 = currentBendValue;
-					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this2))));
+					var this5 = currentBendValue;
+					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this5))));
 					--currentBendValue;
 					tick = tick + ticksPerValue;
 				}
 			} else {
-				var this3 = currentBendValue;
-				this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this3))));
+				var this6 = currentBendValue;
+				this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this6))));
 			}
 			++i;
 		}
@@ -7768,7 +7876,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		if(beat.BrushDuration == 0) {
 			return 0;
 		}
-		var duration = beat.CalculateDuration(true);
+		var duration = beat.PlaybackDuration;
 		if(duration == 0) {
 			return 0;
 		}
@@ -7779,17 +7887,17 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		switch(_g) {
 		case 1:
 			var volume = alphaTab.audio.generator.MidiFileGenerator.ToChannelShort(system.Convert.ToInt32_Single(automation.Value));
-			this._handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index,beat.Start + startMove,system.Convert.ToUInt8(beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(7),system.Convert.ToUInt8(volume));
-			this._handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index,beat.Start + startMove,system.Convert.ToUInt8(beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel),system.Convert.ToUInt8(7),system.Convert.ToUInt8(volume));
+			this._handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index,beat.PlaybackStart + startMove,system.Convert.ToUInt8(beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(7),system.Convert.ToUInt8(volume));
+			this._handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index,beat.PlaybackStart + startMove,system.Convert.ToUInt8(beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel),system.Convert.ToUInt8(7),system.Convert.ToUInt8(volume));
 			break;
 		case 2:
-			this._handler.AddProgramChange(beat.Voice.Bar.Staff.Track.Index,beat.Start + startMove,system.Convert.ToUInt8(beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Single(automation.Value)));
-			this._handler.AddProgramChange(beat.Voice.Bar.Staff.Track.Index,beat.Start + startMove,system.Convert.ToUInt8(beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Single(automation.Value)));
+			this._handler.AddProgramChange(beat.Voice.Bar.Staff.Track.Index,beat.PlaybackStart + startMove,system.Convert.ToUInt8(beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Single(automation.Value)));
+			this._handler.AddProgramChange(beat.Voice.Bar.Staff.Track.Index,beat.PlaybackStart + startMove,system.Convert.ToUInt8(beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Single(automation.Value)));
 			break;
 		case 3:
 			var balance = alphaTab.audio.generator.MidiFileGenerator.ToChannelShort(system.Convert.ToInt32_Single(automation.Value));
-			this._handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index,beat.Start + startMove,system.Convert.ToUInt8(beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(10),system.Convert.ToUInt8(balance));
-			this._handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index,beat.Start + startMove,system.Convert.ToUInt8(beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel),system.Convert.ToUInt8(10),system.Convert.ToUInt8(balance));
+			this._handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index,beat.PlaybackStart + startMove,system.Convert.ToUInt8(beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(10),system.Convert.ToUInt8(balance));
+			this._handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index,beat.PlaybackStart + startMove,system.Convert.ToUInt8(beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel),system.Convert.ToUInt8(10),system.Convert.ToUInt8(balance));
 			break;
 		default:
 		}
@@ -18793,7 +18901,10 @@ alphaTab.model.Beat = $hx_exports["alphaTab"]["model"]["Beat"] = function() {
 	this.PickStroke = 0;
 	this.TremoloSpeed = null;
 	this.Crescendo = 0;
-	this.Start = 0;
+	this.DisplayStart = 0;
+	this.PlaybackStart = 0;
+	this.DisplayDuration = 0;
+	this.PlaybackDuration = 0;
 	this.Dynamic = 0;
 	this.InvertBeamDirection = false;
 	this.Id = alphaTab.model.Beat.GlobalBeatId++;
@@ -18811,7 +18922,10 @@ alphaTab.model.Beat = $hx_exports["alphaTab"]["model"]["Beat"] = function() {
 	var this3 = [];
 	this.Automations = this3;
 	this.Dots = 0;
-	this.Start = 0;
+	this.DisplayStart = 0;
+	this.DisplayDuration = 0;
+	this.PlaybackStart = 0;
+	this.PlaybackDuration = 0;
 	this.TupletDenominator = -1;
 	this.TupletNumerator = -1;
 	this.Dynamic = 5;
@@ -18854,7 +18968,10 @@ alphaTab.model.Beat.CopyTo = function(src,dst) {
 	dst.PickStroke = src.PickStroke;
 	dst.TremoloSpeed = src.TremoloSpeed;
 	dst.Crescendo = src.Crescendo;
-	dst.Start = src.Start;
+	dst.DisplayStart = src.DisplayStart;
+	dst.DisplayDuration = src.DisplayDuration;
+	dst.PlaybackStart = src.PlaybackStart;
+	dst.PlaybackDuration = src.PlaybackDuration;
 	dst.Dynamic = src.Dynamic;
 	dst.IsLegatoOrigin = src.IsLegatoOrigin;
 	dst.InvertBeamDirection = src.InvertBeamDirection;
@@ -18916,8 +19033,11 @@ alphaTab.model.Beat.prototype = {
 	,get_IsTremolo: function() {
 		return this.TremoloSpeed != null;
 	}
-	,get_AbsoluteStart: function() {
-		return this.Voice.Bar.get_MasterBar().Start + this.Start;
+	,get_AbsoluteDisplayStart: function() {
+		return this.Voice.Bar.get_MasterBar().Start + this.DisplayStart;
+	}
+	,get_AbsolutePlaybackStart: function() {
+		return this.Voice.Bar.get_MasterBar().Start + this.PlaybackStart;
 	}
 	,Clone: function() {
 		var beat = new alphaTab.model.Beat();
@@ -18985,32 +19105,6 @@ alphaTab.model.Beat.prototype = {
 			}
 		}
 	}
-	,CalculateDuration: function(forPlayback) {
-		if(forPlayback == null) {
-			forPlayback = false;
-		}
-		var ticks = alphaTab.audio.MidiUtils.ToTicks(this.Duration);
-		if(this.Dots == 2) {
-			ticks = alphaTab.audio.MidiUtils.ApplyDot(ticks,true);
-		} else if(this.Dots == 1) {
-			ticks = alphaTab.audio.MidiUtils.ApplyDot(ticks,false);
-		}
-		if(this.TupletDenominator > 0 && this.TupletNumerator >= 0) {
-			ticks = alphaTab.audio.MidiUtils.ApplyTuplet(ticks,this.TupletNumerator,this.TupletDenominator);
-		}
-		if(this.PreviousBeat != null && this.PreviousBeat.GraceType == 1) {
-			ticks = ticks - this.PreviousBeat.CalculateDuration(forPlayback);
-		}
-		if(forPlayback && this.NextBeat != null && this.NextBeat.Voice.Bar != this.Voice.Bar) {
-			var thisStart = this.get_AbsoluteStart();
-			var end = thisStart + ticks;
-			var nextStart = this.Voice.Bar.get_MasterBar().Start + this.Voice.Bar.get_MasterBar().CalculateDuration() + this.NextBeat.Start;
-			if(nextStart < end) {
-				ticks = nextStart - thisStart;
-			}
-		}
-		return ticks;
-	}
 	,AddNote: function(note) {
 		note.Beat = this;
 		note.Index = this.Notes.length;
@@ -19070,12 +19164,37 @@ alphaTab.model.Beat.prototype = {
 	}
 	,Finish: function(settings) {
 		if(this.Index == 0) {
-			this.Start = 0;
+			this.DisplayStart = 0;
+			this.PlaybackStart = 0;
 		} else {
-			this.Start = this.PreviousBeat.Start + this.PreviousBeat.CalculateDuration(false);
+			this.DisplayStart = this.PreviousBeat.DisplayStart + this.PreviousBeat.DisplayDuration;
+			this.PlaybackStart = this.PreviousBeat.PlaybackStart + this.PreviousBeat.PlaybackDuration;
 		}
-		if(this.GraceType == 2) {
-			this.Start = this.Start - this.CalculateDuration(false);
+		if(this.PreviousBeat != null && this.PreviousBeat.GraceType == 3) {
+			this.PlaybackDuration = 0;
+		} else {
+			var ticks = alphaTab.audio.MidiUtils.ToTicks(this.Duration);
+			if(this.Dots == 2) {
+				ticks = alphaTab.audio.MidiUtils.ApplyDot(ticks,true);
+			} else if(this.Dots == 1) {
+				ticks = alphaTab.audio.MidiUtils.ApplyDot(ticks,false);
+			}
+			if(this.TupletDenominator > 0 && this.TupletNumerator >= 0) {
+				ticks = alphaTab.audio.MidiUtils.ApplyTuplet(ticks,this.TupletNumerator,this.TupletDenominator);
+			}
+			this.DisplayDuration = ticks;
+			this.PlaybackDuration = ticks;
+			if(this.PreviousBeat != null && this.PreviousBeat.GraceType == 1) {
+				this.PlaybackDuration = this.PlaybackDuration - this.PreviousBeat.PlaybackDuration;
+			}
+			if(this.NextBeat != null && this.NextBeat.Voice.Bar != this.Voice.Bar) {
+				var thisStart = this.get_AbsolutePlaybackStart();
+				var end = thisStart + ticks;
+				var nextStart = this.Voice.Bar.get_MasterBar().Start + this.Voice.Bar.get_MasterBar().CalculateDuration() + this.NextBeat.PlaybackStart;
+				if(nextStart < end) {
+					this.PlaybackDuration = nextStart - thisStart;
+				}
+			}
 		}
 		var bendMode = settings == null ? 0 : settings.BendMode;
 		var isGradual = this.Text == "grad" || this.Text == "grad.";
@@ -21765,6 +21884,9 @@ alphaTab.model.Voice.CopyTo = function(src,dst) {
 alphaTab.model.Voice.prototype = {
 	InsertBeat: function(after,newBeat) {
 		newBeat.NextBeat = after.NextBeat;
+		if(newBeat.NextBeat != null) {
+			newBeat.NextBeat.PreviousBeat = newBeat;
+		}
 		newBeat.PreviousBeat = after;
 		newBeat.Voice = this;
 		after.NextBeat = newBeat;
@@ -23059,7 +23181,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		alphaTab.util.Logger.Info("AlphaTab","Generating Midi",null);
 		var midiFile = new alphaTab.audio.synth.midi.MidiFile();
 		var handler = new alphaTab.audio.generator.AlphaSynthMidiFileHandler(midiFile);
-		var generator = new alphaTab.audio.generator.MidiFileGenerator(this.Score,handler);
+		var generator = new alphaTab.audio.generator.MidiFileGenerator(this.Score,this.Settings,handler);
 		generator.Generate();
 		this._tickCache = generator.TickLookup;
 		this.Player.LoadMidiFile(midiFile);
@@ -23067,7 +23189,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 	,DownloadMidi: function() {
 		var midiFile = new alphaTab.audio.synth.midi.MidiFile();
 		var handler = new alphaTab.audio.generator.AlphaSynthMidiFileHandler(midiFile);
-		var generator = new alphaTab.audio.generator.MidiFileGenerator(this.Score,handler);
+		var generator = new alphaTab.audio.generator.MidiFileGenerator(this.Score,this.Settings,handler);
 		generator.Generate();
 		var binary = midiFile.ToBinary();
 		var uint8Array = binary;
@@ -23251,8 +23373,8 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 			}
 			e2.preventDefault();
 			if(_gthis._selectionEnd != null) {
-				var startTick = _gthis._selectionStart.Beat.get_AbsoluteStart();
-				var endTick = _gthis._selectionStart.Beat.get_AbsoluteStart();
+				var startTick = _gthis._selectionStart.Beat.get_AbsoluteDisplayStart();
+				var endTick = _gthis._selectionStart.Beat.get_AbsoluteDisplayStart();
 				if(endTick < startTick) {
 					var t = _gthis._selectionStart;
 					_gthis._selectionStart = _gthis._selectionEnd;
@@ -23263,13 +23385,13 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 				var tickCache = _gthis._tickCache;
 				var realMasterBarStart = tickCache.GetMasterBarStart(_gthis._selectionStart.Beat.Voice.Bar.get_MasterBar());
 				_gthis.CursorUpdateBeat(_gthis._selectionStart.Beat,null,0,false);
-				_gthis.Player.set_TickPosition(realMasterBarStart + _gthis._selectionStart.Beat.Start);
+				_gthis.Player.set_TickPosition(realMasterBarStart + _gthis._selectionStart.Beat.PlaybackStart);
 				if(_gthis._selectionEnd != null && _gthis._selectionStart.Beat != _gthis._selectionEnd.Beat) {
 					var realMasterBarEnd = tickCache.GetMasterBarStart(_gthis._selectionEnd.Beat.Voice.Bar.get_MasterBar());
 					var _gthis1 = _gthis.Player;
 					var _tmp = new alphaTab.audio.synth.synthesis.PlaybackRange();
-					_tmp.StartTick = realMasterBarStart + _gthis._selectionStart.Beat.Start;
-					_tmp.EndTick = realMasterBarEnd + _gthis._selectionEnd.Beat.Start + _gthis._selectionEnd.Beat.CalculateDuration(false) - 50;
+					_tmp.StartTick = realMasterBarStart + _gthis._selectionStart.Beat.PlaybackStart;
+					_tmp.EndTick = realMasterBarEnd + _gthis._selectionEnd.Beat.PlaybackStart + _gthis._selectionEnd.Beat.PlaybackDuration - 50;
 					_gthis1.set_PlaybackRange(_tmp);
 				} else {
 					_gthis._selectionStart = null;
@@ -23471,8 +23593,8 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		if(endBeat.Bounds == null) {
 			endBeat.Bounds = cache.FindBeat(endBeat.Beat);
 		}
-		var startTick = startBeat.Beat.get_AbsoluteStart();
-		var endTick = endBeat.Beat.get_AbsoluteStart();
+		var startTick = startBeat.Beat.get_AbsolutePlaybackStart();
+		var endTick = endBeat.Beat.get_AbsolutePlaybackStart();
 		if(endTick < startTick) {
 			var t = startBeat;
 			startBeat = endBeat;
@@ -25692,7 +25814,8 @@ alphaTab.rendering.glyphs.BeatContainerGlyph.prototype = $extend(alphaTab.render
 		if(isEmptyGlyph) {
 			return;
 		}
-		canvas.BeginGroup(alphaTab.rendering.glyphs.BeatContainerGlyph.GetGroupId(this.Beat));
+		var group = this.Beat.PreviousBeat != null && this.Beat.PreviousBeat.GraceType == 3 ? this.Beat.PreviousBeat : this.Beat;
+		canvas.BeginGroup(alphaTab.rendering.glyphs.BeatContainerGlyph.GetGroupId(group));
 		this.PreNotes.Paint(cx + this.X,cy + this.Y,canvas);
 		this.OnNotes.Paint(cx + this.X,cy + this.Y,canvas);
 		var staffX = cx - this.VoiceContainer.X - this.Renderer.X;
@@ -31215,7 +31338,7 @@ alphaTab.rendering.glyphs.VoiceContainerGlyph.prototype = $extend(alphaTab.rende
 		var j = beatGlyphs.length;
 		while(i < j) {
 			var currentBeatGlyph = beatGlyphs[i];
-			var time = currentBeatGlyph.Beat.get_AbsoluteStart();
+			var time = currentBeatGlyph.Beat.get_AbsoluteDisplayStart();
 			var tmp = currentBeatGlyph.get_OnTimeX();
 			currentBeatGlyph.X = positions[time] - tmp;
 			if(i > 0) {
@@ -31471,7 +31594,7 @@ alphaTab.rendering.staves.BarLayoutingInfo.prototype = {
 		return spring;
 	}
 	,AddBeatSpring: function(beat,beatSize,preBeatSize) {
-		return this.AddSpring(beat.get_AbsoluteStart(),beat.CalculateDuration(false),beatSize,preBeatSize);
+		return this.AddSpring(beat.get_AbsoluteDisplayStart(),beat.DisplayDuration,beatSize,preBeatSize);
 	}
 	,Finish: function() {
 		this.CalculateSpringConstants();
@@ -32415,8 +32538,8 @@ alphaTab.rendering.utils.BeamingHelper.CanJoin = function(b1,b2) {
 	if(m1 != m2) {
 		return false;
 	}
-	var start1 = b1.Start;
-	var start2 = b2.Start;
+	var start1 = b1.DisplayStart;
+	var start2 = b2.DisplayStart;
 	if(!alphaTab.rendering.utils.BeamingHelper.CanJoinDuration(b1.Duration) || !alphaTab.rendering.utils.BeamingHelper.CanJoinDuration(b2.Duration)) {
 		return start1 == start2;
 	}
@@ -32561,30 +32684,30 @@ alphaTab.rendering.utils.BeamingHelper.prototype = {
 	}
 	,CheckNote: function(note) {
 		var value = this.GetValue(note);
-		if(this.FirstMinNote == null || note.Beat.Start < this.FirstMinNote.Beat.Start) {
+		if(this.FirstMinNote == null || note.Beat.DisplayStart < this.FirstMinNote.Beat.DisplayStart) {
 			this.FirstMinNote = note;
-		} else if(note.Beat.Start == this.FirstMinNote.Beat.Start) {
+		} else if(note.Beat.DisplayStart == this.FirstMinNote.Beat.DisplayStart) {
 			if(value < this.GetValue(this.FirstMinNote)) {
 				this.FirstMinNote = note;
 			}
 		}
-		if(this.FirstMaxNote == null || note.Beat.Start < this.FirstMaxNote.Beat.Start) {
+		if(this.FirstMaxNote == null || note.Beat.DisplayStart < this.FirstMaxNote.Beat.DisplayStart) {
 			this.FirstMaxNote = note;
-		} else if(note.Beat.Start == this.FirstMaxNote.Beat.Start) {
+		} else if(note.Beat.DisplayStart == this.FirstMaxNote.Beat.DisplayStart) {
 			if(value > this.GetValue(this.FirstMaxNote)) {
 				this.FirstMaxNote = note;
 			}
 		}
-		if(this.LastMinNote == null || note.Beat.Start > this.LastMinNote.Beat.Start) {
+		if(this.LastMinNote == null || note.Beat.DisplayStart > this.LastMinNote.Beat.DisplayStart) {
 			this.LastMinNote = note;
-		} else if(note.Beat.Start == this.LastMinNote.Beat.Start) {
+		} else if(note.Beat.DisplayStart == this.LastMinNote.Beat.DisplayStart) {
 			if(value < this.GetValue(this.LastMinNote)) {
 				this.LastMinNote = note;
 			}
 		}
-		if(this.LastMaxNote == null || note.Beat.Start > this.LastMaxNote.Beat.Start) {
+		if(this.LastMaxNote == null || note.Beat.DisplayStart > this.LastMaxNote.Beat.DisplayStart) {
 			this.LastMaxNote = note;
-		} else if(note.Beat.Start == this.LastMaxNote.Beat.Start) {
+		} else if(note.Beat.DisplayStart == this.LastMaxNote.Beat.DisplayStart) {
 			if(value > this.GetValue(this.LastMaxNote)) {
 				this.LastMaxNote = note;
 			}
@@ -35570,6 +35693,9 @@ alphaTab.model.Beat.WhammyBarMaxPosition = 60;
 alphaTab.model.Beat.WhammyBarMaxValue = 24;
 alphaTab.model.Beat.GlobalBeatId = 0;
 alphaTab.model.BendPoint.MaxPosition = 60;
+alphaTab.model.BendPoint.FastBendPointStart = 30;
+alphaTab.model.BendPoint.FastBendPointMiddle = 40;
+alphaTab.model.BendPoint.FastBendPointEnd = 50;
 alphaTab.model.BendPoint.MaxValue = 12;
 alphaTab.model._BendStyle.BendStyle_Impl_.Default = 0;
 alphaTab.model._BendStyle.BendStyle_Impl_.Gradual = 1;

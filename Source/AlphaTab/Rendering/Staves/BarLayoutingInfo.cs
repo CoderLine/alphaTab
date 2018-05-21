@@ -211,7 +211,7 @@ namespace AlphaTab.Rendering.Staves
 
         public Spring AddBeatSpring(Beat beat, float beatSize, float preBeatSize)
         {
-            return AddSpring(beat.AbsoluteStart, beat.CalculateDuration(), beatSize, preBeatSize);
+            return AddSpring(beat.AbsoluteDisplayStart, beat.DisplayDuration, beatSize, preBeatSize);
         }
 
         public void Finish()

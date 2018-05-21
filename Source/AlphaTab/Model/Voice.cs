@@ -52,6 +52,10 @@ namespace AlphaTab.Model
         public void InsertBeat(Beat after, Beat newBeat)
         {
             newBeat.NextBeat = after.NextBeat;
+            if (newBeat.NextBeat != null)
+            {
+                newBeat.NextBeat.PreviousBeat = newBeat;
+            }
             newBeat.PreviousBeat = after;
             newBeat.Voice = this;
             after.NextBeat = newBeat;

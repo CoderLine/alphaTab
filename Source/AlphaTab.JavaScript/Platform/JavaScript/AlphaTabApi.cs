@@ -925,7 +925,7 @@ namespace AlphaTab.Platform.JavaScript
             Logger.Info("AlphaTab", "Generating Midi");
             var midiFile = new MidiFile();
             var handler = new AlphaSynthMidiFileHandler(midiFile);
-            var generator = new MidiFileGenerator(Score, handler);
+            var generator = new MidiFileGenerator(Score, Settings, handler);
             generator.Generate();
             _tickCache = generator.TickLookup;
             Player.LoadMidiFile(midiFile);
@@ -935,11 +935,10 @@ namespace AlphaTab.Platform.JavaScript
         {
             var midiFile = new MidiFile();
             var handler = new AlphaSynthMidiFileHandler(midiFile);
-            var generator = new MidiFileGenerator(Score, handler);
+            var generator = new MidiFileGenerator(Score, Settings, handler);
             generator.Generate();
 
             var binary = midiFile.ToBinary();
-
             Uint8Array uint8Array = Script.Write<Uint8Array>("binary.toUint8Array()");
             var fileName = string.IsNullOrEmpty(Score.Title) ? "File.mid" : Score.Title + ".mid";
             var dlLink = (AnchorElement)Browser.Document.CreateElement("a");
@@ -1186,8 +1185,8 @@ namespace AlphaTab.Platform.JavaScript
                 // for the selection ensure start < end
                 if (_selectionEnd != null)
                 {
-                    var startTick = _selectionStart.Beat.AbsoluteStart;
-                    var endTick = _selectionStart.Beat.AbsoluteStart;
+                    var startTick = _selectionStart.Beat.AbsoluteDisplayStart;
+                    var endTick = _selectionStart.Beat.AbsoluteDisplayStart;
                     if (endTick < startTick)
                     {
                         var t = _selectionStart;
@@ -1204,7 +1203,7 @@ namespace AlphaTab.Platform.JavaScript
 
                     // move to selection start
                     CursorUpdateBeat(_selectionStart.Beat, null, 0, false);
-                    Player.TickPosition = realMasterBarStart + _selectionStart.Beat.Start;
+                    Player.TickPosition = realMasterBarStart + _selectionStart.Beat.PlaybackStart;
 
                     // set playback range 
                     if (_selectionEnd != null && _selectionStart.Beat != _selectionEnd.Beat)
@@ -1212,9 +1211,9 @@ namespace AlphaTab.Platform.JavaScript
                         var realMasterBarEnd = tickCache.GetMasterBarStart(_selectionEnd.Beat.Voice.Bar.MasterBar);
                         Player.PlaybackRange = new PlaybackRange
                         {
-                            StartTick = realMasterBarStart + _selectionStart.Beat.Start,
-                            EndTick = realMasterBarEnd + _selectionEnd.Beat.Start +
-                                      _selectionEnd.Beat.CalculateDuration() - 50
+                            StartTick = realMasterBarStart + _selectionStart.Beat.PlaybackStart,
+                            EndTick = realMasterBarEnd + _selectionEnd.Beat.PlaybackStart +
+                                      _selectionEnd.Beat.PlaybackDuration - 50
                         };
                     }
                     else
@@ -1496,8 +1495,8 @@ namespace AlphaTab.Platform.JavaScript
                 endBeat.Bounds = cache.FindBeat(endBeat.Beat);
             }
 
-            var startTick = startBeat.Beat.AbsoluteStart;
-            var endTick = endBeat.Beat.AbsoluteStart;
+            var startTick = startBeat.Beat.AbsolutePlaybackStart;
+            var endTick = endBeat.Beat.AbsolutePlaybackStart;
             if (endTick < startTick)
             {
                 var t = startBeat;

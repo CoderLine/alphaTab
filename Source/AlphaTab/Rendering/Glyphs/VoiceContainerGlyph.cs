@@ -59,7 +59,7 @@ namespace AlphaTab.Rendering.Glyphs
             for (int i = 0, j = beatGlyphs.Count; i < j; i++)
             {
                 var currentBeatGlyph = beatGlyphs[i];
-                var time = currentBeatGlyph.Beat.AbsoluteStart;
+                var time = currentBeatGlyph.Beat.AbsoluteDisplayStart;
                 currentBeatGlyph.X = positions[time] - currentBeatGlyph.OnTimeX;
 
                 // size always previousl glyph after we know the position

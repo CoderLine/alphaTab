@@ -226,14 +226,34 @@ namespace AlphaTab.Model
         public CrescendoType Crescendo { get; set; }
 
         /// <summary>
-        /// The timeline position of the voice within the current bar. (unit: midi ticks)
+        /// The timeline position of the voice within the current bar as it is displayed. (unit: midi ticks)
         /// </summary>
-        public int Start { get; set; }
+        /// <remarks>
+        /// This might differ from the actual playback time due to special grace types. 
+        /// </remarks>
+        public int DisplayStart { get; set; }
 
-        public int AbsoluteStart
+        /// <summary>
+        /// The timeline position of the voice within the current bar as it is played. (unit: midi ticks)
+        /// </summary>
+        /// <remarks>
+        /// This might differ from the actual playback time due to special grace types. 
+        /// </remarks>
+        public int PlaybackStart { get; set; }
+
+        public int DisplayDuration { get; set; }
+        public int PlaybackDuration { get; set; }
+
+        public int AbsoluteDisplayStart
         {
-            get { return Voice.Bar.MasterBar.Start + Start; }
+            get { return Voice.Bar.MasterBar.Start + DisplayStart; }
         }
+
+        public int AbsolutePlaybackStart
+        {
+            get { return Voice.Bar.MasterBar.Start + PlaybackStart; }
+        }
+
         public DynamicValue Dynamic { get; set; }
 
         public bool InvertBeamDirection { get; set; }
@@ -252,7 +272,10 @@ namespace AlphaTab.Model
             TremoloSpeed = null;
             Automations = new FastList<Automation>();
             Dots = 0;
-            Start = 0;
+            DisplayStart = 0;
+            DisplayDuration = 0;
+            PlaybackStart = 0;
+            PlaybackDuration = 0;
             TupletDenominator = -1;
             TupletNumerator = -1;
             Dynamic = DynamicValue.F;
@@ -293,7 +316,10 @@ namespace AlphaTab.Model
             dst.PickStroke = src.PickStroke;
             dst.TremoloSpeed = src.TremoloSpeed;
             dst.Crescendo = src.Crescendo;
-            dst.Start = src.Start;
+            dst.DisplayStart = src.DisplayStart;
+            dst.DisplayDuration = src.DisplayDuration;
+            dst.PlaybackStart = src.PlaybackStart;
+            dst.PlaybackDuration = src.PlaybackDuration;
             dst.Dynamic = src.Dynamic;
             dst.IsLegatoOrigin = src.IsLegatoOrigin;
             dst.InvertBeamDirection = src.InvertBeamDirection;
@@ -375,52 +401,6 @@ namespace AlphaTab.Model
             }
         }
 
-        /// <summary>
-        /// Calculates the time spent in this bar. (unit: midi ticks)
-        /// </summary>
-        /// <returns></returns>
-        public int CalculateDuration(bool forPlayback = false)
-        {
-            var ticks = Duration.ToTicks();
-            if (Dots == 2)
-            {
-                ticks = MidiUtils.ApplyDot(ticks, true);
-            }
-            else if (Dots == 1)
-            {
-                ticks = MidiUtils.ApplyDot(ticks, false);
-            }
-
-            if (TupletDenominator > 0 && TupletNumerator >= 0)
-            {
-                ticks = MidiUtils.ApplyTuplet(ticks, TupletNumerator, TupletDenominator);
-            }
-
-            if (PreviousBeat != null && PreviousBeat.GraceType == GraceType.OnBeat)
-            {
-                ticks -= PreviousBeat.CalculateDuration(forPlayback);
-            }
-
-            // It can happen that the first beat of the next bar shifts into this
-            // beat due to before-beat grace. In this case we need to 
-            // reduce the duration of this beat. 
-            // Within the same bar the start of the next beat is always directly after the current. 
-            if (forPlayback && NextBeat != null && NextBeat.Voice.Bar != Voice.Bar)
-            {
-                var thisStart = AbsoluteStart;
-                var end = thisStart + ticks;
-                // we cannot use AbsoluteStart yet as the next bar might not have it's actual start time. (e.g. during model finish)
-                var nextStart = Voice.Bar.MasterBar.Start + Voice.Bar.MasterBar.CalculateDuration() +
-                                NextBeat.Start;
-                if (nextStart < end)
-                {
-                    ticks = nextStart - thisStart;
-                }
-            }
-
-            return ticks;
-        }
-
         public void AddNote(Note note)
         {
             note.Beat = this;
@@ -497,16 +477,62 @@ namespace AlphaTab.Model
             // start
             if (Index == 0)
             {
-                Start = 0;
+                DisplayStart = 0;
+                PlaybackStart = 0;
             }
             else
             {
-                Start = PreviousBeat.Start + PreviousBeat.CalculateDuration();
+                DisplayStart = PreviousBeat.DisplayStart + PreviousBeat.DisplayDuration;
+                PlaybackStart = PreviousBeat.PlaybackStart + PreviousBeat.PlaybackDuration;
             }
-
-            if (GraceType == GraceType.BeforeBeat)
+            
+            // if the previous beat is a bend grace it covers
+            // also this beat fully. 
+            if (PreviousBeat != null && PreviousBeat.GraceType == GraceType.BendGrace)
             {
-                Start -= CalculateDuration();
+                PlaybackDuration = 0;
+            }
+            else
+            {
+                var ticks = Duration.ToTicks();
+                if (Dots == 2)
+                {
+                    ticks = MidiUtils.ApplyDot(ticks, true);
+                }
+                else if (Dots == 1)
+                {
+                    ticks = MidiUtils.ApplyDot(ticks, false);
+                }
+
+                if (TupletDenominator > 0 && TupletNumerator >= 0)
+                {
+                    ticks = MidiUtils.ApplyTuplet(ticks, TupletNumerator, TupletDenominator);
+                }
+                DisplayDuration = ticks;
+                PlaybackDuration = ticks;
+
+                // if the previous beat is a on-beat grace it steals the duration from this beat
+                if (PreviousBeat != null && PreviousBeat.GraceType == GraceType.OnBeat)
+                {
+                    PlaybackDuration -= PreviousBeat.PlaybackDuration;
+                }
+
+                // It can happen that the first beat of the next bar shifts into this
+                // beat due to before-beat grace. In this case we need to 
+                // reduce the duration of this beat. 
+                // Within the same bar the start of the next beat is always directly after the current. 
+                if (NextBeat != null && NextBeat.Voice.Bar != Voice.Bar)
+                {
+                    var thisStart = AbsolutePlaybackStart;
+                    var end = thisStart + ticks;
+                    // we cannot use AbsoluteStart yet as the next bar might not have it's actual start time. (e.g. during model finish)
+                    var nextStart = Voice.Bar.MasterBar.Start + Voice.Bar.MasterBar.CalculateDuration() +
+                                    NextBeat.PlaybackStart;
+                    if (nextStart < end)
+                    {
+                        PlaybackDuration = nextStart - thisStart;
+                    }
+                }
             }
 
             var bendMode = settings == null ? BendMode.GuitarPro : settings.BendMode;
