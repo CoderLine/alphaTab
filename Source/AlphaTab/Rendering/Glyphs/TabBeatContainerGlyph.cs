@@ -25,9 +25,22 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class TabBeatContainerGlyph : BeatContainerGlyph
     {
+        private TabBendGlyph _bend;
+
         public TabBeatContainerGlyph(Beat beat, VoiceContainerGlyph voiceContainer)
             : base(beat, voiceContainer)
         {
+        }
+
+        public override void DoLayout()
+        {
+            base.DoLayout();
+            if (_bend != null)
+            {
+                _bend.Renderer = Renderer;
+                _bend.DoLayout();
+                UpdateWidth();
+            }
         }
 
         protected override void CreateTies(Note n)
@@ -87,10 +100,13 @@ namespace AlphaTab.Rendering.Glyphs
 
             if (n.HasBend)
             {
-                var bend = new TabBendGlyph(n);
-                bend.Renderer = renderer;
-                bend.DoLayout();
-                Ties.Add(bend);
+                if (_bend == null)
+                {
+                    _bend = new TabBendGlyph(n.Beat);
+                    _bend.Renderer = Renderer;
+                    Ties.Add(_bend);
+                }
+                _bend.AddBends(n);
             }
         }
     }

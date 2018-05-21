@@ -113,14 +113,14 @@ namespace AlphaTab.Rendering.Glyphs
 
             if (_middleNoteGlyph != null)
             {
-                _middleNoteGlyph.X = middleX - _bendNoteHeads[0].NoteHeadOffset;
+                _middleNoteGlyph.X = middleX - _middleNoteGlyph.NoteHeadOffset;
                 _middleNoteGlyph.Y = cy + startNoteRenderer.Y;
                 _middleNoteGlyph.Paint(0, 0, canvas);
             }
 
             if (_endNoteGlyph != null)
             {
-                _endNoteGlyph.X = endBeatX - _bendNoteHeads[0].NoteHeadOffset;
+                _endNoteGlyph.X = endBeatX - _endNoteGlyph.NoteHeadOffset;
                 _endNoteGlyph.Y = cy + startNoteRenderer.Y;
                 _endNoteGlyph.Paint(0, 0, canvas);
             }

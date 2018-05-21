@@ -379,7 +379,7 @@ namespace AlphaTab.Model
         /// Calculates the time spent in this bar. (unit: midi ticks)
         /// </summary>
         /// <returns></returns>
-        public int CalculateDuration()
+        public int CalculateDuration(bool forPlayback = false)
         {
             var ticks = Duration.ToTicks();
             if (Dots == 2)
@@ -398,19 +398,20 @@ namespace AlphaTab.Model
 
             if (PreviousBeat != null && PreviousBeat.GraceType == GraceType.OnBeat)
             {
-                ticks -= PreviousBeat.CalculateDuration();
+                ticks -= PreviousBeat.CalculateDuration(forPlayback);
             }
 
             // It can happen that the first beat of the next bar shifts into this
             // beat due to before-beat grace. In this case we need to 
             // reduce the duration of this beat. 
             // Within the same bar the start of the next beat is always directly after the current. 
-            if (NextBeat != null && NextBeat.Voice.Bar != Voice.Bar)
+            if (forPlayback && NextBeat != null && NextBeat.Voice.Bar != Voice.Bar)
             {
                 var thisStart = AbsoluteStart;
                 var end = thisStart + ticks;
                 // we cannot use AbsoluteStart yet as the next bar might not have it's actual start time. (e.g. during model finish)
-                var nextStart = Voice.Bar.MasterBar.Start + Voice.Bar.MasterBar.CalculateDuration() + NextBeat.Start;
+                var nextStart = Voice.Bar.MasterBar.Start + Voice.Bar.MasterBar.CalculateDuration() +
+                                NextBeat.Start;
                 if (nextStart < end)
                 {
                     ticks = nextStart - thisStart;

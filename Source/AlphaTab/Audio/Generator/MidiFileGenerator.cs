@@ -229,7 +229,7 @@ namespace AlphaTab.Audio.Generator
             var beatStart = beat.Start;
             var audioDuration = beat.Voice.Bar.IsEmpty
                 ? beat.Voice.Bar.MasterBar.CalculateDuration()
-                : beat.CalculateDuration();
+                : beat.CalculateDuration(true);
 
             var beatLookup = new BeatTickLookup();
             beatLookup.Start = barStartTick + beatStart;
@@ -404,7 +404,7 @@ namespace AlphaTab.Audio.Generator
                     if (!note.IsTieDestination)
                     {
                         var startTick = note.Beat.AbsoluteStart;
-                        var tieDestinationDuration = GetNoteDuration(endNote, endNote.Beat.CalculateDuration());
+                        var tieDestinationDuration = GetNoteDuration(endNote, endNote.Beat.CalculateDuration(true));
                         var endTick = endNote.Beat.AbsoluteStart + tieDestinationDuration.UntilTieEnd;
                         durationWithEffects.UntilTieEnd = endTick - startTick;
                     }
@@ -412,7 +412,7 @@ namespace AlphaTab.Audio.Generator
                     {
                         // for continuing ties, take the current duration + the one from the destination 
                         // this branch will be entered as part of the recusion of the if branch
-                        var tieDestinationDuration = GetNoteDuration(endNote, endNote.Beat.CalculateDuration());
+                        var tieDestinationDuration = GetNoteDuration(endNote, endNote.Beat.CalculateDuration(true));
                         durationWithEffects.UntilTieEnd = duration + tieDestinationDuration.UntilTieEnd;
                     }
                 }
@@ -446,7 +446,7 @@ namespace AlphaTab.Audio.Generator
                 }
                 else
                 {
-                    durationWithEffects.LetRingEnd = (lastLetRingBeat.AbsoluteStart - note.Beat.AbsoluteStart) + lastLetRingBeat.CalculateDuration();
+                    durationWithEffects.LetRingEnd = (lastLetRingBeat.AbsoluteStart - note.Beat.AbsoluteStart) + lastLetRingBeat.CalculateDuration(true);
                 }
             }
             else
@@ -590,7 +590,7 @@ namespace AlphaTab.Audio.Generator
                     endNote = endNote.TieDestination;
                 }
 
-                duration = endNote.Beat.AbsoluteStart - note.Beat.AbsoluteStart + GetNoteDuration(endNote, endNote.Beat.CalculateDuration()).NoteOnly;
+                duration = endNote.Beat.AbsoluteStart - note.Beat.AbsoluteStart + GetNoteDuration(endNote, endNote.Beat.CalculateDuration(true)).NoteOnly;
             }
             else
             {
@@ -733,7 +733,7 @@ namespace AlphaTab.Audio.Generator
         private int GetBrushIncrement(Beat beat)
         {
             if (beat.BrushDuration == 0) return 0;
-            var duration = beat.CalculateDuration();
+            var duration = beat.CalculateDuration(true);
             if (duration == 0) return 0;
             return (int)((duration / 8.0) * (4.0 / beat.BrushDuration));
         }

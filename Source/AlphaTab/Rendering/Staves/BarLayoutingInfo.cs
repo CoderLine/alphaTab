@@ -264,6 +264,11 @@ namespace AlphaTab.Rendering.Staves
 
         private float CalculateSpringConstant(Spring spring, int duration)
         {
+            if (duration <= 0)
+            {
+                duration = Duration.SixtyFourth.ToTicks();
+            }
+
             if (spring.SmallestDuration == 0)
             {
                 spring.SmallestDuration = duration;
