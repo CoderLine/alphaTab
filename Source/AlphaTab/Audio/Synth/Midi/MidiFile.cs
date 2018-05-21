@@ -58,7 +58,6 @@ namespace AlphaTab.Audio.Synth.Midi
                         break;
                     }
                 }
-
                 Events.InsertAt(insertPos, e);
             }
         }
@@ -81,7 +80,7 @@ namespace AlphaTab.Audio.Synth.Midi
             s.Write(b, 0, b.Length);
 
             // format 
-            b = new byte[] { 0x00, 0x01 };
+            b = new byte[] { 0x00, 0x00 };
             s.Write(b, 0, b.Length);
 
             // number of tracks
@@ -95,16 +94,16 @@ namespace AlphaTab.Audio.Synth.Midi
 
             // build track data first
             var trackData = ByteBuffer.Empty();
+            var previousTick = 0;
             foreach (var midiEvent in Events)
             {
-                WriteVariableInt(s, midiEvent.Tick);
-                b = new[]
-                {
-                    (byte) ((midiEvent.Message >> 24) & 0xFF), (byte) ((midiEvent.Message >> 16) & 0xFF),
-                    (byte) ((midiEvent.Message >> 8) & 0xFF), (byte) ((midiEvent.Message >> 0) & 0xFF)
-                };
-                s.Write(b, 0, b.Length);
+                var delta = midiEvent.Tick - previousTick;
+                WriteVariableInt(trackData, delta);
+                midiEvent.WriteTo(trackData);
+                previousTick = midiEvent.Tick;
             }
+
+            // end of track
 
             // magic number "MTrk" (0x4D54726B)
             b = new byte[] { 0x4D, 0x54, 0x72, 0x6B };
@@ -121,7 +120,7 @@ namespace AlphaTab.Audio.Synth.Midi
             s.Write(data, 0, data.Length);
         }
 
-        private void WriteVariableInt(IWriteable s, int value)
+        public static void WriteVariableInt(IWriteable s, int value)
         {
             var array = new byte[4];
 

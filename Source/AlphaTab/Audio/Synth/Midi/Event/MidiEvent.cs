@@ -144,5 +144,15 @@ namespace AlphaTab.Audio.Synth.Midi.Event
             Tick = tick;
             Message = status | (data1 << 8) | (data2 << 16);
         }
+
+        public virtual void WriteTo(ByteBuffer s)
+        {
+            var b = new[]
+            {
+                (byte) ((Message >> 24) & 0xFF), (byte) ((Message >> 16) & 0xFF),
+                (byte) ((Message >> 8) & 0xFF), (byte) ((Message >> 0) & 0xFF)
+            };
+            s.Write(b, 0, b.Length);
+        }
     }
 }

@@ -20,6 +20,7 @@ using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Audio.Synth.Midi.Event;
 using AlphaTab.Audio.Synth.Synthesis;
 using AlphaTab.Collections;
+using AlphaTab.Util;
 
 namespace AlphaTab.Audio.Synth
 {
@@ -171,13 +172,18 @@ namespace AlphaTab.Audio.Synth
             var metronomeTick = 0;
             var metronomeTime = 0.0;
 
+            var previousTick = 0;
+
             foreach(var mEvent in midiFile.Events)
             {
                 var synthData = new SynthEvent(_synthData.Count, mEvent);
                 _synthData.Add(synthData);
-                absTick = mEvent.Tick;
-                absTime = mEvent.Tick * (60000.0 / (bpm * midiFile.Division));
+
+                var deltaTick = mEvent.Tick - previousTick;
+                absTick += deltaTick;
+                absTime += deltaTick * (60000.0 / (bpm * midiFile.Division));
                 synthData.Time = absTime;
+                previousTick = mEvent.Tick;
 
                 if (mEvent.Command == MidiEventTypeEnum.Meta && mEvent.Data1 == (int)MetaEventTypeEnum.Tempo)
                 {

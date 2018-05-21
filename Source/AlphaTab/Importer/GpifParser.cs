@@ -420,6 +420,7 @@ namespace AlphaTab.Importer
                             ParseTrackProperties(track, c);
                             break;
                         case "GeneralMidi":
+                        case "MidiConnection":
                             ParseGeneralMidi(track, c);
                             break;
                         case "Sounds":
@@ -748,17 +749,29 @@ namespace AlphaTab.Importer
 
         private void ParseGeneralMidi(Track track, XmlNode node)
         {
-            var port = Platform.Platform.ParseInt(node.FindChildElement("Port").InnerText);
-            var program = Platform.Platform.ParseInt(node.FindChildElement("Program").InnerText);
-            var primaryChannel = Platform.Platform.ParseInt(node.FindChildElement("PrimaryChannel").InnerText);
-            var pecondaryChannel = Platform.Platform.ParseInt(node.FindChildElement("SecondaryChannel").InnerText);
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Program":
+                            track.PlaybackInfo.Program = Platform.Platform.ParseInt(c.InnerText);
+                            break;
+                        case "Port":
+                            track.PlaybackInfo.Port = Platform.Platform.ParseInt(c.InnerText);
+                            break;
+                        case "PrimaryChannel":
+                            track.PlaybackInfo.PrimaryChannel = Platform.Platform.ParseInt(c.InnerText);
+                            break;
+                        case "SecondaryChannel":
+                            track.PlaybackInfo.SecondaryChannel = Platform.Platform.ParseInt(c.InnerText);
+                            break;
+                    }
+                }
+            }
+
             var isPercussion = node.GetAttribute("table") == "Percussion";
-
-            track.PlaybackInfo.Port = port;
-            track.PlaybackInfo.Program = program;
-            track.PlaybackInfo.PrimaryChannel = primaryChannel;
-            track.PlaybackInfo.SecondaryChannel = pecondaryChannel;
-
             if (isPercussion)
             {
                 foreach (var staff in track.Staves)

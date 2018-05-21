@@ -16,6 +16,8 @@
  * License along with this library.
  */
 
+using AlphaTab.IO;
+
 namespace AlphaTab.Audio.Synth.Midi.Event
 {
     public class MetaDataEvent : MetaEvent
@@ -26,6 +28,16 @@ namespace AlphaTab.Audio.Synth.Midi.Event
             : base(delta, status, metaId, 0)
         {
             Data = data;
+        }
+
+        public override void WriteTo(ByteBuffer s)
+        {
+            s.WriteByte(0xFF);
+            s.WriteByte((byte)MetaStatus);
+
+            var l = Data.Length;
+            MidiFile.WriteVariableInt(s, l);
+            s.Write(Data, 0, Data.Length);
         }
     }
 }

@@ -4558,14 +4558,17 @@ alphaTab.audio.synth.MidiFileSequencer.prototype = {
 		var metronomeLength = 0;
 		var metronomeTick = 0;
 		var metronomeTime = 0.0;
+		var previousTick = 0;
 		var mEvent = $iterator(midiFile.Events)();
 		while(mEvent.hasNext()) {
 			var mEvent1 = mEvent.next();
 			var synthData = new alphaTab.audio.synth.synthesis.SynthEvent(this._synthData.length,mEvent1);
 			this._synthData.push(synthData);
-			absTick = mEvent1.Tick;
-			absTime = mEvent1.Tick * (60000.0 / (bpm * midiFile.Division));
+			var deltaTick = mEvent1.Tick - previousTick;
+			absTick = absTick + deltaTick;
+			absTime = absTime + deltaTick * (60000.0 / (bpm * midiFile.Division));
 			synthData.Time = absTime;
+			previousTick = mEvent1.Tick;
 			if(mEvent1.get_Command() == 255 && mEvent1.get_Data1() == 81) {
 				var meta = js.Boot.__cast(mEvent1 , alphaTab.audio.synth.midi.event.MetaNumberEvent);
 				bpm = 60000000 / js.Boot.__cast(meta.Value , Float);
@@ -7260,44 +7263,45 @@ alphaTab.audio.generator.AlphaSynthMidiFileHandler.prototype = {
 			++denominatorIndex;
 		}
 		var message = new alphaTab.audio.synth.midi.event.MetaDataEvent(tick,255,system.Convert.ToUInt8(88),new Uint8Array([system.Convert.ToUInt8(timeSignatureNumerator & 255),system.Convert.ToUInt8(denominatorIndex & 255),48,8]));
-		this._midiFile.Events.push(message);
+		this._midiFile.AddEvent(message);
 	}
 	,AddRest: function(track,tick,channel) {
 		var message = new alphaTab.audio.synth.midi.event.SystemExclusiveEvent(tick,system.Convert.ToUInt8(240),0,new Uint8Array([255]));
-		this._midiFile.Events.push(message);
+		this._midiFile.AddEvent(message);
 	}
 	,AddNote: function(track,start,length,key,dynamicValue,channel) {
 		var velocity = alphaTab.audio.MidiUtils.DynamicToVelocity(dynamicValue);
 		var noteOn = new alphaTab.audio.synth.midi.event.MidiEvent(start,this.MakeCommand(system.Convert.ToUInt8(144),channel),alphaTab.audio.generator.AlphaSynthMidiFileHandler.FixValue(key),alphaTab.audio.generator.AlphaSynthMidiFileHandler.FixValue(system.Convert.ToUInt8(velocity)));
-		this._midiFile.Events.push(noteOn);
+		this._midiFile.AddEvent(noteOn);
 		var noteOff = new alphaTab.audio.synth.midi.event.MidiEvent(start + length,this.MakeCommand(system.Convert.ToUInt8(128),channel),alphaTab.audio.generator.AlphaSynthMidiFileHandler.FixValue(key),alphaTab.audio.generator.AlphaSynthMidiFileHandler.FixValue(system.Convert.ToUInt8(velocity)));
-		this._midiFile.Events.push(noteOff);
+		this._midiFile.AddEvent(noteOff);
+		alphaTab.util.Logger.Info("Midi",Std.string(start + length) + "/NoteOff:" + Std.string(key) + "/" + Std.string(channel),null);
 	}
 	,MakeCommand: function(command,channel) {
 		return system.Convert.ToUInt8(command & 240 | channel & 15);
 	}
 	,AddControlChange: function(track,tick,channel,controller,value) {
 		var message = new alphaTab.audio.synth.midi.event.MidiEvent(tick,this.MakeCommand(system.Convert.ToUInt8(176),channel),alphaTab.audio.generator.AlphaSynthMidiFileHandler.FixValue(controller),alphaTab.audio.generator.AlphaSynthMidiFileHandler.FixValue(value));
-		this._midiFile.Events.push(message);
+		this._midiFile.AddEvent(message);
 	}
 	,AddProgramChange: function(track,tick,channel,program) {
 		var message = new alphaTab.audio.synth.midi.event.MidiEvent(tick,this.MakeCommand(system.Convert.ToUInt8(192),channel),alphaTab.audio.generator.AlphaSynthMidiFileHandler.FixValue(program),0);
-		this._midiFile.Events.push(message);
+		this._midiFile.AddEvent(message);
 	}
 	,AddTempo: function(tick,tempo) {
 		var tempoInUsq = 60000000 / tempo | 0;
 		var message = new alphaTab.audio.synth.midi.event.MetaNumberEvent(tick,255,system.Convert.ToUInt8(81),tempoInUsq);
-		this._midiFile.Events.push(message);
+		this._midiFile.AddEvent(message);
 	}
 	,AddBend: function(track,tick,channel,value) {
 		var message = new alphaTab.audio.synth.midi.event.MidiEvent(tick,this.MakeCommand(system.Convert.ToUInt8(224),channel),0,alphaTab.audio.generator.AlphaSynthMidiFileHandler.FixValue(value));
-		this._midiFile.Events.push(message);
+		this._midiFile.AddEvent(message);
 	}
 	,FinishTrack: function(track,tick) {
 		var message = system.Convert.ToUInt8(47);
 		var this1 = new Uint8Array(0);
 		var message1 = new alphaTab.audio.synth.midi.event.MetaDataEvent(tick,255,message,this1);
-		this._midiFile.Events.push(message1);
+		this._midiFile.AddEvent(message1);
 	}
 	,__class__: alphaTab.audio.generator.AlphaSynthMidiFileHandler
 };
@@ -7523,7 +7527,6 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		}
 		if(!note.IsTieDestination) {
 			var noteSoundDuration = Math.max(noteDuration.UntilTieEnd,noteDuration.LetRingEnd);
-			alphaTab.util.Logger.Info("Midi","Note " + note.Beat.Voice.Bar.Index + "/" + note.Beat.Index + " from " + noteStart + " to " + (noteStart + noteSoundDuration),null);
 			this._handler.AddNote(track.Index,noteStart,noteSoundDuration,system.Convert.ToUInt8(noteKey),dynamicValue,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel));
 		}
 	}
@@ -7531,6 +7534,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		var durationWithEffects = new alphaTab.audio.generator.MidiNoteDuration();
 		durationWithEffects.NoteOnly = duration;
 		durationWithEffects.UntilTieEnd = duration;
+		durationWithEffects.LetRingEnd = duration;
 		if(note.IsDead) {
 			durationWithEffects.NoteOnly = this.ApplyStaticDuration(30,duration);
 			durationWithEffects.UntilTieEnd = durationWithEffects.NoteOnly;
@@ -9845,6 +9849,26 @@ alphaTab.audio.synth.midi.MidiFile = $hx_exports["alphaTab"]["audio"]["synth"]["
 	this.Events = this1;
 };
 alphaTab.audio.synth.midi.MidiFile.__name__ = ["alphaTab","audio","synth","midi","MidiFile"];
+alphaTab.audio.synth.midi.MidiFile.WriteVariableInt = function(s,value) {
+	var this1 = new Uint8Array(4);
+	var array = this1;
+	var n = 0;
+	while(true) {
+		array[n++] = system.Convert.ToUInt8(value & 127 & 255);
+		value = value >> 7;
+		if(!(value > 0)) {
+			break;
+		}
+	}
+	while(n > 0) {
+		--n;
+		if(n > 0) {
+			s.WriteByte(system.Convert.ToUInt8(array[n] | 128));
+		} else {
+			s.WriteByte(array[n]);
+		}
+	}
+};
 alphaTab.audio.synth.midi.MidiFile.prototype = {
 	AddEvent: function(e) {
 		if(this.Events.length == 0) {
@@ -9872,7 +9896,7 @@ alphaTab.audio.synth.midi.MidiFile.prototype = {
 		s.Write(b,0,b.length);
 		b = new Uint8Array([0,0,0,6]);
 		s.Write(b,0,b.length);
-		b = new Uint8Array([0,1]);
+		b = new Uint8Array([0,0]);
 		s.Write(b,0,b.length);
 		var v = 1;
 		b = new Uint8Array([system.Convert.ToUInt8(v >> 8 & 255),system.Convert.ToUInt8(v & 255)]);
@@ -9881,12 +9905,14 @@ alphaTab.audio.synth.midi.MidiFile.prototype = {
 		b = new Uint8Array([system.Convert.ToUInt8(v >> 8 & 255),system.Convert.ToUInt8(v & 255)]);
 		s.Write(b,0,b.length);
 		var trackData = alphaTab.io.ByteBuffer.Empty();
+		var previousTick = 0;
 		var midiEvent = $iterator(this.Events)();
 		while(midiEvent.hasNext()) {
 			var midiEvent1 = midiEvent.next();
-			this.WriteVariableInt(s,midiEvent1.Tick);
-			b = new Uint8Array([system.Convert.ToUInt8(midiEvent1.Message >> 24 & 255),system.Convert.ToUInt8(midiEvent1.Message >> 16 & 255),system.Convert.ToUInt8(midiEvent1.Message >> 8 & 255),system.Convert.ToUInt8(midiEvent1.Message & 255)]);
-			s.Write(b,0,b.length);
+			var delta = midiEvent1.Tick - previousTick;
+			alphaTab.audio.synth.midi.MidiFile.WriteVariableInt(trackData,delta);
+			midiEvent1.WriteTo(trackData);
+			previousTick = midiEvent1.Tick;
 		}
 		b = new Uint8Array([77,84,114,107]);
 		s.Write(b,0,b.length);
@@ -9895,26 +9921,6 @@ alphaTab.audio.synth.midi.MidiFile.prototype = {
 		b = new Uint8Array([system.Convert.ToUInt8(l >> 24 & 255),system.Convert.ToUInt8(l >> 16 & 255),system.Convert.ToUInt8(l >> 8 & 255),system.Convert.ToUInt8(l & 255)]);
 		s.Write(b,0,b.length);
 		s.Write(data,0,data.length);
-	}
-	,WriteVariableInt: function(s,value) {
-		var this1 = new Uint8Array(4);
-		var array = this1;
-		var n = 0;
-		while(true) {
-			array[n++] = system.Convert.ToUInt8(value & 127 & 255);
-			value = value >> 7;
-			if(!(value > 0)) {
-				break;
-			}
-		}
-		while(n > 0) {
-			--n;
-			if(n > 0) {
-				s.WriteByte(system.Convert.ToUInt8(array[n] | 128));
-			} else {
-				s.WriteByte(array[n]);
-			}
-		}
 	}
 	,__class__: alphaTab.audio.synth.midi.MidiFile
 };
@@ -10227,6 +10233,10 @@ alphaTab.audio.synth.midi.event.MidiEvent.prototype = {
 		this.Message = this.Message | value << 16;
 		return this.get_Data2();
 	}
+	,WriteTo: function(s) {
+		var b = new Uint8Array([system.Convert.ToUInt8(this.Message >> 24 & 255),system.Convert.ToUInt8(this.Message >> 16 & 255),system.Convert.ToUInt8(this.Message >> 8 & 255),system.Convert.ToUInt8(this.Message & 255)]);
+		s.Write(b,0,b.length);
+	}
 	,__class__: alphaTab.audio.synth.midi.event.MidiEvent
 };
 alphaTab.audio.synth.midi.event.MetaEvent = $hx_exports["alphaTab"]["audio"]["synth"]["midi"]["event"]["MetaEvent"] = function(delta,status,data1,data2) {
@@ -10254,7 +10264,14 @@ alphaTab.audio.synth.midi.event.MetaDataEvent = $hx_exports["alphaTab"]["audio"]
 alphaTab.audio.synth.midi.event.MetaDataEvent.__name__ = ["alphaTab","audio","synth","midi","event","MetaDataEvent"];
 alphaTab.audio.synth.midi.event.MetaDataEvent.__super__ = alphaTab.audio.synth.midi.event.MetaEvent;
 alphaTab.audio.synth.midi.event.MetaDataEvent.prototype = $extend(alphaTab.audio.synth.midi.event.MetaEvent.prototype,{
-	__class__: alphaTab.audio.synth.midi.event.MetaDataEvent
+	WriteTo: function(s) {
+		s.WriteByte(255);
+		s.WriteByte(system.Convert.ToUInt8(this.get_MetaStatus()));
+		var l = this.Data.length;
+		alphaTab.audio.synth.midi.MidiFile.WriteVariableInt(s,l);
+		s.Write(this.Data,0,this.Data.length);
+	}
+	,__class__: alphaTab.audio.synth.midi.event.MetaDataEvent
 });
 alphaTab.audio.synth.midi.event._MetaEventTypeEnum = {};
 alphaTab.audio.synth.midi.event._MetaEventTypeEnum.MetaEventTypeEnum_Impl_ = $hx_exports["alphaTab"]["audio"]["synth"]["midi"]["event"]["_MetaEventTypeEnum"]["MetaEventTypeEnum_Impl_"] = {};
@@ -10344,17 +10361,14 @@ alphaTab.audio.synth.midi.event.MetaNumberEvent = $hx_exports["alphaTab"]["audio
 alphaTab.audio.synth.midi.event.MetaNumberEvent.__name__ = ["alphaTab","audio","synth","midi","event","MetaNumberEvent"];
 alphaTab.audio.synth.midi.event.MetaNumberEvent.__super__ = alphaTab.audio.synth.midi.event.MetaEvent;
 alphaTab.audio.synth.midi.event.MetaNumberEvent.prototype = $extend(alphaTab.audio.synth.midi.event.MetaEvent.prototype,{
-	__class__: alphaTab.audio.synth.midi.event.MetaNumberEvent
-});
-alphaTab.audio.synth.midi.event.MetaTextEvent = $hx_exports["alphaTab"]["audio"]["synth"]["midi"]["event"]["MetaTextEvent"] = function(delta,status,metaId,text) {
-	alphaTab.audio.synth.midi.event.MetaEvent.call(this,delta,status,metaId,0);
-	this.Text = null;
-	this.Text = text;
-};
-alphaTab.audio.synth.midi.event.MetaTextEvent.__name__ = ["alphaTab","audio","synth","midi","event","MetaTextEvent"];
-alphaTab.audio.synth.midi.event.MetaTextEvent.__super__ = alphaTab.audio.synth.midi.event.MetaEvent;
-alphaTab.audio.synth.midi.event.MetaTextEvent.prototype = $extend(alphaTab.audio.synth.midi.event.MetaEvent.prototype,{
-	__class__: alphaTab.audio.synth.midi.event.MetaTextEvent
+	WriteTo: function(s) {
+		s.WriteByte(255);
+		s.WriteByte(system.Convert.ToUInt8(this.get_MetaStatus()));
+		alphaTab.audio.synth.midi.MidiFile.WriteVariableInt(s,3);
+		var b = new Uint8Array([system.Convert.ToUInt8(this.Value >> 16 & 255),system.Convert.ToUInt8(this.Value >> 8 & 255),system.Convert.ToUInt8(this.Value & 255)]);
+		s.Write(b,0,b.length);
+	}
+	,__class__: alphaTab.audio.synth.midi.event.MetaNumberEvent
 });
 alphaTab.audio.synth.midi.event._MidiEventTypeEnum = {};
 alphaTab.audio.synth.midi.event._MidiEventTypeEnum.MidiEventTypeEnum_Impl_ = $hx_exports["alphaTab"]["audio"]["synth"]["midi"]["event"]["_MidiEventTypeEnum"]["MidiEventTypeEnum_Impl_"] = {};
@@ -10496,6 +10510,14 @@ alphaTab.audio.synth.midi.event.SystemExclusiveEvent.__super__ = alphaTab.audio.
 alphaTab.audio.synth.midi.event.SystemExclusiveEvent.prototype = $extend(alphaTab.audio.synth.midi.event.SystemCommonEvent.prototype,{
 	get_ManufacturerId: function() {
 		return this.Message >> 8;
+	}
+	,WriteTo: function(s) {
+		s.WriteByte(240);
+		var l = this.Data.length + 2;
+		s.WriteByte(system.Convert.ToUInt8(this.get_ManufacturerId()));
+		var b = new Uint8Array([system.Convert.ToUInt8(l >> 24 & 255),system.Convert.ToUInt8(l >> 16 & 255),system.Convert.ToUInt8(l >> 8 & 255),system.Convert.ToUInt8(l & 255)]);
+		s.Write(b,0,b.length);
+		s.WriteByte(247);
 	}
 	,__class__: alphaTab.audio.synth.midi.event.SystemExclusiveEvent
 });
@@ -14865,9 +14887,6 @@ alphaTab.importer.GpifParser.prototype = {
 						track.Color = new alphaTab.platform.model.Color(system.Convert.ToUInt8(r),system.Convert.ToUInt8(g),system.Convert.ToUInt8(b),255);
 					}
 					break;
-				case "GeneralMidi":
-					this.ParseGeneralMidi(track,c1);
-					break;
 				case "Instrument":
 					var instrumentName = c1.GetAttribute("ref");
 					if(StringTools.endsWith(instrumentName,"-gs") || StringTools.endsWith(instrumentName,"GrandStaff")) {
@@ -14877,6 +14896,9 @@ alphaTab.importer.GpifParser.prototype = {
 					break;
 				case "Lyrics":
 					this.ParseLyrics(trackId,c1);
+					break;
+				case "GeneralMidi":case "MidiConnection":
+					this.ParseGeneralMidi(track,c1);
 					break;
 				case "Name":
 					track.Name = c1.get_InnerText();
@@ -15173,15 +15195,33 @@ alphaTab.importer.GpifParser.prototype = {
 		}
 	}
 	,ParseGeneralMidi: function(track,node) {
-		var port = alphaTab.platform.Platform.ParseInt(node.FindChildElement("Port").get_InnerText());
-		var program = alphaTab.platform.Platform.ParseInt(node.FindChildElement("Program").get_InnerText());
-		var primaryChannel = alphaTab.platform.Platform.ParseInt(node.FindChildElement("PrimaryChannel").get_InnerText());
-		var pecondaryChannel = alphaTab.platform.Platform.ParseInt(node.FindChildElement("SecondaryChannel").get_InnerText());
+		var c = $iterator(node.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "Port":
+					var tmp = c1.get_InnerText();
+					track.PlaybackInfo.Port = alphaTab.platform.Platform.ParseInt(tmp);
+					break;
+				case "PrimaryChannel":
+					var tmp1 = c1.get_InnerText();
+					track.PlaybackInfo.PrimaryChannel = alphaTab.platform.Platform.ParseInt(tmp1);
+					break;
+				case "Program":
+					var tmp2 = c1.get_InnerText();
+					track.PlaybackInfo.Program = alphaTab.platform.Platform.ParseInt(tmp2);
+					break;
+				case "SecondaryChannel":
+					var tmp3 = c1.get_InnerText();
+					track.PlaybackInfo.SecondaryChannel = alphaTab.platform.Platform.ParseInt(tmp3);
+					break;
+				default:
+				}
+			}
+		}
 		var isPercussion = node.GetAttribute("table") == "Percussion";
-		track.PlaybackInfo.Port = port;
-		track.PlaybackInfo.Program = program;
-		track.PlaybackInfo.PrimaryChannel = primaryChannel;
-		track.PlaybackInfo.SecondaryChannel = pecondaryChannel;
 		if(isPercussion) {
 			var staff = $iterator(track.Staves)();
 			while(staff.hasNext()) {
@@ -20046,20 +20086,8 @@ alphaTab.model.JsonConverter.JsObjectToMidiFile = function(midi) {
 			midiEvent2 = new alphaTab.audio.synth.midi.event.MetaDataEvent(tick,0,0,midiEvent1.Data);
 			midiEvent2.Message = message;
 			break;
-		case "alphaTab.audio.synth.midi.event.MetaEvent":
-			midiEvent2 = new alphaTab.audio.synth.midi.event.MetaEvent(tick,0,0,0);
-			midiEvent2.Message = message;
-			break;
 		case "alphaTab.audio.synth.midi.event.MetaNumberEvent":
 			midiEvent2 = new alphaTab.audio.synth.midi.event.MetaNumberEvent(tick,0,0,midiEvent1.Value);
-			midiEvent2.Message = message;
-			break;
-		case "alphaTab.audio.synth.midi.event.MetaTextEvent":
-			midiEvent2 = new alphaTab.audio.synth.midi.event.MetaTextEvent(tick,0,0,midiEvent1.Text);
-			midiEvent2.Message = message;
-			break;
-		case "alphaTab.audio.synth.midi.event.SystemCommonEvent":
-			midiEvent2 = new alphaTab.audio.synth.midi.event.SystemCommonEvent(tick,0,0,0);
 			midiEvent2.Message = message;
 			break;
 		case "alphaTab.audio.synth.midi.event.SystemExclusiveEvent":
@@ -20099,12 +20127,6 @@ alphaTab.model.JsonConverter.MidiFileToJsObject = function(midi) {
 		case "alphaTab.audio.synth.midi.event.MetaNumberEvent":
 			var metanumber = js.Boot.__cast(midiEvent1 , alphaTab.audio.synth.midi.event.MetaNumberEvent);
 			midiEvent2.Value = metanumber.Value;
-			break;
-		case "alphaTab.audio.synth.midi.event.MetaTextEvent":
-			var metatext = js.Boot.__cast(midiEvent1 , alphaTab.audio.synth.midi.event.MetaTextEvent);
-			midiEvent2.Text = metatext.Text;
-			break;
-		case "alphaTab.audio.synth.midi.event.MetaEvent":case "alphaTab.audio.synth.midi.event.SystemCommonEvent":
 			break;
 		case "alphaTab.audio.synth.midi.event.SystemExclusiveEvent":
 			var sysex = js.Boot.__cast(midiEvent1 , alphaTab.audio.synth.midi.event.SystemExclusiveEvent);

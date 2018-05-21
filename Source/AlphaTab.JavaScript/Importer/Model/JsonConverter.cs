@@ -341,14 +341,6 @@ namespace AlphaTab.Model
                 MidiEvent midiEvent2;
                 switch (midiEvent.Type)
                 {
-                    case "alphaTab.audio.synth.midi.event.MetaEvent":
-                        midiEvent2 = new MetaEvent(tick, 0, 0, 0);
-                        midiEvent2.Message = message;
-                        break;
-                    case "alphaTab.audio.synth.midi.event.SystemCommonEvent":
-                        midiEvent2 = new SystemCommonEvent(tick, 0, 0, 0);
-                        midiEvent2.Message = message;
-                        break;
                     case "alphaTab.audio.synth.midi.event.SystemExclusiveEvent":
                         midiEvent2 = new SystemExclusiveEvent(tick, 0, 0, midiEvent.Data);
                         midiEvent2.Message = message;
@@ -359,10 +351,6 @@ namespace AlphaTab.Model
                         break;
                     case "alphaTab.audio.synth.midi.event.MetaNumberEvent":
                         midiEvent2 = new MetaNumberEvent(tick, 0, 0, midiEvent.Value);
-                        midiEvent2.Message = message;
-                        break;
-                    case "alphaTab.audio.synth.midi.event.MetaTextEvent":
-                        midiEvent2 = new MetaTextEvent(tick, 0, 0, midiEvent.Text);
                         midiEvent2.Message = message;
                         break;
                     default:
@@ -393,10 +381,6 @@ namespace AlphaTab.Model
                 midiEvent2.Message = midiEvent.Message;
                 switch (midiEvent2.Type)
                 {
-                    case "alphaTab.audio.synth.midi.event.MetaEvent":
-                    case "alphaTab.audio.synth.midi.event.SystemCommonEvent":
-                        // no additional fields
-                        break;
                     case "alphaTab.audio.synth.midi.event.SystemExclusiveEvent":
                         SystemExclusiveEvent sysex = (SystemExclusiveEvent)midiEvent;
                         midiEvent2.Data = sysex.Data;
@@ -408,10 +392,6 @@ namespace AlphaTab.Model
                     case "alphaTab.audio.synth.midi.event.MetaNumberEvent":
                         MetaNumberEvent metanumber = (MetaNumberEvent)midiEvent;
                         midiEvent2.Value = metanumber.Value;
-                        break;
-                    case "alphaTab.audio.synth.midi.event.MetaTextEvent":
-                        MetaTextEvent metatext = (MetaTextEvent)midiEvent;
-                        midiEvent2.Text = metatext.Text;
                         break;
                 }
             }

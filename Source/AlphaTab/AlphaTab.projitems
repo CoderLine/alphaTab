@@ -50,9 +50,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\MetaDataEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\MetaEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\MetaNumberEvent.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\MetaTextEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\MidiEvent.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\RealTimeEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\SystemCommonEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\SystemExclusiveEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\MidiFile.cs" />

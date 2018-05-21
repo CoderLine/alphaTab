@@ -364,8 +364,6 @@ namespace AlphaTab.Audio.Generator
             if (!note.IsTieDestination)
             {
                 var noteSoundDuration = Math.Max(noteDuration.UntilTieEnd, noteDuration.LetRingEnd);
-                Logger.Info("Midi", "Note " + note.Beat.Voice.Bar.Index + "/" + note.Beat.Index + " from " + noteStart + " to " + (noteStart + noteSoundDuration));
-
                 _handler.AddNote(track.Index, noteStart, noteSoundDuration, (byte)noteKey, dynamicValue, (byte)track.PlaybackInfo.PrimaryChannel);
             }
         }
@@ -375,6 +373,8 @@ namespace AlphaTab.Audio.Generator
             var durationWithEffects = new MidiNoteDuration();
             durationWithEffects.NoteOnly = duration;
             durationWithEffects.UntilTieEnd = duration;
+            durationWithEffects.LetRingEnd = duration;
+
             if (note.IsDead)
             {
                 durationWithEffects.NoteOnly = ApplyStaticDuration(DefaultDurationDead, duration);
