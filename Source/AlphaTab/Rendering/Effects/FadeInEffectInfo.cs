@@ -53,16 +53,8 @@ namespace AlphaTab.Rendering.Effects
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
             if (settings.FingeringMode != FingeringMode.SingleNoteEffectBand) return false;
-
-            var fingerCount = 0;
-            foreach (var note in beat.Notes)
-            {
-                if (note.IsFingering)
-                {
-                    fingerCount++;
-                }
-            }
-            return fingerCount == 1;
+            if (beat.Notes.Count > 1) return false;
+            return beat.Notes[0].IsFingering;
         }
 
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)

@@ -1,20 +1,3 @@
-/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
 (function ($hx_exports, $global) { "use strict";
 $hx_exports["alphaTab"] = $hx_exports["alphaTab"] || {};
 $hx_exports["alphaTab"]["xml"] = $hx_exports["alphaTab"]["xml"] || {};
@@ -6136,15 +6119,10 @@ alphaTab.rendering.effects.FingeringEffectInfo.prototype = {
 		if(settings.FingeringMode != 1) {
 			return false;
 		}
-		var fingerCount = 0;
-		var note = $iterator(beat.Notes)();
-		while(note.hasNext()) {
-			var note1 = note.next();
-			if(note1.IsFingering) {
-				++fingerCount;
-			}
+		if(beat.Notes.length > 1) {
+			return false;
 		}
-		return fingerCount == 1;
+		return beat.Notes[0].IsFingering;
 	}
 	,CreateNewGlyph: function(renderer,beat) {
 		var finger = -2;
