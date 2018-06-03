@@ -35,7 +35,7 @@ namespace AlphaTab.Rendering.Effects
             _aboveStaff = aboveStaff;
         }
 
-        public bool ShouldCreateGlyph(Beat beat)
+        public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
             switch (beat.Ottava)
             {

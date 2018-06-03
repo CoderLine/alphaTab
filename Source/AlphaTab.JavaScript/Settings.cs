@@ -198,6 +198,7 @@ namespace AlphaTab
             json.showParenthesisForTiedBends = ShowParenthesisForTiedBends;
             json.showTabNoteOnTiedBend = ShowTabNoteOnTiedBend;
             json.bendMode = BendMode;
+            json.fingeringMode = FingeringMode;
 
             json.scriptFile = ScriptFile;
             json.fontDirectory = FontDirectory;
@@ -396,6 +397,15 @@ namespace AlphaTab
                 settings.BendMode = DecodeBendMode(dataAttributes["bendMode"]);
             }
 
+            if (Platform.Platform.JsonExists(json, "fingeringMode"))
+            {
+                settings.FingeringMode = DecodeFingeringMode(json.fingeringMode);
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("fingeringMode"))
+            {
+                settings.FingeringMode = DecodeFingeringMode(dataAttributes["fingeringMode"]);
+            }
+
             if (Platform.Platform.JsonExists(json, "extendBendArrowsOnTiedNotes"))
             {
                 settings.ExtendBendArrowsOnTiedNotes = json.extendBendArrowsOnTiedNotes;
@@ -522,6 +532,28 @@ namespace AlphaTab
             }
 
             return BendMode.GuitarPro;
+        }
+
+        private static FingeringMode DecodeFingeringMode(object mode)
+        {
+            if (Platform.Platform.TypeOf(mode) == "number")
+            {
+                return (FingeringMode)mode;
+            }
+
+            if (Platform.Platform.TypeOf(mode) == "string")
+            {
+                var s = (string)mode;
+                switch (s.ToLower())
+                {
+                    case "score":
+                        return FingeringMode.Score;
+                    case "effectband":
+                        return FingeringMode.SingleNoteEffectBand;
+                }
+            }
+
+            return FingeringMode.Score;
         }
 
         private static LogLevel DecodeLogLevel(object log)

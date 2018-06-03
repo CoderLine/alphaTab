@@ -32,7 +32,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (Renderer.IsLast)
             {
-                Width = 8 * Scale;
+                Width = 15 * Scale;
             }
             else if (Renderer.NextRenderer == null || Renderer.NextRenderer.Staff != Renderer.Staff || !Renderer.NextRenderer.Bar.MasterBar.IsRepeatStart)
             {
@@ -60,7 +60,7 @@ namespace AlphaTab.Rendering.Glyphs
             if (Renderer.IsLast)
             {
                 // small bar
-                canvas.FillRect(left, top, Scale, h);
+                canvas.FillRect(left + Width - blockWidth - blockWidth, top, Scale, h);
                 // big bar
                 canvas.FillRect(left + Width - blockWidth, top, blockWidth, h);
             }

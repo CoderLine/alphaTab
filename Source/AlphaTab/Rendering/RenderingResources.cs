@@ -40,6 +40,7 @@ namespace AlphaTab.Rendering
         public Font BarNumberFont { get; set; }
         public Color BarNumberColor { get; set; }
 
+        public Font FingeringFont { get; set; }
         public Font MarkerFont { get; set; }
         public Font TabClefFont { get; set; }
 
@@ -78,6 +79,7 @@ namespace AlphaTab.Rendering
             BarNumberFont = new Font(sansFont, 11 * scale);
             BarNumberColor = new Color(200, 0, 0);
 
+            FingeringFont = new Font(serifFont, 14 * scale);
             MarkerFont = new Font(serifFont, 14 * scale, FontStyle.Bold);
             TabClefFont = new Font(sansFont, 18 * scale, FontStyle.Bold);
 

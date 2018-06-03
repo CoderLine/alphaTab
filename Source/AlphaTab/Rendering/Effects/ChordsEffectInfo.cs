@@ -27,7 +27,7 @@ namespace AlphaTab.Rendering.Effects
         public bool CanShareBand { get { return true; } }
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
 
-        public bool ShouldCreateGlyph(Beat beat)
+        public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
             return beat.HasChord;
         }

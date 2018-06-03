@@ -43,6 +43,22 @@ namespace AlphaTab
     }
 
     /// <summary>
+    /// Lists all modes on how fingerings should be displayed.
+    /// </summary>
+    public enum FingeringMode
+    {
+        /// <summary>
+        /// Fingerings will be shown in the standard notation staff. 
+        /// </summary>
+        Score,
+        /// <summary>
+        /// Fingerings will be shown in a effect band above the tabs in case
+        /// they have only a single note on the beat.
+        /// </summary>
+        SingleNoteEffectBand
+    }
+
+    /// <summary>
     /// This public class contains instance specific settings for alphaTab
     /// </summary>
     public partial class Settings
@@ -143,6 +159,11 @@ namespace AlphaTab
         /// </summary>
         public BendMode BendMode { get; set; }
 
+        /// <summary>
+        /// Gets or sets the fingering mode to use. 
+        /// </summary>
+        public FingeringMode FingeringMode { get; set; }
+
         public static Settings Defaults
         {
             get
@@ -160,6 +181,7 @@ namespace AlphaTab
                 settings.ShowParenthesisForTiedBends = true;
                 settings.ShowTabNoteOnTiedBend = true;
                 settings.BendMode = BendMode.GuitarPro;
+                settings.FingeringMode = FingeringMode.Score;
 
                 settings.ImporterSettings = new FastDictionary<string, object>();
 

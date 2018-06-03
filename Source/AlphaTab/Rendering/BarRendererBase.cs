@@ -449,7 +449,6 @@ namespace AlphaTab.Rendering
 
         protected virtual void CreateBeatGlyphs()
         {
-
         }
 
         protected virtual void CreatePostBeatGlyphs()

@@ -92,6 +92,7 @@ namespace AlphaTab
                     new HarmonicsEffectInfo(),
                     new LetRingEffectInfo(),
                     new CapoEffectInfo(),
+                    new FingeringEffectInfo(),
                     new PalmMuteEffectInfo(),
                     new PickStrokeEffectInfo(),
                     new PickSlideEffectInfo()
@@ -148,7 +149,8 @@ namespace AlphaTab
                     new FadeInEffectInfo(), 
                     new HarmonicsEffectInfo(), 
                     new LetRingEffectInfo(), 
-                    new CapoEffectInfo(), 
+                    new CapoEffectInfo(),
+                    new FingeringEffectInfo(),
                     new PalmMuteEffectInfo(), 
                     new PickStrokeEffectInfo(),
                     new PickSlideEffectInfo(), 

@@ -26,7 +26,7 @@ namespace AlphaTab.Rendering.Effects
         public bool CanShareBand { get { return false; } }
         public virtual bool HideOnMultiTrack { get { return false; } }
 
-        public bool ShouldCreateGlyph(Beat beat)
+        public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
             return beat.IsLetRing;
         }

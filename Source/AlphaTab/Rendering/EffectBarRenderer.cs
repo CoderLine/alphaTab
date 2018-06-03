@@ -63,7 +63,7 @@ namespace AlphaTab.Rendering
         {
             // NOTE: the track order will never change. even if the staff behind the renderer changes, the trackIndex will not. 
             // so it's okay to access the staff here while creating the glyphs. 
-            if (Info.ShouldCreateGlyph(beat) && (!Info.HideOnMultiTrack || Renderer.Staff.TrackIndex == 0))
+            if (Info.ShouldCreateGlyph(Renderer.Settings, beat) && (!Info.HideOnMultiTrack || Renderer.Staff.TrackIndex == 0))
             {
                 IsEmpty = false;
                 if (FirstBeat == null || beat.IsBefore(FirstBeat))
@@ -131,7 +131,7 @@ namespace AlphaTab.Rendering
                     {
                         // check if the previous beat also had this effect
                         Beat prevBeat = b.PreviousBeat;
-                        if (Info.ShouldCreateGlyph(prevBeat))
+                        if (Info.ShouldCreateGlyph(Renderer.Settings, prevBeat))
                         {
                             // first load the effect bar renderer and glyph
                             EffectGlyph prevEffect = null;

@@ -604,6 +604,9 @@ namespace AlphaTab.Rendering
 
         private void PaintFingering(ICanvas canvas, Beat beat, float beatLineX, BeamDirection direction, float topY)
         {
+            var settings = Settings;
+            if (settings.FingeringMode != FingeringMode.Score) return;
+
             if (direction == BeamDirection.Up)
             {
                 beatLineX -= 10 * Scale;
@@ -624,11 +627,11 @@ namespace AlphaTab.Rendering
                 string text = null;
                 if (note.LeftHandFinger != Fingers.Unknown)
                 {
-                    text = FingerToString(beat, note.LeftHandFinger, true);
+                    text = ModelUtils.FingerToString(settings, beat, note.LeftHandFinger, true);
                 }
                 else if (note.RightHandFinger != Fingers.Unknown)
                 {
-                    text = FingerToString(beat, note.RightHandFinger, false);
+                    text = ModelUtils.FingerToString(settings, beat, note.RightHandFinger, false);
                 }
 
                 if (text == null)
@@ -638,73 +641,6 @@ namespace AlphaTab.Rendering
 
                 canvas.FillText(text, beatLineX, topY);
                 topY -= (int)(canvas.Font.Size);
-            }
-        }
-
-        private string FingerToString(Beat beat, Fingers finger, bool leftHand)
-        {
-            if (Settings.ForcePianoFingering || GeneralMidi.IsPiano(beat.Voice.Bar.Staff.Track.PlaybackInfo.Program))
-            {
-                switch (finger)
-                {
-                    case Fingers.Unknown:
-                    case Fingers.NoOrDead:
-                        return null;
-                    case Fingers.Thumb:
-                        return "1";
-                    case Fingers.IndexFinger:
-                        return "2";
-                    case Fingers.MiddleFinger:
-                        return "3";
-                    case Fingers.AnnularFinger:
-                        return "4";
-                    case Fingers.LittleFinger:
-                        return "5";
-                    default:
-                        return null;
-                }
-            }
-            else if (leftHand)
-            {
-                switch (finger)
-                {
-                    case Fingers.Unknown:
-                    case Fingers.NoOrDead:
-                        return "0";
-                    case Fingers.Thumb:
-                        return "T";
-                    case Fingers.IndexFinger:
-                        return "1";
-                    case Fingers.MiddleFinger:
-                        return "2";
-                    case Fingers.AnnularFinger:
-                        return "3";
-                    case Fingers.LittleFinger:
-                        return "4";
-                    default:
-                        return null;
-                }
-            }
-            else
-            {
-                switch (finger)
-                {
-                    case Fingers.Unknown:
-                    case Fingers.NoOrDead:
-                        return null;
-                    case Fingers.Thumb:
-                        return "p";
-                    case Fingers.IndexFinger:
-                        return "i";
-                    case Fingers.MiddleFinger:
-                        return "m";
-                    case Fingers.AnnularFinger:
-                        return "a";
-                    case Fingers.LittleFinger:
-                        return "c";
-                    default:
-                        return null;
-                }
             }
         }
 

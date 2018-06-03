@@ -25,7 +25,7 @@ namespace AlphaTab.Rendering.Effects
     {
         protected FastList<Note> LastCreateInfo;
 
-        public virtual bool ShouldCreateGlyph(Beat beat)
+        public virtual bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
             LastCreateInfo = new FastList<Note>();
             for (int i = 0, j = beat.Notes.Count; i < j; i++)
