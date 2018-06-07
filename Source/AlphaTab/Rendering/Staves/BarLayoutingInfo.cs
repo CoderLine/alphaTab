@@ -142,7 +142,7 @@ namespace AlphaTab.Rendering.Staves
 
         public FastDictionary<int, Spring> Springs { get; set; }
 
-        public Spring AddSpring(int start, int duration, float springSize, float preSpringSize)
+        public Spring AddSpring(int start, int duration, float preSpringSize, float postSpringSize)
         {
             Version++;
             Spring spring;
@@ -172,7 +172,7 @@ namespace AlphaTab.Rendering.Staves
                     spring.SmallestDuration = duration;
                 }
                 spring.LongestDuration = duration;
-                spring.SpringWidth = springSize;
+                spring.PostSpringWidth = postSpringSize;
                 spring.PreSpringWidth = preSpringSize;
                 Springs[start] = spring;
 
@@ -187,9 +187,9 @@ namespace AlphaTab.Rendering.Staves
             else
             {
                 spring = Springs[start];
-                if (spring.SpringWidth < springSize)
+                if (spring.PostSpringWidth < postSpringSize)
                 {
-                    spring.SpringWidth = springSize;
+                    spring.PostSpringWidth = postSpringSize;
                 }
                 if (spring.PreSpringWidth < preSpringSize)
                 {
@@ -209,9 +209,9 @@ namespace AlphaTab.Rendering.Staves
             return spring;
         }
 
-        public Spring AddBeatSpring(Beat beat, float beatSize, float preBeatSize)
+        public Spring AddBeatSpring(Beat beat, float preBeatSize, float postBeatSize)
         {
-            return AddSpring(beat.AbsoluteDisplayStart, beat.DisplayDuration, beatSize, preBeatSize);
+            return AddSpring(beat.AbsoluteDisplayStart, beat.DisplayDuration, preBeatSize, postBeatSize);
         }
 
         public void Finish()
@@ -330,8 +330,9 @@ namespace AlphaTab.Rendering.Staves
         public float Force { get; set; }
         public float SpringConstant { get; set; }
 
-        public float SpringWidth { get; set; }
+        public float SpringWidth => PreSpringWidth + PostSpringWidth;
         public float PreSpringWidth { get; set; }
+        public float PostSpringWidth { get; set; }
 
         public FastList<int> AllDurations { get; set; }
 

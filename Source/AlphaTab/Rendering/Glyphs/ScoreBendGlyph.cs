@@ -125,7 +125,7 @@ namespace AlphaTab.Rendering.Glyphs
                 _endNoteGlyph.Paint(0, 0, canvas);
             }
 
-            _notes.Sort((a, b) => b.RealValueWithEffects - a.RealValueWithEffects);
+            _notes.Sort((a, b) => b.DisplayValue - a.DisplayValue);
 
             var directionBeat = _beat.GraceType == GraceType.BendGrace ? _beat.NextBeat : _beat;
             var direction = _notes.Count == 1 ? GetBeamDirection(directionBeat, startNoteRenderer) : BeamDirection.Up;

@@ -18,6 +18,7 @@
 
 using System;
 using AlphaTab.Collections;
+using AlphaTab.Platform;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
 
@@ -279,7 +280,14 @@ namespace AlphaTab.Model
                 }
                 if (IsStringed)
                 {
-                    return Fret + StringTuning - Beat.Voice.Bar.Staff.TranspositionPitch;
+                    var noteValue = Fret + StringTuning - Beat.Voice.Bar.Staff.TranspositionPitch;
+
+                    if (IsStringed)
+                    {
+                        noteValue += HarmonicPitch;
+                    }
+
+                    return noteValue;
                 }
                 if (IsPiano)
                 {
@@ -290,11 +298,108 @@ namespace AlphaTab.Model
             }
         }
 
+        public int HarmonicPitch
+        {
+            get
+            {
+                var value = HarmonicValue;
+                switch (HarmonicType)
+                {
+                    case HarmonicType.Natural:
+                        // add semitones to reach corresponding harmonic frets
+                        if (value.IsAlmostEqualTo(2.7f))
+                        {
+                            // Fret 3 2nd octave + minor seventh
+                            return 34 - Fret;
+                        }
+                        else if (value < 3)
+                        {
+                            // no natural harmonics below fret 3
+                            return 0;
+                        }
+                        else if (value <= 3 /*2.7*/)
+                        {
+                            // Fret 3 2nd octave + minor seventh
+                            return 34 - Fret;
+                        }
+                        else if (value <= 3.5 /*3.2*/)
+                        {
+                            // Fret 3 2nd octave + fifth
+                            return 31 - Fret;
+                        }
+                        else if (value <= 4)
+                        {
+                            return 28 - Fret;
+                        }
+                        else if (value <= 5)
+                        {
+                            return 24 - Fret;
+                        }
+                        else if (value <= 6 /* 5.8 */)
+                        {
+                            return 34 - Fret;
+                        }
+                        else if (value <= 7)
+                        {
+                            return 22 - Fret;
+                        }
+                        else if (value <= 8.5 /*8.2*/)
+                        {
+                            return 36 - Fret;
+                        }
+                        else if (value <= 9)
+                        {
+                            return 28 - Fret;
+                        }
+                        else if (value <= 10 /*9.6*/)
+                        {
+                            return 34 - Fret;
+                        }
+                        else if (value < 14)
+                        {
+                            // fret 11,12,13,14 stay
+                            return 0;
+                        }
+                        else if (value <= 15 /*14.7*/)
+                        {
+                            return 34 - Fret;
+                        }
+                        else if (value <= 16)
+                        {
+                            return 28 - Fret;
+                        }
+                        else if (value <= 17)
+                        {
+                            return 36 - Fret;
+                        }
+                        else if (value <= 21)
+                        {
+                            // fret 18,19,20,21 stay
+                            return 0;
+                        }
+                        else if (value <= 22 /* 21.7 */)
+                        {
+                            return 36 - Fret;
+                        }
+
+                        return 0;
+                    case HarmonicType.Artificial:
+                    case HarmonicType.Feedback:
+                    case HarmonicType.Pinch:
+                    case HarmonicType.Semi:
+                    case HarmonicType.Tap:
+                        break;
+                }
+
+                return 0;
+            }
+        }
+
         /// <summary>
         /// Gets the absolute value of this note considering
         /// offsets by bends and ottavia
         /// </summary>
-        public int RealValueWithEffects
+        public int DisplayValue
         {
             get
             {
@@ -504,7 +609,7 @@ namespace AlphaTab.Model
                     {
                         BendOrigin = TieOrigin.BendOrigin;
                     }
-                    else if(TieOrigin.HasBend)
+                    else if (TieOrigin.HasBend)
                     {
                         BendOrigin = TieOrigin;
                     }
@@ -672,7 +777,7 @@ namespace AlphaTab.Model
                     }
                 }
             }
-            else if(BendPoints.Count == 0)
+            else if (BendPoints.Count == 0)
             {
                 BendType = BendType.None;
             }

@@ -159,7 +159,7 @@ namespace AlphaTab.Rendering.Utils
             }
             else
             {
-                return n.RealValueWithEffects - _staff.DisplayTranspositionPitch;
+                return n.DisplayValue - _staff.DisplayTranspositionPitch;
             }
         }
 

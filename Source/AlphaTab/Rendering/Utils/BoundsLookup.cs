@@ -189,6 +189,7 @@ namespace AlphaTab.Rendering.Utils
 
         public Bounds VisualBounds { get; set; }
         public Bounds RealBounds { get; set; }
+
         public Beat Beat { get; set; }
     }
 

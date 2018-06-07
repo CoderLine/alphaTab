@@ -17,6 +17,7 @@
  */
 using System;
 using AlphaTab.Collections;
+using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Effects;
@@ -89,7 +90,12 @@ namespace AlphaTab
                     new SlightNoteVibratoEffectInfo(),
                     new TapEffectInfo(),
                     new FadeInEffectInfo(),
-                    new HarmonicsEffectInfo(),
+                    new HarmonicsEffectInfo(HarmonicType.Natural),
+                    new HarmonicsEffectInfo(HarmonicType.Artificial),
+                    new HarmonicsEffectInfo(HarmonicType.Pinch),
+                    new HarmonicsEffectInfo(HarmonicType.Tap),
+                    new HarmonicsEffectInfo(HarmonicType.Semi),
+                    new HarmonicsEffectInfo(HarmonicType.Feedback),
                     new LetRingEffectInfo(),
                     new CapoEffectInfo(),
                     new FingeringEffectInfo(),
@@ -146,8 +152,12 @@ namespace AlphaTab
                     new WideNoteVibratoEffectInfo(),
                     new SlightNoteVibratoEffectInfo(),
                     new TapEffectInfo(), 
-                    new FadeInEffectInfo(), 
-                    new HarmonicsEffectInfo(), 
+                    new FadeInEffectInfo(),
+                    new HarmonicsEffectInfo(HarmonicType.Artificial),
+                    new HarmonicsEffectInfo(HarmonicType.Pinch),
+                    new HarmonicsEffectInfo(HarmonicType.Tap),
+                    new HarmonicsEffectInfo(HarmonicType.Semi),
+                    new HarmonicsEffectInfo(HarmonicType.Feedback),
                     new LetRingEffectInfo(), 
                     new CapoEffectInfo(),
                     new FingeringEffectInfo(),
@@ -177,8 +187,12 @@ namespace AlphaTab
                     new WideNoteVibratoEffectInfo(),
                     new SlightNoteVibratoEffectInfo(),
                     new TapEffectInfo(), 
-                    new FadeInEffectInfo(), 
-                    new HarmonicsEffectInfo(), 
+                    new FadeInEffectInfo(),
+                    new HarmonicsEffectInfo(HarmonicType.Artificial),
+                    new HarmonicsEffectInfo(HarmonicType.Pinch),
+                    new HarmonicsEffectInfo(HarmonicType.Tap),
+                    new HarmonicsEffectInfo(HarmonicType.Semi),
+                    new HarmonicsEffectInfo(HarmonicType.Feedback),
                     new LetRingEffectInfo(), 
                     new CapoEffectInfo(), 
                     new PalmMuteEffectInfo(), 

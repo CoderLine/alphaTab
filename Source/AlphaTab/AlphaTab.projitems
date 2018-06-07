@@ -165,6 +165,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\EffectBarGlyphSizing.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\EffectBarRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\EffectBarRendererFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\FingeringEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\OttaviaEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\PickSlideEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\WideBeatVibratoEffectInfo.cs" />

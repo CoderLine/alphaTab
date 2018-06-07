@@ -31,6 +31,7 @@ namespace AlphaTab.Rendering.Glyphs
             _isOpen = isOpen;
             _infos = new FastList<GhostNoteInfo>();
             _glyphs = new FastList<Glyph>();
+            IsEmpty = true;
         }
 
         public void AddParenthesis(Note n)

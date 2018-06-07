@@ -174,7 +174,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
             else
             {
-                CenterX = NoteNumbers.X + NoteNumbers.Width / 2;
+                CenterX = NoteNumbers.X + NoteNumbers.NoteStringWidth / 2;
             }
         }
 

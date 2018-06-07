@@ -34,6 +34,7 @@ namespace AlphaTab.Rendering.Glyphs
         public Note MinStringNote { get; set; }
         public FastDictionary<string, Glyph> BeatEffects { get; set; }
         public FastDictionary<int, NoteNumberGlyph> NotesPerString { get; set; }
+        public float NoteStringWidth { get; set; }
 
         public TabNoteChordGlyph(float x, float y, bool isGrace)
             : base(x, y)
@@ -71,6 +72,7 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             var w = 0f;
+            var noteStringWidth = 0f;
             for (int i = 0, j = _notes.Count; i < j; i++)
             {
                 var g = _notes[i];
@@ -80,7 +82,14 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     w = g.Width;
                 }
+
+                if (g.NoteStringWidth > noteStringWidth)
+                {
+                    noteStringWidth = g.NoteStringWidth;
+                }
             }
+
+            NoteStringWidth = noteStringWidth;
 
             var tabHeight = Renderer.Resources.TablatureFont.Size;
             var effectY = GetNoteY(MinStringNote) + tabHeight / 2;

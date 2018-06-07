@@ -47,7 +47,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public virtual void RegisterLayoutingInfo(BarLayoutingInfo layoutings)
         {
-            var preBeatStretch = PreNotes.Width + OnNotes.Width / 2;
+            var preBeatStretch = OnTimeX;
             var postBeatStretch = 0f;
             foreach (var tie in Ties)
             {
@@ -56,8 +56,9 @@ namespace AlphaTab.Rendering.Glyphs
                     postBeatStretch = tie.Width;
                 }
             }
+            postBeatStretch += OnNotes.X + (OnNotes.Width - OnNotes.CenterX);
 
-            layoutings.AddBeatSpring(Beat, MinWidth, preBeatStretch);
+            layoutings.AddBeatSpring(Beat, preBeatStretch, postBeatStretch);
             // store sizes for special renderers like the EffectBarRenderer
             layoutings.SetPreBeatSize(Beat, PreNotes.Width);
             layoutings.SetOnBeatSize(Beat, OnNotes.Width);
@@ -66,9 +67,10 @@ namespace AlphaTab.Rendering.Glyphs
 
         public virtual void ApplyLayoutingInfo(BarLayoutingInfo info)
         {
+            var offset = info.GetBeatCenterX(Beat) - OnNotes.CenterX;
+            PreNotes.X = offset;
             PreNotes.Width = info.GetPreBeatSize(Beat);
             OnNotes.Width = info.GetOnBeatSize(Beat);
-            OnNotes.CenterX = info.GetBeatCenterX(Beat);
             OnNotes.X = PreNotes.X + PreNotes.Width;
             OnNotes.UpdateBeamingHelper();
         }

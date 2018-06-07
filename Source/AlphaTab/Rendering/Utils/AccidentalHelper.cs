@@ -109,7 +109,7 @@ namespace AlphaTab.Rendering.Utils
         /// <returns></returns>
         public AccidentalType ApplyAccidental(Note note)
         {
-            var noteValue = note.RealValueWithEffects;
+            var noteValue = note.DisplayValue;
             bool quarterBend = note.HasQuarterToneOffset;
             var line = RegisterNoteLine(note, noteValue);
             return GetAccidental(line, noteValue, quarterBend);
