@@ -41,6 +41,8 @@ namespace AlphaTab.Platform.CSharp
         private SKPath _path;
         private string _typeFaceCache;
         private SKTypeface _typeFace;
+        private float _width;
+        private float _height;
 
         public Color Color { get; set; }
         public float LineWidth { get; set; }
@@ -83,6 +85,8 @@ namespace AlphaTab.Platform.CSharp
 
         public void BeginRender(float width, float height)
         {
+            _width = width;
+            _height = height;
             var newImage = SKSurface.Create((int)width, (int)height, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
             _surface = newImage;
             if (_path != null)
@@ -288,5 +292,36 @@ namespace AlphaTab.Platform.CSharp
                 _surface.Canvas.DrawText(Platform.StringFromCharCode((int)symbol), x, y, paint);
             }
         }
+        public void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols)
+        {
+            var s = "";
+            foreach (var symbol in symbols)
+            {
+                if (symbol != MusicFontSymbol.None)
+                {
+                    s += Platform.StringFromCharCode((int)symbol);
+                }
+            }
+
+            using (var paint = CreatePaint())
+            {
+                paint.Typeface = MusicFont;
+                paint.TextSize = MusicFontSize * scale;
+                _surface.Canvas.DrawText(s, x, y, paint);
+            }
+        }
+
+        public void BeginRotate(float centerX, float centerY, float angle)
+        {
+            _surface.Canvas.Save();
+            _surface.Canvas.Translate(centerX, centerY);
+            _surface.Canvas.RotateDegrees(angle);
+        }
+
+        public void EndRotate()
+        {
+            _surface.Canvas.Restore();
+        }
+
     }
 }

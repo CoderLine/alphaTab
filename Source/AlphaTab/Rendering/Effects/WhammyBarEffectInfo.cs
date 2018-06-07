@@ -15,21 +15,31 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-namespace AlphaTab.Rendering.Glyphs
-{
-    public class SharpGlyph : MusicFontGlyph
-    {
-        private readonly bool _isGrace;
+using AlphaTab.Model;
+using AlphaTab.Rendering.Glyphs;
 
-        public SharpGlyph(float x, float y, bool isGrace = false)
-            : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, MusicFontSymbol.AccidentalSharp)
+namespace AlphaTab.Rendering.Effects
+{
+    public class WhammyBarEffectInfo : IEffectBarRendererInfo
+    {
+        public string EffectId { get { return "whammy"; } }
+        public bool HideOnMultiTrack { get { return false; } }
+        public bool CanShareBand { get { return false; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.GroupedOnBeat; } }
+
+        public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
-            _isGrace = isGrace;
+            return beat.HasWhammyBar;
         }
 
-        public override void DoLayout()
+        public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
-            Width = 8 * (_isGrace ? NoteHeadGlyph.GraceScale : 1) * Scale;
+            return new LineRangedGlyph("w/bar");
+        }
+
+        public bool CanExpand(Beat from, Beat to)
+        {
+            return true;
         }
     }
 }

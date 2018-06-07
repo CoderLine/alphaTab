@@ -151,7 +151,7 @@ namespace AlphaTab.Rendering.Glyphs
         /// <param name="y2"></param>
         /// <param name="down"></param>
         public static void PaintTie(ICanvas canvas, float scale, float x1, float y1, float x2, float y2,
-            bool down = false)
+            bool down = false, float offset = 22, float size = 4)
         {
             if (x1 == x2 && y1 == y2)
             {
@@ -171,8 +171,8 @@ namespace AlphaTab.Rendering.Glyphs
             // calculate control points 
             //
 
-            var offset = 22 * scale;
-            var size = 4 * scale;
+            offset *= scale;
+            size *= scale;
             // normal vector
             var normalVectorX = (y2 - y1);
             var normalVectorY = (x2 - x1);

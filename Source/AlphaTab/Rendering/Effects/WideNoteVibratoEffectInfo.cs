@@ -15,21 +15,28 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-namespace AlphaTab.Rendering.Glyphs
-{
-    public class NaturalizeGlyph : MusicFontGlyph
-    {
-        private readonly bool _isGrace;
+using AlphaTab.Model;
+using AlphaTab.Rendering.Glyphs;
 
-        public NaturalizeGlyph(float x, float y, bool isGrace = false)
-            : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, MusicFontSymbol.AccidentalNatural)
+namespace AlphaTab.Rendering.Effects
+{
+    public class WideNoteVibratoEffectInfo : NoteEffectInfoBase
+    {
+        public override string EffectId { get { return "wide-note-vibrato"; } }
+
+        protected override bool ShouldCreateGlyphForNote(Note note)
         {
-            _isGrace = isGrace;
+            return note.Vibrato == VibratoType.Wide || (note.IsTieDestination && note.TieOrigin.Vibrato == VibratoType.Wide);
         }
 
-        public override void DoLayout()
+        public override EffectBarGlyphSizing SizingMode
         {
-            Width = 8 * (_isGrace ? NoteHeadGlyph.GraceScale : 1) * Scale;
+            get { return EffectBarGlyphSizing.GroupedOnBeatToEnd; }
+        }
+
+        public override EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
+        {
+            return new NoteVibratoGlyph(0, 0, VibratoType.Wide);
         }
     }
 }

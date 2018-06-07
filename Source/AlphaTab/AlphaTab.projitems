@@ -50,9 +50,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\MetaDataEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\MetaEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\MetaNumberEvent.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\MetaTextEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\MidiEvent.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\RealTimeEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\SystemCommonEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\Event\SystemExclusiveEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Midi\MidiFile.cs" />
@@ -138,6 +136,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\MasterBar.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\ModelUtils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Note.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\Ottavia.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\PickStrokeType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\PlaybackInformation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\RepeatGroup.cs" />
@@ -166,7 +165,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\EffectBarGlyphSizing.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\EffectBarRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\EffectBarRendererFactory.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\BeatVibratoEffectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\FingeringEffectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\OttaviaEffectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\PickSlideEffectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\WideBeatVibratoEffectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\SlightBeatVibratoEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\ChordsEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\CrescendoEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\DummyEffectGlyph.cs" />
@@ -176,8 +179,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\LetRingEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\MarkerEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\NoteEffectInfoBase.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\NoteVibratoEffectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\WideNoteVibratoEffectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\SlightNoteVibratoEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\CapoEffectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\WhammyBarEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\PalmMuteEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\PickStrokeEffectInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Effects\TapEffectInfo.cs" />
@@ -196,7 +201,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeatContainerGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeatGlyphBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeatOnNoteGlyphBase.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BendGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BendNoteHeadGroupGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\GhostNoteContainerGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\GhostParenthesisGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreBendGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreHelperNotesBaseGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreNoteChordGlyphBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreWhammyBarGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TabBendGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ChineseCymbalGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\CircleGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ClefGlyph.cs" />
@@ -218,7 +230,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\LyricsGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\MusicFontGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\MusicFontSymbol.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\NaturalizeGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\NoteHeadGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\NoteNumberGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\NumberGlyph.cs" />
@@ -236,7 +247,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreNoteChordGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreSlideLineGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreTieGlyph.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\SharpGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\SpacingGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TabBeatContainerGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TabBeatGlyph.cs" />
@@ -255,9 +265,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TrillGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TripletFeelGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TuningGlyph.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\VibratoGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\NoteVibratoGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\VoiceContainerGlyph.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\WhammyBarGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TabWhammyBarGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\IEffectBarRendererInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\IScoreRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Layout\HeaderFooterElements.cs" />

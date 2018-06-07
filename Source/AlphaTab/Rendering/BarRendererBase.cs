@@ -81,11 +81,19 @@ namespace AlphaTab.Rendering
         /// </summary>
         public bool IsLinkedToPrevious { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether this renderer can wrap to the next line
+        /// or it needs to stay connected to the previous one. 
+        /// (e.g. when having double bar repeats we must not separate the 2 bars)
+        /// </summary>
+        public bool CanWrap { get; set; }
+
         public BarRendererBase(ScoreRenderer renderer, Bar bar)
         {
             Bar = bar;
             ScoreRenderer = renderer;
             Helpers = new BarHelpers(bar);
+            CanWrap = true;
         }
 
         public void RegisterOverflowTop(float topOverflow)
@@ -158,7 +166,7 @@ namespace AlphaTab.Rendering
         {
             get
             {
-                return Staff.StaveGroup.IsLast && Index == Staff.BarRenderers.Count - 1;
+                return Bar.Index == ScoreRenderer.Layout.LastBarIndex;
             }
         }
 
@@ -266,6 +274,11 @@ namespace AlphaTab.Rendering
                 }
             }
 
+            if (Bar.SimileMark == SimileMark.SecondOfDouble)
+            {
+                CanWrap = false;
+            }
+
             CreatePreBeatGlyphs();
             CreateBeatGlyphs();
             CreatePostBeatGlyphs();
@@ -361,12 +374,8 @@ namespace AlphaTab.Rendering
 
         protected virtual void PaintBackground(float cx, float cy, ICanvas canvas)
         {
-            //var c = new Color((byte)Platform.Random(255),
-            //      (byte)Platform.Random(255),
-            //      (byte)Platform.Random(255),
-            //      100);
-            //canvas.Color = c;
-            //canvas.FillRect(cx + X, cy + Y, Width, Height);
+            //canvas.Color = Color.Random();
+            //canvas.FillRect(cx + X, cy + Y - TopOverflow - TopPadding, Width, Height + TopOverflow + BottomOverflow + TopPadding + BottomPadding);
         }
 
         public virtual void BuildBoundingsLookup(MasterBarBounds masterBarBounds, float cx, float cy)
@@ -392,7 +401,8 @@ namespace AlphaTab.Rendering
             foreach (var voice in _voiceContainers)
             {
                 var c = _voiceContainers[voice];
-                if (!c.Voice.IsEmpty || (Bar.IsEmpty && voice == 0))
+                var isEmptyBar = (Bar.IsEmpty && voice == 0);
+                if (!c.Voice.IsEmpty || isEmptyBar)
                 {
                     for (int i = 0, j = c.BeatGlyphs.Count; i < j; i++)
                     {
@@ -414,6 +424,13 @@ namespace AlphaTab.Rendering
                             W = bc.Width,
                             H = barBounds.RealBounds.H
                         };
+
+                        if (isEmptyBar)
+                        {
+                            beatBoundings.VisualBounds.X = cx + X;
+                            beatBoundings.RealBounds.X = beatBoundings.VisualBounds.X;
+                        }
+
                         barBounds.AddBeat(beatBoundings);
                     }
                 }
@@ -432,12 +449,10 @@ namespace AlphaTab.Rendering
 
         protected virtual void CreateBeatGlyphs()
         {
-
         }
 
         protected virtual void CreatePostBeatGlyphs()
         {
-            AddPostBeatGlyph(new SpacingGlyph(0, 0, 5 * Scale));
         }
 
         public float BeatGlyphsStart
@@ -445,6 +460,14 @@ namespace AlphaTab.Rendering
             get
             {
                 return _preBeatGlyphs.X + _preBeatGlyphs.Width;
+            }
+        }
+
+        public float PostBeatGlyphsStart
+        {
+            get
+            {
+                return _postBeatGlyphs.X;
             }
         }
 
@@ -464,6 +487,8 @@ namespace AlphaTab.Rendering
                         return container.VoiceContainer.X + container.X + container.PreNotes.X;
                     case BeatXPosition.OnNotes:
                         return container.VoiceContainer.X + container.X + container.OnNotes.X;
+                    case BeatXPosition.MiddleNotes:
+                        return container.VoiceContainer.X + container.X + container.OnTimeX;
                     case BeatXPosition.PostNotes:
                         return container.VoiceContainer.X + container.X + container.OnNotes.X + container.OnNotes.Width;
                     case BeatXPosition.EndBeat:
@@ -492,6 +517,22 @@ namespace AlphaTab.Rendering
             UpdateSizes();
             RegisterLayoutingInfo();
         }
+
+        protected void PaintSimileMark(float cx, float cy, ICanvas canvas)
+        {
+            switch (Bar.SimileMark)
+            {
+                case SimileMark.Simple:
+                    canvas.FillMusicFontSymbol(cx + X + (Width - 20 * Scale) / 2, cy + Y + Height / 2, 1,
+                        MusicFontSymbol.SimileMarkSimple);
+                    break;
+                case SimileMark.SecondOfDouble:
+                    canvas.FillMusicFontSymbol(cx + X - (28 * Scale) / 2, cy + Y + Height / 2, 1,
+                        MusicFontSymbol.SimileMarkDouble);
+                    break;
+            }
+
+        }
     }
 
     /// <summary>
@@ -508,6 +549,11 @@ namespace AlphaTab.Rendering
         /// Gets the on-notes position which is located after the accidentals but before the note heads. 
         /// </summary>
         OnNotes,
+
+        /// <summary>
+        /// Gets the middel-notes position which is located after in the middle the note heads. 
+        /// </summary>
+        MiddleNotes,
 
         /// <summary>
         /// Get the post-notes position which is located at after the note heads. 

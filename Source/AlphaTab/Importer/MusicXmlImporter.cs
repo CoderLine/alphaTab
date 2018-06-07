@@ -69,7 +69,7 @@ namespace AlphaTab.Importer
                 MergePartGroups();
             }
 
-            _score.Finish();
+            _score.Finish(Settings);
             // the structure of MusicXML does not allow live creation of the groups,
             _score.RebuildRepeatGroups();
 
@@ -1367,16 +1367,16 @@ namespace AlphaTab.Importer
                             switch (Platform.Platform.ParseInt(c.InnerText))
                             {
                                 case -2:
-                                    bar.ClefOttavia = ClefOttavia._15mb;
+                                    bar.ClefOttava = Ottavia._15mb;
                                     break;
                                 case -1:
-                                    bar.ClefOttavia = ClefOttavia._8vb;
+                                    bar.ClefOttava = Ottavia._8vb;
                                     break;
                                 case 1:
-                                    bar.ClefOttavia = ClefOttavia._8va;
+                                    bar.ClefOttava = Ottavia._8va;
                                     break;
                                 case 2:
-                                    bar.ClefOttavia = ClefOttavia._15mb;
+                                    bar.ClefOttava = Ottavia._15mb;
                                     break;
                             }
                             break;

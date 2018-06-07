@@ -56,10 +56,10 @@ namespace AlphaTab.Importer
         /// </summary>
         private const float BendPointPositionFactor = 60.0f / 100.0f;
         /// <summary>
-        /// GPX Range: 0-300      
-        /// Internal Range: 0-12
+        /// GPIF: 25 per quarternote
+        /// Internal Range: 1 per quarter note
         /// </summary>
-        private const float BendPointValueFactor = 12f / 300f;
+        private const float BendPointValueFactor = 1 / 25f;
 
         public Score Score { get; set; }
 
@@ -88,7 +88,7 @@ namespace AlphaTab.Importer
 
         private FastDictionary<string, FastList<Lyrics>> _lyricsByTrack;
 
-        public void ParseXml(string xml)
+        public void ParseXml(string xml, Settings settings)
         {
             _masterTrackAutomations = new FastDictionary<string, FastList<Automation>>();
             _tracksMapping = new string[0];
@@ -120,7 +120,7 @@ namespace AlphaTab.Importer
 
             BuildModel();
 
-            Score.Finish();
+            Score.Finish(settings);
 
             if (_lyricsByTrack.Count > 0)
             {
@@ -420,6 +420,7 @@ namespace AlphaTab.Importer
                             ParseTrackProperties(track, c);
                             break;
                         case "GeneralMidi":
+                        case "MidiConnection":
                             ParseGeneralMidi(track, c);
                             break;
                         case "Sounds":
@@ -748,22 +749,33 @@ namespace AlphaTab.Importer
 
         private void ParseGeneralMidi(Track track, XmlNode node)
         {
-            var port = Platform.Platform.ParseInt(node.FindChildElement("Port").InnerText);
-            var program = Platform.Platform.ParseInt(node.FindChildElement("Program").InnerText);
-            var primaryChannel = Platform.Platform.ParseInt(node.FindChildElement("PrimaryChannel").InnerText);
-            var pecondaryChannel = Platform.Platform.ParseInt(node.FindChildElement("SecondaryChannel").InnerText);
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Program":
+                            track.PlaybackInfo.Program = Platform.Platform.ParseInt(c.InnerText);
+                            break;
+                        case "Port":
+                            track.PlaybackInfo.Port = Platform.Platform.ParseInt(c.InnerText);
+                            break;
+                        case "PrimaryChannel":
+                            track.PlaybackInfo.PrimaryChannel = Platform.Platform.ParseInt(c.InnerText);
+                            break;
+                        case "SecondaryChannel":
+                            track.PlaybackInfo.SecondaryChannel = Platform.Platform.ParseInt(c.InnerText);
+                            break;
+                    }
+                }
+            }
+
             var isPercussion = node.GetAttribute("table") == "Percussion";
-
-            track.PlaybackInfo.Port = port;
-            track.PlaybackInfo.Program = program;
-            track.PlaybackInfo.PrimaryChannel = primaryChannel;
-            track.PlaybackInfo.SecondaryChannel = pecondaryChannel;
-
             if (isPercussion)
             {
                 foreach (var staff in track.Staves)
                 {
-
                     staff.StaffKind = StaffKind.Percussion;
                 }
             }
@@ -817,9 +829,6 @@ namespace AlphaTab.Importer
                 }
             }
         }
-
-
-
 
         private void ParsePartSounding(Track track, XmlNode node)
         {
@@ -1038,20 +1047,33 @@ namespace AlphaTab.Importer
                             switch (c.InnerText)
                             {
                                 case "8va":
-                                    bar.ClefOttavia = ClefOttavia._8va;
+                                    bar.ClefOttava = Ottavia._8va;
                                     break;
                                 case "15ma":
-                                    bar.ClefOttavia = ClefOttavia._15ma;
+                                    bar.ClefOttava = Ottavia._15ma;
                                     break;
                                 case "8vb":
-                                    bar.ClefOttavia = ClefOttavia._8vb;
+                                    bar.ClefOttava = Ottavia._8vb;
                                     break;
                                 case "15mb":
-                                    bar.ClefOttavia = ClefOttavia._15mb;
+                                    bar.ClefOttava = Ottavia._15mb;
                                     break;
                             }
                             break;
-                            // case "SimileMark":
+                        case "SimileMark":
+                            switch (c.InnerText)
+                            {
+                                case "Simple":
+                                    bar.SimileMark = SimileMark.Simple;
+                                    break;
+                                case "FirstOfDouble":
+                                    bar.SimileMark = SimileMark.FirstOfDouble;
+                                    break;
+                                case "SecondOfDouble":
+                                    bar.SimileMark = SimileMark.SecondOfDouble;
+                                    break;
+                            }
+                            break;
                     }
                 }
             }
@@ -1239,33 +1261,43 @@ namespace AlphaTab.Importer
                             break;
                         case "Whammy":
 
-                            var whammy = new FastList<BendPoint>();
-
                             var whammyOrigin = new BendPoint();
                             whammyOrigin.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("originValue")));
                             whammyOrigin.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("originOffset")));
-                            whammy.Add(whammyOrigin);
+                            beat.AddWhammyBarPoint(whammyOrigin);
 
                             var whammyMiddle1 = new BendPoint();
                             whammyMiddle1.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("middleValue")));
                             whammyMiddle1.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("middleOffset1")));
-                            whammy.Add(whammyMiddle1);
+                            beat.AddWhammyBarPoint(whammyMiddle1);
 
 
                             var whammyMiddle2 = new BendPoint();
                             whammyMiddle2.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("middleValue")));
                             whammyMiddle2.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("middleOffset2")));
-                            if (whammyMiddle2.Offset != whammyMiddle1.Offset)
-                            {
-                                whammy.Add(whammyMiddle2);
-                            }
+                            beat.AddWhammyBarPoint(whammyMiddle2);
 
                             var whammyDestination = new BendPoint();
                             whammyDestination.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("destinationValue")));
                             whammyDestination.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("destinationOffset")));
-                            whammy.Add(whammyDestination);
-
-                            beat.WhammyBarPoints = whammy;
+                            beat.AddWhammyBarPoint(whammyDestination);
+                            break;
+                        case "Ottavia":
+                            switch (c.InnerText)
+                            {
+                                case "8va":
+                                    beat.Ottava = Ottavia._8va;
+                                    break;
+                                case "8vb":
+                                    beat.Ottava = Ottavia._8vb;
+                                    break;
+                                case "15ma":
+                                    beat.Ottava = Ottavia._15ma;
+                                    break;
+                                case "15mb":
+                                    beat.Ottava = Ottavia._15mb;
+                                    break;
+                            }
                             break;
                     }
                 }
@@ -1405,24 +1437,22 @@ namespace AlphaTab.Importer
             {
                 if (whammyOrigin == null) whammyOrigin = new BendPoint();
                 if (whammyDestination == null) whammyDestination = new BendPoint(BendPoint.MaxPosition);
-                var whammy = new FastList<BendPoint>();
-                whammy.Add(whammyOrigin);
+                beat.AddWhammyBarPoint(whammyOrigin);
 
                 if (whammyMiddleOffset1 != null && whammyMiddleValue != null)
                 {
-                    whammy.Add(new BendPoint(whammyMiddleOffset1.Value, whammyMiddleValue.Value));
+                    beat.AddWhammyBarPoint(new BendPoint(whammyMiddleOffset1.Value, whammyMiddleValue.Value));
                 }
                 if (whammyMiddleOffset2 != null && whammyMiddleValue != null)
                 {
-                    whammy.Add(new BendPoint(whammyMiddleOffset2.Value, whammyMiddleValue.Value));
+                    beat.AddWhammyBarPoint(new BendPoint(whammyMiddleOffset2.Value, whammyMiddleValue.Value));
                 }
 
                 if (whammyMiddleOffset1 == null && whammyMiddleOffset2 == null && whammyMiddleValue != null)
                 {
-                    whammy.Add(new BendPoint(BendPoint.MaxPosition / 2, whammyMiddleValue.Value));
+                    beat.AddWhammyBarPoint(new BendPoint(BendPoint.MaxPosition / 2, whammyMiddleValue.Value));
                 }
-                whammy.Add(whammyDestination);
-                beat.WhammyBarPoints = whammy;
+                beat.AddWhammyBarPoint(whammyDestination);
             }
         }
 
@@ -1689,18 +1719,22 @@ namespace AlphaTab.Importer
                                     break;
                                 case "Slide":
                                     var slideFlags = Platform.Platform.ParseInt(c.FindChildElement("Flags").InnerText);
-                                    if ((slideFlags & 0x01) != 0)
+                                    if ((slideFlags & 1) != 0)
                                         note.SlideType = SlideType.Shift;
-                                    if ((slideFlags & 0x02) != 0)
+                                    if ((slideFlags & 2) != 0)
                                         note.SlideType = SlideType.Legato;
-                                    if ((slideFlags & 0x04) != 0)
+                                    if ((slideFlags & 4) != 0)
                                         note.SlideType = SlideType.OutDown;
-                                    if ((slideFlags & 0x08) != 0)
+                                    if ((slideFlags & 8) != 0)
                                         note.SlideType = SlideType.OutUp;
-                                    if ((slideFlags & 0x10) != 0)
+                                    if ((slideFlags & 16) != 0)
                                         note.SlideType = SlideType.IntoFromBelow;
-                                    if ((slideFlags & 0x20) != 0)
+                                    if ((slideFlags & 32) != 0)
                                         note.SlideType = SlideType.IntoFromAbove;
+                                    if ((slideFlags & 64) != 0)
+                                        note.SlideType = SlideType.PickSlideDown;
+                                    if ((slideFlags & 128) != 0)
+                                        note.SlideType = SlideType.PickSlideUp;
                                     break;
                             }
                             break;

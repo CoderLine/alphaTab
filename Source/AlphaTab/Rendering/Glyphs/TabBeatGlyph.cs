@@ -31,7 +31,8 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 //
                 // Note numbers
-                NoteNumbers = new TabNoteChordGlyph(0, 0, Container.Beat.GraceType != GraceType.None);
+                var isGrace = Renderer.Settings.SmallGraceTabNotes && Container.Beat.GraceType != GraceType.None;
+                NoteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
                 NoteNumbers.Beat = Container.Beat;
                 NoteNumbers.BeamingHelper = BeamingHelper;
                 foreach (var note in Container.Beat.Notes)
@@ -42,14 +43,13 @@ namespace AlphaTab.Rendering.Glyphs
 
                 //
                 // Whammy Bar
-                if (Container.Beat.HasWhammyBar && !NoteNumbers.BeatEffects.ContainsKey("Whammy"))
+                if (Container.Beat.HasWhammyBar)
                 {
-                    NoteNumbers.BeatEffects["Whammy"] = new WhammyBarGlyph(Container.Beat, Container);
+                    var whammy = new TabWhammyBarGlyph(Container.Beat);
+                    whammy.Renderer = Renderer;
+                    whammy.DoLayout();
 
-                    var whammyValueHeight = (WhammyBarGlyph.WhammyMaxOffset * Scale) / Beat.WhammyBarMaxValue;
-
-                    var whammyHeight = Container.Beat.MaxWhammyPoint.Value * whammyValueHeight;
-                    Renderer.RegisterOverflowTop(whammyHeight);
+                    Container.Ties.Add(whammy);
                 }
 
                 //
@@ -163,6 +163,19 @@ namespace AlphaTab.Rendering.Glyphs
                 w += g.Width;
             }
             Width = w;
+
+            if (Container.Beat.IsEmpty)
+            {
+                CenterX = Width / 2;
+            }
+            else if (Container.Beat.IsRest)
+            {
+                CenterX = RestGlyph.X + RestGlyph.Width / 2;
+            }
+            else
+            {
+                CenterX = NoteNumbers.X + NoteNumbers.NoteStringWidth / 2;
+            }
         }
 
         public override void UpdateBeamingHelper()

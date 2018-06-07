@@ -400,6 +400,34 @@ namespace AlphaTab.Platform.CSharp
 
             _graphics.DrawString(Platform.StringFromCharCode((int)symbol), GetMusicFont(scale), _brush, x, y, MusicFontFormat);
         }
+
+        public void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols)
+        {
+            var s = "";
+            foreach (var symbol in symbols)
+            {
+                if (symbol != MusicFontSymbol.None)
+                {
+                    s += Platform.StringFromCharCode((int)symbol);
+                }
+            }
+
+            // for whatever reason the padding on GDI font rendering is a bit messed up, there is 1px padding on the left
+            x += scale;
+
+            _graphics.DrawString(s, GetMusicFont(scale), _brush, x, y, MusicFontFormat);
+        }
+
+        public void BeginRotate(float centerX, float centerY, float angle)
+        {
+            _graphics.TranslateTransform(centerX, centerY);
+            _graphics.RotateTransform(angle);
+        }
+
+        public void EndRotate()
+        {
+            _graphics.ResetTransform();
+        }
     }
 }
 #endif

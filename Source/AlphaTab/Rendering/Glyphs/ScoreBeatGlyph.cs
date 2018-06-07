@@ -16,10 +16,8 @@
  * License along with this library.
  */
 
-using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
-using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
@@ -54,11 +52,33 @@ namespace AlphaTab.Rendering.Glyphs
                     NoteHeads = new ScoreNoteChordGlyph();
                     NoteHeads.Beat = Container.Beat;
                     NoteHeads.BeamingHelper = BeamingHelper;
+
+                    var ghost = new GhostNoteContainerGlyph(false);
+                    ghost.Renderer = Renderer;
+
                     foreach (var note in Container.Beat.Notes)
                     {
                         CreateNoteGlyph(note);
+                        ghost.AddParenthesis(note);
                     }
                     AddGlyph(NoteHeads);
+
+                    if (!ghost.IsEmpty)
+                    {
+                        AddGlyph(new SpacingGlyph(0, 0, 4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
+                        AddGlyph(ghost);
+                    }
+
+                    //
+                    // Whammy Bar
+                    if (Container.Beat.HasWhammyBar)
+                    {
+                        var whammy = new ScoreWhammyBarGlyph(Container.Beat);
+                        whammy.Renderer = Renderer;
+                        whammy.DoLayout();
+
+                        Container.Ties.Add(whammy);
+                    }
 
                     //
                     // Note dots
@@ -156,6 +176,19 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             base.DoLayout();
+
+            if (Container.Beat.IsEmpty)
+            {
+                CenterX = Width / 2;
+            }
+            else if (Container.Beat.IsRest)
+            {
+                CenterX = RestGlyph.X + RestGlyph.Width / 2;
+            }
+            else
+            {
+                CenterX = NoteHeads.X + NoteHeads.Width / 2;
+            }
         }
 
         private void CreateBeatDot(int line, GlyphGroup group)
@@ -222,23 +255,52 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 return new DeadNoteHeadGlyph(0, 0, isGrace);
             }
-            if (n.HarmonicType == HarmonicType.None)
+            if (n.Beat.GraceType == GraceType.BendGrace)
             {
-                return new NoteHeadGlyph(0, 0, n.Beat.Duration, isGrace);
+                return new NoteHeadGlyph(0, 0, Duration.Quarter, true);
             }
-            return new DiamondNoteHeadGlyph(0, 0, isGrace);
+
+            //if (n.HarmonicType == HarmonicType.Natural)
+            //{
+            //    return new DiamondNoteHeadGlyph(0, 0, isGrace); 
+            //}
+
+            if (n.HarmonicType != HarmonicType.None)
+            {
+                return new DiamondNoteHeadGlyph(0, 0, isGrace);
+            }
+
+            return new NoteHeadGlyph(0, 0, n.Beat.Duration, isGrace);
         }
 
         private void CreateNoteGlyph(Note n)
         {
+            if (n.Beat.GraceType == GraceType.BendGrace && !n.HasBend)
+            {
+                return;
+            }
+
             var sr = (ScoreBarRenderer)Renderer;
             var noteHeadGlyph = CreateNoteHeadGlyph(n);
-
+            
             // calculate y position
             var line = sr.GetNoteLine(n);
 
             noteHeadGlyph.Y = sr.GetScoreY(line);
             NoteHeads.AddNoteGlyph(noteHeadGlyph, n, line);
+
+            //if (n.HarmonicType != HarmonicType.None && n.HarmonicType != HarmonicType.Natural)
+            //{
+            //    // create harmonic note head. 
+            //    var harmonicFret = n.RealValue;
+            //    noteHeadGlyph = new DiamondNoteHeadGlyph(0, 0, Container.Beat.GraceType != GraceType.None);
+            //    // TODO: render accidental
+            //    var accidental = sr.AccidentalHelper.ApplyAccidentalForValue(harmonicFret, false);
+            //    line = sr.AccidentalHelper.GetNoteLineForValue(harmonicFret);
+
+            //    noteHeadGlyph.Y = sr.GetScoreY(line);
+            //    NoteHeads.AddNoteGlyph(noteHeadGlyph, n, line);
+            //}
 
             if (n.IsStaccato && !NoteHeads.BeatEffects.ContainsKey("Staccato"))
             {

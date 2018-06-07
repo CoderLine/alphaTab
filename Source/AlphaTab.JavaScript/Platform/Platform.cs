@@ -296,6 +296,12 @@ namespace AlphaTab.Platform
 
         public const bool IsLittleEndian = true;
 
+        public static int Random(int max)
+        {
+            HaxeInt m = max;
+            return Script.Write<int>("Std.int(Math.random() * m)");
+        }
+
         [Inline]
         public static double RandomDouble()
         {

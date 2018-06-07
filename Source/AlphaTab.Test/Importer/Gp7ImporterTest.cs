@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.IO;
 using System.Linq;
 using AlphaTab.Importer;
 using AlphaTab.IO;
@@ -33,7 +34,7 @@ namespace AlphaTab.Test.Importer
             const string path = "TestFiles/";
             return TestPlatform.LoadFile(path + name);
         }
-        
+
         internal Gp7Importer PrepareGp7ImporterWithBytes(string name)
         {
             return PrepareGp7ImporterWithBytes(Load(name));
@@ -244,13 +245,11 @@ namespace AlphaTab.Test.Importer
 
             note = score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Notes[0];
             Assert.AreEqual(BendType.PrebendBend, note.BendType);
-            Assert.AreEqual(3, note.BendPoints.Count);
+            Assert.AreEqual(2, note.BendPoints.Count);
             Assert.AreEqual(0, note.BendPoints[0].Offset);
             Assert.AreEqual(4, note.BendPoints[0].Value);
-            Assert.AreEqual(7, note.BendPoints[1].Offset);
-            Assert.AreEqual(5, note.BendPoints[1].Value);
-            Assert.AreEqual(15, note.BendPoints[2].Offset);
-            Assert.AreEqual(5, note.BendPoints[2].Value);
+            Assert.AreEqual(15, note.BendPoints[1].Offset);
+            Assert.AreEqual(6, note.BendPoints[1].Value);
 
             #endregion
 
@@ -302,13 +301,11 @@ namespace AlphaTab.Test.Importer
 
             note = score.Tracks[0].Staves[0].Bars[5].Voices[0].Beats[1].Notes[0];
             Assert.AreEqual(BendType.PrebendBend, note.BendType);
-            Assert.AreEqual(3, note.BendPoints.Count);
+            Assert.AreEqual(2, note.BendPoints.Count);
             Assert.AreEqual(0, note.BendPoints[0].Offset);
             Assert.AreEqual(8, note.BendPoints[0].Value);
-            Assert.AreEqual(7, note.BendPoints[1].Offset);
-            Assert.AreEqual(10, note.BendPoints[1].Value);
-            Assert.AreEqual(16, note.BendPoints[2].Offset);
-            Assert.AreEqual(10, note.BendPoints[2].Value);
+            Assert.AreEqual(16, note.BendPoints[1].Offset);
+            Assert.AreEqual(12, note.BendPoints[1].Value);
 
             #endregion
 
@@ -543,6 +540,214 @@ namespace AlphaTab.Test.Importer
 
         [TestMethod]
         [Ignore("appveyor fails for some reason, locally everything is fine?")]
+        public void TestWhammyAdvanced()
+        {
+            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/WhammyAdvanced.gp");
+            var score = reader.ReadScore();
+
+            #region Bar 1
+
+            var beat = score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0];
+
+            Assert.AreEqual(WhammyType.Dive, beat.WhammyBarType);
+            Assert.AreEqual(2, beat.WhammyBarPoints.Count);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Offset);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Value);
+            Assert.AreEqual(45, beat.WhammyBarPoints[1].Offset);
+            Assert.AreEqual(-4, beat.WhammyBarPoints[1].Value);
+       
+            beat = score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2];
+
+            Assert.AreEqual(WhammyType.PrediveDive, beat.WhammyBarType);
+            Assert.AreEqual(2, beat.WhammyBarPoints.Count);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Offset);
+            Assert.AreEqual(-4, beat.WhammyBarPoints[0].Value);
+            Assert.AreEqual(60, beat.WhammyBarPoints[1].Offset);
+            Assert.AreEqual(-16, beat.WhammyBarPoints[1].Value);
+       
+            #endregion
+
+            #region Bar 2
+
+            beat = score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0];
+
+            Assert.AreEqual(WhammyType.Dip, beat.WhammyBarType);
+            Assert.AreEqual(3, beat.WhammyBarPoints.Count);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Offset);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Value);
+            Assert.AreEqual(15, beat.WhammyBarPoints[1].Offset);
+            Assert.AreEqual(-16, beat.WhammyBarPoints[1].Value);
+            Assert.AreEqual(30, beat.WhammyBarPoints[2].Offset);
+            Assert.AreEqual(0, beat.WhammyBarPoints[2].Value);
+           
+
+            beat = score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[2];
+
+            Assert.AreEqual(WhammyType.Dip, beat.WhammyBarType);
+            Assert.AreEqual(4, beat.WhammyBarPoints.Count);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Offset);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Value);
+            Assert.AreEqual(14, beat.WhammyBarPoints[1].Offset);
+            Assert.AreEqual(-12, beat.WhammyBarPoints[1].Value);
+            Assert.AreEqual(31, beat.WhammyBarPoints[2].Offset);
+            Assert.AreEqual(-12, beat.WhammyBarPoints[2].Value);
+            Assert.AreEqual(53, beat.WhammyBarPoints[3].Offset);
+            Assert.AreEqual(0, beat.WhammyBarPoints[3].Value);
+           
+            #endregion
+
+            #region Bar 3
+
+            beat = score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0];
+
+            Assert.AreEqual(WhammyType.Dip, beat.WhammyBarType);
+            Assert.AreEqual(3, beat.WhammyBarPoints.Count);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Offset);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Value);
+            Assert.AreEqual(15, beat.WhammyBarPoints[1].Offset);
+            Assert.AreEqual(-16, beat.WhammyBarPoints[1].Value);
+            Assert.AreEqual(30, beat.WhammyBarPoints[2].Offset);
+            Assert.AreEqual(0, beat.WhammyBarPoints[2].Value);
+           
+
+            beat = score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[2];
+
+            Assert.AreEqual(WhammyType.Dip, beat.WhammyBarType);
+            Assert.AreEqual(4, beat.WhammyBarPoints.Count);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Offset);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Value);
+            Assert.AreEqual(14, beat.WhammyBarPoints[1].Offset);
+            Assert.AreEqual(-12, beat.WhammyBarPoints[1].Value);
+            Assert.AreEqual(31, beat.WhammyBarPoints[2].Offset);
+            Assert.AreEqual(-12, beat.WhammyBarPoints[2].Value);
+            Assert.AreEqual(53, beat.WhammyBarPoints[3].Offset);
+            Assert.AreEqual(0, beat.WhammyBarPoints[3].Value);
+           
+            #endregion
+
+            #region Bar 4
+
+            beat = score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0];
+
+            Assert.AreEqual(WhammyType.Predive, beat.WhammyBarType);
+            Assert.AreEqual(2, beat.WhammyBarPoints.Count);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Offset);
+            Assert.AreEqual(-8, beat.WhammyBarPoints[0].Value);
+            Assert.AreEqual(60, beat.WhammyBarPoints[1].Offset);
+            Assert.AreEqual(-8, beat.WhammyBarPoints[1].Value);
+           
+            #endregion
+
+            #region Bar 5
+
+            beat = score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0];
+
+            Assert.AreEqual(WhammyType.PrediveDive, beat.WhammyBarType);
+            Assert.AreEqual(2, beat.WhammyBarPoints.Count);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Offset);
+            Assert.AreEqual(-4, beat.WhammyBarPoints[0].Value);
+            Assert.AreEqual(30, beat.WhammyBarPoints[1].Offset);
+            Assert.AreEqual(0, beat.WhammyBarPoints[1].Value);
+           
+            #endregion
+
+            #region Bar 6
+
+            beat = score.Tracks[0].Staves[0].Bars[5].Voices[0].Beats[0];
+
+            Assert.AreEqual(WhammyType.PrediveDive, beat.WhammyBarType);
+            Assert.AreEqual(2, beat.WhammyBarPoints.Count);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Offset);
+            Assert.AreEqual(-4, beat.WhammyBarPoints[0].Value);
+            Assert.AreEqual(29, beat.WhammyBarPoints[1].Offset);
+            Assert.AreEqual(-12, beat.WhammyBarPoints[1].Value);
+           
+
+            beat = score.Tracks[0].Staves[0].Bars[5].Voices[0].Beats[1];
+
+            Assert.AreEqual(WhammyType.Dive, beat.WhammyBarType);
+            Assert.AreEqual(2, beat.WhammyBarPoints.Count);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Offset);
+            Assert.AreEqual(-12, beat.WhammyBarPoints[0].Value);
+            Assert.AreEqual(45, beat.WhammyBarPoints[1].Offset);
+            Assert.AreEqual(0, beat.WhammyBarPoints[1].Value);
+           
+            #endregion
+
+            #region Bar 7
+
+            beat = score.Tracks[0].Staves[0].Bars[6].Voices[0].Beats[0];
+
+            Assert.AreEqual(WhammyType.Dive, beat.WhammyBarType);
+            Assert.AreEqual(2, beat.WhammyBarPoints.Count);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Offset);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Value);
+            Assert.AreEqual(45, beat.WhammyBarPoints[1].Offset);
+            Assert.AreEqual(-4, beat.WhammyBarPoints[1].Value);
+           
+
+            beat = score.Tracks[0].Staves[0].Bars[6].Voices[0].Beats[1];
+            Assert.AreEqual(WhammyType.Hold, beat.WhammyBarType);
+            Assert.AreEqual(2, beat.WhammyBarPoints.Count);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Offset);
+            Assert.AreEqual(-4, beat.WhammyBarPoints[0].Value);
+            Assert.AreEqual(60, beat.WhammyBarPoints[1].Offset);
+            Assert.AreEqual(-4, beat.WhammyBarPoints[1].Value);
+           
+            #endregion
+
+            #region Bar 8
+
+            beat = score.Tracks[0].Staves[0].Bars[7].Voices[0].Beats[0];
+
+            Assert.AreEqual(WhammyType.Dive, beat.WhammyBarType);
+            Assert.AreEqual(2, beat.WhammyBarPoints.Count);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Offset);
+            Assert.AreEqual(-4, beat.WhammyBarPoints[0].Value);
+            Assert.AreEqual(46, beat.WhammyBarPoints[1].Offset);
+            Assert.AreEqual(-12, beat.WhammyBarPoints[1].Value);
+           
+            beat = score.Tracks[0].Staves[0].Bars[7].Voices[0].Beats[1];
+
+            Assert.AreEqual(WhammyType.Dive, beat.WhammyBarType);
+            Assert.AreEqual(2, beat.WhammyBarPoints.Count);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Offset);
+            Assert.AreEqual(-12, beat.WhammyBarPoints[0].Value);
+            Assert.AreEqual(44, beat.WhammyBarPoints[1].Offset);
+            Assert.AreEqual(8, beat.WhammyBarPoints[1].Value);
+           
+            #endregion
+
+            #region Bar 9
+
+            beat = score.Tracks[0].Staves[0].Bars[8].Voices[0].Beats[0];
+
+            Assert.AreEqual(WhammyType.Dip, beat.WhammyBarType);
+            Assert.AreEqual(3, beat.WhammyBarPoints.Count);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Offset);
+            Assert.AreEqual(8, beat.WhammyBarPoints[0].Value);
+            Assert.AreEqual(15, beat.WhammyBarPoints[1].Offset);
+            Assert.AreEqual(12, beat.WhammyBarPoints[1].Value);
+            Assert.AreEqual(30, beat.WhammyBarPoints[2].Offset);
+            Assert.AreEqual(0, beat.WhammyBarPoints[2].Value);
+
+            beat = score.Tracks[0].Staves[0].Bars[8].Voices[0].Beats[1];
+
+            Assert.AreEqual(WhammyType.Dip, beat.WhammyBarType);
+            Assert.AreEqual(3, beat.WhammyBarPoints.Count);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Offset);
+            Assert.AreEqual(0, beat.WhammyBarPoints[0].Value);
+            Assert.AreEqual(15, beat.WhammyBarPoints[1].Offset);
+            Assert.AreEqual(-4, beat.WhammyBarPoints[1].Value);
+            Assert.AreEqual(30, beat.WhammyBarPoints[2].Offset);
+            Assert.AreEqual(0, beat.WhammyBarPoints[2].Value);
+          
+            #endregion
+
+            Render(score);
+        }
+
+        [TestMethod]
         public void TestTremolo()
         {
             var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestTremolo.gp");
@@ -560,19 +765,15 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints[2].Value);
 
 
-            Assert.AreEqual(3, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints.Count);
+            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints.Count);
 
             Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[0].Offset);
             Assert.AreEqual(-4, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[0].Value);
 
-            // in case of dive the middle point is already on an earlier position
-            Assert.AreEqual(15, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[1].Offset);
-            Assert.AreEqual(-2, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[1].Value);
+            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[1].Offset);
+            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[1].Value);
 
-            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[2].Offset);
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[2].Value);
-
-            Assert.AreEqual(3, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints.Count);
+            Assert.AreEqual(4, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints.Count);
 
             Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[0].Offset);
             Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[0].Value);
@@ -580,8 +781,11 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(30, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[1].Offset);
             Assert.AreEqual(-4, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[1].Value);
 
-            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[2].Offset);
+            Assert.AreEqual(30, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[2].Offset);
             Assert.AreEqual(-4, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[2].Value);
+
+            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[3].Offset);
+            Assert.AreEqual(-4, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[3].Value);
 
             Assert.AreEqual(4, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints.Count);
 
@@ -725,6 +929,118 @@ namespace AlphaTab.Test.Importer
             var score = reader.ReadScore();
 
             CheckColors(score);
+            Render(score);
+        }
+
+
+        [TestMethod]
+        public void TestTremoloVibrato()
+        {
+            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestTremoloVibrato.gp");
+            var score = reader.ReadScore();
+
+            Assert.AreEqual(VibratoType.Slight, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].Vibrato);
+
+            Assert.AreEqual(VibratoType.Wide, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].Vibrato);
+            Assert.AreEqual(VibratoType.Slight, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[1].Vibrato);
+
+            Assert.AreEqual(VibratoType.Slight, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Vibrato);
+
+            Assert.AreEqual(VibratoType.Wide, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].Vibrato);
+
+            Assert.AreEqual(VibratoType.Wide, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].Vibrato);
+
+            Render(score);
+        }
+
+        [TestMethod]
+        public void TestOttavia()
+        {
+            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestOttavia.gp");
+            var score = reader.ReadScore();
+
+            Assert.AreEqual(Ottavia._8va, score.Tracks[0].Staves[0].Bars[0].ClefOttava);
+            Assert.AreEqual(Ottavia._8vb, score.Tracks[0].Staves[0].Bars[1].ClefOttava);
+            Assert.AreEqual(Ottavia._15ma, score.Tracks[0].Staves[0].Bars[2].ClefOttava);
+            Assert.AreEqual(Ottavia._15mb, score.Tracks[0].Staves[0].Bars[3].ClefOttava);
+
+
+            Assert.AreEqual(Ottavia._8va, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].Ottava);
+            Assert.AreEqual(Ottavia._8vb, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[1].Ottava);
+            Assert.AreEqual(Ottavia._15ma, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[2].Ottava);
+            Assert.AreEqual(Ottavia._15mb, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[3].Ottava);
+        }
+
+
+        [TestMethod]
+        public void TestSimileMark()
+        {
+            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestSimileMark.gp");
+            var score = reader.ReadScore();
+
+            Assert.AreEqual(SimileMark.None, score.Tracks[0].Staves[0].Bars[0].SimileMark);
+            Assert.AreEqual(SimileMark.Simple, score.Tracks[0].Staves[0].Bars[1].SimileMark);
+
+            Assert.AreEqual(SimileMark.None, score.Tracks[0].Staves[0].Bars[2].SimileMark);
+            Assert.AreEqual(SimileMark.None, score.Tracks[0].Staves[0].Bars[3].SimileMark);
+
+            Assert.AreEqual(SimileMark.FirstOfDouble, score.Tracks[0].Staves[0].Bars[4].SimileMark);
+            Assert.AreEqual(SimileMark.SecondOfDouble, score.Tracks[0].Staves[0].Bars[5].SimileMark);
+        }
+
+        [TestMethod]
+        public void TestPickSlide()
+        {
+            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestPickSlide.gp");
+            var score = reader.ReadScore();
+
+            Assert.AreEqual(SlideType.PickSlideUp, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].SlideType);
+            Assert.AreEqual(10, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].Fret);
+            Assert.AreEqual(10, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].Fret);
+
+            Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Notes[0].SlideType);
+            Assert.AreEqual(10, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Notes[0].Fret);
+            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Notes[0].Fret);
+
+
+            Assert.AreEqual(SlideType.PickSlideUp, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].SlideType);
+            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].Fret);
+            Assert.AreEqual(10, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Notes[0].Fret);
+
+            Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[2].Notes[0].SlideType);
+            Assert.AreEqual(10, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[2].Notes[0].Fret);
+            Assert.AreEqual(5, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[3].Notes[0].Fret);
+
+
+            Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Notes[0].SlideType);
+            Assert.AreEqual(20, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Notes[0].Fret);
+
+            Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Notes[0].SlideType);
+            Assert.AreEqual(12, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Notes[0].Fret);
+
+            Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[2].Notes[0].SlideType);
+            Assert.AreEqual(5, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[2].Notes[0].Fret);
+
+            Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[3].Notes[0].SlideType);
+            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[3].Notes[0].Fret);
+
+
+            Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].Notes[0].SlideType);
+            Assert.AreEqual(20, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].Notes[0].Fret);
+
+            Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].Notes[0].SlideType);
+            Assert.AreEqual(12, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].Notes[0].Fret);
+
+            Assert.AreEqual(SlideType.PickSlideUp, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[2].Notes[0].SlideType);
+            Assert.AreEqual(5, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[2].Notes[0].Fret);
+
+            Assert.AreEqual(SlideType.PickSlideUp, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[3].Notes[0].SlideType);
+            Assert.AreEqual(10, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[3].Notes[0].Fret);
+
+
+            Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].Notes[0].SlideType);
+            Assert.AreEqual(20, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].Notes[0].Fret);
+            
             Render(score);
         }
     }

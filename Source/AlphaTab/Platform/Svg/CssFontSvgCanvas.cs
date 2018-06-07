@@ -27,18 +27,46 @@ namespace AlphaTab.Platform.Svg
         public override void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)
         {
             Buffer.Append("<g transform=\"translate(" + ((int) x - BlurCorrection) + " " + ((int) y - BlurCorrection) + ")\" class=\"at\" ><text");
-            //Buffer.Append("<svg x=\"" + ((int) x - BlurCorrection) + "\" y=\"" + ((int) y - BlurCorrection) +
-            //              "\" class=\"at\" >");
             if (scale != 1)
             {
-                Buffer.Append("  style=\"font-size: " + (scale * 100) + "%\"");
+                Buffer.Append(" style=\"font-size: " + (scale * 100) + "%; stroke:none\"");
+            }
+            else
+            {
+                Buffer.Append(" style=\"stroke:none\"");
             }
             if (Color.RGBA != Model.Color.BlackRgb)
             {
                 Buffer.Append(" fill=\"" + Color.RGBA + "\"");
             }
-            //Buffer.Append(">&#" + (int)symbol + ";</text></svg>");
             Buffer.Append(">&#" + (int)symbol + ";</text></g>");
+        }
+
+        public override void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols)
+        {
+            var s = "";
+            foreach (var symbol in symbols)
+            {
+                if (symbol != MusicFontSymbol.None)
+                {
+                    s += "&#" + (int)symbol + ";";
+                }
+            }
+
+            Buffer.Append("<g transform=\"translate(" + ((int) x - BlurCorrection) + " " + ((int) y - BlurCorrection) + ")\" class=\"at\" ><text");
+            if (scale != 1)
+            {
+                Buffer.Append(" style=\"font-size: " + (scale * 100) + "%; stroke:none\"");
+            }
+            else
+            {
+                Buffer.Append(" style=\"stroke:none\"");
+            }
+            if (Color.RGBA != Model.Color.BlackRgb)
+            {
+                Buffer.Append(" fill=\"" + Color.RGBA + "\"");
+            }
+            Buffer.Append(">" + s + "</text></g>");
         }
     }
 }

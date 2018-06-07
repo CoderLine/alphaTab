@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using AlphaTab.Audio;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Model
@@ -70,6 +71,73 @@ namespace AlphaTab.Model
                     {
                         staff.TranspositionPitch = -settings.TranspositionPitches[i];
                     }
+                }
+            }
+        }
+
+        public static string FingerToString(Settings settings, Beat beat, Fingers finger, bool leftHand)
+        {
+            if (settings.ForcePianoFingering || GeneralMidi.IsPiano(beat.Voice.Bar.Staff.Track.PlaybackInfo.Program))
+            {
+                switch (finger)
+                {
+                    case Fingers.Unknown:
+                    case Fingers.NoOrDead:
+                        return null;
+                    case Fingers.Thumb:
+                        return "1";
+                    case Fingers.IndexFinger:
+                        return "2";
+                    case Fingers.MiddleFinger:
+                        return "3";
+                    case Fingers.AnnularFinger:
+                        return "4";
+                    case Fingers.LittleFinger:
+                        return "5";
+                    default:
+                        return null;
+                }
+            }
+            else if (leftHand)
+            {
+                switch (finger)
+                {
+                    case Fingers.Unknown:
+                    case Fingers.NoOrDead:
+                        return "0";
+                    case Fingers.Thumb:
+                        return "T";
+                    case Fingers.IndexFinger:
+                        return "1";
+                    case Fingers.MiddleFinger:
+                        return "2";
+                    case Fingers.AnnularFinger:
+                        return "3";
+                    case Fingers.LittleFinger:
+                        return "4";
+                    default:
+                        return null;
+                }
+            }
+            else
+            {
+                switch (finger)
+                {
+                    case Fingers.Unknown:
+                    case Fingers.NoOrDead:
+                        return null;
+                    case Fingers.Thumb:
+                        return "p";
+                    case Fingers.IndexFinger:
+                        return "i";
+                    case Fingers.MiddleFinger:
+                        return "m";
+                    case Fingers.AnnularFinger:
+                        return "a";
+                    case Fingers.LittleFinger:
+                        return "c";
+                    default:
+                        return null;
                 }
             }
         }

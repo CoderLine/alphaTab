@@ -65,5 +65,13 @@ namespace AlphaTab.Haxe.Js.Html
         public extern void FillText(HaxeString text, HaxeFloat x, HaxeFloat y);
         [Name("measureText")]
         public extern TextMetrics MeasureText(HaxeString text);
+        [Name("save")]
+        public extern void Save();
+        [Name("restore")]
+        public extern void Restore();
+        [Name("translate")]
+        public extern void Translate(HaxeFloat x, HaxeFloat y);
+        [Name("rotate")]
+        public extern void Rotate(HaxeFloat angle);
     }
 }

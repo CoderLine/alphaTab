@@ -25,6 +25,9 @@ namespace AlphaTab.Model
         None,
         Natural,
         Sharp,
-        Flat
+        Flat,
+        NaturalQuarterNoteUp,
+        SharpQuarterNoteUp,
+        FlatQuarterNoteUp
     }
 }

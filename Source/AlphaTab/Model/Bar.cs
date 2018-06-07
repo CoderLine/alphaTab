@@ -21,6 +21,31 @@ using AlphaTab.Collections;
 namespace AlphaTab.Model
 {
     /// <summary>
+    /// Lists all simile mark types as they are assigned to bars. 
+    /// </summary>
+    public enum SimileMark
+    {
+        /// <summary>
+        /// No simile mark is applied
+        /// </summary>
+        None,
+        /// <summary>
+        /// A simple simile mark. The previous bar is repeated. 
+        /// </summary>
+        Simple,
+        /// <summary>
+        /// A double simile mark. This value is assigned to the first
+        /// bar of the 2 repeat bars. 
+        /// </summary>
+        FirstOfDouble,
+        /// <summary>
+        /// A double simile mark. This value is assigned to the second
+        /// bar of the 2 repeat bars. 
+        /// </summary>
+        SecondOfDouble
+    }
+
+    /// <summary>
     /// A bar is a single block within a track, also known as Measure.
     /// </summary>
     public class Bar
@@ -37,16 +62,19 @@ namespace AlphaTab.Model
         public Bar NextBar { get; set; }
         public Bar PreviousBar { get; set; }
         public Clef Clef { get; set; }
-        public ClefOttavia ClefOttavia { get; set; }
+        public Ottavia ClefOttava { get; set; }
         public Staff Staff { get; set; }
         public FastList<Voice> Voices { get; set; }
+
+        public SimileMark SimileMark { get; set; }
 
         public Bar()
         {
             Id = GlobalBarId++;
             Voices = new FastList<Voice>();
             Clef = Clef.G2;
-            ClefOttavia = ClefOttavia.Regular;
+            ClefOttava = Ottavia.Regular;
+            SimileMark = SimileMark.None;
         }
 
         public static void CopyTo(Bar src, Bar dst)
@@ -54,7 +82,8 @@ namespace AlphaTab.Model
             dst.Id = src.Id;
             dst.Index = src.Index;
             dst.Clef = src.Clef;
-            dst.ClefOttavia = src.ClefOttavia;
+            dst.ClefOttava = src.ClefOttava;
+            dst.SimileMark = src.SimileMark;
         }
 
         public void AddVoice(Voice voice)
@@ -72,7 +101,6 @@ namespace AlphaTab.Model
             }
         }
 
-
         public bool IsEmpty
         {
             get
@@ -88,12 +116,12 @@ namespace AlphaTab.Model
             }
         }
 
-        public void Finish()
+        public void Finish(Settings settings)
         {
             for (int i = 0, j = Voices.Count; i < j; i++)
             {
                 var voice = Voices[i];
-                voice.Finish();
+                voice.Finish(settings);
             }
         }
     }

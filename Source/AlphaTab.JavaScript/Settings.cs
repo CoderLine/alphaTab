@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-
-using System;
 using AlphaTab.Collections;
 using AlphaTab.Platform;
 using AlphaTab.Util;
@@ -195,7 +193,12 @@ namespace AlphaTab
             json.transpositionPitches = TranspositionPitches;
             json.displayTranspositionPitches = DisplayTranspositionPitches;
             json.logging = LogLevel;
-
+            json.smallGraceTabNotes = SmallGraceTabNotes;
+            json.extendBendArrowsOnTiedNotes = ExtendBendArrowsOnTiedNotes;
+            json.showParenthesisForTiedBends = ShowParenthesisForTiedBends;
+            json.showTabNoteOnTiedBend = ShowTabNoteOnTiedBend;
+            json.bendMode = BendMode;
+            json.fingeringMode = FingeringMode;
 
             json.scriptFile = ScriptFile;
             json.fontDirectory = FontDirectory;
@@ -273,7 +276,6 @@ namespace AlphaTab
                     }
                 }
             }
-
 
             if (Platform.Platform.JsonExists(json, "logging"))
             {
@@ -377,6 +379,60 @@ namespace AlphaTab
                 settings.FontDirectory = EnsureFullUrl(json.fontDirectory);
             }
 
+            if (Platform.Platform.JsonExists(json, "smallGraceTabNotes"))
+            {
+                settings.SmallGraceTabNotes = json.smallGraceTabNotes;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("smallGraceTabNotes"))
+            {
+                settings.SmallGraceTabNotes = (bool)dataAttributes["smallGraceTabNotes"];
+            }
+
+            if (Platform.Platform.JsonExists(json, "bendMode"))
+            {
+                settings.BendMode = DecodeBendMode(json.bendMode);
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("bendMode"))
+            {
+                settings.BendMode = DecodeBendMode(dataAttributes["bendMode"]);
+            }
+
+            if (Platform.Platform.JsonExists(json, "fingeringMode"))
+            {
+                settings.FingeringMode = DecodeFingeringMode(json.fingeringMode);
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("fingeringMode"))
+            {
+                settings.FingeringMode = DecodeFingeringMode(dataAttributes["fingeringMode"]);
+            }
+
+            if (Platform.Platform.JsonExists(json, "extendBendArrowsOnTiedNotes"))
+            {
+                settings.ExtendBendArrowsOnTiedNotes = json.extendBendArrowsOnTiedNotes;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("extendBendArrowsOnTiedNotes"))
+            {
+                settings.ExtendBendArrowsOnTiedNotes = (bool)dataAttributes["extendBendArrowsOnTiedNotes"];
+            }
+
+            if (Platform.Platform.JsonExists(json, "showParenthesisForTiedBends"))
+            {
+                settings.ShowParenthesisForTiedBends = json.showParenthesisForTiedBends;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("showParenthesisForTiedBends"))
+            {
+                settings.ShowParenthesisForTiedBends = (bool)dataAttributes["showParenthesisForTiedBends"];
+            }
+
+            if (Platform.Platform.JsonExists(json, "showTabNoteOnTiedBend"))
+            {
+                settings.ShowTabNoteOnTiedBend = json.showTabNoteOnTiedBend;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("showTabNoteOnTiedBend"))
+            {
+                settings.ShowTabNoteOnTiedBend = (bool)dataAttributes["showTabNoteOnTiedBend"];
+            }
+
             if (Platform.Platform.JsonExists(json, "layout"))
             {
                 settings.Layout = LayoutFromJson(json.layout);
@@ -454,6 +510,50 @@ namespace AlphaTab
                     }
                 }
             }
+        }
+
+        private static BendMode DecodeBendMode(object mode)
+        {
+            if (Platform.Platform.TypeOf(mode) == "number")
+            {
+                return (BendMode)mode;
+            }
+
+            if (Platform.Platform.TypeOf(mode) == "string")
+            {
+                var s = (string)mode;
+                switch (s.ToLower())
+                {
+                    case "songbook":
+                        return BendMode.SongBook;
+                    case "guitarpro":
+                        return BendMode.GuitarPro;
+                }
+            }
+
+            return BendMode.GuitarPro;
+        }
+
+        private static FingeringMode DecodeFingeringMode(object mode)
+        {
+            if (Platform.Platform.TypeOf(mode) == "number")
+            {
+                return (FingeringMode)mode;
+            }
+
+            if (Platform.Platform.TypeOf(mode) == "string")
+            {
+                var s = (string)mode;
+                switch (s.ToLower())
+                {
+                    case "score":
+                        return FingeringMode.Score;
+                    case "effectband":
+                        return FingeringMode.SingleNoteEffectBand;
+                }
+            }
+
+            return FingeringMode.Score;
         }
 
         private static LogLevel DecodeLogLevel(object log)
@@ -564,7 +664,7 @@ namespace AlphaTab
         private static string EnsureFullUrl(string relativeUrl)
         {
             var global = Script.Write<dynamic>("js.Lib.global");
-            if (!relativeUrl.StartsWith("http") && !relativeUrl.StartsWith("https"))
+            if (!relativeUrl.StartsWith("http") && !relativeUrl.StartsWith("https") && !relativeUrl.StartsWith("file"))
             {
                 var root = new StringBuilder();
                 root.Append(global.location.protocol);

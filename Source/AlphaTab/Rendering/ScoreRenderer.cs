@@ -204,7 +204,7 @@ namespace AlphaTab.Rendering
             {
                 Logger.Warning("Rendering", "Current layout does not support dynamic resizing, nothing was done");
             }
-            Logger.Info("Rendering", "Resize finished");
+            Logger.Debug("Rendering", "Resize finished");
         }
 
         private void LayoutAndRender()

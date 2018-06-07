@@ -101,7 +101,8 @@ namespace AlphaTab.Rendering.Glyphs
         Accentuation = 0xE4A0,
         HeavyAccentuation = 0xE4AC,
 
-        WaveHorizontal = 0xEAA4,
+        WaveHorizontalSlight = 0xEAA4,
+        WaveHorizontalWide = 0xEADE,
 
         PickStrokeDown = 0xE610,
         PickStrokeUp = 0xE612,
@@ -114,6 +115,20 @@ namespace AlphaTab.Rendering.Glyphs
 
         AccidentalFlat = 0xE260,
         AccidentalNatural = 0xE261,
-        AccidentalSharp = 0xE262
+        AccidentalSharp = 0xE262,
+        AccidentalQuarterToneFlatArrowUp = 0xE270,
+        AccidentalQuarterToneSharpArrowUp = 0xE274,
+        AccidentalQuarterToneNaturalArrowUp = 0xE272,
+
+        Ottava8 = 0xE510,
+        Ottava8va = 0xE511,
+        Ottava8vb = 0xE51C,
+        Ottava15 = 0xE514,
+        Ottava15ma = 0xE515,
+        OttavaMBaseline = 0xEC95,
+        OttavaBBaseline = 0xEC93,
+
+        SimileMarkSimple = 0xE500,
+        SimileMarkDouble = 0xE501
     }
 }

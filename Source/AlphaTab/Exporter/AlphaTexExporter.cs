@@ -385,6 +385,9 @@ namespace AlphaTab.Exporter
 
             switch (beat.GraceType)
             {
+                case GraceType.BendGrace:
+                    _builder.Append("gr b ");
+                    break;
                 case GraceType.OnBeat:
                     _builder.Append("gr ob ");
                     break;

@@ -56,6 +56,18 @@ namespace AlphaTab.Rendering.Layout
 
         public void LayoutAndRender()
         {
+            var score = Renderer.Score;
+            var startIndex = Renderer.Settings.Layout.Get("start", 1);
+            startIndex--; // map to array index
+            startIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, startIndex));
+            FirstBarIndex = startIndex;
+
+            var endBarIndex = Renderer.Settings.Layout.Get("count", score.MasterBars.Count);
+            if (endBarIndex < 0) endBarIndex = score.MasterBars.Count;
+            endBarIndex = startIndex + endBarIndex - 1; // map count to array index
+            endBarIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, endBarIndex));
+            LastBarIndex = endBarIndex;
+
             CreateScoreInfoGlyphs();
             DoLayoutAndRender();
         }
@@ -142,6 +154,9 @@ namespace AlphaTab.Rendering.Layout
                 return Renderer.Settings.Scale;
             }
         }
+
+        public int FirstBarIndex { get; private set; }
+        public int LastBarIndex { get; private set; }
 
         protected StaveGroup CreateEmptyStaveGroup()
         {

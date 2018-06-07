@@ -28,6 +28,8 @@ namespace AlphaTab.Model
         IntoFromBelow, 
         IntoFromAbove, 
         OutUp, 
-        OutDown
+        OutDown,
+        PickSlideDown,
+        PickSlideUp
     }
 }

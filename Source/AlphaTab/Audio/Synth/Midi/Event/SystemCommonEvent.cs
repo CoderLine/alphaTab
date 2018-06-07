@@ -27,7 +27,7 @@ namespace AlphaTab.Audio.Synth.Midi.Event
         SystemExclusive2 = 0xF7
     }
 
-    public class SystemCommonEvent : MidiEvent
+    public abstract class SystemCommonEvent : MidiEvent
     {
         public override int Channel
         {
@@ -39,7 +39,7 @@ namespace AlphaTab.Audio.Synth.Midi.Event
             get { return (MidiEventTypeEnum) (Message & 0x00000FF); }
         }
 
-        public SystemCommonEvent(int delta, byte status, byte data1, byte data2)
+        protected SystemCommonEvent(int delta, byte status, byte data1, byte data2)
             : base(delta, status, data1, data2)
         {
         }

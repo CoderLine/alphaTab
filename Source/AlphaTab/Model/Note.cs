@@ -16,7 +16,9 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
+using AlphaTab.Platform;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
 
@@ -47,6 +49,25 @@ namespace AlphaTab.Model
         /// This will move the note one line up and applies a Flat. 
         /// </summary>
         ForceFlat,
+    }
+
+    /// <summary>
+    /// Lists the different bend styles
+    /// </summary>
+    public enum BendStyle
+    {
+        /// <summary>
+        /// The bends are as described by the bend points 
+        /// </summary>
+        Default,
+        /// <summary>
+        /// The bends are gradual over the beat duration. 
+        /// </summary>
+        Gradual,
+        /// <summary>
+        /// The bends are done fast before the next note. 
+        /// </summary>
+        Fast
     }
 
     /// <summary>
@@ -114,6 +135,7 @@ namespace AlphaTab.Model
         public int Index { get; set; }
         public AccentuationType Accentuated { get; set; }
         public BendType BendType { get; set; }
+        public BendStyle BendStyle { get; set; }
         public bool IsContinuedBend { get; set; }
         public FastList<BendPoint> BendPoints { get; set; }
         public BendPoint MaxBendPoint { get; set; }
@@ -181,7 +203,11 @@ namespace AlphaTab.Model
 
         public bool IsGhost { get; set; }
         public bool IsLetRing { get; set; }
+        public Note LetRingDestination { get; set; }
+
         public bool IsPalmMute { get; set; }
+        public Note PalmMuteDestination { get; set; }
+
         public bool IsDead { get; set; }
         public bool IsStaccato { get; set; }
 
@@ -194,6 +220,8 @@ namespace AlphaTab.Model
         public Note TieDestination { get; set; }
         public bool IsTieDestination { get; set; }
         public bool IsTieOrigin { get; set; }
+
+        public Note BendOrigin { get; set; }
 
         public Fingers LeftHandFinger { get; set; }
         public Fingers RightHandFinger { get; set; }
@@ -239,6 +267,9 @@ namespace AlphaTab.Model
             return 0;
         }
 
+        /// <summary>
+        /// Gets the absolute value of this note for playback. 
+        /// </summary>
         public int RealValue
         {
             get
@@ -249,7 +280,14 @@ namespace AlphaTab.Model
                 }
                 if (IsStringed)
                 {
-                    return Fret + StringTuning - Beat.Voice.Bar.Staff.TranspositionPitch;
+                    var noteValue = Fret + StringTuning - Beat.Voice.Bar.Staff.TranspositionPitch;
+
+                    if (IsStringed)
+                    {
+                        noteValue += HarmonicPitch;
+                    }
+
+                    return noteValue;
                 }
                 if (IsPiano)
                 {
@@ -260,10 +298,202 @@ namespace AlphaTab.Model
             }
         }
 
+        public int HarmonicPitch
+        {
+            get
+            {
+                var value = HarmonicValue;
+                switch (HarmonicType)
+                {
+                    case HarmonicType.Natural:
+                        // add semitones to reach corresponding harmonic frets
+                        if (value.IsAlmostEqualTo(2.7f))
+                        {
+                            // Fret 3 2nd octave + minor seventh
+                            return 34 - Fret;
+                        }
+                        else if (value < 3)
+                        {
+                            // no natural harmonics below fret 3
+                            return 0;
+                        }
+                        else if (value <= 3 /*2.7*/)
+                        {
+                            // Fret 3 2nd octave + minor seventh
+                            return 34 - Fret;
+                        }
+                        else if (value <= 3.5 /*3.2*/)
+                        {
+                            // Fret 3 2nd octave + fifth
+                            return 31 - Fret;
+                        }
+                        else if (value <= 4)
+                        {
+                            return 28 - Fret;
+                        }
+                        else if (value <= 5)
+                        {
+                            return 24 - Fret;
+                        }
+                        else if (value <= 6 /* 5.8 */)
+                        {
+                            return 34 - Fret;
+                        }
+                        else if (value <= 7)
+                        {
+                            return 22 - Fret;
+                        }
+                        else if (value <= 8.5 /*8.2*/)
+                        {
+                            return 36 - Fret;
+                        }
+                        else if (value <= 9)
+                        {
+                            return 28 - Fret;
+                        }
+                        else if (value <= 10 /*9.6*/)
+                        {
+                            return 34 - Fret;
+                        }
+                        else if (value < 14)
+                        {
+                            // fret 11,12,13,14 stay
+                            return 0;
+                        }
+                        else if (value <= 15 /*14.7*/)
+                        {
+                            return 34 - Fret;
+                        }
+                        else if (value <= 16)
+                        {
+                            return 28 - Fret;
+                        }
+                        else if (value <= 17)
+                        {
+                            return 36 - Fret;
+                        }
+                        else if (value <= 21)
+                        {
+                            // fret 18,19,20,21 stay
+                            return 0;
+                        }
+                        else if (value <= 22 /* 21.7 */)
+                        {
+                            return 36 - Fret;
+                        }
+
+                        return 0;
+                    case HarmonicType.Artificial:
+                    case HarmonicType.Feedback:
+                    case HarmonicType.Pinch:
+                    case HarmonicType.Semi:
+                    case HarmonicType.Tap:
+                        break;
+                }
+
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets the absolute value of this note considering
+        /// offsets by bends and ottavia
+        /// </summary>
+        public int DisplayValue
+        {
+            get
+            {
+                var noteValue = RealValue;
+                if (HasBend)
+                {
+                    noteValue += BendPoints[0].Value / 2;
+                }
+                else if (BendOrigin != null)
+                {
+                    noteValue += BendOrigin.BendPoints[BendOrigin.BendPoints.Count - 1].Value / 2;
+                }
+                else if (Beat.HasWhammyBar)
+                {
+                    noteValue += Beat.WhammyBarPoints[0].Value / 2;
+                }
+                else if (Beat.IsContinuedWhammy)
+                {
+                    noteValue += Beat.PreviousBeat.WhammyBarPoints[Beat.PreviousBeat.WhammyBarPoints.Count - 1].Value / 2;
+                }
+
+                switch (Beat.Ottava)
+                {
+                    case Ottavia._15ma:
+                        noteValue -= 24;
+                        break;
+                    case Ottavia._8va:
+                        noteValue -= 12;
+                        break;
+                    case Ottavia.Regular:
+                        break;
+                    case Ottavia._8vb:
+                        noteValue += 12;
+                        break;
+                    case Ottavia._15mb:
+                        noteValue += 24;
+                        break;
+                }
+
+                switch (Beat.Voice.Bar.ClefOttava)
+                {
+                    case Ottavia._15ma:
+                        noteValue -= 24;
+                        break;
+                    case Ottavia._8va:
+                        noteValue -= 12;
+                        break;
+                    case Ottavia.Regular:
+                        break;
+                    case Ottavia._8vb:
+                        noteValue += 12;
+                        break;
+                    case Ottavia._15mb:
+                        noteValue += 24;
+                        break;
+                }
+
+                return noteValue;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the note has a offset of a quartertone caused by bends.
+        /// </summary>
+        public bool HasQuarterToneOffset
+        {
+            get
+            {
+                if (HasBend)
+                {
+                    return (BendPoints[0].Value % 2) != 0;
+                }
+                if (BendOrigin != null)
+                {
+                    return (BendOrigin.BendPoints[BendOrigin.BendPoints.Count - 1].Value % 2) != 0;
+                }
+                if (Beat.HasWhammyBar)
+                {
+                    return (Beat.WhammyBarPoints[0].Value % 2) != 0;
+                }
+                if (Beat.IsContinuedWhammy)
+                {
+                    return (Beat.PreviousBeat.WhammyBarPoints[Beat.PreviousBeat.WhammyBarPoints.Count - 1].Value % 2) != 0;
+                }
+                return false;
+            }
+        }
+
+
         public Note()
         {
             Id = GlobalNoteId++;
             BendType = BendType.None;
+            BendStyle = BendStyle.Default;
             BendPoints = new FastList<BendPoint>();
             Dynamic = DynamicValue.F;
 
@@ -301,11 +531,14 @@ namespace AlphaTab.Model
             dst.HarmonicType = src.HarmonicType;
             dst.IsGhost = src.IsGhost;
             dst.IsLetRing = src.IsLetRing;
+            dst.LetRingDestination = src.LetRingDestination;
             dst.IsPalmMute = src.IsPalmMute;
+            dst.PalmMuteDestination = src.PalmMuteDestination;
             dst.IsDead = src.IsDead;
             dst.IsStaccato = src.IsStaccato;
             dst.SlideType = src.SlideType;
             dst.Vibrato = src.Vibrato;
+            dst.IsTieOrigin = src.IsTieOrigin;
             dst.IsTieDestination = src.IsTieDestination;
             dst.LeftHandFinger = src.LeftHandFinger;
             dst.RightHandFinger = src.RightHandFinger;
@@ -320,16 +553,20 @@ namespace AlphaTab.Model
             dst.Element = src.Element;
             dst.Variation = src.Variation;
             dst.BendType = src.BendType;
+            dst.BendStyle = src.BendStyle;
+            dst.IsContinuedBend = src.IsContinuedBend;
         }
 
         public Note Clone()
         {
             var n = new Note();
+            var id = n.Id;
             CopyTo(this, n);
             for (int i = 0, j = BendPoints.Count; i < j; i++)
             {
                 n.AddBendPoint(BendPoints[i].Clone());
             }
+            n.Id = id;
             return n;
         }
 
@@ -347,7 +584,7 @@ namespace AlphaTab.Model
             }
         }
 
-        public void Finish()
+        public void Finish(Settings settings)
         {
             var nextNoteOnLine = new Util.Lazy<Note>(() => NextNoteOnSameLine(this));
             var prevNoteOnLine = new Util.Lazy<Note>(() => PreviousNoteOnSameLine(this));
@@ -367,6 +604,41 @@ namespace AlphaTab.Model
                     Fret = TieOrigin.Fret;
                     Octave = TieOrigin.Octave;
                     Tone = TieOrigin.Tone;
+
+                    if (TieOrigin.BendOrigin != null)
+                    {
+                        BendOrigin = TieOrigin.BendOrigin;
+                    }
+                    else if (TieOrigin.HasBend)
+                    {
+                        BendOrigin = TieOrigin;
+                    }
+                }
+            }
+
+            // connect letring
+            if (IsLetRing)
+            {
+                if (nextNoteOnLine.Value == null || !nextNoteOnLine.Value.IsLetRing)
+                {
+                    LetRingDestination = this;
+                }
+                else
+                {
+                    LetRingDestination = nextNoteOnLine.Value;
+                }
+            }
+
+            // connect palmmute
+            if (IsPalmMute)
+            {
+                if (nextNoteOnLine.Value == null || !nextNoteOnLine.Value.IsPalmMute)
+                {
+                    PalmMuteDestination = this;
+                }
+                else
+                {
+                    PalmMuteDestination = nextNoteOnLine.Value;
                 }
             }
 
@@ -399,8 +671,8 @@ namespace AlphaTab.Model
                 {
                     var origin = BendPoints[0];
                     var middle1 = BendPoints[1];
-                    BendPoint middle2 = BendPoints[2];
-                    BendPoint destination = BendPoints[3];
+                    var middle2 = BendPoints[2];
+                    var destination = BendPoints[3];
 
                     // the middle points are used for holds, anything else is a new feature we do not support yet
                     if (middle1.Value == middle2.Value)
@@ -416,9 +688,7 @@ namespace AlphaTab.Model
                             {
                                 BendType = BendType.PrebendBend;
                                 BendPoints.RemoveAt(2);
-                                // bug in Guitar Pro? even though after the bend we hold 
-                                // the note it bends up slightly more. 
-                                destination.Value = middle1.Value;
+                                BendPoints.RemoveAt(1);
                             }
                             else
                             {
@@ -507,14 +777,14 @@ namespace AlphaTab.Model
                     }
                 }
             }
-            else if(BendPoints.Count == 0)
+            else if (BendPoints.Count == 0)
             {
                 BendType = BendType.None;
             }
         }
 
         private const int MaxOffsetForSameLineSearch = 3;
-        private static Note NextNoteOnSameLine(Note note)
+        public static Note NextNoteOnSameLine(Note note)
         {
             var nextBeat = note.Beat.NextBeat;
             // keep searching in same bar
@@ -534,7 +804,7 @@ namespace AlphaTab.Model
             return null;
         }
 
-        private static Note PreviousNoteOnSameLine(Note note)
+        public static Note PreviousNoteOnSameLine(Note note)
         {
             var previousBeat = note.Beat.PreviousBeat;
 

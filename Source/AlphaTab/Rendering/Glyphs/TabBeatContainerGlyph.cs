@@ -25,7 +25,8 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class TabBeatContainerGlyph : BeatContainerGlyph
     {
-        private FastList<BendGlyph> _bendGlyphs;
+        private TabBendGlyph _bend;
+
         public TabBeatContainerGlyph(Beat beat, VoiceContainerGlyph voiceContainer)
             : base(beat, voiceContainer)
         {
@@ -34,41 +35,11 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             base.DoLayout();
-
-            _bendGlyphs = new FastList<BendGlyph>();
-            foreach (var n in Beat.Notes)
+            if (_bend != null)
             {
-                if (n.HasBend)
-                {
-                    var bendValueHeight = 6;
-                    var bendHeight = n.MaxBendPoint.Value * bendValueHeight;
-                    Renderer.RegisterOverflowTop(bendHeight);
-
-                    var bend = new BendGlyph(n, bendValueHeight);
-
-                    if (n.IsContinuedBend || n.BendType == BendType.PrebendBend || n.BendType == BendType.Prebend || n.BendType == BendType.PrebendRelease)
-                    {
-                        bend.X = OnNotes.X + OnNotes.Width / 2;
-                    }
-                    else
-                    {
-                        bend.X = OnNotes.X + OnNotes.Width;
-                    }
-
-                    bend.Renderer = Renderer;
-                    _bendGlyphs.Add(bend);
-                }
-            }
-        }
-
-        public override void ScaleToWidth(float beatWidth)
-        {
-            base.ScaleToWidth(beatWidth);
-
-            for (int i = 0; i < _bendGlyphs.Count; i++)
-            {
-                var g = _bendGlyphs[i];
-                g.Width = beatWidth - g.X;
+                _bend.Renderer = Renderer;
+                _bend.DoLayout();
+                UpdateWidth();
             }
         }
 
@@ -126,16 +97,16 @@ namespace AlphaTab.Rendering.Glyphs
                 var l = new TabSlideLineGlyph(n.SlideType, n, this);
                 Ties.Add(l);
             }
-        }
 
-        public override void Paint(float cx, float cy, ICanvas canvas)
-        {
-            base.Paint(cx, cy, canvas);
-
-            for (int i = 0; i < _bendGlyphs.Count; i++)
+            if (n.HasBend)
             {
-                var g = _bendGlyphs[i];
-                g.Paint(cx + X, cy + Y, canvas);
+                if (_bend == null)
+                {
+                    _bend = new TabBendGlyph(n.Beat);
+                    _bend.Renderer = Renderer;
+                    Ties.Add(_bend);
+                }
+                _bend.AddBends(n);
             }
         }
     }

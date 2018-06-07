@@ -85,11 +85,11 @@ namespace AlphaTab.Model
             dst.StaffKind = src.StaffKind;
         }
 
-        public void Finish()
+        public void Finish(Settings settings)
         {
             for (int i = 0, j = Bars.Count; i < j; i++)
             {
-                Bars[i].Finish();
+                Bars[i].Finish(settings);
             }
         }
 

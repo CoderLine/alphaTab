@@ -1,6 +1,7 @@
 ﻿using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Audio.Synth.Midi.Event;
 using AlphaTab.Model;
+using AlphaTab.Util;
 
 namespace AlphaTab.Audio.Generator
 {
@@ -21,18 +22,17 @@ namespace AlphaTab.Audio.Generator
                 denominatorIndex++;
             }
 
-            var message = new MetaDataEvent(tick, 
-                0xFF, 
-                (byte)MetaEventTypeEnum.TimeSignature, 
+            var message = new MetaDataEvent(tick,
+                0xFF,
+                (byte)MetaEventTypeEnum.TimeSignature,
                 new byte[] { (byte)(timeSignatureNumerator & 0xFF), (byte)(denominatorIndex & 0xFF), 48, 8 });
-
-            _midiFile.Events.Add(message);
+            _midiFile.AddEvent(message);
         }
 
         public void AddRest(int track, int tick, int channel)
         {
-            var message = new SystemExclusiveEvent(tick, (byte) SystemCommonTypeEnum.SystemExclusive, 0, new byte[] {0xFF});
-            _midiFile.Events.Add(message);
+            var message = new SystemExclusiveEvent(tick, (byte)SystemCommonTypeEnum.SystemExclusive, 0, new byte[] { 0xFF });
+            _midiFile.AddEvent(message);
         }
 
         public void AddNote(int track, int start, int length, byte key, DynamicValue dynamicValue, byte channel)
@@ -40,10 +40,11 @@ namespace AlphaTab.Audio.Generator
             var velocity = MidiUtils.DynamicToVelocity(dynamicValue);
 
             var noteOn = new MidiEvent(start, MakeCommand((byte)MidiEventTypeEnum.NoteOn, channel), FixValue(key), FixValue((byte)velocity));
-            _midiFile.Events.Add(noteOn);
+            _midiFile.AddEvent(noteOn);
 
             var noteOff = new MidiEvent(start + length, MakeCommand((byte)MidiEventTypeEnum.NoteOff, channel), FixValue(key), FixValue((byte)velocity));
-            _midiFile.Events.Add(noteOff);
+            _midiFile.AddEvent(noteOff);
+            Logger.Info("Midi", "Note: " + start + "/" + (start + length));
         }
 
         private byte MakeCommand(byte command, byte channel)
@@ -60,13 +61,13 @@ namespace AlphaTab.Audio.Generator
         public void AddControlChange(int track, int tick, byte channel, byte controller, byte value)
         {
             var message = new MidiEvent(tick, MakeCommand((byte)MidiEventTypeEnum.Controller, channel), FixValue(controller), FixValue(value));
-            _midiFile.Events.Add(message);
+            _midiFile.AddEvent(message);
         }
 
         public void AddProgramChange(int track, int tick, byte channel, byte program)
         {
             var message = new MidiEvent(tick, MakeCommand((byte)MidiEventTypeEnum.ProgramChange, channel), FixValue(program), 0);
-            _midiFile.Events.Add(message);
+            _midiFile.AddEvent(message);
         }
 
         public void AddTempo(int tick, int tempo)
@@ -78,13 +79,14 @@ namespace AlphaTab.Audio.Generator
                 0xFF,
                 (byte)MetaEventTypeEnum.Tempo,
                 tempoInUsq);
-            _midiFile.Events.Add(message);
+            _midiFile.AddEvent(message);
         }
 
         public void AddBend(int track, int tick, byte channel, byte value)
         {
             var message = new MidiEvent(tick, MakeCommand((byte)MidiEventTypeEnum.PitchBend, channel), 0, FixValue(value));
-            _midiFile.Events.Add(message);
+            _midiFile.AddEvent(message);
+            Logger.Info("Midi", "Bend: " + tick + "/" + value);
         }
 
         public void FinishTrack(int track, int tick)
@@ -93,7 +95,7 @@ namespace AlphaTab.Audio.Generator
                 0xFF,
                 (byte)MetaEventTypeEnum.EndOfTrack,
                 new byte[0]);
-            _midiFile.Events.Add(message);
+            _midiFile.AddEvent(message);
         }
     }
 }

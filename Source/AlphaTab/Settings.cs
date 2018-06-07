@@ -22,6 +22,43 @@ using AlphaTab.Util;
 namespace AlphaTab
 {
     /// <summary>
+    /// Lists all modes on how bends should be handled.
+    /// </summary>
+    public enum BendMode
+    {
+        /// <summary>
+        /// Bends will be displayed and played as in GuitarPro.
+        /// Note heads are shown after the bended note to show the target note. 
+        /// Playback will follow the defined BendPoints. 
+        /// </summary>
+        GuitarPro,
+        /// <summary>
+        /// Bends will be displayed and played in a traditional SongBook manner. 
+        /// For bends additional grace beats are introduced. 
+        /// Bends are categorized into gradual and fast bends. 
+        /// - Gradual bends are indicated by beat text "grad" or "grad.". Bend will sound along the beat duration. 
+        /// - Fast bends are done right before the next note. If the next note is tied even on-beat of the next note. 
+        /// </summary>
+        SongBook
+    }
+
+    /// <summary>
+    /// Lists all modes on how fingerings should be displayed.
+    /// </summary>
+    public enum FingeringMode
+    {
+        /// <summary>
+        /// Fingerings will be shown in the standard notation staff. 
+        /// </summary>
+        Score,
+        /// <summary>
+        /// Fingerings will be shown in a effect band above the tabs in case
+        /// they have only a single note on the beat.
+        /// </summary>
+        SingleNoteEffectBand
+    }
+
+    /// <summary>
     /// This public class contains instance specific settings for alphaTab
     /// </summary>
     public partial class Settings
@@ -94,6 +131,39 @@ namespace AlphaTab
         /// </summary>
         public LogLevel LogLevel { get; set; }
 
+        /// <summary>
+        /// If set to true the guitar tabs on grace beats are rendered smaller.
+        /// </summary>
+        public bool SmallGraceTabNotes { get; set; }
+
+        /// <summary>
+        /// If set to true bend arrows expand to the end of the last tied note
+        /// of the string. Otherwise they end on the next beat. 
+        /// </summary>
+        public bool ExtendBendArrowsOnTiedNotes { get; set; }
+
+        /// <summary>
+        /// If set to true the note heads on tied notes
+        /// will have parenthesis if they are preceeded by bends. 
+        /// </summary>
+        public bool ShowParenthesisForTiedBends { get; set; }
+
+        /// <summary>
+        /// If set to true a tab number will be shown in case
+        /// a bend is increased on a tied note. 
+        /// </summary>
+        public bool ShowTabNoteOnTiedBend { get; set; }
+
+        /// <summary>
+        /// Gets or sets the bend mode to use for display and playback of bends. 
+        /// </summary>
+        public BendMode BendMode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the fingering mode to use. 
+        /// </summary>
+        public FingeringMode FingeringMode { get; set; }
+
         public static Settings Defaults
         {
             get
@@ -106,6 +176,12 @@ namespace AlphaTab
                 settings.Engine = "default";
                 settings.TranspositionPitches = new int[0];
                 settings.DisplayTranspositionPitches = new int[0];
+                settings.SmallGraceTabNotes = true;
+                settings.ExtendBendArrowsOnTiedNotes = true;
+                settings.ShowParenthesisForTiedBends = true;
+                settings.ShowTabNoteOnTiedBend = true;
+                settings.BendMode = BendMode.GuitarPro;
+                settings.FingeringMode = FingeringMode.Score;
 
                 settings.ImporterSettings = new FastDictionary<string, object>();
 

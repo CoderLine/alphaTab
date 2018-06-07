@@ -21,20 +21,61 @@ namespace AlphaTab.Rendering.Glyphs
 {
     public class ScoreBeatPreNotesGlyph : BeatGlyphBase
     {
+        private BendNoteHeadGroupGlyph _prebends;
+        public float PrebendNoteHeadOffset => _prebends.X + _prebends.NoteHeadOffset;
+
         public override void DoLayout()
         {
             if (!Container.Beat.IsRest)
             {
+                var accidentals = new AccidentalGroupGlyph();
+                var ghost = new GhostNoteContainerGlyph(true);
+                ghost.Renderer = Renderer;
+                _prebends = new BendNoteHeadGroupGlyph(true);
+                _prebends.Renderer = Renderer;
+                foreach (var note in Container.Beat.Notes)
+                {
+                    if (note.HasBend)
+                    {
+                        switch (note.BendType)
+                        {
+                            case BendType.PrebendBend:
+                            case BendType.Prebend:
+                            case BendType.PrebendRelease:
+                                _prebends.AddGlyph(note.RealValue);
+                                break;
+                        }
+                    }
+                    else if (note.Beat.HasWhammyBar)
+                    {
+                        switch (note.Beat.WhammyBarType)
+                        {
+                            case WhammyType.PrediveDive:
+                            case WhammyType.Predive:
+                                _prebends.AddGlyph(note.RealValue);
+                                break;
+                        }
+                    }
+                    CreateAccidentalGlyph(note, accidentals);
+                    ghost.AddParenthesis(note);
+                }
+
+                if (!_prebends.IsEmpty)
+                {
+                    AddGlyph(_prebends);
+                    AddGlyph(new SpacingGlyph(0, 0, 4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
+                }
+
                 if (Container.Beat.BrushType != BrushType.None)
                 {
                     AddGlyph(new ScoreBrushGlyph(Container.Beat));
                     AddGlyph(new SpacingGlyph(0, 0, 4 * Scale));
                 }
 
-                var accidentals = new AccidentalGroupGlyph();
-                foreach (var note in Container.Beat.Notes)
+                if (!ghost.IsEmpty)
                 {
-                    CreateAccidentalGlyph(note, accidentals);
+                    AddGlyph(ghost);
+                    AddGlyph(new SpacingGlyph(0, 0, 4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
                 }
 
                 if (!accidentals.IsEmpty)
@@ -53,17 +94,10 @@ namespace AlphaTab.Rendering.Glyphs
             var accidental = sr.AccidentalHelper.ApplyAccidental(n);
             var noteLine = sr.GetNoteLine(n);
             var isGrace = Container.Beat.GraceType != GraceType.None;
-            switch (accidental)
+
+            if (accidental != AccidentalType.None)
             {
-                case AccidentalType.Sharp:
-                    accidentals.AddGlyph(new SharpGlyph(0, sr.GetScoreY(noteLine), isGrace));
-                    break;
-                case AccidentalType.Flat:
-                    accidentals.AddGlyph(new FlatGlyph(0, sr.GetScoreY(noteLine), isGrace));
-                    break;
-                case AccidentalType.Natural:
-                    accidentals.AddGlyph(new NaturalizeGlyph(0, sr.GetScoreY(noteLine), isGrace));
-                    break;
+                accidentals.AddGlyph(new AccidentalGlyph(0, sr.GetScoreY(noteLine), accidental, isGrace));
             }
         }
     }

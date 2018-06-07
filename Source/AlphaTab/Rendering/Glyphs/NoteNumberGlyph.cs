@@ -15,34 +15,53 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
     public class NoteNumberGlyph : Glyph
     {
-        private readonly string _noteString;
-        private float _noteStringWidth;
-        private readonly string _trillNoteString;
+        private readonly Note _note;
+        private string _noteString;
+        private string _trillNoteString;
         private float _trillNoteStringWidth;
 
         public bool IsEmpty { get; set; }
         public float Height { get; set; }
+        public float NoteStringWidth { get; set; }
 
-        public NoteNumberGlyph(float x, float y, Note n)
+        public NoteNumberGlyph(float x, float y, Note note)
             : base(x, y)
         {
+            _note = note;
+        }
+
+        public override void DoLayout()
+        {
+            var n = _note;
+
+            double fret = n.Fret - n.Beat.Voice.Bar.Staff.TranspositionPitch;
+            if (n.HarmonicType == HarmonicType.Natural && n.HarmonicValue != 0)
+            {
+                fret = n.HarmonicValue - n.Beat.Voice.Bar.Staff.TranspositionPitch;
+            }
+
             if (!n.IsTieDestination)
             {
-                _noteString = n.IsDead ? "x" : (n.Fret - n.Beat.Voice.Bar.Staff.TranspositionPitch).ToString();
+                _noteString = n.IsDead ? "x" : fret.ToString();
                 if (n.IsGhost)
                 {
                     _noteString = "(" + _noteString + ")";
                 }
+                else if (n.HarmonicType == HarmonicType.Natural)
+                {
+                    _noteString = "<" + _noteString + ">";
+                }
             }
-            else if (n.Beat.Index == 0 || (n.HasBend))
+            else if (n.Beat.Index == 0 || (n.BendType == BendType.Bend && Renderer.Settings.ShowTabNoteOnTiedBend && n.IsTieOrigin))
             {
                 _noteString = "(" + (n.TieOrigin.Fret - n.Beat.Voice.Bar.Staff.TranspositionPitch) + ")";
             }
@@ -55,32 +74,64 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 _trillNoteString = "(" + (n.TrillFret - n.Beat.Voice.Bar.Staff.TranspositionPitch) + ")";
             }
+            else if (!n.HarmonicValue.IsAlmostEqualTo(0))
+            {
+                switch (n.HarmonicType)
+                {
+                    case HarmonicType.Artificial:
+                    case HarmonicType.Pinch:
+                    case HarmonicType.Tap:
+                    case HarmonicType.Semi:
+                    case HarmonicType.Feedback:
+
+                        var s = (n.HarmonicValue - n.Beat.Voice.Bar.Staff.TranspositionPitch).ToString();
+                        // only first decimal char
+                        var i = s.IndexOf('.');
+                        if (i >= 0)
+                        {
+                            s = s.Substring(0, i + 2);
+                        }
+
+                        _trillNoteString = "<" + s + ">";
+                        break;
+                    default:
+                        _trillNoteString = "";
+                        break;
+                }
+            }
             else
             {
                 _trillNoteString = "";
             }
-        }
 
-        public override void DoLayout()
-        {
-            IsEmpty = string.IsNullOrEmpty(_noteString) && string.IsNullOrEmpty(_trillNoteString);
+            IsEmpty = string.IsNullOrEmpty(_noteString);
             if (!IsEmpty)
             {
                 Renderer.ScoreRenderer.Canvas.Font = Renderer.Resources.TablatureFont;
-                _noteStringWidth = Renderer.ScoreRenderer.Canvas.MeasureText(_noteString);
-                _trillNoteStringWidth = Renderer.ScoreRenderer.Canvas.MeasureText(_trillNoteString);
-                Width = _noteStringWidth + _trillNoteStringWidth;
+                Width = NoteStringWidth = Renderer.ScoreRenderer.Canvas.MeasureText(_noteString);
                 Height = Renderer.ScoreRenderer.Canvas.Font.Size;
+
+                var hasTrill = !string.IsNullOrEmpty(_trillNoteString);
+                if (hasTrill)
+                {
+                    Renderer.ScoreRenderer.Canvas.Font = Renderer.Resources.GraceFont;
+                    _trillNoteStringWidth = 3 * Scale + Renderer.ScoreRenderer.Canvas.MeasureText(_trillNoteString);
+                    Width += _trillNoteStringWidth;
+                }
             }
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             if (IsEmpty) return;
-            var textWidth = _noteStringWidth + _trillNoteStringWidth;
+            var textWidth = NoteStringWidth + _trillNoteStringWidth;
             var x = cx + X + (Width - textWidth) / 2;
+
+            Renderer.ScoreRenderer.Canvas.Font = Renderer.Resources.GraceFont;
+            canvas.FillText(_trillNoteString, x + NoteStringWidth + 3 * Scale, cy + Y);
+
+            Renderer.ScoreRenderer.Canvas.Font = Renderer.Resources.TablatureFont;
             canvas.FillText(_noteString, x, cy + Y);
-            canvas.FillText(_trillNoteString, x + _noteStringWidth, cy + Y);
         }
     }
 }

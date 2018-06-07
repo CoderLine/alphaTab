@@ -25,9 +25,9 @@ namespace AlphaTab.Rendering.Effects
         public string EffectId { get { return "crescendo"; } }
         public bool HideOnMultiTrack { get { return false; } }
         public bool CanShareBand { get { return true; } }
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.GroupedOnBeat; } }
+        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.GroupedOnBeatToEnd; } }
 
-        public bool ShouldCreateGlyph(Beat beat)
+        public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
             return beat.Crescendo != CrescendoType.None;
         }

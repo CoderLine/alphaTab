@@ -81,6 +81,8 @@ namespace AlphaTab.Haxe.Js.Html
         [Name("getBoundingClientRect")]
         public extern DOMRect GetBoundingClientRect();
 
+        [Name("click")]
+        public extern void Click();
 
     }
 }

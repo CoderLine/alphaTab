@@ -29,5 +29,6 @@ class CsMath
 	public static inline function Abs_Double(v:Double) : Double return Math.abs(v.ToHaxeFloat());
 	public static inline function Sqrt(v:Double) : Double return Math.sqrt(v.ToHaxeFloat());
 	public static inline function Exp(v:Double) : Double return Math.exp(v.ToHaxeFloat());
+	public static inline function Asin(v:Double) : Double return Math.asin(v.ToHaxeFloat());
 
 }

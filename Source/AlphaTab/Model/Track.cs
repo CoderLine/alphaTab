@@ -73,7 +73,7 @@ namespace AlphaTab.Model
             dst.Color.RGBA = src.Color.RGBA;
         }
 
-        public void Finish()
+        public void Finish(Settings settings)
         {
 
             if (string.IsNullOrEmpty(ShortName))
@@ -85,7 +85,7 @@ namespace AlphaTab.Model
 
             for (int i = 0, j = Staves.Count; i < j; i++)
             {
-                Staves[i].Finish();
+                Staves[i].Finish(settings);
             }
         }
 

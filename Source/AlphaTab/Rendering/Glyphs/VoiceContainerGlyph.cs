@@ -59,7 +59,7 @@ namespace AlphaTab.Rendering.Glyphs
             for (int i = 0, j = beatGlyphs.Count; i < j; i++)
             {
                 var currentBeatGlyph = beatGlyphs[i];
-                var time = currentBeatGlyph.Beat.AbsoluteStart;
+                var time = currentBeatGlyph.Beat.AbsoluteDisplayStart;
                 currentBeatGlyph.X = positions[time] - currentBeatGlyph.OnTimeX;
 
                 // size always previousl glyph after we know the position
@@ -118,8 +118,8 @@ namespace AlphaTab.Rendering.Glyphs
         //private static Random Random = new Random();
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            //canvas.Color = new Color((byte)Platform.Random(255), (byte)Platform.Random(255), (byte)Platform.Random(255), 80);
-            //canvas.FillRect(cx + X, cy + Y, Width, 100);
+            //canvas.Color = Color.Random();
+            //canvas.StrokeRect(cx + X, cy + Y, Width, 100);
 
             //if (Voice.Index == 0)
             //{

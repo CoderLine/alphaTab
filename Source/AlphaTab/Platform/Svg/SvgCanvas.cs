@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering;
@@ -33,6 +34,7 @@ namespace AlphaTab.Platform.Svg
         protected StringBuilder Buffer;
         private StringBuilder _currentPath;
         private bool _currentPathIsEmpty;
+        private StringBuilder _suspendBuffer;
 
         public Color Color { get; set; }
         public float LineWidth { get; set; }
@@ -57,7 +59,7 @@ namespace AlphaTab.Platform.Svg
             Buffer = new StringBuilder();
 
             Buffer.Append("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
-            Buffer.Append(width);
+            Buffer.Append(Math.Ceiling(width));
             Buffer.Append("px\" height=\"");
             Buffer.Append(height);
             Buffer.Append("px\" class=\"alphaTabSurfaceSvg\">\n");
@@ -157,7 +159,7 @@ namespace AlphaTab.Platform.Svg
                 {
                     Buffer.Append(" fill=\"" + Color.RGBA + "\"");
                 }
-                Buffer.Append(" stroke=\"none\"/>");
+                Buffer.Append(" style=\"stroke: none\"/>");
 
             }
             _currentPath = new StringBuilder();
@@ -173,7 +175,7 @@ namespace AlphaTab.Platform.Svg
                 {
                     s += " stroke-width=\"" + LineWidth + "\"";
                 }
-                s += " fill=\"none\" />";
+                s += " style=\"fill: none\" />";
                 Buffer.Append(s);
             }
             _currentPath = new StringBuilder();
@@ -183,7 +185,7 @@ namespace AlphaTab.Platform.Svg
         public void FillText(string text, float x, float y)
         {
             if (text == "") return;
-            var s = "<text x=\"" + ((int)x) + "\" y=\"" + ((int)y) + "\" style=\"font:" + Font.ToCssString() + "\" "
+            var s = "<text x=\"" + ((int)x) + "\" y=\"" + ((int)y) + "\" style=\"stroke: none; font:" + Font.ToCssString() + "\" "
                     + " dominant-baseline=\"" + GetSvgBaseLine() + "\"";
             if (Color.RGBA != Color.BlackRgb)
             {
@@ -193,7 +195,7 @@ namespace AlphaTab.Platform.Svg
             {
                 s += " text-anchor=\"" + GetSvgTextAlignment() + "\"";
             }
-            s+= ">" + text + "</text>";
+            s += ">" + text + "</text>";
             Buffer.Append(s);
         }
 
@@ -231,6 +233,7 @@ namespace AlphaTab.Platform.Svg
         }
 
         public abstract void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol);
+        public abstract void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols);
 
 
         public virtual object OnPreRender()
@@ -243,6 +246,16 @@ namespace AlphaTab.Platform.Svg
         {
             // nothing to do
             return null;
+        }
+
+        public void BeginRotate(float centerX, float centerY, float angle)
+        {
+            Buffer.Append("<g transform=\"translate(" + centerX + " ," + centerY + ") rotate( " + angle + ")\">");
+        }
+
+        public void EndRotate()
+        {
+            Buffer.Append("</g>");
         }
     }
 }

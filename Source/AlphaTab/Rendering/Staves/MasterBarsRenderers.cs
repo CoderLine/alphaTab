@@ -28,6 +28,7 @@ namespace AlphaTab.Rendering.Staves
     {
         public float Width { get; set; }
         public bool IsLinkedToPrevious { get; set; }
+        public bool CanWrap { get; set; }
         public MasterBar MasterBar { get; set; }
         public FastList<BarRendererBase> Renderers { get; set; }
         public BarLayoutingInfo LayoutingInfo { get; set; }
@@ -35,6 +36,7 @@ namespace AlphaTab.Rendering.Staves
         public MasterBarsRenderers()
         {
             Renderers = new FastList<BarRendererBase>();
+            CanWrap = true;
         }
     }
 }

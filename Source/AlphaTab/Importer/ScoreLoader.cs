@@ -30,7 +30,7 @@ namespace AlphaTab.Importer
     /// </summary>
     public partial class ScoreLoader
     {
-        public static Score LoadScoreFromBytes(byte[] data, FastDictionary<string, object> importSettings = null)
+        public static Score LoadScoreFromBytes(byte[] data, Settings settings = null)
         {
             var importers = ScoreImporter.BuildImporters();
 
@@ -44,7 +44,7 @@ namespace AlphaTab.Importer
                 try
                 {
                     Logger.Info("ScoreLoader", "Importing using importer " + importer.Name);
-                    importer.Init(bb, importSettings);
+                    importer.Init(bb, settings);
                     score = importer.ReadScore();
                     Logger.Info("ScoreLoader", "Score imported using " + importer.Name);
                     break;

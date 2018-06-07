@@ -39,7 +39,7 @@ namespace AlphaTab.Audio.Synth.Midi.Event
         SequencerSpecific = 0x7F
     }
 
-    public class MetaEvent : MidiEvent
+    public abstract class MetaEvent : MidiEvent
     {
         public override int Channel
         {
@@ -56,7 +56,7 @@ namespace AlphaTab.Audio.Synth.Midi.Event
             get { return Data1; }
         }
 
-        public MetaEvent(int delta, byte status, byte data1, byte data2)
+        protected MetaEvent(int delta, byte status, byte data1, byte data2)
             : base(delta, status, data1, data2)
         {
         }

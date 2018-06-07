@@ -15,6 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
@@ -22,6 +25,12 @@ namespace AlphaTab.Rendering.Glyphs
     public class BeatOnNoteGlyphBase : BeatGlyphBase
     {
         public BeamingHelper BeamingHelper { get; set; }
+        public float CenterX { get; set; }
+
+        public BeatOnNoteGlyphBase()
+        {
+            CenterX = 0;
+        }
 
         public virtual void UpdateBeamingHelper()
         {
@@ -30,7 +39,7 @@ namespace AlphaTab.Rendering.Glyphs
         //public override void Paint(float cx, float cy, ICanvas canvas)
         //{
         //    base.Paint(cx, cy, canvas);
-        //    canvas.Color = new Color((byte)Platform.Random(255), (byte)Platform.Random(255), (byte)Platform.Random(255), 80);
+        //    canvas.Color = Color.Random();
         //    canvas.FillRect(cx + X, cy + Y, Width, 100);
         //}
     }

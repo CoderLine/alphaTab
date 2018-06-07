@@ -125,6 +125,18 @@ namespace AlphaTab.Rendering.Utils
         /// </summary>
         public Note MaxNote { get; set; }
 
+        /// <summary>
+        /// the overall min note value within this group. 
+        /// This includes values caused by bends. 
+        /// </summary>
+        public int MinNoteValue { get; set; }
+
+        /// <summary>
+        /// the overall max note value within this group
+        /// This includes values caused by bends. 
+        /// </summary>
+        public int MaxNoteValue { get; set; }
+
         public bool InvertBeamDirection { get; set; }
 
 
@@ -135,19 +147,40 @@ namespace AlphaTab.Rendering.Utils
             Beats = new FastList<Beat>();
             _beatLineXPositions = new FastDictionary<int, BeatLinePositions>();
             ShortestDuration = Duration.QuadrupleWhole;
+            MaxNoteValue = int.MinValue;
+            MinNoteValue = int.MinValue;
         }
 
         private int GetValue(Note n)
         {
             if (_staff.StaffKind== StaffKind.Percussion)
             {
-                return PercussionMapper.MapNoteForDisplay(n);
+                return PercussionMapper.MapNoteForDisplay(n.RealValue);
             }
             else
             {
-                return n.RealValue - _staff.DisplayTranspositionPitch;
+                return n.DisplayValue - _staff.DisplayTranspositionPitch;
             }
         }
+
+        private int GetMaxValue(Note n)
+        {
+            int value = GetValue(n);
+            if (n.HasBend)
+            {
+                value += n.MaxBendPoint.Value / 2;
+            }
+            return value;
+        }
+
+        private int GetMinValue(Note n)
+        {
+            int value = GetValue(n);
+            // we do not need to consider bends here as bends always can go up
+            // whammy bar might need to considered here once it's rendered like bends. 
+            return value;
+        }
+
 
         public float GetBeatLineX(Beat beat)
         {
@@ -195,10 +228,6 @@ namespace AlphaTab.Rendering.Utils
                         return Invert(BeamDirection.Up);
                     }
                 }
-            }
-            if (Beats.Count == 1 && (Beats[0].Duration == Duration.Whole || Beats[0].Duration == Duration.DoubleWhole))
-            {
-                return Invert(BeamDirection.Up);
             }
 
             if (Beats[0].GraceType != GraceType.None)
@@ -295,11 +324,11 @@ namespace AlphaTab.Rendering.Utils
             var value = GetValue(note);
 
             // detect the smallest note which is at the beginning of this group
-            if (FirstMinNote == null || note.Beat.Start < FirstMinNote.Beat.Start)
+            if (FirstMinNote == null || note.Beat.DisplayStart < FirstMinNote.Beat.DisplayStart)
             {
                 FirstMinNote = note;
             }
-            else if (note.Beat.Start == FirstMinNote.Beat.Start)
+            else if (note.Beat.DisplayStart == FirstMinNote.Beat.DisplayStart)
             {
                 if (value < GetValue(FirstMinNote))
                 {
@@ -308,11 +337,11 @@ namespace AlphaTab.Rendering.Utils
             }
 
             // detect the biggest note which is at the beginning of this group
-            if (FirstMaxNote == null || note.Beat.Start < FirstMaxNote.Beat.Start)
+            if (FirstMaxNote == null || note.Beat.DisplayStart < FirstMaxNote.Beat.DisplayStart)
             {
                 FirstMaxNote = note;
             }
-            else if (note.Beat.Start == FirstMaxNote.Beat.Start)
+            else if (note.Beat.DisplayStart == FirstMaxNote.Beat.DisplayStart)
             {
                 if (value > GetValue(FirstMaxNote))
                 {
@@ -321,11 +350,11 @@ namespace AlphaTab.Rendering.Utils
             }
 
             // detect the smallest note which is at the end of this group
-            if (LastMinNote == null || note.Beat.Start > LastMinNote.Beat.Start)
+            if (LastMinNote == null || note.Beat.DisplayStart > LastMinNote.Beat.DisplayStart)
             {
                 LastMinNote = note;
             }
-            else if (note.Beat.Start == LastMinNote.Beat.Start)
+            else if (note.Beat.DisplayStart == LastMinNote.Beat.DisplayStart)
             {
                 if (value < GetValue(LastMinNote))
                 {
@@ -333,11 +362,11 @@ namespace AlphaTab.Rendering.Utils
                 }
             }
             // detect the biggest note which is at the end of this group
-            if (LastMaxNote == null || note.Beat.Start > LastMaxNote.Beat.Start)
+            if (LastMaxNote == null || note.Beat.DisplayStart > LastMaxNote.Beat.DisplayStart)
             {
                 LastMaxNote = note;
             }
-            else if (note.Beat.Start == LastMaxNote.Beat.Start)
+            else if (note.Beat.DisplayStart == LastMaxNote.Beat.DisplayStart)
             {
                 if (value > GetValue(LastMaxNote))
                 {
@@ -352,6 +381,18 @@ namespace AlphaTab.Rendering.Utils
             if (MinNote == null || value < GetValue(MinNote))
             {
                 MinNote = note;
+            }
+
+            var minValue = GetMinValue(MaxNote);
+            if (MinNoteValue == int.MinValue || MinNoteValue > minValue)
+            {
+                MinNoteValue = minValue;
+            }
+
+            var maxValue = GetMaxValue(MaxNote);
+            if (MaxNoteValue == int.MinValue || MaxNoteValue > maxValue)
+            {
+                MaxNoteValue = maxValue;
             }
         }
 
@@ -417,7 +458,7 @@ namespace AlphaTab.Rendering.Utils
         private static bool CanJoin(Beat b1, Beat b2)
         {
             // is this a voice we can join with?
-            if (b1 == null || b2 == null || b1.IsRest || b2.IsRest || b1.GraceType != b2.GraceType)
+            if (b1 == null || b2 == null || b1.IsRest || b2.IsRest || b1.GraceType != b2.GraceType || b1.GraceType == GraceType.BendGrace || b2.GraceType == GraceType.BendGrace)
             {
                 return false;
             }
@@ -429,8 +470,8 @@ namespace AlphaTab.Rendering.Utils
 
             // get times of those voices and check if the times 
             // are in the same division
-            var start1 = b1.Start;
-            var start2 = b2.Start;
+            var start1 = b1.DisplayStart;
+            var start2 = b2.DisplayStart;
 
             // we can only join 8th, 16th, 32th and 64th voices
             if (!CanJoinDuration(b1.Duration) || !CanJoinDuration(b2.Duration))

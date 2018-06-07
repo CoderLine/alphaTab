@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
 
 namespace AlphaTab.Model
@@ -48,9 +49,22 @@ namespace AlphaTab.Model
             dst.IsEmpty = src.IsEmpty;
         }
 
+        public void InsertBeat(Beat after, Beat newBeat)
+        {
+            newBeat.NextBeat = after.NextBeat;
+            if (newBeat.NextBeat != null)
+            {
+                newBeat.NextBeat.PreviousBeat = newBeat;
+            }
+            newBeat.PreviousBeat = after;
+            newBeat.Voice = this;
+            after.NextBeat = newBeat;
+            Beats.InsertAt(after.Index + 1, newBeat);
+        }
+
+
         public void AddBeat(Beat beat)
         {
-            // chaining
             beat.Voice = this;
             beat.Index = Beats.Count;
             Beats.Add(beat);
@@ -104,18 +118,19 @@ namespace AlphaTab.Model
             IsEmpty = false;
         }
 
-        public void Finish()
+        public void Finish(Settings settings)
         {
-            // TODO: find a proper solution to chain beats without iterating twice
-            for (int i = 0, j = Beats.Count; i < j; i++)
+            for (var index = 0; index < Beats.Count; index++)
             {
-                var beat = Beats[i];
+                var beat = Beats[index];
+                beat.Index = index;
                 Chain(beat);
             }
-            for (int i = 0, j = Beats.Count; i < j; i++)
+            for (var index = 0; index < Beats.Count; index++)
             {
-                var beat = Beats[i];
-                beat.Finish();
+                var beat = Beats[index];
+                beat.Index = index;
+                beat.Finish(settings);
             }
         }
     }

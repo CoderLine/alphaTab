@@ -29,6 +29,7 @@ using AlphaTab.Importer;
 using AlphaTab.IO;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
+using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
 using Haxe;
@@ -46,7 +47,6 @@ namespace AlphaTab.Platform.JavaScript
 
     public class AlphaTabApi
     {
-        private readonly Element _element;
         private readonly Element _canvasElement;
         private int _visibilityCheckerInterval;
         private int _visibilityCheckerIntervalId;
@@ -56,13 +56,14 @@ namespace AlphaTab.Platform.JavaScript
 
         protected bool IsElementVisible
         {
-            get { return _element.OffsetWidth.IsTruthy() || _element.OffsetHeight.IsTruthy() || _element.GetClientRects().Length.IsTruthy(); }
+            get { return Element.OffsetWidth.IsTruthy() || Element.OffsetHeight.IsTruthy() || Element.GetClientRects().Length.IsTruthy(); }
         }
 
         public Settings Settings { get; private set; }
         public IScoreRenderer Renderer { get; private set; }
         public Score Score { get; set; }
         public int[] TrackIndexes { get; set; }
+        public Element Element { get; set; }
         public Track[] Tracks
         {
             get
@@ -80,9 +81,9 @@ namespace AlphaTab.Platform.JavaScript
 
         public AlphaTabApi(Element element, dynamic options)
         {
-            _element = element;
+            Element = element;
 
-            _element.ClassList.Add("alphaTab");
+            Element.ClassList.Add("alphaTab");
 
             // load settings
             var dataAttributes = GetDataAttributes();
@@ -203,8 +204,8 @@ namespace AlphaTab.Platform.JavaScript
             Renderer.RenderFinished += o => TriggerEvent("rendered");
             Renderer.PostRenderFinished += () =>
             {
-                _element.ClassList.Remove("loading");
-                _element.ClassList.Remove("rendering");
+                Element.ClassList.Remove("loading");
+                Element.ClassList.Remove("rendering");
                 TriggerEvent("postRendered");
             };
             Renderer.PreRender += result =>
@@ -236,7 +237,7 @@ namespace AlphaTab.Platform.JavaScript
                 // in this case we need the correct width for autosize
                 if (autoSize)
                 {
-                    Settings.Width = _element.OffsetWidth;
+                    Settings.Width = Element.OffsetWidth;
                     Renderer.UpdateSettings(settings);
                 }
 
@@ -288,11 +289,11 @@ namespace AlphaTab.Platform.JavaScript
         {
             var dataAttributes = new FastDictionary<string, object>();
 
-            if (_element.Dataset.As<bool>())
+            if (Element.Dataset.As<bool>())
             {
-                foreach (var key in Platform.JsonKeys(_element.Dataset))
+                foreach (var key in Platform.JsonKeys(Element.Dataset))
                 {
-                    object value = _element.Dataset.Member<object>(key);
+                    object value = Element.Dataset.Member<object>(key);
                     try
                     {
                         string stringValue = (string)value;
@@ -310,9 +311,9 @@ namespace AlphaTab.Platform.JavaScript
             }
             else
             {
-                for (var i = 0; i < _element.Attributes.Length; i++)
+                for (var i = 0; i < Element.Attributes.Length; i++)
                 {
-                    var attr = _element.Attributes.Item(i);
+                    var attr = Element.Attributes.Item(i);
                     string nodeName = attr.NodeName;
                     if (nodeName.StartsWith("data-"))
                     {
@@ -358,12 +359,12 @@ namespace AlphaTab.Platform.JavaScript
 
                 var resizeEventInfo = new ResizeEventArgs();
                 resizeEventInfo.OldWidth = Settings.Width;
-                resizeEventInfo.NewWidth = _element.OffsetWidth;
+                resizeEventInfo.NewWidth = Element.OffsetWidth;
                 resizeEventInfo.Settings = Settings;
                 TriggerEvent("resize", resizeEventInfo);
                 Settings.Width = resizeEventInfo.NewWidth;
                 Renderer.UpdateSettings(Settings);
-                Renderer.Resize(_element.OffsetWidth);
+                Renderer.Resize(Element.OffsetWidth);
             }
             // if there is no "invisibility timer" we set up one, if there is already a timer scheduled, it will trigger the proper rendering. 
             else if (_visibilityCheckerIntervalId == 0)
@@ -549,7 +550,7 @@ namespace AlphaTab.Platform.JavaScript
 
         private void CreateStyleElement(Settings settings)
         {
-            var elementDocument = _element.OwnerDocument;
+            var elementDocument = Element.OwnerDocument;
             var styleElement = (StyleElement)elementDocument.GetElementById("alphaTabStyle");
             if (styleElement == null)
             {
@@ -593,29 +594,29 @@ namespace AlphaTab.Platform.JavaScript
 
         public virtual void Destroy()
         {
-            _element.InnerHTML = "";
+            Element.InnerHTML = "";
             Renderer.Destroy();
         }
 
         public void Load(object data)
         {
-            _element.ClassList.Add("loading");
+            Element.ClassList.Add("loading");
             try
             {
                 if (Platform.InstanceOf<ArrayBuffer>(data))
                 {
-                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes(Platform.ArrayBufferToByteArray((ArrayBuffer)data), Settings.ImporterSettings));
+                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes(Platform.ArrayBufferToByteArray((ArrayBuffer)data), Settings));
                 }
                 else if (Platform.InstanceOf<Uint8Array>(data))
                 {
-                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes((byte[])data, Settings.ImporterSettings));
+                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes((byte[])data, Settings));
                 }
                 else if (Platform.TypeOf(data) == "string")
                 {
                     ScoreLoader.LoadScoreAsync((string)data, s => ScoreLoaded(s), e =>
                     {
                         Error("import", e);
-                    }, Settings.ImporterSettings);
+                    }, Settings);
                 }
             }
             catch (Exception e)
@@ -627,12 +628,12 @@ namespace AlphaTab.Platform.JavaScript
 
         public void Tex(string contents)
         {
-            _element.ClassList.Add("loading");
+            Element.ClassList.Add("loading");
             try
             {
                 var parser = new AlphaTexImporter();
                 var data = ByteBuffer.FromBuffer(Platform.StringToByteArray(contents));
-                parser.Init(data, Settings.ImporterSettings);
+                parser.Init(data, Settings);
                 ScoreLoaded(parser.ReadScore());
             }
             catch (Exception e)
@@ -757,17 +758,17 @@ namespace AlphaTab.Platform.JavaScript
 
         public void TriggerEvent(string name, object details = null)
         {
-            if (_element != null)
+            if (Element != null)
             {
                 name = "alphaTab." + name;
                 dynamic e = Browser.Document.CreateEvent("CustomEvent");
                 e.initCustomEvent(name, false, false, details);
-                _element.DispatchEvent(e);
+                Element.DispatchEvent(e);
 
                 if (Platform.JsonExists(Browser.Window, "jQuery"))
                 {
                     dynamic jquery = Browser.Window.Member<dynamic>("jQuery");
-                    jquery(_element).trigger(name, details);
+                    jquery(Element).trigger(name, details);
                 }
             }
         }
@@ -806,7 +807,6 @@ namespace AlphaTab.Platform.JavaScript
         #region Player
 
         public AlphaSynthWebWorkerApi Player { get; private set; }
-        private double _playbackSpeed;
         private MidiTickLookup _tickCache;
         private Element _cursorWrapper;
         private Element _beatCursor;
@@ -868,7 +868,6 @@ namespace AlphaTab.Platform.JavaScript
                 }));
                 Player.On("readyForPlayback", (Action)(() =>
                 {
-                    _playbackSpeed = Player.PlaybackSpeed;
                     TriggerEvent("playerReady");
                 }));
                 Player.On("soundFontLoad", (Action<object>)(data =>
@@ -927,10 +926,35 @@ namespace AlphaTab.Platform.JavaScript
             Logger.Info("AlphaTab", "Generating Midi");
             var midiFile = new MidiFile();
             var handler = new AlphaSynthMidiFileHandler(midiFile);
-            var generator = new MidiFileGenerator(Score, handler);
+            var generator = new MidiFileGenerator(Score, Settings, handler);
             generator.Generate();
             _tickCache = generator.TickLookup;
             Player.LoadMidiFile(midiFile);
+        }
+
+        public void DownloadMidi()
+        {
+            var midiFile = new MidiFile();
+            var handler = new AlphaSynthMidiFileHandler(midiFile);
+            var generator = new MidiFileGenerator(Score, Settings, handler);
+            generator.Generate();
+
+            var binary = midiFile.ToBinary();
+            Uint8Array uint8Array = Script.Write<Uint8Array>("binary.toUint8Array()");
+            var fileName = string.IsNullOrEmpty(Score.Title) ? "File.mid" : Score.Title + ".mid";
+            var dlLink = (AnchorElement)Browser.Document.CreateElement("a");
+            dlLink.Download = fileName;
+
+            var blob = new Blob(new[] { uint8Array }, new
+            {
+                type = "audio/midi"
+            });
+            var url = URL.CreateObjectURL(blob);
+            dlLink.Href = url;
+            dlLink.Style.Display = "none";
+            Browser.Document.Body.AppendChild(dlLink);
+            dlLink.Click();
+            Browser.Document.Body.RemoveChild(dlLink);
         }
 
         public void SetTrackVolume(object tracks, float volume)
@@ -1048,11 +1072,11 @@ namespace AlphaTab.Platform.JavaScript
             var beatCursor = Browser.Document.CreateElement("div");
             beatCursor.ClassList.Add("beatCursor");
 
-            var surface = _element.QuerySelector(".alphaTabSurface");
+            var surface = Element.QuerySelector(".alphaTabSurface");
 
             // required css styles 
-            _element.Style.Position = "relative";
-            _element.Style.TextAlign = "left";
+            Element.Style.Position = "relative";
+            Element.Style.TextAlign = "left";
 
             cursorWrapper.Style.Position = "absolute";
             cursorWrapper.Style.ZIndex = "1000";
@@ -1071,7 +1095,7 @@ namespace AlphaTab.Platform.JavaScript
             _selectionWrapper = selectionWrapper;
 
             // add cursors to UI
-            _element.InsertBefore(cursorWrapper, _element.FirstChild);
+            Element.InsertBefore(cursorWrapper, Element.FirstChild);
             cursorWrapper.AppendChild(selectionWrapper);
             cursorWrapper.AppendChild(barCursor);
             cursorWrapper.AppendChild(beatCursor);
@@ -1142,29 +1166,28 @@ namespace AlphaTab.Platform.JavaScript
 
             _canvasElement.AddEventListener("mousemove", (Action<MouseEvent>)(e =>
             {
-                if (_selecting)
+                if (!_selecting) return;
+                var parentOffset = GetOffset(_canvasElement);
+                var relX = e.PageX - parentOffset.X;
+                var relY = e.PageY - parentOffset.Y;
+                var beat = _cursorCache.GetBeatAtPos(relX, relY);
+                if (beat != null && (_selectionEnd == null || _selectionEnd.Beat != beat))
                 {
-                    var parentOffset = GetOffset(_canvasElement);
-                    var relX = e.PageX - parentOffset.X;
-                    var relY = e.PageY - parentOffset.Y;
-                    var beat = _cursorCache.GetBeatAtPos(relX, relY);
-                    if (beat != null && (_selectionEnd == null || _selectionEnd.Beat != beat))
-                    {
-                        _selectionEnd = new SelectionInfo(beat);
-                        CursorSelectRange(_selectionStart, _selectionEnd);
-                    }
+                    _selectionEnd = new SelectionInfo(beat);
+                    CursorSelectRange(_selectionStart, _selectionEnd);
                 }
             }));
 
             _canvasElement.AddEventListener("mouseup", (Action<MouseEvent>)(e =>
             {
+                if (!_selecting) return;
                 e.PreventDefault();
 
                 // for the selection ensure start < end
                 if (_selectionEnd != null)
                 {
-                    var startTick = _selectionStart.Beat.AbsoluteStart;
-                    var endTick = _selectionStart.Beat.AbsoluteStart;
+                    var startTick = _selectionStart.Beat.AbsoluteDisplayStart;
+                    var endTick = _selectionStart.Beat.AbsoluteDisplayStart;
                     if (endTick < startTick)
                     {
                         var t = _selectionStart;
@@ -1181,7 +1204,7 @@ namespace AlphaTab.Platform.JavaScript
 
                     // move to selection start
                     CursorUpdateBeat(_selectionStart.Beat, null, 0, false);
-                    Player.TickPosition = realMasterBarStart + _selectionStart.Beat.Start;
+                    Player.TickPosition = realMasterBarStart + _selectionStart.Beat.PlaybackStart;
 
                     // set playback range 
                     if (_selectionEnd != null && _selectionStart.Beat != _selectionEnd.Beat)
@@ -1189,9 +1212,9 @@ namespace AlphaTab.Platform.JavaScript
                         var realMasterBarEnd = tickCache.GetMasterBarStart(_selectionEnd.Beat.Voice.Bar.MasterBar);
                         Player.PlaybackRange = new PlaybackRange
                         {
-                            StartTick = realMasterBarStart + _selectionStart.Beat.Start,
-                            EndTick = realMasterBarEnd + _selectionEnd.Beat.Start +
-                                      _selectionEnd.Beat.CalculateDuration() - 50
+                            StartTick = realMasterBarStart + _selectionStart.Beat.PlaybackStart,
+                            EndTick = realMasterBarEnd + _selectionEnd.Beat.PlaybackStart +
+                                      _selectionEnd.Beat.PlaybackDuration - 50
                         };
                     }
                     else
@@ -1277,6 +1300,7 @@ namespace AlphaTab.Platform.JavaScript
                 return;
             }
 
+
             var barCursor = _barCursor;
             var beatCursor = _beatCursor;
 
@@ -1287,34 +1311,34 @@ namespace AlphaTab.Platform.JavaScript
             }
 
             var barBoundings = beatBoundings.BarBounds.MasterBarBounds;
-            barCursor.Style.Top = barBoundings.VisualBounds.Y + "px";
-            barCursor.Style.Left = barBoundings.VisualBounds.X + "px";
-            barCursor.Style.Width = barBoundings.VisualBounds.W + "px";
-            barCursor.Style.Height = barBoundings.VisualBounds.H + "px";
+            var barBounds = barBoundings.VisualBounds;
+            barCursor.Style.Top = barBounds.Y + "px";
+            barCursor.Style.Left = barBounds.X + "px";
+            barCursor.Style.Width = barBounds.W + "px";
+            barCursor.Style.Height = barBounds.H + "px";
 
             // move beat to start position immediately
-            beatCursor.Style.Transition = "all 0s linear";
-            beatCursor.Style.TransitionDuration = "0ms";
-            beatCursor.Style.Top = barBoundings.VisualBounds.Y + "px";
+            beatCursor.Style.Transition = "none";
+            beatCursor.Style.Top = barBounds.Y + "px";
             beatCursor.Style.Left = beatBoundings.VisualBounds.X + "px";
             beatCursor.Style.Width = Settings.BeatCursorWidth + "px";
-            beatCursor.Style.Height = barBoundings.VisualBounds.H + "px";
+            beatCursor.Style.Height = barBounds.H + "px";
 
             // if playing, animate the cursor to the next beat
-            var elements = _element.GetElementsByClassName("atHighlight");
-            while(elements.Length > 0)
+            var elements = Element.GetElementsByClassName("atHighlight");
+            while (elements.Length > 0)
             {
                 elements.Item(0).ClassList.Remove("atHighlight");
             }
 
             if (_playerState == PlayerState.Playing || stop)
             {
-                duration /= _playbackSpeed;
+                duration /= Player.PlaybackSpeed;
 
                 if (!stop)
                 {
-                    var className = "b" + beat.Id;
-                    var elementsToHighlight = _element.GetElementsByClassName(className);
+                    var className = BeatContainerGlyph.GetGroupId(beat);
+                    var elementsToHighlight = Element.GetElementsByClassName(className);
                     for (int i = 0; i < elementsToHighlight.Length; i++)
                     {
                         elementsToHighlight.Item(i).ClassList.Add("atHighlight");
@@ -1324,16 +1348,29 @@ namespace AlphaTab.Platform.JavaScript
                     // get position of next beat on same stavegroup
                     if (nextBeat != null)
                     {
-                        var nextBeatBoundings = cache.FindBeat(nextBeat);
-                        if (nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds == barBoundings.StaveGroupBounds)
+                        // if we are moving within the same bar or to the next bar
+                        // transition to the next beat, otherwise transition to the end of the bar. 
+                        if (nextBeat.Voice.Bar.Index == beat.Voice.Bar.Index ||
+                            nextBeat.Voice.Bar.Index == beat.Voice.Bar.Index + 1)
                         {
-                            nextBeatX = nextBeatBoundings.VisualBounds.X;
+                            var nextBeatBoundings = cache.FindBeat(nextBeat);
+                            if (nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds ==
+                                barBoundings.StaveGroupBounds)
+                            {
+                                nextBeatX = nextBeatBoundings.VisualBounds.X;
+                            }
                         }
                     }
 
-                    beatCursor.Style.Transition = "all 0s linear";
-                    beatCursor.Style.TransitionDuration = duration + "ms";
-                    beatCursor.Style.Left = nextBeatX + "px";
+                    Browser.Window.RequestAnimationFrame(f =>
+                    {
+                        Logger.Info("Player",
+                            "Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration +
+                            "(" + Player.PlaybackRange + ")");
+                        beatCursor.Style.Transition = "all 0s linear";
+                        beatCursor.Style.TransitionDuration = duration + "ms";
+                        beatCursor.Style.Left = nextBeatX + "px";
+                    });
                 }
 
                 if (!_selecting)
@@ -1341,7 +1378,7 @@ namespace AlphaTab.Platform.JavaScript
                     // calculate position of whole music wheet within the scroll parent
                     var scrollElement = Browser.Document.QuerySelector(Settings.ScrollElement);
 
-                    var elementOffset = GetOffset(_element);
+                    var elementOffset = GetOffset(Element);
                     var nodeName = scrollElement.NodeName.ToLowerCase();
                     if (nodeName != "html" && nodeName != "body")
                     {
@@ -1459,8 +1496,8 @@ namespace AlphaTab.Platform.JavaScript
                 endBeat.Bounds = cache.FindBeat(endBeat.Beat);
             }
 
-            var startTick = startBeat.Beat.AbsoluteStart;
-            var endTick = endBeat.Beat.AbsoluteStart;
+            var startTick = startBeat.Beat.AbsolutePlaybackStart;
+            var endTick = endBeat.Beat.AbsolutePlaybackStart;
             if (endTick < startTick)
             {
                 var t = startBeat;

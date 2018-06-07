@@ -34,6 +34,11 @@ namespace AlphaTab.Rendering.Glyphs
 
         private static MusicFontSymbol GetSymbol(Duration duration, BeamDirection direction, bool isGrace)
         {
+            if (isGrace)
+            {
+                duration = Duration.Eighth;
+            }
+
             if (direction == BeamDirection.Up)
             {
                 switch (duration)

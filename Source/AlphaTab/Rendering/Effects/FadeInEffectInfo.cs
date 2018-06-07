@@ -27,7 +27,7 @@ namespace AlphaTab.Rendering.Effects
         public bool CanShareBand { get { return true; } }
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
 
-        public bool ShouldCreateGlyph(Beat beat)
+        public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
             return beat.FadeIn;
         }
@@ -37,7 +37,7 @@ namespace AlphaTab.Rendering.Effects
             return new FadeInGlyph(0, 0);
         }
 
-        public bool CanExpand(Beat @from, Beat to)
+        public bool CanExpand(Beat from, Beat to)
         {
             return true;
         }
