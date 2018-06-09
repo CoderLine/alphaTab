@@ -65,7 +65,7 @@ namespace AlphaTab.Rendering.Glyphs
         public void AddGlyph(int noteValue, bool quarterBend = false)
         {
             var sr = (ScoreBarRenderer)Renderer;
-            var noteHeadGlyph = new NoteHeadGlyph(0, 0, Duration.Quarter, true);
+            var noteHeadGlyph = new NoteHeadGlyph(0, 0, Duration.Quarter, sr.Settings.SmallGraceTabNotes);
             var accidental = sr.AccidentalHelper.ApplyAccidentalForValue(noteValue, quarterBend);
             var line = sr.AccidentalHelper.GetNoteLineForValue(noteValue);
             noteHeadGlyph.Y = sr.GetScoreY(line);

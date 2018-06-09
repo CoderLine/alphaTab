@@ -27488,7 +27488,7 @@ alphaTab.rendering.glyphs.BendNoteHeadGroupGlyph.prototype = $extend(alphaTab.re
 			quarterBend = false;
 		}
 		var sr = js.Boot.__cast(this.Renderer , alphaTab.rendering.ScoreBarRenderer);
-		var noteHeadGlyph = new alphaTab.rendering.glyphs.NoteHeadGlyph(0,0,4,true);
+		var noteHeadGlyph = new alphaTab.rendering.glyphs.NoteHeadGlyph(0,0,4,sr.get_Settings().SmallGraceTabNotes);
 		var accidental = sr.AccidentalHelper.ApplyAccidentalForValue(noteValue,quarterBend);
 		var line = sr.AccidentalHelper.GetNoteLineForValue(noteValue,false);
 		var this1 = line;
@@ -31329,7 +31329,7 @@ alphaTab.rendering.glyphs.TabWhammyBarGlyph.prototype = $extend(alphaTab.renderi
 				endBeat = null;
 				endNoteRenderer = null;
 			} else if(endBeat.IsContinuedWhammy || endNoteRenderer == startNoteRenderer) {
-				if(endBeat.get_HasWhammyBar()) {
+				if(endBeat.get_HasWhammyBar() && (startNoteRenderer.get_Settings().WhammyMode != 1 || endBeat.WhammyBarType != 3)) {
 					endXPositionType = 2;
 				} else {
 					endXPositionType = 0;
@@ -31351,6 +31351,10 @@ alphaTab.rendering.glyphs.TabWhammyBarGlyph.prototype = $extend(alphaTab.renderi
 			} else {
 				endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat,endXPositionType);
 			}
+			if(endXPositionType == 0) {
+				var subscale = startNoteRenderer.get_Settings().SmallGraceTabNotes ? 0.75 : 1;
+				endX = endX - (8 * this.get_Scale() * subscale - 2 * this.get_Scale());
+			}
 		}
 		var old = canvas.get_TextAlign();
 		canvas.set_TextAlign(1);
@@ -31364,17 +31368,19 @@ alphaTab.rendering.glyphs.TabWhammyBarGlyph.prototype = $extend(alphaTab.renderi
 				var firstPt = this._renderPoints[i];
 				var secondPt = this._renderPoints[i + 1];
 				var nextPt = i < j - 2 ? this._renderPoints[i + 2] : null;
+				var isFirst = i == 0;
 				if(i == 0 && firstPt.Value != 0 && !this._beat.IsContinuedWhammy) {
-					this.PaintWhammy(new alphaTab.model.BendPoint(0,0),firstPt,secondPt,startX,zeroY,dx,canvas);
+					this.PaintWhammy(false,new alphaTab.model.BendPoint(0,0),firstPt,secondPt,startX,zeroY,dx,canvas);
+					isFirst = false;
 				}
-				this.PaintWhammy(firstPt,secondPt,nextPt,startX,zeroY,dx,canvas);
+				this.PaintWhammy(isFirst,firstPt,secondPt,nextPt,startX,zeroY,dx,canvas);
 				++i;
 			}
 			canvas.Stroke();
 		}
 		canvas.set_TextAlign(old);
 	}
-	,PaintWhammy: function(firstPt,secondPt,nextPt,cx,cy,dx,canvas) {
+	,PaintWhammy: function(isFirst,firstPt,secondPt,nextPt,cx,cy,dx,canvas) {
 		var x1 = cx + dx * firstPt.Offset;
 		var x2 = cx + dx * secondPt.Offset;
 		var y1 = cy - this.GetOffset(firstPt.Value);
@@ -31415,37 +31421,45 @@ alphaTab.rendering.glyphs.TabWhammyBarGlyph.prototype = $extend(alphaTab.renderi
 			canvas.MoveTo(x1,y1);
 			canvas.LineTo(x2,y2);
 		}
+		var res = canvas.get_Resources();
+		if(isFirst && this.Renderer.get_Settings().ShowZeroOnDiveWhammy && !this._beat.IsContinuedWhammy && !this._isSimpleDip) {
+			var s = "0";
+			var y = y1;
+			y = y - (res.TablatureFont.Size + 2 * this.get_Scale());
+			canvas.FillText(s,x1,y);
+		}
 		var dV = Math.abs(secondPt.Value);
-		if((dV != 0 || this.Renderer.get_Settings().ShowZeroOnDiveWhammy) && firstPt.Value != secondPt.Value) {
-			var res = canvas.get_Resources();
-			var s = "";
+		if((dV != 0 || this.Renderer.get_Settings().ShowZeroOnDiveWhammy && !this._isSimpleDip) && firstPt.Value != secondPt.Value) {
+			var s1 = "";
 			if(secondPt.Value < 0) {
-				s = s + "-";
+				s1 = s1 + "-";
 			}
 			if(dV >= 4) {
 				var steps = dV / 4 | 0;
-				s = s + Std.string(steps);
+				s1 = s1 + Std.string(steps);
 				dV = dV - steps * 4;
+			} else if(dV == 0) {
+				s1 = s1 + "0";
 			}
 			if(dV > 0) {
-				s = s + alphaTab.rendering.glyphs.TabBendGlyph.GetFractionSign(dV);
+				s1 = s1 + alphaTab.rendering.glyphs.TabBendGlyph.GetFractionSign(dV);
 			}
-			var y;
+			var y3;
 			if(this._isSimpleDip) {
-				y = Math.min(y1,y2) - res.TablatureFont.Size - 2 * this.get_Scale();
+				y3 = Math.min(y1,y2) - res.TablatureFont.Size - 2 * this.get_Scale();
 			} else {
 				if(firstPt.Offset == secondPt.Offset) {
-					y = Math.min(y1,y2);
+					y3 = Math.min(y1,y2);
 				} else {
-					y = y2;
+					y3 = y2;
 				}
-				y = y - (res.TablatureFont.Size + 2 * this.get_Scale());
+				y3 = y3 - (res.TablatureFont.Size + 2 * this.get_Scale());
 				if(nextPt != null && nextPt.Value > secondPt.Value) {
-					y = y - 2 * this.get_Scale();
+					y3 = y3 - 2 * this.get_Scale();
 				}
 			}
 			var x = x2;
-			canvas.FillText(s,x,y);
+			canvas.FillText(s1,x,y3);
 		}
 	}
 	,__class__: alphaTab.rendering.glyphs.TabWhammyBarGlyph
