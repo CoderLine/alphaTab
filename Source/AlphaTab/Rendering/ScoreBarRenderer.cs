@@ -497,7 +497,7 @@ namespace AlphaTab.Rendering
         private void PaintFooter(float cx, float cy, ICanvas canvas, BeamingHelper h)
         {
             var beat = h.Beats[0];
-            if (beat.GraceType == GraceType.BendGrace)
+            if (beat.GraceType == GraceType.BendGrace || (beat.GraceType != GraceType.None && Settings.BendMode == BendMode.SongBook))
             {
                 return;
             }
@@ -515,7 +515,7 @@ namespace AlphaTab.Rendering
 
             var direction = h.Direction;
 
-            var topY = GetYPositionForNoteValue(h.MaxNoteValue);
+            var topY = beat.Notes.Count > 1 ? GetYPositionForNoteValue(h.MaxNoteValue) : GetYPositionForNoteValue(h.MinNoteValue);
             var bottomY = GetYPositionForNoteValue(h.MinNoteValue);
             float beamY;
             float fingeringY;

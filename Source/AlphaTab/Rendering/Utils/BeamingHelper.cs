@@ -131,6 +131,7 @@ namespace AlphaTab.Rendering.Utils
 
         public bool InvertBeamDirection { get; set; }
 
+        public bool IsGrace { get; set; }
 
         public BeamingHelper(Staff staff)
         {

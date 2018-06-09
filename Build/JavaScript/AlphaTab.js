@@ -25632,7 +25632,7 @@ alphaTab.rendering.ScoreBarRenderer.prototype = $extend(alphaTab.rendering.BarRe
 	}
 	,PaintFooter: function(cx,cy,canvas,h) {
 		var beat = h.Beats[0];
-		if(beat.GraceType == 3) {
+		if(beat.GraceType == 3 || beat.GraceType != 0 && this.get_Settings().BendMode == 1) {
 			return;
 		}
 		var isGrace = beat.GraceType != 0;
@@ -25640,7 +25640,7 @@ alphaTab.rendering.ScoreBarRenderer.prototype = $extend(alphaTab.rendering.BarRe
 		var stemSize = this.GetFooterStemSize(h.ShortestDuration);
 		var beatLineX = h.GetBeatLineX(beat) + this.get_Scale();
 		var direction = h.Direction;
-		var topY = this.GetYPositionForNoteValue(h.MaxNoteValue);
+		var topY = beat.Notes.length > 1 ? this.GetYPositionForNoteValue(h.MaxNoteValue) : this.GetYPositionForNoteValue(h.MinNoteValue);
 		var bottomY = this.GetYPositionForNoteValue(h.MinNoteValue);
 		var beamY;
 		var fingeringY;
@@ -32770,6 +32770,7 @@ alphaTab.rendering.utils.BeamingHelper = $hx_exports["alphaTab"]["rendering"]["u
 	this.MaxNoteValue = 0;
 	this.MaxNoteBeat = null;
 	this.InvertBeamDirection = false;
+	this.IsGrace = false;
 	this.Direction = 0;
 	this._staff = staff;
 	var this1 = [];
