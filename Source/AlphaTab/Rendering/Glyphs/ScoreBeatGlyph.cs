@@ -239,7 +239,7 @@ namespace AlphaTab.Rendering.Glyphs
                 }
                 if (value == 49 || value == 57)
                 {
-                    return new DiamondNoteHeadGlyph(0, 0, isGrace);
+                    return new DiamondNoteHeadGlyph(0, 0, n.Beat.Duration, isGrace);
                 }
                 if (value == 52)
                 {
@@ -262,7 +262,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             if (n.HarmonicType == HarmonicType.Natural)
             {
-                return new DiamondNoteHeadGlyph(0, 0, isGrace);
+                return new DiamondNoteHeadGlyph(0, 0, n.Beat.Duration, isGrace);
             }
             
             return new NoteHeadGlyph(0, 0, n.Beat.Duration, isGrace);
@@ -288,7 +288,7 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 // create harmonic note head. 
                 var harmonicFret = n.DisplayValue + n.HarmonicPitch;
-                noteHeadGlyph = new DiamondNoteHeadGlyph(0, 0, Container.Beat.GraceType != GraceType.None);
+                noteHeadGlyph = new DiamondNoteHeadGlyph(0, 0, n.Beat.Duration, Container.Beat.GraceType != GraceType.None);
                 line = sr.AccidentalHelper.GetNoteLineForValue(harmonicFret);
 
                 noteHeadGlyph.Y = sr.GetScoreY(line);

@@ -83,6 +83,7 @@ namespace AlphaTab.Model
         public FastList<Note> Notes { get; set; }
         public FastDictionary<int, Note> NoteStringLookup { get; set; }
         public bool IsEmpty { get; set; }
+        public BendStyle WhammyStyle { get; set; }
 
         public Ottavia Ottava { get; set; }
 
@@ -283,6 +284,7 @@ namespace AlphaTab.Model
             InvertBeamDirection = false;
             Ottava = Ottavia.Regular;
             NoteStringLookup = new FastDictionary<int, Note>();
+            WhammyStyle = BendStyle.Default;
         }
 
         public static void CopyTo(Beat src, Beat dst)
@@ -326,6 +328,7 @@ namespace AlphaTab.Model
             dst.WhammyBarType = src.WhammyBarType;
             dst.IsContinuedWhammy = src.IsContinuedWhammy;
             dst.Ottava = src.Ottava;
+            dst.WhammyStyle = src.WhammyStyle;
         }
 
         public Beat Clone()
@@ -613,6 +616,11 @@ namespace AlphaTab.Model
             // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all whammys
             if (WhammyBarPoints.Count > 0 && WhammyBarType == WhammyType.Custom)
             {
+                if (bendMode == BendMode.SongBook)
+                {
+                    WhammyStyle = isGradual ? BendStyle.Gradual : BendStyle.Fast;
+                }
+
                 var isContinuedWhammy = IsContinuedWhammy = PreviousBeat != null && PreviousBeat.HasWhammyBar;
                 if (WhammyBarPoints.Count == 4)
                 {

@@ -46,6 +46,8 @@ namespace AlphaTab.Rendering
         private const float LineSpacing = 8;
         private const float StemWidth = 1.3f;
 
+        public float SimpleWhammyOverflow { get; set; }
+
         public AccidentalHelper AccidentalHelper { get; set; }
 
         public ScoreBarRenderer(ScoreRenderer renderer, Bar bar)
@@ -114,6 +116,9 @@ namespace AlphaTab.Rendering
             var top = GetScoreY(0);
             var bottom = GetScoreY(8);
 
+            var whammyOffset = SimpleWhammyOverflow;
+            RegisterOverflowTop(whammyOffset);
+
             for (int i = 0, j = Helpers.BeamHelpers.Count; i < j; i++)
             {
                 var v = Helpers.BeamHelpers[i];
@@ -142,7 +147,7 @@ namespace AlphaTab.Rendering
 
                     if (maxNoteY < top)
                     {
-                        RegisterOverflowTop(Math.Abs(maxNoteY));
+                        RegisterOverflowTop(Math.Abs(maxNoteY) + whammyOffset);
                     }
 
                     //
@@ -163,6 +168,7 @@ namespace AlphaTab.Rendering
                 }
             }
         }
+
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {

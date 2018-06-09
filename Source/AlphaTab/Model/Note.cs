@@ -408,12 +408,7 @@ namespace AlphaTab.Model
         {
             get
             {
-                var noteValue = RealValue;
-
-                if (HarmonicType != HarmonicType.Natural && HarmonicType != HarmonicType.None)
-                {
-                    noteValue -= HarmonicPitch;
-                }
+                var noteValue = DisplayValueWithoutBend;
 
                 if (HasBend)
                 {
@@ -430,6 +425,25 @@ namespace AlphaTab.Model
                 else if (Beat.IsContinuedWhammy)
                 {
                     noteValue += Beat.PreviousBeat.WhammyBarPoints[Beat.PreviousBeat.WhammyBarPoints.Count - 1].Value / 2;
+                }
+
+
+                return noteValue;
+            }
+        }
+
+        /// <summary>
+        /// Gets the absolute value of this note considering all effects beside bends. 
+        /// </summary>
+        public int DisplayValueWithoutBend
+        {
+            get
+            {
+                var noteValue = RealValue;
+
+                if (HarmonicType != HarmonicType.Natural && HarmonicType != HarmonicType.None)
+                {
+                    noteValue -= HarmonicPitch;
                 }
 
                 switch (Beat.Ottava)

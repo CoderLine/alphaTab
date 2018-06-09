@@ -26,17 +26,19 @@ namespace AlphaTab.Rendering.Glyphs
     public class TabWhammyBarGlyph : Glyph
     {
         private const string TopOffsetSharedDataKey = "tab.whammy.topoffset";
-        private const int PerHalfSize = 6;
+        public const int PerHalfSize = 6;
         private const int DashSize = 3;
 
         private readonly Beat _beat;
         private FastList<BendPoint> _renderPoints;
+        private bool _isSimpleDip;
 
         public TabWhammyBarGlyph(Beat beat)
             : base(0, 0)
         {
             _beat = beat;
             _renderPoints = CreateRenderingPoints(beat);
+            _isSimpleDip = false;
         }
 
         private FastList<BendPoint> CreateRenderingPoints(Beat beat)
@@ -78,6 +80,9 @@ namespace AlphaTab.Rendering.Glyphs
         {
             base.DoLayout();
 
+            _isSimpleDip = Renderer.Settings.WhammyMode == WhammyMode.SongBook &&
+                           _beat.WhammyBarType == WhammyType.Dip;
+
             // 
             // Get the min and max values for all combined whammys
             BendPoint minValue = null;
@@ -90,6 +95,7 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     minValue = beat.MinWhammyPoint;
                 }
+
                 if (maxValue == null || maxValue.Value < beat.MaxWhammyPoint.Value)
                 {
                     maxValue = beat.MaxWhammyPoint;
@@ -119,6 +125,7 @@ namespace AlphaTab.Rendering.Glyphs
         private float GetOffset(int value)
         {
             if (value == 0) return 0;
+
             var offset = PerHalfSize * Scale + Platform.Platform.Log2(Math.Abs(value) / 2f) * PerHalfSize * Scale;
             if (value < 0)
             {
@@ -137,7 +144,12 @@ namespace AlphaTab.Rendering.Glyphs
             if (endBeat != null)
             {
                 endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, endBeat.Voice.Bar);
-                if (endBeat.IsContinuedWhammy || endNoteRenderer == startNoteRenderer || endNoteRenderer.Staff != startNoteRenderer.Staff)
+                if (endNoteRenderer == null || endNoteRenderer.Staff != startNoteRenderer.Staff)
+                {
+                    endBeat = null;
+                    endNoteRenderer = null;
+                }
+                else if (endBeat.IsContinuedWhammy || endNoteRenderer == startNoteRenderer)
                 {
                     endXPositionType = endBeat.HasWhammyBar
                         ? BeatXPosition.MiddleNotes
@@ -150,11 +162,25 @@ namespace AlphaTab.Rendering.Glyphs
                 }
             }
 
-            float startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_beat, BeatXPosition.MiddleNotes);
-            float endX = endNoteRenderer == null
-                ? cx + startNoteRenderer.X + startNoteRenderer.Width - ScoreHelperNotesBaseGlyph.EndPadding * Scale
-                : cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat, endXPositionType);
-            
+            float startX;
+            float endX;
+
+            if (_isSimpleDip)
+            {
+                startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_beat, BeatXPosition.OnNotes) 
+                         - ScoreWhammyBarGlyph.SimpleDipPadding * Scale;
+                endX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_beat, BeatXPosition.PostNotes) 
+                         + ScoreWhammyBarGlyph.SimpleDipPadding * Scale;
+            }
+            else
+            {
+                startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_beat, BeatXPosition.MiddleNotes);
+                endX = endNoteRenderer == null
+                    ? cx + startNoteRenderer.X + startNoteRenderer.Width - ScoreHelperNotesBaseGlyph.EndPadding * Scale
+                    : cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat, endXPositionType);
+            }
+
+
             var old = canvas.TextAlign;
             canvas.TextAlign = TextAlign.Center;
             if (_renderPoints.Count >= 2)
@@ -246,7 +272,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             var dV = Math.Abs(secondPt.Value);
-            if (dV != 0 && firstPt.Value != secondPt.Value)
+            if ((dV != 0 || Renderer.Settings.ShowZeroOnDiveWhammy) && firstPt.Value != secondPt.Value)
             {
                 var res = canvas.Resources;
 
@@ -269,12 +295,22 @@ namespace AlphaTab.Rendering.Glyphs
                     s += TabBendGlyph.GetFractionSign(dV);
                 }
 
-                var y = firstPt.Offset == secondPt.Offset ? Math.Min(y1, y2) : y2;
-                y -= res.TablatureFont.Size + (2 * Scale);
-                if (nextPt != null && nextPt.Value > secondPt.Value)
+                float y;
+
+                if (_isSimpleDip)
                 {
-                    y -= (2 * Scale);
+                    y = Math.Min(y1, y2) - res.TablatureFont.Size - (2 * Scale);
                 }
+                else
+                {
+                    y = firstPt.Offset == secondPt.Offset ? Math.Min(y1, y2) : y2;
+                    y -= res.TablatureFont.Size + (2 * Scale);
+                    if (nextPt != null && nextPt.Value > secondPt.Value)
+                    {
+                        y -= (2 * Scale);
+                    }
+                }
+                
                 var x = x2;
 
                 canvas.FillText(s, x, y);

@@ -42,7 +42,7 @@ namespace AlphaTab.Rendering.Glyphs
                             case BendType.PrebendBend:
                             case BendType.Prebend:
                             case BendType.PrebendRelease:
-                                _prebends.AddGlyph(note.RealValue);
+                                _prebends.AddGlyph(note.DisplayValue - note.BendPoints[0].Value / 2);
                                 break;
                         }
                     }
@@ -52,7 +52,7 @@ namespace AlphaTab.Rendering.Glyphs
                         {
                             case WhammyType.PrediveDive:
                             case WhammyType.Predive:
-                                _prebends.AddGlyph(note.RealValue);
+                                _prebends.AddGlyph(note.DisplayValue - note.Beat.WhammyBarPoints[0].Value / 2);
                                 break;
                         }
                     }

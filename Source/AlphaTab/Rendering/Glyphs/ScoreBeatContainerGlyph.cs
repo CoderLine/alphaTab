@@ -73,12 +73,12 @@ namespace AlphaTab.Rendering
 
             // NOTE: we create 2 tie glyphs if we have a line break inbetween 
             // the two notes
-            if (n.IsTieOrigin && !n.HasBend) 
+            if (n.IsTieOrigin && !n.HasBend && !n.Beat.HasWhammyBar) 
             {
                 var tie = new ScoreTieGlyph(n, n.TieDestination);
                 Ties.Add(tie);
             }
-            if (n.IsTieDestination && !n.TieOrigin.HasBend)
+            if (n.IsTieDestination && !n.TieOrigin.HasBend && !n.Beat.HasWhammyBar)
             {
                 var tie = new ScoreTieGlyph(n.TieOrigin, n, true);
                 Ties.Add(tie);

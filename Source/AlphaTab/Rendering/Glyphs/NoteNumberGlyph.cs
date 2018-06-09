@@ -67,7 +67,8 @@ namespace AlphaTab.Rendering.Glyphs
                     _noteString = "<" + _noteString + ">";
                 }
             }
-            else if (n.Beat.Index == 0 || (n.BendType == BendType.Bend && Renderer.Settings.ShowTabNoteOnTiedBend && n.IsTieOrigin))
+            else if ((n.Beat.Index == 0 || (n.BendType == BendType.Bend && Renderer.Settings.ShowTabNoteOnTiedBend && n.IsTieOrigin)) &&
+                     (!Renderer.Settings.ShowTabNoteOnTiedBend || !n.Beat.HasWhammyBar))
             {
                 _noteString = "(" + (n.TieOrigin.Fret - n.Beat.Voice.Bar.Staff.TranspositionPitch) + ")";
             }

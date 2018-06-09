@@ -15,16 +15,33 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using AlphaTab.Model;
+
 namespace AlphaTab.Rendering.Glyphs
 {
     public class DiamondNoteHeadGlyph : MusicFontGlyph
     {
         private readonly bool _isGrace;
 
-        public DiamondNoteHeadGlyph(float x, float y, bool isGrace)
-            : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, MusicFontSymbol.NoteHarmonic)
+        public DiamondNoteHeadGlyph(float x, float y, Duration duration, bool isGrace)
+            : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, GetSymbol(duration))
         {
             _isGrace = isGrace;
+        }
+
+        private static MusicFontSymbol GetSymbol(Duration duration)
+        {
+            switch (duration)
+            {
+                case Duration.QuadrupleWhole:
+                case Duration.DoubleWhole:
+                case Duration.Whole:
+                case Duration.Half:
+                    return MusicFontSymbol.NoteHarmonicWhole;
+                default:
+                    return MusicFontSymbol.NoteHarmonic;
+            }
         }
 
         public override void DoLayout()

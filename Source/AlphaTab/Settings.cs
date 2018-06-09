@@ -43,6 +43,25 @@ namespace AlphaTab
     }
 
     /// <summary>
+    /// Lists all modes on how whammy bars should be handled.
+    /// </summary>
+    public enum WhammyMode
+    {
+        /// <summary>
+        /// Whammy Bars will be displayed and played as in GuitarPro.
+        /// </summary>
+        GuitarPro,
+        /// <summary>
+        /// Whammy Bars will be displayed and played in a traditional SongBook manner. 
+        /// - Dips are shown as simple annotation over the beats
+        /// Whammy Bars are categorized into gradual and fast. 
+        /// - Gradual whammys are indicated by beat text "grad" or "grad.". Whammys will sound along the beat duration. 
+        /// - Fast whammys are done right the beat. 
+        /// </summary>
+        SongBook
+    }
+
+    /// <summary>
     /// Lists all modes on how fingerings should be displayed.
     /// </summary>
     public enum FingeringMode
@@ -160,9 +179,19 @@ namespace AlphaTab
         public BendMode BendMode { get; set; }
 
         /// <summary>
+        /// Gets or sets the whammy mode to use for display and playback of whammys. 
+        /// </summary>
+        public WhammyMode WhammyMode { get; set; }
+
+        /// <summary>
         /// Gets or sets the fingering mode to use. 
         /// </summary>
         public FingeringMode FingeringMode { get; set; }
+
+        /// <summary>
+        /// If set to true, 0 is shown on dive whammy bars. 
+        /// </summary>
+        public bool ShowZeroOnDiveWhammy{ get; set; }
 
         public static Settings Defaults
         {
@@ -181,7 +210,9 @@ namespace AlphaTab
                 settings.ShowParenthesisForTiedBends = true;
                 settings.ShowTabNoteOnTiedBend = true;
                 settings.BendMode = BendMode.GuitarPro;
+                settings.WhammyMode = WhammyMode.GuitarPro;
                 settings.FingeringMode = FingeringMode.Score;
+                settings.ShowZeroOnDiveWhammy = false;
 
                 settings.ImporterSettings = new FastDictionary<string, object>();
 

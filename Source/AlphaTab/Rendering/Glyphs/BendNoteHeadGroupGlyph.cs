@@ -42,6 +42,11 @@ namespace AlphaTab.Rendering.Glyphs
             return 0;
         }
 
+        public bool ContainsNoteValue(int noteValue)
+        {
+            return _noteValueLookup.ContainsKey(noteValue);
+        }
+
         public float GetNoteX(int noteValue, bool onMiddle = true)
         {
             if (_noteValueLookup.ContainsKey(noteValue))
@@ -143,5 +148,6 @@ namespace AlphaTab.Rendering.Glyphs
 
             base.Paint(cx, cy, canvas);
         }
+
     }
 }

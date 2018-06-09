@@ -199,6 +199,8 @@ namespace AlphaTab
             json.showTabNoteOnTiedBend = ShowTabNoteOnTiedBend;
             json.bendMode = BendMode;
             json.fingeringMode = FingeringMode;
+            json.showZeroOnDiveWhammy = ShowZeroOnDiveWhammy;
+            json.whammyMode = WhammyMode;
 
             json.scriptFile = ScriptFile;
             json.fontDirectory = FontDirectory;
@@ -397,6 +399,15 @@ namespace AlphaTab
                 settings.BendMode = DecodeBendMode(dataAttributes["bendMode"]);
             }
 
+            if (Platform.Platform.JsonExists(json, "whammyMode"))
+            {
+                settings.WhammyMode = DecodeWhammyMode(json.whammyMode);
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("whammyMode"))
+            {
+                settings.WhammyMode = DecodeWhammyMode(dataAttributes["whammyMode"]);
+            }
+
             if (Platform.Platform.JsonExists(json, "fingeringMode"))
             {
                 settings.FingeringMode = DecodeFingeringMode(json.fingeringMode);
@@ -431,6 +442,15 @@ namespace AlphaTab
             else if (dataAttributes != null && dataAttributes.ContainsKey("showTabNoteOnTiedBend"))
             {
                 settings.ShowTabNoteOnTiedBend = (bool)dataAttributes["showTabNoteOnTiedBend"];
+            }
+
+            if (Platform.Platform.JsonExists(json, "showZeroOnDiveWhammy"))
+            {
+                settings.ShowZeroOnDiveWhammy = json.showZeroOnDiveWhammy;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("showZeroOnDiveWhammy"))
+            {
+                settings.ShowZeroOnDiveWhammy = (bool)dataAttributes["showZeroOnDiveWhammy"];
             }
 
             if (Platform.Platform.JsonExists(json, "layout"))
@@ -532,6 +552,28 @@ namespace AlphaTab
             }
 
             return BendMode.GuitarPro;
+        }
+
+        private static WhammyMode DecodeWhammyMode(object mode)
+        {
+            if (Platform.Platform.TypeOf(mode) == "number")
+            {
+                return (WhammyMode)mode;
+            }
+
+            if (Platform.Platform.TypeOf(mode) == "string")
+            {
+                var s = (string)mode;
+                switch (s.ToLower())
+                {
+                    case "songbook":
+                        return WhammyMode.SongBook;
+                    case "guitarpro":
+                        return WhammyMode.GuitarPro;
+                }
+            }
+
+            return WhammyMode.GuitarPro;
         }
 
         private static FingeringMode DecodeFingeringMode(object mode)

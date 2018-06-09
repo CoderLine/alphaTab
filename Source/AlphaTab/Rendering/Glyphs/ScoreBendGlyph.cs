@@ -193,12 +193,12 @@ namespace AlphaTab.Rendering.Glyphs
                         case BendType.PrebendRelease:
                             var preX = cx + startNoteRenderer.X +
                                        startNoteRenderer.GetBeatX(note.Beat, BeatXPosition.PreNotes);
-                            preX += ((ScoreBeatPreNotesGlyph) startNoteRenderer.GetBeatContainer(note.Beat).PreNotes)
+                            preX += ((ScoreBeatPreNotesGlyph)startNoteRenderer.GetBeatContainer(note.Beat).PreNotes)
                                 .PrebendNoteHeadOffset;
 
                             var preY = cy + startNoteRenderer.Y +
                                        startNoteRenderer.GetScoreY(
-                                           startNoteRenderer.AccidentalHelper.GetNoteLineForValue(note.RealValue)) +
+                                           startNoteRenderer.AccidentalHelper.GetNoteLineForValue(note.DisplayValue - note.BendPoints[0].Value / 2)) +
                                        heightOffset;
 
                             DrawBendSlur(canvas, preX, preY, startX, startY, direction == BeamDirection.Down, Scale);
@@ -248,12 +248,12 @@ namespace AlphaTab.Rendering.Glyphs
 
                             var preX = cx + startNoteRenderer.X +
                                        startNoteRenderer.GetBeatX(note.Beat, BeatXPosition.PreNotes);
-                            preX += ((ScoreBeatPreNotesGlyph) startNoteRenderer.GetBeatContainer(note.Beat).PreNotes)
+                            preX += ((ScoreBeatPreNotesGlyph)startNoteRenderer.GetBeatContainer(note.Beat).PreNotes)
                                 .PrebendNoteHeadOffset;
 
                             var preY = cy + startNoteRenderer.Y +
                                        startNoteRenderer.GetScoreY(
-                                           startNoteRenderer.AccidentalHelper.GetNoteLineForValue(note.RealValue)) +
+                                           startNoteRenderer.AccidentalHelper.GetNoteLineForValue(note.DisplayValue - note.BendPoints[0].Value / 2)) +
                                        heightOffset;
 
                             DrawBendSlur(canvas, preX, preY, startX, startY, direction == BeamDirection.Down, Scale);
@@ -275,7 +275,7 @@ namespace AlphaTab.Rendering.Glyphs
         private int GetBendNoteValue(Note note, BendPoint bendPoint)
         {
             // NOTE: bendpoints are in 1/4 tones, but the note values are in 1/2 notes. 
-            return note.RealValue + bendPoint.Value / 2;
+            return note.DisplayValueWithoutBend + bendPoint.Value / 2;
         }
 
     }

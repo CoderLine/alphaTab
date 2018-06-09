@@ -65,6 +65,7 @@ namespace AlphaTab.Rendering.Glyphs
         NoteQuarter = 0xE0A4,
         NoteDead = 0xE0AA,
         NoteHarmonic = 0xE0DC,
+        NoteHarmonicWhole = 0xE0DE,
         NoteRideCymbal = 0xE0DE,
         NoteHiHat = 0xE0B3,
         NoteSideStick = 0xE0A9,
