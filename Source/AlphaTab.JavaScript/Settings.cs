@@ -669,7 +669,10 @@ namespace AlphaTab
                 var root = new StringBuilder();
                 root.Append(global.location.protocol);
                 root.Append("//");
-                root.Append(global.location.hostName);
+                if (global.location.hostName)
+                {
+                    root.Append(global.location.hostName);
+                }
                 if (global.location.port)
                 {
                     root.Append(":");

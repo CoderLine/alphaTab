@@ -42,7 +42,7 @@
     <PackageReference Include="Xamarin.Forms" Version="2.3.4.231" PrivateAssets="All" />
   </ItemGroup>
 
-  <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" />
+  <Import Project="..\AlphaTab\AlphaTab.Shared.projitems" Label="Shared" />
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)Build\CSharp\$(TargetFramework)\ /Y&#xD;&#xA;xcopy $(OutDir)$(TargetName).pdb $(SolutionDir)Build\CSharp\$(TargetFramework)\ /Y&#xD;&#xA;xcopy $(OutDir)$(TargetName).xml $(SolutionDir)Build\CSharp\$(TargetFramework)\ /Y" />

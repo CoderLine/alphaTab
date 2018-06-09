@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <PackageId>AlphaTab.JavaScript</PackageId>
     <RootNamespace>AlphaTab</RootNamespace>
     <AssemblyName>AlphaTab.JavaScript</AssemblyName>
     <TargetFramework>net471</TargetFramework>
@@ -20,7 +21,7 @@
     </Reference>
   </ItemGroup>
 
-  <Import Project="..\AlphaTab\AlphaTab.projitems" Label="Shared" />
+  <Import Project="..\AlphaTab\AlphaTab.Shared.projitems" Label="Shared" />
   
   <Import Project="..\..\Phase\Compiler\Phase.Build.targets" />
 

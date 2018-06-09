@@ -6916,7 +6916,9 @@ alphaTab.Settings.EnsureFullUrl = function(relativeUrl) {
 		var root = this1;
 		root += Std.string(global.location.protocol);
 		root += Std.string("//");
-		root += Std.string(global.location.hostName);
+		if(global.location.hostName) {
+			root += Std.string(global.location.hostName);
+		}
 		if(global.location.port) {
 			root += Std.string(":");
 			root += Std.string(global.location.port);

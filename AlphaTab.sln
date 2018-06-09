@@ -32,13 +32,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaTab.CSharp", "Source\A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{4642B107-04FE-4777-AA50-667A6A7E6C09}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "AlphaTab", "Source\AlphaTab\AlphaTab.shproj", "{8083B3BC-0681-47F2-9FBF-A5C96107F538}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AlphaTab.Samples.Player", "Samples\CSharp\AlphaTab.Samples.Player\AlphaTab.Samples.Player.csproj", "{52B2CA3F-0CCF-45E2-96C6-223F6CE01070}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "AlphaTab.Shared", "Source\AlphaTab\AlphaTab.Shared.shproj", "{8083B3BC-0681-47F2-9FBF-A5C96107F538}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Source\AlphaTab\AlphaTab.projitems*{8083b3bc-0681-47f2-9fbf-a5c96107f538}*SharedItemsImports = 13
+		Source\AlphaTab\AlphaTab.Shared.projitems*{8083b3bc-0681-47f2-9fbf-a5c96107f538}*SharedItemsImports = 13
 		Source\AlphaTab.Test\AlphaTab.Test.projitems*{ce43d0c5-8a17-4f8f-9623-3a7a52ad02f4}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
