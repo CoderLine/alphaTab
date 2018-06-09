@@ -26,6 +26,7 @@ namespace AlphaTab.Platform.Svg
     {
         public override void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)
         {
+            if (symbol == MusicFontSymbol.None) return;
             Buffer.Append("<g transform=\"translate(" + ((int) x - BlurCorrection) + " " + ((int) y - BlurCorrection) + ")\" class=\"at\" ><text");
             if (scale != 1)
             {

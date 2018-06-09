@@ -92,6 +92,7 @@ namespace AlphaTab.Rendering.Utils
 
         private readonly FastDictionary<int, int> _appliedScoreLines;
         private readonly FastDictionary<int, int> _appliedScoreLinesByValue;
+        private readonly FastDictionary<int, Note> _notesByValue;
 
         public AccidentalHelper(Bar bar)
         {
@@ -99,6 +100,7 @@ namespace AlphaTab.Rendering.Utils
             _registeredAccidentals = new FastDictionary<int, bool>();
             _appliedScoreLines = new FastDictionary<int, int>();
             _appliedScoreLinesByValue = new FastDictionary<int, int>();
+            _notesByValue = new FastDictionary<int, Note>();
         }
 
         /// <summary>
@@ -185,6 +187,7 @@ namespace AlphaTab.Rendering.Utils
         {
             var steps = CalculateNoteLine(noteValue, n.AccidentalMode);
             _appliedScoreLines[n.Id] = steps;
+            _notesByValue[noteValue] = n;
             return steps;
         }
 
@@ -200,7 +203,7 @@ namespace AlphaTab.Rendering.Utils
             var staff = _bar.Staff;
             var value = staff.StaffKind == StaffKind.Percussion 
                 ? PercussionMapper.MapNoteForDisplay(noteValue) 
-                : noteValue - staff.DisplayTranspositionPitch;
+                : noteValue;
             var ks = _bar.MasterBar.KeySignature;
             var clef = _bar.Clef;
 
@@ -245,15 +248,20 @@ namespace AlphaTab.Rendering.Utils
             return _appliedScoreLines[n.Id];
         }
 
-        public int GetNoteLineForValue(int rawValue)
+        public int GetNoteLineForValue(int rawValue, bool searchForNote = false)
         {
             if (_appliedScoreLinesByValue.ContainsKey(rawValue))
             {
                 return _appliedScoreLinesByValue[rawValue];
             }
+
+            if (searchForNote && _notesByValue.ContainsKey(rawValue))
+            {
+                return GetNoteLine(_notesByValue[rawValue]);
+            }
             else
             {
-                return int.MinValue;
+                return 0;
             }
         }
     }

@@ -99,6 +99,13 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 accidentals.AddGlyph(new AccidentalGlyph(0, sr.GetScoreY(noteLine), accidental, isGrace));
             }
+            if (n.HarmonicType != HarmonicType.None && n.HarmonicType != HarmonicType.Natural)
+            {
+                var harmonicFret = n.DisplayValue + n.HarmonicPitch;
+                accidental = sr.AccidentalHelper.ApplyAccidentalForValue(harmonicFret, isGrace);
+                noteLine = sr.AccidentalHelper.GetNoteLineForValue(harmonicFret);
+                accidentals.AddGlyph(new AccidentalGlyph(0, sr.GetScoreY(noteLine), accidental, isGrace));
+            }
         }
     }
 }

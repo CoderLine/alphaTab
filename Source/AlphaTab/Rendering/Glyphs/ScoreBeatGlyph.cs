@@ -260,16 +260,11 @@ namespace AlphaTab.Rendering.Glyphs
                 return new NoteHeadGlyph(0, 0, Duration.Quarter, true);
             }
 
-            //if (n.HarmonicType == HarmonicType.Natural)
-            //{
-            //    return new DiamondNoteHeadGlyph(0, 0, isGrace); 
-            //}
-
-            if (n.HarmonicType != HarmonicType.None)
+            if (n.HarmonicType == HarmonicType.Natural)
             {
                 return new DiamondNoteHeadGlyph(0, 0, isGrace);
             }
-
+            
             return new NoteHeadGlyph(0, 0, n.Beat.Duration, isGrace);
         }
 
@@ -289,18 +284,16 @@ namespace AlphaTab.Rendering.Glyphs
             noteHeadGlyph.Y = sr.GetScoreY(line);
             NoteHeads.AddNoteGlyph(noteHeadGlyph, n, line);
 
-            //if (n.HarmonicType != HarmonicType.None && n.HarmonicType != HarmonicType.Natural)
-            //{
-            //    // create harmonic note head. 
-            //    var harmonicFret = n.RealValue;
-            //    noteHeadGlyph = new DiamondNoteHeadGlyph(0, 0, Container.Beat.GraceType != GraceType.None);
-            //    // TODO: render accidental
-            //    var accidental = sr.AccidentalHelper.ApplyAccidentalForValue(harmonicFret, false);
-            //    line = sr.AccidentalHelper.GetNoteLineForValue(harmonicFret);
+            if (n.HarmonicType != HarmonicType.None && n.HarmonicType != HarmonicType.Natural)
+            {
+                // create harmonic note head. 
+                var harmonicFret = n.DisplayValue + n.HarmonicPitch;
+                noteHeadGlyph = new DiamondNoteHeadGlyph(0, 0, Container.Beat.GraceType != GraceType.None);
+                line = sr.AccidentalHelper.GetNoteLineForValue(harmonicFret);
 
-            //    noteHeadGlyph.Y = sr.GetScoreY(line);
-            //    NoteHeads.AddNoteGlyph(noteHeadGlyph, n, line);
-            //}
+                noteHeadGlyph.Y = sr.GetScoreY(line);
+                NoteHeads.AddNoteGlyph(noteHeadGlyph, n, line);
+            }
 
             if (n.IsStaccato && !NoteHeads.BeatEffects.ContainsKey("Staccato"))
             {

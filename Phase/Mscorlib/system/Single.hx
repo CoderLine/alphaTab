@@ -32,6 +32,9 @@ abstract Single(Float) from Float from Int
 	public inline function ToString() : CsString return Std.string(this);
 	public function GetHashCode() : system.Int32 return system.Convert.ToHashCode_Single(this);
 	
+	public static var NaN(get, never) : system.Single;
+	public static inline function get_NaN() : system.Single return Math.NaN;
+	public static inline function IsNaN(v:system.Single) : system.Boolean return Math.isNaN(v.ToHaxeFloat());
 	
 	@:op(-A) public inline function neg() : system.Single return -this;
 

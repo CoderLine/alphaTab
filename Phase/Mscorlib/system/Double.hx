@@ -31,10 +31,12 @@ abstract Double(Float) from Float from Int
 	public inline function ToSingle_IFormatProvider(provider:IFormatProvider) : system.Single return system.Convert.ToSingle_Double(this);
 	public inline function ToDouble_IFormatProvider(provider:IFormatProvider) : system.Double return system.Convert.ToDouble_Double(this);
 	
-	public static inline function IsNaN(v:system.Double) : system.Boolean return Math.isNaN(v.ToHaxeFloat());
-
 	public function GetHashCode() : system.Int32 return system.Convert.ToHashCode_Double(this);
 		
+	public static var NaN(get, never) : system.Double;
+	public static inline function get_NaN() : system.Double return Math.NaN;
+	public static inline function IsNaN(v:system.Double) : system.Boolean return Math.isNaN(v.ToHaxeFloat());
+	
 	@:op(-A) public inline function neg() : system.Double return -this;
 
     @:op(A++) public inline function postinc() : system.Double return this++;

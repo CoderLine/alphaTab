@@ -58,6 +58,12 @@ namespace AlphaTab.Rendering.Glyphs
                 }
                 else if (n.HarmonicType == HarmonicType.Natural)
                 {
+                    // only first decimal char
+                    var i = _noteString.IndexOf('.');
+                    if (i >= 0)
+                    {
+                        _noteString = _noteString.Substring(0, i + 2);
+                    }
                     _noteString = "<" + _noteString + ">";
                 }
             }

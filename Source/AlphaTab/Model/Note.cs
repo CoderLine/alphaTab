@@ -281,12 +281,7 @@ namespace AlphaTab.Model
                 if (IsStringed)
                 {
                     var noteValue = Fret + StringTuning - Beat.Voice.Bar.Staff.TranspositionPitch;
-
-                    if (IsStringed)
-                    {
-                        noteValue += HarmonicPitch;
-                    }
-
+                    noteValue += HarmonicPitch;
                     return noteValue;
                 }
                 if (IsPiano)
@@ -302,93 +297,103 @@ namespace AlphaTab.Model
         {
             get
             {
-                var value = HarmonicValue;
-                switch (HarmonicType)
-                {
-                    case HarmonicType.Natural:
-                        // add semitones to reach corresponding harmonic frets
-                        if (value.IsAlmostEqualTo(2.7f))
-                        {
-                            // Fret 3 2nd octave + minor seventh
-                            return 34 - Fret;
-                        }
-                        else if (value < 3)
-                        {
-                            // no natural harmonics below fret 3
-                            return 0;
-                        }
-                        else if (value <= 3 /*2.7*/)
-                        {
-                            // Fret 3 2nd octave + minor seventh
-                            return 34 - Fret;
-                        }
-                        else if (value <= 3.5 /*3.2*/)
-                        {
-                            // Fret 3 2nd octave + fifth
-                            return 31 - Fret;
-                        }
-                        else if (value <= 4)
-                        {
-                            return 28 - Fret;
-                        }
-                        else if (value <= 5)
-                        {
-                            return 24 - Fret;
-                        }
-                        else if (value <= 6 /* 5.8 */)
-                        {
-                            return 34 - Fret;
-                        }
-                        else if (value <= 7)
-                        {
-                            return 22 - Fret;
-                        }
-                        else if (value <= 8.5 /*8.2*/)
-                        {
-                            return 36 - Fret;
-                        }
-                        else if (value <= 9)
-                        {
-                            return 28 - Fret;
-                        }
-                        else if (value <= 10 /*9.6*/)
-                        {
-                            return 34 - Fret;
-                        }
-                        else if (value < 14)
-                        {
-                            // fret 11,12,13,14 stay
-                            return 0;
-                        }
-                        else if (value <= 15 /*14.7*/)
-                        {
-                            return 34 - Fret;
-                        }
-                        else if (value <= 16)
-                        {
-                            return 28 - Fret;
-                        }
-                        else if (value <= 17)
-                        {
-                            return 36 - Fret;
-                        }
-                        else if (value <= 21)
-                        {
-                            // fret 18,19,20,21 stay
-                            return 0;
-                        }
-                        else if (value <= 22 /* 21.7 */)
-                        {
-                            return 36 - Fret;
-                        }
+                if (HarmonicType == HarmonicType.None || !IsStringed) return 0;
 
-                        return 0;
-                    case HarmonicType.Artificial:
-                    case HarmonicType.Feedback:
-                    case HarmonicType.Pinch:
-                    case HarmonicType.Semi:
-                    case HarmonicType.Tap:
-                        break;
+                var value = HarmonicValue;
+
+                // add semitones to reach corresponding harmonic frets
+                if (value.IsAlmostEqualTo(2.4f))
+                {
+                    return 36 - Fret;
+                }
+                else if (value.IsAlmostEqualTo(2.7f))
+                {
+                    // Fret 3 2nd octave + minor seventh
+                    return 34 - Fret;
+                }
+                else if (value < 3)
+                {
+                    // no natural harmonics below fret 3
+                    return 0;
+                }
+                else if (value <= 3.5 /*3.2*/)
+                {
+                    // Fret 3 2nd octave + fifth
+                    return 31 - Fret;
+                }
+                else if (value <= 4)
+                {
+                    return 28 - Fret;
+                }
+                else if (value <= 5)
+                {
+                    return 24 - Fret;
+                }
+                else if (value <= 6 /* 5.8 */)
+                {
+                    return 34 - Fret;
+                }
+                else if (value <= 7)
+                {
+                    return 19 - Fret;
+                }
+                else if (value <= 8.5 /*8.2*/)
+                {
+                    return 36 - Fret;
+                }
+                else if (value <= 9)
+                {
+                    return 28 - Fret;
+                }
+                else if (value <= 10 /*9.6*/)
+                {
+                    return 34 - Fret;
+                }
+                else if (value <= 11)
+                {
+                    return 0;
+                }
+                else if (value <= 12)
+                {
+                    return 12 - Fret;
+                }
+                else if (value < 14)
+                {
+                    // fret 13,14 stay
+                    return 0;
+                }
+                else if (value <= 15 /*14.7*/)
+                {
+                    return 34 - Fret;
+                }
+                else if (value <= 16)
+                {
+                    return 28 - Fret;
+                }
+                else if (value <= 17)
+                {
+                    return 36 - Fret;
+                }
+                else if (value <= 18)
+                {
+                    return 0;
+                }
+                else if (value <= 19)
+                {
+                    return 19 - Fret;
+                }
+                else if (value <= 21)
+                {
+                    //  20,21 stay
+                    return 0;
+                }
+                else if (value <= 22 /* 21.7 */)
+                {
+                    return 36 - Fret;
+                }
+                else if (value <= 24)
+                {
+                    return 24 - Fret;
                 }
 
                 return 0;
@@ -404,6 +409,12 @@ namespace AlphaTab.Model
             get
             {
                 var noteValue = RealValue;
+
+                if (HarmonicType != HarmonicType.Natural && HarmonicType != HarmonicType.None)
+                {
+                    noteValue -= HarmonicPitch;
+                }
+
                 if (HasBend)
                 {
                     noteValue += BendPoints[0].Value / 2;
@@ -457,7 +468,7 @@ namespace AlphaTab.Model
                         break;
                 }
 
-                return noteValue;
+                return noteValue - Beat.Voice.Bar.Staff.DisplayTranspositionPitch;
             }
         }
 

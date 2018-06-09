@@ -123,19 +123,7 @@ namespace AlphaTab.Rendering
                     //
                     // max note (highest) -> top overflow
                     // 
-                    var maxNoteY = GetScoreY(GetNoteLine(h.MaxNote));
-                    {
-                        var maxNoteLineValue = AccidentalHelper.GetNoteLineForValue(h.MaxNoteValue);
-                        if (maxNoteLineValue != int.MinValue)
-                        {
-                            var maxNoteValueY = GetScoreY(maxNoteLineValue);
-                            if (maxNoteValueY < maxNoteY)
-                            {
-                                maxNoteY = maxNoteValueY;
-                            }
-                        }
-                    }
-
+                    var maxNoteY = GetYPositionForNoteValue(h.MaxNoteValue);
 
                     if (h.Direction == BeamDirection.Up)
                     {
@@ -159,19 +147,7 @@ namespace AlphaTab.Rendering
 
                     //
                     // min note (lowest) -> bottom overflow
-                    //t
-                    var minNoteY = GetScoreY(GetNoteLine(h.MinNote));
-                    {
-                        var minNoteValueLine = AccidentalHelper.GetNoteLineForValue(h.MinNoteValue);
-                        if (minNoteValueLine != int.MinValue)
-                        {
-                            var minNoteValueY = GetScoreY(minNoteValueLine);
-                            if (minNoteValueY > minNoteY)
-                            {
-                                minNoteY = minNoteValueY;
-                            }
-                        }
-                    }
+                    var minNoteY = GetYPositionForNoteValue(h.MinNoteValue);
 
 
                     if (h.Direction == BeamDirection.Down)
@@ -386,9 +362,9 @@ namespace AlphaTab.Rendering
             return GetScoreY(size);
         }
 
-        public float GetYPositionForNote(Note note)
+        public float GetYPositionForNoteValue(int noteValue)
         {
-            return GetScoreY(GetNoteLine(note));
+            return GetScoreY(AccidentalHelper.GetNoteLineForValue(noteValue, true));
         }
 
         private float CalculateBeamY(BeamingHelper h, float x)
@@ -419,9 +395,9 @@ namespace AlphaTab.Rendering
                 var direction = h.Direction;
 
                 var y1 = cy + Y;
-                y1 += (direction == BeamDirection.Up
-                            ? GetScoreY(GetNoteLine(beat.MinNote))
-                            : GetScoreY(GetNoteLine(beat.MaxNote)));
+                y1 += direction == BeamDirection.Up
+                    ? GetYPositionForNoteValue(h.GetBeatMinValue(beat))
+                    : GetYPositionForNoteValue(h.GetBeatMaxValue(beat));
 
                 var y2 = cy + Y;
                 y2 += scaleMod * CalculateBeamY(h, beatLineX);
@@ -539,8 +515,8 @@ namespace AlphaTab.Rendering
 
             var direction = h.Direction;
 
-            var topY = GetScoreY(GetNoteLine(beat.MaxNote));
-            var bottomY = GetScoreY(GetNoteLine(beat.MinNote));
+            var topY = GetYPositionForNoteValue(h.MaxNoteValue);
+            var bottomY = GetYPositionForNoteValue(h.MinNoteValue);
             float beamY;
             float fingeringY;
             if (direction == BeamDirection.Down)
