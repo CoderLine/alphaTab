@@ -7820,20 +7820,27 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		}
 		if(note.IsLetRing) {
 			var lastLetRingBeat = note.Beat;
+			var letRingEnd = 0;
+			var maxDuration = note.Beat.Voice.Bar.get_MasterBar().CalculateDuration();
 			while(lastLetRingBeat.NextBeat != null) {
 				var next = lastLetRingBeat.NextBeat;
-				if(next.Voice.Bar.Index != note.Beat.Voice.Bar.Index) {
+				if(next.get_IsRest()) {
 					break;
 				}
 				if(note.get_IsStringed() && next.HasNoteOnString(note.String)) {
 					break;
 				}
 				lastLetRingBeat = lastLetRingBeat.NextBeat;
+				letRingEnd = lastLetRingBeat.get_AbsolutePlaybackStart() - note.Beat.get_AbsolutePlaybackStart() + lastLetRingBeat.PlaybackDuration;
+				if(letRingEnd > maxDuration) {
+					letRingEnd = maxDuration;
+					break;
+				}
 			}
 			if(lastLetRingBeat == note.Beat) {
-				durationWithEffects.LetRingEnd = durationWithEffects.LetRingEnd + duration;
+				durationWithEffects.LetRingEnd = duration;
 			} else {
-				durationWithEffects.LetRingEnd = lastLetRingBeat.get_AbsolutePlaybackStart() - note.Beat.get_AbsolutePlaybackStart() + lastLetRingBeat.PlaybackDuration;
+				durationWithEffects.LetRingEnd = letRingEnd;
 			}
 		} else {
 			durationWithEffects.LetRingEnd = durationWithEffects.UntilTieEnd;
@@ -7945,7 +7952,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[1].Value));
 				break;
 			case 2:
-				playedBendPoints.push(new alphaTab.model.BendPoint(30,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[0].Value));
 				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[1].Value));
 				break;
 			default:
@@ -7963,8 +7970,8 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[2].Value));
 				break;
 			case 2:
-				playedBendPoints.push(new alphaTab.model.BendPoint(30,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[1].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(45,note.BendPoints[1].Value));
 				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[2].Value));
 				break;
 			default:
@@ -7989,7 +7996,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				break;
 			case 2:
 				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(30,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[0].Value));
 				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[1].Value));
 				break;
 			default:
@@ -8008,7 +8015,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				break;
 			case 2:
 				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(30,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[0].Value));
 				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[1].Value));
 				break;
 			default:
@@ -30664,6 +30671,10 @@ alphaTab.rendering.glyphs.TabBendGlyph.prototype = $extend(alphaTab.rendering.gl
 				}
 				if(note1.BendType != 6) {
 					this.PaintBend(note1,firstPt,secondPt,startX,topY,dX,slurText,canvas);
+				} else if(note1.IsTieOrigin && note1.TieDestination.get_HasBend()) {
+					var _tmp = new alphaTab.rendering.glyphs.TabBendRenderPoint(60,firstPt.Value);
+					_tmp.LineValue = firstPt.LineValue;
+					this.PaintBend(note1,firstPt,_tmp,startX,topY,dX,slurText,canvas);
 				}
 				++i;
 			}
@@ -36179,8 +36190,8 @@ alphaTab.model.Beat.WhammyBarMaxPosition = 60;
 alphaTab.model.Beat.WhammyBarMaxValue = 24;
 alphaTab.model.Beat.GlobalBeatId = 0;
 alphaTab.model.BendPoint.MaxPosition = 60;
-alphaTab.model.BendPoint.FastBendPointStart = 30;
-alphaTab.model.BendPoint.FastBendPointMiddle = 40;
+alphaTab.model.BendPoint.FastBendPointStart = 40;
+alphaTab.model.BendPoint.FastBendPointMiddle = 45;
 alphaTab.model.BendPoint.FastBendPointEnd = 50;
 alphaTab.model.BendPoint.MaxValue = 12;
 alphaTab.model._BendStyle.BendStyle_Impl_.Default = 0;

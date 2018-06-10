@@ -407,6 +407,13 @@ namespace AlphaTab.Rendering.Glyphs
                     {
                         PaintBend(note, firstPt, secondPt, startX, topY, dX, slurText, canvas);
                     }
+                    else if (note.IsTieOrigin && note.TieDestination.HasBend)
+                    {
+                        PaintBend(note, firstPt, new TabBendRenderPoint(BendPoint.MaxPosition, firstPt.Value)
+                        {
+                            LineValue = firstPt.LineValue
+                        }, startX, topY, dX, slurText, canvas);
+                    }
                 }
 
                 canvas.Color = color;

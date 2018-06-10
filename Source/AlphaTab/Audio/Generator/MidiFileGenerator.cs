@@ -443,14 +443,14 @@ namespace AlphaTab.Audio.Generator
             if (note.IsLetRing)
             {
                 // LetRing ends when:  
-                // - a note on the same line appears 
-                // - at the end of the bar    
+                // - rest 
                 Beat lastLetRingBeat = note.Beat;
+                var letRingEnd = 0;
+                var maxDuration = note.Beat.Voice.Bar.MasterBar.CalculateDuration();
                 while (lastLetRingBeat.NextBeat != null)
                 {
                     var next = lastLetRingBeat.NextBeat;
-                    // Bar break
-                    if (next.Voice.Bar.Index != note.Beat.Voice.Bar.Index)
+                    if (next.IsRest)
                     {
                         break;
                     }
@@ -460,15 +460,22 @@ namespace AlphaTab.Audio.Generator
                         break;
                     }
                     lastLetRingBeat = lastLetRingBeat.NextBeat;
+
+                    letRingEnd = (lastLetRingBeat.AbsolutePlaybackStart - note.Beat.AbsolutePlaybackStart) + lastLetRingBeat.PlaybackDuration;
+                    if (letRingEnd > maxDuration)
+                    {
+                        letRingEnd = maxDuration;
+                        break;
+                    }
                 }
 
                 if (lastLetRingBeat == note.Beat)
                 {
-                    durationWithEffects.LetRingEnd += duration;
+                    durationWithEffects.LetRingEnd = duration;
                 }
                 else
                 {
-                    durationWithEffects.LetRingEnd = (lastLetRingBeat.AbsolutePlaybackStart - note.Beat.AbsolutePlaybackStart) + lastLetRingBeat.PlaybackDuration;
+                    durationWithEffects.LetRingEnd = letRingEnd;
                 }
             }
             else
