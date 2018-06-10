@@ -21,7 +21,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
 {
-    public class TupletHelper
+    class TupletHelper
     {
         private bool _isFinished;
 

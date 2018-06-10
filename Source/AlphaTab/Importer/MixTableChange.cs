@@ -21,7 +21,7 @@ namespace AlphaTab.Importer
     /// <summary>
     /// A mixtablechange describes several track changes. 
     /// </summary>
-    public class MixTableChange
+    class MixTableChange
     {
         public int Volume { get; set; }
         public int Balance { get; set; }

@@ -4,7 +4,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class FingeringEffectInfo : IEffectBarRendererInfo
+    class FingeringEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "fingering"; } }
         public bool HideOnMultiTrack { get { return false; } }

@@ -19,7 +19,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
 {
-    public class PercussionMapper
+    class PercussionMapper
     {
         private static readonly int[][] ElementVariationToMidi =
         {        

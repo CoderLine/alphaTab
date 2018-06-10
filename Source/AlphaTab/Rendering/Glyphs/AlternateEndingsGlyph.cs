@@ -21,7 +21,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class AlternateEndingsGlyph : EffectGlyph
+    class AlternateEndingsGlyph : EffectGlyph
     {
         private const float Padding = 3;
 

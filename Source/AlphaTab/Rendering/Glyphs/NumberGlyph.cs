@@ -17,7 +17,7 @@
  */
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class NumberGlyph : GlyphGroup
+    class NumberGlyph : GlyphGroup
     {
         private readonly int _number;
         private readonly float _scale;

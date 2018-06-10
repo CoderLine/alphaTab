@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This Factory procudes ScoreBarRenderer instances
     /// </summary>
-    public class ScoreBarRendererFactory : BarRendererFactory
+    class ScoreBarRendererFactory : BarRendererFactory
     {
         public override string StaffId { get { return ScoreBarRenderer.StaffId; } }
 

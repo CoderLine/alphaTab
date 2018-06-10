@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class BeamGlyph : MusicFontGlyph
+    class BeamGlyph : MusicFontGlyph
     {
         public BeamGlyph(float x, float y, Duration duration, BeamDirection direction, bool isGrace)
             : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, GetSymbol(duration, direction, isGrace))

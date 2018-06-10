@@ -21,7 +21,7 @@ using AlphaTab.Audio.Synth.Util;
 
 namespace AlphaTab.Audio.Synth.Bank
 {
-    public abstract class PcmData
+    abstract class PcmData
     {
         protected byte[] Data;
 
@@ -62,7 +62,7 @@ namespace AlphaTab.Audio.Synth.Bank
         }
     }
 
-    public class PcmData8Bit : PcmData
+    class PcmData8Bit : PcmData
     {
         public PcmData8Bit(int bits, byte[] pcmData, bool isDataInLittleEndianFormat) : base(bits, pcmData, isDataInLittleEndianFormat) { }
         public override float this[int index]
@@ -71,7 +71,7 @@ namespace AlphaTab.Audio.Synth.Bank
         }
     }
 
-    public class PcmData16Bit : PcmData
+    class PcmData16Bit : PcmData
     {
         public PcmData16Bit(int bits, byte[] pcmData, bool isDataInLittleEndianFormat) : base(bits, pcmData, isDataInLittleEndianFormat) { }
         public override float this[int index]
@@ -80,7 +80,7 @@ namespace AlphaTab.Audio.Synth.Bank
         }
     }
 
-    public class PcmData24Bit : PcmData
+    class PcmData24Bit : PcmData
     {
         public PcmData24Bit(int bits, byte[] pcmData, bool isDataInLittleEndianFormat) : base(bits, pcmData, isDataInLittleEndianFormat) { }
         public override float this[int index]
@@ -89,7 +89,7 @@ namespace AlphaTab.Audio.Synth.Bank
         }
     }
 
-    public class PcmData32Bit : PcmData
+    class PcmData32Bit : PcmData
     {
         public PcmData32Bit(int bits, byte[] pcmData, bool isDataInLittleEndianFormat) : base(bits, pcmData, isDataInLittleEndianFormat) { }
         public override float this[int index]

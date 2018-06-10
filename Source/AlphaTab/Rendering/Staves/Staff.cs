@@ -27,7 +27,7 @@ namespace AlphaTab.Rendering.Staves
     /// A Staff represents a single line within a StaveGroup. 
     /// It stores BarRenderer instances created from a given factory. 
     /// </summary>
-    public class Staff
+    class Staff
     {
         private readonly BarRendererFactory _factory;
 

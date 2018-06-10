@@ -20,7 +20,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TrillGlyph : EffectGlyph
+    class TrillGlyph : EffectGlyph
     {
 
         public TrillGlyph(float x, float y)

@@ -24,7 +24,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabNoteChordGlyph : Glyph
+    class TabNoteChordGlyph : Glyph
     {
         private readonly FastList<NoteNumberGlyph> _notes;
         private readonly bool _isGrace;

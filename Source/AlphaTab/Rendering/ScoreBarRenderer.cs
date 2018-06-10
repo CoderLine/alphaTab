@@ -29,7 +29,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This BarRenderer renders a bar using standard music notation. 
     /// </summary>
-    public class ScoreBarRenderer : BarRendererBase, IBeamYCalculator
+    class ScoreBarRenderer : BarRendererBase, IBeamYCalculator
     {
         public const string StaffId = "score";
 

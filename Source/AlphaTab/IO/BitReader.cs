@@ -21,7 +21,7 @@ namespace AlphaTab.IO
     /// <summary>
     /// This utility public class allows bitwise reading of a stream
     /// </summary>
-    public class BitReader
+    class BitReader
     {
         private const int ByteSize = 8; // size of byte in bits
 

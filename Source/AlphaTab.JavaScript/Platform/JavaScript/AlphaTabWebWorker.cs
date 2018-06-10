@@ -8,7 +8,7 @@ using AlphaTab.Util;
 
 namespace AlphaTab.Platform.JavaScript
 {
-    public class AlphaTabWebWorker
+    class AlphaTabWebWorker
     {
         private ScoreRenderer _renderer;
         private readonly DedicatedWorkerGlobalScope _main;

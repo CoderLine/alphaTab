@@ -21,7 +21,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabBrushGlyph : Glyph
+    class TabBrushGlyph : Glyph
     {
         private readonly Beat _beat;
 

@@ -21,7 +21,7 @@ using AlphaTab.Platform.Svg;
 
 namespace AlphaTab
 {
-    public partial class Environment
+    partial class Environment
     {
         static void PlatformInit()
         {

@@ -19,7 +19,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TremoloPickingGlyph : MusicFontGlyph
+    class TremoloPickingGlyph : MusicFontGlyph
     {
         public TremoloPickingGlyph(float x, float y, Duration duration)
             : base(x, y, 1, GetSymbol(duration))

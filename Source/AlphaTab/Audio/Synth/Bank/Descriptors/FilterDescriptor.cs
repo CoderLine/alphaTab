@@ -20,7 +20,7 @@ using AlphaTab.Audio.Synth.Bank.Components;
 
 namespace AlphaTab.Audio.Synth.Bank.Descriptors
 {
-    public class FilterDescriptor
+    class FilterDescriptor
     {
         public FilterType FilterMethod { get; set; }
         public float CutOff { get; set; }

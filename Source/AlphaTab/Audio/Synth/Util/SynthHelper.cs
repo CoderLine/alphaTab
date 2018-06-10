@@ -16,11 +16,10 @@
  * License along with this library.
  */
 using System;
-using AlphaTab.Platform;
 
 namespace AlphaTab.Audio.Synth.Util
 {
-    public class SynthHelper
+    class SynthHelper
     {
         public static void SwapEndianess(byte[] data, int bits)
         {

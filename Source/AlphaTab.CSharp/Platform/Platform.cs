@@ -29,7 +29,7 @@ using AlphaTab.Xml;
 
 namespace AlphaTab.Platform
 {
-    public static partial class Platform
+    static partial class Platform
     {
         public static T As<T>(this object s)
         {

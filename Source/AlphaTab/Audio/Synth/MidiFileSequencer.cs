@@ -28,7 +28,7 @@ namespace AlphaTab.Audio.Synth
     /// This sequencer dispatches midi events to the synthesizer based on the current
     /// synthesize position. The sequencer does not consider the playback speed. 
     /// </summary>
-    public class MidiFileSequencer
+    class MidiFileSequencer
     {
         private readonly Synthesizer _synthesizer;
 
@@ -357,7 +357,7 @@ namespace AlphaTab.Audio.Synth
         }
     }
 
-    public class MidiFileSequencerTempoChange
+    class MidiFileSequencerTempoChange
     {
         public double Bpm { get; set; }
         public int Ticks { get; set; }

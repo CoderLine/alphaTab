@@ -24,7 +24,7 @@ using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class BeatContainerGlyph : Glyph
+    class BeatContainerGlyph : Glyph
     {
         public VoiceContainerGlyph VoiceContainer { get; set; }
 

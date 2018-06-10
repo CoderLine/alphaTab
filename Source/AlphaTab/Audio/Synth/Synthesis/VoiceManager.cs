@@ -21,13 +21,13 @@ using AlphaTab.Audio.Synth.Util;
 
 namespace AlphaTab.Audio.Synth.Synthesis
 {
-    public class VoiceNode
+    class VoiceNode
     {
         public Voice Value { get; set; }
         public VoiceNode Next { get; set; }
     }
 
-    public class VoiceManager
+    class VoiceManager
     {
         private Voice[] _voicePool;
         private LinkedList<VoiceNode> _vNodes;

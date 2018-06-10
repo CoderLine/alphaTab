@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class HarmonicsEffectInfo : NoteEffectInfoBase
+    class HarmonicsEffectInfo : NoteEffectInfoBase
     {
         private readonly HarmonicType _harmonicType;
         private Beat _beat;

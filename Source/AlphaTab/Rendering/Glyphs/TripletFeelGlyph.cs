@@ -21,7 +21,7 @@ using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TripletFeelGlyph : EffectGlyph
+    class TripletFeelGlyph : EffectGlyph
     {
         private const float NoteScale = 0.40f;
         private const int NoteHeight = 12;

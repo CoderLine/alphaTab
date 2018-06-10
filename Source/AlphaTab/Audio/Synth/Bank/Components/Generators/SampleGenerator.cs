@@ -23,7 +23,7 @@ using AlphaTab.Audio.Synth.Util;
 
 namespace AlphaTab.Audio.Synth.Bank.Components.Generators
 {
-    public enum Interpolation
+    enum Interpolation
     {
         None = 0,
         Linear = 1,
@@ -32,7 +32,7 @@ namespace AlphaTab.Audio.Synth.Bank.Components.Generators
         Sinc = 4
     }
 
-    public class SampleGenerator : Generator
+    class SampleGenerator : Generator
     {
         public PcmData Samples { get; set; }
 

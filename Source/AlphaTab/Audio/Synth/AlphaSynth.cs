@@ -4,19 +4,17 @@ using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Audio.Synth.Synthesis;
 using AlphaTab.Audio.Synth.Util;
 using AlphaTab.IO;
-using AlphaTab.Platform;
 using AlphaTab.Util;
 
 namespace AlphaTab.Audio.Synth
 {
-    public class AlphaSynth : IAlphaSynth
+    class AlphaSynth : IAlphaSynth
     {
         private MidiFileSequencer _sequencer;
         private Synthesizer _synthesizer;
 
         private bool _outputIsReady;
         private PlayerState _state;
-        private LogLevel _logLevel;
         private bool _isSoundFontLoaded;
         private bool _isMidiLoaded;
         private int _tickPosition;
@@ -414,7 +412,7 @@ namespace AlphaTab.Audio.Synth
 
     #region EventArgs
 
-    public class ProgressEventArgs
+    class ProgressEventArgs
     {
         public int Loaded { get; private set; }
         public int Total { get; private set; }
@@ -426,7 +424,7 @@ namespace AlphaTab.Audio.Synth
         }
     }
 
-    public class PlayerStateChangedEventArgs
+    class PlayerStateChangedEventArgs
     {
         public PlayerState State { get; private set; }
 
@@ -436,7 +434,7 @@ namespace AlphaTab.Audio.Synth
         }
     }
 
-    public class PositionChangedEventArgs
+    class PositionChangedEventArgs
     {
         public double CurrentTime { get; private set; }
         public double EndTime { get; private set; }

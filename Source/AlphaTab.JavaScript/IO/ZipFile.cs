@@ -3,7 +3,7 @@ using Phase;
 
 namespace AlphaTab.IO
 {
-    public partial class ZipFile
+    partial class ZipFile
     {
         /// <summary>
         /// Load a complete ZipFile to the memory.

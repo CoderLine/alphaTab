@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class SlightBeatVibratoEffectInfo : IEffectBarRendererInfo
+    class SlightBeatVibratoEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "slight-beat-vibrato"; } }
         public bool HideOnMultiTrack { get { return false; } }

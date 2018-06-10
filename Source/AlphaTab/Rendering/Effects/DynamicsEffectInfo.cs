@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class DynamicsEffectInfo : IEffectBarRendererInfo
+    class DynamicsEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "dynamics"; } }
         public bool HideOnMultiTrack { get { return false; } }

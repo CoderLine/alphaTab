@@ -4,7 +4,7 @@ using Phase;
 
 namespace AlphaTab.IO
 {
-    public class ReadableInput : HaxeInput
+    class ReadableInput : HaxeInput
     {
         private readonly IReadable _readable;
 

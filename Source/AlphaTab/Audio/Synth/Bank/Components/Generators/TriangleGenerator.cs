@@ -21,7 +21,7 @@ using AlphaTab.Audio.Synth.Bank.Descriptors;
 
 namespace AlphaTab.Audio.Synth.Bank.Components.Generators
 {
-    public class TriangleGenerator : Generator
+    class TriangleGenerator : Generator
     {
         public TriangleGenerator(GeneratorDescriptor description)
             : base(description)

@@ -17,7 +17,7 @@
  */
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class DrumSticksGlyph : MusicFontGlyph
+    class DrumSticksGlyph : MusicFontGlyph
     {
         private readonly bool _isGrace;
 

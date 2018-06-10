@@ -19,7 +19,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class RepeatOpenGlyph : Glyph
+    class RepeatOpenGlyph : Glyph
     {
         private readonly float _dotOffset;
         private readonly float _circleSize;

@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class PalmMuteEffectInfo : NoteEffectInfoBase
+    class PalmMuteEffectInfo : NoteEffectInfoBase
     {
         public override string EffectId { get { return "palm-mute"; } }
 

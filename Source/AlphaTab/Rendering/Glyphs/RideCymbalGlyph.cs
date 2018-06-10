@@ -17,7 +17,7 @@
  */
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class RideCymbalGlyph : MusicFontGlyph
+    class RideCymbalGlyph : MusicFontGlyph
     {
         private readonly bool _isGrace;
 

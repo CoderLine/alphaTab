@@ -18,7 +18,7 @@
 
 namespace AlphaTab.Audio.Synth.Bank.Descriptors
 {
-    public class EnvelopeDescriptor
+    class EnvelopeDescriptor
     {
         public float DelayTime { get; set; }
         public float AttackTime { get; set; }

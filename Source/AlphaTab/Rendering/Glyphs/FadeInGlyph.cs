@@ -21,7 +21,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class FadeInGlyph : EffectGlyph
+    class FadeInGlyph : EffectGlyph
     {
         public FadeInGlyph(float x, float y)
             : base(x, y)

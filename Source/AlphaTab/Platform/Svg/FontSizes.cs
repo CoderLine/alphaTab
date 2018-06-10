@@ -23,7 +23,7 @@ namespace AlphaTab.Platform.Svg
     /// <summary>
     /// This public class stores text widths for several fonts and allows width calculation 
     /// </summary>
-    public class FontSizes
+    class FontSizes
     {
         // NOTE: use tools/FontMeasureMent.html to generate those arrays
         // TODO: probably use a regression function for this

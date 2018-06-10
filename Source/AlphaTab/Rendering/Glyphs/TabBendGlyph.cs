@@ -22,7 +22,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabBendRenderPoint : BendPoint
+    class TabBendRenderPoint : BendPoint
     {
         public int LineValue { get; set; }
 
@@ -31,7 +31,7 @@ namespace AlphaTab.Rendering.Glyphs
             LineValue = value;
         }
     }
-    public class TabBendGlyph : Glyph
+    class TabBendGlyph : Glyph
     {
         private readonly Beat _beat;
         private FastList<Note> _notes;

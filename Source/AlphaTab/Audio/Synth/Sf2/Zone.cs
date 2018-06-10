@@ -17,7 +17,7 @@
  */
 namespace AlphaTab.Audio.Synth.Sf2
 {
-    public class Zone
+    class Zone
     {
         public Modulator[] Modulators { get; set; }
         public Generator[] Generators { get; set; }

@@ -266,6 +266,21 @@
             Gets or sets the playback speed. 
             </summary>
         </member>
+        <member name="T:AlphaTab.Audio.Synth.PlayerState">
+            <summary>
+            Lists the different states of the player
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.PlayerState.Paused">
+            <summary>
+            Player is paused
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.PlayerState.Playing">
+            <summary>
+            Player is playing
+            </summary>
+        </member>
         <member name="T:AlphaTab.Audio.Synth.Synthesis.PlaybackRange">
             <summary>
             Represents a range of the song that should be played.
@@ -410,6 +425,75 @@
             <summary>
             A handler is responsible for writing midi events to a custom structure
             </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.IMidiFileHandler.AddTimeSignature(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Adds a time signature to the generated midi file
+            </summary>
+            <param name="tick">The midi ticks when this event should be happening. </param>
+            <param name="timeSignatureNumerator">The time signature numerator</param>
+            <param name="timeSignatureDenominator">The time signature denominator</param>
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.IMidiFileHandler.AddRest(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Adds a rest to the generated midi file. 
+            </summary>
+            <param name="track">The midi track on which the rest should be "played".</param>
+            <param name="tick">The midi ticks when the rest is "playing". </param>
+            <param name="channel">The midi channel on which the rest should be "played".</param>
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.IMidiFileHandler.AddNote(System.Int32,System.Int32,System.Int32,System.Byte,AlphaTab.Model.DynamicValue,System.Byte)">
+            <summary>
+            Adds a note to the generated midi file
+            </summary>
+            <param name="track">The midi track on which the note should be played.</param>
+            <param name="start">The midi ticks when the note should start playing. </param>
+            <param name="length">The duration the note in midi ticks. </param>
+            <param name="key">The key of the note to play</param>
+            <param name="dynamicValue">The dynamic which should be applied to the note. </param>
+            <param name="channel">The midi channel on which the note should be played.</param>
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.IMidiFileHandler.AddControlChange(System.Int32,System.Int32,System.Byte,System.Byte,System.Byte)">
+            <summary>
+            Adds a control change to the generated midi file. 
+            </summary>
+            <param name="track">The midi track on which the controller should change.</param>
+            <param name="tick">The midi ticks when the controller should change.</param>
+            <param name="channel">The midi channel on which the controller should change.</param>
+            <param name="controller">The midi controller that should change.</param>
+            <param name="value">The value to which the midi controller should change</param>
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.IMidiFileHandler.AddProgramChange(System.Int32,System.Int32,System.Byte,System.Byte)">
+            <summary>
+            Add a program change to the generated midi file
+            </summary>
+            <param name="track">The midi track on which the program should change.</param>
+            <param name="tick">The midi ticks when the program should change.</param>
+            <param name="channel">The midi channel on which the program should change.</param>
+            <param name="program">The new program for the selected track and channel.</param>
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.IMidiFileHandler.AddTempo(System.Int32,System.Int32)">
+            <summary>
+            Add a tempo change to the generated midi file. 
+            </summary>
+            <param name="tick">The midi ticks when the tempo should change change.</param>
+            <param name="tempo">The tempo as BPM</param>
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.IMidiFileHandler.AddBend(System.Int32,System.Int32,System.Byte,System.Byte)">
+            <summary>
+            Add a bend to the generated midi file. 
+            </summary>
+            <param name="track">The midi track on which the bend should change.</param>
+            <param name="tick">The midi ticks when the bend should change.</param>
+            <param name="channel">The midi channel on which the bend should change.</param>
+            <param name="value">The new bend for the selected track and channel.</param>
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.IMidiFileHandler.FinishTrack(System.Int32,System.Int32)">
+            <summary>
+            Indicates that the track is finished on the given ticks.
+            </summary>
+            <param name="track">The track that was finished. </param>
+            <param name="tick">The end tick for this track.</param>
         </member>
         <member name="T:AlphaTab.Audio.Generator.MidiFileGenerator">
             <summary>

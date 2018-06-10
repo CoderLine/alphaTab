@@ -26,7 +26,7 @@ namespace AlphaTab.Importer
     /// <summary>
     /// this public class represents a file within the GpxFileSystem
     /// </summary>
-    public class GpxFile
+    class GpxFile
     {
         public string FileName { get; set; }
         public int FileSize { get; set; }
@@ -37,7 +37,7 @@ namespace AlphaTab.Importer
     /// This public class represents the file system structure
     /// stored within a GPX container file. 
     /// </summary>
-    public class GpxFileSystem
+    class GpxFileSystem
     {
         public const string HeaderBcFs = "BCFS";
         public const string HeaderBcFz = "BCFZ";

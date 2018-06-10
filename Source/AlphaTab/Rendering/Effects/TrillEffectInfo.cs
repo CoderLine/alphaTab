@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class TrillEffectInfo : NoteEffectInfoBase
+    class TrillEffectInfo : NoteEffectInfoBase
     {
         public override string EffectId { get { return "trill"; } }
 

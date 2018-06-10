@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This is the base public class for creating factories providing BarRenderers
     /// </summary>
-    public abstract class BarRendererFactory
+    abstract class BarRendererFactory
     {
         public bool IsInAccolade { get; set; }
         public bool HideOnMultiTrack { get; set; }

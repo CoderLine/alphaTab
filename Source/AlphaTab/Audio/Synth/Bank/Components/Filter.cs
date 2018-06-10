@@ -24,7 +24,7 @@ using AlphaTab.Audio.Synth.Util;
 
 namespace AlphaTab.Audio.Synth.Bank.Components
 {
-    public enum FilterType
+    enum FilterType
     {
         None = 0,
         BiquadLowpass = 1,
@@ -32,7 +32,7 @@ namespace AlphaTab.Audio.Synth.Bank.Components
         OnePoleLowpass = 3
     }
 
-    public class Filter
+    class Filter
     {
         private float _a1;
         private float _a2;

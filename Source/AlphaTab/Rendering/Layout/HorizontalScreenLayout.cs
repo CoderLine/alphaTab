@@ -25,7 +25,7 @@ using AlphaTab.Util;
 
 namespace AlphaTab.Rendering.Layout
 {
-    public class HorizontalScreenLayoutPartialInfo
+    class HorizontalScreenLayoutPartialInfo
     {
         public float Width { get; set; }
         public FastList<MasterBar> MasterBars { get; set; }
@@ -39,7 +39,7 @@ namespace AlphaTab.Rendering.Layout
     /// <summary>
     /// This layout arranges the bars all horizontally
     /// </summary>
-    public class HorizontalScreenLayout : ScoreLayout
+    class HorizontalScreenLayout : ScoreLayout
     {
         // left top right bottom
         public static readonly float[] PagePadding = { 20, 20, 20, 20 };

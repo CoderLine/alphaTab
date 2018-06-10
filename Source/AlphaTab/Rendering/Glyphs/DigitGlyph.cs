@@ -17,7 +17,7 @@
  */
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class DigitGlyph : MusicFontGlyph
+    class DigitGlyph : MusicFontGlyph
     {
         private readonly int _digit;
         private readonly float _scale;

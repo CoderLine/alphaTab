@@ -20,7 +20,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class AccidentalGroupGlyph : GlyphGroup
+    class AccidentalGroupGlyph : GlyphGroup
     {
         private const int NonReserved = -3000;
 

@@ -18,7 +18,7 @@
 
 namespace AlphaTab.Audio.Synth.Bank.Components.Generators
 {
-    public class GeneratorParameters
+    class GeneratorParameters
     {
         public double Phase { get; set; }
         public double CurrentStart { get; set; }

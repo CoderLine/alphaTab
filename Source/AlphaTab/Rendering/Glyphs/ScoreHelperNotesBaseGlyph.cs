@@ -6,7 +6,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ScoreHelperNotesBaseGlyph : Glyph
+    class ScoreHelperNotesBaseGlyph : Glyph
     {
         private const int SlurHeight = 11;
         public const int EndPadding = (NoteHeadGlyph.QuarterNoteHeadWidth / 2) + 3;

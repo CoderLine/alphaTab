@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ScoreRestGlyph : MusicFontGlyph
+    class ScoreRestGlyph : MusicFontGlyph
     {
         private readonly Duration _duration;
 

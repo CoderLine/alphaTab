@@ -20,7 +20,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class BeatGlyphBase : GlyphGroup
+    class BeatGlyphBase : GlyphGroup
     {
         public BeatContainerGlyph Container { get; set; }
 

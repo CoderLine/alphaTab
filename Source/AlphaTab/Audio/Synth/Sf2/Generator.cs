@@ -22,7 +22,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Audio.Synth.Sf2
 {
-    public class Generator
+    class Generator
     {
         private ushort _rawAmount;
 

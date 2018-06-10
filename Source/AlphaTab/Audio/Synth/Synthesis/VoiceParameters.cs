@@ -24,7 +24,7 @@ using AlphaTab.Utils;
 
 namespace AlphaTab.Audio.Synth.Synthesis
 {
-    public class VoiceParameters
+    class VoiceParameters
     {
         private float mix1;
         private float mix2;

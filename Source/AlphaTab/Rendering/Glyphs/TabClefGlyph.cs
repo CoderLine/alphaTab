@@ -20,7 +20,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabClefGlyph : Glyph
+    class TabClefGlyph : Glyph
     {
         public TabClefGlyph(float x, float y)
             : base(x, y)

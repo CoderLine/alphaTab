@@ -21,7 +21,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class TextEffectInfo : IEffectBarRendererInfo
+    class TextEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "text"; } }
         public bool HideOnMultiTrack { get { return false; } }

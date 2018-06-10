@@ -22,14 +22,14 @@ using AlphaTab.Audio.Synth.Util;
 
 namespace AlphaTab.Audio.Synth.Bank.Components
 {
-    public enum PanFormulaEnum
+    enum PanFormulaEnum
     {
         Neg3dBCenter = 0,
         Neg6dBCenter = 1,
         ZeroCenter = 2
     }
 
-    public class PanComponent
+    class PanComponent
     {
         public float Left { get; set; }
         public float Right { get; set; }

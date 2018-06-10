@@ -18,11 +18,10 @@
 
 using System;
 using System.Globalization;
-using AlphaTab.Platform;
 
 namespace AlphaTab.Collections
 {
-    public class StringBuilder
+    class StringBuilder
     {
         private readonly System.Text.StringBuilder _sb;
 

@@ -27,14 +27,13 @@ namespace AlphaTab.Platform.Svg
     /// <summary>
     ///  A canvas implementation storing SVG data
     /// </summary>
-    public abstract class SvgCanvas : ICanvas, IPathCanvas
+    abstract class SvgCanvas : ICanvas, IPathCanvas
     {
         protected const float BlurCorrection = 0;
 
         protected StringBuilder Buffer;
         private StringBuilder _currentPath;
         private bool _currentPathIsEmpty;
-        private StringBuilder _suspendBuffer;
 
         public Color Color { get; set; }
         public float LineWidth { get; set; }

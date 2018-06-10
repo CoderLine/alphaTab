@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering.Glyphs
     /// Effect-Glyphs implementing this public interface get notified
     /// as they are expanded over multiple beats.
     /// </summary>
-    public class EffectGlyph : Glyph
+    class EffectGlyph : Glyph
     {
         /// <summary>
         /// Gets or sets the beat where the glyph belongs to.

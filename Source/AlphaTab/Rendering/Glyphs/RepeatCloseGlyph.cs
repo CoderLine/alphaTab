@@ -19,7 +19,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class RepeatCloseGlyph : Glyph
+    class RepeatCloseGlyph : Glyph
     {
         public RepeatCloseGlyph(float x, float y)
             : base(x, y)

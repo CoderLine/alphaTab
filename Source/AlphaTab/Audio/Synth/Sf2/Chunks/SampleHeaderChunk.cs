@@ -20,7 +20,7 @@ using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Synth.Sf2.Chunks
 {
-    public class SampleHeaderChunk : Chunk
+    class SampleHeaderChunk : Chunk
     {
         public SampleHeader[] SampleHeaders { get; set; }
 

@@ -28,7 +28,7 @@ namespace AlphaTab.Model
     /// This class can convert a full <see cref="Score"/> instance to a simple JavaScript object and back for further
     /// JSON serialization. 
     /// </summary>
-    public class JsonConverter
+    class JsonConverter
     {
         public static Score ScoreToJsObject(Score score)
         {
@@ -345,7 +345,7 @@ namespace AlphaTab.Model
             return score2;
         }
 
-        public static MidiFile JsObjectToMidiFile(dynamic midi)
+        internal static MidiFile JsObjectToMidiFile(dynamic midi)
         {
             var midi2 = new MidiFile();
             midi2.Division = midi.Division;
@@ -383,7 +383,7 @@ namespace AlphaTab.Model
             return midi2;
         }
 
-        public static object MidiFileToJsObject(MidiFile midi)
+        internal static object MidiFileToJsObject(MidiFile midi)
         {
             var midi2 = Platform.Platform.NewObject();
             midi2.Division = midi.Division;

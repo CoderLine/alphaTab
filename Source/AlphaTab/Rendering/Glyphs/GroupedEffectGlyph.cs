@@ -19,7 +19,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public abstract class GroupedEffectGlyph : EffectGlyph
+    abstract class GroupedEffectGlyph : EffectGlyph
     {
         private readonly BeatXPosition _endPosition;
 

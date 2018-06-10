@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class GhostParenthesisGlyph : Glyph
+    class GhostParenthesisGlyph : Glyph
     {
         private readonly bool _isOpen;
         private const int Size = 6;

@@ -384,7 +384,6 @@ alphaTab.platform.svg.SvgCanvas = $hx_exports["alphaTab"]["platform"]["svg"]["Sv
 	this.Buffer = null;
 	this._currentPath = null;
 	this._currentPathIsEmpty = false;
-	this._suspendBuffer = null;
 	var this1 = "";
 	this._currentPath = this1;
 	this._currentPathIsEmpty = true;
@@ -1359,7 +1358,7 @@ alphaTab.platform.javaScript.JQueryAlphaTab.prototype = {
 		context.Print(width);
 	}
 	,player: function(element,context) {
-		return context.Player;
+		return context.get_Player();
 	}
 	,playerOptions: function(element,context,options) {
 		if(!(!options)) {
@@ -1371,67 +1370,67 @@ alphaTab.platform.javaScript.JQueryAlphaTab.prototype = {
 		return this.playerOptions(element,context,options);
 	}
 	,playerState: function(element,context) {
-		if(context.Player == null) {
+		if(context.get_Player() == null) {
 			return 0;
 		}
-		return context.Player.get_State();
+		return context.get_Player().get_State();
 	}
 	,masterVolume: function(element,context,masterVolume) {
-		if(context.Player == null) {
+		if(context.get_Player() == null) {
 			return 0;
 		}
 		if(!(!masterVolume)) {
-			context.Player.set_MasterVolume(masterVolume);
+			context.get_Player().set_MasterVolume(masterVolume);
 		}
-		return context.Player.get_MasterVolume();
+		return context.get_Player().get_MasterVolume();
 	}
 	,playbackSpeed: function(element,context,playbackSpeed) {
-		if(context.Player == null) {
+		if(context.get_Player() == null) {
 			return 0;
 		}
 		if(!(!playbackSpeed)) {
-			context.Player.set_PlaybackSpeed(playbackSpeed);
+			context.get_Player().set_PlaybackSpeed(playbackSpeed);
 		}
-		return context.Player.get_PlaybackSpeed();
+		return context.get_Player().get_PlaybackSpeed();
 	}
 	,metronomeVolume: function(element,context,metronomeVolume) {
-		if(context.Player == null) {
+		if(context.get_Player() == null) {
 			return 0;
 		}
 		if(!(!metronomeVolume)) {
-			context.Player.set_MetronomeVolume(metronomeVolume);
+			context.get_Player().set_MetronomeVolume(metronomeVolume);
 		}
-		return context.Player.get_MetronomeVolume();
+		return context.get_Player().get_MetronomeVolume();
 	}
 	,tickPosition: function(element,context,tickPosition) {
-		if(context.Player == null) {
+		if(context.get_Player() == null) {
 			return 0;
 		}
 		if(!(!tickPosition)) {
-			context.Player.set_TickPosition(tickPosition);
+			context.get_Player().set_TickPosition(tickPosition);
 		}
-		return context.Player.get_TickPosition();
+		return context.get_Player().get_TickPosition();
 	}
 	,playbackRange: function(element,context,playbackRange) {
-		if(context.Player == null) {
+		if(context.get_Player() == null) {
 			return null;
 		}
 		if(!(!playbackRange)) {
-			context.Player.set_PlaybackRange(playbackRange);
+			context.get_Player().set_PlaybackRange(playbackRange);
 		}
-		return context.Player.get_PlaybackRange();
+		return context.get_Player().get_PlaybackRange();
 	}
 	,loop: function(element,context,loop) {
-		if(context.Player == null) {
+		if(context.get_Player() == null) {
 			return false;
 		}
 		if(!(!loop)) {
-			context.Player.set_IsLooping(loop);
+			context.get_Player().set_IsLooping(loop);
 		}
-		return context.Player.get_IsLooping();
+		return context.get_Player().get_IsLooping();
 	}
 	,autoScroll: function(element,context,autoScroll) {
-		if(context.Player == null) {
+		if(context.get_Player() == null) {
 			return null;
 		}
 		if(!(!autoScroll)) {
@@ -2117,7 +2116,6 @@ alphaTab.audio.synth.AlphaSynth = $hx_exports["alphaTab"]["audio"]["synth"]["Alp
 	this._synthesizer = null;
 	this._outputIsReady = false;
 	this._state = 0;
-	this._logLevel = 0;
 	this._isSoundFontLoaded = false;
 	this._isMidiLoaded = false;
 	this._tickPosition = 0;
@@ -2500,7 +2498,6 @@ alphaTab.audio.synth.synthesis.Synthesizer = $hx_exports["alphaTab"]["audio"]["s
 	this._mutedChannels = null;
 	this._soloChannels = null;
 	this._isAnySolo = false;
-	this._syn = 0.0;
 	this.MicroBufferSize = 0;
 	this.MicroBufferCount = 0;
 	this.SampleBuffer = null;
@@ -4874,14 +4871,12 @@ alphaTab.rendering.layout.ScoreLayout.prototype = {
 		while(trackIndex < this.Renderer.Tracks.length) {
 			var track = this.Renderer.Tracks[trackIndex];
 			var hasScore = false;
-			var hasTab = false;
 			var staff = $iterator(track.Staves)();
 			while(staff.hasNext()) {
 				var staff1 = staff.next();
 				var _g = staff1.StaffKind;
 				switch(_g) {
 				case 0:
-					hasTab = true;
 					break;
 				case 1:
 					hasScore = true;
@@ -4890,7 +4885,6 @@ alphaTab.rendering.layout.ScoreLayout.prototype = {
 					break;
 				case 3:
 					hasScore = true;
-					hasTab = true;
 					break;
 				default:
 				}
@@ -9883,11 +9877,7 @@ alphaTab.audio.synth.bank.patch.Sf2Patch.prototype = $extend(alphaTab.audio.synt
 			}
 			var this1 = voiceparams.VolOffset + voiceparams.Envelopes[1].Value + voiceparams.Lfos[0].Value * this.modLfoToVolume;
 			var volume = js.Boot.__cast(alphaTab.audio.synth.util.SynthHelper.DBtoLinear(this1) , Float) * baseVolume;
-			if(2 == 2) {
-				voiceparams.MixMonoToStereoInterp(x,volume * this.pan.Left * voiceparams.SynthParams.CurrentPan.Left,volume * this.pan.Right * voiceparams.SynthParams.CurrentPan.Right);
-			} else {
-				voiceparams.MixMonoToMonoInterp(x,volume);
-			}
+			voiceparams.MixMonoToStereoInterp(x,volume * this.pan.Left * voiceparams.SynthParams.CurrentPan.Left,volume * this.pan.Right * voiceparams.SynthParams.CurrentPan.Right);
 			if(voiceparams.Envelopes[1].CurrentStage > 2 && volume <= 1e-5 || voiceparams.GeneratorParams[0].CurrentState == 3) {
 				voiceparams.State = 0;
 				return;
@@ -18546,8 +18536,6 @@ alphaTab.io.IWriteable.prototype = {
 };
 alphaTab.io.ByteBuffer = $hx_exports["alphaTab"]["io"]["ByteBuffer"] = function() {
 	this._buffer = null;
-	this._position = 0;
-	this._length = 0;
 	this._capacity = 0;
 };
 alphaTab.io.ByteBuffer.__name__ = ["alphaTab","io","ByteBuffer"];
@@ -18565,37 +18553,39 @@ alphaTab.io.ByteBuffer.WithCapactiy = function(capacity) {
 alphaTab.io.ByteBuffer.FromBuffer = function(data) {
 	var buffer = new alphaTab.io.ByteBuffer();
 	buffer._buffer = data;
-	buffer._capacity = buffer._length = data.length;
+	buffer._capacity = buffer.set_Length(data.length);
 	return buffer;
 };
 alphaTab.io.ByteBuffer.prototype = {
 	get_Length: function() {
-		return this._length;
+		return this.__Length;
+	}
+	,set_Length: function(value) {
+		return this.__Length = value;
 	}
 	,get_Position: function() {
-		return this._position;
+		return this.__Position;
 	}
 	,set_Position: function(value) {
-		this._position = value;
-		return this.get_Position();
+		return this.__Position = value;
 	}
 	,GetBuffer: function() {
 		return this._buffer;
 	}
 	,Reset: function() {
-		this._position = 0;
+		this.set_Position(0);
 	}
 	,Skip: function(offset) {
-		this._position = this._position + offset;
+		this.set_Position(this.get_Position() + offset);
 	}
 	,SetCapacity: function(value) {
 		if(value != this._capacity) {
 			if(value > 0) {
 				var this1 = new Uint8Array(value);
 				var newBuffer = this1;
-				if(this._length > 0) {
+				if(this.get_Length() > 0) {
 					var src = this._buffer;
-					var count = this._length;
+					var count = this.get_Length();
 					newBuffer.set(src.subarray(0,0+count), 0);
 				}
 				this._buffer = newBuffer;
@@ -18606,15 +18596,19 @@ alphaTab.io.ByteBuffer.prototype = {
 		}
 	}
 	,ReadByte: function() {
-		var n = this._length - this._position;
+		var n = this.get_Length() - this.get_Position();
 		if(n <= 0) {
 			return -1;
 		}
-		var this1 = this._buffer[this._position++];
-		return this1;
+		var this1 = this._buffer;
+		var _g = this;
+		var _g1 = _g.get_Position();
+		_g.set_Position(_g1 + 1);
+		var this2 = this1[_g1];
+		return this2;
 	}
 	,Read: function(buffer,offset,count) {
-		var n = this._length - this._position;
+		var n = this.get_Length() - this.get_Position();
 		if(n > count) {
 			n = count;
 		}
@@ -18628,14 +18622,14 @@ alphaTab.io.ByteBuffer.prototype = {
 				if(!(byteCount >= 0)) {
 					break;
 				}
-				buffer[offset + byteCount] = this._buffer[this._position + byteCount];
+				buffer[offset + byteCount] = this._buffer[this.get_Position() + byteCount];
 			}
 		} else {
 			var src = this._buffer;
-			var srcOffset = this._position;
+			var srcOffset = this.get_Position();
 			buffer.set(src.subarray(srcOffset,srcOffset+n), offset);
 		}
-		this._position = this._position + n;
+		this.set_Position(this.get_Position() + n);
 		return n;
 	}
 	,WriteByte: function(value) {
@@ -18645,12 +18639,12 @@ alphaTab.io.ByteBuffer.prototype = {
 		this.Write(buffer,0,1);
 	}
 	,Write: function(buffer,offset,count) {
-		var i = this._position + count;
-		if(i > this._length) {
+		var i = this.get_Position() + count;
+		if(i > this.get_Length()) {
 			if(i > this._capacity) {
 				this.EnsureCapacity(i);
 			}
-			this._length = i;
+			this.set_Length(i);
 		}
 		if(count <= 8 && buffer != this._buffer) {
 			var byteCount = count;
@@ -18659,15 +18653,15 @@ alphaTab.io.ByteBuffer.prototype = {
 				if(!(byteCount >= 0)) {
 					break;
 				}
-				this._buffer[this._position + byteCount] = buffer[offset + byteCount];
+				this._buffer[this.get_Position() + byteCount] = buffer[offset + byteCount];
 			}
 		} else {
 			var dst = this._buffer;
-			var dstOffset = this._position;
+			var dstOffset = this.get_Position();
 			var count1 = Math.min(count,buffer.length - offset);
 			dst.set(buffer.subarray(offset,offset+count1), dstOffset);
 		}
-		this._position = i;
+		this.set_Position(i);
 	}
 	,EnsureCapacity: function(value) {
 		if(value > this._capacity) {
@@ -18685,10 +18679,10 @@ alphaTab.io.ByteBuffer.prototype = {
 		return this.ToArray();
 	}
 	,ToArray: function() {
-		var this1 = new Uint8Array(this._length);
+		var this1 = new Uint8Array(this.get_Length());
 		var copy = this1;
 		var src = this._buffer;
-		var count = this._length;
+		var count = this.get_Length();
 		copy.set(src.subarray(0,0+count), 0);
 		return copy;
 	}
@@ -22560,7 +22554,6 @@ alphaTab.platform.javaScript.AlphaSynthFlashOutput = $hx_exports["alphaTab"]["pl
 	this._id = null;
 	this._swfId = null;
 	this._swfContainer = null;
-	this._playbackSpeed = 0.0;
 	this._alphaSynthRoot = alphaSynthRoot;
 	var lastSlash = this._alphaSynthRoot.lastIndexOf("/");
 	if(lastSlash != -1) {
@@ -22594,7 +22587,6 @@ alphaTab.platform.javaScript.AlphaSynthFlashOutput.prototype = {
 		return 44100;
 	}
 	,Open: function() {
-		this._playbackSpeed = 1;
 		this._id = "alphaSynthFlashPlayer" + Std.string(alphaTab.platform.javaScript.AlphaSynthFlashOutput.NextId);
 		this._swfId = this._id + "swf";
 		alphaTab.platform.javaScript.AlphaSynthFlashOutput.Lookup[this._id] = this;
@@ -22792,12 +22784,9 @@ alphaTab.platform.javaScript.AlphaSynthWebWorkerApi = $hx_exports["alphaTab"]["p
 	this._workerIsReady = false;
 	this._outputIsReady = false;
 	this._state = 0;
-	this._logLevel = 0;
 	this._masterVolume = 0.0;
 	this._metronomeVolume = 0.0;
 	this._playbackSpeed = 0.0;
-	this._isSoundFontLoaded = false;
-	this._isMidiLoaded = false;
 	this._tickPosition = 0;
 	this._timePosition = 0.0;
 	this._isLooping = false;
@@ -22996,12 +22985,10 @@ alphaTab.platform.javaScript.AlphaSynthWebWorkerApi.prototype = {
 			alphaTab.util.Logger.Log(data.level,"AlphaSynth",data.message,null);
 			break;
 		case "alphaSynth.midiLoadFailed":
-			this._isSoundFontLoaded = true;
 			this.CheckReadyForPlayback();
 			this.TriggerEvent("midiFileLoadFailed",null);
 			break;
 		case "alphaSynth.midiLoaded":
-			this._isMidiLoaded = true;
 			this.CheckReadyForPlayback();
 			this.TriggerEvent("midiFileLoaded",null);
 			break;
@@ -23102,7 +23089,7 @@ alphaTab.platform.javaScript.AlphaTabApi = $hx_exports["alphaTab"]["platform"]["
 	this.Score = null;
 	this.TrackIndexes = null;
 	this.Element = null;
-	this.Player = null;
+	this._player = null;
 	this._tickCache = null;
 	this._cursorWrapper = null;
 	this._beatCursor = null;
@@ -23667,6 +23654,9 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		this.Renderer.UpdateSettings(this.Settings);
 		this.Renderer.Invalidate();
 	}
+	,get_Player: function() {
+		return this._player;
+	}
 	,SetupPlayer: function() {
 		var _gthis = this;
 		var supportsWebAudio = !!window.ScriptProcessorNode;
@@ -23675,46 +23665,46 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		var alphaSynthScriptFile = alphaTab.Environment.ScriptFile;
 		if(supportsWebAudio && !forceFlash) {
 			alphaTab.util.Logger.Info("Player","Will use webworkers for synthesizing and web audio api for playback",null);
-			this.Player = new alphaTab.platform.javaScript.AlphaSynthWebWorkerApi(new alphaTab.platform.javaScript.AlphaSynthWebAudioOutput(),alphaSynthScriptFile,this.Settings.LogLevel);
+			this._player = new alphaTab.platform.javaScript.AlphaSynthWebWorkerApi(new alphaTab.platform.javaScript.AlphaSynthWebAudioOutput(),alphaSynthScriptFile,this.Settings.LogLevel);
 		} else if(supportsWebWorkers) {
 			alphaTab.util.Logger.Info("Player","Will use webworkers for synthesizing and flash for playback",null);
-			this.Player = new alphaTab.platform.javaScript.AlphaSynthWebWorkerApi(new alphaTab.platform.javaScript.AlphaSynthFlashOutput(alphaSynthScriptFile),alphaSynthScriptFile,this.Settings.LogLevel);
+			this._player = new alphaTab.platform.javaScript.AlphaSynthWebWorkerApi(new alphaTab.platform.javaScript.AlphaSynthFlashOutput(alphaSynthScriptFile),alphaSynthScriptFile,this.Settings.LogLevel);
 		}
-		if(this.Player == null) {
+		if(this.get_Player() == null) {
 			alphaTab.util.Logger.Error("Player","Player requires webworkers and web audio api or flash, browser unsupported",null);
 		} else {
-			this.Player.On("ready",function() {
+			this._player.On("ready",function() {
 				_gthis.LoadSoundFont(_gthis.Settings.SoundFontFile);
 				_gthis.LoadMidiForScore();
 			});
-			this.Player.On("readyForPlayback",function() {
+			this._player.On("readyForPlayback",function() {
 				_gthis.TriggerEvent("playerReady",null);
 			});
-			this.Player.On("soundFontLoad",function(data) {
+			this._player.On("soundFontLoad",function(data) {
 				_gthis.TriggerEvent("soundFontLoad",data);
 			});
-			this.Player.On("soundFontLoaded",function() {
+			this._player.On("soundFontLoaded",function() {
 				_gthis.TriggerEvent("soundFontLoaded",null);
 			});
-			this.Player.On("soundFontLoadFailed",function() {
+			this._player.On("soundFontLoadFailed",function() {
 				_gthis.TriggerEvent("soundFontLoadFailed",null);
 			});
-			this.Player.On("midiLoad",function(data1) {
+			this._player.On("midiLoad",function(data1) {
 				_gthis.TriggerEvent("midiLoad",data1);
 			});
-			this.Player.On("midiFileLoaded",function() {
+			this._player.On("midiFileLoaded",function() {
 				_gthis.TriggerEvent("midiFileLoaded",null);
 			});
-			this.Player.On("midiFileLoadFailed",function() {
+			this._player.On("midiFileLoadFailed",function() {
 				_gthis.TriggerEvent("midiFileLoadFailed",null);
 			});
-			this.Player.On("playerStateChanged",function(data2) {
+			this._player.On("playerStateChanged",function(data2) {
 				_gthis.TriggerEvent("playerStateChanged",data2);
 			});
-			this.Player.On("positionChanged",function(data3) {
+			this._player.On("positionChanged",function(data3) {
 				_gthis.TriggerEvent("positionChanged",data3);
 			});
-			this.Player.On("finished",function(data4) {
+			this._player.On("finished",function(data4) {
 				_gthis.TriggerEvent("finished",data4);
 			});
 			if(this.Settings.EnableCursor) {
@@ -23723,7 +23713,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		}
 	}
 	,LoadMidiForScore: function() {
-		if(this.Player == null || this.Score == null || !this.Player.get_IsReady()) {
+		if(this.get_Player() == null || this.Score == null || !this._player.get_IsReady()) {
 			return;
 		}
 		alphaTab.util.Logger.Info("AlphaTab","Generating Midi",null);
@@ -23732,7 +23722,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		var generator = new alphaTab.audio.generator.MidiFileGenerator(this.Score,this.Settings,handler);
 		generator.Generate();
 		this._tickCache = generator.TickLookup;
-		this.Player.LoadMidiFile(midiFile);
+		this._player.LoadMidiFile(midiFile);
 	}
 	,DownloadMidi: function() {
 		var midiFile = new alphaTab.audio.synth.midi.MidiFile();
@@ -23759,7 +23749,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		window.document.body.removeChild(dlLink);
 	}
 	,SetTrackVolume: function(tracks,volume) {
-		if(this.Player == null) {
+		if(this.get_Player() == null) {
 			return;
 		}
 		var trackList = this.TrackIndexesToTracks(this.ParseTracks(tracks));
@@ -23767,68 +23757,68 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		while(track.hasNext()) {
 			var track1 = track.next();
 			var this1 = volume;
-			this.Player.SetChannelVolume(track1.PlaybackInfo.PrimaryChannel,this1);
+			this.get_Player().SetChannelVolume(track1.PlaybackInfo.PrimaryChannel,this1);
 			var this2 = volume;
-			this.Player.SetChannelVolume(track1.PlaybackInfo.SecondaryChannel,this2);
+			this.get_Player().SetChannelVolume(track1.PlaybackInfo.SecondaryChannel,this2);
 		}
 	}
 	,SetTrackSolo: function(tracks,solo) {
-		if(this.Player == null) {
+		if(this.get_Player() == null) {
 			return;
 		}
 		var trackList = this.TrackIndexesToTracks(this.ParseTracks(tracks));
 		var track = $iterator(trackList)();
 		while(track.hasNext()) {
 			var track1 = track.next();
-			this.Player.SetChannelSolo(track1.PlaybackInfo.PrimaryChannel,solo);
-			this.Player.SetChannelSolo(track1.PlaybackInfo.SecondaryChannel,solo);
+			this.get_Player().SetChannelSolo(track1.PlaybackInfo.PrimaryChannel,solo);
+			this.get_Player().SetChannelSolo(track1.PlaybackInfo.SecondaryChannel,solo);
 		}
 	}
 	,SetTrackMute: function(tracks,mute) {
-		if(this.Player == null) {
+		if(this.get_Player() == null) {
 			return;
 		}
 		var trackList = this.TrackIndexesToTracks(this.ParseTracks(tracks));
 		var track = $iterator(trackList)();
 		while(track.hasNext()) {
 			var track1 = track.next();
-			this.Player.SetChannelMute(track1.PlaybackInfo.PrimaryChannel,mute);
-			this.Player.SetChannelMute(track1.PlaybackInfo.SecondaryChannel,mute);
+			this.get_Player().SetChannelMute(track1.PlaybackInfo.PrimaryChannel,mute);
+			this.get_Player().SetChannelMute(track1.PlaybackInfo.SecondaryChannel,mute);
 		}
 	}
 	,LoadSoundFont: function(value) {
-		if(this.Player == null) {
+		if(this.get_Player() == null) {
 			return;
 		}
 		if(typeof(value) == "string") {
-			this.Player.LoadSoundFontFromUrl(value);
+			this._player.LoadSoundFontFromUrl(value);
 		} else {
-			this.Player.LoadSoundFont(value);
+			this._player.LoadSoundFont(value);
 		}
 	}
 	,Play: function() {
-		if(this.Player == null) {
+		if(this.get_Player() == null) {
 			return;
 		}
-		this.Player.Play();
+		this._player.Play();
 	}
 	,Pause: function() {
-		if(this.Player == null) {
+		if(this.get_Player() == null) {
 			return;
 		}
-		this.Player.Pause();
+		this.get_Player().Pause();
 	}
 	,PlayPause: function() {
-		if(this.Player == null) {
+		if(this.get_Player() == null) {
 			return;
 		}
-		this.Player.PlayPause();
+		this.get_Player().PlayPause();
 	}
 	,Stop: function() {
-		if(this.Player == null) {
+		if(this.get_Player() == null) {
 			return;
 		}
-		this.Player.Stop();
+		this.get_Player().Stop();
 		this.CursorUpdateTick(0,true);
 	}
 	,SetupCursor: function() {
@@ -23869,13 +23859,13 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 			cursorWrapper.style.width = surfaceSite.width + "px";
 			cursorWrapper.style.height = surfaceSite.height + "px";
 		});
-		this.Player.On("positionChanged",function(data) {
+		this._player.On("positionChanged",function(data) {
 			_gthis._previousTick = data.CurrentTick;
 			window.setTimeout(function() {
 				_gthis.CursorUpdateTick(data.CurrentTick,false);
 			},0);
 		});
-		this.Player.On("playerStateChanged",function(data1) {
+		this._player.On("playerStateChanged",function(data1) {
 			_gthis._playerState = data1.State;
 			window.setTimeout(function() {
 				_gthis.CursorUpdateTick(_gthis._previousTick,false);
@@ -23933,17 +23923,17 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 				var tickCache = _gthis._tickCache;
 				var realMasterBarStart = tickCache.GetMasterBarStart(_gthis._selectionStart.Beat.Voice.Bar.get_MasterBar());
 				_gthis.CursorUpdateBeat(_gthis._selectionStart.Beat,null,0,false);
-				_gthis.Player.set_TickPosition(realMasterBarStart + _gthis._selectionStart.Beat.PlaybackStart);
+				_gthis.get_Player().set_TickPosition(realMasterBarStart + _gthis._selectionStart.Beat.PlaybackStart);
 				if(_gthis._selectionEnd != null && _gthis._selectionStart.Beat != _gthis._selectionEnd.Beat) {
 					var realMasterBarEnd = tickCache.GetMasterBarStart(_gthis._selectionEnd.Beat.Voice.Bar.get_MasterBar());
-					var _gthis1 = _gthis.Player;
+					var tmp = _gthis.get_Player();
 					var _tmp = new alphaTab.audio.synth.synthesis.PlaybackRange();
 					_tmp.StartTick = realMasterBarStart + _gthis._selectionStart.Beat.PlaybackStart;
 					_tmp.EndTick = realMasterBarEnd + _gthis._selectionEnd.Beat.PlaybackStart + _gthis._selectionEnd.Beat.PlaybackDuration - 50;
-					_gthis1.set_PlaybackRange(_tmp);
+					tmp.set_PlaybackRange(_tmp);
 				} else {
 					_gthis._selectionStart = null;
-					_gthis.Player.set_PlaybackRange(null);
+					_gthis.get_Player().set_PlaybackRange(null);
 					_gthis.CursorSelectRange(_gthis._selectionStart,_gthis._selectionEnd);
 				}
 			}
@@ -24023,7 +24013,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		var elements = this.Element.getElementsByClassName("atHighlight");
 		while(elements.length > 0) elements.item(0).classList.remove("atHighlight");
 		if(this._playerState == 1 || stop) {
-			var duration1 = this.Player.get_PlaybackSpeed();
+			var duration1 = this.get_Player().get_PlaybackSpeed();
 			duration = duration / duration1;
 			if(!stop) {
 				var className = alphaTab.rendering.glyphs.BeatContainerGlyph.GetGroupId(beat);
@@ -24043,7 +24033,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 					}
 				}
 				window.requestAnimationFrame(function(f) {
-					alphaTab.util.Logger.Info("Player","Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration + "(" + Std.string(_gthis.Player.get_PlaybackRange()) + ")",null);
+					alphaTab.util.Logger.Info("Player","Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration + "(" + Std.string(_gthis.get_Player().get_PlaybackRange()) + ")",null);
 					beatCursor.style.transition = "all 0s linear";
 					beatCursor.style.transitionDuration = duration + "ms";
 					beatCursor.style.left = Std.string(nextBeatX) + "px";
@@ -36093,7 +36083,6 @@ alphaTab.audio.MidiUtils.QuarterTime = 960;
 alphaTab.audio.MidiUtils.PercussionChannel = 9;
 alphaTab.audio.MidiUtils.MinVelocity = 15;
 alphaTab.audio.MidiUtils.VelocityIncrement = 16;
-alphaTab.audio.generator.MidiFileGenerator.DefaultMetronomeKey = 37;
 alphaTab.audio.generator.MidiFileGenerator.DefaultDurationDead = 30;
 alphaTab.audio.generator.MidiFileGenerator.DefaultDurationPalmMute = 80;
 alphaTab.audio.generator.MidiFileGenerator.DefaultBend = 64;

@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering.Layout
     /// of a rendered song sheet. All values can be combined using bit-operators as they are flags. 
     /// </summary>
     [Flags]
-    public enum HeaderFooterElements
+    enum HeaderFooterElements
     {
         /// <summary>
         /// No elements get rendered. 

@@ -20,7 +20,7 @@ using AlphaTab.Audio.Synth.Bank.Components.Generators;
 
 namespace AlphaTab.Audio.Synth.Bank.Descriptors
 {
-    public enum Waveform
+    enum Waveform
     {
         Sine = 0,
         Square = 1,
@@ -30,7 +30,7 @@ namespace AlphaTab.Audio.Synth.Bank.Descriptors
         WhiteNoise = 5
     }
 
-    public class GeneratorDescriptor
+    class GeneratorDescriptor
     {
         public LoopMode LoopMethod { get; set; }
         public Waveform SamplerType { get; set; }

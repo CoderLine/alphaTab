@@ -21,7 +21,7 @@ using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Synth.Sf2
 {
-    public class SoundFontInfo
+    class SoundFontInfo
     {
         public short RomVersionMajor { get; set; }
         public short RomVersionMinor { get; set; }

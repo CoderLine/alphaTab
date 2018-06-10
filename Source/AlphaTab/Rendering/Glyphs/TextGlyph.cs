@@ -20,7 +20,7 @@ using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TextGlyph : EffectGlyph
+    class TextGlyph : EffectGlyph
     {
         private readonly string[] _lines;
 

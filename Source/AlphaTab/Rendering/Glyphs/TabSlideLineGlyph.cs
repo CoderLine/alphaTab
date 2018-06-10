@@ -22,7 +22,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabSlideLineGlyph : Glyph
+    class TabSlideLineGlyph : Glyph
     {
         private readonly Note _startNote;
         private readonly SlideType _type;

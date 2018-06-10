@@ -18,7 +18,7 @@
 
 namespace AlphaTab.Audio.Synth.Ds
 {
-    public class LinkedList<T> where T : class
+    class LinkedList<T> where T : class
     {
         public LinkedListNode<T> First { get; set; }
 
@@ -113,7 +113,7 @@ namespace AlphaTab.Audio.Synth.Ds
         }
     }
 
-    public class LinkedListNode<T> where T : class
+    class LinkedListNode<T> where T : class
     {
         internal LinkedList<T> _list;
         internal LinkedListNode<T> _next;

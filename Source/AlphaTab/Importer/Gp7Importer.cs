@@ -27,7 +27,7 @@ namespace AlphaTab.Importer
     /// <summary>
     /// This ScoreImporter can read Guitar Pro 7 (gp) files.
     /// </summary>
-    public class Gp7Importer : ScoreImporter
+    class Gp7Importer : ScoreImporter
     {
         public override string Name { get { return "Guitar Pro 7"; } }
 

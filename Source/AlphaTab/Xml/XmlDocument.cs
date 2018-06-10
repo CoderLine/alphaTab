@@ -18,7 +18,7 @@
 
 namespace AlphaTab.Xml
 {
-    public class XmlDocument : XmlNode
+    class XmlDocument : XmlNode
     {
         public XmlNode DocumentElement { get; private set; }
 
@@ -35,7 +35,5 @@ namespace AlphaTab.Xml
                 }
             }
         }
-
-
     }
 }

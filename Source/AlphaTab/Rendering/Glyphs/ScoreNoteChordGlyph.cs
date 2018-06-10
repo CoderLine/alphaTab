@@ -24,7 +24,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ScoreNoteChordGlyph : ScoreNoteChordGlyphBase
+    class ScoreNoteChordGlyph : ScoreNoteChordGlyphBase
     {
         private readonly FastDictionary<int, Glyph> _noteLookup;
         private Glyph _tremoloPicking;

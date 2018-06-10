@@ -145,7 +145,7 @@ namespace AlphaTab.Audio.Synth.Midi.Event
             Message = status | (data1 << 8) | (data2 << 16);
         }
 
-        public virtual void WriteTo(ByteBuffer s)
+        public virtual void WriteTo(IWriteable s)
         {
             var b = new[]
             {

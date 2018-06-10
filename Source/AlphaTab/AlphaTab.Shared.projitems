@@ -204,13 +204,16 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeatContainerGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeatGlyphBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeatOnNoteGlyphBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeatVibratoGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BendNoteHeadGroupGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\FermataGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\GhostNoteContainerGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\GhostParenthesisGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\OttavaGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreBendGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreHelperNotesBaseGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreNoteChordGlyphBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreTimeSignatureGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreWhammyBarGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TabBendGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ChineseCymbalGlyph.cs" />
@@ -261,6 +264,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TabRestGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TabSlideLineGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TabTieGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TabTimeSignatureGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TempoGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TextGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TieGlyph.cs" />
@@ -286,6 +290,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Staves\MasterBarsRenderers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Staves\Staff.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Staves\StaveGroup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Staves\StaveTrackGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\TabBarRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\TabBarRendererFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\AccidentalHelper.cs" />

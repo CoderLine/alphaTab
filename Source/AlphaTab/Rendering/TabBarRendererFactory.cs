@@ -23,7 +23,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This Factory produces TabBarRenderer instances
     /// </summary>
-    public class TabBarRendererFactory : BarRendererFactory
+    class TabBarRendererFactory : BarRendererFactory
     {
         private readonly bool _showTimeSignature;
         private readonly bool _showRests;

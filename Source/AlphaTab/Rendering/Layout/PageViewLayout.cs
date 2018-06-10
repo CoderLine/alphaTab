@@ -29,7 +29,7 @@ namespace AlphaTab.Rendering.Layout
     /// <summary>
     /// This layout arranges the bars into a fixed width and dynamic height region. 
     /// </summary>
-    public class PageViewLayout : ScoreLayout
+    class PageViewLayout : ScoreLayout
     {
         // left top right bottom
         public static readonly float[] PagePadding = { 40, 40, 40, 40 };

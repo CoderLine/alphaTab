@@ -5,7 +5,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class GhostNoteInfo
+    class GhostNoteInfo
     {
         public int Line { get; set; }
         public bool IsGhost { get; set; }
@@ -18,7 +18,7 @@ namespace AlphaTab.Rendering.Glyphs
     }
 
 
-    public class GhostNoteContainerGlyph : Glyph
+    class GhostNoteContainerGlyph : Glyph
     {
         private readonly bool _isOpen;
         private readonly FastList<GhostNoteInfo> _infos;

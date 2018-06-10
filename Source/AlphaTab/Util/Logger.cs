@@ -1,8 +1,6 @@
-﻿using AlphaTab.Platform;
-
-namespace AlphaTab.Util
+﻿namespace AlphaTab.Util
 {
-    public class Logger
+    class Logger
     {
         public static LogLevel LogLevel { get; set; }
 

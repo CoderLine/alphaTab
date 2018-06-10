@@ -20,7 +20,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TuningGlyph : GlyphGroup
+    class TuningGlyph : GlyphGroup
     {
         private readonly float _scale;
         private readonly RenderingResources _resources;

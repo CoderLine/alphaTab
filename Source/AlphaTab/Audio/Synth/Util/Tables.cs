@@ -20,7 +20,7 @@ using AlphaTab.Audio.Synth.Ds;
 
 namespace AlphaTab.Audio.Synth.Util
 {
-    public class Tables
+    class Tables
     {
         private static bool _isInitialized;
 

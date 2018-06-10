@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class SlightNoteVibratoEffectInfo : NoteEffectInfoBase
+    class SlightNoteVibratoEffectInfo : NoteEffectInfoBase
     {
         public override string EffectId { get { return "slight-note-vibrato"; } }
 

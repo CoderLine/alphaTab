@@ -21,13 +21,13 @@ using AlphaTab.Audio.Synth.Bank.Descriptors;
 
 namespace AlphaTab.Audio.Synth.Bank.Components
 {
-    public enum LfoState
+    enum LfoState
     {
         Delay = 0,
         Sustain = 1
     }
 
-    public class Lfo
+    class Lfo
     {
         private double _phase;
         private double _increment;

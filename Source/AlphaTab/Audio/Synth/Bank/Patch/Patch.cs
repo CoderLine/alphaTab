@@ -20,7 +20,7 @@ using AlphaTab.Audio.Synth.Synthesis;
 
 namespace AlphaTab.Audio.Synth.Bank.Patch
 {
-    public abstract class Patch
+    abstract class Patch
     {
         public int ExclusiveGroupTarget { get; set; }
         public int ExclusiveGroup { get; set; }

@@ -3,7 +3,7 @@ using System.IO;
 
 namespace AlphaTab.IO
 {
-    public class ReadableStream : Stream
+    class ReadableStream : Stream
     {
         private readonly IReadable _readable;
 

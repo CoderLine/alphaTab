@@ -22,7 +22,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class BeatOnNoteGlyphBase : BeatGlyphBase
+    class BeatOnNoteGlyphBase : BeatGlyphBase
     {
         public BeamingHelper BeamingHelper { get; set; }
         public float CenterX { get; set; }

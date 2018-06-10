@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class WhammyBarEffectInfo : IEffectBarRendererInfo
+    class WhammyBarEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "whammy"; } }
         public bool HideOnMultiTrack { get { return false; } }

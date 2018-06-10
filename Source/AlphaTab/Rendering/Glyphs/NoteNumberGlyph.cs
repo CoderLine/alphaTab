@@ -22,7 +22,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class NoteNumberGlyph : Glyph
+    class NoteNumberGlyph : Glyph
     {
         private readonly Note _note;
         private string _noteString;

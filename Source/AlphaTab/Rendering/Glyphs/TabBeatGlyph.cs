@@ -19,7 +19,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabBeatGlyph : BeatOnNoteGlyphBase
+    class TabBeatGlyph : BeatOnNoteGlyphBase
     {
         public TabNoteChordGlyph NoteNumbers { get; set; }
         public TabRestGlyph RestGlyph { get; set; }

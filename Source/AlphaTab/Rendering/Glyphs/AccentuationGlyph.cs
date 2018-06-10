@@ -19,7 +19,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class AccentuationGlyph : MusicFontGlyph
+    class AccentuationGlyph : MusicFontGlyph
     {
         public AccentuationGlyph(float x, float y, AccentuationType accentuation)
             : base(x, y, 1, GetSymbol(accentuation))

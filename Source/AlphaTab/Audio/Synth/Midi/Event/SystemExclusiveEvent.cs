@@ -20,7 +20,7 @@ using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Synth.Midi.Event
 {
-    public class SystemExclusiveEvent : SystemCommonEvent
+    class SystemExclusiveEvent : SystemCommonEvent
     {
         public byte[] Data { get; private set; }
 
@@ -39,7 +39,7 @@ namespace AlphaTab.Audio.Synth.Midi.Event
             Data = data;
         }
 
-        public override void WriteTo(ByteBuffer s)
+        public override void WriteTo(IWriteable s)
         {
             s.WriteByte(0xF0);
             var l = Data.Length + 2;

@@ -21,7 +21,7 @@ using AlphaTab.Collections;
 
 namespace AlphaTab.Xml
 {
-    public class XmlNode
+    class XmlNode
     {
         public XmlNodeType NodeType { get; set; }
         public string LocalName { get; set; }

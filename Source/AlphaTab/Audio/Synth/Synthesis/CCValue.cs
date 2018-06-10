@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using AlphaTab.Platform;
 
 namespace AlphaTab.Audio.Synth.Synthesis
 {
-    public class CCValue
+
+    class CCValue
     {
         private byte _coarseValue;
         private byte _fineValue;

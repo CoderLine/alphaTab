@@ -26,7 +26,7 @@ namespace AlphaTab.Platform
     /// <summary>
     /// This is the base public interface for canvas implementations on different plattforms.
     /// </summary>
-    public interface ICanvas : IPathCanvas
+    interface ICanvas : IPathCanvas
     {
         RenderingResources Resources { get; set; }
 
@@ -63,7 +63,7 @@ namespace AlphaTab.Platform
     /// This is the path drawing API for canvas implementations
     /// </summary>
     // NOTE: For a full HTML based rendering we need to get rid of those 
-    public interface IPathCanvas
+    interface IPathCanvas
     {
         void BeginPath();
         void ClosePath();

@@ -20,7 +20,7 @@ using AlphaTab.Audio.Synth.Ds;
 
 namespace AlphaTab.Audio.Synth
 {
-    public interface ISynthOutput
+    interface ISynthOutput
     {
         /// <summary>
         /// Gets the sample rate required by the output.

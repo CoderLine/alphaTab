@@ -13,7 +13,7 @@ using Phase.Attributes;
 
 namespace AlphaTab.Platform.JavaScript
 {
-    public class JQueryAlphaTab
+    class JQueryAlphaTab
     {
         public object Exec(Element element, string method, string[] args)
         {
@@ -130,7 +130,7 @@ namespace AlphaTab.Platform.JavaScript
 
         #region Player
         [Name("player")]
-        public AlphaSynthWebWorkerApi Player(JQuery element, AlphaTabApi context)
+        public IAlphaSynth Player(JQuery element, AlphaTabApi context)
         {
             return context.Player;
         }

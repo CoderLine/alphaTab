@@ -19,7 +19,7 @@ using AlphaTab.Collections;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class LeftToRightLayoutingGlyphGroup : GlyphGroup
+    class LeftToRightLayoutingGlyphGroup : GlyphGroup
     {
         public LeftToRightLayoutingGlyphGroup()
             : base(0,0)

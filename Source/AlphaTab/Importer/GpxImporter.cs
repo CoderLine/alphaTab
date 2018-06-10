@@ -25,7 +25,7 @@ namespace AlphaTab.Importer
     /// <summary>
     /// This ScoreImporter can read Guitar Pro 6 (gpx) files.
     /// </summary>
-    public class GpxImporter : ScoreImporter
+    class GpxImporter : ScoreImporter
     {
         public override string Name { get { return "Guitar Pro 6"; } }
 

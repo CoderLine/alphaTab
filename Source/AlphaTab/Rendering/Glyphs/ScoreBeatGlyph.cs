@@ -21,7 +21,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ScoreBeatGlyph : BeatOnNoteGlyphBase
+    class ScoreBeatGlyph : BeatOnNoteGlyphBase
     {
         public ScoreNoteChordGlyph NoteHeads { get; set; }
         public ScoreRestGlyph RestGlyph { get; set; }

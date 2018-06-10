@@ -5,7 +5,7 @@ using AlphaTab.Util;
 
 namespace AlphaTab.Audio.Generator
 {
-    public class AlphaSynthMidiFileHandler : IMidiFileHandler
+    class AlphaSynthMidiFileHandler : IMidiFileHandler
     {
         private readonly MidiFile _midiFile;
 

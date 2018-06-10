@@ -23,7 +23,7 @@ using AlphaTab.Audio.Synth.Util;
 
 namespace AlphaTab.Audio.Synth.Bank.Components
 {
-    public enum EnvelopeState
+    enum EnvelopeState
     {
         Delay = 0,
         Attack = 1,
@@ -34,7 +34,7 @@ namespace AlphaTab.Audio.Synth.Bank.Components
         None = 6
     }
 
-    public class Envelope
+    class Envelope
     {
         private readonly EnvelopeStage[] _stages;
         private int _index;
@@ -183,7 +183,7 @@ namespace AlphaTab.Audio.Synth.Bank.Components
         }
     }
 
-    public class EnvelopeStage
+    class EnvelopeStage
     {
         public int Time { get; set; }
         public SampleArray Graph { get; set; }

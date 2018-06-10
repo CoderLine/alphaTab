@@ -17,7 +17,7 @@
  */
 namespace AlphaTab.Audio.Synth.Midi
 {
-    public static class MidiHelper
+    static class MidiHelper
     {
         public const int MicroSecondsPerMinute = 60000000;
         public const int MinChannel = 0;

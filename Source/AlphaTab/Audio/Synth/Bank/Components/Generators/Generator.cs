@@ -22,7 +22,7 @@ using AlphaTab.Audio.Synth.Ds;
 
 namespace AlphaTab.Audio.Synth.Bank.Components.Generators
 {
-    public enum LoopMode
+    enum LoopMode
     {
         NoLoop = 0,
         OneShot = 1,
@@ -30,7 +30,7 @@ namespace AlphaTab.Audio.Synth.Bank.Components.Generators
         LoopUntilNoteOff = 3
     }
 
-    public enum GeneratorState
+    enum GeneratorState
     {
         PreLoop = 0,
         Loop = 1,
@@ -38,7 +38,7 @@ namespace AlphaTab.Audio.Synth.Bank.Components.Generators
         Finished = 3
     }
 
-    public abstract class Generator
+    abstract class Generator
     {
         public LoopMode LoopMode { get; set; }
         public double LoopStartPhase { get; set; }

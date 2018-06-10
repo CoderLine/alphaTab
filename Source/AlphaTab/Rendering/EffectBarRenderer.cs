@@ -25,7 +25,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering
 {
-    public class EffectBand : Glyph
+    class EffectBand : Glyph
     {
         private FastList<FastList<EffectGlyph>> _uniqueEffectGlyphs;
         private FastList<FastDictionary<int, EffectGlyph>> _effectGlyphs;
@@ -255,7 +255,7 @@ namespace AlphaTab.Rendering
         }
     }
 
-    public class EffectBandSizingInfo
+    class EffectBandSizingInfo
     {
         private readonly FastDictionary<string, EffectBandSlot> _effectSlot;
         public FastList<EffectBandSlot> Slots { get; set; }
@@ -301,7 +301,7 @@ namespace AlphaTab.Rendering
         }
     }
 
-    public class EffectBandSlotShared
+    class EffectBandSlotShared
     {
         public string UniqueEffectId { get; set; }
         public float Y { get; set; }
@@ -316,7 +316,7 @@ namespace AlphaTab.Rendering
         }
     }
 
-    public class EffectBandSlot
+    class EffectBandSlot
     {
         public FastList<EffectBand> Bands { get; set; }
         public EffectBandSlotShared Shared { get; set; }
@@ -367,7 +367,7 @@ namespace AlphaTab.Rendering
     /// This renderer is responsible for displaying effects above or below the other staves
     /// like the vibrato. 
     /// </summary>
-    public class EffectBarRenderer : BarRendererBase
+    class EffectBarRenderer : BarRendererBase
     {
         private readonly IEffectBarRendererInfo[] _infos;
         private EffectBand[] _bands;

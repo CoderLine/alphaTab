@@ -22,7 +22,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ScoreBrushGlyph : Glyph
+    class ScoreBrushGlyph : Glyph
     {
         private readonly Beat _beat;
 

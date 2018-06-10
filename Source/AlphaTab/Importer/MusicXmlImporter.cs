@@ -25,7 +25,7 @@ using XmlNodeType = AlphaTab.Xml.XmlNodeType;
 
 namespace AlphaTab.Importer
 {
-    public class MusicXmlImporter : ScoreImporter
+    class MusicXmlImporter : ScoreImporter
     {
         public const string MergePartGroupsSetting = "musicXMLMergePartGroups";
 

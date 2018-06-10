@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class TempoEffectInfo : IEffectBarRendererInfo
+    class TempoEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "tempo"; } }
         public bool HideOnMultiTrack { get { return true; } }

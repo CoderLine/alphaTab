@@ -21,7 +21,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
 {
-    public enum BeamDirection
+    enum BeamDirection
     {
         Up,
         Down
@@ -30,7 +30,7 @@ namespace AlphaTab.Rendering.Utils
     /// <summary>
     /// Lists all types how two voices can be joined with bars.
     /// </summary>
-    public enum BeamBarType
+    enum BeamBarType
     {
         /// <summary>
         /// Full Bar from current to next
@@ -46,12 +46,12 @@ namespace AlphaTab.Rendering.Utils
         PartRight
     }
 
-    public interface IBeamYCalculator
+    interface IBeamYCalculator
     {
         float GetYPositionForNoteValue(int noteValue);
     }
 
-    public class BeatLinePositions
+    class BeatLinePositions
     {
         public string StaffId { get; set; }
         public float Up { get; set; }
@@ -68,7 +68,7 @@ namespace AlphaTab.Rendering.Utils
     /// <summary>
     /// This public class helps drawing beams and bars for notes.
     /// </summary>
-    public class BeamingHelper
+    class BeamingHelper
     {
         private static readonly int[] ScoreMiddleKeys = { 60, 60, 57, 50, 71 };
 

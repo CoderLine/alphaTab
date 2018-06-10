@@ -23,7 +23,7 @@ using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabWhammyBarGlyph : Glyph
+    class TabWhammyBarGlyph : Glyph
     {
         private const string TopOffsetSharedDataKey = "tab.whammy.topoffset";
         public const int PerHalfSize = 6;

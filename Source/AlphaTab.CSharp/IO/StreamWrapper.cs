@@ -20,7 +20,7 @@ using System.IO;
 
 namespace AlphaTab.IO
 {
-    public sealed class StreamWrapper : IReadable, IWriteable, IDisposable
+    sealed class StreamWrapper : IReadable, IWriteable, IDisposable
     {
         public Stream Stream { get; }
 

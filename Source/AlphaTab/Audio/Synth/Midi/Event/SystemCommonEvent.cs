@@ -17,7 +17,7 @@
  */
 namespace AlphaTab.Audio.Synth.Midi.Event
 {
-    public enum SystemCommonTypeEnum
+    enum SystemCommonTypeEnum
     {
         SystemExclusive = 0xF0,
         MtcQuarterFrame = 0xF1,
@@ -27,7 +27,7 @@ namespace AlphaTab.Audio.Synth.Midi.Event
         SystemExclusive2 = 0xF7
     }
 
-    public abstract class SystemCommonEvent : MidiEvent
+    abstract class SystemCommonEvent : MidiEvent
     {
         public override int Channel
         {

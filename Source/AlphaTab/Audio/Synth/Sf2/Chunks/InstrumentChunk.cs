@@ -22,7 +22,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Audio.Synth.Sf2.Chunks
 {
-    public class InstrumentChunk : Chunk
+    class InstrumentChunk : Chunk
     {
         private RawInstrument[] _rawInstruments;
 

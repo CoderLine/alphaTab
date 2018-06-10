@@ -37,7 +37,7 @@ using GdiColor = System.Drawing.Color;
 
 namespace AlphaTab.Platform.CSharp
 {
-    public class GdiCanvas : ICanvas
+    class GdiCanvas : ICanvas
     {
         protected const float BlurCorrection = 0.5f;
 

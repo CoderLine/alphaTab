@@ -22,7 +22,7 @@ using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Synth.Sf2
 {
-    public class SoundFontPresets
+    class SoundFontPresets
     {
         public SampleHeader[] SampleHeaders { get; private set; }
         public PresetHeader[] PresetHeaders { get; private set; }

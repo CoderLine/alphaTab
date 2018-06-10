@@ -21,7 +21,7 @@ using AlphaTab.Audio.Synth.Util;
 
 namespace AlphaTab.Audio.Synth.Bank.Descriptors
 {
-    public class LfoDescriptor
+    class LfoDescriptor
     {
         public float DelayTime { get; set; }
         public float Frequency { get; set; }

@@ -7,7 +7,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class BendNoteHeadGroupGlyph : ScoreNoteChordGlyphBase
+    class BendNoteHeadGroupGlyph : ScoreNoteChordGlyphBase
     {
         private readonly bool _showParenthesis;
         private readonly FastDictionary<int, Glyph> _noteValueLookup;

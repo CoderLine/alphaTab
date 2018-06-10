@@ -27,7 +27,7 @@ namespace AlphaTab.Importer
     /// <summary>
     /// This importer can parse alphaTex markup into a score structure. 
     /// </summary>
-    public class AlphaTexImporter : ScoreImporter
+    class AlphaTexImporter : ScoreImporter
     {
         private const int Eof = 0;
         private static readonly int[] TrackChannels = { 0, 1 };

@@ -20,7 +20,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class DiamondNoteHeadGlyph : MusicFontGlyph
+    class DiamondNoteHeadGlyph : MusicFontGlyph
     {
         private readonly bool _isGrace;
 

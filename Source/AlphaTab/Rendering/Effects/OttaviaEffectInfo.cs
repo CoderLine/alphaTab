@@ -22,7 +22,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class OttaviaEffectInfo : IEffectBarRendererInfo
+    class OttaviaEffectInfo : IEffectBarRendererInfo
     {
         private readonly bool _aboveStaff;
         public string EffectId => "ottavia-" + (_aboveStaff ? "above" : "below");

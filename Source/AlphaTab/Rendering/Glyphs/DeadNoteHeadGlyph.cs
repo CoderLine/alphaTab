@@ -17,7 +17,7 @@
  */
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class DeadNoteHeadGlyph : MusicFontGlyph
+    class DeadNoteHeadGlyph : MusicFontGlyph
     {
         private readonly bool _isGrace;
 

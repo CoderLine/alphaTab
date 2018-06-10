@@ -29,7 +29,7 @@ namespace AlphaTab.Rendering.Glyphs
     /// This glyph acts as container for handling
     /// multiple voice rendering
     /// </summary>
-    public class VoiceContainerGlyph : GlyphGroup
+    class VoiceContainerGlyph : GlyphGroup
     {
         public const string KeySizeBeat = "Beat";
 

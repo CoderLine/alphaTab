@@ -21,7 +21,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabRestGlyph : MusicFontGlyph
+    class TabRestGlyph : MusicFontGlyph
     {
         private readonly bool _isVisibleRest;
         private readonly Duration _duration;

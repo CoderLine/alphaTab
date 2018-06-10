@@ -3,7 +3,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class FermataEffectInfo : IEffectBarRendererInfo
+    class FermataEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "fermata"; } }
         public bool HideOnMultiTrack { get { return false; } }

@@ -25,7 +25,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Xml
 {
-    public class XmlParser
+    class XmlParser
     {
         public const int CharCodeLF = '\n';
         public const int CharCodeTab = '\t';

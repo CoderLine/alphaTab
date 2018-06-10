@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ScoreLegatoGlyph : TieGlyph
+    class ScoreLegatoGlyph : TieGlyph
     {
         public ScoreLegatoGlyph(Beat startBeat, Beat endBeat, bool forEnd = false)
             : base(startBeat, endBeat, forEnd)

@@ -195,9 +195,11 @@ namespace AlphaTab.Platform.CSharp.WinForms
             }
         }
 
+        private ScoreRenderer _renderer;
+
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public ScoreRenderer Renderer { get; private set; }
+        public IScoreRenderer Renderer => _renderer;
 
         public AlphaTabControl()
         {
@@ -214,8 +216,8 @@ namespace AlphaTab.Platform.CSharp.WinForms
             _stavesMode = settings.Staves.Id;
             _renderEngine = settings.Engine;
 
-            Renderer = new ScoreRenderer(settings);
-            Renderer.PreRender += result =>
+            _renderer = new ScoreRenderer(settings);
+            _renderer.PreRender += result =>
             {
                 BeginInvoke(new Action(() =>
                 {
@@ -235,14 +237,14 @@ namespace AlphaTab.Platform.CSharp.WinForms
                     AddPartialResult(result);
                 }));
             };
-            Renderer.PartialRenderFinished += result =>
+            _renderer.PartialRenderFinished += result =>
             {
                 BeginInvoke(new Action(() =>
                 {
                     AddPartialResult(result);
                 }));
             };
-            Renderer.RenderFinished += result =>
+            _renderer.RenderFinished += result =>
             {
                 BeginInvoke(new Action(() =>
                 {
@@ -299,19 +301,19 @@ namespace AlphaTab.Platform.CSharp.WinForms
             var width = RenderWidth - Padding.Horizontal;
             if (width > 0)
             {
-                if (trackArray == Renderer.Tracks && !force)
+                if (trackArray == _renderer.Tracks && !force)
                 {
                     return;
                 }
 
-                var settings = Renderer.Settings;
+                var settings = _renderer.Settings;
                 settings.Width = width;
                 settings.Engine = RenderEngine;
                 settings.Scale = Scale;
                 settings.Layout.Mode = LayoutMode;
                 settings.StretchForce = StretchForce;
                 settings.Staves.Id = StavesMode;
-                Renderer.UpdateSettings(settings);
+                _renderer.UpdateSettings(settings);
                 ModelUtils.ApplyPitchOffsets(settings, trackArray[0].Score);
 
                 _initialRenderCompleted = false;
@@ -319,7 +321,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
 
                 Task.Factory.StartNew(() =>
                 {
-                    Renderer.Render(trackArray[0].Score, trackArray.Select(t=>t.Index).ToArray());
+                    _renderer.Render(trackArray[0].Score, trackArray.Select(t=>t.Index).ToArray());
                 });
             }
             else
@@ -362,11 +364,11 @@ namespace AlphaTab.Platform.CSharp.WinForms
                 {
                     InvalidateTracks(true);
                 }
-                else if (newWidth != Renderer.Settings.Width)
+                else if (newWidth != _renderer.Settings.Width)
                 {
                     Task.Factory.StartNew(() =>
                     {
-                        Renderer.Resize(newWidth);
+                        _renderer.Resize(newWidth);
                     });
                 }
                 else

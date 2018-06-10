@@ -22,7 +22,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Audio.Synth.Sf2.Chunks
 {
-    public class PresetHeaderChunk : Chunk
+    class PresetHeaderChunk : Chunk
     {
         private readonly RawPreset[] _rawPresets;
 

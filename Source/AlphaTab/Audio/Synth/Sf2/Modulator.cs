@@ -21,7 +21,7 @@ using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Synth.Sf2
 {
-    public class Modulator
+    class Modulator
     {
         private ModulatorType _sourceModulationData;
         private int _destinationGenerator;

@@ -19,7 +19,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabBeatPreNotesGlyph : BeatGlyphBase
+    class TabBeatPreNotesGlyph : BeatGlyphBase
     {
         public override void DoLayout()
         {

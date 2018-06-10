@@ -19,7 +19,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class DynamicsGlyph : MusicFontGlyph
+    class DynamicsGlyph : MusicFontGlyph
     {
         public DynamicsGlyph(float x, float y, DynamicValue dynamics)
                   : base(x, y, 0.6f, GetSymbol(dynamics))

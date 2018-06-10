@@ -21,7 +21,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public abstract class NoteEffectInfoBase : IEffectBarRendererInfo
+    abstract class NoteEffectInfoBase : IEffectBarRendererInfo
     {
         protected FastList<Note> LastCreateInfo;
 

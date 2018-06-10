@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class TripletFeelEffectInfo : IEffectBarRendererInfo
+    class TripletFeelEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "triplet-feel"; } }
         public bool HideOnMultiTrack { get { return true; } }

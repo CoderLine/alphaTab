@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class MarkerEffectInfo : IEffectBarRendererInfo
+    class MarkerEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "marker"; } }
         public bool HideOnMultiTrack { get { return true; } }

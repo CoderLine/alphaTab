@@ -17,7 +17,7 @@
  */
 namespace AlphaTab.Xml
 {
-    public enum XmlNodeType
+    enum XmlNodeType
     {
         None,
         Element,

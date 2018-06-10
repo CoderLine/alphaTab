@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabTieGlyph : TieGlyph
+    class TabTieGlyph : TieGlyph
     {
         private readonly Note _startNote;
         private readonly Note _endNote;

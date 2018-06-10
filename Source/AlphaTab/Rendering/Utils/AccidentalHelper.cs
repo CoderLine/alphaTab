@@ -26,7 +26,7 @@ namespace AlphaTab.Rendering.Utils
     /// This small utilty public class allows the assignment of accidentals within a 
     /// desired scope. 
     /// </summary>
-    public class AccidentalHelper
+    class AccidentalHelper
     {
         private readonly Bar _bar;
 

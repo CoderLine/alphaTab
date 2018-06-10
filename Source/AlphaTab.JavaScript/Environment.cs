@@ -39,7 +39,7 @@ namespace AlphaTab
     /// alphaTab looks for information like available layout engines
     /// staves etc.
     /// </summary>
-    public partial class Environment
+    partial class Environment
     {
         public static string ScriptFile { get; set; }
         public static bool IsFontLoaded { get; set; }

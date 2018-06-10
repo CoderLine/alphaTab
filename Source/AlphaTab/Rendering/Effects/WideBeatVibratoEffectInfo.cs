@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class WideBeatVibratoEffectInfo : IEffectBarRendererInfo
+    class WideBeatVibratoEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "wide-beat-vibrato"; } }
         public bool HideOnMultiTrack { get { return false; } }

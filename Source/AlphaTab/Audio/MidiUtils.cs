@@ -20,7 +20,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Audio
 {
-    public static class MidiUtils
+    static class MidiUtils
     {
         /// <summary>
         /// The amount of ticks per quarter note used within this midi system.

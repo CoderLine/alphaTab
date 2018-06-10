@@ -29,7 +29,7 @@ namespace AlphaTab.Rendering.Staves
     /// It is used by the layout engine to collect the sizes of score parts
     /// to align the parts across multiple staves.
     /// </summary>
-    public class BarLayoutingInfo
+    class BarLayoutingInfo
     {
         private const int MinDuration = 30;
         private const int MinDurationWidth = 10;

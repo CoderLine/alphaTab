@@ -22,7 +22,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
 {
-    public class BarHelpers
+    class BarHelpers
     {
         public FastList<FastList<BeamingHelper>> BeamHelpers { get; set; }
         public FastList<FastDictionary<int, BeamingHelper>> BeamHelperLookup { get; set; }

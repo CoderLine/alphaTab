@@ -22,7 +22,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ScoreTieGlyph : TieGlyph
+    class ScoreTieGlyph : TieGlyph
     {
         private readonly Note _startNote;
         private readonly Note _endNote;

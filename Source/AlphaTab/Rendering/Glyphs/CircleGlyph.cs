@@ -19,7 +19,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class CircleGlyph : Glyph
+    class CircleGlyph : Glyph
     {
         private readonly float _size;
 

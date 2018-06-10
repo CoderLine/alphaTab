@@ -21,7 +21,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class AccidentalGlyph : MusicFontGlyph
+    class AccidentalGlyph : MusicFontGlyph
     {
         private readonly bool _isGrace;
 

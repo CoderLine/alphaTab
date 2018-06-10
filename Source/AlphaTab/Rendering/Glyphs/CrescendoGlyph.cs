@@ -22,7 +22,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class CrescendoGlyph : GroupedEffectGlyph
+    class CrescendoGlyph : GroupedEffectGlyph
     {
         private readonly CrescendoType _crescendo;
 

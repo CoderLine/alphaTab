@@ -17,7 +17,7 @@
  */
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class HiHatGlyph : MusicFontGlyph
+    class HiHatGlyph : MusicFontGlyph
     {
         private readonly bool _isGrace;
 

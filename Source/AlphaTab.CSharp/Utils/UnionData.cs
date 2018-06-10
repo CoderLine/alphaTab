@@ -3,7 +3,7 @@
 namespace AlphaTab.Utils
 {
     [StructLayout(LayoutKind.Explicit)]
-    public struct UnionData
+    struct UnionData
     {
         //double values
         [FieldOffset(0)]

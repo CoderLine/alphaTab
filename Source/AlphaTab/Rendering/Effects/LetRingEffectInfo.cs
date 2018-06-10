@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class LetRingEffectInfo : IEffectBarRendererInfo
+    class LetRingEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "let-ring"; } }
         public bool CanShareBand { get { return false; } }

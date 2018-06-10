@@ -20,7 +20,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering
 {
-    public class EffectBarRendererFactory : BarRendererFactory
+    class EffectBarRendererFactory : BarRendererFactory
     {
         private readonly IEffectBarRendererInfo[] _infos;
         private readonly string _staffId;

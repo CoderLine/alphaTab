@@ -19,7 +19,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ScoreBeatPreNotesGlyph : BeatGlyphBase
+    class ScoreBeatPreNotesGlyph : BeatGlyphBase
     {
         private BendNoteHeadGroupGlyph _prebends;
         public float PrebendNoteHeadOffset => _prebends.X + _prebends.NoteHeadOffset;

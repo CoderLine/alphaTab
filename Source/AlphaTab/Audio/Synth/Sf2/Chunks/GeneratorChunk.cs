@@ -20,7 +20,7 @@ using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Synth.Sf2.Chunks
 {
-    public class GeneratorChunk : Chunk
+    class GeneratorChunk : Chunk
     {
         public Generator[] Generators { get; set; }
 

@@ -34,7 +34,7 @@ namespace AlphaTab.Platform
 {
     [Name("js.html.TextDecoder")]
     [External]
-    public class TextDecoder
+    class TextDecoder
     {
         public extern TextDecoder(HaxeString label);
 
@@ -44,7 +44,7 @@ namespace AlphaTab.Platform
         public extern HaxeString Decode(ArrayBufferView data);
     }
 
-    public static partial class Platform
+    static partial class Platform
     {
         [Inline]
         public static float ParseFloat(string s)

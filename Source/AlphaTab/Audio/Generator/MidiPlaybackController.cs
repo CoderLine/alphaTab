@@ -20,7 +20,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Audio.Generator
 {
-    public class MidiPlaybackController
+    class MidiPlaybackController
     {
         private readonly Score _score;
 
@@ -32,13 +32,7 @@ namespace AlphaTab.Audio.Generator
         public int Index { get; set; }
         public int CurrentTick { get; set; }
 
-        public bool Finished
-        {
-            get
-            {
-                return Index >= _score.MasterBars.Count;
-            }
-        }
+        public bool Finished => Index >= _score.MasterBars.Count;
 
 
         public MidiPlaybackController(Score score)

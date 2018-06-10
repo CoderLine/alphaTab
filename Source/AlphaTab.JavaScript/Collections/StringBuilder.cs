@@ -22,7 +22,7 @@ namespace AlphaTab.Collections
 {
     [Abstract("String")]
     [NativeConstructors]
-    public class StringBuilder
+    class StringBuilder
     {
         [Inline]
         public StringBuilder()

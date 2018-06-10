@@ -22,7 +22,7 @@ namespace AlphaTab.Audio
     /// <summary>
     /// This public class provides names for all general midi instruments.
     /// </summary>
-    public class GeneralMidi
+    class GeneralMidi
     {
         private static FastDictionary<string, int> _values;
 

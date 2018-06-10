@@ -18,7 +18,7 @@
 
 namespace AlphaTab.Audio.Synth.Bank
 {
-    public class PatchAsset
+    class PatchAsset
     {
         public string Name { get; }
         public Patch.Patch Patch { get; }

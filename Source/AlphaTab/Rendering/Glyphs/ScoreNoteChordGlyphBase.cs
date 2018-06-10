@@ -5,7 +5,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ScoreNoteGlyphInfo
+    class ScoreNoteGlyphInfo
     {
         public Glyph Glyph { get; set; }
         public int Line { get; set; }
@@ -17,7 +17,7 @@ namespace AlphaTab.Rendering.Glyphs
         }
     }
 
-    public abstract class ScoreNoteChordGlyphBase : Glyph
+    abstract class ScoreNoteChordGlyphBase : Glyph
     {
         private readonly FastList<ScoreNoteGlyphInfo> _infos;
         private float _noteHeadPadding;

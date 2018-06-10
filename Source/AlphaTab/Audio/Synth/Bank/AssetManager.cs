@@ -20,7 +20,7 @@ using AlphaTab.Collections;
 
 namespace AlphaTab.Audio.Synth.Bank
 {
-    public class AssetManager
+    class AssetManager
     {
         public FastList<PatchAsset> PatchAssets { get; }
         public FastList<SampleDataAsset> SampleAssets { get; }

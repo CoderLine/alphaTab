@@ -27,7 +27,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This BarRenderer renders a bar using guitar tablature notation
     /// </summary>
-    public class TabBarRenderer : BarRendererBase
+    class TabBarRenderer : BarRendererBase
     {
         public const string StaffId = "tab";
 

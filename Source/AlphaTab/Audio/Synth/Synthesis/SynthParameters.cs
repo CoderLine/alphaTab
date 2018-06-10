@@ -24,7 +24,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
     /// <summary>
     /// Parameters for a single synth channel including its program, bank, and cc list.
     /// </summary>
-    public class SynthParameters
+    class SynthParameters
     {
         /// <summary>
         /// program number

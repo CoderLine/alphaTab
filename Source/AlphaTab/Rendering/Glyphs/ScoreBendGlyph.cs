@@ -6,7 +6,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ScoreBendGlyph : ScoreHelperNotesBaseGlyph
+    class ScoreBendGlyph : ScoreHelperNotesBaseGlyph
     {
         private readonly Beat _beat;
         private FastList<Note> _notes;

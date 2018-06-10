@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class AlternateEndingsEffectInfo : IEffectBarRendererInfo
+    class AlternateEndingsEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "alternate-feel"; } }
         public bool HideOnMultiTrack { get { return true; } }

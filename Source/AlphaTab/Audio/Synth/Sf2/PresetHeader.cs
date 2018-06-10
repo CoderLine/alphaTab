@@ -17,7 +17,7 @@
  */
 namespace AlphaTab.Audio.Synth.Sf2
 {
-    public class PresetHeader
+    class PresetHeader
     {
         public string Name { get; set; }
         public int PatchNumber { get; set; }

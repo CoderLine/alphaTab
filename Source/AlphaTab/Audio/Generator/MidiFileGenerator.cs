@@ -23,7 +23,7 @@ using AlphaTab.Util;
 
 namespace AlphaTab.Audio.Generator
 {
-    public class MidiNoteDuration
+    class MidiNoteDuration
     {
         public int NoteOnly { get; set; }
         public int UntilTieEnd { get; set; }
@@ -41,12 +41,10 @@ namespace AlphaTab.Audio.Generator
         private int _currentTempo;
         private BeatTickLookup _currentBarRepeatLookup;
 
-        public const int DefaultMetronomeKey = 37;
-        public const int DefaultDurationDead = 30;
-        public const int DefaultDurationPalmMute = 80;
+        private const int DefaultDurationDead = 30;
+        private const int DefaultDurationPalmMute = 80;
 
         public MidiTickLookup TickLookup { get; private set; }
-
 
         public MidiFileGenerator(Score score, Settings settings, IMidiFileHandler handler)
         {

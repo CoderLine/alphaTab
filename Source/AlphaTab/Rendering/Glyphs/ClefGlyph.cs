@@ -22,7 +22,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ClefGlyph : MusicFontGlyph
+    class ClefGlyph : MusicFontGlyph
     {
         private readonly Clef _clef;
         private readonly Ottavia _clefOttava;

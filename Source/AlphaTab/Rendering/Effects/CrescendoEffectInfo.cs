@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class CrescendoEffectInfo : IEffectBarRendererInfo
+    class CrescendoEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "crescendo"; } }
         public bool HideOnMultiTrack { get { return false; } }

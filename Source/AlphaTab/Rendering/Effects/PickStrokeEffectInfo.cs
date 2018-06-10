@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class PickStrokeEffectInfo : IEffectBarRendererInfo
+    class PickStrokeEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "pick-stroke"; } }
         public bool HideOnMultiTrack { get { return false; } }

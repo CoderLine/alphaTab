@@ -5,7 +5,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ScoreWhammyBarGlyph : ScoreHelperNotesBaseGlyph
+    class ScoreWhammyBarGlyph : ScoreHelperNotesBaseGlyph
     {
         public const int SimpleDipHeight = TabWhammyBarGlyph.PerHalfSize * 2;
         public const int SimpleDipPadding = 2;

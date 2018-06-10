@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class ChordsEffectInfo : IEffectBarRendererInfo
+    class ChordsEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "chords"; } }
         public bool HideOnMultiTrack { get { return false; } }

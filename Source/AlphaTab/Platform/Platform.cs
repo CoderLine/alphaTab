@@ -22,7 +22,7 @@ using AlphaTab.Xml;
 
 namespace AlphaTab.Platform
 {
-    public static partial class Platform
+    static partial class Platform
     {
         public static bool IsStringNumber(string s, bool allowSign = true)
         {

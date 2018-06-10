@@ -19,7 +19,7 @@ using System;
 
 namespace AlphaTab.Util
 {
-    public class Lazy<T>
+    class Lazy<T>
     {
         private readonly Func<T> _factory;
         private bool _created;

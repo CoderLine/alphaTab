@@ -17,7 +17,7 @@
  */
 namespace AlphaTab.Rendering.Glyphs
 {
-    public enum MusicFontSymbol
+    enum MusicFontSymbol
     {
         None = -1,
 

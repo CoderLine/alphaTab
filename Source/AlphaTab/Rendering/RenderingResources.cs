@@ -23,7 +23,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This public class contains central definitions for controlling the visual appearance. 
     /// </summary>
-    public class RenderingResources
+    class RenderingResources
     {
         public Font CopyrightFont { get; set; }
         public Font TitleFont { get; set; }

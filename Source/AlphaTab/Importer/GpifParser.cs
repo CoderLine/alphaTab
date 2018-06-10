@@ -30,7 +30,7 @@ namespace AlphaTab.Importer
     /// <summary>
     /// This structure represents a duration within a gpif model.
     /// </summary>
-    public class GpifRhythm
+    class GpifRhythm
     {
         public int Dots { get; set; }
         public int TupletDenominator { get; set; }
@@ -48,7 +48,7 @@ namespace AlphaTab.Importer
     /// <summary>
     /// This public class can parse a score.gpif xml file into the model structure
     /// </summary>
-    public class GpifParser
+    class GpifParser
     {
         private const string InvalidId = "-1";
         /// <summary>

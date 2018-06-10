@@ -19,7 +19,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class MusicFontGlyph : EffectGlyph
+    class MusicFontGlyph : EffectGlyph
     {
         protected readonly float GlyphScale;
         protected readonly MusicFontSymbol Symbol;

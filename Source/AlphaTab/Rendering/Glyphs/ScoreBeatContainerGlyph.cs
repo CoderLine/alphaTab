@@ -21,7 +21,7 @@ using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering
 {
-    public class ScoreBeatContainerGlyph : BeatContainerGlyph
+    class ScoreBeatContainerGlyph : BeatContainerGlyph
     {
         private ScoreBendGlyph _bend;
 

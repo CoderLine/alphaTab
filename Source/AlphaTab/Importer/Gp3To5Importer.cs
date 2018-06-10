@@ -25,7 +25,7 @@ using AlphaTab.Util;
 
 namespace AlphaTab.Importer
 {
-    public class Gp3To5Importer : ScoreImporter
+    class Gp3To5Importer : ScoreImporter
     {
         private const string VersionString = "FICHIER GUITAR PRO ";
 

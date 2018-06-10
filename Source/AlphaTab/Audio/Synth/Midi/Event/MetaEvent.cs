@@ -17,7 +17,7 @@
  */
 namespace AlphaTab.Audio.Synth.Midi.Event
 {
-    public enum MetaEventTypeEnum
+    enum MetaEventTypeEnum
     {
         SequenceNumber = 0x00,
         TextEvent = 0x01,
@@ -39,7 +39,7 @@ namespace AlphaTab.Audio.Synth.Midi.Event
         SequencerSpecific = 0x7F
     }
 
-    public abstract class MetaEvent : MidiEvent
+    abstract class MetaEvent : MidiEvent
     {
         public override int Channel
         {

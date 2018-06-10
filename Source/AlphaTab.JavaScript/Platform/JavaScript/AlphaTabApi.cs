@@ -806,7 +806,9 @@ namespace AlphaTab.Platform.JavaScript
 
         #region Player
 
-        public AlphaSynthWebWorkerApi Player { get; private set; }
+        private AlphaSynthWebWorkerApi _player;
+
+        public IAlphaSynth Player => _player;
         private MidiTickLookup _tickCache;
         private Element _cursorWrapper;
         private Element _beatCursor;
@@ -847,12 +849,12 @@ namespace AlphaTab.Platform.JavaScript
             if (supportsWebAudio && !forceFlash)
             {
                 Logger.Info("Player", "Will use webworkers for synthesizing and web audio api for playback");
-                Player = new AlphaSynthWebWorkerApi(new AlphaSynthWebAudioOutput(), alphaSynthScriptFile, Settings.LogLevel);
+                _player = new AlphaSynthWebWorkerApi(new AlphaSynthWebAudioOutput(), alphaSynthScriptFile, Settings.LogLevel);
             }
             else if (supportsWebWorkers)
             {
                 Logger.Info("Player", "Will use webworkers for synthesizing and flash for playback");
-                Player = new AlphaSynthWebWorkerApi(new AlphaSynthFlashOutput(alphaSynthScriptFile), alphaSynthScriptFile, Settings.LogLevel);
+                _player = new AlphaSynthWebWorkerApi(new AlphaSynthFlashOutput(alphaSynthScriptFile), alphaSynthScriptFile, Settings.LogLevel);
             }
 
             if (Player == null)
@@ -861,49 +863,49 @@ namespace AlphaTab.Platform.JavaScript
             }
             else
             {
-                Player.On("ready", (Action)(() =>
+                _player.On("ready", (Action)(() =>
                 {
                     LoadSoundFont(Settings.SoundFontFile);
                     LoadMidiForScore();
                 }));
-                Player.On("readyForPlayback", (Action)(() =>
+                _player.On("readyForPlayback", (Action)(() =>
                 {
                     TriggerEvent("playerReady");
                 }));
-                Player.On("soundFontLoad", (Action<object>)(data =>
+                _player.On("soundFontLoad", (Action<object>)(data =>
                 {
                     TriggerEvent("soundFontLoad", data);
                 }));
-                Player.On("soundFontLoaded", (Action)(() =>
+                _player.On("soundFontLoaded", (Action)(() =>
                 {
                     TriggerEvent("soundFontLoaded");
                 }));
-                Player.On("soundFontLoadFailed", (Action)(() =>
+                _player.On("soundFontLoadFailed", (Action)(() =>
                 {
                     TriggerEvent("soundFontLoadFailed");
                 }));
 
-                Player.On("midiLoad", (Action<object>)(data =>
+                _player.On("midiLoad", (Action<object>)(data =>
                 {
                     TriggerEvent("midiLoad", data);
                 }));
-                Player.On("midiFileLoaded", (Action)(() =>
+                _player.On("midiFileLoaded", (Action)(() =>
                 {
                     TriggerEvent("midiFileLoaded");
                 }));
-                Player.On("midiFileLoadFailed", (Action)(() =>
+                _player.On("midiFileLoadFailed", (Action)(() =>
                 {
                     TriggerEvent("midiFileLoadFailed");
                 }));
-                Player.On("playerStateChanged", (Action<object>)(data =>
+                _player.On("playerStateChanged", (Action<object>)(data =>
                 {
                     TriggerEvent("playerStateChanged", data);
                 }));
-                Player.On("positionChanged", (Action<object>)(data =>
+                _player.On("positionChanged", (Action<object>)(data =>
                 {
                     TriggerEvent("positionChanged", data);
                 }));
-                Player.On("finished", (Action<object>)(data =>
+                _player.On("finished", (Action<object>)(data =>
                 {
                     TriggerEvent("finished", data);
                 }));
@@ -918,7 +920,7 @@ namespace AlphaTab.Platform.JavaScript
 
         private void LoadMidiForScore()
         {
-            if (Player == null || Score == null || !Player.IsReady)
+            if (Player == null || Score == null || !_player.IsReady)
             {
                 return;
             }
@@ -929,7 +931,7 @@ namespace AlphaTab.Platform.JavaScript
             var generator = new MidiFileGenerator(Score, Settings, handler);
             generator.Generate();
             _tickCache = generator.TickLookup;
-            Player.LoadMidiFile(midiFile);
+            _player.LoadMidiFile(midiFile);
         }
 
         public void DownloadMidi()
@@ -1012,11 +1014,11 @@ namespace AlphaTab.Platform.JavaScript
 
             if (Platform.TypeOf(value) == "string")
             {
-                Player.LoadSoundFontFromUrl((string)value);
+                _player.LoadSoundFontFromUrl((string)value);
             }
             else
             {
-                Player.LoadSoundFont((byte[])value);
+                _player.LoadSoundFont((byte[])value);
             }
         }
 
@@ -1026,7 +1028,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 return;
             }
-            Player.Play();
+            _player.Play();
         }
         public void Pause()
         {
@@ -1115,7 +1117,7 @@ namespace AlphaTab.Platform.JavaScript
                 cursorWrapper.Style.Height = surfaceSite.Height + "px";
             };
 
-            Player.On("positionChanged", (Action<PositionChangedEventArgs>)(data =>
+            _player.On("positionChanged", (Action<PositionChangedEventArgs>)(data =>
            {
                _previousTick = data.CurrentTick;
                Browser.Window.SetTimeout((Action)(() =>
@@ -1125,7 +1127,7 @@ namespace AlphaTab.Platform.JavaScript
            }));
 
 
-            Player.On("playerStateChanged", (Action<PlayerStateChangedEventArgs>)(data =>
+            _player.On("playerStateChanged", (Action<PlayerStateChangedEventArgs>)(data =>
             {
                 _playerState = data.State;
                 Browser.Window.SetTimeout((Action)(() =>

@@ -22,7 +22,7 @@ using AlphaTab.Util;
 
 namespace AlphaTab.Audio.Synth.Sf2
 {
-    public class SoundFont
+    class SoundFont
     {
         public SoundFontInfo Info { get; set; }
         public SoundFontSampleData SampleData { get; set; }

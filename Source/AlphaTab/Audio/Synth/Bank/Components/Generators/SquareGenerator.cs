@@ -22,7 +22,7 @@ using AlphaTab.Audio.Synth.Util;
 
 namespace AlphaTab.Audio.Synth.Bank.Components.Generators
 {
-    public class SquareGenerator : Generator
+    class SquareGenerator : Generator
     {
         public SquareGenerator(GeneratorDescriptor description)
             : base(description)

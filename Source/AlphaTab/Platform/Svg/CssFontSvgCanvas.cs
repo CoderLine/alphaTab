@@ -22,7 +22,7 @@ namespace AlphaTab.Platform.Svg
     /// <summary>
     /// This SVG canvas renders the music symbols by adding a CSS class 'at' to all elements. 
     /// </summary>
-    public class CssFontSvgCanvas : SvgCanvas
+    class CssFontSvgCanvas : SvgCanvas
     {
         public override void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)
         {

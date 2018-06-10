@@ -20,7 +20,7 @@ using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 { 
-    public class RepeatCountGlyph : Glyph
+    class RepeatCountGlyph : Glyph
     {
         private readonly int _count;
 

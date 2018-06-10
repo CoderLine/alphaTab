@@ -1,4 +1,5 @@
 ﻿using System;
+using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Audio.Synth.Synthesis;
 
 namespace AlphaTab.Audio.Synth

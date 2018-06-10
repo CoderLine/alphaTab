@@ -21,7 +21,7 @@ using AlphaTab.Rendering.Effects;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class BarSeperatorGlyph : Glyph
+    class BarSeperatorGlyph : Glyph
     {
         public BarSeperatorGlyph(float x, float y)
             : base(x, y)

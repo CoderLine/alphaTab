@@ -15,10 +15,9 @@ using Phase;
 namespace AlphaTab.Platform.JavaScript
 {
     /// <summary>
-
     /// a WebWorker based alphaSynth which uses the given player as output.
     /// </summary>
-    public class AlphaSynthWebWorkerApi : IAlphaSynth
+    class AlphaSynthWebWorkerApi : IAlphaSynth
     {
         private readonly Worker _synth;
         private readonly ISynthOutput _output;
@@ -29,12 +28,9 @@ namespace AlphaTab.Platform.JavaScript
         private bool _workerIsReady;
         private bool _outputIsReady;
         private PlayerState _state;
-        private LogLevel _logLevel;
         private float _masterVolume;
         private float _metronomeVolume;
         private double _playbackSpeed;
-        private bool _isSoundFontLoaded;
-        private bool _isMidiLoaded;
         private int _tickPosition;
         private double _timePosition;
         private bool _isLooping;
@@ -202,7 +198,9 @@ namespace AlphaTab.Platform.JavaScript
 
             _synth.AddEventListener("message", (Action<MessageEvent>)HandleWorkerMessage, false);
 
-            _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdInitialize,
+            _synth.PostMessage(new
+            {
+                cmd = AlphaSynthWebWorker.CmdInitialize,
                 sampleRate = _output.SampleRate,
                 logLevel = logLevel
             });
@@ -337,7 +335,7 @@ namespace AlphaTab.Platform.JavaScript
                     _state = data.state;
                     TriggerEvent("playerStateChanged", new[]
                     {
-                        new PlayerStateChangedEventArgs(data.state), 
+                        new PlayerStateChangedEventArgs(data.state),
                     });
                     break;
                 case AlphaSynthWebWorker.CmdFinished:
@@ -350,12 +348,10 @@ namespace AlphaTab.Platform.JavaScript
                     TriggerEvent("soundFontLoadFailed");
                     break;
                 case AlphaSynthWebWorker.CmdMidiLoaded:
-                    _isMidiLoaded = true;
                     CheckReadyForPlayback();
                     TriggerEvent("midiFileLoaded");
                     break;
                 case AlphaSynthWebWorker.CmdMidiLoadFailed:
-                    _isSoundFontLoaded = true;
                     CheckReadyForPlayback();
                     TriggerEvent("midiFileLoadFailed");
                     break;

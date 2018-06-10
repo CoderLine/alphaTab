@@ -25,7 +25,7 @@ using Haxe;
 
 namespace AlphaTab.Platform.JavaScript
 {
-    public class AlphaTabWorkerScoreRenderer : IScoreRenderer
+    class AlphaTabWorkerScoreRenderer : IScoreRenderer
     {
         private readonly AlphaTabApi _api;
         private readonly Worker _worker;

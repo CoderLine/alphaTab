@@ -21,7 +21,7 @@ using AlphaTab.Audio.Synth.Sf2;
 
 namespace AlphaTab.Audio.Synth.Bank
 {
-    public class SampleDataAsset
+    class SampleDataAsset
     {
         public string Name { get; set; }
         public int Channels { get; set; }

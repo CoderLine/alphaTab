@@ -29,7 +29,7 @@ namespace AlphaTab.Platform.JavaScript
     /// <summary>
     /// A canvas implementation for HTML5 canvas
     /// </summary>
-    public class Html5Canvas : ICanvas
+    class Html5Canvas : ICanvas
     {
         protected const float BlurCorrection = 0;
 

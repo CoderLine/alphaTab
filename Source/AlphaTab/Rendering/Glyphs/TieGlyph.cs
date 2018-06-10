@@ -22,7 +22,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TieGlyph : Glyph
+    class TieGlyph : Glyph
     {
         protected Beat StartBeat;
         protected Beat EndBeat;

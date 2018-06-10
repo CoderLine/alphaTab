@@ -22,7 +22,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Audio.Synth.Sf2.Chunks
 {
-    public class ZoneChunk : Chunk
+    class ZoneChunk : Chunk
     {
         private RawZoneData[] _zoneData;
 

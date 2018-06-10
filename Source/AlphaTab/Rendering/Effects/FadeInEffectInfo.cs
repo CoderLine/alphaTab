@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class FadeInEffectInfo : IEffectBarRendererInfo
+    class FadeInEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "fade-in"; } }
         public bool HideOnMultiTrack { get { return false; } }

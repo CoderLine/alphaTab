@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering.Staves
     /// This container represents a single column of bar renderers independent from any staves. 
     /// This container can be used to reorganize renderers into a new staves. 
     /// </summary>
-    public class MasterBarsRenderers
+    class MasterBarsRenderers
     {
         public float Width { get; set; }
         public bool IsLinkedToPrevious { get; set; }

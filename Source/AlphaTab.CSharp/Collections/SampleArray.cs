@@ -19,7 +19,7 @@ using System;
 
 namespace AlphaTab.Audio.Synth.Ds
 {
-    public class SampleArray
+    class SampleArray
     {
         public float[] Samples
         {

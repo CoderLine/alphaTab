@@ -25,7 +25,7 @@ namespace AlphaTab.Rendering.Glyphs
     /// This glyph allows to group several other glyphs to be
     /// drawn at the same x position
     /// </summary>
-    public class GlyphGroup : Glyph
+    class GlyphGroup : Glyph
     {
         protected FastList<Glyph> Glyphs;
 

@@ -23,12 +23,11 @@ using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Audio.Synth.Midi.Event;
 using AlphaTab.Audio.Synth.Util;
 using AlphaTab.Collections;
-using AlphaTab.Platform;
 using AlphaTab.Util;
 
 namespace AlphaTab.Audio.Synth.Synthesis
 {
-    public class SynthEvent
+    class SynthEvent
     {
         public int EventIndex { get; set; }
         public MidiEvent Event { get; set; }
@@ -49,7 +48,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
         }
     }
 
-    public class Synthesizer
+    class Synthesizer
     {
         private readonly VoiceManager _voiceManager;
         private readonly SynthParameters[] _synthChannels;
@@ -62,7 +61,6 @@ namespace AlphaTab.Audio.Synth.Synthesis
         private FastDictionary<int, bool> _mutedChannels;
         private FastDictionary<int, bool> _soloChannels;
         private bool _isAnySolo;
-        private float _syn;
 
 
         public int ActiveVoices
@@ -231,7 +229,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                     // channel is muted if it is either explicitley muted, or another channel is set to solo but not this one. 
                     var isChannelMuted = _mutedChannels.ContainsKey(channel) ||
                                          (anySolo && !_soloChannels.ContainsKey(channel));
-                    node.Value.Process(sampleIndex, sampleIndex + MicroBufferSize * SynthConstants.AudioChannels, isChannelMuted);
+                    node.Value.Process(sampleIndex, sampleIndex + MicroBufferSize * 2, isChannelMuted);
                     //if an active voice has stopped remove it from the list
                     if (node.Value.VoiceParams.State == VoiceStateEnum.Stopped)
                     {

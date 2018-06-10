@@ -21,7 +21,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Audio.Synth.Bank.Components.Generators
 {
-    public class WhiteNoiseGenerator : Generator
+    class WhiteNoiseGenerator : Generator
     {
         
         public WhiteNoiseGenerator(GeneratorDescriptor description)

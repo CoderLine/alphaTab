@@ -23,7 +23,7 @@ using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabBeatContainerGlyph : BeatContainerGlyph
+    class TabBeatContainerGlyph : BeatContainerGlyph
     {
         private TabBendGlyph _bend;
 

@@ -20,7 +20,7 @@ using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Synth.Midi.Event
 {
-    public class MetaNumberEvent : MetaEvent
+    class MetaNumberEvent : MetaEvent
     {
         public int Value { get; private set; }
 
@@ -31,7 +31,7 @@ namespace AlphaTab.Audio.Synth.Midi.Event
         }
 
 
-        public override void WriteTo(ByteBuffer s)
+        public override void WriteTo(IWriteable s)
         {
             s.WriteByte(0xFF);
             s.WriteByte((byte)MetaStatus);

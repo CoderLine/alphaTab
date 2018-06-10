@@ -31,7 +31,7 @@ namespace AlphaTab
     /// alphaTab looks for information like available layout engines
     /// staves etc.
     /// </summary>
-    public partial class Environment
+    partial class Environment
     {
         public static FastDictionary<string, Func<ICanvas>> RenderEngines;
         public static FastDictionary<string, Func<ScoreRenderer, ScoreLayout>> LayoutEngines;

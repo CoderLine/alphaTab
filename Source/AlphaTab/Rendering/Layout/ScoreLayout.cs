@@ -30,7 +30,7 @@ namespace AlphaTab.Rendering.Layout
     /// <summary>
     /// This is the base public class for creating new layouting engines for the score renderer. 
     /// </summary>
-    public abstract class ScoreLayout
+    abstract class ScoreLayout
     {
         private readonly FastDictionary<string, FastDictionary<int, BarRendererBase>> _barRendererLookup;
 
@@ -167,13 +167,13 @@ namespace AlphaTab.Rendering.Layout
             {
                 var track = Renderer.Tracks[trackIndex];
                 var hasScore = false;
-                var hasTab = false;
+                //var hasTab = false;
                 foreach (var staff in track.Staves)
                 {
                     switch (staff.StaffKind)
                     {
                         case StaffKind.Tablature:
-                            hasTab = true;
+                            //hasTab = true;
                             break;
                         case StaffKind.Score:
                             hasScore = true;
@@ -182,7 +182,7 @@ namespace AlphaTab.Rendering.Layout
                             break;
                         case StaffKind.Mixed:
                             hasScore = true;
-                            hasTab = true;
+                            //hasTab = true;
                             break;
                     }
                 }

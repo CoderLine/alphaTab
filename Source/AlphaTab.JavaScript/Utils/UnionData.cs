@@ -5,7 +5,7 @@ using Phase.Attributes;
 namespace AlphaTab.Utils
 {
     [Abstract("js.html.DataView")]
-    public class UnionData
+    class UnionData
     {
         [Inline]
         public UnionData() => Script.AbstractThis = new DataView(new ArrayBuffer(8));

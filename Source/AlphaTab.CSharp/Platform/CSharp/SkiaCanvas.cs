@@ -23,7 +23,7 @@ using SkiaSharp;
 
 namespace AlphaTab.Platform.CSharp
 {
-    public class SkiaCanvas : ICanvas
+    class SkiaCanvas : ICanvas
     {
         private static readonly SKTypeface MusicFont;
         private static readonly int MusicFontSize = 34;

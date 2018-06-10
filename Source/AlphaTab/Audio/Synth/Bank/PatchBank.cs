@@ -26,7 +26,7 @@ using AlphaTab.Util;
 
 namespace AlphaTab.Audio.Synth.Bank
 {
-    public class PatchBank
+    class PatchBank
     {
         public const int DrumBank = 128;
         public const int BankSize = 128;

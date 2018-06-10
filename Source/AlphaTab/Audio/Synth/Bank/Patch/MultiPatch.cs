@@ -22,7 +22,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Audio.Synth.Bank.Patch
 {
-    public class MultiPatch : Patch
+    class MultiPatch : Patch
     {
         private IntervalType _intervalType;
         private PatchInterval[] _intervalList;
@@ -160,7 +160,7 @@ namespace AlphaTab.Audio.Synth.Bank.Patch
         }
     }
 
-    public enum IntervalType
+    enum IntervalType
     {
         ChannelKeyVelocity = 0,
         ChannelKey = 1,
@@ -168,7 +168,7 @@ namespace AlphaTab.Audio.Synth.Bank.Patch
         Key = 3
     }
 
-    public class PatchInterval
+    class PatchInterval
     {
         public Patch Patch { get; set; }
         public byte StartChannel { get; set; }

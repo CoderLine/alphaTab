@@ -1,6 +1,6 @@
 ﻿namespace AlphaTab.Audio.Synth.Sf2
 {
-    public enum GeneratorEnum
+    enum GeneratorEnum
     {
         StartAddressOffset = 0,
         EndAddressOffset = 1,

@@ -19,7 +19,7 @@ using System.Runtime.CompilerServices;
 
 namespace AlphaTab.Audio.Synth.Sf2.Chunks
 {
-    public class Chunk
+    class Chunk
     {
         public string Id { get; private set; }
         public int Size { get; private set; }

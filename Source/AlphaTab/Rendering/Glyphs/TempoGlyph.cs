@@ -19,7 +19,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TempoGlyph : EffectGlyph
+    class TempoGlyph : EffectGlyph
     {
         private readonly int _tempo;
 

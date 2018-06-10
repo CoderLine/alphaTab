@@ -12,7 +12,7 @@ namespace AlphaTab.Platform.JavaScript
 {
     // NOTE: we prefix all ISynthOutput methods with "AlphaSynth" to ensure
     // the ExternalInterface callbacks are called (play, stop etc. might control. the main movie)
-    public interface IFlashSynthOutput
+    interface IFlashSynthOutput
     {
         void AlphaSynthSequencerFinished();
         void AlphaSynthPlay();
@@ -39,7 +39,6 @@ namespace AlphaTab.Platform.JavaScript
         private string _id;
         private string _swfId;
         private Element _swfContainer;
-        private float _playbackSpeed;
 
         public int SampleRate
         {
@@ -59,7 +58,6 @@ namespace AlphaTab.Platform.JavaScript
 
         public void Open()
         {
-            _playbackSpeed = 1;
             _id = Id + NextId;
             _swfId = _id + "swf";
             Lookup[_id] = this;

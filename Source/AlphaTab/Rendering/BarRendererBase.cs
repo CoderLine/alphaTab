@@ -32,7 +32,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This is the base public class for creating blocks which can render bars.
     /// </summary>
-    public class BarRendererBase
+    class BarRendererBase
     {
         private LeftToRightLayoutingGlyphGroup _preBeatGlyphs;
         private FastDictionary<int, VoiceContainerGlyph> _voiceContainers;

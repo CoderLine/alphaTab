@@ -18,7 +18,7 @@
 
 namespace AlphaTab.Importer
 {
-    public class AlphaTexException : AlphaTabException
+    class AlphaTexException : AlphaTabException
     {
         public int Position { get; set; }
         public string NonTerm { get; set; }

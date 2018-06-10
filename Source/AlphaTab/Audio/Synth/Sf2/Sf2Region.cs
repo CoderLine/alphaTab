@@ -17,7 +17,7 @@
  */
 namespace AlphaTab.Audio.Synth.Sf2
 {
-    public class Sf2Region
+    class Sf2Region
     {
         public short[] Generators { get; set; }
 

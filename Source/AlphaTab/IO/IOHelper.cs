@@ -20,7 +20,7 @@ using AlphaTab.Collections;
 
 namespace AlphaTab.IO
 {
-    public static class IOHelper
+    static class IOHelper
     {
         public static int ReadInt32LE(this IReadable input)
         {

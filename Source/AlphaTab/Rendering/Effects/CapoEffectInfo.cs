@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class CapoEffectInfo : IEffectBarRendererInfo
+    class CapoEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "capo"; } }
         public bool HideOnMultiTrack { get { return false; } }

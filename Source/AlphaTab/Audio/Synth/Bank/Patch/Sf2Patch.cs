@@ -27,7 +27,7 @@ using Generator = AlphaTab.Audio.Synth.Bank.Components.Generators.Generator;
 
 namespace AlphaTab.Audio.Synth.Bank.Patch
 {
-    public class Sf2Patch : Patch
+    class Sf2Patch : Patch
     {
         private int iniFilterFc;
         private double filterQ;
@@ -132,10 +132,7 @@ namespace AlphaTab.Audio.Synth.Bank.Patch
                 float volume = (float)SynthHelper.DBtoLinear(voiceparams.VolOffset + voiceparams.Envelopes[1].Value + voiceparams.Lfos[0].Value * modLfoToVolume) * baseVolume;
 
                 //--Mix block based on number of channels
-                if (SynthConstants.AudioChannels == 2)
-                    voiceparams.MixMonoToStereoInterp(x, volume * pan.Left * voiceparams.SynthParams.CurrentPan.Left, volume * pan.Right * voiceparams.SynthParams.CurrentPan.Right);
-                else
-                    voiceparams.MixMonoToMonoInterp(x, volume);
+                voiceparams.MixMonoToStereoInterp(x, volume * pan.Left * voiceparams.SynthParams.CurrentPan.Left, volume * pan.Right * voiceparams.SynthParams.CurrentPan.Right);
                 //--Check and end early if necessary
                 if ((voiceparams.Envelopes[1].CurrentStage > EnvelopeState.Hold && volume <= SynthConstants.NonAudible) || voiceparams.GeneratorParams[0].CurrentState == GeneratorState.Finished)
                 {

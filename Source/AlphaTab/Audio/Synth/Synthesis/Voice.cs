@@ -20,14 +20,14 @@ using AlphaTab.Audio.Synth.Bank.Patch;
 
 namespace AlphaTab.Audio.Synth.Synthesis
 {
-    public enum VoiceStateEnum
+    enum VoiceStateEnum
     {
         Stopped = 0,
         Stopping = 1,
         Playing = 2
     }
 
-    public class Voice
+    class Voice
     {
         public Patch Patch { get; private set; }
         public VoiceParameters VoiceParams { get; private set; }

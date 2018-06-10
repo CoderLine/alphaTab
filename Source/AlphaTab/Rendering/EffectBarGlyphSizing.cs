@@ -20,7 +20,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// Lists all sizing types of the effect bar glyphs
     /// </summary>
-    public enum EffectBarGlyphSizing
+    enum EffectBarGlyphSizing
     {
         /// <summary>
         /// The effect glyph is placed above the pre-beat glyph which is before 

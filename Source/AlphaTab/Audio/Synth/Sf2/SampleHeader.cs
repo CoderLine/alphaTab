@@ -22,7 +22,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Audio.Synth.Sf2
 {
-    public class SampleHeader
+    class SampleHeader
     {
         public string Name { get; set; }
         public int Start { get; private set; }

@@ -21,7 +21,7 @@ using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Synth.Sf2
 {
-    public class SoundFontSampleData
+    class SoundFontSampleData
     {
         public int BitsPerSample { get; set; }
         public byte[] SampleData { get; set; }

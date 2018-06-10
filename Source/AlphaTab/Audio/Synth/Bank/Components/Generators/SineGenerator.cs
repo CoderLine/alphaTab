@@ -22,7 +22,7 @@ using AlphaTab.Audio.Synth.Util;
 
 namespace AlphaTab.Audio.Synth.Bank.Components.Generators
 {
-    public class SineGenerator : Generator
+    class SineGenerator : Generator
     {
         public SineGenerator(GeneratorDescriptor description)
             : base(description)

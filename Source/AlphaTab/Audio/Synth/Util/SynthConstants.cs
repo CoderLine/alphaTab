@@ -20,7 +20,7 @@ using AlphaTab.Audio.Synth.Bank.Components.Generators;
 
 namespace AlphaTab.Audio.Synth.Util
 {
-    public static class SynthConstants
+    static class SynthConstants
     {
         public const Interpolation InterpolationMode = Interpolation.Linear;
 

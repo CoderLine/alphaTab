@@ -17,7 +17,7 @@
  */
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ChineseCymbalGlyph : MusicFontGlyph
+    class ChineseCymbalGlyph : MusicFontGlyph
     {
         private readonly bool _isGrace;
 

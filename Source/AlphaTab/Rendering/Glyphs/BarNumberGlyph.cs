@@ -19,7 +19,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class BarNumberGlyph : Glyph
+    class BarNumberGlyph : Glyph
     {
         private readonly int _number;
 

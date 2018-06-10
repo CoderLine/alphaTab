@@ -21,7 +21,7 @@ using AlphaTab.Audio.Synth.Bank.Descriptors;
 
 namespace AlphaTab.Audio.Synth.Bank.Components.Generators
 {
-    public class SawGenerator : Generator
+    class SawGenerator : Generator
     {
         public SawGenerator(GeneratorDescriptor description)
             : base(description)
