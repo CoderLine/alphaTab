@@ -57,7 +57,6 @@ build:
 
 before_build:
 - nuget restore
-- dotnet restore
   
 test:
   assemblies:
