@@ -59,6 +59,15 @@ namespace AlphaTab.Model
                     masterBar2.Section = Platform.Platform.NewObject();
                     Section.CopyTo(masterBar.Section, masterBar2.Section);
                 }
+
+                masterBar2.Fermata = Platform.Platform.NewObject();
+                foreach (var offset in masterBar.Fermata)
+                {
+                    var fermata = masterBar.Fermata[offset];
+                    var fermata2 = masterBar2.Fermata[offset] = Platform.Platform.NewObject();
+                    Fermata.CopyTo(fermata, fermata2);
+                }
+
                 score2.MasterBars.Add(masterBar2);
             }
 
@@ -214,6 +223,16 @@ namespace AlphaTab.Model
                     masterBar2.Section = new Section();
                     Section.CopyTo(masterBar.Section, masterBar2.Section);
                 }
+
+                foreach (var offset in masterBar.Fermata)
+                {
+                    var fermata = masterBar.Fermata[offset];
+                    var fermata2 = new Fermata();
+                    Fermata.CopyTo(fermata, fermata2);
+                    masterBar2.AddFermata(offset, fermata2);
+                }
+
+
                 score2.AddMasterBar(masterBar2);
             }
 

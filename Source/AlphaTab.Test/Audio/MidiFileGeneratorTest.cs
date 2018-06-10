@@ -53,7 +53,7 @@ namespace AlphaTab.Test.Audio
             Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes.Count);
 
             var handler = new FlatMidiEventGenerator();
-            var generator = new MidiFileGenerator(score, handler);
+            var generator = new MidiFileGenerator(score, null, handler);
             generator.Generate();
 
             var info = score.Tracks[0].PlaybackInfo;
@@ -134,7 +134,7 @@ namespace AlphaTab.Test.Audio
             Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes.Count);
 
             var handler = new FlatMidiEventGenerator();
-            var generator = new MidiFileGenerator(score, handler);
+            var generator = new MidiFileGenerator(score, null, handler);
             generator.Generate();
 
             var info = score.Tracks[0].PlaybackInfo;

@@ -228,7 +228,8 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(expected.PickStroke, actual.PickStroke, "Mismatch on PickStroke");
             Assert.AreEqual(expected.TremoloSpeed, actual.TremoloSpeed, "Mismatch on TremoloSpeed");
             Assert.AreEqual(expected.Crescendo, actual.Crescendo, "Mismatch on Crescendo");
-            Assert.AreEqual(expected.Start, actual.Start, "Mismatch on Start");
+            Assert.AreEqual(expected.PlaybackStart, actual.PlaybackStart, "Mismatch on Start");
+            Assert.AreEqual(expected.DisplayStart, actual.DisplayStart, "Mismatch on Start");
             //Assert.AreEqual(expected.Dynamic, actual.Dynamic, "Mismatch on Dynamic");
             Assert.AreEqual(expected.InvertBeamDirection, actual.InvertBeamDirection, "Mismatch on InvertBeamDirection");
 

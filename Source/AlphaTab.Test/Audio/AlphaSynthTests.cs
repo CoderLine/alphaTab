@@ -71,7 +71,7 @@ namespace AlphaTab.Test.Audio
             var score = importer.ReadScore();
 
             var midi = new MidiFile();
-            var gen = new MidiFileGenerator(score, new AlphaSynthMidiFileHandler(midi));
+            var gen = new MidiFileGenerator(score, null, new AlphaSynthMidiFileHandler(midi));
             gen.Generate();
 
             var testOutput = new TestOutput();

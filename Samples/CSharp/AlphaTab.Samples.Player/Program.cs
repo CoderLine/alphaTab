@@ -48,7 +48,7 @@ namespace AlphaTab.Samples.PngDump
             // generate midi
             var midiFile = new MidiFile();
             var handler = new AlphaSynthMidiFileHandler(midiFile);
-            var generator = new MidiFileGenerator(score, handler);
+            var generator = new MidiFileGenerator(score, null, handler);
             generator.Generate();
 
             var player = new AlphaSynth(new NAudioSynthOutput());

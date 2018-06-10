@@ -75,7 +75,6 @@ namespace AlphaTab.Model
 
         public void Finish(Settings settings)
         {
-
             if (string.IsNullOrEmpty(ShortName))
             {
                 ShortName = Name;

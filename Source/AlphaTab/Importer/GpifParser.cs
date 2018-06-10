@@ -18,6 +18,7 @@
 
 using System;
 using System.Diagnostics;
+using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -981,12 +982,74 @@ namespace AlphaTab.Importer
                                         break;
                                 }
                             }
-
                             break;
+                        case "Fermatas":
+                            ParseFermatas(masterBar, c);
+                            break;
+
                     }
                 }
             }
             _masterBars.Add(masterBar);
+        }
+
+        private void ParseFermatas(MasterBar masterBar, XmlNode node)
+        {
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Fermata":
+                            ParseFermata(masterBar, c);
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void ParseFermata(MasterBar masterBar, XmlNode node)
+        {
+            var offset = 0;
+            var fermata = new Fermata();
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Type":
+                            switch (c.InnerText)
+                            {
+                                case "Short":
+                                    fermata.Type = FermataType.Short;
+                                    break;
+                                case "Medium":
+                                    fermata.Type = FermataType.Medium;
+                                    break;
+                                case "Long":
+                                    fermata.Type = FermataType.Long;
+                                    break;
+                            }
+                            break;
+                        case "Length":
+                            fermata.Length = Platform.Platform.ParseFloat(c.InnerText);
+                            break;
+                        case "Offset":
+                            var parts = c.InnerText.Split('/');
+                            if (parts.Length == 2)
+                            {
+                                float numerator = Platform.Platform.ParseInt(parts[0]);
+                                float denominator = Platform.Platform.ParseInt(parts[1]);
+                                offset = (int)((numerator / denominator) * MidiUtils.QuarterTime);
+                            }
+                            break;
+                    }
+                }
+            }
+
+            masterBar.AddFermata(offset, fermata);
         }
 
         //

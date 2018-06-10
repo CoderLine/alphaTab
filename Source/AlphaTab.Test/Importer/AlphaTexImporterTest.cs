@@ -215,7 +215,7 @@ namespace AlphaTab.Test.Importer
 
             Environment.StaveProfiles["harmonics"] = new BarRendererFactory[]
             {
-                new EffectBarRendererFactory("harmonics", new IEffectBarRendererInfo[] {new HarmonicsEffectInfo()}),
+                new EffectBarRendererFactory("harmonics", new IEffectBarRendererInfo[] {new HarmonicsEffectInfo(HarmonicType.Artificial)}),
             };
 
 

@@ -155,7 +155,7 @@ class MusicXmlImporterTestBase
     {
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Index, actual.Index, "Mismatch on Index");
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Clef, actual.Clef, "Mismatch on Clef");
-        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.ClefOttavia, actual.ClefOttavia, "Mismatch on ClefOttavia");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.ClefOttava, actual.ClefOttava, "Mismatch on ClefOttavia");
         //Assert.AreEqual(expected.Voices.Count, actual.Voices.Count, "Mismatch on Voices.Count");
         {
             var i: system.Int32 = 0;
@@ -189,7 +189,13 @@ class MusicXmlImporterTestBase
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Dots, actual.Dots, "Mismatch on Dots");
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.FadeIn, actual.FadeIn, "Mismatch on FadeIn");
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.IsLegatoOrigin, actual.IsLegatoOrigin, "Mismatch on IsLegatoOrigin");
-        alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_CsStringArray(" ", expected.Lyrics), system.CsString.Join_CsString_CsStringArray(" ", actual.Lyrics));
+        if (expected.Lyrics == null)
+        {
+            alphaTab.test.Assert.IsNull(actual.Lyrics);
+        }
+        else         {
+            alphaTab.test.Assert.AreEqual_T1_T22(system.CsString.Join_CsString_CsStringArray(" ", expected.Lyrics), system.CsString.Join_CsString_CsStringArray(" ", actual.Lyrics));
+        }
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Pop, actual.Pop, "Mismatch on Pop");
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.HasChord, actual.HasChord, "Mismatch on HasChord");
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.HasRasgueado, actual.HasRasgueado, "Mismatch on HasRasgueado");
@@ -209,7 +215,8 @@ class MusicXmlImporterTestBase
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.PickStroke, actual.PickStroke, "Mismatch on PickStroke");
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.TremoloSpeed, actual.TremoloSpeed, "Mismatch on TremoloSpeed");
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Crescendo, actual.Crescendo, "Mismatch on Crescendo");
-        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Start, actual.Start, "Mismatch on Start");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.PlaybackStart, actual.PlaybackStart, "Mismatch on Start");
+        alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.DisplayStart, actual.DisplayStart, "Mismatch on Start");
         //Assert.AreEqual(expected.Dynamic, actual.Dynamic, "Mismatch on Dynamic");
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.InvertBeamDirection, actual.InvertBeamDirection, "Mismatch on InvertBeamDirection");
         alphaTab.test.Assert.AreEqual_T1_T2_CsString2(expected.Notes.Count, actual.Notes.Count, "Mismatch on Notes.Count");

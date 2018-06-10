@@ -87,6 +87,8 @@ namespace AlphaTab.Model
 
         public Ottavia Ottava { get; set; }
 
+        public Fermata Fermata { get; set; }
+
         public bool IsLegatoOrigin { get; set; }
         public bool IsLegatoDestination
         {
@@ -723,6 +725,8 @@ namespace AlphaTab.Model
 
                 Voice.InsertBeat(this, cloneBeat);
             }
+
+            Fermata = Voice.Bar.MasterBar.GetFermata(this);
         }
 
         /// <summary>

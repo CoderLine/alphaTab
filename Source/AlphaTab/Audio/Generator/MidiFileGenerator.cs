@@ -611,7 +611,7 @@ namespace AlphaTab.Audio.Generator
 
             // Bends are spread across all tied notes unless they have a bend on their own.
             double duration;
-            if (note.IsTieOrigin && _settings.ExtendBendArrowsOnTiedNotes)
+            if (note.IsTieOrigin && (_settings == null || _settings.ExtendBendArrowsOnTiedNotes))
             {
                 var endNote = note;
                 while (endNote.IsTieOrigin && !endNote.TieDestination.HasBend)

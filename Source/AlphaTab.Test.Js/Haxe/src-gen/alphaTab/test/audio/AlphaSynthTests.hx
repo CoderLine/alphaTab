@@ -35,7 +35,7 @@ class AlphaSynthTests
         importer.Init(alphaTab.test.TestPlatform.CreateStringReader(tex), null);
         var score : alphaTab.model.Score = importer.ReadScore();
         var midi : alphaTab.audio.synth.midi.MidiFile = new alphaTab.audio.synth.midi.MidiFile();
-        var gen : alphaTab.audio.generator.MidiFileGenerator = new alphaTab.audio.generator.MidiFileGenerator(score, new alphaTab.audio.generator.AlphaSynthMidiFileHandler(midi));
+        var gen : alphaTab.audio.generator.MidiFileGenerator = new alphaTab.audio.generator.MidiFileGenerator(score, null, new alphaTab.audio.generator.AlphaSynthMidiFileHandler(midi));
         gen.Generate();
         var testOutput : alphaTab.test.audio.TestOutput = new alphaTab.test.audio.TestOutput();
         var synth : alphaTab.audio.synth.AlphaSynth = new alphaTab.audio.synth.AlphaSynth(testOutput);

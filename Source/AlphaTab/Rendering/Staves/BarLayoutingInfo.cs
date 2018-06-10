@@ -33,7 +33,6 @@ namespace AlphaTab.Rendering.Staves
     {
         private const int MinDuration = 30;
         private const int MinDurationWidth = 10;
-        private const float MidiTimeToFraction = MidiUtils.QuarterTime * 4;
 
         private FastList<Spring> _timeSortedSprings;
         private float _xMin;

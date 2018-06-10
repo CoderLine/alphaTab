@@ -644,9 +644,19 @@
             Gets or sets the bend mode to use for display and playback of bends. 
             </summary>
         </member>
+        <member name="P:AlphaTab.Settings.WhammyMode">
+            <summary>
+            Gets or sets the whammy mode to use for display and playback of whammys. 
+            </summary>
+        </member>
         <member name="P:AlphaTab.Settings.FingeringMode">
             <summary>
             Gets or sets the fingering mode to use. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Settings.ShowZeroOnDiveWhammy">
+            <summary>
+            If set to true, 0 is shown on dive whammy bars. 
             </summary>
         </member>
         <member name="T:AlphaTab.Importer.AlphaTexImporter">
@@ -1094,6 +1104,41 @@
             Lists all dynamics.
             </summary>
         </member>
+        <member name="T:AlphaTab.Model.Fermata">
+            <summary>
+            Represents a fermata. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Fermata.Type">
+            <summary>
+            Gets or sets the type of fermata. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Fermata.Length">
+            <summary>
+            Gets or sets the actual lenght of the fermata. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.FermataType">
+            <summary>
+            Lists all types of fermatas
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.FermataType.Short">
+            <summary>
+            A short fermata (triangle symbol)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.FermataType.Medium">
+            <summary>
+            A medium fermata (round symbol)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.FermataType.Long">
+            <summary>
+            A long fermata (rectangular symbol)
+            </summary>
+        </member>
         <member name="F:AlphaTab.Model.Fingers.Unknown">
             <summary>
             Unknown type (not documented)
@@ -1155,6 +1200,11 @@
             The maximum alternate endings.  (1 byte with 8 bitflags)
             </summary>
         </member>
+        <member name="P:AlphaTab.Model.MasterBar.Fermata">
+            <summary>
+            Gets or sets the fermatas for this bar. The key is the offset of the fermata in midi ticks. 
+            </summary>
+        </member>
         <member name="P:AlphaTab.Model.MasterBar.Start">
             <summary>
             The timeline position of the voice within the whole score. (unit: midi ticks)
@@ -1164,6 +1214,20 @@
             <summary>
             Calculates the time spent in this bar. (unit: midi ticks)
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.Model.MasterBar.AddFermata(System.Int32,AlphaTab.Model.Fermata)">
+            <summary>
+            Adds a fermata to the masterbar. 
+            </summary>
+            <param name="offset">The offset of the fermata within the bar in midi ticks. </param>
+            <param name="fermata">The fermata.</param>
+        </member>
+        <member name="M:AlphaTab.Model.MasterBar.GetFermata(AlphaTab.Model.Beat)">
+            <summary>
+            Gets the fermata for a given beat. 
+            </summary>
+            <param name="beat">The beat to get the fermata for.</param>
             <returns></returns>
         </member>
         <member name="T:AlphaTab.Model.ModelUtils">
@@ -1304,6 +1368,11 @@
             <summary>
             Gets the absolute value of this note considering
             offsets by bends and ottavia
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.DisplayValueWithoutBend">
+            <summary>
+            Gets the absolute value of this note considering all effects beside bends. 
             </summary>
         </member>
         <member name="P:AlphaTab.Model.Note.HasQuarterToneOffset">
@@ -2036,34 +2105,24 @@
             an indicator whether any beat has a tuplet on it. 
             </summary>
         </member>
-        <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.FirstMinNote">
+        <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.FirstMinNoteValue">
             <summary>
             the first min note within this group
             </summary>
         </member>
-        <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.FirstMaxNote">
+        <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.FirstMaxNoteValue">
             <summary>
             the first max note within this group
             </summary>
         </member>
-        <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.LastMinNote">
+        <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.LastMinNoteValue">
             <summary>
             the last min note within this group
             </summary>
         </member>
-        <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.LastMaxNote">
+        <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.LastMaxNoteValue">
             <summary>
             the last max note within this group
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.MinNote">
-            <summary>
-            the overall min note within this group
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.MaxNote">
-            <summary>
-            the overall max note within this group
             </summary>
         </member>
         <member name="P:AlphaTab.Rendering.Utils.BeamingHelper.MinNoteValue">
@@ -2113,6 +2172,25 @@
             Bends are categorized into gradual and fast bends. 
             - Gradual bends are indicated by beat text "grad" or "grad.". Bend will sound along the beat duration. 
             - Fast bends are done right before the next note. If the next note is tied even on-beat of the next note. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.WhammyMode">
+            <summary>
+            Lists all modes on how whammy bars should be handled.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.WhammyMode.GuitarPro">
+            <summary>
+            Whammy Bars will be displayed and played as in GuitarPro.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.WhammyMode.SongBook">
+            <summary>
+            Whammy Bars will be displayed and played in a traditional SongBook manner. 
+            - Dips are shown as simple annotation over the beats
+            Whammy Bars are categorized into gradual and fast. 
+            - Gradual whammys are indicated by beat text "grad" or "grad.". Whammys will sound along the beat duration. 
+            - Fast whammys are done right the beat. 
             </summary>
         </member>
         <member name="T:AlphaTab.FingeringMode">
@@ -2183,6 +2261,36 @@
         <member name="T:AlphaTab.Xml.XmlParser.XmlState">
             <summary>
             faster than enum
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
             </summary>
         </member>
     </members>

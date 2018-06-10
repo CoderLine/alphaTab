@@ -40,7 +40,7 @@ class MidiFileGeneratorTest
         alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.Count);
         alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.Count);
         var handler : alphaTab.test.audio.FlatMidiEventGenerator = new alphaTab.test.audio.FlatMidiEventGenerator();
-        var generator : alphaTab.audio.generator.MidiFileGenerator = new alphaTab.audio.generator.MidiFileGenerator(score, handler);
+        var generator : alphaTab.audio.generator.MidiFileGenerator = new alphaTab.audio.generator.MidiFileGenerator(score, null, handler);
         generator.Generate();
         var info : alphaTab.model.PlaybackInformation = score.Tracks.get_Item(0).PlaybackInfo;
         var note : alphaTab.model.Note = score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0);
@@ -323,7 +323,7 @@ class MidiFileGeneratorTest
         alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.Count);
         alphaTab.test.Assert.AreEqual_T1_T22(1, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(1).Notes.Count);
         var handler : alphaTab.test.audio.FlatMidiEventGenerator = new alphaTab.test.audio.FlatMidiEventGenerator();
-        var generator : alphaTab.audio.generator.MidiFileGenerator = new alphaTab.audio.generator.MidiFileGenerator(score, handler);
+        var generator : alphaTab.audio.generator.MidiFileGenerator = new alphaTab.audio.generator.MidiFileGenerator(score, null, handler);
         generator.Generate();
         var info : alphaTab.model.PlaybackInformation = score.Tracks.get_Item(0).PlaybackInfo;
         var note : alphaTab.model.Note = score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0);

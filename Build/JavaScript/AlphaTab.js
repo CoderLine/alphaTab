@@ -35,6 +35,7 @@ $hx_exports["alphaTab"]["model"]["_WhammyType"] = $hx_exports["alphaTab"]["model
 ;$hx_exports["alphaTab"]["model"]["_HarmonicType"] = $hx_exports["alphaTab"]["model"]["_HarmonicType"] || {};
 ;$hx_exports["alphaTab"]["model"]["_GraceType"] = $hx_exports["alphaTab"]["model"]["_GraceType"] || {};
 ;$hx_exports["alphaTab"]["model"]["_Fingers"] = $hx_exports["alphaTab"]["model"]["_Fingers"] || {};
+;$hx_exports["alphaTab"]["model"]["_FermataType"] = $hx_exports["alphaTab"]["model"]["_FermataType"] || {};
 ;$hx_exports["alphaTab"]["model"]["_DynamicValue"] = $hx_exports["alphaTab"]["model"]["_DynamicValue"] || {};
 ;$hx_exports["alphaTab"]["model"]["_Duration"] = $hx_exports["alphaTab"]["model"]["_Duration"] || {};
 ;$hx_exports["alphaTab"]["model"]["_CrescendoType"] = $hx_exports["alphaTab"]["model"]["_CrescendoType"] || {};
@@ -5521,6 +5522,34 @@ alphaTab.rendering.effects.ChordsEffectInfo.prototype = {
 	}
 	,__class__: alphaTab.rendering.effects.ChordsEffectInfo
 };
+alphaTab.rendering.effects.FermataEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["FermataEffectInfo"] = function() {
+};
+alphaTab.rendering.effects.FermataEffectInfo.__name__ = ["alphaTab","rendering","effects","FermataEffectInfo"];
+alphaTab.rendering.effects.FermataEffectInfo.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
+alphaTab.rendering.effects.FermataEffectInfo.prototype = {
+	get_EffectId: function() {
+		return "fermata";
+	}
+	,get_HideOnMultiTrack: function() {
+		return false;
+	}
+	,get_CanShareBand: function() {
+		return false;
+	}
+	,get_SizingMode: function() {
+		return 1;
+	}
+	,ShouldCreateGlyph: function(settings,beat) {
+		return beat.Fermata != null;
+	}
+	,CreateNewGlyph: function(renderer,beat) {
+		return new alphaTab.rendering.glyphs.FermataGlyph(0,0,beat.Fermata.Type);
+	}
+	,CanExpand: function(from,to) {
+		return true;
+	}
+	,__class__: alphaTab.rendering.effects.FermataEffectInfo
+};
 alphaTab.rendering.effects.WhammyBarEffectInfo = $hx_exports["alphaTab"]["rendering"]["effects"]["WhammyBarEffectInfo"] = function() {
 };
 alphaTab.rendering.effects.WhammyBarEffectInfo.__name__ = ["alphaTab","rendering","effects","WhammyBarEffectInfo"];
@@ -6478,9 +6507,9 @@ alphaTab.Environment.Init = function() {
 	alphaTab.Environment.LayoutEngines["horizontal"] = function(r2) {
 		return new alphaTab.rendering.layout.HorizontalScreenLayout(r2);
 	};
-	alphaTab.Environment.StaveProfiles["default"] = alphaTab.Environment.StaveProfiles["score-tab"] = [new alphaTab.rendering.EffectBarRendererFactory("score-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.WhammyBarEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.OttaviaEffectInfo(true),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.ScoreBarRendererFactory(),new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.CrescendoEffectInfo(),new alphaTab.rendering.effects.OttaviaEffectInfo(false),new alphaTab.rendering.effects.DynamicsEffectInfo(),new alphaTab.rendering.effects.LyricsEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(1),new alphaTab.rendering.effects.HarmonicsEffectInfo(2),new alphaTab.rendering.effects.HarmonicsEffectInfo(3),new alphaTab.rendering.effects.HarmonicsEffectInfo(4),new alphaTab.rendering.effects.HarmonicsEffectInfo(5),new alphaTab.rendering.effects.HarmonicsEffectInfo(6),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.FingeringEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(false,false,false)];
-	alphaTab.Environment.StaveProfiles["score"] = [new alphaTab.rendering.EffectBarRendererFactory("score-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.WhammyBarEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.OttaviaEffectInfo(true),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.ScoreBarRendererFactory(),new alphaTab.rendering.EffectBarRendererFactory("score-bottom-effects",[new alphaTab.rendering.effects.CrescendoEffectInfo(),new alphaTab.rendering.effects.OttaviaEffectInfo(false),new alphaTab.rendering.effects.DynamicsEffectInfo(),new alphaTab.rendering.effects.LyricsEffectInfo()])];
-	alphaTab.Environment.StaveProfiles["tab"] = [new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(2),new alphaTab.rendering.effects.HarmonicsEffectInfo(3),new alphaTab.rendering.effects.HarmonicsEffectInfo(4),new alphaTab.rendering.effects.HarmonicsEffectInfo(5),new alphaTab.rendering.effects.HarmonicsEffectInfo(6),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.FingeringEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(true,true,true),new alphaTab.rendering.EffectBarRendererFactory("tab-bottom-effects",[new alphaTab.rendering.effects.LyricsEffectInfo()])];
+	alphaTab.Environment.StaveProfiles["default"] = alphaTab.Environment.StaveProfiles["score-tab"] = [new alphaTab.rendering.EffectBarRendererFactory("score-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.FermataEffectInfo(),new alphaTab.rendering.effects.WhammyBarEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.OttaviaEffectInfo(true),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.ScoreBarRendererFactory(),new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.CrescendoEffectInfo(),new alphaTab.rendering.effects.OttaviaEffectInfo(false),new alphaTab.rendering.effects.DynamicsEffectInfo(),new alphaTab.rendering.effects.LyricsEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(1),new alphaTab.rendering.effects.HarmonicsEffectInfo(2),new alphaTab.rendering.effects.HarmonicsEffectInfo(3),new alphaTab.rendering.effects.HarmonicsEffectInfo(4),new alphaTab.rendering.effects.HarmonicsEffectInfo(5),new alphaTab.rendering.effects.HarmonicsEffectInfo(6),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.FingeringEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(false,false,false)];
+	alphaTab.Environment.StaveProfiles["score"] = [new alphaTab.rendering.EffectBarRendererFactory("score-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.FermataEffectInfo(),new alphaTab.rendering.effects.WhammyBarEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.OttaviaEffectInfo(true),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.ScoreBarRendererFactory(),new alphaTab.rendering.EffectBarRendererFactory("score-bottom-effects",[new alphaTab.rendering.effects.CrescendoEffectInfo(),new alphaTab.rendering.effects.OttaviaEffectInfo(false),new alphaTab.rendering.effects.DynamicsEffectInfo(),new alphaTab.rendering.effects.LyricsEffectInfo()])];
+	alphaTab.Environment.StaveProfiles["tab"] = [new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.FermataEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(2),new alphaTab.rendering.effects.HarmonicsEffectInfo(3),new alphaTab.rendering.effects.HarmonicsEffectInfo(4),new alphaTab.rendering.effects.HarmonicsEffectInfo(5),new alphaTab.rendering.effects.HarmonicsEffectInfo(6),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.FingeringEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(true,true,true),new alphaTab.rendering.EffectBarRendererFactory("tab-bottom-effects",[new alphaTab.rendering.effects.LyricsEffectInfo()])];
 	alphaTab.Environment.StaveProfiles["tab-mixed"] = [new alphaTab.rendering.EffectBarRendererFactory("tab-effects",[new alphaTab.rendering.effects.TempoEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.MarkerEffectInfo(),new alphaTab.rendering.effects.TextEffectInfo(),new alphaTab.rendering.effects.ChordsEffectInfo(),new alphaTab.rendering.effects.TripletFeelEffectInfo(),new alphaTab.rendering.effects.TrillEffectInfo(),new alphaTab.rendering.effects.WideBeatVibratoEffectInfo(),new alphaTab.rendering.effects.SlightBeatVibratoEffectInfo(),new alphaTab.rendering.effects.WideNoteVibratoEffectInfo(),new alphaTab.rendering.effects.SlightNoteVibratoEffectInfo(),new alphaTab.rendering.effects.TapEffectInfo(),new alphaTab.rendering.effects.FadeInEffectInfo(),new alphaTab.rendering.effects.HarmonicsEffectInfo(2),new alphaTab.rendering.effects.HarmonicsEffectInfo(3),new alphaTab.rendering.effects.HarmonicsEffectInfo(4),new alphaTab.rendering.effects.HarmonicsEffectInfo(5),new alphaTab.rendering.effects.HarmonicsEffectInfo(6),new alphaTab.rendering.effects.LetRingEffectInfo(),new alphaTab.rendering.effects.CapoEffectInfo(),new alphaTab.rendering.effects.PalmMuteEffectInfo(),new alphaTab.rendering.effects.PickStrokeEffectInfo(),new alphaTab.rendering.effects.PickSlideEffectInfo(),new alphaTab.rendering.effects.AlternateEndingsEffectInfo()]),new alphaTab.rendering.TabBarRendererFactory(false,false,false),new alphaTab.rendering.EffectBarRendererFactory("tab-bottom-effects",[new alphaTab.rendering.effects.LyricsEffectInfo()])];
 };
 alphaTab.Environment.prototype = {
@@ -7922,7 +7951,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 	,GenerateBend: function(note,bendPoints,noteStart,noteDuration,noteKey,dynamicValue) {
 		var track = note.Beat.Voice.Bar.Staff.Track;
 		var duration;
-		if(note.IsTieOrigin && this._settings.ExtendBendArrowsOnTiedNotes) {
+		if(note.IsTieOrigin && (this._settings == null || this._settings.ExtendBendArrowsOnTiedNotes)) {
 			var endNote = note;
 			while(endNote.IsTieOrigin && !endNote.TieDestination.get_HasBend()) endNote = endNote.TieDestination;
 			var this1 = endNote.Beat.get_AbsolutePlaybackStart() - note.Beat.get_AbsolutePlaybackStart() + this.GetNoteDuration(endNote,endNote.Beat.PlaybackDuration).NoteOnly;
@@ -15703,6 +15732,9 @@ alphaTab.importer.GpifParser.prototype = {
 				case "DoubleBar":
 					masterBar.IsDoubleBar = true;
 					break;
+				case "Fermatas":
+					this.ParseFermatas(masterBar,c1);
+					break;
 				case "Key":
 					masterBar.KeySignature = alphaTab.platform.Platform.ParseInt(c1.FindChildElement("AccidentalCount").get_InnerText());
 					var mode = c1.FindChildElement("Mode");
@@ -15772,6 +15804,65 @@ alphaTab.importer.GpifParser.prototype = {
 			}
 		}
 		this._masterBars.push(masterBar);
+	}
+	,ParseFermatas: function(masterBar,node) {
+		var c = $iterator(node.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				if(_g == "Fermata") {
+					this.ParseFermata(masterBar,c1);
+				}
+			}
+		}
+	}
+	,ParseFermata: function(masterBar,node) {
+		var offset = 0;
+		var fermata = new alphaTab.model.Fermata();
+		var c = $iterator(node.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				switch(_g) {
+				case "Length":
+					var s = c1.get_InnerText();
+					fermata.Length = parseFloat(s);
+					break;
+				case "Offset":
+					var a = c1.get_InnerText();
+					var this1 = system.Convert.ToUInt16(47);
+					var this2 = this1;
+					var parts = system._CsString.CsString_Impl_.Split_CharArray(a,[this2]);
+					if(parts.length == 2) {
+						var this3 = alphaTab.platform.Platform.ParseInt(parts[0]);
+						var numerator = this3;
+						var this4 = alphaTab.platform.Platform.ParseInt(parts[1]);
+						var denominator = this4;
+						offset = system.Convert.ToInt32_Single(numerator / denominator * 960);
+					}
+					break;
+				case "Type":
+					var _g1 = c1.get_InnerText();
+					switch(_g1) {
+					case "Long":
+						fermata.Type = 2;
+						break;
+					case "Medium":
+						fermata.Type = 1;
+						break;
+					case "Short":
+						fermata.Type = 0;
+						break;
+					default:
+					}
+					break;
+				default:
+				}
+			}
+		}
+		masterBar.AddFermata(offset,fermata);
 	}
 	,ParseBars: function(node) {
 		var c = $iterator(node.ChildNodes)();
@@ -19114,6 +19205,7 @@ alphaTab.model.Beat = $hx_exports["alphaTab"]["model"]["Beat"] = function() {
 	this.IsEmpty = false;
 	this.WhammyStyle = 0;
 	this.Ottava = 0;
+	this.Fermata = null;
 	this.IsLegatoOrigin = false;
 	this._minNote = null;
 	this._maxNote = null;
@@ -19569,6 +19661,7 @@ alphaTab.model.Beat.prototype = {
 			this.GraceType = 3;
 			this.Voice.InsertBeat(this,cloneBeat);
 		}
+		this.Fermata = this.Voice.Bar.get_MasterBar().GetFermata(this);
 	}
 	,IsBefore: function(beat) {
 		if(!(this.Voice.Bar.Index < beat.Voice.Bar.Index)) {
@@ -20037,6 +20130,66 @@ alphaTab.model._DynamicValue.DynamicValue_Impl_.toString = function(this1) {
 	}
 	return "";
 };
+alphaTab.model.Fermata = $hx_exports["alphaTab"]["model"]["Fermata"] = function() {
+};
+alphaTab.model.Fermata.__name__ = ["alphaTab","model","Fermata"];
+alphaTab.model.Fermata.CopyTo = function(src,dst) {
+	dst.Type = src.Type;
+	dst.Length = src.Length;
+};
+alphaTab.model.Fermata.prototype = {
+	__class__: alphaTab.model.Fermata
+};
+alphaTab.model._FermataType = {};
+alphaTab.model._FermataType.FermataType_Impl_ = $hx_exports["alphaTab"]["model"]["_FermataType"]["FermataType_Impl_"] = {};
+alphaTab.model._FermataType.FermataType_Impl_.__name__ = ["alphaTab","model","_FermataType","FermataType_Impl_"];
+alphaTab.model._FermataType.FermataType_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaTab.model._FermataType.FermataType_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaTab.model._FermataType.FermataType_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaTab.model._FermataType.FermataType_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaTab.model._FermataType.FermataType_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaTab.model._FermataType.FermataType_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaTab.model._FermataType.FermataType_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaTab.model._FermataType.FermataType_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaTab.model._FermataType.FermataType_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaTab.model._FermataType.FermataType_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaTab.model._FermataType.FermataType_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaTab.model._FermataType.FermataType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaTab.model._FermataType.FermataType_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "Short";
+	case 1:
+		return "Medium";
+	case 2:
+		return "Long";
+	}
+	return "";
+};
 alphaTab.model._Fingers = {};
 alphaTab.model._Fingers.Fingers_Impl_ = $hx_exports["alphaTab"]["model"]["_Fingers"]["Fingers_Impl_"] = {};
 alphaTab.model._Fingers.Fingers_Impl_.__name__ = ["alphaTab","model","_Fingers","Fingers_Impl_"];
@@ -20232,6 +20385,15 @@ alphaTab.model.JsonConverter.ScoreToJsObject = function(score) {
 			masterBar2.Section = {}
 			alphaTab.model.Section.CopyTo(masterBar.Section,masterBar2.Section);
 		}
+		masterBar2.Fermata = {}
+		var this3 = masterBar.Fermata;
+		var offset = $iterator(Object.keys(this3))();
+		while(offset.hasNext()) {
+			var offset1 = offset.next();
+			var fermata = masterBar.Fermata[offset1];
+			var fermata2 = masterBar2.Fermata[offset1] = {}
+			alphaTab.model.Fermata.CopyTo(fermata,fermata2);
+		}
 		score2.MasterBars.push(masterBar2);
 		++i;
 	}
@@ -20243,17 +20405,17 @@ alphaTab.model.JsonConverter.ScoreToJsObject = function(score) {
 		alphaTab.model.Track.CopyTo(track,track2);
 		track2.PlaybackInfo = {}
 		alphaTab.model.PlaybackInformation.CopyTo(track.PlaybackInfo,track2.PlaybackInfo);
-		var this3 = [];
-		track2.Staves = this3;
+		var this4 = [];
+		track2.Staves = this4;
 		var s = 0;
 		while(s < track.Staves.length) {
 			var staff = track.Staves[s];
 			var staff2 = {}
 			alphaTab.model.Staff.CopyTo(staff,staff2);
-			var this4 = {}
-			staff2.Chords = this4;
-			var this5 = staff.Chords;
-			var key = $iterator(Object.keys(this5))();
+			var this5 = {}
+			staff2.Chords = this5;
+			var this6 = staff.Chords;
+			var key = $iterator(Object.keys(this6))();
 			while(key.hasNext()) {
 				var key1 = key.next();
 				var chord = staff.Chords[key1];
@@ -20261,29 +20423,29 @@ alphaTab.model.JsonConverter.ScoreToJsObject = function(score) {
 				alphaTab.model.Chord.CopyTo(chord,chord2);
 				staff2.Chords[key1] = chord;
 			}
-			var this6 = [];
-			staff2.Bars = this6;
+			var this7 = [];
+			staff2.Bars = this7;
 			var b = 0;
 			while(b < staff.Bars.length) {
 				var bar = staff.Bars[b];
 				var bar2 = {}
 				alphaTab.model.Bar.CopyTo(bar,bar2);
-				var this7 = [];
-				bar2.Voices = this7;
+				var this8 = [];
+				bar2.Voices = this8;
 				var v = 0;
 				while(v < bar.Voices.length) {
 					var voice = bar.Voices[v];
 					var voice2 = {}
 					alphaTab.model.Voice.CopyTo(voice,voice2);
-					var this8 = [];
-					voice2.Beats = this8;
+					var this9 = [];
+					voice2.Beats = this9;
 					var bb = 0;
 					while(bb < voice.Beats.length) {
 						var beat = voice.Beats[bb];
 						var beat2 = {}
 						alphaTab.model.Beat.CopyTo(beat,beat2);
-						var this9 = [];
-						beat2.Automations = this9;
+						var this10 = [];
+						beat2.Automations = this10;
 						var a = 0;
 						while(a < beat.Automations.length) {
 							var automation = {}
@@ -20291,8 +20453,8 @@ alphaTab.model.JsonConverter.ScoreToJsObject = function(score) {
 							beat2.Automations.push(automation);
 							++a;
 						}
-						var this10 = [];
-						beat2.WhammyBarPoints = this10;
+						var this11 = [];
+						beat2.WhammyBarPoints = this11;
 						var i1 = 0;
 						while(i1 < beat.WhammyBarPoints.length) {
 							var point = {}
@@ -20300,15 +20462,15 @@ alphaTab.model.JsonConverter.ScoreToJsObject = function(score) {
 							beat2.WhammyBarPoints.push(point);
 							++i1;
 						}
-						var this11 = [];
-						beat2.Notes = this11;
+						var this12 = [];
+						beat2.Notes = this12;
 						var n = 0;
 						while(n < beat.Notes.length) {
 							var note = beat.Notes[n];
 							var note2 = {}
 							alphaTab.model.Note.CopyTo(note,note2);
-							var this12 = [];
-							note2.BendPoints = this12;
+							var this13 = [];
+							note2.BendPoints = this13;
 							var i2 = 0;
 							while(i2 < note.BendPoints.length) {
 								var point1 = {}
@@ -20356,6 +20518,15 @@ alphaTab.model.JsonConverter.JsObjectToScore = function(score) {
 			masterBar2.Section = new alphaTab.model.Section();
 			alphaTab.model.Section.CopyTo(masterBar.Section,masterBar2.Section);
 		}
+		var this1 = masterBar.Fermata;
+		var offset = $iterator(Object.keys(this1))();
+		while(offset.hasNext()) {
+			var offset1 = offset.next();
+			var fermata = masterBar.Fermata[offset1];
+			var fermata2 = new alphaTab.model.Fermata();
+			alphaTab.model.Fermata.CopyTo(fermata,fermata2);
+			masterBar2.AddFermata(offset1,fermata2);
+		}
 		score2.AddMasterBar(masterBar2);
 		++i;
 	}
@@ -20371,8 +20542,8 @@ alphaTab.model.JsonConverter.JsObjectToScore = function(score) {
 			var staff = track.Staves[s];
 			var staff2 = track2.Staves[s];
 			alphaTab.model.Staff.CopyTo(staff,staff2);
-			var this1 = staff.Chords;
-			var key = $iterator(Object.keys(this1))();
+			var this2 = staff.Chords;
+			var key = $iterator(Object.keys(this2))();
 			while(key.hasNext()) {
 				var key1 = key.next();
 				var chord = staff.Chords[key1];
@@ -20677,12 +20848,15 @@ alphaTab.model.MasterBar = $hx_exports["alphaTab"]["model"]["MasterBar"] = funct
 	this.TempoAutomation = null;
 	this.VolumeAutomation = null;
 	this.Score = null;
+	this.Fermata = null;
 	this.Start = 0;
 	this.TimeSignatureDenominator = 4;
 	this.TimeSignatureNumerator = 4;
 	this.TripletFeel = 0;
 	this.KeySignatureType = 0;
 	this.TimeSignatureCommon = false;
+	var this1 = {}
+	this.Fermata = this1;
 };
 alphaTab.model.MasterBar.__name__ = ["alphaTab","model","MasterBar"];
 alphaTab.model.MasterBar.CopyTo = function(src,dst) {
@@ -20708,6 +20882,15 @@ alphaTab.model.MasterBar.prototype = {
 	}
 	,CalculateDuration: function() {
 		return this.TimeSignatureNumerator * alphaTab.audio.MidiUtils.ValueToTicks(this.TimeSignatureDenominator);
+	}
+	,AddFermata: function(offset,fermata) {
+		this.Fermata[offset] = fermata;
+	}
+	,GetFermata: function(beat) {
+		if(this.Fermata.hasOwnProperty(beat.PlaybackStart)) {
+			return this.Fermata[beat.PlaybackStart];
+		}
+		return null;
 	}
 	,__class__: alphaTab.model.MasterBar
 };
@@ -27889,6 +28072,33 @@ alphaTab.rendering.glyphs.FadeInGlyph.prototype = $extend(alphaTab.rendering.gly
 	}
 	,__class__: alphaTab.rendering.glyphs.FadeInGlyph
 });
+alphaTab.rendering.glyphs.FermataGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["FermataGlyph"] = function(x,y,fermata) {
+	alphaTab.rendering.glyphs.MusicFontGlyph.call(this,x,y,1,alphaTab.rendering.glyphs.FermataGlyph.GetSymbol(fermata));
+};
+alphaTab.rendering.glyphs.FermataGlyph.__name__ = ["alphaTab","rendering","glyphs","FermataGlyph"];
+alphaTab.rendering.glyphs.FermataGlyph.GetSymbol = function(accentuation) {
+	switch(accentuation) {
+	case 0:
+		return 58564;
+	case 1:
+		return 58560;
+	case 2:
+		return 58566;
+	default:
+		return -1;
+	}
+};
+alphaTab.rendering.glyphs.FermataGlyph.__super__ = alphaTab.rendering.glyphs.MusicFontGlyph;
+alphaTab.rendering.glyphs.FermataGlyph.prototype = $extend(alphaTab.rendering.glyphs.MusicFontGlyph.prototype,{
+	DoLayout: function() {
+		this.Width = 23 * this.get_Scale();
+		this.Height = 12 * this.get_Scale();
+	}
+	,Paint: function(cx,cy,canvas) {
+		alphaTab.rendering.glyphs.MusicFontGlyph.prototype.Paint.call(this,cx - this.Width / 2,cy + this.Height,canvas);
+	}
+	,__class__: alphaTab.rendering.glyphs.FermataGlyph
+});
 alphaTab.rendering.glyphs.GhostNoteContainerGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["GhostNoteContainerGlyph"] = function(isOpen) {
 	alphaTab.rendering.glyphs.Glyph.call(this,0,0);
 	this._isOpen = false;
@@ -28272,6 +28482,12 @@ alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.toString = func
 		return "Accentuation";
 	case 58540:
 		return "HeavyAccentuation";
+	case 58560:
+		return "FermataMedium";
+	case 58564:
+		return "FermataShort";
+	case 58566:
+		return "FermataLong";
 	case 58593:
 		return "RestQuadrupleWhole";
 	case 58594:
@@ -36238,6 +36454,9 @@ alphaTab.model._DynamicValue.DynamicValue_Impl_.MF = 4;
 alphaTab.model._DynamicValue.DynamicValue_Impl_.F = 5;
 alphaTab.model._DynamicValue.DynamicValue_Impl_.FF = 6;
 alphaTab.model._DynamicValue.DynamicValue_Impl_.FFF = 7;
+alphaTab.model._FermataType.FermataType_Impl_.Short = 0;
+alphaTab.model._FermataType.FermataType_Impl_.Medium = 1;
+alphaTab.model._FermataType.FermataType_Impl_.Long = 2;
 alphaTab.model._Fingers.Fingers_Impl_.Unknown = -2;
 alphaTab.model._Fingers.Fingers_Impl_.NoOrDead = -1;
 alphaTab.model._Fingers.Fingers_Impl_.Thumb = 0;
@@ -36458,6 +36677,9 @@ alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.OttavaMBaseline
 alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.OttavaBBaseline = 60563;
 alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.SimileMarkSimple = 58624;
 alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.SimileMarkDouble = 58625;
+alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.FermataMedium = 58560;
+alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.FermataShort = 58564;
+alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.FermataLong = 58566;
 alphaTab.rendering.glyphs.NoteHeadGlyph.GraceScale = 0.75;
 alphaTab.rendering.glyphs.NoteHeadGlyph.NoteHeadHeight = 9;
 alphaTab.rendering.glyphs.NoteHeadGlyph.QuarterNoteHeadWidth = 8;
@@ -36495,7 +36717,6 @@ alphaTab.rendering.layout._HeaderFooterElements.HeaderFooterElements_Impl_.PageN
 alphaTab.rendering.layout._HeaderFooterElements.HeaderFooterElements_Impl_.All = 511;
 alphaTab.rendering.staves.BarLayoutingInfo.MinDuration = 30;
 alphaTab.rendering.staves.BarLayoutingInfo.MinDurationWidth = 10;
-alphaTab.rendering.staves.BarLayoutingInfo.MidiTimeToFraction = 3840;
 alphaTab.rendering.staves.StaveGroup.AccoladeLabelSpacing = 10;
 alphaTab.rendering.utils.AccidentalHelper.KeySignatureLookup = [[true,true,true,true,true,true,true,true,true,true,true,true],[true,true,true,true,true,false,true,true,true,true,true,true],[false,true,true,true,true,false,true,true,true,true,true,true],[false,true,true,true,true,false,false,false,true,true,true,true],[false,false,false,true,true,false,false,false,true,true,true,true],[false,false,false,true,true,false,false,false,false,false,true,true],[false,false,false,false,false,false,false,false,false,false,true,true],[false,false,false,false,false,false,false,false,false,false,false,false],[false,false,false,false,false,true,true,false,false,false,false,false],[true,true,false,false,false,true,true,false,false,false,false,false],[true,true,false,false,false,true,true,true,true,false,false,false],[true,true,true,true,false,true,true,true,true,false,false,false],[true,true,true,true,false,true,true,true,true,true,true,false],[true,true,true,true,true,true,true,true,true,true,true,false],[true,true,true,true,true,true,true,true,true,true,true,true]];
 alphaTab.rendering.utils.AccidentalHelper.AccidentalNotes = [false,true,false,true,false,false,true,false,true,false,true,false];

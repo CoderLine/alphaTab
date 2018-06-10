@@ -130,6 +130,10 @@ namespace AlphaTab.Rendering.Glyphs
         OttavaBBaseline = 0xEC93,
 
         SimileMarkSimple = 0xE500,
-        SimileMarkDouble = 0xE501
+        SimileMarkDouble = 0xE501,
+
+        FermataMedium = 0xE4C0,
+        FermataShort = 0xE4C4,
+        FermataLong = 0xE4C6
     }
 }

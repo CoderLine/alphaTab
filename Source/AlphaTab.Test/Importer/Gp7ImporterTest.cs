@@ -19,6 +19,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using AlphaTab.Audio;
 using AlphaTab.Importer;
 using AlphaTab.IO;
 using AlphaTab.Model;
@@ -555,7 +556,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(0, beat.WhammyBarPoints[0].Value);
             Assert.AreEqual(45, beat.WhammyBarPoints[1].Offset);
             Assert.AreEqual(-4, beat.WhammyBarPoints[1].Value);
-       
+
             beat = score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2];
 
             Assert.AreEqual(WhammyType.PrediveDive, beat.WhammyBarType);
@@ -564,7 +565,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(-4, beat.WhammyBarPoints[0].Value);
             Assert.AreEqual(60, beat.WhammyBarPoints[1].Offset);
             Assert.AreEqual(-16, beat.WhammyBarPoints[1].Value);
-       
+
             #endregion
 
             #region Bar 2
@@ -579,7 +580,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(-16, beat.WhammyBarPoints[1].Value);
             Assert.AreEqual(30, beat.WhammyBarPoints[2].Offset);
             Assert.AreEqual(0, beat.WhammyBarPoints[2].Value);
-           
+
 
             beat = score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[2];
 
@@ -593,7 +594,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(-12, beat.WhammyBarPoints[2].Value);
             Assert.AreEqual(53, beat.WhammyBarPoints[3].Offset);
             Assert.AreEqual(0, beat.WhammyBarPoints[3].Value);
-           
+
             #endregion
 
             #region Bar 3
@@ -608,7 +609,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(-16, beat.WhammyBarPoints[1].Value);
             Assert.AreEqual(30, beat.WhammyBarPoints[2].Offset);
             Assert.AreEqual(0, beat.WhammyBarPoints[2].Value);
-           
+
 
             beat = score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[2];
 
@@ -622,7 +623,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(-12, beat.WhammyBarPoints[2].Value);
             Assert.AreEqual(53, beat.WhammyBarPoints[3].Offset);
             Assert.AreEqual(0, beat.WhammyBarPoints[3].Value);
-           
+
             #endregion
 
             #region Bar 4
@@ -635,7 +636,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(-8, beat.WhammyBarPoints[0].Value);
             Assert.AreEqual(60, beat.WhammyBarPoints[1].Offset);
             Assert.AreEqual(-8, beat.WhammyBarPoints[1].Value);
-           
+
             #endregion
 
             #region Bar 5
@@ -648,7 +649,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(-4, beat.WhammyBarPoints[0].Value);
             Assert.AreEqual(30, beat.WhammyBarPoints[1].Offset);
             Assert.AreEqual(0, beat.WhammyBarPoints[1].Value);
-           
+
             #endregion
 
             #region Bar 6
@@ -661,7 +662,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(-4, beat.WhammyBarPoints[0].Value);
             Assert.AreEqual(29, beat.WhammyBarPoints[1].Offset);
             Assert.AreEqual(-12, beat.WhammyBarPoints[1].Value);
-           
+
 
             beat = score.Tracks[0].Staves[0].Bars[5].Voices[0].Beats[1];
 
@@ -671,7 +672,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(-12, beat.WhammyBarPoints[0].Value);
             Assert.AreEqual(45, beat.WhammyBarPoints[1].Offset);
             Assert.AreEqual(0, beat.WhammyBarPoints[1].Value);
-           
+
             #endregion
 
             #region Bar 7
@@ -684,7 +685,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(0, beat.WhammyBarPoints[0].Value);
             Assert.AreEqual(45, beat.WhammyBarPoints[1].Offset);
             Assert.AreEqual(-4, beat.WhammyBarPoints[1].Value);
-           
+
 
             beat = score.Tracks[0].Staves[0].Bars[6].Voices[0].Beats[1];
             Assert.AreEqual(WhammyType.Hold, beat.WhammyBarType);
@@ -693,7 +694,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(-4, beat.WhammyBarPoints[0].Value);
             Assert.AreEqual(60, beat.WhammyBarPoints[1].Offset);
             Assert.AreEqual(-4, beat.WhammyBarPoints[1].Value);
-           
+
             #endregion
 
             #region Bar 8
@@ -706,7 +707,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(-4, beat.WhammyBarPoints[0].Value);
             Assert.AreEqual(46, beat.WhammyBarPoints[1].Offset);
             Assert.AreEqual(-12, beat.WhammyBarPoints[1].Value);
-           
+
             beat = score.Tracks[0].Staves[0].Bars[7].Voices[0].Beats[1];
 
             Assert.AreEqual(WhammyType.Dive, beat.WhammyBarType);
@@ -715,7 +716,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(-12, beat.WhammyBarPoints[0].Value);
             Assert.AreEqual(44, beat.WhammyBarPoints[1].Offset);
             Assert.AreEqual(8, beat.WhammyBarPoints[1].Value);
-           
+
             #endregion
 
             #region Bar 9
@@ -741,7 +742,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(-4, beat.WhammyBarPoints[1].Value);
             Assert.AreEqual(30, beat.WhammyBarPoints[2].Offset);
             Assert.AreEqual(0, beat.WhammyBarPoints[2].Value);
-          
+
             #endregion
 
             Render(score);
@@ -989,6 +990,56 @@ namespace AlphaTab.Test.Importer
         }
 
         [TestMethod]
+        public void TestFermata()
+        {
+            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestFermata.gp");
+            var score = reader.ReadScore();
+
+            Assert.AreEqual(5, score.MasterBars[0].Fermata.Count);
+            Assert.AreEqual(5, score.MasterBars[1].Fermata.Count);
+            Assert.AreEqual(5, score.MasterBars[2].Fermata.Count);
+
+            // Short
+            var offsets = new[]
+            {
+                0,
+                (int) (MidiUtils.QuarterTime * (1f / 2f)),
+                (int) (MidiUtils.QuarterTime * (1f / 1f)),
+                (int) (MidiUtils.QuarterTime * (2f / 1f)),
+                (int) (MidiUtils.QuarterTime * (3f / 1f))
+            };
+            var types = new[]
+            {
+                FermataType.Short,
+                FermataType.Medium,
+                FermataType.Long
+            };
+
+            for (int i = 0; i < 3; i++)
+            {
+                var masterBar = score.MasterBars[i];
+                Assert.AreEqual(5, masterBar.Fermata.Count);
+                foreach (var offset in offsets)
+                {
+                    var fermata = masterBar.Fermata[offset];
+                    Assert.IsNotNull(fermata);
+                    Assert.AreEqual(types[i], fermata.Type);
+                }
+
+                var beats = score.Tracks[0].Staves[0].Bars[i].Voices[0].Beats;
+                foreach (var beat in beats)
+                {
+                    var fermata = masterBar.Fermata[beat.PlaybackStart];
+                    var beatFermata = beat.Fermata;
+                    Assert.IsNotNull(beatFermata);
+                    Assert.IsNotNull(fermata);
+                    Assert.AreEqual(types[i], beatFermata.Type);
+                    Assert.AreEqual(types[i], fermata.Type);
+                }
+            }
+        }
+
+        [TestMethod]
         public void TestPickSlide()
         {
             var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestPickSlide.gp");
@@ -1040,7 +1091,7 @@ namespace AlphaTab.Test.Importer
 
             Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].Notes[0].SlideType);
             Assert.AreEqual(20, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].Notes[0].Fret);
-            
+
             Render(score);
         }
     }

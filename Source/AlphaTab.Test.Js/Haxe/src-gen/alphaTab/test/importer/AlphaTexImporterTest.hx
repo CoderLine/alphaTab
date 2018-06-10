@@ -159,7 +159,7 @@ class AlphaTexImporterTest
     {
         var tex : system.CsString = ":8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh}";
         var score : alphaTab.model.Score = ParseTex(tex);
-        alphaTab.Environment.StaveProfiles.set_Item("harmonics", [new alphaTab.rendering.EffectBarRendererFactory("harmonics", [new alphaTab.rendering.effects.HarmonicsEffectInfo()])]);
+        alphaTab.Environment.StaveProfiles.set_Item("harmonics", [new alphaTab.rendering.EffectBarRendererFactory("harmonics", [new alphaTab.rendering.effects.HarmonicsEffectInfo(alphaTab.model.HarmonicType.Artificial)])]);
         var settings : alphaTab.Settings = alphaTab.Settings.Defaults;
         settings.Engine = "svg";
         settings.Staves = new alphaTab.StaveSettings("harmonics");
@@ -209,7 +209,7 @@ class AlphaTexImporterTest
         renderer.Render(score, [0]);
         var tab : alphaTab.xml.XmlDocument = new alphaTab.xml.XmlDocument(partials.get_Item(0));
         var texts : system.FixedArray<alphaTab.xml.XmlNode> = tab.GetElementsByTagName("text", true);
-        var expectedTexts : system.FixedArray<system.CsString> = [alphaTab.platform.Platform.StringFromCharCode((alphaTab.rendering.glyphs.MusicFontSymbol.ClefTab).ToInt32_IFormatProvider(null)), "1", "15", "full", "18", "1½", "17", "2", "16", "¾", "2", "15", "2", "-1", "14", "full", "13", "full", "1½", "14", "full"];
+        var expectedTexts : system.FixedArray<system.CsString> = [alphaTab.platform.Platform.StringFromCharCode((alphaTab.rendering.glyphs.MusicFontSymbol.ClefTab).ToInt32_IFormatProvider(null)), "1", "15", "full", "18", "1½", "17", "2", "16", "¾", "2", "15", "2", "full", "14", "full", "13", "full", "1½", "14", "full"];
         {
             var i: system.Int32 = 0;
             while (i < expectedTexts.Length)
