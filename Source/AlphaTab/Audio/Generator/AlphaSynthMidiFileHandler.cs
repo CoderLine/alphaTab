@@ -44,7 +44,6 @@ namespace AlphaTab.Audio.Generator
 
             var noteOff = new MidiEvent(start + length, MakeCommand((byte)MidiEventTypeEnum.NoteOff, channel), FixValue(key), FixValue((byte)velocity));
             _midiFile.AddEvent(noteOff);
-            Logger.Info("Midi", "Note: " + start + "/" + (start + length));
         }
 
         private byte MakeCommand(byte command, byte channel)
@@ -86,7 +85,6 @@ namespace AlphaTab.Audio.Generator
         {
             var message = new MidiEvent(tick, MakeCommand((byte)MidiEventTypeEnum.PitchBend, channel), 0, FixValue(value));
             _midiFile.AddEvent(message);
-            Logger.Info("Midi", "Bend: " + tick + "/" + value);
         }
 
         public void FinishTrack(int track, int tick)

@@ -63,10 +63,13 @@ namespace AlphaTab.Audio.Generator
                 GenerateTrack(_score.Tracks[i]);
             }
 
+            Logger.Info("Midi", "Begin midi generation");
             var controller = new MidiPlaybackController(_score);
             MasterBar previousMasterBar = null; // store the previous played bar for repeats
             while (!controller.Finished)
             {
+                Logger.Info("Midi", "Generating bar " + controller.Index);
+
                 var index = controller.Index;
                 var bar = _score.MasterBars[index];
                 var currentTick = controller.CurrentTick;
@@ -97,7 +100,7 @@ namespace AlphaTab.Audio.Generator
             }
 
             TickLookup.Finish();
-
+            Logger.Info("Midi", "Midi generation done");
         }
 
         #region Track
@@ -324,7 +327,6 @@ namespace AlphaTab.Audio.Generator
 
             if (initialBend > 0)
             {
-                Logger.Info("Midi", "ResetBend");
                 _handler.AddBend(track.Index, noteStart, (byte)track.PlaybackInfo.PrimaryChannel, (byte)initialBend);
             }
 
@@ -605,6 +607,7 @@ namespace AlphaTab.Audio.Generator
 
         private void GenerateBend(Note note, FastList<BendPoint> bendPoints, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue)
         {
+            return;
             var track = note.Beat.Voice.Bar.Staff.Track;
 
             // Bends are spread across all tied notes unless they have a bend on their own.

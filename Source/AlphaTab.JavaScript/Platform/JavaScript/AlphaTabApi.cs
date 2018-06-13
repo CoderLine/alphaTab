@@ -808,7 +808,7 @@ namespace AlphaTab.Platform.JavaScript
 
         private AlphaSynthWebWorkerApi _player;
 
-        public IAlphaSynth Player => _player;
+        public IAlphaSynth Player { get; set; }
         private MidiTickLookup _tickCache;
         private Element _cursorWrapper;
         private Element _beatCursor;
@@ -857,7 +857,9 @@ namespace AlphaTab.Platform.JavaScript
                 _player = new AlphaSynthWebWorkerApi(new AlphaSynthFlashOutput(alphaSynthScriptFile), alphaSynthScriptFile, Settings.LogLevel);
             }
 
-            if (Player == null)
+            Player = _player;
+
+            if (_player == null)
             {
                 Logger.Error("Player", "Player requires webworkers and web audio api or flash, browser unsupported");
             }

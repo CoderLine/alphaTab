@@ -307,6 +307,7 @@ system.Exception.prototype = {
 var alphaTab = {};
 alphaTab.AlphaTabException = $hx_exports["alphaTab"]["AlphaTabException"] = function() {
 	system.Exception.call(this);
+	this.Description = null;
 };
 alphaTab.AlphaTabException.__name__ = ["alphaTab","AlphaTabException"];
 alphaTab.AlphaTabException.__super__ = system.Exception;
@@ -384,6 +385,12 @@ alphaTab.platform.svg.SvgCanvas = $hx_exports["alphaTab"]["platform"]["svg"]["Sv
 	this.Buffer = null;
 	this._currentPath = null;
 	this._currentPathIsEmpty = false;
+	this.set_Color(null);
+	this.set_LineWidth(0.0);
+	this.set_Font(null);
+	this.set_TextAlign(0);
+	this.set_TextBaseline(0);
+	this.set_Resources(null);
 	var this1 = "";
 	this._currentPath = this1;
 	this._currentPathIsEmpty = true;
@@ -1047,6 +1054,7 @@ alphaTab.platform.javaScript.Html5Canvas = $hx_exports["alphaTab"]["platform"]["
 	this._color = null;
 	this._font = null;
 	this._musicFont = null;
+	this.set_Resources(null);
 	this._color = new alphaTab.platform.model.Color(0,0,0,255);
 	var fontElement = window.document.createElement("span");
 	fontElement.classList.add("at");
@@ -1358,7 +1366,7 @@ alphaTab.platform.javaScript.JQueryAlphaTab.prototype = {
 		context.Print(width);
 	}
 	,player: function(element,context) {
-		return context.get_Player();
+		return context.Player;
 	}
 	,playerOptions: function(element,context,options) {
 		if(!(!options)) {
@@ -1370,67 +1378,67 @@ alphaTab.platform.javaScript.JQueryAlphaTab.prototype = {
 		return this.playerOptions(element,context,options);
 	}
 	,playerState: function(element,context) {
-		if(context.get_Player() == null) {
+		if(context.Player == null) {
 			return 0;
 		}
-		return context.get_Player().get_State();
+		return context.Player.get_State();
 	}
 	,masterVolume: function(element,context,masterVolume) {
-		if(context.get_Player() == null) {
+		if(context.Player == null) {
 			return 0;
 		}
 		if(!(!masterVolume)) {
-			context.get_Player().set_MasterVolume(masterVolume);
+			context.Player.set_MasterVolume(masterVolume);
 		}
-		return context.get_Player().get_MasterVolume();
+		return context.Player.get_MasterVolume();
 	}
 	,playbackSpeed: function(element,context,playbackSpeed) {
-		if(context.get_Player() == null) {
+		if(context.Player == null) {
 			return 0;
 		}
 		if(!(!playbackSpeed)) {
-			context.get_Player().set_PlaybackSpeed(playbackSpeed);
+			context.Player.set_PlaybackSpeed(playbackSpeed);
 		}
-		return context.get_Player().get_PlaybackSpeed();
+		return context.Player.get_PlaybackSpeed();
 	}
 	,metronomeVolume: function(element,context,metronomeVolume) {
-		if(context.get_Player() == null) {
+		if(context.Player == null) {
 			return 0;
 		}
 		if(!(!metronomeVolume)) {
-			context.get_Player().set_MetronomeVolume(metronomeVolume);
+			context.Player.set_MetronomeVolume(metronomeVolume);
 		}
-		return context.get_Player().get_MetronomeVolume();
+		return context.Player.get_MetronomeVolume();
 	}
 	,tickPosition: function(element,context,tickPosition) {
-		if(context.get_Player() == null) {
+		if(context.Player == null) {
 			return 0;
 		}
 		if(!(!tickPosition)) {
-			context.get_Player().set_TickPosition(tickPosition);
+			context.Player.set_TickPosition(tickPosition);
 		}
-		return context.get_Player().get_TickPosition();
+		return context.Player.get_TickPosition();
 	}
 	,playbackRange: function(element,context,playbackRange) {
-		if(context.get_Player() == null) {
+		if(context.Player == null) {
 			return null;
 		}
 		if(!(!playbackRange)) {
-			context.get_Player().set_PlaybackRange(playbackRange);
+			context.Player.set_PlaybackRange(playbackRange);
 		}
-		return context.get_Player().get_PlaybackRange();
+		return context.Player.get_PlaybackRange();
 	}
 	,loop: function(element,context,loop) {
-		if(context.get_Player() == null) {
+		if(context.Player == null) {
 			return false;
 		}
 		if(!(!loop)) {
-			context.get_Player().set_IsLooping(loop);
+			context.Player.set_IsLooping(loop);
 		}
-		return context.get_Player().get_IsLooping();
+		return context.Player.get_IsLooping();
 	}
 	,autoScroll: function(element,context,autoScroll) {
-		if(context.get_Player() == null) {
+		if(context.Player == null) {
 			return null;
 		}
 		if(!(!autoScroll)) {
@@ -2035,6 +2043,7 @@ alphaTab.audio.synth.ISynthOutput.prototype = {
 	__class__: alphaTab.audio.synth.ISynthOutput
 };
 alphaTab.platform.javaScript.AlphaSynthWorkerSynthOutput = $hx_exports["alphaTab"]["platform"]["javaScript"]["AlphaSynthWorkerSynthOutput"] = function() {
+	this._worker = null;
 };
 alphaTab.platform.javaScript.AlphaSynthWorkerSynthOutput.__name__ = ["alphaTab","platform","javaScript","AlphaSynthWorkerSynthOutput"];
 alphaTab.platform.javaScript.AlphaSynthWorkerSynthOutput.__interfaces__ = [alphaTab.audio.synth.ISynthOutput];
@@ -3165,6 +3174,9 @@ alphaTab.audio.synth.synthesis.SynthParameters.prototype = {
 	,__class__: alphaTab.audio.synth.synthesis.SynthParameters
 };
 alphaTab.audio.synth.synthesis.CCValue = $hx_exports["alphaTab"]["audio"]["synth"]["synthesis"]["CCValue"] = function() {
+	this._coarseValue = 0;
+	this._fineValue = 0;
+	this._combined = 0;
 };
 alphaTab.audio.synth.synthesis.CCValue.__name__ = ["alphaTab","audio","synth","synthesis","CCValue"];
 alphaTab.audio.synth.synthesis.CCValue.prototype = {
@@ -3233,6 +3245,8 @@ alphaTab.audio.synth.synthesis.CCValue.prototype = {
 alphaTab.audio.synth.bank = {};
 alphaTab.audio.synth.bank.components = {};
 alphaTab.audio.synth.bank.components.PanComponent = $hx_exports["alphaTab"]["audio"]["synth"]["bank"]["components"]["PanComponent"] = function() {
+	this.Left = 0.0;
+	this.Right = 0.0;
 };
 alphaTab.audio.synth.bank.components.PanComponent.__name__ = ["alphaTab","audio","synth","bank","components","PanComponent"];
 alphaTab.audio.synth.bank.components.PanComponent.prototype = {
@@ -4472,6 +4486,8 @@ alphaTab.audio.synth.bank.components.generators.DefaultGenerators.prototype = {
 	__class__: alphaTab.audio.synth.bank.components.generators.DefaultGenerators
 };
 alphaTab.audio.synth.synthesis.VoiceNode = $hx_exports["alphaTab"]["audio"]["synth"]["synthesis"]["VoiceNode"] = function() {
+	this.Value = null;
+	this.Next = null;
 };
 alphaTab.audio.synth.synthesis.VoiceNode.__name__ = ["alphaTab","audio","synth","synthesis","VoiceNode"];
 alphaTab.audio.synth.synthesis.VoiceNode.prototype = {
@@ -5573,6 +5589,7 @@ alphaTab.rendering.effects.WhammyBarEffectInfo.prototype = {
 	,__class__: alphaTab.rendering.effects.WhammyBarEffectInfo
 };
 alphaTab.rendering.effects.NoteEffectInfoBase = $hx_exports["alphaTab"]["rendering"]["effects"]["NoteEffectInfoBase"] = function() {
+	this.LastCreateInfo = null;
 };
 alphaTab.rendering.effects.NoteEffectInfoBase.__name__ = ["alphaTab","rendering","effects","NoteEffectInfoBase"];
 alphaTab.rendering.effects.NoteEffectInfoBase.__interfaces__ = [alphaTab.rendering.IEffectBarRendererInfo];
@@ -6585,6 +6602,39 @@ alphaTab.Main.__name__ = ["alphaTab","Main"];
 alphaTab.Main.main = function() {
 };
 alphaTab.Settings = $hx_exports["alphaTab"]["Settings"] = function() {
+	this.ScriptFile = null;
+	this.FontDirectory = null;
+	this.DisableLazyLoading = false;
+	this.UseWebWorker = false;
+	this.EnablePlayer = false;
+	this.SoundFontFile = null;
+	this.EnableCursor = false;
+	this.ScrollOffsetX = 0;
+	this.ScrollOffsetY = 0;
+	this.EnableSeekByClick = false;
+	this.ScrollMode = null;
+	this.ScrollSpeed = 0;
+	this.ScrollElement = null;
+	this.BeatCursorWidth = 0;
+	this.Scale = 0.0;
+	this.Width = 0;
+	this.Engine = null;
+	this.Layout = null;
+	this.ImporterSettings = null;
+	this.StretchForce = 0.0;
+	this.ForcePianoFingering = false;
+	this.Staves = null;
+	this.TranspositionPitches = null;
+	this.DisplayTranspositionPitches = null;
+	this.LogLevel = 0;
+	this.SmallGraceTabNotes = false;
+	this.ExtendBendArrowsOnTiedNotes = false;
+	this.ShowParenthesisForTiedBends = false;
+	this.ShowTabNoteOnTiedBend = false;
+	this.BendMode = 0;
+	this.WhammyMode = 0;
+	this.FingeringMode = 0;
+	this.ShowZeroOnDiveWhammy = false;
 };
 alphaTab.Settings.__name__ = ["alphaTab","Settings"];
 alphaTab.Settings.SetDefaults = function(settings) {
@@ -7131,6 +7181,10 @@ alphaTab._WhammyMode.WhammyMode_Impl_.toString = function(this1) {
 	return "";
 };
 alphaTab.audio.BeatTickLookup = $hx_exports["alphaTab"]["audio"]["BeatTickLookup"] = function() {
+	this.Start = 0;
+	this.End = 0;
+	this.Beat = null;
+	this.IsEmptyBar = false;
 };
 alphaTab.audio.BeatTickLookup.__name__ = ["alphaTab","audio","BeatTickLookup"];
 alphaTab.audio.BeatTickLookup.prototype = {
@@ -7461,6 +7515,9 @@ alphaTab.audio.MidiTickLookup.prototype = {
 	,__class__: alphaTab.audio.MidiTickLookup
 };
 alphaTab.audio.MidiTickLookupFindBeatResult = $hx_exports["alphaTab"]["audio"]["MidiTickLookupFindBeatResult"] = function() {
+	this.CurrentBeat = null;
+	this.NextBeat = null;
+	this.Duration = 0;
 };
 alphaTab.audio.MidiTickLookupFindBeatResult.__name__ = ["alphaTab","audio","MidiTickLookupFindBeatResult"];
 alphaTab.audio.MidiTickLookupFindBeatResult.prototype = {
@@ -7535,7 +7592,6 @@ alphaTab.audio.generator.AlphaSynthMidiFileHandler.prototype = {
 		this._midiFile.AddEvent(noteOn);
 		var noteOff = new alphaTab.audio.synth.midi.event.MidiEvent(start + length,this.MakeCommand(system.Convert.ToUInt8(128),channel),alphaTab.audio.generator.AlphaSynthMidiFileHandler.FixValue(key),alphaTab.audio.generator.AlphaSynthMidiFileHandler.FixValue(system.Convert.ToUInt8(velocity)));
 		this._midiFile.AddEvent(noteOff);
-		alphaTab.util.Logger.Info("Midi","Note: " + start + "/" + (start + length),null);
 	}
 	,MakeCommand: function(command,channel) {
 		return system.Convert.ToUInt8(command & 240 | channel & 15);
@@ -7556,7 +7612,6 @@ alphaTab.audio.generator.AlphaSynthMidiFileHandler.prototype = {
 	,AddBend: function(track,tick,channel,value) {
 		var message = new alphaTab.audio.synth.midi.event.MidiEvent(tick,this.MakeCommand(system.Convert.ToUInt8(224),channel),0,alphaTab.audio.generator.AlphaSynthMidiFileHandler.FixValue(value));
 		this._midiFile.AddEvent(message);
-		alphaTab.util.Logger.Info("Midi","Bend: " + tick + "/" + value,null);
 	}
 	,FinishTrack: function(track,tick) {
 		var message = system.Convert.ToUInt8(47);
@@ -7592,9 +7647,11 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			this.GenerateTrack(this._score.Tracks[i]);
 			++i;
 		}
+		alphaTab.util.Logger.Info("Midi","Begin midi generation",null);
 		var controller = new alphaTab.audio.generator.MidiPlaybackController(this._score);
 		var previousMasterBar = null;
 		while(!controller.get_Finished()) {
+			alphaTab.util.Logger.Info("Midi","Generating bar " + controller.Index,null);
 			var index = controller.Index;
 			var bar = this._score.MasterBars[index];
 			var currentTick = controller.CurrentTick;
@@ -7627,6 +7684,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			++i2;
 		}
 		this.TickLookup.Finish();
+		alphaTab.util.Logger.Info("Midi","Midi generation done",null);
 	}
 	,GenerateTrack: function(track) {
 		this.GenerateChannel(track,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),track.PlaybackInfo);
@@ -7776,7 +7834,6 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			initialBend = 0;
 		}
 		if(initialBend > 0) {
-			alphaTab.util.Logger.Info("Midi","ResetBend",null);
 			this._handler.AddBend(track.Index,noteStart,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(initialBend));
 		}
 		if(note.Beat.FadeIn) {
@@ -7943,139 +8000,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 	,GenerateWhammyBar: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
 	}
 	,GenerateBend: function(note,bendPoints,noteStart,noteDuration,noteKey,dynamicValue) {
-		var track = note.Beat.Voice.Bar.Staff.Track;
-		var duration;
-		if(note.IsTieOrigin && (this._settings == null || this._settings.ExtendBendArrowsOnTiedNotes)) {
-			var endNote = note;
-			while(endNote.IsTieOrigin && !endNote.TieDestination.get_HasBend()) endNote = endNote.TieDestination;
-			var this1 = endNote.Beat.get_AbsolutePlaybackStart() - note.Beat.get_AbsolutePlaybackStart() + this.GetNoteDuration(endNote,endNote.Beat.PlaybackDuration).NoteOnly;
-			duration = this1;
-		} else {
-			var this2 = noteDuration.NoteOnly;
-			duration = this2;
-		}
-		if(bendPoints[0].Value > 0 && !note.IsContinuedBend) {
-			--noteStart;
-		}
-		var this3 = [];
-		var playedBendPoints = this3;
-		var _g = note.BendType;
-		switch(_g) {
-		case 1:
-			playedBendPoints = bendPoints;
-			break;
-		case 2:case 3:
-			var _g1 = note.BendStyle;
-			switch(_g1) {
-			case 0:
-				playedBendPoints = bendPoints;
-				break;
-			case 1:
-				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[1].Value));
-				break;
-			case 2:
-				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[1].Value));
-				break;
-			default:
-			}
-			break;
-		case 4:
-			var _g2 = note.BendStyle;
-			switch(_g2) {
-			case 0:
-				playedBendPoints = bendPoints;
-				break;
-			case 1:
-				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(60 / 2 | 0,note.BendPoints[1].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[2].Value));
-				break;
-			case 2:
-				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(45,note.BendPoints[1].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[2].Value));
-				break;
-			default:
-			}
-			break;
-		case 5:
-			playedBendPoints = bendPoints;
-			break;
-		case 6:
-			playedBendPoints = bendPoints;
-			break;
-		case 7:
-			var _g3 = note.BendStyle;
-			switch(_g3) {
-			case 0:
-				playedBendPoints = bendPoints;
-				break;
-			case 1:
-				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(60 / 2 | 0,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[1].Value));
-				break;
-			case 2:
-				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[1].Value));
-				break;
-			default:
-			}
-			break;
-		case 8:
-			var _g4 = note.BendStyle;
-			switch(_g4) {
-			case 0:
-				playedBendPoints = bendPoints;
-				break;
-			case 1:
-				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(60 / 2 | 0,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[1].Value));
-				break;
-			case 2:
-				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[1].Value));
-				break;
-			default:
-			}
-			break;
-		default:
-		}
-		var ticksPerPosition = duration / 60;
-		var i = 0;
-		while(i < playedBendPoints.length - 1) {
-			var currentPoint = playedBendPoints[i];
-			var nextPoint = playedBendPoints[i + 1];
-			var currentBendValue = 64 + currentPoint.Value * 2.75;
-			var nextBendValue = 64 + nextPoint.Value * 2.75;
-			var ticksBetweenPoints = ticksPerPosition * (nextPoint.Offset - currentPoint.Offset);
-			var ticksPerValue = ticksBetweenPoints / Math.abs(nextBendValue - currentBendValue);
-			var tick = noteStart + ticksPerPosition * currentPoint.Offset;
-			if(currentBendValue < nextBendValue) {
-				while(currentBendValue <= nextBendValue) {
-					var this4 = currentBendValue;
-					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this4))));
-					++currentBendValue;
-					tick = tick + ticksPerValue;
-				}
-			} else if(currentBendValue > nextBendValue) {
-				while(currentBendValue >= nextBendValue) {
-					var this5 = currentBendValue;
-					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this5))));
-					--currentBendValue;
-					tick = tick + ticksPerValue;
-				}
-			} else {
-				var this6 = currentBendValue;
-				this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this6))));
-			}
-			++i;
-		}
+		return;
 	}
 	,GenerateTrill: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
 		var track = note.Beat.Voice.Bar.Staff.Track;
@@ -8172,6 +8097,9 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 	,__class__: alphaTab.audio.generator.MidiFileGenerator
 };
 alphaTab.audio.generator.MidiNoteDuration = $hx_exports["alphaTab"]["audio"]["generator"]["MidiNoteDuration"] = function() {
+	this.NoteOnly = 0;
+	this.UntilTieEnd = 0;
+	this.LetRingEnd = 0;
 };
 alphaTab.audio.generator.MidiNoteDuration.__name__ = ["alphaTab","audio","generator","MidiNoteDuration"];
 alphaTab.audio.generator.MidiNoteDuration.prototype = {
@@ -10157,6 +10085,10 @@ alphaTab.audio.synth.ds.CircularSampleBuffer.prototype = {
 	,__class__: alphaTab.audio.synth.ds.CircularSampleBuffer
 };
 alphaTab.audio.synth.ds.LinkedListNode = $hx_exports["alphaTab"]["audio"]["synth"]["ds"]["LinkedListNode"] = function() {
+	this._list = null;
+	this._next = null;
+	this._prev = null;
+	this.Value = null;
 };
 alphaTab.audio.synth.ds.LinkedListNode.__name__ = ["alphaTab","audio","synth","ds","LinkedListNode"];
 alphaTab.audio.synth.ds.LinkedListNode.prototype = {
@@ -11139,6 +11071,8 @@ alphaTab.audio.synth.sf2._GeneratorEnum.GeneratorEnum_Impl_.toString = function(
 	return "";
 };
 alphaTab.audio.synth.sf2.Instrument = $hx_exports["alphaTab"]["audio"]["synth"]["sf2"]["Instrument"] = function() {
+	this.Name = null;
+	this.Zones = null;
 };
 alphaTab.audio.synth.sf2.Instrument.__name__ = ["alphaTab","audio","synth","sf2","Instrument"];
 alphaTab.audio.synth.sf2.Instrument.prototype = {
@@ -11226,6 +11160,13 @@ alphaTab.audio.synth.sf2._PolarityEnum.PolarityEnum_Impl_.toString = function(th
 	return "";
 };
 alphaTab.audio.synth.sf2.PresetHeader = $hx_exports["alphaTab"]["audio"]["synth"]["sf2"]["PresetHeader"] = function() {
+	this.Name = null;
+	this.PatchNumber = 0;
+	this.BankNumber = 0;
+	this.Library = 0;
+	this.Genre = 0;
+	this.Morphology = 0;
+	this.Zones = null;
 };
 alphaTab.audio.synth.sf2.PresetHeader.__name__ = ["alphaTab","audio","synth","sf2","PresetHeader"];
 alphaTab.audio.synth.sf2.PresetHeader.prototype = {
@@ -11381,6 +11322,9 @@ alphaTab.audio.synth.sf2.Sf2Region.prototype = {
 	,__class__: alphaTab.audio.synth.sf2.Sf2Region
 };
 alphaTab.audio.synth.sf2.SoundFont = $hx_exports["alphaTab"]["audio"]["synth"]["sf2"]["SoundFont"] = function() {
+	this.Info = null;
+	this.SampleData = null;
+	this.Presets = null;
 };
 alphaTab.audio.synth.sf2.SoundFont.__name__ = ["alphaTab","audio","synth","sf2","SoundFont"];
 alphaTab.audio.synth.sf2.SoundFont.prototype = {
@@ -11714,6 +11658,8 @@ alphaTab.audio.synth.sf2._TransformEnum.TransformEnum_Impl_.toString = function(
 	return "";
 };
 alphaTab.audio.synth.sf2.Zone = $hx_exports["alphaTab"]["audio"]["synth"]["sf2"]["Zone"] = function() {
+	this.Modulators = null;
+	this.Generators = null;
 };
 alphaTab.audio.synth.sf2.Zone.__name__ = ["alphaTab","audio","synth","sf2","Zone"];
 alphaTab.audio.synth.sf2.Zone.prototype = {
@@ -11874,18 +11820,33 @@ alphaTab.audio.synth.sf2.chunks.PresetHeaderChunk.prototype = $extend(alphaTab.a
 	,__class__: alphaTab.audio.synth.sf2.chunks.PresetHeaderChunk
 });
 alphaTab.audio.synth.sf2.chunks.RawInstrument = $hx_exports["alphaTab"]["audio"]["synth"]["sf2"]["chunks"]["RawInstrument"] = function() {
+	this.Name = null;
+	this.StartInstrumentZoneIndex = 0;
+	this.EndInstrumentZoneIndex = 0;
 };
 alphaTab.audio.synth.sf2.chunks.RawInstrument.__name__ = ["alphaTab","audio","synth","sf2","chunks","RawInstrument"];
 alphaTab.audio.synth.sf2.chunks.RawInstrument.prototype = {
 	__class__: alphaTab.audio.synth.sf2.chunks.RawInstrument
 };
 alphaTab.audio.synth.sf2.chunks.RawPreset = $hx_exports["alphaTab"]["audio"]["synth"]["sf2"]["chunks"]["RawPreset"] = function() {
+	this.Name = null;
+	this.PatchNumber = 0;
+	this.BankNumber = 0;
+	this.StartPresetZoneIndex = 0;
+	this.EndPresetZoneIndex = 0;
+	this.Library = 0;
+	this.Genre = 0;
+	this.Morphology = 0;
 };
 alphaTab.audio.synth.sf2.chunks.RawPreset.__name__ = ["alphaTab","audio","synth","sf2","chunks","RawPreset"];
 alphaTab.audio.synth.sf2.chunks.RawPreset.prototype = {
 	__class__: alphaTab.audio.synth.sf2.chunks.RawPreset
 };
 alphaTab.audio.synth.sf2.chunks.RawZoneData = $hx_exports["alphaTab"]["audio"]["synth"]["sf2"]["chunks"]["RawZoneData"] = function() {
+	this.GeneratorIndex = 0;
+	this.ModulatorIndex = 0;
+	this.GeneratorCount = 0;
+	this.ModulatorCount = 0;
 };
 alphaTab.audio.synth.sf2.chunks.RawZoneData.__name__ = ["alphaTab","audio","synth","sf2","chunks","RawZoneData"];
 alphaTab.audio.synth.sf2.chunks.RawZoneData.prototype = {
@@ -11960,6 +11921,8 @@ alphaTab.audio.synth.sf2.chunks.ZoneChunk.prototype = $extend(alphaTab.audio.syn
 	,__class__: alphaTab.audio.synth.sf2.chunks.ZoneChunk
 });
 alphaTab.audio.synth.synthesis.PlaybackRange = $hx_exports["alphaTab"]["audio"]["synth"]["synthesis"]["PlaybackRange"] = function() {
+	this.StartTick = 0;
+	this.EndTick = 0;
 };
 alphaTab.audio.synth.synthesis.PlaybackRange.__name__ = ["alphaTab","audio","synth","synthesis","PlaybackRange"];
 alphaTab.audio.synth.synthesis.PlaybackRange.prototype = {
@@ -12620,6 +12583,11 @@ alphaTab.exporter.AlphaTexExporter.prototype = {
 alphaTab.importer = {};
 alphaTab.importer.AlphaTexException = $hx_exports["alphaTab"]["importer"]["AlphaTexException"] = function() {
 	alphaTab.AlphaTabException.call(this);
+	this.Position = 0;
+	this.NonTerm = null;
+	this.Expected = 0;
+	this.Symbol = 0;
+	this.SymbolData = null;
 };
 alphaTab.importer.AlphaTexException.__name__ = ["alphaTab","importer","AlphaTexException"];
 alphaTab.importer.AlphaTexException.__super__ = alphaTab.AlphaTabException;
@@ -12646,6 +12614,8 @@ alphaTab.importer.AlphaTexException.prototype = $extend(alphaTab.AlphaTabExcepti
 	,__class__: alphaTab.importer.AlphaTexException
 });
 alphaTab.importer.ScoreImporter = $hx_exports["alphaTab"]["importer"]["ScoreImporter"] = function() {
+	this.Data = null;
+	this.Settings = null;
 };
 alphaTab.importer.ScoreImporter.__name__ = ["alphaTab","importer","ScoreImporter"];
 alphaTab.importer.ScoreImporter.BuildImporters = function() {
@@ -13837,6 +13807,7 @@ alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.toString = function(thi
 };
 alphaTab.importer.FileLoadException = $hx_exports["alphaTab"]["importer"]["FileLoadException"] = function() {
 	alphaTab.AlphaTabException.call(this);
+	this.Xhr = null;
 };
 alphaTab.importer.FileLoadException.__name__ = ["alphaTab","importer","FileLoadException"];
 alphaTab.importer.FileLoadException.__super__ = alphaTab.AlphaTabException;
@@ -14948,6 +14919,23 @@ alphaTab.importer.Gp7Importer.prototype = $extend(alphaTab.importer.ScoreImporte
 	,__class__: alphaTab.importer.Gp7Importer
 });
 alphaTab.importer.GpifParser = $hx_exports["alphaTab"]["importer"]["GpifParser"] = function() {
+	this.Score = null;
+	this._masterTrackAutomations = null;
+	this._tracksMapping = null;
+	this._tracksById = null;
+	this._masterBars = null;
+	this._barsOfMasterBar = null;
+	this._barsById = null;
+	this._voicesOfBar = null;
+	this._voiceById = null;
+	this._beatsOfVoice = null;
+	this._rhythmOfBeat = null;
+	this._beatById = null;
+	this._rhythmById = null;
+	this._noteById = null;
+	this._notesOfBeat = null;
+	this._tappedNotes = null;
+	this._lyricsByTrack = null;
 };
 alphaTab.importer.GpifParser.__name__ = ["alphaTab","importer","GpifParser"];
 alphaTab.importer.GpifParser.prototype = {
@@ -16817,6 +16805,9 @@ alphaTab.importer.GpifRhythm.prototype = {
 	__class__: alphaTab.importer.GpifRhythm
 };
 alphaTab.importer.GpxFile = $hx_exports["alphaTab"]["importer"]["GpxFile"] = function() {
+	this.FileName = null;
+	this.FileSize = 0;
+	this.Data = null;
 };
 alphaTab.importer.GpxFile.__name__ = ["alphaTab","importer","GpxFile"];
 alphaTab.importer.GpxFile.prototype = {
@@ -18537,6 +18528,8 @@ alphaTab.io.IWriteable.prototype = {
 alphaTab.io.ByteBuffer = $hx_exports["alphaTab"]["io"]["ByteBuffer"] = function() {
 	this._buffer = null;
 	this._capacity = 0;
+	this.set_Length(0);
+	this.set_Position(0);
 };
 alphaTab.io.ByteBuffer.__name__ = ["alphaTab","io","ByteBuffer"];
 alphaTab.io.ByteBuffer.__interfaces__ = [alphaTab.io.IReadable,alphaTab.io.IWriteable];
@@ -18900,6 +18893,9 @@ alphaTab.io.ReadableInput.prototype = $extend(haxe.io.Input.prototype,{
 	,__class__: alphaTab.io.ReadableInput
 });
 alphaTab.io.ZipEntry = $hx_exports["alphaTab"]["io"]["ZipEntry"] = function() {
+	this.FullName = null;
+	this.FileName = null;
+	this.Data = null;
 };
 alphaTab.io.ZipEntry.__name__ = ["alphaTab","io","ZipEntry"];
 alphaTab.io.ZipEntry.prototype = {
@@ -19051,6 +19047,11 @@ alphaTab.model._AccidentalType.AccidentalType_Impl_.toString = function(this1) {
 	return "";
 };
 alphaTab.model.Automation = $hx_exports["alphaTab"]["model"]["Automation"] = function() {
+	this.IsLinear = false;
+	this.Type = 0;
+	this.Value = 0.0;
+	this.RatioPosition = 0.0;
+	this.Text = null;
 };
 alphaTab.model.Automation.__name__ = ["alphaTab","model","Automation"];
 alphaTab.model.Automation.BuildTempoAutomation = function(isLinear,ratioPosition,value,reference) {
@@ -20125,6 +20126,8 @@ alphaTab.model._DynamicValue.DynamicValue_Impl_.toString = function(this1) {
 	return "";
 };
 alphaTab.model.Fermata = $hx_exports["alphaTab"]["model"]["Fermata"] = function() {
+	this.Type = 0;
+	this.Length = 0.0;
 };
 alphaTab.model.Fermata.__name__ = ["alphaTab","model","Fermata"];
 alphaTab.model.Fermata.CopyTo = function(src,dst) {
@@ -20726,6 +20729,9 @@ alphaTab.model._KeySignatureType.KeySignatureType_Impl_.toString = function(this
 	return "";
 };
 alphaTab.model.Lyrics = $hx_exports["alphaTab"]["model"]["Lyrics"] = function() {
+	this.StartBar = 0;
+	this.Text = null;
+	this.Chunks = null;
 };
 alphaTab.model.Lyrics.__name__ = ["alphaTab","model","Lyrics"];
 alphaTab.model.Lyrics.prototype = {
@@ -22266,6 +22272,9 @@ alphaTab.model.Tuning.prototype = {
 	__class__: alphaTab.model.Tuning
 };
 alphaTab.model.TuningParseResult = $hx_exports["alphaTab"]["model"]["TuningParseResult"] = function() {
+	this.Note = null;
+	this.NoteValue = 0;
+	this.Octave = 0;
 };
 alphaTab.model.TuningParseResult.__name__ = ["alphaTab","model","TuningParseResult"];
 alphaTab.model.TuningParseResult.prototype = {
@@ -22659,6 +22668,12 @@ alphaTab.platform.javaScript.AlphaSynthFlashOutput.prototype = {
 	,__class__: alphaTab.platform.javaScript.AlphaSynthFlashOutput
 };
 alphaTab.platform.javaScript.AlphaSynthWebAudioOutput = $hx_exports["alphaTab"]["platform"]["javaScript"]["AlphaSynthWebAudioOutput"] = function() {
+	this._context = null;
+	this._buffer = null;
+	this._source = null;
+	this._audioNode = null;
+	this._circularBuffer = null;
+	this._finished = false;
 };
 alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.__name__ = ["alphaTab","platform","javaScript","AlphaSynthWebAudioOutput"];
 alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.__interfaces__ = [alphaTab.audio.synth.ISynthOutput];
@@ -23090,6 +23105,7 @@ alphaTab.platform.javaScript.AlphaTabApi = $hx_exports["alphaTab"]["platform"]["
 	this.TrackIndexes = null;
 	this.Element = null;
 	this._player = null;
+	this.Player = null;
 	this._tickCache = null;
 	this._cursorWrapper = null;
 	this._beatCursor = null;
@@ -23654,9 +23670,6 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		this.Renderer.UpdateSettings(this.Settings);
 		this.Renderer.Invalidate();
 	}
-	,get_Player: function() {
-		return this._player;
-	}
 	,SetupPlayer: function() {
 		var _gthis = this;
 		var supportsWebAudio = !!window.ScriptProcessorNode;
@@ -23670,7 +23683,8 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 			alphaTab.util.Logger.Info("Player","Will use webworkers for synthesizing and flash for playback",null);
 			this._player = new alphaTab.platform.javaScript.AlphaSynthWebWorkerApi(new alphaTab.platform.javaScript.AlphaSynthFlashOutput(alphaSynthScriptFile),alphaSynthScriptFile,this.Settings.LogLevel);
 		}
-		if(this.get_Player() == null) {
+		this.Player = this._player;
+		if(this._player == null) {
 			alphaTab.util.Logger.Error("Player","Player requires webworkers and web audio api or flash, browser unsupported",null);
 		} else {
 			this._player.On("ready",function() {
@@ -23713,7 +23727,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		}
 	}
 	,LoadMidiForScore: function() {
-		if(this.get_Player() == null || this.Score == null || !this._player.get_IsReady()) {
+		if(this.Player == null || this.Score == null || !this._player.get_IsReady()) {
 			return;
 		}
 		alphaTab.util.Logger.Info("AlphaTab","Generating Midi",null);
@@ -23749,7 +23763,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		window.document.body.removeChild(dlLink);
 	}
 	,SetTrackVolume: function(tracks,volume) {
-		if(this.get_Player() == null) {
+		if(this.Player == null) {
 			return;
 		}
 		var trackList = this.TrackIndexesToTracks(this.ParseTracks(tracks));
@@ -23757,37 +23771,37 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		while(track.hasNext()) {
 			var track1 = track.next();
 			var this1 = volume;
-			this.get_Player().SetChannelVolume(track1.PlaybackInfo.PrimaryChannel,this1);
+			this.Player.SetChannelVolume(track1.PlaybackInfo.PrimaryChannel,this1);
 			var this2 = volume;
-			this.get_Player().SetChannelVolume(track1.PlaybackInfo.SecondaryChannel,this2);
+			this.Player.SetChannelVolume(track1.PlaybackInfo.SecondaryChannel,this2);
 		}
 	}
 	,SetTrackSolo: function(tracks,solo) {
-		if(this.get_Player() == null) {
+		if(this.Player == null) {
 			return;
 		}
 		var trackList = this.TrackIndexesToTracks(this.ParseTracks(tracks));
 		var track = $iterator(trackList)();
 		while(track.hasNext()) {
 			var track1 = track.next();
-			this.get_Player().SetChannelSolo(track1.PlaybackInfo.PrimaryChannel,solo);
-			this.get_Player().SetChannelSolo(track1.PlaybackInfo.SecondaryChannel,solo);
+			this.Player.SetChannelSolo(track1.PlaybackInfo.PrimaryChannel,solo);
+			this.Player.SetChannelSolo(track1.PlaybackInfo.SecondaryChannel,solo);
 		}
 	}
 	,SetTrackMute: function(tracks,mute) {
-		if(this.get_Player() == null) {
+		if(this.Player == null) {
 			return;
 		}
 		var trackList = this.TrackIndexesToTracks(this.ParseTracks(tracks));
 		var track = $iterator(trackList)();
 		while(track.hasNext()) {
 			var track1 = track.next();
-			this.get_Player().SetChannelMute(track1.PlaybackInfo.PrimaryChannel,mute);
-			this.get_Player().SetChannelMute(track1.PlaybackInfo.SecondaryChannel,mute);
+			this.Player.SetChannelMute(track1.PlaybackInfo.PrimaryChannel,mute);
+			this.Player.SetChannelMute(track1.PlaybackInfo.SecondaryChannel,mute);
 		}
 	}
 	,LoadSoundFont: function(value) {
-		if(this.get_Player() == null) {
+		if(this.Player == null) {
 			return;
 		}
 		if(typeof(value) == "string") {
@@ -23797,28 +23811,28 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		}
 	}
 	,Play: function() {
-		if(this.get_Player() == null) {
+		if(this.Player == null) {
 			return;
 		}
 		this._player.Play();
 	}
 	,Pause: function() {
-		if(this.get_Player() == null) {
+		if(this.Player == null) {
 			return;
 		}
-		this.get_Player().Pause();
+		this.Player.Pause();
 	}
 	,PlayPause: function() {
-		if(this.get_Player() == null) {
+		if(this.Player == null) {
 			return;
 		}
-		this.get_Player().PlayPause();
+		this.Player.PlayPause();
 	}
 	,Stop: function() {
-		if(this.get_Player() == null) {
+		if(this.Player == null) {
 			return;
 		}
-		this.get_Player().Stop();
+		this.Player.Stop();
 		this.CursorUpdateTick(0,true);
 	}
 	,SetupCursor: function() {
@@ -23923,17 +23937,17 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 				var tickCache = _gthis._tickCache;
 				var realMasterBarStart = tickCache.GetMasterBarStart(_gthis._selectionStart.Beat.Voice.Bar.get_MasterBar());
 				_gthis.CursorUpdateBeat(_gthis._selectionStart.Beat,null,0,false);
-				_gthis.get_Player().set_TickPosition(realMasterBarStart + _gthis._selectionStart.Beat.PlaybackStart);
+				_gthis.Player.set_TickPosition(realMasterBarStart + _gthis._selectionStart.Beat.PlaybackStart);
 				if(_gthis._selectionEnd != null && _gthis._selectionStart.Beat != _gthis._selectionEnd.Beat) {
 					var realMasterBarEnd = tickCache.GetMasterBarStart(_gthis._selectionEnd.Beat.Voice.Bar.get_MasterBar());
-					var tmp = _gthis.get_Player();
+					var _gthis1 = _gthis.Player;
 					var _tmp = new alphaTab.audio.synth.synthesis.PlaybackRange();
 					_tmp.StartTick = realMasterBarStart + _gthis._selectionStart.Beat.PlaybackStart;
 					_tmp.EndTick = realMasterBarEnd + _gthis._selectionEnd.Beat.PlaybackStart + _gthis._selectionEnd.Beat.PlaybackDuration - 50;
-					tmp.set_PlaybackRange(_tmp);
+					_gthis1.set_PlaybackRange(_tmp);
 				} else {
 					_gthis._selectionStart = null;
-					_gthis.get_Player().set_PlaybackRange(null);
+					_gthis.Player.set_PlaybackRange(null);
 					_gthis.CursorSelectRange(_gthis._selectionStart,_gthis._selectionEnd);
 				}
 			}
@@ -24013,7 +24027,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		var elements = this.Element.getElementsByClassName("atHighlight");
 		while(elements.length > 0) elements.item(0).classList.remove("atHighlight");
 		if(this._playerState == 1 || stop) {
-			var duration1 = this.get_Player().get_PlaybackSpeed();
+			var duration1 = this.Player.get_PlaybackSpeed();
 			duration = duration / duration1;
 			if(!stop) {
 				var className = alphaTab.rendering.glyphs.BeatContainerGlyph.GetGroupId(beat);
@@ -24033,7 +24047,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 					}
 				}
 				window.requestAnimationFrame(function(f) {
-					alphaTab.util.Logger.Info("Player","Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration + "(" + Std.string(_gthis.get_Player().get_PlaybackRange()) + ")",null);
+					alphaTab.util.Logger.Info("Player","Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration + "(" + Std.string(_gthis.Player.get_PlaybackRange()) + ")",null);
 					beatCursor.style.transition = "all 0s linear";
 					beatCursor.style.transitionDuration = duration + "ms";
 					beatCursor.style.left = Std.string(nextBeatX) + "px";
@@ -24194,6 +24208,7 @@ alphaTab.rendering.IScoreRenderer.prototype = {
 alphaTab.platform.javaScript.AlphaTabWorkerScoreRenderer = $hx_exports["alphaTab"]["platform"]["javaScript"]["AlphaTabWorkerScoreRenderer"] = function(api,settings) {
 	this._api = null;
 	this._worker = null;
+	this.set_BoundsLookup(null);
 	this._api = api;
 	try {
 		this._worker = new Worker(settings.ScriptFile);
@@ -24343,6 +24358,9 @@ alphaTab.platform.javaScript.IFlashSynthOutput.prototype = {
 	__class__: alphaTab.platform.javaScript.IFlashSynthOutput
 };
 alphaTab.platform.javaScript.ResizeEventArgs = $hx_exports["alphaTab"]["platform"]["javaScript"]["ResizeEventArgs"] = function() {
+	this.OldWidth = 0;
+	this.NewWidth = 0;
+	this.Settings = null;
 };
 alphaTab.platform.javaScript.ResizeEventArgs.__name__ = ["alphaTab","platform","javaScript","ResizeEventArgs"];
 alphaTab.platform.javaScript.ResizeEventArgs.prototype = {
@@ -25452,6 +25470,13 @@ alphaTab.rendering.EffectBarRenderer.prototype = $extend(alphaTab.rendering.BarR
 	,__class__: alphaTab.rendering.EffectBarRenderer
 });
 alphaTab.rendering.RenderFinishedEventArgs = $hx_exports["alphaTab"]["rendering"]["RenderFinishedEventArgs"] = function() {
+	this.Width = 0.0;
+	this.Height = 0.0;
+	this.TotalWidth = 0.0;
+	this.TotalHeight = 0.0;
+	this.FirstMasterBarIndex = 0;
+	this.LastMasterBarIndex = 0;
+	this.RenderResult = null;
 };
 alphaTab.rendering.RenderFinishedEventArgs.__name__ = ["alphaTab","rendering","RenderFinishedEventArgs"];
 alphaTab.rendering.RenderFinishedEventArgs.prototype = {
@@ -26378,6 +26403,7 @@ alphaTab.rendering.ScoreRenderer = $hx_exports["alphaTab"]["rendering"]["ScoreRe
 	this.Layout = null;
 	this.RenderingResources = null;
 	this.Settings = null;
+	this.set_BoundsLookup(null);
 	this.Settings = settings;
 	this.RenderingResources = new alphaTab.rendering.RenderingResources(1);
 	this.RecreateCanvas();
@@ -33474,6 +33500,10 @@ alphaTab.rendering.utils.BeamingHelper.prototype = {
 	,__class__: alphaTab.rendering.utils.BeamingHelper
 };
 alphaTab.rendering.utils.BeatBounds = $hx_exports["alphaTab"]["rendering"]["utils"]["BeatBounds"] = function() {
+	this.BarBounds = null;
+	this.VisualBounds = null;
+	this.RealBounds = null;
+	this.Beat = null;
 };
 alphaTab.rendering.utils.BeatBounds.__name__ = ["alphaTab","rendering","utils","BeatBounds"];
 alphaTab.rendering.utils.BeatBounds.prototype = {
@@ -33491,6 +33521,10 @@ alphaTab.rendering.utils.BeatLinePositions.prototype = {
 	__class__: alphaTab.rendering.utils.BeatLinePositions
 };
 alphaTab.rendering.utils.Bounds = $hx_exports["alphaTab"]["rendering"]["utils"]["Bounds"] = function() {
+	this.X = 0.0;
+	this.Y = 0.0;
+	this.W = 0.0;
+	this.H = 0.0;
 };
 alphaTab.rendering.utils.Bounds.__name__ = ["alphaTab","rendering","utils","Bounds"];
 alphaTab.rendering.utils.Bounds.prototype = {
@@ -34039,6 +34073,8 @@ alphaTab.xml.XmlDocument.prototype = $extend(alphaTab.xml.XmlNode.prototype,{
 });
 alphaTab.xml.XmlException = $hx_exports["alphaTab"]["xml"]["XmlException"] = function() {
 	alphaTab.AlphaTabException.call(this);
+	this.Xml = null;
+	this.Pos = 0;
 };
 alphaTab.xml.XmlException.__name__ = ["alphaTab","xml","XmlException"];
 alphaTab.xml.XmlException.__super__ = alphaTab.AlphaTabException;
