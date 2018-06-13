@@ -711,20 +711,29 @@ namespace AlphaTab
                 var root = new StringBuilder();
                 root.Append(global.location.protocol);
                 root.Append("//");
-                if (global.location.hostName)
+                if (global.location.hostname)
                 {
-                    root.Append(global.location.hostName);
+                    root.Append(global.location.hostname);
                 }
                 if (global.location.port)
                 {
                     root.Append(":");
                     root.Append(global.location.port);
                 }
-                root.Append(relativeUrl);
-                if (!relativeUrl.EndsWith("/"))
+
+                // as it is not clearly defined how slashes are treated in the location object
+                // better be safe than sorry here
+                string directory = global.location.pathname.split("/").slice(0, -1).join("/");
+                if (directory.Length > 0)
                 {
-                    root.Append("/");
+                    if (!directory.StartsWith("/")) root.Append("/");
+                    root.Append(directory);
                 }
+                
+
+                if (!relativeUrl.StartsWith("/")) root.Append("/");
+                root.Append(relativeUrl);
+
                 return root.ToString();
             }
 

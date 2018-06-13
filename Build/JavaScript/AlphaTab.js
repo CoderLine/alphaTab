@@ -7020,17 +7020,24 @@ alphaTab.Settings.EnsureFullUrl = function(relativeUrl) {
 		var root = this1;
 		root += Std.string(global.location.protocol);
 		root += Std.string("//");
-		if(global.location.hostName) {
-			root += Std.string(global.location.hostName);
+		if(global.location.hostname) {
+			root += Std.string(global.location.hostname);
 		}
 		if(global.location.port) {
 			root += Std.string(":");
 			root += Std.string(global.location.port);
 		}
-		root += Std.string(relativeUrl);
-		if(!StringTools.endsWith(relativeUrl,"/")) {
+		var directory = global.location.pathname.split("/").slice(0,-1).join("/");
+		if(directory.length > 0) {
+			if(!StringTools.startsWith(directory,"/")) {
+				root += Std.string("/");
+			}
+			root += Std.string(directory);
+		}
+		if(!StringTools.startsWith(relativeUrl,"/")) {
 			root += Std.string("/");
 		}
+		root += Std.string(relativeUrl);
 		return root;
 	}
 	return relativeUrl;
