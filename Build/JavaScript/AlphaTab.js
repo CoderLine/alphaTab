@@ -7651,7 +7651,6 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		var controller = new alphaTab.audio.generator.MidiPlaybackController(this._score);
 		var previousMasterBar = null;
 		while(!controller.get_Finished()) {
-			alphaTab.util.Logger.Info("Midi","Generating bar " + controller.Index,null);
 			var index = controller.Index;
 			var bar = this._score.MasterBars[index];
 			var currentTick = controller.CurrentTick;
@@ -8000,7 +7999,139 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 	,GenerateWhammyBar: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
 	}
 	,GenerateBend: function(note,bendPoints,noteStart,noteDuration,noteKey,dynamicValue) {
-		return;
+		var track = note.Beat.Voice.Bar.Staff.Track;
+		var duration;
+		if(note.IsTieOrigin && (this._settings == null || this._settings.ExtendBendArrowsOnTiedNotes)) {
+			var endNote = note;
+			while(endNote.IsTieOrigin && !endNote.TieDestination.get_HasBend()) endNote = endNote.TieDestination;
+			var this1 = endNote.Beat.get_AbsolutePlaybackStart() - note.Beat.get_AbsolutePlaybackStart() + this.GetNoteDuration(endNote,endNote.Beat.PlaybackDuration).NoteOnly;
+			duration = this1;
+		} else {
+			var this2 = noteDuration.NoteOnly;
+			duration = this2;
+		}
+		if(bendPoints[0].Value > 0 && !note.IsContinuedBend) {
+			--noteStart;
+		}
+		var this3 = [];
+		var playedBendPoints = this3;
+		var _g = note.BendType;
+		switch(_g) {
+		case 1:
+			playedBendPoints = bendPoints;
+			break;
+		case 2:case 3:
+			var _g1 = note.BendStyle;
+			switch(_g1) {
+			case 0:
+				playedBendPoints = bendPoints;
+				break;
+			case 1:
+				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[1].Value));
+				break;
+			case 2:
+				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[1].Value));
+				break;
+			default:
+			}
+			break;
+		case 4:
+			var _g2 = note.BendStyle;
+			switch(_g2) {
+			case 0:
+				playedBendPoints = bendPoints;
+				break;
+			case 1:
+				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60 / 2 | 0,note.BendPoints[1].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[2].Value));
+				break;
+			case 2:
+				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(45,note.BendPoints[1].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[2].Value));
+				break;
+			default:
+			}
+			break;
+		case 5:
+			playedBendPoints = bendPoints;
+			break;
+		case 6:
+			playedBendPoints = bendPoints;
+			break;
+		case 7:
+			var _g3 = note.BendStyle;
+			switch(_g3) {
+			case 0:
+				playedBendPoints = bendPoints;
+				break;
+			case 1:
+				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60 / 2 | 0,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[1].Value));
+				break;
+			case 2:
+				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[1].Value));
+				break;
+			default:
+			}
+			break;
+		case 8:
+			var _g4 = note.BendStyle;
+			switch(_g4) {
+			case 0:
+				playedBendPoints = bendPoints;
+				break;
+			case 1:
+				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60 / 2 | 0,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[1].Value));
+				break;
+			case 2:
+				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[1].Value));
+				break;
+			default:
+			}
+			break;
+		default:
+		}
+		var ticksPerPosition = duration / 60;
+		var i = 0;
+		while(i < playedBendPoints.length - 1) {
+			var currentPoint = playedBendPoints[i];
+			var nextPoint = playedBendPoints[i + 1];
+			var currentBendValue = 64 + currentPoint.Value * 2.75;
+			var nextBendValue = 64 + nextPoint.Value * 2.75;
+			var ticksBetweenPoints = ticksPerPosition * (nextPoint.Offset - currentPoint.Offset);
+			var ticksPerValue = ticksBetweenPoints / Math.abs(nextBendValue - currentBendValue);
+			var tick = noteStart + ticksPerPosition * currentPoint.Offset;
+			if(currentBendValue < nextBendValue) {
+				while(currentBendValue <= nextBendValue) {
+					var this4 = currentBendValue;
+					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this4))));
+					++currentBendValue;
+					tick = tick + ticksPerValue;
+				}
+			} else if(currentBendValue > nextBendValue) {
+				while(currentBendValue >= nextBendValue) {
+					var this5 = currentBendValue;
+					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this5))));
+					--currentBendValue;
+					tick = tick + ticksPerValue;
+				}
+			} else {
+				var this6 = currentBendValue;
+				this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this6))));
+			}
+			++i;
+		}
 	}
 	,GenerateTrill: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
 		var track = note.Beat.Voice.Bar.Staff.Track;
@@ -21072,9 +21203,7 @@ alphaTab.model.Note.CopyTo = function(src,dst) {
 	dst.HarmonicType = src.HarmonicType;
 	dst.IsGhost = src.IsGhost;
 	dst.IsLetRing = src.IsLetRing;
-	dst.LetRingDestination = src.LetRingDestination;
 	dst.IsPalmMute = src.IsPalmMute;
-	dst.PalmMuteDestination = src.PalmMuteDestination;
 	dst.IsDead = src.IsDead;
 	dst.IsStaccato = src.IsStaccato;
 	dst.SlideType = src.SlideType;

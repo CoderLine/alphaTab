@@ -556,9 +556,7 @@ namespace AlphaTab.Model
             dst.HarmonicType = src.HarmonicType;
             dst.IsGhost = src.IsGhost;
             dst.IsLetRing = src.IsLetRing;
-            dst.LetRingDestination = src.LetRingDestination;
             dst.IsPalmMute = src.IsPalmMute;
-            dst.PalmMuteDestination = src.PalmMuteDestination;
             dst.IsDead = src.IsDead;
             dst.IsStaccato = src.IsStaccato;
             dst.SlideType = src.SlideType;

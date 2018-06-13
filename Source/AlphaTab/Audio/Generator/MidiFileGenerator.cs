@@ -68,8 +68,6 @@ namespace AlphaTab.Audio.Generator
             MasterBar previousMasterBar = null; // store the previous played bar for repeats
             while (!controller.Finished)
             {
-                Logger.Info("Midi", "Generating bar " + controller.Index);
-
                 var index = controller.Index;
                 var bar = _score.MasterBars[index];
                 var currentTick = controller.CurrentTick;
@@ -607,7 +605,6 @@ namespace AlphaTab.Audio.Generator
 
         private void GenerateBend(Note note, FastList<BendPoint> bendPoints, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue)
         {
-            return;
             var track = note.Beat.Voice.Bar.Staff.Track;
 
             // Bends are spread across all tied notes unless they have a bend on their own.
