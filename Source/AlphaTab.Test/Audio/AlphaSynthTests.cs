@@ -100,7 +100,7 @@ namespace AlphaTab.Test.Audio
         }
     }
 
-    public class TestOutput : ISynthOutput
+    class TestOutput : ISynthOutput
     {
         private bool _finished;
 

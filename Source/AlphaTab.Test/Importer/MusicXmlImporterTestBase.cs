@@ -19,7 +19,7 @@ namespace AlphaTab.Test.Importer
 {
     public class MusicXmlImporterTestBase
     {
-        protected MusicXmlImporter PrepareImporterWithBytes(byte[] buffer)
+        internal MusicXmlImporter PrepareImporterWithBytes(byte[] buffer)
         {
             var readerBase = new MusicXmlImporter();
             readerBase.Init(ByteBuffer.FromBuffer(buffer));

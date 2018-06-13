@@ -13,10 +13,6 @@
     <NoWarn>$(NoWarn);0162</NoWarn>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
-
   <PropertyGroup Condition=" '$(TargetFramework)' == 'MonoAndroid60' ">
     <DefineConstants>$(DefineConstants);ANDROID;</DefineConstants>
   </PropertyGroup>

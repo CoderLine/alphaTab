@@ -8,6 +8,6 @@ Settings[DocsKeys.BaseEditUrl] = "https://github.com/CoderLine/alphaTab/tree/dev
 Settings[DocsKeys.ImplicitInheritDoc] = true;
 Settings[DocsKeys.ProjectFiles] = null;
 Settings[DocsKeys.ProjectFiles] = null;
-//Settings[DocsKeys.SourceFiles] = @"../../Source/**/{!bin,!obj,!packages,!*.Tests,!Haxe*,!Microsoft*,}/**/*.cs";
+Settings[DocsKeys.SourceFiles] = @"../../Source/**/{!bin,!obj,!packages,!*.Tests,!Haxe*,!Microsoft*,}/**/*.cs";
 
 // Add any pipeline customizations here
