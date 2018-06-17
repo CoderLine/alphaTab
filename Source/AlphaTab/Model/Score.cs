@@ -21,6 +21,26 @@ using AlphaTab.Collections;
 namespace AlphaTab.Model
 {
     /// <summary>
+    /// This class represents the rendering stylesheet.
+    /// It contains settings which control the display of the score when rendered. 
+    /// </summary>
+    public class RenderStylesheet
+    {
+        public bool HideDynamics { get; set; }
+
+        public RenderStylesheet()
+        {
+            HideDynamics = false;
+        }
+
+        public static void CopyTo(RenderStylesheet src, RenderStylesheet dst)
+        {
+            dst.HideDynamics = src.HideDynamics;
+        }
+    }
+
+
+    /// <summary>
     /// The score is the root node of the complete 
     /// model. It stores the basic information of 
     /// a song and stores the sub components. 
@@ -85,6 +105,8 @@ namespace AlphaTab.Model
         public FastList<MasterBar> MasterBars { get; set; }
         public FastList<Track> Tracks { get; set; }
 
+        public RenderStylesheet Stylesheet { get; set; }
+
         public Score()
         {
             MasterBars = new FastList<MasterBar>();
@@ -92,6 +114,7 @@ namespace AlphaTab.Model
             _currentRepeatGroup = new RepeatGroup();
             Album = Artist = Copyright = Instructions = Music = Notices = SubTitle = Title = Words = Tab = TempoLabel = "";
             Tempo = 120;
+            Stylesheet = new RenderStylesheet();
         }
 
         public static void CopyTo(Score src, Score dst)

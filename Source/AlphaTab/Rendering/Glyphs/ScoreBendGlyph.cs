@@ -99,7 +99,7 @@ namespace AlphaTab.Rendering.Glyphs
             var startNoteRenderer = (ScoreBarRenderer)Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, _beat.Voice.Bar);
             var startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_beat, BeatXPosition.MiddleNotes);
             var endBeatX = cx + startNoteRenderer.X;
-            if (_beat.Index == _beat.Voice.Beats.Count - 1)
+            if (_beat.IsLastOfVoice)
             {
                 endBeatX += startNoteRenderer.PostBeatGlyphsStart;
             }

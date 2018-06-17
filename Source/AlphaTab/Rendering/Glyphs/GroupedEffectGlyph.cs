@@ -15,17 +15,20 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using AlphaTab.Model;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
     abstract class GroupedEffectGlyph : EffectGlyph
     {
-        private readonly BeatXPosition _endPosition;
+        protected BeatXPosition EndPosition { get; set; }
+        protected bool ForceGroupedRendering { get; set; }
 
         protected GroupedEffectGlyph(BeatXPosition endPosition) : base(0, 0)
         {
-            _endPosition = endPosition;
+            EndPosition = endPosition;
         }
 
         /// <summary>
@@ -62,41 +65,66 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             // we are not linked with any glyph therefore no expansion is required, we render a simple glyph. 
-            if (!IsLinkedWithNext)
+            if (!IsLinkedWithNext && !ForceGroupedRendering)
             {
                 PaintNonGrouped(cx, cy, canvas);
                 return;
             }
 
             // find last linked glyph that can be  
-            var lastLinkedGlyph = (GroupedEffectGlyph)NextGlyph;
-            while (lastLinkedGlyph.IsLinkedWithNext)
+            GroupedEffectGlyph lastLinkedGlyph;
+            if (!IsLinkedWithNext && ForceGroupedRendering)
             {
-                lastLinkedGlyph = (GroupedEffectGlyph)lastLinkedGlyph.NextGlyph;
+                lastLinkedGlyph = this;
+            }
+            else
+            {
+                lastLinkedGlyph = (GroupedEffectGlyph) NextGlyph;
+                while (lastLinkedGlyph.IsLinkedWithNext)
+                {
+                    lastLinkedGlyph = (GroupedEffectGlyph) lastLinkedGlyph.NextGlyph;
+                }
+            }
+
+            // use start position of next beat when possible
+            Beat endBeat;
+            BarRendererBase endBeatRenderer;
+            BeatXPosition position;
+            if (EndPosition == BeatXPosition.EndBeat && lastLinkedGlyph.Beat.NextBeat != null)
+            {
+                endBeat = lastLinkedGlyph.Beat.NextBeat;
+                endBeatRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, endBeat.Voice.Bar);
+                position = BeatXPosition.MiddleNotes;
+                if (endBeatRenderer == null || endBeatRenderer.Staff != Renderer.Staff)
+                {
+                    endBeatRenderer = lastLinkedGlyph.Renderer;
+                    endBeat = lastLinkedGlyph.Beat;
+                    position = EndPosition;
+                }
+            }
+            else
+            {
+                endBeatRenderer = lastLinkedGlyph.Renderer;
+                endBeat = lastLinkedGlyph.Beat;
+                position = EndPosition;
             }
 
             // calculate end X-position
-
             var cxRenderer = cx - Renderer.X;
-
-            var endRenderer = lastLinkedGlyph.Renderer;
-            var endX = CalculateEndX(endRenderer, cxRenderer, lastLinkedGlyph, _endPosition);
+            var endX = CalculateEndX(endBeatRenderer, endBeat, cxRenderer, position);
 
             PaintGrouped(cx, cy, endX, canvas);
         }
 
-        protected virtual float CalculateEndX(BarRendererBase renderer, float cx, GroupedEffectGlyph lastGlyph, BeatXPosition endPosition)
+        protected virtual float CalculateEndX(BarRendererBase endBeatRenderer, Beat endBeat, float cx, BeatXPosition endPosition)
         {
-            var endBeatX = endPosition == BeatXPosition.EndBeat
-                ? lastGlyph.X + lastGlyph.Width
-                : renderer.GetBeatX(lastGlyph.Beat, _endPosition);
-            return cx + renderer.X + endBeatX;
+            return cx + endBeatRenderer.X + endBeatRenderer.GetBeatX(endBeat, endPosition);
         }
 
         protected virtual void PaintNonGrouped(float cx, float cy, ICanvas canvas)
         {
             var cxRenderer = cx - Renderer.X;
-            var endX = CalculateEndX(Renderer, cxRenderer, this, _endPosition);
+            var endX = CalculateEndX(Renderer, Beat, cxRenderer, EndPosition);
             PaintGrouped(cx, cy, endX, canvas);
         }
 

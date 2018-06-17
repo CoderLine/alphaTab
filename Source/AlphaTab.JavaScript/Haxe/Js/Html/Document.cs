@@ -22,7 +22,7 @@ namespace AlphaTab.Haxe.Js.Html
 {
     [External]
     [Name("js.html.Document")]
-    public class Document 
+    public class Document : Node
     {
         [Name("currentScript")]
         public extern Element CurrentScript { get; }

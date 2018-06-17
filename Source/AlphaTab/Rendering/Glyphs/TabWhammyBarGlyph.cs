@@ -149,18 +149,13 @@ namespace AlphaTab.Rendering.Glyphs
                     endBeat = null;
                     endNoteRenderer = null;
                 }
-                else if (endBeat.IsContinuedWhammy || endNoteRenderer == startNoteRenderer)
+                else
                 {
                     endXPositionType = endBeat.HasWhammyBar
                                        && (startNoteRenderer.Settings.WhammyMode != WhammyMode.SongBook ||
                                            endBeat.WhammyBarType != WhammyType.Dip)
                         ? BeatXPosition.MiddleNotes
                         : BeatXPosition.PreNotes;
-                }
-                else
-                {
-                    endBeat = null;
-                    endNoteRenderer = null;
                 }
             }
 

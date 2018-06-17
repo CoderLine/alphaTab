@@ -277,6 +277,11 @@ namespace AlphaTab.Platform
             return array[0];
         }
 
+        public static float ToFloat(byte[] bytes)
+        {
+            var array = new Float32Array(Script.Write<ArrayBuffer>("untyped __js__(\"{0}.buffer\", bytes)"));
+            return array[0];
+        }
 
         public static void ClearIntArray(int[] array)
         {

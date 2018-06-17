@@ -32,6 +32,16 @@ namespace AlphaTab.IO
             return ((ch4 << 24) | (ch3 << 16) | (ch2 << 8) | (ch1 << 0));
         }
 
+        public static uint ReadUInt32LE(this IReadable input)
+        {
+            var ch1 = input.ReadByte();
+            var ch2 = input.ReadByte();
+            var ch3 = input.ReadByte();
+            var ch4 = input.ReadByte();
+
+            return Platform.Platform.ToUInt32((ch4 << 24) | (ch3 << 16) | (ch2 << 8) | (ch1 << 0));
+        }
+
         public static ushort ReadUInt16LE(this IReadable input)
         {
             var ch1 = input.ReadByte();
@@ -56,6 +66,16 @@ namespace AlphaTab.IO
             var ch4 = input.ReadByte();
 
             return ((ch1 << 24) | (ch2 << 16) | (ch3 << 8) | (ch4 << 0));
+        }
+
+        public static uint ReadUInt32BE(this IReadable input)
+        {
+            var ch1 = input.ReadByte();
+            var ch2 = input.ReadByte();
+            var ch3 = input.ReadByte();
+            var ch4 = input.ReadByte();
+
+            return Platform.Platform.ToUInt32((ch1 << 24) | (ch2 << 16) | (ch3 << 8) | (ch4 << 0));
         }
 
         public static ushort ReadUInt16BE(this IReadable input)
@@ -123,15 +143,6 @@ namespace AlphaTab.IO
             return ((((v & 255) >> 7) * (-256)) + (v & 255));
         }
 
-        public static uint ReadUInt32(this IReadable input)
-        {
-            var ch1 = input.ReadByte();
-            var ch2 = input.ReadByte();
-            var ch3 = input.ReadByte();
-            var ch4 = input.ReadByte();
-
-            return Platform.Platform.ToUInt32((ch1 << 24) | (ch2 << 16) | (ch3 << 8) | (ch4 << 0));
-        }
 
         public static int ReadInt24(this byte[] input, int index)
         {

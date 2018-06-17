@@ -97,13 +97,12 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 case WhammyType.None:
                 case WhammyType.Custom:
-                case WhammyType.Hold:
                     return;
             }
 
             var whammyMode = Renderer.Settings.WhammyMode;
             var startNoteRenderer = (ScoreBarRenderer)Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, beat.Voice.Bar);
-            var startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(beat, BeatXPosition.MiddleNotes);
+            var startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(beat, BeatXPosition.PostNotes);
             var beatDirection = GetBeamDirection(beat, startNoteRenderer);
             var direction = _beat.Notes.Count == 1 ? beatDirection : BeamDirection.Up;
 
@@ -124,7 +123,7 @@ namespace AlphaTab.Rendering.Glyphs
                 }
 
                 var endX = cx + startNoteRenderer.X;
-                if (beat.Index == beat.Voice.Beats.Count - 1)
+                if (beat.IsLastOfVoice)
                 {
                     endX += startNoteRenderer.Width;
                 }
@@ -144,7 +143,7 @@ namespace AlphaTab.Rendering.Glyphs
                     if (endNoteRenderer != null && endNoteRenderer.Staff == startNoteRenderer.Staff)
                     {
                         endX = cx + endNoteRenderer.X +
-                               endNoteRenderer.GetBeatX(note.TieDestination.Beat, BeatXPosition.MiddleNotes);
+                               endNoteRenderer.GetBeatX(note.TieDestination.Beat, BeatXPosition.PreNotes);
                     }
                     else
                     {
@@ -159,6 +158,22 @@ namespace AlphaTab.Rendering.Glyphs
 
                 switch (beat.WhammyBarType)
                 {
+                    case WhammyType.Hold:
+                        if (note.IsTieOrigin)
+                        {
+                            if (endNoteRenderer == null)
+                            {
+                                endY = startY;
+                            }
+                            else
+                            {
+                                endY = cy + endNoteRenderer.Y + endNoteRenderer.GetNoteY(note.TieDestination, true);
+                            }
+                            TieGlyph.PaintTie(canvas, Scale, startX, startY, endX, endY,
+                                beatDirection == BeamDirection.Down);
+                            canvas.Fill();
+                        }
+                        break;
                     case WhammyType.Dive:
                         if (i == 0)
                         {

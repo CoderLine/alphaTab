@@ -815,6 +815,7 @@ namespace AlphaTab.Platform.JavaScript
         private Element _barCursor;
         private Element _selectionWrapper;
         private int _previousTick;
+        private BoundsLookup _previousCursorCache;
         private BoundsLookup _cursorCache;
         private PlayerState _playerState;
         private SelectionInfo _selectionStart;
@@ -1293,10 +1294,10 @@ namespace AlphaTab.Platform.JavaScript
             }
 
             var previousBeat = _currentBeat;
-            var previousCache = _cursorCache;
+            var previousCache = _previousCursorCache;
             var previousState = _previousStateForCursor;
             _currentBeat = beat;
-            _cursorCache = cache;
+            _previousCursorCache = cache;
             _previousStateForCursor = _playerState;
 
             if (beat == previousBeat && cache == previousCache && previousState == _playerState)

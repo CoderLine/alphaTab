@@ -238,7 +238,7 @@ namespace AlphaTab.Rendering
                 case EffectBarGlyphSizing.GroupedOnBeatToEnd: // grouping is achieved by linking the normaly aligned glyphs
                     pos = container.OnNotes;
                     g.X = Renderer.BeatGlyphsStart + pos.X + container.X;
-                    if (container.Beat.Index == container.Beat.Voice.Beats.Count - 1)
+                    if (container.Beat.IsLastOfVoice)
                     {
                         g.Width = Renderer.Width - g.X;
                     }

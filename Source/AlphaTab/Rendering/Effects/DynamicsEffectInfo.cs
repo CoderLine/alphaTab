@@ -29,6 +29,10 @@ namespace AlphaTab.Rendering.Effects
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
+            if (beat.Voice.Bar.Staff.Track.Score.Stylesheet.HideDynamics)
+            {
+                return false;
+            }
             return beat.Voice.Index == 0 &&
                    ((beat.Index == 0 && beat.Voice.Bar.Index == 0) || (beat.PreviousBeat != null && beat.Dynamic != beat.PreviousBeat.Dynamic));
         }

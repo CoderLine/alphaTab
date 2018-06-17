@@ -193,6 +193,12 @@ namespace AlphaTab
         /// </summary>
         public bool ShowZeroOnDiveWhammy{ get; set; }
 
+        /// <summary>
+        /// If set to true, line effects (like w/bar, let-ring etc)
+        /// are drawn until the end of the beat instead of the start. 
+        /// </summary>
+        public bool ExtendLineEffectsToBeatEnd { get; set; }
+
         public static Settings Defaults
         {
             get
@@ -213,6 +219,7 @@ namespace AlphaTab
                 settings.WhammyMode = WhammyMode.GuitarPro;
                 settings.FingeringMode = FingeringMode.Score;
                 settings.ShowZeroOnDiveWhammy = false;
+                settings.ExtendLineEffectsToBeatEnd = false;
 
                 settings.ImporterSettings = new FastDictionary<string, object>();
 

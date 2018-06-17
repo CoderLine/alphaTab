@@ -332,7 +332,7 @@ namespace AlphaTab.Rendering.Glyphs
                 endBeat = endNote.Beat;
                 endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, endBeat.Voice.Bar);
 
-                if (endBeat.Index == endBeat.Voice.Beats.Count - 1 && !endNote.HasBend && Renderer.Settings.ExtendBendArrowsOnTiedNotes)
+                if (endBeat.IsLastOfVoice && !endNote.HasBend && Renderer.Settings.ExtendBendArrowsOnTiedNotes)
                 {
                     endBeat = null;
                 }
@@ -361,7 +361,7 @@ namespace AlphaTab.Rendering.Glyphs
                 //    cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_note.Beat, BeatXPosition.EndBeat),
                 //    cy + startNoteRenderer.Y + 10, 10, 10);
 
-                if (endBeat == null || (endBeat.Index == endBeat.Voice.Beats.Count - 1 && !endNoteHasBend))
+                if (endBeat == null || (endBeat.IsLastOfVoice && !endNoteHasBend))
                 {
                     endX = cx + endNoteRenderer.X + endNoteRenderer.PostBeatGlyphsStart;
                 }

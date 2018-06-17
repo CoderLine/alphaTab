@@ -36,7 +36,7 @@ namespace AlphaTab.Test.Importer
             return TestPlatform.LoadFile(path + name);
         }
 
-        internal Gp7Importer PrepareGp7ImporterWithBytes(string name)
+        internal Gp7Importer PrepareGp7ImporterWithFile(string name)
         {
             return PrepareGp7ImporterWithBytes(Load(name));
         }
@@ -51,7 +51,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestScoreInfo()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/Test01.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/Test01.gp");
             var score = reader.ReadScore();
 
             Assert.AreEqual("Title", score.Title);
@@ -74,7 +74,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestNotes()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/Test02.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/Test02.gp");
             var score = reader.ReadScore();
             CheckTest02Score(score);
             Render(score);
@@ -83,7 +83,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestTimeSignatures()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/Test03.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/Test03.gp");
             var score = reader.ReadScore();
 
             CheckTest03Score(score);
@@ -93,7 +93,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestDead()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestDead.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestDead.gp");
             var score = reader.ReadScore();
             CheckDead(score);
             Render(score);
@@ -102,7 +102,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestGrace()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestGrace.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestGrace.gp");
             var score = reader.ReadScore();
             CheckGrace(score);
             Render(score);
@@ -111,7 +111,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestAccentuation()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestAccentuations.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestAccentuations.gp");
             var score = reader.ReadScore();
             CheckAccentuation(score, true);
             Render(score);
@@ -120,7 +120,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestHarmonics()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestHarmonics.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestHarmonics.gp");
             var score = reader.ReadScore();
             CheckHarmonics(score);
             Render(score);
@@ -129,7 +129,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestHammer()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestHammer.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestHammer.gp");
             var score = reader.ReadScore();
             CheckHammer(score);
             Render(score);
@@ -139,7 +139,7 @@ namespace AlphaTab.Test.Importer
         [Ignore("appveyor fails for some reason, locally everything is fine?")]
         public void TestBend()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestBends.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestBends.gp");
             var score = reader.ReadScore();
 
             Assert.AreEqual(BendType.Bend, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendType);
@@ -181,7 +181,7 @@ namespace AlphaTab.Test.Importer
         [Ignore("appveyor fails for some reason, locally everything is fine?")]
         public void TestBendAdvanced()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/BendsAdvanced.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/BendsAdvanced.gp");
             var score = reader.ReadScore();
 
             #region Simple Standalone Bends
@@ -543,7 +543,7 @@ namespace AlphaTab.Test.Importer
         [Ignore("appveyor fails for some reason, locally everything is fine?")]
         public void TestWhammyAdvanced()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/WhammyAdvanced.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/WhammyAdvanced.gp");
             var score = reader.ReadScore();
 
             #region Bar 1
@@ -751,7 +751,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestTremolo()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestTremolo.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestTremolo.gp");
             var score = reader.ReadScore();
 
             Assert.AreEqual(3, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints.Count);
@@ -808,7 +808,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestSlides()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestSlides.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestSlides.gp");
             var score = reader.ReadScore();
             CheckSlides(score);
             Render(score);
@@ -817,7 +817,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestVibrato()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestVibrato.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestVibrato.gp");
             var score = reader.ReadScore();
             CheckVibrato(score, true);
             Render(score);
@@ -826,7 +826,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestTrills()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestTrills.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestTrills.gp");
             var score = reader.ReadScore();
             CheckTrills(score);
             Render(score);
@@ -835,7 +835,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestOtherEffects()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestOtherEffects.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestOtherEffects.gp");
             var score = reader.ReadScore();
             CheckOtherEffects(score, true /* GPX doesn't support instrument changes */);
             Render(score);
@@ -844,7 +844,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestFingering()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestFingering.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestFingering.gp");
             var score = reader.ReadScore();
             CheckFingering(score);
             Render(score);
@@ -853,7 +853,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestStroke()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestStrokes.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestStrokes.gp");
             var score = reader.ReadScore();
             CheckStroke(score);
             Render(score);
@@ -862,7 +862,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestTuplets()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestTuplets.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestTuplets.gp");
             var score = reader.ReadScore();
             CheckTuplets(score);
             Render(score);
@@ -871,7 +871,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestRanges()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestRanges.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestRanges.gp");
             var score = reader.ReadScore();
             CheckRanges(score);
             Render(score);
@@ -880,7 +880,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestEffects()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/Effects.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/Effects.gp");
             var score = reader.ReadScore();
             CheckEffects(score);
             Render(score);
@@ -889,7 +889,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestSerenade()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/Serenade.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/Serenade.gp");
             var score = reader.ReadScore();// only Check reading
             Render(score);
         }
@@ -897,7 +897,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestStrings()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestStrings.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestStrings.gp");
             var score = reader.ReadScore();
             CheckStrings(score);
             Render(score);
@@ -906,7 +906,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestKeySignatures()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestKeySignatures.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestKeySignatures.gp");
             var score = reader.ReadScore();
             CheckKeySignatures(score);
             Render(score);
@@ -915,7 +915,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestChords()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestChords.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestChords.gp");
             var score = reader.ReadScore();
             CheckChords(score);
             Render(score);
@@ -926,7 +926,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestColors()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/Colors.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/Colors.gp");
             var score = reader.ReadScore();
 
             CheckColors(score);
@@ -937,7 +937,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestTremoloVibrato()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestTremoloVibrato.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestTremoloVibrato.gp");
             var score = reader.ReadScore();
 
             Assert.AreEqual(VibratoType.Slight, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].Vibrato);
@@ -957,7 +957,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestOttavia()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestOttavia.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestOttavia.gp");
             var score = reader.ReadScore();
 
             Assert.AreEqual(Ottavia._8va, score.Tracks[0].Staves[0].Bars[0].ClefOttava);
@@ -976,7 +976,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestSimileMark()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestSimileMark.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestSimileMark.gp");
             var score = reader.ReadScore();
 
             Assert.AreEqual(SimileMark.None, score.Tracks[0].Staves[0].Bars[0].SimileMark);
@@ -992,7 +992,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestFermata()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestFermata.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestFermata.gp");
             var score = reader.ReadScore();
 
             Assert.AreEqual(5, score.MasterBars[0].Fermata.Count);
@@ -1042,7 +1042,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestPickSlide()
         {
-            var reader = PrepareGp7ImporterWithBytes("GuitarPro7/TestPickSlide.gp");
+            var reader = PrepareGp7ImporterWithFile("GuitarPro7/TestPickSlide.gp");
             var score = reader.ReadScore();
 
             Assert.AreEqual(SlideType.PickSlideUp, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].SlideType);

@@ -98,7 +98,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)Importer\AlphaTexException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\AlphaTexImporter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\AlphaTexSymbols.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Importer\BinaryStylesheetParser.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\Gp3To5Importer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Importer\GpBinaryHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\GpxFileSystem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\Gp7Importer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\GpxImporter.cs" />

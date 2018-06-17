@@ -48,7 +48,8 @@ $hx_exports["alphaTab"]["model"]["_WhammyType"] = $hx_exports["alphaTab"]["model
 ;$hx_exports["alphaTab"]["model"]["_AccentuationType"] = $hx_exports["alphaTab"]["model"]["_AccentuationType"] || {};
 ;$hx_exports["alphaTab"]["io"] = $hx_exports["alphaTab"]["io"] || {};
 ;$hx_exports["alphaTab"]["importer"] = $hx_exports["alphaTab"]["importer"] || {};
-$hx_exports["alphaTab"]["importer"]["_AlphaTexSymbols"] = $hx_exports["alphaTab"]["importer"]["_AlphaTexSymbols"] || {};
+$hx_exports["alphaTab"]["importer"]["_BinaryStylesheetParser_DataType"] = $hx_exports["alphaTab"]["importer"]["_BinaryStylesheetParser_DataType"] || {};
+;$hx_exports["alphaTab"]["importer"]["_AlphaTexSymbols"] = $hx_exports["alphaTab"]["importer"]["_AlphaTexSymbols"] || {};
 ;$hx_exports["alphaTab"]["exporter"] = $hx_exports["alphaTab"]["exporter"] || {};
 ;$hx_exports["alphaTab"]["collections"] = $hx_exports["alphaTab"]["collections"] || {};
 $hx_exports["alphaTab"]["collections"]["_StringBuilder"] = $hx_exports["alphaTab"]["collections"]["_StringBuilder"] || {};
@@ -841,6 +842,10 @@ alphaTab.platform.Platform.ArrayBufferToByteArray = function(data) {
 };
 alphaTab.platform.Platform.ToDouble = function(bytes) {
 	var array = new Float64Array(bytes.buffer);
+	return array[0];
+};
+alphaTab.platform.Platform.ToFloat = function(bytes) {
+	var array = new Float32Array(bytes.buffer);
 	return array[0];
 };
 alphaTab.platform.Platform.ClearIntArray = function(array) {
@@ -5578,7 +5583,15 @@ alphaTab.rendering.effects.WhammyBarEffectInfo.prototype = {
 		return 4;
 	}
 	,ShouldCreateGlyph: function(settings,beat) {
-		return beat.get_HasWhammyBar();
+		if(settings.WhammyMode == 1) {
+			if(beat.get_HasWhammyBar()) {
+				return beat.WhammyBarType != 3;
+			} else {
+				return false;
+			}
+		} else {
+			return beat.get_HasWhammyBar();
+		}
 	}
 	,CreateNewGlyph: function(renderer,beat) {
 		return new alphaTab.rendering.glyphs.LineRangedGlyph("w/bar");
@@ -5941,6 +5954,9 @@ alphaTab.rendering.effects.DynamicsEffectInfo.prototype = {
 		return 1;
 	}
 	,ShouldCreateGlyph: function(settings,beat) {
+		if(beat.Voice.Bar.Staff.Track.Score.Stylesheet.HideDynamics) {
+			return false;
+		}
 		if(beat.Voice.Index == 0) {
 			if(!(beat.Index == 0 && beat.Voice.Bar.Index == 0)) {
 				if(beat.PreviousBeat != null) {
@@ -6356,7 +6372,6 @@ alphaTab.Environment.PlatformInit = function() {
 		var document = window.document;
 		var this1 = "";
 		var vbAjaxLoader = this1;
-		vbAjaxLoader = vbAjaxLoader + ("<script type=\"text/vbscript\">" + "\r\n");
 		vbAjaxLoader = vbAjaxLoader + ("Function VbAjaxLoader(method, fileName)" + "\r\n");
 		vbAjaxLoader = vbAjaxLoader + ("    Dim xhr" + "\r\n");
 		vbAjaxLoader = vbAjaxLoader + ("    Set xhr = CreateObject(\"Microsoft.XMLHTTP\")" + "\r\n");
@@ -6375,9 +6390,13 @@ alphaTab.Environment.PlatformInit = function() {
 		vbAjaxLoader = vbAjaxLoader + ("    End If" + "\r\n");
 		vbAjaxLoader = vbAjaxLoader + ("    VbAjaxLoader=byteArray" + "\r\n");
 		vbAjaxLoader = vbAjaxLoader + ("End Function" + "\r\n");
-		vbAjaxLoader = vbAjaxLoader + ("</script>" + "\r\n");
-		var s = vbAjaxLoader;
-		document.write(s);
+		var vbAjaxLoaderScript = document.createElement("script");
+		vbAjaxLoaderScript.setAttribute("type","text/vbscript");
+		var inlineScript = document.createTextNode(vbAjaxLoader);
+		vbAjaxLoaderScript.appendChild(inlineScript);
+		document.addEventListener("DOMContentLoaded",function() {
+			document.body.appendChild(vbAjaxLoaderScript);
+		},false);
 		var scriptElement = document.currentScript;
 		if(!(!(!scriptElement))) {
 			try {
@@ -6392,15 +6411,15 @@ alphaTab.Environment.PlatformInit = function() {
 				if( js.Boot.__instanceof(e,Error) ) {
 					var stack1 = e.stack;
 					if(!(!(!stack1))) {
-						scriptElement = document.querySelector("script[data-alphatab]\")");
+						scriptElement = document.querySelector("script[data-alphatab]");
 					} else {
 						alphaTab.Environment.ScriptFile = alphaTab.Environment.ScriptFileFromStack(stack1);
 					}
 				} else throw(e);
 			}
 		}
-		var s1 = alphaTab.Environment.ScriptFile;
-		if(s1 == null || s1.length == 0) {
+		var s = alphaTab.Environment.ScriptFile;
+		if(s == null || s.length == 0) {
 			if(!(!(!scriptElement))) {
 				alphaTab.util.Logger.Warning("Environment","Could not automatically find alphaTab script file for worker, please add the data-alphatab attribute to the script tag that includes alphaTab or provide it when initializing alphaTab",null);
 			} else {
@@ -6635,6 +6654,7 @@ alphaTab.Settings = $hx_exports["alphaTab"]["Settings"] = function() {
 	this.WhammyMode = 0;
 	this.FingeringMode = 0;
 	this.ShowZeroOnDiveWhammy = false;
+	this.ExtendLineEffectsToBeatEnd = false;
 };
 alphaTab.Settings.__name__ = ["alphaTab","Settings"];
 alphaTab.Settings.SetDefaults = function(settings) {
@@ -6820,6 +6840,11 @@ alphaTab.Settings.FillFromJson = function(settings,json,dataAttributes) {
 		settings.ShowZeroOnDiveWhammy = json.showZeroOnDiveWhammy;
 	} else if(dataAttributes != null && dataAttributes.hasOwnProperty("showZeroOnDiveWhammy")) {
 		settings.ShowZeroOnDiveWhammy = dataAttributes["showZeroOnDiveWhammy"];
+	}
+	if((json && "extendLineEffectsToBeatEnd" in json)) {
+		settings.ExtendLineEffectsToBeatEnd = json.extendLineEffectsToBeatEnd;
+	} else if(dataAttributes != null && dataAttributes.hasOwnProperty("extendLineEffectsToBeatEnd")) {
+		settings.ExtendLineEffectsToBeatEnd = dataAttributes["extendLineEffectsToBeatEnd"];
 	}
 	if((json && "layout" in json)) {
 		settings.Layout = alphaTab.Settings.LayoutFromJson(json.layout);
@@ -7060,6 +7085,7 @@ alphaTab.Settings.get_Defaults = function() {
 	settings.WhammyMode = 0;
 	settings.FingeringMode = 0;
 	settings.ShowZeroOnDiveWhammy = false;
+	settings.ExtendLineEffectsToBeatEnd = false;
 	var this3 = {}
 	settings.ImporterSettings = this3;
 	settings.Layout = alphaTab.LayoutSettings.get_Defaults();
@@ -7088,6 +7114,7 @@ alphaTab.Settings.prototype = {
 		json.fingeringMode = this.FingeringMode;
 		json.showZeroOnDiveWhammy = this.ShowZeroOnDiveWhammy;
 		json.whammyMode = this.WhammyMode;
+		json.extendLineEffectsToBeatEnd = this.ExtendLineEffectsToBeatEnd;
 		json.scriptFile = this.ScriptFile;
 		json.fontDirectory = this.FontDirectory;
 		json.lazy = this.DisableLazyLoading;
@@ -13943,6 +13970,156 @@ alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.toString = function(thi
 	}
 	return "";
 };
+alphaTab.importer.BinaryStylesheet = $hx_exports["alphaTab"]["importer"]["BinaryStylesheet"] = function() {
+	this.Raw = null;
+	var this1 = {}
+	this.Raw = this1;
+};
+alphaTab.importer.BinaryStylesheet.__name__ = ["alphaTab","importer","BinaryStylesheet"];
+alphaTab.importer.BinaryStylesheet.prototype = {
+	Apply: function(score) {
+		var this1 = this.Raw;
+		var key = $iterator(Object.keys(this1))();
+		while(key.hasNext()) {
+			var key1 = key.next();
+			if(key1 == "StandardNotation/hideDynamics") {
+				score.Stylesheet.HideDynamics = this.Raw[key1];
+			}
+		}
+	}
+	,AddValue: function(key,value) {
+		this.Raw[key] = value;
+	}
+	,__class__: alphaTab.importer.BinaryStylesheet
+};
+alphaTab.importer.BinaryStylesheetParser = $hx_exports["alphaTab"]["importer"]["BinaryStylesheetParser"] = function() {
+	this.Stylesheet = null;
+};
+alphaTab.importer.BinaryStylesheetParser.__name__ = ["alphaTab","importer","BinaryStylesheetParser"];
+alphaTab.importer.BinaryStylesheetParser.prototype = {
+	Parse: function(data) {
+		this.Stylesheet = new alphaTab.importer.BinaryStylesheet();
+		var readable = alphaTab.io.ByteBuffer.FromBuffer(data);
+		var entryCount = alphaTab.io.IOHelper.ReadInt32BE(readable);
+		var i = 0;
+		while(i < entryCount) {
+			var key = alphaTab.importer.GpBinaryHelpers.GpReadString(readable,readable.ReadByte());
+			var type = js.Boot.__cast(readable.ReadByte() , Int);
+			switch(type) {
+			case 0:
+				var flag = readable.ReadByte() == 1;
+				this.Stylesheet.AddValue(key,flag);
+				break;
+			case 1:
+				var ivalue = alphaTab.io.IOHelper.ReadInt32BE(readable);
+				this.Stylesheet.AddValue(key,ivalue);
+				break;
+			case 2:
+				var fvalue = alphaTab.importer.GpBinaryHelpers.GpReadFloat(readable);
+				this.Stylesheet.AddValue(key,fvalue);
+				break;
+			case 3:
+				var s = alphaTab.importer.GpBinaryHelpers.GpReadString(readable,alphaTab.io.IOHelper.ReadInt16BE(readable));
+				this.Stylesheet.AddValue(key,s);
+				break;
+			case 4:
+				var x = alphaTab.io.IOHelper.ReadInt32BE(readable);
+				var y = alphaTab.io.IOHelper.ReadInt32BE(readable);
+				this.Stylesheet.AddValue(key,new alphaTab.model.BendPoint(x,y));
+				break;
+			case 5:
+				var width = alphaTab.io.IOHelper.ReadInt32BE(readable);
+				var height = alphaTab.io.IOHelper.ReadInt32BE(readable);
+				this.Stylesheet.AddValue(key,new alphaTab.model.BendPoint(width,height));
+				break;
+			case 6:
+				var rectX = alphaTab.io.IOHelper.ReadInt32BE(readable);
+				var rectY = alphaTab.io.IOHelper.ReadInt32BE(readable);
+				var rectW = alphaTab.io.IOHelper.ReadInt32BE(readable);
+				var rectH = alphaTab.io.IOHelper.ReadInt32BE(readable);
+				var tmp = this.Stylesheet;
+				var _tmp = new alphaTab.rendering.utils.Bounds();
+				var this1 = rectX;
+				_tmp.X = this1;
+				var this2 = rectY;
+				_tmp.Y = this2;
+				var this3 = rectW;
+				_tmp.W = this3;
+				var this4 = rectH;
+				_tmp.H = this4;
+				tmp.AddValue(key,_tmp);
+				break;
+			case 7:
+				var color = alphaTab.importer.GpBinaryHelpers.GpReadColor(readable,true);
+				this.Stylesheet.AddValue(key,color);
+				break;
+			default:
+			}
+			++i;
+		}
+	}
+	,__class__: alphaTab.importer.BinaryStylesheetParser
+};
+alphaTab.importer._BinaryStylesheetParser_DataType = {};
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_ = $hx_exports["alphaTab"]["importer"]["_BinaryStylesheetParser_DataType"]["BinaryStylesheetParser_DataType_Impl_"] = {};
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.__name__ = ["alphaTab","importer","_BinaryStylesheetParser_DataType","BinaryStylesheetParser_DataType_Impl_"];
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+	return this1 != 0;
+};
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt8(this1);
+};
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt8(this1);
+};
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToInt16(this1);
+};
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt16(this1);
+};
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+	return system.Convert.ToUInt32(this1);
+};
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+	return this1;
+};
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.toString = function(this1) {
+	switch(this1) {
+	case 0:
+		return "Boolean";
+	case 1:
+		return "Integer";
+	case 2:
+		return "Float";
+	case 3:
+		return "String";
+	case 4:
+		return "Point";
+	case 5:
+		return "Size";
+	case 6:
+		return "Rectangle";
+	case 7:
+		return "Color";
+	}
+	return "";
+};
 alphaTab.importer.FileLoadException = $hx_exports["alphaTab"]["importer"]["FileLoadException"] = function() {
 	alphaTab.AlphaTabException.call(this);
 	this.Xhr = null;
@@ -13990,7 +14167,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		this._score = new alphaTab.model.Score();
 		this.ReadScoreInformation();
 		if(this._versionNumber < 500) {
-			this._globalTripletFeel = this.ReadBool() ? 2 : 0;
+			this._globalTripletFeel = alphaTab.importer.GpBinaryHelpers.GpReadBool(this.Data) ? 2 : 0;
 		}
 		if(this._versionNumber >= 400) {
 			this.ReadLyrics();
@@ -14000,13 +14177,13 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		}
 		if(this._versionNumber >= 500) {
 			this.ReadPageSetup();
-			this._score.TempoLabel = this.ReadStringIntByte();
+			this._score.TempoLabel = alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
 		}
-		this._score.Tempo = this.ReadInt32();
+		this._score.Tempo = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 		if(this._versionNumber >= 510) {
-			this.ReadBool();
+			alphaTab.importer.GpBinaryHelpers.GpReadBool(this.Data);
 		}
-		this.ReadInt32();
+		alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 		if(this._versionNumber >= 400) {
 			this.Data.ReadByte();
 		}
@@ -14015,8 +14192,8 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			this.Data.Skip(38);
 			this.Data.Skip(4);
 		}
-		this._barCount = this.ReadInt32();
-		this._trackCount = this.ReadInt32();
+		this._barCount = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+		this._trackCount = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 		this.ReadMasterBars();
 		this.ReadTracks();
 		this.ReadBars();
@@ -14027,7 +14204,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		return this._score;
 	}
 	,ReadVersion: function() {
-		var version = this.ReadStringByteLength(30);
+		var version = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,30);
 		if(!StringTools.startsWith(version,"FICHIER GUITAR PRO ")) {
 			throw new js._Boot.HaxeError(new alphaTab.importer.UnsupportedFormatException().UnsupportedFormatException(""));
 		}
@@ -14038,17 +14215,17 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		alphaTab.util.Logger.Info(this.get_Name(),"Guitar Pro version " + version + " detected",null);
 	}
 	,ReadScoreInformation: function() {
-		this._score.Title = this.ReadStringIntUnused();
-		this._score.SubTitle = this.ReadStringIntUnused();
-		this._score.Artist = this.ReadStringIntUnused();
-		this._score.Album = this.ReadStringIntUnused();
-		this._score.Words = this.ReadStringIntUnused();
-		var tmp = this._versionNumber >= 500 ? this.ReadStringIntUnused() : this._score.Words;
+		this._score.Title = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
+		this._score.SubTitle = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
+		this._score.Artist = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
+		this._score.Album = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
+		this._score.Words = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
+		var tmp = this._versionNumber >= 500 ? alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data) : this._score.Words;
 		this._score.Music = tmp;
-		this._score.Copyright = this.ReadStringIntUnused();
-		this._score.Tab = this.ReadStringIntUnused();
-		this._score.Instructions = this.ReadStringIntUnused();
-		var noticeLines = this.ReadInt32();
+		this._score.Copyright = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
+		this._score.Tab = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
+		this._score.Instructions = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
+		var noticeLines = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 		var this1 = "";
 		var notice = this1;
 		var i = 0;
@@ -14056,7 +14233,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			if(i > 0) {
 				notice = notice + ("" + "\r\n");
 			}
-			notice += Std.string(this.ReadStringIntUnused());
+			notice += Std.string(alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data));
 			++i;
 		}
 		this._score.Notices = notice;
@@ -14064,12 +14241,12 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 	,ReadLyrics: function() {
 		var this1 = [];
 		this._lyrics = this1;
-		this._lyricsTrack = this.ReadInt32() - 1;
+		this._lyricsTrack = alphaTab.io.IOHelper.ReadInt32BE(this.Data) - 1;
 		var i = 0;
 		while(i < 5) {
 			var lyrics = new alphaTab.model.Lyrics();
-			lyrics.StartBar = this.ReadInt32() - 1;
-			lyrics.Text = this.ReadStringInt();
+			lyrics.StartBar = alphaTab.io.IOHelper.ReadInt32BE(this.Data) - 1;
+			lyrics.Text = alphaTab.importer.GpBinaryHelpers.GpReadStringInt(this.Data);
 			this._lyrics.push(lyrics);
 			++i;
 		}
@@ -14078,7 +14255,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		this.Data.Skip(30);
 		var i = 0;
 		while(i < 10) {
-			this.ReadStringIntByte();
+			alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
 			++i;
 		}
 	}
@@ -14090,7 +14267,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			var info = new alphaTab.model.PlaybackInformation();
 			info.PrimaryChannel = i;
 			info.SecondaryChannel = i;
-			info.Program = this.ReadInt32();
+			info.Program = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 			info.Volume = this.Data.ReadByte();
 			info.Balance = this.Data.ReadByte();
 			this.Data.Skip(6);
@@ -14157,9 +14334,9 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		}
 		if((flags & 32) != 0) {
 			var section = new alphaTab.model.Section();
-			section.Text = this.ReadStringIntByte();
+			section.Text = alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
 			section.Marker = "";
-			this.ReadColor();
+			alphaTab.importer.GpBinaryHelpers.GpReadColor(this.Data,false);
 			newMasterBar.Section = section;
 		}
 		if((flags & 64) != 0) {
@@ -14205,25 +14382,25 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		this._score.AddTrack(newTrack);
 		var mainStaff = newTrack.Staves[0];
 		var flags = this.Data.ReadByte();
-		newTrack.Name = this.ReadStringByteLength(40);
+		newTrack.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,40);
 		if((flags & 1) != 0) {
 			mainStaff.StaffKind = 2;
 		}
-		var stringCount = this.ReadInt32();
+		var stringCount = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 		var this1 = [];
 		var tuning = this1;
 		var i = 0;
 		while(i < 7) {
-			var stringTuning = this.ReadInt32();
+			var stringTuning = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 			if(stringCount > i) {
 				tuning.push(stringTuning);
 			}
 			++i;
 		}
 		mainStaff.Tuning = new Int32Array(tuning);
-		var port = this.ReadInt32();
-		var index = this.ReadInt32() - 1;
-		var effectChannel = this.ReadInt32() - 1;
+		var port = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+		var index = alphaTab.io.IOHelper.ReadInt32BE(this.Data) - 1;
+		var effectChannel = alphaTab.io.IOHelper.ReadInt32BE(this.Data) - 1;
 		this.Data.Skip(4);
 		if(index >= 0 && index < this._playbackInfos.length) {
 			var info = this._playbackInfos[index];
@@ -14236,8 +14413,8 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			}
 			newTrack.PlaybackInfo = info;
 		}
-		mainStaff.Capo = this.ReadInt32();
-		newTrack.Color = this.ReadColor();
+		mainStaff.Capo = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+		newTrack.Color = alphaTab.importer.GpBinaryHelpers.GpReadColor(this.Data,false);
 		if(this._versionNumber >= 500) {
 			this.Data.ReadByte();
 			this.Data.ReadByte();
@@ -14245,8 +14422,8 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		}
 		if(this._versionNumber >= 510) {
 			this.Data.Skip(4);
-			this.ReadStringIntByte();
-			this.ReadStringIntByte();
+			alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
+			alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
 		}
 	}
 	,ReadBars: function() {
@@ -14279,7 +14456,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		}
 	}
 	,ReadVoice: function(track,bar) {
-		var beatCount = this.ReadInt32();
+		var beatCount = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 		if(beatCount == 0) {
 			return;
 		}
@@ -14329,7 +14506,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			newBeat.Duration = 4;
 		}
 		if((flags & 32) != 0) {
-			newBeat.TupletNumerator = this.ReadInt32();
+			newBeat.TupletNumerator = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 			var _g = newBeat.TupletNumerator;
 			switch(_g) {
 			case 1:
@@ -14355,7 +14532,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			this.ReadChord(newBeat);
 		}
 		if((flags & 4) != 0) {
-			newBeat.Text = this.ReadStringIntUnused();
+			newBeat.Text = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
 		}
 		if((flags & 8) != 0) {
 			this.ReadBeatEffects(newBeat);
@@ -14384,12 +14561,12 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		var chordId = alphaTab.platform.Platform.NewGuid();
 		if(this._versionNumber >= 500) {
 			this.Data.Skip(17);
-			chord.Name = this.ReadStringByteLength(21);
+			chord.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,21);
 			this.Data.Skip(4);
-			chord.FirstFret = this.ReadInt32();
+			chord.FirstFret = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 			var i = 0;
 			while(i < 7) {
-				var fret = this.ReadInt32();
+				var fret = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 				if(i < beat.Voice.Bar.Staff.Tuning.length) {
 					chord.Strings.push(fret);
 				}
@@ -14409,12 +14586,12 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		} else if(this.Data.ReadByte() != 0) {
 			if(this._versionNumber >= 400) {
 				this.Data.Skip(16);
-				chord.Name = this.ReadStringByteLength(21);
+				chord.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,21);
 				this.Data.Skip(4);
-				chord.FirstFret = this.ReadInt32();
+				chord.FirstFret = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 				var i2 = 0;
 				while(i2 < 7) {
-					var fret1 = this.ReadInt32();
+					var fret1 = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 					if(i2 < beat.Voice.Bar.Staff.Tuning.length) {
 						chord.Strings.push(fret1);
 					}
@@ -14433,11 +14610,11 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 				this.Data.Skip(26);
 			} else {
 				this.Data.Skip(25);
-				chord.Name = this.ReadStringByteLength(34);
-				chord.FirstFret = this.ReadInt32();
+				chord.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,34);
+				chord.FirstFret = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 				var i4 = 0;
 				while(i4 < 6) {
-					var fret2 = this.ReadInt32();
+					var fret2 = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 					if(i4 < beat.Voice.Bar.Staff.Tuning.length) {
 						chord.Strings.push(fret2);
 					}
@@ -14447,12 +14624,12 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			}
 		} else {
 			var strings = this._versionNumber >= 406 ? 7 : 6;
-			chord.Name = this.ReadStringIntByte();
-			chord.FirstFret = this.ReadInt32();
+			chord.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
+			chord.FirstFret = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 			if(chord.FirstFret > 0) {
 				var i5 = 0;
 				while(i5 < strings) {
-					var fret3 = this.ReadInt32();
+					var fret3 = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 					if(i5 < beat.Voice.Bar.Staff.Tuning.length) {
 						chord.Strings.push(fret3);
 					}
@@ -14546,15 +14723,15 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 	}
 	,ReadTremoloBarEffect: function(beat) {
 		this.Data.ReadByte();
-		this.ReadInt32();
-		var pointCount = this.ReadInt32();
+		alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+		var pointCount = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 		if(pointCount > 0) {
 			var i = 0;
 			while(i < pointCount) {
 				var point = new alphaTab.model.BendPoint(0,0);
-				point.Offset = this.ReadInt32();
-				point.Value = this.ReadInt32() / 25 | 0;
-				this.ReadBool();
+				point.Offset = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+				point.Value = alphaTab.io.IOHelper.ReadInt32BE(this.Data) / 25 | 0;
+				alphaTab.importer.GpBinaryHelpers.GpReadBool(this.Data);
 				beat.AddWhammyBarPoint(point);
 				++i;
 			}
@@ -14573,9 +14750,9 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		var phaser = alphaTab.platform.Platform.ReadSignedByte(this.Data);
 		var tremolo = alphaTab.platform.Platform.ReadSignedByte(this.Data);
 		if(this._versionNumber >= 500) {
-			tableChange.TempoName = this.ReadStringIntByte();
+			tableChange.TempoName = alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
 		}
-		tableChange.Tempo = this.ReadInt32();
+		tableChange.Tempo = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 		if(tableChange.Volume >= 0) {
 			this.Data.ReadByte();
 		}
@@ -14607,8 +14784,8 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			this.Data.ReadByte();
 		}
 		if(this._versionNumber >= 510) {
-			this.ReadStringIntByte();
-			this.ReadStringIntByte();
+			alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
+			alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
 		}
 		if(tableChange.Volume >= 0) {
 			var volumeAutomation = new alphaTab.model.Automation();
@@ -14681,7 +14858,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		}
 		if(this._versionNumber >= 500) {
 			if((flags & 1) != 0) {
-				newNote.DurationPercent = this.ReadDouble();
+				newNote.DurationPercent = alphaTab.importer.GpBinaryHelpers.GpReadDouble(this.Data);
 			}
 			var flags2 = this.Data.ReadByte();
 			newNote.AccidentalMode = (flags2 & 2) != 0 ? 1 : 0;
@@ -14759,15 +14936,15 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 	}
 	,ReadBend: function(note) {
 		this.Data.ReadByte();
-		this.ReadInt32();
-		var pointCount = this.ReadInt32();
+		alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+		var pointCount = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
 		if(pointCount > 0) {
 			var i = 0;
 			while(i < pointCount) {
 				var point = new alphaTab.model.BendPoint(0,0);
-				point.Offset = this.ReadInt32();
-				point.Value = this.ReadInt32() / 25 | 0;
-				this.ReadBool();
+				point.Offset = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+				point.Value = alphaTab.io.IOHelper.ReadInt32BE(this.Data) / 25 | 0;
+				alphaTab.importer.GpBinaryHelpers.GpReadBool(this.Data);
 				note.AddBendPoint(point);
 				++i;
 			}
@@ -14965,59 +15142,6 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		default:
 		}
 	}
-	,ReadDouble: function() {
-		var this1 = new Uint8Array(8);
-		var bytes = this1;
-		this.Data.Read(bytes,0,bytes.length);
-		return alphaTab.platform.Platform.ToDouble(bytes);
-	}
-	,GetDoubleSig: function(bytes) {
-		var this1 = bytes[3];
-		var this2 = bytes[7];
-		return system.Convert.ToInt32_Double(((bytes[1] & 15) << 16 | bytes[2] << 8 | this1) * 4294967296.0 + (bytes[4] >> 7) * 2147483648 + ((bytes[4] & 127) << 24 | bytes[5] << 16 | bytes[6] << 8 | this2));
-	}
-	,ReadColor: function() {
-		var r = system.Convert.ToUInt8(this.Data.ReadByte());
-		var g = system.Convert.ToUInt8(this.Data.ReadByte());
-		var b = system.Convert.ToUInt8(this.Data.ReadByte());
-		this.Data.Skip(1);
-		return new alphaTab.platform.model.Color(r,g,b,255);
-	}
-	,ReadBool: function() {
-		return this.Data.ReadByte() != 0;
-	}
-	,ReadInt32: function() {
-		var this1 = new Uint8Array(4);
-		var bytes = this1;
-		this.Data.Read(bytes,0,4);
-		return bytes[0] | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
-	}
-	,ReadStringIntUnused: function() {
-		this.Data.Skip(4);
-		return this.ReadString(this.Data.ReadByte());
-	}
-	,ReadStringInt: function() {
-		return this.ReadString(this.ReadInt32());
-	}
-	,ReadStringIntByte: function() {
-		var length = this.ReadInt32() - 1;
-		this.Data.ReadByte();
-		return this.ReadString(length);
-	}
-	,ReadString: function(length) {
-		var this1 = new Uint8Array(length);
-		var b = this1;
-		this.Data.Read(b,0,b.length);
-		return alphaTab.platform.Platform.ToString(b);
-	}
-	,ReadStringByteLength: function(length) {
-		var stringLength = this.Data.ReadByte();
-		var s = this.ReadString(stringLength);
-		if(stringLength < length) {
-			this.Data.Skip(length - stringLength);
-		}
-		return s;
-	}
 	,__class__: alphaTab.importer.Gp3To5Importer
 });
 alphaTab.importer.Gp7Importer = $hx_exports["alphaTab"]["importer"]["Gp7Importer"] = function() {
@@ -15033,7 +15157,11 @@ alphaTab.importer.Gp7Importer.prototype = $extend(alphaTab.importer.ScoreImporte
 		alphaTab.util.Logger.Info(this.get_Name(),"Loading ZIP entries",null);
 		var fileSystem = new alphaTab.io.ZipFile();
 		fileSystem.FileFilter = function(s) {
-			return StringTools.endsWith(s,"score.gpif");
+			if(!StringTools.endsWith(s,"score.gpif")) {
+				return StringTools.endsWith(s,"BinaryStylesheet");
+			} else {
+				return true;
+			}
 		};
 		try {
 			fileSystem.Load(this.Data);
@@ -15044,18 +15172,103 @@ alphaTab.importer.Gp7Importer.prototype = $extend(alphaTab.importer.ScoreImporte
 			} else throw(e);
 		}
 		alphaTab.util.Logger.Info(this.get_Name(),"Zip entries loaded",null);
-		var data = fileSystem.Entries[0].Data;
-		var xml = alphaTab.platform.Platform.ToString(data);
+		var xml = null;
+		var binaryStylesheet = null;
+		var entry = $iterator(fileSystem.Entries)();
+		while(entry.hasNext()) {
+			var entry1 = entry.next();
+			var _g = entry1.FileName;
+			switch(_g) {
+			case "BinaryStylesheet":
+				binaryStylesheet = entry1.Data;
+				break;
+			case "score.gpif":
+				xml = alphaTab.platform.Platform.ToString(entry1.Data);
+				break;
+			default:
+			}
+		}
 		fileSystem.Entries = null;
 		fileSystem = null;
 		alphaTab.util.Logger.Info(this.get_Name(),"Start Parsing score.gpif",null);
-		var parser = new alphaTab.importer.GpifParser();
-		parser.ParseXml(xml,this.Settings);
+		var gpifParser = new alphaTab.importer.GpifParser();
+		gpifParser.ParseXml(xml,this.Settings);
 		alphaTab.util.Logger.Info(this.get_Name(),"score.gpif parsed",null);
-		return parser.Score;
+		var score = gpifParser.Score;
+		if(binaryStylesheet != null) {
+			alphaTab.util.Logger.Info(this.get_Name(),"Start Parsing BinaryStylesheet",null);
+			var stylesheetParser = new alphaTab.importer.BinaryStylesheetParser();
+			stylesheetParser.Parse(binaryStylesheet);
+			if(stylesheetParser.Stylesheet != null) {
+				stylesheetParser.Stylesheet.Apply(score);
+			}
+			alphaTab.util.Logger.Info(this.get_Name(),"BinaryStylesheet parsed",null);
+		}
+		return score;
 	}
 	,__class__: alphaTab.importer.Gp7Importer
 });
+alphaTab.importer.GpBinaryHelpers = $hx_exports["alphaTab"]["importer"]["GpBinaryHelpers"] = function() { };
+alphaTab.importer.GpBinaryHelpers.__name__ = ["alphaTab","importer","GpBinaryHelpers"];
+alphaTab.importer.GpBinaryHelpers.GpReadDouble = function(data) {
+	var this1 = new Uint8Array(8);
+	var bytes = this1;
+	data.Read(bytes,0,bytes.length);
+	return alphaTab.platform.Platform.ToDouble(bytes);
+};
+alphaTab.importer.GpBinaryHelpers.GpReadFloat = function(data) {
+	var this1 = new Uint8Array(4);
+	var bytes = this1;
+	bytes[3] = system.Convert.ToUInt8(data.ReadByte());
+	bytes[2] = system.Convert.ToUInt8(data.ReadByte());
+	bytes[2] = system.Convert.ToUInt8(data.ReadByte());
+	bytes[1] = system.Convert.ToUInt8(data.ReadByte());
+	return alphaTab.platform.Platform.ToFloat(bytes);
+};
+alphaTab.importer.GpBinaryHelpers.GpReadColor = function(data,readAlpha) {
+	if(readAlpha == null) {
+		readAlpha = false;
+	}
+	var r = system.Convert.ToUInt8(data.ReadByte());
+	var g = system.Convert.ToUInt8(data.ReadByte());
+	var b = system.Convert.ToUInt8(data.ReadByte());
+	var a = 255;
+	if(readAlpha) {
+		a = system.Convert.ToUInt8(data.ReadByte());
+	} else {
+		data.Skip(1);
+	}
+	return new alphaTab.platform.model.Color(r,g,b,a);
+};
+alphaTab.importer.GpBinaryHelpers.GpReadBool = function(data) {
+	return data.ReadByte() != 0;
+};
+alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused = function(data) {
+	data.Skip(4);
+	return alphaTab.importer.GpBinaryHelpers.GpReadString(data,data.ReadByte());
+};
+alphaTab.importer.GpBinaryHelpers.GpReadStringInt = function(data) {
+	return alphaTab.importer.GpBinaryHelpers.GpReadString(data,alphaTab.io.IOHelper.ReadInt32BE(data));
+};
+alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte = function(data) {
+	var length = alphaTab.io.IOHelper.ReadInt32BE(data) - 1;
+	data.ReadByte();
+	return alphaTab.importer.GpBinaryHelpers.GpReadString(data,length);
+};
+alphaTab.importer.GpBinaryHelpers.GpReadString = function(data,length) {
+	var this1 = new Uint8Array(length);
+	var b = this1;
+	data.Read(b,0,b.length);
+	return alphaTab.platform.Platform.ToString(b);
+};
+alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength = function(data,length) {
+	var stringLength = data.ReadByte();
+	var s = alphaTab.importer.GpBinaryHelpers.GpReadString(data,stringLength);
+	if(stringLength < length) {
+		data.Skip(length - stringLength);
+	}
+	return s;
+};
 alphaTab.importer.GpifParser = $hx_exports["alphaTab"]["importer"]["GpifParser"] = function() {
 	this.Score = null;
 	this._masterTrackAutomations = null;
@@ -17091,19 +17304,47 @@ alphaTab.importer.GpxImporter.prototype = $extend(alphaTab.importer.ScoreImporte
 		alphaTab.util.Logger.Info(this.get_Name(),"Loading GPX filesystem",null);
 		var fileSystem = new alphaTab.importer.GpxFileSystem();
 		fileSystem.FileFilter = function(s) {
-			return s == "score.gpif";
+			if(!StringTools.endsWith(s,"score.gpif")) {
+				return StringTools.endsWith(s,"BinaryStylesheet");
+			} else {
+				return true;
+			}
 		};
 		fileSystem.Load(this.Data);
 		alphaTab.util.Logger.Info(this.get_Name(),"GPX filesystem loaded",null);
-		var data = fileSystem.Files[0].Data;
-		var xml = alphaTab.platform.Platform.ToString(data);
+		var xml = null;
+		var binaryStylesheet = null;
+		var entry = $iterator(fileSystem.Files)();
+		while(entry.hasNext()) {
+			var entry1 = entry.next();
+			var _g = entry1.FileName;
+			switch(_g) {
+			case "BinaryStylesheet":
+				binaryStylesheet = entry1.Data;
+				break;
+			case "score.gpif":
+				xml = alphaTab.platform.Platform.ToString(entry1.Data);
+				break;
+			default:
+			}
+		}
 		fileSystem.Files = null;
 		fileSystem = null;
 		alphaTab.util.Logger.Info(this.get_Name(),"Start Parsing score.gpif",null);
 		var parser = new alphaTab.importer.GpifParser();
 		parser.ParseXml(xml,this.Settings);
 		alphaTab.util.Logger.Info(this.get_Name(),"score.gpif parsed",null);
-		return parser.Score;
+		var score = parser.Score;
+		if(binaryStylesheet != null) {
+			alphaTab.util.Logger.Info(this.get_Name(),"Start Parsing BinaryStylesheet",null);
+			var stylesheetParser = new alphaTab.importer.BinaryStylesheetParser();
+			stylesheetParser.Parse(binaryStylesheet);
+			if(stylesheetParser.Stylesheet != null) {
+				stylesheetParser.Stylesheet.Apply(score);
+			}
+			alphaTab.util.Logger.Info(this.get_Name(),"BinaryStylesheet parsed",null);
+		}
+		return score;
 	}
 	,__class__: alphaTab.importer.GpxImporter
 });
@@ -18840,6 +19081,13 @@ alphaTab.io.IOHelper.ReadInt32LE = function(input) {
 	var ch4 = input.ReadByte();
 	return ch4 << 24 | ch3 << 16 | ch2 << 8 | ch1;
 };
+alphaTab.io.IOHelper.ReadUInt32LE = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	var ch3 = input.ReadByte();
+	var ch4 = input.ReadByte();
+	return alphaTab.platform.Platform.ToUInt32(ch4 << 24 | ch3 << 16 | ch2 << 8 | ch1);
+};
 alphaTab.io.IOHelper.ReadUInt16LE = function(input) {
 	var ch1 = input.ReadByte();
 	var ch2 = input.ReadByte();
@@ -18856,6 +19104,13 @@ alphaTab.io.IOHelper.ReadInt32BE = function(input) {
 	var ch3 = input.ReadByte();
 	var ch4 = input.ReadByte();
 	return ch1 << 24 | ch2 << 16 | ch3 << 8 | ch4;
+};
+alphaTab.io.IOHelper.ReadUInt32BE = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	var ch3 = input.ReadByte();
+	var ch4 = input.ReadByte();
+	return alphaTab.platform.Platform.ToUInt32(ch1 << 24 | ch2 << 16 | ch3 << 8 | ch4);
 };
 alphaTab.io.IOHelper.ReadUInt16BE = function(input) {
 	var ch1 = input.ReadByte();
@@ -18911,13 +19166,6 @@ alphaTab.io.IOHelper.Read8BitStringLength = function(input,length) {
 alphaTab.io.IOHelper.ReadSInt8 = function(input) {
 	var v = input.ReadByte();
 	return ((v & 255) >> 7) * -256 + (v & 255);
-};
-alphaTab.io.IOHelper.ReadUInt32 = function(input) {
-	var ch1 = input.ReadByte();
-	var ch2 = input.ReadByte();
-	var ch3 = input.ReadByte();
-	var ch4 = input.ReadByte();
-	return alphaTab.platform.Platform.ToUInt32(ch1 << 24 | ch2 << 16 | ch3 << 8 | ch4);
 };
 alphaTab.io.IOHelper.ReadInt24 = function(input,index) {
 	var i = input[index] | input[index + 1] << 8 | input[index + 2] << 16;
@@ -19452,7 +19700,10 @@ alphaTab.model.Beat.CopyTo = function(src,dst) {
 	dst.WhammyStyle = src.WhammyStyle;
 };
 alphaTab.model.Beat.prototype = {
-	get_IsLegatoDestination: function() {
+	get_IsLastOfVoice: function() {
+		return this.Index == this.Voice.Beats.length - 1;
+	}
+	,get_IsLegatoDestination: function() {
 		if(this.PreviousBeat != null) {
 			return this.PreviousBeat.IsLegatoOrigin;
 		} else {
@@ -20503,6 +20754,8 @@ alphaTab.model.JsonConverter.ScoreToJsObject = function(score) {
 	score2.MasterBars = this1;
 	var this2 = [];
 	score2.Tracks = this2;
+	score2.Stylesheet = {}
+	alphaTab.model.RenderStylesheet.CopyTo(score.Stylesheet,score2.Stylesheet);
 	var i = 0;
 	while(i < score.MasterBars.length) {
 		var masterBar = score.MasterBars[i];
@@ -20636,6 +20889,7 @@ alphaTab.model.JsonConverter.ScoreToJsObject = function(score) {
 alphaTab.model.JsonConverter.JsObjectToScore = function(score) {
 	var score2 = new alphaTab.model.Score();
 	alphaTab.model.Score.CopyTo(score,score2);
+	alphaTab.model.RenderStylesheet.CopyTo(score.Stylesheet,score2.Stylesheet);
 	var i = 0;
 	while(i < score.MasterBars.length) {
 		var masterBar = score.MasterBars[i];
@@ -21790,6 +22044,17 @@ alphaTab.model.PlaybackInformation.CopyTo = function(src,dst) {
 alphaTab.model.PlaybackInformation.prototype = {
 	__class__: alphaTab.model.PlaybackInformation
 };
+alphaTab.model.RenderStylesheet = $hx_exports["alphaTab"]["model"]["RenderStylesheet"] = function() {
+	this.HideDynamics = false;
+	this.HideDynamics = false;
+};
+alphaTab.model.RenderStylesheet.__name__ = ["alphaTab","model","RenderStylesheet"];
+alphaTab.model.RenderStylesheet.CopyTo = function(src,dst) {
+	dst.HideDynamics = src.HideDynamics;
+};
+alphaTab.model.RenderStylesheet.prototype = {
+	__class__: alphaTab.model.RenderStylesheet
+};
 alphaTab.model.RepeatGroup = $hx_exports["alphaTab"]["model"]["RepeatGroup"] = function() {
 	this.MasterBars = null;
 	this.Openings = null;
@@ -21842,6 +22107,7 @@ alphaTab.model.Score = $hx_exports["alphaTab"]["model"]["Score"] = function() {
 	this.TempoLabel = null;
 	this.MasterBars = null;
 	this.Tracks = null;
+	this.Stylesheet = null;
 	var this1 = [];
 	this.MasterBars = this1;
 	var this2 = [];
@@ -21849,6 +22115,7 @@ alphaTab.model.Score = $hx_exports["alphaTab"]["model"]["Score"] = function() {
 	this._currentRepeatGroup = new alphaTab.model.RepeatGroup();
 	this.Album = this.Artist = this.Copyright = this.Instructions = this.Music = this.Notices = this.SubTitle = this.Title = this.Words = this.Tab = this.TempoLabel = "";
 	this.Tempo = 120;
+	this.Stylesheet = new alphaTab.model.RenderStylesheet();
 };
 alphaTab.model.Score.__name__ = ["alphaTab","model","Score"];
 alphaTab.model.Score.CopyTo = function(src,dst) {
@@ -22594,7 +22861,7 @@ alphaTab.model.Voice.prototype = {
 		if(beat.Index < this.Beats.length - 1) {
 			beat.NextBeat = this.Beats[beat.Index + 1];
 			beat.NextBeat.PreviousBeat = beat;
-		} else if(beat.Index == beat.Voice.Beats.length - 1 && beat.Voice.Bar.NextBar != null) {
+		} else if(beat.get_IsLastOfVoice() && beat.Voice.Bar.NextBar != null) {
 			var nextVoice = this.Bar.NextBar.Voices[this.Index];
 			if(nextVoice.Beats.length > 0) {
 				beat.NextBeat = nextVoice.Beats[0];
@@ -22742,8 +23009,12 @@ alphaTab.platform.javaScript.AlphaSynthFlashOutput.prototype = {
 		this._swfContainer.setAttribute("id",this._id);
 		document.body.appendChild(this._swfContainer);
 		var swf = $global.swfobject;
-		var embedSwf = swf.embedSWF;
-		embedSwf(this._alphaSynthRoot + "AlphaSynth.FlashOutput.swf",this._id,"1px","1px","9.0.0",null,{ id : this._id, sampleRate : 44100},{ allowScriptAccess : "always"},{ id : this._swfId});
+		if(swf) {
+			var embedSwf = swf.embedSWF;
+			embedSwf(this._alphaSynthRoot + "AlphaSynth.FlashOutput.swf",this._id,"1px","1px","9.0.0",null,{ id : this._id, sampleRate : 44100},{ allowScriptAccess : "always"},{ id : this._swfId});
+		} else {
+			alphaTab.util.Logger.Error("Player","swfobject not found, player will not work",null);
+		}
 	}
 	,get_FlashOutput: function() {
 		var element = this._swfId;
@@ -23248,6 +23519,7 @@ alphaTab.platform.javaScript.AlphaTabApi = $hx_exports["alphaTab"]["platform"]["
 	this._barCursor = null;
 	this._selectionWrapper = null;
 	this._previousTick = 0;
+	this._previousCursorCache = null;
 	this._cursorCache = null;
 	this._playerState = 0;
 	this._selectionStart = null;
@@ -24135,10 +24407,10 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 			return;
 		}
 		var previousBeat = this._currentBeat;
-		var previousCache = this._cursorCache;
+		var previousCache = this._previousCursorCache;
 		var previousState = this._previousStateForCursor;
 		this._currentBeat = beat;
-		this._cursorCache = cache;
+		this._previousCursorCache = cache;
 		this._previousStateForCursor = this._playerState;
 		if(beat == previousBeat && cache == previousCache && previousState == this._playerState) {
 			return;
@@ -25045,7 +25317,7 @@ alphaTab.rendering.BarRendererBase.prototype = {
 		if(container != null) {
 			switch(requestedPosition) {
 			case 0:
-				return container.VoiceContainer.X + container.X + container.PreNotes.X;
+				return container.VoiceContainer.X + container.X;
 			case 1:
 				return container.VoiceContainer.X + container.X + container.OnNotes.X;
 			case 2:
@@ -25317,7 +25589,7 @@ alphaTab.rendering.EffectBand.prototype = $extend(alphaTab.rendering.glyphs.Glyp
 		case 2:case 5:
 			pos = container.OnNotes;
 			g.X = this.Renderer.get_BeatGlyphsStart() + pos.X + container.X;
-			if(container.Beat.Index == container.Beat.Voice.Beats.length - 1) {
+			if(container.Beat.get_IsLastOfVoice()) {
 				g.Width = this.Renderer.Width - g.X;
 			} else {
 				g.Width = container.Width - container.PreNotes.Width - container.PreNotes.X;
@@ -27527,8 +27799,9 @@ alphaTab.rendering.glyphs.BeatOnNoteGlyphBase.prototype = $extend(alphaTab.rende
 });
 alphaTab.rendering.glyphs.GroupedEffectGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["GroupedEffectGlyph"] = function(endPosition) {
 	alphaTab.rendering.glyphs.EffectGlyph.call(this,0,0);
-	this._endPosition = 0;
-	this._endPosition = endPosition;
+	this.EndPosition = 0;
+	this.ForceGroupedRendering = false;
+	this.EndPosition = endPosition;
 };
 alphaTab.rendering.glyphs.GroupedEffectGlyph.__name__ = ["alphaTab","rendering","glyphs","GroupedEffectGlyph"];
 alphaTab.rendering.glyphs.GroupedEffectGlyph.__super__ = alphaTab.rendering.glyphs.EffectGlyph;
@@ -27551,24 +27824,44 @@ alphaTab.rendering.glyphs.GroupedEffectGlyph.prototype = $extend(alphaTab.render
 		if(this.get_IsLinkedWithPrevious()) {
 			return;
 		}
-		if(!this.get_IsLinkedWithNext()) {
+		if(!this.get_IsLinkedWithNext() && !this.ForceGroupedRendering) {
 			this.PaintNonGrouped(cx,cy,canvas);
 			return;
 		}
-		var lastLinkedGlyph = js.Boot.__cast(this.NextGlyph , alphaTab.rendering.glyphs.GroupedEffectGlyph);
-		while(lastLinkedGlyph.get_IsLinkedWithNext()) lastLinkedGlyph = js.Boot.__cast(lastLinkedGlyph.NextGlyph , alphaTab.rendering.glyphs.GroupedEffectGlyph);
+		var lastLinkedGlyph;
+		if(!this.get_IsLinkedWithNext() && this.ForceGroupedRendering) {
+			lastLinkedGlyph = this;
+		} else {
+			lastLinkedGlyph = js.Boot.__cast(this.NextGlyph , alphaTab.rendering.glyphs.GroupedEffectGlyph);
+			while(lastLinkedGlyph.get_IsLinkedWithNext()) lastLinkedGlyph = js.Boot.__cast(lastLinkedGlyph.NextGlyph , alphaTab.rendering.glyphs.GroupedEffectGlyph);
+		}
+		var endBeat;
+		var endBeatRenderer;
+		var position;
+		if(this.EndPosition == 4 && lastLinkedGlyph.Beat.NextBeat != null) {
+			endBeat = lastLinkedGlyph.Beat.NextBeat;
+			endBeatRenderer = this.Renderer.ScoreRenderer.Layout.GetRendererForBar(this.Renderer.Staff.get_StaveId(),endBeat.Voice.Bar);
+			position = 2;
+			if(endBeatRenderer == null || endBeatRenderer.Staff != this.Renderer.Staff) {
+				endBeatRenderer = lastLinkedGlyph.Renderer;
+				endBeat = lastLinkedGlyph.Beat;
+				position = this.EndPosition;
+			}
+		} else {
+			endBeatRenderer = lastLinkedGlyph.Renderer;
+			endBeat = lastLinkedGlyph.Beat;
+			position = this.EndPosition;
+		}
 		var cxRenderer = cx - this.Renderer.X;
-		var endRenderer = lastLinkedGlyph.Renderer;
-		var endX = this.CalculateEndX(endRenderer,cxRenderer,lastLinkedGlyph,this._endPosition);
+		var endX = this.CalculateEndX(endBeatRenderer,endBeat,cxRenderer,position);
 		this.PaintGrouped(cx,cy,endX,canvas);
 	}
-	,CalculateEndX: function(renderer,cx,lastGlyph,endPosition) {
-		var endBeatX = endPosition == 4 ? lastGlyph.X + lastGlyph.Width : renderer.GetBeatX(lastGlyph.Beat,this._endPosition);
-		return cx + renderer.X + endBeatX;
+	,CalculateEndX: function(endBeatRenderer,endBeat,cx,endPosition) {
+		return cx + endBeatRenderer.X + endBeatRenderer.GetBeatX(endBeat,endPosition);
 	}
 	,PaintNonGrouped: function(cx,cy,canvas) {
 		var cxRenderer = cx - this.Renderer.X;
-		var endX = this.CalculateEndX(this.Renderer,cxRenderer,this,this._endPosition);
+		var endX = this.CalculateEndX(this.Renderer,this.Beat,cxRenderer,this.EndPosition);
 		this.PaintGrouped(cx,cy,endX,canvas);
 	}
 	,PaintGrouped: function(cx,cy,endX,canvas) {
@@ -27599,17 +27892,8 @@ alphaTab.rendering.glyphs.BeatVibratoGlyph.prototype = $extend(alphaTab.renderin
 		}
 		this.Height = 18 * this.get_Scale();
 	}
-	,CalculateEndX: function(renderer,cx,lastGlyph,endPosition) {
-		var endBeat = lastGlyph.Beat.NextBeat;
-		if(endBeat == null) {
-			return alphaTab.rendering.glyphs.GroupedEffectGlyph.prototype.CalculateEndX.call(this,renderer,cx,lastGlyph,endPosition);
-		}
-		var endBeatRenderer = this.Renderer.ScoreRenderer.Layout.GetRendererForBar(this.Renderer.Staff.get_StaveId(),endBeat.Voice.Bar);
-		if(endBeatRenderer == null) {
-			return alphaTab.rendering.glyphs.GroupedEffectGlyph.prototype.CalculateEndX.call(this,renderer,cx,lastGlyph,endPosition);
-		}
-		var endBeatX = endBeatRenderer.GetBeatX(endBeat,2);
-		return cx + endBeatRenderer.X + endBeatX;
+	,CalculateEndX: function(endBeatRenderer,endBeat,cx,endPosition) {
+		return cx + endBeatRenderer.X + endBeatRenderer.GetBeatX(endBeat,2);
 	}
 	,PaintGrouped: function(cx,cy,endX,canvas) {
 		var startX = cx + this.X;
@@ -28407,6 +28691,10 @@ alphaTab.rendering.glyphs.LineRangedGlyph.__name__ = ["alphaTab","rendering","gl
 alphaTab.rendering.glyphs.LineRangedGlyph.__super__ = alphaTab.rendering.glyphs.GroupedEffectGlyph;
 alphaTab.rendering.glyphs.LineRangedGlyph.prototype = $extend(alphaTab.rendering.glyphs.GroupedEffectGlyph.prototype,{
 	DoLayout: function() {
+		if(this.Renderer.get_Settings().ExtendLineEffectsToBeatEnd) {
+			this.EndPosition = 4;
+			this.ForceGroupedRendering = true;
+		}
 		alphaTab.rendering.glyphs.GroupedEffectGlyph.prototype.DoLayout.call(this);
 		this.Height = this.Renderer.get_Resources().EffectFont.Size;
 	}
@@ -29553,7 +29841,7 @@ alphaTab.rendering.glyphs.ScoreBendGlyph.prototype = $extend(alphaTab.rendering.
 		var startNoteRenderer = js.Boot.__cast(this.Renderer.ScoreRenderer.Layout.GetRendererForBar(this.Renderer.Staff.get_StaveId(),this._beat.Voice.Bar) , alphaTab.rendering.ScoreBarRenderer);
 		var startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(this._beat,2);
 		var endBeatX = cx + startNoteRenderer.X;
-		if(this._beat.Index == this._beat.Voice.Beats.length - 1) {
+		if(this._beat.get_IsLastOfVoice()) {
 			endBeatX = endBeatX + startNoteRenderer.get_PostBeatGlyphsStart();
 		} else {
 			endBeatX = endBeatX + startNoteRenderer.GetBeatX(this._beat,4);
@@ -30391,13 +30679,13 @@ alphaTab.rendering.glyphs.ScoreWhammyBarGlyph.prototype = $extend(alphaTab.rende
 		var beat = this._beat;
 		var _g = beat.WhammyBarType;
 		switch(_g) {
-		case 0:case 1:case 4:
+		case 0:case 1:
 			return;
 		default:
 		}
 		var whammyMode = this.Renderer.get_Settings().WhammyMode;
 		var startNoteRenderer = js.Boot.__cast(this.Renderer.ScoreRenderer.Layout.GetRendererForBar(this.Renderer.Staff.get_StaveId(),beat.Voice.Bar) , alphaTab.rendering.ScoreBarRenderer);
-		var startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(beat,2);
+		var startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(beat,3);
 		var beatDirection = this.GetBeamDirection(beat,startNoteRenderer);
 		var direction = this._beat.Notes.length == 1 ? beatDirection : 0;
 		var textalign = canvas.get_TextAlign();
@@ -30413,7 +30701,7 @@ alphaTab.rendering.glyphs.ScoreWhammyBarGlyph.prototype = $extend(alphaTab.rende
 				direction = 1;
 			}
 			var endX = cx + startNoteRenderer.X;
-			if(beat.Index == beat.Voice.Beats.length - 1) {
+			if(beat.get_IsLastOfVoice()) {
 				endX = endX + startNoteRenderer.Width;
 			} else {
 				endX = endX + startNoteRenderer.GetBeatX(beat,4);
@@ -30423,7 +30711,7 @@ alphaTab.rendering.glyphs.ScoreWhammyBarGlyph.prototype = $extend(alphaTab.rende
 			if(note.IsTieOrigin) {
 				endNoteRenderer = js.Boot.__cast(this.Renderer.ScoreRenderer.Layout.GetRendererForBar(this.Renderer.Staff.get_StaveId(),note.TieDestination.Beat.Voice.Bar) , alphaTab.rendering.ScoreBarRenderer);
 				if(endNoteRenderer != null && endNoteRenderer.Staff == startNoteRenderer.Staff) {
-					endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(note.TieDestination.Beat,2);
+					endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(note.TieDestination.Beat,0);
 				} else {
 					endNoteRenderer = null;
 				}
@@ -30496,6 +30784,17 @@ alphaTab.rendering.glyphs.ScoreWhammyBarGlyph.prototype = $extend(alphaTab.rende
 					endValue = this.GetBendNoteValue(note,beat.WhammyBarPoints[beat.WhammyBarPoints.length - 1]);
 					endY = this._bendNoteHeads[1].GetNoteValueY(endValue,false) + heightOffset;
 					this.DrawBendSlur(canvas,middleX1,middleY,endX,endY,direction == 1,this.get_Scale(),null);
+				}
+				break;
+			case 4:
+				if(note.IsTieOrigin) {
+					if(endNoteRenderer == null) {
+						endY = startY;
+					} else {
+						endY = cy + endNoteRenderer.Y + endNoteRenderer.GetNoteY(note.TieDestination,true);
+					}
+					alphaTab.rendering.glyphs.TieGlyph.PaintTie(canvas,this.get_Scale(),startX,startY,endX,endY,beatDirection == 1,22,4);
+					canvas.Fill();
 				}
 				break;
 			case 5:case 6:
@@ -31001,7 +31300,7 @@ alphaTab.rendering.glyphs.TabBendGlyph.prototype = $extend(alphaTab.rendering.gl
 			}
 			endBeat = endNote.Beat;
 			endNoteRenderer = this.Renderer.ScoreRenderer.Layout.GetRendererForBar(this.Renderer.Staff.get_StaveId(),endBeat.Voice.Bar);
-			if(endBeat.Index == endBeat.Voice.Beats.length - 1 && !endNote.get_HasBend() && this.Renderer.get_Settings().ExtendBendArrowsOnTiedNotes) {
+			if(endBeat.get_IsLastOfVoice() && !endNote.get_HasBend() && this.Renderer.get_Settings().ExtendBendArrowsOnTiedNotes) {
 				endBeat = null;
 			}
 			var startX = 0;
@@ -31014,7 +31313,7 @@ alphaTab.rendering.glyphs.TabBendGlyph.prototype = $extend(alphaTab.rendering.gl
 			} else {
 				startX = startX + startNoteRenderer.GetNoteX(note1,true);
 			}
-			if(endBeat == null || endBeat.Index == endBeat.Voice.Beats.length - 1 && !endNoteHasBend) {
+			if(endBeat == null || endBeat.get_IsLastOfVoice() && !endNoteHasBend) {
 				endX = cx + endNoteRenderer.X + endNoteRenderer.get_PostBeatGlyphsStart();
 			} else if(endNoteHasBend || endBeat.NextBeat == null) {
 				endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat,2);
@@ -31707,15 +32006,10 @@ alphaTab.rendering.glyphs.TabWhammyBarGlyph.prototype = $extend(alphaTab.renderi
 			if(endNoteRenderer == null || endNoteRenderer.Staff != startNoteRenderer.Staff) {
 				endBeat = null;
 				endNoteRenderer = null;
-			} else if(endBeat.IsContinuedWhammy || endNoteRenderer == startNoteRenderer) {
-				if(endBeat.get_HasWhammyBar() && (startNoteRenderer.get_Settings().WhammyMode != 1 || endBeat.WhammyBarType != 3)) {
-					endXPositionType = 2;
-				} else {
-					endXPositionType = 0;
-				}
+			} else if(endBeat.get_HasWhammyBar() && (startNoteRenderer.get_Settings().WhammyMode != 1 || endBeat.WhammyBarType != 3)) {
+				endXPositionType = 2;
 			} else {
-				endBeat = null;
-				endNoteRenderer = null;
+				endXPositionType = 0;
 			}
 		}
 		var startX;
@@ -36538,6 +36832,14 @@ alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.Pipe = 11;
 alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.MetaCommand = 12;
 alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.Multiply = 13;
 alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.LowerThan = 14;
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.Boolean = 0;
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.Integer = 1;
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.Float = 2;
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.String = 3;
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.Point = 4;
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.Size = 5;
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.Rectangle = 6;
+alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.Color = 7;
 alphaTab.importer.Gp3To5Importer.VersionString = "FICHIER GUITAR PRO ";
 alphaTab.importer.Gp3To5Importer.BendStep = 25;
 alphaTab.importer.GpifParser.InvalidId = "-1";
@@ -36546,6 +36848,7 @@ alphaTab.importer.GpifParser.BendPointValueFactor = 0.04;
 alphaTab.importer.GpxFileSystem.HeaderBcFs = "BCFS";
 alphaTab.importer.GpxFileSystem.HeaderBcFz = "BCFZ";
 alphaTab.importer.GpxFileSystem.ScoreGpif = "score.gpif";
+alphaTab.importer.GpxFileSystem.BinaryStylesheet = "BinaryStylesheet";
 alphaTab.importer.MusicXmlImporter.MergePartGroupsSetting = "musicXMLMergePartGroups";
 alphaTab.io.BitReader.ByteSize = 8;
 alphaTab.model._AccentuationType.AccentuationType_Impl_.None = 0;

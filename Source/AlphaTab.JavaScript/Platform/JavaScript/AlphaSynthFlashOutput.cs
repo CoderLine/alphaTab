@@ -4,6 +4,7 @@ using AlphaTab.Audio.Synth.Ds;
 using AlphaTab.Collections;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
+using AlphaTab.Util;
 using Haxe.Js.Html;
 using Phase;
 using Phase.Attributes;
@@ -70,13 +71,20 @@ namespace AlphaTab.Platform.JavaScript
             document.Body.AppendChild(_swfContainer);
 
             var swf = Lib.Global.swfobject;
-            Action<string, string, string, string, string, string, object, object, object> embedSwf = swf.embedSWF;
-            embedSwf(
-                _alphaSynthRoot + "AlphaSynth.FlashOutput.swf",
-                _id, "1px", "1px", "9.0.0",
-                null,
-                new { id = _id, sampleRate = PreferredSampleRate }, new { allowScriptAccess = "always" }, new { id = _swfId }
-            );
+            if (swf)
+            {
+                Action<string, string, string, string, string, string, object, object, object> embedSwf = swf.embedSWF;
+                embedSwf(
+                    _alphaSynthRoot + "AlphaSynth.FlashOutput.swf",
+                    _id, "1px", "1px", "9.0.0",
+                    null,
+                    new { id = _id, sampleRate = PreferredSampleRate }, new { allowScriptAccess = "always" }, new { id = _swfId }
+                );
+            }
+            else
+            {
+                Logger.Error("Player", "swfobject not found, player will not work");
+            }
         }
 
         private IFlashSynthOutput FlashOutput

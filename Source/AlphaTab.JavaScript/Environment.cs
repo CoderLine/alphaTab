@@ -70,8 +70,8 @@ namespace AlphaTab
                  *     Copyright (c) 2008 Andy G.P. Na <nagoon97@naver.com>
                  *     The source code is freely distributable under the terms of an MIT-style license.
                  */
+
                 var vbAjaxLoader = new StringBuilder();
-                vbAjaxLoader.AppendLine("<script type=\"text/vbscript\">");
                 vbAjaxLoader.AppendLine("Function VbAjaxLoader(method, fileName)");
                 vbAjaxLoader.AppendLine("    Dim xhr");
                 vbAjaxLoader.AppendLine("    Set xhr = CreateObject(\"Microsoft.XMLHTTP\")");
@@ -90,10 +90,16 @@ namespace AlphaTab
                 vbAjaxLoader.AppendLine("    End If");
                 vbAjaxLoader.AppendLine("    VbAjaxLoader=byteArray");
                 vbAjaxLoader.AppendLine("End Function");
-                vbAjaxLoader.AppendLine("</script>");
 
-                var s = vbAjaxLoader.ToString();
-                document.Write(s);
+
+                var vbAjaxLoaderScript = (ScriptElement)document.CreateElement("script");
+                vbAjaxLoaderScript.SetAttribute("type", "text/vbscript");
+                var inlineScript = document.CreateTextNode(vbAjaxLoader.ToString());
+                vbAjaxLoaderScript.AppendChild(inlineScript);
+                document.AddEventListener("DOMContentLoaded", new Action(() =>
+                {
+                    document.Body.AppendChild(vbAjaxLoaderScript);
+                }), false);
 
                 ScriptElement scriptElement = (ScriptElement)document.CurrentScript;
                 if (!scriptElement.IsTruthy())
@@ -114,7 +120,7 @@ namespace AlphaTab
                         var stack = e.Stack;
                         if (!stack.IsTruthy())
                         {
-                            scriptElement = (ScriptElement)document.QuerySelector("script[data-alphatab]\")");
+                            scriptElement = (ScriptElement)document.QuerySelector("script[data-alphatab]");
                         }
                         else
                         {

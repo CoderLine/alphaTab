@@ -31,5 +31,7 @@ namespace AlphaTab.Haxe.Js.Html
         public extern BodyElement Body { get; set; }
         [Name("documentElement")]
         public extern Element DocumentElement { get; set; }
+        [Name("createTextNode")]
+        public extern Node CreateTextNode(HaxeString text);
     }
 }

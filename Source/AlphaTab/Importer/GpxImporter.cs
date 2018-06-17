@@ -35,13 +35,24 @@ namespace AlphaTab.Importer
             // from the GPX container
             Logger.Info(Name, "Loading GPX filesystem");
             var fileSystem = new GpxFileSystem();
-            fileSystem.FileFilter = s => s == GpxFileSystem.ScoreGpif;
+            fileSystem.FileFilter = s => s.EndsWith(GpxFileSystem.ScoreGpif) || s.EndsWith(GpxFileSystem.BinaryStylesheet);
             fileSystem.Load(Data);
             Logger.Info(Name, "GPX filesystem loaded");
 
-            // convert data to string
-            var data = fileSystem.Files[0].Data;
-            var xml = Platform.Platform.ToString(data);
+            string xml = null;
+            byte[] binaryStylesheet = null;
+            foreach (var entry in fileSystem.Files)
+            {
+                switch (entry.FileName)
+                {
+                    case GpxFileSystem.ScoreGpif:
+                        xml = Platform.Platform.ToString(entry.Data);
+                        break;
+                    case GpxFileSystem.BinaryStylesheet:
+                        binaryStylesheet = entry.Data;
+                        break;
+                }
+            }
 
             // lets set the fileSystem to null, maybe the garbage collector will come along
             // and kick the fileSystem binary data before we finish parsing
@@ -55,7 +66,21 @@ namespace AlphaTab.Importer
             parser.ParseXml(xml, Settings);
             Logger.Info(Name, "score.gpif parsed");
 
-            return parser.Score;
+            var score = parser.Score;
+
+            if (binaryStylesheet != null)
+            {
+                Logger.Info(Name, "Start Parsing BinaryStylesheet");
+                var stylesheetParser = new BinaryStylesheetParser();
+                stylesheetParser.Parse(binaryStylesheet);
+                if (stylesheetParser.Stylesheet != null)
+                {
+                    stylesheetParser.Stylesheet.Apply(score);
+                }
+                Logger.Info(Name, "BinaryStylesheet parsed");
+            }
+
+            return score;
         }
     }
 }

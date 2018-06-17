@@ -83,7 +83,7 @@ namespace AlphaTab.Model
                 beat.NextBeat = Beats[beat.Index + 1];
                 beat.NextBeat.PreviousBeat = beat;
             }
-            else if (beat.Index == beat.Voice.Beats.Count - 1 && beat.Voice.Bar.NextBar != null)
+            else if (beat.IsLastOfVoice && beat.Voice.Bar.NextBar != null)
             {
                 var nextVoice = Bar.NextBar.Voices[Index];
                 if (nextVoice.Beats.Count > 0)

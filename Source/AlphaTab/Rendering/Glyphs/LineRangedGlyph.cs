@@ -37,6 +37,11 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
+            if (Renderer.Settings.ExtendLineEffectsToBeatEnd)
+            {
+                EndPosition = BeatXPosition.EndBeat;
+                ForceGroupedRendering = true;
+            }
             base.DoLayout();
             Height = Renderer.Resources.EffectFont.Size;
         }

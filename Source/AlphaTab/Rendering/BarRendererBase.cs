@@ -484,7 +484,7 @@ namespace AlphaTab.Rendering
                 switch (requestedPosition)
                 {
                     case BeatXPosition.PreNotes:
-                        return container.VoiceContainer.X + container.X + container.PreNotes.X;
+                        return container.VoiceContainer.X + container.X;
                     case BeatXPosition.OnNotes:
                         return container.VoiceContainer.X + container.X + container.OnNotes.X;
                     case BeatXPosition.MiddleNotes:

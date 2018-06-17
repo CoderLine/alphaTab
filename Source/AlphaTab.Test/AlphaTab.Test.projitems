@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Audio\MidiFileGeneratorTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\MidiPlaybackControllerTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\AlphaTexImporterTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Importer\BinaryStylesheetParserTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\Gp3ImporterTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\Gp4ImporterTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\Gp5ImporterTest.cs" />
@@ -323,6 +324,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\BendsAdvanced.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\BinaryStylesheet">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro7\Colors.gp">

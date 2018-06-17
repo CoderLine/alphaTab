@@ -743,6 +743,12 @@
             If set to true, 0 is shown on dive whammy bars. 
             </summary>
         </member>
+        <member name="P:AlphaTab.Settings.ExtendLineEffectsToBeatEnd">
+            <summary>
+            If set to true, line effects (like w/bar, let-ring etc)
+            are drawn until the end of the beat instead of the start. 
+            </summary>
+        </member>
         <member name="T:AlphaTab.Importer.AlphaTexImporter">
             <summary>
             This importer can parse alphaTex markup into a score structure. 
@@ -830,26 +836,26 @@
             A list of terminals recognized by the alphaTex-parser
             </summary>
         </member>
-        <member name="M:AlphaTab.Importer.Gp3To5Importer.ReadStringIntUnused">
+        <member name="M:AlphaTab.Importer.GpBinaryHelpers.GpReadStringIntUnused(AlphaTab.IO.IReadable)">
             <summary>
              Skips an integer (4byte) and reads a string using 
              a bytesize
             </summary>
             <returns></returns>
         </member>
-        <member name="M:AlphaTab.Importer.Gp3To5Importer.ReadStringInt">
+        <member name="M:AlphaTab.Importer.GpBinaryHelpers.GpReadStringInt(AlphaTab.IO.IReadable)">
             <summary>
             Reads an integer as size, and then the string itself
             </summary>
             <returns></returns>
         </member>
-        <member name="M:AlphaTab.Importer.Gp3To5Importer.ReadStringIntByte">
+        <member name="M:AlphaTab.Importer.GpBinaryHelpers.GpReadStringIntByte(AlphaTab.IO.IReadable)">
             <summary>
             Reads an integer as size, skips a byte and reads the string itself
             </summary>
             <returns></returns>
         </member>
-        <member name="M:AlphaTab.Importer.Gp3To5Importer.ReadStringByteLength(System.Int32)">
+        <member name="M:AlphaTab.Importer.GpBinaryHelpers.GpReadStringByteLength(AlphaTab.IO.IReadable,System.Int32)">
             <summary>
             Reads a byte as size and the string itself.
             Additionally it is ensured the specified amount of bytes is read. 
@@ -1508,6 +1514,12 @@
         <member name="P:AlphaTab.Model.RepeatGroup.IsClosed">
             <summary>
              true if the repeat group was closed well
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.RenderStylesheet">
+            <summary>
+            This class represents the rendering stylesheet.
+            It contains settings which control the display of the score when rendered. 
             </summary>
         </member>
         <member name="T:AlphaTab.Model.Score">

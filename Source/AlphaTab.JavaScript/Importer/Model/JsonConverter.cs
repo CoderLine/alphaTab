@@ -37,6 +37,9 @@ namespace AlphaTab.Model
             score2.MasterBars = new FastList<MasterBar>();
             score2.Tracks = new FastList<Track>();
 
+            score2.Stylesheet = Platform.Platform.NewObject();
+            RenderStylesheet.CopyTo(score.Stylesheet, score2.Stylesheet);
+
             #region MasterBars
 
             for (var i = 0; i < score.MasterBars.Count; i++)
@@ -200,6 +203,7 @@ namespace AlphaTab.Model
         {
             var score2 = new Score();
             Score.CopyTo(score, score2);
+            RenderStylesheet.CopyTo(score.Stylesheet, score2.Stylesheet);
 
             #region MasterBars
 

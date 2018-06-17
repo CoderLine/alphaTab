@@ -78,6 +78,7 @@ namespace AlphaTab.Model
         public Beat NextBeat { get; set; }
         public int Id { get; set; }
         public int Index { get; set; }
+        public bool IsLastOfVoice => Index == Voice.Beats.Count - 1;
 
         public Voice Voice { get; set; }
         public FastList<Note> Notes { get; set; }

@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using AlphaTab.Audio.Synth;
@@ -133,6 +134,10 @@ namespace AlphaTab.Platform
         public static double ToDouble(byte[] bytes)
         {
             return BitConverter.ToDouble(bytes, 0);
+        }
+        public static float ToFloat(byte[] bytes)
+        {
+            return BitConverter.ToSingle(bytes, 0);
         }
 
         public static readonly bool IsLittleEndian = BitConverter.IsLittleEndian;
