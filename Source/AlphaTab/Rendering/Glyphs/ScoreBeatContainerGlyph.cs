@@ -78,6 +78,7 @@ namespace AlphaTab.Rendering
                 var tie = new ScoreTieGlyph(n, n.TieDestination);
                 Ties.Add(tie);
             }
+
             if (n.IsTieDestination && !n.TieOrigin.HasBend && !n.Beat.HasWhammyBar)
             {
                 var tie = new ScoreTieGlyph(n.TieOrigin, n, true);
@@ -113,7 +114,8 @@ namespace AlphaTab.Rendering
                     Ties.Add(tie);
                 }
             }
-            else if (n.SlideType == SlideType.Legato)
+
+            if (n.SlideType == SlideType.Legato)
             {
                 var tie = new ScoreTieGlyph(n, n.SlideTarget);
                 Ties.Add(tie);

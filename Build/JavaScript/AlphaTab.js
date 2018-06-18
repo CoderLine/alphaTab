@@ -26785,7 +26785,8 @@ alphaTab.rendering.ScoreBeatContainerGlyph.prototype = $extend(alphaTab.renderin
 				var tie3 = new alphaTab.rendering.glyphs.ScoreTieGlyph(origin,n,true);
 				this.Ties.push(tie3);
 			}
-		} else if(n.SlideType == 2) {
+		}
+		if(n.SlideType == 2) {
 			var tie4 = new alphaTab.rendering.glyphs.ScoreTieGlyph(n,n.SlideTarget,false);
 			this.Ties.push(tie4);
 		}
@@ -28476,7 +28477,7 @@ alphaTab.rendering.glyphs.DynamicsGlyph.GetSymbol = function(dynamics) {
 	case 5:
 		return 58658;
 	case 6:
-		return 58672;
+		return 58671;
 	case 7:
 		return 58672;
 	default:
@@ -29896,14 +29897,22 @@ alphaTab.rendering.glyphs.ScoreBendGlyph.prototype = $extend(alphaTab.rendering.
 					var endY = cy + startNoteRenderer.Y;
 					var this2 = startNoteRenderer.AccidentalHelper.GetNoteLineForValue(noteValueToDraw,false);
 					var endY1 = endY + startNoteRenderer.GetScoreY(this2,0);
-					this.DrawBendSlur(canvas,startX,startY,endX,endY1,direction == 1,this.get_Scale(),slurText);
+					if(note.BendType == 5) {
+						alphaTab.rendering.glyphs.TieGlyph.PaintTie(canvas,this.get_Scale(),startX,startY,endX,endY1,direction == 1,22,4);
+					} else {
+						this.DrawBendSlur(canvas,startX,startY,endX,endY1,direction == 1,this.get_Scale(),slurText);
+					}
 				} else {
 					var endX1 = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endNote.Beat,2);
 					var endY2 = cy + endNoteRenderer.Y + endNoteRenderer.GetNoteY(endNote,true);
 					if(direction == 1) {
 						endY2 = endY2 + 9 * this.get_Scale();
 					}
-					this.DrawBendSlur(canvas,startX,startY,endX1,endY2,direction == 1,this.get_Scale(),slurText);
+					if(note.BendType == 5) {
+						alphaTab.rendering.glyphs.TieGlyph.PaintTie(canvas,this.get_Scale(),startX,startY,endX1,endY2,direction == 1,22,4);
+					} else {
+						this.DrawBendSlur(canvas,startX,startY,endX1,endY2,direction == 1,this.get_Scale(),slurText);
+					}
 				}
 				var _g = note.BendType;
 				switch(_g) {
@@ -29983,12 +29992,21 @@ alphaTab.rendering.glyphs.ScoreBrushGlyph.prototype = $extend(alphaTab.rendering
 	,Paint: function(cx,cy,canvas) {
 		var scoreBarRenderer = js.Boot.__cast(this.Renderer , alphaTab.rendering.ScoreBarRenderer);
 		var lineSize = scoreBarRenderer.get_LineOffset();
-		var startY = cy + this.Y + (scoreBarRenderer.GetNoteY(this._beat.get_MaxNote(),false) - lineSize / 2);
+		var startY = cy + this.Y + (scoreBarRenderer.GetNoteY(this._beat.get_MaxNote(),false) - lineSize);
 		var endY = cy + this.Y + scoreBarRenderer.GetNoteY(this._beat.get_MinNote(),false) + lineSize;
 		var arrowX = cx + this.X + this.Width / 2;
 		var arrowSize = 8 * this.get_Scale();
 		if(this._beat.BrushType != 0) {
 			if(this._beat.BrushType == 3) {
+				var lineStartY = startY - arrowSize;
+				var lineEndY = endY - arrowSize;
+				canvas.BeginRotate(cx + this.X + 2 * this.get_Scale(),lineEndY,-90);
+				var glyph = new alphaTab.rendering.glyphs.NoteVibratoGlyph(0,0,1,1.2);
+				glyph.Renderer = this.Renderer;
+				glyph.DoLayout();
+				glyph.Width = Math.abs(lineEndY - lineStartY);
+				glyph.Paint(0,0,canvas);
+				canvas.EndRotate();
 				canvas.BeginPath();
 				canvas.MoveTo(arrowX,endY);
 				canvas.LineTo(arrowX + arrowSize / 2,endY - arrowSize);
@@ -29996,6 +30014,15 @@ alphaTab.rendering.glyphs.ScoreBrushGlyph.prototype = $extend(alphaTab.rendering
 				canvas.ClosePath();
 				canvas.Fill();
 			} else if(this._beat.BrushType == 4) {
+				var lineStartY1 = startY + arrowSize;
+				var lineEndY1 = endY + arrowSize;
+				canvas.BeginRotate(cx + this.X + 7 * this.get_Scale(),lineStartY1,90);
+				var glyph1 = new alphaTab.rendering.glyphs.NoteVibratoGlyph(0,0,1,1.2);
+				glyph1.Renderer = this.Renderer;
+				glyph1.DoLayout();
+				glyph1.Width = Math.abs(lineEndY1 - lineStartY1);
+				glyph1.Paint(0,0,canvas);
+				canvas.EndRotate();
 				canvas.BeginPath();
 				canvas.MoveTo(arrowX,startY);
 				canvas.LineTo(arrowX + arrowSize / 2,startY + arrowSize);
@@ -30878,7 +30905,8 @@ alphaTab.rendering.glyphs.TabBeatContainerGlyph.prototype = $extend(alphaTab.ren
 				var tie3 = new alphaTab.rendering.glyphs.TabTieGlyph(origin,n,false,true);
 				this.Ties.push(tie3);
 			}
-		} else if(n.SlideType == 2) {
+		}
+		if(n.SlideType == 2) {
 			var tie4 = new alphaTab.rendering.glyphs.TabTieGlyph(n,n.SlideTarget,true,false);
 			this.Ties.push(tie4);
 		}
@@ -31531,6 +31559,26 @@ alphaTab.rendering.glyphs.TabBrushGlyph.prototype = $extend(alphaTab.rendering.g
 				var this2 = arrowX;
 				canvas.LineTo(this2,endY);
 				canvas.Stroke();
+			} else if(this._beat.BrushType == 3) {
+				var lineStartY = startY - arrowSize;
+				var lineEndY = endY - arrowSize;
+				canvas.BeginRotate(cx + this.X + 2 * this.get_Scale(),lineEndY,-90);
+				var glyph = new alphaTab.rendering.glyphs.NoteVibratoGlyph(0,0,1,1.2);
+				glyph.Renderer = this.Renderer;
+				glyph.DoLayout();
+				glyph.Width = Math.abs(lineEndY - lineStartY);
+				glyph.Paint(0,0,canvas);
+				canvas.EndRotate();
+			} else if(this._beat.BrushType == 4) {
+				var lineStartY1 = startY + arrowSize;
+				var lineEndY1 = endY + arrowSize;
+				canvas.BeginRotate(cx + this.X + 7 * this.get_Scale(),lineStartY1,90);
+				var glyph1 = new alphaTab.rendering.glyphs.NoteVibratoGlyph(0,0,1,1.2);
+				glyph1.Renderer = this.Renderer;
+				glyph1.DoLayout();
+				glyph1.Width = Math.abs(lineEndY1 - lineStartY1);
+				glyph1.Paint(0,0,canvas);
+				canvas.EndRotate();
 			}
 			if(this._beat.BrushType == 1 || this._beat.BrushType == 3) {
 				canvas.BeginPath();

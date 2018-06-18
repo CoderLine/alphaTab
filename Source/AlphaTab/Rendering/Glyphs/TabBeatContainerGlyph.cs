@@ -86,7 +86,8 @@ namespace AlphaTab.Rendering.Glyphs
                     Ties.Add(tie);
                 }
             }
-            else if (n.SlideType == SlideType.Legato)
+
+            if (n.SlideType == SlideType.Legato)
             {
                 var tie = new TabTieGlyph(n, n.SlideTarget, true, false);
                 Ties.Add(tie);

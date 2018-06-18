@@ -168,8 +168,16 @@ namespace AlphaTab.Rendering.Glyphs
                                    startNoteRenderer.GetScoreY(
                                        startNoteRenderer.AccidentalHelper.GetNoteLineForValue(noteValueToDraw));
 
-                        DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale,
-                            slurText);
+                        if (note.BendType == BendType.Hold)
+                        {
+                            TieGlyph.PaintTie(canvas, Scale, startX, startY, endX, endY,
+                                direction == BeamDirection.Down);
+                        }
+                        else
+                        {
+                            DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale,
+                                slurText);
+                        }
                     }
                     // otherwise we draw a line to the target note
                     else
@@ -182,8 +190,16 @@ namespace AlphaTab.Rendering.Glyphs
                             endY += NoteHeadGlyph.NoteHeadHeight * Scale;
                         }
 
-                        DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale,
-                            slurText);
+                        if (note.BendType == BendType.Hold)
+                        {
+                            TieGlyph.PaintTie(canvas, Scale, startX, startY, endX, endY,
+                                direction == BeamDirection.Down);
+                        }
+                        else
+                        {
+                            DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale,
+                                slurText);
+                        }
                     }
 
                     switch (note.BendType)

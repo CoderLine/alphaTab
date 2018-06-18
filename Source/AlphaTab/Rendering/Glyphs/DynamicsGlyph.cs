@@ -50,7 +50,7 @@ namespace AlphaTab.Rendering.Glyphs
                 case DynamicValue.F:
                     return MusicFontSymbol.DynamicF;
                 case DynamicValue.FF:
-                    return MusicFontSymbol.DynamicFFF;
+                    return MusicFontSymbol.DynamicFF;
                 case DynamicValue.FFF:
                     return MusicFontSymbol.DynamicFFF;
                 default:
