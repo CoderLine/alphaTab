@@ -26764,7 +26764,7 @@ alphaTab.rendering.ScoreBeatContainerGlyph.prototype = $extend(alphaTab.renderin
 		}
 	}
 	,CreateTies: function(n) {
-		if(n.IsTieOrigin && !n.get_HasBend() && !n.Beat.get_HasWhammyBar()) {
+		if(n.IsTieOrigin && !n.get_HasBend() && !n.Beat.get_HasWhammyBar() && n.Beat.GraceType != 3) {
 			var tie = new alphaTab.rendering.glyphs.ScoreTieGlyph(n,n.TieDestination,false);
 			this.Ties.push(tie);
 		}
