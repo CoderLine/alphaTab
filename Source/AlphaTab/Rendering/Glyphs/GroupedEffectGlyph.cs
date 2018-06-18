@@ -118,7 +118,14 @@ namespace AlphaTab.Rendering.Glyphs
 
         protected virtual float CalculateEndX(BarRendererBase endBeatRenderer, Beat endBeat, float cx, BeatXPosition endPosition)
         {
-            return cx + endBeatRenderer.X + endBeatRenderer.GetBeatX(endBeat, endPosition);
+            if (endBeat == null)
+            {
+                return cx + endBeatRenderer.X + X + Width;
+            }
+            else
+            {
+                return cx + endBeatRenderer.X + endBeatRenderer.GetBeatX(endBeat, endPosition);
+            }
         }
 
         protected virtual void PaintNonGrouped(float cx, float cy, ICanvas canvas)

@@ -27857,7 +27857,11 @@ alphaTab.rendering.glyphs.GroupedEffectGlyph.prototype = $extend(alphaTab.render
 		this.PaintGrouped(cx,cy,endX,canvas);
 	}
 	,CalculateEndX: function(endBeatRenderer,endBeat,cx,endPosition) {
-		return cx + endBeatRenderer.X + endBeatRenderer.GetBeatX(endBeat,endPosition);
+		if(endBeat == null) {
+			return cx + endBeatRenderer.X + this.X + this.Width;
+		} else {
+			return cx + endBeatRenderer.X + endBeatRenderer.GetBeatX(endBeat,endPosition);
+		}
 	}
 	,PaintNonGrouped: function(cx,cy,canvas) {
 		var cxRenderer = cx - this.Renderer.X;
