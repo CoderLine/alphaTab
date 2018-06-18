@@ -25,6 +25,7 @@ using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Staves;
 using AlphaTab.Rendering.Utils;
+using AlphaTab.Util;
 using Staff = AlphaTab.Rendering.Staves.Staff;
 
 namespace AlphaTab.Rendering
@@ -222,10 +223,10 @@ namespace AlphaTab.Rendering
             }
 
             // on the post glyphs we add the spacing before all other glyphs
-            _postBeatGlyphs.X = voiceEnd;
+            _postBeatGlyphs.X = (float)Math.Floor(voiceEnd);
             _postBeatGlyphs.Width = LayoutingInfo.PostBeatSize;
 
-            Width = _postBeatGlyphs.X + _postBeatGlyphs.Width;
+            Width = (float)Math.Ceiling(_postBeatGlyphs.X + _postBeatGlyphs.Width);
             return true;
         }
 
@@ -311,9 +312,9 @@ namespace AlphaTab.Rendering
                 }
             }
 
-            _postBeatGlyphs.X = postBeatStart;
+            _postBeatGlyphs.X = (float)Math.Floor(postBeatStart);
 
-            Width = _postBeatGlyphs.X + _postBeatGlyphs.Width;
+            Width = (float)Math.Ceiling(_postBeatGlyphs.X + _postBeatGlyphs.Width);
         }
 
         protected void AddPreBeatGlyph(Glyph g)

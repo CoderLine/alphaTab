@@ -444,13 +444,12 @@ alphaTab.platform.svg.SvgCanvas.prototype = {
 		var this1 = "";
 		this.Buffer = this1;
 		this.Buffer += Std.string("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
-		var this2 = width;
-		this.Buffer += Std.string(Math.ceil(this2));
+		this.Buffer += Std.string(width);
 		this.Buffer += Std.string("px\" height=\"");
 		this.Buffer += Std.string(height);
 		this.Buffer += Std.string("px\" class=\"alphaTabSurfaceSvg\">\n");
-		var this3 = "";
-		this._currentPath = this3;
+		var this2 = "";
+		this._currentPath = this2;
 		this._currentPathIsEmpty = true;
 	}
 	,BeginGroup: function(identifier) {
@@ -25136,9 +25135,11 @@ alphaTab.rendering.BarRendererBase.prototype = {
 				voiceEnd = newEnd;
 			}
 		}
-		this._postBeatGlyphs.X = voiceEnd;
+		var this2 = voiceEnd;
+		this._postBeatGlyphs.X = js.Boot.__cast(Math.floor(this2) , Float);
 		this._postBeatGlyphs.Width = this.LayoutingInfo.PostBeatSize;
-		this.Width = this._postBeatGlyphs.X + this._postBeatGlyphs.Width;
+		var this3 = this._postBeatGlyphs.X + this._postBeatGlyphs.Width;
+		this.Width = js.Boot.__cast(Math.ceil(this3) , Float);
 		return true;
 	}
 	,FinalizeRenderer: function() {
@@ -25193,8 +25194,10 @@ alphaTab.rendering.BarRendererBase.prototype = {
 				postBeatStart = x;
 			}
 		}
-		this._postBeatGlyphs.X = postBeatStart;
-		this.Width = this._postBeatGlyphs.X + this._postBeatGlyphs.Width;
+		var this1 = postBeatStart;
+		this._postBeatGlyphs.X = js.Boot.__cast(Math.floor(this1) , Float);
+		var this2 = this._postBeatGlyphs.X + this._postBeatGlyphs.Width;
+		this.Width = js.Boot.__cast(Math.ceil(this2) , Float);
 	}
 	,AddPreBeatGlyph: function(g) {
 		this._preBeatGlyphs.AddGlyph(g);
@@ -27693,7 +27696,7 @@ alphaTab.rendering.glyphs.BarSeperatorGlyph.prototype = $extend(alphaTab.renderi
 			canvas.FillRect(left + this.Width - blockWidth - blockWidth,top,this.get_Scale(),h);
 			canvas.FillRect(left + this.Width - blockWidth,top,blockWidth,h);
 		} else if(this.Renderer.get_NextRenderer() == null || this.Renderer.get_NextRenderer().Staff != this.Renderer.Staff || !this.Renderer.get_NextRenderer().Bar.get_MasterBar().IsRepeatStart) {
-			canvas.FillRect(left + this.Width,top,this.get_Scale(),h);
+			canvas.FillRect(left + this.Width - this.get_Scale(),top,this.get_Scale(),h);
 			if(this.Renderer.Bar.get_MasterBar().IsDoubleBar) {
 				canvas.FillRect(left + this.Width - 5 * this.get_Scale(),top,this.get_Scale(),h);
 			}
@@ -33139,7 +33142,8 @@ alphaTab.rendering.staves.StaveGroup.prototype = {
 				var t = HxOverrides.iter(tracks);
 				while(t.hasNext()) {
 					var t1 = t.next();
-					this.AccoladeSpacing = Math.max(this.AccoladeSpacing,canvas.MeasureText(t1.ShortName));
+					var this1 = Math.max(this.AccoladeSpacing,canvas.MeasureText(t1.ShortName));
+					this.AccoladeSpacing = js.Boot.__cast(Math.ceil(this1) , Float);
 				}
 				this.AccoladeSpacing = this.AccoladeSpacing + 2 * 10;
 				this.Width = this.Width + this.AccoladeSpacing;

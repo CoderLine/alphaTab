@@ -191,7 +191,6 @@ namespace AlphaTab.Rendering.Staves
                     realWidth = s.BarRenderers[s.BarRenderers.Count - 1].Width;
                 }
             }
-
             Width += realWidth;
             return realWidth;
         }
@@ -212,7 +211,7 @@ namespace AlphaTab.Rendering.Staves
                     canvas.Font = res;
                     foreach (var t in tracks)
                     {
-                        AccoladeSpacing = Math.Max(AccoladeSpacing, canvas.MeasureText(t.ShortName));
+                        AccoladeSpacing = (float)Math.Ceiling(Math.Max(AccoladeSpacing, canvas.MeasureText(t.ShortName)));
                     }
                     AccoladeSpacing += (2 * AccoladeLabelSpacing);
                     Width += AccoladeSpacing;

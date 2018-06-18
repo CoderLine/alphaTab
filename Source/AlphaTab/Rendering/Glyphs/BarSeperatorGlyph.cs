@@ -64,10 +64,10 @@ namespace AlphaTab.Rendering.Glyphs
                 // big bar
                 canvas.FillRect(left + Width - blockWidth, top, blockWidth, h);
             }
-            else if(Renderer.NextRenderer == null || Renderer.NextRenderer.Staff != Renderer.Staff || !Renderer.NextRenderer.Bar.MasterBar.IsRepeatStart)
+            else if (Renderer.NextRenderer == null || Renderer.NextRenderer.Staff != Renderer.Staff || !Renderer.NextRenderer.Bar.MasterBar.IsRepeatStart)
             {
                 // small bar
-                canvas.FillRect(left + Width, top, Scale, h);
+                canvas.FillRect(left + Width - Scale, top, Scale, h);
                 if (Renderer.Bar.MasterBar.IsDoubleBar)
                 {
                     canvas.FillRect(left + Width - 5 * Scale, top, Scale, h);
