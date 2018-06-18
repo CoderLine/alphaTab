@@ -28122,7 +28122,7 @@ alphaTab.rendering.glyphs.BendNoteHeadGroupGlyph.prototype = $extend(alphaTab.re
 			quarterBend = false;
 		}
 		var sr = js.Boot.__cast(this.Renderer , alphaTab.rendering.ScoreBarRenderer);
-		var noteHeadGlyph = new alphaTab.rendering.glyphs.NoteHeadGlyph(0,0,4,sr.get_Settings().SmallGraceTabNotes);
+		var noteHeadGlyph = new alphaTab.rendering.glyphs.NoteHeadGlyph(0,0,4,true);
 		var accidental = sr.AccidentalHelper.ApplyAccidentalForValue(noteValue,quarterBend);
 		var line = sr.AccidentalHelper.GetNoteLineForValue(noteValue,false);
 		var this1 = line;
