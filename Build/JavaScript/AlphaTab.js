@@ -5701,7 +5701,7 @@ alphaTab.rendering.effects.OttaviaEffectInfo.prototype = {
 		return new alphaTab.rendering.glyphs.OttavaGlyph(beat.Ottava,this._aboveStaff);
 	}
 	,CanExpand: function(from,to) {
-		return true;
+		return from.Ottava == to.Ottava;
 	}
 	,__class__: alphaTab.rendering.effects.OttaviaEffectInfo
 };
@@ -29899,6 +29899,7 @@ alphaTab.rendering.glyphs.ScoreBendGlyph.prototype = $extend(alphaTab.rendering.
 					var endY1 = endY + startNoteRenderer.GetScoreY(this2,0);
 					if(note.BendType == 5) {
 						alphaTab.rendering.glyphs.TieGlyph.PaintTie(canvas,this.get_Scale(),startX,startY,endX,endY1,direction == 1,22,4);
+						canvas.Fill();
 					} else {
 						this.DrawBendSlur(canvas,startX,startY,endX,endY1,direction == 1,this.get_Scale(),slurText);
 					}
@@ -29910,6 +29911,7 @@ alphaTab.rendering.glyphs.ScoreBendGlyph.prototype = $extend(alphaTab.rendering.
 					}
 					if(note.BendType == 5) {
 						alphaTab.rendering.glyphs.TieGlyph.PaintTie(canvas,this.get_Scale(),startX,startY,endX1,endY2,direction == 1,22,4);
+						canvas.Fill();
 					} else {
 						this.DrawBendSlur(canvas,startX,startY,endX1,endY2,direction == 1,this.get_Scale(),slurText);
 					}

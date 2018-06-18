@@ -58,7 +58,7 @@ namespace AlphaTab.Rendering.Effects
 
         public bool CanExpand(Beat from, Beat to)
         {
-            return true;
+            return from.Ottava == to.Ottava;
         }
     }
 }

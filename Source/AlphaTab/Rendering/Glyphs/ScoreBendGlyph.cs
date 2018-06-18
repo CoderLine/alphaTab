@@ -172,6 +172,7 @@ namespace AlphaTab.Rendering.Glyphs
                         {
                             TieGlyph.PaintTie(canvas, Scale, startX, startY, endX, endY,
                                 direction == BeamDirection.Down);
+                            canvas.Fill();
                         }
                         else
                         {
@@ -194,6 +195,7 @@ namespace AlphaTab.Rendering.Glyphs
                         {
                             TieGlyph.PaintTie(canvas, Scale, startX, startY, endX, endY,
                                 direction == BeamDirection.Down);
+                            canvas.Fill();
                         }
                         else
                         {
