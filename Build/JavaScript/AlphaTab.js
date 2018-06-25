@@ -55,7 +55,6 @@ $hx_exports["alphaTab"]["importer"]["_BinaryStylesheetParser_DataType"] = $hx_ex
 $hx_exports["alphaTab"]["collections"]["_StringBuilder"] = $hx_exports["alphaTab"]["collections"]["_StringBuilder"] || {};
 ;$hx_exports["alphaTab"]["collections"]["_FastList"] = $hx_exports["alphaTab"]["collections"]["_FastList"] || {};
 ;$hx_exports["alphaTab"]["collections"]["_FastDictionary"] = $hx_exports["alphaTab"]["collections"]["_FastDictionary"] || {};
-;$hx_exports["alphaTab"]["_WhammyMode"] = $hx_exports["alphaTab"]["_WhammyMode"] || {};
 ;$hx_exports["alphaTab"]["_FingeringMode"] = $hx_exports["alphaTab"]["_FingeringMode"] || {};
 ;$hx_exports["alphaTab"]["rendering"] = $hx_exports["alphaTab"]["rendering"] || {};
 $hx_exports["alphaTab"]["rendering"]["staves"] = $hx_exports["alphaTab"]["rendering"]["staves"] || {};
@@ -118,7 +117,7 @@ $hx_exports["alphaTab"]["platform"]["model"]["_TextBaseline"] = $hx_exports["alp
 ;$hx_exports["alphaTab"]["platform"]["model"]["_FontStyle"] = $hx_exports["alphaTab"]["platform"]["model"]["_FontStyle"] || {};
 ;$hx_exports["alphaTab"]["platform"]["svg"] = $hx_exports["alphaTab"]["platform"]["svg"] || {};
 $hx_exports["alphaTab"]["platform"]["svg"]["_SupportedFonts"] = $hx_exports["alphaTab"]["platform"]["svg"]["_SupportedFonts"] || {};
-;$hx_exports["alphaTab"]["_BendMode"] = $hx_exports["alphaTab"]["_BendMode"] || {};
+;$hx_exports["alphaTab"]["_DisplayMode"] = $hx_exports["alphaTab"]["_DisplayMode"] || {};
 var $estr = function() { return js.Boot.__string_rec(this,''); };
 function $extend(from, fields) {
 	function Inherit() {} Inherit.prototype = from; var proto = new Inherit();
@@ -321,46 +320,46 @@ alphaTab.AlphaTabException.prototype = $extend(system.Exception.prototype,{
 	}
 	,__class__: alphaTab.AlphaTabException
 });
-alphaTab._BendMode = {};
-alphaTab._BendMode.BendMode_Impl_ = $hx_exports["alphaTab"]["_BendMode"]["BendMode_Impl_"] = {};
-alphaTab._BendMode.BendMode_Impl_.__name__ = ["alphaTab","_BendMode","BendMode_Impl_"];
-alphaTab._BendMode.BendMode_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
+alphaTab._DisplayMode = {};
+alphaTab._DisplayMode.DisplayMode_Impl_ = $hx_exports["alphaTab"]["_DisplayMode"]["DisplayMode_Impl_"] = {};
+alphaTab._DisplayMode.DisplayMode_Impl_.__name__ = ["alphaTab","_DisplayMode","DisplayMode_Impl_"];
+alphaTab._DisplayMode.DisplayMode_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
 	return this1 != 0;
 };
-alphaTab._BendMode.BendMode_Impl_.ToChar_IFormatProvider = function(this1,provider) {
+alphaTab._DisplayMode.DisplayMode_Impl_.ToChar_IFormatProvider = function(this1,provider) {
 	return system.Convert.ToUInt16(this1);
 };
-alphaTab._BendMode.BendMode_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
+alphaTab._DisplayMode.DisplayMode_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
 	return system.Convert.ToInt8(this1);
 };
-alphaTab._BendMode.BendMode_Impl_.ToByte_IFormatProvider = function(this1,provider) {
+alphaTab._DisplayMode.DisplayMode_Impl_.ToByte_IFormatProvider = function(this1,provider) {
 	return system.Convert.ToUInt8(this1);
 };
-alphaTab._BendMode.BendMode_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
+alphaTab._DisplayMode.DisplayMode_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
 	return system.Convert.ToInt16(this1);
 };
-alphaTab._BendMode.BendMode_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
+alphaTab._DisplayMode.DisplayMode_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
 	return system.Convert.ToUInt16(this1);
 };
-alphaTab._BendMode.BendMode_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
+alphaTab._DisplayMode.DisplayMode_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
 	return this1;
 };
-alphaTab._BendMode.BendMode_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
+alphaTab._DisplayMode.DisplayMode_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
 	return system.Convert.ToUInt32(this1);
 };
-alphaTab._BendMode.BendMode_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
+alphaTab._DisplayMode.DisplayMode_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
 	return this1;
 };
-alphaTab._BendMode.BendMode_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
+alphaTab._DisplayMode.DisplayMode_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
 	return system.Convert.ToUInt32(this1);
 };
-alphaTab._BendMode.BendMode_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
+alphaTab._DisplayMode.DisplayMode_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
 	return this1;
 };
-alphaTab._BendMode.BendMode_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
+alphaTab._DisplayMode.DisplayMode_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
 	return this1;
 };
-alphaTab._BendMode.BendMode_Impl_.toString = function(this1) {
+alphaTab._DisplayMode.DisplayMode_Impl_.toString = function(this1) {
 	switch(this1) {
 	case 0:
 		return "GuitarPro";
@@ -5582,7 +5581,7 @@ alphaTab.rendering.effects.WhammyBarEffectInfo.prototype = {
 		return 4;
 	}
 	,ShouldCreateGlyph: function(settings,beat) {
-		if(settings.WhammyMode == 1) {
+		if(settings.DisplayMode == 1) {
 			if(beat.get_HasWhammyBar()) {
 				return beat.WhammyBarType != 3;
 			} else {
@@ -6649,8 +6648,7 @@ alphaTab.Settings = $hx_exports["alphaTab"]["Settings"] = function() {
 	this.ExtendBendArrowsOnTiedNotes = false;
 	this.ShowParenthesisForTiedBends = false;
 	this.ShowTabNoteOnTiedBend = false;
-	this.BendMode = 0;
-	this.WhammyMode = 0;
+	this.DisplayMode = 0;
 	this.FingeringMode = 0;
 	this.ShowZeroOnDiveWhammy = false;
 	this.ExtendLineEffectsToBeatEnd = false;
@@ -6806,15 +6804,10 @@ alphaTab.Settings.FillFromJson = function(settings,json,dataAttributes) {
 	} else if(dataAttributes != null && dataAttributes.hasOwnProperty("smallGraceTabNotes")) {
 		settings.SmallGraceTabNotes = dataAttributes["smallGraceTabNotes"];
 	}
-	if((json && "bendMode" in json)) {
-		settings.BendMode = alphaTab.Settings.DecodeBendMode(json.bendMode);
-	} else if(dataAttributes != null && dataAttributes.hasOwnProperty("bendMode")) {
-		settings.BendMode = alphaTab.Settings.DecodeBendMode(dataAttributes["bendMode"]);
-	}
-	if((json && "whammyMode" in json)) {
-		settings.WhammyMode = alphaTab.Settings.DecodeWhammyMode(json.whammyMode);
-	} else if(dataAttributes != null && dataAttributes.hasOwnProperty("whammyMode")) {
-		settings.WhammyMode = alphaTab.Settings.DecodeWhammyMode(dataAttributes["whammyMode"]);
+	if((json && "displayMode" in json)) {
+		settings.DisplayMode = alphaTab.Settings.DecodeDisplayMode(json.displayMode);
+	} else if(dataAttributes != null && dataAttributes.hasOwnProperty("displayMode")) {
+		settings.DisplayMode = alphaTab.Settings.DecodeDisplayMode(dataAttributes["displayMode"]);
 	}
 	if((json && "fingeringMode" in json)) {
 		settings.FingeringMode = alphaTab.Settings.DecodeFingeringMode(json.fingeringMode);
@@ -6957,24 +6950,7 @@ alphaTab.Settings.FillFromJson = function(settings,json,dataAttributes) {
 		}
 	}
 };
-alphaTab.Settings.DecodeBendMode = function(mode) {
-	if(typeof(mode) == "number") {
-		return mode;
-	}
-	if(typeof(mode) == "string") {
-		var s = mode;
-		var _g = s.toLowerCase();
-		switch(_g) {
-		case "guitarpro":
-			return 0;
-		case "songbook":
-			return 1;
-		default:
-		}
-	}
-	return 0;
-};
-alphaTab.Settings.DecodeWhammyMode = function(mode) {
+alphaTab.Settings.DecodeDisplayMode = function(mode) {
 	if(typeof(mode) == "number") {
 		return mode;
 	}
@@ -7133,8 +7109,7 @@ alphaTab.Settings.get_Defaults = function() {
 	settings.ExtendBendArrowsOnTiedNotes = true;
 	settings.ShowParenthesisForTiedBends = true;
 	settings.ShowTabNoteOnTiedBend = true;
-	settings.BendMode = 0;
-	settings.WhammyMode = 0;
+	settings.DisplayMode = 0;
 	settings.FingeringMode = 0;
 	settings.ShowZeroOnDiveWhammy = false;
 	settings.ExtendLineEffectsToBeatEnd = false;
@@ -7171,10 +7146,9 @@ alphaTab.Settings.prototype = {
 		json.extendBendArrowsOnTiedNotes = this.ExtendBendArrowsOnTiedNotes;
 		json.showParenthesisForTiedBends = this.ShowParenthesisForTiedBends;
 		json.showTabNoteOnTiedBend = this.ShowTabNoteOnTiedBend;
-		json.bendMode = this.BendMode;
+		json.displayMode = this.DisplayMode;
 		json.fingeringMode = this.FingeringMode;
 		json.showZeroOnDiveWhammy = this.ShowZeroOnDiveWhammy;
-		json.whammyMode = this.WhammyMode;
 		json.extendLineEffectsToBeatEnd = this.ExtendLineEffectsToBeatEnd;
 		json.scriptFile = this.ScriptFile;
 		json.fontDirectory = this.FontDirectory;
@@ -7249,54 +7223,6 @@ alphaTab.VibratoPlaybackSettings = $hx_exports["alphaTab"]["VibratoPlaybackSetti
 alphaTab.VibratoPlaybackSettings.__name__ = ["alphaTab","VibratoPlaybackSettings"];
 alphaTab.VibratoPlaybackSettings.prototype = {
 	__class__: alphaTab.VibratoPlaybackSettings
-};
-alphaTab._WhammyMode = {};
-alphaTab._WhammyMode.WhammyMode_Impl_ = $hx_exports["alphaTab"]["_WhammyMode"]["WhammyMode_Impl_"] = {};
-alphaTab._WhammyMode.WhammyMode_Impl_.__name__ = ["alphaTab","_WhammyMode","WhammyMode_Impl_"];
-alphaTab._WhammyMode.WhammyMode_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
-	return this1 != 0;
-};
-alphaTab._WhammyMode.WhammyMode_Impl_.ToChar_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToUInt16(this1);
-};
-alphaTab._WhammyMode.WhammyMode_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToInt8(this1);
-};
-alphaTab._WhammyMode.WhammyMode_Impl_.ToByte_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToUInt8(this1);
-};
-alphaTab._WhammyMode.WhammyMode_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToInt16(this1);
-};
-alphaTab._WhammyMode.WhammyMode_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToUInt16(this1);
-};
-alphaTab._WhammyMode.WhammyMode_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
-	return this1;
-};
-alphaTab._WhammyMode.WhammyMode_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToUInt32(this1);
-};
-alphaTab._WhammyMode.WhammyMode_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
-	return this1;
-};
-alphaTab._WhammyMode.WhammyMode_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToUInt32(this1);
-};
-alphaTab._WhammyMode.WhammyMode_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
-	return this1;
-};
-alphaTab._WhammyMode.WhammyMode_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	return this1;
-};
-alphaTab._WhammyMode.WhammyMode_Impl_.toString = function(this1) {
-	switch(this1) {
-	case 0:
-		return "GuitarPro";
-	case 1:
-		return "SongBook";
-	}
-	return "";
 };
 alphaTab.audio.BeatTickLookup = $hx_exports["alphaTab"]["audio"]["BeatTickLookup"] = function() {
 	this.Start = 0;
@@ -20028,9 +19954,9 @@ alphaTab.model.Beat.prototype = {
 				}
 			}
 		}
-		var bendMode = settings == null ? 0 : settings.BendMode;
+		var displayMode = settings == null ? 0 : settings.DisplayMode;
 		var isGradual = this.Text == "grad" || this.Text == "grad.";
-		if(isGradual && bendMode == 1) {
+		if(isGradual && displayMode == 1) {
 			this.Text = "";
 		}
 		var needCopyBeatForBend = false;
@@ -20045,7 +19971,7 @@ alphaTab.model.Beat.prototype = {
 			if(note.IsPalmMute) {
 				this.IsPalmMute = true;
 			}
-			if(bendMode == 1 && note.get_HasBend()) {
+			if(displayMode == 1 && note.get_HasBend()) {
 				if(note.BendType == 2 && !note.IsTieOrigin) {
 					needCopyBeatForBend = true;
 				}
@@ -20078,7 +20004,7 @@ alphaTab.model.Beat.prototype = {
 			}
 		}
 		if(this.WhammyBarPoints.length > 0 && this.WhammyBarType == 1) {
-			if(bendMode == 1) {
+			if(displayMode == 1) {
 				this.WhammyStyle = isGradual ? 1 : 2;
 			}
 			var isContinuedWhammy = this.IsContinuedWhammy = this.PreviousBeat != null && this.PreviousBeat.get_HasWhammyBar();
@@ -26451,7 +26377,7 @@ alphaTab.rendering.ScoreBarRenderer.prototype = $extend(alphaTab.rendering.BarRe
 	}
 	,PaintFooter: function(cx,cy,canvas,h) {
 		var beat = h.Beats[0];
-		if(beat.GraceType == 3 || beat.GraceType != 0 && this.get_Settings().BendMode == 1) {
+		if(beat.GraceType == 3 || beat.GraceType != 0 && this.get_Settings().DisplayMode == 1) {
 			return;
 		}
 		var isGrace = beat.GraceType != 0;
@@ -30762,7 +30688,7 @@ alphaTab.rendering.glyphs.ScoreWhammyBarGlyph.__name__ = ["alphaTab","rendering"
 alphaTab.rendering.glyphs.ScoreWhammyBarGlyph.__super__ = alphaTab.rendering.glyphs.ScoreHelperNotesBaseGlyph;
 alphaTab.rendering.glyphs.ScoreWhammyBarGlyph.prototype = $extend(alphaTab.rendering.glyphs.ScoreHelperNotesBaseGlyph.prototype,{
 	DoLayout: function() {
-		var whammyMode = this.Renderer.get_Settings().WhammyMode;
+		var whammyMode = this.Renderer.get_Settings().DisplayMode;
 		var _g = this._beat.WhammyBarType;
 		switch(_g) {
 		case 0:case 1:case 4:
@@ -30791,7 +30717,7 @@ alphaTab.rendering.glyphs.ScoreWhammyBarGlyph.prototype = $extend(alphaTab.rende
 			} else {
 				var middleGlyphs = new alphaTab.rendering.glyphs.BendNoteHeadGroupGlyph(false);
 				middleGlyphs.Renderer = this.Renderer;
-				if(this.Renderer.get_Settings().WhammyMode == 0) {
+				if(this.Renderer.get_Settings().DisplayMode == 0) {
 					var middleBendPoint = this._beat.WhammyBarPoints[1];
 					var note2 = $iterator(this._beat.Notes)();
 					while(note2.hasNext()) {
@@ -30803,7 +30729,7 @@ alphaTab.rendering.glyphs.ScoreWhammyBarGlyph.prototype = $extend(alphaTab.rende
 				this._bendNoteHeads.push(middleGlyphs);
 				var endGlyphs1 = new alphaTab.rendering.glyphs.BendNoteHeadGroupGlyph(false);
 				endGlyphs1.Renderer = this.Renderer;
-				if(this.Renderer.get_Settings().WhammyMode == 0) {
+				if(this.Renderer.get_Settings().DisplayMode == 0) {
 					var lastBendPoint = this._beat.WhammyBarPoints[this._beat.WhammyBarPoints.length - 1];
 					var note4 = $iterator(this._beat.Notes)();
 					while(note4.hasNext()) {
@@ -30829,7 +30755,7 @@ alphaTab.rendering.glyphs.ScoreWhammyBarGlyph.prototype = $extend(alphaTab.rende
 			return;
 		default:
 		}
-		var whammyMode = this.Renderer.get_Settings().WhammyMode;
+		var whammyMode = this.Renderer.get_Settings().DisplayMode;
 		var startNoteRenderer = js.Boot.__cast(this.Renderer.ScoreRenderer.Layout.GetRendererForBar(this.Renderer.Staff.get_StaveId(),beat.Voice.Bar) , alphaTab.rendering.ScoreBarRenderer);
 		var startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(beat,3);
 		var beatDirection = this.GetBeamDirection(beat,startNoteRenderer);
@@ -32127,7 +32053,7 @@ alphaTab.rendering.glyphs.TabWhammyBarGlyph.prototype = $extend(alphaTab.renderi
 	}
 	,DoLayout: function() {
 		alphaTab.rendering.glyphs.Glyph.prototype.DoLayout.call(this);
-		this._isSimpleDip = this.Renderer.get_Settings().WhammyMode == 1 && this._beat.WhammyBarType == 3;
+		this._isSimpleDip = this.Renderer.get_Settings().DisplayMode == 1 && this._beat.WhammyBarType == 3;
 		var minValue = null;
 		var maxValue = null;
 		var beat = this._beat;
@@ -32173,7 +32099,7 @@ alphaTab.rendering.glyphs.TabWhammyBarGlyph.prototype = $extend(alphaTab.renderi
 			if(endNoteRenderer == null || endNoteRenderer.Staff != startNoteRenderer.Staff) {
 				endBeat = null;
 				endNoteRenderer = null;
-			} else if(endBeat.get_HasWhammyBar() && (startNoteRenderer.get_Settings().WhammyMode != 1 || endBeat.WhammyBarType != 3)) {
+			} else if(endBeat.get_HasWhammyBar() && (startNoteRenderer.get_Settings().DisplayMode != 1 || endBeat.WhammyBarType != 3)) {
 				endXPositionType = 2;
 			} else {
 				endXPositionType = 0;
@@ -36643,8 +36569,8 @@ var DataView = $global.DataView || js.html.compat.DataView;
 var Float32Array = $global.Float32Array || js.html.compat.Float32Array._new;
 var Float64Array = $global.Float64Array || ($global.Float32Array ? "notsupported" : null) || js.html.compat.Float64Array._new;
 var Uint8Array = $global.Uint8Array || js.html.compat.Uint8Array._new;
-alphaTab._BendMode.BendMode_Impl_.GuitarPro = 0;
-alphaTab._BendMode.BendMode_Impl_.SongBook = 1;
+alphaTab._DisplayMode.DisplayMode_Impl_.GuitarPro = 0;
+alphaTab._DisplayMode.DisplayMode_Impl_.SongBook = 1;
 alphaTab.platform.svg.SvgCanvas.BlurCorrection = 0;
 alphaTab.platform.model.Color.BlackRgb = "#000000";
 alphaTab.platform.Platform.IsLittleEndian = true;
@@ -36711,8 +36637,6 @@ alphaTab.Environment.StaveProfileTabMixed = "tab-mixed";
 alphaTab.Environment.StaveProfileScore = "score";
 alphaTab._FingeringMode.FingeringMode_Impl_.Score = 0;
 alphaTab._FingeringMode.FingeringMode_Impl_.SingleNoteEffectBand = 1;
-alphaTab._WhammyMode.WhammyMode_Impl_.GuitarPro = 0;
-alphaTab._WhammyMode.WhammyMode_Impl_.SongBook = 1;
 alphaTab.audio.MidiUtils.QuarterTime = 960;
 alphaTab.audio.MidiUtils.PercussionChannel = 9;
 alphaTab.audio.MidiUtils.MinVelocity = 15;

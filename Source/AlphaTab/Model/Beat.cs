@@ -541,9 +541,9 @@ namespace AlphaTab.Model
                 }
             }
 
-            var bendMode = settings == null ? BendMode.GuitarPro : settings.BendMode;
+            var displayMode = settings == null ? DisplayMode.GuitarPro : settings.DisplayMode;
             var isGradual = Text == "grad" || Text == "grad.";
-            if (isGradual && bendMode == BendMode.SongBook)
+            if (isGradual && displayMode == DisplayMode.SongBook)
             {
                 Text = "";
             }
@@ -561,7 +561,7 @@ namespace AlphaTab.Model
                 {
                     IsPalmMute = true;
                 }
-                if (bendMode == BendMode.SongBook && note.HasBend)
+                if (displayMode == DisplayMode.SongBook && note.HasBend)
                 {
                     if (note.BendType == BendType.Bend && !note.IsTieOrigin)
                     {
@@ -619,7 +619,7 @@ namespace AlphaTab.Model
             // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all whammys
             if (WhammyBarPoints.Count > 0 && WhammyBarType == WhammyType.Custom)
             {
-                if (bendMode == BendMode.SongBook)
+                if (displayMode == DisplayMode.SongBook)
                 {
                     WhammyStyle = isGradual ? BendStyle.Gradual : BendStyle.Fast;
                 }

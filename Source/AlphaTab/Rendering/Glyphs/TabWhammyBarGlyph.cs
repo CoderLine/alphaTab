@@ -80,7 +80,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             base.DoLayout();
 
-            _isSimpleDip = Renderer.Settings.WhammyMode == WhammyMode.SongBook &&
+            _isSimpleDip = Renderer.Settings.DisplayMode == DisplayMode.SongBook &&
                            _beat.WhammyBarType == WhammyType.Dip;
 
             // 
@@ -152,7 +152,7 @@ namespace AlphaTab.Rendering.Glyphs
                 else
                 {
                     endXPositionType = endBeat.HasWhammyBar
-                                       && (startNoteRenderer.Settings.WhammyMode != WhammyMode.SongBook ||
+                                       && (startNoteRenderer.Settings.DisplayMode != DisplayMode.SongBook ||
                                            endBeat.WhammyBarType != WhammyType.Dip)
                         ? BeatXPosition.MiddleNotes
                         : BeatXPosition.PreNotes;

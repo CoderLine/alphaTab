@@ -197,10 +197,9 @@ namespace AlphaTab
             json.extendBendArrowsOnTiedNotes = ExtendBendArrowsOnTiedNotes;
             json.showParenthesisForTiedBends = ShowParenthesisForTiedBends;
             json.showTabNoteOnTiedBend = ShowTabNoteOnTiedBend;
-            json.bendMode = BendMode;
+            json.displayMode = DisplayMode;
             json.fingeringMode = FingeringMode;
             json.showZeroOnDiveWhammy = ShowZeroOnDiveWhammy;
-            json.whammyMode = WhammyMode;
             json.extendLineEffectsToBeatEnd = ExtendLineEffectsToBeatEnd;
 
             json.scriptFile = ScriptFile;
@@ -401,22 +400,13 @@ namespace AlphaTab
                 settings.SmallGraceTabNotes = (bool)dataAttributes["smallGraceTabNotes"];
             }
 
-            if (Platform.Platform.JsonExists(json, "bendMode"))
+            if (Platform.Platform.JsonExists(json, "displayMode"))
             {
-                settings.BendMode = DecodeBendMode(json.bendMode);
+                settings.DisplayMode = DecodeDisplayMode(json.displayMode);
             }
-            else if (dataAttributes != null && dataAttributes.ContainsKey("bendMode"))
+            else if (dataAttributes != null && dataAttributes.ContainsKey("displayMode"))
             {
-                settings.BendMode = DecodeBendMode(dataAttributes["bendMode"]);
-            }
-
-            if (Platform.Platform.JsonExists(json, "whammyMode"))
-            {
-                settings.WhammyMode = DecodeWhammyMode(json.whammyMode);
-            }
-            else if (dataAttributes != null && dataAttributes.ContainsKey("whammyMode"))
-            {
-                settings.WhammyMode = DecodeWhammyMode(dataAttributes["whammyMode"]);
+                settings.DisplayMode = DecodeDisplayMode(dataAttributes["displayMode"]);
             }
 
             if (Platform.Platform.JsonExists(json, "fingeringMode"))
@@ -624,11 +614,11 @@ namespace AlphaTab
             }
         }
 
-        private static BendMode DecodeBendMode(object mode)
+        private static DisplayMode DecodeDisplayMode(object mode)
         {
             if (Platform.Platform.TypeOf(mode) == "number")
             {
-                return (BendMode)mode;
+                return (DisplayMode)mode;
             }
 
             if (Platform.Platform.TypeOf(mode) == "string")
@@ -637,35 +627,13 @@ namespace AlphaTab
                 switch (s.ToLower())
                 {
                     case "songbook":
-                        return BendMode.SongBook;
+                        return DisplayMode.SongBook;
                     case "guitarpro":
-                        return BendMode.GuitarPro;
+                        return DisplayMode.GuitarPro;
                 }
             }
 
-            return BendMode.GuitarPro;
-        }
-
-        private static WhammyMode DecodeWhammyMode(object mode)
-        {
-            if (Platform.Platform.TypeOf(mode) == "number")
-            {
-                return (WhammyMode)mode;
-            }
-
-            if (Platform.Platform.TypeOf(mode) == "string")
-            {
-                var s = (string)mode;
-                switch (s.ToLower())
-                {
-                    case "songbook":
-                        return WhammyMode.SongBook;
-                    case "guitarpro":
-                        return WhammyMode.GuitarPro;
-                }
-            }
-
-            return WhammyMode.GuitarPro;
+            return DisplayMode.GuitarPro;
         }
 
         private static FingeringMode DecodeFingeringMode(object mode)

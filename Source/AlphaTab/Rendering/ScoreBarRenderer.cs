@@ -503,7 +503,7 @@ namespace AlphaTab.Rendering
         private void PaintFooter(float cx, float cy, ICanvas canvas, BeamingHelper h)
         {
             var beat = h.Beats[0];
-            if (beat.GraceType == GraceType.BendGrace || (beat.GraceType != GraceType.None && Settings.BendMode == BendMode.SongBook))
+            if (beat.GraceType == GraceType.BendGrace || (beat.GraceType != GraceType.None && Settings.DisplayMode == DisplayMode.SongBook))
             {
                 return;
             }

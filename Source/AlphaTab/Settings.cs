@@ -22,41 +22,30 @@ using AlphaTab.Util;
 namespace AlphaTab
 {
     /// <summary>
-    /// Lists all modes on how bends should be handled.
+    /// Lists all modes on how alphaTab can handle the display and playback of music notation. 
     /// </summary>
-    public enum BendMode
+    public enum DisplayMode
     {
         /// <summary>
-        /// Bends will be displayed and played as in GuitarPro.
-        /// Note heads are shown after the bended note to show the target note. 
-        /// Playback will follow the defined BendPoints. 
+        /// Music elements will be displayed and played as in Guitar Pro. 
         /// </summary>
         GuitarPro,
         /// <summary>
-        /// Bends will be displayed and played in a traditional SongBook manner. 
-        /// For bends additional grace beats are introduced. 
-        /// Bends are categorized into gradual and fast bends. 
-        /// - Gradual bends are indicated by beat text "grad" or "grad.". Bend will sound along the beat duration. 
-        /// - Fast bends are done right before the next note. If the next note is tied even on-beat of the next note. 
-        /// </summary>
-        SongBook
-    }
-
-    /// <summary>
-    /// Lists all modes on how whammy bars should be handled.
-    /// </summary>
-    public enum WhammyMode
-    {
-        /// <summary>
-        /// Whammy Bars will be displayed and played as in GuitarPro.
-        /// </summary>
-        GuitarPro,
-        /// <summary>
-        /// Whammy Bars will be displayed and played in a traditional SongBook manner. 
-        /// - Dips are shown as simple annotation over the beats
-        /// Whammy Bars are categorized into gradual and fast. 
-        /// - Gradual whammys are indicated by beat text "grad" or "grad.". Whammys will sound along the beat duration. 
-        /// - Fast whammys are done right the beat. 
+        /// Music elements will be displayed and played as in traditional songbooks.
+        /// Changes:
+        /// 1. Bends
+        ///     For bends additional grace beats are introduced. 
+        ///     Bends are categorized into gradual and fast bends. 
+        ///         - Gradual bends are indicated by beat text "grad" or "grad.". Bend will sound along the beat duration. 
+        ///         - Fast bends are done right before the next note. If the next note is tied even on-beat of the next note.
+        /// 2. Whammy Bars
+        ///     Dips are shown as simple annotation over the beats
+        ///     Whammy Bars are categorized into gradual and fast. 
+        ///         - Gradual whammys are indicated by beat text "grad" or "grad.". Whammys will sound along the beat duration. 
+        ///         - Fast whammys are done right the beat.
+        /// 3. Let Ring
+        ///     Tied notes with let ring are not shown in standard notation
+        ///     Let ring does not cause a longer playback, duration is defined via tied notes. 
         /// </summary>
         SongBook
     }
@@ -174,14 +163,9 @@ namespace AlphaTab
         public bool ShowTabNoteOnTiedBend { get; set; }
 
         /// <summary>
-        /// Gets or sets the bend mode to use for display and playback of bends. 
+        /// Gets or sets the mode to use for display and play music notation elements.
         /// </summary>
-        public BendMode BendMode { get; set; }
-
-        /// <summary>
-        /// Gets or sets the whammy mode to use for display and playback of whammys. 
-        /// </summary>
-        public WhammyMode WhammyMode { get; set; }
+        public DisplayMode DisplayMode { get; set; }
 
         /// <summary>
         /// Gets or sets the fingering mode to use. 
@@ -220,8 +204,7 @@ namespace AlphaTab
                 settings.ExtendBendArrowsOnTiedNotes = true;
                 settings.ShowParenthesisForTiedBends = true;
                 settings.ShowTabNoteOnTiedBend = true;
-                settings.BendMode = BendMode.GuitarPro;
-                settings.WhammyMode = WhammyMode.GuitarPro;
+                settings.DisplayMode = DisplayMode.GuitarPro;
                 settings.FingeringMode = FingeringMode.Score;
                 settings.ShowZeroOnDiveWhammy = false;
                 settings.ExtendLineEffectsToBeatEnd = false;
