@@ -445,7 +445,8 @@ alphaTab.platform.svg.SvgCanvas.prototype = {
 		this.Buffer += Std.string("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"");
 		this.Buffer += Std.string(width);
 		this.Buffer += Std.string("px\" height=\"");
-		this.Buffer += Std.string(height);
+		var s = system.Convert.ToInt32_Single(height);
+		this.Buffer += Std.string(s);
 		this.Buffer += Std.string("px\" class=\"alphaTabSurfaceSvg\">\n");
 		var this2 = "";
 		this._currentPath = this2;
@@ -26015,7 +26016,7 @@ alphaTab.rendering.RenderingResources.prototype = {
 		this.WordsFont = new alphaTab.platform.model.Font(serifFont,15 * scale,0);
 		this.TablatureFont = new alphaTab.platform.model.Font(sansFont,13 * scale,0);
 		this.GraceFont = new alphaTab.platform.model.Font(sansFont,11 * scale,0);
-		this.StaveLineColor = new alphaTab.platform.model.Color(0,0,0,255);
+		this.StaveLineColor = new alphaTab.platform.model.Color(165,165,165,255);
 		this.BarSeperatorColor = new alphaTab.platform.model.Color(34,34,17,255);
 		this.BarNumberFont = new alphaTab.platform.model.Font(sansFont,11 * scale,0);
 		this.BarNumberColor = new alphaTab.platform.model.Color(200,0,0,255);

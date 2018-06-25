@@ -723,14 +723,9 @@
             a bend is increased on a tied note. 
             </summary>
         </member>
-        <member name="P:AlphaTab.Settings.BendMode">
+        <member name="P:AlphaTab.Settings.DisplayMode">
             <summary>
-            Gets or sets the bend mode to use for display and playback of bends. 
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Settings.WhammyMode">
-            <summary>
-            Gets or sets the whammy mode to use for display and playback of whammys. 
+            Gets or sets the mode to use for display and play music notation elements.
             </summary>
         </member>
         <member name="P:AlphaTab.Settings.FingeringMode">
@@ -747,6 +742,11 @@
             <summary>
             If set to true, line effects (like w/bar, let-ring etc)
             are drawn until the end of the beat instead of the start. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Settings.Vibrato">
+            <summary>
+            Gets or sets the settings on how the vibrato audio is generated. 
             </summary>
         </member>
         <member name="T:AlphaTab.Importer.AlphaTexImporter">
@@ -835,6 +835,49 @@
             <summary>
             A list of terminals recognized by the alphaTex-parser
             </summary>
+        </member>
+        <member name="T:AlphaTab.Importer.BinaryStylesheetParser">
+             <summary>
+             A parser for the BinaryStylesheet file of Guitar Pro 6 and 7. 
+             </summary>
+             <remarks>
+             The BinaryStylesheet is a simple binary key-value store.
+            
+             File: 
+                 int32 (big endian) | Number of KeyValuePairs
+                 KeyValuePair[]     | The raw records 
+            
+             KeyValuePair:
+                 1 Byte  | length of the key
+                 n Bytes | key as utf8 encoded string
+                 1 Byte  | Data Type
+                 n Bytes | Value
+            
+             Values based on Data Type:
+                 0 = bool
+                     0 == false
+                 1 = int32 (big endian)
+                 2 = float (big endian, IEEE)
+                 3 = string
+                   int16 (big endian) | length of string
+                   n bytes            | utf-8 encoded string
+                 4 = point
+                   int32 (big endian) | X-coordinate
+                   int32 (big endian) | Y-coordinate
+                 5 = size
+                   int32 (big endian) | Width
+                   int32 (big endian) | Height
+                 6 = rectangle
+                   int32 (big endian) | X-coordinate
+                   int32 (big endian) | Y-coordinate
+                   int32 (big endian) | Width
+                   int32 (big endian) | Height
+                 7 = color
+                   1 byte | Red
+                   1 byte | Green
+                   1 byte | Blue
+                   1 byte | Alpha
+             </remarks>
         </member>
         <member name="M:AlphaTab.Importer.GpBinaryHelpers.GpReadStringIntUnused(AlphaTab.IO.IReadable)">
             <summary>
@@ -2153,7 +2196,7 @@
             <param name="note"></param>
             <returns></returns>
         </member>
-        <member name="M:AlphaTab.Rendering.Utils.AccidentalHelper.ApplyAccidentalForValue(System.Int32,System.Boolean)">
+        <member name="M:AlphaTab.Rendering.Utils.AccidentalHelper.ApplyAccidentalForValue(AlphaTab.Model.Beat,System.Int32,System.Boolean)">
             <summary>
             Calculates the accidental for the given note value and assignes the value to it. 
             The new accidental type is also registered within the current scope
@@ -2249,44 +2292,33 @@
             <param name="note"></param>
             <returns></returns>
         </member>
-        <member name="T:AlphaTab.BendMode">
+        <member name="T:AlphaTab.DisplayMode">
             <summary>
-            Lists all modes on how bends should be handled.
+            Lists all modes on how alphaTab can handle the display and playback of music notation. 
             </summary>
         </member>
-        <member name="F:AlphaTab.BendMode.GuitarPro">
+        <member name="F:AlphaTab.DisplayMode.GuitarPro">
             <summary>
-            Bends will be displayed and played as in GuitarPro.
-            Note heads are shown after the bended note to show the target note. 
-            Playback will follow the defined BendPoints. 
+            Music elements will be displayed and played as in Guitar Pro. 
             </summary>
         </member>
-        <member name="F:AlphaTab.BendMode.SongBook">
+        <member name="F:AlphaTab.DisplayMode.SongBook">
             <summary>
-            Bends will be displayed and played in a traditional SongBook manner. 
-            For bends additional grace beats are introduced. 
-            Bends are categorized into gradual and fast bends. 
-            - Gradual bends are indicated by beat text "grad" or "grad.". Bend will sound along the beat duration. 
-            - Fast bends are done right before the next note. If the next note is tied even on-beat of the next note. 
-            </summary>
-        </member>
-        <member name="T:AlphaTab.WhammyMode">
-            <summary>
-            Lists all modes on how whammy bars should be handled.
-            </summary>
-        </member>
-        <member name="F:AlphaTab.WhammyMode.GuitarPro">
-            <summary>
-            Whammy Bars will be displayed and played as in GuitarPro.
-            </summary>
-        </member>
-        <member name="F:AlphaTab.WhammyMode.SongBook">
-            <summary>
-            Whammy Bars will be displayed and played in a traditional SongBook manner. 
-            - Dips are shown as simple annotation over the beats
-            Whammy Bars are categorized into gradual and fast. 
-            - Gradual whammys are indicated by beat text "grad" or "grad.". Whammys will sound along the beat duration. 
-            - Fast whammys are done right the beat. 
+            Music elements will be displayed and played as in traditional songbooks.
+            Changes:
+            1. Bends
+                For bends additional grace beats are introduced. 
+                Bends are categorized into gradual and fast bends. 
+                    - Gradual bends are indicated by beat text "grad" or "grad.". Bend will sound along the beat duration. 
+                    - Fast bends are done right before the next note. If the next note is tied even on-beat of the next note.
+            2. Whammy Bars
+                Dips are shown as simple annotation over the beats
+                Whammy Bars are categorized into gradual and fast. 
+                    - Gradual whammys are indicated by beat text "grad" or "grad.". Whammys will sound along the beat duration. 
+                    - Fast whammys are done right the beat.
+            3. Let Ring
+                Tied notes with let ring are not shown in standard notation
+                Let ring does not cause a longer playback, duration is defined via tied notes. 
             </summary>
         </member>
         <member name="T:AlphaTab.FingeringMode">
@@ -2357,36 +2389,6 @@
         <member name="T:AlphaTab.Xml.XmlParser.XmlState">
             <summary>
             faster than enum
-            </summary>
-        </member>
-        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
-            <summary>
-            GeneratedInternalTypeHelper
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
-            <summary>
-            CreateInstance
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            GetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            SetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
-            <summary>
-            CreateDelegate
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
-            <summary>
-            AddEventHandler
             </summary>
         </member>
     </members>

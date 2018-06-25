@@ -73,7 +73,7 @@ namespace AlphaTab.Rendering
             TablatureFont = new Font(sansFont, 13 * scale);
             GraceFont = new Font(sansFont, 11 * scale);
 
-            StaveLineColor = new Color(0, 0, 0);
+            StaveLineColor = new Color(165, 165, 165);
             BarSeperatorColor = new Color(34, 34, 17);
 
             BarNumberFont = new Font(sansFont, 11 * scale);
