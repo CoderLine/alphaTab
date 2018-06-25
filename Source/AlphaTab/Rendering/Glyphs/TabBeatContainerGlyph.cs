@@ -58,40 +58,10 @@ namespace AlphaTab.Rendering.Glyphs
                 var tie = new TabTieGlyph(n.TieOrigin, n, false, true);
                 Ties.Add(tie);
             }
-            else if (n.IsHammerPullOrigin)
-            {
-                // only create tie for very first origin of "group"
-                if (n.HammerPullOrigin == null)
-                {
-                    // tie with end note
-                    Note destination = n.HammerPullDestination;
-                    while (destination.HammerPullDestination != null)
-                    {
-                        destination = destination.HammerPullDestination;
-                    }
-                    var tie = new TabTieGlyph(n, destination, false);
-                    Ties.Add(tie);
-                }
-            }
-            else if (n.IsHammerPullDestination)
-            {
-                // only create tie for last destination of "group"
-                // NOTE: HOPOs over more than 2 staffs does not work with this mechanism, but this sounds unrealistic
-                if (n.HammerPullDestination == null)
-                {
-                    Note origin = n.HammerPullOrigin;
-                    while (origin.HammerPullOrigin != null)
-                    {
-                        origin = origin.HammerPullOrigin;
-                    }
-                    var tie = new TabTieGlyph(origin, n, false, true);
-                    Ties.Add(tie);
-                }
-            }
 
-            if (n.SlideType == SlideType.Legato)
+            if (n.SlurOrigin != null)
             {
-                var tie = new TabTieGlyph(n, n.SlideTarget, true, false);
+                var tie = new TabSlurGlyph(n);
                 Ties.Add(tie);
             }
 

@@ -21839,6 +21839,7 @@ alphaTab.model.Note.prototype = {
 			this.IsSlurOrigin = true;
 			this.SlurDestination = nextNoteOnLine.get_Value();
 			if(!this.get_IsSlurDestination()) {
+				this.SlurOrigin = this;
 				if(this.SlurDestination != null) {
 					this.SlurDestination.SlurOrigin = this;
 				}
@@ -30620,7 +30621,7 @@ alphaTab.rendering.glyphs.ScoreSlurGlyph.prototype = $extend(alphaTab.rendering.
 		}
 	}
 	,Paint: function(cx,cy,canvas) {
-		var slurId = "Slur" + this._startBeat.SlurOrigin.Id;
+		var slurId = "score.slur." + this._startBeat.SlurOrigin.Id;
 		var renderer = this.Renderer;
 		var isSlurRendered = renderer.Staff.GetSharedLayoutData(slurId,false);
 		if(!isSlurRendered) {
@@ -31026,24 +31027,10 @@ alphaTab.rendering.glyphs.TabBeatContainerGlyph.prototype = $extend(alphaTab.ren
 		if(n.IsTieDestination && renderer.ShowTiedNotes) {
 			var tie1 = new alphaTab.rendering.glyphs.TabTieGlyph(n.TieOrigin,n,false,true);
 			this.Ties.push(tie1);
-		} else if(n.IsHammerPullOrigin) {
-			if(n.HammerPullOrigin == null) {
-				var destination = n.HammerPullDestination;
-				while(destination.HammerPullDestination != null) destination = destination.HammerPullDestination;
-				var tie2 = new alphaTab.rendering.glyphs.TabTieGlyph(n,destination,false,false);
-				this.Ties.push(tie2);
-			}
-		} else if(n.get_IsHammerPullDestination()) {
-			if(n.HammerPullDestination == null) {
-				var origin = n.HammerPullOrigin;
-				while(origin.HammerPullOrigin != null) origin = origin.HammerPullOrigin;
-				var tie3 = new alphaTab.rendering.glyphs.TabTieGlyph(origin,n,false,true);
-				this.Ties.push(tie3);
-			}
 		}
-		if(n.SlideType == 2) {
-			var tie4 = new alphaTab.rendering.glyphs.TabTieGlyph(n,n.SlideTarget,true,false);
-			this.Ties.push(tie4);
+		if(n.SlurOrigin != null) {
+			var tie2 = new alphaTab.rendering.glyphs.TabSlurGlyph(n);
+			this.Ties.push(tie2);
 		}
 		if(n.SlideType != 0) {
 			var l = new alphaTab.rendering.glyphs.TabSlideLineGlyph(n.SlideType,n,this);
@@ -32026,6 +32013,50 @@ alphaTab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphaTab.renderi
 		}
 	}
 	,__class__: alphaTab.rendering.glyphs.TabSlideLineGlyph
+});
+alphaTab.rendering.glyphs.TabSlurGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["TabSlurGlyph"] = function(startNote) {
+	alphaTab.rendering.glyphs.Glyph.call(this,0,0);
+	this._startNote = null;
+	this._startNote = startNote;
+};
+alphaTab.rendering.glyphs.TabSlurGlyph.__name__ = ["alphaTab","rendering","glyphs","TabSlurGlyph"];
+alphaTab.rendering.glyphs.TabSlurGlyph.__super__ = alphaTab.rendering.glyphs.Glyph;
+alphaTab.rendering.glyphs.TabSlurGlyph.prototype = $extend(alphaTab.rendering.glyphs.Glyph.prototype,{
+	GetBeamDirection: function(note) {
+		if(note.String > 3) {
+			return 0;
+		} else {
+			return 1;
+		}
+	}
+	,Paint: function(cx,cy,canvas) {
+		var slurId = "tab.slur." + this._startNote.SlurOrigin.Beat.Id + "." + this._startNote.SlurOrigin.SlurDestination.Beat.Id;
+		var renderer = this.Renderer;
+		var isSlurRendered = renderer.Staff.GetSharedLayoutData(slurId,false);
+		if(!isSlurRendered) {
+			renderer.Staff.SetSharedLayoutData(slurId,true);
+			var startNoteRenderer = this.Renderer.ScoreRenderer.Layout.GetRendererForBar(this.Renderer.Staff.get_StaveId(),this._startNote.Beat.Voice.Bar);
+			var direction = this.GetBeamDirection(this._startNote);
+			var startX = cx + startNoteRenderer.X;
+			var startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,direction == 0);
+			if(this._startNote.SlurOrigin.Id == this._startNote.Id) {
+				startX = startX + startNoteRenderer.GetBeatX(this._startNote.Beat,2);
+			}
+			var endNote = this._startNote.SlurOrigin.SlurDestination;
+			var endNoteRenderer = this.Renderer.ScoreRenderer.Layout.GetRendererForBar(this.Renderer.Staff.get_StaveId(),endNote.Beat.Voice.Bar);
+			var endX;
+			var endY = startY;
+			if(endNoteRenderer == null || startNoteRenderer.Staff != endNoteRenderer.Staff) {
+				endNoteRenderer = startNoteRenderer.Staff.BarRenderers[startNoteRenderer.Staff.BarRenderers.length - 1];
+				endX = cx + endNoteRenderer.X + endNoteRenderer.Width;
+			} else {
+				endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endNote.Beat,2);
+			}
+			alphaTab.rendering.glyphs.TieGlyph.PaintTie(canvas,this.get_Scale(),startX,startY,endX,endY,direction == 1,22,4);
+			canvas.Fill();
+		}
+	}
+	,__class__: alphaTab.rendering.glyphs.TabSlurGlyph
 });
 alphaTab.rendering.glyphs.TabTieGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["TabTieGlyph"] = function(startNote,endNote,forSlide,forEnd) {
 	if(forEnd == null) {

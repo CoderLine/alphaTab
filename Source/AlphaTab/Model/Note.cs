@@ -702,9 +702,10 @@ namespace AlphaTab.Model
             if (IsHammerPullOrigin || SlideType == SlideType.Legato)
             {
                 IsSlurOrigin = true;
-                    SlurDestination = nextNoteOnLine.Value;
+                SlurDestination = nextNoteOnLine.Value;
                 if (!IsSlurDestination)
                 {
+                    SlurOrigin = this;
                     if (SlurDestination != null)
                     {
                         SlurDestination.SlurOrigin = this;
