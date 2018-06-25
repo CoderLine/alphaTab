@@ -134,6 +134,8 @@ namespace AlphaTab.Rendering.Glyphs
 
                 endX -= EndPadding * Scale;
 
+                var slurText = beat.WhammyStyle == BendStyle.Gradual && i == 0 ? "grad." : "";
+
                 ScoreBarRenderer endNoteRenderer = null;
                 if (note.IsTieOrigin)
                 {
@@ -186,12 +188,12 @@ namespace AlphaTab.Rendering.Glyphs
                         if (_bendNoteHeads[0].ContainsNoteValue(endValue))
                         {
                             endY = _bendNoteHeads[0].GetNoteValueY(endValue) + heightOffset;
-                            DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale);
+                            DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale, slurText);
                         }
                         else if (endNoteRenderer != null && (note.IsTieOrigin && note.TieDestination.Beat.HasWhammyBar || (note.Beat.IsContinuedWhammy)))
                         {
                             endY = cy + endNoteRenderer.Y + endNoteRenderer.GetNoteY(note.TieDestination, true);
-                            DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale);
+                            DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale, slurText);
                         }
                         else if (note.IsTieOrigin)
                         {
@@ -253,14 +255,14 @@ namespace AlphaTab.Rendering.Glyphs
                             var middleValue = GetBendNoteValue(note, beat.WhammyBarPoints[1]);
                             var middleY = _bendNoteHeads[0].GetNoteValueY(middleValue) + heightOffset;
                             DrawBendSlur(canvas, startX, startY, middleX, middleY, direction == BeamDirection.Down,
-                                Scale);
+                                Scale, slurText);
 
                             _bendNoteHeads[1].X = endX - _bendNoteHeads[1].NoteHeadOffset;
                             _bendNoteHeads[1].Y = cy + startNoteRenderer.Y;
                             _bendNoteHeads[1].Paint(0, 0, canvas);
                             endValue = GetBendNoteValue(note, beat.WhammyBarPoints[beat.WhammyBarPoints.Count - 1]);
                             endY = _bendNoteHeads[1].GetNoteValueY(endValue) + heightOffset;
-                            DrawBendSlur(canvas, middleX, middleY, endX, endY, direction == BeamDirection.Down, Scale);
+                            DrawBendSlur(canvas, middleX, middleY, endX, endY, direction == BeamDirection.Down, Scale, slurText);
                         }
 
                         break;
@@ -275,7 +277,7 @@ namespace AlphaTab.Rendering.Glyphs
                                    startNoteRenderer.GetScoreY(startNoteRenderer.AccidentalHelper.GetNoteLineForValue(note.DisplayValue - note.Beat.WhammyBarPoints[0].Value / 2))
                                    + heightOffset;
 
-                        DrawBendSlur(canvas, preX, preY, startX, startY, direction == BeamDirection.Down, Scale);
+                        DrawBendSlur(canvas, preX, preY, startX, startY, direction == BeamDirection.Down, Scale, slurText);
 
                         if (_bendNoteHeads.Count > 0)
                         {
@@ -285,7 +287,7 @@ namespace AlphaTab.Rendering.Glyphs
 
                             endValue = GetBendNoteValue(note, beat.WhammyBarPoints[beat.WhammyBarPoints.Count - 1]);
                             endY = _bendNoteHeads[0].GetNoteValueY(endValue) + heightOffset;
-                            DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale);
+                            DrawBendSlur(canvas, startX, startY, endX, endY, direction == BeamDirection.Down, Scale, slurText);
                         }
 
                         break;

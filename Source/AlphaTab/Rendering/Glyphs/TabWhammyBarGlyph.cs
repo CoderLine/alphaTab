@@ -106,9 +106,9 @@ namespace AlphaTab.Rendering.Glyphs
 
             var topOffset = maxValue.Value > 0 ? Math.Abs(GetOffset(maxValue.Value)) : 0;
 
-            if (topOffset > 0 || _beat.WhammyBarPoints[0].Value != 0)
+            if (topOffset > 0 || _beat.WhammyBarPoints[0].Value != 0 || Renderer.Settings.ShowZeroOnDiveWhammy)
             {
-                topOffset += Renderer.Resources.TablatureFont.Size * 1.5f;
+                topOffset += Renderer.Resources.TablatureFont.Size * 2f;
             }
 
             var bottomOffset = minValue.Value < 0 ? Math.Abs(GetOffset(minValue.Value)) : 0;

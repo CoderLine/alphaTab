@@ -167,6 +167,10 @@ namespace AlphaTab.Rendering.Utils
             {
                 value += n.MaxBendPoint.Value / 2;
             }
+            if (n.Beat.HasWhammyBar)
+            {
+                value += n.Beat.MaxWhammyPoint.Value / 2;
+            }
 
             if (n.HarmonicType != HarmonicType.None && n.HarmonicType != HarmonicType.Natural)
             {
@@ -180,7 +184,11 @@ namespace AlphaTab.Rendering.Utils
         {
             int value = GetValue(n);
             // we do not need to consider bends here as bends always can go up
-            // whammy bar might need to considered here once it's rendered like bends. 
+            if (n.Beat.HasWhammyBar)
+            {
+                value += n.Beat.MinWhammyPoint.Value / 2;
+            }
+
             return value;
         }
 

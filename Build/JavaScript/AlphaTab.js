@@ -5528,7 +5528,7 @@ alphaTab.rendering.effects.ChordsEffectInfo.prototype = {
 		return beat.get_HasChord();
 	}
 	,CreateNewGlyph: function(renderer,beat) {
-		return new alphaTab.rendering.glyphs.TextGlyph(0,0,beat.get_Chord().Name,renderer.get_Resources().EffectFont,0);
+		return new alphaTab.rendering.glyphs.TextGlyph(0,0,beat.get_Chord().Name,renderer.get_Resources().EffectFont,1);
 	}
 	,CanExpand: function(from,to) {
 		return false;
@@ -19635,10 +19635,10 @@ alphaTab.model.Beat = $hx_exports["alphaTab"]["model"]["Beat"] = function() {
 	this.Ottava = 0;
 	this.Fermata = null;
 	this.IsLegatoOrigin = false;
-	this._minNote = null;
-	this._maxNote = null;
-	this._maxStringNote = null;
-	this._minStringNote = null;
+	this.MinNote = null;
+	this.MaxNote = null;
+	this.MaxStringNote = null;
+	this.MinStringNote = null;
 	this.Duration = -4;
 	this.IsNewLetRing = false;
 	this.IsLetRing = false;
@@ -19758,32 +19758,12 @@ alphaTab.model.Beat.prototype = {
 			return false;
 		}
 	}
-	,get_MinNote: function() {
-		if(this._minNote == null) {
-			this.RefreshNotes();
-		}
-		return this._minNote;
-	}
-	,get_MaxNote: function() {
-		if(this._maxNote == null) {
-			this.RefreshNotes();
-		}
-		return this._maxNote;
-	}
-	,get_MaxStringNote: function() {
-		if(this._maxStringNote == null) {
-			this.RefreshNotes();
-		}
-		return this._maxStringNote;
-	}
-	,get_MinStringNote: function() {
-		if(this._minStringNote == null) {
-			this.RefreshNotes();
-		}
-		return this._minStringNote;
-	}
 	,get_IsRest: function() {
-		return this.Notes.length == 0;
+		if(!this.IsEmpty) {
+			return this.Notes.length == 0;
+		} else {
+			return true;
+		}
 	}
 	,get_HasTuplet: function() {
 		if(!(this.TupletDenominator == -1 && this.TupletNumerator == -1)) {
@@ -19891,31 +19871,6 @@ alphaTab.model.Beat.prototype = {
 				this.Notes.splice(index,1);
 			}
 		}
-		if(note == this._minNote || note == this._maxNote || note == this._minStringNote || note == this._maxStringNote) {
-			this.RefreshNotes();
-		}
-	}
-	,RefreshNotes: function() {
-		var i = 0;
-		var j = this.Notes.length;
-		while(i < j) {
-			var note = this.Notes[i];
-			if(note.IsVisible) {
-				if(this._minNote == null || note.get_RealValue() < this._minNote.get_RealValue()) {
-					this._minNote = note;
-				}
-				if(this._maxNote == null || note.get_RealValue() > this._maxNote.get_RealValue()) {
-					this._maxNote = note;
-				}
-				if(this._minStringNote == null || note.String < this._minStringNote.String) {
-					this._minStringNote = note;
-				}
-				if(this._maxStringNote == null || note.String > this._maxStringNote.String) {
-					this._maxStringNote = note;
-				}
-			}
-			++i;
-		}
 	}
 	,GetAutomation: function(type) {
 		var i = 0;
@@ -19975,6 +19930,10 @@ alphaTab.model.Beat.prototype = {
 			this.Text = "";
 		}
 		var needCopyBeatForBend = false;
+		this.MinNote = null;
+		this.MaxNote = null;
+		this.MinStringNote = null;
+		this.MaxStringNote = null;
 		var i = 0;
 		var j = this.Notes.length;
 		while(i < j) {
@@ -19997,7 +19956,24 @@ alphaTab.model.Beat.prototype = {
 					note.BendStyle = 2;
 				}
 			}
+			if(note.IsVisible) {
+				if(this.MinNote == null || note.get_RealValue() < this.MinNote.get_RealValue()) {
+					this.MinNote = note;
+				}
+				if(this.MaxNote == null || note.get_RealValue() > this.MaxNote.get_RealValue()) {
+					this.MaxNote = note;
+				}
+				if(this.MinStringNote == null || note.String < this.MinStringNote.String) {
+					this.MinStringNote = note;
+				}
+				if(this.MaxStringNote == null || note.String > this.MaxStringNote.String) {
+					this.MaxStringNote = note;
+				}
+			}
 			++i;
+		}
+		if(this.MinNote == null) {
+			this.IsEmpty = true;
 		}
 		if(!this.get_IsRest() && (!this.IsLetRing || !this.IsPalmMute)) {
 			var currentBeat = this.PreviousBeat;
@@ -25296,6 +25272,8 @@ alphaTab.rendering.BarRendererBase.prototype = {
 		this._postBeatGlyphs.Paint(cx + this.X,cy + this.Y,canvas);
 	}
 	,PaintBackground: function(cx,cy,canvas) {
+		canvas.set_Color(alphaTab.platform.model.Color.Random(100));
+		canvas.FillRect(cx + this.X,cy + this.Y - this.TopOverflow,this.Width,this.Height + this.TopOverflow + this.BottomOverflow);
 	}
 	,BuildBoundingsLookup: function(masterBarBounds,cx,cy) {
 		var _gthis = this;
@@ -30064,8 +30042,8 @@ alphaTab.rendering.glyphs.ScoreBrushGlyph.prototype = $extend(alphaTab.rendering
 	,Paint: function(cx,cy,canvas) {
 		var scoreBarRenderer = js.Boot.__cast(this.Renderer , alphaTab.rendering.ScoreBarRenderer);
 		var lineSize = scoreBarRenderer.get_LineOffset();
-		var startY = cy + this.Y + (scoreBarRenderer.GetNoteY(this._beat.get_MaxNote(),false) - lineSize);
-		var endY = cy + this.Y + scoreBarRenderer.GetNoteY(this._beat.get_MinNote(),false) + lineSize;
+		var startY = cy + this.Y + (scoreBarRenderer.GetNoteY(this._beat.MaxNote,false) - lineSize);
+		var endY = cy + this.Y + scoreBarRenderer.GetNoteY(this._beat.MinNote,false) + lineSize;
 		var arrowX = cx + this.X + this.Width / 2;
 		var arrowSize = 8 * this.get_Scale();
 		if(this._beat.BrushType != 0) {
@@ -30256,9 +30234,9 @@ alphaTab.rendering.glyphs.ScoreLegatoGlyph.prototype = $extend(alphaTab.renderin
 			return (js.Boot.__cast(noteRenderer , alphaTab.rendering.ScoreBarRenderer)).GetScoreY(9,0);
 		}
 		if(direction == 0) {
-			return noteRenderer.GetNoteY(this.StartBeat.get_MinNote(),false);
+			return noteRenderer.GetNoteY(this.StartBeat.MinNote,false);
 		} else {
-			return noteRenderer.GetNoteY(this.StartBeat.get_MaxNote(),false);
+			return noteRenderer.GetNoteY(this.StartBeat.MaxNote,false);
 		}
 	}
 	,GetEndY: function(noteRenderer,direction) {
@@ -30270,23 +30248,23 @@ alphaTab.rendering.glyphs.ScoreLegatoGlyph.prototype = $extend(alphaTab.renderin
 			}
 		}
 		if(direction == 0) {
-			return (js.Boot.__cast(noteRenderer , alphaTab.rendering.ScoreBarRenderer)).GetNoteY(this.EndBeat.get_MinNote(),false);
+			return (js.Boot.__cast(noteRenderer , alphaTab.rendering.ScoreBarRenderer)).GetNoteY(this.EndBeat.MinNote,false);
 		} else {
-			return (js.Boot.__cast(noteRenderer , alphaTab.rendering.ScoreBarRenderer)).GetNoteY(this.EndBeat.get_MaxNote(),false);
+			return (js.Boot.__cast(noteRenderer , alphaTab.rendering.ScoreBarRenderer)).GetNoteY(this.EndBeat.MaxNote,false);
 		}
 	}
 	,GetStartX: function(noteRenderer) {
 		if(this.StartBeat.get_IsRest()) {
 			return noteRenderer.GetBeatX(this.StartBeat,0);
 		} else {
-			return noteRenderer.GetNoteX(this.StartBeat.get_MinNote(),true);
+			return noteRenderer.GetNoteX(this.StartBeat.MinNote,true);
 		}
 	}
 	,GetEndX: function(noteRenderer) {
 		if(this.EndBeat.get_IsRest()) {
 			return noteRenderer.GetBeatX(this.EndBeat,0);
 		} else {
-			return noteRenderer.GetNoteX(this.EndBeat.get_MinNote(),false);
+			return noteRenderer.GetNoteX(this.EndBeat.MinNote,false);
 		}
 	}
 	,__class__: alphaTab.rendering.glyphs.ScoreLegatoGlyph
@@ -30813,6 +30791,7 @@ alphaTab.rendering.glyphs.ScoreWhammyBarGlyph.prototype = $extend(alphaTab.rende
 				endX = endX + startNoteRenderer.GetBeatX(beat,4);
 			}
 			endX = endX - ((8 / 2 | 0) + 3) * this.get_Scale();
+			var slurText = beat.WhammyStyle == 1 && i == 0 ? "grad." : "";
 			var endNoteRenderer = null;
 			if(note.IsTieOrigin) {
 				endNoteRenderer = this.Renderer.ScoreRenderer.Layout.GetRendererForBar(this.Renderer.Staff.get_StaveId(),note.TieDestination.Beat.Voice.Bar);
@@ -30840,10 +30819,10 @@ alphaTab.rendering.glyphs.ScoreWhammyBarGlyph.prototype = $extend(alphaTab.rende
 				endValue = this.GetBendNoteValue(note,beat.WhammyBarPoints[beat.WhammyBarPoints.length - 1]);
 				if(this._bendNoteHeads[0].ContainsNoteValue(endValue)) {
 					endY = this._bendNoteHeads[0].GetNoteValueY(endValue,false) + heightOffset;
-					this.DrawBendSlur(canvas,startX,startY,endX,endY,direction == 1,this.get_Scale(),null);
+					this.DrawBendSlur(canvas,startX,startY,endX,endY,direction == 1,this.get_Scale(),slurText);
 				} else if(endNoteRenderer != null && (note.IsTieOrigin && note.TieDestination.Beat.get_HasWhammyBar() || note.Beat.IsContinuedWhammy)) {
 					endY = cy + endNoteRenderer.Y + endNoteRenderer.GetNoteY(note.TieDestination,true);
-					this.DrawBendSlur(canvas,startX,startY,endX,endY,direction == 1,this.get_Scale(),null);
+					this.DrawBendSlur(canvas,startX,startY,endX,endY,direction == 1,this.get_Scale(),slurText);
 				} else if(note.IsTieOrigin) {
 					if(endNoteRenderer == null) {
 						endY = startY;
@@ -30883,13 +30862,13 @@ alphaTab.rendering.glyphs.ScoreWhammyBarGlyph.prototype = $extend(alphaTab.rende
 					this._bendNoteHeads[0].Paint(0,0,canvas);
 					var middleValue = this.GetBendNoteValue(note,beat.WhammyBarPoints[1]);
 					var middleY = this._bendNoteHeads[0].GetNoteValueY(middleValue,false) + heightOffset;
-					this.DrawBendSlur(canvas,startX,startY,middleX1,middleY,direction == 1,this.get_Scale(),null);
+					this.DrawBendSlur(canvas,startX,startY,middleX1,middleY,direction == 1,this.get_Scale(),slurText);
 					this._bendNoteHeads[1].X = endX - this._bendNoteHeads[1].NoteHeadOffset;
 					this._bendNoteHeads[1].Y = cy + startNoteRenderer.Y;
 					this._bendNoteHeads[1].Paint(0,0,canvas);
 					endValue = this.GetBendNoteValue(note,beat.WhammyBarPoints[beat.WhammyBarPoints.length - 1]);
 					endY = this._bendNoteHeads[1].GetNoteValueY(endValue,false) + heightOffset;
-					this.DrawBendSlur(canvas,middleX1,middleY,endX,endY,direction == 1,this.get_Scale(),null);
+					this.DrawBendSlur(canvas,middleX1,middleY,endX,endY,direction == 1,this.get_Scale(),slurText);
 				}
 				break;
 			case 4:
@@ -30909,14 +30888,14 @@ alphaTab.rendering.glyphs.ScoreWhammyBarGlyph.prototype = $extend(alphaTab.rende
 				var preY = cy + startNoteRenderer.Y;
 				var this2 = startNoteRenderer.AccidentalHelper.GetNoteLineForValue(note.get_DisplayValue() - (note.Beat.WhammyBarPoints[0].Value / 2 | 0),false);
 				var preY1 = preY + startNoteRenderer.GetScoreY(this2,0) + heightOffset;
-				this.DrawBendSlur(canvas,preX,preY1,startX,startY,direction == 1,this.get_Scale(),null);
+				this.DrawBendSlur(canvas,preX,preY1,startX,startY,direction == 1,this.get_Scale(),slurText);
 				if(this._bendNoteHeads.length > 0) {
 					this._bendNoteHeads[0].X = endX - this._bendNoteHeads[0].NoteHeadOffset;
 					this._bendNoteHeads[0].Y = cy + startNoteRenderer.Y;
 					this._bendNoteHeads[0].Paint(0,0,canvas);
 					endValue = this.GetBendNoteValue(note,beat.WhammyBarPoints[beat.WhammyBarPoints.length - 1]);
 					endY = this._bendNoteHeads[0].GetNoteValueY(endValue,false) + heightOffset;
-					this.DrawBendSlur(canvas,startX,startY,endX,endY,direction == 1,this.get_Scale(),null);
+					this.DrawBendSlur(canvas,startX,startY,endX,endY,direction == 1,this.get_Scale(),slurText);
 				}
 				break;
 			default:
@@ -31469,7 +31448,7 @@ alphaTab.rendering.glyphs.TabBendGlyph.prototype = $extend(alphaTab.rendering.gl
 		var y1 = cy - bendValueHeight * firstPt.LineValue;
 		if(firstPt.Value == 0) {
 			if(secondPt.Offset == firstPt.Offset) {
-				y1 = y1 + r.GetNoteY(note.Beat.get_MaxStringNote(),true);
+				y1 = y1 + r.GetNoteY(note.Beat.MaxStringNote,true);
 			} else {
 				y1 = y1 + r.GetNoteY(note,false);
 			}
@@ -31624,8 +31603,8 @@ alphaTab.rendering.glyphs.TabBrushGlyph.prototype = $extend(alphaTab.rendering.g
 	,Paint: function(cx,cy,canvas) {
 		var tabBarRenderer = js.Boot.__cast(this.Renderer , alphaTab.rendering.TabBarRenderer);
 		var res = this.Renderer.get_Resources();
-		var startY = cy + this.X + (tabBarRenderer.GetNoteY(this._beat.get_MaxNote(),false) - res.TablatureFont.Size / 2);
-		var endY = cy + this.Y + tabBarRenderer.GetNoteY(this._beat.get_MinNote(),false) + res.TablatureFont.Size / 2;
+		var startY = cy + this.X + (tabBarRenderer.GetNoteY(this._beat.MaxNote,false) - res.TablatureFont.Size / 2);
+		var endY = cy + this.Y + tabBarRenderer.GetNoteY(this._beat.MinNote,false) + res.TablatureFont.Size / 2;
 		var arrowX = system.Convert.ToInt32_Single(cx + this.X + this.Width / 2);
 		var arrowSize = 8 * this.get_Scale();
 		if(this._beat.BrushType != 0) {
@@ -32106,8 +32085,8 @@ alphaTab.rendering.glyphs.TabWhammyBarGlyph.prototype = $extend(alphaTab.renderi
 			beat = beat.NextBeat;
 		}
 		var topOffset = maxValue.Value > 0 ? Math.abs(this.GetOffset(maxValue.Value)) : 0;
-		if(topOffset > 0 || this._beat.WhammyBarPoints[0].Value != 0) {
-			var this1 = 1.5;
+		if(topOffset > 0 || this._beat.WhammyBarPoints[0].Value != 0 || this.Renderer.get_Settings().ShowZeroOnDiveWhammy) {
+			var this1 = 2;
 			topOffset = topOffset + this.Renderer.get_Resources().TablatureFont.Size * this1;
 		}
 		var bottomOffset = minValue.Value < 0 ? Math.abs(this.GetOffset(minValue.Value)) : 0;
@@ -32995,7 +32974,7 @@ alphaTab.rendering.staves.Staff = $hx_exports["alphaTab"]["rendering"]["staves"]
 	this.TrackIndex = trackIndex;
 	this.ModelStaff = staff;
 	this._factory = factory;
-	this.TopSpacing = 15;
+	this.TopSpacing = 0;
 	this.BottomSpacing = 5;
 	this.StaveTop = 0;
 	this.StaveBottom = 0;
@@ -33858,6 +33837,9 @@ alphaTab.rendering.utils.BeamingHelper.prototype = {
 		if(n.get_HasBend()) {
 			value = value + (n.MaxBendPoint.Value / 2 | 0);
 		}
+		if(n.Beat.get_HasWhammyBar()) {
+			value = value + (n.Beat.MaxWhammyPoint.Value / 2 | 0);
+		}
 		if(n.HarmonicType != 0 && n.HarmonicType != 1) {
 			value = n.get_RealValue() - this._staff.DisplayTranspositionPitch;
 		}
@@ -33865,6 +33847,9 @@ alphaTab.rendering.utils.BeamingHelper.prototype = {
 	}
 	,GetMinValue: function(n) {
 		var value = this.GetValue(n);
+		if(n.Beat.get_HasWhammyBar()) {
+			value = value + (n.Beat.MinWhammyPoint.Value / 2 | 0);
+		}
 		return value;
 	}
 	,GetBeatLineX: function(beat) {
@@ -33963,8 +33948,8 @@ alphaTab.rendering.utils.BeamingHelper.prototype = {
 			}
 			this.LastMinNoteValue = -2147483648;
 			this.LastMaxNoteValue = -2147483648;
-			this.CheckNote(beat.get_MinNote());
-			this.CheckNote(beat.get_MaxNote());
+			this.CheckNote(beat.MinNote);
+			this.CheckNote(beat.MaxNote);
 			positions.MinNoteValue = this.LastMinNoteValue;
 			positions.MaxNoteValue = this.LastMaxNoteValue;
 			if(this.ShortestDuration < beat.Duration) {
@@ -34049,13 +34034,13 @@ alphaTab.rendering.utils.BeamingHelper.prototype = {
 	}
 	,GetBeatMinValue: function(beat) {
 		if(!this._beatLineXPositions.hasOwnProperty(beat.Index)) {
-			return beat.get_MinNote().get_DisplayValue();
+			return beat.MinNote.get_DisplayValue();
 		}
 		return this._beatLineXPositions[beat.Index].MinNoteValue;
 	}
 	,GetBeatMaxValue: function(beat) {
 		if(!this._beatLineXPositions.hasOwnProperty(beat.Index)) {
-			return beat.get_MaxNote().get_DisplayValue();
+			return beat.MaxNote.get_DisplayValue();
 		}
 		return this._beatLineXPositions[beat.Index].MaxNoteValue;
 	}

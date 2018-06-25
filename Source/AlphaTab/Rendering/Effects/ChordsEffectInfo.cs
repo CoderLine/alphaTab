@@ -16,6 +16,7 @@
  * License along with this library.
  */
 using AlphaTab.Model;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
@@ -34,7 +35,7 @@ namespace AlphaTab.Rendering.Effects
       
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
-            return new TextGlyph(0, 0, beat.Chord.Name, renderer.Resources.EffectFont);
+            return new TextGlyph(0, 0, beat.Chord.Name, renderer.Resources.EffectFont, TextAlign.Center);
         }
 
         public bool CanExpand(Beat from, Beat to)

@@ -96,61 +96,11 @@ namespace AlphaTab.Model
             get { return PreviousBeat != null && PreviousBeat.IsLegatoOrigin; }
         }
 
-        private Note _minNote;
 
-        public Note MinNote
-        {
-            get
-            {
-                if (_minNote == null)
-                {
-                    RefreshNotes();
-                }
-                return _minNote;
-            }
-        }
-
-        private Note _maxNote;
-
-        public Note MaxNote
-        {
-            get
-            {
-                if (_maxNote == null)
-                {
-                    RefreshNotes();
-                }
-                return _maxNote;
-            }
-        }
-
-        private Note _maxStringNote;
-
-        public Note MaxStringNote
-        {
-            get
-            {
-                if (_maxStringNote == null)
-                {
-                    RefreshNotes();
-                }
-                return _maxStringNote;
-            }
-        }
-
-        private Note _minStringNote;
-
-        public Note MinStringNote
-        {
-            get
-            {
-                if (_minStringNote == null)
-                {
-                    RefreshNotes();
-                }
-                return _minStringNote;
-            }
-        }
+        public Note MinNote { get; set; }
+        public Note MaxNote { get; set; }
+        public Note MaxStringNote { get; set; }
+        public Note MinStringNote { get; set; }
 
         public Duration Duration { get; set; }
 
@@ -158,7 +108,7 @@ namespace AlphaTab.Model
         {
             get
             {
-                return Notes.Count == 0;
+                return IsEmpty || Notes.Count == 0;
             }
         }
 
@@ -426,41 +376,6 @@ namespace AlphaTab.Model
             {
                 Notes.RemoveAt(index);
             }
-
-            if (note == _minNote || note == _maxNote || note == _minStringNote || note == _maxStringNote)
-            {
-                RefreshNotes();
-            }
-        }
-
-        public void RefreshNotes()
-        {
-            for (int i = 0, j = Notes.Count; i < j; i++)
-            {
-                var note = Notes[i];
-                if (note.IsVisible)
-                {
-                    if (_minNote == null || note.RealValue < _minNote.RealValue)
-                    {
-                        _minNote = note;
-                    }
-
-                    if (_maxNote == null || note.RealValue > _maxNote.RealValue)
-                    {
-                        _maxNote = note;
-                    }
-
-                    if (_minStringNote == null || note.String < _minStringNote.String)
-                    {
-                        _minStringNote = note;
-                    }
-
-                    if (_maxStringNote == null || note.String > _maxStringNote.String)
-                    {
-                        _maxStringNote = note;
-                    }
-                }
-            }
         }
 
         public Automation GetAutomation(AutomationType type)
@@ -556,6 +471,11 @@ namespace AlphaTab.Model
             }
 
             var needCopyBeatForBend = false;
+            MinNote = null;
+            MaxNote = null;
+            MinStringNote = null;
+            MaxStringNote = null;
+         
             for (int i = 0, j = Notes.Count; i < j; i++)
             {
                 var note = Notes[i];
@@ -585,6 +505,34 @@ namespace AlphaTab.Model
                         note.BendStyle = BendStyle.Fast;
                     }
                 }
+
+                if (note.IsVisible)
+                {
+                    if (MinNote == null || note.RealValue < MinNote.RealValue)
+                    {
+                        MinNote = note;
+                    }
+
+                    if (MaxNote == null || note.RealValue > MaxNote.RealValue)
+                    {
+                        MaxNote = note;
+                    }
+
+                    if (MinStringNote == null || note.String < MinStringNote.String)
+                    {
+                        MinStringNote = note;
+                    }
+
+                    if (MaxStringNote == null || note.String > MaxStringNote.String)
+                    {
+                        MaxStringNote = note;
+                    }
+                }
+            }
+
+            if (MinNote == null)
+            {
+                IsEmpty = true;
             }
 
             // we need to clean al letring/palmmute flags for rests

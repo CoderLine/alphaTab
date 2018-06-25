@@ -376,7 +376,7 @@ namespace AlphaTab.Rendering
         protected virtual void PaintBackground(float cx, float cy, ICanvas canvas)
         {
             //canvas.Color = Color.Random();
-            //canvas.FillRect(cx + X, cy + Y - TopOverflow - TopPadding, Width, Height + TopOverflow + BottomOverflow + TopPadding + BottomPadding);
+            //canvas.FillRect(cx + X, cy + Y - TopOverflow, Width, Height + TopOverflow + BottomOverflow);
         }
 
         public virtual void BuildBoundingsLookup(MasterBarBounds masterBarBounds, float cx, float cy)
