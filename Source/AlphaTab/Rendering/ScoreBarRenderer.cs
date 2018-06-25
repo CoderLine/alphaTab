@@ -113,58 +113,47 @@ namespace AlphaTab.Rendering
         {
             base.DoLayout();
 
-            var top = GetScoreY(0);
-            var bottom = GetScoreY(8);
-
-            var whammyOffset = SimpleWhammyOverflow;
-            RegisterOverflowTop(whammyOffset);
-
-            for (int i = 0, j = Helpers.BeamHelpers.Count; i < j; i++)
+            if (!Bar.IsEmpty)
             {
-                var v = Helpers.BeamHelpers[i];
-                for (int k = 0, l = v.Count; k < l; k++)
+                var top = GetScoreY(0);
+                var bottom = GetScoreY(8);
+
+                var whammyOffset = SimpleWhammyOverflow;
+                RegisterOverflowTop(whammyOffset);
+
+                var maxNoteY = GetYPositionForNoteValue(AccidentalHelper.MaxNoteValue);
+                var maxNoteHelper = Helpers.GetBeamingHelperForBeat(AccidentalHelper.MaxNoteValueBeat);
+                if (maxNoteHelper.Direction == BeamDirection.Up)
                 {
-                    var h = v[k];
-                    //
-                    // max note (highest) -> top overflow
-                    // 
-                    var maxNoteY = GetYPositionForNoteValue(h.MaxNoteValue);
-
-                    if (h.Direction == BeamDirection.Up)
+                    maxNoteY -= GetStemSize(maxNoteHelper);
+                    maxNoteY -= maxNoteHelper.FingeringCount * Resources.GraceFont.Size;
+                    if (maxNoteHelper.HasTuplet)
                     {
-                        maxNoteY -= GetStemSize(h);
-                        maxNoteY -= h.FingeringCount * Resources.GraceFont.Size;
-                        if (h.HasTuplet)
-                        {
-                            maxNoteY -= Resources.EffectFont.Size * 2;
-                        }
+                        maxNoteY -= Resources.EffectFont.Size * 2;
                     }
+                }
 
-                    if (h.HasTuplet)
-                    {
-                        maxNoteY -= Resources.EffectFont.Size * 1.5f;
-                    }
+                if (maxNoteHelper.HasTuplet)
+                {
+                    maxNoteY -= Resources.EffectFont.Size * 1.5f;
+                }
 
-                    if (maxNoteY < top)
-                    {
-                        RegisterOverflowTop(Math.Abs(maxNoteY) + whammyOffset);
-                    }
+                if (maxNoteY < top)
+                {
+                    RegisterOverflowTop(Math.Abs(maxNoteY) + whammyOffset);
+                }
 
-                    //
-                    // min note (lowest) -> bottom overflow
-                    var minNoteY = GetYPositionForNoteValue(h.MinNoteValue);
+                var minNoteY = GetYPositionForNoteValue(AccidentalHelper.MinNoteValue);
+                var minNoteHelper = Helpers.GetBeamingHelperForBeat(AccidentalHelper.MinNoteValueBeat);
+                if (minNoteHelper.Direction == BeamDirection.Down)
+                {
+                    minNoteY += GetStemSize(minNoteHelper);
+                    minNoteY += minNoteHelper.FingeringCount * Resources.GraceFont.Size;
+                }
 
-
-                    if (h.Direction == BeamDirection.Down)
-                    {
-                        minNoteY += GetStemSize(h);
-                        minNoteY += h.FingeringCount * Resources.GraceFont.Size;
-                    }
-
-                    if (minNoteY > bottom)
-                    {
-                        RegisterOverflowBottom(Math.Abs(minNoteY) - bottom);
-                    }
+                if (minNoteY > bottom)
+                {
+                    RegisterOverflowBottom(Math.Abs(minNoteY) - bottom);
                 }
             }
         }

@@ -9,6 +9,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     class BendNoteHeadGroupGlyph : ScoreNoteChordGlyphBase
     {
+        private readonly Beat _beat;
         private readonly bool _showParenthesis;
         private readonly FastDictionary<int, Glyph> _noteValueLookup;
 
@@ -20,8 +21,9 @@ namespace AlphaTab.Rendering.Glyphs
         public override BeamDirection Direction => BeamDirection.Up;
         public float NoteHeadOffset { get; set; }
 
-        public BendNoteHeadGroupGlyph(bool showParenthesis = false)
+        public BendNoteHeadGroupGlyph(Beat beat, bool showParenthesis = false)
         {
+            _beat = beat;
             _showParenthesis = showParenthesis;
             IsEmpty = true;
             _accidentals = new AccidentalGroupGlyph();
@@ -66,7 +68,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var sr = (ScoreBarRenderer)Renderer;
             var noteHeadGlyph = new NoteHeadGlyph(0, 0, Duration.Quarter, true);
-            var accidental = sr.AccidentalHelper.ApplyAccidentalForValue(noteValue, quarterBend);
+            var accidental = sr.AccidentalHelper.ApplyAccidentalForValue(_beat, noteValue, quarterBend);
             var line = sr.AccidentalHelper.GetNoteLineForValue(noteValue);
             noteHeadGlyph.Y = sr.GetScoreY(line);
 

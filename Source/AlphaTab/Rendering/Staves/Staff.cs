@@ -81,7 +81,7 @@ namespace AlphaTab.Rendering.Staves
             TrackIndex = trackIndex;
             ModelStaff = staff;
             _factory = factory;
-            TopSpacing = 0;
+            TopSpacing = 20;
             BottomSpacing = 5;
             StaveTop = 0;
             StaveBottom = 0;

@@ -38,7 +38,7 @@ namespace AlphaTab.Rendering.Glyphs
                         BendNoteHeadGroupGlyph endGlyphs = _endNoteGlyph;
                         if (endGlyphs == null)
                         {
-                            endGlyphs = _endNoteGlyph = new BendNoteHeadGroupGlyph();
+                            endGlyphs = _endNoteGlyph = new BendNoteHeadGroupGlyph(note.Beat);
                             endGlyphs.Renderer = Renderer;
                             _bendNoteHeads.Add(endGlyphs);
                         }
@@ -55,7 +55,7 @@ namespace AlphaTab.Rendering.Glyphs
                             BendNoteHeadGroupGlyph endGlyphs = _endNoteGlyph;
                             if (endGlyphs == null)
                             {
-                                endGlyphs = _endNoteGlyph = new BendNoteHeadGroupGlyph();
+                                endGlyphs = _endNoteGlyph = new BendNoteHeadGroupGlyph(note.Beat);
                                 endGlyphs.Renderer = Renderer;
                                 _bendNoteHeads.Add(endGlyphs);
                             }
@@ -71,7 +71,7 @@ namespace AlphaTab.Rendering.Glyphs
                         BendNoteHeadGroupGlyph middleGlyphs = _middleNoteGlyph;
                         if (middleGlyphs == null)
                         {
-                            middleGlyphs = _middleNoteGlyph = new BendNoteHeadGroupGlyph();
+                            middleGlyphs = _middleNoteGlyph = new BendNoteHeadGroupGlyph(note.Beat);
                             middleGlyphs.Renderer = Renderer;
                             _bendNoteHeads.Add(middleGlyphs);
                         }
@@ -81,7 +81,7 @@ namespace AlphaTab.Rendering.Glyphs
                         BendNoteHeadGroupGlyph endGlyphs = _endNoteGlyph;
                         if (endGlyphs == null)
                         {
-                            endGlyphs = _endNoteGlyph = new BendNoteHeadGroupGlyph();
+                            endGlyphs = _endNoteGlyph = new BendNoteHeadGroupGlyph(note.Beat);
                             endGlyphs.Renderer = Renderer;
                             _bendNoteHeads.Add(endGlyphs);
                         }
@@ -163,7 +163,7 @@ namespace AlphaTab.Rendering.Glyphs
                         var noteValueToDraw = note.TieDestination.RealValue;
 
                         var accidental =
-                            startNoteRenderer.AccidentalHelper.ApplyAccidentalForValue(noteValueToDraw, false);
+                            startNoteRenderer.AccidentalHelper.ApplyAccidentalForValue(note.Beat, noteValueToDraw, false);
                         var endY = cy + startNoteRenderer.Y +
                                    startNoteRenderer.GetScoreY(
                                        startNoteRenderer.AccidentalHelper.GetNoteLineForValue(noteValueToDraw));

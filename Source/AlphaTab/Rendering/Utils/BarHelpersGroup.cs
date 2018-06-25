@@ -114,5 +114,10 @@ namespace AlphaTab.Rendering.Utils
                 }
             }
         }
+
+        public BeamingHelper GetBeamingHelperForBeat(Beat beat)
+        {
+            return BeamHelperLookup[beat.Voice.Index][beat.Index];
+        }
     }
 }

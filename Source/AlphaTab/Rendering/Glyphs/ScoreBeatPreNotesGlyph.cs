@@ -31,7 +31,7 @@ namespace AlphaTab.Rendering.Glyphs
                 var accidentals = new AccidentalGroupGlyph();
                 var ghost = new GhostNoteContainerGlyph(true);
                 ghost.Renderer = Renderer;
-                _prebends = new BendNoteHeadGroupGlyph(true);
+                _prebends = new BendNoteHeadGroupGlyph(Container.Beat, true);
                 _prebends.Renderer = Renderer;
                 foreach (var note in Container.Beat.Notes)
                 {
@@ -106,7 +106,7 @@ namespace AlphaTab.Rendering.Glyphs
             if (n.HarmonicType != HarmonicType.None && n.HarmonicType != HarmonicType.Natural)
             {
                 var harmonicFret = n.DisplayValue + n.HarmonicPitch;
-                accidental = sr.AccidentalHelper.ApplyAccidentalForValue(harmonicFret, isGrace);
+                accidental = sr.AccidentalHelper.ApplyAccidentalForValue(n.Beat, harmonicFret, isGrace);
                 noteLine = sr.AccidentalHelper.GetNoteLineForValue(harmonicFret);
                 accidentals.AddGlyph(new AccidentalGlyph(0, sr.GetScoreY(noteLine), accidental, isGrace));
             }

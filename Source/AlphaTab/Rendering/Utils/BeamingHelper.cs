@@ -163,15 +163,6 @@ namespace AlphaTab.Rendering.Utils
         private int GetMaxValue(Note n)
         {
             int value = GetValue(n);
-            if (n.HasBend)
-            {
-                value += n.MaxBendPoint.Value / 2;
-            }
-            if (n.Beat.HasWhammyBar)
-            {
-                value += n.Beat.MaxWhammyPoint.Value / 2;
-            }
-
             if (n.HarmonicType != HarmonicType.None && n.HarmonicType != HarmonicType.Natural)
             {
                 value = n.RealValue - _staff.DisplayTranspositionPitch;
@@ -183,12 +174,6 @@ namespace AlphaTab.Rendering.Utils
         private int GetMinValue(Note n)
         {
             int value = GetValue(n);
-            // we do not need to consider bends here as bends always can go up
-            if (n.Beat.HasWhammyBar)
-            {
-                value += n.Beat.MinWhammyPoint.Value / 2;
-            }
-
             return value;
         }
 

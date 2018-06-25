@@ -94,6 +94,11 @@ namespace AlphaTab.Rendering.Utils
         private readonly FastDictionary<int, int> _appliedScoreLinesByValue;
         private readonly FastDictionary<int, Note> _notesByValue;
 
+        public Beat MaxNoteValueBeat { get; set; }
+        public Beat MinNoteValueBeat { get; set; }
+        public int MaxNoteValue { get; set; }
+        public int MinNoteValue { get; set; }
+
         public AccidentalHelper(Bar bar)
         {
             _bar = bar;
@@ -101,6 +106,9 @@ namespace AlphaTab.Rendering.Utils
             _appliedScoreLines = new FastDictionary<int, int>();
             _appliedScoreLinesByValue = new FastDictionary<int, int>();
             _notesByValue = new FastDictionary<int, Note>();
+
+            MaxNoteValue = -1;
+            MinNoteValue = -1;
         }
 
         /// <summary>
@@ -114,6 +122,16 @@ namespace AlphaTab.Rendering.Utils
             var noteValue = note.DisplayValue;
             bool quarterBend = note.HasQuarterToneOffset;
             var line = RegisterNoteLine(note, noteValue);
+            if (MinNoteValue == -1 || noteValue < MinNoteValue)
+            {
+                MinNoteValue = noteValue;
+                MinNoteValueBeat = note.Beat;
+            }
+            if (MaxNoteValue == -1 || noteValue > MaxNoteValue)
+            {
+                MaxNoteValue = noteValue;
+                MaxNoteValueBeat = note.Beat;
+            }
             return GetAccidental(line, noteValue, quarterBend);
         }
 
@@ -123,9 +141,19 @@ namespace AlphaTab.Rendering.Utils
         /// </summary>
         /// <param name="note"></param>
         /// <returns></returns>
-        public AccidentalType ApplyAccidentalForValue(int noteValue, bool quarterBend)
+        public AccidentalType ApplyAccidentalForValue(Beat relatedBeat, int noteValue, bool quarterBend)
         {
             var line = RegisterNoteValueLine(noteValue);
+            if (MinNoteValue == -1 || noteValue < MinNoteValue)
+            {
+                MinNoteValue = noteValue;
+                MinNoteValueBeat = relatedBeat;
+            }
+            if (MaxNoteValue == -1 || noteValue > MaxNoteValue)
+            {
+                MaxNoteValue = noteValue;
+                MaxNoteValueBeat = relatedBeat;
+            }
             return GetAccidental(line, noteValue, quarterBend);
         }
 

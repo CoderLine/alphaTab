@@ -28,7 +28,7 @@ namespace AlphaTab.Rendering.Glyphs
                 case WhammyType.Dive:
                 case WhammyType.PrediveDive:
                     {
-                        var endGlyphs = new BendNoteHeadGroupGlyph();
+                        var endGlyphs = new BendNoteHeadGroupGlyph(_beat);
                         endGlyphs.Renderer = Renderer;
 
                         var lastWhammyPoint = _beat.WhammyBarPoints[_beat.WhammyBarPoints.Count - 1];
@@ -54,7 +54,7 @@ namespace AlphaTab.Rendering.Glyphs
                         }
                         else
                         {
-                            var middleGlyphs = new BendNoteHeadGroupGlyph();
+                            var middleGlyphs = new BendNoteHeadGroupGlyph(_beat);
                             middleGlyphs.Renderer = Renderer;
                             if (Renderer.Settings.DisplayMode == DisplayMode.GuitarPro)
                             {
@@ -68,7 +68,7 @@ namespace AlphaTab.Rendering.Glyphs
                             middleGlyphs.DoLayout();
                             _bendNoteHeads.Add(middleGlyphs);
 
-                            var endGlyphs = new BendNoteHeadGroupGlyph();
+                            var endGlyphs = new BendNoteHeadGroupGlyph(_beat);
                             endGlyphs.Renderer = Renderer;
                             if (Renderer.Settings.DisplayMode == DisplayMode.GuitarPro)
                             {
