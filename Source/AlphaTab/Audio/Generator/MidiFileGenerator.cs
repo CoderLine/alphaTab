@@ -290,8 +290,19 @@ namespace AlphaTab.Audio.Generator
 
             if (beat.Vibrato != VibratoType.None)
             {
-                const int phaseLength = 240; // ticks
-                const int bendAmplitude = 3;
+                int phaseLength = 240; 
+                int bendAmplitude = 3;
+                switch (beat.Vibrato)
+                {
+                    case VibratoType.Slight:
+                        phaseLength = _settings.Vibrato.BeatSlightLength;
+                        bendAmplitude = _settings.Vibrato.BeatSlightAmplitude;
+                        break;
+                    case VibratoType.Wide:
+                        phaseLength = _settings.Vibrato.BeatWideLength;
+                        bendAmplitude = _settings.Vibrato.BeatWideAmplitude;
+                        break;
+                }
 
                 GenerateVibratorWithParams(beat.Voice.Bar.Staff.Track, barStartTick + beatStart, beat.PlaybackDuration, phaseLength, bendAmplitude);
             }
@@ -555,8 +566,23 @@ namespace AlphaTab.Audio.Generator
 
         private void GenerateVibrato(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue)
         {
-            const int phaseLength = 480; // ticks
-            const int bendAmplitude = 2;
+            int phaseLength;
+            int bendAmplitude;
+
+            switch (note.Vibrato)
+            {
+                case VibratoType.Slight:
+                    phaseLength = _settings.Vibrato.NoteSlightLength;
+                    bendAmplitude = _settings.Vibrato.NoteSlightAmplitude;
+                    break;
+                case VibratoType.Wide:
+                    phaseLength = _settings.Vibrato.NoteWideLength;
+                    bendAmplitude = _settings.Vibrato.NoteWideAmplitude;
+                    break;
+                default:
+                    return;
+            }
+
             var track = note.Beat.Voice.Bar.Staff.Track;
 
             GenerateVibratorWithParams(track, noteStart, noteDuration.NoteOnly, phaseLength, bendAmplitude);

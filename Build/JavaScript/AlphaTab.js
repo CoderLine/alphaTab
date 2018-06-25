@@ -6654,6 +6654,7 @@ alphaTab.Settings = $hx_exports["alphaTab"]["Settings"] = function() {
 	this.FingeringMode = 0;
 	this.ShowZeroOnDiveWhammy = false;
 	this.ExtendLineEffectsToBeatEnd = false;
+	this.Vibrato = null;
 };
 alphaTab.Settings.__name__ = ["alphaTab","Settings"];
 alphaTab.Settings.SetDefaults = function(settings) {
@@ -6849,6 +6850,58 @@ alphaTab.Settings.FillFromJson = function(settings,json,dataAttributes) {
 		settings.Layout = alphaTab.Settings.LayoutFromJson(json.layout);
 	} else if(dataAttributes != null && dataAttributes.hasOwnProperty("layout")) {
 		settings.Layout = alphaTab.Settings.LayoutFromJson(dataAttributes["layout"]);
+	}
+	if((json && "vibrato" in json)) {
+		var vibrato = json.vibrato;
+		if(vibrato.noteSlightAmplitude) {
+			settings.Vibrato.NoteSlightAmplitude = vibrato.noteSlightAmplitude;
+		}
+		if(vibrato.noteWideAmplitude) {
+			settings.Vibrato.NoteWideAmplitude = vibrato.noteWideAmplitude;
+		}
+		if(vibrato.noteSlightLength) {
+			settings.Vibrato.NoteSlightLength = vibrato.noteSlightLength;
+		}
+		if(vibrato.noteWideLength) {
+			settings.Vibrato.NoteWideLength = vibrato.noteWideLength;
+		}
+		if(vibrato.beatSlightAmplitude) {
+			settings.Vibrato.BeatSlightAmplitude = vibrato.beatSlightAmplitude;
+		}
+		if(vibrato.beatWideAmplitude) {
+			settings.Vibrato.BeatWideAmplitude = vibrato.beatWideAmplitude;
+		}
+		if(vibrato.beatSlightLength) {
+			settings.Vibrato.BeatSlightLength = vibrato.beatSlightLength;
+		}
+		if(vibrato.beatWideLength) {
+			settings.Vibrato.BeatWideLength = vibrato.beatWideLength;
+		}
+	} else if(dataAttributes != null) {
+		if(dataAttributes.hasOwnProperty("vibratoNoteSlightLength")) {
+			settings.Vibrato.NoteSlightLength = dataAttributes["vibratoNoteSlightLength"];
+		}
+		if(dataAttributes.hasOwnProperty("vibratoNoteSlightAmplitude")) {
+			settings.Vibrato.NoteSlightAmplitude = dataAttributes["vibratoNoteSlightAmplitude"];
+		}
+		if(dataAttributes.hasOwnProperty("vibratoNoteWideLength")) {
+			settings.Vibrato.NoteWideLength = dataAttributes["vibratoNoteWideLength"];
+		}
+		if(dataAttributes.hasOwnProperty("vibratoNoteWideAmplitude")) {
+			settings.Vibrato.NoteWideAmplitude = dataAttributes["vibratoNoteWideAmplitude"];
+		}
+		if(dataAttributes.hasOwnProperty("vibratoBeatSlightLength")) {
+			settings.Vibrato.BeatSlightLength = dataAttributes["vibratoBeatSlightLength"];
+		}
+		if(dataAttributes.hasOwnProperty("vibratoBeatSlightAmplitude")) {
+			settings.Vibrato.BeatSlightAmplitude = dataAttributes["vibratoBeatSlightAmplitude"];
+		}
+		if(dataAttributes.hasOwnProperty("vibratoBeatWideLength")) {
+			settings.Vibrato.BeatWideLength = dataAttributes["vibratoBeatWideLength"];
+		}
+		if(dataAttributes.hasOwnProperty("vibratoBeatWideAmplitude")) {
+			settings.Vibrato.BeatWideAmplitude = dataAttributes["vibratoBeatWideAmplitude"];
+		}
 	}
 	if(dataAttributes != null) {
 		var key = $iterator(Object.keys(dataAttributes))();
@@ -7090,6 +7143,15 @@ alphaTab.Settings.get_Defaults = function() {
 	settings.Layout = alphaTab.LayoutSettings.get_Defaults();
 	settings.Staves = new alphaTab.StaveSettings("default");
 	settings.LogLevel = 2;
+	settings.Vibrato = new alphaTab.VibratoPlaybackSettings();
+	settings.Vibrato.NoteSlightAmplitude = 2;
+	settings.Vibrato.NoteWideAmplitude = 2;
+	settings.Vibrato.NoteSlightLength = 480;
+	settings.Vibrato.NoteWideLength = 480;
+	settings.Vibrato.BeatSlightAmplitude = 3;
+	settings.Vibrato.BeatWideAmplitude = 3;
+	settings.Vibrato.BeatSlightLength = 240;
+	settings.Vibrato.BeatWideLength = 240;
 	alphaTab.Settings.SetDefaults(settings);
 	return settings;
 };
@@ -7117,6 +7179,15 @@ alphaTab.Settings.prototype = {
 		json.scriptFile = this.ScriptFile;
 		json.fontDirectory = this.FontDirectory;
 		json.lazy = this.DisableLazyLoading;
+		json.vibrato = {}
+		json.noteSlightAmplitude = this.Vibrato.NoteSlightAmplitude;
+		json.noteWideAmplitude = this.Vibrato.NoteWideAmplitude;
+		json.noteSlightLength = this.Vibrato.NoteSlightLength;
+		json.noteWideLength = this.Vibrato.NoteWideLength;
+		json.beatSlightAmplitude = this.Vibrato.BeatSlightAmplitude;
+		json.beatWideAmplitude = this.Vibrato.BeatWideAmplitude;
+		json.beatSlightLength = this.Vibrato.BeatSlightLength;
+		json.beatWideLength = this.Vibrato.BeatWideLength;
 		json.layout = {}
 		json.layout.mode = this.Layout.Mode;
 		json.layout.additionalSettings = {}
@@ -7164,6 +7235,20 @@ alphaTab.StaveSettings.prototype = {
 		return def;
 	}
 	,__class__: alphaTab.StaveSettings
+};
+alphaTab.VibratoPlaybackSettings = $hx_exports["alphaTab"]["VibratoPlaybackSettings"] = function() {
+	this.NoteWideLength = 0;
+	this.NoteWideAmplitude = 0;
+	this.NoteSlightLength = 0;
+	this.NoteSlightAmplitude = 0;
+	this.BeatWideLength = 0;
+	this.BeatWideAmplitude = 0;
+	this.BeatSlightLength = 0;
+	this.BeatSlightAmplitude = 0;
+};
+alphaTab.VibratoPlaybackSettings.__name__ = ["alphaTab","VibratoPlaybackSettings"];
+alphaTab.VibratoPlaybackSettings.prototype = {
+	__class__: alphaTab.VibratoPlaybackSettings
 };
 alphaTab._WhammyMode = {};
 alphaTab._WhammyMode.WhammyMode_Impl_ = $hx_exports["alphaTab"]["_WhammyMode"]["WhammyMode_Impl_"] = {};
@@ -7842,6 +7927,18 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		if(beat.Vibrato != 0) {
 			var phaseLength = 240;
 			var bendAmplitude = 3;
+			var _g = beat.Vibrato;
+			switch(_g) {
+			case 1:
+				phaseLength = this._settings.Vibrato.BeatSlightLength;
+				bendAmplitude = this._settings.Vibrato.BeatSlightAmplitude;
+				break;
+			case 2:
+				phaseLength = this._settings.Vibrato.BeatWideLength;
+				bendAmplitude = this._settings.Vibrato.BeatWideAmplitude;
+				break;
+			default:
+			}
 			this.GenerateVibratorWithParams(beat.Voice.Bar.Staff.Track,barStartTick + beatStart,beat.PlaybackDuration,phaseLength,bendAmplitude);
 		}
 	}
@@ -8006,8 +8103,21 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 	,GenerateHarmonic: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
 	}
 	,GenerateVibrato: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
-		var phaseLength = 480;
-		var bendAmplitude = 2;
+		var phaseLength;
+		var bendAmplitude;
+		var _g = note.Vibrato;
+		switch(_g) {
+		case 1:
+			phaseLength = this._settings.Vibrato.NoteSlightLength;
+			bendAmplitude = this._settings.Vibrato.NoteSlightAmplitude;
+			break;
+		case 2:
+			phaseLength = this._settings.Vibrato.NoteWideLength;
+			bendAmplitude = this._settings.Vibrato.NoteWideAmplitude;
+			break;
+		default:
+			return;
+		}
 		var track = note.Beat.Voice.Bar.Staff.Track;
 		this.GenerateVibratorWithParams(track,noteStart,noteDuration.NoteOnly,phaseLength,bendAmplitude);
 	}

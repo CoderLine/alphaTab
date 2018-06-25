@@ -207,6 +207,16 @@ namespace AlphaTab
             json.fontDirectory = FontDirectory;
             json.lazy = DisableLazyLoading;
 
+            json.vibrato = Platform.Platform.NewObject();
+            json.noteSlightAmplitude = Vibrato.NoteSlightAmplitude;
+            json.noteWideAmplitude = Vibrato.NoteWideAmplitude;
+            json.noteSlightLength = Vibrato.NoteSlightLength;
+            json.noteWideLength = Vibrato.NoteWideLength;
+            json.beatSlightAmplitude = Vibrato.BeatSlightAmplitude;
+            json.beatWideAmplitude = Vibrato.BeatWideAmplitude;
+            json.beatSlightLength = Vibrato.BeatSlightLength;
+            json.beatWideLength = Vibrato.BeatWideLength;
+
             json.layout = Platform.Platform.NewObject();
             json.layout.mode = Layout.Mode;
             json.layout.additionalSettings = Platform.Platform.NewObject();
@@ -470,6 +480,78 @@ namespace AlphaTab
             else if (dataAttributes != null && dataAttributes.ContainsKey("layout"))
             {
                 settings.Layout = LayoutFromJson(dataAttributes["layout"]);
+            }
+
+            if (Platform.Platform.JsonExists(json, "vibrato"))
+            {
+                var vibrato = json.vibrato;
+                if (vibrato.noteSlightAmplitude)
+                {
+                    settings.Vibrato.NoteSlightAmplitude = vibrato.noteSlightAmplitude;
+                }
+                if (vibrato.noteWideAmplitude)
+                {
+                    settings.Vibrato.NoteWideAmplitude = vibrato.noteWideAmplitude;
+                }
+                if (vibrato.noteSlightLength)
+                {
+                    settings.Vibrato.NoteSlightLength = vibrato.noteSlightLength;
+                }
+                if (vibrato.noteWideLength)
+                {
+                    settings.Vibrato.NoteWideLength = vibrato.noteWideLength;
+                }
+                if (vibrato.beatSlightAmplitude)
+                {
+                    settings.Vibrato.BeatSlightAmplitude = vibrato.beatSlightAmplitude;
+                }
+                if (vibrato.beatWideAmplitude)
+                {
+                    settings.Vibrato.BeatWideAmplitude = vibrato.beatWideAmplitude;
+                }
+                if (vibrato.beatSlightLength)
+                {
+                    settings.Vibrato.BeatSlightLength = vibrato.beatSlightLength;
+                }
+                if (vibrato.beatWideLength)
+                {
+                    settings.Vibrato.BeatWideLength = vibrato.beatWideLength;
+                }
+            }
+            else if (dataAttributes != null)
+            {
+                if (dataAttributes.ContainsKey("vibratoNoteSlightLength"))
+                {
+                    settings.Vibrato.NoteSlightLength = (int) dataAttributes["vibratoNoteSlightLength"];
+                }
+                if (dataAttributes.ContainsKey("vibratoNoteSlightAmplitude"))
+                {
+                    settings.Vibrato.NoteSlightAmplitude = (int) dataAttributes["vibratoNoteSlightAmplitude"];
+                }
+                if (dataAttributes.ContainsKey("vibratoNoteWideLength"))
+                {
+                    settings.Vibrato.NoteWideLength = (int) dataAttributes["vibratoNoteWideLength"];
+                }
+                if (dataAttributes.ContainsKey("vibratoNoteWideAmplitude"))
+                {
+                    settings.Vibrato.NoteWideAmplitude = (int) dataAttributes["vibratoNoteWideAmplitude"];
+                }
+                if (dataAttributes.ContainsKey("vibratoBeatSlightLength"))
+                {
+                    settings.Vibrato.BeatSlightLength = (int) dataAttributes["vibratoBeatSlightLength"];
+                }
+                if (dataAttributes.ContainsKey("vibratoBeatSlightAmplitude"))
+                {
+                    settings.Vibrato.BeatSlightAmplitude = (int) dataAttributes["vibratoBeatSlightAmplitude"];
+                }
+                if (dataAttributes.ContainsKey("vibratoBeatWideLength"))
+                {
+                    settings.Vibrato.BeatWideLength = (int) dataAttributes["vibratoBeatWideLength"];
+                }
+                if (dataAttributes.ContainsKey("vibratoBeatWideAmplitude"))
+                {
+                    settings.Vibrato.BeatWideAmplitude = (int) dataAttributes["vibratoBeatWideAmplitude"];
+                }
             }
 
             if (dataAttributes != null)

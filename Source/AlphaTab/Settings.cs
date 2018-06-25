@@ -199,6 +199,11 @@ namespace AlphaTab
         /// </summary>
         public bool ExtendLineEffectsToBeatEnd { get; set; }
 
+        /// <summary>
+        /// Gets or sets the settings on how the vibrato audio is generated. 
+        /// </summary>
+        public VibratoPlaybackSettings Vibrato { get; set; }
+
         public static Settings Defaults
         {
             get
@@ -228,11 +233,37 @@ namespace AlphaTab
                 settings.Staves = new StaveSettings("default");
                 settings.LogLevel = LogLevel.Info;
 
+                settings.Vibrato = new VibratoPlaybackSettings();
+                settings.Vibrato.NoteSlightAmplitude = 2;
+                settings.Vibrato.NoteWideAmplitude = 2;
+                settings.Vibrato.NoteSlightLength = 480;
+                settings.Vibrato.NoteWideLength = 480;
+
+                settings.Vibrato.BeatSlightAmplitude = 3;
+                settings.Vibrato.BeatWideAmplitude = 3;
+                settings.Vibrato.BeatSlightLength = 240;
+                settings.Vibrato.BeatWideLength = 240;
+
                 SetDefaults(settings);
 
                 return settings;
             }
         }
+    }
+
+    public class VibratoPlaybackSettings
+    {
+        public int NoteWideLength { get; set; }
+        public int NoteWideAmplitude { get; set; }
+
+        public int NoteSlightLength { get; set; }
+        public int NoteSlightAmplitude { get; set; }
+
+        public int BeatWideLength { get; set; }
+        public int BeatWideAmplitude { get; set; }
+
+        public int BeatSlightLength { get; set; }
+        public int BeatSlightAmplitude { get; set; }
     }
 
     public class LayoutSettings
