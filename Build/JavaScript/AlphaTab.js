@@ -30516,9 +30516,7 @@ alphaTab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphaTab.rende
 		this.Width = 0;
 	}
 	,Paint: function(cx,cy,canvas) {
-		var r = js.Boot.__cast(this.Renderer , alphaTab.rendering.ScoreBarRenderer);
-		cx = cx + r.X;
-		cy = cy + r.Y;
+		var startNoteRenderer = js.Boot.__cast(this.Renderer , alphaTab.rendering.ScoreBarRenderer);
 		var sizeX = 12 * this.get_Scale();
 		var offsetX = this.get_Scale();
 		var startX;
@@ -30529,52 +30527,71 @@ alphaTab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphaTab.rende
 		var _g = this._type;
 		switch(_g) {
 		case 1:case 2:
-			startX = cx + r.GetNoteX(this._startNote,true) + offsetX;
-			startY = cy + r.GetNoteY(this._startNote,false) + 9 / 2;
-			if(this._startNote.SlideTarget != null) {
-				endX = cx + r.GetNoteX(this._startNote.SlideTarget,false) - offsetX;
-				endY = cy + r.GetNoteY(this._startNote.SlideTarget,false) + 9 / 2;
+			startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(this._startNote.Beat,3) + offsetX;
+			var isUp = this._startNote.SlideTarget.get_RealValue() > this._startNote.get_RealValue();
+			startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false);
+			var this1 = 0.25;
+			var lineOffset = this1 * 9 * this.get_Scale();
+			if(isUp) {
+				startY = startY + lineOffset;
 			} else {
-				endX = cx + this._parent.X;
+				startY = startY - lineOffset;
+			}
+			if(this._startNote.SlideTarget != null) {
+				var endNoteRenderer = this.Renderer.ScoreRenderer.Layout.GetRendererForBar(this.Renderer.Staff.get_StaveId(),this._startNote.SlideTarget.Beat.Voice.Bar);
+				if(endNoteRenderer == null || endNoteRenderer.Staff != startNoteRenderer.Staff) {
+					endX = cx + startNoteRenderer.X + this._parent.X;
+					endY = startY;
+				} else {
+					endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(this._startNote.SlideTarget.Beat,0) - offsetX;
+					endY = cy + endNoteRenderer.Y + endNoteRenderer.GetNoteY(this._startNote.SlideTarget,false);
+					if(isUp) {
+						endY = endY - lineOffset;
+					} else {
+						endY = endY + lineOffset;
+					}
+				}
+			} else {
+				endX = cx + startNoteRenderer.X + this._parent.X;
 				endY = startY;
 			}
 			break;
 		case 3:
-			endX = cx + r.GetNoteX(this._startNote,false) - offsetX;
-			endY = cy + r.GetNoteY(this._startNote,false) + 9 / 2;
+			endX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(this._startNote,false) - offsetX;
+			endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false) + 9 / 2;
 			startX = endX - sizeX;
-			startY = cy + r.GetNoteY(this._startNote,false) + 9;
+			startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false) + 9;
 			break;
 		case 4:
-			endX = cx + r.GetNoteX(this._startNote,false) - offsetX;
-			endY = cy + r.GetNoteY(this._startNote,false) + 9 / 2;
+			endX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(this._startNote,false) - offsetX;
+			endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false) + 9 / 2;
 			startX = endX - sizeX;
-			startY = cy + r.GetNoteY(this._startNote,false);
+			startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false);
 			break;
 		case 5:
-			startX = cx + r.GetNoteX(this._startNote,true) + offsetX;
-			startY = cy + r.GetNoteY(this._startNote,false) + 9 / 2;
+			startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(this._startNote,true) + offsetX;
+			startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false) + 9 / 2;
 			endX = startX + sizeX;
-			endY = cy + r.GetNoteY(this._startNote,false);
+			endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false);
 			break;
 		case 6:
-			startX = cx + r.GetNoteX(this._startNote,true) + offsetX;
-			startY = cy + r.GetNoteY(this._startNote,false) + 9 / 2;
+			startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(this._startNote,true) + offsetX;
+			startY = cy + startNoteRenderer.GetNoteY(this._startNote,false) + 9 / 2;
 			endX = startX + sizeX;
-			endY = cy + r.GetNoteY(this._startNote,false) + 9;
+			endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false) + 9;
 			break;
 		case 7:
-			startX = cx + r.GetNoteX(this._startNote,true);
-			startY = cy + r.GetNoteY(this._startNote,false) - 9 / 2;
-			endX = cx + r.GetBeatX(this._startNote.Beat,4);
-			endY = cy + r.GetNoteY(this._startNote,false) + 9;
+			startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(this._startNote,true);
+			startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false) - 9 / 2;
+			endX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(this._startNote.Beat,4);
+			endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false) + 9;
 			waves = true;
 			break;
 		case 8:
-			startX = cx + r.GetNoteX(this._startNote,true);
-			startY = cy + r.GetNoteY(this._startNote,false) + 9 / 2;
-			endX = cx + r.GetBeatX(this._startNote.Beat,4);
-			endY = cy + r.GetNoteY(this._startNote,false) - 9;
+			startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(this._startNote,true);
+			startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false) + 9 / 2;
+			endX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(this._startNote.Beat,4);
+			endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false) - 9;
 			waves = true;
 			break;
 		default:
@@ -30583,11 +30600,11 @@ alphaTab.rendering.glyphs.ScoreSlideLineGlyph.prototype = $extend(alphaTab.rende
 		if(waves) {
 			var b = endX - startX;
 			var a = endY - startY;
-			var this1 = a;
-			var this2 = b;
-			var c = Math.sqrt(Math.pow(this1,2) + Math.pow(this2,2));
-			var this3 = a / c;
-			var angle = js.Boot.__cast(Math.asin(this3) * 57.29577951308238 , Float);
+			var this2 = a;
+			var this3 = b;
+			var c = Math.sqrt(Math.pow(this2,2) + Math.pow(this3,2));
+			var this4 = a / c;
+			var angle = js.Boot.__cast(Math.asin(this4) * 57.29577951308238 , Float);
 			canvas.BeginRotate(startX,startY,angle);
 			var glyph = new alphaTab.rendering.glyphs.NoteVibratoGlyph(0,0,1,1.2);
 			glyph.Renderer = this.Renderer;
@@ -31914,9 +31931,9 @@ alphaTab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphaTab.renderi
 		this.Width = 0;
 	}
 	,Paint: function(cx,cy,canvas) {
-		var r = js.Boot.__cast(this.Renderer , alphaTab.rendering.TabBarRenderer);
-		cx = cx + r.X;
-		cy = cy + r.Y;
+		var startNoteRenderer = js.Boot.__cast(this.Renderer , alphaTab.rendering.TabBarRenderer);
+		cx = cx + startNoteRenderer.X;
+		cy = cy + startNoteRenderer.Y;
 		var sizeX = 12 * this.get_Scale();
 		var sizeY = 3 * this.get_Scale();
 		var startX;
@@ -31939,51 +31956,57 @@ alphaTab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphaTab.renderi
 				startOffsetY = sizeY * -1;
 				endOffsetY = sizeY;
 			}
-			startX = cx + r.GetNoteX(this._startNote,true);
-			startY = cy + r.GetNoteY(this._startNote,false) + startOffsetY;
+			startX = cx + startNoteRenderer.GetBeatX(this._startNote.Beat,3);
+			startY = cy + startNoteRenderer.GetNoteY(this._startNote,false) + startOffsetY;
 			if(this._startNote.SlideTarget != null) {
-				endX = cx + r.GetNoteX(this._startNote.SlideTarget,false);
-				endY = cy + r.GetNoteY(this._startNote.SlideTarget,false) + endOffsetY;
+				var endNoteRenderer = this.Renderer.ScoreRenderer.Layout.GetRendererForBar(this.Renderer.Staff.get_StaveId(),this._startNote.SlideTarget.Beat.Voice.Bar);
+				if(endNoteRenderer == null || endNoteRenderer.Staff != startNoteRenderer.Staff) {
+					endX = cx + this._parent.X;
+					endY = startY;
+				} else {
+					endX = cx + endNoteRenderer.GetBeatX(this._startNote.SlideTarget.Beat,1);
+					endY = cy + endNoteRenderer.GetNoteY(this._startNote.SlideTarget,false) + endOffsetY;
+				}
 			} else {
 				endX = cx + this._parent.X;
 				endY = startY;
 			}
 			break;
 		case 3:
-			endX = cx + r.GetNoteX(this._startNote,false);
-			endY = cy + r.GetNoteY(this._startNote,false);
+			endX = cx + startNoteRenderer.GetNoteX(this._startNote,false);
+			endY = cy + startNoteRenderer.GetNoteY(this._startNote,false);
 			startX = endX - sizeX;
-			startY = cy + r.GetNoteY(this._startNote,false) + sizeY;
+			startY = cy + startNoteRenderer.GetNoteY(this._startNote,false) + sizeY;
 			break;
 		case 4:
-			endX = cx + r.GetNoteX(this._startNote,false);
-			endY = cy + r.GetNoteY(this._startNote,false);
+			endX = cx + startNoteRenderer.GetNoteX(this._startNote,false);
+			endY = cy + startNoteRenderer.GetNoteY(this._startNote,false);
 			startX = endX - sizeX;
-			startY = cy + r.GetNoteY(this._startNote,false) - sizeY;
+			startY = cy + startNoteRenderer.GetNoteY(this._startNote,false) - sizeY;
 			break;
 		case 5:
-			startX = cx + r.GetNoteX(this._startNote,true);
-			startY = cy + r.GetNoteY(this._startNote,false);
+			startX = cx + startNoteRenderer.GetNoteX(this._startNote,true);
+			startY = cy + startNoteRenderer.GetNoteY(this._startNote,false);
 			endX = startX + sizeX;
-			endY = cy + r.GetNoteY(this._startNote,false) - sizeY;
+			endY = cy + startNoteRenderer.GetNoteY(this._startNote,false) - sizeY;
 			break;
 		case 6:
-			startX = cx + r.GetNoteX(this._startNote,true);
-			startY = cy + r.GetNoteY(this._startNote,false);
+			startX = cx + startNoteRenderer.GetNoteX(this._startNote,true);
+			startY = cy + startNoteRenderer.GetNoteY(this._startNote,false);
 			endX = startX + sizeX;
-			endY = cy + r.GetNoteY(this._startNote,false) + sizeY;
+			endY = cy + startNoteRenderer.GetNoteY(this._startNote,false) + sizeY;
 			break;
 		case 7:
-			startX = cx + r.GetNoteX(this._startNote,true);
-			startY = cy + r.GetNoteY(this._startNote,false) - sizeY * 2;
-			endX = cx + r.GetBeatX(this._startNote.Beat,4);
+			startX = cx + startNoteRenderer.GetNoteX(this._startNote,true);
+			startY = cy + startNoteRenderer.GetNoteY(this._startNote,false) - sizeY * 2;
+			endX = cx + startNoteRenderer.GetBeatX(this._startNote.Beat,4);
 			endY = startY + sizeY * 3;
 			waves = true;
 			break;
 		case 8:
-			startX = cx + r.GetNoteX(this._startNote,true);
-			startY = cy + r.GetNoteY(this._startNote,false) + sizeY;
-			endX = cx + r.GetBeatX(this._startNote.Beat,4);
+			startX = cx + startNoteRenderer.GetNoteX(this._startNote,true);
+			startY = cy + startNoteRenderer.GetNoteY(this._startNote,false) + sizeY;
+			endX = cx + startNoteRenderer.GetBeatX(this._startNote.Beat,4);
 			endY = startY - sizeY * 3;
 			waves = true;
 			break;
@@ -32023,7 +32046,7 @@ alphaTab.rendering.glyphs.TabSlurGlyph.__name__ = ["alphaTab","rendering","glyph
 alphaTab.rendering.glyphs.TabSlurGlyph.__super__ = alphaTab.rendering.glyphs.Glyph;
 alphaTab.rendering.glyphs.TabSlurGlyph.prototype = $extend(alphaTab.rendering.glyphs.Glyph.prototype,{
 	GetBeamDirection: function(note) {
-		if(note.String > 3) {
+		if(note.String > 3 || note.Beat.Notes.length > 1 && note.String == note.Beat.MaxStringNote.String) {
 			return 0;
 		} else {
 			return 1;
@@ -32031,14 +32054,17 @@ alphaTab.rendering.glyphs.TabSlurGlyph.prototype = $extend(alphaTab.rendering.gl
 	}
 	,Paint: function(cx,cy,canvas) {
 		var slurId = "tab.slur." + this._startNote.SlurOrigin.Beat.Id + "." + this._startNote.SlurOrigin.SlurDestination.Beat.Id;
-		var renderer = this.Renderer;
+		var renderer = js.Boot.__cast(this.Renderer , alphaTab.rendering.TabBarRenderer);
 		var isSlurRendered = renderer.Staff.GetSharedLayoutData(slurId,false);
 		if(!isSlurRendered) {
 			renderer.Staff.SetSharedLayoutData(slurId,true);
 			var startNoteRenderer = this.Renderer.ScoreRenderer.Layout.GetRendererForBar(this.Renderer.Staff.get_StaveId(),this._startNote.Beat.Voice.Bar);
 			var direction = this.GetBeamDirection(this._startNote);
 			var startX = cx + startNoteRenderer.X;
-			var startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,direction == 0);
+			var startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,true);
+			if(direction == 1) {
+				startY = startY + renderer.GetTabY(1,0);
+			}
 			if(this._startNote.SlurOrigin.Id == this._startNote.Id) {
 				startX = startX + startNoteRenderer.GetBeatX(this._startNote.Beat,2);
 			}
