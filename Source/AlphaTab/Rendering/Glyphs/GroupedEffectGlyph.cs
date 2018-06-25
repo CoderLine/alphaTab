@@ -25,6 +25,7 @@ namespace AlphaTab.Rendering.Glyphs
     {
         protected BeatXPosition EndPosition { get; set; }
         protected bool ForceGroupedRendering { get; set; }
+        protected bool EndOnBarLine { get; set; }
 
         protected GroupedEffectGlyph(BeatXPosition endPosition) : base(0, 0)
         {

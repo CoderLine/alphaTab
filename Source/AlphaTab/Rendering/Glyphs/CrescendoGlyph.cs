@@ -24,6 +24,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     class CrescendoGlyph : GroupedEffectGlyph
     {
+        private const int Padding = 5;
         private readonly CrescendoType _crescendo;
 
         public CrescendoGlyph(float x, float y, CrescendoType crescendo)
@@ -47,15 +48,17 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.BeginPath();
             if (_crescendo == CrescendoType.Crescendo)
             {
+                endX -= Padding * Scale;
                 canvas.MoveTo(endX, cy + Y);
                 canvas.LineTo(startX, cy + Y + height / 2);
                 canvas.LineTo(endX, cy + Y + height);
             }
             else
             {
-                canvas.MoveTo(cx + X, cy + Y);
+                endX -= Padding * Scale;
+                canvas.MoveTo(startX, cy + Y);
                 canvas.LineTo(endX, cy + Y + (height / 2));
-                canvas.LineTo(cx + X, cy + Y + height);
+                canvas.LineTo(startX, cy + Y + height);
             }
             canvas.Stroke();
         }

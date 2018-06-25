@@ -27876,6 +27876,7 @@ alphaTab.rendering.glyphs.GroupedEffectGlyph = $hx_exports["alphaTab"]["renderin
 	alphaTab.rendering.glyphs.EffectGlyph.call(this,0,0);
 	this.EndPosition = 0;
 	this.ForceGroupedRendering = false;
+	this.EndOnBarLine = false;
 	this.EndPosition = endPosition;
 };
 alphaTab.rendering.glyphs.GroupedEffectGlyph.__name__ = ["alphaTab","rendering","glyphs","GroupedEffectGlyph"];
@@ -28420,13 +28421,15 @@ alphaTab.rendering.glyphs.CrescendoGlyph.prototype = $extend(alphaTab.rendering.
 		var height = this.Height * this.get_Scale();
 		canvas.BeginPath();
 		if(this._crescendo == 1) {
+			endX = endX - 5 * this.get_Scale();
 			canvas.MoveTo(endX,cy + this.Y);
 			canvas.LineTo(startX,cy + this.Y + height / 2);
 			canvas.LineTo(endX,cy + this.Y + height);
 		} else {
-			canvas.MoveTo(cx + this.X,cy + this.Y);
+			endX = endX - 5 * this.get_Scale();
+			canvas.MoveTo(startX,cy + this.Y);
 			canvas.LineTo(endX,cy + this.Y + height / 2);
-			canvas.LineTo(cx + this.X,cy + this.Y + height);
+			canvas.LineTo(startX,cy + this.Y + height);
 		}
 		canvas.Stroke();
 	}
@@ -37321,6 +37324,7 @@ alphaTab.rendering.TabBarRenderer.LineSpacing = 10;
 alphaTab.rendering.glyphs.AccidentalGroupGlyph.NonReserved = -3000;
 alphaTab.rendering.glyphs.AlternateEndingsGlyph.Padding = 3;
 alphaTab.rendering.glyphs.BendNoteHeadGroupGlyph.ElementPadding = 2;
+alphaTab.rendering.glyphs.CrescendoGlyph.Padding = 5;
 alphaTab.rendering.glyphs.GhostParenthesisGlyph.Size = 6;
 alphaTab.rendering.glyphs.LineRangedGlyph.LineSpacing = 3;
 alphaTab.rendering.glyphs.LineRangedGlyph.LineTopPadding = 8;
