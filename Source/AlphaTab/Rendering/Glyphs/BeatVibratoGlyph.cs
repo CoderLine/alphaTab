@@ -32,11 +32,6 @@ namespace AlphaTab.Rendering.Glyphs
             Height = 18 * Scale;
         }
 
-        protected override float CalculateEndX(BarRendererBase endBeatRenderer, Beat endBeat, float cx, BeatXPosition endPosition)
-        {
-            return cx + endBeatRenderer.X + endBeatRenderer.GetBeatX(endBeat, BeatXPosition.MiddleNotes);
-        }
-
         protected override void PaintGrouped(float cx, float cy, float endX, ICanvas canvas)
         {
             var startX = cx + X;

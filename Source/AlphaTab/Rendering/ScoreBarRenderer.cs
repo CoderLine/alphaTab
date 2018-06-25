@@ -113,7 +113,7 @@ namespace AlphaTab.Rendering
         {
             base.DoLayout();
 
-            if (!Bar.IsEmpty)
+            if (!Bar.IsEmpty && AccidentalHelper.MaxNoteValueBeat != null)
             {
                 var top = GetScoreY(0);
                 var bottom = GetScoreY(8);

@@ -26100,7 +26100,7 @@ alphaTab.rendering.ScoreBarRenderer.prototype = $extend(alphaTab.rendering.BarRe
 	}
 	,DoLayout: function() {
 		alphaTab.rendering.BarRendererBase.prototype.DoLayout.call(this);
-		if(!this.Bar.get_IsEmpty()) {
+		if(!this.Bar.get_IsEmpty() && this.AccidentalHelper.MaxNoteValueBeat != null) {
 			var top = this.GetScoreY(0,0);
 			var bottom = this.GetScoreY(8,0);
 			var whammyOffset = this.SimpleWhammyOverflow;
@@ -27971,9 +27971,6 @@ alphaTab.rendering.glyphs.BeatVibratoGlyph.prototype = $extend(alphaTab.renderin
 		default:
 		}
 		this.Height = 18 * this.get_Scale();
-	}
-	,CalculateEndX: function(endBeatRenderer,endBeat,cx,endPosition) {
-		return cx + endBeatRenderer.X + endBeatRenderer.GetBeatX(endBeat,2);
 	}
 	,PaintGrouped: function(cx,cy,endX,canvas) {
 		var startX = cx + this.X;
