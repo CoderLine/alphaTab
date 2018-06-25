@@ -107,7 +107,6 @@ namespace AlphaTab.Rendering.Glyphs
             var direction = _beat.Notes.Count == 1 ? beatDirection : BeamDirection.Up;
 
             var textalign = canvas.TextAlign;
-            canvas.TextAlign = TextAlign.Center;
             for (var i = 0; i < beat.Notes.Count; i++)
             {
                 var note = beat.Notes[i];

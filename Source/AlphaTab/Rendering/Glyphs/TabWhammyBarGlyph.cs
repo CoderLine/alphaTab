@@ -192,6 +192,8 @@ namespace AlphaTab.Rendering.Glyphs
 
                 var zeroY = cy + Renderer.Staff.GetSharedLayoutData(TopOffsetSharedDataKey, 0);
 
+                var slurText = _beat.WhammyStyle == BendStyle.Gradual ? "grad." : "";
+
                 for (int i = 0, j = _renderPoints.Count - 1; i < j; i++)
                 {
                     var firstPt = _renderPoints[i];
@@ -206,14 +208,16 @@ namespace AlphaTab.Rendering.Glyphs
                         isFirst = false;
                     }
 
-                    PaintWhammy(isFirst, firstPt, secondPt, nextPt, startX, zeroY, dx, canvas);
+                    PaintWhammy(isFirst, firstPt, secondPt, nextPt, startX, zeroY, dx, canvas, slurText);
+
+                    slurText = "";
                 }
                 canvas.Stroke();
             }
             canvas.TextAlign = old;
         }
 
-        private void PaintWhammy(bool isFirst, BendPoint firstPt, BendPoint secondPt, BendPoint nextPt, float cx, float cy, float dx, ICanvas canvas)
+        private void PaintWhammy(bool isFirst, BendPoint firstPt, BendPoint secondPt, BendPoint nextPt, float cx, float cy, float dx, ICanvas canvas, string slurText = null)
         {
             var x1 = cx + dx * firstPt.Offset;
             var x2 = cx + dx * secondPt.Offset;
@@ -277,12 +281,20 @@ namespace AlphaTab.Rendering.Glyphs
 
             var res = canvas.Resources;
 
-            if (isFirst && Renderer.Settings.ShowZeroOnDiveWhammy && !_beat.IsContinuedWhammy && !_isSimpleDip)
+            if (isFirst && !_beat.IsContinuedWhammy && !_isSimpleDip)
             {
-                var s = "0";
                 float y = y1;
                 y -= res.TablatureFont.Size + (2 * Scale);
-                canvas.FillText(s, x1, y);
+                if (Renderer.Settings.ShowZeroOnDiveWhammy)
+                {
+                    canvas.FillText("0", x1, y);
+                }
+
+                if (slurText != null)
+                {
+                    y -= res.TablatureFont.Size + (2 * Scale);
+                    canvas.FillText(slurText, x1, y);
+                }
             }
 
             var dV = Math.Abs(secondPt.Value);

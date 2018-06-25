@@ -25272,8 +25272,6 @@ alphaTab.rendering.BarRendererBase.prototype = {
 		this._postBeatGlyphs.Paint(cx + this.X,cy + this.Y,canvas);
 	}
 	,PaintBackground: function(cx,cy,canvas) {
-		canvas.set_Color(alphaTab.platform.model.Color.Random(100));
-		canvas.FillRect(cx + this.X,cy + this.Y - this.TopOverflow,this.Width,this.Height + this.TopOverflow + this.BottomOverflow);
 	}
 	,BuildBoundingsLookup: function(masterBarBounds,cx,cy) {
 		var _gthis = this;
@@ -30773,7 +30771,6 @@ alphaTab.rendering.glyphs.ScoreWhammyBarGlyph.prototype = $extend(alphaTab.rende
 		var beatDirection = this.GetBeamDirection(beat,startNoteRenderer);
 		var direction = this._beat.Notes.length == 1 ? beatDirection : 0;
 		var textalign = canvas.get_TextAlign();
-		canvas.set_TextAlign(1);
 		var i = 0;
 		while(i < beat.Notes.length) {
 			var note = beat.Notes[i];
@@ -32145,6 +32142,7 @@ alphaTab.rendering.glyphs.TabWhammyBarGlyph.prototype = $extend(alphaTab.renderi
 			var dx = (endX - startX) / 60;
 			canvas.BeginPath();
 			var zeroY = cy + this.Renderer.Staff.GetSharedLayoutData("tab.whammy.topoffset",0);
+			var slurText = this._beat.WhammyStyle == 1 ? "grad." : "";
 			var i = 0;
 			var j = this._renderPoints.length - 1;
 			while(i < j) {
@@ -32153,17 +32151,18 @@ alphaTab.rendering.glyphs.TabWhammyBarGlyph.prototype = $extend(alphaTab.renderi
 				var nextPt = i < j - 2 ? this._renderPoints[i + 2] : null;
 				var isFirst = i == 0;
 				if(i == 0 && firstPt.Value != 0 && !this._beat.IsContinuedWhammy) {
-					this.PaintWhammy(false,new alphaTab.model.BendPoint(0,0),firstPt,secondPt,startX,zeroY,dx,canvas);
+					this.PaintWhammy(false,new alphaTab.model.BendPoint(0,0),firstPt,secondPt,startX,zeroY,dx,canvas,null);
 					isFirst = false;
 				}
-				this.PaintWhammy(isFirst,firstPt,secondPt,nextPt,startX,zeroY,dx,canvas);
+				this.PaintWhammy(isFirst,firstPt,secondPt,nextPt,startX,zeroY,dx,canvas,slurText);
+				slurText = "";
 				++i;
 			}
 			canvas.Stroke();
 		}
 		canvas.set_TextAlign(old);
 	}
-	,PaintWhammy: function(isFirst,firstPt,secondPt,nextPt,cx,cy,dx,canvas) {
+	,PaintWhammy: function(isFirst,firstPt,secondPt,nextPt,cx,cy,dx,canvas,slurText) {
 		var x1 = cx + dx * firstPt.Offset;
 		var x2 = cx + dx * secondPt.Offset;
 		var y1 = cy - this.GetOffset(firstPt.Value);
@@ -32205,27 +32204,32 @@ alphaTab.rendering.glyphs.TabWhammyBarGlyph.prototype = $extend(alphaTab.renderi
 			canvas.LineTo(x2,y2);
 		}
 		var res = canvas.get_Resources();
-		if(isFirst && this.Renderer.get_Settings().ShowZeroOnDiveWhammy && !this._beat.IsContinuedWhammy && !this._isSimpleDip) {
-			var s = "0";
+		if(isFirst && !this._beat.IsContinuedWhammy && !this._isSimpleDip) {
 			var y = y1;
 			y = y - (res.TablatureFont.Size + 2 * this.get_Scale());
-			canvas.FillText(s,x1,y);
+			if(this.Renderer.get_Settings().ShowZeroOnDiveWhammy) {
+				canvas.FillText("0",x1,y);
+			}
+			if(slurText != null) {
+				y = y - (res.TablatureFont.Size + 2 * this.get_Scale());
+				canvas.FillText(slurText,x1,y);
+			}
 		}
 		var dV = Math.abs(secondPt.Value);
 		if((dV != 0 || this.Renderer.get_Settings().ShowZeroOnDiveWhammy && !this._isSimpleDip) && firstPt.Value != secondPt.Value) {
-			var s1 = "";
+			var s = "";
 			if(secondPt.Value < 0) {
-				s1 = s1 + "-";
+				s = s + "-";
 			}
 			if(dV >= 4) {
 				var steps = dV / 4 | 0;
-				s1 = s1 + Std.string(steps);
+				s = s + Std.string(steps);
 				dV = dV - steps * 4;
 			} else if(dV == 0) {
-				s1 = s1 + "0";
+				s = s + "0";
 			}
 			if(dV > 0) {
-				s1 = s1 + alphaTab.rendering.glyphs.TabBendGlyph.GetFractionSign(dV);
+				s = s + alphaTab.rendering.glyphs.TabBendGlyph.GetFractionSign(dV);
 			}
 			var y3;
 			if(this._isSimpleDip) {
@@ -32242,7 +32246,7 @@ alphaTab.rendering.glyphs.TabWhammyBarGlyph.prototype = $extend(alphaTab.renderi
 				}
 			}
 			var x = x2;
-			canvas.FillText(s1,x,y3);
+			canvas.FillText(s,x,y3);
 		}
 	}
 	,__class__: alphaTab.rendering.glyphs.TabWhammyBarGlyph
