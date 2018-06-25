@@ -303,7 +303,7 @@ namespace AlphaTab.Rendering.Glyphs
                 var startNoteRenderer = Renderer;
                 Note endNote = note;
                 bool isMultiBeatBend = false;
-                BarRendererBase endNoteRenderer;
+                TabBarRenderer endNoteRenderer;
                 bool endNoteHasBend = false;
                 var slurText = note.BendStyle == BendStyle.Gradual ? "grad." : "";
 
@@ -312,7 +312,7 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     var nextNote = endNote.TieDestination;
 
-                    endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, nextNote.Beat.Voice.Bar);
+                    endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<TabBarRenderer>(Renderer.Staff.StaveId, nextNote.Beat.Voice.Bar);
 
                     if (endNoteRenderer == null || startNoteRenderer.Staff != endNoteRenderer.Staff)
                     {
@@ -330,7 +330,7 @@ namespace AlphaTab.Rendering.Glyphs
                 }
 
                 endBeat = endNote.Beat;
-                endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, endBeat.Voice.Bar);
+                endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<TabBarRenderer>(Renderer.Staff.StaveId, endBeat.Voice.Bar);
 
                 if (endBeat.IsLastOfVoice && !endNote.HasBend && Renderer.Settings.ExtendBendArrowsOnTiedNotes)
                 {

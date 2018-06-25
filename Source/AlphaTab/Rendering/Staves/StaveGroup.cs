@@ -491,7 +491,7 @@ namespace AlphaTab.Rendering.Staves
                 return 0;
             }
             var bar = Layout.Renderer.Tracks[0].Staves[0].Bars[index];
-            var renderer = Layout.GetRendererForBar(_firstStaffInAccolade.StaveId, bar);
+            var renderer = Layout.GetRendererForBar<BarRendererBase>(_firstStaffInAccolade.StaveId, bar);
             return renderer.X;
         }
     }

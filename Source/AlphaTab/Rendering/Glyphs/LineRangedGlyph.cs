@@ -50,8 +50,10 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var res = Renderer.Resources;
             canvas.Font = res.EffectFont;
+            var x = canvas.TextAlign;
             canvas.TextAlign = TextAlign.Center;
             canvas.FillText(_label, cx + X, cy + Y);
+            canvas.TextAlign = x;
         }
 
         protected override void PaintGrouped(float cx, float cy, float endX, ICanvas canvas)

@@ -260,6 +260,9 @@ namespace AlphaTab
         public static void FillFromJson(Settings settings, dynamic json, FastDictionary<string, object> dataAttributes)
         {
             var global = Script.Write<dynamic>("js.Lib.global");
+
+            // System Settings
+
             if (global.document && global.ALPHATAB_ROOT)
             {
                 settings.ScriptFile = global.ALPHATAB_ROOT;
@@ -306,6 +309,29 @@ namespace AlphaTab
             {
                 settings.UseWebWorker = dataAttributes["useWorker"].IsTruthy();
             }
+
+            // Display settings
+
+            if (Platform.Platform.JsonExists(json, "displayMode"))
+            {
+                settings.DisplayMode = DecodeDisplayMode(json.displayMode);
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("displayMode"))
+            {
+                settings.DisplayMode = DecodeDisplayMode(dataAttributes["displayMode"]);
+            }
+
+            // Override some defaults on songbook mode
+            if (settings.DisplayMode == DisplayMode.SongBook)
+            {
+                settings.SmallGraceTabNotes = false;
+                settings.FingeringMode = FingeringMode.SingleNoteEffectBand;
+                settings.ExtendBendArrowsOnTiedNotes = false;
+                settings.ShowParenthesisForTiedBends = false;
+                settings.ShowTabNoteOnTiedBend = false;
+                settings.ShowZeroOnDiveWhammy = true;
+            }
+
             if (Platform.Platform.JsonExists(json, "scale"))
             {
                 settings.Scale = json.scale;
@@ -398,15 +424,6 @@ namespace AlphaTab
             else if (dataAttributes != null && dataAttributes.ContainsKey("smallGraceTabNotes"))
             {
                 settings.SmallGraceTabNotes = (bool)dataAttributes["smallGraceTabNotes"];
-            }
-
-            if (Platform.Platform.JsonExists(json, "displayMode"))
-            {
-                settings.DisplayMode = DecodeDisplayMode(json.displayMode);
-            }
-            else if (dataAttributes != null && dataAttributes.ContainsKey("displayMode"))
-            {
-                settings.DisplayMode = DecodeDisplayMode(dataAttributes["displayMode"]);
             }
 
             if (Platform.Platform.JsonExists(json, "fingeringMode"))

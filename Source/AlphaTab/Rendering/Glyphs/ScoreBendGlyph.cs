@@ -96,7 +96,7 @@ namespace AlphaTab.Rendering.Glyphs
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             // Draw note heads
-            var startNoteRenderer = (ScoreBarRenderer)Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, _beat.Voice.Bar);
+            var startNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<ScoreBarRenderer>(Renderer.Staff.StaveId, _beat.Voice.Bar);
             var startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_beat, BeatXPosition.MiddleNotes);
             var endBeatX = cx + startNoteRenderer.X;
             if (_beat.IsLastOfVoice)
@@ -105,7 +105,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
             else
             {
-                endBeatX += startNoteRenderer.GetBeatX(_beat, BeatXPosition.EndBeat);
+                endBeatX += startNoteRenderer.GetBeatX(_beat, BeatXPosition.MiddleNotes);
             }
             endBeatX -= EndPadding * Scale;
 
@@ -153,7 +153,7 @@ namespace AlphaTab.Rendering.Glyphs
                     var endNote = note.TieDestination;
                     var endNoteRenderer = endNote == null
                         ? null
-                        : Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId,
+                        : Renderer.ScoreRenderer.Layout.GetRendererForBar<ScoreBarRenderer>(Renderer.Staff.StaveId,
                             endNote.Beat.Voice.Bar);
 
                     // if we have a line break we draw only a line until the end

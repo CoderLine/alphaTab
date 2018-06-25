@@ -93,7 +93,7 @@ namespace AlphaTab.Rendering.Glyphs
             if (EndPosition == BeatXPosition.EndBeat && lastLinkedGlyph.Beat.NextBeat != null)
             {
                 endBeat = lastLinkedGlyph.Beat.NextBeat;
-                endBeatRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, endBeat.Voice.Bar);
+                endBeatRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Renderer.Staff.StaveId, endBeat.Voice.Bar);
                 position = BeatXPosition.MiddleNotes;
                 if (endBeatRenderer == null || endBeatRenderer.Staff != Renderer.Staff)
                 {

@@ -101,8 +101,8 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             var whammyMode = Renderer.Settings.DisplayMode;
-            var startNoteRenderer = (ScoreBarRenderer)Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, beat.Voice.Bar);
-            var startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(beat, BeatXPosition.PostNotes);
+            var startNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<ScoreBarRenderer>(Renderer.Staff.StaveId, beat.Voice.Bar);
+            var startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(beat, BeatXPosition.MiddleNotes);
             var beatDirection = GetBeamDirection(beat, startNoteRenderer);
             var direction = _beat.Notes.Count == 1 ? beatDirection : BeamDirection.Up;
 
@@ -138,12 +138,12 @@ namespace AlphaTab.Rendering.Glyphs
                 if (note.IsTieOrigin)
                 {
                     endNoteRenderer =
-                        (ScoreBarRenderer)Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId,
+                        Renderer.ScoreRenderer.Layout.GetRendererForBar<ScoreBarRenderer>(Renderer.Staff.StaveId,
                             note.TieDestination.Beat.Voice.Bar);
                     if (endNoteRenderer != null && endNoteRenderer.Staff == startNoteRenderer.Staff)
                     {
                         endX = cx + endNoteRenderer.X +
-                               endNoteRenderer.GetBeatX(note.TieDestination.Beat, BeatXPosition.PreNotes);
+                               endNoteRenderer.GetBeatX(note.TieDestination.Beat, BeatXPosition.MiddleNotes);
                     }
                     else
                     {

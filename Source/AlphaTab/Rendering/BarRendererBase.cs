@@ -47,7 +47,7 @@ namespace AlphaTab.Rendering
                 {
                     return null;
                 }
-                return ScoreRenderer.Layout.GetRendererForBar(Staff.StaveId, Bar.NextBar);
+                return ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Staff.StaveId, Bar.NextBar);
             }
         }
 
@@ -59,7 +59,7 @@ namespace AlphaTab.Rendering
                 {
                     return null;
                 }
-                return ScoreRenderer.Layout.GetRendererForBar(Staff.StaveId, Bar.PreviousBar);
+                return ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Staff.StaveId, Bar.PreviousBar);
             }
         }
 

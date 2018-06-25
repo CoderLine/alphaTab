@@ -252,12 +252,13 @@ namespace AlphaTab.Rendering.Layout
             }
         }
 
-        public BarRendererBase GetRendererForBar(string key, Bar bar)
+        public T GetRendererForBar<T>(string key, Bar bar)
+            where T: BarRendererBase
         {
             var barRendererId = bar.Id;
             if (_barRendererLookup.ContainsKey(key) && _barRendererLookup[key].ContainsKey(barRendererId))
             {
-                return _barRendererLookup[key][barRendererId];
+                return (T)_barRendererLookup[key][barRendererId];
             }
             return null;
         }

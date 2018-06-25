@@ -139,12 +139,17 @@ namespace AlphaTab.Rendering.Glyphs
             var startNoteRenderer = Renderer;
 
             Beat endBeat = _beat.NextBeat;
-            BarRendererBase endNoteRenderer = null;
+            TabBarRenderer endNoteRenderer = null;
             BeatXPosition endXPositionType = BeatXPosition.PreNotes;
             if (endBeat != null)
             {
-                endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, endBeat.Voice.Bar);
+                endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<TabBarRenderer>(Renderer.Staff.StaveId, endBeat.Voice.Bar);
                 if (endNoteRenderer == null || endNoteRenderer.Staff != startNoteRenderer.Staff)
+                {
+                    endBeat = null;
+                    endNoteRenderer = null;
+                }
+                else if (endNoteRenderer != startNoteRenderer && !endBeat.HasWhammyBar)
                 {
                     endBeat = null;
                     endNoteRenderer = null;
@@ -173,13 +178,8 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_beat, BeatXPosition.MiddleNotes);
                 endX = endNoteRenderer == null
-                    ? cx + startNoteRenderer.X + startNoteRenderer.Width - ScoreHelperNotesBaseGlyph.EndPadding * Scale
+                    ? cx + startNoteRenderer.X + startNoteRenderer.Width - 2 * Scale
                     : cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat, endXPositionType);
-                if (endXPositionType == BeatXPosition.PreNotes)
-                {
-                    var subscale = (startNoteRenderer.Settings.SmallGraceTabNotes) ? NoteHeadGlyph.GraceScale : 1;
-                    endX -= NoteHeadGlyph.QuarterNoteHeadWidth * Scale * subscale - 2 * Scale;
-                }
             }
 
 

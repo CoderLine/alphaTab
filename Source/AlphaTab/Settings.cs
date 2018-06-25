@@ -175,7 +175,7 @@ namespace AlphaTab
         /// <summary>
         /// If set to true, 0 is shown on dive whammy bars. 
         /// </summary>
-        public bool ShowZeroOnDiveWhammy{ get; set; }
+        public bool ShowZeroOnDiveWhammy { get; set; }
 
         /// <summary>
         /// If set to true, line effects (like w/bar, let-ring etc)

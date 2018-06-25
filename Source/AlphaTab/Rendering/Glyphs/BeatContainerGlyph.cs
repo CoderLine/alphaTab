@@ -182,7 +182,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             //if (Beat.Voice.Index == 0)
             //{
-            //    canvas.Color = new Color(200, 200, 0, 100);
+            //    canvas.Color = new Color(200, 0, 0, 100);
             //    canvas.StrokeRect(cx + X, cy + Y + PreNotes.Y + 30, Width, 10);
             //}
 
@@ -199,6 +199,7 @@ namespace AlphaTab.Rendering.Glyphs
             //    canvas.StrokeRect(cx + X + OnNotes.X, cy + Y + OnNotes.Y + 10, OnNotes.Width, 10);
             //}
 
+            canvas.Color = canvas.Resources.MainGlyphColor;
             // paint the ties relative to the whole staff, 
             // reason: we have possibly multiple staves involved and need to calculate the correct positions.
             var staffX = cx - VoiceContainer.X - Renderer.X;
