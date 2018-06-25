@@ -162,6 +162,7 @@ namespace AlphaTab.Model
             }
         }
 
+        public bool IsNewLetRing { get; set; }
         public bool IsLetRing { get; set; }
         public bool IsPalmMute { get; set; }
 
@@ -437,21 +438,27 @@ namespace AlphaTab.Model
             for (int i = 0, j = Notes.Count; i < j; i++)
             {
                 var note = Notes[i];
-                if (_minNote == null || note.RealValue < _minNote.RealValue)
+                if (note.IsVisible)
                 {
-                    _minNote = note;
-                }
-                if (_maxNote == null || note.RealValue > _maxNote.RealValue)
-                {
-                    _maxNote = note;
-                }
-                if (_minStringNote == null || note.String < _minStringNote.String)
-                {
-                    _minStringNote = note;
-                }
-                if (_maxStringNote == null || note.String > _maxStringNote.String)
-                {
-                    _maxStringNote = note;
+                    if (_minNote == null || note.RealValue < _minNote.RealValue)
+                    {
+                        _minNote = note;
+                    }
+
+                    if (_maxNote == null || note.RealValue > _maxNote.RealValue)
+                    {
+                        _maxNote = note;
+                    }
+
+                    if (_minStringNote == null || note.String < _minStringNote.String)
+                    {
+                        _minStringNote = note;
+                    }
+
+                    if (_maxStringNote == null || note.String > _maxStringNote.String)
+                    {
+                        _maxStringNote = note;
+                    }
                 }
             }
         }

@@ -449,7 +449,7 @@ namespace AlphaTab.Audio.Generator
                 }
             }
 
-            if (note.IsLetRing)
+            if (note.IsLetRing && _settings.DisplayMode == DisplayMode.GuitarPro)
             {
                 // LetRing ends when:  
                 // - rest 
@@ -463,14 +463,17 @@ namespace AlphaTab.Audio.Generator
                     {
                         break;
                     }
+
                     // note on the same string 
                     if (note.IsStringed && next.HasNoteOnString(note.String))
                     {
                         break;
                     }
+
                     lastLetRingBeat = lastLetRingBeat.NextBeat;
 
-                    letRingEnd = (lastLetRingBeat.AbsolutePlaybackStart - note.Beat.AbsolutePlaybackStart) + lastLetRingBeat.PlaybackDuration;
+                    letRingEnd = (lastLetRingBeat.AbsolutePlaybackStart - note.Beat.AbsolutePlaybackStart) +
+                                 lastLetRingBeat.PlaybackDuration;
                     if (letRingEnd > maxDuration)
                     {
                         letRingEnd = maxDuration;
@@ -491,7 +494,6 @@ namespace AlphaTab.Audio.Generator
             {
                 durationWithEffects.LetRingEnd = durationWithEffects.UntilTieEnd;
             }
-
             return durationWithEffects;
         }
 

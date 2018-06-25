@@ -37,7 +37,10 @@ namespace AlphaTab.Rendering.Glyphs
                 NoteNumbers.BeamingHelper = BeamingHelper;
                 foreach (var note in Container.Beat.Notes)
                 {
-                    CreateNoteGlyph(note);
+                    if (note.IsVisible)
+                    {
+                        CreateNoteGlyph(note);
+                    }
                 }
                 AddGlyph(NoteNumbers);
 

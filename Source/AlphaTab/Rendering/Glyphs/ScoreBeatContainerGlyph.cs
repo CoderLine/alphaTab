@@ -70,10 +70,11 @@ namespace AlphaTab.Rendering
         protected override void CreateTies(Note n)
         {
             // create a tie if any effect requires it
+            if (!n.IsVisible) return;
 
             // NOTE: we create 2 tie glyphs if we have a line break inbetween 
             // the two notes
-            if (n.IsTieOrigin && !n.HasBend && !n.Beat.HasWhammyBar && n.Beat.GraceType != GraceType.BendGrace) 
+            if (n.IsTieOrigin && !n.HasBend && !n.Beat.HasWhammyBar && n.Beat.GraceType != GraceType.BendGrace && n.TieDestination.IsVisible) 
             {
                 var tie = new ScoreTieGlyph(n, n.TieDestination);
                 Ties.Add(tie);

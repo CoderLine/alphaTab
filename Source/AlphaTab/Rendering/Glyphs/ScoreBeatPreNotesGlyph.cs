@@ -35,29 +35,33 @@ namespace AlphaTab.Rendering.Glyphs
                 _prebends.Renderer = Renderer;
                 foreach (var note in Container.Beat.Notes)
                 {
-                    if (note.HasBend)
+                    if (note.IsVisible)
                     {
-                        switch (note.BendType)
+                        if (note.HasBend)
                         {
-                            case BendType.PrebendBend:
-                            case BendType.Prebend:
-                            case BendType.PrebendRelease:
-                                _prebends.AddGlyph(note.DisplayValue - note.BendPoints[0].Value / 2);
-                                break;
+                            switch (note.BendType)
+                            {
+                                case BendType.PrebendBend:
+                                case BendType.Prebend:
+                                case BendType.PrebendRelease:
+                                    _prebends.AddGlyph(note.DisplayValue - note.BendPoints[0].Value / 2);
+                                    break;
+                            }
                         }
-                    }
-                    else if (note.Beat.HasWhammyBar)
-                    {
-                        switch (note.Beat.WhammyBarType)
+                        else if (note.Beat.HasWhammyBar)
                         {
-                            case WhammyType.PrediveDive:
-                            case WhammyType.Predive:
-                                _prebends.AddGlyph(note.DisplayValue - note.Beat.WhammyBarPoints[0].Value / 2);
-                                break;
+                            switch (note.Beat.WhammyBarType)
+                            {
+                                case WhammyType.PrediveDive:
+                                case WhammyType.Predive:
+                                    _prebends.AddGlyph(note.DisplayValue - note.Beat.WhammyBarPoints[0].Value / 2);
+                                    break;
+                            }
                         }
+
+                        CreateAccidentalGlyph(note, accidentals);
+                        ghost.AddParenthesis(note);
                     }
-                    CreateAccidentalGlyph(note, accidentals);
-                    ghost.AddParenthesis(note);
                 }
 
                 if (!_prebends.IsEmpty)

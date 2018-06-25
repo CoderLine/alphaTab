@@ -45,8 +45,10 @@ namespace AlphaTab.Rendering.Glyphs
 
         protected override void CreateTies(Note n)
         {
+            if (!n.IsVisible) return;
+
             var renderer = (TabBarRenderer)Renderer;
-            if (n.IsTieOrigin && renderer.ShowTiedNotes)
+            if (n.IsTieOrigin && renderer.ShowTiedNotes && n.TieDestination.IsVisible)
             {
                 var tie = new TabTieGlyph(n, n.TieDestination, false);
                 Ties.Add(tie);

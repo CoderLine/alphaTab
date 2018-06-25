@@ -192,6 +192,9 @@ namespace AlphaTab.Model
 
         #endregion
 
+
+        public bool IsVisible { get; set; }
+
         public bool IsHammerPullOrigin { get; set; }
         public bool IsHammerPullDestination { get { return HammerPullOrigin != null; } }
         public Note HammerPullOrigin { get; set; }
@@ -543,6 +546,7 @@ namespace AlphaTab.Model
 
             Element = -1;
             Variation = -1;
+            IsVisible = true;
         }
 
         public static void CopyTo(Note src, Note dst)
@@ -578,6 +582,7 @@ namespace AlphaTab.Model
             dst.BendType = src.BendType;
             dst.BendStyle = src.BendStyle;
             dst.IsContinuedBend = src.IsContinuedBend;
+            dst.IsVisible = src.IsVisible;
         }
 
         public Note Clone()
@@ -649,6 +654,14 @@ namespace AlphaTab.Model
                 else
                 {
                     LetRingDestination = nextNoteOnLine.Value;
+                }
+
+                if (settings != null)
+                {
+                    if (settings.DisplayMode == DisplayMode.SongBook && IsTieDestination)
+                    {
+                        IsVisible = false;
+                    }
                 }
             }
 

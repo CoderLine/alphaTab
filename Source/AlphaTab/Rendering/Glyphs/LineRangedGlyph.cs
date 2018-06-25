@@ -30,7 +30,7 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly string _label;
 
         public LineRangedGlyph(string label)
-            : base(BeatXPosition.PostNotes)
+            : base(BeatXPosition.OnNotes)
         {
             _label = label;
         }
@@ -50,7 +50,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var res = Renderer.Resources;
             canvas.Font = res.EffectFont;
-            canvas.TextAlign = TextAlign.Left;
+            canvas.TextAlign = TextAlign.Center;
             canvas.FillText(_label, cx + X, cy + Y);
         }
 
@@ -60,7 +60,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             var lineSpacing = LineSpacing * Scale;
             var textWidth = canvas.MeasureText(_label);
-            var startX = cx + X + textWidth + lineSpacing;
+            var startX = cx + X + textWidth/2f + lineSpacing;
             var lineY = cy + Y + (LineTopPadding * Scale);
             var lineSize = LineSize * Scale;
 

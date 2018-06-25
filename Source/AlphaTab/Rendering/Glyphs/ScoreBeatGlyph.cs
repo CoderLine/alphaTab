@@ -58,8 +58,11 @@ namespace AlphaTab.Rendering.Glyphs
 
                     foreach (var note in Container.Beat.Notes)
                     {
-                        CreateNoteGlyph(note);
-                        ghost.AddParenthesis(note);
+                        if (note.IsVisible)
+                        {
+                            CreateNoteGlyph(note);
+                            ghost.AddParenthesis(note);
+                        }
                     }
                     AddGlyph(NoteHeads);
 

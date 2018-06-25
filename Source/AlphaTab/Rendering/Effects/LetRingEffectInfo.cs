@@ -22,19 +22,16 @@ namespace AlphaTab.Rendering.Effects
 {
     class LetRingEffectInfo : IEffectBarRendererInfo
     {
-        public string EffectId { get { return "let-ring"; } }
-        public bool CanShareBand { get { return false; } }
-        public virtual bool HideOnMultiTrack { get { return false; } }
+        public string EffectId => "let-ring";
+        public bool CanShareBand => false;
+        public virtual bool HideOnMultiTrack => false;
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
             return beat.IsLetRing;
         }
 
-        public EffectBarGlyphSizing SizingMode
-        {
-            get { return EffectBarGlyphSizing.GroupedOnBeat; }
-        }
+        public EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.GroupedOnBeat;
 
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
@@ -43,7 +40,7 @@ namespace AlphaTab.Rendering.Effects
 
         public virtual bool CanExpand(Beat from, Beat to)
         {
-            return true;
+            return !to.IsLetRing || !to.IsNewLetRing;
         }
     }
 }
