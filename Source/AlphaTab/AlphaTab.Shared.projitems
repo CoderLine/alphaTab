@@ -216,6 +216,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreBendGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreHelperNotesBaseGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreNoteChordGlyphBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreSlurGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreTimeSignatureGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ScoreWhammyBarGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\TabBendGlyph.cs" />

@@ -104,6 +104,11 @@ namespace AlphaTab.Model
 
         public Duration Duration { get; set; }
 
+        public bool IsSlurOrigin { get; set; }
+        public bool IsSlurDestination { get { return SlurOrigin != null; } }
+        public Beat SlurOrigin { get; set; }
+        public Beat SlurDestination { get; set; }
+
         public bool IsRest
         {
             get
@@ -239,6 +244,7 @@ namespace AlphaTab.Model
             Ottava = Ottavia.Regular;
             NoteStringLookup = new FastDictionary<int, Note>();
             WhammyStyle = BendStyle.Default;
+            IsSlurOrigin = false;
         }
 
         public static void CopyTo(Beat src, Beat dst)
@@ -488,6 +494,11 @@ namespace AlphaTab.Model
                 {
                     IsPalmMute = true;
                 }
+
+                if (note.IsSlurOrigin)
+                {
+                    IsSlurOrigin = true;
+                }
                 if (displayMode == DisplayMode.SongBook && note.HasBend)
                 {
                     if (note.BendType == BendType.Bend && !note.IsTieOrigin)
@@ -526,6 +537,28 @@ namespace AlphaTab.Model
                     if (MaxStringNote == null || note.String > MaxStringNote.String)
                     {
                         MaxStringNote = note;
+                    }
+                }
+            }
+
+            if (IsSlurOrigin)
+            {
+                IsSlurOrigin = true;
+                SlurDestination = NextBeat;
+                if (!IsSlurDestination)
+                {
+                    SlurOrigin = this;
+                    if (SlurDestination != null)
+                    {
+                        SlurDestination.SlurOrigin = this;
+                    }
+                }
+                else
+                {
+                    SlurOrigin.SlurDestination = SlurDestination;
+                    if (SlurDestination != null)
+                    {
+                        SlurDestination.SlurOrigin = SlurOrigin;
                     }
                 }
             }

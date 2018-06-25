@@ -42,8 +42,8 @@ namespace AlphaTab.Rendering.Glyphs
         protected override BeamDirection GetBeamDirection(Beat beat, BarRendererBase noteRenderer)
         {
             return _startNote.String > 3
-                ? BeamDirection.Down
-                : BeamDirection.Up;
+                ? BeamDirection.Up
+                : BeamDirection.Down;
         }
 
         protected override float GetStartY(BarRendererBase noteRenderer, BeamDirection direction)

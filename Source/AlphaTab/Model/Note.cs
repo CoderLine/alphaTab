@@ -200,6 +200,12 @@ namespace AlphaTab.Model
         public Note HammerPullOrigin { get; set; }
         public Note HammerPullDestination { get; set; }
 
+        public bool IsSlurOrigin { get; set; }
+        public bool IsSlurDestination { get { return SlurOrigin != null; } }
+        public Note SlurOrigin { get; set; }
+        public Note SlurDestination { get; set; }
+
+
         public bool IsHarmonic { get { return HarmonicType != HarmonicType.None; } }
         public float HarmonicValue { get; set; }
         public HarmonicType HarmonicType { get; set; }
@@ -556,6 +562,7 @@ namespace AlphaTab.Model
             dst.Fret = src.Fret;
             dst.String = src.String;
             dst.IsHammerPullOrigin = src.IsHammerPullOrigin;
+            dst.IsSlurOrigin = src.IsSlurOrigin;
             dst.HarmonicValue = src.HarmonicValue;
             dst.HarmonicType = src.HarmonicType;
             dst.IsGhost = src.IsGhost;
@@ -689,6 +696,27 @@ namespace AlphaTab.Model
                 {
                     HammerPullDestination = nextNoteOnLine.Value;
                     HammerPullDestination.HammerPullOrigin = this;
+                }
+            }
+
+            if (IsHammerPullOrigin || SlideType == SlideType.Legato)
+            {
+                IsSlurOrigin = true;
+                    SlurDestination = nextNoteOnLine.Value;
+                if (!IsSlurDestination)
+                {
+                    if (SlurDestination != null)
+                    {
+                        SlurDestination.SlurOrigin = this;
+                    }
+                }
+                else
+                {
+                    SlurOrigin.SlurDestination = SlurDestination;
+                    if (SlurDestination != null)
+                    {
+                        SlurDestination.SlurOrigin = SlurOrigin;
+                    }
                 }
             }
 

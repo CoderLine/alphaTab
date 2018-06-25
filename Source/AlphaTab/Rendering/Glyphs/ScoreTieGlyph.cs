@@ -24,14 +24,14 @@ namespace AlphaTab.Rendering.Glyphs
 {
     class ScoreTieGlyph : TieGlyph
     {
-        private readonly Note _startNote;
-        private readonly Note _endNote;
+        protected readonly Note StartNote;
+        protected readonly Note EndNote;
 
         public ScoreTieGlyph(Note startNote, Note endNote, bool forEnd = false)
             : base(startNote == null ? null : startNote.Beat, endNote == null ? null : endNote.Beat, forEnd)
         {
-            _startNote = startNote;
-            _endNote = endNote;
+            StartNote = startNote;
+            EndNote = endNote;
         }
 
         public override void DoLayout()
@@ -55,22 +55,22 @@ namespace AlphaTab.Rendering.Glyphs
 
         protected override float GetStartY(BarRendererBase noteRenderer, BeamDirection direction)
         {
-            return noteRenderer.GetNoteY(_startNote);
+            return noteRenderer.GetNoteY(StartNote);
         }
 
         protected override float GetEndY(BarRendererBase noteRenderer, BeamDirection direction)
         {
-            return noteRenderer.GetNoteY(_endNote);
+            return noteRenderer.GetNoteY(EndNote);
         }
 
         protected override float GetStartX(BarRendererBase noteRenderer)
         {
-            return noteRenderer.GetBeatX(_startNote.Beat, BeatXPosition.MiddleNotes);
+            return noteRenderer.GetBeatX(StartNote.Beat, BeatXPosition.MiddleNotes);
         }
 
         protected override float GetEndX(BarRendererBase noteRenderer)
         {
-            return noteRenderer.GetNoteX(_endNote, false);
+            return noteRenderer.GetNoteX(EndNote, false);
         }
     }
 }

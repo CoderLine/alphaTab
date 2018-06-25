@@ -74,7 +74,7 @@ namespace AlphaTab.Rendering
 
             // NOTE: we create 2 tie glyphs if we have a line break inbetween 
             // the two notes
-            if (n.IsTieOrigin && !n.HasBend && !n.Beat.HasWhammyBar && n.Beat.GraceType != GraceType.BendGrace && n.TieDestination.IsVisible) 
+            if (n.IsTieOrigin && !n.HasBend && !n.Beat.HasWhammyBar && n.Beat.GraceType != GraceType.BendGrace && n.TieDestination.IsVisible)
             {
                 var tie = new ScoreTieGlyph(n, n.TieDestination);
                 Ties.Add(tie);
@@ -85,42 +85,6 @@ namespace AlphaTab.Rendering
                 var tie = new ScoreTieGlyph(n.TieOrigin, n, true);
                 Ties.Add(tie);
             }
-            else if (n.IsHammerPullOrigin)
-            {
-                // only create tie for very first origin of "group"
-                if (n.HammerPullOrigin == null)
-                {
-                    // tie with end note
-                    Note destination = n.HammerPullDestination;
-                    while (destination.HammerPullDestination != null)
-                    {
-                        destination = destination.HammerPullDestination;
-                    }
-                    var tie = new ScoreTieGlyph(n, destination);
-                    Ties.Add(tie);
-                }
-            }
-            else if (n.IsHammerPullDestination)
-            {
-                // only create tie for last destination of "group"
-                // NOTE: HOPOs over more than 2 staffs does not work with this mechanism, but this sounds unrealistic
-                if (n.HammerPullDestination == null)
-                {
-                    Note origin = n.HammerPullOrigin;
-                    while (origin.HammerPullOrigin != null)
-                    {
-                        origin = origin.HammerPullOrigin;
-                    }
-                    var tie = new ScoreTieGlyph(origin, n, true);
-                    Ties.Add(tie);
-                }
-            }
-
-            if (n.SlideType == SlideType.Legato)
-            {
-                var tie = new ScoreTieGlyph(n, n.SlideTarget);
-                Ties.Add(tie);
-            }
 
             // TODO: depending on the type we have other positioning
             // we should place glyphs in the preNotesGlyph or postNotesGlyph if needed
@@ -128,6 +92,12 @@ namespace AlphaTab.Rendering
             {
                 var l = new ScoreSlideLineGlyph(n.SlideType, n, this);
                 Ties.Add(l);
+            }
+
+            if (n.Beat.SlurOrigin != null && n.Index == 0)
+            {
+                var tie = new ScoreSlurGlyph(n.Beat);
+                Ties.Add(tie);
             }
 
             if (n.HasBend)
