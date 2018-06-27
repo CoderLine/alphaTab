@@ -6221,17 +6221,11 @@ alphaTab.rendering.effects.FingeringEffectInfo.prototype = {
 		return 1;
 	}
 	,ShouldCreateGlyph: function(settings,beat) {
-		if(beat.get_IsRest() || settings.FingeringMode != 1) {
+		if(beat.Voice.Index != 0 || beat.get_IsRest() || settings.FingeringMode != 1) {
 			return false;
 		}
-		var noteCount = 0;
-		var voiceBeat = $iterator(beat.Voice.Beats)();
-		while(voiceBeat.hasNext()) {
-			var voiceBeat1 = voiceBeat.next();
-			noteCount = noteCount + voiceBeat1.Notes.length;
-			if(noteCount > 1) {
-				return false;
-			}
+		if(beat.Notes.length != 1) {
+			return false;
 		}
 		return beat.Notes[0].IsFingering;
 	}
@@ -26824,7 +26818,6 @@ alphaTab.rendering.glyphs.BeatContainerGlyph.prototype = $extend(alphaTab.render
 		canvas.BeginGroup(alphaTab.rendering.glyphs.BeatContainerGlyph.GetGroupId(group));
 		this.PreNotes.Paint(cx + this.X,cy + this.Y,canvas);
 		this.OnNotes.Paint(cx + this.X,cy + this.Y,canvas);
-		canvas.set_Color(canvas.get_Resources().MainGlyphColor);
 		var staffX = cx - this.VoiceContainer.X - this.Renderer.X;
 		var staffY = cy - this.VoiceContainer.Y - this.Renderer.Y;
 		var i = 0;
@@ -27755,10 +27748,11 @@ alphaTab.rendering.glyphs.BarNumberGlyph.prototype = $extend(alphaTab.rendering.
 			return;
 		}
 		var res = this.Renderer.get_Resources();
+		var c = canvas.get_Color();
 		canvas.set_Color(res.BarNumberColor);
 		canvas.set_Font(res.BarNumberFont);
 		canvas.FillText(Std.string(this._number),cx + this.X,cy + this.Y);
-		canvas.set_Color(res.MainGlyphColor);
+		canvas.set_Color(c);
 	}
 	,__class__: alphaTab.rendering.glyphs.BarNumberGlyph
 });
@@ -27933,12 +27927,9 @@ alphaTab.rendering.glyphs.GroupedEffectGlyph.prototype = $extend(alphaTab.render
 			lastLinkedGlyph = js.Boot.__cast(this.NextGlyph , alphaTab.rendering.glyphs.GroupedEffectGlyph);
 			while(lastLinkedGlyph.get_IsLinkedWithNext()) lastLinkedGlyph = js.Boot.__cast(lastLinkedGlyph.NextGlyph , alphaTab.rendering.glyphs.GroupedEffectGlyph);
 		}
-		var endBeat;
-		var endBeatRenderer;
-		var position;
-		endBeatRenderer = lastLinkedGlyph.Renderer;
-		endBeat = lastLinkedGlyph.Beat;
-		position = this.EndPosition;
+		var endBeatRenderer = lastLinkedGlyph.Renderer;
+		var endBeat = lastLinkedGlyph.Beat;
+		var position = this.EndPosition;
 		var cxRenderer = cx - this.Renderer.X;
 		var endX = this.CalculateEndX(endBeatRenderer,endBeat,cxRenderer,position);
 		this.PaintGrouped(cx,cy,endX,canvas);

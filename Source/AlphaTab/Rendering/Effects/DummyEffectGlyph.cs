@@ -38,7 +38,6 @@ namespace AlphaTab.Rendering.Effects
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var res = Renderer.Resources;
-            canvas.Color = res.MainGlyphColor;
             canvas.StrokeRect(cx + X, cy + Y, Width, 20 * Scale);
             canvas.Font = res.TablatureFont;
             canvas.FillText(_s, cx + X, cy + Y);

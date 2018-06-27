@@ -42,12 +42,12 @@ namespace AlphaTab.Rendering.Glyphs
                 return;
             }
             var res = Renderer.Resources;
+            var c = canvas.Color;
             canvas.Color = res.BarNumberColor;
             canvas.Font = res.BarNumberFont;
 
             canvas.FillText(_number.ToString(), cx + X, cy + Y);
-
-            canvas.Color = res.MainGlyphColor;
+            canvas.Color = c;
         }
     }
 }
