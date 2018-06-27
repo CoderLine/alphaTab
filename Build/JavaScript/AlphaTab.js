@@ -27936,20 +27936,9 @@ alphaTab.rendering.glyphs.GroupedEffectGlyph.prototype = $extend(alphaTab.render
 		var endBeat;
 		var endBeatRenderer;
 		var position;
-		if(this.EndPosition == 4 && lastLinkedGlyph.Beat.NextBeat != null) {
-			endBeat = lastLinkedGlyph.Beat.NextBeat;
-			endBeatRenderer = this.Renderer.ScoreRenderer.Layout.GetRendererForBar(this.Renderer.Staff.get_StaveId(),endBeat.Voice.Bar);
-			position = 2;
-			if(endBeatRenderer == null || endBeatRenderer.Staff != this.Renderer.Staff) {
-				endBeatRenderer = lastLinkedGlyph.Renderer;
-				endBeat = lastLinkedGlyph.Beat;
-				position = this.EndPosition;
-			}
-		} else {
-			endBeatRenderer = lastLinkedGlyph.Renderer;
-			endBeat = lastLinkedGlyph.Beat;
-			position = this.EndPosition;
-		}
+		endBeatRenderer = lastLinkedGlyph.Renderer;
+		endBeat = lastLinkedGlyph.Beat;
+		position = this.EndPosition;
 		var cxRenderer = cx - this.Renderer.X;
 		var endX = this.CalculateEndX(endBeatRenderer,endBeat,cxRenderer,position);
 		this.PaintGrouped(cx,cy,endX,canvas);

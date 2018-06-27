@@ -88,27 +88,9 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             // use start position of next beat when possible
-            Beat endBeat;
-            BarRendererBase endBeatRenderer;
-            BeatXPosition position;
-            if (EndPosition == BeatXPosition.EndBeat && lastLinkedGlyph.Beat.NextBeat != null)
-            {
-                endBeat = lastLinkedGlyph.Beat.NextBeat;
-                endBeatRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Renderer.Staff.StaveId, endBeat.Voice.Bar);
-                position = BeatXPosition.MiddleNotes;
-                if (endBeatRenderer == null || endBeatRenderer.Staff != Renderer.Staff)
-                {
-                    endBeatRenderer = lastLinkedGlyph.Renderer;
-                    endBeat = lastLinkedGlyph.Beat;
-                    position = EndPosition;
-                }
-            }
-            else
-            {
-                endBeatRenderer = lastLinkedGlyph.Renderer;
-                endBeat = lastLinkedGlyph.Beat;
-                position = EndPosition;
-            }
+            var endBeatRenderer = lastLinkedGlyph.Renderer;
+            var endBeat = lastLinkedGlyph.Beat;
+            var position = EndPosition;
 
             // calculate end X-position
             var cxRenderer = cx - Renderer.X;
