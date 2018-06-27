@@ -33,6 +33,9 @@ namespace AlphaTab.Platform.JavaScript
     {
         protected const float BlurCorrection = 0;
 
+        private CanvasElement _measureCanvas;
+        private CanvasRenderingContext2D _measureContext;
+
         private CanvasElement _canvas;
         private CanvasRenderingContext2D _context;
         private Color _color;
@@ -49,6 +52,14 @@ namespace AlphaTab.Platform.JavaScript
             Browser.Document.Body.AppendChild(fontElement);
             var style = Browser.Window.GetComputedStyle(fontElement);
             _musicFont = new Font(style.FontFamily, Platform.ParseFloat(style.FontSize));
+
+            _measureCanvas = (CanvasElement)Browser.Document.CreateElement("canvas");
+            _measureCanvas.Width = 10;
+            _measureCanvas.Height = 10;
+            _measureCanvas.Style.Width = 10 + "px";
+            _measureCanvas.Style.Height = 10 + "px";
+            _measureContext = (CanvasRenderingContext2D)_measureCanvas.GetContext("2d");
+            _measureContext.TextBaseline = "top";
         }
 
         public virtual object OnPreRender()
@@ -173,7 +184,12 @@ namespace AlphaTab.Platform.JavaScript
             set
             {
                 _font = value;
-                _context.Font = value.ToCssString();
+                if (_context != null)
+                {
+                    _context.Font = value.ToCssString();
+                }
+
+                _measureContext.Font = value.ToCssString();
             }
         }
 
@@ -260,7 +276,7 @@ namespace AlphaTab.Platform.JavaScript
 
         public float MeasureText(string text)
         {
-            return (float)_context.MeasureText(text).Width;
+            return (float)_measureContext.MeasureText(text).Width;
         }
 
         public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)

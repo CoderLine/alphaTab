@@ -304,7 +304,7 @@ namespace AlphaTab.Audio.Generator
                         break;
                 }
 
-                GenerateVibratorWithParams(beat.Voice.Bar.Staff.Track, barStartTick + beatStart, beat.PlaybackDuration, phaseLength, bendAmplitude);
+                GenerateVibratorWithParams(beat.Voice.Bar.Staff.Track, barStartTick + beatStart, beat.PlaybackDuration, phaseLength, bendAmplitude, track.PlaybackInfo.SecondaryChannel);
             }
         }
 
@@ -319,6 +319,10 @@ namespace AlphaTab.Audio.Generator
             noteDuration.UntilTieEnd -= brushOffset;
             noteDuration.NoteOnly -= brushOffset;
             var dynamicValue = GetDynamicValue(note);
+
+            var channel = note.HasBend || note.Beat.HasWhammyBar || note.Beat.Vibrato != VibratoType.None
+                ? track.PlaybackInfo.SecondaryChannel
+                : track.PlaybackInfo.PrimaryChannel;
 
             var initialBend = DefaultBend;
             if (note.HasBend)
@@ -336,7 +340,7 @@ namespace AlphaTab.Audio.Generator
 
             if (initialBend > 0)
             {
-                _handler.AddBend(track.Index, noteStart, (byte)track.PlaybackInfo.PrimaryChannel, (byte)initialBend);
+                _handler.AddBend(track.Index, noteStart, (byte)channel, (byte)initialBend);
             }
 
             // 
@@ -352,7 +356,7 @@ namespace AlphaTab.Audio.Generator
             // Trill
             if (note.IsTrill && staff.StaffKind != StaffKind.Percussion)
             {
-                GenerateTrill(note, noteStart, noteDuration, noteKey, dynamicValue);
+                GenerateTrill(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
                 // no further generation needed
                 return;
             }
@@ -361,7 +365,7 @@ namespace AlphaTab.Audio.Generator
             // Tremolo Picking
             if (note.Beat.IsTremolo)
             {
-                GenerateTremoloPicking(note, noteStart, noteDuration, noteKey, dynamicValue);
+                GenerateTremoloPicking(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
                 // no further generation needed
                 return;
             }
@@ -370,32 +374,25 @@ namespace AlphaTab.Audio.Generator
             // All String Bending/Variation effects
             if (note.HasBend)
             {
-                GenerateBend(note, note.BendPoints, noteStart, noteDuration, noteKey, dynamicValue);
+                GenerateBend(note, note.BendPoints, noteStart, noteDuration, noteKey, dynamicValue, channel);
             }
             else if (note.Beat.HasWhammyBar && note.Index == 0)
             {
-                GenerateBend(note, note.Beat.WhammyBarPoints, noteStart, noteDuration, noteKey, dynamicValue);
+                GenerateBend(note, note.Beat.WhammyBarPoints, noteStart, noteDuration, noteKey, dynamicValue, channel);
             }
             else if (note.SlideType != SlideType.None)
             {
-                GenerateSlide(note, noteStart, noteDuration, noteKey, dynamicValue);
+                GenerateSlide(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
             }
             else if (note.Vibrato != VibratoType.None)
             {
-                GenerateVibrato(note, noteStart, noteDuration, noteKey, dynamicValue);
+                GenerateVibrato(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
             }
-
-            //
-            // Harmonics
-            if (note.HarmonicType != HarmonicType.None)
-            {
-                GenerateHarmonic(note, noteStart, noteDuration, noteKey, dynamicValue);
-            }
-
+            
             if (!note.IsTieDestination)
             {
                 var noteSoundDuration = Math.Max(noteDuration.UntilTieEnd, noteDuration.LetRingEnd);
-                _handler.AddNote(track.Index, noteStart, noteSoundDuration, (byte)noteKey, dynamicValue, (byte)track.PlaybackInfo.PrimaryChannel);
+                _handler.AddNote(track.Index, noteStart, noteSoundDuration, (byte)noteKey, dynamicValue, (byte)channel);
             }
         }
 
@@ -410,18 +407,21 @@ namespace AlphaTab.Audio.Generator
             {
                 durationWithEffects.NoteOnly = ApplyStaticDuration(DefaultDurationDead, duration);
                 durationWithEffects.UntilTieEnd = durationWithEffects.NoteOnly;
+                durationWithEffects.LetRingEnd = durationWithEffects.NoteOnly;
                 return durationWithEffects;
             }
             if (note.IsPalmMute)
             {
                 durationWithEffects.NoteOnly = ApplyStaticDuration(DefaultDurationPalmMute, duration);
                 durationWithEffects.UntilTieEnd = durationWithEffects.NoteOnly;
+                durationWithEffects.LetRingEnd = durationWithEffects.NoteOnly;
                 return durationWithEffects;
             }
             if (note.IsStaccato)
             {
                 durationWithEffects.NoteOnly = (duration / 2);
                 durationWithEffects.UntilTieEnd = durationWithEffects.NoteOnly;
+                durationWithEffects.LetRingEnd = durationWithEffects.NoteOnly;
                 return durationWithEffects;
             }
 
@@ -561,12 +561,7 @@ namespace AlphaTab.Audio.Generator
             }
         }
 
-        private void GenerateHarmonic(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue)
-        {
-            // TODO
-        }
-
-        private void GenerateVibrato(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue)
+        private void GenerateVibrato(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue, int channel)
         {
             int phaseLength;
             int bendAmplitude;
@@ -587,10 +582,10 @@ namespace AlphaTab.Audio.Generator
 
             var track = note.Beat.Voice.Bar.Staff.Track;
 
-            GenerateVibratorWithParams(track, noteStart, noteDuration.NoteOnly, phaseLength, bendAmplitude);
+            GenerateVibratorWithParams(track, noteStart, noteDuration.NoteOnly, phaseLength, bendAmplitude, channel);
         }
 
-        private void GenerateVibratorWithParams(Track track, int noteStart, int noteDuration, int phaseLength, int bendAmplitude)
+        private void GenerateVibratorWithParams(Track track, int noteStart, int noteDuration, int phaseLength, int bendAmplitude, int channel)
         {
             const int resolution = 16;
 
@@ -609,7 +604,7 @@ namespace AlphaTab.Audio.Generator
                 {
                     var bend = bendAmplitude * Math.Sin(phase * Math.PI / phaseHalf);
 
-                    _handler.AddBend(track.Index, noteStart + phase, (byte)track.PlaybackInfo.PrimaryChannel, (byte)(DefaultBend + bend));
+                    _handler.AddBend(track.Index, noteStart + phase, (byte)channel, (byte)(DefaultBend + bend));
 
                     phase += resolution;
                 }
@@ -618,12 +613,12 @@ namespace AlphaTab.Audio.Generator
             }
         }
 
-        private void GenerateSlide(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue)
+        private void GenerateSlide(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue, int channel)
         {
             // TODO 
         }
 
-        private void GenerateWhammyBar(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue)
+        private void GenerateWhammyBar(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue, int channel)
         {
             // TODO 
         }
@@ -631,7 +626,7 @@ namespace AlphaTab.Audio.Generator
         private const int DefaultBend = 0x40;
         private const float DefaultBendSemitone = 2.75f;
 
-        private void GenerateBend(Note note, FastList<BendPoint> bendPoints, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue)
+        private void GenerateBend(Note note, FastList<BendPoint> bendPoints, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue, int channel)
         {
             var track = note.Beat.Voice.Bar.Staff.Track;
 
@@ -770,7 +765,7 @@ namespace AlphaTab.Audio.Generator
                 {
                     while (currentBendValue <= nextBendValue)
                     {
-                        _handler.AddBend(track.Index, (int)tick, (byte)track.PlaybackInfo.PrimaryChannel, (byte)Math.Round(currentBendValue));
+                        _handler.AddBend(track.Index, (int)tick, (byte)channel, (byte)Math.Round(currentBendValue));
                         currentBendValue++;
                         tick += ticksPerValue;
                     }
@@ -780,7 +775,7 @@ namespace AlphaTab.Audio.Generator
                 {
                     while (currentBendValue >= nextBendValue)
                     {
-                        _handler.AddBend(track.Index, (int)tick, (byte)track.PlaybackInfo.PrimaryChannel, (byte)Math.Round(currentBendValue));
+                        _handler.AddBend(track.Index, (int)tick, (byte)channel, (byte)Math.Round(currentBendValue));
                         currentBendValue--;
                         tick += ticksPerValue;
                     }
@@ -788,12 +783,12 @@ namespace AlphaTab.Audio.Generator
                 // hold
                 else
                 {
-                    _handler.AddBend(track.Index, (int)tick, (byte)track.PlaybackInfo.PrimaryChannel, (byte)Math.Round(currentBendValue));
+                    _handler.AddBend(track.Index, (int)tick, (byte)channel, (byte)Math.Round(currentBendValue));
                 }
             }
         }
 
-        private void GenerateTrill(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue)
+        private void GenerateTrill(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue, int channel)
         {
             var track = note.Beat.Voice.Bar.Staff.Track;
             var trillKey = note.StringTuning + note.TrillFret;
@@ -808,13 +803,13 @@ namespace AlphaTab.Audio.Generator
                 {
                     trillLength = (end) - tick;
                 }
-                _handler.AddNote(track.Index, tick, trillLength, (byte)(realKey ? trillKey : noteKey), dynamicValue, (byte)track.PlaybackInfo.PrimaryChannel);
+                _handler.AddNote(track.Index, tick, trillLength, (byte)(realKey ? trillKey : noteKey), dynamicValue, (byte)channel);
                 realKey = !realKey;
                 tick += trillLength;
             }
         }
 
-        private void GenerateTremoloPicking(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue)
+        private void GenerateTremoloPicking(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue, int channel)
         {
             var track = note.Beat.Voice.Bar.Staff.Track;
             var tpLength = note.Beat.TremoloSpeed.Value.ToTicks();
@@ -827,7 +822,7 @@ namespace AlphaTab.Audio.Generator
                 {
                     tpLength = (end) - tick;
                 }
-                _handler.AddNote(track.Index, tick, tpLength, (byte)noteKey, dynamicValue, (byte)track.PlaybackInfo.PrimaryChannel);
+                _handler.AddNote(track.Index, tick, tpLength, (byte)noteKey, dynamicValue, (byte)channel);
                 tick += tpLength;
             }
         }

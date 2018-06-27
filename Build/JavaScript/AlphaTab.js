@@ -1053,6 +1053,8 @@ alphaTab.platform.model.Font.prototype = {
 };
 alphaTab.platform.javaScript = {};
 alphaTab.platform.javaScript.Html5Canvas = $hx_exports["alphaTab"]["platform"]["javaScript"]["Html5Canvas"] = function() {
+	this._measureCanvas = null;
+	this._measureContext = null;
 	this._canvas = null;
 	this._context = null;
 	this._color = null;
@@ -1066,6 +1068,13 @@ alphaTab.platform.javaScript.Html5Canvas = $hx_exports["alphaTab"]["platform"]["
 	var style = window.getComputedStyle(fontElement);
 	var s = style.fontSize;
 	this._musicFont = new alphaTab.platform.model.Font(style.fontFamily,parseFloat(s),0);
+	this._measureCanvas = js.Boot.__cast(window.document.createElement("canvas") , HTMLCanvasElement);
+	this._measureCanvas.width = 10;
+	this._measureCanvas.height = 10;
+	this._measureCanvas.style.width = 10 + "px";
+	this._measureCanvas.style.height = 10 + "px";
+	this._measureContext = this._measureCanvas.getContext("2d");
+	this._measureContext.textBaseline = "top";
 };
 alphaTab.platform.javaScript.Html5Canvas.__name__ = ["alphaTab","platform","javaScript","Html5Canvas"];
 alphaTab.platform.javaScript.Html5Canvas.__interfaces__ = [alphaTab.platform.ICanvas];
@@ -1159,8 +1168,12 @@ alphaTab.platform.javaScript.Html5Canvas.prototype = {
 	}
 	,set_Font: function(value) {
 		this._font = value;
-		var tmp = value.ToCssString(1);
-		this._context.font = tmp;
+		if(this._context != null) {
+			var tmp = value.ToCssString(1);
+			this._context.font = tmp;
+		}
+		var tmp1 = value.ToCssString(1);
+		this._measureContext.font = tmp1;
 		return this.get_Font();
 	}
 	,get_TextAlign: function() {
@@ -1231,7 +1244,7 @@ alphaTab.platform.javaScript.Html5Canvas.prototype = {
 		this._context.fillText(text,x,y);
 	}
 	,MeasureText: function(text) {
-		return js.Boot.__cast(this._context.measureText(text).width , Float);
+		return js.Boot.__cast(this._measureContext.measureText(text).width , Float);
 	}
 	,FillMusicFontSymbol: function(x,y,scale,symbol) {
 		if(symbol == -1) {
@@ -7878,7 +7891,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				break;
 			default:
 			}
-			this.GenerateVibratorWithParams(beat.Voice.Bar.Staff.Track,barStartTick + beatStart,beat.PlaybackDuration,phaseLength,bendAmplitude);
+			this.GenerateVibratorWithParams(beat.Voice.Bar.Staff.Track,barStartTick + beatStart,beat.PlaybackDuration,phaseLength,bendAmplitude,track.PlaybackInfo.SecondaryChannel);
 		}
 	}
 	,GenerateNote: function(note,beatStart,beatDuration,brushInfo) {
@@ -7891,6 +7904,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		noteDuration.UntilTieEnd = noteDuration.UntilTieEnd - brushOffset;
 		noteDuration.NoteOnly = noteDuration.NoteOnly - brushOffset;
 		var dynamicValue = this.GetDynamicValue(note);
+		var channel = note.get_HasBend() || note.Beat.get_HasWhammyBar() || note.Beat.Vibrato != 0 ? track.PlaybackInfo.SecondaryChannel : track.PlaybackInfo.PrimaryChannel;
 		var initialBend = 64;
 		if(note.get_HasBend()) {
 			var this1 = note.BendPoints[0].Value * 2.75;
@@ -7902,34 +7916,31 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			initialBend = 0;
 		}
 		if(initialBend > 0) {
-			this._handler.AddBend(track.Index,noteStart,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(initialBend));
+			this._handler.AddBend(track.Index,noteStart,system.Convert.ToUInt8(channel),system.Convert.ToUInt8(initialBend));
 		}
 		if(note.Beat.FadeIn) {
 			this.GenerateFadeIn(note,noteStart,noteDuration,noteKey,dynamicValue);
 		}
 		if(note.get_IsTrill() && staff.StaffKind != 2) {
-			this.GenerateTrill(note,noteStart,noteDuration,noteKey,dynamicValue);
+			this.GenerateTrill(note,noteStart,noteDuration,noteKey,dynamicValue,channel);
 			return;
 		}
 		if(note.Beat.get_IsTremolo()) {
-			this.GenerateTremoloPicking(note,noteStart,noteDuration,noteKey,dynamicValue);
+			this.GenerateTremoloPicking(note,noteStart,noteDuration,noteKey,dynamicValue,channel);
 			return;
 		}
 		if(note.get_HasBend()) {
-			this.GenerateBend(note,note.BendPoints,noteStart,noteDuration,noteKey,dynamicValue);
+			this.GenerateBend(note,note.BendPoints,noteStart,noteDuration,noteKey,dynamicValue,channel);
 		} else if(note.Beat.get_HasWhammyBar() && note.Index == 0) {
-			this.GenerateBend(note,note.Beat.WhammyBarPoints,noteStart,noteDuration,noteKey,dynamicValue);
+			this.GenerateBend(note,note.Beat.WhammyBarPoints,noteStart,noteDuration,noteKey,dynamicValue,channel);
 		} else if(note.SlideType != 0) {
-			this.GenerateSlide(note,noteStart,noteDuration,noteKey,dynamicValue);
+			this.GenerateSlide(note,noteStart,noteDuration,noteKey,dynamicValue,channel);
 		} else if(note.Vibrato != 0) {
-			this.GenerateVibrato(note,noteStart,noteDuration,noteKey,dynamicValue);
-		}
-		if(note.HarmonicType != 0) {
-			this.GenerateHarmonic(note,noteStart,noteDuration,noteKey,dynamicValue);
+			this.GenerateVibrato(note,noteStart,noteDuration,noteKey,dynamicValue,channel);
 		}
 		if(!note.IsTieDestination) {
 			var noteSoundDuration = Math.max(noteDuration.UntilTieEnd,noteDuration.LetRingEnd);
-			this._handler.AddNote(track.Index,noteStart,noteSoundDuration,system.Convert.ToUInt8(noteKey),dynamicValue,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel));
+			this._handler.AddNote(track.Index,noteStart,noteSoundDuration,system.Convert.ToUInt8(noteKey),dynamicValue,system.Convert.ToUInt8(channel));
 		}
 	}
 	,GetNoteDuration: function(note,duration) {
@@ -7940,16 +7951,19 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		if(note.IsDead) {
 			durationWithEffects.NoteOnly = this.ApplyStaticDuration(30,duration);
 			durationWithEffects.UntilTieEnd = durationWithEffects.NoteOnly;
+			durationWithEffects.LetRingEnd = durationWithEffects.NoteOnly;
 			return durationWithEffects;
 		}
 		if(note.IsPalmMute) {
 			durationWithEffects.NoteOnly = this.ApplyStaticDuration(80,duration);
 			durationWithEffects.UntilTieEnd = durationWithEffects.NoteOnly;
+			durationWithEffects.LetRingEnd = durationWithEffects.NoteOnly;
 			return durationWithEffects;
 		}
 		if(note.IsStaccato) {
 			durationWithEffects.NoteOnly = duration / 2 | 0;
 			durationWithEffects.UntilTieEnd = durationWithEffects.NoteOnly;
+			durationWithEffects.LetRingEnd = durationWithEffects.NoteOnly;
 			return durationWithEffects;
 		}
 		if(note.IsTieOrigin) {
@@ -8039,9 +8053,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			--i;
 		}
 	}
-	,GenerateHarmonic: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
-	}
-	,GenerateVibrato: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
+	,GenerateVibrato: function(note,noteStart,noteDuration,noteKey,dynamicValue,channel) {
 		var phaseLength;
 		var bendAmplitude;
 		var _g = note.Vibrato;
@@ -8058,9 +8070,9 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			return;
 		}
 		var track = note.Beat.Voice.Bar.Staff.Track;
-		this.GenerateVibratorWithParams(track,noteStart,noteDuration.NoteOnly,phaseLength,bendAmplitude);
+		this.GenerateVibratorWithParams(track,noteStart,noteDuration.NoteOnly,phaseLength,bendAmplitude,channel);
 	}
-	,GenerateVibratorWithParams: function(track,noteStart,noteDuration,phaseLength,bendAmplitude) {
+	,GenerateVibratorWithParams: function(track,noteStart,noteDuration,phaseLength,bendAmplitude,channel) {
 		var resolution = 16;
 		var phaseHalf = phaseLength / 2 | 0;
 		noteStart = noteStart + phaseLength;
@@ -8070,17 +8082,17 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			var phaseDuration = noteStart + phaseLength < noteEnd ? phaseLength : noteEnd - noteStart;
 			while(phase < phaseDuration) {
 				var bend = bendAmplitude * Math.sin(phase * 3.14159265358979 / phaseHalf);
-				this._handler.AddBend(track.Index,noteStart + phase,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(64 + bend)));
+				this._handler.AddBend(track.Index,noteStart + phase,system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(64 + bend)));
 				phase = phase + resolution;
 			}
 			noteStart = noteStart + phaseLength;
 		}
 	}
-	,GenerateSlide: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
+	,GenerateSlide: function(note,noteStart,noteDuration,noteKey,dynamicValue,channel) {
 	}
-	,GenerateWhammyBar: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
+	,GenerateWhammyBar: function(note,noteStart,noteDuration,noteKey,dynamicValue,channel) {
 	}
-	,GenerateBend: function(note,bendPoints,noteStart,noteDuration,noteKey,dynamicValue) {
+	,GenerateBend: function(note,bendPoints,noteStart,noteDuration,noteKey,dynamicValue,channel) {
 		var track = note.Beat.Voice.Bar.Staff.Track;
 		var duration;
 		if(note.IsTieOrigin && (this._settings == null || this._settings.ExtendBendArrowsOnTiedNotes)) {
@@ -8197,25 +8209,25 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			if(currentBendValue < nextBendValue) {
 				while(currentBendValue <= nextBendValue) {
 					var this4 = currentBendValue;
-					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this4))));
+					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this4))));
 					++currentBendValue;
 					tick = tick + ticksPerValue;
 				}
 			} else if(currentBendValue > nextBendValue) {
 				while(currentBendValue >= nextBendValue) {
 					var this5 = currentBendValue;
-					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this5))));
+					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this5))));
 					--currentBendValue;
 					tick = tick + ticksPerValue;
 				}
 			} else {
 				var this6 = currentBendValue;
-				this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this6))));
+				this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this6))));
 			}
 			++i;
 		}
 	}
-	,GenerateTrill: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
+	,GenerateTrill: function(note,noteStart,noteDuration,noteKey,dynamicValue,channel) {
 		var track = note.Beat.Voice.Bar.Staff.Track;
 		var trillKey = note.get_StringTuning() + note.get_TrillFret();
 		var trillLength = alphaTab.audio.MidiUtils.ToTicks(note.TrillSpeed);
@@ -8226,12 +8238,12 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			if(tick + trillLength >= end) {
 				trillLength = end - tick;
 			}
-			this._handler.AddNote(track.Index,tick,trillLength,system.Convert.ToUInt8(realKey ? trillKey : noteKey),dynamicValue,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel));
+			this._handler.AddNote(track.Index,tick,trillLength,system.Convert.ToUInt8(realKey ? trillKey : noteKey),dynamicValue,system.Convert.ToUInt8(channel));
 			realKey = !realKey;
 			tick = tick + trillLength;
 		}
 	}
-	,GenerateTremoloPicking: function(note,noteStart,noteDuration,noteKey,dynamicValue) {
+	,GenerateTremoloPicking: function(note,noteStart,noteDuration,noteKey,dynamicValue,channel) {
 		var track = note.Beat.Voice.Bar.Staff.Track;
 		var tpLength = alphaTab.audio.MidiUtils.ToTicks(note.Beat.TremoloSpeed);
 		var tick = noteStart;
@@ -8240,7 +8252,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			if(tick + tpLength >= end) {
 				tpLength = end - tick;
 			}
-			this._handler.AddNote(track.Index,tick,tpLength,system.Convert.ToUInt8(noteKey),dynamicValue,system.Convert.ToUInt8(track.PlaybackInfo.PrimaryChannel));
+			this._handler.AddNote(track.Index,tick,tpLength,system.Convert.ToUInt8(noteKey),dynamicValue,system.Convert.ToUInt8(channel));
 			tick = tick + tpLength;
 		}
 	}
