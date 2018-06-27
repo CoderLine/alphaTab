@@ -288,6 +288,10 @@ namespace AlphaTab.Rendering.Utils
             if (add)
             {
                 Beats.Add(beat);
+                if (beat.GraceType != GraceType.None)
+                {
+                    IsGrace = true;
+                }
 
                 var positions = GetOrCreateBeatPositions(beat);
 

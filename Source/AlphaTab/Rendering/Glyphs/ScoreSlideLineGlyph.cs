@@ -120,7 +120,7 @@ namespace AlphaTab.Rendering.Glyphs
                     break;
                 case SlideType.OutDown:
                     startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote) + offsetX;
-                    startY = cy + startNoteRenderer.GetNoteY(_startNote) + NoteHeadGlyph.NoteHeadHeight / 2;
+                    startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) + NoteHeadGlyph.NoteHeadHeight / 2;
                     endX = startX + sizeX;
                     endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) + NoteHeadGlyph.NoteHeadHeight;
                     break;

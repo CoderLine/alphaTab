@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     class CrescendoGlyph : GroupedEffectGlyph
     {
-        private const int Padding = 5;
+        private const int Padding = NoteHeadGlyph.QuarterNoteHeadWidth / 2;
         private readonly CrescendoType _crescendo;
 
         public CrescendoGlyph(float x, float y, CrescendoType crescendo)

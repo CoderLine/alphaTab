@@ -168,7 +168,7 @@ namespace AlphaTab.Rendering.Glyphs
                                    startNoteRenderer.GetScoreY(
                                        startNoteRenderer.AccidentalHelper.GetNoteLineForValue(noteValueToDraw));
 
-                        if (note.BendType == BendType.Hold)
+                        if (note.BendType == BendType.Hold || note.BendType == BendType.Prebend)
                         {
                             TieGlyph.PaintTie(canvas, Scale, startX, startY, endX, endY,
                                 direction == BeamDirection.Down);
@@ -191,7 +191,7 @@ namespace AlphaTab.Rendering.Glyphs
                             endY += NoteHeadGlyph.NoteHeadHeight * Scale;
                         }
 
-                        if (note.BendType == BendType.Hold)
+                        if (note.BendType == BendType.Hold || note.BendType == BendType.Prebend)
                         {
                             TieGlyph.PaintTie(canvas, Scale, startX, startY, endX, endY,
                                 direction == BeamDirection.Down);

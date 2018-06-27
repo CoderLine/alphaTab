@@ -312,9 +312,15 @@ namespace AlphaTab.Rendering
 
         private float GetStemSize(BeamingHelper helper)
         {
-            return helper.Beats.Count == 1
+             var size = helper.Beats.Count == 1
                 ? GetFooterStemSize(helper.ShortestDuration)
                 : GetBarStemSize(helper.ShortestDuration);
+            if (helper.IsGrace)
+            {
+                size = size * NoteHeadGlyph.GraceScale;
+            }
+
+            return size;
         }
 
         private float GetBarStemSize(Duration duration)
@@ -362,7 +368,7 @@ namespace AlphaTab.Rendering
             return GetScoreY(AccidentalHelper.GetNoteLineForValue(noteValue, true));
         }
 
-        private float CalculateBeamY(BeamingHelper h, float x)
+        public float CalculateBeamY(BeamingHelper h, float x)
         {
             var stemSize = GetStemSize(h);
             return h.CalculateBeamY(stemSize, Scale, x, Scale, this);

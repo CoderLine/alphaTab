@@ -419,6 +419,22 @@ namespace AlphaTab.Model
                 DisplayStart = PreviousBeat.DisplayStart + PreviousBeat.DisplayDuration;
                 PlaybackStart = PreviousBeat.PlaybackStart + PreviousBeat.PlaybackDuration;
             }
+
+            if (GraceType == GraceType.BeforeBeat || GraceType == GraceType.OnBeat)
+            {
+                var previousGraceDuration = PreviousBeat != null &&
+                                      (PreviousBeat.GraceType == GraceType.BeforeBeat ||
+                                       PreviousBeat.GraceType == GraceType.OnBeat)
+                    ? PreviousBeat.Duration
+                    : Duration.Quarter;
+                if (previousGraceDuration < Duration.ThirtySecond)
+                {
+                    previousGraceDuration = (Duration)((int)previousGraceDuration * 2);
+                }
+
+                ApplyGraceDuration(previousGraceDuration);
+            }
+
             
             // if the previous beat is a bend grace it covers
             // also this beat fully. 
@@ -716,6 +732,17 @@ namespace AlphaTab.Model
             }
 
             Fermata = Voice.Bar.MasterBar.GetFermata(this);
+        }
+
+        private void ApplyGraceDuration(Duration duration)
+        {
+            Beat currentBeat = this;
+            while (currentBeat != null && (currentBeat.GraceType == GraceType.BeforeBeat ||
+                                           currentBeat.GraceType == GraceType.OnBeat))
+            {
+                currentBeat.Duration = duration;
+                currentBeat = currentBeat.PreviousBeat;
+            }
         }
 
         /// <summary>

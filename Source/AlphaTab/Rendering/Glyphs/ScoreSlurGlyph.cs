@@ -55,23 +55,35 @@ namespace AlphaTab.Rendering.Glyphs
                 }
                 var endBeat = _startBeat.SlurOrigin.SlurDestination;
 
-                var endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Renderer.Staff.StaveId, endBeat.Voice.Bar);
+                var endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<ScoreBarRenderer>(Renderer.Staff.StaveId, endBeat.Voice.Bar);
                 float endX;
                 float endY;
                 if (endNoteRenderer == null || startNoteRenderer.Staff != endNoteRenderer.Staff)
                 {
-                    endNoteRenderer = startNoteRenderer.Staff.BarRenderers[startNoteRenderer.Staff.BarRenderers.Count - 1];
+                    endNoteRenderer = (ScoreBarRenderer)startNoteRenderer.Staff.BarRenderers[startNoteRenderer.Staff.BarRenderers.Count - 1];
                     endX = cx + endNoteRenderer.X + endNoteRenderer.Width;
                     endY = cy + endNoteRenderer.Y + endNoteRenderer.Height;
                 }
                 else
                 {
                     endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(endBeat, BeatXPosition.MiddleNotes);
-                    var note = direction == BeamDirection.Down ? endBeat.MinNote : endBeat.MaxNote;
-                    endY = cy + endNoteRenderer.Y + endNoteRenderer.GetNoteY(note);
+
+                    // if the note stem is pointing towards the slur, we need to let it end on top of the stem. 
+                    var endBeatHelper = endNoteRenderer.Helpers.GetBeamingHelperForBeat(endBeat);
+                    if (endBeatHelper.Direction == direction)
+                    {
+                        endY = cy + endNoteRenderer.Y + endNoteRenderer.CalculateBeamY(endBeatHelper, endX);
+                    }
+                    else
+                    {
+                        var note = direction == BeamDirection.Down ? endBeat.MinNote : endBeat.MaxNote;
+                        endY = cy + endNoteRenderer.Y + endNoteRenderer.GetNoteY(note);
+                    }
                 }
 
-                TieGlyph.PaintTie(canvas, Scale, startX, startY, endX, endY, direction == BeamDirection.Down);
+                var height = (endX - startX) * Renderer.Settings.SlurHeightFactor;
+
+                TieGlyph.PaintTie(canvas, Scale, startX, startY, endX, endY, direction == BeamDirection.Down, height);
                 canvas.Fill();
             }
         }
