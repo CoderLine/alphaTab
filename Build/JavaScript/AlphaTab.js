@@ -5582,15 +5582,7 @@ alphaTab.rendering.effects.WhammyBarEffectInfo.prototype = {
 		return 4;
 	}
 	,ShouldCreateGlyph: function(settings,beat) {
-		if(settings.DisplayMode == 1) {
-			if(beat.get_HasWhammyBar()) {
-				return beat.WhammyBarType != 3;
-			} else {
-				return false;
-			}
-		} else {
-			return beat.get_HasWhammyBar();
-		}
+		return beat.get_HasWhammyBar();
 	}
 	,CreateNewGlyph: function(renderer,beat) {
 		return new alphaTab.rendering.glyphs.LineRangedGlyph("w/bar");

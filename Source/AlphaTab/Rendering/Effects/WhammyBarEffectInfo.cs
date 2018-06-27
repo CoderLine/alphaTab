@@ -29,7 +29,7 @@ namespace AlphaTab.Rendering.Effects
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
-            return settings.DisplayMode == DisplayMode.SongBook ? beat.HasWhammyBar && beat.WhammyBarType != WhammyType.Dip : beat.HasWhammyBar;
+            return beat.HasWhammyBar;
         }
 
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
