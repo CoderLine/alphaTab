@@ -7931,9 +7931,9 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			return;
 		}
 		if(note.get_HasBend()) {
-			this.GenerateBend(note,note.BendPoints,noteStart,noteDuration,noteKey,dynamicValue,channel);
+			this.GenerateBend(note,noteStart,noteDuration,noteKey,dynamicValue,channel);
 		} else if(note.Beat.get_HasWhammyBar() && note.Index == 0) {
-			this.GenerateBend(note,note.Beat.WhammyBarPoints,noteStart,noteDuration,noteKey,dynamicValue,channel);
+			this.GenerateWhammy(note.Beat,noteStart,noteDuration,noteKey,dynamicValue,channel);
 		} else if(note.SlideType != 0) {
 			this.GenerateSlide(note,noteStart,noteDuration,noteKey,dynamicValue,channel);
 		} else if(note.Vibrato != 0) {
@@ -8091,9 +8091,8 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 	}
 	,GenerateSlide: function(note,noteStart,noteDuration,noteKey,dynamicValue,channel) {
 	}
-	,GenerateWhammyBar: function(note,noteStart,noteDuration,noteKey,dynamicValue,channel) {
-	}
-	,GenerateBend: function(note,bendPoints,noteStart,noteDuration,noteKey,dynamicValue,channel) {
+	,GenerateBend: function(note,noteStart,noteDuration,noteKey,dynamicValue,channel) {
+		var bendPoints = note.BendPoints;
 		var track = note.Beat.Voice.Bar.Staff.Track;
 		var duration;
 		if(note.IsTieOrigin && (this._settings == null || this._settings.ExtendBendArrowsOnTiedNotes)) {
@@ -8197,6 +8196,89 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			break;
 		default:
 		}
+		this.GenerateWhammyOrBend(noteStart,channel,duration,playedBendPoints,track);
+	}
+	,GenerateWhammy: function(beat,noteStart,noteDuration,noteKey,dynamicValue,channel) {
+		var bendPoints = beat.WhammyBarPoints;
+		var track = beat.Voice.Bar.Staff.Track;
+		var this1 = noteDuration.NoteOnly;
+		var duration = this1;
+		if(bendPoints[0].Value > 0 && !beat.IsContinuedWhammy) {
+			--noteStart;
+		}
+		var this2 = [];
+		var playedBendPoints = this2;
+		var _g = beat.WhammyBarType;
+		switch(_g) {
+		case 1:
+			playedBendPoints = bendPoints;
+			break;
+		case 2:
+			var _g1 = beat.WhammyStyle;
+			switch(_g1) {
+			case 0:
+				playedBendPoints = bendPoints;
+				break;
+			case 1:
+				playedBendPoints.push(new alphaTab.model.BendPoint(0,bendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60,bendPoints[1].Value));
+				break;
+			case 2:
+				playedBendPoints.push(new alphaTab.model.BendPoint(40,bendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(50,bendPoints[1].Value));
+				break;
+			default:
+			}
+			break;
+		case 3:
+			var _g2 = beat.WhammyStyle;
+			switch(_g2) {
+			case 0:
+				playedBendPoints = bendPoints;
+				break;
+			case 1:
+				playedBendPoints.push(new alphaTab.model.BendPoint(0,bendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60 / 2 | 0,bendPoints[1].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60,bendPoints[2].Value));
+				break;
+			case 2:
+				playedBendPoints.push(new alphaTab.model.BendPoint(40,bendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(45,bendPoints[1].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(50,bendPoints[2].Value));
+				break;
+			default:
+			}
+			break;
+		case 4:
+			playedBendPoints = bendPoints;
+			break;
+		case 5:
+			playedBendPoints = bendPoints;
+			break;
+		case 6:
+			var _g3 = beat.WhammyStyle;
+			switch(_g3) {
+			case 0:
+				playedBendPoints = bendPoints;
+				break;
+			case 1:
+				playedBendPoints.push(new alphaTab.model.BendPoint(0,bendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60 / 2 | 0,bendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(60,bendPoints[1].Value));
+				break;
+			case 2:
+				playedBendPoints.push(new alphaTab.model.BendPoint(0,bendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(40,bendPoints[0].Value));
+				playedBendPoints.push(new alphaTab.model.BendPoint(50,bendPoints[1].Value));
+				break;
+			default:
+			}
+			break;
+		default:
+		}
+		this.GenerateWhammyOrBend(noteStart,channel,duration,playedBendPoints,track);
+	}
+	,GenerateWhammyOrBend: function(noteStart,channel,duration,playedBendPoints,track) {
 		var ticksPerPosition = duration / 60;
 		var i = 0;
 		while(i < playedBendPoints.length - 1) {
@@ -8209,21 +8291,21 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			var tick = noteStart + ticksPerPosition * currentPoint.Offset;
 			if(currentBendValue < nextBendValue) {
 				while(currentBendValue <= nextBendValue) {
-					var this4 = currentBendValue;
-					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this4))));
+					var this1 = currentBendValue;
+					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this1))));
 					++currentBendValue;
 					tick = tick + ticksPerValue;
 				}
 			} else if(currentBendValue > nextBendValue) {
 				while(currentBendValue >= nextBendValue) {
-					var this5 = currentBendValue;
-					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this5))));
+					var this2 = currentBendValue;
+					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this2))));
 					--currentBendValue;
 					tick = tick + ticksPerValue;
 				}
 			} else {
-				var this6 = currentBendValue;
-				this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this6))));
+				var this3 = currentBendValue;
+				this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this3))));
 			}
 			++i;
 		}

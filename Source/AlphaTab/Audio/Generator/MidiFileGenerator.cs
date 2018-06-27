@@ -375,11 +375,11 @@ namespace AlphaTab.Audio.Generator
             // All String Bending/Variation effects
             if (note.HasBend)
             {
-                GenerateBend(note, note.BendPoints, noteStart, noteDuration, noteKey, dynamicValue, channel);
+                GenerateBend(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
             }
             else if (note.Beat.HasWhammyBar && note.Index == 0)
             {
-                GenerateBend(note, note.Beat.WhammyBarPoints, noteStart, noteDuration, noteKey, dynamicValue, channel);
+                GenerateWhammy(note.Beat, noteStart, noteDuration, noteKey, dynamicValue, channel);
             }
             else if (note.SlideType != SlideType.None)
             {
@@ -619,16 +619,12 @@ namespace AlphaTab.Audio.Generator
             // TODO 
         }
 
-        private void GenerateWhammyBar(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue, int channel)
-        {
-            // TODO 
-        }
-
         private const int DefaultBend = 0x40;
         private const float DefaultBendSemitone = 2.75f;
 
-        private void GenerateBend(Note note, FastList<BendPoint> bendPoints, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue, int channel)
+        private void GenerateBend(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue, int channel)
         {
+            FastList<BendPoint> bendPoints = note.BendPoints;
             var track = note.Beat.Voice.Bar.Staff.Track;
 
             // Bends are spread across all tied notes unless they have a bend on their own.
@@ -743,6 +739,97 @@ namespace AlphaTab.Audio.Generator
                     break;
             }
 
+            GenerateWhammyOrBend(noteStart, channel, duration, playedBendPoints, track);
+        }
+
+
+        private void GenerateWhammy(Beat beat, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue, int channel)
+        {
+            FastList<BendPoint> bendPoints = beat.WhammyBarPoints;
+            var track = beat.Voice.Bar.Staff.Track;
+
+            double duration = noteDuration.NoteOnly;
+
+            // ensure prebends are slightly before the actual note. 
+            if (bendPoints[0].Value > 0 && !beat.IsContinuedWhammy)
+            {
+                noteStart--;
+            }
+
+            FastList<BendPoint> playedBendPoints = new FastList<BendPoint>();
+            switch (beat.WhammyBarType)
+            {
+                case WhammyType.Custom:
+                    playedBendPoints = bendPoints;
+                    break;
+                case WhammyType.Dive:
+                    switch (beat.WhammyStyle)
+                    {
+                        case BendStyle.Default:
+                            playedBendPoints = bendPoints;
+                            break;
+                        case BendStyle.Gradual:
+                            playedBendPoints.Add(new BendPoint(0, bendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, bendPoints[1].Value));
+                            break;
+                        case BendStyle.Fast:
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointStart, bendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointEnd, bendPoints[1].Value));
+                            break;
+                    }
+
+                    break;
+                case WhammyType.Dip:
+                    switch (beat.WhammyStyle)
+                    {
+                        case BendStyle.Default:
+                            playedBendPoints = bendPoints;
+                            break;
+                        case BendStyle.Gradual:
+                            playedBendPoints.Add(new BendPoint(0, bendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition / 2, bendPoints[1].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, bendPoints[2].Value));
+                            break;
+                        case BendStyle.Fast:
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointStart, bendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointMiddle, bendPoints[1].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointEnd, bendPoints[2].Value));
+                            break;
+                    }
+
+                    break;
+                case WhammyType.Hold:
+                    playedBendPoints = bendPoints;
+                    break;
+                case WhammyType.Predive:
+                    playedBendPoints = bendPoints;
+                    break;
+                case WhammyType.PrediveDive:
+                    switch (beat.WhammyStyle)
+                    {
+                        case BendStyle.Default:
+                            playedBendPoints = bendPoints;
+                            break;
+                        case BendStyle.Gradual:
+                            playedBendPoints.Add(new BendPoint(0, bendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition / 2, bendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, bendPoints[1].Value));
+                            break;
+                        case BendStyle.Fast:
+                            playedBendPoints.Add(new BendPoint(0, bendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointStart, bendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointEnd, bendPoints[1].Value));
+                            break;
+                    }
+
+                    break;
+            }
+
+            GenerateWhammyOrBend(noteStart, channel, duration, playedBendPoints, track);
+        }
+
+        private void GenerateWhammyOrBend(int noteStart, int channel, double duration, FastList<BendPoint> playedBendPoints, Track track)
+        {
             var ticksPerPosition = duration / BendPoint.MaxPosition;
             for (int i = 0; i < playedBendPoints.Count - 1; i++)
             {
@@ -766,7 +853,7 @@ namespace AlphaTab.Audio.Generator
                 {
                     while (currentBendValue <= nextBendValue)
                     {
-                        _handler.AddBend(track.Index, (int)tick, (byte)channel, (byte)Math.Round(currentBendValue));
+                        _handler.AddBend(track.Index, (int) tick, (byte) channel, (byte) Math.Round(currentBendValue));
                         currentBendValue++;
                         tick += ticksPerValue;
                     }
@@ -776,7 +863,7 @@ namespace AlphaTab.Audio.Generator
                 {
                     while (currentBendValue >= nextBendValue)
                     {
-                        _handler.AddBend(track.Index, (int)tick, (byte)channel, (byte)Math.Round(currentBendValue));
+                        _handler.AddBend(track.Index, (int) tick, (byte) channel, (byte) Math.Round(currentBendValue));
                         currentBendValue--;
                         tick += ticksPerValue;
                     }
@@ -784,7 +871,7 @@ namespace AlphaTab.Audio.Generator
                 // hold
                 else
                 {
-                    _handler.AddBend(track.Index, (int)tick, (byte)channel, (byte)Math.Round(currentBendValue));
+                    _handler.AddBend(track.Index, (int) tick, (byte) channel, (byte) Math.Round(currentBendValue));
                 }
             }
         }
