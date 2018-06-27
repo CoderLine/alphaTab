@@ -22,6 +22,16 @@ namespace AlphaTab.IO
 {
     static class IOHelper
     {
+        public static int ReadInt32BE(this IReadable input)
+        {
+            var ch1 = input.ReadByte();
+            var ch2 = input.ReadByte();
+            var ch3 = input.ReadByte();
+            var ch4 = input.ReadByte();
+
+            return ((ch1 << 24) | (ch2 << 16) | (ch3 << 8) | (ch4 << 0));
+        }
+
         public static int ReadInt32LE(this IReadable input)
         {
             var ch1 = input.ReadByte();
@@ -56,16 +66,6 @@ namespace AlphaTab.IO
             var ch2 = input.ReadByte();
 
             return Platform.Platform.ToInt16((ch2 << 8) | (ch1 << 0));
-        }
-
-        public static int ReadInt32BE(this IReadable input)
-        {
-            var ch1 = input.ReadByte();
-            var ch2 = input.ReadByte();
-            var ch3 = input.ReadByte();
-            var ch4 = input.ReadByte();
-
-            return ((ch1 << 24) | (ch2 << 16) | (ch3 << 8) | (ch4 << 0));
         }
 
         public static uint ReadUInt32BE(this IReadable input)

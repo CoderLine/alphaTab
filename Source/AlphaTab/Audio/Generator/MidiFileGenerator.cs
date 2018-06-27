@@ -318,6 +318,7 @@ namespace AlphaTab.Audio.Generator
             var noteDuration = GetNoteDuration(note, beatDuration);
             noteDuration.UntilTieEnd -= brushOffset;
             noteDuration.NoteOnly -= brushOffset;
+            noteDuration.LetRingEnd -= brushOffset;
             var dynamicValue = GetDynamicValue(note);
 
             var channel = note.HasBend || note.Beat.HasWhammyBar || note.Beat.Vibrato != VibratoType.None
@@ -838,12 +839,14 @@ namespace AlphaTab.Audio.Generator
 
                 // a mask where the single bits indicate the strings used
                 var stringUsed = 0;
+                var stringCount = 0;
 
                 for (int i = 0, j = beat.Notes.Count; i < j; i++)
                 {
                     var n = beat.Notes[i];
                     if (n.IsTieDestination) continue;
                     stringUsed |= 0x01 << (n.String - 1);
+                    stringCount++;
                 }
 
                 //
@@ -851,7 +854,7 @@ namespace AlphaTab.Audio.Generator
                 if (beat.Notes.Count > 0)
                 {
                     int brushMove = 0;
-                    var brushIncrement = GetBrushIncrement(beat);
+                    var brushIncrement = beat.BrushDuration / (stringCount - 1);
                     for (int i = 0, j = beat.Voice.Bar.Staff.Tuning.Length; i < j; i++)
                     {
                         var index = (beat.BrushType == BrushType.ArpeggioDown || beat.BrushType == BrushType.BrushDown)
@@ -860,7 +863,7 @@ namespace AlphaTab.Audio.Generator
                         if ((stringUsed & (0x01 << index)) != 0)
                         {
                             brushInfo[index] = brushMove;
-                            brushMove = brushIncrement;
+                            brushMove += brushIncrement;
                         }
                     }
                 }

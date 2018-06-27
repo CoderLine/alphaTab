@@ -128,13 +128,13 @@ namespace AlphaTab.Test.Importer
         {
             Assert.AreEqual(GraceType.BeforeBeat, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].GraceType);
             Assert.AreEqual(3, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].Fret);
-            Assert.AreEqual(Duration.ThirtySecond, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Duration);
+            Assert.AreEqual(Duration.Eighth, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Duration);
             Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].Fret);
             Assert.AreEqual(Duration.Quarter, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Duration);
 
             Assert.AreEqual(GraceType.BeforeBeat, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].GraceType);
             Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Notes[0].Fret);
-            Assert.AreEqual(Duration.ThirtySecond, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Duration);
+            Assert.AreEqual(Duration.Eighth, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Duration);
             Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Notes[0].Fret);
             Assert.AreEqual(Duration.Quarter, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Duration);
         }

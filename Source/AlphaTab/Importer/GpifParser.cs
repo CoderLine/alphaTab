@@ -1379,11 +1379,16 @@ namespace AlphaTab.Importer
                     {
                         case "XProperty":
                             var id = c.GetAttribute("id");
+                            int val;
                             switch (id)
                             {
                                 case "1124204545":
-                                    var val = Platform.Platform.ParseInt(c.FindChildElement("Int").InnerText);
+                                    val = Platform.Platform.ParseInt(c.FindChildElement("Int").InnerText);
                                     beat.InvertBeamDirection = val == 1;
+                                    break;
+                                case "687935489":
+                                    val = Platform.Platform.ParseInt(c.FindChildElement("Int").InnerText);
+                                    beat.BrushDuration = val;
                                     break;
                             }
                             break;

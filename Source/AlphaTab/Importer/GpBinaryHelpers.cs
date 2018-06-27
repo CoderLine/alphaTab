@@ -62,7 +62,7 @@ namespace AlphaTab.Importer
         /// <returns></returns>
         public static string GpReadStringInt(this IReadable data)
         {
-            return data.GpReadString(data.ReadInt32BE());
+            return data.GpReadString(data.ReadInt32LE());
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace AlphaTab.Importer
         /// <returns></returns>
         public static string GpReadStringIntByte(this IReadable data)
         {
-            var length = data.ReadInt32BE() - 1;
+            var length = data.ReadInt32LE() - 1;
             data.ReadByte();
             return data.GpReadString(length);
         }

@@ -7903,6 +7903,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		var noteDuration = this.GetNoteDuration(note,beatDuration);
 		noteDuration.UntilTieEnd = noteDuration.UntilTieEnd - brushOffset;
 		noteDuration.NoteOnly = noteDuration.NoteOnly - brushOffset;
+		noteDuration.LetRingEnd = noteDuration.LetRingEnd - brushOffset;
 		var dynamicValue = this.GetDynamicValue(note);
 		var channel = note.get_HasBend() || note.Beat.get_HasWhammyBar() || note.Beat.Vibrato != 0 ? track.PlaybackInfo.SecondaryChannel : track.PlaybackInfo.PrimaryChannel;
 		var initialBend = 64;
@@ -8261,6 +8262,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		var brushInfo = this1;
 		if(beat.BrushType != 0) {
 			var stringUsed = 0;
+			var stringCount = 0;
 			var i = 0;
 			var j = beat.Notes.length;
 			while(i < j) {
@@ -8270,18 +8272,19 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 					continue;
 				}
 				stringUsed = stringUsed | 1 << n.String - 1;
+				++stringCount;
 				++i;
 			}
 			if(beat.Notes.length > 0) {
 				var brushMove = 0;
-				var brushIncrement = this.GetBrushIncrement(beat);
+				var brushIncrement = beat.BrushDuration / (stringCount - 1) | 0;
 				var i1 = 0;
 				var j1 = beat.Voice.Bar.Staff.Tuning.length;
 				while(i1 < j1) {
 					var index = beat.BrushType == 4 || beat.BrushType == 2 ? i1 : brushInfo.length - 1 - i1;
 					if((stringUsed & 1 << index) != 0) {
 						brushInfo[index] = brushMove;
-						brushMove = brushIncrement;
+						brushMove = brushMove + brushIncrement;
 					}
 					++i1;
 				}
@@ -14239,11 +14242,11 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			this.ReadPageSetup();
 			this._score.TempoLabel = alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
 		}
-		this._score.Tempo = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+		this._score.Tempo = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 		if(this._versionNumber >= 510) {
 			alphaTab.importer.GpBinaryHelpers.GpReadBool(this.Data);
 		}
-		alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+		alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 		if(this._versionNumber >= 400) {
 			this.Data.ReadByte();
 		}
@@ -14252,8 +14255,8 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			this.Data.Skip(38);
 			this.Data.Skip(4);
 		}
-		this._barCount = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
-		this._trackCount = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+		this._barCount = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
+		this._trackCount = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 		this.ReadMasterBars();
 		this.ReadTracks();
 		this.ReadBars();
@@ -14285,7 +14288,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		this._score.Copyright = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
 		this._score.Tab = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
 		this._score.Instructions = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
-		var noticeLines = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+		var noticeLines = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 		var this1 = "";
 		var notice = this1;
 		var i = 0;
@@ -14301,11 +14304,11 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 	,ReadLyrics: function() {
 		var this1 = [];
 		this._lyrics = this1;
-		this._lyricsTrack = alphaTab.io.IOHelper.ReadInt32BE(this.Data) - 1;
+		this._lyricsTrack = alphaTab.io.IOHelper.ReadInt32LE(this.Data) - 1;
 		var i = 0;
 		while(i < 5) {
 			var lyrics = new alphaTab.model.Lyrics();
-			lyrics.StartBar = alphaTab.io.IOHelper.ReadInt32BE(this.Data) - 1;
+			lyrics.StartBar = alphaTab.io.IOHelper.ReadInt32LE(this.Data) - 1;
 			lyrics.Text = alphaTab.importer.GpBinaryHelpers.GpReadStringInt(this.Data);
 			this._lyrics.push(lyrics);
 			++i;
@@ -14327,7 +14330,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			var info = new alphaTab.model.PlaybackInformation();
 			info.PrimaryChannel = i;
 			info.SecondaryChannel = i;
-			info.Program = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+			info.Program = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 			info.Volume = this.Data.ReadByte();
 			info.Balance = this.Data.ReadByte();
 			this.Data.Skip(6);
@@ -14446,21 +14449,21 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		if((flags & 1) != 0) {
 			mainStaff.StaffKind = 2;
 		}
-		var stringCount = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+		var stringCount = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 		var this1 = [];
 		var tuning = this1;
 		var i = 0;
 		while(i < 7) {
-			var stringTuning = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+			var stringTuning = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 			if(stringCount > i) {
 				tuning.push(stringTuning);
 			}
 			++i;
 		}
 		mainStaff.Tuning = new Int32Array(tuning);
-		var port = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
-		var index = alphaTab.io.IOHelper.ReadInt32BE(this.Data) - 1;
-		var effectChannel = alphaTab.io.IOHelper.ReadInt32BE(this.Data) - 1;
+		var port = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
+		var index = alphaTab.io.IOHelper.ReadInt32LE(this.Data) - 1;
+		var effectChannel = alphaTab.io.IOHelper.ReadInt32LE(this.Data) - 1;
 		this.Data.Skip(4);
 		if(index >= 0 && index < this._playbackInfos.length) {
 			var info = this._playbackInfos[index];
@@ -14473,7 +14476,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			}
 			newTrack.PlaybackInfo = info;
 		}
-		mainStaff.Capo = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+		mainStaff.Capo = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 		newTrack.Color = alphaTab.importer.GpBinaryHelpers.GpReadColor(this.Data,false);
 		if(this._versionNumber >= 500) {
 			this.Data.ReadByte();
@@ -14516,7 +14519,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		}
 	}
 	,ReadVoice: function(track,bar) {
-		var beatCount = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+		var beatCount = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 		if(beatCount == 0) {
 			return;
 		}
@@ -14566,7 +14569,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			newBeat.Duration = 4;
 		}
 		if((flags & 32) != 0) {
-			newBeat.TupletNumerator = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+			newBeat.TupletNumerator = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 			var _g = newBeat.TupletNumerator;
 			switch(_g) {
 			case 1:
@@ -14623,10 +14626,10 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			this.Data.Skip(17);
 			chord.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,21);
 			this.Data.Skip(4);
-			chord.FirstFret = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+			chord.FirstFret = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 			var i = 0;
 			while(i < 7) {
-				var fret = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+				var fret = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 				if(i < beat.Voice.Bar.Staff.Tuning.length) {
 					chord.Strings.push(fret);
 				}
@@ -14648,10 +14651,10 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 				this.Data.Skip(16);
 				chord.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,21);
 				this.Data.Skip(4);
-				chord.FirstFret = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+				chord.FirstFret = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 				var i2 = 0;
 				while(i2 < 7) {
-					var fret1 = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+					var fret1 = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 					if(i2 < beat.Voice.Bar.Staff.Tuning.length) {
 						chord.Strings.push(fret1);
 					}
@@ -14671,10 +14674,10 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			} else {
 				this.Data.Skip(25);
 				chord.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,34);
-				chord.FirstFret = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+				chord.FirstFret = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 				var i4 = 0;
 				while(i4 < 6) {
-					var fret2 = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+					var fret2 = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 					if(i4 < beat.Voice.Bar.Staff.Tuning.length) {
 						chord.Strings.push(fret2);
 					}
@@ -14685,11 +14688,11 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		} else {
 			var strings = this._versionNumber >= 406 ? 7 : 6;
 			chord.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
-			chord.FirstFret = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+			chord.FirstFret = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 			if(chord.FirstFret > 0) {
 				var i5 = 0;
 				while(i5 < strings) {
-					var fret3 = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+					var fret3 = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 					if(i5 < beat.Voice.Bar.Staff.Tuning.length) {
 						chord.Strings.push(fret3);
 					}
@@ -14783,14 +14786,14 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 	}
 	,ReadTremoloBarEffect: function(beat) {
 		this.Data.ReadByte();
-		alphaTab.io.IOHelper.ReadInt32BE(this.Data);
-		var pointCount = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+		alphaTab.io.IOHelper.ReadInt32LE(this.Data);
+		var pointCount = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 		if(pointCount > 0) {
 			var i = 0;
 			while(i < pointCount) {
 				var point = new alphaTab.model.BendPoint(0,0);
-				point.Offset = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
-				point.Value = alphaTab.io.IOHelper.ReadInt32BE(this.Data) / 25 | 0;
+				point.Offset = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
+				point.Value = alphaTab.io.IOHelper.ReadInt32LE(this.Data) / 25 | 0;
 				alphaTab.importer.GpBinaryHelpers.GpReadBool(this.Data);
 				beat.AddWhammyBarPoint(point);
 				++i;
@@ -14812,7 +14815,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		if(this._versionNumber >= 500) {
 			tableChange.TempoName = alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
 		}
-		tableChange.Tempo = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+		tableChange.Tempo = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 		if(tableChange.Volume >= 0) {
 			this.Data.ReadByte();
 		}
@@ -14996,14 +14999,14 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 	}
 	,ReadBend: function(note) {
 		this.Data.ReadByte();
-		alphaTab.io.IOHelper.ReadInt32BE(this.Data);
-		var pointCount = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
+		alphaTab.io.IOHelper.ReadInt32LE(this.Data);
+		var pointCount = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 		if(pointCount > 0) {
 			var i = 0;
 			while(i < pointCount) {
 				var point = new alphaTab.model.BendPoint(0,0);
-				point.Offset = alphaTab.io.IOHelper.ReadInt32BE(this.Data);
-				point.Value = alphaTab.io.IOHelper.ReadInt32BE(this.Data) / 25 | 0;
+				point.Offset = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
+				point.Value = alphaTab.io.IOHelper.ReadInt32LE(this.Data) / 25 | 0;
 				alphaTab.importer.GpBinaryHelpers.GpReadBool(this.Data);
 				note.AddBendPoint(point);
 				++i;
@@ -15308,10 +15311,10 @@ alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused = function(data) {
 	return alphaTab.importer.GpBinaryHelpers.GpReadString(data,data.ReadByte());
 };
 alphaTab.importer.GpBinaryHelpers.GpReadStringInt = function(data) {
-	return alphaTab.importer.GpBinaryHelpers.GpReadString(data,alphaTab.io.IOHelper.ReadInt32BE(data));
+	return alphaTab.importer.GpBinaryHelpers.GpReadString(data,alphaTab.io.IOHelper.ReadInt32LE(data));
 };
 alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte = function(data) {
-	var length = alphaTab.io.IOHelper.ReadInt32BE(data) - 1;
+	var length = alphaTab.io.IOHelper.ReadInt32LE(data) - 1;
 	data.ReadByte();
 	return alphaTab.importer.GpBinaryHelpers.GpReadString(data,length);
 };
@@ -16559,9 +16562,17 @@ alphaTab.importer.GpifParser.prototype = {
 				var _g = c1.LocalName;
 				if(_g == "XProperty") {
 					var id = c1.GetAttribute("id");
-					if(id == "1124204545") {
-						var val = alphaTab.platform.Platform.ParseInt(c1.FindChildElement("Int").get_InnerText());
+					var val;
+					switch(id) {
+					case "1124204545":
+						val = alphaTab.platform.Platform.ParseInt(c1.FindChildElement("Int").get_InnerText());
 						beat.InvertBeamDirection = val == 1;
+						break;
+					case "687935489":
+						val = alphaTab.platform.Platform.ParseInt(c1.FindChildElement("Int").get_InnerText());
+						beat.BrushDuration = val;
+						break;
+					default:
 					}
 				}
 			}
@@ -19134,6 +19145,13 @@ alphaTab.io.EndOfReaderException.prototype = $extend(alphaTab.AlphaTabException.
 });
 alphaTab.io.IOHelper = $hx_exports["alphaTab"]["io"]["IOHelper"] = function() { };
 alphaTab.io.IOHelper.__name__ = ["alphaTab","io","IOHelper"];
+alphaTab.io.IOHelper.ReadInt32BE = function(input) {
+	var ch1 = input.ReadByte();
+	var ch2 = input.ReadByte();
+	var ch3 = input.ReadByte();
+	var ch4 = input.ReadByte();
+	return ch1 << 24 | ch2 << 16 | ch3 << 8 | ch4;
+};
 alphaTab.io.IOHelper.ReadInt32LE = function(input) {
 	var ch1 = input.ReadByte();
 	var ch2 = input.ReadByte();
@@ -19157,13 +19175,6 @@ alphaTab.io.IOHelper.ReadInt16LE = function(input) {
 	var ch1 = input.ReadByte();
 	var ch2 = input.ReadByte();
 	return alphaTab.platform.Platform.ToInt16(ch2 << 8 | ch1);
-};
-alphaTab.io.IOHelper.ReadInt32BE = function(input) {
-	var ch1 = input.ReadByte();
-	var ch2 = input.ReadByte();
-	var ch3 = input.ReadByte();
-	var ch4 = input.ReadByte();
-	return ch1 << 24 | ch2 << 16 | ch3 << 8 | ch4;
 };
 alphaTab.io.IOHelper.ReadUInt32BE = function(input) {
 	var ch1 = input.ReadByte();
