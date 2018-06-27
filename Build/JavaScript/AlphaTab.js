@@ -7498,7 +7498,7 @@ alphaTab.audio.MidiTickLookup.prototype = {
 		var b1 = index + 1;
 		while(b1 < beats.length) {
 			var currentBeat1 = beats[b1];
-			if(trackLookup.hasOwnProperty(currentBeat1.Beat.Voice.Bar.Staff.Track.Index)) {
+			if(currentBeat1.Start > beat.Start && trackLookup.hasOwnProperty(currentBeat1.Beat.Voice.Bar.Staff.Track.Index)) {
 				nextBeat = currentBeat1;
 				break;
 			}
@@ -21638,9 +21638,11 @@ alphaTab.model.Note.prototype = {
 			return alphaTab.rendering.utils.PercussionMapper.MidiFromElementVariation(this);
 		}
 		if(this.get_IsStringed()) {
-			var noteValue = this.Fret + this.get_StringTuning() - this.Beat.Voice.Bar.Staff.TranspositionPitch;
-			noteValue = noteValue + this.get_HarmonicPitch();
-			return noteValue;
+			if(this.HarmonicType == 1) {
+				return this.get_HarmonicPitch() + this.get_StringTuning() - this.Beat.Voice.Bar.Staff.TranspositionPitch;
+			} else {
+				return this.Fret + this.get_StringTuning() - this.Beat.Voice.Bar.Staff.TranspositionPitch + this.get_HarmonicPitch();
+			}
 		}
 		if(this.get_IsPiano()) {
 			return this.Octave * 12 + this.Tone - this.Beat.Voice.Bar.Staff.TranspositionPitch;
@@ -21653,49 +21655,49 @@ alphaTab.model.Note.prototype = {
 		}
 		var value = this.HarmonicValue;
 		if(alphaTab.platform.Platform.IsAlmostEqualTo(value,2.4)) {
-			return 36 - this.Fret;
+			return 36;
 		} else if(alphaTab.platform.Platform.IsAlmostEqualTo(value,2.7)) {
-			return 34 - this.Fret;
+			return 34;
 		} else if(value < 3) {
 			return 0;
 		} else if(value <= 3.5) {
-			return 31 - this.Fret;
+			return 31;
 		} else if(value <= 4) {
-			return 28 - this.Fret;
+			return 28;
 		} else if(value <= 5) {
-			return 24 - this.Fret;
+			return 24;
 		} else if(value <= 6) {
-			return 34 - this.Fret;
+			return 34;
 		} else if(value <= 7) {
-			return 19 - this.Fret;
+			return 19;
 		} else if(value <= 8.5) {
-			return 36 - this.Fret;
+			return 36;
 		} else if(value <= 9) {
-			return 28 - this.Fret;
+			return 28;
 		} else if(value <= 10) {
-			return 34 - this.Fret;
+			return 34;
 		} else if(value <= 11) {
 			return 0;
 		} else if(value <= 12) {
-			return 12 - this.Fret;
+			return 12;
 		} else if(value < 14) {
 			return 0;
 		} else if(value <= 15) {
-			return 34 - this.Fret;
+			return 34;
 		} else if(value <= 16) {
-			return 28 - this.Fret;
+			return 28;
 		} else if(value <= 17) {
-			return 36 - this.Fret;
+			return 36;
 		} else if(value <= 18) {
 			return 0;
 		} else if(value <= 19) {
-			return 19 - this.Fret;
+			return 19;
 		} else if(value <= 21) {
 			return 0;
 		} else if(value <= 22) {
-			return 36 - this.Fret;
+			return 36;
 		} else if(value <= 24) {
-			return 24 - this.Fret;
+			return 24;
 		}
 		return 0;
 	}
@@ -26438,7 +26440,7 @@ alphaTab.rendering.ScoreBarRenderer.prototype = $extend(alphaTab.rendering.BarRe
 		var stemSize = this.GetFooterStemSize(h.ShortestDuration);
 		var beatLineX = h.GetBeatLineX(beat) + this.get_Scale();
 		var direction = h.Direction;
-		var topY = beat.Notes.length > 1 ? this.GetYPositionForNoteValue(h.MaxNoteValue) : this.GetYPositionForNoteValue(h.MinNoteValue);
+		var topY = this.GetYPositionForNoteValue(h.MaxNoteValue);
 		var bottomY = this.GetYPositionForNoteValue(h.MinNoteValue);
 		var beamY;
 		var fingeringY;
@@ -29172,7 +29174,7 @@ alphaTab.rendering.glyphs.NoteNumberGlyph.prototype = $extend(alphaTab.rendering
 			var _g = n.HarmonicType;
 			switch(_g) {
 			case 2:case 3:case 4:case 5:case 6:
-				var s = Std.string(n.HarmonicValue - n.Beat.Voice.Bar.Staff.TranspositionPitch);
+				var s = Std.string(fret + n.HarmonicValue);
 				var this5 = system.Convert.ToUInt16(46);
 				var i1 = s.indexOf(String.fromCharCode(this5));
 				if(i1 >= 0) {

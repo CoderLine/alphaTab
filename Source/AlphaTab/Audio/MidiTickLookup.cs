@@ -153,7 +153,7 @@ namespace AlphaTab.Audio
             for (int b = index + 1; b < beats.Count; b++)
             {
                 var currentBeat = beats[b];
-                if (trackLookup.ContainsKey(currentBeat.Beat.Voice.Bar.Staff.Track.Index))
+                if (currentBeat.Start > beat.Start && trackLookup.ContainsKey(currentBeat.Beat.Voice.Bar.Staff.Track.Index))
                 {
                     nextBeat = currentBeat;
                     break;

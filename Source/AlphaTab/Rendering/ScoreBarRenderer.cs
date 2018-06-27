@@ -516,7 +516,7 @@ namespace AlphaTab.Rendering
 
             var direction = h.Direction;
 
-            var topY = beat.Notes.Count > 1 ? GetYPositionForNoteValue(h.MaxNoteValue) : GetYPositionForNoteValue(h.MinNoteValue);
+            var topY = GetYPositionForNoteValue(h.MaxNoteValue);
             var bottomY = GetYPositionForNoteValue(h.MinNoteValue);
             float beamY;
             float fingeringY;

@@ -91,7 +91,7 @@ namespace AlphaTab.Rendering.Glyphs
                     case HarmonicType.Semi:
                     case HarmonicType.Feedback:
 
-                        var s = (n.HarmonicValue - n.Beat.Voice.Bar.Staff.TranspositionPitch).ToString();
+                        var s = (fret + n.HarmonicValue).ToString();
                         // only first decimal char
                         var i = s.IndexOf('.');
                         if (i >= 0)

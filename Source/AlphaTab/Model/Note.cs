@@ -289,9 +289,14 @@ namespace AlphaTab.Model
                 }
                 if (IsStringed)
                 {
-                    var noteValue = Fret + StringTuning - Beat.Voice.Bar.Staff.TranspositionPitch;
-                    noteValue += HarmonicPitch;
-                    return noteValue;
+                    if (HarmonicType == HarmonicType.Natural)
+                    {
+                        return HarmonicPitch + StringTuning - Beat.Voice.Bar.Staff.TranspositionPitch;
+                    }
+                    else
+                    {
+                        return Fret + StringTuning - Beat.Voice.Bar.Staff.TranspositionPitch + HarmonicPitch;
+                    }
                 }
                 if (IsPiano)
                 {
@@ -313,12 +318,12 @@ namespace AlphaTab.Model
                 // add semitones to reach corresponding harmonic frets
                 if (value.IsAlmostEqualTo(2.4f))
                 {
-                    return 36 - Fret;
+                    return 36;
                 }
                 else if (value.IsAlmostEqualTo(2.7f))
                 {
                     // Fret 3 2nd octave + minor seventh
-                    return 34 - Fret;
+                    return 34;
                 }
                 else if (value < 3)
                 {
@@ -328,35 +333,35 @@ namespace AlphaTab.Model
                 else if (value <= 3.5 /*3.2*/)
                 {
                     // Fret 3 2nd octave + fifth
-                    return 31 - Fret;
+                    return 31;
                 }
                 else if (value <= 4)
                 {
-                    return 28 - Fret;
+                    return 28;
                 }
                 else if (value <= 5)
                 {
-                    return 24 - Fret;
+                    return 24;
                 }
                 else if (value <= 6 /* 5.8 */)
                 {
-                    return 34 - Fret;
+                    return 34;
                 }
                 else if (value <= 7)
                 {
-                    return 19 - Fret;
+                    return 19 ;
                 }
                 else if (value <= 8.5 /*8.2*/)
                 {
-                    return 36 - Fret;
+                    return 36;
                 }
                 else if (value <= 9)
                 {
-                    return 28 - Fret;
+                    return 28;
                 }
                 else if (value <= 10 /*9.6*/)
                 {
-                    return 34 - Fret;
+                    return 34;
                 }
                 else if (value <= 11)
                 {
@@ -364,7 +369,7 @@ namespace AlphaTab.Model
                 }
                 else if (value <= 12)
                 {
-                    return 12 - Fret;
+                    return 12;
                 }
                 else if (value < 14)
                 {
@@ -373,15 +378,15 @@ namespace AlphaTab.Model
                 }
                 else if (value <= 15 /*14.7*/)
                 {
-                    return 34 - Fret;
+                    return 34;
                 }
                 else if (value <= 16)
                 {
-                    return 28 - Fret;
+                    return 28;
                 }
                 else if (value <= 17)
                 {
-                    return 36 - Fret;
+                    return 36;
                 }
                 else if (value <= 18)
                 {
@@ -389,7 +394,7 @@ namespace AlphaTab.Model
                 }
                 else if (value <= 19)
                 {
-                    return 19 - Fret;
+                    return 19;
                 }
                 else if (value <= 21)
                 {
@@ -398,11 +403,11 @@ namespace AlphaTab.Model
                 }
                 else if (value <= 22 /* 21.7 */)
                 {
-                    return 36 - Fret;
+                    return 36;
                 }
                 else if (value <= 24)
                 {
-                    return 24 - Fret;
+                    return 24;
                 }
 
                 return 0;
