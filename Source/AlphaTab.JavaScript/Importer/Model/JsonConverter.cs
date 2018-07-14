@@ -199,7 +199,7 @@ namespace AlphaTab.Model
             return score2;
         }
 
-        public static Score JsObjectToScore(Score score)
+        public static Score JsObjectToScore(Score score, Settings settings = null)
         {
             var score2 = new Score();
             Score.CopyTo(score, score2);
@@ -345,7 +345,7 @@ namespace AlphaTab.Model
 
             #endregion
 
-            score2.Finish(null);
+            score2.Finish(settings);
             return score2;
         }
 

@@ -349,7 +349,7 @@ namespace AlphaTab.Model
                 }
                 else if (value <= 7)
                 {
-                    return 19 ;
+                    return 19;
                 }
                 else if (value <= 8.5 /*8.2*/)
                 {
@@ -431,6 +431,10 @@ namespace AlphaTab.Model
                 else if (BendOrigin != null)
                 {
                     noteValue += BendOrigin.BendPoints[BendOrigin.BendPoints.Count - 1].Value / 2;
+                }
+                else if (IsTieDestination && TieOrigin.BendOrigin != null)
+                {
+                    noteValue += TieOrigin.BendOrigin.BendPoints[TieOrigin.BendOrigin.BendPoints.Count - 1].Value / 2;
                 }
                 else if (Beat.HasWhammyBar)
                 {
@@ -629,6 +633,8 @@ namespace AlphaTab.Model
             var nextNoteOnLine = new Util.Lazy<Note>(() => NextNoteOnSameLine(this));
             var prevNoteOnLine = new Util.Lazy<Note>(() => PreviousNoteOnSameLine(this));
 
+            var isSongBook = settings != null && settings.DisplayMode == DisplayMode.SongBook;
+
             // connect ties
             if (IsTieDestination)
             {
@@ -645,14 +651,16 @@ namespace AlphaTab.Model
                     Octave = TieOrigin.Octave;
                     Tone = TieOrigin.Tone;
 
-                    if (TieOrigin.BendOrigin != null)
-                    {
-                        BendOrigin = TieOrigin.BendOrigin;
-                    }
-                    else if (TieOrigin.HasBend)
+                    if (TieOrigin.HasBend)
                     {
                         BendOrigin = TieOrigin;
                     }
+                }
+
+                // implicit let ring 
+                if (isSongBook && TieOrigin.IsLetRing)
+                {
+                    IsLetRing = true;
                 }
             }
 
@@ -668,14 +676,12 @@ namespace AlphaTab.Model
                     LetRingDestination = nextNoteOnLine.Value;
                 }
 
-                if (settings != null)
+                if (isSongBook && IsTieDestination && !TieOrigin.HasBend)
                 {
-                    if (settings.DisplayMode == DisplayMode.SongBook && IsTieDestination)
-                    {
-                        IsVisible = false;
-                    }
+                    IsVisible = false;
                 }
             }
+
 
             // connect palmmute
             if (IsPalmMute)
@@ -687,20 +693,6 @@ namespace AlphaTab.Model
                 else
                 {
                     PalmMuteDestination = nextNoteOnLine.Value;
-                }
-            }
-
-            // set hammeron/pulloffs
-            if (IsHammerPullOrigin)
-            {
-                if (nextNoteOnLine.Value == null)
-                {
-                    IsHammerPullOrigin = false;
-                }
-                else
-                {
-                    HammerPullDestination = nextNoteOnLine.Value;
-                    HammerPullDestination.HammerPullOrigin = this;
                 }
             }
 
@@ -723,6 +715,20 @@ namespace AlphaTab.Model
                     {
                         SlurDestination.SlurOrigin = SlurOrigin;
                     }
+                }
+            }
+
+            // set hammeron/pulloffs
+            if (IsHammerPullOrigin)
+            {
+                if (nextNoteOnLine.Value == null)
+                {
+                    IsHammerPullOrigin = false;
+                }
+                else
+                {
+                    HammerPullDestination = nextNoteOnLine.Value;
+                    HammerPullDestination.HammerPullOrigin = this;
                 }
             }
 

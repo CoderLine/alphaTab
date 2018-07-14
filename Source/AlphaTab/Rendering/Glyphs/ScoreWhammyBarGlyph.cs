@@ -243,6 +243,21 @@ namespace AlphaTab.Rendering.Glyphs
                                 }
                                 canvas.Stroke();
                             }
+
+                            if (note.IsTieOrigin)
+                            {
+                                if (endNoteRenderer == null)
+                                {
+                                    endY = startY;
+                                }
+                                else
+                                {
+                                    endY = cy + endNoteRenderer.Y + endNoteRenderer.GetNoteY(note.TieDestination, true);
+                                }
+                                TieGlyph.PaintTie(canvas, Scale, startX, startY, endX, endY,
+                                    beatDirection == BeamDirection.Down);
+                                canvas.Fill();
+                            }
                         }
                         else
                         {

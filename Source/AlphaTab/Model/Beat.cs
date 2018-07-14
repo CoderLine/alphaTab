@@ -435,7 +435,6 @@ namespace AlphaTab.Model
                 ApplyGraceDuration(previousGraceDuration);
             }
 
-            
             // if the previous beat is a bend grace it covers
             // also this beat fully. 
             if (PreviousBeat != null && PreviousBeat.GraceType == GraceType.BendGrace)
@@ -458,8 +457,12 @@ namespace AlphaTab.Model
                 {
                     ticks = MidiUtils.ApplyTuplet(ticks, TupletNumerator, TupletDenominator);
                 }
-                DisplayDuration = ticks;
                 PlaybackDuration = ticks;
+                DisplayDuration = ticks;
+                if (PreviousBeat != null && PreviousBeat.GraceType != GraceType.None)
+                {
+                    DisplayDuration -= PreviousBeat.DisplayDuration;
+                }
 
                 // if the previous beat is a on-beat grace it steals the duration from this beat
                 if (PreviousBeat != null && PreviousBeat.GraceType == GraceType.OnBeat)
@@ -517,9 +520,16 @@ namespace AlphaTab.Model
                 }
                 if (displayMode == DisplayMode.SongBook && note.HasBend)
                 {
-                    if (note.BendType == BendType.Bend && !note.IsTieOrigin)
+                    if (!note.IsTieOrigin)
                     {
-                        needCopyBeatForBend = true;
+                        switch (note.BendType)
+                        {
+                            case BendType.Bend:
+                            case BendType.PrebendRelease:
+                            case BendType.PrebendBend:
+                                needCopyBeatForBend = true;
+                                break;
+                        }
                     }
 
                     if (isGradual)
@@ -579,11 +589,6 @@ namespace AlphaTab.Model
                 }
             }
 
-            if (MinNote == null)
-            {
-                IsEmpty = true;
-            }
-
             // we need to clean al letring/palmmute flags for rests
             // in case the effect is not continued on this beat
             if (!IsRest && (!IsLetRing || !IsPalmMute))
@@ -605,7 +610,7 @@ namespace AlphaTab.Model
             }
             // if beat is a rest implicitely take over letring/palmmute
             // from the previous beat gets cleaned later in case we flagged it wrong. 
-            else if (IsRest && PreviousBeat != null)
+            else if (IsRest && PreviousBeat != null && settings != null && settings.DisplayMode == DisplayMode.GuitarPro)
             {
                 if (PreviousBeat.IsLetRing)
                 {

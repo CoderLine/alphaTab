@@ -36,13 +36,15 @@ namespace AlphaTab.Rendering
         public Beat FirstBeat { get; set; }
         public Beat LastBeat { get; set; }
         public float Height { get; set; }
+        public Voice Voice { get; set; }
 
         public IEffectBarRendererInfo Info { get; set; }
         public EffectBandSlot Slot { get; set; }
 
-        public EffectBand(IEffectBarRendererInfo info)
+        public EffectBand(Voice voice, IEffectBarRendererInfo info)
             : base(0, 0)
         {
+            Voice = voice;
             Info = info;
             _uniqueEffectGlyphs = new FastList<FastList<EffectGlyph>>();
             _effectGlyphs = new FastList<FastDictionary<int, EffectGlyph>>();
@@ -61,6 +63,8 @@ namespace AlphaTab.Rendering
 
         public void CreateGlyph(Beat beat)
         {
+            if (beat.Voice != Voice) return;
+
             // NOTE: the track order will never change. even if the staff behind the renderer changes, the trackIndex will not. 
             // so it's okay to access the staff here while creating the glyphs. 
             if (Info.ShouldCreateGlyph(Renderer.Settings, beat) && (!Info.HideOnMultiTrack || Renderer.Staff.TrackIndex == 0))
@@ -145,7 +149,7 @@ namespace AlphaTab.Rendering
                             {
                                 // load the effect from the previous renderer if possible. 
                                 var previousRenderer = (EffectBarRenderer)Renderer.PreviousRenderer;
-                                var previousBand = previousRenderer.BandLookup[Info.EffectId];
+                                var previousBand = previousRenderer.GetBand(Voice, Info.EffectId);
                                 var voiceGlyphs = previousBand._effectGlyphs[b.Voice.Index];
                                 if (voiceGlyphs.ContainsKey(prevBeat.Index))
                                 {
@@ -370,8 +374,8 @@ namespace AlphaTab.Rendering
     class EffectBarRenderer : BarRendererBase
     {
         private readonly IEffectBarRendererInfo[] _infos;
-        private EffectBand[] _bands;
-        public FastDictionary<string, EffectBand> BandLookup { get; set; }
+        private FastList<EffectBand> _bands;
+        private FastDictionary<string, EffectBand> _bandLookup;
 
         public EffectBandSizingInfo SizingInfo { get; set; }
 
@@ -462,14 +466,21 @@ namespace AlphaTab.Rendering
 
         protected override void CreateBeatGlyphs()
         {
-            _bands = new EffectBand[_infos.Length];
-            BandLookup = new FastDictionary<string, EffectBand>();
-            for (int i = 0; i < _infos.Length; i++)
+            _bands = new FastList<EffectBand>();
+            _bandLookup = new FastDictionary<string, EffectBand>();
+            foreach (var voice in Bar.Voices)
             {
-                _bands[i] = new EffectBand(_infos[i]);
-                _bands[i].Renderer = this;
-                _bands[i].DoLayout();
-                BandLookup[_infos[i].EffectId] = _bands[i];
+                if (HasVoiceContainer(voice))
+                {
+                    foreach (var info in _infos)
+                    {
+                        var band = new EffectBand(voice, info);
+                        band.Renderer = this;
+                        band.DoLayout();
+                        _bands.Add(band);
+                        _bandLookup[voice.Index + "." + info.EffectId] = band;
+                    }
+                }
             }
 
             foreach (var voice in Bar.Voices)
@@ -510,9 +521,9 @@ namespace AlphaTab.Rendering
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             PaintBackground(cx, cy, canvas);
-            canvas.Color = Resources.MainGlyphColor;
             foreach (var effectBand in _bands)
             {
+                canvas.Color = effectBand.Voice.Index == 0 ? Resources.MainGlyphColor : Resources.SecondaryGlyphColor;
                 if (!effectBand.IsEmpty)
                 {
                     effectBand.Paint(cx + X, cy + Y, canvas);
@@ -521,6 +532,13 @@ namespace AlphaTab.Rendering
 
             //canvas.Color = new Color(0, 0, 200, 100);
             //canvas.StrokeRect(cx + X, cy + Y, Width, Height);
+        }
+
+        public EffectBand GetBand(Voice voice, string effectId)
+        {
+            var id = voice.Index + "." + effectId;
+            if (_bandLookup.ContainsKey(id)) return _bandLookup[id];
+            return null;
         }
     }
 }

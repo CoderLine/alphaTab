@@ -27,6 +27,7 @@ namespace AlphaTab.Model
     /// </summary>
     public class Voice
     {
+        private FastDictionary<int, Beat> _beatLookup;
         public int Index { get; set; }
         public Bar Bar { get; set; }
         public FastList<Beat> Beats { get; set; }
@@ -118,8 +119,21 @@ namespace AlphaTab.Model
             IsEmpty = false;
         }
 
+
+
+        public Beat GetBeatAtDisplayStart(int displayStart)
+        {
+            if (_beatLookup.ContainsKey(displayStart))
+            {
+                return _beatLookup[displayStart];
+            }
+
+            return null;
+        }
+
         public void Finish(Settings settings)
         {
+            _beatLookup = new FastDictionary<int, Beat>();
             for (var index = 0; index < Beats.Count; index++)
             {
                 var beat = Beats[index];
@@ -131,6 +145,7 @@ namespace AlphaTab.Model
                 var beat = Beats[index];
                 beat.Index = index;
                 beat.Finish(settings);
+                _beatLookup[beat.DisplayStart] = beat;
             }
         }
     }
