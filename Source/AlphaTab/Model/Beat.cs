@@ -117,6 +117,8 @@ namespace AlphaTab.Model
             }
         }
 
+        public bool IsRake { get; private set; }
+
         public bool IsNewLetRing { get; set; }
         public bool IsLetRing { get; set; }
         public bool IsPalmMute { get; set; }
@@ -245,6 +247,7 @@ namespace AlphaTab.Model
             NoteStringLookup = new FastDictionary<int, Note>();
             WhammyStyle = BendStyle.Default;
             IsSlurOrigin = false;
+            IsRake = false;
         }
 
         public static void CopyTo(Beat src, Beat dst)
@@ -406,87 +409,62 @@ namespace AlphaTab.Model
             return null;
         }
 
+        private int CalculateDuration()
+        {
+            var ticks = Duration.ToTicks();
+            if (Dots == 2)
+            {
+                ticks = MidiUtils.ApplyDot(ticks, true);
+            }
+            else if (Dots == 1)
+            {
+                ticks = MidiUtils.ApplyDot(ticks, false);
+            }
+
+            if (TupletDenominator > 0 && TupletNumerator >= 0)
+            {
+                ticks = MidiUtils.ApplyTuplet(ticks, TupletNumerator, TupletDenominator);
+            }
+
+            return ticks;
+        }
+
+        public void UpdateDurations()
+        {
+            var ticks = CalculateDuration();
+            PlaybackDuration = ticks;
+            DisplayDuration = ticks;
+
+            var previous = PreviousBeat;
+            if (previous != null)
+            {
+                switch (previous.GraceType)
+                {
+                    case GraceType.BendGrace:
+                        // the grace bend grace is reduced to a quarter note for correct display
+                        // with this beat as tied note we have the correct duration. 
+                        PlaybackDuration -= previous.PlaybackDuration;
+                        break;
+                    case GraceType.OnBeat:
+                        // if the previous beat is a on-beat grace it steals the duration from this beat
+                        PlaybackDuration -= previous.PlaybackDuration;
+                        break;
+                }
+            }
+
+            // It can happen that the first beat of the next bar shifts into this
+            // beat due to before-beat grace. In this case we need to 
+            // reduce the duration of this beat. 
+            // Within the same bar the start of the next beat is always directly after the current. 
+            if (NextBeat != null && NextBeat.Voice.Bar != Voice.Bar && NextBeat.GraceType == GraceType.BeforeBeat)
+            {
+                PlaybackDuration -= NextBeat.CalculateDuration();
+            }
+        }
+
         public void Finish(Settings settings)
         {
-            // start
-            if (Index == 0)
-            {
-                DisplayStart = 0;
-                PlaybackStart = 0;
-            }
-            else
-            {
-                DisplayStart = PreviousBeat.DisplayStart + PreviousBeat.DisplayDuration;
-                PlaybackStart = PreviousBeat.PlaybackStart + PreviousBeat.PlaybackDuration;
-            }
-
-            if (GraceType == GraceType.BeforeBeat || GraceType == GraceType.OnBeat)
-            {
-                var previousGraceDuration = PreviousBeat != null &&
-                                      (PreviousBeat.GraceType == GraceType.BeforeBeat ||
-                                       PreviousBeat.GraceType == GraceType.OnBeat)
-                    ? PreviousBeat.Duration
-                    : Duration.Quarter;
-                if (previousGraceDuration < Duration.ThirtySecond)
-                {
-                    previousGraceDuration = (Duration)((int)previousGraceDuration * 2);
-                }
-
-                ApplyGraceDuration(previousGraceDuration);
-            }
-
-            // if the previous beat is a bend grace it covers
-            // also this beat fully. 
-            if (PreviousBeat != null && PreviousBeat.GraceType == GraceType.BendGrace)
-            {
-                PlaybackDuration = 0;
-            }
-            else
-            {
-                var ticks = Duration.ToTicks();
-                if (Dots == 2)
-                {
-                    ticks = MidiUtils.ApplyDot(ticks, true);
-                }
-                else if (Dots == 1)
-                {
-                    ticks = MidiUtils.ApplyDot(ticks, false);
-                }
-
-                if (TupletDenominator > 0 && TupletNumerator >= 0)
-                {
-                    ticks = MidiUtils.ApplyTuplet(ticks, TupletNumerator, TupletDenominator);
-                }
-                PlaybackDuration = ticks;
-                DisplayDuration = ticks;
-                if (PreviousBeat != null && PreviousBeat.GraceType != GraceType.None)
-                {
-                    DisplayDuration -= PreviousBeat.DisplayDuration;
-                }
-
-                // if the previous beat is a on-beat grace it steals the duration from this beat
-                if (PreviousBeat != null && PreviousBeat.GraceType == GraceType.OnBeat)
-                {
-                    PlaybackDuration -= PreviousBeat.PlaybackDuration;
-                }
-
-                // It can happen that the first beat of the next bar shifts into this
-                // beat due to before-beat grace. In this case we need to 
-                // reduce the duration of this beat. 
-                // Within the same bar the start of the next beat is always directly after the current. 
-                if (NextBeat != null && NextBeat.Voice.Bar != Voice.Bar)
-                {
-                    var thisStart = AbsolutePlaybackStart;
-                    var end = thisStart + ticks;
-                    // we cannot use AbsoluteStart yet as the next bar might not have it's actual start time. (e.g. during model finish)
-                    var nextStart = Voice.Bar.MasterBar.Start + Voice.Bar.MasterBar.CalculateDuration() +
-                                    NextBeat.PlaybackStart;
-                    if (nextStart < end)
-                    {
-                        PlaybackDuration = nextStart - thisStart;
-                    }
-                }
-            }
+            UpdateDurations();
 
             var displayMode = settings == null ? DisplayMode.GuitarPro : settings.DisplayMode;
             var isGradual = Text == "grad" || Text == "grad.";
@@ -500,7 +478,7 @@ namespace AlphaTab.Model
             MaxNote = null;
             MinStringNote = null;
             MaxStringNote = null;
-         
+
             for (int i = 0, j = Notes.Count; i < j; i++)
             {
                 var note = Notes[i];
@@ -518,7 +496,7 @@ namespace AlphaTab.Model
                 {
                     IsSlurOrigin = true;
                 }
-                if (displayMode == DisplayMode.SongBook && note.HasBend)
+                if (displayMode == DisplayMode.SongBook && note.HasBend && GraceType != GraceType.BendGrace)
                 {
                     if (!note.IsTieOrigin)
                     {
@@ -532,8 +510,9 @@ namespace AlphaTab.Model
                         }
                     }
 
-                    if (isGradual)
+                    if (isGradual || note.BendStyle == BendStyle.Gradual)
                     {
+                        isGradual = true;
                         note.BendStyle = BendStyle.Gradual;
                         needCopyBeatForBend = false;
                     }

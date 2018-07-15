@@ -452,8 +452,8 @@ namespace AlphaTab.Rendering.Utils
 
             // get times of those voices and check if the times 
             // are in the same division
-            var start1 = b1.DisplayStart;
-            var start2 = b2.DisplayStart;
+            var start1 = b1.PlaybackStart;
+            var start2 = b2.PlaybackStart;
 
             // we can only join 8th, 16th, 32th and 64th voices
             if (!CanJoinDuration(b1.Duration) || !CanJoinDuration(b2.Duration))

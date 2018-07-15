@@ -32,6 +32,9 @@
     <None Include="$(MSBuildThisFileDirectory)TestFiles\Audio\default.sf2">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="$(MSBuildThisFileDirectory)TestFiles\Audio\GraceBeats.gp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="$(MSBuildThisFileDirectory)TestFiles\GuitarPro3\Effects.gp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

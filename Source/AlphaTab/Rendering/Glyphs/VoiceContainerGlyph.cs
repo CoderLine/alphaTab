@@ -137,41 +137,17 @@ namespace AlphaTab.Rendering.Glyphs
 
         //private void PaintSprings(float x, float y, ICanvas canvas)
         //{
-        //    var sortedSprings = new FastList<Spring>();
-        //    var xMin = 0f;
-        //    Platform.Foreach(_layoutings.Springs.Values, spring =>
-        //    {
-        //        sortedSprings.Add(spring);
-        //        if (spring.SpringWidth < xMin)
-        //        {
-        //            xMin = spring.SpringWidth;
-        //        }
-        //    });
-
-        //    sortedSprings.Sort((a, b) =>
-        //    {
-        //        if (a.TimePosition < b.TimePosition)
-        //        {
-        //            return -1;
-        //        }
-        //        if (a.TimePosition > b.TimePosition)
-        //        {
-        //            return 1;
-        //        }
-        //        return 0;
-        //    });
-
         //    y += 40;
 
+        //    var force = Renderer.LayoutingInfo.SpaceToForce(Width);
 
-        //    var positions = _layoutings.BuildOnTimePositions();
-        //    var keys = positions.Keys;
+        //    var positions = Renderer.LayoutingInfo.BuildOnTimePositions(force);
         //    canvas.Color = new Color(255, 0, 0);
-        //    for (int i = 0; i < keys.Length; i++)
+
+        //    foreach (var time in positions)
         //    {
-        //        var time = Platform.ParseInt(keys[i]);
         //        var springX = positions[time];
-        //        var spring = _layoutings.Springs[time];
+        //        var spring = Renderer.LayoutingInfo.Springs[time];
 
         //        canvas.BeginPath();
         //        canvas.MoveTo(x + springX, y);
@@ -180,8 +156,11 @@ namespace AlphaTab.Rendering.Glyphs
 
         //        canvas.BeginPath();
         //        canvas.MoveTo(x + springX, y + 5);
-        //        canvas.LineTo(x + springX + _layoutings.CalculateWidth(spring.SpringConstant), y + 5);
+        //        canvas.LineTo(x + springX + Renderer.LayoutingInfo.CalculateWidth(force, spring.SpringConstant), y + 5);
         //        canvas.Stroke();
+
+        //        canvas.TextAlign = TextAlign.Center;
+        //        canvas.FillText(time.ToString(), x + springX, y + 10);
         //    }
         //}
     }

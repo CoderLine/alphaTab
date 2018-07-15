@@ -166,6 +166,14 @@ namespace AlphaTab.Rendering.Glyphs
                 : Beat;
             canvas.BeginGroup(GetGroupId(group));
 
+            //var c = canvas.Color;
+            //var ta = canvas.TextAlign;
+            //canvas.Color = new Color(255, 0, 0);
+            //canvas.TextAlign = TextAlign.Left;
+            //canvas.FillText(Beat.DisplayStart.ToString(), cx + X, cy + Y - 10);
+            //canvas.Color = c;
+            //canvas.TextAlign = ta;
+
             //canvas.Color = Color.Random();
             //canvas.FillRect(cx + X, cy + Y, Width, Renderer.Height);
 

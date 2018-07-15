@@ -325,12 +325,7 @@ namespace AlphaTab
             // Override some defaults on songbook mode
             if (settings.DisplayMode == DisplayMode.SongBook)
             {
-                settings.SmallGraceTabNotes = false;
-                settings.FingeringMode = FingeringMode.SingleNoteEffectBand;
-                settings.ExtendBendArrowsOnTiedNotes = false;
-                settings.ShowParenthesisForTiedBends = false;
-                settings.ShowTabNoteOnTiedBend = false;
-                settings.ShowZeroOnDiveWhammy = true;
+                settings.ApplySongBookDefaults();
             }
 
             if (Platform.Platform.JsonExists(json, "scale"))
@@ -639,6 +634,7 @@ namespace AlphaTab
                 }
             }
         }
+
 
         private static DisplayMode DecodeDisplayMode(object mode)
         {

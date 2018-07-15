@@ -17,6 +17,7 @@
  */
 
 using System;
+using AlphaTab.Audio;
 using AlphaTab.Collections;
 
 namespace AlphaTab.Model
@@ -35,7 +36,7 @@ namespace AlphaTab.Model
         public bool IsEmpty
         {
             get; set;
-          
+
         }
 
         public Voice()
@@ -140,11 +141,77 @@ namespace AlphaTab.Model
                 beat.Index = index;
                 Chain(beat);
             }
-            for (var index = 0; index < Beats.Count; index++)
+
+            var currentDisplayTick = 0;
+            var currentPlaybackTick = 0;
+            for (var i = 0; i < Beats.Count; i++)
             {
-                var beat = Beats[index];
-                beat.Index = index;
+                var beat = Beats[i];
+                beat.Index = i;
                 beat.Finish(settings);
+
+                if (beat.GraceType == GraceType.None)
+                {
+                    beat.DisplayStart = currentDisplayTick;
+                    beat.PlaybackStart = currentPlaybackTick;
+                    currentDisplayTick += beat.DisplayDuration;
+                    currentPlaybackTick += beat.PlaybackDuration;
+                }
+                else
+                {
+                    // find note which is not a grace note
+                    Beat nonGrace = beat;
+                    int numberOfGraceBeats = 0;
+                    while (nonGrace != null && nonGrace.GraceType != GraceType.None)
+                    {
+                        nonGrace = nonGrace.NextBeat;
+                        numberOfGraceBeats++;
+                    }
+
+                    var graceDuration = Duration.Eighth;
+                    if (numberOfGraceBeats == 1)
+                    {
+                        graceDuration = Duration.Eighth;
+                    }
+                    else if (numberOfGraceBeats == 2)
+                    {
+                        graceDuration = Duration.Sixteenth;
+                    }
+                    else
+                    {
+                        graceDuration = Duration.ThirtySecond;
+                    }
+
+
+                    // grace beats have 1/4 size of the non grace beat following them
+                    var perGraceDuration = nonGrace == null ? Duration.ThirtySecond.ToTicks() : (nonGrace.DisplayDuration / 4) / numberOfGraceBeats;
+
+                    // move all grace beats 
+                    for (int j = 0; j < numberOfGraceBeats; j++)
+                    {
+                        var graceBeat = Beats[j + i];
+                        if (beat.PreviousBeat == null || beat.PreviousBeat.GraceType == GraceType.None)
+                        {
+                            graceBeat.Duration = graceDuration;
+                            graceBeat.UpdateDurations();
+                        }
+                        graceBeat.DisplayStart = currentDisplayTick - (numberOfGraceBeats - j + 1) * perGraceDuration;
+                        graceBeat.DisplayDuration = perGraceDuration;
+                    }
+
+                    beat.PlaybackStart = currentPlaybackTick;
+                    switch (beat.GraceType)
+                    {
+                        case GraceType.BeforeBeat:
+                            beat.PlaybackStart -= beat.PlaybackDuration;
+                            break;
+                        case GraceType.OnBeat:
+                        case GraceType.BendGrace:
+                            currentPlaybackTick += beat.PlaybackDuration;
+                            break;
+                    }
+                }
+
                 _beatLookup[beat.DisplayStart] = beat;
             }
         }

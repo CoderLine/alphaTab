@@ -36,6 +36,7 @@ namespace AlphaTab.Rendering.Staves
 
         private FastList<Spring> _timeSortedSprings;
         private float _xMin;
+        private int _minTime;
 
         private float _onTimePositionsForce;
         private FastDictionary<int, float> _onTimePositions;
@@ -64,6 +65,7 @@ namespace AlphaTab.Rendering.Staves
             Springs = new FastDictionary<int, Spring>();
             Version = 0;
             _timeSortedSprings = new FastList<Spring>();
+            _minTime = int.MaxValue;
         }
 
         public void UpdateVoiceSize(float size)
@@ -205,12 +207,18 @@ namespace AlphaTab.Rendering.Staves
                 spring.AllDurations.Add(duration);
             }
 
+            if (_minTime > start)
+            {
+                _minTime = start;
+            }
+
             return spring;
         }
 
         public Spring AddBeatSpring(Beat beat, float preBeatSize, float postBeatSize)
         {
-            return AddSpring(beat.AbsoluteDisplayStart, beat.DisplayDuration, preBeatSize, postBeatSize);
+            var start = beat.AbsoluteDisplayStart;
+            return AddSpring(start, beat.DisplayDuration, preBeatSize, postBeatSize);
         }
 
         public void Finish()
@@ -234,21 +242,9 @@ namespace AlphaTab.Rendering.Staves
 
             var totalSpringConstant = 0f;
             var sortedSprings = _timeSortedSprings;
-            for (int i = 0; i < sortedSprings.Count; i++)
+            foreach (var currentSpring in sortedSprings)
             {
-                var currentSpring = sortedSprings[i];
-                int duration;
-                if (i == sortedSprings.Count - 1)
-                {
-                    duration = currentSpring.LongestDuration;
-                }
-                else
-                {
-                    var nextSpring = sortedSprings[i + 1];
-                    duration = nextSpring.TimePosition - currentSpring.TimePosition;
-                }
-
-                currentSpring.SpringConstant = CalculateSpringConstant(currentSpring, duration);
+                currentSpring.SpringConstant = CalculateSpringConstant(currentSpring);
                 totalSpringConstant += 1 / currentSpring.SpringConstant;
             }
             TotalSpringConstant = 1 / totalSpringConstant;
@@ -261,8 +257,9 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        private float CalculateSpringConstant(Spring spring, int duration)
+        private float CalculateSpringConstant(Spring spring)
         {
+            var duration = spring.LongestDuration;
             if (duration <= 0)
             {
                 duration = Duration.SixtyFourth.ToTicks();

@@ -194,6 +194,27 @@ namespace AlphaTab
         /// </summary>
         public float SlurHeightFactor { get; set; }
 
+        public static Settings SongBook
+        {
+            get
+            {
+                var settings = Defaults;
+                settings.DisplayMode = DisplayMode.SongBook;
+                settings.ApplySongBookDefaults();
+                return settings;
+            }
+        }
+
+        private void ApplySongBookDefaults()
+        {
+            SmallGraceTabNotes = false;
+            FingeringMode = FingeringMode.SingleNoteEffectBand;
+            ExtendBendArrowsOnTiedNotes = false;
+            ShowParenthesisForTiedBends = false;
+            ShowTabNoteOnTiedBend = false;
+            ShowZeroOnDiveWhammy = true;
+        }
+
         public static Settings Defaults
         {
             get
