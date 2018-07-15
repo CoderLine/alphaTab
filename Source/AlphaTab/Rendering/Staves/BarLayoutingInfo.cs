@@ -168,10 +168,6 @@ namespace AlphaTab.Rendering.Staves
                         }
                     }
                 }
-                else
-                {
-                    spring.SmallestDuration = duration;
-                }
                 spring.LongestDuration = duration;
                 spring.PostSpringWidth = postSpringSize;
                 spring.PreSpringWidth = preSpringSize;
@@ -242,9 +238,20 @@ namespace AlphaTab.Rendering.Staves
 
             var totalSpringConstant = 0f;
             var sortedSprings = _timeSortedSprings;
-            foreach (var currentSpring in sortedSprings)
+            for (int i = 0; i < sortedSprings.Count; i++)
             {
-                currentSpring.SpringConstant = CalculateSpringConstant(currentSpring);
+                var currentSpring = sortedSprings[i];
+                int duration;
+                if (i == sortedSprings.Count - 1)
+                {
+                    duration = currentSpring.LongestDuration;
+                }
+                else
+                {
+                    var nextSpring = sortedSprings[i + 1];
+                    duration = Math.Abs(nextSpring.TimePosition - currentSpring.TimePosition);
+                }
+                currentSpring.SpringConstant = CalculateSpringConstant(currentSpring, duration);
                 totalSpringConstant += 1 / currentSpring.SpringConstant;
             }
             TotalSpringConstant = 1 / totalSpringConstant;
@@ -257,9 +264,8 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        private float CalculateSpringConstant(Spring spring)
+        private float CalculateSpringConstant(Spring spring, int duration)
         {
-            var duration = spring.LongestDuration;
             if (duration <= 0)
             {
                 duration = Duration.SixtyFourth.ToTicks();

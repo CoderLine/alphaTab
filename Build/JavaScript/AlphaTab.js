@@ -33156,8 +33156,6 @@ alphaTab.rendering.staves.BarLayoutingInfo.prototype = {
 						smallestDuration = prevDuration1;
 					}
 				}
-			} else {
-				spring.SmallestDuration = duration;
 			}
 			spring.LongestDuration = duration;
 			spring.PostSpringWidth = postSpringSize;
@@ -33209,22 +33207,29 @@ alphaTab.rendering.staves.BarLayoutingInfo.prototype = {
 		}
 		var totalSpringConstant = 0;
 		var sortedSprings = this._timeSortedSprings;
-		var currentSpring = $iterator(sortedSprings)();
-		while(currentSpring.hasNext()) {
-			var currentSpring1 = currentSpring.next();
-			currentSpring1.SpringConstant = this.CalculateSpringConstant(currentSpring1);
-			totalSpringConstant = totalSpringConstant + 1 / currentSpring1.SpringConstant;
-		}
-		this.TotalSpringConstant = 1 / totalSpringConstant;
 		var i = 0;
 		while(i < sortedSprings.length) {
-			var force = sortedSprings[i].get_SpringWidth() * sortedSprings[i].SpringConstant;
-			this.UpdateMinStretchForce(force);
+			var currentSpring = sortedSprings[i];
+			var duration;
+			if(i == sortedSprings.length - 1) {
+				duration = currentSpring.LongestDuration;
+			} else {
+				var nextSpring = sortedSprings[i + 1];
+				duration = Math.abs(nextSpring.TimePosition - currentSpring.TimePosition);
+			}
+			currentSpring.SpringConstant = this.CalculateSpringConstant(currentSpring,duration);
+			totalSpringConstant = totalSpringConstant + 1 / currentSpring.SpringConstant;
 			++i;
 		}
+		this.TotalSpringConstant = 1 / totalSpringConstant;
+		var i1 = 0;
+		while(i1 < sortedSprings.length) {
+			var force = sortedSprings[i1].get_SpringWidth() * sortedSprings[i1].SpringConstant;
+			this.UpdateMinStretchForce(force);
+			++i1;
+		}
 	}
-	,CalculateSpringConstant: function(spring) {
-		var duration = spring.LongestDuration;
+	,CalculateSpringConstant: function(spring,duration) {
 		if(duration <= 0) {
 			duration = alphaTab.audio.MidiUtils.ToTicks(64);
 		}
