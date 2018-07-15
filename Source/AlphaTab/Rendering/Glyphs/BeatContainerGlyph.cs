@@ -161,10 +161,7 @@ namespace AlphaTab.Rendering.Glyphs
             var isEmptyGlyph = PreNotes.IsEmpty && OnNotes.IsEmpty && Ties.Count == 0;
             if (isEmptyGlyph) return;
 
-            var group = Beat.PreviousBeat != null && Beat.PreviousBeat.GraceType == GraceType.BendGrace
-                ? Beat.PreviousBeat
-                : Beat;
-            canvas.BeginGroup(GetGroupId(group));
+            canvas.BeginGroup(GetGroupId(Beat));
 
             //var c = canvas.Color;
             //var ta = canvas.TextAlign;

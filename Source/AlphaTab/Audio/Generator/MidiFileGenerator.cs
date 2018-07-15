@@ -237,33 +237,29 @@ namespace AlphaTab.Audio.Generator
             var realTickOffset = beat.NextBeat == null ? audioDuration : beat.NextBeat.AbsolutePlaybackStart - beat.AbsolutePlaybackStart;
             beatLookup.End = barStartTick + beatStart;
 
-            if (beat.GraceType == GraceType.BendGrace || beat.PreviousBeat == null || beat.PreviousBeat.GraceType != GraceType.BendGrace)
-            {
-                beatLookup.End += (realTickOffset > audioDuration ? realTickOffset : audioDuration);
+            beatLookup.End += (realTickOffset > audioDuration ? realTickOffset : audioDuration);
 
-                // in case of normal playback register playback
-                if (realBar == beat.Voice.Bar)
+            // in case of normal playback register playback
+            if (realBar == beat.Voice.Bar)
+            {
+                beatLookup.Beat = beat;
+                TickLookup.AddBeat(beatLookup);
+            }
+            // in case of bar repeats register empty beat
+            else
+            {
+                beatLookup.IsEmptyBar = true;
+                beatLookup.Beat = realBar.Voices[0].Beats[0];
+                if (_currentBarRepeatLookup == null)
                 {
-                    beatLookup.Beat = beat;
-                    TickLookup.AddBeat(beatLookup);
+                    _currentBarRepeatLookup = beatLookup;
+                    TickLookup.AddBeat(_currentBarRepeatLookup);
                 }
-                // in case of bar repeats register empty beat
                 else
                 {
-                    beatLookup.IsEmptyBar = true;
-                    beatLookup.Beat = realBar.Voices[0].Beats[0];
-                    if (_currentBarRepeatLookup == null)
-                    {
-                        _currentBarRepeatLookup = beatLookup;
-                        TickLookup.AddBeat(_currentBarRepeatLookup);
-                    }
-                    else
-                    {
-                        _currentBarRepeatLookup.End = beatLookup.End;
-                    }
+                    _currentBarRepeatLookup.End = beatLookup.End;
                 }
             }
-
 
             var track = beat.Voice.Bar.Staff.Track;
 
@@ -650,6 +646,15 @@ namespace AlphaTab.Audio.Generator
                 noteStart--;
             }
 
+            if (note.BendStyle == BendStyle.Fast)
+            {
+
+            }
+            else
+            {
+
+            }
+
             FastList<BendPoint> playedBendPoints = new FastList<BendPoint>();
             switch (note.BendType)
             {
@@ -668,8 +673,16 @@ namespace AlphaTab.Audio.Generator
                             playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, note.BendPoints[1].Value));
                             break;
                         case BendStyle.Fast:
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointStart, note.BendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointEnd, note.BendPoints[1].Value));
+                            if (note.Beat.GraceType == GraceType.BendGrace)
+                            {
+                                playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtStartPointStart, note.BendPoints[0].Value));
+                                playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtStartPointEnd, note.BendPoints[1].Value));
+                            }
+                            else
+                            {
+                                playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointStart, note.BendPoints[0].Value));
+                                playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointEnd, note.BendPoints[1].Value));
+                            }
                             break;
                     }
 
@@ -686,9 +699,9 @@ namespace AlphaTab.Audio.Generator
                             playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, note.BendPoints[2].Value));
                             break;
                         case BendStyle.Fast:
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointStart, note.BendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointMiddle, note.BendPoints[1].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointEnd, note.BendPoints[2].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointStart, note.BendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointMiddle, note.BendPoints[1].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointEnd, note.BendPoints[2].Value));
                             break;
                     }
 
@@ -712,8 +725,8 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Fast:
                             playedBendPoints.Add(new BendPoint(0, note.BendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointStart, note.BendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointEnd, note.BendPoints[1].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointStart, note.BendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointEnd, note.BendPoints[1].Value));
                             break;
                     }
 
@@ -731,8 +744,8 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Fast:
                             playedBendPoints.Add(new BendPoint(0, note.BendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointStart, note.BendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointEnd, note.BendPoints[1].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointStart, note.BendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointEnd, note.BendPoints[1].Value));
                             break;
                     }
 
@@ -773,8 +786,8 @@ namespace AlphaTab.Audio.Generator
                             playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, bendPoints[1].Value));
                             break;
                         case BendStyle.Fast:
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointStart, bendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointEnd, bendPoints[1].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointStart, bendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointEnd, bendPoints[1].Value));
                             break;
                     }
 
@@ -791,9 +804,9 @@ namespace AlphaTab.Audio.Generator
                             playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, bendPoints[2].Value));
                             break;
                         case BendStyle.Fast:
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointStart, bendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointMiddle, bendPoints[1].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointEnd, bendPoints[2].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointStart, bendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointMiddle, bendPoints[1].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointEnd, bendPoints[2].Value));
                             break;
                     }
 
@@ -817,8 +830,8 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Fast:
                             playedBendPoints.Add(new BendPoint(0, bendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointStart, bendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendPointEnd, bendPoints[1].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointStart, bendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointEnd, bendPoints[1].Value));
                             break;
                     }
 

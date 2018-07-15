@@ -25,9 +25,12 @@ namespace AlphaTab.Model
     public class BendPoint
     {
         public const int MaxPosition = 60;
-        public const int FastBendPointStart = 40;
-        public const int FastBendPointMiddle= 45;
-        public const int FastBendPointEnd = 50;
+        public const int FastBendAtStartPointStart = 0;
+        public const int FastBendAtStartPointMiddle= 5;
+        public const int FastBendAtStartPointEnd = 10;
+        public const int FastBendAtEndPointStart = 40;
+        public const int FastBendAtEndPointMiddle= 45;
+        public const int FastBendAtEndPointEnd = 50;
         public const int MaxValue = 12;
 
         public int Offset { get; set; }
