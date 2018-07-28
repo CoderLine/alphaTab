@@ -194,6 +194,11 @@ namespace AlphaTab
         /// </summary>
         public float SlurHeightFactor { get; set; }
 
+        /// <summary>
+        /// Gets or sets the bend duration in milliseconds for songbook bends. 
+        /// </summary>
+        public int SongBookBendDuration { get; set; }
+
         public static Settings SongBook
         {
             get
@@ -254,6 +259,8 @@ namespace AlphaTab
                 settings.Vibrato.BeatWideAmplitude = 3;
                 settings.Vibrato.BeatSlightLength = 240;
                 settings.Vibrato.BeatWideLength = 240;
+
+                settings.SongBookBendDuration = 75;
 
                 SetDefaults(settings);
 

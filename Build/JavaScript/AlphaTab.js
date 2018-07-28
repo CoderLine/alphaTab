@@ -6670,6 +6670,7 @@ alphaTab.Settings = $hx_exports["alphaTab"]["Settings"] = function() {
 	this.ExtendLineEffectsToBeatEnd = false;
 	this.Vibrato = null;
 	this.SlurHeightFactor = 0.0;
+	this.SongBookBendDuration = 0;
 };
 alphaTab.Settings.__name__ = ["alphaTab","Settings"];
 alphaTab.Settings.SetDefaults = function(settings) {
@@ -6863,6 +6864,11 @@ alphaTab.Settings.FillFromJson = function(settings,json,dataAttributes) {
 		settings.ExtendLineEffectsToBeatEnd = json.extendLineEffectsToBeatEnd;
 	} else if(dataAttributes != null && dataAttributes.hasOwnProperty("extendLineEffectsToBeatEnd")) {
 		settings.ExtendLineEffectsToBeatEnd = dataAttributes["extendLineEffectsToBeatEnd"];
+	}
+	if((json && "songBookBendDuration" in json)) {
+		settings.SongBookBendDuration = json.songBookBendDuration;
+	} else if(dataAttributes != null && dataAttributes.hasOwnProperty("songBookBendDuration")) {
+		settings.SongBookBendDuration = dataAttributes["songBookBendDuration"];
 	}
 	if((json && "layout" in json)) {
 		settings.Layout = alphaTab.Settings.LayoutFromJson(json.layout);
@@ -7159,6 +7165,7 @@ alphaTab.Settings.get_Defaults = function() {
 	settings.Vibrato.BeatWideAmplitude = 3;
 	settings.Vibrato.BeatSlightLength = 240;
 	settings.Vibrato.BeatWideLength = 240;
+	settings.SongBookBendDuration = 75;
 	alphaTab.Settings.SetDefaults(settings);
 	return settings;
 };
@@ -7183,6 +7190,7 @@ alphaTab.Settings.prototype = {
 		json.fingeringMode = this.FingeringMode;
 		json.showZeroOnDiveWhammy = this.ShowZeroOnDiveWhammy;
 		json.extendLineEffectsToBeatEnd = this.ExtendLineEffectsToBeatEnd;
+		json.songBookBendDuration = this.SongBookBendDuration;
 		json.scriptFile = this.ScriptFile;
 		json.fontDirectory = this.FontDirectory;
 		json.lazy = this.DisableLazyLoading;
@@ -7612,6 +7620,9 @@ alphaTab.audio.MidiUtils = $hx_exports["alphaTab"]["audio"]["MidiUtils"] = funct
 alphaTab.audio.MidiUtils.__name__ = ["alphaTab","audio","MidiUtils"];
 alphaTab.audio.MidiUtils.TicksToMillis = function(ticks,tempo) {
 	return system.Convert.ToInt32_Double(ticks * (60000.0 / (tempo * 960)));
+};
+alphaTab.audio.MidiUtils.MillisToTicks = function(millis,tempo) {
+	return system.Convert.ToInt32_Double(millis / (60000.0 / (tempo * 960)));
 };
 alphaTab.audio.MidiUtils.ToTicks = function(duration) {
 	return alphaTab.audio.MidiUtils.ValueToTicks(duration);
@@ -8120,7 +8131,6 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		if(bendPoints[0].Value > 0 && !note.IsContinuedBend) {
 			--noteStart;
 		}
-		var tmp = note.BendStyle == 2;
 		var this3 = [];
 		var playedBendPoints = this3;
 		var _g = note.BendType;
@@ -8140,13 +8150,11 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				break;
 			case 2:
 				if(note.Beat.GraceType == 3) {
-					playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
-					playedBendPoints.push(new alphaTab.model.BendPoint(10,note.BendPoints[1].Value));
+					this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,true,new Int32Array([note.BendPoints[0].Value,note.BendPoints[1].Value]));
 				} else {
-					playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[0].Value));
-					playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[1].Value));
+					this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,false,new Int32Array([note.BendPoints[0].Value,note.BendPoints[1].Value]));
 				}
-				break;
+				return;
 			default:
 			}
 			break;
@@ -8162,9 +8170,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[2].Value));
 				break;
 			case 2:
-				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(45,note.BendPoints[1].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[2].Value));
+				this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,false,new Int32Array([note.BendPoints[0].Value,note.BendPoints[1].Value,note.BendPoints[2].Value]));
 				break;
 			default:
 			}
@@ -8187,9 +8193,9 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[1].Value));
 				break;
 			case 2:
-				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[1].Value));
+				var preBendValue = 64 + note.BendPoints[0].Value * 2.75;
+				this._handler.AddBend(track.Index,noteStart,system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Single(preBendValue)));
+				this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,false,new Int32Array([note.BendPoints[0].Value,note.BendPoints[1].Value]));
 				break;
 			default:
 			}
@@ -8206,9 +8212,9 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[1].Value));
 				break;
 			case 2:
-				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(40,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(50,note.BendPoints[1].Value));
+				var preBendValue1 = 64 + note.BendPoints[0].Value * 2.75;
+				this._handler.AddBend(track.Index,noteStart,system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Single(preBendValue1)));
+				this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,false,new Int32Array([note.BendPoints[0].Value,note.BendPoints[1].Value]));
 				break;
 			default:
 			}
@@ -8216,6 +8222,26 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		default:
 		}
 		this.GenerateWhammyOrBend(noteStart,channel,duration,playedBendPoints,track);
+	}
+	,GenerateSongBookWhammyOrBend: function(noteStart,channel,duration,track,bendAtBeginning,bendValues) {
+		var this1 = alphaTab.audio.MidiUtils.MillisToTicks(this._settings.SongBookBendDuration,this._currentTempo);
+		var durationBySetting = Math.min(duration,this1);
+		var startTick;
+		if(bendAtBeginning) {
+			var this2 = noteStart;
+			startTick = this2;
+		} else {
+			startTick = noteStart + duration - durationBySetting;
+		}
+		var ticksBetweenPoints = durationBySetting / (bendValues.length - 1);
+		var i = 0;
+		while(i < bendValues.length - 1) {
+			var currentBendValue = 64 + bendValues[i] * 2.75;
+			var nextBendValue = 64 + bendValues[i + 1] * 2.75;
+			var tick = startTick + ticksBetweenPoints * i;
+			this.GenerateBendValues(tick,channel,track,ticksBetweenPoints,currentBendValue,nextBendValue);
+			++i;
+		}
 	}
 	,GenerateWhammy: function(beat,noteStart,noteDuration,noteKey,dynamicValue,channel) {
 		var bendPoints = beat.WhammyBarPoints;
@@ -8306,27 +8332,30 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			var currentBendValue = 64 + currentPoint.Value * 2.75;
 			var nextBendValue = 64 + nextPoint.Value * 2.75;
 			var ticksBetweenPoints = ticksPerPosition * (nextPoint.Offset - currentPoint.Offset);
-			var ticksPerValue = ticksBetweenPoints / Math.abs(nextBendValue - currentBendValue);
 			var tick = noteStart + ticksPerPosition * currentPoint.Offset;
-			if(currentBendValue < nextBendValue) {
-				while(currentBendValue <= nextBendValue) {
-					var this1 = currentBendValue;
-					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this1))));
-					++currentBendValue;
-					tick = tick + ticksPerValue;
-				}
-			} else if(currentBendValue > nextBendValue) {
-				while(currentBendValue >= nextBendValue) {
-					var this2 = currentBendValue;
-					this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this2))));
-					--currentBendValue;
-					tick = tick + ticksPerValue;
-				}
-			} else {
-				var this3 = currentBendValue;
-				this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(tick),system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this3))));
-			}
+			this.GenerateBendValues(tick,channel,track,ticksBetweenPoints,currentBendValue,nextBendValue);
 			++i;
+		}
+	}
+	,GenerateBendValues: function(currentTick,channel,track,ticksBetweenPoints,currentBendValue,nextBendValue) {
+		var ticksPerValue = ticksBetweenPoints / Math.abs(nextBendValue - currentBendValue);
+		if(currentBendValue < nextBendValue) {
+			while(currentBendValue <= nextBendValue) {
+				var this1 = currentBendValue;
+				this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(currentTick),system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this1))));
+				++currentBendValue;
+				currentTick = currentTick + ticksPerValue;
+			}
+		} else if(currentBendValue > nextBendValue) {
+			while(currentBendValue >= nextBendValue) {
+				var this2 = currentBendValue;
+				this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(currentTick),system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this2))));
+				--currentBendValue;
+				currentTick = currentTick + ticksPerValue;
+			}
+		} else {
+			var this3 = currentBendValue;
+			this._handler.AddBend(track.Index,system.Convert.ToInt32_Double(currentTick),system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Double(Math.round(this3))));
 		}
 	}
 	,GenerateTrill: function(note,noteStart,noteDuration,noteKey,dynamicValue,channel) {
@@ -20061,9 +20090,13 @@ alphaTab.model.Beat.prototype = {
 			break;
 		default:
 			var previous = this.PreviousBeat;
-			while(previous != null && previous.GraceType == 1) {
-				this.PlaybackDuration = this.PlaybackDuration - previous.PlaybackDuration;
-				previous = previous.PreviousBeat;
+			if(previous != null && previous.GraceType == 3) {
+				this.PlaybackDuration = 0;
+			} else {
+				while(previous != null && previous.GraceType == 1) {
+					this.PlaybackDuration = this.PlaybackDuration - previous.PlaybackDuration;
+					previous = previous.PreviousBeat;
+				}
 			}
 		}
 		if(this.NextBeat != null && this.NextBeat.Voice.Bar != this.Voice.Bar) {
@@ -23150,7 +23183,7 @@ alphaTab.model.Voice.prototype = {
 			var beat1 = this.Beats[i];
 			beat1.Index = i;
 			beat1.Finish(settings);
-			if(beat1.GraceType == 0) {
+			if(beat1.GraceType == 0 || beat1.GraceType == 3) {
 				beat1.DisplayStart = currentDisplayTick;
 				beat1.PlaybackStart = currentPlaybackTick;
 				currentDisplayTick = currentDisplayTick + beat1.DisplayDuration;
@@ -23185,7 +23218,7 @@ alphaTab.model.Voice.prototype = {
 				beat1.PlaybackStart = currentPlaybackTick;
 				var _g = beat1.GraceType;
 				switch(_g) {
-				case 1:case 3:
+				case 1:
 					currentPlaybackTick = currentPlaybackTick + beat1.PlaybackDuration;
 					break;
 				case 2:

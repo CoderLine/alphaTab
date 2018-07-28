@@ -457,11 +457,18 @@ namespace AlphaTab.Model
                 default:
 
                     var previous = PreviousBeat;
-                    while (previous != null && previous.GraceType == GraceType.OnBeat)
+                    if (previous != null && previous.GraceType == GraceType.BendGrace)
                     {
-                        // if the previous beat is a on-beat grace it steals the duration from this beat
-                        PlaybackDuration -= previous.PlaybackDuration;
-                        previous = previous.PreviousBeat;
+                        PlaybackDuration = 0;
+                    }
+                    else
+                    {
+                        while (previous != null && previous.GraceType == GraceType.OnBeat)
+                        {
+                            // if the previous beat is a on-beat grace it steals the duration from this beat
+                            PlaybackDuration -= previous.PlaybackDuration;
+                            previous = previous.PreviousBeat;
+                        }
                     }
 
                     break;

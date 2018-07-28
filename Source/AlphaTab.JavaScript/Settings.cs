@@ -202,6 +202,7 @@ namespace AlphaTab
             json.fingeringMode = FingeringMode;
             json.showZeroOnDiveWhammy = ShowZeroOnDiveWhammy;
             json.extendLineEffectsToBeatEnd = ExtendLineEffectsToBeatEnd;
+            json.songBookBendDuration = SongBookBendDuration;
 
             json.scriptFile = ScriptFile;
             json.fontDirectory = FontDirectory;
@@ -482,6 +483,15 @@ namespace AlphaTab
             else if (dataAttributes != null && dataAttributes.ContainsKey("extendLineEffectsToBeatEnd"))
             {
                 settings.ExtendLineEffectsToBeatEnd = (bool)dataAttributes["extendLineEffectsToBeatEnd"];
+            }
+
+            if (Platform.Platform.JsonExists(json, "songBookBendDuration"))
+            {
+                settings.SongBookBendDuration = json.songBookBendDuration;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("songBookBendDuration"))
+            {
+                settings.SongBookBendDuration = (int)dataAttributes["songBookBendDuration"];
             }
 
             if (Platform.Platform.JsonExists(json, "layout"))

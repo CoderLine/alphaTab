@@ -150,7 +150,7 @@ namespace AlphaTab.Model
                 beat.Index = i;
                 beat.Finish(settings);
 
-                if (beat.GraceType == GraceType.None)
+                if (beat.GraceType == GraceType.None || beat.GraceType == GraceType.BendGrace)
                 {
                     beat.DisplayStart = currentDisplayTick;
                     beat.PlaybackStart = currentPlaybackTick;
@@ -206,7 +206,6 @@ namespace AlphaTab.Model
                             beat.PlaybackStart -= beat.PlaybackDuration;
                             break;
                         case GraceType.OnBeat:
-                        case GraceType.BendGrace:
                             currentPlaybackTick += beat.PlaybackDuration;
                             break;
                     }
