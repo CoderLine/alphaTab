@@ -736,6 +736,10 @@ namespace AlphaTab.Model
             if (SlideType != SlideType.None)
             {
                 SlideTarget = nextNoteOnLine.Value;
+                if (SlideTarget == null)
+                {
+                    SlideType = SlideType.None;
+                }
             }
 
             // try to detect what kind of bend was used and cleans unneeded points if required

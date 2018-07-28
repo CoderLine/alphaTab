@@ -16662,25 +16662,29 @@ alphaTab.importer.GpifParser.prototype = {
 				case "Whammy":
 					var whammyOrigin = new alphaTab.model.BendPoint(0,0);
 					var s = c1.GetAttribute("originValue");
-					whammyOrigin.Value = this.ToBendValue(parseFloat(s));
+					var this4 = parseFloat(s);
+					whammyOrigin.Value = this.ToBendValue(this4);
 					var s1 = c1.GetAttribute("originOffset");
 					whammyOrigin.Offset = this.ToBendOffset(parseFloat(s1));
 					beat.AddWhammyBarPoint(whammyOrigin);
 					var whammyMiddle1 = new alphaTab.model.BendPoint(0,0);
 					var s2 = c1.GetAttribute("middleValue");
-					whammyMiddle1.Value = this.ToBendValue(parseFloat(s2));
+					var this5 = parseFloat(s2);
+					whammyMiddle1.Value = this.ToBendValue(this5);
 					var s3 = c1.GetAttribute("middleOffset1");
 					whammyMiddle1.Offset = this.ToBendOffset(parseFloat(s3));
 					beat.AddWhammyBarPoint(whammyMiddle1);
 					var whammyMiddle2 = new alphaTab.model.BendPoint(0,0);
 					var s4 = c1.GetAttribute("middleValue");
-					whammyMiddle2.Value = this.ToBendValue(parseFloat(s4));
+					var this6 = parseFloat(s4);
+					whammyMiddle2.Value = this.ToBendValue(this6);
 					var s5 = c1.GetAttribute("middleOffset2");
 					whammyMiddle2.Offset = this.ToBendOffset(parseFloat(s5));
 					beat.AddWhammyBarPoint(whammyMiddle2);
 					var whammyDestination = new alphaTab.model.BendPoint(0,0);
 					var s6 = c1.GetAttribute("destinationValue");
-					whammyDestination.Value = this.ToBendValue(parseFloat(s6));
+					var this7 = parseFloat(s6);
+					whammyDestination.Value = this.ToBendValue(this7);
 					var s7 = c1.GetAttribute("destinationOffset");
 					whammyDestination.Offset = this.ToBendOffset(parseFloat(s7));
 					beat.AddWhammyBarPoint(whammyDestination);
@@ -16784,7 +16788,8 @@ alphaTab.importer.GpifParser.prototype = {
 							whammyDestination = new alphaTab.model.BendPoint(60,0);
 						}
 						var s1 = c1.FindChildElement("Float").get_InnerText();
-						whammyDestination.Value = this.ToBendValue(parseFloat(s1));
+						var this1 = parseFloat(s1);
+						whammyDestination.Value = this.ToBendValue(this1);
 						break;
 					case "WhammyBarExtend":
 						break;
@@ -16798,7 +16803,8 @@ alphaTab.importer.GpifParser.prototype = {
 						break;
 					case "WhammyBarMiddleValue":
 						var s4 = c1.FindChildElement("Float").get_InnerText();
-						whammyMiddleValue = this.ToBendValue(parseFloat(s4));
+						var this2 = parseFloat(s4);
+						whammyMiddleValue = this.ToBendValue(this2);
 						break;
 					case "WhammyBarOriginOffset":
 						if(whammyOrigin == null) {
@@ -16812,7 +16818,8 @@ alphaTab.importer.GpifParser.prototype = {
 							whammyOrigin = new alphaTab.model.BendPoint(0,0);
 						}
 						var s6 = c1.FindChildElement("Float").get_InnerText();
-						whammyOrigin.Value = this.ToBendValue(parseFloat(s6));
+						var this3 = parseFloat(s6);
+						whammyOrigin.Value = this.ToBendValue(this3);
 						break;
 					default:
 					}
@@ -16984,7 +16991,8 @@ alphaTab.importer.GpifParser.prototype = {
 							bendDestination = new alphaTab.model.BendPoint(60,0);
 						}
 						var s1 = c1.FindChildElement("Float").get_InnerText();
-						bendDestination.Value = this.ToBendValue(parseFloat(s1));
+						var this1 = parseFloat(s1);
+						bendDestination.Value = this.ToBendValue(this1);
 						break;
 					case "BendMiddleOffset1":
 						var s2 = c1.FindChildElement("Float").get_InnerText();
@@ -16996,7 +17004,8 @@ alphaTab.importer.GpifParser.prototype = {
 						break;
 					case "BendMiddleValue":
 						var s4 = c1.FindChildElement("Float").get_InnerText();
-						bendMiddleValue = this.ToBendValue(parseFloat(s4));
+						var this2 = parseFloat(s4);
+						bendMiddleValue = this.ToBendValue(this2);
 						break;
 					case "BendOriginOffset":
 						if(bendOrigin == null) {
@@ -17010,7 +17019,8 @@ alphaTab.importer.GpifParser.prototype = {
 							bendOrigin = new alphaTab.model.BendPoint(0,0);
 						}
 						var s6 = c1.FindChildElement("Float").get_InnerText();
-						bendOrigin.Value = this.ToBendValue(parseFloat(s6));
+						var this3 = parseFloat(s6);
+						bendOrigin.Value = this.ToBendValue(this3);
 						break;
 					case "Bended":
 						isBended = true;
@@ -17143,8 +17153,7 @@ alphaTab.importer.GpifParser.prototype = {
 		}
 	}
 	,ToBendValue: function(gpxValue) {
-		var converted = gpxValue * 0.04;
-		return system.Convert.ToInt32_Single(converted);
+		return system.Convert.ToInt32_Double(gpxValue * 0.04);
 	}
 	,ToBendOffset: function(gpxOffset) {
 		var converted = gpxOffset * 0.6;
@@ -22044,6 +22053,9 @@ alphaTab.model.Note.prototype = {
 		}
 		if(this.SlideType != 0) {
 			this.SlideTarget = nextNoteOnLine.get_Value();
+			if(this.SlideTarget == null) {
+				this.SlideType = 0;
+			}
 		}
 		if(this.BendPoints.length > 0 && this.BendType == 1) {
 			var isContinuedBend = this.IsContinuedBend = this.TieOrigin != null && this.TieOrigin.get_HasBend();
@@ -32205,8 +32217,6 @@ alphaTab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphaTab.renderi
 	}
 	,Paint: function(cx,cy,canvas) {
 		var startNoteRenderer = js.Boot.__cast(this.Renderer , alphaTab.rendering.TabBarRenderer);
-		cx = cx + startNoteRenderer.X;
-		cy = cy + startNoteRenderer.Y;
 		var sizeX = 12 * this.get_Scale();
 		var sizeY = 3 * this.get_Scale();
 		var startX;
@@ -32229,57 +32239,57 @@ alphaTab.rendering.glyphs.TabSlideLineGlyph.prototype = $extend(alphaTab.renderi
 				startOffsetY = sizeY * -1;
 				endOffsetY = sizeY;
 			}
-			startX = cx + startNoteRenderer.GetBeatX(this._startNote.Beat,3);
-			startY = cy + startNoteRenderer.GetNoteY(this._startNote,false) + startOffsetY;
+			startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(this._startNote.Beat,3);
+			startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false) + startOffsetY;
 			if(this._startNote.SlideTarget != null) {
 				var endNoteRenderer = this.Renderer.ScoreRenderer.Layout.GetRendererForBar(this.Renderer.Staff.get_StaveId(),this._startNote.SlideTarget.Beat.Voice.Bar);
 				if(endNoteRenderer == null || endNoteRenderer.Staff != startNoteRenderer.Staff) {
-					endX = cx + this._parent.X;
+					endX = cx + startNoteRenderer.X + this._parent.X;
 					endY = startY;
 				} else {
-					endX = cx + endNoteRenderer.GetBeatX(this._startNote.SlideTarget.Beat,1);
-					endY = cy + endNoteRenderer.GetNoteY(this._startNote.SlideTarget,false) + endOffsetY;
+					endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(this._startNote.SlideTarget.Beat,1);
+					endY = cy + endNoteRenderer.Y + endNoteRenderer.GetNoteY(this._startNote.SlideTarget,false) + endOffsetY;
 				}
 			} else {
-				endX = cx + this._parent.X;
+				endX = cx + startNoteRenderer.X + this._parent.X;
 				endY = startY;
 			}
 			break;
 		case 3:
-			endX = cx + startNoteRenderer.GetNoteX(this._startNote,false);
-			endY = cy + startNoteRenderer.GetNoteY(this._startNote,false);
+			endX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(this._startNote,false);
+			endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false);
 			startX = endX - sizeX;
-			startY = cy + startNoteRenderer.GetNoteY(this._startNote,false) + sizeY;
+			startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false) + sizeY;
 			break;
 		case 4:
-			endX = cx + startNoteRenderer.GetNoteX(this._startNote,false);
-			endY = cy + startNoteRenderer.GetNoteY(this._startNote,false);
+			endX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(this._startNote,false);
+			endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false);
 			startX = endX - sizeX;
-			startY = cy + startNoteRenderer.GetNoteY(this._startNote,false) - sizeY;
+			startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false) - sizeY;
 			break;
 		case 5:
-			startX = cx + startNoteRenderer.GetNoteX(this._startNote,true);
-			startY = cy + startNoteRenderer.GetNoteY(this._startNote,false);
+			startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(this._startNote,true);
+			startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false);
 			endX = startX + sizeX;
-			endY = cy + startNoteRenderer.GetNoteY(this._startNote,false) - sizeY;
+			endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false) - sizeY;
 			break;
 		case 6:
-			startX = cx + startNoteRenderer.GetNoteX(this._startNote,true);
-			startY = cy + startNoteRenderer.GetNoteY(this._startNote,false);
+			startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(this._startNote,true);
+			startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false);
 			endX = startX + sizeX;
-			endY = cy + startNoteRenderer.GetNoteY(this._startNote,false) + sizeY;
+			endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false) + sizeY;
 			break;
 		case 7:
-			startX = cx + startNoteRenderer.GetNoteX(this._startNote,true);
-			startY = cy + startNoteRenderer.GetNoteY(this._startNote,false) - sizeY * 2;
-			endX = cx + startNoteRenderer.GetBeatX(this._startNote.Beat,4);
+			startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(this._startNote,true);
+			startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false) - sizeY * 2;
+			endX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(this._startNote.Beat,4);
 			endY = startY + sizeY * 3;
 			waves = true;
 			break;
 		case 8:
-			startX = cx + startNoteRenderer.GetNoteX(this._startNote,true);
-			startY = cy + startNoteRenderer.GetNoteY(this._startNote,false) + sizeY;
-			endX = cx + startNoteRenderer.GetBeatX(this._startNote.Beat,4);
+			startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(this._startNote,true);
+			startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(this._startNote,false) + sizeY;
+			endX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(this._startNote.Beat,4);
 			endY = startY - sizeY * 3;
 			waves = true;
 			break;
