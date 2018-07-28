@@ -733,13 +733,16 @@ namespace AlphaTab.Model
             }
 
             // set slides
-            if (SlideType != SlideType.None)
+            switch (SlideType)
             {
-                SlideTarget = nextNoteOnLine.Value;
-                if (SlideTarget == null)
-                {
-                    SlideType = SlideType.None;
-                }
+                case SlideType.Shift:
+                case SlideType.Legato:
+                    SlideTarget = nextNoteOnLine.Value;
+                    if (SlideTarget == null)
+                    {
+                        SlideType = SlideType.None;
+                    }
+                    break;
             }
 
             // try to detect what kind of bend was used and cleans unneeded points if required
