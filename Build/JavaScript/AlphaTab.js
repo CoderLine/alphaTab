@@ -8171,7 +8171,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				break;
 			case 2:
 				this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,false,new Int32Array([note.BendPoints[0].Value,note.BendPoints[1].Value,note.BendPoints[2].Value]));
-				break;
+				return;
 			default:
 			}
 			break;
@@ -8196,7 +8196,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				var preBendValue = 64 + note.BendPoints[0].Value * 2.75;
 				this._handler.AddBend(track.Index,noteStart,system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Single(preBendValue)));
 				this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,false,new Int32Array([note.BendPoints[0].Value,note.BendPoints[1].Value]));
-				break;
+				return;
 			default:
 			}
 			break;
@@ -8215,7 +8215,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				var preBendValue1 = 64 + note.BendPoints[0].Value * 2.75;
 				this._handler.AddBend(track.Index,noteStart,system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Single(preBendValue1)));
 				this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,false,new Int32Array([note.BendPoints[0].Value,note.BendPoints[1].Value]));
-				break;
+				return;
 			default:
 			}
 			break;
@@ -8269,9 +8269,8 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				playedBendPoints.push(new alphaTab.model.BendPoint(60,bendPoints[1].Value));
 				break;
 			case 2:
-				playedBendPoints.push(new alphaTab.model.BendPoint(40,bendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(50,bendPoints[1].Value));
-				break;
+				this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,false,new Int32Array([bendPoints[0].Value,bendPoints[1].Value]));
+				return;
 			default:
 			}
 			break;
@@ -8287,10 +8286,8 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				playedBendPoints.push(new alphaTab.model.BendPoint(60,bendPoints[2].Value));
 				break;
 			case 2:
-				playedBendPoints.push(new alphaTab.model.BendPoint(40,bendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(45,bendPoints[1].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(50,bendPoints[2].Value));
-				break;
+				this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,true,new Int32Array([bendPoints[0].Value,bendPoints[1].Value,bendPoints[2].Value]));
+				return;
 			default:
 			}
 			break;
@@ -8312,10 +8309,10 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				playedBendPoints.push(new alphaTab.model.BendPoint(60,bendPoints[1].Value));
 				break;
 			case 2:
-				playedBendPoints.push(new alphaTab.model.BendPoint(0,bendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(40,bendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(50,bendPoints[1].Value));
-				break;
+				var preDiveValue = 64 + bendPoints[0].Value * 2.75;
+				this._handler.AddBend(track.Index,noteStart,system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Single(preDiveValue)));
+				this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,false,new Int32Array([bendPoints[0].Value,bendPoints[1].Value]));
+				return;
 			default:
 			}
 			break;

@@ -692,7 +692,7 @@ namespace AlphaTab.Audio.Generator
                         case BendStyle.Fast:
                             GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
                                 false, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value, note.BendPoints[2].Value });
-                            break;
+                            return;
                     }
 
                     break;
@@ -719,7 +719,7 @@ namespace AlphaTab.Audio.Generator
 
                             GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
                                 false, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value });
-                            break;
+                            return;
                     }
 
                     break;
@@ -740,7 +740,7 @@ namespace AlphaTab.Audio.Generator
 
                             GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
                                 false, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value });
-                            break;
+                            return;
                     }
 
                     break;
@@ -798,9 +798,9 @@ namespace AlphaTab.Audio.Generator
                             playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, bendPoints[1].Value));
                             break;
                         case BendStyle.Fast:
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointStart, bendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointEnd, bendPoints[1].Value));
-                            break;
+                            GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
+                                false, new[] { bendPoints[0].Value, bendPoints[1].Value });
+                            return;
                     }
 
                     break;
@@ -816,10 +816,9 @@ namespace AlphaTab.Audio.Generator
                             playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, bendPoints[2].Value));
                             break;
                         case BendStyle.Fast:
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointStart, bendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointMiddle, bendPoints[1].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointEnd, bendPoints[2].Value));
-                            break;
+                            GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
+                                true, new[] { bendPoints[0].Value, bendPoints[1].Value, bendPoints[2].Value });
+                            return;
                     }
 
                     break;
@@ -841,10 +840,12 @@ namespace AlphaTab.Audio.Generator
                             playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, bendPoints[1].Value));
                             break;
                         case BendStyle.Fast:
-                            playedBendPoints.Add(new BendPoint(0, bendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointStart, bendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.FastBendAtEndPointEnd, bendPoints[1].Value));
-                            break;
+                            var preDiveValue = DefaultBend + (bendPoints[0].Value * DefaultBendSemitone);
+                            _handler.AddBend(track.Index, noteStart, (byte)channel, (byte)preDiveValue);
+
+                            GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
+                                false, new[] { bendPoints[0].Value, bendPoints[1].Value });
+                            return;
                     }
 
                     break;
