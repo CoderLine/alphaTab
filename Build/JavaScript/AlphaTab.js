@@ -20040,21 +20040,23 @@ alphaTab.model.Beat.prototype = {
 		var ticks = this.CalculateDuration();
 		this.PlaybackDuration = ticks;
 		this.DisplayDuration = ticks;
-		var previous = this.PreviousBeat;
-		if(previous != null) {
-			var _g = previous.GraceType;
-			switch(_g) {
-			case 1:
+		var _g = this.GraceType;
+		switch(_g) {
+		case 1:case 2:
+			this.PlaybackDuration = alphaTab.audio.MidiUtils.ToTicks(32);
+			break;
+		case 3:
+			break;
+		default:
+			var previous = this.PreviousBeat;
+			while(previous != null && previous.GraceType == 1) {
 				this.PlaybackDuration = this.PlaybackDuration - previous.PlaybackDuration;
-				break;
-			case 3:
-				this.PlaybackDuration = this.PlaybackDuration - previous.PlaybackDuration;
-				break;
-			default:
+				previous = previous.PreviousBeat;
 			}
 		}
-		if(this.NextBeat != null && this.NextBeat.Voice.Bar != this.Voice.Bar && this.NextBeat.GraceType == 2) {
-			this.PlaybackDuration = this.PlaybackDuration - this.NextBeat.CalculateDuration();
+		if(this.NextBeat != null && this.NextBeat.Voice.Bar != this.Voice.Bar) {
+			var next = this.NextBeat;
+			while(next != null && next.GraceType == 2) this.PlaybackDuration = this.PlaybackDuration - next.CalculateDuration();
 		}
 	}
 	,Finish: function(settings) {

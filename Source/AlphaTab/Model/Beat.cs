@@ -435,30 +435,40 @@ namespace AlphaTab.Model
             PlaybackDuration = ticks;
             DisplayDuration = ticks;
 
-            var previous = PreviousBeat;
-            if (previous != null)
+            switch (GraceType)
             {
-                switch (previous.GraceType)
-                {
-                    case GraceType.BendGrace:
-                        // the grace bend grace is reduced to a quarter note for correct display
-                        // with this beat as tied note we have the correct duration. 
-                        PlaybackDuration -= previous.PlaybackDuration;
-                        break;
-                    case GraceType.OnBeat:
+                case GraceType.BeforeBeat:
+                case GraceType.OnBeat:
+                    PlaybackDuration = Duration.ThirtySecond.ToTicks();
+                    break;
+                case GraceType.BendGrace:
+                    break;
+                default:
+
+                    var previous = PreviousBeat;
+                    while (previous != null && previous.GraceType == GraceType.OnBeat)
+                    {
                         // if the previous beat is a on-beat grace it steals the duration from this beat
                         PlaybackDuration -= previous.PlaybackDuration;
-                        break;
-                }
+                        previous = previous.PreviousBeat;
+                    }
+
+                    break;
             }
 
+         
             // It can happen that the first beat of the next bar shifts into this
             // beat due to before-beat grace. In this case we need to 
             // reduce the duration of this beat. 
             // Within the same bar the start of the next beat is always directly after the current. 
-            if (NextBeat != null && NextBeat.Voice.Bar != Voice.Bar && NextBeat.GraceType == GraceType.BeforeBeat)
+            
+            if (NextBeat != null && NextBeat.Voice.Bar != Voice.Bar)
             {
-                PlaybackDuration -= NextBeat.CalculateDuration();
+                var next = NextBeat;
+                while (next != null && next.GraceType == GraceType.BeforeBeat)
+                {
+                    PlaybackDuration -= next.CalculateDuration();
+                }
             }
         }
 
