@@ -41,6 +41,7 @@ namespace AlphaTab.Platform.JavaScript
         private Color _color;
         private Font _font;
         private Font _musicFont;
+        private float _lineWidth;
 
         public RenderingResources Resources { get; set; }
 
@@ -87,6 +88,7 @@ namespace AlphaTab.Platform.JavaScript
             _canvas.Style.Height = height + "px";
             _context = (CanvasRenderingContext2D)_canvas.GetContext("2d");
             _context.TextBaseline = "top";
+            _context.LineWidth = _lineWidth;
         }
 
         public object EndRender()
@@ -115,11 +117,15 @@ namespace AlphaTab.Platform.JavaScript
         {
             get
             {
-                return _context.LineWidth;
+                return _lineWidth;
             }
             set
             {
-                _context.LineWidth = value;
+                _lineWidth = value;
+                if (_context != null)
+                {
+                    _context.LineWidth = value;
+                }
             }
         }
 

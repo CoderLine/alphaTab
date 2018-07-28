@@ -1062,6 +1062,7 @@ alphaTab.platform.javaScript.Html5Canvas = $hx_exports["alphaTab"]["platform"]["
 	this._color = null;
 	this._font = null;
 	this._musicFont = null;
+	this._lineWidth = 0.0;
 	this.set_Resources(null);
 	this._color = new alphaTab.platform.model.Color(0,0,0,255);
 	var fontElement = window.document.createElement("span");
@@ -1107,6 +1108,7 @@ alphaTab.platform.javaScript.Html5Canvas.prototype = {
 		this._canvas.style.height = Std.string(height) + "px";
 		this._context = this._canvas.getContext("2d");
 		this._context.textBaseline = "top";
+		this._context.lineWidth = this._lineWidth;
 	}
 	,EndRender: function() {
 		var result = this._canvas;
@@ -1126,10 +1128,13 @@ alphaTab.platform.javaScript.Html5Canvas.prototype = {
 		return this.get_Color();
 	}
 	,get_LineWidth: function() {
-		return this._context.lineWidth;
+		return this._lineWidth;
 	}
 	,set_LineWidth: function(value) {
-		this._context.lineWidth = value;
+		this._lineWidth = value;
+		if(this._context != null) {
+			this._context.lineWidth = value;
+		}
 		return this.get_LineWidth();
 	}
 	,FillRect: function(x,y,w,h) {
@@ -32700,7 +32705,8 @@ alphaTab.rendering.glyphs.TempoGlyph.prototype = $extend(alphaTab.rendering.glyp
 		var res = this.Renderer.get_Resources();
 		canvas.set_Font(res.MarkerFont);
 		var this1 = 0.8;
-		canvas.FillMusicFontSymbol(cx + this.X,cy + this.Y + this.Height * this1,0.75,57813);
+		var this2 = 0.75;
+		canvas.FillMusicFontSymbol(cx + this.X,cy + this.Y + this.Height * this1,this.get_Scale() * this2,57813);
 		canvas.FillText("= " + this._tempo,cx + this.X + this.Height / 2,cy + this.Y + canvas.get_Font().Size / 2);
 	}
 	,__class__: alphaTab.rendering.glyphs.TempoGlyph

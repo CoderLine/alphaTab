@@ -40,7 +40,7 @@ namespace AlphaTab.Rendering.Glyphs
             var res = Renderer.Resources;
             canvas.Font = res.MarkerFont;
 
-            canvas.FillMusicFontSymbol(cx + X, cy + Y + Height * 0.8f, 0.75f, MusicFontSymbol.Tempo);
+            canvas.FillMusicFontSymbol(cx + X, cy + Y + Height * 0.8f, Scale * 0.75f, MusicFontSymbol.Tempo);
             canvas.FillText("= " + _tempo, cx + X + (Height / 2), cy + Y + canvas.Font.Size / 2);
         }
     }
