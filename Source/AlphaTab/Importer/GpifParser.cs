@@ -23,6 +23,7 @@ using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
+using AlphaTab.Util;
 using AlphaTab.Xml;
 
 namespace AlphaTab.Importer
@@ -60,7 +61,7 @@ namespace AlphaTab.Importer
         /// GPIF: 25 per quarternote
         /// Internal Range: 1 per quarter note
         /// </summary>
-        private const float BendPointValueFactor = 1 / 25f;
+        private const double BendPointValueFactor = 1 / 25.0;
 
         public Score Score { get; set; }
 
@@ -1834,13 +1835,9 @@ namespace AlphaTab.Importer
             }
         }
 
-        private int ToBendValue(float gpxValue)
+        private int ToBendValue(double gpxValue)
         {
-            // NOTE: strange IEEE behavior here: 
-            // (int)(100f * 0.04f) => 3
-            // (100f*0.04f) => 4.0f => (int)4.0f => 4
-            var converted = gpxValue * BendPointValueFactor;
-            return (int)(converted);
+            return (int)(gpxValue * BendPointValueFactor);
         }
 
         private int ToBendOffset(float gpxOffset)

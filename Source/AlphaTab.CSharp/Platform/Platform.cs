@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using AlphaTab.Audio.Synth;
@@ -39,7 +40,7 @@ namespace AlphaTab.Platform
 
         public static void Log(LogLevel logLevel, string category, string msg, object details = null)
         {
-            Debug.WriteLine("[AlphaTab][{0}][{1}] {2} {3}", category, logLevel, msg, details);
+            Trace.WriteLine($"[AlphaTab][{category}][{logLevel}] {msg} {details}", "AlphaTab");
         }
 
         public static float ParseFloat(string s)

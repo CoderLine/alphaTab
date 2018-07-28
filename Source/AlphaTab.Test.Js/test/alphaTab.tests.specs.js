@@ -311,15 +311,12 @@ describe("alphaTab.test.importer.Gp7ImporterTest", function() {
         __instance.TestHammer();
     });
     it("TestBend", function() {
-         pending("appveyor fails for some reason, locally everything is fine?");
         __instance.TestBend();
     });
     it("TestBendAdvanced", function() {
-         pending("appveyor fails for some reason, locally everything is fine?");
         __instance.TestBendAdvanced();
     });
     it("TestWhammyAdvanced", function() {
-         pending("appveyor fails for some reason, locally everything is fine?");
         __instance.TestWhammyAdvanced();
     });
     it("TestTremolo", function() {
@@ -413,11 +410,9 @@ describe("alphaTab.test.importer.GpxImporterTest", function() {
         __instance.TestHammer();
     });
     it("TestBend", function() {
-         pending("appveyor fails for some reason, locally everything is fine?");
         __instance.TestBend();
     });
     it("TestTremolo", function() {
-         pending("appveyor fails for some reason, locally everything is fine?");
         __instance.TestTremolo();
     });
     it("TestSlides", function() {
