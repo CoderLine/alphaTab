@@ -5,6 +5,7 @@ using AlphaTab.Audio;
 using AlphaTab.Audio.Generator;
 using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Audio.Synth.Midi.Event;
+using AlphaTab.Collections;
 using AlphaTab.Importer;
 using AlphaTab.IO;
 using AlphaTab.Model;
@@ -86,7 +87,7 @@ namespace AlphaTab.Test.Audio
 
                 // bend effect 
                 new FlatMidiEventGenerator.BendEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, Value = 64 }, // no bend
-                new FlatMidiEventGenerator.BendEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, Value = 64 }, 
+                new FlatMidiEventGenerator.BendEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, Value = 64 },
                 new FlatMidiEventGenerator.BendEvent { Tick = 87, Track = 0, Channel = info.SecondaryChannel, Value = 65 },
                 new FlatMidiEventGenerator.BendEvent { Tick = 174, Track = 0, Channel = info.SecondaryChannel, Value = 66 },
                 new FlatMidiEventGenerator.BendEvent { Tick = 261, Track = 0, Channel = info.SecondaryChannel, Value = 67 },
@@ -133,36 +134,54 @@ namespace AlphaTab.Test.Audio
             var score = reader.ReadScore();
 
             var handler = new FlatMidiEventGenerator();
-            var generator = new MidiFileGenerator(score, null, handler);
+            var generator = new MidiFileGenerator(score, settings, handler);
             generator.Generate();
 
             // on beat
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].AbsolutePlaybackStart);
+            var tick = 0;
+            var ticks = new FastList<int>();
+            Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].AbsolutePlaybackStart);
             Assert.AreEqual(3840, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].PlaybackDuration);
+            ticks.Add(tick);
+            tick += score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].PlaybackDuration;
 
-            Assert.AreEqual(0 + 3840, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].AbsolutePlaybackStart);
-            Assert.AreEqual(480, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].PlaybackDuration);
+            Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].AbsolutePlaybackStart);
+            Assert.AreEqual(120, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].PlaybackDuration);
+            ticks.Add(tick);
+            tick += score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].PlaybackDuration;
 
-            Assert.AreEqual(0+ 3840 + 480, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].AbsolutePlaybackStart);
-            Assert.AreEqual(3360, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].PlaybackDuration);
+            Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].AbsolutePlaybackStart);
+            Assert.AreEqual(3720, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].PlaybackDuration);
+            ticks.Add(tick);
+            tick += score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].PlaybackDuration;
 
             // before beat
-            Assert.AreEqual(0+3840+480+3360, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].AbsolutePlaybackStart);
-            Assert.AreEqual(3360, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].PlaybackDuration);
+            Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].AbsolutePlaybackStart);
+            Assert.AreEqual(3720, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].PlaybackDuration);
+            ticks.Add(tick);
+            tick += score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].PlaybackDuration;
 
-            Assert.AreEqual(0 + 3840 + 480 + 3360 + 3360, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].AbsolutePlaybackStart);
-            Assert.AreEqual(480, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].PlaybackDuration);
+            Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].AbsolutePlaybackStart);
+            Assert.AreEqual(120, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].PlaybackDuration);
+            ticks.Add(tick);
+            tick += score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].PlaybackDuration;
 
-            Assert.AreEqual(0 + 3840 + 480 + 3360 + 3360 + 480, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].AbsolutePlaybackStart);
+            Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].AbsolutePlaybackStart);
             Assert.AreEqual(3840, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].PlaybackDuration);
+            ticks.Add(tick);
+            tick += score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].PlaybackDuration;
 
             // bend
             Assert.AreEqual(GraceType.BendGrace, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].GraceType);
-            Assert.AreEqual(0 + 3840 + 480 + 3360 + 3360 + 480 + 3840, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].AbsolutePlaybackStart);
-            Assert.AreEqual(480, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].PlaybackDuration);
+            Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].AbsolutePlaybackStart);
+            Assert.AreEqual(1920, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].PlaybackDuration);
+            ticks.Add(tick);
+            tick += score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].PlaybackDuration;
 
-            Assert.AreEqual(0 + 3840 + 480 + 3360 + 3360 + 480 + 3840 + 480, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[1].AbsolutePlaybackStart);
-            Assert.AreEqual(3840 - 480, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[1].PlaybackDuration);
+            Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[1].AbsolutePlaybackStart);
+            Assert.AreEqual(1920, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[1].PlaybackDuration);
+            ticks.Add(tick);
+            tick += score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[1].PlaybackDuration;
 
             var info = score.Tracks[0].PlaybackInfo;
             var expectedEvents = new FlatMidiEventGenerator.MidiEvent[]
@@ -190,41 +209,41 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.TempoEvent { Tick = 0, Tempo = 120 },
 
                 // on beat
-                new FlatMidiEventGenerator.BendEvent { Tick = 0, Track = 0, Channel = info.PrimaryChannel, Value = 64 },
-                new FlatMidiEventGenerator.NoteEvent { Tick = 0, Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 3840 },
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[0], Track = 0, Channel = info.PrimaryChannel, Value = 64 },
+                new FlatMidiEventGenerator.NoteEvent { Tick = ticks[0], Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 3840 },
 
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840, Track = 0, Channel = info.PrimaryChannel, Value = 64 }, 
-                new FlatMidiEventGenerator.NoteEvent { Tick = 3840, Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 480 },
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[1], Track = 0, Channel = info.PrimaryChannel, Value = 64 },
+                new FlatMidiEventGenerator.NoteEvent { Tick = ticks[1], Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 120 },
 
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480, Track = 0, Channel = info.PrimaryChannel, Value = 64 },
-                new FlatMidiEventGenerator.NoteEvent { Tick = 3840 + 480, Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 3360},
-                
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[2], Track = 0, Channel = info.PrimaryChannel, Value = 64 },
+                new FlatMidiEventGenerator.NoteEvent { Tick = ticks[2], Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 3720},
+
 
                 // before beat
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480 + 3360, Track = 0, Channel = info.PrimaryChannel, Value = 64 },
-                new FlatMidiEventGenerator.NoteEvent { Tick = 3840 + 480 + 3360, Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 3360 },
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[3], Track = 0, Channel = info.PrimaryChannel, Value = 64 },
+                new FlatMidiEventGenerator.NoteEvent { Tick = ticks[3], Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 3720 },
 
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480 + 3360 + 3360, Track = 0, Channel = info.PrimaryChannel, Value = 64 }, 
-                new FlatMidiEventGenerator.NoteEvent { Tick = 3840 + 480 + 3360 + 3360, Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 480 },
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[4], Track = 0, Channel = info.PrimaryChannel, Value = 64 },
+                new FlatMidiEventGenerator.NoteEvent { Tick = ticks[4], Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 120 },
 
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480 + 3360 + 3360 + 480, Track = 0, Channel = info.PrimaryChannel, Value = 64 },
-                new FlatMidiEventGenerator.NoteEvent { Tick = 3840 + 480 + 3360 + 3360 + 480, Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 3840},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[5], Track = 0, Channel = info.PrimaryChannel, Value = 64 },
+                new FlatMidiEventGenerator.NoteEvent { Tick = ticks[5], Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 3840},
 
                 // bend beat
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480 + 3360 + 3360 + 480 + 3840, Track = 0, Channel = info.SecondaryChannel, Value = 64},
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480 + 3360 + 3360 + 480 + 3840 + 2560 + 58 * 0, Track = 0, Channel = info.SecondaryChannel, Value = 64},
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480 + 3360 + 3360 + 480 + 3840 + 2560 + 58 * 1, Track = 0, Channel = info.SecondaryChannel, Value = 65},
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480 + 3360 + 3360 + 480 + 3840 + 2560 + 58 * 2, Track = 0, Channel = info.SecondaryChannel, Value = 66},
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480 + 3360 + 3360 + 480 + 3840 + 2560 + 58 * 3, Track = 0, Channel = info.SecondaryChannel, Value = 67},
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480 + 3360 + 3360 + 480 + 3840 + 2560 + 58 * 4, Track = 0, Channel = info.SecondaryChannel, Value = 68},
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480 + 3360 + 3360 + 480 + 3840 + 2560 + 58 * 5, Track = 0, Channel = info.SecondaryChannel, Value = 69},
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480 + 3360 + 3360 + 480 + 3840 + 2560 + 58 * 6 + 1, Track = 0, Channel = info.SecondaryChannel, Value = 70},
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480 + 3360 + 3360 + 480 + 3840 + 2560 + 58 * 7 + 1, Track = 0, Channel = info.SecondaryChannel, Value = 71},
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480 + 3360 + 3360 + 480 + 3840 + 2560 + 58 * 8 + 1, Track = 0, Channel = info.SecondaryChannel, Value = 72},
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480 + 3360 + 3360 + 480 + 3840 + 2560 + 58 * 9 + 1, Track = 0, Channel = info.SecondaryChannel, Value = 73},
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480 + 3360 + 3360 + 480 + 3840 + 2560 + 58 * 10 + 1, Track = 0, Channel = info.SecondaryChannel, Value = 74},
-                new FlatMidiEventGenerator.BendEvent { Tick = 3840 + 480 + 3360 + 3360 + 480 + 3840 + 2560 + 58 * 11 + 2, Track = 0, Channel = info.SecondaryChannel, Value = 75},
-                new FlatMidiEventGenerator.NoteEvent { Tick = 3840 + 480 + 3360 + 3360 + 480 + 3840, Track = 0, Channel = info.SecondaryChannel, Length = 3840, Key = 67, DynamicValue = DynamicValue.F},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6], Track = 0, Channel = info.SecondaryChannel, Value = 64},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 0, Track = 0, Channel = info.SecondaryChannel, Value = 64},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 1, Track = 0, Channel = info.SecondaryChannel, Value = 65},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 2, Track = 0, Channel = info.SecondaryChannel, Value = 66},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 3, Track = 0, Channel = info.SecondaryChannel, Value = 67},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 4, Track = 0, Channel = info.SecondaryChannel, Value = 68},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 5, Track = 0, Channel = info.SecondaryChannel, Value = 69},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 6, Track = 0, Channel = info.SecondaryChannel, Value = 70},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 7, Track = 0, Channel = info.SecondaryChannel, Value = 71},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 8, Track = 0, Channel = info.SecondaryChannel, Value = 72},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 9, Track = 0, Channel = info.SecondaryChannel, Value = 73},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 10, Track = 0, Channel = info.SecondaryChannel, Value = 74},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 11 + 1, Track = 0, Channel = info.SecondaryChannel, Value = 75},
+                new FlatMidiEventGenerator.NoteEvent { Tick = ticks[6], Track = 0, Channel = info.SecondaryChannel, Length = 3840, Key = 67, DynamicValue = DynamicValue.F},
 
                 // end of track
                 new FlatMidiEventGenerator.TrackEndEvent { Tick = 19200, Track = 0 } // 3840 = end of bar

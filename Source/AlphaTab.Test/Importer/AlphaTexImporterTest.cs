@@ -215,7 +215,12 @@ namespace AlphaTab.Test.Importer
 
             Environment.StaveProfiles["harmonics"] = new BarRendererFactory[]
             {
-                new EffectBarRendererFactory("harmonics", new IEffectBarRendererInfo[] {new HarmonicsEffectInfo(HarmonicType.Artificial)}),
+                new EffectBarRendererFactory("n-harmonics", new IEffectBarRendererInfo[] {new HarmonicsEffectInfo(HarmonicType.Natural)}),
+                new EffectBarRendererFactory("a-harmonics", new IEffectBarRendererInfo[] {new HarmonicsEffectInfo(HarmonicType.Artificial)}),
+                new EffectBarRendererFactory("t-harmonics", new IEffectBarRendererInfo[] {new HarmonicsEffectInfo(HarmonicType.Tap)}),
+                new EffectBarRendererFactory("p-harmonics", new IEffectBarRendererInfo[] {new HarmonicsEffectInfo(HarmonicType.Pinch)}),
+                new EffectBarRendererFactory("s-harmonics", new IEffectBarRendererInfo[] {new HarmonicsEffectInfo(HarmonicType.Semi)}),
+                new EffectBarRendererFactory("f-harmonics", new IEffectBarRendererInfo[] {new HarmonicsEffectInfo(HarmonicType.Feedback)}),
             };
 
 
@@ -229,7 +234,7 @@ namespace AlphaTab.Test.Importer
             {
                 svg += r.RenderResult.ToString();
             };
-            renderer.Render(score, new[]{0});
+            renderer.Render(score, new[] { 0 });
 
             var regexTemplate = @"<text[^>]+>\s*{0}\s*</text>";
 
@@ -272,6 +277,10 @@ namespace AlphaTab.Test.Importer
 
             var renderer = new ScoreRenderer(settings);
             var partials = new FastList<string>();
+            renderer.Error += (o, e) =>
+            {
+                Assert.Fail(e.Message);
+            };
             renderer.PartialRenderFinished += r =>
             {
                 partials.Add(r.RenderResult.ToString());

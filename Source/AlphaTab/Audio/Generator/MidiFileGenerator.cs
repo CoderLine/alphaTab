@@ -752,7 +752,7 @@ namespace AlphaTab.Audio.Generator
         private void GenerateSongBookWhammyOrBend(int noteStart, int channel, double duration, Track track,
                                                 bool bendAtBeginning, int[] bendValues)
         {
-            var durationBySetting = Math.Min(duration, MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
+            var durationBySetting = _settings == null ? duration : Math.Min(duration, MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
 
             var startTick = bendAtBeginning ? noteStart : (noteStart + duration) - durationBySetting;
             var ticksBetweenPoints = durationBySetting / (bendValues.Length - 1);

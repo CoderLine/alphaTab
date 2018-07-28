@@ -33,6 +33,9 @@ namespace AlphaTab.Rendering.Effects
             _harmonicType = harmonicType;
             switch (harmonicType)
             {
+                case HarmonicType.Natural:
+                    _effectId = "harmonics-natural";
+                    break;
                 case HarmonicType.Artificial:
                     _effectId = "harmonics-artificial";
                     break;

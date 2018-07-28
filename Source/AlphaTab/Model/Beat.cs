@@ -453,13 +453,14 @@ namespace AlphaTab.Model
                     }
                     break;
                 case GraceType.BendGrace:
+                    PlaybackDuration /= 2;
                     break;
                 default:
 
                     var previous = PreviousBeat;
                     if (previous != null && previous.GraceType == GraceType.BendGrace)
                     {
-                        PlaybackDuration = 0;
+                        PlaybackDuration = previous.PlaybackDuration;
                     }
                     else
                     {
@@ -475,26 +476,24 @@ namespace AlphaTab.Model
             }
 
          
-            // It can happen that the first beat of the next bar shifts into this
-            // beat due to before-beat grace. In this case we need to 
-            // reduce the duration of this beat. 
-            // Within the same bar the start of the next beat is always directly after the current. 
+            //// It can happen that the first beat of the next bar shifts into this
+            //// beat due to before-beat grace. In this case we need to 
+            //// reduce the duration of this beat. 
+            //// Within the same bar the start of the next beat is always directly after the current. 
             
-            if (NextBeat != null && NextBeat.Voice.Bar != Voice.Bar)
-            {
-                var next = NextBeat;
-                while (next != null && next.GraceType == GraceType.BeforeBeat)
-                {
-                    PlaybackDuration -= next.CalculateDuration();
-                    next = next.NextBeat;
-                }
-            }
+            //if (NextBeat != null && NextBeat.Voice.Bar != Voice.Bar)
+            //{
+            //    var next = NextBeat;
+            //    while (next != null && next.GraceType == GraceType.BeforeBeat)
+            //    {
+            //        PlaybackDuration -= next.CalculateDuration();
+            //        next = next.NextBeat;
+            //    }
+            //}
         }
 
         public void Finish(Settings settings)
         {
-            UpdateDurations();
-
             var displayMode = settings == null ? DisplayMode.GuitarPro : settings.DisplayMode;
             var isGradual = Text == "grad" || Text == "grad.";
             if (isGradual && displayMode == DisplayMode.SongBook)
@@ -703,6 +702,8 @@ namespace AlphaTab.Model
                 }
             }
 
+            UpdateDurations();
+
             if (needCopyBeatForBend)
             {
                 // if this beat is a simple bend convert it to a grace beat 
@@ -739,7 +740,7 @@ namespace AlphaTab.Model
                 }
 
                 GraceType = GraceType.BendGrace;
-                
+                UpdateDurations();
 
                 Voice.InsertBeat(this, cloneBeat);
             }

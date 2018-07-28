@@ -169,17 +169,21 @@ namespace AlphaTab.Model
                     }
 
                     var graceDuration = Duration.Eighth;
+                    int stolenDuration = 0;
                     if (numberOfGraceBeats == 1)
                     {
                         graceDuration = Duration.Eighth;
+                        stolenDuration = Duration.ThirtySecond.ToTicks();
                     }
                     else if (numberOfGraceBeats == 2)
                     {
                         graceDuration = Duration.Sixteenth;
+                        stolenDuration = Duration.SixtyFourth.ToTicks();
                     }
                     else
                     {
                         graceDuration = Duration.ThirtySecond;
+                        stolenDuration = Duration.OneHundredTwentyEighth.ToTicks();
                     }
 
 
@@ -197,6 +201,11 @@ namespace AlphaTab.Model
                         }
                         graceBeat.DisplayStart = currentDisplayTick - (numberOfGraceBeats - j + 1) * perGraceDuration;
                         graceBeat.DisplayDuration = perGraceDuration;
+                    }
+
+                    if (beat.PreviousBeat != null && beat.GraceType == GraceType.BeforeBeat)
+                    {
+                        beat.PreviousBeat.PlaybackDuration -= stolenDuration;
                     }
 
                     beat.PlaybackStart = currentPlaybackTick;

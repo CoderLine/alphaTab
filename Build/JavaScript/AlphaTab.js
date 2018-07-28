@@ -6093,6 +6093,9 @@ alphaTab.rendering.effects.HarmonicsEffectInfo = $hx_exports["alphaTab"]["render
 	this._effectId = null;
 	this._harmonicType = harmonicType;
 	switch(harmonicType) {
+	case 1:
+		this._effectId = "harmonics-natural";
+		break;
 	case 2:
 		this._effectId = "harmonics-artificial";
 		break;
@@ -8229,8 +8232,13 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		this.GenerateWhammyOrBend(noteStart,channel,duration,playedBendPoints,track);
 	}
 	,GenerateSongBookWhammyOrBend: function(noteStart,channel,duration,track,bendAtBeginning,bendValues) {
-		var this1 = alphaTab.audio.MidiUtils.MillisToTicks(this._settings.SongBookBendDuration,this._currentTempo);
-		var durationBySetting = Math.min(duration,this1);
+		var durationBySetting;
+		if(this._settings == null) {
+			durationBySetting = duration;
+		} else {
+			var this1 = alphaTab.audio.MidiUtils.MillisToTicks(this._settings.SongBookBendDuration,this._currentTempo);
+			durationBySetting = Math.min(duration,this1);
+		}
 		var startTick;
 		if(bendAtBeginning) {
 			var this2 = noteStart;
@@ -20089,11 +20097,12 @@ alphaTab.model.Beat.prototype = {
 			}
 			break;
 		case 3:
+			this.PlaybackDuration = this.PlaybackDuration / 2 | 0;
 			break;
 		default:
 			var previous = this.PreviousBeat;
 			if(previous != null && previous.GraceType == 3) {
-				this.PlaybackDuration = 0;
+				this.PlaybackDuration = previous.PlaybackDuration;
 			} else {
 				while(previous != null && previous.GraceType == 1) {
 					this.PlaybackDuration = this.PlaybackDuration - previous.PlaybackDuration;
@@ -20101,16 +20110,8 @@ alphaTab.model.Beat.prototype = {
 				}
 			}
 		}
-		if(this.NextBeat != null && this.NextBeat.Voice.Bar != this.Voice.Bar) {
-			var next = this.NextBeat;
-			while(next != null && next.GraceType == 2) {
-				this.PlaybackDuration = this.PlaybackDuration - next.CalculateDuration();
-				next = next.NextBeat;
-			}
-		}
 	}
 	,Finish: function(settings) {
-		this.UpdateDurations();
 		var displayMode = settings == null ? 0 : settings.DisplayMode;
 		var isGradual = this.Text == "grad" || this.Text == "grad.";
 		if(isGradual && displayMode == 1) {
@@ -20253,6 +20254,7 @@ alphaTab.model.Beat.prototype = {
 				}
 			}
 		}
+		this.UpdateDurations();
 		if(needCopyBeatForBend) {
 			var cloneBeat = this.Clone();
 			var i1 = 0;
@@ -20278,6 +20280,7 @@ alphaTab.model.Beat.prototype = {
 				++i1;
 			}
 			this.GraceType = 3;
+			this.UpdateDurations();
 			this.Voice.InsertBeat(this,cloneBeat);
 		}
 		this.Fermata = this.Voice.Bar.get_MasterBar().GetFermata(this);
@@ -23198,12 +23201,16 @@ alphaTab.model.Voice.prototype = {
 					++numberOfGraceBeats;
 				}
 				var graceDuration = 8;
+				var stolenDuration = 0;
 				if(numberOfGraceBeats == 1) {
 					graceDuration = 8;
+					stolenDuration = alphaTab.audio.MidiUtils.ToTicks(32);
 				} else if(numberOfGraceBeats == 2) {
 					graceDuration = 16;
+					stolenDuration = alphaTab.audio.MidiUtils.ToTicks(64);
 				} else {
 					graceDuration = 32;
+					stolenDuration = alphaTab.audio.MidiUtils.ToTicks(128);
 				}
 				var perGraceDuration = nonGrace == null ? alphaTab.audio.MidiUtils.ToTicks(32) : (nonGrace.DisplayDuration / 4 | 0) / numberOfGraceBeats | 0;
 				var j = 0;
@@ -23216,6 +23223,9 @@ alphaTab.model.Voice.prototype = {
 					graceBeat.DisplayStart = currentDisplayTick - (numberOfGraceBeats - j + 1) * perGraceDuration;
 					graceBeat.DisplayDuration = perGraceDuration;
 					++j;
+				}
+				if(beat1.PreviousBeat != null && beat1.GraceType == 2) {
+					beat1.PreviousBeat.PlaybackDuration = beat1.PreviousBeat.PlaybackDuration - stolenDuration;
 				}
 				beat1.PlaybackStart = currentPlaybackTick;
 				var _g = beat1.GraceType;
@@ -34350,10 +34360,9 @@ alphaTab.rendering.utils.BeamingHelper.prototype = {
 			this.Voice = beat.Voice;
 		}
 		var add = false;
-		var lastBeat = this.Beats[this.Beats.length - 1];
 		if(this.Beats.length == 0) {
 			add = true;
-		} else if(alphaTab.rendering.utils.BeamingHelper.CanJoin(lastBeat,beat)) {
+		} else if(alphaTab.rendering.utils.BeamingHelper.CanJoin(this.Beats[this.Beats.length - 1],beat)) {
 			add = true;
 		}
 		if(add) {

@@ -275,12 +275,11 @@ namespace AlphaTab.Rendering.Utils
             }
             // allow adding if there are no beats yet
             var add = false;
-            var lastBeat = Beats[Beats.Count - 1];
             if (Beats.Count == 0)
             {
                 add = true;
             }
-            else if (CanJoin(lastBeat, beat))
+            else if (CanJoin(Beats[Beats.Count - 1], beat))
             {
                 add = true;
             }
