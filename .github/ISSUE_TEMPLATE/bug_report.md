@@ -1,3 +1,18 @@
+---
+name: :spider: Bug report
+about: Report a bug
+
+---
+
+<!--
+
+Thanks for contributing to alphaTab. Before entering a new bug please check following points
+
+- Please make sure that no other bug with the same topic exists already. Rather reopen a closed one than enter a new one.  
+- Ensure that you are using the lastest version. 
+
+-->
+
 # Your environment
 
 * Version used: (master branch)
@@ -9,22 +24,21 @@
 
 
 # Expected Results
-
-Explain here what is your expected behavior of alphaTab. 
+<!-- Explain here what is your expected behavior of alphaTab. -->
 
 # Observed Results
-
-Explain here how alphaTab is behaving currently. 
+<!-- Explain here how alphaTab is behaving currently. -->
 
 # Steps to Reproduce (for bugs)
-
+<!--
 Explain here the exact steps how to reproduce the problem. Try to provide a
 running sample showing the issue. If you have problem with a dedicated input file, 
 please provide a download link or attach it to the issue. 
- 
+-->
+
 1. 
 2. 
 3.  
 
 # Possible Solution 
-If you already know a solution to the problem please provide it here. 
+<!-- If you already know a solution to the problem please provide it here. -->
