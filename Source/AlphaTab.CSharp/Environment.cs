@@ -18,6 +18,7 @@
 
 using AlphaTab.Platform.CSharp;
 using AlphaTab.Platform.Svg;
+using AlphaTab.Rendering;
 
 namespace AlphaTab
 {

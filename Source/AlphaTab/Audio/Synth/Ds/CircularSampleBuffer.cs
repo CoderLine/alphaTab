@@ -19,7 +19,7 @@ using System;
 
 namespace AlphaTab.Audio.Synth.Ds
 {
-    class CircularSampleBuffer
+    public class CircularSampleBuffer
     {
         private SampleArray _buffer;
         private int _writePosition;

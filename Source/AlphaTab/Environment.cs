@@ -46,6 +46,11 @@ namespace AlphaTab
             Init();
         }
 
+        public static IScoreRenderer CreateScoreRenderer(Settings settings)
+        {
+            return new ScoreRenderer(settings);
+        }
+
         public static void Init()
         {
             RenderEngines = new FastDictionary<string, Func<ICanvas>>();

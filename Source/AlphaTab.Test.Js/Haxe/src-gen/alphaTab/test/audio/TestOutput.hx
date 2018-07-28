@@ -111,6 +111,8 @@ class TestOutput implements alphaTab.audio.synth.ISynthOutput
 
     public function new() 
     {
+        _finished = false;
+        Samples = null;
     }
 
 }

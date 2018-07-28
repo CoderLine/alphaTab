@@ -10,7 +10,7 @@
          DefineConstants="$(DefineConstants)"
          DisabledWarnings="$(NoWarn)"
          MainEntryPoint="$(StartupObject)"
-         ModuleAssemblyName="$(ModuleAssemblyName)"
+         AssemblyName="$(AssemblyName)"
          Platform="$(Platform)"
          References="@(ReferencePathWithRefAssemblies)"
          Sources="@(Compile)"

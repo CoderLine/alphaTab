@@ -3,7 +3,7 @@ package alphaTab.test.importer;
 using system.HaxeExtensions;
 class MusicXmlImporterTestBase
 {
-    private function PrepareImporterWithBytes(buffer : system.ByteArray) : alphaTab.importer.MusicXmlImporter 
+    public function PrepareImporterWithBytes(buffer : system.ByteArray) : alphaTab.importer.MusicXmlImporter 
     {
         var readerBase : alphaTab.importer.MusicXmlImporter = new alphaTab.importer.MusicXmlImporter();
         readerBase.Init(alphaTab.io.ByteBuffer.FromBuffer(buffer), null);

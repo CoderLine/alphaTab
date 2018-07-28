@@ -11,13 +11,13 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
 
     }
 
-    public function PrepareGp7ImporterWithBytes_CsString(name : system.CsString) : alphaTab.importer.Gp7Importer 
+    public function PrepareGp7ImporterWithFile(name : system.CsString) : alphaTab.importer.Gp7Importer 
     {
-        return PrepareGp7ImporterWithBytes_ByteArray(Load(name));
+        return PrepareGp7ImporterWithBytes(Load(name));
 
     }
 
-    public function PrepareGp7ImporterWithBytes_ByteArray(buffer : system.ByteArray) : alphaTab.importer.Gp7Importer 
+    public function PrepareGp7ImporterWithBytes(buffer : system.ByteArray) : alphaTab.importer.Gp7Importer 
     {
         var readerBase : alphaTab.importer.Gp7Importer = new alphaTab.importer.Gp7Importer();
         readerBase.Init(alphaTab.io.ByteBuffer.FromBuffer(buffer), null);
@@ -28,7 +28,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestScoreInfo() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/Test01.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/Test01.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         alphaTab.test.Assert.AreEqual_T1_T22("Title", score.Title);
         alphaTab.test.Assert.AreEqual_T1_T22("Subtitle", score.SubTitle);
@@ -50,7 +50,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestNotes() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/Test02.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/Test02.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckTest02Score(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestNotes");
@@ -59,7 +59,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestTimeSignatures() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/Test03.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/Test03.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckTest03Score(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestTimeSignatures");
@@ -68,7 +68,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestDead() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestDead.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestDead.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckDead(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestDead");
@@ -77,7 +77,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestGrace() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestGrace.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestGrace.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckGrace(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestGrace");
@@ -86,7 +86,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestAccentuation() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestAccentuations.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestAccentuations.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckAccentuation(score, true);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestAccentuation");
@@ -95,7 +95,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestHarmonics() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestHarmonics.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestHarmonics.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckHarmonics(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestHarmonics");
@@ -104,7 +104,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestHammer() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestHammer.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestHammer.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckHammer(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestHammer");
@@ -114,7 +114,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testIgnore("appveyor fails for some reason, locally everything is fine?")
     public function TestBend() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestBends.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestBends.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.BendType.Bend, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).BendType);
         alphaTab.test.Assert.AreEqual_T1_T22(2, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).BendPoints.Count);
@@ -145,7 +145,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testIgnore("appveyor fails for some reason, locally everything is fine?")
     public function TestBendAdvanced() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/BendsAdvanced.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/BendsAdvanced.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         var note : alphaTab.model.Note = score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0);
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.BendType.Bend, note.BendType);
@@ -395,7 +395,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testIgnore("appveyor fails for some reason, locally everything is fine?")
     public function TestWhammyAdvanced() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/WhammyAdvanced.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/WhammyAdvanced.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         var beat : alphaTab.model.Beat = score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0);
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.WhammyType.Dive, beat.WhammyBarType);
@@ -531,7 +531,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestTremolo() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestTremolo.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestTremolo.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         alphaTab.test.Assert.AreEqual_T1_T22(3, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).WhammyBarPoints.Count);
         alphaTab.test.Assert.AreEqual_T1_T22(0, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).WhammyBarPoints.get_Item(0).Offset);
@@ -569,7 +569,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestSlides() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestSlides.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestSlides.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckSlides(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestSlides");
@@ -578,7 +578,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestVibrato() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestVibrato.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestVibrato.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckVibrato(score, true);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestVibrato");
@@ -587,7 +587,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestTrills() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestTrills.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestTrills.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckTrills(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestTrills");
@@ -596,7 +596,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestOtherEffects() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestOtherEffects.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestOtherEffects.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckOtherEffects(score, true);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestOtherEffects");
@@ -605,7 +605,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestFingering() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestFingering.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestFingering.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckFingering(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestFingering");
@@ -614,7 +614,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestStroke() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestStrokes.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestStrokes.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckStroke(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestStroke");
@@ -623,7 +623,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestTuplets() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestTuplets.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestTuplets.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckTuplets(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestTuplets");
@@ -632,7 +632,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestRanges() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestRanges.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestRanges.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckRanges(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestRanges");
@@ -641,7 +641,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestEffects() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/Effects.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/Effects.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckEffects(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestEffects");
@@ -650,7 +650,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestSerenade() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/Serenade.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/Serenade.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         // only Check reading
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestSerenade");
@@ -659,7 +659,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestStrings() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestStrings.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestStrings.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckStrings(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestStrings");
@@ -668,7 +668,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestKeySignatures() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestKeySignatures.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestKeySignatures.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckKeySignatures(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestKeySignatures");
@@ -677,7 +677,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestChords() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestChords.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestChords.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckChords(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestChords");
@@ -686,7 +686,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestColors() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/Colors.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/Colors.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         CheckColors(score);
         Render(score, "D:\\Dev\\AlphaTab\\AlphaTab2\\Source\\AlphaTab.Test\\Importer\\Gp7ImporterTest.cs", "TestColors");
@@ -695,7 +695,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestTremoloVibrato() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestTremoloVibrato.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestTremoloVibrato.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.VibratoType.Slight, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Vibrato);
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.VibratoType.Wide, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Vibrato);
@@ -709,7 +709,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestOttavia() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestOttavia.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestOttavia.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Ottavia._8va, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).ClefOttava);
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.Ottavia._8vb, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).ClefOttava);
@@ -724,7 +724,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestSimileMark() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestSimileMark.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestSimileMark.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.SimileMark.None, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).SimileMark);
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.SimileMark.Simple, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(1).SimileMark);
@@ -737,7 +737,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestFermata() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestFermata.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestFermata.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         alphaTab.test.Assert.AreEqual_T1_T22(5, score.MasterBars.get_Item(0).Fermata.Count);
         alphaTab.test.Assert.AreEqual_T1_T22(5, score.MasterBars.get_Item(1).Fermata.Count);
@@ -775,7 +775,7 @@ class Gp7ImporterTest extends alphaTab.test.importer.GpImporterTestBase
     @:testMethod
     public function TestPickSlide() : Void 
     {
-        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithBytes_CsString("GuitarPro7/TestPickSlide.gp");
+        var reader : alphaTab.importer.Gp7Importer = PrepareGp7ImporterWithFile("GuitarPro7/TestPickSlide.gp");
         var score : alphaTab.model.Score = reader.ReadScore();
         alphaTab.test.Assert.AreEqual_T1_T22(alphaTab.model.SlideType.PickSlideUp, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).SlideType);
         alphaTab.test.Assert.AreEqual_T1_T22(10, score.Tracks.get_Item(0).Staves.get_Item(0).Bars.get_Item(0).Voices.get_Item(0).Beats.get_Item(0).Notes.get_Item(0).Fret);

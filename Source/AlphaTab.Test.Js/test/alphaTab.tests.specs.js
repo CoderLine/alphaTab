@@ -16,6 +16,9 @@ describe("alphaTab.test.audio.MidiFileGeneratorTest", function() {
     it("TestBend", function() {
         __instance.TestBend();
     });
+    it("TestGraceBeatGeneration", function() {
+        __instance.TestGraceBeatGeneration();
+    });
     it("TestBendMultiPoint", function() {
         __instance.TestBendMultiPoint();
     });

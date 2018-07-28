@@ -8,7 +8,7 @@ using AlphaTab.Util;
 
 namespace AlphaTab.Audio.Synth
 {
-    class AlphaSynth : IAlphaSynth
+    public class AlphaSynth : IAlphaSynth
     {
         private MidiFileSequencer _sequencer;
         private Synthesizer _synthesizer;
@@ -424,7 +424,7 @@ namespace AlphaTab.Audio.Synth
         }
     }
 
-    class PlayerStateChangedEventArgs
+    public class PlayerStateChangedEventArgs
     {
         public PlayerState State { get; private set; }
 
@@ -434,7 +434,7 @@ namespace AlphaTab.Audio.Synth
         }
     }
 
-    class PositionChangedEventArgs
+    public class PositionChangedEventArgs
     {
         public double CurrentTime { get; private set; }
         public double EndTime { get; private set; }

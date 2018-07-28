@@ -40,6 +40,7 @@ class FlatMidiEventGenerator_MidiEvent
 
     private function new() 
     {
+        Tick = 0;
     }
 
 }

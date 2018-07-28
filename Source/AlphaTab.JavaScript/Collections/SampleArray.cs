@@ -23,7 +23,7 @@ namespace AlphaTab.Audio.Synth.Ds
 {
     [Abstract("js.html.Float32Array")]
     [NativeConstructors]
-    class SampleArray
+    public class SampleArray
     {
         [Inline]
         public SampleArray(int length) =>  Script.AbstractThis = new Float32Array(length);

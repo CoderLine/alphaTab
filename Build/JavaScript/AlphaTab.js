@@ -6534,6 +6534,9 @@ alphaTab.Environment.CheckFontLoad = function() {
 		});
 	}
 };
+alphaTab.Environment.CreateScoreRenderer = function(settings) {
+	return new alphaTab.rendering.ScoreRenderer(settings);
+};
 alphaTab.Environment.Init = function() {
 	var this1 = {}
 	alphaTab.Environment.RenderEngines = this1;

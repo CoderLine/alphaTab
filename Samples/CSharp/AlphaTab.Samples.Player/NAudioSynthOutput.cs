@@ -24,7 +24,7 @@ namespace AlphaTab.Samples.PngDump
         }
 
         public NAudioSynthOutput()
-            : base(PreferredSampleRate, SynthConstants.AudioChannels)
+            : base(PreferredSampleRate, 2)
         {
         }
 

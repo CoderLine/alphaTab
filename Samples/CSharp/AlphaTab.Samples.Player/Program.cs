@@ -40,8 +40,6 @@ namespace AlphaTab.Samples.PngDump
                 return;
             }
 
-            Logger.LogLevel = LogLevel.Debug;
-
             // load score
             var score = ScoreLoader.LoadScoreFromBytes(File.ReadAllBytes(args[0]));
 

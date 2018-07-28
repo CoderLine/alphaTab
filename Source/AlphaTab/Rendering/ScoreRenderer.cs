@@ -29,20 +29,20 @@ namespace AlphaTab.Rendering
     /// This is the main wrapper of the rendering engine which 
     /// can render a single track of a score object into a notation sheet.
     /// </summary>
-    class ScoreRenderer : IScoreRenderer
+    public class ScoreRenderer : IScoreRenderer
     {
         private string _currentLayoutMode;
         private string _currentRenderEngine;
         private Track[] _renderedTracks;
 
-        public ICanvas Canvas { get; set; }
+        internal ICanvas Canvas { get; set; }
 
-        public Score Score { get; private set; }
-        public Track[] Tracks { get; private set; }
-        public ScoreLayout Layout { get; set; }
+        internal Score Score { get; private set; }
+        internal Track[] Tracks { get; private set; }
+        internal ScoreLayout Layout { get; set; }
 
-        public RenderingResources RenderingResources { get; set; }
-        public Settings Settings { get; set; }
+        internal RenderingResources RenderingResources { get; set; }
+        internal Settings Settings { get; set; }
 
         public BoundsLookup BoundsLookup { get; set; }
 
