@@ -1,4 +1,6 @@
 /*
+ * alphaTab v0.9.1.0
+ *
  * This file is part of alphaTab.
  * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 

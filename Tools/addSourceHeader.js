@@ -3,8 +3,12 @@ var fs = require('fs');
 
 console.log("Loading Template from " + templateFile);
 
+var buildProps = fs.readFileSync('Directory.Build.props', 'utf8');
+var version = (/<FileVersion>([^<]+)<\/FileVersion>/i).exec(buildProps)[1];
+
 var template = fs.readFileSync(templateFile, 'utf8');
 template = template.replace("{{year}}", new Date().getFullYear());
+template = template.replace("{{version}}", version);
 
 console.log(template);
 
