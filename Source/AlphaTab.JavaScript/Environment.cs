@@ -49,10 +49,7 @@ namespace AlphaTab
             RenderEngines["svg"] = () => new CssFontSvgCanvas();
             RenderEngines["default"] = () => new CssFontSvgCanvas();
             RenderEngines["html5"] = () => new Platform.JavaScript.Html5Canvas();
-
-            // check whether webfont is loaded
-            CheckFontLoad();
-
+            
             RegisterJQueryPlugin();
 
             Script.Write("untyped __js__(\"Math.log2 = Math.log2 || function(x) { return Math.log(x) * Math.LOG2E; };\");");
@@ -141,6 +138,8 @@ namespace AlphaTab
                         ScriptFile = scriptElement.Src;
                     }
                 }
+
+                CheckForFontAvailability();
             }
             else
             {
@@ -205,7 +204,7 @@ namespace AlphaTab
             return matches[1];
         }
 
-        private static void CheckFontLoad()
+        public static void CheckForFontAvailability()
         {
             var isWorker = Script.Write<bool>("untyped __js__(\"typeof(WorkerGlobalScope) !== 'undefined' && self instanceof WorkerGlobalScope\")");
             if (isWorker)
@@ -219,16 +218,21 @@ namespace AlphaTab
             if (cssFontLoadingModuleSupported)
             {
                 Action checkFont = null;
+                var firstCheck = true;
                 checkFont = () =>
                 {
+                    Logger.Info("Rendering", "Checking for WebFont availability");
+
                     Browser.Document.Fonts.Load("1em alphaTab").Then(_ =>
                     {
                         if (Browser.Document.Fonts.Check("1em alphaTab"))
                         {
+                            Logger.Info("Rendering", "Font available");
                             IsFontLoaded = true;
                         }
                         else
                         {
+                            Logger.Info("Rendering", "Font not available, checking again");
                             Browser.Window.SetTimeout((Action)(() =>
                             {
                                 checkFont();

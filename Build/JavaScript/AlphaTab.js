@@ -1068,8 +1068,12 @@ alphaTab.platform.javaScript.Html5Canvas = $hx_exports["alphaTab"]["platform"]["
 	fontElement.classList.add("at");
 	window.document.body.appendChild(fontElement);
 	var style = window.getComputedStyle(fontElement);
+	var family = style.fontFamily;
+	if(StringTools.startsWith(family,"\"") || StringTools.startsWith(family,"'")) {
+		family = HxOverrides.substr(family,1,family.length - 2);
+	}
 	var s = style.fontSize;
-	this._musicFont = new alphaTab.platform.model.Font(style.fontFamily,parseFloat(s),0);
+	this._musicFont = new alphaTab.platform.model.Font(family,parseFloat(s),0);
 	this._measureCanvas = js.Boot.__cast(window.document.createElement("canvas") , HTMLCanvasElement);
 	this._measureCanvas.width = 10;
 	this._measureCanvas.height = 10;
@@ -6383,7 +6387,6 @@ alphaTab.Environment.PlatformInit = function() {
 	alphaTab.Environment.RenderEngines["html5"] = function() {
 		return new alphaTab.platform.javaScript.Html5Canvas();
 	};
-	alphaTab.Environment.CheckFontLoad();
 	alphaTab.Environment.RegisterJQueryPlugin();
 	Math.log2 = Math.log2 || function(x) { return Math.log(x) * Math.LOG2E; };
 	if($global.document) {
@@ -6445,6 +6448,7 @@ alphaTab.Environment.PlatformInit = function() {
 				alphaTab.Environment.ScriptFile = scriptElement.src;
 			}
 		}
+		alphaTab.Environment.CheckForFontAvailability();
 	} else {
 		alphaTab.platform.javaScript.AlphaTabWebWorker.Init();
 		alphaTab.platform.javaScript.AlphaSynthWebWorker.Init();
@@ -6485,7 +6489,7 @@ alphaTab.Environment.ScriptFileFromStack = function(stack) {
 	}
 	return matches[1];
 };
-alphaTab.Environment.CheckFontLoad = function() {
+alphaTab.Environment.CheckForFontAvailability = function() {
 	var isWorker = typeof(WorkerGlobalScope) !== 'undefined' && self instanceof WorkerGlobalScope;
 	if(isWorker) {
 		alphaTab.Environment.IsFontLoaded = false;
@@ -6494,11 +6498,15 @@ alphaTab.Environment.CheckFontLoad = function() {
 	var cssFontLoadingModuleSupported = !(!window.document.fonts) && !(!window.document.fonts["load"]);
 	if(cssFontLoadingModuleSupported) {
 		var checkFont = null;
+		var firstCheck = true;
 		checkFont = function() {
+			alphaTab.util.Logger.Info("Rendering","Checking for WebFont availability",null);
 			window.document.fonts.load("1em alphaTab").then(function(_) {
 				if(window.document.fonts.check("1em alphaTab")) {
+					alphaTab.util.Logger.Info("Rendering","Font available",null);
 					alphaTab.Environment.IsFontLoaded = true;
 				} else {
+					alphaTab.util.Logger.Info("Rendering","Font not available, checking again",null);
 					window.setTimeout(function() {
 						checkFont();
 					},250);
@@ -24263,6 +24271,7 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 			css = css + ("}" + "\r\n");
 			styleElement.innerHTML = css;
 			elementDocument.getElementsByTagName("head").item(0).appendChild(styleElement);
+			alphaTab.Environment.CheckForFontAvailability();
 		}
 	}
 	,Destroy: function() {

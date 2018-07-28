@@ -51,7 +51,12 @@ namespace AlphaTab.Platform.JavaScript
             fontElement.ClassList.Add("at");
             Browser.Document.Body.AppendChild(fontElement);
             var style = Browser.Window.GetComputedStyle(fontElement);
-            _musicFont = new Font(style.FontFamily, Platform.ParseFloat(style.FontSize));
+            string family = style.FontFamily;
+            if (family.StartsWith("\"") || family.StartsWith("'"))
+            {
+                family = family.Substring(1, family.Length - 2);
+            }
+            _musicFont = new Font(family, Platform.ParseFloat(style.FontSize));
 
             _measureCanvas = (CanvasElement)Browser.Document.CreateElement("canvas");
             _measureCanvas.Width = 10;

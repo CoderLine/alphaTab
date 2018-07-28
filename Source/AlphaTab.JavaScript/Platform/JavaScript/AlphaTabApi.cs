@@ -588,6 +588,7 @@ namespace AlphaTab.Platform.JavaScript
                 css.AppendLine("}");
                 styleElement.InnerHTML = css.ToString();
                 elementDocument.GetElementsByTagName("head").Item(0).AppendChild(styleElement);
+                Environment.CheckForFontAvailability();
             }
         }
 
