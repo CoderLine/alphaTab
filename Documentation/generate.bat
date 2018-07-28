@@ -14,3 +14,4 @@ xcopy ..\Build\JavaScript input\assets\js\alphaTab\ /Y /S
 echo GitRevision=%GitRevision% GitBranch=%GitBranch% LinkRoot=%GitBranch%
 %WYAM% build --setting GitRevision=%GitRevision% --setting GitBranch=%GitBranch% --setting LinkRoot=%GitBranch%
 
+popd
