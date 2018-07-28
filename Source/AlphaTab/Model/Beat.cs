@@ -439,7 +439,18 @@ namespace AlphaTab.Model
             {
                 case GraceType.BeforeBeat:
                 case GraceType.OnBeat:
-                    PlaybackDuration = Duration.ThirtySecond.ToTicks();
+                    switch (Duration)
+                    {
+                        case Duration.Eighth:
+                            PlaybackDuration = Duration.ThirtySecond.ToTicks();
+                            break;
+                        case Duration.Sixteenth:
+                            PlaybackDuration = Duration.SixtyFourth.ToTicks();
+                            break;
+                        case Duration.ThirtySecond:
+                            PlaybackDuration = Duration.OneHundredTwentyEighth.ToTicks();
+                            break;
+                    }
                     break;
                 case GraceType.BendGrace:
                     break;
@@ -468,6 +479,7 @@ namespace AlphaTab.Model
                 while (next != null && next.GraceType == GraceType.BeforeBeat)
                 {
                     PlaybackDuration -= next.CalculateDuration();
+                    next = next.NextBeat;
                 }
             }
         }

@@ -20043,7 +20043,19 @@ alphaTab.model.Beat.prototype = {
 		var _g = this.GraceType;
 		switch(_g) {
 		case 1:case 2:
-			this.PlaybackDuration = alphaTab.audio.MidiUtils.ToTicks(32);
+			var _g1 = this.Duration;
+			switch(_g1) {
+			case 8:
+				this.PlaybackDuration = alphaTab.audio.MidiUtils.ToTicks(32);
+				break;
+			case 16:
+				this.PlaybackDuration = alphaTab.audio.MidiUtils.ToTicks(64);
+				break;
+			case 32:
+				this.PlaybackDuration = alphaTab.audio.MidiUtils.ToTicks(128);
+				break;
+			default:
+			}
 			break;
 		case 3:
 			break;
@@ -20056,7 +20068,10 @@ alphaTab.model.Beat.prototype = {
 		}
 		if(this.NextBeat != null && this.NextBeat.Voice.Bar != this.Voice.Bar) {
 			var next = this.NextBeat;
-			while(next != null && next.GraceType == 2) this.PlaybackDuration = this.PlaybackDuration - next.CalculateDuration();
+			while(next != null && next.GraceType == 2) {
+				this.PlaybackDuration = this.PlaybackDuration - next.CalculateDuration();
+				next = next.NextBeat;
+			}
 		}
 	}
 	,Finish: function(settings) {
