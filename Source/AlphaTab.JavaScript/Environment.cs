@@ -221,8 +221,6 @@ namespace AlphaTab
                 var firstCheck = true;
                 checkFont = () =>
                 {
-                    Logger.Info("Rendering", "Checking for WebFont availability");
-
                     Browser.Document.Fonts.Load("1em alphaTab").Then(_ =>
                     {
                         if (Browser.Document.Fonts.Check("1em alphaTab"))
@@ -232,7 +230,6 @@ namespace AlphaTab
                         }
                         else
                         {
-                            Logger.Info("Rendering", "Font not available, checking again");
                             Browser.Window.SetTimeout((Action)(() =>
                             {
                                 checkFont();

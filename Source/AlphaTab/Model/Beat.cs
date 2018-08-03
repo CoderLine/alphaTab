@@ -710,15 +710,16 @@ namespace AlphaTab.Model
                 // and generate a placeholder beat with tied notes
 
                 var cloneBeat = Clone();
+                cloneBeat.Id = GlobalBeatId++;
                 for (int i = 0, j = cloneBeat.Notes.Count; i < j; i++)
                 {
                     var cloneNote = cloneBeat.Notes[i];
-
                     // remove bend on cloned note
                     cloneNote.BendType = BendType.None;
                     cloneNote.MaxBendPoint = null;
                     cloneNote.BendPoints = new FastList<BendPoint>();
                     cloneNote.BendStyle = BendStyle.Default;
+                    cloneNote.Id = Note.GlobalNoteId++;
 
                     // if the note has a bend which is continued on the next note
                     // we need to convert this note into a hold bend

@@ -128,7 +128,7 @@ namespace AlphaTab.Model
         /// This is a global counter for all notes. We use it 
         /// at several locations for lookup tables. 
         /// </summary>
-        private static int GlobalNoteId = 0;
+        internal static int GlobalNoteId = 0;
 
 
         public int Id { get; set; }

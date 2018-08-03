@@ -18,6 +18,7 @@
 
 using AlphaTab.Collections;
 using AlphaTab.Model;
+using AlphaTab.Util;
 
 namespace AlphaTab.Rendering.Utils
 {
@@ -243,6 +244,7 @@ namespace AlphaTab.Rendering.Utils
         public void AddBeat(BeatBounds bounds)
         {
             _beatLookup[bounds.Beat.Id] = bounds;
+            Logger.Info("Model", "Adding BeatBoudnds " + bounds.Beat.Id);
         }
 
         public MasterBarBounds FindMasterBarByIndex(int index)

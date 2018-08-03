@@ -1360,8 +1360,8 @@ namespace AlphaTab.Platform.JavaScript
                             nextBeat.Voice.Bar.Index == beat.Voice.Bar.Index + 1)
                         {
                             var nextBeatBoundings = cache.FindBeat(nextBeat);
-                            if (nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds ==
-                                barBoundings.StaveGroupBounds)
+                            if (nextBeatBoundings != null && 
+                                nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds == barBoundings.StaveGroupBounds)
                             {
                                 nextBeatX = nextBeatBoundings.VisualBounds.X;
                             }
@@ -1370,9 +1370,9 @@ namespace AlphaTab.Platform.JavaScript
 
                     Browser.Window.RequestAnimationFrame(f =>
                     {
-                        Logger.Info("Player",
-                            "Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration +
-                            "(" + Player.PlaybackRange + ")");
+                        //Logger.Info("Player",
+                        //    "Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration +
+                        //    "(" + Player.PlaybackRange + ")");
                         beatCursor.Style.Transition = "all 0s linear";
                         beatCursor.Style.TransitionDuration = duration + "ms";
                         beatCursor.Style.Left = nextBeatX + "px";

@@ -60,6 +60,11 @@ namespace AlphaTab.Platform.JavaScript
                 Browser.Document.Body.AddEventListener("touchend", resume, false);
             }
 
+            Ready();
+        }
+
+        public void Play()
+        {
             // create an empty buffer source (silence)
             _buffer = _context.CreateBuffer(2, BufferSize, _context.SampleRate);
 
@@ -67,11 +72,8 @@ namespace AlphaTab.Platform.JavaScript
             _audioNode = _context.CreateScriptProcessor(BufferSize, 0, 2);
             _audioNode.OnAudioProcess = (Action<AudioProcessingEvent>)GenerateSound;
 
-            Ready();
-        }
+            _circularBuffer.Clear();
 
-        public void Play()
-        {
             RequestBuffers();
             _finished = false;
             _source = _context.CreateBufferSource();
@@ -90,7 +92,11 @@ namespace AlphaTab.Platform.JavaScript
                 _source.Disconnect(0);
             }
             _source = null;
-            _audioNode.Disconnect(0);
+            if (_audioNode != null)
+            {
+                _audioNode.Disconnect(0);
+            }
+            _audioNode = null;
         }
 
         public void SequencerFinished()
@@ -157,7 +163,7 @@ namespace AlphaTab.Platform.JavaScript
                 RequestBuffers();
             }
         }
-
+        
 
         public event Action Ready;
         public event Action<int> SamplesPlayed;
