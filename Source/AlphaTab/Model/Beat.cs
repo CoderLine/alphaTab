@@ -464,7 +464,7 @@ namespace AlphaTab.Model
                     }
                     else
                     {
-                        while (previous != null && previous.GraceType == GraceType.OnBeat)
+                        while (previous != null && (previous.GraceType == GraceType.OnBeat))
                         {
                             // if the previous beat is a on-beat grace it steals the duration from this beat
                             PlaybackDuration -= previous.PlaybackDuration;

@@ -8234,7 +8234,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			case 2:
 				var preBendValue1 = 64 + note.BendPoints[0].Value * 2.75;
 				this._handler.AddBend(track.Index,noteStart,system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Single(preBendValue1)));
-				this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,false,new Int32Array([note.BendPoints[0].Value,note.BendPoints[1].Value]));
+				this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,true,new Int32Array([note.BendPoints[0].Value,note.BendPoints[1].Value]));
 				return;
 			default:
 			}
@@ -23453,11 +23453,21 @@ alphaTab.platform.javaScript.AlphaSynthWebAudioOutput = $hx_exports["alphaTab"][
 	this._audioNode = null;
 	this._circularBuffer = null;
 	this._finished = false;
+	this._allSamples = null;
 };
 alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.__name__ = ["alphaTab","platform","javaScript","AlphaSynthWebAudioOutput"];
 alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.__interfaces__ = [alphaTab.audio.synth.ISynthOutput];
 alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.prototype = {
-	get_SampleRate: function() {
+	StartRecording: function() {
+		var this1 = [];
+		this._allSamples = this1;
+	}
+	,StopRecording: function() {
+		var s = this._allSamples;
+		this._allSamples = null;
+		return s;
+	}
+	,get_SampleRate: function() {
 		return this._context.sampleRate;
 	}
 	,Open: function() {
@@ -23540,6 +23550,10 @@ alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.prototype = {
 			while(i < left.length) {
 				left[i] = buffer[s++];
 				right[i] = buffer[s++];
+				if(this._allSamples != null) {
+					this._allSamples.push(left[i]);
+					this._allSamples.push(right[i]);
+				}
 				++i;
 			}
 			system._EventAction1.EventAction1_Impl_.Invoke(this.SamplesPlayed,left.length);
@@ -34690,7 +34704,6 @@ alphaTab.rendering.utils.BoundsLookup.prototype = {
 	}
 	,AddBeat: function(bounds) {
 		this._beatLookup[bounds.Beat.Id] = bounds;
-		alphaTab.util.Logger.Info("Model","Adding BeatBoudnds " + bounds.Beat.Id,null);
 	}
 	,FindMasterBarByIndex: function(index) {
 		if(this._masterBarLookup.hasOwnProperty(index)) {

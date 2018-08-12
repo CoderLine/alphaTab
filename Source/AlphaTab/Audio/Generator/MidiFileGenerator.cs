@@ -739,7 +739,7 @@ namespace AlphaTab.Audio.Generator
                             _handler.AddBend(track.Index, noteStart, (byte)channel, (byte)preBendValue);
 
                             GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
-                                false, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value });
+                                true, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value });
                             return;
                     }
 
