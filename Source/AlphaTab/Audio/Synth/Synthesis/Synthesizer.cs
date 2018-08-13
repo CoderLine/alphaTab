@@ -233,10 +233,17 @@ namespace AlphaTab.Audio.Synth.Synthesis
                 {
                     var channel = node.Value.VoiceParams.Channel;
                     // channel is muted if it is either explicitley muted, or another channel is set to solo but not this one. 
-                    var isChannelMuted = silent ||
-                                         _mutedChannels.ContainsKey(channel) ||
+                    var isChannelMuted = _mutedChannels.ContainsKey(channel) ||
                                          (anySolo && !_soloChannels.ContainsKey(channel));
-                    node.Value.Process(sampleIndex, sampleIndex + MicroBufferSize * 2, isChannelMuted);
+
+                    if (silent)
+                    {
+                        node.Value.ProcessSilent(sampleIndex, sampleIndex + MicroBufferSize * 2);
+                    }
+                    else
+                    {
+                        node.Value.Process(sampleIndex, sampleIndex + MicroBufferSize * 2, isChannelMuted);
+                    }
                     //if an active voice has stopped remove it from the list
                     if (node.Value.VoiceParams.State == VoiceStateEnum.Stopped)
                     {

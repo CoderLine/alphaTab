@@ -67,7 +67,7 @@ namespace AlphaTab.Audio.Synth.Bank.Components
             if (CurrentState == LfoState.Delay)
             {
                 _phase -= amount;
-                if (_phase <= 0.0)
+                while (_phase <= 0.0)
                 {
                     _phase = _generator.LoopStartPhase + _increment * -_phase;
                     Value = _generator.GetValue(_phase);
@@ -77,8 +77,10 @@ namespace AlphaTab.Audio.Synth.Bank.Components
             else
             {
                 _phase += _increment * amount;
-                if (_phase >= _generator.LoopEndPhase)
+                while (_phase >= _generator.LoopEndPhase)
+                {
                     _phase = _generator.LoopStartPhase + (_phase - _generator.LoopEndPhase) % (_generator.LoopEndPhase - _generator.LoopStartPhase);
+                }
                 Value = _generator.GetValue(_phase);
             }
         }

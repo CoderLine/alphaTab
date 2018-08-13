@@ -2648,8 +2648,12 @@ alphaTab.audio.synth.synthesis.Synthesizer.prototype = {
 			var node = this._voiceManager.ActiveVoices.First;
 			while(node != null) {
 				var channel = node.Value.VoiceParams.Channel;
-				var isChannelMuted = silent || this._mutedChannels.hasOwnProperty(channel) || anySolo && !this._soloChannels.hasOwnProperty(channel);
-				node.Value.Process(sampleIndex,sampleIndex + this.MicroBufferSize * 2,isChannelMuted);
+				var isChannelMuted = this._mutedChannels.hasOwnProperty(channel) || anySolo && !this._soloChannels.hasOwnProperty(channel);
+				if(silent) {
+					node.Value.ProcessSilent(sampleIndex,sampleIndex + this.MicroBufferSize * 2);
+				} else {
+					node.Value.Process(sampleIndex,sampleIndex + this.MicroBufferSize * 2,isChannelMuted);
+				}
 				if(node.Value.VoiceParams.State == 0) {
 					var delnode = node;
 					node = node.get_Next();
@@ -3538,7 +3542,13 @@ alphaTab.audio.synth.synthesis.Voice.prototype = {
 		if(this.VoiceParams.State == 0) {
 			return;
 		}
-		this.Patch.Process(this.VoiceParams,startIndex,endIndex,isMuted);
+		this.Patch.Process(this.VoiceParams,startIndex,endIndex,isMuted,false);
+	}
+	,ProcessSilent: function(startIndex,endIndex) {
+		if(this.VoiceParams.State == 0) {
+			return;
+		}
+		this.Patch.Process(this.VoiceParams,startIndex,endIndex,true,true);
 	}
 	,Configure: function(channel,note,velocity,patch,synthParams) {
 		this.VoiceParams.Reset();
@@ -4250,7 +4260,7 @@ alphaTab.audio.synth.bank.components.Lfo.prototype = {
 	,Increment: function(amount) {
 		if(this.CurrentState == 0) {
 			this._phase = this._phase - amount;
-			if(this._phase <= 0.0) {
+			while(this._phase <= 0.0) {
 				this._phase = this._generator.LoopStartPhase + this._increment * -this._phase;
 				var this1 = this._generator.GetValue(this._phase);
 				this.Value = this1;
@@ -4258,9 +4268,7 @@ alphaTab.audio.synth.bank.components.Lfo.prototype = {
 			}
 		} else {
 			this._phase = this._phase + this._increment * amount;
-			if(this._phase >= this._generator.LoopEndPhase) {
-				this._phase = this._generator.LoopStartPhase + (this._phase - this._generator.LoopEndPhase) % (this._generator.LoopEndPhase - this._generator.LoopStartPhase);
-			}
+			while(this._phase >= this._generator.LoopEndPhase) this._phase = this._generator.LoopStartPhase + (this._phase - this._generator.LoopEndPhase) % (this._generator.LoopEndPhase - this._generator.LoopStartPhase);
 			var this2 = this._generator.GetValue(this._phase);
 			this.Value = this2;
 		}
@@ -9482,6 +9490,38 @@ alphaTab.audio.synth.bank.components.generators.SampleGenerator.prototype = $ext
 	GetValue: function(phase) {
 		return this.Samples.get_Item(system.Convert.ToInt32_Double(phase));
 	}
+	,DiscardValues: function(generatorParams,samples,increment) {
+		var proccessed = 0;
+		while(true) {
+			var samplesAvailable = system.Convert.ToInt32_Double(Math.ceil((generatorParams.CurrentEnd - generatorParams.Phase) / increment));
+			if(samplesAvailable > samples - proccessed) {
+				this.InterpolateSilent(generatorParams,increment,proccessed,samples);
+				return;
+			} else {
+				var endProccessed = proccessed + samplesAvailable;
+				this.InterpolateSilent(generatorParams,increment,proccessed,endProccessed);
+				proccessed = endProccessed;
+				var _g = generatorParams.CurrentState;
+				switch(_g) {
+				case 0:
+					generatorParams.CurrentStart = this.LoopStartPhase;
+					generatorParams.CurrentEnd = this.LoopEndPhase;
+					generatorParams.CurrentState = 1;
+					break;
+				case 1:
+					generatorParams.Phase = generatorParams.Phase + (generatorParams.CurrentStart - generatorParams.CurrentEnd);
+					break;
+				case 2:
+					generatorParams.CurrentState = 3;
+					break;
+				default:
+				}
+			}
+			if(!(proccessed < samples)) {
+				break;
+			}
+		}
+	}
 	,GetValues: function(generatorParams,blockBuffer,increment) {
 		var proccessed = 0;
 		while(true) {
@@ -9516,6 +9556,17 @@ alphaTab.audio.synth.bank.components.generators.SampleGenerator.prototype = $ext
 			if(!(proccessed < blockBuffer.length)) {
 				break;
 			}
+		}
+	}
+	,InterpolateSilent: function(generatorParams,increment,start,end) {
+		var _end = generatorParams.CurrentState == 1 ? this.LoopEndPhase - 1 : this.EndPhase - 1;
+		while(start < end && generatorParams.Phase < _end) {
+			generatorParams.Phase = generatorParams.Phase + increment;
+			++start;
+		}
+		while(start < end) {
+			generatorParams.Phase = generatorParams.Phase + increment;
+			++start;
 		}
 	}
 	,Interpolate: function(generatorParams,blockBuffer,increment,start,end) {
@@ -9880,7 +9931,7 @@ alphaTab.audio.synth.bank.patch.Patch.prototype = {
 	Start: function(voiceparams) {
 		throw new js._Boot.HaxeError("abstract");
 	}
-	,Process: function(voiceparams,startIndex,endIndex,isMuted) {
+	,Process: function(voiceparams,startIndex,endIndex,isMuted,isSilentProcess) {
 		throw new js._Boot.HaxeError("abstract");
 	}
 	,Stop: function(voiceparams) {
@@ -9956,7 +10007,7 @@ alphaTab.audio.synth.bank.patch.MultiPatch.prototype = $extend(alphaTab.audio.sy
 	,Start: function(voiceparams) {
 		return false;
 	}
-	,Process: function(voiceparams,startIndex,endIndex,isMuted) {
+	,Process: function(voiceparams,startIndex,endIndex,isMuted,isSilentProcess) {
 	}
 	,Stop: function(voiceparams) {
 	}
@@ -10174,40 +10225,53 @@ alphaTab.audio.synth.bank.patch.Sf2Patch.prototype = $extend(alphaTab.audio.synt
 			voiceparams.Envelopes[1].ReleaseSf2VolumeEnvelope();
 		}
 	}
-	,Process: function(voiceparams,startIndex,endIndex,isMuted) {
+	,Process: function(voiceparams,startIndex,endIndex,isMuted,isSilentProcess) {
 		var basePitchFrequency = alphaTab.audio.synth.util.SynthHelper.CentsToPitch(voiceparams.SynthParams.CurrentPitch) * this.gen.Frequency;
 		var pitchWithBend = basePitchFrequency * alphaTab.audio.synth.util.SynthHelper.CentsToPitch(voiceparams.PitchOffset);
 		var basePitch = pitchWithBend / voiceparams.SynthParams.Synth.SampleRate;
 		var baseVolume = voiceparams.SynthParams.Synth.MasterVolume * voiceparams.SynthParams.CurrentVolume * 0.35 * voiceparams.SynthParams.MixVolume;
-		var x = startIndex;
-		while(x < endIndex) {
-			voiceparams.Envelopes[0].Increment(64);
-			voiceparams.Envelopes[1].Increment(64);
-			voiceparams.Lfos[0].Increment(64);
-			voiceparams.Lfos[1].Increment(64);
-			this.gen.GetValues(voiceparams.GeneratorParams[0],voiceparams.BlockBuffer,basePitch * alphaTab.audio.synth.util.SynthHelper.CentsToPitch(system.Convert.ToInt32_Single(voiceparams.Envelopes[0].Value * this.modEnvToPitch + voiceparams.Lfos[0].Value * this.modLfoToPitch + voiceparams.Lfos[1].Value * this.vibLfoToPitch)));
-			if(voiceparams.Filters[0].get_Enabled()) {
-				var centsFc = voiceparams.PData[0].getInt32(0,true) + voiceparams.Lfos[0].Value * this.modLfoToFilterFc + voiceparams.Envelopes[0].Value * this.modEnvToFilterFc;
-				if(centsFc > 13500) {
-					centsFc = 13500;
-				}
-				voiceparams.Filters[0].set_CutOff(alphaTab.audio.synth.util.SynthHelper.KeyToFrequency(centsFc / 100.0,69));
-				if(voiceparams.Filters[0].CoeffNeedsUpdating) {
-					voiceparams.Filters[0].ApplyFilterInterp(voiceparams.BlockBuffer,voiceparams.SynthParams.Synth.SampleRate);
-				} else {
-					voiceparams.Filters[0].ApplyFilter_SampleArray(voiceparams.BlockBuffer);
-				}
-			}
+		if(isSilentProcess) {
+			var iterations = (endIndex - startIndex) / (64 * 2) | 0;
+			voiceparams.Envelopes[0].Increment(iterations * 64);
+			voiceparams.Envelopes[1].Increment(iterations * 64);
+			voiceparams.Lfos[0].Increment(iterations * 64);
+			voiceparams.Lfos[1].Increment(iterations * 64);
 			var this1 = voiceparams.VolOffset + voiceparams.Envelopes[1].Value + voiceparams.Lfos[0].Value * this.modLfoToVolume;
 			var volume = js.Boot.__cast(alphaTab.audio.synth.util.SynthHelper.DBtoLinear(this1) , Float) * baseVolume;
-			if(!isMuted) {
-				voiceparams.MixMonoToStereoInterp(x,volume * this.pan.Left * voiceparams.SynthParams.CurrentPan.Left,volume * this.pan.Right * voiceparams.SynthParams.CurrentPan.Right);
-			}
 			if(voiceparams.Envelopes[1].CurrentStage > 2 && volume <= 1e-5 || voiceparams.GeneratorParams[0].CurrentState == 3) {
 				voiceparams.State = 0;
-				return;
 			}
-			x = x + 64 * 2;
+		} else {
+			var x = startIndex;
+			while(x < endIndex) {
+				voiceparams.Envelopes[0].Increment(64);
+				voiceparams.Envelopes[1].Increment(64);
+				voiceparams.Lfos[0].Increment(64);
+				voiceparams.Lfos[1].Increment(64);
+				this.gen.GetValues(voiceparams.GeneratorParams[0],voiceparams.BlockBuffer,basePitch * alphaTab.audio.synth.util.SynthHelper.CentsToPitch(system.Convert.ToInt32_Single(voiceparams.Envelopes[0].Value * this.modEnvToPitch + voiceparams.Lfos[0].Value * this.modLfoToPitch + voiceparams.Lfos[1].Value * this.vibLfoToPitch)));
+				if(voiceparams.Filters[0].get_Enabled()) {
+					var centsFc = voiceparams.PData[0].getInt32(0,true) + voiceparams.Lfos[0].Value * this.modLfoToFilterFc + voiceparams.Envelopes[0].Value * this.modEnvToFilterFc;
+					if(centsFc > 13500) {
+						centsFc = 13500;
+					}
+					voiceparams.Filters[0].set_CutOff(alphaTab.audio.synth.util.SynthHelper.KeyToFrequency(centsFc / 100.0,69));
+					if(voiceparams.Filters[0].CoeffNeedsUpdating) {
+						voiceparams.Filters[0].ApplyFilterInterp(voiceparams.BlockBuffer,voiceparams.SynthParams.Synth.SampleRate);
+					} else {
+						voiceparams.Filters[0].ApplyFilter_SampleArray(voiceparams.BlockBuffer);
+					}
+				}
+				var this2 = voiceparams.VolOffset + voiceparams.Envelopes[1].Value + voiceparams.Lfos[0].Value * this.modLfoToVolume;
+				var volume1 = js.Boot.__cast(alphaTab.audio.synth.util.SynthHelper.DBtoLinear(this2) , Float) * baseVolume;
+				if(!isMuted) {
+					voiceparams.MixMonoToStereoInterp(x,volume1 * this.pan.Left * voiceparams.SynthParams.CurrentPan.Left,volume1 * this.pan.Right * voiceparams.SynthParams.CurrentPan.Right);
+				}
+				if(voiceparams.Envelopes[1].CurrentStage > 2 && volume1 <= 1e-5 || voiceparams.GeneratorParams[0].CurrentState == 3) {
+					voiceparams.State = 0;
+					return;
+				}
+				x = x + 64 * 2;
+			}
 		}
 	}
 	,Load: function(region,assets) {

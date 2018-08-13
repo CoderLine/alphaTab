@@ -91,7 +91,7 @@ namespace AlphaTab.Audio.Synth.Bank.Patch
             return false;
         }
 
-        public override void Process(VoiceParameters voiceparams, int startIndex, int endIndex, bool isMuted)
+        public override void Process(VoiceParameters voiceparams, int startIndex, int endIndex, bool isMuted, bool isSilentProcess)
         {
 
         }

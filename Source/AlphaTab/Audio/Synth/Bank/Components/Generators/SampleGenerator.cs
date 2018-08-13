@@ -46,6 +46,41 @@ namespace AlphaTab.Audio.Synth.Bank.Components.Generators
             return Samples[(int)(phase)];
         }
 
+        public void DiscardValues(GeneratorParameters generatorParams, int samples, double increment)
+        {
+            int proccessed = 0;
+            do
+            {
+                int samplesAvailable = (int)Math.Ceiling((generatorParams.CurrentEnd - generatorParams.Phase) / increment);
+                if (samplesAvailable > samples - proccessed)
+                {
+                    InterpolateSilent(generatorParams, increment, proccessed, samples);
+                    return; //proccessed = blockBuffer.Length;
+                }
+                else
+                {
+                    int endProccessed = proccessed + samplesAvailable;
+                    InterpolateSilent(generatorParams, increment, proccessed, endProccessed);
+                    proccessed = endProccessed;
+                    switch (generatorParams.CurrentState)
+                    {
+                        case GeneratorState.PreLoop:
+                            generatorParams.CurrentStart = LoopStartPhase;
+                            generatorParams.CurrentEnd = LoopEndPhase;
+                            generatorParams.CurrentState = GeneratorState.Loop;
+                            break;
+                        case GeneratorState.Loop:
+                            generatorParams.Phase += generatorParams.CurrentStart - generatorParams.CurrentEnd;
+                            break;
+                        case GeneratorState.PostLoop:
+                            generatorParams.CurrentState = GeneratorState.Finished;
+                            break;
+                    }
+                }
+            }
+            while (proccessed < samples);
+        }
+
         public override void GetValues(GeneratorParameters generatorParams, SampleArray blockBuffer, double increment)
         {
             int proccessed = 0;
@@ -81,6 +116,27 @@ namespace AlphaTab.Audio.Synth.Bank.Components.Generators
                 }
             }
             while (proccessed < blockBuffer.Length);
+        }
+
+
+        private void InterpolateSilent(GeneratorParameters generatorParams, double increment, int start, int end)
+        {
+            double _end = generatorParams.CurrentState == GeneratorState.Loop
+                ? this.LoopEndPhase - 1
+                : this.EndPhase - 1;
+
+            // TODO: can be directly calculated
+            while (start < end && generatorParams.Phase < _end) //do this until we reach an edge case or fill the buffer
+            {
+                generatorParams.Phase += increment;
+                start++;
+            }
+
+            while (start < end) //edge case, if in loop wrap to loop start else use duplicate sample
+            {
+                generatorParams.Phase += increment;
+                start++;
+            }
         }
 
         private void Interpolate(GeneratorParameters generatorParams, SampleArray blockBuffer, double increment, int start, int end)

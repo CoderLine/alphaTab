@@ -65,7 +65,17 @@ namespace AlphaTab.Audio.Synth.Synthesis
                 return;
 
             //process using the patch's algorithm
-            Patch.Process(VoiceParams, startIndex, endIndex, isMuted);
+            Patch.Process(VoiceParams, startIndex, endIndex, isMuted, false);
+        }
+
+        public void ProcessSilent(int startIndex, int endIndex)
+        {
+            //do not process if the voice is stopped
+            if (VoiceParams.State == VoiceStateEnum.Stopped)
+                return;
+
+            //process using the patch's algorithm
+            Patch.Process(VoiceParams, startIndex, endIndex, true, true);
         }
 
         public void Configure(int channel, int note, int velocity, Patch patch, SynthParameters synthParams)
