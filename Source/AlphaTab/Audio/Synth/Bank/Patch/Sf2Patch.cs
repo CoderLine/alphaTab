@@ -98,12 +98,14 @@ namespace AlphaTab.Audio.Synth.Bank.Patch
 
         public override void Process(VoiceParameters voiceparams, int startIndex, int endIndex, bool isMuted)
         {
+            // TODO: Find a faster way to process this patch silent without loosing track on envelopes/lfos etc. 
+
             //--Base pitch calculation
             var basePitchFrequency = SynthHelper.CentsToPitch(voiceparams.SynthParams.CurrentPitch)*gen.Frequency;
             var pitchWithBend = basePitchFrequency*SynthHelper.CentsToPitch(voiceparams.PitchOffset);
             var basePitch = pitchWithBend / voiceparams.SynthParams.Synth.SampleRate;
 
-            float baseVolume = isMuted ? 0 : voiceparams.SynthParams.Synth.MasterVolume * voiceparams.SynthParams.CurrentVolume * SynthConstants.DefaultMixGain * voiceparams.SynthParams.MixVolume;
+            float baseVolume = voiceparams.SynthParams.Synth.MasterVolume * voiceparams.SynthParams.CurrentVolume * SynthConstants.DefaultMixGain * voiceparams.SynthParams.MixVolume;
 
             //--Main Loop
             for (int x = startIndex; x < endIndex; x += SynthConstants.DefaultBlockSize * SynthConstants.AudioChannels)
@@ -131,8 +133,13 @@ namespace AlphaTab.Audio.Synth.Bank.Patch
                 //--Volume calculation
                 float volume = (float)SynthHelper.DBtoLinear(voiceparams.VolOffset + voiceparams.Envelopes[1].Value + voiceparams.Lfos[0].Value * modLfoToVolume) * baseVolume;
 
-                //--Mix block based on number of channels
-                voiceparams.MixMonoToStereoInterp(x, volume * pan.Left * voiceparams.SynthParams.CurrentPan.Left, volume * pan.Right * voiceparams.SynthParams.CurrentPan.Right);
+                // only mix if needed
+                if (!isMuted)
+                {
+                    //--Mix block based on number of channels
+                    voiceparams.MixMonoToStereoInterp(x, volume * pan.Left * voiceparams.SynthParams.CurrentPan.Left, volume * pan.Right * voiceparams.SynthParams.CurrentPan.Right);
+                }
+
                 //--Check and end early if necessary
                 if ((voiceparams.Envelopes[1].CurrentStage > EnvelopeState.Hold && volume <= SynthConstants.NonAudible) || voiceparams.GeneratorParams[0].CurrentState == GeneratorState.Finished)
                 {

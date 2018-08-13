@@ -162,5 +162,10 @@ namespace AlphaTab.Platform
         {
             Array.Reverse(array);
         }
+
+        public static long GetCurrentMilliseconds()
+        {
+            return Stopwatch.GetTimestamp();
+        }
     }
 }

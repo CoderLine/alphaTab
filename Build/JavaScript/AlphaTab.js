@@ -904,6 +904,9 @@ alphaTab.platform.Platform.Reverse = function(array) {
 alphaTab.platform.Platform.GetTypeName = function(obj) {
 	return Type.getClassName(obj == null ? null : js.Boot.getClass(obj));
 };
+alphaTab.platform.Platform.GetCurrentMilliseconds = function() {
+	return Date.now();
+};
 alphaTab.platform.Platform.IsStringNumber = function(s,allowSign) {
 	if(allowSign == null) {
 		allowSign = true;
@@ -2618,9 +2621,13 @@ alphaTab.audio.synth.synthesis.Synthesizer.prototype = {
 	}
 	,Synthesize: function() {
 		this.SampleBuffer = new Float32Array(this.SampleBuffer.length);
-		this.FillWorkingBuffer();
+		this.FillWorkingBuffer(false);
 	}
-	,FillWorkingBuffer: function() {
+	,SynthesizeSilent: function() {
+		this.SampleBuffer = new Float32Array(this.SampleBuffer.length);
+		this.FillWorkingBuffer(true);
+	}
+	,FillWorkingBuffer: function(silent) {
 		var sampleIndex = 0;
 		var anySolo = this._isAnySolo;
 		var x = 0;
@@ -2641,7 +2648,7 @@ alphaTab.audio.synth.synthesis.Synthesizer.prototype = {
 			var node = this._voiceManager.ActiveVoices.First;
 			while(node != null) {
 				var channel = node.Value.VoiceParams.Channel;
-				var isChannelMuted = this._mutedChannels.hasOwnProperty(channel) || anySolo && !this._soloChannels.hasOwnProperty(channel);
+				var isChannelMuted = silent || this._mutedChannels.hasOwnProperty(channel) || anySolo && !this._soloChannels.hasOwnProperty(channel);
 				node.Value.Process(sampleIndex,sampleIndex + this.MicroBufferSize * 2,isChannelMuted);
 				if(node.Value.VoiceParams.State == 0) {
 					var delnode = node;
@@ -4587,14 +4594,13 @@ alphaTab.audio.synth.MidiFileSequencer.prototype = {
 		if(milliseconds <= 0) {
 			return;
 		}
-		this._currentTime = this._currentTime + milliseconds;
-		while(this._eventIndex < this._synthData.length && this._synthData[this._eventIndex].Time < this._currentTime) {
-			var m = this._synthData[this._eventIndex];
-			if(!m.IsMetronome) {
-				this._synthesizer.ProcessMidiMessage(m.Event);
-			}
-			this._eventIndex++;
+		var start = alphaTab.platform.Platform.GetCurrentMilliseconds();
+		var finalTime = this._currentTime + milliseconds;
+		while(this._currentTime < finalTime) if(this.FillMidiEventQueueLimited(finalTime - this._currentTime)) {
+			this._synthesizer.SynthesizeSilent();
 		}
+		var duration = alphaTab.platform.Platform.GetCurrentMilliseconds() - start;
+		alphaTab.util.Logger.Debug("Sequencer","Silent seek finished in " + duration + "ms",null);
 	}
 	,LoadMidi: function(midiFile) {
 		var this1 = [];
@@ -4661,16 +4667,25 @@ alphaTab.audio.synth.MidiFileSequencer.prototype = {
 		this.EndTick = absTick;
 	}
 	,FillMidiEventQueue: function() {
+		return this.FillMidiEventQueueLimited(-1);
+	}
+	,FillMidiEventQueueLimited: function(maxMilliseconds) {
 		var millisecondsPerBuffer = this._synthesizer.MicroBufferSize / js.Boot.__cast(this._synthesizer.SampleRate , Float) * 1000 * this.PlaybackSpeed;
+		if(maxMilliseconds > 0 && maxMilliseconds < millisecondsPerBuffer) {
+			millisecondsPerBuffer = maxMilliseconds;
+		}
+		var anyEventsDispatched = false;
 		var i = 0;
 		while(i < this._synthesizer.MicroBufferCount) {
 			this._currentTime = this._currentTime + millisecondsPerBuffer;
 			while(this._eventIndex < this._synthData.length && this._synthData[this._eventIndex].Time < this._currentTime) {
 				this._synthesizer.DispatchEvent(i,this._synthData[this._eventIndex]);
 				this._eventIndex++;
+				anyEventsDispatched = true;
 			}
 			++i;
 		}
+		return anyEventsDispatched;
 	}
 	,TickPositionToTimePosition: function(tickPosition) {
 		return this.TickPositionToTimePositionWithSpeed(tickPosition,this.PlaybackSpeed);
@@ -10163,7 +10178,7 @@ alphaTab.audio.synth.bank.patch.Sf2Patch.prototype = $extend(alphaTab.audio.synt
 		var basePitchFrequency = alphaTab.audio.synth.util.SynthHelper.CentsToPitch(voiceparams.SynthParams.CurrentPitch) * this.gen.Frequency;
 		var pitchWithBend = basePitchFrequency * alphaTab.audio.synth.util.SynthHelper.CentsToPitch(voiceparams.PitchOffset);
 		var basePitch = pitchWithBend / voiceparams.SynthParams.Synth.SampleRate;
-		var baseVolume = isMuted ? 0 : voiceparams.SynthParams.Synth.MasterVolume * voiceparams.SynthParams.CurrentVolume * 0.35 * voiceparams.SynthParams.MixVolume;
+		var baseVolume = voiceparams.SynthParams.Synth.MasterVolume * voiceparams.SynthParams.CurrentVolume * 0.35 * voiceparams.SynthParams.MixVolume;
 		var x = startIndex;
 		while(x < endIndex) {
 			voiceparams.Envelopes[0].Increment(64);
@@ -10185,7 +10200,9 @@ alphaTab.audio.synth.bank.patch.Sf2Patch.prototype = $extend(alphaTab.audio.synt
 			}
 			var this1 = voiceparams.VolOffset + voiceparams.Envelopes[1].Value + voiceparams.Lfos[0].Value * this.modLfoToVolume;
 			var volume = js.Boot.__cast(alphaTab.audio.synth.util.SynthHelper.DBtoLinear(this1) , Float) * baseVolume;
-			voiceparams.MixMonoToStereoInterp(x,volume * this.pan.Left * voiceparams.SynthParams.CurrentPan.Left,volume * this.pan.Right * voiceparams.SynthParams.CurrentPan.Right);
+			if(!isMuted) {
+				voiceparams.MixMonoToStereoInterp(x,volume * this.pan.Left * voiceparams.SynthParams.CurrentPan.Left,volume * this.pan.Right * voiceparams.SynthParams.CurrentPan.Right);
+			}
 			if(voiceparams.Envelopes[1].CurrentStage > 2 && volume <= 1e-5 || voiceparams.GeneratorParams[0].CurrentState == 3) {
 				voiceparams.State = 0;
 				return;
@@ -23453,21 +23470,11 @@ alphaTab.platform.javaScript.AlphaSynthWebAudioOutput = $hx_exports["alphaTab"][
 	this._audioNode = null;
 	this._circularBuffer = null;
 	this._finished = false;
-	this._allSamples = null;
 };
 alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.__name__ = ["alphaTab","platform","javaScript","AlphaSynthWebAudioOutput"];
 alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.__interfaces__ = [alphaTab.audio.synth.ISynthOutput];
 alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.prototype = {
-	StartRecording: function() {
-		var this1 = [];
-		this._allSamples = this1;
-	}
-	,StopRecording: function() {
-		var s = this._allSamples;
-		this._allSamples = null;
-		return s;
-	}
-	,get_SampleRate: function() {
+	get_SampleRate: function() {
 		return this._context.sampleRate;
 	}
 	,Open: function() {
@@ -23550,10 +23557,6 @@ alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.prototype = {
 			while(i < left.length) {
 				left[i] = buffer[s++];
 				right[i] = buffer[s++];
-				if(this._allSamples != null) {
-					this._allSamples.push(left[i]);
-					this._allSamples.push(right[i]);
-				}
 				++i;
 			}
 			system._EventAction1.EventAction1_Impl_.Invoke(this.SamplesPlayed,left.length);

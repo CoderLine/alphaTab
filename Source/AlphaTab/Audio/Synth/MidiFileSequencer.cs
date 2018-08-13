@@ -139,16 +139,20 @@ namespace AlphaTab.Audio.Synth
         {
             if (milliseconds <= 0) return;
 
-            _currentTime += milliseconds;
-            while (_eventIndex < _synthData.Count && _synthData[_eventIndex].Time < (_currentTime))
+            var start = Platform.Platform.GetCurrentMilliseconds();
+
+            var finalTime = _currentTime + milliseconds;
+
+            while (_currentTime < finalTime)
             {
-                var m = _synthData[_eventIndex];
-                if (!m.IsMetronome)
+                if (FillMidiEventQueueLimited(finalTime - _currentTime))
                 {
-                    _synthesizer.ProcessMidiMessage(m.Event);   
+                    _synthesizer.SynthesizeSilent();
                 }
-                _eventIndex++;
             }
+
+            var duration = Platform.Platform.GetCurrentMilliseconds() - start;
+            Logger.Debug("Sequencer", "Silent seek finished in " + duration + "ms");
         }
 
 
@@ -174,7 +178,7 @@ namespace AlphaTab.Audio.Synth
 
             var previousTick = 0;
 
-            foreach(var mEvent in midiFile.Events)
+            foreach (var mEvent in midiFile.Events)
             {
                 var synthData = new SynthEvent(_synthData.Count, mEvent);
                 _synthData.Add(synthData);
@@ -237,9 +241,20 @@ namespace AlphaTab.Audio.Synth
         }
 
 
-        public void FillMidiEventQueue()
+        public bool FillMidiEventQueue()
+        {
+            return FillMidiEventQueueLimited(-1);
+        }
+
+        private bool FillMidiEventQueueLimited(double maxMilliseconds)
         {
             var millisecondsPerBuffer = (_synthesizer.MicroBufferSize / (double)_synthesizer.SampleRate) * 1000 * PlaybackSpeed;
+            if (maxMilliseconds > 0 && maxMilliseconds < millisecondsPerBuffer)
+            {
+                millisecondsPerBuffer = maxMilliseconds;
+            }
+
+            bool anyEventsDispatched = false;
             for (int i = 0; i < _synthesizer.MicroBufferCount; i++)
             {
                 _currentTime += millisecondsPerBuffer;
@@ -247,8 +262,10 @@ namespace AlphaTab.Audio.Synth
                 {
                     _synthesizer.DispatchEvent(i, _synthData[_eventIndex]);
                     _eventIndex++;
+                    anyEventsDispatched = true;
                 }
             }
+            return anyEventsDispatched;
         }
 
         public double TickPositionToTimePosition(int tickPosition)

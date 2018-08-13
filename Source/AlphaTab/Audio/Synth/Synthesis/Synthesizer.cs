@@ -194,10 +194,16 @@ namespace AlphaTab.Audio.Synth.Synthesis
         public void Synthesize()
         {
             SampleBuffer.Clear();
-            FillWorkingBuffer();
+            FillWorkingBuffer(false);
         }
 
-        private void FillWorkingBuffer()
+        public void SynthesizeSilent()
+        {
+            SampleBuffer.Clear();
+            FillWorkingBuffer(true);
+        }
+
+        private void FillWorkingBuffer(bool silent)
         {
             /*Break the process loop into sections representing the smallest timeframe before the midi controls need to be updated
             the bigger the timeframe the more efficent the process is, but playback quality will be reduced.*/
@@ -227,7 +233,8 @@ namespace AlphaTab.Audio.Synth.Synthesis
                 {
                     var channel = node.Value.VoiceParams.Channel;
                     // channel is muted if it is either explicitley muted, or another channel is set to solo but not this one. 
-                    var isChannelMuted = _mutedChannels.ContainsKey(channel) ||
+                    var isChannelMuted = silent ||
+                                         _mutedChannels.ContainsKey(channel) ||
                                          (anySolo && !_soloChannels.ContainsKey(channel));
                     node.Value.Process(sampleIndex, sampleIndex + MicroBufferSize * 2, isChannelMuted);
                     //if an active voice has stopped remove it from the list
