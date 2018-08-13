@@ -4576,9 +4576,6 @@ alphaTab.audio.synth.MidiFileSequencer.prototype = {
 		return this._endTime / this.PlaybackSpeed;
 	}
 	,Seek: function(timePosition) {
-		if(timePosition < 0) {
-			timePosition = 0;
-		}
 		timePosition = timePosition * this.PlaybackSpeed;
 		if(this.get_PlaybackRange() != null) {
 			if(timePosition < this._playbackRangeStartTime) {
@@ -4586,6 +4583,10 @@ alphaTab.audio.synth.MidiFileSequencer.prototype = {
 			} else if(timePosition > this._playbackRangeEndTime) {
 				timePosition = this._playbackRangeEndTime;
 			}
+		}
+		timePosition = timePosition - 25;
+		if(timePosition < 0) {
+			timePosition = 0;
 		}
 		if(timePosition > this._currentTime) {
 			this.SilentProcess(timePosition - this._currentTime);
@@ -9490,38 +9491,6 @@ alphaTab.audio.synth.bank.components.generators.SampleGenerator.prototype = $ext
 	GetValue: function(phase) {
 		return this.Samples.get_Item(system.Convert.ToInt32_Double(phase));
 	}
-	,DiscardValues: function(generatorParams,samples,increment) {
-		var proccessed = 0;
-		while(true) {
-			var samplesAvailable = system.Convert.ToInt32_Double(Math.ceil((generatorParams.CurrentEnd - generatorParams.Phase) / increment));
-			if(samplesAvailable > samples - proccessed) {
-				this.InterpolateSilent(generatorParams,increment,proccessed,samples);
-				return;
-			} else {
-				var endProccessed = proccessed + samplesAvailable;
-				this.InterpolateSilent(generatorParams,increment,proccessed,endProccessed);
-				proccessed = endProccessed;
-				var _g = generatorParams.CurrentState;
-				switch(_g) {
-				case 0:
-					generatorParams.CurrentStart = this.LoopStartPhase;
-					generatorParams.CurrentEnd = this.LoopEndPhase;
-					generatorParams.CurrentState = 1;
-					break;
-				case 1:
-					generatorParams.Phase = generatorParams.Phase + (generatorParams.CurrentStart - generatorParams.CurrentEnd);
-					break;
-				case 2:
-					generatorParams.CurrentState = 3;
-					break;
-				default:
-				}
-			}
-			if(!(proccessed < samples)) {
-				break;
-			}
-		}
-	}
 	,GetValues: function(generatorParams,blockBuffer,increment) {
 		var proccessed = 0;
 		while(true) {
@@ -9556,17 +9525,6 @@ alphaTab.audio.synth.bank.components.generators.SampleGenerator.prototype = $ext
 			if(!(proccessed < blockBuffer.length)) {
 				break;
 			}
-		}
-	}
-	,InterpolateSilent: function(generatorParams,increment,start,end) {
-		var _end = generatorParams.CurrentState == 1 ? this.LoopEndPhase - 1 : this.EndPhase - 1;
-		while(start < end && generatorParams.Phase < _end) {
-			generatorParams.Phase = generatorParams.Phase + increment;
-			++start;
-		}
-		while(start < end) {
-			generatorParams.Phase = generatorParams.Phase + increment;
-			++start;
 		}
 	}
 	,Interpolate: function(generatorParams,blockBuffer,increment,start,end) {
@@ -10231,16 +10189,7 @@ alphaTab.audio.synth.bank.patch.Sf2Patch.prototype = $extend(alphaTab.audio.synt
 		var basePitch = pitchWithBend / voiceparams.SynthParams.Synth.SampleRate;
 		var baseVolume = voiceparams.SynthParams.Synth.MasterVolume * voiceparams.SynthParams.CurrentVolume * 0.35 * voiceparams.SynthParams.MixVolume;
 		if(isSilentProcess) {
-			var iterations = (endIndex - startIndex) / (64 * 2) | 0;
-			voiceparams.Envelopes[0].Increment(iterations * 64);
-			voiceparams.Envelopes[1].Increment(iterations * 64);
-			voiceparams.Lfos[0].Increment(iterations * 64);
-			voiceparams.Lfos[1].Increment(iterations * 64);
-			var this1 = voiceparams.VolOffset + voiceparams.Envelopes[1].Value + voiceparams.Lfos[0].Value * this.modLfoToVolume;
-			var volume = js.Boot.__cast(alphaTab.audio.synth.util.SynthHelper.DBtoLinear(this1) , Float) * baseVolume;
-			if(voiceparams.Envelopes[1].CurrentStage > 2 && volume <= 1e-5 || voiceparams.GeneratorParams[0].CurrentState == 3) {
-				voiceparams.State = 0;
-			}
+			voiceparams.State = 0;
 		} else {
 			var x = startIndex;
 			while(x < endIndex) {
@@ -10261,12 +10210,12 @@ alphaTab.audio.synth.bank.patch.Sf2Patch.prototype = $extend(alphaTab.audio.synt
 						voiceparams.Filters[0].ApplyFilter_SampleArray(voiceparams.BlockBuffer);
 					}
 				}
-				var this2 = voiceparams.VolOffset + voiceparams.Envelopes[1].Value + voiceparams.Lfos[0].Value * this.modLfoToVolume;
-				var volume1 = js.Boot.__cast(alphaTab.audio.synth.util.SynthHelper.DBtoLinear(this2) , Float) * baseVolume;
+				var this1 = voiceparams.VolOffset + voiceparams.Envelopes[1].Value + voiceparams.Lfos[0].Value * this.modLfoToVolume;
+				var volume = js.Boot.__cast(alphaTab.audio.synth.util.SynthHelper.DBtoLinear(this1) , Float) * baseVolume;
 				if(!isMuted) {
-					voiceparams.MixMonoToStereoInterp(x,volume1 * this.pan.Left * voiceparams.SynthParams.CurrentPan.Left,volume1 * this.pan.Right * voiceparams.SynthParams.CurrentPan.Right);
+					voiceparams.MixMonoToStereoInterp(x,volume * this.pan.Left * voiceparams.SynthParams.CurrentPan.Left,volume * this.pan.Right * voiceparams.SynthParams.CurrentPan.Right);
 				}
-				if(voiceparams.Envelopes[1].CurrentStage > 2 && volume1 <= 1e-5 || voiceparams.GeneratorParams[0].CurrentState == 3) {
+				if(voiceparams.Envelopes[1].CurrentStage > 2 && volume <= 1e-5 || voiceparams.GeneratorParams[0].CurrentState == 3) {
 					voiceparams.State = 0;
 					return;
 				}

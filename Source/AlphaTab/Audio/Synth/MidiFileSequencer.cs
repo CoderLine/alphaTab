@@ -97,11 +97,6 @@ namespace AlphaTab.Audio.Synth
 
         public void Seek(double timePosition)
         {
-            if (timePosition < 0)
-            {
-                timePosition = 0;
-            }
-
             // map to speed=1
             timePosition *= PlaybackSpeed;
 
@@ -116,6 +111,13 @@ namespace AlphaTab.Audio.Synth
                 {
                     timePosition = _playbackRangeEndTime;
                 }
+            }
+
+            // move back some ticks to ensure the on-time events are played
+            timePosition -= 25;
+            if (timePosition < 0)
+            {
+                timePosition = 0;
             }
 
             if (timePosition > _currentTime)

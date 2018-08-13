@@ -107,31 +107,17 @@ namespace AlphaTab.Audio.Synth.Bank.Patch
 
             if (isSilentProcess)
             {
-                //--Main Loop
-                var iterations = (endIndex - startIndex) / (SynthConstants.DefaultBlockSize * SynthConstants.AudioChannels);
-
-                voiceparams.Envelopes[0].Increment(iterations * SynthConstants.DefaultBlockSize);
-                voiceparams.Envelopes[1].Increment(iterations * SynthConstants.DefaultBlockSize);
-                voiceparams.Lfos[0].Increment(iterations * SynthConstants.DefaultBlockSize);
-                voiceparams.Lfos[1].Increment(iterations * SynthConstants.DefaultBlockSize);
-
-                //--Volume calculation
-                float volume = (float)SynthHelper.DBtoLinear(voiceparams.VolOffset + voiceparams.Envelopes[1].Value + voiceparams.Lfos[0].Value * modLfoToVolume) * baseVolume;
-                //--Check and end early if necessary
-                if ((voiceparams.Envelopes[1].CurrentStage > EnvelopeState.Hold && volume <= SynthConstants.NonAudible) || voiceparams.GeneratorParams[0].CurrentState == GeneratorState.Finished)
-                {
-                    voiceparams.State = VoiceStateEnum.Stopped;
-                }
+                voiceparams.State = VoiceStateEnum.Stopped;
             }
             else
             {
                 //--Main Loop
                 for (int x = startIndex; x < endIndex; x += SynthConstants.DefaultBlockSize * SynthConstants.AudioChannels)
                 {
-                    voiceparams.Envelopes[0].Increment( SynthConstants.DefaultBlockSize);
-                    voiceparams.Envelopes[1].Increment( SynthConstants.DefaultBlockSize);
+                    voiceparams.Envelopes[0].Increment(SynthConstants.DefaultBlockSize);
+                    voiceparams.Envelopes[1].Increment(SynthConstants.DefaultBlockSize);
                     voiceparams.Lfos[0].Increment(SynthConstants.DefaultBlockSize);
-                    voiceparams.Lfos[1].Increment( SynthConstants.DefaultBlockSize);
+                    voiceparams.Lfos[1].Increment(SynthConstants.DefaultBlockSize);
 
                     //--Calculate pitch and get next block of samples
                     gen.GetValues(voiceparams.GeneratorParams[0], voiceparams.BlockBuffer, basePitch *
@@ -167,7 +153,7 @@ namespace AlphaTab.Audio.Synth.Bank.Patch
                     }
                 }
             }
-          
+
         }
 
 
