@@ -385,75 +385,73 @@ namespace AlphaTab.Test.Importer
         protected void CheckKeySignatures(Score score)
         {
             // major - flats
-            Assert.AreEqual(0, score.MasterBars[0].KeySignature);
+            Assert.AreEqual(KeySignature.C, score.MasterBars[0].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[0].KeySignatureType);
-            Assert.AreEqual(-1, score.MasterBars[1].KeySignature);
+            Assert.AreEqual(KeySignature.F, score.MasterBars[1].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[1].KeySignatureType);
-            Assert.AreEqual(-2, score.MasterBars[2].KeySignature);
+            Assert.AreEqual(KeySignature.Bb, score.MasterBars[2].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[2].KeySignatureType);
-            Assert.AreEqual(-3, score.MasterBars[3].KeySignature);
+            Assert.AreEqual(KeySignature.Eb, score.MasterBars[3].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[3].KeySignatureType);
-            Assert.AreEqual(-4, score.MasterBars[4].KeySignature);
+            Assert.AreEqual(KeySignature.Ab, score.MasterBars[4].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[4].KeySignatureType);
-            Assert.AreEqual(-5, score.MasterBars[5].KeySignature);
+            Assert.AreEqual(KeySignature.Db, score.MasterBars[5].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[5].KeySignatureType);
-            Assert.AreEqual(-6, score.MasterBars[6].KeySignature);
+            Assert.AreEqual(KeySignature.Gb, score.MasterBars[6].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[6].KeySignatureType);
-            Assert.AreEqual(-7, score.MasterBars[7].KeySignature);
+            Assert.AreEqual(KeySignature.Cb, score.MasterBars[7].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[7].KeySignatureType);
             // major - sharps 
-            Assert.AreEqual(0, score.MasterBars[8].KeySignature);
+            Assert.AreEqual(KeySignature.C, score.MasterBars[8].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[8].KeySignatureType);
-            Assert.AreEqual(1, score.MasterBars[9].KeySignature);
+            Assert.AreEqual(KeySignature.G, score.MasterBars[9].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[9].KeySignatureType);
-            Assert.AreEqual(2, score.MasterBars[10].KeySignature);
+            Assert.AreEqual(KeySignature.D, score.MasterBars[10].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[10].KeySignatureType);
-            Assert.AreEqual(3, score.MasterBars[11].KeySignature);
+            Assert.AreEqual(KeySignature.A, score.MasterBars[11].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[11].KeySignatureType);
-            Assert.AreEqual(4, score.MasterBars[12].KeySignature);
+            Assert.AreEqual(KeySignature.E, score.MasterBars[12].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[12].KeySignatureType);
-            Assert.AreEqual(5, score.MasterBars[13].KeySignature);
+            Assert.AreEqual(KeySignature.B, score.MasterBars[13].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[13].KeySignatureType);
-            Assert.AreEqual(6, score.MasterBars[14].KeySignature);
+            Assert.AreEqual(KeySignature.FSharp, score.MasterBars[14].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[14].KeySignatureType);
-            Assert.AreEqual(7, score.MasterBars[15].KeySignature);
+            Assert.AreEqual(KeySignature.CSharp, score.MasterBars[15].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[15].KeySignatureType);
             // minor flats
-            Assert.AreEqual(0, score.MasterBars[16].KeySignature);
+            Assert.AreEqual(KeySignature.C, score.MasterBars[16].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[16].KeySignatureType);
-            Assert.AreEqual(-1, score.MasterBars[17].KeySignature);
+            Assert.AreEqual(KeySignature.F, score.MasterBars[17].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[17].KeySignatureType);
-            Assert.AreEqual(-2, score.MasterBars[18].KeySignature);
+            Assert.AreEqual(KeySignature.Bb, score.MasterBars[18].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[18].KeySignatureType);
-            Assert.AreEqual(-3, score.MasterBars[19].KeySignature);
+            Assert.AreEqual(KeySignature.Eb, score.MasterBars[19].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[19].KeySignatureType);
-            Assert.AreEqual(-4, score.MasterBars[20].KeySignature);
+            Assert.AreEqual(KeySignature.Ab, score.MasterBars[20].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[20].KeySignatureType);
-            Assert.AreEqual(-5, score.MasterBars[21].KeySignature);
+            Assert.AreEqual(KeySignature.Db, score.MasterBars[21].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[21].KeySignatureType);
-            Assert.AreEqual(-6, score.MasterBars[22].KeySignature);
+            Assert.AreEqual(KeySignature.Gb, score.MasterBars[22].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[22].KeySignatureType);
-            Assert.AreEqual(-7, score.MasterBars[23].KeySignature);
+            Assert.AreEqual(KeySignature.Cb, score.MasterBars[23].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[23].KeySignatureType);
             // minor sharps
-            Assert.AreEqual(0, score.MasterBars[24].KeySignature);
+            Assert.AreEqual(KeySignature.C, score.MasterBars[24].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[24].KeySignatureType);
-            Assert.AreEqual(1, score.MasterBars[25].KeySignature);
+            Assert.AreEqual(KeySignature.G, score.MasterBars[25].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[25].KeySignatureType);
-            Assert.AreEqual(2, score.MasterBars[26].KeySignature);
+            Assert.AreEqual(KeySignature.D, score.MasterBars[26].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[26].KeySignatureType);
-            Assert.AreEqual(3, score.MasterBars[27].KeySignature);
+            Assert.AreEqual(KeySignature.A, score.MasterBars[27].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[27].KeySignatureType);
-            Assert.AreEqual(4, score.MasterBars[28].KeySignature);
+            Assert.AreEqual(KeySignature.E, score.MasterBars[28].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[28].KeySignatureType);
-            Assert.AreEqual(5, score.MasterBars[29].KeySignature);
+            Assert.AreEqual(KeySignature.B, score.MasterBars[29].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[29].KeySignatureType);
-            Assert.AreEqual(6, score.MasterBars[30].KeySignature);
+            Assert.AreEqual(KeySignature.FSharp, score.MasterBars[30].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[30].KeySignatureType);
-            Assert.AreEqual(7, score.MasterBars[31].KeySignature);
+            Assert.AreEqual(KeySignature.CSharp, score.MasterBars[31].KeySignature);
             Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[31].KeySignatureType);
-            Assert.AreEqual(0, score.MasterBars[32].KeySignature);
-            Assert.AreEqual(KeySignatureType.Minor, score.MasterBars[32].KeySignatureType);
         }
 
         protected void CheckColors(Score score)
