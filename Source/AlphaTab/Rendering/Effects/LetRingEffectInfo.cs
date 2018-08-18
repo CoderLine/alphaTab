@@ -40,7 +40,7 @@ namespace AlphaTab.Rendering.Effects
 
         public virtual bool CanExpand(Beat from, Beat to)
         {
-            return !to.IsLetRing;
+            return true;
         }
     }
 }

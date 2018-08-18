@@ -6214,7 +6214,7 @@ alphaTab.rendering.effects.LetRingEffectInfo.prototype = {
 		return new alphaTab.rendering.glyphs.LineRangedGlyph("LetRing");
 	}
 	,CanExpand: function(from,to) {
-		return !to.IsLetRing;
+		return true;
 	}
 	,__class__: alphaTab.rendering.effects.LetRingEffectInfo
 };
@@ -10201,29 +10201,26 @@ alphaTab.audio.synth.ds.CircularSampleBuffer = $hx_exports["alphaTab"]["audio"][
 	this._buffer = null;
 	this._writePosition = 0;
 	this._readPosition = 0;
-	this._sampleCount = 0;
+	this.Count = 0;
 	var this1 = new Float32Array(size);
 	this._buffer = this1;
 	this._writePosition = 0;
 	this._readPosition = 0;
-	this._sampleCount = 0;
+	this.Count = 0;
 };
 alphaTab.audio.synth.ds.CircularSampleBuffer.__name__ = ["alphaTab","audio","synth","ds","CircularSampleBuffer"];
 alphaTab.audio.synth.ds.CircularSampleBuffer.prototype = {
-	get_Count: function() {
-		return this._sampleCount;
-	}
-	,Clear: function() {
+	Clear: function() {
 		this._readPosition = 0;
 		this._writePosition = 0;
-		this._sampleCount = 0;
+		this.Count = 0;
 		var this1 = new Float32Array(this._buffer.length);
 		this._buffer = this1;
 	}
 	,Write: function(data,offset,count) {
 		var samplesWritten = 0;
-		if(count > this._buffer.length - this._sampleCount) {
-			count = this._buffer.length - this._sampleCount;
+		if(count > this._buffer.length - this.Count) {
+			count = this._buffer.length - this.Count;
 		}
 		var writeToEnd = Math.min(this._buffer.length - this._writePosition,count);
 		var destPos = this._writePosition;
@@ -10238,12 +10235,12 @@ alphaTab.audio.synth.ds.CircularSampleBuffer.prototype = {
 			this._writePosition = this._writePosition + (count - samplesWritten);
 			samplesWritten = count;
 		}
-		this._sampleCount = this._sampleCount + samplesWritten;
+		this.Count = this.Count + samplesWritten;
 		return samplesWritten;
 	}
 	,Read: function(data,offset,count) {
-		if(count > this._sampleCount) {
-			count = this._sampleCount;
+		if(count > this.Count) {
+			count = this.Count;
 		}
 		var samplesRead = 0;
 		var readToEnd = Math.min(this._buffer.length - this._readPosition,count);
@@ -10260,7 +10257,7 @@ alphaTab.audio.synth.ds.CircularSampleBuffer.prototype = {
 			this._readPosition = this._readPosition + (count - samplesRead);
 			samplesRead = count;
 		}
-		this._sampleCount = this._sampleCount - samplesRead;
+		this.Count = this.Count - samplesRead;
 		return samplesRead;
 	}
 	,__class__: alphaTab.audio.synth.ds.CircularSampleBuffer
@@ -23226,7 +23223,7 @@ alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.prototype = {
 	}
 	,RequestBuffers: function() {
 		var count = (10 / 2 | 0) * 4096;
-		if(this._circularBuffer.get_Count() < count && this.SampleRequest != null) {
+		if(this._circularBuffer.Count < count && this.SampleRequest != null) {
 			var i = 0;
 			while(i < (10 / 2 | 0)) {
 				system._EventAction.EventAction_Impl_.Invoke(this.SampleRequest);
@@ -23238,7 +23235,7 @@ alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.prototype = {
 		var left = e.outputBuffer.getChannelData(0);
 		var right = e.outputBuffer.getChannelData(1);
 		var samples = left.length + right.length;
-		if(this._circularBuffer.get_Count() < samples) {
+		if(this._circularBuffer.Count < samples) {
 			if(this._finished) {
 				system._EventAction.EventAction_Impl_.Invoke(this.Finished);
 			}

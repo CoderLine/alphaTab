@@ -19,40 +19,56 @@ using System;
 
 namespace AlphaTab.Audio.Synth.Ds
 {
+    /// <summary>
+    /// Represents a fixed size circular sample buffer that can be written to and read from. 
+    /// </summary>
     public class CircularSampleBuffer
     {
         private SampleArray _buffer;
         private int _writePosition;
         private int _readPosition;
-        private int _sampleCount;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CircularSampleBuffer"/> class.
+        /// </summary>
+        /// <param name="size">The size.</param>
         public CircularSampleBuffer(int size)
         {
             _buffer = new SampleArray(size);
             _writePosition = 0;
             _readPosition = 0;
-            _sampleCount = 0;
+            Count = 0;
         }
 
-        public int Count
-        {
-            get { return _sampleCount; }
-        }
+        /// <summary>
+        /// Gets the number of samples written to the buffer. 
+        /// </summary>
+        public int Count { get; private set; }
 
+        /// <summary>
+        /// Clears all samples written to this buffer. 
+        /// </summary>
         public void Clear()
         {
             _readPosition = 0;
             _writePosition = 0;
-            _sampleCount = 0;
+            Count = 0;
             _buffer = new SampleArray(_buffer.Length);
         }
 
+        /// <summary>
+        /// Writes the given samples to this buffer. 
+        /// </summary>
+        /// <param name="data">The sample array to read from. </param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
         public int Write(SampleArray data, int offset, int count)
         {
             var samplesWritten = 0;
-            if (count > _buffer.Length - _sampleCount)
+            if (count > _buffer.Length - Count)
             {
-                count = _buffer.Length - _sampleCount;
+                count = _buffer.Length - Count;
             }
 
             var writeToEnd = Math.Min(_buffer.Length - _writePosition, count);
@@ -66,15 +82,15 @@ namespace AlphaTab.Audio.Synth.Ds
                 _writePosition += (count - samplesWritten);
                 samplesWritten = count;
             }
-            _sampleCount += samplesWritten;
+            Count += samplesWritten;
             return samplesWritten;
         }
 
         public int Read(SampleArray data, int offset, int count)
         {
-            if (count > _sampleCount)
+            if (count > Count)
             {
-                count = _sampleCount;
+                count = Count;
             }
             var samplesRead = 0;
             var readToEnd = Math.Min(_buffer.Length - _readPosition, count);
@@ -90,7 +106,7 @@ namespace AlphaTab.Audio.Synth.Ds
                 samplesRead = count;
             }
 
-            _sampleCount -= samplesRead;
+            Count -= samplesRead;
             return samplesRead;
         }
     }
