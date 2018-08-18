@@ -52,8 +52,8 @@ namespace AlphaTab.Samples.PngDump
             var player = new AlphaSynth(new NAudioSynthOutput());
             player.MidiLoaded += () => { Console.WriteLine("Midi loaded"); };
             player.SoundFontLoaded += () => { Console.WriteLine("SoundFont loaded"); };
-            player.MidiLoadFailed += () => { Console.WriteLine("Midi load failed"); };
-            player.SoundFontLoadFailed += () => { Console.WriteLine("SoundFont load failed"); };
+            player.MidiLoadFailed += e => { Console.WriteLine("Midi load failed"); };
+            player.SoundFontLoadFailed += e => { Console.WriteLine("SoundFont load failed"); };
             player.Finished += _ =>
             {
                 Console.WriteLine("Playback finished");

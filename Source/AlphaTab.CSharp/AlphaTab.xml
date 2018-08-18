@@ -1697,6 +1697,16 @@
             Gets or sets the bend duration in milliseconds for songbook bends. 
             </summary>
         </member>
+        <member name="P:AlphaTab.Settings.SongBook">
+            <summary>
+            Gets the default settings for the songbook display mode. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Settings.Defaults">
+            <summary>
+            Gets the default settings.
+            </summary>
+        </member>
         <member name="T:AlphaTab.AlphaTabException">
             <summary>
             The base class for all errors that can happen in alphaTab. 
@@ -4622,6 +4632,111 @@
             <param name="to">the beat which the glyph should get expanded to</param>
             <returns> true if the glyph can be expanded, false if a new glyph needs to be created.</returns>
         </member>
+        <member name="T:AlphaTab.Rendering.IScoreRenderer">
+            <summary>
+            Represents the public interface of the component that can render scores. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.IScoreRenderer.BoundsLookup">
+            <summary>
+            Gets or sets the lookup which allows fast access to beats at a given position. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Rendering.IScoreRenderer.Invalidate">
+            <summary>
+            Invalidates the drawn music sheet and initiates a redraw. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Rendering.IScoreRenderer.Resize(System.Int32)">
+            <summary>
+            Triggers a relayout to the given size including redrawing. 
+            </summary>
+            <param name="width"></param>
+        </member>
+        <member name="M:AlphaTab.Rendering.IScoreRenderer.Render(AlphaTab.Model.Score,System.Int32[])">
+            <summary>
+            Initiates the rendering of the specified tracks of the given score. 
+            </summary>
+            <param name="score">The score defining the tracks. </param>
+            <param name="trackIndexes">The indexes of the tracks to draw.</param>
+        </member>
+        <member name="E:AlphaTab.Rendering.IScoreRenderer.PreRender">
+            <summary>
+            Occurs before the rendering of the tracks starts.
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Rendering.IScoreRenderer.RenderFinished">
+            <summary>
+            Occurs after the rendering of the tracks finished. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Rendering.IScoreRenderer.PartialRenderFinished">
+            <summary>
+            Occurs whenever a part of the whole music sheet is rendered and can be displayed. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Rendering.IScoreRenderer.PostRenderFinished">
+            <summary>
+            Occurs when the whole rendering and layout process finished. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Rendering.IScoreRenderer.Error">
+            <summary>
+            Occurs whenever an error happens. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Rendering.IScoreRenderer.UpdateSettings(AlphaTab.Settings)">
+            <summary>
+            Updates the settings to the given object. 
+            </summary>
+            <param name="settings"></param>
+        </member>
+        <member name="M:AlphaTab.Rendering.IScoreRenderer.Destroy">
+            <summary>
+            Destroys the renderer. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Rendering.RenderFinishedEventArgs">
+            <summary>
+            This eventargs define the details about the rendering and layouting process and are
+            provided whenever a part of of the music sheet is rendered. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderFinishedEventArgs.Width">
+            <summary>
+            Gets or sets the width of the current rendering result. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderFinishedEventArgs.Height">
+            <summary>
+            Gets or sets the height of the current rendering result.  
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderFinishedEventArgs.TotalWidth">
+            <summary>
+            Gets or sets the currently known total width of the final music sheet. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderFinishedEventArgs.TotalHeight">
+            <summary>
+            Gets or sets the currently known total height of the final music sheet. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderFinishedEventArgs.FirstMasterBarIndex">
+            <summary>
+            Gets or sets the index of the first masterbar that was rendered in this result. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderFinishedEventArgs.LastMasterBarIndex">
+            <summary>
+            Gets or sets the index of the last masterbar that was rendered in this result. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderFinishedEventArgs.RenderResult">
+            <summary>
+            Gets or sets the render engine specific result object which contains the rendered music sheet. 
+            </summary>
+        </member>
         <member name="T:AlphaTab.Rendering.Layout.HeaderFooterElements">
             <summary>
             A list of the elements which can be shown in the header and footer 
@@ -4878,7 +4993,9 @@
             Calculates the accidental for the given note value and assignes the value to it. 
             The new accidental type is also registered within the current scope
             </summary>
-            <param name="note"></param>
+            <param name="relatedBeat"></param>
+            <param name="noteValue"></param>
+            <param name="quarterBend"></param>
             <returns></returns>
         </member>
         <member name="T:AlphaTab.Rendering.Utils.BeamBarType">
@@ -4966,7 +5083,7 @@
             Maps the given note to a normal note value to place the note at the 
             correct line on score notation
             </summary>
-            <param name="note"></param>
+            <param name="value"></param>
             <returns></returns>
         </member>
         <member name="T:AlphaTab.DisplayMode">
@@ -5014,6 +5131,56 @@
             they have only a single note on the beat.
             </summary>
         </member>
+        <member name="T:AlphaTab.VibratoPlaybackSettings">
+            <summary>
+            This object defines the details on how to generate the vibrato effects. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.VibratoPlaybackSettings.NoteWideLength">
+            <summary>
+            Gets or sets the wavelength of the note-wide vibrato in midi ticks. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.VibratoPlaybackSettings.NoteWideAmplitude">
+            <summary>
+            Gets or sets the amplitude for the note-wide vibrato in semitones. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.VibratoPlaybackSettings.NoteSlightLength">
+            <summary>
+            Gets or sets the wavelength of the note-slight vibrato in midi ticks. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.VibratoPlaybackSettings.NoteSlightAmplitude">
+            <summary>
+            Gets or sets the amplitude for the note-slight vibrato in semitones. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.VibratoPlaybackSettings.BeatWideLength">
+            <summary>
+            Gets or sets the wavelength of the beat-wide vibrato in midi ticks. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.VibratoPlaybackSettings.BeatWideAmplitude">
+            <summary>
+            Gets or sets the amplitude for the beat-wide vibrato in semitones. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.VibratoPlaybackSettings.BeatSlightLength">
+            <summary>
+            Gets or sets the wavelength of the beat-slight vibrato in midi ticks. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.VibratoPlaybackSettings.BeatSlightAmplitude">
+            <summary>
+            Gets or sets the amplitude for the beat-slight vibrato in semitones. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.LayoutSettings">
+            <summary>
+            Represents the layout specific settings. 
+            </summary>
+        </member>
         <member name="P:AlphaTab.LayoutSettings.Mode">
             <summary>
             The layouting mode used to arrange the the notation.
@@ -5043,6 +5210,16 @@
             </ul>
             </summary>
         </member>
+        <member name="M:AlphaTab.LayoutSettings.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.LayoutSettings"/> class.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.StaveSettings">
+            <summary>
+            Represents the stave specific settings. 
+            </summary>
+        </member>
         <member name="P:AlphaTab.StaveSettings.Id">
             <summary>
             The stave profile name as it is registered in <see cref="F:AlphaTab.Environment.StaveProfiles"/>
@@ -5063,9 +5240,69 @@
             </ul>
             </summary>
         </member>
+        <member name="T:AlphaTab.Util.LogLevel">
+            <summary>
+            Defines all loglevels. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Util.LogLevel.None">
+            <summary>
+            No logging
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Util.LogLevel.Debug">
+            <summary>
+            Debug level (internal details are displayed).
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Util.LogLevel.Info">
+            <summary>
+            Info level (only important details are shown)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Util.LogLevel.Warning">
+            <summary>
+            Warning level
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Util.LogLevel.Error">
+            <summary>
+            Error level.
+            </summary>
+        </member>
         <member name="T:AlphaTab.Xml.XmlParser.XmlState">
             <summary>
             faster than enum
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
             </summary>
         </member>
     </members>
