@@ -1,23 +1,30 @@
-![alphaTab](Images/banner.png?raw=true "alphaTab")alphaTab is a cross platform music notation and guitar tablature rendering library. 
+# AlphaTab
+[![Official Site](https://img.shields.io/badge/site-alphatab.net-blue.svg)](https://alphatab.net) 
+[![License LGPLv3](https://img.shields.io/badge/license-LGPLv3-green.svg)](http://www.gnu.org/licenses/lgpl-3.0.html)
+[![Twitter](https://img.shields.io/badge/twitter-alphaTabMusic-blue.svg)](https://twitter.com/alphaTabMusic)
+[![Facebook](https://img.shields.io/badge/facebook-alphaTabMusic-blue.svg)](https://facebook.com/alphaTabMusic)
 
-You can use alphaTab within your own website or application to load and display music sheets from data sources like Guitar Pro or the built in markup language named alphaTex.
+alphaTab is a cross platform music notation and guitar tablature rendering library. You can use alphaTab within your own website or application to load and display music sheets from data sources like Guitar Pro or the built in markup language named alphaTex.
 
-Website: http://www.alphatab.net 
+![alphaTab](Images/banner.png?raw=true "alphaTab")
 
-Twitter: https://twitter.com/alphaTabMusic
+## Build Status
 
-Facebook: https://facebook.com/alphaTabMusic
+&nbsp; | `master` | `develop`
+--- | --- | --- 
+**Build** | [![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/CoderLine/AlphaTab?branch=master&svg=true)](https://ci.appveyor.com/project/Danielku15/alphaTab/branch/master)  | [![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/CoderLine/AlphaTab?branch=develop&svg=true)](https://ci.appveyor.com/project/Danielku15/alphaTab/branch/develop)
+**Documentation** | [![Documentation](https://img.shields.io/badge/docs-master-brightgreen.svg)](https://docs.alphatab.net/master)  | [![Documentation](https://img.shields.io/badge/docs-develop-brightgreen.svg)](https://docs.alphatab.net/develop)
 
 # Features
 alphaTab mostly focuses on web based platforms allowing music notation to be embedded into websites and browser based apps but is designed to be used also from .net based platforms like Windows, UWP and Xamarin. 
 
 Before reading further you might simply jump to our demos: 
 
-> [Feature Demo](http://demo.alphatab.net/features.html) - *Take a look at all visual elements that alphaTab can render*
+> [Feature Demo](https://docs.alphatab.net/master/features/) - *Take a look at all visual elements that alphaTab can render*
 >
-> [Player Demo](http://demo.alphatab.net/player.html) - *By integrating alphaSynth the you get a web based music sheet player* 
+> [Player Demo](https://docs.alphatab.net/master/assets/files/player.html) - *By integrating alphaSynth the you get a web based music sheet player* 
 >
-> [alphaTex Introduction](http://demo.alphatab.net/alphatex.html) - *Learn about alphaTex, the built-in markup language for writing music notation*
+> [alphaTex Introduction](https://docs.alphatab.net/master/alphatex/) - *Learn about alphaTex, the built-in markup language for writing music notation*
 
 alphaTab can load music notation from various sources like Guitar Pro 3-5, Guitar Pro 6, AlphaTex and MusicXML (experimental) and render them into beautiful music sheets right within your browser (or application). Using [alphaSynth](http://github.com/CoderLine/alphaSynth) the music sheets can also be played in your browser without the need of any plugins (HTML5 Web Audio if available, fallback to flash) .
 
