@@ -1,5 +1,5 @@
 ---
-name: :spider: Bug report
+name: 🕷 Bug report
 about: Report a bug
 
 ---
