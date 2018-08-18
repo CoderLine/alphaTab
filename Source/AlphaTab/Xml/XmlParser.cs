@@ -25,7 +25,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Xml
 {
-    public class XmlParser
+    class XmlParser
     {
         public const int CharCodeLF = '\n';
         public const int CharCodeTab = '\t';
@@ -52,7 +52,7 @@ namespace AlphaTab.Xml
         public const int CharCodeUpperA = 'A';
         public const int CharCodeUpperZ = 'Z';
         public const int CharCode0 = '0';
-        public const int CharCode9 = '0';
+        public const int CharCode9 = '9';
         public const int CharCodeColon = ':';
         public const int CharCodeDot = '.';
         public const int CharCodeUnderscore = '_';
@@ -361,8 +361,6 @@ namespace AlphaTab.Xml
                             default:
                                 throw new XmlException("Expected >", str, p);
                         }
-                        break;
-
                     case XmlState.CLOSE:
                         // CLOSE
                         if (!IsValidChar(c))
@@ -442,8 +440,8 @@ namespace AlphaTab.Xml
                             {
                                 // #
                                 var code = s[1] == CharCodeLowerX
-                                    ? Std.ParseInt("0" + s.Substring(1, s.Length - 1))
-                                    : Std.ParseInt(s.Substring(1, s.Length - 1));
+                                    ? Platform.Platform.ParseInt("0" + s.Substring(1, s.Length - 1))
+                                    : Platform.Platform.ParseInt(s.Substring(1, s.Length - 1));
                                 buf.AppendChar(code);
                             }
                             else if (Escapes.ContainsKey(s))

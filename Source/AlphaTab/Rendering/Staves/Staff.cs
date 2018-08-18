@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,9 +27,11 @@ namespace AlphaTab.Rendering.Staves
     /// A Staff represents a single line within a StaveGroup. 
     /// It stores BarRenderer instances created from a given factory. 
     /// </summary>
-    public class Staff
+    class Staff
     {
         private readonly BarRendererFactory _factory;
+
+        private FastDictionary<string, object> _sharedLayoutData;
 
         public StaveTrackGroup StaveTrackGroup { get; set; }
         public StaveGroup StaveGroup { get; set; }
@@ -79,10 +81,26 @@ namespace AlphaTab.Rendering.Staves
             TrackIndex = trackIndex;
             ModelStaff = staff;
             _factory = factory;
-            TopSpacing = 15;
+            TopSpacing = 20;
             BottomSpacing = 5;
             StaveTop = 0;
             StaveBottom = 0;
+            _sharedLayoutData = new FastDictionary<string, object>();
+        }
+
+        public T GetSharedLayoutData<T>(string key, T def)
+        {
+            if (_sharedLayoutData.ContainsKey(key))
+            {
+                return (T)_sharedLayoutData[key];
+            }
+
+            return def;
+        }
+
+        public void SetSharedLayoutData<T>(string key, T def)
+        {
+            _sharedLayoutData[key] = def;
         }
 
         public bool IsInAccolade
@@ -135,15 +153,17 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public void RevertLastBar()
+        public BarRendererBase RevertLastBar()
         {
             var lastBar = BarRenderers[BarRenderers.Count - 1];
             BarRenderers.RemoveAt(BarRenderers.Count - 1);
             StaveGroup.Layout.UnregisterBarRenderer(StaveId, lastBar);
+            return lastBar;
         }
 
         public void ScaleToWidth(float width)
         {
+            _sharedLayoutData = new FastDictionary<string, object>();
             // Note: here we could do some "intelligent" distribution of 
             // the space over the bar renderers, for now we evenly apply the space to all bars
             var difference = width - StaveGroup.Width;
@@ -188,7 +208,7 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        public void FinalizeStave()
+        public void FinalizeStaff()
         {
             var x = 0f;
             Height = 0;

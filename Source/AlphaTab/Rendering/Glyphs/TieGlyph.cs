@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TieGlyph : Glyph
+    class TieGlyph : Glyph
     {
         protected Beat StartBeat;
         protected Beat EndBeat;
@@ -48,8 +48,8 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (EndBeat == null) return;
 
-            var startNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, StartBeat.Voice.Bar);
-            var endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar(Renderer.Staff.StaveId, EndBeat.Voice.Bar);
+            var startNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Renderer.Staff.StaveId, StartBeat.Voice.Bar);
+            var endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Renderer.Staff.StaveId, EndBeat.Voice.Bar);
 
             float startX = 0;
             float endX = 0;
@@ -151,7 +151,7 @@ namespace AlphaTab.Rendering.Glyphs
         /// <param name="y2"></param>
         /// <param name="down"></param>
         public static void PaintTie(ICanvas canvas, float scale, float x1, float y1, float x2, float y2,
-            bool down = false)
+            bool down = false, float offset = 22, float size = 4)
         {
             if (x1 == x2 && y1 == y2)
             {
@@ -171,8 +171,8 @@ namespace AlphaTab.Rendering.Glyphs
             // calculate control points 
             //
 
-            var offset = 22 * scale;
-            var size = 4 * scale;
+            offset *= scale;
+            size *= scale;
             // normal vector
             var normalVectorX = (y2 - y1);
             var normalVectorY = (x2 - x1);

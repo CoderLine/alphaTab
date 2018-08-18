@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,10 +22,11 @@ using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
 using AlphaTab.Util;
+using AlphaTab.IO;
 
 namespace AlphaTab.Importer
 {
-    public class Gp3To5Importer : ScoreImporter
+    class Gp3To5Importer : ScoreImporter
     {
         private const string VersionString = "FICHIER GUITAR PRO ";
 
@@ -57,7 +58,7 @@ namespace AlphaTab.Importer
             // triplet feel before Gp5
             if (_versionNumber < 500)
             {
-                _globalTripletFeel = ReadBool() ? TripletFeel.Triplet8th : TripletFeel.NoTripletFeel;
+                _globalTripletFeel = Data.GpReadBool() ? TripletFeel.Triplet8th : TripletFeel.NoTripletFeel;
             }
 
             // beat lyrics
@@ -80,18 +81,18 @@ namespace AlphaTab.Importer
             if (_versionNumber >= 500)
             {
                 ReadPageSetup();
-                _score.TempoLabel = ReadStringIntByte();
+                _score.TempoLabel = Data.GpReadStringIntByte();
             }
 
             // tempo stuff
-            _score.Tempo = ReadInt32();
+            _score.Tempo = Data.ReadInt32LE();
             if (_versionNumber >= 510)
             {
-                ReadBool(); // hide tempo?
+                Data.GpReadBool(); // hide tempo?
             }
             // keysignature and octave
             /* var keySignature = */
-            ReadInt32();
+            Data.ReadInt32LE();
             if (_versionNumber >= 400)
             {
                 /* octave = */
@@ -128,14 +129,14 @@ namespace AlphaTab.Importer
             }
 
             // contents
-            _barCount = ReadInt32();
-            _trackCount = ReadInt32();
+            _barCount = Data.ReadInt32LE();
+            _trackCount = Data.ReadInt32LE();
 
             ReadMasterBars();
             ReadTracks();
             ReadBars();
 
-            _score.Finish();
+            _score.Finish(Settings);
             if (_lyrics != null && _lyricsTrack >= 0)
             {
                 _score.Tracks[_lyricsTrack].ApplyLyrics(_lyrics);
@@ -146,7 +147,7 @@ namespace AlphaTab.Importer
 
         public void ReadVersion()
         {
-            string version = ReadStringByteLength(30);
+            string version = Data.GpReadStringByteLength(30);
             if (!version.StartsWith("FICHIER GUITAR PRO "))
             {
                 throw new UnsupportedFormatException();
@@ -155,30 +156,30 @@ namespace AlphaTab.Importer
             version = version.Substring(VersionString.Length + 1);
             int dot = version.IndexOf('.');
 
-            _versionNumber = (100 * Std.ParseInt(version.Substring(0, dot))) + Std.ParseInt(version.Substring(dot + 1));
+            _versionNumber = (100 * Platform.Platform.ParseInt(version.Substring(0, dot))) + Platform.Platform.ParseInt(version.Substring(dot + 1));
 
             Logger.Info(Name, "Guitar Pro version " + version + " detected");
         }
 
         public void ReadScoreInformation()
         {
-            _score.Title = ReadStringIntUnused();
-            _score.SubTitle = ReadStringIntUnused();
-            _score.Artist = ReadStringIntUnused();
-            _score.Album = ReadStringIntUnused();
-            _score.Words = ReadStringIntUnused();
+            _score.Title = Data.GpReadStringIntUnused();
+            _score.SubTitle = Data.GpReadStringIntUnused();
+            _score.Artist = Data.GpReadStringIntUnused();
+            _score.Album = Data.GpReadStringIntUnused();
+            _score.Words = Data.GpReadStringIntUnused();
 
-            _score.Music = (_versionNumber >= 500) ? ReadStringIntUnused() : _score.Words;
+            _score.Music = (_versionNumber >= 500) ? Data.GpReadStringIntUnused() : _score.Words;
 
-            _score.Copyright = ReadStringIntUnused();
-            _score.Tab = ReadStringIntUnused();
-            _score.Instructions = ReadStringIntUnused();
-            int noticeLines = ReadInt32();
+            _score.Copyright = Data.GpReadStringIntUnused();
+            _score.Tab = Data.GpReadStringIntUnused();
+            _score.Instructions = Data.GpReadStringIntUnused();
+            int noticeLines = Data.ReadInt32LE();
             var notice = new StringBuilder();
             for (int i = 0; i < noticeLines; i++)
             {
                 if (i > 0) notice.AppendLine();
-                notice.Append(ReadStringIntUnused());
+                notice.Append(Data.GpReadStringIntUnused());
             }
             _score.Notices = notice.ToString();
         }
@@ -187,12 +188,12 @@ namespace AlphaTab.Importer
         {
             _lyrics = new FastList<Lyrics>();
 
-            _lyricsTrack = ReadInt32() - 1;
+            _lyricsTrack = Data.ReadInt32LE() - 1;
             for (int i = 0; i < 5; i++)
             {
                 var lyrics = new Lyrics();
-                lyrics.StartBar = ReadInt32() - 1;
-                lyrics.Text = ReadStringInt();
+                lyrics.StartBar = Data.ReadInt32LE() - 1;
+                lyrics.Text = Data.GpReadStringInt();
                 _lyrics.Add(lyrics);
             }
         }
@@ -219,7 +220,7 @@ namespace AlphaTab.Importer
             // pagpublic enumber format
             for (int i = 0; i < 10; i++)
             {
-                ReadStringIntByte();
+                Data.GpReadStringIntByte();
             }
         }
 
@@ -231,7 +232,7 @@ namespace AlphaTab.Importer
                 PlaybackInformation info = new PlaybackInformation();
                 info.PrimaryChannel = i;
                 info.SecondaryChannel = i;
-                info.Program = ReadInt32();
+                info.Program = Data.ReadInt32LE();
 
                 info.Volume = Data.ReadByte();
                 info.Balance = Data.ReadByte();
@@ -333,9 +334,9 @@ namespace AlphaTab.Importer
             if ((flags & 0x20) != 0)
             {
                 Section section = new Section();
-                section.Text = ReadStringIntByte();
+                section.Text = Data.GpReadStringIntByte();
                 section.Marker = "";
-                ReadColor();
+                Data.GpReadColor();
                 newMasterBar.Section = section;
             }
 
@@ -400,26 +401,30 @@ namespace AlphaTab.Importer
             var newTrack = new Track(1);
             _score.AddTrack(newTrack);
 
+            var mainStaff = newTrack.Staves[0];
 
             var flags = Data.ReadByte();
-            newTrack.Name = ReadStringByteLength(40);
-            newTrack.IsPercussion = (flags & 0x01) != 0;
+            newTrack.Name = Data.GpReadStringByteLength(40);
+            if ((flags & 0x01) != 0)
+            {
+                mainStaff.StaffKind = StaffKind.Percussion;
+            }
 
-            var stringCount = ReadInt32();
+            var stringCount = Data.ReadInt32LE();
             var tuning = new FastList<int>();
             for (int i = 0; i < 7; i++)
             {
-                var stringTuning = ReadInt32();
+                var stringTuning = Data.ReadInt32LE();
                 if (stringCount > i)
                 {
                     tuning.Add(stringTuning);
                 }
             }
-            newTrack.Tuning = tuning.ToArray();
+            mainStaff.Tuning = tuning.ToArray();
 
-            var port = ReadInt32();
-            var index = ReadInt32() - 1;
-            var effectChannel = ReadInt32() - 1;
+            var port = Data.ReadInt32LE();
+            var index = Data.ReadInt32LE() - 1;
+            var effectChannel = Data.ReadInt32LE() - 1;
             Data.Skip(4); // Fretcount
             if (index >= 0 && index < _playbackInfos.Count)
             {
@@ -431,14 +436,14 @@ namespace AlphaTab.Importer
 
                 if (GeneralMidi.IsGuitar(info.Program))
                 {
-                    newTrack.DisplayTranspositionPitch = -12;
+                    mainStaff.DisplayTranspositionPitch = -12;
                 }
 
                 newTrack.PlaybackInfo = info;
             }
 
-            newTrack.Capo = ReadInt32();
-            newTrack.Color = ReadColor();
+            mainStaff.Capo = Data.ReadInt32LE();
+            newTrack.Color = Data.GpReadColor();
 
             if (_versionNumber >= 500)
             {
@@ -459,8 +464,8 @@ namespace AlphaTab.Importer
             if (_versionNumber >= 510)
             {
                 Data.Skip(4);
-                ReadStringIntByte();
-                ReadStringIntByte();
+                Data.GpReadStringIntByte();
+                Data.GpReadStringIntByte();
             }
         }
 
@@ -478,11 +483,14 @@ namespace AlphaTab.Importer
         public void ReadBar(Track track)
         {
             var newBar = new Bar();
-            if (track.IsPercussion)
+            var mainStaff = track.Staves[0];
+
+            if (mainStaff.StaffKind == StaffKind.Percussion)
             {
                 newBar.Clef = Clef.Neutral;
             }
-            track.AddBarToStaff(0, newBar);
+
+            mainStaff.AddBar(newBar);
 
             var voiceCount = 1;
             if (_versionNumber >= 500)
@@ -499,7 +507,7 @@ namespace AlphaTab.Importer
 
         public void ReadVoice(Track track, Bar bar)
         {
-            var beatCount = ReadInt32();
+            var beatCount = Data.ReadInt32LE();
             if (beatCount == 0)
             {
                 return;
@@ -562,7 +570,7 @@ namespace AlphaTab.Importer
 
             if ((flags & 0x20) != 0)
             {
-                newBeat.TupletNumerator = ReadInt32();
+                newBeat.TupletNumerator = Data.ReadInt32LE();
                 switch (newBeat.TupletNumerator)
                 {
                     case 1:
@@ -601,7 +609,7 @@ namespace AlphaTab.Importer
 
             if ((flags & 0x04) != 0)
             {
-                newBeat.Text = ReadStringIntUnused();
+                newBeat.Text = Data.GpReadStringIntUnused();
             }
 
             if ((flags & 0x08) != 0)
@@ -617,7 +625,7 @@ namespace AlphaTab.Importer
             var stringFlags = Data.ReadByte();
             for (int i = 6; i >= 0; i--)
             {
-                if ((stringFlags & (1 << i)) != 0 && (6 - i) < track.Tuning.Length)
+                if ((stringFlags & (1 << i)) != 0 && (6 - i) < bar.Staff.Tuning.Length)
                 {
                     ReadNote(track, bar, voice, newBeat, (6 - i));
                 }
@@ -637,17 +645,17 @@ namespace AlphaTab.Importer
         public void ReadChord(Beat beat)
         {
             var chord = new Chord();
-            var chordId = Std.NewGuid();
+            var chordId = Platform.Platform.NewGuid();
             if (_versionNumber >= 500)
             {
                 Data.Skip(17);
-                chord.Name = ReadStringByteLength(21);
+                chord.Name = Data.GpReadStringByteLength(21);
                 Data.Skip(4);
-                chord.FirstFret = ReadInt32();
+                chord.FirstFret = Data.ReadInt32LE();
                 for (int i = 0; i < 7; i++)
                 {
-                    var fret = ReadInt32();
-                    if (i < beat.Voice.Bar.Staff.Track.Tuning.Length)
+                    var fret = Data.ReadInt32LE();
+                    if (i < beat.Voice.Bar.Staff.Tuning.Length)
                     {
                         chord.Strings.Add(fret);
                     }
@@ -679,17 +687,17 @@ namespace AlphaTab.Importer
                         // Diminished/Augmented (4)
                         // Add (1)
                         Data.Skip(16);
-                        chord.Name = (ReadStringByteLength(21));
+                        chord.Name = (Data.GpReadStringByteLength(21));
                         // Unused (2)
                         // Fifth (1)
                         // Ninth (1)
                         // Eleventh (1)
                         Data.Skip(4);
-                        chord.FirstFret = (ReadInt32());
+                        chord.FirstFret = (Data.ReadInt32LE());
                         for (int i = 0; i < 7; i++)
                         {
-                            var fret = ReadInt32();
-                            if (i < beat.Voice.Bar.Staff.Track.Tuning.Length)
+                            var fret = Data.ReadInt32LE();
+                            if (i < beat.Voice.Bar.Staff.Tuning.Length)
                             {
                                 chord.Strings.Add(fret);
                             }
@@ -715,12 +723,12 @@ namespace AlphaTab.Importer
                     {
                         // unknown
                         Data.Skip(25);
-                        chord.Name = ReadStringByteLength(34);
-                        chord.FirstFret = ReadInt32();
+                        chord.Name = Data.GpReadStringByteLength(34);
+                        chord.FirstFret = Data.ReadInt32LE();
                         for (int i = 0; i < 6; i++)
                         {
-                            var fret = ReadInt32();
-                            if (i < beat.Voice.Bar.Staff.Track.Tuning.Length)
+                            var fret = Data.ReadInt32LE();
+                            if (i < beat.Voice.Bar.Staff.Tuning.Length)
                             {
                                 chord.Strings.Add(fret);
                             }
@@ -733,14 +741,14 @@ namespace AlphaTab.Importer
                 {
                     int strings = _versionNumber >= 406 ? 7 : 6;
 
-                    chord.Name = ReadStringIntByte();
-                    chord.FirstFret = ReadInt32();
+                    chord.Name = Data.GpReadStringIntByte();
+                    chord.FirstFret = Data.ReadInt32LE();
                     if (chord.FirstFret > 0)
                     {
                         for (int i = 0; i < strings; i++)
                         {
-                            var fret = ReadInt32();
-                            if (i < beat.Voice.Bar.Staff.Track.Tuning.Length)
+                            var fret = Data.ReadInt32LE();
+                            if (i < beat.Voice.Bar.Staff.Tuning.Length)
                             {
                                 chord.Strings.Add(fret);
                             }
@@ -753,7 +761,7 @@ namespace AlphaTab.Importer
             if (!string.IsNullOrEmpty(chord.Name))
             {
                 beat.ChordId = chordId;
-                beat.Voice.Bar.Staff.Track.Chords[beat.ChordId] = chord;
+                beat.Voice.Bar.Staff.Chords[beat.ChordId] = chord;
             }
         }
 
@@ -860,16 +868,16 @@ namespace AlphaTab.Importer
         public void ReadTremoloBarEffect(Beat beat)
         {
             Data.ReadByte(); // type
-            ReadInt32(); // value
-            var pointCount = ReadInt32();
+            Data.ReadInt32LE(); // value
+            var pointCount = Data.ReadInt32LE();
             if (pointCount > 0)
             {
                 for (int i = 0; i < pointCount; i++)
                 {
                     var point = new BendPoint();
-                    point.Offset = ReadInt32(); // 0...60
-                    point.Value = ReadInt32() / BendStep; // 0..12 (amount of quarters)
-                    ReadBool(); // vibrato
+                    point.Offset = Data.ReadInt32LE(); // 0...60
+                    point.Value = Data.ReadInt32LE() / BendStep; // 0..12 (amount of quarters)
+                    Data.GpReadBool(); // vibrato
                     beat.AddWhammyBarPoint(point);
                 }
             }
@@ -912,9 +920,9 @@ namespace AlphaTab.Importer
             var tremolo = Data.ReadSignedByte();
             if (_versionNumber >= 500)
             {
-                tableChange.TempoName = ReadStringIntByte();
+                tableChange.TempoName = Data.GpReadStringIntByte();
             }
-            tableChange.Tempo = ReadInt32();
+            tableChange.Tempo = Data.ReadInt32LE();
 
             // durations
             if (tableChange.Volume >= 0)
@@ -969,8 +977,8 @@ namespace AlphaTab.Importer
             // unknown
             if (_versionNumber >= 510)
             {
-                ReadStringIntByte();
-                ReadStringIntByte();
+                Data.GpReadStringIntByte();
+                Data.GpReadStringIntByte();
             }
 
             if (tableChange.Volume >= 0)
@@ -1015,7 +1023,7 @@ namespace AlphaTab.Importer
         public void ReadNote(Track track, Bar bar, Voice voice, Beat beat, int stringIndex)
         {
             var newNote = new Note();
-            newNote.String = track.Tuning.Length - stringIndex;
+            newNote.String = bar.Staff.Tuning.Length - stringIndex;
 
             var flags = Data.ReadByte();
             if ((flags & 0x02) != 0)
@@ -1070,7 +1078,7 @@ namespace AlphaTab.Importer
             {
                 if ((flags & 0x01) != 0)
                 {
-                    newNote.DurationPercent = ReadDouble();
+                    newNote.DurationPercent = Data.GpReadDouble();
                 }
                 var flags2 = Data.ReadByte();
                 newNote.AccidentalMode = (flags2 & 0x02) != 0
@@ -1182,16 +1190,16 @@ namespace AlphaTab.Importer
         public void ReadBend(Note note)
         {
             Data.ReadByte(); // type
-            ReadInt32(); // value
-            var pointCount = ReadInt32();
+            Data.ReadInt32LE(); // value
+            var pointCount = Data.ReadInt32LE();
             if (pointCount > 0)
             {
                 for (int i = 0; i < pointCount; i++)
                 {
                     var point = new BendPoint();
-                    point.Offset = ReadInt32(); // 0...60
-                    point.Value = ReadInt32() / BendStep; // 0..12 (amount of quarters)
-                    ReadBool(); // vibrato
+                    point.Offset = Data.ReadInt32LE(); // 0...60
+                    point.Value = Data.ReadInt32LE() / BendStep; // 0..12 (amount of quarters)
+                    Data.GpReadBool(); // vibrato
                     note.AddBendPoint(point);
                 }
             }
@@ -1428,103 +1436,5 @@ namespace AlphaTab.Importer
             }
         }
 
-        // TODO: use native features to convert byte array to double
-        public double ReadDouble()
-        {
-            var bytes = new byte[8];
-            Data.Read(bytes, 0, bytes.Length);
-
-            var sign = 1 - ((bytes[0] >> 7) << 1); // sign = bit 0
-            var exp = (((bytes[0] << 4) & 0x7FF) | (bytes[1] >> 4)) - 1023; // exponent = bits 1..11
-            var sig = GetDoubleSig(bytes);
-            if (sig == 0 && exp == -1023)
-                return 0.0;
-            return sign * (1.0 + Math.Pow(2, -52) * sig) * Math.Pow(2, exp);
-        }
-
-        public int GetDoubleSig(byte[] bytes)
-        {
-            return (int)((((bytes[1] & 0xF) << 16) | (bytes[2] << 8) | bytes[3]) * 4294967296.0 +
-                   (bytes[4] >> 7) * 2147483648 +
-                   (((bytes[4] & 0x7F) << 24) | (bytes[5] << 16) | (bytes[6] << 8) | bytes[7]));
-        }
-
-        public Color ReadColor()
-        {
-            byte r = (byte)Data.ReadByte();
-            byte g = (byte)Data.ReadByte();
-            byte b = (byte)Data.ReadByte();
-            Data.Skip(1); // alpha?
-            return new Color(r, g, b);
-        }
-
-
-        public bool ReadBool()
-        {
-            return Data.ReadByte() != 0;
-        }
-
-        public int ReadInt32()
-        {
-            var bytes = new byte[4];
-            Data.Read(bytes, 0, 4);
-            return bytes[0] | bytes[1] << 8 | bytes[2] << 16 | bytes[3] << 24;
-        }
-
-        /// <summary>
-        ///  Skips an integer (4byte) and reads a string using 
-        ///  a bytesize
-        /// </summary>
-        /// <returns></returns>
-        public string ReadStringIntUnused()
-        {
-            Data.Skip(4);
-            return ReadString(Data.ReadByte());
-        }
-
-        /// <summary>
-        /// Reads an integer as size, and then the string itself
-        /// </summary>
-        /// <returns></returns>
-        public string ReadStringInt()
-        {
-            return ReadString(ReadInt32());
-        }
-
-        /// <summary>
-        /// Reads an integer as size, skips a byte and reads the string itself
-        /// </summary>
-        /// <returns></returns>
-        public string ReadStringIntByte()
-        {
-            var length = ReadInt32() - 1;
-            Data.ReadByte();
-            return ReadString(length);
-        }
-
-
-        public string ReadString(int length)
-        {
-            byte[] b = new byte[length];
-            Data.Read(b, 0, b.Length);
-            return Std.ToString(b);
-        }
-
-        /// <summary>
-        /// Reads a byte as size and the string itself.
-        /// Additionally it is ensured the specified amount of bytes is read. 
-        /// </summary>
-        /// <param name="length">the amount of bytes to read</param>
-        /// <returns></returns>
-        public string ReadStringByteLength(int length)
-        {
-            var stringLength = Data.ReadByte();
-            var s = ReadString(stringLength);
-            if (stringLength < length)
-            {
-                Data.Skip(length - stringLength);
-            }
-            return s;
-        }
     }
 }

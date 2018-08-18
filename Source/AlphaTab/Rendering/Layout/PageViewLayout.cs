@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ namespace AlphaTab.Rendering.Layout
     /// <summary>
     /// This layout arranges the bars into a fixed width and dynamic height region. 
     /// </summary>
-    public class PageViewLayout : ScoreLayout
+    class PageViewLayout : ScoreLayout
     {
         // left top right bottom
         public static readonly float[] PagePadding = { 40, 40, 40, 40 };
@@ -37,18 +37,42 @@ namespace AlphaTab.Rendering.Layout
 
         private FastList<StaveGroup> _groups;
         private FastList<MasterBarsRenderers> _allMasterBarRenderers;
-        private MasterBarsRenderers _barsFromPreviousGroup;
+        private FastList<MasterBarsRenderers> _barsFromPreviousGroup;
+        private float[] _pagePadding;
 
         public override string Name { get { return "PageView"; } }
         public PageViewLayout(ScoreRenderer renderer)
             : base(renderer)
         {
+            _barsFromPreviousGroup = new FastList<MasterBarsRenderers>();
         }
 
         protected override void DoLayoutAndRender()
         {
-            var x = PagePadding[0];
-            var y = PagePadding[1];
+            _pagePadding = Renderer.Settings.Layout.Get("padding", PagePadding);
+            if (_pagePadding.Length == 1)
+            {
+                _pagePadding = new[]
+                {
+                    _pagePadding[0],
+                    _pagePadding[0],
+                    _pagePadding[0],
+                    _pagePadding[0]
+                };
+            }
+            else if (_pagePadding.Length == 2)
+            {
+                _pagePadding = new[]
+                {
+                    _pagePadding[0],
+                    _pagePadding[1],
+                    _pagePadding[0],
+                    _pagePadding[1]
+                };
+            }
+
+            var x = _pagePadding[0];
+            var y = _pagePadding[1];
             Width = Renderer.Settings.Width;
             _allMasterBarRenderers = new FastList<MasterBarsRenderers>();
 
@@ -60,7 +84,7 @@ namespace AlphaTab.Rendering.Layout
             // 2. One result per StaveGroup
             y = LayoutAndRenderScore(x, y);
 
-            Height = y + PagePadding[3];
+            Height = y + _pagePadding[3];
         }
 
         public override bool SupportsResize
@@ -70,8 +94,8 @@ namespace AlphaTab.Rendering.Layout
 
         public override void Resize()
         {
-            var x = PagePadding[0];
-            var y = PagePadding[1];
+            var x = _pagePadding[0];
+            var y = _pagePadding[1];
             Width = Renderer.Settings.Width;
             var oldHeight = Height;
 
@@ -83,12 +107,12 @@ namespace AlphaTab.Rendering.Layout
             // 2. One result per StaveGroup
             y = ResizeAndRenderScore(x, y, oldHeight);
 
-            Height = y + PagePadding[3];
+            Height = y + _pagePadding[3];
         }
 
         private float LayoutAndRenderScoreInfo(float x, float y, float totalHeight = -1)
         {
-            Logger.Info(Name, "Layouting score info");
+            Logger.Debug(Name, "Layouting score info");
 
             var scale = Scale;
             var res = Renderer.RenderingResources;
@@ -116,7 +140,7 @@ namespace AlphaTab.Rendering.Layout
             if (ScoreInfoGlyphs.ContainsKey(HeaderFooterElements.Music))
             {
                 var glyph = ScoreInfoGlyphs[HeaderFooterElements.Music];
-                glyph.X = Width - PagePadding[2];
+                glyph.X = Width - _pagePadding[2];
                 glyph.Y = y;
                 glyph.TextAlign = TextAlign.Right;
                 musicOrWords = true;
@@ -219,9 +243,17 @@ namespace AlphaTab.Rendering.Layout
                     }
                     else
                     {
+                        // if we cannot wrap on the current bar, we remove the last bar
+                        // (this might even remove multiple ones until we reach a bar that can wrap);
+                        while (renderers != null && !renderers.CanWrap && group.MasterBarsRenderers.Count > 1)
+                        {
+                            renderers = group.RevertLastBar();
+                            currentIndex--;
+                        }
+
                         // in case we do not have space, we create a new group
                         group.IsFull = true;
-                        group.IsLast = false;
+                        group.IsLast = LastBarIndex == group.LastBarIndex;
                         _groups.Add(group);
                         FitGroup(group);
                         group.FinalizeGroup();
@@ -234,6 +266,7 @@ namespace AlphaTab.Rendering.Layout
                         group.Y = y;
                     }
                 }
+                group.IsLast = LastBarIndex == group.LastBarIndex;
 
                 // don't forget to finish the last group
                 FitGroup(group);
@@ -246,18 +279,12 @@ namespace AlphaTab.Rendering.Layout
 
         private float LayoutAndRenderScore(float x, float y)
         {
-            var score = Renderer.Score;
             var canvas = Renderer.Canvas;
 
-            var startIndex = Renderer.Settings.Layout.Get("start", 1);
-            startIndex--; // map to array index
-            startIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, startIndex));
+            var startIndex = FirstBarIndex;
             var currentBarIndex = startIndex;
 
-            var endBarIndex = Renderer.Settings.Layout.Get("count", score.MasterBars.Count);
-            if (endBarIndex < 0) endBarIndex = score.MasterBars.Count;
-            endBarIndex = startIndex + endBarIndex - 1; // map count to array index
-            endBarIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, endBarIndex));
+            var endBarIndex = LastBarIndex;
 
             _groups = new FastList<StaveGroup>();
             while (currentBarIndex <= endBarIndex)
@@ -334,17 +361,20 @@ namespace AlphaTab.Rendering.Layout
             var end = endIndex + 1;
             for (int i = currentBarIndex; i < end; i++)
             {
-                MasterBarsRenderers renderers;
-                if (_barsFromPreviousGroup != null && _barsFromPreviousGroup.MasterBar.Index == i)
+                if (_barsFromPreviousGroup.Count > 0)
                 {
-                    renderers = group.AddMasterBarRenderers(Renderer.Tracks, _barsFromPreviousGroup);
+                    foreach (var renderer in _barsFromPreviousGroup)
+                    {
+                        group.AddMasterBarRenderers(Renderer.Tracks, renderer);
+                        i = renderer.MasterBar.Index;
+                    }
                 }
                 else
                 {
-                    renderers = group.AddBars(Renderer.Tracks, i);
+                    var renderers = group.AddBars(Renderer.Tracks, i);
                     _allMasterBarRenderers.Add(renderers);
                 }
-                _barsFromPreviousGroup = null;
+                _barsFromPreviousGroup = new FastList<MasterBarsRenderers>();
 
                 var groupIsFull = false;
 
@@ -360,10 +390,22 @@ namespace AlphaTab.Rendering.Layout
 
                 if (groupIsFull)
                 {
-                    group.RevertLastBar();
+                    MasterBarsRenderers reverted = group.RevertLastBar();
+                    if (reverted != null)
+                    {
+                        _barsFromPreviousGroup.Add(reverted);
+
+                        while (reverted != null && !reverted.CanWrap && group.MasterBarsRenderers.Count > 1)
+                        {
+                            reverted = group.RevertLastBar();
+                            _barsFromPreviousGroup.Add(reverted);
+                        }
+                    }
+                   
                     group.IsFull = true;
                     group.IsLast = false;
-                    _barsFromPreviousGroup = renderers;
+
+                    _barsFromPreviousGroup.Reverse();
                     return group;
                 }
 
@@ -378,7 +420,7 @@ namespace AlphaTab.Rendering.Layout
         {
             get
             {
-                return Renderer.Settings.Width - PagePadding[0] - PagePadding[2];
+                return Renderer.Settings.Width - _pagePadding[0] - _pagePadding[2];
             }
         }
     }

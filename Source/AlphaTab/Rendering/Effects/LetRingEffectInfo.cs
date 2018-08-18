@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,24 +20,27 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class LetRingEffectInfo : NoteEffectInfoBase
+    class LetRingEffectInfo : IEffectBarRendererInfo
     {
-        public override string EffectId { get { return "let-ring"; } }
-        public override bool CanShareBand { get { return false; } }
+        public string EffectId => "let-ring";
+        public bool CanShareBand => false;
+        public virtual bool HideOnMultiTrack => false;
 
-        protected override bool ShouldCreateGlyphForNote(Note note)
+        public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
-            return note.IsLetRing;
+            return beat.IsLetRing;
         }
 
-        public override EffectBarGlyphSizing SizingMode
-        {
-            get { return EffectBarGlyphSizing.GroupedOnBeat; }
-        }
+        public EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.GroupedOnBeat;
 
-        public override EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
+        public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
             return new LineRangedGlyph("LetRing");
+        }
+
+        public virtual bool CanExpand(Beat from, Beat to)
+        {
+            return !to.IsLetRing || !to.IsNewLetRing;
         }
     }
 }

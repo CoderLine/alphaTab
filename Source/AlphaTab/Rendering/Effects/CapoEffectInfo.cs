@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,21 +20,21 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class CapoEffectInfo : IEffectBarRendererInfo
+    class CapoEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "capo"; } }
         public bool HideOnMultiTrack { get { return false; } }
         public bool CanShareBand { get { return false; } }
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
 
-        public bool ShouldCreateGlyph(Beat beat)
+        public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
-            return beat.Index == 0 && beat.Voice.Bar.Index == 0 && beat.Voice.Bar.Staff.Track.Capo != 0;
+            return beat.Index == 0 && beat.Voice.Bar.Index == 0 && beat.Voice.Bar.Staff.Capo != 0;
         }
 
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
-            return new TextGlyph(0,0, "Capo. fret " + beat.Voice.Bar.Staff.Track.Capo, renderer.Resources.EffectFont);
+            return new TextGlyph(0,0, "Capo. fret " + beat.Voice.Bar.Staff.Capo, renderer.Resources.EffectFont);
         }
 
         public bool CanExpand(Beat from, Beat to)

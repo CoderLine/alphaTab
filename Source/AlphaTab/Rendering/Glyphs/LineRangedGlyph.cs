@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,22 +21,27 @@ using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class LineRangedGlyph : GroupedEffectGlyph
+    class LineRangedGlyph : GroupedEffectGlyph
     {
-        private const float LineSpacing = 3;
-        private const float LineTopPadding = 8;
-        private const float LineTopOffset = 6;
-        private const float LineSize = 8;
+        public const float LineSpacing = 3;
+        public const float LineTopPadding = 4;
+        public const float LineTopOffset = 5;
+        public const float LineSize = 8;
         private readonly string _label;
 
         public LineRangedGlyph(string label)
-            : base(BeatXPosition.PostNotes)
+            : base(BeatXPosition.OnNotes)
         {
             _label = label;
         }
 
         public override void DoLayout()
         {
+            if (Renderer.Settings.ExtendLineEffectsToBeatEnd)
+            {
+                EndPosition = BeatXPosition.EndBeat;
+                ForceGroupedRendering = true;
+            }
             base.DoLayout();
             Height = Renderer.Resources.EffectFont.Size;
         }
@@ -45,8 +50,10 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var res = Renderer.Resources;
             canvas.Font = res.EffectFont;
-            canvas.TextAlign = TextAlign.Left;
+            var x = canvas.TextAlign;
+            canvas.TextAlign = TextAlign.Center;
             canvas.FillText(_label, cx + X, cy + Y);
+            canvas.TextAlign = x;
         }
 
         protected override void PaintGrouped(float cx, float cy, float endX, ICanvas canvas)
@@ -55,7 +62,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             var lineSpacing = LineSpacing * Scale;
             var textWidth = canvas.MeasureText(_label);
-            var startX = cx + X + textWidth + lineSpacing;
+            var startX = cx + X + textWidth/2f + lineSpacing;
             var lineY = cy + Y + (LineTopPadding * Scale);
             var lineSize = LineSize * Scale;
 

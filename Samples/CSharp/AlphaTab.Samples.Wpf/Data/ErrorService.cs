@@ -21,7 +21,7 @@ using System.Windows;
 using AlphaTab.Samples.Wpf.ViewModel;
 
 namespace AlphaTab.Samples.Wpf.Data
-{ 
+{
     /// <summary>
     /// This error service implementation shows errors as messageboxes on the main window
     /// </summary>

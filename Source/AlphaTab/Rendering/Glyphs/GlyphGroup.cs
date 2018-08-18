@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@ namespace AlphaTab.Rendering.Glyphs
     /// This glyph allows to group several other glyphs to be
     /// drawn at the same x position
     /// </summary>
-    public class GlyphGroup : Glyph
+    class GlyphGroup : Glyph
     {
         protected FastList<Glyph> Glyphs;
 

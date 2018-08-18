@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,7 @@ using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Layout;
 using AlphaTab.Rendering.Staves;
 using AlphaTab.Rendering.Utils;
+using AlphaTab.Util;
 using Staff = AlphaTab.Rendering.Staves.Staff;
 
 namespace AlphaTab.Rendering
@@ -32,7 +33,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This is the base public class for creating blocks which can render bars.
     /// </summary>
-    public class BarRendererBase
+    class BarRendererBase
     {
         private LeftToRightLayoutingGlyphGroup _preBeatGlyphs;
         private FastDictionary<int, VoiceContainerGlyph> _voiceContainers;
@@ -46,7 +47,7 @@ namespace AlphaTab.Rendering
                 {
                     return null;
                 }
-                return ScoreRenderer.Layout.GetRendererForBar(Staff.StaveId, Bar.NextBar);
+                return ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Staff.StaveId, Bar.NextBar);
             }
         }
 
@@ -58,7 +59,7 @@ namespace AlphaTab.Rendering
                 {
                     return null;
                 }
-                return ScoreRenderer.Layout.GetRendererForBar(Staff.StaveId, Bar.PreviousBar);
+                return ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Staff.StaveId, Bar.PreviousBar);
             }
         }
 
@@ -81,11 +82,19 @@ namespace AlphaTab.Rendering
         /// </summary>
         public bool IsLinkedToPrevious { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether this renderer can wrap to the next line
+        /// or it needs to stay connected to the previous one. 
+        /// (e.g. when having double bar repeats we must not separate the 2 bars)
+        /// </summary>
+        public bool CanWrap { get; set; }
+
         public BarRendererBase(ScoreRenderer renderer, Bar bar)
         {
             Bar = bar;
             ScoreRenderer = renderer;
             Helpers = new BarHelpers(bar);
+            CanWrap = true;
         }
 
         public void RegisterOverflowTop(float topOverflow)
@@ -158,7 +167,7 @@ namespace AlphaTab.Rendering
         {
             get
             {
-                return Staff.StaveGroup.IsLast && Index == Staff.BarRenderers.Count - 1;
+                return Bar.Index == ScoreRenderer.Layout.LastBarIndex;
             }
         }
 
@@ -214,10 +223,10 @@ namespace AlphaTab.Rendering
             }
 
             // on the post glyphs we add the spacing before all other glyphs
-            _postBeatGlyphs.X = voiceEnd;
+            _postBeatGlyphs.X = (float)Math.Floor(voiceEnd);
             _postBeatGlyphs.Width = LayoutingInfo.PostBeatSize;
 
-            Width = _postBeatGlyphs.X + _postBeatGlyphs.Width;
+            Width = (float)Math.Ceiling(_postBeatGlyphs.X + _postBeatGlyphs.Width);
             return true;
         }
 
@@ -266,6 +275,11 @@ namespace AlphaTab.Rendering
                 }
             }
 
+            if (Bar.SimileMark == SimileMark.SecondOfDouble)
+            {
+                CanWrap = false;
+            }
+
             CreatePreBeatGlyphs();
             CreateBeatGlyphs();
             CreatePostBeatGlyphs();
@@ -298,9 +312,9 @@ namespace AlphaTab.Rendering
                 }
             }
 
-            _postBeatGlyphs.X = postBeatStart;
+            _postBeatGlyphs.X = (float)Math.Floor(postBeatStart);
 
-            Width = _postBeatGlyphs.X + _postBeatGlyphs.Width;
+            Width = (float)Math.Ceiling(_postBeatGlyphs.X + _postBeatGlyphs.Width);
         }
 
         protected void AddPreBeatGlyph(Glyph g)
@@ -361,12 +375,8 @@ namespace AlphaTab.Rendering
 
         protected virtual void PaintBackground(float cx, float cy, ICanvas canvas)
         {
-            //var c = new Color((byte)Std.Random(255),
-            //      (byte)Std.Random(255),
-            //      (byte)Std.Random(255),
-            //      100);
-            //canvas.Color = c;
-            //canvas.FillRect(cx + X, cy + Y, Width, Height);
+            //canvas.Color = Color.Random();
+            //canvas.FillRect(cx + X, cy + Y - TopOverflow, Width, Height + TopOverflow + BottomOverflow);
         }
 
         public virtual void BuildBoundingsLookup(MasterBarBounds masterBarBounds, float cx, float cy)
@@ -392,7 +402,8 @@ namespace AlphaTab.Rendering
             foreach (var voice in _voiceContainers)
             {
                 var c = _voiceContainers[voice];
-                if (!c.Voice.IsEmpty || (Bar.IsEmpty && voice == 0))
+                var isEmptyBar = (Bar.IsEmpty && voice == 0);
+                if (!c.Voice.IsEmpty || isEmptyBar)
                 {
                     for (int i = 0, j = c.BeatGlyphs.Count; i < j; i++)
                     {
@@ -414,6 +425,13 @@ namespace AlphaTab.Rendering
                             W = bc.Width,
                             H = barBounds.RealBounds.H
                         };
+
+                        if (isEmptyBar)
+                        {
+                            beatBoundings.VisualBounds.X = cx + X;
+                            beatBoundings.RealBounds.X = beatBoundings.VisualBounds.X;
+                        }
+
                         barBounds.AddBeat(beatBoundings);
                     }
                 }
@@ -432,12 +450,10 @@ namespace AlphaTab.Rendering
 
         protected virtual void CreateBeatGlyphs()
         {
-
         }
 
         protected virtual void CreatePostBeatGlyphs()
         {
-            AddPostBeatGlyph(new SpacingGlyph(0, 0, 5 * Scale));
         }
 
         public float BeatGlyphsStart
@@ -445,6 +461,14 @@ namespace AlphaTab.Rendering
             get
             {
                 return _preBeatGlyphs.X + _preBeatGlyphs.Width;
+            }
+        }
+
+        public float PostBeatGlyphsStart
+        {
+            get
+            {
+                return _postBeatGlyphs.X;
             }
         }
 
@@ -461,9 +485,11 @@ namespace AlphaTab.Rendering
                 switch (requestedPosition)
                 {
                     case BeatXPosition.PreNotes:
-                        return container.VoiceContainer.X + container.X + container.PreNotes.X;
+                        return container.VoiceContainer.X + container.X;
                     case BeatXPosition.OnNotes:
                         return container.VoiceContainer.X + container.X + container.OnNotes.X;
+                    case BeatXPosition.MiddleNotes:
+                        return container.VoiceContainer.X + container.X + container.OnTimeX;
                     case BeatXPosition.PostNotes:
                         return container.VoiceContainer.X + container.X + container.OnNotes.X + container.OnNotes.Width;
                     case BeatXPosition.EndBeat:
@@ -473,7 +499,7 @@ namespace AlphaTab.Rendering
             return 0;
         }
 
-        public virtual float GetNoteY(Note note)
+        public virtual float GetNoteY(Note note, bool aboveNote = false)
         {
             return 0;
         }
@@ -482,7 +508,7 @@ namespace AlphaTab.Rendering
         {
             // there are some glyphs which are shown only for renderers at the line start, so we simply recreate them
             // but we only need to recreate them for the renderers that were the first of the line or are now the first of the line
-            if (_wasFirstOfLine ^ IsFirstOfLine)
+            if ((_wasFirstOfLine && !IsFirstOfLine) || (!_wasFirstOfLine && IsFirstOfLine))
             {
                 _preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
                 _preBeatGlyphs.Renderer = this;
@@ -491,6 +517,22 @@ namespace AlphaTab.Rendering
 
             UpdateSizes();
             RegisterLayoutingInfo();
+        }
+
+        protected void PaintSimileMark(float cx, float cy, ICanvas canvas)
+        {
+            switch (Bar.SimileMark)
+            {
+                case SimileMark.Simple:
+                    canvas.FillMusicFontSymbol(cx + X + (Width - 20 * Scale) / 2, cy + Y + Height / 2, 1,
+                        MusicFontSymbol.SimileMarkSimple);
+                    break;
+                case SimileMark.SecondOfDouble:
+                    canvas.FillMusicFontSymbol(cx + X - (28 * Scale) / 2, cy + Y + Height / 2, 1,
+                        MusicFontSymbol.SimileMarkDouble);
+                    break;
+            }
+
         }
     }
 
@@ -508,6 +550,11 @@ namespace AlphaTab.Rendering
         /// Gets the on-notes position which is located after the accidentals but before the note heads. 
         /// </summary>
         OnNotes,
+
+        /// <summary>
+        /// Gets the middel-notes position which is located after in the middle the note heads. 
+        /// </summary>
+        MiddleNotes,
 
         /// <summary>
         /// Get the post-notes position which is located at after the note heads. 

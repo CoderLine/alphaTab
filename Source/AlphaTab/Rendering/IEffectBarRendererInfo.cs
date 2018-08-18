@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering
     /// A public class implementing this public interface can provide the 
     /// data needed by a EffectBarRenderer to create effect glyphs dynamically.
     /// </summary>
-    public interface IEffectBarRendererInfo
+    interface IEffectBarRendererInfo
     {
         /// <summary>
         /// Gets the unique effect name for this effect. (Used for grouping)
@@ -51,9 +51,10 @@ namespace AlphaTab.Rendering
         /// Checks whether the given beat has the appropriate effect set and
         /// needs a glyph creation 
         /// </summary>
+        /// <param name="settings"></param>
         /// <param name="beat">the beat storing the data</param>
         /// <returns>true if the beat has the effect set, otherwise false.</returns>
-        bool ShouldCreateGlyph(Beat beat);
+        bool ShouldCreateGlyph(Settings settings, Beat beat);
 
         /// <summary>
         /// Gets the sizing mode of the glyphs created by this info.

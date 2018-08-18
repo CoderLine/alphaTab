@@ -1,0 +1,96 @@
+.main-header {
+    background-image: linear-gradient(to bottom,#fff 0,#f8f8f8 100%);
+    background-repeat: repeat-x;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 1px 5px rgba(0,0,0,.075);
+}
+
+.main-header .logo, .main-header .navbar {
+    background: none !important;
+}
+
+.main-header .logo img {
+    height: 30px;
+}
+
+.main-header .navbar .nav > li > a {
+	color: #777;
+}
+.main-header .navbar .nav > li > a:hover {
+	color: #333;
+    background-color: transparent;
+}
+
+	.main-header .navbar .nav > .active > a,
+	.main-header .navbar .nav > .open > a {
+		color: #555;
+		background-color: #e7e7e7;
+		background-image: linear-gradient(to bottom,#dbdbdb 0,#e2e2e2 100%);
+		background-repeat: repeat-x;
+		box-shadow: inset 0 3px 9px rgba(0,0,0,.075);
+	}
+
+		.main-header .navbar .nav > .active > a:hover,
+		.main-header .navbar .nav > .open > a:hover {
+			color: #555;
+			background-color: #e7e7e7;
+		}
+		
+.content-header h1 {
+	color: #426d9d;
+}
+
+.menu-container {
+    column-count: 2;
+}
+
+.tab-content {
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+}
+
+.alphaTabSurface {
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    background: #FFF;
+    border-radius: 3px;
+}
+
+.example-source, .description {
+    margin-bottom: 10px;
+}
+
+.infobar {
+	position: static;
+	right: auto !important;
+	top: auto !important;
+	width: auto !important;
+	padding: 30px 12px 0 12px !important;
+}
+
+.infobar.affix {
+	position: static !important;
+    left: auto  !important;
+    margin-left: 0 !important;
+}
+
+.sidebar {
+	padding-top: 0 !important;
+}
+
+@media only screen and (max-width: 1670px) and (min-width: 1250px) {
+	.wrapper.with-container {
+		max-width: none;
+		left: 0;
+	}
+}
+
+.wip {
+	color: #999;
+    font-size: 12px;
+	font-weight: normal;
+}
+
+.menu-block td {
+	width: 100%;
+}

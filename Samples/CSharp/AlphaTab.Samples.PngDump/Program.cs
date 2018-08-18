@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,12 +18,10 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using AlphaTab;
 using AlphaTab.Importer;
 using AlphaTab.Rendering;
-using AlphaTab.Rendering.Layout;
+using SkiaSharp;
 
 namespace AlphaTab.Samples.PngDump
 {
@@ -42,7 +40,7 @@ namespace AlphaTab.Samples.PngDump
 
             // render score with svg engine and desired rendering width
             var settings = Settings.Defaults;
-            settings.Engine = "gdi";
+            settings.Engine = "skia";
             settings.Width = 970;
             var renderer = new ScoreRenderer(settings);
 
@@ -53,12 +51,12 @@ namespace AlphaTab.Samples.PngDump
 
                 // render track
                 Console.WriteLine("Rendering track {0} - {1}", i + 1, track.Name);
-                var images = new List<Image>();
+                var images = new List<SKImage>();
                 var totalWidth = 0;
                 var totalHeight = 0;
                 renderer.PartialRenderFinished += r =>
                 {
-                    images.Add((Image)r.RenderResult);
+                    images.Add((SKImage)r.RenderResult);
                 };
                 renderer.RenderFinished += r =>
                 {
@@ -71,19 +69,25 @@ namespace AlphaTab.Samples.PngDump
                 var info = new FileInfo(args[0]);
                 var path = Path.Combine(info.DirectoryName, Path.GetFileNameWithoutExtension(info.Name) + "-" + i + ".png");
 
-                using (var bmp = new Bitmap(totalWidth, totalHeight))
+                using (var full = SKSurface.Create(totalWidth, totalHeight, SKImageInfo.PlatformColorType, SKAlphaType.Premul))
                 {
                     int y = 0;
-                    using (var g = Graphics.FromImage(bmp))
+                    foreach (var image in images)
                     {
-                        foreach (var image in images)
+                        full.Canvas.DrawImage(image, new SKRect(0, 0, image.Width, image.Height), new SKRect(0, y, image.Width, y + image.Height));
+                        y += image.Height;
+                    }
+
+                    using (var fullImage = full.Snapshot())
+                    {
+                        using (var data = fullImage.Encode(SKEncodedImageFormat.Png, 100).AsStream(true))
                         {
-                            g.DrawImage(image, new Rectangle(0, y, image.Width, image.Height),
-                                new Rectangle(0, 0, image.Width, image.Height), GraphicsUnit.Pixel);
-                            y += image.Height;
+                            using (var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write))
+                            {
+                                data.CopyTo(fileStream);
+                            }
                         }
                     }
-                    bmp.Save(path, ImageFormat.Png);
                 }
             }
         }

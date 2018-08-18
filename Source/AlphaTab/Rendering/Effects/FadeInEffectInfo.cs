@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,14 +20,14 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class FadeInEffectInfo : IEffectBarRendererInfo
+    class FadeInEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "fade-in"; } }
         public bool HideOnMultiTrack { get { return false; } }
         public bool CanShareBand { get { return true; } }
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
 
-        public bool ShouldCreateGlyph(Beat beat)
+        public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
             return beat.FadeIn;
         }
@@ -37,7 +37,7 @@ namespace AlphaTab.Rendering.Effects
             return new FadeInGlyph(0, 0);
         }
 
-        public bool CanExpand(Beat @from, Beat to)
+        public bool CanExpand(Beat from, Beat to)
         {
             return true;
         }

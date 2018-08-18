@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// Lists all sizing types of the effect bar glyphs
     /// </summary>
-    public enum EffectBarGlyphSizing
+    enum EffectBarGlyphSizing
     {
         /// <summary>
         /// The effect glyph is placed above the pre-beat glyph which is before 
@@ -33,6 +33,12 @@ namespace AlphaTab.Rendering
         /// </summary>
         SingleOnBeat,
         /// <summary>
+        /// The effect glyph is placed above the on-beat glyph which is where
+        /// the actual note head glyphs are placed. The glyph will size to the end of
+        /// the applied beat.
+        /// </summary>
+        SingleOnBeatToEnd,
+        /// <summary>
         /// The effect glyph is placed above the on-beat glyph and expaded to the 
         /// on-beat position of the next beat.
         /// </summary>
@@ -42,6 +48,12 @@ namespace AlphaTab.Rendering
         /// on-beat position of the next beat.
         /// </summary>
         GroupedOnBeat,
+        /// <summary>
+        /// The effect glyph is placed above the on-beat glyph and expaded to the 
+        /// on-beat position of the next beat. The glyph will size to the end of
+        /// the applied beat.
+        /// </summary>
+        GroupedOnBeatToEnd,
         /// <summary>
         /// The effect glyph is placed on the whole bar covering the whole width
         /// </summary>

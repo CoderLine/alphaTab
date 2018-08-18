@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabBrushGlyph : Glyph
+    class TabBrushGlyph : Glyph
     {
         private readonly Beat _beat;
 
@@ -56,14 +56,31 @@ namespace AlphaTab.Rendering.Glyphs
                     canvas.LineTo(arrowX, endY);
                     canvas.Stroke();
                 }
-                else
+                else if(_beat.BrushType == BrushType.ArpeggioUp)
                 {
-                    //var size = 15 * Scale;
-                    //var steps = Math.Abs(endY - startY) / size;
-                    //for (var i = 0; i < steps; i++)
-                    //{
-                    //    canvas.FillMusicFontSymbol(cx + X + (3 * Scale), 1, startY + (i * size), MusicFontSymbol.WaveVertical);
-                    //}
+                    var lineStartY = startY - arrowSize;
+                    var lineEndY = endY - arrowSize;
+
+                    canvas.BeginRotate(cx + X + 2 * Scale, lineEndY, -90);
+                    var glyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight);
+                    glyph.Renderer = Renderer;
+                    glyph.DoLayout();
+                    glyph.Width = Math.Abs(lineEndY - lineStartY);
+                    glyph.Paint(0, 0, canvas);
+                    canvas.EndRotate();
+                }
+                else if(_beat.BrushType == BrushType.ArpeggioDown)
+                {
+                    var lineStartY = startY + arrowSize;
+                    var lineEndY = endY + arrowSize;
+
+                    canvas.BeginRotate(cx + X + 7 * Scale, lineStartY, 90);
+                    var glyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight);
+                    glyph.Renderer = Renderer;
+                    glyph.DoLayout();
+                    glyph.Width = Math.Abs(lineEndY - lineStartY);
+                    glyph.Paint(0, 0, canvas);
+                    canvas.EndRotate();
                 }
 
                 if (_beat.BrushType == BrushType.BrushUp || _beat.BrushType == BrushType.ArpeggioUp)

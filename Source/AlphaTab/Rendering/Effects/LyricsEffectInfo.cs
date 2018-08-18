@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,14 +21,14 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class LyricsEffectInfo : IEffectBarRendererInfo
+    class LyricsEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "lyrics"; } }
         public bool HideOnMultiTrack { get { return false; } }
         public bool CanShareBand { get { return false; } }
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
 
-        public bool ShouldCreateGlyph(Beat beat)
+        public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
             return beat.Lyrics != null;
         }

@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,48 +16,43 @@
  * License along with this library.
  */
 using System;
-using AlphaTab.Audio.Model;
+using AlphaTab.Audio.Synth.Midi.Event;
+using AlphaTab.Collections;
 using AlphaTab.Model;
+using AlphaTab.Util;
 
 namespace AlphaTab.Audio.Generator
 {
+    class MidiNoteDuration
+    {
+        public int NoteOnly { get; set; }
+        public int UntilTieEnd { get; set; }
+        public int LetRingEnd { get; set; }
+    }
+
     /// <summary>
     /// This generator creates a midi file using a score. 
     /// </summary>
     public class MidiFileGenerator
     {
         private readonly Score _score;
+        private readonly Settings _settings;
         private readonly IMidiFileHandler _handler;
         private int _currentTempo;
+        private BeatTickLookup _currentBarRepeatLookup;
 
+        private const int DefaultDurationDead = 30;
+        private const int DefaultDurationPalmMute = 80;
 
         public MidiTickLookup TickLookup { get; private set; }
 
-
-        public MidiFileGenerator(Score score, IMidiFileHandler handler)
+        public MidiFileGenerator(Score score, Settings settings, IMidiFileHandler handler)
         {
             _score = score;
+            _settings = settings;
             _currentTempo = _score.Tempo;
             _handler = handler;
             TickLookup = new MidiTickLookup();
-        }
-
-        public static MidiFile GenerateMidiFile(Score score)
-        {
-            var midiFile = new MidiFile();
-            // create score tracks + metronometrack
-            for (int i = 0, j = score.Tracks.Count; i < j; i++)
-            {
-                midiFile.CreateTrack();
-            }
-            midiFile.InfoTrack = 0;
-            
-
-            var handler = new MidiFileHandler(midiFile);
-            var generator = new MidiFileGenerator(score, handler);
-            generator.Generate();
-            midiFile.TickLookup = generator.TickLookup;
-            return midiFile;
         }
 
         public void Generate()
@@ -68,6 +63,7 @@ namespace AlphaTab.Audio.Generator
                 GenerateTrack(_score.Tracks[i]);
             }
 
+            Logger.Info("Midi", "Begin midi generation");
             var controller = new MidiPlaybackController(_score);
             MasterBar previousMasterBar = null; // store the previous played bar for repeats
             while (!controller.Finished)
@@ -102,7 +98,7 @@ namespace AlphaTab.Audio.Generator
             }
 
             TickLookup.Finish();
-
+            Logger.Info("Midi", "Midi generation done");
         }
 
         #region Track
@@ -121,17 +117,17 @@ namespace AlphaTab.Audio.Generator
         {
             var volume = ToChannelShort(playbackInfo.Volume);
             var balance = ToChannelShort(playbackInfo.Balance);
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.VolumeCoarse, (byte)volume);
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.PanCoarse, (byte)balance);
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.ExpressionControllerCoarse, 127);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)ControllerTypeEnum.VolumeCoarse, (byte)volume);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)ControllerTypeEnum.PanCoarse, (byte)balance);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)ControllerTypeEnum.ExpressionControllerCoarse, 127);
 
             // set parameter that is being updated (0) -> PitchBendRangeCoarse
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.RegisteredParameterFine, 0);
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.RegisteredParameterCourse, 0);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)ControllerTypeEnum.RegisteredParameterFine, 0);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)ControllerTypeEnum.RegisteredParameterCourse, 0);
 
             // Set PitchBendRangeCoarse to 12
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.DataEntryFine, 0);
-            _handler.AddControlChange(track.Index, 0, channel, (byte)MidiController.DataEntryCoarse, 12);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)ControllerTypeEnum.DataEntryFine, 0);
+            _handler.AddControlChange(track.Index, 0, channel, (byte)ControllerTypeEnum.DataEntryCoarse, 12);
 
             _handler.AddProgramChange(track.Index, 0, channel, (byte)playbackInfo.Program);
         }
@@ -182,36 +178,88 @@ namespace AlphaTab.Audio.Generator
 
         public void GenerateBar(Bar bar, int barStartTick)
         {
-            for (int i = 0, j = bar.Voices.Count; i < j; i++)
+            var playbackBar = GetPlaybackBar(bar);
+            _currentBarRepeatLookup = null;
+
+            for (int i = 0, j = playbackBar.Voices.Count; i < j; i++)
             {
-                GenerateVoice(bar.Voices[i], barStartTick);
+                GenerateVoice(playbackBar.Voices[i], barStartTick, bar);
             }
         }
 
-        private void GenerateVoice(Voice voice, int barStartTick)
+        private Bar GetPlaybackBar(Bar bar)
+        {
+            switch (bar.SimileMark)
+            {
+                case SimileMark.Simple:
+                    if (bar.PreviousBar != null)
+                    {
+                        bar = GetPlaybackBar(bar.PreviousBar);
+                    }
+                    break;
+                case SimileMark.FirstOfDouble:
+                    if (bar.PreviousBar != null && bar.PreviousBar.PreviousBar != null)
+                    {
+                        bar = GetPlaybackBar(bar.PreviousBar.PreviousBar);
+                    }
+                    break;
+                case SimileMark.SecondOfDouble:
+                    if (bar.PreviousBar != null && bar.PreviousBar.PreviousBar != null)
+                    {
+                        bar = GetPlaybackBar(bar.PreviousBar.PreviousBar);
+                    }
+                    break;
+            }
+
+            return bar;
+        }
+
+        private void GenerateVoice(Voice voice, int barStartTick, Bar realBar)
         {
             if (voice.IsEmpty && (!voice.Bar.IsEmpty || voice.Index != 0)) return;
 
             for (int i = 0, j = voice.Beats.Count; i < j; i++)
             {
-                GenerateBeat(voice.Beats[i], barStartTick);
+                GenerateBeat(voice.Beats[i], barStartTick, realBar);
             }
         }
 
-        private void GenerateBeat(Beat beat, int barStartTick)
+        private void GenerateBeat(Beat beat, int barStartTick, Bar realBar)
         {
             // TODO: take care of tripletfeel 
-            var beatStart = beat.Start;
+            var beatStart = beat.PlaybackStart;
             var audioDuration = beat.Voice.Bar.IsEmpty
                 ? beat.Voice.Bar.MasterBar.CalculateDuration()
-                : beat.CalculateDuration();
+                : beat.PlaybackDuration;
 
             var beatLookup = new BeatTickLookup();
             beatLookup.Start = barStartTick + beatStart;
-            var realTickOffset = beat.NextBeat == null ? audioDuration : beat.NextBeat.AbsoluteStart - beat.AbsoluteStart;
-            beatLookup.End = barStartTick + beatStart + (realTickOffset > audioDuration ? realTickOffset : audioDuration);
-            beatLookup.Beat = beat;
-            TickLookup.AddBeat(beatLookup);
+            var realTickOffset = beat.NextBeat == null ? audioDuration : beat.NextBeat.AbsolutePlaybackStart - beat.AbsolutePlaybackStart;
+            beatLookup.End = barStartTick + beatStart;
+
+            beatLookup.End += (realTickOffset > audioDuration ? realTickOffset : audioDuration);
+
+            // in case of normal playback register playback
+            if (realBar == beat.Voice.Bar)
+            {
+                beatLookup.Beat = beat;
+                TickLookup.AddBeat(beatLookup);
+            }
+            // in case of bar repeats register empty beat
+            else
+            {
+                beatLookup.IsEmptyBar = true;
+                beatLookup.Beat = realBar.Voices[0].Beats[0];
+                if (_currentBarRepeatLookup == null)
+                {
+                    _currentBarRepeatLookup = beatLookup;
+                    TickLookup.AddBeat(_currentBarRepeatLookup);
+                }
+                else
+                {
+                    _currentBarRepeatLookup.End = beatLookup.End;
+                }
+            }
 
             var track = beat.Voice.Bar.Staff.Track;
 
@@ -238,27 +286,58 @@ namespace AlphaTab.Audio.Generator
 
             if (beat.Vibrato != VibratoType.None)
             {
-                const int phaseLength = 240; // ticks
-                const int bendAmplitude = 3;
+                int phaseLength = 240;
+                int bendAmplitude = 3;
+                switch (beat.Vibrato)
+                {
+                    case VibratoType.Slight:
+                        phaseLength = _settings.Vibrato.BeatSlightLength;
+                        bendAmplitude = _settings.Vibrato.BeatSlightAmplitude;
+                        break;
+                    case VibratoType.Wide:
+                        phaseLength = _settings.Vibrato.BeatWideLength;
+                        bendAmplitude = _settings.Vibrato.BeatWideAmplitude;
+                        break;
+                }
 
-                GenerateVibratorWithParams(beat.Voice.Bar.Staff.Track, barStartTick + beatStart, beat.CalculateDuration(), phaseLength, bendAmplitude);
+                GenerateVibratorWithParams(beat.Voice.Bar.Staff.Track, barStartTick + beatStart, beat.PlaybackDuration, phaseLength, bendAmplitude, track.PlaybackInfo.SecondaryChannel);
             }
         }
 
         private void GenerateNote(Note note, int beatStart, int beatDuration, int[] brushInfo)
         {
             var track = note.Beat.Voice.Bar.Staff.Track;
+            var staff = note.Beat.Voice.Bar.Staff;
             var noteKey = note.RealValue;
             var brushOffset = note.IsStringed && note.String <= brushInfo.Length ? brushInfo[note.String - 1] : 0;
             var noteStart = beatStart + brushOffset;
-            var noteDuration = GetNoteDuration(note, beatDuration) - brushOffset;
+            var noteDuration = GetNoteDuration(note, beatDuration);
+            noteDuration.UntilTieEnd -= brushOffset;
+            noteDuration.NoteOnly -= brushOffset;
+            noteDuration.LetRingEnd -= brushOffset;
             var dynamicValue = GetDynamicValue(note);
 
-            // TODO: enable second condition after whammy generation is implemented
-            if (!note.HasBend /* && !note.Beat.HasWhammyBar */)
+            var channel = note.HasBend || note.Beat.HasWhammyBar || note.Beat.Vibrato != VibratoType.None
+                ? track.PlaybackInfo.SecondaryChannel
+                : track.PlaybackInfo.PrimaryChannel;
+
+            var initialBend = DefaultBend;
+            if (note.HasBend)
             {
-                // reset bend 
-                _handler.AddBend(track.Index, noteStart, (byte)track.PlaybackInfo.PrimaryChannel, DefaultBend);
+                initialBend += (int)Math.Round(note.BendPoints[0].Value * DefaultBendSemitone);
+            }
+            else if (note.Beat.HasWhammyBar)
+            {
+                initialBend += (int)Math.Round(note.Beat.WhammyBarPoints[0].Value * DefaultBendSemitone);
+            }
+            else if (note.IsTieDestination)
+            {
+                initialBend = 0;
+            }
+
+            if (initialBend > 0)
+            {
+                _handler.AddBend(track.Index, noteStart, (byte)channel, (byte)initialBend);
             }
 
             // 
@@ -272,9 +351,9 @@ namespace AlphaTab.Audio.Generator
 
             //
             // Trill
-            if (note.IsTrill && !track.IsPercussion)
+            if (note.IsTrill && staff.StaffKind != StaffKind.Percussion)
             {
-                GenerateTrill(note, noteStart, noteDuration, noteKey, dynamicValue);
+                GenerateTrill(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
                 // no further generation needed
                 return;
             }
@@ -283,7 +362,7 @@ namespace AlphaTab.Audio.Generator
             // Tremolo Picking
             if (note.Beat.IsTremolo)
             {
-                GenerateTremoloPicking(note, noteStart, noteDuration, noteKey, dynamicValue);
+                GenerateTremoloPicking(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
                 // no further generation needed
                 return;
             }
@@ -292,130 +371,127 @@ namespace AlphaTab.Audio.Generator
             // All String Bending/Variation effects
             if (note.HasBend)
             {
-                GenerateBend(note, noteStart, noteDuration, noteKey, dynamicValue);
+                GenerateBend(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
             }
-            else if (note.Beat.HasWhammyBar)
+            else if (note.Beat.HasWhammyBar && note.Index == 0)
             {
-                GenerateWhammyBar(note, noteStart, noteDuration, noteKey, dynamicValue);
+                GenerateWhammy(note.Beat, noteStart, noteDuration, noteKey, dynamicValue, channel);
             }
             else if (note.SlideType != SlideType.None)
             {
-                GenerateSlide(note, noteStart, noteDuration, noteKey, dynamicValue);
+                GenerateSlide(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
             }
             else if (note.Vibrato != VibratoType.None)
             {
-                GenerateVibrato(note, noteStart, noteDuration, noteKey, dynamicValue);
-            }
-
-
-            //
-            // Harmonics
-            if (note.HarmonicType != HarmonicType.None)
-            {
-                GenerateHarmonic(note, noteStart, noteDuration, noteKey, dynamicValue);
+                GenerateVibrato(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
             }
 
             if (!note.IsTieDestination)
             {
-                _handler.AddNote(track.Index, noteStart, noteDuration, (byte)noteKey, dynamicValue, (byte)track.PlaybackInfo.PrimaryChannel);
+                var noteSoundDuration = Math.Max(noteDuration.UntilTieEnd, noteDuration.LetRingEnd);
+                _handler.AddNote(track.Index, noteStart, noteSoundDuration, (byte)noteKey, dynamicValue, (byte)channel);
             }
         }
 
-        private int GetNoteDuration(Note note, int beatDuration)
+        private MidiNoteDuration GetNoteDuration(Note note, int duration)
         {
-            return ApplyDurationEffects(note, beatDuration);
-            // a bit buggy:
-            /*
-            var lastNoteEnd = note.beat.start - note.beat.calculateDuration();
-            var noteDuration = beatDuration;
-            var currentBeat = note.beat.nextBeat;
-        
-            var letRingSuspend = false;
-        
-            // find the real note duration (let ring)
-            while (currentBeat != null)
-            {
-                if (currentBeat.isRest())
-                {
-                    return applyDurationEffects(note, noteDuration);
-                }
-            
-                var letRing = currentBeat.voice == note.beat.voice && note.isLetRing;
-                var letRingApplied = false;
-            
-                // we look for a note which still has let ring on or is a tie destination
-                // in this case we increate the first played note
-                var noteOnSameString = currentBeat.getNoteOnString(note.string);
-                if (noteOnSameString != null)
-                {
-                    // quit letring?
-                    if (!noteOnSameString.isTieDestination)
-                    {
-                        letRing = false; 
-                        letRingSuspend = true;
-                    
-                        // no let ring anymore, we are done
-                        if (!noteOnSameString.isLetRing)
-                        {
-                            return applyDurationEffects(note, noteDuration);
-                        }
-                    }
-                
-                    // increase duration 
-                    letRingApplied = true;
-                    noteDuration += (currentBeat.start - lastNoteEnd) + noteOnSameString.beat.calculateDuration();
-                    lastNoteEnd = currentBeat.start + currentBeat.calculateDuration();
-                }
-            
-                // if letRing is still active? (no note on the same string found)
-                // and we didn't apply it already and of course it's not already stopped 
-                // then we increase our duration as well
-                if (letRing && !letRingApplied && !letRingSuspend)
-                {
-                    noteDuration += (currentBeat.start - lastNoteEnd) + currentBeat.calculateDuration();
-                    lastNoteEnd = currentBeat.start + currentBeat.calculateDuration();
-                }
-            
-            
-                currentBeat = currentBeat.nextBeat;
-            }
-        
-            return applyDurationEffects(note, noteDuration);*/
-        }
+            var durationWithEffects = new MidiNoteDuration();
+            durationWithEffects.NoteOnly = duration;
+            durationWithEffects.UntilTieEnd = duration;
+            durationWithEffects.LetRingEnd = duration;
 
-        private int ApplyDurationEffects(Note note, int duration)
-        {
             if (note.IsDead)
             {
-                return ApplyStaticDuration(MidiFileHandler.DefaultDurationDead, duration);
+                durationWithEffects.NoteOnly = ApplyStaticDuration(DefaultDurationDead, duration);
+                durationWithEffects.UntilTieEnd = durationWithEffects.NoteOnly;
+                durationWithEffects.LetRingEnd = durationWithEffects.NoteOnly;
+                return durationWithEffects;
             }
             if (note.IsPalmMute)
             {
-                return ApplyStaticDuration(MidiFileHandler.DefaultDurationPalmMute, duration);
+                durationWithEffects.NoteOnly = ApplyStaticDuration(DefaultDurationPalmMute, duration);
+                durationWithEffects.UntilTieEnd = durationWithEffects.NoteOnly;
+                durationWithEffects.LetRingEnd = durationWithEffects.NoteOnly;
+                return durationWithEffects;
             }
             if (note.IsStaccato)
             {
-                return (duration / 2);
+                durationWithEffects.NoteOnly = (duration / 2);
+                durationWithEffects.UntilTieEnd = durationWithEffects.NoteOnly;
+                durationWithEffects.LetRingEnd = durationWithEffects.NoteOnly;
+                return durationWithEffects;
             }
+
             if (note.IsTieOrigin)
             {
                 var endNote = note.TieDestination;
 
                 // for the initial start of the tie calculate absolute duration from start to end note
-                if (!note.IsTieDestination)
+                if (endNote != null)
                 {
-                    var startTick = note.Beat.AbsoluteStart;
-                    var endTick = endNote.Beat.AbsoluteStart + GetNoteDuration(endNote, endNote.Beat.CalculateDuration());
-                    return endTick - startTick;
+                    if (!note.IsTieDestination)
+                    {
+                        var startTick = note.Beat.AbsolutePlaybackStart;
+                        var tieDestinationDuration = GetNoteDuration(endNote, endNote.Beat.PlaybackDuration);
+                        var endTick = endNote.Beat.AbsolutePlaybackStart + tieDestinationDuration.UntilTieEnd;
+                        durationWithEffects.UntilTieEnd = endTick - startTick;
+                    }
+                    else
+                    {
+                        // for continuing ties, take the current duration + the one from the destination 
+                        // this branch will be entered as part of the recusion of the if branch
+                        var tieDestinationDuration = GetNoteDuration(endNote, endNote.Beat.PlaybackDuration);
+                        durationWithEffects.UntilTieEnd = duration + tieDestinationDuration.UntilTieEnd;
+                    }
+                }
+            }
+
+            if (note.IsLetRing && _settings.DisplayMode == DisplayMode.GuitarPro)
+            {
+                // LetRing ends when:  
+                // - rest 
+                Beat lastLetRingBeat = note.Beat;
+                var letRingEnd = 0;
+                var maxDuration = note.Beat.Voice.Bar.MasterBar.CalculateDuration();
+                while (lastLetRingBeat.NextBeat != null)
+                {
+                    var next = lastLetRingBeat.NextBeat;
+                    if (next.IsRest)
+                    {
+                        break;
+                    }
+
+                    // note on the same string 
+                    if (note.IsStringed && next.HasNoteOnString(note.String))
+                    {
+                        break;
+                    }
+
+                    lastLetRingBeat = lastLetRingBeat.NextBeat;
+
+                    letRingEnd = (lastLetRingBeat.AbsolutePlaybackStart - note.Beat.AbsolutePlaybackStart) +
+                                 lastLetRingBeat.PlaybackDuration;
+                    if (letRingEnd > maxDuration)
+                    {
+                        letRingEnd = maxDuration;
+                        break;
+                    }
+                }
+
+                if (lastLetRingBeat == note.Beat)
+                {
+                    durationWithEffects.LetRingEnd = duration;
                 }
                 else
                 {
-                    // for continuing ties, take the current duration + the one from the destination 
-                    // this branch will be entered as part of the recusion of the if branch
-                    return duration + GetNoteDuration(endNote, endNote.Beat.CalculateDuration());
+                    durationWithEffects.LetRingEnd = letRingEnd;
                 }
             }
-            return duration;
+            else
+            {
+                durationWithEffects.LetRingEnd = durationWithEffects.UntilTieEnd;
+            }
+            return durationWithEffects;
         }
 
         private int ApplyStaticDuration(int duration, int maximum)
@@ -429,7 +505,7 @@ namespace AlphaTab.Audio.Generator
             var dynamicValue = note.Dynamic;
 
             // more silent on hammer destination
-            if (!note.Beat.Voice.Bar.Staff.Track.IsPercussion && note.HammerPullOrigin != null)
+            if (note.Beat.Voice.Bar.Staff.StaffKind != StaffKind.Percussion && note.HammerPullOrigin != null)
             {
                 dynamicValue--;
             }
@@ -458,45 +534,55 @@ namespace AlphaTab.Audio.Generator
 
         #region Effect Generation
 
-        private void GenerateFadeIn(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
+        private void GenerateFadeIn(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue)
         {
             var track = note.Beat.Voice.Bar.Staff.Track;
             var endVolume = ToChannelShort(track.PlaybackInfo.Volume);
-            var volumeFactor = (float)endVolume / noteDuration;
+            var volumeFactor = (float)endVolume / noteDuration.NoteOnly;
 
             var tickStep = 120;
-            int steps = (noteDuration / tickStep);
+            int steps = (noteDuration.NoteOnly / tickStep);
 
-            var endTick = noteStart + noteDuration;
+            var endTick = noteStart + noteDuration.NoteOnly;
             for (int i = steps - 1; i >= 0; i--)
             {
                 var tick = endTick - (i * tickStep);
                 var volume = (tick - noteStart) * volumeFactor;
                 if (i == steps - 1)
                 {
-                    _handler.AddControlChange(track.Index, noteStart, (byte)track.PlaybackInfo.PrimaryChannel, (byte)MidiController.VolumeCoarse, (byte)volume);
-                    _handler.AddControlChange(track.Index, noteStart, (byte)track.PlaybackInfo.SecondaryChannel, (byte)MidiController.VolumeCoarse, (byte)volume);
+                    _handler.AddControlChange(track.Index, noteStart, (byte)track.PlaybackInfo.PrimaryChannel, (byte)ControllerTypeEnum.VolumeCoarse, (byte)volume);
+                    _handler.AddControlChange(track.Index, noteStart, (byte)track.PlaybackInfo.SecondaryChannel, (byte)ControllerTypeEnum.VolumeCoarse, (byte)volume);
                 }
-                _handler.AddControlChange(track.Index, tick, (byte)track.PlaybackInfo.PrimaryChannel, (byte)MidiController.VolumeCoarse, (byte)volume);
-                _handler.AddControlChange(track.Index, tick, (byte)track.PlaybackInfo.SecondaryChannel, (byte)MidiController.VolumeCoarse, (byte)volume);
+                _handler.AddControlChange(track.Index, tick, (byte)track.PlaybackInfo.PrimaryChannel, (byte)ControllerTypeEnum.VolumeCoarse, (byte)volume);
+                _handler.AddControlChange(track.Index, tick, (byte)track.PlaybackInfo.SecondaryChannel, (byte)ControllerTypeEnum.VolumeCoarse, (byte)volume);
             }
         }
 
-        private void GenerateHarmonic(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
+        private void GenerateVibrato(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue, int channel)
         {
-            // TODO
-        }
+            int phaseLength;
+            int bendAmplitude;
 
-        private void GenerateVibrato(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
-        {
-            const int phaseLength = 480; // ticks
-            const int bendAmplitude = 2;
+            switch (note.Vibrato)
+            {
+                case VibratoType.Slight:
+                    phaseLength = _settings.Vibrato.NoteSlightLength;
+                    bendAmplitude = _settings.Vibrato.NoteSlightAmplitude;
+                    break;
+                case VibratoType.Wide:
+                    phaseLength = _settings.Vibrato.NoteWideLength;
+                    bendAmplitude = _settings.Vibrato.NoteWideAmplitude;
+                    break;
+                default:
+                    return;
+            }
+
             var track = note.Beat.Voice.Bar.Staff.Track;
 
-            GenerateVibratorWithParams(track, noteStart, noteDuration, phaseLength, bendAmplitude);
+            GenerateVibratorWithParams(track, noteStart, noteDuration.NoteOnly, phaseLength, bendAmplitude, channel);
         }
 
-        private void GenerateVibratorWithParams(Track track, int noteStart, int noteDuration, int phaseLength, int bendAmplitude)
+        private void GenerateVibratorWithParams(Track track, int noteStart, int noteDuration, int phaseLength, int bendAmplitude, int channel)
         {
             const int resolution = 16;
 
@@ -515,7 +601,7 @@ namespace AlphaTab.Audio.Generator
                 {
                     var bend = bendAmplitude * Math.Sin(phase * Math.PI / phaseHalf);
 
-                    _handler.AddBend(track.Index, noteStart + phase, (byte)track.PlaybackInfo.PrimaryChannel, (byte)(DefaultBend + bend));
+                    _handler.AddBend(track.Index, noteStart + phase, (byte)channel, (byte)(DefaultBend + bend));
 
                     phase += resolution;
                 }
@@ -524,12 +610,7 @@ namespace AlphaTab.Audio.Generator
             }
         }
 
-        private void GenerateSlide(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
-        {
-            // TODO 
-        }
-
-        private void GenerateWhammyBar(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
+        private void GenerateSlide(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue, int channel)
         {
             // TODO 
         }
@@ -537,14 +618,249 @@ namespace AlphaTab.Audio.Generator
         private const int DefaultBend = 0x40;
         private const float DefaultBendSemitone = 2.75f;
 
-        private void GenerateBend(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
+        private void GenerateBend(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue, int channel)
         {
+            FastList<BendPoint> bendPoints = note.BendPoints;
             var track = note.Beat.Voice.Bar.Staff.Track;
-            var ticksPerPosition = ((double)noteDuration) / BendPoint.MaxPosition;
-            for (int i = 0; i < note.BendPoints.Count - 1; i++)
+
+            // Bends are spread across all tied notes unless they have a bend on their own.
+            double duration;
+            if (note.IsTieOrigin && (_settings == null || _settings.ExtendBendArrowsOnTiedNotes))
             {
-                var currentPoint = note.BendPoints[i];
-                var nextPoint = note.BendPoints[i + 1];
+                var endNote = note;
+                while (endNote.IsTieOrigin && !endNote.TieDestination.HasBend)
+                {
+                    endNote = endNote.TieDestination;
+                }
+
+                duration = endNote.Beat.AbsolutePlaybackStart - note.Beat.AbsolutePlaybackStart + GetNoteDuration(endNote, endNote.Beat.PlaybackDuration).NoteOnly;
+            }
+            else
+            {
+                duration = noteDuration.NoteOnly;
+            }
+
+            // ensure prebends are slightly before the actual note. 
+            if (bendPoints[0].Value > 0 && !note.IsContinuedBend)
+            {
+                noteStart--;
+            }
+
+            FastList<BendPoint> playedBendPoints = new FastList<BendPoint>();
+            switch (note.BendType)
+            {
+                case BendType.Custom:
+                    playedBendPoints = bendPoints;
+                    break;
+                case BendType.Bend:
+                case BendType.Release:
+                    switch (note.BendStyle)
+                    {
+                        case BendStyle.Default:
+                            playedBendPoints = bendPoints;
+                            break;
+                        case BendStyle.Gradual:
+                            playedBendPoints.Add(new BendPoint(0, note.BendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, note.BendPoints[1].Value));
+                            break;
+                        case BendStyle.Fast:
+                            if (note.Beat.GraceType == GraceType.BendGrace)
+                            {
+                                GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
+                                    true, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value });
+                            }
+                            else
+                            {
+                                GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
+                                    false, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value });
+                            }
+                            return;
+                    }
+
+                    break;
+                case BendType.BendRelease:
+                    switch (note.BendStyle)
+                    {
+                        case BendStyle.Default:
+                            playedBendPoints = bendPoints;
+                            break;
+                        case BendStyle.Gradual:
+                            playedBendPoints.Add(new BendPoint(0, note.BendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition / 2, note.BendPoints[1].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, note.BendPoints[2].Value));
+                            break;
+                        case BendStyle.Fast:
+                            GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
+                                false, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value, note.BendPoints[2].Value });
+                            return;
+                    }
+
+                    break;
+                case BendType.Hold:
+                    playedBendPoints = bendPoints;
+                    break;
+                case BendType.Prebend:
+                    playedBendPoints = bendPoints;
+                    break;
+                case BendType.PrebendBend:
+                    switch (note.BendStyle)
+                    {
+                        case BendStyle.Default:
+                            playedBendPoints = bendPoints;
+                            break;
+                        case BendStyle.Gradual:
+                            playedBendPoints.Add(new BendPoint(0, note.BendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition / 2, note.BendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, note.BendPoints[1].Value));
+                            break;
+                        case BendStyle.Fast:
+                            var preBendValue = DefaultBend + (note.BendPoints[0].Value * DefaultBendSemitone);
+                            _handler.AddBend(track.Index, noteStart, (byte)channel, (byte)preBendValue);
+
+                            GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
+                                false, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value });
+                            return;
+                    }
+
+                    break;
+                case BendType.PrebendRelease:
+                    switch (note.BendStyle)
+                    {
+                        case BendStyle.Default:
+                            playedBendPoints = bendPoints;
+                            break;
+                        case BendStyle.Gradual:
+                            playedBendPoints.Add(new BendPoint(0, note.BendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition / 2, note.BendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, note.BendPoints[1].Value));
+                            break;
+                        case BendStyle.Fast:
+                            var preBendValue = DefaultBend + (note.BendPoints[0].Value * DefaultBendSemitone);
+                            _handler.AddBend(track.Index, noteStart, (byte)channel, (byte)preBendValue);
+
+                            GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
+                                true, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value });
+                            return;
+                    }
+
+                    break;
+            }
+
+            GenerateWhammyOrBend(noteStart, channel, duration, playedBendPoints, track);
+        }
+
+        private void GenerateSongBookWhammyOrBend(int noteStart, int channel, double duration, Track track,
+                                                bool bendAtBeginning, int[] bendValues)
+        {
+            var durationBySetting = _settings == null ? duration : Math.Min(duration, MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
+
+            var startTick = bendAtBeginning ? noteStart : (noteStart + duration) - durationBySetting;
+            var ticksBetweenPoints = durationBySetting / (bendValues.Length - 1);
+
+            for (int i = 0; i < bendValues.Length - 1; i++)
+            {
+                var currentBendValue = DefaultBend + (bendValues[i] * DefaultBendSemitone);
+                var nextBendValue = DefaultBend + (bendValues[i + 1] * DefaultBendSemitone);
+
+                var tick = startTick + (ticksBetweenPoints * i);
+                GenerateBendValues(tick, channel, track, ticksBetweenPoints, currentBendValue, nextBendValue);
+            }
+        }
+
+
+        private void GenerateWhammy(Beat beat, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue, int channel)
+        {
+            FastList<BendPoint> bendPoints = beat.WhammyBarPoints;
+            var track = beat.Voice.Bar.Staff.Track;
+
+            double duration = noteDuration.NoteOnly;
+
+            // ensure prebends are slightly before the actual note. 
+            if (bendPoints[0].Value > 0 && !beat.IsContinuedWhammy)
+            {
+                noteStart--;
+            }
+
+            FastList<BendPoint> playedBendPoints = new FastList<BendPoint>();
+            switch (beat.WhammyBarType)
+            {
+                case WhammyType.Custom:
+                    playedBendPoints = bendPoints;
+                    break;
+                case WhammyType.Dive:
+                    switch (beat.WhammyStyle)
+                    {
+                        case BendStyle.Default:
+                            playedBendPoints = bendPoints;
+                            break;
+                        case BendStyle.Gradual:
+                            playedBendPoints.Add(new BendPoint(0, bendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, bendPoints[1].Value));
+                            break;
+                        case BendStyle.Fast:
+                            GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
+                                false, new[] { bendPoints[0].Value, bendPoints[1].Value });
+                            return;
+                    }
+
+                    break;
+                case WhammyType.Dip:
+                    switch (beat.WhammyStyle)
+                    {
+                        case BendStyle.Default:
+                            playedBendPoints = bendPoints;
+                            break;
+                        case BendStyle.Gradual:
+                            playedBendPoints.Add(new BendPoint(0, bendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition / 2, bendPoints[1].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, bendPoints[2].Value));
+                            break;
+                        case BendStyle.Fast:
+                            GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
+                                true, new[] { bendPoints[0].Value, bendPoints[1].Value, bendPoints[2].Value });
+                            return;
+                    }
+
+                    break;
+                case WhammyType.Hold:
+                    playedBendPoints = bendPoints;
+                    break;
+                case WhammyType.Predive:
+                    playedBendPoints = bendPoints;
+                    break;
+                case WhammyType.PrediveDive:
+                    switch (beat.WhammyStyle)
+                    {
+                        case BendStyle.Default:
+                            playedBendPoints = bendPoints;
+                            break;
+                        case BendStyle.Gradual:
+                            playedBendPoints.Add(new BendPoint(0, bendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition / 2, bendPoints[0].Value));
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, bendPoints[1].Value));
+                            break;
+                        case BendStyle.Fast:
+                            var preDiveValue = DefaultBend + (bendPoints[0].Value * DefaultBendSemitone);
+                            _handler.AddBend(track.Index, noteStart, (byte)channel, (byte)preDiveValue);
+
+                            GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
+                                false, new[] { bendPoints[0].Value, bendPoints[1].Value });
+                            return;
+                    }
+
+                    break;
+            }
+
+            GenerateWhammyOrBend(noteStart, channel, duration, playedBendPoints, track);
+        }
+
+        private void GenerateWhammyOrBend(int noteStart, int channel, double duration, FastList<BendPoint> playedBendPoints, Track track)
+        {
+            var ticksPerPosition = duration / BendPoint.MaxPosition;
+            for (int i = 0; i < playedBendPoints.Count - 1; i++)
+            {
+                var currentPoint = playedBendPoints[i];
+                var nextPoint = playedBendPoints[i + 1];
 
                 // calculate the midi pitchbend values start and end values
                 var currentBendValue = DefaultBend + (currentPoint.Value * DefaultBendSemitone);
@@ -555,72 +871,85 @@ namespace AlphaTab.Audio.Generator
 
                 // we will generate one pitchbend message for each value
                 // for this we need to calculate how many ticks to offset per value
-
-                var ticksPerValue = ticksBetweenPoints / Math.Abs(nextBendValue - currentBendValue);
                 var tick = noteStart + (ticksPerPosition * currentPoint.Offset);
-                // bend up
-                if (currentBendValue < nextBendValue)
-                {
-                    while (currentBendValue <= nextBendValue)
-                    {
-                        _handler.AddBend(track.Index, (int)tick, (byte)track.PlaybackInfo.PrimaryChannel, (byte)Math.Round(currentBendValue));
-                        currentBendValue++;
-                        tick += ticksPerValue;
-                    }
-                }
-                // bend down
-                else if (currentBendValue > nextBendValue)
-                {
-                    while (currentBendValue >= nextBendValue)
-                    {
-                        _handler.AddBend(track.Index, (int)tick, (byte)track.PlaybackInfo.PrimaryChannel, (byte)Math.Round(currentBendValue));
-                        currentBendValue--;
-                        tick += ticksPerValue;
-                    }
-                }
+
+                GenerateBendValues(tick, channel, track, ticksBetweenPoints, currentBendValue, nextBendValue);
             }
         }
 
-        private void GenerateTrill(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
+        private void GenerateBendValues(double currentTick, int channel, Track track, double ticksBetweenPoints,
+            float currentBendValue, float nextBendValue)
+        {
+            var ticksPerValue = ticksBetweenPoints / Math.Abs(nextBendValue - currentBendValue);
+            // bend up
+            if (currentBendValue < nextBendValue)
+            {
+                while (currentBendValue <= nextBendValue)
+                {
+                    _handler.AddBend(track.Index, (int) currentTick, (byte) channel, (byte) Math.Round(currentBendValue));
+                    currentBendValue++;
+                    currentTick += ticksPerValue;
+                }
+            }
+            // bend down
+            else if (currentBendValue > nextBendValue)
+            {
+                while (currentBendValue >= nextBendValue)
+                {
+                    _handler.AddBend(track.Index, (int) currentTick, (byte) channel, (byte) Math.Round(currentBendValue));
+                    currentBendValue--;
+                    currentTick += ticksPerValue;
+                }
+            }
+            // hold
+            else
+            {
+                _handler.AddBend(track.Index, (int) currentTick, (byte) channel, (byte) Math.Round(currentBendValue));
+            }
+        }
+
+        private void GenerateTrill(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue, int channel)
         {
             var track = note.Beat.Voice.Bar.Staff.Track;
             var trillKey = note.StringTuning + note.TrillFret;
             var trillLength = note.TrillSpeed.ToTicks();
             var realKey = true;
             var tick = noteStart;
-            while (tick + 10 < (noteStart + noteDuration))
+            var end = noteStart + noteDuration.UntilTieEnd;
+            while (tick + 10 < (end))
             {
                 // only the rest on last trill play
-                if ((tick + trillLength) >= (noteStart + noteDuration))
+                if ((tick + trillLength) >= (end))
                 {
-                    trillLength = (noteStart + noteDuration) - tick;
+                    trillLength = (end) - tick;
                 }
-                _handler.AddNote(track.Index, tick, trillLength, (byte)(realKey ? trillKey : noteKey), dynamicValue, (byte)track.PlaybackInfo.PrimaryChannel);
+                _handler.AddNote(track.Index, tick, trillLength, (byte)(realKey ? trillKey : noteKey), dynamicValue, (byte)channel);
                 realKey = !realKey;
                 tick += trillLength;
             }
         }
 
-        private void GenerateTremoloPicking(Note note, int noteStart, int noteDuration, int noteKey, DynamicValue dynamicValue)
+        private void GenerateTremoloPicking(Note note, int noteStart, MidiNoteDuration noteDuration, int noteKey, DynamicValue dynamicValue, int channel)
         {
             var track = note.Beat.Voice.Bar.Staff.Track;
             var tpLength = note.Beat.TremoloSpeed.Value.ToTicks();
             var tick = noteStart;
-            while (tick + 10 < (noteStart + noteDuration))
+            var end = noteStart + noteDuration.UntilTieEnd;
+            while (tick + 10 < (end))
             {
                 // only the rest on last trill play
-                if ((tick + tpLength) >= (noteStart + noteDuration))
+                if ((tick + tpLength) >= (end))
                 {
-                    tpLength = (noteStart + noteDuration) - tick;
+                    tpLength = (end) - tick;
                 }
-                _handler.AddNote(track.Index, tick, tpLength, (byte)noteKey, dynamicValue, (byte)track.PlaybackInfo.PrimaryChannel);
+                _handler.AddNote(track.Index, tick, tpLength, (byte)noteKey, dynamicValue, (byte)channel);
                 tick += tpLength;
             }
         }
 
         private int[] GetBrushInfo(Beat beat)
         {
-            var brushInfo = new int[beat.Voice.Bar.Staff.Track.Tuning.Length];
+            var brushInfo = new int[beat.Voice.Bar.Staff.Tuning.Length];
 
             if (beat.BrushType != BrushType.None)
             {
@@ -629,12 +958,14 @@ namespace AlphaTab.Audio.Generator
 
                 // a mask where the single bits indicate the strings used
                 var stringUsed = 0;
+                var stringCount = 0;
 
                 for (int i = 0, j = beat.Notes.Count; i < j; i++)
                 {
                     var n = beat.Notes[i];
                     if (n.IsTieDestination) continue;
                     stringUsed |= 0x01 << (n.String - 1);
+                    stringCount++;
                 }
 
                 //
@@ -642,8 +973,8 @@ namespace AlphaTab.Audio.Generator
                 if (beat.Notes.Count > 0)
                 {
                     int brushMove = 0;
-                    var brushIncrement = GetBrushIncrement(beat);
-                    for (int i = 0, j = beat.Voice.Bar.Staff.Track.Tuning.Length; i < j; i++)
+                    var brushIncrement = beat.BrushDuration / (stringCount - 1);
+                    for (int i = 0, j = beat.Voice.Bar.Staff.Tuning.Length; i < j; i++)
                     {
                         var index = (beat.BrushType == BrushType.ArpeggioDown || beat.BrushType == BrushType.BrushDown)
                                     ? i
@@ -651,7 +982,7 @@ namespace AlphaTab.Audio.Generator
                         if ((stringUsed & (0x01 << index)) != 0)
                         {
                             brushInfo[index] = brushMove;
-                            brushMove = brushIncrement;
+                            brushMove += brushIncrement;
                         }
                     }
                 }
@@ -663,7 +994,7 @@ namespace AlphaTab.Audio.Generator
         private int GetBrushIncrement(Beat beat)
         {
             if (beat.BrushDuration == 0) return 0;
-            var duration = beat.CalculateDuration();
+            var duration = beat.PlaybackDuration;
             if (duration == 0) return 0;
             return (int)((duration / 8.0) * (4.0 / beat.BrushDuration));
         }
@@ -677,34 +1008,34 @@ namespace AlphaTab.Audio.Generator
             switch (automation.Type)
             {
                 case AutomationType.Instrument:
-                    _handler.AddProgramChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
+                    _handler.AddProgramChange(beat.Voice.Bar.Staff.Track.Index, beat.PlaybackStart + startMove,
                                                 (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel,
                                                 (byte)(automation.Value));
-                    _handler.AddProgramChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
+                    _handler.AddProgramChange(beat.Voice.Bar.Staff.Track.Index, beat.PlaybackStart + startMove,
                                                 (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel,
                                                 (byte)(automation.Value));
                     break;
                 case AutomationType.Balance:
                     var balance = ToChannelShort((int)automation.Value);
-                    _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
+                    _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.PlaybackStart + startMove,
                                                 (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel,
-                                                (byte)MidiController.PanCoarse,
+                                                (byte)ControllerTypeEnum.PanCoarse,
                                                 (byte)balance);
-                    _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
+                    _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.PlaybackStart + startMove,
                                                 (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel,
-                                                (byte)MidiController.PanCoarse,
+                                                (byte)ControllerTypeEnum.PanCoarse,
                                                 (byte)balance);
                     break;
                 case AutomationType.Volume:
                     var volume = ToChannelShort((int)automation.Value);
 
-                    _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
+                    _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.PlaybackStart + startMove,
                                                 (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.PrimaryChannel,
-                                                (byte)MidiController.VolumeCoarse,
+                                                (byte)ControllerTypeEnum.VolumeCoarse,
                                                 (byte)volume);
-                    _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.Start + startMove,
+                    _handler.AddControlChange(beat.Voice.Bar.Staff.Track.Index, beat.PlaybackStart + startMove,
                                                 (byte)beat.Voice.Bar.Staff.Track.PlaybackInfo.SecondaryChannel,
-                                                (byte)MidiController.VolumeCoarse,
+                                                (byte)ControllerTypeEnum.VolumeCoarse,
                                                 (byte)volume);
                     break;
             }

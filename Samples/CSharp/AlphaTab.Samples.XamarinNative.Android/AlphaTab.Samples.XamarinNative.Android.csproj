@@ -58,7 +58,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidAsset Include="..\..\JavaScript\files\Canon.gp5">
+    <AndroidAsset Include="..\..\..\Documentation\input\assets\files\Canon.gp5">
       <Link>Assets\Canon.gp5</Link>
     </AndroidAsset>
     <None Include="Readme.md" />
@@ -80,15 +80,17 @@
     <None Include="Properties\AndroidManifest.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Source\AlphaTab.Xamarin.Android\AlphaTab.Xamarin.Android.csproj">
-      <Project>{cf20a332-7808-46ac-99f4-84580e18df8a}</Project>
-      <Name>AlphaTab.Xamarin.Android</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <AndroidResource Include="Resources\values\Colors.xml" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Source\AlphaTab.CSharp\AlphaTab.CSharp.csproj">
+      <Project>{bcc950ea-7465-47fc-a7af-e733b55ec91f}</Project>
+      <Name>AlphaTab.CSharp</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" Condition="Exists('$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets')" />
+  <Import Project="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\Xamarin\Android\Xamarin.Android.CSharp.targets" Condition="Exists('C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\Xamarin\Android\Xamarin.Android.CSharp.targets')" />
+  <Import Project="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\Xamarin\Android\Xamarin.Android.CSharp.targets" Condition="Exists('C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\Xamarin\Android\Xamarin.Android.CSharp.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
      Other similar extension points exist, see Microsoft.Common.targets.
 		<Target Name="BeforeBuild">

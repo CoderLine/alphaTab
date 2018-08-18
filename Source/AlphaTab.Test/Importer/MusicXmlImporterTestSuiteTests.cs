@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace AlphaTab.Test.Importer
 {
     [TestClass]
+    [Ignore]
     public class MusicXmlImporterTestSuiteTests : MusicXmlImporterTestBase
     {
         [TestMethod]
@@ -775,10 +776,14 @@ namespace AlphaTab.Test.Importer
 
         private Score TestReference([CallerMemberName] string caller = null, string renderLayout = "page")
         {
+#if !PHASE
             var fileId = caller.Split('_')[1];
             const string path = "TestFiles/MusicXmlTestSuite";
             var file = Directory.EnumerateFiles(path, "*.xml").FirstOrDefault(f => f.Contains(fileId));
             return TestReferenceFile(file, renderLayout);
+#else
+            return null; // TODO: how to find testfile on JS
+#endif
         }
     }
 }

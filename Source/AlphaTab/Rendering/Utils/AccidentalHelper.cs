@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 
@@ -25,8 +26,10 @@ namespace AlphaTab.Rendering.Utils
     /// This small utilty public class allows the assignment of accidentals within a 
     /// desired scope. 
     /// </summary>
-    public class AccidentalHelper
+    class AccidentalHelper
     {
+        private readonly Bar _bar;
+
         /// <summary>
         /// a lookup list containing an info whether the notes within an octave 
         /// need an accidental rendered. the accidental symbol is determined based on the type of key signature. 
@@ -88,11 +91,24 @@ namespace AlphaTab.Rendering.Utils
         private readonly FastDictionary<int, bool> _registeredAccidentals;
 
         private readonly FastDictionary<int, int> _appliedScoreLines;
+        private readonly FastDictionary<int, int> _appliedScoreLinesByValue;
+        private readonly FastDictionary<int, Note> _notesByValue;
 
-        public AccidentalHelper()
+        public Beat MaxNoteValueBeat { get; set; }
+        public Beat MinNoteValueBeat { get; set; }
+        public int MaxNoteValue { get; set; }
+        public int MinNoteValue { get; set; }
+
+        public AccidentalHelper(Bar bar)
         {
+            _bar = bar;
             _registeredAccidentals = new FastDictionary<int, bool>();
             _appliedScoreLines = new FastDictionary<int, int>();
+            _appliedScoreLinesByValue = new FastDictionary<int, int>();
+            _notesByValue = new FastDictionary<int, Note>();
+
+            MaxNoteValue = -1;
+            MinNoteValue = -1;
         }
 
         /// <summary>
@@ -103,19 +119,53 @@ namespace AlphaTab.Rendering.Utils
         /// <returns></returns>
         public AccidentalType ApplyAccidental(Note note)
         {
-            var track = note.Beat.Voice.Bar.Staff.Track;
-            var noteValue = track.IsPercussion ? PercussionMapper.MapNoteForDisplay(note) : note.RealValue - track.DisplayTranspositionPitch;
-
-            var ks = note.Beat.Voice.Bar.MasterBar.KeySignature;
-            var ksi = (ks + 7);
-            var index = (noteValue % 12);
-
-            var accidentalToSet = AccidentalType.None;
-
-            var line = RegisterNoteLine(note);
-
-            if (!note.Beat.Voice.Bar.Staff.Track.IsPercussion)
+            var noteValue = note.DisplayValue;
+            bool quarterBend = note.HasQuarterToneOffset;
+            var line = RegisterNoteLine(note, noteValue);
+            if (MinNoteValue == -1 || noteValue < MinNoteValue)
             {
+                MinNoteValue = noteValue;
+                MinNoteValueBeat = note.Beat;
+            }
+            if (MaxNoteValue == -1 || noteValue > MaxNoteValue)
+            {
+                MaxNoteValue = noteValue;
+                MaxNoteValueBeat = note.Beat;
+            }
+            return GetAccidental(line, noteValue, quarterBend);
+        }
+
+        /// <summary>
+        /// Calculates the accidental for the given note value and assignes the value to it. 
+        /// The new accidental type is also registered within the current scope
+        /// </summary>
+        /// <param name="note"></param>
+        /// <returns></returns>
+        public AccidentalType ApplyAccidentalForValue(Beat relatedBeat, int noteValue, bool quarterBend)
+        {
+            var line = RegisterNoteValueLine(noteValue);
+            if (MinNoteValue == -1 || noteValue < MinNoteValue)
+            {
+                MinNoteValue = noteValue;
+                MinNoteValueBeat = relatedBeat;
+            }
+            if (MaxNoteValue == -1 || noteValue > MaxNoteValue)
+            {
+                MaxNoteValue = noteValue;
+                MaxNoteValueBeat = relatedBeat;
+            }
+            return GetAccidental(line, noteValue, quarterBend);
+        }
+
+        private AccidentalType GetAccidental(int line, int noteValue, bool quarterBend)
+        { 
+            var accidentalToSet = AccidentalType.None;
+            if (_bar.Staff.StaffKind != StaffKind.Percussion)
+            {
+                var ks = _bar.MasterBar.KeySignature;
+                var ksi = (ks + 7);
+                var index = (noteValue % 12);
+
                 // the key signature symbol required according to 
                 var keySignatureAccidental = ksi < 7 ? AccidentalType.Flat : AccidentalType.Sharp;
 
@@ -123,30 +173,67 @@ namespace AlphaTab.Rendering.Utils
                 var hasNoteAccidentalForKeySignature = KeySignatureLookup[ksi][index];
                 var isAccidentalNote = AccidentalNotes[index];
 
-                var isAccidentalRegistered = _registeredAccidentals.ContainsKey(line);
-                if (hasNoteAccidentalForKeySignature != isAccidentalNote && !isAccidentalRegistered)
+                if (quarterBend)
                 {
-                    _registeredAccidentals[line] = true;
                     accidentalToSet = isAccidentalNote ? keySignatureAccidental : AccidentalType.Natural;
                 }
-                else if (hasNoteAccidentalForKeySignature == isAccidentalNote && isAccidentalRegistered)
+                else
                 {
-                    _registeredAccidentals.Remove(line);
-                    accidentalToSet = isAccidentalNote ? keySignatureAccidental : AccidentalType.Natural;
+                    var isAccidentalRegistered = _registeredAccidentals.ContainsKey(line);
+                    if (hasNoteAccidentalForKeySignature != isAccidentalNote && !isAccidentalRegistered)
+                    {
+                        _registeredAccidentals[line] = true;
+                        accidentalToSet = isAccidentalNote ? keySignatureAccidental : AccidentalType.Natural;
+                    }
+                    else if (hasNoteAccidentalForKeySignature == isAccidentalNote && isAccidentalRegistered)
+                    {
+                        _registeredAccidentals.Remove(line);
+                        accidentalToSet = isAccidentalNote ? keySignatureAccidental : AccidentalType.Natural;
+                    }
                 }
             }
 
             // TODO: change accidentalToSet according to note.AccidentalMode
 
+            if (quarterBend)
+            {
+                switch (accidentalToSet)
+                {
+                    case AccidentalType.Natural:
+                        return AccidentalType.NaturalQuarterNoteUp;
+                    case AccidentalType.Sharp:
+                        return AccidentalType.SharpQuarterNoteUp;
+                    case AccidentalType.Flat:
+                        return AccidentalType.FlatQuarterNoteUp;
+                }
+            }
+
             return accidentalToSet;
         }
 
-        private int RegisterNoteLine(Note n)
+        private int RegisterNoteLine(Note n, int noteValue)
         {
-            var track = n.Beat.Voice.Bar.Staff.Track;
-            var value = track.IsPercussion ? PercussionMapper.MapNoteForDisplay(n) : n.RealValue - track.DisplayTranspositionPitch;
-            var ks = n.Beat.Voice.Bar.MasterBar.KeySignature;
-            var clef = n.Beat.Voice.Bar.Clef;
+            var steps = CalculateNoteLine(noteValue, n.AccidentalMode);
+            _appliedScoreLines[n.Id] = steps;
+            _notesByValue[noteValue] = n;
+            return steps;
+        }
+
+        private int RegisterNoteValueLine(int noteValue)
+        {
+            var steps = CalculateNoteLine(noteValue, NoteAccidentalMode.Default);
+            _appliedScoreLinesByValue[noteValue] = steps;
+            return steps;
+        }
+
+        private int CalculateNoteLine(int noteValue, NoteAccidentalMode mode)
+        {
+            var staff = _bar.Staff;
+            var value = staff.StaffKind == StaffKind.Percussion 
+                ? PercussionMapper.MapNoteForDisplay(noteValue) 
+                : noteValue;
+            var ks = _bar.MasterBar.KeySignature;
+            var clef = _bar.Clef;
 
             var index = value % 12;
             var octave = (value / 12) - 1;
@@ -164,7 +251,7 @@ namespace AlphaTab.Rendering.Utils
 
             //Add offset for note itself
             int offset = 0;
-            switch (n.AccidentalMode)
+            switch (mode)
             {
                 // TODO: provide line according to accidentalMode
                 case NoteAccidentalMode.Default:
@@ -180,8 +267,6 @@ namespace AlphaTab.Rendering.Utils
             }
             steps -= stepList[index];
 
-            _appliedScoreLines[n.Id] = steps;
-
             return steps;
         }
 
@@ -189,6 +274,23 @@ namespace AlphaTab.Rendering.Utils
         public int GetNoteLine(Note n)
         {
             return _appliedScoreLines[n.Id];
+        }
+
+        public int GetNoteLineForValue(int rawValue, bool searchForNote = false)
+        {
+            if (_appliedScoreLinesByValue.ContainsKey(rawValue))
+            {
+                return _appliedScoreLinesByValue[rawValue];
+            }
+
+            if (searchForNote && _notesByValue.ContainsKey(rawValue))
+            {
+                return GetNoteLine(_notesByValue[rawValue]);
+            }
+            else
+            {
+                return 0;
+            }
         }
     }
 

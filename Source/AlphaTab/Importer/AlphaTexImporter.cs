@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,19 +27,21 @@ namespace AlphaTab.Importer
     /// <summary>
     /// This importer can parse alphaTex markup into a score structure. 
     /// </summary>
-    public class AlphaTexImporter : ScoreImporter
+    class AlphaTexImporter : ScoreImporter
     {
         private const int Eof = 0;
         private static readonly int[] TrackChannels = { 0, 1 };
 
         private Score _score;
         private Track _track;
+        private Staff _staff;
 
         private int _ch;
         private int _curChPos;
 
         private AlphaTexSymbols _sy;
         private object _syData;
+        private bool _anyDataLoaded;
 
         private bool _allowNegatives;
 
@@ -58,19 +60,20 @@ namespace AlphaTab.Importer
                 _lyrics = new FastList<Lyrics>();
                 NextChar();
                 NewSy();
+                if (_sy == AlphaTexSymbols.LowerThan)
+                {
+                    // potential XML, stop parsing (alphaTex never starts with <)
+                    throw new UnsupportedFormatException("Unknown start sign <");
+                }
                 Score();
 
-                _score.Finish();
+                _score.Finish(Settings);
                 _track.ApplyLyrics(_lyrics);
                 return _score;
             }
-            catch (Exception e)
+            catch (AlphaTexException e)
             {
-                if (Std.IsException<AlphaTexException>(e))
-                {
-                    throw new UnsupportedFormatException(((AlphaTexException)e).Description);
-                }
-                throw e;
+                throw new UnsupportedFormatException(e.Description);
             }
         }
 
@@ -100,10 +103,13 @@ namespace AlphaTab.Importer
             _score.TempoLabel = "";
 
             _track = new Track(1);
+
             _track.PlaybackInfo.Program = 25;
             _track.PlaybackInfo.PrimaryChannel = TrackChannels[0];
             _track.PlaybackInfo.SecondaryChannel = TrackChannels[1];
-            _track.Tuning = Tuning.GetDefaultTuningFor(6).Tunings;
+
+            _staff = _track.Staves[0];
+            _staff.Tuning = Tuning.GetDefaultTuningFor(6).Tunings;
 
             _score.AddTrack(_track);
         }
@@ -217,7 +223,7 @@ namespace AlphaTab.Importer
                 {
                     _sy = AlphaTexSymbols.Eof;
                 }
-                else if (Std.IsWhiteSpace(_ch))
+                else if (Platform.Platform.IsWhiteSpace(_ch))
                 {
                     // skip whitespaces 
                     NextChar();
@@ -334,6 +340,11 @@ namespace AlphaTab.Importer
                     _sy = AlphaTexSymbols.Multiply;
                     NextChar();
                 }
+                else if (_ch == 0x3C /* < */)
+                {
+                    _sy = AlphaTexSymbols.LowerThan;
+                    NextChar();
+                }
                 else if (IsDigit(_ch))
                 {
                     var number = ReadNumber();
@@ -435,7 +446,7 @@ namespace AlphaTab.Importer
                 str.AppendChar(_ch);
                 NextChar();
             } while (IsDigit(_ch));
-            return Std.ParseInt(str.ToString());
+            return Platform.Platform.ParseInt(str.ToString());
         }
 
         #region Recursive Decent Parser
@@ -464,7 +475,7 @@ namespace AlphaTab.Importer
                         Error("title", AlphaTexSymbols.String);
                     }
                     NewSy();
-                    anyMeta = true;
+                    _anyDataLoaded = anyMeta = true;
                 }
                 else if (syData == "subtitle")
                 {
@@ -478,7 +489,7 @@ namespace AlphaTab.Importer
                         Error("subtitle", AlphaTexSymbols.String);
                     }
                     NewSy();
-                    anyMeta = true;
+                    _anyDataLoaded = anyMeta = true;
                 }
                 else if (syData == "artist")
                 {
@@ -492,7 +503,7 @@ namespace AlphaTab.Importer
                         Error("artist", AlphaTexSymbols.String);
                     }
                     NewSy();
-                    anyMeta = true;
+                    _anyDataLoaded = anyMeta = true;
                 }
                 else if (syData == "album")
                 {
@@ -506,7 +517,7 @@ namespace AlphaTab.Importer
                         Error("album", AlphaTexSymbols.String);
                     }
                     NewSy();
-                    anyMeta = true;
+                    _anyDataLoaded = anyMeta = true;
                 }
                 else if (syData == "words")
                 {
@@ -520,7 +531,7 @@ namespace AlphaTab.Importer
                         Error("words", AlphaTexSymbols.String);
                     }
                     NewSy();
-                    anyMeta = true;
+                    _anyDataLoaded = anyMeta = true;
                 }
                 else if (syData == "music")
                 {
@@ -534,7 +545,7 @@ namespace AlphaTab.Importer
                         Error("music", AlphaTexSymbols.String);
                     }
                     NewSy();
-                    anyMeta = true;
+                    _anyDataLoaded = anyMeta = true;
                 }
                 else if (syData == "copyright")
                 {
@@ -548,7 +559,7 @@ namespace AlphaTab.Importer
                         Error("copyright", AlphaTexSymbols.String);
                     }
                     NewSy();
-                    anyMeta = true;
+                    _anyDataLoaded = anyMeta = true;
                 }
                 else if (syData == "tempo")
                 {
@@ -562,21 +573,21 @@ namespace AlphaTab.Importer
                         Error("tempo", AlphaTexSymbols.Number);
                     }
                     NewSy();
-                    anyMeta = true;
+                    _anyDataLoaded = anyMeta = true;
                 }
                 else if (syData == "capo")
                 {
                     NewSy();
                     if (_sy == AlphaTexSymbols.Number)
                     {
-                        _track.Capo = (int)_syData;
+                        _staff.Capo = (int)_syData;
                     }
                     else
                     {
                         Error("capo", AlphaTexSymbols.Number);
                     }
                     NewSy();
-                    anyMeta = true;
+                    _anyDataLoaded = anyMeta = true;
                 }
                 else if (syData == "tuning")
                 {
@@ -588,7 +599,7 @@ namespace AlphaTab.Importer
                             if (text == "piano" || text == "none" || text == "voice")
                             {
                                 // clear tuning
-                                _track.Tuning = new int[0];
+                                _staff.Tuning = new int[0];
                             }
                             else
                             {
@@ -605,13 +616,13 @@ namespace AlphaTab.Importer
                                 NewSy();
                             } while (_sy == AlphaTexSymbols.Tuning);
 
-                            _track.Tuning = tuning.ToArray();
+                            _staff.Tuning = tuning.ToArray();
                             break;
                         default:
                             Error("tuning", AlphaTexSymbols.Tuning);
                             break;
                     }
-                    anyMeta = true;
+                    _anyDataLoaded = anyMeta = true;
                 }
                 else if (syData == "instrument")
                 {
@@ -638,7 +649,7 @@ namespace AlphaTab.Importer
                         Error("instrument", AlphaTexSymbols.Number);
                     }
                     NewSy();
-                    anyMeta = true;
+                    _anyDataLoaded = anyMeta = true;
                 }
                 else if (syData == "lyrics")
                 {
@@ -666,7 +677,7 @@ namespace AlphaTab.Importer
 
                     _lyrics.Add(lyrics);
 
-                    anyMeta = true;
+                    _anyDataLoaded = anyMeta = true;
                 }
                 else if (anyMeta)
                 {
@@ -716,7 +727,7 @@ namespace AlphaTab.Importer
             _score.AddMasterBar(master);
 
             var bar = new Bar();
-            _track.AddBarToStaff(0, bar);
+            _staff.AddBar(bar);
 
             if (master.Index > 0)
             {
@@ -1059,6 +1070,11 @@ namespace AlphaTab.Importer
                     beat.GraceType = GraceType.OnBeat;
                     NewSy();
                 }
+                else if (_syData.ToString().ToLower() == "b")
+                {
+                    beat.GraceType = GraceType.BendGrace;
+                    NewSy();
+                }
                 else
                 {
                     beat.GraceType = GraceType.BeforeBeat;
@@ -1101,8 +1117,8 @@ namespace AlphaTab.Importer
         {
             // fret.string
 
-            var isDead = _syData == "x";
-            var isTie = _syData == "-";
+            var isDead = _syData.ToString() == "x";
+            var isTie = _syData.ToString() == "-";
             var fret = -1;
             var octave = -1;
             var tone = -1;
@@ -1134,7 +1150,7 @@ namespace AlphaTab.Importer
 
             NewSy(); // Fret done
 
-            var isFretted = octave == -1 && _track.Tuning.Length > 0;
+            var isFretted = octave == -1 && _staff.Tuning.Length > 0;
 
             int @string = -1;
             if (isFretted)
@@ -1152,7 +1168,7 @@ namespace AlphaTab.Importer
                     Error("note-string", AlphaTexSymbols.Number);
                 }
                 @string = (int)_syData;
-                if (@string < 1 || @string > _track.Tuning.Length)
+                if (@string < 1 || @string > _staff.Tuning.Length)
                 {
                     Error("note-string", AlphaTexSymbols.Number, false);
                 }
@@ -1164,7 +1180,7 @@ namespace AlphaTab.Importer
             beat.AddNote(note);
             if (isFretted)
             {
-                note.String = _track.Tuning.Length - (@string - 1);
+                note.String = _staff.Tuning.Length - (@string - 1);
                 note.IsDead = isDead;
                 note.IsTieDestination = isTie;
                 if (!isTie)
@@ -1513,7 +1529,8 @@ namespace AlphaTab.Importer
                             bar.Clef = ParseClefFromInt((int)_syData);
                             break;
                         case AlphaTexSymbols.Tuning:
-                            bar.Clef = ParseClefFromInt(((TuningParseResult)_syData).RealValue);
+                            TuningParseResult parseResult = (TuningParseResult) _syData;
+                            bar.Clef = ParseClefFromInt(parseResult.RealValue);
                             break;
                         default:
                             Error("clef", AlphaTexSymbols.String);

@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,16 +22,16 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class ClefGlyph : MusicFontGlyph
+    class ClefGlyph : MusicFontGlyph
     {
         private readonly Clef _clef;
-        private readonly ClefOttavia _clefOttavia;
+        private readonly Ottavia _clefOttava;
 
-        public ClefGlyph(float x, float y, Clef clef, ClefOttavia clefOttavia)
+        public ClefGlyph(float x, float y, Clef clef, Ottavia clefOttava)
             : base(x, y, 1, GetSymbol(clef))
         {
             _clef = clef;
-            _clefOttavia = clefOttavia;
+            _clefOttava = clefOttava;
         }
 
         public override void DoLayout()
@@ -72,46 +72,52 @@ namespace AlphaTab.Rendering.Glyphs
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             base.Paint(cx, cy, canvas);
-            NumberGlyph numberGlyph;
+            Glyph numberGlyph;
             bool top = false;
-            switch (_clefOttavia)
+            switch (_clefOttava)
             {
-                case ClefOttavia._15ma:
-                    numberGlyph = new NumberGlyph(Width/2, 0, 15, 0.5f);
+                case Ottavia._15ma:
+                    numberGlyph = new MusicFontGlyph(-4 * Scale, 0, 0.5f, MusicFontSymbol.Ottava15);
                     top = true;
                     break;
-                case ClefOttavia._8va:
-                    numberGlyph = new NumberGlyph(0, 0, 8, 0.5f);
+                case Ottavia._8va:
+                    numberGlyph = new MusicFontGlyph(-2 * Scale, 0, 0.5f, MusicFontSymbol.Ottava8);
                     top = true;
                     break;
-                case ClefOttavia._8vb:
-                    numberGlyph = new NumberGlyph(0, 0, 8, 0.5f);
+                case Ottavia._8vb:
+                    numberGlyph = new MusicFontGlyph(-6 * Scale, 0, 0.5f, MusicFontSymbol.Ottava8);
                     break;
-                case ClefOttavia._15mb:
-                    numberGlyph = new NumberGlyph(0, 0, 15, 0.5f);
+                case Ottavia._15mb:
+                    numberGlyph = new MusicFontGlyph(-8 * Scale, 0, 0.5f, MusicFontSymbol.Ottava15);
                     break;
                 default:
                     return;
             }
 
-            int offset;
+            int offsetY;
+            int offsetX;
 
             switch (_clef)
             {
                 case Clef.Neutral:
-                    offset = top ? -25 : 10;
+                    offsetY = top ? -12 : 15;
+                    offsetX = 0;
                     break;
                 case Clef.C3:
-                    offset = top ? -30 : 20;
+                    offsetY = top ? -19 : 27;
+                    offsetX = 0;
                     break;
                 case Clef.C4:
-                    offset = top ? -30 : 20;
+                    offsetY = top ? -19 : 27;
+                    offsetX = 0;
                     break;
                 case Clef.F4:
-                    offset = top ? -25 : 20;
+                    offsetY = top ? -9 : 27;
+                    offsetX = -4;
                     break;
                 case Clef.G2:
-                    offset = top ? -50 : 25;
+                    offsetY = top ? -37 : 30;
+                    offsetX = 0;
                     break;
                 default:
                     return;
@@ -120,9 +126,9 @@ namespace AlphaTab.Rendering.Glyphs
             numberGlyph.Renderer = Renderer;
             numberGlyph.DoLayout();
 
-            var x = (Width - numberGlyph.Width)/2;
+            var x = Width / 2;
 
-            numberGlyph.Paint(cx + X + x, cy + Y + offset*Scale, canvas);
+            numberGlyph.Paint(cx + X + x + offsetX * Scale, cy + Y + offsetY * Scale, canvas);
         }
     }
 }

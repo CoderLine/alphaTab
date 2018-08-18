@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,7 @@ namespace AlphaTab.Importer
     /// <summary>
     /// this public class represents a file within the GpxFileSystem
     /// </summary>
-    public class GpxFile
+    class GpxFile
     {
         public string FileName { get; set; }
         public int FileSize { get; set; }
@@ -37,11 +37,12 @@ namespace AlphaTab.Importer
     /// This public class represents the file system structure
     /// stored within a GPX container file. 
     /// </summary>
-    public class GpxFileSystem
+    class GpxFileSystem
     {
         public const string HeaderBcFs = "BCFS";
         public const string HeaderBcFz = "BCFZ";
         public const string ScoreGpif = "score.gpif";
+        public const string BinaryStylesheet = "BinaryStylesheet";
 
         /// <summary>
         /// You can set a file filter method using this setter. On parsing
@@ -144,7 +145,7 @@ namespace AlphaTab.Importer
             var resultOffset = skipHeader ? 4 : 0;
             var resultSize = uncompressed.Length - resultOffset;
             var result = new byte[(int)resultSize];
-            Std.BlockCopy(buffer, resultOffset, result, 0, (int)resultSize);
+            Platform.Platform.BlockCopy(buffer, resultOffset, result, 0, (int)resultSize);
             return result;
         }
 
@@ -244,7 +245,7 @@ namespace AlphaTab.Importer
                         file.Data = new byte[(int)Math.Min(file.FileSize, fileData.Length)];
                         // we can use the getBuffer here because we are intelligent and know not to read the empty data.
                         byte[] raw = fileData.ToArray();
-                        Std.BlockCopy(raw, 0, file.Data, 0, file.Data.Length);
+                        Platform.Platform.BlockCopy(raw, 0, file.Data, 0, file.Data.Length);
                     }
                 }
 

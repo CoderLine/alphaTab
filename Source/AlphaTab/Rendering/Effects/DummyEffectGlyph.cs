@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class DummyEffectGlyph : EffectGlyph
+    class DummyEffectGlyph : EffectGlyph
     {
         private readonly string _s;
 
@@ -38,7 +38,6 @@ namespace AlphaTab.Rendering.Effects
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var res = Renderer.Resources;
-            canvas.Color = res.MainGlyphColor;
             canvas.StrokeRect(cx + X, cy + Y, Width, 20 * Scale);
             canvas.Font = res.TablatureFont;
             canvas.FillText(_s, cx + X, cy + Y);

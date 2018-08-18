@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabNoteChordGlyph : Glyph
+    class TabNoteChordGlyph : Glyph
     {
         private readonly FastList<NoteNumberGlyph> _notes;
         private readonly bool _isGrace;
@@ -34,6 +34,7 @@ namespace AlphaTab.Rendering.Glyphs
         public Note MinStringNote { get; set; }
         public FastDictionary<string, Glyph> BeatEffects { get; set; }
         public FastDictionary<int, NoteNumberGlyph> NotesPerString { get; set; }
+        public float NoteStringWidth { get; set; }
 
         public TabNoteChordGlyph(float x, float y, bool isGrace)
             : base(x, y)
@@ -59,11 +60,11 @@ namespace AlphaTab.Rendering.Glyphs
             return 0;
         }
 
-        public float GetNoteY(Note note)
+        public float GetNoteY(Note note, bool aboveNote = false)
         {
             if (NotesPerString.ContainsKey(note.String))
             {
-                return Y + NotesPerString[note.String].Y;
+                return Y + NotesPerString[note.String].Y + (aboveNote ? -NotesPerString[note.String].Height / 2 : 0);
             }
             return 0;
         }
@@ -71,6 +72,7 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             var w = 0f;
+            var noteStringWidth = 0f;
             for (int i = 0, j = _notes.Count; i < j; i++)
             {
                 var g = _notes[i];
@@ -80,7 +82,14 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     w = g.Width;
                 }
+
+                if (g.NoteStringWidth > noteStringWidth)
+                {
+                    noteStringWidth = g.NoteStringWidth;
+                }
             }
+
+            NoteStringWidth = noteStringWidth;
 
             var tabHeight = Renderer.Resources.TablatureFont.Size;
             var effectY = GetNoteY(MinStringNote) + tabHeight / 2;

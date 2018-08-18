@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This is the base public class for creating factories providing BarRenderers
     /// </summary>
-    public abstract class BarRendererFactory
+    abstract class BarRendererFactory
     {
         public bool IsInAccolade { get; set; }
         public bool HideOnMultiTrack { get; set; }
@@ -40,7 +40,7 @@ namespace AlphaTab.Rendering
 
         public virtual bool CanCreate(Track track, Staff staff)
         {
-            return !HideOnPercussionTrack || !track.IsPercussion;
+            return !HideOnPercussionTrack || staff.StaffKind != StaffKind.Percussion;
         }
         public abstract BarRendererBase Create(ScoreRenderer renderer, Bar bar, StaveSettings staveSettings);
     }

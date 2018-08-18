@@ -1,6 +1,6 @@
 /*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,9 +18,47 @@
 
 using AlphaTab.Audio;
 using AlphaTab.Collections;
+using AlphaTab.Util;
 
 namespace AlphaTab.Model
 {
+    /// <summary>
+    /// Lists all types of whammy bars
+    /// </summary>
+    public enum WhammyType
+    {
+        /// <summary>
+        /// No whammy at all
+        /// </summary>
+        None,
+        /// <summary>
+        /// Individual points define the whammy in a flexible manner. 
+        /// This system was mainly used in Guitar Pro 3-5
+        /// </summary>
+        Custom,
+        /// <summary>
+        /// Simple dive to a lower or higher note.
+        /// </summary>
+        Dive,
+        /// <summary>
+        /// A dive to a lower or higher note and releasing it back to normal. 
+        /// </summary>
+        Dip,
+        /// <summary>
+        /// Continue to hold the whammy at the position from a previous whammy. 
+        /// </summary>
+        Hold,
+        /// <summary>
+        /// Dive to a lower or higher note before playing it. 
+        /// </summary>
+        Predive,
+        /// <summary>
+        /// Dive to a lower or higher note before playing it, then change to another
+        /// note. 
+        /// </summary>
+        PrediveDive
+    }
+
     /// <summary>
     /// A beat is a single block within a bar. A beat is a combination
     /// of several notes played at the same time. 
@@ -40,10 +78,17 @@ namespace AlphaTab.Model
         public Beat NextBeat { get; set; }
         public int Id { get; set; }
         public int Index { get; set; }
+        public bool IsLastOfVoice => Index == Voice.Beats.Count - 1;
 
         public Voice Voice { get; set; }
         public FastList<Note> Notes { get; set; }
+        public FastDictionary<int, Note> NoteStringLookup { get; set; }
         public bool IsEmpty { get; set; }
+        public BendStyle WhammyStyle { get; set; }
+
+        public Ottavia Ottava { get; set; }
+
+        public Fermata Fermata { get; set; }
 
         public bool IsLegatoOrigin { get; set; }
         public bool IsLegatoDestination
@@ -51,71 +96,32 @@ namespace AlphaTab.Model
             get { return PreviousBeat != null && PreviousBeat.IsLegatoOrigin; }
         }
 
-        private Note _minNote;
 
-        public Note MinNote
-        {
-            get
-            {
-                if (_minNote == null)
-                {
-                    RefreshNotes();
-                }
-                return _minNote;
-            }
-        }
-
-        private Note _maxNote;
-
-        public Note MaxNote
-        {
-            get
-            {
-                if (_maxNote == null)
-                {
-                    RefreshNotes();
-                }
-                return _maxNote;
-            }
-        }
-
-        private Note _maxStringNote;
-
-        public Note MaxStringNote
-        {
-            get
-            {
-                if (_maxStringNote == null)
-                {
-                    RefreshNotes();
-                }
-                return _maxStringNote;
-            }
-        }
-
-        private Note _minStringNote;
-
-        public Note MinStringNote
-        {
-            get
-            {
-                if (_minStringNote == null)
-                {
-                    RefreshNotes();
-                }
-                return _minStringNote;
-            }
-        }
+        public Note MinNote { get; set; }
+        public Note MaxNote { get; set; }
+        public Note MaxStringNote { get; set; }
+        public Note MinStringNote { get; set; }
 
         public Duration Duration { get; set; }
+
+        public bool IsSlurOrigin { get; set; }
+        public bool IsSlurDestination { get { return SlurOrigin != null; } }
+        public Beat SlurOrigin { get; set; }
+        public Beat SlurDestination { get; set; }
 
         public bool IsRest
         {
             get
             {
-                return Notes.Count == 0;
+                return IsEmpty || Notes.Count == 0;
             }
         }
+
+        public bool IsRake { get; private set; }
+
+        public bool IsNewLetRing { get; set; }
+        public bool IsLetRing { get; set; }
+        public bool IsPalmMute { get; set; }
 
         public FastList<Automation> Automations { get; set; }
 
@@ -143,15 +149,19 @@ namespace AlphaTab.Model
             }
         }
 
+        public bool IsContinuedWhammy { get; set; }
+        public WhammyType WhammyBarType { get; set; }
         public FastList<BendPoint> WhammyBarPoints { get; set; }
         public BendPoint MaxWhammyPoint { get; set; }
+        public BendPoint MinWhammyPoint { get; set; }
 
         public bool HasWhammyBar
         {
-            get { return WhammyBarPoints.Count > 0; }
+            get { return WhammyBarType != WhammyType.None; }
         }
 
         public VibratoType Vibrato { get; set; }
+
         public string ChordId { get; set; }
         public bool HasChord
         {
@@ -162,7 +172,7 @@ namespace AlphaTab.Model
         {
             get
             {
-                return Voice.Bar.Staff.Track.Chords[ChordId];
+                return Voice.Bar.Staff.Chords[ChordId];
             }
         }
 
@@ -178,14 +188,34 @@ namespace AlphaTab.Model
         public CrescendoType Crescendo { get; set; }
 
         /// <summary>
-        /// The timeline position of the voice within the current bar. (unit: midi ticks)
+        /// The timeline position of the voice within the current bar as it is displayed. (unit: midi ticks)
         /// </summary>
-        public int Start { get; set; }
+        /// <remarks>
+        /// This might differ from the actual playback time due to special grace types. 
+        /// </remarks>
+        public int DisplayStart { get; set; }
 
-        public int AbsoluteStart
+        /// <summary>
+        /// The timeline position of the voice within the current bar as it is played. (unit: midi ticks)
+        /// </summary>
+        /// <remarks>
+        /// This might differ from the actual playback time due to special grace types. 
+        /// </remarks>
+        public int PlaybackStart { get; set; }
+
+        public int DisplayDuration { get; set; }
+        public int PlaybackDuration { get; set; }
+
+        public int AbsoluteDisplayStart
         {
-            get { return Voice.Bar.MasterBar.Start + Start; }
+            get { return Voice.Bar.MasterBar.Start + DisplayStart; }
         }
+
+        public int AbsolutePlaybackStart
+        {
+            get { return Voice.Bar.MasterBar.Start + PlaybackStart; }
+        }
+
         public DynamicValue Dynamic { get; set; }
 
         public bool InvertBeamDirection { get; set; }
@@ -193,6 +223,7 @@ namespace AlphaTab.Model
         public Beat()
         {
             Id = GlobalBeatId++;
+            WhammyBarType = WhammyType.None;
             WhammyBarPoints = new FastList<BendPoint>();
             Notes = new FastList<Note>();
             BrushType = BrushType.None;
@@ -203,12 +234,20 @@ namespace AlphaTab.Model
             TremoloSpeed = null;
             Automations = new FastList<Automation>();
             Dots = 0;
-            Start = 0;
+            DisplayStart = 0;
+            DisplayDuration = 0;
+            PlaybackStart = 0;
+            PlaybackDuration = 0;
             TupletDenominator = -1;
             TupletNumerator = -1;
             Dynamic = DynamicValue.F;
             Crescendo = CrescendoType.None;
             InvertBeamDirection = false;
+            Ottava = Ottavia.Regular;
+            NoteStringLookup = new FastDictionary<int, Note>();
+            WhammyStyle = BendStyle.Default;
+            IsSlurOrigin = false;
+            IsRake = false;
         }
 
         public static void CopyTo(Beat src, Beat dst)
@@ -242,10 +281,17 @@ namespace AlphaTab.Model
             dst.PickStroke = src.PickStroke;
             dst.TremoloSpeed = src.TremoloSpeed;
             dst.Crescendo = src.Crescendo;
-            dst.Start = src.Start;
+            dst.DisplayStart = src.DisplayStart;
+            dst.DisplayDuration = src.DisplayDuration;
+            dst.PlaybackStart = src.PlaybackStart;
+            dst.PlaybackDuration = src.PlaybackDuration;
             dst.Dynamic = src.Dynamic;
             dst.IsLegatoOrigin = src.IsLegatoOrigin;
             dst.InvertBeamDirection = src.InvertBeamDirection;
+            dst.WhammyBarType = src.WhammyBarType;
+            dst.IsContinuedWhammy = src.IsContinuedWhammy;
+            dst.Ottava = src.Ottava;
+            dst.WhammyStyle = src.WhammyStyle;
         }
 
         public Beat Clone()
@@ -276,6 +322,15 @@ namespace AlphaTab.Model
             {
                 MaxWhammyPoint = point;
             }
+            if (MinWhammyPoint == null || point.Value < MinWhammyPoint.Value)
+            {
+                MinWhammyPoint = point;
+            }
+
+            if (WhammyBarType == WhammyType.None)
+            {
+                WhammyBarType = WhammyType.Custom;
+            }
         }
 
         public void RemoveWhammyBarPoint(int index)
@@ -288,22 +343,73 @@ namespace AlphaTab.Model
             var point = WhammyBarPoints[index];
 
             // update maxWhammy point if required
-            if (point != MaxWhammyPoint) return;
-            MaxWhammyPoint = null;
-            foreach (var currentPoint in WhammyBarPoints)
+            if (point == MaxWhammyPoint)
             {
-                if (MaxWhammyPoint == null || currentPoint.Value > MaxWhammyPoint.Value)
+                MaxWhammyPoint = null;
+                foreach (var currentPoint in WhammyBarPoints)
                 {
-                    MaxWhammyPoint = currentPoint;
+                    if (MaxWhammyPoint == null || currentPoint.Value > MaxWhammyPoint.Value)
+                    {
+                        MaxWhammyPoint = currentPoint;
+                    }
+                }
+            }
+            if (point == MinWhammyPoint)
+            {
+                MinWhammyPoint = null;
+                foreach (var currentPoint in WhammyBarPoints)
+                {
+                    if (MinWhammyPoint == null || currentPoint.Value < MinWhammyPoint.Value)
+                    {
+                        MinWhammyPoint = currentPoint;
+                    }
                 }
             }
         }
 
-        /// <summary>
-        /// Calculates the time spent in this bar. (unit: midi ticks)
-        /// </summary>
-        /// <returns></returns>
-        public int CalculateDuration()
+        public void AddNote(Note note)
+        {
+            note.Beat = this;
+            note.Index = Notes.Count;
+            Notes.Add(note);
+            if (note.IsStringed)
+            {
+                NoteStringLookup[note.String] = note;
+            }
+        }
+
+        public void RemoveNote(Note note)
+        {
+            var index = Notes.IndexOf(note);
+            if (index >= 0)
+            {
+                Notes.RemoveAt(index);
+            }
+        }
+
+        public Automation GetAutomation(AutomationType type)
+        {
+            for (int i = 0, j = Automations.Count; i < j; i++)
+            {
+                var automation = Automations[i];
+                if (automation.Type == type)
+                {
+                    return automation;
+                }
+            }
+            return null;
+        }
+
+        public Note GetNoteOnString(int @string)
+        {
+            if (NoteStringLookup.ContainsKey(@string))
+            {
+                return NoteStringLookup[@string];
+            }
+            return null;
+        }
+
+        private int CalculateDuration()
         {
             var ticks = Duration.ToTicks();
             if (Dots == 2)
@@ -323,93 +429,370 @@ namespace AlphaTab.Model
             return ticks;
         }
 
-        public void AddNote(Note note)
+        public void UpdateDurations()
         {
-            note.Beat = this;
-            note.Index = Notes.Count;
-            Notes.Add(note);
-        }
+            var ticks = CalculateDuration();
+            PlaybackDuration = ticks;
+            DisplayDuration = ticks;
 
-        public void RemoveNote(Note note)
-        {
-            var index = Notes.IndexOf(note);
-            if (index >= 0)
+            switch (GraceType)
             {
-                Notes.RemoveAt(index);
+                case GraceType.BeforeBeat:
+                case GraceType.OnBeat:
+                    switch (Duration)
+                    {
+                        case Duration.Eighth:
+                            PlaybackDuration = Duration.ThirtySecond.ToTicks();
+                            break;
+                        case Duration.Sixteenth:
+                            PlaybackDuration = Duration.SixtyFourth.ToTicks();
+                            break;
+                        case Duration.ThirtySecond:
+                            PlaybackDuration = Duration.OneHundredTwentyEighth.ToTicks();
+                            break;
+                    }
+                    break;
+                case GraceType.BendGrace:
+                    PlaybackDuration /= 2;
+                    break;
+                default:
+
+                    var previous = PreviousBeat;
+                    if (previous != null && previous.GraceType == GraceType.BendGrace)
+                    {
+                        PlaybackDuration = previous.PlaybackDuration;
+                    }
+                    else
+                    {
+                        while (previous != null && (previous.GraceType == GraceType.OnBeat))
+                        {
+                            // if the previous beat is a on-beat grace it steals the duration from this beat
+                            PlaybackDuration -= previous.PlaybackDuration;
+                            previous = previous.PreviousBeat;
+                        }
+                    }
+
+                    break;
             }
 
-            if (note == _minNote || note == _maxNote || note == _minStringNote || note == _maxStringNote)
-            {
-                RefreshNotes();
-            }
+         
+            //// It can happen that the first beat of the next bar shifts into this
+            //// beat due to before-beat grace. In this case we need to 
+            //// reduce the duration of this beat. 
+            //// Within the same bar the start of the next beat is always directly after the current. 
+            
+            //if (NextBeat != null && NextBeat.Voice.Bar != Voice.Bar)
+            //{
+            //    var next = NextBeat;
+            //    while (next != null && next.GraceType == GraceType.BeforeBeat)
+            //    {
+            //        PlaybackDuration -= next.CalculateDuration();
+            //        next = next.NextBeat;
+            //    }
+            //}
         }
 
-        public void RefreshNotes()
+        public void Finish(Settings settings)
         {
+            var displayMode = settings == null ? DisplayMode.GuitarPro : settings.DisplayMode;
+            var isGradual = Text == "grad" || Text == "grad.";
+            if (isGradual && displayMode == DisplayMode.SongBook)
+            {
+                Text = "";
+            }
+
+            var needCopyBeatForBend = false;
+            MinNote = null;
+            MaxNote = null;
+            MinStringNote = null;
+            MaxStringNote = null;
+
+            var visibleNotes = 0;
+
             for (int i = 0, j = Notes.Count; i < j; i++)
             {
                 var note = Notes[i];
-                if (_minNote == null || note.RealValue < _minNote.RealValue)
+                note.Finish(settings);
+                if (note.IsLetRing)
                 {
-                    _minNote = note;
+                    IsLetRing = true;
                 }
-                if (_maxNote == null || note.RealValue > _maxNote.RealValue)
+                if (note.IsPalmMute)
                 {
-                    _maxNote = note;
+                    IsPalmMute = true;
                 }
-                if (_minStringNote == null || note.String < _minStringNote.String)
+
+                if (note.IsSlurOrigin)
                 {
-                    _minStringNote = note;
+                    IsSlurOrigin = true;
                 }
-                if (_maxStringNote == null || note.String > _maxStringNote.String)
+                if (displayMode == DisplayMode.SongBook && note.HasBend && GraceType != GraceType.BendGrace)
                 {
-                    _maxStringNote = note;
+                    if (!note.IsTieOrigin)
+                    {
+                        switch (note.BendType)
+                        {
+                            case BendType.Bend:
+                            case BendType.PrebendRelease:
+                            case BendType.PrebendBend:
+                                needCopyBeatForBend = true;
+                                break;
+                        }
+                    }
+
+                    if (isGradual || note.BendStyle == BendStyle.Gradual)
+                    {
+                        isGradual = true;
+                        note.BendStyle = BendStyle.Gradual;
+                        needCopyBeatForBend = false;
+                    }
+                    else
+                    {
+                        note.BendStyle = BendStyle.Fast;
+                    }
                 }
+
+                if (note.IsVisible)
+                {
+                    visibleNotes++;
+                    if (MinNote == null || note.RealValue < MinNote.RealValue)
+                    {
+                        MinNote = note;
+                    }
+
+                    if (MaxNote == null || note.RealValue > MaxNote.RealValue)
+                    {
+                        MaxNote = note;
+                    }
+
+                    if (MinStringNote == null || note.String < MinStringNote.String)
+                    {
+                        MinStringNote = note;
+                    }
+
+                    if (MaxStringNote == null || note.String > MaxStringNote.String)
+                    {
+                        MaxStringNote = note;
+                    }
+                }
+            }
+
+            if (visibleNotes == 0)
+            {
+                IsEmpty = true;
+            }
+
+            if (IsSlurOrigin)
+            {
+                IsSlurOrigin = true;
+                SlurDestination = NextBeat;
+                if (!IsSlurDestination)
+                {
+                    SlurOrigin = this;
+                    if (SlurDestination != null)
+                    {
+                        SlurDestination.SlurOrigin = this;
+                    }
+                }
+                else
+                {
+                    SlurOrigin.SlurDestination = SlurDestination;
+                    if (SlurDestination != null)
+                    {
+                        SlurDestination.SlurOrigin = SlurOrigin;
+                    }
+                }
+            }
+
+            // we need to clean al letring/palmmute flags for rests
+            // in case the effect is not continued on this beat
+            if (!IsRest && (!IsLetRing || !IsPalmMute))
+            {
+                var currentBeat = PreviousBeat;
+                while (currentBeat != null && currentBeat.IsRest)
+                {
+                    if (!IsLetRing)
+                    {
+                        currentBeat.IsLetRing = false;
+                    }
+                    if (!IsPalmMute)
+                    {
+                        currentBeat.IsPalmMute = false;
+                    }
+
+                    currentBeat = currentBeat.PreviousBeat;
+                }
+            }
+            // if beat is a rest implicitely take over letring/palmmute
+            // from the previous beat gets cleaned later in case we flagged it wrong. 
+            else if (IsRest && PreviousBeat != null && settings != null && settings.DisplayMode == DisplayMode.GuitarPro)
+            {
+                if (PreviousBeat.IsLetRing)
+                {
+                    IsLetRing = true;
+                }
+
+                if (PreviousBeat.IsPalmMute)
+                {
+                    IsPalmMute = true;
+                }
+            }
+
+
+            // try to detect what kind of bend was used and cleans unneeded points if required
+            // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all whammys
+            if (WhammyBarPoints.Count > 0 && WhammyBarType == WhammyType.Custom)
+            {
+                if (displayMode == DisplayMode.SongBook)
+                {
+                    WhammyStyle = isGradual ? BendStyle.Gradual : BendStyle.Fast;
+                }
+
+                var isContinuedWhammy = IsContinuedWhammy = PreviousBeat != null && PreviousBeat.HasWhammyBar;
+                if (WhammyBarPoints.Count == 4)
+                {
+                    var origin = WhammyBarPoints[0];
+                    var middle1 = WhammyBarPoints[1];
+                    var middle2 = WhammyBarPoints[2];
+                    var destination = WhammyBarPoints[3];
+
+                    // the middle points are used for holds, anything else is a new feature we do not support yet
+                    if (middle1.Value == middle2.Value)
+                    {
+                        // constant decrease or increase
+                        if (origin.Value < middle1.Value && middle1.Value < destination.Value ||
+                            origin.Value > middle1.Value && middle1.Value > destination.Value)
+                        {
+                            if (origin.Value != 0 && !isContinuedWhammy)
+                            {
+                                WhammyBarType = WhammyType.PrediveDive;
+                            }
+                            else
+                            {
+                                WhammyBarType = WhammyType.Dive;
+                            }
+
+                            WhammyBarPoints.RemoveAt(2);
+                            WhammyBarPoints.RemoveAt(1);
+                        }
+                        // down-up or up-down
+                        else if (origin.Value > middle1.Value && middle1.Value < destination.Value ||
+                                origin.Value < middle1.Value && middle1.Value > destination.Value)
+                        {
+                            WhammyBarType = WhammyType.Dip;
+                            if (middle1.Offset == middle2.Offset)
+                            {
+                                WhammyBarPoints.RemoveAt(2);
+                            }
+                        }
+                        else if (origin.Value == middle1.Value && middle1.Value == destination.Value)
+                        {
+                            if (origin.Value != 0 && !isContinuedWhammy)
+                            {
+                                WhammyBarType = WhammyType.Predive;
+                            }
+                            else
+                            {
+                                WhammyBarType = WhammyType.Hold;
+                            }
+                            WhammyBarPoints.RemoveAt(2);
+                            WhammyBarPoints.RemoveAt(1);
+                        }
+                        else
+                        {
+                            Logger.Warning("Model", "Unsupported whammy type detected, fallback to custom");
+                        }
+                    }
+                    else
+                    {
+                        Logger.Warning("Model", "Unsupported whammy type detected, fallback to custom");
+                    }
+                }
+            }
+
+            UpdateDurations();
+
+            if (needCopyBeatForBend)
+            {
+                // if this beat is a simple bend convert it to a grace beat 
+                // and generate a placeholder beat with tied notes
+
+                var cloneBeat = Clone();
+                cloneBeat.Id = GlobalBeatId++;
+                for (int i = 0, j = cloneBeat.Notes.Count; i < j; i++)
+                {
+                    var cloneNote = cloneBeat.Notes[i];
+                    // remove bend on cloned note
+                    cloneNote.BendType = BendType.None;
+                    cloneNote.MaxBendPoint = null;
+                    cloneNote.BendPoints = new FastList<BendPoint>();
+                    cloneNote.BendStyle = BendStyle.Default;
+                    cloneNote.Id = Note.GlobalNoteId++;
+
+                    // if the note has a bend which is continued on the next note
+                    // we need to convert this note into a hold bend
+                    var note = Notes[i];
+                    if (note.HasBend && note.IsTieOrigin)
+                    {
+                        var tieDestination = Note.NextNoteOnSameLine(note);
+                        if (tieDestination != null && tieDestination.HasBend)
+                        {
+                            cloneNote.BendType = BendType.Hold;
+                            var lastPoint = note.BendPoints[note.BendPoints.Count - 1];
+                            cloneNote.AddBendPoint(new BendPoint(0, lastPoint.Value));
+                            cloneNote.AddBendPoint(new BendPoint(BendPoint.MaxPosition, lastPoint.Value));
+                        }
+                    }
+
+                    // mark as tied note
+                    cloneNote.IsTieDestination = true;
+                }
+
+                GraceType = GraceType.BendGrace;
+                UpdateDurations();
+
+                Voice.InsertBeat(this, cloneBeat);
+            }
+
+            Fermata = Voice.Bar.MasterBar.GetFermata(this);
+        }
+
+        private void ApplyGraceDuration(Duration duration)
+        {
+            Beat currentBeat = this;
+            while (currentBeat != null && (currentBeat.GraceType == GraceType.BeforeBeat ||
+                                           currentBeat.GraceType == GraceType.OnBeat))
+            {
+                currentBeat.Duration = duration;
+                currentBeat = currentBeat.PreviousBeat;
             }
         }
 
-        public Automation GetAutomation(AutomationType type)
+        /// <summary>
+        /// Checks whether the current beat is timewise before the given beat. 
+        /// </summary>
+        /// <param name="beat"></param>
+        /// <returns></returns>
+        public bool IsBefore(Beat beat)
         {
-            for (int i = 0, j = Automations.Count; i < j; i++)
-            {
-                var automation = Automations[i];
-                if (automation.Type == type)
-                {
-                    return automation;
-                }
-            }
-            return null;
+            return Voice.Bar.Index < beat.Voice.Bar.Index ||
+                   (beat.Voice.Bar.Index == Voice.Bar.Index && Index < beat.Index);
         }
 
-        public Note GetNoteOnString(int @string)
+        /// <summary>
+        /// Checks whether the current beat is timewise after the given beat. 
+        /// </summary>
+        /// <param name="beat"></param>
+        /// <returns></returns>
+        public bool IsAfter(Beat beat)
         {
-            for (int i = 0, j = Notes.Count; i < j; i++)
-            {
-                var note = Notes[i];
-                if (note.String == @string)
-                {
-                    return note;
-                }
-            }
-            return null;
+            return Voice.Bar.Index > beat.Voice.Bar.Index ||
+                   (beat.Voice.Bar.Index == Voice.Bar.Index && Index > beat.Index);
         }
 
-        public void Finish()
+        public bool HasNoteOnString(int noteString)
         {
-            // start
-            if (Index == 0)
-            {
-                Start = 0;
-            }
-            else
-            {
-                Start = PreviousBeat.Start + PreviousBeat.CalculateDuration();
-            }
-
-            for (int i = 0, j = Notes.Count; i < j; i++)
-            {
-                Notes[i].Finish();
-            }
+            return NoteStringLookup.ContainsKey(noteString);
         }
     }
 }

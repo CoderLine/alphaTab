@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@ namespace AlphaTab.Rendering.Glyphs
     /// <summary>
     /// This simple glyph allows to put an empty region in to a BarRenderer.
     /// </summary>
-    public class SpacingGlyph : Glyph
+    class SpacingGlyph : Glyph
     {
         public SpacingGlyph(float x, float y, float width)
             : base(x, y)

@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,24 +20,35 @@ using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Xml;
+using Note = AlphaTab.Model.Note;
 using XmlNodeType = AlphaTab.Xml.XmlNodeType;
 
 namespace AlphaTab.Importer
 {
-    public class MusicXmlImporter : ScoreImporter
+    class MusicXmlImporter : ScoreImporter
     {
+        public const string MergePartGroupsSetting = "musicXMLMergePartGroups";
+
         private Score _score;
         private FastDictionary<string, Track> _trackById;
+        private FastDictionary<string, FastList<Track>> _partGroups;
+        private string _currentPartGroup;
         private int _trackFirstMeasureNumber;
         private int _maxVoices;
+        private string _currentDirection;
+        private int _firstVoice;
+
+        private FastList<Note> _tieStarts;
 
         public override string Name { get { return "MusicXML"; } }
 
         public override Score ReadScore()
         {
             _trackById = new FastDictionary<string, Track>();
+            _partGroups = new FastDictionary<string, FastList<Track>>();
+            _tieStarts = new FastList<Note>();
 
-            var xml = Std.ToString(Data.ReadAll());
+            var xml = Platform.Platform.ToString(Data.ReadAll());
             XmlDocument dom;
             try
             {
@@ -51,8 +62,59 @@ namespace AlphaTab.Importer
             _score = new Score();
             _score.Tempo = 120;
             ParseDom(dom);
-            _score.Finish();
+
+            // merge partgroups into a single track with multiple staves
+            if (GetSetting(MergePartGroupsSetting, false))
+            {
+                MergePartGroups();
+            }
+
+            _score.Finish(Settings);
+            // the structure of MusicXML does not allow live creation of the groups,
+            _score.RebuildRepeatGroups();
+
             return _score;
+        }
+
+        private void MergePartGroups()
+        {
+            var anyMerged = false;
+            foreach (var groupId in _partGroups)
+            {
+                var tracks = _partGroups[groupId];
+                if (tracks.Count > 1)
+                {
+                    MergeGroup(tracks);
+                    anyMerged = true;
+                }
+            }
+
+            // if any groups were merged, we need to rebuild the indexes
+            if (anyMerged)
+            {
+                for (int i = 0; i < _score.Tracks.Count; i++)
+                {
+                    _score.Tracks[i].Index = i;
+                }
+            }
+        }
+
+        private void MergeGroup(FastList<Track> partGroup)
+        {
+            var primaryTrack = partGroup[0];
+            for (int i = 1; i < partGroup.Count; i++)
+            {
+                // merge staves over to primary track
+                var secondaryTrack = partGroup[i];
+                foreach (var staff in secondaryTrack.Staves)
+                {
+                    primaryTrack.AddStaff(staff);
+                }
+
+                // remove track from score
+                var trackIndex = _score.Tracks.IndexOf(secondaryTrack);
+                _score.Tracks.RemoveAt(trackIndex);
+            }
         }
 
         private void ParseDom(XmlDocument dom)
@@ -84,8 +146,11 @@ namespace AlphaTab.Importer
                 {
                     switch (c.LocalName)
                     {
+                        case "work":
+                            ParseWork(c);
+                            break;
                         case "movement-title":
-                            _score.Title = c.FirstChild.InnerText;
+                            _score.Title = c.InnerText;
                             break;
                         case "identification":
                             ParseIdentification(c);
@@ -101,6 +166,22 @@ namespace AlphaTab.Importer
             }
         }
 
+        private void ParseWork(XmlNode element)
+        {
+            foreach (var c in element.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "work-title":
+                            _score.Title = c.InnerText;
+                            break;
+                    }
+                }
+            }
+        }
+
         private void ParsePart(XmlNode element)
         {
             var id = element.GetAttribute("id");
@@ -108,6 +189,8 @@ namespace AlphaTab.Importer
             {
                 return;
             }
+
+            _firstVoice = -1;
 
             var track = _trackById[id];
             var isFirstMeasure = true;
@@ -136,10 +219,16 @@ namespace AlphaTab.Importer
             }
 
             var barIndex = 0;
+            var barWidth = Platform.Platform.ParseInt(element.GetAttribute("width"));
+            if (barWidth == int.MinValue)
+            {
+                barWidth = 0;
+            }
+
             if (isFirstMeasure)
             {
                 _divisionsPerQuarterNote = 0;
-                _trackFirstMeasureNumber = Std.ParseInt(element.GetAttribute("number"));
+                _trackFirstMeasureNumber = Platform.Platform.ParseInt(element.GetAttribute("number"));
                 if (_trackFirstMeasureNumber == int.MinValue)
                 {
                     _trackFirstMeasureNumber = 0;
@@ -148,7 +237,7 @@ namespace AlphaTab.Importer
             }
             else
             {
-                barIndex = Std.ParseInt(element.GetAttribute("number"));
+                barIndex = Platform.Platform.ParseInt(element.GetAttribute("number"));
                 if (barIndex == int.MinValue)
                 {
                     return false;
@@ -165,7 +254,7 @@ namespace AlphaTab.Importer
                     var stavesElements = attributes[0].GetElementsByTagName("staves");
                     if (stavesElements.Length > 0)
                     {
-                        var staves = Std.ParseInt(stavesElements[0].InnerText);
+                        var staves = Platform.Platform.ParseInt(stavesElements[0].InnerText);
                         track.EnsureStaveCount(staves);
                     }
                 }
@@ -186,13 +275,14 @@ namespace AlphaTab.Importer
                         bar.Clef = previousBar.Clef;
                     }
                     masterBar = GetOrCreateMasterBar(barIndex);
-                    track.AddBarToStaff(s, bar);
+                    track.Staves[s].AddBar(bar);
 
                     for (int v = 0; v < _maxVoices; v++)
                     {
                         var emptyVoice = new Voice();
                         bar.AddVoice(emptyVoice);
                         var emptyBeat = new Beat { IsEmpty = true };
+                        emptyBeat.ChordId = _currentChord;
                         emptyVoice.AddBeat(emptyBeat);
                     }
                 }
@@ -218,7 +308,7 @@ namespace AlphaTab.Importer
                         case "attributes":
                             if (!attributesParsed)
                             {
-                                ParseAttributes(c, bars, masterBar);
+                                ParseAttributes(c, bars, masterBar, track);
                                 attributesParsed = true;
                             }
                             break;
@@ -244,7 +334,13 @@ namespace AlphaTab.Importer
             var voiceNodes = element.GetElementsByTagName("voice");
             if (voiceNodes.Length > 0)
             {
-                voiceIndex = Std.ParseInt(voiceNodes[0].InnerText) - 1;
+                voiceIndex = Platform.Platform.ParseInt(voiceNodes[0].InnerText) - 1;
+
+                if (_firstVoice == -1)
+                {
+                    _firstVoice = voiceIndex;
+                    voiceIndex = 0;
+                }
             }
 
             var previousBeatWasPulled = _previousBeatWasPulled;
@@ -253,7 +349,7 @@ namespace AlphaTab.Importer
             int staff = 1;
             if (staffElement.Length > 0)
             {
-                staff = Std.ParseInt(staffElement[0].InnerText);
+                staff = Platform.Platform.ParseInt(staffElement[0].InnerText);
 
                 // in case we have a beam with a staff-jump we pull the note to the previous staff
                 if ((_isBeamContinue || previousBeatWasPulled) && _previousBeat.Voice.Bar.Staff.Index != staff - 1)
@@ -293,7 +389,7 @@ namespace AlphaTab.Importer
         private void ParseForward(XmlNode element, Bar[] bars)
         {
             var beat = GetOrCreateBeat(element, bars, false);
-            var durationInDivisions = Std.ParseInt(element.FindChildElement("duration").InnerText);
+            var durationInDivisions = Platform.Platform.ParseInt(element.FindChildElement("duration").InnerText);
 
             var duration = (durationInDivisions * (int)Duration.Quarter) / (float)_divisionsPerQuarterNote;
 
@@ -335,7 +431,10 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "staff-lines":
-                            track.Tuning = new int[Std.ParseInt(c.InnerText)];
+                            foreach (var staff in track.Staves)
+                            {
+                                staff.Tuning = new int[Platform.Platform.ParseInt(c.InnerText)];
+                            }
                             break;
                         case "staff-tuning":
                             ParseStaffTuning(c, track);
@@ -344,15 +443,18 @@ namespace AlphaTab.Importer
                 }
             }
 
-            if (IsEmptyTuning(track.Tuning))
+            foreach (var staff in track.Staves)
             {
-                track.Tuning = new int[0];
+                if (IsEmptyTuning(staff.Tuning))
+                {
+                    staff.Tuning = new int[0];
+                }
             }
         }
 
         private void ParseStaffTuning(XmlNode element, Track track)
         {
-            var line = Std.ParseInt(element.GetAttribute("line"));
+            var line = Platform.Platform.ParseInt(element.GetAttribute("line"));
             string tuningStep = "C";
             string tuningOctave = "";
             int tuningAlter = 0;
@@ -366,7 +468,7 @@ namespace AlphaTab.Importer
                             tuningStep = c.InnerText;
                             break;
                         case "tuning-alter":
-                            tuningAlter = Std.ParseInt(c.InnerText);
+                            tuningAlter = Platform.Platform.ParseInt(c.InnerText);
                             break;
                         case "tuning-octave":
                             tuningOctave = c.InnerText;
@@ -375,7 +477,11 @@ namespace AlphaTab.Importer
                 }
             }
 
-            track.Tuning[track.Tuning.Length - line] = TuningParser.GetTuningForText(tuningStep + tuningOctave) + tuningAlter;
+            var tuning = TuningParser.GetTuningForText(tuningStep + tuningOctave) + tuningAlter;
+            foreach (var staff in track.Staves)
+            {
+                staff.Tuning[staff.Tuning.Length - line] = tuning;
+            }
         }
 
         private string _currentChord;
@@ -383,12 +489,61 @@ namespace AlphaTab.Importer
 
         private void ParseHarmony(XmlNode element, Track track)
         {
-            var root = element.FindChildElement("root");
-            var rootStep = root.FindChildElement("root-step").InnerText;
-            var kind = element.FindChildElement("kind").InnerText;
+            string rootStep = null;
+            string rootAlter = "";
+            string kind = null;
+            string kindText = null;
+
+            foreach (var c in element.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "root":
+                            foreach (var rootChild in c.ChildNodes)
+                            {
+                                if (rootChild.NodeType == XmlNodeType.Element)
+                                {
+                                    switch (rootChild.LocalName)
+                                    {
+                                        case "root-step":
+                                            rootStep = rootChild.InnerText;
+                                            break;
+                                        case "root-alter":
+                                            switch (Platform.Platform.ParseInt(c.InnerText))
+                                            {
+                                                case -2:
+                                                    rootAlter = " bb";
+                                                    break;
+                                                case -1:
+                                                    rootAlter = " b";
+                                                    break;
+                                                case 0:
+                                                    rootAlter = "";
+                                                    break;
+                                                case 1:
+                                                    rootAlter = " #";
+                                                    break;
+                                                case 2:
+                                                    rootAlter = " ##";
+                                                    break;
+                                            }
+                                            break;
+                                    }
+                                }
+                            }
+                            break;
+                        case "kind":
+                            kindText = c.GetAttribute("text");
+                            kind = c.InnerText;
+                            break;
+                    }
+                }
+            }
 
             var chord = new Chord();
-            chord.Name = rootStep;
+            chord.Name = rootStep + rootAlter;
             // TODO: find proper names for the rest
             //switch (kind)
             //{
@@ -471,9 +626,9 @@ namespace AlphaTab.Importer
             //var degree = element.GetElementsByTagName("degree");
             //if (degree.Length > 0)
             //{
-            //    var degreeValue = Std.GetNodeValue(degree[0].GetElementsByTagName("degree-value")[0]);
-            //    var degreeAlter = Std.GetNodeValue(degree[0].GetElementsByTagName("degree-alter")[0]);
-            //    var degreeType = Std.GetNodeValue(degree[0].GetElementsByTagName("degree-type")[0]);
+            //    var degreeValue = Platform.GetNodeValue(degree[0].GetElementsByTagName("degree-value")[0]);
+            //    var degreeAlter = Platform.GetNodeValue(degree[0].GetElementsByTagName("degree-alter")[0]);
+            //    var degreeType = Platform.GetNodeValue(degree[0].GetElementsByTagName("degree-type")[0]);
 
             //    if (!string.IsNullOrEmpty(degreeType))
             //    {
@@ -486,9 +641,11 @@ namespace AlphaTab.Importer
             //    }
             //}
 
-
-            _currentChord = Std.NewGuid();
-            track.Chords[_currentChord] = chord;
+            _currentChord = Platform.Platform.NewGuid();
+            foreach (var staff in track.Staves)
+            {
+                staff.Chords[_currentChord] = chord;
+            }
         }
 
         private void ParseBarline(XmlNode element, MasterBar masterBar)
@@ -512,7 +669,7 @@ namespace AlphaTab.Importer
 
         private void ParseEnding(XmlNode element, MasterBar masterBar)
         {
-            var number = Std.ParseInt(element.GetAttribute("number"));
+            var number = Platform.Platform.ParseInt(element.GetAttribute("number"));
             if (number > 0)
             {
                 --number;
@@ -523,7 +680,7 @@ namespace AlphaTab.Importer
         private void ParseRepeat(XmlNode element, MasterBar masterBar)
         {
             var direction = element.GetAttribute("direction");
-            var times = Std.ParseInt(element.GetAttribute("times"));
+            var times = Platform.Platform.ParseInt(element.GetAttribute("times"));
             if (times < 0)
             {
                 times = 2;
@@ -549,8 +706,18 @@ namespace AlphaTab.Importer
             var chord = element.GetElementsByTagName("chord").Length > 0;
             var beat = GetOrCreateBeat(element, bars, chord);
 
-            beat.ChordId = _currentChord;
-            _currentChord = null;
+            if (beat.ChordId == null && _currentChord != null)
+            {
+                beat.ChordId = _currentChord;
+                _currentChord = null;
+            }
+
+            if (_currentDirection != null)
+            {
+                beat.Text = _currentDirection;
+                _currentDirection = null;
+            }
+
 
             var note = new Note();
             beat.Voice.IsEmpty = false;
@@ -566,9 +733,9 @@ namespace AlphaTab.Importer
                     {
                         case "grace":
                             //var slash = e.GetAttribute("slash");
-                            //var makeTime = Std.ParseInt(e.GetAttribute("make-time"));
-                            //var stealTimePrevious = Std.ParseInt(e.GetAttribute("steal-time-previous"));
-                            //var stealTimeFollowing = Std.ParseInt(e.GetAttribute("steal-time-following"));
+                            //var makeTime = Platform.ParseInt(e.GetAttribute("make-time"));
+                            //var stealTimePrevious = Platform.ParseInt(e.GetAttribute("steal-time-previous"));
+                            //var stealTimeFollowing = Platform.ParseInt(e.GetAttribute("steal-time-following"));
                             beat.GraceType = GraceType.BeforeBeat;
                             beat.Duration = Duration.ThirtySecond;
                             break;
@@ -576,7 +743,7 @@ namespace AlphaTab.Importer
                             if (beat.IsRest)
                             {
                                 // unit: divisions per quarter note
-                                var duration = Std.ParseInt(c.InnerText);
+                                var duration = Platform.Platform.ParseInt(c.InnerText);
                                 switch (duration)
                                 {
                                     case 1:
@@ -766,17 +933,20 @@ namespace AlphaTab.Importer
             }
         }
 
-        private static void ParseTied(XmlNode element, Note note)
+        private void ParseTied(XmlNode element, Note note)
         {
             if (note.Beat.GraceType != GraceType.None) return;
 
             if (element.GetAttribute("type") == "start")
             {
                 note.IsTieOrigin = true;
+                _tieStarts.Add(note);
             }
-            else
+            else if (element.GetAttribute("type") == "stop" && _tieStarts.Count > 0)
             {
+                note.TieDestination = _tieStarts[0];
                 note.IsTieDestination = true;
+                _tieStarts.RemoveAt(0);
             }
         }
 
@@ -830,7 +1000,7 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "tremolo":
-                            var tremoloSpeed = Std.ParseInt(c.InnerText);
+                            var tremoloSpeed = Platform.Platform.ParseInt(c.InnerText);
                             switch (tremoloSpeed)
                             {
                                 case 1:
@@ -858,14 +1028,20 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "string":
-                            note.String = Std.ParseInt(c.InnerText);
+                            note.String = Platform.Platform.ParseInt(c.InnerText);
                             if (note.String != int.MinValue)
                             {
-                                note.String = note.Beat.Voice.Bar.Staff.Track.Tuning.Length - note.String + 1;
+                                note.String = note.Beat.Voice.Bar.Staff.Tuning.Length - note.String + 1;
                             }
                             break;
                         case "fret":
-                            note.Fret = Std.ParseInt(c.InnerText);
+                            note.Fret = Platform.Platform.ParseInt(c.InnerText);
+                            break;
+                        case "down-bow":
+                            note.Beat.PickStroke = PickStrokeType.Down;
+                            break;
+                        case "up-bow":
+                            note.Beat.PickStroke = PickStrokeType.Up;
                             break;
                     }
                 }
@@ -944,10 +1120,10 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "actual-notes":
-                            beat.TupletNumerator = Std.ParseInt(c.InnerText);
+                            beat.TupletNumerator = Platform.Platform.ParseInt(c.InnerText);
                             break;
                         case "normal-notes":
-                            beat.TupletDenominator = Std.ParseInt(c.InnerText);
+                            beat.TupletDenominator = Platform.Platform.ParseInt(c.InnerText);
                             break;
                             //case "normal-type":
                             //    break;
@@ -973,11 +1149,11 @@ namespace AlphaTab.Importer
                             step = c.InnerText;
                             break;
                         case "display-alter":
-                            semitones = Std.ParseInt(c.InnerText);
+                            semitones = Platform.Platform.ParseInt(c.InnerText);
                             break;
                         case "display-octave":
                             // 0-9, 4 for middle C
-                            octave = Std.ParseInt(c.InnerText);
+                            octave = Platform.Platform.ParseInt(c.InnerText);
                             break;
                     }
                 }
@@ -1004,15 +1180,15 @@ namespace AlphaTab.Importer
                             step = c.InnerText;
                             break;
                         case "alter":
-                            semitones = Std.ParseFloat(c.InnerText);
-                            if (float.IsNaN(semitones))
+                            semitones = Platform.Platform.ParseFloat(c.InnerText);
+                            if (double.IsNaN(semitones))
                             {
                                 semitones = 0;
                             }
                             break;
                         case "octave":
                             // 0-9, 4 for middle C
-                            octave = Std.ParseInt(c.InnerText);
+                            octave = Platform.Platform.ParseInt(c.InnerText);
                             break;
                     }
                 }
@@ -1056,7 +1232,7 @@ namespace AlphaTab.Importer
                                 var tempoAutomation = new Automation();
                                 tempoAutomation.IsLinear = true;
                                 tempoAutomation.Type = AutomationType.Tempo;
-                                tempoAutomation.Value = Std.ParseInt(tempo);
+                                tempoAutomation.Value = Platform.Platform.ParseInt(tempo);
                                 masterBar.TempoAutomation = tempoAutomation;
                             }
                             break;
@@ -1065,8 +1241,7 @@ namespace AlphaTab.Importer
                             switch (directionType.LocalName)
                             {
                                 case "words":
-                                    masterBar.Section = new Section();
-                                    masterBar.Section.Text = directionType.InnerText;
+                                    _currentDirection = directionType.InnerText;
                                     break;
                                 case "metronome":
                                     ParseMetronome(c.FirstElement, masterBar);
@@ -1092,7 +1267,7 @@ namespace AlphaTab.Importer
                             unit = GetDuration(c.InnerText);
                             break;
                         case "per-minute":
-                            perMinute = Std.ParseInt(c.InnerText);
+                            perMinute = Platform.Platform.ParseInt(c.InnerText);
                             break;
                     }
                 }
@@ -1100,10 +1275,10 @@ namespace AlphaTab.Importer
 
             var tempoAutomation = masterBar.TempoAutomation = new Automation();
             tempoAutomation.Type = AutomationType.Tempo;
-            tempoAutomation.Value = perMinute * ((int) unit / 4);
+            tempoAutomation.Value = perMinute * ((int)unit / 4);
         }
 
-        private void ParseAttributes(XmlNode element, Bar[] bars, MasterBar masterBar)
+        private void ParseAttributes(XmlNode element, Bar[] bars, MasterBar masterBar, Track track)
         {
             int number;
             bool hasTime = false;
@@ -1114,7 +1289,7 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "divisions":
-                            _divisionsPerQuarterNote = Std.ParseInt(c.InnerText);
+                            _divisionsPerQuarterNote = Platform.Platform.ParseInt(c.InnerText);
                             break;
                         case "key":
                             ParseKey(c, masterBar);
@@ -1124,7 +1299,7 @@ namespace AlphaTab.Importer
                             hasTime = true;
                             break;
                         case "clef":
-                            number = Std.ParseInt(c.GetAttribute("number"));
+                            number = Platform.Platform.ParseInt(c.GetAttribute("number"));
                             if (number == int.MinValue)
                             {
                                 number = 1;
@@ -1132,12 +1307,10 @@ namespace AlphaTab.Importer
                             ParseClef(c, bars[number - 1]);
                             break;
                         case "staff-details":
-                            number = Std.ParseInt(c.GetAttribute("number"));
-                            if (number == int.MinValue)
-                            {
-                                number = 1;
-                            }
-                            ParseStaffDetails(c, bars[number - 1].Staff.Track);
+                            ParseStaffDetails(c, track);
+                            break;
+                        case "transpose":
+                            ParseTranspose(c, track);
                             break;
                     }
                 }
@@ -1146,6 +1319,31 @@ namespace AlphaTab.Importer
             if (!hasTime)
             {
                 masterBar.TimeSignatureCommon = true;
+            }
+        }
+
+        private void ParseTranspose(XmlNode element, Track track)
+        {
+            int semitones = 0;
+            foreach (var c in element.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "chromatic":
+                            semitones += Platform.Platform.ParseInt(c.InnerText);
+                            break;
+                        case "octave-change":
+                            semitones += Platform.Platform.ParseInt(c.InnerText) * 12;
+                            break;
+                    }
+                }
+            }
+
+            foreach (var staff in track.Staves)
+            {
+                staff.TranspositionPitch = semitones;
             }
         }
 
@@ -1160,25 +1358,25 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "sign":
-                            sign = c.InnerText;
+                            sign = c.InnerText.ToLower();
                             break;
                         case "line":
-                            line = Std.ParseInt(c.InnerText);
+                            line = Platform.Platform.ParseInt(c.InnerText);
                             break;
                         case "clef-octave-change":
-                            switch (Std.ParseInt(c.InnerText))
+                            switch (Platform.Platform.ParseInt(c.InnerText))
                             {
                                 case -2:
-                                    bar.ClefOttavia = ClefOttavia._15mb;
+                                    bar.ClefOttava = Ottavia._15mb;
                                     break;
                                 case -1:
-                                    bar.ClefOttavia = ClefOttavia._8vb;
+                                    bar.ClefOttava = Ottavia._8vb;
                                     break;
                                 case 1:
-                                    bar.ClefOttavia = ClefOttavia._8va;
+                                    bar.ClefOttava = Ottavia._8va;
                                     break;
                                 case 2:
-                                    bar.ClefOttavia = ClefOttavia._15mb;
+                                    bar.ClefOttava = Ottavia._15mb;
                                     break;
                             }
                             break;
@@ -1206,6 +1404,11 @@ namespace AlphaTab.Importer
                     break;
                 case "percussion":
                     bar.Clef = Clef.Neutral;
+                    bar.Staff.StaffKind = StaffKind.Percussion;
+                    break;
+                case "tab":
+                    bar.Clef = Clef.G2;
+                    bar.Staff.StaffKind = StaffKind.Tablature;
                     break;
                 default:
                     bar.Clef = Clef.G2;
@@ -1233,7 +1436,7 @@ namespace AlphaTab.Importer
                             {
                                 if (!v.Contains("+")) // compound TS
                                 {
-                                    masterBar.TimeSignatureNumerator = Std.ParseInt(v);
+                                    masterBar.TimeSignatureNumerator = Platform.Platform.ParseInt(v);
                                 }
                                 else
                                 {
@@ -1247,7 +1450,7 @@ namespace AlphaTab.Importer
                             {
                                 if (!v.Contains("+")) // compound TS
                                 {
-                                    masterBar.TimeSignatureDenominator = Std.ParseInt(v);
+                                    masterBar.TimeSignatureDenominator = Platform.Platform.ParseInt(v);
                                 }
                                 else
                                 {
@@ -1274,13 +1477,13 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "fifths":
-                            fifths = Std.ParseInt(c.InnerText);
+                            fifths = Platform.Platform.ParseInt(c.InnerText);
                             break;
                         case "key-step":
-                            keyStep = Std.ParseInt(c.InnerText);
+                            keyStep = Platform.Platform.ParseInt(c.InnerText);
                             break;
                         case "key-alter":
-                            keyAlter = Std.ParseInt(c.InnerText);
+                            keyAlter = Platform.Platform.ParseInt(c.InnerText);
                             break;
                         case "mode":
                             mode = c.InnerText;
@@ -1347,7 +1550,7 @@ namespace AlphaTab.Importer
                         case "creator":
                             if (c.GetAttribute("type") == "composer")
                             {
-                                _score.Words = c.InnerText;
+                                _score.Music = c.InnerText;
                             }
                             break;
                         case "rights":
@@ -1370,6 +1573,9 @@ namespace AlphaTab.Importer
                 {
                     switch (c.LocalName)
                     {
+                        case "part-group":
+                            ParsePartGroup(c);
+                            break;
                         case "score-part":
                             ParseScorePart(c);
                             break;
@@ -1379,12 +1585,36 @@ namespace AlphaTab.Importer
 
         }
 
+        private void ParsePartGroup(XmlNode element)
+        {
+            var type = element.GetAttribute("type");
+            switch (type)
+            {
+                case "start":
+                    _currentPartGroup = element.GetAttribute("number");
+                    _partGroups[_currentPartGroup] = new FastList<Track>();
+                    break;
+                case "stop":
+                    _currentPartGroup = null;
+                    break;
+            }
+        }
+
         private void ParseScorePart(XmlNode element)
         {
             string id = element.GetAttribute("id");
-            var track = new Track(1);
+
+            Track track = new Track(1);
+            var staff = track.Staves[0];
+            staff.StaffKind = StaffKind.Score;
             _trackById[id] = track;
             _score.AddTrack(track);
+
+            if (_currentPartGroup != null)
+            {
+                _partGroups[_currentPartGroup].Add(track);
+            }
+
             foreach (var c in element.ChildNodes)
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -1404,9 +1634,9 @@ namespace AlphaTab.Importer
                 }
             }
 
-            if (IsEmptyTuning(track.Tuning))
+            if (IsEmptyTuning(track.Staves[0].Tuning))
             {
-                track.Tuning = new int[0];
+                track.Staves[0].Tuning = new int[0];
             }
         }
 
@@ -1436,13 +1666,13 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "midi-channel":
-                            track.PlaybackInfo.PrimaryChannel = Std.ParseInt(c.InnerText);
+                            track.PlaybackInfo.PrimaryChannel = Platform.Platform.ParseInt(c.InnerText);
                             break;
                         case "midi-program":
-                            track.PlaybackInfo.Program = Std.ParseInt(c.InnerText);
+                            track.PlaybackInfo.Program = Platform.Platform.ParseInt(c.InnerText);
                             break;
                         case "midi-volume":
-                            track.PlaybackInfo.Volume = Std.ParseInt(c.InnerText);
+                            track.PlaybackInfo.Volume = Platform.Platform.ParseInt(c.InnerText);
                             break;
                     }
                 }

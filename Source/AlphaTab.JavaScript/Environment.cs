@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,11 +17,19 @@
  */
 
 using System;
+using AlphaTab.Collections;
+using AlphaTab.Haxe.Js;
+using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Platform;
+using AlphaTab.Platform.JavaScript;
 using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering.Glyphs;
-using SharpKit.Html;
-using SharpKit.JavaScript;
+using AlphaTab.Util;
+using Haxe;
+using Haxe.Js;
+using Phase;
+using Phase.Attributes;
+using Phase.CompilerServices;
 using StringBuilder = AlphaTab.Collections.StringBuilder;
 
 namespace AlphaTab
@@ -31,7 +39,7 @@ namespace AlphaTab
     /// alphaTab looks for information like available layout engines
     /// staves etc.
     /// </summary>
-    public partial class Environment
+    partial class Environment
     {
         public static string ScriptFile { get; set; }
         public static bool IsFontLoaded { get; set; }
@@ -41,15 +49,17 @@ namespace AlphaTab
             RenderEngines["svg"] = () => new CssFontSvgCanvas();
             RenderEngines["default"] = () => new CssFontSvgCanvas();
             RenderEngines["html5"] = () => new Platform.JavaScript.Html5Canvas();
+            
+            RegisterJQueryPlugin();
 
-            // check whether webfont is loaded
-            CheckFontLoad();
-
-            JsContext.JsCode("Math.log2 = Math.log2 || function(x) { return Math.log(x) * Math.LOG2E; };");
+            Script.Write("untyped __js__(\"Math.log2 = Math.log2 || function(x) { return Math.log(x) * Math.LOG2E; };\");");
 
             // try to build the find the alphaTab script url in case we are not in the webworker already
-            if (HtmlContext.self.document.As<bool>())
+            if (Lib.Global.document)
             {
+                Script.Write("untyped __js__(\"window.AudioContext = window.AudioContext || window.webkitAudioContext;\");");
+
+                var document = Browser.Document;
                 /**
                  * VB Loader For IE 
                  * This code is based on the code of 
@@ -57,8 +67,8 @@ namespace AlphaTab
                  *     Copyright (c) 2008 Andy G.P. Na <nagoon97@naver.com>
                  *     The source code is freely distributable under the terms of an MIT-style license.
                  */
+
                 var vbAjaxLoader = new StringBuilder();
-                vbAjaxLoader.AppendLine("<script type=\"text/vbscript\">");
                 vbAjaxLoader.AppendLine("Function VbAjaxLoader(method, fileName)");
                 vbAjaxLoader.AppendLine("    Dim xhr");
                 vbAjaxLoader.AppendLine("    Set xhr = CreateObject(\"Microsoft.XMLHTTP\")");
@@ -77,35 +87,41 @@ namespace AlphaTab
                 vbAjaxLoader.AppendLine("    End If");
                 vbAjaxLoader.AppendLine("    VbAjaxLoader=byteArray");
                 vbAjaxLoader.AppendLine("End Function");
-                vbAjaxLoader.AppendLine("</script>");
-                HtmlContext.document.write(vbAjaxLoader.ToString());
 
-                var scriptElement = HtmlContext.document.Member("currentScript").As<HtmlScriptElement>();
-                if (!scriptElement.As<bool>())
+
+                var vbAjaxLoaderScript = (ScriptElement)document.CreateElement("script");
+                vbAjaxLoaderScript.SetAttribute("type", "text/vbscript");
+                var inlineScript = document.CreateTextNode(vbAjaxLoader.ToString());
+                vbAjaxLoaderScript.AppendChild(inlineScript);
+                document.AddEventListener("DOMContentLoaded", new Action(() =>
+                {
+                    document.Body.AppendChild(vbAjaxLoaderScript);
+                }), false);
+
+                ScriptElement scriptElement = (ScriptElement)document.CurrentScript;
+                if (!scriptElement.IsTruthy())
                 {
                     // try to get javascript from exception stack
                     try
                     {
-                        var error = new JsError();
-                        var stack = error.Member("stack");
-                        if (!stack.As<bool>())
+                        var error = new Error();
+                        var stack = error.Stack;
+                        if (!stack.IsTruthy())
                         {
                             throw error;
                         }
-
-                        ScriptFile = ScriptFileFromStack(stack.As<JsString>());
+                        ScriptFile = ScriptFileFromStack(stack);
                     }
-                    catch (JsError e)
+                    catch (Error e)
                     {
-                        var stack = e.Member("stack");
-                        if (!stack.As<bool>())
+                        var stack = e.Stack;
+                        if (!stack.IsTruthy())
                         {
-                            scriptElement =
-                                HtmlContext.document.querySelector("script[data-alphatab]").As<HtmlScriptElement>();
+                            scriptElement = (ScriptElement)document.QuerySelector("script[data-alphatab]");
                         }
                         else
                         {
-                            ScriptFile = ScriptFileFromStack(stack.As<JsString>());
+                            ScriptFile = ScriptFileFromStack(stack);
                         }
                     }
                 }
@@ -113,30 +129,73 @@ namespace AlphaTab
                 // failed to automatically resolve
                 if (string.IsNullOrEmpty(ScriptFile))
                 {
-                    if (!scriptElement.As<bool>())
+                    if (!scriptElement.IsTruthy())
                     {
-                        HtmlContext.console.warn(
-                            "Could not automatically find alphaTab script file for worker, please add the data-alphatab attribute to the script tag that includes alphaTab or provide it when initializing alphaTab");
+                        Logger.Warning("Environment", "Could not automatically find alphaTab script file for worker, please add the data-alphatab attribute to the script tag that includes alphaTab or provide it when initializing alphaTab");
                     }
                     else
                     {
-                        ScriptFile = scriptElement.src;
+                        ScriptFile = scriptElement.Src;
                     }
                 }
+
+                CheckForFontAvailability();
+            }
+            else
+            {
+                AlphaTabWebWorker.Init();
+                AlphaSynthWebWorker.Init();
             }
         }
 
-        // based on https://github.com/JamesMGreene/currentExecutingScript
-        private static string ScriptFileFromStack(JsString stack)
+        private static void RegisterJQueryPlugin()
         {
-            var matches = stack.match(@"(data:text\/javascript(?:;[^,]+)?,.+?|(?:|blob:)(?:http[s]?|file):\/\/[\/]?.+?\/[^:\)]*?)(?::\d+)(?::\d+)?");
-            if (!matches.As<bool>())
+            if (Platform.Platform.JsonExists(Lib.Global, "jQuery"))
             {
-                matches = stack.match(@"^(?:|[^:@]*@|.+\)@(?=data:text\/javascript|blob|http[s]?|file)|.+?\s+(?: at |@)(?:[^:\(]+ )*[\(]?)(data:text\/javascript(?:;[^,]+)?,.+?|(?:|blob:)(?:http[s]?|file):\/\/[\/]?.+?\/[^:\)]*?)(?::\d+)(?::\d+)?");
-                if (!matches.As<bool>())
+                dynamic jquery = Browser.Window.Member<dynamic>("jQuery");
+
+
+                var api = new JQueryAlphaTab();
+                jquery.fn.alphaTab = (Func<string, object>)(method =>
                 {
-                    matches = stack.match(@"\)@(data:text\/javascript(?:;[^,]+)?,.+?|(?:|blob:)(?:http[s]?|file):\/\/[\/]?.+?\/[^:\)]*?)(?::\d+)(?::\d+)?");
-                    if (!matches.As<bool>())
+                    var _this = Script.Write<HaxeArray<Element>>("untyped __js__(\"this\")");
+                    // if only a single element is affected, we use this
+                    if (_this.Length == 1)
+                    {
+                        return api.Exec(_this[0], method, Script.Write<string[]>("untyped __js__(\"Array.prototype.slice.call(arguments, 1)\")"));
+                    }
+                    // if multiple elements are affected we provide chaining
+                    else
+                    {
+                        return Script.Write<dynamic>("untyped __js__(\"this\")")
+                            .each((Action)(() =>
+                            {
+                                api.Exec(Script.Write<Element>("untyped __js__(\"this\")"), method,
+                                    Script.Write<string[]>("untyped __js__(\"Array.prototype.slice.call(arguments, 1)\")"));
+                            }));
+                    }
+                });
+                jquery.alphaTab = new
+                {
+                    restore = JQueryAlphaTab.Restore
+                };
+                jquery.fn.alphaTab.fn = api;
+            }
+
+
+        }
+
+        // based on https://github.com/JamesMGreene/currentExecutingScript
+        private static string ScriptFileFromStack(string stack)
+        {
+            var matches = stack.Match(@"(data:text\/javascript(?:;[^,]+)?,.+?|(?:|blob:)(?:http[s]?|file):\/\/[\/]?.+?\/[^:\)]*?)(?::\d+)(?::\d+)?");
+            if (!matches.IsTruthy())
+            {
+                matches = stack.Match(@"^(?:|[^:@]*@|.+\)@(?=data:text\/javascript|blob|http[s]?|file)|.+?\s+(?: at |@)(?:[^:\(]+ )*[\(]?)(data:text\/javascript(?:;[^,]+)?,.+?|(?:|blob:)(?:http[s]?|file):\/\/[\/]?.+?\/[^:\)]*?)(?::\d+)(?::\d+)?");
+                if (!matches.IsTruthy())
+                {
+                    matches = stack.Match(@"\)@(data:text\/javascript(?:;[^,]+)?,.+?|(?:|blob:)(?:http[s]?|file):\/\/[\/]?.+?\/[^:\)]*?)(?::\d+)(?::\d+)?");
+                    if (!matches.IsTruthy())
                     {
                         return null;
                     }
@@ -145,9 +204,9 @@ namespace AlphaTab
             return matches[1];
         }
 
-        private static void CheckFontLoad()
+        public static void CheckForFontAvailability()
         {
-            var isWorker = JsContext.JsCode("typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope").As<bool>();
+            var isWorker = Script.Write<bool>("untyped __js__(\"typeof(WorkerGlobalScope) !== 'undefined' && self instanceof WorkerGlobalScope\")");
             if (isWorker)
             {
                 // no web fonts in web worker
@@ -155,60 +214,76 @@ namespace AlphaTab
                 return;
             }
 
-
-            var cssFontLoadingModuleSupported = JsContext.JsCode("!!document.fonts && !!document.fonts.load").As<bool>();
+            var cssFontLoadingModuleSupported = Browser.Document.Fonts.IsTruthy() && Browser.Document.Fonts.Member<object>("load").IsTruthy();
             if (cssFontLoadingModuleSupported)
             {
-                // ReSharper disable once UnusedVariable
-                JsFunc<bool> onLoaded = () =>
+                Action checkFont = null;
+                var firstCheck = true;
+                checkFont = () =>
                 {
-                    IsFontLoaded = true;
-                    return true;
+                    Browser.Document.Fonts.Load("1em alphaTab").Then(_ =>
+                    {
+                        if (Browser.Document.Fonts.Check("1em alphaTab"))
+                        {
+                            Logger.Info("Rendering", "Font available");
+                            IsFontLoaded = true;
+                        }
+                        else
+                        {
+                            Browser.Window.SetTimeout((Action)(() =>
+                            {
+                                checkFont();
+                            }), 250);
+
+                        }
+                        return true;
+                    });
                 };
-                JsContext.JsCode("document.fonts.load('1em alphaTab').then(onLoaded)");
+                checkFont();
             }
             else
             {
                 Action checkFont = null;
                 checkFont = () =>
                 {
-                    var testItem = HtmlContext.document.getElementById("alphaTabFontChecker").As<HtmlDivElement>();
+                    var document = Browser.Document;
+                    var testItem = document.GetElementById("alphaTabFontChecker");
 
                     if (testItem == null)
                     {
                         // create a hidden element with the font style set
-                        testItem = HtmlContext.document.createElement("div").As<HtmlDivElement>();
-                        testItem.setAttribute("id", "alphaTabFontChecker");
-                        testItem.style.opacity = "0";
-                        testItem.style.position = "absolute";
-                        testItem.style.left = "0";
-                        testItem.style.top = "0";
-                        testItem.style.fontSize = "100px";
-                        testItem.classList.add("at");
-                        testItem.innerHTML = "&#" + (int)MusicFontSymbol.ClefG + ";";
+                        testItem = document.CreateElement("div");
+                        testItem.SetAttribute("id", "alphaTabFontChecker");
+                        testItem.Style.Opacity = "0";
+                        testItem.Style.Position = "absolute";
+                        testItem.Style.Left = "0";
+                        testItem.Style.Top = "0";
+                        testItem.Style.FontSize = "100px";
+                        testItem.ClassList.Add("at");
+                        testItem.InnerHTML = "&#" + (int)MusicFontSymbol.ClefG + ";";
 
-                        HtmlContext.document.body.appendChild(testItem);
+                        document.Body.AppendChild(testItem);
                     }
 
                     // get width
-                    var width = testItem.offsetWidth;
+                    var width = testItem.OffsetWidth;
                     if (width > 30 && width < 100)
                     {
                         IsFontLoaded = true;
-                        HtmlContext.document.body.removeChild(testItem);
+                        document.Body.RemoveChild(testItem);
                     }
                     else
                     {
-                        HtmlContext.window.setTimeout(() =>
+                        Browser.Window.SetTimeout((Action)(() =>
                         {
                             checkFont();
-                        }, 1000);
+                        }), 250);
                     }
                 };
-                HtmlContext.window.addEventListener("DOMContentLoaded", e =>
+                Browser.Window.AddEventListener("DOMContentLoaded", (Action)(() =>
                 {
                     checkFont();
-                });
+                }));
             }
         }
     }

@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
 {
-    public class BarHelpers
+    class BarHelpers
     {
         public FastList<FastList<BeamingHelper>> BeamHelpers { get; set; }
         public FastList<FastDictionary<int, BeamingHelper>> BeamHelperLookup { get; set; }
@@ -67,7 +67,7 @@ namespace AlphaTab.Rendering.Utils
                                     forceNewTupletHelper = true;
                                 }
                                 // if not possible, create the next beaming helper
-                                currentBeamHelper = new BeamingHelper(bar.Staff.Track);
+                                currentBeamHelper = new BeamingHelper(bar.Staff);
                                 currentBeamHelper.CheckBeat(b);
                                 BeamHelpers[v.Index].Add(currentBeamHelper);
                             }
@@ -113,6 +113,11 @@ namespace AlphaTab.Rendering.Utils
                     currentTupletHelper = null;
                 }
             }
+        }
+
+        public BeamingHelper GetBeamingHelperForBeat(Beat beat)
+        {
+            return BeamHelperLookup[beat.Voice.Index][beat.Index];
         }
     }
 }

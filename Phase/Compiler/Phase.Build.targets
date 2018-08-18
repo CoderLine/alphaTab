@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask TaskName="Phase" AssemblyFile="$(MSBuildThisFileDirectory)Phase.MsBuild.dll" 
+             />
+  <Target Name="PhaseCompile" AfterTargets="Build">
+    <Message Importance="High" Text="Starting Phase Compiler task" />
+    <Phase
+         Configuration="$(Configuration)"
+         ProjectFile="$(MSBuildProjectFullPath)"
+         DefineConstants="$(DefineConstants)"
+         DisabledWarnings="$(NoWarn)"
+         MainEntryPoint="$(StartupObject)"
+         AssemblyName="$(AssemblyName)"
+         Platform="$(Platform)"
+         References="@(ReferencePathWithRefAssemblies)"
+         Sources="@(Compile)"
+         TargetType="$(OutputType)"
+         TreatWarningsAsErrors="$(TreatWarningsAsErrors)"
+         WarningLevel="$(WarningLevel)"
+         WarningsAsErrors="$(WarningsAsErrors)"
+         WarningsNotAsErrors="$(WarningsNotAsErrors)"
+      />
+  </Target>
+</Project>

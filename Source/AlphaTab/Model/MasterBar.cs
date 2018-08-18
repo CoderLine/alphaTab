@@ -1,6 +1,6 @@
 /*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,7 @@
  */
 
 using AlphaTab.Audio;
+using AlphaTab.Collections;
 
 namespace AlphaTab.Model
 {
@@ -59,6 +60,11 @@ namespace AlphaTab.Model
         public Score Score { get; set; }
 
         /// <summary>
+        /// Gets or sets the fermatas for this bar. The key is the offset of the fermata in midi ticks. 
+        /// </summary>
+        public FastDictionary<int, Fermata> Fermata { get; set; }
+
+        /// <summary>
         /// The timeline position of the voice within the whole score. (unit: midi ticks)
         /// </summary>
         public int Start { get; set; }
@@ -70,6 +76,7 @@ namespace AlphaTab.Model
             TripletFeel = TripletFeel.NoTripletFeel;
             KeySignatureType = KeySignatureType.Major;
             TimeSignatureCommon = false;
+            Fermata = new FastDictionary<int, Fermata>();
         }
 
         public static void CopyTo(MasterBar src, MasterBar dst)
@@ -87,7 +94,7 @@ namespace AlphaTab.Model
             dst.TripletFeel = src.TripletFeel;
             dst.Start = src.Start;
         }
-         
+
         /// <summary>
         /// Calculates the time spent in this bar. (unit: midi ticks)
         /// </summary>
@@ -95,6 +102,30 @@ namespace AlphaTab.Model
         public int CalculateDuration()
         {
             return TimeSignatureNumerator * MidiUtils.ValueToTicks(TimeSignatureDenominator);
+        }
+
+        /// <summary>
+        /// Adds a fermata to the masterbar. 
+        /// </summary>
+        /// <param name="offset">The offset of the fermata within the bar in midi ticks. </param>
+        /// <param name="fermata">The fermata.</param>
+        public void AddFermata(int offset, Fermata fermata)
+        {
+            Fermata[offset] = fermata;
+        }
+
+        /// <summary>
+        /// Gets the fermata for a given beat. 
+        /// </summary>
+        /// <param name="beat">The beat to get the fermata for.</param>
+        /// <returns></returns>
+        public Fermata GetFermata(Beat beat)
+        {
+            if (Fermata.ContainsKey(beat.PlaybackStart))
+            {
+                return Fermata[beat.PlaybackStart];
+            }
+            return null;
         }
     }
 }

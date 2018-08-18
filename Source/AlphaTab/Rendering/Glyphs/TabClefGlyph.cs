@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabClefGlyph : Glyph
+    class TabClefGlyph : Glyph
     {
         public TabClefGlyph(float x, float y)
             : base(x, y)
@@ -33,7 +33,7 @@ namespace AlphaTab.Rendering.Glyphs
         }
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            var strings = Renderer.Bar.Staff.Track.Tuning.Length;
+            var strings = Renderer.Bar.Staff.Tuning.Length;
 
             var correction = strings * Scale * 0.5f;
             var symbol = strings <= 4 ? MusicFontSymbol.ClefTabSmall : MusicFontSymbol.ClefTab;

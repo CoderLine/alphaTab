@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering.Glyphs
     /// A glyph is a single symbol which can be added to a GlyphBarRenderer for automated
     /// layouting and drawing of stacked symbols.
     /// </summary>
-    public class Glyph
+    class Glyph
     {
         public float X { get; set; }
         public float Y { get; set; }

@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,7 @@
  */
 using System;
 using System.IO;
+using System.Linq;
 using AlphaTab.Importer;
 using AlphaTab.Model;
 
@@ -47,7 +48,7 @@ namespace AlphaTab.Samples.ScoreDump
             for (int i = 0; i < score.Tracks.Count; i++)
             {
                 Track track = (Track)score.Tracks[i];
-                Console.WriteLine("   {0} - {1} - {2}", i + 1, track.Name, track.IsPercussion ? "Percussion" : "Midi Instrument: " + track.PlaybackInfo.Program);
+                Console.WriteLine("   {0} - {1} - {2}", i + 1, track.Name, track.Staves.Any(s=>s.StaffKind == StaffKind.Percussion) ? "Percussion" : "Midi Instrument: " + track.PlaybackInfo.Program);
             }
         }
     }

@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,7 @@ namespace AlphaTab.Platform
     /// <summary>
     /// This is the base public interface for canvas implementations on different plattforms.
     /// </summary>
-    public interface ICanvas : IPathCanvas
+    interface ICanvas : IPathCanvas
     {
         RenderingResources Resources { get; set; }
 
@@ -48,18 +48,22 @@ namespace AlphaTab.Platform
         void FillText(string text, float x, float y);
         float MeasureText(string text);
         void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol);
+        void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols);
 
         object OnPreRender();
         void BeginRender(float width, float height);
         object EndRender();
         object OnRenderFinished();
+
+        void BeginRotate(float centerX, float centerY, float angle);
+        void EndRotate();
     }
 
     /// <summary>
     /// This is the path drawing API for canvas implementations
     /// </summary>
     // NOTE: For a full HTML based rendering we need to get rid of those 
-    public interface IPathCanvas
+    interface IPathCanvas
     {
         void BeginPath();
         void ClosePath();

@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,7 +17,7 @@
  */
 namespace AlphaTab.Rendering.Glyphs
 {
-    public enum MusicFontSymbol
+    enum MusicFontSymbol
     {
         None = -1,
 
@@ -65,6 +65,7 @@ namespace AlphaTab.Rendering.Glyphs
         NoteQuarter = 0xE0A4,
         NoteDead = 0xE0AA,
         NoteHarmonic = 0xE0DC,
+        NoteHarmonicWhole = 0xE0DE,
         NoteRideCymbal = 0xE0DE,
         NoteHiHat = 0xE0B3,
         NoteSideStick = 0xE0A9,
@@ -101,7 +102,8 @@ namespace AlphaTab.Rendering.Glyphs
         Accentuation = 0xE4A0,
         HeavyAccentuation = 0xE4AC,
 
-        WaveHorizontal = 0xEAA4,
+        WaveHorizontalSlight = 0xEAA4,
+        WaveHorizontalWide = 0xEADE,
 
         PickStrokeDown = 0xE610,
         PickStrokeUp = 0xE612,
@@ -114,6 +116,24 @@ namespace AlphaTab.Rendering.Glyphs
 
         AccidentalFlat = 0xE260,
         AccidentalNatural = 0xE261,
-        AccidentalSharp = 0xE262
+        AccidentalSharp = 0xE262,
+        AccidentalQuarterToneFlatArrowUp = 0xE270,
+        AccidentalQuarterToneSharpArrowUp = 0xE274,
+        AccidentalQuarterToneNaturalArrowUp = 0xE272,
+
+        Ottava8 = 0xE510,
+        Ottava8va = 0xE511,
+        Ottava8vb = 0xE51C,
+        Ottava15 = 0xE514,
+        Ottava15ma = 0xE515,
+        OttavaMBaseline = 0xEC95,
+        OttavaBBaseline = 0xEC93,
+
+        SimileMarkSimple = 0xE500,
+        SimileMarkDouble = 0xE501,
+
+        FermataMedium = 0xE4C0,
+        FermataShort = 0xE4C4,
+        FermataLong = 0xE4C6
     }
 }

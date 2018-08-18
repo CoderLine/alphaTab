@@ -1,0 +1,6 @@
+{
+    "msbuild-sdks": 
+	{
+        "MSBuild.Sdk.Extras": "1.5.4"
+    }
+}

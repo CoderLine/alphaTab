@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,9 +17,55 @@
  */
 
 using AlphaTab.Collections;
+using AlphaTab.Util;
 
 namespace AlphaTab
 {
+    /// <summary>
+    /// Lists all modes on how alphaTab can handle the display and playback of music notation. 
+    /// </summary>
+    public enum DisplayMode
+    {
+        /// <summary>
+        /// Music elements will be displayed and played as in Guitar Pro. 
+        /// </summary>
+        GuitarPro,
+        /// <summary>
+        /// Music elements will be displayed and played as in traditional songbooks.
+        /// Changes:
+        /// 1. Bends
+        ///     For bends additional grace beats are introduced. 
+        ///     Bends are categorized into gradual and fast bends. 
+        ///         - Gradual bends are indicated by beat text "grad" or "grad.". Bend will sound along the beat duration. 
+        ///         - Fast bends are done right before the next note. If the next note is tied even on-beat of the next note.
+        /// 2. Whammy Bars
+        ///     Dips are shown as simple annotation over the beats
+        ///     Whammy Bars are categorized into gradual and fast. 
+        ///         - Gradual whammys are indicated by beat text "grad" or "grad.". Whammys will sound along the beat duration. 
+        ///         - Fast whammys are done right the beat.
+        /// 3. Let Ring
+        ///     Tied notes with let ring are not shown in standard notation
+        ///     Let ring does not cause a longer playback, duration is defined via tied notes. 
+        /// </summary>
+        SongBook
+    }
+
+    /// <summary>
+    /// Lists all modes on how fingerings should be displayed.
+    /// </summary>
+    public enum FingeringMode
+    {
+        /// <summary>
+        /// Fingerings will be shown in the standard notation staff. 
+        /// </summary>
+        Score,
+        /// <summary>
+        /// Fingerings will be shown in a effect band above the tabs in case
+        /// they have only a single note on the beat.
+        /// </summary>
+        SingleNoteEffectBand
+    }
+
     /// <summary>
     /// This public class contains instance specific settings for alphaTab
     /// </summary>
@@ -51,6 +97,15 @@ namespace AlphaTab
         public LayoutSettings Layout { get; set; }
 
         /// <summary>
+        /// Specific settings for importers. Keys are specific for the importers. 
+        /// <strong>MusicXML</strong>
+        /// <ul>
+        ///  <li><strong>musicxmlMergePartGroups</strong> - If part-groups should be merged into a single track (boolean, default:false)</li>
+        /// </ul>
+        /// </summary>
+        public FastDictionary<string, object> ImporterSettings { get; set; }
+
+        /// <summary>
         /// The default stretch force to use for layouting. 
         /// </summary>
         public float StretchForce { get; set; }
@@ -79,6 +134,92 @@ namespace AlphaTab
         /// </summary>
         public int[] DisplayTranspositionPitches { get; set; }
 
+        /// <summary>
+        /// The log level to use within alphaTab
+        /// </summary>
+        public LogLevel LogLevel { get; set; }
+
+        /// <summary>
+        /// If set to true the guitar tabs on grace beats are rendered smaller.
+        /// </summary>
+        public bool SmallGraceTabNotes { get; set; }
+
+        /// <summary>
+        /// If set to true bend arrows expand to the end of the last tied note
+        /// of the string. Otherwise they end on the next beat. 
+        /// </summary>
+        public bool ExtendBendArrowsOnTiedNotes { get; set; }
+
+        /// <summary>
+        /// If set to true the note heads on tied notes
+        /// will have parenthesis if they are preceeded by bends. 
+        /// </summary>
+        public bool ShowParenthesisForTiedBends { get; set; }
+
+        /// <summary>
+        /// If set to true a tab number will be shown in case
+        /// a bend is increased on a tied note. 
+        /// </summary>
+        public bool ShowTabNoteOnTiedBend { get; set; }
+
+        /// <summary>
+        /// Gets or sets the mode to use for display and play music notation elements.
+        /// </summary>
+        public DisplayMode DisplayMode { get; set; }
+
+        /// <summary>
+        /// Gets or sets the fingering mode to use. 
+        /// </summary>
+        public FingeringMode FingeringMode { get; set; }
+
+        /// <summary>
+        /// If set to true, 0 is shown on dive whammy bars. 
+        /// </summary>
+        public bool ShowZeroOnDiveWhammy { get; set; }
+
+        /// <summary>
+        /// If set to true, line effects (like w/bar, let-ring etc)
+        /// are drawn until the end of the beat instead of the start. 
+        /// </summary>
+        public bool ExtendLineEffectsToBeatEnd { get; set; }
+
+        /// <summary>
+        /// Gets or sets the settings on how the vibrato audio is generated. 
+        /// </summary>
+        public VibratoPlaybackSettings Vibrato { get; set; }
+
+        /// <summary>
+        /// Gets or sets the height factor for slurs. The factor is multiplied with the distance
+        /// between slur start and end.
+        /// </summary>
+        public float SlurHeightFactor { get; set; }
+
+        /// <summary>
+        /// Gets or sets the bend duration in milliseconds for songbook bends. 
+        /// </summary>
+        public int SongBookBendDuration { get; set; }
+
+        public static Settings SongBook
+        {
+            get
+            {
+                var settings = Defaults;
+                settings.DisplayMode = DisplayMode.SongBook;
+                settings.ApplySongBookDefaults();
+                return settings;
+            }
+        }
+
+        private void ApplySongBookDefaults()
+        {
+            SmallGraceTabNotes = false;
+            FingeringMode = FingeringMode.SingleNoteEffectBand;
+            ExtendBendArrowsOnTiedNotes = false;
+            ShowParenthesisForTiedBends = false;
+            ShowTabNoteOnTiedBend = false;
+            ShowZeroOnDiveWhammy = true;
+        }
+
         public static Settings Defaults
         {
             get
@@ -91,16 +232,56 @@ namespace AlphaTab
                 settings.Engine = "default";
                 settings.TranspositionPitches = new int[0];
                 settings.DisplayTranspositionPitches = new int[0];
+                settings.SmallGraceTabNotes = true;
+                settings.ExtendBendArrowsOnTiedNotes = true;
+                settings.ShowParenthesisForTiedBends = true;
+                settings.ShowTabNoteOnTiedBend = true;
+                settings.DisplayMode = DisplayMode.GuitarPro;
+                settings.FingeringMode = FingeringMode.Score;
+                settings.ShowZeroOnDiveWhammy = false;
+                settings.ExtendLineEffectsToBeatEnd = false;
+                settings.SlurHeightFactor = 0.3f;
+
+                settings.ImporterSettings = new FastDictionary<string, object>();
 
                 settings.Layout = LayoutSettings.Defaults;
 
                 settings.Staves = new StaveSettings("default");
+                settings.LogLevel = LogLevel.Info;
+
+                settings.Vibrato = new VibratoPlaybackSettings();
+                settings.Vibrato.NoteSlightAmplitude = 2;
+                settings.Vibrato.NoteWideAmplitude = 2;
+                settings.Vibrato.NoteSlightLength = 480;
+                settings.Vibrato.NoteWideLength = 480;
+
+                settings.Vibrato.BeatSlightAmplitude = 3;
+                settings.Vibrato.BeatWideAmplitude = 3;
+                settings.Vibrato.BeatSlightLength = 240;
+                settings.Vibrato.BeatWideLength = 240;
+
+                settings.SongBookBendDuration = 75;
 
                 SetDefaults(settings);
 
                 return settings;
             }
         }
+    }
+
+    public class VibratoPlaybackSettings
+    {
+        public int NoteWideLength { get; set; }
+        public int NoteWideAmplitude { get; set; }
+
+        public int NoteSlightLength { get; set; }
+        public int NoteSlightAmplitude { get; set; }
+
+        public int BeatWideLength { get; set; }
+        public int BeatWideAmplitude { get; set; }
+
+        public int BeatSlightLength { get; set; }
+        public int BeatSlightAmplitude { get; set; }
     }
 
     public class LayoutSettings

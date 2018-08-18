@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 
 using AlphaTab.Collections;
 using AlphaTab.Model;
+using AlphaTab.Util;
 
 namespace AlphaTab.Rendering.Utils
 {
@@ -53,6 +54,7 @@ namespace AlphaTab.Rendering.Utils
 
         public void AddBar(MasterBarBounds bounds)
         {
+            BoundsLookup.AddMasterBar(bounds);
             bounds.StaveGroupBounds = this;
             Bars.Add(bounds);
         }
@@ -79,9 +81,11 @@ namespace AlphaTab.Rendering.Utils
 
     public class MasterBarBounds
     {
+        public int Index { get; set; }
         public bool IsFirstOfLine { get; set; }
         public Bounds VisualBounds { get; set; }
         public Bounds RealBounds { get; set; }
+        public Bounds LineAlignedBounds { get; set; }
         public FastList<BarBounds> Bars { get; set; }
         public StaveGroupBounds StaveGroupBounds { get; set; }
 
@@ -186,20 +190,24 @@ namespace AlphaTab.Rendering.Utils
 
         public Bounds VisualBounds { get; set; }
         public Bounds RealBounds { get; set; }
+
         public Beat Beat { get; set; }
     }
 
     public partial class BoundsLookup
     {
         private FastDictionary<int, BeatBounds> _beatLookup;
+        private FastDictionary<int, MasterBarBounds> _masterBarLookup;
         private StaveGroupBounds _currentStaveGroup;
         public FastList<StaveGroupBounds> StaveGroups { get; set; }
         public bool IsFinished { get; private set; }
+
 
         public BoundsLookup()
         {
             StaveGroups = new FastList<StaveGroupBounds>();
             _beatLookup = new FastDictionary<int, BeatBounds>();
+            _masterBarLookup = new FastDictionary<int, MasterBarBounds>();
         }
 
         public void Finish()
@@ -221,13 +229,40 @@ namespace AlphaTab.Rendering.Utils
 
         public void AddMasterBar(MasterBarBounds bounds)
         {
-            bounds.StaveGroupBounds = _currentStaveGroup;
-            _currentStaveGroup.AddBar(bounds);
+            if (bounds.StaveGroupBounds == null)
+            {
+                bounds.StaveGroupBounds = _currentStaveGroup;
+                _masterBarLookup[bounds.Index] = bounds;
+                _currentStaveGroup.AddBar(bounds);
+            }
+            else
+            {
+                _masterBarLookup[bounds.Index] = bounds;
+            }
         }
 
         public void AddBeat(BeatBounds bounds)
         {
             _beatLookup[bounds.Beat.Id] = bounds;
+        }
+
+        public MasterBarBounds FindMasterBarByIndex(int index)
+        {
+            if (_masterBarLookup.ContainsKey(index))
+            {
+                return _masterBarLookup[index];
+            }
+            return null;
+        }
+
+        public MasterBarBounds FindMasterBar(MasterBar bar)
+        {
+            var id = bar.Index;
+            if (_masterBarLookup.ContainsKey(id))
+            {
+                return _masterBarLookup[id];
+            }
+            return null;
         }
 
         public BeatBounds FindBeat(Beat beat)

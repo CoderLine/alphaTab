@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@ using AlphaTab.Collections;
 
 namespace AlphaTab.Xml
 {
-    public class XmlNode
+    class XmlNode
     {
         public XmlNodeType NodeType { get; set; }
         public string LocalName { get; set; }
@@ -56,17 +56,27 @@ namespace AlphaTab.Xml
             return "";
         }
 
-        public XmlNode[] GetElementsByTagName(string name)
+        public XmlNode[] GetElementsByTagName(string name, bool recursive = false)
         {
             var tags = new FastList<XmlNode>();
-            foreach (var c in ChildNodes)
+            SearchElementsByTagName(ChildNodes, tags, name, recursive);
+            return tags.ToArray();
+        }
+
+        private void SearchElementsByTagName(FastList<XmlNode> all, FastList<XmlNode> result, string name, bool recursive = false)
+        {
+            foreach (var c in all)
             {
                 if (c != null && c.NodeType == XmlNodeType.Element && c.LocalName == name)
                 {
-                    tags.Add(c);
+                    result.Add(c);
+                }
+
+                if (recursive)
+                {
+                    SearchElementsByTagName(c.ChildNodes, result, name, true);
                 }
             }
-            return tags.ToArray();
         }
 
         public XmlNode FindChildElement(string name)
@@ -92,7 +102,8 @@ namespace AlphaTab.Xml
                     {
                         txt.Append(c.InnerText);
                     }
-                    return txt.ToString().Trim();
+                    string s = txt.ToString();
+                    return s.Trim();
                 }
                 return Value;
             }

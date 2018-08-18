@@ -1,6 +1,6 @@
 /*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,8 @@
  * License along with this library.
  */
 
+using System;
+using AlphaTab.Audio;
 using AlphaTab.Collections;
 
 namespace AlphaTab.Model
@@ -26,6 +28,7 @@ namespace AlphaTab.Model
     /// </summary>
     public class Voice
     {
+        private FastDictionary<int, Beat> _beatLookup;
         public int Index { get; set; }
         public Bar Bar { get; set; }
         public FastList<Beat> Beats { get; set; }
@@ -33,7 +36,7 @@ namespace AlphaTab.Model
         public bool IsEmpty
         {
             get; set;
-          
+
         }
 
         public Voice()
@@ -48,9 +51,22 @@ namespace AlphaTab.Model
             dst.IsEmpty = src.IsEmpty;
         }
 
+        public void InsertBeat(Beat after, Beat newBeat)
+        {
+            newBeat.NextBeat = after.NextBeat;
+            if (newBeat.NextBeat != null)
+            {
+                newBeat.NextBeat.PreviousBeat = newBeat;
+            }
+            newBeat.PreviousBeat = after;
+            newBeat.Voice = this;
+            after.NextBeat = newBeat;
+            Beats.InsertAt(after.Index + 1, newBeat);
+        }
+
+
         public void AddBeat(Beat beat)
         {
-            // chaining
             beat.Voice = this;
             beat.Index = Beats.Count;
             Beats.Add(beat);
@@ -69,7 +85,7 @@ namespace AlphaTab.Model
                 beat.NextBeat = Beats[beat.Index + 1];
                 beat.NextBeat.PreviousBeat = beat;
             }
-            else if (beat.Index == beat.Voice.Beats.Count - 1 && beat.Voice.Bar.NextBar != null)
+            else if (beat.IsLastOfVoice && beat.Voice.Bar.NextBar != null)
             {
                 var nextVoice = Bar.NextBar.Voices[Index];
                 if (nextVoice.Beats.Count > 0)
@@ -104,18 +120,107 @@ namespace AlphaTab.Model
             IsEmpty = false;
         }
 
-        public void Finish()
+
+
+        public Beat GetBeatAtDisplayStart(int displayStart)
         {
-            // TODO: find a proper solution to chain beats without iterating twice
-            for (int i = 0, j = Beats.Count; i < j; i++)
+            if (_beatLookup.ContainsKey(displayStart))
             {
-                var beat = Beats[i];
+                return _beatLookup[displayStart];
+            }
+
+            return null;
+        }
+
+        public void Finish(Settings settings)
+        {
+            _beatLookup = new FastDictionary<int, Beat>();
+            for (var index = 0; index < Beats.Count; index++)
+            {
+                var beat = Beats[index];
+                beat.Index = index;
                 Chain(beat);
             }
-            for (int i = 0, j = Beats.Count; i < j; i++)
+
+            var currentDisplayTick = 0;
+            var currentPlaybackTick = 0;
+            for (var i = 0; i < Beats.Count; i++)
             {
                 var beat = Beats[i];
-                beat.Finish();
+                beat.Index = i;
+                beat.Finish(settings);
+
+                if (beat.GraceType == GraceType.None || beat.GraceType == GraceType.BendGrace)
+                {
+                    beat.DisplayStart = currentDisplayTick;
+                    beat.PlaybackStart = currentPlaybackTick;
+                    currentDisplayTick += beat.DisplayDuration;
+                    currentPlaybackTick += beat.PlaybackDuration;
+                }
+                else
+                {
+                    // find note which is not a grace note
+                    Beat nonGrace = beat;
+                    int numberOfGraceBeats = 0;
+                    while (nonGrace != null && nonGrace.GraceType != GraceType.None)
+                    {
+                        nonGrace = nonGrace.NextBeat;
+                        numberOfGraceBeats++;
+                    }
+
+                    var graceDuration = Duration.Eighth;
+                    int stolenDuration = 0;
+                    if (numberOfGraceBeats == 1)
+                    {
+                        graceDuration = Duration.Eighth;
+                        stolenDuration = Duration.ThirtySecond.ToTicks();
+                    }
+                    else if (numberOfGraceBeats == 2)
+                    {
+                        graceDuration = Duration.Sixteenth;
+                        stolenDuration = Duration.SixtyFourth.ToTicks();
+                    }
+                    else
+                    {
+                        graceDuration = Duration.ThirtySecond;
+                        stolenDuration = Duration.OneHundredTwentyEighth.ToTicks();
+                    }
+
+
+                    // grace beats have 1/4 size of the non grace beat following them
+                    var perGraceDuration = nonGrace == null ? Duration.ThirtySecond.ToTicks() : (nonGrace.DisplayDuration / 4) / numberOfGraceBeats;
+
+                    // move all grace beats 
+                    for (int j = 0; j < numberOfGraceBeats; j++)
+                    {
+                        var graceBeat = Beats[j + i];
+                        if (beat.PreviousBeat == null || beat.PreviousBeat.GraceType == GraceType.None)
+                        {
+                            graceBeat.Duration = graceDuration;
+                            graceBeat.UpdateDurations();
+                        }
+                        graceBeat.DisplayStart = currentDisplayTick - (numberOfGraceBeats - j + 1) * perGraceDuration;
+                        graceBeat.DisplayDuration = perGraceDuration;
+                    }
+
+                    if (beat.PreviousBeat != null && beat.GraceType == GraceType.BeforeBeat)
+                    {
+                        beat.PreviousBeat.PlaybackDuration -= stolenDuration;
+                    }
+
+                    beat.PlaybackStart = currentPlaybackTick;
+                    switch (beat.GraceType)
+                    {
+                        case GraceType.BeforeBeat:
+                            beat.PlaybackStart -= beat.PlaybackDuration;
+                            break;
+                        case GraceType.OnBeat:
+                            currentPlaybackTick += beat.PlaybackDuration;
+                            break;
+                    }
+                }
+
+                _beatLookup[beat.DisplayStart] = beat;
             }
         }
     }

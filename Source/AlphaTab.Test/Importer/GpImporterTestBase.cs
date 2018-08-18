@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,7 @@ using AlphaTab.Importer;
 using AlphaTab.IO;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
+using AlphaTab.Util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test.Importer
@@ -33,14 +34,14 @@ namespace AlphaTab.Test.Importer
         internal Gp3To5Importer PrepareImporterWithFile(string name)
         {
             const string path = "TestFiles/";
-            var buffer = File.ReadAllBytes(Path.Combine(path, name));
+            var buffer = TestPlatform.LoadFile(path + name);
             return PrepareImporterWithBytes(buffer);
         }
 
         internal Gp3To5Importer PrepareImporterWithBytes(byte[] buffer)
         {
             var readerBase = new Gp3To5Importer();
-            readerBase.Init(new StreamWrapper(new MemoryStream(buffer)));
+            readerBase.Init(ByteBuffer.FromBuffer(buffer));
             return readerBase;
         }
 
@@ -127,13 +128,13 @@ namespace AlphaTab.Test.Importer
         {
             Assert.AreEqual(GraceType.BeforeBeat, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].GraceType);
             Assert.AreEqual(3, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].Fret);
-            Assert.AreEqual(Duration.ThirtySecond, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Duration);
+            Assert.AreEqual(Duration.Eighth, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Duration);
             Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].Fret);
             Assert.AreEqual(Duration.Quarter, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Duration);
 
             Assert.AreEqual(GraceType.BeforeBeat, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].GraceType);
             Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Notes[0].Fret);
-            Assert.AreEqual(Duration.ThirtySecond, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Duration);
+            Assert.AreEqual(Duration.Eighth, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Duration);
             Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Notes[0].Fret);
             Assert.AreEqual(Duration.Quarter, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Duration);
         }
@@ -470,7 +471,8 @@ namespace AlphaTab.Test.Importer
         protected void CheckChords(Score score)
         {
             var track = score.Tracks[0];
-            Assert.AreEqual(8, track.Chords.Count);
+            var staff = track.Staves[0];
+            Assert.AreEqual(8, staff.Chords.Count);
 
             CheckChord(new Chord
             {
@@ -546,6 +548,7 @@ namespace AlphaTab.Test.Importer
             {
                 throw new ArgumentNullException("caller", "svg rendering failed because caller info was missing");
             }
+#if !PHASE
             var settings = Settings.Defaults;
             settings.Engine = "svg";
             var renderer = new ScoreRenderer(settings);
@@ -553,18 +556,16 @@ namespace AlphaTab.Test.Importer
             {
                 Track track = score.Tracks[i];
                 // render track
-                Console.WriteLine("Rendering track {0} - {1}", i + 1, track.Name);
+                Logger.Info("Test", $"Rendering track {i + 1} - {track.Name}");
                 var totalWidth = 0;
                 var totalHeight = 0;
-                var merged = XDocument.Parse("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"1px\" height=\"1px\"></svg>");
+                var merged = new StringBuilder();
                 var currentY = 0f;
                 renderer.PartialRenderFinished += r =>
                 {
-                    var subSvg = XDocument.Parse(r.RenderResult.ToString());
-                    var subRoot = subSvg.Root;
-                    subRoot.SetAttributeValue("x", "0px");
-                    subRoot.SetAttributeValue("y", ((int)currentY) + "px");
-                    merged.Root.Add(subRoot);
+                    var subSvg = r.RenderResult.ToString()
+                        .Replace("width=", "x=\"0px\" y=\"" + ((int)currentY) + "\" width=");
+                    merged.Append(subSvg);
                     currentY += r.Height;
                 };
                 renderer.RenderFinished += r =>
@@ -574,9 +575,10 @@ namespace AlphaTab.Test.Importer
                 };
                 renderer.Render(score, new[] { track.Index });
 
-                merged.Root.Attribute("width").Value = totalWidth + "px";
-                merged.Root.Attribute("height").Value = totalHeight + "px";
-
+                var final = new StringBuilder();
+                final.Append("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"" + ((int)totalWidth) + "px\" height=\"" + ((int)totalHeight) + "px\">");
+                final.Append(merged.ToString());
+                final.Append("</svg>");
                 var svg = merged.ToString();
 
                 var dirName = Path.GetFileNameWithoutExtension(callerFile);
@@ -587,6 +589,7 @@ namespace AlphaTab.Test.Importer
                 }
                 File.WriteAllText(path, svg);
             }
+#endif
         }
     }
 }

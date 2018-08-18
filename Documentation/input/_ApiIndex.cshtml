@@ -1,0 +1,22 @@
+@section Search {	
+	@Html.Partial("_ApiSearch")
+}
+
+@{
+	Layout = "/_Layout.cshtml";
+}
+
+<p>
+	Please be aware that this API documentation is generated based on the C# source code. Names of properties and methods can slightly differ when using AlphaTab from JavaScript.
+</p>
+
+@Html.Partial("Section\\_DocsTable", new DocsTable
+{
+	Docs = Documents.FromPipeline("Api")
+		.Where(x => x.String("Kind") == "Namespace")
+		.OrderBy(x => x.String("DisplayName"))
+		.ToList(),
+	Title = "Namespaces",
+	Header = "Namespace",
+	HasSummary = true	
+})

@@ -1,6 +1,6 @@
 /*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,32 +20,59 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class HarmonicsEffectInfo : NoteEffectInfoBase
+    class HarmonicsEffectInfo : NoteEffectInfoBase
     {
+        private readonly HarmonicType _harmonicType;
         private Beat _beat;
-        private HarmonicType _beatType;
+        private string _effectId;
 
-        public override string EffectId { get { return "harmonics"; } }
+        public override string EffectId { get { return _effectId; } }
+
+        public HarmonicsEffectInfo(HarmonicType harmonicType)
+        {
+            _harmonicType = harmonicType;
+            switch (harmonicType)
+            {
+                case HarmonicType.Natural:
+                    _effectId = "harmonics-natural";
+                    break;
+                case HarmonicType.Artificial:
+                    _effectId = "harmonics-artificial";
+                    break;
+                case HarmonicType.Pinch:
+                    _effectId = "harmonics-pinch";
+                    break;
+                case HarmonicType.Tap:
+                    _effectId = "harmonics-tap";
+                    break;
+                case HarmonicType.Semi:
+                    _effectId = "harmonics-semi";
+                    break;
+                case HarmonicType.Feedback:
+                    _effectId = "harmonics-feedback";
+                    break;
+            }
+        }
+
 
         protected override bool ShouldCreateGlyphForNote(Note note)
         {
-            if (!note.IsHarmonic) return false;
-            if (note.Beat != _beat || note.HarmonicType > _beatType)
+            if (!note.IsHarmonic || note.HarmonicType != _harmonicType) return false;
+            if (note.Beat != _beat)
             {
                 _beat = note.Beat;
-                _beatType = note.HarmonicType;
             }
             return true;
         }
 
         public override EffectBarGlyphSizing SizingMode
         {
-            get { return EffectBarGlyphSizing.SingleOnBeat; }
+            get { return EffectBarGlyphSizing.GroupedOnBeat; }
         }
 
         public override EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
-            return new TextGlyph(0, 0, HarmonicToString(_beatType), renderer.Resources.EffectFont);
+            return new LineRangedGlyph(HarmonicToString(_harmonicType));
         }
 
         public static string HarmonicToString(HarmonicType type)

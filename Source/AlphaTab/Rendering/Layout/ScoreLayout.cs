@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,7 +30,7 @@ namespace AlphaTab.Rendering.Layout
     /// <summary>
     /// This is the base public class for creating new layouting engines for the score renderer. 
     /// </summary>
-    public abstract class ScoreLayout
+    abstract class ScoreLayout
     {
         private readonly FastDictionary<string, FastDictionary<int, BarRendererBase>> _barRendererLookup;
 
@@ -56,6 +56,18 @@ namespace AlphaTab.Rendering.Layout
 
         public void LayoutAndRender()
         {
+            var score = Renderer.Score;
+            var startIndex = Renderer.Settings.Layout.Get("start", 1);
+            startIndex--; // map to array index
+            startIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, startIndex));
+            FirstBarIndex = startIndex;
+
+            var endBarIndex = Renderer.Settings.Layout.Get("count", score.MasterBars.Count);
+            if (endBarIndex < 0) endBarIndex = score.MasterBars.Count;
+            endBarIndex = startIndex + endBarIndex - 1; // map count to array index
+            endBarIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, endBarIndex));
+            LastBarIndex = endBarIndex;
+
             CreateScoreInfoGlyphs();
             DoLayoutAndRender();
         }
@@ -99,17 +111,38 @@ namespace AlphaTab.Rendering.Layout
                 }
                 if (!string.IsNullOrEmpty(score.Words) && (flags & HeaderFooterElements.Words) != 0)
                 {
-                    ScoreInfoGlyphs[HeaderFooterElements.Words] = new TextGlyph(0, 0, "Words by " + score.Music, res.WordsFont, TextAlign.Left);
+                    ScoreInfoGlyphs[HeaderFooterElements.Words] = new TextGlyph(0, 0, "Words by " + score.Words, res.WordsFont, TextAlign.Left);
                 }
             }
 
-            // tuning info
-            if (Renderer.Tracks.Length == 1 && !Renderer.Tracks[0].IsPercussion && !Renderer.Settings.Layout.Get("hideTuning", false))
+            if (!Renderer.Settings.Layout.Get("hideTuning", false))
             {
-                var tuning = Tuning.FindTuning(Renderer.Tracks[0].Tuning);
-                if (tuning != null)
+                Model.Staff staffWithTuning = null;
+                foreach (var track in Renderer.Tracks)
                 {
-                    TuningGlyph = new TuningGlyph(0, 0, Scale, Renderer.RenderingResources, tuning);
+                    foreach (var staff in track.Staves)
+                    {
+                        if (staff.StaffKind != StaffKind.Percussion && staff.IsStringed && staff.Tuning.Length > 0)
+                        {
+                            staffWithTuning = staff;
+                            break;
+                        }
+                    }
+
+                    if (staffWithTuning != null)
+                    {
+                        break;
+                    }
+                }
+
+                // tuning info
+                if (staffWithTuning != null)
+                {
+                    var tuning = Tuning.FindTuning(staffWithTuning.Tuning);
+                    if (tuning != null)
+                    {
+                        TuningGlyph = new TuningGlyph(0, 0, Scale, Renderer.RenderingResources, tuning);
+                    }
                 }
             }
         }
@@ -122,6 +155,9 @@ namespace AlphaTab.Rendering.Layout
             }
         }
 
+        public int FirstBarIndex { get; private set; }
+        public int LastBarIndex { get; private set; }
+
         protected StaveGroup CreateEmptyStaveGroup()
         {
             var group = new StaveGroup();
@@ -130,31 +166,64 @@ namespace AlphaTab.Rendering.Layout
             for (var trackIndex = 0; trackIndex < Renderer.Tracks.Length; trackIndex++)
             {
                 var track = Renderer.Tracks[trackIndex];
-                string staveProfile;
-                // use optimal profile for track 
-                if (track.IsPercussion)
+                var hasScore = false;
+                //var hasTab = false;
+                foreach (var staff in track.Staves)
                 {
-                    staveProfile = Environment.StaveProfileScore;
-                }
-                else if (track.IsStringed)
-                {
-                    staveProfile = Renderer.Settings.Staves.Id;
-                }
-                else
-                {
-                    staveProfile = Environment.StaveProfileScore;
-                }
-
-                var profile = Environment.StaveProfiles.ContainsKey(staveProfile)
-                    ? Environment.StaveProfiles[staveProfile]
-                    : Environment.StaveProfiles["default"];
-
-                for (int staveIndex = 0; staveIndex < track.Staves.Count; staveIndex++)
-                {
-                    for (var renderStaveIndex = 0; renderStaveIndex < profile.Length; renderStaveIndex++)
+                    switch (staff.StaffKind)
                     {
-                        var factory = profile[renderStaveIndex];
-                        var staff = track.Staves[staveIndex];
+                        case StaffKind.Tablature:
+                            //hasTab = true;
+                            break;
+                        case StaffKind.Score:
+                            hasScore = true;
+                            break;
+                        case StaffKind.Percussion:
+                            break;
+                        case StaffKind.Mixed:
+                            hasScore = true;
+                            //hasTab = true;
+                            break;
+                    }
+                }
+
+
+                for (int staffIndex = 0; staffIndex < track.Staves.Count; staffIndex++)
+                {
+                    var staff = track.Staves[staffIndex];
+
+                    // use optimal profile for track 
+                    string staveProfile;
+                    if (staff.StaffKind == StaffKind.Percussion)
+                    {
+                        staveProfile = Environment.StaveProfileScore;
+                    }
+                    else if (staff.StaffKind == StaffKind.Tablature)
+                    {
+                        if (hasScore)
+                        {
+                            staveProfile = Environment.StaveProfileTabMixed;
+                        }
+                        else
+                        {
+                            staveProfile = Environment.StaveProfileTab;
+                        }
+                    }
+                    else if (staff.IsStringed)
+                    {
+                        staveProfile = Renderer.Settings.Staves.Id;
+                    }
+                    else // if(staff.StaffKind == StaffKind.Score)
+                    {
+                        staveProfile = Environment.StaveProfileScore;
+                    }
+
+                    var profile = Environment.StaveProfiles.ContainsKey(staveProfile)
+                        ? Environment.StaveProfiles[staveProfile]
+                        : Environment.StaveProfiles["default"];
+
+                    foreach (var factory in profile)
+                    {
                         if (factory.CanCreate(track, staff))
                         {
                             group.AddStaff(track, new Staff(trackIndex, staff, factory));
@@ -183,12 +252,13 @@ namespace AlphaTab.Rendering.Layout
             }
         }
 
-        public BarRendererBase GetRendererForBar(string key, Bar bar)
+        public T GetRendererForBar<T>(string key, Bar bar)
+            where T: BarRendererBase
         {
             var barRendererId = bar.Id;
             if (_barRendererLookup.ContainsKey(key) && _barRendererLookup[key].ContainsKey(barRendererId))
             {
-                return _barRendererLookup[key][barRendererId];
+                return (T)_barRendererLookup[key][barRendererId];
             }
             return null;
         }

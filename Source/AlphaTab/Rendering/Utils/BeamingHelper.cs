@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -15,14 +15,13 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System;
 using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
 {
-    public enum BeamDirection
+    enum BeamDirection
     {
         Up,
         Down
@@ -31,7 +30,7 @@ namespace AlphaTab.Rendering.Utils
     /// <summary>
     /// Lists all types how two voices can be joined with bars.
     /// </summary>
-    public enum BeamBarType
+    enum BeamBarType
     {
         /// <summary>
         /// Full Bar from current to next
@@ -47,34 +46,33 @@ namespace AlphaTab.Rendering.Utils
         PartRight
     }
 
-    public interface IBeamYCalculator
+    interface IBeamYCalculator
     {
-        float GetYPositionForNote(Note note);
+        float GetYPositionForNoteValue(int noteValue);
     }
 
-    public class BeatLinePositions
+    class BeatLinePositions
     {
         public string StaffId { get; set; }
         public float Up { get; set; }
         public float Down { get; set; }
 
-        public BeatLinePositions(string staffId, float up, float down)
+        public int MinNoteValue { get; set; }
+        public int MaxNoteValue { get; set; }
+
+        public BeatLinePositions()
         {
-            StaffId = staffId;
-            Up = up;
-            Down = down;
         }
     }
 
     /// <summary>
     /// This public class helps drawing beams and bars for notes.
     /// </summary>
-    public class BeamingHelper
+    class BeamingHelper
     {
         private static readonly int[] ScoreMiddleKeys = { 60, 60, 57, 50, 71 };
 
-        private Beat _lastBeat;
-        private readonly Track _track;
+        private readonly Staff _staff;
 
         /// <summary>
         /// stores the X-positions for beat indices
@@ -98,56 +96,87 @@ namespace AlphaTab.Rendering.Utils
         /// <summary>
         /// the first min note within this group
         /// </summary>
-        public Note FirstMinNote { get; set; }
+        public int FirstMinNoteValue { get; set; }
 
         /// <summary>
         /// the first max note within this group
         /// </summary>
-        public Note FirstMaxNote { get; set; }
+        public int FirstMaxNoteValue { get; set; }
 
         /// <summary>
         /// the last min note within this group
         /// </summary>
-        public Note LastMinNote { get; set; }
+        public int LastMinNoteValue { get; set; }
 
         /// <summary>
         /// the last max note within this group
         /// </summary>
-        public Note LastMaxNote { get; set; }
+        public int LastMaxNoteValue { get; set; }
 
         /// <summary>
-        /// the overall min note within this group
+        /// the overall min note value within this group. 
+        /// This includes values caused by bends. 
         /// </summary>
-        public Note MinNote { get; set; }
+        public int MinNoteValue { get; set; }
+
+        public Beat MinNoteBeat { get; set; }
 
         /// <summary>
-        /// the overall max note within this group
+        /// the overall max note value within this group
+        /// This includes values caused by bends. 
         /// </summary>
-        public Note MaxNote { get; set; }
+        public int MaxNoteValue { get; set; }
+
+        public Beat MaxNoteBeat { get; set; }
 
         public bool InvertBeamDirection { get; set; }
 
+        public bool IsGrace { get; set; }
 
-        public BeamingHelper(Track track)
+        public BeamingHelper(Staff staff)
         {
-            _track = track;
+            _staff = staff;
 
             Beats = new FastList<Beat>();
             _beatLineXPositions = new FastDictionary<int, BeatLinePositions>();
             ShortestDuration = Duration.QuadrupleWhole;
+            MaxNoteValue = int.MinValue;
+            MinNoteValue = int.MinValue;
+            FirstMinNoteValue = int.MinValue;
+            FirstMaxNoteValue = int.MinValue;
+            LastMinNoteValue = int.MinValue;
+            LastMaxNoteValue = int.MinValue;
         }
 
         private int GetValue(Note n)
         {
-            if (_track.IsPercussion)
+            if (_staff.StaffKind == StaffKind.Percussion)
             {
-                return PercussionMapper.MapNoteForDisplay(n);
+                return PercussionMapper.MapNoteForDisplay(n.RealValue);
             }
             else
             {
-                return n.RealValue - _track.DisplayTranspositionPitch;
+                return n.DisplayValue;
             }
         }
+
+        private int GetMaxValue(Note n)
+        {
+            int value = GetValue(n);
+            if (n.HarmonicType != HarmonicType.None && n.HarmonicType != HarmonicType.Natural)
+            {
+                value = n.RealValue - _staff.DisplayTranspositionPitch;
+            }
+
+            return value;
+        }
+
+        private int GetMinValue(Note n)
+        {
+            int value = GetValue(n);
+            return value;
+        }
+
 
         public float GetBeatLineX(Beat beat)
         {
@@ -155,9 +184,9 @@ namespace AlphaTab.Rendering.Utils
             {
                 if (Direction == BeamDirection.Up)
                 {
-                    return _beatLineXPositions[beat.Index].Up;
+                    return (int)_beatLineXPositions[beat.Index].Up;
                 }
-                return _beatLineXPositions[beat.Index].Down;
+                return (int)_beatLineXPositions[beat.Index].Down;
             }
             return 0;
         }
@@ -169,7 +198,17 @@ namespace AlphaTab.Rendering.Utils
 
         public void RegisterBeatLineX(string staffId, Beat beat, float up, float down)
         {
-            _beatLineXPositions[beat.Index] = new BeatLinePositions(staffId, up, down);
+            var positions = GetOrCreateBeatPositions(beat);
+            positions.StaffId = staffId;
+            positions.Up = up;
+            positions.Down = down;
+        }
+
+        private BeatLinePositions GetOrCreateBeatPositions(Beat beat)
+        {
+            return _beatLineXPositions.ContainsKey(beat.Index)
+                ? _beatLineXPositions[beat.Index]
+                : (_beatLineXPositions[beat.Index] = new BeatLinePositions());
         }
 
         public BeamDirection Direction { get; private set; }
@@ -196,21 +235,17 @@ namespace AlphaTab.Rendering.Utils
                     }
                 }
             }
-            if (Beats.Count == 1 && (Beats[0].Duration == Duration.Whole || Beats[0].Duration == Duration.DoubleWhole))
-            {
-                return Invert(BeamDirection.Up);
-            }
 
             if (Beats[0].GraceType != GraceType.None)
             {
                 return Invert(BeamDirection.Up);
             }
-            
+
             // the average key is used for determination
             //      key lowerequal than middle line -> up
             //      key higher than middle line -> down
-            var avg = (GetValue(MaxNote) + GetValue(MinNote)) / 2;
-            return Invert(avg < ScoreMiddleKeys[(int)_lastBeat.Voice.Bar.Clef] ? BeamDirection.Up : BeamDirection.Down);
+            var avg = (MaxNoteValue + MinNoteValue) / 2;
+            return Invert(avg < ScoreMiddleKeys[(int)Beats[Beats.Count - 1].Voice.Bar.Clef] ? BeamDirection.Up : BeamDirection.Down);
         }
 
         private BeamDirection Invert(BeamDirection direction)
@@ -244,15 +279,20 @@ namespace AlphaTab.Rendering.Utils
             {
                 add = true;
             }
-            else if (CanJoin(_lastBeat, beat))
+            else if (CanJoin(Beats[Beats.Count - 1], beat))
             {
                 add = true;
             }
 
             if (add)
             {
-                _lastBeat = beat;
                 Beats.Add(beat);
+                if (beat.GraceType != GraceType.None)
+                {
+                    IsGrace = true;
+                }
+
+                var positions = GetOrCreateBeatPositions(beat);
 
                 if (beat.HasTuplet)
                 {
@@ -274,8 +314,15 @@ namespace AlphaTab.Rendering.Utils
                     FingeringCount = fingeringCount;
                 }
 
+                LastMinNoteValue = int.MinValue;
+                LastMaxNoteValue = int.MinValue;
+
                 CheckNote(beat.MinNote);
                 CheckNote(beat.MaxNote);
+
+                positions.MinNoteValue = LastMinNoteValue;
+                positions.MaxNoteValue = LastMaxNoteValue;
+
                 if (ShortestDuration < beat.Duration)
                 {
                     ShortestDuration = beat.Duration;
@@ -294,64 +341,39 @@ namespace AlphaTab.Rendering.Utils
         {
             var value = GetValue(note);
 
-            // detect the smallest note which is at the beginning of this group
-            if (FirstMinNote == null || note.Beat.Start < FirstMinNote.Beat.Start)
+            if (Beats.Count == 1 && Beats[0] == note.Beat)
             {
-                FirstMinNote = note;
-            }
-            else if (note.Beat.Start == FirstMinNote.Beat.Start)
-            {
-                if (value < GetValue(FirstMinNote))
+                if (FirstMinNoteValue == int.MinValue || value < FirstMinNoteValue)
                 {
-                    FirstMinNote = note;
+                    FirstMinNoteValue = value;
+                }
+                if (FirstMaxNoteValue == int.MinValue || value > FirstMaxNoteValue)
+                {
+                    FirstMaxNoteValue = value;
                 }
             }
 
-            // detect the biggest note which is at the beginning of this group
-            if (FirstMaxNote == null || note.Beat.Start < FirstMaxNote.Beat.Start)
+            if (LastMinNoteValue == int.MinValue || value < LastMinNoteValue)
             {
-                FirstMaxNote = note;
+                LastMinNoteValue = value;
             }
-            else if (note.Beat.Start == FirstMaxNote.Beat.Start)
+            if (LastMaxNoteValue == int.MinValue || value > LastMaxNoteValue)
             {
-                if (value > GetValue(FirstMaxNote))
-                {
-                    FirstMaxNote = note;
-                }
+                LastMaxNoteValue = value;
             }
 
-            // detect the smallest note which is at the end of this group
-            if (LastMinNote == null || note.Beat.Start > LastMinNote.Beat.Start)
+            var minValue = GetMinValue(note);
+            if (MinNoteValue == int.MinValue || MinNoteValue > minValue)
             {
-                LastMinNote = note;
-            }
-            else if (note.Beat.Start == LastMinNote.Beat.Start)
-            {
-                if (value < GetValue(LastMinNote))
-                {
-                    LastMinNote = note;
-                }
-            }
-            // detect the biggest note which is at the end of this group
-            if (LastMaxNote == null || note.Beat.Start > LastMaxNote.Beat.Start)
-            {
-                LastMaxNote = note;
-            }
-            else if (note.Beat.Start == LastMaxNote.Beat.Start)
-            {
-                if (value > GetValue(LastMaxNote))
-                {
-                    LastMaxNote = note;
-                }
+                MinNoteValue = minValue;
+                MinNoteBeat = note.Beat;
             }
 
-            if (MaxNote == null || value > GetValue(MaxNote))
+            var maxValue = GetMaxValue(note);
+            if (MaxNoteValue == int.MinValue || MaxNoteValue < maxValue)
             {
-                MaxNote = note;
-            }
-            if (MinNote == null || value < GetValue(MinNote))
-            {
-                MinNote = note;
+                MaxNoteValue = maxValue;
+                MaxNoteBeat= note.Beat;
             }
         }
 
@@ -367,9 +389,9 @@ namespace AlphaTab.Rendering.Utils
             {
                 if (direction == BeamDirection.Up)
                 {
-                    return yPosition.GetYPositionForNote(MaxNote) - stemSize;
+                    return yPosition.GetYPositionForNoteValue(MaxNoteValue) - stemSize;
                 }
-                return yPosition.GetYPositionForNote(MinNote) + stemSize;
+                return yPosition.GetYPositionForNoteValue(MinNoteValue) + stemSize;
             }
 
             // we use the min/max notes to place the beam along their real position        
@@ -379,24 +401,24 @@ namespace AlphaTab.Rendering.Utils
 
             // if the min note is not first or last, we can align notes directly to the position
             // of the min note
-            if (direction == BeamDirection.Down && MinNote != FirstMinNote && MinNote != LastMinNote)
+            if (direction == BeamDirection.Down && MinNoteBeat != Beats[0] && MinNoteBeat != Beats[Beats.Count - 1])
             {
-                return yPosition.GetYPositionForNote(MinNote) + stemSize;
+                return yPosition.GetYPositionForNoteValue(MinNoteValue) + stemSize;
             }
-            if (direction == BeamDirection.Up && MaxNote != FirstMaxNote && MaxNote != LastMaxNote)
+            if (direction == BeamDirection.Up && MaxNoteBeat != Beats[0] && MinNoteBeat != Beats[Beats.Count - 1])
             {
-                return yPosition.GetYPositionForNote(MaxNote) - stemSize;
+                return yPosition.GetYPositionForNoteValue(MaxNoteValue) - stemSize;
             }
 
-            float startX = GetBeatLineX(FirstMinNote.Beat) + xCorrection;
+            float startX = GetBeatLineX(Beats[0]) + xCorrection;
             float startY = direction == BeamDirection.Up
-                            ? yPosition.GetYPositionForNote(FirstMaxNote) - stemSize
-                            : yPosition.GetYPositionForNote(FirstMinNote) + stemSize;
+                            ? yPosition.GetYPositionForNoteValue(FirstMaxNoteValue) - stemSize
+                            : yPosition.GetYPositionForNoteValue(FirstMinNoteValue) + stemSize;
 
-            float endX = GetBeatLineX(LastMaxNote.Beat) + xCorrection;
+            float endX = GetBeatLineX(Beats[Beats.Count - 1]) + xCorrection;
             float endY = direction == BeamDirection.Up
-                            ? yPosition.GetYPositionForNote(LastMaxNote) - stemSize
-                            : yPosition.GetYPositionForNote(LastMinNote) + stemSize;
+                            ? yPosition.GetYPositionForNoteValue(LastMaxNoteValue) - stemSize
+                            : yPosition.GetYPositionForNoteValue(LastMinNoteValue) + stemSize;
 
             // ensure the maxDistance
             if (direction == BeamDirection.Down && startY > endY && (startY - endY) > maxDistance) endY = (startY - maxDistance);
@@ -417,7 +439,7 @@ namespace AlphaTab.Rendering.Utils
         private static bool CanJoin(Beat b1, Beat b2)
         {
             // is this a voice we can join with?
-            if (b1 == null || b2 == null || b1.IsRest || b2.IsRest || b1.GraceType != b2.GraceType)
+            if (b1 == null || b2 == null || b1.IsRest || b2.IsRest || b1.GraceType != b2.GraceType || b1.GraceType == GraceType.BendGrace || b2.GraceType == GraceType.BendGrace)
             {
                 return false;
             }
@@ -429,8 +451,8 @@ namespace AlphaTab.Rendering.Utils
 
             // get times of those voices and check if the times 
             // are in the same division
-            var start1 = b1.Start;
-            var start2 = b2.Start;
+            var start1 = b1.PlaybackStart;
+            var start2 = b2.PlaybackStart;
 
             // we can only join 8th, 16th, 32th and 64th voices
             if (!CanJoinDuration(b1.Duration) || !CanJoinDuration(b2.Duration))
@@ -490,6 +512,25 @@ namespace AlphaTab.Rendering.Utils
                 return true;
             }
             return _beatLineXPositions[beat.Index].StaffId == staffId;
+        }
+
+
+        public int GetBeatMinValue(Beat beat)
+        {
+            if (!_beatLineXPositions.ContainsKey(beat.Index))
+            {
+                return beat.MinNote.DisplayValue;
+            }
+            return _beatLineXPositions[beat.Index].MinNoteValue;
+        }
+
+        public int GetBeatMaxValue(Beat beat)
+        {
+            if (!_beatLineXPositions.ContainsKey(beat.Index))
+            {
+                return beat.MaxNote.DisplayValue;
+            }
+            return _beatLineXPositions[beat.Index].MaxNoteValue;
         }
     }
 }

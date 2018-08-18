@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -35,14 +35,14 @@ namespace AlphaTab.Rendering
         private string _currentRenderEngine;
         private Track[] _renderedTracks;
 
-        public ICanvas Canvas { get; set; }
+        internal ICanvas Canvas { get; set; }
 
-        public Score Score { get; private set; }
-        public Track[] Tracks { get; private set; }
-        public ScoreLayout Layout { get; set; }
+        internal Score Score { get; private set; }
+        internal Track[] Tracks { get; private set; }
+        internal ScoreLayout Layout { get; set; }
 
-        public RenderingResources RenderingResources { get; set; }
-        public Settings Settings { get; set; }
+        internal RenderingResources RenderingResources { get; set; }
+        internal Settings Settings { get; set; }
 
         public BoundsLookup BoundsLookup { get; set; }
 
@@ -204,7 +204,7 @@ namespace AlphaTab.Rendering
             {
                 Logger.Warning("Rendering", "Current layout does not support dynamic resizing, nothing was done");
             }
-            Logger.Info("Rendering", "Resize finished");
+            Logger.Debug("Rendering", "Resize finished");
         }
 
         private void LayoutAndRender()

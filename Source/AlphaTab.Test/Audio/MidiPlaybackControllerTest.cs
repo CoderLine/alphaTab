@@ -2,6 +2,7 @@
 using AlphaTab.Audio.Generator;
 using AlphaTab.Model;
 using AlphaTab.Test.Importer;
+using AlphaTab.Util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test.Audio
@@ -70,7 +71,7 @@ namespace AlphaTab.Test.Audio
                 controller.ProcessCurrent();
                 if (controller.ShouldPlay)
                 {
-                    Trace.WriteLine(string.Format("Checking index {0}, expected[{1}]", i, expectedIndexes[i]));
+                    Logger.Debug("Test", $"Checking index {i}, expected[{expectedIndexes[i]}]");
                     Assert.AreEqual(expectedIndexes[i], index);
                     i++;
                 }

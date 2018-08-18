@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TabBeatGlyph : BeatOnNoteGlyphBase
+    class TabBeatGlyph : BeatOnNoteGlyphBase
     {
         public TabNoteChordGlyph NoteNumbers { get; set; }
         public TabRestGlyph RestGlyph { get; set; }
@@ -31,25 +31,28 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 //
                 // Note numbers
-                NoteNumbers = new TabNoteChordGlyph(0, 0, Container.Beat.GraceType != GraceType.None);
+                var isGrace = Renderer.Settings.SmallGraceTabNotes && Container.Beat.GraceType != GraceType.None;
+                NoteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
                 NoteNumbers.Beat = Container.Beat;
                 NoteNumbers.BeamingHelper = BeamingHelper;
                 foreach (var note in Container.Beat.Notes)
                 {
-                    CreateNoteGlyph(note);
+                    if (note.IsVisible)
+                    {
+                        CreateNoteGlyph(note);
+                    }
                 }
                 AddGlyph(NoteNumbers);
 
                 //
                 // Whammy Bar
-                if (Container.Beat.HasWhammyBar && !NoteNumbers.BeatEffects.ContainsKey("Whammy"))
+                if (Container.Beat.HasWhammyBar)
                 {
-                    NoteNumbers.BeatEffects["Whammy"] = new WhammyBarGlyph(Container.Beat, Container);
+                    var whammy = new TabWhammyBarGlyph(Container.Beat);
+                    whammy.Renderer = Renderer;
+                    whammy.DoLayout();
 
-                    var whammyValueHeight = (WhammyBarGlyph.WhammyMaxOffset * Scale) / Beat.WhammyBarMaxValue;
-
-                    var whammyHeight = Container.Beat.MaxWhammyPoint.Value * whammyValueHeight;
-                    Renderer.RegisterOverflowTop(whammyHeight);
+                    Container.Ties.Add(whammy);
                 }
 
                 //
@@ -83,13 +86,12 @@ namespace AlphaTab.Rendering.Glyphs
                     AddGlyph(new SpacingGlyph(0, 0, 5 * Scale));
                     for (var i = 0; i < Container.Beat.Dots; i++)
                     {
-                        AddGlyph(new CircleGlyph(0, tabRenderer.LineOffset * tabRenderer.Bar.Staff.Track.Tuning.Length + tabRenderer.RhythmHeight, 1.5f * Scale));
+                        AddGlyph(new CircleGlyph(0, tabRenderer.LineOffset * tabRenderer.Bar.Staff.Tuning.Length + tabRenderer.RhythmHeight, 1.5f * Scale));
                     }
                 }
             }
             else
             {
-                var dotLine = 0f;
                 var line = 0f;
                 var offset = 0;
 
@@ -97,49 +99,38 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     case Duration.QuadrupleWhole:
                         line = 3;
-                        dotLine = 2;
                         break;
                     case Duration.DoubleWhole:
                         line = 3;
-                        dotLine = 2;
                         break;
                     case Duration.Whole:
                         line = 2;
-                        dotLine = 2;
                         break;
                     case Duration.Half:
                         line = 3;
-                        dotLine = 3;
                         break;
                     case Duration.Quarter:
                         line = 3;
-                        dotLine = 2.5f;
                         break;
                     case Duration.Eighth:
                         line = 2;
-                        dotLine = 2.5f;
                         offset = 5;
                         break;
                     case Duration.Sixteenth:
                         line = 2;
-                        dotLine = 2.5f;
                         offset = 5;
                         break;
                     case Duration.ThirtySecond:
                         line = 3;
-                        dotLine = 2.5f;
                         break;
                     case Duration.SixtyFourth:
                         line = 3;
-                        dotLine = 2.5f;
                         break;
                     case Duration.OneHundredTwentyEighth:
                         line = 3;
-                        dotLine = 2.5f;
                         break;
                     case Duration.TwoHundredFiftySixth:
                         line = 3;
-                        dotLine = 2.5f;
                         break;
                 }
 
@@ -175,6 +166,19 @@ namespace AlphaTab.Rendering.Glyphs
                 w += g.Width;
             }
             Width = w;
+
+            if (Container.Beat.IsEmpty)
+            {
+                CenterX = Width / 2;
+            }
+            else if (Container.Beat.IsRest)
+            {
+                CenterX = RestGlyph.X + RestGlyph.Width / 2;
+            }
+            else
+            {
+                CenterX = NoteNumbers.X + NoteNumbers.NoteStringWidth / 2;
+            }
         }
 
         public override void UpdateBeamingHelper()
@@ -193,7 +197,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var tr = (TabBarRenderer)Renderer;
             var noteNumberGlyph = new NoteNumberGlyph(0, 0, n);
-            var l = n.Beat.Voice.Bar.Staff.Track.Tuning.Length - n.String + 1;
+            var l = n.Beat.Voice.Bar.Staff.Tuning.Length - n.String + 1;
             noteNumberGlyph.Y = tr.GetTabY(l, -2);
             noteNumberGlyph.Renderer = Renderer;
             noteNumberGlyph.DoLayout();

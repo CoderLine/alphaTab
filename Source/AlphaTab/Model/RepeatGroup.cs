@@ -1,6 +1,6 @@
 /*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -41,6 +41,11 @@ namespace AlphaTab.Model
         public FastList<MasterBar> Closings { get; set; }
 
         /// <summary>
+        ///  true if the repeat group was opened well
+        /// </summary>
+        public bool IsOpened { get; set; }
+
+        /// <summary>
         ///  true if the repeat group was closed well
         /// </summary>
         public bool IsClosed { get; set; }
@@ -67,6 +72,11 @@ namespace AlphaTab.Model
             {
                 Closings.Add(masterBar);
                 IsClosed = true;
+                if (!IsOpened)
+                {
+                    MasterBars[0].IsRepeatStart = true;
+                    IsOpened = true;
+                }
             }
             // a new item after the header was closed? -> repeat alternative reopens the group
             else if (IsClosed)

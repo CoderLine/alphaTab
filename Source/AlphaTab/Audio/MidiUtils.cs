@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,13 +16,11 @@
  * License along with this library.
  */
 
-using AlphaTab.Audio.Generator;
-using AlphaTab.Audio.Model;
 using AlphaTab.Model;
 
 namespace AlphaTab.Audio
 {
-    public static class MidiUtils
+    static class MidiUtils
     {
         /// <summary>
         /// The amount of ticks per quarter note used within this midi system.
@@ -47,6 +45,16 @@ namespace AlphaTab.Audio
         public static int TicksToMillis(int ticks, int tempo)
         {
             return (int)(ticks * (60000.0 / (tempo * QuarterTime)));
+        }
+
+        /// <summary>
+        /// Converts a duration value to its ticks equivalent.
+        /// </summary>
+        /// <param name="duration"></param>
+        /// <returns></returns>
+        public static int MillisToTicks(int millis, int tempo)
+        {
+            return (int)(millis / (60000.0 / (tempo * QuarterTime)));
         }
 
 

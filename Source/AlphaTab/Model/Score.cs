@@ -1,6 +1,6 @@
 /*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,6 +20,26 @@ using AlphaTab.Collections;
 
 namespace AlphaTab.Model
 {
+    /// <summary>
+    /// This class represents the rendering stylesheet.
+    /// It contains settings which control the display of the score when rendered. 
+    /// </summary>
+    public class RenderStylesheet
+    {
+        public bool HideDynamics { get; set; }
+
+        public RenderStylesheet()
+        {
+            HideDynamics = false;
+        }
+
+        public static void CopyTo(RenderStylesheet src, RenderStylesheet dst)
+        {
+            dst.HideDynamics = src.HideDynamics;
+        }
+    }
+
+
     /// <summary>
     /// The score is the root node of the complete 
     /// model. It stores the basic information of 
@@ -85,6 +105,8 @@ namespace AlphaTab.Model
         public FastList<MasterBar> MasterBars { get; set; }
         public FastList<Track> Tracks { get; set; }
 
+        public RenderStylesheet Stylesheet { get; set; }
+
         public Score()
         {
             MasterBars = new FastList<MasterBar>();
@@ -92,6 +114,7 @@ namespace AlphaTab.Model
             _currentRepeatGroup = new RepeatGroup();
             Album = Artist = Copyright = Instructions = Music = Notices = SubTitle = Title = Words = Tab = TempoLabel = "";
             Tempo = 120;
+            Stylesheet = new RenderStylesheet();
         }
 
         public static void CopyTo(Score src, Score dst)
@@ -108,6 +131,24 @@ namespace AlphaTab.Model
             dst.Tab = src.Tab;
             dst.Tempo = src.Tempo;
             dst.TempoLabel = src.TempoLabel;
+        }
+
+
+
+        public void RebuildRepeatGroups()
+        {
+            var currentGroup = new RepeatGroup();
+            foreach (var bar in MasterBars)
+            {
+                // if the group is closed only the next upcoming header can
+                // reopen the group in case of a repeat alternative, so we 
+                // remove the current group 
+                if (bar.IsRepeatStart || (_currentRepeatGroup.IsClosed && bar.AlternateEndings <= 0))
+                {
+                    currentGroup = new RepeatGroup();
+                }
+                currentGroup.AddMasterBar(bar);
+            }
         }
 
         public void AddMasterBar(MasterBar bar)
@@ -139,11 +180,11 @@ namespace AlphaTab.Model
             Tracks.Add(track);
         }
 
-        public void Finish()
+        public void Finish(Settings settings)
         {
             for (int i = 0, j = Tracks.Count; i < j; i++)
             {
-                Tracks[i].Finish();
+                Tracks[i].Finish(settings);
             }
         }
     }

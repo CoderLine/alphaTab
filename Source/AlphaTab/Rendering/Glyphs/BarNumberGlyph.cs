@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class BarNumberGlyph : Glyph
+    class BarNumberGlyph : Glyph
     {
         private readonly int _number;
 
@@ -42,12 +42,12 @@ namespace AlphaTab.Rendering.Glyphs
                 return;
             }
             var res = Renderer.Resources;
+            var c = canvas.Color;
             canvas.Color = res.BarNumberColor;
             canvas.Font = res.BarNumberFont;
 
             canvas.FillText(_number.ToString(), cx + X, cy + Y);
-
-            canvas.Color = res.MainGlyphColor;
+            canvas.Color = c;
         }
     }
 }

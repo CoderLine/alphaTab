@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This public class contains central definitions for controlling the visual appearance. 
     /// </summary>
-    public class RenderingResources
+    class RenderingResources
     {
         public Font CopyrightFont { get; set; }
         public Font TitleFont { get; set; }
@@ -40,6 +40,7 @@ namespace AlphaTab.Rendering
         public Font BarNumberFont { get; set; }
         public Color BarNumberColor { get; set; }
 
+        public Font FingeringFont { get; set; }
         public Font MarkerFont { get; set; }
         public Font TabClefFont { get; set; }
 
@@ -72,12 +73,13 @@ namespace AlphaTab.Rendering
             TablatureFont = new Font(sansFont, 13 * scale);
             GraceFont = new Font(sansFont, 11 * scale);
 
-            StaveLineColor = new Color(0, 0, 0);
+            StaveLineColor = new Color(165, 165, 165);
             BarSeperatorColor = new Color(34, 34, 17);
 
             BarNumberFont = new Font(sansFont, 11 * scale);
             BarNumberColor = new Color(200, 0, 0);
 
+            FingeringFont = new Font(serifFont, 14 * scale);
             MarkerFont = new Font(serifFont, 14 * scale, FontStyle.Bold);
             TabClefFont = new Font(sansFont, 18 * scale, FontStyle.Bold);
 

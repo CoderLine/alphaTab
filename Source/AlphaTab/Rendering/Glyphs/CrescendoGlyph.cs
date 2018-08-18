@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,8 +22,9 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class CrescendoGlyph : GroupedEffectGlyph
+    class CrescendoGlyph : GroupedEffectGlyph
     {
+        private const int Padding = NoteHeadGlyph.QuarterNoteHeadWidth / 2;
         private readonly CrescendoType _crescendo;
 
         public CrescendoGlyph(float x, float y, CrescendoType crescendo)
@@ -47,15 +48,17 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.BeginPath();
             if (_crescendo == CrescendoType.Crescendo)
             {
+                endX -= Padding * Scale;
                 canvas.MoveTo(endX, cy + Y);
                 canvas.LineTo(startX, cy + Y + height / 2);
                 canvas.LineTo(endX, cy + Y + height);
             }
             else
             {
-                canvas.MoveTo(cx + X, cy + Y);
+                endX -= Padding * Scale;
+                canvas.MoveTo(startX, cy + Y);
                 canvas.LineTo(endX, cy + Y + (height / 2));
-                canvas.LineTo(cx + X, cy + Y + height);
+                canvas.LineTo(startX, cy + Y + height);
             }
             canvas.Stroke();
         }

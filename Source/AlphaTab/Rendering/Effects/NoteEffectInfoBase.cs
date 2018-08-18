@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,11 +21,11 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public abstract class NoteEffectInfoBase : IEffectBarRendererInfo
+    abstract class NoteEffectInfoBase : IEffectBarRendererInfo
     {
         protected FastList<Note> LastCreateInfo;
 
-        public virtual bool ShouldCreateGlyph(Beat beat)
+        public virtual bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
             LastCreateInfo = new FastList<Note>();
             for (int i = 0, j = beat.Notes.Count; i < j; i++)

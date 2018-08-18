@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This BarRenderer renders a bar using guitar tablature notation
     /// </summary>
-    public class TabBarRenderer : BarRendererBase
+    class TabBarRenderer : BarRendererBase
     {
         public const string StaffId = "tab";
 
@@ -66,12 +66,12 @@ namespace AlphaTab.Rendering
             return 0;
         }
 
-        public override float GetNoteY(Note note)
+        public override float GetNoteY(Note note, bool aboveNote = false)
         {
             var beat = (TabBeatGlyph)GetOnNotesGlyphForBeat(note.Beat);
             if (beat != null)
             {
-                return beat.NoteNumbers.GetNoteY(note);
+                return beat.NoteNumbers.GetNoteY(note, aboveNote);
             }
             return 0;
         }
@@ -82,7 +82,7 @@ namespace AlphaTab.Rendering
             var numberOverflow = (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2f);
             TopPadding = numberOverflow;
             BottomPadding = numberOverflow;
-            Height = LineOffset * (Bar.Staff.Track.Tuning.Length - 1) + (numberOverflow * 2);
+            Height = LineOffset * (Bar.Staff.Tuning.Length - 1) + (numberOverflow * 2);
 
             if (RenderRhythm)
             {
@@ -104,7 +104,7 @@ namespace AlphaTab.Rendering
             // Clef
             if (IsFirstOfLine)
             {
-                var center = (Bar.Staff.Track.Tuning.Length + 1) / 2f;
+                var center = (Bar.Staff.Tuning.Length + 1) / 2f;
                 AddPreBeatGlyph(new TabClefGlyph(5 * Scale, GetTabY(center)));
             }
 
@@ -174,7 +174,7 @@ namespace AlphaTab.Rendering
                     AddPostBeatGlyph(new RepeatCountGlyph(0, GetTabY(-0.5f, -3), Bar.MasterBar.RepeatCount));
                 }
             }
-            else if (Bar.NextBar == null || !Bar.NextBar.MasterBar.IsRepeatStart)
+            else
             {
                 AddPostBeatGlyph(new BarSeperatorGlyph(0, 0));
             }
@@ -207,7 +207,7 @@ namespace AlphaTab.Rendering
 
             // collect tab note position for spaces
             var tabNotes = new FastList<FastList<float[]>>();
-            for (int i = 0, j = Bar.Staff.Track.Tuning.Length; i < j; i++)
+            for (int i = 0, j = Bar.Staff.Tuning.Length; i < j; i++)
             {
                 tabNotes.Add(new FastList<float[]>());
             }
@@ -228,7 +228,7 @@ namespace AlphaTab.Rendering
                                 var noteNumber = noteNumbers.NotesPerString[s];
                                 if (!noteNumber.IsEmpty)
                                 {
-                                    tabNotes[Bar.Staff.Track.Tuning.Length - s].Add(
+                                    tabNotes[Bar.Staff.Tuning.Length - s].Add(
                                         new[]
                                         {
                                         vc.X + bg.X + notes.X + noteNumbers.X,
@@ -249,7 +249,7 @@ namespace AlphaTab.Rendering
             }
 
             var lineOffset = LineOffset;
-            for (int i = 0, j = Bar.Staff.Track.Tuning.Length; i < j; i++)
+            for (int i = 0, j = Bar.Staff.Tuning.Length; i < j; i++)
             {
                 if (i > 0) lineY += lineOffset;
 
@@ -265,6 +265,8 @@ namespace AlphaTab.Rendering
 
             canvas.Color = res.MainGlyphColor;
 
+            PaintSimileMark(cx, cy, canvas);
+
             // Info guides for debugging
 
             //DrawInfoGuide(canvas, cx, cy, 0, new Color(255, 0, 0)); // top
@@ -272,6 +274,7 @@ namespace AlphaTab.Rendering
             //DrawInfoGuide(canvas, cx, cy, stave.StaveBottom, new Color(0,255,0)); // stavebottom
             //DrawInfoGuide(canvas, cx, cy, Height, new Color(255, 0, 0)); // bottom
         }
+
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {

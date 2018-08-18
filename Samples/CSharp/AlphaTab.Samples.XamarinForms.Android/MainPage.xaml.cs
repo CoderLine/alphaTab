@@ -1,10 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using AlphaTab.Importer;
 using AlphaTab.Model;
-using Android.App;
-using Java.IO;
-using SkiaSharp;
 using Xamarin.Forms;
 
 namespace AlphaTab.Samples.XamarinForms.Android

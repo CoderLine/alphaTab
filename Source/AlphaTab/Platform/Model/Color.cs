@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@ namespace AlphaTab.Platform.Model
             Raw = (a << 24) | (r << 16) | (g << 8) | b;
             if (A == 0xFF)
             {
-                RGBA = "#" + Std.ToHexString(R, 2) + Std.ToHexString(G, 2) + Std.ToHexString(B, 2);
+                RGBA = "#" + Platform.ToHexString(R, 2) + Platform.ToHexString(G, 2) + Platform.ToHexString(B, 2);
             }
             else
             {
@@ -79,5 +79,12 @@ namespace AlphaTab.Platform.Model
             get; internal set;
         }
 
+        public static Color Random(byte opacity = 100)
+        { 
+            return new Color((byte)Platform.Random(255),
+                (byte)Platform.Random(255),
+                (byte)Platform.Random(255),
+                opacity);
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ namespace AlphaTab.Rendering.Glyphs
     /// This glyph acts as container for handling
     /// multiple voice rendering
     /// </summary>
-    public class VoiceContainerGlyph : GlyphGroup
+    class VoiceContainerGlyph : GlyphGroup
     {
         public const string KeySizeBeat = "Beat";
 
@@ -59,7 +59,7 @@ namespace AlphaTab.Rendering.Glyphs
             for (int i = 0, j = beatGlyphs.Count; i < j; i++)
             {
                 var currentBeatGlyph = beatGlyphs[i];
-                var time = currentBeatGlyph.Beat.AbsoluteStart;
+                var time = currentBeatGlyph.Beat.AbsoluteDisplayStart;
                 currentBeatGlyph.X = positions[time] - currentBeatGlyph.OnTimeX;
 
                 // size always previousl glyph after we know the position
@@ -118,8 +118,8 @@ namespace AlphaTab.Rendering.Glyphs
         //private static Random Random = new Random();
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            //canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 80);
-            //canvas.FillRect(cx + X, cy + Y, Width, 100);
+            //canvas.Color = Color.Random();
+            //canvas.StrokeRect(cx + X, cy + Y, Width, 100);
 
             //if (Voice.Index == 0)
             //{
@@ -137,41 +137,17 @@ namespace AlphaTab.Rendering.Glyphs
 
         //private void PaintSprings(float x, float y, ICanvas canvas)
         //{
-        //    var sortedSprings = new FastList<Spring>();
-        //    var xMin = 0f;
-        //    Std.Foreach(_layoutings.Springs.Values, spring =>
-        //    {
-        //        sortedSprings.Add(spring);
-        //        if (spring.SpringWidth < xMin)
-        //        {
-        //            xMin = spring.SpringWidth;
-        //        }
-        //    });
-
-        //    sortedSprings.Sort((a, b) =>
-        //    {
-        //        if (a.TimePosition < b.TimePosition)
-        //        {
-        //            return -1;
-        //        }
-        //        if (a.TimePosition > b.TimePosition)
-        //        {
-        //            return 1;
-        //        }
-        //        return 0;
-        //    });
-
         //    y += 40;
 
+        //    var force = Renderer.LayoutingInfo.SpaceToForce(Width);
 
-        //    var positions = _layoutings.BuildOnTimePositions();
-        //    var keys = positions.Keys;
+        //    var positions = Renderer.LayoutingInfo.BuildOnTimePositions(force);
         //    canvas.Color = new Color(255, 0, 0);
-        //    for (int i = 0; i < keys.Length; i++)
+
+        //    foreach (var time in positions)
         //    {
-        //        var time = Std.ParseInt(keys[i]);
         //        var springX = positions[time];
-        //        var spring = _layoutings.Springs[time];
+        //        var spring = Renderer.LayoutingInfo.Springs[time];
 
         //        canvas.BeginPath();
         //        canvas.MoveTo(x + springX, y);
@@ -180,8 +156,11 @@ namespace AlphaTab.Rendering.Glyphs
 
         //        canvas.BeginPath();
         //        canvas.MoveTo(x + springX, y + 5);
-        //        canvas.LineTo(x + springX + _layoutings.CalculateWidth(spring.SpringConstant), y + 5);
+        //        canvas.LineTo(x + springX + Renderer.LayoutingInfo.CalculateWidth(force, spring.SpringConstant), y + 5);
         //        canvas.Stroke();
+
+        //        canvas.TextAlign = TextAlign.Center;
+        //        canvas.FillText(time.ToString(), x + springX, y + 10);
         //    }
         //}
     }

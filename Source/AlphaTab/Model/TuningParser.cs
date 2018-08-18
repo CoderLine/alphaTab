@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -55,18 +55,18 @@ namespace AlphaTab.Model
             for (int i = 0; i < name.Length; i++)
             {
                 var c = (int)name[i];
-                if (Std.IsCharNumber(c, false))
+                if (Platform.Platform.IsCharNumber(c, false))
                 {
                     // number without note?
                     if (string.IsNullOrEmpty(note))
                     {
                         return null;
                     }
-                    octave += Std.StringFromCharCode(c);
+                    octave += Platform.Platform.StringFromCharCode(c);
                 }
                 else if ((c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A) || c == 0x23)
                 {
-                    note += Std.StringFromCharCode(c);
+                    note += Platform.Platform.StringFromCharCode(c);
                 }
                 else
                 {
@@ -80,7 +80,7 @@ namespace AlphaTab.Model
             }
 
             var result = new TuningParseResult();
-            result.Octave = Std.ParseInt(octave) + 1;
+            result.Octave = Platform.Platform.ParseInt(octave) + 1;
             result.Note = note.ToLower();
             result.NoteValue = GetToneForText(result.Note);
             return result;

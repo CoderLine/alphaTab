@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class TempoGlyph : EffectGlyph
+    class TempoGlyph : EffectGlyph
     {
         private readonly int _tempo;
 
@@ -40,7 +40,7 @@ namespace AlphaTab.Rendering.Glyphs
             var res = Renderer.Resources;
             canvas.Font = res.MarkerFont;
 
-            canvas.FillMusicFontSymbol(cx + X, cy + Y + Height * 0.8f, 0.75f, MusicFontSymbol.Tempo);
+            canvas.FillMusicFontSymbol(cx + X, cy + Y + Height * 0.8f, Scale * 0.75f, MusicFontSymbol.Tempo);
             canvas.FillText("= " + _tempo, cx + X + (Height / 2), cy + Y + canvas.Font.Size / 2);
         }
     }

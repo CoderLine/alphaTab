@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,7 @@
  */
 
 using System;
+using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -28,13 +29,14 @@ namespace AlphaTab.Rendering.Staves
     /// It is used by the layout engine to collect the sizes of score parts
     /// to align the parts across multiple staves.
     /// </summary>
-    public class BarLayoutingInfo
+    class BarLayoutingInfo
     {
         private const int MinDuration = 30;
         private const int MinDurationWidth = 10;
 
         private FastList<Spring> _timeSortedSprings;
         private float _xMin;
+        private int _minTime;
 
         private float _onTimePositionsForce;
         private FastDictionary<int, float> _onTimePositions;
@@ -45,6 +47,7 @@ namespace AlphaTab.Rendering.Staves
         public int Version { get; set; }
         public FastDictionary<int, float> PreBeatSizes { get; set; }
         public FastDictionary<int, float> OnBeatSizes { get; set; }
+        public FastDictionary<int, float> OnBeatCenterX { get; set; }
 
         public float PreBeatSize { get; set; }
         public float PostBeatSize { get; set; }
@@ -57,9 +60,12 @@ namespace AlphaTab.Rendering.Staves
         {
             PreBeatSizes = new FastDictionary<int, float>();
             OnBeatSizes = new FastDictionary<int, float>();
+            OnBeatCenterX = new FastDictionary<int, float>();
             VoiceSize = 0;
             Springs = new FastDictionary<int, Spring>();
             Version = 0;
+            _timeSortedSprings = new FastList<Spring>();
+            _minTime = int.MaxValue;
         }
 
         public void UpdateVoiceSize(float size)
@@ -107,6 +113,25 @@ namespace AlphaTab.Rendering.Staves
             return 0;
         }
 
+
+        public float GetBeatCenterX(Beat beat)
+        {
+            if (OnBeatCenterX.ContainsKey(beat.Index))
+            {
+                return OnBeatCenterX[beat.Index];
+            }
+            return 0;
+        }
+
+        public void SetBeatCenterX(Beat beat, float x)
+        {
+            if (!OnBeatCenterX.ContainsKey(beat.Index) || OnBeatCenterX[beat.Index] < x)
+            {
+                OnBeatCenterX[beat.Index] = x;
+                Version++;
+            }
+        }
+
         public void UpdateMinStretchForce(float force)
         {
             if (MinStretchForce < force)
@@ -117,9 +142,8 @@ namespace AlphaTab.Rendering.Staves
         }
 
         public FastDictionary<int, Spring> Springs { get; set; }
-        public int SmallestDuration { get; set; }
 
-        public Spring AddSpring(int start, int duration, float springSize, float preSpringSize)
+        public Spring AddSpring(int start, int duration, float preSpringSize, float postSpringSize)
         {
             Version++;
             Spring spring;
@@ -127,18 +151,42 @@ namespace AlphaTab.Rendering.Staves
             {
                 spring = new Spring();
                 spring.TimePosition = start;
-                spring.SmallestDuration = duration;
+                spring.AllDurations.Add(duration);
+
+                // check in the previous spring for the shortest duration that overlaps with this spring
+                // Gourlay defines that we need the smallest note duration that either starts **or continues** on the current spring. 
+                if (_timeSortedSprings.Count > 0)
+                {
+                    int smallestDuration = duration;
+                    var previousSpring = _timeSortedSprings[_timeSortedSprings.Count - 1];
+                    foreach (var prevDuration in previousSpring.AllDurations)
+                    {
+                        var end = previousSpring.TimePosition + prevDuration;
+                        if (end >= start && prevDuration < smallestDuration)
+                        {
+                            smallestDuration = prevDuration;
+                        }
+                    }
+                }
                 spring.LongestDuration = duration;
-                spring.SpringWidth = springSize;
+                spring.PostSpringWidth = postSpringSize;
                 spring.PreSpringWidth = preSpringSize;
                 Springs[start] = spring;
+
+                var timeSorted = _timeSortedSprings;
+                var insertPos = timeSorted.Count - 1;
+                while (insertPos > 0 && timeSorted[insertPos].TimePosition > start)
+                {
+                    insertPos--;
+                }
+                _timeSortedSprings.InsertAt(insertPos + 1, spring);
             }
             else
             {
                 spring = Springs[start];
-                if (spring.SpringWidth < springSize)
+                if (spring.PostSpringWidth < postSpringSize)
                 {
-                    spring.SpringWidth = springSize;
+                    spring.PostSpringWidth = postSpringSize;
                 }
                 if (spring.PreSpringWidth < preSpringSize)
                 {
@@ -152,19 +200,21 @@ namespace AlphaTab.Rendering.Staves
                 {
                     spring.LongestDuration = duration;
                 }
+                spring.AllDurations.Add(duration);
             }
 
-            if (duration < SmallestDuration)
+            if (_minTime > start)
             {
-                SmallestDuration = duration;
+                _minTime = start;
             }
 
             return spring;
         }
 
-        public Spring AddBeatSpring(Beat beat, float beatSize, float preBeatSize)
+        public Spring AddBeatSpring(Beat beat, float preBeatSize, float postBeatSize)
         {
-            return AddSpring(beat.AbsoluteStart, beat.CalculateDuration(), beatSize, preBeatSize);
+            var start = beat.AbsoluteDisplayStart;
+            return AddSpring(start, beat.DisplayDuration, preBeatSize, postBeatSize);
         }
 
         public void Finish()
@@ -175,33 +225,19 @@ namespace AlphaTab.Rendering.Staves
 
         private void CalculateSpringConstants()
         {
-            var sortedSprings = _timeSortedSprings = new FastList<Spring>();
             _xMin = 0f;
             var springs = Springs;
             foreach (var time in springs)
             {
                 var spring = springs[time];
-                sortedSprings.Add(spring);
                 if (spring.SpringWidth < _xMin)
                 {
                     _xMin = spring.SpringWidth;
                 }
             }
 
-            sortedSprings.Sort((a, b) =>
-            {
-                if (a.TimePosition < b.TimePosition)
-                {
-                    return -1;
-                }
-                if (a.TimePosition > b.TimePosition)
-                {
-                    return 1;
-                }
-                return 0;
-            });
-
             var totalSpringConstant = 0f;
+            var sortedSprings = _timeSortedSprings;
             for (int i = 0; i < sortedSprings.Count; i++)
             {
                 var currentSpring = sortedSprings[i];
@@ -213,9 +249,8 @@ namespace AlphaTab.Rendering.Staves
                 else
                 {
                     var nextSpring = sortedSprings[i + 1];
-                    duration = nextSpring.TimePosition - currentSpring.TimePosition;
+                    duration = Math.Abs(nextSpring.TimePosition - currentSpring.TimePosition);
                 }
-
                 currentSpring.SpringConstant = CalculateSpringConstant(currentSpring, duration);
                 totalSpringConstant += 1 / currentSpring.SpringConstant;
             }
@@ -229,17 +264,21 @@ namespace AlphaTab.Rendering.Staves
             }
         }
 
-        private float CalculateSpringConstant(Spring spring, float duration)
+        private float CalculateSpringConstant(Spring spring, int duration)
         {
-            float minDuration = spring.SmallestDuration;
+            if (duration <= 0)
+            {
+                duration = Duration.SixtyFourth.ToTicks();
+            }
+
             if (spring.SmallestDuration == 0)
             {
-                minDuration = duration;
+                spring.SmallestDuration = duration;
             }
-            var phi = 1 + 0.6f * Std.Log2(duration / (float)MinDuration);
-            return (minDuration / duration) * 1 / (phi * MinDurationWidth);
+            float minDuration = spring.SmallestDuration;
+            var phi = 1 + 0.6f * Platform.Platform.Log2(duration / (float)MinDuration);
+            return (minDuration / duration) * (1 / (phi * MinDurationWidth));
         }
-
 
         public float SpaceToForce(float space)
         {
@@ -293,7 +332,15 @@ namespace AlphaTab.Rendering.Staves
         public float Force { get; set; }
         public float SpringConstant { get; set; }
 
-        public float SpringWidth { get; set; }
+        public float SpringWidth => PreSpringWidth + PostSpringWidth;
         public float PreSpringWidth { get; set; }
+        public float PostSpringWidth { get; set; }
+
+        public FastList<int> AllDurations { get; set; }
+
+        public Spring()
+        {
+            AllDurations = new FastList<int>();
+        }
     }
 }

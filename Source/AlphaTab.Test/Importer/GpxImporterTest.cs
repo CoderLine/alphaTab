@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,6 +20,7 @@ using System.IO;
 using AlphaTab.Importer;
 using AlphaTab.IO;
 using AlphaTab.Model;
+using AlphaTab.Util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test.Importer
@@ -30,18 +31,18 @@ namespace AlphaTab.Test.Importer
         internal byte[] Load(string name)
         {
             const string path = "TestFiles/";
-            return File.ReadAllBytes(Path.Combine(path, name));
+            return TestPlatform.LoadFile(path + name);
         }
         
-        internal new GpxImporter PrepareImporterWithFile(string name)
+        internal GpxImporter PrepareGpxImporterWithFile(string name)
         {
-            return PrepareImporterWithBytes(Load(name));
+            return PrepareGpxImporterWithBytes(Load(name));
         }
 
-        internal new GpxImporter PrepareImporterWithBytes(byte[] buffer)
+        internal GpxImporter PrepareGpxImporterWithBytes(byte[] buffer)
         {
             var readerBase = new GpxImporter();
-            readerBase.Init(new StreamWrapper(new MemoryStream(buffer)));
+            readerBase.Init(ByteBuffer.FromBuffer(buffer));
             return readerBase;
         }
 
@@ -49,7 +50,7 @@ namespace AlphaTab.Test.Importer
         public void TestFileSystemCompressed()
         {
             GpxFileSystem fileSystem = new GpxFileSystem();
-            fileSystem.Load(new StreamWrapper(new MemoryStream(Load("GuitarPro6/Compressed.gpx"))));
+            fileSystem.Load(ByteBuffer.FromBuffer(Load("GuitarPro6/Compressed.gpx")));
 
             string[] names = {"score.gpif", "misc.xml", "BinaryStylesheet", "PartConfiguration", "LayoutConfiguration"};
             int[] sizes = {8488, 130, 12204, 20, 12};
@@ -57,7 +58,7 @@ namespace AlphaTab.Test.Importer
             for (int i = 0; i < fileSystem.Files.Count; i++)
             {
                 var file = fileSystem.Files[i];
-                Console.WriteLine("{0} - {1}", file.FileName, file.FileSize);
+                Logger.Info("Test", $"{file.FileName} - {file.FileSize}");
                 Assert.AreEqual(names[i], file.FileName);
                 Assert.AreEqual(sizes[i], file.FileSize);
             }
@@ -66,7 +67,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestScoreInfo()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/Test01.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/Test01.gpx");
             var score = reader.ReadScore();
 
             Assert.AreEqual("Title", score.Title);
@@ -89,7 +90,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestNotes()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/Test02.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/Test02.gpx");
             var score = reader.ReadScore();
             CheckTest02Score(score);
             Render(score);
@@ -98,7 +99,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestTimeSignatures()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/Test03.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/Test03.gpx");
             var score = reader.ReadScore();
 
             CheckTest03Score(score);
@@ -108,7 +109,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestDead()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestDead.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestDead.gpx");
             var score = reader.ReadScore();
             CheckDead(score);
             Render(score);
@@ -117,7 +118,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestGrace()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestGrace.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestGrace.gpx");
             var score = reader.ReadScore();
             CheckGrace(score);
             Render(score);
@@ -126,7 +127,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestAccentuation()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestAccentuations.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestAccentuations.gpx");
             var score = reader.ReadScore();
             CheckAccentuation(score, true);
             Render(score);
@@ -135,7 +136,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestHarmonics()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestHarmonics.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestHarmonics.gpx");
             var score = reader.ReadScore();
             CheckHarmonics(score);
             Render(score);
@@ -144,7 +145,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestHammer()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestHammer.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestHammer.gpx");
             var score = reader.ReadScore();
             CheckHammer(score);
             Render(score);
@@ -153,7 +154,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestBend()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestBends.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestBends.gpx");
             var score = reader.ReadScore();
 
             Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints.Count);
@@ -191,7 +192,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestTremolo()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestTremolo.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestTremolo.gpx");
             var score = reader.ReadScore();
 
             Assert.AreEqual(3, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints.Count);
@@ -246,7 +247,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestSlides()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestSlides.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestSlides.gpx");
             var score = reader.ReadScore();
             CheckSlides(score);
             Render(score);
@@ -255,7 +256,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestVibrato()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestVibrato.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestVibrato.gpx");
             var score = reader.ReadScore();
             CheckVibrato(score, true);
             Render(score);
@@ -264,7 +265,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestTrills()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestTrills.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestTrills.gpx");
             var score = reader.ReadScore();
             CheckTrills(score);
             Render(score);
@@ -273,7 +274,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestOtherEffects()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestOtherEffects.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestOtherEffects.gpx");
             var score = reader.ReadScore();
             CheckOtherEffects(score, true /* GPX doesn't support instrument changes */);
             Render(score);
@@ -282,7 +283,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestFingering()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestFingering.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestFingering.gpx");
             var score = reader.ReadScore();
             CheckFingering(score);
             Render(score);
@@ -291,7 +292,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestStroke()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestStrokes.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestStrokes.gpx");
             var score = reader.ReadScore();
             CheckStroke(score);
             Render(score);
@@ -300,7 +301,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestTuplets()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestTuplets.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestTuplets.gpx");
             var score = reader.ReadScore();
             CheckTuplets(score);
             Render(score);
@@ -309,7 +310,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestRanges()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestRanges.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestRanges.gpx");
             var score = reader.ReadScore();
             CheckRanges(score);
             Render(score);
@@ -318,7 +319,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestEffects()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/Effects.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/Effects.gpx");
             var score = reader.ReadScore();
             CheckEffects(score);
             Render(score);
@@ -327,7 +328,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestSerenade()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/Serenade.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/Serenade.gpx");
             var score = reader.ReadScore();// only Check reading
             Render(score);
         }
@@ -335,7 +336,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestStrings()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestStrings.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestStrings.gpx");
             var score = reader.ReadScore();
             CheckStrings(score);
             Render(score);
@@ -344,7 +345,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestKeySignatures()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestKeySignatures.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestKeySignatures.gpx");
             var score = reader.ReadScore();
             CheckKeySignatures(score);
             Render(score);
@@ -353,7 +354,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestChords()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/TestChords.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestChords.gpx");
             var score = reader.ReadScore();
             CheckChords(score);
             Render(score);
@@ -364,7 +365,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestColors()
         {
-            var reader = PrepareImporterWithFile("GuitarPro6/Colors.gpx");
+            var reader = PrepareGpxImporterWithFile("GuitarPro6/Colors.gpx");
             var score = reader.ReadScore();
 
             CheckColors(score);

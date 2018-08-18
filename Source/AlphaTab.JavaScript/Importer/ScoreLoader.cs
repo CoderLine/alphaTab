@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,9 +18,10 @@
 using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
-using SharpKit.Html;
-using SharpKit.JavaScript;
-using Console = System.Console;
+using AlphaTab.Platform;
+using Haxe.Js.Html;
+using Phase;
+using Phase.Attributes;
 
 namespace AlphaTab.Importer
 {
@@ -36,21 +37,24 @@ namespace AlphaTab.Importer
         /// <param name="path">the source path to load the binary file from</param>
         /// <param name="success">this function is called if the Score was successfully loaded from the datasource</param>
         /// <param name="error">this function is called if any error during the loading occured.</param>
-        public static void LoadScoreAsync(string path, Action<Score> success, Action<Exception> error)
+        /// <param name="settings">settings for the score import</param>
+        public static void LoadScoreAsync(string path, Action<Score> success, Action<Exception> error, Settings settings = null)
         {
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", path);
-            xhr.responseType = "arraybuffer";
-            xhr.onreadystatechange = e =>
+            xhr.Open("GET", path, true);
+            xhr.ResponseType = XMLHttpRequestResponseType.ARRAYBUFFER;
+            xhr.OnReadyStateChange = (Action)(() =>
             {
-                if (xhr.readyState == 4)
+                if (xhr.ReadyState == XMLHttpRequest.DONE)
                 {
-                    if (xhr.status == 200)
+                    object response = xhr.Response;
+                    if (xhr.Status == 200 || (xhr.Status == 0 && response.IsTruthy()))
                     {
                         try
                         {
-                            var reader = new Uint8Array(xhr.response.As<ArrayBuffer>());
-                            var score = LoadScoreFromBytes(reader.As<byte[]>());
+                            ArrayBuffer buffer = xhr.Response;
+                            var reader = new Uint8Array(buffer);
+                            var score = LoadScoreFromBytes(reader.As<byte[]>(), settings);
                             success(score);
                         }
                         catch (Exception exception)
@@ -59,40 +63,37 @@ namespace AlphaTab.Importer
                         }
                     }
                     // Error handling
-                    else if (xhr.status == 0)
+                    else if (xhr.Status == 0)
                     {
                         error(new FileLoadException("You are offline!!\n Please Check Your Network.", xhr));
                     }
-                    else if (xhr.status == 404)
+                    else if (xhr.Status == 404)
                     {
                         error(new FileLoadException("Requested URL not found.", xhr));
                     }
-                    else if (xhr.status == 500)
+                    else if (xhr.Status == 500)
                     {
                         error(new FileLoadException("Internel Server Error.", xhr));
                     }
-                    else if (xhr.statusText == "parsererror")
+                    else if (xhr.StatusText == "parsererror")
                     {
                         error(new FileLoadException("Error.\nParsing JSON Request failed.", xhr));
                     }
-                    else if (xhr.statusText == "timeout")
+                    else if (xhr.StatusText == "timeout")
                     {
                         error(new FileLoadException("Request Time out.", xhr));
                     }
                     else
                     {
-                        error(new FileLoadException("Unknow Error: " + xhr.responseText, xhr));
+                        error(new FileLoadException("Unknow Error: " + xhr.ResponseText, xhr));
                     }
                 }
-            };
-
-            xhr.open("GET", path, true);
-            xhr.responseType = "arraybuffer";
+            });
             // IE fallback
-            if (xhr.responseType != "arraybuffer")
+            if (xhr.ResponseType != XMLHttpRequestResponseType.ARRAYBUFFER)
             {
                 // use VB Loader to load binary array
-                dynamic vbArr = VbAjaxLoader("GET", path);
+                dynamic vbArr = Script.Write<dynamic>("untyped VbAjaxLoader(\"GET\", path)");
                 var fileContents = vbArr.toArray();
 
                 // decode byte array to string
@@ -105,11 +106,10 @@ namespace AlphaTab.Importer
                 }
 
                 var reader = GetBytesFromString(data.ToString());
-                var score = LoadScoreFromBytes(reader.As<byte[]>());
+                var score = LoadScoreFromBytes(reader, settings);
                 success(score);
-                return;
             }
-            xhr.send();
+            xhr.Send();
         }
 
         private static byte[] GetBytesFromString(string s)
@@ -120,12 +120,6 @@ namespace AlphaTab.Importer
                 b[i] = (byte)s[i];
             }
             return b;
-        }
-
-        [JsMethod(InlineCodeExpression = "VbAjaxLoader(method, path)", Export = false)]
-        private static dynamic VbAjaxLoader(string method, string path)
-        {
-            return null;
         }
     }
 }

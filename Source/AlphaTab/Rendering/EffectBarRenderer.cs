@@ -1,6 +1,6 @@
 /*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -23,7 +25,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering
 {
-    public class EffectBand : Glyph
+    class EffectBand : Glyph
     {
         private FastList<FastList<EffectGlyph>> _uniqueEffectGlyphs;
         private FastList<FastDictionary<int, EffectGlyph>> _effectGlyphs;
@@ -34,11 +36,15 @@ namespace AlphaTab.Rendering
         public Beat FirstBeat { get; set; }
         public Beat LastBeat { get; set; }
         public float Height { get; set; }
-        public IEffectBarRendererInfo Info { get; set; }
+        public Voice Voice { get; set; }
 
-        public EffectBand(IEffectBarRendererInfo info)
+        public IEffectBarRendererInfo Info { get; set; }
+        public EffectBandSlot Slot { get; set; }
+
+        public EffectBand(Voice voice, IEffectBarRendererInfo info)
             : base(0, 0)
         {
+            Voice = voice;
             Info = info;
             _uniqueEffectGlyphs = new FastList<FastList<EffectGlyph>>();
             _effectGlyphs = new FastList<FastDictionary<int, EffectGlyph>>();
@@ -57,19 +63,34 @@ namespace AlphaTab.Rendering
 
         public void CreateGlyph(Beat beat)
         {
+            if (beat.Voice != Voice) return;
+
             // NOTE: the track order will never change. even if the staff behind the renderer changes, the trackIndex will not. 
             // so it's okay to access the staff here while creating the glyphs. 
-            if (Info.ShouldCreateGlyph(beat) && (!Info.HideOnMultiTrack || Renderer.Staff.TrackIndex == 0))
+            if (Info.ShouldCreateGlyph(Renderer.Settings, beat) && (!Info.HideOnMultiTrack || Renderer.Staff.TrackIndex == 0))
             {
                 IsEmpty = false;
-                if (FirstBeat == null || FirstBeat.Index > beat.Index)
+                if (FirstBeat == null || beat.IsBefore(FirstBeat))
                 {
                     FirstBeat = beat;
                 }
-                if (LastBeat == null || LastBeat.Index < beat.Index)
+                if (LastBeat == null || beat.IsAfter(LastBeat))
                 {
                     LastBeat = beat;
+
+                    // for "toEnd" sizing occupy until next follow-up-beat
+                    switch (Info.SizingMode)
+                    {
+                        case EffectBarGlyphSizing.SingleOnBeatToEnd:
+                        case EffectBarGlyphSizing.GroupedOnBeatToEnd:
+                            if (LastBeat.NextBeat != null)
+                            {
+                                LastBeat = LastBeat.NextBeat;
+                            }
+                            break;
+                    }
                 }
+
 
                 var glyph = CreateOrResizeGlyph(Info.SizingMode, beat);
                 if (glyph.Height > Height)
@@ -94,6 +115,7 @@ namespace AlphaTab.Rendering
                     return g;
                 case EffectBarGlyphSizing.SinglePreBeat:
                 case EffectBarGlyphSizing.SingleOnBeat:
+                case EffectBarGlyphSizing.SingleOnBeatToEnd:
                     g = Info.CreateNewGlyph(Renderer, b);
                     g.Renderer = Renderer;
                     g.Beat = b;
@@ -103,11 +125,17 @@ namespace AlphaTab.Rendering
                     return g;
 
                 case EffectBarGlyphSizing.GroupedOnBeat:
+                case EffectBarGlyphSizing.GroupedOnBeatToEnd:
+
+                    var singleSizing = sizing == EffectBarGlyphSizing.GroupedOnBeat
+                        ? EffectBarGlyphSizing.SingleOnBeat
+                        : EffectBarGlyphSizing.SingleOnBeatToEnd;
+
                     if (b.Index > 0 || Renderer.Index > 0)
                     {
                         // check if the previous beat also had this effect
                         Beat prevBeat = b.PreviousBeat;
-                        if (Info.ShouldCreateGlyph(prevBeat))
+                        if (Info.ShouldCreateGlyph(Renderer.Settings, prevBeat))
                         {
                             // first load the effect bar renderer and glyph
                             EffectGlyph prevEffect = null;
@@ -121,7 +149,7 @@ namespace AlphaTab.Rendering
                             {
                                 // load the effect from the previous renderer if possible. 
                                 var previousRenderer = (EffectBarRenderer)Renderer.PreviousRenderer;
-                                var previousBand = previousRenderer.BandLookup[Info.EffectId];
+                                var previousBand = previousRenderer.GetBand(Voice, Info.EffectId);
                                 var voiceGlyphs = previousBand._effectGlyphs[b.Voice.Index];
                                 if (voiceGlyphs.ContainsKey(prevBeat.Index))
                                 {
@@ -132,7 +160,7 @@ namespace AlphaTab.Rendering
                             // if the effect cannot be expanded, create a new glyph
                             // in case of expansion also create a new glyph, but also link the glyphs together 
                             // so for rendering it might be expanded. 
-                            EffectGlyph newGlyph = CreateOrResizeGlyph(EffectBarGlyphSizing.SingleOnBeat, b);
+                            EffectGlyph newGlyph = CreateOrResizeGlyph(singleSizing, b);
 
                             if (prevEffect != null && Info.CanExpand(prevBeat, b))
                             {
@@ -148,11 +176,11 @@ namespace AlphaTab.Rendering
                         }
 
                         // in case the previous beat did not have the same effect, we simply create a new glyph
-                        return CreateOrResizeGlyph(EffectBarGlyphSizing.SingleOnBeat, b);
+                        return CreateOrResizeGlyph(singleSizing, b);
                     }
 
                     // in case of the very first beat, we simply create the glyph. 
-                    return CreateOrResizeGlyph(EffectBarGlyphSizing.SingleOnBeat, b);
+                    return CreateOrResizeGlyph(singleSizing, b);
             }
 
             return null;
@@ -163,15 +191,13 @@ namespace AlphaTab.Rendering
         {
             base.Paint(cx, cy, canvas);
 
-            //canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 100);
-            //canvas.FillRect(cx + X, cy + Y, Renderer.Width, Height);
+            //canvas.LineWidth = 1;
+            //canvas.StrokeRect(cx + X, cy + Y, Renderer.Width, Slot.Shared.Height);
+            //canvas.LineWidth = 1.5f;
 
             for (int i = 0, j = _uniqueEffectGlyphs.Count; i < j; i++)
             {
                 var v = _uniqueEffectGlyphs[i];
-                //canvas.Color = i == 0
-                //    ? Renderer.Resources.MainGlyphColor
-                //    : Renderer.Resources.SecondaryGlyphColor;
 
                 for (int k = 0, l = v.Count; k < l; k++)
                 {
@@ -212,6 +238,20 @@ namespace AlphaTab.Rendering
                     g.Width = pos.Width;
                     break;
 
+                case EffectBarGlyphSizing.SingleOnBeatToEnd:
+                case EffectBarGlyphSizing.GroupedOnBeatToEnd: // grouping is achieved by linking the normaly aligned glyphs
+                    pos = container.OnNotes;
+                    g.X = Renderer.BeatGlyphsStart + pos.X + container.X;
+                    if (container.Beat.IsLastOfVoice)
+                    {
+                        g.Width = Renderer.Width - g.X;
+                    }
+                    else
+                    {
+                        g.Width = container.Width - container.PreNotes.Width - container.PreNotes.X;
+                    }
+                    break;
+
                 case EffectBarGlyphSizing.FullBar:
                     g.Width = Renderer.Width;
                     break;
@@ -219,7 +259,7 @@ namespace AlphaTab.Rendering
         }
     }
 
-    public class EffectBandSizingInfo
+    class EffectBandSizingInfo
     {
         private readonly FastDictionary<string, EffectBandSlot> _effectSlot;
         public FastList<EffectBandSlot> Slots { get; set; }
@@ -257,22 +297,6 @@ namespace AlphaTab.Rendering
             return newSlot;
         }
 
-        public void CopySlots(EffectBandSizingInfo sizingInfo)
-        {
-            foreach (var slot in sizingInfo.Slots)
-            {
-                var copy = new EffectBandSlot();
-                copy.Y = slot.Y;
-                copy.Height = slot.Height;
-                copy.UniqueEffectId = slot.UniqueEffectId;
-                Slots.Add(copy);
-                foreach (var band in slot.Bands)
-                {
-                    _effectSlot[band.Info.EffectId] = copy;
-                }
-            }
-        }
-
         public void Register(EffectBand effectBand)
         {
             var freeSlot = GetOrCreateSlot(effectBand);
@@ -280,18 +304,31 @@ namespace AlphaTab.Rendering
             _effectSlot[effectBand.Info.EffectId] = freeSlot;
         }
     }
-    public class EffectBandSlot
+
+    class EffectBandSlotShared
     {
+        public string UniqueEffectId { get; set; }
         public float Y { get; set; }
         public float Height { get; set; }
         public Beat FirstBeat { get; set; }
         public Beat LastBeat { get; set; }
+
+        public EffectBandSlotShared()
+        {
+            Y = 0;
+            Height = 0;
+        }
+    }
+
+    class EffectBandSlot
+    {
         public FastList<EffectBand> Bands { get; set; }
-        public string UniqueEffectId { get; set; }
+        public EffectBandSlotShared Shared { get; set; }
 
         public EffectBandSlot()
         {
             Bands = new FastList<EffectBand>();
+            Shared = new EffectBandSlotShared();
         }
 
         public void Update(EffectBand effectBand)
@@ -299,20 +336,23 @@ namespace AlphaTab.Rendering
             // lock band to particular effect if needed
             if (!effectBand.Info.CanShareBand)
             {
-                UniqueEffectId = effectBand.Info.EffectId;
+                Shared.UniqueEffectId = effectBand.Info.EffectId;
             }
+
+            effectBand.Slot = this;
             Bands.Add(effectBand);
-            if (effectBand.Height > Height)
+
+            if (effectBand.Height > Shared.Height)
             {
-                Height = effectBand.Height;
+                Shared.Height = effectBand.Height;
             }
-            if (FirstBeat == null || FirstBeat.Index > effectBand.FirstBeat.Index)
+            if (Shared.FirstBeat == null || effectBand.FirstBeat.IsBefore(Shared.FirstBeat))
             {
-                FirstBeat = effectBand.FirstBeat;
+                Shared.FirstBeat = effectBand.FirstBeat;
             }
-            if (LastBeat == null || LastBeat.Index < effectBand.LastBeat.Index)
+            if (Shared.LastBeat == null || effectBand.LastBeat.IsAfter(Shared.LastBeat))
             {
-                LastBeat = effectBand.LastBeat;
+                Shared.LastBeat = effectBand.LastBeat;
             }
         }
 
@@ -321,9 +361,9 @@ namespace AlphaTab.Rendering
             return
                 // if the current band is marked as unique, only merge with same effect, 
                 // if the current band is shared, only merge with same effect 
-                ((UniqueEffectId == null && band.Info.CanShareBand) || band.Info.EffectId == UniqueEffectId)
+                ((Shared.UniqueEffectId == null && band.Info.CanShareBand) || band.Info.EffectId == Shared.UniqueEffectId)
                 // only merge if there is space for the new band before or after the current beat
-                && (FirstBeat == null || LastBeat.Index < band.FirstBeat.Index || band.LastBeat.Index < FirstBeat.Index);
+                && (Shared.FirstBeat == null || Shared.LastBeat.IsBefore(band.FirstBeat) || Shared.LastBeat.IsBefore(Shared.FirstBeat));
         }
     }
 
@@ -331,13 +371,14 @@ namespace AlphaTab.Rendering
     /// This renderer is responsible for displaying effects above or below the other staves
     /// like the vibrato. 
     /// </summary>
-    public class EffectBarRenderer : BarRendererBase
+    class EffectBarRenderer : BarRendererBase
     {
         private readonly IEffectBarRendererInfo[] _infos;
-        private EffectBand[] _bands;
-        public FastDictionary<string, EffectBand> BandLookup { get; set; }
+        private FastList<EffectBand> _bands;
+        private FastDictionary<string, EffectBand> _bandLookup;
 
         public EffectBandSizingInfo SizingInfo { get; set; }
+
 
         public EffectBarRenderer(ScoreRenderer renderer, Bar bar, IEffectBarRendererInfo[] infos)
             : base(renderer, bar)
@@ -357,6 +398,12 @@ namespace AlphaTab.Rendering
             base.UpdateSizes();
         }
 
+        public override void FinalizeRenderer()
+        {
+            base.FinalizeRenderer();
+            UpdateHeight();
+        }
+
         private void UpdateHeight()
         {
             if (SizingInfo == null) return;
@@ -364,28 +411,33 @@ namespace AlphaTab.Rendering
             var y = 0f;
             foreach (var slot in SizingInfo.Slots)
             {
-                slot.Y = y;
+                slot.Shared.Y = y;
                 foreach (var band in slot.Bands)
                 {
                     band.Y = y;
-                    band.Height = slot.Height;
+                    band.Height = slot.Shared.Height;
                 }
-                y += slot.Height;
+
+                y += slot.Shared.Height;
             }
 
             Height = y;
         }
 
+
         public override bool ApplyLayoutingInfo()
         {
             if (!base.ApplyLayoutingInfo()) return false;
 
-            SizingInfo = new EffectBandSizingInfo();
             // we create empty slots for the same group
             if (Index > 0)
             {
                 var previousRenderer = (EffectBarRenderer)PreviousRenderer;
-                SizingInfo.CopySlots(previousRenderer.SizingInfo);
+                SizingInfo = previousRenderer.SizingInfo;
+            }
+            else
+            {
+                SizingInfo = new EffectBandSizingInfo();
             }
 
             foreach (var effectBand in _bands)
@@ -414,14 +466,21 @@ namespace AlphaTab.Rendering
 
         protected override void CreateBeatGlyphs()
         {
-            _bands = new EffectBand[_infos.Length];
-            BandLookup = new FastDictionary<string, EffectBand>();
-            for (int i = 0; i < _infos.Length; i++)
+            _bands = new FastList<EffectBand>();
+            _bandLookup = new FastDictionary<string, EffectBand>();
+            foreach (var voice in Bar.Voices)
             {
-                _bands[i] = new EffectBand(_infos[i]);
-                _bands[i].Renderer = this;
-                _bands[i].DoLayout();
-                BandLookup[_infos[i].EffectId] = _bands[i];
+                if (HasVoiceContainer(voice))
+                {
+                    foreach (var info in _infos)
+                    {
+                        var band = new EffectBand(voice, info);
+                        band.Renderer = this;
+                        band.DoLayout();
+                        _bands.Add(band);
+                        _bandLookup[voice.Index + "." + info.EffectId] = band;
+                    }
+                }
             }
 
             foreach (var voice in Bar.Voices)
@@ -440,7 +499,7 @@ namespace AlphaTab.Rendering
                 }
             }
         }
-        
+
         private void CreateVoiceGlyphs(Voice v)
         {
             foreach (var b in v.Beats)
@@ -462,14 +521,24 @@ namespace AlphaTab.Rendering
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             PaintBackground(cx, cy, canvas);
-            canvas.Color = Resources.MainGlyphColor;
             foreach (var effectBand in _bands)
             {
-                effectBand.Paint(cx + X, cy + Y, canvas);
+                canvas.Color = effectBand.Voice.Index == 0 ? Resources.MainGlyphColor : Resources.SecondaryGlyphColor;
+                if (!effectBand.IsEmpty)
+                {
+                    effectBand.Paint(cx + X, cy + Y, canvas);
+                }
             }
 
             //canvas.Color = new Color(0, 0, 200, 100);
             //canvas.StrokeRect(cx + X, cy + Y, Width, Height);
+        }
+
+        public EffectBand GetBand(Voice voice, string effectId)
+        {
+            var id = voice.Index + "." + effectId;
+            if (_bandLookup.ContainsKey(id)) return _bandLookup[id];
+            return null;
         }
     }
 }

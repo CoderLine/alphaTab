@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,11 +19,12 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class BeatContainerGlyph : Glyph
+    class BeatContainerGlyph : Glyph
     {
         public VoiceContainerGlyph VoiceContainer { get; set; }
 
@@ -33,7 +34,7 @@ namespace AlphaTab.Rendering.Glyphs
         public FastList<Glyph> Ties { get; set; }
 
         public float MinWidth { get; set; }
-        public float OnTimeX { get; set; }
+        public float OnTimeX => OnNotes.X + OnNotes.CenterX;
 
 
         public BeatContainerGlyph(Beat beat, VoiceContainerGlyph voiceContainer)
@@ -46,19 +47,31 @@ namespace AlphaTab.Rendering.Glyphs
 
         public virtual void RegisterLayoutingInfo(BarLayoutingInfo layoutings)
         {
-            var preBeatStretch = PreNotes.Width + OnNotes.Width / 2;
-            layoutings.AddBeatSpring(Beat, MinWidth, preBeatStretch);
+            var preBeatStretch = OnTimeX;
+            var postBeatStretch = 0f;
+            foreach (var tie in Ties)
+            {
+                if (tie.Width > postBeatStretch)
+                {
+                    postBeatStretch = tie.Width;
+                }
+            }
+            postBeatStretch += OnNotes.X + (OnNotes.Width - OnNotes.CenterX);
+
+            layoutings.AddBeatSpring(Beat, preBeatStretch, postBeatStretch);
             // store sizes for special renderers like the EffectBarRenderer
             layoutings.SetPreBeatSize(Beat, PreNotes.Width);
             layoutings.SetOnBeatSize(Beat, OnNotes.Width);
+            layoutings.SetBeatCenterX(Beat, OnNotes.CenterX);
         }
 
         public virtual void ApplyLayoutingInfo(BarLayoutingInfo info)
         {
+            var offset = info.GetBeatCenterX(Beat) - OnNotes.CenterX;
+            PreNotes.X = offset;
             PreNotes.Width = info.GetPreBeatSize(Beat);
             OnNotes.Width = info.GetOnBeatSize(Beat);
             OnNotes.X = PreNotes.X + PreNotes.Width;
-            OnTimeX = OnNotes.X + OnNotes.Width / 2;
             OnNotes.UpdateBeamingHelper();
         }
 
@@ -79,6 +92,11 @@ namespace AlphaTab.Rendering.Glyphs
                 CreateTies(Beat.Notes[i--]);
             }
 
+            UpdateWidth();
+        }
+
+        protected virtual void UpdateWidth()
+        {
             MinWidth = PreNotes.Width + OnNotes.Width;
             if (!Beat.IsRest)
             {
@@ -103,20 +121,37 @@ namespace AlphaTab.Rendering.Glyphs
                 }
             }
 
+            var tieWidth = 0f;
+            foreach (var tie in Ties)
+            {
+                if (tie.Width > tieWidth)
+                {
+                    tieWidth = tie.Width;
+                }
+            }
+            MinWidth += tieWidth;
+
 
             Width = MinWidth;
-            OnTimeX = OnNotes.X + OnNotes.Width / 2;
         }
-
 
         public virtual void ScaleToWidth(float beatWidth)
         {
+            foreach (var tie in Ties)
+            {
+                tie.DoLayout();
+            }
             OnNotes.UpdateBeamingHelper();
             Width = beatWidth;
         }
 
         protected virtual void CreateTies(Note n)
         {
+        }
+
+        public static string GetGroupId(Beat beat)
+        {
+            return "b" + beat.Id;
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
@@ -126,10 +161,21 @@ namespace AlphaTab.Rendering.Glyphs
             var isEmptyGlyph = PreNotes.IsEmpty && OnNotes.IsEmpty && Ties.Count == 0;
             if (isEmptyGlyph) return;
 
-            canvas.BeginGroup("b" + Beat.Id);
+            canvas.BeginGroup(GetGroupId(Beat));
 
-            var oldColor = canvas.Color;
-            //canvas.Color = new Color((byte)Std.Random(255), (byte)Std.Random(255), (byte)Std.Random(255), 100);
+            //var c = canvas.Color;
+            //var ta = canvas.TextAlign;
+            //canvas.Color = new Color(255, 0, 0);
+            //canvas.TextAlign = TextAlign.Left;
+            //canvas.FillText(Beat.DisplayStart.ToString(), cx + X, cy + Y - 10);
+            //canvas.Color = c;
+            //canvas.TextAlign = ta;
+
+            //canvas.Color = Color.Random();
+            //canvas.FillRect(cx + X, cy + Y, Width, Renderer.Height);
+
+            //var oldColor = canvas.Color;
+            //canvas.Color = new Color((byte)Platform.Platform.Random(255), (byte)Platform.Platform.Random(255), (byte)Platform.Platform.Random(255), 100);
             //canvas.FillRect(cx + X, cy + Y, Width, Renderer.Height);
             //canvas.Color = oldColor;
 
@@ -141,7 +187,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             //if (Beat.Voice.Index == 0)
             //{
-            //    canvas.Color = new Color(200, 200, 0, 100);
+            //    canvas.Color = new Color(200, 0, 0, 100);
             //    canvas.StrokeRect(cx + X, cy + Y + PreNotes.Y + 30, Width, 10);
             //}
 

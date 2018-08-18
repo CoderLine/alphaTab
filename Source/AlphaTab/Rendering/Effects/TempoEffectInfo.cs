@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,14 +20,14 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    public class TempoEffectInfo : IEffectBarRendererInfo
+    class TempoEffectInfo : IEffectBarRendererInfo
     {
         public string EffectId { get { return "tempo"; } }
         public bool HideOnMultiTrack { get { return true; } }
         public bool CanShareBand { get { return false; } }
         public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SinglePreBeat; } }
 
-        public bool ShouldCreateGlyph(Beat beat)
+        public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
             return beat.Voice.Bar.Staff.Index == 0 && beat.Voice.Index == 0 && beat.Index == 0 && (beat.Voice.Bar.MasterBar.TempoAutomation != null || beat.Voice.Bar.Index == 0);
         }

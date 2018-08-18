@@ -137,7 +137,7 @@ namespace AlphaTab.Test.Xml
         [TestMethod]
         public void ParseFull()
         {
-            var s = File.ReadAllText("TestFiles\\Xml\\GPIF.xml");
+            var s = TestPlatform.LoadFileAsString("TestFiles\\Xml\\GPIF.xml");
             var xml = new XmlDocument(s);
             Assert.IsNotNull(xml.DocumentElement);
         }

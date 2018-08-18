@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This Factory produces TabBarRenderer instances
     /// </summary>
-    public class TabBarRendererFactory : BarRendererFactory
+    class TabBarRendererFactory : BarRendererFactory
     {
         private readonly bool _showTimeSignature;
         private readonly bool _showRests;
@@ -40,7 +40,7 @@ namespace AlphaTab.Rendering
 
         public override bool CanCreate(Track track, Staff staff)
         {
-            return track.Tuning.Length > 0 && base.CanCreate(track, staff);
+            return staff.Tuning.Length > 0 && base.CanCreate(track, staff);
         }
 
         public override BarRendererBase Create(ScoreRenderer renderer, Bar bar, StaveSettings staveSettings)

@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class BeamGlyph : MusicFontGlyph
+    class BeamGlyph : MusicFontGlyph
     {
         public BeamGlyph(float x, float y, Duration duration, BeamDirection direction, bool isGrace)
             : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, GetSymbol(duration, direction, isGrace))
@@ -34,6 +34,11 @@ namespace AlphaTab.Rendering.Glyphs
 
         private static MusicFontSymbol GetSymbol(Duration duration, BeamDirection direction, bool isGrace)
         {
+            if (isGrace)
+            {
+                duration = Duration.Eighth;
+            }
+
             if (direction == BeamDirection.Up)
             {
                 switch (duration)

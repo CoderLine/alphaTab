@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,21 +19,21 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    public class MusicFontGlyph : EffectGlyph
+    class MusicFontGlyph : EffectGlyph
     {
         protected readonly float GlyphScale;
-        private readonly MusicFontSymbol _symbol;
+        protected readonly MusicFontSymbol Symbol;
 
         public MusicFontGlyph(float x, float y, float glyphScale, MusicFontSymbol symbol)
             : base(x, y)
         {
             GlyphScale = glyphScale;
-            _symbol = symbol;
+            Symbol = symbol;
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            canvas.FillMusicFontSymbol(cx + X, cy + Y, GlyphScale*Scale, _symbol);
+            canvas.FillMusicFontSymbol(cx + X, cy + Y, GlyphScale*Scale, Symbol);
         }
     }
 }

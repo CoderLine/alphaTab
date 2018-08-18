@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -15,10 +15,11 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using SharpKit.JavaScript;
 
 namespace AlphaTab.Rendering.Utils
 {
@@ -26,29 +27,30 @@ namespace AlphaTab.Rendering.Utils
     {
         public object ToJson()
         {
-            var json = Std.NewObject();
+            var json = Platform.Platform.NewObject();
 
             var staveGroups = new FastList<StaveGroupBounds>();
             json.StaveGroups = staveGroups;
 
             foreach (var group in StaveGroups)
             {
-                StaveGroupBounds g = Std.NewObject();
+                StaveGroupBounds g = Platform.Platform.NewObject();
                 g.VisualBounds = BoundsToJson(group.VisualBounds);
                 g.RealBounds = BoundsToJson(group.RealBounds);
                 g.Bars = new FastList<MasterBarBounds>();
 
                 foreach (var masterBar in group.Bars)
                 {
-                    MasterBarBounds mb = Std.NewObject();
+                    MasterBarBounds mb = Platform.Platform.NewObject();
+                    mb.LineAlignedBounds = BoundsToJson(masterBar.LineAlignedBounds);
                     mb.VisualBounds = BoundsToJson(masterBar.VisualBounds);
                     mb.RealBounds = BoundsToJson(masterBar.RealBounds);
-
+                    mb.Index = masterBar.Index;
                     mb.Bars = new FastList<BarBounds>();
 
                     foreach (var bar in masterBar.Bars)
                     {
-                        BarBounds b = Std.NewObject();
+                        BarBounds b = Platform.Platform.NewObject();
                         b.VisualBounds = BoundsToJson(bar.VisualBounds);
                         b.RealBounds = BoundsToJson(bar.RealBounds);
 
@@ -56,7 +58,7 @@ namespace AlphaTab.Rendering.Utils
 
                         foreach (var beat in bar.Beats)
                         {
-                            var bb = Std.NewObject();
+                            var bb = Platform.Platform.NewObject();
 
                             bb.VisualBounds = BoundsToJson(beat.VisualBounds);
                             bb.RealBounds = BoundsToJson(beat.RealBounds);
@@ -85,7 +87,7 @@ namespace AlphaTab.Rendering.Utils
         {
             var lookup = new BoundsLookup();
 
-            var staveGroups = json.Member("StaveGroups").As<FastList<StaveGroupBounds>>();
+            var staveGroups = json.Member<FastList<StaveGroupBounds>>("StaveGroups");
             foreach (var staveGroup in staveGroups)
             {
                 var sg = new StaveGroupBounds();
@@ -96,7 +98,9 @@ namespace AlphaTab.Rendering.Utils
                 foreach (var masterBar in staveGroup.Bars)
                 {
                     var mb = new MasterBarBounds();
+                    mb.Index = masterBar.Index;
                     mb.IsFirstOfLine = masterBar.IsFirstOfLine;
+                    mb.LineAlignedBounds = masterBar.LineAlignedBounds;
                     mb.VisualBounds = masterBar.VisualBounds;
                     mb.RealBounds = masterBar.RealBounds;
                     sg.AddBar(mb);
@@ -114,11 +118,11 @@ namespace AlphaTab.Rendering.Utils
                             bb.VisualBounds = beat.VisualBounds;
                             bb.RealBounds = beat.RealBounds;
                             bb.Beat = score
-                                .Tracks[beat.Member("TrackIndex").As<int>()]
-                                .Staves[beat.Member("StaffIndex").As<int>()]
-                                .Bars[beat.Member("BarIndex").As<int>()]
-                                .Voices[beat.Member("VoiceIndex").As<int>()]
-                                .Beats[beat.Member("BeatIndex").As<int>()];
+                                .Tracks[beat.Member<int>("TrackIndex")]
+                                .Staves[beat.Member<int>("StaffIndex")]
+                                .Bars[beat.Member<int>("BarIndex")]
+                                .Voices[beat.Member<int>("VoiceIndex")]
+                                .Beats[beat.Member<int>("BeatIndex")];
 
                             b.AddBeat(bb);
                         }
@@ -131,7 +135,7 @@ namespace AlphaTab.Rendering.Utils
 
         private Bounds BoundsToJson(Bounds bounds)
         {
-            var json = Std.NewObject();
+            var json = Platform.Platform.NewObject();
             json.X = bounds.X;
             json.Y = bounds.Y;
             json.W = bounds.W;

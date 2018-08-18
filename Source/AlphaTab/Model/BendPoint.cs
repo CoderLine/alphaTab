@@ -1,6 +1,6 @@
 /*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,12 @@ namespace AlphaTab.Model
     public class BendPoint
     {
         public const int MaxPosition = 60;
+        public const int FastBendAtStartPointStart = 0;
+        public const int FastBendAtStartPointMiddle= 5;
+        public const int FastBendAtStartPointEnd = 10;
+        public const int FastBendAtEndPointStart = 40;
+        public const int FastBendAtEndPointMiddle= 45;
+        public const int FastBendAtEndPointEnd = 50;
         public const int MaxValue = 12;
 
         public int Offset { get; set; }

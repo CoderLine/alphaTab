@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,7 @@
  * License along with this library.
  */
 using System;
+using AlphaTab.Collections;
 using AlphaTab.IO;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -29,7 +30,7 @@ namespace AlphaTab.Importer
     /// </summary>
     public partial class ScoreLoader
     {
-        public static Score LoadScoreFromBytes(byte[] data)
+        public static Score LoadScoreFromBytes(byte[] data, Settings settings = null)
         {
             var importers = ScoreImporter.BuildImporters();
 
@@ -43,22 +44,19 @@ namespace AlphaTab.Importer
                 try
                 {
                     Logger.Info("ScoreLoader", "Importing using importer " + importer.Name);
-                    importer.Init(bb);
+                    importer.Init(bb, settings);
                     score = importer.ReadScore();
                     Logger.Info("ScoreLoader", "Score imported using " + importer.Name);
                     break;
                 }
+                catch (UnsupportedFormatException)
+                {
+                    Logger.Info("ScoreLoader", importer.Name + " does not support the file");
+                }
                 catch (Exception e)
                 {
-                    if (!Std.IsException<UnsupportedFormatException>(e))
-                    {
-                        Logger.Info("ScoreLoader", "Score import failed due to unexpected error: " + e);
-                        throw e;
-                    }
-                    else
-                    {
-                        Logger.Info("ScoreLoader", importer.Name + " does not support the file");
-                    }
+                    Logger.Info("ScoreLoader", "Score import failed due to unexpected error: " + e);
+                    throw;
                 }
             }
 

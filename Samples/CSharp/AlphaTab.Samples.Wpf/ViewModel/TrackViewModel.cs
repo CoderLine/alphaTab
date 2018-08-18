@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using System.Linq;
 using AlphaTab.Model;
 
 namespace AlphaTab.Samples.Wpf.ViewModel
@@ -115,7 +116,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
             _track = track;
 
             // general midi Programs
-            if (track.IsPercussion)
+            if (track.Staves.Any(s=>s.StaffKind == StaffKind.Percussion))
             {
                 TrackType = TrackType.Drums;
             }

@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,24 +17,17 @@
  */
 
 using System;
-using AlphaTab.Platform;
 
 namespace AlphaTab.IO
 {
-    public partial class ByteBuffer : IWriteable, IReadable
+    class ByteBuffer : IWriteable, IReadable
     {
         private byte[] _buffer;
-        private int _position;
-        private int _length;
         private int _capacity;
 
-        public long Length
-        {
-            get
-            {
-                return _length;
-            }
-        }
+        public int Length { get; private set; }
+
+        public int Position { get; set; }
 
         public virtual byte[] GetBuffer()
         {
@@ -59,7 +52,7 @@ namespace AlphaTab.IO
         {
             ByteBuffer buffer = new ByteBuffer();
             buffer._buffer = data;
-            buffer._capacity = buffer._length = data.Length;
+            buffer._capacity = buffer.Length = data.Length;
             return buffer;
         }
 
@@ -69,12 +62,12 @@ namespace AlphaTab.IO
 
         public void Reset()
         {
-            _position = 0;
+            Position = 0;
         }
 
         public void Skip(int offset)
         {
-            _position += offset;
+            Position += offset;
         }
 
         private void SetCapacity(int value)
@@ -84,7 +77,7 @@ namespace AlphaTab.IO
                 if (value > 0)
                 {
                     var newBuffer = new byte[value];
-                    if (_length > 0) Std.BlockCopy(_buffer, 0, newBuffer, 0, _length);
+                    if (Length > 0) Platform.Platform.BlockCopy(_buffer, 0, newBuffer, 0, Length);
                     _buffer = newBuffer;
                 }
                 else
@@ -97,16 +90,16 @@ namespace AlphaTab.IO
 
         public int ReadByte()
         {
-            int n = _length - _position;
+            int n = Length - Position;
             if (n <= 0)
                 return -1;
 
-            return _buffer[_position++];
+            return _buffer[Position++];
         }
 
         public int Read(byte[] buffer, int offset, int count)
         {
-            int n = _length - _position;
+            int n = Length - Position;
             if (n > count) n = count;
             if (n <= 0)
                 return 0;
@@ -115,11 +108,11 @@ namespace AlphaTab.IO
             {
                 int byteCount = n;
                 while (--byteCount >= 0)
-                    buffer[offset + byteCount] = _buffer[_position + byteCount];
+                    buffer[offset + byteCount] = _buffer[Position + byteCount];
             }
             else
-                Std.BlockCopy(_buffer, _position, buffer, offset, n);
-            _position += n;
+                Platform.Platform.BlockCopy(_buffer, Position, buffer, offset, n);
+            Position += n;
 
             return n;
         }
@@ -133,27 +126,27 @@ namespace AlphaTab.IO
 
         public void Write(byte[] buffer, int offset, int count)
         {
-            int i = _position + count;
+            int i = Position + count;
 
-            if (i > _length)
+            if (i > Length)
             {
                 if (i > _capacity)
                 {
                     EnsureCapacity(i);
                 }
-                _length = i;
+                Length = i;
             }
             if ((count <= 8) && (buffer != _buffer))
             {
                 int byteCount = count;
                 while (--byteCount >= 0)
-                    _buffer[_position + byteCount] = buffer[offset + byteCount];
+                    _buffer[Position + byteCount] = buffer[offset + byteCount];
             }
             else
             {
-                Std.BlockCopy(buffer, offset, _buffer, _position, Math.Min(count, buffer.Length - offset));
+                Platform.Platform.BlockCopy(buffer, offset, _buffer, Position, Math.Min(count, buffer.Length - offset));
             }
-            _position = i;
+            Position = i;
         }
 
         private void EnsureCapacity(int value)
@@ -176,8 +169,8 @@ namespace AlphaTab.IO
 
         public virtual byte[] ToArray()
         {
-            byte[] copy = new byte[_length];
-            Std.BlockCopy(_buffer, 0, copy, 0, _length);
+            byte[] copy = new byte[Length];
+            Platform.Platform.BlockCopy(_buffer, 0, copy, 0, Length);
             return copy;
         }
     }

@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -61,18 +61,20 @@ namespace AlphaTab.Exporter
             _builder.Append(score.Tempo);
             _builder.AppendLine();
 
-            if (track.Capo > 0)
+            var staff = track.Staves[0];
+
+            if (staff.Capo > 0)
             {
                 _builder.Append("\\capo ");
-                _builder.Append(track.Capo);
+                _builder.Append(staff.Capo);
                 _builder.AppendLine();
             }
 
             _builder.Append("\\tuning");
-            for (int i = 0; i < track.Tuning.Length; i++)
+            for (int i = 0; i < staff.Tuning.Length; i++)
             {
                 _builder.Append(" ");
-                _builder.Append(Tuning.GetTextForTuning(track.Tuning[i], true));
+                _builder.Append(Tuning.GetTextForTuning(staff.Tuning[i], true));
             }
 
             _builder.Append("\\instrument ");
@@ -85,7 +87,7 @@ namespace AlphaTab.Exporter
 
         private void StringMetaData(string key, string value)
         {
-            if (!value.IsNullOrWhiteSpace())
+            if (!string.IsNullOrWhiteSpace(value))
             {
                 _builder.Append("\\");
                 _builder.Append(key);
@@ -175,7 +177,7 @@ namespace AlphaTab.Exporter
             }
 
             _builder.Append(".");
-            _builder.Append(note.Beat.Voice.Bar.Staff.Track.Tuning.Length - note.String + 1);
+            _builder.Append(note.Beat.Voice.Bar.Staff.Tuning.Length - note.String + 1);
             _builder.Append(" ");
 
             NoteEffects(note);
@@ -383,6 +385,9 @@ namespace AlphaTab.Exporter
 
             switch (beat.GraceType)
             {
+                case GraceType.BendGrace:
+                    _builder.Append("gr b ");
+                    break;
                 case GraceType.OnBeat:
                     _builder.Append("gr ob ");
                     break;

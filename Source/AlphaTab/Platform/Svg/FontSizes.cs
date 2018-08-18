@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@ namespace AlphaTab.Platform.Svg
     /// <summary>
     /// This public class stores text widths for several fonts and allows width calculation 
     /// </summary>
-    public class FontSizes
+    class FontSizes
     {
         // NOTE: use tools/FontMeasureMent.html to generate those arrays
         // TODO: probably use a regression function for this

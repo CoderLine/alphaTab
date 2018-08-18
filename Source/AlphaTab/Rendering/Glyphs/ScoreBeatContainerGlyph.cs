@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of alphaTab.
- * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,11 +17,14 @@
  */
 using AlphaTab.Model;
 using AlphaTab.Rendering.Glyphs;
+using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering
 {
-    public class ScoreBeatContainerGlyph : BeatContainerGlyph
+    class ScoreBeatContainerGlyph : BeatContainerGlyph
     {
+        private ScoreBendGlyph _bend;
+
         public ScoreBeatContainerGlyph(Beat beat, VoiceContainerGlyph voiceContainer) : base(beat, voiceContainer)
         {
         }
@@ -56,57 +59,30 @@ namespace AlphaTab.Rendering
                     Ties.Add(new ScoreLegatoGlyph(origin, Beat, true));
                 }
             }
+            if (_bend != null)
+            {
+                _bend.Renderer = Renderer;
+                _bend.DoLayout();
+                UpdateWidth();
+            }
         }
 
         protected override void CreateTies(Note n)
         {
             // create a tie if any effect requires it
+            if (!n.IsVisible) return;
 
             // NOTE: we create 2 tie glyphs if we have a line break inbetween 
             // the two notes
-            if (n.IsTieOrigin) 
+            if (n.IsTieOrigin && !n.HasBend && !n.Beat.HasWhammyBar && n.Beat.GraceType != GraceType.BendGrace && n.TieDestination.IsVisible)
             {
                 var tie = new ScoreTieGlyph(n, n.TieDestination);
                 Ties.Add(tie);
             }
-            if (n.IsTieDestination)
+
+            if (n.IsTieDestination && !n.TieOrigin.HasBend && !n.Beat.HasWhammyBar)
             {
                 var tie = new ScoreTieGlyph(n.TieOrigin, n, true);
-                Ties.Add(tie);
-            }
-            else if (n.IsHammerPullOrigin)
-            {
-                // only create tie for very first origin of "group"
-                if (n.HammerPullOrigin == null)
-                {
-                    // tie with end note
-                    Note destination = n.HammerPullDestination;
-                    while (destination.HammerPullDestination != null)
-                    {
-                        destination = destination.HammerPullDestination;
-                    }
-                    var tie = new ScoreTieGlyph(n, destination);
-                    Ties.Add(tie);
-                }
-            }
-            else if (n.IsHammerPullDestination)
-            {
-                // only create tie for last destination of "group"
-                // NOTE: HOPOs over more than 2 staffs does not work with this mechanism, but this sounds unrealistic
-                if (n.HammerPullDestination == null)
-                {
-                    Note origin = n.HammerPullOrigin;
-                    while (origin.HammerPullOrigin != null)
-                    {
-                        origin = origin.HammerPullOrigin;
-                    }
-                    var tie = new ScoreTieGlyph(origin, n, true);
-                    Ties.Add(tie);
-                }
-            }
-            else if (n.SlideType == SlideType.Legato)
-            {
-                var tie = new ScoreTieGlyph(n, n.SlideTarget);
                 Ties.Add(tie);
             }
 
@@ -116,6 +92,23 @@ namespace AlphaTab.Rendering
             {
                 var l = new ScoreSlideLineGlyph(n.SlideType, n, this);
                 Ties.Add(l);
+            }
+
+            if (n.Beat.SlurOrigin != null && n.Index == 0)
+            {
+                var tie = new ScoreSlurGlyph(n.Beat);
+                Ties.Add(tie);
+            }
+
+            if (n.HasBend)
+            {
+                if (_bend == null)
+                {
+                    _bend = new ScoreBendGlyph(n.Beat);
+                    _bend.Renderer = Renderer;
+                    Ties.Add(_bend);
+                }
+                _bend.AddBends(n);
             }
         }
     }
