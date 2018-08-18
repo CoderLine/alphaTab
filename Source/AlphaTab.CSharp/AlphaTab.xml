@@ -4,6 +4,181 @@
         <name>AlphaTab</name>
     </assembly>
     <members>
+        <member name="T:AlphaTab.Collections.FastDictionary`2">
+            <summary>
+            Represents a collection of key-value pairs. 
+            </summary>
+            <typeparam name="TKey"></typeparam>
+            <typeparam name="TValue"></typeparam>
+        </member>
+        <member name="M:AlphaTab.Collections.FastDictionary`2.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Collections.FastDictionary`2"/> class.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Collections.FastDictionary`2.Item(`0)">
+            <summary>
+            Gets or sets the value at the specified index.
+            </summary>
+            <param name="index">The key to access the item.</param>
+            <returns>The value stored at the specified index.</returns>
+        </member>
+        <member name="P:AlphaTab.Collections.FastDictionary`2.Count">
+            <summary>
+            Gets the number of elements stored in this dictionary
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Collections.FastDictionary`2.GetEnumerator">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Collections.FastDictionary`2.Remove(`0)">
+            <summary>
+            Removes the value with the specified key.
+            </summary>
+            <param name="key">The key to remove from the dictionary. </param>
+        </member>
+        <member name="M:AlphaTab.Collections.FastDictionary`2.ContainsKey(`0)">
+            <summary>
+            Determines whether the dictionary container contains the specified key.
+            </summary>
+            <param name="key">The key to check the existence for.</param>
+            <returns>
+              <c>true</c> if the specified key is contained; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:AlphaTab.Collections.FastDictionary`2.System#Collections#IEnumerable#GetEnumerator">
+            <inheritdoc />
+        </member>
+        <member name="T:AlphaTab.Collections.FastList`1">
+            <summary>
+            Represents a strongly typed list of elements. 
+            </summary>
+            <typeparam name="T">The type fo the elements</typeparam>
+            <seealso cref="T:System.Collections.Generic.IEnumerable`1" />
+        </member>
+        <member name="M:AlphaTab.Collections.FastList`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Collections.FastList`1" /> class.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Collections.FastList`1.Count">
+            <summary>
+            Gets the number of elements contained in the list.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Collections.FastList`1.Item(System.Int32)">
+            <summary>
+            Gets or sets the value at the specified index.
+            </summary>
+            <param name="index">The index of which item to access.</param>
+            <returns>The item located at the specified index. </returns>
+        </member>
+        <member name="M:AlphaTab.Collections.FastList`1.Add(`0)">
+            <summary>
+            Adds the specified item to the list. 
+            </summary>
+            <param name="item">The item to be added.</param>
+        </member>
+        <member name="M:AlphaTab.Collections.FastList`1.Sort(System.Comparison{`0})">
+            <summary>
+            Sorts the elements in the list using the specified comparison.
+            </summary>
+            <param name="comparison">The comparison to use when comparing elements for sorting.</param>
+        </member>
+        <member name="M:AlphaTab.Collections.FastList`1.Clone">
+            <summary>
+            Clones this instance.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.Collections.FastList`1.RemoveAt(System.Int32)">
+            <summary>
+            Removes the item at the specified index. 
+            </summary>
+            <param name="index">The index to remove.</param>
+        </member>
+        <member name="M:AlphaTab.Collections.FastList`1.ToArray">
+            <summary>
+            Converts the current list into an array of all elements. 
+            </summary>
+            <returns>An array containing all elements. </returns>
+        </member>
+        <member name="M:AlphaTab.Collections.FastList`1.GetEnumerator">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Collections.FastList`1.IndexOf(`0)">
+            <summary>
+            Searches for the given item in the list and returns the index. 
+            </summary>
+            <param name="item">The item to search</param>
+            <returns>The index at which the specified item was found, or -1 if the item is not contained in the list.</returns>
+        </member>
+        <member name="M:AlphaTab.Collections.FastList`1.Reverse">
+            <summary>
+            Reverses the items in the list
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Collections.FastList`1.InsertAt(System.Int32,`0)">
+            <summary>
+            Inserts an element at the specified index. 
+            </summary>
+            <param name="insertPos">The index at which the item should be inserted</param>
+            <param name="item">The item to insert.</param>
+        </member>
+        <member name="T:AlphaTab.Audio.Synth.Ds.SampleArray">
+            <summary>
+            Represents an array of audiosamples. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Ds.SampleArray.Samples">
+            <summary>
+            Gets the audio samples as floats. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.Ds.SampleArray.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Audio.Synth.Ds.SampleArray"/> class.
+            </summary>
+            <param name="length">The length of the array.</param>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Ds.SampleArray.Item(System.Int32)">
+            <summary>
+            Gets or sets the sample at the specified index.
+            </summary>
+            <param name="index">The index of the sample to get or set.</param>
+            <returns>The sample at the specified index.</returns>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Ds.SampleArray.Length">
+            <summary>
+            Gets the total number of samples contained in this array
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.Ds.SampleArray.Clear">
+            <summary>
+            Resets all samples in the array to 0. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.Ds.SampleArray.Blit(AlphaTab.Audio.Synth.Ds.SampleArray,System.Int32,AlphaTab.Audio.Synth.Ds.SampleArray,System.Int32,System.Int32)">
+            <summary>
+            Copies a range of samples from the given source array into the specified destination. 
+            </summary>
+            <param name="src">The array where to copy the samples from.</param>
+            <param name="srcPos">The start index from which to start copying.</param>
+            <param name="dest">The array where to copy the samples to.</param>
+            <param name="destPos">The start index at which the samples should be written in the destination array.</param>
+            <param name="len">The number of samples to copy.</param>
+        </member>
+        <member name="T:AlphaTab.Audio.Synth.AlphaSynth">
+            <summary>
+            This is the main synthesizer component which can be used to
+            play a <see cref="T:AlphaTab.Audio.Synth.Midi.MidiFile"/> via a <see cref="T:AlphaTab.Audio.Synth.ISynthOutput"/>.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.AlphaSynth.Output">
+            <summary>
+            Gets the <see cref="T:AlphaTab.Audio.Synth.ISynthOutput"/> used for playing the generated samples. 
+            </summary>
+        </member>
         <member name="P:AlphaTab.Audio.Synth.AlphaSynth.IsReady">
             <inheritdoc />
         </member>
@@ -37,6 +212,12 @@
         <member name="P:AlphaTab.Audio.Synth.AlphaSynth.IsLooping">
             <inheritdoc />
         </member>
+        <member name="M:AlphaTab.Audio.Synth.AlphaSynth.#ctor(AlphaTab.Audio.Synth.ISynthOutput)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Audio.Synth.AlphaSynth"/> class.
+            </summary>
+            <param name="output">The output to use for playing the generated samples.</param>
+        </member>
         <member name="M:AlphaTab.Audio.Synth.AlphaSynth.Play">
             <inheritdoc />
         </member>
@@ -52,6 +233,12 @@
         <member name="M:AlphaTab.Audio.Synth.AlphaSynth.LoadSoundFont(System.Byte[])">
             <inheritdoc />
         </member>
+        <member name="M:AlphaTab.Audio.Synth.AlphaSynth.LoadMidi(AlphaTab.Audio.Synth.Midi.MidiFile)">
+            <summary>
+            Loads the given midi file for playback. 
+            </summary>
+            <param name="midiFile">The midi file to load</param>
+        </member>
         <member name="M:AlphaTab.Audio.Synth.AlphaSynth.SetChannelMute(System.Int32,System.Boolean)">
             <inheritdoc />
         </member>
@@ -66,6 +253,102 @@
         </member>
         <member name="M:AlphaTab.Audio.Synth.AlphaSynth.SetChannelProgram(System.Int32,System.Byte)">
             <inheritdoc />
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.AlphaSynth.Finished">
+            <summary>
+            Occurs when the playback of the whole midi file finished.
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.AlphaSynth.PlayerStateChanged">
+            <summary>
+            Occurs when the playback state changes. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.AlphaSynth.SoundFontLoaded">
+            <summary>
+            Occurs when the soundfont was successfully loaded. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.AlphaSynth.ReadyForPlayback">
+            <summary>
+            Occurs when AlphaSynth is ready to start the playback.
+            This is the case once the <see cref="T:AlphaTab.Audio.Synth.ISynthOutput"/> is ready, a SoundFont was loaded and also a MidiFle is loaded. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.AlphaSynth.SoundFontLoadFailed">
+            <summary>
+            Occurs when the soundfont failed to be loaded. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.AlphaSynth.MidiLoaded">
+            <summary>
+            Occurs when the midi file was successfully loaded. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.AlphaSynth.MidiLoadFailed">
+            <summary>
+            Occurs when the midi failed to be loaded. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.AlphaSynth.PositionChanged">
+            <summary>
+            Occurs whenever the current time of the played audio changes. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Synth.PlayerStateChangedEventArgs">
+            <summary>
+            Represents the info when the player state changes. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.PlayerStateChangedEventArgs.State">
+            <summary>
+            The new state of the player.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.PlayerStateChangedEventArgs.#ctor(AlphaTab.Audio.Synth.PlayerState)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Audio.Synth.PlayerStateChangedEventArgs"/> class.
+            </summary>
+            <param name="state">The state.</param>
+        </member>
+        <member name="T:AlphaTab.Audio.Synth.PositionChangedEventArgs">
+            <summary>
+            Represents the info when the time in the synthesizer changes. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.PositionChangedEventArgs.CurrentTime">
+            <summary>
+            Gets the current time in milliseconds. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.PositionChangedEventArgs.EndTime">
+            <summary>
+            Gets the length of the played song in milliseconds. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.PositionChangedEventArgs.CurrentTick">
+            <summary>
+            Gets the current time in midi ticks. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.PositionChangedEventArgs.EndTick">
+            <summary>
+            Gets the length of the played song in midi ticks. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.PositionChangedEventArgs.#ctor(System.Double,System.Double,System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Audio.Synth.PositionChangedEventArgs"/> class.
+            </summary>
+            <param name="currentTime">The current time.</param>
+            <param name="endTime">The end time.</param>
+            <param name="currentTick">The current tick.</param>
+            <param name="endTick">The end tick.</param>
+        </member>
+        <member name="T:AlphaTab.Audio.Synth.IAlphaSynth">
+            <summary>
+            The public API interface for interacting with the synthesizer.
+            </summary>
         </member>
         <member name="P:AlphaTab.Audio.Synth.IAlphaSynth.IsReady">
             <summary>
@@ -182,6 +465,12 @@
             <param name="channel">The channel number.</param>
             <param name="program">The midi program.</param>
         </member>
+        <member name="T:AlphaTab.Audio.Synth.ISynthOutput">
+            <summary>
+            This is the base interface for output devices which can
+            request and playback audio samples. 
+            </summary>
+        </member>
         <member name="P:AlphaTab.Audio.Synth.ISynthOutput.SampleRate">
             <summary>
             Gets the sample rate required by the output.
@@ -265,6 +554,239 @@
             <summary>
             Gets or sets the playback speed. 
             </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Synth.Midi.Event.MidiEventType">
+            <summary>
+            Lists all midi events. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.MidiEventType.NoteOff">
+            <summary>
+            A note is released. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.MidiEventType.NoteOn">
+            <summary>
+            A note is started. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.MidiEventType.NoteAftertouch">
+            <summary>
+            The pressure that was used to play the note. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.MidiEventType.Controller">
+            <summary>
+            Change of a midi controller
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.MidiEventType.ProgramChange">
+            <summary>
+            Change of a midi program
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.MidiEventType.ChannelAftertouch">
+            <summary>
+            The pressure that should be applied to the whole channel. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.MidiEventType.PitchBend">
+            <summary>
+            A change of the audio pitch. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.MidiEventType.Meta">
+            <summary>
+            A meta event. See <see cref="T:AlphaTab.Audio.Synth.Midi.Event.MetaEventTypeEnum"/> for details. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Synth.Midi.Event.ControllerType">
+            <summary>
+            Lists all midi controllers. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.BankSelectCoarse">
+            <summary>
+            Bank Select. MSB
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.ModulationCoarse">
+            <summary>
+            Modulation wheel or lever MSB
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.DataEntryCoarse">
+            <summary>
+            Data entry MSB
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.VolumeCoarse">
+            <summary>
+            Channel Volume MSB
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.PanCoarse">
+            <summary>
+            Pan MSB
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.ExpressionControllerCoarse">
+            <summary>
+            Expression Controller MSB
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.ModulationFine">
+            <summary>
+            Modulation wheel or level LSB
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.DataEntryFine">
+            <summary>
+            Data Entry LSB
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.VolumeFine">
+            <summary>
+            Channel Volume LSB
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.PanFine">
+            <summary>
+            Pan LSB
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.ExpressionControllerFine">
+            <summary>
+            Expression controller LSB
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.HoldPedal">
+            <summary>
+            Damper pedal (sustain)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.LegatoPedal">
+            <summary>
+            Legato Footswitch
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.NonRegisteredParameterFine">
+            <summary>
+            Non-Registered Parameter Number LSB
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.NonRegisteredParameterCourse">
+            <summary>
+            Non-Registered Parameter Number MSB
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.RegisteredParameterFine">
+            <summary>
+            Registered Parameter Number LSB 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.RegisteredParameterCourse">
+            <summary>
+            Registered Parameter Number MSB
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.ResetControllers">
+            <summary>
+            Reset all controllers
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Audio.Synth.Midi.Event.ControllerType.AllNotesOff">
+            <summary>
+            All notes of. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Synth.Midi.Event.MidiEvent">
+            <summary>
+            Represents a midi event. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Midi.Event.MidiEvent.Message">
+            <summary>
+            Gets or sets the raw midi message. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Midi.Event.MidiEvent.Tick">
+            <summary>
+            Gets or sets the absolute tick of this midi event. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Midi.Event.MidiEvent.Channel">
+            <summary>
+            Gets or sets the channel of this midi event. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Midi.Event.MidiEvent.Command">
+            <summary>
+            Gets or sets the command of this midi event. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Midi.Event.MidiEvent.Data1">
+            <summary>
+            Gets or sets the first data component of this midi event. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Midi.Event.MidiEvent.Data2">
+            <summary>
+            Gets or sets the second data component of this midi event. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.Midi.Event.MidiEvent.#ctor(System.Int32,System.Int32,System.Byte,System.Byte)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Audio.Synth.Midi.Event.MidiEvent"/> class.
+            </summary>
+            <param name="tick">The absolute midi ticks of this event..</param>
+            <param name="status">The status information of this event.</param>
+            <param name="data1">The first data component of this midi event.</param>
+            <param name="data2">The second data component of this midi event.</param>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.Midi.Event.MidiEvent.WriteTo(AlphaTab.IO.IWriteable)">
+            <summary>
+            Writes the midi event as binary into the given stream. 
+            </summary>
+            <param name="s">The stream to write to.</param>
+        </member>
+        <member name="T:AlphaTab.Audio.Synth.Midi.MidiFile">
+            <summary>
+            Represents a midi file with a single track that can be played via <see cref="T:AlphaTab.Audio.Synth.AlphaSynth"/>
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Midi.MidiFile.Division">
+            <summary>
+            Gets or sets the division per quarter notes. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Midi.MidiFile.Events">
+            <summary>
+            Gets a list of midi events sorted by time. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.Midi.MidiFile.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Audio.Synth.Midi.MidiFile"/> class.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.Midi.MidiFile.AddEvent(AlphaTab.Audio.Synth.Midi.Event.MidiEvent)">
+            <summary>
+            Adds the given midi event a the correct time position into the file. 
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.Midi.MidiFile.ToBinary">
+            <summary>
+            Writes the midi file into a binary format. 
+            </summary>
+            <returns>The binary midi file.</returns>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.Midi.MidiFile.WriteTo(AlphaTab.IO.IWriteable)">
+            <summary>
+            Writes the midi file as binary into the given stream.
+            </summary>
+            <returns>The stream to write to.</returns>
         </member>
         <member name="T:AlphaTab.Audio.Synth.PlayerState">
             <summary>
@@ -421,6 +943,42 @@
             This public class provides names for all general midi instruments.
             </summary>
         </member>
+        <member name="T:AlphaTab.Audio.Generator.AlphaSynthMidiFileHandler">
+            <summary>
+            This implementation of the <see cref="T:AlphaTab.Audio.Generator.IMidiFileHandler"/> generates a <see cref="T:AlphaTab.Audio.Synth.Midi.MidiFile"/>
+            object which can be used in AlphaSynth for playback. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.AlphaSynthMidiFileHandler.#ctor(AlphaTab.Audio.Synth.Midi.MidiFile)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Audio.Generator.AlphaSynthMidiFileHandler"/> class.
+            </summary>
+            <param name="midiFile">The midi file.</param>
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.AlphaSynthMidiFileHandler.AddTimeSignature(System.Int32,System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.AlphaSynthMidiFileHandler.AddRest(System.Int32,System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.AlphaSynthMidiFileHandler.AddNote(System.Int32,System.Int32,System.Int32,System.Byte,AlphaTab.Model.DynamicValue,System.Byte)">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.AlphaSynthMidiFileHandler.AddControlChange(System.Int32,System.Int32,System.Byte,System.Byte,System.Byte)">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.AlphaSynthMidiFileHandler.AddProgramChange(System.Int32,System.Int32,System.Byte,System.Byte)">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.AlphaSynthMidiFileHandler.AddTempo(System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.AlphaSynthMidiFileHandler.AddBend(System.Int32,System.Int32,System.Byte,System.Byte)">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.AlphaSynthMidiFileHandler.FinishTrack(System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
         <member name="T:AlphaTab.Audio.Generator.IMidiFileHandler">
             <summary>
             A handler is responsible for writing midi events to a custom structure
@@ -500,30 +1058,44 @@
             This generator creates a midi file using a score. 
             </summary>
         </member>
+        <member name="P:AlphaTab.Audio.Generator.MidiFileGenerator.TickLookup">
+            <summary>
+            Gets a lookup object which can be used to quickly find beats and bars
+            at a given midi tick position.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.MidiFileGenerator.#ctor(AlphaTab.Model.Score,AlphaTab.Settings,AlphaTab.Audio.Generator.IMidiFileHandler)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Audio.Generator.MidiFileGenerator"/> class.
+            </summary>
+            <param name="score">The score for which the midi file should be generated.</param>
+            <param name="settings">The settings ot use for generation.</param>
+            <param name="handler">The handler that should be used for generating midi events.</param>
+        </member>
+        <member name="M:AlphaTab.Audio.Generator.MidiFileGenerator.Generate">
+            <inheritdoc />
+        </member>
         <member name="F:AlphaTab.Audio.MidiUtils.QuarterTime">
             <summary>
             The amount of ticks per quarter note used within this midi system.
             (Pulses Per Quarter Note)
             </summary>
         </member>
-        <member name="F:AlphaTab.Audio.MidiUtils.PercussionChannel">
-            <summary>
-            The default midi channel used for percussion
-            </summary>
-        </member>
         <member name="M:AlphaTab.Audio.MidiUtils.TicksToMillis(System.Int32,System.Int32)">
             <summary>
-            Converts a duration value to its ticks equivalent.
+            Converts the given midi tick duration into milliseconds. 
             </summary>
-            <param name="duration"></param>
-            <returns></returns>
+            <param name="ticks">The duration in midi ticks</param>
+            <param name="tempo">The current tempo in BPM.</param>
+            <returns>The converted duration in milliseconds. </returns>
         </member>
         <member name="M:AlphaTab.Audio.MidiUtils.MillisToTicks(System.Int32,System.Int32)">
             <summary>
-            Converts a duration value to its ticks equivalent.
+            Converts the given midi tick duration into milliseconds. 
             </summary>
-            <param name="duration"></param>
-            <returns></returns>
+            <param name="millis">The duration in milliseconds</param>
+            <param name="tempo">The current tempo in BPM.</param>
+            <returns>The converted duration in midi ticks. </returns>
         </member>
         <member name="M:AlphaTab.Audio.MidiUtils.ToTicks(AlphaTab.Model.Duration)">
             <summary>
@@ -538,6 +1110,166 @@
             </summary>
             <param name="duration">the numerical proportion to convert. (i.E. timesignature denominator, note duration,...)</param>
             <returns></returns>
+        </member>
+        <member name="T:AlphaTab.Audio.BeatTickLookup">
+            <summary>
+            Represents the time period, for which a <see cref="P:AlphaTab.Audio.BeatTickLookup.Beat"/> is played.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.BeatTickLookup.Start">
+            <summary>
+            Gets or sets the start time in midi ticks at which the given beat is played. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.BeatTickLookup.End">
+            <summary>
+            Gets or sets the end time in midi ticks at which the given beat is played. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.BeatTickLookup.Beat">
+            <summary>
+            Gets or sets the beat which is played.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.BeatTickLookup.IsEmptyBar">
+            <summary>
+            Gets or sets whether the beat is the placeholder beat for an empty bar. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.MasterBarTickLookup">
+            <summary>
+            Represents the time period, for which all bars of a <see cref="P:AlphaTab.Audio.MasterBarTickLookup.MasterBar"/> are played.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.MasterBarTickLookup.Start">
+            <summary>
+            Gets or sets the start time in midi ticks at which the MasterBar is played. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.MasterBarTickLookup.End">
+            <summary>
+            Gets or sets the end time in midi ticks at which the MasterBar is played. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.MasterBarTickLookup.Tempo">
+            <summary>
+            Gets or sets the current tempo when the MasterBar is played.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.MasterBarTickLookup.MasterBar">
+            <summary>
+            Gets or sets the MasterBar which is played. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.MasterBarTickLookup.Beats">
+            <summary>
+            Gets or sets the list of <see cref="T:AlphaTab.Audio.BeatTickLookup"/> object which define the durations
+            for all <see cref="P:AlphaTab.Audio.MasterBarTickLookup.Beats"/> played within the period of this MasterBar. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.MasterBarTickLookup.NextMasterBar">
+            <summary>
+            Gets or sets the <see cref="T:AlphaTab.Audio.MasterBarTickLookup"/> of the next masterbar in the <see cref="T:AlphaTab.Model.Score"/>
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.MasterBarTickLookup.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Audio.MasterBarTickLookup"/> class.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.MasterBarTickLookup.Finish">
+            <summary>
+            Performs the neccessary finalization steps after all information was written. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.MasterBarTickLookup.AddBeat(AlphaTab.Audio.BeatTickLookup)">
+            <summary>
+            Adds a new <see cref="T:AlphaTab.Audio.BeatTickLookup"/> to the list of played beats during this MasterBar period. 
+            </summary>
+            <param name="beat"></param>
+        </member>
+        <member name="T:AlphaTab.Audio.MidiTickLookupFindBeatResult">
+            <summary>
+            Represents the results of searching the currently played beat. 
+            </summary>
+            <seealso cref="M:AlphaTab.Audio.MidiTickLookup.FindBeat(AlphaTab.Model.Track[],System.Int32)"/>
+        </member>
+        <member name="P:AlphaTab.Audio.MidiTickLookupFindBeatResult.CurrentBeat">
+            <summary>
+            Gets or sets the beat that is currently played. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.MidiTickLookupFindBeatResult.NextBeat">
+            <summary>
+            Gets or sets the beat that will be played next. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.MidiTickLookupFindBeatResult.Duration">
+            <summary>
+            Gets or sets the duration in milliseconds how long this beat is playing. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.MidiTickLookup">
+            <summary>
+            This class holds all information about when <see cref="T:AlphaTab.Model.MasterBar"/>s and <see cref="T:AlphaTab.Model.Beat"/>s are played. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.MidiTickLookup.MasterBarLookup">
+            <summary>
+            Gets a dictionary of all master bars played. The index is the index equals to <see cref="P:AlphaTab.Model.MasterBar.Index"/>.
+            </summary>
+            <remarks>
+            This lookup only contains the first time a MasterBar is played. For a whole sequence of the song refer to <see cref="P:AlphaTab.Audio.MidiTickLookup.MasterBars"/>.
+            </remarks>
+        </member>
+        <member name="P:AlphaTab.Audio.MidiTickLookup.MasterBars">
+            <summary>
+            Gets a list of all <see cref="T:AlphaTab.Audio.MasterBarTickLookup"/> sorted by time. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.MidiTickLookup.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Audio.MidiTickLookup"/> class.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.MidiTickLookup.Finish">
+            <summary>
+            Performs the neccessary finalization steps after all information was written. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.MidiTickLookup.FindBeat(AlphaTab.Model.Track[],System.Int32)">
+            <summary>
+            Finds the currently played beat given a list of tracks and the current time. 
+            </summary>
+            <param name="tracks">The tracks in which to search the played beat for.</param>
+            <param name="tick">The current time in midi ticks.</param>
+            <returns>The information about the current beat or null if no beat could be found.</returns>
+        </member>
+        <member name="M:AlphaTab.Audio.MidiTickLookup.GetMasterBar(AlphaTab.Model.MasterBar)">
+            <summary>
+            Gets the <see cref="T:AlphaTab.Audio.MasterBarTickLookup"/> for a given masterbar at which the masterbar is played the first time. 
+            </summary>
+            <param name="bar">The masterbar to find the time period for. </param>
+            <returns>A <see cref="T:AlphaTab.Audio.MasterBarTickLookup"/> containing the details about the first time the <see cref="T:AlphaTab.Model.MasterBar"/> is played.</returns>
+        </member>
+        <member name="M:AlphaTab.Audio.MidiTickLookup.GetMasterBarStart(AlphaTab.Model.MasterBar)">
+            <summary>
+            Gets the start time in midi ticks for a given masterbar at which the masterbar is played the first time. 
+            </summary>
+            <param name="bar">The masterbar to find the time period for. </param>
+            <returns>The time in midi ticks at which the masterbar is played the first time or 0 if the masterbar is not contained</returns>
+        </member>
+        <member name="M:AlphaTab.Audio.MidiTickLookup.AddMasterBar(AlphaTab.Audio.MasterBarTickLookup)">
+            <summary>
+            Adds a new <see cref="T:AlphaTab.Audio.MasterBarTickLookup"/> to the lookup table. 
+            </summary>
+            <param name="masterBar">The item to add. </param>
+        </member>
+        <member name="M:AlphaTab.Audio.MidiTickLookup.AddBeat(AlphaTab.Audio.BeatTickLookup)">
+            <summary>
+            Adds the given <see cref="T:AlphaTab.Audio.BeatTickLookup"/> to the current <see cref="T:AlphaTab.Audio.MasterBarTickLookup"/>.
+            </summary>
+            <param name="beat">The lookup to add.</param>
         </member>
         <member name="T:AlphaTab.Environment">
             <summary>
@@ -581,6 +1313,72 @@
             This utility public class allows bitwise reading of a stream
             </summary>
         </member>
+        <member name="T:AlphaTab.IO.IReadable">
+            <summary>
+            Represents a stream of binary data that can be read from. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.IO.IReadable.Position">
+            <summary>
+            Gets or sets the current read position relative in the stream. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.IO.IReadable.Length">
+            <summary>
+            Gets the total number of bytes contained in the stream. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.IO.IReadable.Reset">
+            <summary>
+            Resets the stream for reading the data from the beginning. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.IO.IReadable.Skip(System.Int32)">
+            <summary>
+            Skip the given number of bytes. 
+            </summary>
+            <param name="offset">The number of bytes to skip. </param>
+        </member>
+        <member name="M:AlphaTab.IO.IReadable.ReadByte">
+            <summary>
+            Read a single byte from the data stream. 
+            </summary>
+            <returns>The value of the next byte or -1 if there is no more data. </returns>
+        </member>
+        <member name="M:AlphaTab.IO.IReadable.Read(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Reads the given number of bytes from the stream into the given buffer. 
+            </summary>
+            <param name="buffer">The buffer to fill. </param>
+            <param name="offset">The offset in the buffer where to start writing. </param>
+            <param name="count">The number of bytes to read. </param>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.IO.IReadable.ReadAll">
+            <summary>
+            Reads the remaining data. 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:AlphaTab.IO.IWriteable">
+            <summary>
+            Represents a writer where binary data can be written to. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.IO.IWriteable.WriteByte(System.Byte)">
+            <summary>
+            Write a single byte to the stream. 
+            </summary>
+            <param name="value">The value to write.</param>
+        </member>
+        <member name="M:AlphaTab.IO.IWriteable.Write(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Write data from the given buffer. 
+            </summary>
+            <param name="buffer">The buffer to get the data from. </param>
+            <param name="offset">The offset where to start reading the data.</param>
+            <param name="count">The number of bytes to write</param>
+        </member>
         <member name="T:AlphaTab.IO.ZipEntry">
             <summary>
             this public class represents a file within the GpxFileSystem
@@ -596,9 +1394,111 @@
             This is the path drawing API for canvas implementations
             </summary>
         </member>
+        <member name="T:AlphaTab.Platform.Model.Color">
+            <summary>
+            A color object which allows accessing each color component individually. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Platform.Model.Color.BlackRgb">
+            <summary>
+            Gets the hex string for black. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Platform.Model.Color.#ctor(System.Byte,System.Byte,System.Byte,System.Byte)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Platform.Model.Color"/> class.
+            </summary>
+            <param name="r">The red component.</param>
+            <param name="g">The green component.</param>
+            <param name="b">The blue component.</param>
+            <param name="a">The alpha component.</param>
+        </member>
+        <member name="P:AlphaTab.Platform.Model.Color.Raw">
+            <summary>
+            Gets or sets the raw RGBA value. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Platform.Model.Color.A">
+            <summary>
+            Gets or sets the alpha component of the color. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Platform.Model.Color.R">
+            <summary>
+            Gets or sets the red component of the color. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Platform.Model.Color.G">
+            <summary>
+            Gets or sets the green component of the color. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Platform.Model.Color.B">
+            <summary>
+            Gets or sets the blue component of the color. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Platform.Model.Color.RGBA">
+            <summary>
+            Gets the RGBA hex string to use in CSS areas. 
+            </summary>
+        </member>
         <member name="T:AlphaTab.Platform.Model.Font">
             <summary>
             This container public class can store the definition for a font and it's style.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Platform.Model.Font.Family">
+            <summary>
+            Gets or sets the font family name. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Platform.Model.Font.Size">
+            <summary>
+            Gets or sets the font size in pixels. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Platform.Model.Font.Style">
+            <summary>
+            Gets or sets the font style. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Platform.Model.Font.IsBold">
+            <summary>
+            Gets a value indicating whether the font is bold. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Platform.Model.Font.IsItalic">
+            <summary>
+            Gets a value indicating whether the font is italic. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Platform.Model.Font.#ctor(System.String,System.Single,AlphaTab.Platform.Model.FontStyle)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Platform.Model.Font"/> class.
+            </summary>
+            <param name="family">The family.</param>
+            <param name="size">The size.</param>
+            <param name="style">The style.</param>
+        </member>
+        <member name="T:AlphaTab.Platform.Model.FontStyle">
+            <summary>
+            Lists all flags for font styles. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Platform.Model.FontStyle.Plain">
+            <summary>
+            No flags. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Platform.Model.FontStyle.Bold">
+            <summary>
+            Font is bold
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Platform.Model.FontStyle.Italic">
+            <summary>
+            Font is italic. 
             </summary>
         </member>
         <member name="T:AlphaTab.Platform.Model.TextAlign">
@@ -606,9 +1506,39 @@
             This public enum lists all different text alignments
             </summary>
         </member>
+        <member name="F:AlphaTab.Platform.Model.TextAlign.Left">
+            <summary>
+            Text is left aligned. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Platform.Model.TextAlign.Center">
+            <summary>
+            Text is centered. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Platform.Model.TextAlign.Right">
+            <summary>
+            Text is right aligned. 
+            </summary>
+        </member>
         <member name="T:AlphaTab.Platform.Model.TextBaseline">
             <summary>
             This public enum lists all base line modes
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Platform.Model.TextBaseline.Top">
+            <summary>
+            Text is aligned on top. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Platform.Model.TextBaseline.Middle">
+            <summary>
+            Text is aligned middle
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Platform.Model.TextBaseline.Bottom">
+            <summary>
+            Text is aligend on the bottom. 
             </summary>
         </member>
         <member name="T:AlphaTab.Platform.Svg.FontSizes">
@@ -767,6 +1697,39 @@
             Gets or sets the bend duration in milliseconds for songbook bends. 
             </summary>
         </member>
+        <member name="T:AlphaTab.AlphaTabException">
+            <summary>
+            The base class for all errors that can happen in alphaTab. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.AlphaTabException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.AlphaTabException"/> class.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="T:AlphaTab.Exporter.AlphaTexExporter">
+            <summary>
+            This class allows converting scores into alphaTex. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Exporter.AlphaTexExporter.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Exporter.AlphaTexExporter"/> class.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Exporter.AlphaTexExporter.Export(AlphaTab.Model.Track)">
+            <summary>
+            Exports the given track. 
+            </summary>
+            <param name="track">The track to export</param>
+        </member>
+        <member name="M:AlphaTab.Exporter.AlphaTexExporter.ToTex">
+            <summary>
+            Returns the generated tex code. 
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:AlphaTab.Importer.AlphaTexImporter">
             <summary>
             This importer can parse alphaTex markup into a score structure. 
@@ -921,6 +1884,7 @@
             Reads a byte as size and the string itself.
             Additionally it is ensured the specified amount of bytes is read. 
             </summary>
+            <param name="data">the data to read from.</param>
             <param name="length">the amount of bytes to read</param>
             <returns></returns>
         </member>
@@ -1044,15 +2008,61 @@
             A mixtablechange describes several track changes. 
             </summary>
         </member>
+        <member name="T:AlphaTab.Importer.NoCompatibleReaderFoundException">
+            <summary>
+            An exception indicating no reader for importing a file could be found. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Importer.NoCompatibleReaderFoundException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Importer.NoCompatibleReaderFoundException"/> class.
+            </summary>
+        </member>
         <member name="T:AlphaTab.Importer.ScoreImporter">
             <summary>
             This is the base public class for creating new song importers which 
             enable reading scores from any binary datasource
             </summary>
         </member>
+        <member name="F:AlphaTab.Importer.ScoreImporter.Data">
+            <summary>
+            The raw data to read from. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Importer.ScoreImporter.Settings">
+            <summary>
+            The settings to use during the import. 
+            </summary>
+        </member>
         <member name="M:AlphaTab.Importer.ScoreImporter.BuildImporters">
             Gets all default ScoreImporters
             @return
+        </member>
+        <member name="M:AlphaTab.Importer.ScoreImporter.Init(AlphaTab.IO.IReadable,AlphaTab.Settings)">
+            <summary>
+            Initializes the importer with the given data and settings. 
+            </summary>
+            <param name="data"></param>
+            <param name="settings"></param>
+        </member>
+        <member name="M:AlphaTab.Importer.ScoreImporter.GetSetting``1(System.String,``0)">
+            <summary>
+            Gets the importer specific setting using the specified key. 
+            </summary>
+            <param name="key">The key of the setting to load the value for.</param>
+            <param name="defaultValue">The default value to load if no setting was specified. </param>
+            <returns>The importer setting specified by the user, or the given defaultValue if the key was not contained.</returns>
+        </member>
+        <member name="P:AlphaTab.Importer.ScoreImporter.Name">
+            <summary>
+            Get the human readable name of the importer. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Importer.ScoreImporter.ReadScore">
+            <summary>
+            Reads the <see cref="T:AlphaTab.Model.Score"/> contained in the data. 
+            </summary>
+            <returns>The score that was contained in the data. </returns>
         </member>
         <member name="T:AlphaTab.Importer.ScoreLoader">
             <summary>
@@ -1060,9 +2070,44 @@
             available importers
             </summary>
         </member>
+        <member name="M:AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(System.Byte[],AlphaTab.Settings)">
+            <summary>
+            Loads the score from the given binary data. 
+            </summary>
+            <param name="data">The binary data containing a score in any known file format. </param>
+            <param name="settings">The settings to use during importing. </param>
+            <returns>The loaded score.</returns>
+        </member>
+        <member name="T:AlphaTab.Importer.UnsupportedFormatException">
+            <summary>
+            The exception thrown by a <see cref="T:AlphaTab.Importer.ScoreImporter"/> in case the
+            binary data does not contain a reader compatible structure. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Importer.UnsupportedFormatException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Importer.UnsupportedFormatException"/> class.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
         <member name="T:AlphaTab.Model.AccentuationType">
             <summary>
             Lists all types of note acceuntations
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.AccentuationType.None">
+            <summary>
+            No accentuation
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.AccentuationType.Normal">
+            <summary>
+            Normal accentuation 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.AccentuationType.Heavy">
+            <summary>
+            Heavy accentuation
             </summary>
         </member>
         <member name="T:AlphaTab.Model.AccidentalType">
@@ -1070,9 +2115,69 @@
             Defines all possible accidentals for notes.
             </summary>
         </member>
+        <member name="F:AlphaTab.Model.AccidentalType.None">
+            <summary>
+            No accidental
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.AccidentalType.Natural">
+            <summary>
+            Naturalize 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.AccidentalType.Sharp">
+            <summary>
+            Sharp
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.AccidentalType.Flat">
+            <summary>
+            Flat
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.AccidentalType.NaturalQuarterNoteUp">
+            <summary>
+            Natural for smear bends
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.AccidentalType.SharpQuarterNoteUp">
+            <summary>
+            Sharp for smear bends
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.AccidentalType.FlatQuarterNoteUp">
+            <summary>
+            Flat for smear bends
+            </summary>
+        </member>
         <member name="T:AlphaTab.Model.Automation">
             <summary>
             Automations are used to change the behaviour of a song.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Automation.IsLinear">
+            <summary>
+            Gets or sets whether the automation is applied linear. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Automation.Type">
+            <summary>
+            Gets or sets the type of the automation. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Automation.Value">
+            <summary>
+            Gets or sets the target value of the automation. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Automation.RatioPosition">
+            <summary>
+            Gets or sets the relative position of of the automation. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Automation.Text">
+            <summary>
+            Gets or sets the additional text of the automation. s
             </summary>
         </member>
         <member name="T:AlphaTab.Model.AutomationType">
@@ -1080,31 +2185,24 @@
             This public enumeration lists all types of automations.
             </summary>
         </member>
-        <member name="T:AlphaTab.Model.SimileMark">
+        <member name="F:AlphaTab.Model.AutomationType.Tempo">
             <summary>
-            Lists all simile mark types as they are assigned to bars. 
+            Tempo change. 
             </summary>
         </member>
-        <member name="F:AlphaTab.Model.SimileMark.None">
+        <member name="F:AlphaTab.Model.AutomationType.Volume">
             <summary>
-            No simile mark is applied
+            Colume change. 
             </summary>
         </member>
-        <member name="F:AlphaTab.Model.SimileMark.Simple">
+        <member name="F:AlphaTab.Model.AutomationType.Instrument">
             <summary>
-            A simple simile mark. The previous bar is repeated. 
+            Instrument change.
             </summary>
         </member>
-        <member name="F:AlphaTab.Model.SimileMark.FirstOfDouble">
+        <member name="F:AlphaTab.Model.AutomationType.Balance">
             <summary>
-            A double simile mark. This value is assigned to the first
-            bar of the 2 repeat bars. 
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.SimileMark.SecondOfDouble">
-            <summary>
-            A double simile mark. This value is assigned to the second
-            bar of the 2 repeat bars. 
+            Balance change.
             </summary>
         </member>
         <member name="T:AlphaTab.Model.Bar">
@@ -1118,46 +2216,64 @@
             at several locations for lookup tables. 
             </summary>
         </member>
-        <member name="T:AlphaTab.Model.WhammyType">
+        <member name="P:AlphaTab.Model.Bar.Id">
             <summary>
-            Lists all types of whammy bars
+            Gets or sets the unique id of this bar. 
             </summary>
         </member>
-        <member name="F:AlphaTab.Model.WhammyType.None">
+        <member name="P:AlphaTab.Model.Bar.Index">
             <summary>
-            No whammy at all
+            Gets or sets the zero-based index of this bar within the staff. 
             </summary>
         </member>
-        <member name="F:AlphaTab.Model.WhammyType.Custom">
+        <member name="P:AlphaTab.Model.Bar.NextBar">
             <summary>
-            Individual points define the whammy in a flexible manner. 
-            This system was mainly used in Guitar Pro 3-5
+            Gets or sets the next bar that comes after this bar. 
             </summary>
         </member>
-        <member name="F:AlphaTab.Model.WhammyType.Dive">
+        <member name="P:AlphaTab.Model.Bar.PreviousBar">
             <summary>
-            Simple dive to a lower or higher note.
+            Gets or sets the previous bar that comes before this bar. 
             </summary>
         </member>
-        <member name="F:AlphaTab.Model.WhammyType.Dip">
+        <member name="P:AlphaTab.Model.Bar.Clef">
             <summary>
-            A dive to a lower or higher note and releasing it back to normal. 
+            Gets or sets the clef on this bar. 
             </summary>
         </member>
-        <member name="F:AlphaTab.Model.WhammyType.Hold">
+        <member name="P:AlphaTab.Model.Bar.ClefOttava">
             <summary>
-            Continue to hold the whammy at the position from a previous whammy. 
+            Gets or sets the ottava applied to the clef. 
             </summary>
         </member>
-        <member name="F:AlphaTab.Model.WhammyType.Predive">
+        <member name="P:AlphaTab.Model.Bar.Staff">
             <summary>
-            Dive to a lower or higher note before playing it. 
+            Gets or sets the reference to the parent staff. 
             </summary>
         </member>
-        <member name="F:AlphaTab.Model.WhammyType.PrediveDive">
+        <member name="P:AlphaTab.Model.Bar.Voices">
             <summary>
-            Dive to a lower or higher note before playing it, then change to another
-            note. 
+            Gets or sets the list of voices contained in this bar. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Bar.SimileMark">
+            <summary>
+            Gets or sets the simile mark on this bar. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Bar.MasterBar">
+            <summary>
+            Gets the masterbar for this bar. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Bar.IsEmpty">
+            <summary>
+            Gets a value indicating whether all voices in this bar are empty and therefore the whole bar is empty. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Model.Bar.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Model.Bar"/> class.
             </summary>
         </member>
         <member name="T:AlphaTab.Model.Beat">
@@ -1170,6 +2286,282 @@
             <summary>
             This is a global counter for all beats. We use it 
             at several locations for lookup tables. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Id">
+            <summary>
+            Gets or sets the unique id of this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Index">
+            <summary>
+            Gets or sets the zero-based index of this beat within the voice. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.PreviousBeat">
+            <summary>
+            Gets or sets the previous beat within the whole song.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.NextBeat">
+            <summary>
+            Gets or sets the next beat within the whole song. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.IsLastOfVoice">
+            <summary>
+            Gets a value indicating whether this beat is the last beat in the voice. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Voice">
+            <summary>
+            Gets or sets the reference to the parent voice this beat belongs to. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Notes">
+            <summary>
+            Gets or sets the list of notes contained in this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.NoteStringLookup">
+            <summary>
+            Gets the lookup where the notes per string are registered.
+            If this staff contains string based notes this lookup allows fast access. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.IsEmpty">
+            <summary>
+            Gets or sets a value indicating whether this beat is considered empty. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.WhammyStyle">
+            <summary>
+            Gets or sets which whammy bar style should be used for this bar. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Ottava">
+            <summary>
+            Gets or sets the ottava applied to this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Fermata">
+            <summary>
+            Gets or sets the fermata applied to this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.IsLegatoOrigin">
+            <summary>
+            Gets a value indicating whether this beat starts a legato slur. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.IsLegatoDestination">
+            <summary>
+            Gets a value indicating whether this beat ends a legato slur. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.MinNote">
+            <summary>
+            Gets or sets the note with the lowest pitch in this beat. Only visible notes are considered.  
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.MaxNote">
+            <summary>
+            Gets or sets the note with the highest pitch in this beat. Only visible notes are considered. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.MaxStringNote">
+            <summary>
+            Gets or sets the note with the highest string number in this beat. Only visible notes are considered.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.MinStringNote">
+            <summary>
+            Gets or sets the note with the lowest string number in this beat. Only visible notes are considered.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Duration">
+            <summary>
+            Gets or sets the duration of this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.IsSlurOrigin">
+            <summary>
+            Gets or sets whether this beat starts a slur. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.IsSlurDestination">
+            <summary>
+            Gets or sets whether this beat ends or continues a slur. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.SlurOrigin">
+            <summary>
+            Gets or sets the slur origin beat
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.SlurDestination">
+            <summary>
+            Gets or sets the slur destination beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.IsRest">
+            <summary>
+            Gets or sets whether this beat is considered as rest.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.IsLetRing">
+            <summary>
+            Gets or sets whether any note in this beat has a let-ring applied. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.IsPalmMute">
+            <summary>
+            Gets or sets whether any note in this beat has a palm-mute paplied. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Automations">
+            <summary>
+            Gets or sets a list of all automations on this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Dots">
+            <summary>
+            Gets or sets the number of dots applied to the duration of this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.FadeIn">
+            <summary>
+            Gets or sets a value indicating whether this beat is fade-in. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Lyrics">
+            <summary>
+            Gets or sets the lyrics shown on this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.HasRasgueado">
+            <summary>
+            Gets or sets a value indicating whether the beat is played in rasgueado style. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Pop">
+            <summary>
+            Gets or sets a value indicating whether the notes on this beat are played with a pop-style (bass).
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Slap">
+            <summary>
+            Gets or sets a value indicating whether the notes on this beat are played with a slap-style (bass).
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Tap">
+            <summary>
+            Gets or sets a value indicating whether the notes on this beat are played with a tap-style (bass).
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Text">
+            <summary>
+            Gets or sets the text annotation shown on this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.BrushType">
+            <summary>
+            Gets or sets the brush type applied to the notes of this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.BrushDuration">
+            <summary>
+            Gets or sets the duration of the brush between the notes in midi ticks. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.TupletDenominator">
+            <summary>
+            Gets or sets the tuplet denominator.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.TupletNumerator">
+            <summary>
+            Gets or sets the tuplet numerator. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.HasTuplet">
+            <summary>
+            Gets or sets whether there is a tuplet applied to the duration of this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.IsContinuedWhammy">
+            <summary>
+            Gets or sets whether this beat continues a whammy effect. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.WhammyBarType">
+            <summary>
+            Gets or sets the whammy bar style of this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.WhammyBarPoints">
+            <summary>
+            Gets or sets the points defining the whammy bar usage. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.MaxWhammyPoint">
+            <summary>
+            Gets or sets the highest point with for the highest whammy bar value. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.MinWhammyPoint">
+            <summary>
+            Gets or sets the highest point with for the lowest whammy bar value. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.HasWhammyBar">
+            <summary>
+            Gets a value indicating whether a whammy bar is used on this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Vibrato">
+            <summary>
+            Gets or sets the vibrato effect used on this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.ChordId">
+            <summary>
+            Gets or sets the ID of the chord used on this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.HasChord">
+            <summary>
+            Gets a value indicating whether a chord is used on this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Chord">
+            <summary>
+            Gets the chord used on this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.GraceType">
+            <summary>
+            Gets or sets the grace style of this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.PickStroke">
+            <summary>
+            Gets or sets the pickstroke applied on this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.IsTremolo">
+            <summary>
+            Gets whether a tremolo effect is played on this beat.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.TremoloSpeed">
+            <summary>
+            Gets or sets the speed of the tremolo effect. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Crescendo">
+            <summary>
+            Gets or sets whether a crescendo/decrescendo is applied on this beat. 
             </summary>
         </member>
         <member name="P:AlphaTab.Model.Beat.DisplayStart">
@@ -1187,6 +2579,42 @@
             <remarks>
             This might differ from the actual playback time due to special grace types. 
             </remarks>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.DisplayDuration">
+            <summary>
+            Gets or sets the duration that is used for the display of this beat. It defines the size/width of the beat in
+            the music sheet. (unit: midi ticks).
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.PlaybackDuration">
+            <summary>
+            Gets or sets the duration that the note is played during the audio generation.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.AbsoluteDisplayStart">
+            <summary>
+            Gets the absolute display start time within the song. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.AbsolutePlaybackStart">
+            <summary>
+            Gets the absolute playback start time within the song. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.Dynamic">
+            <summary>
+            Gets or sets the dynamics applied to this beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Beat.InvertBeamDirection">
+            <summary>
+            Gets or sets a value indicating whether the beam direction should be inverted. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Model.Beat.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Model.Beat"/> class.
+            </summary>
         </member>
         <member name="M:AlphaTab.Model.Beat.IsBefore(AlphaTab.Model.Beat)">
             <summary>
@@ -1208,213 +2636,32 @@
             describe WhammyBar and String Bending effects.
             </summary>
         </member>
-        <member name="T:AlphaTab.Model.BrushType">
+        <member name="F:AlphaTab.Model.BendPoint.MaxPosition">
             <summary>
-            Lists all types of how to brush multiple notes on a beat. 
+            The maximum offset for points
             </summary>
         </member>
-        <member name="T:AlphaTab.Model.Chord">
+        <member name="F:AlphaTab.Model.BendPoint.MaxValue">
             <summary>
-            A chord definition.
+            The maximum value for points. 
             </summary>
         </member>
-        <member name="P:AlphaTab.Model.Chord.FirstFret">
+        <member name="P:AlphaTab.Model.BendPoint.Offset">
             <summary>
-            Indicates the first fret of the chord diagram.
+            Gets or sets offset of the point relative to the note duration (0-60)
             </summary>
         </member>
-        <member name="P:AlphaTab.Model.Chord.Strings">
+        <member name="P:AlphaTab.Model.BendPoint.Value">
             <summary>
-            Gets or sets the frets played on the individual strings for this chord. 
-            - The order in this list goes from the highest string to the lowest string.  
-            - -1 indicates that the string is not played. 
+            Gets or sets the 1/4 note value offsets for the bend. 
             </summary>
         </member>
-        <member name="P:AlphaTab.Model.Chord.BarreFrets">
+        <member name="M:AlphaTab.Model.BendPoint.#ctor(System.Int32,System.Int32)">
             <summary>
-            Gets or sets a list of frets where the finger should hold a barre 
+            Initializes a new instance of the <see cref="T:AlphaTab.Model.BendPoint"/> class.
             </summary>
-        </member>
-        <member name="T:AlphaTab.Model.Clef">
-            <summary>
-            This public enumeration lists all supported Clefs.
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Model.CrescendoType">
-            <summary>
-            Lists all Crescendo and Decrescendo types. 
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Model.Duration">
-            <summary>
-            Lists all durations of a beat.
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Model.DynamicValue">
-            <summary>
-            Lists all dynamics.
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Model.Fermata">
-            <summary>
-            Represents a fermata. 
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Model.Fermata.Type">
-            <summary>
-            Gets or sets the type of fermata. 
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Model.Fermata.Length">
-            <summary>
-            Gets or sets the actual lenght of the fermata. 
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Model.FermataType">
-            <summary>
-            Lists all types of fermatas
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.FermataType.Short">
-            <summary>
-            A short fermata (triangle symbol)
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.FermataType.Medium">
-            <summary>
-            A medium fermata (round symbol)
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.FermataType.Long">
-            <summary>
-            A long fermata (rectangular symbol)
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.Fingers.Unknown">
-            <summary>
-            Unknown type (not documented)
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.Fingers.NoOrDead">
-            <summary>
-            No finger, dead note
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.Fingers.Thumb">
-            <summary>
-            The thumb
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.Fingers.IndexFinger">
-            <summary>
-            The index finger
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.Fingers.MiddleFinger">
-            <summary>
-            The middle finger
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.Fingers.AnnularFinger">
-            <summary>
-            The annular finger
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.Fingers.LittleFinger">
-            <summary>
-            The little finger
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Model.GraceType">
-            <summary>
-            Lists all types of grace notes
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Model.HarmonicType">
-            <summary>
-            Lists all harmonic types.
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Model.KeySignatureType">
-            <summary>
-            This public enumeration lists all available types of KeySignatures
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Model.MasterBar">
-            <summary>
-            The MasterBar stores information about a bar which affects
-            all tracks.
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.MasterBar.MaxAlternateEndings">
-            <summary>
-            The maximum alternate endings.  (1 byte with 8 bitflags)
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Model.MasterBar.Fermata">
-            <summary>
-            Gets or sets the fermatas for this bar. The key is the offset of the fermata in midi ticks. 
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Model.MasterBar.Start">
-            <summary>
-            The timeline position of the voice within the whole score. (unit: midi ticks)
-            </summary>
-        </member>
-        <member name="M:AlphaTab.Model.MasterBar.CalculateDuration">
-            <summary>
-            Calculates the time spent in this bar. (unit: midi ticks)
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:AlphaTab.Model.MasterBar.AddFermata(System.Int32,AlphaTab.Model.Fermata)">
-            <summary>
-            Adds a fermata to the masterbar. 
-            </summary>
-            <param name="offset">The offset of the fermata within the bar in midi ticks. </param>
-            <param name="fermata">The fermata.</param>
-        </member>
-        <member name="M:AlphaTab.Model.MasterBar.GetFermata(AlphaTab.Model.Beat)">
-            <summary>
-            Gets the fermata for a given beat. 
-            </summary>
-            <param name="beat">The beat to get the fermata for.</param>
-            <returns></returns>
-        </member>
-        <member name="T:AlphaTab.Model.ModelUtils">
-            <summary>
-            This public class contains some utilities for working with model public classes
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Model.NoteAccidentalMode">
-            <summary>
-            Lists the modes how accidentals are handled for notes
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.NoteAccidentalMode.Default">
-            <summary>
-            Accidentals are calculated automatically. 
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.NoteAccidentalMode.SwapAccidentals">
-            <summary>
-            If the default behavior calculates a Sharp, use flat instead (and vice versa).
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.NoteAccidentalMode.ForceNatural">
-            <summary>
-            This will move the note one line down and applies a Naturalize. 
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.NoteAccidentalMode.ForceSharp">
-            <summary>
-            This will move the note one line down and applies a Sharp. 
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.NoteAccidentalMode.ForceFlat">
-            <summary>
-            This will move the note one line up and applies a Flat. 
-            </summary>
+            <param name="offset">The offset.</param>
+            <param name="value">The value.</param>
         </member>
         <member name="T:AlphaTab.Model.BendStyle">
             <summary>
@@ -1490,6 +2737,626 @@
             then releases the bend to a lower note where it is held until the end.
             </summary>
         </member>
+        <member name="T:AlphaTab.Model.BrushType">
+            <summary>
+            Lists all types of how to brush multiple notes on a beat. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.BrushType.None">
+            <summary>
+            No brush. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.BrushType.BrushUp">
+            <summary>
+            Normal brush up. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.BrushType.BrushDown">
+            <summary>
+            Normal brush down. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.BrushType.ArpeggioUp">
+            <summary>
+            Arpeggio up. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.BrushType.ArpeggioDown">
+            <summary>
+            Arpeggio down. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.Chord">
+            <summary>
+            A chord definition.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Chord.Name">
+            <summary>
+            Gets or sets the name of the chord
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Chord.FirstFret">
+            <summary>
+            Indicates the first fret of the chord diagram.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Chord.Strings">
+            <summary>
+            Gets or sets the frets played on the individual strings for this chord. 
+            - The order in this list goes from the highest string to the lowest string.  
+            - -1 indicates that the string is not played. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Chord.BarreFrets">
+            <summary>
+            Gets or sets a list of frets where the finger should hold a barre 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Model.Chord.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Model.Chord"/> class.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.Clef">
+            <summary>
+            This public enumeration lists all supported Clefs.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Clef.Neutral">
+            <summary>
+            Neutral clef.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Clef.C3">
+            <summary>
+            C3 clef
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Clef.C4">
+            <summary>
+            C4 clef
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Clef.F4">
+            <summary>
+            F4 clef
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Clef.G2">
+            <summary>
+            G2 clef
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.CrescendoType">
+            <summary>
+            Lists all Crescendo and Decrescendo types. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.CrescendoType.None">
+            <summary>
+            No crescendo applied. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.CrescendoType.Crescendo">
+            <summary>
+            Normal crescendo applied. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.CrescendoType.Decrescendo">
+            <summary>
+            Normal decrescendo applied. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.Duration">
+            <summary>
+            Lists all durations of a beat.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Duration.QuadrupleWhole">
+            <summary>
+            A quadruple whole note duration 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Duration.DoubleWhole">
+            <summary>
+            A double whole note duration 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Duration.Whole">
+            <summary>
+            A whole note duration 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Duration.Half">
+            <summary>
+            A 1/2 note duration 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Duration.Quarter">
+            <summary>
+            A 1/4 note duration 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Duration.Eighth">
+            <summary>
+            A 1/8 note duration 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Duration.Sixteenth">
+            <summary>
+            A 1/16 note duration 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Duration.ThirtySecond">
+            <summary>
+            A 1/32 note duration 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Duration.SixtyFourth">
+            <summary>
+            A 1/64 note duration 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Duration.OneHundredTwentyEighth">
+            <summary>
+            A 1/128 note duration 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Duration.TwoHundredFiftySixth">
+            <summary>
+            A 1/256 note duration 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.DynamicValue">
+            <summary>
+            Lists all dynamics.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.DynamicValue.PPP">
+            <summary>
+            pianississimo (very very soft)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.DynamicValue.PP">
+            <summary>
+            pianissimo (very soft)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.DynamicValue.P">
+            <summary>
+            piano (soft)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.DynamicValue.MP">
+            <summary>
+            mezzo-piano (half soft)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.DynamicValue.MF">
+            <summary>
+            mezzo-forte (half loud)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.DynamicValue.F">
+            <summary>
+            forte (loud)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.DynamicValue.FF">
+            <summary>
+            fortissimo (very loud)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.DynamicValue.FFF">
+            <summary>
+            fortississimo (very very loud)
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.Fermata">
+            <summary>
+            Represents a fermata. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Fermata.Type">
+            <summary>
+            Gets or sets the type of fermata. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Fermata.Length">
+            <summary>
+            Gets or sets the actual lenght of the fermata. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.FermataType">
+            <summary>
+            Lists all types of fermatas
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.FermataType.Short">
+            <summary>
+            A short fermata (triangle symbol)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.FermataType.Medium">
+            <summary>
+            A medium fermata (round symbol)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.FermataType.Long">
+            <summary>
+            A long fermata (rectangular symbol)
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.Fingers">
+            <summary>
+            Lists all fingers.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Fingers.Unknown">
+            <summary>
+            Unknown type (not documented)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Fingers.NoOrDead">
+            <summary>
+            No finger, dead note
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Fingers.Thumb">
+            <summary>
+            The thumb
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Fingers.IndexFinger">
+            <summary>
+            The index finger
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Fingers.MiddleFinger">
+            <summary>
+            The middle finger
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Fingers.AnnularFinger">
+            <summary>
+            The annular finger
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Fingers.LittleFinger">
+            <summary>
+            The little finger
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.GraceType">
+            <summary>
+            Lists all types of grace notes
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.GraceType.None">
+            <summary>
+            No grace, normal beat. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.GraceType.OnBeat">
+            <summary>
+            The beat contains on-beat grace notes. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.GraceType.BeforeBeat">
+            <summary>
+            The beat contains before-beat grace notes. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.GraceType.BendGrace">
+            <summary>
+            The beat contains very special bend-grace notes used in SongBook style displays.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.HarmonicType">
+            <summary>
+            Lists all harmonic types.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.HarmonicType.None">
+            <summary>
+            No harmonics. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.HarmonicType.Natural">
+            <summary>
+            Natural harmonic
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.HarmonicType.Artificial">
+            <summary>
+            Artificial harmonic
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.HarmonicType.Pinch">
+            <summary>
+            Pinch harmonics
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.HarmonicType.Tap">
+            <summary>
+            Tap harmonics
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.HarmonicType.Semi">
+            <summary>
+            Semi harmonics
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.HarmonicType.Feedback">
+            <summary>
+            Feedback harmonics
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.KeySignature">
+            <summary>
+            This public enumeration lists all available key signatures
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignature.Cb">
+            <summary>
+            Cb (7 flats)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignature.Gb">
+            <summary>
+            Gb (6 flats)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignature.Db">
+            <summary>
+            Db (5 flats)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignature.Ab">
+            <summary>
+            Ab (4 flats)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignature.Eb">
+            <summary>
+            Eb (3 flats)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignature.Bb">
+            <summary>
+            Bb (2 flats)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignature.F">
+            <summary>
+            F (1 flat)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignature.C">
+            <summary>
+            C (no signs)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignature.G">
+            <summary>
+            G (1 sharp)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignature.D">
+            <summary>
+            D (2 sharp)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignature.A">
+            <summary>
+            A (3 sharp)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignature.E">
+            <summary>
+            E (4 sharp)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignature.B">
+            <summary>
+            B (5 sharp)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignature.FSharp">
+            <summary>
+            F# (6 sharp)
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignature.CSharp">
+            <summary>
+            C# (8 sharp)
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.KeySignatureType">
+            <summary>
+            This public enumeration lists all available types of KeySignatures
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignatureType.Major">
+            <summary>
+            Major
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.KeySignatureType.Minor">
+            <summary>
+            Minor
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.Lyrics">
+            <summary>
+            Represents the lyrics of a song. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Lyrics.StartBar">
+            <summary>
+            Gets or sets he start bar on which the lyrics should begin. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Lyrics.Text">
+            <summary>
+            Gets or sets the raw lyrics text in Guitar Pro format.
+            (spaces split word syllables, plus merge syllables, [..] are comments) 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Lyrics.Chunks">
+            <summary>
+            Gets or sets the prepared chunks of the lyrics to apply to beats. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.MasterBar">
+            <summary>
+            The MasterBar stores information about a bar which affects
+            all tracks.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.MasterBar.MaxAlternateEndings">
+            <summary>
+            The maximum alternate endings.  (1 byte with 8 bitflags)
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.AlternateEndings">
+            <summary>
+            Gets or sets the bitflag for the alternate endings. Each bit defines for which repeat counts
+            the bar is played.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.NextMasterBar">
+            <summary>
+            Gets or sets the next masterbar in the song. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.PreviousMasterBar">
+            <summary>
+            Gets or sets the next masterbar in the song. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.Index">
+            <summary>
+            Gets the zero based index of the masterbar. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.KeySignature">
+            <summary>
+            Gets or sets the key signature used on all bars.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.KeySignatureType">
+            <summary>
+            Gets or sets the type of key signature (major/minor)
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.IsDoubleBar">
+            <summary>
+            Gets or sets whether a double bar is shown for this masterbar. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.IsRepeatStart">
+            <summary>
+            Gets or sets whether a repeat section starts on this masterbar. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.IsRepeatEnd">
+            <summary>
+            Gets or sets whether a repeat section ends on this masterbar. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.RepeatCount">
+            <summary>
+            Gets or sets the number of repeats for the current repeat section. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.RepeatGroup">
+            <summary>
+            Gets or sets the repeat group this bar belongs to. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.TimeSignatureNumerator">
+            <summary>
+            Gets or sets the time signature numerator.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.TimeSignatureDenominator">
+            <summary>
+            Gets or sets the time signature denominiator. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.TimeSignatureCommon">
+            <summary>
+            Gets or sets whether this is bar has a common time signature. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.TripletFeel">
+            <summary>
+            Gets or sets the triplet feel that is valid for this bar. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.Section">
+            <summary>
+            Gets or sets the new section information for this bar. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.IsSectionStart">
+            <summary>
+            Gets a value indicating whether a new section starts on this bar. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.TempoAutomation">
+            <summary>
+            Gets or sets the tempo automation for this bar. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.Score">
+            <summary>
+            Gets or sets the reference to the score this song belongs to. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.Fermata">
+            <summary>
+            Gets or sets the fermatas for this bar. The key is the offset of the fermata in midi ticks. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.MasterBar.Start">
+            <summary>
+            The timeline position of the voice within the whole score. (unit: midi ticks)
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Model.MasterBar.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Model.MasterBar"/> class.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Model.MasterBar.CalculateDuration">
+            <summary>
+            Calculates the time spent in this bar. (unit: midi ticks)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.Model.MasterBar.AddFermata(System.Int32,AlphaTab.Model.Fermata)">
+            <summary>
+            Adds a fermata to the masterbar. 
+            </summary>
+            <param name="offset">The offset of the fermata within the bar in midi ticks. </param>
+            <param name="fermata">The fermata.</param>
+        </member>
+        <member name="M:AlphaTab.Model.MasterBar.GetFermata(AlphaTab.Model.Beat)">
+            <summary>
+            Gets the fermata for a given beat. 
+            </summary>
+            <param name="beat">The beat to get the fermata for.</param>
+            <returns></returns>
+        </member>
+        <member name="T:AlphaTab.Model.ModelUtils">
+            <summary>
+            This public class contains some utilities for working with model public classes
+            </summary>
+        </member>
         <member name="T:AlphaTab.Model.Note">
             <summary>
             A note is a single played sound on a fretted instrument. 
@@ -1503,6 +3370,66 @@
             at several locations for lookup tables. 
             </summary>
         </member>
+        <member name="P:AlphaTab.Model.Note.Id">
+            <summary>
+            Gets or sets the unique id of this note. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.Index">
+            <summary>
+            Gets or sets the zero-based index of this note within the beat. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.Accentuated">
+            <summary>
+            Gets or sets the accentuation of this note. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.BendType">
+            <summary>
+            Gets or sets the bend type for this note. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.BendStyle">
+            <summary>
+            Gets or sets the bend style for this note. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.BendOrigin">
+            <summary>
+            Gets or sets the note from which this note continues the bend. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsContinuedBend">
+            <summary>
+            Gets or sets whether this note continues a bend from a previous note. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.BendPoints">
+            <summary>
+            Gets or sets a list of the points defining the bend behavior. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.MaxBendPoint">
+            <summary>
+            Gets or sets the bend point with the highest bend value. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.HasBend">
+            <summary>
+            Gets a value indicating whether this note is bended.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsStringed">
+            <summary>
+            Gets a value indicating whether this note is defined via a string on the instrument. . 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.Fret">
+            <summary>
+            Gets or sets the fret on which this note is played on the instrument. 
+            </summary>
+        </member>
         <member name="P:AlphaTab.Model.Note.String">
             <summary>
             Gets or sets the string number where the note is placed. 
@@ -1510,9 +3437,234 @@
             It then increases the the number of strings on available on the track. 
             </summary>
         </member>
+        <member name="P:AlphaTab.Model.Note.IsPiano">
+            <summary>
+            Gets a value indicating whether the value of this note is defined via octave and tone. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.Octave">
+            <summary>
+            Gets or sets the octave on which this note is played. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.Tone">
+            <summary>
+            Gets or sets the tone of this note within the octave. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsPercussion">
+            <summary>
+            Gets a value indicating whether this note is a percussion note. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.Element">
+            <summary>
+            Gets or sets the percusson element. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.Variation">
+            <summary>
+            Gets or sets the variation of this note. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsVisible">
+            <summary>
+            Gets or sets whether this note is visible on the music sheet. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsHammerPullOrigin">
+            <summary>
+            Gets or sets whether this note starts a hammeron or pulloff. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsHammerPullDestination">
+            <summary>
+            Gets a value indicating whether this note ends a hammeron or pulloff. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.HammerPullOrigin">
+            <summary>
+            Gets the origin of the hammeron/pulloff of this note. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.HammerPullDestination">
+            <summary>
+            Gets the destination for the hammeron/pullof started by this note. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsSlurOrigin">
+            <summary>
+            Gets or sets whether this note starts a slur. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsSlurDestination">
+            <summary>
+            Gets or sets whether a slur finished or continues on this note. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.SlurOrigin">
+            <summary>
+            Gets or sets the origin of the slur this note contributes to. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.SlurDestination">
+            <summary>
+            Gets or sets the destination of the slur this note contributes to. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsHarmonic">
+            <summary>
+            Gets or sets whether this note has an harmonic effect.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.HarmonicType">
+            <summary>
+            Gets or sets the harmonic type applied to this note. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.HarmonicValue">
+            <summary>
+            Gets or sets the value defining the harmonic pitch. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsGhost">
+            <summary>
+            Gets or sets whether the note is a ghost note and shown in parenthesis. Also this will make the note a bit more silent. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsLetRing">
+            <summary>
+            Gets or sets whether this note has a let-ring effect. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.LetRingDestination">
+            <summary>
+            Gets or sets the destination note for the let-ring effect.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsPalmMute">
+            <summary>
+            Gets or sets whether this note has a palm-mute effect. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.PalmMuteDestination">
+            <summary>
+            Gets or sets the destination note for the palm-mute effect. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsDead">
+            <summary>
+            Gets or sets whether the note is shown and played as dead note. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsStaccato">
+            <summary>
+            Gets or sets whether the note is played as staccato. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.SlideType">
+            <summary>
+            Gets or sets the slide type this note is played with. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.SlideTarget">
+            <summary>
+            Gets or sets the target note for several slide types. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.Vibrato">
+            <summary>
+            Gets or sets whether a vibrato is played on the note. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.TieOrigin">
+            <summary>
+            Gets or sets the origin of the tied if this note is tied. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.TieDestination">
+            <summary>
+            Gets or sets the desination of the tie. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsTieDestination">
+            <summary>
+            Gets or sets whether this note is ends a tied note. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsTieOrigin">
+            <summary>
+            Gets or sets whether this note starts or continues a tied note. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.LeftHandFinger">
+            <summary>
+            Gets or sets the fingers used for this note on the left hand.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.RightHandFinger">
+            <summary>
+            Gets or sets the fingers used for this note on the right hand.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsFingering">
+            <summary>
+            Gets or sets whether this note has fingering defined. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.TrillValue">
+            <summary>
+            Gets or sets the target note value for the trill effect. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.TrillFret">
+            <summary>
+            Gets the fret for the trill. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.IsTrill">
+            <summary>
+            Gets a value indicating whether this note has a trill effect. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.TrillSpeed">
+            <summary>
+            Gets or sets the speed of the trill effect. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.DurationPercent">
+            <summary>
+            Gets or sets the percentual duration of the note relative to the overall beat duration .
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.AccidentalMode">
+            <summary>
+            Gets or sets how accidetnals for this note should  be handled. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.Beat">
+            <summary>
+            Gets or sets the reference to the parent beat to which this note belongs to. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.Dynamic">
+            <summary>
+            Gets or sets the dynamics for this note. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.StringTuning">
+            <summary>
+            Gets the base note value for the string of this note. 
+            </summary>
+        </member>
         <member name="P:AlphaTab.Model.Note.RealValue">
             <summary>
             Gets the absolute value of this note for playback. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Note.HarmonicPitch">
+            <summary>
+            Gets or sets the harmonic pitch value for this note. 
             </summary>
         </member>
         <member name="P:AlphaTab.Model.Note.DisplayValue">
@@ -1531,20 +3683,156 @@
             Gets or sets whether the note has a offset of a quartertone caused by bends.
             </summary>
         </member>
+        <member name="M:AlphaTab.Model.Note.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Model.Note"/> class.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.NoteAccidentalMode">
+            <summary>
+            Lists the modes how accidentals are handled for notes
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.NoteAccidentalMode.Default">
+            <summary>
+            Accidentals are calculated automatically. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.NoteAccidentalMode.SwapAccidentals">
+            <summary>
+            If the default behavior calculates a Sharp, use flat instead (and vice versa).
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.NoteAccidentalMode.ForceNatural">
+            <summary>
+            This will move the note one line down and applies a Naturalize. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.NoteAccidentalMode.ForceSharp">
+            <summary>
+            This will move the note one line down and applies a Sharp. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.NoteAccidentalMode.ForceFlat">
+            <summary>
+            This will move the note one line up and applies a Flat. 
+            </summary>
+        </member>
         <member name="T:AlphaTab.Model.Ottavia">
             <summary>
             Lists all ottavia.  
             </summary>
         </member>
-        <member name="T:AlphaTab.Model.PickStrokeType">
+        <member name="F:AlphaTab.Model.Ottavia._15ma">
+            <summary>
+            2 octaves higher 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Ottavia._8va">
+            <summary>
+            1 octave higher
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Ottavia.Regular">
+            <summary>
+            Normal
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Ottavia._8vb">
+            <summary>
+            1 octave lower
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.Ottavia._15mb">
+            <summary>
+            2 octaves lower. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.PickStroke">
             <summary>
             Lists all types of pick strokes.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.PickStroke.None">
+            <summary>
+            No pickstroke used. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.PickStroke.Up">
+            <summary>
+            Pickstroke up. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.PickStroke.Down">
+            <summary>
+            Pickstroke down
             </summary>
         </member>
         <member name="T:AlphaTab.Model.PlaybackInformation">
             <summary>
             This public class stores the midi specific information of a track needed
             for playback.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.PlaybackInformation.Volume">
+            <summary>
+            Gets or sets the volume (0-16)
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.PlaybackInformation.Balance">
+            <summary>
+            Gets or sets the balance (0-16; 8=center)
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.PlaybackInformation.Port">
+            <summary>
+            Gets or sets the midi port to use.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.PlaybackInformation.Program">
+            <summary>
+            Gets or sets the midi program to use. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.PlaybackInformation.PrimaryChannel">
+            <summary>
+            Gets or sets the primary channel for all normal midi events. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.PlaybackInformation.SecondaryChannel">
+            <summary>
+            Gets or sets the secondary channel for special midi events. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.PlaybackInformation.IsMute">
+            <summary>
+            Gets or sets whether the track is muted.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.PlaybackInformation.IsSolo">
+            <summary>
+            Gets or sets whether the track is playing alone. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Model.PlaybackInformation.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Model.PlaybackInformation"/> class.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.RenderStylesheet">
+            <summary>
+            This class represents the rendering stylesheet.
+            It contains settings which control the display of the score when rendered. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.RenderStylesheet.HideDynamics">
+            <summary>
+            Gets or sets whether dynamics are hidden.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Model.RenderStylesheet.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Model.RenderStylesheet"/> class.
             </summary>
         </member>
         <member name="T:AlphaTab.Model.RepeatGroup">
@@ -1577,10 +3865,9 @@
              true if the repeat group was closed well
             </summary>
         </member>
-        <member name="T:AlphaTab.Model.RenderStylesheet">
+        <member name="M:AlphaTab.Model.RepeatGroup.#ctor">
             <summary>
-            This class represents the rendering stylesheet.
-            It contains settings which control the display of the score when rendered. 
+            Initializes a new instance of the <see cref="T:AlphaTab.Model.RepeatGroup"/> class.
             </summary>
         </member>
         <member name="T:AlphaTab.Model.Score">
@@ -1640,10 +3927,82 @@
             The author of this tablature.
             </summary>
         </member>
+        <member name="P:AlphaTab.Model.Score.Tempo">
+            <summary>
+            Gets or sets the global tempo of the song in BPM. The tempo might change via <see cref="P:AlphaTab.Model.MasterBar.TempoAutomation"/>.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Score.TempoLabel">
+            <summary>
+            Gets or sets the name/label of the tempo. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Score.MasterBars">
+            <summary>
+            Gets or sets a list of all masterbars contained in this song. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Score.Tracks">
+            <summary>
+            Gets or sets a list of all tracks contained in this song. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Score.Stylesheet">
+            <summary>
+            Gets or sets the rendering stylesheet for this song.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Model.Score.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Model.Score"/> class.
+            </summary>
+        </member>
         <member name="T:AlphaTab.Model.Section">
             <summary>
             This public class is used to describe the beginning of a 
             section within a song. It acts like a marker. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Section.Marker">
+            <summary>
+            Gets or sets the marker ID for this section. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Section.Text">
+            <summary>
+            Gets or sets the descriptional text of this section.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Model.Section.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Model.Section"/> class.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.SimileMark">
+            <summary>
+            Lists all simile mark types as they are assigned to bars. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.SimileMark.None">
+            <summary>
+            No simile mark is applied
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.SimileMark.Simple">
+            <summary>
+            A simple simile mark. The previous bar is repeated. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.SimileMark.FirstOfDouble">
+            <summary>
+            A double simile mark. This value is assigned to the first
+            bar of the 2 repeat bars. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.SimileMark.SecondOfDouble">
+            <summary>
+            A double simile mark. This value is assigned to the second
+            bar of the 2 repeat bars. 
             </summary>
         </member>
         <member name="T:AlphaTab.Model.SlideType">
@@ -1651,15 +4010,80 @@
             This public enum lists all different types of finger slides on a string.
             </summary>
         </member>
-        <member name="T:AlphaTab.Model.StaffKind">
+        <member name="F:AlphaTab.Model.SlideType.None">
             <summary>
-            Represents the different kinds of staffs.
+            No slide. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.SlideType.Shift">
+            <summary>
+            Shift slide to next note on same string
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.SlideType.Legato">
+            <summary>
+            Legato slide to next note on same string. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.SlideType.IntoFromBelow">
+            <summary>
+            Slide into the note from below on the same string.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.SlideType.IntoFromAbove">
+            <summary>
+            Slide into the note from above on the same string.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.SlideType.OutUp">
+            <summary>
+            Slide out from the note from upwards on the same string.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.SlideType.OutDown">
+            <summary>
+            Slide out from the note from downwards on the same string.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.SlideType.PickSlideDown">
+            <summary>
+            Pickslide down on this note
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.SlideType.PickSlideUp">
+            <summary>
+            Pickslide up on this note
             </summary>
         </member>
         <member name="T:AlphaTab.Model.Staff">
             <summary>
             This class describes a single staff within a track. There are instruments like pianos
             where a single track can contain multiple staffs. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Staff.Index">
+            <summary>
+            Gets or sets the zero-based index of this staff within the track.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Staff.Track">
+            <summary>
+            Gets or sets the reference to the track this staff belongs to. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Staff.Bars">
+            <summary>
+            Gets or sets a list of all bars contained in this staff. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Staff.Chords">
+            <summary>
+            Gets or sets a list of all chords defined for this staff. <see cref="P:AlphaTab.Model.Beat.ChordId"/> refers to entries in this lookup.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Staff.Capo">
+            <summary>
+            Gets or sets the fret on which a capo is set. s
             </summary>
         </member>
         <member name="P:AlphaTab.Model.Staff.TranspositionPitch">
@@ -1681,21 +4105,186 @@
             the order of the tracks shown in the tablature. The first item is the most top tablature line. 
             </summary>
         </member>
+        <member name="P:AlphaTab.Model.Staff.TuningName">
+            <summary>
+            Gets or sets the name of the tuning.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Staff.IsStringed">
+            <summary>
+            Gets a value indicating whether this staff contains string based notes.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Staff.StaffKind">
+            <summary>
+            Gets or sets the staff kind. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Model.Staff.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Model.Staff"/> class.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.StaffKind">
+            <summary>
+            Represents the different kinds of staffs.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.StaffKind.Tablature">
+            <summary>
+            The staff should be shown as guitar tablature. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.StaffKind.Score">
+            <summary>
+            The staff should be shown as normal music notation without tabs. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.StaffKind.Percussion">
+            <summary>
+            The staff should be shown as percussion tabs. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.StaffKind.Mixed">
+            <summary>
+            The staff should be shown as mixed tab/music notaiton
+            </summary>
+        </member>
         <member name="T:AlphaTab.Model.Track">
             <summary>
             This public class describes a single track or instrument of score.
             It is bascially a list of staffs containing individual music notation kinds.
             </summary>
         </member>
+        <member name="P:AlphaTab.Model.Track.Index">
+            <summary>
+            Gets or sets the zero-based index of this track. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Track.Score">
+            <summary>
+            Gets or sets the reference this track belongs to. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Track.Staves">
+            <summary>
+            Gets or sets the list of staffs that are defined for this track. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Track.PlaybackInfo">
+            <summary>
+            Gets or sets the playback information for this track. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Track.Color">
+            <summary>
+            Gets or sets the display color defined for this track. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Track.Name">
+            <summary>
+            Gets or sets the long name of this track. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Track.ShortName">
+            <summary>
+            Gets or sets the short name of this track. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Model.Track.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Model.Track"/> class.
+            </summary>
+            <param name="staveCount">The stave count.</param>
+        </member>
         <member name="T:AlphaTab.Model.TripletFeel">
             <summary>
-            This public enumeration lists all feels of triplets. 
+            This public enumeration lists all feels of triplets.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.TripletFeel.NoTripletFeel">
+            <summary>
+            No triplet feel
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.TripletFeel.Triplet16th">
+            <summary>
+            Triplet 16th
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.TripletFeel.Triplet8th">
+            <summary>
+            Triplet 8th
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.TripletFeel.Dotted16th">
+            <summary>
+            Dotted 16th
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.TripletFeel.Dotted8th">
+            <summary>
+            Dotte d8th
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.TripletFeel.Scottish16th">
+            <summary>
+            Scottish 16th
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.TripletFeel.Scottish8th">
+            <summary>
+            Scottish 8th
             </summary>
         </member>
         <member name="T:AlphaTab.Model.Tuning">
             <summary>
             This public class represents a predefined string tuning.
             </summary>
+        </member>
+        <member name="M:AlphaTab.Model.Tuning.GetDefaultTuningFor(System.Int32)">
+            <summary>
+            Gets the default tuning for the given string count. 
+            </summary>
+            <param name="stringCount">The string count. </param>
+            <returns>The tuning for the given string count or null if the string count is not defined. </returns>
+        </member>
+        <member name="M:AlphaTab.Model.Tuning.GetPresetsFor(System.Int32)">
+            <summary>
+            Gets a list of all tuning presets for a given stirng count. 
+            </summary>
+            <param name="stringCount">The string count. </param>
+            <returns>The list of known tunings for the given string count or an empty list if the string count is not defined. </returns>
+        </member>
+        <member name="M:AlphaTab.Model.Tuning.FindTuning(System.Int32[])">
+            <summary>
+            Tries to find a known tuning by a given list of tuning values. 
+            </summary>
+            <param name="strings">The values defining the tuning. </param>
+            <returns>The known tuning. </returns>
+        </member>
+        <member name="P:AlphaTab.Model.Tuning.IsStandard">
+            <summary>
+            Gets or sets whether this is the standard tuning for this number of strings. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Tuning.Name">
+            <summary>
+            Gets or sets the name of the tuning. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Tuning.Tunings">
+            <summary>
+            Gets or sets the values for each string of the instrument. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Model.Tuning.#ctor(System.String,System.Int32[],System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Model.Tuning"/> class.
+            </summary>
+            <param name="name">The name.</param>
+            <param name="tuning">The tuning.</param>
+            <param name="isStandard">if set to <c>true</c> [is standard].</param>
         </member>
         <member name="M:AlphaTab.Model.TuningParser.IsTuning(System.String)">
             <summary>
@@ -1709,10 +4298,92 @@
             This public enum lists all vibrato types that can be performed.
             </summary>
         </member>
+        <member name="F:AlphaTab.Model.VibratoType.None">
+            <summary>
+            No vibrato.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.VibratoType.Slight">
+            <summary>
+            A slight vibrato. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.VibratoType.Wide">
+            <summary>
+            A wide vibrato.
+            </summary>
+        </member>
         <member name="T:AlphaTab.Model.Voice">
             <summary>
             A voice represents a group of beats 
             that can be played during a bar. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Voice.Index">
+            <summary>
+            Gets or sets the zero-based index of this voice within the bar. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Voice.Bar">
+            <summary>
+            Gets or sets the reference to the bar this voice belongs to. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Voice.Beats">
+            <summary>
+            Gets or sets the list of beats contained in this voice. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Voice.IsEmpty">
+            <summary>
+            Gets or sets a value indicating whether this voice is empty. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Model.Voice.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Model.Voice"/> class.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Model.WhammyType">
+            <summary>
+            Lists all types of whammy bars
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.WhammyType.None">
+            <summary>
+            No whammy at all
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.WhammyType.Custom">
+            <summary>
+            Individual points define the whammy in a flexible manner. 
+            This system was mainly used in Guitar Pro 3-5
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.WhammyType.Dive">
+            <summary>
+            Simple dive to a lower or higher note.
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.WhammyType.Dip">
+            <summary>
+            A dive to a lower or higher note and releasing it back to normal. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.WhammyType.Hold">
+            <summary>
+            Continue to hold the whammy at the position from a previous whammy. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.WhammyType.Predive">
+            <summary>
+            Dive to a lower or higher note before playing it. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.Model.WhammyType.PrediveDive">
+            <summary>
+            Dive to a lower or higher note before playing it, then change to another
+            note. 
             </summary>
         </member>
         <member name="T:AlphaTab.Rendering.BarRendererBase">
@@ -1886,18 +4557,6 @@
             <summary>
             This simple glyph allows to put an empty region in to a BarRenderer.
             </summary>
-        </member>
-        <member name="M:AlphaTab.Rendering.Glyphs.TieGlyph.PaintTie(AlphaTab.Platform.ICanvas,System.Single,System.Single,System.Single,System.Single,System.Single,System.Boolean,System.Single,System.Single)">
-            <summary>
-            paints a tie between the two given points
-            </summary>
-            <param name="canvas"></param>
-            <param name="scale"></param>
-            <param name="x1"></param>
-            <param name="y1"></param>
-            <param name="x2"></param>
-            <param name="y2"></param>
-            <param name="down"></param>
         </member>
         <member name="T:AlphaTab.Rendering.Glyphs.VoiceContainerGlyph">
             <summary>

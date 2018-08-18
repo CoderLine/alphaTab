@@ -20,6 +20,10 @@ using AlphaTab.Audio.Synth.Ds;
 
 namespace AlphaTab.Audio.Synth
 {
+    /// <summary>
+    /// This is the base interface for output devices which can
+    /// request and playback audio samples. 
+    /// </summary>
     public interface ISynthOutput
     {
         /// <summary>

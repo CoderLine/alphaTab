@@ -76,7 +76,6 @@ namespace AlphaTab.Importer
             return data.GpReadString(length);
         }
 
-
         public static string GpReadString(this IReadable data, int length)
         {
             byte[] b = new byte[length];
@@ -88,6 +87,7 @@ namespace AlphaTab.Importer
         /// Reads a byte as size and the string itself.
         /// Additionally it is ensured the specified amount of bytes is read. 
         /// </summary>
+        /// <param name="data">the data to read from.</param>
         /// <param name="length">the amount of bytes to read</param>
         /// <returns></returns>
         public static string GpReadStringByteLength(this IReadable data, int length)

@@ -21,26 +21,6 @@ using AlphaTab.Collections;
 namespace AlphaTab.Model
 {
     /// <summary>
-    /// This class represents the rendering stylesheet.
-    /// It contains settings which control the display of the score when rendered. 
-    /// </summary>
-    public class RenderStylesheet
-    {
-        public bool HideDynamics { get; set; }
-
-        public RenderStylesheet()
-        {
-            HideDynamics = false;
-        }
-
-        public static void CopyTo(RenderStylesheet src, RenderStylesheet dst)
-        {
-            dst.HideDynamics = src.HideDynamics;
-        }
-    }
-
-
-    /// <summary>
     /// The score is the root node of the complete 
     /// model. It stores the basic information of 
     /// a song and stores the sub components. 
@@ -99,14 +79,33 @@ namespace AlphaTab.Model
         /// </summary>
         public string Tab { get; set; }
 
+        /// <summary>
+        /// Gets or sets the global tempo of the song in BPM. The tempo might change via <see cref="MasterBar.TempoAutomation"/>.
+        /// </summary>
         public int Tempo { get; set; }
+        /// <summary>
+        /// Gets or sets the name/label of the tempo. 
+        /// </summary>
         public string TempoLabel { get; set; }
 
+        /// <summary>
+        /// Gets or sets a list of all masterbars contained in this song. 
+        /// </summary>
         public FastList<MasterBar> MasterBars { get; set; }
+
+        /// <summary>
+        /// Gets or sets a list of all tracks contained in this song. 
+        /// </summary>
         public FastList<Track> Tracks { get; set; }
 
+        /// <summary>
+        /// Gets or sets the rendering stylesheet for this song.
+        /// </summary>
         public RenderStylesheet Stylesheet { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Score"/> class.
+        /// </summary>
         public Score()
         {
             MasterBars = new FastList<MasterBar>();
@@ -117,7 +116,7 @@ namespace AlphaTab.Model
             Stylesheet = new RenderStylesheet();
         }
 
-        public static void CopyTo(Score src, Score dst)
+        internal static void CopyTo(Score src, Score dst)
         {
             dst.Album = src.Album;
             dst.Artist = src.Artist;
@@ -132,10 +131,8 @@ namespace AlphaTab.Model
             dst.Tempo = src.Tempo;
             dst.TempoLabel = src.TempoLabel;
         }
-
-
-
-        public void RebuildRepeatGroups()
+        
+        internal void RebuildRepeatGroups()
         {
             var currentGroup = new RepeatGroup();
             foreach (var bar in MasterBars)
@@ -151,7 +148,7 @@ namespace AlphaTab.Model
             }
         }
 
-        public void AddMasterBar(MasterBar bar)
+        internal void AddMasterBar(MasterBar bar)
         {
             bar.Score = this;
             bar.Index = MasterBars.Count;
@@ -173,14 +170,14 @@ namespace AlphaTab.Model
             MasterBars.Add(bar);
         }
 
-        public void AddTrack(Track track)
+        internal void AddTrack(Track track)
         {
             track.Score = this;
             track.Index = Tracks.Count;
             Tracks.Add(track);
         }
 
-        public void Finish(Settings settings)
+        internal void Finish(Settings settings)
         {
             for (int i = 0, j = Tracks.Count; i < j; i++)
             {

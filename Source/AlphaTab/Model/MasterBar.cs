@@ -32,31 +32,95 @@ namespace AlphaTab.Model
         /// </summary>
         public const int MaxAlternateEndings = 8;
 
+        /// <summary>
+        /// Gets or sets the bitflag for the alternate endings. Each bit defines for which repeat counts
+        /// the bar is played.
+        /// </summary>
         public byte AlternateEndings { get; set; }
+
+        /// <summary>
+        /// Gets or sets the next masterbar in the song. 
+        /// </summary>
         public MasterBar NextMasterBar { get; set; }
+
+        /// <summary>
+        /// Gets or sets the next masterbar in the song. 
+        /// </summary>
         public MasterBar PreviousMasterBar { get; set; }
+
+        /// <summary>
+        /// Gets the zero based index of the masterbar. 
+        /// </summary>
         public int Index { get; set; }
-        public int KeySignature { get; set; }
+
+        /// <summary>
+        /// Gets or sets the key signature used on all bars.
+        /// </summary>
+        public KeySignature KeySignature { get; set; }
+        /// <summary>
+        /// Gets or sets the type of key signature (major/minor)
+        /// </summary>
         public KeySignatureType KeySignatureType { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether a double bar is shown for this masterbar. 
+        /// </summary>
         public bool IsDoubleBar { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether a repeat section starts on this masterbar. 
+        /// </summary>
         public bool IsRepeatStart { get; set; }
-        public bool IsRepeatEnd { get { return RepeatCount > 0; } }
+        /// <summary>
+        /// Gets or sets whether a repeat section ends on this masterbar. 
+        /// </summary>
+        public bool IsRepeatEnd => RepeatCount > 0;
+        /// <summary>
+        /// Gets or sets the number of repeats for the current repeat section. 
+        /// </summary>
         public int RepeatCount { get; set; }
+
+        /// <summary>
+        /// Gets or sets the repeat group this bar belongs to. 
+        /// </summary>
         public RepeatGroup RepeatGroup { get; set; }
 
+        /// <summary>
+        /// Gets or sets the time signature numerator.
+        /// </summary>
         public int TimeSignatureNumerator { get; set; }
+        /// <summary>
+        /// Gets or sets the time signature denominiator. 
+        /// </summary>
         public int TimeSignatureDenominator { get; set; }
+        /// <summary>
+        /// Gets or sets whether this is bar has a common time signature. 
+        /// </summary>
         public bool TimeSignatureCommon { get; set; }
 
+        /// <summary>
+        /// Gets or sets the triplet feel that is valid for this bar. 
+        /// </summary>
         public TripletFeel TripletFeel { get; set; }
 
+        /// <summary>
+        /// Gets or sets the new section information for this bar. 
+        /// </summary>
         public Section Section { get; set; }
-        public bool IsSectionStart { get { return Section != null; } }
 
+        /// <summary>
+        /// Gets a value indicating whether a new section starts on this bar. 
+        /// </summary>
+        public bool IsSectionStart => Section != null;
+
+        /// <summary>
+        /// Gets or sets the tempo automation for this bar. 
+        /// </summary>
         public Automation TempoAutomation { get; set; }
-        public Automation VolumeAutomation { get; set; }
 
+        /// <summary>
+        /// Gets or sets the reference to the score this song belongs to. 
+        /// </summary>
         public Score Score { get; set; }
 
         /// <summary>
@@ -69,6 +133,9 @@ namespace AlphaTab.Model
         /// </summary>
         public int Start { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MasterBar"/> class.
+        /// </summary>
         public MasterBar()
         {
             TimeSignatureDenominator = 4;
@@ -79,7 +146,7 @@ namespace AlphaTab.Model
             Fermata = new FastDictionary<int, Fermata>();
         }
 
-        public static void CopyTo(MasterBar src, MasterBar dst)
+        internal static void CopyTo(MasterBar src, MasterBar dst)
         {
             dst.AlternateEndings = src.AlternateEndings;
             dst.Index = src.Index;
@@ -109,7 +176,7 @@ namespace AlphaTab.Model
         /// </summary>
         /// <param name="offset">The offset of the fermata within the bar in midi ticks. </param>
         /// <param name="fermata">The fermata.</param>
-        public void AddFermata(int offset, Fermata fermata)
+        internal void AddFermata(int offset, Fermata fermata)
         {
             Fermata[offset] = fermata;
         }
@@ -119,7 +186,7 @@ namespace AlphaTab.Model
         /// </summary>
         /// <param name="beat">The beat to get the fermata for.</param>
         /// <returns></returns>
-        public Fermata GetFermata(Beat beat)
+        internal Fermata GetFermata(Beat beat)
         {
             if (Fermata.ContainsKey(beat.PlaybackStart))
             {

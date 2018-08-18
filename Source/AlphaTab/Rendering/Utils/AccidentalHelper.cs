@@ -139,7 +139,9 @@ namespace AlphaTab.Rendering.Utils
         /// Calculates the accidental for the given note value and assignes the value to it. 
         /// The new accidental type is also registered within the current scope
         /// </summary>
-        /// <param name="note"></param>
+        /// <param name="relatedBeat"></param>
+        /// <param name="noteValue"></param>
+        /// <param name="quarterBend"></param>
         /// <returns></returns>
         public AccidentalType ApplyAccidentalForValue(Beat relatedBeat, int noteValue, bool quarterBend)
         {
@@ -162,7 +164,7 @@ namespace AlphaTab.Rendering.Utils
             var accidentalToSet = AccidentalType.None;
             if (_bar.Staff.StaffKind != StaffKind.Percussion)
             {
-                var ks = _bar.MasterBar.KeySignature;
+                var ks = (int)_bar.MasterBar.KeySignature;
                 var ksi = (ks + 7);
                 var index = (noteValue % 12);
 
@@ -232,7 +234,7 @@ namespace AlphaTab.Rendering.Utils
             var value = staff.StaffKind == StaffKind.Percussion 
                 ? PercussionMapper.MapNoteForDisplay(noteValue) 
                 : noteValue;
-            var ks = _bar.MasterBar.KeySignature;
+            var ks = (int)_bar.MasterBar.KeySignature;
             var clef = _bar.Clef;
 
             var index = value % 12;

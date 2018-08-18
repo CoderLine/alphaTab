@@ -16,32 +16,38 @@
  * License along with this library.
  */
 using AlphaTab.Collections;
-using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Model
 {
-    /// <summary>
-    /// Represents the different kinds of staffs.
-    /// </summary>
-    public enum StaffKind
-    {
-        Tablature,
-        Score,
-        Percussion,
-        Mixed
-    }
-
     /// <summary>
     /// This class describes a single staff within a track. There are instruments like pianos
     /// where a single track can contain multiple staffs. 
     /// </summary>
     public class Staff
     {
-        public FastList<Bar> Bars { get; set; }
-        public Track Track { get; set; }
+        /// <summary>
+        /// Gets or sets the zero-based index of this staff within the track.
+        /// </summary>
         public int Index { get; set; }
 
+        /// <summary>
+        /// Gets or sets the reference to the track this staff belongs to. 
+        /// </summary>
+        public Track Track { get; set; }
+
+        /// <summary>
+        /// Gets or sets a list of all bars contained in this staff. 
+        /// </summary>
+        public FastList<Bar> Bars { get; set; }
+
+        /// <summary>
+        /// Gets or sets a list of all chords defined for this staff. <see cref="Beat.ChordId"/> refers to entries in this lookup.
+        /// </summary>
         public FastDictionary<string, Chord> Chords { get; set; }
+
+        /// <summary>
+        /// Gets or sets the fret on which a capo is set. s
+        /// </summary>
         public int Capo { get; set; }
 
         /// <summary>
@@ -49,6 +55,7 @@ namespace AlphaTab.Model
         /// transposed. This applies to rendering and playback.
         /// </summary>
         public int TranspositionPitch { get; set; }
+
         /// <summary>
         /// Gets or sets the number of semitones this track should be 
         /// transposed. This applies only to rendering. 
@@ -61,12 +68,25 @@ namespace AlphaTab.Model
         /// the order of the tracks shown in the tablature. The first item is the most top tablature line. 
         /// </summary>
         public int[] Tuning { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the tuning.
+        /// </summary>
         public string TuningName { get; set; }
 
-        public bool IsStringed { get { return Tuning.Length > 0; } }
+        /// <summary>
+        /// Gets a value indicating whether this staff contains string based notes.
+        /// </summary>
+        public bool IsStringed => Tuning.Length > 0;
 
+        /// <summary>
+        /// Gets or sets the staff kind. 
+        /// </summary>
         public StaffKind StaffKind { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Staff"/> class.
+        /// </summary>
         public Staff()
         {
             Bars = new FastList<Bar>();
@@ -75,7 +95,7 @@ namespace AlphaTab.Model
             StaffKind = StaffKind.Mixed;
         }
 
-        public static void CopyTo(Staff src, Staff dst)
+        internal static void CopyTo(Staff src, Staff dst)
         {
             dst.Capo = src.Capo;
             dst.Index = src.Index;
@@ -85,7 +105,7 @@ namespace AlphaTab.Model
             dst.StaffKind = src.StaffKind;
         }
 
-        public void Finish(Settings settings)
+        internal void Finish(Settings settings)
         {
             for (int i = 0, j = Bars.Count; i < j; i++)
             {
@@ -93,7 +113,7 @@ namespace AlphaTab.Model
             }
         }
 
-        public void AddBar(Bar bar)
+        internal void AddBar(Bar bar)
         {
             var bars = Bars;
             bar.Staff = this;

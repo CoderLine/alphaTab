@@ -218,7 +218,6 @@ namespace AlphaTab
             if (cssFontLoadingModuleSupported)
             {
                 Action checkFont = null;
-                var firstCheck = true;
                 checkFont = () =>
                 {
                     Browser.Document.Fonts.Load("1em alphaTab").Then(_ =>

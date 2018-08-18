@@ -343,8 +343,8 @@ namespace AlphaTab.Test.Importer
         {
             Assert.AreEqual(BrushType.BrushDown, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].BrushType);
             Assert.AreEqual(BrushType.BrushUp, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].BrushType);
-            Assert.AreEqual(PickStrokeType.Up, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].PickStroke);
-            Assert.AreEqual(PickStrokeType.Down, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].PickStroke);
+            Assert.AreEqual(PickStroke.Up, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].PickStroke);
+            Assert.AreEqual(PickStroke.Down, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].PickStroke);
         }
 
         protected void CheckTuplets(Score score)

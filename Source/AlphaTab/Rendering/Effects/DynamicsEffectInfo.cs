@@ -22,8 +22,6 @@ namespace AlphaTab.Rendering.Effects
 {
     class DynamicsEffectInfo : IEffectBarRendererInfo
     {
-        private readonly int _voice;
-        private readonly bool _primaryVoice;
         public string EffectId { get { return "dynamics"; } }
         public bool HideOnMultiTrack { get { return false; } }
         public bool CanShareBand { get { return false; } }

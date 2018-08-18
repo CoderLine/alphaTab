@@ -187,7 +187,7 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.TextAlign = TextAlign.Center;
             if (_renderPoints.Count >= 2)
             {
-                var dx = (endX - startX) / Beat.WhammyBarMaxPosition;
+                var dx = (endX - startX) / BendPoint.MaxPosition;
                 canvas.BeginPath();
 
                 var zeroY = cy + Renderer.Staff.GetSharedLayoutData(TopOffsetSharedDataKey, 0);

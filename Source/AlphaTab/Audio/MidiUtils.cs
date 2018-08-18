@@ -28,36 +28,30 @@ namespace AlphaTab.Audio
         /// </summary>
         public const int QuarterTime = 960;
 
-        /// <summary>
-        /// The default midi channel used for percussion
-        /// </summary>
-        public const int PercussionChannel = 9;
-
         private const int MinVelocity = 15;
         private const int VelocityIncrement = 16;
 
-
         /// <summary>
-        /// Converts a duration value to its ticks equivalent.
+        /// Converts the given midi tick duration into milliseconds. 
         /// </summary>
-        /// <param name="duration"></param>
-        /// <returns></returns>
+        /// <param name="ticks">The duration in midi ticks</param>
+        /// <param name="tempo">The current tempo in BPM.</param>
+        /// <returns>The converted duration in milliseconds. </returns>
         public static int TicksToMillis(int ticks, int tempo)
         {
             return (int)(ticks * (60000.0 / (tempo * QuarterTime)));
         }
 
         /// <summary>
-        /// Converts a duration value to its ticks equivalent.
+        /// Converts the given midi tick duration into milliseconds. 
         /// </summary>
-        /// <param name="duration"></param>
-        /// <returns></returns>
+        /// <param name="millis">The duration in milliseconds</param>
+        /// <param name="tempo">The current tempo in BPM.</param>
+        /// <returns>The converted duration in midi ticks. </returns>
         public static int MillisToTicks(int millis, int tempo)
         {
             return (int)(millis / (60000.0 / (tempo * QuarterTime)));
         }
-
-
 
         /// <summary>
         /// Converts a duration value to its ticks equivalent.

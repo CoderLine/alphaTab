@@ -73,7 +73,7 @@ namespace AlphaTab.Importer
             }
             catch (AlphaTexException e)
             {
-                throw new UnsupportedFormatException(e.Description);
+                throw new UnsupportedFormatException(e.Message);
             }
         }
 
@@ -88,7 +88,7 @@ namespace AlphaTab.Importer
             {
                 e = new AlphaTexException(_curChPos, nonterm, expected, expected, _syData);
             }
-            Logger.Error(Name, e.Description);
+            Logger.Error(Name, e.Message);
             throw e;
         }
 
@@ -921,13 +921,13 @@ namespace AlphaTab.Importer
             }
             if (syData == "su")
             {
-                beat.PickStroke = PickStrokeType.Up;
+                beat.PickStroke = PickStroke.Up;
                 NewSy();
                 return true;
             }
             if (syData == "sd")
             {
-                beat.PickStroke = PickStrokeType.Down;
+                beat.PickStroke = PickStroke.Down;
                 NewSy();
                 return true;
             }
@@ -1515,7 +1515,7 @@ namespace AlphaTab.Importer
                     {
                         Error("keysignature", AlphaTexSymbols.String);
                     }
-                    master.KeySignature = ParseKeySignature(_syData.ToString().ToLower());
+                    master.KeySignature = (KeySignature)ParseKeySignature(_syData.ToString().ToLower());
                 }
                 else if (syData == "clef")
                 {

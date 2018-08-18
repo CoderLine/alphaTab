@@ -122,6 +122,7 @@ namespace AlphaTab.Platform
         }
 
         private static readonly Random Rnd = new Random();
+
         public static int Random(int max)
         {
             return Rnd.Next(max);
@@ -140,8 +141,6 @@ namespace AlphaTab.Platform
         {
             return BitConverter.ToSingle(bytes, 0);
         }
-
-        public static readonly bool IsLittleEndian = BitConverter.IsLittleEndian;
 
         public static void ClearIntArray(int[] array)
         {

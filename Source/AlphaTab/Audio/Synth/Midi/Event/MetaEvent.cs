@@ -46,9 +46,9 @@ namespace AlphaTab.Audio.Synth.Midi.Event
             get { return -1; }
         }
 
-        public override MidiEventTypeEnum Command
+        public override MidiEventType Command
         {
-            get { return (MidiEventTypeEnum) (Message & 0x00000FF); }
+            get { return (MidiEventType) (Message & 0x00000FF); }
         }
 
         public int MetaStatus

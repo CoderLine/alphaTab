@@ -21,31 +21,6 @@ using AlphaTab.Collections;
 namespace AlphaTab.Model
 {
     /// <summary>
-    /// Lists all simile mark types as they are assigned to bars. 
-    /// </summary>
-    public enum SimileMark
-    {
-        /// <summary>
-        /// No simile mark is applied
-        /// </summary>
-        None,
-        /// <summary>
-        /// A simple simile mark. The previous bar is repeated. 
-        /// </summary>
-        Simple,
-        /// <summary>
-        /// A double simile mark. This value is assigned to the first
-        /// bar of the 2 repeat bars. 
-        /// </summary>
-        FirstOfDouble,
-        /// <summary>
-        /// A double simile mark. This value is assigned to the second
-        /// bar of the 2 repeat bars. 
-        /// </summary>
-        SecondOfDouble
-    }
-
-    /// <summary>
     /// A bar is a single block within a track, also known as Measure.
     /// </summary>
     public class Bar
@@ -56,51 +31,57 @@ namespace AlphaTab.Model
         /// </summary>
         private static int GlobalBarId = 0;
 
+        /// <summary>
+        /// Gets or sets the unique id of this bar. 
+        /// </summary>
         public int Id { get; set; }
+        /// <summary>
+        /// Gets or sets the zero-based index of this bar within the staff. 
+        /// </summary>
         public int Index { get; set; }
 
+        /// <summary>
+        /// Gets or sets the next bar that comes after this bar. 
+        /// </summary>
         public Bar NextBar { get; set; }
+        /// <summary>
+        /// Gets or sets the previous bar that comes before this bar. 
+        /// </summary>
         public Bar PreviousBar { get; set; }
+
+        /// <summary>
+        /// Gets or sets the clef on this bar. 
+        /// </summary>
         public Clef Clef { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ottava applied to the clef. 
+        /// </summary>
         public Ottavia ClefOttava { get; set; }
+
+        /// <summary>
+        /// Gets or sets the reference to the parent staff. 
+        /// </summary>
         public Staff Staff { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of voices contained in this bar. 
+        /// </summary>
         public FastList<Voice> Voices { get; set; }
 
+        /// <summary>
+        /// Gets or sets the simile mark on this bar. 
+        /// </summary>
         public SimileMark SimileMark { get; set; }
 
-        public Bar()
-        {
-            Id = GlobalBarId++;
-            Voices = new FastList<Voice>();
-            Clef = Clef.G2;
-            ClefOttava = Ottavia.Regular;
-            SimileMark = SimileMark.None;
-        }
+        /// <summary>
+        /// Gets the masterbar for this bar. 
+        /// </summary>
+        public MasterBar MasterBar => Staff.Track.Score.MasterBars[Index];
 
-        public static void CopyTo(Bar src, Bar dst)
-        {
-            dst.Id = src.Id;
-            dst.Index = src.Index;
-            dst.Clef = src.Clef;
-            dst.ClefOttava = src.ClefOttava;
-            dst.SimileMark = src.SimileMark;
-        }
-
-        public void AddVoice(Voice voice)
-        {
-            voice.Bar = this;
-            voice.Index = Voices.Count;
-            Voices.Add(voice);
-        }
-
-        public MasterBar MasterBar
-        {
-            get
-            {
-                return Staff.Track.Score.MasterBars[Index];
-            }
-        }
-
+        /// <summary>
+        /// Gets a value indicating whether all voices in this bar are empty and therefore the whole bar is empty. 
+        /// </summary>
         public bool IsEmpty
         {
             get
@@ -116,7 +97,35 @@ namespace AlphaTab.Model
             }
         }
 
-        public void Finish(Settings settings)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Bar"/> class.
+        /// </summary>
+        public Bar()
+        {
+            Id = GlobalBarId++;
+            Voices = new FastList<Voice>();
+            Clef = Clef.G2;
+            ClefOttava = Ottavia.Regular;
+            SimileMark = SimileMark.None;
+        }
+
+        internal static void CopyTo(Bar src, Bar dst)
+        {
+            dst.Id = src.Id;
+            dst.Index = src.Index;
+            dst.Clef = src.Clef;
+            dst.ClefOttava = src.ClefOttava;
+            dst.SimileMark = src.SimileMark;
+        }
+
+        internal void AddVoice(Voice voice)
+        {
+            voice.Bar = this;
+            voice.Index = Voices.Count;
+            Voices.Add(voice);
+        }
+
+        internal void Finish(Settings settings)
         {
             for (int i = 0, j = Voices.Count; i < j; i++)
             {

@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-
-using System;
 using AlphaTab.Collections;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Utils;
@@ -24,99 +22,6 @@ using AlphaTab.Util;
 
 namespace AlphaTab.Model
 {
-    /// <summary>
-    /// Lists the modes how accidentals are handled for notes
-    /// </summary>
-    public enum NoteAccidentalMode
-    {
-        /// <summary>
-        /// Accidentals are calculated automatically. 
-        /// </summary>
-        Default,
-        /// <summary>
-        /// If the default behavior calculates a Sharp, use flat instead (and vice versa).
-        /// </summary>
-        SwapAccidentals,
-        /// <summary>
-        /// This will move the note one line down and applies a Naturalize. 
-        /// </summary>
-        ForceNatural,
-        /// <summary>
-        /// This will move the note one line down and applies a Sharp. 
-        /// </summary>
-        ForceSharp,
-        /// <summary>
-        /// This will move the note one line up and applies a Flat. 
-        /// </summary>
-        ForceFlat,
-    }
-
-    /// <summary>
-    /// Lists the different bend styles
-    /// </summary>
-    public enum BendStyle
-    {
-        /// <summary>
-        /// The bends are as described by the bend points 
-        /// </summary>
-        Default,
-        /// <summary>
-        /// The bends are gradual over the beat duration. 
-        /// </summary>
-        Gradual,
-        /// <summary>
-        /// The bends are done fast before the next note. 
-        /// </summary>
-        Fast
-    }
-
-    /// <summary>
-    /// Lists all types of bends 
-    /// </summary>
-    public enum BendType
-    {
-        /// <summary>
-        /// No bend at all
-        /// </summary>
-        None,
-        /// <summary>
-        /// Individual points define the bends in a flexible manner. 
-        /// This system was mainly used in Guitar Pro 3-5
-        /// </summary>
-        Custom,
-        /// <summary>
-        /// Simple Bend from an unbended string to a higher note. 
-        /// </summary>
-        Bend,
-        /// <summary>
-        /// Release of a bend that was started on an earlier note.
-        /// </summary>
-        Release,
-        /// <summary>
-        /// A bend that starts from an unbended string, 
-        /// and also releases the bend after some time.
-        /// </summary>
-        BendRelease,
-        /// <summary>
-        /// Holds a bend that was started on an earlier note
-        /// </summary>
-        Hold,
-        /// <summary>
-        /// A bend that is already started before the note is played then it is held until the end. 
-        /// </summary>
-        Prebend,
-        /// <summary>
-        /// A bend that is already started before the note is played and
-        /// bends even further, then it is held until the end. 
-        /// </summary>
-        PrebendBend,
-        /// <summary>
-        /// A bend that is already started before the note is played and
-        /// then releases the bend to a lower note where it is held until the end.
-        /// </summary>
-        PrebendRelease,
-    }
-
     /// <summary>
     /// A note is a single played sound on a fretted instrument. 
     /// It consists of a fret offset and a string on which the note is played on.
@@ -130,24 +35,65 @@ namespace AlphaTab.Model
         /// </summary>
         internal static int GlobalNoteId = 0;
 
-
+        /// <summary>
+        /// Gets or sets the unique id of this note. 
+        /// </summary>
         public int Id { get; set; }
+        /// <summary>
+        /// Gets or sets the zero-based index of this note within the beat. 
+        /// </summary>
         public int Index { get; set; }
+
+        /// <summary>
+        /// Gets or sets the accentuation of this note. 
+        /// </summary>
         public AccentuationType Accentuated { get; set; }
+
+        /// <summary>
+        /// Gets or sets the bend type for this note. 
+        /// </summary>
         public BendType BendType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the bend style for this note. 
+        /// </summary>
         public BendStyle BendStyle { get; set; }
+
+        /// <summary>
+        /// Gets or sets the note from which this note continues the bend. 
+        /// </summary>
+        public Note BendOrigin { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether this note continues a bend from a previous note. 
+        /// </summary>
         public bool IsContinuedBend { get; set; }
+
+        /// <summary>
+        /// Gets or sets a list of the points defining the bend behavior. 
+        /// </summary>
         public FastList<BendPoint> BendPoints { get; set; }
+
+        /// <summary>
+        /// Gets or sets the bend point with the highest bend value. 
+        /// </summary>
         public BendPoint MaxBendPoint { get; set; }
-        public bool HasBend { get { return BendType != BendType.None; } }
+
+        /// <summary>
+        /// Gets a value indicating whether this note is bended.
+        /// </summary>
+        public bool HasBend => BendType != BendType.None;
 
         #region Stringed Instruments
 
-        public bool IsStringed
-        {
-            get { return Fret >= 0 && String >= 0; }
-        }
+        /// <summary>
+        /// Gets a value indicating whether this note is defined via a string on the instrument. . 
+        /// </summary>
+        public bool IsStringed => Fret >= 0 && String >= 0;
 
+        /// <summary>
+        /// Gets or sets the fret on which this note is played on the instrument. 
+        /// </summary>
         public int Fret { get; set; }
 
         /// <summary>
@@ -161,115 +107,219 @@ namespace AlphaTab.Model
 
         #region Piano Instruments
 
-        public bool IsPiano
-        {
-            get
-            {
-                if (IsStringed) return false;
-                return Octave >= 0 && Tone >= 0;
-            }
-        }
+        /// <summary>
+        /// Gets a value indicating whether the value of this note is defined via octave and tone. 
+        /// </summary>
+        public bool IsPiano => !IsStringed && (Octave >= 0 && Tone >= 0);
 
+        /// <summary>
+        /// Gets or sets the octave on which this note is played. 
+        /// </summary>
         public int Octave { get; set; }
+        /// <summary>
+        /// Gets or sets the tone of this note within the octave. 
+        /// </summary>
         public int Tone { get; set; }
 
         #endregion
 
         #region Percussion
 
-        public bool IsPercussion
-        {
-            get
-            {
-                if (IsStringed) return false;
-                return Element >= 0 && Variation >= 0;
-            }
-        }
-
-
+        /// <summary>
+        /// Gets a value indicating whether this note is a percussion note. 
+        /// </summary>
+        public bool IsPercussion => !IsStringed && (Element >= 0 && Variation >= 0);
+        
+        /// <summary>
+        /// Gets or sets the percusson element. 
+        /// </summary>
         public int Element { get; set; }
+
+        /// <summary>
+        /// Gets or sets the variation of this note. 
+        /// </summary>
         public int Variation { get; set; }
 
         #endregion
 
-
+        /// <summary>
+        /// Gets or sets whether this note is visible on the music sheet. 
+        /// </summary>
         public bool IsVisible { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether this note starts a hammeron or pulloff. 
+        /// </summary>
         public bool IsHammerPullOrigin { get; set; }
-        public bool IsHammerPullDestination { get { return HammerPullOrigin != null; } }
+        /// <summary>
+        /// Gets a value indicating whether this note ends a hammeron or pulloff. 
+        /// </summary>
+        public bool IsHammerPullDestination => HammerPullOrigin != null;
+
+        /// <summary>
+        /// Gets the origin of the hammeron/pulloff of this note. 
+        /// </summary>
         public Note HammerPullOrigin { get; set; }
+
+        /// <summary>
+        /// Gets the destination for the hammeron/pullof started by this note. 
+        /// </summary>
         public Note HammerPullDestination { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether this note starts a slur. 
+        /// </summary>
         public bool IsSlurOrigin { get; set; }
-        public bool IsSlurDestination { get { return SlurOrigin != null; } }
+        /// <summary>
+        /// Gets or sets whether a slur finished or continues on this note. 
+        /// </summary>
+        public bool IsSlurDestination => SlurOrigin != null;
+
+        /// <summary>
+        /// Gets or sets the origin of the slur this note contributes to. 
+        /// </summary>
         public Note SlurOrigin { get; set; }
+
+        /// <summary>
+        /// Gets or sets the destination of the slur this note contributes to. 
+        /// </summary>
         public Note SlurDestination { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether this note has an harmonic effect.
+        /// </summary>
+        public bool IsHarmonic => HarmonicType != HarmonicType.None;
 
-        public bool IsHarmonic { get { return HarmonicType != HarmonicType.None; } }
-        public float HarmonicValue { get; set; }
+        /// <summary>
+        /// Gets or sets the harmonic type applied to this note. 
+        /// </summary>
         public HarmonicType HarmonicType { get; set; }
 
+        /// <summary>
+        /// Gets or sets the value defining the harmonic pitch. 
+        /// </summary>
+        public float HarmonicValue { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the note is a ghost note and shown in parenthesis. Also this will make the note a bit more silent. 
+        /// </summary>
         public bool IsGhost { get; set; }
+        /// <summary>
+        /// Gets or sets whether this note has a let-ring effect. 
+        /// </summary>
         public bool IsLetRing { get; set; }
+        /// <summary>
+        /// Gets or sets the destination note for the let-ring effect.
+        /// </summary>
         public Note LetRingDestination { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether this note has a palm-mute effect. 
+        /// </summary>
         public bool IsPalmMute { get; set; }
+        /// <summary>
+        /// Gets or sets the destination note for the palm-mute effect. 
+        /// </summary>
         public Note PalmMuteDestination { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether the note is shown and played as dead note. 
+        /// </summary>
         public bool IsDead { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the note is played as staccato. 
+        /// </summary>
         public bool IsStaccato { get; set; }
 
+        /// <summary>
+        /// Gets or sets the slide type this note is played with. 
+        /// </summary>
         public SlideType SlideType { get; set; }
+        /// <summary>
+        /// Gets or sets the target note for several slide types. 
+        /// </summary>
         public Note SlideTarget { get; set; }
 
+        /// <summary>
+        /// Gets or sets whether a vibrato is played on the note. 
+        /// </summary>
         public VibratoType Vibrato { get; set; }
 
+        /// <summary>
+        /// Gets or sets the origin of the tied if this note is tied. 
+        /// </summary>
         public Note TieOrigin { get; set; }
+        /// <summary>
+        /// Gets or sets the desination of the tie. 
+        /// </summary>
         public Note TieDestination { get; set; }
+        /// <summary>
+        /// Gets or sets whether this note is ends a tied note. 
+        /// </summary>
         public bool IsTieDestination { get; set; }
+        /// <summary>
+        /// Gets or sets whether this note starts or continues a tied note. 
+        /// </summary>
         public bool IsTieOrigin { get; set; }
 
-        public Note BendOrigin { get; set; }
-
+        /// <summary>
+        /// Gets or sets the fingers used for this note on the left hand.
+        /// </summary>
         public Fingers LeftHandFinger { get; set; }
+        /// <summary>
+        /// Gets or sets the fingers used for this note on the right hand.
+        /// </summary>
         public Fingers RightHandFinger { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether this note has fingering defined. 
+        /// </summary>
         public bool IsFingering { get; set; }
 
+        /// <summary>
+        /// Gets or sets the target note value for the trill effect. 
+        /// </summary>
         public int TrillValue { get; set; }
-        public int TrillFret
-        {
-            get
-            {
-                return TrillValue - StringTuning;
-            }
-        }
-
-        public bool IsTrill
-        {
-            get
-            {
-                return TrillValue >= 0;
-            }
-        }
+        /// <summary>
+        /// Gets the fret for the trill. 
+        /// </summary>
+        public int TrillFret => TrillValue - StringTuning;
+        /// <summary>
+        /// Gets a value indicating whether this note has a trill effect. 
+        /// </summary>
+        public bool IsTrill => TrillValue >= 0;
+        /// <summary>
+        /// Gets or sets the speed of the trill effect. 
+        /// </summary>
         public Duration TrillSpeed { get; set; }
 
+        /// <summary>
+        /// Gets or sets the percentual duration of the note relative to the overall beat duration .
+        /// </summary>
         public double DurationPercent { get; set; }
 
+        /// <summary>
+        /// Gets or sets how accidetnals for this note should  be handled. 
+        /// </summary>
         public NoteAccidentalMode AccidentalMode { get; set; }
 
+        /// <summary>
+        /// Gets or sets the reference to the parent beat to which this note belongs to. 
+        /// </summary>
         public Beat Beat { get; set; }
+
+        /// <summary>
+        /// Gets or sets the dynamics for this note. 
+        /// </summary>
         public DynamicValue Dynamic { get; set; }
 
-        public int StringTuning
-        {
-            get
-            {
-                return Beat.Voice.Bar.Staff.Capo + GetStringTuning(Beat.Voice.Bar.Staff, String);
-            }
-        }
+        /// <summary>
+        /// Gets the base note value for the string of this note. 
+        /// </summary>
+        public int StringTuning => Beat.Voice.Bar.Staff.Capo + GetStringTuning(Beat.Voice.Bar.Staff, String);
 
-        public static int GetStringTuning(Staff staff, int noteString)
+        internal static int GetStringTuning(Staff staff, int noteString)
         {
             if (staff.Tuning.Length > 0)
                 return staff.Tuning[staff.Tuning.Length - (noteString - 1) - 1];
@@ -307,6 +357,9 @@ namespace AlphaTab.Model
             }
         }
 
+        /// <summary>
+        /// Gets or sets the harmonic pitch value for this note. 
+        /// </summary>
         public int HarmonicPitch
         {
             get
@@ -532,6 +585,9 @@ namespace AlphaTab.Model
         }
 
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Note"/> class.
+        /// </summary>
         public Note()
         {
             Id = GlobalNoteId++;
@@ -564,7 +620,7 @@ namespace AlphaTab.Model
             IsVisible = true;
         }
 
-        public static void CopyTo(Note src, Note dst)
+        internal static void CopyTo(Note src, Note dst)
         {
             dst.Id = src.Id;
             dst.Accentuated = src.Accentuated;
@@ -601,7 +657,7 @@ namespace AlphaTab.Model
             dst.IsVisible = src.IsVisible;
         }
 
-        public Note Clone()
+        internal Note Clone()
         {
             var n = new Note();
             var id = n.Id;
@@ -614,7 +670,7 @@ namespace AlphaTab.Model
             return n;
         }
 
-        public void AddBendPoint(BendPoint point)
+        internal void AddBendPoint(BendPoint point)
         {
             BendPoints.Add(point);
             if (MaxBendPoint == null || point.Value > MaxBendPoint.Value)
@@ -628,7 +684,7 @@ namespace AlphaTab.Model
             }
         }
 
-        public void Finish(Settings settings)
+        internal void Finish(Settings settings)
         {
             var nextNoteOnLine = new Util.Lazy<Note>(() => NextNoteOnSameLine(this));
             var prevNoteOnLine = new Util.Lazy<Note>(() => PreviousNoteOnSameLine(this));
@@ -867,7 +923,7 @@ namespace AlphaTab.Model
         }
 
         private const int MaxOffsetForSameLineSearch = 3;
-        public static Note NextNoteOnSameLine(Note note)
+        internal static Note NextNoteOnSameLine(Note note)
         {
             var nextBeat = note.Beat.NextBeat;
             // keep searching in same bar
@@ -887,7 +943,7 @@ namespace AlphaTab.Model
             return null;
         }
 
-        public static Note PreviousNoteOnSameLine(Note note)
+        internal static Note PreviousNoteOnSameLine(Note note)
         {
             var previousBeat = note.Beat.PreviousBeat;
 
@@ -907,6 +963,5 @@ namespace AlphaTab.Model
 
             return null;
         }
-
     }
 }

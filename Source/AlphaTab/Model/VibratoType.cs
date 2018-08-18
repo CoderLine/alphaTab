@@ -22,8 +22,17 @@ namespace AlphaTab.Model
     /// </summary>
     public enum VibratoType
     {
+        /// <summary>
+        /// No vibrato.
+        /// </summary>
         None, 
+        /// <summary>
+        /// A slight vibrato. 
+        /// </summary>
         Slight, 
+        /// <summary>
+        /// A wide vibrato.
+        /// </summary>
         Wide
     }
 }

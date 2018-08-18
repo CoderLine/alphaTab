@@ -969,7 +969,7 @@ namespace AlphaTab.Importer
                             }
                             break;
                         case "Key":
-                            masterBar.KeySignature = Platform.Platform.ParseInt(c.FindChildElement("AccidentalCount").InnerText);
+                            masterBar.KeySignature = (KeySignature)Platform.Platform.ParseInt(c.FindChildElement("AccidentalCount").InnerText);
                             var mode = c.FindChildElement("Mode");
                             if (mode != null)
                             {
@@ -1431,11 +1431,11 @@ namespace AlphaTab.Importer
                                 case "PickStroke":
                                     if (c.FindChildElement("Direction").InnerText == "Up")
                                     {
-                                        beat.PickStroke = PickStrokeType.Up;
+                                        beat.PickStroke = PickStroke.Up;
                                     }
                                     else
                                     {
-                                        beat.PickStroke = PickStrokeType.Down;
+                                        beat.PickStroke = PickStroke.Down;
                                     }
                                     break;
                                 // TODO: brush duration

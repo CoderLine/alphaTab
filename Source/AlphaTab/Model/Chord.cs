@@ -25,6 +25,9 @@ namespace AlphaTab.Model
     /// </summary>
     public class Chord
     {
+        /// <summary>
+        /// Gets or sets the name of the chord
+        /// </summary>
         public string Name { get; set; }
 
         /// <summary>
@@ -44,13 +47,16 @@ namespace AlphaTab.Model
         /// </summary>
         public FastList<int> BarreFrets { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Chord"/> class.
+        /// </summary>
         public Chord()
         {
             Strings = new FastList<int>();
             BarreFrets = new FastList<int>();
         }
 
-        public static void CopyTo(Chord src, Chord dst)
+        internal static void CopyTo(Chord src, Chord dst)
         {
             dst.FirstFret = src.FirstFret;
             dst.Name = src.Name;

@@ -51,7 +51,7 @@ namespace AlphaTab.Rendering.Utils
         /// Maps the given note to a normal note value to place the note at the 
         /// correct line on score notation
         /// </summary>
-        /// <param name="note"></param>
+        /// <param name="value"></param>
         /// <returns></returns>
         public static int MapNoteForDisplay(int value)
         {

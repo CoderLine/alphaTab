@@ -16,11 +16,9 @@
  * License along with this library.
  */
 
-using AlphaTab.Platform;
-
 namespace AlphaTab.Model
 {
-    public class TuningParseResult
+    class TuningParseResult
     {
         public string Note { get; set; }
         public int NoteValue { get; set; }
@@ -35,7 +33,7 @@ namespace AlphaTab.Model
         }
     }
 
-    public static class TuningParser
+    static class TuningParser
     {
         /// <summary>
         /// Checks if the given string is a tuning inticator.

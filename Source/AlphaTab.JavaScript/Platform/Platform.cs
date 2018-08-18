@@ -299,8 +299,6 @@ namespace AlphaTab.Platform
             }
         }
 
-        public const bool IsLittleEndian = true;
-
         public static int Random(int max)
         {
             HaxeInt m = max;

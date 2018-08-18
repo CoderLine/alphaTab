@@ -23,13 +23,28 @@ namespace AlphaTab.Model
     /// </summary>
     public class Automation
     {
+        /// <summary>
+        /// Gets or sets whether the automation is applied linear. 
+        /// </summary>
         public bool IsLinear { get; set; }
+        /// <summary>
+        /// Gets or sets the type of the automation. 
+        /// </summary>
         public AutomationType Type { get; set; }
+        /// <summary>
+        /// Gets or sets the target value of the automation. 
+        /// </summary>
         public float Value { get; set; }
+        /// <summary>
+        /// Gets or sets the relative position of of the automation. 
+        /// </summary>
         public float RatioPosition { get; set; }
+        /// <summary>
+        /// Gets or sets the additional text of the automation. s
+        /// </summary>
         public string Text { get; set; }
 
-        public static Automation BuildTempoAutomation(bool isLinear, float ratioPosition, float value, int reference)
+        internal static Automation BuildTempoAutomation(bool isLinear, float ratioPosition, float value, int reference)
         {
             if (reference < 1 || reference > 5) reference = 2;
 
@@ -42,7 +57,7 @@ namespace AlphaTab.Model
             return automation;
         }
 
-        public static void CopyTo(Automation src, Automation dst)
+        internal static void CopyTo(Automation src, Automation dst)
         {
             dst.IsLinear = src.IsLinear;
             dst.RatioPosition = src.RatioPosition;
@@ -51,7 +66,7 @@ namespace AlphaTab.Model
             dst.Value = src.Value;
         }
 
-        public Automation Clone()
+        internal Automation Clone()
         {
             var a = new Automation();
             CopyTo(this, a);

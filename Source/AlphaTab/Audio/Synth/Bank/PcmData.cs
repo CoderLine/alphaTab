@@ -36,7 +36,7 @@ namespace AlphaTab.Audio.Synth.Bank
             //    throw new Exception("Invalid PCM format. The PCM data was an invalid size.");
             Data = pcmData;
             Length = Data.Length / BytesPerSample;
-            if (Platform.Platform.IsLittleEndian != isDataInLittleEndianFormat)
+            if (!isDataInLittleEndianFormat)
             {
                 SynthHelper.SwapEndianess(Data, bits);
             }

@@ -36,12 +36,30 @@
         }
     }
 
+    /// <summary>
+    /// Defines all loglevels. 
+    /// </summary>
     public enum LogLevel
     {
+        /// <summary>
+        /// No logging
+        /// </summary>
         None = 0,
+        /// <summary>
+        /// Debug level (internal details are displayed).
+        /// </summary>
         Debug = 1,
+        /// <summary>
+        /// Info level (only important details are shown)
+        /// </summary>
         Info = 2,
+        /// <summary>
+        /// Warning level
+        /// </summary>
         Warning = 3,
+        /// <summary>
+        /// Error level.
+        /// </summary>
         Error = 4
     }
 }

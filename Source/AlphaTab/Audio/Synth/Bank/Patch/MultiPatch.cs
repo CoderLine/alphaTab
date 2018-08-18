@@ -109,20 +109,11 @@ namespace AlphaTab.Audio.Synth.Bank.Patch
                 byte hiKey;
                 byte loVel;
                 byte hiVel;
-                if (Platform.Platform.IsLittleEndian)
-                {
-                    loKey = Platform.Platform.ToUInt8(regions[x].Generators[(int)GeneratorEnum.KeyRange] & 0xFF);
-                    hiKey = Platform.Platform.ToUInt8((regions[x].Generators[(int)GeneratorEnum.KeyRange] >> 8) & 0xFF);
-                    loVel = Platform.Platform.ToUInt8(regions[x].Generators[(int)GeneratorEnum.VelocityRange] & 0xFF);
-                    hiVel = Platform.Platform.ToUInt8((regions[x].Generators[(int)GeneratorEnum.VelocityRange] >> 8) & 0xFF);
-                }
-                else
-                {
-                    hiKey = Platform.Platform.ToUInt8(regions[x].Generators[(int)GeneratorEnum.KeyRange] & 0xFF);
-                    loKey = Platform.Platform.ToUInt8((regions[x].Generators[(int)GeneratorEnum.KeyRange] >> 8) & 0xFF);
-                    hiVel = Platform.Platform.ToUInt8(regions[x].Generators[(int)GeneratorEnum.VelocityRange] & 0xFF);
-                    loVel = Platform.Platform.ToUInt8((regions[x].Generators[(int)GeneratorEnum.VelocityRange] >> 8) & 0xFF);
-                }
+                loKey = Platform.Platform.ToUInt8(regions[x].Generators[(int)GeneratorEnum.KeyRange] & 0xFF);
+                hiKey = Platform.Platform.ToUInt8((regions[x].Generators[(int)GeneratorEnum.KeyRange] >> 8) & 0xFF);
+                loVel = Platform.Platform.ToUInt8(regions[x].Generators[(int)GeneratorEnum.VelocityRange] & 0xFF);
+                hiVel = Platform.Platform.ToUInt8((regions[x].Generators[(int)GeneratorEnum.VelocityRange] >> 8) & 0xFF);
+
                 var sf2 = new Sf2Patch(Name + "_" + x);
                 sf2.Load(regions[x], assets);
                 _intervalList[x] = new PatchInterval(sf2, 0, 15, loKey, hiKey, loVel, hiVel);

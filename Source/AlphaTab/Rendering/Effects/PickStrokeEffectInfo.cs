@@ -29,7 +29,7 @@ namespace AlphaTab.Rendering.Effects
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
-            return beat.PickStroke != PickStrokeType.None;
+            return beat.PickStroke != PickStroke.None;
         }
 
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)

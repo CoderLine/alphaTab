@@ -722,8 +722,8 @@ namespace AlphaTab.Rendering
         private void CreateKeySignatureGlyphs()
         {
             int offsetClef = 0;
-            int currentKey = Bar.MasterBar.KeySignature;
-            int previousKey = Bar.PreviousBar == null ? 0 : Bar.PreviousBar.MasterBar.KeySignature;
+            int currentKey = (int)Bar.MasterBar.KeySignature;
+            int previousKey = Bar.PreviousBar == null ? 0 : (int)Bar.PreviousBar.MasterBar.KeySignature;
 
             switch (Bar.Clef)
             {

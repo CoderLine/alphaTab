@@ -191,19 +191,19 @@ namespace AlphaTab.Audio.Synth
                 synthData.Time = absTime;
                 previousTick = mEvent.Tick;
 
-                if (mEvent.Command == MidiEventTypeEnum.Meta && mEvent.Data1 == (int)MetaEventTypeEnum.Tempo)
+                if (mEvent.Command == MidiEventType.Meta && mEvent.Data1 == (int)MetaEventTypeEnum.Tempo)
                 {
                     var meta = (MetaNumberEvent)mEvent;
                     bpm = MidiHelper.MicroSecondsPerMinute / (double)meta.Value;
                     _tempoChanges.Add(new MidiFileSequencerTempoChange(bpm, absTick, (int)(absTime)));
                 }
-                else if (mEvent.Command == MidiEventTypeEnum.Meta && mEvent.Data1 == (int)MetaEventTypeEnum.TimeSignature)
+                else if (mEvent.Command == MidiEventType.Meta && mEvent.Data1 == (int)MetaEventTypeEnum.TimeSignature)
                 {
                     var meta = (MetaDataEvent)mEvent;
                     var timeSignatureDenominator = (int)Math.Pow(2, meta.Data[1]);
                     metronomeLength = (int)(_division * (4.0 / timeSignatureDenominator));
                 }
-                else if (mEvent.Command == MidiEventTypeEnum.ProgramChange)
+                else if (mEvent.Command == MidiEventType.ProgramChange)
                 {
                     var channel = mEvent.Channel;
                     if (!_firstProgramEventPerChannel.ContainsKey(channel))

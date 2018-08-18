@@ -52,11 +52,6 @@ namespace AlphaTab.Model
                     masterBar2.TempoAutomation = Platform.Platform.NewObject();
                     Automation.CopyTo(masterBar.TempoAutomation, masterBar2.TempoAutomation);
                 }
-                if (masterBar.VolumeAutomation != null)
-                {
-                    masterBar2.VolumeAutomation = Platform.Platform.NewObject();
-                    Automation.CopyTo(masterBar.VolumeAutomation, masterBar2.VolumeAutomation);
-                }
                 if (masterBar.Section != null)
                 {
                     masterBar2.Section = Platform.Platform.NewObject();
@@ -217,11 +212,6 @@ namespace AlphaTab.Model
                     masterBar2.TempoAutomation = new Automation();
                     Automation.CopyTo(masterBar.TempoAutomation, masterBar2.TempoAutomation);
                 }
-                if (masterBar.VolumeAutomation != null)
-                {
-                    masterBar2.VolumeAutomation = new Automation();
-                    Automation.CopyTo(masterBar.VolumeAutomation, masterBar2.VolumeAutomation);
-                }
                 if (masterBar.Section != null)
                 {
                     masterBar2.Section = new Section();
@@ -353,8 +343,6 @@ namespace AlphaTab.Model
         {
             var midi2 = new MidiFile();
             midi2.Division = midi.Division;
-            midi2.TimingStandard = midi.TimingStandard;
-            midi2.TrackFormat = midi.TrackFormat;
 
             FastList<dynamic> midiEvents = midi.Events;
             foreach (var midiEvent in midiEvents)
@@ -391,8 +379,6 @@ namespace AlphaTab.Model
         {
             var midi2 = Platform.Platform.NewObject();
             midi2.Division = midi.Division;
-            midi2.TimingStandard = midi.TimingStandard;
-            midi2.TrackFormat = midi.TrackFormat;
             var midiEvents = new FastList<object>();
             midi2.Events = midiEvents;
             foreach (var midiEvent in midi.Events)

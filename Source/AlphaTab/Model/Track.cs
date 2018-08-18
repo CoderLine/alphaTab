@@ -29,15 +29,45 @@ namespace AlphaTab.Model
     {
         private const int ShortNameMaxLength = 10;
 
+        /// <summary>
+        /// Gets or sets the zero-based index of this track. 
+        /// </summary>
         public int Index { get; set; }
+
+        /// <summary>
+        /// Gets or sets the reference this track belongs to. 
+        /// </summary>
         public Score Score { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of staffs that are defined for this track. 
+        /// </summary>
         public FastList<Staff> Staves { get; set; }
+
+        /// <summary>
+        /// Gets or sets the playback information for this track. 
+        /// </summary>
         public PlaybackInformation PlaybackInfo { get; set; }
+
+        /// <summary>
+        /// Gets or sets the display color defined for this track. 
+        /// </summary>
         public Color Color { get; set; }
 
+        /// <summary>
+        /// Gets or sets the long name of this track. 
+        /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the short name of this track. 
+        /// </summary>
         public string ShortName { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Track"/> class.
+        /// </summary>
+        /// <param name="staveCount">The stave count.</param>
         public Track(int staveCount)
         {
             Staves = new FastList<Staff>();
@@ -48,7 +78,7 @@ namespace AlphaTab.Model
             Color = new Color(200, 0, 0);
         }
 
-        public void EnsureStaveCount(int staveCount)
+        internal void EnsureStaveCount(int staveCount)
         {
             while (Staves.Count < staveCount)
             {
@@ -56,15 +86,14 @@ namespace AlphaTab.Model
             }
         }
 
-
-        public void AddStaff(Staff staff)
+        internal void AddStaff(Staff staff)
         {
             staff.Index = Staves.Count;
             staff.Track = this;
             Staves.Add(staff);
         }
 
-        public static void CopyTo(Track src, Track dst)
+        internal static void CopyTo(Track src, Track dst)
         {
             dst.Name = src.Name;
             dst.ShortName = src.ShortName;
@@ -73,7 +102,7 @@ namespace AlphaTab.Model
             dst.Color.RGBA = src.Color.RGBA;
         }
 
-        public void Finish(Settings settings)
+        internal void Finish(Settings settings)
         {
             if (string.IsNullOrEmpty(ShortName))
             {
@@ -88,7 +117,7 @@ namespace AlphaTab.Model
             }
         }
 
-        public void ApplyLyrics(FastList<Lyrics> lyrics)
+        internal void ApplyLyrics(FastList<Lyrics> lyrics)
         {
             foreach (var lyric in lyrics)
             {

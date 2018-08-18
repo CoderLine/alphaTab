@@ -50,6 +50,9 @@ namespace AlphaTab.Model
         /// </summary>
         public bool IsClosed { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RepeatGroup"/> class.
+        /// </summary>
         public RepeatGroup()
         {
             MasterBars = new FastList<MasterBar>();
@@ -58,7 +61,7 @@ namespace AlphaTab.Model
             IsClosed = false;
         }
 
-        public void AddMasterBar(MasterBar masterBar)
+        internal void AddMasterBar(MasterBar masterBar)
         {
             if (Openings.Count == 0)
             {

@@ -20,6 +20,9 @@ using AlphaTab.Collections;
 
 namespace AlphaTab.Model
 {
+    /// <summary>
+    /// Represents the lyrics of a song. 
+    /// </summary>
     public class Lyrics
     {
         private const int CharCodeLF = '\n';
@@ -30,11 +33,22 @@ namespace AlphaTab.Model
         private const int CharCodeBrackedOpen = '[';
         private const int CharCodeDash = '-';
 
+        /// <summary>
+        /// Gets or sets he start bar on which the lyrics should begin. 
+        /// </summary>
         public int StartBar { get; set; }
+        /// <summary>
+        /// Gets or sets the raw lyrics text in Guitar Pro format.
+        /// (spaces split word syllables, plus merge syllables, [..] are comments) 
+        /// </summary>
         public string Text { get; set; }
+
+        /// <summary>
+        /// Gets or sets the prepared chunks of the lyrics to apply to beats. 
+        /// </summary>
         public string[] Chunks { get; set; }
 
-        public void Finish()
+        internal void Finish()
         {
             var chunks = new FastList<string>();
             Parse(Text, 0, chunks);
@@ -44,8 +58,8 @@ namespace AlphaTab.Model
         private void Parse(string str, int p, FastList<string> chunks)
         {
             if (string.IsNullOrEmpty(str)) return;
-            var state = LyricsState.BEGIN;
-            var next = LyricsState.BEGIN;
+            var state = LyricsState.Begin;
+            var next = LyricsState.Begin;
             var skipSpace = false;
             var start = 0;
 
@@ -54,7 +68,7 @@ namespace AlphaTab.Model
                 int c = str[p];
                 switch (state)
                 {
-                    case LyricsState.IGNORE_SPACES:
+                    case LyricsState.IgnoreSpaces:
                         switch (c)
                         {
                             case CharCodeLF:
@@ -74,32 +88,32 @@ namespace AlphaTab.Model
                                 continue;
                         }
                         break;
-                    case LyricsState.BEGIN:
+                    case LyricsState.Begin:
                         switch (c)
                         {
                             case CharCodeBrackedOpen:
-                                state = LyricsState.COMMENT;
+                                state = LyricsState.Comment;
                                 break;
                             default:
                                 start = p;
-                                state = LyricsState.TEXT;
+                                state = LyricsState.Text;
                                 continue;
                         }
                         break;
-                    case LyricsState.COMMENT:
+                    case LyricsState.Comment:
                         switch (c)
                         {
                             case CharCodeBrackedClose:
-                                state = LyricsState.BEGIN;
+                                state = LyricsState.Begin;
                                 break;
                         }
                         break;
 
-                    case LyricsState.TEXT:
+                    case LyricsState.Text:
                         switch (c)
                         {
                             case CharCodeDash:
-                                state = LyricsState.DASH;
+                                state = LyricsState.Dash;
                                 break;
                             case CharCodeCR:
                             case CharCodeLF:
@@ -107,13 +121,13 @@ namespace AlphaTab.Model
                                 var txt = str.Substring(start, p - start);
                                 chunks.Add(PrepareChunk(txt));
 
-                                state = LyricsState.IGNORE_SPACES;
-                                next = LyricsState.BEGIN;
+                                state = LyricsState.IgnoreSpaces;
+                                next = LyricsState.Begin;
                                 break;
                         }
                         break;
 
-                    case LyricsState.DASH:
+                    case LyricsState.Dash:
                         switch (c)
                         {
                             case CharCodeDash:
@@ -123,8 +137,8 @@ namespace AlphaTab.Model
                                 chunks.Add(PrepareChunk(txt));
 
                                 skipSpace = true;
-                                state = LyricsState.IGNORE_SPACES;
-                                next = LyricsState.BEGIN;
+                                state = LyricsState.IgnoreSpaces;
+                                next = LyricsState.Begin;
                                 continue;
                         }
                         break;
@@ -133,7 +147,7 @@ namespace AlphaTab.Model
                 p++;
             }
 
-            if (state == LyricsState.TEXT)
+            if (state == LyricsState.Text)
             {
                 if (p != start)
                 {
@@ -147,13 +161,13 @@ namespace AlphaTab.Model
             return txt.Replace("+", " ");
         }
 
-        class LyricsState
+        enum LyricsState
         {
-            public const int IGNORE_SPACES = 0;
-            public const int BEGIN = 1;
-            public const int TEXT = 2;
-            public const int COMMENT = 3;
-            public const int DASH = 4;
+            IgnoreSpaces,
+            Begin,
+            Text,
+            Comment,
+            Dash
         }
     }
 }

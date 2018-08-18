@@ -349,11 +349,11 @@ namespace AlphaTab.Platform.JavaScript
                     break;
                 case AlphaSynthWebWorker.CmdMidiLoaded:
                     CheckReadyForPlayback();
-                    TriggerEvent("midiFileLoaded");
+                    TriggerEvent("midiFileLoaded", new object[] { data.error });
                     break;
                 case AlphaSynthWebWorker.CmdMidiLoadFailed:
                     CheckReadyForPlayback();
-                    TriggerEvent("midiFileLoadFailed");
+                    TriggerEvent("midiFileLoadFailed", new object[] { data.error });
                     break;
                 case AlphaSynthWebWorker.CmdLog:
                     Logger.Log(data.level, "AlphaSynth", data.message);

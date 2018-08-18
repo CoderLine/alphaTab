@@ -1,9 +1,10 @@
-﻿using System;
-using AlphaTab.Audio.Synth.Midi;
-using AlphaTab.Audio.Synth.Synthesis;
+﻿using AlphaTab.Audio.Synth.Synthesis;
 
 namespace AlphaTab.Audio.Synth
 {
+    /// <summary>
+    /// The public API interface for interacting with the synthesizer.
+    /// </summary>
     public interface IAlphaSynth
     {
         /// <summary>

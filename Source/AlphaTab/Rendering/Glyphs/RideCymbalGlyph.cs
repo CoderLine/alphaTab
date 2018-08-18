@@ -22,7 +22,7 @@ namespace AlphaTab.Rendering.Glyphs
         private readonly bool _isGrace;
 
         public RideCymbalGlyph(float x, float y, bool isGrace)
-            : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, MusicFontSymbol.NoteRideCymbal)
+            : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, MusicFontSymbol.NoteHarmonicWhole)
         {
             _isGrace = isGrace;
         }

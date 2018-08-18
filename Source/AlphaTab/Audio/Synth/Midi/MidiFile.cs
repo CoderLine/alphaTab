@@ -22,21 +22,34 @@ using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Synth.Midi
 {
+    /// <summary>
+    /// Represents a midi file with a single track that can be played via <see cref="AlphaSynth"/>
+    /// </summary>
     public class MidiFile
     {
+        /// <summary>
+        /// Gets or sets the division per quarter notes. 
+        /// </summary>
         public int Division { get; set; }
-        public MidiTrackFormat TrackFormat { get; set; }
-        public MidiTimeFormat TimingStandard { get; set; }
-        public FastList<MidiEvent> Events { get; private set; }
 
+        /// <summary>
+        /// Gets a list of midi events sorted by time. 
+        /// </summary>
+        public FastList<MidiEvent> Events { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MidiFile"/> class.
+        /// </summary>
         public MidiFile()
         {
             Division = MidiUtils.QuarterTime;
-            TrackFormat = MidiTrackFormat.SingleTrack;
-            TimingStandard = MidiTimeFormat.TicksPerBeat;
             Events = new FastList<MidiEvent>();
         }
 
+        /// <summary>
+        /// Adds the given midi event a the correct time position into the file. 
+        /// </summary>
+        /// <param name="e"></param>
         public void AddEvent(MidiEvent e)
         {
             if (Events.Count == 0)
@@ -62,6 +75,11 @@ namespace AlphaTab.Audio.Synth.Midi
             }
         }
 
+        /// <summary>
+        /// Writes the midi file into a binary format. 
+        /// </summary>
+        /// <returns>The binary midi file.</returns>
+        // ReSharper disable once UnusedMember.Global
         public byte[] ToBinary()
         {
             var data = ByteBuffer.Empty();
@@ -69,6 +87,10 @@ namespace AlphaTab.Audio.Synth.Midi
             return data.ToArray();
         }
 
+        /// <summary>
+        /// Writes the midi file as binary into the given stream.
+        /// </summary>
+        /// <returns>The stream to write to.</returns>
         public void WriteTo(IWriteable s)
         {
             // magic number "MThd" (0x4D546864)
@@ -120,7 +142,7 @@ namespace AlphaTab.Audio.Synth.Midi
             s.Write(data, 0, data.Length);
         }
 
-        public static void WriteVariableInt(IWriteable s, int value)
+        internal static void WriteVariableInt(IWriteable s, int value)
         {
             var array = new byte[4];
 
@@ -140,18 +162,5 @@ namespace AlphaTab.Audio.Synth.Midi
                     s.WriteByte(array[n]);
             }
         }
-    }
-
-    public enum MidiTrackFormat
-    {
-        SingleTrack = 0,
-        MultiTrack = 1,
-        MultiSong = 2
-    }
-
-    public enum MidiTimeFormat
-    {
-        TicksPerBeat = 0,
-        FramesPerSecond = 1
     }
 }

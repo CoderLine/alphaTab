@@ -27,23 +27,26 @@ namespace AlphaTab.Importer
         public object SymbolData { get; set; }
 
         public AlphaTexException(int position, string nonTerm, AlphaTexSymbols expected, AlphaTexSymbols symbol, object symbolData = null)
-            : base("")
+            : base(BuildMessage(position, nonTerm, expected, symbol, symbolData))
         {
             Position = position;
             NonTerm = nonTerm;
             Expected = expected;
             Symbol = symbol;
             SymbolData = symbolData;
+        }
 
-            if (SymbolData == null)
+        private static string BuildMessage(int position, string nonTerm, AlphaTexSymbols expected, AlphaTexSymbols symbol, object symbolData)
+        {
+            if (symbolData == null)
             {
-                Description = "MalFormed AlphaTex: @" + Position + ": Error on block " + NonTerm +
-                              ", expected a " + Expected + " found a " + Symbol;
+                return "MalFormed AlphaTex: @" + position + ": Error on block " + nonTerm +
+                              ", expected a " + expected + " found a " + symbol;
             }
             else
             {
-                Description =  "MalFormed AlphaTex: @" + Position + ": Error on block " + NonTerm +
-                       ", invalid value: " + SymbolData;
+                return "MalFormed AlphaTex: @" + position + ": Error on block " + nonTerm +
+                              ", invalid value: " + symbolData;
             }
         }
     }

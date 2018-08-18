@@ -59,23 +59,12 @@ namespace AlphaTab.Audio.Synth.Synthesis
 
         private void UpdateCombined()
         {
-            if (Platform.Platform.IsLittleEndian)
-                _combined = (short)((_coarseValue << 7) | _fineValue);
-            else
-                _combined = (short)((_fineValue << 7) | _coarseValue);
+            _combined = (short)((_coarseValue << 7) | _fineValue);
         }
         private void UpdateCoarseFinePair()
         {
-            if (Platform.Platform.IsLittleEndian)
-            {
-                _coarseValue = (byte)(_combined >> 7);
-                _fineValue = (byte)(_combined & 0x7F);
-            }
-            else
-            {
-                _fineValue = (byte)(_combined >> 7);
-                _coarseValue = (byte)(_combined & 0x7F);
-            }
+            _coarseValue = (byte)(_combined >> 7);
+            _fineValue = (byte)(_combined & 0x7F);
         }
     }
 }

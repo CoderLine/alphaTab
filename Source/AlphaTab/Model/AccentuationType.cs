@@ -22,6 +22,17 @@ namespace AlphaTab.Model
     /// </summary>
     public enum AccentuationType
     {
-        None, Normal, Heavy
+        /// <summary>
+        /// No accentuation
+        /// </summary>
+        None,
+        /// <summary>
+        /// Normal accentuation 
+        /// </summary>
+        Normal,
+        /// <summary>
+        /// Heavy accentuation
+        /// </summary>
+        Heavy
     }
 }

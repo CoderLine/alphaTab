@@ -22,7 +22,7 @@ namespace AlphaTab.Rendering.Glyphs
 {
     class PickStrokeGlyph : MusicFontGlyph
     {
-        public PickStrokeGlyph(float x, float y, PickStrokeType pickStroke)
+        public PickStrokeGlyph(float x, float y, PickStroke pickStroke)
             : base(x, y, 0.75f, GetSymbol(pickStroke))
         {
         }
@@ -38,12 +38,12 @@ namespace AlphaTab.Rendering.Glyphs
             base.Paint(cx, cy + Height, canvas);
         }
 
-        private static MusicFontSymbol GetSymbol(PickStrokeType pickStroke)
+        private static MusicFontSymbol GetSymbol(PickStroke pickStroke)
         {
             switch (pickStroke)
             {
-                case PickStrokeType.Up: return MusicFontSymbol.PickStrokeUp;
-                case PickStrokeType.Down: return MusicFontSymbol.PickStrokeDown;
+                case PickStroke.Up: return MusicFontSymbol.PickStrokeUp;
+                case PickStroke.Down: return MusicFontSymbol.PickStrokeDown;
                 default: return MusicFontSymbol.None;
             }
         }

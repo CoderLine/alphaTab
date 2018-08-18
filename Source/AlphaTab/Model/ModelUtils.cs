@@ -17,14 +17,13 @@
  */
 
 using AlphaTab.Audio;
-using AlphaTab.Platform;
 
 namespace AlphaTab.Model
 {
     /// <summary>
     /// This public class contains some utilities for working with model public classes
     /// </summary>
-    public static class ModelUtils
+    static class ModelUtils
     {
         public static int GetIndex(this Duration duration)
         {
@@ -38,7 +37,6 @@ namespace AlphaTab.Model
             return (int)Platform.Platform.Log2((int)duration);
         }
 
-        // TODO: Externalize this into some model public class
         public static bool KeySignatureIsFlat(int ks)
         {
             return ks < 0;

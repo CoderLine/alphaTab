@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-
-using AlphaTab.Collections;
 using AlphaTab.IO;
 using AlphaTab.Model;
 
@@ -28,7 +26,13 @@ namespace AlphaTab.Importer
     /// </summary>
     public abstract class ScoreImporter
     {
+        /// <summary>
+        /// The raw data to read from. 
+        /// </summary>
         protected IReadable Data;
+        /// <summary>
+        /// The settings to use during the import. 
+        /// </summary>
         protected Settings Settings;
 
         /**
@@ -47,12 +51,23 @@ namespace AlphaTab.Importer
             };
         }
 
-        public virtual void Init(IReadable data, Settings settings = null)
+        /// <summary>
+        /// Initializes the importer with the given data and settings. 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="settings"></param>
+        public void Init(IReadable data, Settings settings = null)
         {
             Data = data;
             Settings = settings;
         }
 
+        /// <summary>
+        /// Gets the importer specific setting using the specified key. 
+        /// </summary>
+        /// <param name="key">The key of the setting to load the value for.</param>
+        /// <param name="defaultValue">The default value to load if no setting was specified. </param>
+        /// <returns>The importer setting specified by the user, or the given defaultValue if the key was not contained.</returns>
         protected T GetSetting<T>(string key, T defaultValue = default(T))
         {
             key = key.ToLower();
@@ -64,7 +79,15 @@ namespace AlphaTab.Importer
             return (T)Settings.ImporterSettings[key];
         }
 
+        /// <summary>
+        /// Get the human readable name of the importer. 
+        /// </summary>
         public abstract string Name { get; }
+
+        /// <summary>
+        /// Reads the <see cref="Score"/> contained in the data. 
+        /// </summary>
+        /// <returns>The score that was contained in the data. </returns>
         public abstract Score ReadScore();
     }
 }

@@ -22,8 +22,6 @@ namespace AlphaTab.Audio.Synth.Util
 {
     static class SynthConstants
     {
-        public const Interpolation InterpolationMode = Interpolation.Linear;
-
         public const int AudioChannels = 2;
 
         public const double Pi = 3.14159265358979;

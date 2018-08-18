@@ -15,46 +15,47 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-using System;
+
 using AlphaTab.Collections;
 
 namespace AlphaTab.Platform.Model
 {
-    [Flags]
-    public enum FontStyle
-    {
-        Plain = 0,
-        Bold = 1,
-        Italic = 2
-    }
-
     /// <summary>
     /// This container public class can store the definition for a font and it's style.
     /// </summary>
     public class Font
     {
-        private string _css;
+        private readonly string _css;
 
+        /// <summary>
+        /// Gets or sets the font family name. 
+        /// </summary>
         public string Family { get; set; }
+        /// <summary>
+        /// Gets or sets the font size in pixels. 
+        /// </summary>
         public float Size { get; set; }
+        /// <summary>
+        /// Gets or sets the font style. 
+        /// </summary>
         public FontStyle Style { get; set; }
 
-        public bool IsBold
-        {
-            get
-            {
-                return (Style & FontStyle.Bold) != 0;
-            }
-        }
+        /// <summary>
+        /// Gets a value indicating whether the font is bold. 
+        /// </summary>
+        public bool IsBold => (Style & FontStyle.Bold) != 0;
 
-        public bool IsItalic
-        {
-            get
-            {
-                return (Style & FontStyle.Italic) != 0;
-            }
-        }
+        /// <summary>
+        /// Gets a value indicating whether the font is italic. 
+        /// </summary>
+        public bool IsItalic => (Style & FontStyle.Italic) != 0;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Font"/> class.
+        /// </summary>
+        /// <param name="family">The family.</param>
+        /// <param name="size">The size.</param>
+        /// <param name="style">The style.</param>
         public Font(string family, float size, FontStyle style = FontStyle.Plain)
         {
             Family = family;
@@ -63,12 +64,12 @@ namespace AlphaTab.Platform.Model
             _css = ToCssString();
         }
 
-        public Font Clone()
+        internal Font Clone()
         {
             return new Font(Family, Size, Style);
         }
 
-        public string ToCssString(float scale = 1)
+        internal string ToCssString(float scale = 1)
         {
             if (_css != null && scale == 1)
             {

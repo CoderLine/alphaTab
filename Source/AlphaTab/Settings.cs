@@ -199,6 +199,9 @@ namespace AlphaTab
         /// </summary>
         public int SongBookBendDuration { get; set; }
 
+        /// <summary>
+        /// Gets the default settings for the songbook display mode. 
+        /// </summary>
         public static Settings SongBook
         {
             get
@@ -220,6 +223,9 @@ namespace AlphaTab
             ShowZeroOnDiveWhammy = true;
         }
 
+        /// <summary>
+        /// Gets the default settings.
+        /// </summary>
         public static Settings Defaults
         {
             get
@@ -269,21 +275,51 @@ namespace AlphaTab
         }
     }
 
+    /// <summary>
+    /// This object defines the details on how to generate the vibrato effects. 
+    /// </summary>
     public class VibratoPlaybackSettings
     {
+        /// <summary>
+        /// Gets or sets the wavelength of the note-wide vibrato in midi ticks. 
+        /// </summary>
         public int NoteWideLength { get; set; }
+        /// <summary>
+        /// Gets or sets the amplitude for the note-wide vibrato in semitones. 
+        /// </summary>
         public int NoteWideAmplitude { get; set; }
 
+        /// <summary>
+        /// Gets or sets the wavelength of the note-slight vibrato in midi ticks. 
+        /// </summary>
         public int NoteSlightLength { get; set; }
+        /// <summary>
+        /// Gets or sets the amplitude for the note-slight vibrato in semitones. 
+        /// </summary>
         public int NoteSlightAmplitude { get; set; }
 
+        /// <summary>
+        /// Gets or sets the wavelength of the beat-wide vibrato in midi ticks. 
+        /// </summary>
         public int BeatWideLength { get; set; }
+        /// <summary>
+        /// Gets or sets the amplitude for the beat-wide vibrato in semitones. 
+        /// </summary>
         public int BeatWideAmplitude { get; set; }
 
+        /// <summary>
+        /// Gets or sets the wavelength of the beat-slight vibrato in midi ticks. 
+        /// </summary>
         public int BeatSlightLength { get; set; }
+        /// <summary>
+        /// Gets or sets the amplitude for the beat-slight vibrato in semitones. 
+        /// </summary>
         public int BeatSlightAmplitude { get; set; }
     }
 
+    /// <summary>
+    /// Represents the layout specific settings. 
+    /// </summary>
     public class LayoutSettings
     {
         /// <summary>
@@ -315,7 +351,7 @@ namespace AlphaTab
         /// </summary>
         public FastDictionary<string, object> AdditionalSettings { get; set; }
 
-        public T Get<T>(string key, T def)
+        internal T Get<T>(string key, T def)
         {
             if (AdditionalSettings.ContainsKey(key.ToLower()))
             {
@@ -324,12 +360,15 @@ namespace AlphaTab
             return def;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LayoutSettings"/> class.
+        /// </summary>
         public LayoutSettings()
         {
             AdditionalSettings = new FastDictionary<string, object>();
         }
 
-        public static LayoutSettings Defaults
+        internal static LayoutSettings Defaults
         {
             get
             {
@@ -340,6 +379,9 @@ namespace AlphaTab
         }
     }
 
+    /// <summary>
+    /// Represents the stave specific settings. 
+    /// </summary>
     public class StaveSettings
     {
         /// <summary>

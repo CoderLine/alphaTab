@@ -2,6 +2,7 @@
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Audio.Synth.Synthesis;
+using AlphaTab.Haxe;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Model;
@@ -203,12 +204,33 @@ namespace AlphaTab.Platform.JavaScript
             });
         }
 
-        public void OnSoundFontLoadFailed()
+        public void OnSoundFontLoadFailed(Exception e)
         {
             _main.PostMessage(new
             {
-                cmd = CmdSoundFontLoadFailed
+                cmd = CmdSoundFontLoadFailed,
+                error = SerializeException(e)
             });
+        }
+
+        private object SerializeException(Exception e)
+        {
+            dynamic error = Json.Parse(Json.Stringify(e));
+            dynamic e2 = e;
+            if (e2.message)
+            {
+                error.message = e2.message;
+            }
+            if (e2.stack)
+            {
+                error.stack = e2.stack;
+            }
+            if (e2.constructor && e2.constructor.name)
+            {
+                error.type = e2.constructor.name;
+            }
+
+            return error;
         }
 
         public void OnMidiLoaded()
@@ -219,11 +241,12 @@ namespace AlphaTab.Platform.JavaScript
             });
         }
 
-        public void OnMidiLoadFailed()
+        public void OnMidiLoadFailed(Exception e)
         {
             _main.PostMessage(new
             {
-                cmd = CmdMidiLoaded
+                cmd = CmdMidiLoaded,
+                error = SerializeException(e)
             });
         }
 

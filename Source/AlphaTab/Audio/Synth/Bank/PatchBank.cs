@@ -141,42 +141,19 @@ namespace AlphaTab.Audio.Synth.Bank
 
                     if (p.Zones[i].Generators[0].GeneratorType == GeneratorEnum.KeyRange)
                     {
-                        if (Platform.Platform.IsLittleEndian)
-                        {
-                            presetLoKey = Platform.Platform.ToUInt8(p.Zones[i].Generators[0].AmountInt16 & 0xFF);
-                            presetHiKey = Platform.Platform.ToUInt8((p.Zones[i].Generators[0].AmountInt16 >> 8) & 0xFF);
-                        }
-                        else
-                        {
-                            presetHiKey = Platform.Platform.ToUInt8(p.Zones[i].Generators[0].AmountInt16 & 0xFF);
-                            presetLoKey = Platform.Platform.ToUInt8((p.Zones[i].Generators[0].AmountInt16 >> 8) & 0xFF);
-                        }
+                        presetLoKey = Platform.Platform.ToUInt8(p.Zones[i].Generators[0].AmountInt16 & 0xFF);
+                        presetHiKey = Platform.Platform.ToUInt8((p.Zones[i].Generators[0].AmountInt16 >> 8) & 0xFF);
+
                         if (p.Zones[i].Generators.Length > 1 && p.Zones[i].Generators[1].GeneratorType == GeneratorEnum.VelocityRange)
                         {
-                            if (Platform.Platform.IsLittleEndian)
-                            {
-                                presetLoVel = Platform.Platform.ToUInt8(p.Zones[i].Generators[1].AmountInt16 & 0xFF);
-                                presetHiVel = Platform.Platform.ToUInt8((p.Zones[i].Generators[1].AmountInt16 >> 8) & 0xFF);
-                            }
-                            else
-                            {
-                                presetHiVel = Platform.Platform.ToUInt8(p.Zones[i].Generators[1].AmountInt16 & 0xFF);
-                                presetLoVel = Platform.Platform.ToUInt8((p.Zones[i].Generators[1].AmountInt16 >> 8) & 0xFF);
-                            }
+                            presetLoVel = Platform.Platform.ToUInt8(p.Zones[i].Generators[1].AmountInt16 & 0xFF);
+                            presetHiVel = Platform.Platform.ToUInt8((p.Zones[i].Generators[1].AmountInt16 >> 8) & 0xFF);
                         }
                     }
                     else if (p.Zones[i].Generators[0].GeneratorType == GeneratorEnum.VelocityRange)
                     {
-                        if (Platform.Platform.IsLittleEndian)
-                        {
-                            presetLoVel = Platform.Platform.ToUInt8(p.Zones[i].Generators[0].AmountInt16 & 0xFF);
-                            presetHiVel = Platform.Platform.ToUInt8((p.Zones[i].Generators[0].AmountInt16 >> 8) & 0xFF);
-                        }
-                        else
-                        {
-                            presetHiVel = Platform.Platform.ToUInt8(p.Zones[i].Generators[0].AmountInt16 & 0xFF);
-                            presetLoVel = Platform.Platform.ToUInt8((p.Zones[i].Generators[0].AmountInt16 >> 8) & 0xFF);
-                        }
+                        presetLoVel = Platform.Platform.ToUInt8(p.Zones[i].Generators[0].AmountInt16 & 0xFF);
+                        presetHiVel = Platform.Platform.ToUInt8((p.Zones[i].Generators[0].AmountInt16 >> 8) & 0xFF);
                     }
                     if (p.Zones[i].Generators[p.Zones[i].Generators.Length - 1].GeneratorType == GeneratorEnum.Instrument)
                     {
@@ -187,20 +164,12 @@ namespace AlphaTab.Audio.Synth.Bank
                             byte instHiKey;
                             byte instLoVel;
                             byte instHiVel;
-                            if (Platform.Platform.IsLittleEndian)
-                            {
-                                instLoKey = Platform.Platform.ToUInt8(inst.Generators[(int)GeneratorEnum.KeyRange] & 0xFF);
-                                instHiKey = Platform.Platform.ToUInt8((inst.Generators[(int)GeneratorEnum.KeyRange] >> 8) & 0xFF);
-                                instLoVel = Platform.Platform.ToUInt8(inst.Generators[(int)GeneratorEnum.VelocityRange] & 0xFF);
-                                instHiVel = Platform.Platform.ToUInt8((inst.Generators[(int)GeneratorEnum.VelocityRange] >> 8) & 0xFF);
-                            }
-                            else
-                            {
-                                instHiKey = Platform.Platform.ToUInt8(inst.Generators[(int)GeneratorEnum.KeyRange] & 0xFF);
-                                instLoKey = Platform.Platform.ToUInt8((inst.Generators[(int)GeneratorEnum.KeyRange] >> 8) & 0xFF);
-                                instHiVel = Platform.Platform.ToUInt8(inst.Generators[(int)GeneratorEnum.VelocityRange] & 0xFF);
-                                instLoVel = Platform.Platform.ToUInt8((inst.Generators[(int)GeneratorEnum.VelocityRange] >> 8) & 0xFF);
-                            }
+
+                            instLoKey = Platform.Platform.ToUInt8(inst.Generators[(int)GeneratorEnum.KeyRange] & 0xFF);
+                            instHiKey = Platform.Platform.ToUInt8((inst.Generators[(int)GeneratorEnum.KeyRange] >> 8) & 0xFF);
+                            instLoVel = Platform.Platform.ToUInt8(inst.Generators[(int)GeneratorEnum.VelocityRange] & 0xFF);
+                            instHiVel = Platform.Platform.ToUInt8((inst.Generators[(int)GeneratorEnum.VelocityRange] >> 8) & 0xFF);
+
                             if ((instLoKey <= presetHiKey && presetLoKey <= instHiKey) && (instLoVel <= presetHiVel && presetLoVel <= instHiVel))
                             {
                                 var r = new Sf2Region();
@@ -255,12 +224,12 @@ namespace AlphaTab.Audio.Synth.Bank
                 {
                     for (int x = 0; x < globals.Length; x++)
                     {
-                        region.Generators[(int) globals[x].GeneratorType] = globals[x].AmountInt16;
+                        region.Generators[(int)globals[x].GeneratorType] = globals[x].AmountInt16;
                     }
                 }
                 for (int x = 0; x < gens.Length; x++)
                 {
-                    region.Generators[(int) gens[x].GeneratorType] = gens[x].AmountInt16;
+                    region.Generators[(int)gens[x].GeneratorType] = gens[x].AmountInt16;
                 }
             }
             else
@@ -303,35 +272,19 @@ namespace AlphaTab.Audio.Synth.Bank
                         byte hi_a;
                         byte lo_b;
                         byte hi_b;
-                        if (Platform.Platform.IsLittleEndian)
-                        {
-                            lo_a = Platform.Platform.ToUInt8(region.Generators[value] & 0xFF);
-                            hi_a = Platform.Platform.ToUInt8((region.Generators[value] >> 8) & 0xFF);
-                            lo_b = Platform.Platform.ToUInt8(genList[x].AmountInt16 & 0xFF);
-                            hi_b = Platform.Platform.ToUInt8((genList[x].AmountInt16 >> 8) & 0xFF);
-                        }
-                        else
-                        {
-                            hi_a = Platform.Platform.ToUInt8(region.Generators[value] & 0xFF);
-                            lo_a = Platform.Platform.ToUInt8((region.Generators[value] >> 8) & 0xFF);
-                            hi_b = Platform.Platform.ToUInt8(genList[x].AmountInt16 & 0xFF);
-                            lo_b = Platform.Platform.ToUInt8((genList[x].AmountInt16 >> 8) & 0xFF);
-                        }
-                        lo_a = (byte) Math.Max(lo_a, lo_b);
+                        lo_a = Platform.Platform.ToUInt8(region.Generators[value] & 0xFF);
+                        hi_a = Platform.Platform.ToUInt8((region.Generators[value] >> 8) & 0xFF);
+                        lo_b = Platform.Platform.ToUInt8(genList[x].AmountInt16 & 0xFF);
+                        hi_b = Platform.Platform.ToUInt8((genList[x].AmountInt16 >> 8) & 0xFF);
+
+                        lo_a = (byte)Math.Max(lo_a, lo_b);
                         hi_a = Math.Min(hi_a, hi_b);
 
                         if (lo_a > hi_a)
                         {
                             throw new Exception("Invalid sf2 region. The range generators do not intersect.");
                         }
-                        if (Platform.Platform.IsLittleEndian)
-                        {
-                            region.Generators[value] = Platform.Platform.ToInt16((lo_a | (hi_a << 8)));
-                        }
-                        else
-                        {
-                            region.Generators[value] = Platform.Platform.ToInt16((lo_a << 8) | hi_a);
-                        }
+                        region.Generators[value] = Platform.Platform.ToInt16((lo_a | (hi_a << 8)));
                     }
                     else
                     {

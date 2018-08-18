@@ -22,8 +22,17 @@ namespace AlphaTab.Model
     /// </summary>
     public enum CrescendoType
     {
+        /// <summary>
+        /// No crescendo applied. 
+        /// </summary>
         None,
+        /// <summary>
+        /// Normal crescendo applied. 
+        /// </summary>
         Crescendo,
+        /// <summary>
+        /// Normal decrescendo applied. 
+        /// </summary>
         Decrescendo
     }
 }

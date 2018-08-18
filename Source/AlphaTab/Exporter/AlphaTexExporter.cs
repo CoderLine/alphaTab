@@ -17,19 +17,29 @@
  */
 using AlphaTab.Collections;
 using AlphaTab.Model;
-using AlphaTab.Platform;
 
 namespace AlphaTab.Exporter
 {
+    /// <summary>
+    /// This class allows converting scores into alphaTex. 
+    /// </summary>
+    // ReSharper disable once UnusedMember.Global
     public class AlphaTexExporter
     {
         private readonly StringBuilder _builder;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AlphaTexExporter"/> class.
+        /// </summary>
         public AlphaTexExporter()
         {
             _builder = new StringBuilder();
         }
 
+        /// <summary>
+        /// Exports the given track. 
+        /// </summary>
+        /// <param name="track">The track to export</param>
         public void Export(Track track)
         {
             Score(track);
@@ -41,6 +51,10 @@ namespace AlphaTab.Exporter
             Bars(track);
         }
 
+        /// <summary>
+        /// Returns the generated tex code. 
+        /// </summary>
+        /// <returns></returns>
         public string ToTex()
         {
             return _builder.ToString();
@@ -425,12 +439,12 @@ namespace AlphaTab.Exporter
                 _builder.Append("d ");
             }
 
-            if (beat.PickStroke == PickStrokeType.Up)
+            if (beat.PickStroke == PickStroke.Up)
             {
                 hasEffectOpen = EffectOpen(hasEffectOpen);
                 _builder.Append("su ");
             }
-            else if (beat.PickStroke == PickStrokeType.Down)
+            else if (beat.PickStroke == PickStroke.Down)
             {
                 hasEffectOpen = EffectOpen(hasEffectOpen);
                 _builder.Append("sd ");
@@ -545,49 +559,49 @@ namespace AlphaTab.Exporter
                     _builder.Append("\\ks ");
                     switch (masterBar.KeySignature)
                     {
-                        case -7:
+                        case KeySignature.Cb:
                             _builder.Append("cb");
                             break;
-                        case -6:
+                        case KeySignature.Gb:
                             _builder.Append("gb");
                             break;
-                        case -5:
+                        case KeySignature.Db:
                             _builder.Append("db");
                             break;
-                        case -4:
+                        case KeySignature.Ab:
                             _builder.Append("ab");
                             break;
-                        case -3:
+                        case KeySignature.Eb:
                             _builder.Append("eb");
                             break;
-                        case -2:
+                        case KeySignature.Bb:
                             _builder.Append("bb");
                             break;
-                        case -1:
+                        case KeySignature.F:
                             _builder.Append("f");
                             break;
-                        case 0:
+                        case KeySignature.C:
                             _builder.Append("c");
                             break;
-                        case 1:
+                        case KeySignature.G:
                             _builder.Append("g");
                             break;
-                        case 2:
+                        case KeySignature.D:
                             _builder.Append("d");
                             break;
-                        case 3:
+                        case KeySignature.A:
                             _builder.Append("a");
                             break;
-                        case 4:
+                        case KeySignature.E:
                             _builder.Append("e");
                             break;
-                        case 5:
+                        case KeySignature.B:
                             _builder.Append("b");
                             break;
-                        case 6:
+                        case KeySignature.FSharp:
                             _builder.Append("f#");
                             break;
-                        case 7:
+                        case KeySignature.CSharp:
                             _builder.Append("c#");
                             break;
                     }

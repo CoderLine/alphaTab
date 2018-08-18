@@ -15,7 +15,7 @@ namespace AlphaTab.Model
         /// </summary>
         public float Length { get; set; }
 
-        public static void CopyTo(Fermata src, Fermata dst)
+        internal static void CopyTo(Fermata src, Fermata dst)
         {
             dst.Type = src.Type;
             dst.Length = src.Length;

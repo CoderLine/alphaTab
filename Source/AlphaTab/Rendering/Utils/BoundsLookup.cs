@@ -18,7 +18,6 @@
 
 using AlphaTab.Collections;
 using AlphaTab.Model;
-using AlphaTab.Util;
 
 namespace AlphaTab.Rendering.Utils
 {

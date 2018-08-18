@@ -301,7 +301,9 @@ namespace AlphaTab.Platform.JavaScript
                     }
                     catch
                     {
+#pragma warning disable 252,253
                         if (value == "")
+#pragma warning restore 252,253
                         {
                             value = null;
                         }
@@ -331,7 +333,9 @@ namespace AlphaTab.Platform.JavaScript
                         }
                         catch
                         {
+#pragma warning disable 252, 253
                             if (value == "")
+#pragma warning restore 252, 253
                             {
                                 value = null;
                             }

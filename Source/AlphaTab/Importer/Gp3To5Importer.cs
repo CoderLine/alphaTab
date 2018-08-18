@@ -343,7 +343,7 @@ namespace AlphaTab.Importer
             // keysignature
             if ((flags & 0x40) != 0)
             {
-                newMasterBar.KeySignature = Data.ReadSignedByte();
+                newMasterBar.KeySignature = (KeySignature)Data.ReadSignedByte();
                 newMasterBar.KeySignatureType = (KeySignatureType)Data.ReadByte();
             }
             else if (previousMasterBar != null)
@@ -853,13 +853,13 @@ namespace AlphaTab.Importer
                 switch (Data.ReadSignedByte())
                 {
                     case 0:
-                        beat.PickStroke = PickStrokeType.None;
+                        beat.PickStroke = PickStroke.None;
                         break;
                     case 1:
-                        beat.PickStroke = PickStrokeType.Up;
+                        beat.PickStroke = PickStroke.Up;
                         break;
                     case 2:
-                        beat.PickStroke = PickStrokeType.Down;
+                        beat.PickStroke = PickStroke.Down;
                         break;
                 }
             }

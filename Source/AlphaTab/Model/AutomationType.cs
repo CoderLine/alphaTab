@@ -22,9 +22,21 @@ namespace AlphaTab.Model
     /// </summary>
     public enum AutomationType
     {
+        /// <summary>
+        /// Tempo change. 
+        /// </summary>
         Tempo, 
+        /// <summary>
+        /// Colume change. 
+        /// </summary>
         Volume, 
+        /// <summary>
+        /// Instrument change.
+        /// </summary>
         Instrument, 
+        /// <summary>
+        /// Balance change.
+        /// </summary>
         Balance
     }
 }

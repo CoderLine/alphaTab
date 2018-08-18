@@ -1038,10 +1038,10 @@ namespace AlphaTab.Importer
                             note.Fret = Platform.Platform.ParseInt(c.InnerText);
                             break;
                         case "down-bow":
-                            note.Beat.PickStroke = PickStrokeType.Down;
+                            note.Beat.PickStroke = PickStroke.Down;
                             break;
                         case "up-bow":
-                            note.Beat.PickStroke = PickStrokeType.Up;
+                            note.Beat.PickStroke = PickStroke.Up;
                             break;
                     }
                 }
@@ -1495,7 +1495,7 @@ namespace AlphaTab.Importer
             if (-7 <= fifths && fifths <= 7)
             {
                 // TODO: check if this is conrrect
-                masterBar.KeySignature = fifths;
+                masterBar.KeySignature = (KeySignature)fifths;
             }
             else
             {

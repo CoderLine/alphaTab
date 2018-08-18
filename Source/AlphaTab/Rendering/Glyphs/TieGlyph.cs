@@ -140,16 +140,6 @@ namespace AlphaTab.Rendering.Glyphs
             return 0;
         }
 
-        /// <summary>
-        /// paints a tie between the two given points
-        /// </summary>
-        /// <param name="canvas"></param>
-        /// <param name="scale"></param>
-        /// <param name="x1"></param>
-        /// <param name="y1"></param>
-        /// <param name="x2"></param>
-        /// <param name="y2"></param>
-        /// <param name="down"></param>
         public static void PaintTie(ICanvas canvas, float scale, float x1, float y1, float x2, float y2,
             bool down = false, float offset = 22, float size = 4)
         {

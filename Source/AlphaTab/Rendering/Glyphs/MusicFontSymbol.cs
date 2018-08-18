@@ -40,9 +40,6 @@ namespace AlphaTab.Rendering.Glyphs
         RestOneHundredTwentyEighth = 0xE4EA,
         RestTwoHundredFiftySixth = 0xE4EB,
 
-        GraceUp = 0xE1D7,
-        GraceDown = 0xE1D8,
-
         Trill = 0xE566,
 
         Num0 = 0xE080,
@@ -66,7 +63,6 @@ namespace AlphaTab.Rendering.Glyphs
         NoteDead = 0xE0AA,
         NoteHarmonic = 0xE0DC,
         NoteHarmonicWhole = 0xE0DE,
-        NoteRideCymbal = 0xE0DE,
         NoteHiHat = 0xE0B3,
         NoteSideStick = 0xE0A9,
         NoteHiHatHalf = 0xE0F7,

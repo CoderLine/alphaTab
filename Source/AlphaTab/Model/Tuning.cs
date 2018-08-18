@@ -30,8 +30,8 @@ namespace AlphaTab.Model
         private static FastList<Tuning> _fiveStrings;
         private static FastList<Tuning> _fourStrings;
         private static FastDictionary<int, Tuning> _defaultTunings;
-
-        public static string GetTextForTuning(int tuning, bool includeOctave)
+        
+        internal static string GetTextForTuning(int tuning, bool includeOctave)
         {
             var octave = tuning / 12;
             var note = tuning % 12;
@@ -44,9 +44,12 @@ namespace AlphaTab.Model
 
             return result;
         }
-
-
-
+        
+        /// <summary>
+        /// Gets the default tuning for the given string count. 
+        /// </summary>
+        /// <param name="stringCount">The string count. </param>
+        /// <returns>The tuning for the given string count or null if the string count is not defined. </returns>
         public static Tuning GetDefaultTuningFor(int stringCount)
         {
             if (_defaultTunings.ContainsKey(stringCount))
@@ -54,6 +57,11 @@ namespace AlphaTab.Model
             return null;
         }
 
+        /// <summary>
+        /// Gets a list of all tuning presets for a given stirng count. 
+        /// </summary>
+        /// <param name="stringCount">The string count. </param>
+        /// <returns>The list of known tunings for the given string count or an empty list if the string count is not defined. </returns>
         public static FastList<Tuning> GetPresetsFor(int stringCount)
         {
             switch (stringCount)
@@ -143,6 +151,11 @@ namespace AlphaTab.Model
             _fourStrings.Add(new Tuning("Cello Tuning", new[] { 57, 50, 43, 36 }, false));
         }
 
+        /// <summary>
+        /// Tries to find a known tuning by a given list of tuning values. 
+        /// </summary>
+        /// <param name="strings">The values defining the tuning. </param>
+        /// <returns>The known tuning. </returns>
         public static Tuning FindTuning(int[] strings)
         {
             var tunings = GetPresetsFor(strings.Length);
@@ -168,10 +181,25 @@ namespace AlphaTab.Model
             return null;
         }
 
+        /// <summary>
+        /// Gets or sets whether this is the standard tuning for this number of strings. 
+        /// </summary>
         public bool IsStandard { get; set; }
+        /// <summary>
+        /// Gets or sets the name of the tuning. 
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// Gets or sets the values for each string of the instrument. 
+        /// </summary>
         public int[] Tunings { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Tuning"/> class.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="tuning">The tuning.</param>
+        /// <param name="isStandard">if set to <c>true</c> [is standard].</param>
         public Tuning(string name, int[] tuning, bool isStandard)
         {
             IsStandard = isStandard;

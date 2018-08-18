@@ -16,9 +16,7 @@
  * License along with this library.
  */
 using System;
-using AlphaTab.Audio.Synth.Util;
 using AlphaTab.IO;
-using AlphaTab.Platform;
 
 namespace AlphaTab.Audio.Synth.Sf2.Chunks
 {
@@ -74,7 +72,7 @@ namespace AlphaTab.Audio.Synth.Sf2.Chunks
         }
     }
 
-    public class RawPreset
+    class RawPreset
     {
         public string Name { get; set; }
         public int PatchNumber { get; set; }

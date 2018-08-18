@@ -16,7 +16,6 @@
  * License along with this library.
  */
 
-using System;
 using AlphaTab.Audio;
 using AlphaTab.Collections;
 
@@ -29,29 +28,45 @@ namespace AlphaTab.Model
     public class Voice
     {
         private FastDictionary<int, Beat> _beatLookup;
+
+        /// <summary>
+        /// Gets or sets the zero-based index of this voice within the bar. 
+        /// </summary>
         public int Index { get; set; }
+        /// <summary>
+        /// Gets or sets the reference to the bar this voice belongs to. 
+        /// </summary>
         public Bar Bar { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of beats contained in this voice. 
+        /// </summary>
         public FastList<Beat> Beats { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this voice is empty. 
+        /// </summary>
         public bool IsEmpty
         {
             get; set;
-
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Voice"/> class.
+        /// </summary>
         public Voice()
         {
             Beats = new FastList<Beat>();
             IsEmpty = true;
         }
 
-        public static void CopyTo(Voice src, Voice dst)
+        internal static void CopyTo(Voice src, Voice dst)
         {
             dst.Index = src.Index;
             dst.IsEmpty = src.IsEmpty;
         }
 
-        public void InsertBeat(Beat after, Beat newBeat)
+        internal void InsertBeat(Beat after, Beat newBeat)
         {
             newBeat.NextBeat = after.NextBeat;
             if (newBeat.NextBeat != null)
@@ -65,7 +80,7 @@ namespace AlphaTab.Model
         }
 
 
-        public void AddBeat(Beat beat)
+        internal void AddBeat(Beat beat)
         {
             beat.Voice = this;
             beat.Index = Beats.Count;
@@ -100,7 +115,7 @@ namespace AlphaTab.Model
             }
         }
 
-        public void AddGraceBeat(Beat beat)
+        internal void AddGraceBeat(Beat beat)
         {
             if (Beats.Count == 0)
             {
@@ -119,10 +134,8 @@ namespace AlphaTab.Model
 
             IsEmpty = false;
         }
-
-
-
-        public Beat GetBeatAtDisplayStart(int displayStart)
+        
+        internal Beat GetBeatAtDisplayStart(int displayStart)
         {
             if (_beatLookup.ContainsKey(displayStart))
             {
@@ -132,7 +145,7 @@ namespace AlphaTab.Model
             return null;
         }
 
-        public void Finish(Settings settings)
+        internal void Finish(Settings settings)
         {
             _beatLookup = new FastDictionary<int, Beat>();
             for (var index = 0; index < Beats.Count; index++)

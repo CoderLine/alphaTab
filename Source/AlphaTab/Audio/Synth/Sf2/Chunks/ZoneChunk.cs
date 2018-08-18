@@ -64,7 +64,7 @@ namespace AlphaTab.Audio.Synth.Sf2.Chunks
         }
     }
 
-    public class RawZoneData
+    class RawZoneData
     {
         public int GeneratorIndex { get; set; }
         public int ModulatorIndex { get; set; }

@@ -17,6 +17,9 @@
  */
 namespace AlphaTab.Model
 {
+    /// <summary>
+    /// Lists all fingers.
+    /// </summary>
     public enum Fingers
     {
         /// <summary>

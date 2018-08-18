@@ -322,7 +322,7 @@ namespace AlphaTab.Rendering.Staves
         }
     }
 
-    public class Spring
+    class Spring
     {
         public int TimePosition { get; set; }
 

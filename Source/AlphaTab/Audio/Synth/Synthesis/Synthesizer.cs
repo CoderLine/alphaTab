@@ -436,22 +436,22 @@ namespace AlphaTab.Audio.Synth.Synthesis
             var data2 = e.Data2;
             switch (command)
             {
-                case MidiEventTypeEnum.NoteOff:
+                case MidiEventType.NoteOff:
                     NoteOff(channel, data1);
                     break;
-                case MidiEventTypeEnum.NoteOn:
+                case MidiEventType.NoteOn:
                     if (data2 == 0)
                         NoteOff(channel, data1);
                     else
                         NoteOn(channel, data1, data2);
                     break;
-                case MidiEventTypeEnum.NoteAftertouch:
+                case MidiEventType.NoteAftertouch:
                     //synth uses channel after touch instead
                     break;
-                case MidiEventTypeEnum.Controller:
-                    switch ((ControllerTypeEnum)data1)
+                case MidiEventType.Controller:
+                    switch ((ControllerType)data1)
                     {
-                        case ControllerTypeEnum.BankSelectCoarse: //Bank select coarse
+                        case ControllerType.BankSelectCoarse: //Bank select coarse
                             if (channel == MidiHelper.DrumChannel)
                                 data2 += PatchBank.DrumBank;
                             if (SoundBank.IsBankLoaded(data2))
@@ -459,62 +459,62 @@ namespace AlphaTab.Audio.Synth.Synthesis
                             else
                                 _synthChannels[channel].BankSelect = (byte)((channel == MidiHelper.DrumChannel) ? PatchBank.DrumBank : 0);
                             break;
-                        case ControllerTypeEnum.ModulationCoarse: //Modulation wheel coarse
+                        case ControllerType.ModulationCoarse: //Modulation wheel coarse
                             _synthChannels[channel].ModRange.Coarse = (byte)data2;
                             _synthChannels[channel].UpdateCurrentMod();
                             break;
-                        case ControllerTypeEnum.ModulationFine: //Modulation wheel fine
+                        case ControllerType.ModulationFine: //Modulation wheel fine
                             _synthChannels[channel].ModRange.Fine = (byte)data2;
                             _synthChannels[channel].UpdateCurrentMod();
                             break;
-                        case ControllerTypeEnum.VolumeCoarse: //Channel volume coarse
+                        case ControllerType.VolumeCoarse: //Channel volume coarse
                             _synthChannels[channel].Volume.Coarse = (byte)data2;
                             _synthChannels[channel].UpdateCurrentVolumeFromVolume();
                             break;
-                        case ControllerTypeEnum.VolumeFine: //Channel volume fine
+                        case ControllerType.VolumeFine: //Channel volume fine
                             _synthChannels[channel].Volume.Fine = (byte)data2;
                             _synthChannels[channel].UpdateCurrentVolumeFromVolume();
                             break;
-                        case ControllerTypeEnum.PanCoarse: //Pan coarse
+                        case ControllerType.PanCoarse: //Pan coarse
                             _synthChannels[channel].Pan.Coarse = (byte)data2;
                             _synthChannels[channel].UpdateCurrentPan();
                             break;
-                        case ControllerTypeEnum.PanFine: //Pan fine
+                        case ControllerType.PanFine: //Pan fine
                             _synthChannels[channel].Pan.Fine = (byte)data2;
                             _synthChannels[channel].UpdateCurrentPan();
                             break;
-                        case ControllerTypeEnum.ExpressionControllerCoarse: //Expression coarse
+                        case ControllerType.ExpressionControllerCoarse: //Expression coarse
                             _synthChannels[channel].Expression.Coarse = (byte)data2;
                             _synthChannels[channel].UpdateCurrentVolumeFromExpression();
                             break;
-                        case ControllerTypeEnum.ExpressionControllerFine: //Expression fine
+                        case ControllerType.ExpressionControllerFine: //Expression fine
                             _synthChannels[channel].Expression.Fine = (byte)data2;
                             _synthChannels[channel].UpdateCurrentVolumeFromExpression();
                             break;
-                        case ControllerTypeEnum.HoldPedal: //Hold pedal
+                        case ControllerType.HoldPedal: //Hold pedal
                             if (_synthChannels[channel].HoldPedal && !(data2 > 63)) //if hold pedal is released stop any voices with pending release tags
                                 ReleaseHoldPedal(channel);
                             _synthChannels[channel].HoldPedal = data2 > 63;
                             break;
-                        case ControllerTypeEnum.LegatoPedal: //Legato Pedal
+                        case ControllerType.LegatoPedal: //Legato Pedal
                             _synthChannels[channel].LegatoPedal = data2 > 63;
                             break;
-                        case ControllerTypeEnum.NonRegisteredParameterCourse: //NRPN Coarse Select   //fix for invalid DataEntry after unsupported NRPN events
+                        case ControllerType.NonRegisteredParameterCourse: //NRPN Coarse Select   //fix for invalid DataEntry after unsupported NRPN events
                             _synthChannels[channel].Rpn.Combined = 0x3FFF; //todo implement NRPN
                             break;
-                        case ControllerTypeEnum.NonRegisteredParameterFine: //NRPN Fine Select     //fix for invalid DataEntry after unsupported NRPN events
+                        case ControllerType.NonRegisteredParameterFine: //NRPN Fine Select     //fix for invalid DataEntry after unsupported NRPN events
                             _synthChannels[channel].Rpn.Combined = 0x3FFF; //todo implement NRPN
                             break;
-                        case ControllerTypeEnum.RegisteredParameterCourse: //RPN Coarse Select
+                        case ControllerType.RegisteredParameterCourse: //RPN Coarse Select
                             _synthChannels[channel].Rpn.Coarse = (byte)data2;
                             break;
-                        case ControllerTypeEnum.RegisteredParameterFine: //RPN Fine Select
+                        case ControllerType.RegisteredParameterFine: //RPN Fine Select
                             _synthChannels[channel].Rpn.Fine = (byte)data2;
                             break;
-                        case ControllerTypeEnum.AllNotesOff: //Note Off All
+                        case ControllerType.AllNotesOff: //Note Off All
                             NoteOffAll(false);
                             break;
-                        case ControllerTypeEnum.DataEntryCoarse: //DataEntry Coarse
+                        case ControllerType.DataEntryCoarse: //DataEntry Coarse
                             switch (_synthChannels[channel].Rpn.Combined)
                             {
                                 case 0: //change semitone, pitchwheel
@@ -529,7 +529,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                                     break;
                             }
                             break;
-                        case ControllerTypeEnum.DataEntryFine: //DataEntry Fine
+                        case ControllerType.DataEntryFine: //DataEntry Fine
                             switch (_synthChannels[channel].Rpn.Combined)
                             {
                                 case 0: //change cents, pitchwheel
@@ -541,7 +541,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                                     break;
                             }
                             break;
-                        case ControllerTypeEnum.ResetControllers: //Reset All
+                        case ControllerType.ResetControllers: //Reset All
                             _synthChannels[channel].Expression.Combined = 0x3FFF;
                             _synthChannels[channel].ModRange.Combined = 0;
                             if (_synthChannels[channel].HoldPedal)
@@ -558,13 +558,13 @@ namespace AlphaTab.Audio.Synth.Synthesis
                             return;
                     }
                     break;
-                case MidiEventTypeEnum.ProgramChange: //Program Change
+                case MidiEventType.ProgramChange: //Program Change
                     _synthChannels[channel].Program = (byte)data1;
                     break;
-                case MidiEventTypeEnum.ChannelAftertouch: //Channel Aftertouch
+                case MidiEventType.ChannelAftertouch: //Channel Aftertouch
                     _synthChannels[channel].ChannelAfterTouch = (byte)data2;
                     break;
-                case MidiEventTypeEnum.PitchBend: //Pitch Bend
+                case MidiEventType.PitchBend: //Pitch Bend
                     _synthChannels[channel].PitchBend.Coarse = (byte)data2;
                     _synthChannels[channel].PitchBend.Fine = (byte)data1;
                     _synthChannels[channel].UpdateCurrentPitch();

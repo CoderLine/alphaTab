@@ -30,6 +30,12 @@ namespace AlphaTab.Importer
     /// </summary>
     public partial class ScoreLoader
     {
+        /// <summary>
+        /// Loads the score from the given binary data. 
+        /// </summary>
+        /// <param name="data">The binary data containing a score in any known file format. </param>
+        /// <param name="settings">The settings to use during importing. </param>
+        /// <returns>The loaded score.</returns>
         public static Score LoadScoreFromBytes(byte[] data, Settings settings = null)
         {
             var importers = ScoreImporter.BuildImporters();
