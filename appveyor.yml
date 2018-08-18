@@ -2,6 +2,7 @@ version: 0.9.1.{build}
 # branches to build
 branches:
   only:
+    - master
     - develop
     
 image: Visual Studio 2017

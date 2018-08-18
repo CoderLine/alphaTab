@@ -1,5 +1,5 @@
 /*
- * alphaTab v{{version}}
+ * alphaTab v{{version}} ({{branch}})
  *
  * This file is part of alphaTab.
  * Copyright © {{year}}, Daniel Kuschny and Contributors, All rights reserved.

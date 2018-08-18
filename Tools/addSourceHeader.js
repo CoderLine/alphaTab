@@ -1,14 +1,17 @@
 var templateFile = process.argv[2];
 var fs = require('fs');
+var execSync = require('child_process').execSync;
 
 console.log("Loading Template from " + templateFile);
 
 var buildProps = fs.readFileSync('Directory.Build.props', 'utf8');
 var version = (/<FileVersion>([^<]+)<\/FileVersion>/i).exec(buildProps)[1];
+var branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
 
 var template = fs.readFileSync(templateFile, 'utf8');
 template = template.replace("{{year}}", new Date().getFullYear());
 template = template.replace("{{version}}", version);
+template = template.replace("{{branch}}", branch);
 
 console.log(template);
 
