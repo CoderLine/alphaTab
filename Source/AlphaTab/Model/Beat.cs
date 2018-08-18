@@ -507,6 +507,8 @@ namespace AlphaTab.Model
             MinStringNote = null;
             MaxStringNote = null;
 
+            var visibleNotes = 0;
+
             for (int i = 0, j = Notes.Count; i < j; i++)
             {
                 var note = Notes[i];
@@ -552,6 +554,7 @@ namespace AlphaTab.Model
 
                 if (note.IsVisible)
                 {
+                    visibleNotes++;
                     if (MinNote == null || note.RealValue < MinNote.RealValue)
                     {
                         MinNote = note;
@@ -572,6 +575,11 @@ namespace AlphaTab.Model
                         MaxStringNote = note;
                     }
                 }
+            }
+
+            if (visibleNotes == 0)
+            {
+                IsEmpty = true;
             }
 
             if (IsSlurOrigin)

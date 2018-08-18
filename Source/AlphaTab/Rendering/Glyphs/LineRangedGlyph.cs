@@ -24,8 +24,8 @@ namespace AlphaTab.Rendering.Glyphs
     class LineRangedGlyph : GroupedEffectGlyph
     {
         public const float LineSpacing = 3;
-        public const float LineTopPadding = 8;
-        public const float LineTopOffset = 6;
+        public const float LineTopPadding = 4;
+        public const float LineTopOffset = 5;
         public const float LineSize = 8;
         private readonly string _label;
 

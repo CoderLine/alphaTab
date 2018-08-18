@@ -20173,6 +20173,7 @@ alphaTab.model.Beat.prototype = {
 		this.MaxNote = null;
 		this.MinStringNote = null;
 		this.MaxStringNote = null;
+		var visibleNotes = 0;
 		var i = 0;
 		var j = this.Notes.length;
 		while(i < j) {
@@ -20206,6 +20207,7 @@ alphaTab.model.Beat.prototype = {
 				}
 			}
 			if(note.IsVisible) {
+				++visibleNotes;
 				if(this.MinNote == null || note.get_RealValue() < this.MinNote.get_RealValue()) {
 					this.MinNote = note;
 				}
@@ -20220,6 +20222,9 @@ alphaTab.model.Beat.prototype = {
 				}
 			}
 			++i;
+		}
+		if(visibleNotes == 0) {
+			this.IsEmpty = true;
 		}
 		if(this.IsSlurOrigin) {
 			this.IsSlurOrigin = true;
@@ -29113,7 +29118,7 @@ alphaTab.rendering.glyphs.LineRangedGlyph.prototype = $extend(alphaTab.rendering
 		var textWidth = canvas.MeasureText(this._label);
 		var this1 = 2;
 		var startX = cx + this.X + textWidth / this1 + lineSpacing;
-		var lineY = cy + this.Y + 8 * this.get_Scale();
+		var lineY = cy + this.Y + 4 * this.get_Scale();
 		var lineSize = 8 * this.get_Scale();
 		if(endX > startX) {
 			var lineX = startX;
@@ -29128,9 +29133,9 @@ alphaTab.rendering.glyphs.LineRangedGlyph.prototype = $extend(alphaTab.rendering
 				canvas.Stroke();
 			}
 			canvas.BeginPath();
-			var this4 = system.Convert.ToInt32_Single(lineY - 6 * this.get_Scale());
+			var this4 = system.Convert.ToInt32_Single(lineY - 5 * this.get_Scale());
 			canvas.MoveTo(endX,this4);
-			var this5 = system.Convert.ToInt32_Single(lineY + 6 * this.get_Scale());
+			var this5 = system.Convert.ToInt32_Single(lineY + 5 * this.get_Scale());
 			canvas.LineTo(endX,this5);
 			canvas.Stroke();
 		}
@@ -37667,8 +37672,8 @@ alphaTab.rendering.glyphs.BendNoteHeadGroupGlyph.ElementPadding = 2;
 alphaTab.rendering.glyphs.CrescendoGlyph.Padding = 8 / 2 | 0;
 alphaTab.rendering.glyphs.GhostParenthesisGlyph.Size = 6;
 alphaTab.rendering.glyphs.LineRangedGlyph.LineSpacing = 3;
-alphaTab.rendering.glyphs.LineRangedGlyph.LineTopPadding = 8;
-alphaTab.rendering.glyphs.LineRangedGlyph.LineTopOffset = 6;
+alphaTab.rendering.glyphs.LineRangedGlyph.LineTopPadding = 4;
+alphaTab.rendering.glyphs.LineRangedGlyph.LineTopOffset = 5;
 alphaTab.rendering.glyphs.LineRangedGlyph.LineSize = 8;
 alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.None = -1;
 alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.ClefG = 57424;
