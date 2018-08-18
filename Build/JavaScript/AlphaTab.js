@@ -30257,7 +30257,7 @@ alphaTab.rendering.glyphs.ScoreBendGlyph.prototype = $extend(alphaTab.rendering.
 		if(this._beat.get_IsLastOfVoice()) {
 			endBeatX = endBeatX + startNoteRenderer.get_PostBeatGlyphsStart();
 		} else {
-			endBeatX = endBeatX + startNoteRenderer.GetBeatX(this._beat,2);
+			endBeatX = endBeatX + startNoteRenderer.GetBeatX(this._beat.NextBeat,0);
 		}
 		endBeatX = endBeatX - ((8 / 2 | 0) + 3) * this.get_Scale();
 		var middleX = (startX + endBeatX) / 2;

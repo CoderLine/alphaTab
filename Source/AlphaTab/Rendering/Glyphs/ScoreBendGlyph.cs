@@ -105,7 +105,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
             else
             {
-                endBeatX += startNoteRenderer.GetBeatX(_beat, BeatXPosition.MiddleNotes);
+                endBeatX += startNoteRenderer.GetBeatX(_beat.NextBeat, BeatXPosition.PreNotes);
             }
             endBeatX -= EndPadding * Scale;
 
