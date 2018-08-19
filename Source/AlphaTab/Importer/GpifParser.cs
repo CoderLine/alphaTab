@@ -412,6 +412,9 @@ namespace AlphaTab.Importer
                                 track.Staves[1].StaffKind = StaffKind.Score;
                             }
                             break;
+                        case "InstrumentSet":
+                            ParseInstrumentSet(track, c);
+                            break;
                         case "ShortName":
                             track.ShortName = c.InnerText;
                             break;
@@ -447,6 +450,29 @@ namespace AlphaTab.Importer
             }
 
             _tracksById[trackId] = track;
+        }
+
+        private void ParseInstrumentSet(Track track, XmlNode node)
+        {
+            int staffIndex = 0;
+            foreach (var c in node.ChildNodes)
+            {
+                if (c.NodeType == XmlNodeType.Element)
+                {
+                    switch (c.LocalName)
+                    {
+                        case "Type":
+                            if (c.InnerText == "drumKit")
+                            {
+                                foreach (var staff in track.Staves)
+                                {
+                                    staff.StaffKind = StaffKind.Percussion;
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
         }
 
         private void ParseStaves(Track track, XmlNode node)
@@ -515,7 +541,10 @@ namespace AlphaTab.Importer
                     }
 
                     staff.Tuning = tuning;
-                    staff.StaffKind = StaffKind.Mixed;
+                    if (staff.StaffKind != StaffKind.Percussion)
+                    {
+                        staff.StaffKind = StaffKind.Mixed;
+                    }
                     break;
                 case "DiagramCollection":
                 case "ChordCollection":

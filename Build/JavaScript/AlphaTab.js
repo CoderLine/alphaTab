@@ -15424,6 +15424,9 @@ alphaTab.importer.GpifParser.prototype = {
 						track.Staves[1].StaffKind = 1;
 					}
 					break;
+				case "InstrumentSet":
+					this.ParseInstrumentSet(track,c1);
+					break;
 				case "Lyrics":
 					this.ParseLyrics(trackId,c1);
 					break;
@@ -15461,6 +15464,25 @@ alphaTab.importer.GpifParser.prototype = {
 			}
 		}
 		this._tracksById[trackId] = track;
+	}
+	,ParseInstrumentSet: function(track,node) {
+		var staffIndex = 0;
+		var c = $iterator(node.ChildNodes)();
+		while(c.hasNext()) {
+			var c1 = c.next();
+			if(c1.NodeType == 1) {
+				var _g = c1.LocalName;
+				if(_g == "Type") {
+					if(c1.get_InnerText() == "drumKit") {
+						var staff = $iterator(track.Staves)();
+						while(staff.hasNext()) {
+							var staff1 = staff.next();
+							staff1.StaffKind = 2;
+						}
+					}
+				}
+			}
+		}
 	}
 	,ParseStaves: function(track,node) {
 		var staffIndex = 0;
@@ -15525,7 +15547,9 @@ alphaTab.importer.GpifParser.prototype = {
 				++i;
 			}
 			staff.Tuning = tuning;
-			staff.StaffKind = 3;
+			if(staff.StaffKind != 2) {
+				staff.StaffKind = 3;
+			}
 			break;
 		default:
 		}
@@ -33676,7 +33700,8 @@ alphaTab.rendering.utils.AccidentalHelper = $hx_exports["alphaTab"]["rendering"]
 alphaTab.rendering.utils.AccidentalHelper.__name__ = ["alphaTab","rendering","utils","AccidentalHelper"];
 alphaTab.rendering.utils.AccidentalHelper.prototype = {
 	ApplyAccidental: function(note) {
-		var noteValue = note.get_DisplayValue();
+		var staff = this._bar.Staff;
+		var noteValue = staff.StaffKind == 2 ? alphaTab.rendering.utils.PercussionMapper.MapNoteForDisplay(note.get_DisplayValue()) : note.get_DisplayValue();
 		var quarterBend = note.get_HasQuarterToneOffset();
 		var line = this.RegisterNoteLine(note,noteValue);
 		if(this.MinNoteValue == -1 || noteValue < this.MinNoteValue) {
@@ -33690,6 +33715,10 @@ alphaTab.rendering.utils.AccidentalHelper.prototype = {
 		return this.GetAccidental(line,noteValue,quarterBend);
 	}
 	,ApplyAccidentalForValue: function(relatedBeat,noteValue,quarterBend) {
+		var staff = this._bar.Staff;
+		if(staff.StaffKind == 2) {
+			noteValue = alphaTab.rendering.utils.PercussionMapper.MapNoteForDisplay(noteValue);
+		}
 		var line = this.RegisterNoteValueLine(noteValue);
 		if(this.MinNoteValue == -1 || noteValue < this.MinNoteValue) {
 			this.MinNoteValue = noteValue;
@@ -33761,8 +33790,7 @@ alphaTab.rendering.utils.AccidentalHelper.prototype = {
 		return steps;
 	}
 	,CalculateNoteLine: function(noteValue,mode) {
-		var staff = this._bar.Staff;
-		var value = staff.StaffKind == 2 ? alphaTab.rendering.utils.PercussionMapper.MapNoteForDisplay(noteValue) : noteValue;
+		var value = noteValue;
 		var ks = this._bar.get_MasterBar().KeySignature;
 		var clef = this._bar.Clef;
 		var index = value % 12;
@@ -34028,7 +34056,7 @@ alphaTab.rendering.utils.BeamingHelper.IsFullBarJoin = function(a,b,barIndex) {
 alphaTab.rendering.utils.BeamingHelper.prototype = {
 	GetValue: function(n) {
 		if(this._staff.StaffKind == 2) {
-			return alphaTab.rendering.utils.PercussionMapper.MapNoteForDisplay(n.get_RealValue());
+			return alphaTab.rendering.utils.PercussionMapper.MapNoteForDisplay(n.get_DisplayValue());
 		} else {
 			return n.get_DisplayValue();
 		}
@@ -34527,28 +34555,28 @@ alphaTab.rendering.utils.PercussionMapper.MidiFromElementVariation = function(no
 	return alphaTab.rendering.utils.PercussionMapper.ElementVariationToMidi[note.Element][note.Variation];
 };
 alphaTab.rendering.utils.PercussionMapper.MapNoteForDisplay = function(value) {
-	if(value == 61 || value == 66) {
-		return 50;
-	} else if(value == 60 || value == 65) {
-		return 52;
-	} else if(value >= 35 && value <= 36 || value == 44) {
-		return 53;
-	} else if(value == 41 || value == 64) {
-		return 55;
-	} else if(value == 43 || value == 62) {
-		return 57;
-	} else if(value == 45 || value == 63) {
-		return 59;
-	} else if(value == 47 || value == 54) {
+	if(value == 61 || value == 66 || value == 44) {
 		return 62;
-	} else if(value == 48 || value == 56) {
+	} else if(value == 60 || value == 65) {
 		return 64;
-	} else if(value == 50) {
+	} else if(value >= 35 && value <= 36) {
 		return 65;
-	} else if(value == 42 || value == 46 || value >= 49 && value <= 53 || value == 57 || value == 59) {
+	} else if(value == 41 || value == 64) {
 		return 67;
+	} else if(value == 43 || value == 62) {
+		return 69;
+	} else if(value == 45 || value == 63) {
+		return 71;
+	} else if(value == 47 || value == 54) {
+		return 74;
+	} else if(value == 48 || value == 56) {
+		return 76;
+	} else if(value == 50) {
+		return 77;
+	} else if(value == 42 || value == 46 || value >= 49 && value <= 53 || value == 57 || value == 59) {
+		return 79;
 	}
-	return 60;
+	return 72;
 };
 alphaTab.rendering.utils.PercussionMapper.prototype = {
 	__class__: alphaTab.rendering.utils.PercussionMapper
@@ -37446,7 +37474,7 @@ alphaTab.rendering.utils.AccidentalHelper.SharpNoteSteps = new Int32Array([0,0,1
 alphaTab.rendering.utils.AccidentalHelper.FlatNoteSteps = new Int32Array([0,1,1,2,2,3,4,4,5,5,6,6]);
 alphaTab.rendering.utils._BeamDirection.BeamDirection_Impl_.Up = 0;
 alphaTab.rendering.utils._BeamDirection.BeamDirection_Impl_.Down = 1;
-alphaTab.rendering.utils.BeamingHelper.ScoreMiddleKeys = new Int32Array([60,60,57,50,71]);
+alphaTab.rendering.utils.BeamingHelper.ScoreMiddleKeys = new Int32Array([71,60,57,50,71]);
 alphaTab.rendering.utils.PercussionMapper.ElementVariationToMidi = [new Int32Array([35,35,35]),new Int32Array([38,38,37]),new Int32Array([56,56,56]),new Int32Array([56,56,56]),new Int32Array([56,56,56]),new Int32Array([41,41,41]),new Int32Array([43,43,43]),new Int32Array([45,45,45]),new Int32Array([47,47,47]),new Int32Array([48,48,48]),new Int32Array([42,46,46]),new Int32Array([44,44,44]),new Int32Array([49,49,49]),new Int32Array([57,57,57]),new Int32Array([55,55,55]),new Int32Array([51,59,53]),new Int32Array([52,52,52])];
 alphaTab.util._LogLevel.LogLevel_Impl_.None = 0;
 alphaTab.util._LogLevel.LogLevel_Impl_.Debug = 1;

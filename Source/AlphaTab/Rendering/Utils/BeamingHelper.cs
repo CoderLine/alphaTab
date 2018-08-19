@@ -70,7 +70,7 @@ namespace AlphaTab.Rendering.Utils
     /// </summary>
     class BeamingHelper
     {
-        private static readonly int[] ScoreMiddleKeys = { 60, 60, 57, 50, 71 };
+        private static readonly int[] ScoreMiddleKeys = { 71, 60, 57, 50, 71 };
 
         private readonly Staff _staff;
 
@@ -152,7 +152,7 @@ namespace AlphaTab.Rendering.Utils
         {
             if (_staff.StaffKind == StaffKind.Percussion)
             {
-                return PercussionMapper.MapNoteForDisplay(n.RealValue);
+                return PercussionMapper.MapNoteForDisplay(n.DisplayValue);
             }
             else
             {
