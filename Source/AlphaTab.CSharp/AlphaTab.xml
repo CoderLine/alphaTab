@@ -168,6 +168,36 @@
             <param name="destPos">The start index at which the samples should be written in the destination array.</param>
             <param name="len">The number of samples to copy.</param>
         </member>
+        <member name="T:AlphaTab.Audio.Synth.Ds.CircularSampleBuffer">
+            <summary>
+            Represents a fixed size circular sample buffer that can be written to and read from. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.Ds.CircularSampleBuffer.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Audio.Synth.Ds.CircularSampleBuffer"/> class.
+            </summary>
+            <param name="size">The size.</param>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.Ds.CircularSampleBuffer.Count">
+            <summary>
+            Gets the number of samples written to the buffer. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.Ds.CircularSampleBuffer.Clear">
+            <summary>
+            Clears all samples written to this buffer. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.Ds.CircularSampleBuffer.Write(AlphaTab.Audio.Synth.Ds.SampleArray,System.Int32,System.Int32)">
+            <summary>
+            Writes the given samples to this buffer. 
+            </summary>
+            <param name="data">The sample array to read from. </param>
+            <param name="offset"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
         <member name="T:AlphaTab.Audio.Synth.AlphaSynth">
             <summary>
             This is the main synthesizer component which can be used to

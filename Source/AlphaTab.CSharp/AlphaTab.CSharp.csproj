@@ -39,6 +39,12 @@
     <PackageReference Include="Xamarin.Forms" Version="2.3.4.231" PrivateAssets="All" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Platform\CSharp\Wpf\Templates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+  </ItemGroup>
+
   <Import Project="..\AlphaTab\AlphaTab.Shared.projitems" Label="Shared" />
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

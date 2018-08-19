@@ -146,7 +146,7 @@ namespace AlphaTab.Platform
         {
             if (SupportsTextDecoder)
             {
-            var encoding = DetectEncoding(data);
+                var encoding = DetectEncoding(data);
                 var decoder = new TextDecoder(encoding);
                 return decoder.Decode(data.As<ArrayBuffer>());
             }
@@ -344,7 +344,7 @@ namespace AlphaTab.Platform
             [Inline]
             get
             {
-                return Script.Write<bool>("untyped __js__(\"!!self.TextDecoder\")");
+                return !!Lib.Global.TextDecoder;
             }
         }
 

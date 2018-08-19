@@ -143,8 +143,12 @@ namespace AlphaTab
             }
             else
             {
-                AlphaTabWebWorker.Init();
-                AlphaSynthWebWorker.Init();
+                var isWebWorker = Script.Write<bool>("untyped __js__(\"typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope\")");
+                if (isWebWorker)
+                {
+                    AlphaTabWebWorker.Init();
+                    AlphaSynthWebWorker.Init();
+                }
             }
         }
 

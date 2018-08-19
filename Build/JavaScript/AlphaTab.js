@@ -748,7 +748,7 @@ alphaTab.platform.Platform.ReadSignedByte = function(readable) {
 	return system.Convert.ToInt8(n);
 };
 alphaTab.platform.Platform.ToString = function(data) {
-	if(!!self.TextDecoder) {
+	if(!(!$global.TextDecoder)) {
 		var encoding = alphaTab.platform.Platform.DetectEncoding(data);
 		var decoder = new TextDecoder(encoding);
 		return decoder.decode(data);
@@ -876,7 +876,7 @@ alphaTab.platform.Platform.get_ForceFlash = function() {
 	return !!window.ForceFlash;
 };
 alphaTab.platform.Platform.get_SupportsTextDecoder = function() {
-	return !!self.TextDecoder;
+	return !(!$global.TextDecoder);
 };
 alphaTab.platform.Platform.ArrayCopy_Int32Array_Int32_Int32Array_Int32_Int32 = function(src,srcOffset,dst,dstOffset,count) {
 	dst.set(src.subarray(srcOffset,srcOffset+count), dstOffset);
@@ -6477,8 +6477,11 @@ alphaTab.Environment.PlatformInit = function() {
 		}
 		alphaTab.Environment.CheckForFontAvailability();
 	} else {
-		alphaTab.platform.javaScript.AlphaTabWebWorker.Init();
-		alphaTab.platform.javaScript.AlphaSynthWebWorker.Init();
+		var isWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+		if(isWebWorker) {
+			alphaTab.platform.javaScript.AlphaTabWebWorker.Init();
+			alphaTab.platform.javaScript.AlphaSynthWebWorker.Init();
+		}
 	}
 };
 alphaTab.Environment.RegisterJQueryPlugin = function() {
