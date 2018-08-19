@@ -20,7 +20,8 @@ using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Audio.Synth.Midi.Event;
 using AlphaTab.Collections;
 using AlphaTab.Haxe;
-using AlphaTab.Platform;
+using Haxe.Js.Html;
+using Phase;
 
 namespace AlphaTab.Model
 {
@@ -30,7 +31,41 @@ namespace AlphaTab.Model
     /// </summary>
     class JsonConverter
     {
-        public static Score ScoreToJsObject(Score score)
+        /// <summary>
+        /// Converts the given score into a JSON encoded string. 
+        /// </summary>
+        /// <param name="score">The score to serialize. </param>
+        /// <returns>A JSON encoded string that can be used togehter with <see cref="JSONToScore"/> for conversion.</returns>
+        public static string ScoreToJson(Score score)
+        {
+            var obj = ScoreToJsObject(score);
+            return Json.Stringify(obj, (k, v) =>
+            {
+                if (ArrayBuffer.IsView(v))
+                {
+                    return Script.Write<object>("untyped __js__(\"Array.apply([], {0})\", v)");
+                }
+                return v;
+            });
+        }
+
+        /// <summary>
+        /// Converts the given JSON string back to a <see cref="Score"/> object. 
+        /// </summary>
+        /// <param name="json">The JSON string that was created via <see cref="ScoreToJSON"/></param>
+        /// <param name="settings">The settings to use during conversion.</param>
+        /// <returns>The converted score object.</returns>
+        public static Score JsonToScore(string json, Settings settings = null)
+        {
+            return JsObjectToScore(JsObjectToScore(Json.Parse(json), settings));
+        }
+
+        /// <summary>
+        /// Converts the score into a JavaScript object without circular dependencies. 
+        /// </summary>
+        /// <param name="score">The score object to serialize</param>
+        /// <returns>A serialized score object without ciruclar dependencies that can be used for further serializations.</returns>
+        public static object ScoreToJsObject(Score score)
         {
             Score score2 = Platform.Platform.NewObject();
             Score.CopyTo(score, score2);
@@ -194,8 +229,15 @@ namespace AlphaTab.Model
             return score2;
         }
 
-        public static Score JsObjectToScore(Score score, Settings settings = null)
+        /// <summary>
+        /// Converts the given JavaScript object into a score object. 
+        /// </summary>
+        /// <param name="jsObject">The javascript object created via <see cref="ScoreToJsObject"/></param>
+        /// <param name="settings">The settings to use during conversion.</param>
+        /// <returns>The converted score object.</returns>
+        public static Score JsObjectToScore(object jsObject, Settings settings = null)
         {
+            Score score = jsObject.As<Score>();
             var score2 = new Score();
             Score.CopyTo(score, score2);
             RenderStylesheet.CopyTo(score.Stylesheet, score2.Stylesheet);

@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using Haxe;
 using Phase.Attributes;
 
@@ -28,5 +30,7 @@ namespace AlphaTab.Haxe
         public static extern dynamic Parse(HaxeString text);
         [Name("stringify")]
         public static extern HaxeString Stringify(object value);
+        [Name("stringify")]
+        public static extern HaxeString Stringify(object value, Func<dynamic, dynamic, dynamic> replacer);
     }
 }

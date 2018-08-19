@@ -1,5 +1,5 @@
 /*
- * alphaTab v0.9.1.0 (master)
+ * alphaTab v0.9.1.0 (develop)
  *
  * This file is part of alphaTab.
  * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
@@ -20615,6 +20615,18 @@ alphaTab.model._HarmonicType.HarmonicType_Impl_.toString = function(this1) {
 alphaTab.model.JsonConverter = $hx_exports["alphaTab"]["model"]["JsonConverter"] = function() {
 };
 alphaTab.model.JsonConverter.__name__ = ["alphaTab","model","JsonConverter"];
+alphaTab.model.JsonConverter.ScoreToJson = function(score) {
+	var obj = alphaTab.model.JsonConverter.ScoreToJsObject(score);
+	return JSON.stringify(obj,function(k,v) {
+		if(ArrayBuffer.isView(v)) {
+			return Array.apply([], v);
+		}
+		return v;
+	});
+};
+alphaTab.model.JsonConverter.JsonToScore = function(json,settings) {
+	return alphaTab.model.JsonConverter.JsObjectToScore(alphaTab.model.JsonConverter.JsObjectToScore(JSON.parse(json),settings),null);
+};
 alphaTab.model.JsonConverter.ScoreToJsObject = function(score) {
 	var score2 = {}
 	alphaTab.model.Score.CopyTo(score,score2);
@@ -20750,7 +20762,8 @@ alphaTab.model.JsonConverter.ScoreToJsObject = function(score) {
 	}
 	return score2;
 };
-alphaTab.model.JsonConverter.JsObjectToScore = function(score,settings) {
+alphaTab.model.JsonConverter.JsObjectToScore = function(jsObject,settings) {
+	var score = jsObject;
 	var score2 = new alphaTab.model.Score();
 	alphaTab.model.Score.CopyTo(score,score2);
 	alphaTab.model.RenderStylesheet.CopyTo(score.Stylesheet,score2.Stylesheet);
@@ -24766,8 +24779,8 @@ alphaTab.platform.javaScript.AlphaTabWorkerScoreRenderer.prototype = {
 		}
 	}
 	,Render: function(score,trackIndexes) {
-		score = alphaTab.model.JsonConverter.ScoreToJsObject(score);
-		this._worker.postMessage({ cmd : "alphaTab.render", score : score, trackIndexes : trackIndexes});
+		var jsObject = alphaTab.model.JsonConverter.ScoreToJsObject(score);
+		this._worker.postMessage({ cmd : "alphaTab.render", score : jsObject, trackIndexes : trackIndexes});
 	}
 	,add_PreRender: function(value) {
 		return this.PreRender = system._EventAction1.EventAction1_Impl_.add(this.PreRender,value);

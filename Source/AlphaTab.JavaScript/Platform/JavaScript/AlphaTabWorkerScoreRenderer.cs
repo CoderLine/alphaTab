@@ -106,8 +106,8 @@ namespace AlphaTab.Platform.JavaScript
 
         public void Render(Score score, int[] trackIndexes)
         {
-            score = JsonConverter.ScoreToJsObject(score);
-            _worker.PostMessage(new { cmd = "alphaTab.render", score = score, trackIndexes = trackIndexes });
+            var jsObject = JsonConverter.ScoreToJsObject(score);
+            _worker.PostMessage(new { cmd = "alphaTab.render", score = jsObject, trackIndexes = trackIndexes });
         }
 
         public event Action<RenderFinishedEventArgs> PreRender;
