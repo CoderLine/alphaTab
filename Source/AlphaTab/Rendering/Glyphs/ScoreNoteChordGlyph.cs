@@ -26,7 +26,8 @@ namespace AlphaTab.Rendering.Glyphs
 {
     class ScoreNoteChordGlyph : ScoreNoteChordGlyphBase
     {
-        private readonly FastDictionary<int, Glyph> _noteLookup;
+        private readonly FastDictionary<int, EffectGlyph> _noteGlyphLookup;
+        private readonly FastList<Note> _notes;
         private Glyph _tremoloPicking;
 
         public FastDictionary<string, Glyph> BeatEffects { get; set; }
@@ -37,7 +38,8 @@ namespace AlphaTab.Rendering.Glyphs
         public ScoreNoteChordGlyph()
         {
             BeatEffects = new FastDictionary<string, Glyph>();
-            _noteLookup = new FastDictionary<int, Glyph>();
+            _noteGlyphLookup = new FastDictionary<int, EffectGlyph>();
+            _notes = new FastList<Note>();
         }
 
         public override BeamDirection Direction
@@ -50,9 +52,9 @@ namespace AlphaTab.Rendering.Glyphs
 
         public float GetNoteX(Note note, bool onEnd = true)
         {
-            if (_noteLookup.ContainsKey(note.Id))
+            if (_noteGlyphLookup.ContainsKey(note.Id))
             {
-                var n = _noteLookup[note.Id];
+                var n = _noteGlyphLookup[note.Id];
                 var pos = X + n.X;
                 if (onEnd)
                 {
@@ -65,17 +67,18 @@ namespace AlphaTab.Rendering.Glyphs
 
         public float GetNoteY(Note note, bool aboveNote = false)
         {
-            if (_noteLookup.ContainsKey(note.Id))
+            if (_noteGlyphLookup.ContainsKey(note.Id))
             {
-                return Y + _noteLookup[note.Id].Y + (aboveNote ? -(NoteHeadGlyph.NoteHeadHeight * Scale) / 2 : 0);
+                return Y + _noteGlyphLookup[note.Id].Y + (aboveNote ? -(NoteHeadGlyph.NoteHeadHeight * Scale) / 2 : 0);
             }
             return 0;
         }
 
-        public void AddNoteGlyph(Glyph noteGlyph, Note note, int noteLine)
+        public void AddNoteGlyph(EffectGlyph noteGlyph, Note note, int noteLine)
         {
             base.Add(noteGlyph, noteLine);
-            _noteLookup[note.Id] = noteGlyph;
+            _noteGlyphLookup[note.Id] = noteGlyph;
+            _notes.Add(note);
         }
 
         public void UpdateBeamingHelper(float cx)
@@ -149,6 +152,27 @@ namespace AlphaTab.Rendering.Glyphs
                 g.X = Width / 2;
                 g.Paint(cx + X, cy + Y, canvas);
                 effectY += effectSpacing;
+            }
+
+            if (Renderer.Settings.IncludeNoteBounds)
+            {
+                foreach (var note in _notes)
+                {
+                    if (_noteGlyphLookup.ContainsKey(note.Id))
+                    {
+                        var glyph = _noteGlyphLookup[note.Id];
+                        var noteBounds = new NoteBounds();
+                        noteBounds.Note = note;
+                        noteBounds.NoteHeadBounds = new Bounds
+                        {
+                            X = cx + X + glyph.X,
+                            Y = cy + Y + glyph.Y,
+                            W = glyph.Width,
+                            H = glyph.Height
+                        };
+                        Renderer.ScoreRenderer.BoundsLookup.AddNote(noteBounds);
+                    }
+                }
             }
 
             base.Paint(cx, cy, canvas);

@@ -221,7 +221,8 @@ class Convert
 				// return result;
 			}
 		}
-		throw new OverflowException("Value was either too large or too small for a Int32.");
+		return Std.int(v.ToHaxeFloat());
+		// throw new OverflowException("Value was either too large or too small for a Int32.");
 	}
 	public static inline function ToUInt32_Double(v:system.Double) : system.UInt32 
 	{

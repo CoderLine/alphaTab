@@ -68,28 +68,28 @@ namespace AlphaTab.Audio.Synth.Bank.Components
             // Delay
             _stages[0].Offset = 0;
             _stages[0].Scale = 0;
-            _stages[0].Time = Math.Max(0, (int)(sampleRate * (envelopeInfo.DelayTime)));
+            _stages[0].Time = Math.Max(0, (sampleRate * (envelopeInfo.DelayTime)));
             // Attack
             _stages[1].Offset = envelopeInfo.StartLevel;
             _stages[1].Scale = envelopeInfo.PeakLevel - envelopeInfo.StartLevel;
-            _stages[1].Time = Math.Max(0, (int)(sampleRate * (envelopeInfo.AttackTime)));
+            _stages[1].Time = Math.Max(0, (sampleRate * (envelopeInfo.AttackTime)));
             _stages[1].Graph = Tables.EnvelopeTables(envelopeInfo.AttackGraph);
             // Hold
             _stages[2].Offset = 0;
             _stages[2].Scale = envelopeInfo.PeakLevel;
-            _stages[2].Time = (int) Math.Max(0, sampleRate * (envelopeInfo.HoldTime) * Math.Pow(2, ((60 - note) * keyNumToHold) / 1200.0));
+            _stages[2].Time = Math.Max(0, sampleRate * (envelopeInfo.HoldTime) * Math.Pow(2, ((60 - note) * keyNumToHold) / 1200.0));
             // Decay
             _stages[3].Offset = envelopeInfo.SustainLevel;
             _stages[3].Scale = envelopeInfo.PeakLevel - envelopeInfo.SustainLevel;
             if (envelopeInfo.SustainLevel == envelopeInfo.PeakLevel)
                 _stages[3].Time = 0;
             else
-                _stages[3].Time = Math.Max(0, (int)(sampleRate * (envelopeInfo.DecayTime) * Math.Pow(2, ((60 - note) * keyNumToDecay) / 1200.0)));
+                _stages[3].Time = Math.Max(0, (sampleRate * (envelopeInfo.DecayTime) * Math.Pow(2, ((60 - note) * keyNumToDecay) / 1200.0)));
             _stages[3].Graph = Tables.EnvelopeTables(envelopeInfo.DecayGraph);
             // Sustain
             _stages[4].Offset = 0;
             _stages[4].Scale = envelopeInfo.SustainLevel;
-            _stages[4].Time = (int) (sampleRate * envelopeInfo.SustainTime);
+            _stages[4].Time = (sampleRate * envelopeInfo.SustainTime);
             // Release
             _stages[5].Scale = _stages[3].Time == 0 && _stages[4].Time == 0 ? envelopeInfo.PeakLevel : _stages[4].Scale;
             if (isVolumeEnvelope)
@@ -109,7 +109,7 @@ namespace AlphaTab.Audio.Synth.Bank.Components
             _index = 0;
             Value = 0;
             CurrentStage = EnvelopeState.Delay;
-            while (_stages[(int)CurrentStage].Time == 0)
+            while (Math.Abs(_stages[(int)CurrentStage].Time) < 0.01)
             {
                 CurrentStage++;
             }
@@ -120,7 +120,7 @@ namespace AlphaTab.Audio.Synth.Bank.Components
         {
             do
             {
-                var neededSamples = _stage.Time - _index;
+                var neededSamples = (int)_stage.Time - _index;
                 if (neededSamples > samples)
                 {
                     _index += samples;
@@ -185,7 +185,7 @@ namespace AlphaTab.Audio.Synth.Bank.Components
 
     class EnvelopeStage
     {
-        public int Time { get; set; }
+        public double Time { get; set; }
         public SampleArray Graph { get; set; }
         public float Scale { get; set; }
         public float Offset { get; set; }

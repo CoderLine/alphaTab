@@ -208,6 +208,8 @@ namespace AlphaTab
             json.fontDirectory = FontDirectory;
             json.lazy = DisableLazyLoading;
 
+            json.includeNoteBounds = IncludeNoteBounds;
+
             json.vibrato = Platform.Platform.NewObject();
             json.noteSlightAmplitude = Vibrato.NoteSlightAmplitude;
             json.noteWideAmplitude = Vibrato.NoteWideAmplitude;
@@ -501,6 +503,16 @@ namespace AlphaTab
             else if (dataAttributes != null && dataAttributes.ContainsKey("layout"))
             {
                 settings.Layout = LayoutFromJson(dataAttributes["layout"]);
+            }
+
+
+            if (Platform.Platform.JsonExists(json, "includeNoteBounds"))
+            {
+                settings.IncludeNoteBounds = json.includeNoteBounds;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("includeNoteBounds"))
+            {
+                settings.IncludeNoteBounds = (bool)dataAttributes["includeNoteBounds"];
             }
 
             if (Platform.Platform.JsonExists(json, "vibrato"))

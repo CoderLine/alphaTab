@@ -19,6 +19,7 @@
 using System;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
@@ -139,6 +140,20 @@ namespace AlphaTab.Rendering.Glyphs
 
             Renderer.ScoreRenderer.Canvas.Font = Renderer.Resources.TablatureFont;
             canvas.FillText(_noteString, x, cy + Y);
+
+            if (Renderer.Settings.IncludeNoteBounds)
+            {
+                var noteBounds = new NoteBounds();
+                noteBounds.Note = _note;
+                noteBounds.NoteHeadBounds = new Bounds
+                {
+                    X = cx + X,
+                    Y = cy + Y,
+                    W = Width,
+                    H = Height
+                };
+                Renderer.ScoreRenderer.BoundsLookup.AddNote(noteBounds);
+            }
         }
     }
 }

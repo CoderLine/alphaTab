@@ -1152,6 +1152,21 @@ namespace AlphaTab.Platform.JavaScript
 
         private void SetupClickHandling()
         {
+            _canvasElement.AddEventListener("click", (Action<MouseEvent>)(e =>
+           {
+               var parentOffset = GetOffset(_canvasElement);
+
+               var relX = e.PageX - parentOffset.X;
+               var relY = e.PageY - parentOffset.Y;
+               var beat = _cursorCache.GetBeatAtPos(relX, relY);
+               if (beat == null) return;
+               var note = _cursorCache.GetNoteAtPos(beat, relX, relY);
+               TriggerEvent("beatClick", new
+               {
+                   beat = beat,
+                   note = note
+               });
+           }));
             _canvasElement.AddEventListener("mousedown", (Action<MouseEvent>)(e =>
             {
                 if (e.Button != 0)
@@ -1364,7 +1379,7 @@ namespace AlphaTab.Platform.JavaScript
                             nextBeat.Voice.Bar.Index == beat.Voice.Bar.Index + 1)
                         {
                             var nextBeatBoundings = cache.FindBeat(nextBeat);
-                            if (nextBeatBoundings != null && 
+                            if (nextBeatBoundings != null &&
                                 nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds == barBoundings.StaveGroupBounds)
                             {
                                 nextBeatX = nextBeatBoundings.VisualBounds.X;

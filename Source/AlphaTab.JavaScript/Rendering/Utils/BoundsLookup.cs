@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-
-using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
@@ -67,6 +65,19 @@ namespace AlphaTab.Rendering.Utils
                             bb.BarIndex = beat.Beat.Voice.Bar.Index;
                             bb.StaffIndex = beat.Beat.Voice.Bar.Staff.Index;
                             bb.TrackIndex = beat.Beat.Voice.Bar.Staff.Track.Index;
+
+                            if (beat.Notes != null)
+                            {
+                                FastList<NoteBounds> notes = bb.Notes = new FastList<NoteBounds>();
+
+                                foreach (var note in beat.Notes)
+                                {
+                                    var n = Platform.Platform.NewObject();
+                                    n.Index = note.Note.Index;
+                                    n.NoteHeadBounds = BoundsToJson(note.NoteHeadBounds);
+                                    notes.Add(n);
+                                }
+                            }
 
                             b.Beats.Add(bb);
                         }
@@ -123,6 +134,18 @@ namespace AlphaTab.Rendering.Utils
                                 .Bars[beat.Member<int>("BarIndex")]
                                 .Voices[beat.Member<int>("VoiceIndex")]
                                 .Beats[beat.Member<int>("BeatIndex")];
+
+                            if (beat.Notes != null)
+                            {
+                                bb.Notes = new FastList<NoteBounds>();
+                                foreach (var note in beat.Notes)
+                                {
+                                    var n = new NoteBounds();
+                                    n.Note = bb.Beat.Notes[note.Member<int>("Index")];
+                                    n.NoteHeadBounds = note.NoteHeadBounds;
+                                    bb.AddNote(n);
+                                }
+                            }
 
                             b.AddBeat(bb);
                         }

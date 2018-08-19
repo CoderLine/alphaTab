@@ -221,7 +221,7 @@ namespace AlphaTab.Rendering.Glyphs
             // ReSharper restore ForCanBeConvertedToForeach
         }
 
-        private Glyph CreateNoteHeadGlyph(Note n)
+        private EffectGlyph CreateNoteHeadGlyph(Note n)
         {
             var isGrace = Container.Beat.GraceType != GraceType.None;
             if (n.Beat.Voice.Bar.Staff.StaffKind == StaffKind.Percussion)

@@ -17,6 +17,8 @@
  */
 
 using AlphaTab.Collections;
+using AlphaTab.Rendering;
+using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
 
 namespace AlphaTab
@@ -204,6 +206,12 @@ namespace AlphaTab
         public int SongBookBendDuration { get; set; }
 
         /// <summary>
+        /// Gets or sets whether in the <see cref="BoundsLookup"/> also the
+        /// position and area of each individual note is provided. 
+        /// </summary>
+        public bool IncludeNoteBounds { get; set; }
+
+        /// <summary>
         /// Gets the default settings for the songbook display mode. 
         /// </summary>
         public static Settings SongBook
@@ -271,6 +279,7 @@ namespace AlphaTab
                 settings.Vibrato.BeatWideLength = 240;
 
                 settings.SongBookBendDuration = 75;
+                settings.IncludeNoteBounds = false;
 
                 SetDefaults(settings);
 

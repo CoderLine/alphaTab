@@ -191,6 +191,39 @@ namespace AlphaTab.Rendering.Utils
         public Bounds RealBounds { get; set; }
 
         public Beat Beat { get; set; }
+
+        public FastList<NoteBounds> Notes { get; set; }
+
+        public void AddNote(NoteBounds bounds)
+        {
+            if(Notes == null) Notes = new FastList<NoteBounds>();
+            Notes.Add(bounds);
+        }
+
+        public Note FindNoteAtPos(float x, float y)
+        {
+            if (Notes == null) return null;
+            // TODO: can be likely optimized 
+            // a beat is mostly vertically aligned, we could sort the note bounds by Y 
+            // and then do a binary search on the Y-axis. 
+            foreach (var note in Notes)
+            {
+                var bottom = note.NoteHeadBounds.Y + note.NoteHeadBounds.H;
+                var right = note.NoteHeadBounds.X + note.NoteHeadBounds.W;
+                if (note.NoteHeadBounds.X >= x && note.NoteHeadBounds.Y >= y && x <= right && y <= bottom)
+                {
+                    return note.Note;
+                }
+            }
+            return null;
+        }
+    }
+
+    public class NoteBounds
+    {
+        public Bounds NoteHeadBounds { get; set; }
+
+        public Note Note { get; set; }
     }
 
     public partial class BoundsLookup
@@ -200,7 +233,6 @@ namespace AlphaTab.Rendering.Utils
         private StaveGroupBounds _currentStaveGroup;
         public FastList<StaveGroupBounds> StaveGroups { get; set; }
         public bool IsFinished { get; private set; }
-
 
         public BoundsLookup()
         {
@@ -216,6 +248,12 @@ namespace AlphaTab.Rendering.Utils
                 StaveGroups[i].Finish();
             }
             IsFinished = true;
+        }
+
+        public void AddNote(NoteBounds bounds)
+        {
+            var beat = FindBeat(bounds.Note.Beat);
+            beat.AddNote(bounds);
         }
 
         public void AddStaveGroup(StaveGroupBounds bounds)
@@ -320,6 +358,17 @@ namespace AlphaTab.Rendering.Utils
             }
 
             return null;
+        }
+
+        public Note GetNoteAtPos(Beat beat, float x, float y)
+        {
+            var beatBounds = FindBeat(beat);
+            if (beatBounds == null) return null;
+
+            x -= beatBounds.BarBounds.MasterBarBounds.StaveGroupBounds.RealBounds.X;
+            y -= beatBounds.BarBounds.MasterBarBounds.StaveGroupBounds.RealBounds.Y;
+
+            return beatBounds.FindNoteAtPos(x, y);
         }
 
     }
