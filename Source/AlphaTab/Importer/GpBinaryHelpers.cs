@@ -50,37 +50,37 @@ namespace AlphaTab.Importer
         ///  a bytesize
         /// </summary>
         /// <returns></returns>
-        public static string GpReadStringIntUnused(this IReadable data)
+        public static string GpReadStringIntUnused(this IReadable data, string encoding)
         {
             data.Skip(4);
-            return data.GpReadString(data.ReadByte());
+            return data.GpReadString(data.ReadByte(), encoding);
         }
 
         /// <summary>
         /// Reads an integer as size, and then the string itself
         /// </summary>
         /// <returns></returns>
-        public static string GpReadStringInt(this IReadable data)
+        public static string GpReadStringInt(this IReadable data, string encoding)
         {
-            return data.GpReadString(data.ReadInt32LE());
+            return data.GpReadString(data.ReadInt32LE(), encoding);
         }
 
         /// <summary>
         /// Reads an integer as size, skips a byte and reads the string itself
         /// </summary>
         /// <returns></returns>
-        public static string GpReadStringIntByte(this IReadable data)
+        public static string GpReadStringIntByte(this IReadable data, string encoding)
         {
             var length = data.ReadInt32LE() - 1;
             data.ReadByte();
-            return data.GpReadString(length);
+            return data.GpReadString(length, encoding);
         }
 
-        public static string GpReadString(this IReadable data, int length)
+        public static string GpReadString(this IReadable data, int length, string encoding)
         {
             byte[] b = new byte[length];
             data.Read(b, 0, b.Length);
-            return Platform.Platform.ToString(b);
+            return Platform.Platform.ToString(b, encoding);
         }
 
         /// <summary>
@@ -90,10 +90,10 @@ namespace AlphaTab.Importer
         /// <param name="data">the data to read from.</param>
         /// <param name="length">the amount of bytes to read</param>
         /// <returns></returns>
-        public static string GpReadStringByteLength(this IReadable data, int length)
+        public static string GpReadStringByteLength(this IReadable data, int length, string encoding)
         {
             var stringLength = data.ReadByte();
-            var s = data.GpReadString(stringLength);
+            var s = data.GpReadString(stringLength, encoding);
             if (stringLength < length)
             {
                 data.Skip(length - stringLength);

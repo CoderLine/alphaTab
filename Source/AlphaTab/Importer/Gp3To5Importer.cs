@@ -43,11 +43,13 @@ namespace AlphaTab.Importer
         private int _trackCount;
 
         private FastList<PlaybackInformation> _playbackInfos;
+        private string _encoding;
 
         public override string Name { get { return "Guitar Pro 3-5"; } }
 
         public override Score ReadScore()
         {
+            _encoding = GetSetting("encoding", "utf-8");
             ReadVersion();
 
             _score = new Score();
@@ -81,7 +83,7 @@ namespace AlphaTab.Importer
             if (_versionNumber >= 500)
             {
                 ReadPageSetup();
-                _score.TempoLabel = Data.GpReadStringIntByte();
+                _score.TempoLabel = Data.GpReadStringIntByte(_encoding);
             }
 
             // tempo stuff
@@ -147,7 +149,7 @@ namespace AlphaTab.Importer
 
         public void ReadVersion()
         {
-            string version = Data.GpReadStringByteLength(30);
+            string version = Data.GpReadStringByteLength(30, _encoding);
             if (!version.StartsWith("FICHIER GUITAR PRO "))
             {
                 throw new UnsupportedFormatException();
@@ -163,23 +165,23 @@ namespace AlphaTab.Importer
 
         public void ReadScoreInformation()
         {
-            _score.Title = Data.GpReadStringIntUnused();
-            _score.SubTitle = Data.GpReadStringIntUnused();
-            _score.Artist = Data.GpReadStringIntUnused();
-            _score.Album = Data.GpReadStringIntUnused();
-            _score.Words = Data.GpReadStringIntUnused();
+            _score.Title = Data.GpReadStringIntUnused(_encoding);
+            _score.SubTitle = Data.GpReadStringIntUnused(_encoding);
+            _score.Artist = Data.GpReadStringIntUnused(_encoding);
+            _score.Album = Data.GpReadStringIntUnused(_encoding);
+            _score.Words = Data.GpReadStringIntUnused(_encoding);
 
-            _score.Music = (_versionNumber >= 500) ? Data.GpReadStringIntUnused() : _score.Words;
+            _score.Music = (_versionNumber >= 500) ? Data.GpReadStringIntUnused(_encoding) : _score.Words;
 
-            _score.Copyright = Data.GpReadStringIntUnused();
-            _score.Tab = Data.GpReadStringIntUnused();
-            _score.Instructions = Data.GpReadStringIntUnused();
+            _score.Copyright = Data.GpReadStringIntUnused(_encoding);
+            _score.Tab = Data.GpReadStringIntUnused(_encoding);
+            _score.Instructions = Data.GpReadStringIntUnused(_encoding);
             int noticeLines = Data.ReadInt32LE();
             var notice = new StringBuilder();
             for (int i = 0; i < noticeLines; i++)
             {
                 if (i > 0) notice.AppendLine();
-                notice.Append(Data.GpReadStringIntUnused());
+                notice.Append(Data.GpReadStringIntUnused(_encoding));
             }
             _score.Notices = notice.ToString();
         }
@@ -193,7 +195,7 @@ namespace AlphaTab.Importer
             {
                 var lyrics = new Lyrics();
                 lyrics.StartBar = Data.ReadInt32LE() - 1;
-                lyrics.Text = Data.GpReadStringInt();
+                lyrics.Text = Data.GpReadStringInt(_encoding);
                 _lyrics.Add(lyrics);
             }
         }
@@ -220,7 +222,7 @@ namespace AlphaTab.Importer
             // pagpublic enumber format
             for (int i = 0; i < 10; i++)
             {
-                Data.GpReadStringIntByte();
+                Data.GpReadStringIntByte(_encoding);
             }
         }
 
@@ -334,7 +336,7 @@ namespace AlphaTab.Importer
             if ((flags & 0x20) != 0)
             {
                 Section section = new Section();
-                section.Text = Data.GpReadStringIntByte();
+                section.Text = Data.GpReadStringIntByte(_encoding);
                 section.Marker = "";
                 Data.GpReadColor();
                 newMasterBar.Section = section;
@@ -404,7 +406,7 @@ namespace AlphaTab.Importer
             var mainStaff = newTrack.Staves[0];
 
             var flags = Data.ReadByte();
-            newTrack.Name = Data.GpReadStringByteLength(40);
+            newTrack.Name = Data.GpReadStringByteLength(40, _encoding);
             if ((flags & 0x01) != 0)
             {
                 mainStaff.StaffKind = StaffKind.Percussion;
@@ -464,8 +466,8 @@ namespace AlphaTab.Importer
             if (_versionNumber >= 510)
             {
                 Data.Skip(4);
-                Data.GpReadStringIntByte();
-                Data.GpReadStringIntByte();
+                Data.GpReadStringIntByte(_encoding);
+                Data.GpReadStringIntByte(_encoding);
             }
         }
 
@@ -609,7 +611,7 @@ namespace AlphaTab.Importer
 
             if ((flags & 0x04) != 0)
             {
-                newBeat.Text = Data.GpReadStringIntUnused();
+                newBeat.Text = Data.GpReadStringIntUnused(_encoding);
             }
 
             if ((flags & 0x08) != 0)
@@ -649,7 +651,7 @@ namespace AlphaTab.Importer
             if (_versionNumber >= 500)
             {
                 Data.Skip(17);
-                chord.Name = Data.GpReadStringByteLength(21);
+                chord.Name = Data.GpReadStringByteLength(21, _encoding);
                 Data.Skip(4);
                 chord.FirstFret = Data.ReadInt32LE();
                 for (int i = 0; i < 7; i++)
@@ -687,7 +689,7 @@ namespace AlphaTab.Importer
                         // Diminished/Augmented (4)
                         // Add (1)
                         Data.Skip(16);
-                        chord.Name = (Data.GpReadStringByteLength(21));
+                        chord.Name = Data.GpReadStringByteLength(21, _encoding);
                         // Unused (2)
                         // Fifth (1)
                         // Ninth (1)
@@ -723,7 +725,7 @@ namespace AlphaTab.Importer
                     {
                         // unknown
                         Data.Skip(25);
-                        chord.Name = Data.GpReadStringByteLength(34);
+                        chord.Name = Data.GpReadStringByteLength(34, _encoding);
                         chord.FirstFret = Data.ReadInt32LE();
                         for (int i = 0; i < 6; i++)
                         {
@@ -741,7 +743,7 @@ namespace AlphaTab.Importer
                 {
                     int strings = _versionNumber >= 406 ? 7 : 6;
 
-                    chord.Name = Data.GpReadStringIntByte();
+                    chord.Name = Data.GpReadStringIntByte(_encoding);
                     chord.FirstFret = Data.ReadInt32LE();
                     if (chord.FirstFret > 0)
                     {
@@ -920,7 +922,7 @@ namespace AlphaTab.Importer
             var tremolo = Data.ReadSignedByte();
             if (_versionNumber >= 500)
             {
-                tableChange.TempoName = Data.GpReadStringIntByte();
+                tableChange.TempoName = Data.GpReadStringIntByte(_encoding);
             }
             tableChange.Tempo = Data.ReadInt32LE();
 
@@ -977,8 +979,8 @@ namespace AlphaTab.Importer
             // unknown
             if (_versionNumber >= 510)
             {
-                Data.GpReadStringIntByte();
-                Data.GpReadStringIntByte();
+                Data.GpReadStringIntByte(_encoding);
+                Data.GpReadStringIntByte(_encoding);
             }
 
             if (tableChange.Volume >= 0)

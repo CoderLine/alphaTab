@@ -747,9 +747,15 @@ alphaTab.platform.Platform.ReadSignedByte = function(readable) {
 	}
 	return system.Convert.ToInt8(n);
 };
-alphaTab.platform.Platform.ToString = function(data) {
+alphaTab.platform.Platform.ToString = function(data,encoding) {
 	if(!(!$global.TextDecoder)) {
-		var encoding = alphaTab.platform.Platform.DetectEncoding(data);
+		var detectedEncoding = alphaTab.platform.Platform.DetectEncoding(data);
+		if(detectedEncoding != null) {
+			encoding = detectedEncoding;
+		}
+		if(encoding == null) {
+			encoding = "utf-8";
+		}
 		var decoder = new TextDecoder(encoding);
 		return decoder.decode(data);
 	} else {
@@ -775,21 +781,6 @@ alphaTab.platform.Platform.ToString = function(data) {
 		}
 		return s;
 	}
-};
-alphaTab.platform.Platform.DetectEncoding = function(data) {
-	if(data[0] == 254 && data[1] == 255) {
-		return "utf-16be";
-	}
-	if(data[0] == 255 && data[1] == 254) {
-		return "utf-16le";
-	}
-	if(data[0] == 0 && data[1] == 0 && data[2] == 254 && data[3] == 255) {
-		return "utf-32be";
-	}
-	if(data[0] == 255 && data[1] == 254 && data[2] == 0 && data[3] == 0) {
-		return "utf-32le";
-	}
-	return "utf-8";
 };
 alphaTab.platform.Platform.StringToByteArray = function(contents) {
 	var this1 = new Uint8Array(contents.length);
@@ -967,6 +958,21 @@ alphaTab.platform.Platform.ToUInt16 = function(i) {
 };
 alphaTab.platform.Platform.ToUInt8 = function(i) {
 	return system.Convert.ToUInt8(i);
+};
+alphaTab.platform.Platform.DetectEncoding = function(data) {
+	if(data[0] == 254 && data[1] == 255) {
+		return "utf-16be";
+	}
+	if(data[0] == 255 && data[1] == 254) {
+		return "utf-16le";
+	}
+	if(data[0] == 0 && data[1] == 0 && data[2] == 254 && data[3] == 255) {
+		return "utf-32be";
+	}
+	if(data[0] == 255 && data[1] == 254 && data[2] == 0 && data[3] == 0) {
+		return "utf-32le";
+	}
+	return null;
 };
 system.Convert = function() { };
 system.Convert.__name__ = ["system","Convert"];
@@ -13823,7 +13829,7 @@ alphaTab.importer.BinaryStylesheetParser.prototype = {
 		var entryCount = alphaTab.io.IOHelper.ReadInt32BE(readable);
 		var i = 0;
 		while(i < entryCount) {
-			var key = alphaTab.importer.GpBinaryHelpers.GpReadString(readable,readable.ReadByte());
+			var key = alphaTab.importer.GpBinaryHelpers.GpReadString(readable,readable.ReadByte(),"utf-8");
 			var type = js.Boot.__cast(readable.ReadByte() , Int);
 			switch(type) {
 			case 0:
@@ -13839,7 +13845,7 @@ alphaTab.importer.BinaryStylesheetParser.prototype = {
 				this.Stylesheet.AddValue(key,fvalue);
 				break;
 			case 3:
-				var s = alphaTab.importer.GpBinaryHelpers.GpReadString(readable,alphaTab.io.IOHelper.ReadInt16BE(readable));
+				var s = alphaTab.importer.GpBinaryHelpers.GpReadString(readable,alphaTab.io.IOHelper.ReadInt16BE(readable),"utf-8");
 				this.Stylesheet.AddValue(key,s);
 				break;
 			case 4:
@@ -13983,6 +13989,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		return "Guitar Pro 3-5";
 	}
 	,ReadScore: function() {
+		this._encoding = this.GetSetting("encoding","utf-8");
 		this.ReadVersion();
 		this._score = new alphaTab.model.Score();
 		this.ReadScoreInformation();
@@ -13997,7 +14004,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		}
 		if(this._versionNumber >= 500) {
 			this.ReadPageSetup();
-			this._score.TempoLabel = alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
+			this._score.TempoLabel = alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data,this._encoding);
 		}
 		this._score.Tempo = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 		if(this._versionNumber >= 510) {
@@ -14024,7 +14031,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		return this._score;
 	}
 	,ReadVersion: function() {
-		var version = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,30);
+		var version = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,30,this._encoding);
 		if(!StringTools.startsWith(version,"FICHIER GUITAR PRO ")) {
 			throw new js._Boot.HaxeError(new alphaTab.importer.UnsupportedFormatException().UnsupportedFormatException("Unsupported format"));
 		}
@@ -14035,16 +14042,16 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		alphaTab.util.Logger.Info(this.get_Name(),"Guitar Pro version " + version + " detected",null);
 	}
 	,ReadScoreInformation: function() {
-		this._score.Title = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
-		this._score.SubTitle = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
-		this._score.Artist = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
-		this._score.Album = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
-		this._score.Words = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
-		var tmp = this._versionNumber >= 500 ? alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data) : this._score.Words;
+		this._score.Title = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data,this._encoding);
+		this._score.SubTitle = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data,this._encoding);
+		this._score.Artist = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data,this._encoding);
+		this._score.Album = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data,this._encoding);
+		this._score.Words = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data,this._encoding);
+		var tmp = this._versionNumber >= 500 ? alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data,this._encoding) : this._score.Words;
 		this._score.Music = tmp;
-		this._score.Copyright = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
-		this._score.Tab = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
-		this._score.Instructions = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
+		this._score.Copyright = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data,this._encoding);
+		this._score.Tab = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data,this._encoding);
+		this._score.Instructions = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data,this._encoding);
 		var noticeLines = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 		var this1 = "";
 		var notice = this1;
@@ -14053,7 +14060,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			if(i > 0) {
 				notice = notice + ("" + "\r\n");
 			}
-			notice += Std.string(alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data));
+			notice += Std.string(alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data,this._encoding));
 			++i;
 		}
 		this._score.Notices = notice;
@@ -14066,7 +14073,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		while(i < 5) {
 			var lyrics = new alphaTab.model.Lyrics();
 			lyrics.StartBar = alphaTab.io.IOHelper.ReadInt32LE(this.Data) - 1;
-			lyrics.Text = alphaTab.importer.GpBinaryHelpers.GpReadStringInt(this.Data);
+			lyrics.Text = alphaTab.importer.GpBinaryHelpers.GpReadStringInt(this.Data,this._encoding);
 			this._lyrics.push(lyrics);
 			++i;
 		}
@@ -14075,7 +14082,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		this.Data.Skip(30);
 		var i = 0;
 		while(i < 10) {
-			alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
+			alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data,this._encoding);
 			++i;
 		}
 	}
@@ -14154,7 +14161,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		}
 		if((flags & 32) != 0) {
 			var section = new alphaTab.model.Section();
-			section.Text = alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
+			section.Text = alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data,this._encoding);
 			section.Marker = "";
 			alphaTab.importer.GpBinaryHelpers.GpReadColor(this.Data,false);
 			newMasterBar.Section = section;
@@ -14202,7 +14209,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		this._score.AddTrack(newTrack);
 		var mainStaff = newTrack.Staves[0];
 		var flags = this.Data.ReadByte();
-		newTrack.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,40);
+		newTrack.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,40,this._encoding);
 		if((flags & 1) != 0) {
 			mainStaff.StaffKind = 2;
 		}
@@ -14242,8 +14249,8 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		}
 		if(this._versionNumber >= 510) {
 			this.Data.Skip(4);
-			alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
-			alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
+			alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data,this._encoding);
+			alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data,this._encoding);
 		}
 	}
 	,ReadBars: function() {
@@ -14352,7 +14359,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			this.ReadChord(newBeat);
 		}
 		if((flags & 4) != 0) {
-			newBeat.Text = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data);
+			newBeat.Text = alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused(this.Data,this._encoding);
 		}
 		if((flags & 8) != 0) {
 			this.ReadBeatEffects(newBeat);
@@ -14381,7 +14388,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		var chordId = alphaTab.platform.Platform.NewGuid();
 		if(this._versionNumber >= 500) {
 			this.Data.Skip(17);
-			chord.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,21);
+			chord.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,21,this._encoding);
 			this.Data.Skip(4);
 			chord.FirstFret = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 			var i = 0;
@@ -14406,7 +14413,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		} else if(this.Data.ReadByte() != 0) {
 			if(this._versionNumber >= 400) {
 				this.Data.Skip(16);
-				chord.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,21);
+				chord.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,21,this._encoding);
 				this.Data.Skip(4);
 				chord.FirstFret = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 				var i2 = 0;
@@ -14430,7 +14437,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 				this.Data.Skip(26);
 			} else {
 				this.Data.Skip(25);
-				chord.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,34);
+				chord.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,34,this._encoding);
 				chord.FirstFret = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 				var i4 = 0;
 				while(i4 < 6) {
@@ -14444,7 +14451,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			}
 		} else {
 			var strings = this._versionNumber >= 406 ? 7 : 6;
-			chord.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
+			chord.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data,this._encoding);
 			chord.FirstFret = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 			if(chord.FirstFret > 0) {
 				var i5 = 0;
@@ -14570,7 +14577,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		var phaser = alphaTab.platform.Platform.ReadSignedByte(this.Data);
 		var tremolo = alphaTab.platform.Platform.ReadSignedByte(this.Data);
 		if(this._versionNumber >= 500) {
-			tableChange.TempoName = alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
+			tableChange.TempoName = alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data,this._encoding);
 		}
 		tableChange.Tempo = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 		if(tableChange.Volume >= 0) {
@@ -14604,8 +14611,8 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 			this.Data.ReadByte();
 		}
 		if(this._versionNumber >= 510) {
-			alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
-			alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data);
+			alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data,this._encoding);
+			alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte(this.Data,this._encoding);
 		}
 		if(tableChange.Volume >= 0) {
 			var volumeAutomation = new alphaTab.model.Automation();
@@ -15003,7 +15010,7 @@ alphaTab.importer.Gp7Importer.prototype = $extend(alphaTab.importer.ScoreImporte
 				binaryStylesheet = entry1.Data;
 				break;
 			case "score.gpif":
-				xml = alphaTab.platform.Platform.ToString(entry1.Data);
+				xml = alphaTab.platform.Platform.ToString(entry1.Data,this.GetSetting("encoding","utf-8"));
 				break;
 			default:
 			}
@@ -15063,27 +15070,27 @@ alphaTab.importer.GpBinaryHelpers.GpReadColor = function(data,readAlpha) {
 alphaTab.importer.GpBinaryHelpers.GpReadBool = function(data) {
 	return data.ReadByte() != 0;
 };
-alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused = function(data) {
+alphaTab.importer.GpBinaryHelpers.GpReadStringIntUnused = function(data,encoding) {
 	data.Skip(4);
-	return alphaTab.importer.GpBinaryHelpers.GpReadString(data,data.ReadByte());
+	return alphaTab.importer.GpBinaryHelpers.GpReadString(data,data.ReadByte(),encoding);
 };
-alphaTab.importer.GpBinaryHelpers.GpReadStringInt = function(data) {
-	return alphaTab.importer.GpBinaryHelpers.GpReadString(data,alphaTab.io.IOHelper.ReadInt32LE(data));
+alphaTab.importer.GpBinaryHelpers.GpReadStringInt = function(data,encoding) {
+	return alphaTab.importer.GpBinaryHelpers.GpReadString(data,alphaTab.io.IOHelper.ReadInt32LE(data),encoding);
 };
-alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte = function(data) {
+alphaTab.importer.GpBinaryHelpers.GpReadStringIntByte = function(data,encoding) {
 	var length = alphaTab.io.IOHelper.ReadInt32LE(data) - 1;
 	data.ReadByte();
-	return alphaTab.importer.GpBinaryHelpers.GpReadString(data,length);
+	return alphaTab.importer.GpBinaryHelpers.GpReadString(data,length,encoding);
 };
-alphaTab.importer.GpBinaryHelpers.GpReadString = function(data,length) {
+alphaTab.importer.GpBinaryHelpers.GpReadString = function(data,length,encoding) {
 	var this1 = new Uint8Array(length);
 	var b = this1;
 	data.Read(b,0,b.length);
-	return alphaTab.platform.Platform.ToString(b);
+	return alphaTab.platform.Platform.ToString(b,encoding);
 };
-alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength = function(data,length) {
+alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength = function(data,length,encoding) {
 	var stringLength = data.ReadByte();
-	var s = alphaTab.importer.GpBinaryHelpers.GpReadString(data,stringLength);
+	var s = alphaTab.importer.GpBinaryHelpers.GpReadString(data,stringLength,encoding);
 	if(stringLength < length) {
 		data.Skip(length - stringLength);
 	}
@@ -17184,7 +17191,7 @@ alphaTab.importer.GpxImporter.prototype = $extend(alphaTab.importer.ScoreImporte
 				binaryStylesheet = entry1.Data;
 				break;
 			case "score.gpif":
-				xml = alphaTab.platform.Platform.ToString(entry1.Data);
+				xml = alphaTab.platform.Platform.ToString(entry1.Data,this.GetSetting("encoding","utf-8"));
 				break;
 			default:
 			}
@@ -17245,7 +17252,7 @@ alphaTab.importer.MusicXmlImporter.prototype = $extend(alphaTab.importer.ScoreIm
 		this._partGroups = this2;
 		var this3 = [];
 		this._tieStarts = this3;
-		var xml = alphaTab.platform.Platform.ToString(this.Data.ReadAll());
+		var xml = alphaTab.platform.Platform.ToString(this.Data.ReadAll(),this.GetSetting("encoding","utf-8"));
 		var dom;
 		try {
 			dom = new alphaTab.xml.XmlDocument(xml);
@@ -18993,7 +19000,7 @@ alphaTab.io.IOHelper.Read8BitChars = function(input,length) {
 	var this1 = new Uint8Array(length);
 	var b = this1;
 	input.Read(b,0,b.length);
-	return alphaTab.platform.Platform.ToString(b);
+	return alphaTab.platform.Platform.ToString(b,"utf-8");
 };
 alphaTab.io.IOHelper.Read8BitString = function(input) {
 	var this1 = "";

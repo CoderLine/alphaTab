@@ -1627,6 +1627,10 @@
         <member name="P:AlphaTab.Settings.ImporterSettings">
             <summary>
             Specific settings for importers. Keys are specific for the importers. 
+            <strong>General</strong>
+            <ul>
+             <li><strong>encoding</strong> - The text encoding to use when decoding strings (string, default:utf-8)</li>
+            </ul>
             <strong>MusicXML</strong>
             <ul>
              <li><strong>musicxmlMergePartGroups</strong> - If part-groups should be merged into a single track (boolean, default:false)</li>
@@ -1900,26 +1904,26 @@
                    1 byte | Alpha
              </remarks>
         </member>
-        <member name="M:AlphaTab.Importer.GpBinaryHelpers.GpReadStringIntUnused(AlphaTab.IO.IReadable)">
+        <member name="M:AlphaTab.Importer.GpBinaryHelpers.GpReadStringIntUnused(AlphaTab.IO.IReadable,System.String)">
             <summary>
              Skips an integer (4byte) and reads a string using 
              a bytesize
             </summary>
             <returns></returns>
         </member>
-        <member name="M:AlphaTab.Importer.GpBinaryHelpers.GpReadStringInt(AlphaTab.IO.IReadable)">
+        <member name="M:AlphaTab.Importer.GpBinaryHelpers.GpReadStringInt(AlphaTab.IO.IReadable,System.String)">
             <summary>
             Reads an integer as size, and then the string itself
             </summary>
             <returns></returns>
         </member>
-        <member name="M:AlphaTab.Importer.GpBinaryHelpers.GpReadStringIntByte(AlphaTab.IO.IReadable)">
+        <member name="M:AlphaTab.Importer.GpBinaryHelpers.GpReadStringIntByte(AlphaTab.IO.IReadable,System.String)">
             <summary>
             Reads an integer as size, skips a byte and reads the string itself
             </summary>
             <returns></returns>
         </member>
-        <member name="M:AlphaTab.Importer.GpBinaryHelpers.GpReadStringByteLength(AlphaTab.IO.IReadable,System.Int32)">
+        <member name="M:AlphaTab.Importer.GpBinaryHelpers.GpReadStringByteLength(AlphaTab.IO.IReadable,System.Int32,System.String)">
             <summary>
             Reads a byte as size and the string itself.
             Additionally it is ensured the specified amount of bytes is read. 

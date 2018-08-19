@@ -101,9 +101,28 @@ namespace AlphaTab.Platform
             return unchecked((sbyte)(byte)readable.ReadByte());
         }
 
-        public static string ToString(byte[] data)
+        public static string ToString(byte[] data, string encoding)
         {
-            return Encoding.UTF8.GetString(data, 0, data.Length);
+            var detectedEncoding = DetectEncoding(data);
+            if (detectedEncoding != null)
+            {
+                encoding = detectedEncoding;
+            }
+            if (encoding == null)
+            {
+                encoding = "utf-8";
+            }
+
+            Encoding enc;
+            try
+            {
+                enc = Encoding.GetEncoding(encoding);
+            }
+            catch
+            {
+                enc = Encoding.UTF8;
+            }
+            return enc.GetString(data, 0, data.Length);
         }
 
         public static bool InstanceOf<T>(object value)

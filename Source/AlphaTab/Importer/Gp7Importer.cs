@@ -55,7 +55,7 @@ namespace AlphaTab.Importer
                 switch (entry.FileName)
                 {
                     case GpxFileSystem.ScoreGpif:
-                        xml = Platform.Platform.ToString(entry.Data);
+                        xml = Platform.Platform.ToString(entry.Data, GetSetting("encoding",  "utf-8"));
                         break;
                     case GpxFileSystem.BinaryStylesheet:
                         binaryStylesheet = entry.Data;

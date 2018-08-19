@@ -48,7 +48,7 @@ namespace AlphaTab.Importer
             _partGroups = new FastDictionary<string, FastList<Track>>();
             _tieStarts = new FastList<Note>();
 
-            var xml = Platform.Platform.ToString(Data.ReadAll());
+            var xml = Platform.Platform.ToString(Data.ReadAll(), GetSetting("encoding", "utf-8"));
             XmlDocument dom;
             try
             {

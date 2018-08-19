@@ -105,7 +105,7 @@ namespace AlphaTab.IO
         {
             byte[] b = new byte[length];
             input.Read(b, 0, b.Length);
-            return Platform.Platform.ToString(b);
+            return Platform.Platform.ToString(b, "utf-8");
         }
 
         public static string Read8BitString(this IReadable input)

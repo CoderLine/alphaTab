@@ -98,6 +98,10 @@ namespace AlphaTab
 
         /// <summary>
         /// Specific settings for importers. Keys are specific for the importers. 
+        /// <strong>General</strong>
+        /// <ul>
+        ///  <li><strong>encoding</strong> - The text encoding to use when decoding strings (string, default:utf-8)</li>
+        /// </ul>
         /// <strong>MusicXML</strong>
         /// <ul>
         ///  <li><strong>musicxmlMergePartGroups</strong> - If part-groups should be merged into a single track (boolean, default:false)</li>

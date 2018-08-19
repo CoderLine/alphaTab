@@ -70,7 +70,7 @@ namespace AlphaTab.Importer
             var entryCount = readable.ReadInt32BE();
             for (int i = 0; i < entryCount; i++)
             {
-                var key = readable.GpReadString(readable.ReadByte());
+                var key = readable.GpReadString(readable.ReadByte(), "utf-8");
                 var type = (DataType)readable.ReadByte();
 
                 switch (type)
@@ -88,7 +88,7 @@ namespace AlphaTab.Importer
                         Stylesheet.AddValue(key, fvalue);
                         break;
                     case DataType.String:
-                        var s = readable.GpReadString(readable.ReadInt16BE());
+                        var s = readable.GpReadString(readable.ReadInt16BE(), "utf-8");
                         Stylesheet.AddValue(key, s);
                         break;
                     case DataType.Point:

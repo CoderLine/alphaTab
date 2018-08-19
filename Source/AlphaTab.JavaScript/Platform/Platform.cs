@@ -142,11 +142,19 @@ namespace AlphaTab.Platform
             return (sbyte)n;
         }
 
-        public static string ToString(byte[] data)
+        public static string ToString(byte[] data, string encoding)
         {
             if (SupportsTextDecoder)
             {
-                var encoding = DetectEncoding(data);
+                var detectedEncoding = DetectEncoding(data);
+                if (detectedEncoding != null)
+                {
+                    encoding = detectedEncoding;
+                }
+                if (encoding == null)
+                {
+                    encoding = "utf-8";
+                }
                 var decoder = new TextDecoder(encoding);
                 return decoder.Decode(data.As<ArrayBuffer>());
             }
@@ -181,28 +189,6 @@ namespace AlphaTab.Platform
                 }
                 return s.ToString();
             }
-        }
-
-        private static string DetectEncoding(byte[] data)
-        {
-            if (data[0] == 0xFE && data[1] == 0xFF)
-            {
-                return "utf-16be";
-            }
-            if (data[0] == 0xFF && data[1] == 0xFE)
-            {
-                return "utf-16le";
-            }
-            if (data[0] == 0x00 && data[1] == 0x00 && data[2] == 0xFE && data[3] == 0xFF)
-            {
-                return "utf-32be";
-            }
-            if (data[0] == 0xFF && data[1] == 0xFE && data[2] == 0x00 && data[3] == 0x00)
-            {
-                return "utf-32le";
-            }
-
-            return "utf-8";
         }
 
         public static byte[] StringToByteArray(string contents)
