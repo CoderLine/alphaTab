@@ -1731,6 +1731,12 @@
             Gets or sets the bend duration in milliseconds for songbook bends. 
             </summary>
         </member>
+        <member name="P:AlphaTab.Settings.IncludeNoteBounds">
+            <summary>
+            Gets or sets whether in the <see cref="T:AlphaTab.Rendering.Utils.BoundsLookup"/> also the
+            position and area of each individual note is provided. 
+            </summary>
+        </member>
         <member name="P:AlphaTab.Settings.SongBook">
             <summary>
             Gets the default settings for the songbook display mode. 
@@ -5307,6 +5313,36 @@
         <member name="T:AlphaTab.Xml.XmlParser.XmlState">
             <summary>
             faster than enum
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
             </summary>
         </member>
     </members>

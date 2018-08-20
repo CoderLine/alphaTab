@@ -87,19 +87,19 @@ namespace AlphaTab.Platform
 
         private static string DetectEncoding(byte[] data)
         {
-            if (data[0] == 0xFE && data[1] == 0xFF)
+            if (data.Length > 2 && data[0] == 0xFE && data[1] == 0xFF)
             {
                 return "utf-16be";
             }
-            if (data[0] == 0xFF && data[1] == 0xFE)
+            if (data.Length > 2 && data[0] == 0xFF && data[1] == 0xFE)
             {
                 return "utf-16le";
             }
-            if (data[0] == 0x00 && data[1] == 0x00 && data[2] == 0xFE && data[3] == 0xFF)
+            if (data.Length > 4 && data[0] == 0x00 && data[1] == 0x00 && data[2] == 0xFE && data[3] == 0xFF)
             {
                 return "utf-32be";
             }
-            if (data[0] == 0xFF && data[1] == 0xFE && data[2] == 0x00 && data[3] == 0x00)
+            if (data.Length > 4 && data[0] == 0xFF && data[1] == 0xFE && data[2] == 0x00 && data[3] == 0x00)
             {
                 return "utf-32le";
             }
