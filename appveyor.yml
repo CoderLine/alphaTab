@@ -65,12 +65,13 @@ test:
       - Source\AlphaTab.Test.CSharp\bin\Release\net471\AlphaTab.Test.CSharp.dll
 
 after_test:
+  - 7z a -r Build\JavaScript\dist.zip Build\JavaScript\*
   - Documentation\generate.bat
   - 7z a -r Documentation\documentation.zip Documentation\output\*
 
 artifacts:
   # JavaScript Output
-  - path: Build\JavaScript\*.*
+  - path: Build\JavaScript\dist.zip
     name: JavaScript
   # NuGet package output 
   - path: Source\AlphaTab.CSharp\Bin\$(configuration)\*.nupkg
