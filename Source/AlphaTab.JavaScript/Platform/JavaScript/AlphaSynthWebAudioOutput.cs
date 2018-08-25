@@ -65,6 +65,12 @@ namespace AlphaTab.Platform.JavaScript
 
         public void Play()
         {
+            dynamic ctx = _context;
+            if (ctx.state == "suspended" || ctx.state == "interrupted")
+            {
+                ctx.resume();
+            }
+
             // create an empty buffer source (silence)
             _buffer = _context.CreateBuffer(2, BufferSize, _context.SampleRate);
 

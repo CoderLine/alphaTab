@@ -960,16 +960,16 @@ alphaTab.platform.Platform.ToUInt8 = function(i) {
 	return system.Convert.ToUInt8(i);
 };
 alphaTab.platform.Platform.DetectEncoding = function(data) {
-	if(data[0] == 254 && data[1] == 255) {
+	if(data.length > 2 && data[0] == 254 && data[1] == 255) {
 		return "utf-16be";
 	}
-	if(data[0] == 255 && data[1] == 254) {
+	if(data.length > 2 && data[0] == 255 && data[1] == 254) {
 		return "utf-16le";
 	}
-	if(data[0] == 0 && data[1] == 0 && data[2] == 254 && data[3] == 255) {
+	if(data.length > 4 && data[0] == 0 && data[1] == 0 && data[2] == 254 && data[3] == 255) {
 		return "utf-32be";
 	}
-	if(data[0] == 255 && data[1] == 254 && data[2] == 0 && data[3] == 0) {
+	if(data.length > 4 && data[0] == 255 && data[1] == 254 && data[2] == 0 && data[3] == 0) {
 		return "utf-32le";
 	}
 	return null;
@@ -23237,6 +23237,10 @@ alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.prototype = {
 		system._EventAction.EventAction_Impl_.Invoke(this.Ready);
 	}
 	,Play: function() {
+		var ctx = this._context;
+		if(ctx.state == "suspended" || ctx.state == "interrupted") {
+			ctx.resume();
+		}
 		this._buffer = this._context.createBuffer(2,4096,this._context.sampleRate);
 		this._audioNode = this._context.createScriptProcessor(4096,0,2);
 		this._audioNode.onaudioprocess = $bind(this,this.GenerateSound);
