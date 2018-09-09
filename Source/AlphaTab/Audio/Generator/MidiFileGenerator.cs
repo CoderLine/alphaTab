@@ -348,7 +348,7 @@ namespace AlphaTab.Audio.Generator
 
             if (initialBend > 0)
             {
-                _handler.AddBend(track.Index, noteStart, (byte)channel, (byte)initialBend);
+                _handler.AddBend(track.Index, noteStart, (byte)channel, initialBend);
             }
 
             // 
@@ -612,7 +612,7 @@ namespace AlphaTab.Audio.Generator
                 {
                     var bend = bendAmplitude * Math.Sin(phase * Math.PI / phaseHalf);
 
-                    _handler.AddBend(track.Index, noteStart + phase, (byte)channel, (byte)(DefaultBend + bend));
+                    _handler.AddBend(track.Index, noteStart + phase, (byte)channel, (int)(DefaultBend + bend));
 
                     phase += resolution;
                 }
@@ -763,7 +763,7 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Fast:
                             var preBendValue = DefaultBend + (note.BendPoints[0].Value * DefaultBendSemitone);
-                            _handler.AddBend(track.Index, noteStart, (byte)channel, (byte)preBendValue);
+                            _handler.AddBend(track.Index, noteStart, (byte)channel, (int)preBendValue);
 
                             if (finalBendValue == null || finalBendValue.Value < note.BendPoints[1].Value)
                             {
@@ -788,7 +788,7 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Fast:
                             var preBendValue = DefaultBend + (note.BendPoints[0].Value * DefaultBendSemitone);
-                            _handler.AddBend(track.Index, noteStart, (byte)channel, (byte)preBendValue);
+                            _handler.AddBend(track.Index, noteStart, (byte)channel, (int)preBendValue);
 
                             GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
                                 false, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value }, bendDuration);
@@ -893,7 +893,7 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Fast:
                             var preDiveValue = DefaultBend + (bendPoints[0].Value * DefaultBendSemitone);
-                            _handler.AddBend(track.Index, noteStart, (byte)channel, (byte)preDiveValue);
+                            _handler.AddBend(track.Index, noteStart, (byte)channel, (int)preDiveValue);
 
                             var whammyDuration = _settings == null ? duration : Math.Min(duration, MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
                             GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
@@ -939,7 +939,7 @@ namespace AlphaTab.Audio.Generator
             {
                 while (currentBendValue <= nextBendValue)
                 {
-                    _handler.AddBend(track.Index, (int) currentTick, (byte) channel, (byte) Math.Round(currentBendValue));
+                    _handler.AddBend(track.Index, (int) currentTick, (byte) channel, (int) Math.Round(currentBendValue));
                     currentBendValue++;
                     currentTick += ticksPerValue;
                 }
@@ -949,7 +949,7 @@ namespace AlphaTab.Audio.Generator
             {
                 while (currentBendValue >= nextBendValue)
                 {
-                    _handler.AddBend(track.Index, (int) currentTick, (byte) channel, (byte) Math.Round(currentBendValue));
+                    _handler.AddBend(track.Index, (int) currentTick, (byte) channel, (int) Math.Round(currentBendValue));
                     currentBendValue--;
                     currentTick += ticksPerValue;
                 }
@@ -957,7 +957,7 @@ namespace AlphaTab.Audio.Generator
             // hold
             else
             {
-                _handler.AddBend(track.Index, (int) currentTick, (byte) channel, (byte) Math.Round(currentBendValue));
+                _handler.AddBend(track.Index, (int) currentTick, (byte) channel, (int) Math.Round(currentBendValue));
             }
         }
 

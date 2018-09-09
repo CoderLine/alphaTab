@@ -285,7 +285,7 @@ namespace AlphaTab.Test.Audio
 
         public class BendEvent : ChannelMidiEvent
         {
-            public byte Value { get; set; }
+            public int Value { get; set; }
 
             public override string ToString()
             {
@@ -394,7 +394,7 @@ namespace AlphaTab.Test.Audio
             });
         }
 
-        public void AddBend(int track, int tick, byte channel, byte value)
+        public void AddBend(int track, int tick, byte channel, int value)
         {
             MidiEvents.Add(new BendEvent()
             {

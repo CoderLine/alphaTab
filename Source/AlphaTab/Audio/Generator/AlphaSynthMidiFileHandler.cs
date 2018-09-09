@@ -61,10 +61,11 @@ namespace AlphaTab.Audio.Generator
             return (byte)((command & 0xF0) | (channel & 0x0F));
         }
 
-        private static byte FixValue(byte value)
+        private static byte FixValue(int value)
         {
             if (value > 127) return 127;
-            return value;
+            if (value < 0) return 0;
+            return (byte)value;
         }
 
         /// <inheritdoc />
@@ -95,7 +96,7 @@ namespace AlphaTab.Audio.Generator
         }
 
         /// <inheritdoc />
-        public void AddBend(int track, int tick, byte channel, byte value)
+        public void AddBend(int track, int tick, byte channel, int value)
         {
             var message = new MidiEvent(tick, MakeCommand((byte)MidiEventType.PitchBend, channel), 0, FixValue(value));
             _midiFile.AddEvent(message);
