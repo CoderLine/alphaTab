@@ -8265,7 +8265,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			case 2:
 				var preBendValue1 = 64 + note.BendPoints[0].Value * 2.75;
 				this._handler.AddBend(track.Index,noteStart,system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Single(preBendValue1)));
-				this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,true,new Int32Array([note.BendPoints[0].Value,note.BendPoints[1].Value]));
+				this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,false,new Int32Array([note.BendPoints[0].Value,note.BendPoints[1].Value]));
 				return;
 			default:
 			}
