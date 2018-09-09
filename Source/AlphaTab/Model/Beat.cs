@@ -705,7 +705,7 @@ namespace AlphaTab.Model
                 }
             }
 
-            if (visibleNotes == 0)
+            if (Notes.Count > 0 && visibleNotes == 0)
             {
                 IsEmpty = true;
             }

@@ -1,5 +1,5 @@
 /*
- * alphaTab v0.9.1.0 (develop)
+ * alphaTab v0.9.1.0 (master)
  *
  * This file is part of alphaTab.
  * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
@@ -19828,7 +19828,7 @@ alphaTab.model.Beat.prototype = {
 			}
 			++i;
 		}
-		if(visibleNotes == 0) {
+		if(this.Notes.length > 0 && visibleNotes == 0) {
 			this.IsEmpty = true;
 		}
 		if(this.IsSlurOrigin) {
