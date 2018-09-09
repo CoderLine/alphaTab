@@ -8177,15 +8177,34 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 	,GenerateBend: function(note,noteStart,noteDuration,noteKey,dynamicValue,channel) {
 		var bendPoints = note.BendPoints;
 		var track = note.Beat.Voice.Bar.Staff.Track;
+		var finalBendValue = null;
 		var duration;
 		if(note.IsTieOrigin && (this._settings == null || this._settings.ExtendBendArrowsOnTiedNotes)) {
 			var endNote = note;
 			while(endNote.IsTieOrigin && !endNote.TieDestination.get_HasBend()) endNote = endNote.TieDestination;
 			var this1 = endNote.Beat.get_AbsolutePlaybackStart() - note.Beat.get_AbsolutePlaybackStart() + this.GetNoteDuration(endNote,endNote.Beat.PlaybackDuration).NoteOnly;
 			duration = this1;
+		} else if(note.IsTieOrigin && note.Beat.GraceType != 0) {
+			var _g = note.TieDestination.BendType;
+			switch(_g) {
+			case 2:case 4:case 7:
+				finalBendValue = note.TieDestination.BendPoints[1].Value;
+				break;
+			case 6:case 8:
+				finalBendValue = note.TieDestination.BendPoints[0].Value;
+				break;
+			default:
+			}
+			if(this._settings == null) {
+				var this2 = noteDuration.NoteOnly;
+				duration = this2;
+			} else {
+				var this3 = Math.max(noteDuration.NoteOnly,alphaTab.audio.MidiUtils.MillisToTicks(this._settings.SongBookBendDuration,this._currentTempo));
+				duration = this3;
+			}
 		} else {
-			var this2 = noteDuration.NoteOnly;
-			duration = this2;
+			var this4 = noteDuration.NoteOnly;
+			duration = this4;
 		}
 		if(bendPoints[0].Value > 0 && !note.IsContinuedBend) {
 			--noteStart;
@@ -8194,39 +8213,45 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		if(this._settings == null) {
 			bendDuration = duration;
 		} else {
-			var this3 = alphaTab.audio.MidiUtils.MillisToTicks(this._settings.SongBookBendDuration,this._currentTempo);
-			bendDuration = Math.min(duration,this3);
+			var this5 = alphaTab.audio.MidiUtils.MillisToTicks(this._settings.SongBookBendDuration,this._currentTempo);
+			bendDuration = Math.min(duration,this5);
 		}
-		var this4 = [];
-		var playedBendPoints = this4;
-		var _g = note.BendType;
-		switch(_g) {
+		var this6 = [];
+		var playedBendPoints = this6;
+		var _g1 = note.BendType;
+		switch(_g1) {
 		case 1:
 			playedBendPoints = bendPoints;
 			break;
 		case 2:case 3:
-			var _g1 = note.BendStyle;
-			switch(_g1) {
+			var _g2 = note.BendStyle;
+			switch(_g2) {
 			case 0:
 				playedBendPoints = bendPoints;
 				break;
 			case 1:
 				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[1].Value));
+				if(finalBendValue == null || finalBendValue < note.BendPoints[1].Value) {
+					finalBendValue = note.BendPoints[1].Value;
+				}
+				playedBendPoints.push(new alphaTab.model.BendPoint(60,finalBendValue));
 				break;
 			case 2:
+				if(finalBendValue == null || finalBendValue < note.BendPoints[1].Value) {
+					finalBendValue = note.BendPoints[1].Value;
+				}
 				if(note.Beat.GraceType == 3) {
-					this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,true,new Int32Array([note.BendPoints[0].Value,note.BendPoints[1].Value]),bendDuration);
+					this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,true,new Int32Array([note.BendPoints[0].Value,finalBendValue]),bendDuration);
 				} else {
-					this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,false,new Int32Array([note.BendPoints[0].Value,note.BendPoints[1].Value]),bendDuration);
+					this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,false,new Int32Array([note.BendPoints[0].Value,finalBendValue]),bendDuration);
 				}
 				return;
 			default:
 			}
 			break;
 		case 4:
-			var _g2 = note.BendStyle;
-			switch(_g2) {
+			var _g3 = note.BendStyle;
+			switch(_g3) {
 			case 0:
 				playedBendPoints = bendPoints;
 				break;
@@ -8248,8 +8273,8 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			playedBendPoints = bendPoints;
 			break;
 		case 7:
-			var _g3 = note.BendStyle;
-			switch(_g3) {
+			var _g4 = note.BendStyle;
+			switch(_g4) {
 			case 0:
 				playedBendPoints = bendPoints;
 				break;
@@ -8261,14 +8286,17 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 			case 2:
 				var preBendValue = 64 + note.BendPoints[0].Value * 2.75;
 				this._handler.AddBend(track.Index,noteStart,system.Convert.ToUInt8(channel),system.Convert.ToUInt8(system.Convert.ToInt32_Single(preBendValue)));
-				this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,false,new Int32Array([note.BendPoints[0].Value,note.BendPoints[1].Value]),bendDuration);
+				if(finalBendValue == null || finalBendValue < note.BendPoints[1].Value) {
+					finalBendValue = note.BendPoints[1].Value;
+				}
+				this.GenerateSongBookWhammyOrBend(noteStart,channel,duration,track,false,new Int32Array([note.BendPoints[0].Value,finalBendValue]),bendDuration);
 				return;
 			default:
 			}
 			break;
 		case 8:
-			var _g4 = note.BendStyle;
-			switch(_g4) {
+			var _g5 = note.BendStyle;
+			switch(_g5) {
 			case 0:
 				playedBendPoints = bendPoints;
 				break;
