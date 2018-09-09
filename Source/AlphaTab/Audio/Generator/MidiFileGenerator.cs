@@ -348,7 +348,7 @@ namespace AlphaTab.Audio.Generator
 
             if (initialBend > 0)
             {
-                _handler.AddBend(track.Index, noteStart, (byte)channel, (byte)initialBend);
+                _handler.AddBend(track.Index, noteStart, (byte)channel, initialBend);
             }
 
             // 
@@ -612,7 +612,7 @@ namespace AlphaTab.Audio.Generator
                 {
                     var bend = bendAmplitude * Math.Sin(phase * Math.PI / phaseHalf);
 
-                    _handler.AddBend(track.Index, noteStart + phase, (byte)channel, (byte)(DefaultBend + bend));
+                    _handler.AddBend(track.Index, noteStart + phase, (byte)channel, (int)(DefaultBend + bend));
 
                     phase += resolution;
                 }
@@ -625,7 +625,7 @@ namespace AlphaTab.Audio.Generator
         {
             // TODO 
         }
-
+        
         private const int DefaultBend = 0x40;
         private const float DefaultBendSemitone = 2.75f;
 
@@ -633,6 +633,9 @@ namespace AlphaTab.Audio.Generator
         {
             FastList<BendPoint> bendPoints = note.BendPoints;
             var track = note.Beat.Voice.Bar.Staff.Track;
+
+            // if bend is extended on next tied note, we directly bend to the final bend value 
+            int? finalBendValue = null;
 
             // Bends are spread across all tied notes unless they have a bend on their own.
             double duration;
@@ -646,6 +649,31 @@ namespace AlphaTab.Audio.Generator
 
                 duration = endNote.Beat.AbsolutePlaybackStart - note.Beat.AbsolutePlaybackStart + GetNoteDuration(endNote, endNote.Beat.PlaybackDuration).NoteOnly;
             }
+            // if current note is a grace note with bend and tie, we can reach into next note 
+            else if(note.IsTieOrigin && note.Beat.GraceType != GraceType.None)
+            {
+                switch (note.TieDestination.BendType)
+                {
+                    case BendType.Bend:
+                    case BendType.BendRelease:
+                    case BendType.PrebendBend:
+                        finalBendValue = note.TieDestination.BendPoints[1].Value;
+                        break;
+                    case BendType.Prebend:
+                    case BendType.PrebendRelease:
+                        finalBendValue = note.TieDestination.BendPoints[0].Value;
+                        break;
+                }
+
+                if (_settings == null)
+                {
+                    duration = noteDuration.NoteOnly;
+                }
+                else
+                {
+                    duration = Math.Max(noteDuration.NoteOnly, MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
+                }
+            }
             else
             {
                 duration = noteDuration.NoteOnly;
@@ -656,6 +684,7 @@ namespace AlphaTab.Audio.Generator
             {
                 noteStart--;
             }
+            var bendDuration = _settings == null ? duration : Math.Min(duration, MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
 
             FastList<BendPoint> playedBendPoints = new FastList<BendPoint>();
             switch (note.BendType)
@@ -672,18 +701,27 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Gradual:
                             playedBendPoints.Add(new BendPoint(0, note.BendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, note.BendPoints[1].Value));
+                            if (finalBendValue == null || finalBendValue.Value < note.BendPoints[1].Value)
+                            {
+                                finalBendValue = note.BendPoints[1].Value;
+                            }
+                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, finalBendValue.Value));
                             break;
                         case BendStyle.Fast:
+                            if (finalBendValue == null || finalBendValue.Value < note.BendPoints[1].Value)
+                            {
+                                finalBendValue = note.BendPoints[1].Value;
+                            }
+
                             if (note.Beat.GraceType == GraceType.BendGrace)
                             {
                                 GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
-                                    true, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value });
+                                    true, new[] { note.BendPoints[0].Value, finalBendValue.Value }, bendDuration);
                             }
                             else
                             {
                                 GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
-                                    false, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value });
+                                    false, new[] { note.BendPoints[0].Value, finalBendValue.Value }, bendDuration);
                             }
                             return;
                     }
@@ -702,7 +740,7 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Fast:
                             GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
-                                false, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value, note.BendPoints[2].Value });
+                                false, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value, note.BendPoints[2].Value }, bendDuration);
                             return;
                     }
 
@@ -721,15 +759,19 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Gradual:
                             playedBendPoints.Add(new BendPoint(0, note.BendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition / 2, note.BendPoints[0].Value));
                             playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, note.BendPoints[1].Value));
                             break;
                         case BendStyle.Fast:
                             var preBendValue = DefaultBend + (note.BendPoints[0].Value * DefaultBendSemitone);
-                            _handler.AddBend(track.Index, noteStart, (byte)channel, (byte)preBendValue);
+                            _handler.AddBend(track.Index, noteStart, (byte)channel, (int)preBendValue);
+
+                            if (finalBendValue == null || finalBendValue.Value < note.BendPoints[1].Value)
+                            {
+                                finalBendValue = note.BendPoints[1].Value;
+                            }
 
                             GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
-                                false, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value });
+                                false, new[] { note.BendPoints[0].Value, finalBendValue.Value }, bendDuration);
                             return;
                     }
 
@@ -742,15 +784,14 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Gradual:
                             playedBendPoints.Add(new BendPoint(0, note.BendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition / 2, note.BendPoints[0].Value));
                             playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, note.BendPoints[1].Value));
                             break;
                         case BendStyle.Fast:
                             var preBendValue = DefaultBend + (note.BendPoints[0].Value * DefaultBendSemitone);
-                            _handler.AddBend(track.Index, noteStart, (byte)channel, (byte)preBendValue);
+                            _handler.AddBend(track.Index, noteStart, (byte)channel, (int)preBendValue);
 
                             GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
-                                true, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value });
+                                false, new[] { note.BendPoints[0].Value, note.BendPoints[1].Value }, bendDuration);
                             return;
                     }
 
@@ -761,12 +802,10 @@ namespace AlphaTab.Audio.Generator
         }
 
         private void GenerateSongBookWhammyOrBend(int noteStart, int channel, double duration, Track track,
-                                                bool bendAtBeginning, int[] bendValues)
+                                                bool bendAtBeginning, int[] bendValues, double bendDuration)
         {
-            var durationBySetting = _settings == null ? duration : Math.Min(duration, MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
-
-            var startTick = bendAtBeginning ? noteStart : (noteStart + duration) - durationBySetting;
-            var ticksBetweenPoints = durationBySetting / (bendValues.Length - 1);
+            var startTick = bendAtBeginning ? noteStart : (noteStart + duration) - bendDuration;
+            var ticksBetweenPoints = bendDuration / (bendValues.Length - 1);
 
             for (int i = 0; i < bendValues.Length - 1; i++)
             {
@@ -809,8 +848,9 @@ namespace AlphaTab.Audio.Generator
                             playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, bendPoints[1].Value));
                             break;
                         case BendStyle.Fast:
+                            var whammyDuration = _settings == null ? duration : Math.Min(duration, MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
                             GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
-                                false, new[] { bendPoints[0].Value, bendPoints[1].Value });
+                                false, new[] { bendPoints[0].Value, bendPoints[1].Value }, whammyDuration);
                             return;
                     }
 
@@ -827,8 +867,9 @@ namespace AlphaTab.Audio.Generator
                             playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, bendPoints[2].Value));
                             break;
                         case BendStyle.Fast:
+                            var whammyDuration = _settings == null ? duration : Math.Min(duration, MidiUtils.MillisToTicks(_settings.SongBookDipDuration, _currentTempo));
                             GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
-                                true, new[] { bendPoints[0].Value, bendPoints[1].Value, bendPoints[2].Value });
+                                true, new[] { bendPoints[0].Value, bendPoints[1].Value, bendPoints[2].Value }, whammyDuration);
                             return;
                     }
 
@@ -852,10 +893,11 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Fast:
                             var preDiveValue = DefaultBend + (bendPoints[0].Value * DefaultBendSemitone);
-                            _handler.AddBend(track.Index, noteStart, (byte)channel, (byte)preDiveValue);
+                            _handler.AddBend(track.Index, noteStart, (byte)channel, (int)preDiveValue);
 
+                            var whammyDuration = _settings == null ? duration : Math.Min(duration, MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
                             GenerateSongBookWhammyOrBend(noteStart, channel, duration, track,
-                                false, new[] { bendPoints[0].Value, bendPoints[1].Value });
+                                false, new[] { bendPoints[0].Value, bendPoints[1].Value }, whammyDuration);
                             return;
                     }
 
@@ -897,7 +939,7 @@ namespace AlphaTab.Audio.Generator
             {
                 while (currentBendValue <= nextBendValue)
                 {
-                    _handler.AddBend(track.Index, (int) currentTick, (byte) channel, (byte) Math.Round(currentBendValue));
+                    _handler.AddBend(track.Index, (int) currentTick, (byte) channel, (int) Math.Round(currentBendValue));
                     currentBendValue++;
                     currentTick += ticksPerValue;
                 }
@@ -907,7 +949,7 @@ namespace AlphaTab.Audio.Generator
             {
                 while (currentBendValue >= nextBendValue)
                 {
-                    _handler.AddBend(track.Index, (int) currentTick, (byte) channel, (byte) Math.Round(currentBendValue));
+                    _handler.AddBend(track.Index, (int) currentTick, (byte) channel, (int) Math.Round(currentBendValue));
                     currentBendValue--;
                     currentTick += ticksPerValue;
                 }
@@ -915,7 +957,7 @@ namespace AlphaTab.Audio.Generator
             // hold
             else
             {
-                _handler.AddBend(track.Index, (int) currentTick, (byte) channel, (byte) Math.Round(currentBendValue));
+                _handler.AddBend(track.Index, (int) currentTick, (byte) channel, (int) Math.Round(currentBendValue));
             }
         }
 

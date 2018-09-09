@@ -206,6 +206,11 @@ namespace AlphaTab
         public int SongBookBendDuration { get; set; }
 
         /// <summary>
+        /// Gets or sets the duration of whammy dips in milliseconds for songbook whammys. 
+        /// </summary>
+        public int SongBookDipDuration { get; set; }
+
+        /// <summary>
         /// Gets or sets whether in the <see cref="BoundsLookup"/> also the
         /// position and area of each individual note is provided. 
         /// </summary>
@@ -279,6 +284,7 @@ namespace AlphaTab
                 settings.Vibrato.BeatWideLength = 240;
 
                 settings.SongBookBendDuration = 75;
+                settings.SongBookDipDuration = 150;
                 settings.IncludeNoteBounds = false;
 
                 SetDefaults(settings);

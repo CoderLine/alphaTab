@@ -84,7 +84,7 @@ namespace AlphaTab.Audio.Generator
         /// <param name="tick">The midi ticks when the bend should change.</param>
         /// <param name="channel">The midi channel on which the bend should change.</param>
         /// <param name="value">The new bend for the selected track and channel.</param>
-        void AddBend(int track, int tick, byte channel, byte value);
+        void AddBend(int track, int tick, byte channel, int value);
 
         /// <summary>
         /// Indicates that the track is finished on the given ticks.
