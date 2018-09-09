@@ -759,7 +759,6 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Gradual:
                             playedBendPoints.Add(new BendPoint(0, note.BendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition / 2, note.BendPoints[0].Value));
                             playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, note.BendPoints[1].Value));
                             break;
                         case BendStyle.Fast:
@@ -785,7 +784,6 @@ namespace AlphaTab.Audio.Generator
                             break;
                         case BendStyle.Gradual:
                             playedBendPoints.Add(new BendPoint(0, note.BendPoints[0].Value));
-                            playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition / 2, note.BendPoints[0].Value));
                             playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, note.BendPoints[1].Value));
                             break;
                         case BendStyle.Fast:

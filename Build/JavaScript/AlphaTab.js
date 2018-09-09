@@ -8280,7 +8280,6 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				break;
 			case 1:
 				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(60 / 2 | 0,note.BendPoints[0].Value));
 				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[1].Value));
 				break;
 			case 2:
@@ -8302,7 +8301,6 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 				break;
 			case 1:
 				playedBendPoints.push(new alphaTab.model.BendPoint(0,note.BendPoints[0].Value));
-				playedBendPoints.push(new alphaTab.model.BendPoint(60 / 2 | 0,note.BendPoints[0].Value));
 				playedBendPoints.push(new alphaTab.model.BendPoint(60,note.BendPoints[1].Value));
 				break;
 			case 2:
