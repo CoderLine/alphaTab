@@ -808,7 +808,7 @@ namespace AlphaTab.Model
                                 origin.Value < middle1.Value && middle1.Value > destination.Value)
                         {
                             WhammyBarType = WhammyType.Dip;
-                            if (middle1.Offset == middle2.Offset)
+                            if (middle1.Offset == middle2.Offset || displayMode == DisplayMode.SongBook)
                             {
                                 WhammyBarPoints.RemoveAt(2);
                             }
