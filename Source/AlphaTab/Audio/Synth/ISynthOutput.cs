@@ -82,5 +82,10 @@ namespace AlphaTab.Audio.Synth
         /// Fired when the last samples after calling SequencerFinished have been played. 
         /// </summary>
         event Action Finished;
+
+        /// <summary>
+        /// Activates the output component. 
+        /// </summary>
+        void Activate();
     }
 }

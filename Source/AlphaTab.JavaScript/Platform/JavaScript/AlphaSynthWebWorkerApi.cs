@@ -216,6 +216,7 @@ namespace AlphaTab.Platform.JavaScript
         /// <inheritdoc />
         public void Play()
         {
+            _output.Activate();
             _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdPlay });
         }
 

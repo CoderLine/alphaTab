@@ -119,6 +119,10 @@ namespace AlphaTab.Samples.PngDump
             return count;
         }
 
+        public void Activate()
+        {
+        }
+
         public event Action Ready;
         public event Action<int> SamplesPlayed;
         public event Action SampleRequest;

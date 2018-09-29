@@ -2159,6 +2159,8 @@ alphaTab.platform.javaScript.AlphaSynthWorkerSynthOutput.prototype = {
 	,ResetSamples: function() {
 		this._worker.postMessage({ cmd : "alphaSynth." + "output." + "resetSamples"});
 	}
+	,Activate: function() {
+	}
 	,__class__: alphaTab.platform.javaScript.AlphaSynthWorkerSynthOutput
 };
 alphaTab.audio.synth.IAlphaSynth = $hx_exports["alphaTab"]["audio"]["synth"]["IAlphaSynth"] = function() { };
@@ -2298,6 +2300,7 @@ alphaTab.audio.synth.AlphaSynth.prototype = {
 		if(this.get_State() == 1 || !this.get_IsReadyForPlayback()) {
 			return;
 		}
+		this.Output.Activate();
 		alphaTab.util.Logger.Debug("AlphaSynth","Starting playback",null);
 		this.set_State(1);
 		this.OnPlayerStateChanged(new alphaTab.audio.synth.PlayerStateChangedEventArgs(this.get_State()));
@@ -23304,6 +23307,8 @@ alphaTab.platform.javaScript.AlphaSynthFlashOutput.prototype = {
 	,remove_SamplesPlayed: function(value) {
 		return this.SamplesPlayed = system._EventAction1.EventAction1_Impl_.sub(this.SamplesPlayed,value);
 	}
+	,Activate: function() {
+	}
 	,__class__: alphaTab.platform.javaScript.AlphaSynthFlashOutput
 };
 alphaTab.platform.javaScript.AlphaSynthWebAudioOutput = $hx_exports["alphaTab"]["platform"]["javaScript"]["AlphaSynthWebAudioOutput"] = function() {
@@ -23341,6 +23346,12 @@ alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.prototype = {
 			window.document.body.addEventListener("click",resume,false);
 		}
 		system._EventAction.EventAction_Impl_.Invoke(this.Ready);
+	}
+	,Activate: function() {
+		if(this._context != null) {
+			var ctx = this._context;
+			ctx.resume();
+		}
 	}
 	,PatchIosSampleRate: function() {
 		var ua = window.navigator.userAgent;
@@ -23595,6 +23606,7 @@ alphaTab.platform.javaScript.AlphaSynthWebWorkerApi.prototype = {
 		return this.get_PlaybackRange();
 	}
 	,Play: function() {
+		this._output.Activate();
 		this._synth.postMessage({ cmd : "alphaSynth." + "play"});
 	}
 	,Pause: function() {

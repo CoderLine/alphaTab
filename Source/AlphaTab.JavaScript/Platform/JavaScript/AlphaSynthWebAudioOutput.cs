@@ -68,6 +68,15 @@ namespace AlphaTab.Platform.JavaScript
             Ready();
         }
 
+        public void Activate()
+        {
+            if (_context != null)
+            {
+                dynamic ctx = _context;
+                ctx.resume();
+            }
+        }
+
         private void PatchIosSampleRate()
         {
             string ua = Browser.Navigator.UserAgent;

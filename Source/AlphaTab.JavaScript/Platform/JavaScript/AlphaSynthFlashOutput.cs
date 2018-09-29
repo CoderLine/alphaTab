@@ -160,5 +160,9 @@ namespace AlphaTab.Platform.JavaScript
                 Lookup[id].SamplesPlayed(samples);
             }
         }
+
+        public void Activate()
+        {
+        }
     }
 }

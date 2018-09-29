@@ -91,5 +91,9 @@ namespace AlphaTab.Platform.JavaScript
         {
             _worker.PostMessage(new { cmd = CmdOutputResetSamples });
         }
+
+        public void Activate()
+        {
+        }
     }
 }

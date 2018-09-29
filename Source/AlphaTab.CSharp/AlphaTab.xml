@@ -558,6 +558,11 @@
             Fired when the last samples after calling SequencerFinished have been played. 
             </summary>
         </member>
+        <member name="M:AlphaTab.Audio.Synth.ISynthOutput.Activate">
+            <summary>
+            Activates the output component. 
+            </summary>
+        </member>
         <member name="T:AlphaTab.Audio.Synth.MidiFileSequencer">
             <summary>
             This sequencer dispatches midi events to the synthesizer based on the current

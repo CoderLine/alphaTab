@@ -155,6 +155,10 @@ namespace AlphaTab.Test.Audio
         {
         }
 
+        public void Activate()
+        {
+        }
+
         public event Action Ready;
         public event Action<int> SamplesPlayed;
         public event Action SampleRequest;

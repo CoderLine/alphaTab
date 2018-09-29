@@ -181,11 +181,11 @@ namespace AlphaTab.Audio.Synth
         public void Play()
         {
             if (State == PlayerState.Playing || !IsReadyForPlayback) return;
+            Output.Activate();
 
             Logger.Debug("AlphaSynth", "Starting playback");
             State = PlayerState.Playing;
             OnPlayerStateChanged(new PlayerStateChangedEventArgs(State));
-
             Output.Play();
         }
 
