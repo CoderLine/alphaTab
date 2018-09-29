@@ -694,7 +694,12 @@ namespace AlphaTab.Model
             // connect ties
             if (IsTieDestination)
             {
-                if (prevNoteOnLine.Value == null)
+                if (TieOrigin != null)
+                {
+                    TieOrigin.IsTieOrigin = true;
+                    TieOrigin.TieDestination = this;
+                }
+                else if (prevNoteOnLine.Value == null)
                 {
                     IsTieDestination = false;
                 }

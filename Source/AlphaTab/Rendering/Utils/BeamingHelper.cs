@@ -444,6 +444,11 @@ namespace AlphaTab.Rendering.Utils
                 return false;
             }
 
+            if (b1.GraceType != GraceType.None && b2.GraceType != GraceType.None)
+            {
+                return true;
+            }
+
             var m1 = b1.Voice.Bar;
             var m2 = b1.Voice.Bar;
             // only join on same measure

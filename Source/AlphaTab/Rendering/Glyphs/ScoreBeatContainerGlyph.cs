@@ -74,7 +74,7 @@ namespace AlphaTab.Rendering
 
             // NOTE: we create 2 tie glyphs if we have a line break inbetween 
             // the two notes
-            if (n.IsTieOrigin && !n.HasBend && !n.Beat.HasWhammyBar && n.Beat.GraceType != GraceType.BendGrace && n.TieDestination.IsVisible)
+            if (n.IsTieOrigin && !n.HasBend && !n.Beat.HasWhammyBar && n.Beat.GraceType != GraceType.BendGrace && n.TieDestination != null && n.TieDestination.IsVisible)
             {
                 var tie = new ScoreTieGlyph(n, n.TieDestination);
                 Ties.Add(tie);

@@ -20,6 +20,7 @@ using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Audio.Synth.Midi.Event;
 using AlphaTab.Collections;
 using AlphaTab.Haxe;
+using AlphaTab.Platform;
 using Haxe.Js.Html;
 using Phase;
 
@@ -186,8 +187,18 @@ namespace AlphaTab.Model
                                 for (int n = 0; n < beat.Notes.Count; n++)
                                 {
                                     var note = beat.Notes[n];
-                                    Note note2 = Platform.Platform.NewObject();
+                                    var dynamicNote2 = Platform.Platform.NewObject();
+                                    Note note2 = dynamicNote2;
                                     Note.CopyTo(note, note2);
+
+                                    if (note.IsTieDestination)
+                                    {
+                                        dynamicNote2.TieOriginId = note.TieOrigin.Id;
+                                    }
+                                    if (note.IsTieOrigin)
+                                    {
+                                        dynamicNote2.TieDestinationId = note.TieDestination.Id;
+                                    }
 
                                     note2.BendPoints = new FastList<BendPoint>();
                                     for (int i = 0; i < note.BendPoints.Count; i++)
@@ -241,6 +252,9 @@ namespace AlphaTab.Model
             var score2 = new Score();
             Score.CopyTo(score, score2);
             RenderStylesheet.CopyTo(score.Stylesheet, score2.Stylesheet);
+
+            var allNotes = new FastDictionary<int, Note>();
+            var notesToLink = new FastList<Note>();
 
             #region MasterBars
 
@@ -352,6 +366,19 @@ namespace AlphaTab.Model
                                     Note.CopyTo(note, note2);
                                     beat2.AddNote(note2);
 
+                                    allNotes[note2.Id] = note2;
+
+                                    if (note.IsTieDestination)
+                                    {
+                                        note2.Member("TieOriginId", note.Member<int>("TieOriginId"));
+                                        notesToLink.Add(note2);
+                                    }
+                                    if (note.IsTieOrigin)
+                                    {
+                                        note2.Member("TieDestinationId", note.Member<int>("TieDestinationId"));
+                                        notesToLink.Add(note2);
+                                    }
+
                                     for (int i = 0; i < note.BendPoints.Count; i++)
                                     {
                                         var point = new BendPoint();
@@ -376,6 +403,20 @@ namespace AlphaTab.Model
             }
 
             #endregion
+
+            foreach (var note in notesToLink)
+            {
+                if (note.IsTieDestination)
+                {
+                    var tieOriginId = note.Member<int>("TieOriginId");
+                    note.TieOrigin = allNotes[tieOriginId];
+                }
+                if (note.IsTieOrigin)
+                {
+                    var tieDestinationId = note.Member<int>("TieDestinationId");
+                    note.TieOrigin = allNotes[tieDestinationId];
+                }
+            }
 
             score2.Finish(settings);
             return score2;

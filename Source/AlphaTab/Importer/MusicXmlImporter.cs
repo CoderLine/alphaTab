@@ -39,6 +39,8 @@ namespace AlphaTab.Importer
         private int _firstVoice;
 
         private FastList<Note> _tieStarts;
+        private FastDictionary<int, bool> _tieStartIds;
+
 
         public override string Name { get { return "MusicXML"; } }
 
@@ -47,6 +49,7 @@ namespace AlphaTab.Importer
             _trackById = new FastDictionary<string, Track>();
             _partGroups = new FastDictionary<string, FastList<Track>>();
             _tieStarts = new FastList<Note>();
+            _tieStartIds = new FastDictionary<int, bool>();
 
             var xml = Platform.Platform.ToString(Data.ReadAll(), GetSetting("encoding", "utf-8"));
             XmlDocument dom;
@@ -935,18 +938,22 @@ namespace AlphaTab.Importer
 
         private void ParseTied(XmlNode element, Note note)
         {
-            if (note.Beat.GraceType != GraceType.None) return;
-
             if (element.GetAttribute("type") == "start")
             {
-                note.IsTieOrigin = true;
-                _tieStarts.Add(note);
+                if (!_tieStartIds.ContainsKey(note.Id))
+                {
+                    note.IsTieOrigin = true;
+                    _tieStartIds[note.Id] = true;
+                    _tieStarts.Add(note);
+                }
             }
             else if (element.GetAttribute("type") == "stop" && _tieStarts.Count > 0)
             {
-                note.TieDestination = _tieStarts[0];
                 note.IsTieDestination = true;
+                note.TieOrigin = _tieStarts[0];
                 _tieStarts.RemoveAt(0);
+                _tieStartIds.Remove(note.Id);
+
             }
         }
 
@@ -1188,7 +1195,7 @@ namespace AlphaTab.Importer
                             break;
                         case "octave":
                             // 0-9, 4 for middle C
-                            octave = Platform.Platform.ParseInt(c.InnerText);
+                            octave = Platform.Platform.ParseInt(c.InnerText) + 1;
                             break;
                     }
                 }
@@ -1386,13 +1393,13 @@ namespace AlphaTab.Importer
 
             switch (sign)
             {
-                case "G":
+                case "g":
                     bar.Clef = Clef.G2;
                     break;
-                case "F":
+                case "f":
                     bar.Clef = Clef.F4;
                     break;
-                case "C":
+                case "c":
                     if (line == 3)
                     {
                         bar.Clef = Clef.C3;
