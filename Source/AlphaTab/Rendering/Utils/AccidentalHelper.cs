@@ -120,7 +120,7 @@ namespace AlphaTab.Rendering.Utils
         public AccidentalType ApplyAccidental(Note note)
         {
             var staff = _bar.Staff;
-            var noteValue = staff.StaffKind == StaffKind.Percussion
+            var noteValue = staff.IsPercussion
                 ? PercussionMapper.MapNoteForDisplay(note.DisplayValue)
                 : note.DisplayValue;
             bool quarterBend = note.HasQuarterToneOffset;
@@ -149,7 +149,7 @@ namespace AlphaTab.Rendering.Utils
         public AccidentalType ApplyAccidentalForValue(Beat relatedBeat, int noteValue, bool quarterBend)
         {
             var staff = _bar.Staff;
-            if (staff.StaffKind == StaffKind.Percussion)
+            if (staff.IsPercussion)
             {
                 noteValue = PercussionMapper.MapNoteForDisplay(noteValue);
             }
@@ -170,7 +170,7 @@ namespace AlphaTab.Rendering.Utils
         private AccidentalType GetAccidental(int line, int noteValue, bool quarterBend)
         { 
             var accidentalToSet = AccidentalType.None;
-            if (_bar.Staff.StaffKind != StaffKind.Percussion)
+            if (!_bar.Staff.IsPercussion)
             {
                 var ks = (int)_bar.MasterBar.KeySignature;
                 var ksi = (ks + 7);

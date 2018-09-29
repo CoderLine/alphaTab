@@ -43,6 +43,7 @@ namespace AlphaTab.Importer
         public const string HeaderBcFz = "BCFZ";
         public const string ScoreGpif = "score.gpif";
         public const string BinaryStylesheet = "BinaryStylesheet";
+        public const string PartConfiguration = "PartConfiguration";
 
         /// <summary>
         /// You can set a file filter method using this setter. On parsing

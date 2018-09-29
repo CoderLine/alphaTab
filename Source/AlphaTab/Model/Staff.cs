@@ -80,9 +80,19 @@ namespace AlphaTab.Model
         public bool IsStringed => Tuning.Length > 0;
 
         /// <summary>
-        /// Gets or sets the staff kind. 
+        /// Gets or sets whether the tabs are shown. 
         /// </summary>
-        public StaffKind StaffKind { get; set; }
+        public bool ShowTablature { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the standard notation is shown. 
+        /// </summary>
+        public bool ShowStandardNotation { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the staff contains percussion notation
+        /// </summary>
+        public bool IsPercussion { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Staff"/> class.
@@ -92,7 +102,8 @@ namespace AlphaTab.Model
             Bars = new FastList<Bar>();
             Tuning = new int[0];
             Chords = new FastDictionary<string, Chord>();
-            StaffKind = StaffKind.Mixed;
+            ShowStandardNotation = true;
+            ShowTablature = true;
         }
 
         internal static void CopyTo(Staff src, Staff dst)
@@ -102,7 +113,9 @@ namespace AlphaTab.Model
             dst.Tuning = Platform.Platform.CloneArray(src.Tuning);
             dst.TranspositionPitch = src.TranspositionPitch;
             dst.DisplayTranspositionPitch = src.DisplayTranspositionPitch;
-            dst.StaffKind = src.StaffKind;
+            dst.ShowStandardNotation = src.ShowStandardNotation;
+            dst.ShowTablature = src.ShowTablature;
+            dst.IsPercussion = src.IsPercussion;
         }
 
         internal void Finish(Settings settings)

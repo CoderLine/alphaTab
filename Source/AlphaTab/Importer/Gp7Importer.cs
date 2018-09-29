@@ -37,7 +37,11 @@ namespace AlphaTab.Importer
             // from the GPX container
             Logger.Info(Name, "Loading ZIP entries");
             var fileSystem = new ZipFile();
-            fileSystem.FileFilter = s => s.EndsWith(GpxFileSystem.ScoreGpif) || s.EndsWith(GpxFileSystem.BinaryStylesheet);
+            fileSystem.FileFilter = s => 
+                s.EndsWith(GpxFileSystem.ScoreGpif) 
+                || s.EndsWith(GpxFileSystem.BinaryStylesheet)
+                || s.EndsWith(GpxFileSystem.PartConfiguration)
+            ;
             try
             {
                 fileSystem.Load(Data);
@@ -50,6 +54,7 @@ namespace AlphaTab.Importer
 
             string xml = null;
             byte[] binaryStylesheet = null;
+            byte[] partConfiguration = null;
             foreach (var entry in fileSystem.Entries)
             {
                 switch (entry.FileName)
@@ -59,6 +64,9 @@ namespace AlphaTab.Importer
                         break;
                     case GpxFileSystem.BinaryStylesheet:
                         binaryStylesheet = entry.Data;
+                        break;
+                    case GpxFileSystem.PartConfiguration:
+                        partConfiguration = entry.Data;
                         break;
                 }
             }
@@ -86,6 +94,18 @@ namespace AlphaTab.Importer
                     stylesheetParser.Stylesheet.Apply(score);
                 }
                 Logger.Info(Name, "BinaryStylesheet parsed");
+            }
+
+            if (partConfiguration != null)
+            {
+                Logger.Info(Name, "Start Parsing Part Configuration");
+                var parser = new PartConfigurationParser();
+                parser.Parse(partConfiguration);
+                if (parser.Configuration != null)
+                {
+                    parser.Configuration.Apply(score);
+                }
+                Logger.Info(Name, "Part Configuration parsed");
             }
 
             return score;

@@ -27,7 +27,6 @@ $hx_exports["alphaTab"]["utils"]["_UnionData"] = $hx_exports["alphaTab"]["utils"
 $hx_exports["alphaTab"]["model"]["_WhammyType"] = $hx_exports["alphaTab"]["model"]["_WhammyType"] || {};
 ;$hx_exports["alphaTab"]["model"]["_VibratoType"] = $hx_exports["alphaTab"]["model"]["_VibratoType"] || {};
 ;$hx_exports["alphaTab"]["model"]["_TripletFeel"] = $hx_exports["alphaTab"]["model"]["_TripletFeel"] || {};
-;$hx_exports["alphaTab"]["model"]["_StaffKind"] = $hx_exports["alphaTab"]["model"]["_StaffKind"] || {};
 ;$hx_exports["alphaTab"]["model"]["_SlideType"] = $hx_exports["alphaTab"]["model"]["_SlideType"] || {};
 ;$hx_exports["alphaTab"]["model"]["_SimileMark"] = $hx_exports["alphaTab"]["model"]["_SimileMark"] || {};
 ;$hx_exports["alphaTab"]["model"]["_PickStroke"] = $hx_exports["alphaTab"]["model"]["_PickStroke"] || {};
@@ -4919,7 +4918,7 @@ alphaTab.rendering.layout.ScoreLayout.prototype = {
 				var staff = $iterator(track1.Staves)();
 				while(staff.hasNext()) {
 					var staff1 = staff.next();
-					if(staff1.StaffKind != 2 && staff1.get_IsStringed() && staff1.Tuning.length > 0) {
+					if(!staff1.IsPercussion && staff1.get_IsStringed() && staff1.Tuning.length > 0) {
 						staffWithTuning = staff1;
 						break;
 					}
@@ -4949,37 +4948,32 @@ alphaTab.rendering.layout.ScoreLayout.prototype = {
 			var staff = $iterator(track.Staves)();
 			while(staff.hasNext()) {
 				var staff1 = staff.next();
-				var _g = staff1.StaffKind;
-				switch(_g) {
-				case 0:
-					break;
-				case 1:
+				if(staff1.ShowStandardNotation) {
 					hasScore = true;
 					break;
-				case 2:
-					break;
-				case 3:
-					hasScore = true;
-					break;
-				default:
 				}
 			}
 			var staffIndex = 0;
 			while(staffIndex < track.Staves.length) {
 				var staff2 = track.Staves[staffIndex];
 				var staveProfile;
-				if(staff2.StaffKind == 2) {
+				if(staff2.IsPercussion) {
 					staveProfile = "score";
-				} else if(staff2.StaffKind == 0) {
+				} else if(this.Renderer.Settings.Staves.Id != "default") {
+					staveProfile = this.Renderer.Settings.Staves.Id;
+				} else if(staff2.ShowTablature && staff2.ShowStandardNotation) {
+					staveProfile = "score-tab";
+				} else if(staff2.ShowTablature) {
 					if(hasScore) {
 						staveProfile = "tab-mixed";
 					} else {
 						staveProfile = "tab";
 					}
-				} else if(staff2.get_IsStringed()) {
-					staveProfile = this.Renderer.Settings.Staves.Id;
-				} else {
+				} else if(staff2.ShowStandardNotation) {
 					staveProfile = "score";
+				} else {
+					++staffIndex;
+					continue;
 				}
 				var profile = alphaTab.Environment.StaveProfiles.hasOwnProperty(staveProfile) ? alphaTab.Environment.StaveProfiles[staveProfile] : alphaTab.Environment.StaveProfiles["default"];
 				var factory = HxOverrides.iter(profile);
@@ -5911,7 +5905,7 @@ alphaTab.rendering.BarRendererFactory.prototype = {
 	}
 	,CanCreate: function(track,staff) {
 		if(!(!this.HideOnPercussionTrack)) {
-			return staff.StaffKind != 2;
+			return !staff.IsPercussion;
 		} else {
 			return true;
 		}
@@ -8017,7 +8011,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 		if(note.Beat.FadeIn) {
 			this.GenerateFadeIn(note,noteStart,noteDuration,noteKey,dynamicValue);
 		}
-		if(note.get_IsTrill() && staff.StaffKind != 2) {
+		if(note.get_IsTrill() && !staff.IsPercussion) {
 			this.GenerateTrill(note,noteStart,noteDuration,noteKey,dynamicValue,channel);
 			return;
 		}
@@ -8111,7 +8105,7 @@ alphaTab.audio.generator.MidiFileGenerator.prototype = {
 	}
 	,GetDynamicValue: function(note) {
 		var dynamicValue = note.Dynamic;
-		if(note.Beat.Voice.Bar.Staff.StaffKind != 2 && note.HammerPullOrigin != null) {
+		if(!note.Beat.Voice.Bar.Staff.IsPercussion && note.HammerPullOrigin != null) {
 			--dynamicValue;
 		}
 		if(note.IsGhost) {
@@ -14280,7 +14274,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		var flags = this.Data.ReadByte();
 		newTrack.Name = alphaTab.importer.GpBinaryHelpers.GpReadStringByteLength(this.Data,40,this._encoding);
 		if((flags & 1) != 0) {
-			mainStaff.StaffKind = 2;
+			mainStaff.IsPercussion = true;
 		}
 		var stringCount = alphaTab.io.IOHelper.ReadInt32LE(this.Data);
 		var this1 = [];
@@ -14336,7 +14330,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 	,ReadBar: function(track) {
 		var newBar = new alphaTab.model.Bar();
 		var mainStaff = track.Staves[0];
-		if(mainStaff.StaffKind == 2) {
+		if(mainStaff.IsPercussion) {
 			newBar.Clef = 0;
 		}
 		mainStaff.AddBar(newBar);
@@ -15053,8 +15047,8 @@ alphaTab.importer.Gp7Importer.prototype = $extend(alphaTab.importer.ScoreImporte
 		alphaTab.util.Logger.Info(this.get_Name(),"Loading ZIP entries",null);
 		var fileSystem = new alphaTab.io.ZipFile();
 		fileSystem.FileFilter = function(s) {
-			if(!StringTools.endsWith(s,"score.gpif")) {
-				return StringTools.endsWith(s,"BinaryStylesheet");
+			if(!(StringTools.endsWith(s,"score.gpif") || StringTools.endsWith(s,"BinaryStylesheet"))) {
+				return StringTools.endsWith(s,"PartConfiguration");
 			} else {
 				return true;
 			}
@@ -15070,6 +15064,7 @@ alphaTab.importer.Gp7Importer.prototype = $extend(alphaTab.importer.ScoreImporte
 		alphaTab.util.Logger.Info(this.get_Name(),"Zip entries loaded",null);
 		var xml = null;
 		var binaryStylesheet = null;
+		var partConfiguration = null;
 		var entry = $iterator(fileSystem.Entries)();
 		while(entry.hasNext()) {
 			var entry1 = entry.next();
@@ -15077,6 +15072,9 @@ alphaTab.importer.Gp7Importer.prototype = $extend(alphaTab.importer.ScoreImporte
 			switch(_g) {
 			case "BinaryStylesheet":
 				binaryStylesheet = entry1.Data;
+				break;
+			case "PartConfiguration":
+				partConfiguration = entry1.Data;
 				break;
 			case "score.gpif":
 				xml = alphaTab.platform.Platform.ToString(entry1.Data,this.GetSetting("encoding","utf-8"));
@@ -15099,6 +15097,15 @@ alphaTab.importer.Gp7Importer.prototype = $extend(alphaTab.importer.ScoreImporte
 				stylesheetParser.Stylesheet.Apply(score);
 			}
 			alphaTab.util.Logger.Info(this.get_Name(),"BinaryStylesheet parsed",null);
+		}
+		if(partConfiguration != null) {
+			alphaTab.util.Logger.Info(this.get_Name(),"Start Parsing Part Configuration",null);
+			var parser = new alphaTab.importer.PartConfigurationParser();
+			parser.Parse(partConfiguration);
+			if(parser.Configuration != null) {
+				parser.Configuration.Apply(score);
+			}
+			alphaTab.util.Logger.Info(this.get_Name(),"Part Configuration parsed",null);
 		}
 		return score;
 	}
@@ -15473,7 +15480,7 @@ alphaTab.importer.GpifParser.prototype = {
 	,ParseTrack: function(node) {
 		var track = new alphaTab.model.Track(1);
 		var staff = track.Staves[0];
-		staff.StaffKind = 1;
+		staff.ShowStandardNotation = true;
 		var trackId = node.GetAttribute("id");
 		var c = $iterator(node.ChildNodes)();
 		while(c.hasNext()) {
@@ -15497,7 +15504,7 @@ alphaTab.importer.GpifParser.prototype = {
 					var instrumentName = c1.GetAttribute("ref");
 					if(StringTools.endsWith(instrumentName,"-gs") || StringTools.endsWith(instrumentName,"GrandStaff")) {
 						track.EnsureStaveCount(2);
-						track.Staves[1].StaffKind = 1;
+						track.Staves[1].ShowStandardNotation = true;
 					}
 					break;
 				case "InstrumentSet":
@@ -15549,11 +15556,19 @@ alphaTab.importer.GpifParser.prototype = {
 			if(c1.NodeType == 1) {
 				var _g = c1.LocalName;
 				if(_g == "Type") {
-					if(c1.get_InnerText() == "drumKit") {
+					var _g1 = c1.get_InnerText();
+					if(_g1 == "drumKit") {
 						var staff = $iterator(track.Staves)();
 						while(staff.hasNext()) {
 							var staff1 = staff.next();
-							staff1.StaffKind = 2;
+							staff1.IsPercussion = true;
+						}
+					}
+					if(c1.get_InnerText() == "drumKit") {
+						var staff2 = $iterator(track.Staves)();
+						while(staff2.hasNext()) {
+							var staff3 = staff2.next();
+							staff3.IsPercussion = true;
 						}
 					}
 				}
@@ -15623,8 +15638,8 @@ alphaTab.importer.GpifParser.prototype = {
 				++i;
 			}
 			staff.Tuning = tuning;
-			if(staff.StaffKind != 2) {
-				staff.StaffKind = 3;
+			if(!staff.IsPercussion) {
+				staff.ShowTablature = true;
 			}
 			break;
 		default:
@@ -15818,7 +15833,8 @@ alphaTab.importer.GpifParser.prototype = {
 			while(staff2.hasNext()) {
 				var staff3 = staff2.next();
 				staff3.Tuning = tuning;
-				staff3.StaffKind = 3;
+				staff3.ShowStandardNotation = true;
+				staff3.ShowTablature = true;
 			}
 			break;
 		default:
@@ -15856,7 +15872,7 @@ alphaTab.importer.GpifParser.prototype = {
 			var staff = $iterator(track.Staves)();
 			while(staff.hasNext()) {
 				var staff1 = staff.next();
-				staff1.StaffKind = 2;
+				staff1.IsPercussion = true;
 			}
 		}
 	}
@@ -18399,11 +18415,11 @@ alphaTab.importer.MusicXmlImporter.prototype = $extend(alphaTab.importer.ScoreIm
 			break;
 		case "percussion":
 			bar.Clef = 0;
-			bar.Staff.StaffKind = 2;
+			bar.Staff.IsPercussion = true;
 			break;
 		case "tab":
 			bar.Clef = 4;
-			bar.Staff.StaffKind = 0;
+			bar.Staff.ShowTablature = true;
 			break;
 		default:
 			bar.Clef = 4;
@@ -18567,7 +18583,7 @@ alphaTab.importer.MusicXmlImporter.prototype = $extend(alphaTab.importer.ScoreIm
 		var id = element.GetAttribute("id");
 		var track = new alphaTab.model.Track(1);
 		var staff = track.Staves[0];
-		staff.StaffKind = 1;
+		staff.ShowStandardNotation = true;
 		this._trackById[id] = track;
 		this._score.AddTrack(track);
 		if(this._currentPartGroup != null) {
@@ -18649,6 +18665,99 @@ alphaTab.importer.NoCompatibleReaderFoundException.prototype = $extend(alphaTab.
 	}
 	,__class__: alphaTab.importer.NoCompatibleReaderFoundException
 });
+alphaTab.importer.PartConfiguration = $hx_exports["alphaTab"]["importer"]["PartConfiguration"] = function() {
+	this.Parts = null;
+	this.ZoomLevel = 0;
+	this.Layout = 0;
+	var this1 = [];
+	this.Parts = this1;
+};
+alphaTab.importer.PartConfiguration.__name__ = ["alphaTab","importer","PartConfiguration"];
+alphaTab.importer.PartConfiguration.prototype = {
+	Apply: function(score) {
+		var staffIndex = 0;
+		var trackIndex = 0;
+		var part = $iterator(this.Parts)();
+		while(part.hasNext()) {
+			var part1 = part.next();
+			var trackConfig = $iterator(part1.Tracks)();
+			while(trackConfig.hasNext()) {
+				var trackConfig1 = trackConfig.next();
+				if(trackIndex < score.Tracks.length) {
+					var track = score.Tracks[trackIndex];
+					if(staffIndex < track.Staves.length) {
+						var staff = track.Staves[staffIndex];
+						staff.ShowTablature = trackConfig1.ShowTablature;
+						staff.ShowStandardNotation = trackConfig1.ShowStandardNotation;
+					}
+				}
+				++trackIndex;
+				if(trackIndex >= score.Tracks.length) {
+					++staffIndex;
+					trackIndex = 0;
+				}
+			}
+		}
+	}
+	,__class__: alphaTab.importer.PartConfiguration
+};
+alphaTab.importer.PartConfigurationParser = $hx_exports["alphaTab"]["importer"]["PartConfigurationParser"] = function() {
+	this.Configuration = null;
+};
+alphaTab.importer.PartConfigurationParser.__name__ = ["alphaTab","importer","PartConfigurationParser"];
+alphaTab.importer.PartConfigurationParser.prototype = {
+	Parse: function(partConfigurationData) {
+		this.Configuration = new alphaTab.importer.PartConfiguration();
+		this.ParsePartConfiguration(partConfigurationData);
+	}
+	,ParsePartConfiguration: function(partConfigurationData) {
+		var readable = alphaTab.io.ByteBuffer.FromBuffer(partConfigurationData);
+		var entryCount = alphaTab.io.IOHelper.ReadInt32BE(readable);
+		var i = 0;
+		while(i < entryCount) {
+			var part = new alphaTab.importer.PartConfiguration_Part();
+			this.Configuration.Parts.push(part);
+			part.IsMultiRest = alphaTab.importer.GpBinaryHelpers.GpReadBool(readable);
+			var groupCount = alphaTab.io.IOHelper.ReadInt32BE(readable);
+			var j = 0;
+			while(j < groupCount) {
+				var flags = readable.ReadByte();
+				if(flags == 0) {
+					flags = 1;
+				}
+				var this1 = part.Tracks;
+				var _tmp = new alphaTab.importer.PartConfiguration_TrackConfiguration();
+				_tmp.ShowStandardNotation = (flags & 1) != 0;
+				_tmp.ShowTablature = (flags & 2) != 0;
+				_tmp.ShowSlash = (flags & 4) != 0;
+				this1.push(_tmp);
+				++j;
+			}
+			++i;
+		}
+	}
+	,__class__: alphaTab.importer.PartConfigurationParser
+};
+alphaTab.importer.PartConfiguration_Part = $hx_exports["alphaTab"]["importer"]["PartConfiguration_Part"] = function() {
+	this.IsMultiRest = false;
+	this.Tracks = null;
+	var this1 = [];
+	this.Tracks = this1;
+};
+alphaTab.importer.PartConfiguration_Part.__name__ = ["alphaTab","importer","PartConfiguration_Part"];
+alphaTab.importer.PartConfiguration_Part.prototype = {
+	__class__: alphaTab.importer.PartConfiguration_Part
+};
+alphaTab.importer.PartConfiguration_TrackConfiguration = $hx_exports["alphaTab"]["importer"]["PartConfiguration_TrackConfiguration"] = function() {
+	this.IsVisible = false;
+	this.ShowSlash = false;
+	this.ShowStandardNotation = false;
+	this.ShowTablature = false;
+};
+alphaTab.importer.PartConfiguration_TrackConfiguration.__name__ = ["alphaTab","importer","PartConfiguration_TrackConfiguration"];
+alphaTab.importer.PartConfiguration_TrackConfiguration.prototype = {
+	__class__: alphaTab.importer.PartConfiguration_TrackConfiguration
+};
 alphaTab.importer.ScoreLoader = $hx_exports["alphaTab"]["importer"]["ScoreLoader"] = function() {
 };
 alphaTab.importer.ScoreLoader.__name__ = ["alphaTab","importer","ScoreLoader"];
@@ -22485,14 +22594,17 @@ alphaTab.model.Staff = $hx_exports["alphaTab"]["model"]["Staff"] = function() {
 	this.DisplayTranspositionPitch = 0;
 	this.Tuning = null;
 	this.TuningName = null;
-	this.StaffKind = 0;
+	this.ShowTablature = false;
+	this.ShowStandardNotation = false;
+	this.IsPercussion = false;
 	var this1 = [];
 	this.Bars = this1;
 	var this2 = new Int32Array(0);
 	this.Tuning = this2;
 	var this3 = {}
 	this.Chords = this3;
-	this.StaffKind = 3;
+	this.ShowStandardNotation = true;
+	this.ShowTablature = true;
 };
 alphaTab.model.Staff.__name__ = ["alphaTab","model","Staff"];
 alphaTab.model.Staff.CopyTo = function(src,dst) {
@@ -22502,7 +22614,9 @@ alphaTab.model.Staff.CopyTo = function(src,dst) {
 	dst.Tuning = new Int32Array(array);
 	dst.TranspositionPitch = src.TranspositionPitch;
 	dst.DisplayTranspositionPitch = src.DisplayTranspositionPitch;
-	dst.StaffKind = src.StaffKind;
+	dst.ShowStandardNotation = src.ShowStandardNotation;
+	dst.ShowTablature = src.ShowTablature;
+	dst.IsPercussion = src.IsPercussion;
 };
 alphaTab.model.Staff.prototype = {
 	get_IsStringed: function() {
@@ -22527,58 +22641,6 @@ alphaTab.model.Staff.prototype = {
 		bars.push(bar);
 	}
 	,__class__: alphaTab.model.Staff
-};
-alphaTab.model._StaffKind = {};
-alphaTab.model._StaffKind.StaffKind_Impl_ = $hx_exports["alphaTab"]["model"]["_StaffKind"]["StaffKind_Impl_"] = {};
-alphaTab.model._StaffKind.StaffKind_Impl_.__name__ = ["alphaTab","model","_StaffKind","StaffKind_Impl_"];
-alphaTab.model._StaffKind.StaffKind_Impl_.ToBoolean_IFormatProvider = function(this1,provider) {
-	return this1 != 0;
-};
-alphaTab.model._StaffKind.StaffKind_Impl_.ToChar_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToUInt16(this1);
-};
-alphaTab.model._StaffKind.StaffKind_Impl_.ToSByte_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToInt8(this1);
-};
-alphaTab.model._StaffKind.StaffKind_Impl_.ToByte_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToUInt8(this1);
-};
-alphaTab.model._StaffKind.StaffKind_Impl_.ToInt16_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToInt16(this1);
-};
-alphaTab.model._StaffKind.StaffKind_Impl_.ToUInt16_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToUInt16(this1);
-};
-alphaTab.model._StaffKind.StaffKind_Impl_.ToInt32_IFormatProvider = function(this1,provider) {
-	return this1;
-};
-alphaTab.model._StaffKind.StaffKind_Impl_.ToUInt32_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToUInt32(this1);
-};
-alphaTab.model._StaffKind.StaffKind_Impl_.ToInt64_IFormatProvider = function(this1,provider) {
-	return this1;
-};
-alphaTab.model._StaffKind.StaffKind_Impl_.ToUInt64_IFormatProvider = function(this1,provider) {
-	return system.Convert.ToUInt32(this1);
-};
-alphaTab.model._StaffKind.StaffKind_Impl_.ToSingle_IFormatProvider = function(this1,provider) {
-	return this1;
-};
-alphaTab.model._StaffKind.StaffKind_Impl_.ToDouble_IFormatProvider = function(this1,provider) {
-	return this1;
-};
-alphaTab.model._StaffKind.StaffKind_Impl_.toString = function(this1) {
-	switch(this1) {
-	case 0:
-		return "Tablature";
-	case 1:
-		return "Score";
-	case 2:
-		return "Percussion";
-	case 3:
-		return "Mixed";
-	}
-	return "";
 };
 alphaTab.model.Track = $hx_exports["alphaTab"]["model"]["Track"] = function(staveCount) {
 	this.Index = 0;
@@ -29861,7 +29923,7 @@ alphaTab.rendering.glyphs.ScoreBeatGlyph.prototype = $extend(alphaTab.rendering.
 	}
 	,CreateNoteHeadGlyph: function(n) {
 		var isGrace = this.Container.Beat.GraceType != 0;
-		if(n.Beat.Voice.Bar.Staff.StaffKind == 2) {
+		if(n.Beat.Voice.Bar.Staff.IsPercussion) {
 			var value = n.get_RealValue();
 			if(value <= 30 || value >= 67 || alphaTab.rendering.glyphs.ScoreBeatGlyph.NormalKeys.hasOwnProperty(value)) {
 				return new alphaTab.rendering.glyphs.NoteHeadGlyph(0,0,4,isGrace);
@@ -33891,7 +33953,7 @@ alphaTab.rendering.utils.AccidentalHelper.__name__ = ["alphaTab","rendering","ut
 alphaTab.rendering.utils.AccidentalHelper.prototype = {
 	ApplyAccidental: function(note) {
 		var staff = this._bar.Staff;
-		var noteValue = staff.StaffKind == 2 ? alphaTab.rendering.utils.PercussionMapper.MapNoteForDisplay(note.get_DisplayValue()) : note.get_DisplayValue();
+		var noteValue = staff.IsPercussion ? alphaTab.rendering.utils.PercussionMapper.MapNoteForDisplay(note.get_DisplayValue()) : note.get_DisplayValue();
 		var quarterBend = note.get_HasQuarterToneOffset();
 		var line = this.RegisterNoteLine(note,noteValue);
 		if(this.MinNoteValue == -1 || noteValue < this.MinNoteValue) {
@@ -33906,7 +33968,7 @@ alphaTab.rendering.utils.AccidentalHelper.prototype = {
 	}
 	,ApplyAccidentalForValue: function(relatedBeat,noteValue,quarterBend) {
 		var staff = this._bar.Staff;
-		if(staff.StaffKind == 2) {
+		if(staff.IsPercussion) {
 			noteValue = alphaTab.rendering.utils.PercussionMapper.MapNoteForDisplay(noteValue);
 		}
 		var line = this.RegisterNoteValueLine(noteValue);
@@ -33922,7 +33984,7 @@ alphaTab.rendering.utils.AccidentalHelper.prototype = {
 	}
 	,GetAccidental: function(line,noteValue,quarterBend) {
 		var accidentalToSet = 0;
-		if(this._bar.Staff.StaffKind != 2) {
+		if(!this._bar.Staff.IsPercussion) {
 			var ks = this._bar.get_MasterBar().KeySignature;
 			var ksi = ks + 7;
 			var index = noteValue % 12;
@@ -34248,7 +34310,7 @@ alphaTab.rendering.utils.BeamingHelper.IsFullBarJoin = function(a,b,barIndex) {
 };
 alphaTab.rendering.utils.BeamingHelper.prototype = {
 	GetValue: function(n) {
-		if(this._staff.StaffKind == 2) {
+		if(this._staff.IsPercussion) {
 			return alphaTab.rendering.utils.PercussionMapper.MapNoteForDisplay(n.get_DisplayValue());
 		} else {
 			return n.get_DisplayValue();
@@ -37386,6 +37448,7 @@ alphaTab.importer.GpxFileSystem.HeaderBcFs = "BCFS";
 alphaTab.importer.GpxFileSystem.HeaderBcFz = "BCFZ";
 alphaTab.importer.GpxFileSystem.ScoreGpif = "score.gpif";
 alphaTab.importer.GpxFileSystem.BinaryStylesheet = "BinaryStylesheet";
+alphaTab.importer.GpxFileSystem.PartConfiguration = "PartConfiguration";
 alphaTab.importer.MusicXmlImporter.MergePartGroupsSetting = "musicXMLMergePartGroups";
 alphaTab.io.BitReader.ByteSize = 8;
 alphaTab.model._AccentuationType.AccentuationType_Impl_.None = 0;
@@ -37529,10 +37592,6 @@ alphaTab.model._SlideType.SlideType_Impl_.OutUp = 5;
 alphaTab.model._SlideType.SlideType_Impl_.OutDown = 6;
 alphaTab.model._SlideType.SlideType_Impl_.PickSlideDown = 7;
 alphaTab.model._SlideType.SlideType_Impl_.PickSlideUp = 8;
-alphaTab.model._StaffKind.StaffKind_Impl_.Tablature = 0;
-alphaTab.model._StaffKind.StaffKind_Impl_.Score = 1;
-alphaTab.model._StaffKind.StaffKind_Impl_.Percussion = 2;
-alphaTab.model._StaffKind.StaffKind_Impl_.Mixed = 3;
 alphaTab.model.Track.ShortNameMaxLength = 10;
 alphaTab.model._TripletFeel.TripletFeel_Impl_.NoTripletFeel = 0;
 alphaTab.model._TripletFeel.TripletFeel_Impl_.Triplet16th = 1;

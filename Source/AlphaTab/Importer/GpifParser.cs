@@ -382,7 +382,7 @@ namespace AlphaTab.Importer
         {
             var track = new Track(1);
             var staff = track.Staves[0];
-            staff.StaffKind = StaffKind.Score;
+            staff.ShowStandardNotation = true;
             var trackId = node.GetAttribute("id");
 
             foreach (var c in node.ChildNodes)
@@ -409,7 +409,7 @@ namespace AlphaTab.Importer
                             if (instrumentName.EndsWith("-gs") || instrumentName.EndsWith("GrandStaff"))
                             {
                                 track.EnsureStaveCount(2);
-                                track.Staves[1].StaffKind = StaffKind.Score;
+                                track.Staves[1].ShowStandardNotation = true;
                             }
                             break;
                         case "InstrumentSet":
@@ -462,11 +462,20 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "Type":
+                            switch (c.InnerText)
+                            {
+                                case "drumKit":
+                                foreach (var staff in track.Staves)
+                                {
+                                    staff.IsPercussion = true;
+                                }
+                                break;
+                            }
                             if (c.InnerText == "drumKit")
                             {
                                 foreach (var staff in track.Staves)
                                 {
-                                    staff.StaffKind = StaffKind.Percussion;
+                                    staff.IsPercussion = true;
                                 }
                             }
                             break;
@@ -541,9 +550,9 @@ namespace AlphaTab.Importer
                     }
 
                     staff.Tuning = tuning;
-                    if (staff.StaffKind != StaffKind.Percussion)
+                    if (!staff.IsPercussion)
                     {
-                        staff.StaffKind = StaffKind.Mixed;
+                        staff.ShowTablature = true;
                     }
                     break;
                 case "DiagramCollection":
@@ -761,7 +770,8 @@ namespace AlphaTab.Importer
                     foreach (var staff in track.Staves)
                     {
                         staff.Tuning = tuning;
-                        staff.StaffKind = StaffKind.Mixed;
+                        staff.ShowStandardNotation = true;
+                        staff.ShowTablature = true;
                     }
                     break;
                 case "DiagramCollection":
@@ -807,7 +817,7 @@ namespace AlphaTab.Importer
             {
                 foreach (var staff in track.Staves)
                 {
-                    staff.StaffKind = StaffKind.Percussion;
+                    staff.IsPercussion = true;
                 }
             }
         }

@@ -109,6 +109,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Importer\MixTableChange.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\MusicXmlImporter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\NoCompatibleReaderFoundException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Importer\PartConfiguration.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\ScoreImporter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\ScoreLoader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\UnsupportedFormatException.cs" />
@@ -154,7 +155,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\SimileMark.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\SlideType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Staff.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Model\StaffKind.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Track.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\TripletFeel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Tuning.cs" />

@@ -122,7 +122,7 @@ namespace AlphaTab.Rendering.Layout
                 {
                     foreach (var staff in track.Staves)
                     {
-                        if (staff.StaffKind != StaffKind.Percussion && staff.IsStringed && staff.Tuning.Length > 0)
+                        if (!staff.IsPercussion && staff.IsStringed && staff.Tuning.Length > 0)
                         {
                             staffWithTuning = staff;
                             break;
@@ -163,29 +163,20 @@ namespace AlphaTab.Rendering.Layout
             var group = new StaveGroup();
             group.Layout = this;
 
+
             for (var trackIndex = 0; trackIndex < Renderer.Tracks.Length; trackIndex++)
             {
                 var track = Renderer.Tracks[trackIndex];
                 var hasScore = false;
-                //var hasTab = false;
                 foreach (var staff in track.Staves)
                 {
-                    switch (staff.StaffKind)
+                    if (staff.ShowStandardNotation)
                     {
-                        case StaffKind.Tablature:
-                            //hasTab = true;
-                            break;
-                        case StaffKind.Score:
-                            hasScore = true;
-                            break;
-                        case StaffKind.Percussion:
-                            break;
-                        case StaffKind.Mixed:
-                            hasScore = true;
-                            //hasTab = true;
-                            break;
+                        hasScore = true;
+                        break;
                     }
                 }
+
 
 
                 for (int staffIndex = 0; staffIndex < track.Staves.Count; staffIndex++)
@@ -194,28 +185,29 @@ namespace AlphaTab.Rendering.Layout
 
                     // use optimal profile for track 
                     string staveProfile;
-                    if (staff.StaffKind == StaffKind.Percussion)
+                    if (staff.IsPercussion)
                     {
                         staveProfile = Environment.StaveProfileScore;
                     }
-                    else if (staff.StaffKind == StaffKind.Tablature)
-                    {
-                        if (hasScore)
-                        {
-                            staveProfile = Environment.StaveProfileTabMixed;
-                        }
-                        else
-                        {
-                            staveProfile = Environment.StaveProfileTab;
-                        }
-                    }
-                    else if (staff.IsStringed)
+                    else if (Renderer.Settings.Staves.Id != "default")
                     {
                         staveProfile = Renderer.Settings.Staves.Id;
                     }
-                    else // if(staff.StaffKind == StaffKind.Score)
+                    else if (staff.ShowTablature && staff.ShowStandardNotation)
+                    {
+                        staveProfile = Environment.StaveProfileScoreTab;
+                    }
+                    else if (staff.ShowTablature)
+                    {
+                        staveProfile = hasScore ? Environment.StaveProfileTabMixed : Environment.StaveProfileTab;
+                    }
+                    else if (staff.ShowStandardNotation)
                     {
                         staveProfile = Environment.StaveProfileScore;
+                    }
+                    else
+                    {
+                        continue;
                     }
 
                     var profile = Environment.StaveProfiles.ContainsKey(staveProfile)

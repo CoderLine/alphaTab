@@ -150,7 +150,7 @@ namespace AlphaTab.Rendering.Utils
 
         private int GetValue(Note n)
         {
-            if (_staff.StaffKind == StaffKind.Percussion)
+            if (_staff.IsPercussion)
             {
                 return PercussionMapper.MapNoteForDisplay(n.DisplayValue);
             }

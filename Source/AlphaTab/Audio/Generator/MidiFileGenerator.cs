@@ -362,7 +362,7 @@ namespace AlphaTab.Audio.Generator
 
             //
             // Trill
-            if (note.IsTrill && staff.StaffKind != StaffKind.Percussion)
+            if (note.IsTrill && !staff.IsPercussion)
             {
                 GenerateTrill(note, noteStart, noteDuration, noteKey, dynamicValue, channel);
                 // no further generation needed
@@ -516,7 +516,7 @@ namespace AlphaTab.Audio.Generator
             var dynamicValue = note.Dynamic;
 
             // more silent on hammer destination
-            if (note.Beat.Voice.Bar.Staff.StaffKind != StaffKind.Percussion && note.HammerPullOrigin != null)
+            if (!note.Beat.Voice.Bar.Staff.IsPercussion && note.HammerPullOrigin != null)
             {
                 dynamicValue--;
             }

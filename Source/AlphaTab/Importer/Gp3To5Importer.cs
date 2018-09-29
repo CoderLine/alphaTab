@@ -409,7 +409,7 @@ namespace AlphaTab.Importer
             newTrack.Name = Data.GpReadStringByteLength(40, _encoding);
             if ((flags & 0x01) != 0)
             {
-                mainStaff.StaffKind = StaffKind.Percussion;
+                mainStaff.IsPercussion = true;
             }
 
             var stringCount = Data.ReadInt32LE();
@@ -487,7 +487,7 @@ namespace AlphaTab.Importer
             var newBar = new Bar();
             var mainStaff = track.Staves[0];
 
-            if (mainStaff.StaffKind == StaffKind.Percussion)
+            if (mainStaff.IsPercussion)
             {
                 newBar.Clef = Clef.Neutral;
             }

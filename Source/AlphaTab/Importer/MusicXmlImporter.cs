@@ -1411,11 +1411,11 @@ namespace AlphaTab.Importer
                     break;
                 case "percussion":
                     bar.Clef = Clef.Neutral;
-                    bar.Staff.StaffKind = StaffKind.Percussion;
+                    bar.Staff.IsPercussion = true;
                     break;
                 case "tab":
                     bar.Clef = Clef.G2;
-                    bar.Staff.StaffKind = StaffKind.Tablature;
+                    bar.Staff.ShowTablature = true;
                     break;
                 default:
                     bar.Clef = Clef.G2;
@@ -1613,7 +1613,7 @@ namespace AlphaTab.Importer
 
             Track track = new Track(1);
             var staff = track.Staves[0];
-            staff.StaffKind = StaffKind.Score;
+            staff.ShowStandardNotation = true;
             _trackById[id] = track;
             _score.AddTrack(track);
 
