@@ -99,11 +99,11 @@ namespace AlphaTab.Importer
             if (partConfiguration != null)
             {
                 Logger.Info(Name, "Start Parsing Part Configuration");
-                var parser = new PartConfigurationParser();
-                parser.Parse(partConfiguration);
-                if (parser.Configuration != null)
+                var partConfigurationParser = new PartConfigurationParser();
+                partConfigurationParser.Parse(partConfiguration);
+                if (partConfigurationParser.Configuration != null)
                 {
-                    parser.Configuration.Apply(score);
+                    partConfigurationParser.Configuration.Apply(score);
                 }
                 Logger.Info(Name, "Part Configuration parsed");
             }

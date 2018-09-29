@@ -35,12 +35,17 @@ namespace AlphaTab.Importer
             // from the GPX container
             Logger.Info(Name, "Loading GPX filesystem");
             var fileSystem = new GpxFileSystem();
-            fileSystem.FileFilter = s => s.EndsWith(GpxFileSystem.ScoreGpif) || s.EndsWith(GpxFileSystem.BinaryStylesheet);
+            fileSystem.FileFilter = s =>
+                s.EndsWith(GpxFileSystem.ScoreGpif)
+                || s.EndsWith(GpxFileSystem.BinaryStylesheet)
+                || s.EndsWith(GpxFileSystem.PartConfiguration)
+            ;
             fileSystem.Load(Data);
             Logger.Info(Name, "GPX filesystem loaded");
 
             string xml = null;
             byte[] binaryStylesheet = null;
+            byte[] partConfiguration = null;
             foreach (var entry in fileSystem.Files)
             {
                 switch (entry.FileName)
@@ -50,6 +55,9 @@ namespace AlphaTab.Importer
                         break;
                     case GpxFileSystem.BinaryStylesheet:
                         binaryStylesheet = entry.Data;
+                        break;
+                    case GpxFileSystem.PartConfiguration:
+                        partConfiguration = entry.Data;
                         break;
                 }
             }
@@ -62,11 +70,11 @@ namespace AlphaTab.Importer
             // the score.gpif file within this filesystem stores
             // the score information as XML we need to parse.
             Logger.Info(Name, "Start Parsing score.gpif");
-            var parser = new GpifParser();
-            parser.ParseXml(xml, Settings);
+            var gpifParser = new GpifParser();
+            gpifParser.ParseXml(xml, Settings);
             Logger.Info(Name, "score.gpif parsed");
 
-            var score = parser.Score;
+            var score = gpifParser.Score;
 
             if (binaryStylesheet != null)
             {
@@ -78,6 +86,18 @@ namespace AlphaTab.Importer
                     stylesheetParser.Stylesheet.Apply(score);
                 }
                 Logger.Info(Name, "BinaryStylesheet parsed");
+            }
+
+            if (partConfiguration != null)
+            {
+                Logger.Info(Name, "Start Parsing Part Configuration");
+                var partConfigurationParser = new PartConfigurationParser();
+                partConfigurationParser.Parse(partConfiguration);
+                if (partConfigurationParser.Configuration != null)
+                {
+                    partConfigurationParser.Configuration.Apply(score);
+                }
+                Logger.Info(Name, "Part Configuration parsed");
             }
 
             return score;
