@@ -1,4 +1,6 @@
-﻿using Haxe.Zip;
+﻿using System;
+using AlphaTab.Importer;
+using Haxe.Zip;
 using Phase;
 
 namespace AlphaTab.IO
@@ -12,26 +14,34 @@ namespace AlphaTab.IO
         /// <returns></returns>
         public void Load(IReadable s)
         {
-            var haxeInput = new ReadableInput(s);
-            var reader = new Reader(haxeInput);
-            var entries = reader.Read();
-            foreach (var entry in entries)
+            try
             {
-                string fullName = entry.FileName;
-                if (FileFilter == null || FileFilter(fullName))
+                var haxeInput = new ReadableInput(s);
+                var reader = new Reader(haxeInput);
+                var entries = reader.Read();
+                foreach (var entry in entries)
                 {
-                    var i = fullName.LastIndexOf("/");
-                    string name = i >= 0 ? fullName.Substring(i + 1) : fullName;
-                    var data = entry.Data.GetData();
-
-                    Entries.Add(new ZipEntry
+                    string fullName = entry.FileName;
+                    if (FileFilter == null || FileFilter(fullName))
                     {
-                        FullName = fullName,
-                        FileName = name,
-                        Data = Script.Write<byte[]>("data")
-                    });
+                        var i = fullName.LastIndexOf("/");
+                        string name = i >= 0 ? fullName.Substring(i + 1) : fullName;
+                        var data = entry.Data.GetData();
+
+                        Entries.Add(new ZipEntry
+                        {
+                            FullName = fullName,
+                            FileName = name,
+                            Data = Script.Write<byte[]>("data")
+                        });
+                    }
                 }
             }
+            catch
+            {
+                throw new UnsupportedFormatException("Not a valid zip file");
+            }
+            
         }
     }
 }
