@@ -172,65 +172,72 @@ namespace AlphaTab.Model
                 }
                 else
                 {
-                    // find note which is not a grace note
-                    Beat nonGrace = beat;
-                    int numberOfGraceBeats = 0;
-                    while (nonGrace != null && nonGrace.GraceType != GraceType.None)
+                    if (beat.PreviousBeat == null || beat.PreviousBeat.GraceType == GraceType.None)
                     {
-                        nonGrace = nonGrace.NextBeat;
-                        numberOfGraceBeats++;
-                    }
-
-                    var graceDuration = Duration.Eighth;
-                    int stolenDuration = 0;
-                    if (numberOfGraceBeats == 1)
-                    {
-                        graceDuration = Duration.Eighth;
-                        stolenDuration = Duration.ThirtySecond.ToTicks();
-                    }
-                    else if (numberOfGraceBeats == 2)
-                    {
-                        graceDuration = Duration.Sixteenth;
-                        stolenDuration = Duration.SixtyFourth.ToTicks();
-                    }
-                    else
-                    {
-                        graceDuration = Duration.ThirtySecond;
-                        stolenDuration = Duration.OneHundredTwentyEighth.ToTicks();
-                    }
-
-
-                    // grace beats have 1/4 size of the non grace beat following them
-                    var perGraceDuration = nonGrace == null ? Duration.ThirtySecond.ToTicks() : (nonGrace.DisplayDuration / 4) / numberOfGraceBeats;
-
-                    // move all grace beats 
-                    for (int j = 0; j < numberOfGraceBeats; j++)
-                    {
-                        var graceBeat = Beats[j + i];
-                        if (beat.PreviousBeat == null || beat.PreviousBeat.GraceType == GraceType.None)
+                        // find note which is not a grace note
+                        Beat nonGrace = beat;
+                        int numberOfGraceBeats = 0;
+                        while (nonGrace != null && nonGrace.GraceType != GraceType.None)
                         {
+                            nonGrace = nonGrace.NextBeat;
+                            numberOfGraceBeats++;
+                        }
+
+                        var graceDuration = Duration.Eighth;
+                        int stolenDuration = 0;
+                        if (numberOfGraceBeats == 1)
+                        {
+                            graceDuration = Duration.Eighth;
+                        }
+                        else if (numberOfGraceBeats == 2)
+                        {
+                            graceDuration = Duration.Sixteenth;
+                        }
+                        else
+                        {
+                            graceDuration = Duration.ThirtySecond;
+                        }
+
+                        if (nonGrace != null)
+                        {
+                            nonGrace.UpdateDurations();
+                        }
+
+                        // grace beats have 1/4 size of the non grace beat following them
+                        var perGraceDuration = nonGrace == null
+                            ? Duration.ThirtySecond.ToTicks()
+                            : (nonGrace.DisplayDuration / 4) / numberOfGraceBeats;
+
+                        // move all grace beats 
+                        for (int j = 0; j < numberOfGraceBeats; j++)
+                        {
+                            var graceBeat = Beats[j + i];
                             graceBeat.Duration = graceDuration;
                             graceBeat.UpdateDurations();
-                        }
-                        graceBeat.DisplayStart = currentDisplayTick - (numberOfGraceBeats - j + 1) * perGraceDuration;
-                        graceBeat.DisplayDuration = perGraceDuration;
-                    }
 
-                    if (beat.PreviousBeat != null && beat.GraceType == GraceType.BeforeBeat)
-                    {
-                        beat.PreviousBeat.PlaybackDuration -= stolenDuration;
+                            graceBeat.DisplayStart = currentDisplayTick - (numberOfGraceBeats - j + 1) * perGraceDuration;
+                            graceBeat.DisplayDuration = perGraceDuration;
+
+                            stolenDuration += graceBeat.PlaybackDuration;
+                        }
+
+                        // steal needed duration from beat duration
+                        if (beat.GraceType == GraceType.BeforeBeat)
+                        {
+                            if (beat.PreviousBeat != null)
+                            {
+                                beat.PreviousBeat.PlaybackDuration -= stolenDuration;
+                            }
+                            currentPlaybackTick -= stolenDuration;
+                        }
+                        else if (nonGrace != null && beat.GraceType == GraceType.OnBeat)
+                        {
+                            nonGrace.PlaybackDuration -= stolenDuration;
+                        }
                     }
 
                     beat.PlaybackStart = currentPlaybackTick;
-                    switch (beat.GraceType)
-                    {
-                        case GraceType.BeforeBeat:
-                            beat.PlaybackStart -= beat.PlaybackDuration;
-                            break;
-                        case GraceType.OnBeat:
-                            currentPlaybackTick += beat.PlaybackDuration;
-                            break;
-                    }
+                    currentPlaybackTick = beat.PlaybackStart + beat.PlaybackDuration;
                 }
 
                 _beatLookup[beat.DisplayStart] = beat;

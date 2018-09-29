@@ -401,14 +401,17 @@ namespace AlphaTab.Rendering
                     : GetYPositionForNoteValue(h.GetBeatMaxValue(beat));
 
                 var y2 = cy + Y;
-                y2 += scaleMod * CalculateBeamY(h, beatLineX);
+                y2 += CalculateBeamY(h, beatLineX);
 
                 canvas.LineWidth = StemWidth * Scale;
+
                 canvas.BeginPath();
                 canvas.MoveTo(cx + X + beatLineX, y1);
                 canvas.LineTo(cx + X + beatLineX, y2);
                 canvas.Stroke();
                 canvas.LineWidth = Scale;
+
+
 
                 float fingeringY = y2;
                 if (direction == BeamDirection.Down)
@@ -463,8 +466,8 @@ namespace AlphaTab.Rendering
                         {
                             continue;
                         }
-                        barStartY = barY + CalculateBeamY(h, barStartX) * scaleMod;
-                        barEndY = barY + CalculateBeamY(h, barEndX) * scaleMod;
+                        barStartY = barY + CalculateBeamY(h, barStartX);
+                        barEndY = barY + CalculateBeamY(h, barEndX);
                         PaintSingleBar(canvas, cx + X + barStartX, barStartY, cx + X + barEndX, barEndY, barSize);
                     }
                     // 
@@ -475,8 +478,8 @@ namespace AlphaTab.Rendering
                         barStartX = beatLineX - brokenBarOffset;
                         barEndX = beatLineX;
 
-                        barStartY = barY + CalculateBeamY(h, barStartX) * scaleMod;
-                        barEndY = barY + CalculateBeamY(h, barEndX) * scaleMod;
+                        barStartY = barY + CalculateBeamY(h, barStartX);
+                        barEndY = barY + CalculateBeamY(h, barEndX);
 
                         PaintSingleBar(canvas, cx + X + barStartX, barStartY, cx + X + barEndX, barEndY, barSize);
                     }

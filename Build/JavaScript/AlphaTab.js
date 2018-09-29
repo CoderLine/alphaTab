@@ -17318,6 +17318,8 @@ alphaTab.importer.MusicXmlImporter.prototype = $extend(alphaTab.importer.ScoreIm
 		this._partGroups = this2;
 		var this3 = [];
 		this._tieStarts = this3;
+		var this4 = {}
+		this._tieStartIds = this4;
 		var xml = alphaTab.platform.Platform.ToString(this.Data.ReadAll(),this.GetSetting("encoding","utf-8"));
 		var dom;
 		try {
@@ -17964,18 +17966,21 @@ alphaTab.importer.MusicXmlImporter.prototype = $extend(alphaTab.importer.ScoreIm
 		}
 	}
 	,ParseTied: function(element,note) {
-		if(note.Beat.GraceType != 0) {
-			return;
-		}
 		if(element.GetAttribute("type") == "start") {
-			note.IsTieOrigin = true;
-			this._tieStarts.push(note);
+			if(!this._tieStartIds.hasOwnProperty(note.Id)) {
+				note.IsTieOrigin = true;
+				this._tieStartIds[note.Id] = true;
+				this._tieStarts.push(note);
+			}
 		} else if(element.GetAttribute("type") == "stop" && this._tieStarts.length > 0) {
-			note.TieDestination = this._tieStarts[0];
 			note.IsTieDestination = true;
+			note.TieOrigin = this._tieStarts[0];
 			if(true) {
 				this._tieStarts.splice(0,1);
 			}
+			var this1 = this._tieStartIds;
+			var key = note.Id;
+			delete this1[key];
 		}
 	}
 	,ParseNotations: function(element,beat,note) {
@@ -18189,7 +18194,7 @@ alphaTab.importer.MusicXmlImporter.prototype = $extend(alphaTab.importer.ScoreIm
 					}
 					break;
 				case "octave":
-					octave = alphaTab.platform.Platform.ParseInt(c1.get_InnerText());
+					octave = alphaTab.platform.Platform.ParseInt(c1.get_InnerText()) + 1;
 					break;
 				case "step":
 					step = c1.get_InnerText();
@@ -18376,17 +18381,17 @@ alphaTab.importer.MusicXmlImporter.prototype = $extend(alphaTab.importer.ScoreIm
 			}
 		}
 		switch(sign) {
-		case "C":
+		case "c":
 			if(line == 3) {
 				bar.Clef = 1;
 			} else {
 				bar.Clef = 2;
 			}
 			break;
-		case "F":
+		case "f":
 			bar.Clef = 3;
 			break;
-		case "G":
+		case "g":
 			bar.Clef = 4;
 			break;
 		case "percussion":
@@ -19233,26 +19238,30 @@ alphaTab.io.ZipFile = $hx_exports["alphaTab"]["io"]["ZipFile"] = function() {
 alphaTab.io.ZipFile.__name__ = ["alphaTab","io","ZipFile"];
 alphaTab.io.ZipFile.prototype = {
 	Load: function(s) {
-		var haxeInput = new alphaTab.io.ReadableInput(s);
-		var reader = new haxe.zip.Reader(haxeInput);
-		var entries = reader.read();
-		var _g_head = entries.h;
-		while(_g_head != null) {
-			var val = _g_head.item;
-			_g_head = _g_head.next;
-			var entry = val;
-			var fullName = entry.fileName;
-			if(this.FileFilter == null || this.FileFilter(fullName)) {
-				var i = fullName.lastIndexOf("/");
-				var name = i >= 0 ? HxOverrides.substr(fullName,i + 1,null) : fullName;
-				var data = entry.data.b.bufferValue;
-				var this1 = this.Entries;
-				var _tmp = new alphaTab.io.ZipEntry();
-				_tmp.FullName = fullName;
-				_tmp.FileName = name;
-				_tmp.Data = new Uint8Array(data);
-				this1.push(_tmp);
+		try {
+			var haxeInput = new alphaTab.io.ReadableInput(s);
+			var reader = new haxe.zip.Reader(haxeInput);
+			var entries = reader.read();
+			var _g_head = entries.h;
+			while(_g_head != null) {
+				var val = _g_head.item;
+				_g_head = _g_head.next;
+				var entry = val;
+				var fullName = entry.fileName;
+				if(this.FileFilter == null || this.FileFilter(fullName)) {
+					var i = fullName.lastIndexOf("/");
+					var name = i >= 0 ? HxOverrides.substr(fullName,i + 1,null) : fullName;
+					var data = entry.data.b.bufferValue;
+					var this1 = this.Entries;
+					var _tmp = new alphaTab.io.ZipEntry();
+					_tmp.FullName = fullName;
+					_tmp.FileName = name;
+					_tmp.Data = new Uint8Array(data);
+					this1.push(_tmp);
+				}
 			}
+		} catch( __e ) {
+			throw new js._Boot.HaxeError(new alphaTab.importer.UnsupportedFormatException().UnsupportedFormatException("Not a valid zip file"));
 		}
 	}
 	,__class__: alphaTab.io.ZipFile
@@ -19804,9 +19813,6 @@ alphaTab.model.Beat.prototype = {
 		case 1:case 2:
 			var _g1 = this.Duration;
 			switch(_g1) {
-			case 8:
-				this.PlaybackDuration = alphaTab.audio.MidiUtils.ToTicks(32);
-				break;
 			case 16:
 				this.PlaybackDuration = alphaTab.audio.MidiUtils.ToTicks(64);
 				break;
@@ -19814,6 +19820,7 @@ alphaTab.model.Beat.prototype = {
 				this.PlaybackDuration = alphaTab.audio.MidiUtils.ToTicks(128);
 				break;
 			default:
+				this.PlaybackDuration = alphaTab.audio.MidiUtils.ToTicks(32);
 			}
 			break;
 		case 3:
@@ -20828,8 +20835,15 @@ alphaTab.model.JsonConverter.ScoreToJsObject = function(score) {
 						var n = 0;
 						while(n < beat.Notes.length) {
 							var note = beat.Notes[n];
-							var note2 = {}
+							var dynamicNote2 = {}
+							var note2 = dynamicNote2;
 							alphaTab.model.Note.CopyTo(note,note2);
+							if(note.IsTieDestination) {
+								dynamicNote2.TieOriginId = note.TieOrigin.Id;
+							}
+							if(note.IsTieOrigin) {
+								dynamicNote2.TieDestinationId = note.TieDestination.Id;
+							}
 							var this13 = [];
 							note2.BendPoints = this13;
 							var i2 = 0;
@@ -20864,6 +20878,10 @@ alphaTab.model.JsonConverter.JsObjectToScore = function(jsObject,settings) {
 	var score2 = new alphaTab.model.Score();
 	alphaTab.model.Score.CopyTo(score,score2);
 	alphaTab.model.RenderStylesheet.CopyTo(score.Stylesheet,score2.Stylesheet);
+	var this1 = {}
+	var allNotes = this1;
+	var this2 = [];
+	var notesToLink = this2;
 	var i = 0;
 	while(i < score.MasterBars.length) {
 		var masterBar = score.MasterBars[i];
@@ -20877,8 +20895,8 @@ alphaTab.model.JsonConverter.JsObjectToScore = function(jsObject,settings) {
 			masterBar2.Section = new alphaTab.model.Section();
 			alphaTab.model.Section.CopyTo(masterBar.Section,masterBar2.Section);
 		}
-		var this1 = masterBar.Fermata;
-		var offset = $iterator(Object.keys(this1))();
+		var this3 = masterBar.Fermata;
+		var offset = $iterator(Object.keys(this3))();
 		while(offset.hasNext()) {
 			var offset1 = offset.next();
 			var fermata = masterBar.Fermata[offset1];
@@ -20901,8 +20919,8 @@ alphaTab.model.JsonConverter.JsObjectToScore = function(jsObject,settings) {
 			var staff = track.Staves[s];
 			var staff2 = track2.Staves[s];
 			alphaTab.model.Staff.CopyTo(staff,staff2);
-			var this2 = staff.Chords;
-			var key = $iterator(Object.keys(this2))();
+			var this4 = staff.Chords;
+			var key = $iterator(Object.keys(this4))();
 			while(key.hasNext()) {
 				var key1 = key.next();
 				var chord = staff.Chords[key1];
@@ -20948,6 +20966,15 @@ alphaTab.model.JsonConverter.JsObjectToScore = function(jsObject,settings) {
 							var note2 = new alphaTab.model.Note();
 							alphaTab.model.Note.CopyTo(note,note2);
 							beat2.AddNote(note2);
+							allNotes[note2.Id] = note2;
+							if(note.IsTieDestination) {
+								note2["TieOriginId"] = note["TieOriginId"];
+								notesToLink.push(note2);
+							}
+							if(note.IsTieOrigin) {
+								note2["TieDestinationId"] = note["TieDestinationId"];
+								notesToLink.push(note2);
+							}
 							var i2 = 0;
 							while(i2 < note.BendPoints.length) {
 								var point1 = new alphaTab.model.BendPoint(0,0);
@@ -20966,6 +20993,18 @@ alphaTab.model.JsonConverter.JsObjectToScore = function(jsObject,settings) {
 			++s;
 		}
 		++t;
+	}
+	var note1 = $iterator(notesToLink)();
+	while(note1.hasNext()) {
+		var note3 = note1.next();
+		if(note3.IsTieDestination) {
+			var tieOriginId = note3["TieOriginId"];
+			note3.TieOrigin = allNotes[tieOriginId];
+		}
+		if(note3.IsTieOrigin) {
+			var tieDestinationId = note3["TieDestinationId"];
+			note3.TieOrigin = allNotes[tieDestinationId];
+		}
 	}
 	score2.Finish(settings);
 	return score2;
@@ -21829,7 +21868,10 @@ alphaTab.model.Note.prototype = {
 		});
 		var isSongBook = settings != null && settings.DisplayMode == 1;
 		if(this.IsTieDestination) {
-			if(prevNoteOnLine.get_Value() == null) {
+			if(this.TieOrigin != null) {
+				this.TieOrigin.IsTieOrigin = true;
+				this.TieOrigin.TieDestination = this;
+			} else if(prevNoteOnLine.get_Value() == null) {
 				this.IsTieDestination = false;
 			} else {
 				this.TieOrigin = prevNoteOnLine.get_Value();
@@ -23045,50 +23087,47 @@ alphaTab.model.Voice.prototype = {
 				currentDisplayTick = currentDisplayTick + beat1.DisplayDuration;
 				currentPlaybackTick = currentPlaybackTick + beat1.PlaybackDuration;
 			} else {
-				var nonGrace = beat1;
-				var numberOfGraceBeats = 0;
-				while(nonGrace != null && nonGrace.GraceType != 0) {
-					nonGrace = nonGrace.NextBeat;
-					++numberOfGraceBeats;
-				}
-				var graceDuration = 8;
-				var stolenDuration = 0;
-				if(numberOfGraceBeats == 1) {
-					graceDuration = 8;
-					stolenDuration = alphaTab.audio.MidiUtils.ToTicks(32);
-				} else if(numberOfGraceBeats == 2) {
-					graceDuration = 16;
-					stolenDuration = alphaTab.audio.MidiUtils.ToTicks(64);
-				} else {
-					graceDuration = 32;
-					stolenDuration = alphaTab.audio.MidiUtils.ToTicks(128);
-				}
-				var perGraceDuration = nonGrace == null ? alphaTab.audio.MidiUtils.ToTicks(32) : (nonGrace.DisplayDuration / 4 | 0) / numberOfGraceBeats | 0;
-				var j = 0;
-				while(j < numberOfGraceBeats) {
-					var graceBeat = this.Beats[j + i];
-					if(beat1.PreviousBeat == null || beat1.PreviousBeat.GraceType == 0) {
+				if(beat1.PreviousBeat == null || beat1.PreviousBeat.GraceType == 0) {
+					var nonGrace = beat1;
+					var numberOfGraceBeats = 0;
+					while(nonGrace != null && nonGrace.GraceType != 0) {
+						nonGrace = nonGrace.NextBeat;
+						++numberOfGraceBeats;
+					}
+					var graceDuration = 8;
+					var stolenDuration = 0;
+					if(numberOfGraceBeats == 1) {
+						graceDuration = 8;
+					} else if(numberOfGraceBeats == 2) {
+						graceDuration = 16;
+					} else {
+						graceDuration = 32;
+					}
+					if(nonGrace != null) {
+						nonGrace.UpdateDurations();
+					}
+					var perGraceDuration = nonGrace == null ? alphaTab.audio.MidiUtils.ToTicks(32) : (nonGrace.DisplayDuration / 4 | 0) / numberOfGraceBeats | 0;
+					var j = 0;
+					while(j < numberOfGraceBeats) {
+						var graceBeat = this.Beats[j + i];
 						graceBeat.Duration = graceDuration;
 						graceBeat.UpdateDurations();
+						graceBeat.DisplayStart = currentDisplayTick - (numberOfGraceBeats - j + 1) * perGraceDuration;
+						graceBeat.DisplayDuration = perGraceDuration;
+						stolenDuration = stolenDuration + graceBeat.PlaybackDuration;
+						++j;
 					}
-					graceBeat.DisplayStart = currentDisplayTick - (numberOfGraceBeats - j + 1) * perGraceDuration;
-					graceBeat.DisplayDuration = perGraceDuration;
-					++j;
-				}
-				if(beat1.PreviousBeat != null && beat1.GraceType == 2) {
-					beat1.PreviousBeat.PlaybackDuration = beat1.PreviousBeat.PlaybackDuration - stolenDuration;
+					if(beat1.GraceType == 2) {
+						if(beat1.PreviousBeat != null) {
+							beat1.PreviousBeat.PlaybackDuration = beat1.PreviousBeat.PlaybackDuration - stolenDuration;
+						}
+						currentPlaybackTick = currentPlaybackTick - stolenDuration;
+					} else if(nonGrace != null && beat1.GraceType == 1) {
+						nonGrace.PlaybackDuration = nonGrace.PlaybackDuration - stolenDuration;
+					}
 				}
 				beat1.PlaybackStart = currentPlaybackTick;
-				var _g = beat1.GraceType;
-				switch(_g) {
-				case 1:
-					currentPlaybackTick = currentPlaybackTick + beat1.PlaybackDuration;
-					break;
-				case 2:
-					beat1.PlaybackStart = beat1.PlaybackStart - beat1.PlaybackDuration;
-					break;
-				default:
-				}
+				currentPlaybackTick = beat1.PlaybackStart + beat1.PlaybackDuration;
 			}
 			this._beatLookup[beat1.DisplayStart] = beat1;
 			++i;
@@ -26519,7 +26558,7 @@ alphaTab.rendering.ScoreBarRenderer.prototype = $extend(alphaTab.rendering.BarRe
 			var y1 = cy + this.Y;
 			y1 = y1 + (direction == 0 ? this.GetYPositionForNoteValue(h.GetBeatMinValue(beat)) : this.GetYPositionForNoteValue(h.GetBeatMaxValue(beat)));
 			var y2 = cy + this.Y;
-			y2 = y2 + scaleMod * this.CalculateBeamY(h,beatLineX);
+			y2 = y2 + this.CalculateBeamY(h,beatLineX);
 			canvas.set_LineWidth(1.3 * this.get_Scale());
 			canvas.BeginPath();
 			canvas.MoveTo(cx + this.X + beatLineX,y1);
@@ -26562,14 +26601,14 @@ alphaTab.rendering.ScoreBarRenderer.prototype = $extend(alphaTab.rendering.BarRe
 						++barIndex;
 						continue;
 					}
-					barStartY = barY + this.CalculateBeamY(h,barStartX) * scaleMod;
-					barEndY = barY + this.CalculateBeamY(h,barEndX) * scaleMod;
+					barStartY = barY + this.CalculateBeamY(h,barStartX);
+					barEndY = barY + this.CalculateBeamY(h,barEndX);
 					alphaTab.rendering.ScoreBarRenderer.PaintSingleBar(canvas,cx + this.X + barStartX,barStartY,cx + this.X + barEndX,barEndY,barSize);
 				} else if(i > 0 && !alphaTab.rendering.utils.BeamingHelper.IsFullBarJoin(beat,h.Beats[i - 1],barIndex)) {
 					barStartX = beatLineX - brokenBarOffset;
 					barEndX = beatLineX;
-					barStartY = barY + this.CalculateBeamY(h,barStartX) * scaleMod;
-					barEndY = barY + this.CalculateBeamY(h,barEndX) * scaleMod;
+					barStartY = barY + this.CalculateBeamY(h,barStartX);
+					barEndY = barY + this.CalculateBeamY(h,barEndX);
 					alphaTab.rendering.ScoreBarRenderer.PaintSingleBar(canvas,cx + this.X + barStartX,barStartY,cx + this.X + barEndX,barEndY,barSize);
 				}
 				++barIndex;
@@ -27004,7 +27043,7 @@ alphaTab.rendering.ScoreBeatContainerGlyph.prototype = $extend(alphaTab.renderin
 		if(!n.IsVisible) {
 			return;
 		}
-		if(n.IsTieOrigin && !n.get_HasBend() && !n.Beat.get_HasWhammyBar() && n.Beat.GraceType != 3 && n.TieDestination.IsVisible) {
+		if(n.IsTieOrigin && !n.get_HasBend() && !n.Beat.get_HasWhammyBar() && n.Beat.GraceType != 3 && n.TieDestination != null && n.TieDestination.IsVisible) {
 			var tie = new alphaTab.rendering.glyphs.ScoreTieGlyph(n,n.TieDestination,false);
 			this.Ties.push(tie);
 		}
@@ -34155,6 +34194,9 @@ alphaTab.rendering.utils.BeamingHelper.__name__ = ["alphaTab","rendering","utils
 alphaTab.rendering.utils.BeamingHelper.CanJoin = function(b1,b2) {
 	if(b1 == null || b2 == null || b1.get_IsRest() || b2.get_IsRest() || b1.GraceType != b2.GraceType || b1.GraceType == 3 || b2.GraceType == 3) {
 		return false;
+	}
+	if(b1.GraceType != 0 && b2.GraceType != 0) {
+		return true;
 	}
 	var m1 = b1.Voice.Bar;
 	var m2 = b1.Voice.Bar;

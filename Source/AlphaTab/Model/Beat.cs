@@ -568,15 +568,16 @@ namespace AlphaTab.Model
                 case GraceType.BeforeBeat:
                 case GraceType.OnBeat:
                     switch (Duration)
-                    {
-                        case Duration.Eighth:
-                            PlaybackDuration = Duration.ThirtySecond.ToTicks();
-                            break;
+                    {   
                         case Duration.Sixteenth:
                             PlaybackDuration = Duration.SixtyFourth.ToTicks();
                             break;
                         case Duration.ThirtySecond:
                             PlaybackDuration = Duration.OneHundredTwentyEighth.ToTicks();
+                            break;
+                        case Duration.Eighth:
+                        default:
+                            PlaybackDuration = Duration.ThirtySecond.ToTicks();
                             break;
                     }
                     break;
