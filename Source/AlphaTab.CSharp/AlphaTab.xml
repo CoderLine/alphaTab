@@ -1003,7 +1003,7 @@
         <member name="M:AlphaTab.Audio.Generator.AlphaSynthMidiFileHandler.AddTempo(System.Int32,System.Int32)">
             <inheritdoc />
         </member>
-        <member name="M:AlphaTab.Audio.Generator.AlphaSynthMidiFileHandler.AddBend(System.Int32,System.Int32,System.Byte,System.Byte)">
+        <member name="M:AlphaTab.Audio.Generator.AlphaSynthMidiFileHandler.AddBend(System.Int32,System.Int32,System.Byte,System.Int32)">
             <inheritdoc />
         </member>
         <member name="M:AlphaTab.Audio.Generator.AlphaSynthMidiFileHandler.FinishTrack(System.Int32,System.Int32)">
@@ -1067,7 +1067,7 @@
             <param name="tick">The midi ticks when the tempo should change change.</param>
             <param name="tempo">The tempo as BPM</param>
         </member>
-        <member name="M:AlphaTab.Audio.Generator.IMidiFileHandler.AddBend(System.Int32,System.Int32,System.Byte,System.Byte)">
+        <member name="M:AlphaTab.Audio.Generator.IMidiFileHandler.AddBend(System.Int32,System.Int32,System.Byte,System.Int32)">
             <summary>
             Add a bend to the generated midi file. 
             </summary>
@@ -1729,6 +1729,11 @@
         <member name="P:AlphaTab.Settings.SongBookBendDuration">
             <summary>
             Gets or sets the bend duration in milliseconds for songbook bends. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Settings.SongBookDipDuration">
+            <summary>
+            Gets or sets the duration of whammy dips in milliseconds for songbook whammys. 
             </summary>
         </member>
         <member name="P:AlphaTab.Settings.IncludeNoteBounds">

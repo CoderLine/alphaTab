@@ -1,5 +1,5 @@
 /*
- * alphaTab v0.9.1.0 (master)
+ * alphaTab v0.9.1.0 (develop)
  *
  * This file is part of alphaTab.
  * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
@@ -23283,6 +23283,7 @@ alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.prototype = {
 	}
 	,Open: function() {
 		this._finished = false;
+		this.PatchIosSampleRate();
 		this._circularBuffer = new alphaTab.audio.synth.ds.CircularSampleBuffer(4096 * 10);
 		this._context = new AudioContext();
 		var ctx = this._context;
@@ -23293,12 +23294,27 @@ alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.prototype = {
 				window.setTimeout(function() {
 					if(ctx.state == "running") {
 						window.document.body.removeEventListener("touchend",resume,false);
+						window.document.body.removeEventListener("click",resume,false);
 					}
 				},0);
 			};
 			window.document.body.addEventListener("touchend",resume,false);
+			window.document.body.addEventListener("click",resume,false);
 		}
 		system._EventAction.EventAction_Impl_.Invoke(this.Ready);
+	}
+	,PatchIosSampleRate: function() {
+		var ua = window.navigator.userAgent;
+		if(ua.indexOf("iPhone") != -1 || ua.indexOf("iPad") != -1) {
+			var context = new AudioContext();
+			var buffer = context.createBuffer(1,1,44100);
+			var dummy = context.createBufferSource();
+			dummy.buffer = buffer;
+			dummy.connect(context.destination);
+			dummy.start(0);
+			dummy.disconnect(0);
+			context.close();
+		}
 	}
 	,Play: function() {
 		var ctx = this._context;
@@ -37485,6 +37501,7 @@ alphaTab.platform.javaScript.AlphaSynthFlashOutput.PreferredSampleRate = 44100;
 alphaTab.platform.javaScript.AlphaSynthFlashOutput.Id = "alphaSynthFlashPlayer";
 alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.BufferSize = 4096;
 alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.BufferCount = 10;
+alphaTab.platform.javaScript.AlphaSynthWebAudioOutput.PreferredSampleRate = 44100;
 alphaTab.platform.model._FontStyle.FontStyle_Impl_.Plain = 0;
 alphaTab.platform.model._FontStyle.FontStyle_Impl_.Bold = 1;
 alphaTab.platform.model._FontStyle.FontStyle_Impl_.Italic = 2;

@@ -24,5 +24,8 @@ namespace AlphaTab.Haxe.Js.Html.Audio
 
         [Name("createBufferSource")]
         public extern AudioBufferSourceNode CreateBufferSource();
+
+        [Name("close")]
+        public extern void Close();
     }
 }

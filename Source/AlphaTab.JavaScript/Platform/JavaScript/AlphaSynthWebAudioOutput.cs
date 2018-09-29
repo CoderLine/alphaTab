@@ -19,6 +19,7 @@ namespace AlphaTab.Platform.JavaScript
     {
         private const int BufferSize = 4096;
         private const int BufferCount = 10;
+        private const float PreferredSampleRate = 44100;
 
         private AudioContext _context;
         private AudioBuffer _buffer;
@@ -38,6 +39,8 @@ namespace AlphaTab.Platform.JavaScript
         {
             _finished = false;
 
+            PatchIosSampleRate();
+            
             _circularBuffer = new CircularSampleBuffer(BufferSize * BufferCount);
             _context = new AudioContext();
 
@@ -54,13 +57,33 @@ namespace AlphaTab.Platform.JavaScript
                         if (ctx.state == "running")
                         {
                             Browser.Document.Body.RemoveEventListener("touchend", resume, false);
+                            Browser.Document.Body.RemoveEventListener("click", resume, false);
                         }
                     }), 0);
                 };
                 Browser.Document.Body.AddEventListener("touchend", resume, false);
+                Browser.Document.Body.AddEventListener("click", resume, false);
             }
 
             Ready();
+        }
+
+        private void PatchIosSampleRate()
+        {
+            string ua = Browser.Navigator.UserAgent;
+            if (ua.Contains("iPhone") || ua.Contains("iPad"))
+            {
+                var context = new AudioContext();
+
+                var buffer = context.CreateBuffer(1, 1, PreferredSampleRate);
+                var dummy = context.CreateBufferSource();
+                dummy.Buffer = buffer;
+                dummy.Connect(context.Destination);
+                dummy.Start(0);
+                dummy.Disconnect(0);
+
+                context.Close();
+            }
         }
 
         public void Play()
