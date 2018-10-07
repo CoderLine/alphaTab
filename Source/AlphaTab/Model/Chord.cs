@@ -77,6 +77,7 @@ namespace AlphaTab.Model
             ShowDiagram = true;
             ShowName = true;
             ShowFingering = true;
+            FirstFret = 1;
         }
 
         internal static void CopyTo(Chord src, Chord dst)

@@ -82,12 +82,19 @@ namespace AlphaTab.Importer
             AlphaTexException e;
             if (symbolError)
             {
-                e = new AlphaTexException(_curChPos, nonterm, expected, _sy);
+                e = AlphaTexException.SymbolError(_curChPos, nonterm, expected, _sy);
             }
             else
             {
-                e = new AlphaTexException(_curChPos, nonterm, expected, expected, _syData);
+                e = AlphaTexException.SymbolError(_curChPos, nonterm, expected, expected, _syData);
             }
+            Logger.Error(Name, e.Message);
+            throw e;
+        }
+
+        private void ErrorMessage(string message)
+        {
+            AlphaTexException e = AlphaTexException.ErrorMessage(_curChPos, message);
             Logger.Error(Name, e.Message);
             throw e;
         }
@@ -592,6 +599,8 @@ namespace AlphaTab.Importer
                 else if (syData == "tuning")
                 {
                     NewSy();
+                    var strings = _staff.Tuning.Length;
+
                     switch (_sy)
                     {
                         case AlphaTexSymbols.String:
@@ -623,6 +632,11 @@ namespace AlphaTab.Importer
                             break;
                     }
                     _anyDataLoaded = anyMeta = true;
+
+                    if (strings != _staff.Tuning.Length)
+                    {
+                        ErrorMessage("Tuning must be defined before any chord");
+                    }
                 }
                 else if (syData == "instrument")
                 {
@@ -648,6 +662,7 @@ namespace AlphaTab.Importer
                     {
                         Error("instrument", AlphaTexSymbols.Number);
                     }
+
                     NewSy();
                     _anyDataLoaded = anyMeta = true;
                 }
@@ -679,6 +694,42 @@ namespace AlphaTab.Importer
 
                     _anyDataLoaded = anyMeta = true;
                 }
+                else if (syData == "chord")
+                {
+                    NewSy();
+                    var chord = new Chord();
+
+                    ChordProperties(chord);
+
+                    if (_sy == AlphaTexSymbols.String) // Name
+                    {
+                        chord.Name = (string)_syData;
+                        NewSy();
+                    }
+                    else
+                    {
+                        Error("chord-name", AlphaTexSymbols.Number);
+                    }
+                    
+                   
+                    for (int i = 0; i < _staff.Tuning.Length; i++)
+                    {
+                        if (_sy == AlphaTexSymbols.Number)
+                        {
+                            chord.Strings.Add((int) _syData);
+                        }
+                        else if (_sy == AlphaTexSymbols.String && _syData.ToString().ToLower() == "x")
+                        {
+                            chord.Strings.Add(-1);
+                        }
+
+                        NewSy();
+                    }
+
+                    _staff.AddChord(chord.Name.ToLower(), chord);
+
+                    _anyDataLoaded = anyMeta = true;
+                }
                 else if (anyMeta)
                 {
                     Error("metaDataTags", AlphaTexSymbols.String, false);
@@ -702,6 +753,116 @@ namespace AlphaTab.Importer
             {
                 NewSy();
             }
+
+            if (GeneralMidi.IsGuitar(_track.PlaybackInfo.Program))
+            {
+                _staff.DisplayTranspositionPitch = -12;
+            }
+        }
+
+        private void ChordProperties(Chord chord)
+        {
+            if (_sy != AlphaTexSymbols.LBrace)
+            {
+                return;
+            }
+
+            NewSy();
+
+            while (_sy == AlphaTexSymbols.String)
+            {
+                switch (_syData.ToString().ToLower())
+                {
+                    case "firstfret":
+                        NewSy();
+
+                        switch (_sy)
+                        {
+                            case AlphaTexSymbols.Number:
+                                chord.FirstFret = (int)_syData;
+                                break;
+                            default:
+                                Error("chord-firstfret", AlphaTexSymbols.Number);
+                                break;
+                        }
+
+                        NewSy();
+                        break;
+                    case "showdiagram":
+                        NewSy();
+
+                        switch (_sy)
+                        {
+                            case AlphaTexSymbols.String:
+                                chord.ShowDiagram = _syData.ToString().ToLower() != "false";
+                                break;
+                            case AlphaTexSymbols.Number:
+                                chord.ShowDiagram = ((int)_syData) != 0;
+                                break;
+                            default:
+                                Error("chord-showdiagram", AlphaTexSymbols.String);
+                                break;
+                        }
+
+                        NewSy();
+                        break;
+                    case "showfingering":
+                        NewSy();
+
+                        switch (_sy)
+                        {
+                            case AlphaTexSymbols.String:
+                                chord.ShowDiagram = _syData.ToString().ToLower() != "false";
+                                break;
+                            case AlphaTexSymbols.Number:
+                                chord.ShowFingering = ((int)_syData) != 0;
+                                break;
+                            default:
+                                Error("chord-showfingering", AlphaTexSymbols.String);
+                                break;
+                        }
+
+                        NewSy();
+                        break;
+                    case "showname":
+                        NewSy();
+
+                        switch (_sy)
+                        {
+                            case AlphaTexSymbols.String:
+                                chord.ShowName = _syData.ToString().ToLower() != "false";
+                                break;
+                            case AlphaTexSymbols.Number:
+                                chord.ShowName = ((int)_syData) != 0;
+                                break;
+                            default:
+                                Error("chord-showname", AlphaTexSymbols.String);
+                                break;
+                        }
+
+                        NewSy();
+                        break;
+                    case "barre":
+                        NewSy();
+
+                        while (_sy == AlphaTexSymbols.Number)
+                        {
+                            chord.BarreFrets.Add((int)_syData);
+                            NewSy();
+                        }
+
+                        break;
+                    default:
+                        Error("chord-annotation", AlphaTexSymbols.String, false);
+                        break;
+                }
+            }
+
+            if (_sy != AlphaTexSymbols.RBrace)
+            {
+                Error("beat-effects", AlphaTexSymbols.RBrace);
+            }
+            NewSy();
         }
 
 
@@ -1061,6 +1222,26 @@ namespace AlphaTab.Importer
                 NewSy();
                 return true;
             }
+
+            if (syData == "ch")
+            {
+                NewSy();
+
+                var chordName = _syData.ToString();
+                var chordId = chordName.ToLower();
+                if (!_staff.Chords.ContainsKey(chordId))
+                {
+                    var chord = new Chord();
+                    chord.ShowDiagram = false;
+                    chord.Name = chordName;
+                    _staff.AddChord(chordId, chord);
+                }
+
+                beat.ChordId = chordId;
+                NewSy();
+                return true;
+            }
+
 
             if (syData == "gr")
             {
@@ -1529,7 +1710,7 @@ namespace AlphaTab.Importer
                             bar.Clef = ParseClefFromInt((int)_syData);
                             break;
                         case AlphaTexSymbols.Tuning:
-                            TuningParseResult parseResult = (TuningParseResult) _syData;
+                            TuningParseResult parseResult = (TuningParseResult)_syData;
                             bar.Clef = ParseClefFromInt(parseResult.RealValue);
                             break;
                         default:
@@ -1561,5 +1742,4 @@ namespace AlphaTab.Importer
 
         #endregion
     }
-
 }

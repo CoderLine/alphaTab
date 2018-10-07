@@ -36,6 +36,7 @@ namespace AlphaTab.Importer
         Pipe,
         MetaCommand,
         Multiply,
-        LowerThan
+        LowerThan,
+        Property,
     }
 }

@@ -183,7 +183,7 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     canvas.FillMusicFontSymbol(x, y, Scale, MusicFontSymbol.FretboardO, true);
                 }
-                else if (_chord.ShowFingering)
+                else
                 {
                     fret -= _chord.FirstFret - 1;
                     canvas.FillText(fret.ToString(), x, y);

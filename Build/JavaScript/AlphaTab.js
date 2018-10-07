@@ -12717,27 +12717,36 @@ alphaTab.importer.AlphaTexException = $hx_exports["alphaTab"]["importer"]["Alpha
 	this.SymbolData = null;
 };
 alphaTab.importer.AlphaTexException.__name__ = ["alphaTab","importer","AlphaTexException"];
-alphaTab.importer.AlphaTexException.BuildMessage = function(position,nonTerm,expected,symbol,symbolData) {
+alphaTab.importer.AlphaTexException.SymbolError = function(position,nonTerm,expected,symbol,symbolData) {
+	var message;
 	if(symbolData == null) {
-		return "MalFormed AlphaTex: @" + position + ": Error on block " + nonTerm + ", expected a " + alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.toString(expected) + " found a " + alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.toString(symbol);
+		message = "MalFormed AlphaTex: @" + position + ": Error on block " + nonTerm + ", expected a " + alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.toString(expected) + " found a " + alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.toString(symbol);
 	} else {
-		return "MalFormed AlphaTex: @" + position + ": Error on block " + nonTerm + ", invalid value: " + symbolData;
+		message = "MalFormed AlphaTex: @" + position + ": Error on block " + nonTerm + ", invalid value: " + symbolData;
 	}
+	var exception = new alphaTab.importer.AlphaTexException().AlphaTexException(message);
+	exception.Position = position;
+	exception.NonTerm = nonTerm;
+	exception.Expected = expected;
+	exception.Symbol = symbol;
+	exception.SymbolData = symbolData;
+	return exception;
+};
+alphaTab.importer.AlphaTexException.ErrorMessage = function(position,message) {
+	message = "MalFormed AlphaTex: @" + position + ": " + message;
+	var exception = new alphaTab.importer.AlphaTexException().AlphaTexException(message);
+	exception.Position = position;
+	return exception;
 };
 alphaTab.importer.AlphaTexException.__super__ = alphaTab.AlphaTabException;
 alphaTab.importer.AlphaTexException.prototype = $extend(alphaTab.AlphaTabException.prototype,{
-	AlphaTexException: function(position,nonTerm,expected,symbol,symbolData) {
-		this.AlphaTabException(alphaTab.importer.AlphaTexException.BuildMessage(position,nonTerm,expected,symbol,symbolData));
+	AlphaTexException: function(message) {
+		this.AlphaTabException(message);
 		this.Position = 0;
 		this.NonTerm = null;
 		this.Expected = 0;
 		this.Symbol = 0;
 		this.SymbolData = null;
-		this.Position = position;
-		this.NonTerm = nonTerm;
-		this.Expected = expected;
-		this.Symbol = symbol;
-		this.SymbolData = symbolData;
 		return this;
 	}
 	,__class__: alphaTab.importer.AlphaTexException
@@ -12826,10 +12835,15 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 		}
 		var e;
 		if(symbolError) {
-			e = new alphaTab.importer.AlphaTexException().AlphaTexException(this._curChPos,nonterm,expected,this._sy,null);
+			e = alphaTab.importer.AlphaTexException.SymbolError(this._curChPos,nonterm,expected,this._sy,null);
 		} else {
-			e = new alphaTab.importer.AlphaTexException().AlphaTexException(this._curChPos,nonterm,expected,expected,this._syData);
+			e = alphaTab.importer.AlphaTexException.SymbolError(this._curChPos,nonterm,expected,expected,this._syData);
 		}
+		alphaTab.util.Logger.Error(this.get_Name(),e.Message,null);
+		throw new js._Boot.HaxeError(e);
+	}
+	,ErrorMessage: function(message) {
+		var e = alphaTab.importer.AlphaTexException.ErrorMessage(this._curChPos,message);
 		alphaTab.util.Logger.Error(this.get_Name(),e.Message,null);
 		throw new js._Boot.HaxeError(e);
 	}
@@ -13156,6 +13170,7 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 				this._anyDataLoaded = anyMeta;
 			} else if(syData == "tuning") {
 				this.NewSy();
+				var strings = this._staff.Tuning.length;
 				var _g = this._sy;
 				switch(_g) {
 				case 5:
@@ -13186,6 +13201,9 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 				}
 				anyMeta = true;
 				this._anyDataLoaded = anyMeta;
+				if(strings != this._staff.Tuning.length) {
+					this.ErrorMessage("Tuning must be defined before any chord");
+				}
 			} else if(syData == "instrument") {
 				this.NewSy();
 				if(this._sy == 2) {
@@ -13222,6 +13240,29 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 				this._lyrics.push(lyrics);
 				anyMeta = true;
 				this._anyDataLoaded = anyMeta;
+			} else if(syData == "chord") {
+				this.NewSy();
+				var chord = new alphaTab.model.Chord();
+				this.ChordProperties(chord);
+				if(this._sy == 5) {
+					chord.Name = this._syData;
+					this.NewSy();
+				} else {
+					this.Error("chord-name",2,true);
+				}
+				var i = 0;
+				while(i < this._staff.Tuning.length) {
+					if(this._sy == 2) {
+						chord.Strings.push(this._syData);
+					} else if(this._sy == 5 && Std.string(this._syData).toLowerCase() == "x") {
+						chord.Strings.push(-1);
+					}
+					this.NewSy();
+					++i;
+				}
+				this._staff.AddChord(chord.Name.toLowerCase(),chord);
+				anyMeta = true;
+				this._anyDataLoaded = anyMeta;
 			} else if(anyMeta) {
 				this.Error("metaDataTags",5,false);
 			} else {
@@ -13236,6 +13277,88 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 		} else if(this._sy == 4) {
 			this.NewSy();
 		}
+		if(alphaTab.audio.GeneralMidi.IsGuitar(this._track.PlaybackInfo.Program)) {
+			this._staff.DisplayTranspositionPitch = -12;
+		}
+	}
+	,ChordProperties: function(chord) {
+		if(this._sy != 9) {
+			return;
+		}
+		this.NewSy();
+		while(this._sy == 5) {
+			var _g = Std.string(this._syData).toLowerCase();
+			switch(_g) {
+			case "barre":
+				this.NewSy();
+				while(this._sy == 2) {
+					chord.BarreFrets.push(this._syData);
+					this.NewSy();
+				}
+				break;
+			case "firstfret":
+				this.NewSy();
+				var _g1 = this._sy;
+				if(_g1 == 2) {
+					chord.FirstFret = this._syData;
+				} else {
+					this.Error("chord-firstfret",2,true);
+				}
+				this.NewSy();
+				break;
+			case "showdiagram":
+				this.NewSy();
+				var _g2 = this._sy;
+				switch(_g2) {
+				case 2:
+					chord.ShowDiagram = this._syData != 0;
+					break;
+				case 5:
+					chord.ShowDiagram = Std.string(this._syData).toLowerCase() != "false";
+					break;
+				default:
+					this.Error("chord-showdiagram",5,true);
+				}
+				this.NewSy();
+				break;
+			case "showfingering":
+				this.NewSy();
+				var _g3 = this._sy;
+				switch(_g3) {
+				case 2:
+					chord.ShowFingering = this._syData != 0;
+					break;
+				case 5:
+					chord.ShowDiagram = Std.string(this._syData).toLowerCase() != "false";
+					break;
+				default:
+					this.Error("chord-showfingering",5,true);
+				}
+				this.NewSy();
+				break;
+			case "showname":
+				this.NewSy();
+				var _g4 = this._sy;
+				switch(_g4) {
+				case 2:
+					chord.ShowName = this._syData != 0;
+					break;
+				case 5:
+					chord.ShowName = Std.string(this._syData).toLowerCase() != "false";
+					break;
+				default:
+					this.Error("chord-showname",5,true);
+				}
+				this.NewSy();
+				break;
+			default:
+				this.Error("chord-annotation",5,false);
+			}
+		}
+		if(this._sy != 10) {
+			this.Error("beat-effects",10,true);
+		}
+		this.NewSy();
 	}
 	,Bars: function() {
 		this.Bar();
@@ -13487,6 +13610,20 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 				this.Error("tremolobar-effect",8,true);
 				return false;
 			}
+			this.NewSy();
+			return true;
+		}
+		if(syData == "ch") {
+			this.NewSy();
+			var chordName = Std.string(this._syData);
+			var chordId = chordName.toLowerCase();
+			if(!this._staff.Chords.hasOwnProperty(chordId)) {
+				var chord = new alphaTab.model.Chord();
+				chord.ShowDiagram = false;
+				chord.Name = chordName;
+				this._staff.AddChord(chordId,chord);
+			}
+			beat.ChordId = chordId;
 			this.NewSy();
 			return true;
 		}
@@ -13931,6 +14068,8 @@ alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.toString = function(thi
 		return "Multiply";
 	case 14:
 		return "LowerThan";
+	case 15:
+		return "Property";
 	}
 	return "";
 };
@@ -20468,6 +20607,7 @@ alphaTab.model.Chord = $hx_exports["alphaTab"]["model"]["Chord"] = function() {
 	this.ShowDiagram = true;
 	this.ShowName = true;
 	this.ShowFingering = true;
+	this.FirstFret = 1;
 };
 alphaTab.model.Chord.__name__ = ["alphaTab","model","Chord"];
 alphaTab.model.Chord.CopyTo = function(src,dst) {
@@ -28757,7 +28897,7 @@ alphaTab.rendering.glyphs.ChordDiagramGlyph.prototype = $extend(alphaTab.renderi
 				canvas.FillMusicFontSymbol(x,y,this.get_Scale(),59481,true);
 			} else if(fret == 0) {
 				canvas.FillMusicFontSymbol(x,y,this.get_Scale(),59482,true);
-			} else if(this._chord.ShowFingering) {
+			} else {
 				fret = fret - (this._chord.FirstFret - 1);
 				canvas.FillText(Std.string(fret),x,y);
 			}
@@ -37767,6 +37907,7 @@ alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.Pipe = 11;
 alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.MetaCommand = 12;
 alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.Multiply = 13;
 alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.LowerThan = 14;
+alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.Property = 15;
 alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.Boolean = 0;
 alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.Integer = 1;
 alphaTab.importer._BinaryStylesheetParser_DataType.BinaryStylesheetParser_DataType_Impl_.Float = 2;
