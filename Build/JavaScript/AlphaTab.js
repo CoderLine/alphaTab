@@ -13201,7 +13201,14 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 				}
 				anyMeta = true;
 				this._anyDataLoaded = anyMeta;
+				var tmp;
 				if(strings != this._staff.Tuning.length) {
+					var this3 = this._staff.Chords;
+					tmp = Object.keys(this3).length > 0;
+				} else {
+					tmp = false;
+				}
+				if(tmp) {
 					this.ErrorMessage("Tuning must be defined before any chord");
 				}
 			} else if(syData == "instrument") {

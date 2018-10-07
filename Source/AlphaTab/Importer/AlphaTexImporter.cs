@@ -633,7 +633,7 @@ namespace AlphaTab.Importer
                     }
                     _anyDataLoaded = anyMeta = true;
 
-                    if (strings != _staff.Tuning.Length)
+                    if (strings != _staff.Tuning.Length && _staff.Chords.Count > 0)
                     {
                         ErrorMessage("Tuning must be defined before any chord");
                     }
