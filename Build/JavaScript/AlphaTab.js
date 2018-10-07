@@ -534,14 +534,13 @@ alphaTab.platform.svg.SvgCanvas.prototype = {
 			s = s + (" fill=\"" + this.get_Color().RGBA + "\"");
 		}
 		if(this.get_TextAlign() != 0) {
-			s = s + (" text-anchor=\"" + this.GetSvgTextAlignment() + "\"");
+			s = s + (" text-anchor=\"" + this.GetSvgTextAlignment(this.get_TextAlign()) + "\"");
 		}
 		s = s + (">" + text + "</text>");
 		this.Buffer += Std.string(s);
 	}
-	,GetSvgTextAlignment: function() {
-		var _g = this.get_TextAlign();
-		switch(_g) {
+	,GetSvgTextAlignment: function(textAlign) {
+		switch(textAlign) {
 		case 0:
 			return "start";
 		case 1:
@@ -575,10 +574,16 @@ alphaTab.platform.svg.SvgCanvas.prototype = {
 		}
 		return alphaTab.platform.svg.FontSizes.MeasureString(text,font,this.get_Font().Size,this.get_Font().Style);
 	}
-	,FillMusicFontSymbol: function(x,y,scale,symbol) {
+	,FillMusicFontSymbol: function(x,y,scale,symbol,centerAtPosition) {
+		if(centerAtPosition == null) {
+			centerAtPosition = false;
+		}
 		throw new js._Boot.HaxeError("abstract");
 	}
-	,FillMusicFontSymbols: function(x,y,scale,symbols) {
+	,FillMusicFontSymbols: function(x,y,scale,symbols,centerAtPosition) {
+		if(centerAtPosition == null) {
+			centerAtPosition = false;
+		}
 		throw new js._Boot.HaxeError("abstract");
 	}
 	,OnPreRender: function() {
@@ -601,9 +606,32 @@ alphaTab.platform.svg.CssFontSvgCanvas = $hx_exports["alphaTab"]["platform"]["sv
 alphaTab.platform.svg.CssFontSvgCanvas.__name__ = ["alphaTab","platform","svg","CssFontSvgCanvas"];
 alphaTab.platform.svg.CssFontSvgCanvas.__super__ = alphaTab.platform.svg.SvgCanvas;
 alphaTab.platform.svg.CssFontSvgCanvas.prototype = $extend(alphaTab.platform.svg.SvgCanvas.prototype,{
-	FillMusicFontSymbol: function(x,y,scale,symbol) {
+	FillMusicFontSymbol: function(x,y,scale,symbol,centerAtPosition) {
+		if(centerAtPosition == null) {
+			centerAtPosition = false;
+		}
 		if(symbol == -1) {
 			return;
+		}
+		this.FillMusicFontSymbolText(x,y,scale,"&#" + symbol + ";",centerAtPosition);
+	}
+	,FillMusicFontSymbols: function(x,y,scale,symbols,centerAtPosition) {
+		if(centerAtPosition == null) {
+			centerAtPosition = false;
+		}
+		var s = "";
+		var symbol = HxOverrides.iter(symbols);
+		while(symbol.hasNext()) {
+			var symbol1 = symbol.next();
+			if(symbol1 != -1) {
+				s = s + ("&#" + symbol1 + ";");
+			}
+		}
+		this.FillMusicFontSymbolText(x,y,scale,s,centerAtPosition);
+	}
+	,FillMusicFontSymbolText: function(x,y,scale,symbols,centerAtPosition) {
+		if(centerAtPosition == null) {
+			centerAtPosition = false;
 		}
 		var s = "<g transform=\"translate(" + (system.Convert.ToInt32_Single(x) - 0) + " " + (system.Convert.ToInt32_Single(y) - 0) + ")\" class=\"at\" ><text";
 		this.Buffer += Std.string(s);
@@ -616,29 +644,11 @@ alphaTab.platform.svg.CssFontSvgCanvas.prototype = $extend(alphaTab.platform.svg
 			var s1 = " fill=\"" + this.get_Color().RGBA + "\"";
 			this.Buffer += Std.string(s1);
 		}
-		this.Buffer += Std.string(">&#" + symbol + ";</text></g>");
-	}
-	,FillMusicFontSymbols: function(x,y,scale,symbols) {
-		var s = "";
-		var symbol = HxOverrides.iter(symbols);
-		while(symbol.hasNext()) {
-			var symbol1 = symbol.next();
-			if(symbol1 != -1) {
-				s = s + ("&#" + symbol1 + ";");
-			}
-		}
-		var s1 = "<g transform=\"translate(" + (system.Convert.ToInt32_Single(x) - 0) + " " + (system.Convert.ToInt32_Single(y) - 0) + ")\" class=\"at\" ><text";
-		this.Buffer += Std.string(s1);
-		if(scale != 1) {
-			this.Buffer += Std.string(" style=\"font-size: " + scale * 100 + "%; stroke:none\"");
-		} else {
-			this.Buffer += Std.string(" style=\"stroke:none\"");
-		}
-		if(this.get_Color().RGBA != "#000000") {
-			var s2 = " fill=\"" + this.get_Color().RGBA + "\"";
+		if(centerAtPosition) {
+			var s2 = " text-anchor=\"" + this.GetSvgTextAlignment(1) + "\"";
 			this.Buffer += Std.string(s2);
 		}
-		this.Buffer += Std.string(">" + s + "</text></g>");
+		this.Buffer += Std.string(">" + symbols + "</text></g>");
 	}
 	,__class__: alphaTab.platform.svg.CssFontSvgCanvas
 });
@@ -1261,33 +1271,19 @@ alphaTab.platform.javaScript.Html5Canvas.prototype = {
 	,MeasureText: function(text) {
 		return js.Boot.__cast(this._measureContext.measureText(text).width , Float);
 	}
-	,FillMusicFontSymbol: function(x,y,scale,symbol) {
+	,FillMusicFontSymbol: function(x,y,scale,symbol,centerAtPosition) {
+		if(centerAtPosition == null) {
+			centerAtPosition = false;
+		}
 		if(symbol == -1) {
 			return;
 		}
-		var this1 = system.Convert.ToInt32_Single(x);
-		x = this1;
-		var this2 = system.Convert.ToInt32_Single(y);
-		y = this2;
-		var baseLine = this._context.textBaseline;
-		var font = this._context.font;
-		var tmp = this._musicFont.ToCssString(scale);
-		this._context.font = tmp;
-		this._context.textBaseline = "middle";
-		this._context.fillText(String.fromCharCode(symbol),x,y);
-		this._context.textBaseline = baseLine;
-		this._context.font = font;
+		this.FillMusicFontSymbolText(x,y,scale,String.fromCharCode(symbol),centerAtPosition);
 	}
-	,FillMusicFontSymbols: function(x,y,scale,symbols) {
-		var this1 = system.Convert.ToInt32_Single(x);
-		x = this1;
-		var this2 = system.Convert.ToInt32_Single(y);
-		y = this2;
-		var baseLine = this._context.textBaseline;
-		var font = this._context.font;
-		var tmp = this._musicFont.ToCssString(scale);
-		this._context.font = tmp;
-		this._context.textBaseline = "middle";
+	,FillMusicFontSymbols: function(x,y,scale,symbols,centerAtPosition) {
+		if(centerAtPosition == null) {
+			centerAtPosition = false;
+		}
 		var s = "";
 		var symbol = HxOverrides.iter(symbols);
 		while(symbol.hasNext()) {
@@ -1296,9 +1292,29 @@ alphaTab.platform.javaScript.Html5Canvas.prototype = {
 				s = s + String.fromCharCode(symbol1);
 			}
 		}
-		this._context.fillText(s,x,y);
+		this.FillMusicFontSymbolText(x,y,scale,s,centerAtPosition);
+	}
+	,FillMusicFontSymbolText: function(x,y,scale,symbols,centerAtPosition) {
+		if(centerAtPosition == null) {
+			centerAtPosition = false;
+		}
+		var this1 = system.Convert.ToInt32_Single(x);
+		x = this1;
+		var this2 = system.Convert.ToInt32_Single(y);
+		y = this2;
+		var textAlign = this._context.textAlign;
+		var baseLine = this._context.textBaseline;
+		var font = this._context.font;
+		var tmp = this._musicFont.ToCssString(scale);
+		this._context.font = tmp;
+		this._context.textBaseline = "middle";
+		if(centerAtPosition) {
+			this._context.textAlign = "center";
+		}
+		this._context.fillText(symbols,x,y);
 		this._context.textBaseline = baseLine;
 		this._context.font = font;
+		this._context.textAlign = textAlign;
 	}
 	,BeginRotate: function(centerX,centerY,angle) {
 		this._context.save();
@@ -4789,6 +4805,7 @@ alphaTab.rendering.layout.ScoreLayout = $hx_exports["alphaTab"]["rendering"]["la
 	this.Width = 0.0;
 	this.Height = 0.0;
 	this.ScoreInfoGlyphs = null;
+	this.ChordDiagrams = null;
 	this.TuningGlyph = null;
 	this.FirstBarIndex = 0;
 	this.LastBarIndex = 0;
@@ -4934,6 +4951,32 @@ alphaTab.rendering.layout.ScoreLayout.prototype = {
 				}
 			}
 		}
+		if(!this.Renderer.Settings.Layout.Get("hideChordDiagram",false)) {
+			this.ChordDiagrams = new alphaTab.rendering.glyphs.ChordDiagramContainerGlyph(0,0);
+			this.ChordDiagrams.Renderer = new alphaTab.rendering.BarRendererBase(this.Renderer,null);
+			var this2 = {}
+			var chords = this2;
+			var track2 = HxOverrides.iter(this.Renderer.Tracks);
+			while(track2.hasNext()) {
+				var track3 = track2.next();
+				var staff2 = $iterator(track3.Staves)();
+				while(staff2.hasNext()) {
+					var staff3 = staff2.next();
+					var this3 = staff3.Chords;
+					var chordId = $iterator(Object.keys(this3))();
+					while(chordId.hasNext()) {
+						var chordId1 = chordId.next();
+						if(!chords.hasOwnProperty(chordId1)) {
+							var chord = staff3.Chords[chordId1];
+							if(chord.ShowDiagram) {
+								chords[chordId1] = chord;
+								this.ChordDiagrams.AddChord(chord);
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 	,get_Scale: function() {
 		return this.Renderer.Settings.Scale;
@@ -5067,6 +5110,7 @@ alphaTab.rendering.layout.PageViewLayout.prototype = $extend(alphaTab.rendering.
 		var this2 = [];
 		this._allMasterBarRenderers = this2;
 		y = this.LayoutAndRenderScoreInfo(x,y,-1);
+		y = this.LayoutAndRenderChordDiagrams(x,y,-1);
 		y = this.LayoutAndRenderScore(x,y);
 		this.Height = y + this._pagePadding[3];
 	}
@@ -5080,8 +5124,39 @@ alphaTab.rendering.layout.PageViewLayout.prototype = $extend(alphaTab.rendering.
 		this.Width = this1;
 		var oldHeight = this.Height;
 		y = this.LayoutAndRenderScoreInfo(x,y,oldHeight);
+		y = this.LayoutAndRenderChordDiagrams(x,y,oldHeight);
 		y = this.ResizeAndRenderScore(x,y,oldHeight);
 		this.Height = y + this._pagePadding[3];
+	}
+	,LayoutAndRenderChordDiagrams: function(x,y,totalHeight) {
+		if(totalHeight == null) {
+			totalHeight = -1;
+		}
+		var _gthis = this;
+		if(this.ChordDiagrams == null) {
+			return y;
+		}
+		var res = this.Renderer.RenderingResources;
+		this.ChordDiagrams.Width = this.Width;
+		this.ChordDiagrams.DoLayout();
+		var canvas = this.Renderer.Canvas;
+		canvas.BeginRender(this.Width,this.ChordDiagrams.Height);
+		canvas.set_Color(res.ScoreInfoColor);
+		canvas.set_TextAlign(1);
+		this.ChordDiagrams.Paint(0,0,canvas);
+		var result = canvas.EndRender();
+		y = y + this.ChordDiagrams.Height;
+		var tmp = this.Renderer;
+		var _tmp = new alphaTab.rendering.RenderFinishedEventArgs();
+		_tmp.Width = _gthis.Width;
+		_tmp.Height = _gthis.ChordDiagrams.Height;
+		_tmp.RenderResult = result;
+		_tmp.TotalWidth = _gthis.Width;
+		_tmp.TotalHeight = totalHeight < 0 ? y : totalHeight;
+		_tmp.FirstMasterBarIndex = -1;
+		_tmp.LastMasterBarIndex = -1;
+		tmp.OnPartialRenderFinished(_tmp);
+		return y;
 	}
 	,LayoutAndRenderScoreInfo: function(x,y,totalHeight) {
 		if(totalHeight == null) {
@@ -14530,7 +14605,7 @@ alphaTab.importer.Gp3To5Importer.prototype = $extend(alphaTab.importer.ScoreImpo
 		var s = chord.Name;
 		if(!(s == null || s.length == 0)) {
 			beat.ChordId = chordId;
-			beat.Voice.Bar.Staff.Chords[beat.ChordId] = chord;
+			beat.Voice.Bar.Staff.AddChord(beat.ChordId,chord);
 		}
 	}
 	,ReadBeatEffects: function(beat) {
@@ -15100,10 +15175,10 @@ alphaTab.importer.Gp7Importer.prototype = $extend(alphaTab.importer.ScoreImporte
 		}
 		if(partConfiguration != null) {
 			alphaTab.util.Logger.Info(this.get_Name(),"Start Parsing Part Configuration",null);
-			var parser = new alphaTab.importer.PartConfigurationParser();
-			parser.Parse(partConfiguration);
-			if(parser.Configuration != null) {
-				parser.Configuration.Apply(score);
+			var partConfigurationParser = new alphaTab.importer.PartConfigurationParser();
+			partConfigurationParser.Parse(partConfiguration);
+			if(partConfigurationParser.Configuration != null) {
+				partConfigurationParser.Configuration.Apply(score);
 			}
 			alphaTab.util.Logger.Info(this.get_Name(),"Part Configuration parsed",null);
 		}
@@ -15712,14 +15787,14 @@ alphaTab.importer.GpifParser.prototype = {
 		var staff = $iterator(track.Staves)();
 		while(staff.hasNext()) {
 			var staff1 = staff.next();
-			staff1.Chords[chordId] = chord;
+			staff1.AddChord(chordId,chord);
 		}
 		this.ParseDiagramItem_Chord_XmlNode(chord,node);
 	}
 	,ParseDiagramItem_Staff_XmlNode: function(staff,node) {
 		var chord = new alphaTab.model.Chord();
 		var chordId = node.GetAttribute("id");
-		staff.Chords[chordId] = chord;
+		staff.AddChord(chordId,chord);
 		this.ParseDiagramItem_Chord_XmlNode(chord,node);
 	}
 	,ParseDiagramItem_Chord_XmlNode: function(chord,node) {
@@ -15785,6 +15860,21 @@ alphaTab.importer.GpifParser.prototype = {
 				case "Fret":
 					var guitarString = alphaTab.platform.Platform.ParseInt(c1.GetAttribute("string"));
 					chord.Strings[stringCount - guitarString - 1] = baseFret + alphaTab.platform.Platform.ParseInt(c1.GetAttribute("fret"));
+					break;
+				case "Property":
+					var _g3 = c1.GetAttribute("name");
+					switch(_g3) {
+					case "ShowDiagram":
+						chord.ShowDiagram = c1.GetAttribute("value") == "true";
+						break;
+					case "ShowFingering":
+						chord.ShowFingering = c1.GetAttribute("value") == "true";
+						break;
+					case "ShowName":
+						chord.ShowName = c1.GetAttribute("value") == "true";
+						break;
+					default:
+					}
 					break;
 				default:
 				}
@@ -17257,8 +17347,8 @@ alphaTab.importer.GpxImporter.prototype = $extend(alphaTab.importer.ScoreImporte
 		alphaTab.util.Logger.Info(this.get_Name(),"Loading GPX filesystem",null);
 		var fileSystem = new alphaTab.importer.GpxFileSystem();
 		fileSystem.FileFilter = function(s) {
-			if(!StringTools.endsWith(s,"score.gpif")) {
-				return StringTools.endsWith(s,"BinaryStylesheet");
+			if(!(StringTools.endsWith(s,"score.gpif") || StringTools.endsWith(s,"BinaryStylesheet"))) {
+				return StringTools.endsWith(s,"PartConfiguration");
 			} else {
 				return true;
 			}
@@ -17267,6 +17357,7 @@ alphaTab.importer.GpxImporter.prototype = $extend(alphaTab.importer.ScoreImporte
 		alphaTab.util.Logger.Info(this.get_Name(),"GPX filesystem loaded",null);
 		var xml = null;
 		var binaryStylesheet = null;
+		var partConfiguration = null;
 		var entry = $iterator(fileSystem.Files)();
 		while(entry.hasNext()) {
 			var entry1 = entry.next();
@@ -17274,6 +17365,9 @@ alphaTab.importer.GpxImporter.prototype = $extend(alphaTab.importer.ScoreImporte
 			switch(_g) {
 			case "BinaryStylesheet":
 				binaryStylesheet = entry1.Data;
+				break;
+			case "PartConfiguration":
+				partConfiguration = entry1.Data;
 				break;
 			case "score.gpif":
 				xml = alphaTab.platform.Platform.ToString(entry1.Data,this.GetSetting("encoding","utf-8"));
@@ -17284,10 +17378,10 @@ alphaTab.importer.GpxImporter.prototype = $extend(alphaTab.importer.ScoreImporte
 		fileSystem.Files = null;
 		fileSystem = null;
 		alphaTab.util.Logger.Info(this.get_Name(),"Start Parsing score.gpif",null);
-		var parser = new alphaTab.importer.GpifParser();
-		parser.ParseXml(xml,this.Settings);
+		var gpifParser = new alphaTab.importer.GpifParser();
+		gpifParser.ParseXml(xml,this.Settings);
 		alphaTab.util.Logger.Info(this.get_Name(),"score.gpif parsed",null);
-		var score = parser.Score;
+		var score = gpifParser.Score;
 		if(binaryStylesheet != null) {
 			alphaTab.util.Logger.Info(this.get_Name(),"Start Parsing BinaryStylesheet",null);
 			var stylesheetParser = new alphaTab.importer.BinaryStylesheetParser();
@@ -17296,6 +17390,15 @@ alphaTab.importer.GpxImporter.prototype = $extend(alphaTab.importer.ScoreImporte
 				stylesheetParser.Stylesheet.Apply(score);
 			}
 			alphaTab.util.Logger.Info(this.get_Name(),"BinaryStylesheet parsed",null);
+		}
+		if(partConfiguration != null) {
+			alphaTab.util.Logger.Info(this.get_Name(),"Start Parsing Part Configuration",null);
+			var partConfigurationParser = new alphaTab.importer.PartConfigurationParser();
+			partConfigurationParser.Parse(partConfiguration);
+			if(partConfigurationParser.Configuration != null) {
+				partConfigurationParser.Configuration.Apply(score);
+			}
+			alphaTab.util.Logger.Info(this.get_Name(),"Part Configuration parsed",null);
 		}
 		return score;
 	}
@@ -20354,16 +20457,27 @@ alphaTab.model.Chord = $hx_exports["alphaTab"]["model"]["Chord"] = function() {
 	this.FirstFret = 0;
 	this.Strings = null;
 	this.BarreFrets = null;
+	this.Staff = null;
+	this.ShowName = false;
+	this.ShowDiagram = false;
+	this.ShowFingering = false;
 	var this1 = [];
 	this.Strings = this1;
 	var this2 = [];
 	this.BarreFrets = this2;
+	this.ShowDiagram = true;
+	this.ShowName = true;
+	this.ShowFingering = true;
 };
 alphaTab.model.Chord.__name__ = ["alphaTab","model","Chord"];
 alphaTab.model.Chord.CopyTo = function(src,dst) {
 	dst.FirstFret = src.FirstFret;
 	dst.Name = src.Name;
 	dst.Strings = src.Strings.slice(0);
+	dst.BarreFrets = src.BarreFrets.slice(0);
+	dst.ShowName = src.ShowName;
+	dst.ShowDiagram = src.ShowDiagram;
+	dst.ShowFingering = src.ShowFingering;
 };
 alphaTab.model.Chord.prototype = {
 	__class__: alphaTab.model.Chord
@@ -21038,7 +21152,7 @@ alphaTab.model.JsonConverter.JsObjectToScore = function(jsObject,settings) {
 				var chord = staff.Chords[key1];
 				var chord2 = new alphaTab.model.Chord();
 				alphaTab.model.Chord.CopyTo(chord,chord2);
-				staff2.Chords[key1] = chord2;
+				staff2.AddChord(key1,chord2);
 			}
 			var b = 0;
 			while(b < staff.Bars.length) {
@@ -22629,6 +22743,10 @@ alphaTab.model.Staff.prototype = {
 			this.Bars[i].Finish(settings);
 			++i;
 		}
+	}
+	,AddChord: function(chordId,chord) {
+		chord.Staff = this;
+		this.Chords[chordId] = chord;
 	}
 	,AddBar: function(bar) {
 		var bars = this.Bars;
@@ -25694,10 +25812,10 @@ alphaTab.rendering.BarRendererBase.prototype = {
 		var _g = this.Bar.SimileMark;
 		switch(_g) {
 		case 1:
-			canvas.FillMusicFontSymbol(cx + this.X + (this.Width - 20 * this.get_Scale()) / 2,cy + this.Y + this.Height / 2,1,58624);
+			canvas.FillMusicFontSymbol(cx + this.X + (this.Width - 20 * this.get_Scale()) / 2,cy + this.Y + this.Height / 2,1,58624,false);
 			break;
 		case 3:
-			canvas.FillMusicFontSymbol(cx + this.X - 28 * this.get_Scale() / 2,cy + this.Y + this.Height / 2,1,58625);
+			canvas.FillMusicFontSymbol(cx + this.X - 28 * this.get_Scale() / 2,cy + this.Y + this.Height / 2,1,58625,false);
 			break;
 		default:
 		}
@@ -26258,6 +26376,7 @@ alphaTab.rendering.RenderingResources = $hx_exports["alphaTab"]["rendering"]["Re
 	this.SubTitleFont = null;
 	this.WordsFont = null;
 	this.EffectFont = null;
+	this.FretboardNumberFont = null;
 	this.TablatureFont = null;
 	this.GraceFont = null;
 	this.StaveLineColor = null;
@@ -26281,6 +26400,7 @@ alphaTab.rendering.RenderingResources.prototype = {
 		var serifFont = "Georgia";
 		this.EffectFont = new alphaTab.platform.model.Font(serifFont,12 * scale,2);
 		this.CopyrightFont = new alphaTab.platform.model.Font(sansFont,12 * scale,1);
+		this.FretboardNumberFont = new alphaTab.platform.model.Font(sansFont,11 * scale,0);
 		this.TitleFont = new alphaTab.platform.model.Font(serifFont,32 * scale,0);
 		this.SubTitleFont = new alphaTab.platform.model.Font(serifFont,20 * scale,0);
 		this.WordsFont = new alphaTab.platform.model.Font(serifFont,15 * scale,0);
@@ -27763,7 +27883,7 @@ alphaTab.rendering.glyphs.MusicFontGlyph.__name__ = ["alphaTab","rendering","gly
 alphaTab.rendering.glyphs.MusicFontGlyph.__super__ = alphaTab.rendering.glyphs.EffectGlyph;
 alphaTab.rendering.glyphs.MusicFontGlyph.prototype = $extend(alphaTab.rendering.glyphs.EffectGlyph.prototype,{
 	Paint: function(cx,cy,canvas) {
-		canvas.FillMusicFontSymbol(cx + this.X,cy + this.Y,this.GlyphScale * this.get_Scale(),this.Symbol);
+		canvas.FillMusicFontSymbol(cx + this.X,cy + this.Y,this.GlyphScale * this.get_Scale(),this.Symbol,false);
 	}
 	,__class__: alphaTab.rendering.glyphs.MusicFontGlyph
 });
@@ -28522,6 +28642,218 @@ alphaTab.rendering.glyphs.ChineseCymbalGlyph.prototype = $extend(alphaTab.render
 		this.Width = 9 * (this._isGrace ? 0.75 : 1) * this.get_Scale();
 	}
 	,__class__: alphaTab.rendering.glyphs.ChineseCymbalGlyph
+});
+alphaTab.rendering.glyphs.ChordDiagramContainerGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["ChordDiagramContainerGlyph"] = function(x,y) {
+	alphaTab.rendering.glyphs.GlyphGroup.call(this,x,y);
+	this._rows = null;
+	this.Height = 0.0;
+	var this1 = [];
+	this.Glyphs = this1;
+};
+alphaTab.rendering.glyphs.ChordDiagramContainerGlyph.__name__ = ["alphaTab","rendering","glyphs","ChordDiagramContainerGlyph"];
+alphaTab.rendering.glyphs.ChordDiagramContainerGlyph.__super__ = alphaTab.rendering.glyphs.GlyphGroup;
+alphaTab.rendering.glyphs.ChordDiagramContainerGlyph.prototype = $extend(alphaTab.rendering.glyphs.GlyphGroup.prototype,{
+	AddChord: function(chord) {
+		var chordDiagram = new alphaTab.rendering.glyphs.ChordDiagramGlyph(0,0,chord);
+		chordDiagram.Renderer = this.Renderer;
+		chordDiagram.DoLayout();
+		this.Glyphs.push(chordDiagram);
+	}
+	,DoLayout: function() {
+		var x = 0;
+		var y = 0;
+		var padding = 2 * 3 * this.get_Scale();
+		var this1 = [];
+		this._rows = this1;
+		var row = new alphaTab.rendering.glyphs.ChordDiagramRowGlyph(x,y);
+		row.Width = this.Width;
+		var g = $iterator(this.Glyphs)();
+		while(g.hasNext()) {
+			var g1 = g.next();
+			if(x + g1.Width < this.Width) {
+				row.AddChord(js.Boot.__cast(g1 , alphaTab.rendering.glyphs.ChordDiagramGlyph));
+				x = x + g1.Width;
+			} else {
+				if(!row.get_IsEmpty()) {
+					row.DoLayout();
+					this._rows.push(row);
+					y = y + (row.Height + padding);
+				}
+				x = 0;
+				row = new alphaTab.rendering.glyphs.ChordDiagramRowGlyph(x,y);
+				row.Width = this.Width;
+				row.AddChord(js.Boot.__cast(g1 , alphaTab.rendering.glyphs.ChordDiagramGlyph));
+				x = x + g1.Width;
+			}
+		}
+		if(!row.get_IsEmpty()) {
+			row.DoLayout();
+			this._rows.push(row);
+			y = y + (row.Height + padding);
+		}
+		this.Height = y + padding;
+	}
+	,Paint: function(cx,cy,canvas) {
+		var row = $iterator(this._rows)();
+		while(row.hasNext()) {
+			var row1 = row.next();
+			row1.Paint(cx + this.X,cy + this.Y + 3 * this.get_Scale(),canvas);
+		}
+	}
+	,__class__: alphaTab.rendering.glyphs.ChordDiagramContainerGlyph
+});
+alphaTab.rendering.glyphs.ChordDiagramGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["ChordDiagramGlyph"] = function(x,y,chord) {
+	alphaTab.rendering.glyphs.EffectGlyph.call(this,x,y);
+	this._chord = null;
+	this._textRow = 0.0;
+	this._fretRow = 0.0;
+	this._firstFretSpacing = 0.0;
+	this._chord = chord;
+};
+alphaTab.rendering.glyphs.ChordDiagramGlyph.__name__ = ["alphaTab","rendering","glyphs","ChordDiagramGlyph"];
+alphaTab.rendering.glyphs.ChordDiagramGlyph.__super__ = alphaTab.rendering.glyphs.EffectGlyph;
+alphaTab.rendering.glyphs.ChordDiagramGlyph.prototype = $extend(alphaTab.rendering.glyphs.EffectGlyph.prototype,{
+	DoLayout: function() {
+		alphaTab.rendering.glyphs.EffectGlyph.prototype.DoLayout.call(this);
+		var res = this.Renderer.get_Resources();
+		var this1 = 1.5;
+		this._textRow = res.EffectFont.Size * this1;
+		var this2 = 1.5;
+		this._fretRow = res.EffectFont.Size * this2;
+		if(this._chord.FirstFret > 1) {
+			this._firstFretSpacing = 12 * this.get_Scale();
+		} else {
+			this._firstFretSpacing = 0;
+		}
+		this.Height = this._textRow + this._fretRow + (5 - 1) * 12 * this.get_Scale() + 2 * 5;
+		this.Width = this._firstFretSpacing + (this._chord.Staff.Tuning.length - 1) * 10 * this.get_Scale() + 2 * 5;
+	}
+	,Paint: function(cx,cy,canvas) {
+		cx = cx + (this.X + 5 * this.get_Scale() + this._firstFretSpacing);
+		cy = cy + this.Y;
+		var w = this.Width - 2 * 5 * this.get_Scale() + this.get_Scale() - this._firstFretSpacing;
+		var stringSpacing = 10 * this.get_Scale();
+		var fretSpacing = 12 * this.get_Scale();
+		var res = this.Renderer.get_Resources();
+		var circleRadius = 2.5 * this.get_Scale();
+		var align = canvas.get_TextAlign();
+		var baseline = canvas.get_TextBaseline();
+		canvas.set_Font(res.EffectFont);
+		canvas.set_TextAlign(1);
+		canvas.set_TextBaseline(0);
+		if(this._chord.ShowName) {
+			canvas.FillText(this._chord.Name,cx + this.Width / 2,cy + res.EffectFont.Size / 2);
+		}
+		cy = cy + this._textRow;
+		cx = cx + stringSpacing / 2;
+		canvas.set_Font(res.FretboardNumberFont);
+		canvas.set_TextBaseline(1);
+		var i = 0;
+		while(i < this._chord.Staff.Tuning.length) {
+			var x = cx + i * stringSpacing;
+			var y = cy + this._fretRow / 2;
+			var fret = this._chord.Strings[this._chord.Staff.Tuning.length - i - 1];
+			if(fret < 0) {
+				canvas.FillMusicFontSymbol(x,y,this.get_Scale(),59481,true);
+			} else if(fret == 0) {
+				canvas.FillMusicFontSymbol(x,y,this.get_Scale(),59482,true);
+			} else if(this._chord.ShowFingering) {
+				fret = fret - (this._chord.FirstFret - 1);
+				canvas.FillText(Std.string(fret),x,y);
+			}
+			++i;
+		}
+		cy = cy + this._fretRow;
+		var i1 = 0;
+		while(i1 < this._chord.Staff.Tuning.length) {
+			var x1 = cx + i1 * stringSpacing;
+			canvas.FillRect(x1,cy,1,fretSpacing * 5 + this.get_Scale());
+			++i1;
+		}
+		if(this._chord.FirstFret > 1) {
+			canvas.set_TextAlign(0);
+			canvas.FillText(Std.string(this._chord.FirstFret),cx - this._firstFretSpacing,cy + fretSpacing / 2);
+		}
+		canvas.FillRect(cx,cy - this.get_Scale(),w,2 * this.get_Scale());
+		var i2 = 0;
+		while(i2 <= 5) {
+			var y1 = cy + i2 * fretSpacing;
+			canvas.FillRect(cx,y1,w,this.get_Scale());
+			++i2;
+		}
+		var this1 = {}
+		var barreLookup = this1;
+		var barreFret = $iterator(this._chord.BarreFrets)();
+		while(barreFret.hasNext()) {
+			var barreFret1 = barreFret.next();
+			var this2 = new Int32Array(2);
+			var strings = this2;
+			strings[0] = -1;
+			strings[1] = -1;
+			barreLookup[barreFret1 - this._chord.FirstFret] = strings;
+		}
+		var guitarString = 0;
+		while(guitarString < this._chord.Strings.length) {
+			var fret1 = this._chord.Strings[guitarString];
+			if(fret1 > 0) {
+				fret1 = fret1 - this._chord.FirstFret;
+				if(barreLookup.hasOwnProperty(fret1)) {
+					var info = barreLookup[fret1];
+					if(info[0] == -1 || guitarString < info[0]) {
+						info[0] = guitarString;
+					}
+					if(info[1] == -1 || guitarString > info[1]) {
+						info[1] = guitarString;
+					}
+				}
+				var this3 = 0.5;
+				var y2 = cy + fret1 * fretSpacing + fretSpacing / 2 + this3;
+				var x2 = cx + (this._chord.Strings.length - guitarString - 1) * stringSpacing;
+				canvas.FillCircle(x2,y2,circleRadius);
+			}
+			++guitarString;
+		}
+		var barreFret2 = $iterator(Object.keys(barreLookup))();
+		while(barreFret2.hasNext()) {
+			var barreFret3 = barreFret2.next();
+			var strings1 = barreLookup[barreFret3];
+			var y3 = cy + barreFret3 * fretSpacing + fretSpacing / 2 + this.get_Scale();
+			var xLeft = cx + (this._chord.Strings.length - strings1[1] - 1) * stringSpacing;
+			var xRight = cx + (this._chord.Strings.length - strings1[0] - 1) * stringSpacing;
+			canvas.FillRect(xLeft,y3 - circleRadius,xRight - xLeft,circleRadius * 2);
+		}
+		canvas.set_TextAlign(align);
+		canvas.set_TextBaseline(baseline);
+	}
+	,__class__: alphaTab.rendering.glyphs.ChordDiagramGlyph
+});
+alphaTab.rendering.glyphs.ChordDiagramRowGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["ChordDiagramRowGlyph"] = function(x,y) {
+	this._glyphWidth = 0;
+	alphaTab.rendering.glyphs.GlyphGroup.call(this,x,y);
+	this.Height = 0.0;
+	var this1 = [];
+	this.Glyphs = this1;
+};
+alphaTab.rendering.glyphs.ChordDiagramRowGlyph.__name__ = ["alphaTab","rendering","glyphs","ChordDiagramRowGlyph"];
+alphaTab.rendering.glyphs.ChordDiagramRowGlyph.__super__ = alphaTab.rendering.glyphs.GlyphGroup;
+alphaTab.rendering.glyphs.ChordDiagramRowGlyph.prototype = $extend(alphaTab.rendering.glyphs.GlyphGroup.prototype,{
+	DoLayout: function() {
+		var x = (this.Width - this._glyphWidth) / 2;
+		var glyph = $iterator(this.Glyphs)();
+		while(glyph.hasNext()) {
+			var glyph1 = glyph.next();
+			glyph1.X = x;
+			x = x + glyph1.Width;
+		}
+	}
+	,AddChord: function(chord) {
+		this.Glyphs.push(chord);
+		this._glyphWidth = this._glyphWidth + chord.Width;
+		if(chord.Height > this.Height) {
+			this.Height = chord.Height;
+		}
+	}
+	,__class__: alphaTab.rendering.glyphs.ChordDiagramRowGlyph
 });
 alphaTab.rendering.glyphs.CircleGlyph = $hx_exports["alphaTab"]["rendering"]["glyphs"]["CircleGlyph"] = function(x,y,size) {
 	alphaTab.rendering.glyphs.Glyph.call(this,x,y);
@@ -29323,6 +29655,10 @@ alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.toString = func
 		return "PickStrokeDown";
 	case 58898:
 		return "PickStrokeUp";
+	case 59481:
+		return "FretboardX";
+	case 59482:
+		return "FretboardO";
 	case 60068:
 		return "WaveHorizontalSlight";
 	case 60126:
@@ -29360,7 +29696,7 @@ alphaTab.rendering.glyphs.NoteHeadGlyph.__super__ = alphaTab.rendering.glyphs.Mu
 alphaTab.rendering.glyphs.NoteHeadGlyph.prototype = $extend(alphaTab.rendering.glyphs.MusicFontGlyph.prototype,{
 	Paint: function(cx,cy,canvas) {
 		var offset = this._isGrace ? this.get_Scale() : 0;
-		canvas.FillMusicFontSymbol(cx + this.X,cy + this.Y + offset,this.GlyphScale * this.get_Scale(),this.Symbol);
+		canvas.FillMusicFontSymbol(cx + this.X,cy + this.Y + offset,this.GlyphScale * this.get_Scale(),this.Symbol,false);
 	}
 	,DoLayout: function() {
 		var scale = (this._isGrace ? 0.75 : 1) * this.get_Scale();
@@ -29532,7 +29868,7 @@ alphaTab.rendering.glyphs.NoteVibratoGlyph.prototype = $extend(alphaTab.renderin
 		var loopX = 0;
 		var i = 0;
 		while(i < loops) {
-			canvas.FillMusicFontSymbol(cx + this.X + loopX,cy + this.Y + this._symbolOffset,this._scale,this._symbol);
+			canvas.FillMusicFontSymbol(cx + this.X + loopX,cy + this.Y + this._symbolOffset,this._scale,this._symbol,false);
 			loopX = loopX + step;
 			++i;
 		}
@@ -29600,19 +29936,19 @@ alphaTab.rendering.glyphs.OttavaGlyph.prototype = $extend(alphaTab.rendering.gly
 		switch(_g) {
 		case 0:
 			size = 37 * this.get_Scale();
-			canvas.FillMusicFontSymbol(cx + this.X - size / 2,cy + this.Y + this.Height,0.8,58645);
+			canvas.FillMusicFontSymbol(cx + this.X - size / 2,cy + this.Y + this.Height,0.8,58645,false);
 			break;
 		case 1:
 			size = 26 * this.get_Scale();
-			canvas.FillMusicFontSymbol(cx + this.X - size / 2,cy + this.Y + this.Height,0.8,58641);
+			canvas.FillMusicFontSymbol(cx + this.X - size / 2,cy + this.Y + this.Height,0.8,58641,false);
 			break;
 		case 3:
 			size = 23 * this.get_Scale();
-			canvas.FillMusicFontSymbol(cx + this.X - size / 2,cy + this.Y + this.Height,0.8,58652);
+			canvas.FillMusicFontSymbol(cx + this.X - size / 2,cy + this.Y + this.Height,0.8,58652,false);
 			break;
 		case 4:
 			size = 36 * this.get_Scale();
-			canvas.FillMusicFontSymbols(cx + this.X - size / 2,cy + this.Y + this.Height,0.8,[58644,60565,60563]);
+			canvas.FillMusicFontSymbols(cx + this.X - size / 2,cy + this.Y + this.Height,0.8,[58644,60565,60563],false);
 			break;
 		default:
 		}
@@ -32068,7 +32404,7 @@ alphaTab.rendering.glyphs.TabClefGlyph.prototype = $extend(alphaTab.rendering.gl
 			var this3 = 6.5;
 			scale = strings / this3;
 		}
-		canvas.FillMusicFontSymbol(cx + this.X + 5 * this.get_Scale(),cy + this.Y - correction,scale * this.get_Scale(),symbol);
+		canvas.FillMusicFontSymbol(cx + this.X + 5 * this.get_Scale(),cy + this.Y - correction,scale * this.get_Scale(),symbol,false);
 	}
 	,__class__: alphaTab.rendering.glyphs.TabClefGlyph
 });
@@ -32711,7 +33047,7 @@ alphaTab.rendering.glyphs.TempoGlyph.prototype = $extend(alphaTab.rendering.glyp
 		canvas.set_Font(res.MarkerFont);
 		var this1 = 0.8;
 		var this2 = 0.75;
-		canvas.FillMusicFontSymbol(cx + this.X,cy + this.Y + this.Height * this1,this.get_Scale() * this2,57813);
+		canvas.FillMusicFontSymbol(cx + this.X,cy + this.Y + this.Height * this1,this.get_Scale() * this2,57813,false);
 		canvas.FillText("= " + this._tempo,cx + this.X + this.Height / 2,cy + this.Y + canvas.get_Font().Size / 2);
 	}
 	,__class__: alphaTab.rendering.glyphs.TempoGlyph
@@ -32799,7 +33135,7 @@ alphaTab.rendering.glyphs.TrillGlyph.prototype = $extend(alphaTab.rendering.glyp
 		var loopY = cy + this.Y + this.Height;
 		var i = 0;
 		while(i < loops) {
-			canvas.FillMusicFontSymbol(cx + this.X + loopX,loopY,waveScale,60068);
+			canvas.FillMusicFontSymbol(cx + this.X + loopX,loopY,waveScale,60068,false);
 			loopX = loopX + step;
 			++i;
 		}
@@ -32841,8 +33177,8 @@ alphaTab.rendering.glyphs.TripletFeelGlyph.prototype = $extend(alphaTab.renderin
 			break;
 		case 2:
 			this.RenderBarNote(leftNoteX,noteY,0.40,canvas,[0]);
-			canvas.FillMusicFontSymbol(rightNoteX,noteY,0.40,57813);
-			canvas.FillMusicFontSymbol(rightNoteX + 12 * this.get_Scale(),noteY,0.40,57815);
+			canvas.FillMusicFontSymbol(rightNoteX,noteY,0.40,57813,false);
+			canvas.FillMusicFontSymbol(rightNoteX + 12 * this.get_Scale(),noteY,0.40,57815,false);
 			this.RenderTriplet(rightNoteX,cy,canvas);
 			break;
 		case 3:
@@ -32872,7 +33208,7 @@ alphaTab.rendering.glyphs.TripletFeelGlyph.prototype = $extend(alphaTab.renderin
 		canvas.FillText(")",cx + 65 * this.get_Scale(),cy + this.Height * this3);
 	}
 	,RenderBarNote: function(cx,noteY,noteScale,canvas,bars) {
-		canvas.FillMusicFontSymbol(cx,noteY,noteScale,57813);
+		canvas.FillMusicFontSymbol(cx,noteY,noteScale,57813,false);
 		var this1 = 2;
 		var partialBarWidth = 12 / this1 * this.get_Scale();
 		var i = 0;
@@ -32892,7 +33228,7 @@ alphaTab.rendering.glyphs.TripletFeelGlyph.prototype = $extend(alphaTab.renderin
 			}
 			++i;
 		}
-		canvas.FillMusicFontSymbol(cx + 12 * this.get_Scale(),noteY,noteScale,57813);
+		canvas.FillMusicFontSymbol(cx + 12 * this.get_Scale(),noteY,noteScale,57813,false);
 	}
 	,RenderTriplet: function(cx,cy,canvas) {
 		cy = cy + 2 * this.get_Scale();
@@ -37651,6 +37987,12 @@ alphaTab.rendering.TabBarRenderer.LineSpacing = 10;
 alphaTab.rendering.glyphs.AccidentalGroupGlyph.NonReserved = -3000;
 alphaTab.rendering.glyphs.AlternateEndingsGlyph.Padding = 3;
 alphaTab.rendering.glyphs.BendNoteHeadGroupGlyph.ElementPadding = 2;
+alphaTab.rendering.glyphs.ChordDiagramContainerGlyph.Padding = 3;
+alphaTab.rendering.glyphs.ChordDiagramGlyph.Padding = 5;
+alphaTab.rendering.glyphs.ChordDiagramGlyph.Frets = 5;
+alphaTab.rendering.glyphs.ChordDiagramGlyph.CircleRadius = 2.5;
+alphaTab.rendering.glyphs.ChordDiagramGlyph.StringSpacing = 10;
+alphaTab.rendering.glyphs.ChordDiagramGlyph.FretSpacing = 12;
 alphaTab.rendering.glyphs.CrescendoGlyph.Padding = 8 / 2 | 0;
 alphaTab.rendering.glyphs.GhostParenthesisGlyph.Size = 6;
 alphaTab.rendering.glyphs.LineRangedGlyph.LineSpacing = 3;
@@ -37749,6 +38091,8 @@ alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.SimileMarkDoubl
 alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.FermataMedium = 58560;
 alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.FermataShort = 58564;
 alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.FermataLong = 58566;
+alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.FretboardX = 59481;
+alphaTab.rendering.glyphs._MusicFontSymbol.MusicFontSymbol_Impl_.FretboardO = 59482;
 alphaTab.rendering.glyphs.NoteHeadGlyph.GraceScale = 0.75;
 alphaTab.rendering.glyphs.NoteHeadGlyph.NoteHeadHeight = 9;
 alphaTab.rendering.glyphs.NoteHeadGlyph.QuarterNoteHeadWidth = 8;

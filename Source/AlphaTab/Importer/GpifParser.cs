@@ -645,7 +645,7 @@ namespace AlphaTab.Importer
             var chordId = node.GetAttribute("id");
             foreach (var staff in track.Staves)
             {
-                staff.Chords[chordId] = chord;
+                staff.AddChord(chordId, chord);
             }
             ParseDiagramItem(chord, node);
         }
@@ -654,7 +654,7 @@ namespace AlphaTab.Importer
         {
             var chord = new Chord();
             var chordId = node.GetAttribute("id");
-            staff.Chords[chordId] = chord;
+            staff.AddChord(chordId, chord);
             ParseDiagramItem(chord, node);
         }
 
@@ -731,6 +731,21 @@ namespace AlphaTab.Importer
                                 }
                             }
 
+                            break;
+
+                        case "Property":
+                            switch (c.GetAttribute("name"))
+                            {
+                                case "ShowName":
+                                    chord.ShowName = c.GetAttribute("value") == "true";
+                                    break;
+                                case "ShowDiagram":
+                                    chord.ShowDiagram = c.GetAttribute("value") == "true";
+                                    break;
+                                case "ShowFingering":
+                                    chord.ShowFingering = c.GetAttribute("value") == "true";
+                                    break;
+                            }
                             break;
                     }
                 }

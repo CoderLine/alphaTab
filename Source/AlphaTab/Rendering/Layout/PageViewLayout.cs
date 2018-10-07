@@ -80,8 +80,12 @@ namespace AlphaTab.Rendering.Layout
             // 1. Score Info
             y = LayoutAndRenderScoreInfo(x, y);
 
+            // 
+            // 2. Chord Diagrms
+            y = LayoutAndRenderChordDiagrams(x, y);
+            
             //
-            // 2. One result per StaveGroup
+            // 3. One result per StaveGroup
             y = LayoutAndRenderScore(x, y);
 
             Height = y + _pagePadding[3];
@@ -103,11 +107,49 @@ namespace AlphaTab.Rendering.Layout
             // 1. Score Info
             y = LayoutAndRenderScoreInfo(x, y, oldHeight);
 
+            // 
+            // 2. Chord Digrams
+            y = LayoutAndRenderChordDiagrams(x, y, oldHeight);
+
             //
             // 2. One result per StaveGroup
             y = ResizeAndRenderScore(x, y, oldHeight);
 
             Height = y + _pagePadding[3];
+        }
+
+        private float LayoutAndRenderChordDiagrams(float x, float y, float totalHeight = -1)
+        {
+            if (ChordDiagrams == null)
+            {
+                return y;
+            }
+            var res = Renderer.RenderingResources;
+
+            ChordDiagrams.Width = Width;
+            ChordDiagrams.DoLayout();
+
+            var canvas = Renderer.Canvas;
+            canvas.BeginRender(Width, ChordDiagrams.Height);
+            canvas.Color = res.ScoreInfoColor;
+            canvas.TextAlign = TextAlign.Center;
+
+            ChordDiagrams.Paint(0, 0, canvas);
+
+            var result = canvas.EndRender();
+            y += ChordDiagrams.Height;
+            Renderer.OnPartialRenderFinished(new RenderFinishedEventArgs
+            {
+                Width = Width,
+                Height = ChordDiagrams.Height,
+                RenderResult = result,
+                TotalWidth = Width,
+                TotalHeight = totalHeight < 0 ? y : totalHeight,
+                FirstMasterBarIndex = -1,
+                LastMasterBarIndex = -1
+            });
+
+            return y;
         }
 
         private float LayoutAndRenderScoreInfo(float x, float y, float totalHeight = -1)
@@ -401,7 +443,7 @@ namespace AlphaTab.Rendering.Layout
                             _barsFromPreviousGroup.Add(reverted);
                         }
                     }
-                   
+
                     group.IsFull = true;
                     group.IsLast = false;
 

@@ -290,33 +290,18 @@ namespace AlphaTab.Platform.JavaScript
             return (float)_measureContext.MeasureText(text).Width;
         }
 
-        public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)
+        public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol, bool centerAtPosition = false)
         {
             if (symbol == MusicFontSymbol.None)
             {
                 return;
             }
 
-            x = (int)x;
-            y = (int)y;
-            var baseLine = _context.TextBaseline;
-            var font = _context.Font;
-            _context.Font = _musicFont.ToCssString(scale);
-            _context.TextBaseline = "middle";
-            _context.FillText(Platform.StringFromCharCode((int)symbol), x, y);
-            _context.TextBaseline = baseLine;
-            _context.Font = font;
+            FillMusicFontSymbolText(x, y, scale, Platform.StringFromCharCode((int)symbol), centerAtPosition);
         }
 
-        public void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols)
+        public void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols, bool centerAtPosition = false)
         {
-            x = (int)x;
-            y = (int)y;
-            var baseLine = _context.TextBaseline;
-            var font = _context.Font;
-            _context.Font = _musicFont.ToCssString(scale);
-            _context.TextBaseline = "middle";
-
             var s = "";
             foreach (var symbol in symbols)
             {
@@ -325,10 +310,27 @@ namespace AlphaTab.Platform.JavaScript
                     s += Platform.StringFromCharCode((int)symbol);
                 }
             }
+            FillMusicFontSymbolText(x, y, scale, s, centerAtPosition);
+        }
 
-            _context.FillText(s, x, y);
+        private void FillMusicFontSymbolText(float x, float y, float scale, string symbols, bool centerAtPosition = false)
+        {
+            x = (int)x;
+            y = (int)y;
+            var textAlign = _context.TextAlign;
+            var baseLine = _context.TextBaseline;
+            var font = _context.Font;
+            _context.Font = _musicFont.ToCssString(scale);
+            _context.TextBaseline = "middle";
+            if (centerAtPosition)
+            {
+                _context.TextAlign = "center";
+            }
+
+            _context.FillText(symbols, x, y);
             _context.TextBaseline = baseLine;
             _context.Font = font;
+            _context.TextAlign = textAlign;
         }
 
         public void BeginRotate(float centerX, float centerY, float angle)

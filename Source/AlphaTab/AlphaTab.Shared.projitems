@@ -217,6 +217,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeatOnNoteGlyphBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BeatVibratoGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\BendNoteHeadGroupGlyph.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\ChordDiagramRowGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\FermataGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\GhostNoteContainerGlyph.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Glyphs\GhostParenthesisGlyph.cs" />

@@ -116,7 +116,7 @@ namespace AlphaTab.Rendering.Glyphs
         AccidentalQuarterToneFlatArrowUp = 0xE270,
         AccidentalQuarterToneSharpArrowUp = 0xE274,
         AccidentalQuarterToneNaturalArrowUp = 0xE272,
-
+        
         Ottava8 = 0xE510,
         Ottava8va = 0xE511,
         Ottava8vb = 0xE51C,
@@ -130,6 +130,9 @@ namespace AlphaTab.Rendering.Glyphs
 
         FermataMedium = 0xE4C0,
         FermataShort = 0xE4C4,
-        FermataLong = 0xE4C6
+        FermataLong = 0xE4C6,
+
+        FretboardX = 0xE859,
+        FretboardO = 0xE85A
     }
 }

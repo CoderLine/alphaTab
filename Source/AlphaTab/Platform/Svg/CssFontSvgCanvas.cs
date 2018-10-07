@@ -24,26 +24,13 @@ namespace AlphaTab.Platform.Svg
     /// </summary>
     class CssFontSvgCanvas : SvgCanvas
     {
-        public override void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)
+        public override void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol, bool centerAtPosition = false)
         {
             if (symbol == MusicFontSymbol.None) return;
-            Buffer.Append("<g transform=\"translate(" + ((int) x - BlurCorrection) + " " + ((int) y - BlurCorrection) + ")\" class=\"at\" ><text");
-            if (scale != 1)
-            {
-                Buffer.Append(" style=\"font-size: " + (scale * 100) + "%; stroke:none\"");
-            }
-            else
-            {
-                Buffer.Append(" style=\"stroke:none\"");
-            }
-            if (Color.RGBA != Model.Color.BlackRgb)
-            {
-                Buffer.Append(" fill=\"" + Color.RGBA + "\"");
-            }
-            Buffer.Append(">&#" + (int)symbol + ";</text></g>");
+            FillMusicFontSymbolText(x, y, scale, "&#" + (int)symbol + ";", centerAtPosition);
         }
 
-        public override void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols)
+        public override void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols, bool centerAtPosition = false)
         {
             var s = "";
             foreach (var symbol in symbols)
@@ -54,7 +41,13 @@ namespace AlphaTab.Platform.Svg
                 }
             }
 
-            Buffer.Append("<g transform=\"translate(" + ((int) x - BlurCorrection) + " " + ((int) y - BlurCorrection) + ")\" class=\"at\" ><text");
+            FillMusicFontSymbolText(x, y, scale, s, centerAtPosition);
+        }
+
+        private void FillMusicFontSymbolText(float x, float y, float scale, string symbols, bool centerAtPosition = false)
+        {
+            Buffer.Append("<g transform=\"translate(" + ((int)x - BlurCorrection) + " " + ((int)y - BlurCorrection) +
+                          ")\" class=\"at\" ><text");
             if (scale != 1)
             {
                 Buffer.Append(" style=\"font-size: " + (scale * 100) + "%; stroke:none\"");
@@ -63,11 +56,17 @@ namespace AlphaTab.Platform.Svg
             {
                 Buffer.Append(" style=\"stroke:none\"");
             }
+
             if (Color.RGBA != Model.Color.BlackRgb)
             {
                 Buffer.Append(" fill=\"" + Color.RGBA + "\"");
             }
-            Buffer.Append(">" + s + "</text></g>");
+            if (centerAtPosition)
+            {
+                Buffer.Append(" text-anchor=\"" + GetSvgTextAlignment(Model.TextAlign.Center) + "\"");
+            }
+            Buffer.Append(">" + symbols + "</text></g>");
         }
+
     }
 }

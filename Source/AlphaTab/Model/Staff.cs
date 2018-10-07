@@ -126,6 +126,12 @@ namespace AlphaTab.Model
             }
         }
 
+        internal void AddChord(string chordId, Chord chord)
+        {
+            chord.Staff = this;
+            Chords[chordId] = chord;
+        }
+
         internal void AddBar(Bar bar)
         {
             var bars = Bars;

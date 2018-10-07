@@ -48,12 +48,35 @@ namespace AlphaTab.Model
         public FastList<int> BarreFrets { get; set; }
 
         /// <summary>
+        /// Gets or sets the staff the chord belongs to. 
+        /// </summary>
+        public Staff Staff { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the chord name is shown above the chord diagram. 
+        /// </summary>
+        public bool ShowName { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the chord diagram is shown.
+        /// </summary>
+        public bool ShowDiagram{ get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the fingering is shown below the chord diagram. 
+        /// </summary>
+        public bool ShowFingering { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Chord"/> class.
         /// </summary>
         public Chord()
         {
             Strings = new FastList<int>();
             BarreFrets = new FastList<int>();
+            ShowDiagram = true;
+            ShowName = true;
+            ShowFingering = true;
         }
 
         internal static void CopyTo(Chord src, Chord dst)
@@ -61,6 +84,10 @@ namespace AlphaTab.Model
             dst.FirstFret = src.FirstFret;
             dst.Name = src.Name;
             dst.Strings = src.Strings.Clone();
+            dst.BarreFrets = src.BarreFrets.Clone();
+            dst.ShowName = src.ShowName;
+            dst.ShowDiagram = src.ShowDiagram;
+            dst.ShowFingering = src.ShowFingering;
         }
     }
 }

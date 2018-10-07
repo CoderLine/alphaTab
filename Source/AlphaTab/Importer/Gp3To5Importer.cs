@@ -763,7 +763,7 @@ namespace AlphaTab.Importer
             if (!string.IsNullOrEmpty(chord.Name))
             {
                 beat.ChordId = chordId;
-                beat.Voice.Bar.Staff.Chords[beat.ChordId] = chord;
+                beat.Voice.Bar.Staff.AddChord(beat.ChordId, chord);
             }
         }
 

@@ -30,6 +30,7 @@ namespace AlphaTab.Rendering
         public Font SubTitleFont { get; set; }
         public Font WordsFont { get; set; }
         public Font EffectFont { get; set; }
+        public Font FretboardNumberFont { get; set; }
 
         public Font TablatureFont { get; set; }
         public Font GraceFont { get; set; }
@@ -65,6 +66,7 @@ namespace AlphaTab.Rendering
 
             EffectFont = new Font(serifFont, 12 * scale, FontStyle.Italic);
             CopyrightFont = new Font(sansFont, 12 * scale, FontStyle.Bold);
+            FretboardNumberFont = new Font(sansFont, 11 * scale);
 
             TitleFont = new Font(serifFont, 32 * scale);
             SubTitleFont = new Font(serifFont, 20 * scale);

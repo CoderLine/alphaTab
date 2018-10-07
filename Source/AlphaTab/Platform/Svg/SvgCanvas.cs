@@ -192,15 +192,15 @@ namespace AlphaTab.Platform.Svg
             }
             if (TextAlign != TextAlign.Left)
             {
-                s += " text-anchor=\"" + GetSvgTextAlignment() + "\"";
+                s += " text-anchor=\"" + GetSvgTextAlignment(TextAlign) + "\"";
             }
             s += ">" + text + "</text>";
             Buffer.Append(s);
         }
 
-        private string GetSvgTextAlignment()
+        protected string GetSvgTextAlignment(TextAlign textAlign)
         {
-            switch (TextAlign)
+            switch (textAlign)
             {
                 case TextAlign.Left: return "start";
                 case TextAlign.Center: return "middle";
@@ -231,8 +231,8 @@ namespace AlphaTab.Platform.Svg
             return FontSizes.MeasureString(text, font, Font.Size, Font.Style);
         }
 
-        public abstract void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol);
-        public abstract void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols);
+        public abstract void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol, bool centerAtPosition = false);
+        public abstract void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols, bool centerAtPosition = false);
 
 
         public virtual object OnPreRender()

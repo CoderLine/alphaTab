@@ -314,7 +314,7 @@ namespace AlphaTab.Model
                         var chord = staff.Chords[key];
                         var chord2 = new Chord();
                         Chord.CopyTo(chord, chord2);
-                        staff2.Chords[key] = chord2;
+                        staff2.AddChord(key, chord2);
                     }
                     #region Bars
 

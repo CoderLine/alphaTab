@@ -41,6 +41,7 @@ namespace AlphaTab.Rendering.Layout
         public float Height { get; set; }
 
         protected FastDictionary<HeaderFooterElements, TextGlyph> ScoreInfoGlyphs;
+        protected ChordDiagramContainerGlyph ChordDiagrams;
         protected TuningGlyph TuningGlyph;
 
 
@@ -145,6 +146,32 @@ namespace AlphaTab.Rendering.Layout
                     }
                 }
             }
+
+            // chord diagram glyphs
+            if (!Renderer.Settings.Layout.Get("hideChordDiagram", false))
+            {
+                ChordDiagrams = new ChordDiagramContainerGlyph(0, 0);
+                ChordDiagrams.Renderer = new BarRendererBase(Renderer, null);
+                var chords = new FastDictionary<string, Chord>();
+                foreach (var track in Renderer.Tracks)
+                {
+                    foreach (var staff in track.Staves)
+                    {
+                        foreach (var chordId in staff.Chords)
+                        {
+                            if (!chords.ContainsKey(chordId))
+                            {
+                                var chord = staff.Chords[chordId];
+                                if (chord.ShowDiagram)
+                                {
+                                    chords[chordId] = chord;
+                                    ChordDiagrams.AddChord(chord);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public float Scale
@@ -245,7 +272,7 @@ namespace AlphaTab.Rendering.Layout
         }
 
         public T GetRendererForBar<T>(string key, Bar bar)
-            where T: BarRendererBase
+            where T : BarRendererBase
         {
             var barRendererId = bar.Id;
             if (_barRendererLookup.ContainsKey(key) && _barRendererLookup[key].ContainsKey(barRendererId))

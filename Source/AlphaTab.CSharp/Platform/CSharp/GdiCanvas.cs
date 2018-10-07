@@ -45,6 +45,7 @@ namespace AlphaTab.Platform.CSharp
         private static readonly Graphics MeasurementGraphics;
         private static readonly PrivateFontCollection MusicFontCollection;
         private static readonly StringFormat MusicFontFormat;
+        private static readonly StringFormat MusicFontFormatCenter;
 
         static GdiCanvas()
         {
@@ -58,6 +59,12 @@ namespace AlphaTab.Platform.CSharp
             {
                 LineAlignment = StringAlignment.Center,
                 Alignment = StringAlignment.Near
+            };
+
+            MusicFontFormatCenter = new StringFormat(StringFormat.GenericTypographic)
+            {
+                LineAlignment = StringAlignment.Center,
+                Alignment = StringAlignment.Center
             };
 
             MusicFontCollection = new PrivateFontCollection();
@@ -388,7 +395,7 @@ namespace AlphaTab.Platform.CSharp
             }
         }
 
-        public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)
+        public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol, bool centerAtPosition = false)
         {
             if (symbol == MusicFontSymbol.None)
             {
@@ -398,10 +405,10 @@ namespace AlphaTab.Platform.CSharp
             // for whatever reason the padding on GDI font rendering is a bit messed up, there is 1px padding on the left
             x += scale;
 
-            _graphics.DrawString(Platform.StringFromCharCode((int)symbol), GetMusicFont(scale), _brush, x, y, MusicFontFormat);
+            _graphics.DrawString(Platform.StringFromCharCode((int)symbol), GetMusicFont(scale), _brush, x, y, centerAtPosition ? MusicFontFormatCenter : MusicFontFormat);
         }
 
-        public void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols)
+        public void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols, bool centerAtPosition = false)
         {
             var s = "";
             foreach (var symbol in symbols)
@@ -415,7 +422,7 @@ namespace AlphaTab.Platform.CSharp
             // for whatever reason the padding on GDI font rendering is a bit messed up, there is 1px padding on the left
             x += scale;
 
-            _graphics.DrawString(s, GetMusicFont(scale), _brush, x, y, MusicFontFormat);
+            _graphics.DrawString(s, GetMusicFont(scale), _brush, x, y, centerAtPosition ? MusicFontFormatCenter : MusicFontFormat);
         }
 
         public void BeginRotate(float centerX, float centerY, float angle)

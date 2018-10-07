@@ -17,7 +17,6 @@
  */
 
 using AlphaTab.Collections;
-using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
 
