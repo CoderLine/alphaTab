@@ -2854,6 +2854,26 @@
             Gets or sets a list of frets where the finger should hold a barre 
             </summary>
         </member>
+        <member name="P:AlphaTab.Model.Chord.Staff">
+            <summary>
+            Gets or sets the staff the chord belongs to. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Chord.ShowName">
+            <summary>
+            Gets or sets whether the chord name is shown above the chord diagram. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Chord.ShowDiagram">
+            <summary>
+            Gets or sets whether the chord diagram is shown.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Chord.ShowFingering">
+            <summary>
+            Gets or sets whether the fingering is shown below the chord diagram. 
+            </summary>
+        </member>
         <member name="M:AlphaTab.Model.Chord.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:AlphaTab.Model.Chord"/> class.
@@ -4175,39 +4195,24 @@
             Gets a value indicating whether this staff contains string based notes.
             </summary>
         </member>
-        <member name="P:AlphaTab.Model.Staff.StaffKind">
+        <member name="P:AlphaTab.Model.Staff.ShowTablature">
             <summary>
-            Gets or sets the staff kind. 
+            Gets or sets whether the tabs are shown. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Staff.ShowStandardNotation">
+            <summary>
+            Gets or sets whether the standard notation is shown. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Model.Staff.IsPercussion">
+            <summary>
+            Gets or sets whether the staff contains percussion notation
             </summary>
         </member>
         <member name="M:AlphaTab.Model.Staff.#ctor">
             <summary>
             Initializes a new instance of the <see cref="T:AlphaTab.Model.Staff"/> class.
-            </summary>
-        </member>
-        <member name="T:AlphaTab.Model.StaffKind">
-            <summary>
-            Represents the different kinds of staffs.
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.StaffKind.Tablature">
-            <summary>
-            The staff should be shown as guitar tablature. 
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.StaffKind.Score">
-            <summary>
-            The staff should be shown as normal music notation without tabs. 
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.StaffKind.Percussion">
-            <summary>
-            The staff should be shown as percussion tabs. 
-            </summary>
-        </member>
-        <member name="F:AlphaTab.Model.StaffKind.Mixed">
-            <summary>
-            The staff should be shown as mixed tab/music notaiton
             </summary>
         </member>
         <member name="T:AlphaTab.Model.Track">

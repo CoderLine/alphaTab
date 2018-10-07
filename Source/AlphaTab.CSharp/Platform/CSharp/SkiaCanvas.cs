@@ -278,7 +278,7 @@ namespace AlphaTab.Platform.CSharp
             }
         }
 
-        public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol)
+        public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol, bool centerAtPosition = false)
         {
             if (symbol == MusicFontSymbol.None)
             {
@@ -289,10 +289,14 @@ namespace AlphaTab.Platform.CSharp
             {
                 paint.Typeface = MusicFont;
                 paint.TextSize = MusicFontSize * scale;
+                if (centerAtPosition)
+                {
+                    paint.TextAlign = SKTextAlign.Center;
+                }
                 _surface.Canvas.DrawText(Platform.StringFromCharCode((int)symbol), x, y, paint);
             }
         }
-        public void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols)
+        public void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols, bool centerAtPosition = false)
         {
             var s = "";
             foreach (var symbol in symbols)
@@ -307,6 +311,10 @@ namespace AlphaTab.Platform.CSharp
             {
                 paint.Typeface = MusicFont;
                 paint.TextSize = MusicFontSize * scale;
+                if (centerAtPosition)
+                {
+                    paint.TextAlign = SKTextAlign.Center;
+                }
                 _surface.Canvas.DrawText(s, x, y, paint);
             }
         }

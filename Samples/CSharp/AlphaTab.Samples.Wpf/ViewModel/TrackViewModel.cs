@@ -116,7 +116,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
             _track = track;
 
             // general midi Programs
-            if (track.Staves.Any(s=>s.StaffKind == StaffKind.Percussion))
+            if (track.Staves.Any(s=>s.IsPercussion))
             {
                 TrackType = TrackType.Drums;
             }

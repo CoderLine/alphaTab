@@ -160,7 +160,9 @@ namespace AlphaTab.Test.Importer
         protected void AreEqual(Staff expected, Staff actual)
         {
             Assert.AreEqual(expected.Capo, actual.Capo, "Mismatch on Capo");
-            Assert.AreEqual(expected.StaffKind, actual.StaffKind, "Mismatch on StaffKind");
+            Assert.AreEqual(expected.IsPercussion, actual.IsPercussion, "Mismatch on IsPercussion");
+            Assert.AreEqual(expected.ShowStandardNotation, actual.ShowStandardNotation, "Mismatch on ShowStandardNotation");
+            Assert.AreEqual(expected.ShowTablature, actual.ShowTablature, "Mismatch on ShowTablature");
             Assert.AreEqual(string.Join(",", expected.Tuning), string.Join(",", actual.Tuning));
             Assert.AreEqual(expected.Tuning.Length, actual.Tuning.Length, "Mismatch on Tuning.Length");
             Assert.AreEqual(expected.Index, actual.Index, "Mismatch on Index");
