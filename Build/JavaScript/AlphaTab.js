@@ -1,5 +1,5 @@
 /*
- * alphaTab v0.9.1.0 (develop)
+ * alphaTab v0.9.2.0 (develop)
  *
  * This file is part of alphaTab.
  * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
@@ -27974,7 +27974,7 @@ alphaTab.rendering.TabBarRenderer.prototype = $extend(alphaTab.rendering.BarRend
 		var beat = $iterator(h.Beats)();
 		while(beat.hasNext()) {
 			var beat1 = beat.next();
-			if(beat1.Duration == 1 || beat1.Duration == -2 || beat1.Duration == -4) {
+			if(beat1.GraceType != 0 || beat1.Duration == 1 || beat1.Duration == -2 || beat1.Duration == -4) {
 				return;
 			}
 			var beatLineX = h.GetBeatLineX(beat1);
@@ -34990,7 +34990,11 @@ alphaTab.rendering.utils.BeamingHelper.prototype = {
 		if(!this._beatLineXPositions.hasOwnProperty(beat.Index)) {
 			return true;
 		}
-		return this._beatLineXPositions[beat.Index].StaffId == staffId;
+		if(this._beatLineXPositions[beat.Index].StaffId != staffId) {
+			return this._beatLineXPositions[beat.Index].StaffId == null;
+		} else {
+			return true;
+		}
 	}
 	,GetBeatMinValue: function(beat) {
 		if(!this._beatLineXPositions.hasOwnProperty(beat.Index)) {

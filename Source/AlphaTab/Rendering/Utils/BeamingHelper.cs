@@ -177,7 +177,6 @@ namespace AlphaTab.Rendering.Utils
             return value;
         }
 
-
         public float GetBeatLineX(Beat beat)
         {
             if (HasBeatLineX(beat))
@@ -516,7 +515,8 @@ namespace AlphaTab.Rendering.Utils
             {
                 return true;
             }
-            return _beatLineXPositions[beat.Index].StaffId == staffId;
+
+            return _beatLineXPositions[beat.Index].StaffId == staffId || _beatLineXPositions[beat.Index].StaffId == null;
         }
 
 

@@ -453,7 +453,7 @@ namespace AlphaTab.Rendering
         {
             foreach (var beat in h.Beats)
             {
-                if (beat.Duration == Duration.Whole || beat.Duration == Duration.DoubleWhole || beat.Duration == Duration.QuadrupleWhole)
+                if (beat.GraceType != GraceType.None || beat.Duration == Duration.Whole || beat.Duration == Duration.DoubleWhole || beat.Duration == Duration.QuadrupleWhole)
                 {
                     return;
                 }
