@@ -21376,7 +21376,7 @@ alphaTab.model.JsonConverter.JsObjectToScore = function(jsObject,settings) {
 		}
 		if(note3.IsTieOrigin) {
 			var tieDestinationId = note3["TieDestinationId"];
-			note3.TieOrigin = allNotes[tieDestinationId];
+			note3.TieDestination = allNotes[tieDestinationId];
 		}
 	}
 	score2.Finish(settings);

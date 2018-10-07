@@ -414,7 +414,7 @@ namespace AlphaTab.Model
                 if (note.IsTieOrigin)
                 {
                     var tieDestinationId = note.Member<int>("TieDestinationId");
-                    note.TieOrigin = allNotes[tieDestinationId];
+                    note.TieDestination = allNotes[tieDestinationId];
                 }
             }
 
