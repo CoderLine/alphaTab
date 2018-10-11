@@ -1358,7 +1358,6 @@ namespace AlphaTab.Importer
 
             // read effects
             var note = new Note();
-            beat.AddNote(note);
             if (isFretted)
             {
                 note.String = _staff.Tuning.Length - (@string - 1);
@@ -1375,6 +1374,7 @@ namespace AlphaTab.Importer
                 note.Tone = tone;
                 note.IsTieDestination = isTie;
             }
+            beat.AddNote(note);
 
             NoteEffects(note);
 

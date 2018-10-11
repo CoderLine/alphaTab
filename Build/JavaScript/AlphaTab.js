@@ -13716,7 +13716,6 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 			this.NewSy();
 		}
 		var note = new alphaTab.model.Note();
-		beat.AddNote(note);
 		if(isFretted) {
 			note.String = this._staff.Tuning.length - (string - 1);
 			note.IsDead = isDead;
@@ -13729,6 +13728,7 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 			note.Tone = tone;
 			note.IsTieDestination = isTie;
 		}
+		beat.AddNote(note);
 		this.NoteEffects(note);
 	}
 	,NoteEffects: function(note) {
