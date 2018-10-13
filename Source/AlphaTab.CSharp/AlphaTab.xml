@@ -263,7 +263,7 @@
         <member name="M:AlphaTab.Audio.Synth.AlphaSynth.LoadSoundFont(System.Byte[])">
             <inheritdoc />
         </member>
-        <member name="M:AlphaTab.Audio.Synth.AlphaSynth.LoadMidi(AlphaTab.Audio.Synth.Midi.MidiFile)">
+        <member name="M:AlphaTab.Audio.Synth.AlphaSynth.LoadMidiFile(AlphaTab.Audio.Synth.Midi.MidiFile)">
             <summary>
             Loads the given midi file for playback. 
             </summary>
@@ -289,7 +289,7 @@
             Occurs when the playback of the whole midi file finished.
             </summary>
         </member>
-        <member name="E:AlphaTab.Audio.Synth.AlphaSynth.PlayerStateChanged">
+        <member name="E:AlphaTab.Audio.Synth.AlphaSynth.StateChanged">
             <summary>
             Occurs when the playback state changes. 
             </summary>
@@ -436,6 +436,11 @@
             Gets or sets whether the playback should automatically restart after it finished. 
             </summary>
         </member>
+        <member name="M:AlphaTab.Audio.Synth.IAlphaSynth.Destroy">
+            <summary>
+            Destroys the synthesizer and all related components
+            </summary>
+        </member>
         <member name="M:AlphaTab.Audio.Synth.IAlphaSynth.Play">
             <summary>
             Starts the playback if possible
@@ -461,6 +466,12 @@
             Loads a soundfont from the given data
              </summary>
              <param name="data">a byte array to load the data from </param>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.IAlphaSynth.LoadMidiFile(AlphaTab.Audio.Synth.Midi.MidiFile)">
+            <summary>
+            Loads the given midi file structure. 
+            </summary>
+            <param name="midi"></param>
         </member>
         <member name="M:AlphaTab.Audio.Synth.IAlphaSynth.SetChannelMute(System.Int32,System.Boolean)">
             <summary>
@@ -1747,6 +1758,46 @@
             position and area of each individual note is provided. 
             </summary>
         </member>
+        <member name="P:AlphaTab.Settings.UseWorkers">
+            <summary>
+            Gets or sets whether the rendering should be done in a worker if possible.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Settings.EnablePlayer">
+            <summary>
+            Gets or sets whether the player should be enabled.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Settings.EnableCursor">
+            <summary>
+            Gets or sets whether playback cursors should be displayed. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Settings.BeatCursorWidth">
+            <summary>
+            Gets or sets the width of the beat cursor in pixels. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Settings.ScrollOffsetX">
+            <summary>
+            Gets or sets the X-offset to add when scrolling. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Settings.ScrollOffsetY">
+            <summary>
+            Gets or sets the Y-offset to add when scrolling
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Settings.ScrollMode">
+            <summary>
+            Gets or sets the mode how to scroll. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Settings.ScrollSpeed">
+            <summary>
+            Gets or sets how fast the scrolling to the new position should happen (in milliseconds)
+            </summary>
+        </member>
         <member name="P:AlphaTab.Settings.SongBook">
             <summary>
             Gets the default settings for the songbook display mode. 
@@ -1755,6 +1806,18 @@
         <member name="P:AlphaTab.Settings.Defaults">
             <summary>
             Gets the default settings.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.CursorUpdateTick(System.Int32,System.Boolean)">
+            <summary>
+            updates the cursors to highlight the beat at the specified tick position
+            </summary>
+            <param name="tick"></param>
+            <param name="stop"></param>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.CursorUpdateBeat(AlphaTab.Model.Beat,AlphaTab.Model.Beat,System.Double,System.Boolean)">
+            <summary>
+            updates the cursors to highlight the specified beat
             </summary>
         </member>
         <member name="T:AlphaTab.AlphaTabException">
@@ -5141,6 +5204,26 @@
             <param name="value"></param>
             <returns></returns>
         </member>
+        <member name="T:AlphaTab.ScrollMode">
+            <summary>
+            Lists all modes how alphaTab can scroll the container during playback. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.ScrollMode.Off">
+            <summary>
+            Do not scroll automatically
+            </summary>
+        </member>
+        <member name="F:AlphaTab.ScrollMode.Continuous">
+            <summary>
+            Scrolling happens as soon the offsets of the cursors change. 
+            </summary>
+        </member>
+        <member name="F:AlphaTab.ScrollMode.OffScreen">
+            <summary>
+            Scrolling happens as soon the cursors exceed the displayed range. 
+            </summary>
+        </member>
         <member name="T:AlphaTab.DisplayMode">
             <summary>
             Lists all modes on how alphaTab can handle the display and playback of music notation. 
@@ -5328,6 +5411,36 @@
         <member name="T:AlphaTab.Xml.XmlParser.XmlState">
             <summary>
             faster than enum
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
             </summary>
         </member>
     </members>

@@ -26,6 +26,30 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab
 {
+    class RenderEngineFactory
+    {
+        public bool SupportsWorkers { get; }
+        public Func<ICanvas> CreateCanvas { get; }
+
+        public RenderEngineFactory(bool supportsWorkers, Func<ICanvas> canvas)
+        {
+            SupportsWorkers = supportsWorkers;
+            CreateCanvas = canvas;
+        }
+    }
+
+    class LayoutEngineFactory
+    {
+        public bool Vertical { get; }
+        public Func<ScoreRenderer, ScoreLayout> CreateLayout { get; }
+
+        public LayoutEngineFactory(bool vertical, Func<ScoreRenderer, ScoreLayout> layout)
+        {
+            Vertical = vertical;
+            CreateLayout = layout;
+        }
+    }
+
     /// <summary>
     /// This public class represents the global alphaTab environment where
     /// alphaTab looks for information like available layout engines
@@ -33,8 +57,8 @@ namespace AlphaTab
     /// </summary>
     partial class Environment
     {
-        public static FastDictionary<string, Func<ICanvas>> RenderEngines;
-        public static FastDictionary<string, Func<ScoreRenderer, ScoreLayout>> LayoutEngines;
+        public static FastDictionary<string, RenderEngineFactory> RenderEngines;
+        public static FastDictionary<string, LayoutEngineFactory> LayoutEngines;
         public static FastDictionary<string, BarRendererFactory[]> StaveProfiles;
         public const string StaveProfileScoreTab = "score-tab";
         public const string StaveProfileTab = "tab";
@@ -51,18 +75,42 @@ namespace AlphaTab
             return new ScoreRenderer(settings);
         }
 
+        public static RenderEngineFactory GetRenderEngineFactory(Settings settings)
+        {
+            if (settings.Engine == null || !Environment.RenderEngines.ContainsKey(settings.Engine))
+            {
+                return Environment.RenderEngines["default"];
+            }
+            else
+            {
+                return Environment.RenderEngines[settings.Engine];
+            }
+        }
+
+        public static LayoutEngineFactory GetLayoutEngineFactory(Settings settings)
+        {
+            if (settings.Layout.Mode == null || !Environment.RenderEngines.ContainsKey(settings.Layout.Mode))
+            {
+                return Environment.LayoutEngines["default"];
+            }
+            else
+            {
+                return Environment.LayoutEngines[settings.Layout.Mode];
+            }
+        }
+
         public static void Init()
         {
-            RenderEngines = new FastDictionary<string, Func<ICanvas>>();
-            LayoutEngines = new FastDictionary<string, Func<ScoreRenderer, ScoreLayout>>();
+            RenderEngines = new FastDictionary<string, RenderEngineFactory>();
+            LayoutEngines = new FastDictionary<string, LayoutEngineFactory>();
             StaveProfiles = new FastDictionary<string, BarRendererFactory[]>();
 
             PlatformInit();
 
             // default layout engines
-            LayoutEngines["default"] = r => new PageViewLayout(r);
-            LayoutEngines["page"] = r => new PageViewLayout(r);
-            LayoutEngines["horizontal"] = r => new HorizontalScreenLayout(r);
+            LayoutEngines["page"] = new LayoutEngineFactory(true, r => new PageViewLayout(r));
+            LayoutEngines["horizontal"] = new LayoutEngineFactory(false, r => new HorizontalScreenLayout(r));
+            LayoutEngines["default"] = LayoutEngines["page"];
 
             // default combinations of stave textprofiles
             StaveProfiles["default"] = StaveProfiles[StaveProfileScoreTab] = new BarRendererFactory[]

@@ -47,8 +47,6 @@ namespace AlphaTab.Samples.Wpf.ViewModel
         private IEnumerable<TrackViewModel> _trackInfos;
         private TrackViewModel _selectedTrackInfo;
         private readonly RelayCommand _showScoreInfoCommand;
-        private string[] _renderEngines;
-        private string _renderEngine;
 
         /// <summary>
         /// A command which raises the <see cref="ShowScoreInfo"/> method
@@ -56,22 +54,6 @@ namespace AlphaTab.Samples.Wpf.ViewModel
         public ICommand ShowScoreInfoCommand
         {
             get { return _showScoreInfoCommand; }
-        }
-
-        public string[] RenderEngines
-        {
-            get { return _renderEngines; }
-        }
-
-        public string RenderEngine
-        {
-            get { return _renderEngine; }
-            set
-            {
-                if (value == _renderEngine) return;
-                _renderEngine = value;
-                OnPropertyChanged();
-            }
         }
 
         /// <summary>
@@ -252,8 +234,6 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public MainViewModel(IDialogService dialogService, IErrorService errorService)
         {
-            _renderEngines = new[] { "gdi", "skia" };
-            _renderEngine = _renderEngines[0];
             _dialogService = dialogService;
             _errorService = errorService;
             OpenFileCommand = new RelayCommand(OpenFile);

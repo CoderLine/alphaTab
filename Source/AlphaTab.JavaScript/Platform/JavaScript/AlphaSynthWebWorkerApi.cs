@@ -210,6 +210,11 @@ namespace AlphaTab.Platform.JavaScript
             MetronomeVolume = 0;
         }
 
+        public void Destroy()
+        {
+            _synth.Terminate();
+        }
+
         //
         // API communicating with the web worker
 
@@ -259,16 +264,12 @@ namespace AlphaTab.Platform.JavaScript
             request.OnError = (Action<Event>)(e =>
             {
                 Logger.Error("AlphaSynth", "Loading failed: " + e.Member<string>("message"));
-                TriggerEvent("soundFontLoadFailed");
+                OnSoundFontLoadFailed(e.As<Exception>());
             });
             request.OnProgress = (Action<Event>)(e =>
             {
                 Logger.Debug("AlphaSynth", "Soundfont downloading: " + e.Member<int>("loaded") + "/" + e.Member<int>("total") + " bytes");
-                TriggerEvent("soundFontLoad", new object[] {new
-                {
-                    loaded = e.Member<int>("loaded"),
-                    total = e.Member<int>("total")
-                }});
+                OnSoundFontLoad(new ProgressEventArgs(e.Member<int>("loaded"), e.Member<int>("total")));
             });
             request.Send();
         }
@@ -327,34 +328,29 @@ namespace AlphaTab.Platform.JavaScript
                 case AlphaSynthWebWorker.CmdPositionChanged:
                     _timePosition = data.currentTime;
                     _tickPosition = data.currentTick;
-                    TriggerEvent("positionChanged", new[]
-                    {
-                        new PositionChangedEventArgs(data.currentTime, data.endTime, data.currentTick, data.endTick)
-                    });
+                    OnPositionChanged(new PositionChangedEventArgs(data.currentTime, data.endTime, data.currentTick,
+                        data.endTick));
                     break;
                 case AlphaSynthWebWorker.CmdPlayerStateChanged:
                     _state = data.state;
-                    TriggerEvent("playerStateChanged", new[]
-                    {
-                        new PlayerStateChangedEventArgs(data.state),
-                    });
+                    OnStateChanged(new PlayerStateChangedEventArgs(data.state));
                     break;
                 case AlphaSynthWebWorker.CmdFinished:
-                    TriggerEvent("finished");
+                    OnFinished(new PlaybackFinishedEventArgs(data.isLooping));
                     break;
                 case AlphaSynthWebWorker.CmdSoundFontLoaded:
-                    TriggerEvent("soundFontLoaded");
+                    OnSoundFontLoaded();
                     break;
                 case AlphaSynthWebWorker.CmdSoundFontLoadFailed:
-                    TriggerEvent("soundFontLoadFailed");
+                    OnSoundFontLoadFailed(data.error);
                     break;
                 case AlphaSynthWebWorker.CmdMidiLoaded:
                     CheckReadyForPlayback();
-                    TriggerEvent("midiFileLoaded", new object[] { data.error });
+                    OnMidiLoaded();
                     break;
                 case AlphaSynthWebWorker.CmdMidiLoadFailed:
                     CheckReadyForPlayback();
-                    TriggerEvent("midiFileLoadFailed", new object[] { data.error });
+                    OnMidiLoadFailed(data.error);
                     break;
                 case AlphaSynthWebWorker.CmdLog:
                     Logger.Log(data.level, "AlphaSynth", data.message);
@@ -383,7 +379,7 @@ namespace AlphaTab.Platform.JavaScript
         {
             if (IsReady)
             {
-                TriggerEvent("ready");
+                OnReady();
             }
         }
 
@@ -392,23 +388,135 @@ namespace AlphaTab.Platform.JavaScript
         {
             if (IsReadyForPlayback)
             {
-                TriggerEvent("readyForPlayback");
+                OnReadyForPlayback();
             }
         }
 
-        /// <summary>
-        /// Registers for the specified event.
-        /// </summary>
-        /// <param name="events">The event to register for</param>
-        /// <param name="action">The function to call on the event.</param>
-        public void On(string events, Delegate action)
+        #region Events
+
+        public event Action Ready;
+        protected virtual void OnReady()
         {
-            if (!_events.ContainsKey(events))
+            var handler = Ready;
+            if (handler != null)
             {
-                _events[events] = new FastList<Delegate>();
+                handler();
             }
-            _events[events].Add(action.As<Delegate>());
+
+            TriggerEvent("ready");
         }
+
+        public event Action ReadyForPlayback;
+        protected virtual void OnReadyForPlayback()
+        {
+            var handler = ReadyForPlayback;
+            if (handler != null)
+            {
+                handler();
+            }
+
+            TriggerEvent("ready");
+        }
+
+        public event Action<PlaybackFinishedEventArgs> Finished;
+        protected virtual void OnFinished(PlaybackFinishedEventArgs e)
+        {
+            var handler = Finished;
+            if (handler != null)
+            {
+                handler(e);
+            }
+            TriggerEvent("finished", new object[] { e });
+        }
+
+        public event Action SoundFontLoaded;
+        protected virtual void OnSoundFontLoaded()
+        {
+            var handler = SoundFontLoaded;
+            if (handler != null)
+            {
+                handler();
+            }
+            TriggerEvent("soundFontLoaded");
+        }
+
+        public event Action<ProgressEventArgs> SoundFontLoad;
+        protected virtual void OnSoundFontLoad(ProgressEventArgs e)
+        {
+            var handler = SoundFontLoad;
+            if (handler != null)
+            {
+                handler(e);
+            }
+            // multi-case only there for backwards compatibility
+            TriggerEvent("soundFontLoad", new object[] {new
+            {
+                Loaded = e.Member<int>("loaded"),
+                loaded = e.Member<int>("loaded"),
+                Total = e.Member<int>("total"),
+                total = e.Member<int>("total")
+            }});
+        }
+
+        public event Action<Exception> SoundFontLoadFailed;
+        protected virtual void OnSoundFontLoadFailed(Exception e)
+        {
+            var handler = SoundFontLoadFailed;
+            if (handler != null)
+            {
+                handler(e);
+            }
+            TriggerEvent("soundFontLoadFailed", new object[] { e });
+        }
+
+
+        public event Action MidiLoaded;
+        protected virtual void OnMidiLoaded()
+        {
+            var handler = MidiLoaded;
+            if (handler != null)
+            {
+                handler();
+            }
+            TriggerEvent("midiFileLoaded");
+        }
+
+        public event Action<Exception> MidiLoadFailed;
+        protected virtual void OnMidiLoadFailed(Exception e)
+        {
+            var handler = MidiLoadFailed;
+            if (handler != null)
+            {
+                handler(e);
+            }
+            TriggerEvent("midiFileLoadFailed", new object[]{ e });
+        }
+
+        public event Action<PlayerStateChangedEventArgs> StateChanged;
+        protected virtual void OnStateChanged(PlayerStateChangedEventArgs e)
+        {
+            var handler = StateChanged;
+            if (handler != null)
+            {
+                handler(e);
+            }
+
+            TriggerEvent("playerStateChanged", new object[] { e });
+        }
+
+
+        public event Action<PositionChangedEventArgs> PositionChanged;
+        protected virtual void OnPositionChanged(PositionChangedEventArgs e)
+        {
+            var handler = PositionChanged;
+            if (handler != null)
+            {
+                handler(e);
+            }
+
+            TriggerEvent("positionChanged", new object[] { e });
+        }
+        #endregion
 
         private void TriggerEvent(string name, object[] args = null)
         {

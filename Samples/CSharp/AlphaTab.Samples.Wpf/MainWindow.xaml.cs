@@ -39,5 +39,10 @@ namespace AlphaTab.Samples.Wpf
             MainViewModel viewModel = new MainViewModel(new DialogService(), new ErrorService());
             DataContext = viewModel;
         }
+
+        private void OnPlayPauseClick(object sender, RoutedEventArgs e)
+        {
+            TablatureControl.Api.PlayPause();
+        }
     }
 }

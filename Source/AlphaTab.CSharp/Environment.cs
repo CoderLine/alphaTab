@@ -26,12 +26,13 @@ namespace AlphaTab
     {
         static void PlatformInit()
         {
-            RenderEngines["default"] = () => new SkiaCanvas();
-            RenderEngines["svg"] = () => new CssFontSvgCanvas();
+            RenderEngines["svg"] = new RenderEngineFactory(true, () => new CssFontSvgCanvas());
 #if NET471
-            RenderEngines["gdi"] = () => new GdiCanvas();
+            RenderEngines["gdi"] = new RenderEngineFactory(true, () => new GdiCanvas());
 #endif
-            RenderEngines["skia"] = () => new SkiaCanvas();
+            RenderEngines["skia"] = new RenderEngineFactory(true, () => new SkiaCanvas());
+            RenderEngines["default"] = RenderEngines["skia"];
+
         }
     }
 }

@@ -52,8 +52,8 @@ namespace AlphaTab.Samples.WinForms
             this.alphaTabControl1 = new AlphaTab.Platform.CSharp.WinForms.AlphaTabControl();
             this.mainToolBar = new System.Windows.Forms.ToolStrip();
             this.openFileButton = new System.Windows.Forms.ToolStripButton();
+            this.playPauseButton = new System.Windows.Forms.ToolStripButton();
             this.showScoreInfo = new System.Windows.Forms.ToolStripButton();
-            this.cmbRenderEngine = new System.Windows.Forms.ToolStripComboBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.panel2 = new System.Windows.Forms.Panel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
@@ -115,7 +115,7 @@ namespace AlphaTab.Samples.WinForms
             this.mainToolBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openFileButton,
             this.showScoreInfo,
-            this.cmbRenderEngine});
+            this.playPauseButton});
             this.mainToolBar.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
             this.mainToolBar.Location = new System.Drawing.Point(3, 0);
             this.mainToolBar.Name = "mainToolBar";
@@ -134,6 +134,15 @@ namespace AlphaTab.Samples.WinForms
             this.openFileButton.Text = "Open File";
             this.openFileButton.Click += new System.EventHandler(this.openFileButton_Click);
             // 
+            // playPauseButton
+            // 
+            this.playPauseButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.playPauseButton.Image = global::AlphaTab.Samples.WinForms.Properties.Resources.control_play;
+            this.playPauseButton.Name = "playPauseButton";
+            this.playPauseButton.Size = new System.Drawing.Size(28, 28);
+            this.playPauseButton.Text = "Play/Pause";
+            this.playPauseButton.Click += new System.EventHandler(this.playPauseButton_Click);
+            // 
             // showScoreInfo
             // 
             this.showScoreInfo.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -144,16 +153,6 @@ namespace AlphaTab.Samples.WinForms
             this.showScoreInfo.Size = new System.Drawing.Size(28, 28);
             this.showScoreInfo.Text = "Show Score Info";
             this.showScoreInfo.Click += new System.EventHandler(this.showScoreInfo_Click);
-            // 
-            // cmbRenderEngine
-            // 
-            this.cmbRenderEngine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbRenderEngine.Items.AddRange(new object[] {
-            "gdi",
-            "skia"});
-            this.cmbRenderEngine.Name = "cmbRenderEngine";
-            this.cmbRenderEngine.Size = new System.Drawing.Size(121, 23);
-            this.cmbRenderEngine.SelectedIndexChanged += new System.EventHandler(this.cmbRenderEngine_SelectedIndexChanged);
             // 
             // splitContainer1
             // 
@@ -291,7 +290,7 @@ namespace AlphaTab.Samples.WinForms
         private TrackHeaderControl trackHeaderControl1;
         private System.Windows.Forms.Panel trackBars;
         private System.Windows.Forms.ToolStripButton openFileButton;
-        private System.Windows.Forms.ToolStripComboBox cmbRenderEngine;
+        private System.Windows.Forms.ToolStripButton playPauseButton;
         private AlphaTabControl alphaTabControl1;
     }
 }

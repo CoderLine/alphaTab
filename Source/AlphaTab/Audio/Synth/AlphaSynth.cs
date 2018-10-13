@@ -128,6 +128,12 @@ namespace AlphaTab.Audio.Synth
             set => _sequencer.IsLooping = value;
         }
 
+        public void Destroy()
+        {
+            Logger.Debug("AlphaSynth", "Destroying player");
+            Stop();
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AlphaSynth"/> class.
         /// </summary>
@@ -142,6 +148,7 @@ namespace AlphaTab.Audio.Synth
             Output.Ready += () =>
             {
                 IsReady = true;
+                OnReady();
                 CheckReadyForPlayback();
             };
             Output.Finished += () =>
@@ -149,7 +156,7 @@ namespace AlphaTab.Audio.Synth
                 // stop everything
                 Stop();
                 Logger.Debug("AlphaSynth", "Finished playback");
-                OnFinished(_sequencer.IsLooping);
+                OnFinished(new PlaybackFinishedEventArgs(_sequencer.IsLooping));
                 if (_sequencer.IsLooping)
                 {
                     Play();
@@ -185,7 +192,7 @@ namespace AlphaTab.Audio.Synth
 
             Logger.Debug("AlphaSynth", "Starting playback");
             State = PlayerState.Playing;
-            OnPlayerStateChanged(new PlayerStateChangedEventArgs(State));
+            OnStateChanged(new PlayerStateChangedEventArgs(State));
             Output.Play();
         }
 
@@ -196,8 +203,7 @@ namespace AlphaTab.Audio.Synth
 
             Logger.Debug("AlphaSynth", "Pausing playback");
             State = PlayerState.Paused;
-            OnPlayerStateChanged(new PlayerStateChangedEventArgs(State));
-
+            OnStateChanged(new PlayerStateChangedEventArgs(State));
             Output.Pause();
             _synthesizer.NoteOffAll(false);
         }
@@ -265,7 +271,7 @@ namespace AlphaTab.Audio.Synth
         /// </summary>
         /// <param name="midiFile">The midi file to load</param>
         // ReSharper disable once UnusedMember.Global
-        public void LoadMidi(MidiFile midiFile)
+        public void LoadMidiFile(MidiFile midiFile)
         {
             Stop();
 
@@ -342,24 +348,30 @@ namespace AlphaTab.Audio.Synth
 
         #region Events
 
+        public event Action Ready;
+        protected virtual void OnReady()
+        {
+            var handler = Ready;
+            if (handler != null) handler();
+        }
 
         /// <summary>
         /// Occurs when the playback of the whole midi file finished.
         /// </summary>
-        public event Action<bool> Finished;
-        private void OnFinished(bool isLooping)
+        public event Action<PlaybackFinishedEventArgs> Finished;
+        private void OnFinished(PlaybackFinishedEventArgs e)
         {
             var handler = Finished;
-            if (handler != null) handler(isLooping);
+            if (handler != null) handler(e);
         }
 
         /// <summary>
         /// Occurs when the playback state changes. 
         /// </summary>
-        public event Action<PlayerStateChangedEventArgs> PlayerStateChanged;
-        private void OnPlayerStateChanged(PlayerStateChangedEventArgs e)
+        public event Action<PlayerStateChangedEventArgs> StateChanged;
+        private void OnStateChanged(PlayerStateChangedEventArgs e)
         {
-            var handler = PlayerStateChanged;
+            var handler = StateChanged;
             if (handler != null) handler(e);
         }
 
@@ -428,6 +440,29 @@ namespace AlphaTab.Audio.Synth
     }
 
     #region EventArgs
+
+    public class ProgressEventArgs
+    {
+        public int Loaded { get; }
+        public int Total { get; }
+
+        public ProgressEventArgs(int loaded, int total)
+        {
+            Loaded = loaded;
+            Total = total;
+        }
+    }
+
+
+    public class PlaybackFinishedEventArgs
+    {
+        public bool IsLooping { get; }
+
+        public PlaybackFinishedEventArgs(bool isLooping)
+        {
+            IsLooping = isLooping;
+        }
+    }
 
     /// <summary>
     /// Represents the info when the player state changes. 

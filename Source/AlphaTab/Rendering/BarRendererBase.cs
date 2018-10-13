@@ -539,7 +539,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// Lists the different position modes for <see cref="BarRendererBase.GetBeatX"/>
     /// </summary>
-    public enum BeatXPosition
+    enum BeatXPosition
     {
         /// <summary>
         /// Gets the pre-notes position which is located before the accidentals

@@ -37,52 +37,12 @@ namespace AlphaTab
             get; set;
         }
 
-        public bool DisableLazyLoading
-        {
-            get; set;
-        }
-
-        public bool UseWebWorker
-        {
-            get; set;
-        }
-
-        public bool EnablePlayer
-        {
-            get; set;
-        }
+        /// <summary>
+        /// Gets or sets whether lazy loading for displayed elements is enabled. 
+        /// </summary>
+        public bool DisableLazyLoading { get; set; }
 
         public string SoundFontFile
-        {
-            get; set;
-        }
-
-        public bool EnableCursor
-        {
-            get; set;
-        }
-
-        public int ScrollOffsetX
-        {
-            get; set;
-        }
-
-        public int ScrollOffsetY
-        {
-            get; set;
-        }
-
-        public bool EnableSeekByClick
-        {
-            get; set;
-        }
-
-        public string ScrollMode
-        {
-            get; set;
-        }
-
-        public int ScrollSpeed
         {
             get; set;
         }
@@ -92,19 +52,9 @@ namespace AlphaTab
             get; set;
         }
 
-
-        public int BeatCursorWidth
-        {
-            get; set;
-        }
-
         private static void SetDefaults(Settings settings)
         {
-            settings.UseWebWorker = true;
-            settings.ScrollMode = "vertical";
-            settings.ScrollSpeed = 300;
             settings.ScrollElement = "html,body";
-            settings.BeatCursorWidth = 3;
         }
 
         public static void FillPlayerOptions(Settings settings, dynamic json, bool setDefaults, FastDictionary<string, object> dataAttributes = null)
@@ -134,22 +84,13 @@ namespace AlphaTab
                 }
             }
 
-            if (Platform.Platform.JsonExists(json, "handleClick"))
-            {
-                settings.EnableSeekByClick = json.handleClick;
-            }
-            else if(setDefaults)
-            {
-                settings.EnableSeekByClick = true;
-            }
-
             if (Platform.Platform.JsonExists(json, "autoScroll"))
             {
-                settings.ScrollMode = json.autoScroll;
+                settings.ScrollMode = DecodeScrollMode(json.autoScroll);
             }
-            else if(setDefaults)
+            else if (dataAttributes != null && dataAttributes.ContainsKey("autoScroll"))
             {
-                settings.ScrollMode = "vertical";
+                settings.ScrollMode = DecodeScrollMode(dataAttributes["autoScroll"]);
             }
 
             if (Platform.Platform.JsonExists(json, "scrollSpeed"))
@@ -184,7 +125,7 @@ namespace AlphaTab
         {
             dynamic json = Platform.Platform.NewObject();
 
-            json.useWorker = UseWebWorker;
+            json.useWorker = UseWorkers;
             json.scale = Scale;
             json.slurHeight = SlurHeightFactor;
             json.width = Width;
@@ -308,11 +249,11 @@ namespace AlphaTab
 
             if (Platform.Platform.JsonExists(json, "useWorker"))
             {
-                settings.UseWebWorker = json.useWorker;
+                settings.UseWorkers = json.useWorker;
             }
             else if (dataAttributes != null && dataAttributes.ContainsKey("useWorker"))
             {
-                settings.UseWebWorker = dataAttributes["useWorker"].IsTruthy();
+                settings.UseWorkers = dataAttributes["useWorker"].IsTruthy();
             }
 
             // Display settings
@@ -854,5 +795,48 @@ namespace AlphaTab
 
             return relativeUrl;
         }
+
+        public static string EncodeScrollMode(ScrollMode mode)
+        {
+            // TOOD: check why tostring is not working
+            switch (mode)
+            {
+                case ScrollMode.Off:
+                    return "off";
+                case ScrollMode.OffScreen:
+                    return "offScreen";
+                default:
+                case ScrollMode.Continuous:
+                    return "continuous";
+            }
+        }
+
+        public static ScrollMode DecodeScrollMode(object mode)
+        {
+            if (Platform.Platform.TypeOf(mode) == "number")
+            {
+                return (ScrollMode)mode;
+            }
+
+            if (Platform.Platform.TypeOf(mode) == "string")
+            {
+                var s = (string)mode;
+                switch (s.ToLower())
+                {
+                    case "off":
+                        return ScrollMode.Off;
+                    case "vertical":
+                    case "horizontal-bar":
+                    case "continuous":
+                        return ScrollMode.Continuous;
+                    case "horizontal-offscreen":
+                    case "offscreen":
+                        return ScrollMode.OffScreen;
+                }
+            }
+
+            return ScrollMode.Continuous;
+        }
+
     }
 }

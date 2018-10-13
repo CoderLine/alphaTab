@@ -115,7 +115,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             Renderer.RegisterOverflowTop(topOffset + bottomOffset);
 
-            var currentOffset = Renderer.Staff.GetSharedLayoutData(TopOffsetSharedDataKey, -1);
+            var currentOffset = Renderer.Staff.GetSharedLayoutData(TopOffsetSharedDataKey, -1f);
             if (topOffset > currentOffset)
             {
                 Renderer.Staff.SetSharedLayoutData(TopOffsetSharedDataKey, topOffset);
@@ -190,7 +190,7 @@ namespace AlphaTab.Rendering.Glyphs
                 var dx = (endX - startX) / BendPoint.MaxPosition;
                 canvas.BeginPath();
 
-                var zeroY = cy + Renderer.Staff.GetSharedLayoutData(TopOffsetSharedDataKey, 0);
+                var zeroY = cy + Renderer.Staff.GetSharedLayoutData(TopOffsetSharedDataKey, 0f);
 
                 var slurText = _beat.WhammyStyle == BendStyle.Gradual ? "grad." : "";
 

@@ -23,6 +23,25 @@ using AlphaTab.Util;
 namespace AlphaTab
 {
     /// <summary>
+    /// Lists all modes how alphaTab can scroll the container during playback. 
+    /// </summary>
+    public enum ScrollMode
+    {
+        /// <summary>
+        /// Do not scroll automatically
+        /// </summary>
+        Off,
+        /// <summary>
+        /// Scrolling happens as soon the offsets of the cursors change. 
+        /// </summary>
+        Continuous,
+        /// <summary>
+        /// Scrolling happens as soon the cursors exceed the displayed range. 
+        /// </summary>
+        OffScreen
+    }
+
+    /// <summary>
     /// Lists all modes on how alphaTab can handle the display and playback of music notation. 
     /// </summary>
     public enum DisplayMode
@@ -216,6 +235,58 @@ namespace AlphaTab
         public bool IncludeNoteBounds { get; set; }
 
         /// <summary>
+        /// Gets or sets whether the rendering should be done in a worker if possible.
+        /// </summary>
+        public bool UseWorkers { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the player should be enabled.
+        /// </summary>
+        public bool EnablePlayer { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether playback cursors should be displayed. 
+        /// </summary>
+        public bool EnableCursor { get; set; }
+
+        /// <summary>
+        /// Gets or sets the width of the beat cursor in pixels. 
+        /// </summary>
+        public int BeatCursorWidth { get; set; }
+
+        /// <summary>
+        /// Gets or sets the X-offset to add when scrolling. 
+        /// </summary>
+        public int ScrollOffsetX
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// Gets or sets the Y-offset to add when scrolling
+        /// </summary>
+        public int ScrollOffsetY
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// Gets or sets the mode how to scroll. 
+        /// </summary>
+        public ScrollMode ScrollMode
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// Gets or sets how fast the scrolling to the new position should happen (in milliseconds)
+        /// </summary>
+        public int ScrollSpeed
+        {
+            get; set;
+        }
+
+        /// <summary>
         /// Gets the default settings for the songbook display mode. 
         /// </summary>
         public static Settings SongBook
@@ -285,6 +356,12 @@ namespace AlphaTab
                 settings.SongBookBendDuration = 75;
                 settings.SongBookDipDuration = 150;
                 settings.IncludeNoteBounds = false;
+
+                settings.UseWorkers = true;
+                settings.BeatCursorWidth = 3;
+                settings.ScrollMode = ScrollMode.Continuous;
+                settings.ScrollSpeed = 300;
+
 
                 SetDefaults(settings);
 

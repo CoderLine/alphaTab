@@ -77,7 +77,7 @@ namespace AlphaTab.Test.Audio
             var testOutput = new TestOutput();
             var synth = new AlphaSynth(testOutput);
             synth.LoadSoundFont(TestPlatform.LoadFile("TestFiles/Audio/default.sf2"));
-            synth.LoadMidi(midi);
+            synth.LoadMidiFile(midi);
 
             synth.Play();
 

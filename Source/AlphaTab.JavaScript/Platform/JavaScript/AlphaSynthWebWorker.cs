@@ -69,7 +69,7 @@ namespace AlphaTab.Platform.JavaScript
 
             _player = new Audio.Synth.AlphaSynth(new AlphaSynthWorkerSynthOutput());
             _player.PositionChanged += OnPositionChanged;
-            _player.PlayerStateChanged += OnPlayerStateChanged;
+            _player.StateChanged += OnPlayerStateChanged;
             _player.Finished += OnFinished;
             _player.SoundFontLoaded += OnSoundFontLoaded;
             _player.SoundFontLoadFailed += OnSoundFontLoadFailed;
@@ -145,7 +145,7 @@ namespace AlphaTab.Platform.JavaScript
                     _player.LoadSoundFont(data.data);
                     break;
                 case CmdLoadMidi:
-                    _player.LoadMidi(JsonConverter.JsObjectToMidiFile(data.midi));
+                    _player.LoadMidiFile(JsonConverter.JsObjectToMidiFile(data.midi));
                     break;
                 case CmdSetChannelMute:
                     _player.SetChannelMute(data.channel, data.mute);
@@ -187,12 +187,12 @@ namespace AlphaTab.Platform.JavaScript
             });
         }
 
-        public void OnFinished(bool isLooping)
+        public void OnFinished(PlaybackFinishedEventArgs e)
         {
             _main.PostMessage(new
             {
                 cmd = CmdFinished,
-                isLooping = isLooping
+                isLooping = e.IsLooping
             });
         }
 

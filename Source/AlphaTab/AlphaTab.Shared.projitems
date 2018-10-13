@@ -9,6 +9,7 @@
     <Import_RootNamespace>AlphaTab</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AlphaTabApi.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AlphaTabException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\GeneralMidi.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Generator\AlphaSynthMidiFileHandler.cs" />
@@ -315,6 +316,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\TupletHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\IOHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\Container.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\Cursors.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\IContainer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\IMouseEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\IUiFacade.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Util\Lazy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Util\Logger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlDocument.cs" />

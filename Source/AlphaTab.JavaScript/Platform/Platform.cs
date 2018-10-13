@@ -372,6 +372,17 @@ namespace AlphaTab.Platform
             return Script.Write<string>("Type.getClassName(Type.getClass(obj))");
         }
 
+        public static Action Throttle(Action action, int delay)
+        {
+            var timeoutId = 0;
+            return () =>
+            {
+                Browser.Window.ClearTimeout(timeoutId);
+                timeoutId = Browser.Window.SetTimeout(action, delay);
+            };
+        }
+
+        [Inline]
         public static long GetCurrentMilliseconds()
         {
             return Script.Write<long>("untyped __js__(\"Date.now()\")");

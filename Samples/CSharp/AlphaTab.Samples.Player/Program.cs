@@ -75,7 +75,7 @@ namespace AlphaTab.Samples.PngDump
                 Console.WriteLine("Ready for playback");
             };
             player.LoadSoundFont(File.ReadAllBytes(args[1]));
-            player.LoadMidi(midiFile);
+            player.LoadMidiFile(midiFile);
 
             Console.WriteLine("Start playing");
             player.Play();

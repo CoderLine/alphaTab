@@ -33,6 +33,8 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Xaml" />
+    <PackageReference Include="NAudio" Version="1.8.4" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'MonoAndroid60'">
@@ -40,9 +42,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Platform\CSharp\Wpf\Templates.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </None>
+    <EmbeddedResource Include="..\..\Build\JavaScript\default.sf2" Link="Platform\CSharp\default.sf2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Platform\CSharp\Wpf\Templates.xaml" />
   </ItemGroup>
 
   <Import Project="..\AlphaTab\AlphaTab.Shared.projitems" Label="Shared" />

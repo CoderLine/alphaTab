@@ -19,8 +19,10 @@
 using System;
 using System.IO;
 using System.Windows.Forms;
+using AlphaTab.Audio.Synth;
 using AlphaTab.Importer;
 using AlphaTab.Model;
+using AlphaTab.Samples.WinForms.Properties;
 using Track = AlphaTab.Model.Track;
 
 namespace AlphaTab.Samples.WinForms
@@ -33,7 +35,22 @@ namespace AlphaTab.Samples.WinForms
         public MainWindow()
         {
             InitializeComponent();
-            cmbRenderEngine.SelectedIndex = 0;
+            alphaTabControl1.Api.Player.StateChanged += OnPlayerStateChanged;
+        }
+
+        private void OnPlayerStateChanged(PlayerStateChangedEventArgs e)
+        {
+            switch (e.State)
+            {
+                case PlayerState.Paused:
+                    playPauseButton.Image = Resources.control_play;
+                    break;
+                case PlayerState.Playing:
+                    playPauseButton.Image = Resources.control_pause;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private void openFileButton_Click(object sender, EventArgs e)
@@ -87,7 +104,7 @@ namespace AlphaTab.Samples.WinForms
         {
             using (OpenFileDialog dialog = new OpenFileDialog())
             {
-                dialog.Filter = "Supported Files (*.gp3, *.gp4, *.gp5, *.gpx)|*.gp3;*.gp4;*.gp5;*.gpx";
+                dialog.Filter = "Supported Files (*.gp3, *.gp4, *.gp5, *.gpx, *.gp)|*.gp3;*.gp4;*.gp5;*.gpx;*.gp";
                 if (dialog.ShowDialog(this) == DialogResult.OK)
                 {
                     OpenFile(dialog.FileName);
@@ -160,9 +177,9 @@ namespace AlphaTab.Samples.WinForms
             }
         }
 
-        private void cmbRenderEngine_SelectedIndexChanged(object sender, EventArgs e)
+        private void playPauseButton_Click(object sender, EventArgs e)
         {
-            alphaTabControl1.RenderEngine = cmbRenderEngine.SelectedItem.ToString();
+            alphaTabControl1.Api.PlayPause();
         }
     }
 }

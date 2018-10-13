@@ -69,14 +69,7 @@ namespace AlphaTab.Rendering
         {
             if (_currentRenderEngine != Settings.Engine)
             {
-                if (Settings.Engine == null || !Environment.RenderEngines.ContainsKey(Settings.Engine))
-                {
-                    Canvas = Environment.RenderEngines["default"]();
-                }
-                else
-                {
-                    Canvas = Environment.RenderEngines[Settings.Engine]();
-                }
+                Canvas = Environment.GetRenderEngineFactory(Settings).CreateCanvas();
                 _currentRenderEngine = Settings.Engine;
                 return true;
             }
@@ -87,14 +80,7 @@ namespace AlphaTab.Rendering
         {
             if (_currentLayoutMode != Settings.Layout.Mode)
             {
-                if (Settings.Layout == null || !Environment.LayoutEngines.ContainsKey(Settings.Layout.Mode))
-                {
-                    Layout = Environment.LayoutEngines["default"](this);
-                }
-                else
-                {
-                    Layout = Environment.LayoutEngines[Settings.Layout.Mode](this);
-                }
+                Layout = Environment.GetLayoutEngineFactory(Settings).CreateLayout(this);
                 _currentLayoutMode = Settings.Layout.Mode;
                 return true;
             }
@@ -158,7 +144,7 @@ namespace AlphaTab.Rendering
             }
 
             BoundsLookup = new BoundsLookup();
-            if (Tracks.Length == 0) return;
+            if (Tracks == null || Tracks.Length == 0) return;
 
             RecreateCanvas();
             if (RenderingResources.Scale != Settings.Scale)
@@ -216,19 +202,11 @@ namespace AlphaTab.Rendering
             OnPostRender();
         }
 
-        public event Action<RenderFinishedEventArgs> PreRender;
+        public event Action PreRender;
         protected virtual void OnPreRender()
         {
-            var result = Canvas.OnPreRender();
             var handler = PreRender;
-            var args = new RenderFinishedEventArgs();
-            args.TotalWidth = 0;
-            args.TotalHeight = 0;
-            args.Width = 0;
-            args.Height = 0;
-            args.RenderResult = result;
-
-            if (handler != null) handler(args);
+            if (handler != null) handler();
         }
 
         public event Action<RenderFinishedEventArgs> PartialRenderFinished;

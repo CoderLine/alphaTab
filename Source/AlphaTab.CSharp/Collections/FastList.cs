@@ -146,5 +146,10 @@ namespace AlphaTab.Collections
         {
             _list.Insert(insertPos, item);
         }
+
+        public void Clear()
+        {
+            _list.Clear();
+        }
     }
 }

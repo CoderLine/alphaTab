@@ -4,7 +4,13 @@
         xmlns:wpf="clr-namespace:AlphaTab.Platform.CSharp.Wpf;assembly=AlphaTab"
         xmlns:controls="clr-namespace:AlphaTab.Samples.Wpf.Controls"
         xmlns:converter="clr-namespace:AlphaTab.Samples.Wpf.Converter"
+        xmlns:viewModel="clr-namespace:AlphaTab.Samples.Wpf.ViewModel"
         Title="AlphaTab" Height="800" Width="600" WindowState="Maximized">
+    <Window.Resources>
+        <converter:PlayerStateToImageSourceConverter x:Key="PlayerStateToImageConverter" 
+                                       PlayImage="Images\32\control_play.png"
+                                        PauseImage="Images\32\control_pause.png"/>
+    </Window.Resources>
     <Grid Background="#4b4c4c">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -21,28 +27,20 @@
                 <Button Command="{Binding ShowScoreInfoCommand}" ToolTip="Show Score Info" Style="{StaticResource ToolbarButtonStyle}">
                     <Image Source="Images\32\information.png" Width="24" Height="24" />
                 </Button>
-                <ComboBox ItemsSource="{Binding RenderEngines}" SelectedItem="{Binding RenderEngine}"></ComboBox>
+                <Button Click="OnPlayPauseClick" ToolTip="Play/Pause" Style="{StaticResource ToolbarButtonStyle}">
+                    <Image Source="{Binding ElementName=TablatureControl, Path=Api.Player.State, Converter={StaticResource PlayerStateToImageConverter}}" Width="24" Height="24" />
+                </Button>
             </controls:ToolBarCustom>
         </ToolBarTray>
 
-        <!-- A scroll viewer to enable the tablature scrolling -->
-        <Grid Grid.Column="0" Grid.Row="1" >
-            <!-- A Fancy Drop Shadow Effect --><!--
-            <Border VerticalAlignment="Top"  Background="Black" Name="TablatureShadow">
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="10" ShadowDepth="0" ></DropShadowEffect>
-                </Border.Effect>
-            </Border>-->
-
-            <!-- The Actual AlphaTab control with a binding to a track -->
-            <wpf:AlphaTab Name="TablatureControl" Tracks="{Binding CurrentTracks}"
-                          HorizontalAlignment="Stretch"
-                          Padding="10"
-                          Background="#616362"
-                          Foreground="#F5F5F5"
-                          RenderEngine="{Binding RenderEngine}">
-            </wpf:AlphaTab>
-        </Grid>
+        <!-- The Actual AlphaTab control with a binding to a track -->
+        <wpf:AlphaTab Name="TablatureControl" Tracks="{Binding CurrentTracks}"
+                      Grid.Column="0" Grid.Row="1"
+                      HorizontalAlignment="Stretch"
+                      Padding="10"
+                      Background="#616362"
+                      Foreground="#F5F5F5">
+        </wpf:AlphaTab>
 
         <GridSplitter Grid.Row="2" Grid.Column="0" Height="4" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" />
 
@@ -108,7 +106,7 @@
                         <GridView>
                             <GridViewColumn Header="Name" Width="200">
                                 <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate DataType="viewModel:TrackViewModel">
                                         <StackPanel Orientation="Horizontal">
                                             <Image Source="{Binding TrackType}"></Image>
                                             <TextBlock VerticalAlignment="Center" Text="{Binding Name}" />
@@ -118,7 +116,7 @@
                             </GridViewColumn>
                             <GridViewColumn Header="Vol." Width="150">
                                 <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate DataType="viewModel:TrackViewModel">
                                         <Grid>
                                             <Slider Maximum="15" Value="{Binding Volume}" IsEnabled="False" />
                                         </Grid>
@@ -127,14 +125,14 @@
                             </GridViewColumn>
                             <GridViewColumn Header="S" Width="30">
                                 <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate DataType="viewModel:TrackViewModel">
                                         <CheckBox HorizontalAlignment="Center" HorizontalContentAlignment="Center" IsChecked="{Binding IsSolo}" IsEnabled="False" />
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
                             <GridViewColumn Header="M" Width="25">
                                 <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate DataType="viewModel:TrackViewModel">
                                         <CheckBox HorizontalAlignment="Center" HorizontalContentAlignment="Center" IsChecked="{Binding IsMute}" IsEnabled="False" />
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
@@ -146,7 +144,7 @@
                 <!-- a list of horizontal squares for each track -->
                 <ItemsControl Grid.Column="1" ItemsSource="{Binding TrackInfos}" Margin="0,26,0,0" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Hidden">
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate DataType="viewModel:TrackViewModel">
                             <ItemsControl ItemsSource="{Binding UsedBars}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>

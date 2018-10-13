@@ -18,18 +18,13 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Drawing;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using AlphaTab.Audio.Synth;
+using AlphaTab.Collections;
 using AlphaTab.Model;
-using AlphaTab.Rendering;
-using AlphaTab.Util;
 
 namespace AlphaTab.Platform.CSharp.Wpf
 {
@@ -40,13 +35,9 @@ namespace AlphaTab.Platform.CSharp.Wpf
             DefaultStyleKeyProperty.OverrideMetadata(typeof(AlphaTab), new FrameworkPropertyMetadata(typeof(AlphaTab)));
         }
 
-        private bool _initialRenderCompleted;
-        private bool _redrawPending;
-        private int _isRendering; // interlocked bool
         private ScrollViewer _scrollView;
-        private readonly ObservableCollection<ImageSource> _images;
 
-#region Track
+        #region Tracks
 
         public static readonly DependencyProperty TracksProperty = DependencyProperty.Register("Tracks", typeof(IEnumerable<Track>), typeof(AlphaTab), new PropertyMetadata(default(IEnumerable<Track>), OnTracksChanged));
 
@@ -64,7 +55,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
                 ((AlphaTab)d).RegisterObservableCollection(observable);
             }
 
-            ((AlphaTab)d).InvalidateTracks(true);
+            ((AlphaTab)d).InvalidateTracks();
         }
 
         private void RegisterObservableCollection(INotifyCollectionChanged collection)
@@ -79,7 +70,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         private void OnTracksChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            InvalidateTracks(true);
+            InvalidateTracks();
         }
 
         public IEnumerable<Track> Tracks
@@ -88,336 +79,117 @@ namespace AlphaTab.Platform.CSharp.Wpf
             set { SetValue(TracksProperty, value); }
         }
 
-#endregion
+        #endregion
 
-#region Scale
+        #region Settings
 
-        public static readonly DependencyProperty ScaleProperty = DependencyProperty.Register("Scale", typeof(float), typeof(AlphaTab), new PropertyMetadata(1f, OnScaleChanged));
-        private static void OnScaleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        public static readonly DependencyProperty SettingsProperty = DependencyProperty.Register(
+            "Settings", typeof(Settings), typeof(AlphaTab), new PropertyMetadata(Settings.Defaults, OnSettingsChanged));
+
+        private static void OnSettingsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ((AlphaTab)d).InvalidateTracks(true);
+            ((AlphaTab)d).SettingsChanged?.Invoke((Settings)e.NewValue);
         }
 
-        public float Scale
+        public Settings Settings
         {
-            get { return (float)GetValue(ScaleProperty); }
-            set { SetValue(ScaleProperty, value); }
+            get { return (Settings)GetValue(SettingsProperty); }
+            set { SetValue(SettingsProperty, value); }
         }
 
-#endregion
+        #endregion
 
-#region ScoreWidth
+        #region BarCursorFill
 
-        public static readonly DependencyProperty ScoreWidthProperty = DependencyProperty.Register("ScoreWidth", typeof(int), typeof(AlphaTab), new PropertyMetadata(-1, OnScoreWidthChanged));
+        public static readonly DependencyProperty BarCursorFillProperty = DependencyProperty.Register(
+            "BarCursorFill", typeof(Brush), typeof(AlphaTab), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(64, 255, 242, 0))));
 
-        private static void OnScoreWidthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        public Brush BarCursorFill
         {
-            ((AlphaTab)d).InvalidateTracks(true);
-        }
-
-        public int ScoreWidth
-        {
-            get { return (int)GetValue(ScoreWidthProperty); }
-            set { SetValue(ScoreWidthProperty, value); }
-        }
-
-#endregion
-
-#region ScoreAutoSize
-
-        public bool ScoreAutoSize
-        {
-            get { return ScoreWidth < 0; }
-        }
-
-#endregion
-
-#region LayoutMode
-
-        public static readonly DependencyProperty LayoutModeProperty = DependencyProperty.Register("LayoutMode", typeof(string), typeof(AlphaTab), new PropertyMetadata("page", OnLayoutModeChanged));
-
-        private static void OnLayoutModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((AlphaTab)d).InvalidateTracks(true);
-        }
-
-        public string LayoutMode
-        {
-            get { return (string)GetValue(LayoutModeProperty); }
-            set { SetValue(LayoutModeProperty, value); }
-        }
-
-#endregion
-
-#region StretchForce
-
-        public static readonly DependencyProperty StretchForceProperty = DependencyProperty.Register("StretchForce", typeof(float), typeof(AlphaTab), new PropertyMetadata(1f, OnStretchForceChanged));
-
-        private static void OnStretchForceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((AlphaTab)d).InvalidateTracks(true);
-        }
-
-        public float StretchForce
-        {
-            get { return (float)GetValue(StretchForceProperty); }
-            set { SetValue(StretchForceProperty, value); }
-        }
-
-#endregion
-
-#region StavesMode
-
-        public static readonly DependencyProperty StavesModeProperty = DependencyProperty.Register("StavesMode", typeof(string), typeof(AlphaTab), new PropertyMetadata("score-tab", OnStavesModeChanged));
-
-        private static void OnStavesModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((AlphaTab)d).InvalidateTracks(true);
-        }
-
-        public string StavesMode
-        {
-            get { return (string)GetValue(StavesModeProperty); }
-            set { SetValue(StavesModeProperty, value); }
-        }
-
-#endregion
-
-#region RenderPartials
-
-        private static readonly DependencyPropertyKey RenderPartialsPropertyKey = DependencyProperty.RegisterReadOnly("RenderPartials", typeof(IEnumerable<ImageSource>), typeof(AlphaTab), new PropertyMetadata(default(IEnumerable<ImageSource>)));
-        public static readonly DependencyProperty RenderPartialsProperty = RenderPartialsPropertyKey.DependencyProperty;
-
-        public IEnumerable<ImageSource> RenderPartials
-        {
-            get { return (IEnumerable<ImageSource>)GetValue(RenderPartialsProperty); }
-            private set { SetValue(RenderPartialsPropertyKey, value); }
-        }
-
-#endregion
-
-#region ActualScoreWidth
-
-        private static readonly DependencyPropertyKey ActualScoreWidthPropertyKey = DependencyProperty.RegisterReadOnly("ActualScoreWidth", typeof(float), typeof(AlphaTab), new PropertyMetadata(default(float)));
-        public static readonly DependencyProperty ActualScoreWidthProperty = ActualScoreWidthPropertyKey.DependencyProperty;
-
-        public float ActualScoreWidth
-        {
-            get { return (float)GetValue(ActualScoreWidthProperty); }
-            private set { SetValue(ActualScoreWidthPropertyKey, value); }
-        }
-
-#endregion
-
-#region ActualScoreHeight
-
-        private static readonly DependencyPropertyKey ActualScoreHeightPropertyKey = DependencyProperty.RegisterReadOnly("ActualScoreHeight", typeof(float), typeof(AlphaTab), new PropertyMetadata(default(float)));
-        public static readonly DependencyProperty ActualScoreHeightProperty = ActualScoreWidthPropertyKey.DependencyProperty;
-
-        public float ActualScoreHeight
-        {
-            get { return (float)GetValue(ActualScoreHeightProperty); }
-            private set { SetValue(ActualScoreHeightPropertyKey, value); }
-        }
-
-#endregion
-
-#region RenderEngine
-
-        public static readonly DependencyProperty RenderEngineProperty = DependencyProperty.Register("RenderEngine", typeof(string), typeof(AlphaTab), new PropertyMetadata("gdi", OnRenderEngineChanged));
-
-        private static void OnRenderEngineChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            ((AlphaTab)d).InvalidateTracks(true);
-        }
-
-        public string RenderEngine
-        {
-            get { return (string)GetValue(RenderEngineProperty); }
-            set { SetValue(RenderEngineProperty, value); }
+            get { return (Brush)GetValue(BarCursorFillProperty); }
+            set { SetValue(BarCursorFillProperty, value); }
         }
 
 
-#endregion
+        #endregion
+        #region BeatCursorFill
 
-        private ScoreRenderer _renderer;
-        public IScoreRenderer Renderer => _renderer;
+        public static readonly DependencyProperty BeatCursorFillProperty = DependencyProperty.Register(
+            "BeatCursorFill", typeof(Brush), typeof(AlphaTab), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(191, 64, 64, 255))));
+
+        public Brush BeatCursorFill
+        {
+            get { return (Brush)GetValue(BeatCursorFillProperty); }
+            set { SetValue(BeatCursorFillProperty, value); }
+        }
+
+
+        #endregion
+        #region SelectionFill
+
+        public static readonly DependencyProperty SelectionCursorFillProperty = DependencyProperty.Register(
+            "SelectionFill", typeof(Brush), typeof(AlphaTab), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(25, 64, 64, 255))));
+
+        public Brush SelectionFill
+        {
+            get { return (Brush)GetValue(SelectionCursorFillProperty); }
+            set { SetValue(SelectionCursorFillProperty, value); }
+        }
+
+
+        #endregion
+
+        public AlphaTabApi<AlphaTab> Api { get; private set; }
 
         public AlphaTab()
         {
             SnapsToDevicePixels = true;
-
-            _images = new ObservableCollection<ImageSource>();
-            RenderPartials = _images;
-
-            var settings = Settings.Defaults;
-            settings.Engine = "gdi";
-
-            _renderer = new ScoreRenderer(settings);
-            _renderer.PreRender += result =>
-            {
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    _images.Clear();
-                    GC.Collect();
-                    AddPartialResult(result);
-                }));
-            };
-            _renderer.PartialRenderFinished += result =>
-            {
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    AddPartialResult(result);
-                }));
-            };
-            _renderer.RenderFinished += result =>
-            {
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    _initialRenderCompleted = true;
-                    _isRendering = 0;
-                    AddPartialResult(result);
-                    OnRenderFinished();
-                    if (_redrawPending)
-                    {
-                        ResizeTracks(RenderWidth);
-                    }
-                }));
-            };
+            Settings = Settings.Defaults;
+            Settings.EnablePlayer = true;
+            Settings.EnableCursor = true;
         }
 
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
             _scrollView = (ScrollViewer)Template.FindName("PART_ScrollView", this);
-            _scrollView.ScrollChanged += OnScrollChanged;
-            InvalidateTracks(true);
+            Api = new AlphaTabApi<AlphaTab>(new WpfUiFacade(_scrollView), this);
         }
 
-        public void InvalidateTracks(bool force)
+        public void InvalidateTracks()
         {
-            var trackArray = Tracks?.ToArray();
-            if (trackArray == null || trackArray.Length == 0) return;
-
-            var width = RenderWidth;
-            if (width > 0)
+            if (Api != null)
             {
-                if (trackArray == _renderer.Tracks && !force)
+                RenderTracks();
+            }
+        }
+
+        public void RenderTracks()
+        {
+            if (Tracks == null) return;
+
+            Score score = null;
+            var trackIndexes = new FastList<int>();
+            foreach (var track in Tracks)
+            {
+                if (score == null)
                 {
-                    return;
+                    score = track.Score;
                 }
 
-                var settings = _renderer.Settings;
-                settings.Width = width;
-                settings.Engine = RenderEngine;
-                settings.Scale = Scale;
-                settings.Layout.Mode = LayoutMode;
-                settings.StretchForce = StretchForce;
-                settings.Staves.Id = StavesMode;
-                _renderer.UpdateSettings(settings);
-                ModelUtils.ApplyPitchOffsets(settings, trackArray[0].Score);
-
-                _initialRenderCompleted = false;
-                _isRendering = 1;
-
-                Task.Factory.StartNew(() =>
+                if (score == track.Score)
                 {
-                    _renderer.Render(trackArray[0].Score, trackArray.Select(t => t.Index).ToArray());
-                });
-            }
-            else
-            {
-                _initialRenderCompleted = false;
-                _redrawPending = true;
-                _isRendering = 0;
-            }
-        }
-
-        private int RenderWidth
-        {
-            get
-            {
-                return (int)(ScoreAutoSize ? _scrollView.ViewportWidth : ScoreWidth);
-            }
-        }
-
-        private void OnScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-            if (Math.Abs(e.ViewportWidthChange) > 0 && ScoreAutoSize)
-            {
-                ResizeTracks(e.ViewportWidth);
-            }
-        }
-
-        private void ResizeTracks(double width)
-        {
-            int newWidth = (int)width;
-            if (Interlocked.Exchange(ref _isRendering, 1) == 1)
-            {
-                _redrawPending = true;
-            }
-            else if (width > 0)
-            {
-                _redrawPending = false;
-                if (!_initialRenderCompleted)
-                {
-                    InvalidateTracks(true);
-                }
-                else if (newWidth != _renderer.Settings.Width)
-                {
-                    Task.Factory.StartNew(() =>
-                    {
-                        _renderer.Resize(newWidth);
-                    });
-                }
-                else
-                {
-                    _isRendering = 0;
+                    trackIndexes.Add(track.Index);
                 }
             }
-        }
 
-        private void AddPartialResult(RenderFinishedEventArgs result)
-        {
-            ActualScoreWidth = result.TotalWidth;
-            ActualScoreHeight = result.TotalHeight;
-            if (result.RenderResult != null)
+            if (score != null)
             {
-                var bitmap = result.RenderResult as Bitmap;
-                if (bitmap != null)
-                {
-                    using (bitmap)
-                    {
-                        _images.Add(GdiImageSource.Create(bitmap));
-                    }
-                }
-                else
-                {
-                    using (result.RenderResult as IDisposable)
-                    {
-                        _images.Add(SkImageSource.Create(result.RenderResult));
-                    }
-                }
+                Api.RenderTracks(score, trackIndexes.ToArray());
             }
         }
 
-#region RenderFinished
-
-        public static readonly RoutedEvent RenderFinishedEvent = EventManager.RegisterRoutedEvent("RenderFinished", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(AlphaTab));
-        public event RoutedEventHandler RenderFinished
-        {
-            add { AddHandler(RenderFinishedEvent, value); }
-            remove { RemoveHandler(RenderFinishedEvent, value); }
-        }
-
-        protected virtual void OnRenderFinished()
-        {
-            RoutedEventArgs newEventArgs = new RoutedEventArgs(RenderFinishedEvent);
-            RaiseEvent(newEventArgs);
-        }
-
-#endregion
-
+        public event Action<Settings> SettingsChanged;
     }
 }
 #endif

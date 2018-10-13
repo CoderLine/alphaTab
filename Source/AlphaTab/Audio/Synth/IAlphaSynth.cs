@@ -1,4 +1,6 @@
-﻿using AlphaTab.Audio.Synth.Synthesis;
+﻿using System;
+using AlphaTab.Audio.Synth.Midi;
+using AlphaTab.Audio.Synth.Synthesis;
 
 namespace AlphaTab.Audio.Synth
 {
@@ -99,6 +101,11 @@ namespace AlphaTab.Audio.Synth
         }
 
         /// <summary>
+        /// Destroys the synthesizer and all related components
+        /// </summary>
+        void Destroy();
+
+        /// <summary>
         /// Starts the playback if possible
         /// </summary>  
         void Play();
@@ -123,6 +130,12 @@ namespace AlphaTab.Audio.Synth
         /// </summary>
         /// <param name="data">a byte array to load the data from </param>
         void LoadSoundFont(byte[] data);
+
+        /// <summary>
+        /// Loads the given midi file structure. 
+        /// </summary>
+        /// <param name="midi"></param>
+        void LoadMidiFile(MidiFile midi);
 
         /// <summary>
         /// Gets the mute state of a channel.
@@ -157,5 +170,18 @@ namespace AlphaTab.Audio.Synth
         /// <param name="channel">The channel number.</param>
         /// <param name="program">The midi program.</param>
         void SetChannelProgram(int channel, byte program);
+
+        event Action Ready;
+        event Action ReadyForPlayback;
+        event Action<PlaybackFinishedEventArgs> Finished;
+
+        event Action SoundFontLoaded;
+        event Action<Exception> SoundFontLoadFailed;
+
+        event Action MidiLoaded;
+        event Action<Exception> MidiLoadFailed;
+
+        event Action<PlayerStateChangedEventArgs> StateChanged;
+        event Action<PositionChangedEventArgs> PositionChanged;
     }
 }

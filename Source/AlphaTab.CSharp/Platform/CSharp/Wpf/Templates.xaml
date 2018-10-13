@@ -10,23 +10,8 @@
                                   Background="{TemplateBinding Background}"
                                   Margin="{TemplateBinding Margin}"
                                   Padding="{TemplateBinding Padding}">
-                        <ItemsControl ItemsSource="{TemplateBinding RenderPartials}"
-                                      Background="{TemplateBinding Foreground}"
-                                      Width="{Binding ActualScoreWidth, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"
-                                      Height="{Binding ActualScoreHeight, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <local:AlphaTabLayoutPanel />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Margin="0" Padding="0">
-                                        <Image Source="{Binding}" />
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <Grid Background="{TemplateBinding Foreground}" HorizontalAlignment="Center">
+                        </Grid>
                     </ScrollViewer>
                 </ControlTemplate>
             </Setter.Value>

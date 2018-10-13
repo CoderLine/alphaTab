@@ -24,6 +24,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using AlphaTab.Audio.Synth;
 using AlphaTab.IO;
 using AlphaTab.Util;
@@ -94,6 +96,11 @@ namespace AlphaTab.Platform
             {
                 c(t);
             }
+        }
+
+        public static byte[] StringToByteArray(string contents)
+        {
+            return Encoding.UTF8.GetBytes(contents);
         }
 
         public static sbyte ReadSignedByte(this IReadable readable)
@@ -185,5 +192,23 @@ namespace AlphaTab.Platform
         {
             return Stopwatch.GetTimestamp();
         }
+
+        public static Action Throttle(Action action, int delay)
+        {
+            CancellationTokenSource cancellationTokenSource = null;
+            return () =>
+            {
+                cancellationTokenSource?.Cancel();
+                cancellationTokenSource = new CancellationTokenSource();
+
+                Task.Run(async () =>
+                    {
+                        await Task.Delay(delay, cancellationTokenSource.Token);
+                        action();
+                    },
+                    cancellationTokenSource.Token);
+            };
+        }
+
     }
 }

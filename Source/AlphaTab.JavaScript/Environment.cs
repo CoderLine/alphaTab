@@ -43,13 +43,23 @@ namespace AlphaTab
     {
         public static string ScriptFile { get; set; }
         public static bool IsFontLoaded { get; set; }
+        public static event Action FontLoaded;
+
+        private static void OnFontLoaded()
+        {
+            var handler = FontLoaded;
+            if (handler != null)
+            {
+                handler();
+            }
+        }
 
         static void PlatformInit()
         {
-            RenderEngines["svg"] = () => new CssFontSvgCanvas();
-            RenderEngines["default"] = () => new CssFontSvgCanvas();
-            RenderEngines["html5"] = () => new Platform.JavaScript.Html5Canvas();
-            
+            RenderEngines["svg"] = new RenderEngineFactory(true, () => new CssFontSvgCanvas());
+            RenderEngines["html5"] = new RenderEngineFactory(false, () => new Html5Canvas());
+            RenderEngines["default"] = RenderEngines["svg"];
+
             RegisterJQueryPlugin();
 
             Script.Write("untyped __js__(\"Math.log2 = Math.log2 || function(x) { return Math.log(x) * Math.LOG2E; };\");");
@@ -230,6 +240,7 @@ namespace AlphaTab
                         {
                             Logger.Info("Rendering", "Font available");
                             IsFontLoaded = true;
+                            OnFontLoaded();
                         }
                         else
                         {
@@ -274,6 +285,7 @@ namespace AlphaTab
                     {
                         IsFontLoaded = true;
                         document.Body.RemoveChild(testItem);
+                        OnFontLoaded();
                     }
                     else
                     {

@@ -50,7 +50,6 @@ namespace AlphaTab.Platform
         void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol, bool centerAtPosition = false);
         void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols, bool centerAtPosition = false);
 
-        object OnPreRender();
         void BeginRender(float width, float height);
         object EndRender();
         object OnRenderFinished();

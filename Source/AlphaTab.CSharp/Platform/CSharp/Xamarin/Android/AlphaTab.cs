@@ -83,14 +83,13 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
             settings.StretchForce = 0.8f;
 
             _renderer = new ScoreRenderer(settings);
-            _renderer.PreRender += result =>
+            _renderer.PreRender += () =>
             {
                 lock (this)
                 {
                     Post(() =>
                     {
                         ClearPartialResults();
-                        AddPartialResult(result);
                     });
                 }
             };

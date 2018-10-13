@@ -89,6 +89,11 @@ namespace AlphaTab.Platform.JavaScript
             return context.Tracks;
         }
 
+        [Name("load")]
+        public void Load(JQuery element, AlphaTabApi context, object data)
+        {
+            context.Load(data);
+        }
 
         [Name("api")]
         public AlphaTabApi Api(JQuery element, AlphaTabApi context)
@@ -101,7 +106,7 @@ namespace AlphaTab.Platform.JavaScript
         {
             if (score.IsTruthy())
             {
-                context.ScoreLoaded(score);
+                context.RenderTracks(score, context.TrackIndexes);
             }
             return context.Score;
         }
@@ -242,7 +247,7 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         [Name("loop")]
-        public bool PlaybackRange(JQuery element, AlphaTabApi context, bool loop)
+        public bool Loop(JQuery element, AlphaTabApi context, bool loop)
         {
             if (context.Player == null)
             {
@@ -267,10 +272,10 @@ namespace AlphaTab.Platform.JavaScript
 
             if (autoScroll.IsTruthy())
             {
-                context.Settings.ScrollMode = autoScroll;
+                context.Settings.ScrollMode = Settings.DecodeScrollMode(autoScroll);
             }
 
-            return context.Settings.ScrollMode;
+            return Settings.EncodeScrollMode(context.Settings.ScrollMode);
         }
 
         [Name("play")]
@@ -323,7 +328,7 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         [Name("downloadMidi")]
-        public void DownloadMidi(JQuery element, AlphaTabApi context, object tracks, float volume)
+        public void DownloadMidi(JQuery element, AlphaTabApi context)
         {
             context.DownloadMidi();
         }

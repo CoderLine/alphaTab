@@ -25,14 +25,14 @@ using Haxe;
 
 namespace AlphaTab.Platform.JavaScript
 {
-    class AlphaTabWorkerScoreRenderer : IScoreRenderer
+    class AlphaTabWorkerScoreRenderer<T> : IScoreRenderer
     {
-        private readonly AlphaTabApi _api;
+        private readonly AlphaTabApi<T> _api;
         private readonly Worker _worker;
 
         public BoundsLookup BoundsLookup { get; private set; }
 
-        public AlphaTabWorkerScoreRenderer(AlphaTabApi api, Settings settings)
+        public AlphaTabWorkerScoreRenderer(AlphaTabApi<T> api, Settings settings)
         {
             _api = api;
             try
@@ -86,7 +86,7 @@ namespace AlphaTab.Platform.JavaScript
             switch (cmd)
             {
                 case "alphaTab.preRender":
-                    OnPreRender(data.result);
+                    OnPreRender();
                     break;
                 case "alphaTab.partialRenderFinished":
                     OnPartialRenderFinished(data.result);
@@ -110,11 +110,11 @@ namespace AlphaTab.Platform.JavaScript
             _worker.PostMessage(new { cmd = "alphaTab.render", score = jsObject, trackIndexes = trackIndexes });
         }
 
-        public event Action<RenderFinishedEventArgs> PreRender;
-        protected virtual void OnPreRender(RenderFinishedEventArgs obj)
+        public event Action PreRender;
+        protected virtual void OnPreRender()
         {
             var handler = PreRender;
-            if (handler != null) handler(obj);
+            if (handler != null) handler();
         }
 
         public event Action<RenderFinishedEventArgs> PartialRenderFinished;
