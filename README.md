@@ -23,7 +23,7 @@ The latest binaries are available for download at [Appveyor](https://ci.appveyor
 --- | --- | --- 
 **JavaScript** | [JavaScript.zip](https://ci.appveyor.com/api/projects/Danielku15/alphaTab/artifacts/JavaScript.zip?branch=master) | [JavaScript.zip](https://ci.appveyor.com/api/projects/Danielku15/alphaTab/artifacts/JavaScript.zip?branch=develop)
 **.net (nupkg for download/unzip)** | [AlphaTab.nupkg](https://ci.appveyor.com/api/projects/Danielku15/alphaTab/artifacts/AlphaTab.nupkg?branch=master) | [AlphaTab.nupkg](https://ci.appveyor.com/api/projects/Danielku15/alphaTab/artifacts/AlphaTab.nupkg?branch=develop)
-**.net (NuGet feeds)** | (not available until 1.0) | [AlphaTab](https://www.myget.org/feed/coderline/package/nuget/AlphaTab)
+**.net (NuGet feeds)** | (not available until 1.0) | [AlphaTab at MyGet](https://www.myget.org/feed/coderline/package/nuget/AlphaTab)
 
 JavaScript
 
