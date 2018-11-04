@@ -9,9 +9,11 @@ Try
 Catch [System.Net.WebException]
 {
     echo "Pushing test results failed:" 
+    $ex = $_.Exception.ToString()
     $responseStream = $_.Exception.Response.GetResponseStream()
     $sr = New-Object System.IO.StreamReader $responseStream
     $result = $sr.ReadToEnd()
-    Write-Host $result
+    Write-Host "Pushing test results failed: $($ex)"
+    Write-Host "Response was: $($result)"
 }
 Pop-Location 
