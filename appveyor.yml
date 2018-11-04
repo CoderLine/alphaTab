@@ -68,7 +68,7 @@ after_test:
   - 7z a -r Documentation.zip Documentation\output\*
   # Move Artifacts to root for better names on appveyor
   - move Build\JavaScript\JavaScript.zip .\JavaScript.zip
-  - move Source\AlphaTab.CSharp\bin\$(configuration)\*.nupkg .\AlphaTab.nupkg
+  - move Source\AlphaTab.CSharp\bin\Release\*.nupkg .\AlphaTab.nupkg
 
 artifacts:
   # JavaScript Output
