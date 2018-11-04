@@ -101,7 +101,7 @@ deploy:
 
 on_success:
   - git config --global credential.helper store
-  - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
+  - ps: Add-Content "$HOME\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
   - git config --global user.email "appveyor@alphatab.net"
   - git config --global user.name "AlphaTab Build Agent"
   - git add Directory.Build.props
