@@ -13420,14 +13420,17 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 			var syData = Std.string(this._syData).toLowerCase();
 			if(syData == "track") {
 				this.NewSy();
-				if(this._sy != 5) {
-					this.Error("track-name",5,true);
-				}
 				if(this._score.MasterBars.length > 0) {
 					this.NewTrack();
 				}
-				this._currentTrack.Name = Std.string(this._syData);
-				this.NewSy();
+				if(this._sy == 5) {
+					this._currentTrack.Name = Std.string(this._syData);
+					this.NewSy();
+				}
+				if(this._sy == 5) {
+					this._currentTrack.ShortName = Std.string(this._syData);
+					this.NewSy();
+				}
 			}
 			syData = Std.string(this._syData).toLowerCase();
 			if(syData == "staff") {
