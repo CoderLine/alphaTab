@@ -37,7 +37,7 @@ module.exports = function(config) {
     reporters: ['progress', 'trx'],
     trxReporter: {
       outputFile: 'Results.trx',
-      shortTestName: true
+      shortTestName: false
     },
 
     // web server port
