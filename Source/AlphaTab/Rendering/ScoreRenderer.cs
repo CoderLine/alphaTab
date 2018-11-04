@@ -106,15 +106,23 @@ namespace AlphaTab.Rendering
             try
             {
                 Score = score;
-                var tracks = new FastList<Track>();
-                foreach (var track in trackIndexes)
+                FastList<Track> tracks;
+                if (trackIndexes == null)
                 {
-                    if (track >= 0 && track < score.Tracks.Count)
+                    tracks = score.Tracks.Clone();
+                }
+                else
+                {
+                    tracks = new FastList<Track>();
+                    foreach (var track in trackIndexes)
                     {
-                        tracks.Add(score.Tracks[track]);
+                        if (track >= 0 && track < score.Tracks.Count)
+                        {
+                            tracks.Add(score.Tracks[track]);
+                        }
                     }
                 }
-
+               
                 if (tracks.Count == 0 && score.Tracks.Count > 0)
                 {
                     tracks.Add(score.Tracks[0]);

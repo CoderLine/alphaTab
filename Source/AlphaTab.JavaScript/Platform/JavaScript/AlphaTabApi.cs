@@ -680,6 +680,11 @@ namespace AlphaTab.Platform.JavaScript
         {
             var tracks = new FastList<Track>();
 
+            if (trackIndexes == null)
+            {
+                return Score.Tracks.Clone();
+            }
+
             foreach (var track in trackIndexes)
             {
                 if (track >= 0 && track < Score.Tracks.Count)
@@ -702,16 +707,10 @@ namespace AlphaTab.Platform.JavaScript
                 {
                     if (tracksData == "all")
                     {
-                        tracksData = new int[Score.Tracks.Count];
-                        for (int i = 0; i < Score.Tracks.Count; i++)
-                        {
-                            tracksData[i] = Score.Tracks[i].Index;
-                        }
+                        return null;
                     }
-                    else
-                    {
-                        tracksData = Json.Parse(tracksData);
-                    }
+
+                    tracksData = Json.Parse(tracksData);
                 }
                 catch
                 {
