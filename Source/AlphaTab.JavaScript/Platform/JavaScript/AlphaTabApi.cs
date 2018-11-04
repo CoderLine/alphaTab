@@ -243,7 +243,7 @@ namespace AlphaTab.Platform.JavaScript
 
                 if (!string.IsNullOrEmpty(contents))
                 {
-                    Tex(contents);
+                    Tex(contents, null);
                 }
                 else if (options && options.file)
                 {
@@ -631,7 +631,7 @@ namespace AlphaTab.Platform.JavaScript
         }
 
 
-        public void Tex(string contents)
+        public void Tex(string contents, dynamic tracksData)
         {
             Element.ClassList.Add("loading");
             try
@@ -639,7 +639,17 @@ namespace AlphaTab.Platform.JavaScript
                 var parser = new AlphaTexImporter();
                 var data = ByteBuffer.FromBuffer(Platform.StringToByteArray(contents));
                 parser.Init(data, Settings);
-                ScoreLoaded(parser.ReadScore());
+
+                var score = parser.ReadScore();
+                if (tracksData != null)
+                {
+                    ScoreLoaded(score, false);
+                    SetTracks(tracksData);
+                }
+                else
+                {
+                    ScoreLoaded(score);
+                }
             }
             catch (Exception e)
             {
@@ -690,7 +700,18 @@ namespace AlphaTab.Platform.JavaScript
             {
                 try
                 {
-                    tracksData = Json.Parse(tracksData.As<string>());
+                    if (tracksData == "all")
+                    {
+                        tracksData = new int[Score.Tracks.Count];
+                        for (int i = 0; i < Score.Tracks.Count; i++)
+                        {
+                            tracksData[i] = Score.Tracks[i].Index;
+                        }
+                    }
+                    else
+                    {
+                        tracksData = Json.Parse(tracksData);
+                    }
                 }
                 catch
                 {

@@ -1383,8 +1383,8 @@ alphaTab.platform.javaScript.JQueryAlphaTab.prototype = {
 		element.removeData("alphaTab");
 		context.Destroy();
 	}
-	,tex: function(element,context,tex) {
-		context.Tex(tex);
+	,tex: function(element,context,tex,tracks) {
+		context.Tex(tex,tracks);
 	}
 	,tracks: function(element,context,tracks) {
 		if(tracks) {
@@ -12780,6 +12780,7 @@ alphaTab.importer.ScoreImporter.prototype = {
 	,__class__: alphaTab.importer.ScoreImporter
 };
 alphaTab.importer.AlphaTexImporter = $hx_exports["alphaTab"]["importer"]["AlphaTexImporter"] = function() {
+	this._trackChannel = 0;
 	alphaTab.importer.ScoreImporter.call(this);
 };
 alphaTab.importer.AlphaTexImporter.__name__ = ["alphaTab","importer","AlphaTexImporter"];
@@ -12808,25 +12809,47 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 	}
 	,ReadScore: function() {
 		try {
+			var this1 = {}
+			this._lyrics = this1;
 			this.CreateDefaultScore();
 			this._curChPos = 0;
 			this._currentDuration = 4;
-			var this1 = [];
-			this._lyrics = this1;
 			this.NextChar();
 			this.NewSy();
 			if(this._sy == 14) {
 				throw new js._Boot.HaxeError(new alphaTab.importer.UnsupportedFormatException().UnsupportedFormatException("Unknown start sign <"));
 			}
 			this.Score();
+			this.Consolidate();
 			this._score.Finish(this.Settings);
-			this._track.ApplyLyrics(this._lyrics);
+			var this2 = this._lyrics;
+			var track = $iterator(Object.keys(this2))();
+			while(track.hasNext()) {
+				var track1 = track.next();
+				this._score.Tracks[track1].ApplyLyrics(this._lyrics[track1]);
+			}
 			return this._score;
 		} catch( e ) {
 			if (e instanceof js._Boot.HaxeError) e = e.val;
 			if( js.Boot.__instanceof(e,alphaTab.importer.AlphaTexException) ) {
 				throw new js._Boot.HaxeError(new alphaTab.importer.UnsupportedFormatException().UnsupportedFormatException(e.Message));
 			} else throw(e);
+		}
+	}
+	,Consolidate: function() {
+		var track = $iterator(this._score.Tracks)();
+		while(track.hasNext()) {
+			var track1 = track.next();
+			var staff = $iterator(track1.Staves)();
+			while(staff.hasNext()) {
+				var staff1 = staff.next();
+				while(staff1.Bars.length < this._score.MasterBars.length) {
+					var bar = this.NewBar(staff1);
+					var emptyBeat = new alphaTab.model.Beat();
+					emptyBeat.IsEmpty = true;
+					bar.Voices[0].AddBeat(emptyBeat);
+				}
+			}
 		}
 	}
 	,Error: function(nonterm,expected,symbolError) {
@@ -12851,13 +12874,20 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 		this._score = new alphaTab.model.Score();
 		this._score.Tempo = 120;
 		this._score.TempoLabel = "";
-		this._track = new alphaTab.model.Track(1);
-		this._track.PlaybackInfo.Program = 25;
-		this._track.PlaybackInfo.PrimaryChannel = alphaTab.importer.AlphaTexImporter.TrackChannels[0];
-		this._track.PlaybackInfo.SecondaryChannel = alphaTab.importer.AlphaTexImporter.TrackChannels[1];
-		this._staff = this._track.Staves[0];
-		this._staff.Tuning = alphaTab.model.Tuning.GetDefaultTuningFor(6).Tunings;
-		this._score.AddTrack(this._track);
+		this.NewTrack();
+	}
+	,NewTrack: function() {
+		this._currentTrack = new alphaTab.model.Track(1);
+		this._currentTrack.PlaybackInfo.Program = 25;
+		this._currentTrack.PlaybackInfo.PrimaryChannel = this._trackChannel++;
+		this._currentTrack.PlaybackInfo.SecondaryChannel = this._trackChannel++;
+		this._currentStaff = this._currentTrack.Staves[0];
+		this._currentStaff.Tuning = alphaTab.model.Tuning.GetDefaultTuningFor(6).Tunings;
+		this._score.AddTrack(this._currentTrack);
+		var this1 = this._lyrics;
+		var index = this._currentTrack.Index;
+		var this2 = [];
+		this1[index] = this2;
 	}
 	,ParseClefFromString: function(str) {
 		var _g = str.toLowerCase();
@@ -13076,39 +13106,11 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 	}
 	,MetaData: function() {
 		var anyMeta = false;
-		while(this._sy == 12) {
+		var continueReading = true;
+		while(this._sy == 12 && continueReading) {
 			var syData = Std.string(this._syData).toLowerCase();
-			if(syData == "title") {
-				this.NewSy();
-				if(this._sy == 5) {
-					this._score.Title = Std.string(this._syData);
-				} else {
-					this.Error("title",5,true);
-				}
-				this.NewSy();
-				anyMeta = true;
-				this._anyDataLoaded = anyMeta;
-			} else if(syData == "subtitle") {
-				this.NewSy();
-				if(this._sy == 5) {
-					this._score.SubTitle = Std.string(this._syData);
-				} else {
-					this.Error("subtitle",5,true);
-				}
-				this.NewSy();
-				anyMeta = true;
-				this._anyDataLoaded = anyMeta;
-			} else if(syData == "artist") {
-				this.NewSy();
-				if(this._sy == 5) {
-					this._score.Artist = Std.string(this._syData);
-				} else {
-					this.Error("artist",5,true);
-				}
-				this.NewSy();
-				anyMeta = true;
-				this._anyDataLoaded = anyMeta;
-			} else if(syData == "album") {
+			switch(syData) {
+			case "album":
 				this.NewSy();
 				if(this._sy == 5) {
 					this._score.Album = Std.string(this._syData);
@@ -13117,28 +13119,18 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 				}
 				this.NewSy();
 				anyMeta = true;
-				this._anyDataLoaded = anyMeta;
-			} else if(syData == "words") {
+				break;
+			case "artist":
 				this.NewSy();
 				if(this._sy == 5) {
-					this._score.Words = Std.string(this._syData);
+					this._score.Artist = Std.string(this._syData);
 				} else {
-					this.Error("words",5,true);
+					this.Error("artist",5,true);
 				}
 				this.NewSy();
 				anyMeta = true;
-				this._anyDataLoaded = anyMeta;
-			} else if(syData == "music") {
-				this.NewSy();
-				if(this._sy == 5) {
-					this._score.Music = Std.string(this._syData);
-				} else {
-					this.Error("music",5,true);
-				}
-				this.NewSy();
-				anyMeta = true;
-				this._anyDataLoaded = anyMeta;
-			} else if(syData == "copyright") {
+				break;
+			case "copyright":
 				this.NewSy();
 				if(this._sy == 5) {
 					this._score.Copyright = Std.string(this._syData);
@@ -13147,8 +13139,28 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 				}
 				this.NewSy();
 				anyMeta = true;
-				this._anyDataLoaded = anyMeta;
-			} else if(syData == "tempo") {
+				break;
+			case "music":
+				this.NewSy();
+				if(this._sy == 5) {
+					this._score.Music = Std.string(this._syData);
+				} else {
+					this.Error("music",5,true);
+				}
+				this.NewSy();
+				anyMeta = true;
+				break;
+			case "subtitle":
+				this.NewSy();
+				if(this._sy == 5) {
+					this._score.SubTitle = Std.string(this._syData);
+				} else {
+					this.Error("subtitle",5,true);
+				}
+				this.NewSy();
+				anyMeta = true;
+				break;
+			case "tempo":
 				this.NewSy();
 				if(this._sy == 2) {
 					this._score.Tempo = this._syData;
@@ -13157,123 +13169,35 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 				}
 				this.NewSy();
 				anyMeta = true;
-				this._anyDataLoaded = anyMeta;
-			} else if(syData == "capo") {
-				this.NewSy();
-				if(this._sy == 2) {
-					this._staff.Capo = this._syData;
-				} else {
-					this.Error("capo",2,true);
-				}
-				this.NewSy();
-				anyMeta = true;
-				this._anyDataLoaded = anyMeta;
-			} else if(syData == "tuning") {
-				this.NewSy();
-				var strings = this._staff.Tuning.length;
-				var _g = this._sy;
-				switch(_g) {
-				case 5:
-					var text = Std.string(this._syData).toLowerCase();
-					if(text == "piano" || text == "none" || text == "voice") {
-						var this1 = new Int32Array(0);
-						this._staff.Tuning = this1;
-					} else {
-						this.Error("tuning",6,true);
-					}
-					this.NewSy();
-					break;
-				case 6:
-					var this2 = [];
-					var tuning = this2;
-					while(true) {
-						var t = this._syData;
-						tuning.push(t.get_RealValue());
-						this.NewSy();
-						if(!(this._sy == 6)) {
-							break;
-						}
-					}
-					this._staff.Tuning = new Int32Array(tuning);
-					break;
-				default:
-					this.Error("tuning",6,true);
-				}
-				anyMeta = true;
-				this._anyDataLoaded = anyMeta;
-				var tmp;
-				if(strings != this._staff.Tuning.length) {
-					var this3 = this._staff.Chords;
-					tmp = Object.keys(this3).length > 0;
-				} else {
-					tmp = false;
-				}
-				if(tmp) {
-					this.ErrorMessage("Tuning must be defined before any chord");
-				}
-			} else if(syData == "instrument") {
-				this.NewSy();
-				if(this._sy == 2) {
-					var instrument = this._syData;
-					if(instrument >= 0 && instrument <= 128) {
-						this._track.PlaybackInfo.Program = this._syData;
-					} else {
-						this.Error("instrument",2,false);
-					}
-				} else if(this._sy == 5) {
-					var instrumentName = Std.string(this._syData).toLowerCase();
-					this._track.PlaybackInfo.Program = alphaTab.audio.GeneralMidi.GetValue(instrumentName);
-				} else {
-					this.Error("instrument",2,true);
-				}
-				this.NewSy();
-				anyMeta = true;
-				this._anyDataLoaded = anyMeta;
-			} else if(syData == "lyrics") {
-				this.NewSy();
-				var lyrics = new alphaTab.model.Lyrics();
-				lyrics.StartBar = 0;
-				lyrics.Text = "";
-				if(this._sy == 2) {
-					lyrics.StartBar = this._syData;
-					this.NewSy();
-				}
-				if(this._sy == 5) {
-					lyrics.Text = this._syData;
-					this.NewSy();
-				} else {
-					this.Error("lyrics",5,true);
-				}
-				this._lyrics.push(lyrics);
-				anyMeta = true;
-				this._anyDataLoaded = anyMeta;
-			} else if(syData == "chord") {
-				this.NewSy();
-				var chord = new alphaTab.model.Chord();
-				this.ChordProperties(chord);
-				if(this._sy == 5) {
-					chord.Name = this._syData;
-					this.NewSy();
-				} else {
-					this.Error("chord-name",2,true);
-				}
-				var i = 0;
-				while(i < this._staff.Tuning.length) {
-					if(this._sy == 2) {
-						chord.Strings.push(this._syData);
-					} else if(this._sy == 5 && Std.string(this._syData).toLowerCase() == "x") {
-						chord.Strings.push(-1);
-					}
-					this.NewSy();
-					++i;
-				}
-				this._staff.AddChord(chord.Name.toLowerCase(),chord);
-				anyMeta = true;
-				this._anyDataLoaded = anyMeta;
-			} else if(anyMeta) {
-				this.Error("metaDataTags",5,false);
-			} else {
 				break;
+			case "title":
+				this.NewSy();
+				if(this._sy == 5) {
+					this._score.Title = Std.string(this._syData);
+				} else {
+					this.Error("title",5,true);
+				}
+				this.NewSy();
+				anyMeta = true;
+				break;
+			case "words":
+				this.NewSy();
+				if(this._sy == 5) {
+					this._score.Words = Std.string(this._syData);
+				} else {
+					this.Error("words",5,true);
+				}
+				this.NewSy();
+				anyMeta = true;
+				break;
+			default:
+				if(this.HandleStaffMeta()) {
+					anyMeta = true;
+				} else if(anyMeta) {
+					this.Error("metaDataTags",5,false);
+				} else {
+					continueReading = false;
+				}
 			}
 		}
 		if(anyMeta) {
@@ -13284,8 +13208,122 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 		} else if(this._sy == 4) {
 			this.NewSy();
 		}
-		if(alphaTab.audio.GeneralMidi.IsGuitar(this._track.PlaybackInfo.Program)) {
-			this._staff.DisplayTranspositionPitch = -12;
+		if(alphaTab.audio.GeneralMidi.IsGuitar(this._currentTrack.PlaybackInfo.Program)) {
+			this._currentStaff.DisplayTranspositionPitch = -12;
+		}
+	}
+	,HandleStaffMeta: function() {
+		var syData = Std.string(this._syData).toLowerCase();
+		switch(syData) {
+		case "capo":
+			this.NewSy();
+			if(this._sy == 2) {
+				this._currentStaff.Capo = this._syData;
+			} else {
+				this.Error("capo",2,true);
+			}
+			this.NewSy();
+			return true;
+		case "chord":
+			this.NewSy();
+			var chord = new alphaTab.model.Chord();
+			this.ChordProperties(chord);
+			if(this._sy == 5) {
+				chord.Name = this._syData;
+				this.NewSy();
+			} else {
+				this.Error("chord-name",2,true);
+			}
+			var i = 0;
+			while(i < this._currentStaff.Tuning.length) {
+				if(this._sy == 2) {
+					chord.Strings.push(this._syData);
+				} else if(this._sy == 5 && Std.string(this._syData).toLowerCase() == "x") {
+					chord.Strings.push(-1);
+				}
+				this.NewSy();
+				++i;
+			}
+			this._currentStaff.AddChord(chord.Name.toLowerCase(),chord);
+			return true;
+		case "instrument":
+			this.NewSy();
+			if(this._sy == 2) {
+				var instrument = this._syData;
+				if(instrument >= 0 && instrument <= 128) {
+					this._currentTrack.PlaybackInfo.Program = this._syData;
+				} else {
+					this.Error("instrument",2,false);
+				}
+			} else if(this._sy == 5) {
+				var instrumentName = Std.string(this._syData).toLowerCase();
+				this._currentTrack.PlaybackInfo.Program = alphaTab.audio.GeneralMidi.GetValue(instrumentName);
+			} else {
+				this.Error("instrument",2,true);
+			}
+			this.NewSy();
+			return true;
+		case "lyrics":
+			this.NewSy();
+			var lyrics = new alphaTab.model.Lyrics();
+			lyrics.StartBar = 0;
+			lyrics.Text = "";
+			if(this._sy == 2) {
+				lyrics.StartBar = this._syData;
+				this.NewSy();
+			}
+			if(this._sy == 5) {
+				lyrics.Text = this._syData;
+				this.NewSy();
+			} else {
+				this.Error("lyrics",5,true);
+			}
+			this._lyrics[this._currentTrack.Index].push(lyrics);
+			return true;
+		case "tuning":
+			this.NewSy();
+			var strings = this._currentStaff.Tuning.length;
+			var _g = this._sy;
+			switch(_g) {
+			case 5:
+				var text = Std.string(this._syData).toLowerCase();
+				if(text == "piano" || text == "none" || text == "voice") {
+					var this1 = new Int32Array(0);
+					this._currentStaff.Tuning = this1;
+				} else {
+					this.Error("tuning",6,true);
+				}
+				this.NewSy();
+				break;
+			case 6:
+				var this2 = [];
+				var tuning = this2;
+				while(true) {
+					var t = this._syData;
+					tuning.push(t.get_RealValue());
+					this.NewSy();
+					if(!(this._sy == 6)) {
+						break;
+					}
+				}
+				this._currentStaff.Tuning = new Int32Array(tuning);
+				break;
+			default:
+				this.Error("tuning",6,true);
+			}
+			var tmp;
+			if(strings != this._currentStaff.Tuning.length) {
+				var this3 = this._currentStaff.Chords;
+				tmp = Object.keys(this3).length > 0;
+			} else {
+				tmp = false;
+			}
+			if(tmp) {
+				this.ErrorMessage("Tuning must be defined before any chord");
+			}
+			return true;
+		default:
+			return false;
 		}
 	}
 	,ChordProperties: function(chord) {
@@ -13359,11 +13397,11 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 				this.NewSy();
 				break;
 			default:
-				this.Error("chord-annotation",5,false);
+				this.Error("chord-properties",5,false);
 			}
 		}
 		if(this._sy != 10) {
-			this.Error("beat-effects",10,true);
+			this.Error("chord-properties",10,true);
 		}
 		this.NewSy();
 	}
@@ -13377,26 +13415,92 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 			this.Bar();
 		}
 	}
+	,TrackStaffMeta: function() {
+		if(this._sy == 12) {
+			var syData = Std.string(this._syData).toLowerCase();
+			if(syData == "track") {
+				this.NewSy();
+				if(this._sy != 5) {
+					this.Error("track-name",5,true);
+				}
+				if(this._score.MasterBars.length > 0) {
+					this.NewTrack();
+				}
+				this._currentTrack.Name = Std.string(this._syData);
+				this.NewSy();
+			}
+			syData = Std.string(this._syData).toLowerCase();
+			if(syData == "staff") {
+				this.NewSy();
+				if(this._currentTrack.Staves[0].Bars.length > 0) {
+					this._currentTrack.EnsureStaveCount(this._currentTrack.Staves.length + 1);
+					this._currentStaff = this._currentTrack.Staves[this._currentTrack.Staves.length - 1];
+				}
+				this.StaffProperties();
+			}
+		}
+	}
+	,StaffProperties: function() {
+		if(this._sy != 9) {
+			return;
+		}
+		this.NewSy();
+		var showStandardNotation = false;
+		var showTabs = false;
+		while(this._sy == 5) {
+			var _g = Std.string(this._syData).toLowerCase();
+			switch(_g) {
+			case "score":
+				showStandardNotation = true;
+				this.NewSy();
+				break;
+			case "tabs":
+				showTabs = true;
+				this.NewSy();
+				break;
+			default:
+				this.Error("staff-properties",5,false);
+			}
+		}
+		if(showStandardNotation || showTabs) {
+			this._currentStaff.ShowStandardNotation = showStandardNotation;
+			this._currentStaff.ShowTablature = showTabs;
+		}
+		if(this._sy != 10) {
+			this.Error("staff-properties",10,true);
+		}
+		this.NewSy();
+	}
 	,Bar: function() {
-		var master = new alphaTab.model.MasterBar();
-		this._score.AddMasterBar(master);
-		var bar = new alphaTab.model.Bar();
-		this._staff.AddBar(bar);
-		if(master.Index > 0) {
-			master.KeySignature = master.PreviousMasterBar.KeySignature;
-			master.TimeSignatureDenominator = master.PreviousMasterBar.TimeSignatureDenominator;
-			master.TimeSignatureNumerator = master.PreviousMasterBar.TimeSignatureNumerator;
-			bar.Clef = bar.PreviousBar.Clef;
+		this.TrackStaffMeta();
+		var bar = this.NewBar(this._currentStaff);
+		if(this._currentStaff.Bars.length > this._score.MasterBars.length) {
+			var master = new alphaTab.model.MasterBar();
+			this._score.AddMasterBar(master);
+			if(master.Index > 0) {
+				master.KeySignature = master.PreviousMasterBar.KeySignature;
+				master.TimeSignatureDenominator = master.PreviousMasterBar.TimeSignatureDenominator;
+				master.TimeSignatureNumerator = master.PreviousMasterBar.TimeSignatureNumerator;
+			}
 		}
 		this.BarMeta(bar);
-		var voice = new alphaTab.model.Voice();
-		bar.AddVoice(voice);
+		var voice = bar.Voices[0];
 		while(this._sy != 11 && this._sy != 1) this.Beat(voice);
 		if(voice.Beats.length == 0) {
 			var emptyBeat = new alphaTab.model.Beat();
 			emptyBeat.IsEmpty = true;
 			voice.AddBeat(emptyBeat);
 		}
+	}
+	,NewBar: function(staff) {
+		var bar = new alphaTab.model.Bar();
+		staff.AddBar(bar);
+		if(bar.Index > 0) {
+			bar.Clef = bar.PreviousBar.Clef;
+		}
+		var voice = new alphaTab.model.Voice();
+		bar.AddVoice(voice);
+		return bar;
 	}
 	,Beat: function(voice) {
 		if(this._sy == 3) {
@@ -13624,11 +13728,11 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 			this.NewSy();
 			var chordName = Std.string(this._syData);
 			var chordId = chordName.toLowerCase();
-			if(!this._staff.Chords.hasOwnProperty(chordId)) {
+			if(!this._currentStaff.Chords.hasOwnProperty(chordId)) {
 				var chord = new alphaTab.model.Chord();
 				chord.ShowDiagram = false;
 				chord.Name = chordName;
-				this._staff.AddChord(chordId,chord);
+				this._currentStaff.AddChord(chordId,chord);
 			}
 			beat.ChordId = chordId;
 			this.NewSy();
@@ -13699,7 +13803,7 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 			this.Error("note-fret",2,true);
 		}
 		this.NewSy();
-		var isFretted = octave == -1 && this._staff.Tuning.length > 0;
+		var isFretted = octave == -1 && this._currentStaff.Tuning.length > 0;
 		var string = -1;
 		if(isFretted) {
 			if(this._sy != 4) {
@@ -13710,7 +13814,7 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 				this.Error("note-string",2,true);
 			}
 			string = this._syData;
-			if(string < 1 || string > this._staff.Tuning.length) {
+			if(string < 1 || string > this._currentStaff.Tuning.length) {
 				this.Error("note-string",2,false);
 			}
 			this.NewSy();
@@ -13718,7 +13822,7 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 		var note = new alphaTab.model.Note();
 		beat.AddNote(note);
 		if(isFretted) {
-			note.String = this._staff.Tuning.length - (string - 1);
+			note.String = this._currentStaff.Tuning.length - (string - 1);
 			note.IsDead = isDead;
 			note.IsTieDestination = isTie;
 			if(!isTie) {
@@ -13955,20 +14059,24 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 					this.Error("timesignature-denominator",2,true);
 				}
 				master.TimeSignatureDenominator = this._syData;
+				this.NewSy();
 			} else if(syData == "ro") {
 				master.IsRepeatStart = true;
+				this.NewSy();
 			} else if(syData == "rc") {
 				this.NewSy();
 				if(this._sy != 2) {
 					this.Error("repeatclose",2,true);
 				}
 				master.RepeatCount = this._syData - 1;
+				this.NewSy();
 			} else if(syData == "ks") {
 				this.NewSy();
 				if(this._sy != 5) {
 					this.Error("keysignature",5,true);
 				}
 				master.KeySignature = js.Boot.__cast(this.ParseKeySignature(Std.string(this._syData).toLowerCase()) , Int);
+				this.NewSy();
 			} else if(syData == "clef") {
 				this.NewSy();
 				var _g = this._sy;
@@ -13986,6 +14094,7 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 				default:
 					this.Error("clef",5,true);
 				}
+				this.NewSy();
 			} else if(syData == "tempo") {
 				this.NewSy();
 				if(this._sy != 2) {
@@ -13996,10 +14105,10 @@ alphaTab.importer.AlphaTexImporter.prototype = $extend(alphaTab.importer.ScoreIm
 				tempoAutomation.Type = 0;
 				tempoAutomation.Value = this._syData;
 				master.TempoAutomation = tempoAutomation;
-			} else {
+				this.NewSy();
+			} else if(bar.Index == 0 && !this.HandleStaffMeta()) {
 				this.Error("measure-effects",5,false);
 			}
-			this.NewSy();
 		}
 	}
 	,__class__: alphaTab.importer.AlphaTexImporter
@@ -24216,7 +24325,7 @@ alphaTab.platform.javaScript.AlphaTabApi = $hx_exports["alphaTab"]["platform"]["
 			_gthis.Renderer.UpdateSettings(settings);
 		}
 		if(!(contents == null || contents.length == 0)) {
-			_gthis.Tex(contents);
+			_gthis.Tex(contents,null);
 		} else if(options && options.file) {
 			_gthis.Load(options.file);
 		} else if(dataAttributes.hasOwnProperty("file")) {
@@ -24533,13 +24642,19 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 			} else throw(e1);
 		}
 	}
-	,Tex: function(contents) {
+	,Tex: function(contents,tracksData) {
 		this.Element.classList.add("loading");
 		try {
 			var parser = new alphaTab.importer.AlphaTexImporter();
 			var data = alphaTab.io.ByteBuffer.FromBuffer(alphaTab.platform.Platform.StringToByteArray(contents));
 			parser.Init(data,this.Settings);
-			this.ScoreLoaded(parser.ReadScore(),true);
+			var score = parser.ReadScore();
+			if(tracksData != null) {
+				this.ScoreLoaded(score,false);
+				this.SetTracks(tracksData,true);
+			} else {
+				this.ScoreLoaded(score,true);
+			}
 		} catch( e ) {
 			if (e instanceof js._Boot.HaxeError) e = e.val;
 			if( js.Boot.__instanceof(e,system.Exception) ) {
@@ -24588,7 +24703,17 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		var tracks = this1;
 		if(typeof(tracksData) == "string") {
 			try {
-				tracksData = JSON.parse(tracksData.As());
+				if(tracksData == "all") {
+					var this2 = new Int32Array(this.Score.Tracks.length);
+					tracksData = this2;
+					var i = 0;
+					while(i < this.Score.Tracks.length) {
+						tracksData[i] = this.Score.Tracks[i].Index;
+						++i;
+					}
+				} else {
+					tracksData = JSON.parse(tracksData);
+				}
 			} catch( __e ) {
 				tracksData = [0];
 			}
@@ -24596,24 +24721,24 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		if(typeof(tracksData) == "number") {
 			tracks.push(tracksData);
 		} else if(tracksData.length) {
-			var i = 0;
-			while(i < tracksData.length) {
+			var i1 = 0;
+			while(i1 < tracksData.length) {
 				var value;
-				if(typeof(tracksData[i]) == "number") {
-					value = tracksData[i];
+				if(typeof(tracksData[i1]) == "number") {
+					value = tracksData[i1];
 				} else {
-					var o = tracksData[i].Index;
+					var o = tracksData[i1].Index;
 					if(typeof(o) == "number") {
-						var track = tracksData[i];
+						var track = tracksData[i1];
 						value = track.Index;
 					} else {
-						value = alphaTab.platform.Platform.ParseInt(tracksData[i].ToString());
+						value = alphaTab.platform.Platform.ParseInt(tracksData[i1].ToString());
 					}
 				}
 				if(value >= 0) {
 					tracks.push(value);
 				}
-				++i;
+				++i1;
 			}
 		} else {
 			var o1 = tracksData.Index;
@@ -37902,7 +38027,6 @@ alphaTab.audio.synth.util.SynthConstants.MaxProgram = 127;
 alphaTab.audio.synth.util.SynthConstants.MinPlaybackSpeed = 0.125;
 alphaTab.audio.synth.util.SynthConstants.MaxPlaybackSpeed = 8;
 alphaTab.importer.AlphaTexImporter.Eof = 0;
-alphaTab.importer.AlphaTexImporter.TrackChannels = new Int32Array([0,1]);
 alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.No = 0;
 alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.Eof = 1;
 alphaTab.importer._AlphaTexSymbols.AlphaTexSymbols_Impl_.Number = 2;

@@ -30,23 +30,21 @@ namespace AlphaTab.Importer
     class AlphaTexImporter : ScoreImporter
     {
         private const int Eof = 0;
-        private static readonly int[] TrackChannels = { 0, 1 };
-
+        private int _trackChannel = 0;
         private Score _score;
-        private Track _track;
-        private Staff _staff;
+        private Track _currentTrack;
+        private Staff _currentStaff;
 
         private int _ch;
         private int _curChPos;
 
         private AlphaTexSymbols _sy;
         private object _syData;
-        private bool _anyDataLoaded;
 
         private bool _allowNegatives;
 
         private Duration _currentDuration;
-        private FastList<Lyrics> _lyrics;
+        private FastDictionary<int, FastList<Lyrics>> _lyrics;
 
         public override string Name { get { return "AlphaTex"; } }
 
@@ -54,10 +52,10 @@ namespace AlphaTab.Importer
         {
             try
             {
+                _lyrics = new FastDictionary<int, FastList<Lyrics>>();
                 CreateDefaultScore();
                 _curChPos = 0;
                 _currentDuration = Duration.Quarter;
-                _lyrics = new FastList<Lyrics>();
                 NextChar();
                 NewSy();
                 if (_sy == AlphaTexSymbols.LowerThan)
@@ -67,13 +65,37 @@ namespace AlphaTab.Importer
                 }
                 Score();
 
+                Consolidate();
+
                 _score.Finish(Settings);
-                _track.ApplyLyrics(_lyrics);
+                foreach (var track in _lyrics)
+                {
+                    _score.Tracks[track].ApplyLyrics(_lyrics[track]);
+                }
                 return _score;
             }
             catch (AlphaTexException e)
             {
                 throw new UnsupportedFormatException(e.Message);
+            }
+        }
+
+        private void Consolidate()
+        {
+            // the number of bars per staff and track could be inconsistent,
+            // we need to ensure all staffs of all tracks have the correct number of bars
+            foreach (var track in _score.Tracks)
+            {
+                foreach (var staff in track.Staves)
+                {
+                    while (staff.Bars.Count < _score.MasterBars.Count)
+                    {
+                        var bar = NewBar(staff);
+                        var emptyBeat = new Beat();
+                        emptyBeat.IsEmpty = true;
+                        bar.Voices[0].AddBeat(emptyBeat);
+                    }
+                }
             }
         }
 
@@ -109,16 +131,22 @@ namespace AlphaTab.Importer
             _score.Tempo = 120;
             _score.TempoLabel = "";
 
-            _track = new Track(1);
+            NewTrack();
+        }
 
-            _track.PlaybackInfo.Program = 25;
-            _track.PlaybackInfo.PrimaryChannel = TrackChannels[0];
-            _track.PlaybackInfo.SecondaryChannel = TrackChannels[1];
+        private void NewTrack()
+        {
+            _currentTrack = new Track(1);
 
-            _staff = _track.Staves[0];
-            _staff.Tuning = Tuning.GetDefaultTuningFor(6).Tunings;
+            _currentTrack.PlaybackInfo.Program = 25;
+            _currentTrack.PlaybackInfo.PrimaryChannel = _trackChannel++;
+            _currentTrack.PlaybackInfo.SecondaryChannel = _trackChannel++;
 
-            _score.AddTrack(_track);
+            _currentStaff = _currentTrack.Staves[0];
+            _currentStaff.Tuning = Tuning.GetDefaultTuningFor(6).Tunings;
+
+            _score.AddTrack(_currentTrack);
+            _lyrics[_currentTrack.Index] = new FastList<Lyrics>();
         }
 
         /// <summary>
@@ -467,140 +495,176 @@ namespace AlphaTab.Importer
         private void MetaData()
         {
             var anyMeta = false;
-            while (_sy == AlphaTexSymbols.MetaCommand)
+            bool continueReading = true;
+            while (_sy == AlphaTexSymbols.MetaCommand && continueReading)
             {
                 var syData = _syData.ToString().ToLower();
-                if (syData == "title")
+                switch (syData)
                 {
-                    NewSy();
-                    if (_sy == AlphaTexSymbols.String)
-                    {
-                        _score.Title = _syData.ToString();
-                    }
-                    else
-                    {
-                        Error("title", AlphaTexSymbols.String);
-                    }
-                    NewSy();
-                    _anyDataLoaded = anyMeta = true;
+                    case "title":
+                        NewSy();
+                        if (_sy == AlphaTexSymbols.String)
+                        {
+                            _score.Title = _syData.ToString();
+                        }
+                        else
+                        {
+                            Error("title", AlphaTexSymbols.String);
+                        }
+
+                        NewSy();
+                        anyMeta = true;
+                        break;
+                    case "subtitle":
+                        NewSy();
+                        if (_sy == AlphaTexSymbols.String)
+                        {
+                            _score.SubTitle = _syData.ToString();
+                        }
+                        else
+                        {
+                            Error("subtitle", AlphaTexSymbols.String);
+                        }
+
+                        NewSy();
+                        anyMeta = true;
+                        break;
+                    case "artist":
+                        NewSy();
+                        if (_sy == AlphaTexSymbols.String)
+                        {
+                            _score.Artist = _syData.ToString();
+                        }
+                        else
+                        {
+                            Error("artist", AlphaTexSymbols.String);
+                        }
+                        NewSy();
+                        anyMeta = true;
+                        break;
+                    case "album":
+                        NewSy();
+                        if (_sy == AlphaTexSymbols.String)
+                        {
+                            _score.Album = _syData.ToString();
+                        }
+                        else
+                        {
+                            Error("album", AlphaTexSymbols.String);
+                        }
+                        NewSy();
+                        anyMeta = true;
+                        break;
+                    case "words":
+                        NewSy();
+                        if (_sy == AlphaTexSymbols.String)
+                        {
+                            _score.Words = _syData.ToString();
+                        }
+                        else
+                        {
+                            Error("words", AlphaTexSymbols.String);
+                        }
+                        NewSy();
+                        anyMeta = true;
+                        break;
+                    case "music":
+                        NewSy();
+                        if (_sy == AlphaTexSymbols.String)
+                        {
+                            _score.Music = _syData.ToString();
+                        }
+                        else
+                        {
+                            Error("music", AlphaTexSymbols.String);
+                        }
+                        NewSy();
+                        anyMeta = true;
+                        break;
+                    case "copyright":
+                        NewSy();
+                        if (_sy == AlphaTexSymbols.String)
+                        {
+                            _score.Copyright = _syData.ToString();
+                        }
+                        else
+                        {
+                            Error("copyright", AlphaTexSymbols.String);
+                        }
+                        NewSy();
+                        anyMeta = true;
+                        break;
+                    case "tempo":
+                        NewSy();
+                        if (_sy == AlphaTexSymbols.Number)
+                        {
+                            _score.Tempo = (int)_syData;
+                        }
+                        else
+                        {
+                            Error("tempo", AlphaTexSymbols.Number);
+                        }
+                        NewSy();
+                        anyMeta = true;
+                        break;
+                    default:
+                        if (HandleStaffMeta())
+                        {
+                            anyMeta = true;
+                        }
+                        else if (anyMeta)
+                        {
+                            // invalid meta encountered
+                            Error("metaDataTags", AlphaTexSymbols.String, false);
+                        }
+                        else
+                        {
+                            // fall forward to bar meta if unknown score meta was found
+                            continueReading = false;
+                        }
+                        break;
                 }
-                else if (syData == "subtitle")
+            }
+
+            if (anyMeta)
+            {
+                if (_sy != AlphaTexSymbols.Dot)
                 {
-                    NewSy();
-                    if (_sy == AlphaTexSymbols.String)
-                    {
-                        _score.SubTitle = _syData.ToString();
-                    }
-                    else
-                    {
-                        Error("subtitle", AlphaTexSymbols.String);
-                    }
-                    NewSy();
-                    _anyDataLoaded = anyMeta = true;
+                    Error("song", AlphaTexSymbols.Dot);
                 }
-                else if (syData == "artist")
-                {
-                    NewSy();
-                    if (_sy == AlphaTexSymbols.String)
-                    {
-                        _score.Artist = _syData.ToString();
-                    }
-                    else
-                    {
-                        Error("artist", AlphaTexSymbols.String);
-                    }
-                    NewSy();
-                    _anyDataLoaded = anyMeta = true;
-                }
-                else if (syData == "album")
-                {
-                    NewSy();
-                    if (_sy == AlphaTexSymbols.String)
-                    {
-                        _score.Album = _syData.ToString();
-                    }
-                    else
-                    {
-                        Error("album", AlphaTexSymbols.String);
-                    }
-                    NewSy();
-                    _anyDataLoaded = anyMeta = true;
-                }
-                else if (syData == "words")
-                {
-                    NewSy();
-                    if (_sy == AlphaTexSymbols.String)
-                    {
-                        _score.Words = _syData.ToString();
-                    }
-                    else
-                    {
-                        Error("words", AlphaTexSymbols.String);
-                    }
-                    NewSy();
-                    _anyDataLoaded = anyMeta = true;
-                }
-                else if (syData == "music")
-                {
-                    NewSy();
-                    if (_sy == AlphaTexSymbols.String)
-                    {
-                        _score.Music = _syData.ToString();
-                    }
-                    else
-                    {
-                        Error("music", AlphaTexSymbols.String);
-                    }
-                    NewSy();
-                    _anyDataLoaded = anyMeta = true;
-                }
-                else if (syData == "copyright")
-                {
-                    NewSy();
-                    if (_sy == AlphaTexSymbols.String)
-                    {
-                        _score.Copyright = _syData.ToString();
-                    }
-                    else
-                    {
-                        Error("copyright", AlphaTexSymbols.String);
-                    }
-                    NewSy();
-                    _anyDataLoaded = anyMeta = true;
-                }
-                else if (syData == "tempo")
-                {
+                NewSy();
+            }
+            else if (_sy == AlphaTexSymbols.Dot)
+            {
+                NewSy();
+            }
+
+            if (GeneralMidi.IsGuitar(_currentTrack.PlaybackInfo.Program))
+            {
+                _currentStaff.DisplayTranspositionPitch = -12;
+            }
+        }
+
+        private bool HandleStaffMeta()
+        {
+            var syData = _syData.ToString().ToLower();
+            switch (syData)
+            {
+                case "capo":
                     NewSy();
                     if (_sy == AlphaTexSymbols.Number)
                     {
-                        _score.Tempo = (int)_syData;
-                    }
-                    else
-                    {
-                        Error("tempo", AlphaTexSymbols.Number);
-                    }
-                    NewSy();
-                    _anyDataLoaded = anyMeta = true;
-                }
-                else if (syData == "capo")
-                {
-                    NewSy();
-                    if (_sy == AlphaTexSymbols.Number)
-                    {
-                        _staff.Capo = (int)_syData;
+                        _currentStaff.Capo = (int)_syData;
                     }
                     else
                     {
                         Error("capo", AlphaTexSymbols.Number);
                     }
                     NewSy();
-                    _anyDataLoaded = anyMeta = true;
-                }
-                else if (syData == "tuning")
-                {
+                    return true;
+                case "tuning":
                     NewSy();
-                    var strings = _staff.Tuning.Length;
-
+                    var strings = _currentStaff.Tuning.Length;
                     switch (_sy)
                     {
                         case AlphaTexSymbols.String:
@@ -608,7 +672,7 @@ namespace AlphaTab.Importer
                             if (text == "piano" || text == "none" || text == "voice")
                             {
                                 // clear tuning
-                                _staff.Tuning = new int[0];
+                                _currentStaff.Tuning = new int[0];
                             }
                             else
                             {
@@ -625,28 +689,26 @@ namespace AlphaTab.Importer
                                 NewSy();
                             } while (_sy == AlphaTexSymbols.Tuning);
 
-                            _staff.Tuning = tuning.ToArray();
+                            _currentStaff.Tuning = tuning.ToArray();
                             break;
                         default:
                             Error("tuning", AlphaTexSymbols.Tuning);
                             break;
                     }
-                    _anyDataLoaded = anyMeta = true;
 
-                    if (strings != _staff.Tuning.Length && _staff.Chords.Count > 0)
+                    if (strings != _currentStaff.Tuning.Length && _currentStaff.Chords.Count > 0)
                     {
                         ErrorMessage("Tuning must be defined before any chord");
                     }
-                }
-                else if (syData == "instrument")
-                {
+                    return true;
+                case "instrument":
                     NewSy();
                     if (_sy == AlphaTexSymbols.Number)
                     {
                         var instrument = (int)(_syData);
                         if (instrument >= 0 && instrument <= 128)
                         {
-                            _track.PlaybackInfo.Program = (int)_syData;
+                            _currentTrack.PlaybackInfo.Program = (int)_syData;
                         }
                         else
                         {
@@ -656,7 +718,7 @@ namespace AlphaTab.Importer
                     else if (_sy == AlphaTexSymbols.String) // Name
                     {
                         var instrumentName = _syData.ToString().ToLower();
-                        _track.PlaybackInfo.Program = GeneralMidi.GetValue(instrumentName);
+                        _currentTrack.PlaybackInfo.Program = GeneralMidi.GetValue(instrumentName);
                     }
                     else
                     {
@@ -664,10 +726,8 @@ namespace AlphaTab.Importer
                     }
 
                     NewSy();
-                    _anyDataLoaded = anyMeta = true;
-                }
-                else if (syData == "lyrics")
-                {
+                    return true;
+                case "lyrics":
                     NewSy();
 
                     var lyrics = new Lyrics();
@@ -690,12 +750,9 @@ namespace AlphaTab.Importer
                         Error("lyrics", AlphaTexSymbols.String);
                     }
 
-                    _lyrics.Add(lyrics);
-
-                    _anyDataLoaded = anyMeta = true;
-                }
-                else if (syData == "chord")
-                {
+                    _lyrics[_currentTrack.Index].Add(lyrics);
+                    return true;
+                case "chord":
                     NewSy();
                     var chord = new Chord();
 
@@ -710,13 +767,13 @@ namespace AlphaTab.Importer
                     {
                         Error("chord-name", AlphaTexSymbols.Number);
                     }
-                    
-                   
-                    for (int i = 0; i < _staff.Tuning.Length; i++)
+
+
+                    for (int i = 0; i < _currentStaff.Tuning.Length; i++)
                     {
                         if (_sy == AlphaTexSymbols.Number)
                         {
-                            chord.Strings.Add((int) _syData);
+                            chord.Strings.Add((int)_syData);
                         }
                         else if (_sy == AlphaTexSymbols.String && _syData.ToString().ToLower() == "x")
                         {
@@ -726,37 +783,10 @@ namespace AlphaTab.Importer
                         NewSy();
                     }
 
-                    _staff.AddChord(chord.Name.ToLower(), chord);
-
-                    _anyDataLoaded = anyMeta = true;
-                }
-                else if (anyMeta)
-                {
-                    Error("metaDataTags", AlphaTexSymbols.String, false);
-                }
-                else
-                {
-                    // fall forward to bar meta if unknown score meta was found
-                    break;
-                }
-            }
-
-            if (anyMeta)
-            {
-                if (_sy != AlphaTexSymbols.Dot)
-                {
-                    Error("song", AlphaTexSymbols.Dot);
-                }
-                NewSy();
-            }
-            else if (_sy == AlphaTexSymbols.Dot)
-            {
-                NewSy();
-            }
-
-            if (GeneralMidi.IsGuitar(_track.PlaybackInfo.Program))
-            {
-                _staff.DisplayTranspositionPitch = -12;
+                    _currentStaff.AddChord(chord.Name.ToLower(), chord);
+                    return true;
+                default:
+                    return false;
             }
         }
 
@@ -775,7 +805,6 @@ namespace AlphaTab.Importer
                 {
                     case "firstfret":
                         NewSy();
-
                         switch (_sy)
                         {
                             case AlphaTexSymbols.Number:
@@ -785,7 +814,6 @@ namespace AlphaTab.Importer
                                 Error("chord-firstfret", AlphaTexSymbols.Number);
                                 break;
                         }
-
                         NewSy();
                         break;
                     case "showdiagram":
@@ -853,18 +881,17 @@ namespace AlphaTab.Importer
 
                         break;
                     default:
-                        Error("chord-annotation", AlphaTexSymbols.String, false);
+                        Error("chord-properties", AlphaTexSymbols.String, false);
                         break;
                 }
             }
 
             if (_sy != AlphaTexSymbols.RBrace)
             {
-                Error("beat-effects", AlphaTexSymbols.RBrace);
+                Error("chord-properties", AlphaTexSymbols.RBrace);
             }
             NewSy();
         }
-
 
         private void Bars()
         {
@@ -882,25 +909,107 @@ namespace AlphaTab.Importer
             }
         }
 
+        private void TrackStaffMeta()
+        {
+            if (_sy == AlphaTexSymbols.MetaCommand)
+            {
+                var syData = _syData.ToString().ToLower();
+                if (syData == "track")
+                {
+                    NewSy();
+                    if (_sy != AlphaTexSymbols.String)
+                    {
+                        Error("track-name", AlphaTexSymbols.String);
+                    }
+
+                    // new track starting? - if no masterbars it's the \track of the initial track. 
+                    if (_score.MasterBars.Count > 0)
+                    {
+                        NewTrack();
+                    }
+
+                    _currentTrack.Name = _syData.ToString();
+
+                    NewSy();
+                }
+
+                syData = _syData.ToString().ToLower();
+                if (syData == "staff")
+                {
+                    NewSy();
+                    if (_currentTrack.Staves[0].Bars.Count > 0)
+                    {
+                        _currentTrack.EnsureStaveCount(_currentTrack.Staves.Count + 1);
+                        _currentStaff = _currentTrack.Staves[_currentTrack.Staves.Count - 1];
+                    }
+                    StaffProperties();
+                }
+            }
+        }
+
+        private void StaffProperties()
+        {
+            if (_sy != AlphaTexSymbols.LBrace)
+            {
+                return;
+            }
+
+            NewSy();
+
+            bool showStandardNotation = false;
+            bool showTabs = false;
+
+            while (_sy == AlphaTexSymbols.String)
+            {
+                switch (_syData.ToString().ToLower())
+                {
+                    case "score":
+                        showStandardNotation = true;
+                        NewSy();
+                        break;
+                    case "tabs":
+                        showTabs = true;
+                        NewSy();
+                        break;
+                    default:
+                        Error("staff-properties", AlphaTexSymbols.String, false);
+                        break;
+                }
+            }
+
+            if (showStandardNotation || showTabs)
+            {
+                _currentStaff.ShowStandardNotation = showStandardNotation;
+                _currentStaff.ShowTablature = showTabs;
+            }
+
+            if (_sy != AlphaTexSymbols.RBrace)
+            {
+                Error("staff-properties", AlphaTexSymbols.RBrace);
+            }
+            NewSy();
+        }
+
         private void Bar()
         {
-            var master = new MasterBar();
-            _score.AddMasterBar(master);
+            TrackStaffMeta();
 
-            var bar = new Bar();
-            _staff.AddBar(bar);
-
-            if (master.Index > 0)
+            var bar = NewBar(_currentStaff);
+            if (_currentStaff.Bars.Count > _score.MasterBars.Count)
             {
-                master.KeySignature = master.PreviousMasterBar.KeySignature;
-                master.TimeSignatureDenominator = master.PreviousMasterBar.TimeSignatureDenominator;
-                master.TimeSignatureNumerator = master.PreviousMasterBar.TimeSignatureNumerator;
-                bar.Clef = bar.PreviousBar.Clef;
+                var master = new MasterBar();
+                _score.AddMasterBar(master);
+                if (master.Index > 0)
+                {
+                    master.KeySignature = master.PreviousMasterBar.KeySignature;
+                    master.TimeSignatureDenominator = master.PreviousMasterBar.TimeSignatureDenominator;
+                    master.TimeSignatureNumerator = master.PreviousMasterBar.TimeSignatureNumerator;
+                }
             }
+
             BarMeta(bar);
 
-            var voice = new Voice();
-            bar.AddVoice(voice);
+            var voice = bar.Voices[0];
 
             while (_sy != AlphaTexSymbols.Pipe && _sy != AlphaTexSymbols.Eof)
             {
@@ -913,6 +1022,20 @@ namespace AlphaTab.Importer
                 emptyBeat.IsEmpty = true;
                 voice.AddBeat(emptyBeat);
             }
+        }
+
+        private Bar NewBar(Staff staff)
+        {
+            var bar = new Bar();
+            staff.AddBar(bar);
+            if (bar.Index > 0)
+            {
+                bar.Clef = bar.PreviousBar.Clef;
+            }
+
+            var voice = new Voice();
+            bar.AddVoice(voice);
+            return bar;
         }
 
         private void Beat(Voice voice)
@@ -1229,12 +1352,12 @@ namespace AlphaTab.Importer
 
                 var chordName = _syData.ToString();
                 var chordId = chordName.ToLower();
-                if (!_staff.Chords.ContainsKey(chordId))
+                if (!_currentStaff.Chords.ContainsKey(chordId))
                 {
                     var chord = new Chord();
                     chord.ShowDiagram = false;
                     chord.Name = chordName;
-                    _staff.AddChord(chordId, chord);
+                    _currentStaff.AddChord(chordId, chord);
                 }
 
                 beat.ChordId = chordId;
@@ -1331,7 +1454,7 @@ namespace AlphaTab.Importer
 
             NewSy(); // Fret done
 
-            var isFretted = octave == -1 && _staff.Tuning.Length > 0;
+            var isFretted = octave == -1 && _currentStaff.Tuning.Length > 0;
 
             int @string = -1;
             if (isFretted)
@@ -1349,7 +1472,7 @@ namespace AlphaTab.Importer
                     Error("note-string", AlphaTexSymbols.Number);
                 }
                 @string = (int)_syData;
-                if (@string < 1 || @string > _staff.Tuning.Length)
+                if (@string < 1 || @string > _currentStaff.Tuning.Length)
                 {
                     Error("note-string", AlphaTexSymbols.Number, false);
                 }
@@ -1361,7 +1484,7 @@ namespace AlphaTab.Importer
             beat.AddNote(note);
             if (isFretted)
             {
-                note.String = _staff.Tuning.Length - (@string - 1);
+                note.String = _currentStaff.Tuning.Length - (@string - 1);
                 note.IsDead = isDead;
                 note.IsTieDestination = isTie;
                 if (!isTie)
@@ -1675,10 +1798,12 @@ namespace AlphaTab.Importer
                         Error("timesignature-denominator", AlphaTexSymbols.Number);
                     }
                     master.TimeSignatureDenominator = (int)_syData;
+                    NewSy();
                 }
                 else if (syData == "ro")
                 {
                     master.IsRepeatStart = true;
+                    NewSy();
                 }
                 else if (syData == "rc")
                 {
@@ -1688,6 +1813,7 @@ namespace AlphaTab.Importer
                         Error("repeatclose", AlphaTexSymbols.Number);
                     }
                     master.RepeatCount = ((int)_syData) - 1;
+                    NewSy();
                 }
                 else if (syData == "ks")
                 {
@@ -1697,6 +1823,7 @@ namespace AlphaTab.Importer
                         Error("keysignature", AlphaTexSymbols.String);
                     }
                     master.KeySignature = (KeySignature)ParseKeySignature(_syData.ToString().ToLower());
+                    NewSy();
                 }
                 else if (syData == "clef")
                 {
@@ -1717,6 +1844,7 @@ namespace AlphaTab.Importer
                             Error("clef", AlphaTexSymbols.String);
                             break;
                     }
+                    NewSy();
 
                 }
                 else if (syData == "tempo")
@@ -1731,12 +1859,15 @@ namespace AlphaTab.Importer
                     tempoAutomation.Type = AutomationType.Tempo;
                     tempoAutomation.Value = (float)_syData;
                     master.TempoAutomation = tempoAutomation;
+                    NewSy();
                 }
                 else
                 {
-                    Error("measure-effects", AlphaTexSymbols.String, false);
+                    if (bar.Index == 0 && !HandleStaffMeta())
+                    {
+                        Error("measure-effects", AlphaTexSymbols.String, false);
+                    }
                 }
-                NewSy();
             }
         }
 

@@ -74,9 +74,9 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         [Name("tex")]
-        public void Tex(JQuery element, AlphaTabApi context, string tex)
+        public void Tex(JQuery element, AlphaTabApi context, string tex, dynamic tracks)
         {
-            context.Tex(tex);
+            context.Tex(tex, tracks);
         }
 
         [Name("tracks")]
