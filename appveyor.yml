@@ -37,9 +37,6 @@ install:
   - haxelib install hamcrest  > log.txt || type log.txt && cmd /C exit 1
   - haxelib list
   #
-  # Install the chrome for running tests
-  - cinst googlechrome
-  #
   # Npm/Uglifyjs installation
   - npm install -g uglify-js
   - npm install -g jasmine-core
