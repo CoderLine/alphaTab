@@ -88,6 +88,30 @@ describe("alphaTab.test.importer.AlphaTexImporterTest", function() {
     it("TestUnstringed", function() {
         __instance.TestUnstringed();
     });
+    it("TestMultiStaffDefaultSettings", function() {
+        __instance.TestMultiStaffDefaultSettings();
+    });
+    it("TestMultiStaffDefaultSettingsBraces", function() {
+        __instance.TestMultiStaffDefaultSettingsBraces();
+    });
+    it("TestSingleStaffWithSetting", function() {
+        __instance.TestSingleStaffWithSetting();
+    });
+    it("TestMultiStaffWithSettings", function() {
+        __instance.TestMultiStaffWithSettings();
+    });
+    it("TestMultiTrack", function() {
+        __instance.TestMultiTrack();
+    });
+    it("TestMultiTrackNames", function() {
+        __instance.TestMultiTrackNames();
+    });
+    it("TestMultiTrackMultiStaff", function() {
+        __instance.TestMultiTrackMultiStaff();
+    });
+    it("TestMultiTrackMultiStaffInconsistentBars", function() {
+        __instance.TestMultiTrackMultiStaffInconsistentBars();
+    });
 });
 describe("alphaTab.test.importer.Gp3ImporterTest", function() {
     var __instance = new alphaTab.test.importer.Gp3ImporterTest();
