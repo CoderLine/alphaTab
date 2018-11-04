@@ -12,7 +12,6 @@ environment:
   nodejs_version: '8'
   global:
     HAXELIB_ROOT: C:\projects\haxelib
-  global:
     NODE_PATH: C:\projects\node_modules
   deployment_token:
     secure: F3tqGIN2guX5kU5B6q89HGPDAgI0g//DwtqRQL0oVeaJU6oBkgbQeJfiproA3yFi
