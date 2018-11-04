@@ -10,7 +10,7 @@ configuration: Release
 platform: Any CPU
 environment:
   nodejs_version: '8'
-  NODE_PATH: C:\projects\node_modules
+  NODE_PATH: C:\Users\appveyor\AppData\Roaming\npm\node_modules
   global:
     HAXELIB_ROOT: C:\projects\haxelib
   deployment_token:
