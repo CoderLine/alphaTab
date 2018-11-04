@@ -47,6 +47,7 @@ install:
   - npm install -g karma-jasmine
   - npm install -g karma-cli
   - npm install -g karma-chrome-launcher
+  - npm install -g puppeteer
   - npm install -g karma-trx-reporter
   - RefreshEnv
 
