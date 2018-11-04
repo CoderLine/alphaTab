@@ -22,54 +22,5 @@ class Main
 {
 	static function main() 
 	{
-		var allresources = haxe.Resource.listNames();
-		var loaded = 0;
-		
-		trace('Loading resources ('+loaded+'/' + allresources.length + ')');
-		
-		var resourceContent : Array<{ name : String, data : String, str : String }> = Reflect.getProperty(haxe.Resource, "content");
-		
-		for(res in allresources)
-		{
-			var xhr = new js.html.XMLHttpRequest();
-			xhr.open("GET", res, true);
-			untyped xhr.resource = res;
-			xhr.responseType = js.html.XMLHttpRequestResponseType.ARRAYBUFFER;
-			xhr.onreadystatechange = function(e)
-			{
-				var currentRes = untyped __js__("this.resource");
-				
-				if(xhr.readyState == js.html.XMLHttpRequest.DONE)
-				{
-					loaded++;
-					trace('Loading resources ('+loaded+'/' + allresources.length + ')');
-					var e:js.html.CustomEvent = cast js.Browser.document.createEvent("CustomEvent");
-					e.initCustomEvent("alphaTab.test.status", false, false, {
-						message: 'Loading resources ('+loaded+'/' + allresources.length + ')'
-					});
-					js.Browser.document.dispatchEvent(e);
-					
-					var response:js.html.ArrayBuffer = xhr.response;
-					var resourceData = haxe.crypto.Base64.encode(haxe.io.Bytes.ofData(response));
-					
-					for(r in resourceContent)
-					{
-						if(r.name == currentRes)
-						{
-							r.data = resourceData;
-						}					
-					}
-					
-					if(loaded == allresources.length)
-					{	
-						trace('Launching tests');
-						e = cast js.Browser.document.createEvent("CustomEvent");
-						e.initCustomEvent("alphaTab.test.run", false, false, null);
-						js.Browser.document.dispatchEvent(e);
-					}
-				}
-			};
-			xhr.send();
-		}
 	}
 }

@@ -28,15 +28,15 @@ namespace AlphaTab.Test.Importer
     [TestClass]
     public class GpxImporterTest : GpImporterTestBase
     {
-        internal byte[] Load(string name)
+        internal void Load(string name, Action<byte[]> loaded)
         {
             const string path = "TestFiles/";
-            return TestPlatform.LoadFile(path + name);
+            TestPlatform.LoadFile(path + name, loaded);
         }
-        
-        internal GpxImporter PrepareGpxImporterWithFile(string name)
+
+        internal void PrepareGpxImporterWithFile(string name, Action<GpxImporter> ready)
         {
-            return PrepareGpxImporterWithBytes(Load(name));
+            Load(name, data => ready(PrepareGpxImporterWithBytes(data)));
         }
 
         internal GpxImporter PrepareGpxImporterWithBytes(byte[] buffer)
@@ -46,330 +46,381 @@ namespace AlphaTab.Test.Importer
             return readerBase;
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestFileSystemCompressed()
         {
-            GpxFileSystem fileSystem = new GpxFileSystem();
-            fileSystem.Load(ByteBuffer.FromBuffer(Load("GuitarPro6/Compressed.gpx")));
-
-            string[] names = {"score.gpif", "misc.xml", "BinaryStylesheet", "PartConfiguration", "LayoutConfiguration"};
-            int[] sizes = {8488, 130, 12204, 20, 12};
-
-            for (int i = 0; i < fileSystem.Files.Count; i++)
+            Load("GuitarPro6/Compressed.gpx", data =>
             {
-                var file = fileSystem.Files[i];
-                Logger.Info("Test", $"{file.FileName} - {file.FileSize}");
-                Assert.AreEqual(names[i], file.FileName);
-                Assert.AreEqual(sizes[i], file.FileSize);
-            }
+                GpxFileSystem fileSystem = new GpxFileSystem();
+                fileSystem.Load(ByteBuffer.FromBuffer(data));
+
+                string[] names = { "score.gpif", "misc.xml", "BinaryStylesheet", "PartConfiguration", "LayoutConfiguration" };
+                int[] sizes = { 8488, 130, 12204, 20, 12 };
+
+                for (int i = 0; i < fileSystem.Files.Count; i++)
+                {
+                    var file = fileSystem.Files[i];
+                    Logger.Info("Test", $"{file.FileName} - {file.FileSize}");
+                    Assert.AreEqual(names[i], file.FileName);
+                    Assert.AreEqual(sizes[i], file.FileSize);
+                }
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestScoreInfo()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/Test01.gpx");
-            var score = reader.ReadScore();
+            PrepareGpxImporterWithFile("GuitarPro6/Test01.gpx", reader =>
+            {
+                var score = reader.ReadScore();
 
-            Assert.AreEqual("Title", score.Title);
-            Assert.AreEqual("Subtitle", score.SubTitle);
-            Assert.AreEqual("Artist", score.Artist);
-            Assert.AreEqual("Album", score.Album);
-            Assert.AreEqual("Words", score.Words);
-            Assert.AreEqual("Music", score.Music);
-            Assert.AreEqual("Copyright", score.Copyright);
-            Assert.AreEqual("Tab", score.Tab);
-            Assert.AreEqual("Instructions", score.Instructions);
-            Assert.AreEqual("Notice1\nNotice2", score.Notices);
-            Assert.AreEqual(5, score.MasterBars.Count);
-            Assert.AreEqual(2, score.Tracks.Count);
-            Assert.AreEqual("Track 1", score.Tracks[0].Name);
-            Assert.AreEqual("Track 2", score.Tracks[1].Name);
-            Render(score);
+                Assert.AreEqual("Title", score.Title);
+                Assert.AreEqual("Subtitle", score.SubTitle);
+                Assert.AreEqual("Artist", score.Artist);
+                Assert.AreEqual("Album", score.Album);
+                Assert.AreEqual("Words", score.Words);
+                Assert.AreEqual("Music", score.Music);
+                Assert.AreEqual("Copyright", score.Copyright);
+                Assert.AreEqual("Tab", score.Tab);
+                Assert.AreEqual("Instructions", score.Instructions);
+                Assert.AreEqual("Notice1\nNotice2", score.Notices);
+                Assert.AreEqual(5, score.MasterBars.Count);
+                Assert.AreEqual(2, score.Tracks.Count);
+                Assert.AreEqual("Track 1", score.Tracks[0].Name);
+                Assert.AreEqual("Track 2", score.Tracks[1].Name);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestNotes()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/Test02.gpx");
-            var score = reader.ReadScore();
-            CheckTest02Score(score);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/Test02.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckTest02Score(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestTimeSignatures()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/Test03.gpx");
-            var score = reader.ReadScore();
+            PrepareGpxImporterWithFile("GuitarPro6/Test03.gpx", reader =>
+            {
+                var score = reader.ReadScore();
 
-            CheckTest03Score(score);
-            Render(score);
+                CheckTest03Score(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestDead()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestDead.gpx");
-            var score = reader.ReadScore();
-            CheckDead(score);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/TestDead.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckDead(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestGrace()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestGrace.gpx");
-            var score = reader.ReadScore();
-            CheckGrace(score);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/TestGrace.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckGrace(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestAccentuation()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestAccentuations.gpx");
-            var score = reader.ReadScore();
-            CheckAccentuation(score, true);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/TestAccentuations.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckAccentuation(score, true);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestHarmonics()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestHarmonics.gpx");
-            var score = reader.ReadScore();
-            CheckHarmonics(score);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/TestHarmonics.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckHarmonics(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestHammer()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestHammer.gpx");
-            var score = reader.ReadScore();
-            CheckHammer(score);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/TestHammer.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckHammer(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestBend()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestBends.gpx");
-            var score = reader.ReadScore();
+            PrepareGpxImporterWithFile("GuitarPro6/TestBends.gpx", reader =>
+            {
+                var score = reader.ReadScore();
 
-            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints.Count);
+                Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints.Count);
 
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints[0].Offset);
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints[0].Value);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints[0].Offset);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints[0].Value);
 
-            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints[1].Offset);
-            Assert.AreEqual(4, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints[1].Value);
+                Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints[1].Offset);
+                Assert.AreEqual(4, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].BendPoints[1].Value);
 
-            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints.Count);
+                Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints.Count);
 
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints[0].Offset);
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints[0].Value);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints[0].Offset);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints[0].Value);
 
-            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints[1].Offset);
-            Assert.AreEqual(4, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints[1].Value);
+                Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints[1].Offset);
+                Assert.AreEqual(4, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].BendPoints[1].Value);
 
-            Assert.AreEqual(3, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints.Count);
+                Assert.AreEqual(3, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints.Count);
 
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[0].Offset);
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[0].Value);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[0].Offset);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[0].Value);
 
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[0].Offset);
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[0].Value);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[0].Offset);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[0].Value);
 
-            Assert.AreEqual(30, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[1].Offset);
-            Assert.AreEqual(12, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[1].Value);
+                Assert.AreEqual(30, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[1].Offset);
+                Assert.AreEqual(12, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[1].Value);
 
-            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[2].Offset);
-            Assert.AreEqual(6, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[2].Value);
-            Render(score);
+                Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[2].Offset);
+                Assert.AreEqual(6, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].BendPoints[2].Value);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestTremolo()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestTremolo.gpx");
-            var score = reader.ReadScore();
+            PrepareGpxImporterWithFile("GuitarPro6/TestTremolo.gpx", reader =>
+            {
+                var score = reader.ReadScore();
 
-            Assert.AreEqual(3, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints.Count);
+                Assert.AreEqual(3, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints.Count);
 
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints[0].Offset);
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints[0].Value);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints[0].Offset);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints[0].Value);
 
-            Assert.AreEqual(30, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints[1].Offset);
-            Assert.AreEqual(-4, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints[1].Value);
+                Assert.AreEqual(30, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints[1].Offset);
+                Assert.AreEqual(-4, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints[1].Value);
 
-            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints[2].Offset);
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints[2].Value);
-
-
-            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints.Count);
-
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[0].Offset);
-            Assert.AreEqual(-4, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[0].Value);
-
-            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[1].Offset);
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[1].Value);
+                Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints[2].Offset);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].WhammyBarPoints[2].Value);
 
 
-            Assert.AreEqual(3, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints.Count);
+                Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints.Count);
 
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[0].Offset);
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[0].Value);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[0].Offset);
+                Assert.AreEqual(-4, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[0].Value);
 
-            Assert.AreEqual(30, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[1].Offset);
-            Assert.AreEqual(-4, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[1].Value);
+                Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[1].Offset);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].WhammyBarPoints[1].Value);
 
-            Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[2].Offset);
-            Assert.AreEqual(-4, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[2].Value);
 
-            Assert.AreEqual(4, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints.Count);
+                Assert.AreEqual(3, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints.Count);
 
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[0].Offset);
-            Assert.AreEqual(-4, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[0].Value);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[0].Offset);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[0].Value);
 
-            Assert.AreEqual(15, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[1].Offset);
-            Assert.AreEqual(-12, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[1].Value);
+                Assert.AreEqual(30, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[1].Offset);
+                Assert.AreEqual(-4, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[1].Value);
 
-            Assert.AreEqual(30, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[2].Offset);
-            Assert.AreEqual(-12, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[2].Value);
+                Assert.AreEqual(60, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[2].Offset);
+                Assert.AreEqual(-4, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].WhammyBarPoints[2].Value);
 
-            Assert.AreEqual(45, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[3].Offset);
-            Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[3].Value);
+                Assert.AreEqual(4, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints.Count);
 
-            Render(score);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[0].Offset);
+                Assert.AreEqual(-4, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[0].Value);
+
+                Assert.AreEqual(15, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[1].Offset);
+                Assert.AreEqual(-12, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[1].Value);
+
+                Assert.AreEqual(30, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[2].Offset);
+                Assert.AreEqual(-12, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[2].Value);
+
+                Assert.AreEqual(45, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[3].Offset);
+                Assert.AreEqual(0, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].WhammyBarPoints[3].Value);
+
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestSlides()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestSlides.gpx");
-            var score = reader.ReadScore();
-            CheckSlides(score);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/TestSlides.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckSlides(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestVibrato()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestVibrato.gpx");
-            var score = reader.ReadScore();
-            CheckVibrato(score, true);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/TestVibrato.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckVibrato(score, true);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestTrills()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestTrills.gpx");
-            var score = reader.ReadScore();
-            CheckTrills(score);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/TestTrills.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckTrills(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestOtherEffects()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestOtherEffects.gpx");
-            var score = reader.ReadScore();
-            CheckOtherEffects(score, true /* GPX doesn't support instrument changes */);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/TestOtherEffects.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckOtherEffects(score, true /* GPX doesn't support instrument changes */);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestFingering()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestFingering.gpx");
-            var score = reader.ReadScore();
-            CheckFingering(score);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/TestFingering.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckFingering(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestStroke()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestStrokes.gpx");
-            var score = reader.ReadScore();
-            CheckStroke(score);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/TestStrokes.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckStroke(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestTuplets()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestTuplets.gpx");
-            var score = reader.ReadScore();
-            CheckTuplets(score);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/TestTuplets.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckTuplets(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestRanges()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestRanges.gpx");
-            var score = reader.ReadScore();
-            CheckRanges(score);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/TestRanges.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckRanges(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestEffects()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/Effects.gpx");
-            var score = reader.ReadScore();
-            CheckEffects(score);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/Effects.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckEffects(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestSerenade()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/Serenade.gpx");
-            var score = reader.ReadScore();// only Check reading
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/Serenade.gpx", reader =>
+            {
+                var score = reader.ReadScore();// only Check reading
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestStrings()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestStrings.gpx");
-            var score = reader.ReadScore();
-            CheckStrings(score);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/TestStrings.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckStrings(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestKeySignatures()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestKeySignatures.gpx");
-            var score = reader.ReadScore();
-            CheckKeySignatures(score);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/TestKeySignatures.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckKeySignatures(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestChords()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/TestChords.gpx");
-            var score = reader.ReadScore();
-            CheckChords(score);
-            Render(score);
+            PrepareGpxImporterWithFile("GuitarPro6/TestChords.gpx", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckChords(score);
+                Render(score);
+            });
         }
 
 
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestColors()
         {
-            var reader = PrepareGpxImporterWithFile("GuitarPro6/Colors.gpx");
-            var score = reader.ReadScore();
+            PrepareGpxImporterWithFile("GuitarPro6/Colors.gpx", reader =>
+            {
+                var score = reader.ReadScore();
 
-            CheckColors(score);
-            Render(score);
+                CheckColors(score);
+                Render(score);
+            });
         }
     }
 }

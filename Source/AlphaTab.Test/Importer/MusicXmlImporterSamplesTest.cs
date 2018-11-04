@@ -10,120 +10,120 @@ namespace AlphaTab.Test.Importer
     [Ignore]
     public class MusicXmlImporterSamplesTests : MusicXmlImporterTestBase
     {
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_ActorPreludeSample()
         {
-            TestReference(renderLayout:"horizontal");
+            TestReference(renderLayout: "horizontal");
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_BeetAnGeSample()
         {
             TestReference();
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_Binchois()
         {
             TestReference();
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_BrahWiMeSample()
         {
             TestReference();
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_BrookeWestSample()
         {
             TestReference();
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_Chant()
         {
             TestReference();
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_DebuMandSample()
         {
             TestReference();
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_Dichterliebe01()
         {
             TestReference();
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_Echigo()
         {
             TestReference();
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_FaurReveSample()
         {
             TestReference();
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_MahlFaGe4Sample()
         {
             TestReference();
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_MozaChloSample()
         {
             TestReference();
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_MozartPianoSonata()
         {
             TestReference();
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_MozartTrio()
         {
             TestReference();
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_MozaVeilSample()
         {
             TestReference();
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_Saltarello()
         {
             TestReference();
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_SchbAvMaSample()
         {
             TestReference();
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void Test_Telemann()
         {
             TestReference();
         }
 
-        private Score TestReference([CallerMemberName] string caller = null, string renderLayout = "page", bool renderAllTracks = true)
+        private void TestReference([CallerMemberName] string caller = null, string renderLayout = "page", bool renderAllTracks = true)
         {
             var fileId = caller.Split('_')[1];
-            const string path = "TestFiles/MusicXmlSamples";
+            const string path = "TestFiles/MusicXmlSamples/";
             var file = path + fileId + ".xml";
-            return TestReferenceFile(file, renderLayout, renderAllTracks);
+            TestReferenceFile(file, score => { }, renderLayout, renderAllTracks);
         }
     }
 }

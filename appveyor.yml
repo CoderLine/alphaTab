@@ -12,6 +12,8 @@ environment:
   nodejs_version: '8'
   global:
     HAXELIB_ROOT: C:\projects\haxelib
+  global:
+    NODE_PATH: C:\projects\node_modules
   deployment_token:
     secure: F3tqGIN2guX5kU5B6q89HGPDAgI0g//DwtqRQL0oVeaJU6oBkgbQeJfiproA3yFi
     
@@ -36,8 +38,16 @@ install:
   - haxelib install hamcrest  > log.txt || type log.txt && cmd /C exit 1
   - haxelib list
   #
+  # Install the chrome for running tests
+  - cinst googlechrome
+  #
   # Npm/Uglifyjs installation
   - npm install -g uglify-js
+  - npm install -g jasmine-core
+  - npm install -g karma
+  - npm install -g karma-jasmine
+  - npm install -g karma-cli
+  - npm install -g karma-trx-reporter
   - RefreshEnv
 
 dotnet_csproj:
@@ -63,6 +73,9 @@ test:
       - Source\AlphaTab.Test.CSharp\bin\Release\net471\AlphaTab.Test.CSharp.dll
 
 after_test:
+  # Run JS tests
+  - ps: Source\AlphaTab.Test.Js\test\AppveyorRun.ps1
+  # Package artifacts
   - 7z a -r Build\JavaScript\JavaScript.zip Build\JavaScript\*
   - Documentation\generate.bat
   - 7z a -r Documentation.zip Documentation\output\*

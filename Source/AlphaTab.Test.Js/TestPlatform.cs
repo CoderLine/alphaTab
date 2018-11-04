@@ -1,11 +1,15 @@
-﻿using AlphaTab.IO;
+﻿using System;
+using AlphaTab.IO;
 using Haxe.Js.Html;
 using Phase;
+using Phase.Attributes;
 
 namespace AlphaTab.Test
 {
     class TestPlatform
     {
+        public static Action Done;
+
         public static IReadable CreateStringReader(string tex)
         {
             var buf = new ArrayBuffer(tex.Length * 2);
@@ -17,16 +21,30 @@ namespace AlphaTab.Test
             return ByteBuffer.FromBuffer(view.As<byte[]>());
         }
 
-        public static byte[] LoadFile(string path)
+        public static void LoadFile(string path, Action<byte[]> loaded, bool autoDone = true)
         {
-            path = path.Replace("\\", "/");
-            return new Uint8Array(Script.Write<ArrayBuffer>("haxe.Resource.getBytes(path).getData()")).As<byte[]>();
+            var x = new XMLHttpRequest();
+            x.Open("GET", "/base/" + path, true);
+            x.ResponseType = XMLHttpRequestResponseType.ARRAYBUFFER;
+            x.OnReadyStateChange = new Action(() =>
+            {
+                if (x.ReadyState == XMLHttpRequest.DONE)
+                {
+                    ArrayBuffer ab = x.Response;
+                    var data = new Uint8Array(ab);
+                    loaded(Script.Write<byte[]>("untyped data"));
+                    if (autoDone)
+                    {
+                        Done();
+                    }
+                }
+            });
+            x.Send();
         }
 
-        public static string LoadFileAsString(string path)
+        public static void LoadFileAsString(string path, Action<string> loaded, bool autoDone = true)
         {
-            path = path.Replace("\\", "/");
-            return Script.Write<string>("haxe.Resource.getString(path)");
+            LoadFile(path, data => { loaded(Platform.Platform.ToString(data, "UTF-8")); }, autoDone);
         }
 
         public static bool IsMatch(string value, string regex)

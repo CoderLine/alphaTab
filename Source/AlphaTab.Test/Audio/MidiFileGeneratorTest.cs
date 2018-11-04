@@ -123,69 +123,69 @@ namespace AlphaTab.Test.Audio
             Assert.AreEqual(expectedEvents.Length, handler.MidiEvents.Count);
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestGraceBeatGeneration()
         {
             var reader = new Gp7Importer();
-            var buffer = TestPlatform.LoadFile("TestFiles/Audio/GraceBeats.gp");
-
-            var settings = Settings.SongBook;
-            reader.Init(ByteBuffer.FromBuffer(buffer), settings);
-            var score = reader.ReadScore();
-
-            var handler = new FlatMidiEventGenerator();
-            var generator = new MidiFileGenerator(score, settings, handler);
-            generator.Generate();
-
-            // on beat
-            var tick = 0;
-            var ticks = new FastList<int>();
-            Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].AbsolutePlaybackStart);
-            Assert.AreEqual(3840, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].PlaybackDuration);
-            ticks.Add(tick);
-            tick += score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].PlaybackDuration;
-
-            Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].AbsolutePlaybackStart);
-            Assert.AreEqual(120, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].PlaybackDuration);
-            ticks.Add(tick);
-            tick += score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].PlaybackDuration;
-
-            Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].AbsolutePlaybackStart);
-            Assert.AreEqual(3720, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].PlaybackDuration);
-            ticks.Add(tick);
-            tick += score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].PlaybackDuration;
-
-            // before beat
-            Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].AbsolutePlaybackStart);
-            Assert.AreEqual(3720, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].PlaybackDuration);
-            ticks.Add(tick);
-            tick += score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].PlaybackDuration;
-
-            Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].AbsolutePlaybackStart);
-            Assert.AreEqual(120, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].PlaybackDuration);
-            ticks.Add(tick);
-            tick += score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].PlaybackDuration;
-
-            Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].AbsolutePlaybackStart);
-            Assert.AreEqual(3840, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].PlaybackDuration);
-            ticks.Add(tick);
-            tick += score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].PlaybackDuration;
-
-            // bend
-            Assert.AreEqual(GraceType.BendGrace, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].GraceType);
-            Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].AbsolutePlaybackStart);
-            Assert.AreEqual(1920, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].PlaybackDuration);
-            ticks.Add(tick);
-            tick += score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].PlaybackDuration;
-
-            Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[1].AbsolutePlaybackStart);
-            Assert.AreEqual(1920, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[1].PlaybackDuration);
-            ticks.Add(tick);
-            tick += score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[1].PlaybackDuration;
-
-            var info = score.Tracks[0].PlaybackInfo;
-            var expectedEvents = new FlatMidiEventGenerator.MidiEvent[]
+            TestPlatform.LoadFile("TestFiles/Audio/GraceBeats.gp", buffer =>
             {
+                var settings = Settings.SongBook;
+                reader.Init(ByteBuffer.FromBuffer(buffer), settings);
+                var score = reader.ReadScore();
+
+                var handler = new FlatMidiEventGenerator();
+                var generator = new MidiFileGenerator(score, settings, handler);
+                generator.Generate();
+
+                // on beat
+                var tick = 0;
+                var ticks = new FastList<int>();
+                Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].AbsolutePlaybackStart);
+                Assert.AreEqual(3840, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].PlaybackDuration);
+                ticks.Add(tick);
+                tick += score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].PlaybackDuration;
+
+                Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].AbsolutePlaybackStart);
+                Assert.AreEqual(120, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].PlaybackDuration);
+                ticks.Add(tick);
+                tick += score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].PlaybackDuration;
+
+                Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].AbsolutePlaybackStart);
+                Assert.AreEqual(3720, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].PlaybackDuration);
+                ticks.Add(tick);
+                tick += score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].PlaybackDuration;
+
+                // before beat
+                Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].AbsolutePlaybackStart);
+                Assert.AreEqual(3720, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].PlaybackDuration);
+                ticks.Add(tick);
+                tick += score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].PlaybackDuration;
+
+                Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].AbsolutePlaybackStart);
+                Assert.AreEqual(120, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].PlaybackDuration);
+                ticks.Add(tick);
+                tick += score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].PlaybackDuration;
+
+                Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].AbsolutePlaybackStart);
+                Assert.AreEqual(3840, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].PlaybackDuration);
+                ticks.Add(tick);
+                tick += score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].PlaybackDuration;
+
+                // bend
+                Assert.AreEqual(GraceType.BendGrace, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].GraceType);
+                Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].AbsolutePlaybackStart);
+                Assert.AreEqual(1920, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].PlaybackDuration);
+                ticks.Add(tick);
+                tick += score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[0].PlaybackDuration;
+
+                Assert.AreEqual(tick, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[1].AbsolutePlaybackStart);
+                Assert.AreEqual(1920, score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[1].PlaybackDuration);
+                ticks.Add(tick);
+                tick += score.Tracks[0].Staves[0].Bars[4].Voices[0].Beats[1].PlaybackDuration;
+
+                var info = score.Tracks[0].PlaybackInfo;
+                var expectedEvents = new FlatMidiEventGenerator.MidiEvent[]
+                {
                 // channel init
                 new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Controller = (byte) ControllerType.VolumeCoarse, Value = 120},
                 new FlatMidiEventGenerator.ControlChangeEvent { Tick = 0, Track = 0, Channel=info.PrimaryChannel, Controller = (byte) ControllerType.PanCoarse, Value = 64},
@@ -247,18 +247,19 @@ namespace AlphaTab.Test.Audio
 
                 // end of track
                 new FlatMidiEventGenerator.TrackEndEvent { Tick = 19200, Track = 0 } // 3840 = end of bar
-            };
+                };
 
-            for (int i = 0; i < handler.MidiEvents.Count; i++)
-            {
-                Logger.Info("Test", $"i[{i}] {handler.MidiEvents[i]}");
-                if (i < expectedEvents.Length)
+                for (int i = 0; i < handler.MidiEvents.Count; i++)
                 {
-                    Assert.AreEqual(expectedEvents[i], handler.MidiEvents[i]);
+                    Logger.Info("Test", $"i[{i}] {handler.MidiEvents[i]}");
+                    if (i < expectedEvents.Length)
+                    {
+                        Assert.AreEqual(expectedEvents[i], handler.MidiEvents[i]);
+                    }
                 }
-            }
 
-            Assert.AreEqual(expectedEvents.Length, handler.MidiEvents.Count);
+                Assert.AreEqual(expectedEvents.Length, handler.MidiEvents.Count);
+            });
         }
 
         [TestMethod]

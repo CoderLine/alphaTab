@@ -5,7 +5,7 @@
     {
       "name": "Building JavaScript (debug)",
       "executable": "haxe",
-      "arguments": "-cp ..\\..\\Phase\\Mscorlib -cp ..\\..\\Build\\Haxe\\src -cp ..\\..\\Build\\Haxe\\src-gen -cp Haxe\\src -cp Haxe\\src-gen -js test\\alphaTab.tests.js -main alphaTab.test.Main -debug -D js-unflatten --macro addGlobalMetadata('alphaTab','@:expose') --macro keep('alphaTab',null,true) --macro alphaTab.test.AddResources.run() --macro alphaTab.test.Jasmine.generateJasmineSuites()"
+      "arguments": "-cp ..\\..\\Phase\\Mscorlib -cp ..\\..\\Build\\Haxe\\src -cp ..\\..\\Build\\Haxe\\src-gen -cp Haxe\\src -cp Haxe\\src-gen -js test\\alphaTab.tests.js -main alphaTab.test.Main -debug -D js-unflatten --macro addGlobalMetadata('alphaTab','@:expose') --macro keep('alphaTab',null,true) --macro alphaTab.test.Jasmine.generateJasmineSuites()"
     },
     {
       "name": "Copying testfiles to runner directory",

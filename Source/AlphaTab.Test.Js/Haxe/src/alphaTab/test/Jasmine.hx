@@ -58,7 +58,8 @@ class Jasmine
 						case FMethod(k):
 							if(k == MethNormal && field.meta.has(":testMethod"))
 							{
-								output.writeString("    it(\""+field.name+"\", function() {\r\n");
+								output.writeString("    it(\""+field.name+"\", function(done) {\r\n");
+								output.writeString("        alphaTab.test.TestPlatform.Done = done;\r\n");
 								
 								var ignoreInfo = field.meta.extract(":testIgnore");
 								if(ignoreInfo.length > 0)
@@ -72,6 +73,11 @@ class Jasmine
 									output.writeString("         pending(\"" + reason + "\");\r\n");
 								}
 								output.writeString("        __instance."+field.name+"();\r\n");
+                                
+                                if(!field.meta.has(":testMethodAsync"))
+                                {
+                                    output.writeString("        done();\r\n");
+                                }
 								
 								output.writeString("    });\r\n");
 							}

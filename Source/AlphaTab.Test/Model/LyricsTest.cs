@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using AlphaTab.Collections;
 using AlphaTab.Importer;
 using AlphaTab.IO;
@@ -10,108 +11,119 @@ namespace AlphaTab.Test.Model
     [TestClass]
     public class LyricsTest
     {
-        internal Score LoadLyricsTemplateFile()
+        internal void LoadLyricsTemplateFile(Action<Score> loaded)
         {
             const string path = "TestFiles/GuitarPro6/LyricsTemplate.gpx";
-            var buffer = ByteBuffer.FromBuffer(TestPlatform.LoadFile(path));
-            var importer = new GpxImporter();
-            importer.Init(buffer);
-            return importer.ReadScore();
+            TestPlatform.LoadFile(path, data =>
+            {
+                var buffer = ByteBuffer.FromBuffer(data);
+                var importer = new GpxImporter();
+                importer.Init(buffer);
+                loaded(importer.ReadScore());
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestApplySingleLineFirstBar()
         {
-            var score = LoadLyricsTemplateFile();
-            score.Tracks[0].ApplyLyrics(new FastList<Lyrics>
+            LoadLyricsTemplateFile(score =>
             {
-                new Lyrics { Text = "AAA BBB CCC DDD EEE", StartBar = 0 }
-            });
-            Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Lyrics.Length);
-            Assert.AreEqual("AAA", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Lyrics[0]);
-            Assert.AreEqual("BBB", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Lyrics[0]);
-            Assert.IsNull(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Lyrics);
-            Assert.AreEqual("CCC", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Lyrics[0]);
+                score.Tracks[0].ApplyLyrics(new FastList<Lyrics>
+                {
+                    new Lyrics {Text = "AAA BBB CCC DDD EEE", StartBar = 0}
+                });
+                Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Lyrics.Length);
+                Assert.AreEqual("AAA", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Lyrics[0]);
+                Assert.AreEqual("BBB", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Lyrics[0]);
+                Assert.IsNull(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Lyrics);
+                Assert.AreEqual("CCC", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Lyrics[0]);
 
-            Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics.Length);
-            Assert.AreEqual("DDD", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics[0]);
-            Assert.AreEqual("EEE", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Lyrics[0]);
+                Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics.Length);
+                Assert.AreEqual("DDD", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics[0]);
+                Assert.AreEqual("EEE", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Lyrics[0]);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestApplySingleLineBarOffset()
         {
-            var score = LoadLyricsTemplateFile();
-            score.Tracks[0].ApplyLyrics(new FastList<Lyrics>
+            LoadLyricsTemplateFile(score =>
+            {
+                score.Tracks[0].ApplyLyrics(new FastList<Lyrics>
             {
                 new Lyrics { Text = "AAA BBB CCC DDD EEE", StartBar = 2 }
             });
 
-            Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Lyrics.Length);
-            Assert.AreEqual("AAA", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Lyrics[0]);
-            Assert.AreEqual("BBB", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Lyrics[0]);
-            Assert.IsNull(score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[2].Lyrics);
-            Assert.AreEqual("CCC", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[3].Lyrics[0]);
+                Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Lyrics.Length);
+                Assert.AreEqual("AAA", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Lyrics[0]);
+                Assert.AreEqual("BBB", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Lyrics[0]);
+                Assert.IsNull(score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[2].Lyrics);
+                Assert.AreEqual("CCC", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[3].Lyrics[0]);
 
-            Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].Lyrics.Length);
-            Assert.AreEqual("DDD", score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].Lyrics[0]);
-            Assert.AreEqual("EEE", score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].Lyrics[0]);
+                Assert.AreEqual(1, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].Lyrics.Length);
+                Assert.AreEqual("DDD", score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].Lyrics[0]);
+                Assert.AreEqual("EEE", score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].Lyrics[0]);
+            });
         }
 
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestApplyMultiLineFirstBar()
         {
-            var score = LoadLyricsTemplateFile();
-            score.Tracks[0].ApplyLyrics(new FastList<Lyrics>
+            LoadLyricsTemplateFile(score =>
+            {
+                score.Tracks[0].ApplyLyrics(new FastList<Lyrics>
             {
                 new Lyrics { Text = "AAA BBB CCC DDD EEE", StartBar = 0 },
                 new Lyrics { Text = "111 222 333 444 555", StartBar = 0 }
             });
-            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Lyrics.Length);
-            Assert.AreEqual("AAA", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Lyrics[0]);
-            Assert.AreEqual("111", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Lyrics[1]);
-            Assert.AreEqual("BBB", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Lyrics[0]);
-            Assert.AreEqual("222", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Lyrics[1]);
-            Assert.IsNull(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Lyrics);
-            Assert.AreEqual("CCC", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Lyrics[0]);
-            Assert.AreEqual("333", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Lyrics[1]);
+                Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Lyrics.Length);
+                Assert.AreEqual("AAA", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Lyrics[0]);
+                Assert.AreEqual("111", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Lyrics[1]);
+                Assert.AreEqual("BBB", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Lyrics[0]);
+                Assert.AreEqual("222", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Lyrics[1]);
+                Assert.IsNull(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Lyrics);
+                Assert.AreEqual("CCC", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Lyrics[0]);
+                Assert.AreEqual("333", score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Lyrics[1]);
 
-            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics.Length);
-            Assert.AreEqual("DDD", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics[0]);
-            Assert.AreEqual("444", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics[1]);
-            Assert.AreEqual("EEE", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Lyrics[0]);
-            Assert.AreEqual("555", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Lyrics[1]);
+                Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics.Length);
+                Assert.AreEqual("DDD", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics[0]);
+                Assert.AreEqual("444", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics[1]);
+                Assert.AreEqual("EEE", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Lyrics[0]);
+                Assert.AreEqual("555", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Lyrics[1]);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestApplyMultiLineBarOffset()
         {
-            var score = LoadLyricsTemplateFile();
-            score.Tracks[0].ApplyLyrics(new FastList<Lyrics>
+            LoadLyricsTemplateFile(score =>
+            {
+                score.Tracks[0].ApplyLyrics(new FastList<Lyrics>
             {
                 new Lyrics { Text = "AAA BBB CCC DDD EEE", StartBar = 2 },
                 new Lyrics { Text = "111 222 333 444 555", StartBar = 1 }
             });
 
-            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics.Length);
+                Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics.Length);
 
-            Assert.IsNull(score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics[0]);
-            Assert.AreEqual("111", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics[1]);
-            Assert.IsNull(score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Lyrics[0]);
-            Assert.AreEqual("222", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Lyrics[1]);
-            Assert.IsNull(score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[2].Lyrics);
-            Assert.IsNull(score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[3].Lyrics[0]);
-            Assert.AreEqual("333", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[3].Lyrics[1]);
+                Assert.IsNull(score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics[0]);
+                Assert.AreEqual("111", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Lyrics[1]);
+                Assert.IsNull(score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Lyrics[0]);
+                Assert.AreEqual("222", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Lyrics[1]);
+                Assert.IsNull(score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[2].Lyrics);
+                Assert.IsNull(score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[3].Lyrics[0]);
+                Assert.AreEqual("333", score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[3].Lyrics[1]);
 
-            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Lyrics.Length);
-            Assert.AreEqual("AAA", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Lyrics[0]);
-            Assert.AreEqual("444", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Lyrics[1]);
-            Assert.AreEqual("BBB", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Lyrics[0]);
-            Assert.AreEqual("555", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Lyrics[1]);
-            Assert.IsNull(score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[2].Lyrics);
-            Assert.AreEqual("CCC", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[3].Lyrics[0]);
-            Assert.IsNull(score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[3].Lyrics[1]);
+                Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Lyrics.Length);
+                Assert.AreEqual("AAA", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Lyrics[0]);
+                Assert.AreEqual("444", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Lyrics[1]);
+                Assert.AreEqual("BBB", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Lyrics[0]);
+                Assert.AreEqual("555", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Lyrics[1]);
+                Assert.IsNull(score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[2].Lyrics);
+                Assert.AreEqual("CCC", score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[3].Lyrics[0]);
+                Assert.IsNull(score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[3].Lyrics[1]);
+            });
         }
 
         [TestMethod]

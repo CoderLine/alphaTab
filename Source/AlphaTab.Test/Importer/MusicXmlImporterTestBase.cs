@@ -26,47 +26,53 @@ namespace AlphaTab.Test.Importer
             return readerBase;
         }
 
-        protected Score TestReferenceFile(string file, string renderLayout = "page", bool renderAllTracks = false)
+        protected void TestReferenceFile(string file, Action<Score> done, string renderLayout = "page", bool renderAllTracks = false)
         {
             var gpxImporter = new GpxImporter();
-
-            try
+            TestPlatform.LoadFile(file, fileData =>
             {
-                var buffer = TestPlatform.LoadFile(file);
-                var importer = PrepareImporterWithBytes(buffer);
-                var score = importer.ReadScore();
                 var reference = TestPlatform.ChangeExtension(file, ".gpx");
+                TestPlatform.LoadFile(reference, referenceData =>
+                {
+                    try
+                    {
+                        var importer = PrepareImporterWithBytes(fileData);
+                        var score = importer.ReadScore();
 
 #if !PHASE
-                if (renderAllTracks)
-                {
-                    Render(score.Tracks.ToArray(), Path.ChangeExtension(file, ".all.png"), renderLayout);
-                }
-                else
-                {
-                    foreach (var track in score.Tracks)
-                    {
-                        Render(new[] { track }, Path.ChangeExtension(file, "." + track.Index + ".png"), renderLayout);
-                    }
-                }
+                        if (renderAllTracks)
+                        {
+                            Render(score.Tracks.ToArray(), Path.ChangeExtension(file, ".all.png"), renderLayout);
+                        }
+                        else
+                        {
+                            foreach (var track in score.Tracks)
+                            {
+                                Render(new[] {track}, Path.ChangeExtension(file, "." + track.Index + ".png"),
+                                    renderLayout);
+                            }
+                        }
 
-                if (!File.Exists(reference))
-                {
-                    Assert.Inconclusive();
-                }
+                        if (!File.Exists(reference))
+                        {
+                            Assert.Inconclusive();
+                        }
 #endif
 
-                gpxImporter.Init(ByteBuffer.FromBuffer(TestPlatform.LoadFile(reference)));
-                var referenceScore = gpxImporter.ReadScore();
-                AreEqual(referenceScore, score);
+                        gpxImporter.Init(ByteBuffer.FromBuffer(referenceData));
+                        var referenceScore = gpxImporter.ReadScore();
+                        AreEqual(referenceScore, score);
 
-                return score;
-            }
-            catch (UnsupportedFormatException e)
-            {
-                Assert.Fail("Failed to load file {0}: {1}", file, e);
-                throw;
-            }
+                        done(score);
+                        TestPlatform.Done();
+                    }
+                    catch (UnsupportedFormatException e)
+                    {
+                        Assert.Fail("Failed to load file {0}: {1}", file, e);
+                        throw;
+                    }
+                }, false);
+            }, false);
         }
 
         protected string GetHierarchy(object node)

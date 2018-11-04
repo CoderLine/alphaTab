@@ -10,55 +10,63 @@ namespace AlphaTab.Test.Audio
     [TestClass]
     public class MidiPlaybackControllerTest : GpImporterTestBase
     {
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestRepeatClose()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5\\RepeatClose.gp5");
-            var score = reader.ReadScore();
-            var expectedIndexes = new[]
+            PrepareImporterWithFile("GuitarPro5\\RepeatClose.gp5", reader =>
             {
-                0, 1, 0, 1, 2
-            };
+                var score = reader.ReadScore();
+                var expectedIndexes = new[]
+                {
+                    0, 1, 0, 1, 2
+                };
 
-            TestRepeat(score, expectedIndexes);
+                TestRepeat(score, expectedIndexes);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestRepeatCloseMulti()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5\\RepeatCloseMulti.gp5");
-            var score = reader.ReadScore();
-            var expectedIndexes = new[]
+            PrepareImporterWithFile("GuitarPro5\\RepeatCloseMulti.gp5", reader =>
             {
-                0,1,0,1,0,1,0,1,2
-            };
-            TestRepeat(score, expectedIndexes);
+                var score = reader.ReadScore();
+                var expectedIndexes = new[]
+                {
+                    0,1,0,1,0,1,0,1,2
+                };
+                TestRepeat(score, expectedIndexes);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestRepeatCloseWithoutStartAtBeginning()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5\\RepeatCloseWithoutStartAtBeginning.gp5");
-            var score = reader.ReadScore();
-            var expectedIndexes = new[]
+            PrepareImporterWithFile("GuitarPro5\\RepeatCloseWithoutStartAtBeginning.gp5", reader =>
             {
-                0,1,0,1
-            };
+                var score = reader.ReadScore();
+                var expectedIndexes = new[]
+                {
+                    0,1,0,1
+                };
 
-            TestRepeat(score, expectedIndexes);
+                TestRepeat(score, expectedIndexes);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestRepeatCloseAlternateEndings()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5\\RepeatCloseAlternateEndings.gp5");
-            var score = reader.ReadScore();
-            var expectedIndexes = new[]
+            PrepareImporterWithFile("GuitarPro5\\RepeatCloseAlternateEndings.gp5", reader =>
             {
-                0,1,0,2,3,0,1,0,4
-            };
+                var score = reader.ReadScore();
+                var expectedIndexes = new[]
+                {
+                    0,1,0,2,3,0,1,0,4
+                };
 
-            TestRepeat(score, expectedIndexes);
+                TestRepeat(score, expectedIndexes);
+            });
         }
 
         private void TestRepeat(Score score, int[] expectedIndexes)
