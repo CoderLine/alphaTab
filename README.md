@@ -15,6 +15,18 @@ alphaTab is a cross platform music notation and guitar tablature rendering libra
 **Build** | [![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/CoderLine/AlphaTab?branch=master&svg=true)](https://ci.appveyor.com/project/Danielku15/alphaTab/branch/master)  | [![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/CoderLine/AlphaTab?branch=develop&svg=true)](https://ci.appveyor.com/project/Danielku15/alphaTab/branch/develop)
 **Documentation** | [![Documentation](https://img.shields.io/badge/docs-master-brightgreen.svg)](https://docs.alphatab.net/master)  | [![Documentation](https://img.shields.io/badge/docs-develop-brightgreen.svg)](https://docs.alphatab.net/develop)
 
+# Downloads
+
+The latest binaries are available for download at [Appveyor](https://ci.appveyor.com/project/Danielku15/alphatab/build/artifacts). Use the links below to grab the binaries from the latest builds.
+
+&nbsp; | `master` | `develop`
+--- | --- | --- 
+**JavaScript** | [JavaScript.zip](https://ci.appveyor.com/api/projects/Danielku15/alphaTab/artifacts/JavaScript.zip?branch=master) | [JavaScript.zip](https://ci.appveyor.com/api/projects/Danielku15/alphaTab/artifacts/JavaScript.zip?branch=develop)
+**.net (nupkg for download/unzip)** | [AlphaTab.nupkg](https://ci.appveyor.com/api/projects/Danielku15/alphaTab/artifacts/AlphaTab.nupkg?branch=master) | [AlphaTab.nupkg](https://ci.appveyor.com/api/projects/Danielku15/alphaTab/artifacts/AlphaTab.nupkg?branch=develop)
+**.net (NuGet feeds)** | (not available until 1.0) | [AlphaTab](https://www.myget.org/feed/coderline/package/nuget/AlphaTab)
+
+JavaScript
+
 # Features
 alphaTab mostly focuses on web based platforms allowing music notation to be embedded into websites and browser based apps but is designed to be used also from .net based platforms like Windows, UWP and Xamarin. 
 

@@ -6,8 +6,8 @@
       "name": "Building JavaScript",
       "executable": "haxe",
       "arguments": "-cp ..\\..\\Phase\\Mscorlib -cp ..\\..\\Build\\Haxe\\src -cp ..\\..\\Build\\Haxe\\src-gen -js ..\\..\\Build\\JavaScript\\AlphaTab.js -main alphaTab.Main -D js-unflatten -dce full --macro addGlobalMetadata('alphaTab','@:expose') --macro keep('alphaTab',null,true) -D source-header= -D doc-gen"
-    }
-    ,{
+    },
+    {
       "name": "Minify JavaScript",
       "executable": "cmd",
       "arguments": "/C uglifyjs ..\\..\\Build\\JavaScript\\AlphaTab.js -o ..\\..\\Build\\JavaScript\\AlphaTab.min.js -c"
@@ -16,7 +16,31 @@
       "name": "Add Source Headers",
       "executable": "node",
       "arguments": "tools\\addSourceHeader.js Tools\\header.js Build\\JavaScript\\AlphaTab.js Build\\JavaScript\\AlphaTab.min.js",
-      "workingDirectory":  "..\\..\\"
+      "workingDirectory": "..\\..\\"
+    },
+    {
+      "name": "Copying WebFont EOT",
+      "executable": "cmd.exe",
+      "arguments": "/C xcopy Font\\bravura\\eot\\Bravura.eot Build\\JavaScript\\Font\\ /Y /S /D",
+      "workingDirectory": "..\\..\\"
+    },
+    {
+      "name": "Copying WebFont OTF",
+      "executable": "cmd.exe",
+      "arguments": "/C xcopy Font\\bravura\\otf\\Bravura.otf Build\\JavaScript\\Font\\ /Y /S /D",
+      "workingDirectory": "..\\..\\"
+    },
+    {
+      "name": "Copying WebFont SVG",
+      "executable": "cmd.exe",
+      "arguments": "/C xcopy Font\\bravura\\svg\\Bravura.svg Build\\JavaScript\\Font\\ /Y /S /D",
+      "workingDirectory": "..\\..\\"
+    },
+    {
+      "name": "Copying WebFont WOFF",
+      "executable": "cmd.exe",
+      "arguments": "/C xcopy Font\\bravura\\woff\\Bravura.woff Build\\JavaScript\\Font\\ /Y /S /D",
+      "workingDirectory": "..\\..\\"
     }
   ]
 }

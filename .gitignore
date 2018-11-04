@@ -43,7 +43,7 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 *.skccache
 
-# Project Dirs
+# Project Dirs and Files
 /Tools/fontconverter/font/*
 /Tools/gpx-decompress/test/*
 /Tools/gpx-decompress/bin/*
@@ -62,7 +62,13 @@ _ReSharper*/
 /Build/CSharp/**/*.dll
 /Build/CSharp/**/*.pdb
 /Build/CSharp/**/*.xml
+/Build/JavaScript/AlphaTab.js
+/Build/JavaScript/AlphaTab.min.js
+/Build/JavaScript/Font/*
 /Test/*
+/JavaScript.zip
+/*.nupkg
+/Documentation.zip
 
 # temps
 .DS_Store 
