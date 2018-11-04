@@ -91,6 +91,9 @@ artifacts:
   # Documentation 
   - path: Documentation.zip
     name: Documentation
+  # JavaScript Test Results  
+  - path: Source\AlphaTab.Test.Js\test\Results.trx
+    name: JavaScriptTestResults
 
 deploy:
   # My Get (Every Build)

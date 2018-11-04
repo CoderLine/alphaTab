@@ -14,4 +14,4 @@ Catch [System.Net.WebException]
     $result = $sr.ReadToEnd()
     Write-Host $result
 }
-Get-Location 
+Pop-Location 
