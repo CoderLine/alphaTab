@@ -24689,6 +24689,9 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 	,TrackIndexesToTracks: function(trackIndexes) {
 		var this1 = [];
 		var tracks = this1;
+		if(trackIndexes == null) {
+			return this.Score.Tracks.slice(0);
+		}
 		var track = new system.Int32ArrayIterator(trackIndexes);
 		while(track.hasNext()) {
 			var track1 = track.next();
@@ -24704,16 +24707,9 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		if(typeof(tracksData) == "string") {
 			try {
 				if(tracksData == "all") {
-					var this2 = new Int32Array(this.Score.Tracks.length);
-					tracksData = this2;
-					var i = 0;
-					while(i < this.Score.Tracks.length) {
-						tracksData[i] = this.Score.Tracks[i].Index;
-						++i;
-					}
-				} else {
-					tracksData = JSON.parse(tracksData);
+					return null;
 				}
+				tracksData = JSON.parse(tracksData);
 			} catch( __e ) {
 				tracksData = [0];
 			}
@@ -24721,24 +24717,24 @@ alphaTab.platform.javaScript.AlphaTabApi.prototype = {
 		if(typeof(tracksData) == "number") {
 			tracks.push(tracksData);
 		} else if(tracksData.length) {
-			var i1 = 0;
-			while(i1 < tracksData.length) {
+			var i = 0;
+			while(i < tracksData.length) {
 				var value;
-				if(typeof(tracksData[i1]) == "number") {
-					value = tracksData[i1];
+				if(typeof(tracksData[i]) == "number") {
+					value = tracksData[i];
 				} else {
-					var o = tracksData[i1].Index;
+					var o = tracksData[i].Index;
 					if(typeof(o) == "number") {
-						var track = tracksData[i1];
+						var track = tracksData[i];
 						value = track.Index;
 					} else {
-						value = alphaTab.platform.Platform.ParseInt(tracksData[i1].ToString());
+						value = alphaTab.platform.Platform.ParseInt(tracksData[i].ToString());
 					}
 				}
 				if(value >= 0) {
 					tracks.push(value);
 				}
-				++i1;
+				++i;
 			}
 		} else {
 			var o1 = tracksData.Index;
@@ -27597,13 +27593,18 @@ alphaTab.rendering.ScoreRenderer.prototype = {
 	,Render: function(score,trackIndexes) {
 		try {
 			this.Score = score;
-			var this1 = [];
-			var tracks = this1;
-			var track = new system.Int32ArrayIterator(trackIndexes);
-			while(track.hasNext()) {
-				var track1 = track.next();
-				if(track1 >= 0 && track1 < score.Tracks.length) {
-					tracks.push(score.Tracks[track1]);
+			var tracks;
+			if(trackIndexes == null) {
+				tracks = score.Tracks.slice(0);
+			} else {
+				var this1 = [];
+				tracks = this1;
+				var track = new system.Int32ArrayIterator(trackIndexes);
+				while(track.hasNext()) {
+					var track1 = track.next();
+					if(track1 >= 0 && track1 < score.Tracks.length) {
+						tracks.push(score.Tracks[track1]);
+					}
 				}
 			}
 			if(tracks.length == 0 && score.Tracks.length > 0) {

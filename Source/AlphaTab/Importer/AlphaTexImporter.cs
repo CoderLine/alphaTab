@@ -917,20 +917,26 @@ namespace AlphaTab.Importer
                 if (syData == "track")
                 {
                     NewSy();
-                    if (_sy != AlphaTexSymbols.String)
-                    {
-                        Error("track-name", AlphaTexSymbols.String);
-                    }
-
+                   
                     // new track starting? - if no masterbars it's the \track of the initial track. 
                     if (_score.MasterBars.Count > 0)
                     {
                         NewTrack();
                     }
 
-                    _currentTrack.Name = _syData.ToString();
+                    // name
+                    if (_sy == AlphaTexSymbols.String)
+                    {
+                        _currentTrack.Name = _syData.ToString();
+                        NewSy();
+                    }
 
-                    NewSy();
+                    // short name
+                    if (_sy == AlphaTexSymbols.String)
+                    {
+                        _currentTrack.ShortName = _syData.ToString();
+                        NewSy();
+                    }
                 }
 
                 syData = _syData.ToString().ToLower();

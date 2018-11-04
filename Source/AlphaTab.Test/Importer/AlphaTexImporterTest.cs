@@ -523,6 +523,43 @@ namespace AlphaTab.Test.Importer
         }
 
         [TestMethod]
+        public void TestMultiTrackNames()
+        {
+            var tex = @"\track 1.1 | 1.1 | \track ""Only Long Name"" 2.2 | 2.2 | \track ""Very Long Name"" ""shrt"" 3.3 | 3.3 ";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(3, score.Tracks.Count);
+            Assert.AreEqual(2, score.MasterBars.Count);
+
+            Assert.AreEqual(1, score.Tracks[0].Staves.Count);
+            Assert.AreEqual("", score.Tracks[0].Name);
+            Assert.AreEqual("", score.Tracks[0].ShortName);
+            Assert.AreEqual(0, score.Tracks[0].PlaybackInfo.PrimaryChannel);
+            Assert.AreEqual(1, score.Tracks[0].PlaybackInfo.SecondaryChannel);
+            Assert.IsTrue(score.Tracks[0].Staves[0].ShowTablature);
+            Assert.IsTrue(score.Tracks[0].Staves[0].ShowStandardNotation);
+            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars.Count);
+
+            Assert.AreEqual(1, score.Tracks[1].Staves.Count);
+            Assert.AreEqual("Only Long Name", score.Tracks[1].Name);
+            Assert.AreEqual("Only Long ", score.Tracks[1].ShortName);
+            Assert.AreEqual(2, score.Tracks[1].PlaybackInfo.PrimaryChannel);
+            Assert.AreEqual(3, score.Tracks[1].PlaybackInfo.SecondaryChannel);
+            Assert.IsTrue(score.Tracks[1].Staves[0].ShowTablature);
+            Assert.IsTrue(score.Tracks[1].Staves[0].ShowStandardNotation);
+            Assert.AreEqual(2, score.Tracks[1].Staves[0].Bars.Count);
+
+            Assert.AreEqual(1, score.Tracks[2].Staves.Count);
+            Assert.AreEqual("Very Long Name", score.Tracks[2].Name);
+            Assert.AreEqual("shrt", score.Tracks[2].ShortName);
+            Assert.AreEqual(4, score.Tracks[2].PlaybackInfo.PrimaryChannel);
+            Assert.AreEqual(5, score.Tracks[2].PlaybackInfo.SecondaryChannel);
+            Assert.IsTrue(score.Tracks[2].Staves[0].ShowTablature);
+            Assert.IsTrue(score.Tracks[2].Staves[0].ShowStandardNotation);
+            Assert.AreEqual(2, score.Tracks[2].Staves[0].Bars.Count);
+        }
+
+        [TestMethod]
         public void TestMultiTrackMultiStaff()
         {
             var tex = 
