@@ -1,5 +1,5 @@
 /*
- * alphaTab v0.9.2.0 (develop)
+ * alphaTab v0.9.3.0 (develop)
  *
  * This file is part of alphaTab.
  * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
