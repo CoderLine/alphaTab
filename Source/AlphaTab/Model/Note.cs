@@ -258,10 +258,11 @@ namespace AlphaTab.Model
         /// Gets or sets whether this note is ends a tied note. 
         /// </summary>
         public bool IsTieDestination { get; set; }
+
         /// <summary>
         /// Gets or sets whether this note starts or continues a tied note. 
         /// </summary>
-        public bool IsTieOrigin { get; set; }
+        public bool IsTieOrigin => TieDestination != null;
 
         /// <summary>
         /// Gets or sets the fingers used for this note on the left hand.
@@ -637,7 +638,6 @@ namespace AlphaTab.Model
             dst.IsStaccato = src.IsStaccato;
             dst.SlideType = src.SlideType;
             dst.Vibrato = src.Vibrato;
-            dst.IsTieOrigin = src.IsTieOrigin;
             dst.IsTieDestination = src.IsTieDestination;
             dst.LeftHandFinger = src.LeftHandFinger;
             dst.RightHandFinger = src.RightHandFinger;
@@ -687,7 +687,6 @@ namespace AlphaTab.Model
         internal void Finish(Settings settings)
         {
             var nextNoteOnLine = new Util.Lazy<Note>(() => NextNoteOnSameLine(this));
-            var prevNoteOnLine = new Util.Lazy<Note>(() => PreviousNoteOnSameLine(this));
 
             var isSongBook = settings != null && settings.DisplayMode == DisplayMode.SongBook;
 
@@ -696,27 +695,30 @@ namespace AlphaTab.Model
             {
                 if (TieOrigin != null)
                 {
-                    TieOrigin.IsTieOrigin = true;
                     TieOrigin.TieDestination = this;
-                }
-                else if (prevNoteOnLine.Value == null)
-                {
-                    IsTieDestination = false;
                 }
                 else
                 {
-                    TieOrigin = prevNoteOnLine.Value;
-                    TieOrigin.IsTieOrigin = true;
-                    TieOrigin.TieDestination = this;
-                    Fret = TieOrigin.Fret;
-                    Octave = TieOrigin.Octave;
-                    Tone = TieOrigin.Tone;
-
-                    if (TieOrigin.HasBend)
+                    var tieOrigin = FindTieOrigin(this);
+                    if (tieOrigin == null)
                     {
-                        BendOrigin = TieOrigin;
+                        IsTieDestination = false;
+                    }
+                    else
+                    {
+                        TieOrigin = tieOrigin;
+                        TieOrigin.TieDestination = this;
+                        Fret = TieOrigin.Fret;
+                        Octave = TieOrigin.Octave;
+                        Tone = TieOrigin.Tone;
+
+                        if (TieOrigin.HasBend)
+                        {
+                            BendOrigin = TieOrigin;
+                        }
                     }
                 }
+                
 
                 // implicit let ring 
                 if (isSongBook && TieOrigin.IsLetRing)
@@ -948,22 +950,31 @@ namespace AlphaTab.Model
             return null;
         }
 
-        internal static Note PreviousNoteOnSameLine(Note note)
+        internal static Note FindTieOrigin(Note note)
         {
             var previousBeat = note.Beat.PreviousBeat;
 
             // keep searching in same bar
             while (previousBeat != null && previousBeat.Voice.Bar.Index >= note.Beat.Voice.Bar.Index - MaxOffsetForSameLineSearch)
             {
-                var noteOnString = previousBeat.GetNoteOnString(note.String);
-                if (noteOnString != null)
+                if (note.IsStringed)
                 {
-                    return noteOnString;
+                    var noteOnString = previousBeat.GetNoteOnString(note.String);
+                    if (noteOnString != null)
+                    {
+                        return noteOnString;
+                    }
                 }
                 else
                 {
-                    previousBeat = previousBeat.PreviousBeat;
+                    var noteWithValue = previousBeat.GetNoteWithRealValue(note.RealValue);
+                    if (noteWithValue != null)
+                    {
+                        return noteWithValue;
+                    }
                 }
+
+                previousBeat = previousBeat.PreviousBeat;
             }
 
             return null;

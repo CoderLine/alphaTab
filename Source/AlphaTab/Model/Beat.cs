@@ -75,6 +75,12 @@ namespace AlphaTab.Model
         public FastDictionary<int, Note> NoteStringLookup { get; }
 
         /// <summary>
+        /// Gets the lookup where the notes per value are registered.
+        /// If this staff contains string based notes this lookup allows fast access. 
+        /// </summary>
+        public FastDictionary<int, Note> NoteValueLookup { get; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this beat is considered empty. 
         /// </summary>
         public bool IsEmpty { get; set; }
@@ -212,7 +218,7 @@ namespace AlphaTab.Model
 
         /// <summary>
         /// Gets or sets the tuplet denominator.
-        /// </summary>
+        /// </summary>re
         public int TupletDenominator { get; set; }
         /// <summary>
         /// Gets or sets the tuplet numerator. 
@@ -374,6 +380,7 @@ namespace AlphaTab.Model
             InvertBeamDirection = false;
             Ottava = Ottavia.Regular;
             NoteStringLookup = new FastDictionary<int, Note>();
+            NoteValueLookup = new FastDictionary<int, Note>();
             WhammyStyle = BendStyle.Default;
             IsSlurOrigin = false;
         }
@@ -504,6 +511,7 @@ namespace AlphaTab.Model
             {
                 NoteStringLookup[note.String] = note;
             }
+            NoteValueLookup[note.RealValue] = note;
         }
 
         internal void RemoveNote(Note note)
@@ -911,6 +919,15 @@ namespace AlphaTab.Model
         internal bool HasNoteOnString(int noteString)
         {
             return NoteStringLookup.ContainsKey(noteString);
+        }
+
+        internal Note GetNoteWithRealValue(int noteRealValue)
+        {
+            if (NoteValueLookup.ContainsKey(noteRealValue))
+            {
+                return NoteValueLookup[noteRealValue];
+            }
+            return null;
         }
     }
 }

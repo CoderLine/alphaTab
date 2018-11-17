@@ -942,7 +942,6 @@ namespace AlphaTab.Importer
             {
                 if (!_tieStartIds.ContainsKey(note.Id))
                 {
-                    note.IsTieOrigin = true;
                     _tieStartIds[note.Id] = true;
                     _tieStarts.Add(note);
                 }

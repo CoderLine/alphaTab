@@ -373,7 +373,7 @@ namespace AlphaTab.Model
                                         note2.Member("TieOriginId", note.Member<int>("TieOriginId"));
                                         notesToLink.Add(note2);
                                     }
-                                    if (note.IsTieOrigin)
+                                    if (note.Member<bool>("TieDestinationId"))
                                     {
                                         note2.Member("TieDestinationId", note.Member<int>("TieDestinationId"));
                                         notesToLink.Add(note2);
