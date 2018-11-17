@@ -129,7 +129,7 @@ namespace AlphaTab.Model
         /// Gets a value indicating whether this note is a percussion note. 
         /// </summary>
         public bool IsPercussion => !IsStringed && (Element >= 0 && Variation >= 0);
-        
+
         /// <summary>
         /// Gets or sets the percusson element. 
         /// </summary>
@@ -169,19 +169,19 @@ namespace AlphaTab.Model
         /// <summary>
         /// Gets or sets whether this note starts a slur. 
         /// </summary>
-        public bool IsSlurOrigin { get; set; }
+        public bool IsSlurOrigin => SlurDestination != null;
         /// <summary>
-        /// Gets or sets whether a slur finished or continues on this note. 
+        /// Gets or sets whether this note finishes a slur. 
         /// </summary>
-        public bool IsSlurDestination => SlurOrigin != null;
+        public bool IsSlurDestination { get; set; }
 
         /// <summary>
-        /// Gets or sets the origin of the slur this note contributes to. 
+        /// Gets or sets the note where the slur of this note starts. 
         /// </summary>
         public Note SlurOrigin { get; set; }
 
         /// <summary>
-        /// Gets or sets the destination of the slur this note contributes to. 
+        /// Gets or sets the note where the slur of this note ends.
         /// </summary>
         public Note SlurDestination { get; set; }
 
@@ -314,6 +314,13 @@ namespace AlphaTab.Model
         /// Gets or sets the dynamics for this note. 
         /// </summary>
         public DynamicValue Dynamic { get; set; }
+
+        internal bool IsEffectSlurOrigin { get; set; }
+        internal bool HasEffectSlur { get; set; }
+        internal bool IsEffectSlurDestination => EffectSlurOrigin != null;
+        internal Note EffectSlurOrigin { get; set; }
+        internal Note EffectSlurDestination { get; set; }
+
 
         /// <summary>
         /// Gets the base note value for the string of this note. 
@@ -627,8 +634,6 @@ namespace AlphaTab.Model
             dst.Accentuated = src.Accentuated;
             dst.Fret = src.Fret;
             dst.String = src.String;
-            dst.IsHammerPullOrigin = src.IsHammerPullOrigin;
-            dst.IsSlurOrigin = src.IsSlurOrigin;
             dst.HarmonicValue = src.HarmonicValue;
             dst.HarmonicType = src.HarmonicType;
             dst.IsGhost = src.IsGhost;
@@ -639,6 +644,8 @@ namespace AlphaTab.Model
             dst.SlideType = src.SlideType;
             dst.Vibrato = src.Vibrato;
             dst.IsTieDestination = src.IsTieDestination;
+            dst.IsSlurDestination = src.IsSlurDestination;
+            dst.IsHammerPullOrigin = src.IsHammerPullOrigin;
             dst.LeftHandFinger = src.LeftHandFinger;
             dst.RightHandFinger = src.RightHandFinger;
             dst.IsFingering = src.IsFingering;
@@ -718,7 +725,7 @@ namespace AlphaTab.Model
                         }
                     }
                 }
-                
+
 
                 // implicit let ring 
                 if (isSongBook && TieOrigin.IsLetRing)
@@ -759,28 +766,6 @@ namespace AlphaTab.Model
                 }
             }
 
-            if (IsHammerPullOrigin || SlideType == SlideType.Legato)
-            {
-                IsSlurOrigin = true;
-                SlurDestination = nextNoteOnLine.Value;
-                if (!IsSlurDestination)
-                {
-                    SlurOrigin = this;
-                    if (SlurDestination != null)
-                    {
-                        SlurDestination.SlurOrigin = this;
-                    }
-                }
-                else
-                {
-                    SlurOrigin.SlurDestination = SlurDestination;
-                    if (SlurDestination != null)
-                    {
-                        SlurDestination.SlurOrigin = SlurOrigin;
-                    }
-                }
-            }
-
             // set hammeron/pulloffs
             if (IsHammerPullOrigin)
             {
@@ -807,6 +792,34 @@ namespace AlphaTab.Model
                     }
                     break;
             }
+
+            Note effectSlurDestination = null;
+            if (IsHammerPullOrigin)
+            {
+                effectSlurDestination = HammerPullDestination;
+            }
+            else if (SlideType == SlideType.Legato && SlideTarget != null)
+            {
+                effectSlurDestination = SlideTarget;
+            }
+
+            if (effectSlurDestination != null)
+            {
+                HasEffectSlur = true;
+                if (EffectSlurOrigin != null)
+                {
+                    EffectSlurOrigin.EffectSlurDestination = effectSlurDestination;
+                    EffectSlurOrigin.EffectSlurDestination.EffectSlurOrigin = EffectSlurOrigin;
+                    EffectSlurOrigin = null;
+                }
+                else
+                {
+                    IsEffectSlurOrigin = true;
+                    EffectSlurDestination = effectSlurDestination;
+                    EffectSlurDestination.EffectSlurOrigin = this;
+                }
+            }
+
 
             // try to detect what kind of bend was used and cleans unneeded points if required
             // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all bends

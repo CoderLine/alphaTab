@@ -219,6 +219,12 @@ namespace AlphaTab.Platform
         }
 
         [Inline]
+        public static bool HasMember(this object s, string name)
+        {
+            return Script.Write<bool>("untyped __js__(\"{0} in {1}\", name, s)");
+        }
+
+        [Inline]
         public static T Member<T>(this object s, string name, T value)
         {
             return Script.Write<T>("untyped s[name] = value");

@@ -162,7 +162,8 @@ namespace AlphaTab.Model
                             for (int bb = 0; bb < voice.Beats.Count; bb++)
                             {
                                 var beat = voice.Beats[bb];
-                                Beat beat2 = Platform.Platform.NewObject();
+                                var dynamicBeat2 = Platform.Platform.NewObject();
+                                Beat beat2 = dynamicBeat2;
                                 Beat.CopyTo(beat, beat2);
 
                                 beat2.Automations = new FastList<Automation>();
@@ -198,6 +199,22 @@ namespace AlphaTab.Model
                                     if (note.IsTieOrigin)
                                     {
                                         dynamicNote2.TieDestinationId = note.TieDestination.Id;
+                                    }
+                                    if (note.IsSlurDestination)
+                                    {
+                                        dynamicNote2.SlurOriginId = note.SlurOrigin.Id;
+                                    }
+                                    if (note.IsSlurOrigin)
+                                    {
+                                        dynamicNote2.SlurDestinationId = note.SlurDestination.Id;
+                                    }
+                                    if (note.IsHammerPullDestination)
+                                    {
+                                        dynamicNote2.HammerPullOriginId = note.HammerPullOrigin.Id;
+                                    }
+                                    if (note.IsHammerPullOrigin)
+                                    {
+                                        dynamicNote2.HammerPullDestinationId = note.HammerPullDestination.Id;
                                     }
 
                                     note2.BendPoints = new FastList<BendPoint>();
@@ -368,14 +385,34 @@ namespace AlphaTab.Model
 
                                     allNotes[note2.Id] = note2;
 
-                                    if (note.IsTieDestination)
+                                    if (note.HasMember("TieOriginId"))
                                     {
                                         note2.Member("TieOriginId", note.Member<int>("TieOriginId"));
                                         notesToLink.Add(note2);
                                     }
-                                    if (note.Member<bool>("TieDestinationId"))
+                                    if (note.HasMember("TieDestinationId"))
                                     {
                                         note2.Member("TieDestinationId", note.Member<int>("TieDestinationId"));
+                                        notesToLink.Add(note2);
+                                    }
+                                    if (note.HasMember("SlurOriginId"))
+                                    {
+                                        note2.Member("SlurOriginId", note.Member<int>("SlurOriginId"));
+                                        notesToLink.Add(note2);
+                                    }
+                                    if (note.HasMember("SlurDestinationId"))
+                                    {
+                                        note2.Member("SlurDestinationId", note.Member<int>("SlurDestinationId"));
+                                        notesToLink.Add(note2);
+                                    }
+                                    if (note.HasMember("HammerPullDestinationId"))
+                                    {
+                                        note2.Member("HammerPullDestinationId", note.Member<int>("HammerPullDestinationId"));
+                                        notesToLink.Add(note2);
+                                    }
+                                    if (note.HasMember("HammerPullDestinationId"))
+                                    {
+                                        note2.Member("HammerPullDestinationId", note.Member<int>("HammerPullDestinationId"));
                                         notesToLink.Add(note2);
                                     }
 
@@ -406,15 +443,35 @@ namespace AlphaTab.Model
 
             foreach (var note in notesToLink)
             {
-                if (note.IsTieDestination)
+                if (note.HasMember("TieOriginId"))
                 {
-                    var tieOriginId = note.Member<int>("TieOriginId");
-                    note.TieOrigin = allNotes[tieOriginId];
+                    var originId = note.Member<int>("TieOriginId");
+                    note.TieOrigin = allNotes[originId];
                 }
-                if (note.IsTieOrigin)
+                if (note.HasMember("TieDestinationId"))
                 {
-                    var tieDestinationId = note.Member<int>("TieDestinationId");
-                    note.TieDestination = allNotes[tieDestinationId];
+                    var destinationId = note.Member<int>("TieDestinationId");
+                    note.TieDestination = allNotes[destinationId];
+                }
+                if (note.HasMember("SlurOriginId"))
+                {
+                    var originId = note.Member<int>("SlurOriginId");
+                    note.SlurOrigin = allNotes[originId];
+                }
+                if (note.HasMember("SlurDestinationId"))
+                {
+                    var destinationId = note.Member<int>("SlurDestinationId");
+                    note.SlurDestination = allNotes[destinationId];
+                }
+                if (note.HasMember("HammerPullOriginId"))
+                {
+                    var originId = note.Member<int>("HammerPullOriginId");
+                    note.HammerPullOrigin = allNotes[originId];
+                }
+                if (note.HasMember("HammerPullDestinationId"))
+                {
+                    var destinationId = note.Member<int>("HammerPullDestinationId");
+                    note.HammerPullDestination = allNotes[destinationId];
                 }
             }
 

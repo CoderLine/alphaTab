@@ -27,14 +27,14 @@ namespace AlphaTab.Rendering.Glyphs
         protected Beat StartBeat;
         protected Beat EndBeat;
         protected float YOffset;
-        private readonly bool _forEnd;
+        protected readonly bool ForEnd;
 
         public TieGlyph(Beat startBeat, Beat endBeat, bool forEnd)
             : base(0, 0)
         {
             StartBeat = startBeat;
             EndBeat = endBeat;
-            _forEnd = forEnd;
+            ForEnd = forEnd;
         }
 
         public override void DoLayout()
@@ -62,7 +62,7 @@ namespace AlphaTab.Rendering.Glyphs
             var direction = GetBeamDirection(StartBeat, startNoteRenderer);
             // if we are on the tie start, we check if we 
             // either can draw till the end note, or we just can draw till the bar end
-            if (!_forEnd)
+            if (!ForEnd)
             {
                 // line break or bar break
                 if (startNoteRenderer != endNoteRenderer)
@@ -108,10 +108,15 @@ namespace AlphaTab.Rendering.Glyphs
 
             if (shouldDraw)
             {
-                PaintTie(canvas, Scale, startX, startY, endX, endY, direction == BeamDirection.Down);
+                PaintTie(canvas, Scale, startX, startY, endX, endY, direction == BeamDirection.Down, GetTieHeight(startX, startY, endX, endY));
 
                 canvas.Fill();
             }
+        }
+
+        protected virtual float GetTieHeight(float startX, float startY, float endX, float endY)
+        {
+            return 22f;
         }
 
         protected virtual BeamDirection GetBeamDirection(Beat beat, BarRendererBase noteRenderer)

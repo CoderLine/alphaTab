@@ -131,24 +131,7 @@ namespace AlphaTab.Model
         /// Gets or sets the duration of this beat. 
         /// </summary>
         public Duration Duration { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether this beat starts a slur. 
-        /// </summary>
-        public bool IsSlurOrigin { get; set; }
-        /// <summary>
-        /// Gets or sets whether this beat ends or continues a slur. 
-        /// </summary>
-        public bool IsSlurDestination => SlurOrigin != null;
-        /// <summary>
-        /// Gets or sets the slur origin beat
-        /// </summary>
-        public Beat SlurOrigin { get; set; }
-        /// <summary>
-        /// Gets or sets the slur destination beat. 
-        /// </summary>
-        public Beat SlurDestination { get; set; }
-
+        
         /// <summary>
         /// Gets or sets whether this beat is considered as rest.
         /// </summary>
@@ -352,6 +335,11 @@ namespace AlphaTab.Model
         /// </summary>
         public bool InvertBeamDirection { get; set; }
 
+        internal bool IsEffectSlurOrigin { get; set; }
+        internal bool IsEffectSlurDestination => EffectSlurOrigin != null;
+        internal Beat EffectSlurOrigin { get; set; }
+        internal Beat EffectSlurDestination { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Beat"/> class.
         /// </summary>
@@ -382,7 +370,6 @@ namespace AlphaTab.Model
             NoteStringLookup = new FastDictionary<int, Note>();
             NoteValueLookup = new FastDictionary<int, Note>();
             WhammyStyle = BendStyle.Default;
-            IsSlurOrigin = false;
         }
 
         internal static void CopyTo(Beat src, Beat dst)
@@ -652,6 +639,7 @@ namespace AlphaTab.Model
             MaxStringNote = null;
 
             var visibleNotes = 0;
+            var isEffectSlurBeat = false;
 
             for (int i = 0, j = Notes.Count; i < j; i++)
             {
@@ -666,10 +654,6 @@ namespace AlphaTab.Model
                     IsPalmMute = true;
                 }
 
-                if (note.IsSlurOrigin)
-                {
-                    IsSlurOrigin = true;
-                }
                 if (displayMode == DisplayMode.SongBook && note.HasBend && GraceType != GraceType.BendGrace)
                 {
                     if (!note.IsTieOrigin)
@@ -718,34 +702,33 @@ namespace AlphaTab.Model
                     {
                         MaxStringNote = note;
                     }
+
+                    if (note.HasEffectSlur)
+                    {
+                        isEffectSlurBeat = true;
+                    }
+                }
+            }
+
+            if (isEffectSlurBeat)
+            {
+                if (EffectSlurOrigin != null)
+                {
+                    EffectSlurOrigin.EffectSlurDestination = NextBeat;
+                    EffectSlurOrigin.EffectSlurDestination.EffectSlurOrigin = EffectSlurOrigin;
+                    EffectSlurOrigin = null;
+                }
+                else
+                {
+                    IsEffectSlurOrigin = true;
+                    EffectSlurDestination = NextBeat;
+                    EffectSlurDestination.EffectSlurOrigin = this;
                 }
             }
 
             if (Notes.Count > 0 && visibleNotes == 0)
             {
                 IsEmpty = true;
-            }
-
-            if (IsSlurOrigin)
-            {
-                IsSlurOrigin = true;
-                SlurDestination = NextBeat;
-                if (!IsSlurDestination)
-                {
-                    SlurOrigin = this;
-                    if (SlurDestination != null)
-                    {
-                        SlurDestination.SlurOrigin = this;
-                    }
-                }
-                else
-                {
-                    SlurOrigin.SlurDestination = SlurDestination;
-                    if (SlurDestination != null)
-                    {
-                        SlurDestination.SlurOrigin = SlurOrigin;
-                    }
-                }
             }
 
             // we need to clean al letring/palmmute flags for rests

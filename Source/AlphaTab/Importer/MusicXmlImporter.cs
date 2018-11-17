@@ -40,6 +40,8 @@ namespace AlphaTab.Importer
         private FastList<Note> _tieStarts;
         private FastDictionary<int, bool> _tieStartIds;
 
+        private FastDictionary<string, Note> _slurStarts;
+
 
         public override string Name { get { return "MusicXML"; } }
 
@@ -49,7 +51,7 @@ namespace AlphaTab.Importer
             _partGroups = new FastDictionary<string, FastList<Track>>();
             _tieStarts = new FastList<Note>();
             _tieStartIds = new FastDictionary<int, bool>();
-
+            _slurStarts = new FastDictionary<string, Note>();
             var xml = Platform.Platform.ToString(Data.ReadAll(), GetSetting("encoding", "utf-8"));
             XmlDocument dom;
             try
@@ -1012,9 +1014,26 @@ namespace AlphaTab.Importer
                             ParseOrnaments(c, note);
                             break;
                         case "slur":
-                            if (c.GetAttribute("type") == "start")
+                            var slurNumber = c.GetAttribute("number");
+                            if (string.IsNullOrEmpty(slurNumber))
                             {
-                                beat.IsLegatoOrigin = true;
+                                slurNumber = "1";
+                            }
+
+                            switch (c.GetAttribute("type"))
+                            {
+                                case "start":
+                                    _slurStarts[slurNumber] = note;
+                                    break;
+                                case "stop":
+                                    if (_slurStarts.ContainsKey(slurNumber))
+                                    {
+                                        note.IsSlurDestination = true;
+                                        var slurStart = _slurStarts[slurNumber];
+                                        slurStart.SlurDestination = note;
+                                        note.SlurOrigin = note;
+                                    }
+                                    break;
                             }
                             break;
                     }
