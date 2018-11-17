@@ -1709,6 +1709,11 @@ namespace AlphaTab.Importer
                     note.Fret = 0;
                     note.IsDead = true;
                 }
+                else if (syData == "-" || syData == "t")
+                {
+                    NewSy();
+                    note.IsTieDestination = true;
+                }
                 else if (syData == "lf")
                 {
                     NewSy();

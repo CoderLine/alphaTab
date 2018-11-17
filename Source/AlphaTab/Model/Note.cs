@@ -967,10 +967,22 @@ namespace AlphaTab.Model
                 }
                 else
                 {
-                    var noteWithValue = previousBeat.GetNoteWithRealValue(note.RealValue);
-                    if (noteWithValue != null)
+                    if (note.Octave == -1 && note.Tone == -1)
                     {
-                        return noteWithValue;
+                        // if the note has no value (e.g. alphaTex dash tie), we try to find a matching
+                        // note on the previous beat by index. 
+                        if (note.Index < previousBeat.Notes.Count)
+                        {
+                            return previousBeat.Notes[note.Index];
+                        }
+                    }
+                    else
+                    {
+                        var noteWithValue = previousBeat.GetNoteWithRealValue(note.RealValue);
+                        if (noteWithValue != null)
+                        {
+                            return noteWithValue;
+                        }
                     }
                 }
 
