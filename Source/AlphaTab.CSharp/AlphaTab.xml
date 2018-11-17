@@ -2450,26 +2450,6 @@
             Gets or sets the duration of this beat. 
             </summary>
         </member>
-        <member name="P:AlphaTab.Model.Beat.IsSlurOrigin">
-            <summary>
-            Gets or sets whether this beat starts a slur. 
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Model.Beat.IsSlurDestination">
-            <summary>
-            Gets or sets whether this beat ends or continues a slur. 
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Model.Beat.SlurOrigin">
-            <summary>
-            Gets or sets the slur origin beat
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Model.Beat.SlurDestination">
-            <summary>
-            Gets or sets the slur destination beat. 
-            </summary>
-        </member>
         <member name="P:AlphaTab.Model.Beat.IsRest">
             <summary>
             Gets or sets whether this beat is considered as rest.
@@ -3585,17 +3565,17 @@
         </member>
         <member name="P:AlphaTab.Model.Note.IsSlurDestination">
             <summary>
-            Gets or sets whether a slur finished or continues on this note. 
+            Gets or sets whether this note finishes a slur. 
             </summary>
         </member>
         <member name="P:AlphaTab.Model.Note.SlurOrigin">
             <summary>
-            Gets or sets the origin of the slur this note contributes to. 
+            Gets or sets the note where the slur of this note starts. 
             </summary>
         </member>
         <member name="P:AlphaTab.Model.Note.SlurDestination">
             <summary>
-            Gets or sets the destination of the slur this note contributes to. 
+            Gets or sets the note where the slur of this note ends.
             </summary>
         </member>
         <member name="P:AlphaTab.Model.Note.IsHarmonic">
@@ -5334,36 +5314,6 @@
         <member name="T:AlphaTab.Xml.XmlParser.XmlState">
             <summary>
             faster than enum
-            </summary>
-        </member>
-        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
-            <summary>
-            GeneratedInternalTypeHelper
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
-            <summary>
-            CreateInstance
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            GetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            SetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
-            <summary>
-            CreateDelegate
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
-            <summary>
-            AddEventHandler
             </summary>
         </member>
     </members>

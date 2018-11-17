@@ -169,7 +169,7 @@ namespace AlphaTab.Platform.JavaScript
                 return 0;
             }
 
-            if (masterVolume.IsTruthy())
+            if (Platform.TypeOf(masterVolume) == "number")
             {
                 context.Player.MasterVolume = masterVolume;
             }
@@ -185,7 +185,7 @@ namespace AlphaTab.Platform.JavaScript
                 return 0;
             }
 
-            if (playbackSpeed.IsTruthy())
+            if (Platform.TypeOf(playbackSpeed) == "number")
             {
                 context.Player.PlaybackSpeed = playbackSpeed;
             }
@@ -201,7 +201,7 @@ namespace AlphaTab.Platform.JavaScript
                 return 0;
             }
 
-            if (metronomeVolume.IsTruthy())
+            if (Platform.TypeOf(metronomeVolume) == "number")
             {
                 context.Player.MetronomeVolume = metronomeVolume;
             }
@@ -217,7 +217,7 @@ namespace AlphaTab.Platform.JavaScript
                 return 0;
             }
 
-            if (tickPosition.IsTruthy())
+            if (Platform.TypeOf(tickPosition) == "number")
             {
                 context.Player.TickPosition = tickPosition;
             }
@@ -249,7 +249,7 @@ namespace AlphaTab.Platform.JavaScript
                 return false;
             }
 
-            if (loop.IsTruthy())
+            if (Platform.TypeOf(loop) == "boolean")
             {
                 context.Player.IsLooping = loop;
             }

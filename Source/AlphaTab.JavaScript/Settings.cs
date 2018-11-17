@@ -161,9 +161,13 @@ namespace AlphaTab
                 settings.ScrollSpeed = 300;
             }
 
-            if (Platform.Platform.JsonExists(json, "scrollSpeed"))
+            if (Platform.Platform.JsonExists(json, "scrollElement"))
             {
-                settings.ScrollElement = json.scrollSpeed;
+                settings.ScrollElement = json.scrollElement;
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("scrollElement"))
+            {
+                settings.ScrollElement = (string)dataAttributes["scrollElement"];
             }
             else if(setDefaults)
             {
