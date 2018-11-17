@@ -1244,8 +1244,8 @@ namespace AlphaTab.Importer
                 graceBeat.GraceType = (flags & 0x02) != 0 ? GraceType.OnBeat : GraceType.BeforeBeat;
             }
 
-            graceBeat.AddNote(graceNote);
             voice.AddGraceBeat(graceBeat);
+            graceBeat.AddNote(graceNote);
         }
 
         public void ReadTremoloPicking(Beat beat)

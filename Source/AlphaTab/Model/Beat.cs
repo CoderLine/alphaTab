@@ -439,7 +439,7 @@ namespace AlphaTab.Model
             }
             for (int i = 0, j = Notes.Count; i < j; i++)
             {
-                beat.AddNote(Notes[i].Clone());
+                beat.AddNoteInternal(Notes[i].Clone(), Notes[i].RealValue);
             }
             CopyTo(this, beat);
             for (int i = 0, j = Automations.Count; i < j; i++)
@@ -504,6 +504,11 @@ namespace AlphaTab.Model
 
         internal void AddNote(Note note)
         {
+            AddNoteInternal(note);
+        }
+
+        private void AddNoteInternal(Note note, int realValue = -1)
+        {
             note.Beat = this;
             note.Index = Notes.Count;
             Notes.Add(note);
@@ -511,7 +516,9 @@ namespace AlphaTab.Model
             {
                 NoteStringLookup[note.String] = note;
             }
-            NoteValueLookup[note.RealValue] = note;
+
+            if (realValue == -1) realValue = note.RealValue;
+            NoteValueLookup[realValue] = note;
         }
 
         internal void RemoveNote(Note note)

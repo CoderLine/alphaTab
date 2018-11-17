@@ -2389,6 +2389,12 @@
             If this staff contains string based notes this lookup allows fast access. 
             </summary>
         </member>
+        <member name="P:AlphaTab.Model.Beat.NoteValueLookup">
+            <summary>
+            Gets the lookup where the notes per value are registered.
+            If this staff contains string based notes this lookup allows fast access. 
+            </summary>
+        </member>
         <member name="P:AlphaTab.Model.Beat.IsEmpty">
             <summary>
             Gets or sets a value indicating whether this beat is considered empty. 
@@ -2537,7 +2543,7 @@
         <member name="P:AlphaTab.Model.Beat.TupletDenominator">
             <summary>
             Gets or sets the tuplet denominator.
-            </summary>
+            </summary>re
         </member>
         <member name="P:AlphaTab.Model.Beat.TupletNumerator">
             <summary>
@@ -5328,6 +5334,36 @@
         <member name="T:AlphaTab.Xml.XmlParser.XmlState">
             <summary>
             faster than enum
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
             </summary>
         </member>
     </members>
