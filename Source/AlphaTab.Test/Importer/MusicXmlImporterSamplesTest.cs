@@ -12,111 +12,103 @@ namespace AlphaTab.Test.Importer
         [TestMethod, AsyncTestMethod]
         public void Test_BeetAnGeSample()
         {
-            TestReference();
+            TestReferenceFile("TestFiles/MusicXmlSamples/BeetAnGeSample.xml");
         }
 
         [TestMethod, AsyncTestMethod]
         public void Test_Binchois()
         {
-            TestReference();
+            TestReferenceFile("TestFiles/MusicXmlSamples/Binchois.xml");
         }
 
         [TestMethod, AsyncTestMethod]
         public void Test_BrahWiMeSample()
         {
-            TestReference();
+            TestReferenceFile("TestFiles/MusicXmlSamples/BrahWiMeSample.xml");
         }
 
         [TestMethod, AsyncTestMethod]
         public void Test_BrookeWestSample()
         {
-            TestReference();
+            TestReferenceFile("TestFiles/MusicXmlSamples/BrookeWestSample.xml");
         }
 
         [TestMethod, AsyncTestMethod]
         public void Test_Chant()
         {
-            TestReference();
+            TestReferenceFile("TestFiles/MusicXmlSamples/Chant.xml");
         }
 
         [TestMethod, AsyncTestMethod]
         public void Test_DebuMandSample()
         {
-            TestReference();
+            TestReferenceFile("TestFiles/MusicXmlSamples/DebuMandSample.xml");
         }
 
         [TestMethod, AsyncTestMethod]
         public void Test_Dichterliebe01()
         {
-            TestReference();
+            TestReferenceFile("TestFiles/MusicXmlSamples/Dichterliebe01.xml");
         }
 
         [TestMethod, AsyncTestMethod]
         public void Test_Echigo()
         {
-            TestReference();
+            TestReferenceFile("TestFiles/MusicXmlSamples/Echigo.xml");
         }
 
         [TestMethod, AsyncTestMethod]
         public void Test_FaurReveSample()
         {
-            TestReference();
+            TestReferenceFile("TestFiles/MusicXmlSamples/FaurReveSample.xml");
         }
 
         [TestMethod, AsyncTestMethod]
         public void Test_MahlFaGe4Sample()
         {
-            TestReference();
+            TestReferenceFile("TestFiles/MusicXmlSamples/MahlFaGe4Sample.xml");
         }
 
         [TestMethod, AsyncTestMethod]
         public void Test_MozaChloSample()
         {
-            TestReference();
+            TestReferenceFile("TestFiles/MusicXmlSamples/MozaChloSample.xml");
         }
 
         [TestMethod, AsyncTestMethod]
         public void Test_MozartPianoSonata()
         {
-            TestReference();
+            TestReferenceFile("TestFiles/MusicXmlSamples/MozartPianoSonata.xml");
         }
 
         [TestMethod, AsyncTestMethod]
         public void Test_MozartTrio()
         {
-            TestReference();
+            TestReferenceFile("TestFiles/MusicXmlSamples/MozartTrio.xml");
         }
 
         [TestMethod, AsyncTestMethod]
         public void Test_MozaVeilSample()
         {
-            TestReference();
+            TestReferenceFile("TestFiles/MusicXmlSamples/MozaVeilSample.xml");
         }
 
         [TestMethod, AsyncTestMethod]
         public void Test_Saltarello()
         {
-            TestReference();
+            TestReferenceFile("TestFiles/MusicXmlSamples/Saltarello.xml");
         }
 
         [TestMethod, AsyncTestMethod]
         public void Test_SchbAvMaSample()
         {
-            TestReference();
+            TestReferenceFile("TestFiles/MusicXmlSamples/SchbAvMaSample.xml");
         }
 
         [TestMethod, AsyncTestMethod]
         public void Test_Telemann()
         {
-            TestReference();
-        }
-
-        private void TestReference([CallerMemberName] string caller = null, string renderLayout = "page", bool renderAllTracks = true)
-        {
-            var fileId = caller.Split('_')[1];
-            const string path = "TestFiles/MusicXmlSamples/";
-            var file = path + fileId + ".xml";
-            TestReferenceFile(file, score => { }, renderLayout, renderAllTracks);
+            TestReferenceFile("TestFiles/MusicXmlSamples/Telemann.xml");
         }
     }
 }

@@ -36,7 +36,6 @@ namespace AlphaTab.Importer
         private int _trackFirstMeasureNumber;
         private int _maxVoices;
         private string _currentDirection;
-        private int _firstVoice;
 
         private FastList<Note> _tieStarts;
         private FastDictionary<int, bool> _tieStartIds;
@@ -209,10 +208,9 @@ namespace AlphaTab.Importer
                 }
             }
 
-            _firstVoice = -1;
-
             var track = _trackById[id];
             var isFirstMeasure = true;
+            _maxVoices = 0;
             foreach (var c in element.ChildNodes)
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -227,6 +225,16 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
+            }
+
+            // ensure voices for all bars
+            foreach (var staff in track.Staves)
+            {
+                foreach (var bar in staff.Bars)
+                {
+                    EnsureVoices(bar);
+                }
+
             }
         }
 
@@ -296,14 +304,7 @@ namespace AlphaTab.Importer
                     masterBar = GetOrCreateMasterBar(barIndex);
                     track.Staves[s].AddBar(bar);
 
-                    for (int v = 0; v < _maxVoices; v++)
-                    {
-                        var emptyVoice = new Voice();
-                        bar.AddVoice(emptyVoice);
-                        var emptyBeat = new Beat { IsEmpty = true };
-                        emptyBeat.ChordId = _currentChord;
-                        emptyVoice.AddBeat(emptyBeat);
-                    }
+                    EnsureVoices(bar);
                 }
             }
 
@@ -347,6 +348,18 @@ namespace AlphaTab.Importer
             return true;
         }
 
+        private void EnsureVoices(Bar bar)
+        {
+            while (bar.Voices.Count < _maxVoices)
+            {
+                var emptyVoice = new Voice();
+                bar.AddVoice(emptyVoice);
+                var emptyBeat = new Beat { IsEmpty = true };
+                emptyBeat.ChordId = _currentChord;
+                emptyVoice.AddBeat(emptyBeat);
+            }
+        }
+
         private Beat GetOrCreateBeat(XmlNode element, Bar[] bars, bool chord)
         {
             int voiceIndex = 0;
@@ -385,7 +398,7 @@ namespace AlphaTab.Importer
 
             Beat beat;
             var voice = GetOrCreateVoice(bar, voiceIndex);
-            if (chord || (voice.Beats.Count == 1 && voice.IsEmpty))
+            if ((chord && voice.Beats.Count > 0) || (voice.Beats.Count == 1 && voice.IsEmpty))
             {
                 beat = voice.Beats[voice.Beats.Count - 1];
             }

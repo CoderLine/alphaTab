@@ -75,7 +75,7 @@ namespace AlphaTab.Test.Importer
         //            }, false);
         //        }
 
-        protected void TestReferenceFile(string file, Action<Score> done, string renderLayout = "page", bool renderAllTracks = false)
+        protected void TestReferenceFile(string file, Action<Score> done = null, string renderLayout = "page", bool renderAllTracks = false)
         {
             TestPlatform.LoadFile(file, fileData =>
             {
@@ -99,8 +99,10 @@ namespace AlphaTab.Test.Importer
                     }
 
 #endif
-
-                    done(score);
+                    if (done != null)
+                    {
+                        done(score);
+                    }
                     TestPlatform.Done();
                 }
                 catch (UnsupportedFormatException e)

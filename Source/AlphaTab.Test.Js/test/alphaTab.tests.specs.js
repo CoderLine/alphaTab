@@ -667,12 +667,8 @@ describe("alphaTab.test.importer.GpxImporterTest", function() {
         __instance.TestColors();
     });
 });
-xdescribe("alphaTab.test.importer.MusicXmlImporterSamplesTests", function() {
+describe("alphaTab.test.importer.MusicXmlImporterSamplesTests", function() {
     var __instance = new alphaTab.test.importer.MusicXmlImporterSamplesTests();
-    it("Test_ActorPreludeSample", function(done) {
-        alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_ActorPreludeSample();
-    });
     it("Test_BeetAnGeSample", function(done) {
         alphaTab.test.TestPlatform.Done = done;
         __instance.Test_BeetAnGeSample();
@@ -742,7 +738,7 @@ xdescribe("alphaTab.test.importer.MusicXmlImporterSamplesTests", function() {
         __instance.Test_Telemann();
     });
 });
-xdescribe("alphaTab.test.importer.MusicXmlImporterTestSuiteTests", function() {
+describe("alphaTab.test.importer.MusicXmlImporterTestSuiteTests", function() {
     var __instance = new alphaTab.test.importer.MusicXmlImporterTestSuiteTests();
     it("Test_01a_Pitches_Pitches", function(done) {
         alphaTab.test.TestPlatform.Done = done;
