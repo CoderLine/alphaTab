@@ -89,7 +89,7 @@ namespace AlphaTab.Model
         /// <summary>
         /// Gets a value indicating whether this note is defined via a string on the instrument. . 
         /// </summary>
-        public bool IsStringed => Fret >= 0 && String >= 0;
+        public bool IsStringed => String >= 0;
 
         /// <summary>
         /// Gets or sets the fret on which this note is played on the instrument. 

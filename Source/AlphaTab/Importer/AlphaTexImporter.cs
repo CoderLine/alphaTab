@@ -46,6 +46,7 @@ namespace AlphaTab.Importer
         private Duration _currentDuration;
         private FastDictionary<int, FastList<Lyrics>> _lyrics;
 
+
         public override string Name { get { return "AlphaTex"; } }
 
         public override Score ReadScore()
