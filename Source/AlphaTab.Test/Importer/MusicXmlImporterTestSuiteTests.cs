@@ -8,7 +8,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace AlphaTab.Test.Importer
 {
     [TestClass]
-    [Ignore]
     public class MusicXmlImporterTestSuiteTests : MusicXmlImporterTestBase
     {
         [TestMethod, AsyncTestMethod]

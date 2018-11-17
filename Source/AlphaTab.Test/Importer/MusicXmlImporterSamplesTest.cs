@@ -7,15 +7,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace AlphaTab.Test.Importer
 {
     [TestClass]
-    [Ignore]
     public class MusicXmlImporterSamplesTests : MusicXmlImporterTestBase
     {
-        [TestMethod, AsyncTestMethod]
-        public void Test_ActorPreludeSample()
-        {
-            TestReference(renderLayout: "horizontal");
-        }
-
         [TestMethod, AsyncTestMethod]
         public void Test_BeetAnGeSample()
         {

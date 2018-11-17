@@ -209,9 +209,9 @@ namespace AlphaTab.Model
                             : (nonGrace.DisplayDuration / 4) / numberOfGraceBeats;
 
                         // move all grace beats 
-                        for (int j = 0; j < numberOfGraceBeats; j++)
+                        var graceBeat = Beats[i];
+                        for (int j = 0; j < numberOfGraceBeats && graceBeat != null; j++)
                         {
-                            var graceBeat = Beats[j + i];
                             graceBeat.Duration = graceDuration;
                             graceBeat.UpdateDurations();
 
@@ -219,6 +219,8 @@ namespace AlphaTab.Model
                             graceBeat.DisplayDuration = perGraceDuration;
 
                             stolenDuration += graceBeat.PlaybackDuration;
+
+                            graceBeat = graceBeat.NextBeat;
                         }
 
                         // steal needed duration from beat duration

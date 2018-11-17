@@ -190,7 +190,23 @@ namespace AlphaTab.Importer
             var id = element.GetAttribute("id");
             if (!_trackById.ContainsKey(id))
             {
-                return;
+                if (_trackById.Count == 1)
+                {
+                    foreach (var key in _trackById)
+                    {
+                        var t = _trackById[key];
+                        if (t.Staves.Count == 0 || t.Staves[0].Bars.Count == 0)
+                        {
+                            id = key;
+                        }
+                    }
+
+                    if (!_trackById.ContainsKey(id)) return;
+                }
+                else
+                {
+                    return;
+                }
             }
 
             _firstVoice = -1;
@@ -338,12 +354,6 @@ namespace AlphaTab.Importer
             if (voiceNodes.Length > 0)
             {
                 voiceIndex = Platform.Platform.ParseInt(voiceNodes[0].InnerText) - 1;
-
-                if (_firstVoice == -1)
-                {
-                    _firstVoice = voiceIndex;
-                    voiceIndex = 0;
-                }
             }
 
             var previousBeatWasPulled = _previousBeatWasPulled;
@@ -366,9 +376,12 @@ namespace AlphaTab.Importer
                 {
                     _voiceOfStaff[staffId] = voiceIndex;
                 }
-                voiceIndex -= _voiceOfStaff[staffId];
             }
-            var bar = bars[staff - 1];
+            staff--;
+            Bar bar;
+            if (staff < 0) bar = bars[0];
+            else if (staff >= bars.Length) bar = bars[bars.Length - 1];
+            else bar = bars[staff];
 
             Beat beat;
             var voice = GetOrCreateVoice(bar, voiceIndex);
@@ -647,7 +660,7 @@ namespace AlphaTab.Importer
             _currentChord = Platform.Platform.NewGuid();
             foreach (var staff in track.Staves)
             {
-                staff.Chords[_currentChord] = chord;
+                staff.AddChord(_currentChord, chord);
             }
         }
 
@@ -946,13 +959,12 @@ namespace AlphaTab.Importer
                     _tieStarts.Add(note);
                 }
             }
-            else if (element.GetAttribute("type") == "stop" && _tieStarts.Count > 0)
+            else if (element.GetAttribute("type") == "stop" && _tieStarts.Count > 0 && !note.IsTieDestination)
             {
                 note.IsTieDestination = true;
                 note.TieOrigin = _tieStarts[0];
                 _tieStarts.RemoveAt(0);
                 _tieStartIds.Remove(note.Id);
-
             }
         }
 

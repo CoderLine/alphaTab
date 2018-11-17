@@ -26,52 +26,88 @@ namespace AlphaTab.Test.Importer
             return readerBase;
         }
 
+        //        protected void TestReferenceFile(string file, Action<Score> done, string renderLayout = "page", bool renderAllTracks = false)
+        //        {
+        //            var gpxImporter = new GpxImporter();
+        //            TestPlatform.LoadFile(file, fileData =>
+        //            {
+        //                var reference = TestPlatform.ChangeExtension(file, ".gpx");
+        //                TestPlatform.LoadFile(reference, referenceData =>
+        //                {
+        //                    try
+        //                    {
+        //                        var importer = PrepareImporterWithBytes(fileData);
+        //                        var score = importer.ReadScore();
+
+        //#if !PHASE
+        //                        if (renderAllTracks)
+        //                        {
+        //                            Render(score.Tracks.ToArray(), Path.ChangeExtension(file, ".all.png"), renderLayout);
+        //                        }
+        //                        else
+        //                        {
+        //                            foreach (var track in score.Tracks)
+        //                            {
+        //                                Render(new[] {track}, Path.ChangeExtension(file, "." + track.Index + ".png"),
+        //                                    renderLayout);
+        //                            }
+        //                        }
+
+        //                        if (!File.Exists(reference))
+        //                        {
+        //                            Assert.Inconclusive();
+        //                        }
+        //#endif
+
+        //                        gpxImporter.Init(ByteBuffer.FromBuffer(referenceData));
+        //                        var referenceScore = gpxImporter.ReadScore();
+        //                        AreEqual(referenceScore, score);
+
+        //                        done(score);
+        //                        TestPlatform.Done();
+        //                    }
+        //                    catch (UnsupportedFormatException e)
+        //                    {
+        //                        Assert.Fail("Failed to load file {0}: {1}", file, e);
+        //                        throw;
+        //                    }
+        //                }, false);
+        //            }, false);
+        //        }
+
         protected void TestReferenceFile(string file, Action<Score> done, string renderLayout = "page", bool renderAllTracks = false)
         {
-            var gpxImporter = new GpxImporter();
             TestPlatform.LoadFile(file, fileData =>
             {
-                var reference = TestPlatform.ChangeExtension(file, ".gpx");
-                TestPlatform.LoadFile(reference, referenceData =>
+                try
                 {
-                    try
-                    {
-                        var importer = PrepareImporterWithBytes(fileData);
-                        var score = importer.ReadScore();
+                    var importer = PrepareImporterWithBytes(fileData);
+                    var score = importer.ReadScore();
 
 #if !PHASE
-                        if (renderAllTracks)
+                    if (renderAllTracks)
+                    {
+                        Render(score.Tracks.ToArray(), Path.ChangeExtension(file, ".all.png"), renderLayout);
+                    }
+                    else
+                    {
+                        foreach (var track in score.Tracks)
                         {
-                            Render(score.Tracks.ToArray(), Path.ChangeExtension(file, ".all.png"), renderLayout);
+                            Render(new[] { track }, Path.ChangeExtension(file, "." + track.Index + ".png"),
+                                renderLayout);
                         }
-                        else
-                        {
-                            foreach (var track in score.Tracks)
-                            {
-                                Render(new[] {track}, Path.ChangeExtension(file, "." + track.Index + ".png"),
-                                    renderLayout);
-                            }
-                        }
+                    }
 
-                        if (!File.Exists(reference))
-                        {
-                            Assert.Inconclusive();
-                        }
 #endif
 
-                        gpxImporter.Init(ByteBuffer.FromBuffer(referenceData));
-                        var referenceScore = gpxImporter.ReadScore();
-                        AreEqual(referenceScore, score);
-
-                        done(score);
-                        TestPlatform.Done();
-                    }
-                    catch (UnsupportedFormatException e)
-                    {
-                        Assert.Fail("Failed to load file {0}: {1}", file, e);
-                        throw;
-                    }
-                }, false);
+                    done(score);
+                    TestPlatform.Done();
+                }
+                catch (UnsupportedFormatException e)
+                {
+                    Assert.Fail("Failed to load file {0}: {1}", file, e);
+                    throw;
+                }
             }, false);
         }
 
