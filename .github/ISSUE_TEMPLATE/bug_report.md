@@ -8,6 +8,7 @@ about: Report a bug
 
 Thanks for contributing to alphaTab. Before entering a new bug please check following points
 
+- IMPORTANT: Do not simply delete the whole template and submit without providing the details asked for! Issues not following the template will be closed without being worked on. Please try to be precise and provide all details that help to work on the issue. 
 - Please make sure that no other bug with the same topic exists already. Rather reopen a closed one than enter a new one.  
 - Ensure that you are using the lastest version. 
 
