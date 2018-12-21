@@ -2,7 +2,7 @@
   <PropertyGroup>
     <RootNamespace>AlphaTab.Test.CSharp</RootNamespace>
     <AssemblyName>AlphaTab.Test.CSharp</AssemblyName>
-    <TargetFramework>net471</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
 	  <PackageId>AlphaTab.Test.CSharp</PackageId>
     <NoWarn>$(NoWarn);0626;0824</NoWarn>
   </PropertyGroup>
@@ -12,9 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
-    <PackageReference Include="MSTest.TestAdapter" Version="1.2.0" />
-    <PackageReference Include="MSTest.TestFramework" Version="1.2.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
   </ItemGroup>
 
   <ItemGroup>

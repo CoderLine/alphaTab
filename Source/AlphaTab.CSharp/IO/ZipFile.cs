@@ -11,7 +11,7 @@ namespace AlphaTab.IO
         /// <returns></returns>
         public void Load(IReadable s)
         {
-#if NET471 || NETSTANDARD2_0
+#if NET472 || NETSTANDARD2_0
             using (var zipArchive = new System.IO.Compression.ZipArchive(ReadableStream.Create(s), System.IO.Compression.ZipArchiveMode.Read))
             {
                 foreach (var entry in zipArchive.Entries)

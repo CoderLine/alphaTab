@@ -28,7 +28,7 @@ namespace AlphaTab
         {
             RenderEngines["default"] = () => new SkiaCanvas();
             RenderEngines["svg"] = () => new CssFontSvgCanvas();
-#if NET471
+#if NET472
             RenderEngines["gdi"] = () => new GdiCanvas();
 #endif
             RenderEngines["skia"] = () => new SkiaCanvas();
