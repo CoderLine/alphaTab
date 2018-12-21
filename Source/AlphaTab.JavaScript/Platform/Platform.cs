@@ -53,6 +53,12 @@ namespace AlphaTab.Platform
         }
 
         [Inline]
+        public static int ParseHex(string s)
+        {
+            return Script.Write<int>("untyped parseInt(s, 16)");
+        }
+
+        [Inline]
         public static string GetCallerName()
         {
             return Script.Write<string>("untyped __js__(\"arguments.callee.caller.caller.name\")");
@@ -216,6 +222,12 @@ namespace AlphaTab.Platform
         public static T Member<T>(this object s, string name)
         {
             return Script.Write<T>("untyped s[name]");
+        }
+
+        [Inline]
+        public static bool HasMember(this object s, string name)
+        {
+            return Script.Write<bool>("untyped __js__(\"{0} in {1}\", name, s)");
         }
 
         [Inline]

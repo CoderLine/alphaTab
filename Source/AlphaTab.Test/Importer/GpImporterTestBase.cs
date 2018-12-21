@@ -31,11 +31,13 @@ namespace AlphaTab.Test.Importer
 {
     public class GpImporterTestBase
     {
-        internal Gp3To5Importer PrepareImporterWithFile(string name)
+        internal void PrepareImporterWithFile(string name, Action<Gp3To5Importer> ready)
         {
             const string path = "TestFiles/";
-            var buffer = TestPlatform.LoadFile(path + name);
-            return PrepareImporterWithBytes(buffer);
+            TestPlatform.LoadFile(path + name, buffer =>
+            {
+                ready(PrepareImporterWithBytes(buffer));
+            });
         }
 
         internal Gp3To5Importer PrepareImporterWithBytes(byte[] buffer)

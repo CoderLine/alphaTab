@@ -51,10 +51,13 @@ namespace AlphaTab.Rendering.Glyphs
 
         public void AddChord(Chord chord)
         {
-            var chordDiagram = new ChordDiagramGlyph(0, 0, chord);
-            chordDiagram.Renderer = Renderer;
-            chordDiagram.DoLayout();
-            Glyphs.Add(chordDiagram);
+            if (chord.Strings.Count > 0)
+            {
+                var chordDiagram = new ChordDiagramGlyph(0, 0, chord);
+                chordDiagram.Renderer = Renderer;
+                chordDiagram.DoLayout();
+                Glyphs.Add(chordDiagram);
+            }
         }
 
         public override void DoLayout()

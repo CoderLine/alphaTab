@@ -126,8 +126,8 @@ namespace AlphaTab.Rendering.Glyphs
             //    PaintSprings(cx + X, cy + Y, canvas);
             //}
             canvas.Color = Voice.Index == 0
-                ? Renderer.ScoreRenderer.RenderingResources.MainGlyphColor
-                : Renderer.ScoreRenderer.RenderingResources.SecondaryGlyphColor;
+                ? Renderer.Resources.MainGlyphColor
+                : Renderer.Resources.SecondaryGlyphColor;
 
             for (int i = 0, j = BeatGlyphs.Count; i < j; i++)
             {

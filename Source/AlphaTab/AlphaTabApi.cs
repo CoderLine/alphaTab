@@ -141,6 +141,11 @@ namespace AlphaTab
         {
             var tracks = new FastList<Track>();
 
+            if (trackIndexes == null)
+            {
+                return Score.Tracks.ToArray();
+            }
+
             foreach (var track in trackIndexes)
             {
                 if (track >= 0 && track < Score.Tracks.Count)
@@ -219,15 +224,19 @@ namespace AlphaTab
             }
         }
 
-        public void Tex(string contents)
+        public void Tex(string contents, int[] tracks = null)
         {
             try
             {
                 var parser = new AlphaTexImporter();
                 var data = ByteBuffer.FromBuffer(Platform.Platform.StringToByteArray(contents));
                 parser.Init(data, Settings);
-                TrackIndexes = new[] { 0 };
-                ScoreLoaded(parser.ReadScore());
+                var score = parser.ReadScore();
+                if (tracks != null)
+                {
+                    tracks = new int[] {0};
+                }
+                RenderTracks(score, tracks, true);
             }
             catch (Exception e)
             {

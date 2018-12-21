@@ -9,7 +9,7 @@
        
     <!-- Including alphaTab -->
 	<script src="../js/alphaTab/swfobject.js"></script>
-	<script src="../js/alphaTab/alphaTab.min.js"></script>
+	<script src="../js/alphaTab/alphaTab.js"></script>
 
     <!-- Demo Styles and Scripts -->
 	<link href="../css/mermaid.css" rel="stylesheet">
@@ -23,7 +23,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.2/bootstrap-slider.min.js" integrity="sha256-dd5QxcG/E8fb/H/iIQann2y2EDS0nEMVI56yYWFeeW4=" crossorigin="anonymous"></script>    
 	<script src="../js/bootstrap.min.js"></script>        
 
-    <link rel="stylesheet" href="support/demo.css" />
+    <link rel="stylesheet" href="demo.css" />
     <style type="text/css">
     .barCursor { /* Defines the color of the bar background when a bar is played */
         background: rgba(255, 242, 0, 0.25);
@@ -77,11 +77,11 @@
 </head>
 <body>
     <!-- Toolbar containing the buttons -->
-    <nav class="navbar navbar-default navbar-fixed-top">
+    <nav class="navbar navbar-default">
       <div class="container">
-        <div id="navbar" class="navbar-collapse collapse">
+        <div id="navbar">
           <!-- Player controls -->
-          <ul class="nav navbar-nav">
+          <ul class="nav navbar-nav navbar-left">
             <li><button id="playPause" disabled="disabled" class="btn btn-link navbar-btn fa fa-play"></button></li>
             <li><button id="stop" disabled="disabled" class="btn btn-link navbar-btn fa fa-stop"></button></li>
             <li class="dropdown">
@@ -132,15 +132,19 @@
         </div>
       </div>
     </nav>
+    
+    <div id="content">
     <!-- 
     data-player enables the player 
-    data-player-offset specifies the additional offset to apply when scrolling. 
-                       in this sample we scroll 70px up for vertical layouts because the menubar would overlap the tablature otherwise. 
-                       the 10px are to have a small horizontal padding. 
+    data-scroll-element specifies that the scrolling should happen within the #content div 
     -->
     <div id="alphaTab" data-file="../files/NightWish.gp5" data-tracks="3"
                        data-player="../js/alphaTab/default.sf2"
-                       data-player-offset="[-10,-70]"></div>
+                       data-scroll-element="#content"></div>
+                       
+    </div>
+    
+    </div>
     
     <script type="text/javascript">
         var at = $('#alphaTab');

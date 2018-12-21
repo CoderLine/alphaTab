@@ -207,7 +207,7 @@ namespace AlphaTab.Rendering.Staves
                 else
                 {
                     var canvas = Layout.Renderer.Canvas;
-                    var res = Layout.Renderer.RenderingResources.EffectFont;
+                    var res = Layout.Renderer.Settings.RenderingResources.EffectFont;
                     canvas.Font = res;
                     foreach (var t in tracks)
                     {
@@ -302,13 +302,14 @@ namespace AlphaTab.Rendering.Staves
                 _allStaves[i].Paint(cx, cy, canvas, startIndex, count);
             }
 
-            var res = Layout.Renderer.RenderingResources;
+            var res = Layout.Renderer.Settings.RenderingResources;
 
             if (Staves.Count > 0 && startIndex == 0)
             {
                 //
                 // Draw start grouping
                 // 
+                canvas.Color = res.BarSeparatorColor;
 
                 if (_firstStaffInAccolade != null && _lastStaffInAccolade != null)
                 {
@@ -322,7 +323,6 @@ namespace AlphaTab.Rendering.Staves
 
                     var acooladeX = cx + _firstStaffInAccolade.X;
 
-                    canvas.Color = res.BarSeperatorColor;
 
                     canvas.BeginPath();
                     canvas.MoveTo(acooladeX, firstStart);

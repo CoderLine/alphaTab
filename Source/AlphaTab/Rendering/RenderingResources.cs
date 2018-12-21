@@ -23,7 +23,7 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This public class contains central definitions for controlling the visual appearance. 
     /// </summary>
-    class RenderingResources
+    public class RenderingResources
     {
         public Font CopyrightFont { get; set; }
         public Font TitleFont { get; set; }
@@ -35,55 +35,43 @@ namespace AlphaTab.Rendering
         public Font TablatureFont { get; set; }
         public Font GraceFont { get; set; }
 
-        public Color StaveLineColor { get; set; }
-        public Color BarSeperatorColor { get; set; }
+        public Color StaffLineColor { get; set; }
+        public Color BarSeparatorColor { get; set; }
 
         public Font BarNumberFont { get; set; }
         public Color BarNumberColor { get; set; }
 
         public Font FingeringFont { get; set; }
         public Font MarkerFont { get; set; }
-        public Font TabClefFont { get; set; }
 
         public Color MainGlyphColor { get; set; }
         public Color SecondaryGlyphColor { get; set; }
-
-        public float Scale { get; set; }
-
         public Color ScoreInfoColor { get; set; }
 
-        public RenderingResources(float scale)
+        public RenderingResources()
         {
-            Init(scale);
-        }
-
-        public void Init(float scale)
-        {
-            Scale = scale;
-
             const string sansFont = "Arial";
             const string serifFont = "Georgia";
 
-            EffectFont = new Font(serifFont, 12 * scale, FontStyle.Italic);
-            CopyrightFont = new Font(sansFont, 12 * scale, FontStyle.Bold);
-            FretboardNumberFont = new Font(sansFont, 11 * scale);
+            EffectFont = new Font(serifFont, 12, FontStyle.Italic);
+            CopyrightFont = new Font(sansFont, 12, FontStyle.Bold);
+            FretboardNumberFont = new Font(sansFont, 11);
 
-            TitleFont = new Font(serifFont, 32 * scale);
-            SubTitleFont = new Font(serifFont, 20 * scale);
-            WordsFont = new Font(serifFont, 15 * scale);
+            TitleFont = new Font(serifFont, 32);
+            SubTitleFont = new Font(serifFont, 20);
+            WordsFont = new Font(serifFont, 15);
 
-            TablatureFont = new Font(sansFont, 13 * scale);
-            GraceFont = new Font(sansFont, 11 * scale);
+            TablatureFont = new Font(sansFont, 13);
+            GraceFont = new Font(sansFont, 11);
 
-            StaveLineColor = new Color(165, 165, 165);
-            BarSeperatorColor = new Color(34, 34, 17);
+            StaffLineColor = new Color(165, 165, 165);
+            BarSeparatorColor = new Color(34, 34, 17);
 
-            BarNumberFont = new Font(sansFont, 11 * scale);
+            BarNumberFont = new Font(sansFont, 11);
             BarNumberColor = new Color(200, 0, 0);
 
-            FingeringFont = new Font(serifFont, 14 * scale);
-            MarkerFont = new Font(serifFont, 14 * scale, FontStyle.Bold);
-            TabClefFont = new Font(sansFont, 18 * scale, FontStyle.Bold);
+            FingeringFont = new Font(serifFont, 14);
+            MarkerFont = new Font(serifFont, 14, FontStyle.Bold);
 
             ScoreInfoColor = new Color(0, 0, 0);
             MainGlyphColor = new Color(0, 0, 0);

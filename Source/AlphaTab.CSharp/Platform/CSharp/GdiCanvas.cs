@@ -1,4 +1,4 @@
-﻿#if NET471
+﻿#if NET472
 /*
  * This file is part of alphaTab.
  * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
@@ -120,7 +120,7 @@ namespace AlphaTab.Platform.CSharp
         private Pen _pen;
         private GdiColor _color;
 
-        public RenderingResources Resources { get; set; }
+        public Settings Settings { get; set; }
 
         public Color Color
         {
@@ -155,7 +155,7 @@ namespace AlphaTab.Platform.CSharp
                 FontStyle fs = FontStyle.Plain;
                 if (_font.Bold) fs |= FontStyle.Bold;
                 if (_font.Italic) fs |= FontStyle.Italic;
-                return new Font(_font.FontFamily.Name, _font.Size, fs);
+                return new Font(_font.FontFamily.Name, _font.Size * Settings.Scale, fs);
             }
             set
             {
@@ -163,7 +163,7 @@ namespace AlphaTab.Platform.CSharp
                 if (value.IsBold) fontStyle |= GdiFontStyle.Bold;
                 if (value.IsItalic) fontStyle = GdiFontStyle.Italic;
 
-                _font = new GdiFont(value.Family, value.Size, fontStyle, GraphicsUnit.Pixel);
+                _font = new GdiFont(value.Family, value.Size * Settings.Scale, fontStyle, GraphicsUnit.Pixel);
             }
         }
 

@@ -40,7 +40,7 @@ namespace AlphaTab.Platform.Svg
         public Font Font { get; set; }
         public TextAlign TextAlign { get; set; }
         public TextBaseline TextBaseline { get; set; }
-        public RenderingResources Resources { get; set; }
+        public Settings Settings { get; set; }
 
         public SvgCanvas()
         {
@@ -184,7 +184,7 @@ namespace AlphaTab.Platform.Svg
         public void FillText(string text, float x, float y)
         {
             if (text == "") return;
-            var s = "<text x=\"" + ((int)x) + "\" y=\"" + ((int)y) + "\" style=\"stroke: none; font:" + Font.ToCssString() + "\" "
+            var s = "<text x=\"" + ((int)x) + "\" y=\"" + ((int)y) + "\" style=\"stroke: none; font:" + Font.ToCssString(Settings.Scale) + "\" "
                     + " dominant-baseline=\"" + GetSvgBaseLine() + "\"";
             if (Color.RGBA != Color.BlackRgb)
             {
@@ -223,12 +223,7 @@ namespace AlphaTab.Platform.Svg
         public float MeasureText(string text)
         {
             if (string.IsNullOrEmpty(text)) return 0;
-            var font = SupportedFonts.Arial;
-            if (Font.Family.Contains("Times"))
-            {
-                font = SupportedFonts.TimesNewRoman;
-            }
-            return FontSizes.MeasureString(text, font, Font.Size, Font.Style);
+            return FontSizes.MeasureString(text, Font.Family, Font.Size, Font.Style);
         }
 
         public abstract void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol, bool centerAtPosition = false);

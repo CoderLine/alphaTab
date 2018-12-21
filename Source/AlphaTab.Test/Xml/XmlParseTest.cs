@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AlphaTab.Xml;
+﻿using AlphaTab.Xml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test.Xml
@@ -137,9 +131,11 @@ namespace AlphaTab.Test.Xml
         [TestMethod]
         public void ParseFull()
         {
-            var s = TestPlatform.LoadFileAsString("TestFiles\\Xml\\GPIF.xml");
-            var xml = new XmlDocument(s);
-            Assert.IsNotNull(xml.DocumentElement);
+            TestPlatform.LoadFileAsString("TestFiles\\Xml\\GPIF.xml", s =>
+            {
+                var xml = new XmlDocument(s);
+                Assert.IsNotNull(xml.DocumentElement);
+            });
         }
     }
 }

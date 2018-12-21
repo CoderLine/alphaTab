@@ -46,6 +46,11 @@ namespace AlphaTab.Platform.JavaScript
         {
         }
 
+        public void TexWithTrackData(string tex, dynamic trackData)
+        {
+            Tex(tex, ((BrowserUiFacade)UiFacade).ParseTracks(trackData));
+        }
+
         public void Print(string width)
         {
             // prepare a popup window for printing (a4 width, window height, centered)

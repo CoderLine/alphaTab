@@ -89,7 +89,7 @@ namespace AlphaTab.Model
         /// <summary>
         /// Gets a value indicating whether this note is defined via a string on the instrument. . 
         /// </summary>
-        public bool IsStringed => Fret >= 0 && String >= 0;
+        public bool IsStringed => String >= 0;
 
         /// <summary>
         /// Gets or sets the fret on which this note is played on the instrument. 
@@ -129,7 +129,7 @@ namespace AlphaTab.Model
         /// Gets a value indicating whether this note is a percussion note. 
         /// </summary>
         public bool IsPercussion => !IsStringed && (Element >= 0 && Variation >= 0);
-        
+
         /// <summary>
         /// Gets or sets the percusson element. 
         /// </summary>
@@ -169,19 +169,19 @@ namespace AlphaTab.Model
         /// <summary>
         /// Gets or sets whether this note starts a slur. 
         /// </summary>
-        public bool IsSlurOrigin { get; set; }
+        public bool IsSlurOrigin => SlurDestination != null;
         /// <summary>
-        /// Gets or sets whether a slur finished or continues on this note. 
+        /// Gets or sets whether this note finishes a slur. 
         /// </summary>
-        public bool IsSlurDestination => SlurOrigin != null;
+        public bool IsSlurDestination { get; set; }
 
         /// <summary>
-        /// Gets or sets the origin of the slur this note contributes to. 
+        /// Gets or sets the note where the slur of this note starts. 
         /// </summary>
         public Note SlurOrigin { get; set; }
 
         /// <summary>
-        /// Gets or sets the destination of the slur this note contributes to. 
+        /// Gets or sets the note where the slur of this note ends.
         /// </summary>
         public Note SlurDestination { get; set; }
 
@@ -258,10 +258,11 @@ namespace AlphaTab.Model
         /// Gets or sets whether this note is ends a tied note. 
         /// </summary>
         public bool IsTieDestination { get; set; }
+
         /// <summary>
         /// Gets or sets whether this note starts or continues a tied note. 
         /// </summary>
-        public bool IsTieOrigin { get; set; }
+        public bool IsTieOrigin => TieDestination != null;
 
         /// <summary>
         /// Gets or sets the fingers used for this note on the left hand.
@@ -313,6 +314,13 @@ namespace AlphaTab.Model
         /// Gets or sets the dynamics for this note. 
         /// </summary>
         public DynamicValue Dynamic { get; set; }
+
+        internal bool IsEffectSlurOrigin { get; set; }
+        internal bool HasEffectSlur { get; set; }
+        internal bool IsEffectSlurDestination => EffectSlurOrigin != null;
+        internal Note EffectSlurOrigin { get; set; }
+        internal Note EffectSlurDestination { get; set; }
+
 
         /// <summary>
         /// Gets the base note value for the string of this note. 
@@ -626,8 +634,6 @@ namespace AlphaTab.Model
             dst.Accentuated = src.Accentuated;
             dst.Fret = src.Fret;
             dst.String = src.String;
-            dst.IsHammerPullOrigin = src.IsHammerPullOrigin;
-            dst.IsSlurOrigin = src.IsSlurOrigin;
             dst.HarmonicValue = src.HarmonicValue;
             dst.HarmonicType = src.HarmonicType;
             dst.IsGhost = src.IsGhost;
@@ -637,8 +643,9 @@ namespace AlphaTab.Model
             dst.IsStaccato = src.IsStaccato;
             dst.SlideType = src.SlideType;
             dst.Vibrato = src.Vibrato;
-            dst.IsTieOrigin = src.IsTieOrigin;
             dst.IsTieDestination = src.IsTieDestination;
+            dst.IsSlurDestination = src.IsSlurDestination;
+            dst.IsHammerPullOrigin = src.IsHammerPullOrigin;
             dst.LeftHandFinger = src.LeftHandFinger;
             dst.RightHandFinger = src.RightHandFinger;
             dst.IsFingering = src.IsFingering;
@@ -687,7 +694,6 @@ namespace AlphaTab.Model
         internal void Finish(Settings settings)
         {
             var nextNoteOnLine = new Util.Lazy<Note>(() => NextNoteOnSameLine(this));
-            var prevNoteOnLine = new Util.Lazy<Note>(() => PreviousNoteOnSameLine(this));
 
             var isSongBook = settings != null && settings.DisplayMode == DisplayMode.SongBook;
 
@@ -696,27 +702,30 @@ namespace AlphaTab.Model
             {
                 if (TieOrigin != null)
                 {
-                    TieOrigin.IsTieOrigin = true;
                     TieOrigin.TieDestination = this;
-                }
-                else if (prevNoteOnLine.Value == null)
-                {
-                    IsTieDestination = false;
                 }
                 else
                 {
-                    TieOrigin = prevNoteOnLine.Value;
-                    TieOrigin.IsTieOrigin = true;
-                    TieOrigin.TieDestination = this;
-                    Fret = TieOrigin.Fret;
-                    Octave = TieOrigin.Octave;
-                    Tone = TieOrigin.Tone;
-
-                    if (TieOrigin.HasBend)
+                    var tieOrigin = FindTieOrigin(this);
+                    if (tieOrigin == null)
                     {
-                        BendOrigin = TieOrigin;
+                        IsTieDestination = false;
+                    }
+                    else
+                    {
+                        TieOrigin = tieOrigin;
+                        TieOrigin.TieDestination = this;
+                        Fret = TieOrigin.Fret;
+                        Octave = TieOrigin.Octave;
+                        Tone = TieOrigin.Tone;
+
+                        if (TieOrigin.HasBend)
+                        {
+                            BendOrigin = TieOrigin;
+                        }
                     }
                 }
+
 
                 // implicit let ring 
                 if (isSongBook && TieOrigin.IsLetRing)
@@ -757,28 +766,6 @@ namespace AlphaTab.Model
                 }
             }
 
-            if (IsHammerPullOrigin || SlideType == SlideType.Legato)
-            {
-                IsSlurOrigin = true;
-                SlurDestination = nextNoteOnLine.Value;
-                if (!IsSlurDestination)
-                {
-                    SlurOrigin = this;
-                    if (SlurDestination != null)
-                    {
-                        SlurDestination.SlurOrigin = this;
-                    }
-                }
-                else
-                {
-                    SlurOrigin.SlurDestination = SlurDestination;
-                    if (SlurDestination != null)
-                    {
-                        SlurDestination.SlurOrigin = SlurOrigin;
-                    }
-                }
-            }
-
             // set hammeron/pulloffs
             if (IsHammerPullOrigin)
             {
@@ -805,6 +792,34 @@ namespace AlphaTab.Model
                     }
                     break;
             }
+
+            Note effectSlurDestination = null;
+            if (IsHammerPullOrigin)
+            {
+                effectSlurDestination = HammerPullDestination;
+            }
+            else if (SlideType == SlideType.Legato && SlideTarget != null)
+            {
+                effectSlurDestination = SlideTarget;
+            }
+
+            if (effectSlurDestination != null)
+            {
+                HasEffectSlur = true;
+                if (EffectSlurOrigin != null)
+                {
+                    EffectSlurOrigin.EffectSlurDestination = effectSlurDestination;
+                    EffectSlurOrigin.EffectSlurDestination.EffectSlurOrigin = EffectSlurOrigin;
+                    EffectSlurOrigin = null;
+                }
+                else
+                {
+                    IsEffectSlurOrigin = true;
+                    EffectSlurDestination = effectSlurDestination;
+                    EffectSlurDestination.EffectSlurOrigin = this;
+                }
+            }
+
 
             // try to detect what kind of bend was used and cleans unneeded points if required
             // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all bends
@@ -948,22 +963,43 @@ namespace AlphaTab.Model
             return null;
         }
 
-        internal static Note PreviousNoteOnSameLine(Note note)
+        internal static Note FindTieOrigin(Note note)
         {
             var previousBeat = note.Beat.PreviousBeat;
 
             // keep searching in same bar
             while (previousBeat != null && previousBeat.Voice.Bar.Index >= note.Beat.Voice.Bar.Index - MaxOffsetForSameLineSearch)
             {
-                var noteOnString = previousBeat.GetNoteOnString(note.String);
-                if (noteOnString != null)
+                if (note.IsStringed)
                 {
-                    return noteOnString;
+                    var noteOnString = previousBeat.GetNoteOnString(note.String);
+                    if (noteOnString != null)
+                    {
+                        return noteOnString;
+                    }
                 }
                 else
                 {
-                    previousBeat = previousBeat.PreviousBeat;
+                    if (note.Octave == -1 && note.Tone == -1)
+                    {
+                        // if the note has no value (e.g. alphaTex dash tie), we try to find a matching
+                        // note on the previous beat by index. 
+                        if (note.Index < previousBeat.Notes.Count)
+                        {
+                            return previousBeat.Notes[note.Index];
+                        }
+                    }
+                    else
+                    {
+                        var noteWithValue = previousBeat.GetNoteWithRealValue(note.RealValue);
+                        if (noteWithValue != null)
+                        {
+                            return noteWithValue;
+                        }
+                    }
                 }
+
+                previousBeat = previousBeat.PreviousBeat;
             }
 
             return null;

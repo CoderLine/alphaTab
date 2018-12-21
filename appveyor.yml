@@ -1,4 +1,4 @@
-version: 0.9.2.{build}
+version: 0.9.3.{build}
 # branches to build
 branches:
   only:
@@ -10,10 +10,9 @@ configuration: Release
 platform: Any CPU
 environment:
   nodejs_version: '8'
+  NODE_PATH: C:\Users\appveyor\AppData\Roaming\npm\node_modules
   global:
     HAXELIB_ROOT: C:\projects\haxelib
-  access_token:
-    secure: ig+MHQrCziKIZzGkDBsOTuusdSATGEXh79QCG8b4guSHAcM0+uYy0zGoVTKG446Q
   deployment_token:
     secure: F3tqGIN2guX5kU5B6q89HGPDAgI0g//DwtqRQL0oVeaJU6oBkgbQeJfiproA3yFi
     
@@ -40,6 +39,13 @@ install:
   #
   # Npm/Uglifyjs installation
   - npm install -g uglify-js
+  - npm install -g jasmine-core
+  - npm install -g karma
+  - npm install -g karma-jasmine
+  - npm install -g karma-cli
+  - npm install -g karma-chrome-launcher
+  - npm install -g puppeteer
+  - npm install -g karma-trx-reporter
   - RefreshEnv
 
 dotnet_csproj:
@@ -65,20 +71,29 @@ test:
       - Source\AlphaTab.Test.CSharp\bin\Release\net471\AlphaTab.Test.CSharp.dll
 
 after_test:
-  - 7z a -r Build\JavaScript\dist.zip Build\JavaScript\*
+  # Run JS tests
+  - ps: Source\AlphaTab.Test.Js\test\AppveyorRun.ps1
+  # Package artifacts
+  - 7z a -r Build\JavaScript\JavaScript.zip Build\JavaScript\*
   - Documentation\generate.bat
-  - 7z a -r Documentation\documentation.zip Documentation\output\*
+  - 7z a -r Documentation.zip Documentation\output\*
+  # Move Artifacts to root for better names on appveyor
+  - move Build\JavaScript\JavaScript.zip .\JavaScript.zip
+  - move Source\AlphaTab.CSharp\bin\Release\*.nupkg .\AlphaTab.nupkg
 
 artifacts:
   # JavaScript Output
-  - path: Build\JavaScript\dist.zip
+  - path: JavaScript.zip
     name: JavaScript
-  # NuGet package output 
-  - path: Source\AlphaTab.CSharp\Bin\$(configuration)\*.nupkg
+  # NuGet package output
+  - path: AlphaTab.nupkg
     name: NuGet
   # Documentation 
-  - path: Documentation\documentation.zip
+  - path: Documentation.zip
     name: Documentation
+  # JavaScript Test Results  
+  - path: Source\AlphaTab.Test.Js\test\Results.trx
+    name: JavaScriptTestResults
 
 deploy:
   # My Get (Every Build)
@@ -98,12 +113,3 @@ deploy:
   # Documentation
   - provider: Environment
     name: AlphaTabDocumentation
-
-on_success:
-  - git config --global credential.helper store
-  - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
-  - git config --global user.email "appveyor@alphatab.net"
-  - git config --global user.name "AlphaTab Build Agent"
-  - git add Directory.Build.props
-  - git commit -m "%APPVEYOR_REPO_COMMIT_MESSAGE%, build %APPVEYOR_BUILD_VERSION%"
-  - git push origin "%APPVEYOR_REPO_BRANCH%"

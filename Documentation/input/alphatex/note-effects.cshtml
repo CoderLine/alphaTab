@@ -1,5 +1,5 @@
 Title: Note Effects
-Order: 4
+Order: 5
 TexSample: true
 ---
 
@@ -62,3 +62,42 @@ TexSample: true
 <script type="text/x-alphatab">
 	$('#alphaTabBends').alphaTab();
 </script>
+
+<h2 id="tied-notes">Tied Notes</h2>
+
+<p>
+	There are multiple ways to indicate tied notes depending on whether the instrument is stringed or not stringed. 
+    For stringed instruments the fret simply can be set to <code>-</code> and the note will be tied to the note of the same string.
+</p>
+
+<div id="alphaTabStringTie" data-tex="true">
+3.3 -.3 | (1.1 3.2 2.3 0.4) (-.1 -.4)
+</div>
+<script type="text/x-alphatab">
+	$('#alphaTabStringTie').alphaTab();
+</script>
+
+<p>
+	For non stringed instrument it can be a bit more tricky as we cannot use the string to identify which note to tie. There are multiple ways to work around this problem. AlphaTab will try to find the start note for the tie via several rules, if this does not match the desired behavior, you can specify the note value as alternative and indicate the tie via a note effect.
+</p>
+
+<div id="alphaTabPianoTie" data-tex="true">
+\tuning piano
+.
+// If there is a single note on the previous beat, we tie to this one
+// Then a simple - is enough for a tie
+:2 a4 - |
+// Alternatively you can specify a '-' or 't' as note effect to indicate a tie 
+:2 a4 a4{-} |
+// This also works for chords using correct note ordering 
+:2 (a4 a3) (- a3) |
+:2 (a4 a3) (a4 -) |
+// If nothing helps, always the explicit note value and tie effect should allow
+// specifying the correct behavior
+:2 (a4 a3) (a4{t} a3) |
+:4 (a4 a3) (b2 b3) a4{t} a3{-} |
+</div>
+<script type="text/x-alphatab">
+	$('#alphaTabPianoTie').alphaTab();
+</script>
+

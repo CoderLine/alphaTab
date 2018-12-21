@@ -1592,11 +1592,6 @@
             This public class stores text widths for several fonts and allows width calculation 
             </summary>
         </member>
-        <member name="T:AlphaTab.Platform.Svg.SupportedFonts">
-            <summary>
-            The supported fonts by the FontSizes public class
-            </summary>
-        </member>
         <member name="T:AlphaTab.Platform.Svg.CssFontSvgCanvas">
             <summary>
             This SVG canvas renders the music symbols by adding a CSS class 'at' to all elements. 
@@ -1736,9 +1731,9 @@
             Gets or sets the settings on how the vibrato audio is generated. 
             </summary>
         </member>
-        <member name="P:AlphaTab.Settings.SlurHeightFactor">
+        <member name="P:AlphaTab.Settings.SlurHeight">
             <summary>
-            Gets or sets the height factor for slurs. The factor is multiplied with the distance
+            Gets or sets the height for slurs. The factor is multiplied with the a logarithmic distance
             between slur start and end.
             </summary>
         </member>
@@ -1796,6 +1791,11 @@
         <member name="P:AlphaTab.Settings.ScrollSpeed">
             <summary>
             Gets or sets how fast the scrolling to the new position should happen (in milliseconds)
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Settings.RenderingResources">
+            <summary>
+            Gets or sets the resources used during rendering. This defines all fonts and colors used. 
             </summary>
         </member>
         <member name="P:AlphaTab.Settings.SongBook">
@@ -2452,6 +2452,12 @@
             If this staff contains string based notes this lookup allows fast access. 
             </summary>
         </member>
+        <member name="P:AlphaTab.Model.Beat.NoteValueLookup">
+            <summary>
+            Gets the lookup where the notes per value are registered.
+            If this staff contains string based notes this lookup allows fast access. 
+            </summary>
+        </member>
         <member name="P:AlphaTab.Model.Beat.IsEmpty">
             <summary>
             Gets or sets a value indicating whether this beat is considered empty. 
@@ -2505,26 +2511,6 @@
         <member name="P:AlphaTab.Model.Beat.Duration">
             <summary>
             Gets or sets the duration of this beat. 
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Model.Beat.IsSlurOrigin">
-            <summary>
-            Gets or sets whether this beat starts a slur. 
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Model.Beat.IsSlurDestination">
-            <summary>
-            Gets or sets whether this beat ends or continues a slur. 
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Model.Beat.SlurOrigin">
-            <summary>
-            Gets or sets the slur origin beat
-            </summary>
-        </member>
-        <member name="P:AlphaTab.Model.Beat.SlurDestination">
-            <summary>
-            Gets or sets the slur destination beat. 
             </summary>
         </member>
         <member name="P:AlphaTab.Model.Beat.IsRest">
@@ -2600,7 +2586,7 @@
         <member name="P:AlphaTab.Model.Beat.TupletDenominator">
             <summary>
             Gets or sets the tuplet denominator.
-            </summary>
+            </summary>re
         </member>
         <member name="P:AlphaTab.Model.Beat.TupletNumerator">
             <summary>
@@ -3642,17 +3628,17 @@
         </member>
         <member name="P:AlphaTab.Model.Note.IsSlurDestination">
             <summary>
-            Gets or sets whether a slur finished or continues on this note. 
+            Gets or sets whether this note finishes a slur. 
             </summary>
         </member>
         <member name="P:AlphaTab.Model.Note.SlurOrigin">
             <summary>
-            Gets or sets the origin of the slur this note contributes to. 
+            Gets or sets the note where the slur of this note starts. 
             </summary>
         </member>
         <member name="P:AlphaTab.Model.Note.SlurDestination">
             <summary>
-            Gets or sets the destination of the slur this note contributes to. 
+            Gets or sets the note where the slur of this note ends.
             </summary>
         </member>
         <member name="P:AlphaTab.Model.Note.IsHarmonic">
@@ -5411,36 +5397,6 @@
         <member name="T:AlphaTab.Xml.XmlParser.XmlState">
             <summary>
             faster than enum
-            </summary>
-        </member>
-        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
-            <summary>
-            GeneratedInternalTypeHelper
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
-            <summary>
-            CreateInstance
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            GetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            SetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
-            <summary>
-            CreateDelegate
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
-            <summary>
-            AddEventHandler
             </summary>
         </member>
     </members>

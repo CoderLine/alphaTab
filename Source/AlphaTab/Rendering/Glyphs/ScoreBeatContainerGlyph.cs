@@ -15,15 +15,21 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Staves;
+using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering
 {
     class ScoreBeatContainerGlyph : BeatContainerGlyph
     {
         private ScoreBendGlyph _bend;
+        private ScoreSlurGlyph _effectSlur;
+        private ScoreSlurGlyph _effectEndSlur;
 
         public ScoreBeatContainerGlyph(Beat beat, VoiceContainerGlyph voiceContainer) : base(beat, voiceContainer)
         {
@@ -31,6 +37,8 @@ namespace AlphaTab.Rendering
 
         public override void DoLayout()
         {
+            _effectSlur = null;
+            _effectEndSlur = null;
             base.DoLayout();
             if (Beat.IsLegatoOrigin)
             {
@@ -94,10 +102,39 @@ namespace AlphaTab.Rendering
                 Ties.Add(l);
             }
 
-            if (n.Beat.SlurOrigin != null && n.Index == 0)
+            if (n.IsSlurOrigin && n.SlurDestination != null && n.SlurDestination.IsVisible)
             {
-                var tie = new ScoreSlurGlyph(n.Beat);
+                var tie = new ScoreSlurGlyph(n, n.SlurDestination, false);
                 Ties.Add(tie);
+            }
+
+            if (n.IsSlurDestination)
+            {
+                var tie = new ScoreSlurGlyph(n.SlurOrigin, n, true);
+                Ties.Add(tie);
+            }
+
+            // start effect slur on first beat
+            if (_effectSlur == null && n.Beat.IsEffectSlurOrigin && n.Beat.EffectSlurDestination != null)
+            {
+                var direction = OnNotes.BeamingHelper.Direction;
+
+                var startNote = direction == BeamDirection.Up ? n.Beat.MinNote : n.Beat.MaxNote;
+                var endNote = direction == BeamDirection.Up ? n.Beat.EffectSlurDestination.MinNote : n.Beat.EffectSlurDestination.MaxNote;
+
+                _effectSlur = new ScoreSlurGlyph(startNote, endNote, false);
+                Ties.Add(_effectSlur);
+            }
+            // end effect slur on last beat
+            if (_effectEndSlur == null && n.Beat.IsEffectSlurDestination && n.Beat.EffectSlurOrigin != null)
+            {
+                var direction = OnNotes.BeamingHelper.Direction;
+
+                var startNote = direction == BeamDirection.Up ? n.Beat.EffectSlurOrigin.MinNote : n.Beat.EffectSlurOrigin.MaxNote;
+                var endNote = direction == BeamDirection.Up ? n.Beat.MinNote : n.Beat.MaxNote;
+
+                _effectEndSlur = new ScoreSlurGlyph(startNote, endNote, true);
+                Ties.Add(_effectEndSlur);
             }
 
             if (n.HasBend)

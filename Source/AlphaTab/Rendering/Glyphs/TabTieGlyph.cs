@@ -22,48 +22,53 @@ namespace AlphaTab.Rendering.Glyphs
 {
     class TabTieGlyph : TieGlyph
     {
-        private readonly Note _startNote;
-        private readonly Note _endNote;
-        private readonly bool _forSlide;
+        protected Note StartNote;
+        protected Note EndNote;
+        protected readonly bool ForSlide;
 
         public TabTieGlyph(Note startNote, Note endNote, bool forSlide, bool forEnd = false)
             : base(startNote.Beat, endNote.Beat, forEnd)
         {
-            _startNote = startNote;
-            _endNote = endNote;
-            _forSlide = forSlide;
+            StartNote = startNote;
+            EndNote = endNote;
+            ForSlide = forSlide;
         }
 
         private float Offset
         {
-            get { return _forSlide ? 5 * Scale : 0; }
+            get { return ForSlide ? 5 * Scale : 0; }
         }
 
         protected override BeamDirection GetBeamDirection(Beat beat, BarRendererBase noteRenderer)
         {
-            return _startNote.String > 3
+            return GetBeamDirection(StartNote);
+        }
+
+        protected static BeamDirection GetBeamDirection(Note note)
+        {
+            return note.String > 3
                 ? BeamDirection.Up
                 : BeamDirection.Down;
         }
 
         protected override float GetStartY(BarRendererBase noteRenderer, BeamDirection direction)
         {
-            return noteRenderer.GetNoteY(_startNote) - Offset;
+            return noteRenderer.GetNoteY(StartNote) - Offset;
         }
 
         protected override float GetEndY(BarRendererBase noteRenderer, BeamDirection direction)
         {
-            return noteRenderer.GetNoteY(_endNote) - Offset;
+            return noteRenderer.GetNoteY(EndNote) - Offset;
         }
 
         protected override float GetStartX(BarRendererBase noteRenderer)
         {
-            return noteRenderer.GetNoteX(_startNote);
+            return noteRenderer.GetNoteX(StartNote);
         }
 
         protected override float GetEndX(BarRendererBase noteRenderer)
         {
-            return noteRenderer.GetNoteX(_endNote, false);
+            return noteRenderer.GetNoteX(EndNote, false);
         }
     }
 }

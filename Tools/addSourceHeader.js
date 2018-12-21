@@ -6,7 +6,10 @@ console.log("Loading Template from " + templateFile);
 
 var buildProps = fs.readFileSync('Directory.Build.props', 'utf8');
 var version = (/<FileVersion>([^<]+)<\/FileVersion>/i).exec(buildProps)[1];
-var branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
+var branch = process.env.APPVEYOR_REPO_BRANCH;
+if(!branch || branch.length == 0) {
+  branch = execSync('git rev-parse --abbrev-ref HEAD').toString().trim();
+}
 
 var template = fs.readFileSync(templateFile, 'utf8');
 template = template.replace("{{year}}", new Date().getFullYear());

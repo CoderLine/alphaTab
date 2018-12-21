@@ -128,7 +128,7 @@ namespace AlphaTab.Rendering
         {
             get
             {
-                return ScoreRenderer.RenderingResources;
+                return Settings.RenderingResources;
             }
         }
 

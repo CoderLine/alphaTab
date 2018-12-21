@@ -170,7 +170,7 @@ namespace AlphaTab.Rendering.Glyphs
             if (HasTopOverflow)
             {
                 var color = canvas.Color;
-                canvas.Color = Renderer.ScoreRenderer.RenderingResources.StaveLineColor;
+                canvas.Color = scoreRenderer.Resources.StaffLineColor;
                 var l = 0;
                 while (l >= MinNote.Line)
                 {
@@ -185,7 +185,7 @@ namespace AlphaTab.Rendering.Glyphs
             if (HasBottomOverflow)
             {
                 var color = canvas.Color;
-                canvas.Color = Renderer.ScoreRenderer.RenderingResources.StaveLineColor;
+                canvas.Color = scoreRenderer.Resources.StaffLineColor;
                 var l = 12;
                 while (l <= MaxNote.Line)
                 {

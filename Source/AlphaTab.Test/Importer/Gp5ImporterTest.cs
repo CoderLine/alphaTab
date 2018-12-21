@@ -22,265 +22,315 @@ namespace AlphaTab.Test.Importer
     [TestClass]
     public class Gp5ImporterTest : GpImporterTestBase
     {
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestScoreInfo()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/Test01.gp5");
-            var score = reader.ReadScore();
+            PrepareImporterWithFile("GuitarPro5/Test01.gp5", reader =>
+            {
+                var score = reader.ReadScore();
 
-            Assert.AreEqual("Title", score.Title);
-            Assert.AreEqual("Subtitle", score.SubTitle);
-            Assert.AreEqual("Artist", score.Artist);
-            Assert.AreEqual("Album", score.Album);
-            Assert.AreEqual("Words", score.Words);
-            Assert.AreEqual("Music", score.Music);
-            Assert.AreEqual("Copyright", score.Copyright);
-            Assert.AreEqual("Tab", score.Tab);
-            Assert.AreEqual("Instructions", score.Instructions);
-            Assert.AreEqual("Notice1\r\nNotice2", score.Notices);
-            Assert.AreEqual(5, score.MasterBars.Count);
-            Assert.AreEqual(2, score.Tracks.Count);
-            Assert.AreEqual("Track 1", score.Tracks[0].Name);
-            Assert.AreEqual("Track 2", score.Tracks[1].Name);
-            Render(score);
+                Assert.AreEqual("Title", score.Title);
+                Assert.AreEqual("Subtitle", score.SubTitle);
+                Assert.AreEqual("Artist", score.Artist);
+                Assert.AreEqual("Album", score.Album);
+                Assert.AreEqual("Words", score.Words);
+                Assert.AreEqual("Music", score.Music);
+                Assert.AreEqual("Copyright", score.Copyright);
+                Assert.AreEqual("Tab", score.Tab);
+                Assert.AreEqual("Instructions", score.Instructions);
+                Assert.AreEqual("Notice1\r\nNotice2", score.Notices);
+                Assert.AreEqual(5, score.MasterBars.Count);
+                Assert.AreEqual(2, score.Tracks.Count);
+                Assert.AreEqual("Track 1", score.Tracks[0].Name);
+                Assert.AreEqual("Track 2", score.Tracks[1].Name);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestNotes()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/Test02.gp5");
-            var score = reader.ReadScore();
-            CheckTest02Score(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/Test02.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckTest02Score(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestTimeSignatures()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/Test03.gp5");
-            var score = reader.ReadScore();
+            PrepareImporterWithFile("GuitarPro5/Test03.gp5", reader =>
+            {
+                var score = reader.ReadScore();
 
-            CheckTest03Score(score);
-            Render(score);
+                CheckTest03Score(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestDead()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestDead.gp5");
-            var score = reader.ReadScore();
-            CheckDead(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestDead.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckDead(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestGrace()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestGrace.gp5");
-            var score = reader.ReadScore();
-            CheckGrace(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestGrace.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckGrace(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestAccentuation()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestAccentuations.gp5");
-            var score = reader.ReadScore();
-            CheckAccentuation(score, true);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestAccentuations.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckAccentuation(score, true);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestHarmonics()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestHarmonics.gp5");
-            var score = reader.ReadScore();
-            CheckHarmonics(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestHarmonics.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckHarmonics(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestHammer()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestHammer.gp5");
-            var score = reader.ReadScore();
-            CheckHammer(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestHammer.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckHammer(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestBend()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestBends.gp5");
-            var score = reader.ReadScore();
-            CheckBend(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestBends.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckBend(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestTremolo()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestTremolo.gp5");
-            var score = reader.ReadScore();
-            CheckTremolo(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestTremolo.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckTremolo(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestSlides()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestSlides.gp5");
-            var score = reader.ReadScore();
-            CheckSlides(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestSlides.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckSlides(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestVibrato()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestVibrato.gp5");
-            var score = reader.ReadScore();
-            CheckVibrato(score, true);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestVibrato.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckVibrato(score, true);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestTrills()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestTrills.gp5");
-            var score = reader.ReadScore();
-            CheckTrills(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestTrills.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckTrills(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestOtherEffects()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestOtherEffects.gp5");
-            var score = reader.ReadScore();
-            CheckOtherEffects(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestOtherEffects.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckOtherEffects(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestFingering()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestFingering.gp5");
-            var score = reader.ReadScore();
-            CheckFingering(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestFingering.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckFingering(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestStroke()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestStrokes.gp5");
-            var score = reader.ReadScore();
-            CheckStroke(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestStrokes.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckStroke(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestTuplets()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestTuplets.gp5");
-            var score = reader.ReadScore();
-            CheckTuplets(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestTuplets.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckTuplets(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestRanges()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestRanges.gp5");
-            var score = reader.ReadScore();
-            CheckRanges(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestRanges.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckRanges(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestEffects()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/Effects.gp5");
-            var score = reader.ReadScore();
-            CheckEffects(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/Effects.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckEffects(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestSerenade()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/Serenade.gp5");
-            var score = reader.ReadScore();// only Check reading
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/Serenade.gp5", reader =>
+            {
+                var score = reader.ReadScore();// only Check reading
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestStrings()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestStrings.gp5");
-            var score = reader.ReadScore();
-            CheckStrings(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestStrings.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckStrings(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestKeySignatures()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestKeySignatures.gp5");
-            var score = reader.ReadScore();
-            CheckKeySignatures(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro5/TestKeySignatures.gp5", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckKeySignatures(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestChords()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/TestChords.gp5");
-            var score = reader.ReadScore();
+            PrepareImporterWithFile("GuitarPro5/TestChords.gp5", reader =>
+            {
+                var score = reader.ReadScore();
 
-            CheckChords(score);
-            Render(score);
+                CheckChords(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestColors()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/Colors.gp5");
-            var score = reader.ReadScore();
+            PrepareImporterWithFile("GuitarPro5/Colors.gp5", reader =>
+            {
+                var score = reader.ReadScore();
 
-            CheckColors(score);
-            Render(score);
+                CheckColors(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestCanon()
         {
-            var reader = PrepareImporterWithFile("GuitarPro5/Canon.gp5");
-            var score = reader.ReadScore();
+            PrepareImporterWithFile("GuitarPro5/Canon.gp5", reader =>
+            {
+                var score = reader.ReadScore();
 
-            Assert.AreEqual("Canon Rock", score.Title);
-            Assert.AreEqual("", score.SubTitle);
-            Assert.AreEqual("JerryC", score.Artist);
-            Assert.AreEqual("", score.Album);
-            Assert.AreEqual("", score.Words);
-            Assert.AreEqual("JerryC", score.Music);
-            Assert.AreEqual("", score.Copyright);
-            Assert.AreEqual("", score.Tab);
-            Assert.AreEqual("", score.Instructions);
-            Assert.AreEqual("", score.Notices);
-            Assert.AreEqual(224, score.MasterBars.Count);
-            Assert.AreEqual(9, score.Tracks.Count);
-            Assert.AreEqual("Guitar Player", score.Tracks[0].Name);
-            Assert.AreEqual("Low Bassy Sound", score.Tracks[1].Name);
-            Assert.AreEqual("High Soundy Thing", score.Tracks[2].Name);
-            Assert.AreEqual("Second Guitar", score.Tracks[3].Name);
-            Assert.AreEqual("Drums", score.Tracks[4].Name);
-            Assert.AreEqual("Harmonizer", score.Tracks[5].Name);
-            Assert.AreEqual("The clean guitar", score.Tracks[6].Name);
-            Assert.AreEqual("Track 8", score.Tracks[7].Name);
-            Assert.AreEqual("Percussion", score.Tracks[8].Name);
+                Assert.AreEqual("Canon Rock", score.Title);
+                Assert.AreEqual("", score.SubTitle);
+                Assert.AreEqual("JerryC", score.Artist);
+                Assert.AreEqual("", score.Album);
+                Assert.AreEqual("", score.Words);
+                Assert.AreEqual("JerryC", score.Music);
+                Assert.AreEqual("", score.Copyright);
+                Assert.AreEqual("", score.Tab);
+                Assert.AreEqual("", score.Instructions);
+                Assert.AreEqual("", score.Notices);
+                Assert.AreEqual(224, score.MasterBars.Count);
+                Assert.AreEqual(9, score.Tracks.Count);
+                Assert.AreEqual("Guitar Player", score.Tracks[0].Name);
+                Assert.AreEqual("Low Bassy Sound", score.Tracks[1].Name);
+                Assert.AreEqual("High Soundy Thing", score.Tracks[2].Name);
+                Assert.AreEqual("Second Guitar", score.Tracks[3].Name);
+                Assert.AreEqual("Drums", score.Tracks[4].Name);
+                Assert.AreEqual("Harmonizer", score.Tracks[5].Name);
+                Assert.AreEqual("The clean guitar", score.Tracks[6].Name);
+                Assert.AreEqual("Track 8", score.Tracks[7].Name);
+                Assert.AreEqual("Percussion", score.Tracks[8].Name);
+            });
         }
     }
 }

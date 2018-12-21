@@ -36,10 +36,11 @@ namespace AlphaTab.Importer
         private int _trackFirstMeasureNumber;
         private int _maxVoices;
         private string _currentDirection;
-        private int _firstVoice;
 
         private FastList<Note> _tieStarts;
         private FastDictionary<int, bool> _tieStartIds;
+
+        private FastDictionary<string, Note> _slurStarts;
 
 
         public override string Name { get { return "MusicXML"; } }
@@ -50,7 +51,7 @@ namespace AlphaTab.Importer
             _partGroups = new FastDictionary<string, FastList<Track>>();
             _tieStarts = new FastList<Note>();
             _tieStartIds = new FastDictionary<int, bool>();
-
+            _slurStarts = new FastDictionary<string, Note>();
             var xml = Platform.Platform.ToString(Data.ReadAll(), GetSetting("encoding", "utf-8"));
             XmlDocument dom;
             try
@@ -190,13 +191,28 @@ namespace AlphaTab.Importer
             var id = element.GetAttribute("id");
             if (!_trackById.ContainsKey(id))
             {
-                return;
-            }
+                if (_trackById.Count == 1)
+                {
+                    foreach (var key in _trackById)
+                    {
+                        var t = _trackById[key];
+                        if (t.Staves.Count == 0 || t.Staves[0].Bars.Count == 0)
+                        {
+                            id = key;
+                        }
+                    }
 
-            _firstVoice = -1;
+                    if (!_trackById.ContainsKey(id)) return;
+                }
+                else
+                {
+                    return;
+                }
+            }
 
             var track = _trackById[id];
             var isFirstMeasure = true;
+            _maxVoices = 0;
             foreach (var c in element.ChildNodes)
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -211,6 +227,16 @@ namespace AlphaTab.Importer
                             break;
                     }
                 }
+            }
+
+            // ensure voices for all bars
+            foreach (var staff in track.Staves)
+            {
+                foreach (var bar in staff.Bars)
+                {
+                    EnsureVoices(bar);
+                }
+
             }
         }
 
@@ -280,14 +306,7 @@ namespace AlphaTab.Importer
                     masterBar = GetOrCreateMasterBar(barIndex);
                     track.Staves[s].AddBar(bar);
 
-                    for (int v = 0; v < _maxVoices; v++)
-                    {
-                        var emptyVoice = new Voice();
-                        bar.AddVoice(emptyVoice);
-                        var emptyBeat = new Beat { IsEmpty = true };
-                        emptyBeat.ChordId = _currentChord;
-                        emptyVoice.AddBeat(emptyBeat);
-                    }
+                    EnsureVoices(bar);
                 }
             }
 
@@ -331,6 +350,18 @@ namespace AlphaTab.Importer
             return true;
         }
 
+        private void EnsureVoices(Bar bar)
+        {
+            while (bar.Voices.Count < _maxVoices)
+            {
+                var emptyVoice = new Voice();
+                bar.AddVoice(emptyVoice);
+                var emptyBeat = new Beat { IsEmpty = true };
+                emptyBeat.ChordId = _currentChord;
+                emptyVoice.AddBeat(emptyBeat);
+            }
+        }
+
         private Beat GetOrCreateBeat(XmlNode element, Bar[] bars, bool chord)
         {
             int voiceIndex = 0;
@@ -338,12 +369,6 @@ namespace AlphaTab.Importer
             if (voiceNodes.Length > 0)
             {
                 voiceIndex = Platform.Platform.ParseInt(voiceNodes[0].InnerText) - 1;
-
-                if (_firstVoice == -1)
-                {
-                    _firstVoice = voiceIndex;
-                    voiceIndex = 0;
-                }
             }
 
             var previousBeatWasPulled = _previousBeatWasPulled;
@@ -366,13 +391,16 @@ namespace AlphaTab.Importer
                 {
                     _voiceOfStaff[staffId] = voiceIndex;
                 }
-                voiceIndex -= _voiceOfStaff[staffId];
             }
-            var bar = bars[staff - 1];
+            staff--;
+            Bar bar;
+            if (staff < 0) bar = bars[0];
+            else if (staff >= bars.Length) bar = bars[bars.Length - 1];
+            else bar = bars[staff];
 
             Beat beat;
             var voice = GetOrCreateVoice(bar, voiceIndex);
-            if (chord || (voice.Beats.Count == 1 && voice.IsEmpty))
+            if ((chord && voice.Beats.Count > 0) || (voice.Beats.Count == 1 && voice.IsEmpty))
             {
                 beat = voice.Beats[voice.Beats.Count - 1];
             }
@@ -647,7 +675,7 @@ namespace AlphaTab.Importer
             _currentChord = Platform.Platform.NewGuid();
             foreach (var staff in track.Staves)
             {
-                staff.Chords[_currentChord] = chord;
+                staff.AddChord(_currentChord, chord);
             }
         }
 
@@ -942,18 +970,16 @@ namespace AlphaTab.Importer
             {
                 if (!_tieStartIds.ContainsKey(note.Id))
                 {
-                    note.IsTieOrigin = true;
                     _tieStartIds[note.Id] = true;
                     _tieStarts.Add(note);
                 }
             }
-            else if (element.GetAttribute("type") == "stop" && _tieStarts.Count > 0)
+            else if (element.GetAttribute("type") == "stop" && _tieStarts.Count > 0 && !note.IsTieDestination)
             {
                 note.IsTieDestination = true;
                 note.TieOrigin = _tieStarts[0];
                 _tieStarts.RemoveAt(0);
                 _tieStartIds.Remove(note.Id);
-
             }
         }
 
@@ -988,9 +1014,26 @@ namespace AlphaTab.Importer
                             ParseOrnaments(c, note);
                             break;
                         case "slur":
-                            if (c.GetAttribute("type") == "start")
+                            var slurNumber = c.GetAttribute("number");
+                            if (string.IsNullOrEmpty(slurNumber))
                             {
-                                beat.IsLegatoOrigin = true;
+                                slurNumber = "1";
+                            }
+
+                            switch (c.GetAttribute("type"))
+                            {
+                                case "start":
+                                    _slurStarts[slurNumber] = note;
+                                    break;
+                                case "stop":
+                                    if (_slurStarts.ContainsKey(slurNumber))
+                                    {
+                                        note.IsSlurDestination = true;
+                                        var slurStart = _slurStarts[slurNumber];
+                                        slurStart.SlurDestination = note;
+                                        note.SlurOrigin = note;
+                                    }
+                                    break;
                             }
                             break;
                     }

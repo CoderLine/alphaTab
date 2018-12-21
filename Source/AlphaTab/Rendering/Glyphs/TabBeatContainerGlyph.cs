@@ -16,16 +16,19 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Staves;
+using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
     class TabBeatContainerGlyph : BeatContainerGlyph
     {
         private TabBendGlyph _bend;
+        private FastList<TabSlurGlyph> _effectSlurs;
 
         public TabBeatContainerGlyph(Beat beat, VoiceContainerGlyph voiceContainer)
             : base(beat, voiceContainer)
@@ -34,6 +37,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void DoLayout()
         {
+            _effectSlurs = new FastList<TabSlurGlyph>();
             base.DoLayout();
             if (_bend != null)
             {
@@ -59,10 +63,45 @@ namespace AlphaTab.Rendering.Glyphs
                 Ties.Add(tie);
             }
 
-            if (n.SlurOrigin != null)
+            // start effect slur on first beat
+            if (n.IsEffectSlurOrigin && n.EffectSlurDestination != null)
             {
-                var tie = new TabSlurGlyph(n);
-                Ties.Add(tie);
+                var expanded = false;
+                foreach (var slur in _effectSlurs)
+                {
+                    if (slur.TryExpand(n, n.EffectSlurDestination, false, false))
+                    {
+                        expanded = true;
+                        break;
+                    }
+                }
+
+                if (!expanded)
+                {
+                    var effectSlur = new TabSlurGlyph(n, n.EffectSlurDestination, false, false);
+                    _effectSlurs.Add(effectSlur);
+                    Ties.Add(effectSlur);
+                }
+            }
+            // end effect slur on last beat
+            if (n.IsEffectSlurDestination && n.EffectSlurOrigin != null)
+            {
+                var expanded = false;
+                foreach (var slur in _effectSlurs)
+                {
+                    if (slur.TryExpand(n.EffectSlurOrigin, n, false, true))
+                    {
+                        expanded = true;
+                        break;
+                    }
+                }
+
+                if (!expanded)
+                {
+                    var effectSlur = new TabSlurGlyph(n.EffectSlurOrigin, n, false, true);
+                    _effectSlurs.Add(effectSlur);
+                    Ties.Add(effectSlur);
+                }
             }
 
             if (n.SlideType != SlideType.None)

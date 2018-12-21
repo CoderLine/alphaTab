@@ -14,6 +14,7 @@ abstract CsString(String) from String to String
 	public inline function Substring_Int32_Int32(start:Int32, length:Int32) : CsString return this.substr(start.ToHaxeInt(), length.ToHaxeInt());
 	public inline function Replace_CsString_CsString(from:CsString, with :CsString) : CsString return StringTools.replace(this, from.ToHaxeString(), with.ToHaxeString() );
 	public inline function IndexOf_Char(ch:Char) : Int32 return this.indexOf(ch.ToString());
+	public inline function IndexOf_CsString(ch:CsString) : Int32 return this.indexOf(ch.ToHaxeString());
 	public inline function LastIndexOf_Char(ch:Char) : Int32 return this.lastIndexOf(ch.ToString());
 	public inline function LastIndexOf_CsString(ch:CsString) : Int32 return this.lastIndexOf(ch.ToHaxeString());
 	public inline function EndsWith_CsString(end:CsString) : Boolean return StringTools.endsWith(this, end.ToHaxeString());

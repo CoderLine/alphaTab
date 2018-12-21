@@ -846,7 +846,7 @@ namespace AlphaTab.Rendering
             //
             // draw string lines
             //
-            canvas.Color = res.StaveLineColor;
+            canvas.Color = res.StaffLineColor;
             var lineY = cy + Y + TopPadding;
             var lineOffset = LineOffset;
             for (var i = 0; i < 5; i++)

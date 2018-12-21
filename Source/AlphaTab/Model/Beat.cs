@@ -75,6 +75,12 @@ namespace AlphaTab.Model
         public FastDictionary<int, Note> NoteStringLookup { get; }
 
         /// <summary>
+        /// Gets the lookup where the notes per value are registered.
+        /// If this staff contains string based notes this lookup allows fast access. 
+        /// </summary>
+        public FastDictionary<int, Note> NoteValueLookup { get; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this beat is considered empty. 
         /// </summary>
         public bool IsEmpty { get; set; }
@@ -125,24 +131,7 @@ namespace AlphaTab.Model
         /// Gets or sets the duration of this beat. 
         /// </summary>
         public Duration Duration { get; set; }
-
-        /// <summary>
-        /// Gets or sets whether this beat starts a slur. 
-        /// </summary>
-        public bool IsSlurOrigin { get; set; }
-        /// <summary>
-        /// Gets or sets whether this beat ends or continues a slur. 
-        /// </summary>
-        public bool IsSlurDestination => SlurOrigin != null;
-        /// <summary>
-        /// Gets or sets the slur origin beat
-        /// </summary>
-        public Beat SlurOrigin { get; set; }
-        /// <summary>
-        /// Gets or sets the slur destination beat. 
-        /// </summary>
-        public Beat SlurDestination { get; set; }
-
+        
         /// <summary>
         /// Gets or sets whether this beat is considered as rest.
         /// </summary>
@@ -212,7 +201,7 @@ namespace AlphaTab.Model
 
         /// <summary>
         /// Gets or sets the tuplet denominator.
-        /// </summary>
+        /// </summary>re
         public int TupletDenominator { get; set; }
         /// <summary>
         /// Gets or sets the tuplet numerator. 
@@ -346,6 +335,11 @@ namespace AlphaTab.Model
         /// </summary>
         public bool InvertBeamDirection { get; set; }
 
+        internal bool IsEffectSlurOrigin { get; set; }
+        internal bool IsEffectSlurDestination => EffectSlurOrigin != null;
+        internal Beat EffectSlurOrigin { get; set; }
+        internal Beat EffectSlurDestination { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Beat"/> class.
         /// </summary>
@@ -374,8 +368,8 @@ namespace AlphaTab.Model
             InvertBeamDirection = false;
             Ottava = Ottavia.Regular;
             NoteStringLookup = new FastDictionary<int, Note>();
+            NoteValueLookup = new FastDictionary<int, Note>();
             WhammyStyle = BendStyle.Default;
-            IsSlurOrigin = false;
         }
 
         internal static void CopyTo(Beat src, Beat dst)
@@ -432,7 +426,7 @@ namespace AlphaTab.Model
             }
             for (int i = 0, j = Notes.Count; i < j; i++)
             {
-                beat.AddNote(Notes[i].Clone());
+                beat.AddNoteInternal(Notes[i].Clone(), Notes[i].RealValue);
             }
             CopyTo(this, beat);
             for (int i = 0, j = Automations.Count; i < j; i++)
@@ -497,6 +491,11 @@ namespace AlphaTab.Model
 
         internal void AddNote(Note note)
         {
+            AddNoteInternal(note);
+        }
+
+        private void AddNoteInternal(Note note, int realValue = -1)
+        {
             note.Beat = this;
             note.Index = Notes.Count;
             Notes.Add(note);
@@ -504,6 +503,9 @@ namespace AlphaTab.Model
             {
                 NoteStringLookup[note.String] = note;
             }
+
+            if (realValue == -1) realValue = note.RealValue;
+            NoteValueLookup[realValue] = note;
         }
 
         internal void RemoveNote(Note note)
@@ -637,6 +639,7 @@ namespace AlphaTab.Model
             MaxStringNote = null;
 
             var visibleNotes = 0;
+            var isEffectSlurBeat = false;
 
             for (int i = 0, j = Notes.Count; i < j; i++)
             {
@@ -651,10 +654,6 @@ namespace AlphaTab.Model
                     IsPalmMute = true;
                 }
 
-                if (note.IsSlurOrigin)
-                {
-                    IsSlurOrigin = true;
-                }
                 if (displayMode == DisplayMode.SongBook && note.HasBend && GraceType != GraceType.BendGrace)
                 {
                     if (!note.IsTieOrigin)
@@ -703,34 +702,33 @@ namespace AlphaTab.Model
                     {
                         MaxStringNote = note;
                     }
+
+                    if (note.HasEffectSlur)
+                    {
+                        isEffectSlurBeat = true;
+                    }
+                }
+            }
+
+            if (isEffectSlurBeat)
+            {
+                if (EffectSlurOrigin != null)
+                {
+                    EffectSlurOrigin.EffectSlurDestination = NextBeat;
+                    EffectSlurOrigin.EffectSlurDestination.EffectSlurOrigin = EffectSlurOrigin;
+                    EffectSlurOrigin = null;
+                }
+                else
+                {
+                    IsEffectSlurOrigin = true;
+                    EffectSlurDestination = NextBeat;
+                    EffectSlurDestination.EffectSlurOrigin = this;
                 }
             }
 
             if (Notes.Count > 0 && visibleNotes == 0)
             {
                 IsEmpty = true;
-            }
-
-            if (IsSlurOrigin)
-            {
-                IsSlurOrigin = true;
-                SlurDestination = NextBeat;
-                if (!IsSlurDestination)
-                {
-                    SlurOrigin = this;
-                    if (SlurDestination != null)
-                    {
-                        SlurDestination.SlurOrigin = this;
-                    }
-                }
-                else
-                {
-                    SlurOrigin.SlurDestination = SlurDestination;
-                    if (SlurDestination != null)
-                    {
-                        SlurDestination.SlurOrigin = SlurOrigin;
-                    }
-                }
             }
 
             // we need to clean al letring/palmmute flags for rests
@@ -911,6 +909,15 @@ namespace AlphaTab.Model
         internal bool HasNoteOnString(int noteString)
         {
             return NoteStringLookup.ContainsKey(noteString);
+        }
+
+        internal Note GetNoteWithRealValue(int noteRealValue)
+        {
+            if (NoteValueLookup.ContainsKey(noteRealValue))
+            {
+                return NoteValueLookup[noteRealValue];
+            }
+            return null;
         }
     }
 }

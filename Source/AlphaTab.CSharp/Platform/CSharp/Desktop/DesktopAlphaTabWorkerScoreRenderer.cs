@@ -1,4 +1,4 @@
-﻿#if NET471
+﻿#if NET472
 /*
  * This file is part of alphaTab.
  * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.

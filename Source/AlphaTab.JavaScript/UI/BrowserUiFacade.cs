@@ -202,7 +202,7 @@ namespace AlphaTab.UI
 
                 if (!string.IsNullOrEmpty(_contents))
                 {
-                    _api.Tex(_contents);
+                    _api.Tex(_contents, null);
                 }
                 else if (!string.IsNullOrEmpty(_file))
                 {
@@ -303,7 +303,12 @@ namespace AlphaTab.UI
             {
                 try
                 {
-                    tracksData = Json.Parse(tracksData.As<string>());
+                    if (tracksData == "all")
+                    {
+                        return null;
+                    }
+
+                    tracksData = Json.Parse(tracksData);
                 }
                 catch
                 {

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Importer;
 using AlphaTab.IO;
@@ -414,5 +415,336 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(true, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].IsPiano);
             Assert.AreEqual(63, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[3].Notes[0].RealValue);
         }
+
+        [TestMethod]
+        public void TestMultiStaffDefaultSettings()
+        {
+            var tex = @"1.1 | 1.1 | \staff 2.1 | 2.1";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(2, score.MasterBars.Count);
+            Assert.AreEqual(2, score.Tracks[0].Staves.Count);
+
+            Assert.IsTrue(score.Tracks[0].Staves[0].ShowTablature);
+            Assert.IsTrue(score.Tracks[0].Staves[0].ShowStandardNotation);
+            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars.Count);
+
+            Assert.IsTrue(score.Tracks[0].Staves[1].ShowTablature); // default settings used
+            Assert.IsTrue(score.Tracks[0].Staves[1].ShowStandardNotation);
+            Assert.AreEqual(2, score.Tracks[0].Staves[1].Bars.Count);
+        }
+
+        [TestMethod]
+        public void TestMultiStaffDefaultSettingsBraces()
+        {
+            var tex = @"1.1 | 1.1 | \staff{} 2.1 | 2.1";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(2, score.MasterBars.Count);
+            Assert.AreEqual(2, score.Tracks[0].Staves.Count);
+
+            Assert.IsTrue(score.Tracks[0].Staves[0].ShowTablature);
+            Assert.IsTrue(score.Tracks[0].Staves[0].ShowStandardNotation);
+            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars.Count);
+
+            Assert.IsTrue(score.Tracks[0].Staves[1].ShowTablature); // default settings used
+            Assert.IsTrue(score.Tracks[0].Staves[1].ShowStandardNotation);
+            Assert.AreEqual(2, score.Tracks[0].Staves[1].Bars.Count);
+        }
+
+        [TestMethod]
+        public void TestSingleStaffWithSetting()
+        {
+            var tex = @"\staff{score} 1.1 | 1.1";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(2, score.MasterBars.Count);
+            Assert.AreEqual(1, score.Tracks[0].Staves.Count);
+
+            Assert.IsFalse(score.Tracks[0].Staves[0].ShowTablature);
+            Assert.IsTrue(score.Tracks[0].Staves[0].ShowStandardNotation);
+            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars.Count);
+        }
+
+        [TestMethod]
+        public void TestMultiStaffWithSettings()
+        {
+            var tex = @"\staff{score} 1.1 | 1.1 | 
+                        \staff{tabs} \capo 2 2.1 | 2.1 |
+                        \staff{score tabs} \tuning A1 D2 A2 D3 G3 B3 E4 3.1 | 3.1";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(2, score.MasterBars.Count);
+            Assert.AreEqual(3, score.Tracks[0].Staves.Count);
+
+            Assert.IsFalse(score.Tracks[0].Staves[0].ShowTablature);
+            Assert.IsTrue(score.Tracks[0].Staves[0].ShowStandardNotation);
+            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars.Count);
+
+            Assert.IsTrue(score.Tracks[0].Staves[1].ShowTablature);
+            Assert.IsFalse(score.Tracks[0].Staves[1].ShowStandardNotation);
+            Assert.AreEqual(2, score.Tracks[0].Staves[1].Bars.Count);
+            Assert.AreEqual(2, score.Tracks[0].Staves[1].Capo);
+
+            Assert.IsTrue(score.Tracks[0].Staves[2].ShowTablature);
+            Assert.IsTrue(score.Tracks[0].Staves[2].ShowStandardNotation);
+            Assert.AreEqual(2, score.Tracks[0].Staves[2].Bars.Count);
+            Assert.AreEqual(7, score.Tracks[0].Staves[2].Tuning.Length);
+        }
+
+        [TestMethod]
+        public void TestMultiTrack()
+        {
+            var tex = @"\track ""First"" 1.1 | 1.1 | \track ""Second"" 2.2 | 2.2";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(2, score.Tracks.Count);
+            Assert.AreEqual(2, score.MasterBars.Count);
+
+            Assert.AreEqual(1, score.Tracks[0].Staves.Count);
+            Assert.AreEqual("First", score.Tracks[0].Name);
+            Assert.AreEqual(0, score.Tracks[0].PlaybackInfo.PrimaryChannel);
+            Assert.AreEqual(1, score.Tracks[0].PlaybackInfo.SecondaryChannel);
+            Assert.IsTrue(score.Tracks[0].Staves[0].ShowTablature);
+            Assert.IsTrue(score.Tracks[0].Staves[0].ShowStandardNotation);
+            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars.Count);
+
+            Assert.AreEqual(1, score.Tracks[1].Staves.Count);
+            Assert.AreEqual("Second", score.Tracks[1].Name);
+            Assert.AreEqual(2, score.Tracks[1].PlaybackInfo.PrimaryChannel);
+            Assert.AreEqual(3, score.Tracks[1].PlaybackInfo.SecondaryChannel);
+            Assert.IsTrue(score.Tracks[1].Staves[0].ShowTablature);
+            Assert.IsTrue(score.Tracks[1].Staves[0].ShowStandardNotation);
+            Assert.AreEqual(2, score.Tracks[1].Staves[0].Bars.Count);
+        }
+
+        [TestMethod]
+        public void TestMultiTrackNames()
+        {
+            var tex = @"\track 1.1 | 1.1 | \track ""Only Long Name"" 2.2 | 2.2 | \track ""Very Long Name"" ""shrt"" 3.3 | 3.3 ";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(3, score.Tracks.Count);
+            Assert.AreEqual(2, score.MasterBars.Count);
+
+            Assert.AreEqual(1, score.Tracks[0].Staves.Count);
+            Assert.AreEqual("", score.Tracks[0].Name);
+            Assert.AreEqual("", score.Tracks[0].ShortName);
+            Assert.AreEqual(0, score.Tracks[0].PlaybackInfo.PrimaryChannel);
+            Assert.AreEqual(1, score.Tracks[0].PlaybackInfo.SecondaryChannel);
+            Assert.IsTrue(score.Tracks[0].Staves[0].ShowTablature);
+            Assert.IsTrue(score.Tracks[0].Staves[0].ShowStandardNotation);
+            Assert.AreEqual(2, score.Tracks[0].Staves[0].Bars.Count);
+
+            Assert.AreEqual(1, score.Tracks[1].Staves.Count);
+            Assert.AreEqual("Only Long Name", score.Tracks[1].Name);
+            Assert.AreEqual("Only Long ", score.Tracks[1].ShortName);
+            Assert.AreEqual(2, score.Tracks[1].PlaybackInfo.PrimaryChannel);
+            Assert.AreEqual(3, score.Tracks[1].PlaybackInfo.SecondaryChannel);
+            Assert.IsTrue(score.Tracks[1].Staves[0].ShowTablature);
+            Assert.IsTrue(score.Tracks[1].Staves[0].ShowStandardNotation);
+            Assert.AreEqual(2, score.Tracks[1].Staves[0].Bars.Count);
+
+            Assert.AreEqual(1, score.Tracks[2].Staves.Count);
+            Assert.AreEqual("Very Long Name", score.Tracks[2].Name);
+            Assert.AreEqual("shrt", score.Tracks[2].ShortName);
+            Assert.AreEqual(4, score.Tracks[2].PlaybackInfo.PrimaryChannel);
+            Assert.AreEqual(5, score.Tracks[2].PlaybackInfo.SecondaryChannel);
+            Assert.IsTrue(score.Tracks[2].Staves[0].ShowTablature);
+            Assert.IsTrue(score.Tracks[2].Staves[0].ShowStandardNotation);
+            Assert.AreEqual(2, score.Tracks[2].Staves[0].Bars.Count);
+        }
+
+        [TestMethod]
+        public void TestMultiTrackMultiStaff()
+        {
+            var tex = 
+            @"\track ""Piano"" 
+                \staff{score} \tuning piano \instrument acousticgrandpiano 
+                c4 d4 e4 f4 |
+                
+                \staff{score} \tuning piano \clef F4
+                c2 c2 c2 c2 |
+
+              \track ""Guitar""
+                \staff{tabs}
+                1.2 3.2 0.1 1.1 |
+              
+              \track ""Second Guitar""
+                1.2 3.2 0.1 1.1
+            ";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(3, score.Tracks.Count);
+            Assert.AreEqual(1, score.MasterBars.Count);
+
+            {
+                var track1 = score.Tracks[0];
+                Assert.AreEqual("Piano", track1.Name);
+                Assert.AreEqual(2, track1.Staves.Count);
+                Assert.AreEqual(0, track1.PlaybackInfo.Program);
+                Assert.AreEqual(0, track1.PlaybackInfo.PrimaryChannel);
+                Assert.AreEqual(1, track1.PlaybackInfo.SecondaryChannel);
+
+                {
+                    var staff1 = track1.Staves[0];
+                    Assert.IsFalse(staff1.ShowTablature);
+                    Assert.IsTrue(staff1.ShowStandardNotation);
+                    Assert.AreEqual(0, staff1.Tuning.Length);
+                    Assert.AreEqual(1, staff1.Bars.Count);
+                    Assert.AreEqual(Clef.G2, staff1.Bars[0].Clef);
+                }
+
+                {
+                    var staff2 = track1.Staves[1];
+                    Assert.IsFalse(staff2.ShowTablature);
+                    Assert.IsTrue(staff2.ShowStandardNotation);
+                    Assert.AreEqual(0, staff2.Tuning.Length);
+                    Assert.AreEqual(1, staff2.Bars.Count);
+                    Assert.AreEqual(Clef.F4, staff2.Bars[0].Clef);
+                }
+            }
+
+            {
+                var track2 = score.Tracks[1];
+                Assert.AreEqual("Guitar", track2.Name);
+                Assert.AreEqual(1, track2.Staves.Count);
+                Assert.AreEqual(25, track2.PlaybackInfo.Program);
+                Assert.AreEqual(2, track2.PlaybackInfo.PrimaryChannel);
+                Assert.AreEqual(3, track2.PlaybackInfo.SecondaryChannel);
+
+                {
+                    var staff1 = track2.Staves[0];
+                    Assert.IsTrue(staff1.ShowTablature);
+                    Assert.IsFalse(staff1.ShowStandardNotation);
+                    Assert.AreEqual(6, staff1.Tuning.Length);
+                    Assert.AreEqual(1, staff1.Bars.Count);
+                    Assert.AreEqual(Clef.G2, staff1.Bars[0].Clef);
+                }
+            }
+
+            {
+                var track3 = score.Tracks[2];
+                Assert.AreEqual("Second Guitar", track3.Name);
+                Assert.AreEqual(1, track3.Staves.Count);
+                Assert.AreEqual(25, track3.PlaybackInfo.Program);
+                Assert.AreEqual(4, track3.PlaybackInfo.PrimaryChannel);
+                Assert.AreEqual(5, track3.PlaybackInfo.SecondaryChannel);
+
+                {
+                    var staff1 = track3.Staves[0];
+                    Assert.IsTrue(staff1.ShowTablature);
+                    Assert.IsTrue(staff1.ShowStandardNotation);
+                    Assert.AreEqual(6, staff1.Tuning.Length);
+                    Assert.AreEqual(1, staff1.Bars.Count);
+                    Assert.AreEqual(Clef.G2, staff1.Bars[0].Clef);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestMultiTrackMultiStaffInconsistentBars()
+        {
+            var tex = 
+            @"\track ""Piano"" 
+                \staff{score} \tuning piano \instrument acousticgrandpiano 
+                c4 d4 e4 f4 |
+                
+                \staff{score} \tuning piano \clef F4
+                c2 c2 c2 c2 | c2 c2 c2 c2 | c2 c2 c2 c2 |
+
+              \track ""Guitar""
+                \staff{tabs}
+                1.2 3.2 0.1 1.1 | 1.2 3.2 0.1 1.1 |
+              
+              \track ""Second Guitar""
+                1.2 3.2 0.1 1.1
+            ";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(3, score.Tracks.Count);
+            Assert.AreEqual(3, score.MasterBars.Count);
+
+            {
+                var track1 = score.Tracks[0];
+                Assert.AreEqual("Piano", track1.Name);
+                Assert.AreEqual(2, track1.Staves.Count);
+                Assert.AreEqual(0, track1.PlaybackInfo.Program);
+                Assert.AreEqual(0, track1.PlaybackInfo.PrimaryChannel);
+                Assert.AreEqual(1, track1.PlaybackInfo.SecondaryChannel);
+
+                {
+                    var staff1 = track1.Staves[0];
+                    Assert.IsFalse(staff1.ShowTablature);
+                    Assert.IsTrue(staff1.ShowStandardNotation);
+                    Assert.AreEqual(0, staff1.Tuning.Length);
+                    Assert.AreEqual(3, staff1.Bars.Count);
+                    Assert.IsFalse(staff1.Bars[0].IsEmpty);
+                    Assert.IsTrue(staff1.Bars[1].IsEmpty);
+                    Assert.IsTrue(staff1.Bars[2].IsEmpty);
+                    Assert.AreEqual(Clef.G2, staff1.Bars[0].Clef);
+                }
+
+                {
+                    var staff2 = track1.Staves[1];
+                    Assert.IsFalse(staff2.ShowTablature);
+                    Assert.IsTrue(staff2.ShowStandardNotation);
+                    Assert.AreEqual(0, staff2.Tuning.Length);
+                    Assert.AreEqual(3, staff2.Bars.Count);
+                    Assert.IsFalse(staff2.Bars[0].IsEmpty);
+                    Assert.IsFalse(staff2.Bars[1].IsEmpty);
+                    Assert.IsFalse(staff2.Bars[2].IsEmpty);
+                    Assert.AreEqual(Clef.F4, staff2.Bars[0].Clef);
+                }
+            }
+
+            {
+                var track2 = score.Tracks[1];
+                Assert.AreEqual("Guitar", track2.Name);
+                Assert.AreEqual(1, track2.Staves.Count);
+                Assert.AreEqual(25, track2.PlaybackInfo.Program);
+                Assert.AreEqual(2, track2.PlaybackInfo.PrimaryChannel);
+                Assert.AreEqual(3, track2.PlaybackInfo.SecondaryChannel);
+
+                {
+                    var staff1 = track2.Staves[0];
+                    Assert.IsTrue(staff1.ShowTablature);
+                    Assert.IsFalse(staff1.ShowStandardNotation);
+                    Assert.AreEqual(6, staff1.Tuning.Length);
+                    Assert.AreEqual(3, staff1.Bars.Count);
+                    Assert.IsFalse(staff1.Bars[0].IsEmpty);
+                    Assert.IsFalse(staff1.Bars[1].IsEmpty);
+                    Assert.IsTrue(staff1.Bars[2].IsEmpty);
+
+                    Assert.AreEqual(Clef.G2, staff1.Bars[0].Clef);
+                }
+            }
+
+            {
+                var track3 = score.Tracks[2];
+                Assert.AreEqual("Second Guitar", track3.Name);
+                Assert.AreEqual(1, track3.Staves.Count);
+                Assert.AreEqual(25, track3.PlaybackInfo.Program);
+                Assert.AreEqual(4, track3.PlaybackInfo.PrimaryChannel);
+                Assert.AreEqual(5, track3.PlaybackInfo.SecondaryChannel);
+
+                {
+                    var staff1 = track3.Staves[0];
+                    Assert.IsTrue(staff1.ShowTablature);
+                    Assert.IsTrue(staff1.ShowStandardNotation);
+                    Assert.AreEqual(6, staff1.Tuning.Length);
+                    Assert.AreEqual(3, staff1.Bars.Count);
+                    Assert.IsFalse(staff1.Bars[0].IsEmpty);
+                    Assert.IsTrue(staff1.Bars[1].IsEmpty);
+                    Assert.IsTrue(staff1.Bars[2].IsEmpty);
+                    Assert.AreEqual(Clef.G2, staff1.Bars[0].Clef);
+                }
+            }
+        }
+
     }
 }

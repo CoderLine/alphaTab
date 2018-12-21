@@ -41,7 +41,6 @@ namespace AlphaTab.Rendering
         internal Track[] Tracks { get; private set; }
         internal ScoreLayout Layout { get; set; }
 
-        internal RenderingResources RenderingResources { get; set; }
         internal Settings Settings { get; set; }
 
         public BoundsLookup BoundsLookup { get; set; }
@@ -49,7 +48,6 @@ namespace AlphaTab.Rendering
         public ScoreRenderer(Settings settings)
         {
             Settings = settings;
-            RenderingResources = new RenderingResources(1);
             RecreateCanvas();
             RecreateLayout();
         }
@@ -59,7 +57,6 @@ namespace AlphaTab.Rendering
             Score = null;
             Canvas = null;
             Layout = null;
-            RenderingResources = null;
             Settings = null;
             BoundsLookup = null;
             Tracks = null;
@@ -92,15 +89,23 @@ namespace AlphaTab.Rendering
             try
             {
                 Score = score;
-                var tracks = new FastList<Track>();
-                foreach (var track in trackIndexes)
+                FastList<Track> tracks;
+                if (trackIndexes == null)
                 {
-                    if (track >= 0 && track < score.Tracks.Count)
+                    tracks = score.Tracks.Clone();
+                }
+                else
+                {
+                    tracks = new FastList<Track>();
+                    foreach (var track in trackIndexes)
                     {
-                        tracks.Add(score.Tracks[track]);
+                        if (track >= 0 && track < score.Tracks.Count)
+                        {
+                            tracks.Add(score.Tracks[track]);
+                        }
                     }
                 }
-
+               
                 if (tracks.Count == 0 && score.Tracks.Count > 0)
                 {
                     tracks.Add(score.Tracks[0]);
@@ -147,12 +152,8 @@ namespace AlphaTab.Rendering
             if (Tracks == null || Tracks.Length == 0) return;
 
             RecreateCanvas();
-            if (RenderingResources.Scale != Settings.Scale)
-            {
-                RenderingResources.Init(Settings.Scale);
-                Canvas.LineWidth = Settings.Scale;
-            }
-            Canvas.Resources = RenderingResources;
+            Canvas.LineWidth = Settings.Scale;
+            Canvas.Settings = Settings;
 
             Logger.Info("Rendering", "Rendering " + Tracks.Length + " tracks");
             for (int i = 0; i < Tracks.Length; i++)
@@ -181,6 +182,7 @@ namespace AlphaTab.Rendering
                 BoundsLookup = new BoundsLookup();
                 OnPreRender();
                 Settings.Width = width;
+                Canvas.Settings = Settings;
                 Layout.Resize();
                 Layout.RenderAnnotation();
                 OnRenderFinished();

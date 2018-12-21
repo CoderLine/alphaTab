@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test.Importer
@@ -22,209 +23,250 @@ namespace AlphaTab.Test.Importer
     [TestClass]
     public class Gp4ImporterTest : GpImporterTestBase
     {
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestScoreInfo()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/Test01.gp4");
-            var score = reader.ReadScore();
+            PrepareImporterWithFile("GuitarPro4/Test01.gp4", reader =>
+            {
+                var score = reader.ReadScore();
 
-            Assert.AreEqual("Title", score.Title);
-            Assert.AreEqual("Subtitle", score.SubTitle);
-            Assert.AreEqual("Artist", score.Artist);
-            Assert.AreEqual("Album", score.Album);
-            Assert.AreEqual("Music", score.Words); // no words in gp4
-            Assert.AreEqual("Music", score.Music);
-            Assert.AreEqual("Copyright", score.Copyright);
-            Assert.AreEqual("Tab", score.Tab);
-            Assert.AreEqual("Instructions", score.Instructions);
-            Assert.AreEqual("Notice1\r\nNotice2", score.Notices);
-            Assert.AreEqual(5, score.MasterBars.Count);
-            Assert.AreEqual(1, score.Tracks.Count);
-            Assert.AreEqual("Track 1", score.Tracks[0].Name);
-            Render(score);
+                Assert.AreEqual("Title", score.Title);
+                Assert.AreEqual("Subtitle", score.SubTitle);
+                Assert.AreEqual("Artist", score.Artist);
+                Assert.AreEqual("Album", score.Album);
+                Assert.AreEqual("Music", score.Words); // no words in gp4
+                Assert.AreEqual("Music", score.Music);
+                Assert.AreEqual("Copyright", score.Copyright);
+                Assert.AreEqual("Tab", score.Tab);
+                Assert.AreEqual("Instructions", score.Instructions);
+                Assert.AreEqual("Notice1\r\nNotice2", score.Notices);
+                Assert.AreEqual(5, score.MasterBars.Count);
+                Assert.AreEqual(1, score.Tracks.Count);
+                Assert.AreEqual("Track 1", score.Tracks[0].Name);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestNotes()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/Test02.gp4");
-            var score = reader.ReadScore();
-            CheckTest02Score(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/Test02.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckTest02Score(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestTimeSignatures()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/Test03.gp4");
-            var score = reader.ReadScore();
+            PrepareImporterWithFile("GuitarPro4/Test03.gp4", reader =>
+            {
+                var score = reader.ReadScore();
 
-            CheckTest03Score(score);
-            Render(score);
+                CheckTest03Score(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestDead()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/TestDead.gp4");
-            var score = reader.ReadScore();
-            CheckDead(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/TestDead.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckDead(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestGrace()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/TestGrace.gp4");
-            var score = reader.ReadScore();
-            CheckGrace(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/TestGrace.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckGrace(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestAccentuation()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/TestAccentuations.gp4");
-            var score = reader.ReadScore();
-            CheckAccentuation(score, false);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/TestAccentuations.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckAccentuation(score, false);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestHarmonics()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/TestHarmonics.gp4");
-            var score = reader.ReadScore();
-            CheckHarmonics(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/TestHarmonics.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckHarmonics(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestHammer()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/TestHammer.gp4");
-            var score = reader.ReadScore();
-            CheckHammer(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/TestHammer.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckHammer(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestBend()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/TestBends.gp4");
-            var score = reader.ReadScore();
-            CheckBend(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/TestBends.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckBend(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestTremolo()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/TestTremolo.gp4");
-            var score = reader.ReadScore();
-            CheckTremolo(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/TestTremolo.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckTremolo(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestSlides()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/TestSlides.gp4");
-            var score = reader.ReadScore();
-            CheckSlides(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/TestSlides.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckSlides(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestVibrato()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/TestVibrato.gp4");
-            var score = reader.ReadScore();
-            CheckVibrato(score, true);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/TestVibrato.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckVibrato(score, true);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestTrills()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/TestTrills.gp4");
-            var score = reader.ReadScore();
-            CheckTrills(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/TestTrills.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckTrills(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestOtherEffects()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/TestOtherEffects.gp4");
-            var score = reader.ReadScore();
-            CheckOtherEffects(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/TestOtherEffects.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckOtherEffects(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestFingering()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/TestFingering.gp4");
-            var score = reader.ReadScore();
-            CheckFingering(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/TestFingering.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckFingering(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestStroke()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/TestStrokes.gp4");
-            var score = reader.ReadScore();
-            CheckStroke(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/TestStrokes.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckStroke(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestTuplets()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/TestTuplets.gp4");
-            var score = reader.ReadScore();
-            CheckTuplets(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/TestTuplets.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckTuplets(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestRanges()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/TestRanges.gp4");
-            var score = reader.ReadScore();
-            CheckRanges(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/TestRanges.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckRanges(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestEffects()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/Effects.gp4");
-            var score = reader.ReadScore();
-            CheckEffects(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/Effects.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckEffects(score);
+                Render(score);
+            });
         }
 
-        [TestMethod]
+        [TestMethod, AsyncTestMethod]
         public void TestStrings()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/TestStrings.gp4");
-            var score = reader.ReadScore();
-            CheckStrings(score);
-            Render(score);
+            PrepareImporterWithFile("GuitarPro4/TestStrings.gp4", reader =>
+            {
+                var score = reader.ReadScore();
+                CheckStrings(score);
+                Render(score);
+            });
         }
-        
-        [TestMethod]
+
+        [TestMethod, AsyncTestMethod]
         public void TestColors()
         {
-            var reader = PrepareImporterWithFile("GuitarPro4/Colors.gp4");
-            var score = reader.ReadScore();
+            PrepareImporterWithFile("GuitarPro4/Colors.gp4", reader =>
+            {
+                var score = reader.ReadScore();
 
-            CheckColors(score);
-            Render(score);
+                CheckColors(score);
+                Render(score);
+            });
         }
-
     }
 }

@@ -28,7 +28,7 @@ namespace AlphaTab.Platform
     /// </summary>
     interface ICanvas : IPathCanvas
     {
-        RenderingResources Resources { get; set; }
+        Settings Settings { get; set; }
 
         Color Color { get; set; }
 

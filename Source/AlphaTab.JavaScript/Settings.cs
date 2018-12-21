@@ -15,8 +15,14 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
 using AlphaTab.Collections;
+using AlphaTab.Haxe.Js;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
+using AlphaTab.Platform.Svg;
+using AlphaTab.Rendering;
 using AlphaTab.Util;
 using Phase;
 
@@ -67,7 +73,7 @@ namespace AlphaTab
             {
                 settings.EnableCursor = (bool)dataAttributes["cursor"];
             }
-            else if(setDefaults)
+            else if (setDefaults)
             {
                 settings.EnableCursor = true;
             }
@@ -97,16 +103,20 @@ namespace AlphaTab
             {
                 settings.ScrollSpeed = json.scrollSpeed;
             }
-            else if(setDefaults)
+            else if (setDefaults)
             {
                 settings.ScrollSpeed = 300;
             }
 
-            if (Platform.Platform.JsonExists(json, "scrollSpeed"))
+            if (Platform.Platform.JsonExists(json, "scrollElement"))
             {
-                settings.ScrollElement = json.scrollSpeed;
+                settings.ScrollElement = json.scrollElement;
             }
-            else if(setDefaults)
+            else if (dataAttributes != null && dataAttributes.ContainsKey("scrollElement"))
+            {
+                settings.ScrollElement = (string)dataAttributes["scrollElement"];
+            }
+            else if (setDefaults)
             {
                 settings.ScrollElement = "html,body";
             }
@@ -115,7 +125,7 @@ namespace AlphaTab
             {
                 settings.BeatCursorWidth = json.beatCursorWidth;
             }
-            else if(setDefaults)
+            else if (setDefaults)
             {
                 settings.BeatCursorWidth = 3;
             }
@@ -127,7 +137,7 @@ namespace AlphaTab
 
             json.useWorker = UseWorkers;
             json.scale = Scale;
-            json.slurHeight = SlurHeightFactor;
+            json.slurHeight = SlurHeight;
             json.width = Width;
             json.engine = Engine;
             json.stretchForce = StretchForce;
@@ -185,6 +195,28 @@ namespace AlphaTab
                 json.staves.additionalSettings[additionalSetting] = Staves.AdditionalSettings[additionalSetting];
             }
 
+            json.resources = Platform.Platform.NewObject();
+            json.resources.CopyrightFont = EncodeFont(RenderingResources.CopyrightFont);
+            json.resources.TitleFont = EncodeFont(RenderingResources.TitleFont);
+            json.resources.SubTitleFont = EncodeFont(RenderingResources.SubTitleFont);
+            json.resources.WordsFont = EncodeFont(RenderingResources.WordsFont);
+            json.resources.EffectFont = EncodeFont(RenderingResources.EffectFont);
+            json.resources.FretboardNumberFont = EncodeFont(RenderingResources.FretboardNumberFont);
+            json.resources.TablatureFont = EncodeFont(RenderingResources.TablatureFont);
+            json.resources.GraceFont = EncodeFont(RenderingResources.GraceFont);
+            json.resources.BarNumberFont = EncodeFont(RenderingResources.BarNumberFont);
+            json.resources.FingeringFont = EncodeFont(RenderingResources.FingeringFont);
+            json.resources.MarkerFont = EncodeFont(RenderingResources.MarkerFont);
+            json.resources.StaffLineColor = EncodeColor(RenderingResources.StaffLineColor);
+            json.resources.BarNumberColor = EncodeColor(RenderingResources.BarNumberColor);
+            json.resources.BarSeparatorColor = EncodeColor(RenderingResources.BarSeparatorColor);
+            json.resources.MainGlyphColor = EncodeColor(RenderingResources.MainGlyphColor);
+            json.resources.SecondaryGlyphColor = EncodeColor(RenderingResources.SecondaryGlyphColor);
+            json.resources.ScoreInfoColor = EncodeColor(RenderingResources.ScoreInfoColor);
+
+            // include font sizes in serialization!
+            json.fontSizes = FontSizes.FontSizeLookupTables;
+
             return json;
         }
 
@@ -199,6 +231,19 @@ namespace AlphaTab
             settings.ScriptFile = Environment.ScriptFile;
 
             FillFromJson(settings, json, dataAttributes);
+
+            if (json && json.fontSizes)
+            {
+                if (FontSizes.FontSizeLookupTables == null)
+                {
+                    FontSizes.FontSizeLookupTables = new FastDictionary<string, byte[]>();
+                }
+                string[] keys = Platform.Platform.JsonKeys(json.fontSizes);
+                foreach (var font in keys)
+                {
+                    FontSizes.FontSizeLookupTables[font] = json.fontSizes[font];
+                }
+            }
 
             return settings;
         }
@@ -283,11 +328,11 @@ namespace AlphaTab
             }
             if (Platform.Platform.JsonExists(json, "slurHeight"))
             {
-                settings.SlurHeightFactor = json.slurHeight;
+                settings.SlurHeight = json.slurHeight;
             }
             else if (dataAttributes != null && dataAttributes.ContainsKey("slurHeight"))
             {
-                settings.SlurHeightFactor = dataAttributes["slurHeight"].As<float>();
+                settings.SlurHeight = dataAttributes["slurHeight"].As<float>();
             }
             if (Platform.Platform.JsonExists(json, "width"))
             {
@@ -507,35 +552,35 @@ namespace AlphaTab
             {
                 if (dataAttributes.ContainsKey("vibratoNoteSlightLength"))
                 {
-                    settings.Vibrato.NoteSlightLength = (int) dataAttributes["vibratoNoteSlightLength"];
+                    settings.Vibrato.NoteSlightLength = (int)dataAttributes["vibratoNoteSlightLength"];
                 }
                 if (dataAttributes.ContainsKey("vibratoNoteSlightAmplitude"))
                 {
-                    settings.Vibrato.NoteSlightAmplitude = (int) dataAttributes["vibratoNoteSlightAmplitude"];
+                    settings.Vibrato.NoteSlightAmplitude = (int)dataAttributes["vibratoNoteSlightAmplitude"];
                 }
                 if (dataAttributes.ContainsKey("vibratoNoteWideLength"))
                 {
-                    settings.Vibrato.NoteWideLength = (int) dataAttributes["vibratoNoteWideLength"];
+                    settings.Vibrato.NoteWideLength = (int)dataAttributes["vibratoNoteWideLength"];
                 }
                 if (dataAttributes.ContainsKey("vibratoNoteWideAmplitude"))
                 {
-                    settings.Vibrato.NoteWideAmplitude = (int) dataAttributes["vibratoNoteWideAmplitude"];
+                    settings.Vibrato.NoteWideAmplitude = (int)dataAttributes["vibratoNoteWideAmplitude"];
                 }
                 if (dataAttributes.ContainsKey("vibratoBeatSlightLength"))
                 {
-                    settings.Vibrato.BeatSlightLength = (int) dataAttributes["vibratoBeatSlightLength"];
+                    settings.Vibrato.BeatSlightLength = (int)dataAttributes["vibratoBeatSlightLength"];
                 }
                 if (dataAttributes.ContainsKey("vibratoBeatSlightAmplitude"))
                 {
-                    settings.Vibrato.BeatSlightAmplitude = (int) dataAttributes["vibratoBeatSlightAmplitude"];
+                    settings.Vibrato.BeatSlightAmplitude = (int)dataAttributes["vibratoBeatSlightAmplitude"];
                 }
                 if (dataAttributes.ContainsKey("vibratoBeatWideLength"))
                 {
-                    settings.Vibrato.BeatWideLength = (int) dataAttributes["vibratoBeatWideLength"];
+                    settings.Vibrato.BeatWideLength = (int)dataAttributes["vibratoBeatWideLength"];
                 }
                 if (dataAttributes.ContainsKey("vibratoBeatWideAmplitude"))
                 {
-                    settings.Vibrato.BeatWideAmplitude = (int) dataAttributes["vibratoBeatWideAmplitude"];
+                    settings.Vibrato.BeatWideAmplitude = (int)dataAttributes["vibratoBeatWideAmplitude"];
                 }
             }
 
@@ -590,10 +635,10 @@ namespace AlphaTab
 
             if (Platform.Platform.JsonExists(json, "importer"))
             {
-                string[] keys2 = Platform.Platform.JsonKeys(json.importer);
-                foreach (var key2 in keys2)
+                string[] keys = Platform.Platform.JsonKeys(json.importer);
+                foreach (var key in keys)
                 {
-                    settings.ImporterSettings[key2.ToLower()] = json.importer[key2];
+                    settings.ImporterSettings[key.ToLower()] = json.importer[key];
                 }
             }
             else if (dataAttributes != null)
@@ -607,6 +652,304 @@ namespace AlphaTab
                     }
                 }
             }
+
+            if (Platform.Platform.JsonExists(json, "resources"))
+            {
+                string[] keys = Platform.Platform.JsonKeys(json.resources);
+                foreach (var key in keys)
+                {
+                    DecodeResource(settings.RenderingResources, key, json.resources[key]);
+                }
+            }
+            else if (dataAttributes != null)
+            {
+                foreach (var key in dataAttributes)
+                {
+                    if (key.StartsWith("resources"))
+                    {
+                        var property = key.Substring(9);
+                        DecodeResource(settings.RenderingResources, property, dataAttributes[key]);
+                    }
+                }
+            }
+        }
+
+        private static void DecodeResource(RenderingResources resources, string key, object value)
+        {
+            switch (key.ToLower())
+            {
+                case "copyrightfont":
+                    resources.CopyrightFont = DecodeFont(value, resources.CopyrightFont);
+                    break;
+                case "titlefont":
+                    resources.TitleFont = DecodeFont(value, resources.TitleFont);
+                    break;
+                case "subtitlefont":
+                    resources.SubTitleFont = DecodeFont(value, resources.SubTitleFont);
+                    break;
+                case "wordsfont":
+                    resources.WordsFont = DecodeFont(value, resources.WordsFont);
+                    break;
+                case "effectfont":
+                    resources.EffectFont = DecodeFont(value, resources.EffectFont);
+                    break;
+                case "fretboardnumberfont":
+                    resources.FretboardNumberFont = DecodeFont(value, resources.FretboardNumberFont);
+                    break;
+                case "tablaturefont":
+                    resources.TablatureFont = DecodeFont(value, resources.TablatureFont);
+                    break;
+                case "gracefont":
+                    resources.GraceFont = DecodeFont(value, resources.GraceFont);
+                    break;
+                case "barnumberfont":
+                    resources.BarNumberFont = DecodeFont(value, resources.BarNumberFont);
+                    break;
+                case "fingeringfont":
+                    resources.FingeringFont = DecodeFont(value, resources.FingeringFont);
+                    break;
+                case "markerfont":
+                    resources.MarkerFont = DecodeFont(value, resources.MarkerFont);
+                    break;
+
+                case "stafflinecolor":
+                    resources.StaffLineColor = DecodeColor(value, resources.StaffLineColor);
+                    break;
+                case "barnumbercolor":
+                    resources.BarNumberColor = DecodeColor(value, resources.BarNumberColor);
+                    break;
+                case "barseparatorcolor":
+                    resources.BarSeparatorColor = DecodeColor(value, resources.BarSeparatorColor);
+                    break;
+                case "mainglyphcolor":
+                    resources.MainGlyphColor = DecodeColor(value, resources.MainGlyphColor);
+                    break;
+                case "secondaryglyphcolor":
+                    resources.SecondaryGlyphColor = DecodeColor(value, resources.SecondaryGlyphColor);
+                    break;
+                case "scoreinfocolor":
+                    resources.ScoreInfoColor = DecodeColor(value, resources.ScoreInfoColor);
+                    break;
+            }
+        }
+
+        private static int EncodeColor(Color value)
+        {
+            return value.Raw;
+        }
+
+        private static Color DecodeColor(object value, Color defaultColor)
+        {
+            if (value == null) return defaultColor;
+
+            switch (Platform.Platform.TypeOf(value))
+            {
+                case "number":
+                    var c = new Color(0, 0, 0, 0);
+                    double raw = value.As<double>();
+                    c.Raw = (int)raw;
+                    c.UpdateRgba();
+                    return c;
+                case "string":
+                    var s = value.As<string>();
+                    if (s.StartsWith("#"))
+                    {
+                        if (s.Length == 4) // #RGB
+                        {
+                            return new Color(
+                                (byte)(Platform.Platform.ParseHex(s.Substring(1, 1)) * 17),
+                                (byte)(Platform.Platform.ParseHex(s.Substring(2, 1)) * 17),
+                                (byte)(Platform.Platform.ParseHex(s.Substring(3, 1)) * 17)
+                            );
+                        }
+
+                        if (s.Length == 5) // #RGBA
+                        {
+                            return new Color(
+                                (byte)(Platform.Platform.ParseHex(s.Substring(1, 1)) * 17),
+                                (byte)(Platform.Platform.ParseHex(s.Substring(2, 1)) * 17),
+                                (byte)(Platform.Platform.ParseHex(s.Substring(3, 1)) * 17),
+                                (byte)(Platform.Platform.ParseHex(s.Substring(4, 1)) * 17)
+                            );
+                        }
+
+                        if (s.Length == 7) // #RRGGBB
+                        {
+                            return new Color(
+                                (byte)(Platform.Platform.ParseHex(s.Substring(1, 2))),
+                                (byte)(Platform.Platform.ParseHex(s.Substring(3, 2))),
+                                (byte)(Platform.Platform.ParseHex(s.Substring(5, 2)))
+                            );
+                        }
+
+                        if (s.Length == 9) // #RRGGBBAA
+                        {
+                            return new Color(
+                                (byte)(Platform.Platform.ParseHex(s.Substring(1, 2))),
+                                (byte)(Platform.Platform.ParseHex(s.Substring(3, 2))),
+                                (byte)(Platform.Platform.ParseHex(s.Substring(5, 2))),
+                                (byte)(Platform.Platform.ParseHex(s.Substring(7, 2)))
+                            );
+                        }
+                    }
+                    else if (s.StartsWith("rgba") || s.StartsWith("rgb"))
+                    {
+                        var start = s.IndexOf("(");
+                        var end = s.LastIndexOf(")");
+                        if (start == -1 || end == -1)
+                        {
+                            return defaultColor;
+                        }
+
+                        var numbers = s.Substring(start + 1, end - start - 1).Split(',');
+                        if (numbers.Length == 3)
+                        {
+                            return new Color(
+                                (byte)Platform.Platform.ParseInt(numbers[0]),
+                                (byte)Platform.Platform.ParseInt(numbers[1]),
+                                (byte)Platform.Platform.ParseInt(numbers[2])
+                            );
+                        }
+
+                        if (numbers.Length == 4)
+                        {
+                            return new Color(
+                                (byte)Platform.Platform.ParseInt(numbers[0]),
+                                (byte)Platform.Platform.ParseInt(numbers[1]),
+                                (byte)Platform.Platform.ParseInt(numbers[2]),
+                                (byte)(Platform.Platform.ParseFloat(numbers[3]) * 255)
+                            );
+                        }
+
+                    }
+                    break;
+            }
+
+            return defaultColor;
+        }
+
+        private static object EncodeFont(Font value)
+        {
+            var font = Platform.Platform.NewObject();
+            font.family = value.Family;
+            font.size = value.Size;
+            font.style = (int)value.Style;
+            return font;
+        }
+
+        private static Font DecodeFont(object value, Font defaultFont)
+        {
+            if (value == null) return defaultFont;
+
+            if (Platform.Platform.TypeOf(value) == "object" && value.Member<bool>("family"))
+            {
+                return new Font(value.Member<string>("family"), value.Member<float>("size"), (FontStyle)(value.Member<int>("style")));
+            }
+
+            if (Platform.Platform.TypeOf(value) == "string" && Lib.Global.document)
+            {
+                var fontText = value.As<string>();
+                var el = Browser.Document.CreateElement("span");
+                el.SetAttribute("style", "font: " + fontText);
+
+                var style = el.Style;
+
+                if (string.IsNullOrEmpty(style.FontFamily))
+                {
+                    return defaultFont;
+                }
+
+                string family = style.FontFamily;
+                if (family.StartsWith("'") && family.EndsWith("'") || family.StartsWith("\"") && family.EndsWith("\""))
+                {
+                    family = family.Substring(1, family.Length - 2);
+                }
+
+                FontSizes.GenerateFontLookup(family);
+
+                string fontSizeString = style.FontSize.ToLowerCase();
+                float fontSize;
+                // as per https://websemantics.uk/articles/font-size-conversion/
+                switch (fontSizeString)
+                {
+                    case "xx-small":
+                        fontSize = 7;
+                        break;
+                    case "x-small":
+                        fontSize = 10;
+                        break;
+                    case "small":
+                    case "smaller":
+                        fontSize = 13;
+                        break;
+                    case "medium":
+                        fontSize = 16;
+                        break;
+                    case "large":
+                    case "larger":
+                        fontSize = 18;
+                        break;
+                    case "x-large":
+                        fontSize = 24;
+                        break;
+                    case "xx-large":
+                        fontSize = 32;
+                        break;
+                    default:
+                        try
+                        {
+                            if (fontSizeString.EndsWith("%"))
+                            {
+                                // percent values not supported
+                                fontSize = defaultFont.Size;
+                            }
+                            else if (fontSizeString.EndsWith("em"))
+                            {
+                                fontSize = Platform.Platform.ParseFloat(fontSizeString.Substring(0, fontSizeString.Length - 2)) * 16;
+                            }
+                            else if (fontSizeString.EndsWith("pt"))
+                            {
+                                fontSize = Platform.Platform.ParseFloat(fontSizeString.Substring(0, fontSizeString.Length - 2)) * 16.0f / 12.0f;
+
+                            }
+                            else if (fontSizeString.EndsWith("px"))
+                            {
+                                fontSize = Platform.Platform.ParseFloat(fontSizeString.Substring(0, fontSizeString.Length - 2));
+                            }
+                            else
+                            {
+                                fontSize = defaultFont.Size;
+                            }
+                        }
+                        catch
+                        {
+                            fontSize = defaultFont.Size;
+                        }
+                        break;
+                }
+
+                FontStyle fontStyle = FontStyle.Plain;
+                if (style.FontStyle == "italic")
+                {
+                    fontStyle |= FontStyle.Italic;
+                }
+
+                string fontWeightString = style.FontWeight.ToLowerCase();
+                switch (fontWeightString)
+                {
+                    case "normal":
+                    case "lighter":
+                        break;
+                    default:
+                        fontStyle |= FontStyle.Bold;
+                        break;
+                }
+
+                return new Font(family, fontSize, fontStyle);
+            }
+
+
+            return defaultFont;
         }
 
 
@@ -658,12 +1001,12 @@ namespace AlphaTab
         {
             if (Platform.Platform.TypeOf(log) == "number")
             {
-                return (LogLevel) log;
+                return (LogLevel)log;
             }
 
             if (Platform.Platform.TypeOf(log) == "string")
             {
-                var s = (string) log;
+                var s = (string)log;
                 switch (s.ToLower())
                 {
                     case "none":
@@ -785,7 +1128,7 @@ namespace AlphaTab
                     if (!directory.StartsWith("/")) root.Append("/");
                     root.Append(directory);
                 }
-                
+
 
                 if (!relativeUrl.StartsWith("/")) root.Append("/");
                 root.Append(relativeUrl);

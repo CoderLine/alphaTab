@@ -17,6 +17,7 @@
  */
 
 using AlphaTab.Collections;
+using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
 
@@ -213,10 +214,10 @@ namespace AlphaTab
         public VibratoPlaybackSettings Vibrato { get; set; }
 
         /// <summary>
-        /// Gets or sets the height factor for slurs. The factor is multiplied with the distance
+        /// Gets or sets the height for slurs. The factor is multiplied with the a logarithmic distance
         /// between slur start and end.
         /// </summary>
-        public float SlurHeightFactor { get; set; }
+        public float SlurHeight { get; set; }
 
         /// <summary>
         /// Gets or sets the bend duration in milliseconds for songbook bends. 
@@ -287,6 +288,11 @@ namespace AlphaTab
         }
 
         /// <summary>
+        /// Gets or sets the resources used during rendering. This defines all fonts and colors used. 
+        /// </summary>
+        public RenderingResources RenderingResources { get; set; }
+
+        /// <summary>
         /// Gets the default settings for the songbook display mode. 
         /// </summary>
         public static Settings SongBook
@@ -333,7 +339,7 @@ namespace AlphaTab
                 settings.FingeringMode = FingeringMode.Score;
                 settings.ShowZeroOnDiveWhammy = false;
                 settings.ExtendLineEffectsToBeatEnd = false;
-                settings.SlurHeightFactor = 0.3f;
+                settings.SlurHeight = 7f;
 
                 settings.ImporterSettings = new FastDictionary<string, object>();
 
@@ -362,6 +368,7 @@ namespace AlphaTab
                 settings.ScrollMode = ScrollMode.Continuous;
                 settings.ScrollSpeed = 300;
 
+                settings.RenderingResources = new RenderingResources();
 
                 SetDefaults(settings);
 

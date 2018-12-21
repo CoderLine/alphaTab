@@ -43,7 +43,7 @@ namespace AlphaTab.Platform.JavaScript
         private Font _musicFont;
         private float _lineWidth;
 
-        public RenderingResources Resources { get; set; }
+        public Settings Settings { get; set; }
 
         public Html5Canvas()
         {
@@ -191,10 +191,10 @@ namespace AlphaTab.Platform.JavaScript
                 _font = value;
                 if (_context != null)
                 {
-                    _context.Font = value.ToCssString();
+                    _context.Font = value.ToCssString(Settings.Scale);
                 }
 
-                _measureContext.Font = value.ToCssString();
+                _measureContext.Font = value.ToCssString(Settings.Scale);
             }
         }
 

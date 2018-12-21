@@ -1636,10 +1636,6 @@ namespace AlphaTab.Importer
                                 note.Accentuated = AccentuationType.Normal;
                             break;
                         case "Tie":
-                            if (c.GetAttribute("origin").ToLower() == "true")
-                            {
-                                note.IsTieOrigin = true;
-                            }
                             if (c.GetAttribute("destination").ToLower() == "true")
                             {
                                 note.IsTieDestination = true;
@@ -2003,10 +1999,8 @@ namespace AlphaTab.Importer
             }
 
             // process all masterbars
-            for (int masterBarIndex = 0; masterBarIndex < _barsOfMasterBar.Count; masterBarIndex++)
+            foreach (var barIds in _barsOfMasterBar)
             {
-                var barIds = _barsOfMasterBar[masterBarIndex];
-
                 // add all bars of masterbar vertically to all tracks
                 int staffIndex = 0;
                 for (int barIndex = 0, trackIndex = 0; barIndex < barIds.Length && trackIndex < Score.Tracks.Count; barIndex++)
@@ -2018,6 +2012,73 @@ namespace AlphaTab.Importer
                         var track = Score.Tracks[trackIndex];
                         var staff = track.Staves[staffIndex];
                         staff.AddBar(bar);
+
+
+                        if (_voicesOfBar.ContainsKey(barId))
+                        {
+                            // add voices to bars
+                            foreach (var voiceId in _voicesOfBar[barId])
+                            {
+                                if (voiceId != InvalidId)
+                                {
+                                    var voice = _voiceById[voiceId];
+                                    bar.AddVoice(voice);
+
+                                    if (_beatsOfVoice.ContainsKey(voiceId))
+                                    {
+                                        // add beats to voices
+                                        foreach (var beatId in _beatsOfVoice[voiceId])
+                                        {
+                                            if (beatId != InvalidId)
+                                            {
+                                                // important! we clone the beat because beats get reused
+                                                // in gp6, our model needs to have unique beats.
+                                                var beat = _beatById[beatId].Clone();
+                                                voice.AddBeat(beat);
+
+                                                var rhythmId = _rhythmOfBeat[beatId];
+                                                var rhythm = _rhythmById[rhythmId];
+
+                                                // set beat duration
+                                                beat.Duration = rhythm.Value;
+                                                beat.Dots = rhythm.Dots;
+                                                beat.TupletNumerator = rhythm.TupletNumerator;
+                                                beat.TupletDenominator = rhythm.TupletDenominator;
+
+                                                // add notes to beat
+                                                if (_notesOfBeat.ContainsKey(beatId))
+                                                {
+                                                    foreach (var noteId in _notesOfBeat[beatId])
+                                                    {
+                                                        if (noteId != InvalidId)
+                                                        {
+                                                            beat.AddNote(_noteById[noteId].Clone());
+                                                            if (_tappedNotes.ContainsKey(noteId))
+                                                            {
+                                                                beat.Tap = true;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    // invalid voice -> empty voice
+                                    var voice = new Voice();
+                                    bar.AddVoice(voice);
+
+                                    var beat = new Beat();
+                                    beat.IsEmpty = true;
+                                    beat.Duration = Duration.Quarter;
+                                    voice.AddBeat(beat);
+                                }
+                            }
+                        }
+
 
                         // stave is full? -> next track
                         if (staffIndex == track.Staves.Count - 1)
@@ -2035,84 +2096,6 @@ namespace AlphaTab.Importer
 
                         // no bar for track
                         trackIndex++;
-                    }
-                }
-            }
-
-
-            // build bars
-            foreach (var barId in _barsById)
-            {
-                var bar = _barsById[barId];
-                if (_voicesOfBar.ContainsKey(barId))
-                {
-                    // add voices to bars
-                    foreach (var voiceId in _voicesOfBar[barId])
-                    {
-                        if (voiceId != InvalidId)
-                        {
-                            bar.AddVoice(_voiceById[voiceId]);
-                        }
-                        else
-                        {
-                            // invalid voice -> empty voice
-                            var voice = new Voice();
-                            bar.AddVoice(voice);
-
-                            var beat = new Beat();
-                            beat.IsEmpty = true;
-                            beat.Duration = Duration.Quarter;
-                            voice.AddBeat(beat);
-                        }
-                    }
-                }
-            }
-
-            // build beats
-            foreach (var beatId in _beatById)
-            {
-                var beat = _beatById[beatId];
-                var rhythmId = _rhythmOfBeat[beatId];
-                var rhythm = _rhythmById[rhythmId];
-
-                // set beat duration
-                beat.Duration = rhythm.Value;
-                beat.Dots = rhythm.Dots;
-                beat.TupletNumerator = rhythm.TupletNumerator;
-                beat.TupletDenominator = rhythm.TupletDenominator;
-
-                // add notes to beat
-                if (_notesOfBeat.ContainsKey(beatId))
-                {
-                    foreach (var noteId in _notesOfBeat[beatId])
-                    {
-                        if (noteId != InvalidId)
-                        {
-                            beat.AddNote(_noteById[noteId]);
-                            if (_tappedNotes.ContainsKey(noteId))
-                            {
-                                beat.Tap = true;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // build voices
-            foreach (var voiceId in _voiceById)
-            {
-                var voice = _voiceById[voiceId];
-                if (_beatsOfVoice.ContainsKey(voiceId))
-                {
-                    // add beats to voices
-                    foreach (var beatId in _beatsOfVoice[voiceId])
-                    {
-                        if (beatId != InvalidId)
-                        {
-                            // important! we clone the beat because beats get reused
-                            // in gp6, our model needs to have unique beats.
-                            voice.AddBeat(_beatById[beatId].Clone());
-                        }
                     }
                 }
             }
