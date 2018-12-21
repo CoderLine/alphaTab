@@ -208,11 +208,10 @@ namespace AlphaTab.Platform.JavaScript
                 Element.ClassList.Remove("rendering");
                 TriggerEvent("postRendered");
             };
-            Renderer.PreRender += result =>
+            Renderer.PreRender += () =>
             {
                 _renderResults = new FastList<RenderFinishedEventArgs>();
                 _totalResultCount = 0;
-                AppendRenderResult(result);
             };
             Renderer.PartialRenderFinished += AppendRenderResult;
             Renderer.RenderFinished += r =>

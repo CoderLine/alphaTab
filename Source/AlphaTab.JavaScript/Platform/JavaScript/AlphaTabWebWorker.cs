@@ -37,7 +37,7 @@ namespace AlphaTab.Platform.JavaScript
                     _renderer.PartialRenderFinished += result => _main.PostMessage(new { cmd = "alphaTab.partialRenderFinished", result = result });
                     _renderer.RenderFinished += result => _main.PostMessage(new { cmd = "alphaTab.renderFinished", result = result });
                     _renderer.PostRenderFinished += () => _main.PostMessage(new { cmd = "alphaTab.postRenderFinished", boundsLookup = _renderer.BoundsLookup.ToJson() });
-                    _renderer.PreRender += result => _main.PostMessage(new { cmd = "alphaTab.preRender", result = result });
+                    _renderer.PreRender += () => _main.PostMessage(new { cmd = "alphaTab.preRender", });
                     _renderer.Error += Error;
                     break;
                 case "alphaTab.invalidate":

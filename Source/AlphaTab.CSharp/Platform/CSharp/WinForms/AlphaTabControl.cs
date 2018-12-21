@@ -217,7 +217,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
             _renderEngine = settings.Engine;
 
             _renderer = new ScoreRenderer(settings);
-            _renderer.PreRender += result =>
+            _renderer.PreRender += () =>
             {
                 BeginInvoke(new Action(() =>
                 {
@@ -233,8 +233,6 @@ namespace AlphaTab.Platform.CSharp.WinForms
                     }
                     _layoutPanel.ResumeLayout(true);
                     GC.Collect();
-
-                    AddPartialResult(result);
                 }));
             };
             _renderer.PartialRenderFinished += result =>

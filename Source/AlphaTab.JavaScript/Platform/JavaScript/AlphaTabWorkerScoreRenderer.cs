@@ -86,7 +86,7 @@ namespace AlphaTab.Platform.JavaScript
             switch (cmd)
             {
                 case "alphaTab.preRender":
-                    OnPreRender(data.result);
+                    OnPreRender();
                     break;
                 case "alphaTab.partialRenderFinished":
                     OnPartialRenderFinished(data.result);
@@ -110,11 +110,11 @@ namespace AlphaTab.Platform.JavaScript
             _worker.PostMessage(new { cmd = "alphaTab.render", score = jsObject, trackIndexes = trackIndexes });
         }
 
-        public event Action<RenderFinishedEventArgs> PreRender;
-        protected virtual void OnPreRender(RenderFinishedEventArgs obj)
+        public event Action PreRender;
+        protected virtual void OnPreRender()
         {
             var handler = PreRender;
-            if (handler != null) handler(obj);
+            if (handler != null) handler();
         }
 
         public event Action<RenderFinishedEventArgs> PartialRenderFinished;

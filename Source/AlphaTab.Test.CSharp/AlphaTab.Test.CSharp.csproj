@@ -28,4 +28,12 @@
 
   <Import Project="..\AlphaTab.Test\AlphaTab.Test.projitems" Label="Shared" />
 
+  <ItemGroup>
+    <TestData Include="$(SolutionDir)TestData\**\*.*"/>
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="AfterBuild">
+    <Copy SourceFiles="@(TestData)" 
+          DestinationFiles="@(TestData->'$(ProjectDir)$(OutDir)TestFiles\%(RecursiveDir)%(Filename)%(Extension)')"/>
+  </Target>
+
 </Project>

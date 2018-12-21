@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using AlphaTab.Collections;
 using AlphaTab.IO;
 
 namespace AlphaTab.Test
@@ -51,6 +52,10 @@ namespace AlphaTab.Test
             {
                 return file.Substring(0, lastDot) + extension;
             }
+        }
+
+        public static void CompareVisualResult(FastList<object> result, byte[] referenceFileData)
+        {
         }
     }
 }

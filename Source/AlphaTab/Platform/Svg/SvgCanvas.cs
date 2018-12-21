@@ -230,12 +230,6 @@ namespace AlphaTab.Platform.Svg
         public abstract void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols, bool centerAtPosition = false);
 
 
-        public virtual object OnPreRender()
-        {
-            // nothing to do
-            return null;
-        }
-
         public virtual object OnRenderFinished()
         {
             // nothing to do

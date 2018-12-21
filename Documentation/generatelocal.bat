@@ -13,8 +13,9 @@ IF "%GitBranch%"=="" (
 
 rmdir /S /Q input\assets\js\alphaTab
 xcopy ..\Build\JavaScript input\assets\js\alphaTab\ /Y /S
+xcopy ..\TestData\Docs input\assets\files\ /Y /S
 
 echo GitRevision=%GitRevision% GitBranch=%GitBranch%
-%WYAM% build --setting GitRevision=%GitRevision% --setting GitBranch=%GitBranch% --setting LinkRoot=/Documentation/output/
+%WYAM% build --setting GitRevision=%GitRevision% --setting GitBranch=%GitBranch% --setting LinkRoot=/Documentation/output/ --setting NoApi=true
 
 popd

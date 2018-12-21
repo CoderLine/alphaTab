@@ -218,19 +218,11 @@ namespace AlphaTab.Rendering
             OnPostRender();
         }
 
-        public event Action<RenderFinishedEventArgs> PreRender;
+        public event Action PreRender;
         protected virtual void OnPreRender()
         {
-            var result = Canvas.OnPreRender();
             var handler = PreRender;
-            var args = new RenderFinishedEventArgs();
-            args.TotalWidth = 0;
-            args.TotalHeight = 0;
-            args.Width = 0;
-            args.Height = 0;
-            args.RenderResult = result;
-
-            if (handler != null) handler(args);
+            if (handler != null) handler();
         }
 
         public event Action<RenderFinishedEventArgs> PartialRenderFinished;

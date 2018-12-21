@@ -254,13 +254,12 @@ namespace AlphaTab.Platform.CSharp.Wpf
             settings.Engine = "gdi";
 
             _renderer = new ScoreRenderer(settings);
-            _renderer.PreRender += result =>
+            _renderer.PreRender += () =>
             {
                 Dispatcher.BeginInvoke(new Action(() =>
                 {
                     _images.Clear();
                     GC.Collect();
-                    AddPartialResult(result);
                 }));
             };
             _renderer.PartialRenderFinished += result =>

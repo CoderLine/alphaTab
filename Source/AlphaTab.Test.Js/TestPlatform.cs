@@ -1,4 +1,5 @@
 ﻿using System;
+using AlphaTab.Collections;
 using AlphaTab.IO;
 using Haxe.Js.Html;
 using Phase;
@@ -65,5 +66,8 @@ namespace AlphaTab.Test
             }
         }
 
+        public static void CompareVisualResult(FastList<object> result, byte[] referenceFileData)
+        {
+        }
     }
 }

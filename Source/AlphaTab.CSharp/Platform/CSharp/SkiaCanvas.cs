@@ -104,12 +104,6 @@ namespace AlphaTab.Platform.CSharp
             return image;
         }
 
-        public virtual object OnPreRender()
-        {
-            // nothing to do
-            return null;
-        }
-
         public virtual object OnRenderFinished()
         {
             // nothing to do
