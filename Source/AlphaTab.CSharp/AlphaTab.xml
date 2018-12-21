@@ -1720,9 +1720,9 @@
             Gets or sets the settings on how the vibrato audio is generated. 
             </summary>
         </member>
-        <member name="P:AlphaTab.Settings.SlurHeightFactor">
+        <member name="P:AlphaTab.Settings.SlurHeight">
             <summary>
-            Gets or sets the height factor for slurs. The factor is multiplied with the distance
+            Gets or sets the height for slurs. The factor is multiplied with the a logarithmic distance
             between slur start and end.
             </summary>
         </member>
