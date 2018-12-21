@@ -279,7 +279,7 @@ namespace AlphaTab.Rendering.Glyphs
                 canvas.LineTo(x2, y2);
             }
 
-            var res = canvas.Resources;
+            var res = Renderer.Resources;
 
             if (isFirst && !_beat.IsContinuedWhammy && !_isSimpleDip)
             {

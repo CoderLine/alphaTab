@@ -34,6 +34,10 @@ namespace AlphaTab.Haxe.Js.Html
         public extern HaxeString Top { get; set; }
         [Name("fontSize")]
         public extern HaxeString FontSize { get; set; }
+        [Name("fontStyle")]
+        public extern HaxeString FontStyle { get; set; }
+        [Name("fontWeight")]
+        public extern HaxeString FontWeight { get; set; }
         [Name("fontFamily")]
         public extern HaxeString FontFamily { get; set; }
         [Name("width")]

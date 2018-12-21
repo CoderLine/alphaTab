@@ -81,7 +81,7 @@ namespace AlphaTab.Rendering.Layout
 
             var flags = Renderer.Settings.Layout.Get("hideInfo", false) ? HeaderFooterElements.None : HeaderFooterElements.All;
             var score = Renderer.Score;
-            var res = Renderer.RenderingResources;
+            var res = Renderer.Settings.RenderingResources;
 
             ScoreInfoGlyphs = new FastDictionary<HeaderFooterElements, TextGlyph>();
             if (!string.IsNullOrEmpty(score.Title) && (flags & HeaderFooterElements.Title) != 0)
@@ -142,7 +142,7 @@ namespace AlphaTab.Rendering.Layout
                     var tuning = Tuning.FindTuning(staffWithTuning.Tuning);
                     if (tuning != null)
                     {
-                        TuningGlyph = new TuningGlyph(0, 0, Scale, Renderer.RenderingResources, tuning);
+                        TuningGlyph = new TuningGlyph(0, 0, Scale, res, tuning);
                     }
                 }
             }
@@ -285,20 +285,23 @@ namespace AlphaTab.Rendering.Layout
         public void RenderAnnotation()
         {
             // attention, you are not allowed to remove change this notice within any version of this library without permission!
-            var msg = "Rendered using alphaTab (http://www.alphaTab.net)";
+            var msg = "Rendered using alphaTab (https://www.alphaTab.net)";
 
             var canvas = Renderer.Canvas;
-            var resources = Renderer.RenderingResources;
+            var resources = Renderer.Settings.RenderingResources;
 
             var height = (resources.CopyrightFont.Size * 2);
             Height += height;
             var x = Width / 2;
 
+
+            var size = 13 * Renderer.Settings.Scale;
+
             canvas.BeginRender(Width, height);
             canvas.Color = resources.MainGlyphColor;
-            canvas.Font = resources.CopyrightFont;
+            canvas.Font = new Font(resources.CopyrightFont.Family, size, FontStyle.Bold);
             canvas.TextAlign = TextAlign.Center;
-            canvas.FillText(msg, x, resources.CopyrightFont.Size);
+            canvas.FillText(msg, x, size);
             var result = canvas.EndRender();
             Renderer.OnPartialRenderFinished(new RenderFinishedEventArgs
             {

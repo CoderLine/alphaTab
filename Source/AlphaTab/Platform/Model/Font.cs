@@ -16,6 +16,7 @@
  * License along with this library.
  */
 
+using System;
 using AlphaTab.Collections;
 
 namespace AlphaTab.Platform.Model
@@ -25,7 +26,8 @@ namespace AlphaTab.Platform.Model
     /// </summary>
     public class Font
     {
-        private readonly string _css;
+        private string _css;
+        private float _cssScale;
 
         /// <summary>
         /// Gets or sets the font family name. 
@@ -61,7 +63,7 @@ namespace AlphaTab.Platform.Model
             Family = family;
             Size = size;
             Style = style;
-            _css = ToCssString();
+            _css = ToCssString(1f);
         }
 
         internal Font Clone()
@@ -69,31 +71,33 @@ namespace AlphaTab.Platform.Model
             return new Font(Family, Size, Style);
         }
 
-        internal string ToCssString(float scale = 1)
+        internal string ToCssString(float scale)
         {
-            if (_css != null && scale == 1)
+            if (_css == null || !(Math.Abs(scale - _cssScale) < 0.01))
             {
-                return _css;
+                var buf = new StringBuilder();
+
+                if (IsBold)
+                {
+                    buf.Append("bold ");
+                }
+
+                if (IsItalic)
+                {
+                    buf.Append("italic ");
+                }
+
+                buf.Append(Size * scale);
+                buf.Append("px ");
+                buf.Append("'");
+                buf.Append(Family);
+                buf.Append("'");
+
+                _css = buf.ToString();
+                _cssScale = scale;
             }
 
-            var buf = new StringBuilder();
-
-            if (IsBold)
-            {
-                buf.Append("bold ");
-            }
-            if (IsItalic)
-            {
-                buf.Append("italic ");
-            }
-
-            buf.Append(Size * scale);
-            buf.Append("px ");
-            buf.Append("'");
-            buf.Append(Family);
-            buf.Append("'");
-
-            return buf.ToString();
+            return _css;
         }
     }
 }

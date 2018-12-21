@@ -17,6 +17,7 @@
  */
 
 using AlphaTab.Collections;
+using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
 
@@ -216,6 +217,11 @@ namespace AlphaTab
         public bool IncludeNoteBounds { get; set; }
 
         /// <summary>
+        /// Gets or sets the resources used during rendering. This defines all fonts and colors used. 
+        /// </summary>
+        public RenderingResources RenderingResources { get; set; }
+
+        /// <summary>
         /// Gets the default settings for the songbook display mode. 
         /// </summary>
         public static Settings SongBook
@@ -285,6 +291,8 @@ namespace AlphaTab
                 settings.SongBookBendDuration = 75;
                 settings.SongBookDipDuration = 150;
                 settings.IncludeNoteBounds = false;
+
+                settings.RenderingResources = new RenderingResources();
 
                 SetDefaults(settings);
 

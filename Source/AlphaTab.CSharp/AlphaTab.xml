@@ -1581,11 +1581,6 @@
             This public class stores text widths for several fonts and allows width calculation 
             </summary>
         </member>
-        <member name="T:AlphaTab.Platform.Svg.SupportedFonts">
-            <summary>
-            The supported fonts by the FontSizes public class
-            </summary>
-        </member>
         <member name="T:AlphaTab.Platform.Svg.CssFontSvgCanvas">
             <summary>
             This SVG canvas renders the music symbols by adding a CSS class 'at' to all elements. 
@@ -1745,6 +1740,11 @@
             <summary>
             Gets or sets whether in the <see cref="T:AlphaTab.Rendering.Utils.BoundsLookup"/> also the
             position and area of each individual note is provided. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Settings.RenderingResources">
+            <summary>
+            Gets or sets the resources used during rendering. This defines all fonts and colors used. 
             </summary>
         </member>
         <member name="P:AlphaTab.Settings.SongBook">

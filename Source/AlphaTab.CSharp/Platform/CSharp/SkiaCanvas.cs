@@ -52,13 +52,13 @@ namespace AlphaTab.Platform.CSharp
         {
             get
             {
-                if (_typeFaceCache != Font.ToCssString())
+                if (_typeFaceCache != Font.ToCssString(Settings.Scale))
                 {
                     if (_typeFace != null)
                     {
                         _typeFace.Dispose();
                     }
-                    _typeFaceCache = Font.ToCssString();
+                    _typeFaceCache = Font.ToCssString(Settings.Scale);
                     _typeFace = SKTypeface.FromFamilyName(Font.Family,
                         Font.IsBold ? SKFontStyleWeight.Bold : SKFontStyleWeight.Normal,
                         SKFontStyleWidth.Normal,
@@ -72,7 +72,7 @@ namespace AlphaTab.Platform.CSharp
         public TextAlign TextAlign { get; set; }
 
         public TextBaseline TextBaseline { get; set; }
-        public RenderingResources Resources { get; set; }
+        public Settings Settings { get; set; }
 
         public SkiaCanvas()
         {
@@ -221,7 +221,7 @@ namespace AlphaTab.Platform.CSharp
             using (var paint = CreatePaint())
             {
                 paint.Typeface = TypeFace;
-                paint.TextSize = Font.Size;
+                paint.TextSize = Font.Size * Settings.Scale;
                 switch (TextAlign)
                 {
                     case TextAlign.Left:

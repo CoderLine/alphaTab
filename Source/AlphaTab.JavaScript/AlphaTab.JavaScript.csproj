@@ -5,10 +5,11 @@
     <AssemblyName>AlphaTab.JavaScript</AssemblyName>
     <TargetFramework>net471</TargetFramework>
     <NoWarn>$(NoWarn);0626;0824</NoWarn>
+    <DefineConstants>$(DefineConstants);JavaScript</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>

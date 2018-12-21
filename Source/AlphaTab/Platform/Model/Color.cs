@@ -38,6 +38,11 @@ namespace AlphaTab.Platform.Model
         public Color(byte r, byte g, byte b, byte a = 0xFF)
         {
             Raw = (a << 24) | (r << 16) | (g << 8) | b;
+            UpdateRgba();
+        }
+
+        internal void UpdateRgba()
+        {
             if (A == 0xFF)
             {
                 RGBA = "#" + Platform.ToHexString(R, 2) + Platform.ToHexString(G, 2) + Platform.ToHexString(B, 2);
@@ -54,7 +59,7 @@ namespace AlphaTab.Platform.Model
         public int Raw
         {
             get;
-            set;
+            internal set;
         }
 
         /// <summary>

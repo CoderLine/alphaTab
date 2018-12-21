@@ -53,6 +53,12 @@ namespace AlphaTab.Platform
         }
 
         [Inline]
+        public static int ParseHex(string s)
+        {
+            return Script.Write<int>("untyped parseInt(s, 16)");
+        }
+
+        [Inline]
         public static string GetCallerName()
         {
             return Script.Write<string>("untyped __js__(\"arguments.callee.caller.caller.name\")");

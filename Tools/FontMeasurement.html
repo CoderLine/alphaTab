@@ -12,18 +12,20 @@
 	    var ctx = canvas.getContext('2d');  
 		ctx.font = font;
 
-		var sizes = [];
+		var sizes = "{ ";
 		for(var i = 0x20; i < 255; i++) {
+            if(i > 0x20) sizes += ", ";
 			var s = String.fromCharCode(i);
-			sizes.push(ctx.measureText(s).width);
+			sizes += Math.round(ctx.measureText(s).width);
 		}
+        sizes += " }";
 		
-		document.getElementById('output').innerText = JSON.stringify(sizes);
+		document.getElementById('output').innerText = sizes;
 	}
 	</script>
 </head>
 <body>
-	<input type="text" id="font" value="11px 'Times New Roman'" /><button onclick="run()">Calculate</button>
+	<input type="text" id="font" value="11px Georgia" /><button onclick="run()">Calculate</button>
 	<div id="output">
 		
 	</div>
