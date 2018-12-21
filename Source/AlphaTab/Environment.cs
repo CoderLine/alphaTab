@@ -89,7 +89,7 @@ namespace AlphaTab
 
         public static LayoutEngineFactory GetLayoutEngineFactory(Settings settings)
         {
-            if (settings.Layout.Mode == null || !Environment.RenderEngines.ContainsKey(settings.Layout.Mode))
+            if (settings.Layout.Mode == null || !Environment.LayoutEngines.ContainsKey(settings.Layout.Mode))
             {
                 return Environment.LayoutEngines["default"];
             }

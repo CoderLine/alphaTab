@@ -275,6 +275,7 @@ namespace AlphaTab.Test.Importer
             settings.Engine = "svg";
             settings.Layout.Mode = "horizontal";
             settings.Staves = new StaveSettings("tabOnly");
+            settings.UseWorkers = false;
 
             var renderer = new ScoreRenderer(settings);
             var partials = new FastList<string>();
@@ -290,7 +291,12 @@ namespace AlphaTab.Test.Importer
 
             var tab = new XmlDocument(partials[0]);
 
-            var texts = tab.GetElementsByTagName("text", true);
+            var textTags = tab.GetElementsByTagName("text", true);
+            var texts = new string[textTags.Length];
+            for (int i = 0; i < textTags.Length; i++)
+            {
+                texts[i] = textTags[i].InnerText.Trim();
+            }
 
             var expectedTexts = new[]
             {
@@ -311,11 +317,7 @@ namespace AlphaTab.Test.Importer
                 "14", "full"
             };
 
-            for (int i = 0; i < expectedTexts.Length; i++)
-            {
-                var text = texts[i].InnerText.Trim();
-                Assert.AreEqual(expectedTexts[i], text, "Mismatch at index {0}", i);
-            }
+            Assert.AreEqual(string.Join(", ", expectedTexts), string.Join(", ", texts));
         }
 
         [TestMethod]
