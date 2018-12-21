@@ -18,7 +18,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         protected override float GetTieHeight(float startX, float startY, float endX, float endY)
         {
-            return (endX - startX) * Renderer.Settings.SlurHeightFactor;
+            return (float)Math.Log(endX - startX + 1) * Renderer.Settings.SlurHeight;
         }
 
         public bool TryExpand(Note startNote, Note endNote, bool forSlide, bool forEnd)

@@ -24,6 +24,7 @@ class CsMath
 	public static inline function Floor_Double(v:Double) : Double return Math.floor(v.ToHaxeFloat());
 	public static inline function Sign_Single(v:Single) : Single return Math.floor(v.ToHaxeFloat());
 	public static inline function Sign_Double(v:Double) : system.Int32 return if( v < 0 ) -1 else if (v > 0) 1 else 0;
+	public static inline function Log_Double(a:Double) : system.Double return Math.log(a.ToHaxeFloat());
 	public static inline function Log_Double_Double(a:Double, newBase:Double) : system.Double return Math.log(a.ToHaxeFloat()) / Math.log(newBase.ToHaxeFloat());
 	public static inline function Log10(a:Double) : system.Double return Log_Double_Double(a, 10);
 	public static inline function Abs_Double(v:Double) : Double return Math.abs(v.ToHaxeFloat());

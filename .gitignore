@@ -67,6 +67,7 @@ _ReSharper*/
 /Build/JavaScript/AlphaTab.min.js
 /Build/JavaScript/Font/*
 /Test/*
+/Playground/*
 /JavaScript.zip
 /*.nupkg
 /Documentation.zip

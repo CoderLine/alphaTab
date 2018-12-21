@@ -195,10 +195,10 @@ namespace AlphaTab
         public VibratoPlaybackSettings Vibrato { get; set; }
 
         /// <summary>
-        /// Gets or sets the height factor for slurs. The factor is multiplied with the distance
+        /// Gets or sets the height for slurs. The factor is multiplied with the a logarithmic distance
         /// between slur start and end.
         /// </summary>
-        public float SlurHeightFactor { get; set; }
+        public float SlurHeight { get; set; }
 
         /// <summary>
         /// Gets or sets the bend duration in milliseconds for songbook bends. 
@@ -268,7 +268,7 @@ namespace AlphaTab
                 settings.FingeringMode = FingeringMode.Score;
                 settings.ShowZeroOnDiveWhammy = false;
                 settings.ExtendLineEffectsToBeatEnd = false;
-                settings.SlurHeightFactor = 0.3f;
+                settings.SlurHeight = 7f;
 
                 settings.ImporterSettings = new FastDictionary<string, object>();
 

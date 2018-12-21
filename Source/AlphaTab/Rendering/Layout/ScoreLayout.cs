@@ -290,12 +290,10 @@ namespace AlphaTab.Rendering.Layout
             var canvas = Renderer.Canvas;
             var resources = Renderer.Settings.RenderingResources;
 
-            var height = (resources.CopyrightFont.Size * 2);
+            var size = 12 * Renderer.Settings.Scale;
+            var height = (size * 2);
             Height += height;
             var x = Width / 2;
-
-
-            var size = 13 * Renderer.Settings.Scale;
 
             canvas.BeginRender(Width, height);
             canvas.Color = resources.MainGlyphColor;
