@@ -66,7 +66,7 @@ namespace AlphaTab.Test
             }
         }
 
-        public static void CompareVisualResult(FastList<object> result, byte[] referenceFileData)
+        public static void CompareVisualResult(float totalWidth, float totalHeight, FastList<object> result, string referenceImageFileName, byte[] referenceFileData)
         {
         }
     }
