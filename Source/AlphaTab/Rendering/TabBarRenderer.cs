@@ -41,7 +41,7 @@ namespace AlphaTab.Rendering
             : base(renderer, bar)
         {
             RhythmHeight = 15 * renderer.Layout.Scale;
-            RhythmBeams = true;
+            RhythmBeams = false;
         }
 
         public float LineOffset
@@ -306,7 +306,7 @@ namespace AlphaTab.Rendering
                 : Resources.SecondaryGlyphColor;
 
             // check if we need to paint simple footer
-            if (h.Beats.Count == 1 || !RhythmBeams)
+            if (h.Beats.Count == 1 || RhythmBeams)
             {
                 PaintFooter(cx, cy, canvas, h);
             }

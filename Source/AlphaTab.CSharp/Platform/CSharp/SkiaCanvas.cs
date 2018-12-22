@@ -80,14 +80,14 @@ namespace AlphaTab.Platform.CSharp
             LineWidth = 1;
             Font = new Font("Arial", 10);
             TextAlign = TextAlign.Left;
-            TextBaseline = TextBaseline.Middle;
+            TextBaseline = TextBaseline.Top;
         }
 
         public void BeginRender(float width, float height)
         {
             _width = width;
             _height = height;
-            var newImage = SKSurface.Create((int)width, (int)height, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
+            var newImage = SKSurface.Create(new SKImageInfo((int)width, (int)height, SKImageInfo.PlatformColorType, SKAlphaType.Premul));
             _surface = newImage;
             if (_path != null)
             {
@@ -238,7 +238,7 @@ namespace AlphaTab.Platform.CSharp
             switch (baseline)
             {
                 case TextBaseline.Top: // TopTextBaseline
-                    return paint.FontMetrics.Ascent;
+                    return -paint.FontMetrics.Ascent;
                 case TextBaseline.Middle: // MiddleTextBaseline
                     return -paint.FontMetrics.Descent + paint.TextSize / 2;
                 case TextBaseline.Bottom: // BottomTextBaseline
@@ -252,6 +252,7 @@ namespace AlphaTab.Platform.CSharp
 
         public float MeasureText(string text)
         {
+            if (string.IsNullOrEmpty(text)) return 0;
             using (var paint = CreatePaint())
             {
                 paint.Typeface = TypeFace;

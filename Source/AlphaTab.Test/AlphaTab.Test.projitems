@@ -26,6 +26,12 @@
     <Compile Include="$(MSBuildThisFileDirectory)Importer\MusicXmlImporterTestSuiteTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\LyricsTest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\TuningParserTest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VisualTests\Features\EffectsAndAnnotationsTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VisualTests\Features\SpecialNotesTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VisualTests\Features\SpecialTracksTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VisualTests\Features\GuitarTabsTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VisualTests\Features\MusicNotationTests.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VisualTests\Features\LayoutTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)VisualTests\Features\GeneralTests.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)VisualTests\VisualTestBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlParseTest.cs" />
