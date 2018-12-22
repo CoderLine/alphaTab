@@ -9,6 +9,6 @@
     foreach(Tuple<string, string> page in pages)
     {
         string active = Context.GetLink(Document).StartsWith(page.Item2) ? "active" : null;
-        <li class="@active"><a href="@page.Item2">@Html.Raw(page.Item1)</a></li>
+        <li class="@active"><a href="@(page.Item2)">@Html.Raw(page.Item1)</a></li>
     }
 }
