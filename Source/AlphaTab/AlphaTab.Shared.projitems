@@ -315,7 +315,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\TupletHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\IOHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)UI\Container.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Cursors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\IContainer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\IMouseEventArgs.cs" />

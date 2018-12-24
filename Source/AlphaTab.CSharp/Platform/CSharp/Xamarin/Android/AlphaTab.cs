@@ -18,8 +18,10 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
 using Android.App;
@@ -34,11 +36,9 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
 {
     public class AlphaTab : ScrollView
     {
-        private AlphaTabLayoutPanel _contentPanel;
-        private bool _initialRenderCompleted;
-        private bool _isRendering;
-        private bool _redrawPending;
-        private float _displayDensity;
+        private AlphaTabLayoutPanel _layoutPanel;
+        private Settings _settings;
+        private IEnumerable<Track> _tracks;
 
         public IEnumerable<Track> Tracks
         {
@@ -46,13 +46,35 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
             set
             {
                 if (_tracks == value) return;
+
+                var observable = _tracks as INotifyCollectionChanged;
+                if (observable != null)
+                {
+                    observable.CollectionChanged -= OnTracksChanged;
+                }
+
                 _tracks = value;
-                InvalidateTracks();
+
+                observable = _tracks as INotifyCollectionChanged;
+                if (observable != null)
+                {
+                    observable.CollectionChanged += OnTracksChanged;
+                }
+                RenderTracks();
+            }
+        }
+        public Settings Settings
+        {
+            get => _settings;
+            set
+            {
+                if (_settings == value) return;
+                _settings = value;
+                OnSettingsChanged(value);
             }
         }
 
-        private ScoreRenderer _renderer;
-        private IEnumerable<Track> _tracks;
+        public AlphaTabApi<AlphaTab> Api { get; private set; }
 
         public AlphaTab(Context context)
             : base(context)
@@ -68,173 +90,50 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
 
         private void Initialize(Context context)
         {
-            using (var metrics = context.Resources.DisplayMetrics)
-            {
-                _displayDensity = metrics.Density;
-            }
+            _layoutPanel = new AlphaTabLayoutPanel(context);
+            AddView(_layoutPanel);
 
-            _contentPanel = new AlphaTabLayoutPanel(context);
-            AddView(_contentPanel);
+            Settings = Settings.Defaults;
+            Settings.EnablePlayer = true;
+            Settings.EnableCursor = true;
 
-            var settings = Settings.Defaults;
-            settings.Engine = "skia";
-            settings.Width = 970;
-            settings.Scale = 0.8f;
-            settings.StretchForce = 0.8f;
-
-            _renderer = new ScoreRenderer(settings);
-            _renderer.PreRender += () =>
-            {
-                lock (this)
-                {
-                    Post(() =>
-                    {
-                        ClearPartialResults();
-                    });
-                }
-            };
-            _renderer.PartialRenderFinished += result =>
-            {
-                lock (this)
-                {
-                    Post(() =>
-                    {
-                        AddPartialResult(result);
-                    });
-                }
-            };
-            _renderer.RenderFinished += result =>
-            {
-                Post(() =>
-                {
-                    _initialRenderCompleted = true;
-                    _isRendering = false;
-                    AddPartialResult(result);
-                    OnRenderFinished(result);
-                    if (_redrawPending)
-                    {
-                        Resize((int)(Width / _displayDensity));
-                    }
-                });
-            };
+            Api = new AlphaTabApi<AlphaTab>(new AndroidUiFacade(this, _layoutPanel), this);
         }
 
-        private void ClearPartialResults()
+        private void OnTracksChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var childCount = _contentPanel.ChildCount;
-            while (childCount > 0)
-            {
-                var child = _contentPanel.GetChildAt(0);
-                var imageView = child as ImageView;
-                if (imageView != null)
-                {
-                    var image = imageView.Drawable;
-                    imageView.SetImageResource(0);
-                    image.Dispose();
-                    imageView.DestroyDrawingCache();
-                }
-
-                _contentPanel.RemoveView(child);
-                child.Dispose();
-
-                childCount--;
-            }
-            _contentPanel.RemoveAllViews();
+            RenderTracks();
         }
 
-        private void AddPartialResult(RenderFinishedEventArgs result)
-        {
-            lock (this)
-            {
-                _contentPanel.SetMinimumWidth((int)(result.TotalWidth * _displayDensity));
-                _contentPanel.SetMinimumHeight((int)(result.TotalHeight * _displayDensity));
-
-                if (result.RenderResult != null)
-                {
-                    using (var image = (SKImage)result.RenderResult)
-                    {
-                        byte[] imageBytes;
-                        using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
-                        {
-                            imageBytes = data.ToArray();
-                        }
-
-                        var view = new ImageView(Context);
-                        view.SetMinimumWidth((int)(result.Width * _displayDensity));
-                        view.SetMinimumHeight((int)(result.Height * _displayDensity));
-                        view.SetMaxWidth((int)(result.Width * _displayDensity));
-                        view.SetMaxHeight((int)(result.Width * _displayDensity));
-                        view.SetImageBitmap(BitmapFactory.DecodeByteArray(imageBytes, 0, imageBytes.Length));
-
-                        _contentPanel.AddView(view);
-                    }
-                }
-            }
-        }
-
-        private void InvalidateTracks()
+        public void RenderTracks()
         {
             if (Tracks == null) return;
 
-            if (Width > 0)
+            Score score = null;
+            var trackIndexes = new FastList<int>();
+            foreach (var track in Tracks)
             {
-                _renderer.Settings.Width = (int)(Width / _displayDensity);
-
-                _initialRenderCompleted = false;
-                _isRendering = true;
-                var tracks = Tracks.ToArray();
-                if (tracks.Length > 0)
+                if (score == null)
                 {
-                    ModelUtils.ApplyPitchOffsets(_renderer.Settings, tracks[0].Score);
-                    Task.Factory.StartNew(() =>
-                    {
-                        _renderer.Render(tracks[0].Score, tracks.Select(t => t.Index).ToArray());
-                    });
+                    score = track.Score;
                 }
 
+                if (score == track.Score)
+                {
+                    trackIndexes.Add(track.Index);
+                }
             }
-            else
+
+            if (score != null)
             {
-                _initialRenderCompleted = false;
-                _redrawPending = true;
+                Api.RenderTracks(score, trackIndexes.ToArray());
             }
         }
 
-        protected override void OnSizeChanged(int w, int h, int oldw, int oldh)
+        public event Action<Settings> SettingsChanged;
+        private void OnSettingsChanged(Settings obj)
         {
-            Resize((int)(w / _displayDensity));
-            base.OnSizeChanged(w, h, oldw, oldh);
-        }
-
-        private void Resize(int width)
-        {
-            if (_isRendering)
-            {
-                _redrawPending = true;
-            }
-            else if (width > 0)
-            {
-                _redrawPending = false;
-
-                if (!_initialRenderCompleted)
-                {
-                    InvalidateTracks();
-                }
-                else if (width != _renderer.Settings.Width)
-                {
-                    _isRendering = true;
-                    Task.Factory.StartNew(() =>
-                    {
-                        _renderer.Resize(width);
-                    });
-                }
-            }
-        }
-
-        public event EventHandler<RenderFinishedEventArgs> RenderFinished;
-        protected virtual void OnRenderFinished(RenderFinishedEventArgs e)
-        {
-            RenderFinished?.Invoke(this, e);
+            SettingsChanged?.Invoke(obj);
         }
     }
 }

@@ -233,7 +233,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public IScoreRenderer CreateWorkerRenderer()
         {
-            return new DesktopAlphaTabWorkerScoreRenderer<AlphaTab>(_api, _api.Settings, a =>
+            return new ManagedThreadScoreRenderer<AlphaTab>(_api, _api.Settings, a =>
             {
                 if (_control.Dispatcher.CheckAccess())
                 {
@@ -248,7 +248,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public IAlphaSynth CreateWorkerPlayer()
         {
-            var player = new DesktopAlphaSynthWorkerApi(new NAudioSynthOutput(), _api.Settings.LogLevel, a =>
+            var player = new ManagedThreadAlphaSynthWorkerApi(new NAudioSynthOutput(), _api.Settings.LogLevel, a =>
             {
                 if (_control.Dispatcher.CheckAccess())
                 {

@@ -18,11 +18,9 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
-using SkiaSharp;
 using Xamarin.Forms;
 
 namespace AlphaTab.Platform.CSharp.Xamarin.Forms
@@ -37,7 +35,7 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
         public static readonly BindableProperty TracksProperty = BindableProperty.Create("Tracks", typeof(IEnumerable<Track>), typeof(AlphaTab), propertyChanged: OnTracksChanged);
         private static void OnTracksChanged(BindableObject bindable, object oldvalue, object newvalue)
         {
-            ((AlphaTab)bindable).InvalidateTracks();
+            ((AlphaTab)bindable).RenderTracks();
         }
         public IEnumerable<Track> Tracks
         {
@@ -45,7 +43,20 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
             set { SetValue(TracksProperty, value); }
         }
 
+        public static readonly BindableProperty SettingsProperty = BindableProperty.Create("Settings", typeof(Settings), typeof(AlphaTab), propertyChanged: OnSettingsChanged);
+        private static void OnSettingsChanged(BindableObject bindable, object oldvalue, object newvalue)
+        {
+            ((AlphaTab)bindable).OnSettingsChanged((Settings)newvalue);
+        }
+
+        public Settings Settings
+        {
+            get { return (Settings)GetValue(SettingsProperty); }
+            set { SetValue(SettingsProperty, value); }
+        }
+
         private readonly ScoreRenderer _renderer;
+        public AlphaTabApi<AlphaTab> Api { get; private set; }
 
         public AlphaTab()
         {
@@ -57,140 +68,43 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
 
             Content = _contentPanel;
 
-            var settings = Settings.Defaults;
-            settings.Engine = "skia";
-            settings.Width = 970;
-            settings.Scale = 0.8f;
-            settings.StretchForce = 0.8f;
+            Settings = Settings.Defaults;
+            Settings.EnablePlayer = true;
+            Settings.EnableCursor = true;
 
-            _renderer = new ScoreRenderer(settings);
-            _renderer.PreRender += () =>
-            {
-                lock (this)
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        ClearPartialResults();
-                    });
-                }
-            };
-            _renderer.PartialRenderFinished += result =>
-            {
-                lock (this)
-                {
-                    Device.BeginInvokeOnMainThread(() =>
-                    {
-                        AddPartialResult(result);
-                    });
-                }
-            };
-            _renderer.RenderFinished += result =>
-            {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    _initialRenderCompleted = true;
-                    _isRendering = false;
-                    if (_redrawPending)
-                    {
-                        Resize((int)Width);
-                    }
-                    OnRenderFinished(result);
-                });
-            };
+            Api = new AlphaTabApi<AlphaTab>(new XamarinFormsUiFacade(this, _contentPanel), this);
+
         }
 
-        private void ClearPartialResults()
-        {
-            _contentPanel.Children.Clear();
-        }
-
-        private void AddPartialResult(RenderFinishedEventArgs result)
-        {
-            lock (this)
-            {
-                _contentPanel.WidthRequest = result.TotalWidth;
-                _contentPanel.HeightRequest = result.TotalHeight;
-
-                if (result.RenderResult != null)
-                {
-                    using (var image = (SKImage)result.RenderResult)
-                    {
-                        _contentPanel.Children.Add(new Image
-                        {
-                            Source = new SkImageSource(image),
-                            WidthRequest = result.Width,
-                            HeightRequest = result.Height
-                        });
-                    }
-                }
-            }
-        }
-
-        private void InvalidateTracks()
+        public void RenderTracks()
         {
             if (Tracks == null) return;
 
-            if (Width > 0)
+            Score score = null;
+            var trackIndexes = new FastList<int>();
+            foreach (var track in Tracks)
             {
-                _renderer.Settings.Width = (int)Width;
-                _initialRenderCompleted = false;
-                _isRendering = true;
-                var tracks = Tracks.ToArray();
-                if (tracks.Length > 0)
+                if (score == null)
                 {
-                    ModelUtils.ApplyPitchOffsets(_renderer.Settings, tracks[0].Score);
-                    Task.Factory.StartNew(() =>
-                    {
-                        _renderer.Render(tracks[0].Score, tracks.Select(t => t.Index).ToArray());
-                    });
+                    score = track.Score;
+                }
+
+                if (score == track.Score)
+                {
+                    trackIndexes.Add(track.Index);
                 }
             }
-            else
+
+            if (score != null)
             {
-                _initialRenderCompleted = false;
-                _redrawPending = true;
+                Api.RenderTracks(score, trackIndexes.ToArray());
             }
         }
 
-        protected override void OnSizeAllocated(double width, double height)
+        public event Action<Settings> SettingsChanged;
+        private void OnSettingsChanged(Settings obj)
         {
-            Resize((int)width);
-            base.OnSizeAllocated(width, height);
-        }
-
-        private void Resize(int width)
-        {
-            if (_isRendering)
-            {
-                _redrawPending = true;
-            }
-            else if (width > 0)
-            {
-                _redrawPending = false;
-
-                if (!_initialRenderCompleted)
-                {
-                    InvalidateTracks();
-                }
-                else
-                {
-                    if (width != _renderer.Settings.Width)
-                    {
-                        _renderer.Settings.Width = width;
-                        _isRendering = true;
-                        Task.Factory.StartNew(() =>
-                        {
-                            _renderer.Resize(width);
-                        });
-                    }
-                }
-            }
-        }
-
-        public event EventHandler<RenderFinishedEventArgs> RenderFinished;
-        protected virtual void OnRenderFinished(RenderFinishedEventArgs e)
-        {
-            RenderFinished?.Invoke(this, e);
+            SettingsChanged?.Invoke(obj);
         }
     }
 }

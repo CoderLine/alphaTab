@@ -39,7 +39,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'MonoAndroid8.1'">
-    <PackageReference Include="Xamarin.Forms" Version="3.4.0.1008975" PrivateAssets="All" />
+    <PackageReference Include="Xamarin.Forms" Version="2.3.4.231" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

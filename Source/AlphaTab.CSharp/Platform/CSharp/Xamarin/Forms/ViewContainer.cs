@@ -1,7 +1,7 @@
-﻿#if NET472
+﻿#if ANDROID
 /*
  * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
+ * Copyright © 2017, Daniel Kuschny and Contributors, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -17,83 +17,95 @@
  * License along with this library.
  */
 using System;
-using System.Drawing;
-using System.Windows.Forms;
 using AlphaTab.UI;
+using Xamarin.Forms;
 
-namespace AlphaTab.Platform.CSharp.WinForms
+namespace AlphaTab.Platform.CSharp.Xamarin.Forms
 {
-    internal class ControlContainer : IContainer
+    class ViewContainer : IContainer
     {
-        public Control Control { get; }
+        public View View { get; set; }
 
-        public ControlContainer(Control control)
+        public ViewContainer(View view)
         {
-            Control = control;
+            View = view;
         }
 
         public float Top
         {
-            get => Control.Top;
-            set => Control.Top = (int)value;
+            get => (float)AbsoluteLayout.GetLayoutBounds(View).Top;
+            set
+            {
+                var bounds = AbsoluteLayout.GetLayoutBounds(View);
+                bounds.Top = value;
+                AbsoluteLayout.SetLayoutBounds(View, bounds);
+            }
         }
 
         public float Left
         {
-            get => Control.Left;
-            set => Control.Left = (int)value;
+            get => (float)AbsoluteLayout.GetLayoutBounds(View).Left;
+            set
+            {
+                var bounds = AbsoluteLayout.GetLayoutBounds(View);
+                bounds.Top = value;
+                AbsoluteLayout.SetLayoutBounds(View, bounds);
+            }
         }
 
         public float Width
         {
-            get => Control.ClientSize.Width - Control.Padding.Horizontal;
-            set => Control.Width = (int)value + Control.Padding.Horizontal;
+            get => (float)View.Width;
+            set => View.WidthRequest = value;
         }
-
 
         public float Height
         {
-            get => Control.ClientSize.Height - Control.Padding.Vertical;
-            set => Control.Height = (int)value + Control.Padding.Vertical;
+            get => (float)View.Height;
+            set => View.HeightRequest = value;
         }
 
-        public bool IsVisible => Control.Visible && Control.Width > 0;
+        public bool IsVisible => View.IsVisible && View.Width > 0;
 
         public float ScrollLeft
         {
-            get => Control is ScrollableControl scroll ? scroll.AutoScrollPosition.X : 0;
+            get => View is ScrollView scroll ? (float)scroll.ScrollX : 0;
             set
             {
-                if (Control is ScrollableControl scroll)
+                if (View is ScrollView scroll)
                 {
-                    scroll.AutoScrollPosition = new Point((int)value, scroll.AutoScrollPosition.Y);
+                    scroll.ScrollToAsync(value, scroll.ScrollY, true);
                 }
             }
         }
 
         public float ScrollTop
         {
-            get => Control is ScrollableControl scroll ? scroll.VerticalScroll.Value : 0;
+            get => View is ScrollView scroll ? (float)scroll.ScrollY : 0;
             set
             {
-                if (Control is ScrollableControl scroll)
+                if (View is ScrollView scroll)
                 {
-                    scroll.AutoScrollPosition = new Point(scroll.AutoScrollPosition.X, (int)value);
+                    scroll.ScrollToAsync(scroll.ScrollX, value, true);
                 }
             }
         }
+
         public void AppendChild(IContainer child)
         {
-            Control.Controls.Add(((ControlContainer)child).Control);
+            if (View is Layout<View> g)
+            {
+                g.Children.Add(((ViewContainer)child).View);
+            }
         }
 
         public event Action Scroll
         {
             add
             {
-                if (Control is ScrollableControl scroll)
+                if (View is ScrollView scroll)
                 {
-                    scroll.Scroll += (sender, args) => value();
+                    scroll.Scrolled += (sender, args) => value();
                 }
             }
             remove
@@ -105,7 +117,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
         {
             add
             {
-                Control.Resize += (sender, args) => value();
+                View.SizeChanged += (o, e) => value();
             }
             remove
             {
@@ -114,16 +126,12 @@ namespace AlphaTab.Platform.CSharp.WinForms
 
         public void StopAnimation()
         {
-            //Control.BeginAnimation(Canvas.LeftProperty, null);
+            ViewExtensions.CancelAnimations(View);
         }
 
         public void TransitionToX(double duration, float x)
         {
-            // TODO: Animation
-            Control.Left = (int)x;
-
-            //Control.BeginAnimation(Canvas.LeftProperty,
-            //    new DoubleAnimation(x, new Duration(TimeSpan.FromMilliseconds(duration))));
+            View.TranslateTo(x, 0, (uint) duration);
         }
 
 
@@ -131,7 +139,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
         {
             add
             {
-                Control.MouseDown += (sender, args) => value(new WinFormsMouseEventArgs(Control, args));
+                // TODO
             }
             remove
             {
@@ -142,7 +150,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
         {
             add
             {
-                Control.MouseMove += (sender, args) => value(new WinFormsMouseEventArgs(Control, args));
+                // TODO
             }
             remove
             {
@@ -153,7 +161,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
         {
             add
             {
-                Control.MouseUp += (sender, args) => value(new WinFormsMouseEventArgs(Control, args));
+                // TODO
             }
             remove
             {
@@ -162,7 +170,10 @@ namespace AlphaTab.Platform.CSharp.WinForms
 
         public void Clear()
         {
-            Control.Controls.Clear();
+            if (View is Layout<View> g)
+            {
+                g.Children.Clear();
+            }
         }
     }
 }

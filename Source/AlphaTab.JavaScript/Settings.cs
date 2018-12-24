@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-
-using System;
 using AlphaTab.Collections;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Platform;

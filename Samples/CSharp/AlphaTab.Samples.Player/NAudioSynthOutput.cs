@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NET472
+using System;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Ds;
 using AlphaTab.Audio.Synth.Util;
@@ -129,3 +130,4 @@ namespace AlphaTab.Samples.PngDump
         public event Action Finished;
     }
 }
+#endif

@@ -1,54 +1,42 @@
-﻿#if NET472
-/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using System;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Text;
 using System.Threading;
-using System.Windows.Threading;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 
-namespace AlphaTab.Platform.CSharp.Wpf
+namespace AlphaTab.Platform.CSharp
 {
-    class DesktopAlphaTabWorkerScoreRenderer<T> : IScoreRenderer
+    class ManagedThreadScoreRenderer<T> : IScoreRenderer
     {
         private readonly AlphaTabApi<T> _api;
         private readonly Action<Action> _uiInvoke;
 
         private readonly Thread _workerThread;
-        private Dispatcher _threadDispatcher;
+        private BlockingCollection<Action> _workerQueue;
         private ManualResetEventSlim _threadStartedEvent;
+        private CancellationTokenSource _workerCancellationToken;
         private ScoreRenderer _renderer;
 
         public BoundsLookup BoundsLookup { get; private set; }
 
-        public DesktopAlphaTabWorkerScoreRenderer(AlphaTabApi<T> api, Settings settings, Action<Action> uiInvoke)
+        public ManagedThreadScoreRenderer(AlphaTabApi<T> api, Settings settings, Action<Action> uiInvoke)
         {
             _api = api;
             _uiInvoke = uiInvoke;
             _threadStartedEvent = new ManualResetEventSlim(false);
+            _workerQueue = new BlockingCollection<Action>();
+            _workerCancellationToken = new CancellationTokenSource();
 
             _workerThread = new Thread(DoWork);
             _workerThread.IsBackground = true;
             _workerThread.Start();
 
             _threadStartedEvent.Wait();
-            _threadDispatcher.BeginInvoke(new Action<Settings>(Initialize), settings);
+
+            _workerQueue.Add(() => Initialize(settings));
             _threadStartedEvent.Dispose();
             _threadStartedEvent = null;
         }
@@ -56,9 +44,15 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         private void DoWork()
         {
-            _threadDispatcher = Dispatcher.CurrentDispatcher;
             _threadStartedEvent.Set();
-            Dispatcher.Run();
+            while (_workerQueue.TryTake(out var action, Timeout.Infinite, _workerCancellationToken.Token))
+            {
+                if (_workerCancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+                action();
+            }
         }
 
         private void Initialize(Settings settings)
@@ -68,7 +62,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
             _renderer.RenderFinished += result => _uiInvoke(() => OnRenderFinished(result));
             _renderer.PostRenderFinished += () => _uiInvoke(() => OnPostFinished(_renderer.BoundsLookup));
             _renderer.PreRender += () => _uiInvoke(OnPreRender);
-            _renderer.Error += (s, e) => _uiInvoke(()=> OnError(s,e));
+            _renderer.Error += (s, e) => _uiInvoke(() => OnError(s, e));
         }
 
         private void OnPostFinished(BoundsLookup boundsLookup)
@@ -79,55 +73,60 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public void Destroy()
         {
-            _threadDispatcher.InvokeShutdown();
+            _workerCancellationToken.Cancel();
             _workerThread.Join();
         }
 
         public void UpdateSettings(Settings settings)
         {
-            if (_threadDispatcher.CheckAccess())
+            if (CheckAccess())
             {
                 _renderer.UpdateSettings(settings);
             }
             else
             {
-                _threadDispatcher.BeginInvoke(new Action<Settings>(UpdateSettings), settings);
+                _workerQueue.Add(() => UpdateSettings(settings));
             }
+        }
+
+        private bool CheckAccess()
+        {
+            return Thread.CurrentThread == _workerThread;
         }
 
         public void Invalidate()
         {
-            if (_threadDispatcher.CheckAccess())
+            if (CheckAccess())
             {
                 _renderer.Invalidate();
             }
             else
             {
-                _threadDispatcher.BeginInvoke(new Action(Invalidate));
+                _workerQueue.Add(() => Invalidate());
             }
         }
 
         public void Resize(int width)
         {
-            if (_threadDispatcher.CheckAccess())
+            if (CheckAccess())
             {
                 _renderer.Resize(width);
             }
             else
             {
-                _threadDispatcher.BeginInvoke(new Action<int>(Resize), width);
+                _workerQueue.Add(() => Resize(width));
             }
         }
 
         public void Render(Score score, int[] trackIndexes)
         {
-            if (_threadDispatcher.CheckAccess())
+            if (CheckAccess())
             {
                 _renderer.Render(score, trackIndexes);
             }
             else
             {
-                _threadDispatcher.BeginInvoke(new Action<Score, int[]>(Render), score, trackIndexes);
+                _workerQueue.Add(() => Render(score, trackIndexes));
             }
         }
 
@@ -167,4 +166,3 @@ namespace AlphaTab.Platform.CSharp.Wpf
         }
     }
 }
-#endif

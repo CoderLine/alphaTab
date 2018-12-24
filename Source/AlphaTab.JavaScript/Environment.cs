@@ -17,7 +17,6 @@
  */
 
 using System;
-using AlphaTab.Collections;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Platform;
@@ -26,10 +25,7 @@ using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Util;
 using Haxe;
-using Haxe.Js;
 using Phase;
-using Phase.Attributes;
-using Phase.CompilerServices;
 using StringBuilder = AlphaTab.Collections.StringBuilder;
 
 namespace AlphaTab
