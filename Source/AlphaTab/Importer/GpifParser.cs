@@ -454,7 +454,6 @@ namespace AlphaTab.Importer
 
         private void ParseInstrumentSet(Track track, XmlNode node)
         {
-            int staffIndex = 0;
             foreach (var c in node.ChildNodes)
             {
                 if (c.NodeType == XmlNodeType.Element)

@@ -147,6 +147,9 @@ namespace AlphaTab.Collections
             _list.Insert(insertPos, item);
         }
 
+        /// <summary>
+        /// Remove all elements from the list.
+        /// </summary>
         public void Clear()
         {
             _list.Clear();

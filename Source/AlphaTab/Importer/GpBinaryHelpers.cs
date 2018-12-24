@@ -89,6 +89,7 @@ namespace AlphaTab.Importer
         /// </summary>
         /// <param name="data">the data to read from.</param>
         /// <param name="length">the amount of bytes to read</param>
+        /// <param name="encoding">The encoding to use to decode the byte into a string</param>
         /// <returns></returns>
         public static string GpReadStringByteLength(this IReadable data, int length, string encoding)
         {

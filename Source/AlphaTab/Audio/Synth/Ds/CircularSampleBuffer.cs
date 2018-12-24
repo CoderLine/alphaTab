@@ -86,6 +86,13 @@ namespace AlphaTab.Audio.Synth.Ds
             return samplesWritten;
         }
 
+        /// <summary>
+        /// Reads the requested amount of samples from the buffer. 
+        /// </summary>
+        /// <param name="data">The sample array to store the read elements.</param>
+        /// <param name="offset">The offset within the destination buffer to put the items at.</param>
+        /// <param name="count">The number of items to read from this buffer.</param>
+        /// <returns>The number of items actually read from the buffer.</returns>
         public int Read(SampleArray data, int offset, int count)
         {
             if (count > Count)

@@ -171,17 +171,44 @@ namespace AlphaTab.Audio.Synth
         /// <param name="program">The midi program.</param>
         void SetChannelProgram(int channel, byte program);
 
+        /// <summary>
+        /// This event is fired when the player is ready to be interacted with. 
+        /// </summary>
         event Action Ready;
+        /// <summary>
+        /// This event is fired when all required data for playback is loaded and ready. 
+        /// </summary>
         event Action ReadyForPlayback;
+        /// <summary>
+        /// This event is fired when the playback of the whole song finished. 
+        /// </summary>
         event Action<PlaybackFinishedEventArgs> Finished;
 
+        /// <summary>
+        /// This event is fired when the SoundFont needed for playback was loaded. 
+        /// </summary>
         event Action SoundFontLoaded;
+        /// <summary>
+        /// This event is fired when the loading of the SoundFont failed. 
+        /// </summary>
         event Action<Exception> SoundFontLoadFailed;
 
+        /// <summary>
+        /// This event is fired when the Midi file needed for playback was loaded. 
+        /// </summary>
         event Action MidiLoaded;
+        /// <summary>
+        /// This event is fired when the loading of the Midi file failed. 
+        /// </summary>
         event Action<Exception> MidiLoadFailed;
 
+        /// <summary>
+        /// This event is fired when the playback state changed. 
+        /// </summary>
         event Action<PlayerStateChangedEventArgs> StateChanged;
+        /// <summary>
+        /// This event is fired when the current playback position of the song changed. 
+        /// </summary>
         event Action<PositionChangedEventArgs> PositionChanged;
     }
 }

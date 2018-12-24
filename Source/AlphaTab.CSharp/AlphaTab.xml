@@ -198,6 +198,15 @@
             <param name="count"></param>
             <returns></returns>
         </member>
+        <member name="M:AlphaTab.Audio.Synth.Ds.CircularSampleBuffer.Read(AlphaTab.Audio.Synth.Ds.SampleArray,System.Int32,System.Int32)">
+            <summary>
+            Reads the requested amount of samples from the buffer. 
+            </summary>
+            <param name="data">The sample array to store the read elements.</param>
+            <param name="offset">The offset within the destination buffer to put the items at.</param>
+            <param name="count">The number of items to read from this buffer.</param>
+            <returns>The number of items actually read from the buffer.</returns>
+        </member>
         <member name="T:AlphaTab.Audio.Synth.AlphaSynth">
             <summary>
             This is the main synthesizer component which can be used to
@@ -242,6 +251,9 @@
         <member name="P:AlphaTab.Audio.Synth.AlphaSynth.IsLooping">
             <inheritdoc />
         </member>
+        <member name="M:AlphaTab.Audio.Synth.AlphaSynth.Destroy">
+            <inheritdoc />
+        </member>
         <member name="M:AlphaTab.Audio.Synth.AlphaSynth.#ctor(AlphaTab.Audio.Synth.ISynthOutput)">
             <summary>
             Initializes a new instance of the <see cref="T:AlphaTab.Audio.Synth.AlphaSynth"/> class.
@@ -284,6 +296,9 @@
         <member name="M:AlphaTab.Audio.Synth.AlphaSynth.SetChannelProgram(System.Int32,System.Byte)">
             <inheritdoc />
         </member>
+        <member name="E:AlphaTab.Audio.Synth.AlphaSynth.Ready">
+            <inheritdoc />
+        </member>
         <member name="E:AlphaTab.Audio.Synth.AlphaSynth.Finished">
             <summary>
             Occurs when the playback of the whole midi file finished.
@@ -324,6 +339,44 @@
             <summary>
             Occurs whenever the current time of the played audio changes. 
             </summary>
+        </member>
+        <member name="T:AlphaTab.Audio.Synth.ProgressEventArgs">
+            <summary>
+            Represents the progress of any data being loaded. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.ProgressEventArgs.Loaded">
+            <summary>
+            Gets the currently loaded bytes. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.ProgressEventArgs.Total">
+            <summary>
+            Gets the total number of bytes to load. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.ProgressEventArgs.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Audio.Synth.ProgressEventArgs"/> class.
+            </summary>
+            <param name="loaded"></param>
+            <param name="total"></param>
+        </member>
+        <member name="T:AlphaTab.Audio.Synth.PlaybackFinishedEventArgs">
+            <summary>
+            Represents the info when the playback of a whole song finished. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Audio.Synth.PlaybackFinishedEventArgs.IsLooping">
+            <summary>
+            Gets a value indicating whether looping is active, and the playback will start automatically again at the beginning. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Audio.Synth.PlaybackFinishedEventArgs.#ctor(System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Audio.Synth.PlaybackFinishedEventArgs"/> class.
+            </summary>
+            <param name="isLooping"></param>
         </member>
         <member name="T:AlphaTab.Audio.Synth.PlayerStateChangedEventArgs">
             <summary>
@@ -505,6 +558,51 @@
             </summary>
             <param name="channel">The channel number.</param>
             <param name="program">The midi program.</param>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.IAlphaSynth.Ready">
+            <summary>
+            This event is fired when the player is ready to be interacted with. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.IAlphaSynth.ReadyForPlayback">
+            <summary>
+            This event is fired when all required data for playback is loaded and ready. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.IAlphaSynth.Finished">
+            <summary>
+            This event is fired when the playback of the whole song finished. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.IAlphaSynth.SoundFontLoaded">
+            <summary>
+            This event is fired when the SoundFont needed for playback was loaded. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.IAlphaSynth.SoundFontLoadFailed">
+            <summary>
+            This event is fired when the loading of the SoundFont failed. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.IAlphaSynth.MidiLoaded">
+            <summary>
+            This event is fired when the Midi file needed for playback was loaded. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.IAlphaSynth.MidiLoadFailed">
+            <summary>
+            This event is fired when the loading of the Midi file failed. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.IAlphaSynth.StateChanged">
+            <summary>
+            This event is fired when the playback state changed. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.Audio.Synth.IAlphaSynth.PositionChanged">
+            <summary>
+            This event is fired when the current playback position of the song changed. 
+            </summary>
         </member>
         <member name="T:AlphaTab.Audio.Synth.ISynthOutput">
             <summary>
@@ -1808,6 +1906,178 @@
             Gets the default settings.
             </summary>
         </member>
+        <member name="T:AlphaTab.ResizeEventArgs">
+            <summary>
+            Represents the information related to a resize event. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.ResizeEventArgs.OldWidth">
+            <summary>
+            Gets the size before the resizing happened. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.ResizeEventArgs.NewWidth">
+            <summary>
+            Gets the size after the resize was complete. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.ResizeEventArgs.Settings">
+            <summary>
+            Gets the settings currently used for rendering. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.AlphaTabApi`1">
+            <summary>
+            This class represents the public API of alphaTab and provides all logic to display
+            a music sheet in any UI using the given <see cref="T:AlphaTab.UI.IUiFacade`1"/>
+            </summary>
+            <typeparam name="TSettings">The UI object holding the settings.</typeparam>
+        </member>
+        <member name="P:AlphaTab.AlphaTabApi`1.UiFacade">
+            <summary>
+            Gets the UI facade to use for interacting with the user interface.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.AlphaTabApi`1.Container">
+            <summary>
+            Gets the UI container that holds the whole alphaTab control.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.AlphaTabApi`1.CanvasElement">
+            <summary>
+            Gets the UI container that will hold all rendered results. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.AlphaTabApi`1.Renderer">
+            <summary>
+            Gets the score renderer used for rendering the music sheet. This is the low-level API responsible for the actual rendering chain. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.AlphaTabApi`1.AutoSize">
+            <summary>
+            Gets a value indicating whether auto-sizing is active and the music sheet will be re-rendered on resize. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.AlphaTabApi`1.Score">
+            <summary>
+            Gets the score holding all information about the song being rendered. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.AlphaTabApi`1.TrackIndexes">
+            <summary>
+            Gets the indexes of the tracks that should be rendered of the currently set score. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.AlphaTabApi`1.Settings">
+            <summary>
+            Gets the settings that are used for rendering the music notation.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.AlphaTabApi`1.Tracks">
+            <summary>
+            Gets a list of the tracks that should be rendered based on <see cref="P:AlphaTab.AlphaTabApi`1.Score"/> and <see cref="P:AlphaTab.AlphaTabApi`1.TrackIndexes"/>
+            </summary>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.#ctor(AlphaTab.UI.IUiFacade{`0},`0)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.AlphaTabApi`1"/> class.
+            </summary>
+            <param name="uiFacade">The UI facade to use for interacting with the user interface.</param>
+            <param name="settings">The UI settings object to use for loading the settings.</param>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.Destroy">
+            <summary>
+            Destroys the alphaTab control and restores the initial state of the UI. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.TrackIndexesToTracks(System.Int32[])">
+            <summary>
+            Maps the given list of track indexes to tracks using the current <see cref="P:AlphaTab.AlphaTabApi`1.Score"/>
+            </summary>
+            <param name="trackIndexes">The indexes of the tracks.</param>
+            <returns>A list of Tracks that are available in the current <see cref="P:AlphaTab.AlphaTabApi`1.Score"/>.</returns>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.UpdateSettings">
+            <summary>
+            Applies any changes that were done to the settings object and informs the <see cref="P:AlphaTab.AlphaTabApi`1.Renderer"/> about any new values to consider. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.RenderTracks(AlphaTab.Model.Score,System.Int32[],System.Boolean)">
+            <summary>
+            Initiates a rendering of the given tracks. 
+            </summary>
+            <param name="score">The data model holding the song information.</param>
+            <param name="tracks">The indexes of the tracks to render.</param>
+            <param name="invalidate">If set to true, a redrawing will be done as part of this call. </param>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.Tex(System.String,System.Int32[])">
+            <summary>
+            Tells alphaTab to render the given alphaTex. 
+            </summary>
+            <param name="contents">The alphaTex code to render.</param>
+            <param name="tracks">If set, the given tracks will be rendered, otherwise the first track only will be rendered.</param>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.ScoreLoaded(AlphaTab.Model.Score,System.Boolean)">
+            <summary>
+            Performs any necessary steps that are needed after a new score was loaded/set. 
+            </summary>
+            <param name="score">The score that was loaded.</param>
+            <param name="render">If set to true, a rerendering will be initiated as part of this call.</param>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.Render">
+            <summary>
+            Initiates a re-rendering of the current setup. If rendering is not yet possible, it will be deferred until the UI changes to be ready for rendering.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.AlphaTabApi`1.Player">
+            <summary>
+            Gets the alphaSynth player used for playback. This is the low-level API to the Midi synthesizer used for playback. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.ChangeTrackVolume(AlphaTab.Model.Track[],System.Single)">
+            <summary>
+            Changes the volume of th given tracks. 
+            </summary>
+            <param name="tracks">The tracks for which the volume should be changed.</param>
+            <param name="volume">The volume to set for all tracks in percent (0-1)</param>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.ChangeTrackSolo(AlphaTab.Model.Track[],System.Boolean)">
+            <summary>
+            Changes the given tracks to be played solo or not. 
+            </summary>
+            <param name="tracks">The list of tracks to play solo or not.</param>
+            <param name="solo">If set to true, the tracks will be added to the solo list. If false, they are removed.</param>
+            <remarks>
+            If one or more tracks are set to solo, only those tracks are hearable.
+            </remarks>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.ChangeTrackMute(AlphaTab.Model.Track[],System.Boolean)">
+            <summary>
+            Changes the given tracks to be muted or not. 
+            </summary>
+            <param name="tracks">The list of track to mute or unmute.</param>
+            <param name="mute">If set to true, the tracks will be muted. If false they are unmuted.</param>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.Play">
+            <summary>
+            Starts the playback of the current song. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.Pause">
+            <summary>
+            Pauses the playback of the current song.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.PlayPause">
+            <summary>
+            Toggles between play/pause depending on the current player state. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.AlphaTabApi`1.Stop">
+            <summary>
+            Stops the playback of the current song, and moves the playback position back to the start.
+            </summary>
+        </member>
         <member name="M:AlphaTab.AlphaTabApi`1.CursorUpdateTick(System.Int32,System.Boolean)">
             <summary>
             updates the cursors to highlight the beat at the specified tick position
@@ -1818,6 +2088,31 @@
         <member name="M:AlphaTab.AlphaTabApi`1.CursorUpdateBeat(AlphaTab.Model.Beat,AlphaTab.Model.Beat,System.Double,System.Boolean)">
             <summary>
             updates the cursors to highlight the specified beat
+            </summary>
+        </member>
+        <member name="E:AlphaTab.AlphaTabApi`1.PlayedBeatChanged">
+            <summary>
+            This event is fired whenever a new beat is played. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.AlphaTabApi`1.Loaded">
+            <summary>
+            This event is fired whenever a new song is loaded. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.AlphaTabApi`1.Resize">
+            <summary>
+            This event is fired when alphaTab was resized and is about to rerender the music notation.
+            </summary>
+        </member>
+        <member name="E:AlphaTab.AlphaTabApi`1.RenderFinished">
+            <summary>
+            This event is fired when the rendering of the whole music sheet is finished. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.AlphaTabApi`1.PostRenderFinished">
+            <summary>
+            This event is fired when the rendering of the whole music sheet is finished, and all handlers of <see cref="E:AlphaTab.AlphaTabApi`1.RenderFinished"/> ran. 
             </summary>
         </member>
         <member name="T:AlphaTab.AlphaTabException">
@@ -2009,6 +2304,7 @@
             </summary>
             <param name="data">the data to read from.</param>
             <param name="length">the amount of bytes to read</param>
+            <param name="encoding">The encoding to use to decode the byte into a string</param>
             <returns></returns>
         </member>
         <member name="T:AlphaTab.Importer.GpxFile">
@@ -4927,6 +5223,96 @@
             This public class contains central definitions for controlling the visual appearance. 
             </summary>
         </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.CopyrightFont">
+            <summary>
+            Gets or sets the font to use for displaying the songs copyright information in the header of the music sheet. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.TitleFont">
+            <summary>
+            Gets or sets the font to use for displaying the songs title in the header of the music sheet. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.SubTitleFont">
+            <summary>
+            Gets or sets the font to use for displaying the songs subtitle in the header of the music sheet. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.WordsFont">
+            <summary>
+            Gets or sets the font to use for displaying the lyrics information in the header of the music sheet. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.EffectFont">
+            <summary>
+            Gets or sets the font to use for displaying certain effect related elements in the music sheet. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.FretboardNumberFont">
+            <summary>
+            Gets or sets the font to use for displaying the fretboard numbers in chord diagrams.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.TablatureFont">
+            <summary>
+            Gets or sets the font to use for displaying the guitar tablature numbers in the music sheet. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.GraceFont">
+            <summary>
+            Gets or sets the font to use for grace notation related texts in the music sheet.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.StaffLineColor">
+            <summary>
+            Gets or sets the color to use for rendering the lines of staves. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.BarSeparatorColor">
+            <summary>
+            Gets or sets the color to use for rendering bar separators, the accolade and repeat signs. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.BarNumberFont">
+            <summary>
+            Gets or sets the font to use for displaying the bar numbers above the music sheet. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.BarNumberColor">
+            <summary>
+            Gets or sets the color to use for displaying the bar numbers above the music sheet. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.FingeringFont">
+            <summary>
+            Gets or sets the font to use for displaying finger information in the music sheet.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.MarkerFont">
+            <summary>
+            Gets or sets the font to use for section marker labels shown above the music sheet. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.MainGlyphColor">
+            <summary>
+            Gets or sets the color to use for music notation elements of the primary voice. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.SecondaryGlyphColor">
+            <summary>
+            Gets or sets the color to use for music notation elements of the secondary voices. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.RenderingResources.ScoreInfoColor">
+            <summary>
+            Gets or sets the color to use for displaying the song information above the music sheet. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Rendering.RenderingResources.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Rendering.RenderingResources"/> class.
+            </summary>
+        </member>
         <member name="T:AlphaTab.Rendering.ScoreBarRenderer">
             <summary>
             This BarRenderer renders a bar using standard music notation. 
@@ -4960,6 +5346,51 @@
             This is the main wrapper of the rendering engine which 
             can render a single track of a score object into a notation sheet.
             </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.ScoreRenderer.BoundsLookup">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Rendering.ScoreRenderer.#ctor(AlphaTab.Settings)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Rendering.ScoreRenderer"/> class.
+            </summary>
+            <param name="settings">The settings to use for rendering.</param>
+        </member>
+        <member name="M:AlphaTab.Rendering.ScoreRenderer.Destroy">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Rendering.ScoreRenderer.Render(AlphaTab.Model.Score,System.Int32[])">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Rendering.ScoreRenderer.RenderTracks(AlphaTab.Model.Track[])">
+            <summary>
+            Initiates rendering fof the given tracks.
+            </summary>
+            <param name="tracks">The tracks to render.</param>
+        </member>
+        <member name="M:AlphaTab.Rendering.ScoreRenderer.UpdateSettings(AlphaTab.Settings)">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Rendering.ScoreRenderer.Invalidate">
+            <inheritdoc />
+        </member>
+        <member name="M:AlphaTab.Rendering.ScoreRenderer.Resize(System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="E:AlphaTab.Rendering.ScoreRenderer.PreRender">
+            <inheritdoc />
+        </member>
+        <member name="E:AlphaTab.Rendering.ScoreRenderer.PartialRenderFinished">
+            <inheritdoc />
+        </member>
+        <member name="E:AlphaTab.Rendering.ScoreRenderer.RenderFinished">
+            <inheritdoc />
+        </member>
+        <member name="E:AlphaTab.Rendering.ScoreRenderer.Error">
+            <inheritdoc />
+        </member>
+        <member name="E:AlphaTab.Rendering.ScoreRenderer.PostRenderFinished">
+            <inheritdoc />
         </member>
         <member name="T:AlphaTab.Rendering.Staves.BarLayoutingInfo">
             <summary>
@@ -5182,6 +5613,350 @@
             <param name="beat"></param>
             <returns></returns>
         </member>
+        <member name="T:AlphaTab.Rendering.Utils.Bounds">
+            <summary>
+            Represents a rectangular area within the renderer music notation.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.Bounds.X">
+            <summary>
+            Gets or sets the X-position of the rectangle within the music notation.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.Bounds.Y">
+            <summary>
+            Gets or sets the Y-position of the rectangle within the music notation.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.Bounds.W">
+            <summary>
+            Gets or sets the width of the rectangle.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.Bounds.H">
+            <summary>
+            Gets or sets the height of the rectangle.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Rendering.Utils.StaveGroupBounds">
+            <summary>
+            Represents the bounds of a stave group. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.StaveGroupBounds.Index">
+            <summary>
+            Gets or sets the index of the bounds within the parent lookup.
+            This allows fast access of the next/previous groups.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.StaveGroupBounds.VisualBounds">
+            <summary>
+            Gets or sets the bounds covering all visually visible elements of this stave group.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.StaveGroupBounds.RealBounds">
+            <summary>
+            Gets or sets the actual bounds of the elements in this stave group including whitespace areas.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.StaveGroupBounds.Bars">
+            <summary>
+            Gets or sets the list of master bar bounds related to this stave group.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.StaveGroupBounds.BoundsLookup">
+            <summary>
+            Gets or sets a reference to the parent bounds lookup.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.StaveGroupBounds.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Rendering.Utils.StaveGroupBounds"/> class.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.StaveGroupBounds.Finish">
+            <summary>
+            Finished the lookup for optimized access. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.StaveGroupBounds.AddBar(AlphaTab.Rendering.Utils.MasterBarBounds)">
+            <summary>
+            Adds a new master bar to this lookup.
+            </summary>
+            <param name="bounds">The master bar bounds to add.</param>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.StaveGroupBounds.FindBarAtPos(System.Single)">
+            <summary>
+            Tries to find the master bar bounds that are located at the given X-position.
+            </summary>
+            <param name="x">The X-position to find a master bar.</param>
+            <returns>The master bounds at the given X-position.</returns>
+        </member>
+        <member name="T:AlphaTab.Rendering.Utils.MasterBarBounds">
+            <summary>
+            Represents the boundaries of a list of bars related to a single master bar.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.MasterBarBounds.Index">
+            <summary>
+            Gets or sets the index of this bounds relative within the parent lookup. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.MasterBarBounds.IsFirstOfLine">
+            <summary>
+            Gets or sets a value indicating whether this bounds are the first of the line. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.MasterBarBounds.VisualBounds">
+            <summary>
+            Gets or sets the bounds covering all visually visible elements spanning all bars of this master bar.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.MasterBarBounds.RealBounds">
+            <summary>
+            Gets or sets the actual bounds of the elements in this master bar including whitespace areas.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.MasterBarBounds.LineAlignedBounds">
+            <summary>
+            Gets or sets the actual bounds which are exactly aligned with the lines of the staffs.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.MasterBarBounds.Bars">
+            <summary>
+            Gets or sets the list of individual bars within this lookup.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.MasterBarBounds.StaveGroupBounds">
+            <summary>
+            Gets or sets a reference to the parent <see cref="P:AlphaTab.Rendering.Utils.MasterBarBounds.StaveGroupBounds"/>.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.MasterBarBounds.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Rendering.Utils.MasterBarBounds"/> class.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.MasterBarBounds.AddBar(AlphaTab.Rendering.Utils.BarBounds)">
+            <summary>
+            Adds a new bar to this lookup.
+            </summary>
+            <param name="bounds">The bar bounds to add to this lookup.</param>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.MasterBarBounds.FindBeatAtPos(System.Single,System.Single)">
+            <summary>
+            Tries to find a beat at the given location.
+            </summary>
+            <param name="x">The absolute X position where the beat spans across.</param>
+            <param name="y">The absolute Y position where the beat spans across.</param>
+            <returns>The beat that spans across the given point, or null if none of the contained bars had a beat at this position.</returns>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.MasterBarBounds.Finish">
+            <summary>
+            Finishes the lookup object and optimizes itself for fast access.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.MasterBarBounds.AddBeat(AlphaTab.Rendering.Utils.BeatBounds)">
+            <summary>
+            Adds a new beat to the lookup.
+            </summary>
+            <param name="bounds">The beat bounds to add.</param>
+        </member>
+        <member name="T:AlphaTab.Rendering.Utils.BarBounds">
+            <summary>
+            Represents the boundaries of a single bar.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.BarBounds.MasterBarBounds">
+            <summary>
+            Gets or sets the reference to the related <see cref="P:AlphaTab.Rendering.Utils.BarBounds.MasterBarBounds"/>
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.BarBounds.VisualBounds">
+            <summary>
+            Gets or sets the bounds covering all visually visible elements spanning this bar.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.BarBounds.RealBounds">
+            <summary>
+            Gets or sets the actual bounds of the elements in this bar including whitespace areas.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.BarBounds.Bar">
+            <summary>
+            Gets or sets the bar related to this boundaries.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.BarBounds.Beats">
+            <summary>
+            Gets or sets a list of the beats contained in this lookup.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.BarBounds.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Rendering.Utils.BarBounds"/> class.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.BarBounds.AddBeat(AlphaTab.Rendering.Utils.BeatBounds)">
+            <summary>
+            Adds a new beat to this lookup.
+            </summary>
+            <param name="bounds">The beat bounds to add.</param>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.BarBounds.FindBeatAtPos(System.Single)">
+            <summary>
+            Tries to find the beat at the given X-position.
+            </summary>
+            <param name="x">The X-position of the beat to find.</param>
+            <returns>The beat at the given X-position or null if none was found.</returns>
+        </member>
+        <member name="T:AlphaTab.Rendering.Utils.BeatBounds">
+            <summary>
+            Represents the bounds of a single beat.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.BeatBounds.BarBounds">
+            <summary>
+            Gets or sets the reference to the parent <see cref="P:AlphaTab.Rendering.Utils.BeatBounds.BarBounds"/>.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.BeatBounds.VisualBounds">
+            <summary>
+            Gets or sets the bounds covering all visually visible elements spanning this beat.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.BeatBounds.RealBounds">
+            <summary>
+            Gets or sets the actual bounds of the elements in this beat including whitespace areas.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.BeatBounds.Beat">
+            <summary>
+            Gets or sets the beat related to this bounds.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.BeatBounds.Notes">
+            <summary>
+            Gets or sets the individual note positions of this beat (if <see cref="P:AlphaTab.Settings.IncludeNoteBounds"/> was set to true).
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.BeatBounds.AddNote(AlphaTab.Rendering.Utils.NoteBounds)">
+            <summary>
+            Adds a new note to this bounds.
+            </summary>
+            <param name="bounds">The note bounds to add.</param>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.BeatBounds.FindNoteAtPos(System.Single,System.Single)">
+            <summary>
+            Tries to find a note at the given position.
+            </summary>
+            <param name="x">The X-position of the note to find.</param>
+            <param name="y">The Y-position of the note to find.</param>
+            <returns>The note at the given position or null if no note was found, or the note lookup was not enabled before rendering.</returns>
+        </member>
+        <member name="T:AlphaTab.Rendering.Utils.NoteBounds">
+            <summary>
+            Represents the bounds of a single note
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.NoteBounds.NoteHeadBounds">
+            <summary>
+            Gets or sets the bounds of the individual note head.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.NoteBounds.Note">
+            <summary>
+            Gets or sets the note related to this instance.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.Rendering.Utils.BoundsLookup">
+            <summary>
+            Represents a lookup cache for quickly finding bars, beats and notes at a given position.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.BoundsLookup.StaveGroups">
+            <summary>
+            Gets a list of all individual stave groups contained in the rendered music notation.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.Rendering.Utils.BoundsLookup.IsFinished">
+            <summary>
+            Gets or sets a value indicating whether this lookup was finished already.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.BoundsLookup.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.Rendering.Utils.BoundsLookup"/> class.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.BoundsLookup.Finish">
+            <summary>
+            Finishes the lookup for optimized access.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.BoundsLookup.AddNote(AlphaTab.Rendering.Utils.NoteBounds)">
+            <summary>
+            Adds a new note to the lookup.
+            </summary>
+            <param name="bounds">The note bounds to add.</param>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.BoundsLookup.AddStaveGroup(AlphaTab.Rendering.Utils.StaveGroupBounds)">
+            <summary>
+            Adds a new stave group to the lookup.
+            </summary>
+            <param name="bounds">The stave group bounds to add.</param>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.BoundsLookup.AddMasterBar(AlphaTab.Rendering.Utils.MasterBarBounds)">
+            <summary>
+            Adds a new master bar to the lookup.
+            </summary>
+            <param name="bounds">The master bar bounds to add.</param>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.BoundsLookup.AddBeat(AlphaTab.Rendering.Utils.BeatBounds)">
+            <summary>
+            Adds a new beat to the lookup.
+            </summary>
+            <param name="bounds">The beat bounds to add.</param>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.BoundsLookup.FindMasterBarByIndex(System.Int32)">
+            <summary>
+            Tries to find the master bar bounds by a given index.
+            </summary>
+            <param name="index">The index of the master bar to find.</param>
+            <returns>The master bar bounds if it was rendered, or null if no boundary information is available.</returns>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.BoundsLookup.FindMasterBar(AlphaTab.Model.MasterBar)">
+            <summary>
+            Tries to find the master bar bounds by a given master bar.
+            </summary>
+            <param name="bar">The master bar to find.</param>
+            <returns>The master bar bounds if it was rendered, or null if no boundary information is available.</returns>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.BoundsLookup.FindBeat(AlphaTab.Model.Beat)">
+            <summary>
+            Tries to find the bounds of a given beat. 
+            </summary>
+            <param name="beat">The beat to find.</param>
+            <returns>The beat bounds if it was rendered, or null if no boundary information is available.</returns>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.BoundsLookup.GetBeatAtPos(System.Single,System.Single)">
+            <summary>
+            Tries to find a beat at the given absolute position.
+            </summary>
+            <param name="x">The absolute X-position of the beat to find.</param>
+            <param name="y">The absolute Y-position of the beat to find.</param>
+            <returns>The beat found at the given position or null if no beat could be found.</returns>
+        </member>
+        <member name="M:AlphaTab.Rendering.Utils.BoundsLookup.GetNoteAtPos(AlphaTab.Model.Beat,System.Single,System.Single)">
+            <summary>
+            Tries to find the note at the given position using the given beat for fast access.
+            Use <see cref="M:AlphaTab.Rendering.Utils.BoundsLookup.FindBeat(AlphaTab.Model.Beat)"/> to find a beat for a given position first.
+            </summary>
+            <param name="beat">The beat containing the note.</param>
+            <param name="x">The X-position of the note. </param>
+            <param name="y">The Y-position of the note.</param>
+            <returns>The note at the given position within the beat.</returns>
+        </member>
         <member name="M:AlphaTab.Rendering.Utils.PercussionMapper.MapNoteForDisplay(System.Int32)">
             <summary>
             Maps the given note to a normal note value to place the note at the 
@@ -5363,6 +6138,302 @@
              <li><strong>rhythm</strong> - Renders rhythm beams to tablature notes</li>
             </ul>
             </summary>
+        </member>
+        <member name="T:AlphaTab.UI.Cursors">
+            <summary>
+            This wrapper holds all cursor related elements. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.UI.Cursors.CursorWrapper">
+            <summary>
+            Gets the element that spans across the whole music sheet and holds the other cursor elements.  
+            </summary>
+        </member>
+        <member name="P:AlphaTab.UI.Cursors.BarCursor">
+            <summary>
+            Gets the element that is positioned above the bar that is currently played. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.UI.Cursors.BeatCursor">
+            <summary>
+            Gets the element that is positioned above the beat that is currently played. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.UI.Cursors.SelectionWrapper">
+            <summary>
+            Gets the element that spans across the whole music sheet and will hold any selection related elements. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.UI.Cursors.#ctor(AlphaTab.UI.IContainer,AlphaTab.UI.IContainer,AlphaTab.UI.IContainer,AlphaTab.UI.IContainer)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.UI.Cursors"/> class.
+            </summary>
+            <param name="cursorWrapper"></param>
+            <param name="barCursor"></param>
+            <param name="beatCursor"></param>
+            <param name="selectionWrapper"></param>
+        </member>
+        <member name="T:AlphaTab.UI.IContainer">
+            <summary>
+            This interface represents a container control in the UI layer. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.UI.IContainer.Top">
+            <summary>
+            Gets or sets the Y-position of the control, relative to its parent. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.UI.IContainer.Left">
+            <summary>
+            Gets or sets the X-position of the control, relative to its parent. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.UI.IContainer.Width">
+            <summary>
+            Gets or sets the width of the control.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.UI.IContainer.Height">
+            <summary>
+            Gets or sets the height of the control.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.UI.IContainer.IsVisible">
+            <summary>
+            Gets a value indicating whether the control is visible.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.UI.IContainer.ScrollLeft">
+            <summary>
+            Gets or sets the horizontal scroll offset of this control if it is scrollable. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.UI.IContainer.ScrollTop">
+            <summary>
+            Gets or sets the vertical scroll offset of this control if it is scrollable. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.UI.IContainer.AppendChild(AlphaTab.UI.IContainer)">
+            <summary>
+            Adds the given child control to this container. 
+            </summary>
+            <param name="child">The child control to add.</param>
+        </member>
+        <member name="E:AlphaTab.UI.IContainer.Scroll">
+            <summary>
+            This event occurs when a scroll on the control happened. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.UI.IContainer.Resize">
+            <summary>
+            This event occurs when the control was resized. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.UI.IContainer.StopAnimation">
+            <summary>
+            Stops the animations of this control immediately. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.UI.IContainer.TransitionToX(System.Double,System.Single)">
+            <summary>
+            Tells the control to move to the given X-position in the given time. 
+            </summary>
+            <param name="duration">The milliseconds that should be needed to reach the new X-position</param>
+            <param name="x">The new X-position</param>
+        </member>
+        <member name="E:AlphaTab.UI.IContainer.MouseDown">
+            <summary>
+            This event occurs when a mouse/finger press happened on the control.
+            </summary>
+        </member>
+        <member name="E:AlphaTab.UI.IContainer.MouseMove">
+            <summary>
+            This event occurs when a mouse/finger moves on top of the control.
+            </summary>
+        </member>
+        <member name="E:AlphaTab.UI.IContainer.MouseUp">
+            <summary>
+            This event occurs when a mouse/finger is released from the control.
+            </summary>
+        </member>
+        <member name="M:AlphaTab.UI.IContainer.Clear">
+            <summary>
+            Clears the container and removes all child items.
+            </summary>
+        </member>
+        <member name="T:AlphaTab.UI.IMouseEventArgs">
+            <summary>
+            This interface represents the information about a mouse event that occured on the UI. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.UI.IMouseEventArgs.IsLeftMouseButton">
+            <summary>
+            Gets a value indicating whether the left mouse button was pressed. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.UI.IMouseEventArgs.GetX(AlphaTab.UI.IContainer)">
+            <summary>
+            Gets the X-position of the cursor at the time of the event relative to the given UI container. 
+            </summary>
+            <param name="relativeTo">The UI element to which the relative position should be calculated.</param>
+            <returns>The relative X-position of the cursor to the given UI container at the time the event occured.</returns>
+        </member>
+        <member name="M:AlphaTab.UI.IMouseEventArgs.GetY(AlphaTab.UI.IContainer)">
+            <summary>
+            Gets the Y-position of the cursor at the time of the event relative to the given UI container. 
+            </summary>
+            <param name="relativeTo">The UI element to which the relative position should be calculated.</param>
+            <returns>The relative Y-position of the cursor to the given UI container at the time the event occured.</returns>
+        </member>
+        <member name="M:AlphaTab.UI.IMouseEventArgs.PreventDefault">
+            <summary>
+            If called, the original mouse action is prevented and the event is flagged as handled. 
+            </summary>
+        </member>
+        <member name="T:AlphaTab.UI.IUiFacade`1">
+            <summary>
+            This interface represents the UI abstraction between alphaTab and the corresponding UI framework being used. 
+            </summary>
+            <typeparam name="TSettings">The type of that holds the settings passed from the UI layer.</typeparam>
+        </member>
+        <member name="P:AlphaTab.UI.IUiFacade`1.RootContainer">
+            <summary>
+            Gets the root UI element that holds the whole alphaTab control.
+            </summary>
+        </member>
+        <member name="P:AlphaTab.UI.IUiFacade`1.AreWorkersSupported">
+            <summary>
+            Gets a value indicating whether the UI framework supports worker based rendering. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.UI.IUiFacade`1.CanRender">
+            <summary>
+            Gets or sets whether the UI is ready to render the music notation. On some platforms where pre-loading of assets is done asynchronously,
+            rendering might need to be deferred. 
+            </summary>
+        </member>
+        <member name="P:AlphaTab.UI.IUiFacade`1.ResizeThrottle">
+            <summary>
+            Gets the resize throttling in milliseconds. Then the music sheet is resized, the re-rendering is deferred until this timeout is reached. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.UI.IUiFacade`1.CanRenderChanged">
+            <summary>
+            This events is fired when the <see cref="P:AlphaTab.UI.IUiFacade`1.CanRender"/> property changes. 
+            </summary>
+        </member>
+        <member name="E:AlphaTab.UI.IUiFacade`1.RootContainerBecameVisible">
+            <summary>
+            This event is fired when <see cref="P:AlphaTab.UI.IUiFacade`1.RootContainer"/> became visible when it was invisible at the time rendering was initiated. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.Initialize(AlphaTab.AlphaTabApi{`0},`0)">
+            <summary>
+            Initializes the UI using the given alphaTab API and settings object. 
+            </summary>
+            <param name="api">The alphaTab API wrapper responsible for UI interaction.</param>
+            <param name="settings">The settings object holding the settings from the UI layer.</param>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.Destroy">
+            <summary>
+            Tells the UI layer to destroy the alphaTab controls and restore the initial state. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.CreateCanvasElement">
+            <summary>
+            Creates the canvas element that wraps all individually rendered partials.  
+            </summary>
+            <returns>The canvas element that wraps all individually rendered partials.</returns>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.TriggerEvent(AlphaTab.UI.IContainer,System.String,System.Object)">
+            <summary>
+            Tells the UI layer to trigger an event with the given name and details.
+            </summary>
+            <param name="container">The element on which the event should be triggered. </param>
+            <param name="eventName">The event that should be triggered.</param>
+            <param name="details">The object holding the details about the event.</param>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.InitialRender">
+            <summary>
+            Tells the UI layer to do the initial rendering. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.BeginAppendRenderResults(AlphaTab.Rendering.RenderFinishedEventArgs)">
+            <summary>
+            Tells the UI layer to append the given render results to the UI. 
+            </summary>
+            <param name="renderResults">The rendered partial that should be added to the UI. </param>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.CreateWorkerRenderer">
+            <summary>
+            Tells the UI layer to create the worker renderer. This method is the UI layer supports worker rendering and worker rendering is not disabled via setting. 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.CreateWorkerPlayer">
+            <summary>
+            Tells the UI layer to create a player worker. 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.CreateCursors">
+            <summary>
+            Creates the cursor objects that are used to highlight the currently played beats and bars. 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.BeginInvoke(System.Action)">
+            <summary>
+            Tells the UI layer to invoke the given action. 
+            </summary>
+            <param name="action"></param>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.RemoveHighlights">
+            <summary>
+            Tells the UI layer to remove all highlights from highlighted music notation elements. 
+            </summary>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.HighlightElements(System.String)">
+            <summary>
+            Tells the UI layer to highlight the music notation elements with the given ID.
+            </summary>
+            <param name="groupId">The group id that identifies the elements to be highlighted. </param>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.CreateSelectionElement">
+            <summary>
+            Creates a new UI element that is used to display the selection rectangle. 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.GetScrollContainer">
+            <summary>
+            Gets the UI element that is used for scrolling during playback. 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.GetOffset(AlphaTab.UI.IContainer,AlphaTab.UI.IContainer)">
+            <summary>
+            Calculates the relative offset of a container to the scroll element. 
+            </summary>
+            <param name="scrollElement">The parent scroll element to which the relative position is computed. </param>
+            <param name="container">The container element for which the relative position is calculated.</param>
+            <returns></returns>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.ScrollToY(AlphaTab.UI.IContainer,System.Int32,System.Int32)">
+            <summary>
+            Initiates a vertical scroll on the given element. 
+            </summary>
+            <param name="scrollElement">The element on which the scrolling should happen.</param>
+            <param name="offset">The absolute scroll offset to which scrolling should happen.</param>
+            <param name="speed">How fast the scrolling from the current offset to the given one should happen in milliseconds.</param>
+        </member>
+        <member name="M:AlphaTab.UI.IUiFacade`1.ScrollToX(AlphaTab.UI.IContainer,System.Int32,System.Int32)">
+            <summary>
+            Initiates a horizontal scroll on the given element. 
+            </summary>
+            <param name="scrollElement">The element on which the scrolling should happen.</param>
+            <param name="offset">The absolute scroll offset to which scrolling should happen.</param>
+            <param name="speed">How fast the scrolling from the current offset to the given one should happen in milliseconds.</param>
         </member>
         <member name="T:AlphaTab.Util.LogLevel">
             <summary>

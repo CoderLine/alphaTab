@@ -28,9 +28,6 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
     public class AlphaTab : ScrollView
     {
         private readonly AlphaTabLayoutPanel _contentPanel;
-        private bool _initialRenderCompleted;
-        private bool _isRendering;
-        private bool _redrawPending;
 
         public static readonly BindableProperty TracksProperty = BindableProperty.Create("Tracks", typeof(IEnumerable<Track>), typeof(AlphaTab), propertyChanged: OnTracksChanged);
         private static void OnTracksChanged(BindableObject bindable, object oldvalue, object newvalue)

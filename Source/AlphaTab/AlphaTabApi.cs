@@ -33,29 +33,73 @@ using AlphaTab.Util;
 
 namespace AlphaTab
 {
+    /// <summary>
+    /// Represents the information related to a resize event. 
+    /// </summary>
     public class ResizeEventArgs
     {
+        /// <summary>
+        /// Gets the size before the resizing happened. 
+        /// </summary>
         public int OldWidth { get; set; }
+        /// <summary>
+        /// Gets the size after the resize was complete. 
+        /// </summary>
         public int NewWidth { get; set; }
+        /// <summary>
+        /// Gets the settings currently used for rendering. 
+        /// </summary>
         public Settings Settings { get; set; }
     }
 
+    /// <summary>
+    /// This class represents the public API of alphaTab and provides all logic to display
+    /// a music sheet in any UI using the given <see cref="IUiFacade{TSettings}"/>
+    /// </summary>
+    /// <typeparam name="TSettings">The UI object holding the settings.</typeparam>
     public class AlphaTabApi<TSettings>
     {
         private long _startTime;
 
+        /// <summary>
+        /// Gets the UI facade to use for interacting with the user interface.
+        /// </summary>
         protected IUiFacade<TSettings> UiFacade { get; }
 
+        /// <summary>
+        /// Gets the UI container that holds the whole alphaTab control.
+        /// </summary>
         public IContainer Container { get; }
+        /// <summary>
+        /// Gets the UI container that will hold all rendered results. 
+        /// </summary>
         public IContainer CanvasElement { get; }
+        /// <summary>
+        /// Gets the score renderer used for rendering the music sheet. This is the low-level API responsible for the actual rendering chain. 
+        /// </summary>
         public IScoreRenderer Renderer { get; }
+        /// <summary>
+        /// Gets a value indicating whether auto-sizing is active and the music sheet will be re-rendered on resize. 
+        /// </summary>
         public bool AutoSize { get; }
 
+        /// <summary>
+        /// Gets the score holding all information about the song being rendered. 
+        /// </summary>
         public Score Score { get; private set; }
+        /// <summary>
+        /// Gets the indexes of the tracks that should be rendered of the currently set score. 
+        /// </summary>
         public int[] TrackIndexes { get; private set; }
 
+        /// <summary>
+        /// Gets the settings that are used for rendering the music notation.
+        /// </summary>
         public Settings Settings { get; internal set; }
 
+        /// <summary>
+        /// Gets a list of the tracks that should be rendered based on <see cref="Score"/> and <see cref="TrackIndexes"/>
+        /// </summary>
         public Track[] Tracks
         {
             get
@@ -71,6 +115,11 @@ namespace AlphaTab
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AlphaTabApi{TSettings}"/> class.
+        /// </summary>
+        /// <param name="uiFacade">The UI facade to use for interacting with the user interface.</param>
+        /// <param name="settings">The UI settings object to use for loading the settings.</param>
         public AlphaTabApi(IUiFacade<TSettings> uiFacade, TSettings settings)
         {
             UiFacade = uiFacade;
@@ -144,6 +193,9 @@ namespace AlphaTab
             UiFacade.InitialRender();
         }
 
+        /// <summary>
+        /// Destroys the alphaTab control and restores the initial state of the UI. 
+        /// </summary>
         public virtual void Destroy()
         {
             if (Player != null)
@@ -154,7 +206,12 @@ namespace AlphaTab
             Renderer.Destroy();
         }
 
-        public Track[] TrackIndexesToTracks(int[] trackIndexes)
+        /// <summary>
+        /// Maps the given list of track indexes to tracks using the current <see cref="Score"/>
+        /// </summary>
+        /// <param name="trackIndexes">The indexes of the tracks.</param>
+        /// <returns>A list of Tracks that are available in the current <see cref="Score"/>.</returns>
+        protected Track[] TrackIndexesToTracks(int[] trackIndexes)
         {
             var tracks = new FastList<Track>();
 
@@ -177,6 +234,9 @@ namespace AlphaTab
 
         #region Rendering
 
+        /// <summary>
+        /// Applies any changes that were done to the settings object and informs the <see cref="Renderer"/> about any new values to consider. 
+        /// </summary>
         public void UpdateSettings()
         {
             Renderer.UpdateSettings(Settings);
@@ -206,7 +266,6 @@ namespace AlphaTab
             }
         }
 
-
         private void AppendRenderResult(RenderFinishedEventArgs result)
         {
             if (result != null)
@@ -226,6 +285,12 @@ namespace AlphaTab
             }
         }
 
+        /// <summary>
+        /// Initiates a rendering of the given tracks. 
+        /// </summary>
+        /// <param name="score">The data model holding the song information.</param>
+        /// <param name="tracks">The indexes of the tracks to render.</param>
+        /// <param name="invalidate">If set to true, a redrawing will be done as part of this call. </param>
         public void RenderTracks(Score score, int[] tracks, bool invalidate = true)
         {
             if (score != null && score != Score)
@@ -241,6 +306,11 @@ namespace AlphaTab
             }
         }
 
+        /// <summary>
+        /// Tells alphaTab to render the given alphaTex. 
+        /// </summary>
+        /// <param name="contents">The alphaTex code to render.</param>
+        /// <param name="tracks">If set, the given tracks will be rendered, otherwise the first track only will be rendered.</param>
         public void Tex(string contents, int[] tracks = null)
         {
             try
@@ -251,7 +321,7 @@ namespace AlphaTab
                 var score = parser.ReadScore();
                 if (tracks != null)
                 {
-                    tracks = new int[] {0};
+                    tracks = new int[] { 0 };
                 }
                 RenderTracks(score, tracks, true);
             }
@@ -261,6 +331,11 @@ namespace AlphaTab
             }
         }
 
+        /// <summary>
+        /// Performs any necessary steps that are needed after a new score was loaded/set. 
+        /// </summary>
+        /// <param name="score">The score that was loaded.</param>
+        /// <param name="render">If set to true, a rerendering will be initiated as part of this call.</param>
         protected internal void ScoreLoaded(Score score, bool render = true)
         {
             ModelUtils.ApplyPitchOffsets(Settings, score);
@@ -275,6 +350,9 @@ namespace AlphaTab
             }
         }
 
+        /// <summary>
+        /// Initiates a re-rendering of the current setup. If rendering is not yet possible, it will be deferred until the UI changes to be ready for rendering.
+        /// </summary>
         public void Render()
         {
             if (Renderer == null) return;
@@ -300,6 +378,9 @@ namespace AlphaTab
 
         private MidiTickLookup _tickCache;
 
+        /// <summary>
+        /// Gets the alphaSynth player used for playback. This is the low-level API to the Midi synthesizer used for playback. 
+        /// </summary>
         public IAlphaSynth Player { get; private set; }
 
         private void SetupPlayer()
@@ -370,6 +451,11 @@ namespace AlphaTab
             Player.LoadMidiFile(midiFile);
         }
 
+        /// <summary>
+        /// Changes the volume of th given tracks. 
+        /// </summary>
+        /// <param name="tracks">The tracks for which the volume should be changed.</param>
+        /// <param name="volume">The volume to set for all tracks in percent (0-1)</param>
         public void ChangeTrackVolume(Track[] tracks, float volume)
         {
             if (Player == null)
@@ -384,6 +470,14 @@ namespace AlphaTab
             }
         }
 
+        /// <summary>
+        /// Changes the given tracks to be played solo or not. 
+        /// </summary>
+        /// <param name="tracks">The list of tracks to play solo or not.</param>
+        /// <param name="solo">If set to true, the tracks will be added to the solo list. If false, they are removed.</param>
+        /// <remarks>
+        /// If one or more tracks are set to solo, only those tracks are hearable.
+        /// </remarks>
         public void ChangeTrackSolo(Track[] tracks, bool solo)
         {
             if (Player == null)
@@ -398,6 +492,11 @@ namespace AlphaTab
             }
         }
 
+        /// <summary>
+        /// Changes the given tracks to be muted or not. 
+        /// </summary>
+        /// <param name="tracks">The list of track to mute or unmute.</param>
+        /// <param name="mute">If set to true, the tracks will be muted. If false they are unmuted.</param>
         public void ChangeTrackMute(Track[] tracks, bool mute)
         {
             if (Player == null)
@@ -412,6 +511,9 @@ namespace AlphaTab
             }
         }
 
+        /// <summary>
+        /// Starts the playback of the current song. 
+        /// </summary>
         public void Play()
         {
             if (Player == null)
@@ -421,6 +523,9 @@ namespace AlphaTab
             Player.Play();
         }
 
+        /// <summary>
+        /// Pauses the playback of the current song.
+        /// </summary>
         public void Pause()
         {
             if (Player == null)
@@ -430,6 +535,9 @@ namespace AlphaTab
             Player.Pause();
         }
 
+        /// <summary>
+        /// Toggles between play/pause depending on the current player state. 
+        /// </summary>
         public void PlayPause()
         {
             if (Player == null)
@@ -439,6 +547,9 @@ namespace AlphaTab
             Player.PlayPause();
         }
 
+        /// <summary>
+        /// Stops the playback of the current song, and moves the playback position back to the start.
+        /// </summary>
         public void Stop()
         {
             if (Player == null)
@@ -448,9 +559,6 @@ namespace AlphaTab
             Player.Stop();
             CursorUpdateTick(0, true);
         }
-
-
-
 
         #endregion
 
@@ -690,6 +798,9 @@ namespace AlphaTab
             }
         }
 
+        /// <summary>
+        /// This event is fired whenever a new beat is played. 
+        /// </summary>
         public event Action<Beat> PlayedBeatChanged;
         private void OnPlayedBeatChanged(Beat beat)
         {
@@ -894,6 +1005,9 @@ namespace AlphaTab
 
         #region Events
 
+        /// <summary>
+        /// This event is fired whenever a new song is loaded. 
+        /// </summary>
         public event Action<Score> Loaded;
         private void OnLoaded(Score obj)
         {
@@ -905,6 +1019,9 @@ namespace AlphaTab
             UiFacade.TriggerEvent(Container, "loaded", obj);
         }
 
+        /// <summary>
+        /// This event is fired when alphaTab was resized and is about to rerender the music notation.
+        /// </summary>
         public event Action<ResizeEventArgs> Resize;
         private void OnResize(ResizeEventArgs obj)
         {
@@ -916,6 +1033,9 @@ namespace AlphaTab
             UiFacade.TriggerEvent(Container, "resize", obj);
         }
 
+        /// <summary>
+        /// This event is fired when the rendering of the whole music sheet is finished. 
+        /// </summary>
         public event Action<RenderFinishedEventArgs> RenderFinished;
         private void OnRenderFinished(RenderFinishedEventArgs e)
         {
@@ -927,6 +1047,9 @@ namespace AlphaTab
             UiFacade.TriggerEvent(Container, "rendered");
         }
 
+        /// <summary>
+        /// This event is fired when the rendering of the whole music sheet is finished, and all handlers of <see cref="RenderFinished"/> ran. 
+        /// </summary>
         public event Action PostRenderFinished;
         private void OnPostRenderFinished()
         {
@@ -938,7 +1061,7 @@ namespace AlphaTab
             UiFacade.TriggerEvent(Container, "postRendered");
         }
 
-        public void OnError(string type, Exception details)
+        internal void OnError(string type, Exception details)
         {
             Logger.Error(type, "An unexpected error occurred", details);
             UiFacade.TriggerEvent(Container, "error", new

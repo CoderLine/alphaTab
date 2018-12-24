@@ -43,8 +43,13 @@ namespace AlphaTab.Rendering
 
         internal Settings Settings { get; set; }
 
+        /// <inheritdoc />
         public BoundsLookup BoundsLookup { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ScoreRenderer"/> class.
+        /// </summary>
+        /// <param name="settings">The settings to use for rendering.</param>
         public ScoreRenderer(Settings settings)
         {
             Settings = settings;
@@ -52,6 +57,7 @@ namespace AlphaTab.Rendering
             RecreateLayout();
         }
 
+        /// <inheritdoc />
         public void Destroy()
         {
             Score = null;
@@ -84,6 +90,7 @@ namespace AlphaTab.Rendering
             return false;
         }
 
+        /// <inheritdoc />
         public void Render(Score score, int[] trackIndexes)
         {
             try
@@ -119,6 +126,10 @@ namespace AlphaTab.Rendering
             }
         }
 
+        /// <summary>
+        /// Initiates rendering fof the given tracks.
+        /// </summary>
+        /// <param name="tracks">The tracks to render.</param>
         public void RenderTracks(Track[] tracks)
         {
             if (tracks.Length == 0)
@@ -135,11 +146,13 @@ namespace AlphaTab.Rendering
         }
 
 
+        /// <inheritdoc />
         public void UpdateSettings(Settings settings)
         {
             Settings = settings;
         }
 
+        /// <inheritdoc />
         public void Invalidate()
         {
             if (Settings.Width == 0)
@@ -169,6 +182,7 @@ namespace AlphaTab.Rendering
             Logger.Info("Rendering", "Rendering finished");
         }
 
+        /// <inheritdoc />
         public void Resize(int width)
         {
             if (RecreateLayout() || RecreateCanvas() || _renderedTracks != Tracks || Tracks == null)
@@ -204,23 +218,26 @@ namespace AlphaTab.Rendering
             OnPostRender();
         }
 
+        /// <inheritdoc />
         public event Action PreRender;
-        protected virtual void OnPreRender()
+        private void OnPreRender()
         {
             var handler = PreRender;
             if (handler != null) handler();
         }
 
+        /// <inheritdoc />
         public event Action<RenderFinishedEventArgs> PartialRenderFinished;
 
-        public virtual void OnPartialRenderFinished(RenderFinishedEventArgs e)
+        internal void OnPartialRenderFinished(RenderFinishedEventArgs e)
         {
             Action<RenderFinishedEventArgs> handler = PartialRenderFinished;
             if (handler != null) handler(e);
         }
 
+        /// <inheritdoc />
         public event Action<RenderFinishedEventArgs> RenderFinished;
-        protected virtual void OnRenderFinished()
+        private void OnRenderFinished()
         {
             var result = Canvas.OnRenderFinished();
             Action<RenderFinishedEventArgs> handler = RenderFinished;
@@ -232,15 +249,17 @@ namespace AlphaTab.Rendering
             });
         }
 
+        /// <inheritdoc />
         public event Action<string, Exception> Error;
-        protected virtual void OnError(string type, Exception details)
+        private void OnError(string type, Exception details)
         {
             var handler = Error;
             if (handler != null) handler(type, details);
         }
 
+        /// <inheritdoc />
         public event Action PostRenderFinished;
-        protected virtual void OnPostRender()
+        private void OnPostRender()
         {
             Action handler = PostRenderFinished;
             if (handler != null) handler();

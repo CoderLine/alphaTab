@@ -25,29 +25,86 @@ namespace AlphaTab.Rendering
     /// </summary>
     public class RenderingResources
     {
+        /// <summary>
+        /// Gets or sets the font to use for displaying the songs copyright information in the header of the music sheet. 
+        /// </summary>
         public Font CopyrightFont { get; set; }
+        /// <summary>
+        /// Gets or sets the font to use for displaying the songs title in the header of the music sheet. 
+        /// </summary>
         public Font TitleFont { get; set; }
+        /// <summary>
+        /// Gets or sets the font to use for displaying the songs subtitle in the header of the music sheet. 
+        /// </summary>
         public Font SubTitleFont { get; set; }
+        /// <summary>
+        /// Gets or sets the font to use for displaying the lyrics information in the header of the music sheet. 
+        /// </summary>
         public Font WordsFont { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the font to use for displaying certain effect related elements in the music sheet. 
+        /// </summary>
         public Font EffectFont { get; set; }
+
+        /// <summary>
+        /// Gets or sets the font to use for displaying the fretboard numbers in chord diagrams.
+        /// </summary>
         public Font FretboardNumberFont { get; set; }
 
+        /// <summary>
+        /// Gets or sets the font to use for displaying the guitar tablature numbers in the music sheet. 
+        /// </summary>
         public Font TablatureFont { get; set; }
+        /// <summary>
+        /// Gets or sets the font to use for grace notation related texts in the music sheet.
+        /// </summary>
         public Font GraceFont { get; set; }
 
+        /// <summary>
+        /// Gets or sets the color to use for rendering the lines of staves. 
+        /// </summary>
         public Color StaffLineColor { get; set; }
+        /// <summary>
+        /// Gets or sets the color to use for rendering bar separators, the accolade and repeat signs. 
+        /// </summary>
         public Color BarSeparatorColor { get; set; }
 
+        /// <summary>
+        /// Gets or sets the font to use for displaying the bar numbers above the music sheet. 
+        /// </summary>
         public Font BarNumberFont { get; set; }
+        /// <summary>
+        /// Gets or sets the color to use for displaying the bar numbers above the music sheet. 
+        /// </summary>
         public Color BarNumberColor { get; set; }
 
+        /// <summary>
+        /// Gets or sets the font to use for displaying finger information in the music sheet.
+        /// </summary>
         public Font FingeringFont { get; set; }
+
+        /// <summary>
+        /// Gets or sets the font to use for section marker labels shown above the music sheet. 
+        /// </summary>
         public Font MarkerFont { get; set; }
 
+        /// <summary>
+        /// Gets or sets the color to use for music notation elements of the primary voice. 
+        /// </summary>
         public Color MainGlyphColor { get; set; }
+        /// <summary>
+        /// Gets or sets the color to use for music notation elements of the secondary voices. 
+        /// </summary>
         public Color SecondaryGlyphColor { get; set; }
+        /// <summary>
+        /// Gets or sets the color to use for displaying the song information above the music sheet. 
+        /// </summary>
         public Color ScoreInfoColor { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RenderingResources"/> class.
+        /// </summary>
         public RenderingResources()
         {
             const string sansFont = "Arial";
