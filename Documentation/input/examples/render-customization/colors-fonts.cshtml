@@ -74,7 +74,7 @@ Order: 10
         <div class="js">
             <script type="text/x-alphatab">
                 $('#alphaTabScriptInit').alphaTab({
-                  file: '/Documentation/output/assets/files/features/Skillet.gp5',
+                  file: '@Context.GetLink("/assets/files/features/Skillet.gp5")',
                   resources: {
                     copyrightFont: "12px Roboto bold",
                     titleFont: "32px 'Roboto Slab'",
@@ -104,7 +104,7 @@ Order: 10
             <style>
                 .alphaTabSurface { background: #000; }
             </style>
-            <div id="alphaTabDataInit" data-file="/Documentation/output/assets/files/features/Skillet.gp5"
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/features/Skillet.gp5")"
                 data-resources-copyrightFont="12px Roboto bold"
                 data-resources-titleFont="32px 'Roboto Slab'"
                 data-resources-subTitleFont="20px 'Roboto Slab'"

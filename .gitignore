@@ -47,7 +47,10 @@ _ReSharper*/
 /Tools/fontconverter/font/*
 /Tools/gpx-decompress/test/*
 /Tools/gpx-decompress/bin/*
+/Documentation/config.wyam.hash
+/Documentation/config.wyam.dll
 /Documentation/input/assets/js/alphaTab/*
+/Documentation/input/assets/files/*
 /Documentation/output/*
 /Private
 /Samples/JavaScript/files/Test.gp5

@@ -68,7 +68,7 @@ before_build:
 test:
   assemblies:
     only: 
-      - Source\AlphaTab.Test.CSharp\bin\Release\net471\AlphaTab.Test.CSharp.dll
+      - Source\AlphaTab.Test.CSharp\bin\Release\net472\AlphaTab.Test.CSharp.dll
 
 after_test:
   # Run JS tests

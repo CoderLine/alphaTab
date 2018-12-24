@@ -16,26 +16,13 @@
  * License along with this library.
  */
 using System;
-using AlphaTab.Audio;
-using AlphaTab.Audio.Synth;
-using AlphaTab.Audio.Synth.Synthesis;
 using AlphaTab.Audio.Generator;
 using AlphaTab.Audio.Synth.Midi;
-using AlphaTab.Collections;
-using AlphaTab.Haxe;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Importer;
-using AlphaTab.IO;
-using AlphaTab.Model;
-using AlphaTab.Rendering;
-using AlphaTab.Rendering.Glyphs;
-using AlphaTab.Rendering.Utils;
 using AlphaTab.UI;
-using AlphaTab.Util;
-using Haxe;
 using Haxe.Js.Html;
-using Phase;
 
 namespace AlphaTab.Platform.JavaScript
 {
@@ -182,7 +169,7 @@ namespace AlphaTab.Platform.JavaScript
             generator.Generate();
 
             var binary = midiFile.ToBinary();
-            Uint8Array uint8Array = Script.Write<Uint8Array>("binary.toUint8Array()");
+            Uint8Array uint8Array = Phase.Script.Write<Uint8Array>("binary.toUint8Array()");
             var fileName = string.IsNullOrEmpty(Score.Title) ? "File.mid" : Score.Title + ".mid";
             var dlLink = (AnchorElement)Browser.Document.CreateElement("a");
             dlLink.Download = fileName;

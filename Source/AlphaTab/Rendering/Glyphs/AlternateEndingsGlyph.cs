@@ -18,6 +18,7 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
@@ -57,6 +58,10 @@ namespace AlphaTab.Rendering.Glyphs
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             base.Paint(cx, cy, canvas);
+
+            var baseline = canvas.TextBaseline;
+            canvas.TextBaseline = TextBaseline.Top;
+
             if (_endings.Count > 0)
             {
                 var res = Renderer.Resources;
@@ -68,6 +73,8 @@ namespace AlphaTab.Rendering.Glyphs
 
                 canvas.FillText(_endingsString, cx + X + Padding * Scale, cy + Y * Scale);
             }
+
+            canvas.TextBaseline = baseline;
         }
     }
 }

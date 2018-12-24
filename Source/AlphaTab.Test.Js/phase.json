@@ -10,7 +10,7 @@
     {
       "name": "Copying testfiles to runner directory",
       "executable": "cmd.exe",
-      "arguments": "/C xcopy ..\\AlphaTab.Test\\TestFiles test\\TestFiles\\ /Y /S /D"
+      "arguments": "/C xcopy ..\\..\\TestData test\\TestFiles\\ /Y /S /D"
     }
   ]
 }

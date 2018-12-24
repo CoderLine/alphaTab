@@ -3,8 +3,9 @@
     <RootNamespace>AlphaTab.Test.CSharp</RootNamespace>
     <AssemblyName>AlphaTab.Test.CSharp</AssemblyName>
     <TargetFramework>net472</TargetFramework>
-	  <PackageId>AlphaTab.Test.CSharp</PackageId>
+    <PackageId>AlphaTab.Test.CSharp</PackageId>
     <NoWarn>$(NoWarn);0626;0824</NoWarn>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,5 +28,12 @@
   </ItemGroup>
 
   <Import Project="..\AlphaTab.Test\AlphaTab.Test.projitems" Label="Shared" />
+
+  <ItemGroup>
+    <TestData Include="$(SolutionDir)TestData\**\*.*" />
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="AfterBuild">
+    <Copy SourceFiles="@(TestData)" DestinationFiles="@(TestData->'$(ProjectDir)$(OutDir)TestFiles\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
 
 </Project>

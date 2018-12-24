@@ -15,10 +15,15 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
+using System;
+using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
+using AlphaTab.Util;
 using SkiaSharp;
 
 namespace AlphaTab.Platform.CSharp
@@ -28,8 +33,44 @@ namespace AlphaTab.Platform.CSharp
         private static readonly SKTypeface MusicFont;
         private static readonly int MusicFontSize = 34;
 
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern IntPtr LoadLibrary(string libname);
+
         static SkiaCanvas()
         {
+            // https://github.com/mono/SkiaSharp/issues/713
+            // https://github.com/mono/SkiaSharp/issues/572
+            // manually load skia lib
+            switch (System.Environment.OSVersion.Platform)
+            {
+                case PlatformID.MacOSX:
+                case PlatformID.Unix:
+                    // I think unix platforms should be fine, to be tested
+                    break;
+                default:
+                    string libSkiaSharpPath = Path.GetDirectoryName(typeof(SkiaCanvas).Assembly.Location);
+                    if (IntPtr.Size == 4)
+                    {
+                        libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "x86", "libSkiaSharp.dll");
+                    }
+                    else
+                    {
+                        libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "x64", "libSkiaSharp.dll");
+                    }
+                    Logger.Debug("Skia", "Loading native lib from '" + libSkiaSharpPath + "'");
+                    var lib = LoadLibrary(libSkiaSharpPath);
+                    if (lib == IntPtr.Zero)
+                    {
+                        Logger.Warning("Skia", "Loading native lib from '" + libSkiaSharpPath + "' failed");
+                    }
+                    else
+                    {
+                        Logger.Debug("Skia", "Loading native lib from '" + libSkiaSharpPath + "' successful");
+                    }
+                    break;
+            }
+
+            // attempt to load correct skia native lib
             var type = typeof(SkiaCanvas).GetTypeInfo();
             var bravura = type.Assembly.GetManifestResourceStream(type.Namespace + ".Bravura.ttf");
             {
@@ -80,14 +121,14 @@ namespace AlphaTab.Platform.CSharp
             LineWidth = 1;
             Font = new Font("Arial", 10);
             TextAlign = TextAlign.Left;
-            TextBaseline = TextBaseline.Middle;
+            TextBaseline = TextBaseline.Top;
         }
 
         public void BeginRender(float width, float height)
         {
             _width = width;
             _height = height;
-            var newImage = SKSurface.Create((int)width, (int)height, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
+            var newImage = SKSurface.Create(new SKImageInfo((int)width, (int)height, SKImageInfo.PlatformColorType, SKAlphaType.Premul));
             _surface = newImage;
             if (_path != null)
             {
@@ -238,7 +279,7 @@ namespace AlphaTab.Platform.CSharp
             switch (baseline)
             {
                 case TextBaseline.Top: // TopTextBaseline
-                    return paint.FontMetrics.Ascent;
+                    return -paint.FontMetrics.Ascent;
                 case TextBaseline.Middle: // MiddleTextBaseline
                     return -paint.FontMetrics.Descent + paint.TextSize / 2;
                 case TextBaseline.Bottom: // BottomTextBaseline
@@ -252,6 +293,7 @@ namespace AlphaTab.Platform.CSharp
 
         public float MeasureText(string text)
         {
+            if (string.IsNullOrEmpty(text)) return 0;
             using (var paint = CreatePaint())
             {
                 paint.Typeface = TypeFace;

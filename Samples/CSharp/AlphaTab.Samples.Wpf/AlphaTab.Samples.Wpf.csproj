@@ -2,8 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <OutputType>WinExe</OutputType>
-        <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
-
+    <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
   </PropertyGroup>
 
   <ItemGroup>
