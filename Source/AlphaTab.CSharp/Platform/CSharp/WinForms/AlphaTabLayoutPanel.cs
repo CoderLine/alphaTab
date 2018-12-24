@@ -25,7 +25,7 @@ using System.Windows.Forms.Layout;
 
 namespace AlphaTab.Platform.CSharp.WinForms
 {
-    public class AlphaTabLayoutPanel : Panel
+    class AlphaTabLayoutPanel : Panel
     {
         private AlphaTabLayoutEngine _laoyutEngine;
 

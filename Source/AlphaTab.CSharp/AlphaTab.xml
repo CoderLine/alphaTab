@@ -125,6 +125,11 @@
             <param name="insertPos">The index at which the item should be inserted</param>
             <param name="item">The item to insert.</param>
         </member>
+        <member name="M:AlphaTab.Collections.FastList`1.Clear">
+            <summary>
+            Remove all elements from the list.
+            </summary>
+        </member>
         <member name="T:AlphaTab.Audio.Synth.Ds.SampleArray">
             <summary>
             Represents an array of audiosamples. 
@@ -6138,6 +6143,21 @@
              <li><strong>rhythm</strong> - Renders rhythm beams to tablature notes</li>
             </ul>
             </summary>
+        </member>
+        <member name="M:AlphaTab.StaveSettings.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:AlphaTab.StaveSettings"/> class.
+            </summary>
+            <param name="id">The id of the settings defining the display mode.</param>
+        </member>
+        <member name="M:AlphaTab.StaveSettings.Get``1(System.String,``0)">
+            <summary>
+            Gets the staff layout specific setting using the given key. 
+            </summary>
+            <typeparam name="T">The data type fo the stored value.</typeparam>
+            <param name="key">The key of the setting.</param>
+            <param name="def">The default value to return if no setting was specified.</param>
+            <returns>The user defined setting for the given key, or <paramref name="def"/> if the user did not specify a custom setting.</returns>
         </member>
         <member name="T:AlphaTab.UI.Cursors">
             <summary>

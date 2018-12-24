@@ -502,7 +502,7 @@ namespace AlphaTab
         public string Id { get; set; }
 
         /// <summary>
-        /// Additional stave sspecific settings
+        /// Additional stave specific settings
         /// <strong>id=tab</strong>
         /// <ul>
         ///  <li><strong>rhythm</strong> - Renders rhythm beams to tablature notes</li>

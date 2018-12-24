@@ -22,7 +22,7 @@ using System.Windows.Controls;
 
 namespace AlphaTab.Platform.CSharp.Wpf
 {
-    public class AlphaTabLayoutPanel : Panel
+    class AlphaTabLayoutPanel : Panel
     {
         protected override Size MeasureOverride(Size availableSize)
         {
