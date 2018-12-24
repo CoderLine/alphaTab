@@ -9,6 +9,12 @@
     <NoWarn>$(NoWarn);0162</NoWarn>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net472'">
+    <ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
+    <ExtrasEnableWinFormsProjectSetup>true</ExtrasEnableWinFormsProjectSetup>
+    <ExtrasEnableUserControlDesigner>true</ExtrasEnableUserControlDesigner>
+  </PropertyGroup>
+
   <PropertyGroup Condition=" '$(TargetFramework)' == 'MonoAndroid8.1' ">
     <DefineConstants>$(DefineConstants);ANDROID;</DefineConstants>
   </PropertyGroup>
@@ -16,7 +22,6 @@
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="1.68.0" />
     <PackageReference Include="Wyam" Version="2.1.1" PrivateAssets="All" />
-    <PackageReference Include="Xamarin.Forms" Version="3.4.0.1008975" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,7 +39,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'MonoAndroid8.1'">
-    <PackageReference Include="Xamarin.Forms" Version="2.3.4.231" PrivateAssets="All" />
+    <PackageReference Include="Xamarin.Forms" Version="3.4.0.1008975" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,6 +48,12 @@
 
   <ItemGroup>
     <Resource Include="Platform\CSharp\Wpf\Templates.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Platform\CSharp\Wpf\Templates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
   </ItemGroup>
 
   <Import Project="..\AlphaTab\AlphaTab.Shared.projitems" Label="Shared" />
