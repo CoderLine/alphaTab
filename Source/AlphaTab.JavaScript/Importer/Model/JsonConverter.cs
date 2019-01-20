@@ -135,7 +135,7 @@ namespace AlphaTab.Model
                         var chord = staff.Chords[key];
                         Chord chord2 = Platform.Platform.NewObject();
                         Chord.CopyTo(chord, chord2);
-                        staff2.Chords[key] = chord;
+                        staff2.Chords[key] = chord2;
                     }
 
                     #region Bars
