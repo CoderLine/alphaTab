@@ -748,5 +748,28 @@ namespace AlphaTab.Test.Importer
             }
         }
 
+        [TestMethod]
+        public void TestSlides()
+        {
+            var tex = @"3.3{sl} 4.3 | 3.3{ss} 4.3 | 3.3{sib} 3.3{sia} 3.3{sou} 3.3{sod} | 3.3{psd} 3.3{psu}";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(4, score.MasterBars.Count);
+
+            Assert.AreEqual(SlideType.Legato, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].SlideType);
+            Assert.AreEqual(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].Id, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].SlideTarget.Id);
+
+            Assert.AreEqual(SlideType.Shift, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].SlideType);
+            Assert.AreEqual(score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[1].Notes[0].Id, score.Tracks[0].Staves[0].Bars[1].Voices[0].Beats[0].Notes[0].SlideTarget.Id);
+
+            Assert.AreEqual(SlideType.IntoFromBelow, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[0].Notes[0].SlideType);
+            Assert.AreEqual(SlideType.IntoFromAbove, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[1].Notes[0].SlideType);
+            Assert.AreEqual(SlideType.OutUp, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[2].Notes[0].SlideType);
+            Assert.AreEqual(SlideType.OutDown, score.Tracks[0].Staves[0].Bars[2].Voices[0].Beats[3].Notes[0].SlideType);
+
+            Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].Notes[0].SlideType);
+            Assert.AreEqual(SlideType.PickSlideUp, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].Notes[0].SlideType);
+        }
     }
 }

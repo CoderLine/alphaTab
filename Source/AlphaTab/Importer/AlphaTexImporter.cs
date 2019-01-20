@@ -1669,6 +1669,36 @@ namespace AlphaTab.Importer
                     NewSy();
                     note.SlideType = SlideType.Shift;
                 }
+                else if (syData == "sib")
+                {
+                    NewSy();
+                    note.SlideType = SlideType.IntoFromBelow;
+                }
+                else if (syData == "sia")
+                {
+                    NewSy();
+                    note.SlideType = SlideType.IntoFromAbove;
+                }
+                else if (syData == "sou")
+                {
+                    NewSy();
+                    note.SlideType = SlideType.OutUp;
+                }
+                else if (syData == "sod")
+                {
+                    NewSy();
+                    note.SlideType = SlideType.OutDown;
+                }
+                else if (syData == "psd")
+                {
+                    NewSy();
+                    note.SlideType = SlideType.PickSlideDown;
+                }
+                else if (syData == "psu")
+                {
+                    NewSy();
+                    note.SlideType = SlideType.PickSlideUp;
+                }
                 else if (syData == "h")
                 {
                     NewSy();
