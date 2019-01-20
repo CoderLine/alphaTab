@@ -241,7 +241,7 @@ namespace AlphaTab.Model
                     beat.PlaybackStart = currentPlaybackTick;
                     currentPlaybackTick = beat.PlaybackStart + beat.PlaybackDuration;
                 }
-
+                beat.FinishTuplet();
                 _beatLookup[beat.DisplayStart] = beat;
             }
         }

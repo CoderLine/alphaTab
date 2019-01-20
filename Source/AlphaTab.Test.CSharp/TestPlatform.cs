@@ -118,7 +118,7 @@ namespace AlphaTab.Test
                 {
                     referenceBitmap = SKBitmap.Decode(data);
                 }
-
+                 
                 using (referenceBitmap)
                 {
                     var compareResult = PixelMatch.Run(finalBitmap, referenceBitmap, new PixelMatchOptions
@@ -127,6 +127,7 @@ namespace AlphaTab.Test
                         IgnoreTransparent = true,
                         CreateOutputImage = true
                     });
+
 
                     using (compareResult.Output)
                     {

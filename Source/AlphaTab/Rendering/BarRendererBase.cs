@@ -322,7 +322,7 @@ namespace AlphaTab.Rendering
             _preBeatGlyphs.AddGlyph(g);
         }
 
-        protected void AddBeatGlyph(BeatContainerGlyph g)
+        protected virtual void AddBeatGlyph(BeatContainerGlyph g)
         {
             g.Renderer = this;
             g.PreNotes.Renderer = this;

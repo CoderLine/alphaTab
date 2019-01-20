@@ -214,6 +214,8 @@ namespace AlphaTab.Model
         public bool HasTuplet => !(TupletDenominator == -1 && TupletNumerator == -1) &&
                                  !(TupletDenominator == 1 && TupletNumerator == 1);
 
+        public TupletGroup TupletGroup { get; set; }
+
         /// <summary>
         /// Gets or sets whether this beat continues a whammy effect. 
         /// </summary>
@@ -621,6 +623,25 @@ namespace AlphaTab.Model
             //        next = next.NextBeat;
             //    }
             //}
+        }
+
+        internal void FinishTuplet()
+        {
+            if (HasTuplet)
+            {
+                var previousBeat = PreviousBeat;
+                var currentTupletGroup = previousBeat != null && previousBeat.HasTuplet
+                    ? previousBeat.TupletGroup
+                    : null;
+
+                if (previousBeat == null || currentTupletGroup == null || !currentTupletGroup.Check(this))
+                {
+                    currentTupletGroup = new TupletGroup(Voice);
+                    currentTupletGroup.Check(this);
+                }
+
+                TupletGroup = currentTupletGroup;
+            }
         }
 
         internal void Finish(Settings settings)

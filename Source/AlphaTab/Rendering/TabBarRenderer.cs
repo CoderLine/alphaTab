@@ -19,6 +19,7 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
+using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Rendering.Utils;
 
@@ -32,6 +33,8 @@ namespace AlphaTab.Rendering
         public const string StaffId = "tab";
 
         public const float LineSpacing = 10;
+
+        private float _tupletSize = 0;
 
         public bool ShowTimeSignature { get; set; }
         public bool ShowRests { get; set; }
@@ -91,6 +94,33 @@ namespace AlphaTab.Rendering
             }
 
             base.UpdateSizes();
+        }
+
+        public override void DoLayout()
+        {
+            base.DoLayout();
+            if (RenderRhythm)
+            {
+                var hasTuplets = false;
+                foreach (var voice in Bar.Voices)
+                {
+                    if (HasVoiceContainer(voice))
+                    {
+                        var c = GetOrCreateVoiceContainer(voice);
+                        if (c.TupletGroups.Count > 0)
+                        {
+                            hasTuplets = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (hasTuplets)
+                {
+                    _tupletSize = Resources.EffectFont.Size * 0.8f;
+                    RegisterOverflowBottom(_tupletSize);
+                }
+            }
         }
 
         protected override void CreatePreBeatGlyphs()
@@ -282,6 +312,7 @@ namespace AlphaTab.Rendering
             if (RenderRhythm)
             {
                 PaintBeams(cx, cy, canvas);
+                PaintTuplets(cx, cy, canvas);
             }
         }
 
@@ -295,6 +326,20 @@ namespace AlphaTab.Rendering
                 {
                     var h = v[k];
                     PaintBeamHelper(cx + BeatGlyphsStart, cy, canvas, h);
+                }
+            }
+        }
+        private void PaintTuplets(float cx, float cy, ICanvas canvas)
+        {
+            foreach (var voice in Bar.Voices)
+            {
+                if (HasVoiceContainer(voice))
+                {
+                    var container = GetOrCreateVoiceContainer(voice);
+                    foreach (var tupletGroup in container.TupletGroups)
+                    {
+                        PaintTupletHelper(cx + BeatGlyphsStart, cy, canvas, tupletGroup);
+                    }
                 }
             }
         }
@@ -316,6 +361,7 @@ namespace AlphaTab.Rendering
             }
         }
 
+
         private void PaintBar(float cx, float cy, ICanvas canvas, BeamingHelper h)
         {
             for (int i = 0, j = h.Beats.Count; i < j; i++)
@@ -329,12 +375,12 @@ namespace AlphaTab.Rendering
                     //
                     var beatLineX = h.GetBeatLineX(beat);
                     var y1 = cy + Y;
-                    var y2 = cy + Y + Height;
+                    var y2 = cy + Y + Height - _tupletSize;
 
                     var startGlyph = (TabBeatGlyph)GetOnNotesGlyphForBeat(beat);
                     if (startGlyph.NoteNumbers == null)
                     {
-                        y1 += Height - RhythmHeight;
+                        y1 += Height - RhythmHeight - _tupletSize;
                     }
                     else
                     {
@@ -356,12 +402,10 @@ namespace AlphaTab.Rendering
                     canvas.Stroke();
 
                     var brokenBarOffset = (6 * Scale);
-                    var barSpacing = (6 * Scale);
+                    var barSpacing = (-6 * Scale);
                     var barSize = (3 * Scale);
                     var barCount = beat.Duration.GetIndex() - 2;
-                    var barStart = cy + Y;
-                    barSpacing = -barSpacing;
-                    barStart += Height;
+                    var barStart = y2;
 
                     for (int barIndex = 0; barIndex < barCount; barIndex++)
                     {
@@ -438,6 +482,163 @@ namespace AlphaTab.Rendering
             }
         }
 
+        private void PaintTupletHelper(float cx, float cy, ICanvas canvas, TupletGroup h)
+        {
+            var res = Resources;
+            var oldAlign = canvas.TextAlign;
+            canvas.Color = h.Voice.Index == 0
+                ? Resources.MainGlyphColor
+                : Resources.SecondaryGlyphColor;
+            canvas.TextAlign = TextAlign.Center;
+            string s;
+            var num = h.Beats[0].TupletNumerator;
+            var den = h.Beats[0].TupletDenominator;
+
+            // list as in Guitar Pro 7. for certain tuplets only the numerator is shown
+            if (num == 2 && den == 3)
+            {
+                s = "2";
+            }
+            else if (num == 3 && den == 2)
+            {
+                s = "3";
+            }
+            else if (num == 4 && den == 6)
+            {
+                s = "4";
+            }
+            else if (num == 5 && den == 4)
+            {
+                s = "5";
+            }
+            else if (num == 6 && den == 4)
+            {
+                s = "6";
+            }
+            else if (num == 7 && den == 4)
+            {
+                s = "7";
+            }
+            else if (num == 9 && den == 8)
+            {
+                s = "9";
+            }
+            else if (num == 10 && den == 8)
+            {
+                s = "10";
+            }
+            else if (num == 11 && den == 8)
+            {
+                s = "11";
+            }
+            else if (num == 12 && den == 8)
+            {
+                s = "12";
+            }
+            else if (num == 13 && den == 8)
+            {
+                s = "13";
+            }
+            else
+            {
+                s = num + ":" + den;
+            }
+
+            // check if we need to paint simple footer
+            if (h.Beats.Count == 1 || (!h.IsFull))
+            {
+                for (int i = 0, j = h.Beats.Count; i < j; i++)
+                {
+                    var beat = h.Beats[i];
+                    var beamingHelper = Helpers.BeamHelperLookup[h.Voice.Index][beat.Index];
+                    if (beamingHelper == null) continue;
+
+                    var tupletX = beamingHelper.GetBeatLineX(beat);
+                    var startGlyph = (TabBeatGlyph)GetOnNotesGlyphForBeat(beat);
+                    if (beamingHelper.Direction == BeamDirection.Up)
+                    {
+                        tupletX -= startGlyph.Width / 2f;
+                    }
+                    else
+                    {
+                        tupletX += startGlyph.Width / 2f;
+                    }
+
+                    var tupletY = cy + Y + Height - _tupletSize + res.EffectFont.Size * 0.5f;
+
+                    canvas.Font = res.EffectFont;
+                    canvas.FillText(s, cx + X + tupletX, tupletY);
+                }
+            }
+            else
+            {
+                var firstBeat = h.Beats[0];
+                var lastBeat = h.Beats[h.Beats.Count - 1];
+
+                var firstBeamingHelper = Helpers.BeamHelperLookup[h.Voice.Index][firstBeat.Index];
+                var lastBeamingHelper = Helpers.BeamHelperLookup[h.Voice.Index][lastBeat.Index];
+                if (firstBeamingHelper != null && lastBeamingHelper != null)
+                {
+                    // 
+                    // Calculate the overall area of the tuplet bracket
+
+                    var startX = firstBeamingHelper.GetBeatLineX(firstBeat);
+                    var endX = lastBeamingHelper.GetBeatLineX(lastBeat);
+
+                    var startGlyph = (TabBeatGlyph)GetOnNotesGlyphForBeat(firstBeat);
+                    var endGlyph = (TabBeatGlyph)GetOnNotesGlyphForBeat(firstBeat);
+                    if (firstBeamingHelper.Direction == BeamDirection.Up)
+                    {
+                        startX -= startGlyph.Width / 2f;
+                        endX -= endGlyph.Width / 2f;
+                    }
+                    else
+                    {
+                        startX += startGlyph.Width / 2f;
+                        endX += endGlyph.Width / 2f;
+                    }
+
+                    //
+                    // Calculate how many space the text will need
+                    canvas.Font = res.EffectFont;
+                    var sw = canvas.MeasureText(s);
+                    var sp = 3 * Scale;
+
+                    // 
+                    // Calculate the offsets where to break the bracket
+                    var middleX = (startX + endX) / 2;
+                    var offset1X = middleX - sw / 2 - sp;
+                    var offset2X = middleX + sw / 2 + sp;
+
+                    //
+                    // calculate the y positions for our bracket
+                    var startY = cy + Y + Height - _tupletSize + res.EffectFont.Size * 0.5f;
+
+                    var offset = -res.EffectFont.Size * 0.25f;
+                    var size = -5 * Scale;
+
+                    //
+                    // draw the bracket
+                    canvas.BeginPath();
+                    canvas.MoveTo(cx + X + startX, (int)(startY - offset));
+                    canvas.LineTo(cx + X + startX, (int)(startY - offset - size));
+                    canvas.LineTo(cx + X + offset1X, (int)(startY - offset - size));
+                    canvas.Stroke();
+
+                    canvas.BeginPath();
+                    canvas.MoveTo(cx + X + offset2X, (int)(startY - offset - size));
+                    canvas.LineTo(cx + X + endX, (int)(startY - offset - size));
+                    canvas.LineTo(cx + X + endX, (int)(startY - offset));
+                    canvas.Stroke();
+
+                    //
+                    // Draw the string
+                    canvas.FillText(s, cx + X + middleX, startY);
+                }
+            }
+            canvas.TextAlign = oldAlign;
+        }
+
         private static void PaintSingleBar(ICanvas canvas, float x1, float y1, float x2, float y2, float size)
         {
             canvas.BeginPath();
@@ -465,12 +666,12 @@ namespace AlphaTab.Rendering
 
                 var beatLineX = h.GetBeatLineX(beat);
                 var y1 = cy + Y;
-                var y2 = cy + Y + Height;
+                var y2 = cy + Y + Height - _tupletSize;
 
                 var startGlyph = (TabBeatGlyph) GetOnNotesGlyphForBeat(beat);
                 if (startGlyph.NoteNumbers == null)
                 {
-                    y1 += Height - RhythmHeight;
+                    y1 += Height - RhythmHeight - _tupletSize;
                 }
                 else
                 {

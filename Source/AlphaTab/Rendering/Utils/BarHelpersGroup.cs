@@ -26,16 +26,12 @@ namespace AlphaTab.Rendering.Utils
     {
         public FastList<FastList<BeamingHelper>> BeamHelpers { get; set; }
         public FastList<FastDictionary<int, BeamingHelper>> BeamHelperLookup { get; set; }
-        public FastList<FastList<TupletHelper>> TupletHelpers { get; set; }
-
         public BarHelpers(Bar bar)
         {
             BeamHelpers = new FastList<FastList<BeamingHelper>>();
             BeamHelperLookup = new FastList<FastDictionary<int, BeamingHelper>>();
-            TupletHelpers = new FastList<FastList<TupletHelper>>();
 
             BeamingHelper currentBeamHelper = null;
-            TupletHelper currentTupletHelper = null;
 
             if (bar != null)
             {
@@ -44,11 +40,11 @@ namespace AlphaTab.Rendering.Utils
                     var v = bar.Voices[i];
                     BeamHelpers.Add(new FastList<BeamingHelper>());
                     BeamHelperLookup.Add(new FastDictionary<int, BeamingHelper>());
-                    TupletHelpers.Add(new FastList<TupletHelper>());
 
                     for (int k = 0, l = v.Beats.Count; k < l; k++)
                     {
                         var b = v.Beats[k];
+                        var hasNewTupletHelper = false;
                         var forceNewTupletHelper = false;
 
                         // if a new beaming helper was started, we close our tuplet grouping as well
@@ -73,29 +69,6 @@ namespace AlphaTab.Rendering.Utils
                             }
                         }
 
-                        if (b.HasTuplet)
-                        {
-                            // try to fit tuplet to current tuplethelper
-                            // TODO: register tuplet overflow
-                            var previousBeat = b.PreviousBeat;
-
-                            // don't group if the previous beat isn't in the same voice
-                            if (previousBeat != null && previousBeat.Voice != b.Voice) previousBeat = null;
-
-                            // if a new beaming helper was started, we close our tuplet grouping as well
-                            if (forceNewTupletHelper && currentTupletHelper != null)
-                            {
-                                currentTupletHelper.Finish();
-                            }
-
-                            if (previousBeat == null || currentTupletHelper == null || !currentTupletHelper.Check(b))
-                            {
-                                currentTupletHelper = new TupletHelper(v.Index);
-                                currentTupletHelper.Check(b);
-                                TupletHelpers[v.Index].Add(currentTupletHelper);
-                            }
-                        }
-
                         BeamHelperLookup[v.Index][b.Index] = currentBeamHelper;
                     }
 
@@ -104,13 +77,7 @@ namespace AlphaTab.Rendering.Utils
                         currentBeamHelper.Finish();
                     }
 
-                    if (currentTupletHelper != null)
-                    {
-                        currentTupletHelper.Finish();
-                    }
-
                     currentBeamHelper = null;
-                    currentTupletHelper = null;
                 }
             }
         }

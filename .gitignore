@@ -74,6 +74,7 @@ _ReSharper*/
 /JavaScript.zip
 /*.nupkg
 /Documentation.zip
+/Source/AlphaTab.CSharp/AlphaTab.xml
 
 # temps
 .DS_Store 

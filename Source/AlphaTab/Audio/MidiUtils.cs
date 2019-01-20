@@ -92,6 +92,11 @@ namespace AlphaTab.Audio
             return ticks * denominator / numerator;
         }
 
+        public static int RemoveTuplet(int ticks, int numerator, int denominator)
+        {
+            return (ticks * numerator) / denominator;
+        }
+
         public static int DynamicToVelocity(DynamicValue dyn)
         {
             return (MinVelocity + ((int)(dyn) * VelocityIncrement));

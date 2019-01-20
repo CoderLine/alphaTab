@@ -464,6 +464,22 @@ namespace AlphaTab.Rendering.Utils
                 return start1 == start2;
             }
 
+            // break between different tuplet groups
+            if (b1.TupletGroup != b2.TupletGroup)
+            {
+                return false;
+            }
+            if (b1.HasTuplet && b2.HasTuplet)
+            {
+                
+                // force joining for full tuplet groups
+                if (b1.TupletGroup == b2.TupletGroup && b1.TupletGroup.IsFull)
+                {
+                    return true;
+                }
+            }
+          
+
             // TODO: create more rules for automatic beaming
             var divisionLength = MidiUtils.QuarterTime;
             switch (m1.MasterBar.TimeSignatureDenominator)

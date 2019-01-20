@@ -38,11 +38,14 @@ namespace AlphaTab.Rendering.Glyphs
         public Voice Voice { get; set; }
         public float MinWidth { get; set; }
 
+        public FastList<TupletGroup> TupletGroups { get; set; }
+
         public VoiceContainerGlyph(float x, float y, Voice voice)
             : base(x, y)
         {
             Voice = voice;
             BeatGlyphs = new FastList<BeatContainerGlyph>();
+            TupletGroups = new FastList<TupletGroup>();
         }
 
         public void ScaleToWidth(float width)
@@ -101,13 +104,18 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void AddGlyph(Glyph g)
         {
+            var bg = (BeatContainerGlyph) g;
             g.X = BeatGlyphs.Count == 0
                 ? 0
                 : BeatGlyphs[BeatGlyphs.Count - 1].X + BeatGlyphs[BeatGlyphs.Count - 1].Width;
             g.Renderer = Renderer;
             g.DoLayout();
-            BeatGlyphs.Add((BeatContainerGlyph)g);
+            BeatGlyphs.Add(bg);
             Width = g.X + g.Width;
+            if (bg.Beat.HasTuplet && bg.Beat.TupletGroup.Beats[0].Id == bg.Beat.Id)
+            {
+                TupletGroups.Add(bg.Beat.TupletGroup);
+            }
         }
 
         public override void DoLayout()

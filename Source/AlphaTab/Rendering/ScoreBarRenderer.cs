@@ -158,6 +158,14 @@ namespace AlphaTab.Rendering
             }
         }
 
+        protected override void AddBeatGlyph(BeatContainerGlyph g)
+        {
+            base.AddBeatGlyph(g);
+            if (g.Beat.HasTuplet && g.Beat.Id == g.Beat.TupletGroup.Beats[0].Id)
+            {
+
+            }
+        }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
@@ -168,13 +176,15 @@ namespace AlphaTab.Rendering
 
         private void PaintTuplets(float cx, float cy, ICanvas canvas)
         {
-            for (int i = 0, j = Helpers.TupletHelpers.Count; i < j; i++)
+            foreach (var voice in Bar.Voices)
             {
-                var v = Helpers.TupletHelpers[i];
-                for (int k = 0, l = v.Count; k < l; k++)
+                if (HasVoiceContainer(voice))
                 {
-                    var h = v[k];
-                    PaintTupletHelper(cx + BeatGlyphsStart, cy, canvas, h);
+                    var container = GetOrCreateVoiceContainer(voice);
+                    foreach (var tupletGroup in container.TupletGroups)
+                    {
+                        PaintTupletHelper(cx + BeatGlyphsStart, cy, canvas, tupletGroup);
+                    }
                 }
             }
         }
@@ -211,18 +221,75 @@ namespace AlphaTab.Rendering
             }
         }
 
-        private void PaintTupletHelper(float cx, float cy, ICanvas canvas, TupletHelper h)
+        private void PaintTupletHelper(float cx, float cy, ICanvas canvas, TupletGroup h)
         {
             var res = Resources;
             var oldAlign = canvas.TextAlign;
+            canvas.Color = h.Voice.Index == 0
+                ? Resources.MainGlyphColor
+                : Resources.SecondaryGlyphColor;
             canvas.TextAlign = TextAlign.Center;
+            string s;
+            var num = h.Beats[0].TupletNumerator;
+            var den = h.Beats[0].TupletDenominator;
+
+            // list as in Guitar Pro 7. for certain tuplets only the numerator is shown
+            if (num == 2 && den == 3)
+            {
+                s = "2";
+            }
+            else if (num == 3 && den == 2)
+            {
+                s = "3";
+            }
+            else if (num == 4 && den == 6)
+            {
+                s = "4";
+            }
+            else if (num == 5 && den == 4)
+            {
+                s = "5";
+            }
+            else if (num == 6 && den == 4)
+            {
+                s = "6";
+            }
+            else if (num == 7 && den == 4)
+            {
+                s = "7";
+            }
+            else if (num == 9 && den == 8)
+            {
+                s = "9";
+            }
+            else if (num == 10 && den == 8)
+            {
+                s = "10";
+            }
+            else if (num == 11 && den == 8)
+            {
+                s = "11";
+            }
+            else if (num == 12 && den == 8)
+            {
+                s = "12";
+            }
+            else if (num == 13 && den == 8)
+            {
+                s = "13";
+            }
+            else
+            {
+                s = num + ":" + den;
+            }
+
             // check if we need to paint simple footer
-            if (h.Beats.Count == 1 || !h.IsFull)
+            if (h.Beats.Count == 1 || (!h.IsFull))
             {
                 for (int i = 0, j = h.Beats.Count; i < j; i++)
                 {
                     var beat = h.Beats[i];
-                    var beamingHelper = Helpers.BeamHelperLookup[h.VoiceIndex][beat.Index];
+                    var beamingHelper = Helpers.BeamHelperLookup[h.Voice.Index][beat.Index];
                     if (beamingHelper == null) continue;
                     var direction = beamingHelper.Direction;
 
@@ -230,11 +297,11 @@ namespace AlphaTab.Rendering
                     var tupletY = cy + Y + CalculateBeamY(beamingHelper, tupletX);
 
                     var offset = direction == BeamDirection.Up
-                                ? res.EffectFont.Size * 1.8f
+                                ? res.EffectFont.Size * 1.5f
                                 : -3 * Scale;
 
                     canvas.Font = res.EffectFont;
-                    canvas.FillText(h.Tuplet.ToString(), cx + X + tupletX, tupletY - offset);
+                    canvas.FillText(s, cx + X + tupletX, tupletY - offset);
                 }
             }
             else
@@ -242,8 +309,8 @@ namespace AlphaTab.Rendering
                 var firstBeat = h.Beats[0];
                 var lastBeat = h.Beats[h.Beats.Count - 1];
 
-                var firstBeamingHelper = Helpers.BeamHelperLookup[h.VoiceIndex][firstBeat.Index];
-                var lastBeamingHelper = Helpers.BeamHelperLookup[h.VoiceIndex][lastBeat.Index];
+                var firstBeamingHelper = Helpers.BeamHelperLookup[h.Voice.Index][firstBeat.Index];
+                var lastBeamingHelper = Helpers.BeamHelperLookup[h.Voice.Index][lastBeat.Index];
                 if (firstBeamingHelper != null && lastBeamingHelper != null)
                 {
                     var direction = firstBeamingHelper.Direction;
@@ -257,7 +324,6 @@ namespace AlphaTab.Rendering
                     //
                     // Calculate how many space the text will need
                     canvas.Font = res.EffectFont;
-                    var s = h.Tuplet.ToString();
                     var sw = canvas.MeasureText(s);
                     var sp = 3 * Scale;
 
@@ -304,7 +370,7 @@ namespace AlphaTab.Rendering
 
                     //
                     // Draw the string
-                    canvas.FillText(s, cx + X + middleX, cy + Y + middleY - offset - size - res.EffectFont.Size);
+                    canvas.FillText(s, cx + X + middleX, cy + Y + middleY - offset - size - res.EffectFont.Size /2f);
                 }
             }
             canvas.TextAlign = oldAlign;
@@ -312,9 +378,9 @@ namespace AlphaTab.Rendering
 
         private float GetStemSize(BeamingHelper helper)
         {
-             var size = helper.Beats.Count == 1
-                ? GetFooterStemSize(helper.ShortestDuration)
-                : GetBarStemSize(helper.ShortestDuration);
+            var size = helper.Beats.Count == 1
+               ? GetFooterStemSize(helper.ShortestDuration)
+               : GetBarStemSize(helper.ShortestDuration);
             if (helper.IsGrace)
             {
                 size = size * NoteHeadGlyph.GraceScale;

@@ -160,6 +160,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Model\TripletFeel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Tuning.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\TuningParser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Model\TupletGroup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\VibratoType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Voice.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\WhammyType.cs" />
@@ -312,7 +313,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\BeamingHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\BoundsLookup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\PercussionMapper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\TupletHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\IOHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Cursors.cs" />
