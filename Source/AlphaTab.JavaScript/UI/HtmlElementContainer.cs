@@ -105,18 +105,18 @@ namespace AlphaTab.UI
 
         public event Action<IMouseEventArgs> MouseDown
         {
-            add { Browser.Window.AddEventListener("mousedown", (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }), true); }
+            add { Element.AddEventListener("mousedown", (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }), true); }
             remove { }
         }
 
         public event Action<IMouseEventArgs> MouseMove
         {
-            add { Browser.Window.AddEventListener("mousemove", (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }), true); }
+            add { Element.AddEventListener("mousemove", (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }), true); }
             remove { }
         }
         public event Action<IMouseEventArgs> MouseUp
         {
-            add { Browser.Window.AddEventListener("mouseup", (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }), true); }
+            add { Element.AddEventListener("mouseup", (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }), true); }
             remove { }
         }
         public void Clear()
