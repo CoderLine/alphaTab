@@ -59,6 +59,6 @@
   <Import Project="..\AlphaTab\AlphaTab.Shared.projitems" Label="Shared" />
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy $(OutDir)$(TargetName)$(TargetExt) $(SolutionDir)Build\CSharp\$(TargetFramework)\ /Y&#xD;&#xA;xcopy $(OutDir)$(TargetName).pdb $(SolutionDir)Build\CSharp\$(TargetFramework)\ /Y&#xD;&#xA;xcopy $(OutDir)$(TargetName).xml $(SolutionDir)Build\CSharp\$(TargetFramework)\ /Y" />
+    <Exec Command="xcopy &quot;$(OutDir)$(TargetName)$(TargetExt)&quot; &quot;$(SolutionDir)Build\CSharp\$(TargetFramework)\&quot; /Y&#xD;&#xA;xcopy &quot;$(OutDir)$(TargetName).pdb&quot; &quot;$(SolutionDir)Build\CSharp\$(TargetFramework)\&quot; /Y&#xD;&#xA;xcopy &quot;$(OutDir)$(TargetName).xml&quot; &quot;$(SolutionDir)Build\CSharp\$(TargetFramework)\&quot; /Y" />
   </Target>
 </Project>
