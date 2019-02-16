@@ -829,6 +829,45 @@ namespace AlphaTab.Test.Importer
         }
 
         [TestMethod]
+        public void TestTupletRepeat()
+        {
+            var tex = @":8 5.3{tu 3}*3";
+            var score = ParseTex(tex);
+
+            var durations = new[]
+            {
+                Duration.Eighth,
+                Duration.Eighth,
+                Duration.Eighth,
+            };
+
+            var tuplets = new[]
+            {
+                3, 3, 3
+            };
+
+            var i = 0;
+            Beat b = score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0];
+            while (b != null)
+            {
+                Assert.AreEqual(durations[i], b.Duration, "Duration on beat " + i + " was wrong");
+                if (tuplets[i] == 1)
+                {
+                    Assert.IsFalse(b.HasTuplet, "Beat " + i + " had wrongly a tuplet");
+                }
+                else
+                {
+                    Assert.AreEqual(tuplets[i], b.TupletNumerator, "Tuplet on beat " + i + " was wrong");
+                }
+                b = b.NextBeat;
+                i++;
+            }
+
+            Assert.AreEqual(durations.Length, i);
+
+        }
+
+        [TestMethod]
         public void TestRangeTuplets()
         {
             var tex = @":4{tu 3} 3.3 3.3 3.3 :8 3.3 3.3 3.3 3.3 | :8{tu 3} 3.3 3.3 3.3 3.3.16 3.3.16 3.3.16 3.3.2{tu 1} 3.3.16{tu 1} 3.3.4 3.3.4 3.3.4";

@@ -1158,8 +1158,11 @@ namespace AlphaTab.Importer
                 NewSy();
             }
             beat.Duration = _currentDuration;
-            ApplyTuplet(beat, _currentTuplet);
-            
+            if(_currentTuplet != 1 && !beat.HasTuplet)
+            {
+                ApplyTuplet(beat, _currentTuplet);
+            }
+
             // beat multiplier (repeat beat n times)
             var beatRepeat = 1;
             if (_sy == AlphaTexSymbols.Multiply)
