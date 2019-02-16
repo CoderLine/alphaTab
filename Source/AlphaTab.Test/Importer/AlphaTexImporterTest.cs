@@ -775,7 +775,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestPopSlapTap()
         {
-            var tex = @"3.3{p} 3.3{s} 3.3{tp} r";
+            var tex = @"3.3{p} 3.3{s} 3.3{tt} r";
             var score = ParseTex(tex);
 
             Assert.IsTrue(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Pop, "Pop not set");

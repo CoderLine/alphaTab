@@ -1253,7 +1253,7 @@ namespace AlphaTab.Importer
                 NewSy();
                 return true;
             }
-            if (syData == "tp")
+            if (syData == "tt")
             {
                 beat.Tap = true;
                 NewSy();
