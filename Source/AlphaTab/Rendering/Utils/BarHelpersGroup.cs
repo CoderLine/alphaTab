@@ -32,6 +32,7 @@ namespace AlphaTab.Rendering.Utils
             BeamHelperLookup = new FastList<FastDictionary<int, BeamingHelper>>();
 
             BeamingHelper currentBeamHelper = null;
+            BeamingHelper currentGraceBeamHelper = null;
 
             if (bar != null)
             {
@@ -44,32 +45,45 @@ namespace AlphaTab.Rendering.Utils
                     for (int k = 0, l = v.Beats.Count; k < l; k++)
                     {
                         var b = v.Beats[k];
-                        var hasNewTupletHelper = false;
-                        var forceNewTupletHelper = false;
+
+                        BeamingHelper helperForBeat;
+                        if (b.GraceType != GraceType.None)
+                        {
+                            helperForBeat = currentGraceBeamHelper;
+                        }
+                        else
+                        {
+                            helperForBeat = currentBeamHelper;
+                            currentGraceBeamHelper = null;
+                        }
 
                         // if a new beaming helper was started, we close our tuplet grouping as well
                         if (!b.IsRest)
                         {
                             // try to fit beam to current beamhelper
-                            if (currentBeamHelper == null || !currentBeamHelper.CheckBeat(b))
+                            if (helperForBeat == null || !helperForBeat.CheckBeat(b))
                             {
-                                if (currentBeamHelper != null)
+                                if (helperForBeat != null)
                                 {
-                                    currentBeamHelper.Finish();
-                                    forceNewTupletHelper = currentBeamHelper.Beats.Count > 1;
+                                    helperForBeat.Finish();
+                                }
+
+                                // if not possible, create the next beaming helper
+                                helperForBeat = new BeamingHelper(bar.Staff);
+                                helperForBeat.CheckBeat(b);
+                                if (b.GraceType != GraceType.None)
+                                {
+                                    currentGraceBeamHelper = helperForBeat;
                                 }
                                 else
                                 {
-                                    forceNewTupletHelper = true;
+                                    currentBeamHelper = helperForBeat;
                                 }
-                                // if not possible, create the next beaming helper
-                                currentBeamHelper = new BeamingHelper(bar.Staff);
-                                currentBeamHelper.CheckBeat(b);
-                                BeamHelpers[v.Index].Add(currentBeamHelper);
+                                BeamHelpers[v.Index].Add(helperForBeat);
                             }
                         }
 
-                        BeamHelperLookup[v.Index][b.Index] = currentBeamHelper;
+                        BeamHelperLookup[v.Index][b.Index] = helperForBeat;
                     }
 
                     if (currentBeamHelper != null)
@@ -77,7 +91,13 @@ namespace AlphaTab.Rendering.Utils
                         currentBeamHelper.Finish();
                     }
 
+                    if (currentGraceBeamHelper != null)
+                    {
+                        currentGraceBeamHelper.Finish();
+                    }
+
                     currentBeamHelper = null;
+                    currentGraceBeamHelper = null;
                 }
             }
         }

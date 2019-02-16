@@ -131,7 +131,7 @@ namespace AlphaTab.Model
         /// Gets or sets the duration of this beat. 
         /// </summary>
         public Duration Duration { get; set; }
-        
+
         /// <summary>
         /// Gets or sets whether this beat is considered as rest.
         /// </summary>
@@ -572,7 +572,7 @@ namespace AlphaTab.Model
                 case GraceType.BeforeBeat:
                 case GraceType.OnBeat:
                     switch (Duration)
-                    {   
+                    {
                         case Duration.Sixteenth:
                             PlaybackDuration = Duration.SixtyFourth.ToTicks();
                             break;
@@ -608,12 +608,12 @@ namespace AlphaTab.Model
                     break;
             }
 
-         
+
             //// It can happen that the first beat of the next bar shifts into this
             //// beat due to before-beat grace. In this case we need to 
             //// reduce the duration of this beat. 
             //// Within the same bar the start of the next beat is always directly after the current. 
-            
+
             //if (NextBeat != null && NextBeat.Voice.Bar != Voice.Bar)
             //{
             //    var next = NextBeat;
@@ -627,13 +627,11 @@ namespace AlphaTab.Model
 
         internal void FinishTuplet()
         {
-            if (HasTuplet)
-            {
-                var previousBeat = PreviousBeat;
-                var currentTupletGroup = previousBeat != null && previousBeat.HasTuplet
-                    ? previousBeat.TupletGroup
-                    : null;
+            var previousBeat = PreviousBeat;
+            var currentTupletGroup = previousBeat != null ? previousBeat.TupletGroup : null;
 
+            if (HasTuplet || (GraceType != GraceType.None && currentTupletGroup != null))
+            {
                 if (previousBeat == null || currentTupletGroup == null || !currentTupletGroup.Check(this))
                 {
                     currentTupletGroup = new TupletGroup(Voice);

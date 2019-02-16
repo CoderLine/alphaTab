@@ -48,7 +48,6 @@ namespace AlphaTab.Model
         private static readonly int FullThreshold = Duration.OneHundredTwentyEighth.ToTicks();
         internal bool Check(Beat beat)
         {
-
             if (Beats.Count == 0)
             {
                 // calculate the range for which the tuplet will be valid. ("N notes sound like M")
@@ -69,6 +68,11 @@ namespace AlphaTab.Model
                     beatDuration = MidiUtils.RemoveTuplet(beatDuration, beat.TupletNumerator, beat.TupletDenominator);
                 }
                 TupletEnd = TupletStart + beatDuration * beat.TupletDenominator;
+            }
+            else if (beat.GraceType != GraceType.None)
+            {
+                // grace notes do not break tuplet group, but also do not contribute to them. 
+                return true;
             }
             else if (beat.Voice != Voice || IsFull
                      || beat.TupletNumerator != Beats[0].TupletNumerator || beat.TupletDenominator != Beats[0].TupletDenominator 
