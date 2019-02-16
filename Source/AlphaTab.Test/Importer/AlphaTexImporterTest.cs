@@ -564,7 +564,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestMultiTrackMultiStaff()
         {
-            var tex = 
+            var tex =
             @"\track ""Piano"" 
                 \staff{score} \tuning piano \instrument acousticgrandpiano 
                 c4 d4 e4 f4 |
@@ -651,7 +651,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestMultiTrackMultiStaffInconsistentBars()
         {
-            var tex = 
+            var tex =
             @"\track ""Piano"" 
                 \staff{score} \tuning piano \instrument acousticgrandpiano 
                 c4 d4 e4 f4 |
@@ -826,6 +826,66 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(TripletFeel.Dotted8th, score.MasterBars[4].TripletFeel);
             Assert.AreEqual(TripletFeel.Scottish16th, score.MasterBars[5].TripletFeel);
             Assert.AreEqual(TripletFeel.Scottish8th, score.MasterBars[6].TripletFeel);
+        }
+
+        [TestMethod]
+        public void TestRangeTuplets()
+        {
+            var tex = @":4{tu 3} 3.3 3.3 3.3 :8 3.3 3.3 3.3 3.3 | :8{tu 3} 3.3 3.3 3.3 3.3.16 3.3.16 3.3.16 3.3.2{tu 1} 3.3.16{tu 1} 3.3.4 3.3.4 3.3.4";
+            var score = ParseTex(tex);
+
+            var durations = new[]
+            {
+                Duration.Quarter,
+                Duration.Quarter,
+                Duration.Quarter,
+                Duration.Eighth,
+                Duration.Eighth,
+                Duration.Eighth,
+                Duration.Eighth,
+
+                Duration.Eighth,
+                Duration.Eighth,
+                Duration.Eighth,
+                Duration.Sixteenth,
+                Duration.Sixteenth,
+                Duration.Sixteenth,
+                Duration.Half,
+                Duration.Sixteenth,
+                Duration.Quarter,
+                Duration.Quarter,
+                Duration.Quarter,
+            };
+
+            var tuplets = new[]
+            {
+                3, 3, 3, // ranged tuplet
+                1, 1, 1, 1, // ranged tuplet stopped
+
+                3, 3, 3, // new ranged tuplet
+                3, 3, 3,
+                1, 1, // individual notes without tuplet
+                3, 3, 3
+            };
+
+            var i = 0;
+            Beat b = score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0];
+            while (b != null)
+            {
+                Assert.AreEqual(durations[i], b.Duration, "Duration on beat " + i + " was wrong");
+                if(tuplets[i] == 1)
+                {
+                    Assert.IsFalse(b.HasTuplet, "Beat " + i + " had wrongly a tuplet");
+                }
+                else
+                {
+                    Assert.AreEqual(tuplets[i], b.TupletNumerator, "Tuplet on beat " + i + " was wrong");
+                }
+                b = b.NextBeat;
+                i++;
+            }
+
+            Assert.AreEqual(durations.Length, i);
         }
     }
 }

@@ -45,6 +45,7 @@ namespace AlphaTab.Importer
         private bool _allowTuning;
 
         private Duration _currentDuration;
+        private int _currentTuplet;
         private FastDictionary<int, FastList<Lyrics>> _lyrics;
 
 
@@ -59,6 +60,7 @@ namespace AlphaTab.Importer
                 CreateDefaultScore();
                 _curChPos = 0;
                 _currentDuration = Duration.Quarter;
+                _currentTuplet = 1;
                 NextChar();
                 NewSy();
                 if (_sy == AlphaTexSymbols.LowerThan)
@@ -1103,21 +1105,7 @@ namespace AlphaTab.Importer
         private void Beat(Voice voice)
         {
             // duration specifier?
-            if (_sy == AlphaTexSymbols.DoubleDot)
-            {
-                _allowNegatives = true;
-                NewSy();
-                _allowNegatives = false;
-                if (_sy != AlphaTexSymbols.Number)
-                {
-                    Error("duration", AlphaTexSymbols.Number);
-                }
-
-                _currentDuration = ParseDuration((int)_syData);
-
-                NewSy();
-                return;
-            }
+            BeatDuration();
 
             var beat = new Beat();
             voice.AddBeat(beat);
@@ -1170,7 +1158,8 @@ namespace AlphaTab.Importer
                 NewSy();
             }
             beat.Duration = _currentDuration;
-
+            ApplyTuplet(beat, _currentTuplet);
+            
             // beat multiplier (repeat beat n times)
             var beatRepeat = 1;
             if (_sy == AlphaTexSymbols.Multiply)
@@ -1195,6 +1184,58 @@ namespace AlphaTab.Importer
             {
                 voice.AddBeat(beat.Clone());
             }
+        }
+
+        private void BeatDuration()
+        {
+            if (_sy != AlphaTexSymbols.DoubleDot)
+            {
+                return;
+            }
+
+            _allowNegatives = true;
+            NewSy();
+            _allowNegatives = false;
+            if (_sy != AlphaTexSymbols.Number)
+            {
+                Error("duration", AlphaTexSymbols.Number);
+            }
+
+            _currentDuration = ParseDuration((int)_syData);
+            _currentTuplet = 1;
+            NewSy();
+
+            if (_sy != AlphaTexSymbols.LBrace)
+            {
+                return;
+            }
+            NewSy();
+
+            while (_sy == AlphaTexSymbols.String)
+            {
+                var effect = _syData.ToString().ToLower();
+                switch(effect)
+                {
+                    case "tu":
+                        NewSy();
+                        if (_sy != AlphaTexSymbols.Number)
+                        {
+                            Error("duration-tuplet", AlphaTexSymbols.Number);
+                        }
+                        _currentTuplet = (int) _syData;
+                        NewSy();
+                        break;
+                    default:
+                        Error("beat-duration", AlphaTexSymbols.String, false);
+                        break;
+                }
+            }
+
+            if (_sy != AlphaTexSymbols.RBrace)
+            {
+                Error("beat-duration", AlphaTexSymbols.RBrace);
+            }
+            NewSy();
         }
 
         private void BeatEffects(Beat beat)
@@ -1291,43 +1332,7 @@ namespace AlphaTab.Importer
                     Error("tuplet", AlphaTexSymbols.Number);
                     return false;
                 }
-                var tuplet = (int)_syData;
-                switch (tuplet)
-                {
-                    case 3:
-                        beat.TupletNumerator = 3;
-                        beat.TupletDenominator = 2;
-                        break;
-                    case 5:
-                        beat.TupletNumerator = 5;
-                        beat.TupletDenominator = 4;
-                        break;
-                    case 6:
-                        beat.TupletNumerator = 6;
-                        beat.TupletDenominator = 4;
-                        break;
-                    case 7:
-                        beat.TupletNumerator = 7;
-                        beat.TupletDenominator = 4;
-                        break;
-                    case 9:
-                        beat.TupletNumerator = 9;
-                        beat.TupletDenominator = 8;
-                        break;
-                    case 10:
-                        beat.TupletNumerator = 10;
-                        beat.TupletDenominator = 8;
-                        break;
-                    case 11:
-                        beat.TupletNumerator = 11;
-                        beat.TupletDenominator = 8;
-                        break;
-                    case 12:
-                        beat.TupletNumerator = 12;
-                        beat.TupletNumerator = 8;
-                        beat.TupletDenominator = 8;
-                        break;
-                }
+                ApplyTuplet(beat, (int)_syData);
                 NewSy();
                 return true;
             }
@@ -1483,6 +1488,49 @@ namespace AlphaTab.Importer
             }
 
             return false;
+        }
+
+        private void ApplyTuplet(Beat beat, int tuplet)
+        {
+            switch (tuplet)
+            {
+                case 3:
+                    beat.TupletNumerator = 3;
+                    beat.TupletDenominator = 2;
+                    break;
+                case 5:
+                    beat.TupletNumerator = 5;
+                    beat.TupletDenominator = 4;
+                    break;
+                case 6:
+                    beat.TupletNumerator = 6;
+                    beat.TupletDenominator = 4;
+                    break;
+                case 7:
+                    beat.TupletNumerator = 7;
+                    beat.TupletDenominator = 4;
+                    break;
+                case 9:
+                    beat.TupletNumerator = 9;
+                    beat.TupletDenominator = 8;
+                    break;
+                case 10:
+                    beat.TupletNumerator = 10;
+                    beat.TupletDenominator = 8;
+                    break;
+                case 11:
+                    beat.TupletNumerator = 11;
+                    beat.TupletDenominator = 8;
+                    break;
+                case 12:
+                    beat.TupletNumerator = 12;
+                    beat.TupletDenominator = 8;
+                    break;
+                default:
+                    beat.TupletNumerator = 1;
+                    beat.TupletDenominator = 1;
+                    break;
+            }
         }
 
         private void Note(Beat beat)
