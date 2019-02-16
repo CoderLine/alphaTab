@@ -92,3 +92,35 @@ TexSample: true
 <script type="text/x-alphatab">
 	$('#alphaTabTempo').alphaTab();
 </script>
+
+<h2 id="triplet-feel">Triplet Feel</h2>
+
+<p>
+	To change the triplet feel of a bar specify <code>\tf TripletFeel</code>. Where <code>TripletFeel</code> is one of the following values: 
+</p>                       
+<table class="table table-striped table-condensed">
+    <thead>
+        <tr>
+            <th>TripletFeel</th>
+            <th>Possible values</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>No Triplet Feel</td>  <td>none, no, 0</td></tr>
+        <tr><td>Triplet 16th</td>     <td>triplet-16th, t16, 1</td></tr>
+        <tr><td>Triplet 8th</td>      <td>triplet-8th, t8, 2</td></tr>
+        <tr><td>Dotted 16th</td>      <td>dotted-16th, d16, 3</td></tr>
+        <tr><td>Dotted 8th</td>       <td>dotted-8th, d8, 4</td></tr>
+        <tr><td>Scottish 16th</td>    <td>scottish-16th, s16, 5</td></tr>
+        <tr><td>Scottish 8th</td>     <td>scottish-8th, s8, 6</td></tr>
+    </tbody>
+</table>
+
+						   
+<div id="alphaTabTripletFeel" data-tex="true">
+\tf none | \tf triplet-16th | \tf triplet-8th | \tf dotted-16th | \tf dotted-8th | \tf scottish-16th | \tf scottish-8th |
+\tf no | \tf t16 | \tf t8 | \tf d16 | \tf d8 | \tf s16 | \tf s8
+</div>
+<script type="text/x-alphatab">
+	$('#alphaTabTripletFeel').alphaTab();
+</script>

@@ -42,6 +42,7 @@ namespace AlphaTab.Importer
         private object _syData;
 
         private bool _allowNegatives;
+        private bool _allowTuning;
 
         private Duration _currentDuration;
         private FastDictionary<int, FastList<Lyrics>> _lyrics;
@@ -53,6 +54,7 @@ namespace AlphaTab.Importer
         {
             try
             {
+                _allowTuning = true;
                 _lyrics = new FastDictionary<int, FastList<Lyrics>>();
                 CreateDefaultScore();
                 _curChPos = 0;
@@ -199,6 +201,59 @@ namespace AlphaTab.Importer
                     return Clef.C4;
                 default:
                     return Clef.G2;
+            }
+        }
+
+        private TripletFeel ParseTripletFeelFromString(string str)
+        {
+            switch (str.ToLower())
+            {
+                case "no":
+                case "none":
+                    return TripletFeel.NoTripletFeel;
+                case "t16":
+                case "triplet-16th":
+                    return TripletFeel.Triplet16th;
+                case "t8":
+                case "triplet-8th":
+                    return TripletFeel.Triplet8th;
+                case "d16":
+                case "dotted-16th":
+                    return TripletFeel.Dotted16th;
+                case "d8":
+                case "dotted-8th":
+                    return TripletFeel.Dotted8th;
+                case "s16":
+                case "scottish-16th":
+                    return TripletFeel.Scottish16th;
+                case "s8":
+                case "scottish-8th":
+                    return TripletFeel.Scottish8th;
+                default:
+                    return TripletFeel.NoTripletFeel;
+            }
+        }
+
+        private TripletFeel ParseTripletFeelFromInt(int i)
+        {
+            switch (i)
+            {
+                case 0:
+                    return TripletFeel.NoTripletFeel;
+                case 1:
+                    return TripletFeel.Triplet16th;
+                case 2:
+                    return TripletFeel.Triplet8th;
+                case 3:
+                    return TripletFeel.Dotted16th;
+                case 4:
+                    return TripletFeel.Dotted8th;
+                case 5:
+                    return TripletFeel.Scottish16th;
+                case 6:
+                    return TripletFeel.Scottish8th;
+                default:
+                    return TripletFeel.NoTripletFeel;
             }
         }
 
@@ -390,7 +445,7 @@ namespace AlphaTab.Importer
                 else if (IsLetter(_ch))
                 {
                     var name = ReadName();
-                    var tuning = TuningParser.Parse(name);
+                    var tuning = _allowTuning ? TuningParser.Parse(name) : null; 
                     if (tuning != null)
                     {
                         _sy = AlphaTexSymbols.Tuning;
@@ -1907,6 +1962,26 @@ namespace AlphaTab.Importer
                     tempoAutomation.Type = AutomationType.Tempo;
                     tempoAutomation.Value = (float)_syData;
                     master.TempoAutomation = tempoAutomation;
+                    NewSy();
+                }
+                else if (syData == "tf")
+                {
+                    _allowTuning = false;
+                    NewSy();
+                    _allowTuning = true;
+
+                    switch (_sy)
+                    {
+                        case AlphaTexSymbols.String:
+                            master.TripletFeel = ParseTripletFeelFromString(_syData.ToString().ToLower());
+                            break;
+                        case AlphaTexSymbols.Number:
+                            master.TripletFeel = ParseTripletFeelFromInt((int)_syData);
+                            break;
+                        default:
+                            Error("triplet-feel", AlphaTexSymbols.String);
+                            break;
+                    }
                     NewSy();
                 }
                 else

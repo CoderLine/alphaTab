@@ -782,5 +782,50 @@ namespace AlphaTab.Test.Importer
             Assert.IsTrue(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Slap, "Slap not set");
             Assert.IsTrue(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Tap, "Tap not set");
         }
+
+        [TestMethod]
+        public void TestTripletFeelNumeric()
+        {
+            var tex = @"\tf 0 | \tf 1 | \tf 2 | \tf 3 | \tf 4 | \tf 5 | \tf 6";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(TripletFeel.NoTripletFeel, score.MasterBars[0].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet16th, score.MasterBars[1].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet8th, score.MasterBars[2].TripletFeel);
+            Assert.AreEqual(TripletFeel.Dotted16th, score.MasterBars[3].TripletFeel);
+            Assert.AreEqual(TripletFeel.Dotted8th, score.MasterBars[4].TripletFeel);
+            Assert.AreEqual(TripletFeel.Scottish16th, score.MasterBars[5].TripletFeel);
+            Assert.AreEqual(TripletFeel.Scottish8th, score.MasterBars[6].TripletFeel);
+        }
+
+        [TestMethod]
+        public void TestTripletFeelLongNames()
+        {
+            var tex = @"\tf none | \tf triplet-16th | \tf triplet-8th | \tf dotted-16th | \tf dotted-8th | \tf scottish-16th | \tf scottish-8th";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(TripletFeel.NoTripletFeel, score.MasterBars[0].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet16th, score.MasterBars[1].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet8th, score.MasterBars[2].TripletFeel);
+            Assert.AreEqual(TripletFeel.Dotted16th, score.MasterBars[3].TripletFeel);
+            Assert.AreEqual(TripletFeel.Dotted8th, score.MasterBars[4].TripletFeel);
+            Assert.AreEqual(TripletFeel.Scottish16th, score.MasterBars[5].TripletFeel);
+            Assert.AreEqual(TripletFeel.Scottish8th, score.MasterBars[6].TripletFeel);
+        }
+
+        [TestMethod]
+        public void TestTripletFeelShortNames()
+        {
+            var tex = @"\tf no | \tf t16 | \tf t8 | \tf d16 | \tf d8 | \tf s16 | \tf s8";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(TripletFeel.NoTripletFeel, score.MasterBars[0].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet16th, score.MasterBars[1].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet8th, score.MasterBars[2].TripletFeel);
+            Assert.AreEqual(TripletFeel.Dotted16th, score.MasterBars[3].TripletFeel);
+            Assert.AreEqual(TripletFeel.Dotted8th, score.MasterBars[4].TripletFeel);
+            Assert.AreEqual(TripletFeel.Scottish16th, score.MasterBars[5].TripletFeel);
+            Assert.AreEqual(TripletFeel.Scottish8th, score.MasterBars[6].TripletFeel);
+        }
     }
 }
