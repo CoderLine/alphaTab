@@ -771,5 +771,16 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(SlideType.PickSlideDown, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[0].Notes[0].SlideType);
             Assert.AreEqual(SlideType.PickSlideUp, score.Tracks[0].Staves[0].Bars[3].Voices[0].Beats[1].Notes[0].SlideType);
         }
+
+        [TestMethod]
+        public void TestPopSlapTap()
+        {
+            var tex = @"3.3{p} 3.3{s} 3.3{tp} r";
+            var score = ParseTex(tex);
+
+            Assert.IsTrue(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Pop, "Pop not set");
+            Assert.IsTrue(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Slap, "Slap not set");
+            Assert.IsTrue(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Tap, "Tap not set");
+        }
     }
 }

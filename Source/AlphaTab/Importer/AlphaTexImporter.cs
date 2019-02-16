@@ -1198,6 +1198,12 @@ namespace AlphaTab.Importer
                 NewSy();
                 return true;
             }
+            if (syData == "tp")
+            {
+                beat.Tap = true;
+                NewSy();
+                return true;
+            }
             if (syData == "dd")
             {
                 beat.Dots = 2;
