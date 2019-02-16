@@ -173,6 +173,36 @@ describe("alphaTab.test.importer.AlphaTexImporterTest", function() {
         __instance.TestMultiTrackMultiStaffInconsistentBars();
         done();
     });
+    it("TestSlides", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.TestSlides();
+        done();
+    });
+    it("TestPopSlapTap", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.TestPopSlapTap();
+        done();
+    });
+    it("TestTripletFeelNumeric", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.TestTripletFeelNumeric();
+        done();
+    });
+    it("TestTripletFeelLongNames", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.TestTripletFeelLongNames();
+        done();
+    });
+    it("TestTripletFeelShortNames", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.TestTripletFeelShortNames();
+        done();
+    });
+    it("TestRangeTuplets", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.TestRangeTuplets();
+        done();
+    });
 });
 describe("alphaTab.test.importer.Gp3ImporterTest", function() {
     var __instance = new alphaTab.test.importer.Gp3ImporterTest();
