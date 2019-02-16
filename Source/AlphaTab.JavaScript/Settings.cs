@@ -283,7 +283,7 @@ namespace AlphaTab
 
             if (Platform.Platform.JsonExists(json, "logging"))
             {
-                settings.LogLevel = DecodeLogLevel(json.log);
+                settings.LogLevel = DecodeLogLevel(json.logging);
             }
             else if (dataAttributes != null && dataAttributes.ContainsKey("logging"))
             {
