@@ -829,6 +829,25 @@ namespace AlphaTab.Test.Importer
         }
 
         [TestMethod]
+        public void TestTripletFeelMultiBar()
+        {
+            var tex = @"\tf t16 | | | \tf t8 | | | \tf no | | ";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(TripletFeel.Triplet16th, score.MasterBars[0].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet16th, score.MasterBars[1].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet16th, score.MasterBars[2].TripletFeel);
+
+            Assert.AreEqual(TripletFeel.Triplet8th, score.MasterBars[3].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet8th, score.MasterBars[4].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet8th, score.MasterBars[5].TripletFeel);
+
+            Assert.AreEqual(TripletFeel.NoTripletFeel, score.MasterBars[6].TripletFeel);
+            Assert.AreEqual(TripletFeel.NoTripletFeel, score.MasterBars[7].TripletFeel);
+            Assert.AreEqual(TripletFeel.NoTripletFeel, score.MasterBars[8].TripletFeel);
+        }
+
+        [TestMethod]
         public void TestTupletRepeat()
         {
             var tex = @":8 5.3{tu 3}*3";

@@ -1066,8 +1066,10 @@ namespace AlphaTab.Importer
                 if (master.Index > 0)
                 {
                     master.KeySignature = master.PreviousMasterBar.KeySignature;
+                    master.KeySignatureType = master.PreviousMasterBar.KeySignatureType;
                     master.TimeSignatureDenominator = master.PreviousMasterBar.TimeSignatureDenominator;
                     master.TimeSignatureNumerator = master.PreviousMasterBar.TimeSignatureNumerator;
+                    master.TripletFeel = master.PreviousMasterBar.TripletFeel;
                 }
             }
 
