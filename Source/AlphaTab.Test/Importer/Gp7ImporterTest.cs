@@ -1064,6 +1064,8 @@ namespace AlphaTab.Test.Importer
             {
                 var score = reader.ReadScore();
                 Assert.IsTrue(score.MasterBars[0].IsAnacrusis);
+                Assert.AreEqual(1920, score.MasterBars[0].CalculateDuration());
+                Assert.AreEqual(3840, score.MasterBars[1].CalculateDuration());
             });
         }
 

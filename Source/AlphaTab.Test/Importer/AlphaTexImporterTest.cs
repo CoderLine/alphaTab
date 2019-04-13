@@ -891,6 +891,8 @@ namespace AlphaTab.Test.Importer
             var tex = @"\ac 3.3 3.3 | 1.1 2.1 3.1 4.1";
             var score = ParseTex(tex);
             Assert.IsTrue(score.MasterBars[0].IsAnacrusis);
+            Assert.AreEqual(1920, score.MasterBars[0].CalculateDuration());
+            Assert.AreEqual(3840, score.MasterBars[1].CalculateDuration());
         }
 
         [TestMethod]
@@ -900,6 +902,9 @@ namespace AlphaTab.Test.Importer
             var score = ParseTex(tex);
             Assert.IsTrue(score.MasterBars[0].IsAnacrusis);
             Assert.IsTrue(score.MasterBars[1].IsAnacrusis);
+            Assert.AreEqual(1920, score.MasterBars[0].CalculateDuration());
+            Assert.AreEqual(1920, score.MasterBars[1].CalculateDuration());
+            Assert.AreEqual(3840, score.MasterBars[2].CalculateDuration());
         }
 
         [TestMethod]
@@ -911,6 +916,10 @@ namespace AlphaTab.Test.Importer
             Assert.IsFalse(score.MasterBars[1].IsAnacrusis);
             Assert.IsTrue(score.MasterBars[2].IsAnacrusis);
             Assert.IsFalse(score.MasterBars[3].IsAnacrusis);
+            Assert.AreEqual(1920, score.MasterBars[0].CalculateDuration());
+            Assert.AreEqual(3840, score.MasterBars[1].CalculateDuration());
+            Assert.AreEqual(1920, score.MasterBars[2].CalculateDuration());
+            Assert.AreEqual(3840, score.MasterBars[3].CalculateDuration());
         }
     }
 }

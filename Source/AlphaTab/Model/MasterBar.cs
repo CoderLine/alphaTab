@@ -174,6 +174,22 @@ namespace AlphaTab.Model
         /// <returns></returns>
         public int CalculateDuration()
         {
+            if (IsAnacrusis)
+            {
+                int duration = 0;
+                foreach (var track in Score.Tracks)
+                {
+                    foreach (var staff in track.Staves)
+                    {
+                        var barDuration = staff.Bars[0].CalculateDuration();
+                        if (barDuration > duration)
+                        {
+                            duration = barDuration;
+                        }
+                    }
+                }
+                return duration;
+            }
             return TimeSignatureNumerator * MidiUtils.ValueToTicks(TimeSignatureDenominator);
         }
 
