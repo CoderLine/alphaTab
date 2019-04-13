@@ -89,6 +89,7 @@ namespace AlphaTab.Importer
         private FastDictionary<string, bool> _tappedNotes; // contains a flag indicating whether a note is tapped (key = note id);
 
         private FastDictionary<string, FastList<Lyrics>> _lyricsByTrack;
+        private bool _hasAnacrusis;
 
         public void ParseXml(string xml, Settings settings)
         {
@@ -271,6 +272,9 @@ namespace AlphaTab.Importer
                             break;
                         case "Tracks":
                             _tracksMapping = c.InnerText.Split(' ');
+                            break;
+                        case "Anacrusis":
+                            _hasAnacrusis = true;
                             break;
                     }
                 }
@@ -953,6 +957,11 @@ namespace AlphaTab.Importer
         private void ParseMasterBar(XmlNode node)
         {
             var masterBar = new MasterBar();
+            if (_masterBars.Count == 0 && _hasAnacrusis)
+            {
+                masterBar.IsAnacrusis = true;
+            }
+
             foreach (var c in node.ChildNodes)
             {
                 if (c.NodeType == XmlNodeType.Element)

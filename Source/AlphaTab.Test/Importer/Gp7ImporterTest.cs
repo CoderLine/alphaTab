@@ -1058,6 +1058,16 @@ namespace AlphaTab.Test.Importer
         }
 
         [TestMethod, AsyncTestMethod]
+        public void TestAnacrusis()
+        {
+            PrepareGp7ImporterWithFile("GuitarPro7/TestAnacrusis.gp", reader =>
+            {
+                var score = reader.ReadScore();
+                Assert.IsTrue(score.MasterBars[0].IsAnacrusis);
+            });
+        }
+
+        [TestMethod, AsyncTestMethod]
         public void TestFermata()
         {
             PrepareGp7ImporterWithFile("GuitarPro7/TestFermata.gp", reader =>

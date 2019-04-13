@@ -134,6 +134,11 @@ namespace AlphaTab.Model
         public int Start { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the master bar is an anacrusis (aka. pickup bar)
+        /// </summary>
+        public bool IsAnacrusis { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="MasterBar"/> class.
         /// </summary>
         public MasterBar()
@@ -148,6 +153,7 @@ namespace AlphaTab.Model
 
         internal static void CopyTo(MasterBar src, MasterBar dst)
         {
+            dst.IsAnacrusis = src.IsAnacrusis;
             dst.AlternateEndings = src.AlternateEndings;
             dst.Index = src.Index;
             dst.KeySignature = src.KeySignature;
