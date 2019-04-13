@@ -2037,6 +2037,11 @@ namespace AlphaTab.Importer
                     }
                     NewSy();
                 }
+                else if (syData == "ac")
+                {
+                    master.IsAnacrusis = true;
+                    NewSy();
+                }
                 else
                 {
                     if (bar.Index == 0 && !HandleStaffMeta())

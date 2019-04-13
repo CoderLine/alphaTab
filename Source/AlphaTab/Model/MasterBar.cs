@@ -134,6 +134,11 @@ namespace AlphaTab.Model
         public int Start { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the master bar is an anacrusis (aka. pickup bar)
+        /// </summary>
+        public bool IsAnacrusis { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="MasterBar"/> class.
         /// </summary>
         public MasterBar()
@@ -148,6 +153,7 @@ namespace AlphaTab.Model
 
         internal static void CopyTo(MasterBar src, MasterBar dst)
         {
+            dst.IsAnacrusis = src.IsAnacrusis;
             dst.AlternateEndings = src.AlternateEndings;
             dst.Index = src.Index;
             dst.KeySignature = src.KeySignature;
@@ -168,6 +174,22 @@ namespace AlphaTab.Model
         /// <returns></returns>
         public int CalculateDuration()
         {
+            if (IsAnacrusis)
+            {
+                int duration = 0;
+                foreach (var track in Score.Tracks)
+                {
+                    foreach (var staff in track.Staves)
+                    {
+                        var barDuration = staff.Bars[0].CalculateDuration();
+                        if (barDuration > duration)
+                        {
+                            duration = barDuration;
+                        }
+                    }
+                }
+                return duration;
+            }
             return TimeSignatureNumerator * MidiUtils.ValueToTicks(TimeSignatureDenominator);
         }
 

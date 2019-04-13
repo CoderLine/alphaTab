@@ -883,67 +883,43 @@ namespace AlphaTab.Test.Importer
             }
 
             Assert.AreEqual(durations.Length, i);
-
         }
 
         [TestMethod]
-        public void TestRangeTuplets()
+        public void TestSimpleAnacrusis()
         {
-            var tex = @":4{tu 3} 3.3 3.3 3.3 :8 3.3 3.3 3.3 3.3 | :8{tu 3} 3.3 3.3 3.3 3.3.16 3.3.16 3.3.16 3.3.2{tu 1} 3.3.16{tu 1} 3.3.4 3.3.4 3.3.4";
+            var tex = @"\ac 3.3 3.3 | 1.1 2.1 3.1 4.1";
             var score = ParseTex(tex);
+            Assert.IsTrue(score.MasterBars[0].IsAnacrusis);
+            Assert.AreEqual(1920, score.MasterBars[0].CalculateDuration());
+            Assert.AreEqual(3840, score.MasterBars[1].CalculateDuration());
+        }
 
-            var durations = new[]
-            {
-                Duration.Quarter,
-                Duration.Quarter,
-                Duration.Quarter,
-                Duration.Eighth,
-                Duration.Eighth,
-                Duration.Eighth,
-                Duration.Eighth,
+        [TestMethod]
+        public void TestMultiBarAnacrusis()
+        {
+            var tex = @"\ac 3.3 3.3 | \ac 3.3 3.3 | 1.1 2.1 3.1 4.1";
+            var score = ParseTex(tex);
+            Assert.IsTrue(score.MasterBars[0].IsAnacrusis);
+            Assert.IsTrue(score.MasterBars[1].IsAnacrusis);
+            Assert.AreEqual(1920, score.MasterBars[0].CalculateDuration());
+            Assert.AreEqual(1920, score.MasterBars[1].CalculateDuration());
+            Assert.AreEqual(3840, score.MasterBars[2].CalculateDuration());
+        }
 
-                Duration.Eighth,
-                Duration.Eighth,
-                Duration.Eighth,
-                Duration.Sixteenth,
-                Duration.Sixteenth,
-                Duration.Sixteenth,
-                Duration.Half,
-                Duration.Sixteenth,
-                Duration.Quarter,
-                Duration.Quarter,
-                Duration.Quarter,
-            };
-
-            var tuplets = new[]
-            {
-                3, 3, 3, // ranged tuplet
-                1, 1, 1, 1, // ranged tuplet stopped
-
-                3, 3, 3, // new ranged tuplet
-                3, 3, 3,
-                1, 1, // individual notes without tuplet
-                3, 3, 3
-            };
-
-            var i = 0;
-            Beat b = score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0];
-            while (b != null)
-            {
-                Assert.AreEqual(durations[i], b.Duration, "Duration on beat " + i + " was wrong");
-                if(tuplets[i] == 1)
-                {
-                    Assert.IsFalse(b.HasTuplet, "Beat " + i + " had wrongly a tuplet");
-                }
-                else
-                {
-                    Assert.AreEqual(tuplets[i], b.TupletNumerator, "Tuplet on beat " + i + " was wrong");
-                }
-                b = b.NextBeat;
-                i++;
-            }
-
-            Assert.AreEqual(durations.Length, i);
+        [TestMethod]
+        public void TestRandomAnacrusis()
+        {
+            var tex = @"\ac 3.3 3.3 | 1.1 2.1 3.1 4.1 | \ac 3.3 3.3 | 1.1 2.1 3.1 4.1";
+            var score = ParseTex(tex);
+            Assert.IsTrue(score.MasterBars[0].IsAnacrusis);
+            Assert.IsFalse(score.MasterBars[1].IsAnacrusis);
+            Assert.IsTrue(score.MasterBars[2].IsAnacrusis);
+            Assert.IsFalse(score.MasterBars[3].IsAnacrusis);
+            Assert.AreEqual(1920, score.MasterBars[0].CalculateDuration());
+            Assert.AreEqual(3840, score.MasterBars[1].CalculateDuration());
+            Assert.AreEqual(1920, score.MasterBars[2].CalculateDuration());
+            Assert.AreEqual(3840, score.MasterBars[3].CalculateDuration());
         }
     }
 }
