@@ -564,7 +564,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestMultiTrackMultiStaff()
         {
-            var tex = 
+            var tex =
             @"\track ""Piano"" 
                 \staff{score} \tuning piano \instrument acousticgrandpiano 
                 c4 d4 e4 f4 |
@@ -651,7 +651,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestMultiTrackMultiStaffInconsistentBars()
         {
-            var tex = 
+            var tex =
             @"\track ""Piano"" 
                 \staff{score} \tuning piano \instrument acousticgrandpiano 
                 c4 d4 e4 f4 |
@@ -794,6 +794,156 @@ namespace AlphaTab.Test.Importer
             Assert.IsTrue(score.MasterBars[3].IsSectionStart);
             Assert.AreEqual("Solo", score.MasterBars[3].Section.Text);
             Assert.AreEqual("S", score.MasterBars[3].Section.Marker);
+        }
+
+        [TestMethod]
+        public void TestPopSlapTap()
+        {
+            var tex = @"3.3{p} 3.3{s} 3.3{tt} r";
+            var score = ParseTex(tex);
+
+            Assert.IsTrue(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Pop, "Pop not set");
+            Assert.IsTrue(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Slap, "Slap not set");
+            Assert.IsTrue(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[2].Tap, "Tap not set");
+        }
+
+        [TestMethod]
+        public void TestTripletFeelNumeric()
+        {
+            var tex = @"\tf 0 | \tf 1 | \tf 2 | \tf 3 | \tf 4 | \tf 5 | \tf 6";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(TripletFeel.NoTripletFeel, score.MasterBars[0].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet16th, score.MasterBars[1].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet8th, score.MasterBars[2].TripletFeel);
+            Assert.AreEqual(TripletFeel.Dotted16th, score.MasterBars[3].TripletFeel);
+            Assert.AreEqual(TripletFeel.Dotted8th, score.MasterBars[4].TripletFeel);
+            Assert.AreEqual(TripletFeel.Scottish16th, score.MasterBars[5].TripletFeel);
+            Assert.AreEqual(TripletFeel.Scottish8th, score.MasterBars[6].TripletFeel);
+        }
+
+        [TestMethod]
+        public void TestTripletFeelLongNames()
+        {
+            var tex = @"\tf none | \tf triplet-16th | \tf triplet-8th | \tf dotted-16th | \tf dotted-8th | \tf scottish-16th | \tf scottish-8th";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(TripletFeel.NoTripletFeel, score.MasterBars[0].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet16th, score.MasterBars[1].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet8th, score.MasterBars[2].TripletFeel);
+            Assert.AreEqual(TripletFeel.Dotted16th, score.MasterBars[3].TripletFeel);
+            Assert.AreEqual(TripletFeel.Dotted8th, score.MasterBars[4].TripletFeel);
+            Assert.AreEqual(TripletFeel.Scottish16th, score.MasterBars[5].TripletFeel);
+            Assert.AreEqual(TripletFeel.Scottish8th, score.MasterBars[6].TripletFeel);
+        }
+
+        [TestMethod]
+        public void TestTripletFeelShortNames()
+        {
+            var tex = @"\tf no | \tf t16 | \tf t8 | \tf d16 | \tf d8 | \tf s16 | \tf s8";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(TripletFeel.NoTripletFeel, score.MasterBars[0].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet16th, score.MasterBars[1].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet8th, score.MasterBars[2].TripletFeel);
+            Assert.AreEqual(TripletFeel.Dotted16th, score.MasterBars[3].TripletFeel);
+            Assert.AreEqual(TripletFeel.Dotted8th, score.MasterBars[4].TripletFeel);
+            Assert.AreEqual(TripletFeel.Scottish16th, score.MasterBars[5].TripletFeel);
+            Assert.AreEqual(TripletFeel.Scottish8th, score.MasterBars[6].TripletFeel);
+        }
+
+        [TestMethod]
+        public void TestTripletFeelMultiBar()
+        {
+            var tex = @"\tf t16 | | | \tf t8 | | | \tf no | | ";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(TripletFeel.Triplet16th, score.MasterBars[0].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet16th, score.MasterBars[1].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet16th, score.MasterBars[2].TripletFeel);
+
+            Assert.AreEqual(TripletFeel.Triplet8th, score.MasterBars[3].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet8th, score.MasterBars[4].TripletFeel);
+            Assert.AreEqual(TripletFeel.Triplet8th, score.MasterBars[5].TripletFeel);
+
+            Assert.AreEqual(TripletFeel.NoTripletFeel, score.MasterBars[6].TripletFeel);
+            Assert.AreEqual(TripletFeel.NoTripletFeel, score.MasterBars[7].TripletFeel);
+            Assert.AreEqual(TripletFeel.NoTripletFeel, score.MasterBars[8].TripletFeel);
+        }
+
+        [TestMethod]
+        public void TestTupletRepeat()
+        {
+            var tex = @":8 5.3{tu 3}*3";
+            var score = ParseTex(tex);
+
+            var durations = new[]
+            {
+                Duration.Eighth,
+                Duration.Eighth,
+                Duration.Eighth,
+            };
+
+            var tuplets = new[]
+            {
+                3, 3, 3
+            };
+
+            var i = 0;
+            Beat b = score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0];
+            while (b != null)
+            {
+                Assert.AreEqual(durations[i], b.Duration, "Duration on beat " + i + " was wrong");
+                if (tuplets[i] == 1)
+                {
+                    Assert.IsFalse(b.HasTuplet, "Beat " + i + " had wrongly a tuplet");
+                }
+                else
+                {
+                    Assert.AreEqual(tuplets[i], b.TupletNumerator, "Tuplet on beat " + i + " was wrong");
+                }
+                b = b.NextBeat;
+                i++;
+            }
+
+            Assert.AreEqual(durations.Length, i);
+        }
+
+        [TestMethod]
+        public void TestSimpleAnacrusis()
+        {
+            var tex = @"\ac 3.3 3.3 | 1.1 2.1 3.1 4.1";
+            var score = ParseTex(tex);
+            Assert.IsTrue(score.MasterBars[0].IsAnacrusis);
+            Assert.AreEqual(1920, score.MasterBars[0].CalculateDuration());
+            Assert.AreEqual(3840, score.MasterBars[1].CalculateDuration());
+        }
+
+        [TestMethod]
+        public void TestMultiBarAnacrusis()
+        {
+            var tex = @"\ac 3.3 3.3 | \ac 3.3 3.3 | 1.1 2.1 3.1 4.1";
+            var score = ParseTex(tex);
+            Assert.IsTrue(score.MasterBars[0].IsAnacrusis);
+            Assert.IsTrue(score.MasterBars[1].IsAnacrusis);
+            Assert.AreEqual(1920, score.MasterBars[0].CalculateDuration());
+            Assert.AreEqual(1920, score.MasterBars[1].CalculateDuration());
+            Assert.AreEqual(3840, score.MasterBars[2].CalculateDuration());
+        }
+
+        [TestMethod]
+        public void TestRandomAnacrusis()
+        {
+            var tex = @"\ac 3.3 3.3 | 1.1 2.1 3.1 4.1 | \ac 3.3 3.3 | 1.1 2.1 3.1 4.1";
+            var score = ParseTex(tex);
+            Assert.IsTrue(score.MasterBars[0].IsAnacrusis);
+            Assert.IsFalse(score.MasterBars[1].IsAnacrusis);
+            Assert.IsTrue(score.MasterBars[2].IsAnacrusis);
+            Assert.IsFalse(score.MasterBars[3].IsAnacrusis);
+            Assert.AreEqual(1920, score.MasterBars[0].CalculateDuration());
+            Assert.AreEqual(3840, score.MasterBars[1].CalculateDuration());
+            Assert.AreEqual(1920, score.MasterBars[2].CalculateDuration());
+            Assert.AreEqual(3840, score.MasterBars[3].CalculateDuration());
         }
     }
 }

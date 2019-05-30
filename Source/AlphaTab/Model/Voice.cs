@@ -134,7 +134,7 @@ namespace AlphaTab.Model
 
             IsEmpty = false;
         }
-        
+
         internal Beat GetBeatAtDisplayStart(int displayStart)
         {
             if (_beatLookup.ContainsKey(displayStart))
@@ -244,6 +244,17 @@ namespace AlphaTab.Model
                 beat.FinishTuplet();
                 _beatLookup[beat.DisplayStart] = beat;
             }
+        }
+
+        public int CalculateDuration()
+        {
+            if (IsEmpty || Beats.Count == 0)
+            {
+                return 0;
+            }
+
+            var lastBeat = Beats[Beats.Count - 1];
+            return lastBeat.PlaybackStart + lastBeat.PlaybackDuration;
         }
     }
 }

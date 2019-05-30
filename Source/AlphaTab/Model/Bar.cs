@@ -133,5 +133,19 @@ namespace AlphaTab.Model
                 voice.Finish(settings);
             }
         }
+
+        internal int CalculateDuration()
+        {
+            int duration = 0;
+            foreach (var voice in Voices)
+            {
+                var voiceDuration = voice.CalculateDuration();
+                if (voiceDuration > duration)
+                {
+                    duration = voiceDuration;
+                }
+            }
+            return duration;
+        }
     }
 }

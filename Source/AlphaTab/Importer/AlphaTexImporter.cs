@@ -42,8 +42,10 @@ namespace AlphaTab.Importer
         private object _syData;
 
         private bool _allowNegatives;
+        private bool _allowTuning;
 
         private Duration _currentDuration;
+        private int _currentTuplet;
         private FastDictionary<int, FastList<Lyrics>> _lyrics;
 
 
@@ -53,10 +55,12 @@ namespace AlphaTab.Importer
         {
             try
             {
+                _allowTuning = true;
                 _lyrics = new FastDictionary<int, FastList<Lyrics>>();
                 CreateDefaultScore();
                 _curChPos = 0;
                 _currentDuration = Duration.Quarter;
+                _currentTuplet = 1;
                 NextChar();
                 NewSy();
                 if (_sy == AlphaTexSymbols.LowerThan)
@@ -199,6 +203,59 @@ namespace AlphaTab.Importer
                     return Clef.C4;
                 default:
                     return Clef.G2;
+            }
+        }
+
+        private TripletFeel ParseTripletFeelFromString(string str)
+        {
+            switch (str.ToLower())
+            {
+                case "no":
+                case "none":
+                    return TripletFeel.NoTripletFeel;
+                case "t16":
+                case "triplet-16th":
+                    return TripletFeel.Triplet16th;
+                case "t8":
+                case "triplet-8th":
+                    return TripletFeel.Triplet8th;
+                case "d16":
+                case "dotted-16th":
+                    return TripletFeel.Dotted16th;
+                case "d8":
+                case "dotted-8th":
+                    return TripletFeel.Dotted8th;
+                case "s16":
+                case "scottish-16th":
+                    return TripletFeel.Scottish16th;
+                case "s8":
+                case "scottish-8th":
+                    return TripletFeel.Scottish8th;
+                default:
+                    return TripletFeel.NoTripletFeel;
+            }
+        }
+
+        private TripletFeel ParseTripletFeelFromInt(int i)
+        {
+            switch (i)
+            {
+                case 0:
+                    return TripletFeel.NoTripletFeel;
+                case 1:
+                    return TripletFeel.Triplet16th;
+                case 2:
+                    return TripletFeel.Triplet8th;
+                case 3:
+                    return TripletFeel.Dotted16th;
+                case 4:
+                    return TripletFeel.Dotted8th;
+                case 5:
+                    return TripletFeel.Scottish16th;
+                case 6:
+                    return TripletFeel.Scottish8th;
+                default:
+                    return TripletFeel.NoTripletFeel;
             }
         }
 
@@ -390,7 +447,7 @@ namespace AlphaTab.Importer
                 else if (IsLetter(_ch))
                 {
                     var name = ReadName();
-                    var tuning = TuningParser.Parse(name);
+                    var tuning = _allowTuning ? TuningParser.Parse(name) : null; 
                     if (tuning != null)
                     {
                         _sy = AlphaTexSymbols.Tuning;
@@ -1009,8 +1066,10 @@ namespace AlphaTab.Importer
                 if (master.Index > 0)
                 {
                     master.KeySignature = master.PreviousMasterBar.KeySignature;
+                    master.KeySignatureType = master.PreviousMasterBar.KeySignatureType;
                     master.TimeSignatureDenominator = master.PreviousMasterBar.TimeSignatureDenominator;
                     master.TimeSignatureNumerator = master.PreviousMasterBar.TimeSignatureNumerator;
+                    master.TripletFeel = master.PreviousMasterBar.TripletFeel;
                 }
             }
 
@@ -1048,21 +1107,7 @@ namespace AlphaTab.Importer
         private void Beat(Voice voice)
         {
             // duration specifier?
-            if (_sy == AlphaTexSymbols.DoubleDot)
-            {
-                _allowNegatives = true;
-                NewSy();
-                _allowNegatives = false;
-                if (_sy != AlphaTexSymbols.Number)
-                {
-                    Error("duration", AlphaTexSymbols.Number);
-                }
-
-                _currentDuration = ParseDuration((int)_syData);
-
-                NewSy();
-                return;
-            }
+            BeatDuration();
 
             var beat = new Beat();
             voice.AddBeat(beat);
@@ -1115,6 +1160,10 @@ namespace AlphaTab.Importer
                 NewSy();
             }
             beat.Duration = _currentDuration;
+            if(_currentTuplet != 1 && !beat.HasTuplet)
+            {
+                ApplyTuplet(beat, _currentTuplet);
+            }
 
             // beat multiplier (repeat beat n times)
             var beatRepeat = 1;
@@ -1140,6 +1189,58 @@ namespace AlphaTab.Importer
             {
                 voice.AddBeat(beat.Clone());
             }
+        }
+
+        private void BeatDuration()
+        {
+            if (_sy != AlphaTexSymbols.DoubleDot)
+            {
+                return;
+            }
+
+            _allowNegatives = true;
+            NewSy();
+            _allowNegatives = false;
+            if (_sy != AlphaTexSymbols.Number)
+            {
+                Error("duration", AlphaTexSymbols.Number);
+            }
+
+            _currentDuration = ParseDuration((int)_syData);
+            _currentTuplet = 1;
+            NewSy();
+
+            if (_sy != AlphaTexSymbols.LBrace)
+            {
+                return;
+            }
+            NewSy();
+
+            while (_sy == AlphaTexSymbols.String)
+            {
+                var effect = _syData.ToString().ToLower();
+                switch(effect)
+                {
+                    case "tu":
+                        NewSy();
+                        if (_sy != AlphaTexSymbols.Number)
+                        {
+                            Error("duration-tuplet", AlphaTexSymbols.Number);
+                        }
+                        _currentTuplet = (int) _syData;
+                        NewSy();
+                        break;
+                    default:
+                        Error("beat-duration", AlphaTexSymbols.String, false);
+                        break;
+                }
+            }
+
+            if (_sy != AlphaTexSymbols.RBrace)
+            {
+                Error("beat-duration", AlphaTexSymbols.RBrace);
+            }
+            NewSy();
         }
 
         private void BeatEffects(Beat beat)
@@ -1198,6 +1299,12 @@ namespace AlphaTab.Importer
                 NewSy();
                 return true;
             }
+            if (syData == "tt")
+            {
+                beat.Tap = true;
+                NewSy();
+                return true;
+            }
             if (syData == "dd")
             {
                 beat.Dots = 2;
@@ -1230,43 +1337,7 @@ namespace AlphaTab.Importer
                     Error("tuplet", AlphaTexSymbols.Number);
                     return false;
                 }
-                var tuplet = (int)_syData;
-                switch (tuplet)
-                {
-                    case 3:
-                        beat.TupletNumerator = 3;
-                        beat.TupletDenominator = 2;
-                        break;
-                    case 5:
-                        beat.TupletNumerator = 5;
-                        beat.TupletDenominator = 4;
-                        break;
-                    case 6:
-                        beat.TupletNumerator = 6;
-                        beat.TupletDenominator = 4;
-                        break;
-                    case 7:
-                        beat.TupletNumerator = 7;
-                        beat.TupletDenominator = 4;
-                        break;
-                    case 9:
-                        beat.TupletNumerator = 9;
-                        beat.TupletDenominator = 8;
-                        break;
-                    case 10:
-                        beat.TupletNumerator = 10;
-                        beat.TupletDenominator = 8;
-                        break;
-                    case 11:
-                        beat.TupletNumerator = 11;
-                        beat.TupletDenominator = 8;
-                        break;
-                    case 12:
-                        beat.TupletNumerator = 12;
-                        beat.TupletNumerator = 8;
-                        beat.TupletDenominator = 8;
-                        break;
-                }
+                ApplyTuplet(beat, (int)_syData);
                 NewSy();
                 return true;
             }
@@ -1422,6 +1493,49 @@ namespace AlphaTab.Importer
             }
 
             return false;
+        }
+
+        private void ApplyTuplet(Beat beat, int tuplet)
+        {
+            switch (tuplet)
+            {
+                case 3:
+                    beat.TupletNumerator = 3;
+                    beat.TupletDenominator = 2;
+                    break;
+                case 5:
+                    beat.TupletNumerator = 5;
+                    beat.TupletDenominator = 4;
+                    break;
+                case 6:
+                    beat.TupletNumerator = 6;
+                    beat.TupletDenominator = 4;
+                    break;
+                case 7:
+                    beat.TupletNumerator = 7;
+                    beat.TupletDenominator = 4;
+                    break;
+                case 9:
+                    beat.TupletNumerator = 9;
+                    beat.TupletDenominator = 8;
+                    break;
+                case 10:
+                    beat.TupletNumerator = 10;
+                    beat.TupletDenominator = 8;
+                    break;
+                case 11:
+                    beat.TupletNumerator = 11;
+                    beat.TupletDenominator = 8;
+                    break;
+                case 12:
+                    beat.TupletNumerator = 12;
+                    beat.TupletDenominator = 8;
+                    break;
+                default:
+                    beat.TupletNumerator = 1;
+                    beat.TupletDenominator = 1;
+                    break;
+            }
         }
 
         private void Note(Beat beat)
@@ -1903,7 +2017,7 @@ namespace AlphaTab.Importer
                     master.TempoAutomation = tempoAutomation;
                     NewSy();
                 }
-                else if(syData == "section")
+                else if (syData == "section")
                 {
                     NewSy();
                     if (_sy != AlphaTexSymbols.String)
@@ -1925,6 +2039,31 @@ namespace AlphaTab.Importer
                     section.Marker = marker;
                     section.Text = text;
                     master.Section = section;
+                }
+                else if (syData == "tf")
+                {
+                    _allowTuning = false;
+                    NewSy();
+                    _allowTuning = true;
+
+                    switch (_sy)
+                    {
+                        case AlphaTexSymbols.String:
+                            master.TripletFeel = ParseTripletFeelFromString(_syData.ToString().ToLower());
+                            break;
+                        case AlphaTexSymbols.Number:
+                            master.TripletFeel = ParseTripletFeelFromInt((int)_syData);
+                            break;
+                        default:
+                            Error("triplet-feel", AlphaTexSymbols.String);
+                            break;
+                    }
+                    NewSy();
+                }
+                else if (syData == "ac")
+                {
+                    master.IsAnacrusis = true;
+                    NewSy();
                 }
                 else
                 {

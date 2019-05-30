@@ -200,7 +200,6 @@ namespace AlphaTab
                     new MarkerEffectInfo(), 
                     new TextEffectInfo(), 
                     new ChordsEffectInfo(),
-                    new TripletFeelEffectInfo(),
                     new FermataEffectInfo(),
                     new TrillEffectInfo(),
                     new WideBeatVibratoEffectInfo(),

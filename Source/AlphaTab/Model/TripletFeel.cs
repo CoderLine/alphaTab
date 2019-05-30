@@ -40,7 +40,7 @@ namespace AlphaTab.Model
         /// </summary>
         Dotted16th,
         /// <summary>
-        /// Dotte d8th
+        /// Dotted 8th
         /// </summary>
         Dotted8th,
         /// <summary>

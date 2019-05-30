@@ -140,7 +140,20 @@ namespace Microsoft.VisualStudio.TestTools.UnitTesting
         }
 
         [Inline]
+        public static void IsTrue(bool actual, string message)
+        {
+            Script.Write("untyped __js__(\"expect({0}).toBe(true)\", actual);");
+
+        }
+
+        [Inline]
         public static void IsFalse(bool actual)
+        {
+            Script.Write("untyped __js__(\"expect({0}).toBe(false)\", actual);");
+        }
+
+        [Inline]
+        public static void IsFalse(bool actual, string message)
         {
             Script.Write("untyped __js__(\"expect({0}).toBe(false)\", actual);");
         }

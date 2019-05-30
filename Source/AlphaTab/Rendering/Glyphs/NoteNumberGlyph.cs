@@ -135,10 +135,11 @@ namespace AlphaTab.Rendering.Glyphs
             var textWidth = NoteStringWidth + _trillNoteStringWidth;
             var x = cx + X + (Width - textWidth) / 2;
 
+            var prevFont = Renderer.ScoreRenderer.Canvas.Font;
             Renderer.ScoreRenderer.Canvas.Font = Renderer.Resources.GraceFont;
             canvas.FillText(_trillNoteString, x + NoteStringWidth + 3 * Scale, cy + Y);
+            Renderer.ScoreRenderer.Canvas.Font = prevFont;
 
-            Renderer.ScoreRenderer.Canvas.Font = Renderer.Resources.TablatureFont;
             canvas.FillText(_noteString, x, cy + Y);
 
             if (Renderer.Settings.IncludeNoteBounds)
