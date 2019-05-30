@@ -173,6 +173,11 @@ describe("alphaTab.test.importer.AlphaTexImporterTest", function() {
         __instance.TestMultiTrackMultiStaffInconsistentBars();
         done();
     });
+    it("TestSlides", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.TestSlides();
+        done();
+    });
 });
 describe("alphaTab.test.importer.Gp3ImporterTest", function() {
     var __instance = new alphaTab.test.importer.Gp3ImporterTest();
