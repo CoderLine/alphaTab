@@ -34,7 +34,10 @@ namespace AlphaTab.Rendering.Effects
        
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
-            return new TextGlyph(0, 0, beat.Voice.Bar.MasterBar.Section.Text, renderer.Resources.MarkerFont);
+            return new TextGlyph(0, 0, 
+                string.IsNullOrEmpty(beat.Voice.Bar.MasterBar.Section.Marker) 
+                    ? beat.Voice.Bar.MasterBar.Section.Text
+                    : "[" + beat.Voice.Bar.MasterBar.Section.Marker + "] " + beat.Voice.Bar.MasterBar.Section.Text, renderer.Resources.MarkerFont);
         }
 
         public bool CanExpand(Beat @from, Beat to)
