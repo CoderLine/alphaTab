@@ -3,7 +3,7 @@
     <RootNamespace>AlphaTab</RootNamespace>
     <AssemblyName>AlphaTab</AssemblyName>
     <PackageId>AlphaTab</PackageId>
-    <TargetFrameworks>netstandard2.0;net472;MonoAndroid8.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <DocumentationFile>$(OutDir)$(AssemblyName).xml</DocumentationFile>
     <NoWarn>$(NoWarn);0162</NoWarn>

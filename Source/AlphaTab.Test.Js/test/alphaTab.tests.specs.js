@@ -178,6 +178,11 @@ describe("alphaTab.test.importer.AlphaTexImporterTest", function() {
         __instance.TestSlides();
         done();
     });
+    it("TestSection", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.TestSection();
+        done();
+    });
     it("TestPopSlapTap", function(done) {
         alphaTab.test.TestPlatform.Done = done;
         __instance.TestPopSlapTap();
@@ -198,9 +203,29 @@ describe("alphaTab.test.importer.AlphaTexImporterTest", function() {
         __instance.TestTripletFeelShortNames();
         done();
     });
-    it("TestRangeTuplets", function(done) {
+    it("TestTripletFeelMultiBar", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestRangeTuplets();
+        __instance.TestTripletFeelMultiBar();
+        done();
+    });
+    it("TestTupletRepeat", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.TestTupletRepeat();
+        done();
+    });
+    it("TestSimpleAnacrusis", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.TestSimpleAnacrusis();
+        done();
+    });
+    it("TestMultiBarAnacrusis", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.TestMultiBarAnacrusis();
+        done();
+    });
+    it("TestRandomAnacrusis", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.TestRandomAnacrusis();
         done();
     });
 });
@@ -584,6 +609,10 @@ describe("alphaTab.test.importer.Gp7ImporterTest", function() {
     it("TestSimileMark", function(done) {
         alphaTab.test.TestPlatform.Done = done;
         __instance.TestSimileMark();
+    });
+    it("TestAnacrusis", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.TestAnacrusis();
     });
     it("TestFermata", function(done) {
         alphaTab.test.TestPlatform.Done = done;

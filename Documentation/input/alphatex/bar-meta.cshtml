@@ -138,3 +138,22 @@ TexSample: true
 <script type="text/x-alphatab">
 	$('#alphaTabAnacrusis').alphaTab();
 </script>
+
+<h2 id="sections">Sections</h2>
+
+<p>
+    To split your song into individual sections (e.g. intro, chorus, solo etc.) you can mark a bar as a section start by using <code>\section</code> followed by the section name. If you want to also specify a marker beside the text, use the format <code>\section Marker Text</code>
+</p>
+
+<div id="alphaTabSections" data-tex="true">
+\section Intro // simple section 
+1.1 | 1.1 | 
+\section "Chorus 01" // with spaces in name
+1.1 | 
+\section S Solo // with marker and section name differently
+1.1
+</div>
+<script type="text/x-alphatab">
+	$('#alphaTabSections').alphaTab();
+</script>
+

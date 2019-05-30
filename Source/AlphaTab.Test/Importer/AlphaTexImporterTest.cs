@@ -773,6 +773,30 @@ namespace AlphaTab.Test.Importer
         }
 
         [TestMethod]
+        public void TestSection()
+        {
+            var tex = @"\section Intro 1.1 | 1.1 | \section ""Chorus 01"" 1.1 | \section S Solo";
+            var score = ParseTex(tex);
+
+            Assert.AreEqual(1, score.Tracks.Count);
+            Assert.AreEqual(4, score.MasterBars.Count);
+
+            Assert.IsTrue(score.MasterBars[0].IsSectionStart);
+            Assert.AreEqual("Intro", score.MasterBars[0].Section.Text);
+            Assert.AreEqual("", score.MasterBars[0].Section.Marker);
+
+            Assert.IsFalse(score.MasterBars[1].IsSectionStart);
+
+            Assert.IsTrue(score.MasterBars[2].IsSectionStart);
+            Assert.AreEqual("Chorus 01", score.MasterBars[2].Section.Text);
+            Assert.AreEqual("", score.MasterBars[2].Section.Marker);
+
+            Assert.IsTrue(score.MasterBars[3].IsSectionStart);
+            Assert.AreEqual("Solo", score.MasterBars[3].Section.Text);
+            Assert.AreEqual("S", score.MasterBars[3].Section.Marker);
+        }
+
+        [TestMethod]
         public void TestPopSlapTap()
         {
             var tex = @"3.3{p} 3.3{s} 3.3{tt} r";

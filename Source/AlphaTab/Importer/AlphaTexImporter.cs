@@ -2017,6 +2017,29 @@ namespace AlphaTab.Importer
                     master.TempoAutomation = tempoAutomation;
                     NewSy();
                 }
+                else if (syData == "section")
+                {
+                    NewSy();
+                    if (_sy != AlphaTexSymbols.String)
+                    {
+                        Error("section", AlphaTexSymbols.String);
+                    }
+
+                    var text = (string) _syData;
+                    NewSy();
+                    var marker = "";
+                    if (_sy == AlphaTexSymbols.String)
+                    {
+                        marker = text;
+                        text = (string) _syData;
+                        NewSy();
+                    }
+
+                    var section = new Section();
+                    section.Marker = marker;
+                    section.Text = text;
+                    master.Section = section;
+                }
                 else if (syData == "tf")
                 {
                     _allowTuning = false;
