@@ -331,7 +331,17 @@ namespace AlphaTab.Audio.Synth
         private void OnSamplesPlayed(int sampleCount)
         {
             var playedMillis = (sampleCount / (double)_synthesizer.SampleRate) * 1000;
-            UpdateTimePosition(_timePosition + playedMillis);
+            if (sampleCount < 0)
+            {
+                // when the output reports a negative sample count, this usually means
+                // that we paused and some samples were discarded from playback, in this case
+                // we seek to the precise position where the playback stopped. 
+                TimePosition = _timePosition + playedMillis;
+            }
+            else
+            {
+                UpdateTimePosition(_timePosition + playedMillis);
+            }
         }
 
         private void UpdateTimePosition(double timePosition)

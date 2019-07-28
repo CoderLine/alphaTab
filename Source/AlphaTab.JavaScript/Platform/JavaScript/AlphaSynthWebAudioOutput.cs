@@ -21,6 +21,8 @@ using AlphaTab.Audio.Synth.Ds;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Haxe.Js.Html.Audio;
+using AlphaTab.Util;
+using Haxe;
 
 namespace AlphaTab.Platform.JavaScript
 {
@@ -42,6 +44,8 @@ namespace AlphaTab.Platform.JavaScript
         private CircularSampleBuffer _circularBuffer;
 
         private bool _finished;
+        private double _contextTimeOnGenerate;
+        private int _samplesGenerated;
 
         public int SampleRate
         {
@@ -148,14 +152,25 @@ namespace AlphaTab.Platform.JavaScript
                 _audioNode.Disconnect(0);
             }
             _audioNode = null;
+
+            // Bug #255: When we pause the playback, there are some samples already
+            // generated and sent to the context for playback. When we pause and discard the whole
+            // context and buffers, we set the playback time to the future while the actual audio
+            // lags behind. here we calculate number of not played samples based on the context time 
+            // and then report back the new position.
+            var pauseTimePosition = _context.CurrentTime;
+            var playedDurationOnContext = pauseTimePosition - _contextTimeOnGenerate;
+            var playedDurationOnSamples = _samplesGenerated / PreferredSampleRate;
+
+            var discardedSamples = (playedDurationOnSamples - playedDurationOnContext) * PreferredSampleRate;
+            SamplesPlayed((int)discardedSamples * -1);
         }
 
         public void SequencerFinished()
         {
             _finished = true;
         }
-
-
+        
         public void AddSamples(SampleArray f)
         {
             _circularBuffer.Write(f, 0, f.Length);
@@ -194,6 +209,9 @@ namespace AlphaTab.Platform.JavaScript
             }
             else
             {
+                _contextTimeOnGenerate = _context.CurrentTime;
+                _samplesGenerated = left.Length;
+
                 var buffer = new SampleArray(samples);
                 _circularBuffer.Read(buffer, 0, buffer.Length);
 
@@ -203,7 +221,7 @@ namespace AlphaTab.Platform.JavaScript
                     left[i] = buffer[s++];
                     right[i] = buffer[s++];
                 }
-
+                
                 SamplesPlayed(left.Length);
             }
 

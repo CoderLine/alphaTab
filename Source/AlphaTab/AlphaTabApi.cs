@@ -217,7 +217,7 @@ namespace AlphaTab
 
             if (trackIndexes == null)
             {
-                return Score.Tracks.ToArray();
+                return Score.Tracks.Clone().ToArray();
             }
 
             foreach (var track in trackIndexes)

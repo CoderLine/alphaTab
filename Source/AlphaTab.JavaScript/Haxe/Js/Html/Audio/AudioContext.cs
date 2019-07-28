@@ -13,7 +13,10 @@ namespace AlphaTab.Haxe.Js.Html.Audio
         public extern HaxeFloat SampleRate { get; set; }
 
         [Name("destination")]
-        public AudioNode Destination { get; }
+        public extern AudioNode Destination { get; }
+
+        [Name("currentTime")]
+        public extern double CurrentTime { get; set; }
 
         [Name("createBuffer")]
         public extern AudioBuffer CreateBuffer(HaxeInt numberOfChannels, HaxeInt length, HaxeFloat sampleRate);
