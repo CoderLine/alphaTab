@@ -152,18 +152,6 @@ namespace AlphaTab.Platform.JavaScript
                 _audioNode.Disconnect(0);
             }
             _audioNode = null;
-
-            // Bug #255: When we pause the playback, there are some samples already
-            // generated and sent to the context for playback. When we pause and discard the whole
-            // context and buffers, we set the playback time to the future while the actual audio
-            // lags behind. here we calculate number of not played samples based on the context time 
-            // and then report back the new position.
-            var pauseTimePosition = _context.CurrentTime;
-            var playedDurationOnContext = pauseTimePosition - _contextTimeOnGenerate;
-            var playedDurationOnSamples = _samplesGenerated / PreferredSampleRate;
-
-            var discardedSamples = (playedDurationOnSamples - playedDurationOnContext) * PreferredSampleRate;
-            SamplesPlayed((int)discardedSamples * -1);
         }
 
         public void SequencerFinished()

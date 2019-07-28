@@ -197,7 +197,8 @@ namespace AlphaTab.Platform.JavaScript
             _main.PostMessage(new
             {
                 cmd = CmdPlayerStateChanged,
-                state = e.State
+                state = e.State,
+                stopped = e.Stopped
             });
         }
 

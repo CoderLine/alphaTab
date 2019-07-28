@@ -557,7 +557,6 @@ namespace AlphaTab
                 return;
             }
             Player.Stop();
-            CursorUpdateTick(0, true);
         }
 
         #endregion
@@ -615,7 +614,16 @@ namespace AlphaTab
             Player.StateChanged += e =>
             {
                 _playerState = e.State;
-                UiFacade.BeginInvoke(() => { CursorUpdateTick(_previousTick); });
+
+                if(!e.Stopped && e.State == PlayerState.Paused)
+                {
+                    var currentBeat = _currentBeat;
+                    var tickCache = _tickCache;
+                    if (currentBeat != null && tickCache != null)
+                    {
+                        Player.TickPosition = tickCache.GetMasterBarStart(currentBeat.Voice.Bar.MasterBar) + currentBeat.PlaybackStart;
+                    }
+                }
             };
 
             SetupClickHandling();

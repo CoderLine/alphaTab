@@ -349,7 +349,7 @@ namespace AlphaTab.Platform.JavaScript
                     break;
                 case AlphaSynthWebWorker.CmdPlayerStateChanged:
                     _state = data.state;
-                    OnStateChanged(new PlayerStateChangedEventArgs(data.state));
+                    OnStateChanged(new PlayerStateChangedEventArgs(data.state, data.stopped));
                     break;
                 case AlphaSynthWebWorker.CmdFinished:
                     OnFinished(new PlaybackFinishedEventArgs(data.isLooping));

@@ -193,7 +193,7 @@ namespace AlphaTab.Audio.Synth
 
             Logger.Debug("AlphaSynth", "Starting playback");
             State = PlayerState.Playing;
-            OnStateChanged(new PlayerStateChangedEventArgs(State));
+            OnStateChanged(new PlayerStateChangedEventArgs(State, false));
             Output.Play();
         }
 
@@ -204,7 +204,7 @@ namespace AlphaTab.Audio.Synth
 
             Logger.Debug("AlphaSynth", "Pausing playback");
             State = PlayerState.Paused;
-            OnStateChanged(new PlayerStateChangedEventArgs(State));
+            OnStateChanged(new PlayerStateChangedEventArgs(State, false));
             Output.Pause();
             _synthesizer.NoteOffAll(false);
         }
@@ -225,12 +225,14 @@ namespace AlphaTab.Audio.Synth
         /// <inheritdoc />
         public void Stop()
         {
-            if (!IsReadyForPlayback) return;
+            if (State == PlayerState.Paused || !IsReadyForPlayback) return;
 
             Logger.Debug("AlphaSynth", "Stopping playback");
-            Pause();
+            State = PlayerState.Paused;
+            Output.Pause();
             _synthesizer.NoteOffAll(true);
             TickPosition = _sequencer.PlaybackRange != null ? _sequencer.PlaybackRange.StartTick : 0;
+            OnStateChanged(new PlayerStateChangedEventArgs(State, true));
         }
 
         /// <inheritdoc />
@@ -331,17 +333,7 @@ namespace AlphaTab.Audio.Synth
         private void OnSamplesPlayed(int sampleCount)
         {
             var playedMillis = (sampleCount / (double)_synthesizer.SampleRate) * 1000;
-            if (sampleCount < 0)
-            {
-                // when the output reports a negative sample count, this usually means
-                // that we paused and some samples were discarded from playback, in this case
-                // we seek to the precise position where the playback stopped. 
-                TimePosition = _timePosition + playedMillis;
-            }
-            else
-            {
-                UpdateTimePosition(_timePosition + playedMillis);
-            }
+            UpdateTimePosition(_timePosition + playedMillis);
         }
 
         private void UpdateTimePosition(double timePosition)
@@ -510,13 +502,21 @@ namespace AlphaTab.Audio.Synth
         public PlayerState State { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the playback was stopped or only paused. 
+        /// </summary>
+        /// <returns>true if the playback was stopped, false if the playback was started or paused</returns>
+        public bool Stopped { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PlayerStateChangedEventArgs"/> class.
         /// </summary>
         /// <param name="state">The state.</param>
-        public PlayerStateChangedEventArgs(PlayerState state)
+        public PlayerStateChangedEventArgs(PlayerState state, bool stopped)
         {
             State = state;
+            Stopped = stopped;
         }
+
     }
 
     /// <summary>
