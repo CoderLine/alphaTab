@@ -10,6 +10,8 @@ alphaTab is a cross platform music notation and guitar tablature rendering libra
 
 ## Build Status
 
+> Until the official 1.0 release we recommend to use `develop` branch.
+
 &nbsp; | `master` | `develop`
 --- | --- | --- 
 **Build** | [![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/CoderLine/AlphaTab?branch=master&svg=true)](https://ci.appveyor.com/project/Danielku15/alphaTab/branch/master)  | [![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/CoderLine/AlphaTab?branch=develop&svg=true)](https://ci.appveyor.com/project/Danielku15/alphaTab/branch/develop)
@@ -18,6 +20,8 @@ alphaTab is a cross platform music notation and guitar tablature rendering libra
 # Downloads
 
 The latest binaries are available for download at [Appveyor](https://ci.appveyor.com/project/Danielku15/alphatab/build/artifacts). Use the links below to grab the binaries from the latest builds. Please do not use the GitHub releases yet, they are not maintained. 
+
+> Until the official 1.0 release we recommend to use `develop` branch.
 
 &nbsp; | `master` | `develop`
 --- | --- | --- 
