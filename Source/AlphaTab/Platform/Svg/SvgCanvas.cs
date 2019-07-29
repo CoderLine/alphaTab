@@ -7,7 +7,7 @@ namespace AlphaTab.Platform.Svg
     /// <summary>
     ///  A canvas implementation storing SVG data
     /// </summary>
-    internal abstract class SvgCanvas : ICanvas, IPathCanvas
+    internal abstract class SvgCanvas : ICanvas
     {
         protected const float BlurCorrection = 0;
 

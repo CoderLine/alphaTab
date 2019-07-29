@@ -218,7 +218,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
 
         public IScoreRenderer CreateWorkerRenderer()
         {
-            return new ManagedThreadScoreRenderer<AlphaTabControl>(_api.Settings, a =>
+            return new ManagedThreadScoreRenderer(_api.Settings, a =>
             {
                 if (_control.InvokeRequired)
                 {

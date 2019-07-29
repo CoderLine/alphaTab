@@ -60,23 +60,23 @@ namespace AlphaTab.Audio.Synth.Bank.Components.Generators
             GeneratorParameters generatorParams,
             SampleArray blockBuffer,
             double increment,
-            int start,
-            int end)
+            int bufferStart,
+            int bufferEnd)
         {
-            var end = generatorParams.CurrentState == GeneratorState.Loop ? LoopEndPhase - 1 : EndPhase - 1;
+            var phaseEnd = generatorParams.CurrentState == GeneratorState.Loop ? LoopEndPhase - 1 : EndPhase - 1;
             int index;
             float s1, s2, mu;
-            while (start < end && generatorParams.Phase < end) //do this until we reach an edge case or fill the buffer
+            while (bufferStart < bufferEnd && generatorParams.Phase < phaseEnd) //do this until we reach an edge case or fill the buffer
             {
                 index = (int)generatorParams.Phase;
                 s1 = Samples[index];
                 s2 = Samples[index + 1];
                 mu = (float)(generatorParams.Phase - index);
-                blockBuffer[start++] = s1 + mu * (s2 - s1);
+                blockBuffer[bufferStart++] = s1 + mu * (s2 - s1);
                 generatorParams.Phase += increment;
             }
 
-            while (start < end) //edge case, if in loop wrap to loop start else use duplicate sample
+            while (bufferStart < bufferEnd) //edge case, if in loop wrap to loop start else use duplicate sample
             {
                 index = (int)generatorParams.Phase;
                 s1 = Samples[index];
@@ -90,7 +90,7 @@ namespace AlphaTab.Audio.Synth.Bank.Components.Generators
                 }
 
                 mu = (float)(generatorParams.Phase - index);
-                blockBuffer[start++] = s1 + mu * (s2 - s1);
+                blockBuffer[bufferStart++] = s1 + mu * (s2 - s1);
                 generatorParams.Phase += increment;
             }
         }

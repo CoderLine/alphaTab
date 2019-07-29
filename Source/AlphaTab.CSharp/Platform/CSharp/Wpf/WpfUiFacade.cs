@@ -216,7 +216,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public IScoreRenderer CreateWorkerRenderer()
         {
-            return new ManagedThreadScoreRenderer<AlphaTab>(_api.Settings, a =>
+            return new ManagedThreadScoreRenderer(_api.Settings, a =>
             {
                 if (_control.Dispatcher.CheckAccess())
                 {

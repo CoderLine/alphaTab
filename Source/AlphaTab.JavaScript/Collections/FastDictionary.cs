@@ -19,7 +19,7 @@ namespace AlphaTab.Collections
         public TValue this[TKey index]
         {
             [Inline] get => Script.Write<TValue>("untyped this[index]");
-            [Inline] set => Script.Write<TValue>("return untyped this[index] = value");
+            [Inline] set => Script.Write<TValue>("untyped this[index] = value");
         }
 
         public int Count
@@ -36,7 +36,7 @@ namespace AlphaTab.Collections
         [Inline]
         public void Remove(TKey key)
         {
-            Script.Write("untyped __js__(\"delete {0}[{1}]\", this, key)");
+            Script.Write("untyped __js__(\"delete {0}[{1}]\", this, key);");
         }
 
         [Inline]
