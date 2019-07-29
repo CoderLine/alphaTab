@@ -1,28 +1,10 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using System;
+﻿using System;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TabSlideLineGlyph : Glyph
+    internal class TabSlideLineGlyph : Glyph
     {
         private readonly Note _startNote;
         private readonly SlideType _type;
@@ -51,7 +33,7 @@ namespace AlphaTab.Rendering.Glyphs
             float startY;
             float endX;
             float endY;
-            bool waves = false;
+            var waves = false;
 
             switch (_type)
             {
@@ -76,11 +58,14 @@ namespace AlphaTab.Rendering.Glyphs
                         endOffsetY = sizeY;
                     }
 
-                    startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_startNote.Beat, BeatXPosition.PostNotes);
+                    startX = cx + startNoteRenderer.X +
+                             startNoteRenderer.GetBeatX(_startNote.Beat, BeatXPosition.PostNotes);
                     startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) + startOffsetY;
                     if (_startNote.SlideTarget != null)
                     {
-                        var endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Renderer.Staff.StaveId, _startNote.SlideTarget.Beat.Voice.Bar);
+                        var endNoteRenderer =
+                            Renderer.ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Renderer.Staff.StaveId,
+                                _startNote.SlideTarget.Beat.Voice.Bar);
                         if (endNoteRenderer == null || endNoteRenderer.Staff != startNoteRenderer.Staff)
                         {
                             endX = cx + startNoteRenderer.X + _parent.X;
@@ -88,8 +73,10 @@ namespace AlphaTab.Rendering.Glyphs
                         }
                         else
                         {
-                            endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(_startNote.SlideTarget.Beat, BeatXPosition.OnNotes);
-                            endY = cy + endNoteRenderer.Y + endNoteRenderer.GetNoteY(_startNote.SlideTarget) + endOffsetY;
+                            endX = cx + endNoteRenderer.X +
+                                   endNoteRenderer.GetBeatX(_startNote.SlideTarget.Beat, BeatXPosition.OnNotes);
+                            endY = cy + endNoteRenderer.Y + endNoteRenderer.GetNoteY(_startNote.SlideTarget) +
+                                   endOffsetY;
                         }
                     }
                     else
@@ -97,6 +84,7 @@ namespace AlphaTab.Rendering.Glyphs
                         endX = cx + startNoteRenderer.X + _parent.X;
                         endY = startY;
                     }
+
                     break;
 
                 case SlideType.IntoFromBelow:
@@ -134,7 +122,8 @@ namespace AlphaTab.Rendering.Glyphs
                     startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote);
                     startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) - sizeY * 2;
 
-                    endX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_startNote.Beat, BeatXPosition.EndBeat);
+                    endX = cx + startNoteRenderer.X +
+                           startNoteRenderer.GetBeatX(_startNote.Beat, BeatXPosition.EndBeat);
                     endY = startY + sizeY * 3;
 
                     waves = true;
@@ -145,7 +134,8 @@ namespace AlphaTab.Rendering.Glyphs
                     startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote);
                     startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) + sizeY;
 
-                    endX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_startNote.Beat, BeatXPosition.EndBeat);
+                    endX = cx + startNoteRenderer.X +
+                           startNoteRenderer.GetBeatX(_startNote.Beat, BeatXPosition.EndBeat);
                     endY = startY - sizeY * 3;
 
                     waves = true;
@@ -177,7 +167,6 @@ namespace AlphaTab.Rendering.Glyphs
                 canvas.LineTo(endX, endY);
                 canvas.Stroke();
             }
-
         }
     }
 }

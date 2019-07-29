@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace AlphaTab.Xml
+﻿namespace AlphaTab.Xml
 {
-    class XmlException : AlphaTabException
+    internal class XmlException : AlphaTabException
     {
         public string Xml { get; private set; }
         public int Pos { get; private set; }

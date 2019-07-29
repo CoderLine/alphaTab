@@ -5,7 +5,7 @@ namespace AlphaTab.Haxe.Js.Html
 {
     [External]
     [Name("js.html.MouseEvent")]
-    public class MouseEvent: UIEvent
+    public class MouseEvent : UIEvent
     {
         [Name("button")]
         public extern int Button { get; set; }

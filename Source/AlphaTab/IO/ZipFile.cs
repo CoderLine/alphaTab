@@ -6,7 +6,7 @@ namespace AlphaTab.IO
     /// <summary>
     /// this public class represents a file within the GpxFileSystem
     /// </summary>
-    class ZipEntry
+    internal class ZipEntry
     {
         public string FullName { get; set; }
         public string FileName { get; set; }
@@ -16,7 +16,7 @@ namespace AlphaTab.IO
     /// <summary>
     /// This class allows reading zip files.
     /// </summary>
-    partial class ZipFile
+    internal partial class ZipFile
     {
         /// <summary>
         /// You can set a file filter method using this setter. On parsing

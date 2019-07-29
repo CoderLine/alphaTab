@@ -1,26 +1,8 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using AlphaTab.Model;
+﻿using AlphaTab.Model;
 
 namespace AlphaTab.Audio.Generator
 {
-    class MidiPlaybackController
+    internal class MidiPlaybackController
     {
         private readonly Score _score;
 
@@ -48,10 +30,11 @@ namespace AlphaTab.Audio.Generator
         {
             var masterBar = _score.MasterBars[Index];
             var masterBarAlternateEndings = masterBar.AlternateEndings;
-            
+
             // if the repeat group wasn't closed we reset the repeating 
             // on the last group opening
-            if (!masterBar.RepeatGroup.IsClosed && masterBar.RepeatGroup.Openings[masterBar.RepeatGroup.Openings.Count - 1] == masterBar)
+            if (!masterBar.RepeatGroup.IsClosed &&
+                masterBar.RepeatGroup.Openings[masterBar.RepeatGroup.Openings.Count - 1] == masterBar)
             {
                 _repeatNumber = 0;
                 _repeatOpen = false;
@@ -93,7 +76,7 @@ namespace AlphaTab.Audio.Generator
             var masterBarRepeatCount = masterBar.RepeatCount - 1;
 
             // if we encounter a repeat end 
-            if (_repeatOpen && (masterBarRepeatCount > 0))
+            if (_repeatOpen && masterBarRepeatCount > 0)
             {
                 // more repeats required?
                 if (_repeatNumber < masterBarRepeatCount)

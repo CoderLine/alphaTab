@@ -1,28 +1,11 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using System;
+﻿using System;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Platform;
 
 namespace AlphaTab.UI
 {
-    class HtmlElementContainer : IContainer
+    internal class HtmlElementContainer : IContainer
     {
         public float Top
         {
@@ -82,7 +65,9 @@ namespace AlphaTab.UI
             }
         }
 
-        public bool IsVisible => Element.OffsetWidth.IsTruthy() || Element.OffsetHeight.IsTruthy() || Element.GetClientRects().Length.IsTruthy();
+        public bool IsVisible =>
+            Element.OffsetWidth.IsTruthy() || Element.OffsetHeight.IsTruthy() ||
+            Element.GetClientRects().Length.IsTruthy();
 
         public Element Element { get; }
 
@@ -105,20 +90,37 @@ namespace AlphaTab.UI
 
         public event Action<IMouseEventArgs> MouseDown
         {
-            add { Element.AddEventListener("mousedown", (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }), true); }
+            add
+            {
+                Element.AddEventListener("mousedown",
+                    (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }),
+                    true);
+            }
             remove { }
         }
 
         public event Action<IMouseEventArgs> MouseMove
         {
-            add { Element.AddEventListener("mousemove", (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }), true); }
+            add
+            {
+                Element.AddEventListener("mousemove",
+                    (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }),
+                    true);
+            }
             remove { }
         }
+
         public event Action<IMouseEventArgs> MouseUp
         {
-            add { Element.AddEventListener("mouseup", (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }), true); }
+            add
+            {
+                Element.AddEventListener("mouseup",
+                    (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }),
+                    true);
+            }
             remove { }
         }
+
         public void Clear()
         {
             Element.InnerHTML = "";

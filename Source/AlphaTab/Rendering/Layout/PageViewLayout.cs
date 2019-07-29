@@ -1,27 +1,8 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using System;
+﻿using System;
 using AlphaTab.Collections;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
-using AlphaTab.Rendering.Utils;
-using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Util;
 
 namespace AlphaTab.Rendering.Layout
@@ -29,10 +10,14 @@ namespace AlphaTab.Rendering.Layout
     /// <summary>
     /// This layout arranges the bars into a fixed width and dynamic height region. 
     /// </summary>
-    class PageViewLayout : ScoreLayout
+    internal class PageViewLayout : ScoreLayout
     {
         // left top right bottom
-        public static readonly float[] PagePadding = { 40, 40, 40, 40 };
+        public static readonly float[] PagePadding =
+        {
+            40, 40, 40, 40
+        };
+
         public const float GroupSpacing = 20;
 
         private FastList<StaveGroup> _groups;
@@ -40,7 +25,8 @@ namespace AlphaTab.Rendering.Layout
         private FastList<MasterBarsRenderers> _barsFromPreviousGroup;
         private float[] _pagePadding;
 
-        public override string Name { get { return "PageView"; } }
+        public override string Name => "PageView";
+
         public PageViewLayout(ScoreRenderer renderer)
             : base(renderer)
         {
@@ -54,20 +40,14 @@ namespace AlphaTab.Rendering.Layout
             {
                 _pagePadding = new[]
                 {
-                    _pagePadding[0],
-                    _pagePadding[0],
-                    _pagePadding[0],
-                    _pagePadding[0]
+                    _pagePadding[0], _pagePadding[0], _pagePadding[0], _pagePadding[0]
                 };
             }
             else if (_pagePadding.Length == 2)
             {
                 _pagePadding = new[]
                 {
-                    _pagePadding[0],
-                    _pagePadding[1],
-                    _pagePadding[0],
-                    _pagePadding[1]
+                    _pagePadding[0], _pagePadding[1], _pagePadding[0], _pagePadding[1]
                 };
             }
 
@@ -82,8 +62,8 @@ namespace AlphaTab.Rendering.Layout
 
             // 
             // 2. Chord Diagrms
-            y = LayoutAndRenderChordDiagrams(x, y);
-            
+            y = LayoutAndRenderChordDiagrams(y);
+
             //
             // 3. One result per StaveGroup
             y = LayoutAndRenderScore(x, y);
@@ -91,10 +71,7 @@ namespace AlphaTab.Rendering.Layout
             Height = y + _pagePadding[3];
         }
 
-        public override bool SupportsResize
-        {
-            get { return true; }
-        }
+        public override bool SupportsResize => true;
 
         public override void Resize()
         {
@@ -109,7 +86,7 @@ namespace AlphaTab.Rendering.Layout
 
             // 
             // 2. Chord Digrams
-            y = LayoutAndRenderChordDiagrams(x, y, oldHeight);
+            y = LayoutAndRenderChordDiagrams(y, oldHeight);
 
             //
             // 2. One result per StaveGroup
@@ -118,12 +95,13 @@ namespace AlphaTab.Rendering.Layout
             Height = y + _pagePadding[3];
         }
 
-        private float LayoutAndRenderChordDiagrams(float x, float y, float totalHeight = -1)
+        private float LayoutAndRenderChordDiagrams(float y, float totalHeight = -1)
         {
             if (ChordDiagrams == null)
             {
                 return y;
             }
+
             var res = Renderer.Settings.RenderingResources;
 
             ChordDiagrams.Width = Width;
@@ -165,7 +143,7 @@ namespace AlphaTab.Rendering.Layout
                 HeaderFooterElements.Album, HeaderFooterElements.WordsAndMusic
             };
 
-            for (int i = 0; i < centeredGlyphs.Length; i++)
+            for (var i = 0; i < centeredGlyphs.Length; i++)
             {
                 if (ScoreInfoGlyphs.ContainsKey(centeredGlyphs[i]))
                 {
@@ -177,7 +155,7 @@ namespace AlphaTab.Rendering.Layout
                 }
             }
 
-            bool musicOrWords = false;
+            var musicOrWords = false;
             float musicOrWordsHeight = 0;
             if (ScoreInfoGlyphs.ContainsKey(HeaderFooterElements.Music))
             {
@@ -188,6 +166,7 @@ namespace AlphaTab.Rendering.Layout
                 musicOrWords = true;
                 musicOrWordsHeight = glyph.Font.Size;
             }
+
             if (ScoreInfoGlyphs.ContainsKey(HeaderFooterElements.Words))
             {
                 var glyph = ScoreInfoGlyphs[HeaderFooterElements.Words];
@@ -249,7 +228,7 @@ namespace AlphaTab.Rendering.Layout
             // if we have a fixed number of bars per row, we only need to refit them. 
             if (Renderer.Settings.Layout.Get("barsPerRow", -1) != -1)
             {
-                for (int i = 0; i < _groups.Count; i++)
+                for (var i = 0; i < _groups.Count; i++)
                 {
                     var group = _groups[i];
                     FitGroup(group);
@@ -308,6 +287,7 @@ namespace AlphaTab.Rendering.Layout
                         group.Y = y;
                     }
                 }
+
                 group.IsLast = LastBarIndex == group.LastBarIndex;
 
                 // don't forget to finish the last group
@@ -353,7 +333,7 @@ namespace AlphaTab.Rendering.Layout
         private float PaintGroup(StaveGroup group, float totalHeight, ICanvas canvas)
         {
             // paint into canvas
-            var height = group.Height + (GroupSpacing * Scale);
+            var height = group.Height + GroupSpacing * Scale;
             canvas.BeginRender(Width, height);
             Renderer.Canvas.Color = Renderer.Settings.RenderingResources.MainGlyphColor;
             Renderer.Canvas.TextAlign = TextAlign.Left;
@@ -401,7 +381,7 @@ namespace AlphaTab.Rendering.Layout
 
             var maxWidth = MaxWidth;
             var end = endIndex + 1;
-            for (int i = currentBarIndex; i < end; i++)
+            for (var i = currentBarIndex; i < end; i++)
             {
                 if (_barsFromPreviousGroup.Count > 0)
                 {
@@ -416,12 +396,13 @@ namespace AlphaTab.Rendering.Layout
                     var renderers = group.AddBars(Renderer.Tracks, i);
                     _allMasterBarRenderers.Add(renderers);
                 }
+
                 _barsFromPreviousGroup = new FastList<MasterBarsRenderers>();
 
                 var groupIsFull = false;
 
                 // can bar placed in this line?
-                if (barsPerRow == -1 && ((group.Width) >= maxWidth && group.MasterBarsRenderers.Count != 0))
+                if (barsPerRow == -1 && group.Width >= maxWidth && group.MasterBarsRenderers.Count != 0)
                 {
                     groupIsFull = true;
                 }
@@ -432,7 +413,7 @@ namespace AlphaTab.Rendering.Layout
 
                 if (groupIsFull)
                 {
-                    MasterBarsRenderers reverted = group.RevertLastBar();
+                    var reverted = group.RevertLastBar();
                     if (reverted != null)
                     {
                         _barsFromPreviousGroup.Add(reverted);
@@ -458,12 +439,6 @@ namespace AlphaTab.Rendering.Layout
             return group;
         }
 
-        private float MaxWidth
-        {
-            get
-            {
-                return Renderer.Settings.Width - _pagePadding[0] - _pagePadding[2];
-            }
-        }
+        private float MaxWidth => Renderer.Settings.Width - _pagePadding[0] - _pagePadding[2];
     }
 }

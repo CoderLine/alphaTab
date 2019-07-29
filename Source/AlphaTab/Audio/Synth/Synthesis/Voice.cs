@@ -1,33 +1,15 @@
-﻿/*
- * This file is part of alphaSynth.
- * Copyright (c) 2014, T3866, PerryCodes, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using AlphaTab.Audio.Synth.Bank.Patch;
+﻿using AlphaTab.Audio.Synth.Bank.Patch;
 
 namespace AlphaTab.Audio.Synth.Synthesis
 {
-    enum VoiceStateEnum
+    internal enum VoiceStateEnum
     {
         Stopped = 0,
         Stopping = 1,
         Playing = 2
     }
 
-    class Voice
+    internal class Voice
     {
         public Patch Patch { get; private set; }
         public VoiceParameters VoiceParams { get; private set; }
@@ -40,15 +22,23 @@ namespace AlphaTab.Audio.Synth.Synthesis
         public void Start()
         {
             if (VoiceParams.State != VoiceStateEnum.Stopped)
+            {
                 return;
+            }
+
             if (Patch.Start(VoiceParams))
+            {
                 VoiceParams.State = VoiceStateEnum.Playing;
+            }
         }
 
         public void Stop()
         {
             if (VoiceParams.State != VoiceStateEnum.Playing)
+            {
                 return;
+            }
+
             VoiceParams.State = VoiceStateEnum.Stopping;
             Patch.Stop(VoiceParams);
         }
@@ -62,7 +52,9 @@ namespace AlphaTab.Audio.Synth.Synthesis
         {
             //do not process if the voice is stopped
             if (VoiceParams.State == VoiceStateEnum.Stopped)
+            {
                 return;
+            }
 
             //process using the patch's algorithm
             Patch.Process(VoiceParams, startIndex, endIndex, isMuted, false);
@@ -72,7 +64,9 @@ namespace AlphaTab.Audio.Synth.Synthesis
         {
             //do not process if the voice is stopped
             if (VoiceParams.State == VoiceStateEnum.Stopped)
+            {
                 return;
+            }
 
             //process using the patch's algorithm
             Patch.Process(VoiceParams, startIndex, endIndex, true, true);

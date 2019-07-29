@@ -6,7 +6,7 @@ using AlphaTab.Audio.Synth;
 
 namespace AlphaTab.Samples.Wpf.Converter
 {
-    class PlayerStateToImageSourceConverter : IValueConverter
+    internal class PlayerStateToImageSourceConverter : IValueConverter
     {
         public ImageSource PlayImage { get; set; }
         public ImageSource PauseImage { get; set; }

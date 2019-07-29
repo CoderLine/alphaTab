@@ -1,21 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using System;
+﻿using System;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Haxe;
 using AlphaTab.Haxe.Js;
@@ -29,7 +12,7 @@ namespace AlphaTab.Platform.JavaScript
     /// This class implements a HTML5 WebWorker based version of alphaSynth
     /// which can be controlled via WebWorker messages.
     /// </summary>
-    class AlphaSynthWebWorker
+    internal class AlphaSynthWebWorker
     {
         #region Commands
 
@@ -92,25 +75,29 @@ namespace AlphaTab.Platform.JavaScript
             _player.MidiLoadFailed += OnMidiLoadFailed;
             _player.ReadyForPlayback += OnReadyForPlayback;
 
-            _main.PostMessage(new { cmd = CmdReady });
+            _main.PostMessage(new
+            {
+                cmd = CmdReady
+            });
         }
 
         public static void Init()
         {
             DedicatedWorkerGlobalScope main = Lib.Global;
-            main.AddEventListener("message", (Action<MessageEvent>)(e =>
-            {
-                var data = e.Data;
-                string cmd = data.cmd;
-                switch (cmd)
+            main.AddEventListener("message",
+                (Action<MessageEvent>)(e =>
                 {
-                    case CmdInitialize:
-                        AlphaSynthWorkerSynthOutput.PreferredSampleRate = data.sampleRate;
-                        Logger.LogLevel = data.logLevel;
-                        new AlphaSynthWebWorker(main, data.id);
-                        break;
-                }
-            }));
+                    var data = e.Data;
+                    string cmd = data.cmd;
+                    switch (cmd)
+                    {
+                        case CmdInitialize:
+                            AlphaSynthWorkerSynthOutput.PreferredSampleRate = data.sampleRate;
+                            Logger.LogLevel = data.logLevel;
+                            new AlphaSynthWebWorker(main, data.id);
+                            break;
+                    }
+                }));
         }
 
         public void HandleMessage(MessageEvent e)
@@ -230,16 +217,18 @@ namespace AlphaTab.Platform.JavaScript
 
         private object SerializeException(Exception e)
         {
-            dynamic error = Json.Parse(Json.Stringify(e));
+            var error = Json.Parse(Json.Stringify(e));
             dynamic e2 = e;
             if (e2.message)
             {
                 error.message = e2.message;
             }
+
             if (e2.stack)
             {
                 error.stack = e2.stack;
             }
+
             if (e2.constructor && e2.constructor.name)
             {
                 error.type = e2.constructor.name;

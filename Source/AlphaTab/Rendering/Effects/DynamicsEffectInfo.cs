@@ -1,45 +1,29 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using AlphaTab.Model;
+﻿using AlphaTab.Model;
 using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class DynamicsEffectInfo : IEffectBarRendererInfo
+    internal class DynamicsEffectInfo : IEffectBarRendererInfo
     {
-        public string EffectId { get { return "dynamics"; } }
-        public bool HideOnMultiTrack { get { return false; } }
-        public bool CanShareBand { get { return false; } }
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
+        public string EffectId => "dynamics";
+        public bool HideOnMultiTrack => false;
+        public bool CanShareBand => false;
+        public EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.SingleOnBeat;
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
-            return InternalShouldCreateGlyph(settings, beat, true);
+            return InternalShouldCreateGlyph(beat);
         }
 
-        private bool InternalShouldCreateGlyph(Settings settings, Beat beat, bool checkForDuplicates)
+        private bool InternalShouldCreateGlyph(Beat beat)
         {
             if (beat.Voice.Bar.Staff.Track.Score.Stylesheet.HideDynamics || beat.IsEmpty || beat.Voice.IsEmpty)
             {
                 return false;
             }
 
-            var show = ((beat.Voice.Index == 0 && beat.Index == 0 && beat.Voice.Bar.Index == 0) || (beat.PreviousBeat != null && beat.Dynamic != beat.PreviousBeat.Dynamic));
+            var show = beat.Voice.Index == 0 && beat.Index == 0 && beat.Voice.Bar.Index == 0 ||
+                       beat.PreviousBeat != null && beat.Dynamic != beat.PreviousBeat.Dynamic;
 
             // ensure we do not show duplicate dynamics
             if (show && beat.Voice.Index > 0)
@@ -49,7 +33,8 @@ namespace AlphaTab.Rendering.Effects
                     if (voice.Index < beat.Voice.Index)
                     {
                         var beatAtSamePos = voice.GetBeatAtDisplayStart(beat.DisplayStart);
-                        if (beatAtSamePos != null && beat.Dynamic == beatAtSamePos.Dynamic && InternalShouldCreateGlyph(settings, beatAtSamePos, false))
+                        if (beatAtSamePos != null && beat.Dynamic == beatAtSamePos.Dynamic &&
+                            InternalShouldCreateGlyph(beatAtSamePos))
                         {
                             show = false;
                         }
@@ -65,7 +50,7 @@ namespace AlphaTab.Rendering.Effects
             return new DynamicsGlyph(0, 0, beat.Dynamic);
         }
 
-        public bool CanExpand(Beat @from, Beat to)
+        public bool CanExpand(Beat from, Beat to)
         {
             return true;
         }

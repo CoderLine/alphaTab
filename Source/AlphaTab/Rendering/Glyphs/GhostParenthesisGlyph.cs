@@ -2,10 +2,11 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class GhostParenthesisGlyph : Glyph
+    internal class GhostParenthesisGlyph : Glyph
     {
         private readonly bool _isOpen;
         private const int Size = 6;
+
         public GhostParenthesisGlyph(bool isOpen) : base(0, 0)
         {
             _isOpen = isOpen;
@@ -23,19 +24,29 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (_isOpen)
             {
-                TieGlyph.PaintTie(canvas, Scale,
-                    cx + X + Width, cy + Y + Height,
-                    cx + X + Width, cy + Y,
-                    false, Size, 3);
+                TieGlyph.PaintTie(canvas,
+                    Scale,
+                    cx + X + Width,
+                    cy + Y + Height,
+                    cx + X + Width,
+                    cy + Y,
+                    false,
+                    Size,
+                    3);
             }
             else
             {
-                TieGlyph.PaintTie(canvas, Scale,
-                    cx + X, cy + Y,
-                    cx + X, cy + Y + Height,
-                    false, Size, 3);
-
+                TieGlyph.PaintTie(canvas,
+                    Scale,
+                    cx + X,
+                    cy + Y,
+                    cx + X,
+                    cy + Y + Height,
+                    false,
+                    Size,
+                    3);
             }
+
             canvas.Fill();
         }
     }

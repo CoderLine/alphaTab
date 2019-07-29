@@ -1,21 +1,3 @@
-/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
 using AlphaTab.Collections;
 using AlphaTab.Platform.Model;
 
@@ -99,7 +81,7 @@ namespace AlphaTab.Model
             dst.ShortName = src.ShortName;
             dst.Index = src.Index;
             dst.Color.Raw = src.Color.Raw;
-            dst.Color.RGBA = src.Color.RGBA;
+            dst.Color.Rgba = src.Color.Rgba;
         }
 
         internal void Finish(Settings settings)
@@ -108,7 +90,9 @@ namespace AlphaTab.Model
             {
                 ShortName = Name;
                 if (ShortName.Length > ShortNameMaxLength)
+                {
                     ShortName = ShortName.Substring(0, ShortNameMaxLength);
+                }
             }
 
             for (int i = 0, j = Staves.Count; i < j; i++)
@@ -132,7 +116,7 @@ namespace AlphaTab.Model
                 if (lyric.StartBar >= 0)
                 {
                     var beat = staff.Bars[lyric.StartBar].Voices[0].Beats[0];
-                    for (int ci = 0; ci < lyric.Chunks.Length && beat != null; ci++)
+                    for (var ci = 0; ci < lyric.Chunks.Length && beat != null; ci++)
                     {
                         // skip rests and empty beats
                         while (beat != null && (beat.IsEmpty || beat.IsRest))
@@ -148,6 +132,7 @@ namespace AlphaTab.Model
                             {
                                 beat.Lyrics = new string[lyrics.Count];
                             }
+
                             // assign chunk
                             beat.Lyrics[li] = lyric.Chunks[ci];
                             beat = beat.NextBeat;

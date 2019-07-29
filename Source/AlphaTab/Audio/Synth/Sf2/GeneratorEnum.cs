@@ -1,6 +1,6 @@
 ﻿namespace AlphaTab.Audio.Synth.Sf2
 {
-    enum GeneratorEnum
+    internal enum GeneratorEnum
     {
         StartAddressOffset = 0,
         EndAddressOffset = 1,
@@ -55,7 +55,7 @@
         EndLoopAddressCoarseOffset = 50,
         CoarseTune = 51,
         FineTune = 52,
-        SampleID = 53,
+        SampleId = 53,
         SampleModes = 54,
         Reserved3 = 55,
         ScaleTuning = 56,

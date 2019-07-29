@@ -6,27 +6,39 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class ScoreHelperNotesBaseGlyph : Glyph
+    internal class ScoreHelperNotesBaseGlyph : Glyph
     {
         private const int SlurHeight = 11;
-        public const int EndPadding = (NoteHeadGlyph.QuarterNoteHeadWidth / 2) + 3;
-        protected FastList<BendNoteHeadGroupGlyph> _bendNoteHeads;
+        public const int EndPadding = NoteHeadGlyph.QuarterNoteHeadWidth / 2 + 3;
+        protected FastList<BendNoteHeadGroupGlyph> BendNoteHeads;
 
         public ScoreHelperNotesBaseGlyph()
             : base(0, 0)
         {
-            _bendNoteHeads = new FastList<BendNoteHeadGroupGlyph>();
+            BendNoteHeads = new FastList<BendNoteHeadGroupGlyph>();
         }
 
-        protected void DrawBendSlur(ICanvas canvas, float x1, float y1, float x2, float y2, bool down, float scale, string slurText = null)
+        protected void DrawBendSlur(
+            ICanvas canvas,
+            float x1,
+            float y1,
+            float x2,
+            float y2,
+            bool down,
+            float scale,
+            string slurText = null)
         {
-            var normalVectorX = (y2 - y1);
-            var normalVectorY = (x2 - x1);
-            var length = (float)Math.Sqrt((normalVectorX * normalVectorX) + (normalVectorY * normalVectorY));
+            var normalVectorX = y2 - y1;
+            var normalVectorY = x2 - x1;
+            var length = (float)Math.Sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
             if (down)
+            {
                 normalVectorX *= -1;
+            }
             else
+            {
                 normalVectorY *= -1;
+            }
 
             // make to unit vector
             normalVectorX /= length;
@@ -42,8 +54,9 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 offset /= 2;
             }
-            var cp1X = centerX + (offset * normalVectorX);
-            var cp1Y = centerY + (offset * normalVectorY);
+
+            var cp1X = centerX + offset * normalVectorX;
+            var cp1Y = centerY + offset * normalVectorY;
 
             canvas.BeginPath();
 
@@ -66,7 +79,7 @@ namespace AlphaTab.Rendering.Glyphs
             base.DoLayout();
 
             Width = 0;
-            foreach (var noteHeads in _bendNoteHeads)
+            foreach (var noteHeads in BendNoteHeads)
             {
                 noteHeads.DoLayout();
                 Width += noteHeads.Width + 10 * Scale;
@@ -85,6 +98,5 @@ namespace AlphaTab.Rendering.Glyphs
                     return BeamDirection.Up;
             }
         }
-
     }
 }

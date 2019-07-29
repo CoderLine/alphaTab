@@ -1,26 +1,9 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using AlphaTab.Model;
+﻿using AlphaTab.Model;
 using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class ScoreLegatoGlyph : TieGlyph
+    internal class ScoreLegatoGlyph : TieGlyph
     {
         public ScoreLegatoGlyph(Beat startBeat, Beat endBeat, bool forEnd = false)
             : base(startBeat, endBeat, forEnd)
@@ -30,7 +13,7 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             base.DoLayout();
-            YOffset = (NoteHeadGlyph.NoteHeadHeight/2);
+            YOffset = NoteHeadGlyph.NoteHeadHeight / 2;
         }
 
         protected override BeamDirection GetBeamDirection(Beat beat, BarRendererBase noteRenderer)
@@ -98,10 +81,8 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 return noteRenderer.GetBeatX(StartBeat);
             }
-            else
-            {
-                return noteRenderer.GetNoteX(StartBeat.MinNote);
-            }
+
+            return noteRenderer.GetNoteX(StartBeat.MinNote);
         }
 
         protected override float GetEndX(BarRendererBase noteRenderer)
@@ -110,11 +91,8 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 return noteRenderer.GetBeatX(EndBeat);
             }
-            else
-            {
-                return noteRenderer.GetNoteX(EndBeat.MinNote, false);
-            }
-        }
 
+            return noteRenderer.GetNoteX(EndBeat.MinNote, false);
+        }
     }
 }

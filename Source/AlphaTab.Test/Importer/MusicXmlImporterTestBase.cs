@@ -175,13 +175,13 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(expected.Tempo, actual.Tempo, "Mismatch on Tempo");
             Assert.AreEqual(expected.TempoLabel, actual.TempoLabel, "Mismatch on TempoLabel");
             Assert.AreEqual(expected.MasterBars.Count, actual.MasterBars.Count, "Mismatch on MasterBars.Count");
-            for (int i = 0; i < expected.MasterBars.Count; i++)
+            for (var i = 0; i < expected.MasterBars.Count; i++)
             {
                 AreEqual(expected.MasterBars[i], actual.MasterBars[i]);
             }
 
             Assert.AreEqual(expected.Tracks.Count, actual.Tracks.Count, "Mismatch on Tracks.Count");
-            for (int i = 0; i < expected.Tracks.Count; i++)
+            for (var i = 0; i < expected.Tracks.Count; i++)
             {
                 AreEqual(expected.Tracks[i], actual.Tracks[i]);
             }
@@ -195,7 +195,7 @@ namespace AlphaTab.Test.Importer
             //Assert.AreEqual(expected.Color.Raw, actual.Color.Raw, "Mismatch on Color.Raw");
             AreEqual(expected.PlaybackInfo, actual.PlaybackInfo);
             Assert.AreEqual(expected.Staves.Count, actual.Staves.Count, "Mismatch on Staves.Count");
-            for (int i = 0; i < expected.Staves.Count; i++)
+            for (var i = 0; i < expected.Staves.Count; i++)
             {
                 AreEqual(expected.Staves[i], actual.Staves[i]);
             }
@@ -211,7 +211,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(expected.Tuning.Length, actual.Tuning.Length, "Mismatch on Tuning.Length");
             Assert.AreEqual(expected.Index, actual.Index, "Mismatch on Index");
             Assert.AreEqual(expected.Bars.Count, actual.Bars.Count, "Mismatch on Bars.Count");
-            for (int i = 0; i < expected.Bars.Count; i++)
+            for (var i = 0; i < expected.Bars.Count; i++)
             {
                 AreEqual(expected.Bars[i], actual.Bars[i]);
             }
@@ -223,7 +223,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(expected.Clef, actual.Clef, "Mismatch on Clef");
             Assert.AreEqual(expected.ClefOttava, actual.ClefOttava, "Mismatch on ClefOttavia");
             //Assert.AreEqual(expected.Voices.Count, actual.Voices.Count, "Mismatch on Voices.Count");
-            for (int i = 0; i < Math.Min(expected.Voices.Count, actual.Voices.Count); i++)
+            for (var i = 0; i < Math.Min(expected.Voices.Count, actual.Voices.Count); i++)
             {
                 AreEqual(expected.Voices[i], actual.Voices[i]);
             }
@@ -233,7 +233,7 @@ namespace AlphaTab.Test.Importer
         {
             Assert.AreEqual(expected.Index, actual.Index, "Mismatch on Index");
             Assert.AreEqual(expected.Beats.Count, actual.Beats.Count, "Mismatch on Beats.Count");
-            for (int i = 0; i < expected.Beats.Count; i++)
+            for (var i = 0; i < expected.Beats.Count; i++)
             {
                 AreEqual(expected.Beats[i], actual.Beats[i]);
             }
@@ -280,7 +280,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(expected.InvertBeamDirection, actual.InvertBeamDirection, "Mismatch on InvertBeamDirection");
 
             Assert.AreEqual(expected.Notes.Count, actual.Notes.Count, "Mismatch on Notes.Count");
-            for (int i = 0; i < expected.Notes.Count; i++)
+            for (var i = 0; i < expected.Notes.Count; i++)
             {
                 AreEqual(expected.Notes[i], actual.Notes[i]);
             }
@@ -339,7 +339,7 @@ namespace AlphaTab.Test.Importer
         protected void AreEqual(FastList<BendPoint> expected, FastList<BendPoint> actual)
         {
             Assert.AreEqual(expected.Count, actual.Count, "Mismatch on Count");
-            for (int i = 0; i < expected.Count; i++)
+            for (var i = 0; i < expected.Count; i++)
             {
                 Assert.AreEqual(expected[i].Value, actual[i].Value);
                 Assert.AreEqual(expected[i].Offset, actual[i].Offset);
@@ -421,7 +421,7 @@ namespace AlphaTab.Test.Importer
             renderer.Render(tracks[0].Score, tracks.Select(t => t.Index).ToArray());
             using (var bmp = new Bitmap(totalWidth, totalHeight))
             {
-                int y = 0;
+                var y = 0;
                 using (var g = Graphics.FromImage(bmp))
                 {
                     g.Clear(Color.White);

@@ -1,21 +1,3 @@
-/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
 using AlphaTab.Audio;
 
 namespace AlphaTab.Model
@@ -23,7 +5,7 @@ namespace AlphaTab.Model
     /// <summary>
     /// This public class contains some utilities for working with model public classes
     /// </summary>
-    static class ModelUtils
+    internal static class ModelUtils
     {
         public static int GetIndex(this Duration duration)
         {
@@ -63,6 +45,7 @@ namespace AlphaTab.Model
                         staff.DisplayTranspositionPitch = -settings.DisplayTranspositionPitches[i];
                     }
                 }
+
                 if (i < settings.TranspositionPitches.Length)
                 {
                     foreach (var staff in score.Tracks[i].Staves)
@@ -96,7 +79,8 @@ namespace AlphaTab.Model
                         return null;
                 }
             }
-            else if (leftHand)
+
+            if (leftHand)
             {
                 switch (finger)
                 {
@@ -117,26 +101,24 @@ namespace AlphaTab.Model
                         return null;
                 }
             }
-            else
+
+            switch (finger)
             {
-                switch (finger)
-                {
-                    case Fingers.Unknown:
-                    case Fingers.NoOrDead:
-                        return null;
-                    case Fingers.Thumb:
-                        return "p";
-                    case Fingers.IndexFinger:
-                        return "i";
-                    case Fingers.MiddleFinger:
-                        return "m";
-                    case Fingers.AnnularFinger:
-                        return "a";
-                    case Fingers.LittleFinger:
-                        return "c";
-                    default:
-                        return null;
-                }
+                case Fingers.Unknown:
+                case Fingers.NoOrDead:
+                    return null;
+                case Fingers.Thumb:
+                    return "p";
+                case Fingers.IndexFinger:
+                    return "i";
+                case Fingers.MiddleFinger:
+                    return "m";
+                case Fingers.AnnularFinger:
+                    return "a";
+                case Fingers.LittleFinger:
+                    return "c";
+                default:
+                    return null;
             }
         }
     }

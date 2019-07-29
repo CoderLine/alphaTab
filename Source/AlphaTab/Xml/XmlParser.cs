@@ -20,12 +20,12 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
+
 using AlphaTab.Collections;
-using AlphaTab.Platform;
 
 namespace AlphaTab.Xml
 {
-    class XmlParser
+    internal class XmlParser
     {
         public const int CharCodeLF = '\n';
         public const int CharCodeTab = '\t';
@@ -72,24 +72,24 @@ namespace AlphaTab.Xml
         public static int Parse(string str, int p, XmlNode parent)
         {
             int c = str[p];
-            var state = XmlState.BEGIN;
-            var next = XmlState.BEGIN;
+            var state = XmlState.Begin;
+            var next = XmlState.Begin;
             var start = 0;
             var buf = new StringBuilder();
-            var escapeNext = XmlState.BEGIN;
+            var escapeNext = XmlState.Begin;
             XmlNode xml = null;
             string aname = null;
 
-            int nbrackets = 0;
+            var nbrackets = 0;
 
-            int attrValQuote = 0;
+            var attrValQuote = 0;
 
             while (p < str.Length)
             {
                 c = str[p];
                 switch (state)
                 {
-                    case XmlState.IGNORE_SPACES:
+                    case XmlState.IgnoreSpaces:
                         // IGNORE_SPACES
                         switch (c)
                         {
@@ -102,25 +102,27 @@ namespace AlphaTab.Xml
                                 state = next;
                                 continue;
                         }
+
                         break;
 
-                    case XmlState.BEGIN:
+                    case XmlState.Begin:
                         // BEGIN
                         switch (c)
                         {
                             case CharCodeLowerThan:
                                 // <
-                                state = XmlState.IGNORE_SPACES;
-                                next = XmlState.BEGIN_NODE;
+                                state = XmlState.IgnoreSpaces;
+                                next = XmlState.BeginNode;
                                 break;
                             default:
                                 start = p;
-                                state = XmlState.PCDATA;
+                                state = XmlState.Pcdata;
                                 continue;
                         }
+
                         break;
 
-                    case XmlState.PCDATA:
+                    case XmlState.Pcdata:
                         // PCDATA
                         if (c == CharCodeLowerThan)
                         {
@@ -131,22 +133,24 @@ namespace AlphaTab.Xml
                             child.Value = buf.ToString();
                             buf = new StringBuilder();
                             parent.AddChild(child);
-                            state = XmlState.IGNORE_SPACES;
-                            next = XmlState.BEGIN_NODE;
+                            state = XmlState.IgnoreSpaces;
+                            next = XmlState.BeginNode;
                         }
                         else if (c == CharCodeAmp)
                         {
                             // &
                             buf.Append(str.Substring(start, p - start));
-                            state = XmlState.ESCAPE;
-                            escapeNext = XmlState.PCDATA;
+                            state = XmlState.Escape;
+                            escapeNext = XmlState.Pcdata;
                             start = p + 1;
                         }
+
                         break;
 
-                    case XmlState.CDATA:
+                    case XmlState.Cdata:
                         // CDATA
-                        if (c == CharCodeBrackedClose && str[p + 1] == CharCodeBrackedClose && str[p + 2] == CharCodeGreaterThan)
+                        if (c == CharCodeBrackedClose && str[p + 1] == CharCodeBrackedClose &&
+                            str[p + 2] == CharCodeGreaterThan)
                         {
                             // ]]>
                             var child = new XmlNode();
@@ -154,11 +158,12 @@ namespace AlphaTab.Xml
                             child.Value = str.Substring(start, p - start);
                             parent.AddChild(child);
                             p += 2;
-                            state = XmlState.BEGIN;
+                            state = XmlState.Begin;
                         }
+
                         break;
 
-                    case XmlState.BEGIN_NODE:
+                    case XmlState.BeginNode:
                         // BEGIN_NODE
                         switch (c)
                         {
@@ -172,8 +177,9 @@ namespace AlphaTab.Xml
                                     {
                                         throw new XmlException("Expected <![CDATA[", str, p);
                                     }
+
                                     p += 5;
-                                    state = XmlState.CDATA;
+                                    state = XmlState.Cdata;
                                     start = p + 1;
                                 }
                                 else if (str[p + 1] == CharCodeUpperD || str[p + 1] == CharCodeLowerD)
@@ -183,8 +189,9 @@ namespace AlphaTab.Xml
                                     {
                                         throw new XmlException("Expected <!DOCTYPE", str, p);
                                     }
+
                                     p += 8;
-                                    state = XmlState.DOCTYPE;
+                                    state = XmlState.Doctype;
                                     start = p + 1;
                                 }
                                 else if (str[p + 1] != CharCodeMinus || str[p + 2] != CharCodeMinus)
@@ -195,13 +202,14 @@ namespace AlphaTab.Xml
                                 else
                                 {
                                     p += 2;
-                                    state = XmlState.COMMENT;
+                                    state = XmlState.Comment;
                                     start = p + 1;
                                 }
+
                                 break;
                             case CharCodeQuestion:
                                 // ?
-                                state = XmlState.HEADER;
+                                state = XmlState.Header;
                                 start = p;
                                 break;
                             case CharCodeSlash:
@@ -210,18 +218,20 @@ namespace AlphaTab.Xml
                                 {
                                     throw new XmlException("Expected node name", str, p);
                                 }
+
                                 start = p + 1;
-                                state = XmlState.IGNORE_SPACES;
-                                next = XmlState.CLOSE;
+                                state = XmlState.IgnoreSpaces;
+                                next = XmlState.Close;
                                 break;
                             default:
-                                state = XmlState.TAG_NAME;
+                                state = XmlState.TagName;
                                 start = p;
                                 continue;
                         }
+
                         break;
 
-                    case XmlState.TAG_NAME:
+                    case XmlState.TagName:
                         // TAG_NAME
                         if (!IsValidChar(c))
                         {
@@ -229,36 +239,39 @@ namespace AlphaTab.Xml
                             {
                                 throw new XmlException("Expected node name", str, p);
                             }
+
                             xml = new XmlNode();
                             xml.NodeType = XmlNodeType.Element;
                             xml.LocalName = str.Substring(start, p - start);
                             parent.AddChild(xml);
-                            state = XmlState.IGNORE_SPACES;
-                            next = XmlState.BODY;
+                            state = XmlState.IgnoreSpaces;
+                            next = XmlState.Body;
                             continue;
                         }
+
                         break;
 
-                    case XmlState.BODY:
+                    case XmlState.Body:
                         // BODY
                         switch (c)
                         {
                             case CharCodeSlash:
                                 // /
-                                state = XmlState.WAIT_END;
+                                state = XmlState.WaitEnd;
                                 break;
                             case CharCodeGreaterThan:
                                 // >
-                                state = XmlState.CHILDS;
+                                state = XmlState.Childs;
                                 break;
                             default:
-                                state = XmlState.ATTRIB_NAME;
+                                state = XmlState.AttribName;
                                 start = p;
                                 continue;
                         }
+
                         break;
 
-                    case XmlState.ATTRIB_NAME:
+                    case XmlState.AttribName:
                         // ATTRIB_NAME
                         if (!IsValidChar(c))
                         {
@@ -266,33 +279,37 @@ namespace AlphaTab.Xml
                             {
                                 throw new XmlException("Expected attribute name", str, p);
                             }
+
                             var tmp = str.Substring(start, p - start);
                             aname = tmp;
                             if (xml.Attributes.ContainsKey(aname))
                             {
                                 throw new XmlException("Duplicate attribute [" + aname + "]", str, p);
                             }
-                            state = XmlState.IGNORE_SPACES;
-                            next = XmlState.EQUALS;
+
+                            state = XmlState.IgnoreSpaces;
+                            next = XmlState.Equals;
                             continue;
                         }
+
                         break;
 
-                    case XmlState.EQUALS:
+                    case XmlState.Equals:
                         // EQUALS
                         switch (c)
                         {
                             case CharCodeEquals:
                                 // =
-                                state = XmlState.IGNORE_SPACES;
-                                next = XmlState.ATTVAL_BEGIN;
+                                state = XmlState.IgnoreSpaces;
+                                next = XmlState.AttvalBegin;
                                 break;
                             default:
                                 throw new XmlException("Expected =", str, p);
                         }
+
                         break;
 
-                    case XmlState.ATTVAL_BEGIN:
+                    case XmlState.AttvalBegin:
                         // ATTVAL_BEGIN
                         switch (c)
                         {
@@ -300,22 +317,23 @@ namespace AlphaTab.Xml
                             case CharCodeSingleQuote:
                                 // " '
                                 buf = new StringBuilder();
-                                state = XmlState.ATTRIB_VAL;
+                                state = XmlState.AttribVal;
                                 start = p + 1;
                                 attrValQuote = c;
                                 break;
                         }
+
                         break;
 
-                    case XmlState.ATTRIB_VAL:
+                    case XmlState.AttribVal:
                         // ATTRIB_VAL
                         switch (c)
                         {
                             case CharCodeAmp:
                                 // &
                                 buf.Append(str.Substring(start, p - start));
-                                state = XmlState.ESCAPE;
-                                escapeNext = XmlState.ATTRIB_VAL;
+                                state = XmlState.Escape;
+                                escapeNext = XmlState.AttribVal;
                                 start = p + 1;
                                 break;
                             default:
@@ -325,33 +343,36 @@ namespace AlphaTab.Xml
                                     var val = buf.ToString();
                                     buf = new StringBuilder();
                                     xml.Attributes[aname] = val;
-                                    state = XmlState.IGNORE_SPACES;
-                                    next = XmlState.BODY;
+                                    state = XmlState.IgnoreSpaces;
+                                    next = XmlState.Body;
                                 }
+
                                 break;
                         }
+
                         break;
 
-                    case XmlState.CHILDS:
+                    case XmlState.Childs:
                         // CHILDS
                         p = Parse(str, p, xml);
                         start = p;
-                        state = XmlState.BEGIN;
+                        state = XmlState.Begin;
                         break;
 
-                    case XmlState.WAIT_END:
+                    case XmlState.WaitEnd:
                         // WAIT_END
                         switch (c)
                         {
                             case CharCodeGreaterThan:
                                 // >
-                                state = XmlState.BEGIN;
+                                state = XmlState.Begin;
                                 break;
                             default:
                                 throw new XmlException("Expected >", str, p);
                         }
+
                         break;
-                    case XmlState.WAIT_END_RET:
+                    case XmlState.WaitEndRet:
                         // WAIT_END_RET
                         switch (c)
                         {
@@ -361,7 +382,7 @@ namespace AlphaTab.Xml
                             default:
                                 throw new XmlException("Expected >", str, p);
                         }
-                    case XmlState.CLOSE:
+                    case XmlState.Close:
                         // CLOSE
                         if (!IsValidChar(c))
                         {
@@ -376,13 +397,14 @@ namespace AlphaTab.Xml
                                 throw new XmlException("Expected </" + parent.LocalName + ">", str, p);
                             }
 
-                            state = XmlState.IGNORE_SPACES;
-                            next = XmlState.WAIT_END_RET;
+                            state = XmlState.IgnoreSpaces;
+                            next = XmlState.WaitEndRet;
                             continue;
                         }
+
                         break;
 
-                    case XmlState.COMMENT:
+                    case XmlState.Comment:
                         // COMMENT
                         if (c == CharCodeMinus && str[p + 1] == CharCodeMinus && str[p + 2] == CharCodeGreaterThan)
                         {
@@ -392,11 +414,12 @@ namespace AlphaTab.Xml
                             //comment.Value = str.Substring(start, p - start);
                             //parent.AddChild(comment);
                             p += 2;
-                            state = XmlState.BEGIN;
+                            state = XmlState.Begin;
                         }
+
                         break;
 
-                    case XmlState.DOCTYPE:
+                    case XmlState.Doctype:
                         // DOCTYPE
                         if (c == CharCodeBrackedOpen)
                         {
@@ -415,22 +438,24 @@ namespace AlphaTab.Xml
                             node.NodeType = XmlNodeType.DocumentType;
                             node.Value = str.Substring(start, p - start);
                             parent.AddChild(node);
-                            state = XmlState.BEGIN;
+                            state = XmlState.Begin;
                         }
+
                         break;
 
-                    case XmlState.HEADER:
+                    case XmlState.Header:
                         // HEADER
                         if (c == CharCodeQuestion && str[p + 1] == CharCodeGreaterThan)
                         {
                             // ?>
                             p++;
                             // skip
-                            state = XmlState.BEGIN;
+                            state = XmlState.Begin;
                         }
+
                         break;
 
-                    case XmlState.ESCAPE:
+                    case XmlState.Escape:
                         // ESCAPE
                         if (c == (int)';')
                         {
@@ -465,19 +490,20 @@ namespace AlphaTab.Xml
                             start = p + 1;
                             state = escapeNext;
                         }
+
                         break;
                 }
 
                 p++;
             }
 
-            if (state == XmlState.BEGIN)
+            if (state == XmlState.Begin)
             {
                 start = p;
-                state = XmlState.PCDATA;
+                state = XmlState.Pcdata;
             }
 
-            if (state == XmlState.PCDATA)
+            if (state == XmlState.Pcdata)
             {
                 if (p != start)
                 {
@@ -487,10 +513,11 @@ namespace AlphaTab.Xml
                     node.Value = buf.ToString();
                     parent.AddChild(node);
                 }
+
                 return p;
             }
 
-            if (state == XmlState.ESCAPE && escapeNext == XmlState.PCDATA)
+            if (state == XmlState.Escape && escapeNext == XmlState.Pcdata)
             {
                 buf.Append("&");
                 buf.Append(str.Substring(start, p - start));
@@ -507,35 +534,36 @@ namespace AlphaTab.Xml
 
         private static bool IsValidChar(int c)
         {
-            return (c >= CharCodeLowerA && c <= CharCodeLowerZ) || (c >= CharCodeUpperA && c <= CharCodeUpperZ) ||
-                   (c >= CharCode0 && c <= CharCode9) || c == CharCodeColon || c == CharCodeDot || c == CharCodeUnderscore ||
+            return c >= CharCodeLowerA && c <= CharCodeLowerZ || c >= CharCodeUpperA && c <= CharCodeUpperZ ||
+                   c >= CharCode0 && c <= CharCode9 || c == CharCodeColon || c == CharCodeDot ||
+                   c == CharCodeUnderscore ||
                    c == CharCodeMinus;
         }
 
         /// <summary>
         /// faster than enum
         /// </summary>
-        class XmlState
+        private class XmlState
         {
-            public const int IGNORE_SPACES = 0;
-            public const int BEGIN = 1;
-            public const int BEGIN_NODE = 2;
-            public const int TAG_NAME = 3;
-            public const int BODY = 4;
-            public const int ATTRIB_NAME = 5;
-            public const int EQUALS = 6;
-            public const int ATTVAL_BEGIN = 7;
-            public const int ATTRIB_VAL = 8;
-            public const int CHILDS = 9;
-            public const int CLOSE = 10;
-            public const int WAIT_END = 11;
-            public const int WAIT_END_RET = 12;
-            public const int PCDATA = 13;
-            public const int HEADER = 14;
-            public const int COMMENT = 15;
-            public const int DOCTYPE = 16;
-            public const int CDATA = 17;
-            public const int ESCAPE = 18;
+            public const int IgnoreSpaces = 0;
+            public const int Begin = 1;
+            public const int BeginNode = 2;
+            public const int TagName = 3;
+            public const int Body = 4;
+            public const int AttribName = 5;
+            public const int Equals = 6;
+            public const int AttvalBegin = 7;
+            public const int AttribVal = 8;
+            public const int Childs = 9;
+            public const int Close = 10;
+            public const int WaitEnd = 11;
+            public const int WaitEndRet = 12;
+            public const int Pcdata = 13;
+            public const int Header = 14;
+            public const int Comment = 15;
+            public const int Doctype = 16;
+            public const int Cdata = 17;
+            public const int Escape = 18;
         }
     }
 }

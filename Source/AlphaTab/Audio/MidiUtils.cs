@@ -1,26 +1,8 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using AlphaTab.Model;
+﻿using AlphaTab.Model;
 
 namespace AlphaTab.Audio
 {
-    static class MidiUtils
+    internal static class MidiUtils
     {
         /// <summary>
         /// The amount of ticks per quarter note used within this midi system.
@@ -75,6 +57,7 @@ namespace AlphaTab.Audio
             {
                 denomninator = 1 / -denomninator;
             }
+
             return (int)(QuarterTime * (4.0 / denomninator));
         }
 
@@ -82,8 +65,9 @@ namespace AlphaTab.Audio
         {
             if (doubleDotted)
             {
-                return ticks + (ticks / 4) * 3;
+                return ticks + ticks / 4 * 3;
             }
+
             return ticks + ticks / 2;
         }
 
@@ -94,12 +78,12 @@ namespace AlphaTab.Audio
 
         public static int RemoveTuplet(int ticks, int numerator, int denominator)
         {
-            return (ticks * numerator) / denominator;
+            return ticks * numerator / denominator;
         }
 
         public static int DynamicToVelocity(DynamicValue dyn)
         {
-            return (MinVelocity + ((int)(dyn) * VelocityIncrement));
+            return MinVelocity + (int)dyn * VelocityIncrement;
             // switch(dynamicValue)
             // {
             //     case PPP:   return (MinVelocity + (0 * VelocityIncrement));

@@ -1,3 +1,5 @@
+// ReSharper disable InconsistentNaming
+
 namespace AlphaTab.Model
 {
     /// <summary>
@@ -8,19 +10,23 @@ namespace AlphaTab.Model
         /// <summary>
         /// 2 octaves higher 
         /// </summary>
-        _15ma, 
+        _15ma,
+
         /// <summary>
         /// 1 octave higher
         /// </summary>
-        _8va, 
+        _8va,
+
         /// <summary>
         /// Normal
         /// </summary>
         Regular,
+
         /// <summary>
         /// 1 octave lower
         /// </summary>
         _8vb,
+
         /// <summary>
         /// 2 octaves lower. 
         /// </summary>

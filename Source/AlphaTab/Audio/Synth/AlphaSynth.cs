@@ -23,7 +23,7 @@ namespace AlphaTab.Audio.Synth
         private double _timePosition;
 
         /// <summary>
-        /// Gets the <see cref="ISynthOutput"/> used for playing the generated samples. 
+        /// Gets the <see cref="ISynthOutput"/> used for playing the generated samples.
         /// </summary>
         public ISynthOutput Output { get; }
 
@@ -82,10 +82,7 @@ namespace AlphaTab.Audio.Synth
         public int TickPosition
         {
             get => _tickPosition;
-            set
-            {
-                TimePosition = _sequencer.TickPositionToTimePosition(value);
-            }
+            set => TimePosition = _sequencer.TickPositionToTimePosition(value);
         }
 
         /// <inheritdoc />
@@ -99,10 +96,10 @@ namespace AlphaTab.Audio.Synth
                 // tell the sequencer to jump to the given position
                 _sequencer.Seek(value);
 
-                // update the internal position 
+                // update the internal position
                 UpdateTimePosition(value);
 
-                // tell the output to reset the already synthesized buffers and request data again 
+                // tell the output to reset the already synthesized buffers and request data again
                 Output.ResetSamples();
             }
         }
@@ -188,7 +185,11 @@ namespace AlphaTab.Audio.Synth
         /// <inheritdoc />
         public void Play()
         {
-            if (State == PlayerState.Playing || !IsReadyForPlayback) return;
+            if (State == PlayerState.Playing || !IsReadyForPlayback)
+            {
+                return;
+            }
+
             Output.Activate();
 
             Logger.Debug("AlphaSynth", "Starting playback");
@@ -200,7 +201,10 @@ namespace AlphaTab.Audio.Synth
         /// <inheritdoc />
         public void Pause()
         {
-            if (State == PlayerState.Paused || !IsReadyForPlayback) return;
+            if (State == PlayerState.Paused || !IsReadyForPlayback)
+            {
+                return;
+            }
 
             Logger.Debug("AlphaSynth", "Pausing playback");
             State = PlayerState.Paused;
@@ -225,7 +229,10 @@ namespace AlphaTab.Audio.Synth
         /// <inheritdoc />
         public void Stop()
         {
-            if (State == PlayerState.Paused || !IsReadyForPlayback) return;
+            if (State == PlayerState.Paused || !IsReadyForPlayback)
+            {
+                return;
+            }
 
             Logger.Debug("AlphaSynth", "Stopping playback");
             State = PlayerState.Paused;
@@ -270,7 +277,7 @@ namespace AlphaTab.Audio.Synth
         }
 
         /// <summary>
-        /// Loads the given midi file for playback. 
+        /// Loads the given midi file for playback.
         /// </summary>
         /// <param name="midiFile">The midi file to load</param>
         // ReSharper disable once UnusedMember.Global
@@ -332,7 +339,7 @@ namespace AlphaTab.Audio.Synth
 
         private void OnSamplesPlayed(int sampleCount)
         {
-            var playedMillis = (sampleCount / (double)_synthesizer.SampleRate) * 1000;
+            var playedMillis = sampleCount / (double)_synthesizer.SampleRate * 1000;
             UpdateTimePosition(_timePosition + playedMillis);
         }
 
@@ -345,7 +352,9 @@ namespace AlphaTab.Audio.Synth
             var endTime = _sequencer.EndTime;
             var endTick = _sequencer.EndTick;
 
-            Logger.Debug("AlphaSynth", "Position changed: (time: " + currentTime + "/" + endTime + ", tick: " + currentTick + "/" + endTime + ", Active Voices: " + _synthesizer.ActiveVoices + ", Free Voices: " + _synthesizer.FreeVoices + ")");
+            Logger.Debug("AlphaSynth",
+                "Position changed: (time: " + currentTime + "/" + endTime + ", tick: " + currentTick + "/" + endTime +
+                ", Active Voices: " + _synthesizer.ActiveVoices + ", Free Voices: " + _synthesizer.FreeVoices + ")");
             OnPositionChanged(new PositionChangedEventArgs(currentTime, endTime, currentTick, endTick));
         }
 
@@ -353,91 +362,127 @@ namespace AlphaTab.Audio.Synth
 
         /// <inheritdoc />
         public event Action Ready;
+
         private void OnReady()
         {
             var handler = Ready;
-            if (handler != null) handler();
+            if (handler != null)
+            {
+                handler();
+            }
         }
 
         /// <summary>
         /// Occurs when the playback of the whole midi file finished.
         /// </summary>
         public event Action<PlaybackFinishedEventArgs> Finished;
+
         private void OnFinished(PlaybackFinishedEventArgs e)
         {
             var handler = Finished;
-            if (handler != null) handler(e);
+            if (handler != null)
+            {
+                handler(e);
+            }
         }
 
         /// <summary>
-        /// Occurs when the playback state changes. 
+        /// Occurs when the playback state changes.
         /// </summary>
         public event Action<PlayerStateChangedEventArgs> StateChanged;
+
         private void OnStateChanged(PlayerStateChangedEventArgs e)
         {
             var handler = StateChanged;
-            if (handler != null) handler(e);
+            if (handler != null)
+            {
+                handler(e);
+            }
         }
 
         /// <summary>
-        /// Occurs when the soundfont was successfully loaded. 
+        /// Occurs when the soundfont was successfully loaded.
         /// </summary>
         public event Action SoundFontLoaded;
+
         private void OnSoundFontLoaded()
         {
             var handler = SoundFontLoaded;
-            if (handler != null) handler();
+            if (handler != null)
+            {
+                handler();
+            }
         }
 
         /// <summary>
         /// Occurs when AlphaSynth is ready to start the playback.
-        /// This is the case once the <see cref="ISynthOutput"/> is ready, a SoundFont was loaded and also a MidiFle is loaded. 
+        /// This is the case once the <see cref="ISynthOutput"/> is ready, a SoundFont was loaded and also a MidiFle is loaded.
         /// </summary>
         public event Action ReadyForPlayback;
+
         private void OnReadyForPlayback()
         {
             var handler = ReadyForPlayback;
-            if (handler != null) handler();
+            if (handler != null)
+            {
+                handler();
+            }
         }
 
         /// <summary>
-        /// Occurs when the soundfont failed to be loaded. 
+        /// Occurs when the soundfont failed to be loaded.
         /// </summary>
         public event Action<Exception> SoundFontLoadFailed;
+
         private void OnSoundFontLoadFailed(Exception e)
         {
             var handler = SoundFontLoadFailed;
-            if (handler != null) handler(e);
+            if (handler != null)
+            {
+                handler(e);
+            }
         }
 
         /// <summary>
-        /// Occurs when the midi file was successfully loaded. 
+        /// Occurs when the midi file was successfully loaded.
         /// </summary>
         public event Action MidiLoaded;
+
         private void OnMidiLoaded()
         {
             var handler = MidiLoaded;
-            if (handler != null) handler();
+            if (handler != null)
+            {
+                handler();
+            }
         }
 
         /// <summary>
-        /// Occurs when the midi failed to be loaded. 
+        /// Occurs when the midi failed to be loaded.
         /// </summary>
         public event Action<Exception> MidiLoadFailed;
+
         private void OnMidiLoadFailed(Exception e)
         {
             var handler = MidiLoadFailed;
-            if (handler != null) handler(e);
+            if (handler != null)
+            {
+                handler(e);
+            }
         }
 
         /// <summary>
-        /// Occurs whenever the current time of the played audio changes. 
+        /// Occurs whenever the current time of the played audio changes.
         /// </summary>
         public event Action<PositionChangedEventArgs> PositionChanged;
+
         private void OnPositionChanged(PositionChangedEventArgs e)
         {
             var handler = PositionChanged;
-            if (handler != null) handler(e);
+            if (handler != null)
+            {
+                handler(e);
+            }
         }
 
         #endregion
@@ -446,16 +491,17 @@ namespace AlphaTab.Audio.Synth
     #region EventArgs
 
     /// <summary>
-    /// Represents the progress of any data being loaded. 
+    /// Represents the progress of any data being loaded.
     /// </summary>
     public class ProgressEventArgs
     {
         /// <summary>
-        /// Gets the currently loaded bytes. 
+        /// Gets the currently loaded bytes.
         /// </summary>
         public int Loaded { get; }
+
         /// <summary>
-        /// Gets the total number of bytes to load. 
+        /// Gets the total number of bytes to load.
         /// </summary>
         public int Total { get; }
 
@@ -472,12 +518,12 @@ namespace AlphaTab.Audio.Synth
     }
 
     /// <summary>
-    /// Represents the info when the playback of a whole song finished. 
+    /// Represents the info when the playback of a whole song finished.
     /// </summary>
     public class PlaybackFinishedEventArgs
     {
         /// <summary>
-        /// Gets a value indicating whether looping is active, and the playback will start automatically again at the beginning. 
+        /// Gets a value indicating whether looping is active, and the playback will start automatically again at the beginning.
         /// </summary>
         public bool IsLooping { get; }
 
@@ -492,7 +538,7 @@ namespace AlphaTab.Audio.Synth
     }
 
     /// <summary>
-    /// Represents the info when the player state changes. 
+    /// Represents the info when the player state changes.
     /// </summary>
     public class PlayerStateChangedEventArgs
     {
@@ -502,7 +548,7 @@ namespace AlphaTab.Audio.Synth
         public PlayerState State { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the playback was stopped or only paused. 
+        /// Gets a value indicating whether the playback was stopped or only paused.
         /// </summary>
         /// <returns>true if the playback was stopped, false if the playback was started or paused</returns>
         public bool Stopped { get; }
@@ -516,29 +562,30 @@ namespace AlphaTab.Audio.Synth
             State = state;
             Stopped = stopped;
         }
-
     }
 
     /// <summary>
-    /// Represents the info when the time in the synthesizer changes. 
+    /// Represents the info when the time in the synthesizer changes.
     /// </summary>
     public class PositionChangedEventArgs
     {
         /// <summary>
-        /// Gets the current time in milliseconds. 
+        /// Gets the current time in milliseconds.
         /// </summary>
         public double CurrentTime { get; }
+
         /// <summary>
-        /// Gets the length of the played song in milliseconds. 
+        /// Gets the length of the played song in milliseconds.
         /// </summary>
         public double EndTime { get; }
 
         /// <summary>
-        /// Gets the current time in midi ticks. 
+        /// Gets the current time in midi ticks.
         /// </summary>
         public int CurrentTick { get; }
+
         /// <summary>
-        /// Gets the length of the played song in midi ticks. 
+        /// Gets the length of the played song in midi ticks.
         /// </summary>
         public int EndTick { get; }
 

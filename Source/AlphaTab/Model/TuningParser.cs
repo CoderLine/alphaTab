@@ -1,39 +1,15 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-namespace AlphaTab.Model
+﻿namespace AlphaTab.Model
 {
-    class TuningParseResult
+    internal class TuningParseResult
     {
         public string Note { get; set; }
         public int NoteValue { get; set; }
         public int Octave { get; set; }
 
-        public int RealValue
-        {
-            get
-            {
-                return (Octave * 12) + NoteValue;
-            }
-        }
+        public int RealValue => Octave * 12 + NoteValue;
     }
 
-    static class TuningParser
+    internal static class TuningParser
     {
         /// <summary>
         /// Checks if the given string is a tuning inticator.
@@ -47,10 +23,10 @@ namespace AlphaTab.Model
 
         public static TuningParseResult Parse(string name)
         {
-            string note = "";
-            string octave = "";
+            var note = "";
+            var octave = "";
 
-            for (int i = 0; i < name.Length; i++)
+            for (var i = 0; i < name.Length; i++)
             {
                 var c = (int)name[i];
                 if (Platform.Platform.IsCharNumber(c, false))
@@ -60,9 +36,10 @@ namespace AlphaTab.Model
                     {
                         return null;
                     }
+
                     octave += Platform.Platform.StringFromCharCode(c);
                 }
-                else if ((c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A) || c == 0x23)
+                else if (c >= 0x41 && c <= 0x5A || c >= 0x61 && c <= 0x7A || c == 0x23)
                 {
                     note += Platform.Platform.StringFromCharCode(c);
                 }
@@ -147,6 +124,5 @@ namespace AlphaTab.Model
 
             return b;
         }
-
     }
 }

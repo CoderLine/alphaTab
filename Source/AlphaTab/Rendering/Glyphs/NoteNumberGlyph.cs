@@ -1,29 +1,10 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using System;
-using AlphaTab.Model;
+﻿using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class NoteNumberGlyph : Glyph
+    internal class NoteNumberGlyph : Glyph
     {
         private readonly Note _note;
         private string _noteString;
@@ -65,10 +46,12 @@ namespace AlphaTab.Rendering.Glyphs
                     {
                         _noteString = _noteString.Substring(0, i + 2);
                     }
+
                     _noteString = "<" + _noteString + ">";
                 }
             }
-            else if (n.Beat.Index == 0 && Renderer.Settings.DisplayMode == DisplayMode.GuitarPro // GP shows tied notes on first beat  
+            else if (n.Beat.Index == 0 &&
+                     Renderer.Settings.DisplayMode == DisplayMode.GuitarPro // GP shows tied notes on first beat  
                      || n.BendType == BendType.Bend && Renderer.Settings.ShowTabNoteOnTiedBend && n.IsTieOrigin)
             {
                 _noteString = "(" + (n.TieOrigin.Fret - n.Beat.Voice.Bar.Staff.TranspositionPitch) + ")";
@@ -131,7 +114,11 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            if (IsEmpty) return;
+            if (IsEmpty)
+            {
+                return;
+            }
+
             var textWidth = NoteStringWidth + _trillNoteStringWidth;
             var x = cx + X + (Width - textWidth) / 2;
 

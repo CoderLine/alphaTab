@@ -1,27 +1,9 @@
-/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
 using AlphaTab.Model;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    abstract class GroupedEffectGlyph : EffectGlyph
+    internal abstract class GroupedEffectGlyph : EffectGlyph
     {
         protected BeatXPosition EndPosition { get; set; }
         protected bool ForceGroupedRendering { get; set; }
@@ -33,29 +15,18 @@ namespace AlphaTab.Rendering.Glyphs
         }
 
         /// <summary>
-        /// Gets a value whether this glyph is linked with a previous glyph for rendering. 
+        /// Gets a value whether this glyph is linked with a previous glyph for rendering.
         /// This means this glyph will not be rendered itself, but rendered as part of the very first glyph of this link-group.
         /// </summary>
-        public bool IsLinkedWithPrevious
-        {
-            get
-            {
-                return PreviousGlyph != null && PreviousGlyph.Renderer.Staff.StaveGroup == Renderer.Staff.StaveGroup;
-            }
-        }
+        public bool IsLinkedWithPrevious =>
+            PreviousGlyph != null && PreviousGlyph.Renderer.Staff.StaveGroup == Renderer.Staff.StaveGroup;
 
         /// <summary>
-        /// Gets a value whether this glyph is linked with the next glyph for rendering. 
+        /// Gets a value whether this glyph is linked with the next glyph for rendering.
         /// </summary>
-        public bool IsLinkedWithNext
-        {
-            get
-            {
-                // we additionally check IsFinalized since the next renderer might not be part of the current partial
-                // and therefore not finalized yet. 
-                return NextGlyph != null && NextGlyph.Renderer.IsFinalized && NextGlyph.Renderer.Staff.StaveGroup == Renderer.Staff.StaveGroup;
-            }
-        }
+        public bool IsLinkedWithNext =>
+            NextGlyph != null && NextGlyph.Renderer.IsFinalized &&
+            NextGlyph.Renderer.Staff.StaveGroup == Renderer.Staff.StaveGroup;
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
@@ -65,14 +36,14 @@ namespace AlphaTab.Rendering.Glyphs
                 return;
             }
 
-            // we are not linked with any glyph therefore no expansion is required, we render a simple glyph. 
+            // we are not linked with any glyph therefore no expansion is required, we render a simple glyph.
             if (!IsLinkedWithNext && !ForceGroupedRendering)
             {
                 PaintNonGrouped(cx, cy, canvas);
                 return;
             }
 
-            // find last linked glyph that can be  
+            // find last linked glyph that can be
             GroupedEffectGlyph lastLinkedGlyph;
             if (!IsLinkedWithNext && ForceGroupedRendering)
             {
@@ -80,10 +51,10 @@ namespace AlphaTab.Rendering.Glyphs
             }
             else
             {
-                lastLinkedGlyph = (GroupedEffectGlyph) NextGlyph;
+                lastLinkedGlyph = (GroupedEffectGlyph)NextGlyph;
                 while (lastLinkedGlyph.IsLinkedWithNext)
                 {
-                    lastLinkedGlyph = (GroupedEffectGlyph) lastLinkedGlyph.NextGlyph;
+                    lastLinkedGlyph = (GroupedEffectGlyph)lastLinkedGlyph.NextGlyph;
                 }
             }
 
@@ -99,16 +70,18 @@ namespace AlphaTab.Rendering.Glyphs
             PaintGrouped(cx, cy, endX, canvas);
         }
 
-        protected virtual float CalculateEndX(BarRendererBase endBeatRenderer, Beat endBeat, float cx, BeatXPosition endPosition)
+        protected virtual float CalculateEndX(
+            BarRendererBase endBeatRenderer,
+            Beat endBeat,
+            float cx,
+            BeatXPosition endPosition)
         {
             if (endBeat == null)
             {
                 return cx + endBeatRenderer.X + X + Width;
             }
-            else
-            {
-                return cx + endBeatRenderer.X + endBeatRenderer.GetBeatX(endBeat, endPosition);
-            }
+
+            return cx + endBeatRenderer.X + endBeatRenderer.GetBeatX(endBeat, endPosition);
         }
 
         protected virtual void PaintNonGrouped(float cx, float cy, ICanvas canvas)

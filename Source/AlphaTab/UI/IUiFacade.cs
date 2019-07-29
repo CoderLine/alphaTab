@@ -1,21 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using System;
+﻿using System;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
@@ -32,6 +15,7 @@ namespace AlphaTab.UI
         /// Gets the root UI element that holds the whole alphaTab control.
         /// </summary>
         IContainer RootContainer { get; }
+
         /// <summary>
         /// Gets a value indicating whether the UI framework supports worker based rendering. 
         /// </summary>
@@ -42,6 +26,7 @@ namespace AlphaTab.UI
         /// rendering might need to be deferred. 
         /// </summary>
         bool CanRender { get; }
+
         /// <summary>
         /// Gets the resize throttling in milliseconds. Then the music sheet is resized, the re-rendering is deferred until this timeout is reached. 
         /// </summary>
@@ -74,6 +59,7 @@ namespace AlphaTab.UI
         /// </summary>
         /// <returns>The canvas element that wraps all individually rendered partials.</returns>
         IContainer CreateCanvasElement();
+
         /// <summary>
         /// Tells the UI layer to trigger an event with the given name and details.
         /// </summary>
@@ -110,17 +96,18 @@ namespace AlphaTab.UI
         /// </summary>
         /// <returns></returns>
         Cursors CreateCursors();
-        
+
         /// <summary>
         /// Tells the UI layer to invoke the given action. 
         /// </summary>
         /// <param name="action"></param>
         void BeginInvoke(Action action);
-        
+
         /// <summary>
         /// Tells the UI layer to remove all highlights from highlighted music notation elements. 
         /// </summary>
         void RemoveHighlights();
+
         /// <summary>
         /// Tells the UI layer to highlight the music notation elements with the given ID.
         /// </summary>

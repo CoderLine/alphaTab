@@ -38,7 +38,8 @@ namespace AlphaTab.Audio.Synth
         /// </summary>
         AlphaTab.Util.LogLevel LogLevel
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -64,7 +65,8 @@ namespace AlphaTab.Audio.Synth
         /// </summary>
         double PlaybackSpeed
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -72,7 +74,8 @@ namespace AlphaTab.Audio.Synth
         /// </summary>
         int TickPosition
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -80,7 +83,8 @@ namespace AlphaTab.Audio.Synth
         /// </summary>
         double TimePosition
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -89,7 +93,8 @@ namespace AlphaTab.Audio.Synth
         /// </summary>
         PlaybackRange PlaybackRange
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -97,7 +102,8 @@ namespace AlphaTab.Audio.Synth
         /// </summary>
         bool IsLooping
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -175,10 +181,12 @@ namespace AlphaTab.Audio.Synth
         /// This event is fired when the player is ready to be interacted with. 
         /// </summary>
         event Action Ready;
+
         /// <summary>
         /// This event is fired when all required data for playback is loaded and ready. 
         /// </summary>
         event Action ReadyForPlayback;
+
         /// <summary>
         /// This event is fired when the playback of the whole song finished. 
         /// </summary>
@@ -188,6 +196,7 @@ namespace AlphaTab.Audio.Synth
         /// This event is fired when the SoundFont needed for playback was loaded. 
         /// </summary>
         event Action SoundFontLoaded;
+
         /// <summary>
         /// This event is fired when the loading of the SoundFont failed. 
         /// </summary>
@@ -197,6 +206,7 @@ namespace AlphaTab.Audio.Synth
         /// This event is fired when the Midi file needed for playback was loaded. 
         /// </summary>
         event Action MidiLoaded;
+
         /// <summary>
         /// This event is fired when the loading of the Midi file failed. 
         /// </summary>
@@ -206,6 +216,7 @@ namespace AlphaTab.Audio.Synth
         /// This event is fired when the playback state changed. 
         /// </summary>
         event Action<PlayerStateChangedEventArgs> StateChanged;
+
         /// <summary>
         /// This event is fired when the current playback position of the song changed. 
         /// </summary>

@@ -4,7 +4,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class OttavaGlyph : GroupedEffectGlyph
+    internal class OttavaGlyph : GroupedEffectGlyph
     {
         private Ottavia _ottava;
         private bool _aboveStaff;
@@ -47,12 +47,13 @@ namespace AlphaTab.Rendering.Glyphs
                 case Ottavia._15mb:
                     size = 36 * Scale;
                     // NOTE: SMUFL does not have a glyph for 15mb so we build it
-                    canvas.FillMusicFontSymbols(cx + X - size / 2, cy + Y + Height, 0.8f, new[]
-                    {
-                        MusicFontSymbol.Ottava15,
-                        MusicFontSymbol.OttavaMBaseline,
-                        MusicFontSymbol.OttavaBBaseline,
-                    });
+                    canvas.FillMusicFontSymbols(cx + X - size / 2,
+                        cy + Y + Height,
+                        0.8f,
+                        new[]
+                        {
+                            MusicFontSymbol.Ottava15, MusicFontSymbol.OttavaMBaseline, MusicFontSymbol.OttavaBBaseline
+                        });
                     break;
             }
 
@@ -98,6 +99,5 @@ namespace AlphaTab.Rendering.Glyphs
                 canvas.Stroke();
             }
         }
-
     }
 }

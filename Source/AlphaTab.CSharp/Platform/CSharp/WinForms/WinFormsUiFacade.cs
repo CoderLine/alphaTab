@@ -1,21 +1,4 @@
 ﻿#if NET472
-/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
 using System;
 using System.Collections.Concurrent;
 using System.Drawing;
@@ -31,7 +14,7 @@ using Cursors = AlphaTab.UI.Cursors;
 
 namespace AlphaTab.Platform.CSharp.WinForms
 {
-    class WinFormsUiFacade : IUiFacade<AlphaTabControl>
+    internal class WinFormsUiFacade : IUiFacade<AlphaTabControl>
     {
         private AlphaTabApi<AlphaTabControl> _api;
         private AlphaTabControl _control;
@@ -174,7 +157,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
                         control.Dispose();
                     }
                 }
-                // NOTE: here we try to replace existing children 
+                // NOTE: here we try to replace existing children
                 else
                 {
                     var body = renderResult.RenderResult;
@@ -202,7 +185,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
                         _totalResultCount.TryPeek(out var counter);
                         if (counter.Count < panel.Controls.Count)
                         {
-                            PictureBox img = (PictureBox)(panel.Controls[counter.Count]);
+                            var img = (PictureBox)panel.Controls[counter.Count];
                             img.Width = (int)renderResult.Width;
                             img.Height = (int)renderResult.Height;
                             var oldImg = img.Image;
@@ -235,7 +218,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
 
         public IScoreRenderer CreateWorkerRenderer()
         {
-            return new ManagedThreadScoreRenderer<AlphaTabControl>(_api, _api.Settings, a =>
+            return new ManagedThreadScoreRenderer(_api.Settings, a =>
             {
                 if (_control.InvokeRequired)
                 {
@@ -264,7 +247,8 @@ namespace AlphaTab.Platform.CSharp.WinForms
 
             player.Ready += () =>
             {
-                using (var sf = typeof(WpfUiFacade).Assembly.GetManifestResourceStream(typeof(GdiCanvas), "default.sf2"))
+                using (var sf =
+ typeof(WpfUiFacade).Assembly.GetManifestResourceStream(typeof(GdiCanvas), "default.sf2"))
                 using (var ms = new MemoryStream())
                 {
                     sf.CopyTo(ms);
@@ -308,8 +292,8 @@ namespace AlphaTab.Platform.CSharp.WinForms
         {
             var containerWinForms = ((ControlContainer)container).Control;
 
-            int left = 0; 
-            int top = 0;
+            var left = 0;
+            var top = 0;
 
             var c = containerWinForms;
             while(c != null && c != _layoutPanel)

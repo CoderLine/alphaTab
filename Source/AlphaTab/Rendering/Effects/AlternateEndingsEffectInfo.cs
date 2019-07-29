@@ -1,31 +1,14 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using AlphaTab.Model;
+﻿using AlphaTab.Model;
 using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class AlternateEndingsEffectInfo : IEffectBarRendererInfo
+    internal class AlternateEndingsEffectInfo : IEffectBarRendererInfo
     {
-        public string EffectId { get { return "alternate-feel"; } }
-        public bool HideOnMultiTrack { get { return true; } }
-        public bool CanShareBand { get { return false; } }
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.FullBar; } }
+        public string EffectId => "alternate-feel";
+        public bool HideOnMultiTrack => true;
+        public bool CanShareBand => false;
+        public EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.FullBar;
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
@@ -34,7 +17,7 @@ namespace AlphaTab.Rendering.Effects
 
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
-            return new AlternateEndingsGlyph(0,0, beat.Voice.Bar.MasterBar.AlternateEndings);
+            return new AlternateEndingsGlyph(0, 0, beat.Voice.Bar.MasterBar.AlternateEndings);
         }
 
         public bool CanExpand(Beat from, Beat to)

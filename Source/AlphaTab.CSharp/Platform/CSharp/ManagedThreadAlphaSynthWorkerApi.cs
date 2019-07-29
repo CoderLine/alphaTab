@@ -6,7 +6,7 @@ using AlphaTab.Util;
 
 namespace AlphaTab.Platform.CSharp
 {
-    class ManagedThreadAlphaSynthWorkerApi : AlphaSynthWorkerApiBase
+    internal class ManagedThreadAlphaSynthWorkerApi : AlphaSynthWorkerApiBase
     {
         private readonly Action<Action> _uiInvoke;
         private readonly Thread _workerThread;
@@ -70,6 +70,7 @@ namespace AlphaTab.Platform.CSharp
                 {
                     break;
                 }
+
                 action();
             }
         }

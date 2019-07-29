@@ -3,7 +3,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Importer
 {
-    class BinaryStylesheet
+    internal class BinaryStylesheet
     {
         public FastDictionary<string, object> Raw { get; }
 
@@ -19,7 +19,7 @@ namespace AlphaTab.Importer
                 switch (key)
                 {
                     case "StandardNotation/hideDynamics":
-                        score.Stylesheet.HideDynamics = (bool) Raw[key];
+                        score.Stylesheet.HideDynamics = (bool)Raw[key];
                         break;
                 }
             }

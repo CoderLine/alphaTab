@@ -1,22 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using System.Windows;
+﻿using System.Windows;
 using AlphaTab.Model;
 using AlphaTab.Samples.Wpf.ViewModel;
 using Microsoft.Win32;
@@ -30,7 +12,7 @@ namespace AlphaTab.Samples.Wpf.Data
     {
         public string OpenFile()
         {
-            OpenFileDialog dialog = new OpenFileDialog
+            var dialog = new OpenFileDialog
             {
                 Filter = "Supported Files (*.gp3, *.gp4, *.gp5, *.gpx, *.gp)|*.gp3;*.gp4;*.gp5;*.gpx;*.gp"
             };
@@ -43,8 +25,8 @@ namespace AlphaTab.Samples.Wpf.Data
 
         public void ShowScoreInfo(Score score)
         {
-            ScoreInfoViewModel viewModel = new ScoreInfoViewModel(score);
-            ScoreInfoWindow window = new ScoreInfoWindow();
+            var viewModel = new ScoreInfoViewModel(score);
+            var window = new ScoreInfoWindow();
             window.DataContext = viewModel;
             window.ShowDialog();
         }

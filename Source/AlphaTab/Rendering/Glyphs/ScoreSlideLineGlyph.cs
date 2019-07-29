@@ -1,28 +1,10 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using System;
+﻿using System;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class ScoreSlideLineGlyph : Glyph
+    internal class ScoreSlideLineGlyph : Glyph
     {
         private readonly Note _startNote;
         private readonly SlideType _type;
@@ -51,13 +33,14 @@ namespace AlphaTab.Rendering.Glyphs
             float startY;
             float endX;
             float endY;
-            bool waves = false;
+            var waves = false;
 
             switch (_type)
             {
                 case SlideType.Shift:
                 case SlideType.Legato:
-                    startX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_startNote.Beat, BeatXPosition.PostNotes) + offsetX;
+                    startX = cx + startNoteRenderer.X +
+                             startNoteRenderer.GetBeatX(_startNote.Beat, BeatXPosition.PostNotes) + offsetX;
                     var isUp = _startNote.SlideTarget.RealValue > _startNote.RealValue;
                     startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote);
                     var lineOffset = 0.25f * NoteHeadGlyph.NoteHeadHeight * Scale;
@@ -72,7 +55,9 @@ namespace AlphaTab.Rendering.Glyphs
 
                     if (_startNote.SlideTarget != null)
                     {
-                        var endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Renderer.Staff.StaveId, _startNote.SlideTarget.Beat.Voice.Bar);
+                        var endNoteRenderer =
+                            Renderer.ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Renderer.Staff.StaveId,
+                                _startNote.SlideTarget.Beat.Voice.Bar);
                         if (endNoteRenderer == null || endNoteRenderer.Staff != startNoteRenderer.Staff)
                         {
                             endX = cx + startNoteRenderer.X + _parent.X;
@@ -80,7 +65,9 @@ namespace AlphaTab.Rendering.Glyphs
                         }
                         else
                         {
-                            endX = cx + endNoteRenderer.X + endNoteRenderer.GetBeatX(_startNote.SlideTarget.Beat, BeatXPosition.PreNotes) - offsetX;
+                            endX = cx + endNoteRenderer.X +
+                                   endNoteRenderer.GetBeatX(_startNote.SlideTarget.Beat, BeatXPosition.PreNotes) -
+                                   offsetX;
                             endY = cy + endNoteRenderer.Y + endNoteRenderer.GetNoteY(_startNote.SlideTarget);
                             if (isUp)
                             {
@@ -97,45 +84,58 @@ namespace AlphaTab.Rendering.Glyphs
                         endX = cx + startNoteRenderer.X + _parent.X;
                         endY = startY;
                     }
+
                     break;
                 case SlideType.IntoFromBelow:
                     endX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote, false) - offsetX;
-                    endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) + NoteHeadGlyph.NoteHeadHeight / 2;
+                    endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) +
+                           NoteHeadGlyph.NoteHeadHeight / 2;
 
                     startX = endX - sizeX;
-                    startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) + NoteHeadGlyph.NoteHeadHeight;
+                    startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) +
+                             NoteHeadGlyph.NoteHeadHeight;
                     break;
                 case SlideType.IntoFromAbove:
                     endX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote, false) - offsetX;
-                    endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) + NoteHeadGlyph.NoteHeadHeight / 2;
+                    endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) +
+                           NoteHeadGlyph.NoteHeadHeight / 2;
 
                     startX = endX - sizeX;
                     startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote);
                     break;
                 case SlideType.OutUp:
                     startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote) + offsetX;
-                    startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) + NoteHeadGlyph.NoteHeadHeight / 2;
+                    startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) +
+                             NoteHeadGlyph.NoteHeadHeight / 2;
                     endX = startX + sizeX;
                     endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote);
                     break;
                 case SlideType.OutDown:
                     startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote) + offsetX;
-                    startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) + NoteHeadGlyph.NoteHeadHeight / 2;
+                    startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) +
+                             NoteHeadGlyph.NoteHeadHeight / 2;
                     endX = startX + sizeX;
-                    endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) + NoteHeadGlyph.NoteHeadHeight;
+                    endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) +
+                           NoteHeadGlyph.NoteHeadHeight;
                     break;
                 case SlideType.PickSlideUp:
                     startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote);
-                    startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) + NoteHeadGlyph.NoteHeadHeight / 2;
-                    endX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_startNote.Beat, BeatXPosition.EndBeat);
-                    endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) - NoteHeadGlyph.NoteHeadHeight;
+                    startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) +
+                             NoteHeadGlyph.NoteHeadHeight / 2;
+                    endX = cx + startNoteRenderer.X +
+                           startNoteRenderer.GetBeatX(_startNote.Beat, BeatXPosition.EndBeat);
+                    endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) -
+                           NoteHeadGlyph.NoteHeadHeight;
                     waves = true;
                     break;
                 case SlideType.PickSlideDown:
                     startX = cx + startNoteRenderer.X + startNoteRenderer.GetNoteX(_startNote);
-                    startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) - NoteHeadGlyph.NoteHeadHeight / 2;
-                    endX = cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_startNote.Beat, BeatXPosition.EndBeat);
-                    endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) + NoteHeadGlyph.NoteHeadHeight;
+                    startY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) -
+                             NoteHeadGlyph.NoteHeadHeight / 2;
+                    endX = cx + startNoteRenderer.X +
+                           startNoteRenderer.GetBeatX(_startNote.Beat, BeatXPosition.EndBeat);
+                    endY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(_startNote) +
+                           NoteHeadGlyph.NoteHeadHeight;
                     waves = true;
                     break;
                 default:

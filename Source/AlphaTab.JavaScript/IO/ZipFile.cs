@@ -5,7 +5,7 @@ using Phase;
 
 namespace AlphaTab.IO
 {
-    partial class ZipFile
+    internal partial class ZipFile
     {
         /// <summary>
         /// Load a complete ZipFile to the memory.
@@ -25,7 +25,7 @@ namespace AlphaTab.IO
                     if (FileFilter == null || FileFilter(fullName))
                     {
                         var i = fullName.LastIndexOf("/");
-                        string name = i >= 0 ? fullName.Substring(i + 1) : fullName;
+                        var name = i >= 0 ? fullName.Substring(i + 1) : fullName;
                         var data = entry.Data.GetData();
 
                         Entries.Add(new ZipEntry
@@ -41,7 +41,6 @@ namespace AlphaTab.IO
             {
                 throw new UnsupportedFormatException("Not a valid zip file");
             }
-            
         }
     }
 }

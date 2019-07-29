@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
@@ -9,9 +7,8 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Platform.CSharp
 {
-    class ManagedThreadScoreRenderer<T> : IScoreRenderer
+    internal class ManagedThreadScoreRenderer : IScoreRenderer
     {
-        private readonly AlphaTabApi<T> _api;
         private readonly Action<Action> _uiInvoke;
 
         private readonly Thread _workerThread;
@@ -22,9 +19,8 @@ namespace AlphaTab.Platform.CSharp
 
         public BoundsLookup BoundsLookup { get; private set; }
 
-        public ManagedThreadScoreRenderer(AlphaTabApi<T> api, Settings settings, Action<Action> uiInvoke)
+        public ManagedThreadScoreRenderer(Settings settings, Action<Action> uiInvoke)
         {
-            _api = api;
             _uiInvoke = uiInvoke;
             _threadStartedEvent = new ManualResetEventSlim(false);
             _workerQueue = new BlockingCollection<Action>();
@@ -51,6 +47,7 @@ namespace AlphaTab.Platform.CSharp
                 {
                     break;
                 }
+
                 action();
             }
         }
@@ -131,38 +128,58 @@ namespace AlphaTab.Platform.CSharp
         }
 
         public event Action PreRender;
+
         protected virtual void OnPreRender()
         {
             var handler = PreRender;
-            if (handler != null) handler();
+            if (handler != null)
+            {
+                handler();
+            }
         }
 
         public event Action<RenderFinishedEventArgs> PartialRenderFinished;
+
         protected virtual void OnPartialRenderFinished(RenderFinishedEventArgs obj)
         {
             var handler = PartialRenderFinished;
-            if (handler != null) handler(obj);
+            if (handler != null)
+            {
+                handler(obj);
+            }
         }
 
         public event Action<RenderFinishedEventArgs> RenderFinished;
+
         protected virtual void OnRenderFinished(RenderFinishedEventArgs obj)
         {
             var handler = RenderFinished;
-            if (handler != null) handler(obj);
+            if (handler != null)
+            {
+                handler(obj);
+            }
         }
 
         public event Action<string, Exception> Error;
+
         protected virtual void OnError(string type, Exception details)
         {
             var handler = Error;
-            if (handler != null) handler(type, details);
+            if (handler != null)
+            {
+                handler(type, details);
+            }
         }
 
         public event Action PostRenderFinished;
+
         protected virtual void OnPostRenderFinished()
         {
             var handler = PostRenderFinished;
-            if (handler != null) handler();
+            if (handler != null)
+            {
+                handler();
+            }
         }
     }
 }

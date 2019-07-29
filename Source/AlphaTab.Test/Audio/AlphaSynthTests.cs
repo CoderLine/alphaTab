@@ -105,14 +105,11 @@ namespace AlphaTab.Test.Audio
         }
     }
 
-    class TestOutput : ISynthOutput
+    internal class TestOutput : ISynthOutput
     {
         private bool _finished;
 
-        public int SampleRate
-        {
-            get { return 44100; }
-        }
+        public int SampleRate => 44100;
 
         public FastList<float> Samples { get; set; }
 
@@ -149,7 +146,7 @@ namespace AlphaTab.Test.Audio
 
         public void AddSamples(SampleArray f)
         {
-            for (int i = 0; i < f.Length; i++)
+            for (var i = 0; i < f.Length; i++)
             {
                 Samples.Add(f[i]);
             }

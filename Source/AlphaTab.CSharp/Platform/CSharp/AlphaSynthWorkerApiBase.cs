@@ -1,21 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using System;
+﻿using System;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Audio.Synth.Synthesis;
@@ -23,7 +6,7 @@ using AlphaTab.Util;
 
 namespace AlphaTab.Platform.CSharp
 {
-    abstract class AlphaSynthWorkerApiBase : IAlphaSynth
+    internal abstract class AlphaSynthWorkerApiBase : IAlphaSynth
     {
         private readonly ISynthOutput _output;
         private LogLevel _logLevel;
@@ -73,64 +56,43 @@ namespace AlphaTab.Platform.CSharp
         public float MasterVolume
         {
             get => Player.MasterVolume;
-            set
-            {
-                DispatchOnWorkerThread(() => { Player.MasterVolume = value; });
-            }
+            set => DispatchOnWorkerThread(() => { Player.MasterVolume = value; });
         }
 
         public float MetronomeVolume
         {
             get => Player.MetronomeVolume;
-            set
-            {
-                DispatchOnWorkerThread(() => { Player.MetronomeVolume = value; });
-            }
+            set => DispatchOnWorkerThread(() => { Player.MetronomeVolume = value; });
         }
 
         public double PlaybackSpeed
         {
             get => Player.PlaybackSpeed;
-            set
-            {
-                DispatchOnWorkerThread(() => { Player.PlaybackSpeed = value; });
-            }
+            set => DispatchOnWorkerThread(() => { Player.PlaybackSpeed = value; });
         }
 
         public int TickPosition
         {
             get => Player.TickPosition;
-            set
-            {
-                DispatchOnWorkerThread(() => { Player.TickPosition = value; });
-            }
+            set => DispatchOnWorkerThread(() => { Player.TickPosition = value; });
         }
 
         public double TimePosition
         {
             get => Player.TimePosition;
-            set
-            {
-                DispatchOnWorkerThread(() => { Player.TimePosition = value; });
-            }
+            set => DispatchOnWorkerThread(() => { Player.TimePosition = value; });
         }
 
         public PlaybackRange PlaybackRange
         {
             get => Player.PlaybackRange;
-            set
-            {
-                DispatchOnWorkerThread(() => { Player.PlaybackRange = value; });
-            }
+            set => DispatchOnWorkerThread(() => { Player.PlaybackRange = value; });
         }
 
         public bool IsLooping
         {
             get => Player.IsLooping;
-            set
-            {
-                DispatchOnWorkerThread(() => { Player.IsLooping = value; });
-            }
+            set => DispatchOnWorkerThread(() => { Player.IsLooping = value; });
         }
 
         public void Play()

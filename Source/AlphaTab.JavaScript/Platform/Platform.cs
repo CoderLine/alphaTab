@@ -1,22 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using System;
+﻿using System;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Audio.Synth.Midi.Event;
@@ -34,17 +16,18 @@ namespace AlphaTab.Platform
 {
     [Name("js.html.TextDecoder")]
     [External]
-    class TextDecoder
+    internal class TextDecoder
     {
         public extern TextDecoder(HaxeString label);
 
         [Name("decode")]
         public extern HaxeString Decode(ArrayBuffer data);
+
         [Name("decode")]
         public extern HaxeString Decode(ArrayBufferView data);
     }
 
-    static partial class Platform
+    internal static partial class Platform
     {
         [Inline]
         public static float ParseFloat(string s)
@@ -144,7 +127,11 @@ namespace AlphaTab.Platform
         public static sbyte ReadSignedByte(this IReadable readable)
         {
             var n = readable.ReadByte();
-            if (n >= 128) return (sbyte)(n - 256);
+            if (n >= 128)
+            {
+                return (sbyte)(n - 256);
+            }
+
             return (sbyte)n;
         }
 
@@ -157,10 +144,12 @@ namespace AlphaTab.Platform
                 {
                     encoding = detectedEncoding;
                 }
+
                 if (encoding == null)
                 {
                     encoding = "utf-8";
                 }
+
                 var decoder = new TextDecoder(encoding);
                 return decoder.Decode(data.As<ArrayBuffer>());
             }
@@ -168,13 +157,17 @@ namespace AlphaTab.Platform
             {
                 // manual UTF8 decoding for older browsers
                 var s = new StringBuilder();
-                int i = 0;
+                var i = 0;
                 while (i < data.Length)
                 {
                     var c = data[i++];
                     if (c < 0x80)
                     {
-                        if (c == 0) break;
+                        if (c == 0)
+                        {
+                            break;
+                        }
+
                         s.AppendChar(c);
                     }
                     else if (c < 0xE0)
@@ -193,6 +186,7 @@ namespace AlphaTab.Platform
                         s.AppendChar((u & 0x3FF) | 0xDC00);
                     }
                 }
+
                 return s.ToString();
             }
         }
@@ -200,10 +194,11 @@ namespace AlphaTab.Platform
         public static byte[] StringToByteArray(string contents)
         {
             var byteArray = new byte[contents.Length];
-            for (int i = 0; i < contents.Length; i++)
+            for (var i = 0; i < contents.Length; i++)
             {
                 byteArray[i] = (byte)contents[i];
             }
+
             return byteArray;
         }
 
@@ -215,7 +210,7 @@ namespace AlphaTab.Platform
         public static string NewGuid()
         {
             return S4() + S4() + '-' + S4() + '-' + S4() + '-' +
-                      S4() + '-' + S4() + S4() + S4();
+                   S4() + '-' + S4() + S4() + S4();
         }
 
         [Inline]
@@ -241,6 +236,7 @@ namespace AlphaTab.Platform
         {
             return Script.Write<string[]>("untyped s.match(regex)");
         }
+
         [Inline]
         public static bool IsTruthy(this object o)
         {
@@ -283,7 +279,7 @@ namespace AlphaTab.Platform
 
         public static void ClearIntArray(int[] array)
         {
-            for (int i = 0; i < array.Length; i++)
+            for (var i = 0; i < array.Length; i++)
             {
                 array[i] = 0;
             }
@@ -291,7 +287,7 @@ namespace AlphaTab.Platform
 
         public static void ClearShortArray(short[] array)
         {
-            for (int i = 0; i < array.Length; i++)
+            for (var i = 0; i < array.Length; i++)
             {
                 array[i] = 0;
             }
@@ -311,62 +307,49 @@ namespace AlphaTab.Platform
 
         public static bool SupportsWebAudio
         {
-            [Inline]
-            get
-            {
-                return Script.Write<bool>("untyped __js__(\"!!window.ScriptProcessorNode\")");
-            }
+            [Inline] get => Script.Write<bool>("untyped __js__(\"!!window.ScriptProcessorNode\")");
         }
 
         public static bool SupportsWebWorkers
         {
-            [Inline]
-            get
-            {
-                return Script.Write<bool>("untyped __js__(\"!!window.Worker\")");
-            }
+            [Inline] get => Script.Write<bool>("untyped __js__(\"!!window.Worker\")");
         }
 
         public static bool ForceFlash
         {
-            [Inline]
-            get
-            {
-                return Script.Write<bool>("untyped __js__(\"!!window.ForceFlash\")");
-            }
+            [Inline] get => Script.Write<bool>("untyped __js__(\"!!window.ForceFlash\")");
         }
 
 
         public static bool SupportsTextDecoder
         {
-            [Inline]
-            get
-            {
-                return !!Lib.Global.TextDecoder;
-            }
+            [Inline] get => !!Lib.Global.TextDecoder;
         }
 
         [Inline]
         public static void ArrayCopy(int[] src, int srcOffset, int[] dst, int dstOffset, int count)
         {
-            Script.Write("untyped __js__(\"{2}.set({0}.subarray({1},{1}+{4}), {3})\", src, srcOffset, dst, dstOffset, count);");
+            Script.Write(
+                "untyped __js__(\"{2}.set({0}.subarray({1},{1}+{4}), {3})\", src, srcOffset, dst, dstOffset, count);");
         }
 
         [Inline]
         public static void ArrayCopy(short[] src, int srcOffset, short[] dst, int dstOffset, int count)
         {
-            Script.Write("untyped __js__(\"{2}.set({0}.subarray({1},{1}+{4}), {3})\", src, srcOffset, dst, dstOffset, count);");
+            Script.Write(
+                "untyped __js__(\"{2}.set({0}.subarray({1},{1}+{4}), {3})\", src, srcOffset, dst, dstOffset, count);");
         }
 
         [Inline]
         public static void ArrayCopy(byte[] src, int srcOffset, byte[] dst, int dstOffset, int count)
         {
-            Script.Write("untyped __js__(\"{2}.set({0}.subarray({1},{1}+{4}), {3})\", src, srcOffset, dst, dstOffset, count);");
+            Script.Write(
+                "untyped __js__(\"{2}.set({0}.subarray({1},{1}+{4}), {3})\", src, srcOffset, dst, dstOffset, count);");
         }
 
         public static void ArrayCopy<T>(T[] src, int srcOffset, T[] dst, int dstOffset, int count)
         {
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 dst[dstOffset + i] = src[srcOffset + i];
             }

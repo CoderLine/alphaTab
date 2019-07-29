@@ -111,7 +111,7 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.TrackEndEvent { Tick = 3840, Track = 0 } // 3840 = end of bar
             };
 
-            for (int i = 0; i < handler.MidiEvents.Count; i++)
+            for (var i = 0; i < handler.MidiEvents.Count; i++)
             {
                 Logger.Info("Test", $"i[{i}] {handler.MidiEvents[i]}");
                 if (i < expectedEvents.Length)
@@ -249,7 +249,7 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.TrackEndEvent { Tick = 19200, Track = 0 } // 3840 = end of bar
                 };
 
-                for (int i = 0; i < handler.MidiEvents.Count; i++)
+                for (var i = 0; i < handler.MidiEvents.Count; i++)
                 {
                     Logger.Info("Test", $"i[{i}] {handler.MidiEvents[i]}");
                     if (i < expectedEvents.Length)
@@ -344,7 +344,7 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.TrackEndEvent { Tick = 3840, Track = 0 } // 3840 = end of bar
             };
 
-            for (int i = 0; i < handler.MidiEvents.Count; i++)
+            for (var i = 0; i < handler.MidiEvents.Count; i++)
             {
                 Logger.Info("Test", $"i[{i}] {handler.MidiEvents[i]}");
                 if (i < expectedEvents.Length)

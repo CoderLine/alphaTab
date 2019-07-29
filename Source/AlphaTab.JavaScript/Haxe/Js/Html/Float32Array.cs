@@ -27,15 +27,19 @@ namespace Haxe.Js.Html
 
         [Name("set")]
         public extern void Set(Float32Array buffer);
+
         [Name("set")]
         public extern void Set(Float32Array buffer, HaxeInt offset);
+
         [Name("set")]
         public extern void Set(HaxeFloat[] buffer);
+
         [Name("set")]
         public extern void Set(HaxeFloat[] buffer, HaxeInt offset);
 
         [Name("subarray")]
         public extern Float32Array SubArray(HaxeInt start);
+
         [Name("subarray")]
         public extern Float32Array SubArray(HaxeInt start, HaxeInt end);
     }

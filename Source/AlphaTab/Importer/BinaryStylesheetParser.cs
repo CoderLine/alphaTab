@@ -45,9 +45,9 @@ namespace AlphaTab.Importer
     ///       1 byte | Blue
     ///       1 byte | Alpha
     /// </remarks>
-    class BinaryStylesheetParser
+    internal class BinaryStylesheetParser
     {
-        enum DataType
+        private enum DataType
         {
             Boolean,
             Integer,
@@ -68,7 +68,7 @@ namespace AlphaTab.Importer
 
             var readable = ByteBuffer.FromBuffer(data);
             var entryCount = readable.ReadInt32BE();
-            for (int i = 0; i < entryCount; i++)
+            for (var i = 0; i < entryCount; i++)
             {
                 var key = readable.GpReadString(readable.ReadByte(), "utf-8");
                 var type = (DataType)readable.ReadByte();
@@ -106,13 +106,14 @@ namespace AlphaTab.Importer
                         var rectY = readable.ReadInt32BE();
                         var rectW = readable.ReadInt32BE();
                         var rectH = readable.ReadInt32BE();
-                        Stylesheet.AddValue(key, new Bounds
-                        {
-                            X = rectX,
-                            Y = rectY,
-                            W = rectW,
-                            H = rectH
-                        });
+                        Stylesheet.AddValue(key,
+                            new Bounds
+                            {
+                                X = rectX,
+                                Y = rectY,
+                                W = rectW,
+                                H = rectH
+                            });
                         break;
                     case DataType.Color:
                         var color = readable.GpReadColor(true);

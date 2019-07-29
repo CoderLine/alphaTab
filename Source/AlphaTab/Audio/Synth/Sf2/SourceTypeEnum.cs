@@ -1,6 +1,6 @@
 ﻿namespace AlphaTab.Audio.Synth.Sf2
 {
-    enum SourceTypeEnum
+    internal enum SourceTypeEnum
     {
         Linear = 0,
         Concave = 1,

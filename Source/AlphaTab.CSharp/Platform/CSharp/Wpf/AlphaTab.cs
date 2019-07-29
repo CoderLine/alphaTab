@@ -1,21 +1,4 @@
 ﻿#if NET472
-/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -75,8 +58,8 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public IEnumerable<Track> Tracks
         {
-            get { return (IEnumerable<Track>)GetValue(TracksProperty); }
-            set { SetValue(TracksProperty, value); }
+            get => (IEnumerable<Track>)GetValue(TracksProperty);
+            set => SetValue(TracksProperty, value);
         }
 
         #endregion
@@ -93,8 +76,8 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public Settings Settings
         {
-            get { return (Settings)GetValue(SettingsProperty); }
-            set { SetValue(SettingsProperty, value); }
+            get => (Settings)GetValue(SettingsProperty);
+            set => SetValue(SettingsProperty, value);
         }
 
         #endregion
@@ -106,8 +89,8 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public Brush BarCursorFill
         {
-            get { return (Brush)GetValue(BarCursorFillProperty); }
-            set { SetValue(BarCursorFillProperty, value); }
+            get => (Brush)GetValue(BarCursorFillProperty);
+            set => SetValue(BarCursorFillProperty, value);
         }
 
 
@@ -119,8 +102,8 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public Brush BeatCursorFill
         {
-            get { return (Brush)GetValue(BeatCursorFillProperty); }
-            set { SetValue(BeatCursorFillProperty, value); }
+            get => (Brush)GetValue(BeatCursorFillProperty);
+            set => SetValue(BeatCursorFillProperty, value);
         }
 
 
@@ -132,8 +115,8 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public Brush SelectionFill
         {
-            get { return (Brush)GetValue(SelectionCursorFillProperty); }
-            set { SetValue(SelectionCursorFillProperty, value); }
+            get => (Brush)GetValue(SelectionCursorFillProperty);
+            set => SetValue(SelectionCursorFillProperty, value);
         }
 
 
@@ -166,7 +149,10 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public void RenderTracks()
         {
-            if (Tracks == null) return;
+            if (Tracks == null)
+            {
+                return;
+            }
 
             Score score = null;
             var trackIndexes = new FastList<int>();

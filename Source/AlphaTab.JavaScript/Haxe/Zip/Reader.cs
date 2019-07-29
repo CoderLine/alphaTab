@@ -36,6 +36,7 @@ namespace Haxe.Zip
     {
         [Name("fileName")]
         public HaxeString FileName { get; set; }
+
         [Name("data")]
         public HaxeBytes Data { get; set; }
     }

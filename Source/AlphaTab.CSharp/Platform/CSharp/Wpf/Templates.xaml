@@ -10,8 +10,7 @@
                                   Background="{TemplateBinding Background}"
                                   Margin="{TemplateBinding Margin}"
                                   Padding="{TemplateBinding Padding}">
-                        <Grid Background="{TemplateBinding Foreground}" HorizontalAlignment="Center">
-                        </Grid>
+                        <Grid Background="{TemplateBinding Foreground}" HorizontalAlignment="Center" />
                     </ScrollViewer>
                 </ControlTemplate>
             </Setter.Value>

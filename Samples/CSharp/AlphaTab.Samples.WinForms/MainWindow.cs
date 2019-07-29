@@ -1,22 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using System;
+﻿using System;
 using System.IO;
 using System.Windows.Forms;
 using AlphaTab.Audio.Synth;
@@ -62,7 +44,7 @@ namespace AlphaTab.Samples.WinForms
 
         public Score Score
         {
-            get { return _score; }
+            get => _score;
             set
             {
                 _score = value;
@@ -74,7 +56,7 @@ namespace AlphaTab.Samples.WinForms
 
         public int CurrentTrackIndex
         {
-            get { return _currentTrackIndex; }
+            get => _currentTrackIndex;
             set
             {
                 _currentTrackIndex = value;
@@ -91,7 +73,11 @@ namespace AlphaTab.Samples.WinForms
         {
             get
             {
-                if (Score == null || CurrentTrackIndex < 0 || CurrentTrackIndex >= _score.Tracks.Count) return null;
+                if (Score == null || CurrentTrackIndex < 0 || CurrentTrackIndex >= _score.Tracks.Count)
+                {
+                    return null;
+                }
+
                 return _score.Tracks[_currentTrackIndex];
             }
         }
@@ -102,7 +88,7 @@ namespace AlphaTab.Samples.WinForms
 
         private void OpenFile()
         {
-            using (OpenFileDialog dialog = new OpenFileDialog())
+            using (var dialog = new OpenFileDialog())
             {
                 dialog.Filter = "Supported Files (*.gp3, *.gp4, *.gp5, *.gpx, *.gp)|*.gp3;*.gp4;*.gp5;*.gpx;*.gp";
                 if (dialog.ShowDialog(this) == DialogResult.OK)
@@ -129,15 +115,15 @@ namespace AlphaTab.Samples.WinForms
 
                 trackDetails.Controls.Clear();
                 trackBars.Controls.Clear();
-                for (int i = Score.Tracks.Count - 1; i >= 0; i--)
+                for (var i = Score.Tracks.Count - 1; i >= 0; i--)
                 {
-                    TrackDetailsControl details = new TrackDetailsControl(Score.Tracks[i]);
+                    var details = new TrackDetailsControl(Score.Tracks[i]);
                     details.Dock = DockStyle.Top;
                     details.Height = 25;
                     trackDetails.Controls.Add(details);
                     details.Selected += details_Click;
 
-                    TrackBarsControl bars = new TrackBarsControl(Score.Tracks[i]);
+                    var bars = new TrackBarsControl(Score.Tracks[i]);
                     bars.Dock = DockStyle.Top;
                     trackBars.Controls.Add(bars);
                 }
@@ -153,7 +139,7 @@ namespace AlphaTab.Samples.WinForms
 
         private void details_Click(object sender, EventArgs e)
         {
-            TrackDetailsControl details = (TrackDetailsControl)sender;
+            var details = (TrackDetailsControl)sender;
             CurrentTrackIndex = _score.Tracks.IndexOf(details.Track);
         }
 
@@ -170,8 +156,12 @@ namespace AlphaTab.Samples.WinForms
 
         private void showScoreInfo_Click(object sender, EventArgs e)
         {
-            if (_score == null) return;
-            using (ScoreInfoWindow window = new ScoreInfoWindow(_score))
+            if (_score == null)
+            {
+                return;
+            }
+
+            using (var window = new ScoreInfoWindow(_score))
             {
                 window.ShowDialog(this);
             }

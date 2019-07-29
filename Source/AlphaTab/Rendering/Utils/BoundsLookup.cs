@@ -1,22 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using AlphaTab.Collections;
+﻿using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
@@ -30,14 +12,17 @@ namespace AlphaTab.Rendering.Utils
         /// Gets or sets the X-position of the rectangle within the music notation.
         /// </summary>
         public float X { get; set; }
+
         /// <summary>
         /// Gets or sets the Y-position of the rectangle within the music notation.
         /// </summary>
         public float Y { get; set; }
+
         /// <summary>
         /// Gets or sets the width of the rectangle.
         /// </summary>
         public float W { get; set; }
+
         /// <summary>
         /// Gets or sets the height of the rectangle.
         /// </summary>
@@ -45,7 +30,7 @@ namespace AlphaTab.Rendering.Utils
     }
 
     /// <summary>
-    /// Represents the bounds of a stave group. 
+    /// Represents the bounds of a stave group.
     /// </summary>
     public class StaveGroupBounds
     {
@@ -54,18 +39,22 @@ namespace AlphaTab.Rendering.Utils
         /// This allows fast access of the next/previous groups.
         /// </summary>
         public int Index { get; set; }
+
         /// <summary>
         /// Gets or sets the bounds covering all visually visible elements of this stave group.
         /// </summary>
         public Bounds VisualBounds { get; set; }
+
         /// <summary>
         /// Gets or sets the actual bounds of the elements in this stave group including whitespace areas.
         /// </summary>
         public Bounds RealBounds { get; set; }
+
         /// <summary>
         /// Gets or sets the list of master bar bounds related to this stave group.
         /// </summary>
         public FastList<MasterBarBounds> Bars { get; set; }
+
         /// <summary>
         /// Gets or sets a reference to the parent bounds lookup.
         /// </summary>
@@ -81,7 +70,7 @@ namespace AlphaTab.Rendering.Utils
         }
 
         /// <summary>
-        /// Finished the lookup for optimized access. 
+        /// Finished the lookup for optimized access.
         /// </summary>
         internal void Finish()
         {
@@ -122,9 +111,9 @@ namespace AlphaTab.Rendering.Utils
                     break;
                 }
             }
+
             return b;
         }
-
     }
 
     /// <summary>
@@ -133,17 +122,20 @@ namespace AlphaTab.Rendering.Utils
     public class MasterBarBounds
     {
         /// <summary>
-        /// Gets or sets the index of this bounds relative within the parent lookup. 
+        /// Gets or sets the index of this bounds relative within the parent lookup.
         /// </summary>
         public int Index { get; set; }
+
         /// <summary>
-        /// Gets or sets a value indicating whether this bounds are the first of the line. 
+        /// Gets or sets a value indicating whether this bounds are the first of the line.
         /// </summary>
         public bool IsFirstOfLine { get; set; }
+
         /// <summary>
         /// Gets or sets the bounds covering all visually visible elements spanning all bars of this master bar.
         /// </summary>
         public Bounds VisualBounds { get; set; }
+
         /// <summary>
         /// Gets or sets the actual bounds of the elements in this master bar including whitespace areas.
         /// </summary>
@@ -199,6 +191,7 @@ namespace AlphaTab.Rendering.Utils
                     beat = b;
                 }
             }
+
             return beat == null ? null : beat.Beat;
         }
 
@@ -207,24 +200,28 @@ namespace AlphaTab.Rendering.Utils
         /// </summary>
         internal void Finish()
         {
-            Bars.Sort((a,b)=>
+            Bars.Sort((a, b) =>
             {
                 if (a.RealBounds.Y < b.RealBounds.Y)
                 {
                     return -1;
                 }
+
                 if (a.RealBounds.Y > b.RealBounds.Y)
                 {
                     return 1;
                 }
+
                 if (a.RealBounds.X < b.RealBounds.X)
                 {
                     return -1;
                 }
+
                 if (a.RealBounds.X > b.RealBounds.X)
                 {
                     return 1;
                 }
+
                 return 0;
             });
         }
@@ -253,6 +250,7 @@ namespace AlphaTab.Rendering.Utils
         /// Gets or sets the bounds covering all visually visible elements spanning this bar.
         /// </summary>
         public Bounds VisualBounds { get; set; }
+
         /// <summary>
         /// Gets or sets the actual bounds of the elements in this bar including whitespace areas.
         /// </summary>
@@ -306,6 +304,7 @@ namespace AlphaTab.Rendering.Utils
                     break;
                 }
             }
+
             return beat;
         }
     }
@@ -324,6 +323,7 @@ namespace AlphaTab.Rendering.Utils
         /// Gets or sets the bounds covering all visually visible elements spanning this beat.
         /// </summary>
         public Bounds VisualBounds { get; set; }
+
         /// <summary>
         /// Gets or sets the actual bounds of the elements in this beat including whitespace areas.
         /// </summary>
@@ -345,7 +345,11 @@ namespace AlphaTab.Rendering.Utils
         /// <param name="bounds">The note bounds to add.</param>
         internal void AddNote(NoteBounds bounds)
         {
-            if(Notes == null) Notes = new FastList<NoteBounds>();
+            if (Notes == null)
+            {
+                Notes = new FastList<NoteBounds>();
+            }
+
             Notes.Add(bounds);
         }
 
@@ -357,10 +361,14 @@ namespace AlphaTab.Rendering.Utils
         /// <returns>The note at the given position or null if no note was found, or the note lookup was not enabled before rendering.</returns>
         public Note FindNoteAtPos(float x, float y)
         {
-            if (Notes == null) return null;
-            // TODO: can be likely optimized 
-            // a beat is mostly vertically aligned, we could sort the note bounds by Y 
-            // and then do a binary search on the Y-axis. 
+            if (Notes == null)
+            {
+                return null;
+            }
+
+            // TODO: can be likely optimized
+            // a beat is mostly vertically aligned, we could sort the note bounds by Y
+            // and then do a binary search on the Y-axis.
             foreach (var note in Notes)
             {
                 var bottom = note.NoteHeadBounds.Y + note.NoteHeadBounds.H;
@@ -370,6 +378,7 @@ namespace AlphaTab.Rendering.Utils
                     return note.Note;
                 }
             }
+
             return null;
         }
     }
@@ -403,6 +412,7 @@ namespace AlphaTab.Rendering.Utils
         /// Gets a list of all individual stave groups contained in the rendered music notation.
         /// </summary>
         public FastList<StaveGroupBounds> StaveGroups { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether this lookup was finished already.
         /// </summary>
@@ -470,6 +480,7 @@ namespace AlphaTab.Rendering.Utils
                 _masterBarLookup[bounds.Index] = bounds;
             }
         }
+
         /// <summary>
         /// Adds a new beat to the lookup.
         /// </summary>
@@ -490,6 +501,7 @@ namespace AlphaTab.Rendering.Utils
             {
                 return _masterBarLookup[index];
             }
+
             return null;
         }
 
@@ -505,11 +517,12 @@ namespace AlphaTab.Rendering.Utils
             {
                 return _masterBarLookup[id];
             }
+
             return null;
         }
 
         /// <summary>
-        /// Tries to find the bounds of a given beat. 
+        /// Tries to find the bounds of a given beat.
         /// </summary>
         /// <param name="beat">The beat to find.</param>
         /// <returns>The beat bounds if it was rendered, or null if no boundary information is available.</returns>
@@ -520,6 +533,7 @@ namespace AlphaTab.Rendering.Utils
             {
                 return _beatLookup[id];
             }
+
             return null;
         }
 
@@ -543,12 +557,13 @@ namespace AlphaTab.Rendering.Utils
                 var group = StaveGroups[middle];
 
                 // found?
-                if (y >= group.RealBounds.Y && y <= (group.RealBounds.Y + group.RealBounds.H))
+                if (y >= group.RealBounds.Y && y <= group.RealBounds.Y + group.RealBounds.H)
                 {
                     staveGroupIndex = middle;
                     break;
                 }
-                // search in lower half 
+
+                // search in lower half
                 if (y < group.RealBounds.Y)
                 {
                     top = middle - 1;
@@ -561,9 +576,12 @@ namespace AlphaTab.Rendering.Utils
             }
 
             // no bar found
-            if (staveGroupIndex == -1) return null;
+            if (staveGroupIndex == -1)
+            {
+                return null;
+            }
 
-            // 
+            //
             // Find the matching bar in the row
             var staveGroup = StaveGroups[staveGroupIndex];
 
@@ -588,13 +606,15 @@ namespace AlphaTab.Rendering.Utils
         public Note GetNoteAtPos(Beat beat, float x, float y)
         {
             var beatBounds = FindBeat(beat);
-            if (beatBounds == null) return null;
+            if (beatBounds == null)
+            {
+                return null;
+            }
 
             x -= beatBounds.BarBounds.MasterBarBounds.StaveGroupBounds.RealBounds.X;
             y -= beatBounds.BarBounds.MasterBarBounds.StaveGroupBounds.RealBounds.Y;
 
             return beatBounds.FindNoteAtPos(x, y);
         }
-
     }
 }

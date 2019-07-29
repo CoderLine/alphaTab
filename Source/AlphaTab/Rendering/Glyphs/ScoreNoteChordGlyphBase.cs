@@ -5,7 +5,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class ScoreNoteGlyphInfo
+    internal class ScoreNoteGlyphInfo
     {
         public Glyph Glyph { get; set; }
         public int Line { get; set; }
@@ -17,7 +17,7 @@ namespace AlphaTab.Rendering.Glyphs
         }
     }
 
-    abstract class ScoreNoteChordGlyphBase : Glyph
+    internal abstract class ScoreNoteChordGlyphBase : Glyph
     {
         private readonly FastList<ScoreNoteGlyphInfo> _infos;
         private float _noteHeadPadding;
@@ -47,27 +47,16 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 MinNote = info;
             }
+
             if (MaxNote == null || MaxNote.Line < info.Line)
             {
                 MaxNote = info;
             }
         }
 
-        public bool HasTopOverflow
-        {
-            get
-            {
-                return MinNote != null && MinNote.Line <= 0;
-            }
-        }
+        public bool HasTopOverflow => MinNote != null && MinNote.Line <= 0;
 
-        public bool HasBottomOverflow
-        {
-            get
-            {
-                return MaxNote != null && MaxNote.Line > 8;
-            }
-        }
+        public bool HasBottomOverflow => MaxNote != null && MaxNote.Line > 8;
 
         public override void DoLayout()
         {
@@ -101,13 +90,13 @@ namespace AlphaTab.Rendering.Glyphs
                         if (!lastDisplaced)
                         {
                             displace = true;
-                            g.X = displacedX - (Scale);
+                            g.X = displacedX - Scale;
                             anyDisplaced = true;
                             lastDisplaced = true; // let next iteration know we are displace now
                         }
                         else
                         {
-                            lastDisplaced = false;  // let next iteration know that we weren't displaced now
+                            lastDisplaced = false; // let next iteration know that we weren't displaced now
                         }
                     }
                     else // offset is big enough? no displacing needed
@@ -130,6 +119,7 @@ namespace AlphaTab.Rendering.Glyphs
                         ? displacedX
                         : 0;
                 }
+
                 g.X += NoteStartX;
 
                 lastLine = _infos[i].Line;
@@ -179,6 +169,7 @@ namespace AlphaTab.Rendering.Glyphs
                     canvas.FillRect(cx - linePadding + NoteStartX, lY, lineWidth, Scale);
                     l -= 2;
                 }
+
                 canvas.Color = color;
             }
 
@@ -193,6 +184,7 @@ namespace AlphaTab.Rendering.Glyphs
                     canvas.FillRect(cx - linePadding + NoteStartX, lY, lineWidth, Scale);
                     l += 2;
                 }
+
                 canvas.Color = color;
             }
 

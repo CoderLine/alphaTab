@@ -1,28 +1,11 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using AlphaTab.Collections;
+﻿using AlphaTab.Collections;
 
 namespace AlphaTab.Audio
 {
     /// <summary>
     /// This public class provides names for all general midi instruments.
     /// </summary>
-    class GeneralMidi
+    internal class GeneralMidi
     {
         private static FastDictionary<string, int> _values;
 
@@ -160,18 +143,19 @@ namespace AlphaTab.Audio
                 _values["applause"] = 126;
                 _values["gunshot"] = 127;
             }
+
             name = name.ToLower().Replace(" ", "");
             return _values.ContainsKey(name) ? _values[name] : 0;
         }
 
         public static bool IsPiano(int program)
         {
-            return program <= 7 || (program >= 16 && program <= 23);
+            return program <= 7 || program >= 16 && program <= 23;
         }
 
         public static bool IsGuitar(int program)
         {
-            return (program >= 24 && program <= 39) || program == 105 || program == 43;
+            return program >= 24 && program <= 39 || program == 105 || program == 43;
         }
     }
 }

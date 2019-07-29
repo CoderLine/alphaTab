@@ -1,25 +1,8 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using AlphaTab.Model;
+﻿using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class ScoreBeatPreNotesGlyph : BeatGlyphBase
+    internal class ScoreBeatPreNotesGlyph : BeatGlyphBase
     {
         private BendNoteHeadGroupGlyph _prebends;
         public float PrebendNoteHeadOffset => _prebends.X + _prebends.NoteHeadOffset;
@@ -67,7 +50,9 @@ namespace AlphaTab.Rendering.Glyphs
                 if (!_prebends.IsEmpty)
                 {
                     AddGlyph(_prebends);
-                    AddGlyph(new SpacingGlyph(0, 0, 4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
+                    AddGlyph(new SpacingGlyph(0,
+                        0,
+                        4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
                 }
 
                 if (Container.Beat.BrushType != BrushType.None)
@@ -79,13 +64,17 @@ namespace AlphaTab.Rendering.Glyphs
                 if (!ghost.IsEmpty)
                 {
                     AddGlyph(ghost);
-                    AddGlyph(new SpacingGlyph(0, 0, 4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
+                    AddGlyph(new SpacingGlyph(0,
+                        0,
+                        4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
                 }
 
                 if (!accidentals.IsEmpty)
                 {
                     AddGlyph(accidentals);
-                    AddGlyph(new SpacingGlyph(0, 0, 4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
+                    AddGlyph(new SpacingGlyph(0,
+                        0,
+                        4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
                 }
             }
 
@@ -103,6 +92,7 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 accidentals.AddGlyph(new AccidentalGlyph(0, sr.GetScoreY(noteLine), accidental, isGrace));
             }
+
             if (n.HarmonicType != HarmonicType.None && n.HarmonicType != HarmonicType.Natural)
             {
                 var harmonicFret = n.DisplayValue + n.HarmonicPitch;

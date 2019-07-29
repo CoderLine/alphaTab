@@ -1,20 +1,3 @@
-/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
 using System;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Model;
@@ -25,7 +8,7 @@ using Haxe;
 
 namespace AlphaTab.Platform.JavaScript
 {
-    class AlphaTabWorkerScoreRenderer<T> : IScoreRenderer
+    internal class AlphaTabWorkerScoreRenderer<T> : IScoreRenderer
     {
         private readonly AlphaTabApi<T> _api;
         private readonly Worker _worker;
@@ -45,7 +28,10 @@ namespace AlphaTab.Platform.JavaScript
                 try
                 {
                     HaxeString script = "importScripts('" + settings.ScriptFile + "')";
-                    var blob = new Blob(new [] { script });
+                    var blob = new Blob(new[]
+                    {
+                        script
+                    });
                     _worker = new Worker(URL.CreateObjectURL(blob));
                 }
                 catch (Exception e)
@@ -55,7 +41,11 @@ namespace AlphaTab.Platform.JavaScript
                 }
             }
 
-            _worker.PostMessage(new { cmd = "alphaTab.initialize", settings = settings.ToJson() });
+            _worker.PostMessage(new
+            {
+                cmd = "alphaTab.initialize",
+                settings = settings.ToJson()
+            });
             _worker.AddEventListener("message", (Action<Event>)(HandleWorkerMessage));
         }
 
@@ -66,17 +56,28 @@ namespace AlphaTab.Platform.JavaScript
 
         public void UpdateSettings(Settings settings)
         {
-            _worker.PostMessage(new { cmd = "alphaTab.updateSettings", settings = settings.ToJson() });
+            _worker.PostMessage(new
+            {
+                cmd = "alphaTab.updateSettings",
+                settings = settings.ToJson()
+            });
         }
 
         public void Invalidate()
         {
-            _worker.PostMessage(new { cmd = "alphaTab.invalidate" });
+            _worker.PostMessage(new
+            {
+                cmd = "alphaTab.invalidate"
+            });
         }
 
         public void Resize(int width)
         {
-            _worker.PostMessage(new { cmd = "alphaTab.resize", width = width });
+            _worker.PostMessage(new
+            {
+                cmd = "alphaTab.resize",
+                width = width
+            });
         }
 
         private void HandleWorkerMessage(Event e)
@@ -95,7 +96,7 @@ namespace AlphaTab.Platform.JavaScript
                     OnRenderFinished(data.result);
                     break;
                 case "alphaTab.postRenderFinished":
-                    BoundsLookup = BoundsLookup.FromJson(data.boundsLookup, _api.Score);
+                    BoundsLookup = Rendering.Utils.BoundsLookup.FromJson(data.boundsLookup, _api.Score);
                     OnPostRenderFinished();
                     break;
                 case "alphaTab.error":
@@ -107,42 +108,67 @@ namespace AlphaTab.Platform.JavaScript
         public void Render(Score score, int[] trackIndexes)
         {
             var jsObject = JsonConverter.ScoreToJsObject(score);
-            _worker.PostMessage(new { cmd = "alphaTab.render", score = jsObject, trackIndexes = trackIndexes });
+            _worker.PostMessage(new
+            {
+                cmd = "alphaTab.render",
+                score = jsObject,
+                trackIndexes = trackIndexes
+            });
         }
 
         public event Action PreRender;
+
         protected virtual void OnPreRender()
         {
             var handler = PreRender;
-            if (handler != null) handler();
+            if (handler != null)
+            {
+                handler();
+            }
         }
 
         public event Action<RenderFinishedEventArgs> PartialRenderFinished;
+
         protected virtual void OnPartialRenderFinished(RenderFinishedEventArgs obj)
         {
             var handler = PartialRenderFinished;
-            if (handler != null) handler(obj);
+            if (handler != null)
+            {
+                handler(obj);
+            }
         }
 
         public event Action<RenderFinishedEventArgs> RenderFinished;
+
         protected virtual void OnRenderFinished(RenderFinishedEventArgs obj)
         {
             var handler = RenderFinished;
-            if (handler != null) handler(obj);
+            if (handler != null)
+            {
+                handler(obj);
+            }
         }
 
         public event Action<string, Exception> Error;
+
         protected virtual void OnError(string type, Exception details)
         {
             var handler = Error;
-            if (handler != null) handler(type, details);
+            if (handler != null)
+            {
+                handler(type, details);
+            }
         }
 
         public event Action PostRenderFinished;
+
         protected virtual void OnPostRenderFinished()
         {
             var handler = PostRenderFinished;
-            if (handler != null) handler();
+            if (handler != null)
+            {
+                handler();
+            }
         }
     }
 }

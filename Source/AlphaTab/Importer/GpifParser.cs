@@ -1,29 +1,8 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using System;
-using System.Diagnostics;
+﻿using System;
 using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
-using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
-using AlphaTab.Util;
 using AlphaTab.Xml;
 
 namespace AlphaTab.Importer
@@ -31,7 +10,7 @@ namespace AlphaTab.Importer
     /// <summary>
     /// This structure represents a duration within a gpif model.
     /// </summary>
-    class GpifRhythm
+    internal class GpifRhythm
     {
         public int Dots { get; set; }
         public int TupletDenominator { get; set; }
@@ -49,14 +28,16 @@ namespace AlphaTab.Importer
     /// <summary>
     /// This public class can parse a score.gpif xml file into the model structure
     /// </summary>
-    class GpifParser
+    internal class GpifParser
     {
         private const string InvalidId = "-1";
+
         /// <summary>
         /// GPX range: 0-100
         /// Internal range: 0 - 60
         /// </summary>
         private const float BendPointPositionFactor = 60.0f / 100.0f;
+
         /// <summary>
         /// GPIF: 25 per quarternote
         /// Internal Range: 1 per quarter note
@@ -71,13 +52,17 @@ namespace AlphaTab.Importer
         private FastDictionary<string, Track> _tracksById; // contains tracks by their id
 
         private FastList<MasterBar> _masterBars; // contains all masterbars in correct order
-        private FastList<string[]> _barsOfMasterBar; // contains ids of bars placed at this masterbar over all tracks (sequencially)
+
+        private FastList<string[]>
+            _barsOfMasterBar; // contains ids of bars placed at this masterbar over all tracks (sequencially)
 
         private FastDictionary<string, Bar> _barsById; // contains bars by their id
         private FastDictionary<string, string[]> _voicesOfBar; // contains ids of voices stored in a bar (key = bar id)
 
         private FastDictionary<string, Voice> _voiceById; // contains voices by their id
-        private FastDictionary<string, string[]> _beatsOfVoice; // contains ids of beats stored in a voice (key = voice id) 
+
+        private FastDictionary<string, string[]>
+            _beatsOfVoice; // contains ids of beats stored in a voice (key = voice id) 
 
         private FastDictionary<string, string> _rhythmOfBeat; // contains ids of rhythm used by a beat (key = beat id)
         private FastDictionary<string, Beat> _beatById; // contains beats by their id
@@ -85,8 +70,12 @@ namespace AlphaTab.Importer
         private FastDictionary<string, GpifRhythm> _rhythmById; // contains rhythms by their id
 
         private FastDictionary<string, Note> _noteById; // contains notes by their id
-        private FastDictionary<string, string[]> _notesOfBeat; // contains ids of notes stored in a beat (key = beat id);
-        private FastDictionary<string, bool> _tappedNotes; // contains a flag indicating whether a note is tapped (key = note id);
+
+        private FastDictionary<string, string[]>
+            _notesOfBeat; // contains ids of notes stored in a beat (key = beat id);
+
+        private FastDictionary<string, bool>
+            _tappedNotes; // contains a flag indicating whether a note is tapped (key = note id);
 
         private FastDictionary<string, FastList<Lyrics>> _lyricsByTrack;
         private bool _hasAnacrusis;
@@ -119,6 +108,7 @@ namespace AlphaTab.Importer
             {
                 throw new UnsupportedFormatException();
             }
+
             ParseDom(dom);
 
             BuildModel();
@@ -140,7 +130,10 @@ namespace AlphaTab.Importer
         private void ParseDom(XmlDocument dom)
         {
             var root = dom.DocumentElement;
-            if (root == null) return;
+            if (root == null)
+            {
+                return;
+            }
 
             // the XML uses IDs for referring elements within the 
             // model. Therefore we do the parsing in 2 steps:
@@ -232,11 +225,13 @@ namespace AlphaTab.Importer
                                 {
                                     Score.Words = wordsAndMusic;
                                 }
+
                                 if (!string.IsNullOrEmpty(wordsAndMusic) && string.IsNullOrEmpty(Score.Music))
                                 {
                                     Score.Music = wordsAndMusic;
                                 }
                             }
+
                             break;
                         case "Copyright":
                             Score.Copyright = c.FirstChild.InnerText;
@@ -300,11 +295,11 @@ namespace AlphaTab.Importer
         private void ParseAutomation(XmlNode node, FastDictionary<string, FastList<Automation>> automations)
         {
             string type = null;
-            bool isLinear = false;
+            var isLinear = false;
             string barId = null;
             float ratioPosition = 0;
             float value = 0;
-            int reference = 0;
+            var reference = 0;
             string text = null;
 
             foreach (var c in node.ChildNodes)
@@ -337,14 +332,18 @@ namespace AlphaTab.Importer
                 }
             }
 
-            if (type == null) return;
+            if (type == null)
+            {
+                return;
+            }
+
             Automation automation = null;
             switch (type)
             {
                 case "Tempo":
                     automation = Automation.BuildTempoAutomation(isLinear, ratioPosition, value, reference);
                     break;
-                    // TODO: other automations
+                // TODO: other automations
             }
 
             if (automation != null)
@@ -358,6 +357,7 @@ namespace AlphaTab.Importer
                 {
                     automations[barId] = new FastList<Automation>();
                 }
+
                 automations[barId].Add(automation);
             }
         }
@@ -407,6 +407,7 @@ namespace AlphaTab.Importer
                                 var b = Platform.Platform.ParseInt(parts[2]);
                                 track.Color = new Color((byte)r, (byte)g, (byte)b);
                             }
+
                             break;
                         case "Instrument":
                             var instrumentName = c.GetAttribute("ref");
@@ -415,6 +416,7 @@ namespace AlphaTab.Importer
                                 track.EnsureStaveCount(2);
                                 track.Staves[1].ShowStandardNotation = true;
                             }
+
                             break;
                         case "InstrumentSet":
                             ParseInstrumentSet(track, c);
@@ -468,12 +470,14 @@ namespace AlphaTab.Importer
                             switch (c.InnerText)
                             {
                                 case "drumKit":
-                                foreach (var staff in track.Staves)
-                                {
-                                    staff.IsPercussion = true;
-                                }
-                                break;
+                                    foreach (var staff in track.Staves)
+                                    {
+                                        staff.IsPercussion = true;
+                                    }
+
+                                    break;
                             }
+
                             if (c.InnerText == "drumKit")
                             {
                                 foreach (var staff in track.Staves)
@@ -481,6 +485,7 @@ namespace AlphaTab.Importer
                                     staff.IsPercussion = true;
                                 }
                             }
+
                             break;
                     }
                 }
@@ -489,7 +494,7 @@ namespace AlphaTab.Importer
 
         private void ParseStaves(Track track, XmlNode node)
         {
-            int staffIndex = 0;
+            var staffIndex = 0;
             foreach (var c in node.ChildNodes)
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -547,7 +552,7 @@ namespace AlphaTab.Importer
                 case "Tuning":
                     var tuningParts = node.FindChildElement("Pitches").InnerText.Split(' ');
                     var tuning = new int[tuningParts.Length];
-                    for (int i = 0; i < tuning.Length; i++)
+                    for (var i = 0; i < tuning.Length; i++)
                     {
                         tuning[tuning.Length - 1 - i] = Platform.Platform.ParseInt(tuningParts[i]);
                     }
@@ -557,6 +562,7 @@ namespace AlphaTab.Importer
                     {
                         staff.ShowTablature = true;
                     }
+
                     break;
                 case "DiagramCollection":
                 case "ChordCollection":
@@ -567,7 +573,6 @@ namespace AlphaTab.Importer
                     staff.Capo = capo;
                     break;
             }
-
         }
 
         private void ParseLyrics(string trackId, XmlNode node)
@@ -585,6 +590,7 @@ namespace AlphaTab.Importer
                     }
                 }
             }
+
             _lyricsByTrack[trackId] = tracks;
         }
 
@@ -606,6 +612,7 @@ namespace AlphaTab.Importer
                     }
                 }
             }
+
             return lyrics;
         }
 
@@ -625,6 +632,7 @@ namespace AlphaTab.Importer
                 }
             }
         }
+
         private void ParseDiagramCollection(Staff staff, XmlNode node)
         {
             var items = node.FindChildElement("Items");
@@ -650,6 +658,7 @@ namespace AlphaTab.Importer
             {
                 staff.AddChord(chordId, chord);
             }
+
             ParseDiagramItem(chord, node);
         }
 
@@ -669,7 +678,7 @@ namespace AlphaTab.Importer
             var stringCount = Platform.Platform.ParseInt(diagram.GetAttribute("stringCount"));
             var baseFret = Platform.Platform.ParseInt(diagram.GetAttribute("baseFret"));
             chord.FirstFret = baseFret + 1;
-            for (int i = 0; i < stringCount; i++)
+            for (var i = 0; i < stringCount; i++)
             {
                 chord.Strings.Add(-1);
             }
@@ -682,7 +691,8 @@ namespace AlphaTab.Importer
                     {
                         case "Fret":
                             var guitarString = Platform.Platform.ParseInt(c.GetAttribute("string"));
-                            chord.Strings[stringCount - guitarString - 1] = baseFret + Platform.Platform.ParseInt(c.GetAttribute("fret"));
+                            chord.Strings[stringCount - guitarString - 1] =
+                                baseFret + Platform.Platform.ParseInt(c.GetAttribute("fret"));
                             break;
                         case "Fingering":
                             var existingFingers = new FastDictionary<Fingers, bool>();
@@ -749,6 +759,7 @@ namespace AlphaTab.Importer
                                     chord.ShowFingering = c.GetAttribute("value") == "true";
                                     break;
                             }
+
                             break;
                     }
                 }
@@ -780,7 +791,7 @@ namespace AlphaTab.Importer
                 case "Tuning":
                     var tuningParts = node.FindChildElement("Pitches").InnerText.Split(' ');
                     var tuning = new int[tuningParts.Length];
-                    for (int i = 0; i < tuning.Length; i++)
+                    for (var i = 0; i < tuning.Length; i++)
                     {
                         tuning[tuning.Length - 1 - i] = Platform.Platform.ParseInt(tuningParts[i]);
                     }
@@ -791,6 +802,7 @@ namespace AlphaTab.Importer
                         staff.ShowStandardNotation = true;
                         staff.ShowTablature = true;
                     }
+
                     break;
                 case "DiagramCollection":
                 case "ChordCollection":
@@ -802,6 +814,7 @@ namespace AlphaTab.Importer
                     {
                         staff.Capo = capo;
                     }
+
                     break;
             }
         }
@@ -902,6 +915,7 @@ namespace AlphaTab.Importer
                             {
                                 staff.DisplayTranspositionPitch = Platform.Platform.ParseInt(c.InnerText);
                             }
+
                             break;
                     }
                 }
@@ -910,8 +924,8 @@ namespace AlphaTab.Importer
 
         private void ParseTranspose(Track track, XmlNode node)
         {
-            int octave = 0;
-            int chromatic = 0;
+            var octave = 0;
+            var chromatic = 0;
             foreach (var c in node.ChildNodes)
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -986,19 +1000,22 @@ namespace AlphaTab.Importer
                             {
                                 masterBar.IsRepeatStart = true;
                             }
+
                             if (c.GetAttribute("end").ToLower() == "true" && c.GetAttribute("count") != null)
                             {
                                 masterBar.RepeatCount = Platform.Platform.ParseInt(c.GetAttribute("count"));
                             }
+
                             break;
                         // TODO case "Directions": // Coda segno etc. 
                         case "AlternateEndings":
                             var alternateEndings = c.InnerText.Split(' ');
                             var i = 0;
-                            for (int k = 0; k < alternateEndings.Length; k++)
+                            for (var k = 0; k < alternateEndings.Length; k++)
                             {
                                 i |= 1 << (-1 + Platform.Platform.ParseInt(alternateEndings[k]));
                             }
+
                             masterBar.AlternateEndings = (byte)i;
                             break;
                         case "Bars":
@@ -1029,9 +1046,12 @@ namespace AlphaTab.Importer
                                     masterBar.TripletFeel = TripletFeel.Scottish16th;
                                     break;
                             }
+
                             break;
                         case "Key":
-                            masterBar.KeySignature = (KeySignature)Platform.Platform.ParseInt(c.FindChildElement("AccidentalCount").InnerText);
+                            masterBar.KeySignature =
+                                (KeySignature)Platform.Platform.ParseInt(
+                                    c.FindChildElement("AccidentalCount").InnerText);
                             var mode = c.FindChildElement("Mode");
                             if (mode != null)
                             {
@@ -1045,14 +1065,15 @@ namespace AlphaTab.Importer
                                         break;
                                 }
                             }
+
                             break;
                         case "Fermatas":
                             ParseFermatas(masterBar, c);
                             break;
-
                     }
                 }
             }
+
             _masterBars.Add(masterBar);
         }
 
@@ -1095,6 +1116,7 @@ namespace AlphaTab.Importer
                                     fermata.Type = FermataType.Long;
                                     break;
                             }
+
                             break;
                         case "Length":
                             fermata.Length = Platform.Platform.ParseFloat(c.InnerText);
@@ -1105,8 +1127,9 @@ namespace AlphaTab.Importer
                             {
                                 float numerator = Platform.Platform.ParseInt(parts[0]);
                                 float denominator = Platform.Platform.ParseInt(parts[1]);
-                                offset = (int)((numerator / denominator) * MidiUtils.QuarterTime);
+                                offset = (int)(numerator / denominator * MidiUtils.QuarterTime);
                             }
+
                             break;
                     }
                 }
@@ -1168,6 +1191,7 @@ namespace AlphaTab.Importer
                                     bar.Clef = Clef.C3;
                                     break;
                             }
+
                             break;
                         case "Ottavia":
                             switch (c.InnerText)
@@ -1185,6 +1209,7 @@ namespace AlphaTab.Importer
                                     bar.ClefOttava = Ottavia._15mb;
                                     break;
                             }
+
                             break;
                         case "SimileMark":
                             switch (c.InnerText)
@@ -1199,6 +1224,7 @@ namespace AlphaTab.Importer
                                     bar.SimileMark = SimileMark.SecondOfDouble;
                                     break;
                             }
+
                             break;
                     }
                 }
@@ -1290,6 +1316,7 @@ namespace AlphaTab.Importer
                             {
                                 beat.FadeIn = true;
                             }
+
                             break;
                         case "Tremolo":
                             switch (c.InnerText)
@@ -1304,6 +1331,7 @@ namespace AlphaTab.Importer
                                     beat.TremoloSpeed = Duration.ThirtySecond;
                                     break;
                             }
+
                             break;
                         case "Chord":
                             beat.ChordId = c.InnerText;
@@ -1318,6 +1346,7 @@ namespace AlphaTab.Importer
                                     beat.Crescendo = CrescendoType.Decrescendo;
                                     break;
                             }
+
                             break;
                         case "Arpeggio":
                             if (c.InnerText == "Up")
@@ -1328,6 +1357,7 @@ namespace AlphaTab.Importer
                             {
                                 beat.BrushType = BrushType.ArpeggioDown;
                             }
+
                             break;
                         // TODO: brushDuration
                         case "Properties":
@@ -1367,6 +1397,7 @@ namespace AlphaTab.Importer
                                     beat.Dynamic = DynamicValue.FFF;
                                     break;
                             }
+
                             break;
                         case "GraceNotes":
                             switch (c.InnerText)
@@ -1378,34 +1409,44 @@ namespace AlphaTab.Importer
                                     beat.GraceType = GraceType.BeforeBeat;
                                     break;
                             }
+
                             break;
                         case "Legato":
                             if (c.GetAttribute("origin") == "true")
                             {
                                 beat.IsLegatoOrigin = true;
                             }
+
                             break;
                         case "Whammy":
 
                             var whammyOrigin = new BendPoint();
-                            whammyOrigin.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("originValue")));
-                            whammyOrigin.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("originOffset")));
+                            whammyOrigin.Value =
+                                ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("originValue")));
+                            whammyOrigin.Offset =
+                                ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("originOffset")));
                             beat.AddWhammyBarPoint(whammyOrigin);
 
                             var whammyMiddle1 = new BendPoint();
-                            whammyMiddle1.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("middleValue")));
-                            whammyMiddle1.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("middleOffset1")));
+                            whammyMiddle1.Value =
+                                ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("middleValue")));
+                            whammyMiddle1.Offset =
+                                ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("middleOffset1")));
                             beat.AddWhammyBarPoint(whammyMiddle1);
 
 
                             var whammyMiddle2 = new BendPoint();
-                            whammyMiddle2.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("middleValue")));
-                            whammyMiddle2.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("middleOffset2")));
+                            whammyMiddle2.Value =
+                                ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("middleValue")));
+                            whammyMiddle2.Offset =
+                                ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("middleOffset2")));
                             beat.AddWhammyBarPoint(whammyMiddle2);
 
                             var whammyDestination = new BendPoint();
-                            whammyDestination.Value = ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("destinationValue")));
-                            whammyDestination.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("destinationOffset")));
+                            whammyDestination.Value =
+                                ToBendValue(Platform.Platform.ParseFloat(c.GetAttribute("destinationValue")));
+                            whammyDestination.Offset =
+                                ToBendOffset(Platform.Platform.ParseFloat(c.GetAttribute("destinationOffset")));
                             beat.AddWhammyBarPoint(whammyDestination);
                             break;
                         case "Ottavia":
@@ -1424,6 +1465,7 @@ namespace AlphaTab.Importer
                                     beat.Ottava = Ottavia._15mb;
                                     break;
                             }
+
                             break;
                     }
                 }
@@ -1454,6 +1496,7 @@ namespace AlphaTab.Importer
                                     beat.BrushDuration = val;
                                     break;
                             }
+
                             break;
                     }
                 }
@@ -1462,7 +1505,7 @@ namespace AlphaTab.Importer
 
         private void ParseBeatProperties(XmlNode node, Beat beat)
         {
-            bool isWhammy = false;
+            var isWhammy = false;
             BendPoint whammyOrigin = null;
             int? whammyMiddleValue = null;
             int? whammyMiddleOffset1 = null;
@@ -1488,6 +1531,7 @@ namespace AlphaTab.Importer
                                     {
                                         beat.BrushType = BrushType.BrushDown;
                                     }
+
                                     break;
                                 // TODO: brush duration
                                 case "PickStroke":
@@ -1499,15 +1543,22 @@ namespace AlphaTab.Importer
                                     {
                                         beat.PickStroke = PickStroke.Down;
                                     }
+
                                     break;
                                 // TODO: brush duration
                                 case "Slapped":
                                     if (c.FindChildElement("Enable") != null)
+                                    {
                                         beat.Slap = true;
+                                    }
+
                                     break;
                                 case "Popped":
                                     if (c.FindChildElement("Enable") != null)
+                                    {
                                         beat.Pop = true;
+                                    }
+
                                     break;
                                 case "VibratoWTremBar":
                                     switch (c.FindChildElement("Strength").InnerText)
@@ -1519,6 +1570,7 @@ namespace AlphaTab.Importer
                                             beat.Vibrato = VibratoType.Slight;
                                             break;
                                     }
+
                                     break;
                                 case "WhammyBar":
                                     isWhammy = true;
@@ -1528,37 +1580,67 @@ namespace AlphaTab.Importer
                                     break;
 
                                 case "WhammyBarOriginValue":
-                                    if (whammyOrigin == null) whammyOrigin = new BendPoint();
-                                    whammyOrigin.Value = ToBendValue(Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
+                                    if (whammyOrigin == null)
+                                    {
+                                        whammyOrigin = new BendPoint();
+                                    }
+
+                                    whammyOrigin.Value =
+                                        ToBendValue(
+                                            Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
                                     break;
                                 case "WhammyBarOriginOffset":
-                                    if (whammyOrigin == null) whammyOrigin = new BendPoint();
-                                    whammyOrigin.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
+                                    if (whammyOrigin == null)
+                                    {
+                                        whammyOrigin = new BendPoint();
+                                    }
+
+                                    whammyOrigin.Offset =
+                                        ToBendOffset(
+                                            Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
                                     break;
 
                                 case "WhammyBarMiddleValue":
-                                    whammyMiddleValue = ToBendValue(Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
+                                    whammyMiddleValue =
+                                        ToBendValue(
+                                            Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
                                     break;
 
                                 case "WhammyBarMiddleOffset1":
-                                    whammyMiddleOffset1 = ToBendOffset(Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
+                                    whammyMiddleOffset1 =
+                                        ToBendOffset(
+                                            Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
                                     break;
                                 case "WhammyBarMiddleOffset2":
-                                    whammyMiddleOffset2 = ToBendOffset(Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
+                                    whammyMiddleOffset2 =
+                                        ToBendOffset(
+                                            Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
                                     break;
 
                                 case "WhammyBarDestinationValue":
                                     if (whammyDestination == null)
+                                    {
                                         whammyDestination = new BendPoint(BendPoint.MaxPosition);
-                                    whammyDestination.Value = ToBendValue(Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
+                                    }
+
+                                    whammyDestination.Value =
+                                        ToBendValue(
+                                            Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
                                     break;
 
                                 case "WhammyBarDestinationOffset":
-                                    if (whammyDestination == null) whammyDestination = new BendPoint();
-                                    whammyDestination.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
+                                    if (whammyDestination == null)
+                                    {
+                                        whammyDestination = new BendPoint();
+                                    }
+
+                                    whammyDestination.Offset =
+                                        ToBendOffset(
+                                            Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
 
                                     break;
                             }
+
                             break;
                     }
                 }
@@ -1566,14 +1648,23 @@ namespace AlphaTab.Importer
 
             if (isWhammy)
             {
-                if (whammyOrigin == null) whammyOrigin = new BendPoint();
-                if (whammyDestination == null) whammyDestination = new BendPoint(BendPoint.MaxPosition);
+                if (whammyOrigin == null)
+                {
+                    whammyOrigin = new BendPoint();
+                }
+
+                if (whammyDestination == null)
+                {
+                    whammyDestination = new BendPoint(BendPoint.MaxPosition);
+                }
+
                 beat.AddWhammyBarPoint(whammyOrigin);
 
                 if (whammyMiddleOffset1 != null && whammyMiddleValue != null)
                 {
                     beat.AddWhammyBarPoint(new BendPoint(whammyMiddleOffset1.Value, whammyMiddleValue.Value));
                 }
+
                 if (whammyMiddleOffset2 != null && whammyMiddleValue != null)
                 {
                     beat.AddWhammyBarPoint(new BendPoint(whammyMiddleOffset2.Value, whammyMiddleValue.Value));
@@ -1583,6 +1674,7 @@ namespace AlphaTab.Importer
                 {
                     beat.AddWhammyBarPoint(new BendPoint(BendPoint.MaxPosition / 2, whammyMiddleValue.Value));
                 }
+
                 beat.AddWhammyBarPoint(whammyDestination);
             }
         }
@@ -1626,6 +1718,7 @@ namespace AlphaTab.Importer
                             {
                                 note.IsGhost = true;
                             }
+
                             break;
                         case "LetRing":
                             note.IsLetRing = true;
@@ -1637,17 +1730,27 @@ namespace AlphaTab.Importer
                         case "Accent":
                             var accentFlags = Platform.Platform.ParseInt(c.InnerText);
                             if ((accentFlags & 0x01) != 0)
+                            {
                                 note.IsStaccato = true;
+                            }
+
                             if ((accentFlags & 0x04) != 0)
+                            {
                                 note.Accentuated = AccentuationType.Heavy;
+                            }
+
                             if ((accentFlags & 0x08) != 0)
+                            {
                                 note.Accentuated = AccentuationType.Normal;
+                            }
+
                             break;
                         case "Tie":
                             if (c.GetAttribute("destination").ToLower() == "true")
                             {
                                 note.IsTieDestination = true;
                             }
+
                             break;
                         case "Vibrato":
                             switch (c.InnerText)
@@ -1659,6 +1762,7 @@ namespace AlphaTab.Importer
                                     note.Vibrato = VibratoType.Wide;
                                     break;
                             }
+
                             break;
                         case "LeftFingering":
                             note.IsFingering = true;
@@ -1680,6 +1784,7 @@ namespace AlphaTab.Importer
                                     note.LeftHandFinger = Fingers.LittleFinger;
                                     break;
                             }
+
                             break;
                         case "RightFingering":
                             note.IsFingering = true;
@@ -1701,6 +1806,7 @@ namespace AlphaTab.Importer
                                     note.RightHandFinger = Fingers.LittleFinger;
                                     break;
                             }
+
                             break;
                     }
                 }
@@ -1711,7 +1817,7 @@ namespace AlphaTab.Importer
 
         private void ParseNoteProperties(XmlNode node, Note note, string noteId)
         {
-            bool isBended = false;
+            var isBended = false;
             BendPoint bendOrigin = null;
             int? bendMiddleValue = null;
             int? bendMiddleOffset1 = null;
@@ -1729,7 +1835,8 @@ namespace AlphaTab.Importer
                             switch (name)
                             {
                                 case "String":
-                                    note.String = Platform.Platform.ParseInt(c.FindChildElement("String").InnerText) + 1;
+                                    note.String = Platform.Platform.ParseInt(c.FindChildElement("String").InnerText) +
+                                                  1;
                                     break;
                                 case "Fret":
                                     note.Fret = Platform.Platform.ParseInt(c.FindChildElement("Fret").InnerText);
@@ -1738,7 +1845,8 @@ namespace AlphaTab.Importer
                                     note.Element = Platform.Platform.ParseInt(c.FindChildElement("Element").InnerText);
                                     break;
                                 case "Variation":
-                                    note.Variation = Platform.Platform.ParseInt(c.FindChildElement("Variation").InnerText);
+                                    note.Variation =
+                                        Platform.Platform.ParseInt(c.FindChildElement("Variation").InnerText);
                                     break;
                                 case "Tapped":
                                     _tappedNotes[noteId] = true;
@@ -1772,6 +1880,7 @@ namespace AlphaTab.Importer
                                                 break;
                                         }
                                     }
+
                                     break;
                                 case "HarmonicFret":
                                     var hfret = c.FindChildElement("HFret");
@@ -1779,14 +1888,21 @@ namespace AlphaTab.Importer
                                     {
                                         note.HarmonicValue = Platform.Platform.ParseFloat(hfret.InnerText);
                                     }
+
                                     break;
                                 case "Muted":
                                     if (c.FindChildElement("Enable") != null)
+                                    {
                                         note.IsDead = true;
+                                    }
+
                                     break;
                                 case "PalmMuted":
                                     if (c.FindChildElement("Enable") != null)
+                                    {
                                         note.IsPalmMute = true;
+                                    }
+
                                     break;
                                 // case "Element": 
                                 // case "Variation": 
@@ -1802,42 +1918,75 @@ namespace AlphaTab.Importer
                                     break;
 
                                 case "BendOriginValue":
-                                    if (bendOrigin == null) bendOrigin = new BendPoint();
-                                    bendOrigin.Value = ToBendValue(Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
+                                    if (bendOrigin == null)
+                                    {
+                                        bendOrigin = new BendPoint();
+                                    }
+
+                                    bendOrigin.Value =
+                                        ToBendValue(
+                                            Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
                                     break;
                                 case "BendOriginOffset":
-                                    if (bendOrigin == null) bendOrigin = new BendPoint();
-                                    bendOrigin.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
+                                    if (bendOrigin == null)
+                                    {
+                                        bendOrigin = new BendPoint();
+                                    }
+
+                                    bendOrigin.Offset =
+                                        ToBendOffset(
+                                            Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
                                     break;
 
                                 case "BendMiddleValue":
-                                    bendMiddleValue = ToBendValue(Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
+                                    bendMiddleValue =
+                                        ToBendValue(
+                                            Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
                                     break;
 
                                 case "BendMiddleOffset1":
-                                    bendMiddleOffset1 = ToBendOffset(Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
+                                    bendMiddleOffset1 =
+                                        ToBendOffset(
+                                            Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
                                     break;
                                 case "BendMiddleOffset2":
-                                    bendMiddleOffset2 = ToBendOffset(Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
+                                    bendMiddleOffset2 =
+                                        ToBendOffset(
+                                            Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
                                     break;
 
                                 case "BendDestinationValue":
-                                    if (bendDestination == null) bendDestination = new BendPoint(BendPoint.MaxPosition);
+                                    if (bendDestination == null)
+                                    {
+                                        bendDestination = new BendPoint(BendPoint.MaxPosition);
+                                    }
+
                                     // NOTE: If we directly cast the expression of value to (int) it is 3 instead of 4, strange compiler
                                     // optimizations happening here: 
                                     // (int)(Platform.ParseFloat(GetValue(c.FindChildElement("Float")))* BendPointValueFactor) => (int)(100f * 0.04f) => 3
                                     // (Platform.ParseFloat(GetValue(c.FindChildElement("Float")))* BendPointValueFactor) => (100f * 0.04f) => 4.0
-                                    bendDestination.Value = ToBendValue(Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
+                                    bendDestination.Value =
+                                        ToBendValue(
+                                            Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
                                     break;
 
                                 case "BendDestinationOffset":
-                                    if (bendDestination == null) bendDestination = new BendPoint();
-                                    bendDestination.Offset = ToBendOffset(Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
+                                    if (bendDestination == null)
+                                    {
+                                        bendDestination = new BendPoint();
+                                    }
+
+                                    bendDestination.Offset =
+                                        ToBendOffset(
+                                            Platform.Platform.ParseFloat(c.FindChildElement("Float").InnerText));
                                     break;
 
                                 case "HopoOrigin":
                                     if (c.FindChildElement("Enable") != null)
+                                    {
                                         note.IsHammerPullOrigin = true;
+                                    }
+
                                     break;
                                 case "HopoDestination":
                                     // NOTE: gets automatically calculated 
@@ -1847,23 +1996,48 @@ namespace AlphaTab.Importer
                                 case "Slide":
                                     var slideFlags = Platform.Platform.ParseInt(c.FindChildElement("Flags").InnerText);
                                     if ((slideFlags & 1) != 0)
+                                    {
                                         note.SlideType = SlideType.Shift;
+                                    }
+
                                     if ((slideFlags & 2) != 0)
+                                    {
                                         note.SlideType = SlideType.Legato;
+                                    }
+
                                     if ((slideFlags & 4) != 0)
+                                    {
                                         note.SlideType = SlideType.OutDown;
+                                    }
+
                                     if ((slideFlags & 8) != 0)
+                                    {
                                         note.SlideType = SlideType.OutUp;
+                                    }
+
                                     if ((slideFlags & 16) != 0)
+                                    {
                                         note.SlideType = SlideType.IntoFromBelow;
+                                    }
+
                                     if ((slideFlags & 32) != 0)
+                                    {
                                         note.SlideType = SlideType.IntoFromAbove;
+                                    }
+
                                     if ((slideFlags & 64) != 0)
+                                    {
                                         note.SlideType = SlideType.PickSlideDown;
+                                    }
+
                                     if ((slideFlags & 128) != 0)
+                                    {
                                         note.SlideType = SlideType.PickSlideUp;
+                                    }
+
                                     break;
                             }
+
                             break;
                     }
                 }
@@ -1871,8 +2045,16 @@ namespace AlphaTab.Importer
 
             if (isBended)
             {
-                if (bendOrigin == null) bendOrigin = new BendPoint();
-                if (bendDestination == null) bendDestination = new BendPoint(BendPoint.MaxPosition);
+                if (bendOrigin == null)
+                {
+                    bendOrigin = new BendPoint();
+                }
+
+                if (bendDestination == null)
+                {
+                    bendDestination = new BendPoint(BendPoint.MaxPosition);
+                }
+
                 note.AddBendPoint(bendOrigin);
 
                 if (bendMiddleOffset1 != null && bendMiddleValue != null)
@@ -1889,6 +2071,7 @@ namespace AlphaTab.Importer
                 {
                     note.AddBendPoint(new BendPoint(BendPoint.MaxPosition / 2, bendMiddleValue.Value));
                 }
+
                 note.AddBendPoint(bendDestination);
             }
         }
@@ -1901,7 +2084,7 @@ namespace AlphaTab.Importer
         private int ToBendOffset(float gpxOffset)
         {
             var converted = gpxOffset * BendPointPositionFactor;
-            return (int)(converted);
+            return (int)converted;
         }
 
         private void ParseRhythms(XmlNode node)
@@ -1967,6 +2150,7 @@ namespace AlphaTab.Importer
                                     rhythm.Value = Duration.TwoHundredFiftySixth;
                                     break;
                             }
+
                             break;
                         case "PrimaryTuplet":
                             rhythm.TupletNumerator = Platform.Platform.ParseInt(c.GetAttribute("num"));
@@ -2002,6 +2186,7 @@ namespace AlphaTab.Importer
                 {
                     continue;
                 }
+
                 var track = _tracksById[trackId];
                 Score.AddTrack(track);
             }
@@ -2010,8 +2195,10 @@ namespace AlphaTab.Importer
             foreach (var barIds in _barsOfMasterBar)
             {
                 // add all bars of masterbar vertically to all tracks
-                int staffIndex = 0;
-                for (int barIndex = 0, trackIndex = 0; barIndex < barIds.Length && trackIndex < Score.Tracks.Count; barIndex++)
+                var staffIndex = 0;
+                for (int barIndex = 0, trackIndex = 0;
+                    barIndex < barIds.Length && trackIndex < Score.Tracks.Count;
+                    barIndex++)
                 {
                     var barId = barIds[barIndex];
                     if (barId != InvalidId)
@@ -2068,7 +2255,6 @@ namespace AlphaTab.Importer
                                                         }
                                                     }
                                                 }
-
                                             }
                                         }
                                     }
@@ -2101,7 +2287,6 @@ namespace AlphaTab.Importer
                     }
                     else
                     {
-
                         // no bar for track
                         trackIndex++;
                     }
@@ -2120,7 +2305,7 @@ namespace AlphaTab.Importer
                     {
                         if (barIndex == "0") // // TODO find the correct first bar id
                         {
-                            Score.Tempo = (int)(automation.Value);
+                            Score.Tempo = (int)automation.Value;
                             if (automation.Text != null)
                             {
                                 Score.TempoLabel = automation.Text;

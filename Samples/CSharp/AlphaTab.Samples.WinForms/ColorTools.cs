@@ -1,22 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using System;
+﻿using System;
 using System.Drawing;
 
 namespace AlphaTab.Samples.WinForms
@@ -93,9 +75,9 @@ namespace AlphaTab.Samples.WinForms
         // Return H,S,L in range of 0-1
         public static void RGB2HSL(Color rgb, out double h, out double s, out double l)
         {
-            double r = rgb.R / 255.0;
-            double g = rgb.G / 255.0;
-            double b = rgb.B / 255.0;
+            var r = rgb.R / 255.0;
+            var g = rgb.G / 255.0;
+            var b = rgb.B / 255.0;
             double v;
             double m;
             double vm;

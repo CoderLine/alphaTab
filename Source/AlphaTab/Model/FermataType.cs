@@ -9,10 +9,12 @@ namespace AlphaTab.Model
         /// A short fermata (triangle symbol)
         /// </summary>
         Short,
+
         /// <summary>
         /// A medium fermata (round symbol)
         /// </summary>
         Medium,
+
         /// <summary>
         /// A long fermata (rectangular symbol)
         /// </summary>

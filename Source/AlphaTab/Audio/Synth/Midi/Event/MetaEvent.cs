@@ -1,23 +1,6 @@
-﻿/*
- * This file is part of alphaSynth.
- * Copyright (c) 2014, T3866, PerryCodes, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-namespace AlphaTab.Audio.Synth.Midi.Event
+﻿namespace AlphaTab.Audio.Synth.Midi.Event
 {
-    enum MetaEventTypeEnum
+    internal enum MetaEventTypeEnum
     {
         SequenceNumber = 0x00,
         TextEvent = 0x01,
@@ -39,22 +22,13 @@ namespace AlphaTab.Audio.Synth.Midi.Event
         SequencerSpecific = 0x7F
     }
 
-    abstract class MetaEvent : MidiEvent
+    internal abstract class MetaEvent : MidiEvent
     {
-        public override int Channel
-        {
-            get { return -1; }
-        }
+        public override int Channel => -1;
 
-        public override MidiEventType Command
-        {
-            get { return (MidiEventType) (Message & 0x00000FF); }
-        }
+        public override MidiEventType Command => (MidiEventType)(Message & 0x00000FF);
 
-        public int MetaStatus
-        {
-            get { return Data1; }
-        }
+        public int MetaStatus => Data1;
 
         protected MetaEvent(int delta, byte status, byte data1, byte data2)
             : base(delta, status, data1, data2)

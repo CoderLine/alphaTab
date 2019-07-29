@@ -1,32 +1,13 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using System;
-using AlphaTab.Audio;
+﻿using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 using AlphaTab.Util;
 using AlphaTab.IO;
 
 namespace AlphaTab.Importer
 {
-    class Gp3To5Importer : ScoreImporter
+    internal class Gp3To5Importer : ScoreImporter
     {
         private const string VersionString = "FICHIER GUITAR PRO ";
 
@@ -45,7 +26,7 @@ namespace AlphaTab.Importer
         private FastList<PlaybackInformation> _playbackInfos;
         private string _encoding;
 
-        public override string Name { get { return "Guitar Pro 3-5"; } }
+        public override string Name => "Guitar Pro 3-5";
 
         public override Score ReadScore()
         {
@@ -92,6 +73,7 @@ namespace AlphaTab.Importer
             {
                 Data.GpReadBool(); // hide tempo?
             }
+
             // keysignature and octave
             /* var keySignature = */
             Data.ReadInt32LE();
@@ -149,16 +131,17 @@ namespace AlphaTab.Importer
 
         public void ReadVersion()
         {
-            string version = Data.GpReadStringByteLength(30, _encoding);
+            var version = Data.GpReadStringByteLength(30, _encoding);
             if (!version.StartsWith("FICHIER GUITAR PRO "))
             {
                 throw new UnsupportedFormatException();
             }
 
             version = version.Substring(VersionString.Length + 1);
-            int dot = version.IndexOf('.');
+            var dot = version.IndexOf('.');
 
-            _versionNumber = (100 * Platform.Platform.ParseInt(version.Substring(0, dot))) + Platform.Platform.ParseInt(version.Substring(dot + 1));
+            _versionNumber = 100 * Platform.Platform.ParseInt(version.Substring(0, dot)) +
+                             Platform.Platform.ParseInt(version.Substring(dot + 1));
 
             Logger.Info(Name, "Guitar Pro version " + version + " detected");
         }
@@ -171,18 +154,23 @@ namespace AlphaTab.Importer
             _score.Album = Data.GpReadStringIntUnused(_encoding);
             _score.Words = Data.GpReadStringIntUnused(_encoding);
 
-            _score.Music = (_versionNumber >= 500) ? Data.GpReadStringIntUnused(_encoding) : _score.Words;
+            _score.Music = _versionNumber >= 500 ? Data.GpReadStringIntUnused(_encoding) : _score.Words;
 
             _score.Copyright = Data.GpReadStringIntUnused(_encoding);
             _score.Tab = Data.GpReadStringIntUnused(_encoding);
             _score.Instructions = Data.GpReadStringIntUnused(_encoding);
-            int noticeLines = Data.ReadInt32LE();
+            var noticeLines = Data.ReadInt32LE();
             var notice = new StringBuilder();
-            for (int i = 0; i < noticeLines; i++)
+            for (var i = 0; i < noticeLines; i++)
             {
-                if (i > 0) notice.AppendLine();
+                if (i > 0)
+                {
+                    notice.AppendLine();
+                }
+
                 notice.Append(Data.GpReadStringIntUnused(_encoding));
             }
+
             _score.Notices = notice.ToString();
         }
 
@@ -191,7 +179,7 @@ namespace AlphaTab.Importer
             _lyrics = new FastList<Lyrics>();
 
             _lyricsTrack = Data.ReadInt32LE() - 1;
-            for (int i = 0; i < 5; i++)
+            for (var i = 0; i < 5; i++)
             {
                 var lyrics = new Lyrics();
                 lyrics.StartBar = Data.ReadInt32LE() - 1;
@@ -220,7 +208,7 @@ namespace AlphaTab.Importer
             // words and music format
             // copyright format
             // pagpublic enumber format
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
             {
                 Data.GpReadStringIntByte(_encoding);
             }
@@ -229,9 +217,9 @@ namespace AlphaTab.Importer
         public void ReadPlaybackInfos()
         {
             _playbackInfos = new FastList<PlaybackInformation>();
-            for (int i = 0; i < 64; i++)
+            for (var i = 0; i < 64; i++)
             {
-                PlaybackInformation info = new PlaybackInformation();
+                var info = new PlaybackInformation();
                 info.PrimaryChannel = i;
                 info.SecondaryChannel = i;
                 info.Program = Data.ReadInt32LE();
@@ -246,7 +234,7 @@ namespace AlphaTab.Importer
 
         public void ReadMasterBars()
         {
-            for (int i = 0; i < _barCount; i++)
+            for (var i = 0; i < _barCount; i++)
             {
                 ReadMasterBar();
             }
@@ -254,14 +242,14 @@ namespace AlphaTab.Importer
 
         public void ReadMasterBar()
         {
-            MasterBar previousMasterBar = default(MasterBar);
+            var previousMasterBar = default(MasterBar);
             if (_score.MasterBars.Count > 0)
             {
                 previousMasterBar = _score.MasterBars[_score.MasterBars.Count - 1];
             }
 
-            MasterBar newMasterBar = new MasterBar();
-            int flags = Data.ReadByte();
+            var newMasterBar = new MasterBar();
+            var flags = Data.ReadByte();
 
             // time signature
             if ((flags & 0x01) != 0)
@@ -272,6 +260,7 @@ namespace AlphaTab.Importer
             {
                 newMasterBar.TimeSignatureNumerator = previousMasterBar.TimeSignatureNumerator;
             }
+
             if ((flags & 0x02) != 0)
             {
                 newMasterBar.TimeSignatureDenominator = Data.ReadByte();
@@ -293,17 +282,22 @@ namespace AlphaTab.Importer
             {
                 if (_versionNumber < 500)
                 {
-                    MasterBar currentMasterBar = previousMasterBar;
+                    var currentMasterBar = previousMasterBar;
                     // get the already existing alternatives to ignore them 
-                    int existentAlternatives = 0;
+                    var existentAlternatives = 0;
                     while (currentMasterBar != null)
                     {
                         // found another repeat ending?
                         if (currentMasterBar.IsRepeatEnd && currentMasterBar != previousMasterBar)
+                        {
                             break;
+                        }
+
                         // found the opening?
                         if (currentMasterBar.IsRepeatStart)
+                        {
                             break;
+                        }
 
                         existentAlternatives |= currentMasterBar.AlternateEndings;
 
@@ -316,7 +310,7 @@ namespace AlphaTab.Importer
                     for (var i = 0; i < 8; i++)
                     {
                         // only add the repeating if it is not existing
-                        var repeating = (1 << i);
+                        var repeating = 1 << i;
                         if (repeatMask > i && (existentAlternatives & repeating) == 0)
                         {
                             repeatAlternative |= repeating;
@@ -335,7 +329,7 @@ namespace AlphaTab.Importer
             // marker
             if ((flags & 0x20) != 0)
             {
-                Section section = new Section();
+                var section = new Section();
                 section.Text = Data.GpReadStringIntByte(_encoding);
                 section.Marker = "";
                 Data.GpReadColor();
@@ -354,13 +348,13 @@ namespace AlphaTab.Importer
                 newMasterBar.KeySignatureType = previousMasterBar.KeySignatureType;
             }
 
-            if ((_versionNumber >= 500) && ((flags & 0x03) != 0))
+            if (_versionNumber >= 500 && (flags & 0x03) != 0)
             {
                 Data.Skip(4);
             }
 
             // better alternate ending mask in GP5
-            if ((_versionNumber >= 500) && ((flags & 0x10) == 0))
+            if (_versionNumber >= 500 && (flags & 0x10) == 0)
             {
                 newMasterBar.AlternateEndings = (byte)Data.ReadByte();
             }
@@ -392,7 +386,7 @@ namespace AlphaTab.Importer
 
         public void ReadTracks()
         {
-            for (int i = 0; i < _trackCount; i++)
+            for (var i = 0; i < _trackCount; i++)
             {
                 ReadTrack();
             }
@@ -414,7 +408,7 @@ namespace AlphaTab.Importer
 
             var stringCount = Data.ReadInt32LE();
             var tuning = new FastList<int>();
-            for (int i = 0; i < 7; i++)
+            for (var i = 0; i < 7; i++)
             {
                 var stringTuning = Data.ReadInt32LE();
                 if (stringCount > i)
@@ -422,6 +416,7 @@ namespace AlphaTab.Importer
                     tuning.Add(stringTuning);
                 }
             }
+
             mainStaff.Tuning = tuning.ToArray();
 
             var port = Data.ReadInt32LE();
@@ -473,9 +468,9 @@ namespace AlphaTab.Importer
 
         public void ReadBars()
         {
-            for (int i = 0; i < _barCount; i++)
+            for (var i = 0; i < _barCount; i++)
             {
-                for (int t = 0; t < _trackCount; t++)
+                for (var t = 0; t < _trackCount; t++)
                 {
                     ReadBar(_score.Tracks[t]);
                 }
@@ -501,7 +496,7 @@ namespace AlphaTab.Importer
                 voiceCount = 2;
             }
 
-            for (int v = 0; v < voiceCount; v++)
+            for (var v = 0; v < voiceCount; v++)
             {
                 ReadVoice(track, newBar);
             }
@@ -518,7 +513,7 @@ namespace AlphaTab.Importer
             var newVoice = new Voice();
             bar.AddVoice(newVoice);
 
-            for (int i = 0; i < beatCount; i++)
+            for (var i = 0; i < beatCount; i++)
             {
                 ReadBeat(track, bar, newVoice);
             }
@@ -539,6 +534,7 @@ namespace AlphaTab.Importer
                 var type = Data.ReadByte();
                 newBeat.IsEmpty = (type & 0x02) == 0;
             }
+
             voice.AddBeat(newBeat);
 
             var duration = Data.ReadSignedByte();
@@ -625,11 +621,11 @@ namespace AlphaTab.Importer
             }
 
             var stringFlags = Data.ReadByte();
-            for (int i = 6; i >= 0; i--)
+            for (var i = 6; i >= 0; i--)
             {
-                if ((stringFlags & (1 << i)) != 0 && (6 - i) < bar.Staff.Tuning.Length)
+                if ((stringFlags & (1 << i)) != 0 && 6 - i < bar.Staff.Tuning.Length)
                 {
-                    ReadNote(track, bar, voice, newBeat, (6 - i));
+                    ReadNote(track, bar, voice, newBeat, 6 - i);
                 }
             }
 
@@ -654,7 +650,7 @@ namespace AlphaTab.Importer
                 chord.Name = Data.GpReadStringByteLength(21, _encoding);
                 Data.Skip(4);
                 chord.FirstFret = Data.ReadInt32LE();
-                for (int i = 0; i < 7; i++)
+                for (var i = 0; i < 7; i++)
                 {
                     var fret = Data.ReadInt32LE();
                     if (i < beat.Voice.Bar.Staff.Tuning.Length)
@@ -666,7 +662,7 @@ namespace AlphaTab.Importer
                 var numberOfBarres = Data.ReadByte();
                 var barreFrets = new byte[5];
                 Data.Read(barreFrets, 0, barreFrets.Length);
-                for (int i = 0; i < numberOfBarres; i++)
+                for (var i = 0; i < numberOfBarres; i++)
                 {
                     chord.BarreFrets.Add(barreFrets[i]);
                 }
@@ -695,8 +691,8 @@ namespace AlphaTab.Importer
                         // Ninth (1)
                         // Eleventh (1)
                         Data.Skip(4);
-                        chord.FirstFret = (Data.ReadInt32LE());
-                        for (int i = 0; i < 7; i++)
+                        chord.FirstFret = Data.ReadInt32LE();
+                        for (var i = 0; i < 7; i++)
                         {
                             var fret = Data.ReadInt32LE();
                             if (i < beat.Voice.Bar.Staff.Tuning.Length)
@@ -708,7 +704,7 @@ namespace AlphaTab.Importer
                         var numberOfBarres = Data.ReadByte();
                         var barreFrets = new byte[5];
                         Data.Read(barreFrets, 0, barreFrets.Length);
-                        for (int i = 0; i < numberOfBarres; i++)
+                        for (var i = 0; i < numberOfBarres; i++)
                         {
                             chord.BarreFrets.Add(barreFrets[i]);
                         }
@@ -727,7 +723,7 @@ namespace AlphaTab.Importer
                         Data.Skip(25);
                         chord.Name = Data.GpReadStringByteLength(34, _encoding);
                         chord.FirstFret = Data.ReadInt32LE();
-                        for (int i = 0; i < 6; i++)
+                        for (var i = 0; i < 6; i++)
                         {
                             var fret = Data.ReadInt32LE();
                             if (i < beat.Voice.Bar.Staff.Tuning.Length)
@@ -735,19 +731,20 @@ namespace AlphaTab.Importer
                                 chord.Strings.Add(fret);
                             }
                         }
+
                         // unknown
                         Data.Skip(36);
                     }
                 }
                 else
                 {
-                    int strings = _versionNumber >= 406 ? 7 : 6;
+                    var strings = _versionNumber >= 406 ? 7 : 6;
 
                     chord.Name = Data.GpReadStringIntByte(_encoding);
                     chord.FirstFret = Data.ReadInt32LE();
                     if (chord.FirstFret > 0)
                     {
-                        for (int i = 0; i < strings; i++)
+                        for (var i = 0; i < strings; i++)
                         {
                             var fret = Data.ReadInt32LE();
                             if (i < beat.Voice.Bar.Staff.Tuning.Length)
@@ -777,10 +774,11 @@ namespace AlphaTab.Importer
             }
 
             beat.FadeIn = (flags & 0x10) != 0;
-            if ( (_versionNumber < 400 && (flags & 0x01) != 0) || (flags & 0x02) != 0)
+            if (_versionNumber < 400 && (flags & 0x01) != 0 || (flags & 0x02) != 0)
             {
                 beat.Vibrato = VibratoType.Slight;
             }
+
             beat.HasRasgueado = (flags2 & 0x01) != 0;
 
             if ((flags & 0x20) != 0 && _versionNumber >= 400)
@@ -814,6 +812,7 @@ namespace AlphaTab.Importer
                         beat.Pop = true;
                         break;
                 }
+
                 Data.Skip(4);
             }
 
@@ -874,7 +873,7 @@ namespace AlphaTab.Importer
             var pointCount = Data.ReadInt32LE();
             if (pointCount > 0)
             {
-                for (int i = 0; i < pointCount; i++)
+                for (var i = 0; i < pointCount; i++)
                 {
                     var point = new BendPoint();
                     point.Offset = Data.ReadInt32LE(); // 0...60
@@ -914,6 +913,7 @@ namespace AlphaTab.Importer
             {
                 Data.Skip(16); // Rse Info 
             }
+
             tableChange.Volume = Data.ReadSignedByte();
             tableChange.Balance = Data.ReadSignedByte();
             var chorus = Data.ReadSignedByte();
@@ -924,6 +924,7 @@ namespace AlphaTab.Importer
             {
                 tableChange.TempoName = Data.GpReadStringIntByte(_encoding);
             }
+
             tableChange.Tempo = Data.ReadInt32LE();
 
             // durations
@@ -976,6 +977,7 @@ namespace AlphaTab.Importer
             {
                 Data.ReadByte();
             }
+
             // unknown
             if (_versionNumber >= 510)
             {
@@ -1037,7 +1039,7 @@ namespace AlphaTab.Importer
                 newNote.Accentuated = AccentuationType.Normal;
             }
 
-            newNote.IsGhost = ((flags & 0x04) != 0);
+            newNote.IsGhost = (flags & 0x04) != 0;
             if ((flags & 0x20) != 0)
             {
                 var noteType = Data.ReadByte();
@@ -1054,7 +1056,7 @@ namespace AlphaTab.Importer
             if ((flags & 0x01) != 0 && _versionNumber < 500)
             {
                 Data.ReadByte(); // duration 
-                Data.ReadByte();  // tuplet
+                Data.ReadByte(); // tuplet
             }
 
             if ((flags & 0x10) != 0)
@@ -1082,6 +1084,7 @@ namespace AlphaTab.Importer
                 {
                     newNote.DurationPercent = Data.GpReadDouble();
                 }
+
                 var flags2 = Data.ReadByte();
                 newNote.AccidentalMode = (flags2 & 0x02) != 0
                     ? NoteAccidentalMode.SwapAccidentals
@@ -1167,6 +1170,7 @@ namespace AlphaTab.Importer
                     note.HarmonicType = HarmonicType.Natural;
                     note.HarmonicValue = DeltaFretToHarmonicValue(note.Fret);
                 }
+
                 if ((flags & 0x08) != 0)
                 {
                     note.HarmonicType = HarmonicType.Artificial;
@@ -1184,11 +1188,13 @@ namespace AlphaTab.Importer
             {
                 note.Vibrato = VibratoType.Slight;
             }
+
             note.IsPalmMute = (flags2 & 0x02) != 0;
             note.IsStaccato = (flags2 & 0x01) != 0;
         }
 
         private const int BendStep = 25;
+
         public void ReadBend(Note note)
         {
             Data.ReadByte(); // type
@@ -1196,7 +1202,7 @@ namespace AlphaTab.Importer
             var pointCount = Data.ReadInt32LE();
             if (pointCount > 0)
             {
-                for (int i = 0; i < pointCount; i++)
+                for (var i = 0; i < pointCount; i++)
                 {
                     var point = new BendPoint();
                     point.Offset = Data.ReadInt32LE(); // 0...60
@@ -1230,6 +1236,7 @@ namespace AlphaTab.Importer
                     graceNote.IsHammerPullOrigin = true;
                     break;
             }
+
             graceNote.Dynamic = graceBeat.Dynamic;
             Data.Skip(1); // duration
 
@@ -1437,6 +1444,5 @@ namespace AlphaTab.Importer
                     break;
             }
         }
-
     }
 }

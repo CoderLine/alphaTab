@@ -1,28 +1,11 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using System;
+﻿using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TabBendRenderPoint : BendPoint
+    internal class TabBendRenderPoint : BendPoint
     {
         public int LineValue { get; set; }
 
@@ -31,9 +14,9 @@ namespace AlphaTab.Rendering.Glyphs
             LineValue = value;
         }
     }
-    class TabBendGlyph : Glyph
+
+    internal class TabBendGlyph : Glyph
     {
-        private readonly Beat _beat;
         private FastList<Note> _notes;
 
         private const int ArrowSize = 6;
@@ -43,9 +26,9 @@ namespace AlphaTab.Rendering.Glyphs
 
         // the values where to draw the arrow heads as multistring bends end at the same position
 
-        private int _preBendMinValue; // directly above the note 
+        private int _preBendMinValue; // directly above the note
         private int _bendMiddleMinValue; // in the middle between note and end
-        private int _bendEndMinValue; // at the end on the helper note 
+        private int _bendEndMinValue; // at the end on the helper note
         private int _bendEndContinuedMinValue; // at the end on the next note
         private int _releaseMinValue; // at the end for releases on the helper note
         private int _releaseContinuedMinValue; // at the end for releases on the next note
@@ -53,10 +36,9 @@ namespace AlphaTab.Rendering.Glyphs
         private int _maxBendValue;
 
 
-        public TabBendGlyph(Beat beat)
+        public TabBendGlyph()
             : base(0, 0)
         {
-            _beat = beat;
             _notes = new FastList<Note>();
             _renderPoints = new FastDictionary<int, FastList<TabBendRenderPoint>>();
             _preBendMinValue = -1;
@@ -99,6 +81,7 @@ namespace AlphaTab.Rendering.Glyphs
                             _bendEndMinValue = value;
                         }
                     }
+
                     break;
                 case BendType.Release:
                     value = renderPoints[1].Value;
@@ -116,6 +99,7 @@ namespace AlphaTab.Rendering.Glyphs
                             _releaseMinValue = value;
                         }
                     }
+
                     break;
                 case BendType.BendRelease:
                     value = renderPoints[1].Value;
@@ -123,6 +107,7 @@ namespace AlphaTab.Rendering.Glyphs
                     {
                         _bendMiddleMinValue = value;
                     }
+
                     value = renderPoints[2].Value;
                     if (note.IsTieOrigin)
                     {
@@ -138,6 +123,7 @@ namespace AlphaTab.Rendering.Glyphs
                             _releaseMinValue = value;
                         }
                     }
+
                     break;
                 case BendType.Prebend:
                     value = renderPoints[0].Value;
@@ -145,6 +131,7 @@ namespace AlphaTab.Rendering.Glyphs
                     {
                         _preBendMinValue = value;
                     }
+
                     break;
                 case BendType.PrebendBend:
                     value = renderPoints[0].Value;
@@ -152,6 +139,7 @@ namespace AlphaTab.Rendering.Glyphs
                     {
                         _preBendMinValue = value;
                     }
+
                     value = renderPoints[1].Value;
                     if (note.IsTieOrigin)
                     {
@@ -167,6 +155,7 @@ namespace AlphaTab.Rendering.Glyphs
                             _bendEndMinValue = value;
                         }
                     }
+
                     break;
                 case BendType.PrebendRelease:
                     value = renderPoints[0].Value;
@@ -174,6 +163,7 @@ namespace AlphaTab.Rendering.Glyphs
                     {
                         _preBendMinValue = value;
                     }
+
                     value = renderPoints[1].Value;
                     if (note.IsTieOrigin)
                     {
@@ -189,6 +179,7 @@ namespace AlphaTab.Rendering.Glyphs
                             _releaseMinValue = value;
                         }
                     }
+
                     break;
             }
         }
@@ -215,6 +206,7 @@ namespace AlphaTab.Rendering.Glyphs
                         {
                             renderPoints[1].LineValue = value;
                         }
+
                         break;
                     case BendType.BendRelease:
                         renderPoints[1].LineValue = _bendMiddleMinValue;
@@ -223,6 +215,7 @@ namespace AlphaTab.Rendering.Glyphs
                         {
                             renderPoints[2].LineValue = value;
                         }
+
                         break;
                     case BendType.Prebend:
                         renderPoints[0].LineValue = _preBendMinValue;
@@ -238,6 +231,7 @@ namespace AlphaTab.Rendering.Glyphs
                         {
                             renderPoints[1].LineValue = value;
                         }
+
                         break;
                 }
             }
@@ -259,9 +253,9 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var renderingPoints = new FastList<TabBendRenderPoint>();
 
-            // Guitar Pro Rendering Note: 
-            // Last point of bend is always at end of the note even 
-            // though it might not be 100% correct from timing perspective. 
+            // Guitar Pro Rendering Note:
+            // Last point of bend is always at end of the note even
+            // though it might not be 100% correct from timing perspective.
 
             switch (note.BendType)
             {
@@ -270,6 +264,7 @@ namespace AlphaTab.Rendering.Glyphs
                     {
                         renderingPoints.Add(new TabBendRenderPoint(bendPoint.Offset, bendPoint.Value));
                     }
+
                     break;
                 case BendType.BendRelease:
                     renderingPoints.Add(new TabBendRenderPoint(0, note.BendPoints[0].Value));
@@ -297,14 +292,15 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 canvas.Color = Renderer.Resources.SecondaryGlyphColor;
             }
+
             foreach (var note in _notes)
             {
                 var renderPoints = _renderPoints[note.Id];
                 var startNoteRenderer = Renderer;
-                Note endNote = note;
-                bool isMultiBeatBend = false;
+                var endNote = note;
+                var isMultiBeatBend = false;
                 TabBarRenderer endNoteRenderer;
-                bool endNoteHasBend = false;
+                var endNoteHasBend = false;
                 var slurText = note.BendStyle == BendStyle.Gradual ? "grad." : "";
 
                 Beat endBeat = null;
@@ -312,7 +308,9 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     var nextNote = endNote.TieDestination;
 
-                    endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<TabBarRenderer>(Renderer.Staff.StaveId, nextNote.Beat.Voice.Bar);
+                    endNoteRenderer =
+                        Renderer.ScoreRenderer.Layout.GetRendererForBar<TabBarRenderer>(Renderer.Staff.StaveId,
+                            nextNote.Beat.Voice.Bar);
 
                     if (endNoteRenderer == null || startNoteRenderer.Staff != endNoteRenderer.Staff)
                     {
@@ -330,7 +328,9 @@ namespace AlphaTab.Rendering.Glyphs
                 }
 
                 endBeat = endNote.Beat;
-                endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<TabBarRenderer>(Renderer.Staff.StaveId, endBeat.Voice.Bar);
+                endNoteRenderer =
+                    Renderer.ScoreRenderer.Layout.GetRendererForBar<TabBarRenderer>(Renderer.Staff.StaveId,
+                        endBeat.Voice.Bar);
 
                 if (endBeat.IsLastOfVoice && !endNote.HasBend && Renderer.Settings.ExtendBendArrowsOnTiedNotes)
                 {
@@ -340,8 +340,8 @@ namespace AlphaTab.Rendering.Glyphs
                 float startX = 0;
                 float endX = 0;
 
-                float topY = cy + startNoteRenderer.Y;
-                float bottomY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(note);
+                var topY = cy + startNoteRenderer.Y;
+                // float bottomY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(note);
 
                 startX = cx + startNoteRenderer.X;
                 if (renderPoints[0].Value > 0 || note.IsContinuedBend)
@@ -361,7 +361,7 @@ namespace AlphaTab.Rendering.Glyphs
                 //    cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_note.Beat, BeatXPosition.EndBeat),
                 //    cy + startNoteRenderer.Y + 10, 10, 10);
 
-                if (endBeat == null || (endBeat.IsLastOfVoice && !endNoteHasBend))
+                if (endBeat == null || endBeat.IsLastOfVoice && !endNoteHasBend)
                 {
                     endX = cx + endNoteRenderer.X + endNoteRenderer.PostBeatGlyphsStart;
                 }
@@ -380,10 +380,10 @@ namespace AlphaTab.Rendering.Glyphs
 
                 if (!isMultiBeatBend)
                 {
-                    endX -= (ArrowSize * Scale);
+                    endX -= ArrowSize * Scale;
                 }
 
-                // we need some pixels for the arrow. otherwise we might draw into the next 
+                // we need some pixels for the arrow. otherwise we might draw into the next
                 // note
                 var width = endX - startX;
 
@@ -397,7 +397,7 @@ namespace AlphaTab.Rendering.Glyphs
                     var firstPt = renderPoints[i];
                     var secondPt = renderPoints[i + 1];
 
-                    // draw pre-bend if previous 
+                    // draw pre-bend if previous
                     if (i == 0 && firstPt.Value != 0 && !note.IsTieDestination)
                     {
                         PaintBend(note, new TabBendRenderPoint(), firstPt, startX, topY, dX, slurText, canvas);
@@ -409,10 +409,17 @@ namespace AlphaTab.Rendering.Glyphs
                     }
                     else if (note.IsTieOrigin && note.TieDestination.HasBend)
                     {
-                        PaintBend(note, firstPt, new TabBendRenderPoint(BendPoint.MaxPosition, firstPt.Value)
-                        {
-                            LineValue = firstPt.LineValue
-                        }, startX, topY, dX, slurText, canvas);
+                        PaintBend(note,
+                            firstPt,
+                            new TabBendRenderPoint(BendPoint.MaxPosition, firstPt.Value)
+                            {
+                                LineValue = firstPt.LineValue
+                            },
+                            startX,
+                            topY,
+                            dX,
+                            slurText,
+                            canvas);
                     }
                 }
 
@@ -420,16 +427,24 @@ namespace AlphaTab.Rendering.Glyphs
             }
         }
 
-        private void PaintBend(Note note, TabBendRenderPoint firstPt, TabBendRenderPoint secondPt, float cx, float cy, float dX, string slurText, ICanvas canvas)
+        private void PaintBend(
+            Note note,
+            TabBendRenderPoint firstPt,
+            TabBendRenderPoint secondPt,
+            float cx,
+            float cy,
+            float dX,
+            string slurText,
+            ICanvas canvas)
         {
             var r = (TabBarRenderer)Renderer;
             var res = Renderer.Resources;
 
             var overflowOffset = r.LineOffset / 2;
 
-            var x1 = cx + (dX * firstPt.Offset);
+            var x1 = cx + dX * firstPt.Offset;
             var bendValueHeight = BendValueHeight * Scale;
-            var y1 = cy - (bendValueHeight * firstPt.LineValue);
+            var y1 = cy - bendValueHeight * firstPt.LineValue;
             if (firstPt.Value == 0)
             {
                 if (secondPt.Offset == firstPt.Offset)
@@ -446,8 +461,8 @@ namespace AlphaTab.Rendering.Glyphs
                 y1 += overflowOffset;
             }
 
-            var x2 = cx + (dX * secondPt.Offset);
-            var y2 = cy - (bendValueHeight * secondPt.LineValue);
+            var x2 = cx + dX * secondPt.Offset;
+            var y2 = cy - bendValueHeight * secondPt.LineValue;
             if (secondPt.LineValue == 0)
             {
                 y2 += r.GetNoteY(note);
@@ -466,6 +481,7 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     y2 = y1 - arrowSize;
                 }
+
                 canvas.BeginPath();
                 canvas.MoveTo(x2, y2);
                 canvas.LineTo(x2 - arrowSize * 0.5f, y2 + arrowSize);
@@ -480,6 +496,7 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     y2 = y1 + arrowSize;
                 }
+
                 canvas.BeginPath();
                 canvas.MoveTo(x2, y2);
                 canvas.LineTo(x2 - arrowSize * 0.5f, y2 - arrowSize);
@@ -488,18 +505,19 @@ namespace AlphaTab.Rendering.Glyphs
                 canvas.Fill();
                 arrowOffset = -arrowSize;
             }
+
             canvas.Stroke();
 
             if (firstPt.Value == secondPt.Value)
             {
-                // draw horizontal dashed line 
+                // draw horizontal dashed line
                 // to really have the line ending at the right position
                 // we draw from right to left. it's okay if the space is at the beginning
                 if (firstPt.LineValue > 0)
                 {
                     var dashX = x2;
                     var dashSize = DashSize * Scale;
-                    var end = (x1 + dashSize);
+                    var end = x1 + dashSize;
                     var dashes = (dashX - x1) / (dashSize * 2);
                     if (dashes < 1)
                     {
@@ -573,7 +591,7 @@ namespace AlphaTab.Rendering.Glyphs
                 }
                 else if (dV >= 4 || dV <= -4)
                 {
-                    int steps = dV / 4;
+                    var steps = dV / 4;
                     s += steps;
                     // Quaters
                     dV -= steps * 4;
@@ -586,7 +604,7 @@ namespace AlphaTab.Rendering.Glyphs
 
                 if (s != "")
                 {
-                    y2 = cy - (bendValueHeight * secondPt.Value);
+                    y2 = cy - bendValueHeight * secondPt.Value;
                     var startY = y2;
                     if (!up)
                     {
@@ -596,7 +614,7 @@ namespace AlphaTab.Rendering.Glyphs
                     // draw label
                     canvas.Font = res.TablatureFont;
                     var size = canvas.MeasureText(s);
-                    var y = startY - res.TablatureFont.Size * 0.5f - (2 * Scale);
+                    var y = startY - res.TablatureFont.Size * 0.5f - 2 * Scale;
                     var x = x2 - size / 2;
 
                     canvas.FillText(s, x, y);

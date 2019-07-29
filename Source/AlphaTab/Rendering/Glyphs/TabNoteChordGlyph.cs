@@ -1,22 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using AlphaTab.Collections;
+﻿using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.Model;
@@ -24,7 +6,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TabNoteChordGlyph : Glyph
+    internal class TabNoteChordGlyph : Glyph
     {
         private readonly FastList<NoteNumberGlyph> _notes;
         private readonly bool _isGrace;
@@ -55,8 +37,10 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     pos += n.Width;
                 }
+
                 return pos;
             }
+
             return 0;
         }
 
@@ -66,6 +50,7 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 return Y + NotesPerString[note.String].Y + (aboveNote ? -NotesPerString[note.String].Height / 2 : 0);
             }
+
             return 0;
         }
 
@@ -112,7 +97,10 @@ namespace AlphaTab.Rendering.Glyphs
         {
             _notes.Add(noteGlyph);
             NotesPerString[note.String] = noteGlyph;
-            if (MinStringNote == null || note.String < MinStringNote.String) MinStringNote = note;
+            if (MinStringNote == null || note.String < MinStringNote.String)
+            {
+                MinStringNote = note;
+            }
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
@@ -132,6 +120,7 @@ namespace AlphaTab.Rendering.Glyphs
                 g.Width = w;
                 g.Paint(cx, cy, canvas);
             }
+
             canvas.TextBaseline = oldBaseLine;
 
             foreach (var beatEffectKey in BeatEffects)

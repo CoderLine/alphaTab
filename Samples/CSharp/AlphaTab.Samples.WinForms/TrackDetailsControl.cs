@@ -12,7 +12,7 @@ namespace AlphaTab.Samples.WinForms
 
         public bool IsSelected
         {
-            get { return _isSelected; }
+            get => _isSelected;
             set
             {
                 _isSelected = value;
@@ -22,7 +22,7 @@ namespace AlphaTab.Samples.WinForms
 
         public Track Track
         {
-            get { return _track; }
+            get => _track;
             set
             {
                 _track = value;
@@ -35,26 +35,26 @@ namespace AlphaTab.Samples.WinForms
 
         public string TrackName
         {
-            get { return lblName.Text; }
-            set { lblName.Text = value; }
+            get => lblName.Text;
+            set => lblName.Text = value;
         }
 
         public int Volume
         {
-            get { return volumeTrack.Value; }
-            set { volumeTrack.Value = value; }
+            get => volumeTrack.Value;
+            set => volumeTrack.Value = value;
         }
 
         public bool IsSolo
         {
-            get { return isSoloCheck.Checked; }
-            set { isSoloCheck.Checked = value; }
+            get => isSoloCheck.Checked;
+            set => isSoloCheck.Checked = value;
         }
 
         public bool IsMute
         {
-            get { return isMuteCheck.Checked; }
-            set { isMuteCheck.Checked = value; }
+            get => isMuteCheck.Checked;
+            set => isMuteCheck.Checked = value;
         }
 
         public TrackDetailsControl()
@@ -71,8 +71,11 @@ namespace AlphaTab.Samples.WinForms
         public event EventHandler Selected;
         protected virtual void OnSelected()
         {
-            EventHandler handler = Selected;
-            if (handler != null) handler(this, EventArgs.Empty);
+            var handler = Selected;
+            if (handler != null)
+            {
+                handler(this, EventArgs.Empty);
+            }
         }
 
         private void lblName_Click(object sender, EventArgs e)

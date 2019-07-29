@@ -1,21 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using System;
+﻿using System;
 using AlphaTab.Collections;
 using AlphaTab.Platform.Model;
 
@@ -24,7 +7,7 @@ namespace AlphaTab.Platform.Svg
     /// <summary>
     /// This public class stores text widths for several fonts and allows width calculation 
     /// </summary>
-    partial class FontSizes
+    internal partial class FontSizes
     {
         public static byte[] Georgia;
         public static byte[] Arial;
@@ -33,8 +16,26 @@ namespace AlphaTab.Platform.Svg
 
         private static void Init()
         {
-            Georgia = new byte[] { 3, 4, 5, 7, 7, 9, 8, 2, 4, 4, 5, 7, 3, 4, 3, 5, 7, 5, 6, 6, 6, 6, 6, 6, 7, 6, 3, 3, 7, 7, 7, 5, 10, 7, 7, 7, 8, 7, 7, 8, 9, 4, 6, 8, 7, 10, 8, 8, 7, 8, 8, 6, 7, 8, 7, 11, 8, 7, 7, 4, 5, 4, 7, 7, 6, 6, 6, 5, 6, 5, 4, 6, 6, 3, 3, 6, 3, 10, 6, 6, 6, 6, 5, 5, 4, 6, 5, 8, 6, 5, 5, 5, 4, 5, 7, 6, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 3, 4, 6, 7, 6, 7, 4, 6, 6, 10, 6, 6, 7, 0, 10, 7, 5, 7, 6, 6, 6, 6, 6, 3, 6, 6, 6, 6, 12, 12, 12, 5, 7, 7, 7, 7, 7, 7, 11, 7, 7, 7, 7, 7, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 7, 8, 8, 8, 8, 8, 7, 7, 6, 6, 6, 6, 6, 6, 6, 8, 5, 5, 5, 5, 5, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6, 5, 6 };
-            Arial = new byte[] { 3, 3, 4, 6, 6, 10, 7, 2, 4, 4, 4, 6, 3, 4, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 6, 6, 6, 6, 11, 7, 7, 8, 8, 7, 7, 9, 8, 3, 6, 7, 6, 9, 8, 9, 7, 9, 8, 7, 7, 8, 7, 10, 7, 7, 7, 3, 3, 3, 5, 6, 4, 6, 6, 6, 6, 6, 3, 6, 6, 2, 2, 6, 2, 9, 6, 6, 6, 6, 4, 6, 3, 6, 6, 8, 6, 6, 6, 4, 3, 4, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 6, 6, 6, 6, 3, 6, 4, 8, 4, 6, 6, 0, 8, 6, 4, 6, 4, 4, 4, 6, 6, 4, 4, 4, 4, 6, 9, 9, 9, 7, 7, 7, 7, 7, 7, 7, 11, 8, 7, 7, 7, 7, 3, 3, 3, 3, 8, 8, 9, 9, 9, 9, 9, 6, 9, 8, 8, 8, 8, 7, 7, 7, 6, 6, 6, 6, 6, 6, 10, 6, 6, 6, 6, 6, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6, 6 };
+            Georgia = new byte[]
+            {
+                3, 4, 5, 7, 7, 9, 8, 2, 4, 4, 5, 7, 3, 4, 3, 5, 7, 5, 6, 6, 6, 6, 6, 6, 7, 6, 3, 3, 7, 7, 7, 5, 10, 7,
+                7, 7, 8, 7, 7, 8, 9, 4, 6, 8, 7, 10, 8, 8, 7, 8, 8, 6, 7, 8, 7, 11, 8, 7, 7, 4, 5, 4, 7, 7, 6, 6, 6, 5,
+                6, 5, 4, 6, 6, 3, 3, 6, 3, 10, 6, 6, 6, 6, 5, 5, 4, 6, 5, 8, 6, 5, 5, 5, 4, 5, 7, 6, 8, 8, 8, 8, 8, 8,
+                8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 3, 4, 6, 7, 6, 7, 4, 6, 6,
+                10, 6, 6, 7, 0, 10, 7, 5, 7, 6, 6, 6, 6, 6, 3, 6, 6, 6, 6, 12, 12, 12, 5, 7, 7, 7, 7, 7, 7, 11, 7, 7, 7,
+                7, 7, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 7, 8, 8, 8, 8, 8, 7, 7, 6, 6, 6, 6, 6, 6, 6, 8, 5, 5, 5, 5, 5, 3,
+                3, 3, 3, 6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6, 5, 6
+            };
+            Arial = new byte[]
+            {
+                3, 3, 4, 6, 6, 10, 7, 2, 4, 4, 4, 6, 3, 4, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 6, 6, 6, 6, 11, 7,
+                7, 8, 8, 7, 7, 9, 8, 3, 6, 7, 6, 9, 8, 9, 7, 9, 8, 7, 7, 8, 7, 10, 7, 7, 7, 3, 3, 3, 5, 6, 4, 6, 6, 6,
+                6, 6, 3, 6, 6, 2, 2, 6, 2, 9, 6, 6, 6, 6, 4, 6, 3, 6, 6, 8, 6, 6, 6, 4, 3, 4, 6, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 6, 6, 6, 6, 3, 6, 4, 8,
+                4, 6, 6, 0, 8, 6, 4, 6, 4, 4, 4, 6, 6, 4, 4, 4, 4, 6, 9, 9, 9, 7, 7, 7, 7, 7, 7, 7, 11, 8, 7, 7, 7, 7,
+                3, 3, 3, 3, 8, 8, 9, 9, 9, 9, 9, 6, 9, 8, 8, 8, 8, 7, 7, 7, 6, 6, 6, 6, 6, 6, 10, 6, 6, 6, 6, 6, 3, 3,
+                3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6, 6
+            };
 
             FontSizeLookupTables = new FastDictionary<string, byte[]>();
             FontSizeLookupTables["Arial"] = Arial;
@@ -55,7 +56,7 @@ namespace AlphaTab.Platform.Svg
             }
 
             byte[] data;
-            int dataSize = 11;
+            var dataSize = 11;
             if (FontSizeLookupTables.ContainsKey(family))
             {
                 data = FontSizeLookupTables[family];
@@ -63,7 +64,10 @@ namespace AlphaTab.Platform.Svg
             else
             {
                 // TODO: on-the-fly-generation for all canvas types
-                data = new byte[] { 8 };
+                data = new byte[]
+                {
+                    8
+                };
             }
 
             float factor = 1;
@@ -71,6 +75,7 @@ namespace AlphaTab.Platform.Svg
             {
                 factor *= 1.2f;
             }
+
             if ((style & FontStyle.Bold) != 0)
             {
                 factor *= 1.2f;
@@ -78,12 +83,12 @@ namespace AlphaTab.Platform.Svg
 
             var stringSize = 0f;
 
-            for (int i = 0; i < s.Length; i++)
+            for (var i = 0; i < s.Length; i++)
             {
                 var code = Math.Min(data.Length - 1, s[i] - ControlChars);
                 if (code >= 0)
                 {
-                    stringSize += ((data[code] * size) / dataSize);
+                    stringSize += data[code] * size / dataSize;
                 }
             }
 

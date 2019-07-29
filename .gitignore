@@ -28,6 +28,7 @@
 *.etl
 *.vspx
 *.userprefs
+.idea
 ipch/
 obj/
 [Dd]ebug*/

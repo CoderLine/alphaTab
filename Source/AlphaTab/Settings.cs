@@ -1,92 +1,10 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using AlphaTab.Collections;
+﻿using AlphaTab.Collections;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
 
 namespace AlphaTab
 {
-    /// <summary>
-    /// Lists all modes how alphaTab can scroll the container during playback. 
-    /// </summary>
-    public enum ScrollMode
-    {
-        /// <summary>
-        /// Do not scroll automatically
-        /// </summary>
-        Off,
-        /// <summary>
-        /// Scrolling happens as soon the offsets of the cursors change. 
-        /// </summary>
-        Continuous,
-        /// <summary>
-        /// Scrolling happens as soon the cursors exceed the displayed range. 
-        /// </summary>
-        OffScreen
-    }
-
-    /// <summary>
-    /// Lists all modes on how alphaTab can handle the display and playback of music notation. 
-    /// </summary>
-    public enum DisplayMode
-    {
-        /// <summary>
-        /// Music elements will be displayed and played as in Guitar Pro. 
-        /// </summary>
-        GuitarPro,
-        /// <summary>
-        /// Music elements will be displayed and played as in traditional songbooks.
-        /// Changes:
-        /// 1. Bends
-        ///     For bends additional grace beats are introduced. 
-        ///     Bends are categorized into gradual and fast bends. 
-        ///         - Gradual bends are indicated by beat text "grad" or "grad.". Bend will sound along the beat duration. 
-        ///         - Fast bends are done right before the next note. If the next note is tied even on-beat of the next note.
-        /// 2. Whammy Bars
-        ///     Dips are shown as simple annotation over the beats
-        ///     Whammy Bars are categorized into gradual and fast. 
-        ///         - Gradual whammys are indicated by beat text "grad" or "grad.". Whammys will sound along the beat duration. 
-        ///         - Fast whammys are done right the beat.
-        /// 3. Let Ring
-        ///     Tied notes with let ring are not shown in standard notation
-        ///     Let ring does not cause a longer playback, duration is defined via tied notes. 
-        /// </summary>
-        SongBook
-    }
-
-    /// <summary>
-    /// Lists all modes on how fingerings should be displayed.
-    /// </summary>
-    public enum FingeringMode
-    {
-        /// <summary>
-        /// Fingerings will be shown in the standard notation staff. 
-        /// </summary>
-        Score,
-        /// <summary>
-        /// Fingerings will be shown in a effect band above the tabs in case
-        /// they have only a single note on the beat.
-        /// </summary>
-        SingleNoteEffectBand
-    }
-
     /// <summary>
     /// This public class contains instance specific settings for alphaTab
     /// </summary>
@@ -260,7 +178,8 @@ namespace AlphaTab
         /// </summary>
         public int ScrollOffsetX
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -268,7 +187,8 @@ namespace AlphaTab
         /// </summary>
         public int ScrollOffsetY
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -276,7 +196,8 @@ namespace AlphaTab
         /// </summary>
         public ScrollMode ScrollMode
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -284,7 +205,8 @@ namespace AlphaTab
         /// </summary>
         public int ScrollSpeed
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -375,171 +297,5 @@ namespace AlphaTab
                 return settings;
             }
         }
-    }
-
-    /// <summary>
-    /// This object defines the details on how to generate the vibrato effects. 
-    /// </summary>
-    public class VibratoPlaybackSettings
-    {
-        /// <summary>
-        /// Gets or sets the wavelength of the note-wide vibrato in midi ticks. 
-        /// </summary>
-        public int NoteWideLength { get; set; }
-        /// <summary>
-        /// Gets or sets the amplitude for the note-wide vibrato in semitones. 
-        /// </summary>
-        public int NoteWideAmplitude { get; set; }
-
-        /// <summary>
-        /// Gets or sets the wavelength of the note-slight vibrato in midi ticks. 
-        /// </summary>
-        public int NoteSlightLength { get; set; }
-        /// <summary>
-        /// Gets or sets the amplitude for the note-slight vibrato in semitones. 
-        /// </summary>
-        public int NoteSlightAmplitude { get; set; }
-
-        /// <summary>
-        /// Gets or sets the wavelength of the beat-wide vibrato in midi ticks. 
-        /// </summary>
-        public int BeatWideLength { get; set; }
-        /// <summary>
-        /// Gets or sets the amplitude for the beat-wide vibrato in semitones. 
-        /// </summary>
-        public int BeatWideAmplitude { get; set; }
-
-        /// <summary>
-        /// Gets or sets the wavelength of the beat-slight vibrato in midi ticks. 
-        /// </summary>
-        public int BeatSlightLength { get; set; }
-        /// <summary>
-        /// Gets or sets the amplitude for the beat-slight vibrato in semitones. 
-        /// </summary>
-        public int BeatSlightAmplitude { get; set; }
-    }
-
-    /// <summary>
-    /// Represents the layout specific settings. 
-    /// </summary>
-    public class LayoutSettings
-    {
-        /// <summary>
-        /// The layouting mode used to arrange the the notation.
-        /// <ul>
-        ///  <li><strong>page</strong> - Bars are aligned in rows using a fixed width</li>
-        ///  <li><strong>horizontal</strong> - Bars are aligned horizontally in one row</li>
-        /// </ul>
-        /// </summary>
-        public string Mode { get; set; }
-
-        /// <summary>
-        /// Additional layout mode specific settings.
-        /// <strong>mode=page</strong>
-        /// <ul>
-        ///  <li><strong>barsPerRow</strong> - Limit the displayed bars per row, <em>-1 for sized based limit</em> (integer, default:-1)</li>
-        ///  <li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li>
-        ///  <li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li>
-        ///  <li><strong>hideInfo</strong> - Render the song information or not (boolean, default:false)</li>
-        ///  <li><strong>hideTuning</strong> - Render the tuning information or not (boolean, default:false)</li>
-        ///  <li><strong>hideTrackNames</strong> - Render the track names or not (boolean, default:false)</li>
-        /// </ul>
-        /// <strong>mode=horizontal</strong>
-        /// <ul>
-        ///  <li><strong>start</strong> - The bar start index to start layouting with (integer: default: 0)</li>
-        ///  <li><strong>count</strong> - The amount of bars to render overall, <em>-1 for all till the end</em>  (integer, default:-1)</li>
-        ///  <li><strong>hideTrackNames</strong> - Render the track names or not (boolean, default:false)</li>
-        /// </ul>
-        /// </summary>
-        public FastDictionary<string, object> AdditionalSettings { get; set; }
-
-        internal T Get<T>(string key, T def)
-        {
-            if (AdditionalSettings.ContainsKey(key.ToLower()))
-            {
-                return (T)(AdditionalSettings[key.ToLower()]);
-            }
-            if (AdditionalSettings.ContainsKey(key))
-            {
-                return (T)(AdditionalSettings[key]);
-            }
-            return def;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LayoutSettings"/> class.
-        /// </summary>
-        public LayoutSettings()
-        {
-            AdditionalSettings = new FastDictionary<string, object>();
-        }
-
-        internal static LayoutSettings Defaults
-        {
-            get
-            {
-                var settings = new LayoutSettings();
-                settings.Mode = "page";
-                return settings;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Represents the stave specific settings. 
-    /// </summary>
-    public class StaveSettings
-    {
-        /// <summary>
-        /// The stave profile name as it is registered in <see cref="Environment.StaveProfiles"/>
-        /// Default Profiles: 
-        /// <ul>
-        ///  <li><strong>score-tab</strong> - Standard music notation and guitar tablature are rendered (default)</li>
-        ///  <li><strong>score</strong> - Only standard music notation is rendered</li>
-        ///  <li><strong>tab</strong> - Only guitar tablature is rendered</li>
-        /// </ul>
-        /// </summary>
-        public string Id { get; set; }
-
-        /// <summary>
-        /// Additional stave specific settings
-        /// <strong>id=tab</strong>
-        /// <ul>
-        ///  <li><strong>rhythm</strong> - Renders rhythm beams to tablature notes</li>
-        /// </ul>
-        /// </summary>
-        public FastDictionary<string, object> AdditionalSettings { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="StaveSettings"/> class.
-        /// </summary>
-        /// <param name="id">The id of the settings defining the display mode.</param>
-        public StaveSettings(string id)
-        {
-            Id = id;
-            AdditionalSettings = new FastDictionary<string, object>();
-        }
-
-        /// <summary>
-        /// Gets the staff layout specific setting using the given key. 
-        /// </summary>
-        /// <typeparam name="T">The data type fo the stored value.</typeparam>
-        /// <param name="key">The key of the setting.</param>
-        /// <param name="def">The default value to return if no setting was specified.</param>
-        /// <returns>The user defined setting for the given key, or <paramref name="def"/> if the user did not specify a custom setting.</returns>
-        public T Get<T>(string key, T def)
-        {
-            if (AdditionalSettings.ContainsKey(key.ToLower()))
-            {
-                return (T)(AdditionalSettings[key.ToLower()]);
-            }
-            if (AdditionalSettings.ContainsKey(key))
-            {
-                return (T)(AdditionalSettings[key]);
-            }
-            return def;
-        }
-
-
     }
 }

@@ -5,9 +5,9 @@ using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class ChordDiagramRowGlyph : GlyphGroup
+    internal class ChordDiagramRowGlyph : GlyphGroup
     {
-        private float _glyphWidth = 0;
+        private float _glyphWidth;
         public float Height { get; set; }
 
         public ChordDiagramRowGlyph(float x, float y) : base(x, y)
@@ -36,7 +36,7 @@ namespace AlphaTab.Rendering.Glyphs
         }
     }
 
-    class ChordDiagramContainerGlyph : GlyphGroup
+    internal class ChordDiagramContainerGlyph : GlyphGroup
     {
         private const float Padding = 3;
 
@@ -71,9 +71,9 @@ namespace AlphaTab.Rendering.Glyphs
             row.Width = Width;
             foreach (var g in Glyphs)
             {
-                if (x + g.Width<Width)
+                if (x + g.Width < Width)
                 {
-                    row.AddChord((ChordDiagramGlyph) g);
+                    row.AddChord((ChordDiagramGlyph)g);
                     x += g.Width;
                 }
                 else
@@ -84,10 +84,11 @@ namespace AlphaTab.Rendering.Glyphs
                         _rows.Add(row);
                         y += row.Height + padding;
                     }
+
                     x = 0;
                     row = new ChordDiagramRowGlyph(x, y);
                     row.Width = Width;
-                    row.AddChord((ChordDiagramGlyph) g);
+                    row.AddChord((ChordDiagramGlyph)g);
                     x += g.Width;
                 }
             }
@@ -107,12 +108,12 @@ namespace AlphaTab.Rendering.Glyphs
         {
             foreach (var row in _rows)
             {
-                row.Paint(cx + X, cy + Y + Padding* Scale, canvas);
+                row.Paint(cx + X, cy + Y + Padding * Scale, canvas);
             }
         }
     }
 
-    class ChordDiagramGlyph : EffectGlyph
+    internal class ChordDiagramGlyph : EffectGlyph
     {
         private const float Padding = 5;
         private const float Frets = 5;
@@ -134,11 +135,11 @@ namespace AlphaTab.Rendering.Glyphs
         {
             base.DoLayout();
             var res = Renderer.Resources;
-            _textRow = res.EffectFont.Size* 1.5f;
-            _fretRow = res.EffectFont.Size* 1.5f;
+            _textRow = res.EffectFont.Size * 1.5f;
+            _fretRow = res.EffectFont.Size * 1.5f;
             if (_chord.FirstFret > 1)
             {
-                _firstFretSpacing = FretSpacing* Scale;
+                _firstFretSpacing = FretSpacing * Scale;
             }
             else
             {
@@ -151,7 +152,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            cx += X + Padding* Scale + _firstFretSpacing;
+            cx += X + Padding * Scale + _firstFretSpacing;
             cy += Y;
             var w = Width - 2 * Padding * Scale + Scale - _firstFretSpacing;
             var stringSpacing = StringSpacing * Scale;
@@ -166,14 +167,14 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.TextBaseline = TextBaseline.Top;
             if (_chord.ShowName)
             {
-                canvas.FillText(_chord.Name, cx + (Width / 2), cy + res.EffectFont.Size / 2);
+                canvas.FillText(_chord.Name, cx + Width / 2, cy + res.EffectFont.Size / 2);
             }
 
             cy += _textRow;
             cx += stringSpacing / 2;
             canvas.Font = res.FretboardNumberFont;
             canvas.TextBaseline = TextBaseline.Middle;
-            for (int i = 0; i < _chord.Staff.Tuning.Length; i++)
+            for (var i = 0; i < _chord.Staff.Tuning.Length; i++)
             {
                 var x = cx + i * stringSpacing;
                 var y = cy + _fretRow / 2;
@@ -192,12 +193,13 @@ namespace AlphaTab.Rendering.Glyphs
                     canvas.FillText(fret.ToString(), x, y);
                 }
             }
+
             cy += _fretRow;
 
-            for (int i = 0; i<_chord.Staff.Tuning.Length; i++)
+            for (var i = 0; i < _chord.Staff.Tuning.Length; i++)
             {
                 var x = cx + i * stringSpacing;
-                canvas.FillRect(x, cy, 1, fretSpacing* Frets + Scale);
+                canvas.FillRect(x, cy, 1, fretSpacing * Frets + Scale);
             }
 
             if (_chord.FirstFret > 1)
@@ -207,7 +209,7 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             canvas.FillRect(cx, cy - Scale, w, 2 * Scale);
-            for (int i = 0; i <= Frets; i++)
+            for (var i = 0; i <= Frets; i++)
             {
                 var y = cy + i * fretSpacing;
                 canvas.FillRect(cx, y, w, Scale);
@@ -222,7 +224,7 @@ namespace AlphaTab.Rendering.Glyphs
                 barreLookup[barreFret - _chord.FirstFret] = strings;
             }
 
-            for (var guitarString = 0; guitarString<_chord.Strings.Count; guitarString++)
+            for (var guitarString = 0; guitarString < _chord.Strings.Count; guitarString++)
             {
                 var fret = _chord.Strings[guitarString];
                 if (fret > 0)
@@ -231,15 +233,17 @@ namespace AlphaTab.Rendering.Glyphs
                     if (barreLookup.ContainsKey(fret))
                     {
                         var info = barreLookup[fret];
-                        if (info[0] == -1 || guitarString<info[0])
+                        if (info[0] == -1 || guitarString < info[0])
                         {
                             info[0] = guitarString;
                         }
+
                         if (info[1] == -1 || guitarString > info[1])
                         {
                             info[1] = guitarString;
                         }
                     }
+
                     var y = cy + fret * fretSpacing + fretSpacing / 2 + 0.5f;
                     var x = cx + (_chord.Strings.Count - guitarString - 1) * stringSpacing;
                     canvas.FillCircle(x, y, circleRadius);
@@ -252,12 +256,11 @@ namespace AlphaTab.Rendering.Glyphs
                 var y = cy + barreFret * fretSpacing + fretSpacing / 2 + Scale;
                 var xLeft = cx + (_chord.Strings.Count - strings[1] - 1) * stringSpacing;
                 var xRight = cx + (_chord.Strings.Count - strings[0] - 1) * stringSpacing;
-                canvas.FillRect(xLeft, y - circleRadius, xRight - xLeft, circleRadius* 2);
+                canvas.FillRect(xLeft, y - circleRadius, xRight - xLeft, circleRadius * 2);
             }
 
             canvas.TextAlign = align;
             canvas.TextBaseline = baseline;
         }
-
     }
 }

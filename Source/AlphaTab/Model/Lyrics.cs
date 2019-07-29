@@ -1,22 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using AlphaTab.Collections;
+﻿using AlphaTab.Collections;
 
 namespace AlphaTab.Model
 {
@@ -37,6 +19,7 @@ namespace AlphaTab.Model
         /// Gets or sets he start bar on which the lyrics should begin. 
         /// </summary>
         public int StartBar { get; set; }
+
         /// <summary>
         /// Gets or sets the raw lyrics text in Guitar Pro format.
         /// (spaces split word syllables, plus merge syllables, [..] are comments) 
@@ -57,7 +40,11 @@ namespace AlphaTab.Model
 
         private void Parse(string str, int p, FastList<string> chunks)
         {
-            if (string.IsNullOrEmpty(str)) return;
+            if (string.IsNullOrEmpty(str))
+            {
+                return;
+            }
+
             var state = LyricsState.Begin;
             var next = LyricsState.Begin;
             var skipSpace = false;
@@ -81,12 +68,14 @@ namespace AlphaTab.Model
                                     state = next;
                                     continue;
                                 }
+
                                 break;
                             default:
                                 skipSpace = false;
                                 state = next;
                                 continue;
                         }
+
                         break;
                     case LyricsState.Begin:
                         switch (c)
@@ -99,6 +88,7 @@ namespace AlphaTab.Model
                                 state = LyricsState.Text;
                                 continue;
                         }
+
                         break;
                     case LyricsState.Comment:
                         switch (c)
@@ -107,6 +97,7 @@ namespace AlphaTab.Model
                                 state = LyricsState.Begin;
                                 break;
                         }
+
                         break;
 
                     case LyricsState.Text:
@@ -125,6 +116,7 @@ namespace AlphaTab.Model
                                 next = LyricsState.Begin;
                                 break;
                         }
+
                         break;
 
                     case LyricsState.Dash:
@@ -141,6 +133,7 @@ namespace AlphaTab.Model
                                 next = LyricsState.Begin;
                                 continue;
                         }
+
                         break;
                 }
 
@@ -161,7 +154,7 @@ namespace AlphaTab.Model
             return txt.Replace("+", " ");
         }
 
-        enum LyricsState
+        private enum LyricsState
         {
             IgnoreSpaces,
             Begin,

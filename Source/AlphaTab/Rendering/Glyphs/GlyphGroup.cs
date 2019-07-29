@@ -1,21 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using System;
+﻿using System;
 using AlphaTab.Collections;
 using AlphaTab.Platform;
 
@@ -25,14 +8,11 @@ namespace AlphaTab.Rendering.Glyphs
     /// This glyph allows to group several other glyphs to be
     /// drawn at the same x position
     /// </summary>
-    class GlyphGroup : Glyph
+    internal class GlyphGroup : Glyph
     {
         protected FastList<Glyph> Glyphs;
 
-        public bool IsEmpty
-        {
-            get { return Glyphs == null || Glyphs.Count == 0; }
-        }
+        public bool IsEmpty => Glyphs == null || Glyphs.Count == 0;
 
         public GlyphGroup(float x, float y)
             : base(x, y)
@@ -55,19 +35,28 @@ namespace AlphaTab.Rendering.Glyphs
                 g.DoLayout();
                 w = Math.Max(w, g.Width);
             }
+
             Width = w;
         }
 
         public virtual void AddGlyph(Glyph g)
         {
-            if (Glyphs == null) Glyphs = new FastList<Glyph>();
+            if (Glyphs == null)
+            {
+                Glyphs = new FastList<Glyph>();
+            }
+
             Glyphs.Add(g);
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var glyphs = Glyphs;
-            if (glyphs == null || glyphs.Count == 0) return;
+            if (glyphs == null || glyphs.Count == 0)
+            {
+                return;
+            }
+
             foreach (var g in glyphs)
             {
                 g.Paint(cx + X, cy + Y, canvas);

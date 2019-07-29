@@ -1,21 +1,4 @@
-﻿/*
- * This file is part of alphaSynth.
- * Copyright (c) 2014, T3866, PerryCodes, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using System;
+﻿using System;
 using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Audio.Synth.Midi.Event;
 using AlphaTab.Audio.Synth.Synthesis;
@@ -28,7 +11,7 @@ namespace AlphaTab.Audio.Synth
     /// This sequencer dispatches midi events to the synthesizer based on the current
     /// synthesize position. The sequencer does not consider the playback speed. 
     /// </summary>
-    class MidiFileSequencer
+    internal class MidiFileSequencer
     {
         private readonly Synthesizer _synthesizer;
 
@@ -52,7 +35,7 @@ namespace AlphaTab.Audio.Synth
 
         public PlaybackRange PlaybackRange
         {
-            get { return _playbackRange; }
+            get => _playbackRange;
             set
             {
                 _playbackRange = value;
@@ -74,17 +57,15 @@ namespace AlphaTab.Audio.Synth
         /// <summary>
         /// Gets the duration of the song in milliseconds. 
         /// </summary>
-        public double EndTime
-        {
-            get { return _endTime / PlaybackSpeed; }
-        }
+        public double EndTime => _endTime / PlaybackSpeed;
 
         /// <summary>
         /// Gets or sets the playback speed. 
         /// </summary>
         public double PlaybackSpeed
         {
-            get; set;
+            get;
+            set;
         }
 
         public MidiFileSequencer(Synthesizer synthesizer)
@@ -139,7 +120,10 @@ namespace AlphaTab.Audio.Synth
 
         private void SilentProcess(double milliseconds)
         {
-            if (milliseconds <= 0) return;
+            if (milliseconds <= 0)
+            {
+                return;
+            }
 
             var start = Platform.Platform.GetCurrentMilliseconds();
 
@@ -195,7 +179,7 @@ namespace AlphaTab.Audio.Synth
                 {
                     var meta = (MetaNumberEvent)mEvent;
                     bpm = MidiHelper.MicroSecondsPerMinute / (double)meta.Value;
-                    _tempoChanges.Add(new MidiFileSequencerTempoChange(bpm, absTick, (int)(absTime)));
+                    _tempoChanges.Add(new MidiFileSequencerTempoChange(bpm, absTick, (int)absTime));
                 }
                 else if (mEvent.Command == MidiEventType.Meta && mEvent.Data1 == (int)MetaEventTypeEnum.TimeSignature)
                 {
@@ -232,10 +216,12 @@ namespace AlphaTab.Audio.Synth
                 {
                     return 1;
                 }
-                else if (a.Time < b.Time)
+
+                if (a.Time < b.Time)
                 {
                     return -1;
                 }
+
                 return a.EventIndex - b.EventIndex;
             });
             _endTime = absTime;
@@ -250,14 +236,15 @@ namespace AlphaTab.Audio.Synth
 
         private bool FillMidiEventQueueLimited(double maxMilliseconds)
         {
-            var millisecondsPerBuffer = (_synthesizer.MicroBufferSize / (double)_synthesizer.SampleRate) * 1000 * PlaybackSpeed;
+            var millisecondsPerBuffer =
+                _synthesizer.MicroBufferSize / (double)_synthesizer.SampleRate * 1000 * PlaybackSpeed;
             if (maxMilliseconds > 0 && maxMilliseconds < millisecondsPerBuffer)
             {
                 millisecondsPerBuffer = maxMilliseconds;
             }
 
-            bool anyEventsDispatched = false;
-            for (int i = 0; i < _synthesizer.MicroBufferCount; i++)
+            var anyEventsDispatched = false;
+            for (var i = 0; i < _synthesizer.MicroBufferCount; i++)
             {
                 _currentTime += millisecondsPerBuffer;
                 while (_eventIndex < _synthData.Count && _synthData[_eventIndex].Time < _currentTime)
@@ -267,6 +254,7 @@ namespace AlphaTab.Audio.Synth
                     anyEventsDispatched = true;
                 }
             }
+
             return anyEventsDispatched;
         }
 
@@ -287,13 +275,14 @@ namespace AlphaTab.Audio.Synth
             var lastChange = 0;
 
             // find start and bpm of last tempo change before time
-            for (int i = 0; i < _tempoChanges.Count; i++)
+            for (var i = 0; i < _tempoChanges.Count; i++)
             {
                 var c = _tempoChanges[i];
                 if (tickPosition < c.Ticks)
                 {
                     break;
                 }
+
                 timePosition = c.Time;
                 bpm = c.Bpm;
                 lastChange = c.Ticks;
@@ -301,7 +290,7 @@ namespace AlphaTab.Audio.Synth
 
             // add the missing millis
             tickPosition -= lastChange;
-            timePosition += (tickPosition * (60000.0 / (bpm * _division)));
+            timePosition += tickPosition * (60000.0 / (bpm * _division));
 
             return timePosition / playbackSpeed;
         }
@@ -315,13 +304,14 @@ namespace AlphaTab.Audio.Synth
             var lastChange = 0;
 
             // find start and bpm of last tempo change before time
-            for (int i = 0; i < _tempoChanges.Count; i++)
+            for (var i = 0; i < _tempoChanges.Count; i++)
             {
                 var c = _tempoChanges[i];
                 if (timePosition < c.Time)
                 {
                     break;
                 }
+
                 ticks = c.Ticks;
                 bpm = c.Bpm;
                 lastChange = c.Time;
@@ -335,6 +325,7 @@ namespace AlphaTab.Audio.Synth
         }
 
         public event Action Finished;
+
         protected virtual void OnFinished()
         {
             var finished = Finished;
@@ -376,7 +367,7 @@ namespace AlphaTab.Audio.Synth
         }
     }
 
-    class MidiFileSequencerTempoChange
+    internal class MidiFileSequencerTempoChange
     {
         public double Bpm { get; set; }
         public int Ticks { get; set; }

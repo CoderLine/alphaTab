@@ -1,21 +1,4 @@
 ﻿#if NET472
-/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
 using System;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Ds;
@@ -23,7 +6,7 @@ using NAudio.Wave;
 
 namespace AlphaTab.Platform.CSharp.Wpf
 {
-    class NAudioSynthOutput : WaveProvider32, ISynthOutput
+    internal class NAudioSynthOutput : WaveProvider32, ISynthOutput
     {
         private const int BufferSize = 4096;
         private const int BufferCount = 10;
@@ -35,10 +18,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         private bool _finished;
 
-        public int SampleRate
-        {
-            get { return PreferredSampleRate; }
-        }
+        public int SampleRate => PreferredSampleRate;
 
         public NAudioSynthOutput()
             : base(PreferredSampleRate, 2)
@@ -99,10 +79,10 @@ namespace AlphaTab.Platform.CSharp.Wpf
         {
             // if we fall under the half of buffers
             // we request one half
-            const int count = (BufferCount / 2) * BufferSize;
+            const int count = BufferCount / 2 * BufferSize;
             if (_circularBuffer.Count < count && SampleRequest != null)
             {
-                for (int i = 0; i < BufferCount / 2; i++)
+                for (var i = 0; i < BufferCount / 2; i++)
                 {
                     SampleRequest();
                 }
@@ -123,7 +103,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
                 var read = new SampleArray(count);
                 _circularBuffer.Read(read, 0, read.Length);
 
-                for (int i = 0; i < count; i++)
+                for (var i = 0; i < count; i++)
                 {
                     buffer[offset + i] = read[i];
                 }

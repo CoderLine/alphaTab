@@ -1,21 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using System;
+﻿using System;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Ds;
 using AlphaTab.Haxe.Js;
@@ -30,7 +13,7 @@ namespace AlphaTab.Platform.JavaScript
     /// This class implements a HTML5 Web Audio API based audio output device
     /// for alphaSynth. It can be controlled via a JS API.
     /// </summary>
-    class AlphaSynthWebAudioOutput : ISynthOutput
+    internal class AlphaSynthWebAudioOutput : ISynthOutput
     {
         private const int BufferSize = 4096;
         private const int BufferCount = 10;
@@ -47,17 +30,14 @@ namespace AlphaTab.Platform.JavaScript
         private double _contextTimeOnGenerate;
         private int _samplesGenerated;
 
-        public int SampleRate
-        {
-            get { return (int)_context.SampleRate; }
-        }
+        public int SampleRate => (int)_context.SampleRate;
 
         public void Open()
         {
             _finished = false;
 
             PatchIosSampleRate();
-            
+
             _circularBuffer = new CircularSampleBuffer(BufferSize * BufferCount);
             _context = new AudioContext();
 
@@ -70,13 +50,14 @@ namespace AlphaTab.Platform.JavaScript
                 {
                     ctx.resume();
                     Browser.Window.SetTimeout((Action)(() =>
-                    {
-                        if (ctx.state == "running")
                         {
-                            Browser.Document.Body.RemoveEventListener("touchend", resume, false);
-                            Browser.Document.Body.RemoveEventListener("click", resume, false);
-                        }
-                    }), 0);
+                            if (ctx.state == "running")
+                            {
+                                Browser.Document.Body.RemoveEventListener("touchend", resume, false);
+                                Browser.Document.Body.RemoveEventListener("click", resume, false);
+                            }
+                        }),
+                        0);
                 };
                 Browser.Document.Body.AddEventListener("touchend", resume, false);
                 Browser.Document.Body.AddEventListener("click", resume, false);
@@ -146,11 +127,13 @@ namespace AlphaTab.Platform.JavaScript
                 _source.Stop(0);
                 _source.Disconnect(0);
             }
+
             _source = null;
             if (_audioNode != null)
             {
                 _audioNode.Disconnect(0);
             }
+
             _audioNode = null;
         }
 
@@ -158,7 +141,7 @@ namespace AlphaTab.Platform.JavaScript
         {
             _finished = true;
         }
-        
+
         public void AddSamples(SampleArray f)
         {
             _circularBuffer.Write(f, 0, f.Length);
@@ -176,7 +159,7 @@ namespace AlphaTab.Platform.JavaScript
             const int count = (BufferCount / 2) * BufferSize;
             if (_circularBuffer.Count < count && SampleRequest != null)
             {
-                for (int i = 0; i < BufferCount / 2; i++)
+                for (var i = 0; i < BufferCount / 2; i++)
                 {
                     SampleRequest();
                 }
@@ -204,15 +187,14 @@ namespace AlphaTab.Platform.JavaScript
                 _circularBuffer.Read(buffer, 0, buffer.Length);
 
                 var s = 0;
-                for (int i = 0; i < left.Length; i++)
+                for (var i = 0; i < left.Length; i++)
                 {
                     left[i] = buffer[s++];
                     right[i] = buffer[s++];
                 }
-                
+
                 SamplesPlayed(left.Length);
             }
-
 
 
             if (!_finished)
@@ -220,7 +202,7 @@ namespace AlphaTab.Platform.JavaScript
                 RequestBuffers();
             }
         }
-        
+
 
         public event Action Ready;
         public event Action<int> SamplesPlayed;

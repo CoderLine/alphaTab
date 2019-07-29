@@ -1,26 +1,7 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using System;
+﻿using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering.Glyphs
@@ -29,7 +10,7 @@ namespace AlphaTab.Rendering.Glyphs
     /// This glyph acts as container for handling
     /// multiple voice rendering
     /// </summary>
-    class VoiceContainerGlyph : GlyphGroup
+    internal class VoiceContainerGlyph : GlyphGroup
     {
         public const string KeySizeBeat = "Beat";
 
@@ -76,7 +57,7 @@ namespace AlphaTab.Rendering.Glyphs
                 // for the last glyph size based on the full width
                 if (i == j - 1)
                 {
-                    float beatWidth = Width - beatGlyphs[beatGlyphs.Count - 1].X;
+                    var beatWidth = Width - beatGlyphs[beatGlyphs.Count - 1].X;
                     currentBeatGlyph.ScaleToWidth(beatWidth);
                 }
             }
@@ -99,12 +80,13 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 b.ApplyLayoutingInfo(info);
             }
+
             ScaleToForce(Math.Max(Renderer.Settings.StretchForce, info.MinStretchForce));
         }
 
         public override void AddGlyph(Glyph g)
         {
-            var bg = (BeatContainerGlyph) g;
+            var bg = (BeatContainerGlyph)g;
             g.X = BeatGlyphs.Count == 0
                 ? 0
                 : BeatGlyphs[BeatGlyphs.Count - 1].X + BeatGlyphs[BeatGlyphs.Count - 1].Width;
@@ -172,5 +154,4 @@ namespace AlphaTab.Rendering.Glyphs
         //    }
         //}
     }
-
 }

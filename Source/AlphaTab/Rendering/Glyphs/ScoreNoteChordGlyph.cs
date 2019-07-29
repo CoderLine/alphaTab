@@ -1,30 +1,11 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using System;
-using AlphaTab.Collections;
+﻿using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class ScoreNoteChordGlyph : ScoreNoteChordGlyphBase
+    internal class ScoreNoteChordGlyph : ScoreNoteChordGlyphBase
     {
         private readonly FastDictionary<int, EffectGlyph> _noteGlyphLookup;
         private readonly FastList<Note> _notes;
@@ -42,13 +23,7 @@ namespace AlphaTab.Rendering.Glyphs
             _notes = new FastList<Note>();
         }
 
-        public override BeamDirection Direction
-        {
-            get
-            {
-                return BeamingHelper.Direction;
-            }
-        }
+        public override BeamDirection Direction => BeamingHelper.Direction;
 
         public float GetNoteX(Note note, bool onEnd = true)
         {
@@ -60,8 +35,10 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     pos += n.Width;
                 }
+
                 return pos;
             }
+
             return 0;
         }
 
@@ -71,6 +48,7 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 return Y + _noteGlyphLookup[note.Id].Y + (aboveNote ? -(NoteHeadGlyph.NoteHeadHeight * Scale) / 2 : 0);
             }
+
             return 0;
         }
 
@@ -123,7 +101,8 @@ namespace AlphaTab.Rendering.Glyphs
                         break;
                 }
 
-                _tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.Glyph.Y + offset * Scale, Beat.TremoloSpeed.Value);
+                _tremoloPicking =
+                    new TremoloPickingGlyph(tremoloX, baseNote.Glyph.Y + offset * Scale, Beat.TremoloSpeed.Value);
                 _tremoloPicking.Renderer = Renderer;
                 _tremoloPicking.DoLayout();
             }
@@ -138,12 +117,12 @@ namespace AlphaTab.Rendering.Glyphs
             // Note Effects only painted once
             //
             var effectY = BeamingHelper.Direction == BeamDirection.Up
-                            ? scoreRenderer.GetScoreY(MaxNote.Line, 1.5f * NoteHeadGlyph.NoteHeadHeight)
-                            : scoreRenderer.GetScoreY(MinNote.Line, -1.0f * NoteHeadGlyph.NoteHeadHeight);
+                ? scoreRenderer.GetScoreY(MaxNote.Line, 1.5f * NoteHeadGlyph.NoteHeadHeight)
+                : scoreRenderer.GetScoreY(MinNote.Line, -1.0f * NoteHeadGlyph.NoteHeadHeight);
             // TODO: take care of actual glyph height
-            var effectSpacing = (BeamingHelper.Direction == BeamDirection.Up)
-                            ? 7 * Scale
-                            : -7 * Scale;
+            var effectSpacing = BeamingHelper.Direction == BeamDirection.Up
+                ? 7 * Scale
+                : -7 * Scale;
 
             foreach (var effectKey in BeatEffects)
             {

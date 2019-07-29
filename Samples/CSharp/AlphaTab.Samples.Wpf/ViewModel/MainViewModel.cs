@@ -1,22 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -51,10 +33,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
         /// <summary>
         /// A command which raises the <see cref="ShowScoreInfo"/> method
         /// </summary>
-        public ICommand ShowScoreInfoCommand
-        {
-            get { return _showScoreInfoCommand; }
-        }
+        public ICommand ShowScoreInfoCommand => _showScoreInfoCommand;
 
         /// <summary>
         /// Gets or sets the currently opened score. 
@@ -62,7 +41,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
         /// </summary>
         public Score Score
         {
-            get { return _score; }
+            get => _score;
             set
             {
                 _score = value;
@@ -78,20 +57,14 @@ namespace AlphaTab.Samples.Wpf.ViewModel
         /// <summary>
         /// Gets or sets the title of the currently loaded sore.
         /// </summary>
-        public string ScoreTitle
-        {
-            get
-            {
-                return _score == null ? "No File Opened" : _score.Title;
-            }
-        }
+        public string ScoreTitle => _score == null ? "No File Opened" : _score.Title;
 
         /// <summary>
         /// Gets or sets the index of the track which should be currently displayed.
         /// </summary>
         public int CurrentTrackIndex
         {
-            get { return _currentTrackIndex; }
+            get => _currentTrackIndex;
             set
             {
                 _currentTrackIndex = value;
@@ -112,7 +85,11 @@ namespace AlphaTab.Samples.Wpf.ViewModel
         {
             get
             {
-                if (Score == null || CurrentTrackIndex < 0 || CurrentTrackIndex >= _score.Tracks.Count) return null;
+                if (Score == null || CurrentTrackIndex < 0 || CurrentTrackIndex >= _score.Tracks.Count)
+                {
+                    return null;
+                }
+
                 return new[] { _score.Tracks[_currentTrackIndex] };
             }
         }
@@ -122,7 +99,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
         /// </summary>
         public IEnumerable<TrackViewModel> TrackInfos
         {
-            get { return _trackInfos; }
+            get => _trackInfos;
             private set
             {
                 _trackInfos = value;
@@ -138,7 +115,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
         /// </summary>
         public TrackViewModel SelectedTrackInfo
         {
-            get { return _selectedTrackInfo; }
+            get => _selectedTrackInfo;
             set
             {
                 _selectedTrackInfo = value;
@@ -157,7 +134,9 @@ namespace AlphaTab.Samples.Wpf.ViewModel
         public void ShowScoreInfo()
         {
             if (_score != null)
+            {
                 _dialogService.ShowScoreInfo(_score);
+            }
         }
 
 
@@ -201,8 +180,8 @@ namespace AlphaTab.Samples.Wpf.ViewModel
                     Score = ScoreLoader.LoadScoreFromBytes(File.ReadAllBytes(file));
 
                     // build the track info objects for the ui
-                    TrackViewModel[] trackInfos = new TrackViewModel[Score.Tracks.Count];
-                    for (int i = 0; i < trackInfos.Length; i++)
+                    var trackInfos = new TrackViewModel[Score.Tracks.Count];
+                    for (var i = 0; i < trackInfos.Length; i++)
                     {
                         trackInfos[i] = new TrackViewModel(Score.Tracks[i]);
                     }

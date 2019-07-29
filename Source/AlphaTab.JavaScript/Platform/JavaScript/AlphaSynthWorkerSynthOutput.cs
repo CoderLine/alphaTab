@@ -1,21 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using System;
+﻿using System;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Ds;
 using AlphaTab.Haxe.Js;
@@ -24,7 +7,7 @@ using AlphaTab.Util;
 
 namespace AlphaTab.Platform.JavaScript
 {
-    class AlphaSynthWorkerSynthOutput : ISynthOutput
+    internal class AlphaSynthWorkerSynthOutput : ISynthOutput
     {
         public const string CmdOutputPrefix = AlphaSynthWebWorker.CmdPrefix + "output.";
 
@@ -47,10 +30,7 @@ namespace AlphaTab.Platform.JavaScript
 
         private DedicatedWorkerGlobalScope _worker;
 
-        public int SampleRate
-        {
-            get { return PreferredSampleRate; }
-        }
+        public int SampleRate => PreferredSampleRate;
 
         public void Open()
         {
@@ -86,27 +66,43 @@ namespace AlphaTab.Platform.JavaScript
 
         public void SequencerFinished()
         {
-            _worker.PostMessage(new { cmd = CmdOutputSequencerFinished });
+            _worker.PostMessage(new
+            {
+                cmd = CmdOutputSequencerFinished
+            });
         }
 
         public void AddSamples(SampleArray samples)
         {
-            _worker.PostMessage(new { cmd = CmdOutputAddSamples, samples = samples });
+            _worker.PostMessage(new
+            {
+                cmd = CmdOutputAddSamples,
+                samples = samples
+            });
         }
 
         public void Play()
         {
-            _worker.PostMessage(new { cmd = CmdOutputPlay });
+            _worker.PostMessage(new
+            {
+                cmd = CmdOutputPlay
+            });
         }
 
         public void Pause()
         {
-            _worker.PostMessage(new { cmd = CmdOutputPause });
+            _worker.PostMessage(new
+            {
+                cmd = CmdOutputPause
+            });
         }
 
         public void ResetSamples()
         {
-            _worker.PostMessage(new { cmd = CmdOutputResetSamples });
+            _worker.PostMessage(new
+            {
+                cmd = CmdOutputResetSamples
+            });
         }
 
         public void Activate()

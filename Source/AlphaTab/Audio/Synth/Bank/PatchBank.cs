@@ -1,32 +1,13 @@
-﻿/*
- * This file is part of alphaSynth.
- * Copyright (c) 2014, T3866, PerryCodes, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using System;
+﻿using System;
 using AlphaTab.Audio.Synth.Bank.Patch;
 using AlphaTab.Audio.Synth.Sf2;
 using AlphaTab.Collections;
 using AlphaTab.IO;
-using AlphaTab.Platform;
 using AlphaTab.Util;
 
 namespace AlphaTab.Audio.Synth.Bank
 {
-    class PatchBank
+    internal class PatchBank
     {
         public const int DrumBank = 128;
         public const int BankSize = 128;
@@ -59,6 +40,7 @@ namespace AlphaTab.Audio.Synth.Bank
                 {
                     banks.Add(bank);
                 }
+
                 banks.Sort((a, b) => a - b);
                 return banks.ToArray();
             }
@@ -87,6 +69,7 @@ namespace AlphaTab.Audio.Synth.Bank
                     }
                 }
             }
+
             return null;
         }
 
@@ -144,7 +127,8 @@ namespace AlphaTab.Audio.Synth.Bank
                         presetLoKey = Platform.Platform.ToUInt8(p.Zones[i].Generators[0].AmountInt16 & 0xFF);
                         presetHiKey = Platform.Platform.ToUInt8((p.Zones[i].Generators[0].AmountInt16 >> 8) & 0xFF);
 
-                        if (p.Zones[i].Generators.Length > 1 && p.Zones[i].Generators[1].GeneratorType == GeneratorEnum.VelocityRange)
+                        if (p.Zones[i].Generators.Length > 1 &&
+                            p.Zones[i].Generators[1].GeneratorType == GeneratorEnum.VelocityRange)
                         {
                             presetLoVel = Platform.Platform.ToUInt8(p.Zones[i].Generators[1].AmountInt16 & 0xFF);
                             presetHiVel = Platform.Platform.ToUInt8((p.Zones[i].Generators[1].AmountInt16 >> 8) & 0xFF);
@@ -155,7 +139,9 @@ namespace AlphaTab.Audio.Synth.Bank
                         presetLoVel = Platform.Platform.ToUInt8(p.Zones[i].Generators[0].AmountInt16 & 0xFF);
                         presetHiVel = Platform.Platform.ToUInt8((p.Zones[i].Generators[0].AmountInt16 >> 8) & 0xFF);
                     }
-                    if (p.Zones[i].Generators[p.Zones[i].Generators.Length - 1].GeneratorType == GeneratorEnum.Instrument)
+
+                    if (p.Zones[i].Generators[p.Zones[i].Generators.Length - 1].GeneratorType ==
+                        GeneratorEnum.Instrument)
                     {
                         var insts = sfinsts[p.Zones[i].Generators[p.Zones[i].Generators.Length - 1].AmountInt16];
                         foreach (var inst in insts)
@@ -166,11 +152,15 @@ namespace AlphaTab.Audio.Synth.Bank
                             byte instHiVel;
 
                             instLoKey = Platform.Platform.ToUInt8(inst.Generators[(int)GeneratorEnum.KeyRange] & 0xFF);
-                            instHiKey = Platform.Platform.ToUInt8((inst.Generators[(int)GeneratorEnum.KeyRange] >> 8) & 0xFF);
-                            instLoVel = Platform.Platform.ToUInt8(inst.Generators[(int)GeneratorEnum.VelocityRange] & 0xFF);
-                            instHiVel = Platform.Platform.ToUInt8((inst.Generators[(int)GeneratorEnum.VelocityRange] >> 8) & 0xFF);
+                            instHiKey = Platform.Platform.ToUInt8(
+                                (inst.Generators[(int)GeneratorEnum.KeyRange] >> 8) & 0xFF);
+                            instLoVel = Platform.Platform.ToUInt8(
+                                inst.Generators[(int)GeneratorEnum.VelocityRange] & 0xFF);
+                            instHiVel = Platform.Platform.ToUInt8(
+                                (inst.Generators[(int)GeneratorEnum.VelocityRange] >> 8) & 0xFF);
 
-                            if ((instLoKey <= presetHiKey && presetLoKey <= instHiKey) && (instLoVel <= presetHiVel && presetLoVel <= instHiVel))
+                            if (instLoKey <= presetHiKey && presetLoKey <= instHiKey && instLoVel <= presetHiVel &&
+                                presetLoVel <= instHiVel)
                             {
                                 var r = new Sf2Region();
                                 Platform.Platform.ArrayCopy(inst.Generators, 0, r.Generators, 0, r.Generators.Length);
@@ -179,8 +169,10 @@ namespace AlphaTab.Audio.Synth.Bank
                             }
                         }
                     }
+
                     i++;
                 }
+
                 var mp = new MultiPatch(p.Name);
                 mp.LoadSf2(regionList.ToArray(), _assets);
                 _assets.PatchAssets.Add(new PatchAsset(mp.Name, mp));
@@ -191,21 +183,24 @@ namespace AlphaTab.Audio.Synth.Bank
         private Sf2Region[][] ReadSf2Instruments(Instrument[] instruments)
         {
             var regions = new Sf2Region[instruments.Length][];
-            for (int x = 0; x < instruments.Length; x++)
+            for (var x = 0; x < instruments.Length; x++)
             {
                 Sf2.Generator[] globalGens = null;
                 int i;
                 if (instruments[x].Zones[0].Generators.Length == 0 ||
-                    instruments[x].Zones[0].Generators[instruments[x].Zones[0].Generators.Length - 1].GeneratorType != GeneratorEnum.SampleID)
+                    instruments[x].Zones[0].Generators[instruments[x].Zones[0].Generators.Length - 1].GeneratorType !=
+                    GeneratorEnum.SampleId)
                 {
                     globalGens = instruments[x].Zones[0].Generators;
                     i = 1;
                 }
                 else
+                {
                     i = 0;
+                }
 
                 regions[x] = new Sf2Region[instruments[x].Zones.Length - i];
-                for (int j = 0; j < regions[x].Length; j++)
+                for (var j = 0; j < regions[x].Length; j++)
                 {
                     var r = new Sf2Region();
                     r.ApplyDefaultValues();
@@ -213,6 +208,7 @@ namespace AlphaTab.Audio.Synth.Bank
                     regions[x][j] = r;
                 }
             }
+
             return regions;
         }
 
@@ -222,12 +218,13 @@ namespace AlphaTab.Audio.Synth.Bank
             {
                 if (globals != null)
                 {
-                    for (int x = 0; x < globals.Length; x++)
+                    for (var x = 0; x < globals.Length; x++)
                     {
                         region.Generators[(int)globals[x].GeneratorType] = globals[x].AmountInt16;
                     }
                 }
-                for (int x = 0; x < gens.Length; x++)
+
+                for (var x = 0; x < gens.Length; x++)
                 {
                     region.Generators[(int)gens[x].GeneratorType] = gens[x].AmountInt16;
                 }
@@ -239,12 +236,13 @@ namespace AlphaTab.Audio.Synth.Bank
                 {
                     genList.Add(generator);
                 }
+
                 if (globals != null)
                 {
-                    for (int x = 0; x < globals.Length; x++)
+                    for (var x = 0; x < globals.Length; x++)
                     {
                         var found = false;
-                        for (int i = 0; i < genList.Count; i++)
+                        for (var i = 0; i < genList.Count; i++)
                         {
                             if (genList[i].GeneratorType == globals[x].GeneratorType)
                             {
@@ -252,13 +250,15 @@ namespace AlphaTab.Audio.Synth.Bank
                                 break;
                             }
                         }
+
                         if (!found)
                         {
                             genList.Add(globals[x]);
                         }
                     }
                 }
-                for (int x = 0; x < genList.Count; x++)
+
+                for (var x = 0; x < genList.Count; x++)
                 {
                     var value = (int)genList[x].GeneratorType;
                     if (value < 5 || value == 12 || value == 45 || value == 46 || value == 47 || value == 50 ||
@@ -266,7 +266,8 @@ namespace AlphaTab.Audio.Synth.Bank
                     {
                         continue;
                     }
-                    else if (value == 43 || value == 44)
+
+                    if (value == 43 || value == 44)
                     {
                         byte lo_a;
                         byte hi_a;
@@ -284,11 +285,13 @@ namespace AlphaTab.Audio.Synth.Bank
                         {
                             throw new Exception("Invalid sf2 region. The range generators do not intersect.");
                         }
-                        region.Generators[value] = Platform.Platform.ToInt16((lo_a | (hi_a << 8)));
+
+                        region.Generators[value] = Platform.Platform.ToInt16(lo_a | (hi_a << 8));
                     }
                     else
                     {
-                        region.Generators[value] = Platform.Platform.ToInt16(region.Generators[value] + genList[x].AmountInt16);
+                        region.Generators[value] =
+                            Platform.Platform.ToInt16(region.Generators[value] + genList[x].AmountInt16);
                     }
                 }
             }
@@ -297,7 +300,9 @@ namespace AlphaTab.Audio.Synth.Bank
         private void AssignPatchToBank(Patch.Patch patch, int bankNumber, int startRange, int endRange)
         {
             if (bankNumber < 0)
+            {
                 return;
+            }
 
             if (startRange > endRange)
             {
@@ -305,10 +310,16 @@ namespace AlphaTab.Audio.Synth.Bank
                 startRange = endRange;
                 endRange = range;
             }
+
             if (startRange < 0 || startRange >= BankSize)
+            {
                 throw new Exception("startRange out of range");
+            }
+
             if (endRange < 0 || endRange >= BankSize)
+            {
                 throw new Exception("endRange out of range");
+            }
 
             Patch.Patch[] patches;
             if (_bank.ContainsKey(bankNumber))
@@ -320,7 +331,8 @@ namespace AlphaTab.Audio.Synth.Bank
                 patches = new Patch.Patch[BankSize];
                 _bank[bankNumber] = patches;
             }
-            for (int x = startRange; x <= endRange; x++)
+
+            for (var x = startRange; x <= endRange; x++)
             {
                 patches[x] = patch;
             }

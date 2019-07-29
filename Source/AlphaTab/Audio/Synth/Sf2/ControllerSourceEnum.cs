@@ -1,6 +1,6 @@
 ﻿namespace AlphaTab.Audio.Synth.Sf2
 {
-    enum ControllerSourceEnum
+    internal enum ControllerSourceEnum
     {
         NoController = 0,
         NoteOnVelocity = 2,

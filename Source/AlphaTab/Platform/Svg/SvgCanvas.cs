@@ -1,25 +1,5 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using System;
-using AlphaTab.Collections;
+﻿using AlphaTab.Collections;
 using AlphaTab.Platform.Model;
-using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Platform.Svg
@@ -27,7 +7,7 @@ namespace AlphaTab.Platform.Svg
     /// <summary>
     ///  A canvas implementation storing SVG data
     /// </summary>
-    abstract class SvgCanvas : ICanvas, IPathCanvas
+    internal abstract class SvgCanvas : ICanvas
     {
         protected const float BlurCorrection = 0;
 
@@ -86,25 +66,27 @@ namespace AlphaTab.Platform.Svg
         {
             if (w > 0)
             {
-                Buffer.Append("<rect x=\"" + ((int)x - BlurCorrection) + "\" y=\"" + ((int)y - BlurCorrection) + "\" width=\"" + w + "\" height=\"" + h + "\" fill=\"" + Color.RGBA + "\" />\n");
+                Buffer.Append("<rect x=\"" + ((int)x - BlurCorrection) + "\" y=\"" + ((int)y - BlurCorrection) +
+                              "\" width=\"" + w + "\" height=\"" + h + "\" fill=\"" + Color.Rgba + "\" />\n");
             }
         }
 
         public void StrokeRect(float x, float y, float w, float h)
         {
             Buffer.Append("<rect x=\""
-                 + ((int)x - BlurCorrection)
-                 + "\" y=\""
-                 + ((int)y - BlurCorrection)
-                 + "\" width=\""
-                 + w
-                 + "\" height=\""
-                 + h
-                 + "\" stroke=\"" + Color.RGBA + "\"");
+                          + ((int)x - BlurCorrection)
+                          + "\" y=\""
+                          + ((int)y - BlurCorrection)
+                          + "\" width=\""
+                          + w
+                          + "\" height=\""
+                          + h
+                          + "\" stroke=\"" + Color.Rgba + "\"");
             if (LineWidth != 1)
             {
                 Buffer.Append(" stroke-width=\"" + LineWidth + "\"");
             }
+
             Buffer.Append(" fill=\"transparent\" />\n");
         }
 
@@ -134,18 +116,19 @@ namespace AlphaTab.Platform.Svg
             _currentPath.Append(" Q" + cpx + "," + cpy + "," + x + "," + y);
         }
 
-        public void BezierCurveTo(float cp1x, float cp1y, float cp2x, float cp2y, float x, float y)
+        public void BezierCurveTo(float cp1X, float cp1Y, float cp2X, float cp2Y, float x, float y)
         {
             _currentPathIsEmpty = false;
-            _currentPath.Append(" C" + cp1x + "," + cp1y + "," + cp2x + "," + cp2y + "," + x + "," + y);
+            _currentPath.Append(" C" + cp1X + "," + cp1Y + "," + cp2X + "," + cp2Y + "," + x + "," + y);
         }
 
         public void FillCircle(float x, float y, float radius)
         {
             _currentPathIsEmpty = false;
-            // 
+            //
             // M0,250 A1,1 0 0,0 500,250 A1,1 0 0,0 0,250 z
-            _currentPath.Append(" M" + (x - radius) + "," + y + " A1,1 0 0,0 " + (x + radius) + "," + y + " A1,1 0 0,0 " + (x - radius) + "," + y + " z");
+            _currentPath.Append(" M" + (x - radius) + "," + y + " A1,1 0 0,0 " + (x + radius) + "," + y +
+                                " A1,1 0 0,0 " + (x - radius) + "," + y + " z");
             Fill();
         }
 
@@ -154,13 +137,14 @@ namespace AlphaTab.Platform.Svg
             if (!_currentPathIsEmpty)
             {
                 Buffer.Append("<path d=\"" + _currentPath + "\"");
-                if (Color.RGBA != Color.BlackRgb)
+                if (Color.Rgba != Color.BlackRgb)
                 {
-                    Buffer.Append(" fill=\"" + Color.RGBA + "\"");
+                    Buffer.Append(" fill=\"" + Color.Rgba + "\"");
                 }
-                Buffer.Append(" style=\"stroke: none\"/>");
 
+                Buffer.Append(" style=\"stroke: none\"/>");
             }
+
             _currentPath = new StringBuilder();
             _currentPathIsEmpty = true;
         }
@@ -169,31 +153,40 @@ namespace AlphaTab.Platform.Svg
         {
             if (!_currentPathIsEmpty)
             {
-                var s = "<path d=\"" + _currentPath + "\" stroke=\"" + Color.RGBA + "\"";
+                var s = "<path d=\"" + _currentPath + "\" stroke=\"" + Color.Rgba + "\"";
                 if (LineWidth != 1)
                 {
                     s += " stroke-width=\"" + LineWidth + "\"";
                 }
+
                 s += " style=\"fill: none\" />";
                 Buffer.Append(s);
             }
+
             _currentPath = new StringBuilder();
             _currentPathIsEmpty = true;
         }
 
         public void FillText(string text, float x, float y)
         {
-            if (text == "") return;
-            var s = "<text x=\"" + ((int)x) + "\" y=\"" + ((int)y) + "\" style=\"stroke: none; font:" + Font.ToCssString(Settings.Scale) + "\" "
-                    + " dominant-baseline=\"" + GetSvgBaseLine() + "\"";
-            if (Color.RGBA != Color.BlackRgb)
+            if (text == "")
             {
-                s += " fill=\"" + Color.RGBA + "\"";
+                return;
             }
+
+            var s = "<text x=\"" + (int)x + "\" y=\"" + (int)y + "\" style=\"stroke: none; font:" +
+                    Font.ToCssString(Settings.Scale) + "\" "
+                    + " dominant-baseline=\"" + GetSvgBaseLine() + "\"";
+            if (Color.Rgba != Color.BlackRgb)
+            {
+                s += " fill=\"" + Color.Rgba + "\"";
+            }
+
             if (TextAlign != TextAlign.Left)
             {
                 s += " text-anchor=\"" + GetSvgTextAlignment(TextAlign) + "\"";
             }
+
             s += ">" + text + "</text>";
             Buffer.Append(s);
         }
@@ -206,6 +199,7 @@ namespace AlphaTab.Platform.Svg
                 case TextAlign.Center: return "middle";
                 case TextAlign.Right: return "end";
             }
+
             return "";
         }
 
@@ -222,12 +216,27 @@ namespace AlphaTab.Platform.Svg
 
         public float MeasureText(string text)
         {
-            if (string.IsNullOrEmpty(text)) return 0;
+            if (string.IsNullOrEmpty(text))
+            {
+                return 0;
+            }
+
             return FontSizes.MeasureString(text, Font.Family, Font.Size, Font.Style);
         }
 
-        public abstract void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol, bool centerAtPosition = false);
-        public abstract void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols, bool centerAtPosition = false);
+        public abstract void FillMusicFontSymbol(
+            float x,
+            float y,
+            float scale,
+            MusicFontSymbol symbol,
+            bool centerAtPosition = false);
+
+        public abstract void FillMusicFontSymbols(
+            float x,
+            float y,
+            float scale,
+            MusicFontSymbol[] symbols,
+            bool centerAtPosition = false);
 
         public virtual object OnRenderFinished()
         {

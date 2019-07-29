@@ -1,25 +1,8 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using AlphaTab.Model;
+﻿using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TabBeatGlyph : BeatOnNoteGlyphBase
+    internal class TabBeatGlyph : BeatOnNoteGlyphBase
     {
         public TabNoteChordGlyph NoteNumbers { get; set; }
         public TabRestGlyph RestGlyph { get; set; }
@@ -42,6 +25,7 @@ namespace AlphaTab.Rendering.Glyphs
                         CreateNoteGlyph(note);
                     }
                 }
+
                 AddGlyph(NoteNumbers);
 
                 //
@@ -59,7 +43,7 @@ namespace AlphaTab.Rendering.Glyphs
                 // Tremolo Picking
                 if (Container.Beat.IsTremolo && !NoteNumbers.BeatEffects.ContainsKey("Tremolo"))
                 {
-                    int offset = 0;
+                    var offset = 0;
                     var speed = Container.Beat.TremoloSpeed.Value;
                     switch (speed)
                     {
@@ -74,7 +58,8 @@ namespace AlphaTab.Rendering.Glyphs
                             break;
                     }
 
-                    NoteNumbers.BeatEffects["Tremolo"] = new TremoloPickingGlyph(5 * Scale, offset * Scale,
+                    NoteNumbers.BeatEffects["Tremolo"] = new TremoloPickingGlyph(5 * Scale,
+                        offset * Scale,
                         Container.Beat.TremoloSpeed.Value);
                 }
 
@@ -86,7 +71,9 @@ namespace AlphaTab.Rendering.Glyphs
                     AddGlyph(new SpacingGlyph(0, 0, 5 * Scale));
                     for (var i = 0; i < Container.Beat.Dots; i++)
                     {
-                        AddGlyph(new CircleGlyph(0, tabRenderer.LineOffset * tabRenderer.Bar.Staff.Tuning.Length + tabRenderer.RhythmHeight, 1.5f * Scale));
+                        AddGlyph(new CircleGlyph(0,
+                            tabRenderer.LineOffset * tabRenderer.Bar.Staff.Tuning.Length + tabRenderer.RhythmHeight,
+                            1.5f * Scale));
                     }
                 }
             }
@@ -155,7 +142,11 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             // left to right layout
-            if (Glyphs == null) return;
+            if (Glyphs == null)
+            {
+                return;
+            }
+
             var w = 0f;
             for (int i = 0, j = Glyphs.Count; i < j; i++)
             {
@@ -165,6 +156,7 @@ namespace AlphaTab.Rendering.Glyphs
                 g.DoLayout();
                 w += g.Width;
             }
+
             Width = w;
 
             if (Container.Beat.IsEmpty)

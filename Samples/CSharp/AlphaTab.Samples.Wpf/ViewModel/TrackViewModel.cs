@@ -1,22 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using System.Linq;
+﻿using System.Linq;
 using AlphaTab.Model;
 
 namespace AlphaTab.Samples.Wpf.ViewModel
@@ -33,7 +15,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public bool IsSelected
         {
-            get { return _isSelected; }
+            get => _isSelected;
             set
             {
                 _isSelected = value;
@@ -43,7 +25,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public TrackType TrackType
         {
-            get { return _trackType; }
+            get => _trackType;
             set
             {
                 _trackType = value;
@@ -53,7 +35,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public string Name
         {
-            get { return _track.Name; }
+            get => _track.Name;
             set
             {
                 _track.Name = value;
@@ -63,7 +45,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public int Volume
         {
-            get { return _track.PlaybackInfo.Volume; }
+            get => _track.PlaybackInfo.Volume;
             set
             {
                 _track.PlaybackInfo.Volume = value;
@@ -73,7 +55,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public bool IsSolo
         {
-            get { return _track.PlaybackInfo.IsSolo; }
+            get => _track.PlaybackInfo.IsSolo;
             set
             {
                 _track.PlaybackInfo.IsSolo = value;
@@ -83,7 +65,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public bool IsMute
         {
-            get { return _track.PlaybackInfo.IsMute; }
+            get => _track.PlaybackInfo.IsMute;
             set
             {
                 _track.PlaybackInfo.IsMute = value;
@@ -93,7 +75,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public bool[] UsedBars
         {
-            get { return _usedBars; }
+            get => _usedBars;
             set
             {
                 _usedBars = value;
@@ -103,7 +85,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public Track Track
         {
-            get { return _track; }
+            get => _track;
             set
             {
                 _track = value;
@@ -139,18 +121,18 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
             // scan all bars if they have any note 
             _usedBars = new bool[track.Score.MasterBars.Count];
-            for (int s = 0; s < track.Staves.Count; s++)
+            for (var s = 0; s < track.Staves.Count; s++)
             {
                 var staff = track.Staves[s];
-                for (int barI = 0; barI < staff.Bars.Count; barI++)
+                for (var barI = 0; barI < staff.Bars.Count; barI++)
                 {
-                    Bar bar = staff.Bars[barI];
+                    var bar = staff.Bars[barI];
                     _usedBars[barI] = false;
 
-                    for (int voiceI = 0; voiceI < bar.Voices.Count && (!_usedBars[barI]); voiceI++)
+                    for (var voiceI = 0; voiceI < bar.Voices.Count && (!_usedBars[barI]); voiceI++)
                     {
-                        Voice voice = bar.Voices[voiceI];
-                        for (int i = 0; i < voice.Beats.Count; i++)
+                        var voice = bar.Voices[voiceI];
+                        for (var i = 0; i < voice.Beats.Count; i++)
                         {
                             var b = voice.Beats[i];
                             if (!b.IsRest)

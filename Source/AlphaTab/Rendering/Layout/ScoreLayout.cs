@@ -1,22 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using System;
+﻿using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform.Model;
@@ -30,7 +12,7 @@ namespace AlphaTab.Rendering.Layout
     /// <summary>
     /// This is the base public class for creating new layouting engines for the score renderer. 
     /// </summary>
-    abstract class ScoreLayout
+    internal abstract class ScoreLayout
     {
         private readonly FastDictionary<string, FastDictionary<int, BarRendererBase>> _barRendererLookup;
 
@@ -64,7 +46,11 @@ namespace AlphaTab.Rendering.Layout
             FirstBarIndex = startIndex;
 
             var endBarIndex = Renderer.Settings.Layout.Get("count", score.MasterBars.Count);
-            if (endBarIndex < 0) endBarIndex = score.MasterBars.Count;
+            if (endBarIndex < 0)
+            {
+                endBarIndex = score.MasterBars.Count;
+            }
+
             endBarIndex = startIndex + endBarIndex - 1; // map count to array index
             endBarIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, endBarIndex));
             LastBarIndex = endBarIndex;
@@ -79,40 +65,64 @@ namespace AlphaTab.Rendering.Layout
         {
             Logger.Info("ScoreLayout", "Creating score info glyphs");
 
-            var flags = Renderer.Settings.Layout.Get("hideInfo", false) ? HeaderFooterElements.None : HeaderFooterElements.All;
+            var flags = Renderer.Settings.Layout.Get("hideInfo", false)
+                ? HeaderFooterElements.None
+                : HeaderFooterElements.All;
             var score = Renderer.Score;
             var res = Renderer.Settings.RenderingResources;
 
             ScoreInfoGlyphs = new FastDictionary<HeaderFooterElements, TextGlyph>();
             if (!string.IsNullOrEmpty(score.Title) && (flags & HeaderFooterElements.Title) != 0)
             {
-                ScoreInfoGlyphs[HeaderFooterElements.Title] = new TextGlyph(0, 0, score.Title, res.TitleFont, TextAlign.Center);
+                ScoreInfoGlyphs[HeaderFooterElements.Title] =
+                    new TextGlyph(0, 0, score.Title, res.TitleFont, TextAlign.Center);
             }
+
             if (!string.IsNullOrEmpty(score.SubTitle) && (flags & HeaderFooterElements.SubTitle) != 0)
             {
-                ScoreInfoGlyphs[HeaderFooterElements.SubTitle] = new TextGlyph(0, 0, score.SubTitle, res.SubTitleFont, TextAlign.Center);
+                ScoreInfoGlyphs[HeaderFooterElements.SubTitle] =
+                    new TextGlyph(0, 0, score.SubTitle, res.SubTitleFont, TextAlign.Center);
             }
+
             if (!string.IsNullOrEmpty(score.Artist) && (flags & HeaderFooterElements.Artist) != 0)
             {
-                ScoreInfoGlyphs[HeaderFooterElements.Artist] = new TextGlyph(0, 0, score.Artist, res.SubTitleFont, TextAlign.Center);
+                ScoreInfoGlyphs[HeaderFooterElements.Artist] =
+                    new TextGlyph(0, 0, score.Artist, res.SubTitleFont, TextAlign.Center);
             }
+
             if (!string.IsNullOrEmpty(score.Album) && (flags & HeaderFooterElements.Album) != 0)
             {
-                ScoreInfoGlyphs[HeaderFooterElements.Album] = new TextGlyph(0, 0, score.Album, res.SubTitleFont, TextAlign.Center);
+                ScoreInfoGlyphs[HeaderFooterElements.Album] =
+                    new TextGlyph(0, 0, score.Album, res.SubTitleFont, TextAlign.Center);
             }
-            if (!string.IsNullOrEmpty(score.Music) && score.Music == score.Words && (flags & HeaderFooterElements.WordsAndMusic) != 0)
+
+            if (!string.IsNullOrEmpty(score.Music) && score.Music == score.Words &&
+                (flags & HeaderFooterElements.WordsAndMusic) != 0)
             {
-                ScoreInfoGlyphs[HeaderFooterElements.WordsAndMusic] = new TextGlyph(0, 0, "Music and Words by " + score.Words, res.WordsFont, TextAlign.Center);
+                ScoreInfoGlyphs[HeaderFooterElements.WordsAndMusic] = new TextGlyph(0,
+                    0,
+                    "Music and Words by " + score.Words,
+                    res.WordsFont,
+                    TextAlign.Center);
             }
             else
             {
                 if (!string.IsNullOrEmpty(score.Music) && (flags & HeaderFooterElements.Music) != 0)
                 {
-                    ScoreInfoGlyphs[HeaderFooterElements.Music] = new TextGlyph(0, 0, "Music by " + score.Music, res.WordsFont, TextAlign.Right);
+                    ScoreInfoGlyphs[HeaderFooterElements.Music] = new TextGlyph(0,
+                        0,
+                        "Music by " + score.Music,
+                        res.WordsFont,
+                        TextAlign.Right);
                 }
+
                 if (!string.IsNullOrEmpty(score.Words) && (flags & HeaderFooterElements.Words) != 0)
                 {
-                    ScoreInfoGlyphs[HeaderFooterElements.Words] = new TextGlyph(0, 0, "Words by " + score.Words, res.WordsFont, TextAlign.Left);
+                    ScoreInfoGlyphs[HeaderFooterElements.Words] = new TextGlyph(0,
+                        0,
+                        "Words by " + score.Words,
+                        res.WordsFont,
+                        TextAlign.Left);
                 }
             }
 
@@ -174,13 +184,7 @@ namespace AlphaTab.Rendering.Layout
             }
         }
 
-        public float Scale
-        {
-            get
-            {
-                return Renderer.Settings.Scale;
-            }
-        }
+        public float Scale => Renderer.Settings.Scale;
 
         public int FirstBarIndex { get; private set; }
         public int LastBarIndex { get; private set; }
@@ -205,8 +209,7 @@ namespace AlphaTab.Rendering.Layout
                 }
 
 
-
-                for (int staffIndex = 0; staffIndex < track.Staves.Count; staffIndex++)
+                for (var staffIndex = 0; staffIndex < track.Staves.Count; staffIndex++)
                 {
                     var staff = track.Staves[staffIndex];
 
@@ -250,6 +253,7 @@ namespace AlphaTab.Rendering.Layout
                     }
                 }
             }
+
             return group;
         }
 
@@ -259,6 +263,7 @@ namespace AlphaTab.Rendering.Layout
             {
                 _barRendererLookup[key] = new FastDictionary<int, BarRendererBase>();
             }
+
             _barRendererLookup[key][renderer.Bar.Id] = renderer;
         }
 
@@ -279,6 +284,7 @@ namespace AlphaTab.Rendering.Layout
             {
                 return (T)_barRendererLookup[key][barRendererId];
             }
+
             return null;
         }
 
@@ -291,7 +297,7 @@ namespace AlphaTab.Rendering.Layout
             var resources = Renderer.Settings.RenderingResources;
 
             var size = 12 * Renderer.Settings.Scale;
-            var height = (size * 2);
+            var height = size * 2;
             Height += height;
             var x = Width / 2;
 

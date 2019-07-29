@@ -1,27 +1,9 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using AlphaTab.Collections;
+﻿using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class ScoreBeatGlyph : BeatOnNoteGlyphBase
+    internal class ScoreBeatGlyph : BeatOnNoteGlyphBase
     {
         public ScoreNoteChordGlyph NoteHeads { get; set; }
         public ScoreRestGlyph RestGlyph { get; set; }
@@ -64,11 +46,14 @@ namespace AlphaTab.Rendering.Glyphs
                             ghost.AddParenthesis(note);
                         }
                     }
+
                     AddGlyph(NoteHeads);
 
                     if (!ghost.IsEmpty)
                     {
-                        AddGlyph(new SpacingGlyph(0, 0, 4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
+                        AddGlyph(new SpacingGlyph(0,
+                            0,
+                            4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
                         AddGlyph(ghost);
                     }
 
@@ -96,6 +81,7 @@ namespace AlphaTab.Rendering.Glyphs
                             {
                                 CreateBeatDot(sr.GetNoteLine(note), group);
                             }
+
                             AddGlyph(group);
                         }
                     }
@@ -207,14 +193,21 @@ namespace AlphaTab.Rendering.Glyphs
         {
             // ReSharper disable ForCanBeConvertedToForeach
             NormalKeys = new FastDictionary<int, bool>();
-            var normalKeyNotes = new[] { 32, 34, 35, 36, 38, 39, 40, 41, 43, 45, 47, 48, 50, 55, 56, 58, 60, 61 };
-            for (int i = 0; i < normalKeyNotes.Length; i++)
+            var normalKeyNotes = new[]
+            {
+                32, 34, 35, 36, 38, 39, 40, 41, 43, 45, 47, 48, 50, 55, 56, 58, 60, 61
+            };
+            for (var i = 0; i < normalKeyNotes.Length; i++)
             {
                 NormalKeys[normalKeyNotes[i]] = true;
             }
+
             XKeys = new FastDictionary<int, bool>();
-            var xKeyNotes = new[] { 31, 33, 37, 42, 44, 54, 62, 63, 64, 65, 66 };
-            for (int i = 0; i < xKeyNotes.Length; i++)
+            var xKeyNotes = new[]
+            {
+                31, 33, 37, 42, 44, 54, 62, 63, 64, 65, 66
+            };
+            for (var i = 0; i < xKeyNotes.Length; i++)
             {
                 XKeys[xKeyNotes[i]] = true;
             }
@@ -232,32 +225,40 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     return new NoteHeadGlyph(0, 0, Duration.Quarter, isGrace);
                 }
+
                 if (XKeys.ContainsKey(value))
                 {
                     return new DrumSticksGlyph(0, 0, isGrace);
                 }
+
                 if (value == 46)
                 {
                     return new HiHatGlyph(0, 0, isGrace);
                 }
+
                 if (value == 49 || value == 57)
                 {
                     return new DiamondNoteHeadGlyph(0, 0, n.Beat.Duration, isGrace);
                 }
+
                 if (value == 52)
                 {
                     return new ChineseCymbalGlyph(0, 0, isGrace);
                 }
+
                 if (value == 51 || value == 53 || value == 59)
                 {
                     return new RideCymbalGlyph(0, 0, isGrace);
                 }
+
                 return new NoteHeadGlyph(0, 0, Duration.Quarter, isGrace);
             }
+
             if (n.IsDead)
             {
                 return new DeadNoteHeadGlyph(0, 0, isGrace);
             }
+
             if (n.Beat.GraceType == GraceType.BendGrace)
             {
                 return new NoteHeadGlyph(0, 0, Duration.Quarter, true);
@@ -267,7 +268,7 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 return new DiamondNoteHeadGlyph(0, 0, n.Beat.Duration, isGrace);
             }
-            
+
             return new NoteHeadGlyph(0, 0, n.Beat.Duration, isGrace);
         }
 
@@ -280,7 +281,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             var sr = (ScoreBarRenderer)Renderer;
             var noteHeadGlyph = CreateNoteHeadGlyph(n);
-            
+
             // calculate y position
             var line = sr.GetNoteLine(n);
 
@@ -291,7 +292,8 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 // create harmonic note head. 
                 var harmonicFret = n.DisplayValue + n.HarmonicPitch;
-                noteHeadGlyph = new DiamondNoteHeadGlyph(0, 0, n.Beat.Duration, Container.Beat.GraceType != GraceType.None);
+                noteHeadGlyph =
+                    new DiamondNoteHeadGlyph(0, 0, n.Beat.Duration, Container.Beat.GraceType != GraceType.None);
                 line = sr.AccidentalHelper.GetNoteLineForValue(harmonicFret);
 
                 noteHeadGlyph.Y = sr.GetScoreY(line);
@@ -307,6 +309,7 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 NoteHeads.BeatEffects["Accent"] = new AccentuationGlyph(0, 0, AccentuationType.Normal);
             }
+
             if (n.Accentuated == AccentuationType.Heavy && !NoteHeads.BeatEffects.ContainsKey("HAccent"))
             {
                 NoteHeads.BeatEffects["HAccent"] = new AccentuationGlyph(0, 0, AccentuationType.Heavy);

@@ -1,66 +1,55 @@
-﻿/*
- * This file is part of alphaSynth.
- * Copyright (c) 2014, T3866, PerryCodes, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
-using AlphaTab.IO;
+﻿using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Synth.Midi.Event
 {
     /// <summary>
-    /// Lists all midi events. 
+    /// Lists all midi events.
     /// </summary>
     public enum MidiEventType
     {
         /// <summary>
-        /// A note is released. 
+        /// A note is released.
         /// </summary>
         NoteOff = 0x80,
+
         /// <summary>
-        /// A note is started. 
+        /// A note is started.
         /// </summary>
         NoteOn = 0x90,
+
         /// <summary>
-        /// The pressure that was used to play the note. 
+        /// The pressure that was used to play the note.
         /// </summary>
         NoteAftertouch = 0xA0,
+
         /// <summary>
         /// Change of a midi controller
         /// </summary>
         Controller = 0xB0,
+
         /// <summary>
         /// Change of a midi program
         /// </summary>
         ProgramChange = 0xC0,
+
         /// <summary>
-        /// The pressure that should be applied to the whole channel. 
+        /// The pressure that should be applied to the whole channel.
         /// </summary>
         ChannelAftertouch = 0xD0,
+
         /// <summary>
-        /// A change of the audio pitch. 
+        /// A change of the audio pitch.
         /// </summary>
         PitchBend = 0xE0,
+
         /// <summary>
-        /// A meta event. See <see cref="MetaEventTypeEnum"/> for details. 
+        /// A meta event. See <see cref="MetaEventTypeEnum"/> for details.
         /// </summary>
         Meta = 0xFF
     }
 
     /// <summary>
-    /// Lists all midi controllers. 
+    /// Lists all midi controllers.
     /// </summary>
     public enum ControllerType
     {
@@ -68,10 +57,12 @@ namespace AlphaTab.Audio.Synth.Midi.Event
         /// Bank Select. MSB
         /// </summary>
         BankSelectCoarse = 0x00,
+
         /// <summary>
         /// Modulation wheel or lever MSB
         /// </summary>
         ModulationCoarse = 0x01,
+
         //BreathControllerCoarse = 0x02,
         //FootControllerCoarse = 0x04,
         //PortamentoTimeCoarse = 0x05,
@@ -79,19 +70,23 @@ namespace AlphaTab.Audio.Synth.Midi.Event
         /// Data entry MSB
         /// </summary>
         DataEntryCoarse = 0x06,
+
         /// <summary>
         /// Channel Volume MSB
         /// </summary>
         VolumeCoarse = 0x07,
+
         //BalanceCoarse = 0x08,
         /// <summary>
         /// Pan MSB
         /// </summary>
         PanCoarse = 0x0A,
+
         /// <summary>
         /// Expression Controller MSB
         /// </summary>
         ExpressionControllerCoarse = 0x0B,
+
         //EffectControl1Coarse = 0x0C,
         //EffectControl2Coarse = 0x0D,
         //GeneralPurposeSlider1 = 0x10,
@@ -103,6 +98,7 @@ namespace AlphaTab.Audio.Synth.Midi.Event
         /// Modulation wheel or level LSB
         /// </summary>
         ModulationFine = 0x21,
+
         //BreathControllerFine = 0x22,
         //FootControllerFine = 0x24,
         //PortamentoTimeFine = 0x25,
@@ -110,25 +106,30 @@ namespace AlphaTab.Audio.Synth.Midi.Event
         /// Data Entry LSB
         /// </summary>
         DataEntryFine = 0x26,
+
         /// <summary>
         /// Channel Volume LSB
         /// </summary>
         VolumeFine = 0x27,
+
         //BalanceFine = 0x28,
         /// <summary>
         /// Pan LSB
         /// </summary>
         PanFine = 0x2A,
+
         /// <summary>
         /// Expression controller LSB
         /// </summary>
         ExpressionControllerFine = 0x2B,
+
         //EffectControl1Fine = 0x2C,
         //EffectControl2Fine = 0x2D,
         /// <summary>
         /// Damper pedal (sustain)
         /// </summary>
         HoldPedal = 0x40,
+
         //Portamento = 0x41,
         //SostenutoPedal = 0x42,
         //SoftPedal = 0x43,
@@ -136,6 +137,7 @@ namespace AlphaTab.Audio.Synth.Midi.Event
         /// Legato Footswitch
         /// </summary>
         LegatoPedal = 0x44,
+
         //Hold2Pedal = 0x45,
         //SoundVariation = 0x46,
         //SoundTimbre = 0x47,
@@ -162,28 +164,34 @@ namespace AlphaTab.Audio.Synth.Midi.Event
         /// Non-Registered Parameter Number LSB
         /// </summary>
         NonRegisteredParameterFine = 0x62,
+
         /// <summary>
         /// Non-Registered Parameter Number MSB
         /// </summary>
         NonRegisteredParameterCourse = 0x63,
+
         /// <summary>
-        /// Registered Parameter Number LSB 
+        /// Registered Parameter Number LSB
         /// </summary>
         RegisteredParameterFine = 0x64,
+
         /// <summary>
         /// Registered Parameter Number MSB
         /// </summary>
         RegisteredParameterCourse = 0x65,
+
         //AllSoundOff = 0x78,
         /// <summary>
         /// Reset all controllers
         /// </summary>
         ResetControllers = 0x79,
+
         //LocalKeyboard = 0x7A,
         /// <summary>
-        /// All notes of. 
+        /// All notes of.
         /// </summary>
-        AllNotesOff = 0x7B,
+        AllNotesOff = 0x7B
+
         //OmniModeOff = 0x7C,
         //OmniModeOn = 0x7D,
         //MonoMode = 0x7E,
@@ -191,32 +199,32 @@ namespace AlphaTab.Audio.Synth.Midi.Event
     }
 
     /// <summary>
-    /// Represents a midi event. 
+    /// Represents a midi event.
     /// </summary>
     public class MidiEvent
     {
         /// <summary>
-        /// Gets or sets the raw midi message. 
+        /// Gets or sets the raw midi message.
         /// </summary>
         public int Message { get; set; }
 
         /// <summary>
-        /// Gets or sets the absolute tick of this midi event. 
+        /// Gets or sets the absolute tick of this midi event.
         /// </summary>
         public int Tick { get; set; }
 
         /// <summary>
-        /// Gets or sets the channel of this midi event. 
+        /// Gets or sets the channel of this midi event.
         /// </summary>
         public virtual int Channel => Message & 0x000000F;
 
         /// <summary>
-        /// Gets or sets the command of this midi event. 
+        /// Gets or sets the command of this midi event.
         /// </summary>
         public virtual MidiEventType Command => (MidiEventType)(Message & 0x00000F0);
 
         /// <summary>
-        /// Gets or sets the first data component of this midi event. 
+        /// Gets or sets the first data component of this midi event.
         /// </summary>
         public int Data1
         {
@@ -229,7 +237,7 @@ namespace AlphaTab.Audio.Synth.Midi.Event
         }
 
         /// <summary>
-        /// Gets or sets the second data component of this midi event. 
+        /// Gets or sets the second data component of this midi event.
         /// </summary>
         public int Data2
         {
@@ -255,15 +263,15 @@ namespace AlphaTab.Audio.Synth.Midi.Event
         }
 
         /// <summary>
-        /// Writes the midi event as binary into the given stream. 
+        /// Writes the midi event as binary into the given stream.
         /// </summary>
         /// <param name="s">The stream to write to.</param>
         public virtual void WriteTo(IWriteable s)
         {
             var b = new[]
             {
-                (byte) ((Message >> 24) & 0xFF), (byte) ((Message >> 16) & 0xFF),
-                (byte) ((Message >> 8) & 0xFF), (byte) ((Message >> 0) & 0xFF)
+                (byte)((Message >> 24) & 0xFF), (byte)((Message >> 16) & 0xFF), (byte)((Message >> 8) & 0xFF),
+                (byte)(Message & 0xFF)
             };
             s.Write(b, 0, b.Length);
         }

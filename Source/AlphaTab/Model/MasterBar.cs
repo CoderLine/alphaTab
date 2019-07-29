@@ -1,21 +1,3 @@
-/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-
 using AlphaTab.Audio;
 using AlphaTab.Collections;
 
@@ -57,6 +39,7 @@ namespace AlphaTab.Model
         /// Gets or sets the key signature used on all bars.
         /// </summary>
         public KeySignature KeySignature { get; set; }
+
         /// <summary>
         /// Gets or sets the type of key signature (major/minor)
         /// </summary>
@@ -71,10 +54,12 @@ namespace AlphaTab.Model
         /// Gets or sets whether a repeat section starts on this masterbar. 
         /// </summary>
         public bool IsRepeatStart { get; set; }
+
         /// <summary>
         /// Gets or sets whether a repeat section ends on this masterbar. 
         /// </summary>
         public bool IsRepeatEnd => RepeatCount > 0;
+
         /// <summary>
         /// Gets or sets the number of repeats for the current repeat section. 
         /// </summary>
@@ -89,10 +74,12 @@ namespace AlphaTab.Model
         /// Gets or sets the time signature numerator.
         /// </summary>
         public int TimeSignatureNumerator { get; set; }
+
         /// <summary>
         /// Gets or sets the time signature denominiator. 
         /// </summary>
         public int TimeSignatureDenominator { get; set; }
+
         /// <summary>
         /// Gets or sets whether this is bar has a common time signature. 
         /// </summary>
@@ -176,7 +163,7 @@ namespace AlphaTab.Model
         {
             if (IsAnacrusis)
             {
-                int duration = 0;
+                var duration = 0;
                 foreach (var track in Score.Tracks)
                 {
                     foreach (var staff in track.Staves)
@@ -188,8 +175,10 @@ namespace AlphaTab.Model
                         }
                     }
                 }
+
                 return duration;
             }
+
             return TimeSignatureNumerator * MidiUtils.ValueToTicks(TimeSignatureDenominator);
         }
 
@@ -214,6 +203,7 @@ namespace AlphaTab.Model
             {
                 return Fermata[beat.PlaybackStart];
             }
+
             return null;
         }
     }

@@ -1,33 +1,14 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using AlphaTab.Collections;
-using AlphaTab.Platform;
+﻿using AlphaTab.Collections;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class AccidentalGroupGlyph : GlyphGroup
+    internal class AccidentalGroupGlyph : GlyphGroup
     {
         private const int NonReserved = -3000;
 
         public AccidentalGroupGlyph()
             : base(0, 0)
         {
-
         }
 
         public override void DoLayout()
@@ -37,13 +18,22 @@ namespace AlphaTab.Rendering.Glyphs
                 Width = 0;
                 return;
             }
+
             //
             // Determine Columns for accidentals
             //
             Glyphs.Sort((a, b) =>
             {
-                if (a.Y < b.Y) return -1;
-                if (a.Y > b.Y) return 1;
+                if (a.Y < b.Y)
+                {
+                    return -1;
+                }
+
+                if (a.Y > b.Y)
+                {
+                    return 1;
+                }
+
                 return 0;
             });
 
@@ -83,20 +73,20 @@ namespace AlphaTab.Rendering.Glyphs
             // Place accidentals in columns
             //
             var columnWidth = 8 * Scale;
-            var padding = 2*Scale;
+            var padding = 2 * Scale;
             if (Glyphs.Count == 0)
             {
                 Width = 0;
             }
             else
             {
-                Width = padding + (columnWidth * columns.Count);
+                Width = padding + columnWidth * columns.Count;
             }
 
             for (int i = 0, j = Glyphs.Count; i < j; i++)
             {
                 var g = Glyphs[i];
-                g.X = padding + (Width - ((g.X + 1) * columnWidth));
+                g.X = padding + (Width - (g.X + 1) * columnWidth);
             }
         }
     }

@@ -1,6 +1,5 @@
 {
   "output": "..\\..\\Build\\Haxe\\src-gen",
-  //"processorCount": 1,
   "postbuild": [
     {
       "name": "Building JavaScript",

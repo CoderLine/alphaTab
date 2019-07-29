@@ -1,21 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using System;
+﻿using System;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Ds;
 using AlphaTab.Collections;
@@ -30,7 +13,7 @@ namespace AlphaTab.Platform.JavaScript
 {
     // NOTE: we prefix all ISynthOutput methods with "AlphaSynth" to ensure
     // the ExternalInterface callbacks are called (play, stop etc. might control. the main movie)
-    interface IFlashSynthOutput
+    internal interface IFlashSynthOutput
     {
         void AlphaSynthSequencerFinished();
         void AlphaSynthPlay();
@@ -39,7 +22,7 @@ namespace AlphaTab.Platform.JavaScript
         void AlphaSynthAddSamples(string base64Samples);
     }
 
-    class AlphaSynthFlashOutput : ISynthOutput
+    internal class AlphaSynthFlashOutput : ISynthOutput
     {
         public const int PreferredSampleRate = 44100;
 
@@ -58,10 +41,7 @@ namespace AlphaTab.Platform.JavaScript
         private string _swfId;
         private Element _swfContainer;
 
-        public int SampleRate
-        {
-            get { return PreferredSampleRate; }
-        }
+        public int SampleRate => PreferredSampleRate;
 
         public AlphaSynthFlashOutput(string alphaSynthRoot)
         {
@@ -93,9 +73,24 @@ namespace AlphaTab.Platform.JavaScript
                 Action<string, string, string, string, string, string, object, object, object> embedSwf = swf.embedSWF;
                 embedSwf(
                     _alphaSynthRoot + "AlphaSynth.FlashOutput.swf",
-                    _id, "1px", "1px", "9.0.0",
+                    _id,
+                    "1px",
+                    "1px",
+                    "9.0.0",
                     null,
-                    new { id = _id, sampleRate = PreferredSampleRate }, new { allowScriptAccess = "always" }, new { id = _swfId }
+                    new
+                    {
+                        id = _id,
+                        sampleRate = PreferredSampleRate
+                    },
+                    new
+                    {
+                        allowScriptAccess = "always"
+                    },
+                    new
+                    {
+                        id = _swfId
+                    }
                 );
             }
             else
@@ -132,7 +127,8 @@ namespace AlphaTab.Platform.JavaScript
         public void AddSamples(SampleArray samples)
         {
             var uint8 = new Uint8Array(samples.ToFloat32Array().Buffer);
-            var b64 = Script.Write<string>("untyped __js__(\"window.btoa(String.fromCharCode.apply(null, {0}))\", uint8)");
+            var b64 = Script.Write<string>(
+                "untyped __js__(\"window.btoa(String.fromCharCode.apply(null, {0}))\", uint8)");
             FlashOutput.AlphaSynthAddSamples(b64);
         }
 
@@ -143,6 +139,7 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         public event Action Ready;
+
         public static void OnReady(string id)
         {
             if (Lookup.ContainsKey(id))
@@ -152,6 +149,7 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         public event Action SampleRequest;
+
         public static void OnSampleRequest(string id)
         {
             if (Lookup.ContainsKey(id))
@@ -161,6 +159,7 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         public event Action Finished;
+
         public static void OnFinished(string id)
         {
             if (Lookup.ContainsKey(id) && Lookup[id].Finished != null)
@@ -170,6 +169,7 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         public event Action<int> SamplesPlayed;
+
         public static void OnSamplesPlayed(string id, int samples)
         {
             if (Lookup.ContainsKey(id))
