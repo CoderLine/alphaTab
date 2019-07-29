@@ -3,7 +3,7 @@ using AlphaTab.Audio.Synth.Sf2;
 
 namespace AlphaTab.Audio.Synth.Bank
 {
-    class SampleDataAsset
+    internal class SampleDataAsset
     {
         public string Name { get; set; }
         public int Channels { get; set; }
@@ -28,14 +28,12 @@ namespace AlphaTab.Audio.Synth.Bank
             End = sample.End;
             LoopStart = sample.StartLoop;
             LoopEnd = sample.EndLoop;
-            if ((sample.SoundFontSampleLink & SFSampleLink.OggVobis) != 0)
+            if ((sample.SoundFontSampleLink & SoundFontSampleLink.OggVobis) != 0)
             {
                 throw new Exception("Ogg Vobis encoded soundfonts not supported");
             }
-            else
-            {
-                SampleData = PcmData.Create(sampleData.BitsPerSample, sampleData.SampleData, true);
-            }
+
+            SampleData = PcmData.Create(sampleData.BitsPerSample, sampleData.SampleData, true);
         }
     }
 }

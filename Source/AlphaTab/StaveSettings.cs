@@ -48,15 +48,15 @@ namespace AlphaTab
         {
             if (AdditionalSettings.ContainsKey(key.ToLower()))
             {
-                return (T)(AdditionalSettings[key.ToLower()]);
+                return (T)AdditionalSettings[key.ToLower()];
             }
+
             if (AdditionalSettings.ContainsKey(key))
             {
-                return (T)(AdditionalSettings[key]);
+                return (T)AdditionalSettings[key];
             }
+
             return def;
         }
-
-
     }
 }

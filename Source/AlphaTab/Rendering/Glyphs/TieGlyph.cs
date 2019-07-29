@@ -5,7 +5,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TieGlyph : Glyph
+    internal class TieGlyph : Glyph
     {
         protected Beat StartBeat;
         protected Beat EndBeat;
@@ -26,13 +26,19 @@ namespace AlphaTab.Rendering.Glyphs
         }
 
 
-
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            if (EndBeat == null) return;
+            if (EndBeat == null)
+            {
+                return;
+            }
 
-            var startNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Renderer.Staff.StaveId, StartBeat.Voice.Bar);
-            var endNoteRenderer = Renderer.ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Renderer.Staff.StaveId, EndBeat.Voice.Bar);
+            var startNoteRenderer =
+                Renderer.ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Renderer.Staff.StaveId,
+                    StartBeat.Voice.Bar);
+            var endNoteRenderer =
+                Renderer.ScoreRenderer.Layout.GetRendererForBar<BarRendererBase>(Renderer.Staff.StaveId,
+                    EndBeat.Voice.Bar);
 
             float startX = 0;
             float endX = 0;
@@ -74,6 +80,7 @@ namespace AlphaTab.Rendering.Glyphs
                     startY = cy + startNoteRenderer.Y + GetStartY(startNoteRenderer, direction) + YOffset;
                     endY = cy + endNoteRenderer.Y + GetEndY(endNoteRenderer, direction) + YOffset;
                 }
+
                 shouldDraw = true;
             }
             // if we draw for the tie end, we only draw a tie if we had a line break between start and end
@@ -91,7 +98,14 @@ namespace AlphaTab.Rendering.Glyphs
 
             if (shouldDraw)
             {
-                PaintTie(canvas, Scale, startX, startY, endX, endY, direction == BeamDirection.Down, GetTieHeight(startX, startY, endX, endY));
+                PaintTie(canvas,
+                    Scale,
+                    startX,
+                    startY,
+                    endX,
+                    endY,
+                    direction == BeamDirection.Down,
+                    GetTieHeight(startX, startY, endX, endY));
 
                 canvas.Fill();
             }
@@ -128,13 +142,22 @@ namespace AlphaTab.Rendering.Glyphs
             return 0;
         }
 
-        public static void PaintTie(ICanvas canvas, float scale, float x1, float y1, float x2, float y2,
-            bool down = false, float offset = 22, float size = 4)
+        public static void PaintTie(
+            ICanvas canvas,
+            float scale,
+            float x1,
+            float y1,
+            float x2,
+            float y2,
+            bool down = false,
+            float offset = 22,
+            float size = 4)
         {
             if (x1 == x2 && y1 == y2)
             {
                 return;
             }
+
             // ensure endX > startX
             if (x2 < x1)
             {
@@ -152,13 +175,17 @@ namespace AlphaTab.Rendering.Glyphs
             offset *= scale;
             size *= scale;
             // normal vector
-            var normalVectorX = (y2 - y1);
-            var normalVectorY = (x2 - x1);
-            var length = (float)Math.Sqrt((normalVectorX * normalVectorX) + (normalVectorY * normalVectorY));
+            var normalVectorX = y2 - y1;
+            var normalVectorY = x2 - x1;
+            var length = (float)Math.Sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
             if (down)
+            {
                 normalVectorX *= -1;
+            }
             else
+            {
                 normalVectorY *= -1;
+            }
 
             // make to unit vector
             normalVectorX /= length;
@@ -169,10 +196,10 @@ namespace AlphaTab.Rendering.Glyphs
             var centerY = (y2 + y1) / 2;
 
             // control points
-            var cp1X = centerX + (offset * normalVectorX);
-            var cp1Y = centerY + (offset * normalVectorY);
-            var cp2X = centerX + ((offset - size) * normalVectorX);
-            var cp2Y = centerY + ((offset - size) * normalVectorY);
+            var cp1X = centerX + offset * normalVectorX;
+            var cp1Y = centerY + offset * normalVectorY;
+            var cp2X = centerX + (offset - size) * normalVectorX;
+            var cp2Y = centerY + (offset - size) * normalVectorY;
 
 
             canvas.BeginPath();

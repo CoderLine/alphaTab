@@ -1,10 +1,9 @@
-﻿using System;
-using AlphaTab.Model;
+﻿using AlphaTab.Model;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class ClefGlyph : MusicFontGlyph
+    internal class ClefGlyph : MusicFontGlyph
     {
         private readonly Clef _clef;
         private readonly Ottavia _clefOttava;
@@ -55,7 +54,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             base.Paint(cx, cy, canvas);
             Glyph numberGlyph;
-            bool top = false;
+            var top = false;
             switch (_clefOttava)
             {
                 case Ottavia._15ma:

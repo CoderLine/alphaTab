@@ -15,6 +15,7 @@ namespace AlphaTab.Haxe.Js.Html
 
         [Name("querySelector")]
         public extern Element QuerySelector(HaxeString selectors);
+
         [Name("querySelectorAll")]
         public extern NodeList QuerySelectorAll(HaxeString selectors);
 
@@ -23,7 +24,7 @@ namespace AlphaTab.Haxe.Js.Html
 
         [Name("createElement")]
         public extern Element CreateElement(HaxeString localName);
-        
+
         [Name("getElementsByTagName")]
         public extern HTMLCollection GetElementsByTagName(HaxeString localName);
 

@@ -9,6 +9,7 @@ namespace AlphaTab.Haxe.Js.Html
     {
         [Name("href")]
         public extern HaxeString Href { get; set; }
+
         [Name("download")]
         public extern HaxeString Download { get; set; }
     }

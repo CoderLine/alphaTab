@@ -35,7 +35,7 @@ namespace AlphaTab.Test.Importer
         protected void CheckTest02Score(Score score)
         {
             // Whole Notes
-            int beat = 0;
+            var beat = 0;
 
             var durationsInFile = new[]
             {
@@ -386,7 +386,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[6].KeySignatureType);
             Assert.AreEqual(KeySignature.Cb, score.MasterBars[7].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[7].KeySignatureType);
-            // major - sharps 
+            // major - sharps
             Assert.AreEqual(KeySignature.C, score.MasterBars[8].KeySignature);
             Assert.AreEqual(KeySignatureType.Major, score.MasterBars[8].KeySignatureType);
             Assert.AreEqual(KeySignature.G, score.MasterBars[9].KeySignature);
@@ -442,13 +442,13 @@ namespace AlphaTab.Test.Importer
         protected void CheckColors(Score score)
         {
             Assert.AreEqual("Red", score.Tracks[0].Name);
-            Assert.AreEqual("#FF0000", score.Tracks[0].Color.RGBA);
+            Assert.AreEqual("#FF0000", score.Tracks[0].Color.Rgba);
             Assert.AreEqual("Green", score.Tracks[1].Name);
-            Assert.AreEqual("#00FF00", score.Tracks[1].Color.RGBA);
+            Assert.AreEqual("#00FF00", score.Tracks[1].Color.Rgba);
             Assert.AreEqual("Yellow", score.Tracks[2].Name);
-            Assert.AreEqual("#FFFF00", score.Tracks[2].Color.RGBA);
+            Assert.AreEqual("#FFFF00", score.Tracks[2].Color.Rgba);
             Assert.AreEqual("Blue", score.Tracks[3].Name);
-            Assert.AreEqual("#0000FF", score.Tracks[3].Color.RGBA);
+            Assert.AreEqual("#0000FF", score.Tracks[3].Color.Rgba);
         }
 
         protected void CheckChords(Score score)
@@ -529,15 +529,15 @@ namespace AlphaTab.Test.Importer
         {
             if (caller == null)
             {
-                throw new ArgumentNullException("caller", "svg rendering failed because caller info was missing");
+                throw new ArgumentNullException(nameof(caller), "svg rendering failed because caller info was missing");
             }
 #if !PHASE
             var settings = Settings.Defaults;
             settings.Engine = "svg";
             var renderer = new ScoreRenderer(settings);
-            for (int i = 0; i < score.Tracks.Count; i++)
+            for (var i = 0; i < score.Tracks.Count; i++)
             {
-                Track track = score.Tracks[i];
+                var track = score.Tracks[i];
                 // render track
                 Logger.Info("Test", $"Rendering track {i + 1} - {track.Name}");
                 var totalWidth = 0;

@@ -8,27 +8,33 @@ namespace AlphaTab.Model
         /// <summary>
         /// No harmonics. 
         /// </summary>
-        None, 
+        None,
+
         /// <summary>
         /// Natural harmonic
         /// </summary>
-        Natural, 
+        Natural,
+
         /// <summary>
         /// Artificial harmonic
         /// </summary>
-        Artificial, 
+        Artificial,
+
         /// <summary>
         /// Pinch harmonics
         /// </summary>
-        Pinch, 
+        Pinch,
+
         /// <summary>
         /// Tap harmonics
         /// </summary>
-        Tap, 
+        Tap,
+
         /// <summary>
         /// Semi harmonics
         /// </summary>
-        Semi, 
+        Semi,
+
         /// <summary>
         /// Feedback harmonics
         /// </summary>

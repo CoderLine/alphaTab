@@ -1,15 +1,14 @@
 ﻿using AlphaTab.Model;
-using AlphaTab.Platform;
 using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class TextEffectInfo : IEffectBarRendererInfo
+    internal class TextEffectInfo : IEffectBarRendererInfo
     {
-        public string EffectId { get { return "text"; } }
-        public bool HideOnMultiTrack { get { return false; } }
-        public bool CanShareBand { get { return false; } }
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
+        public string EffectId => "text";
+        public bool HideOnMultiTrack => false;
+        public bool CanShareBand => false;
+        public EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.SingleOnBeat;
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
@@ -22,7 +21,7 @@ namespace AlphaTab.Rendering.Effects
             return new TextGlyph(0, 0, beat.Text, renderer.Resources.EffectFont);
         }
 
-        public bool CanExpand(Beat @from, Beat to)
+        public bool CanExpand(Beat from, Beat to)
         {
             return true;
         }

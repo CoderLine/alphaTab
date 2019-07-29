@@ -42,13 +42,14 @@ namespace AlphaTab.Platform.JavaScript
                     a4.Style.Width = "210mm";
                 }
             }
+
             preview.Document.Write("<!DOCTYPE html><html></head><body></body></html>");
             preview.Document.Body.AppendChild(a4);
 
-            int dualScreenLeft = Platform.TypeOf(Browser.Window.Member<int>("ScreenLeft")) != "undefined"
+            var dualScreenLeft = Platform.TypeOf(Browser.Window.Member<int>("ScreenLeft")) != "undefined"
                 ? Browser.Window.Member<int>("ScreenLeft")
                 : (int)Browser.Window.Screen.Left;
-            int dualScreenTop = Platform.TypeOf(Browser.Window.Member<int>("ScreenTop")) != "undefined"
+            var dualScreenTop = Platform.TypeOf(Browser.Window.Member<int>("ScreenTop")) != "undefined"
                 ? Browser.Window.Member<int>("ScreenTop")
                 : (int)Browser.Window.Screen.Top;
             int screenWidth = Platform.TypeOf(Browser.Window.InnerWidth) != "undefined"
@@ -62,10 +63,10 @@ namespace AlphaTab.Platform.JavaScript
                     ? Browser.Document.DocumentElement.ClientHeight
                     : Browser.Window.Screen.Height;
 
-            int w = a4.OffsetWidth + 50;
+            var w = a4.OffsetWidth + 50;
             var h = (int)Browser.Window.InnerHeight;
-            int left = ((screenWidth / 2) - (w / 2)) + dualScreenLeft;
-            int top = ((screenHeight / 2) - (h / 2)) + dualScreenTop;
+            var left = ((screenWidth / 2) - (w / 2)) + dualScreenLeft;
+            var top = ((screenHeight / 2) - (h / 2)) + dualScreenTop;
             preview.ResizeTo(w, h);
             preview.MoveTo(left, top);
 
@@ -95,7 +96,8 @@ namespace AlphaTab.Platform.JavaScript
             {
                 if (Platform.InstanceOf<ArrayBuffer>(data))
                 {
-                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes(Platform.ArrayBufferToByteArray((ArrayBuffer)data), Settings));
+                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes(Platform.ArrayBufferToByteArray((ArrayBuffer)data),
+                        Settings));
                 }
                 else if (Platform.InstanceOf<Uint8Array>(data))
                 {
@@ -103,10 +105,13 @@ namespace AlphaTab.Platform.JavaScript
                 }
                 else if (Platform.TypeOf(data) == "string")
                 {
-                    ScoreLoader.LoadScoreAsync((string)data, s => ScoreLoaded(s), e =>
-                    {
-                        OnError("import", e);
-                    }, Settings);
+                    ScoreLoader.LoadScoreAsync((string)data,
+                        s => ScoreLoaded(s),
+                        e =>
+                        {
+                            OnError("import", e);
+                        },
+                        Settings);
                 }
             }
             catch (Exception e)
@@ -152,15 +157,19 @@ namespace AlphaTab.Platform.JavaScript
             generator.Generate();
 
             var binary = midiFile.ToBinary();
-            Uint8Array uint8Array = Phase.Script.Write<Uint8Array>("binary.toUint8Array()");
+            var uint8Array = Phase.Script.Write<Uint8Array>("binary.toUint8Array()");
             var fileName = string.IsNullOrEmpty(Score.Title) ? "File.mid" : Score.Title + ".mid";
             var dlLink = (AnchorElement)Browser.Document.CreateElement("a");
             dlLink.Download = fileName;
 
-            var blob = new Blob(new[] { uint8Array }, new
-            {
-                type = "audio/midi"
-            });
+            var blob = new Blob(new[]
+                {
+                    uint8Array
+                },
+                new
+                {
+                    type = "audio/midi"
+                });
             var url = URL.CreateObjectURL(blob);
             dlLink.Href = url;
             dlLink.Style.Display = "none";

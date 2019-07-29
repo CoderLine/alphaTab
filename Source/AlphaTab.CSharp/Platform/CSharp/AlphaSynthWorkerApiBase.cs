@@ -6,7 +6,7 @@ using AlphaTab.Util;
 
 namespace AlphaTab.Platform.CSharp
 {
-    abstract class AlphaSynthWorkerApiBase : IAlphaSynth
+    internal abstract class AlphaSynthWorkerApiBase : IAlphaSynth
     {
         private readonly ISynthOutput _output;
         private LogLevel _logLevel;
@@ -56,64 +56,43 @@ namespace AlphaTab.Platform.CSharp
         public float MasterVolume
         {
             get => Player.MasterVolume;
-            set
-            {
-                DispatchOnWorkerThread(() => { Player.MasterVolume = value; });
-            }
+            set => DispatchOnWorkerThread(() => { Player.MasterVolume = value; });
         }
 
         public float MetronomeVolume
         {
             get => Player.MetronomeVolume;
-            set
-            {
-                DispatchOnWorkerThread(() => { Player.MetronomeVolume = value; });
-            }
+            set => DispatchOnWorkerThread(() => { Player.MetronomeVolume = value; });
         }
 
         public double PlaybackSpeed
         {
             get => Player.PlaybackSpeed;
-            set
-            {
-                DispatchOnWorkerThread(() => { Player.PlaybackSpeed = value; });
-            }
+            set => DispatchOnWorkerThread(() => { Player.PlaybackSpeed = value; });
         }
 
         public int TickPosition
         {
             get => Player.TickPosition;
-            set
-            {
-                DispatchOnWorkerThread(() => { Player.TickPosition = value; });
-            }
+            set => DispatchOnWorkerThread(() => { Player.TickPosition = value; });
         }
 
         public double TimePosition
         {
             get => Player.TimePosition;
-            set
-            {
-                DispatchOnWorkerThread(() => { Player.TimePosition = value; });
-            }
+            set => DispatchOnWorkerThread(() => { Player.TimePosition = value; });
         }
 
         public PlaybackRange PlaybackRange
         {
             get => Player.PlaybackRange;
-            set
-            {
-                DispatchOnWorkerThread(() => { Player.PlaybackRange = value; });
-            }
+            set => DispatchOnWorkerThread(() => { Player.PlaybackRange = value; });
         }
 
         public bool IsLooping
         {
             get => Player.IsLooping;
-            set
-            {
-                DispatchOnWorkerThread(() => { Player.IsLooping = value; });
-            }
+            set => DispatchOnWorkerThread(() => { Player.IsLooping = value; });
         }
 
         public void Play()

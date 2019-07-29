@@ -7,7 +7,7 @@ namespace AlphaTab.Rendering
     /// A public class implementing this public interface can provide the 
     /// data needed by a EffectBarRenderer to create effect glyphs dynamically.
     /// </summary>
-    interface IEffectBarRendererInfo
+    internal interface IEffectBarRendererInfo
     {
         /// <summary>
         /// Gets the unique effect name for this effect. (Used for grouping)

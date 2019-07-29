@@ -34,13 +34,13 @@ namespace AlphaTab.Test.Importer
         {
             Load("GuitarPro6/Compressed.gpx", data =>
             {
-                GpxFileSystem fileSystem = new GpxFileSystem();
+                var fileSystem = new GpxFileSystem();
                 fileSystem.Load(ByteBuffer.FromBuffer(data));
 
                 string[] names = { "score.gpif", "misc.xml", "BinaryStylesheet", "PartConfiguration", "LayoutConfiguration" };
                 int[] sizes = { 8488, 130, 12204, 20, 12 };
 
-                for (int i = 0; i < fileSystem.Files.Count; i++)
+                for (var i = 0; i < fileSystem.Files.Count; i++)
                 {
                     var file = fileSystem.Files[i];
                     Logger.Info("Test", $"{file.FileName} - {file.FileSize}");

@@ -7,14 +7,11 @@ using System.Windows.Forms.Layout;
 
 namespace AlphaTab.Platform.CSharp.WinForms
 {
-    class AlphaTabLayoutPanel : Panel
+    internal class AlphaTabLayoutPanel : Panel
     {
         private AlphaTabLayoutEngine _laoyutEngine;
 
-        public override LayoutEngine LayoutEngine
-        {
-            get { return _laoyutEngine ?? (_laoyutEngine = new AlphaTabLayoutEngine()); }
-        }
+        public override LayoutEngine LayoutEngine => _laoyutEngine ?? (_laoyutEngine = new AlphaTabLayoutEngine());
 
         public AlphaTabLayoutPanel()
         {
@@ -22,7 +19,7 @@ namespace AlphaTab.Platform.CSharp.WinForms
             ResizeRedraw = true;
         }
 
-        class AlphaTabLayoutEngine : LayoutEngine
+        private class AlphaTabLayoutEngine : LayoutEngine
         {
             public override bool Layout(object container, LayoutEventArgs layoutEventArgs)
             {

@@ -1,12 +1,11 @@
 ﻿using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class BeatContainerGlyph : Glyph
+    internal class BeatContainerGlyph : Glyph
     {
         public VoiceContainerGlyph VoiceContainer { get; set; }
 
@@ -38,6 +37,7 @@ namespace AlphaTab.Rendering.Glyphs
                     postBeatStretch = tie.Width;
                 }
             }
+
             postBeatStretch += OnNotes.X + (OnNotes.Width - OnNotes.CenterX);
 
             layoutings.AddBeatSpring(Beat, preBeatStretch, postBeatStretch);
@@ -111,6 +111,7 @@ namespace AlphaTab.Rendering.Glyphs
                     tieWidth = tie.Width;
                 }
             }
+
             MinWidth += tieWidth;
 
 
@@ -123,6 +124,7 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 tie.DoLayout();
             }
+
             OnNotes.UpdateBeamingHelper();
             Width = beatWidth;
         }
@@ -138,10 +140,16 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            if (Beat.Voice.IsEmpty) return;
+            if (Beat.Voice.IsEmpty)
+            {
+                return;
+            }
 
             var isEmptyGlyph = PreNotes.IsEmpty && OnNotes.IsEmpty && Ties.Count == 0;
-            if (isEmptyGlyph) return;
+            if (isEmptyGlyph)
+            {
+                return;
+            }
 
             canvas.BeginGroup(GetGroupId(Beat));
 
@@ -200,6 +208,5 @@ namespace AlphaTab.Rendering.Glyphs
 
             canvas.EndGroup();
         }
-
     }
 }

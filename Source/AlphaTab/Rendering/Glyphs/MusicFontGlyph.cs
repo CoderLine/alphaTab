@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class MusicFontGlyph : EffectGlyph
+    internal class MusicFontGlyph : EffectGlyph
     {
         protected readonly float GlyphScale;
         protected readonly MusicFontSymbol Symbol;
@@ -16,7 +16,7 @@ namespace AlphaTab.Rendering.Glyphs
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            canvas.FillMusicFontSymbol(cx + X, cy + Y, GlyphScale*Scale, Symbol);
+            canvas.FillMusicFontSymbol(cx + X, cy + Y, GlyphScale * Scale, Symbol);
         }
     }
 }

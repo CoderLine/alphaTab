@@ -5,7 +5,7 @@ using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class AlternateEndingsGlyph : EffectGlyph
+    internal class AlternateEndingsGlyph : EffectGlyph
     {
         private const float Padding = 3;
 
@@ -35,6 +35,7 @@ namespace AlphaTab.Rendering.Glyphs
                 endingsStrings.Append(_endings[i] + 1);
                 endingsStrings.Append(". ");
             }
+
             _endingsString = endingsStrings.ToString();
         }
 

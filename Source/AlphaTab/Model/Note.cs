@@ -16,12 +16,13 @@ namespace AlphaTab.Model
         /// This is a global counter for all notes. We use it 
         /// at several locations for lookup tables. 
         /// </summary>
-        internal static int GlobalNoteId = 0;
+        internal static int GlobalNoteId;
 
         /// <summary>
         /// Gets or sets the unique id of this note. 
         /// </summary>
         public int Id { get; set; }
+
         /// <summary>
         /// Gets or sets the zero-based index of this note within the beat. 
         /// </summary>
@@ -93,12 +94,13 @@ namespace AlphaTab.Model
         /// <summary>
         /// Gets a value indicating whether the value of this note is defined via octave and tone. 
         /// </summary>
-        public bool IsPiano => !IsStringed && (Octave >= 0 && Tone >= 0);
+        public bool IsPiano => !IsStringed && Octave >= 0 && Tone >= 0;
 
         /// <summary>
         /// Gets or sets the octave on which this note is played. 
         /// </summary>
         public int Octave { get; set; }
+
         /// <summary>
         /// Gets or sets the tone of this note within the octave. 
         /// </summary>
@@ -111,7 +113,7 @@ namespace AlphaTab.Model
         /// <summary>
         /// Gets a value indicating whether this note is a percussion note. 
         /// </summary>
-        public bool IsPercussion => !IsStringed && (Element >= 0 && Variation >= 0);
+        public bool IsPercussion => !IsStringed && Element >= 0 && Variation >= 0;
 
         /// <summary>
         /// Gets or sets the percusson element. 
@@ -134,6 +136,7 @@ namespace AlphaTab.Model
         /// Gets or sets whether this note starts a hammeron or pulloff. 
         /// </summary>
         public bool IsHammerPullOrigin { get; set; }
+
         /// <summary>
         /// Gets a value indicating whether this note ends a hammeron or pulloff. 
         /// </summary>
@@ -153,6 +156,7 @@ namespace AlphaTab.Model
         /// Gets or sets whether this note starts a slur. 
         /// </summary>
         public bool IsSlurOrigin => SlurDestination != null;
+
         /// <summary>
         /// Gets or sets whether this note finishes a slur. 
         /// </summary>
@@ -187,10 +191,12 @@ namespace AlphaTab.Model
         /// Gets or sets whether the note is a ghost note and shown in parenthesis. Also this will make the note a bit more silent. 
         /// </summary>
         public bool IsGhost { get; set; }
+
         /// <summary>
         /// Gets or sets whether this note has a let-ring effect. 
         /// </summary>
         public bool IsLetRing { get; set; }
+
         /// <summary>
         /// Gets or sets the destination note for the let-ring effect.
         /// </summary>
@@ -200,6 +206,7 @@ namespace AlphaTab.Model
         /// Gets or sets whether this note has a palm-mute effect. 
         /// </summary>
         public bool IsPalmMute { get; set; }
+
         /// <summary>
         /// Gets or sets the destination note for the palm-mute effect. 
         /// </summary>
@@ -219,6 +226,7 @@ namespace AlphaTab.Model
         /// Gets or sets the slide type this note is played with. 
         /// </summary>
         public SlideType SlideType { get; set; }
+
         /// <summary>
         /// Gets or sets the target note for several slide types. 
         /// </summary>
@@ -233,10 +241,12 @@ namespace AlphaTab.Model
         /// Gets or sets the origin of the tied if this note is tied. 
         /// </summary>
         public Note TieOrigin { get; set; }
+
         /// <summary>
         /// Gets or sets the desination of the tie. 
         /// </summary>
         public Note TieDestination { get; set; }
+
         /// <summary>
         /// Gets or sets whether this note is ends a tied note. 
         /// </summary>
@@ -251,6 +261,7 @@ namespace AlphaTab.Model
         /// Gets or sets the fingers used for this note on the left hand.
         /// </summary>
         public Fingers LeftHandFinger { get; set; }
+
         /// <summary>
         /// Gets or sets the fingers used for this note on the right hand.
         /// </summary>
@@ -265,14 +276,17 @@ namespace AlphaTab.Model
         /// Gets or sets the target note value for the trill effect. 
         /// </summary>
         public int TrillValue { get; set; }
+
         /// <summary>
         /// Gets the fret for the trill. 
         /// </summary>
         public int TrillFret => TrillValue - StringTuning;
+
         /// <summary>
         /// Gets a value indicating whether this note has a trill effect. 
         /// </summary>
         public bool IsTrill => TrillValue >= 0;
+
         /// <summary>
         /// Gets or sets the speed of the trill effect. 
         /// </summary>
@@ -313,7 +327,10 @@ namespace AlphaTab.Model
         internal static int GetStringTuning(Staff staff, int noteString)
         {
             if (staff.Tuning.Length > 0)
+            {
                 return staff.Tuning[staff.Tuning.Length - (noteString - 1) - 1];
+            }
+
             return 0;
         }
 
@@ -328,17 +345,17 @@ namespace AlphaTab.Model
                 {
                     return PercussionMapper.MidiFromElementVariation(this);
                 }
+
                 if (IsStringed)
                 {
                     if (HarmonicType == HarmonicType.Natural)
                     {
                         return HarmonicPitch + StringTuning - Beat.Voice.Bar.Staff.TranspositionPitch;
                     }
-                    else
-                    {
-                        return Fret + StringTuning - Beat.Voice.Bar.Staff.TranspositionPitch + HarmonicPitch;
-                    }
+
+                    return Fret + StringTuning - Beat.Voice.Bar.Staff.TranspositionPitch + HarmonicPitch;
                 }
+
                 if (IsPiano)
                 {
                     return Octave * 12 + Tone - Beat.Voice.Bar.Staff.TranspositionPitch;
@@ -355,7 +372,10 @@ namespace AlphaTab.Model
         {
             get
             {
-                if (HarmonicType == HarmonicType.None || !IsStringed) return 0;
+                if (HarmonicType == HarmonicType.None || !IsStringed)
+                {
+                    return 0;
+                }
 
                 var value = HarmonicValue;
 
@@ -364,92 +384,113 @@ namespace AlphaTab.Model
                 {
                     return 36;
                 }
-                else if (value.IsAlmostEqualTo(2.7f))
+
+                if (value.IsAlmostEqualTo(2.7f))
                 {
                     // Fret 3 2nd octave + minor seventh
                     return 34;
                 }
-                else if (value < 3)
+
+                if (value < 3)
                 {
                     // no natural harmonics below fret 3
                     return 0;
                 }
-                else if (value <= 3.5 /*3.2*/)
+
+                if (value <= 3.5 /*3.2*/)
                 {
                     // Fret 3 2nd octave + fifth
                     return 31;
                 }
-                else if (value <= 4)
+
+                if (value <= 4)
                 {
                     return 28;
                 }
-                else if (value <= 5)
+
+                if (value <= 5)
                 {
                     return 24;
                 }
-                else if (value <= 6 /* 5.8 */)
+
+                if (value <= 6 /* 5.8 */)
                 {
                     return 34;
                 }
-                else if (value <= 7)
+
+                if (value <= 7)
                 {
                     return 19;
                 }
-                else if (value <= 8.5 /*8.2*/)
+
+                if (value <= 8.5 /*8.2*/)
                 {
                     return 36;
                 }
-                else if (value <= 9)
+
+                if (value <= 9)
                 {
                     return 28;
                 }
-                else if (value <= 10 /*9.6*/)
+
+                if (value <= 10 /*9.6*/)
                 {
                     return 34;
                 }
-                else if (value <= 11)
+
+                if (value <= 11)
                 {
                     return 0;
                 }
-                else if (value <= 12)
+
+                if (value <= 12)
                 {
                     return 12;
                 }
-                else if (value < 14)
+
+                if (value < 14)
                 {
                     // fret 13,14 stay
                     return 0;
                 }
-                else if (value <= 15 /*14.7*/)
+
+                if (value <= 15 /*14.7*/)
                 {
                     return 34;
                 }
-                else if (value <= 16)
+
+                if (value <= 16)
                 {
                     return 28;
                 }
-                else if (value <= 17)
+
+                if (value <= 17)
                 {
                     return 36;
                 }
-                else if (value <= 18)
+
+                if (value <= 18)
                 {
                     return 0;
                 }
-                else if (value <= 19)
+
+                if (value <= 19)
                 {
                     return 19;
                 }
-                else if (value <= 21)
+
+                if (value <= 21)
                 {
                     //  20,21 stay
                     return 0;
                 }
-                else if (value <= 22 /* 21.7 */)
+
+                if (value <= 22 /* 21.7 */)
                 {
                     return 36;
                 }
-                else if (value <= 24)
+
+                if (value <= 24)
                 {
                     return 24;
                 }
@@ -486,7 +527,8 @@ namespace AlphaTab.Model
                 }
                 else if (Beat.IsContinuedWhammy)
                 {
-                    noteValue += Beat.PreviousBeat.WhammyBarPoints[Beat.PreviousBeat.WhammyBarPoints.Count - 1].Value / 2;
+                    noteValue += Beat.PreviousBeat.WhammyBarPoints[Beat.PreviousBeat.WhammyBarPoints.Count - 1].Value /
+                                 2;
                 }
 
 
@@ -557,20 +599,25 @@ namespace AlphaTab.Model
             {
                 if (HasBend)
                 {
-                    return (BendPoints[0].Value % 2) != 0;
+                    return BendPoints[0].Value % 2 != 0;
                 }
+
                 if (BendOrigin != null)
                 {
-                    return (BendOrigin.BendPoints[BendOrigin.BendPoints.Count - 1].Value % 2) != 0;
+                    return BendOrigin.BendPoints[BendOrigin.BendPoints.Count - 1].Value % 2 != 0;
                 }
+
                 if (Beat.HasWhammyBar)
                 {
-                    return (Beat.WhammyBarPoints[0].Value % 2) != 0;
+                    return Beat.WhammyBarPoints[0].Value % 2 != 0;
                 }
+
                 if (Beat.IsContinuedWhammy)
                 {
-                    return (Beat.PreviousBeat.WhammyBarPoints[Beat.PreviousBeat.WhammyBarPoints.Count - 1].Value % 2) != 0;
+                    return Beat.PreviousBeat.WhammyBarPoints[Beat.PreviousBeat.WhammyBarPoints.Count - 1].Value % 2 !=
+                           0;
                 }
+
                 return false;
             }
         }
@@ -656,6 +703,7 @@ namespace AlphaTab.Model
             {
                 n.AddBendPoint(BendPoints[i].Clone());
             }
+
             n.Id = id;
             return n;
         }
@@ -773,6 +821,7 @@ namespace AlphaTab.Model
                     {
                         SlideType = SlideType.None;
                     }
+
                     break;
             }
 
@@ -926,21 +975,21 @@ namespace AlphaTab.Model
         }
 
         private const int MaxOffsetForSameLineSearch = 3;
+
         internal static Note NextNoteOnSameLine(Note note)
         {
             var nextBeat = note.Beat.NextBeat;
             // keep searching in same bar
-            while (nextBeat != null && nextBeat.Voice.Bar.Index <= note.Beat.Voice.Bar.Index + MaxOffsetForSameLineSearch)
+            while (nextBeat != null &&
+                   nextBeat.Voice.Bar.Index <= note.Beat.Voice.Bar.Index + MaxOffsetForSameLineSearch)
             {
                 var noteOnString = nextBeat.GetNoteOnString(note.String);
                 if (noteOnString != null)
                 {
                     return noteOnString;
                 }
-                else
-                {
-                    nextBeat = nextBeat.NextBeat;
-                }
+
+                nextBeat = nextBeat.NextBeat;
             }
 
             return null;
@@ -951,7 +1000,8 @@ namespace AlphaTab.Model
             var previousBeat = note.Beat.PreviousBeat;
 
             // keep searching in same bar
-            while (previousBeat != null && previousBeat.Voice.Bar.Index >= note.Beat.Voice.Bar.Index - MaxOffsetForSameLineSearch)
+            while (previousBeat != null &&
+                   previousBeat.Voice.Bar.Index >= note.Beat.Voice.Bar.Index - MaxOffsetForSameLineSearch)
             {
                 if (note.IsStringed)
                 {

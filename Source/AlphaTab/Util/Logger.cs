@@ -1,6 +1,6 @@
 ﻿namespace AlphaTab.Util
 {
-    class Logger
+    internal class Logger
     {
         public static LogLevel LogLevel { get; set; }
 
@@ -31,7 +31,11 @@
 
         public static void Log(LogLevel logLevel, string category, string msg, object details = null)
         {
-            if (logLevel < LogLevel || LogLevel == LogLevel.None) return;
+            if (logLevel < LogLevel || LogLevel == LogLevel.None)
+            {
+                return;
+            }
+
             Platform.Platform.Log(logLevel, category, msg, details);
         }
     }
@@ -45,18 +49,22 @@
         /// No logging
         /// </summary>
         None = 0,
+
         /// <summary>
         /// Debug level (internal details are displayed).
         /// </summary>
         Debug = 1,
+
         /// <summary>
         /// Info level (only important details are shown)
         /// </summary>
         Info = 2,
+
         /// <summary>
         /// Warning level
         /// </summary>
         Warning = 3,
+
         /// <summary>
         /// Error level.
         /// </summary>

@@ -11,19 +11,22 @@ namespace AlphaTab.Rendering
         /// Gets or sets the font to use for displaying the songs copyright information in the header of the music sheet. 
         /// </summary>
         public Font CopyrightFont { get; set; }
+
         /// <summary>
         /// Gets or sets the font to use for displaying the songs title in the header of the music sheet. 
         /// </summary>
         public Font TitleFont { get; set; }
+
         /// <summary>
         /// Gets or sets the font to use for displaying the songs subtitle in the header of the music sheet. 
         /// </summary>
         public Font SubTitleFont { get; set; }
+
         /// <summary>
         /// Gets or sets the font to use for displaying the lyrics information in the header of the music sheet. 
         /// </summary>
         public Font WordsFont { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the font to use for displaying certain effect related elements in the music sheet. 
         /// </summary>
@@ -38,6 +41,7 @@ namespace AlphaTab.Rendering
         /// Gets or sets the font to use for displaying the guitar tablature numbers in the music sheet. 
         /// </summary>
         public Font TablatureFont { get; set; }
+
         /// <summary>
         /// Gets or sets the font to use for grace notation related texts in the music sheet.
         /// </summary>
@@ -47,6 +51,7 @@ namespace AlphaTab.Rendering
         /// Gets or sets the color to use for rendering the lines of staves. 
         /// </summary>
         public Color StaffLineColor { get; set; }
+
         /// <summary>
         /// Gets or sets the color to use for rendering bar separators, the accolade and repeat signs. 
         /// </summary>
@@ -56,6 +61,7 @@ namespace AlphaTab.Rendering
         /// Gets or sets the font to use for displaying the bar numbers above the music sheet. 
         /// </summary>
         public Font BarNumberFont { get; set; }
+
         /// <summary>
         /// Gets or sets the color to use for displaying the bar numbers above the music sheet. 
         /// </summary>
@@ -75,10 +81,12 @@ namespace AlphaTab.Rendering
         /// Gets or sets the color to use for music notation elements of the primary voice. 
         /// </summary>
         public Color MainGlyphColor { get; set; }
+
         /// <summary>
         /// Gets or sets the color to use for music notation elements of the secondary voices. 
         /// </summary>
         public Color SecondaryGlyphColor { get; set; }
+
         /// <summary>
         /// Gets or sets the color to use for displaying the song information above the music sheet. 
         /// </summary>

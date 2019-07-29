@@ -2,7 +2,6 @@
 using AlphaTab.Audio;
 using AlphaTab.Collections;
 using AlphaTab.Model;
-using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Staves
 {
@@ -11,7 +10,7 @@ namespace AlphaTab.Rendering.Staves
     /// It is used by the layout engine to collect the sizes of score parts
     /// to align the parts across multiple staves.
     /// </summary>
-    class BarLayoutingInfo
+    internal class BarLayoutingInfo
     {
         private const int MinDuration = 30;
         private const int MinDurationWidth = 10;
@@ -27,6 +26,7 @@ namespace AlphaTab.Rendering.Staves
         /// an internal version number that increments whenever a change was made. 
         /// </summary>
         public int Version { get; set; }
+
         public FastDictionary<int, float> PreBeatSizes { get; set; }
         public FastDictionary<int, float> OnBeatSizes { get; set; }
         public FastDictionary<int, float> OnBeatCenterX { get; set; }
@@ -74,6 +74,7 @@ namespace AlphaTab.Rendering.Staves
             {
                 return PreBeatSizes[beat.Index];
             }
+
             return 0;
         }
 
@@ -92,6 +93,7 @@ namespace AlphaTab.Rendering.Staves
             {
                 return OnBeatSizes[beat.Index];
             }
+
             return 0;
         }
 
@@ -102,6 +104,7 @@ namespace AlphaTab.Rendering.Staves
             {
                 return OnBeatCenterX[beat.Index];
             }
+
             return 0;
         }
 
@@ -139,7 +142,7 @@ namespace AlphaTab.Rendering.Staves
                 // Gourlay defines that we need the smallest note duration that either starts **or continues** on the current spring. 
                 if (_timeSortedSprings.Count > 0)
                 {
-                    int smallestDuration = duration;
+                    var smallestDuration = duration;
                     var previousSpring = _timeSortedSprings[_timeSortedSprings.Count - 1];
                     foreach (var prevDuration in previousSpring.AllDurations)
                     {
@@ -150,6 +153,7 @@ namespace AlphaTab.Rendering.Staves
                         }
                     }
                 }
+
                 spring.LongestDuration = duration;
                 spring.PostSpringWidth = postSpringSize;
                 spring.PreSpringWidth = preSpringSize;
@@ -161,6 +165,7 @@ namespace AlphaTab.Rendering.Staves
                 {
                     insertPos--;
                 }
+
                 _timeSortedSprings.InsertAt(insertPos + 1, spring);
             }
             else
@@ -170,18 +175,22 @@ namespace AlphaTab.Rendering.Staves
                 {
                     spring.PostSpringWidth = postSpringSize;
                 }
+
                 if (spring.PreSpringWidth < preSpringSize)
                 {
                     spring.PreSpringWidth = preSpringSize;
                 }
+
                 if (duration < spring.SmallestDuration)
                 {
                     spring.SmallestDuration = duration;
                 }
+
                 if (duration > spring.LongestDuration)
                 {
                     spring.LongestDuration = duration;
                 }
+
                 spring.AllDurations.Add(duration);
             }
 
@@ -220,7 +229,7 @@ namespace AlphaTab.Rendering.Staves
 
             var totalSpringConstant = 0f;
             var sortedSprings = _timeSortedSprings;
-            for (int i = 0; i < sortedSprings.Count; i++)
+            for (var i = 0; i < sortedSprings.Count; i++)
             {
                 var currentSpring = sortedSprings[i];
                 int duration;
@@ -233,13 +242,15 @@ namespace AlphaTab.Rendering.Staves
                     var nextSpring = sortedSprings[i + 1];
                     duration = Math.Abs(nextSpring.TimePosition - currentSpring.TimePosition);
                 }
+
                 currentSpring.SpringConstant = CalculateSpringConstant(currentSpring, duration);
                 totalSpringConstant += 1 / currentSpring.SpringConstant;
             }
+
             TotalSpringConstant = 1 / totalSpringConstant;
 
             // calculate the force required to have at least the minimum size. 
-            for (int i = 0; i < sortedSprings.Count; i++)
+            for (var i = 0; i < sortedSprings.Count; i++)
             {
                 var force = sortedSprings[i].SpringWidth * sortedSprings[i].SpringConstant;
                 UpdateMinStretchForce(force);
@@ -257,9 +268,10 @@ namespace AlphaTab.Rendering.Staves
             {
                 spring.SmallestDuration = duration;
             }
+
             float minDuration = spring.SmallestDuration;
             var phi = 1 + 0.6f * Platform.Platform.Log2(duration / (float)MinDuration);
-            return (minDuration / duration) * (1 / (phi * MinDurationWidth));
+            return minDuration / duration * (1 / (phi * MinDurationWidth));
         }
 
         public float SpaceToForce(float space)
@@ -283,6 +295,7 @@ namespace AlphaTab.Rendering.Staves
             {
                 return _onTimePositions;
             }
+
             _onTimePositionsForce = force;
 
             var positions = _onTimePositions = new FastDictionary<int, float>();
@@ -294,7 +307,7 @@ namespace AlphaTab.Rendering.Staves
             }
 
             var springX = sortedSprings[0].PreSpringWidth;
-            for (int i = 0; i < sortedSprings.Count; i++)
+            for (var i = 0; i < sortedSprings.Count; i++)
             {
                 positions[sortedSprings[i].TimePosition] = springX;
                 springX += CalculateWidth(force, sortedSprings[i].SpringConstant);
@@ -304,7 +317,7 @@ namespace AlphaTab.Rendering.Staves
         }
     }
 
-    class Spring
+    internal class Spring
     {
         public int TimePosition { get; set; }
 

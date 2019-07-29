@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TabBeatGlyph : BeatOnNoteGlyphBase
+    internal class TabBeatGlyph : BeatOnNoteGlyphBase
     {
         public TabNoteChordGlyph NoteNumbers { get; set; }
         public TabRestGlyph RestGlyph { get; set; }
@@ -25,6 +25,7 @@ namespace AlphaTab.Rendering.Glyphs
                         CreateNoteGlyph(note);
                     }
                 }
+
                 AddGlyph(NoteNumbers);
 
                 //
@@ -42,7 +43,7 @@ namespace AlphaTab.Rendering.Glyphs
                 // Tremolo Picking
                 if (Container.Beat.IsTremolo && !NoteNumbers.BeatEffects.ContainsKey("Tremolo"))
                 {
-                    int offset = 0;
+                    var offset = 0;
                     var speed = Container.Beat.TremoloSpeed.Value;
                     switch (speed)
                     {
@@ -57,7 +58,8 @@ namespace AlphaTab.Rendering.Glyphs
                             break;
                     }
 
-                    NoteNumbers.BeatEffects["Tremolo"] = new TremoloPickingGlyph(5 * Scale, offset * Scale,
+                    NoteNumbers.BeatEffects["Tremolo"] = new TremoloPickingGlyph(5 * Scale,
+                        offset * Scale,
                         Container.Beat.TremoloSpeed.Value);
                 }
 
@@ -69,7 +71,9 @@ namespace AlphaTab.Rendering.Glyphs
                     AddGlyph(new SpacingGlyph(0, 0, 5 * Scale));
                     for (var i = 0; i < Container.Beat.Dots; i++)
                     {
-                        AddGlyph(new CircleGlyph(0, tabRenderer.LineOffset * tabRenderer.Bar.Staff.Tuning.Length + tabRenderer.RhythmHeight, 1.5f * Scale));
+                        AddGlyph(new CircleGlyph(0,
+                            tabRenderer.LineOffset * tabRenderer.Bar.Staff.Tuning.Length + tabRenderer.RhythmHeight,
+                            1.5f * Scale));
                     }
                 }
             }
@@ -138,7 +142,11 @@ namespace AlphaTab.Rendering.Glyphs
             }
 
             // left to right layout
-            if (Glyphs == null) return;
+            if (Glyphs == null)
+            {
+                return;
+            }
+
             var w = 0f;
             for (int i = 0, j = Glyphs.Count; i < j; i++)
             {
@@ -148,6 +156,7 @@ namespace AlphaTab.Rendering.Glyphs
                 g.DoLayout();
                 w += g.Width;
             }
+
             Width = w;
 
             if (Container.Beat.IsEmpty)

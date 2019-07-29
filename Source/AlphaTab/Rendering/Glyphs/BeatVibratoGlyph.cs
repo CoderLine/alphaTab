@@ -4,7 +4,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class BeatVibratoGlyph : GroupedEffectGlyph
+    internal class BeatVibratoGlyph : GroupedEffectGlyph
     {
         private readonly VibratoType _type;
         private float _stepSize;
@@ -40,7 +40,7 @@ namespace AlphaTab.Rendering.Glyphs
 
             canvas.BeginPath();
             canvas.MoveTo(startX, cy + Y);
-            for (int i = 0; i < loops; i++)
+            for (var i = 0; i < loops; i++)
             {
                 canvas.LineTo(startX + _stepSize / 2, cy + Y + Height);
                 canvas.LineTo(startX + _stepSize, cy + Y);

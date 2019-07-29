@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Audio.Generator
 {
-    class MidiPlaybackController
+    internal class MidiPlaybackController
     {
         private readonly Score _score;
 
@@ -30,10 +30,11 @@ namespace AlphaTab.Audio.Generator
         {
             var masterBar = _score.MasterBars[Index];
             var masterBarAlternateEndings = masterBar.AlternateEndings;
-            
+
             // if the repeat group wasn't closed we reset the repeating 
             // on the last group opening
-            if (!masterBar.RepeatGroup.IsClosed && masterBar.RepeatGroup.Openings[masterBar.RepeatGroup.Openings.Count - 1] == masterBar)
+            if (!masterBar.RepeatGroup.IsClosed &&
+                masterBar.RepeatGroup.Openings[masterBar.RepeatGroup.Openings.Count - 1] == masterBar)
             {
                 _repeatNumber = 0;
                 _repeatOpen = false;
@@ -75,7 +76,7 @@ namespace AlphaTab.Audio.Generator
             var masterBarRepeatCount = masterBar.RepeatCount - 1;
 
             // if we encounter a repeat end 
-            if (_repeatOpen && (masterBarRepeatCount > 0))
+            if (_repeatOpen && masterBarRepeatCount > 0)
             {
                 // more repeats required?
                 if (_repeatNumber < masterBarRepeatCount)

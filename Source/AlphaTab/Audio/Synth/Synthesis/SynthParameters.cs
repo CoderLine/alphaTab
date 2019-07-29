@@ -7,76 +7,91 @@ namespace AlphaTab.Audio.Synth.Synthesis
     /// <summary>
     /// Parameters for a single synth channel including its program, bank, and cc list.
     /// </summary>
-    class SynthParameters
+    internal class SynthParameters
     {
         /// <summary>
         /// program number
         /// </summary>
         public byte Program { get; set; }
+
         /// <summary>
         /// bank number
         /// </summary>
         public byte BankSelect { get; set; }
+
         /// <summary>
         /// channel pressure event
         /// </summary>
         public byte ChannelAfterTouch { get; set; }
+
         /// <summary>
         /// (vol) pan positions controlling both right and left output levels
         /// </summary>
         public CCValue Pan { get; set; }
+
         /// <summary>
         /// (vol) channel volume controller
         /// </summary>
         public CCValue Volume { get; set; }
+
         /// <summary>
         /// (vol) expression controller
         /// </summary>
         public CCValue Expression { get; set; }
+
         /// <summary>
         /// (pitch) mod wheel pitch modifier in partial cents ie. 22.3
         /// </summary>
         public CCValue ModRange { get; set; }
+
         /// <summary>
         /// (pitch) pitch bend including both semitones and cents
         /// </summary>
         public CCValue PitchBend { get; set; }
+
         /// <summary>
         /// controls max and min pitch bend range semitones
         /// </summary>
         public byte PitchBendRangeCoarse { get; set; }
+
         /// <summary>
         /// controls max and min pitch bend range cents
         /// </summary>
         public byte PitchBendRangeFine { get; set; }
+
         /// <summary>
         /// (pitch) transposition in semitones
         /// </summary>
         public short MasterCoarseTune { get; set; }
+
         /// <summary>
         /// (pitch) transposition in cents
         /// </summary>
         public CCValue MasterFineTune { get; set; }
+
         /// <summary>
         /// hold pedal status (true) for active
         /// </summary>
         public bool HoldPedal { get; set; }
+
         /// <summary>
         /// legato pedal status (true) for active
         /// </summary>
         public bool LegatoPedal { get; set; }
+
         /// <summary>
         /// registered parameter number
         /// </summary>
         public CCValue Rpn { get; set; }
+
         public Synthesizer Synth { get; set; }
 
 
         //These are updated whenever a midi event that affects them is recieved. 
 
         public float CurrentVolume { get; set; }
-        public int CurrentPitch { get; set; }    //in cents
-        public int CurrentMod { get; set; }      //in cents
+        public int CurrentPitch { get; set; } //in cents
+        public int CurrentMod { get; set; } //in cents
         public PanComponent CurrentPan { get; set; }
         public float MixVolume { get; set; }
 
@@ -98,6 +113,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
 
             ResetControllers();
         }
+
         /// <summary>
         /// Resets all of the channel's controllers to initial first power on values. Not the same as CC-121.
         /// </summary>
@@ -107,7 +123,8 @@ namespace AlphaTab.Audio.Synth.Synthesis
             BankSelect = 0;
             ChannelAfterTouch = 0; //Reset Channel Pressure to 0
             Pan.Combined = 0x2000;
-            Volume.Fine = 0; Volume.Coarse = 100; //Reset Vol Positions back to 90/127 (GM spec)
+            Volume.Fine = 0;
+            Volume.Coarse = 100; //Reset Vol Positions back to 90/127 (GM spec)
             Expression.Combined = 0x3FFF; //Reset Expression positions back to 127/127
             ModRange.Combined = 0;
             PitchBend.Combined = 0x2000;
@@ -125,7 +142,8 @@ namespace AlphaTab.Audio.Synth.Synthesis
 
         public void UpdateCurrentPitch()
         {
-            CurrentPitch = (int)(((PitchBend.Combined - 8192.0) / 8192.0) * ((100 * PitchBendRangeCoarse) + PitchBendRangeFine));
+            CurrentPitch = (int)((PitchBend.Combined - 8192.0) / 8192.0 *
+                                 (100 * PitchBendRangeCoarse + PitchBendRangeFine));
         }
 
         public void UpdateCurrentMod()
@@ -135,7 +153,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
 
         public void UpdateCurrentPan()
         {
-            double value = SynthConstants.HalfPi * (Pan.Combined / 16383.0);
+            var value = SynthConstants.HalfPi * (Pan.Combined / 16383.0);
             CurrentPan.Left = (float)Math.Cos(value);
             CurrentPan.Right = (float)Math.Sin(value);
         }

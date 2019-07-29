@@ -1,6 +1,6 @@
 ﻿namespace AlphaTab.Rendering.Glyphs
 {
-    class NumberGlyph : GlyphGroup
+    internal class NumberGlyph : GlyphGroup
     {
         private readonly int _number;
         private readonly float _scale;
@@ -22,6 +22,7 @@
                 AddGlyph(gl);
                 i = i / 10;
             }
+
             Glyphs.Reverse();
 
             var cx = 0f;
@@ -34,6 +35,7 @@
                 g.DoLayout();
                 cx += g.Width;
             }
+
             Width = cx;
         }
     }

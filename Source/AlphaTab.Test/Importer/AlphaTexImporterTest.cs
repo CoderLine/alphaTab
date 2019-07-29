@@ -293,7 +293,7 @@ namespace AlphaTab.Test.Importer
 
             var textTags = tab.GetElementsByTagName("text", true);
             var texts = new string[textTags.Length];
-            for (int i = 0; i < textTags.Length; i++)
+            for (var i = 0; i < textTags.Length; i++)
             {
                 texts[i] = textTags[i].InnerText.Trim();
             }
@@ -890,7 +890,7 @@ namespace AlphaTab.Test.Importer
             };
 
             var i = 0;
-            Beat b = score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0];
+            var b = score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0];
             while (b != null)
             {
                 Assert.AreEqual(durations[i], b.Duration, "Duration on beat " + i + " was wrong");

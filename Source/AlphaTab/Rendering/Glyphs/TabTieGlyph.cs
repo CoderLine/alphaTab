@@ -3,7 +3,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TabTieGlyph : TieGlyph
+    internal class TabTieGlyph : TieGlyph
     {
         protected Note StartNote;
         protected Note EndNote;
@@ -17,10 +17,7 @@ namespace AlphaTab.Rendering.Glyphs
             ForSlide = forSlide;
         }
 
-        private float Offset
-        {
-            get { return ForSlide ? 5 * Scale : 0; }
-        }
+        private float Offset => ForSlide ? 5 * Scale : 0;
 
         protected override BeamDirection GetBeamDirection(Beat beat, BarRendererBase noteRenderer)
         {

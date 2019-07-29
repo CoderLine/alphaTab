@@ -4,7 +4,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TabRestGlyph : MusicFontGlyph
+    internal class TabRestGlyph : MusicFontGlyph
     {
         private readonly bool _isVisibleRest;
         private readonly Duration _duration;

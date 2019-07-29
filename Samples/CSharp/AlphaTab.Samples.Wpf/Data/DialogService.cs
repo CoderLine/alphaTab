@@ -12,7 +12,7 @@ namespace AlphaTab.Samples.Wpf.Data
     {
         public string OpenFile()
         {
-            OpenFileDialog dialog = new OpenFileDialog
+            var dialog = new OpenFileDialog
             {
                 Filter = "Supported Files (*.gp3, *.gp4, *.gp5, *.gpx, *.gp)|*.gp3;*.gp4;*.gp5;*.gpx;*.gp"
             };
@@ -25,8 +25,8 @@ namespace AlphaTab.Samples.Wpf.Data
 
         public void ShowScoreInfo(Score score)
         {
-            ScoreInfoViewModel viewModel = new ScoreInfoViewModel(score);
-            ScoreInfoWindow window = new ScoreInfoWindow();
+            var viewModel = new ScoreInfoViewModel(score);
+            var window = new ScoreInfoWindow();
             window.DataContext = viewModel;
             window.ShowDialog();
         }

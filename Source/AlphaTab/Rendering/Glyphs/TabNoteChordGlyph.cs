@@ -6,7 +6,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TabNoteChordGlyph : Glyph
+    internal class TabNoteChordGlyph : Glyph
     {
         private readonly FastList<NoteNumberGlyph> _notes;
         private readonly bool _isGrace;
@@ -37,8 +37,10 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     pos += n.Width;
                 }
+
                 return pos;
             }
+
             return 0;
         }
 
@@ -48,6 +50,7 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 return Y + NotesPerString[note.String].Y + (aboveNote ? -NotesPerString[note.String].Height / 2 : 0);
             }
+
             return 0;
         }
 
@@ -94,7 +97,10 @@ namespace AlphaTab.Rendering.Glyphs
         {
             _notes.Add(noteGlyph);
             NotesPerString[note.String] = noteGlyph;
-            if (MinStringNote == null || note.String < MinStringNote.String) MinStringNote = note;
+            if (MinStringNote == null || note.String < MinStringNote.String)
+            {
+                MinStringNote = note;
+            }
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
@@ -114,6 +120,7 @@ namespace AlphaTab.Rendering.Glyphs
                 g.Width = w;
                 g.Paint(cx, cy, canvas);
             }
+
             canvas.TextBaseline = oldBaseLine;
 
             foreach (var beatEffectKey in BeatEffects)

@@ -10,6 +10,7 @@ namespace AlphaTab.Model
         /// Gets or sets the marker ID for this section. 
         /// </summary>
         public string Marker { get; set; }
+
         /// <summary>
         /// Gets or sets the descriptional text of this section.
         /// </summary>

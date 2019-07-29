@@ -3,7 +3,7 @@ using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Importer
 {
-    static class GpBinaryHelpers
+    internal static class GpBinaryHelpers
     {
         public static double GpReadDouble(this IReadable data)
         {
@@ -24,18 +24,19 @@ namespace AlphaTab.Importer
 
         public static Color GpReadColor(this IReadable data, bool readAlpha = false)
         {
-            byte r = (byte)data.ReadByte();
-            byte g = (byte)data.ReadByte();
-            byte b = (byte)data.ReadByte();
+            var r = (byte)data.ReadByte();
+            var g = (byte)data.ReadByte();
+            var b = (byte)data.ReadByte();
             byte a = 255;
             if (readAlpha)
             {
-                a = (byte) data.ReadByte();
+                a = (byte)data.ReadByte();
             }
             else
             {
                 data.Skip(1);
             }
+
             return new Color(r, g, b, a);
         }
 
@@ -78,7 +79,7 @@ namespace AlphaTab.Importer
 
         public static string GpReadString(this IReadable data, int length, string encoding)
         {
-            byte[] b = new byte[length];
+            var b = new byte[length];
             data.Read(b, 0, b.Length);
             return Platform.Platform.ToString(b, encoding);
         }
@@ -99,6 +100,7 @@ namespace AlphaTab.Importer
             {
                 data.Skip(length - stringLength);
             }
+
             return s;
         }
     }

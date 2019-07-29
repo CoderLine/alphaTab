@@ -12,15 +12,17 @@ namespace AlphaTab.Model
         /// Gets or sets the list of beats contained in this group.
         /// </summary>
         public FastList<Beat> Beats { get; set; }
+
         /// <summary>
         /// Gets or sets the voice this group belongs to.
         /// </summary>
         public Voice Voice { get; set; }
-        
+
         /// <summary>
         /// Gets the absolute midi tick start when this tuplet group starts.
         /// </summary>
         public int TupletStart { get; set; }
+
         /// <summary>
         /// Gets the absolute midi tick start when this tuplet group ends.
         /// </summary>
@@ -46,6 +48,7 @@ namespace AlphaTab.Model
         }
 
         private static readonly int FullThreshold = Duration.OneHundredTwentyEighth.ToTicks();
+
         internal bool Check(Beat beat)
         {
             if (Beats.Count == 0)
@@ -67,6 +70,7 @@ namespace AlphaTab.Model
                 {
                     beatDuration = MidiUtils.RemoveTuplet(beatDuration, beat.TupletNumerator, beat.TupletDenominator);
                 }
+
                 TupletEnd = TupletStart + beatDuration * beat.TupletDenominator;
             }
             else if (beat.GraceType != GraceType.None)
@@ -75,17 +79,20 @@ namespace AlphaTab.Model
                 return true;
             }
             else if (beat.Voice != Voice || IsFull
-                     || beat.TupletNumerator != Beats[0].TupletNumerator || beat.TupletDenominator != Beats[0].TupletDenominator 
-                     || beat.AbsolutePlaybackStart > TupletEnd)
+                                         || beat.TupletNumerator != Beats[0].TupletNumerator ||
+                                         beat.TupletDenominator != Beats[0].TupletDenominator
+                                         || beat.AbsolutePlaybackStart > TupletEnd)
             {
                 return false;
             }
+
             Beats.Add(beat);
             var beatEnd = beat.AbsolutePlaybackStart + beat.PlaybackDuration;
             if (TupletEnd < beatEnd + FullThreshold)
             {
                 IsFull = true;
             }
+
             return true;
         }
     }

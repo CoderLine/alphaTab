@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Audio.Synth.Bank
 {
-    class AssetManager
+    internal class AssetManager
     {
         public FastList<PatchAsset> PatchAssets { get; }
         public FastList<SampleDataAsset> SampleAssets { get; }
@@ -22,6 +22,7 @@ namespace AlphaTab.Audio.Synth.Bank
                     return patchAsset;
                 }
             }
+
             return null;
         }
 
@@ -34,6 +35,7 @@ namespace AlphaTab.Audio.Synth.Bank
                     return sampleDataAsset;
                 }
             }
+
             return null;
         }
     }

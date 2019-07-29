@@ -25,7 +25,7 @@ namespace AlphaTab.Audio.Generator
         public void AddTimeSignature(int tick, int timeSignatureNumerator, int timeSignatureDenominator)
         {
             var denominatorIndex = 0;
-            while ((timeSignatureDenominator = (timeSignatureDenominator >> 1)) > 0)
+            while ((timeSignatureDenominator = timeSignatureDenominator >> 1) > 0)
             {
                 denominatorIndex++;
             }
@@ -33,14 +33,23 @@ namespace AlphaTab.Audio.Generator
             var message = new MetaDataEvent(tick,
                 0xFF,
                 (byte)MetaEventTypeEnum.TimeSignature,
-                new byte[] { (byte)(timeSignatureNumerator & 0xFF), (byte)(denominatorIndex & 0xFF), 48, 8 });
+                new byte[]
+                {
+                    (byte)(timeSignatureNumerator & 0xFF), (byte)(denominatorIndex & 0xFF), 48, 8
+                });
             _midiFile.AddEvent(message);
         }
 
         /// <inheritdoc />
         public void AddRest(int track, int tick, int channel)
         {
-            var message = new SystemExclusiveEvent(tick, (byte)SystemCommonTypeEnum.SystemExclusive, 0, new byte[] { 0xFF });
+            var message = new SystemExclusiveEvent(tick,
+                (byte)SystemCommonTypeEnum.SystemExclusive,
+                0,
+                new byte[]
+                {
+                    0xFF
+                });
             _midiFile.AddEvent(message);
         }
 
@@ -49,10 +58,16 @@ namespace AlphaTab.Audio.Generator
         {
             var velocity = MidiUtils.DynamicToVelocity(dynamicValue);
 
-            var noteOn = new MidiEvent(start, MakeCommand((byte)MidiEventType.NoteOn, channel), FixValue(key), FixValue((byte)velocity));
+            var noteOn = new MidiEvent(start,
+                MakeCommand((byte)MidiEventType.NoteOn, channel),
+                FixValue(key),
+                FixValue((byte)velocity));
             _midiFile.AddEvent(noteOn);
 
-            var noteOff = new MidiEvent(start + length, MakeCommand((byte)MidiEventType.NoteOff, channel), FixValue(key), FixValue((byte)velocity));
+            var noteOff = new MidiEvent(start + length,
+                MakeCommand((byte)MidiEventType.NoteOff, channel),
+                FixValue(key),
+                FixValue((byte)velocity));
             _midiFile.AddEvent(noteOff);
         }
 
@@ -63,22 +78,36 @@ namespace AlphaTab.Audio.Generator
 
         private static byte FixValue(int value)
         {
-            if (value > 127) return 127;
-            if (value < 0) return 0;
+            if (value > 127)
+            {
+                return 127;
+            }
+
+            if (value < 0)
+            {
+                return 0;
+            }
+
             return (byte)value;
         }
 
         /// <inheritdoc />
         public void AddControlChange(int track, int tick, byte channel, byte controller, byte value)
         {
-            var message = new MidiEvent(tick, MakeCommand((byte)MidiEventType.Controller, channel), FixValue(controller), FixValue(value));
+            var message = new MidiEvent(tick,
+                MakeCommand((byte)MidiEventType.Controller, channel),
+                FixValue(controller),
+                FixValue(value));
             _midiFile.AddEvent(message);
         }
 
         /// <inheritdoc />
         public void AddProgramChange(int track, int tick, byte channel, byte program)
         {
-            var message = new MidiEvent(tick, MakeCommand((byte)MidiEventType.ProgramChange, channel), FixValue(program), 0);
+            var message = new MidiEvent(tick,
+                MakeCommand((byte)MidiEventType.ProgramChange, channel),
+                FixValue(program),
+                0);
             _midiFile.AddEvent(message);
         }
 
@@ -86,7 +115,7 @@ namespace AlphaTab.Audio.Generator
         public void AddTempo(int tick, int tempo)
         {
             // bpm -> microsecond per quarter note
-            var tempoInUsq = (60000000 / tempo);
+            var tempoInUsq = 60000000 / tempo;
 
             var message = new MetaNumberEvent(tick,
                 0xFF,

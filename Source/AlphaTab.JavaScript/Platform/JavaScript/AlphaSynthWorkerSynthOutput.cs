@@ -7,7 +7,7 @@ using AlphaTab.Util;
 
 namespace AlphaTab.Platform.JavaScript
 {
-    class AlphaSynthWorkerSynthOutput : ISynthOutput
+    internal class AlphaSynthWorkerSynthOutput : ISynthOutput
     {
         public const string CmdOutputPrefix = AlphaSynthWebWorker.CmdPrefix + "output.";
 
@@ -30,10 +30,7 @@ namespace AlphaTab.Platform.JavaScript
 
         private DedicatedWorkerGlobalScope _worker;
 
-        public int SampleRate
-        {
-            get { return PreferredSampleRate; }
-        }
+        public int SampleRate => PreferredSampleRate;
 
         public void Open()
         {
@@ -69,27 +66,43 @@ namespace AlphaTab.Platform.JavaScript
 
         public void SequencerFinished()
         {
-            _worker.PostMessage(new { cmd = CmdOutputSequencerFinished });
+            _worker.PostMessage(new
+            {
+                cmd = CmdOutputSequencerFinished
+            });
         }
 
         public void AddSamples(SampleArray samples)
         {
-            _worker.PostMessage(new { cmd = CmdOutputAddSamples, samples = samples });
+            _worker.PostMessage(new
+            {
+                cmd = CmdOutputAddSamples,
+                samples = samples
+            });
         }
 
         public void Play()
         {
-            _worker.PostMessage(new { cmd = CmdOutputPlay });
+            _worker.PostMessage(new
+            {
+                cmd = CmdOutputPlay
+            });
         }
 
         public void Pause()
         {
-            _worker.PostMessage(new { cmd = CmdOutputPause });
+            _worker.PostMessage(new
+            {
+                cmd = CmdOutputPause
+            });
         }
 
         public void ResetSamples()
         {
-            _worker.PostMessage(new { cmd = CmdOutputResetSamples });
+            _worker.PostMessage(new
+            {
+                cmd = CmdOutputResetSamples
+            });
         }
 
         public void Activate()

@@ -8,11 +8,13 @@ namespace AlphaTab.Model
         /// <summary>
         /// No pickstroke used. 
         /// </summary>
-        None, 
+        None,
+
         /// <summary>
         /// Pickstroke up. 
         /// </summary>
-        Up, 
+        Up,
+
         /// <summary>
         /// Pickstroke down
         /// </summary>

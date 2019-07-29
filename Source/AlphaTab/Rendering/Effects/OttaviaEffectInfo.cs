@@ -1,10 +1,9 @@
-﻿using System;
-using AlphaTab.Model;
+﻿using AlphaTab.Model;
 using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class OttaviaEffectInfo : IEffectBarRendererInfo
+    internal class OttaviaEffectInfo : IEffectBarRendererInfo
     {
         private readonly bool _aboveStaff;
         public string EffectId => "ottavia-" + (_aboveStaff ? "above" : "below");
@@ -30,6 +29,7 @@ namespace AlphaTab.Rendering.Effects
                 case Ottavia._15mb:
                     return !_aboveStaff;
             }
+
             return false;
         }
 

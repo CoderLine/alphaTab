@@ -3,13 +3,13 @@ using AlphaTab.Audio.Synth.Util;
 
 namespace AlphaTab.Audio.Synth.Synthesis
 {
-    class VoiceNode
+    internal class VoiceNode
     {
         public Voice Value { get; set; }
         public VoiceNode Next { get; set; }
     }
 
-    class VoiceManager
+    internal class VoiceManager
     {
         private Voice[] _voicePool;
         private LinkedList<VoiceNode> _vNodes;
@@ -28,7 +28,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
             FreeVoices = new LinkedList<Voice>();
             ActiveVoices = new LinkedList<Voice>();
 
-            for (int i = 0; i < voiceCount; i++)
+            for (var i = 0; i < voiceCount; i++)
             {
                 var v = new Voice();
                 _voicePool[i] = v;
@@ -37,7 +37,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
             }
 
             Registry = new VoiceNode[SynthConstants.DefaultChannelCount][];
-            for (int i = 0; i < Registry.Length; i++)
+            for (var i = 0; i < Registry.Length; i++)
             {
                 Registry[i] = new VoiceNode[SynthConstants.DefaultKeyCount];
             }
@@ -71,6 +71,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                 _vNodes.AddLast(node);
                 node = node.Next;
             }
+
             Registry[channel][note] = null;
         }
 
@@ -78,7 +79,10 @@ namespace AlphaTab.Audio.Synth.Synthesis
         {
             var node = Registry[voice.VoiceParams.Channel][voice.VoiceParams.Note];
             if (node == null)
+            {
                 return;
+            }
+
             if (node.Value == voice)
             {
                 Registry[voice.VoiceParams.Channel][voice.VoiceParams.Note] = node.Next;
@@ -96,6 +100,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                         _vNodes.AddLast(node);
                         return;
                     }
+
                     node2 = node;
                     node = node.Next;
                 }
@@ -113,6 +118,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                     _vNodes.AddLast(vnode);
                     vnode = vnode.Next;
                 }
+
                 Registry[node.Value.VoiceParams.Channel][node.Value.VoiceParams.Note] = null;
                 node = node.Next;
             }
@@ -120,7 +126,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
 
         public void UnloadPatches()
         {
-            foreach (Voice v in _voicePool)
+            foreach (var v in _voicePool)
             {
                 v.Configure(0, 0, 0, null, null);
                 var current = _vNodes.First;
@@ -141,17 +147,22 @@ namespace AlphaTab.Audio.Synth.Synthesis
             {
                 if (node.Value.VoiceParams.State != VoiceStateEnum.Playing)
                 {
-                    float volume = node.Value.VoiceParams.CombinedVolume;
+                    var volume = node.Value.VoiceParams.CombinedVolume;
                     if (volume < voiceVolume)
                     {
                         quietest = node;
                         voiceVolume = volume;
                     }
                 }
+
                 node = node.Next;
             }
+
             if (quietest == null)
+            {
                 quietest = ActiveVoices.First;
+            }
+
             //check and remove from registry
             RemoveVoiceFromRegistry(quietest.Value);
             ActiveVoices.Remove(quietest);

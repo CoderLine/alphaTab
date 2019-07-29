@@ -6,7 +6,7 @@ using System.Windows.Media.Imaging;
 
 namespace AlphaTab.Platform.CSharp.Wpf
 {
-    class GdiImageSource 
+    internal class GdiImageSource 
     {
         public static BitmapSource Create(Bitmap image)
         {

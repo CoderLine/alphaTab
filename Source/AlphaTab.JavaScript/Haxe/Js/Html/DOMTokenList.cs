@@ -9,6 +9,7 @@ namespace AlphaTab.Haxe.Js.Html
     {
         [Name("add")]
         public extern void Add(HaxeString token);
+
         [Name("remove")]
         public extern void Remove(HaxeString token);
     }

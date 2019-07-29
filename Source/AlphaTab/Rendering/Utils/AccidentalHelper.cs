@@ -1,42 +1,86 @@
-﻿using System;
-using AlphaTab.Collections;
+﻿using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
 {
     /// <summary>
-    /// This small utilty public class allows the assignment of accidentals within a 
-    /// desired scope. 
+    /// This small utilty public class allows the assignment of accidentals within a
+    /// desired scope.
     /// </summary>
-    class AccidentalHelper
+    internal class AccidentalHelper
     {
         private readonly Bar _bar;
 
         /// <summary>
-        /// a lookup list containing an info whether the notes within an octave 
-        /// need an accidental rendered. the accidental symbol is determined based on the type of key signature. 
+        /// a lookup list containing an info whether the notes within an octave
+        /// need an accidental rendered. the accidental symbol is determined based on the type of key signature.
         /// </summary>
         private static readonly bool[][] KeySignatureLookup =
         {
             // Flats (where the value is true, a flat accidental is required for the notes)
-            new[] { true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true, true},
-            new[] { true,  true,  true,  true,  true,  false, true,  true,  true,  true,  true, true},
-            new[] { false, true,  true,  true,  true,  false, true,  true,  true,  true,  true, true},
-            new[] { false, true,  true,  true,  true,  false, false, false, true,  true,  true, true},
-            new[] { false, false, false, true,  true,  false, false, false, true,  true,  true, true},
-            new[] { false, false, false, true,  true,  false, false, false, false, false, true, true},
-            new[] { false, false, false, false, false, false, false, false, false, false, true, true},
+            new[]
+            {
+                true, true, true, true, true, true, true, true, true, true, true, true
+            },
+            new[]
+            {
+                true, true, true, true, true, false, true, true, true, true, true, true
+            },
+            new[]
+            {
+                false, true, true, true, true, false, true, true, true, true, true, true
+            },
+            new[]
+            {
+                false, true, true, true, true, false, false, false, true, true, true, true
+            },
+            new[]
+            {
+                false, false, false, true, true, false, false, false, true, true, true, true
+            },
+            new[]
+            {
+                false, false, false, true, true, false, false, false, false, false, true, true
+            },
+            new[]
+            {
+                false, false, false, false, false, false, false, false, false, false, true, true
+            },
             // natural
-            new[] { false, false, false, false, false, false, false, false, false, false, false, false },
+            new[]
+            {
+                false, false, false, false, false, false, false, false, false, false, false, false
+            },
             // sharps  (where the value is true, a flat accidental is required for the notes)
-            new[] {false, false, false, false, false, true, true, false, false, false, false, false},
-            new[] {true,  true,  false, false, false, true, true, false, false, false, false, false},
-            new[] {true,  true,  false, false, false, true, true, true,  true,  false, false, false},
-            new[] {true,  true,  true,  true,  false, true, true, true,  true,  false, false, false},
-            new[] {true,  true,  true,  true,  false, true, true, true,  true,  true,  true,  false},
-            new[] {true,  true,  true,  true,  true,  true, true, true,  true,  true,  true,  false},
-            new[] {true,  true,  true,  true,  true,  true, true, true,  true,  true,  true,  true }
-       };
+            new[]
+            {
+                false, false, false, false, false, true, true, false, false, false, false, false
+            },
+            new[]
+            {
+                true, true, false, false, false, true, true, false, false, false, false, false
+            },
+            new[]
+            {
+                true, true, false, false, false, true, true, true, true, false, false, false
+            },
+            new[]
+            {
+                true, true, true, true, false, true, true, true, true, false, false, false
+            },
+            new[]
+            {
+                true, true, true, true, false, true, true, true, true, true, true, false
+            },
+            new[]
+            {
+                true, true, true, true, true, true, true, true, true, true, true, false
+            },
+            new[]
+            {
+                true, true, true, true, true, true, true, true, true, true, true, true
+            }
+        };
 
         /// <summary>
         /// Contains the list of notes within an octave have accidentals set.
@@ -47,28 +91,37 @@ namespace AlphaTab.Rendering.Utils
         };
 
         /// <summary>
-        /// We always have 7 steps per octave. 
-        /// (by a step the offsets inbetween score lines is meant, 
+        /// We always have 7 steps per octave.
+        /// (by a step the offsets inbetween score lines is meant,
         ///      0 steps is on the first line (counting from top)
         ///      1 steps is on the space inbetween the first and the second line
         /// </summary>
         private const int StepsPerOctave = 7;
 
         /// <summary>
-        /// Those are the amount of steps for the different clefs in case of a note value 0    
+        /// Those are the amount of steps for the different clefs in case of a note value 0
         /// [Neutral, C3, C4, F4, G2]
         /// </summary>
-        private static readonly int[] OctaveSteps = { 40, 34, 32, 28, 40 };
+        private static readonly int[] OctaveSteps =
+        {
+            40, 34, 32, 28, 40
+        };
 
         /// <summary>
         /// The step offsets of the notes within an octave in case of for sharp keysignatures
         /// </summary>
-        private static readonly int[] SharpNoteSteps = { 0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6 };
+        private static readonly int[] SharpNoteSteps =
+        {
+            0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6
+        };
 
         /// <summary>
         /// The step offsets of the notes within an octave in case of for flat keysignatures
         /// </summary>
-        private static readonly int[] FlatNoteSteps = { 0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6 };
+        private static readonly int[] FlatNoteSteps =
+        {
+            0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6
+        };
 
         private readonly FastDictionary<int, bool> _registeredAccidentals;
 
@@ -94,7 +147,7 @@ namespace AlphaTab.Rendering.Utils
         }
 
         /// <summary>
-        /// Calculates the accidental for the given note and assignes the value to it. 
+        /// Calculates the accidental for the given note and assignes the value to it.
         /// The new accidental type is also registered within the current scope
         /// </summary>
         /// <param name="note"></param>
@@ -105,23 +158,25 @@ namespace AlphaTab.Rendering.Utils
             var noteValue = staff.IsPercussion
                 ? PercussionMapper.MapNoteForDisplay(note.DisplayValue)
                 : note.DisplayValue;
-            bool quarterBend = note.HasQuarterToneOffset;
+            var quarterBend = note.HasQuarterToneOffset;
             var line = RegisterNoteLine(note, noteValue);
             if (MinNoteValue == -1 || noteValue < MinNoteValue)
             {
                 MinNoteValue = noteValue;
                 MinNoteValueBeat = note.Beat;
             }
+
             if (MaxNoteValue == -1 || noteValue > MaxNoteValue)
             {
                 MaxNoteValue = noteValue;
                 MaxNoteValueBeat = note.Beat;
             }
+
             return GetAccidental(line, noteValue, quarterBend);
         }
 
         /// <summary>
-        /// Calculates the accidental for the given note value and assignes the value to it. 
+        /// Calculates the accidental for the given note value and assignes the value to it.
         /// The new accidental type is also registered within the current scope
         /// </summary>
         /// <param name="relatedBeat"></param>
@@ -135,30 +190,33 @@ namespace AlphaTab.Rendering.Utils
             {
                 noteValue = PercussionMapper.MapNoteForDisplay(noteValue);
             }
+
             var line = RegisterNoteValueLine(noteValue);
             if (MinNoteValue == -1 || noteValue < MinNoteValue)
             {
                 MinNoteValue = noteValue;
                 MinNoteValueBeat = relatedBeat;
             }
+
             if (MaxNoteValue == -1 || noteValue > MaxNoteValue)
             {
                 MaxNoteValue = noteValue;
                 MaxNoteValueBeat = relatedBeat;
             }
+
             return GetAccidental(line, noteValue, quarterBend);
         }
 
         private AccidentalType GetAccidental(int line, int noteValue, bool quarterBend)
-        { 
+        {
             var accidentalToSet = AccidentalType.None;
             if (!_bar.Staff.IsPercussion)
             {
                 var ks = (int)_bar.MasterBar.KeySignature;
-                var ksi = (ks + 7);
-                var index = (noteValue % 12);
+                var ksi = ks + 7;
+                var index = noteValue % 12;
 
-                // the key signature symbol required according to 
+                // the key signature symbol required according to
                 var keySignatureAccidental = ksi < 7 ? AccidentalType.Flat : AccidentalType.Sharp;
 
                 // determine whether the current note requires an accidental according to the key signature
@@ -225,13 +283,13 @@ namespace AlphaTab.Rendering.Utils
             var clef = _bar.Clef;
 
             var index = value % 12;
-            var octave = (value / 12) - 1;
+            var octave = value / 12 - 1;
 
             // Initial Position
             var steps = OctaveSteps[(int)clef];
 
             // Move to Octave
-            steps -= (octave * StepsPerOctave);
+            steps -= octave * StepsPerOctave;
 
             // get the step list for the current keySignature
             var stepList = ModelUtils.KeySignatureIsSharp(ks) || ModelUtils.KeySignatureIsNatural(ks)
@@ -239,7 +297,6 @@ namespace AlphaTab.Rendering.Utils
                 : FlatNoteSteps;
 
             //Add offset for note itself
-            int offset = 0;
             switch (mode)
             {
                 // TODO: provide line according to accidentalMode
@@ -249,11 +306,11 @@ namespace AlphaTab.Rendering.Utils
                 case NoteAccidentalMode.ForceFlat:
                 case NoteAccidentalMode.ForceSharp:
                 default:
-                    // normal behavior: simply use the position where 
-                    // the keysignature defines the position 
-                    offset = stepList[index];
+                    // normal behavior: simply use the position where
+                    // the keysignature defines the position
                     break;
             }
+
             steps -= stepList[index];
 
             return steps;
@@ -276,11 +333,8 @@ namespace AlphaTab.Rendering.Utils
             {
                 return GetNoteLine(_notesByValue[rawValue]);
             }
-            else
-            {
-                return 0;
-            }
+
+            return 0;
         }
     }
-
 }

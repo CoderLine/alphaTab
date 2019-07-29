@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class DiamondNoteHeadGlyph : MusicFontGlyph
+    internal class DiamondNoteHeadGlyph : MusicFontGlyph
     {
         private readonly bool _isGrace;
 

@@ -3,12 +3,11 @@ using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
-using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
 
 namespace AlphaTab.Rendering.Layout
 {
-    class HorizontalScreenLayoutPartialInfo
+    internal class HorizontalScreenLayoutPartialInfo
     {
         public float Width { get; set; }
         public FastList<MasterBar> MasterBars { get; set; }
@@ -22,25 +21,27 @@ namespace AlphaTab.Rendering.Layout
     /// <summary>
     /// This layout arranges the bars all horizontally
     /// </summary>
-    class HorizontalScreenLayout : ScoreLayout
+    internal class HorizontalScreenLayout : ScoreLayout
     {
         // left top right bottom
-        public static readonly float[] PagePadding = { 20, 20, 20, 20 };
+        public static readonly float[] PagePadding =
+        {
+            20, 20, 20, 20
+        };
+
         public const float GroupSpacing = 20;
 
         private StaveGroup _group;
         private float[] _pagePadding;
 
-        public override string Name { get { return "HorizontalScreen"; } }
+        public override string Name => "HorizontalScreen";
+
         public HorizontalScreenLayout(ScoreRenderer renderer)
             : base(renderer)
         {
         }
 
-        public override bool SupportsResize
-        {
-            get { return false; }
-        }
+        public override bool SupportsResize => false;
 
         public override void Resize()
         {
@@ -54,20 +55,14 @@ namespace AlphaTab.Rendering.Layout
             {
                 _pagePadding = new[]
                 {
-                    _pagePadding[0],
-                    _pagePadding[0],
-                    _pagePadding[0],
-                    _pagePadding[0]
+                    _pagePadding[0], _pagePadding[0], _pagePadding[0], _pagePadding[0]
                 };
             }
             else if (_pagePadding.Length == 2)
             {
                 _pagePadding = new[]
                 {
-                    _pagePadding[0],
-                    _pagePadding[1],
-                    _pagePadding[0],
-                    _pagePadding[1]
+                    _pagePadding[0], _pagePadding[1], _pagePadding[0], _pagePadding[1]
                 };
             }
 
@@ -80,7 +75,11 @@ namespace AlphaTab.Rendering.Layout
             var currentBarIndex = startIndex;
 
             var endBarIndex = Renderer.Settings.Layout.Get("count", score.MasterBars.Count);
-            if (endBarIndex < 0) endBarIndex = score.MasterBars.Count;
+            if (endBarIndex < 0)
+            {
+                endBarIndex = score.MasterBars.Count;
+            }
+
             endBarIndex = startIndex + endBarIndex - 1; // map count to array index
             endBarIndex = Math.Min(score.MasterBars.Count - 1, Math.Max(0, endBarIndex));
 
@@ -116,10 +115,11 @@ namespace AlphaTab.Rendering.Layout
                         {
                             currentPartial.Width += _group.X + _group.AccoladeSpacing;
                         }
+
                         partials.Add(currentPartial);
                         Logger.Info(Name,
-                                    "Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " +
-                                    currentPartial.MasterBars[currentPartial.MasterBars.Count - 1].Index);
+                            "Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " +
+                            currentPartial.MasterBars[currentPartial.MasterBars.Count - 1].Index);
                         currentPartial = new HorizontalScreenLayoutPartialInfo();
                     }
                 }
@@ -134,17 +134,18 @@ namespace AlphaTab.Rendering.Layout
                 {
                     currentPartial.Width += _group.X + _group.AccoladeSpacing;
                 }
+
                 partials.Add(currentPartial);
                 Logger.Info(Name,
-                            "Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " +
-                            currentPartial.MasterBars[currentPartial.MasterBars.Count - 1].Index);
+                    "Finished partial from bar " + currentPartial.MasterBars[0].Index + " to " +
+                    currentPartial.MasterBars[currentPartial.MasterBars.Count - 1].Index);
             }
 
             _group.FinalizeGroup();
 
             Height = _group.Y + _group.Height + _pagePadding[3];
             Width = _group.X + _group.Width + _pagePadding[2];
-            
+
             currentBarIndex = 0;
             for (var i = 0; i < partials.Count; i++)
             {
@@ -160,8 +161,8 @@ namespace AlphaTab.Rendering.Layout
                 }
 
                 Logger.Info(Name,
-                            "Rendering partial from bar " + partial.MasterBars[0].Index + " to " +
-                            partial.MasterBars[partial.MasterBars.Count - 1].Index);
+                    "Rendering partial from bar " + partial.MasterBars[0].Index + " to " +
+                    partial.MasterBars[partial.MasterBars.Count - 1].Index);
 
                 _group.PaintPartial(-renderX, _group.Y, Renderer.Canvas, currentBarIndex, partial.MasterBars.Count);
                 var result = canvas.EndRender();
@@ -177,7 +178,6 @@ namespace AlphaTab.Rendering.Layout
                 });
                 currentBarIndex += partial.MasterBars.Count;
             }
-
         }
     }
 }

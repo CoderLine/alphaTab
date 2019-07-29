@@ -68,7 +68,7 @@ namespace AlphaTab.Exporter
             }
 
             _builder.Append("\\tuning");
-            for (int i = 0; i < staff.Tuning.Length; i++)
+            for (var i = 0; i < staff.Tuning.Length; i++)
             {
                 _builder.Append(" ");
                 _builder.Append(Tuning.GetTextForTuning(staff.Tuning[i], true));
@@ -98,9 +98,9 @@ namespace AlphaTab.Exporter
         private void Bars(Track track)
         {
             // alphatab only supports single staves, 
-            for (int i = 0; i < 1; i++)
+            for (var i = 0; i < 1; i++)
             {
-                for (int j = 0; j < track.Staves[i].Bars.Count; j++)
+                for (var j = 0; j < track.Staves[i].Bars.Count; j++)
                 {
                     if (i > 0)
                     {
@@ -121,7 +121,7 @@ namespace AlphaTab.Exporter
 
         private void Voice(Voice voice)
         {
-            for (int i = 0; i < voice.Beats.Count; i++)
+            for (var i = 0; i < voice.Beats.Count; i++)
             {
                 Beat(voice.Beats[i]);
             }
@@ -140,7 +140,7 @@ namespace AlphaTab.Exporter
                     _builder.Append("(");
                 }
 
-                for (int i = 0; i < beat.Notes.Count; i++)
+                for (var i = 0; i < beat.Notes.Count; i++)
                 {
                     Note(beat.Notes[i]);
                 }
@@ -182,20 +182,21 @@ namespace AlphaTab.Exporter
 
         private void NoteEffects(Note note)
         {
-            bool hasEffectOpen = false;
+            var hasEffectOpen = false;
 
             if (note.HasBend)
             {
                 hasEffectOpen = EffectOpen(hasEffectOpen);
                 _builder.Append("be (");
 
-                for (int i = 0; i < note.BendPoints.Count; i++)
+                for (var i = 0; i < note.BendPoints.Count; i++)
                 {
                     _builder.Append(note.BendPoints[i].Offset);
                     _builder.Append(" ");
                     _builder.Append(note.BendPoints[i].Value);
                     _builder.Append(" ");
                 }
+
                 _builder.Append(")");
             }
 
@@ -359,6 +360,7 @@ namespace AlphaTab.Exporter
             {
                 _builder.Append("{");
             }
+
             return true;
         }
 
@@ -372,7 +374,7 @@ namespace AlphaTab.Exporter
 
         private void BeatEffects(Beat beat)
         {
-            bool hasEffectOpen = false;
+            var hasEffectOpen = false;
 
             if (beat.FadeIn)
             {
@@ -435,7 +437,7 @@ namespace AlphaTab.Exporter
 
             if (beat.HasTuplet)
             {
-                int tupletValue = 0;
+                var tupletValue = 0;
                 if (beat.TupletDenominator == 3 && beat.TupletNumerator == 2)
                 {
                     tupletValue = 3;
@@ -483,13 +485,14 @@ namespace AlphaTab.Exporter
                 hasEffectOpen = EffectOpen(hasEffectOpen);
                 _builder.Append("tbe (");
 
-                for (int i = 0; i < beat.WhammyBarPoints.Count; i++)
+                for (var i = 0; i < beat.WhammyBarPoints.Count; i++)
                 {
                     _builder.Append(beat.WhammyBarPoints[i].Offset);
                     _builder.Append(" ");
                     _builder.Append(beat.WhammyBarPoints[i].Value);
                     _builder.Append(" ");
                 }
+
                 _builder.Append(")");
             }
 
@@ -528,7 +531,8 @@ namespace AlphaTab.Exporter
                 var previousMasterBar = masterBar.PreviousMasterBar;
                 var previousBar = bar.PreviousBar;
 
-                if (previousMasterBar.TimeSignatureDenominator != masterBar.TimeSignatureDenominator || previousMasterBar.TimeSignatureNumerator != masterBar.TimeSignatureNumerator)
+                if (previousMasterBar.TimeSignatureDenominator != masterBar.TimeSignatureDenominator ||
+                    previousMasterBar.TimeSignatureNumerator != masterBar.TimeSignatureNumerator)
                 {
                     _builder.Append("\\ts ");
                     _builder.Append(masterBar.TimeSignatureNumerator);
@@ -588,6 +592,7 @@ namespace AlphaTab.Exporter
                             _builder.Append("c#");
                             break;
                     }
+
                     _builder.AppendLine();
                 }
 
@@ -612,6 +617,7 @@ namespace AlphaTab.Exporter
                             _builder.Append("g2");
                             break;
                     }
+
                     _builder.AppendLine();
                 }
 

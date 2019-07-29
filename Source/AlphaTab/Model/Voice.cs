@@ -15,6 +15,7 @@ namespace AlphaTab.Model
         /// Gets or sets the zero-based index of this voice within the bar. 
         /// </summary>
         public int Index { get; set; }
+
         /// <summary>
         /// Gets or sets the reference to the bar this voice belongs to. 
         /// </summary>
@@ -30,7 +31,8 @@ namespace AlphaTab.Model
         /// </summary>
         public bool IsEmpty
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -55,6 +57,7 @@ namespace AlphaTab.Model
             {
                 newBeat.NextBeat.PreviousBeat = newBeat;
             }
+
             newBeat.PreviousBeat = after;
             newBeat.Voice = this;
             after.NextBeat = newBeat;
@@ -75,7 +78,10 @@ namespace AlphaTab.Model
 
         private void Chain(Beat beat)
         {
-            if (Bar == null) return;
+            if (Bar == null)
+            {
+                return;
+            }
 
             if (beat.Index < Beats.Count - 1)
             {
@@ -157,8 +163,8 @@ namespace AlphaTab.Model
                     if (beat.PreviousBeat == null || beat.PreviousBeat.GraceType == GraceType.None)
                     {
                         // find note which is not a grace note
-                        Beat nonGrace = beat;
-                        int numberOfGraceBeats = 0;
+                        var nonGrace = beat;
+                        var numberOfGraceBeats = 0;
                         while (nonGrace != null && nonGrace.GraceType != GraceType.None)
                         {
                             nonGrace = nonGrace.NextBeat;
@@ -166,7 +172,7 @@ namespace AlphaTab.Model
                         }
 
                         var graceDuration = Duration.Eighth;
-                        int stolenDuration = 0;
+                        var stolenDuration = 0;
                         if (numberOfGraceBeats == 1)
                         {
                             graceDuration = Duration.Eighth;
@@ -188,16 +194,17 @@ namespace AlphaTab.Model
                         // grace beats have 1/4 size of the non grace beat following them
                         var perGraceDuration = nonGrace == null
                             ? Duration.ThirtySecond.ToTicks()
-                            : (nonGrace.DisplayDuration / 4) / numberOfGraceBeats;
+                            : nonGrace.DisplayDuration / 4 / numberOfGraceBeats;
 
                         // move all grace beats 
                         var graceBeat = Beats[i];
-                        for (int j = 0; j < numberOfGraceBeats && graceBeat != null; j++)
+                        for (var j = 0; j < numberOfGraceBeats && graceBeat != null; j++)
                         {
                             graceBeat.Duration = graceDuration;
                             graceBeat.UpdateDurations();
 
-                            graceBeat.DisplayStart = currentDisplayTick - (numberOfGraceBeats - j + 1) * perGraceDuration;
+                            graceBeat.DisplayStart =
+                                currentDisplayTick - (numberOfGraceBeats - j + 1) * perGraceDuration;
                             graceBeat.DisplayDuration = perGraceDuration;
 
                             stolenDuration += graceBeat.PlaybackDuration;
@@ -212,6 +219,7 @@ namespace AlphaTab.Model
                             {
                                 beat.PreviousBeat.PlaybackDuration -= stolenDuration;
                             }
+
                             currentPlaybackTick -= stolenDuration;
                         }
                         else if (nonGrace != null && beat.GraceType == GraceType.OnBeat)
@@ -223,6 +231,7 @@ namespace AlphaTab.Model
                     beat.PlaybackStart = currentPlaybackTick;
                     currentPlaybackTick = beat.PlaybackStart + beat.PlaybackDuration;
                 }
+
                 beat.FinishTuplet();
                 _beatLookup[beat.DisplayStart] = beat;
             }

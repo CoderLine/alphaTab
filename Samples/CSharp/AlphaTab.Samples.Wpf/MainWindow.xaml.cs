@@ -19,7 +19,7 @@ namespace AlphaTab.Samples.Wpf
             App.InitializeCultures();
 
             // create a our viewmodel for databinding
-            MainViewModel viewModel = new MainViewModel(new DialogService(), new ErrorService());
+            var viewModel = new MainViewModel(new DialogService(), new ErrorService());
             DataContext = viewModel;
         }
 

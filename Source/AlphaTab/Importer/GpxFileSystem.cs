@@ -1,15 +1,13 @@
 ﻿using System;
 using AlphaTab.Collections;
 using AlphaTab.IO;
-using AlphaTab.Platform;
 
 namespace AlphaTab.Importer
 {
-
     /// <summary>
     /// this public class represents a file within the GpxFileSystem
     /// </summary>
-    class GpxFile
+    internal class GpxFile
     {
         public string FileName { get; set; }
         public int FileSize { get; set; }
@@ -20,7 +18,7 @@ namespace AlphaTab.Importer
     /// This public class represents the file system structure
     /// stored within a GPX container file. 
     /// </summary>
-    class GpxFileSystem
+    internal class GpxFileSystem
     {
         public const string HeaderBcFs = "BCFS";
         public const string HeaderBcFz = "BCFZ";
@@ -108,15 +106,15 @@ namespace AlphaTab.Importer
 
                         // get the subbuffer storing the data and add it again to the end
                         buffer = uncompressed.GetBuffer();
-                        uncompressed.Write(buffer, (int) sourcePosition, toRead);
+                        uncompressed.Write(buffer, (int)sourcePosition, toRead);
                     }
                     else // raw content
                     {
                         // on raw content we need to read the data from the source buffer 
                         var size = src.ReadBitsReversed(2);
-                        for (int i = 0; i < size; i++)
+                        for (var i = 0; i < size; i++)
                         {
-                            uncompressed.WriteByte((byte) src.ReadByte());
+                            uncompressed.WriteByte((byte)src.ReadByte());
                         }
                     }
                 }
@@ -174,7 +172,7 @@ namespace AlphaTab.Importer
             var offset = sectorSize;
 
             // we always need 4 bytes (+3 including offset) to read the type
-            while ((offset + 3) < data.Length)
+            while (offset + 3 < data.Length)
             {
                 var entryType = GetInteger(data, offset);
 
@@ -210,7 +208,7 @@ namespace AlphaTab.Importer
 
                     // as long we have data blocks we need to iterate them, 
                     var fileData = storeFile ? ByteBuffer.WithCapactiy(file.FileSize) : null;
-                    while ((sector = GetInteger(data, (dataPointerOffset + (4 * (sectorCount++))))) != 0)
+                    while ((sector = GetInteger(data, dataPointerOffset + 4 * sectorCount++)) != 0)
                     {
                         // the next file entry starts after the last data sector so we 
                         // move the offset along
@@ -228,7 +226,7 @@ namespace AlphaTab.Importer
                         // trim data to filesize if needed
                         file.Data = new byte[(int)Math.Min(file.FileSize, fileData.Length)];
                         // we can use the getBuffer here because we are intelligent and know not to read the empty data.
-                        byte[] raw = fileData.ToArray();
+                        var raw = fileData.ToArray();
                         Platform.Platform.BlockCopy(raw, 0, file.Data, 0, file.Data.Length);
                     }
                 }
@@ -248,12 +246,17 @@ namespace AlphaTab.Importer
         private string GetString(byte[] data, int offset, int length)
         {
             var buf = new StringBuilder();
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 var code = data[offset + i] & 0xFF;
-                if (code == 0) break; // zero terminated string
+                if (code == 0)
+                {
+                    break; // zero terminated string
+                }
+
                 buf.AppendChar(code);
             }
+
             return buf.ToString();
         }
 

@@ -14,7 +14,7 @@ namespace AlphaTab.Test.Model
 
             var tuning = new int[tuningText.Length];
             var tuningText2 = new string[tuningText.Length];
-            for (int i = 0; i < tuningText.Length; i++)
+            for (var i = 0; i < tuningText.Length; i++)
             {
                 tuning[i] = TuningParser.GetTuningForText(tuningText[i]);
                 tuningText2[i] = Tuning.GetTextForTuning(tuning[i], true);

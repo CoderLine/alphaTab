@@ -3,12 +3,12 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class FermataEffectInfo : IEffectBarRendererInfo
+    internal class FermataEffectInfo : IEffectBarRendererInfo
     {
-        public string EffectId { get { return "fermata"; } }
-        public bool HideOnMultiTrack { get { return false; } }
-        public bool CanShareBand { get { return false; } }
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
+        public string EffectId => "fermata";
+        public bool HideOnMultiTrack => false;
+        public bool CanShareBand => false;
+        public EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.SingleOnBeat;
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {

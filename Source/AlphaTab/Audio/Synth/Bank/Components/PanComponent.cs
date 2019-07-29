@@ -1,17 +1,16 @@
 ﻿using System;
-using AlphaTab.Audio.Synth.Synthesis;
 using AlphaTab.Audio.Synth.Util;
 
 namespace AlphaTab.Audio.Synth.Bank.Components
 {
-    enum PanFormulaEnum
+    internal enum PanFormulaEnum
     {
         Neg3dBCenter = 0,
         Neg6dBCenter = 1,
         ZeroCenter = 2
     }
 
-    class PanComponent
+    internal class PanComponent
     {
         public float Left { get; set; }
         public float Right { get; set; }

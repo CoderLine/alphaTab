@@ -21,10 +21,13 @@ namespace AlphaTab.Platform.CSharp.WinForms
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public IEnumerable<Track> Tracks
         {
-            get { return _tracks; }
+            get => _tracks;
             set
             {
-                if (_tracks == value) return;
+                if (_tracks == value)
+                {
+                    return;
+                }
 
                 var observable = _tracks as INotifyCollectionChanged;
                 if (observable != null)
@@ -49,7 +52,11 @@ namespace AlphaTab.Platform.CSharp.WinForms
             get => _settings;
             set
             {
-                if (_settings == value) return;
+                if (_settings == value)
+                {
+                    return;
+                }
+
                 _settings = value;
                 OnSettingsChanged(value);
             }
@@ -106,7 +113,10 @@ namespace AlphaTab.Platform.CSharp.WinForms
 
         public void RenderTracks()
         {
-            if (Tracks == null) return;
+            if (Tracks == null)
+            {
+                return;
+            }
 
             Score score = null;
             var trackIndexes = new FastList<int>();

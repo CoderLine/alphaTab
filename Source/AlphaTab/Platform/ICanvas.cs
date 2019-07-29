@@ -1,5 +1,4 @@
 ﻿using AlphaTab.Platform.Model;
-using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
 using Color = AlphaTab.Platform.Model.Color;
 
@@ -8,7 +7,7 @@ namespace AlphaTab.Platform
     /// <summary>
     /// This is the base public interface for canvas implementations on different plattforms.
     /// </summary>
-    interface ICanvas : IPathCanvas
+    internal interface ICanvas
     {
         Settings Settings { get; set; }
 
@@ -30,7 +29,13 @@ namespace AlphaTab.Platform
         void FillText(string text, float x, float y);
         float MeasureText(string text);
         void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol, bool centerAtPosition = false);
-        void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols, bool centerAtPosition = false);
+
+        void FillMusicFontSymbols(
+            float x,
+            float y,
+            float scale,
+            MusicFontSymbol[] symbols,
+            bool centerAtPosition = false);
 
         void BeginRender(float width, float height);
         object EndRender();
@@ -38,14 +43,7 @@ namespace AlphaTab.Platform
 
         void BeginRotate(float centerX, float centerY, float angle);
         void EndRotate();
-    }
 
-    /// <summary>
-    /// This is the path drawing API for canvas implementations
-    /// </summary>
-    // NOTE: For a full HTML based rendering we need to get rid of those 
-    interface IPathCanvas
-    {
         void BeginPath();
         void ClosePath();
         void Fill();
@@ -53,7 +51,7 @@ namespace AlphaTab.Platform
 
         void MoveTo(float x, float y);
         void LineTo(float x, float y);
-        void BezierCurveTo(float cp1x, float cp1y, float cp2x, float cp2y, float x, float y);
+        void BezierCurveTo(float cp1X, float cp1Y, float cp2X, float cp2Y, float x, float y);
         void QuadraticCurveTo(float cpx, float cpy, float x, float y);
     }
 }

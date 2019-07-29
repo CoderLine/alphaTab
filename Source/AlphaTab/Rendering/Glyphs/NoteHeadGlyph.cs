@@ -3,7 +3,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class NoteHeadGlyph : MusicFontGlyph
+    internal class NoteHeadGlyph : MusicFontGlyph
     {
         public const float GraceScale = 0.75f;
         public const float NoteHeadHeight = 9;

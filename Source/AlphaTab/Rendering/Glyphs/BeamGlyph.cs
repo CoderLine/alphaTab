@@ -3,13 +3,13 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class BeamGlyph : MusicFontGlyph
+    internal class BeamGlyph : MusicFontGlyph
     {
         public BeamGlyph(float x, float y, Duration duration, BeamDirection direction, bool isGrace)
             : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, GetSymbol(duration, direction, isGrace))
         {
         }
-        
+
         public override void DoLayout()
         {
             Width = 0;
@@ -35,21 +35,17 @@ namespace AlphaTab.Rendering.Glyphs
                     default: return MusicFontSymbol.FooterUpEighth;
                 }
             }
-            else
+
+            switch (duration)
             {
-                switch (duration)
-                {
-                    case Duration.Eighth: return MusicFontSymbol.FooterDownEighth;
-                    case Duration.Sixteenth: return MusicFontSymbol.FooterDownSixteenth;
-                    case Duration.ThirtySecond: return MusicFontSymbol.FooterDownThirtySecond;
-                    case Duration.SixtyFourth: return MusicFontSymbol.FooterDownSixtyFourth;
-                    case Duration.OneHundredTwentyEighth: return MusicFontSymbol.FooterDownOneHundredTwentyEighth;
-                    case Duration.TwoHundredFiftySixth: return MusicFontSymbol.FooterDownOneHundredTwentyEighth;
-                    default: return MusicFontSymbol.FooterDownEighth;
-                }
+                case Duration.Eighth: return MusicFontSymbol.FooterDownEighth;
+                case Duration.Sixteenth: return MusicFontSymbol.FooterDownSixteenth;
+                case Duration.ThirtySecond: return MusicFontSymbol.FooterDownThirtySecond;
+                case Duration.SixtyFourth: return MusicFontSymbol.FooterDownSixtyFourth;
+                case Duration.OneHundredTwentyEighth: return MusicFontSymbol.FooterDownOneHundredTwentyEighth;
+                case Duration.TwoHundredFiftySixth: return MusicFontSymbol.FooterDownOneHundredTwentyEighth;
+                default: return MusicFontSymbol.FooterDownEighth;
             }
-
         }
-
     }
 }

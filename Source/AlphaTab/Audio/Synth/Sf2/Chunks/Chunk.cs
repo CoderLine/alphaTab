@@ -1,6 +1,6 @@
 ﻿namespace AlphaTab.Audio.Synth.Sf2.Chunks
 {
-    class Chunk
+    internal class Chunk
     {
         public string Id { get; private set; }
         public int Size { get; private set; }

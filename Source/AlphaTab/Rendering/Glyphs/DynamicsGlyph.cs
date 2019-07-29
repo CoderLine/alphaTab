@@ -2,10 +2,10 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class DynamicsGlyph : MusicFontGlyph
+    internal class DynamicsGlyph : MusicFontGlyph
     {
         public DynamicsGlyph(float x, float y, DynamicValue dynamics)
-                  : base(x, y, 0.6f, GetSymbol(dynamics))
+            : base(x, y, 0.6f, GetSymbol(dynamics))
         {
         }
 

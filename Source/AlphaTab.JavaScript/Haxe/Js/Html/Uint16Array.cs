@@ -23,15 +23,19 @@ namespace Haxe.Js.Html
 
         [Name("set")]
         public extern void Set(Uint8Array buffer);
+
         [Name("set")]
         public extern void Set(Uint8Array buffer, HaxeInt offset);
+
         [Name("set")]
         public extern void Set(HaxeInt[] buffer);
+
         [Name("set")]
         public extern void Set(HaxeInt[] buffer, HaxeInt offset);
 
         [Name("subarray")]
         public extern Uint8Array SubArray(HaxeInt start);
+
         [Name("subarray")]
         public extern Uint8Array SubArray(HaxeInt start, HaxeInt end);
     }

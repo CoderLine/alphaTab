@@ -9,10 +9,12 @@ namespace AlphaTab.Model
         /// No accentuation
         /// </summary>
         None,
+
         /// <summary>
         /// Normal accentuation 
         /// </summary>
         Normal,
+
         /// <summary>
         /// Heavy accentuation
         /// </summary>

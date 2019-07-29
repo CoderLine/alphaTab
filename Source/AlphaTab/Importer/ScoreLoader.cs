@@ -1,8 +1,6 @@
 ﻿using System;
-using AlphaTab.Collections;
 using AlphaTab.IO;
 using AlphaTab.Model;
-using AlphaTab.Platform;
 using AlphaTab.Util;
 
 namespace AlphaTab.Importer
@@ -23,10 +21,11 @@ namespace AlphaTab.Importer
         {
             var importers = ScoreImporter.BuildImporters();
 
-            Logger.Info("ScoreLoader", "Loading score from " + data.Length + " bytes using " + importers.Length + " importers");
+            Logger.Info("ScoreLoader",
+                "Loading score from " + data.Length + " bytes using " + importers.Length + " importers");
 
             Score score = null;
-            ByteBuffer bb = ByteBuffer.FromBuffer(data);
+            var bb = ByteBuffer.FromBuffer(data);
             foreach (var importer in importers)
             {
                 bb.Reset();

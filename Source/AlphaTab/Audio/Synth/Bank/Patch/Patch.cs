@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Audio.Synth.Bank.Patch
 {
-    abstract class Patch
+    internal abstract class Patch
     {
         public int ExclusiveGroupTarget { get; set; }
         public int ExclusiveGroup { get; set; }
@@ -16,7 +16,14 @@ namespace AlphaTab.Audio.Synth.Bank.Patch
         }
 
         public abstract bool Start(VoiceParameters voiceparams);
-        public abstract void Process(VoiceParameters voiceparams, int startIndex, int endIndex, bool isMuted, bool isSilentProcess);
+
+        public abstract void Process(
+            VoiceParameters voiceparams,
+            int startIndex,
+            int endIndex,
+            bool isMuted,
+            bool isSilentProcess);
+
         public abstract void Stop(VoiceParameters voiceparams);
     }
 }

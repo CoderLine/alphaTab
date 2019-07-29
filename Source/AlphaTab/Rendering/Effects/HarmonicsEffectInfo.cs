@@ -3,13 +3,13 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class HarmonicsEffectInfo : NoteEffectInfoBase
+    internal class HarmonicsEffectInfo : NoteEffectInfoBase
     {
         private readonly HarmonicType _harmonicType;
         private Beat _beat;
         private string _effectId;
 
-        public override string EffectId { get { return _effectId; } }
+        public override string EffectId => _effectId;
 
         public HarmonicsEffectInfo(HarmonicType harmonicType)
         {
@@ -40,18 +40,20 @@ namespace AlphaTab.Rendering.Effects
 
         protected override bool ShouldCreateGlyphForNote(Note note)
         {
-            if (!note.IsHarmonic || note.HarmonicType != _harmonicType) return false;
+            if (!note.IsHarmonic || note.HarmonicType != _harmonicType)
+            {
+                return false;
+            }
+
             if (note.Beat != _beat)
             {
                 _beat = note.Beat;
             }
+
             return true;
         }
 
-        public override EffectBarGlyphSizing SizingMode
-        {
-            get { return EffectBarGlyphSizing.GroupedOnBeat; }
-        }
+        public override EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.GroupedOnBeat;
 
         public override EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
@@ -75,6 +77,7 @@ namespace AlphaTab.Rendering.Effects
                 case HarmonicType.Feedback:
                     return "Fdbk.";
             }
+
             return "";
         }
     }

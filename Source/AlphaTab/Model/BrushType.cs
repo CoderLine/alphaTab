@@ -8,19 +8,23 @@ namespace AlphaTab.Model
         /// <summary>
         /// No brush. 
         /// </summary>
-        None, 
+        None,
+
         /// <summary>
         /// Normal brush up. 
         /// </summary>
-        BrushUp, 
+        BrushUp,
+
         /// <summary>
         /// Normal brush down. 
         /// </summary>
-        BrushDown, 
+        BrushDown,
+
         /// <summary>
         /// Arpeggio up. 
         /// </summary>
-        ArpeggioUp, 
+        ArpeggioUp,
+
         /// <summary>
         /// Arpeggio down. 
         /// </summary>

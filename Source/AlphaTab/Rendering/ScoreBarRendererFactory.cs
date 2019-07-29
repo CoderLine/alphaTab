@@ -1,14 +1,13 @@
-﻿using AlphaTab.Collections;
-using AlphaTab.Model;
+﻿using AlphaTab.Model;
 
 namespace AlphaTab.Rendering
 {
     /// <summary>
     /// This Factory procudes ScoreBarRenderer instances
     /// </summary>
-    class ScoreBarRendererFactory : BarRendererFactory
+    internal class ScoreBarRendererFactory : BarRendererFactory
     {
-        public override string StaffId { get { return ScoreBarRenderer.StaffId; } }
+        public override string StaffId => ScoreBarRenderer.StaffId;
 
         public override BarRendererBase Create(ScoreRenderer renderer, Bar bar, StaveSettings staveSettings)
         {

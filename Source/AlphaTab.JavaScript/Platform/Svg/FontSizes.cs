@@ -7,12 +7,19 @@ namespace AlphaTab.Platform.Svg
     /// <summary>
     /// This public class stores text widths for several fonts and allows width calculation 
     /// </summary>
-    partial class FontSizes
+    internal partial class FontSizes
     {
         public static byte[] GenerateFontLookup(string family)
         {
-            if(FontSizeLookupTables == null) FontSizeLookupTables = new FastDictionary<string, byte[]>();
-            if (FontSizeLookupTables.ContainsKey(family)) return FontSizeLookupTables[family];
+            if (FontSizeLookupTables == null)
+            {
+                FontSizeLookupTables = new FastDictionary<string, byte[]>();
+            }
+
+            if (FontSizeLookupTables.ContainsKey(family))
+            {
+                return FontSizeLookupTables[family];
+            }
 
             var canvas = (CanvasElement)Browser.Document.CreateElement("canvas");
             var measureContext = (CanvasRenderingContext2D)canvas.GetContext("2d");

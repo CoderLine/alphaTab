@@ -20,11 +20,12 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
+
 using AlphaTab.Collections;
 
 namespace AlphaTab.Xml
 {
-    class XmlNode
+    internal class XmlNode
     {
         public XmlNodeType NodeType { get; set; }
         public string LocalName { get; set; }
@@ -56,6 +57,7 @@ namespace AlphaTab.Xml
             {
                 return Attributes[name];
             }
+
             return "";
         }
 
@@ -66,7 +68,11 @@ namespace AlphaTab.Xml
             return tags.ToArray();
         }
 
-        private void SearchElementsByTagName(FastList<XmlNode> all, FastList<XmlNode> result, string name, bool recursive = false)
+        private void SearchElementsByTagName(
+            FastList<XmlNode> all,
+            FastList<XmlNode> result,
+            string name,
+            bool recursive = false)
         {
             foreach (var c in all)
             {
@@ -91,6 +97,7 @@ namespace AlphaTab.Xml
                     return c;
                 }
             }
+
             return null;
         }
 
@@ -105,9 +112,11 @@ namespace AlphaTab.Xml
                     {
                         txt.Append(c.InnerText);
                     }
-                    string s = txt.ToString();
+
+                    var s = txt.ToString();
                     return s.Trim();
                 }
+
                 return Value;
             }
         }

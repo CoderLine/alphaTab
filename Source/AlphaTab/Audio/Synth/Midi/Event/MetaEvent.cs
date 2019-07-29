@@ -1,6 +1,6 @@
 ﻿namespace AlphaTab.Audio.Synth.Midi.Event
 {
-    enum MetaEventTypeEnum
+    internal enum MetaEventTypeEnum
     {
         SequenceNumber = 0x00,
         TextEvent = 0x01,
@@ -22,22 +22,13 @@
         SequencerSpecific = 0x7F
     }
 
-    abstract class MetaEvent : MidiEvent
+    internal abstract class MetaEvent : MidiEvent
     {
-        public override int Channel
-        {
-            get { return -1; }
-        }
+        public override int Channel => -1;
 
-        public override MidiEventType Command
-        {
-            get { return (MidiEventType) (Message & 0x00000FF); }
-        }
+        public override MidiEventType Command => (MidiEventType)(Message & 0x00000FF);
 
-        public int MetaStatus
-        {
-            get { return Data1; }
-        }
+        public int MetaStatus => Data1;
 
         protected MetaEvent(int delta, byte status, byte data1, byte data2)
             : base(delta, status, data1, data2)

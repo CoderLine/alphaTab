@@ -8,14 +8,11 @@ namespace AlphaTab.Rendering.Glyphs
     /// This glyph allows to group several other glyphs to be
     /// drawn at the same x position
     /// </summary>
-    class GlyphGroup : Glyph
+    internal class GlyphGroup : Glyph
     {
         protected FastList<Glyph> Glyphs;
 
-        public bool IsEmpty
-        {
-            get { return Glyphs == null || Glyphs.Count == 0; }
-        }
+        public bool IsEmpty => Glyphs == null || Glyphs.Count == 0;
 
         public GlyphGroup(float x, float y)
             : base(x, y)
@@ -38,19 +35,28 @@ namespace AlphaTab.Rendering.Glyphs
                 g.DoLayout();
                 w = Math.Max(w, g.Width);
             }
+
             Width = w;
         }
 
         public virtual void AddGlyph(Glyph g)
         {
-            if (Glyphs == null) Glyphs = new FastList<Glyph>();
+            if (Glyphs == null)
+            {
+                Glyphs = new FastList<Glyph>();
+            }
+
             Glyphs.Add(g);
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var glyphs = Glyphs;
-            if (glyphs == null || glyphs.Count == 0) return;
+            if (glyphs == null || glyphs.Count == 0)
+            {
+                return;
+            }
+
             foreach (var g in glyphs)
             {
                 g.Paint(cx + X, cy + Y, canvas);

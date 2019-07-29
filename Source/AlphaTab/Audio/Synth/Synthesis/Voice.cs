@@ -2,14 +2,14 @@
 
 namespace AlphaTab.Audio.Synth.Synthesis
 {
-    enum VoiceStateEnum
+    internal enum VoiceStateEnum
     {
         Stopped = 0,
         Stopping = 1,
         Playing = 2
     }
 
-    class Voice
+    internal class Voice
     {
         public Patch Patch { get; private set; }
         public VoiceParameters VoiceParams { get; private set; }
@@ -22,15 +22,23 @@ namespace AlphaTab.Audio.Synth.Synthesis
         public void Start()
         {
             if (VoiceParams.State != VoiceStateEnum.Stopped)
+            {
                 return;
+            }
+
             if (Patch.Start(VoiceParams))
+            {
                 VoiceParams.State = VoiceStateEnum.Playing;
+            }
         }
 
         public void Stop()
         {
             if (VoiceParams.State != VoiceStateEnum.Playing)
+            {
                 return;
+            }
+
             VoiceParams.State = VoiceStateEnum.Stopping;
             Patch.Stop(VoiceParams);
         }
@@ -44,7 +52,9 @@ namespace AlphaTab.Audio.Synth.Synthesis
         {
             //do not process if the voice is stopped
             if (VoiceParams.State == VoiceStateEnum.Stopped)
+            {
                 return;
+            }
 
             //process using the patch's algorithm
             Patch.Process(VoiceParams, startIndex, endIndex, isMuted, false);
@@ -54,7 +64,9 @@ namespace AlphaTab.Audio.Synth.Synthesis
         {
             //do not process if the voice is stopped
             if (VoiceParams.State == VoiceStateEnum.Stopped)
+            {
                 return;
+            }
 
             //process using the patch's algorithm
             Patch.Process(VoiceParams, startIndex, endIndex, true, true);

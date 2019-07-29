@@ -4,7 +4,7 @@ using System.Windows.Controls;
 
 namespace AlphaTab.Platform.CSharp.Wpf
 {
-    class AlphaTabLayoutPanel : Panel
+    internal class AlphaTabLayoutPanel : Panel
     {
         protected override Size MeasureOverride(Size availableSize)
         {

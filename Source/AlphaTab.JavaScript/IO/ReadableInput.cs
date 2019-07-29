@@ -4,7 +4,7 @@ using Phase;
 
 namespace AlphaTab.IO
 {
-    class ReadableInput : HaxeInput
+    internal class ReadableInput : HaxeInput
     {
         private readonly IReadable _readable;
 
@@ -20,7 +20,7 @@ namespace AlphaTab.IO
 
         public override HaxeInt ReadBytes(HaxeBytes s, HaxeInt pos, HaxeInt len)
         {
-            byte[] data = Script.Write<byte[]>("s.getData()");
+            var data = Script.Write<byte[]>("s.getData()");
             return _readable.Read(data, pos, len);
         }
     }

@@ -178,7 +178,8 @@ namespace AlphaTab
         /// </summary>
         public int ScrollOffsetX
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -186,7 +187,8 @@ namespace AlphaTab
         /// </summary>
         public int ScrollOffsetY
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -194,7 +196,8 @@ namespace AlphaTab
         /// </summary>
         public ScrollMode ScrollMode
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -202,7 +205,8 @@ namespace AlphaTab
         /// </summary>
         public int ScrollSpeed
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>

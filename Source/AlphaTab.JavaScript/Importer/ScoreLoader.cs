@@ -21,7 +21,11 @@ namespace AlphaTab.Importer
         /// <param name="success">this function is called if the Score was successfully loaded from the datasource</param>
         /// <param name="error">this function is called if any error during the loading occured.</param>
         /// <param name="settings">settings for the score import</param>
-        public static void LoadScoreAsync(string path, Action<Score> success, Action<Exception> error, Settings settings = null)
+        public static void LoadScoreAsync(
+            string path,
+            Action<Score> success,
+            Action<Exception> error,
+            Settings settings = null)
         {
             var xhr = new XMLHttpRequest();
             xhr.Open("GET", path, true);
@@ -76,7 +80,7 @@ namespace AlphaTab.Importer
             if (xhr.ResponseType != XMLHttpRequestResponseType.ARRAYBUFFER)
             {
                 // use VB Loader to load binary array
-                dynamic vbArr = Script.Write<dynamic>("untyped VbAjaxLoader(\"GET\", path)");
+                var vbArr = Script.Write<dynamic>("untyped VbAjaxLoader(\"GET\", path)");
                 var fileContents = vbArr.toArray();
 
                 // decode byte array to string
@@ -92,16 +96,18 @@ namespace AlphaTab.Importer
                 var score = LoadScoreFromBytes(reader, settings);
                 success(score);
             }
+
             xhr.Send();
         }
 
         private static byte[] GetBytesFromString(string s)
         {
-            byte[] b = new byte[s.Length];
-            for (int i = 0; i < s.Length; i++)
+            var b = new byte[s.Length];
+            for (var i = 0; i < s.Length; i++)
             {
                 b[i] = (byte)s[i];
             }
+
             return b;
         }
     }

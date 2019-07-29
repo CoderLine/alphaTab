@@ -9,8 +9,10 @@ namespace AlphaTab.Haxe.Js.Html
     {
         [Name("width")]
         public extern HaxeInt Width { get; set; }
+
         [Name("height")]
         public extern HaxeInt Height { get; set; }
+
         [Name("getContext")]
         public extern object GetContext(HaxeString contextId);
     }

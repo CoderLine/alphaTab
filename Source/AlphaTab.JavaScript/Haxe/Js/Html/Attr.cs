@@ -9,6 +9,7 @@ namespace AlphaTab.Haxe.Js.Html
     {
         [Name("name")]
         public extern HaxeString Name { get; }
+
         [Name("value")]
         public extern HaxeString Value { get; }
     }

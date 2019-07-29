@@ -3,7 +3,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class BeatGlyphBase : GlyphGroup
+    internal class BeatGlyphBase : GlyphGroup
     {
         public BeatContainerGlyph Container { get; set; }
 
@@ -27,12 +27,13 @@ namespace AlphaTab.Rendering.Glyphs
                     w += g.Width;
                 }
             }
+
             Width = w;
         }
 
         protected void NoteLoop(Action<Note> action)
         {
-            for (int i = Container.Beat.Notes.Count - 1; i >= 0; i--)
+            for (var i = Container.Beat.Notes.Count - 1; i >= 0; i--)
             {
                 action(Container.Beat.Notes[i]);
             }

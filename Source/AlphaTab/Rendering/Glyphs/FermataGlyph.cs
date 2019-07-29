@@ -3,7 +3,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class FermataGlyph : MusicFontGlyph
+    internal class FermataGlyph : MusicFontGlyph
     {
         public FermataGlyph(float x, float y, FermataType fermata)
             : base(x, y, 1, GetSymbol(fermata))

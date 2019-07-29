@@ -1,14 +1,13 @@
-﻿using System;
-using AlphaTab.Model;
+﻿using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class AccidentalGlyph : MusicFontGlyph
+    internal class AccidentalGlyph : MusicFontGlyph
     {
         private readonly bool _isGrace;
 
         public AccidentalGlyph(float x, float y, AccidentalType accidentalType, bool isGrace = false)
-            : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1,GetMusicSymbol(accidentalType))
+            : base(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, GetMusicSymbol(accidentalType))
         {
             _isGrace = isGrace;
         }
@@ -30,6 +29,7 @@ namespace AlphaTab.Rendering.Glyphs
                 case AccidentalType.FlatQuarterNoteUp:
                     return MusicFontSymbol.AccidentalQuarterToneFlatArrowUp;
             }
+
             return MusicFontSymbol.None;
         }
 

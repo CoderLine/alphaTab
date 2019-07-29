@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Audio.Synth.Bank.Components.Generators
 {
-    class DefaultGenerators
+    internal class DefaultGenerators
     {
         public static readonly Generator DefaultSine = new SineGenerator(new GeneratorDescriptor());
         public static readonly Generator DefaultSaw = new SawGenerator(new GeneratorDescriptor());

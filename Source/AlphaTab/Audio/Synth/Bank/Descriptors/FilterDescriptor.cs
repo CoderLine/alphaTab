@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Audio.Synth.Bank.Descriptors
 {
-    class FilterDescriptor
+    internal class FilterDescriptor
     {
         public FilterType FilterMethod { get; set; }
         public float CutOff { get; set; }

@@ -9,10 +9,12 @@
         /// Text is aligned on top. 
         /// </summary>
         Top,
+
         /// <summary>
         /// Text is aligned middle
         /// </summary>
-        Middle, 
+        Middle,
+
         /// <summary>
         /// Text is aligend on the bottom. 
         /// </summary>

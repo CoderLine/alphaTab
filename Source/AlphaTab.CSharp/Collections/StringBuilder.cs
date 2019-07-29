@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace AlphaTab.Collections
 {
-    class StringBuilder
+    internal class StringBuilder
     {
         private readonly System.Text.StringBuilder _sb;
 

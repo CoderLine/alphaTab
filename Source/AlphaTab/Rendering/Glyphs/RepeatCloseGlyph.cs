@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class RepeatCloseGlyph : Glyph
+    internal class RepeatCloseGlyph : Glyph
     {
         public RepeatCloseGlyph(float x, float y)
             : base(x, y)
@@ -28,18 +28,18 @@ namespace AlphaTab.Rendering.Glyphs
             var middle = (top + bottom) / 2;
             const int dotOffset = 3;
 
-            canvas.FillCircle(left, middle - (circleSize * dotOffset), circleSize);
-            canvas.FillCircle(left, middle + (circleSize * dotOffset), circleSize);
+            canvas.FillCircle(left, middle - circleSize * dotOffset, circleSize);
+            canvas.FillCircle(left, middle + circleSize * dotOffset, circleSize);
 
             // line
-            left += (4 * Scale);
+            left += 4 * Scale;
             canvas.BeginPath();
             canvas.MoveTo(left, top);
             canvas.LineTo(left, bottom);
             canvas.Stroke();
 
             // big bar
-            left += (3 * Scale) + 0.5f;
+            left += 3 * Scale + 0.5f;
             canvas.FillRect(left, top, blockWidth, h);
         }
     }

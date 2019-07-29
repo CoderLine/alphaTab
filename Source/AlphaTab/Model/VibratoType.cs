@@ -8,11 +8,13 @@ namespace AlphaTab.Model
         /// <summary>
         /// No vibrato.
         /// </summary>
-        None, 
+        None,
+
         /// <summary>
         /// A slight vibrato. 
         /// </summary>
-        Slight, 
+        Slight,
+
         /// <summary>
         /// A wide vibrato.
         /// </summary>

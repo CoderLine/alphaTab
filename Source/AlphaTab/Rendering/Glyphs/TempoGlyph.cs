@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TempoGlyph : EffectGlyph
+    internal class TempoGlyph : EffectGlyph
     {
         private readonly int _tempo;
 
@@ -24,7 +24,7 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.Font = res.MarkerFont;
 
             canvas.FillMusicFontSymbol(cx + X, cy + Y + Height * 0.8f, Scale * 0.75f, MusicFontSymbol.Tempo);
-            canvas.FillText("= " + _tempo, cx + X + (Height / 2), cy + Y + canvas.Font.Size / 2);
+            canvas.FillText("= " + _tempo, cx + X + Height / 2, cy + Y + canvas.Font.Size / 2);
         }
     }
 }

@@ -3,7 +3,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class FadeInGlyph : EffectGlyph
+    internal class FadeInGlyph : EffectGlyph
     {
         public FadeInGlyph(float x, float y)
             : base(x, y)
@@ -25,9 +25,9 @@ namespace AlphaTab.Rendering.Glyphs
 
             canvas.BeginPath();
             canvas.MoveTo(cx + X, cy + Y + offset);
-            canvas.QuadraticCurveTo(cx + X + (width / 2), cy + Y + offset, cx + X + width, cy + Y + offset - size);
+            canvas.QuadraticCurveTo(cx + X + width / 2, cy + Y + offset, cx + X + width, cy + Y + offset - size);
             canvas.MoveTo(cx + X, cy + Y + offset);
-            canvas.QuadraticCurveTo(cx + X + (width / 2), cy + Y + offset, cx + X + width, cy + Y + offset + size);
+            canvas.QuadraticCurveTo(cx + X + width / 2, cy + Y + offset, cx + X + width, cy + Y + offset + size);
             canvas.Stroke();
         }
     }

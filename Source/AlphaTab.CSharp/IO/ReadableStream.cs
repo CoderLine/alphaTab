@@ -3,7 +3,7 @@ using System.IO;
 
 namespace AlphaTab.IO
 {
-    class ReadableStream : Stream
+    internal class ReadableStream : Stream
     {
         private readonly IReadable _readable;
 
@@ -18,7 +18,8 @@ namespace AlphaTab.IO
             {
                 return wrapper.Stream;
             }
-            else if (readable is ByteBuffer buffer)
+
+            if (readable is ByteBuffer buffer)
             {
                 return new MemoryStream(buffer.GetBuffer(), false);
             }

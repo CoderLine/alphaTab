@@ -15,10 +15,12 @@ namespace AlphaTab.Platform.Model
         /// Gets or sets the font family name. 
         /// </summary>
         public string Family { get; set; }
+
         /// <summary>
         /// Gets or sets the font size in pixels. 
         /// </summary>
         public float Size { get; set; }
+
         /// <summary>
         /// Gets or sets the font style. 
         /// </summary>

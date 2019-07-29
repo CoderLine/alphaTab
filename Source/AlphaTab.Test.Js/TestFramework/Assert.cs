@@ -5,14 +5,14 @@ using Phase.Attributes;
 namespace Microsoft.VisualStudio.TestTools.UnitTesting
 {
     [Name("alphaTab.test.Assert")]
-    static class Assert
+    internal static class Assert
     {
         public static void AreEqual<T1, T2>(T1 expected, T2 actual)
         {
             var expectedNull = expected == null;
             var actualNull = actual == null;
 
-            bool equal = true;
+            var equal = true;
             if (expectedNull != actualNull)
             {
                 equal = false;
@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestTools.UnitTesting
             var expectedNull = expected == null;
             var actualNull = actual == null;
 
-            bool equal = true;
+            var equal = true;
             if (expectedNull != actualNull)
             {
                 equal = false;
@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestTools.UnitTesting
             var expectedNull = expected == null;
             var actualNull = actual == null;
 
-            bool equal = true;
+            var equal = true;
             if (expectedNull != actualNull)
             {
                 equal = false;

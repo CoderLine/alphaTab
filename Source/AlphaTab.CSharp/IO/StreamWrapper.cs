@@ -3,14 +3,14 @@ using System.IO;
 
 namespace AlphaTab.IO
 {
-    sealed class StreamWrapper : IReadable, IWriteable, IDisposable
+    internal sealed class StreamWrapper : IReadable, IWriteable, IDisposable
     {
         public Stream Stream { get; }
 
         public int Position
         {
-            get { return (int)Stream.Position; }
-            set { Stream.Position = value; }
+            get => (int)Stream.Position;
+            set => Stream.Position = value;
         }
 
         public int Length => (int)Stream.Length;

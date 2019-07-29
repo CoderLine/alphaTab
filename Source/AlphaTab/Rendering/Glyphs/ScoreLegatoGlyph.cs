@@ -3,7 +3,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class ScoreLegatoGlyph : TieGlyph
+    internal class ScoreLegatoGlyph : TieGlyph
     {
         public ScoreLegatoGlyph(Beat startBeat, Beat endBeat, bool forEnd = false)
             : base(startBeat, endBeat, forEnd)
@@ -13,7 +13,7 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             base.DoLayout();
-            YOffset = (NoteHeadGlyph.NoteHeadHeight/2);
+            YOffset = NoteHeadGlyph.NoteHeadHeight / 2;
         }
 
         protected override BeamDirection GetBeamDirection(Beat beat, BarRendererBase noteRenderer)
@@ -81,10 +81,8 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 return noteRenderer.GetBeatX(StartBeat);
             }
-            else
-            {
-                return noteRenderer.GetNoteX(StartBeat.MinNote);
-            }
+
+            return noteRenderer.GetNoteX(StartBeat.MinNote);
         }
 
         protected override float GetEndX(BarRendererBase noteRenderer)
@@ -93,11 +91,8 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 return noteRenderer.GetBeatX(EndBeat);
             }
-            else
-            {
-                return noteRenderer.GetNoteX(EndBeat.MinNote, false);
-            }
-        }
 
+            return noteRenderer.GetNoteX(EndBeat.MinNote, false);
+        }
     }
 }

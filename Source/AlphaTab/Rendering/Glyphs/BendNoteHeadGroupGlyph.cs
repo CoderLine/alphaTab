@@ -1,13 +1,11 @@
-﻿using System;
-using AlphaTab.Collections;
+﻿using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class BendNoteHeadGroupGlyph : ScoreNoteChordGlyphBase
+    internal class BendNoteHeadGroupGlyph : ScoreNoteChordGlyphBase
     {
         private readonly Beat _beat;
         private readonly bool _showParenthesis;
@@ -39,8 +37,10 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (_noteValueLookup.ContainsKey(noteValue))
             {
-                return Y + _noteValueLookup[noteValue].Y + (aboveNote ? -(NoteHeadGlyph.NoteHeadHeight * NoteHeadGlyph.GraceScale * Scale) / 2 : 0);
+                return Y + _noteValueLookup[noteValue].Y +
+                       (aboveNote ? -(NoteHeadGlyph.NoteHeadHeight * NoteHeadGlyph.GraceScale * Scale) / 2 : 0);
             }
+
             return 0;
         }
 
@@ -59,8 +59,10 @@ namespace AlphaTab.Rendering.Glyphs
                 {
                     pos += n.Width / 2.0f;
                 }
+
                 return pos;
             }
+
             return 0;
         }
 
@@ -124,15 +126,10 @@ namespace AlphaTab.Rendering.Glyphs
                 _postNoteParenthesis.DoLayout();
                 Width += _postNoteParenthesis.Width + ElementPadding * Scale;
             }
-
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
-            var x = 0f;
-            if (!_accidentals.IsEmpty) x = _accidentals.X;
-            else if (_showParenthesis) x = _preNoteParenthesis.X;
-
             //canvas.Color = Color.Random();
             //canvas.FillRect(cx + X, cy + Y, Width, 10);
             //canvas.Color = Renderer.Resources.MainGlyphColor;
@@ -150,6 +147,5 @@ namespace AlphaTab.Rendering.Glyphs
 
             base.Paint(cx, cy, canvas);
         }
-
     }
 }

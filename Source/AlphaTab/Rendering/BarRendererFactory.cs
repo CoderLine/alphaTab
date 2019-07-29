@@ -1,12 +1,11 @@
-﻿using AlphaTab.Collections;
-using AlphaTab.Model;
+﻿using AlphaTab.Model;
 
 namespace AlphaTab.Rendering
 {
     /// <summary>
     /// This is the base public class for creating factories providing BarRenderers
     /// </summary>
-    abstract class BarRendererFactory
+    internal abstract class BarRendererFactory
     {
         public bool IsInAccolade { get; set; }
         public bool HideOnMultiTrack { get; set; }
@@ -24,6 +23,7 @@ namespace AlphaTab.Rendering
         {
             return !HideOnPercussionTrack || !staff.IsPercussion;
         }
+
         public abstract BarRendererBase Create(ScoreRenderer renderer, Bar bar, StaveSettings staveSettings);
     }
 }

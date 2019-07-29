@@ -3,12 +3,12 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class FadeInEffectInfo : IEffectBarRendererInfo
+    internal class FadeInEffectInfo : IEffectBarRendererInfo
     {
-        public string EffectId { get { return "fade-in"; } }
-        public bool HideOnMultiTrack { get { return false; } }
-        public bool CanShareBand { get { return true; } }
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
+        public string EffectId => "fade-in";
+        public bool HideOnMultiTrack => false;
+        public bool CanShareBand => true;
+        public EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.SingleOnBeat;
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {

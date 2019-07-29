@@ -2,21 +2,15 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using AlphaTab.Audio.Synth;
 using AlphaTab.IO;
 using AlphaTab.Util;
-using AlphaTab.Xml;
 
 namespace AlphaTab.Platform
 {
-    static partial class Platform
+    internal static partial class Platform
     {
         public static T As<T>(this object s)
         {
@@ -31,10 +25,11 @@ namespace AlphaTab.Platform
         public static float ParseFloat(string s)
         {
             float f;
-            if (!Single.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out f))
+            if (!float.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out f))
             {
-                f = Single.NaN;
+                f = float.NaN;
             }
+
             return f;
         }
 
@@ -50,6 +45,7 @@ namespace AlphaTab.Platform
             {
                 return int.MinValue;
             }
+
             return (int)f;
         }
 
@@ -65,7 +61,7 @@ namespace AlphaTab.Platform
 
         public static bool IsNullOrWhiteSpace(this string s)
         {
-            return String.IsNullOrWhiteSpace(s);
+            return string.IsNullOrWhiteSpace(s);
         }
 
         public static string StringFromCharCode(int c)
@@ -98,6 +94,7 @@ namespace AlphaTab.Platform
             {
                 encoding = detectedEncoding;
             }
+
             if (encoding == null)
             {
                 encoding = "utf-8";
@@ -112,6 +109,7 @@ namespace AlphaTab.Platform
             {
                 enc = Encoding.UTF8;
             }
+
             return enc.GetString(data, 0, data.Length);
         }
 
@@ -146,6 +144,7 @@ namespace AlphaTab.Platform
         {
             return BitConverter.ToDouble(bytes, 0);
         }
+
         public static float ToFloat(byte[] bytes)
         {
             return BitConverter.ToSingle(bytes, 0);
@@ -192,6 +191,5 @@ namespace AlphaTab.Platform
                     cancellationTokenSource.Token);
             };
         }
-
     }
 }

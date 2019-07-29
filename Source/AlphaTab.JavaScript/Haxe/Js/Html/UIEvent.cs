@@ -9,6 +9,7 @@ namespace AlphaTab.Haxe.Js.Html
     {
         [Name("pageX")]
         public extern int PageX { get; }
+
         [Name("pageY")]
         public extern int PageY { get; }
 

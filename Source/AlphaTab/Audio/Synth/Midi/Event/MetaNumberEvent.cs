@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Audio.Synth.Midi.Event
 {
-    class MetaNumberEvent : MetaEvent
+    internal class MetaNumberEvent : MetaEvent
     {
         public int Value { get; private set; }
 
@@ -20,8 +20,9 @@ namespace AlphaTab.Audio.Synth.Midi.Event
 
             MidiFile.WriteVariableInt(s, 3);
 
-            var b = new[]{
-                (byte)((Value >> 16) & 0xFF), (byte)((Value >> 8) & 0xFF), (byte)((Value >> 0) & 0xFF)
+            var b = new[]
+            {
+                (byte)((Value >> 16) & 0xFF), (byte)((Value >> 8) & 0xFF), (byte)(Value & 0xFF)
             };
             s.Write(b, 0, b.Length);
         }

@@ -4,7 +4,7 @@ using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class LineRangedGlyph : GroupedEffectGlyph
+    internal class LineRangedGlyph : GroupedEffectGlyph
     {
         public const float LineSpacing = 3;
         public const float LineTopPadding = 4;
@@ -25,6 +25,7 @@ namespace AlphaTab.Rendering.Glyphs
                 EndPosition = BeatXPosition.EndBeat;
                 ForceGroupedRendering = true;
             }
+
             base.DoLayout();
             Height = Renderer.Resources.EffectFont.Size;
         }
@@ -45,8 +46,8 @@ namespace AlphaTab.Rendering.Glyphs
 
             var lineSpacing = LineSpacing * Scale;
             var textWidth = canvas.MeasureText(_label);
-            var startX = cx + X + textWidth/2f + lineSpacing;
-            var lineY = cy + Y + (LineTopPadding * Scale);
+            var startX = cx + X + textWidth / 2f + lineSpacing;
+            var lineY = cy + Y + LineTopPadding * Scale;
             var lineSize = LineSize * Scale;
 
             if (endX > startX)
@@ -60,6 +61,7 @@ namespace AlphaTab.Rendering.Glyphs
                     lineX += lineSize + lineSpacing;
                     canvas.Stroke();
                 }
+
                 canvas.BeginPath();
                 canvas.MoveTo(endX, (int)(lineY - LineTopOffset * Scale));
                 canvas.LineTo(endX, (int)(lineY + LineTopOffset * Scale));

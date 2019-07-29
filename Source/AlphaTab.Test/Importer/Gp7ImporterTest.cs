@@ -1078,7 +1078,7 @@ namespace AlphaTab.Test.Importer
                 FermataType.Long
             };
 
-                for (int i = 0; i < 3; i++)
+                for (var i = 0; i < 3; i++)
                 {
                     var masterBar = score.MasterBars[i];
                     Assert.AreEqual(5, masterBar.Fermata.Count);

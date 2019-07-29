@@ -31,7 +31,7 @@ namespace AlphaTab.Samples.Wpf.Utils
         public event EventHandler CanExecuteChanged;
         public virtual void RaiseCanExecuteChanged()
         {
-            EventHandler handler = CanExecuteChanged;
+            var handler = CanExecuteChanged;
             if (handler != null)
             {
                 ViewModelBase.InvokeOnUi(() =>

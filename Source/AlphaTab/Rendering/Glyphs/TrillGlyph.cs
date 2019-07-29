@@ -3,9 +3,8 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TrillGlyph : EffectGlyph
+    internal class TrillGlyph : EffectGlyph
     {
-
         public TrillGlyph(float x, float y)
             : base(x, y)
         {
@@ -14,7 +13,7 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             base.DoLayout();
-            Height = 20*Scale;
+            Height = 20 * Scale;
         }
 
         public override void Paint(float cx, float cy, ICanvas canvas)
@@ -30,7 +29,7 @@ namespace AlphaTab.Rendering.Glyphs
             var endX = Width - startX;
             var waveScale = 1.2f;
             var step = 11 * Scale * waveScale;
-            var loops = Math.Max(1, ((endX - startX) / step));
+            var loops = Math.Max(1, (endX - startX) / step);
 
 
             var loopX = startX;

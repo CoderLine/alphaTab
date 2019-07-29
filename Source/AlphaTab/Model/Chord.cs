@@ -42,7 +42,7 @@ namespace AlphaTab.Model
         /// <summary>
         /// Gets or sets whether the chord diagram is shown.
         /// </summary>
-        public bool ShowDiagram{ get; set; }
+        public bool ShowDiagram { get; set; }
 
         /// <summary>
         /// Gets or sets whether the fingering is shown below the chord diagram. 

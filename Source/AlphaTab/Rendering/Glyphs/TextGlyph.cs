@@ -3,7 +3,7 @@ using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TextGlyph : EffectGlyph
+    internal class TextGlyph : EffectGlyph
     {
         private readonly string[] _lines;
 
@@ -17,7 +17,7 @@ namespace AlphaTab.Rendering.Glyphs
             Font = font;
             TextAlign = textAlign;
         }
-        
+
         public override void DoLayout()
         {
             base.DoLayout();

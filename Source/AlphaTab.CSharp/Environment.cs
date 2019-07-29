@@ -1,12 +1,11 @@
 ﻿using AlphaTab.Platform.CSharp;
 using AlphaTab.Platform.Svg;
-using AlphaTab.Rendering;
 
 namespace AlphaTab
 {
-    partial class Environment
+    internal partial class Environment
     {
-        static void PlatformInit()
+        private static void PlatformInit()
         {
             RenderEngines["svg"] = new RenderEngineFactory(true, () => new CssFontSvgCanvas());
 #if NET472
@@ -14,7 +13,6 @@ namespace AlphaTab
 #endif
             RenderEngines["skia"] = new RenderEngineFactory(true, () => new SkiaCanvas());
             RenderEngines["default"] = RenderEngines["skia"];
-
         }
     }
 }

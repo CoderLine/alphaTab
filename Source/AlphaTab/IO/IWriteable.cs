@@ -10,6 +10,7 @@ namespace AlphaTab.IO
         /// </summary>
         /// <param name="value">The value to write.</param>
         void WriteByte(byte value);
+
         /// <summary>
         /// Write data from the given buffer. 
         /// </summary>

@@ -11,8 +11,10 @@ namespace AlphaTab.Haxe.Js.Html.Audio
     {
         [Name("connect")]
         public extern void Connect(AudioNode destination);
+
         [Name("connect")]
         public extern void Connect(AudioNode destination, HaxeInt output, HaxeInt input);
+
         [Name("disconnect")]
         public extern void Disconnect(HaxeInt output);
     }

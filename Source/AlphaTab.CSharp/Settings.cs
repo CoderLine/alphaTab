@@ -5,6 +5,7 @@
     /// </summary>
     public partial class Settings
     {
+        // ReSharper disable once UnusedParameter.Local
         private static void SetDefaults(Settings settings)
         {
         }

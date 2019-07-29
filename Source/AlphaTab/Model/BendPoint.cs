@@ -1,4 +1,3 @@
-
 namespace AlphaTab.Model
 {
     /// <summary>
@@ -11,6 +10,7 @@ namespace AlphaTab.Model
         /// The maximum offset for points
         /// </summary>
         public const int MaxPosition = 60;
+
         /// <summary>
         /// The maximum value for points. 
         /// </summary>
@@ -20,6 +20,7 @@ namespace AlphaTab.Model
         /// Gets or sets offset of the point relative to the note duration (0-60)
         /// </summary>
         public int Offset { get; set; }
+
         /// <summary>
         /// Gets or sets the 1/4 note value offsets for the bend. 
         /// </summary>
@@ -31,7 +32,7 @@ namespace AlphaTab.Model
         /// <param name="offset">The offset.</param>
         /// <param name="value">The value.</param>
         public BendPoint(int offset = 0, int value = 0)
-        { 
+        {
             Offset = offset;
             Value = value;
         }

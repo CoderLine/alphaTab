@@ -1,16 +1,15 @@
 ﻿using System;
-using AlphaTab.Platform;
 using AlphaTab.Audio.Synth.Util;
 
 namespace AlphaTab.Audio.Synth.Bank
 {
-    abstract class PcmData
+    internal abstract class PcmData
     {
         protected byte[] Data;
 
         public int Length { get; protected set; }
         public int BytesPerSample { get; protected set; }
-        public int BitsPerSample { get { return BytesPerSample * 8; } }
+        public int BitsPerSample => BytesPerSample * 8;
 
         protected PcmData(int bits, byte[] pcmData, bool isDataInLittleEndianFormat)
         {
@@ -45,39 +44,69 @@ namespace AlphaTab.Audio.Synth.Bank
         }
     }
 
-    class PcmData8Bit : PcmData
+    internal class PcmData8Bit : PcmData
     {
-        public PcmData8Bit(int bits, byte[] pcmData, bool isDataInLittleEndianFormat) : base(bits, pcmData, isDataInLittleEndianFormat) { }
+        public PcmData8Bit(int bits, byte[] pcmData, bool isDataInLittleEndianFormat) : base(bits,
+            pcmData,
+            isDataInLittleEndianFormat)
+        {
+        }
+
+        public override float this[int index] => Data[index] / 255f * 2f - 1f;
+    }
+
+    internal class PcmData16Bit : PcmData
+    {
+        public PcmData16Bit(int bits, byte[] pcmData, bool isDataInLittleEndianFormat) : base(bits,
+            pcmData,
+            isDataInLittleEndianFormat)
+        {
+        }
+
         public override float this[int index]
         {
-            get { return ((Data[index] / 255f) * 2f) - 1f; }
+            get
+            {
+                index *= 2;
+                return (((Data[index] | (Data[index + 1] << 8)) << 16) >> 16) / 32768f;
+            }
         }
     }
 
-    class PcmData16Bit : PcmData
+    internal class PcmData24Bit : PcmData
     {
-        public PcmData16Bit(int bits, byte[] pcmData, bool isDataInLittleEndianFormat) : base(bits, pcmData, isDataInLittleEndianFormat) { }
+        public PcmData24Bit(int bits, byte[] pcmData, bool isDataInLittleEndianFormat) : base(bits,
+            pcmData,
+            isDataInLittleEndianFormat)
+        {
+        }
+
         public override float this[int index]
         {
-            get { index *= 2; return (((Data[index] | (Data[index + 1] << 8)) << 16) >> 16) / 32768f; }
+            get
+            {
+                index *= 3;
+                return (((Data[index] | (Data[index + 1] << 8) | (Data[index + 2] << 16)) << 12) >> 12) / 8388608f;
+            }
         }
     }
 
-    class PcmData24Bit : PcmData
+    internal class PcmData32Bit : PcmData
     {
-        public PcmData24Bit(int bits, byte[] pcmData, bool isDataInLittleEndianFormat) : base(bits, pcmData, isDataInLittleEndianFormat) { }
-        public override float this[int index]
+        public PcmData32Bit(int bits, byte[] pcmData, bool isDataInLittleEndianFormat) : base(bits,
+            pcmData,
+            isDataInLittleEndianFormat)
         {
-            get { index *= 3; return (((Data[index] | (Data[index + 1] << 8) | (Data[index + 2] << 16)) << 12) >> 12) / 8388608f; }
         }
-    }
 
-    class PcmData32Bit : PcmData
-    {
-        public PcmData32Bit(int bits, byte[] pcmData, bool isDataInLittleEndianFormat) : base(bits, pcmData, isDataInLittleEndianFormat) { }
         public override float this[int index]
         {
-            get { index *= 4; return (Data[index] | (Data[index + 1] << 8) | (Data[index + 2] << 16) | (Data[index + 3] << 24)) / 2147483648f; }
+            get
+            {
+                index *= 4;
+                return (Data[index] | (Data[index + 1] << 8) | (Data[index + 2] << 16) | (Data[index + 3] << 24)) /
+                       2147483648f;
+            }
         }
     }
 }

@@ -4,7 +4,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class NoteVibratoGlyph : GroupedEffectGlyph
+    internal class NoteVibratoGlyph : GroupedEffectGlyph
     {
         public const int SlightWaveOffset = 10;
         public const float SlightWaveSize = 8.5f;

@@ -2,7 +2,6 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
 using AlphaTab.Rendering.Staves;
 
 namespace AlphaTab.Rendering.Glyphs
@@ -11,7 +10,7 @@ namespace AlphaTab.Rendering.Glyphs
     /// This glyph acts as container for handling
     /// multiple voice rendering
     /// </summary>
-    class VoiceContainerGlyph : GlyphGroup
+    internal class VoiceContainerGlyph : GlyphGroup
     {
         public const string KeySizeBeat = "Beat";
 
@@ -58,7 +57,7 @@ namespace AlphaTab.Rendering.Glyphs
                 // for the last glyph size based on the full width
                 if (i == j - 1)
                 {
-                    float beatWidth = Width - beatGlyphs[beatGlyphs.Count - 1].X;
+                    var beatWidth = Width - beatGlyphs[beatGlyphs.Count - 1].X;
                     currentBeatGlyph.ScaleToWidth(beatWidth);
                 }
             }
@@ -81,12 +80,13 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 b.ApplyLayoutingInfo(info);
             }
+
             ScaleToForce(Math.Max(Renderer.Settings.StretchForce, info.MinStretchForce));
         }
 
         public override void AddGlyph(Glyph g)
         {
-            var bg = (BeatContainerGlyph) g;
+            var bg = (BeatContainerGlyph)g;
             g.X = BeatGlyphs.Count == 0
                 ? 0
                 : BeatGlyphs[BeatGlyphs.Count - 1].X + BeatGlyphs[BeatGlyphs.Count - 1].Width;
@@ -154,5 +154,4 @@ namespace AlphaTab.Rendering.Glyphs
         //    }
         //}
     }
-
 }

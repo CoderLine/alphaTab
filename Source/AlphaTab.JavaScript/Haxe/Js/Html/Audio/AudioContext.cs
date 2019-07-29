@@ -22,7 +22,9 @@ namespace AlphaTab.Haxe.Js.Html.Audio
         public extern AudioBuffer CreateBuffer(HaxeInt numberOfChannels, HaxeInt length, HaxeFloat sampleRate);
 
         [Name("createScriptProcessor")]
-        public extern ScriptProcessorNode CreateScriptProcessor(HaxeInt bufferSize, HaxeInt numberOfInputChannels,
+        public extern ScriptProcessorNode CreateScriptProcessor(
+            HaxeInt bufferSize,
+            HaxeInt numberOfInputChannels,
             HaxeInt numberOfOutputChannels);
 
         [Name("createBufferSource")]

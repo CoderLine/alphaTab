@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Audio.Synth.Bank.Descriptors
 {
-    enum Waveform
+    internal enum Waveform
     {
         Sine = 0,
         Square = 1,
@@ -12,7 +12,7 @@ namespace AlphaTab.Audio.Synth.Bank.Descriptors
         WhiteNoise = 5
     }
 
-    class GeneratorDescriptor
+    internal class GeneratorDescriptor
     {
         public LoopMode LoopMethod { get; set; }
         public Waveform SamplerType { get; set; }

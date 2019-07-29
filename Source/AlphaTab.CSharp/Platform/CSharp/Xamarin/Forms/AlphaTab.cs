@@ -12,7 +12,8 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
     {
         private readonly AlphaTabLayoutPanel _contentPanel;
 
-        public static readonly BindableProperty TracksProperty = BindableProperty.Create("Tracks", typeof(IEnumerable<Track>), typeof(AlphaTab), propertyChanged: OnTracksChanged);
+        public static readonly BindableProperty TracksProperty =
+ BindableProperty.Create("Tracks", typeof(IEnumerable<Track>), typeof(AlphaTab), propertyChanged: OnTracksChanged);
         private static void OnTracksChanged(BindableObject bindable, object oldvalue, object newvalue)
         {
             ((AlphaTab)bindable).RenderTracks();
@@ -23,7 +24,8 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Forms
             set { SetValue(TracksProperty, value); }
         }
 
-        public static readonly BindableProperty SettingsProperty = BindableProperty.Create("Settings", typeof(Settings), typeof(AlphaTab), propertyChanged: OnSettingsChanged);
+        public static readonly BindableProperty SettingsProperty =
+ BindableProperty.Create("Settings", typeof(Settings), typeof(AlphaTab), propertyChanged: OnSettingsChanged);
         private static void OnSettingsChanged(BindableObject bindable, object oldvalue, object newvalue)
         {
             ((AlphaTab)bindable).OnSettingsChanged((Settings)newvalue);

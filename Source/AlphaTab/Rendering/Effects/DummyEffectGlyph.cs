@@ -3,7 +3,7 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class DummyEffectGlyph : EffectGlyph
+    internal class DummyEffectGlyph : EffectGlyph
     {
         private readonly string _s;
 

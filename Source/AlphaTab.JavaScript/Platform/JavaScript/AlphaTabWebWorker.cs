@@ -8,7 +8,7 @@ using AlphaTab.Util;
 
 namespace AlphaTab.Platform.JavaScript
 {
-    class AlphaTabWebWorker
+    internal class AlphaTabWebWorker
     {
         private ScoreRenderer _renderer;
         private readonly DedicatedWorkerGlobalScope _main;
@@ -34,10 +34,25 @@ namespace AlphaTab.Platform.JavaScript
                     Settings settings = Settings.FromJson(data.settings, null);
                     Logger.LogLevel = settings.LogLevel;
                     _renderer = new ScoreRenderer(settings);
-                    _renderer.PartialRenderFinished += result => _main.PostMessage(new { cmd = "alphaTab.partialRenderFinished", result = result });
-                    _renderer.RenderFinished += result => _main.PostMessage(new { cmd = "alphaTab.renderFinished", result = result });
-                    _renderer.PostRenderFinished += () => _main.PostMessage(new { cmd = "alphaTab.postRenderFinished", boundsLookup = _renderer.BoundsLookup.ToJson() });
-                    _renderer.PreRender += () => _main.PostMessage(new { cmd = "alphaTab.preRender" });
+                    _renderer.PartialRenderFinished += result => _main.PostMessage(new
+                    {
+                        cmd = "alphaTab.partialRenderFinished",
+                        result = result
+                    });
+                    _renderer.RenderFinished += result => _main.PostMessage(new
+                    {
+                        cmd = "alphaTab.renderFinished",
+                        result = result
+                    });
+                    _renderer.PostRenderFinished += () => _main.PostMessage(new
+                    {
+                        cmd = "alphaTab.postRenderFinished",
+                        boundsLookup = _renderer.BoundsLookup.ToJson()
+                    });
+                    _renderer.PreRender += () => _main.PostMessage(new
+                    {
+                        cmd = "alphaTab.preRender"
+                    });
                     _renderer.Error += Error;
                     break;
                 case "alphaTab.invalidate":
@@ -77,7 +92,7 @@ namespace AlphaTab.Platform.JavaScript
         {
             Logger.Error(type, "An unexpected error occurred in worker", e);
 
-            dynamic error = Json.Parse(Json.Stringify(e));
+            var error = Json.Parse(Json.Stringify(e));
 
             dynamic e2 = e;
 
@@ -85,15 +100,26 @@ namespace AlphaTab.Platform.JavaScript
             {
                 error.message = e2.message;
             }
+
             if (e2.stack)
             {
                 error.stack = e2.stack;
             }
+
             if (e2.constructor && e2.constructor.name)
             {
                 error.type = e2.constructor.name;
             }
-            _main.PostMessage(new { cmd = "alphaTab.error", error = new { type = type, detail = error } });
+
+            _main.PostMessage(new
+            {
+                cmd = "alphaTab.error",
+                error = new
+                {
+                    type = type,
+                    detail = error
+                }
+            });
         }
     }
 }

@@ -5,7 +5,7 @@ namespace AlphaTab.Haxe.Js.Html
 {
     [External]
     [Name("js.html.NodeList")]
-    public class NodeList 
+    public class NodeList
     {
         [Name("length")]
         public extern HaxeInt Length { get; }

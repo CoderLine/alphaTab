@@ -59,6 +59,7 @@ namespace AlphaTab.Rendering
                 _currentRenderEngine = Settings.Engine;
                 return true;
             }
+
             return false;
         }
 
@@ -70,6 +71,7 @@ namespace AlphaTab.Rendering
                 _currentLayoutMode = Settings.Layout.Mode;
                 return true;
             }
+
             return false;
         }
 
@@ -95,11 +97,12 @@ namespace AlphaTab.Rendering
                         }
                     }
                 }
-               
+
                 if (tracks.Count == 0 && score.Tracks.Count > 0)
                 {
                     tracks.Add(score.Tracks[0]);
                 }
+
                 Tracks = tracks.ToArray();
                 Invalidate();
             }
@@ -145,14 +148,17 @@ namespace AlphaTab.Rendering
             }
 
             BoundsLookup = new BoundsLookup();
-            if (Tracks == null || Tracks.Length == 0) return;
+            if (Tracks == null || Tracks.Length == 0)
+            {
+                return;
+            }
 
             RecreateCanvas();
             Canvas.LineWidth = Settings.Scale;
             Canvas.Settings = Settings;
 
             Logger.Info("Rendering", "Rendering " + Tracks.Length + " tracks");
-            for (int i = 0; i < Tracks.Length; i++)
+            for (var i = 0; i < Tracks.Length; i++)
             {
                 var track = Tracks[i];
                 Logger.Info("Rendering", "Track " + i + ": " + track.Name);
@@ -189,6 +195,7 @@ namespace AlphaTab.Rendering
             {
                 Logger.Warning("Rendering", "Current layout does not support dynamic resizing, nothing was done");
             }
+
             Logger.Debug("Rendering", "Resize finished");
         }
 
@@ -203,10 +210,14 @@ namespace AlphaTab.Rendering
 
         /// <inheritdoc />
         public event Action PreRender;
+
         private void OnPreRender()
         {
             var handler = PreRender;
-            if (handler != null) handler();
+            if (handler != null)
+            {
+                handler();
+            }
         }
 
         /// <inheritdoc />
@@ -214,39 +225,53 @@ namespace AlphaTab.Rendering
 
         internal void OnPartialRenderFinished(RenderFinishedEventArgs e)
         {
-            Action<RenderFinishedEventArgs> handler = PartialRenderFinished;
-            if (handler != null) handler(e);
+            var handler = PartialRenderFinished;
+            if (handler != null)
+            {
+                handler(e);
+            }
         }
 
         /// <inheritdoc />
         public event Action<RenderFinishedEventArgs> RenderFinished;
+
         private void OnRenderFinished()
         {
             var result = Canvas.OnRenderFinished();
-            Action<RenderFinishedEventArgs> handler = RenderFinished;
-            if (handler != null) handler(new RenderFinishedEventArgs
+            var handler = RenderFinished;
+            if (handler != null)
             {
-                RenderResult = result,
-                TotalHeight = Layout.Height,
-                TotalWidth = Layout.Width
-            });
+                handler(new RenderFinishedEventArgs
+                {
+                    RenderResult = result,
+                    TotalHeight = Layout.Height,
+                    TotalWidth = Layout.Width
+                });
+            }
         }
 
         /// <inheritdoc />
         public event Action<string, Exception> Error;
+
         private void OnError(string type, Exception details)
         {
             var handler = Error;
-            if (handler != null) handler(type, details);
+            if (handler != null)
+            {
+                handler(type, details);
+            }
         }
 
         /// <inheritdoc />
         public event Action PostRenderFinished;
+
         private void OnPostRender()
         {
-            Action handler = PostRenderFinished;
-            if (handler != null) handler();
+            var handler = PostRenderFinished;
+            if (handler != null)
+            {
+                handler();
+            }
         }
-
     }
 }

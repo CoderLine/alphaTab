@@ -20,9 +20,10 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
+
 namespace AlphaTab.Xml
 {
-    class XmlDocument : XmlNode
+    internal class XmlDocument : XmlNode
     {
         public XmlNode DocumentElement { get; private set; }
 

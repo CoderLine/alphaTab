@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class BarNumberGlyph : Glyph
+    internal class BarNumberGlyph : Glyph
     {
         private readonly int _number;
 
@@ -24,6 +24,7 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 return;
             }
+
             var res = Renderer.Resources;
             var c = canvas.Color;
             canvas.Color = res.BarNumberColor;

@@ -1,13 +1,11 @@
-﻿using AlphaTab.Audio.Synth.Bank.Components.Generators;
-
-namespace AlphaTab.Audio.Synth.Util
+﻿namespace AlphaTab.Audio.Synth.Util
 {
-    static class SynthConstants
+    internal static class SynthConstants
     {
         public const int AudioChannels = 2;
 
         public const double Pi = 3.14159265358979;
-        public const double TwoPi = 2.0*Pi;
+        public const double TwoPi = 2.0 * Pi;
         public const double HalfPi = Pi / 2.0;
         public const double InverseSqrtOfTwo = 0.707106781186;
         public const float DefaultLfoFrequency = 8.0f;

@@ -10,30 +10,37 @@ namespace AlphaTab.Model
         /// pianississimo (very very soft)
         /// </summary>
         PPP,
+
         /// <summary>
         /// pianissimo (very soft)
         /// </summary>
-        PP, 
+        PP,
+
         /// <summary>
         /// piano (soft)
         /// </summary>
-        P, 
+        P,
+
         /// <summary>
         /// mezzo-piano (half soft)
         /// </summary>
-        MP, 
+        MP,
+
         /// <summary>
         /// mezzo-forte (half loud)
         /// </summary>
-        MF, 
+        MF,
+
         /// <summary>
         /// forte (loud)
         /// </summary>
-        F, 
+        F,
+
         /// <summary>
         /// fortissimo (very loud)
         /// </summary>
-        FF, 
+        FF,
+
         /// <summary>
         /// fortississimo (very very loud)
         /// </summary>

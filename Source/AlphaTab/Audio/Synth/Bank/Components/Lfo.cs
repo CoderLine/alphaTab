@@ -3,13 +3,13 @@ using AlphaTab.Audio.Synth.Bank.Descriptors;
 
 namespace AlphaTab.Audio.Synth.Bank.Components
 {
-    enum LfoState
+    internal enum LfoState
     {
         Delay = 0,
         Sustain = 1
     }
 
-    class Lfo
+    internal class Lfo
     {
         private double _phase;
         private double _increment;
@@ -61,8 +61,10 @@ namespace AlphaTab.Audio.Synth.Bank.Components
                 _phase += _increment * amount;
                 while (_phase >= _generator.LoopEndPhase)
                 {
-                    _phase = _generator.LoopStartPhase + (_phase - _generator.LoopEndPhase) % (_generator.LoopEndPhase - _generator.LoopStartPhase);
+                    _phase = _generator.LoopStartPhase + (_phase - _generator.LoopEndPhase) %
+                             (_generator.LoopEndPhase - _generator.LoopStartPhase);
                 }
+
                 Value = _generator.GetValue(_phase);
             }
         }

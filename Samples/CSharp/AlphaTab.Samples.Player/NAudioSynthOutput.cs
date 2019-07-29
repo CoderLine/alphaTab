@@ -7,7 +7,7 @@ using NAudio.Wave;
 
 namespace AlphaTab.Samples.PngDump
 {
-    class NAudioSynthOutput : WaveProvider32, ISynthOutput
+    internal class NAudioSynthOutput : WaveProvider32, ISynthOutput
     {
         private const int BufferSize = 4096;
         private const int BufferCount = 10;
@@ -19,10 +19,7 @@ namespace AlphaTab.Samples.PngDump
 
         private bool _finished;
 
-        public int SampleRate
-        {
-            get { return PreferredSampleRate; }
-        }
+        public int SampleRate => PreferredSampleRate;
 
         public NAudioSynthOutput()
             : base(PreferredSampleRate, 2)
@@ -82,7 +79,7 @@ namespace AlphaTab.Samples.PngDump
             const int count = (BufferCount / 2) * BufferSize;
             if (_circularBuffer.Count < count && SampleRequest != null)
             {
-                for (int i = 0; i < BufferCount / 2; i++)
+                for (var i = 0; i < BufferCount / 2; i++)
                 {
                     SampleRequest();
                 }
@@ -103,7 +100,7 @@ namespace AlphaTab.Samples.PngDump
                 var read = new SampleArray(count);
                 _circularBuffer.Read(read, 0, read.Length);
 
-                for (int i = 0; i < count; i++)
+                for (var i = 0; i < count; i++)
                 {
                     buffer[offset + i] = read[i];
                 }

@@ -15,7 +15,7 @@ using Image = System.Windows.Controls.Image;
 
 namespace AlphaTab.Platform.CSharp.Wpf
 {
-    class WpfUiFacade : IUiFacade<AlphaTab>
+    internal class WpfUiFacade : IUiFacade<AlphaTab>
     {
         private readonly ScrollViewer _scrollViewer;
         private AlphaTabApi<AlphaTab> _api;
@@ -162,7 +162,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
                         panel.Children.RemoveAt(panel.Children.Count - 1);
                     }
                 }
-                // NOTE: here we try to replace existing children 
+                // NOTE: here we try to replace existing children
                 else
                 {
                     var body = renderResult.RenderResult;
@@ -193,7 +193,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
                         _totalResultCount.TryPeek(out var counter);
                         if (counter.Count < panel.Children.Count)
                         {
-                            Image img = (Image)(panel.Children[counter.Count]);
+                            var img = (Image)panel.Children[counter.Count];
                             img.Width = renderResult.Width;
                             img.Height = renderResult.Height;
                             img.Stretch = Stretch.None;
@@ -216,7 +216,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public IScoreRenderer CreateWorkerRenderer()
         {
-            return new ManagedThreadScoreRenderer<AlphaTab>(_api, _api.Settings, a =>
+            return new ManagedThreadScoreRenderer<AlphaTab>(_api.Settings, a =>
             {
                 if (_control.Dispatcher.CheckAccess())
                 {
@@ -244,7 +244,8 @@ namespace AlphaTab.Platform.CSharp.Wpf
             });
             player.Ready += () =>
             {
-                using (var sf = typeof(WpfUiFacade).Assembly.GetManifestResourceStream(typeof(GdiCanvas), "default.sf2"))
+                using (var sf =
+ typeof(WpfUiFacade).Assembly.GetManifestResourceStream(typeof(GdiCanvas), "default.sf2"))
                 using (var ms = new MemoryStream())
                 {
                     sf.CopyTo(ms);

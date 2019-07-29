@@ -5,7 +5,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.UI
 {
-    class HtmlElementContainer : IContainer
+    internal class HtmlElementContainer : IContainer
     {
         public float Top
         {
@@ -65,7 +65,9 @@ namespace AlphaTab.UI
             }
         }
 
-        public bool IsVisible => Element.OffsetWidth.IsTruthy() || Element.OffsetHeight.IsTruthy() || Element.GetClientRects().Length.IsTruthy();
+        public bool IsVisible =>
+            Element.OffsetWidth.IsTruthy() || Element.OffsetHeight.IsTruthy() ||
+            Element.GetClientRects().Length.IsTruthy();
 
         public Element Element { get; }
 
@@ -88,20 +90,37 @@ namespace AlphaTab.UI
 
         public event Action<IMouseEventArgs> MouseDown
         {
-            add { Element.AddEventListener("mousedown", (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }), true); }
+            add
+            {
+                Element.AddEventListener("mousedown",
+                    (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }),
+                    true);
+            }
             remove { }
         }
 
         public event Action<IMouseEventArgs> MouseMove
         {
-            add { Element.AddEventListener("mousemove", (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }), true); }
+            add
+            {
+                Element.AddEventListener("mousemove",
+                    (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }),
+                    true);
+            }
             remove { }
         }
+
         public event Action<IMouseEventArgs> MouseUp
         {
-            add { Element.AddEventListener("mouseup", (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }), true); }
+            add
+            {
+                Element.AddEventListener("mouseup",
+                    (Action<Event>)(e => { value(new BrowserMouseEventArgs((MouseEvent)e)); }),
+                    true);
+            }
             remove { }
         }
+
         public void Clear()
         {
             Element.InnerHTML = "";

@@ -27,11 +27,11 @@
         {
             if (A == 0xFF)
             {
-                RGBA = "#" + Platform.ToHexString(R, 2) + Platform.ToHexString(G, 2) + Platform.ToHexString(B, 2);
+                Rgba = "#" + Platform.ToHexString(R, 2) + Platform.ToHexString(G, 2) + Platform.ToHexString(B, 2);
             }
             else
             {
-                RGBA = "rgba(" + R + "," + G + "," + B + "," + (A / 255.0) + ")";
+                Rgba = "rgba(" + R + "," + G + "," + B + "," + A / 255.0 + ")";
             }
         }
 
@@ -67,9 +67,10 @@
         /// <summary>
         /// Gets the RGBA hex string to use in CSS areas. 
         /// </summary>
-        public string RGBA
+        public string Rgba
         {
-            get; internal set;
+            get;
+            internal set;
         }
 
         internal static Color Random(byte opacity = 100)

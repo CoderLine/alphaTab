@@ -6,9 +6,9 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Samples.ScoreDump
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             if (args.Length != 1)
             {
@@ -28,9 +28,9 @@ namespace AlphaTab.Samples.ScoreDump
                 score.MasterBars[0].TimeSignatureDenominator);
             // tracks
             Console.WriteLine("Tracks: ");
-            for (int i = 0; i < score.Tracks.Count; i++)
+            for (var i = 0; i < score.Tracks.Count; i++)
             {
-                Track track = (Track)score.Tracks[i];
+                var track = (Track)score.Tracks[i];
                 Console.WriteLine("   {0} - {1} - {2}", i + 1, track.Name, track.Staves.Any(s=>s.IsPercussion) ? "Percussion" : "Midi Instrument: " + track.PlaybackInfo.Program);
             }
         }

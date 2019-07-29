@@ -9,12 +9,14 @@ namespace AlphaTab.Haxe.Js.Html
     {
         [Name("top")]
         public extern HaxeInt Top { get; }
+
         [Name("left")]
         public extern HaxeInt Left { get; }
+
         [Name("width")]
         public extern HaxeInt Width { get; }
+
         [Name("height")]
         public extern HaxeInt Height { get; }
-
     }
 }

@@ -3,12 +3,12 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class WhammyBarEffectInfo : IEffectBarRendererInfo
+    internal class WhammyBarEffectInfo : IEffectBarRendererInfo
     {
-        public string EffectId { get { return "whammy"; } }
-        public bool HideOnMultiTrack { get { return false; } }
-        public bool CanShareBand { get { return false; } }
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.GroupedOnBeat; } }
+        public string EffectId => "whammy";
+        public bool HideOnMultiTrack => false;
+        public bool CanShareBand => false;
+        public EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.GroupedOnBeat;
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {

@@ -9,10 +9,13 @@ namespace AlphaTab.Haxe.Js.Html
     {
         [Name("write")]
         public extern void Write(HaxeString s);
+
         [Name("body")]
         public extern BodyElement Body { get; set; }
+
         [Name("documentElement")]
         public extern Element DocumentElement { get; set; }
+
         [Name("createTextNode")]
         public extern Node CreateTextNode(HaxeString text);
     }

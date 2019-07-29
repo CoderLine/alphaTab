@@ -4,18 +4,18 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class ChordsEffectInfo : IEffectBarRendererInfo
+    internal class ChordsEffectInfo : IEffectBarRendererInfo
     {
-        public string EffectId { get { return "chords"; } }
-        public bool HideOnMultiTrack { get { return false; } }
-        public bool CanShareBand { get { return true; } }
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
+        public string EffectId => "chords";
+        public bool HideOnMultiTrack => false;
+        public bool CanShareBand => true;
+        public EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.SingleOnBeat;
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
             return beat.HasChord;
         }
-      
+
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
             return new TextGlyph(0, 0, beat.Chord.Name, renderer.Resources.EffectFont, TextAlign.Center);

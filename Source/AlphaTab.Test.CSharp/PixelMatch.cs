@@ -22,7 +22,7 @@ namespace AlphaTab.Test.CSharp
     // TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
     // THIS SOFTWARE.
 
-    class PixelMatch
+    internal class PixelMatch
     {
         public static unsafe PixelMatchResult Run(SKBitmap img1, SKBitmap img2, PixelMatchOptions options)
         {
@@ -47,8 +47,8 @@ namespace AlphaTab.Test.CSharp
             var width = img1.Width;
             var height = img1.Height;
 
-            byte* img1Raw = (byte*)img1.GetPixels().ToPointer();
-            byte* img2Raw = (byte*)img2.GetPixels().ToPointer();
+            var img1Raw = (byte*)img1.GetPixels().ToPointer();
+            var img2Raw = (byte*)img2.GetPixels().ToPointer();
             byte* outputRaw = null;
 
             // compare each pixel of one image against the other one
@@ -84,13 +84,19 @@ namespace AlphaTab.Test.CSharp
                                                           AntiAliased(img2Raw, x, y, width, height, img1Raw)))
                         {
                             // one of the pixels is anti-aliasing; draw as yellow and do not count as difference
-                            if (options.CreateOutputImage) DrawPixel(outputRaw, pos, 255, 255, 0);
-
+                            if (options.CreateOutputImage)
+                            {
+                                DrawPixel(outputRaw, pos, 255, 255, 0);
+                            }
                         }
                         else
                         {
                             // found substantial difference not caused by anti-aliasing; draw it as red
-                            if (options.CreateOutputImage) DrawPixel(outputRaw, pos, 255, 0, 0);
+                            if (options.CreateOutputImage)
+                            {
+                                DrawPixel(outputRaw, pos, 255, 0, 0);
+                            }
+
                             diff++;
                         }
 
@@ -122,30 +128,48 @@ namespace AlphaTab.Test.CSharp
             double min = 0;
             double max = 0;
 
-            int minX = 0;
-            int minY = 0;
-            int maxX = 0;
-            int maxY = 0;
+            var minX = 0;
+            var minY = 0;
+            var maxX = 0;
+            var maxY = 0;
 
             // go through 8 adjacent pixels
             for (var x = x0; x <= x2; x++)
             {
                 for (var y = y0; y <= y2; y++)
                 {
-                    if (x == x1 && y == y1) continue;
+                    if (x == x1 && y == y1)
+                    {
+                        continue;
+                    }
 
                     // brightness delta between the center pixel and adjacent one
                     var delta = ColorDelta(img, img, pos, (y * width + x) * 4, true, out var wasTransparent);
 
                     // count the number of equal, darker and brighter adjacent pixels
-                    if (delta == 0) zeroes++;
-                    else if (delta < 0) negatives++;
-                    else if (delta > 0) positives++;
+                    if (delta == 0)
+                    {
+                        zeroes++;
+                    }
+                    else if (delta < 0)
+                    {
+                        negatives++;
+                    }
+                    else if (delta > 0)
+                    {
+                        positives++;
+                    }
 
                     // if found more than 2 equal siblings, it's definitely not anti-aliasing
-                    if (zeroes > 2) return false;
+                    if (zeroes > 2)
+                    {
+                        return false;
+                    }
 
-                    if (img2 == null) continue;
+                    if (img2 == null)
+                    {
+                        continue;
+                    }
 
                     // remember the darkest pixel
                     if (delta < min)
@@ -164,10 +188,16 @@ namespace AlphaTab.Test.CSharp
                 }
             }
 
-            if (img2 == null) return true;
+            if (img2 == null)
+            {
+                return true;
+            }
 
             // if there are no both darker and brighter pixels among siblings, it's not anti-aliasing
-            if (negatives == 0 || positives == 0) return false;
+            if (negatives == 0 || positives == 0)
+            {
+                return false;
+            }
 
             // if either the darkest or the brightest pixel has more than 2 equal siblings in both images
             // (definitely not anti-aliased), this pixel is anti-aliased
@@ -210,7 +240,10 @@ namespace AlphaTab.Test.CSharp
 
             var y = Rgb2Y(r1, g1, b1) - Rgb2Y(r2, g2, b2);
 
-            if (yOnly) return y; // brightness difference only
+            if (yOnly)
+            {
+                return y; // brightness difference only
+            }
 
             var i = Rgb2I(r1, g1, b1) - Rgb2I(r2, g2, b2);
             var q = Rgb2Q(r1, g1, b1) - Rgb2Q(r2, g2, b2);
@@ -239,7 +272,7 @@ namespace AlphaTab.Test.CSharp
         }
     }
 
-    class PixelMatchOptions
+    internal class PixelMatchOptions
     {
         public double Threshold { get; set; }
         public bool IncludeAntiAlias { get; set; }
@@ -253,7 +286,7 @@ namespace AlphaTab.Test.CSharp
         }
     }
 
-    class PixelMatchResult
+    internal class PixelMatchResult
     {
         public SKBitmap Output { get; set; }
         public int DifferentPixels { get; set; }

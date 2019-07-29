@@ -4,7 +4,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Importer
 {
-    class PartConfiguration
+    internal class PartConfiguration
     {
         public class Part
         {
@@ -44,9 +44,9 @@ namespace AlphaTab.Importer
             var staffIndex = 0;
             var trackIndex = 0;
 
-            // the PartConfiguration is really twisted compared to how the score structure looks like. 
-            // the first part typically contains the settings for the first staff of all tracks. 
-            // but then there is 1 part with 1 track for each other staff of the tracks. 
+            // the PartConfiguration is really twisted compared to how the score structure looks like.
+            // the first part typically contains the settings for the first staff of all tracks.
+            // but then there is 1 part with 1 track for each other staff of the tracks.
             // So the structure in the PartConfig appears to be:
             // Parts[0].Tracks = { Track1-Staff1, Track2-Staff1, Track3-Staff1, Track4-Staff1, .. }
             // Parts[1].Tracks = { Track1-Staff2 }
@@ -55,7 +55,7 @@ namespace AlphaTab.Importer
             // Parts[4].Tracks = { Track4-Staff2 }
             //
             // even if a track has only 1 staff, there are 2 staff configurations stored.
-            // I hope Arobas never changes this in the format as the PartConfiguration is not versionized. 
+            // I hope Arobas never changes this in the format as the PartConfiguration is not versionized.
 
             foreach (var part in Parts)
             {
@@ -83,7 +83,7 @@ namespace AlphaTab.Importer
         }
     }
 
-    class PartConfigurationParser
+    internal class PartConfigurationParser
     {
         public PartConfiguration Configuration { get; private set; }
 
@@ -99,14 +99,14 @@ namespace AlphaTab.Importer
             var readable = ByteBuffer.FromBuffer(partConfigurationData);
             var entryCount = readable.ReadInt32BE();
 
-            for (int i = 0; i < entryCount; i++)
+            for (var i = 0; i < entryCount; i++)
             {
                 var part = new PartConfiguration.Part();
                 Configuration.Parts.Add(part);
                 part.IsMultiRest = readable.GpReadBool();
 
                 var groupCount = readable.ReadInt32BE();
-                for (int j = 0; j < groupCount; j++)
+                for (var j = 0; j < groupCount; j++)
                 {
                     var flags = readable.ReadByte();
                     // enable at least standard notation
@@ -119,7 +119,7 @@ namespace AlphaTab.Importer
                     {
                         ShowStandardNotation = (flags & 0x01) != 0,
                         ShowTablature = (flags & 0x02) != 0,
-                        ShowSlash = (flags & 0x04) != 0,
+                        ShowSlash = (flags & 0x04) != 0
                     });
                 }
             }

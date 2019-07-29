@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class RepeatOpenGlyph : Glyph
+    internal class RepeatOpenGlyph : Glyph
     {
         private readonly float _dotOffset;
         private readonly float _circleSize;
@@ -31,7 +31,7 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.FillRect(left, top, blockWidth, h);
 
             // line
-            left += (blockWidth * 2) - 0.5f;
+            left += blockWidth * 2 - 0.5f;
             canvas.BeginPath();
             canvas.MoveTo(left, top);
             canvas.LineTo(left, bottom);
@@ -42,8 +42,8 @@ namespace AlphaTab.Rendering.Glyphs
 
             var circleSize = _circleSize * Scale;
             var middle = (top + bottom) / 2;
-            canvas.FillCircle(left, middle - (circleSize * _dotOffset), circleSize);
-            canvas.FillCircle(left, middle + (circleSize * _dotOffset), circleSize);
+            canvas.FillCircle(left, middle - circleSize * _dotOffset, circleSize);
+            canvas.FillCircle(left, middle + circleSize * _dotOffset, circleSize);
         }
     }
 }

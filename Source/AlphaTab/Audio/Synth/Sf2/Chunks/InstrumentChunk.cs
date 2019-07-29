@@ -3,7 +3,7 @@ using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Synth.Sf2.Chunks
 {
-    class InstrumentChunk : Chunk
+    internal class InstrumentChunk : Chunk
     {
         private RawInstrument[] _rawInstruments;
 
@@ -11,18 +11,22 @@ namespace AlphaTab.Audio.Synth.Sf2.Chunks
             : base(id, size)
         {
             if (size % 22 != 0)
+            {
                 throw new Exception("Invalid SoundFont. The preset chunk was invalid.");
-            _rawInstruments = new RawInstrument[((int)(size / 22.0))];
+            }
+
+            _rawInstruments = new RawInstrument[(int)(size / 22.0)];
             RawInstrument lastInstrument = null;
-            for (int x = 0; x < _rawInstruments.Length; x++)
+            for (var x = 0; x < _rawInstruments.Length; x++)
             {
                 var i = new RawInstrument();
                 i.Name = input.Read8BitStringLength(20);
                 i.StartInstrumentZoneIndex = input.ReadUInt16LE();
                 if (lastInstrument != null)
                 {
-                    lastInstrument.EndInstrumentZoneIndex = Platform.Platform.ToUInt16((i.StartInstrumentZoneIndex - 1));
+                    lastInstrument.EndInstrumentZoneIndex = Platform.Platform.ToUInt16(i.StartInstrumentZoneIndex - 1);
                 }
+
                 _rawInstruments[x] = i;
                 lastInstrument = i;
             }
@@ -31,7 +35,7 @@ namespace AlphaTab.Audio.Synth.Sf2.Chunks
         public Instrument[] ToInstruments(Zone[] zones)
         {
             var inst = new Instrument[_rawInstruments.Length - 1];
-            for (int x = 0; x < inst.Length; x++)
+            for (var x = 0; x < inst.Length; x++)
             {
                 var rawInst = _rawInstruments[x];
                 var i = new Instrument();
@@ -40,11 +44,12 @@ namespace AlphaTab.Audio.Synth.Sf2.Chunks
                 Platform.Platform.ArrayCopy(zones, rawInst.StartInstrumentZoneIndex, i.Zones, 0, i.Zones.Length);
                 inst[x] = i;
             }
+
             return inst;
         }
     }
 
-    class RawInstrument
+    internal class RawInstrument
     {
         public string Name { get; set; }
         public int StartInstrumentZoneIndex { get; set; }

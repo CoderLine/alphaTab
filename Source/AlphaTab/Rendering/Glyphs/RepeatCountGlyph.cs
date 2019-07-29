@@ -2,8 +2,8 @@
 using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
-{ 
-    class RepeatCountGlyph : Glyph
+{
+    internal class RepeatCountGlyph : Glyph
     {
         private readonly int _count;
 
@@ -25,8 +25,8 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.Font = res.BarNumberFont;
             canvas.TextAlign = TextAlign.Right;
             var s = "x" + _count;
-            var w = canvas.MeasureText(s)/1.5f;
-            
+            var w = canvas.MeasureText(s) / 1.5f;
+
             canvas.FillText(s, cx + X - w, cy + Y);
             canvas.TextAlign = oldAlign;
         }

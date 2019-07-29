@@ -8,11 +8,13 @@
         /// <summary>
         /// Text is left aligned. 
         /// </summary>
-        Left, 
+        Left,
+
         /// <summary>
         /// Text is centered. 
         /// </summary>
-        Center, 
+        Center,
+
         /// <summary>
         /// Text is right aligned. 
         /// </summary>

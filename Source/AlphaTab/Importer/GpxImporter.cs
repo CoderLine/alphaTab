@@ -1,5 +1,4 @@
 ﻿using AlphaTab.Model;
-using AlphaTab.Platform;
 using AlphaTab.Util;
 
 namespace AlphaTab.Importer
@@ -7,9 +6,9 @@ namespace AlphaTab.Importer
     /// <summary>
     /// This ScoreImporter can read Guitar Pro 6 (gpx) files.
     /// </summary>
-    class GpxImporter : ScoreImporter
+    internal class GpxImporter : ScoreImporter
     {
-        public override string Name { get { return "Guitar Pro 6"; } }
+        public override string Name => "Guitar Pro 6";
 
         public override Score ReadScore()
         {
@@ -18,10 +17,10 @@ namespace AlphaTab.Importer
             Logger.Info(Name, "Loading GPX filesystem");
             var fileSystem = new GpxFileSystem();
             fileSystem.FileFilter = s =>
-                s.EndsWith(GpxFileSystem.ScoreGpif)
-                || s.EndsWith(GpxFileSystem.BinaryStylesheet)
-                || s.EndsWith(GpxFileSystem.PartConfiguration)
-            ;
+                    s.EndsWith(GpxFileSystem.ScoreGpif)
+                    || s.EndsWith(GpxFileSystem.BinaryStylesheet)
+                    || s.EndsWith(GpxFileSystem.PartConfiguration)
+                ;
             fileSystem.Load(Data);
             Logger.Info(Name, "GPX filesystem loaded");
 
@@ -67,6 +66,7 @@ namespace AlphaTab.Importer
                 {
                     stylesheetParser.Stylesheet.Apply(score);
                 }
+
                 Logger.Info(Name, "BinaryStylesheet parsed");
             }
 
@@ -79,6 +79,7 @@ namespace AlphaTab.Importer
                 {
                     partConfigurationParser.Configuration.Apply(score);
                 }
+
                 Logger.Info(Name, "Part Configuration parsed");
             }
 

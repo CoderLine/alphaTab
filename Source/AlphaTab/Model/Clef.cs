@@ -8,22 +8,26 @@ namespace AlphaTab.Model
         /// <summary>
         /// Neutral clef.
         /// </summary>
-        Neutral, 
+        Neutral,
+
         /// <summary>
         /// C3 clef
         /// </summary>
-        C3, 
+        C3,
+
         /// <summary>
         /// C4 clef
         /// </summary>
-        C4, 
+        C4,
+
         /// <summary>
         /// F4 clef
         /// </summary>
-        F4, 
+        F4,
+
         /// <summary>
         /// G2 clef
         /// </summary>
         G2
-	}
+    }
 }

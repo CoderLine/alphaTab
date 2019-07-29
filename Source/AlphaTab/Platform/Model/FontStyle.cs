@@ -12,10 +12,12 @@ namespace AlphaTab.Platform.Model
         /// No flags. 
         /// </summary>
         Plain = 0,
+
         /// <summary>
         /// Font is bold
         /// </summary>
         Bold = 1,
+
         /// <summary>
         /// Font is italic. 
         /// </summary>

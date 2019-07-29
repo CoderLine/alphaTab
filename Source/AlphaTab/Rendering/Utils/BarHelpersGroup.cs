@@ -1,13 +1,13 @@
-﻿using System;
-using AlphaTab.Collections;
+﻿using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Utils
 {
-    class BarHelpers
+    internal class BarHelpers
     {
         public FastList<FastList<BeamingHelper>> BeamHelpers { get; set; }
         public FastList<FastDictionary<int, BeamingHelper>> BeamHelperLookup { get; set; }
+
         public BarHelpers(Bar bar)
         {
             BeamHelpers = new FastList<FastList<BeamingHelper>>();
@@ -61,6 +61,7 @@ namespace AlphaTab.Rendering.Utils
                                 {
                                     currentBeamHelper = helperForBeat;
                                 }
+
                                 BeamHelpers[v.Index].Add(helperForBeat);
                             }
                         }

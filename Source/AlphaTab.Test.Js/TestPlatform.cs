@@ -7,7 +7,7 @@ using Phase.Attributes;
 
 namespace AlphaTab.Test
 {
-    class TestPlatform
+    internal class TestPlatform
     {
         public static Action Done;
 
@@ -15,7 +15,7 @@ namespace AlphaTab.Test
         {
             var buf = new ArrayBuffer(tex.Length * 2);
             var view = new Uint16Array(buf);
-            for (int i = 0; i < tex.Length; i++)
+            for (var i = 0; i < tex.Length; i++)
             {
                 view[i] = tex[i];
             }

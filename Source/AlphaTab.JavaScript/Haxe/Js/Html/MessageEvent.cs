@@ -9,6 +9,7 @@ namespace AlphaTab.Haxe.Js.Html
     {
         [Name("data")]
         public dynamic Data { get; }
+
         public extern MessageEvent(HaxeString type, dynamic eventInitDict);
     }
 }

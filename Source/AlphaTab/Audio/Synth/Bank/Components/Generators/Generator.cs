@@ -4,7 +4,7 @@ using AlphaTab.Audio.Synth.Ds;
 
 namespace AlphaTab.Audio.Synth.Bank.Components.Generators
 {
-    enum LoopMode
+    internal enum LoopMode
     {
         NoLoop = 0,
         OneShot = 1,
@@ -12,7 +12,7 @@ namespace AlphaTab.Audio.Synth.Bank.Components.Generators
         LoopUntilNoteOff = 3
     }
 
-    enum GeneratorState
+    internal enum GeneratorState
     {
         PreLoop = 0,
         Loop = 1,
@@ -20,7 +20,7 @@ namespace AlphaTab.Audio.Synth.Bank.Components.Generators
         Finished = 3
     }
 
-    abstract class Generator
+    internal abstract class Generator
     {
         public LoopMode LoopMode { get; set; }
         public double LoopStartPhase { get; set; }
@@ -63,12 +63,14 @@ namespace AlphaTab.Audio.Synth.Bank.Components.Generators
         }
 
         public abstract float GetValue(double phase);
+
         public virtual void GetValues(GeneratorParameters generatorParams, SampleArray blockBuffer, double increment)
         {
             var proccessed = 0;
             do
             {
-                var samplesAvailable = (int)(Math.Ceiling((generatorParams.CurrentEnd - generatorParams.Phase) / increment));
+                var samplesAvailable =
+                    (int)Math.Ceiling((generatorParams.CurrentEnd - generatorParams.Phase) / increment);
                 if (samplesAvailable > blockBuffer.Length - proccessed)
                 {
                     while (proccessed < blockBuffer.Length)
@@ -85,6 +87,7 @@ namespace AlphaTab.Audio.Synth.Bank.Components.Generators
                         blockBuffer[proccessed++] = GetValue(generatorParams.Phase);
                         generatorParams.Phase += increment;
                     }
+
                     switch (generatorParams.CurrentState)
                     {
                         case GeneratorState.PreLoop:
@@ -98,7 +101,10 @@ namespace AlphaTab.Audio.Synth.Bank.Components.Generators
                         case GeneratorState.PostLoop:
                             generatorParams.CurrentState = GeneratorState.Finished;
                             while (proccessed < blockBuffer.Length)
+                            {
                                 blockBuffer[proccessed++] = 0;
+                            }
+
                             break;
                     }
                 }

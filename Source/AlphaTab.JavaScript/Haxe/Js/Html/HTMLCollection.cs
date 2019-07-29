@@ -12,6 +12,5 @@ namespace AlphaTab.Haxe.Js.Html
 
         [Name("item")]
         public extern Element Item(HaxeInt index);
-
     }
 }

@@ -11,14 +11,17 @@ namespace AlphaTab.UI
         /// Gets or sets the Y-position of the control, relative to its parent. 
         /// </summary>
         float Top { get; set; }
+
         /// <summary>
         /// Gets or sets the X-position of the control, relative to its parent. 
         /// </summary>
         float Left { get; set; }
+
         /// <summary>
         /// Gets or sets the width of the control.
         /// </summary>
         float Width { get; set; }
+
         /// <summary>
         /// Gets or sets the height of the control.
         /// </summary>
@@ -33,6 +36,7 @@ namespace AlphaTab.UI
         /// Gets or sets the horizontal scroll offset of this control if it is scrollable. 
         /// </summary>
         float ScrollLeft { get; set; }
+
         /// <summary>
         /// Gets or sets the vertical scroll offset of this control if it is scrollable. 
         /// </summary>
@@ -58,6 +62,7 @@ namespace AlphaTab.UI
         /// Stops the animations of this control immediately. 
         /// </summary>
         void StopAnimation();
+
         /// <summary>
         /// Tells the control to move to the given X-position in the given time. 
         /// </summary>
@@ -69,10 +74,12 @@ namespace AlphaTab.UI
         /// This event occurs when a mouse/finger press happened on the control.
         /// </summary>
         event Action<IMouseEventArgs> MouseDown;
+
         /// <summary>
         /// This event occurs when a mouse/finger moves on top of the control.
         /// </summary>
         event Action<IMouseEventArgs> MouseMove;
+
         /// <summary>
         /// This event occurs when a mouse/finger is released from the control.
         /// </summary>

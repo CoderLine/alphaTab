@@ -1,6 +1,6 @@
 ﻿namespace AlphaTab.Rendering.Glyphs
 {
-    class DeadNoteHeadGlyph : MusicFontGlyph
+    internal class DeadNoteHeadGlyph : MusicFontGlyph
     {
         private readonly bool _isGrace;
 

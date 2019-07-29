@@ -9,6 +9,7 @@ namespace AlphaTab
         /// Fingerings will be shown in the standard notation staff. 
         /// </summary>
         Score,
+
         /// <summary>
         /// Fingerings will be shown in a effect band above the tabs in case
         /// they have only a single note on the beat.

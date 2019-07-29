@@ -3,12 +3,12 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class SlightBeatVibratoEffectInfo : IEffectBarRendererInfo
+    internal class SlightBeatVibratoEffectInfo : IEffectBarRendererInfo
     {
-        public string EffectId { get { return "slight-beat-vibrato"; } }
-        public bool HideOnMultiTrack { get { return false; } }
-        public bool CanShareBand { get { return true; } }
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.GroupedOnBeatToEnd; } }
+        public string EffectId => "slight-beat-vibrato";
+        public bool HideOnMultiTrack => false;
+        public bool CanShareBand => true;
+        public EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.GroupedOnBeatToEnd;
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {

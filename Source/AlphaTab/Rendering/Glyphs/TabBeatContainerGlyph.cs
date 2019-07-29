@@ -1,13 +1,9 @@
-﻿using System;
-using AlphaTab.Collections;
+﻿using AlphaTab.Collections;
 using AlphaTab.Model;
-using AlphaTab.Platform;
-using AlphaTab.Rendering.Staves;
-using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TabBeatContainerGlyph : BeatContainerGlyph
+    internal class TabBeatContainerGlyph : BeatContainerGlyph
     {
         private TabBendGlyph _bend;
         private FastList<TabSlurGlyph> _effectSlurs;
@@ -31,7 +27,10 @@ namespace AlphaTab.Rendering.Glyphs
 
         protected override void CreateTies(Note n)
         {
-            if (!n.IsVisible) return;
+            if (!n.IsVisible)
+            {
+                return;
+            }
 
             var renderer = (TabBarRenderer)Renderer;
             if (n.IsTieOrigin && renderer.ShowTiedNotes && n.TieDestination.IsVisible)
@@ -39,6 +38,7 @@ namespace AlphaTab.Rendering.Glyphs
                 var tie = new TabTieGlyph(n, n.TieDestination, false);
                 Ties.Add(tie);
             }
+
             if (n.IsTieDestination && renderer.ShowTiedNotes)
             {
                 var tie = new TabTieGlyph(n.TieOrigin, n, false, true);
@@ -65,6 +65,7 @@ namespace AlphaTab.Rendering.Glyphs
                     Ties.Add(effectSlur);
                 }
             }
+
             // end effect slur on last beat
             if (n.IsEffectSlurDestination && n.EffectSlurOrigin != null)
             {
@@ -96,10 +97,11 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 if (_bend == null)
                 {
-                    _bend = new TabBendGlyph(n.Beat);
+                    _bend = new TabBendGlyph();
                     _bend.Renderer = Renderer;
                     Ties.Add(_bend);
                 }
+
                 _bend.AddBends(n);
             }
         }

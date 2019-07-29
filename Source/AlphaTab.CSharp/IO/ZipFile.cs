@@ -2,7 +2,7 @@
 
 namespace AlphaTab.IO
 {
-    partial class ZipFile
+    internal partial class ZipFile
     {
         /// <summary>
         /// Load a complete ZipFile to the memory.
@@ -12,7 +12,8 @@ namespace AlphaTab.IO
         public void Load(IReadable s)
         {
 #if NET472 || NETSTANDARD2_0
-            using (var zipArchive = new System.IO.Compression.ZipArchive(ReadableStream.Create(s), System.IO.Compression.ZipArchiveMode.Read))
+            using (var zipArchive = new System.IO.Compression.ZipArchive(ReadableStream.Create(s),
+                System.IO.Compression.ZipArchiveMode.Read))
             {
                 foreach (var entry in zipArchive.Entries)
                 {

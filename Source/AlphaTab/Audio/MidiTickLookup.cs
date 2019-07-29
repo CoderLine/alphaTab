@@ -12,14 +12,17 @@ namespace AlphaTab.Audio
         /// Gets or sets the start time in midi ticks at which the given beat is played. 
         /// </summary>
         public int Start { get; set; }
+
         /// <summary>
         /// Gets or sets the end time in midi ticks at which the given beat is played. 
         /// </summary>
         public int End { get; set; }
+
         /// <summary>
         /// Gets or sets the beat which is played.
         /// </summary>
         public Beat Beat { get; set; }
+
         /// <summary>
         /// Gets or sets whether the beat is the placeholder beat for an empty bar. 
         /// </summary>
@@ -35,14 +38,17 @@ namespace AlphaTab.Audio
         /// Gets or sets the start time in midi ticks at which the MasterBar is played. 
         /// </summary>
         public int Start { get; set; }
+
         /// <summary>
         /// Gets or sets the end time in midi ticks at which the MasterBar is played. 
         /// </summary>
         public int End { get; set; }
+
         /// <summary>
         /// Gets or sets the current tempo when the MasterBar is played.
         /// </summary>
         public int Tempo { get; set; }
+
         /// <summary>
         /// Gets or sets the MasterBar which is played. 
         /// </summary>
@@ -96,10 +102,12 @@ namespace AlphaTab.Audio
         /// Gets or sets the beat that is currently played. 
         /// </summary>
         public Beat CurrentBeat { get; set; }
+
         /// <summary>
         /// Gets or sets the beat that will be played next. 
         /// </summary>
         public Beat NextBeat { get; set; }
+
         /// <summary>
         /// Gets or sets the duration in milliseconds how long this beat is playing. 
         /// </summary>
@@ -112,7 +120,7 @@ namespace AlphaTab.Audio
     public class MidiTickLookup
     {
         private MasterBarTickLookup _currentMasterBar;
-        
+
         /// <summary>
         /// Gets a dictionary of all master bars played. The index is the index equals to <see cref="MasterBar.Index"/>.
         /// </summary>
@@ -148,6 +156,7 @@ namespace AlphaTab.Audio
                 {
                     previous.NextMasterBar = bar;
                 }
+
                 previous = bar;
             }
         }
@@ -174,9 +183,9 @@ namespace AlphaTab.Audio
             }
 
             BeatTickLookup beat = null;
-            int index = 0;
+            var index = 0;
             var beats = masterBar.Beats;
-            for (int b = 0; b < beats.Count; b++)
+            for (var b = 0; b < beats.Count; b++)
             {
                 // is the current beat played on the given tick?
                 var currentBeat = beats[b];
@@ -185,10 +194,11 @@ namespace AlphaTab.Audio
                 {
                     continue;
                 }
+
                 if (currentBeat.Start <= tick && tick < currentBeat.End)
                 {
                     // take the latest played beat we can find. (most right)
-                    if (beat == null || (beat.Start < currentBeat.Start))
+                    if (beat == null || beat.Start < currentBeat.Start)
                     {
                         beat = beats[b];
                         index = b;
@@ -208,10 +218,11 @@ namespace AlphaTab.Audio
 
             // search for next relevant beat in masterbar
             BeatTickLookup nextBeat = null;
-            for (int b = index + 1; b < beats.Count; b++)
+            for (var b = index + 1; b < beats.Count; b++)
             {
                 var currentBeat = beats[b];
-                if (currentBeat.Start > beat.Start && trackLookup.ContainsKey(currentBeat.Beat.Voice.Bar.Staff.Track.Index))
+                if (currentBeat.Start > beat.Start &&
+                    trackLookup.ContainsKey(currentBeat.Beat.Voice.Bar.Staff.Track.Index))
                 {
                     nextBeat = currentBeat;
                     break;
@@ -223,7 +234,7 @@ namespace AlphaTab.Audio
             {
                 var nextBar = masterBar.NextMasterBar;
                 beats = nextBar.Beats;
-                for (int b = 0; b < beats.Count; b++)
+                for (var b = 0; b < beats.Count; b++)
                 {
                     var currentBeat = beats[b];
                     if (trackLookup.ContainsKey(currentBeat.Beat.Voice.Bar.Staff.Track.Index))
@@ -257,6 +268,7 @@ namespace AlphaTab.Audio
                 {
                     return bar;
                 }
+
                 // search in lower half 
                 if (tick < bar.Start)
                 {
@@ -278,7 +290,7 @@ namespace AlphaTab.Audio
         /// <param name="bar">The masterbar to find the time period for. </param>
         /// <returns>A <see cref="MasterBarTickLookup"/> containing the details about the first time the <see cref="MasterBar"/> is played.</returns>
         // ReSharper disable once UnusedMember.Global
-        public MasterBarTickLookup GetMasterBar(MasterBar bar) 
+        public MasterBarTickLookup GetMasterBar(MasterBar bar)
         {
             if (!MasterBarLookup.ContainsKey(bar.Index))
             {
@@ -290,6 +302,7 @@ namespace AlphaTab.Audio
                     MasterBar = bar
                 };
             }
+
             return MasterBarLookup[bar.Index];
         }
 
@@ -305,6 +318,7 @@ namespace AlphaTab.Audio
             {
                 return 0;
             }
+
             return MasterBarLookup[bar.Index].Start;
         }
 

@@ -3,19 +3,16 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class TrillEffectInfo : NoteEffectInfoBase
+    internal class TrillEffectInfo : NoteEffectInfoBase
     {
-        public override string EffectId { get { return "trill"; } }
+        public override string EffectId => "trill";
 
         protected override bool ShouldCreateGlyphForNote(Note note)
         {
             return note.IsTrill;
         }
 
-        public override EffectBarGlyphSizing SizingMode
-        {
-            get { return EffectBarGlyphSizing.SingleOnBeat; }
-        }
+        public override EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.SingleOnBeat;
 
         public override EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {

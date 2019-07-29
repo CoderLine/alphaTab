@@ -31,7 +31,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public string Album
         {
-            get { return _album; }
+            get => _album;
             set
             {
                 _album = value;
@@ -41,7 +41,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public string Artist
         {
-            get { return _artist; }
+            get => _artist;
             set
             {
                 _artist = value;
@@ -51,7 +51,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public string Copyright
         {
-            get { return _copyright; }
+            get => _copyright;
             set
             {
                 _copyright = value;
@@ -61,7 +61,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public string Instructions
         {
-            get { return _instructions; }
+            get => _instructions;
             set
             {
                 _instructions = value;
@@ -71,7 +71,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public string Music
         {
-            get { return _music; }
+            get => _music;
             set
             {
                 _music = value;
@@ -81,7 +81,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public string Notices
         {
-            get { return _notices; }
+            get => _notices;
             set
             {
                 _notices = value;
@@ -91,7 +91,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public string SubTitle
         {
-            get { return _subTitle; }
+            get => _subTitle;
             set
             {
                 _subTitle = value;
@@ -101,7 +101,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public string Title
         {
-            get { return _title; }
+            get => _title;
             set
             {
                 _title = value;
@@ -111,7 +111,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public string Words
         {
-            get { return _words; }
+            get => _words;
             set
             {
                 _words = value;
@@ -121,7 +121,7 @@ namespace AlphaTab.Samples.Wpf.ViewModel
 
         public string Tab
         {
-            get { return _tab; }
+            get => _tab;
             set
             {
                 _tab = value;

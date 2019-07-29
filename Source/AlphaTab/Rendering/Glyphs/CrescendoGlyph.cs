@@ -1,10 +1,9 @@
-﻿using System;
-using AlphaTab.Model;
+﻿using AlphaTab.Model;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class CrescendoGlyph : GroupedEffectGlyph
+    internal class CrescendoGlyph : GroupedEffectGlyph
     {
         private const int Padding = NoteHeadGlyph.QuarterNoteHeadWidth / 2;
         private readonly CrescendoType _crescendo;
@@ -20,7 +19,7 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             base.DoLayout();
-            Height = 17*Scale;
+            Height = 17 * Scale;
         }
 
         protected override void PaintGrouped(float cx, float cy, float endX, ICanvas canvas)
@@ -39,9 +38,10 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 endX -= Padding * Scale;
                 canvas.MoveTo(startX, cy + Y);
-                canvas.LineTo(endX, cy + Y + (height / 2));
+                canvas.LineTo(endX, cy + Y + height / 2);
                 canvas.LineTo(startX, cy + Y + height);
             }
+
             canvas.Stroke();
         }
     }

@@ -23,9 +23,21 @@ namespace AlphaTab.Test.Audio
 
             public override bool Equals(object obj)
             {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
+                if (ReferenceEquals(null, obj))
+                {
+                    return false;
+                }
+
+                if (ReferenceEquals(this, obj))
+                {
+                    return true;
+                }
+
+                if (obj.GetType() != this.GetType())
+                {
+                    return false;
+                }
+
                 return Equals((MidiEvent) obj);
             }
 
@@ -51,9 +63,21 @@ namespace AlphaTab.Test.Audio
 
             public override bool Equals(object obj)
             {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
+                if (ReferenceEquals(null, obj))
+                {
+                    return false;
+                }
+
+                if (ReferenceEquals(this, obj))
+                {
+                    return true;
+                }
+
+                if (obj.GetType() != this.GetType())
+                {
+                    return false;
+                }
+
                 return Equals((TrackMidiEvent) obj);
             }
 
@@ -82,9 +106,21 @@ namespace AlphaTab.Test.Audio
 
             public override bool Equals(object obj)
             {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
+                if (ReferenceEquals(null, obj))
+                {
+                    return false;
+                }
+
+                if (ReferenceEquals(this, obj))
+                {
+                    return true;
+                }
+
+                if (obj.GetType() != this.GetType())
+                {
+                    return false;
+                }
+
                 return Equals((ChannelMidiEvent) obj);
             }
 
@@ -114,9 +150,21 @@ namespace AlphaTab.Test.Audio
 
             public override bool Equals(object obj)
             {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
+                if (ReferenceEquals(null, obj))
+                {
+                    return false;
+                }
+
+                if (ReferenceEquals(this, obj))
+                {
+                    return true;
+                }
+
+                if (obj.GetType() != this.GetType())
+                {
+                    return false;
+                }
+
                 return Equals((TimeSignatureEvent) obj);
             }
 
@@ -124,7 +172,7 @@ namespace AlphaTab.Test.Audio
             {
                 unchecked
                 {
-                    int hashCode = base.GetHashCode();
+                    var hashCode = base.GetHashCode();
                     hashCode = (hashCode*397) ^ Numerator;
                     hashCode = (hashCode*397) ^ Denominator;
                     return hashCode;
@@ -141,9 +189,21 @@ namespace AlphaTab.Test.Audio
 
             public override bool Equals(object obj)
             {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
+                if (ReferenceEquals(null, obj))
+                {
+                    return false;
+                }
+
+                if (ReferenceEquals(this, obj))
+                {
+                    return true;
+                }
+
+                if (obj.GetType() != this.GetType())
+                {
+                    return false;
+                }
+
                 return Equals((RestEvent) obj);
             }
         }
@@ -166,9 +226,21 @@ namespace AlphaTab.Test.Audio
 
             public override bool Equals(object obj)
             {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
+                if (ReferenceEquals(null, obj))
+                {
+                    return false;
+                }
+
+                if (ReferenceEquals(this, obj))
+                {
+                    return true;
+                }
+
+                if (obj.GetType() != this.GetType())
+                {
+                    return false;
+                }
+
                 return Equals((NoteEvent) obj);
             }
 
@@ -176,7 +248,7 @@ namespace AlphaTab.Test.Audio
             {
                 unchecked
                 {
-                    int hashCode = base.GetHashCode();
+                    var hashCode = base.GetHashCode();
                     hashCode = (hashCode*397) ^ Length;
                     hashCode = (hashCode*397) ^ Key.GetHashCode();
                     hashCode = (hashCode*397) ^ (int) DynamicValue;
@@ -202,9 +274,21 @@ namespace AlphaTab.Test.Audio
 
             public override bool Equals(object obj)
             {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
+                if (ReferenceEquals(null, obj))
+                {
+                    return false;
+                }
+
+                if (ReferenceEquals(this, obj))
+                {
+                    return true;
+                }
+
+                if (obj.GetType() != this.GetType())
+                {
+                    return false;
+                }
+
                 return Equals((ControlChangeEvent) obj);
             }
 
@@ -212,7 +296,7 @@ namespace AlphaTab.Test.Audio
             {
                 unchecked
                 {
-                    int hashCode = base.GetHashCode();
+                    var hashCode = base.GetHashCode();
                     hashCode = (hashCode*397) ^ Controller.GetHashCode();
                     hashCode = (hashCode*397) ^ Value.GetHashCode();
                     return hashCode;
@@ -236,9 +320,21 @@ namespace AlphaTab.Test.Audio
 
             public override bool Equals(object obj)
             {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
+                if (ReferenceEquals(null, obj))
+                {
+                    return false;
+                }
+
+                if (ReferenceEquals(this, obj))
+                {
+                    return true;
+                }
+
+                if (obj.GetType() != this.GetType())
+                {
+                    return false;
+                }
+
                 return Equals((ProgramChangeEvent) obj);
             }
 
@@ -267,9 +363,21 @@ namespace AlphaTab.Test.Audio
 
             public override bool Equals(object obj)
             {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
+                if (ReferenceEquals(null, obj))
+                {
+                    return false;
+                }
+
+                if (ReferenceEquals(this, obj))
+                {
+                    return true;
+                }
+
+                if (obj.GetType() != this.GetType())
+                {
+                    return false;
+                }
+
                 return Equals((TempoEvent) obj);
             }
 
@@ -299,9 +407,21 @@ namespace AlphaTab.Test.Audio
 
             public override bool Equals(object obj)
             {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
+                if (ReferenceEquals(null, obj))
+                {
+                    return false;
+                }
+
+                if (ReferenceEquals(this, obj))
+                {
+                    return true;
+                }
+
+                if (obj.GetType() != this.GetType())
+                {
+                    return false;
+                }
+
                 return Equals((BendEvent) obj);
             }
 

@@ -1,7 +1,6 @@
 ﻿namespace AlphaTab.Audio.Synth.Synthesis
 {
-
-    class CCValue
+    internal class CCValue
     {
         private byte _coarseValue;
         private byte _fineValue;
@@ -9,18 +8,32 @@
 
         public byte Coarse
         {
-            get { return _coarseValue; }
-            set { _coarseValue = value; UpdateCombined(); }
+            get => _coarseValue;
+            set
+            {
+                _coarseValue = value;
+                UpdateCombined();
+            }
         }
+
         public byte Fine
         {
-            get { return _fineValue; }
-            set { _fineValue = value; UpdateCombined(); }
+            get => _fineValue;
+            set
+            {
+                _fineValue = value;
+                UpdateCombined();
+            }
         }
+
         public short Combined
         {
-            get { return _combined; }
-            set { _combined = value; UpdateCoarseFinePair(); }
+            get => _combined;
+            set
+            {
+                _combined = value;
+                UpdateCoarseFinePair();
+            }
         }
 
         public CCValue(byte coarse, byte fine)
@@ -43,6 +56,7 @@
         {
             _combined = (short)((_coarseValue << 7) | _fineValue);
         }
+
         private void UpdateCoarseFinePair()
         {
             _coarseValue = (byte)(_combined >> 7);

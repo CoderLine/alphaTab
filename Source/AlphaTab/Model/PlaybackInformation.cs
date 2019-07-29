@@ -10,6 +10,7 @@ namespace AlphaTab.Model
         /// Gets or sets the volume (0-16)
         /// </summary>
         public int Volume { get; set; }
+
         /// <summary>
         /// Gets or sets the balance (0-16; 8=center)
         /// </summary>
@@ -19,14 +20,17 @@ namespace AlphaTab.Model
         /// Gets or sets the midi port to use.
         /// </summary>
         public int Port { get; set; }
+
         /// <summary>
         /// Gets or sets the midi program to use. 
         /// </summary>
         public int Program { get; set; }
+
         /// <summary>
         /// Gets or sets the primary channel for all normal midi events. 
         /// </summary>
         public int PrimaryChannel { get; set; }
+
         /// <summary>
         /// Gets or sets the secondary channel for special midi events. 
         /// </summary>

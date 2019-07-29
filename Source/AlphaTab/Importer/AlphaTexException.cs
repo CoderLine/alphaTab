@@ -1,6 +1,6 @@
 ﻿namespace AlphaTab.Importer
 {
-    class AlphaTexException : AlphaTabException
+    internal class AlphaTexException : AlphaTabException
     {
         public int Position { get; set; }
         public string NonTerm { get; set; }
@@ -8,18 +8,23 @@
         public AlphaTexSymbols Symbol { get; set; }
         public object SymbolData { get; set; }
 
-        public static AlphaTexException SymbolError(int position, string nonTerm, AlphaTexSymbols expected, AlphaTexSymbols symbol, object symbolData = null)
+        public static AlphaTexException SymbolError(
+            int position,
+            string nonTerm,
+            AlphaTexSymbols expected,
+            AlphaTexSymbols symbol,
+            object symbolData = null)
         {
             string message;
             if (symbolData == null)
             {
                 message = "MalFormed AlphaTex: @" + position + ": Error on block " + nonTerm +
-                       ", expected a " + expected + " found a " + symbol;
+                          ", expected a " + expected + " found a " + symbol;
             }
             else
             {
                 message = "MalFormed AlphaTex: @" + position + ": Error on block " + nonTerm +
-                       ", invalid value: " + symbolData;
+                          ", invalid value: " + symbolData;
             }
 
             var exception = new AlphaTexException(message);

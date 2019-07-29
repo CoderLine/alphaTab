@@ -11,7 +11,7 @@ namespace AlphaTab.Rendering.Staves
     /// A Staff consists of a list of different staves and groups
     /// them using an accolade. 
     /// </summary>
-    class StaveGroup
+    internal class StaveGroup
     {
         private const float AccoladeLabelSpacing = 10;
 
@@ -57,25 +57,16 @@ namespace AlphaTab.Rendering.Staves
             AccoladeSpacing = 0;
         }
 
-        public int FirstBarIndex
-        {
-            get
-            {
-                return MasterBarsRenderers[0].MasterBar.Index;
-            }
-        }
-        
-        public int LastBarIndex
-        {
-            get
-            {
-                return MasterBarsRenderers[MasterBarsRenderers.Count - 1].MasterBar.Index;
-            }
-        }
+        public int FirstBarIndex => MasterBarsRenderers[0].MasterBar.Index;
+
+        public int LastBarIndex => MasterBarsRenderers[MasterBarsRenderers.Count - 1].MasterBar.Index;
 
         public MasterBarsRenderers AddMasterBarRenderers(Track[] tracks, MasterBarsRenderers renderers)
         {
-            if (tracks.Length == 0) return null;
+            if (tracks.Length == 0)
+            {
+                return null;
+            }
 
             MasterBarsRenderers.Add(renderers);
             CalculateAccoladeSpacing(tracks);
@@ -91,7 +82,7 @@ namespace AlphaTab.Rendering.Staves
                 {
                     var s = g.Staves[k];
                     var renderer = renderers.Renderers[src++];
-                    
+
                     s.AddBarRenderer(renderer);
                 }
             }
@@ -104,7 +95,10 @@ namespace AlphaTab.Rendering.Staves
 
         public MasterBarsRenderers AddBars(Track[] tracks, int barIndex)
         {
-            if (tracks.Length == 0) return null;
+            if (tracks.Length == 0)
+            {
+                return null;
+            }
 
             var result = new MasterBarsRenderers();
             result.LayoutingInfo = new BarLayoutingInfo();
@@ -112,7 +106,7 @@ namespace AlphaTab.Rendering.Staves
             MasterBarsRenderers.Add(result);
 
             CalculateAccoladeSpacing(tracks);
-           
+
             // add renderers
             var barLayoutingInfo = result.LayoutingInfo;
             foreach (var g in Staves)
@@ -134,6 +128,7 @@ namespace AlphaTab.Rendering.Staves
                     }
                 }
             }
+
             barLayoutingInfo.Finish();
 
             // ensure same widths of new renderer
@@ -155,10 +150,12 @@ namespace AlphaTab.Rendering.Staves
                     var lastBar = s.RevertLastBar();
                     w = Math.Max(w, lastBar.Width);
                 }
+
                 Width -= w;
 
                 return toRemove;
             }
+
             return null;
         }
 
@@ -174,6 +171,7 @@ namespace AlphaTab.Rendering.Staves
                     realWidth = s.BarRenderers[s.BarRenderers.Count - 1].Width;
                 }
             }
+
             Width += realWidth;
             return realWidth;
         }
@@ -194,9 +192,11 @@ namespace AlphaTab.Rendering.Staves
                     canvas.Font = res;
                     foreach (var t in tracks)
                     {
-                        AccoladeSpacing = (float)Math.Ceiling(Math.Max(AccoladeSpacing, canvas.MeasureText(t.ShortName)));
+                        AccoladeSpacing =
+                            (float)Math.Ceiling(Math.Max(AccoladeSpacing, canvas.MeasureText(t.ShortName)));
                     }
-                    AccoladeSpacing += (2 * AccoladeLabelSpacing);
+
+                    AccoladeSpacing += 2 * AccoladeLabelSpacing;
                     Width += AccoladeSpacing;
                 }
             }
@@ -212,6 +212,7 @@ namespace AlphaTab.Rendering.Staves
                     return g;
                 }
             }
+
             return null;
         }
 
@@ -237,10 +238,12 @@ namespace AlphaTab.Rendering.Staves
                     _firstStaffInAccolade = staff;
                     staff.IsFirstInAccolade = true;
                 }
+
                 if (group.FirstStaffInAccolade == null)
                 {
                     group.FirstStaffInAccolade = staff;
                 }
+
                 if (_lastStaffInAccolade == null)
                 {
                     _lastStaffInAccolade = staff;
@@ -248,19 +251,14 @@ namespace AlphaTab.Rendering.Staves
                 }
 
                 if (_lastStaffInAccolade != null) { _lastStaffInAccolade.IsLastInAccolade = false; }
+
                 _lastStaffInAccolade = staff;
                 _lastStaffInAccolade.IsLastInAccolade = true;
                 group.LastStaffInAccolade = staff;
             }
         }
 
-        public float Height
-        {
-            get
-            {
-                return _allStaves[_allStaves.Count - 1].Y + _allStaves[_allStaves.Count - 1].Height;
-            }
-        }
+        public float Height => _allStaves[_allStaves.Count - 1].Y + _allStaves[_allStaves.Count - 1].Height;
 
         public void ScaleToWidth(float width)
         {
@@ -268,6 +266,7 @@ namespace AlphaTab.Rendering.Staves
             {
                 _allStaves[i].ScaleToWidth(width);
             }
+
             Width = width;
         }
 
@@ -300,9 +299,11 @@ namespace AlphaTab.Rendering.Staves
                     // draw grouping line for all staves
                     //
 
-                    var firstStart = cy + _firstStaffInAccolade.Y + _firstStaffInAccolade.StaveTop + _firstStaffInAccolade.TopSpacing + _firstStaffInAccolade.TopOverflow;
-                    var lastEnd = cy + _lastStaffInAccolade.Y + _lastStaffInAccolade.TopSpacing + _lastStaffInAccolade.TopOverflow
-                                         + _lastStaffInAccolade.StaveBottom;
+                    var firstStart = cy + _firstStaffInAccolade.Y + _firstStaffInAccolade.StaveTop +
+                                     _firstStaffInAccolade.TopSpacing + _firstStaffInAccolade.TopOverflow;
+                    var lastEnd = cy + _lastStaffInAccolade.Y + _lastStaffInAccolade.TopSpacing +
+                                  _lastStaffInAccolade.TopOverflow
+                                  + _lastStaffInAccolade.StaveBottom;
 
                     var acooladeX = cx + _firstStaffInAccolade.X;
 
@@ -322,26 +323,31 @@ namespace AlphaTab.Rendering.Staves
                     var g = Staves[i];
                     if (g.FirstStaffInAccolade != null && g.LastStaffInAccolade != null)
                     {
-                        var firstStart = cy + g.FirstStaffInAccolade.Y + g.FirstStaffInAccolade.StaveTop + g.FirstStaffInAccolade.TopSpacing + g.FirstStaffInAccolade.TopOverflow;
-                        var lastEnd = cy + g.LastStaffInAccolade.Y + g.LastStaffInAccolade.TopSpacing + g.LastStaffInAccolade.TopOverflow
-                                             + g.LastStaffInAccolade.StaveBottom;
+                        var firstStart = cy + g.FirstStaffInAccolade.Y + g.FirstStaffInAccolade.StaveTop +
+                                         g.FirstStaffInAccolade.TopSpacing + g.FirstStaffInAccolade.TopOverflow;
+                        var lastEnd = cy + g.LastStaffInAccolade.Y + g.LastStaffInAccolade.TopSpacing +
+                                      g.LastStaffInAccolade.TopOverflow
+                                      + g.LastStaffInAccolade.StaveBottom;
 
                         var acooladeX = cx + g.FirstStaffInAccolade.X;
 
-                        var barSize = (3 * Layout.Renderer.Settings.Scale);
+                        var barSize = 3 * Layout.Renderer.Settings.Scale;
                         var barOffset = barSize;
 
-                        var accoladeStart = firstStart - (barSize * 4);
-                        var accoladeEnd = lastEnd + (barSize * 4);
+                        var accoladeStart = firstStart - barSize * 4;
+                        var accoladeEnd = lastEnd + barSize * 4;
 
                         // text
                         if (Index == 0 && !Layout.Renderer.Settings.Layout.Get("hideTrackNames", false))
                         {
-                            canvas.FillText(g.Track.ShortName, cx + (AccoladeLabelSpacing * Layout.Scale), firstStart);
+                            canvas.FillText(g.Track.ShortName, cx + AccoladeLabelSpacing * Layout.Scale, firstStart);
                         }
 
                         // rect
-                        canvas.FillRect(acooladeX - barOffset - barSize, accoladeStart, barSize, accoladeEnd - accoladeStart);
+                        canvas.FillRect(acooladeX - barOffset - barSize,
+                            accoladeStart,
+                            barSize,
+                            accoladeEnd - accoladeStart);
 
                         var spikeStartX = acooladeX - barOffset - barSize;
                         var spikeEndX = acooladeX + barSize * 2;
@@ -349,16 +355,36 @@ namespace AlphaTab.Rendering.Staves
                         // top spike
                         canvas.BeginPath();
                         canvas.MoveTo(spikeStartX, accoladeStart);
-                        canvas.BezierCurveTo(spikeStartX, accoladeStart, spikeStartX, accoladeStart, spikeEndX, accoladeStart - barSize);
-                        canvas.BezierCurveTo(acooladeX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize, spikeStartX, accoladeStart + barSize);
+                        canvas.BezierCurveTo(spikeStartX,
+                            accoladeStart,
+                            spikeStartX,
+                            accoladeStart,
+                            spikeEndX,
+                            accoladeStart - barSize);
+                        canvas.BezierCurveTo(acooladeX,
+                            accoladeStart + barSize,
+                            spikeStartX,
+                            accoladeStart + barSize,
+                            spikeStartX,
+                            accoladeStart + barSize);
                         canvas.ClosePath();
                         canvas.Fill();
 
                         // bottom spike 
                         canvas.BeginPath();
                         canvas.MoveTo(spikeStartX, accoladeEnd);
-                        canvas.BezierCurveTo(spikeStartX, accoladeEnd, acooladeX, accoladeEnd, spikeEndX, accoladeEnd + barSize);
-                        canvas.BezierCurveTo(acooladeX, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize, spikeStartX, accoladeEnd - barSize);
+                        canvas.BezierCurveTo(spikeStartX,
+                            accoladeEnd,
+                            acooladeX,
+                            accoladeEnd,
+                            spikeEndX,
+                            accoladeEnd + barSize);
+                        canvas.BezierCurveTo(acooladeX,
+                            accoladeEnd - barSize,
+                            spikeStartX,
+                            accoladeEnd - barSize,
+                            spikeStartX,
+                            accoladeEnd - barSize);
                         canvas.ClosePath();
 
                         canvas.Fill();
@@ -374,7 +400,7 @@ namespace AlphaTab.Rendering.Staves
             foreach (var staff in _allStaves)
             {
                 staff.X = AccoladeSpacing;
-                staff.Y = (currentY);
+                staff.Y = currentY;
                 staff.FinalizeStaff();
                 currentY += staff.Height;
             }
@@ -382,8 +408,15 @@ namespace AlphaTab.Rendering.Staves
 
         private void BuildBoundingsLookup(float cx, float cy)
         {
-            if (Layout.Renderer.BoundsLookup.IsFinished) return;
-            if (_firstStaffInAccolade == null || _lastStaffInAccolade == null) return;
+            if (Layout.Renderer.BoundsLookup.IsFinished)
+            {
+                return;
+            }
+
+            if (_firstStaffInAccolade == null || _lastStaffInAccolade == null)
+            {
+                return;
+            }
 
             var lastStaff = _allStaves[_allStaves.Count - 1];
 
@@ -391,11 +424,13 @@ namespace AlphaTab.Rendering.Staves
             var visualBottom = cy + Y + _lastStaffInAccolade.Y + _lastStaffInAccolade.Height;
             var realTop = cy + Y + _allStaves[0].Y;
             var realBottom = cy + Y + lastStaff.Y + lastStaff.Height;
-            var lineTop = cy + Y + _firstStaffInAccolade.Y 
-                          + _firstStaffInAccolade.TopSpacing 
+            var lineTop = cy + Y + _firstStaffInAccolade.Y
+                          + _firstStaffInAccolade.TopSpacing
                           + _firstStaffInAccolade.TopOverflow
-                          + (_firstStaffInAccolade.BarRenderers.Count > 0 ? _firstStaffInAccolade.BarRenderers[0].TopPadding : 0);
-            var lineBottom = cy + Y + lastStaff.Y + lastStaff.Height 
+                          + (_firstStaffInAccolade.BarRenderers.Count > 0
+                              ? _firstStaffInAccolade.BarRenderers[0].TopPadding
+                              : 0);
+            var lineBottom = cy + Y + lastStaff.Y + lastStaff.Height
                              - lastStaff.BottomSpacing
                              - lastStaff.BottomOverflow
                              - (lastStaff.BarRenderers.Count > 0 ? lastStaff.BarRenderers[0].BottomPadding : 0);
@@ -424,9 +459,8 @@ namespace AlphaTab.Rendering.Staves
             Layout.Renderer.BoundsLookup.AddStaveGroup(staveGroupBounds);
 
             var masterBarBoundsLookup = new FastList<MasterBarBounds>();
-            for (int i = 0; i < Staves.Count; i++)
+            for (var i = 0; i < Staves.Count; i++)
             {
-
                 for (int j = 0, k = Staves[i].FirstStaffInAccolade.BarRenderers.Count; j < k; j++)
                 {
                     var renderer = Staves[i].FirstStaffInAccolade.BarRenderers[j];
@@ -464,7 +498,6 @@ namespace AlphaTab.Rendering.Staves
                     renderer.BuildBoundingsLookup(masterBarBoundsLookup[j], x, cy + Y + _firstStaffInAccolade.Y);
                 }
             }
-          
         }
 
         public float GetBarX(int index)
@@ -473,6 +506,7 @@ namespace AlphaTab.Rendering.Staves
             {
                 return 0;
             }
+
             var bar = Layout.Renderer.Tracks[0].Staves[0].Bars[index];
             var renderer = Layout.GetRendererForBar<BarRendererBase>(_firstStaffInAccolade.StaveId, bar);
             return renderer.X;

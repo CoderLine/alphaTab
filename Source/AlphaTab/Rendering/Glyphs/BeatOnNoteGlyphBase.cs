@@ -1,10 +1,8 @@
-﻿using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
-using AlphaTab.Rendering.Utils;
+﻿using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class BeatOnNoteGlyphBase : BeatGlyphBase
+    internal class BeatOnNoteGlyphBase : BeatGlyphBase
     {
         public BeamingHelper BeamingHelper { get; set; }
         public float CenterX { get; set; }

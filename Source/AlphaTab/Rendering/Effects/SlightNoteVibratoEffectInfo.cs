@@ -3,19 +3,17 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class SlightNoteVibratoEffectInfo : NoteEffectInfoBase
+    internal class SlightNoteVibratoEffectInfo : NoteEffectInfoBase
     {
-        public override string EffectId { get { return "slight-note-vibrato"; } }
+        public override string EffectId => "slight-note-vibrato";
 
         protected override bool ShouldCreateGlyphForNote(Note note)
         {
-            return note.Vibrato == VibratoType.Slight || (note.IsTieDestination && note.TieOrigin.Vibrato == VibratoType.Slight);
+            return note.Vibrato == VibratoType.Slight ||
+                   note.IsTieDestination && note.TieOrigin.Vibrato == VibratoType.Slight;
         }
 
-        public override EffectBarGlyphSizing SizingMode
-        {
-            get { return EffectBarGlyphSizing.GroupedOnBeatToEnd; }
-        }
+        public override EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.GroupedOnBeatToEnd;
 
         public override EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {

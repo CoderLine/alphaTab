@@ -9,6 +9,7 @@
         /// Player is paused
         /// </summary>
         Paused,
+
         /// <summary>
         /// Player is playing
         /// </summary>

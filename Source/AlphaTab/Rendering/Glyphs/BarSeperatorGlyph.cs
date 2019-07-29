@@ -1,10 +1,8 @@
 ﻿using AlphaTab.Platform;
-using AlphaTab.Platform.Model;
-using AlphaTab.Rendering.Effects;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class BarSeperatorGlyph : Glyph
+    internal class BarSeperatorGlyph : Glyph
     {
         public BarSeperatorGlyph(float x, float y)
             : base(x, y)
@@ -17,7 +15,8 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 Width = 15 * Scale;
             }
-            else if (Renderer.NextRenderer == null || Renderer.NextRenderer.Staff != Renderer.Staff || !Renderer.NextRenderer.Bar.MasterBar.IsRepeatStart)
+            else if (Renderer.NextRenderer == null || Renderer.NextRenderer.Staff != Renderer.Staff ||
+                     !Renderer.NextRenderer.Bar.MasterBar.IsRepeatStart)
             {
                 Width = 2 * Scale;
                 if (Renderer.Bar.MasterBar.IsDoubleBar)
@@ -47,7 +46,8 @@ namespace AlphaTab.Rendering.Glyphs
                 // big bar
                 canvas.FillRect(left + Width - blockWidth, top, blockWidth, h);
             }
-            else if (Renderer.NextRenderer == null || Renderer.NextRenderer.Staff != Renderer.Staff || !Renderer.NextRenderer.Bar.MasterBar.IsRepeatStart)
+            else if (Renderer.NextRenderer == null || Renderer.NextRenderer.Staff != Renderer.Staff ||
+                     !Renderer.NextRenderer.Bar.MasterBar.IsRepeatStart)
             {
                 // small bar
                 canvas.FillRect(left + Width - Scale, top, Scale, h);

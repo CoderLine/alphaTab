@@ -9,10 +9,12 @@ namespace AlphaTab
         /// Gets the size before the resizing happened. 
         /// </summary>
         public int OldWidth { get; set; }
+
         /// <summary>
         /// Gets the size after the resize was complete. 
         /// </summary>
         public int NewWidth { get; set; }
+
         /// <summary>
         /// Gets the settings currently used for rendering. 
         /// </summary>

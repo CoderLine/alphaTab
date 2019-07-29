@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Audio
 {
-    static class MidiUtils
+    internal static class MidiUtils
     {
         /// <summary>
         /// The amount of ticks per quarter note used within this midi system.
@@ -57,6 +57,7 @@ namespace AlphaTab.Audio
             {
                 denomninator = 1 / -denomninator;
             }
+
             return (int)(QuarterTime * (4.0 / denomninator));
         }
 
@@ -64,8 +65,9 @@ namespace AlphaTab.Audio
         {
             if (doubleDotted)
             {
-                return ticks + (ticks / 4) * 3;
+                return ticks + ticks / 4 * 3;
             }
+
             return ticks + ticks / 2;
         }
 
@@ -76,12 +78,12 @@ namespace AlphaTab.Audio
 
         public static int RemoveTuplet(int ticks, int numerator, int denominator)
         {
-            return (ticks * numerator) / denominator;
+            return ticks * numerator / denominator;
         }
 
         public static int DynamicToVelocity(DynamicValue dyn)
         {
-            return (MinVelocity + ((int)(dyn) * VelocityIncrement));
+            return MinVelocity + (int)dyn * VelocityIncrement;
             // switch(dynamicValue)
             // {
             //     case PPP:   return (MinVelocity + (0 * VelocityIncrement));

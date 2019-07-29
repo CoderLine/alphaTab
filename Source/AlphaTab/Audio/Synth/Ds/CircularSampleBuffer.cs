@@ -62,9 +62,10 @@ namespace AlphaTab.Audio.Synth.Ds
             if (samplesWritten < count)
             {
                 SampleArray.Blit(data, offset + samplesWritten, _buffer, _writePosition, count - samplesWritten);
-                _writePosition += (count - samplesWritten);
+                _writePosition += count - samplesWritten;
                 samplesWritten = count;
             }
+
             Count += samplesWritten;
             return samplesWritten;
         }
@@ -82,6 +83,7 @@ namespace AlphaTab.Audio.Synth.Ds
             {
                 count = Count;
             }
+
             var samplesRead = 0;
             var readToEnd = Math.Min(_buffer.Length - _readPosition, count);
             SampleArray.Blit(_buffer, _readPosition, data, offset, readToEnd);
@@ -92,7 +94,7 @@ namespace AlphaTab.Audio.Synth.Ds
             if (samplesRead < count)
             {
                 SampleArray.Blit(_buffer, _readPosition, data, offset + samplesRead, count - samplesRead);
-                _readPosition += (count - samplesRead);
+                _readPosition += count - samplesRead;
                 samplesRead = count;
             }
 

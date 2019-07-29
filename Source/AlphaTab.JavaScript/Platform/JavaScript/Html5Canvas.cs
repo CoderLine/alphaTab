@@ -12,7 +12,7 @@ namespace AlphaTab.Platform.JavaScript
     /// <summary>
     /// A canvas implementation for HTML5 canvas
     /// </summary>
-    class Html5Canvas : ICanvas
+    internal class Html5Canvas : ICanvas
     {
         protected const float BlurCorrection = 0;
 
@@ -40,6 +40,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 family = family.Substring(1, family.Length - 2);
             }
+
             _musicFont = new Font(family, Platform.ParseFloat(style.FontSize));
 
             _measureCanvas = (CanvasElement)Browser.Document.CreateElement("canvas");
@@ -56,6 +57,7 @@ namespace AlphaTab.Platform.JavaScript
             // nothing to do
             return null;
         }
+
         public void BeginRender(float width, float height)
         {
             _canvas = (CanvasElement)Browser.Document.CreateElement("canvas");
@@ -77,25 +79,23 @@ namespace AlphaTab.Platform.JavaScript
 
         public Color Color
         {
-            get
-            {
-                return _color;
-            }
+            get => _color;
             set
             {
-                if (_color.RGBA == value.RGBA) return;
+                if (_color.Rgba == value.Rgba)
+                {
+                    return;
+                }
+
                 _color = value;
-                _context.StrokeStyle = value.RGBA;
-                _context.FillStyle = value.RGBA;
+                _context.StrokeStyle = value.Rgba;
+                _context.FillStyle = value.Rgba;
             }
         }
 
         public float LineWidth
         {
-            get
-            {
-                return _lineWidth;
-            }
+            get => _lineWidth;
             set
             {
                 _lineWidth = value;
@@ -168,7 +168,7 @@ namespace AlphaTab.Platform.JavaScript
 
         public Font Font
         {
-            get { return _font; }
+            get => _font;
             set
             {
                 _font = value;
@@ -267,7 +267,12 @@ namespace AlphaTab.Platform.JavaScript
             return (float)_measureContext.MeasureText(text).Width;
         }
 
-        public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol, bool centerAtPosition = false)
+        public void FillMusicFontSymbol(
+            float x,
+            float y,
+            float scale,
+            MusicFontSymbol symbol,
+            bool centerAtPosition = false)
         {
             if (symbol == MusicFontSymbol.None)
             {
@@ -277,7 +282,12 @@ namespace AlphaTab.Platform.JavaScript
             FillMusicFontSymbolText(x, y, scale, Platform.StringFromCharCode((int)symbol), centerAtPosition);
         }
 
-        public void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols, bool centerAtPosition = false)
+        public void FillMusicFontSymbols(
+            float x,
+            float y,
+            float scale,
+            MusicFontSymbol[] symbols,
+            bool centerAtPosition = false)
         {
             var s = "";
             foreach (var symbol in symbols)
@@ -287,10 +297,16 @@ namespace AlphaTab.Platform.JavaScript
                     s += Platform.StringFromCharCode((int)symbol);
                 }
             }
+
             FillMusicFontSymbolText(x, y, scale, s, centerAtPosition);
         }
 
-        private void FillMusicFontSymbolText(float x, float y, float scale, string symbols, bool centerAtPosition = false)
+        private void FillMusicFontSymbolText(
+            float x,
+            float y,
+            float scale,
+            string symbols,
+            bool centerAtPosition = false)
         {
             x = (int)x;
             y = (int)y;
@@ -321,6 +337,5 @@ namespace AlphaTab.Platform.JavaScript
         {
             _context.Restore();
         }
-
     }
 }

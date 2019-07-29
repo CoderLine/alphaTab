@@ -3,7 +3,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab
 {
-    class RenderEngineFactory
+    internal class RenderEngineFactory
     {
         public bool SupportsWorkers { get; }
         public Func<ICanvas> CreateCanvas { get; }

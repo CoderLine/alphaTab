@@ -34,14 +34,17 @@ namespace AlphaTab
         /// Gets the UI container that holds the whole alphaTab control.
         /// </summary>
         public IContainer Container { get; }
+
         /// <summary>
         /// Gets the UI container that will hold all rendered results. 
         /// </summary>
         public IContainer CanvasElement { get; }
+
         /// <summary>
         /// Gets the score renderer used for rendering the music sheet. This is the low-level API responsible for the actual rendering chain. 
         /// </summary>
         public IScoreRenderer Renderer { get; }
+
         /// <summary>
         /// Gets a value indicating whether auto-sizing is active and the music sheet will be re-rendered on resize. 
         /// </summary>
@@ -51,6 +54,7 @@ namespace AlphaTab
         /// Gets the score holding all information about the song being rendered. 
         /// </summary>
         public Score Score { get; private set; }
+
         /// <summary>
         /// Gets the indexes of the tracks that should be rendered of the currently set score. 
         /// </summary>
@@ -72,7 +76,10 @@ namespace AlphaTab
 
                 if (tracks.Length == 0 && Score.Tracks.Count > 0)
                 {
-                    return new[] { Score.Tracks[0] };
+                    return new[]
+                    {
+                        Score.Tracks[0]
+                    };
                 }
 
                 return tracks;
@@ -104,12 +111,13 @@ namespace AlphaTab
                 Settings.Width = (int)Container.Width;
 
                 Container.Resize += Platform.Platform.Throttle(() =>
-                {
-                    if (Container.Width != Settings.Width)
                     {
-                        TriggerResize();
-                    }
-                }, uiFacade.ResizeThrottle);
+                        if (Container.Width != Settings.Width)
+                        {
+                            TriggerResize();
+                        }
+                    },
+                    uiFacade.ResizeThrottle);
 
                 var initialResizeEventInfo = new ResizeEventArgs();
                 initialResizeEventInfo.OldWidth = 0;
@@ -121,7 +129,8 @@ namespace AlphaTab
 
             #endregion
 
-            if (Settings.UseWorkers && UiFacade.AreWorkersSupported && Environment.GetRenderEngineFactory(Settings).SupportsWorkers)
+            if (Settings.UseWorkers && UiFacade.AreWorkersSupported &&
+                Environment.GetRenderEngineFactory(Settings).SupportsWorkers)
             {
                 Renderer = UiFacade.CreateWorkerRenderer();
             }
@@ -166,6 +175,7 @@ namespace AlphaTab
             {
                 Player.Destroy();
             }
+
             UiFacade.Destroy();
             Renderer.Destroy();
         }
@@ -210,7 +220,8 @@ namespace AlphaTab
         {
             if (!Container.IsVisible)
             {
-                Logger.Warning("Rendering", "AlphaTab container was invisible while autosizing, waiting for element to become visible");
+                Logger.Warning("Rendering",
+                    "AlphaTab container was invisible while autosizing, waiting for element to become visible");
                 UiFacade.RootContainerBecameVisible += () =>
                 {
                     Logger.Info("Rendering", "AlphaTab container became visible, doing autosizing");
@@ -219,10 +230,12 @@ namespace AlphaTab
             }
             else
             {
-                var resizeEventInfo = new ResizeEventArgs();
-                resizeEventInfo.OldWidth = Settings.Width;
-                resizeEventInfo.NewWidth = (int)Container.Width;
-                resizeEventInfo.Settings = Settings;
+                var resizeEventInfo = new ResizeEventArgs
+                {
+                    OldWidth = Settings.Width,
+                    NewWidth = (int)Container.Width,
+                    Settings = Settings
+                };
                 OnResize(resizeEventInfo);
                 Settings.Width = resizeEventInfo.NewWidth;
                 Renderer.UpdateSettings(Settings);
@@ -285,8 +298,12 @@ namespace AlphaTab
                 var score = parser.ReadScore();
                 if (tracks != null)
                 {
-                    tracks = new int[] { 0 };
+                    tracks = new int[]
+                    {
+                        0
+                    };
                 }
+
                 RenderTracks(score, tracks, true);
             }
             catch (Exception e)
@@ -319,7 +336,11 @@ namespace AlphaTab
         /// </summary>
         public void Render()
         {
-            if (Renderer == null) return;
+            if (Renderer == null)
+            {
+                return;
+            }
+
             Action renderAction = null;
             renderAction = () =>
             {
@@ -350,7 +371,10 @@ namespace AlphaTab
         private void SetupPlayer()
         {
             Player = UiFacade.CreateWorkerPlayer();
-            if (Player == null) return;
+            if (Player == null)
+            {
+                return;
+            }
 
             Player.Ready += () =>
             {
@@ -484,6 +508,7 @@ namespace AlphaTab
             {
                 return;
             }
+
             Player.Play();
         }
 
@@ -496,6 +521,7 @@ namespace AlphaTab
             {
                 return;
             }
+
             Player.Pause();
         }
 
@@ -508,6 +534,7 @@ namespace AlphaTab
             {
                 return;
             }
+
             Player.PlayPause();
         }
 
@@ -520,6 +547,7 @@ namespace AlphaTab
             {
                 return;
             }
+
             Player.Stop();
         }
 
@@ -548,7 +576,10 @@ namespace AlphaTab
             // Create cursors
 
             var cursors = UiFacade.CreateCursors();
-            if (cursors == null) return;
+            if (cursors == null)
+            {
+                return;
+            }
 
             // store options and created elements for fast access
             _cursorWrapper = cursors.CursorWrapper;
@@ -579,13 +610,14 @@ namespace AlphaTab
             {
                 _playerState = e.State;
 
-                if(!e.Stopped && e.State == PlayerState.Paused)
+                if (!e.Stopped && e.State == PlayerState.Paused)
                 {
                     var currentBeat = _currentBeat;
                     var tickCache = _tickCache;
                     if (currentBeat != null && tickCache != null)
                     {
-                        Player.TickPosition = tickCache.GetMasterBarStart(currentBeat.Voice.Bar.MasterBar) + currentBeat.PlaybackStart;
+                        Player.TickPosition = tickCache.GetMasterBarStart(currentBeat.Voice.Bar.MasterBar) +
+                                              currentBeat.PlaybackStart;
                     }
                 }
             };
@@ -623,7 +655,10 @@ namespace AlphaTab
         /// </summary>
         private void CursorUpdateBeat(Beat beat, Beat nextBeat, double duration, bool stop)
         {
-            if (beat == null) return;
+            if (beat == null)
+            {
+                return;
+            }
 
             var cache = _cursorCache;
             if (cache == null)
@@ -690,7 +725,8 @@ namespace AlphaTab
                         {
                             var nextBeatBoundings = cache.FindBeat(nextBeat);
                             if (nextBeatBoundings != null &&
-                                nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds == barBoundings.StaveGroupBounds)
+                                nextBeatBoundings.BarBounds.MasterBarBounds.StaveGroupBounds ==
+                                barBoundings.StaveGroupBounds)
                             {
                                 nextBeatX = nextBeatBoundings.VisualBounds.X;
                             }
@@ -703,7 +739,6 @@ namespace AlphaTab
                         //    "Transition from " + beatBoundings.VisualBounds.X + " to " + nextBeatX + " in " + duration +
                         //    "(" + Player.PlaybackRange + ")");
                         beatCursor.TransitionToX(duration, nextBeatX);
-
                     });
                 }
 
@@ -727,15 +762,18 @@ namespace AlphaTab
                                     _lastScroll = y;
                                     UiFacade.ScrollToY(scrollElement, y, Settings.ScrollSpeed);
                                 }
+
                                 break;
                             case ScrollMode.OffScreen:
                                 var elementBottom = scrollElement.ScrollTop + UiFacade.GetOffset(null, scrollElement).H;
-                                if ((barBoundings.VisualBounds.Y + barBoundings.VisualBounds.H) >= elementBottom || barBoundings.VisualBounds.Y < scrollElement.ScrollTop)
+                                if (barBoundings.VisualBounds.Y + barBoundings.VisualBounds.H >= elementBottom ||
+                                    barBoundings.VisualBounds.Y < scrollElement.ScrollTop)
                                 {
                                     var scrollTop = barBoundings.RealBounds.Y + Settings.ScrollOffsetY;
                                     _lastScroll = (int)barBoundings.VisualBounds.X;
                                     UiFacade.ScrollToY(scrollElement, (int)scrollTop, Settings.ScrollSpeed);
                                 }
+
                                 break;
                         }
                     }
@@ -751,15 +789,18 @@ namespace AlphaTab
                                     _lastScroll = (int)barBoundings.VisualBounds.X;
                                     UiFacade.ScrollToX(scrollElement, scrollLeft, Settings.ScrollSpeed);
                                 }
+
                                 break;
                             case ScrollMode.OffScreen:
                                 var elementRight = scrollElement.ScrollLeft + UiFacade.GetOffset(null, scrollElement).W;
-                                if ((barBoundings.VisualBounds.X + barBoundings.VisualBounds.W) >= elementRight || barBoundings.VisualBounds.X < scrollElement.ScrollLeft)
+                                if (barBoundings.VisualBounds.X + barBoundings.VisualBounds.W >= elementRight ||
+                                    barBoundings.VisualBounds.X < scrollElement.ScrollLeft)
                                 {
                                     var scrollLeft = barBoundings.RealBounds.X + Settings.ScrollOffsetX;
                                     _lastScroll = (int)barBoundings.VisualBounds.X;
                                     UiFacade.ScrollToX(scrollElement, (int)scrollLeft, Settings.ScrollSpeed);
                                 }
+
                                 break;
                         }
                     }
@@ -774,6 +815,7 @@ namespace AlphaTab
         /// This event is fired whenever a new beat is played. 
         /// </summary>
         public event Action<Beat> PlayedBeatChanged;
+
         private void OnPlayedBeatChanged(Beat beat)
         {
             var handler = PlayedBeatChanged;
@@ -781,6 +823,7 @@ namespace AlphaTab
             {
                 handler(beat);
             }
+
             UiFacade.TriggerEvent(Container, "playedBeatChanged", beat);
         }
 
@@ -800,6 +843,7 @@ namespace AlphaTab
                 {
                     return;
                 }
+
                 e.PreventDefault();
 
                 var relX = e.GetX(CanvasElement);
@@ -815,7 +859,11 @@ namespace AlphaTab
 
             CanvasElement.MouseMove += e =>
             {
-                if (!_selecting) return;
+                if (!_selecting)
+                {
+                    return;
+                }
+
                 var relX = e.GetX(CanvasElement);
                 var relY = e.GetY(CanvasElement);
                 var beat = _cursorCache.GetBeatAtPos(relX, relY);
@@ -828,7 +876,11 @@ namespace AlphaTab
 
             CanvasElement.MouseUp += e =>
             {
-                if (!_selecting) return;
+                if (!_selecting)
+                {
+                    return;
+                }
+
                 e.PreventDefault();
 
                 // for the selection ensure start < end
@@ -872,6 +924,7 @@ namespace AlphaTab
                         CursorSelectRange(_selectionStart, _selectionEnd);
                     }
                 }
+
                 _selecting = false;
             };
 
@@ -887,7 +940,10 @@ namespace AlphaTab
         private void CursorSelectRange(SelectionInfo startBeat, SelectionInfo endBeat)
         {
             var cache = _cursorCache;
-            if (cache == null) return;
+            if (cache == null)
+            {
+                return;
+            }
 
             var selectionWrapper = _selectionWrapper;
             selectionWrapper.Clear();
@@ -920,23 +976,26 @@ namespace AlphaTab
             var endX = endBeat.Bounds.RealBounds.X + endBeat.Bounds.RealBounds.W;
             if (endBeat.Beat.Index == endBeat.Beat.Voice.Beats.Count - 1)
             {
-                endX = endBeat.Bounds.BarBounds.MasterBarBounds.RealBounds.X + endBeat.Bounds.BarBounds.MasterBarBounds.RealBounds.W;
+                endX = endBeat.Bounds.BarBounds.MasterBarBounds.RealBounds.X +
+                       endBeat.Bounds.BarBounds.MasterBarBounds.RealBounds.W;
             }
 
             // if the selection goes across multiple staves, we need a special selection highlighting
-            if (startBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds != endBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds)
+            if (startBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds !=
+                endBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds)
             {
                 // from the startbeat to the end of the staff, 
                 // then fill all staffs until the end-beat staff
                 // then from staff-start to the end beat (or to end of bar if it's the last beat)
 
                 var staffStartX = startBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.X;
-                var staffEndX = startBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.X + startBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.W;
+                var staffEndX = startBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.X +
+                                startBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds.VisualBounds.W;
 
                 var startSelection = UiFacade.CreateSelectionElement();
                 startSelection.Top = startBeat.Bounds.BarBounds.MasterBarBounds.VisualBounds.Y;
                 startSelection.Left = startX;
-                startSelection.Width = (staffEndX - startX);
+                startSelection.Width = staffEndX - startX;
                 startSelection.Height = startBeat.Bounds.BarBounds.MasterBarBounds.VisualBounds.H;
                 selectionWrapper.AppendChild(startSelection);
 
@@ -949,7 +1008,7 @@ namespace AlphaTab
                     var middleSelection = UiFacade.CreateSelectionElement();
                     middleSelection.Top = staffBounds.VisualBounds.Y;
                     middleSelection.Left = staffStartX;
-                    middleSelection.Width = (staffEndX - staffStartX);
+                    middleSelection.Width = staffEndX - staffStartX;
                     middleSelection.Height = staffBounds.VisualBounds.H;
                     selectionWrapper.AppendChild(middleSelection);
                 }
@@ -957,7 +1016,7 @@ namespace AlphaTab
                 var endSelection = UiFacade.CreateSelectionElement();
                 endSelection.Top = endBeat.Bounds.BarBounds.MasterBarBounds.VisualBounds.Y;
                 endSelection.Left = staffStartX;
-                endSelection.Width = (endX - staffStartX);
+                endSelection.Width = endX - staffStartX;
                 endSelection.Height = endBeat.Bounds.BarBounds.MasterBarBounds.VisualBounds.H;
                 selectionWrapper.AppendChild(endSelection);
             }
@@ -967,7 +1026,7 @@ namespace AlphaTab
                 var selection = UiFacade.CreateSelectionElement();
                 selection.Top = startBeat.Bounds.BarBounds.MasterBarBounds.VisualBounds.Y;
                 selection.Left = startX;
-                selection.Width = (endX - startX);
+                selection.Width = endX - startX;
                 selection.Height = startBeat.Bounds.BarBounds.MasterBarBounds.VisualBounds.H;
                 selectionWrapper.AppendChild(selection);
             }
@@ -981,6 +1040,7 @@ namespace AlphaTab
         /// This event is fired whenever a new song is loaded. 
         /// </summary>
         public event Action<Score> Loaded;
+
         private void OnLoaded(Score obj)
         {
             var handler = Loaded;
@@ -988,6 +1048,7 @@ namespace AlphaTab
             {
                 handler(obj);
             }
+
             UiFacade.TriggerEvent(Container, "loaded", obj);
         }
 
@@ -995,6 +1056,7 @@ namespace AlphaTab
         /// This event is fired when alphaTab was resized and is about to rerender the music notation.
         /// </summary>
         public event Action<ResizeEventArgs> Resize;
+
         private void OnResize(ResizeEventArgs obj)
         {
             var handler = Resize;
@@ -1002,6 +1064,7 @@ namespace AlphaTab
             {
                 handler(obj);
             }
+
             UiFacade.TriggerEvent(Container, "resize", obj);
         }
 
@@ -1009,6 +1072,7 @@ namespace AlphaTab
         /// This event is fired when the rendering of the whole music sheet is finished. 
         /// </summary>
         public event Action<RenderFinishedEventArgs> RenderFinished;
+
         private void OnRenderFinished(RenderFinishedEventArgs e)
         {
             var handler = RenderFinished;
@@ -1016,6 +1080,7 @@ namespace AlphaTab
             {
                 handler(e);
             }
+
             UiFacade.TriggerEvent(Container, "rendered");
         }
 
@@ -1023,6 +1088,7 @@ namespace AlphaTab
         /// This event is fired when the rendering of the whole music sheet is finished, and all handlers of <see cref="RenderFinished"/> ran. 
         /// </summary>
         public event Action PostRenderFinished;
+
         private void OnPostRenderFinished()
         {
             var handler = PostRenderFinished;
@@ -1030,23 +1096,26 @@ namespace AlphaTab
             {
                 handler();
             }
+
             UiFacade.TriggerEvent(Container, "postRendered");
         }
 
         internal void OnError(string type, Exception details)
         {
             Logger.Error(type, "An unexpected error occurred", details);
-            UiFacade.TriggerEvent(Container, "error", new
-            {
-                type = type,
-                details = details
-            });
+            UiFacade.TriggerEvent(Container,
+                "error",
+                new
+                {
+                    type = type,
+                    details = details
+                });
         }
 
         #endregion
     }
 
-    class SelectionInfo
+    internal class SelectionInfo
     {
         public Beat Beat { get; set; }
         public BeatBounds Bounds { get; set; }

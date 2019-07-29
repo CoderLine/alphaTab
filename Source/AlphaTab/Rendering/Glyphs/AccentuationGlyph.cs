@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class AccentuationGlyph : MusicFontGlyph
+    internal class AccentuationGlyph : MusicFontGlyph
     {
         public AccentuationGlyph(float x, float y, AccentuationType accentuation)
             : base(x, y, 1, GetSymbol(accentuation))

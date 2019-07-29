@@ -1,14 +1,13 @@
 ﻿using System;
 using AlphaTab.Collections;
 using AlphaTab.Model;
-using AlphaTab.Platform;
 using AlphaTab.Xml;
 using Note = AlphaTab.Model.Note;
 using XmlNodeType = AlphaTab.Xml.XmlNodeType;
 
 namespace AlphaTab.Importer
 {
-    class MusicXmlImporter : ScoreImporter
+    internal class MusicXmlImporter : ScoreImporter
     {
         public const string MergePartGroupsSetting = "musicXMLMergePartGroups";
 
@@ -26,7 +25,7 @@ namespace AlphaTab.Importer
         private FastDictionary<string, Note> _slurStarts;
 
 
-        public override string Name { get { return "MusicXML"; } }
+        public override string Name => "MusicXML";
 
         public override Score ReadScore()
         {
@@ -79,7 +78,7 @@ namespace AlphaTab.Importer
             // if any groups were merged, we need to rebuild the indexes
             if (anyMerged)
             {
-                for (int i = 0; i < _score.Tracks.Count; i++)
+                for (var i = 0; i < _score.Tracks.Count; i++)
                 {
                     _score.Tracks[i].Index = i;
                 }
@@ -89,7 +88,7 @@ namespace AlphaTab.Importer
         private void MergeGroup(FastList<Track> partGroup)
         {
             var primaryTrack = partGroup[0];
-            for (int i = 1; i < partGroup.Count; i++)
+            for (var i = 1; i < partGroup.Count; i++)
             {
                 // merge staves over to primary track
                 var secondaryTrack = partGroup[i];
@@ -185,7 +184,10 @@ namespace AlphaTab.Importer
                         }
                     }
 
-                    if (!_trackById.ContainsKey(id)) return;
+                    if (!_trackById.ContainsKey(id))
+                    {
+                        return;
+                    }
                 }
                 else
                 {
@@ -207,6 +209,7 @@ namespace AlphaTab.Importer
                             {
                                 isFirstMeasure = false;
                             }
+
                             break;
                     }
                 }
@@ -219,7 +222,6 @@ namespace AlphaTab.Importer
                 {
                     EnsureVoices(bar);
                 }
-
             }
         }
 
@@ -245,6 +247,7 @@ namespace AlphaTab.Importer
                 {
                     _trackFirstMeasureNumber = 0;
                 }
+
                 barIndex = 0;
             }
             else
@@ -254,10 +257,11 @@ namespace AlphaTab.Importer
                 {
                     return false;
                 }
+
                 barIndex -= _trackFirstMeasureNumber;
             }
 
-            // try to find out the number of staffs required 
+            // try to find out the number of staffs required
             if (isFirstMeasure)
             {
                 var attributes = element.GetElementsByTagName("attributes");
@@ -274,11 +278,11 @@ namespace AlphaTab.Importer
 
 
             // create empty bars to the current index
-            Bar[] bars = new Bar[track.Staves.Count];
+            var bars = new Bar[track.Staves.Count];
             MasterBar masterBar = null;
-            for (int b = track.Staves[0].Bars.Count; b <= barIndex; b++)
+            for (var b = track.Staves[0].Bars.Count; b <= barIndex; b++)
             {
-                for (int s = 0; s < track.Staves.Count; s++)
+                for (var s = 0; s < track.Staves.Count; s++)
                 {
                     var bar = bars[s] = new Bar();
                     if (track.Staves[s].Bars.Count > 0)
@@ -286,6 +290,7 @@ namespace AlphaTab.Importer
                         var previousBar = track.Staves[s].Bars[track.Staves[s].Bars.Count - 1];
                         bar.Clef = previousBar.Clef;
                     }
+
                     masterBar = GetOrCreateMasterBar(barIndex);
                     track.Staves[s].AddBar(bar);
 
@@ -316,6 +321,7 @@ namespace AlphaTab.Importer
                                 ParseAttributes(c, bars, masterBar, track);
                                 attributesParsed = true;
                             }
+
                             break;
                         case "harmony":
                             ParseHarmony(c, track);
@@ -339,7 +345,10 @@ namespace AlphaTab.Importer
             {
                 var emptyVoice = new Voice();
                 bar.AddVoice(emptyVoice);
-                var emptyBeat = new Beat { IsEmpty = true };
+                var emptyBeat = new Beat
+                {
+                    IsEmpty = true
+                };
                 emptyBeat.ChordId = _currentChord;
                 emptyVoice.AddBeat(emptyBeat);
             }
@@ -347,7 +356,7 @@ namespace AlphaTab.Importer
 
         private Beat GetOrCreateBeat(XmlNode element, Bar[] bars, bool chord)
         {
-            int voiceIndex = 0;
+            var voiceIndex = 0;
             var voiceNodes = element.GetElementsByTagName("voice");
             if (voiceNodes.Length > 0)
             {
@@ -357,7 +366,7 @@ namespace AlphaTab.Importer
             var previousBeatWasPulled = _previousBeatWasPulled;
             _previousBeatWasPulled = false;
             var staffElement = element.GetElementsByTagName("staff");
-            int staff = 1;
+            var staff = 1;
             if (staffElement.Length > 0)
             {
                 staff = Platform.Platform.ParseInt(staffElement[0].InnerText);
@@ -375,15 +384,25 @@ namespace AlphaTab.Importer
                     _voiceOfStaff[staffId] = voiceIndex;
                 }
             }
+
             staff--;
             Bar bar;
-            if (staff < 0) bar = bars[0];
-            else if (staff >= bars.Length) bar = bars[bars.Length - 1];
-            else bar = bars[staff];
+            if (staff < 0)
+            {
+                bar = bars[0];
+            }
+            else if (staff >= bars.Length)
+            {
+                bar = bars[bars.Length - 1];
+            }
+            else
+            {
+                bar = bars[staff];
+            }
 
             Beat beat;
             var voice = GetOrCreateVoice(bar, voiceIndex);
-            if ((chord && voice.Beats.Count > 0) || (voice.Beats.Count == 1 && voice.IsEmpty))
+            if (chord && voice.Beats.Count > 0 || voice.Beats.Count == 1 && voice.IsEmpty)
             {
                 beat = voice.Beats[voice.Beats.Count - 1];
             }
@@ -405,17 +424,12 @@ namespace AlphaTab.Importer
             var beat = GetOrCreateBeat(element, bars, false);
             var durationInDivisions = Platform.Platform.ParseInt(element.FindChildElement("duration").InnerText);
 
-            var duration = (durationInDivisions * (int)Duration.Quarter) / (float)_divisionsPerQuarterNote;
+            var duration = durationInDivisions * (int)Duration.Quarter / (float)_divisionsPerQuarterNote;
 
             var durations = new[]
             {
-                (int) Duration.SixtyFourth,
-                (int) Duration.ThirtySecond,
-                (int) Duration.Sixteenth,
-                (int) Duration.Eighth,
-                (int) Duration.Quarter,
-                (int) Duration.Half,
-                (int) Duration.Whole
+                (int)Duration.SixtyFourth, (int)Duration.ThirtySecond, (int)Duration.Sixteenth, (int)Duration.Eighth,
+                (int)Duration.Quarter, (int)Duration.Half, (int)Duration.Whole
             };
             foreach (var d in durations)
             {
@@ -429,7 +443,7 @@ namespace AlphaTab.Importer
 
             if (duration > 0)
             {
-                // TODO: Handle remaining duration 
+                // TODO: Handle remaining duration
                 // (additional beats, dotted durations,...)
             }
 
@@ -449,6 +463,7 @@ namespace AlphaTab.Importer
                             {
                                 staff.Tuning = new int[Platform.Platform.ParseInt(c.InnerText)];
                             }
+
                             break;
                         case "staff-tuning":
                             ParseStaffTuning(c, track);
@@ -469,9 +484,9 @@ namespace AlphaTab.Importer
         private void ParseStaffTuning(XmlNode element, Track track)
         {
             var line = Platform.Platform.ParseInt(element.GetAttribute("line"));
-            string tuningStep = "C";
-            string tuningOctave = "";
-            int tuningAlter = 0;
+            var tuningStep = "C";
+            var tuningOctave = "";
+            var tuningAlter = 0;
             foreach (var c in element.ChildNodes)
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -504,8 +519,10 @@ namespace AlphaTab.Importer
         private void ParseHarmony(XmlNode element, Track track)
         {
             string rootStep = null;
-            string rootAlter = "";
+            var rootAlter = "";
+            // ReSharper disable once NotAccessedVariable
             string kind = null;
+            // ReSharper disable once NotAccessedVariable
             string kindText = null;
 
             foreach (var c in element.ChildNodes)
@@ -543,10 +560,12 @@ namespace AlphaTab.Importer
                                                     rootAlter = " ##";
                                                     break;
                                             }
+
                                             break;
                                     }
                                 }
                             }
+
                             break;
                         case "kind":
                             kindText = c.GetAttribute("text");
@@ -786,6 +805,7 @@ namespace AlphaTab.Importer
                                         break;
                                 }
                             }
+
                             break;
                         case "tie":
                             ParseTied(c, note);
@@ -802,6 +822,7 @@ namespace AlphaTab.Importer
                             {
                                 beat.Duration = Duration.Eighth;
                             }
+
                             break;
                         case "dot":
                             beat.Dots++;
@@ -820,6 +841,7 @@ namespace AlphaTab.Importer
                             {
                                 note.IsGhost = true;
                             }
+
                             break;
                         case "beam":
                             var beamMode = c.InnerText;
@@ -827,6 +849,7 @@ namespace AlphaTab.Importer
                             {
                                 _isBeamContinue = true;
                             }
+
                             break;
                         case "notations":
                             ParseNotations(c, beat, note);
@@ -852,7 +875,7 @@ namespace AlphaTab.Importer
             // check if new note is duplicate on string
             if (note.IsStringed)
             {
-                for (int i = 0; i < beat.Notes.Count; i++)
+                for (var i = 0; i < beat.Notes.Count; i++)
                 {
                     if (beat.Notes[i].String == note.String && beat.Notes[i] != note)
                     {
@@ -907,6 +930,7 @@ namespace AlphaTab.Importer
                             {
                                 beat.Text = c.InnerText;
                             }
+
                             break;
                     }
                 }
@@ -986,6 +1010,7 @@ namespace AlphaTab.Importer
                             {
                                 note.SlideType = SlideType.Shift;
                             }
+
                             break;
                         case "dynamics":
                             ParseDynamics(c, beat);
@@ -1016,8 +1041,10 @@ namespace AlphaTab.Importer
                                         slurStart.SlurDestination = note;
                                         note.SlurOrigin = note;
                                     }
+
                                     break;
                             }
+
                             break;
                     }
                 }
@@ -1046,6 +1073,7 @@ namespace AlphaTab.Importer
                                     note.Beat.TremoloSpeed = Duration.ThirtySecond;
                                     break;
                             }
+
                             break;
                     }
                 }
@@ -1066,6 +1094,7 @@ namespace AlphaTab.Importer
                             {
                                 note.String = note.Beat.Voice.Bar.Staff.Tuning.Length - note.String + 1;
                             }
+
                             break;
                         case "fret":
                             note.Fret = Platform.Platform.ParseInt(c.InnerText);
@@ -1158,10 +1187,10 @@ namespace AlphaTab.Importer
                         case "normal-notes":
                             beat.TupletDenominator = Platform.Platform.ParseInt(c.InnerText);
                             break;
-                            //case "normal-type":
-                            //    break;
-                            //case "normal-dot":
-                            //    break;
+                        //case "normal-type":
+                        //    break;
+                        //case "normal-dot":
+                        //    break;
                     }
                 }
             }
@@ -1170,8 +1199,8 @@ namespace AlphaTab.Importer
         private void ParseUnpitched(XmlNode element, Note note)
         {
             string step = null;
-            int semitones = 0;
-            int octave = 0;
+            var semitones = 0;
+            var octave = 0;
             foreach (var c in element.ChildNodes)
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -1194,15 +1223,15 @@ namespace AlphaTab.Importer
 
             var value = octave * 12 + TuningParser.GetToneForText(step) + semitones;
 
-            note.Octave = (value / 12);
-            note.Tone = value - (note.Octave * 12);
+            note.Octave = value / 12;
+            note.Tone = value - note.Octave * 12;
         }
 
         private void ParsePitch(XmlNode element, Note note)
         {
             string step = null;
             float semitones = 0;
-            int octave = 0;
+            var octave = 0;
             foreach (var c in element.ChildNodes)
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -1218,6 +1247,7 @@ namespace AlphaTab.Importer
                             {
                                 semitones = 0;
                             }
+
                             break;
                         case "octave":
                             // 0-9, 4 for middle C
@@ -1229,8 +1259,8 @@ namespace AlphaTab.Importer
 
             var value = octave * 12 + TuningParser.GetToneForText(step) + (int)semitones;
 
-            note.Octave = (value / 12);
-            note.Tone = value - (note.Octave * 12);
+            note.Octave = value / 12;
+            note.Tone = value - note.Octave * 12;
         }
 
         private Voice GetOrCreateVoice(Bar bar, int index)
@@ -1240,7 +1270,7 @@ namespace AlphaTab.Importer
                 return bar.Voices[index];
             }
 
-            for (int i = bar.Voices.Count; i <= index; i++)
+            for (var i = bar.Voices.Count; i <= index; i++)
             {
                 bar.AddVoice(new Voice());
             }
@@ -1268,6 +1298,7 @@ namespace AlphaTab.Importer
                                 tempoAutomation.Value = Platform.Platform.ParseInt(tempo);
                                 masterBar.TempoAutomation = tempoAutomation;
                             }
+
                             break;
                         case "direction-type":
                             var directionType = c.FirstElement;
@@ -1280,6 +1311,7 @@ namespace AlphaTab.Importer
                                     ParseMetronome(c.FirstElement, masterBar);
                                     break;
                             }
+
                             break;
                     }
                 }
@@ -1289,7 +1321,7 @@ namespace AlphaTab.Importer
         private void ParseMetronome(XmlNode element, MasterBar masterBar)
         {
             var unit = Duration.Quarter;
-            int perMinute = 120;
+            var perMinute = 120;
             foreach (var c in element.ChildNodes)
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -1314,7 +1346,7 @@ namespace AlphaTab.Importer
         private void ParseAttributes(XmlNode element, Bar[] bars, MasterBar masterBar, Track track)
         {
             int number;
-            bool hasTime = false;
+            var hasTime = false;
             foreach (var c in element.ChildNodes)
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -1337,6 +1369,7 @@ namespace AlphaTab.Importer
                             {
                                 number = 1;
                             }
+
                             ParseClef(c, bars[number - 1]);
                             break;
                         case "staff-details":
@@ -1357,7 +1390,7 @@ namespace AlphaTab.Importer
 
         private void ParseTranspose(XmlNode element, Track track)
         {
-            int semitones = 0;
+            var semitones = 0;
             foreach (var c in element.ChildNodes)
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -1383,7 +1416,7 @@ namespace AlphaTab.Importer
         private void ParseClef(XmlNode element, Bar bar)
         {
             string sign = null;
-            int line = 0;
+            var line = 0;
             foreach (var c in element.ChildNodes)
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -1412,6 +1445,7 @@ namespace AlphaTab.Importer
                                     bar.ClefOttava = Ottavia._15mb;
                                     break;
                             }
+
                             break;
                     }
                 }
@@ -1434,6 +1468,7 @@ namespace AlphaTab.Importer
                     {
                         bar.Clef = Clef.C4;
                     }
+
                     break;
                 case "percussion":
                     bar.Clef = Clef.Neutral;
@@ -1455,8 +1490,9 @@ namespace AlphaTab.Importer
             {
                 masterBar.TimeSignatureCommon = true;
             }
-            bool beatsParsed = false;
-            bool beatTypeParsed = false;
+
+            var beatsParsed = false;
+            var beatTypeParsed = false;
             foreach (var c in element.ChildNodes)
             {
                 if (c.NodeType == XmlNodeType.Element)
@@ -1475,8 +1511,10 @@ namespace AlphaTab.Importer
                                 {
                                     masterBar.TimeSignatureNumerator = 4;
                                 }
+
                                 beatsParsed = true;
                             }
+
                             break;
                         case "beat-type":
                             if (!beatTypeParsed)
@@ -1489,8 +1527,10 @@ namespace AlphaTab.Importer
                                 {
                                     masterBar.TimeSignatureDenominator = 4;
                                 }
+
                                 beatTypeParsed = true;
                             }
+
                             break;
                     }
                 }
@@ -1499,9 +1539,9 @@ namespace AlphaTab.Importer
 
         private void ParseKey(XmlNode element, MasterBar masterBar)
         {
-            int fifths = int.MinValue;
-            int keyStep = int.MinValue;
-            int keyAlter = int.MinValue;
+            var fifths = int.MinValue;
+            var keyStep = int.MinValue;
+            var keyAlter = int.MinValue;
             string mode = null;
             foreach (var c in element.ChildNodes)
             {
@@ -1553,7 +1593,7 @@ namespace AlphaTab.Importer
                 return _score.MasterBars[index];
             }
 
-            for (int i = _score.MasterBars.Count; i <= index; i++)
+            for (var i = _score.MasterBars.Count; i <= index; i++)
             {
                 var mb = new MasterBar();
                 if (_score.MasterBars.Count > 0)
@@ -1585,12 +1625,14 @@ namespace AlphaTab.Importer
                             {
                                 _score.Music = c.InnerText;
                             }
+
                             break;
                         case "rights":
                             if (!string.IsNullOrEmpty(_score.Copyright))
                             {
                                 _score.Copyright += "\n";
                             }
+
                             _score.Copyright += c.InnerText;
                             break;
                     }
@@ -1615,7 +1657,6 @@ namespace AlphaTab.Importer
                     }
                 }
             }
-
         }
 
         private void ParsePartGroup(XmlNode element)
@@ -1635,9 +1676,9 @@ namespace AlphaTab.Importer
 
         private void ParseScorePart(XmlNode element)
         {
-            string id = element.GetAttribute("id");
+            var id = element.GetAttribute("id");
 
-            Track track = new Track(1);
+            var track = new Track(1);
             var staff = track.Staves[0];
             staff.ShowStandardNotation = true;
             _trackById[id] = track;
@@ -1680,13 +1721,14 @@ namespace AlphaTab.Importer
                 return true;
             }
 
-            for (int i = 0; i < tuning.Length; i++)
+            for (var i = 0; i < tuning.Length; i++)
             {
                 if (tuning[i] != 0)
                 {
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -1711,7 +1753,5 @@ namespace AlphaTab.Importer
                 }
             }
         }
-
-
     }
 }

@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Util
 {
-    class Lazy<T>
+    internal class Lazy<T>
     {
         private readonly Func<T> _factory;
         private bool _created;
@@ -22,6 +22,7 @@ namespace AlphaTab.Util
                     _value = _factory();
                     _created = true;
                 }
+
                 return _value;
             }
         }

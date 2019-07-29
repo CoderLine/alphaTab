@@ -16,7 +16,7 @@ using Phase;
 
 namespace AlphaTab.UI
 {
-    class BrowserUiFacade : IUiFacade<object>
+    internal class BrowserUiFacade : IUiFacade<object>
     {
         private event Action _rootContainerBecameVisible;
 
@@ -33,6 +33,7 @@ namespace AlphaTab.UI
         public bool AreWorkersSupported { get; }
 
         public bool CanRender => _api.Settings.Engine != "html5" || Environment.IsFontLoaded;
+
         public event Action CanRenderChanged
         {
             add => Environment.FontLoaded += value;
@@ -66,21 +67,22 @@ namespace AlphaTab.UI
                     if (_visibilityCheckIntervalId == 0)
                     {
                         _visibilityCheckIntervalId = Browser.Window.SetInterval((Action)(() =>
-                        {
-                            if (_api.Container.IsVisible)
                             {
-                                Browser.Window.ClearInterval(_visibilityCheckIntervalId);
-                                _visibilityCheckIntervalId = 0;
-
-                                if (_rootContainerBecameVisible != null)
+                                if (_api.Container.IsVisible)
                                 {
-                                    _rootContainerBecameVisible();
-                                }
+                                    Browser.Window.ClearInterval(_visibilityCheckIntervalId);
+                                    _visibilityCheckIntervalId = 0;
 
-                                _rootContainerBecameVisible = null;
-                                _visibilityCheckIntervalId = 0;
-                            }
-                        }), _visibilityCheckInterval);
+                                    if (_rootContainerBecameVisible != null)
+                                    {
+                                        _rootContainerBecameVisible();
+                                    }
+
+                                    _rootContainerBecameVisible = null;
+                                    _visibilityCheckIntervalId = 0;
+                                }
+                            }),
+                            _visibilityCheckInterval);
                     }
                 }
             }
@@ -181,7 +183,7 @@ namespace AlphaTab.UI
 
             if (Platform.Platform.JsonExists(Browser.Window, "jQuery"))
             {
-                dynamic jquery = Browser.Window.Member<dynamic>("jQuery");
+                var jquery = Browser.Window.Member<dynamic>("jQuery");
                 jquery(element).trigger(name, details);
             }
         }
@@ -206,7 +208,9 @@ namespace AlphaTab.UI
                 }
                 else if (!string.IsNullOrEmpty(_file))
                 {
-                    ScoreLoader.LoadScoreAsync(_file, s => _api.ScoreLoaded(s), e => { _api.OnError("import", e); },
+                    ScoreLoader.LoadScoreAsync(_file,
+                        s => _api.ScoreLoaded(s),
+                        e => { _api.OnError("import", e); },
                         _api.Settings);
                 }
             };
@@ -241,7 +245,7 @@ namespace AlphaTab.UI
             var styleElement = (StyleElement)elementDocument.GetElementById("alphaTabStyle");
             if (styleElement == null)
             {
-                string fontDirectory = settings.FontDirectory;
+                var fontDirectory = settings.FontDirectory;
                 styleElement = (StyleElement)elementDocument.CreateElement("style");
                 styleElement.Id = "alphaTabStyle";
                 styleElement.Type = "text/css";
@@ -296,7 +300,7 @@ namespace AlphaTab.UI
 
         public int[] ParseTracks(dynamic tracksData)
         {
-            FastList<int> tracks = new FastList<int>();
+            var tracks = new FastList<int>();
 
             // decode string
             if (Platform.Platform.TypeOf(tracksData) == "string")
@@ -312,7 +316,10 @@ namespace AlphaTab.UI
                 }
                 catch
                 {
-                    tracksData = new[] { 0 };
+                    tracksData = new[]
+                    {
+                        0
+                    };
                 }
             }
 
@@ -364,10 +371,10 @@ namespace AlphaTab.UI
             {
                 foreach (var key in Platform.Platform.JsonKeys(element.Dataset))
                 {
-                    object value = element.Dataset.Member<object>(key);
+                    var value = element.Dataset.Member<object>(key);
                     try
                     {
-                        string stringValue = (string)value;
+                        var stringValue = (string)value;
                         value = Json.Parse(stringValue);
                     }
                     catch
@@ -377,6 +384,7 @@ namespace AlphaTab.UI
                             value = null;
                         }
                     }
+
                     dataAttributes[key] = value;
                 }
             }
@@ -390,7 +398,7 @@ namespace AlphaTab.UI
                     {
                         var keyParts = nodeName.Substring(5).Split('-');
                         var key = keyParts[0];
-                        for (int j = 1; j < keyParts.Length; j++)
+                        for (var j = 1; j < keyParts.Length; j++)
                         {
                             key += keyParts[j].Substring(0, 1).ToUpper() + keyParts[j].Substring(1);
                         }
@@ -407,6 +415,7 @@ namespace AlphaTab.UI
                                 value = null;
                             }
                         }
+
                         dataAttributes[key] = value;
                     }
                 }
@@ -418,66 +427,67 @@ namespace AlphaTab.UI
         public void BeginAppendRenderResults(RenderFinishedEventArgs renderResult)
         {
             Browser.Window.SetTimeout((Action)(() =>
-            {
-                var canvasElement = ((HtmlElementContainer)_api.CanvasElement).Element;
-
-                // null result indicates that the rendering finished
-                if (renderResult == null)
                 {
-                    // so we remove elements that might be from a previous render session
-                    while (canvasElement.ChildElementCount > _totalResultCount)
+                    var canvasElement = ((HtmlElementContainer)_api.CanvasElement).Element;
+
+                    // null result indicates that the rendering finished
+                    if (renderResult == null)
                     {
-                        canvasElement.RemoveChild(canvasElement.LastChild);
-                    }
-                }
-                // NOTE: here we try to replace existing children 
-                else
-                {
-                    var body = renderResult.RenderResult;
-                    if (Platform.Platform.TypeOf(body) == "string")
-                    {
-                        Element placeholder;
-                        if (_totalResultCount < canvasElement.ChildElementCount)
+                        // so we remove elements that might be from a previous render session
+                        while (canvasElement.ChildElementCount > _totalResultCount)
                         {
-                            placeholder = (Element)canvasElement.ChildNodes.Item(_totalResultCount);
-                        }
-                        else
-                        {
-                            placeholder = Browser.Document.CreateElement("div");
-                            canvasElement.AppendChild(placeholder);
-                        }
-
-                        placeholder.Style.Width = renderResult.Width + "px";
-                        placeholder.Style.Height = renderResult.Height + "px";
-                        placeholder.Style.Display = "inline-block";
-
-                        if (IsElementInViewPort(placeholder) || _api.Settings.DisableLazyLoading)
-                        {
-                            string bodyHtml = (string)body;
-                            placeholder.OuterHTML = bodyHtml;
-                        }
-                        else
-                        {
-
-                            placeholder.Member("svg", body);
-                            placeholder.SetAttribute("data-lazy", "true");
+                            canvasElement.RemoveChild(canvasElement.LastChild);
                         }
                     }
+                    // NOTE: here we try to replace existing children 
                     else
                     {
-                        if (_totalResultCount < canvasElement.ChildElementCount)
+                        var body = renderResult.RenderResult;
+                        if (Platform.Platform.TypeOf(body) == "string")
                         {
-                            canvasElement.ReplaceChild(renderResult.RenderResult.As<Node>(), canvasElement.ChildNodes.Item(_totalResultCount));
+                            Element placeholder;
+                            if (_totalResultCount < canvasElement.ChildElementCount)
+                            {
+                                placeholder = (Element)canvasElement.ChildNodes.Item(_totalResultCount);
+                            }
+                            else
+                            {
+                                placeholder = Browser.Document.CreateElement("div");
+                                canvasElement.AppendChild(placeholder);
+                            }
+
+                            placeholder.Style.Width = renderResult.Width + "px";
+                            placeholder.Style.Height = renderResult.Height + "px";
+                            placeholder.Style.Display = "inline-block";
+
+                            if (IsElementInViewPort(placeholder) || _api.Settings.DisableLazyLoading)
+                            {
+                                var bodyHtml = (string)body;
+                                placeholder.OuterHTML = bodyHtml;
+                            }
+                            else
+                            {
+                                placeholder.Member("svg", body);
+                                placeholder.SetAttribute("data-lazy", "true");
+                            }
                         }
                         else
                         {
-                            canvasElement.AppendChild(renderResult.RenderResult.As<Node>());
+                            if (_totalResultCount < canvasElement.ChildElementCount)
+                            {
+                                canvasElement.ReplaceChild(renderResult.RenderResult.As<Node>(),
+                                    canvasElement.ChildNodes.Item(_totalResultCount));
+                            }
+                            else
+                            {
+                                canvasElement.AppendChild(renderResult.RenderResult.As<Node>());
+                            }
                         }
-                    }
-                    _totalResultCount++;
-                }
-            }), 1);
 
+                        _totalResultCount++;
+                    }
+                }),
+                1);
         }
 
         /// <summary>
@@ -505,12 +515,16 @@ namespace AlphaTab.UI
             if (supportsWebAudio && !forceFlash)
             {
                 Logger.Info("Player", "Will use webworkers for synthesizing and web audio api for playback");
-                player = new AlphaSynthWebWorkerApi(new AlphaSynthWebAudioOutput(), alphaSynthScriptFile, _api.Settings.LogLevel);
+                player = new AlphaSynthWebWorkerApi(new AlphaSynthWebAudioOutput(),
+                    alphaSynthScriptFile,
+                    _api.Settings.LogLevel);
             }
             else if (supportsWebWorkers)
             {
                 Logger.Info("Player", "Will use webworkers for synthesizing and flash for playback");
-                player = new AlphaSynthWebWorkerApi(new AlphaSynthFlashOutput(alphaSynthScriptFile), alphaSynthScriptFile, _api.Settings.LogLevel);
+                player = new AlphaSynthWebWorkerApi(new AlphaSynthFlashOutput(alphaSynthScriptFile),
+                    alphaSynthScriptFile,
+                    _api.Settings.LogLevel);
             }
 
             if (player == null)
@@ -538,7 +552,7 @@ namespace AlphaTab.UI
         {
             var element = ((HtmlElementContainer)_api.Container).Element;
             var elementsToHighlight = element.GetElementsByClassName(groupId);
-            for (int i = 0; i < elementsToHighlight.Length; i++)
+            for (var i = 0; i < elementsToHighlight.Length; i++)
             {
                 elementsToHighlight.Item(i).ClassList.Add("atHighlight");
             }
@@ -633,6 +647,7 @@ namespace AlphaTab.UI
             {
                 scrollElement = Browser.Document.DocumentElement;
             }
+
             return new HtmlElementContainer(scrollElement);
         }
 
@@ -662,7 +677,10 @@ namespace AlphaTab.UI
             Action<HaxeFloat> step = null;
             step = x =>
             {
-                if (start == 0) start = x;
+                if (start == 0)
+                {
+                    start = x;
+                }
 
                 double time = x - start;
                 var percent = Math.Min(time / speed, 1);
@@ -685,7 +703,10 @@ namespace AlphaTab.UI
             Action<HaxeFloat> step = null;
             step = t =>
             {
-                if (start == 0) start = t;
+                if (start == 0)
+                {
+                    start = t;
+                }
 
                 double time = t - start;
                 var percent = Math.Min(time / speed, 1);
@@ -698,7 +719,5 @@ namespace AlphaTab.UI
             };
             Browser.Window.RequestAnimationFrame(step);
         }
-
-
     }
 }

@@ -6,7 +6,7 @@ namespace AlphaTab.Rendering.Glyphs
     /// A glyph is a single symbol which can be added to a GlyphBarRenderer for automated
     /// layouting and drawing of stacked symbols.
     /// </summary>
-    class Glyph
+    internal class Glyph
     {
         public float X { get; set; }
         public float Y { get; set; }
@@ -19,13 +19,7 @@ namespace AlphaTab.Rendering.Glyphs
             Y = y;
         }
 
-        public float Scale
-        {
-            get
-            {
-                return Renderer.Scale;
-            }
-        }
+        public float Scale => Renderer.Scale;
 
         public virtual void DoLayout()
         {

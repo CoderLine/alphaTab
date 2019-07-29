@@ -1,10 +1,9 @@
-﻿using System;
-using AlphaTab.Model;
+﻿using AlphaTab.Model;
 using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class ScoreTieGlyph : TieGlyph
+    internal class ScoreTieGlyph : TieGlyph
     {
         protected readonly Note StartNote;
         protected readonly Note EndNote;
@@ -19,13 +18,13 @@ namespace AlphaTab.Rendering.Glyphs
         public override void DoLayout()
         {
             base.DoLayout();
-            YOffset = (NoteHeadGlyph.NoteHeadHeight/2);
+            YOffset = NoteHeadGlyph.NoteHeadHeight / 2;
         }
 
         protected override BeamDirection GetBeamDirection(Beat beat, BarRendererBase noteRenderer)
         {
             // invert direction (if stems go up, ties go down to not cross them)
-            switch (((ScoreBarRenderer) noteRenderer).GetBeatDirection(beat))
+            switch (((ScoreBarRenderer)noteRenderer).GetBeatDirection(beat))
             {
                 case BeamDirection.Up:
                     return BeamDirection.Down;

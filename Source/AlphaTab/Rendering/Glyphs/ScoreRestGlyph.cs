@@ -3,7 +3,7 @@ using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class ScoreRestGlyph : MusicFontGlyph
+    internal class ScoreRestGlyph : MusicFontGlyph
     {
         private readonly Duration _duration;
 
@@ -45,6 +45,7 @@ namespace AlphaTab.Rendering.Glyphs
                     return MusicFontSymbol.None;
             }
         }
+
         public static float GetSize(Duration duration)
         {
             switch (duration)

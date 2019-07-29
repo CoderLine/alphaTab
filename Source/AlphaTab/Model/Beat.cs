@@ -14,7 +14,7 @@ namespace AlphaTab.Model
         /// This is a global counter for all beats. We use it 
         /// at several locations for lookup tables. 
         /// </summary>
-        private static int GlobalBeatId = 0;
+        private static int _globalBeatId;
 
         /// <summary>
         /// Gets or sets the unique id of this beat. 
@@ -30,6 +30,7 @@ namespace AlphaTab.Model
         /// Gets or sets the previous beat within the whole song.
         /// </summary>
         public Beat PreviousBeat { get; set; }
+
         /// <summary>
         /// Gets or sets the next beat within the whole song. 
         /// </summary>
@@ -96,14 +97,17 @@ namespace AlphaTab.Model
         /// Gets or sets the note with the lowest pitch in this beat. Only visible notes are considered.  
         /// </summary>
         public Note MinNote { get; set; }
+
         /// <summary>
         /// Gets or sets the note with the highest pitch in this beat. Only visible notes are considered. 
         /// </summary>
         public Note MaxNote { get; set; }
+
         /// <summary>
         /// Gets or sets the note with the highest string number in this beat. Only visible notes are considered.
         /// </summary>
         public Note MaxStringNote { get; set; }
+
         /// <summary>
         /// Gets or sets the note with the lowest string number in this beat. Only visible notes are considered.
         /// </summary>
@@ -143,6 +147,7 @@ namespace AlphaTab.Model
         /// Gets or sets a value indicating whether this beat is fade-in. 
         /// </summary>
         public bool FadeIn { get; set; }
+
         /// <summary>
         /// Gets or sets the lyrics shown on this beat. 
         /// </summary>
@@ -157,10 +162,12 @@ namespace AlphaTab.Model
         /// Gets or sets a value indicating whether the notes on this beat are played with a pop-style (bass).
         /// </summary>
         public bool Pop { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether the notes on this beat are played with a slap-style (bass).
         /// </summary>
         public bool Slap { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether the notes on this beat are played with a tap-style (bass).
         /// </summary>
@@ -185,6 +192,7 @@ namespace AlphaTab.Model
         /// Gets or sets the tuplet denominator.
         /// </summary>re
         public int TupletDenominator { get; set; }
+
         /// <summary>
         /// Gets or sets the tuplet numerator. 
         /// </summary>
@@ -193,8 +201,9 @@ namespace AlphaTab.Model
         /// <summary>
         /// Gets or sets whether there is a tuplet applied to the duration of this beat. 
         /// </summary>
-        public bool HasTuplet => !(TupletDenominator == -1 && TupletNumerator == -1) &&
-                                 !(TupletDenominator == 1 && TupletNumerator == 1);
+        public bool HasTuplet =>
+            !(TupletDenominator == -1 && TupletNumerator == -1) &&
+            !(TupletDenominator == 1 && TupletNumerator == 1);
 
         public TupletGroup TupletGroup { get; set; }
 
@@ -217,6 +226,7 @@ namespace AlphaTab.Model
         /// Gets or sets the highest point with for the highest whammy bar value. 
         /// </summary>
         public BendPoint MaxWhammyPoint { get; set; }
+
         /// <summary>
         /// Gets or sets the highest point with for the lowest whammy bar value. 
         /// </summary>
@@ -329,7 +339,7 @@ namespace AlphaTab.Model
         /// </summary>
         public Beat()
         {
-            Id = GlobalBeatId++;
+            Id = _globalBeatId++;
             WhammyBarType = WhammyType.None;
             WhammyBarPoints = new FastList<BendPoint>();
             Notes = new FastList<Note>();
@@ -367,11 +377,12 @@ namespace AlphaTab.Model
             if (src.Lyrics != null)
             {
                 dst.Lyrics = new string[src.Lyrics.Length];
-                for (int i = 0; i < src.Lyrics.Length; i++)
+                for (var i = 0; i < src.Lyrics.Length; i++)
                 {
                     dst.Lyrics[i] = src.Lyrics[i];
                 }
             }
+
             dst.Pop = src.Pop;
             dst.HasRasgueado = src.HasRasgueado;
             dst.Slap = src.Slap;
@@ -408,15 +419,18 @@ namespace AlphaTab.Model
             {
                 beat.AddWhammyBarPoint(WhammyBarPoints[i].Clone());
             }
+
             for (int i = 0, j = Notes.Count; i < j; i++)
             {
                 beat.AddNoteInternal(Notes[i].Clone(), Notes[i].RealValue);
             }
+
             CopyTo(this, beat);
             for (int i = 0, j = Automations.Count; i < j; i++)
             {
                 beat.Automations.Add(Automations[i].Clone());
             }
+
             beat.Id = id;
             return beat;
         }
@@ -428,6 +442,7 @@ namespace AlphaTab.Model
             {
                 MaxWhammyPoint = point;
             }
+
             if (MinWhammyPoint == null || point.Value < MinWhammyPoint.Value)
             {
                 MinWhammyPoint = point;
@@ -442,7 +457,10 @@ namespace AlphaTab.Model
         internal void RemoveWhammyBarPoint(int index)
         {
             // check index
-            if (index < 0 || index >= WhammyBarPoints.Count) return;
+            if (index < 0 || index >= WhammyBarPoints.Count)
+            {
+                return;
+            }
 
             // remove point
             WhammyBarPoints.RemoveAt(index);
@@ -460,6 +478,7 @@ namespace AlphaTab.Model
                     }
                 }
             }
+
             if (point == MinWhammyPoint)
             {
                 MinWhammyPoint = null;
@@ -488,7 +507,11 @@ namespace AlphaTab.Model
                 NoteStringLookup[note.String] = note;
             }
 
-            if (realValue == -1) realValue = note.RealValue;
+            if (realValue == -1)
+            {
+                realValue = note.RealValue;
+            }
+
             NoteValueLookup[realValue] = note;
         }
 
@@ -511,6 +534,7 @@ namespace AlphaTab.Model
                     return automation;
                 }
             }
+
             return null;
         }
 
@@ -520,6 +544,7 @@ namespace AlphaTab.Model
             {
                 return NoteStringLookup[@string];
             }
+
             return null;
         }
 
@@ -566,6 +591,7 @@ namespace AlphaTab.Model
                             PlaybackDuration = Duration.ThirtySecond.ToTicks();
                             break;
                     }
+
                     break;
                 case GraceType.BendGrace:
                     PlaybackDuration /= 2;
@@ -579,7 +605,7 @@ namespace AlphaTab.Model
                     }
                     else
                     {
-                        while (previous != null && (previous.GraceType == GraceType.OnBeat))
+                        while (previous != null && previous.GraceType == GraceType.OnBeat)
                         {
                             // if the previous beat is a on-beat grace it steals the duration from this beat
                             PlaybackDuration -= previous.PlaybackDuration;
@@ -612,7 +638,7 @@ namespace AlphaTab.Model
             var previousBeat = PreviousBeat;
             var currentTupletGroup = previousBeat != null ? previousBeat.TupletGroup : null;
 
-            if (HasTuplet || (GraceType != GraceType.None && currentTupletGroup != null))
+            if (HasTuplet || GraceType != GraceType.None && currentTupletGroup != null)
             {
                 if (previousBeat == null || currentTupletGroup == null || !currentTupletGroup.Check(this))
                 {
@@ -650,6 +676,7 @@ namespace AlphaTab.Model
                 {
                     IsLetRing = true;
                 }
+
                 if (note.IsPalmMute)
                 {
                     IsPalmMute = true;
@@ -743,6 +770,7 @@ namespace AlphaTab.Model
                     {
                         currentBeat.IsLetRing = false;
                     }
+
                     if (!IsPalmMute)
                     {
                         currentBeat.IsPalmMute = false;
@@ -753,7 +781,8 @@ namespace AlphaTab.Model
             }
             // if beat is a rest implicitely take over letring/palmmute
             // from the previous beat gets cleaned later in case we flagged it wrong. 
-            else if (IsRest && PreviousBeat != null && settings != null && settings.DisplayMode == DisplayMode.GuitarPro)
+            else if (IsRest && PreviousBeat != null && settings != null &&
+                     settings.DisplayMode == DisplayMode.GuitarPro)
             {
                 if (PreviousBeat.IsLetRing)
                 {
@@ -805,7 +834,7 @@ namespace AlphaTab.Model
                         }
                         // down-up or up-down
                         else if (origin.Value > middle1.Value && middle1.Value < destination.Value ||
-                                origin.Value < middle1.Value && middle1.Value > destination.Value)
+                                 origin.Value < middle1.Value && middle1.Value > destination.Value)
                         {
                             WhammyBarType = WhammyType.Dip;
                             if (middle1.Offset == middle2.Offset || displayMode == DisplayMode.SongBook)
@@ -823,6 +852,7 @@ namespace AlphaTab.Model
                             {
                                 WhammyBarType = WhammyType.Hold;
                             }
+
                             WhammyBarPoints.RemoveAt(2);
                             WhammyBarPoints.RemoveAt(1);
                         }
@@ -846,7 +876,7 @@ namespace AlphaTab.Model
                 // and generate a placeholder beat with tied notes
 
                 var cloneBeat = Clone();
-                cloneBeat.Id = GlobalBeatId++;
+                cloneBeat.Id = _globalBeatId++;
                 for (int i = 0, j = cloneBeat.Notes.Count; i < j; i++)
                 {
                     var cloneNote = cloneBeat.Notes[i];
@@ -893,7 +923,7 @@ namespace AlphaTab.Model
         internal bool IsBefore(Beat beat)
         {
             return Voice.Bar.Index < beat.Voice.Bar.Index ||
-                   (beat.Voice.Bar.Index == Voice.Bar.Index && Index < beat.Index);
+                   beat.Voice.Bar.Index == Voice.Bar.Index && Index < beat.Index;
         }
 
         /// <summary>
@@ -904,7 +934,7 @@ namespace AlphaTab.Model
         internal bool IsAfter(Beat beat)
         {
             return Voice.Bar.Index > beat.Voice.Bar.Index ||
-                   (beat.Voice.Bar.Index == Voice.Bar.Index && Index > beat.Index);
+                   beat.Voice.Bar.Index == Voice.Bar.Index && Index > beat.Index;
         }
 
         internal bool HasNoteOnString(int noteString)
@@ -918,6 +948,7 @@ namespace AlphaTab.Model
             {
                 return NoteValueLookup[noteRealValue];
             }
+
             return null;
         }
     }

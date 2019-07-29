@@ -125,6 +125,7 @@ namespace AlphaTab.Model
                 bar.PreviousBar = bars[bars.Count - 1];
                 bar.PreviousBar.NextBar = bar;
             }
+
             bars.Add(bar);
         }
     }

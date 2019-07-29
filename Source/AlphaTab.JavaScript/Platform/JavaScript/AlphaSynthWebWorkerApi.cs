@@ -16,7 +16,7 @@ namespace AlphaTab.Platform.JavaScript
     /// <summary>
     /// a WebWorker based alphaSynth which uses the given player as output.
     /// </summary>
-    class AlphaSynthWebWorkerApi : IAlphaSynth
+    internal class AlphaSynthWebWorkerApi : IAlphaSynth
     {
         private readonly Worker _synth;
         private readonly ISynthOutput _output;
@@ -36,115 +36,136 @@ namespace AlphaTab.Platform.JavaScript
         private PlaybackRange _playbackRange;
 
         /// <inheritdoc />
-        public bool IsReady
-        {
-            get { return _workerIsReady && _outputIsReady; }
-        }
+        public bool IsReady => _workerIsReady && _outputIsReady;
 
         /// <inheritdoc />
-        public bool IsReadyForPlayback
-        {
-            get { return _workerIsReadyForPlayback; }
-        }
+        public bool IsReadyForPlayback => _workerIsReadyForPlayback;
 
         /// <inheritdoc />
-        public PlayerState State
-        {
-            get { return _state; }
-        }
+        public PlayerState State => _state;
 
         /// <inheritdoc />
         public LogLevel LogLevel
         {
-            get { return Logger.LogLevel; }
+            get => Logger.LogLevel;
             set
             {
                 Logger.LogLevel = value;
-                _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdSetLogLevel, value = value });
+                _synth.PostMessage(new
+                {
+                    cmd = AlphaSynthWebWorker.CmdSetLogLevel,
+                    value = value
+                });
             }
         }
 
         /// <inheritdoc />
         public float MasterVolume
         {
-            get { return _masterVolume; }
+            get => _masterVolume;
             set
             {
                 value = SynthHelper.ClampF(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
                 _masterVolume = value;
-                _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdSetMasterVolume, value = value });
+                _synth.PostMessage(new
+                {
+                    cmd = AlphaSynthWebWorker.CmdSetMasterVolume,
+                    value = value
+                });
             }
         }
 
         /// <inheritdoc />
         public float MetronomeVolume
         {
-            get { return _metronomeVolume; }
+            get => _metronomeVolume;
             set
             {
                 value = SynthHelper.ClampF(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
                 _metronomeVolume = value;
-                _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdSetMetronomeVolume, value = value });
+                _synth.PostMessage(new
+                {
+                    cmd = AlphaSynthWebWorker.CmdSetMetronomeVolume,
+                    value = value
+                });
             }
         }
 
         /// <inheritdoc />
         public double PlaybackSpeed
         {
-            get { return _playbackSpeed; }
+            get => _playbackSpeed;
             set
             {
                 value = SynthHelper.ClampD(value, SynthConstants.MinPlaybackSpeed, SynthConstants.MaxPlaybackSpeed);
                 _playbackSpeed = value;
-                _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdSetPlaybackSpeed, value = value });
+                _synth.PostMessage(new
+                {
+                    cmd = AlphaSynthWebWorker.CmdSetPlaybackSpeed,
+                    value = value
+                });
             }
         }
 
         /// <inheritdoc />
         public int TickPosition
         {
-            get { return _tickPosition; }
+            get => _tickPosition;
             set
             {
                 if (value < 0)
                 {
                     value = 0;
                 }
+
                 _tickPosition = value;
-                _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdSetTickPosition, value = value });
+                _synth.PostMessage(new
+                {
+                    cmd = AlphaSynthWebWorker.CmdSetTickPosition,
+                    value = value
+                });
             }
         }
 
         /// <inheritdoc />
         public double TimePosition
         {
-            get { return _timePosition; }
+            get => _timePosition;
             set
             {
                 if (value < 0)
                 {
                     value = 0;
                 }
+
                 _timePosition = value;
-                _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdSetTimePosition, value = value });
+                _synth.PostMessage(new
+                {
+                    cmd = AlphaSynthWebWorker.CmdSetTimePosition,
+                    value = value
+                });
             }
         }
 
         /// <inheritdoc />
         public bool IsLooping
         {
-            get { return _isLooping; }
+            get => _isLooping;
             set
             {
                 _isLooping = value;
-                _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdSetIsLooping, value = value });
+                _synth.PostMessage(new
+                {
+                    cmd = AlphaSynthWebWorker.CmdSetIsLooping,
+                    value = value
+                });
             }
         }
 
         /// <inheritdoc />
         public PlaybackRange PlaybackRange
         {
-            get { return _playbackRange; }
+            get => _playbackRange;
             set
             {
                 if (value != null)
@@ -153,13 +174,19 @@ namespace AlphaTab.Platform.JavaScript
                     {
                         value.StartTick = 0;
                     }
+
                     if (value.EndTick < 0)
                     {
                         value.EndTick = 0;
                     }
                 }
+
                 _playbackRange = value;
-                _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdSetPlaybackRange, value = value });
+                _synth.PostMessage(new
+                {
+                    cmd = AlphaSynthWebWorker.CmdSetPlaybackRange,
+                    value = value
+                });
             }
         }
 
@@ -221,31 +248,47 @@ namespace AlphaTab.Platform.JavaScript
         public void Play()
         {
             _output.Activate();
-            _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdPlay });
+            _synth.PostMessage(new
+            {
+                cmd = AlphaSynthWebWorker.CmdPlay
+            });
         }
 
         /// <inheritdoc />
         public void Pause()
         {
-            _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdPause });
+            _synth.PostMessage(new
+            {
+                cmd = AlphaSynthWebWorker.CmdPause
+            });
         }
 
         /// <inheritdoc />
         public void PlayPause()
         {
-            _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdPlayPause });
+            _synth.PostMessage(new
+            {
+                cmd = AlphaSynthWebWorker.CmdPlayPause
+            });
         }
 
         /// <inheritdoc />
         public void Stop()
         {
-            _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdStop });
+            _synth.PostMessage(new
+            {
+                cmd = AlphaSynthWebWorker.CmdStop
+            });
         }
 
         /// <inheritdoc />
         public void LoadSoundFont(byte[] data)
         {
-            _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdLoadSoundFontBytes, data = data });
+            _synth.PostMessage(new
+            {
+                cmd = AlphaSynthWebWorker.CmdLoadSoundFontBytes,
+                data = data
+            });
         }
 
         public void LoadSoundFontFromUrl(string data)
@@ -258,7 +301,11 @@ namespace AlphaTab.Platform.JavaScript
             request.OnLoad = (Action<Event>)(e =>
             {
                 var buffer = new Uint8Array(request.Response);
-                _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdLoadSoundFontBytes, data = buffer.As<byte[]>() });
+                _synth.PostMessage(new
+                {
+                    cmd = AlphaSynthWebWorker.CmdLoadSoundFontBytes,
+                    data = buffer.As<byte[]>()
+                });
             });
             request.OnError = (Action<Event>)(e =>
             {
@@ -267,7 +314,8 @@ namespace AlphaTab.Platform.JavaScript
             });
             request.OnProgress = (Action<Event>)(e =>
             {
-                Logger.Debug("AlphaSynth", "Soundfont downloading: " + e.Member<int>("loaded") + "/" + e.Member<int>("total") + " bytes");
+                Logger.Debug("AlphaSynth",
+                    "Soundfont downloading: " + e.Member<int>("loaded") + "/" + e.Member<int>("total") + " bytes");
                 OnSoundFontLoad(new ProgressEventArgs(e.Member<int>("loaded"), e.Member<int>("total")));
             });
             request.Send();
@@ -275,39 +323,66 @@ namespace AlphaTab.Platform.JavaScript
 
         public void LoadMidiFile(MidiFile midi)
         {
-            _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdLoadMidi, midi = JsonConverter.MidiFileToJsObject(midi) });
+            _synth.PostMessage(new
+            {
+                cmd = AlphaSynthWebWorker.CmdLoadMidi,
+                midi = JsonConverter.MidiFileToJsObject(midi)
+            });
         }
 
         /// <inheritdoc />
         public void SetChannelMute(int channel, bool mute)
         {
-            _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdSetChannelMute, channel = channel, mute = mute });
+            _synth.PostMessage(new
+            {
+                cmd = AlphaSynthWebWorker.CmdSetChannelMute,
+                channel = channel,
+                mute = mute
+            });
         }
 
         /// <inheritdoc />
         public void ResetChannelStates()
         {
-            _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdResetChannelStates });
+            _synth.PostMessage(new
+            {
+                cmd = AlphaSynthWebWorker.CmdResetChannelStates
+            });
         }
 
         /// <inheritdoc />
         public void SetChannelSolo(int channel, bool solo)
         {
-            _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdSetChannelSolo, channel = channel, solo = solo });
+            _synth.PostMessage(new
+            {
+                cmd = AlphaSynthWebWorker.CmdSetChannelSolo,
+                channel = channel,
+                solo = solo
+            });
         }
 
         /// <inheritdoc />
         public void SetChannelVolume(int channel, double volume)
         {
             volume = SynthHelper.ClampD(volume, SynthConstants.MinVolume, SynthConstants.MaxVolume);
-            _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdSetChannelVolume, channel = channel, volume = volume });
+            _synth.PostMessage(new
+            {
+                cmd = AlphaSynthWebWorker.CmdSetChannelVolume,
+                channel = channel,
+                volume = volume
+            });
         }
 
         /// <inheritdoc />
         public void SetChannelProgram(int channel, byte program)
         {
             program = SynthHelper.ClampB(program, SynthConstants.MinProgram, SynthConstants.MaxProgram);
-            _synth.PostMessage(new { cmd = AlphaSynthWebWorker.CmdSetChannelProgram, channel = channel, program = program });
+            _synth.PostMessage(new
+            {
+                cmd = AlphaSynthWebWorker.CmdSetChannelProgram,
+                channel = channel,
+                program = program
+            });
         }
 
         public virtual void HandleWorkerMessage(MessageEvent e)
@@ -327,7 +402,9 @@ namespace AlphaTab.Platform.JavaScript
                 case AlphaSynthWebWorker.CmdPositionChanged:
                     _timePosition = data.currentTime;
                     _tickPosition = data.currentTick;
-                    OnPositionChanged(new PositionChangedEventArgs(data.currentTime, data.endTime, data.currentTick,
+                    OnPositionChanged(new PositionChangedEventArgs(data.currentTime,
+                        data.endTime,
+                        data.currentTick,
                         data.endTick));
                     break;
                 case AlphaSynthWebWorker.CmdPlayerStateChanged:
@@ -394,6 +471,7 @@ namespace AlphaTab.Platform.JavaScript
         #region Events
 
         public event Action Ready;
+
         protected virtual void OnReady()
         {
             var handler = Ready;
@@ -406,6 +484,7 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         public event Action ReadyForPlayback;
+
         protected virtual void OnReadyForPlayback()
         {
             var handler = ReadyForPlayback;
@@ -418,6 +497,7 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         public event Action<PlaybackFinishedEventArgs> Finished;
+
         protected virtual void OnFinished(PlaybackFinishedEventArgs e)
         {
             var handler = Finished;
@@ -425,10 +505,16 @@ namespace AlphaTab.Platform.JavaScript
             {
                 handler(e);
             }
-            TriggerEvent("finished", new object[] { e });
+
+            TriggerEvent("finished",
+                new object[]
+                {
+                    e
+                });
         }
 
         public event Action SoundFontLoaded;
+
         protected virtual void OnSoundFontLoaded()
         {
             var handler = SoundFontLoaded;
@@ -436,10 +522,12 @@ namespace AlphaTab.Platform.JavaScript
             {
                 handler();
             }
+
             TriggerEvent("soundFontLoaded");
         }
 
         public event Action<ProgressEventArgs> SoundFontLoad;
+
         protected virtual void OnSoundFontLoad(ProgressEventArgs e)
         {
             var handler = SoundFontLoad;
@@ -447,17 +535,23 @@ namespace AlphaTab.Platform.JavaScript
             {
                 handler(e);
             }
+
             // multi-case only there for backwards compatibility
-            TriggerEvent("soundFontLoad", new object[] {new
-            {
-                Loaded = e.Member<int>("loaded"),
-                loaded = e.Member<int>("loaded"),
-                Total = e.Member<int>("total"),
-                total = e.Member<int>("total")
-            }});
+            TriggerEvent("soundFontLoad",
+                new object[]
+                {
+                    new
+                    {
+                        Loaded = e.Member<int>("loaded"),
+                        loaded = e.Member<int>("loaded"),
+                        Total = e.Member<int>("total"),
+                        total = e.Member<int>("total")
+                    }
+                });
         }
 
         public event Action<Exception> SoundFontLoadFailed;
+
         protected virtual void OnSoundFontLoadFailed(Exception e)
         {
             var handler = SoundFontLoadFailed;
@@ -465,11 +559,17 @@ namespace AlphaTab.Platform.JavaScript
             {
                 handler(e);
             }
-            TriggerEvent("soundFontLoadFailed", new object[] { e });
+
+            TriggerEvent("soundFontLoadFailed",
+                new object[]
+                {
+                    e
+                });
         }
 
 
         public event Action MidiLoaded;
+
         protected virtual void OnMidiLoaded()
         {
             var handler = MidiLoaded;
@@ -477,10 +577,12 @@ namespace AlphaTab.Platform.JavaScript
             {
                 handler();
             }
+
             TriggerEvent("midiFileLoaded");
         }
 
         public event Action<Exception> MidiLoadFailed;
+
         protected virtual void OnMidiLoadFailed(Exception e)
         {
             var handler = MidiLoadFailed;
@@ -488,10 +590,16 @@ namespace AlphaTab.Platform.JavaScript
             {
                 handler(e);
             }
-            TriggerEvent("midiFileLoadFailed", new object[]{ e });
+
+            TriggerEvent("midiFileLoadFailed",
+                new object[]
+                {
+                    e
+                });
         }
 
         public event Action<PlayerStateChangedEventArgs> StateChanged;
+
         protected virtual void OnStateChanged(PlayerStateChangedEventArgs e)
         {
             var handler = StateChanged;
@@ -500,11 +608,16 @@ namespace AlphaTab.Platform.JavaScript
                 handler(e);
             }
 
-            TriggerEvent("playerStateChanged", new object[] { e });
+            TriggerEvent("playerStateChanged",
+                new object[]
+                {
+                    e
+                });
         }
 
 
         public event Action<PositionChangedEventArgs> PositionChanged;
+
         protected virtual void OnPositionChanged(PositionChangedEventArgs e)
         {
             var handler = PositionChanged;
@@ -513,8 +626,13 @@ namespace AlphaTab.Platform.JavaScript
                 handler(e);
             }
 
-            TriggerEvent("positionChanged", new object[] { e });
+            TriggerEvent("positionChanged",
+                new object[]
+                {
+                    e
+                });
         }
+
         #endregion
 
         private void TriggerEvent(string name, object[] args = null)
@@ -522,7 +640,7 @@ namespace AlphaTab.Platform.JavaScript
             var events = _events[name];
             if (events != null)
             {
-                for (int i = 0; i < events.Count; i++)
+                for (var i = 0; i < events.Count; i++)
                 {
                     var action = events[i];
                     Script.Write("untyped __js__(\"{0}.apply(null, args)\", action);");
@@ -536,17 +654,27 @@ namespace AlphaTab.Platform.JavaScript
 
         public void OnOutputSampleRequest()
         {
-            _synth.PostMessage(new { cmd = AlphaSynthWorkerSynthOutput.CmdOutputSampleRequest });
+            _synth.PostMessage(new
+            {
+                cmd = AlphaSynthWorkerSynthOutput.CmdOutputSampleRequest
+            });
         }
 
         public void OnOutputFinished()
         {
-            _synth.PostMessage(new { cmd = AlphaSynthWorkerSynthOutput.CmdOutputFinished });
+            _synth.PostMessage(new
+            {
+                cmd = AlphaSynthWorkerSynthOutput.CmdOutputFinished
+            });
         }
 
         public void OnOutputSamplesPlayed(int samples)
         {
-            _synth.PostMessage(new { cmd = AlphaSynthWorkerSynthOutput.CmdOutputSamplesPlayed, samples = samples });
+            _synth.PostMessage(new
+            {
+                cmd = AlphaSynthWorkerSynthOutput.CmdOutputSamplesPlayed,
+                samples = samples
+            });
         }
 
         private void OnOutputReady()

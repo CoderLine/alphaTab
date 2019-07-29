@@ -1,6 +1,6 @@
 ﻿namespace AlphaTab.Audio.Synth.Bank.Components.Generators
 {
-    class GeneratorParameters
+    internal class GeneratorParameters
     {
         public double Phase { get; set; }
         public double CurrentStart { get; set; }
@@ -24,32 +24,42 @@
                 case LoopMode.Continuous:
                 case LoopMode.LoopUntilNoteOff:
                     if (Phase >= generator.EndPhase)
-                    {//phase is greater than the end index so generator is finished
+                    {
+                        //phase is greater than the end index so generator is finished
                         CurrentState = GeneratorState.Finished;
                     }
                     else if (Phase >= generator.LoopEndPhase)
-                    {//phase is greater than the loop end point so generator is in post loop
+                    {
+                        //phase is greater than the loop end point so generator is in post loop
                         CurrentState = GeneratorState.PostLoop;
                         CurrentEnd = generator.EndPhase;
                     }
                     else if (Phase >= generator.LoopStartPhase)
-                    {//phase is greater than loop start so we are inside the loop
+                    {
+                        //phase is greater than loop start so we are inside the loop
                         CurrentState = GeneratorState.Loop;
                         CurrentEnd = generator.LoopEndPhase;
                         CurrentStart = generator.LoopStartPhase;
                     }
                     else
-                    {//phase is less than the loop so generator is in pre loop
+                    {
+                        //phase is less than the loop so generator is in pre loop
                         CurrentState = GeneratorState.PreLoop;
                         CurrentEnd = generator.LoopStartPhase;
                     }
+
                     break;
                 default:
                     CurrentEnd = generator.EndPhase;
                     if (Phase >= CurrentEnd)
+                    {
                         CurrentState = GeneratorState.Finished;
+                    }
                     else
+                    {
                         CurrentState = GeneratorState.PostLoop;
+                    }
+
                     break;
             }
         }

@@ -5,7 +5,7 @@ namespace AlphaTab.Collections
 {
     [Abstract("String")]
     [NativeConstructors]
-    class StringBuilder
+    internal class StringBuilder
     {
         [Inline]
         public StringBuilder()

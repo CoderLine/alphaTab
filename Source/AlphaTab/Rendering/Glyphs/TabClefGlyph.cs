@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TabClefGlyph : Glyph
+    internal class TabClefGlyph : Glyph
     {
         public TabClefGlyph(float x, float y)
             : base(x, y)
@@ -13,6 +13,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             Width = 28 * Scale;
         }
+
         public override void Paint(float cx, float cy, ICanvas canvas)
         {
             var strings = Renderer.Bar.Staff.Tuning.Length;

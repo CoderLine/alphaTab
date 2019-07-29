@@ -1,7 +1,6 @@
 ﻿using System;
 using AlphaTab.IO;
 using AlphaTab.Model;
-using AlphaTab.Platform;
 using AlphaTab.Util;
 
 namespace AlphaTab.Importer
@@ -9,9 +8,9 @@ namespace AlphaTab.Importer
     /// <summary>
     /// This ScoreImporter can read Guitar Pro 7 (gp) files.
     /// </summary>
-    class Gp7Importer : ScoreImporter
+    internal class Gp7Importer : ScoreImporter
     {
-        public override string Name { get { return "Guitar Pro 7"; } }
+        public override string Name => "Guitar Pro 7";
 
         public override Score ReadScore()
         {
@@ -19,11 +18,11 @@ namespace AlphaTab.Importer
             // from the GPX container
             Logger.Info(Name, "Loading ZIP entries");
             var fileSystem = new ZipFile();
-            fileSystem.FileFilter = s => 
-                s.EndsWith(GpxFileSystem.ScoreGpif) 
-                || s.EndsWith(GpxFileSystem.BinaryStylesheet)
-                || s.EndsWith(GpxFileSystem.PartConfiguration)
-            ;
+            fileSystem.FileFilter = s =>
+                    s.EndsWith(GpxFileSystem.ScoreGpif)
+                    || s.EndsWith(GpxFileSystem.BinaryStylesheet)
+                    || s.EndsWith(GpxFileSystem.PartConfiguration)
+                ;
             try
             {
                 fileSystem.Load(Data);
@@ -32,6 +31,7 @@ namespace AlphaTab.Importer
             {
                 throw new UnsupportedFormatException(e.Message);
             }
+
             Logger.Info(Name, "Zip entries loaded");
 
             string xml = null;
@@ -42,7 +42,7 @@ namespace AlphaTab.Importer
                 switch (entry.FileName)
                 {
                     case GpxFileSystem.ScoreGpif:
-                        xml = Platform.Platform.ToString(entry.Data, GetSetting("encoding",  "utf-8"));
+                        xml = Platform.Platform.ToString(entry.Data, GetSetting("encoding", "utf-8"));
                         break;
                     case GpxFileSystem.BinaryStylesheet:
                         binaryStylesheet = entry.Data;
@@ -75,6 +75,7 @@ namespace AlphaTab.Importer
                 {
                     stylesheetParser.Stylesheet.Apply(score);
                 }
+
                 Logger.Info(Name, "BinaryStylesheet parsed");
             }
 
@@ -87,6 +88,7 @@ namespace AlphaTab.Importer
                 {
                     partConfigurationParser.Configuration.Apply(score);
                 }
+
                 Logger.Info(Name, "Part Configuration parsed");
             }
 

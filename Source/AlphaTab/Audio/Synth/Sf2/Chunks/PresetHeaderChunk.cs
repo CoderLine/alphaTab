@@ -3,7 +3,7 @@ using AlphaTab.IO;
 
 namespace AlphaTab.Audio.Synth.Sf2.Chunks
 {
-    class PresetHeaderChunk : Chunk
+    internal class PresetHeaderChunk : Chunk
     {
         private readonly RawPreset[] _rawPresets;
 
@@ -11,11 +11,13 @@ namespace AlphaTab.Audio.Synth.Sf2.Chunks
             : base(id, size)
         {
             if (size % 38 != 0)
+            {
                 throw new Exception("Invalid SoundFont. The preset chunk was invalid.");
+            }
 
-            _rawPresets = new RawPreset[((int)(size / 38.0))];
+            _rawPresets = new RawPreset[(int)(size / 38.0)];
             RawPreset lastPreset = null;
-            for (int x = 0; x < _rawPresets.Length; x++)
+            for (var x = 0; x < _rawPresets.Length; x++)
             {
                 var p = new RawPreset();
                 p.Name = input.Read8BitStringLength(20);
@@ -27,8 +29,9 @@ namespace AlphaTab.Audio.Synth.Sf2.Chunks
                 p.Morphology = input.ReadInt32LE();
                 if (lastPreset != null)
                 {
-                    lastPreset.EndPresetZoneIndex = Platform.Platform.ToUInt16((p.StartPresetZoneIndex - 1));
+                    lastPreset.EndPresetZoneIndex = Platform.Platform.ToUInt16(p.StartPresetZoneIndex - 1);
                 }
+
                 _rawPresets[x] = p;
                 lastPreset = p;
             }
@@ -36,8 +39,8 @@ namespace AlphaTab.Audio.Synth.Sf2.Chunks
 
         public PresetHeader[] ToPresets(Zone[] presetZones)
         {
-            var presets = new PresetHeader[(_rawPresets.Length - 1)];
-            for (int x = 0; x < presets.Length; x++)
+            var presets = new PresetHeader[_rawPresets.Length - 1];
+            for (var x = 0; x < presets.Length; x++)
             {
                 var rawPreset = _rawPresets[x];
                 var p = new PresetHeader();
@@ -47,15 +50,16 @@ namespace AlphaTab.Audio.Synth.Sf2.Chunks
                 p.Morphology = rawPreset.Morphology;
                 p.Name = rawPreset.Name;
                 p.PatchNumber = rawPreset.PatchNumber;
-                p.Zones = new Zone[(rawPreset.EndPresetZoneIndex - rawPreset.StartPresetZoneIndex + 1)];
+                p.Zones = new Zone[rawPreset.EndPresetZoneIndex - rawPreset.StartPresetZoneIndex + 1];
                 Platform.Platform.ArrayCopy(presetZones, rawPreset.StartPresetZoneIndex, p.Zones, 0, p.Zones.Length);
                 presets[x] = p;
             }
+
             return presets;
         }
     }
 
-    class RawPreset
+    internal class RawPreset
     {
         public string Name { get; set; }
         public int PatchNumber { get; set; }

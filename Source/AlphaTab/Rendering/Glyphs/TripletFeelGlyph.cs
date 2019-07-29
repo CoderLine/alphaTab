@@ -4,7 +4,7 @@ using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TripletFeelGlyph : EffectGlyph
+    internal class TripletFeelGlyph : EffectGlyph
     {
         private const float NoteScale = 0.40f;
         private const int NoteHeight = 12;
@@ -35,63 +35,157 @@ namespace AlphaTab.Rendering.Glyphs
 
             canvas.FillText("(", cx, cy + Height * 0.3f);
 
-            var leftNoteX = cx + (10 * Scale);
-            var rightNoteX = cx + (40 * Scale);
+            var leftNoteX = cx + 10 * Scale;
+            var rightNoteX = cx + 40 * Scale;
 
             switch (_tripletFeel)
             {
                 case TripletFeel.NoTripletFeel:
-                    RenderBarNote(leftNoteX, noteY, NoteScale, canvas, new[] { BarType.Full });
-                    RenderBarNote(rightNoteX, noteY, NoteScale, canvas, new[] { BarType.Full });
+                    RenderBarNote(leftNoteX,
+                        noteY,
+                        NoteScale,
+                        canvas,
+                        new[]
+                        {
+                            BarType.Full
+                        });
+                    RenderBarNote(rightNoteX,
+                        noteY,
+                        NoteScale,
+                        canvas,
+                        new[]
+                        {
+                            BarType.Full
+                        });
                     break;
 
                 case TripletFeel.Triplet8th:
-                    RenderBarNote(leftNoteX, noteY, NoteScale, canvas, new[] { BarType.Full });
+                    RenderBarNote(leftNoteX,
+                        noteY,
+                        NoteScale,
+                        canvas,
+                        new[]
+                        {
+                            BarType.Full
+                        });
 
                     canvas.FillMusicFontSymbol(rightNoteX, noteY, NoteScale, MusicFontSymbol.Tempo);
-                    canvas.FillMusicFontSymbol(rightNoteX + (NoteSeparation * Scale), noteY, NoteScale, MusicFontSymbol.NoteEighth);
+                    canvas.FillMusicFontSymbol(rightNoteX + NoteSeparation * Scale,
+                        noteY,
+                        NoteScale,
+                        MusicFontSymbol.NoteEighth);
 
                     RenderTriplet(rightNoteX, cy, canvas);
                     break;
 
                 case TripletFeel.Triplet16th:
-                    RenderBarNote(leftNoteX, noteY, NoteScale, canvas, new[] { BarType.Full, BarType.Full });
+                    RenderBarNote(leftNoteX,
+                        noteY,
+                        NoteScale,
+                        canvas,
+                        new[]
+                        {
+                            BarType.Full, BarType.Full
+                        });
 
-                    RenderBarNote(rightNoteX, noteY, NoteScale, canvas, new[] { BarType.Full, BarType.PartialRight });
+                    RenderBarNote(rightNoteX,
+                        noteY,
+                        NoteScale,
+                        canvas,
+                        new[]
+                        {
+                            BarType.Full, BarType.PartialRight
+                        });
                     RenderTriplet(rightNoteX, cy, canvas);
                     break;
 
                 case TripletFeel.Dotted8th:
-                    RenderBarNote(leftNoteX, noteY, NoteScale, canvas, new[] { BarType.Full });
+                    RenderBarNote(leftNoteX,
+                        noteY,
+                        NoteScale,
+                        canvas,
+                        new[]
+                        {
+                            BarType.Full
+                        });
 
-                    RenderBarNote(rightNoteX, noteY, NoteScale, canvas, new[] { BarType.Full, BarType.PartialRight });
-                    canvas.FillCircle(rightNoteX + (9 * Scale), noteY, Scale);
+                    RenderBarNote(rightNoteX,
+                        noteY,
+                        NoteScale,
+                        canvas,
+                        new[]
+                        {
+                            BarType.Full, BarType.PartialRight
+                        });
+                    canvas.FillCircle(rightNoteX + 9 * Scale, noteY, Scale);
                     break;
 
                 case TripletFeel.Dotted16th:
-                    RenderBarNote(leftNoteX, noteY, NoteScale, canvas, new[] { BarType.Full, BarType.Full });
+                    RenderBarNote(leftNoteX,
+                        noteY,
+                        NoteScale,
+                        canvas,
+                        new[]
+                        {
+                            BarType.Full, BarType.Full
+                        });
 
-                    RenderBarNote(rightNoteX, noteY, NoteScale, canvas, new[] { BarType.Full, BarType.Full, BarType.PartialRight });
-                    canvas.FillCircle(rightNoteX + (9 * Scale), noteY, Scale);
+                    RenderBarNote(rightNoteX,
+                        noteY,
+                        NoteScale,
+                        canvas,
+                        new[]
+                        {
+                            BarType.Full, BarType.Full, BarType.PartialRight
+                        });
+                    canvas.FillCircle(rightNoteX + 9 * Scale, noteY, Scale);
                     break;
 
                 case TripletFeel.Scottish8th:
-                    RenderBarNote(leftNoteX, noteY, NoteScale, canvas, new[] { BarType.Full });
+                    RenderBarNote(leftNoteX,
+                        noteY,
+                        NoteScale,
+                        canvas,
+                        new[]
+                        {
+                            BarType.Full
+                        });
 
-                    RenderBarNote(rightNoteX, noteY, NoteScale, canvas, new[] { BarType.Full, BarType.PartialLeft, });
-                    canvas.FillCircle(rightNoteX + (NoteSeparation * Scale) + (8 * Scale), noteY, Scale);
+                    RenderBarNote(rightNoteX,
+                        noteY,
+                        NoteScale,
+                        canvas,
+                        new[]
+                        {
+                            BarType.Full, BarType.PartialLeft
+                        });
+                    canvas.FillCircle(rightNoteX + NoteSeparation * Scale + 8 * Scale, noteY, Scale);
                     break;
 
                 case TripletFeel.Scottish16th:
-                    RenderBarNote(leftNoteX, noteY, NoteScale, canvas, new[] { BarType.Full, BarType.Full });
+                    RenderBarNote(leftNoteX,
+                        noteY,
+                        NoteScale,
+                        canvas,
+                        new[]
+                        {
+                            BarType.Full, BarType.Full
+                        });
 
-                    RenderBarNote(rightNoteX, noteY, NoteScale, canvas, new[] { BarType.Full, BarType.Full, BarType.PartialLeft, });
-                    canvas.FillCircle(rightNoteX + (NoteSeparation * Scale) + (8 * Scale), noteY, Scale);
+                    RenderBarNote(rightNoteX,
+                        noteY,
+                        NoteScale,
+                        canvas,
+                        new[]
+                        {
+                            BarType.Full, BarType.Full, BarType.PartialLeft
+                        });
+                    canvas.FillCircle(rightNoteX + NoteSeparation * Scale + 8 * Scale, noteY, Scale);
                     break;
             }
 
-            canvas.FillText("=", cx + (30 * Scale), cy + (5 * Scale));
-            canvas.FillText(")", cx + (65 * Scale), cy + Height * 0.3f);
+            canvas.FillText("=", cx + 30 * Scale, cy + 5 * Scale);
+            canvas.FillText(")", cx + 65 * Scale, cy + Height * 0.3f);
         }
 
         private enum BarType
@@ -104,23 +198,33 @@ namespace AlphaTab.Rendering.Glyphs
         private void RenderBarNote(float cx, float noteY, float noteScale, ICanvas canvas, BarType[] bars)
         {
             canvas.FillMusicFontSymbol(cx, noteY, noteScale, MusicFontSymbol.Tempo);
-            var partialBarWidth = (NoteSeparation / 2f) * Scale;
-            for (int i = 0; i < bars.Length; i++)
+            var partialBarWidth = NoteSeparation / 2f * Scale;
+            for (var i = 0; i < bars.Length; i++)
             {
                 switch (bars[i])
                 {
                     case BarType.Full:
-                        canvas.FillRect(cx + (4 * Scale), noteY - (NoteHeight * Scale) + (BarSeparation * Scale * i), NoteSeparation * Scale, BarHeight * Scale);
+                        canvas.FillRect(cx + 4 * Scale,
+                            noteY - NoteHeight * Scale + BarSeparation * Scale * i,
+                            NoteSeparation * Scale,
+                            BarHeight * Scale);
                         break;
                     case BarType.PartialLeft:
-                        canvas.FillRect(cx + (4 * Scale), noteY - (NoteHeight * Scale) + (BarSeparation * Scale * i), partialBarWidth, BarHeight * Scale);
+                        canvas.FillRect(cx + 4 * Scale,
+                            noteY - NoteHeight * Scale + BarSeparation * Scale * i,
+                            partialBarWidth,
+                            BarHeight * Scale);
                         break;
                     case BarType.PartialRight:
-                        canvas.FillRect(cx + (4 * Scale) + partialBarWidth, noteY - (NoteHeight * Scale) + (BarSeparation * Scale * i), partialBarWidth, BarHeight * Scale);
+                        canvas.FillRect(cx + 4 * Scale + partialBarWidth,
+                            noteY - NoteHeight * Scale + BarSeparation * Scale * i,
+                            partialBarWidth,
+                            BarHeight * Scale);
                         break;
                 }
             }
-            canvas.FillMusicFontSymbol(cx + (NoteSeparation * Scale), noteY, noteScale, MusicFontSymbol.Tempo);
+
+            canvas.FillMusicFontSymbol(cx + NoteSeparation * Scale, noteY, noteScale, MusicFontSymbol.Tempo);
         }
 
         private void RenderTriplet(float cx, float cy, ICanvas canvas)
@@ -132,17 +236,17 @@ namespace AlphaTab.Rendering.Glyphs
             var rightX = cx + NoteSeparation * Scale + 3 * Scale;
 
             canvas.BeginPath();
-            canvas.MoveTo(cx, cy + (3 * Scale));
+            canvas.MoveTo(cx, cy + 3 * Scale);
             canvas.LineTo(cx, cy);
-            canvas.LineTo(cx + (5 * Scale), cy);
+            canvas.LineTo(cx + 5 * Scale, cy);
 
-            canvas.MoveTo(rightX + (5 * Scale), cy + (3 * Scale));
-            canvas.LineTo(rightX + (5 * Scale), cy);
+            canvas.MoveTo(rightX + 5 * Scale, cy + 3 * Scale);
+            canvas.LineTo(rightX + 5 * Scale, cy);
             canvas.LineTo(rightX, cy);
 
             canvas.Stroke();
 
-            canvas.FillText("3", cx + (7 * Scale), cy - (10 * Scale));
+            canvas.FillText("3", cx + 7 * Scale, cy - 10 * Scale);
 
             canvas.Font = font;
         }

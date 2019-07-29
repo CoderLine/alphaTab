@@ -9,10 +9,12 @@ namespace AlphaTab
         /// Do not scroll automatically
         /// </summary>
         Off,
+
         /// <summary>
         /// Scrolling happens as soon the offsets of the cursors change. 
         /// </summary>
         Continuous,
+
         /// <summary>
         /// Scrolling happens as soon the cursors exceed the displayed range. 
         /// </summary>

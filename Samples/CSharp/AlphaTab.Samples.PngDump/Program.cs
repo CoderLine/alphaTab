@@ -8,9 +8,9 @@ using SkiaSharp;
 
 namespace AlphaTab.Samples.PngDump
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             if (args.Length != 1)
             {
@@ -54,7 +54,7 @@ namespace AlphaTab.Samples.PngDump
 
                 using (var full = SKSurface.Create(totalWidth, totalHeight, SKImageInfo.PlatformColorType, SKAlphaType.Premul))
                 {
-                    int y = 0;
+                    var y = 0;
                     foreach (var image in images)
                     {
                         full.Canvas.DrawImage(image, new SKRect(0, 0, image.Width, image.Height), new SKRect(0, y, image.Width, y + image.Height));

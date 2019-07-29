@@ -1,21 +1,15 @@
 ﻿namespace AlphaTab.Model
 {
-    class TuningParseResult
+    internal class TuningParseResult
     {
         public string Note { get; set; }
         public int NoteValue { get; set; }
         public int Octave { get; set; }
 
-        public int RealValue
-        {
-            get
-            {
-                return (Octave * 12) + NoteValue;
-            }
-        }
+        public int RealValue => Octave * 12 + NoteValue;
     }
 
-    static class TuningParser
+    internal static class TuningParser
     {
         /// <summary>
         /// Checks if the given string is a tuning inticator.
@@ -29,10 +23,10 @@
 
         public static TuningParseResult Parse(string name)
         {
-            string note = "";
-            string octave = "";
+            var note = "";
+            var octave = "";
 
-            for (int i = 0; i < name.Length; i++)
+            for (var i = 0; i < name.Length; i++)
             {
                 var c = (int)name[i];
                 if (Platform.Platform.IsCharNumber(c, false))
@@ -42,9 +36,10 @@
                     {
                         return null;
                     }
+
                     octave += Platform.Platform.StringFromCharCode(c);
                 }
-                else if ((c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A) || c == 0x23)
+                else if (c >= 0x41 && c <= 0x5A || c >= 0x61 && c <= 0x7A || c == 0x23)
                 {
                     note += Platform.Platform.StringFromCharCode(c);
                 }
@@ -129,6 +124,5 @@
 
             return b;
         }
-
     }
 }

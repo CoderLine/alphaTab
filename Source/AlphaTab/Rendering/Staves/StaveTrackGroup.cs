@@ -3,7 +3,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Staves
 {
-    class StaveTrackGroup
+    internal class StaveTrackGroup
     {
         public Track Track { get; set; }
         public StaveGroup StaveGroup { get; set; }

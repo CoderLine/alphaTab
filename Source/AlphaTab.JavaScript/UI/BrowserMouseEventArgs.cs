@@ -2,7 +2,7 @@
 
 namespace AlphaTab.UI
 {
-    class BrowserMouseEventArgs : IMouseEventArgs
+    internal class BrowserMouseEventArgs : IMouseEventArgs
     {
         private readonly MouseEvent _e;
         public bool IsLeftMouseButton => _e.Button == 0;

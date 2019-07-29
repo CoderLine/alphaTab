@@ -3,12 +3,12 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class CapoEffectInfo : IEffectBarRendererInfo
+    internal class CapoEffectInfo : IEffectBarRendererInfo
     {
-        public string EffectId { get { return "capo"; } }
-        public bool HideOnMultiTrack { get { return false; } }
-        public bool CanShareBand { get { return false; } }
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
+        public string EffectId => "capo";
+        public bool HideOnMultiTrack => false;
+        public bool CanShareBand => false;
+        public EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.SingleOnBeat;
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
@@ -17,7 +17,7 @@ namespace AlphaTab.Rendering.Effects
 
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
-            return new TextGlyph(0,0, "Capo. fret " + beat.Voice.Bar.Staff.Capo, renderer.Resources.EffectFont);
+            return new TextGlyph(0, 0, "Capo. fret " + beat.Voice.Bar.Staff.Capo, renderer.Resources.EffectFont);
         }
 
         public bool CanExpand(Beat from, Beat to)

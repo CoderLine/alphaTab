@@ -36,22 +36,26 @@ namespace AlphaTab.Rendering
         /// Occurs before the rendering of the tracks starts.
         /// </summary>
         event Action PreRender;
+
         /// <summary>
         /// Occurs after the rendering of the tracks finished. 
         /// </summary>
         event Action<RenderFinishedEventArgs> RenderFinished;
+
         /// <summary>
         /// Occurs whenever a part of the whole music sheet is rendered and can be displayed. 
         /// </summary>
         event Action<RenderFinishedEventArgs> PartialRenderFinished;
+
         /// <summary>
         /// Occurs when the whole rendering and layout process finished. 
         /// </summary>
         event Action PostRenderFinished;
+
         /// <summary>
         /// Occurs whenever an error happens. 
         /// </summary>
-        event Action<string,Exception> Error;
+        event Action<string, Exception> Error;
 
         /// <summary>
         /// Updates the settings to the given object. 
@@ -75,6 +79,7 @@ namespace AlphaTab.Rendering
         /// Gets or sets the width of the current rendering result. 
         /// </summary>
         public float Width { get; set; }
+
         /// <summary>
         /// Gets or sets the height of the current rendering result.  
         /// </summary>
@@ -84,14 +89,17 @@ namespace AlphaTab.Rendering
         /// Gets or sets the currently known total width of the final music sheet. 
         /// </summary>
         public float TotalWidth { get; set; }
+
         /// <summary>
         /// Gets or sets the currently known total height of the final music sheet. 
         /// </summary>
         public float TotalHeight { get; set; }
+
         /// <summary>
         /// Gets or sets the index of the first masterbar that was rendered in this result. 
         /// </summary>
         public int FirstMasterBarIndex { get; set; }
+
         /// <summary>
         /// Gets or sets the index of the last masterbar that was rendered in this result. 
         /// </summary>

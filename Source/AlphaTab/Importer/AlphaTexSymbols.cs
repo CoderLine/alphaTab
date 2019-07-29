@@ -3,7 +3,7 @@
     /// <summary>
     /// A list of terminals recognized by the alphaTex-parser
     /// </summary>
-    enum AlphaTexSymbols
+    internal enum AlphaTexSymbols
     {
         No,
         Eof,
@@ -20,6 +20,6 @@
         MetaCommand,
         Multiply,
         LowerThan,
-        Property,
+        Property
     }
 }

@@ -16,27 +16,31 @@ namespace AlphaTab
     {
         public string ScriptFile
         {
-            get; set;
+            get;
+            set;
         }
 
         public string FontDirectory
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
-        /// Gets or sets whether lazy loading for displayed elements is enabled. 
+        /// Gets or sets whether lazy loading for displayed elements is enabled.
         /// </summary>
         public bool DisableLazyLoading { get; set; }
 
         public string SoundFontFile
         {
-            get; set;
+            get;
+            set;
         }
 
         public string ScrollElement
         {
-            get; set;
+            get;
+            set;
         }
 
         private static void SetDefaults(Settings settings)
@@ -44,7 +48,11 @@ namespace AlphaTab
             settings.ScrollElement = "html,body";
         }
 
-        public static void FillPlayerOptions(Settings settings, dynamic json, bool setDefaults, FastDictionary<string, object> dataAttributes = null)
+        public static void FillPlayerOptions(
+            Settings settings,
+            dynamic json,
+            bool setDefaults,
+            FastDictionary<string, object> dataAttributes = null)
         {
             if (Platform.Platform.JsonExists(json, "cursor"))
             {
@@ -114,7 +122,7 @@ namespace AlphaTab
 
         public dynamic ToJson()
         {
-            dynamic json = Platform.Platform.NewObject();
+            var json = Platform.Platform.NewObject();
 
             json.useWorker = UseWorkers;
             json.scale = Scale;
@@ -156,13 +164,13 @@ namespace AlphaTab
             json.layout = Platform.Platform.NewObject();
             json.layout.mode = Layout.Mode;
             json.layout.additionalSettings = Platform.Platform.NewObject();
-            foreach (string setting in Layout.AdditionalSettings)
+            foreach (var setting in Layout.AdditionalSettings)
             {
                 json.layout.additionalSettings[setting] = Layout.AdditionalSettings[setting];
             }
 
             json.importer = Platform.Platform.NewObject();
-            foreach (string setting in ImporterSettings)
+            foreach (var setting in ImporterSettings)
             {
                 json.importer[setting] = ImporterSettings[setting];
             }
@@ -219,6 +227,7 @@ namespace AlphaTab
                 {
                     FontSizes.FontSizeLookupTables = new FastDictionary<string, byte[]>();
                 }
+
                 string[] keys = Platform.Platform.JsonKeys(json.fontSizes);
                 foreach (var font in keys)
                 {
@@ -307,6 +316,7 @@ namespace AlphaTab
             {
                 settings.Scale = dataAttributes["scale"].As<float>();
             }
+
             if (Platform.Platform.JsonExists(json, "slurHeight"))
             {
                 settings.SlurHeight = json.slurHeight;
@@ -315,6 +325,7 @@ namespace AlphaTab
             {
                 settings.SlurHeight = dataAttributes["slurHeight"].As<float>();
             }
+
             if (Platform.Platform.JsonExists(json, "width"))
             {
                 settings.Width = json.width;
@@ -323,6 +334,7 @@ namespace AlphaTab
             {
                 settings.Width = dataAttributes["width"].As<int>();
             }
+
             if (Platform.Platform.JsonExists(json, "engine"))
             {
                 settings.Engine = json.engine;
@@ -331,6 +343,7 @@ namespace AlphaTab
             {
                 settings.Engine = dataAttributes["engine"].As<string>();
             }
+
             if (Platform.Platform.JsonExists(json, "stretchForce"))
             {
                 settings.StretchForce = json.stretchForce;
@@ -339,6 +352,7 @@ namespace AlphaTab
             {
                 settings.StretchForce = dataAttributes["stretchForce"].As<float>();
             }
+
             if (Platform.Platform.JsonExists(json, "forcePianoFingering"))
             {
                 settings.ForcePianoFingering = json.forcePianoFingering;
@@ -347,6 +361,7 @@ namespace AlphaTab
             {
                 settings.ForcePianoFingering = dataAttributes["forcePianoFingering"].As<bool>();
             }
+
             if (Platform.Platform.JsonExists(json, "lazy"))
             {
                 settings.DisableLazyLoading = !json.lazy;
@@ -355,6 +370,7 @@ namespace AlphaTab
             {
                 settings.DisableLazyLoading = !dataAttributes["lazy"].IsTruthy();
             }
+
             if (Platform.Platform.JsonExists(json, "transpositionPitches"))
             {
                 settings.TranspositionPitches = json.transpositionPitches;
@@ -500,30 +516,37 @@ namespace AlphaTab
                 {
                     settings.Vibrato.NoteSlightAmplitude = vibrato.noteSlightAmplitude;
                 }
+
                 if (vibrato.noteWideAmplitude)
                 {
                     settings.Vibrato.NoteWideAmplitude = vibrato.noteWideAmplitude;
                 }
+
                 if (vibrato.noteSlightLength)
                 {
                     settings.Vibrato.NoteSlightLength = vibrato.noteSlightLength;
                 }
+
                 if (vibrato.noteWideLength)
                 {
                     settings.Vibrato.NoteWideLength = vibrato.noteWideLength;
                 }
+
                 if (vibrato.beatSlightAmplitude)
                 {
                     settings.Vibrato.BeatSlightAmplitude = vibrato.beatSlightAmplitude;
                 }
+
                 if (vibrato.beatWideAmplitude)
                 {
                     settings.Vibrato.BeatWideAmplitude = vibrato.beatWideAmplitude;
                 }
+
                 if (vibrato.beatSlightLength)
                 {
                     settings.Vibrato.BeatSlightLength = vibrato.beatSlightLength;
                 }
+
                 if (vibrato.beatWideLength)
                 {
                     settings.Vibrato.BeatWideLength = vibrato.beatWideLength;
@@ -535,30 +558,37 @@ namespace AlphaTab
                 {
                     settings.Vibrato.NoteSlightLength = (int)dataAttributes["vibratoNoteSlightLength"];
                 }
+
                 if (dataAttributes.ContainsKey("vibratoNoteSlightAmplitude"))
                 {
                     settings.Vibrato.NoteSlightAmplitude = (int)dataAttributes["vibratoNoteSlightAmplitude"];
                 }
+
                 if (dataAttributes.ContainsKey("vibratoNoteWideLength"))
                 {
                     settings.Vibrato.NoteWideLength = (int)dataAttributes["vibratoNoteWideLength"];
                 }
+
                 if (dataAttributes.ContainsKey("vibratoNoteWideAmplitude"))
                 {
                     settings.Vibrato.NoteWideAmplitude = (int)dataAttributes["vibratoNoteWideAmplitude"];
                 }
+
                 if (dataAttributes.ContainsKey("vibratoBeatSlightLength"))
                 {
                     settings.Vibrato.BeatSlightLength = (int)dataAttributes["vibratoBeatSlightLength"];
                 }
+
                 if (dataAttributes.ContainsKey("vibratoBeatSlightAmplitude"))
                 {
                     settings.Vibrato.BeatSlightAmplitude = (int)dataAttributes["vibratoBeatSlightAmplitude"];
                 }
+
                 if (dataAttributes.ContainsKey("vibratoBeatWideLength"))
                 {
                     settings.Vibrato.BeatWideLength = (int)dataAttributes["vibratoBeatWideLength"];
                 }
+
                 if (dataAttributes.ContainsKey("vibratoBeatWideAmplitude"))
                 {
                     settings.Vibrato.BeatWideAmplitude = (int)dataAttributes["vibratoBeatWideAmplitude"];
@@ -721,13 +751,16 @@ namespace AlphaTab
 
         private static Color DecodeColor(object value, Color defaultColor)
         {
-            if (value == null) return defaultColor;
+            if (value == null)
+            {
+                return defaultColor;
+            }
 
             switch (Platform.Platform.TypeOf(value))
             {
                 case "number":
                     var c = new Color(0, 0, 0, 0);
-                    double raw = value.As<double>();
+                    var raw = value.As<double>();
                     c.Raw = (int)raw;
                     c.UpdateRgba();
                     return c;
@@ -757,19 +790,19 @@ namespace AlphaTab
                         if (s.Length == 7) // #RRGGBB
                         {
                             return new Color(
-                                (byte)(Platform.Platform.ParseHex(s.Substring(1, 2))),
-                                (byte)(Platform.Platform.ParseHex(s.Substring(3, 2))),
-                                (byte)(Platform.Platform.ParseHex(s.Substring(5, 2)))
+                                (byte)Platform.Platform.ParseHex(s.Substring(1, 2)),
+                                (byte)Platform.Platform.ParseHex(s.Substring(3, 2)),
+                                (byte)Platform.Platform.ParseHex(s.Substring(5, 2))
                             );
                         }
 
                         if (s.Length == 9) // #RRGGBBAA
                         {
                             return new Color(
-                                (byte)(Platform.Platform.ParseHex(s.Substring(1, 2))),
-                                (byte)(Platform.Platform.ParseHex(s.Substring(3, 2))),
-                                (byte)(Platform.Platform.ParseHex(s.Substring(5, 2))),
-                                (byte)(Platform.Platform.ParseHex(s.Substring(7, 2)))
+                                (byte)Platform.Platform.ParseHex(s.Substring(1, 2)),
+                                (byte)Platform.Platform.ParseHex(s.Substring(3, 2)),
+                                (byte)Platform.Platform.ParseHex(s.Substring(5, 2)),
+                                (byte)Platform.Platform.ParseHex(s.Substring(7, 2))
                             );
                         }
                     }
@@ -801,8 +834,8 @@ namespace AlphaTab
                                 (byte)(Platform.Platform.ParseFloat(numbers[3]) * 255)
                             );
                         }
-
                     }
+
                     break;
             }
 
@@ -820,11 +853,16 @@ namespace AlphaTab
 
         private static Font DecodeFont(object value, Font defaultFont)
         {
-            if (value == null) return defaultFont;
+            if (value == null)
+            {
+                return defaultFont;
+            }
 
             if (Platform.Platform.TypeOf(value) == "object" && value.Member<bool>("family"))
             {
-                return new Font(value.Member<string>("family"), value.Member<float>("size"), (FontStyle)(value.Member<int>("style")));
+                return new Font(value.Member<string>("family"),
+                    value.Member<float>("size"),
+                    (FontStyle)value.Member<int>("style"));
             }
 
             if (Platform.Platform.TypeOf(value) == "string" && Lib.Global.document)
@@ -886,16 +924,18 @@ namespace AlphaTab
                             }
                             else if (fontSizeString.EndsWith("em"))
                             {
-                                fontSize = Platform.Platform.ParseFloat(fontSizeString.Substring(0, fontSizeString.Length - 2)) * 16;
+                                fontSize = Platform.Platform.ParseFloat(
+                                               fontSizeString.Substring(0, fontSizeString.Length - 2)) * 16;
                             }
                             else if (fontSizeString.EndsWith("pt"))
                             {
-                                fontSize = Platform.Platform.ParseFloat(fontSizeString.Substring(0, fontSizeString.Length - 2)) * 16.0f / 12.0f;
-
+                                fontSize = Platform.Platform.ParseFloat(
+                                               fontSizeString.Substring(0, fontSizeString.Length - 2)) * 16.0f / 12.0f;
                             }
                             else if (fontSizeString.EndsWith("px"))
                             {
-                                fontSize = Platform.Platform.ParseFloat(fontSizeString.Substring(0, fontSizeString.Length - 2));
+                                fontSize = Platform.Platform.ParseFloat(
+                                    fontSizeString.Substring(0, fontSizeString.Length - 2));
                             }
                             else
                             {
@@ -906,10 +946,11 @@ namespace AlphaTab
                         {
                             fontSize = defaultFont.Size;
                         }
+
                         break;
                 }
 
-                FontStyle fontStyle = FontStyle.Plain;
+                var fontStyle = FontStyle.Plain;
                 if (style.FontStyle == "italic")
                 {
                     fontStyle |= FontStyle.Italic;
@@ -1044,6 +1085,7 @@ namespace AlphaTab
             {
                 return new StaveSettings("score-tab");
             }
+
             return staveSettings;
         }
 
@@ -1056,7 +1098,11 @@ namespace AlphaTab
             }
             else
             {
-                if (json.mode) layout.Mode = json.mode;
+                if (json.mode)
+                {
+                    layout.Mode = json.mode;
+                }
+
                 if (json.additionalSettings)
                 {
                     string[] keys = Platform.Platform.JsonKeys(json.additionalSettings);
@@ -1066,20 +1112,23 @@ namespace AlphaTab
                     }
                 }
             }
+
             return layout;
         }
 
         private static string AppendScriptName(string url)
         {
-            // append script name 
+            // append script name
             if (!string.IsNullOrEmpty(url) && !url.EndsWith(".js"))
             {
                 if (!url.EndsWith("/"))
                 {
                     url += "/";
                 }
+
                 url += "AlphaTab.js";
             }
+
             return url;
         }
 
@@ -1095,6 +1144,7 @@ namespace AlphaTab
                 {
                     root.Append(global.location.hostname);
                 }
+
                 if (global.location.port)
                 {
                     root.Append(":");
@@ -1106,12 +1156,20 @@ namespace AlphaTab
                 string directory = global.location.pathname.split("/").slice(0, -1).join("/");
                 if (directory.Length > 0)
                 {
-                    if (!directory.StartsWith("/")) root.Append("/");
+                    if (!directory.StartsWith("/"))
+                    {
+                        root.Append("/");
+                    }
+
                     root.Append(directory);
                 }
 
 
-                if (!relativeUrl.StartsWith("/")) root.Append("/");
+                if (!relativeUrl.StartsWith("/"))
+                {
+                    root.Append("/");
+                }
+
                 root.Append(relativeUrl);
 
                 return root.ToString();
@@ -1161,6 +1219,5 @@ namespace AlphaTab
 
             return ScrollMode.Continuous;
         }
-
     }
 }

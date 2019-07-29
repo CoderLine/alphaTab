@@ -189,7 +189,8 @@ namespace AlphaTab.Platform.CSharp.Xamarin.Android
 
             player.Ready += () =>
             {
-                using (var sf = typeof(AndroidUiFacade).Assembly.GetManifestResourceStream(typeof(SkiaCanvas), "default.sf2"))
+                using (var sf =
+ typeof(AndroidUiFacade).Assembly.GetManifestResourceStream(typeof(SkiaCanvas), "default.sf2"))
                 using (var ms = new MemoryStream())
                 {
                     sf.CopyTo(ms);

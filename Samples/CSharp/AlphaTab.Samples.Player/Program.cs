@@ -7,9 +7,9 @@ using AlphaTab.Importer;
 
 namespace AlphaTab.Samples.PngDump
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             if (args.Length != 2)
             {
@@ -38,8 +38,8 @@ namespace AlphaTab.Samples.PngDump
             };
             player.PositionChanged += e =>
             {
-                TimeSpan currentTime = TimeSpan.FromMilliseconds(e.CurrentTime);
-                TimeSpan endTime = TimeSpan.FromMilliseconds(e.EndTime);
+                var currentTime = TimeSpan.FromMilliseconds(e.CurrentTime);
+                var endTime = TimeSpan.FromMilliseconds(e.EndTime);
 
                 Console.CursorTop--;
                 Console.Write("".PadLeft(Console.BufferWidth - 1, ' '));

@@ -6,7 +6,7 @@ using SkiaSharp;
 
 namespace AlphaTab.Platform.CSharp.Wpf
 {
-    class SkImageSource 
+    internal class SkImageSource 
     {
         public static BitmapSource Create(object data)
         {

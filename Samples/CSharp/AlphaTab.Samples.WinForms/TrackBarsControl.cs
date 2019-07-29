@@ -5,7 +5,7 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Samples.WinForms
 {
-    class TrackBarsControl : Control
+    internal class TrackBarsControl : Control
     {
         private static readonly Size BlockSize = new Size(25, 25);
         private readonly bool[] _usedBars;
@@ -23,18 +23,18 @@ namespace AlphaTab.Samples.WinForms
             base.BackColor = Color.FromArgb(93, 95, 94);
 
             _usedBars = new bool[track.Score.MasterBars.Count];
-            for (int s = 0; s < track.Staves.Count; s++)
+            for (var s = 0; s < track.Staves.Count; s++)
             {
                 var staff = track.Staves[s];
-                for (int barI = 0; barI < staff.Bars.Count; barI++)
+                for (var barI = 0; barI < staff.Bars.Count; barI++)
                 {
                     var bar = staff.Bars[barI];
                     _usedBars[barI] = false;
 
-                    for (int voiceI = 0; voiceI < bar.Voices.Count && (!_usedBars[barI]); voiceI++)
+                    for (var voiceI = 0; voiceI < bar.Voices.Count && (!_usedBars[barI]); voiceI++)
                     {
-                        Voice voice = bar.Voices[voiceI];
-                        for (int i = 0; i < voice.Beats.Count; i++)
+                        var voice = bar.Voices[voiceI];
+                        for (var i = 0; i < voice.Beats.Count; i++)
                         {
                             var b = voice.Beats[i];
                             if (!b.IsRest)
@@ -68,16 +68,19 @@ namespace AlphaTab.Samples.WinForms
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            if (_usedBars == null) return;
+            if (_usedBars == null)
+            {
+                return;
+            }
 
-            using (LinearGradientBrush brush = new LinearGradientBrush(DisplayRectangle, _startColor, _endColor, LinearGradientMode.Vertical))
+            using (var brush = new LinearGradientBrush(DisplayRectangle, _startColor, _endColor, LinearGradientMode.Vertical))
             {
                 e.Graphics.FillRectangle(brush, new Rectangle(0, 0, _usedBars.Length * BlockSize.Width, BlockSize.Height));
             }
 
-            using (Pen pen = new Pen(Color.FromArgb(75,255,255,255)))
+            using (var pen = new Pen(Color.FromArgb(75,255,255,255)))
             {
-                for (int i = 0; i < _usedBars.Length; i++)
+                for (var i = 0; i < _usedBars.Length; i++)
                 {
                     e.Graphics.DrawLine(pen, (i + 1) * BlockSize.Width, 0, (i + 1) * BlockSize.Width, BlockSize.Height);
                 }

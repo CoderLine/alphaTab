@@ -1,11 +1,10 @@
-﻿using System;
-using AlphaTab.Collections;
+﻿using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class GhostNoteInfo
+    internal class GhostNoteInfo
     {
         public int Line { get; set; }
         public bool IsGhost { get; set; }
@@ -18,7 +17,7 @@ namespace AlphaTab.Rendering.Glyphs
     }
 
 
-    class GhostNoteContainerGlyph : Glyph
+    internal class GhostNoteContainerGlyph : Glyph
     {
         private readonly bool _isOpen;
         private readonly FastList<GhostNoteInfo> _infos;
@@ -38,7 +37,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             var sr = (ScoreBarRenderer)Renderer;
             var line = sr.GetNoteLine(n);
-            var hasParenthesis = n.IsGhost || (IsTiedBend(n) && sr.Settings.ShowParenthesisForTiedBends);
+            var hasParenthesis = n.IsGhost || IsTiedBend(n) && sr.Settings.ShowParenthesisForTiedBends;
             AddParenthesisOnLine(line, hasParenthesis);
         }
 
@@ -56,9 +55,14 @@ namespace AlphaTab.Rendering.Glyphs
         {
             if (note.IsTieDestination)
             {
-                if (note.TieOrigin.HasBend) return true;
+                if (note.TieOrigin.HasBend)
+                {
+                    return true;
+                }
+
                 return IsTiedBend(note.TieOrigin);
             }
+
             return false;
         }
 

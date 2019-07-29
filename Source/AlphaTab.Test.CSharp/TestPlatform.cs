@@ -11,7 +11,7 @@ using SkiaSharp;
 
 namespace AlphaTab.Test
 {
-    class TestPlatform
+    internal class TestPlatform
     {
         public static void Done()
         {
@@ -80,12 +80,15 @@ namespace AlphaTab.Test
             using (var finalImageSurface = SKSurface.Create(new SKImageInfo((int)totalWidth, (int)totalHeight,
                 SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
             {
-                SKPoint point = new SKPoint();
-                int rowHeight = 0;
+                var point = new SKPoint();
+                var rowHeight = 0;
                 foreach (var img in result.OfType<SKImage>())
                 {
                     finalImageSurface.Canvas.DrawImage(img, point);
-                    if (img.Height > rowHeight) rowHeight = img.Height;
+                    if (img.Height > rowHeight)
+                    {
+                        rowHeight = img.Height;
+                    }
 
                     point.X += img.Width;
 

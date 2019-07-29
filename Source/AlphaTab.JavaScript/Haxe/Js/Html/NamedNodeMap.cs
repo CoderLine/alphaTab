@@ -9,8 +9,10 @@ namespace AlphaTab.Haxe.Js.Html
     {
         [Name("length")]
         public extern HaxeInt Length { get; }
+
         [Name("getNamedItem")]
         public extern Attr GetNamedItem(HaxeString name);
+
         [Name("item")]
         public extern Attr Item(HaxeInt index);
     }

@@ -5,7 +5,7 @@ namespace AlphaTab.Audio
     /// <summary>
     /// This public class provides names for all general midi instruments.
     /// </summary>
-    class GeneralMidi
+    internal class GeneralMidi
     {
         private static FastDictionary<string, int> _values;
 
@@ -143,18 +143,19 @@ namespace AlphaTab.Audio
                 _values["applause"] = 126;
                 _values["gunshot"] = 127;
             }
+
             name = name.ToLower().Replace(" ", "");
             return _values.ContainsKey(name) ? _values[name] : 0;
         }
 
         public static bool IsPiano(int program)
         {
-            return program <= 7 || (program >= 16 && program <= 23);
+            return program <= 7 || program >= 16 && program <= 23;
         }
 
         public static bool IsGuitar(int program)
         {
-            return (program >= 24 && program <= 39) || program == 105 || program == 43;
+            return program >= 24 && program <= 39 || program == 105 || program == 43;
         }
     }
 }

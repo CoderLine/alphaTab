@@ -3,7 +3,7 @@ using AlphaTab.Platform.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class LyricsGlyph : EffectGlyph
+    internal class LyricsGlyph : EffectGlyph
     {
         private readonly string[] _lines;
 
@@ -29,13 +29,14 @@ namespace AlphaTab.Rendering.Glyphs
             canvas.Font = Font;
             var old = canvas.TextAlign;
             canvas.TextAlign = TextAlign;
-            for (int i = 0; i < _lines.Length; i++)
+            for (var i = 0; i < _lines.Length; i++)
             {
                 if (_lines[i] != null)
                 {
                     canvas.FillText(_lines[i], cx + X, cy + Y + i * Font.Size);
                 }
             }
+
             canvas.TextAlign = old;
         }
     }

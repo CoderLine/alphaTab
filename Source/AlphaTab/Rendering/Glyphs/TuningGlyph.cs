@@ -3,14 +3,17 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TuningGlyph : GlyphGroup
+    internal class TuningGlyph : GlyphGroup
     {
         private readonly float _scale;
         private readonly RenderingResources _resources;
         public float Height { get; set; }
 
-        public TuningGlyph(float x, float y,
-            float scale, RenderingResources resources,
+        public TuningGlyph(
+            float x,
+            float y,
+            float scale,
+            RenderingResources resources,
             Tuning tuning) : base(x, y)
         {
             _scale = scale;
@@ -39,11 +42,11 @@ namespace AlphaTab.Rendering.Glyphs
                     if (i == stringsPerColumn - 1)
                     {
                         currentY = Height;
-                        currentX += (43 * _scale);
+                        currentX += 43 * _scale;
                     }
                 }
 
-                Height += (stringsPerColumn * (15 * _scale));
+                Height += stringsPerColumn * (15 * _scale);
             }
         }
     }

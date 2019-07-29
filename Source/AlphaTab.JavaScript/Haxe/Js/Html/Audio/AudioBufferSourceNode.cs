@@ -10,11 +10,13 @@ namespace AlphaTab.Haxe.Js.Html.Audio
     {
         [Name("buffer")]
         public AudioBuffer Buffer { get; set; }
+
         [Name("loop")]
         public HaxeBool Loop { get; set; }
 
         [Name("start")]
         public extern void Start(HaxeFloat when);
+
         [Name("stop")]
         public extern void Stop(HaxeFloat when);
     }

@@ -12,7 +12,7 @@ namespace AlphaTab.Model
     /// This class can convert a full <see cref="Score"/> instance to a simple JavaScript object and back for further
     /// JSON serialization. 
     /// </summary>
-    class JsonConverter
+    internal class JsonConverter
     {
         /// <summary>
         /// Converts the given score into a JSON encoded string. 
@@ -22,14 +22,16 @@ namespace AlphaTab.Model
         public static string ScoreToJson(Score score)
         {
             var obj = ScoreToJsObject(score);
-            return Json.Stringify(obj, (k, v) =>
-            {
-                if (ArrayBuffer.IsView(v))
+            return Json.Stringify(obj,
+                (k, v) =>
                 {
-                    return Script.Write<object>("untyped __js__(\"Array.apply([], {0})\", v)");
-                }
-                return v;
-            });
+                    if (ArrayBuffer.IsView(v))
+                    {
+                        return Script.Write<object>("untyped __js__(\"Array.apply([], {0})\", v)");
+                    }
+
+                    return v;
+                });
         }
 
         /// <summary>
@@ -62,7 +64,7 @@ namespace AlphaTab.Model
 
             for (var i = 0; i < score.MasterBars.Count; i++)
             {
-                MasterBar masterBar = score.MasterBars[i];
+                var masterBar = score.MasterBars[i];
                 MasterBar masterBar2 = Platform.Platform.NewObject();
                 MasterBar.CopyTo(masterBar, masterBar2);
                 if (masterBar.TempoAutomation != null)
@@ -70,6 +72,7 @@ namespace AlphaTab.Model
                     masterBar2.TempoAutomation = Platform.Platform.NewObject();
                     Automation.CopyTo(masterBar.TempoAutomation, masterBar2.TempoAutomation);
                 }
+
                 if (masterBar.Section != null)
                 {
                     masterBar2.Section = Platform.Platform.NewObject();
@@ -91,7 +94,7 @@ namespace AlphaTab.Model
 
             #region Tracks
 
-            for (int t = 0; t < score.Tracks.Count; t++)
+            for (var t = 0; t < score.Tracks.Count; t++)
             {
                 var track = score.Tracks[t];
                 Track track2 = Platform.Platform.NewObject();
@@ -103,9 +106,10 @@ namespace AlphaTab.Model
 
 
                 #region Staves
+
                 track2.Staves = new FastList<Staff>();
 
-                for (int s = 0; s < track.Staves.Count; s++)
+                for (var s = 0; s < track.Staves.Count; s++)
                 {
                     var staff = track.Staves[s];
                     Staff staff2 = Platform.Platform.NewObject();
@@ -123,7 +127,7 @@ namespace AlphaTab.Model
                     #region Bars
 
                     staff2.Bars = new FastList<Bar>();
-                    for (int b = 0; b < staff.Bars.Count; b++)
+                    for (var b = 0; b < staff.Bars.Count; b++)
                     {
                         var bar = staff.Bars[b];
                         Bar bar2 = Platform.Platform.NewObject();
@@ -132,7 +136,7 @@ namespace AlphaTab.Model
                         #region Voices
 
                         bar2.Voices = new FastList<Voice>();
-                        for (int v = 0; v < bar.Voices.Count; v++)
+                        for (var v = 0; v < bar.Voices.Count; v++)
                         {
                             var voice = bar.Voices[v];
                             Voice voice2 = Platform.Platform.NewObject();
@@ -141,7 +145,7 @@ namespace AlphaTab.Model
                             #region Beats
 
                             voice2.Beats = new FastList<Beat>();
-                            for (int bb = 0; bb < voice.Beats.Count; bb++)
+                            for (var bb = 0; bb < voice.Beats.Count; bb++)
                             {
                                 var beat = voice.Beats[bb];
                                 var dynamicBeat2 = Platform.Platform.NewObject();
@@ -149,7 +153,7 @@ namespace AlphaTab.Model
                                 Beat.CopyTo(beat, beat2);
 
                                 beat2.Automations = new FastList<Automation>();
-                                for (int a = 0; a < beat.Automations.Count; a++)
+                                for (var a = 0; a < beat.Automations.Count; a++)
                                 {
                                     Automation automation = Platform.Platform.NewObject();
                                     Automation.CopyTo(beat.Automations[a], automation);
@@ -157,7 +161,7 @@ namespace AlphaTab.Model
                                 }
 
                                 beat2.WhammyBarPoints = new FastList<BendPoint>();
-                                for (int i = 0; i < beat.WhammyBarPoints.Count; i++)
+                                for (var i = 0; i < beat.WhammyBarPoints.Count; i++)
                                 {
                                     BendPoint point = Platform.Platform.NewObject();
                                     BendPoint.CopyTo(beat.WhammyBarPoints[i], point);
@@ -167,7 +171,7 @@ namespace AlphaTab.Model
                                 #region Notes
 
                                 beat2.Notes = new FastList<Note>();
-                                for (int n = 0; n < beat.Notes.Count; n++)
+                                for (var n = 0; n < beat.Notes.Count; n++)
                                 {
                                     var note = beat.Notes[n];
                                     var dynamicNote2 = Platform.Platform.NewObject();
@@ -178,29 +182,34 @@ namespace AlphaTab.Model
                                     {
                                         dynamicNote2.TieOriginId = note.TieOrigin.Id;
                                     }
+
                                     if (note.IsTieOrigin)
                                     {
                                         dynamicNote2.TieDestinationId = note.TieDestination.Id;
                                     }
+
                                     if (note.IsSlurDestination)
                                     {
                                         dynamicNote2.SlurOriginId = note.SlurOrigin.Id;
                                     }
+
                                     if (note.IsSlurOrigin)
                                     {
                                         dynamicNote2.SlurDestinationId = note.SlurDestination.Id;
                                     }
+
                                     if (note.IsHammerPullDestination)
                                     {
                                         dynamicNote2.HammerPullOriginId = note.HammerPullOrigin.Id;
                                     }
+
                                     if (note.IsHammerPullOrigin)
                                     {
                                         dynamicNote2.HammerPullDestinationId = note.HammerPullDestination.Id;
                                     }
 
                                     note2.BendPoints = new FastList<BendPoint>();
-                                    for (int i = 0; i < note.BendPoints.Count; i++)
+                                    for (var i = 0; i < note.BendPoints.Count; i++)
                                     {
                                         BendPoint point = Platform.Platform.NewObject();
                                         BendPoint.CopyTo(note.BendPoints[i], point);
@@ -226,6 +235,7 @@ namespace AlphaTab.Model
                     }
 
                     #endregion
+
                     track2.Staves.Add(staff2);
                 }
 
@@ -247,7 +257,7 @@ namespace AlphaTab.Model
         /// <returns>The converted score object.</returns>
         public static Score JsObjectToScore(object jsObject, Settings settings = null)
         {
-            Score score = jsObject.As<Score>();
+            var score = jsObject.As<Score>();
             var score2 = new Score();
             Score.CopyTo(score, score2);
             RenderStylesheet.CopyTo(score.Stylesheet, score2.Stylesheet);
@@ -267,6 +277,7 @@ namespace AlphaTab.Model
                     masterBar2.TempoAutomation = new Automation();
                     Automation.CopyTo(masterBar.TempoAutomation, masterBar2.TempoAutomation);
                 }
+
                 if (masterBar.Section != null)
                 {
                     masterBar2.Section = new Section();
@@ -289,7 +300,7 @@ namespace AlphaTab.Model
 
             #region Tracks
 
-            for (int t = 0; t < score.Tracks.Count; t++)
+            for (var t = 0; t < score.Tracks.Count; t++)
             {
                 var track = score.Tracks[t];
                 var track2 = new Track(track.Staves.Count);
@@ -315,9 +326,10 @@ namespace AlphaTab.Model
                         Chord.CopyTo(chord, chord2);
                         staff2.AddChord(key, chord2);
                     }
+
                     #region Bars
 
-                    for (int b = 0; b < staff.Bars.Count; b++)
+                    for (var b = 0; b < staff.Bars.Count; b++)
                     {
                         var bar = staff.Bars[b];
                         var bar2 = new Bar();
@@ -326,7 +338,7 @@ namespace AlphaTab.Model
 
                         #region Voices
 
-                        for (int v = 0; v < bar.Voices.Count; v++)
+                        for (var v = 0; v < bar.Voices.Count; v++)
                         {
                             var voice = bar.Voices[v];
                             var voice2 = new Voice();
@@ -335,21 +347,21 @@ namespace AlphaTab.Model
 
                             #region Beats
 
-                            for (int bb = 0; bb < voice.Beats.Count; bb++)
+                            for (var bb = 0; bb < voice.Beats.Count; bb++)
                             {
                                 var beat = voice.Beats[bb];
                                 var beat2 = new Beat();
                                 Beat.CopyTo(beat, beat2);
                                 voice2.AddBeat(beat2);
 
-                                for (int a = 0; a < beat.Automations.Count; a++)
+                                for (var a = 0; a < beat.Automations.Count; a++)
                                 {
                                     var automation = new Automation();
                                     Automation.CopyTo(beat.Automations[a], automation);
                                     beat2.Automations.Add(automation);
                                 }
 
-                                for (int i = 0; i < beat.WhammyBarPoints.Count; i++)
+                                for (var i = 0; i < beat.WhammyBarPoints.Count; i++)
                                 {
                                     var point = new BendPoint();
                                     BendPoint.CopyTo(beat.WhammyBarPoints[i], point);
@@ -358,7 +370,7 @@ namespace AlphaTab.Model
 
                                 #region Notes
 
-                                for (int n = 0; n < beat.Notes.Count; n++)
+                                for (var n = 0; n < beat.Notes.Count; n++)
                                 {
                                     var note = beat.Notes[n];
                                     var note2 = new Note();
@@ -372,33 +384,40 @@ namespace AlphaTab.Model
                                         note2.Member("TieOriginId", note.Member<int>("TieOriginId"));
                                         notesToLink.Add(note2);
                                     }
+
                                     if (note.HasMember("TieDestinationId"))
                                     {
                                         note2.Member("TieDestinationId", note.Member<int>("TieDestinationId"));
                                         notesToLink.Add(note2);
                                     }
+
                                     if (note.HasMember("SlurOriginId"))
                                     {
                                         note2.Member("SlurOriginId", note.Member<int>("SlurOriginId"));
                                         notesToLink.Add(note2);
                                     }
+
                                     if (note.HasMember("SlurDestinationId"))
                                     {
                                         note2.Member("SlurDestinationId", note.Member<int>("SlurDestinationId"));
                                         notesToLink.Add(note2);
                                     }
+
                                     if (note.HasMember("HammerPullDestinationId"))
                                     {
-                                        note2.Member("HammerPullDestinationId", note.Member<int>("HammerPullDestinationId"));
-                                        notesToLink.Add(note2);
-                                    }
-                                    if (note.HasMember("HammerPullDestinationId"))
-                                    {
-                                        note2.Member("HammerPullDestinationId", note.Member<int>("HammerPullDestinationId"));
+                                        note2.Member("HammerPullDestinationId",
+                                            note.Member<int>("HammerPullDestinationId"));
                                         notesToLink.Add(note2);
                                     }
 
-                                    for (int i = 0; i < note.BendPoints.Count; i++)
+                                    if (note.HasMember("HammerPullDestinationId"))
+                                    {
+                                        note2.Member("HammerPullDestinationId",
+                                            note.Member<int>("HammerPullDestinationId"));
+                                        notesToLink.Add(note2);
+                                    }
+
+                                    for (var i = 0; i < note.BendPoints.Count; i++)
                                     {
                                         var point = new BendPoint();
                                         BendPoint.CopyTo(note.BendPoints[i], point);
@@ -416,8 +435,8 @@ namespace AlphaTab.Model
                     }
 
                     #endregion
-
                 }
+
                 #endregion
             }
 
@@ -430,26 +449,31 @@ namespace AlphaTab.Model
                     var originId = note.Member<int>("TieOriginId");
                     note.TieOrigin = allNotes[originId];
                 }
+
                 if (note.HasMember("TieDestinationId"))
                 {
                     var destinationId = note.Member<int>("TieDestinationId");
                     note.TieDestination = allNotes[destinationId];
                 }
+
                 if (note.HasMember("SlurOriginId"))
                 {
                     var originId = note.Member<int>("SlurOriginId");
                     note.SlurOrigin = allNotes[originId];
                 }
+
                 if (note.HasMember("SlurDestinationId"))
                 {
                     var destinationId = note.Member<int>("SlurDestinationId");
                     note.SlurDestination = allNotes[destinationId];
                 }
+
                 if (note.HasMember("HammerPullOriginId"))
                 {
                     var originId = note.Member<int>("HammerPullOriginId");
                     note.HammerPullOrigin = allNotes[originId];
                 }
+
                 if (note.HasMember("HammerPullDestinationId"))
                 {
                     var destinationId = note.Member<int>("HammerPullDestinationId");
@@ -491,6 +515,7 @@ namespace AlphaTab.Model
                         midiEvent2.Message = message;
                         break;
                 }
+
                 midi2.Events.Add(midiEvent2);
             }
 
@@ -513,15 +538,15 @@ namespace AlphaTab.Model
                 switch (midiEvent2.Type)
                 {
                     case "alphaTab.audio.synth.midi.event.SystemExclusiveEvent":
-                        SystemExclusiveEvent sysex = (SystemExclusiveEvent)midiEvent;
+                        var sysex = (SystemExclusiveEvent)midiEvent;
                         midiEvent2.Data = sysex.Data;
                         break;
                     case "alphaTab.audio.synth.midi.event.MetaDataEvent":
-                        MetaDataEvent metadata = (MetaDataEvent)midiEvent;
+                        var metadata = (MetaDataEvent)midiEvent;
                         midiEvent2.Data = metadata.Data;
                         break;
                     case "alphaTab.audio.synth.midi.event.MetaNumberEvent":
-                        MetaNumberEvent metanumber = (MetaNumberEvent)midiEvent;
+                        var metanumber = (MetaNumberEvent)midiEvent;
                         midiEvent2.Value = metanumber.Value;
                         break;
                 }

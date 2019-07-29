@@ -1,6 +1,6 @@
 ﻿namespace AlphaTab.Audio.Synth.Midi.Event
 {
-    enum SystemCommonTypeEnum
+    internal enum SystemCommonTypeEnum
     {
         SystemExclusive = 0xF0,
         MtcQuarterFrame = 0xF1,
@@ -10,17 +10,11 @@
         SystemExclusive2 = 0xF7
     }
 
-    abstract class SystemCommonEvent : MidiEvent
+    internal abstract class SystemCommonEvent : MidiEvent
     {
-        public override int Channel
-        {
-            get { return -1; }
-        }
+        public override int Channel => -1;
 
-        public override MidiEventType Command
-        {
-            get { return (MidiEventType) (Message & 0x00000FF); }
-        }
+        public override MidiEventType Command => (MidiEventType)(Message & 0x00000FF);
 
         protected SystemCommonEvent(int delta, byte status, byte data1, byte data2)
             : base(delta, status, data1, data2)

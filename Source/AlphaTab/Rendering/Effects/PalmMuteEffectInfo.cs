@@ -3,19 +3,16 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class PalmMuteEffectInfo : NoteEffectInfoBase
+    internal class PalmMuteEffectInfo : NoteEffectInfoBase
     {
-        public override string EffectId { get { return "palm-mute"; } }
+        public override string EffectId => "palm-mute";
 
         protected override bool ShouldCreateGlyphForNote(Note note)
         {
             return note.IsPalmMute;
         }
 
-        public override EffectBarGlyphSizing SizingMode
-        {
-            get { return EffectBarGlyphSizing.GroupedOnBeat; }
-        }
+        public override EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.GroupedOnBeat;
 
         public override EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {

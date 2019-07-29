@@ -9,18 +9,25 @@ namespace AlphaTab.Haxe.Js.Html
     {
         [Name("top")]
         public extern HaxeFloat Top { get; }
+
         [Name("left")]
         public extern HaxeFloat Left { get; }
+
         [Name("right")]
         public extern HaxeFloat Right { get; }
+
         [Name("bottom")]
         public extern HaxeFloat Bottom { get; }
+
         [Name("x")]
         public extern HaxeFloat X { get; }
+
         [Name("y")]
         public extern HaxeFloat Y { get; }
+
         [Name("width")]
         public extern HaxeFloat Width { get; }
+
         [Name("height")]
         public extern HaxeFloat Height { get; }
     }

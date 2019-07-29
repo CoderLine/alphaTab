@@ -1,17 +1,13 @@
-using AlphaTab.Collections;
 using AlphaTab.Model;
 
 namespace AlphaTab.Rendering
 {
-    class EffectBarRendererFactory : BarRendererFactory
+    internal class EffectBarRendererFactory : BarRendererFactory
     {
         private readonly IEffectBarRendererInfo[] _infos;
         private readonly string _staffId;
 
-        public override string StaffId
-        {
-            get { return _staffId; }
-        }
+        public override string StaffId => _staffId;
 
         public EffectBarRendererFactory(string staffId, IEffectBarRendererInfo[] infos)
         {

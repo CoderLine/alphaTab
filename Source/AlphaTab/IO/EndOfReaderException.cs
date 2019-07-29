@@ -1,6 +1,6 @@
 ﻿namespace AlphaTab.IO
 {
-    class EndOfReaderException : AlphaTabException
+    internal class EndOfReaderException : AlphaTabException
     {
         public EndOfReaderException() : base("")
         {

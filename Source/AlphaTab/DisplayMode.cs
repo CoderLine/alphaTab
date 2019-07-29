@@ -9,6 +9,7 @@ namespace AlphaTab
         /// Music elements will be displayed and played as in Guitar Pro. 
         /// </summary>
         GuitarPro,
+
         /// <summary>
         /// Music elements will be displayed and played as in traditional songbooks.
         /// Changes:

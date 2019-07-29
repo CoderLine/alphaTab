@@ -10,7 +10,7 @@ namespace AlphaTab.Haxe.Js
     public class Error : Exception
     {
         [Name("stack")]
-        public extern HaxeString Stack { get;}
+        public extern HaxeString Stack { get; }
 
         public extern Error();
         public extern Error(string message);

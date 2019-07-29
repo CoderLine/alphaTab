@@ -4,17 +4,25 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class FingeringEffectInfo : IEffectBarRendererInfo
+    internal class FingeringEffectInfo : IEffectBarRendererInfo
     {
-        public string EffectId { get { return "fingering"; } }
-        public bool HideOnMultiTrack { get { return false; } }
-        public bool CanShareBand { get { return true; } }
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.SingleOnBeat; } }
+        public string EffectId => "fingering";
+        public bool HideOnMultiTrack => false;
+        public bool CanShareBand => true;
+        public EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.SingleOnBeat;
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
-            if (beat.Voice.Index != 0 || beat.IsRest || settings.FingeringMode != FingeringMode.SingleNoteEffectBand) return false;
-            if (beat.Notes.Count != 1) return false;
+            if (beat.Voice.Index != 0 || beat.IsRest || settings.FingeringMode != FingeringMode.SingleNoteEffectBand)
+            {
+                return false;
+            }
+
+            if (beat.Notes.Count != 1)
+            {
+                return false;
+            }
+
             return beat.Notes[0].IsFingering;
         }
 

@@ -4,7 +4,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TabBrushGlyph : Glyph
+    internal class TabBrushGlyph : Glyph
     {
         private readonly Beat _beat;
 
@@ -39,7 +39,7 @@ namespace AlphaTab.Rendering.Glyphs
                     canvas.LineTo(arrowX, endY);
                     canvas.Stroke();
                 }
-                else if(_beat.BrushType == BrushType.ArpeggioUp)
+                else if (_beat.BrushType == BrushType.ArpeggioUp)
                 {
                     var lineStartY = startY - arrowSize;
                     var lineEndY = endY - arrowSize;
@@ -52,7 +52,7 @@ namespace AlphaTab.Rendering.Glyphs
                     glyph.Paint(0, 0, canvas);
                     canvas.EndRotate();
                 }
-                else if(_beat.BrushType == BrushType.ArpeggioDown)
+                else if (_beat.BrushType == BrushType.ArpeggioDown)
                 {
                     var lineStartY = startY + arrowSize;
                     var lineEndY = endY + arrowSize;

@@ -3,7 +3,7 @@ using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class PickStrokeGlyph : MusicFontGlyph
+    internal class PickStrokeGlyph : MusicFontGlyph
     {
         public PickStrokeGlyph(float x, float y, PickStroke pickStroke)
             : base(x, y, 0.75f, GetSymbol(pickStroke))

@@ -75,9 +75,9 @@ namespace AlphaTab.Samples.WinForms
         // Return H,S,L in range of 0-1
         public static void RGB2HSL(Color rgb, out double h, out double s, out double l)
         {
-            double r = rgb.R / 255.0;
-            double g = rgb.G / 255.0;
-            double b = rgb.B / 255.0;
+            var r = rgb.R / 255.0;
+            var g = rgb.G / 255.0;
+            var b = rgb.B / 255.0;
             double v;
             double m;
             double vm;

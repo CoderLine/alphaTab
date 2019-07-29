@@ -10,14 +10,19 @@ namespace AlphaTab.Haxe.Js.Html
     {
         [Name("nodeName")]
         public extern HaxeString NodeName { get; }
+
         [Name("nodeValue")]
         public extern HaxeString NodeValue { get; }
+
         [Name("appendChild")]
         public extern void AppendChild(Node node);
+
         [Name("removeChild")]
         public extern void RemoveChild(Node node);
+
         [Name("childNodes")]
         public extern NodeList ChildNodes { get; }
+
         [Name("firstChild")]
         public extern Node FirstChild { get; set; }
 

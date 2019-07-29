@@ -13,13 +13,16 @@ using Phase.Attributes;
 
 namespace AlphaTab.Platform.JavaScript
 {
-    class JQueryAlphaTab
+    internal class JQueryAlphaTab
     {
         public object Exec(Element element, string method, string[] args)
         {
             if (Script.Write<bool>("untyped __js__(\"typeof(method) != 'string'\")"))
             {
-                args = new[] { method };
+                args = new[]
+                {
+                    method
+                };
                 method = "init";
             }
 
@@ -29,11 +32,12 @@ namespace AlphaTab.Platform.JavaScript
             }
 
             var jElement = new JQuery(element);
-            AlphaTabApi context = (AlphaTabApi)jElement.Data("alphaTab");
+            var context = (AlphaTabApi)jElement.Data("alphaTab");
             if (method == "destroy" && !context.IsTruthy())
             {
                 return null;
             }
+
             if (method != "init" && !context.IsTruthy())
             {
                 throw new Error("alphaTab not initialized");
@@ -86,6 +90,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 context.SetTracks(tracks, true);
             }
+
             return context.Tracks;
         }
 
@@ -108,6 +113,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 context.RenderTracks(score, context.TrackIndexes);
             }
+
             return context.Score;
         }
 
@@ -124,6 +130,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 context.UpdateLayout(layout);
             }
+
             return context.Settings.Layout;
         }
 
@@ -134,6 +141,7 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         #region Player
+
         [Name("player")]
         public IAlphaSynth Player(JQuery element, AlphaTabApi context)
         {
@@ -147,6 +155,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 Settings.FillPlayerOptions(context.Settings, options, false);
             }
+
             return context.Settings;
         }
 
@@ -163,6 +172,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 return Audio.Synth.PlayerState.Paused;
             }
+
             return context.Player.State;
         }
 
@@ -335,7 +345,9 @@ namespace AlphaTab.Platform.JavaScript
 
         #endregion
 
-        private readonly FastList<Action<JQuery, AlphaTabApi, dynamic>> _initListeners = new FastList<Action<JQuery, AlphaTabApi, dynamic>>();
+        private readonly FastList<Action<JQuery, AlphaTabApi, dynamic>> _initListeners =
+            new FastList<Action<JQuery, AlphaTabApi, dynamic>>();
+
         [Name("_oninit")]
         public void OnInit(Action<JQuery, AlphaTabApi, dynamic> listener)
         {

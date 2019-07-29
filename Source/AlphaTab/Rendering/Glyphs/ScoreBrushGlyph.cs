@@ -1,11 +1,10 @@
-﻿
-using System;
+﻿using System;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class ScoreBrushGlyph : Glyph
+    internal class ScoreBrushGlyph : Glyph
     {
         private readonly Beat _beat;
 
@@ -24,7 +23,7 @@ namespace AlphaTab.Rendering.Glyphs
         {
             //TODO: Create webfont version
 
-           var scoreBarRenderer = (ScoreBarRenderer)Renderer;
+            var scoreBarRenderer = (ScoreBarRenderer)Renderer;
             var lineSize = scoreBarRenderer.LineOffset;
             var startY = cy + Y + (scoreBarRenderer.GetNoteY(_beat.MaxNote) - lineSize);
             var endY = cy + Y + scoreBarRenderer.GetNoteY(_beat.MinNote) + lineSize;

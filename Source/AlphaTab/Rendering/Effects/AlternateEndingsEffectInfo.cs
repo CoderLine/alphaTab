@@ -3,12 +3,12 @@ using AlphaTab.Rendering.Glyphs;
 
 namespace AlphaTab.Rendering.Effects
 {
-    class AlternateEndingsEffectInfo : IEffectBarRendererInfo
+    internal class AlternateEndingsEffectInfo : IEffectBarRendererInfo
     {
-        public string EffectId { get { return "alternate-feel"; } }
-        public bool HideOnMultiTrack { get { return true; } }
-        public bool CanShareBand { get { return false; } }
-        public EffectBarGlyphSizing SizingMode { get { return EffectBarGlyphSizing.FullBar; } }
+        public string EffectId => "alternate-feel";
+        public bool HideOnMultiTrack => true;
+        public bool CanShareBand => false;
+        public EffectBarGlyphSizing SizingMode => EffectBarGlyphSizing.FullBar;
 
         public bool ShouldCreateGlyph(Settings settings, Beat beat)
         {
@@ -17,7 +17,7 @@ namespace AlphaTab.Rendering.Effects
 
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
-            return new AlternateEndingsGlyph(0,0, beat.Voice.Bar.MasterBar.AlternateEndings);
+            return new AlternateEndingsGlyph(0, 0, beat.Voice.Bar.MasterBar.AlternateEndings);
         }
 
         public bool CanExpand(Beat from, Beat to)

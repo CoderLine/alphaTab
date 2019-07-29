@@ -10,7 +10,7 @@ using AlphaTab.Util;
 
 namespace AlphaTab.Audio.Synth.Synthesis
 {
-    class SynthEvent
+    internal class SynthEvent
     {
         public int EventIndex { get; set; }
         public MidiEvent Event { get; set; }
@@ -31,7 +31,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
         }
     }
 
-    class Synthesizer
+    internal class Synthesizer
     {
         private readonly VoiceManager _voiceManager;
         private readonly SynthParameters[] _synthChannels;
@@ -46,15 +46,9 @@ namespace AlphaTab.Audio.Synth.Synthesis
         private bool _isAnySolo;
 
 
-        public int ActiveVoices
-        {
-            get { return _voiceManager.ActiveVoices.Length; }
-        }
+        public int ActiveVoices => _voiceManager.ActiveVoices.Length;
 
-        public int FreeVoices
-        {
-            get { return _voiceManager.FreeVoices.Length; }
-        }
+        public int FreeVoices => _voiceManager.FreeVoices.Length;
 
 
         /// <summary>
@@ -93,8 +87,8 @@ namespace AlphaTab.Audio.Synth.Synthesis
         /// </summary>
         public float MetronomeVolume
         {
-            get { return _synthChannels[_metronomeChannel].MixVolume; }
-            set { _synthChannels[_metronomeChannel].MixVolume = value; }
+            get => _synthChannels[_metronomeChannel].MixVolume;
+            set => _synthChannels[_metronomeChannel].MixVolume = value;
         }
 
         public Synthesizer(int sampleRate, int audioChannels, int bufferSize, int bufferCount, int polyphony)
@@ -106,14 +100,17 @@ namespace AlphaTab.Audio.Synth.Synthesis
             MasterVolume = 1;
 
             SampleRate = SynthHelper.ClampI(sampleRate, MinSampleRate, MaxSampleRate);
-            MicroBufferSize = SynthHelper.ClampI(bufferSize, (int)(SynthConstants.MinBufferSize * sampleRate), (int)(SynthConstants.MaxBufferSize * sampleRate));
-            MicroBufferSize = (int)(Math.Ceiling(MicroBufferSize / (double)SynthConstants.DefaultBlockSize) * SynthConstants.DefaultBlockSize); //ensure multiple of block size
-            MicroBufferCount = (Math.Max(1, bufferCount));
-            SampleBuffer = new SampleArray((MicroBufferSize * MicroBufferCount * audioChannels));
+            MicroBufferSize = SynthHelper.ClampI(bufferSize,
+                (int)(SynthConstants.MinBufferSize * sampleRate),
+                (int)(SynthConstants.MaxBufferSize * sampleRate));
+            MicroBufferSize = (int)(Math.Ceiling(MicroBufferSize / (double)SynthConstants.DefaultBlockSize) *
+                                    SynthConstants.DefaultBlockSize); //ensure multiple of block size
+            MicroBufferCount = Math.Max(1, bufferCount);
+            SampleBuffer = new SampleArray(MicroBufferSize * MicroBufferCount * audioChannels);
 
             // Setup Controllers
             _synthChannels = new SynthParameters[SynthConstants.DefaultChannelCount];
-            for (int x = 0; x < _synthChannels.Length; x++)
+            for (var x = 0; x < _synthChannels.Length; x++)
             {
                 _synthChannels[x] = new SynthParameters(this);
             }
@@ -122,7 +119,9 @@ namespace AlphaTab.Audio.Synth.Synthesis
             _metronomeChannel = _synthChannels.Length - 1;
 
             // Create synth voices
-            _voiceManager = new VoiceManager(SynthHelper.ClampI(polyphony, SynthConstants.MinPolyphony, SynthConstants.MaxPolyphony));
+            _voiceManager =
+                new VoiceManager(
+                    SynthHelper.ClampI(polyphony, SynthConstants.MinPolyphony, SynthConstants.MaxPolyphony));
 
             // Create midi containers
             _midiEventQueue = new LinkedList<SynthEvent>();
@@ -153,10 +152,11 @@ namespace AlphaTab.Audio.Synth.Synthesis
 
         public void ResetSynthControls()
         {
-            foreach (SynthParameters parameters in _synthChannels)
+            foreach (var parameters in _synthChannels)
             {
                 parameters.ResetControllers();
             }
+
             _synthChannels[MidiHelper.DrumChannel].BankSelect = PatchBank.DrumBank;
             ReleaseAllHoldPedals();
 
@@ -168,7 +168,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
 
         public void ResetPrograms()
         {
-            foreach (SynthParameters parameters in _synthChannels)
+            foreach (var parameters in _synthChannels)
             {
                 parameters.Program = 0;
             }
@@ -192,11 +192,11 @@ namespace AlphaTab.Audio.Synth.Synthesis
             the bigger the timeframe the more efficent the process is, but playback quality will be reduced.*/
             var sampleIndex = 0;
             var anySolo = _isAnySolo;
-            for (int x = 0; x < MicroBufferCount; x++)
+            for (var x = 0; x < MicroBufferCount; x++)
             {
                 if (_midiEventQueue.Length > 0)
                 {
-                    for (int i = 0; i < _midiEventCounts[x]; i++)
+                    for (var i = 0; i < _midiEventCounts[x]; i++)
                     {
                         var m = _midiEventQueue.RemoveLast();
                         if (m.IsMetronome)
@@ -210,6 +210,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                         }
                     }
                 }
+
                 //voice processing loop
                 var node = _voiceManager.ActiveVoices.First; //node used to traverse the active voices
                 while (node != null)
@@ -217,7 +218,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                     var channel = node.Value.VoiceParams.Channel;
                     // channel is muted if it is either explicitley muted, or another channel is set to solo but not this one. 
                     var isChannelMuted = _mutedChannels.ContainsKey(channel) ||
-                                         (anySolo && !_soloChannels.ContainsKey(channel));
+                                         anySolo && !_soloChannels.ContainsKey(channel);
 
                     if (silent)
                     {
@@ -227,6 +228,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                     {
                         node.Value.Process(sampleIndex, sampleIndex + MicroBufferSize * 2, isChannelMuted);
                     }
+
                     //if an active voice has stopped remove it from the list
                     if (node.Value.VoiceParams.State == VoiceStateEnum.Stopped)
                     {
@@ -241,8 +243,10 @@ namespace AlphaTab.Audio.Synth.Synthesis
                         node = node.Next;
                     }
                 }
+
                 sampleIndex += MicroBufferSize * SynthConstants.AudioChannels;
             }
+
             Platform.Platform.ClearIntArray(_midiEventCounts);
         }
 
@@ -252,9 +256,12 @@ namespace AlphaTab.Audio.Synth.Synthesis
         {
             // Get the correct instrument depending if it is a drum or not
             var sChan = _synthChannels[channel];
-            Patch inst = SoundBank.GetPatchByNumber(sChan.BankSelect, sChan.Program);
+            var inst = SoundBank.GetPatchByNumber(sChan.BankSelect, sChan.Program);
             if (inst == null)
+            {
                 return;
+            }
+
             // A NoteOn can trigger multiple voices via layers
             int layerCount;
             if (inst is MultiPatch)
@@ -276,13 +283,15 @@ namespace AlphaTab.Audio.Synth.Synthesis
                     node.Value.Stop();
                     node = node.Next;
                 }
+
                 _voiceManager.RemoveFromRegistry(channel, note);
             }
+
             // Check exclusive groups
             for (var x = 0; x < layerCount; x++)
             {
-                bool notseen = true;
-                for (int i = x - 1; i >= 0; i--)
+                var notseen = true;
+                for (var i = x - 1; i >= 0; i--)
                 {
                     if (_layerList[x].ExclusiveGroupTarget == _layerList[i].ExclusiveGroupTarget)
                     {
@@ -290,6 +299,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                         break;
                     }
                 }
+
                 if (_layerList[x].ExclusiveGroupTarget != 0 && notseen)
                 {
                     var node = _voiceManager.ActiveVoices.First;
@@ -300,25 +310,32 @@ namespace AlphaTab.Audio.Synth.Synthesis
                             node.Value.Stop();
                             _voiceManager.RemoveVoiceFromRegistry(node.Value);
                         }
+
                         node = node.Next;
                     }
                 }
             }
+
             // Assign a voice to each layer
-            for (int x = 0; x < layerCount; x++)
+            for (var x = 0; x < layerCount; x++)
             {
-                Voice voice = _voiceManager.GetFreeVoice();
-                if (voice == null)// out of voices and skipping is enabled
+                var voice = _voiceManager.GetFreeVoice();
+                if (voice == null) // out of voices and skipping is enabled
+                {
                     break;
+                }
+
                 voice.Configure(channel, note, velocity, _layerList[x], _synthChannels[channel]);
                 _voiceManager.AddToRegistry(voice);
                 _voiceManager.ActiveVoices.AddLast(voice);
                 voice.Start();
             }
-            // Clear layer list
-            for (int x = 0; x < layerCount; x++)
-                _layerList[x] = null;
 
+            // Clear layer list
+            for (var x = 0; x < layerCount; x++)
+            {
+                _layerList[x] = null;
+            }
         }
 
         public void NoteOff(int channel, int note)
@@ -340,6 +357,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                     node.Value.Stop();
                     node = node.Next;
                 }
+
                 _voiceManager.RemoveFromRegistry(channel, note);
             }
         }
@@ -348,7 +366,8 @@ namespace AlphaTab.Audio.Synth.Synthesis
         {
             var node = _voiceManager.ActiveVoices.First;
             if (immediate)
-            {//if immediate ignore hold pedals and clear the entire registry
+            {
+                //if immediate ignore hold pedals and clear the entire registry
                 _voiceManager.ClearRegistry();
                 while (node != null)
                 {
@@ -360,10 +379,11 @@ namespace AlphaTab.Audio.Synth.Synthesis
                 }
             }
             else
-            {//otherwise we have to check for hold pedals and double check the registry before removing the voice
+            {
+                //otherwise we have to check for hold pedals and double check the registry before removing the voice
                 while (node != null)
                 {
-                    VoiceParameters voiceParams = node.Value.VoiceParams;
+                    var voiceParams = node.Value.VoiceParams;
                     if (voiceParams.State == VoiceStateEnum.Playing)
                     {
                         //if hold pedal is enabled do not stop the voice
@@ -377,6 +397,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                             _voiceManager.RemoveVoiceFromRegistry(node.Value);
                         }
                     }
+
                     node = node.Next;
                 }
             }
@@ -401,9 +422,14 @@ namespace AlphaTab.Audio.Synth.Synthesis
                     {
                         //if hold pedal is enabled do not stop the voice
                         if (_synthChannels[channel].HoldPedal)
+                        {
                             node.Value.VoiceParams.NoteOffPending = true;
+                        }
                         else
+                        {
                             node.Value.Stop();
+                        }
+
                         node = node.Next;
                     }
                 }
@@ -424,9 +450,14 @@ namespace AlphaTab.Audio.Synth.Synthesis
                     break;
                 case MidiEventType.NoteOn:
                     if (data2 == 0)
+                    {
                         NoteOff(channel, data1);
+                    }
                     else
+                    {
                         NoteOn(channel, data1, data2);
+                    }
+
                     break;
                 case MidiEventType.NoteAftertouch:
                     //synth uses channel after touch instead
@@ -436,11 +467,20 @@ namespace AlphaTab.Audio.Synth.Synthesis
                     {
                         case ControllerType.BankSelectCoarse: //Bank select coarse
                             if (channel == MidiHelper.DrumChannel)
+                            {
                                 data2 += PatchBank.DrumBank;
+                            }
+
                             if (SoundBank.IsBankLoaded(data2))
+                            {
                                 _synthChannels[channel].BankSelect = (byte)data2;
+                            }
                             else
-                                _synthChannels[channel].BankSelect = (byte)((channel == MidiHelper.DrumChannel) ? PatchBank.DrumBank : 0);
+                            {
+                                _synthChannels[channel].BankSelect =
+                                    (byte)(channel == MidiHelper.DrumChannel ? PatchBank.DrumBank : 0);
+                            }
+
                             break;
                         case ControllerType.ModulationCoarse: //Modulation wheel coarse
                             _synthChannels[channel].ModRange.Coarse = (byte)data2;
@@ -475,17 +515,23 @@ namespace AlphaTab.Audio.Synth.Synthesis
                             _synthChannels[channel].UpdateCurrentVolumeFromExpression();
                             break;
                         case ControllerType.HoldPedal: //Hold pedal
-                            if (_synthChannels[channel].HoldPedal && !(data2 > 63)) //if hold pedal is released stop any voices with pending release tags
+                            if (_synthChannels[channel].HoldPedal && !(data2 > 63)
+                            ) //if hold pedal is released stop any voices with pending release tags
+                            {
                                 ReleaseHoldPedal(channel);
+                            }
+
                             _synthChannels[channel].HoldPedal = data2 > 63;
                             break;
                         case ControllerType.LegatoPedal: //Legato Pedal
                             _synthChannels[channel].LegatoPedal = data2 > 63;
                             break;
-                        case ControllerType.NonRegisteredParameterCourse: //NRPN Coarse Select   //fix for invalid DataEntry after unsupported NRPN events
+                        case ControllerType.NonRegisteredParameterCourse
+                            : //NRPN Coarse Select   //fix for invalid DataEntry after unsupported NRPN events
                             _synthChannels[channel].Rpn.Combined = 0x3FFF; //todo implement NRPN
                             break;
-                        case ControllerType.NonRegisteredParameterFine: //NRPN Fine Select     //fix for invalid DataEntry after unsupported NRPN events
+                        case ControllerType.NonRegisteredParameterFine
+                            : //NRPN Fine Select     //fix for invalid DataEntry after unsupported NRPN events
                             _synthChannels[channel].Rpn.Combined = 0x3FFF; //todo implement NRPN
                             break;
                         case ControllerType.RegisteredParameterCourse: //RPN Coarse Select
@@ -511,6 +557,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                                     _synthChannels[channel].MasterCoarseTune = (short)(data2 - 64);
                                     break;
                             }
+
                             break;
                         case ControllerType.DataEntryFine: //DataEntry Fine
                             switch (_synthChannels[channel].Rpn.Combined)
@@ -523,12 +570,16 @@ namespace AlphaTab.Audio.Synth.Synthesis
                                     _synthChannels[channel].MasterFineTune.Fine = (byte)data2;
                                     break;
                             }
+
                             break;
                         case ControllerType.ResetControllers: //Reset All
                             _synthChannels[channel].Expression.Combined = 0x3FFF;
                             _synthChannels[channel].ModRange.Combined = 0;
                             if (_synthChannels[channel].HoldPedal)
+                            {
                                 ReleaseHoldPedal(channel);
+                            }
+
                             _synthChannels[channel].HoldPedal = false;
                             _synthChannels[channel].LegatoPedal = false;
                             _synthChannels[channel].Rpn.Combined = 0x3FFF;
@@ -540,6 +591,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                         default:
                             return;
                     }
+
                     break;
                 case MidiEventType.ProgramChange: //Program Change
                     _synthChannels[channel].Program = (byte)data1;
@@ -553,10 +605,12 @@ namespace AlphaTab.Audio.Synth.Synthesis
                     _synthChannels[channel].UpdateCurrentPitch();
                     break;
             }
+
             OnMidiEventProcessed(e);
         }
 
         public event Action<MidiEvent> MidiEventProcessed;
+
         private void OnMidiEventProcessed(MidiEvent e)
         {
             var handler = MidiEventProcessed;
@@ -568,7 +622,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
 
         private void ReleaseAllHoldPedals()
         {
-            LinkedListNode<Voice> node = _voiceManager.ActiveVoices.First;
+            var node = _voiceManager.ActiveVoices.First;
             while (node != null)
             {
                 if (node.Value.VoiceParams.NoteOffPending)
@@ -576,13 +630,14 @@ namespace AlphaTab.Audio.Synth.Synthesis
                     node.Value.Stop();
                     _voiceManager.RemoveVoiceFromRegistry(node.Value);
                 }
+
                 node = node.Next;
             }
         }
 
         private void ReleaseHoldPedal(int channel)
         {
-            LinkedListNode<Voice> node = _voiceManager.ActiveVoices.First;
+            var node = _voiceManager.ActiveVoices.First;
             while (node != null)
             {
                 if (node.Value.VoiceParams.Channel == channel && node.Value.VoiceParams.NoteOffPending)
@@ -590,10 +645,10 @@ namespace AlphaTab.Audio.Synth.Synthesis
                     node.Value.Stop();
                     _voiceManager.RemoveVoiceFromRegistry(node.Value);
                 }
+
                 node = node.Next;
             }
         }
-
 
         #endregion
 
@@ -638,13 +693,21 @@ namespace AlphaTab.Audio.Synth.Synthesis
 
         public void SetChannelProgram(int channel, byte program)
         {
-            if (channel < 0 || channel >= _synthChannels.Length) return;
+            if (channel < 0 || channel >= _synthChannels.Length)
+            {
+                return;
+            }
+
             _synthChannels[channel].Program = (byte)program;
         }
 
         public void SetChannelVolume(int channel, double volume)
         {
-            if (channel < 0 || channel >= _synthChannels.Length) return;
+            if (channel < 0 || channel >= _synthChannels.Length)
+            {
+                return;
+            }
+
             _synthChannels[channel].MixVolume = (float)volume;
         }
     }

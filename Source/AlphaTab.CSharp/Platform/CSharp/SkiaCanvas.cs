@@ -3,14 +3,13 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using AlphaTab.Platform.Model;
-using AlphaTab.Rendering;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Util;
 using SkiaSharp;
 
 namespace AlphaTab.Platform.CSharp
 {
-    class SkiaCanvas : ICanvas
+    internal class SkiaCanvas : ICanvas
     {
         private static readonly SKTypeface MusicFont;
         private static readonly int MusicFontSize = 34;
@@ -30,7 +29,7 @@ namespace AlphaTab.Platform.CSharp
                     // I think unix platforms should be fine, to be tested
                     break;
                 default:
-                    string libSkiaSharpPath = Path.GetDirectoryName(typeof(SkiaCanvas).Assembly.Location);
+                    var libSkiaSharpPath = Path.GetDirectoryName(typeof(SkiaCanvas).Assembly.Location);
                     if (IntPtr.Size == 4)
                     {
                         libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "x86", "libSkiaSharp.dll");
@@ -39,6 +38,7 @@ namespace AlphaTab.Platform.CSharp
                     {
                         libSkiaSharpPath = Path.Combine(libSkiaSharpPath, "x64", "libSkiaSharp.dll");
                     }
+
                     Logger.Debug("Skia", "Loading native lib from '" + libSkiaSharpPath + "'");
                     var lib = LoadLibrary(libSkiaSharpPath);
                     if (lib == IntPtr.Zero)
@@ -49,6 +49,7 @@ namespace AlphaTab.Platform.CSharp
                     {
                         Logger.Debug("Skia", "Loading native lib from '" + libSkiaSharpPath + "' successful");
                     }
+
                     break;
             }
 
@@ -64,8 +65,6 @@ namespace AlphaTab.Platform.CSharp
         private SKPath _path;
         private string _typeFaceCache;
         private SKTypeface _typeFace;
-        private float _width;
-        private float _height;
 
         public Color Color { get; set; }
         public float LineWidth { get; set; }
@@ -81,6 +80,7 @@ namespace AlphaTab.Platform.CSharp
                     {
                         _typeFace.Dispose();
                     }
+
                     _typeFaceCache = Font.ToCssString(Settings.Scale);
                     _typeFace = SKTypeface.FromFamilyName(Font.Family,
                         Font.IsBold ? SKFontStyleWeight.Bold : SKFontStyleWeight.Normal,
@@ -88,6 +88,7 @@ namespace AlphaTab.Platform.CSharp
                         Font.IsItalic ? SKFontStyleSlant.Italic : SKFontStyleSlant.Upright
                     );
                 }
+
                 return _typeFace;
             }
         }
@@ -108,14 +109,16 @@ namespace AlphaTab.Platform.CSharp
 
         public void BeginRender(float width, float height)
         {
-            _width = width;
-            _height = height;
-            var newImage = SKSurface.Create(new SKImageInfo((int)width, (int)height, SKImageInfo.PlatformColorType, SKAlphaType.Premul));
+            var newImage = SKSurface.Create(new SKImageInfo((int)width,
+                (int)height,
+                SKImageInfo.PlatformColorType,
+                SKAlphaType.Premul));
             _surface = newImage;
             if (_path != null)
             {
                 _path.Dispose();
             }
+
             _path = new SKPath();
             _path.FillType = SKPathFillType.Winding;
         }
@@ -151,7 +154,7 @@ namespace AlphaTab.Platform.CSharp
         {
             var paint = new SKPaint();
             paint.IsAntialias = true;
-            paint.Color = (SKColor)((uint)((int)Color.A << 24 | (int)Color.R << 16 | (int)Color.G << 8) | (uint)Color.B);
+            paint.Color = (uint)(Color.A << 24 | Color.R << 16 | Color.G << 8) | Color.B;
             return paint;
         }
 
@@ -191,9 +194,9 @@ namespace AlphaTab.Platform.CSharp
             _path.QuadTo(cpx, cpy, x, y);
         }
 
-        public void BezierCurveTo(float cp1x, float cp1y, float cp2x, float cp2y, float x, float y)
+        public void BezierCurveTo(float cp1X, float cp1Y, float cp2X, float cp2Y, float x, float y)
         {
-            _path.CubicTo(cp1x, cp1y, cp2x, cp2y, x, y);
+            _path.CubicTo(cp1X, cp1Y, cp2X, cp2Y, x, y);
         }
 
         public void FillCircle(float x, float y, float radius)
@@ -222,6 +225,7 @@ namespace AlphaTab.Platform.CSharp
                 paint.IsStroke = true;
                 _surface.Canvas.DrawPath(_path, paint);
             }
+
             _path.Reset();
         }
 
@@ -275,7 +279,11 @@ namespace AlphaTab.Platform.CSharp
 
         public float MeasureText(string text)
         {
-            if (string.IsNullOrEmpty(text)) return 0;
+            if (string.IsNullOrEmpty(text))
+            {
+                return 0;
+            }
+
             using (var paint = CreatePaint())
             {
                 paint.Typeface = TypeFace;
@@ -292,11 +300,17 @@ namespace AlphaTab.Platform.CSharp
                         paint.TextAlign = SKTextAlign.Right;
                         break;
                 }
+
                 return paint.MeasureText(text);
             }
         }
 
-        public void FillMusicFontSymbol(float x, float y, float scale, MusicFontSymbol symbol, bool centerAtPosition = false)
+        public void FillMusicFontSymbol(
+            float x,
+            float y,
+            float scale,
+            MusicFontSymbol symbol,
+            bool centerAtPosition = false)
         {
             if (symbol == MusicFontSymbol.None)
             {
@@ -311,10 +325,17 @@ namespace AlphaTab.Platform.CSharp
                 {
                     paint.TextAlign = SKTextAlign.Center;
                 }
+
                 _surface.Canvas.DrawText(Platform.StringFromCharCode((int)symbol), x, y, paint);
             }
         }
-        public void FillMusicFontSymbols(float x, float y, float scale, MusicFontSymbol[] symbols, bool centerAtPosition = false)
+
+        public void FillMusicFontSymbols(
+            float x,
+            float y,
+            float scale,
+            MusicFontSymbol[] symbols,
+            bool centerAtPosition = false)
         {
             var s = "";
             foreach (var symbol in symbols)
@@ -333,6 +354,7 @@ namespace AlphaTab.Platform.CSharp
                 {
                     paint.TextAlign = SKTextAlign.Center;
                 }
+
                 _surface.Canvas.DrawText(s, x, y, paint);
             }
         }
@@ -348,6 +370,5 @@ namespace AlphaTab.Platform.CSharp
         {
             _surface.Canvas.Restore();
         }
-
     }
 }

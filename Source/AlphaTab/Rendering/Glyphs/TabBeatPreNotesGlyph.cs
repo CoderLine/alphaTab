@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TabBeatPreNotesGlyph : BeatGlyphBase
+    internal class TabBeatPreNotesGlyph : BeatGlyphBase
     {
         public override void DoLayout()
         {
@@ -11,6 +11,7 @@ namespace AlphaTab.Rendering.Glyphs
                 AddGlyph(new TabBrushGlyph(Container.Beat));
                 AddGlyph(new SpacingGlyph(0, 0, 4 * Scale));
             }
+
             base.DoLayout();
         }
     }

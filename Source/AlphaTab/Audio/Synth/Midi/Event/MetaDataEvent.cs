@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Audio.Synth.Midi.Event
 {
-    class MetaDataEvent : MetaEvent
+    internal class MetaDataEvent : MetaEvent
     {
         public byte[] Data { get; private set; }
 

@@ -4,7 +4,7 @@ using AlphaTab.Rendering.Layout;
 
 namespace AlphaTab
 {
-    class LayoutEngineFactory
+    internal class LayoutEngineFactory
     {
         public bool Vertical { get; }
         public Func<ScoreRenderer, ScoreLayout> CreateLayout { get; }

@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class TremoloPickingGlyph : MusicFontGlyph
+    internal class TremoloPickingGlyph : MusicFontGlyph
     {
         public TremoloPickingGlyph(float x, float y, Duration duration)
             : base(x, y, 1, GetSymbol(duration))

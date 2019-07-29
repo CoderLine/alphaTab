@@ -10,13 +10,13 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This BarRenderer renders a bar using guitar tablature notation
     /// </summary>
-    class TabBarRenderer : BarRendererBase
+    internal class TabBarRenderer : BarRendererBase
     {
         public const string StaffId = "tab";
 
         public const float LineSpacing = 10;
 
-        private float _tupletSize = 0;
+        private float _tupletSize;
 
         public bool ShowTimeSignature { get; set; }
         public bool ShowRests { get; set; }
@@ -29,13 +29,7 @@ namespace AlphaTab.Rendering
             RhythmBeams = false;
         }
 
-        public float LineOffset
-        {
-            get
-            {
-                return ((LineSpacing + 1) * Scale);
-            }
-        }
+        public float LineOffset => (LineSpacing + 1) * Scale;
 
         public bool RenderRhythm { get; set; }
         public float RhythmHeight { get; set; }
@@ -46,8 +40,10 @@ namespace AlphaTab.Rendering
             var beat = (TabBeatGlyph)GetOnNotesGlyphForBeat(note.Beat);
             if (beat != null)
             {
-                return beat.Container.X + beat.Container.VoiceContainer.X + beat.X + beat.NoteNumbers.GetNoteX(note, onEnd);
+                return beat.Container.X + beat.Container.VoiceContainer.X + beat.X +
+                       beat.NoteNumbers.GetNoteX(note, onEnd);
             }
+
             return 0;
         }
 
@@ -58,16 +54,17 @@ namespace AlphaTab.Rendering
             {
                 return beat.NoteNumbers.GetNoteY(note, aboveNote);
             }
+
             return 0;
         }
 
         protected override void UpdateSizes()
         {
             var res = Resources;
-            var numberOverflow = (res.TablatureFont.Size / 2) + (res.TablatureFont.Size * 0.2f);
+            var numberOverflow = res.TablatureFont.Size / 2 + res.TablatureFont.Size * 0.2f;
             TopPadding = numberOverflow;
             BottomPadding = numberOverflow;
-            Height = LineOffset * (Bar.Staff.Tuning.Length - 1) + (numberOverflow * 2);
+            Height = LineOffset * (Bar.Staff.Tuning.Length - 1) + numberOverflow * 2;
 
             if (RenderRhythm)
             {
@@ -121,8 +118,11 @@ namespace AlphaTab.Rendering
             }
 
             // Time Signature
-            if (ShowTimeSignature && 
-                ((Bar.PreviousBar == null) || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureNumerator != Bar.PreviousBar.MasterBar.TimeSignatureNumerator) || (Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureDenominator != Bar.PreviousBar.MasterBar.TimeSignatureDenominator)))
+            if (ShowTimeSignature &&
+                (Bar.PreviousBar == null ||
+                 Bar.PreviousBar != null && Bar.MasterBar.TimeSignatureNumerator !=
+                 Bar.PreviousBar.MasterBar.TimeSignatureNumerator || Bar.PreviousBar != null &&
+                 Bar.MasterBar.TimeSignatureDenominator != Bar.PreviousBar.MasterBar.TimeSignatureDenominator))
             {
                 CreateStartSpacing();
                 CreateTimeSignatureGlyphs();
@@ -140,7 +140,11 @@ namespace AlphaTab.Rendering
 
         private void CreateStartSpacing()
         {
-            if (_startSpacing) return;
+            if (_startSpacing)
+            {
+                return;
+            }
+
             AddPreBeatGlyph(new SpacingGlyph(0, 0, 2 * Scale));
             _startSpacing = true;
         }
@@ -148,12 +152,16 @@ namespace AlphaTab.Rendering
         private void CreateTimeSignatureGlyphs()
         {
             AddPreBeatGlyph(new SpacingGlyph(0, 0, 5 * Scale));
-            AddPreBeatGlyph(new TabTimeSignatureGlyph(0, GetTabY(0), Bar.MasterBar.TimeSignatureNumerator, Bar.MasterBar.TimeSignatureDenominator, Bar.MasterBar.TimeSignatureCommon));
+            AddPreBeatGlyph(new TabTimeSignatureGlyph(0,
+                GetTabY(0),
+                Bar.MasterBar.TimeSignatureNumerator,
+                Bar.MasterBar.TimeSignatureDenominator,
+                Bar.MasterBar.TimeSignatureCommon));
         }
 
         protected override void CreateBeatGlyphs()
         {
-            for (int v = 0; v < Bar.Voices.Count; v++)
+            for (var v = 0; v < Bar.Voices.Count; v++)
             {
                 var voice = Bar.Voices[v];
                 if (HasVoiceContainer(voice))
@@ -200,7 +208,7 @@ namespace AlphaTab.Rendering
         /// <returns></returns>
         public float GetTabY(float line, float correction = 0)
         {
-            return (LineOffset * line) + (correction * Scale);
+            return LineOffset * line + correction * Scale;
         }
 
         protected override void PaintBackground(float cx, float cy, ICanvas canvas)
@@ -224,14 +232,14 @@ namespace AlphaTab.Rendering
                 tabNotes.Add(new FastList<float[]>());
             }
 
-            foreach (Voice voice in Bar.Voices)
+            foreach (var voice in Bar.Voices)
             {
                 if (HasVoiceContainer(voice))
                 {
                     var vc = GetOrCreateVoiceContainer(voice);
                     foreach (var bg in vc.BeatGlyphs)
                     {
-                        var notes = ((TabBeatGlyph) bg.OnNotes);
+                        var notes = (TabBeatGlyph)bg.OnNotes;
                         var noteNumbers = notes.NoteNumbers;
                         if (noteNumbers != null)
                         {
@@ -243,8 +251,7 @@ namespace AlphaTab.Rendering
                                     tabNotes[Bar.Staff.Tuning.Length - s].Add(
                                         new[]
                                         {
-                                        vc.X + bg.X + notes.X + noteNumbers.X,
-                                        noteNumbers.Width + padding
+                                            vc.X + bg.X + notes.X + noteNumbers.X, noteNumbers.Width + padding
                                         });
                                 }
                             }
@@ -263,7 +270,10 @@ namespace AlphaTab.Rendering
             var lineOffset = LineOffset;
             for (int i = 0, j = Bar.Staff.Tuning.Length; i < j; i++)
             {
-                if (i > 0) lineY += lineOffset;
+                if (i > 0)
+                {
+                    lineY += lineOffset;
+                }
 
                 var lineX = 0f;
                 foreach (var line in tabNotes[i])
@@ -311,6 +321,7 @@ namespace AlphaTab.Rendering
                 }
             }
         }
+
         private void PaintTuplets(float cx, float cy, ICanvas canvas)
         {
             foreach (var voice in Bar.Voices)
@@ -383,13 +394,13 @@ namespace AlphaTab.Rendering
                     canvas.LineTo(cx + X + beatLineX, y2);
                     canvas.Stroke();
 
-                    var brokenBarOffset = (6 * Scale);
-                    var barSpacing = (-6 * Scale);
-                    var barSize = (3 * Scale);
+                    var brokenBarOffset = 6 * Scale;
+                    var barSpacing = -6 * Scale;
+                    var barSize = 3 * Scale;
                     var barCount = beat.Duration.GetIndex() - 2;
                     var barStart = y2;
 
-                    for (int barIndex = 0; barIndex < barCount; barIndex++)
+                    for (var barIndex = 0; barIndex < barCount; barIndex++)
                     {
                         float barStartX;
                         float barEndX;
@@ -397,7 +408,7 @@ namespace AlphaTab.Rendering
                         float barStartY;
                         float barEndY;
 
-                        var barY = barStart + (barIndex * barSpacing);
+                        var barY = barStart + barIndex * barSpacing;
 
                         // 
                         // Broken Bar to Next
@@ -430,7 +441,6 @@ namespace AlphaTab.Rendering
                                 {
                                     barEndX += endGlyph.Width / 2f;
                                 }
-
                             }
                             // broken bar?
                             else if (i == 0 || !BeamingHelper.IsFullBarJoin(h.Beats[i - 1], beat, barIndex))
@@ -442,6 +452,7 @@ namespace AlphaTab.Rendering
                             {
                                 continue;
                             }
+
                             barStartY = barY;
                             barEndY = barY;
                             PaintSingleBar(canvas, cx + X + barStartX, barStartY, cx + X + barEndX, barEndY, barSize);
@@ -527,13 +538,16 @@ namespace AlphaTab.Rendering
             }
 
             // check if we need to paint simple footer
-            if (h.Beats.Count == 1 || (!h.IsFull))
+            if (h.Beats.Count == 1 || !h.IsFull)
             {
                 for (int i = 0, j = h.Beats.Count; i < j; i++)
                 {
                     var beat = h.Beats[i];
                     var beamingHelper = Helpers.BeamHelperLookup[h.Voice.Index][beat.Index];
-                    if (beamingHelper == null) continue;
+                    if (beamingHelper == null)
+                    {
+                        continue;
+                    }
 
                     var tupletX = beamingHelper.GetBeatLineX(beat);
                     var startGlyph = (TabBeatGlyph)GetOnNotesGlyphForBeat(beat);
@@ -618,6 +632,7 @@ namespace AlphaTab.Rendering
                     canvas.FillText(s, cx + X + middleX, startY);
                 }
             }
+
             canvas.TextAlign = oldAlign;
         }
 
@@ -636,7 +651,8 @@ namespace AlphaTab.Rendering
         {
             foreach (var beat in h.Beats)
             {
-                if (beat.GraceType != GraceType.None || beat.Duration == Duration.Whole || beat.Duration == Duration.DoubleWhole || beat.Duration == Duration.QuadrupleWhole)
+                if (beat.GraceType != GraceType.None || beat.Duration == Duration.Whole ||
+                    beat.Duration == Duration.DoubleWhole || beat.Duration == Duration.QuadrupleWhole)
                 {
                     return;
                 }
@@ -650,23 +666,23 @@ namespace AlphaTab.Rendering
                 var y1 = cy + Y;
                 var y2 = cy + Y + Height - _tupletSize;
 
-                var startGlyph = (TabBeatGlyph) GetOnNotesGlyphForBeat(beat);
+                var startGlyph = (TabBeatGlyph)GetOnNotesGlyphForBeat(beat);
                 if (startGlyph.NoteNumbers == null)
                 {
                     y1 += Height - RhythmHeight - _tupletSize;
                 }
                 else
                 {
-                    y1 += startGlyph.NoteNumbers.GetNoteY(startGlyph.NoteNumbers.MinStringNote) + LineOffset/2;
+                    y1 += startGlyph.NoteNumbers.GetNoteY(startGlyph.NoteNumbers.MinStringNote) + LineOffset / 2;
                 }
 
                 if (h.Direction == BeamDirection.Up)
                 {
-                    beatLineX -= startGlyph.Width/2f;
+                    beatLineX -= startGlyph.Width / 2f;
                 }
                 else
                 {
-                    beatLineX += startGlyph.Width/2f;
+                    beatLineX += startGlyph.Width / 2f;
                 }
 
                 canvas.BeginPath();

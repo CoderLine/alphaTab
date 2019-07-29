@@ -3,10 +3,10 @@ using AlphaTab.Model;
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class ScoreSlurGlyph : ScoreTieGlyph
+    internal class ScoreSlurGlyph : ScoreTieGlyph
     {
         public ScoreSlurGlyph(Note startNote, Note endNote, bool forEnd = false)
-        : base(startNote, endNote, forEnd)
+            : base(startNote, endNote, forEnd)
         {
         }
 

@@ -5,12 +5,12 @@ namespace AlphaTab.Rendering
     /// <summary>
     /// This Factory produces TabBarRenderer instances
     /// </summary>
-    class TabBarRendererFactory : BarRendererFactory
+    internal class TabBarRendererFactory : BarRendererFactory
     {
         private readonly bool _showTimeSignature;
         private readonly bool _showRests;
         private readonly bool _showTiedNotes;
-        public override string StaffId { get { return TabBarRenderer.StaffId; } }
+        public override string StaffId => TabBarRenderer.StaffId;
 
         public TabBarRendererFactory(bool showTimeSignature, bool showRests, bool showTiedNotes)
         {

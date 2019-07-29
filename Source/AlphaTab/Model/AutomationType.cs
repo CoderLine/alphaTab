@@ -8,15 +8,18 @@ namespace AlphaTab.Model
         /// <summary>
         /// Tempo change. 
         /// </summary>
-        Tempo, 
+        Tempo,
+
         /// <summary>
         /// Colume change. 
         /// </summary>
-        Volume, 
+        Volume,
+
         /// <summary>
         /// Instrument change.
         /// </summary>
-        Instrument, 
+        Instrument,
+
         /// <summary>
         /// Balance change.
         /// </summary>

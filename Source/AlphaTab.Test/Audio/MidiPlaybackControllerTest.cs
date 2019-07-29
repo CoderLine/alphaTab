@@ -72,7 +72,7 @@ namespace AlphaTab.Test.Audio
         private void TestRepeat(Score score, int[] expectedIndexes)
         {
             var controller = new MidiPlaybackController(score);
-            int i = 0;
+            var i = 0;
             while (!controller.Finished)
             {
                 var index = controller.Index;

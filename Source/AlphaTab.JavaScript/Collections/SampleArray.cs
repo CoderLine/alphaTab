@@ -9,28 +9,25 @@ namespace AlphaTab.Audio.Synth.Ds
     public class SampleArray
     {
         [Inline]
-        public SampleArray(int length) =>  Script.AbstractThis = new Float32Array(length);
+        public SampleArray(int length)
+        {
+            Script.AbstractThis = new Float32Array(length);
+        }
 
-        public Float32Array ToFloat32Array() => Script.AbstractThis.As<Float32Array>();
+        public Float32Array ToFloat32Array()
+        {
+            return Script.AbstractThis.As<Float32Array>();
+        }
 
         public float this[int index]
         {
-            [Inline]
-            get { return Script.This<Float32Array>()[index]; }
-            [Inline]
-            set
-            {
-                Script.This<Float32Array>()[index] = value;
-            }
+            [Inline] get => Script.This<Float32Array>()[index];
+            [Inline] set => Script.This<Float32Array>()[index] = value;
         }
 
         public int Length
         {
-            [Inline]
-            get
-            {
-                return Script.This<Float32Array>().Length;
-            }
+            [Inline] get => Script.This<Float32Array>().Length;
         }
 
         [Inline]

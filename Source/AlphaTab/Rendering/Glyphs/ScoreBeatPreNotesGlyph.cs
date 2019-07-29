@@ -2,7 +2,7 @@
 
 namespace AlphaTab.Rendering.Glyphs
 {
-    class ScoreBeatPreNotesGlyph : BeatGlyphBase
+    internal class ScoreBeatPreNotesGlyph : BeatGlyphBase
     {
         private BendNoteHeadGroupGlyph _prebends;
         public float PrebendNoteHeadOffset => _prebends.X + _prebends.NoteHeadOffset;
@@ -50,7 +50,9 @@ namespace AlphaTab.Rendering.Glyphs
                 if (!_prebends.IsEmpty)
                 {
                     AddGlyph(_prebends);
-                    AddGlyph(new SpacingGlyph(0, 0, 4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
+                    AddGlyph(new SpacingGlyph(0,
+                        0,
+                        4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
                 }
 
                 if (Container.Beat.BrushType != BrushType.None)
@@ -62,13 +64,17 @@ namespace AlphaTab.Rendering.Glyphs
                 if (!ghost.IsEmpty)
                 {
                     AddGlyph(ghost);
-                    AddGlyph(new SpacingGlyph(0, 0, 4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
+                    AddGlyph(new SpacingGlyph(0,
+                        0,
+                        4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
                 }
 
                 if (!accidentals.IsEmpty)
                 {
                     AddGlyph(accidentals);
-                    AddGlyph(new SpacingGlyph(0, 0, 4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
+                    AddGlyph(new SpacingGlyph(0,
+                        0,
+                        4 * (Container.Beat.GraceType != GraceType.None ? NoteHeadGlyph.GraceScale : 1) * Scale));
                 }
             }
 
@@ -86,6 +92,7 @@ namespace AlphaTab.Rendering.Glyphs
             {
                 accidentals.AddGlyph(new AccidentalGlyph(0, sr.GetScoreY(noteLine), accidental, isGrace));
             }
+
             if (n.HarmonicType != HarmonicType.None && n.HarmonicType != HarmonicType.Natural)
             {
                 var harmonicFret = n.DisplayValue + n.HarmonicPitch;

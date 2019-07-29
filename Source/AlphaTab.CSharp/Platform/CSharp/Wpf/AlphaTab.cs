@@ -58,8 +58,8 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public IEnumerable<Track> Tracks
         {
-            get { return (IEnumerable<Track>)GetValue(TracksProperty); }
-            set { SetValue(TracksProperty, value); }
+            get => (IEnumerable<Track>)GetValue(TracksProperty);
+            set => SetValue(TracksProperty, value);
         }
 
         #endregion
@@ -76,8 +76,8 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public Settings Settings
         {
-            get { return (Settings)GetValue(SettingsProperty); }
-            set { SetValue(SettingsProperty, value); }
+            get => (Settings)GetValue(SettingsProperty);
+            set => SetValue(SettingsProperty, value);
         }
 
         #endregion
@@ -89,8 +89,8 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public Brush BarCursorFill
         {
-            get { return (Brush)GetValue(BarCursorFillProperty); }
-            set { SetValue(BarCursorFillProperty, value); }
+            get => (Brush)GetValue(BarCursorFillProperty);
+            set => SetValue(BarCursorFillProperty, value);
         }
 
 
@@ -102,8 +102,8 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public Brush BeatCursorFill
         {
-            get { return (Brush)GetValue(BeatCursorFillProperty); }
-            set { SetValue(BeatCursorFillProperty, value); }
+            get => (Brush)GetValue(BeatCursorFillProperty);
+            set => SetValue(BeatCursorFillProperty, value);
         }
 
 
@@ -115,8 +115,8 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public Brush SelectionFill
         {
-            get { return (Brush)GetValue(SelectionCursorFillProperty); }
-            set { SetValue(SelectionCursorFillProperty, value); }
+            get => (Brush)GetValue(SelectionCursorFillProperty);
+            set => SetValue(SelectionCursorFillProperty, value);
         }
 
 
@@ -149,7 +149,10 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
         public void RenderTracks()
         {
-            if (Tracks == null) return;
+            if (Tracks == null)
+            {
+                return;
+            }
 
             Score score = null;
             var trackIndexes = new FastList<int>();

@@ -1,6 +1,6 @@
 ﻿namespace AlphaTab.Rendering.Glyphs
 {
-    abstract class TimeSignatureGlyph : GlyphGroup
+    internal abstract class TimeSignatureGlyph : GlyphGroup
     {
         private readonly int _numerator;
         private readonly int _denominator;

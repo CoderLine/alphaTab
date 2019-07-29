@@ -2,7 +2,6 @@
 using AlphaTab.Collections;
 using AlphaTab.Model;
 using AlphaTab.Platform;
-using AlphaTab.Rendering.Layout;
 
 namespace AlphaTab.Rendering.Staves
 {
@@ -10,7 +9,7 @@ namespace AlphaTab.Rendering.Staves
     /// A Staff represents a single line within a StaveGroup. 
     /// It stores BarRenderer instances created from a given factory. 
     /// </summary>
-    class Staff
+    internal class Staff
     {
         private readonly BarRendererFactory _factory;
 
@@ -34,11 +33,9 @@ namespace AlphaTab.Rendering.Staves
         /// For single-track rendering this will always be zero.
         /// </summary>
         public int TrackIndex { get; set; }
+
         public Model.Staff ModelStaff { get; set; }
-        public string StaveId
-        {
-            get { return _factory.StaffId; }
-        }
+        public string StaveId => _factory.StaffId;
 
         /// <summary>
         /// This is the visual offset from top where the
@@ -46,8 +43,10 @@ namespace AlphaTab.Rendering.Staves
         /// using a accolade
         /// </summary>
         public float StaveTop { get; set; }
+
         public float TopSpacing { get; set; }
         public float BottomSpacing { get; set; }
+
         /// <summary>
         /// This is the visual offset from top where the
         /// Staff contents actually ends. Used for grouping 
@@ -86,13 +85,7 @@ namespace AlphaTab.Rendering.Staves
             _sharedLayoutData[key] = def;
         }
 
-        public bool IsInAccolade
-        {
-            get
-            {
-                return _factory.IsInAccolade;
-            }
-        }
+        public bool IsInAccolade => _factory.IsInAccolade;
 
         public void RegisterStaffTop(float offset)
         {
@@ -124,6 +117,7 @@ namespace AlphaTab.Rendering.Staves
             {
                 renderer = _factory.Create(StaveGroup.Layout.Renderer, bar, StaveGroup.Layout.Renderer.Settings.Staves);
             }
+
             renderer.Staff = this;
             renderer.Index = BarRenderers.Count;
             renderer.LayoutingInfo = layoutingInfo;
@@ -170,6 +164,7 @@ namespace AlphaTab.Rendering.Staves
                         m = r.TopOverflow;
                     }
                 }
+
                 return m;
             }
         }
@@ -187,6 +182,7 @@ namespace AlphaTab.Rendering.Staves
                         m = r.BottomOverflow;
                     }
                 }
+
                 return m;
             }
         }
@@ -215,7 +211,11 @@ namespace AlphaTab.Rendering.Staves
 
         public void Paint(float cx, float cy, ICanvas canvas, int startIndex, int count)
         {
-            if (Height == 0 || count == 0) return;
+            if (Height == 0 || count == 0)
+            {
+                return;
+            }
+
             for (int i = startIndex, j = Math.Min(startIndex + count, BarRenderers.Count); i < j; i++)
             {
                 BarRenderers[i].Paint(cx + X, cy + Y, canvas);
