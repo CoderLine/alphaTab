@@ -94,8 +94,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Util\SynthConstants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Util\SynthHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Util\Tables.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DisplayMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Environment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exporter\AlphaTexExporter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FingeringMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\AlphaTexException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\AlphaTexImporter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Importer\AlphaTexSymbols.cs" />
@@ -120,6 +122,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)IO\IReadable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\IWriteable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\ZipFile.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LayoutEngineFactory.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LayoutSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\AccentuationType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\AccidentalType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Model\Automation.cs" />
@@ -174,6 +178,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\FontSizes.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\CssFontSvgCanvas.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Platform\Svg\SvgCanvas.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RenderEngineFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\BarRendererBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\BarRendererFactory.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\EffectBarGlyphSizing.cs" />
@@ -313,14 +318,18 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\BeamingHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\BoundsLookup.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\Utils\PercussionMapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ResizeEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ScrollMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Settings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IO\IOHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StaveSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\Cursors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\IContainer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\IMouseEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UI\IUiFacade.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Util\Lazy.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Util\Logger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VibratoPlaybackSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlDocument.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Xml\XmlNode.cs" />

@@ -12,8 +12,6 @@ namespace AlphaTab.Haxe.Js.Html
         [Name("pageY")]
         public extern int PageY { get; }
 
-
-
         public extern UIEvent(HaxeString type, dynamic eventInitDict);
     }
 }

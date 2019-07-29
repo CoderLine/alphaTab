@@ -19,7 +19,6 @@
   </ItemGroup>
 
   <Import Project="..\AlphaTab\AlphaTab.Shared.projitems" Label="Shared" />
-  
   <Import Project="..\..\Phase\Compiler\Phase.Build.targets" />
 
 </Project>

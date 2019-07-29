@@ -1,21 +1,4 @@
-﻿/*
- * This file is part of alphaTab.
- * Copyright © 2018, Daniel Kuschny and Contributors, All rights reserved.
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 3.0 of the License, or at your option any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library.
- */
-using System;
+﻿using System;
 using AlphaTab.Audio;
 using AlphaTab.Audio.Generator;
 using AlphaTab.Audio.Synth;
@@ -33,25 +16,6 @@ using AlphaTab.Util;
 
 namespace AlphaTab
 {
-    /// <summary>
-    /// Represents the information related to a resize event. 
-    /// </summary>
-    public class ResizeEventArgs
-    {
-        /// <summary>
-        /// Gets the size before the resizing happened. 
-        /// </summary>
-        public int OldWidth { get; set; }
-        /// <summary>
-        /// Gets the size after the resize was complete. 
-        /// </summary>
-        public int NewWidth { get; set; }
-        /// <summary>
-        /// Gets the settings currently used for rendering. 
-        /// </summary>
-        public Settings Settings { get; set; }
-    }
-
     /// <summary>
     /// This class represents the public API of alphaTab and provides all logic to display
     /// a music sheet in any UI using the given <see cref="IUiFacade{TSettings}"/>
