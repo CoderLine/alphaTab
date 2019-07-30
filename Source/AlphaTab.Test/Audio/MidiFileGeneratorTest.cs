@@ -85,26 +85,26 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.TimeSignatureEvent { Tick = 0, Numerator = 4, Denominator = 4 },
                 new FlatMidiEventGenerator.TempoEvent { Tick = 0, Tempo = 120 },
 
-                // bend effect 
-                new FlatMidiEventGenerator.BendEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, Value = 64 }, // no bend
-                new FlatMidiEventGenerator.BendEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, Value = 64 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 87, Track = 0, Channel = info.SecondaryChannel, Value = 65 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 174, Track = 0, Channel = info.SecondaryChannel, Value = 66 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 261, Track = 0, Channel = info.SecondaryChannel, Value = 67 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 349, Track = 0, Channel = info.SecondaryChannel, Value = 68 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 436, Track = 0, Channel = info.SecondaryChannel, Value = 69 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 523, Track = 0, Channel = info.SecondaryChannel, Value = 70 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 610, Track = 0, Channel = info.SecondaryChannel, Value = 71 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 698, Track = 0, Channel = info.SecondaryChannel, Value = 72 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 785, Track = 0, Channel = info.SecondaryChannel, Value = 73 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 872, Track = 0, Channel = info.SecondaryChannel, Value = 74 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 959, Track = 0, Channel = info.SecondaryChannel, Value = 75 },
+                // bend effect
+                new FlatMidiEventGenerator.BendEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, Value = 32 }, // no bend
+                new FlatMidiEventGenerator.BendEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, Value = 32 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 87, Track = 0, Channel = info.SecondaryChannel, Value = 33 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 174, Track = 0, Channel = info.SecondaryChannel, Value = 34 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 261, Track = 0, Channel = info.SecondaryChannel, Value = 35 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 349, Track = 0, Channel = info.SecondaryChannel, Value = 36 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 436, Track = 0, Channel = info.SecondaryChannel, Value = 37 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 523, Track = 0, Channel = info.SecondaryChannel, Value = 38 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 610, Track = 0, Channel = info.SecondaryChannel, Value = 39 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 698, Track = 0, Channel = info.SecondaryChannel, Value = 40 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 785, Track = 0, Channel = info.SecondaryChannel, Value = 41 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 872, Track = 0, Channel = info.SecondaryChannel, Value = 42 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 959, Track = 0, Channel = info.SecondaryChannel, Value = 43 },
 
                 // note itself
                 new FlatMidiEventGenerator.NoteEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, DynamicValue = note.Dynamic, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
-                
+
                 // reset bend
-                new FlatMidiEventGenerator.BendEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, Value = 64 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, Value = 32 },
                 new FlatMidiEventGenerator.NoteEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, DynamicValue = note.Dynamic, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
 
                 // end of track
@@ -209,40 +209,40 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.TempoEvent { Tick = 0, Tempo = 120 },
 
                 // on beat
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[0], Track = 0, Channel = info.PrimaryChannel, Value = 64 },
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[0], Track = 0, Channel = info.PrimaryChannel, Value = 32 },
                 new FlatMidiEventGenerator.NoteEvent { Tick = ticks[0], Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 3840 },
 
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[1], Track = 0, Channel = info.PrimaryChannel, Value = 64 },
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[1], Track = 0, Channel = info.PrimaryChannel, Value = 32 },
                 new FlatMidiEventGenerator.NoteEvent { Tick = ticks[1], Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 120 },
 
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[2], Track = 0, Channel = info.PrimaryChannel, Value = 64 },
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[2], Track = 0, Channel = info.PrimaryChannel, Value = 32 },
                 new FlatMidiEventGenerator.NoteEvent { Tick = ticks[2], Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 3720},
 
 
                 // before beat
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[3], Track = 0, Channel = info.PrimaryChannel, Value = 64 },
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[3], Track = 0, Channel = info.PrimaryChannel, Value = 32 },
                 new FlatMidiEventGenerator.NoteEvent { Tick = ticks[3], Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 3720 },
 
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[4], Track = 0, Channel = info.PrimaryChannel, Value = 64 },
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[4], Track = 0, Channel = info.PrimaryChannel, Value = 32 },
                 new FlatMidiEventGenerator.NoteEvent { Tick = ticks[4], Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 120 },
 
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[5], Track = 0, Channel = info.PrimaryChannel, Value = 64 },
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[5], Track = 0, Channel = info.PrimaryChannel, Value = 32 },
                 new FlatMidiEventGenerator.NoteEvent { Tick = ticks[5], Track = 0, Channel = info.PrimaryChannel, DynamicValue = DynamicValue.F, Key = (byte) 67, Length = 3840},
 
                 // bend beat
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6], Track = 0, Channel = info.SecondaryChannel, Value = 64},
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 0, Track = 0, Channel = info.SecondaryChannel, Value = 64},
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 1, Track = 0, Channel = info.SecondaryChannel, Value = 65},
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 2, Track = 0, Channel = info.SecondaryChannel, Value = 66},
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 3, Track = 0, Channel = info.SecondaryChannel, Value = 67},
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 4, Track = 0, Channel = info.SecondaryChannel, Value = 68},
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 5, Track = 0, Channel = info.SecondaryChannel, Value = 69},
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 6, Track = 0, Channel = info.SecondaryChannel, Value = 70},
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 7, Track = 0, Channel = info.SecondaryChannel, Value = 71},
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 8, Track = 0, Channel = info.SecondaryChannel, Value = 72},
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 9, Track = 0, Channel = info.SecondaryChannel, Value = 73},
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 10, Track = 0, Channel = info.SecondaryChannel, Value = 74},
-                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 11 + 1, Track = 0, Channel = info.SecondaryChannel, Value = 75},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6], Track = 0, Channel = info.SecondaryChannel, Value = 32},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 0, Track = 0, Channel = info.SecondaryChannel, Value = 32},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 1, Track = 0, Channel = info.SecondaryChannel, Value = 33},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 2, Track = 0, Channel = info.SecondaryChannel, Value = 34},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 3, Track = 0, Channel = info.SecondaryChannel, Value = 35},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 4, Track = 0, Channel = info.SecondaryChannel, Value = 36},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 5, Track = 0, Channel = info.SecondaryChannel, Value = 37},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 6, Track = 0, Channel = info.SecondaryChannel, Value = 38},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 7, Track = 0, Channel = info.SecondaryChannel, Value = 39},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 8, Track = 0, Channel = info.SecondaryChannel, Value = 40},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 9, Track = 0, Channel = info.SecondaryChannel, Value = 41},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 10, Track = 0, Channel = info.SecondaryChannel, Value = 42},
+                new FlatMidiEventGenerator.BendEvent { Tick = ticks[6] + 13 * 11 + 1, Track = 0, Channel = info.SecondaryChannel, Value = 43},
                 new FlatMidiEventGenerator.NoteEvent { Tick = ticks[6], Track = 0, Channel = info.SecondaryChannel, Length = 3840, Key = 67, DynamicValue = DynamicValue.F},
 
                 // end of track
@@ -306,41 +306,41 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.TimeSignatureEvent { Tick = 0, Numerator = 4, Denominator = 4 },
                 new FlatMidiEventGenerator.TempoEvent { Tick = 0, Tempo = 120 },
 
-                // bend effect 
-                new FlatMidiEventGenerator.BendEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, Value = 64 }, // no bend
-                new FlatMidiEventGenerator.BendEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, Value = 64 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 43, Track = 0, Channel = info.SecondaryChannel, Value = 65 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 87, Track = 0, Channel = info.SecondaryChannel, Value = 66 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 130, Track = 0, Channel = info.SecondaryChannel, Value = 67 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 174, Track = 0, Channel = info.SecondaryChannel, Value = 68 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 218, Track = 0, Channel = info.SecondaryChannel, Value = 69 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 261, Track = 0, Channel = info.SecondaryChannel, Value = 70 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 305, Track = 0, Channel = info.SecondaryChannel, Value = 71 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 349, Track = 0, Channel = info.SecondaryChannel, Value = 72 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 392, Track = 0, Channel = info.SecondaryChannel, Value = 73 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 436, Track = 0, Channel = info.SecondaryChannel, Value = 74 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 479, Track = 0, Channel = info.SecondaryChannel, Value = 75 }, // full bend
+                // bend effect
+                new FlatMidiEventGenerator.BendEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, Value = 32 }, // no bend
+                new FlatMidiEventGenerator.BendEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, Value = 32 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 43, Track = 0, Channel = info.SecondaryChannel, Value = 33 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 87, Track = 0, Channel = info.SecondaryChannel, Value = 34 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 130, Track = 0, Channel = info.SecondaryChannel, Value = 35 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 174, Track = 0, Channel = info.SecondaryChannel, Value = 36 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 218, Track = 0, Channel = info.SecondaryChannel, Value = 37 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 261, Track = 0, Channel = info.SecondaryChannel, Value = 38 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 305, Track = 0, Channel = info.SecondaryChannel, Value = 39 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 349, Track = 0, Channel = info.SecondaryChannel, Value = 40 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 392, Track = 0, Channel = info.SecondaryChannel, Value = 41 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 436, Track = 0, Channel = info.SecondaryChannel, Value = 42 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 479, Track = 0, Channel = info.SecondaryChannel, Value = 43 }, // full bend
 
-                new FlatMidiEventGenerator.BendEvent { Tick = 480, Track = 0, Channel = info.SecondaryChannel, Value = 75 }, // full bend 
-                new FlatMidiEventGenerator.BendEvent { Tick = 523, Track = 0, Channel = info.SecondaryChannel, Value = 74 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 567, Track = 0, Channel = info.SecondaryChannel, Value = 73 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 610, Track = 0, Channel = info.SecondaryChannel, Value = 72 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 654, Track = 0, Channel = info.SecondaryChannel, Value = 71 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 698, Track = 0, Channel = info.SecondaryChannel, Value = 70 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 741, Track = 0, Channel = info.SecondaryChannel, Value = 69 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 785, Track = 0, Channel = info.SecondaryChannel, Value = 68 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 829, Track = 0, Channel = info.SecondaryChannel, Value = 67 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 872, Track = 0, Channel = info.SecondaryChannel, Value = 66 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 916, Track = 0, Channel = info.SecondaryChannel, Value = 65 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 959, Track = 0, Channel = info.SecondaryChannel, Value = 64 }, // no bend 
+                new FlatMidiEventGenerator.BendEvent { Tick = 480, Track = 0, Channel = info.SecondaryChannel, Value = 43 }, // full bend
+                new FlatMidiEventGenerator.BendEvent { Tick = 523, Track = 0, Channel = info.SecondaryChannel, Value = 42 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 567, Track = 0, Channel = info.SecondaryChannel, Value = 41 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 610, Track = 0, Channel = info.SecondaryChannel, Value = 40 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 654, Track = 0, Channel = info.SecondaryChannel, Value = 39 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 698, Track = 0, Channel = info.SecondaryChannel, Value = 38 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 741, Track = 0, Channel = info.SecondaryChannel, Value = 37 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 785, Track = 0, Channel = info.SecondaryChannel, Value = 36 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 829, Track = 0, Channel = info.SecondaryChannel, Value = 35 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 872, Track = 0, Channel = info.SecondaryChannel, Value = 34 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 916, Track = 0, Channel = info.SecondaryChannel, Value = 33 },
+                new FlatMidiEventGenerator.BendEvent { Tick = 959, Track = 0, Channel = info.SecondaryChannel, Value = 32 }, // no bend
 
                 // note itself
                 new FlatMidiEventGenerator.NoteEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, DynamicValue = note.Dynamic, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
 
                 // reset bend
-                new FlatMidiEventGenerator.BendEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, Value = 64 }, // finish
+                new FlatMidiEventGenerator.BendEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, Value = 32 }, // finish
                 new FlatMidiEventGenerator.NoteEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, DynamicValue = note.Dynamic, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
-                // end of track 
+                // end of track
                 new FlatMidiEventGenerator.TrackEndEvent { Tick = 3840, Track = 0 } // 3840 = end of bar
             };
 
