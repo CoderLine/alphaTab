@@ -2,6 +2,9 @@
 {
     internal static class SynthConstants
     {
+        public const int DefaultChannelCount = 16 + 1 /*metronome*/;
+        public const int MetronomeChannel = DefaultChannelCount - 1;
+
         public const int AudioChannels = 2;
 
         public const double Pi = 3.14159265358979;
@@ -21,13 +24,12 @@
         public const int SincWidth = 16;
         public const int SincResolution = 64;
         public const int MaxVoiceComponents = 4;
-        public const int DefaultChannelCount = 16 + 1 /*metronome*/;
         public const int DefaultKeyCount = 128;
 
         public const float DefaultMixGain = 0.35f;
 
-        public const float MinVolume = 0;
-        public const float MaxVolume = 10;
+        public const float MinVolume = 0f;
+        public const float MaxVolume = 1f;
 
         public const byte MinProgram = 0;
         public const byte MaxProgram = 127;

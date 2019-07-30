@@ -1,10 +1,10 @@
 ﻿using System;
-using AlphaTab.Audio.Synth.Bank;
 using AlphaTab.Audio.Synth.Midi;
-using AlphaTab.Audio.Synth.Synthesis;
+using AlphaTab.Audio.Synth.SoundFont;
 using AlphaTab.Audio.Synth.Util;
 using AlphaTab.IO;
 using AlphaTab.Util;
+using AlphaTab.Audio.Synth.Synthesis;
 
 namespace AlphaTab.Audio.Synth
 {
@@ -15,7 +15,7 @@ namespace AlphaTab.Audio.Synth
     public class AlphaSynth : IAlphaSynth
     {
         private readonly MidiFileSequencer _sequencer;
-        private readonly Synthesizer _synthesizer;
+        private readonly TinySoundFont _synthesizer;
 
         private bool _isSoundFontLoaded;
         private bool _isMidiLoaded;
@@ -46,22 +46,22 @@ namespace AlphaTab.Audio.Synth
         /// <inheritdoc />
         public float MasterVolume
         {
-            get => _synthesizer.MasterVolume;
+            get => _synthesizer.GlobalGainDb;
             set
             {
                 value = SynthHelper.ClampF(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
-                _synthesizer.MasterVolume = value;
+                _synthesizer.GlobalGainDb = value;
             }
         }
 
         /// <inheritdoc />
         public float MetronomeVolume
         {
-            get => _synthesizer.MetronomeVolume;
+            get => _synthesizer.ChannelGetMixVolume(SynthConstants.MetronomeChannel);
             set
             {
                 value = SynthHelper.ClampF(value, SynthConstants.MinVolume, SynthConstants.MaxVolume);
-                _synthesizer.MetronomeVolume = value;
+                _synthesizer.ChannelSetMixVolume(SynthConstants.MetronomeChannel, value);
             }
         }
 
@@ -173,8 +173,7 @@ namespace AlphaTab.Audio.Synth
             Output.SamplesPlayed += OnSamplesPlayed;
 
             Logger.Debug("AlphaSynth", "Creating synthesizer");
-            _synthesizer = new Synthesizer(Output.SampleRate, SynthConstants.AudioChannels, 441, 3, 100);
-
+            _synthesizer = new TinySoundFont(Output.SampleRate);
             _sequencer = new MidiFileSequencer(_synthesizer);
             _sequencer.Finished += Output.SequencerFinished;
 
@@ -251,10 +250,9 @@ namespace AlphaTab.Audio.Synth
             try
             {
                 Logger.Info("AlphaSynth", "Loading soundfont from bytes");
-                var bank = new PatchBank();
-                bank.LoadSf2(input);
-                _synthesizer.LoadBank(bank);
-
+                var soundFont = new Hydra();
+                soundFont.Load(input);
+                _synthesizer.LoadPresets(soundFont);
                 _isSoundFontLoaded = true;
                 OnSoundFontLoaded();
 
@@ -307,7 +305,7 @@ namespace AlphaTab.Audio.Synth
         /// <inheritdoc />
         public void SetChannelMute(int channel, bool mute)
         {
-            _synthesizer.SetChannelMute(channel, mute);
+            _synthesizer.ChannelSetMute(channel, mute);
         }
 
         /// <inheritdoc />
@@ -319,14 +317,14 @@ namespace AlphaTab.Audio.Synth
         /// <inheritdoc />
         public void SetChannelSolo(int channel, bool solo)
         {
-            _synthesizer.SetChannelSolo(channel, solo);
+            _synthesizer.ChannelSetSolo(channel, solo);
         }
 
         /// <inheritdoc />
-        public void SetChannelVolume(int channel, double volume)
+        public void SetChannelVolume(int channel, float volume)
         {
-            volume = SynthHelper.ClampD(volume, SynthConstants.MinVolume, SynthConstants.MaxVolume);
-            _synthesizer.SetChannelVolume(channel, volume);
+            volume = SynthHelper.ClampF(volume, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+            _synthesizer.ChannelSetMixVolume(channel, volume);
         }
 
         /// <inheritdoc />
@@ -334,12 +332,12 @@ namespace AlphaTab.Audio.Synth
         {
             program = SynthHelper.ClampB(program, SynthConstants.MinProgram, SynthConstants.MaxProgram);
             _sequencer.SetChannelProgram(channel, program);
-            _synthesizer.SetChannelProgram(channel, program);
+            _synthesizer.ChannelSetPresetNumber(channel, program);
         }
 
         private void OnSamplesPlayed(int sampleCount)
         {
-            var playedMillis = sampleCount / (double)_synthesizer.SampleRate * 1000;
+            var playedMillis = sampleCount / (double)_synthesizer.OutSampleRate * 1000;
             UpdateTimePosition(_timePosition + playedMillis);
         }
 
@@ -354,7 +352,7 @@ namespace AlphaTab.Audio.Synth
 
             Logger.Debug("AlphaSynth",
                 "Position changed: (time: " + currentTime + "/" + endTime + ", tick: " + currentTick + "/" + endTime +
-                ", Active Voices: " + _synthesizer.ActiveVoices + ", Free Voices: " + _synthesizer.FreeVoices + ")");
+                ", Active Voices: " + _synthesizer.ActiveVoiceCount);
             OnPositionChanged(new PositionChangedEventArgs(currentTime, endTime, currentTick, endTick));
         }
 

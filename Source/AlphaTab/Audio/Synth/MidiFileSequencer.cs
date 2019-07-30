@@ -1,29 +1,29 @@
 ﻿using System;
 using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Audio.Synth.Midi.Event;
-using AlphaTab.Audio.Synth.Synthesis;
 using AlphaTab.Collections;
 using AlphaTab.Util;
+using AlphaTab.Audio.Synth.Synthesis;
 
 namespace AlphaTab.Audio.Synth
 {
     /// <summary>
     /// This sequencer dispatches midi events to the synthesizer based on the current
-    /// synthesize position. The sequencer does not consider the playback speed. 
+    /// synthesize position. The sequencer does not consider the playback speed.
     /// </summary>
     internal class MidiFileSequencer
     {
-        private readonly Synthesizer _synthesizer;
+        private readonly TinySoundFont _synthesizer;
 
         private FastList<MidiFileSequencerTempoChange> _tempoChanges;
-        private FastDictionary<int, SynthEvent> _firstProgramEventPerChannel;
+        private readonly FastDictionary<int, SynthEvent> _firstProgramEventPerChannel;
         private FastList<SynthEvent> _synthData;
         private int _division;
         private int _eventIndex;
 
         /// <remarks>
-        /// Note that this is not the actual playback position. It's the position where we are currently synthesizing at. 
-        /// Depending on the buffer size of the output, this position is after the actual playback. 
+        /// Note that this is not the actual playback position. It's the position where we are currently synthesizing at.
+        /// Depending on the buffer size of the output, this position is after the actual playback.
         /// </remarks>
         private double _currentTime;
 
@@ -50,17 +50,17 @@ namespace AlphaTab.Audio.Synth
         public bool IsLooping { get; set; }
 
         /// <summary>
-        /// Gets the duration of the song in ticks. 
+        /// Gets the duration of the song in ticks.
         /// </summary>
         public int EndTick { get; private set; }
 
         /// <summary>
-        /// Gets the duration of the song in milliseconds. 
+        /// Gets the duration of the song in milliseconds.
         /// </summary>
         public double EndTime => _endTime / PlaybackSpeed;
 
         /// <summary>
-        /// Gets or sets the playback speed. 
+        /// Gets or sets the playback speed.
         /// </summary>
         public double PlaybackSpeed
         {
@@ -68,7 +68,7 @@ namespace AlphaTab.Audio.Synth
             set;
         }
 
-        public MidiFileSequencer(Synthesizer synthesizer)
+        public MidiFileSequencer(TinySoundFont synthesizer)
         {
             _synthesizer = synthesizer;
             _firstProgramEventPerChannel = new FastDictionary<int, SynthEvent>();
@@ -111,8 +111,7 @@ namespace AlphaTab.Audio.Synth
                 _currentTime = 0;
                 _eventIndex = 0;
                 _synthesizer.NoteOffAll(true);
-                _synthesizer.ResetPrograms();
-                _synthesizer.ResetSynthControls();
+                _synthesizer.Reset();
 
                 SilentProcess(timePosition);
             }
@@ -150,7 +149,7 @@ namespace AlphaTab.Audio.Synth
             _eventIndex = 0;
             _currentTime = 0;
 
-            // build synth events. 
+            // build synth events.
             _synthData = new FastList<SynthEvent>();
 
             // Converts midi to milliseconds for easy sequencing
@@ -236,15 +235,14 @@ namespace AlphaTab.Audio.Synth
 
         private bool FillMidiEventQueueLimited(double maxMilliseconds)
         {
-            var millisecondsPerBuffer =
-                _synthesizer.MicroBufferSize / (double)_synthesizer.SampleRate * 1000 * PlaybackSpeed;
+            var millisecondsPerBuffer = TinySoundFont.MicroBufferSize / (double)_synthesizer.OutSampleRate * 1000 * PlaybackSpeed;
             if (maxMilliseconds > 0 && maxMilliseconds < millisecondsPerBuffer)
             {
                 millisecondsPerBuffer = maxMilliseconds;
             }
 
             var anyEventsDispatched = false;
-            for (var i = 0; i < _synthesizer.MicroBufferCount; i++)
+            for (var i = 0; i < TinySoundFont.MicroBufferCount; i++)
             {
                 _currentTime += millisecondsPerBuffer;
                 while (_eventIndex < _synthData.Count && _synthData[_eventIndex].Time < _currentTime)
@@ -343,8 +341,7 @@ namespace AlphaTab.Audio.Synth
                 _currentTime = 0;
                 _eventIndex = 0;
                 _synthesizer.NoteOffAll(true);
-                _synthesizer.ResetPrograms();
-                _synthesizer.ResetSynthControls();
+                _synthesizer.Reset();
                 OnFinished();
             }
             else if (PlaybackRange != null && _currentTime >= _playbackRangeEndTime)
@@ -352,8 +349,7 @@ namespace AlphaTab.Audio.Synth
                 _currentTime = PlaybackRange.StartTick;
                 _eventIndex = 0;
                 _synthesizer.NoteOffAll(true);
-                _synthesizer.ResetPrograms();
-                _synthesizer.ResetSynthControls();
+                _synthesizer.Reset();
                 OnFinished();
             }
         }

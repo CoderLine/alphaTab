@@ -24,8 +24,8 @@ namespace AlphaTab.Platform.JavaScript
         public const string CmdOutputSamplesPlayed = CmdOutputPrefix + "samplesPlayed";
 
 
-        // this value is initialized by the alphaSynth WebWorker wrapper 
-        // that also includes the alphaSynth library into the worker. 
+        // this value is initialized by the alphaSynth WebWorker wrapper
+        // that also includes the alphaSynth library into the worker.
         public static int PreferredSampleRate { get; set; }
 
         private DedicatedWorkerGlobalScope _worker;
@@ -72,7 +72,7 @@ namespace AlphaTab.Platform.JavaScript
             });
         }
 
-        public void AddSamples(SampleArray samples)
+        public void AddSamples(float[] samples)
         {
             _worker.PostMessage(new
             {

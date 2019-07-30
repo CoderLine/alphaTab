@@ -327,6 +327,13 @@ namespace AlphaTab.Platform
         }
 
         [Inline]
+        public static void ArrayCopy(float[] src, int srcOffset, float[] dst, int dstOffset, int count)
+        {
+            Script.Write(
+                "untyped __js__(\"{2}.set({0}.subarray({1},{1}+{4}), {3})\", src, srcOffset, dst, dstOffset, count);");
+        }
+
+        [Inline]
         public static void ArrayCopy(int[] src, int srcOffset, int[] dst, int dstOffset, int count)
         {
             Script.Write(

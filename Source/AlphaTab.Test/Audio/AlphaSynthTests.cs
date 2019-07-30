@@ -144,7 +144,7 @@ namespace AlphaTab.Test.Audio
         {
         }
 
-        public void AddSamples(SampleArray f)
+        public void AddSamples(float[] f)
         {
             for (var i = 0; i < f.Length; i++)
             {

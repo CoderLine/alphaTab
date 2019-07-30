@@ -142,7 +142,7 @@ namespace AlphaTab.Platform.JavaScript
             _finished = true;
         }
 
-        public void AddSamples(SampleArray f)
+        public void AddSamples(float[] f)
         {
             _circularBuffer.Write(f, 0, f.Length);
         }
@@ -183,7 +183,7 @@ namespace AlphaTab.Platform.JavaScript
                 _contextTimeOnGenerate = _context.CurrentTime;
                 _samplesGenerated = left.Length;
 
-                var buffer = new SampleArray(samples);
+                var buffer = new float[samples];
                 _circularBuffer.Read(buffer, 0, buffer.Length);
 
                 var s = 0;
