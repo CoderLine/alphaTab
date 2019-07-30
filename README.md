@@ -57,4 +57,6 @@ alphaTab can load music notation from various sources like Guitar Pro 3-5, Guita
 <a href="https://www.browserstack.com" target="_blank"><img src="Images/BrowserStack.png?raw=true" width="400" align="center"/></a>
 </p>
 
+... to [Bernhard Schelling](https://github.com/schellingb/TinySoundFont) the author of TinySoundFont and [Steve Folta](https://github.com/stevefolta/SFZero) the author of SFZero for providing the core of the synthesis engine. 
+
 ... to all you people using alphaTab providing new feature ideas and and bug reports. 

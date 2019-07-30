@@ -164,9 +164,9 @@ namespace AlphaTab.Audio.Synth
             {
                 // synthesize buffer
                 _sequencer.FillMidiEventQueue();
-                _synthesizer.Synthesize();
+                var samples = _synthesizer.Synthesize();
                 // send it to output
-                Output.AddSamples(_synthesizer.SampleBuffer);
+                Output.AddSamples(samples);
                 // tell sequencer to check whether its work is done
                 _sequencer.CheckForStop();
             };

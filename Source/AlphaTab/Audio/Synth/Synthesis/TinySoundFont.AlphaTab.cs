@@ -1,35 +1,30 @@
+// This file contains alphaTab specific extensions to the TinySoundFont audio synthesis
 using AlphaTab.Audio.Synth.Ds;
 using AlphaTab.Audio.Synth.Midi.Event;
 using AlphaTab.Audio.Synth.Util;
 using AlphaTab.Collections;
-using AlphaTab.Platform;
 using AlphaTab.Util;
 
 namespace AlphaTab.Audio.Synth.Synthesis
 {
     internal partial class TinySoundFont
     {
-        public const int MicroBufferCount = 3;
-        public const int MicroBufferSize = 448;
+        public const int MicroBufferCount = 32; // 4069 samples in total
+        public const int MicroBufferSize = 64; // 64 stereo samples
 
         private readonly LinkedList<SynthEvent> _midiEventQueue = new LinkedList<SynthEvent>();
         private readonly int[] _midiEventCounts = new int[MicroBufferCount];
-        private FastDictionary<int, bool> _mutedChannels;
-        private FastDictionary<int, bool> _soloChannels;
+        private FastDictionary<int, bool> _mutedChannels = new FastDictionary<int, bool>();
+        private FastDictionary<int, bool> _soloChannels = new FastDictionary<int, bool>();
         private bool _isAnySolo;
-        private float[] _sampleBuffer = new float[MicroBufferSize * MicroBufferCount * SynthConstants.AudioChannels];
 
-        public float[] SampleBuffer => _sampleBuffer;
-
-        public void Synthesize()
+        public float[] Synthesize()
         {
-            _sampleBuffer = new float[_sampleBuffer.Length];
-            FillWorkingBuffer(false);
+            return FillWorkingBuffer(false);
         }
 
         public void SynthesizeSilent()
         {
-            _sampleBuffer = new float[_sampleBuffer.Length];
             FillWorkingBuffer(true);
         }
 
@@ -93,14 +88,18 @@ namespace AlphaTab.Audio.Synth.Synthesis
             _midiEventCounts[i]++;
         }
 
-        private void FillWorkingBuffer(bool silent)
+        private float[] FillWorkingBuffer(bool silent)
         {
             /*Break the process loop into sections representing the smallest timeframe before the midi controls need to be updated
             the bigger the timeframe the more efficent the process is, but playback quality will be reduced.*/
-            var sampleIndex = 0;
+            var buffer = new float[MicroBufferSize * MicroBufferCount * SynthConstants.AudioChannels];
+            var bufferPos = 0;
             var anySolo = _isAnySolo;
+
+            // process in micro-buffers
             for (var x = 0; x < MicroBufferCount; x++)
             {
+                // process events for first microbuffer
                 if (_midiEventQueue.Length > 0)
                 {
                     for (var i = 0; i < _midiEventCounts[x]; i++)
@@ -118,8 +117,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                     }
                 }
 
-                //voice processing loop
-                var sampleCount = MicroBufferSize * SynthConstants.AudioChannels;
+                // voice processing loop
                 foreach (var voice in _voices)
                 {
                     if (voice.PlayingPreset != -1)
@@ -135,15 +133,16 @@ namespace AlphaTab.Audio.Synth.Synthesis
                         }
                         else
                         {
-                            voice.Render(this, _sampleBuffer, sampleIndex, sampleCount, isChannelMuted);
+                            voice.Render(this, buffer, bufferPos, MicroBufferSize, isChannelMuted);
                         }
                     }
                 }
 
-                sampleIndex += sampleCount;
+                bufferPos += MicroBufferSize * SynthConstants.AudioChannels;
             }
 
             Platform.Platform.ClearIntArray(_midiEventCounts);
+            return buffer;
         }
 
         private void ProcessMidiMessage(MidiEvent e)
@@ -159,14 +158,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                     ChannelNoteOff(channel, data1);
                     break;
                 case MidiEventType.NoteOn:
-                    if (data2 == 0)
-                    {
-                        ChannelNoteOff(channel, data1);
-                    }
-                    else
-                    {
-                        ChannelNoteOn(channel, data1, data2);
-                    }
+                    ChannelNoteOn(channel, data1, data2 / 127f);
                     break;
                 case MidiEventType.NoteAftertouch:
                     break;

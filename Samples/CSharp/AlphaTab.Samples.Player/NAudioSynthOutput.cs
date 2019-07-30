@@ -62,7 +62,7 @@ namespace AlphaTab.Samples.PngDump
             _finished = true;
         }
 
-        public void AddSamples(SampleArray f)
+        public void AddSamples(float[] f)
         {
             _circularBuffer.Write(f, 0, f.Length);
         }
@@ -97,7 +97,7 @@ namespace AlphaTab.Samples.PngDump
             }
             else
             {
-                var read = new SampleArray(count);
+                var read = new float[count];
                 _circularBuffer.Read(read, 0, read.Length);
 
                 for (var i = 0; i < count; i++)

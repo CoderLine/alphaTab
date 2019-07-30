@@ -63,7 +63,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\SynthEvent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Util\SynthConstants.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Util\SynthHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Audio\Synth\Util\Utils.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DisplayMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Environment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Exporter\AlphaTexExporter.cs" />

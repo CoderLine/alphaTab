@@ -1,4 +1,35 @@
-﻿namespace AlphaTab.Audio.Synth.Synthesis
+﻿// The SoundFont loading and Audio Synthesis is based on TinySoundFont, licensed under MIT,
+// developed by Bernhard Schelling (https://github.com/schellingb/TinySoundFont)
+
+// C# port for alphaTab: (C) 2019 by Daniel Kuschny
+// Licensed under: MPL-2.0
+
+/*
+ * LICENSE (MIT)
+ *
+ * Copyright (C) 2017, 2018 Bernhard Schelling
+ * Based on SFZero, Copyright (C) 2012 Steve Folta (https://github.com/stevefolta/SFZero)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+ * to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+ * USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+using AlphaTab.Audio.Synth.Util;
+
+namespace AlphaTab.Audio.Synth.Synthesis
 {
     internal class Envelope
     {
@@ -44,20 +75,20 @@
             // EG times need to be converted from timecents to seconds.
             // Pin very short EG segments.  Timecents don't get to zero, and our EG is
             // happier with zero values.
-            Delay = (Delay < -11950.0f ? 0.0f : Utils.Timecents2Secs(Delay));
-            Attack = (Attack < -11950.0f ? 0.0f : Utils.Timecents2Secs(Attack));
-            Release = (Release < -11950.0f ? 0.0f : Utils.Timecents2Secs(Release));
+            Delay = (Delay < -11950.0f ? 0.0f : SynthHelper.Timecents2Secs(Delay));
+            Attack = (Attack < -11950.0f ? 0.0f : SynthHelper.Timecents2Secs(Attack));
+            Release = (Release < -11950.0f ? 0.0f : SynthHelper.Timecents2Secs(Release));
 
             // If we have dynamic hold or decay times depending on key number we need
             // to keep the values in timecents so we can calculate it during startNote
             if (KeynumToHold == 0)
             {
-                Hold = (Hold < -11950.0f ? 0.0f : Utils.Timecents2Secs(Hold));
+                Hold = (Hold < -11950.0f ? 0.0f : SynthHelper.Timecents2Secs(Hold));
             }
 
             if (KeynumToDecay == 0)
             {
-                Decay = (Decay < -11950.0f ? 0.0f : Utils.Timecents2Secs(Decay));
+                Decay = (Decay < -11950.0f ? 0.0f : SynthHelper.Timecents2Secs(Decay));
             }
 
             if (Sustain < 0.0f)
@@ -66,7 +97,7 @@
             }
             else if (sustainIsGain)
             {
-                Sustain = Utils.DecibelsToGain(-Sustain / 10.0f);
+                Sustain = SynthHelper.DecibelsToGain(-Sustain / 10.0f);
             }
             else
             {

@@ -1,5 +1,34 @@
-﻿using System;
+﻿// The SoundFont loading and Audio Synthesis is based on TinySoundFont, licensed under MIT,
+// developed by Bernhard Schelling (https://github.com/schellingb/TinySoundFont)
+
+// C# port for alphaTab: (C) 2019 by Daniel Kuschny
+// Licensed under: MPL-2.0
+
+/*
+ * LICENSE (MIT)
+ *
+ * Copyright (C) 2017, 2018 Bernhard Schelling
+ * Based on SFZero, Copyright (C) 2012 Steve Folta (https://github.com/stevefolta/SFZero)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+ * to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+ * USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+using System;
 using AlphaTab.Audio.Synth.SoundFont;
+using AlphaTab.Audio.Synth.Util;
 using AlphaTab.Collections;
 
 // ReSharper disable UnusedMember.Global
@@ -161,7 +190,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                 voice.PlayingPreset = presetIndex;
                 voice.PlayingKey = key;
                 voice.PlayIndex = voicePlayIndex;
-                voice.NoteGainDb = GlobalGainDb - region.Attenuation - Utils.GainToDecibels(1.0f / vel);
+                voice.NoteGainDb = GlobalGainDb - region.Attenuation - SynthHelper.GainToDecibels(1.0f / vel);
 
                 if (_channels != null)
                 {
@@ -194,7 +223,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                 voice.LowPass.Active = (region.InitialFilterFc <= 13500);
                 if (voice.LowPass.Active)
                 {
-                    voice.LowPass.Setup(Utils.Cents2Hertz(region.InitialFilterFc) / OutSampleRate);
+                    voice.LowPass.Setup(SynthHelper.Cents2Hertz(region.InitialFilterFc) / OutSampleRate);
                 }
 
                 // Setup LFO filters.
@@ -633,7 +662,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
         public void ChannelSetVolume(int channel, float volume)
         {
             var c = ChannelInit(channel);
-            var gainDb = Utils.GainToDecibels(volume);
+            var gainDb = SynthHelper.GainToDecibels(volume);
             var gainDBChange = gainDb - c.GainDb;
             if (gainDBChange == 0)
             {
@@ -892,7 +921,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
         public float ChannelGetVolume(int channel)
         {
             return (_channels != null && channel < _channels.ChannelList.Count
-                ? Utils.DecibelsToGain(_channels.ChannelList[channel].GainDb)
+                ? SynthHelper.DecibelsToGain(_channels.ChannelList[channel].GainDb)
                 : 1.0f);
         }
 
@@ -1178,10 +1207,10 @@ namespace AlphaTab.Audio.Synth.Synthesis
                                         // LFO times need to be converted from timecents to seconds.
                                         zoneRegion.DelayModLFO = (zoneRegion.DelayModLFO < -11950.0f
                                             ? 0.0f
-                                            : Utils.Timecents2Secs(zoneRegion.DelayModLFO));
+                                            : SynthHelper.Timecents2Secs(zoneRegion.DelayModLFO));
                                         zoneRegion.DelayVibLFO = (zoneRegion.DelayVibLFO < -11950.0f
                                             ? 0.0f
-                                            : Utils.Timecents2Secs(zoneRegion.DelayVibLFO));
+                                            : SynthHelper.Timecents2Secs(zoneRegion.DelayVibLFO));
 
                                         // Pin values to their ranges.
                                         if (zoneRegion.Pan < -0.5f)

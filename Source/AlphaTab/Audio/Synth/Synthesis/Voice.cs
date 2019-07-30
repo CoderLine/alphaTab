@@ -1,4 +1,35 @@
-﻿namespace AlphaTab.Audio.Synth.Synthesis
+﻿// The SoundFont loading and Audio Synthesis is based on TinySoundFont, licensed under MIT,
+// developed by Bernhard Schelling (https://github.com/schellingb/TinySoundFont)
+
+// C# port for alphaTab: (C) 2019 by Daniel Kuschny
+// Licensed under: MPL-2.0
+
+/*
+ * LICENSE (MIT)
+ *
+ * Copyright (C) 2017, 2018 Bernhard Schelling
+ * Based on SFZero, Copyright (C) 2012 Steve Folta (https://github.com/stevefolta/SFZero)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+ * to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+ * USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+using AlphaTab.Audio.Synth.Util;
+
+namespace AlphaTab.Audio.Synth.Synthesis
 {
     internal partial class Voice
     {
@@ -52,7 +83,7 @@
             var adjustedPitch = Region.PitchKeyCenter + (note - Region.PitchKeyCenter) * (Region.PitchKeyTrack / 100.0);
             if (pitchShift != 0) adjustedPitch += pitchShift;
             PitchInputTimecents = adjustedPitch * 100.0;
-            PitchOutputFactor = Region.SampleRate / (Utils.Timecents2Secs(Region.PitchKeyCenter * 100.0) * outSampleRate);
+            PitchOutputFactor = Region.SampleRate / (SynthHelper.Timecents2Secs(Region.PitchKeyCenter * 100.0) * outSampleRate);
         }
 
         public void End(float outSampleRate)
@@ -127,7 +158,7 @@
             }
             else
             {
-                pitchRatio = Utils.Timecents2Secs(PitchInputTimecents) * PitchOutputFactor;
+                pitchRatio = SynthHelper.Timecents2Secs(PitchInputTimecents) * PitchOutputFactor;
                 tmpModLfoToPitch = 0;
                 tmpVibLfoToPitch = 0;
                 tmpModEnvToPitch = 0;
@@ -139,7 +170,7 @@
             }
             else
             {
-                noteGain = Utils.DecibelsToGain(NoteGainDb);
+                noteGain = SynthHelper.DecibelsToGain(NoteGainDb);
                 tmpModLfoToVolume = 0;
             }
 
@@ -155,15 +186,15 @@
                     tmpLowpass.Active = (fres <= 13500.0f);
                     if (tmpLowpass.Active)
                     {
-                        tmpLowpass.Setup(Utils.Cents2Hertz(fres) / tmpSampleRate);
+                        tmpLowpass.Setup(SynthHelper.Cents2Hertz(fres) / tmpSampleRate);
                     }
                 }
 
                 if (dynamicPitchRatio)
-                    pitchRatio = Utils.Timecents2Secs(PitchInputTimecents + (ModLfo.Level * tmpModLfoToPitch + VibLfo.Level * tmpVibLfoToPitch + ModEnv.Level * tmpModEnvToPitch)) * PitchOutputFactor;
+                    pitchRatio = SynthHelper.Timecents2Secs(PitchInputTimecents + (ModLfo.Level * tmpModLfoToPitch + VibLfo.Level * tmpVibLfoToPitch + ModEnv.Level * tmpModEnvToPitch)) * PitchOutputFactor;
 
                 if (dynamicGain)
-                    noteGain = Utils.DecibelsToGain(NoteGainDb + (ModLfo.Level * tmpModLfoToVolume));
+                    noteGain = SynthHelper.DecibelsToGain(NoteGainDb + (ModLfo.Level * tmpModLfoToVolume));
 
                 gainMono = noteGain * AmpEnv.Level;
 
@@ -209,8 +240,10 @@
                             // Low-pass filter.
                             if (tmpLowpass.Active) val = tmpLowpass.Process(val);
 
-                            outputBuffer[offset + (outL++)] += val * gainLeft;
-                            outputBuffer[offset + (outL++)] += val * gainRight;
+                            outputBuffer[offset + outL] += val * gainLeft;
+                            outL++;
+                            outputBuffer[offset + outL] += val * gainRight;
+                            outL++;
 
                             // Next sample.
                             tmpSourceSamplePosition += pitchRatio;
@@ -231,8 +264,10 @@
                             // Low-pass filter.
                             if (tmpLowpass.Active) val = tmpLowpass.Process(val);
 
-                            outputBuffer[offset + (outL++)] += val * gainLeft;
-                            outputBuffer[offset + (outR++)] += val * gainRight;
+                            outputBuffer[offset + outL] += val * gainLeft;
+                            outL++;
+                            outputBuffer[offset + outR] += val * gainRight;
+                            outR++;
 
                             // Next sample.
                             tmpSourceSamplePosition += pitchRatio;
@@ -251,7 +286,8 @@
                             // Low-pass filter.
                             if (tmpLowpass.Active) val = tmpLowpass.Process(val);
 
-                            outputBuffer[offset + (outL++)] = val * gainMono;
+                            outputBuffer[offset + outL] = val * gainMono;
+                            outL++;
 
                             // Next sample.
                             tmpSourceSamplePosition += pitchRatio;
