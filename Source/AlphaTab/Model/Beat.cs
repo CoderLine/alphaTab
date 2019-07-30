@@ -6,23 +6,23 @@ namespace AlphaTab.Model
 {
     /// <summary>
     /// A beat is a single block within a bar. A beat is a combination
-    /// of several notes played at the same time. 
+    /// of several notes played at the same time.
     /// </summary>
     public class Beat
     {
         /// <summary>
-        /// This is a global counter for all beats. We use it 
-        /// at several locations for lookup tables. 
+        /// This is a global counter for all beats. We use it
+        /// at several locations for lookup tables.
         /// </summary>
         private static int _globalBeatId;
 
         /// <summary>
-        /// Gets or sets the unique id of this beat. 
+        /// Gets or sets the unique id of this beat.
         /// </summary>
         public int Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the zero-based index of this beat within the voice. 
+        /// Gets or sets the zero-based index of this beat within the voice.
         /// </summary>
         public int Index { get; set; }
 
@@ -32,74 +32,74 @@ namespace AlphaTab.Model
         public Beat PreviousBeat { get; set; }
 
         /// <summary>
-        /// Gets or sets the next beat within the whole song. 
+        /// Gets or sets the next beat within the whole song.
         /// </summary>
         public Beat NextBeat { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether this beat is the last beat in the voice. 
+        /// Gets a value indicating whether this beat is the last beat in the voice.
         /// </summary>
         public bool IsLastOfVoice => Index == Voice.Beats.Count - 1;
 
         /// <summary>
-        /// Gets or sets the reference to the parent voice this beat belongs to. 
+        /// Gets or sets the reference to the parent voice this beat belongs to.
         /// </summary>
         public Voice Voice { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of notes contained in this beat. 
+        /// Gets or sets the list of notes contained in this beat.
         /// </summary>
         public FastList<Note> Notes { get; set; }
 
         /// <summary>
         /// Gets the lookup where the notes per string are registered.
-        /// If this staff contains string based notes this lookup allows fast access. 
+        /// If this staff contains string based notes this lookup allows fast access.
         /// </summary>
         public FastDictionary<int, Note> NoteStringLookup { get; }
 
         /// <summary>
         /// Gets the lookup where the notes per value are registered.
-        /// If this staff contains string based notes this lookup allows fast access. 
+        /// If this staff contains string based notes this lookup allows fast access.
         /// </summary>
         public FastDictionary<int, Note> NoteValueLookup { get; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this beat is considered empty. 
+        /// Gets or sets a value indicating whether this beat is considered empty.
         /// </summary>
         public bool IsEmpty { get; set; }
 
         /// <summary>
-        /// Gets or sets which whammy bar style should be used for this bar. 
+        /// Gets or sets which whammy bar style should be used for this bar.
         /// </summary>
         public BendStyle WhammyStyle { get; set; }
 
         /// <summary>
-        /// Gets or sets the ottava applied to this beat. 
+        /// Gets or sets the ottava applied to this beat.
         /// </summary>
         public Ottavia Ottava { get; set; }
 
         /// <summary>
-        /// Gets or sets the fermata applied to this beat. 
+        /// Gets or sets the fermata applied to this beat.
         /// </summary>
         public Fermata Fermata { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether this beat starts a legato slur. 
+        /// Gets a value indicating whether this beat starts a legato slur.
         /// </summary>
         public bool IsLegatoOrigin { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether this beat ends a legato slur. 
+        /// Gets a value indicating whether this beat ends a legato slur.
         /// </summary>
         public bool IsLegatoDestination => PreviousBeat != null && PreviousBeat.IsLegatoOrigin;
 
         /// <summary>
-        /// Gets or sets the note with the lowest pitch in this beat. Only visible notes are considered.  
+        /// Gets or sets the note with the lowest pitch in this beat. Only visible notes are considered.
         /// </summary>
         public Note MinNote { get; set; }
 
         /// <summary>
-        /// Gets or sets the note with the highest pitch in this beat. Only visible notes are considered. 
+        /// Gets or sets the note with the highest pitch in this beat. Only visible notes are considered.
         /// </summary>
         public Note MaxNote { get; set; }
 
@@ -114,7 +114,7 @@ namespace AlphaTab.Model
         public Note MinStringNote { get; set; }
 
         /// <summary>
-        /// Gets or sets the duration of this beat. 
+        /// Gets or sets the duration of this beat.
         /// </summary>
         public Duration Duration { get; set; }
 
@@ -124,37 +124,37 @@ namespace AlphaTab.Model
         public bool IsRest => IsEmpty || Notes.Count == 0;
 
         /// <summary>
-        /// Gets or sets whether any note in this beat has a let-ring applied. 
+        /// Gets or sets whether any note in this beat has a let-ring applied.
         /// </summary>
         public bool IsLetRing { get; set; }
 
         /// <summary>
-        /// Gets or sets whether any note in this beat has a palm-mute paplied. 
+        /// Gets or sets whether any note in this beat has a palm-mute paplied.
         /// </summary>
         public bool IsPalmMute { get; set; }
 
         /// <summary>
-        /// Gets or sets a list of all automations on this beat. 
+        /// Gets or sets a list of all automations on this beat.
         /// </summary>
         public FastList<Automation> Automations { get; set; }
 
         /// <summary>
-        /// Gets or sets the number of dots applied to the duration of this beat. 
+        /// Gets or sets the number of dots applied to the duration of this beat.
         /// </summary>
         public int Dots { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this beat is fade-in. 
+        /// Gets or sets a value indicating whether this beat is fade-in.
         /// </summary>
         public bool FadeIn { get; set; }
 
         /// <summary>
-        /// Gets or sets the lyrics shown on this beat. 
+        /// Gets or sets the lyrics shown on this beat.
         /// </summary>
         public string[] Lyrics { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the beat is played in rasgueado style. 
+        /// Gets or sets a value indicating whether the beat is played in rasgueado style.
         /// </summary>
         public bool HasRasgueado { get; set; }
 
@@ -174,17 +174,17 @@ namespace AlphaTab.Model
         public bool Tap { get; set; }
 
         /// <summary>
-        /// Gets or sets the text annotation shown on this beat. 
+        /// Gets or sets the text annotation shown on this beat.
         /// </summary>
         public string Text { get; set; }
 
         /// <summary>
-        /// Gets or sets the brush type applied to the notes of this beat. 
+        /// Gets or sets the brush type applied to the notes of this beat.
         /// </summary>
         public BrushType BrushType { get; set; }
 
         /// <summary>
-        /// Gets or sets the duration of the brush between the notes in midi ticks. 
+        /// Gets or sets the duration of the brush between the notes in midi ticks.
         /// </summary>
         public int BrushDuration { get; set; }
 
@@ -194,12 +194,12 @@ namespace AlphaTab.Model
         public int TupletDenominator { get; set; }
 
         /// <summary>
-        /// Gets or sets the tuplet numerator. 
+        /// Gets or sets the tuplet numerator.
         /// </summary>
         public int TupletNumerator { get; set; }
 
         /// <summary>
-        /// Gets or sets whether there is a tuplet applied to the duration of this beat. 
+        /// Gets or sets whether there is a tuplet applied to the duration of this beat.
         /// </summary>
         public bool HasTuplet =>
             !(TupletDenominator == -1 && TupletNumerator == -1) &&
@@ -208,62 +208,62 @@ namespace AlphaTab.Model
         public TupletGroup TupletGroup { get; set; }
 
         /// <summary>
-        /// Gets or sets whether this beat continues a whammy effect. 
+        /// Gets or sets whether this beat continues a whammy effect.
         /// </summary>
         public bool IsContinuedWhammy { get; set; }
 
         /// <summary>
-        /// Gets or sets the whammy bar style of this beat. 
+        /// Gets or sets the whammy bar style of this beat.
         /// </summary>
         public WhammyType WhammyBarType { get; set; }
 
         /// <summary>
-        /// Gets or sets the points defining the whammy bar usage. 
+        /// Gets or sets the points defining the whammy bar usage.
         /// </summary>
         public FastList<BendPoint> WhammyBarPoints { get; set; }
 
         /// <summary>
-        /// Gets or sets the highest point with for the highest whammy bar value. 
+        /// Gets or sets the highest point with for the highest whammy bar value.
         /// </summary>
         public BendPoint MaxWhammyPoint { get; set; }
 
         /// <summary>
-        /// Gets or sets the highest point with for the lowest whammy bar value. 
+        /// Gets or sets the highest point with for the lowest whammy bar value.
         /// </summary>
         public BendPoint MinWhammyPoint { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether a whammy bar is used on this beat. 
+        /// Gets a value indicating whether a whammy bar is used on this beat.
         /// </summary>
         public bool HasWhammyBar => WhammyBarType != WhammyType.None;
 
         /// <summary>
-        /// Gets or sets the vibrato effect used on this beat. 
+        /// Gets or sets the vibrato effect used on this beat.
         /// </summary>
         public VibratoType Vibrato { get; set; }
 
         /// <summary>
-        /// Gets or sets the ID of the chord used on this beat. 
+        /// Gets or sets the ID of the chord used on this beat.
         /// </summary>
         public string ChordId { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether a chord is used on this beat. 
+        /// Gets a value indicating whether a chord is used on this beat.
         /// </summary>
         public bool HasChord => ChordId != null;
 
         /// <summary>
-        /// Gets the chord used on this beat. 
+        /// Gets the chord used on this beat.
         /// </summary>
         public Chord Chord => Voice.Bar.Staff.Chords[ChordId];
 
         /// <summary>
-        /// Gets or sets the grace style of this beat. 
+        /// Gets or sets the grace style of this beat.
         /// </summary>
         public GraceType GraceType { get; set; }
 
         /// <summary>
-        /// Gets or sets the pickstroke applied on this beat. 
+        /// Gets or sets the pickstroke applied on this beat.
         /// </summary>
         public PickStroke PickStroke { get; set; }
 
@@ -273,12 +273,12 @@ namespace AlphaTab.Model
         public bool IsTremolo => TremoloSpeed != null;
 
         /// <summary>
-        /// Gets or sets the speed of the tremolo effect. 
+        /// Gets or sets the speed of the tremolo effect.
         /// </summary>
         public Duration? TremoloSpeed { get; set; }
 
         /// <summary>
-        /// Gets or sets whether a crescendo/decrescendo is applied on this beat. 
+        /// Gets or sets whether a crescendo/decrescendo is applied on this beat.
         /// </summary>
         public CrescendoType Crescendo { get; set; }
 
@@ -286,7 +286,7 @@ namespace AlphaTab.Model
         /// The timeline position of the voice within the current bar as it is displayed. (unit: midi ticks)
         /// </summary>
         /// <remarks>
-        /// This might differ from the actual playback time due to special grace types. 
+        /// This might differ from the actual playback time due to special grace types.
         /// </remarks>
         public int DisplayStart { get; set; }
 
@@ -294,7 +294,7 @@ namespace AlphaTab.Model
         /// The timeline position of the voice within the current bar as it is played. (unit: midi ticks)
         /// </summary>
         /// <remarks>
-        /// This might differ from the actual playback time due to special grace types. 
+        /// This might differ from the actual playback time due to special grace types.
         /// </remarks>
         public int PlaybackStart { get; set; }
 
@@ -310,22 +310,22 @@ namespace AlphaTab.Model
         public int PlaybackDuration { get; set; }
 
         /// <summary>
-        /// Gets the absolute display start time within the song. 
+        /// Gets the absolute display start time within the song.
         /// </summary>
         public int AbsoluteDisplayStart => Voice.Bar.MasterBar.Start + DisplayStart;
 
         /// <summary>
-        /// Gets the absolute playback start time within the song. 
+        /// Gets the absolute playback start time within the song.
         /// </summary>
         public int AbsolutePlaybackStart => Voice.Bar.MasterBar.Start + PlaybackStart;
 
         /// <summary>
-        /// Gets or sets the dynamics applied to this beat. 
+        /// Gets or sets the dynamics applied to this beat.
         /// </summary>
         public DynamicValue Dynamic { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the beam direction should be inverted. 
+        /// Gets or sets a value indicating whether the beam direction should be inverted.
         /// </summary>
         public bool InvertBeamDirection { get; set; }
 
@@ -618,9 +618,9 @@ namespace AlphaTab.Model
 
 
             //// It can happen that the first beat of the next bar shifts into this
-            //// beat due to before-beat grace. In this case we need to 
-            //// reduce the duration of this beat. 
-            //// Within the same bar the start of the next beat is always directly after the current. 
+            //// beat due to before-beat grace. In this case we need to
+            //// reduce the duration of this beat.
+            //// Within the same bar the start of the next beat is always directly after the current.
 
             //if (NextBeat != null && NextBeat.Voice.Bar != Voice.Bar)
             //{
@@ -780,7 +780,7 @@ namespace AlphaTab.Model
                 }
             }
             // if beat is a rest implicitely take over letring/palmmute
-            // from the previous beat gets cleaned later in case we flagged it wrong. 
+            // from the previous beat gets cleaned later in case we flagged it wrong.
             else if (IsRest && PreviousBeat != null && settings != null &&
                      settings.DisplayMode == DisplayMode.GuitarPro)
             {
@@ -872,7 +872,7 @@ namespace AlphaTab.Model
 
             if (needCopyBeatForBend)
             {
-                // if this beat is a simple bend convert it to a grace beat 
+                // if this beat is a simple bend convert it to a grace beat
                 // and generate a placeholder beat with tied notes
 
                 var cloneBeat = Clone();
@@ -916,7 +916,7 @@ namespace AlphaTab.Model
         }
 
         /// <summary>
-        /// Checks whether the current beat is timewise before the given beat. 
+        /// Checks whether the current beat is timewise before the given beat.
         /// </summary>
         /// <param name="beat"></param>
         /// <returns></returns>
@@ -927,7 +927,7 @@ namespace AlphaTab.Model
         }
 
         /// <summary>
-        /// Checks whether the current beat is timewise after the given beat. 
+        /// Checks whether the current beat is timewise after the given beat.
         /// </summary>
         /// <param name="beat"></param>
         /// <returns></returns>
