@@ -27,9 +27,6 @@ namespace AlphaTab.Platform.JavaScript
         private CircularSampleBuffer _circularBuffer;
 
         private bool _finished;
-        private double _contextTimeOnGenerate;
-        private int _samplesGenerated;
-
         public int SampleRate => (int)_context.SampleRate;
 
         public void Open()
@@ -180,9 +177,6 @@ namespace AlphaTab.Platform.JavaScript
             }
             else
             {
-                _contextTimeOnGenerate = _context.CurrentTime;
-                _samplesGenerated = left.Length;
-
                 var buffer = new float[samples];
                 _circularBuffer.Read(buffer, 0, buffer.Length);
 

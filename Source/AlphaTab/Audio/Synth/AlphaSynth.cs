@@ -236,6 +236,7 @@ namespace AlphaTab.Audio.Synth
             Logger.Debug("AlphaSynth", "Stopping playback");
             State = PlayerState.Paused;
             Output.Pause();
+            _sequencer.Stop();
             _synthesizer.NoteOffAll(true);
             TickPosition = _sequencer.PlaybackRange != null ? _sequencer.PlaybackRange.StartTick : 0;
             OnStateChanged(new PlayerStateChangedEventArgs(State, true));

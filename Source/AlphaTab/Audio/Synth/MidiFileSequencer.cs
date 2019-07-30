@@ -338,19 +338,29 @@ namespace AlphaTab.Audio.Synth
         {
             if (PlaybackRange == null && _currentTime >= _endTime)
             {
-                _currentTime = 0;
-                _eventIndex = 0;
                 _synthesizer.NoteOffAll(true);
                 _synthesizer.Reset();
                 OnFinished();
             }
             else if (PlaybackRange != null && _currentTime >= _playbackRangeEndTime)
             {
-                _currentTime = PlaybackRange.StartTick;
-                _eventIndex = 0;
                 _synthesizer.NoteOffAll(true);
                 _synthesizer.Reset();
                 OnFinished();
+            }
+        }
+
+        public void Stop()
+        {
+            if (PlaybackRange == null)
+            {
+                _currentTime = 0;
+                _eventIndex = 0;
+            }
+            else if (PlaybackRange != null && _currentTime >= _playbackRangeEndTime)
+            {
+                _currentTime = PlaybackRange.StartTick;
+                _eventIndex = 0;
             }
         }
 
