@@ -242,10 +242,11 @@ namespace AlphaTab.Audio.Synth
             }
 
             var anyEventsDispatched = false;
+            var endTime = InternalEndTime;
             for (var i = 0; i < TinySoundFont.MicroBufferCount; i++)
             {
                 _currentTime += millisecondsPerBuffer;
-                while (_eventIndex < _synthData.Count && _synthData[_eventIndex].Time < _currentTime)
+                while (_eventIndex < _synthData.Count && _synthData[_eventIndex].Time < _currentTime && _currentTime < endTime)
                 {
                     _synthesizer.DispatchEvent(i, _synthData[_eventIndex]);
                     _eventIndex++;
@@ -334,15 +335,11 @@ namespace AlphaTab.Audio.Synth
         }
 
 
+        private double InternalEndTime => PlaybackRange == null ? _endTime : _playbackRangeEndTime;
+
         public void CheckForStop()
         {
-            if (PlaybackRange == null && _currentTime >= _endTime)
-            {
-                _synthesizer.NoteOffAll(true);
-                _synthesizer.Reset();
-                OnFinished();
-            }
-            else if (PlaybackRange != null && _currentTime >= _playbackRangeEndTime)
+            if (_currentTime >= InternalEndTime)
             {
                 _synthesizer.NoteOffAll(true);
                 _synthesizer.Reset();
@@ -357,7 +354,7 @@ namespace AlphaTab.Audio.Synth
                 _currentTime = 0;
                 _eventIndex = 0;
             }
-            else if (PlaybackRange != null && _currentTime >= _playbackRangeEndTime)
+            else if (PlaybackRange != null)
             {
                 _currentTime = PlaybackRange.StartTick;
                 _eventIndex = 0;
