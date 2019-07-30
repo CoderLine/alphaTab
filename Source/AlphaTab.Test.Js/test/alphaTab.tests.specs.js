@@ -1,10 +1,6 @@
 /// <reference path="alphaTab.tests.js" />
 describe("alphaTab.test.audio.AlphaSynthTests", function() {
     var __instance = new alphaTab.test.audio.AlphaSynthTests();
-    it("TestLoadSf2PatchBank", function(done) {
-        alphaTab.test.TestPlatform.Done = done;
-        __instance.TestLoadSf2PatchBank();
-    });
     it("TestPcmGeneration", function(done) {
         alphaTab.test.TestPlatform.Done = done;
         __instance.TestPcmGeneration();
