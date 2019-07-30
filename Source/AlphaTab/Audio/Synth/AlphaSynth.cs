@@ -228,7 +228,7 @@ namespace AlphaTab.Audio.Synth
         /// <inheritdoc />
         public void Stop()
         {
-            if (State == PlayerState.Paused || !IsReadyForPlayback)
+            if (!IsReadyForPlayback)
             {
                 return;
             }
