@@ -112,6 +112,7 @@ namespace AlphaTab.Audio.Synth
                 _eventIndex = 0;
                 _synthesizer.NoteOffAll(true);
                 _synthesizer.Reset();
+                _synthesizer.SetupMetronomeChannel();
 
                 SilentProcess(timePosition);
             }
@@ -343,6 +344,7 @@ namespace AlphaTab.Audio.Synth
             {
                 _synthesizer.NoteOffAll(true);
                 _synthesizer.Reset();
+                _synthesizer.SetupMetronomeChannel();
                 OnFinished();
             }
         }

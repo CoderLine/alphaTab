@@ -30,6 +30,7 @@ namespace AlphaTab.Audio.Synth.Util
 {
     internal static class SynthConstants
     {
+        public const int DrumBank = 128;
         public const int DefaultChannelCount = 16 + 1 /*metronome*/;
         public const int MetronomeChannel = DefaultChannelCount - 1;
 

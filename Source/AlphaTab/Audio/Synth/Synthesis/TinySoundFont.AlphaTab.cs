@@ -107,8 +107,8 @@ namespace AlphaTab.Audio.Synth.Synthesis
                         var m = _midiEventQueue.RemoveLast();
                         if (m.IsMetronome)
                         {
-                            NoteOff(SynthConstants.MetronomeChannel, 37);
-                            NoteOn(SynthConstants.MetronomeChannel, 37, 95);
+                            ChannelNoteOff(SynthConstants.MetronomeChannel, 33);
+                            ChannelNoteOn(SynthConstants.MetronomeChannel, 33, 95 / 127f);
                         }
                         else
                         {
@@ -174,6 +174,12 @@ namespace AlphaTab.Audio.Synth.Synthesis
                     ChannelSetPitchWheel(channel, (short)(data1 | (data2 << 8)));
                     break;
             }
+        }
+
+        public void SetupMetronomeChannel()
+        {
+            ChannelSetVolume(SynthConstants.MetronomeChannel, 1);
+            ChannelSetPresetNumber(SynthConstants.MetronomeChannel, 0, true);
         }
     }
 }

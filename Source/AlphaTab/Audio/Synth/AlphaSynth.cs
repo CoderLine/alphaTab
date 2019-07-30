@@ -190,6 +190,7 @@ namespace AlphaTab.Audio.Synth
             }
 
             Output.Activate();
+            _synthesizer.SetupMetronomeChannel();
 
             Logger.Debug("AlphaSynth", "Starting playback");
             State = PlayerState.Playing;
@@ -271,6 +272,7 @@ namespace AlphaTab.Audio.Synth
         {
             if (IsReadyForPlayback)
             {
+                _synthesizer.SetupMetronomeChannel();
                 OnReadyForPlayback();
             }
         }
