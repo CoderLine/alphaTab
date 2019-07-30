@@ -202,6 +202,10 @@ namespace AlphaTab.Audio.Synth.Synthesis
                 {
                     gainMono = 0;
                 }
+                else
+                {
+                    gainMono *= MixVolume;
+                }
 
                 // Update EG.
                 AmpEnv.Process(blockSamples, f.OutSampleRate);

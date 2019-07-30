@@ -384,6 +384,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
                 c.GainDb = 0.0f;
                 c.PitchRange = 2.0f;
                 c.Tuning = 0.0f;
+                c.MixVolume = 1;
                 _channels.ChannelList.Add(c);
             }
 

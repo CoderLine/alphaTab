@@ -383,6 +383,15 @@ namespace AlphaTab
             Player.ReadyForPlayback += () =>
             {
                 UiFacade.TriggerEvent(Container, "playerReady");
+                if(Tracks != null)
+                {
+                    foreach (var track in Tracks)
+                    {
+                        var volume = track.PlaybackInfo.Volume / 16f;
+                        Player.SetChannelVolume(track.PlaybackInfo.PrimaryChannel, volume);
+                        Player.SetChannelVolume(track.PlaybackInfo.SecondaryChannel, volume);
+                    }
+                }
             };
 
             Player.SoundFontLoaded += () =>

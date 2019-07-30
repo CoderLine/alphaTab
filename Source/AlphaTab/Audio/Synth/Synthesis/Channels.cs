@@ -27,7 +27,6 @@
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 using System;
-using System.Collections.Generic;
 using AlphaTab.Collections;
 
 namespace AlphaTab.Audio.Synth.Synthesis
@@ -47,6 +46,7 @@ namespace AlphaTab.Audio.Synth.Synthesis
             var c = ChannelList[ActiveChannel];
             var newpan = voice.Region.Pan + c.PanOffset;
             voice.PlayingChannel = ActiveChannel;
+            voice.MixVolume = c.MixVolume;
             voice.NoteGainDb += c.GainDb;
             voice.CalcPitchRatio(
                 (c.PitchWheel == 8192
