@@ -499,6 +499,18 @@ namespace AlphaTab
                 settings.Layout = LayoutFromJson(dataAttributes["layout"]);
             }
 
+            if (dataAttributes != null)
+            {
+                foreach (var key in dataAttributes)
+                {
+                    if (key.StartsWith("layout"))
+                    {
+                        var property = key.Substring(6);
+                        settings.Layout.AdditionalSettings[property.ToLower()] = dataAttributes[key];
+                    }
+                }
+            }
+
 
             if (Platform.Platform.JsonExists(json, "includeNoteBounds"))
             {
@@ -595,17 +607,6 @@ namespace AlphaTab
                 }
             }
 
-            if (dataAttributes != null)
-            {
-                foreach (var key in dataAttributes)
-                {
-                    if (key.StartsWith("layout"))
-                    {
-                        var property = key.Substring(6);
-                        settings.Layout.AdditionalSettings[property.ToLower()] = dataAttributes[key];
-                    }
-                }
-            }
 
             if (Platform.Platform.JsonExists(json, "staves"))
             {
@@ -654,7 +655,7 @@ namespace AlphaTab
             }
             else if (dataAttributes != null)
             {
-                foreach (var key in dataAttributes)
+                foreach (var key in dataAttributeds)
                 {
                     if (key.StartsWith("importer"))
                     {

@@ -36,27 +36,27 @@ namespace AlphaTab
         public IContainer Container { get; }
 
         /// <summary>
-        /// Gets the UI container that will hold all rendered results. 
+        /// Gets the UI container that will hold all rendered results.
         /// </summary>
         public IContainer CanvasElement { get; }
 
         /// <summary>
-        /// Gets the score renderer used for rendering the music sheet. This is the low-level API responsible for the actual rendering chain. 
+        /// Gets the score renderer used for rendering the music sheet. This is the low-level API responsible for the actual rendering chain.
         /// </summary>
         public IScoreRenderer Renderer { get; }
 
         /// <summary>
-        /// Gets a value indicating whether auto-sizing is active and the music sheet will be re-rendered on resize. 
+        /// Gets a value indicating whether auto-sizing is active and the music sheet will be re-rendered on resize.
         /// </summary>
         public bool AutoSize { get; }
 
         /// <summary>
-        /// Gets the score holding all information about the song being rendered. 
+        /// Gets the score holding all information about the song being rendered.
         /// </summary>
         public Score Score { get; private set; }
 
         /// <summary>
-        /// Gets the indexes of the tracks that should be rendered of the currently set score. 
+        /// Gets the indexes of the tracks that should be rendered of the currently set score.
         /// </summary>
         public int[] TrackIndexes { get; private set; }
 
@@ -167,7 +167,7 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// Destroys the alphaTab control and restores the initial state of the UI. 
+        /// Destroys the alphaTab control and restores the initial state of the UI.
         /// </summary>
         public virtual void Destroy()
         {
@@ -205,11 +205,10 @@ namespace AlphaTab
             return tracks.ToArray();
         }
 
-
         #region Rendering
 
         /// <summary>
-        /// Applies any changes that were done to the settings object and informs the <see cref="Renderer"/> about any new values to consider. 
+        /// Applies any changes that were done to the settings object and informs the <see cref="Renderer"/> about any new values to consider.
         /// </summary>
         public void UpdateSettings()
         {
@@ -263,7 +262,7 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// Initiates a rendering of the given tracks. 
+        /// Initiates a rendering of the given tracks.
         /// </summary>
         /// <param name="score">The data model holding the song information.</param>
         /// <param name="tracks">The indexes of the tracks to render.</param>
@@ -284,7 +283,7 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// Tells alphaTab to render the given alphaTex. 
+        /// Tells alphaTab to render the given alphaTex.
         /// </summary>
         /// <param name="contents">The alphaTex code to render.</param>
         /// <param name="tracks">If set, the given tracks will be rendered, otherwise the first track only will be rendered.</param>
@@ -313,7 +312,7 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// Performs any necessary steps that are needed after a new score was loaded/set. 
+        /// Performs any necessary steps that are needed after a new score was loaded/set.
         /// </summary>
         /// <param name="score">The score that was loaded.</param>
         /// <param name="render">If set to true, a rerendering will be initiated as part of this call.</param>
@@ -364,7 +363,7 @@ namespace AlphaTab
         private MidiTickLookup _tickCache;
 
         /// <summary>
-        /// Gets the alphaSynth player used for playback. This is the low-level API to the Midi synthesizer used for playback. 
+        /// Gets the alphaSynth player used for playback. This is the low-level API to the Midi synthesizer used for playback.
         /// </summary>
         public IAlphaSynth Player { get; private set; }
 
@@ -440,7 +439,7 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// Changes the volume of th given tracks. 
+        /// Changes the volume of the given tracks.
         /// </summary>
         /// <param name="tracks">The tracks for which the volume should be changed.</param>
         /// <param name="volume">The volume to set for all tracks in percent (0-1)</param>
@@ -459,7 +458,7 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// Changes the given tracks to be played solo or not. 
+        /// Changes the given tracks to be played solo or not.
         /// </summary>
         /// <param name="tracks">The list of tracks to play solo or not.</param>
         /// <param name="solo">If set to true, the tracks will be added to the solo list. If false, they are removed.</param>
@@ -481,7 +480,7 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// Changes the given tracks to be muted or not. 
+        /// Changes the given tracks to be muted or not.
         /// </summary>
         /// <param name="tracks">The list of track to mute or unmute.</param>
         /// <param name="mute">If set to true, the tracks will be muted. If false they are unmuted.</param>
@@ -500,7 +499,7 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// Starts the playback of the current song. 
+        /// Starts the playback of the current song.
         /// </summary>
         public void Play()
         {
@@ -526,7 +525,7 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// Toggles between play/pause depending on the current player state. 
+        /// Toggles between play/pause depending on the current player state.
         /// </summary>
         public void PlayPause()
         {
@@ -719,7 +718,7 @@ namespace AlphaTab
                     if (nextBeat != null)
                     {
                         // if we are moving within the same bar or to the next bar
-                        // transition to the next beat, otherwise transition to the end of the bar. 
+                        // transition to the next beat, otherwise transition to the end of the bar.
                         if (nextBeat.Voice.Bar.Index == beat.Voice.Bar.Index ||
                             nextBeat.Voice.Bar.Index == beat.Voice.Bar.Index + 1)
                         {
@@ -812,7 +811,7 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// This event is fired whenever a new beat is played. 
+        /// This event is fired whenever a new beat is played.
         /// </summary>
         public event Action<Beat> PlayedBeatChanged;
 
@@ -906,7 +905,7 @@ namespace AlphaTab
                     CursorUpdateBeat(_selectionStart.Beat, null, 0, false);
                     Player.TickPosition = realMasterBarStart + _selectionStart.Beat.PlaybackStart;
 
-                    // set playback range 
+                    // set playback range
                     if (_selectionEnd != null && _selectionStart.Beat != _selectionEnd.Beat)
                     {
                         var realMasterBarEnd = tickCache.GetMasterBarStart(_selectionEnd.Beat.Voice.Bar.MasterBar);
@@ -984,7 +983,7 @@ namespace AlphaTab
             if (startBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds !=
                 endBeat.Bounds.BarBounds.MasterBarBounds.StaveGroupBounds)
             {
-                // from the startbeat to the end of the staff, 
+                // from the startbeat to the end of the staff,
                 // then fill all staffs until the end-beat staff
                 // then from staff-start to the end beat (or to end of bar if it's the last beat)
 
@@ -1037,7 +1036,7 @@ namespace AlphaTab
         #region Events
 
         /// <summary>
-        /// This event is fired whenever a new song is loaded. 
+        /// This event is fired whenever a new song is loaded.
         /// </summary>
         public event Action<Score> Loaded;
 
@@ -1069,7 +1068,7 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// This event is fired when the rendering of the whole music sheet is finished. 
+        /// This event is fired when the rendering of the whole music sheet is finished.
         /// </summary>
         public event Action<RenderFinishedEventArgs> RenderFinished;
 
@@ -1085,7 +1084,7 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// This event is fired when the rendering of the whole music sheet is finished, and all handlers of <see cref="RenderFinished"/> ran. 
+        /// This event is fired when the rendering of the whole music sheet is finished, and all handlers of <see cref="RenderFinished"/> ran.
         /// </summary>
         public event Action PostRenderFinished;
 
@@ -1100,9 +1099,21 @@ namespace AlphaTab
             UiFacade.TriggerEvent(Container, "postRendered");
         }
 
+        /// <summary>
+        /// This event is fired when an error within alphatab occurred.
+        /// </summary>
+        public event Action<string, Exception> Error;
+
         internal void OnError(string type, Exception details)
         {
             Logger.Error(type, "An unexpected error occurred", details);
+
+            var handler = Error;
+            if (handler != null)
+            {
+                handler(type, details);
+            }
+
             UiFacade.TriggerEvent(Container,
                 "error",
                 new

@@ -123,6 +123,24 @@ namespace AlphaTab.Platform.JavaScript
             return context.Renderer;
         }
 
+        [Name("settings")]
+        public Settings Settings(JQuery element, AlphaTabApi context, object settings)
+        {
+            if (settings.IsTruthy())
+            {
+                if(settings is Settings)
+                {
+                    context.Settings = (Settings)settings;
+                }
+                else
+                {
+                    context.Settings = AlphaTab.Settings.FromJson(settings, null);
+                }
+                context.UpdateSettings();
+            }
+            return context.Settings;
+        }
+
         [Name("layout")]
         public LayoutSettings Layout(JQuery element, AlphaTabApi context, object layout)
         {
@@ -146,23 +164,6 @@ namespace AlphaTab.Platform.JavaScript
         public IAlphaSynth Player(JQuery element, AlphaTabApi context)
         {
             return context.Player;
-        }
-
-        [Name("playerOptions")]
-        public Settings PlayerOptions(JQuery element, AlphaTabApi context, object options)
-        {
-            if (options.IsTruthy())
-            {
-                Settings.FillPlayerOptions(context.Settings, options, false);
-            }
-
-            return context.Settings;
-        }
-
-        [Name("cursorOptions")]
-        public Settings CursorOptions(JQuery element, AlphaTabApi context, object options)
-        {
-            return PlayerOptions(element, context, options);
         }
 
         [Name("playerState")]
@@ -282,10 +283,10 @@ namespace AlphaTab.Platform.JavaScript
 
             if (autoScroll.IsTruthy())
             {
-                context.Settings.ScrollMode = Settings.DecodeScrollMode(autoScroll);
+                context.Settings.ScrollMode = AlphaTab.Settings.DecodeScrollMode(autoScroll);
             }
 
-            return Settings.EncodeScrollMode(context.Settings.ScrollMode);
+            return AlphaTab.Settings.EncodeScrollMode(context.Settings.ScrollMode);
         }
 
         [Name("play")]

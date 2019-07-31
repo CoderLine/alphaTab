@@ -2,7 +2,7 @@
 
 pushd %~dp0
 
-SET WYAM=%USERPROFILE%\.nuget\packages\wyam\2.1.1\tools\netcoreapp2.1\Wyam.dll
+SET WYAM=%USERPROFILE%\.nuget\packages\wyam\2.2.5\tools\netcoreapp2.1\Wyam.dll
 SET GitBranch=%APPVEYOR_REPO_BRANCH%
 git rev-parse HEAD > head.txt
 set /p GitRevision=<head.txt

@@ -1,0 +1,62 @@
+Title: Properties
+Description: This section contains a list of all properties that allow configuration of the alphaTab behavior.
+Order: 1
+---
+
+<p>@Html.Raw(Model.String(DocsKeys.Description))</p>
+
+The following table contains all the properties as they can be set on the general settings object.
+
+<table class="table table-striped table-condensed reference-table">
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Summary</th>
+        </tr>
+    </thead>
+    
+    <tbody>    
+        @{
+            IEnumerable<IDocument> propertyPages = Model.DocumentList(Keys.Children);
+            IList<IGrouping<string, IDocument>> propertyPagesGroups = propertyPages
+                        .GroupBy(x => x.String(DocsKeys.Category))
+                        .OrderBy(x => x.Key)
+                        .ToList();
+            foreach(IGrouping<string, IDocument> categoryGroup in propertyPagesGroups)
+            {
+                <tr>
+                    <th colspan="4">@categoryGroup.Key</th>
+                </tr>
+                
+                @foreach(IDocument child in categoryGroup
+                                            .OrderBy(x => x.Get<int>(DocsKeys.Order, 1000))
+                                            .ThenBy(x => x.WithoutSettings.String(Keys.Title)))
+                {
+                    object[] childTreePath = child.Get<object[]>(Keys.TreePath);
+                    string url = child.Get<bool>("Todo", false) ? "#todo" : Context.GetLink(child);
+                    <tr>
+                        <td>
+                            <a href="@url">
+                                <code>
+                                    @Html.Raw(child.WithoutSettings.String(Keys.Title, childTreePath.Last().ToString()))
+                                    <span class="code-badge">.net</span>
+                                </code>
+                                <br />
+                                <code>
+                                    @Html.Raw(child.String("JsName"))
+                                    <span class="code-badge">JSON</span>
+                                </code>
+                                <br />
+                                <code>
+                                    @Html.Raw(child.String("DataAttribute"))
+                                    <span class="code-badge">Data Attribute</span>
+                                </code>
+                            </a>
+                        </td>
+                        <td>@(child.String(DocsKeys.Description))</td>
+                    </tr>
+                }
+            }
+        }
+    </tbody>
+</table>
