@@ -655,7 +655,7 @@ namespace AlphaTab
             }
             else if (dataAttributes != null)
             {
-                foreach (var key in dataAttributeds)
+                foreach (var key in dataAttributes)
                 {
                     if (key.StartsWith("importer"))
                     {
