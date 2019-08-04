@@ -114,22 +114,38 @@ namespace AlphaTab
                     })
             };
 
+            var tabEffectInfos = new IEffectBarRendererInfo[]
+            {
+                new TempoEffectInfo(),
+                new TripletFeelEffectInfo(),
+                new MarkerEffectInfo(),
+                new TextEffectInfo(),
+                new ChordsEffectInfo(),
+                new FermataEffectInfo(),
+                new TrillEffectInfo(),
+                new WideBeatVibratoEffectInfo(),
+                new SlightBeatVibratoEffectInfo(),
+                new WideNoteVibratoEffectInfo(),
+                new SlightNoteVibratoEffectInfo(),
+                new TapEffectInfo(),
+                new FadeInEffectInfo(),
+                new HarmonicsEffectInfo(HarmonicType.Artificial),
+                new HarmonicsEffectInfo(HarmonicType.Pinch),
+                new HarmonicsEffectInfo(HarmonicType.Tap),
+                new HarmonicsEffectInfo(HarmonicType.Semi),
+                new HarmonicsEffectInfo(HarmonicType.Feedback),
+                new LetRingEffectInfo(),
+                new CapoEffectInfo(),
+                new FingeringEffectInfo(),
+                new PalmMuteEffectInfo(),
+                new PickStrokeEffectInfo(),
+                new PickSlideEffectInfo(),
+                new AlternateEndingsEffectInfo()
+            };
+
             StaveProfiles[StaveProfileTab] = new BarRendererFactory[]
             {
-                new EffectBarRendererFactory("tab-effects",
-                    new IEffectBarRendererInfo[]
-                    {
-                        new TempoEffectInfo(), new TripletFeelEffectInfo(), new MarkerEffectInfo(),
-                        new TextEffectInfo(), new ChordsEffectInfo(), new FermataEffectInfo(), new TrillEffectInfo(),
-                        new WideBeatVibratoEffectInfo(), new SlightBeatVibratoEffectInfo(),
-                        new WideNoteVibratoEffectInfo(), new SlightNoteVibratoEffectInfo(), new TapEffectInfo(),
-                        new FadeInEffectInfo(), new HarmonicsEffectInfo(HarmonicType.Artificial),
-                        new HarmonicsEffectInfo(HarmonicType.Pinch), new HarmonicsEffectInfo(HarmonicType.Tap),
-                        new HarmonicsEffectInfo(HarmonicType.Semi), new HarmonicsEffectInfo(HarmonicType.Feedback),
-                        new LetRingEffectInfo(), new CapoEffectInfo(), new FingeringEffectInfo(),
-                        new PalmMuteEffectInfo(), new PickStrokeEffectInfo(), new PickSlideEffectInfo(),
-                        new AlternateEndingsEffectInfo()
-                    }),
+                new EffectBarRendererFactory("tab-effects", tabEffectInfos),
                 new TabBarRendererFactory(true, true, true), new EffectBarRendererFactory("tab-bottom-effects",
                     new IEffectBarRendererInfo[]
                     {
@@ -139,19 +155,7 @@ namespace AlphaTab
 
             StaveProfiles[StaveProfileTabMixed] = new BarRendererFactory[]
             {
-                new EffectBarRendererFactory("tab-effects",
-                    new IEffectBarRendererInfo[]
-                    {
-                        new TempoEffectInfo(), new TripletFeelEffectInfo(), new MarkerEffectInfo(),
-                        new TextEffectInfo(), new ChordsEffectInfo(), new TripletFeelEffectInfo(),
-                        new TrillEffectInfo(), new WideBeatVibratoEffectInfo(), new SlightBeatVibratoEffectInfo(),
-                        new WideNoteVibratoEffectInfo(), new SlightNoteVibratoEffectInfo(), new TapEffectInfo(),
-                        new FadeInEffectInfo(), new HarmonicsEffectInfo(HarmonicType.Artificial),
-                        new HarmonicsEffectInfo(HarmonicType.Pinch), new HarmonicsEffectInfo(HarmonicType.Tap),
-                        new HarmonicsEffectInfo(HarmonicType.Semi), new HarmonicsEffectInfo(HarmonicType.Feedback),
-                        new LetRingEffectInfo(), new CapoEffectInfo(), new PalmMuteEffectInfo(),
-                        new PickStrokeEffectInfo(), new PickSlideEffectInfo(), new AlternateEndingsEffectInfo()
-                    }),
+                new EffectBarRendererFactory("tab-effects",tabEffectInfos),
                 new TabBarRendererFactory(false, false, false), new EffectBarRendererFactory("tab-bottom-effects",
                     new IEffectBarRendererInfo[]
                     {
