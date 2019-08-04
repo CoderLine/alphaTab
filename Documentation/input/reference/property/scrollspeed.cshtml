@@ -4,6 +4,64 @@ DataAttribute: data-scroll-speed
 Category: Player
 Description: Gets or sets how fast the scrolling to the new position should happen.
 ShowInSideBar: false
-Todo: true
 ---
-TODO
+
+<h2>Description</h2>
+<p>
+    If possible from the platform, alphaTab will try to do a smooth scrolling to the played bar. This setting defines the speed of scrolling in milliseconds. 
+</p>
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Values</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td><code>int <span class="code-badge">all</span></td>
+            <td>
+                <code>200</code><br />
+                <code>300</code><br />
+                <code>100</code>
+            </td>
+        </tr>   
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+<code>300</code>
+
+<h2>Example - C#</h2>
+
+<pre>
+<code class="language-csharp line-numbers">
+var settings = Settings.Defaults;
+settings.ScrollSpeed = 100;
+</code>
+</pre>
+
+
+<h2>Example - JavaScript</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+var settings = {
+    scrollSpeed: 120
+};
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'), settings);
+var japi = $('#alphaTab').alphaTab(settings);
+</code>
+</pre>
+
+<h2>Example - HTML</h2>
+
+<pre>
+<code class="language-html line-numbers">
+&lt;div id="alphaTab" data-scroll-speed="100"&gt;&lt;/div&gt;
+</code>
+</pre>
