@@ -50,7 +50,8 @@ namespace AlphaTab.Rendering.Glyphs
                     _noteString = "<" + _noteString + ">";
                 }
             }
-            else if ((n.BendType == BendType.Bend || n.BendType == BendType.BendRelease) && Renderer.Settings.ShowTabNoteOnTiedBend)
+            else if (n.Beat.Index == 0 ||
+                     ((n.BendType == BendType.Bend || n.BendType == BendType.BendRelease) && Renderer.Settings.ShowTabNoteOnTiedBend))
             {
                 _noteString = "(" + (n.TieOrigin.Fret - n.Beat.Voice.Bar.Staff.TranspositionPitch) + ")";
             }
