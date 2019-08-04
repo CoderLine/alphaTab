@@ -33,8 +33,21 @@ The following table contains all the properties as they can be set on the genera
                                             .ThenBy(x => x.WithoutSettings.String(Keys.Title)))
                 {
                     object[] childTreePath = child.Get<object[]>(Keys.TreePath);
-                    string url = child.Get<bool>("Todo", false) ? "#todo" : Context.GetLink(child);
+                    string url;
+                    if(child.Get<bool>("Todo", false))
+                    {
+                        url = "#todo";
+                    }
+                    else if((url = child.Get<string>("Link", null)) != null)
+                    {
+                        url = Context.GetLink(url);
+                    }
+                    else
+                    {
+                        url = Context.GetLink(child);
+                    }
                     <tr>
+                    
                         <td>
                             <a href="@url">
                                 <code>
