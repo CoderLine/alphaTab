@@ -4,6 +4,62 @@ DataAttribute: data-include-note-bounds
 Category: Core
 Description: Gets or sets whether in the BoundsLookup also the position and area of each individual note is provided.
 ShowInSideBar: false
-Todo: true
 ---
-TODO
+
+<h2>Description</h2>
+<p>
+    AlphaTab collects the position of the rendered music notation elements during the rendering process. This way some level of interactivity can be provided like the feature that seeks to the corresponding position when clicking on a beat. 
+    By default the position of the individual notes is not collected due to performance reasons. If access to note position information is needed, this setting can enable it. 
+</p>
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <tbody>    
+        <tr>
+            <td><code>bool</td>
+        </tr>   
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+<code>false<code>
+
+<h2>Example - C#</h2>
+
+<pre>
+<code class="language-csharp line-numbers">
+var settings = Settings.Defaults; 
+settings.IncludeNoteBounds = true;
+</code>
+</pre>
+
+
+<h2>Example - JavaScript</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+var settings = {
+    includeNoteBounds: 'true'
+};
+var api = null;
+document.querySelector('#alphaTab').addEventListener('alphaTab.rendered', function() {
+    var lookup = api.Renderer.BoundsLookup;
+    var x = 100;
+    var y = 100;
+    var beat = lookup.GetBeatAtPos(x, y);
+    var note = lookup.GetNoteAtPos(beat, x, y); 
+});
+api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'), settings);
+var japi = $('#alphaTab').alphaTab(settings);
+</code>
+</pre>
+
+<h2>Example - HTML</h2>
+
+<pre>
+<code class="language-html line-numbers">
+&lt;div id="alphaTab" data-include-note-bounds="true"&gt;&lt;/div&gt;
+</code>
+</pre>

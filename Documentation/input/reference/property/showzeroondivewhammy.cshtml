@@ -4,6 +4,68 @@ DataAttribute: data-show-zero-on-dive-whammy
 Category: Core
 Description: If set to true, 0 is shown on dive whammy bars.
 ShowInSideBar: false
-Todo: true
 ---
-TODO
+
+<h2>Description</h2>
+<p>
+    By default there are no 0 values shown on dive whammy bar effects. If this setting is set to true, they are shown. 
+</p>
+
+<table class="table table-striped table-condensed">
+    <thead>
+        <tr>
+            <th>Enabled</th>
+            <th>Disabled</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td><img src="@Context.GetLink("/reference/property/showzeroondivewhammy-enabled.png")" alt="Enabled" /></td>
+            <td><img src="@Context.GetLink("/reference/property/showzeroondivewhammy-disabled.png")" alt="Disabled" /></td>
+        </tr>   
+    </tbody>
+</table>
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <tbody>    
+        <tr>
+            <td><code>bool</td>
+        </tr>   
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+<code>false<code>
+
+<h2>Example - C#</h2>
+
+<pre>
+<code class="language-csharp line-numbers">
+var settings = Settings.Defaults; 
+settings.ShowZeroOnDiveWhammy = true;
+</code>
+</pre>
+
+
+<h2>Example - JavaScript</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+var settings = {
+    showZeroOnDiveWhammy: 'true'
+};
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'), settings);
+var japi = $('#alphaTab').alphaTab(settings);
+</code>
+</pre>
+
+<h2>Example - HTML</h2>
+
+<pre>
+<code class="language-html line-numbers">
+&lt;div id="alphaTab" data-show-zero-on-dive-whammy="true"&gt;&lt;/div&gt;
+</code>
+</pre>
