@@ -4,6 +4,67 @@ DataAttribute: data-layout
 Category: Layout
 Description: The layouting mode used to arrange the the notation.
 ShowInSideBar: false
-Todo: true
 ---
-TODO
+
+<h2>Description</h2>
+<p>
+    AlphaTab has various layout engines that arrange the rendered bars differently. This setting controls which layout mode is used. 
+</p>
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Values</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td><code>string <span class="code-badge">all</span></td>
+            <td>
+                <code>page</code> - The bars are aligned in a <a href="@Context.GetLink("/features/layouts")#page-layout">page-style fashion</a><br />
+                <code>horizontal</code> - The bars are aligned in a <a href="@Context.GetLink("features/layouts")#horizontal-layout">left-to-right fashion.</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+<code>page</code>
+
+<h2>Example - C#</h2>
+
+<pre>
+<code class="language-csharp line-numbers">
+var settings = Settings.Defaults; 
+settings.Layout.Mode = "horizontal";
+</code>
+</pre>
+
+
+<h2>Example - JavaScript</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+var settings = {
+    layout: {
+        mode: 'horizontal'
+    }
+    // or shorthand if no additional settings are needed: 
+    layout: 'horizontal'
+};
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'), settings);
+var japi = $('#alphaTab').alphaTab(settings);
+</code>
+</pre>
+
+<h2>Example - HTML</h2>
+
+<pre>
+<code class="language-html line-numbers">
+&lt;div id="alphaTab" data-layout="horizontal"&gt;&lt;/div&gt;
+</code>
+</pre>
