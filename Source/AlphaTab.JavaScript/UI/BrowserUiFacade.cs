@@ -439,7 +439,7 @@ namespace AlphaTab.UI
                             canvasElement.RemoveChild(canvasElement.LastChild);
                         }
                     }
-                    // NOTE: here we try to replace existing children 
+                    // NOTE: here we try to replace existing children
                     else
                     {
                         var body = renderResult.RenderResult;
@@ -460,7 +460,7 @@ namespace AlphaTab.UI
                             placeholder.Style.Height = renderResult.Height + "px";
                             placeholder.Style.Display = "inline-block";
 
-                            if (IsElementInViewPort(placeholder) || _api.Settings.DisableLazyLoading)
+                            if (IsElementInViewPort(placeholder) || !_api.Settings.EnableLazyLoading)
                             {
                                 var bodyHtml = (string)body;
                                 placeholder.OuterHTML = bodyHtml;
@@ -492,16 +492,16 @@ namespace AlphaTab.UI
 
         /// <summary>
         /// This method creates the player. It detects browser compatibility and
-        /// initializes a alphaSynth version for the client. 
-        /// 
+        /// initializes a alphaSynth version for the client.
+        ///
         /// Compatibility:
         ///   If a browser supports WebWorkers, we will use WebWorkers for Synthesizing the samples and a Flash player for playback
-        /// 
+        ///
         /// - IE6-9   - Unsupported
         /// - IE10-11 - Flash is used for playback, Synthesizing is done in a WebWorker
-        /// - Firefox - Web Audio API is used for playback, Synthesizing is done in a WebWorker 
-        /// - Chrome  - Web Audio API is used for playback, Synthesizing is done in a WebWorker 
-        /// - Safari  - Web Audio API is used for playback, Synthesizing is done in a WebWorker 
+        /// - Firefox - Web Audio API is used for playback, Synthesizing is done in a WebWorker
+        /// - Chrome  - Web Audio API is used for playback, Synthesizing is done in a WebWorker
+        /// - Safari  - Web Audio API is used for playback, Synthesizing is done in a WebWorker
         /// - Opera   - Web Audio API is used for playback, Synthesizing is done in a WebWorker
         /// </summary>
         public IAlphaSynth CreateWorkerPlayer()
@@ -583,7 +583,7 @@ namespace AlphaTab.UI
             var beatCursor = Browser.Document.CreateElement("div");
             beatCursor.ClassList.Add("beatCursor");
 
-            // required css styles 
+            // required css styles
             element.Style.Position = "relative";
             element.Style.TextAlign = "left";
 

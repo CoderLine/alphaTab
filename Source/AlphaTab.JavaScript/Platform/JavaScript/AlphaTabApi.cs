@@ -78,7 +78,7 @@ namespace AlphaTab.Platform.JavaScript
             settings.FontDirectory = Settings.FontDirectory;
             settings.Scale = 0.8f;
             settings.StretchForce = 0.8f;
-            settings.DisableLazyLoading = true;
+            settings.EnableLazyLoading = false;
             settings.UseWorkers = false;
 
             var alphaTab = new AlphaTabApi(a4, settings);
