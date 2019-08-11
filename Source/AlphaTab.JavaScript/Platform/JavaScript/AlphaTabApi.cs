@@ -99,23 +99,6 @@ namespace AlphaTab.Platform.JavaScript
             base.UpdateLayout(layoutSettings);
         }
 
-        public void LoadSoundFont(object value)
-        {
-            if (Player == null)
-            {
-                return;
-            }
-
-            if (Platform.TypeOf(value) == "string")
-            {
-                ((AlphaSynthWebWorkerApi)Player).LoadSoundFontFromUrl((string)value);
-            }
-            else
-            {
-                Player.LoadSoundFont((byte[])value);
-            }
-        }
-
         public void DownloadMidi()
         {
             var midiFile = new MidiFile();
