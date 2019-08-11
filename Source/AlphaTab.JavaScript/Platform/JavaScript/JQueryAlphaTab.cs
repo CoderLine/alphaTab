@@ -291,9 +291,9 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         [Name("play")]
-        public void Play(JQuery element, AlphaTabApi context)
+        public bool Play(JQuery element, AlphaTabApi context)
         {
-            context.Play();
+            return context.Play();
         }
 
         [Name("pause")]

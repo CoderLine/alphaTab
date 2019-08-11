@@ -542,14 +542,15 @@ namespace AlphaTab
         /// <summary>
         /// Starts the playback of the current song.
         /// </summary>
-        public void Play()
+        /// <returns>true if the playback was started, otherwise false. Reasons for not starting can be that the player is not ready or already playing.</returns>
+        public bool Play()
         {
             if (Player == null)
             {
-                return;
+                return false;
             }
 
-            Player.Play();
+            return Player.Play();
         }
 
         /// <summary>
