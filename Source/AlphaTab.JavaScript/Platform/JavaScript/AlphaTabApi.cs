@@ -150,13 +150,13 @@ namespace AlphaTab.Platform.JavaScript
         public override void ChangeTrackSolo(Track[] tracks, bool solo)
         {
             var trackList = TrackIndexesToTracks(((BrowserUiFacade)UiFacade).ParseTracks(tracks));
-            ChangeTrackSolo(trackList, solo);
+            base.ChangeTrackSolo(trackList, solo);
         }
 
         public override void ChangeTrackVolume(Track[] tracks, float volume)
         {
             var trackList = TrackIndexesToTracks(((BrowserUiFacade)UiFacade).ParseTracks(tracks));
-            ChangeTrackVolume(trackList, volume);
+            base.ChangeTrackVolume(trackList, volume);
         }
     }
 }

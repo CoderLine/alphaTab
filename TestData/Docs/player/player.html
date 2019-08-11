@@ -125,9 +125,9 @@
                 </ul>
             </li>            
             <!-- Buttons for changing the layout -->
-            <li class="active"><a href="#" id="page" data-layout="page" data-scrollmode="vertical">Page</a></li>
-            <li><a href="#" id="horizontalBarwise" data-layout="horizontal" data-scrollmode="horizontal-bar">Horizontal (Barwise)</a></li>
-            <li><a href="#" id="horizontalOffscreen" data-layout="horizontal" data-scrollmode="horizontal-offscreen">Horizontal (Offscreen)</a></li>
+            <li class="active"><a href="#" id="page" data-layout="page" data-scrollmode="1">Page</a></li>
+            <li><a href="#" id="horizontalBarwise" data-layout="horizontal" data-scrollmode="1">Horizontal (Barwise)</a></li>
+            <li><a href="#" id="horizontalOffscreen" data-layout="horizontal" data-scrollmode="2">Horizontal (Offscreen)</a></li>
           </ul>
         </div>
       </div>
@@ -245,10 +245,15 @@
             at.addClass(layout);
             
             // update renderer
-            at.alphaTab('layout', layout);
+            var settings = at.alphaTab('settings');
+            
+            settings.layout.mode = layout;
+            settings.scrollMode = scrollmode;
+            at.alphaTab('updateSettings');
+            at.alphaTab('updateSettings');
+            at.alphaTab('render');
             
             // update player
-            at.alphaTab('autoScroll', scrollmode);
             $('body,html').animate({
                 scrollTop: 0 
             }, 300);
