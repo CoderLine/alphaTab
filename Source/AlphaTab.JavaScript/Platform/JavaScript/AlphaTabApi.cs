@@ -1,5 +1,6 @@
 ﻿using System;
 using AlphaTab.Audio.Generator;
+using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
@@ -7,6 +8,7 @@ using AlphaTab.Importer;
 using AlphaTab.Model;
 using AlphaTab.UI;
 using Haxe.Js.Html;
+using Phase;
 
 namespace AlphaTab.Platform.JavaScript
 {
@@ -15,6 +17,14 @@ namespace AlphaTab.Platform.JavaScript
         public AlphaTabApi(Element element, object options)
             : base(new BrowserUiFacade(element), options)
         {
+        }
+
+        public override PlayerState PlayerState
+        {
+            get
+            {
+                return Script.Write<PlayerState>("untyped __js__(\"{{0}}\", (cast Player.State, Int))");
+            }
         }
 
         public override void Tex(string tex, int[] tracks = null)

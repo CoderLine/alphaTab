@@ -205,6 +205,72 @@ namespace AlphaTab.Platform.JavaScript
             return context.Player;
         }
 
+        [Name("playerState")]
+        public PlayerState PlayerState(JQuery element, AlphaTabApi context)
+        {
+            return context.PlayerState;
+        }
+
+        [Name("masterVolume")]
+        public float MasterVolume(JQuery element, AlphaTabApi context, float masterVolume)
+        {
+            if (Platform.TypeOf(masterVolume) == "number")
+            {
+                context.MasterVolume = masterVolume;
+            }
+            return context.MasterVolume;
+        }
+
+        [Name("metronomeVolume")]
+        public float MetronomeVolume(JQuery element, AlphaTabApi context, float metronomeVolume)
+        {
+            if (Platform.TypeOf(metronomeVolume) == "number")
+            {
+                context.MetronomeVolume = metronomeVolume;
+            }
+            return context.MetronomeVolume;
+        }
+
+        [Name("playbackSpeed")]
+        public double PlaybackSpeed(JQuery element, AlphaTabApi context, double playbackSpeed)
+        {
+            if (Platform.TypeOf(playbackSpeed) == "number")
+            {
+                context.PlaybackSpeed = playbackSpeed;
+            }
+            return context.PlaybackSpeed;
+        }
+
+        [Name("tickPosition")]
+        public int TickPosition(JQuery element, AlphaTabApi context, int tickPosition)
+        {
+            if (Platform.TypeOf(tickPosition) == "number")
+            {
+                context.TickPosition = tickPosition;
+            }
+            return context.TickPosition;
+        }
+
+        [Name("timePosition")]
+        public double TimePosition(JQuery element, AlphaTabApi context, double timePosition)
+        {
+            if (Platform.TypeOf(timePosition) == "number")
+            {
+                context.TimePosition = timePosition;
+            }
+            return context.TimePosition;
+        }
+
+        [Name("loop")]
+        public bool Loop(JQuery element, AlphaTabApi context, bool loop)
+        {
+            if (Platform.TypeOf(loop) == "boolean")
+            {
+                context.IsLooping = loop;
+            }
+            return context.IsLooping;
+        }
+
         [Name("renderer")]
         public IScoreRenderer Renderer(JQuery element, AlphaTabApi context)
         {

@@ -1,34 +1,37 @@
-Title: Player
-JsName: player
-jQueryName: alphaTab('player')
+Title: IsLooping
+JsName: get_IsLooping;set_IsLooping
+jQueryName: alphaTab('looping')
 Category: Properties - Player
-Description: The alphaSynth player used for playback. This is the low-level API to the Midi synthesizer used for playback.
+Description: Whether the playback should automatically restart after it finished
 ShowInSideBar: false
 ---
 
 <h2>Description</h2>
 <p>
-    Gets access to the underling <code>AlphaTab.Audio.Synth.IAlphaSynth</code> that is used for the audio playback. 
+    This setting controls whether the playback should automatically restart after it finished to create a playback loop.
 </p>
+
 
 <h2>Types</h2>
 
 <table class="table table-striped table-condensed type-table">
     <tbody>    
         <tr>
-            <td><code>AlphaTab.Audio.Synth.IAlphaSynth <span class="code-badge">all</span></code></td>
+            <td><code>bool <span class="code-badge">all</span></code></td>
         </tr>  
     </tbody>
 </table>
 
+<h2>Default Value</h2>
 
+<code>false<code>
 
 <h2>Example - C#</h2>
 
 <pre>
 <code class="language-csharp line-numbers">
 var api = new AlphaTabApi<MyControl>(...);
-SetupPlayerEvents(api.Player);
+api.IsLooping = true;
 </code>
 </pre>
 
@@ -38,14 +41,15 @@ SetupPlayerEvents(api.Player);
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-setupPlayerEvents(api.settings);
+api.set_IsLooping(true);
 </code>
 </pre>
+
 
 <h2>Example - jQuery</h2>
 
 <pre>
 <code class="language-javascript line-numbers">
-setupPlayerEvents($('#alphaTab').alphaTab('player'));
+$('#alphaTab').alphaTab('looping', true)
 </code>
 </pre>

@@ -406,6 +406,176 @@ namespace AlphaTab
         /// </summary>
         public IAlphaSynth Player { get; private set; }
 
+        /// <summary>
+        /// Gets the current player state.
+        /// </summary>
+        public virtual PlayerState PlayerState
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return PlayerState.Paused;
+                }
+                return Player.State;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the current master volume as percentage. (range: 0.0-3.0, default 1.0)
+        /// </summary>
+        public float MasterVolume
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return 0;
+                }
+                return Player.MasterVolume;
+            }
+            set
+            {
+                if (Player != null)
+                {
+                    Player.MasterVolume = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the metronome volume as percentage. (range: 0.0-3.0, default 0.0)
+        /// </summary>
+        public float MetronomeVolume
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return 0;
+                }
+                return Player.MetronomeVolume;
+            }
+            set
+            {
+                if (Player != null)
+                {
+                    Player.MetronomeVolume = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the position within the song in midi ticks.
+        /// </summary>
+        public int TickPosition
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return 0;
+                }
+                return Player.TickPosition;
+            }
+            set
+            {
+                if (Player != null)
+                {
+                    Player.TickPosition = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the position within the song in milliseconds.
+        /// </summary>
+        public double TimePosition
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return 0;
+                }
+                return Player.TimePosition;
+            }
+            set
+            {
+                if (Player != null)
+                {
+                    Player.TimePosition = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the range of the song that should be played. Set this to null
+        /// to play the whole song.
+        /// </summary>
+        public PlaybackRange PlaybackRange
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return null;
+                }
+                return Player.PlaybackRange;
+            }
+            set
+            {
+                if (Player != null)
+                {
+                    Player.PlaybackRange = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the current playback speed as percentage. (range: 0.125-8.0, default: 1.0)
+        /// </summary>
+        public double PlaybackSpeed
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return 0;
+                }
+                return Player.PlaybackSpeed;
+            }
+            set
+            {
+                if (Player != null)
+                {
+                    Player.PlaybackSpeed = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the playback should automatically restart after it finished.
+        /// </summary>
+        public bool IsLooping
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return false;
+                }
+                return Player.IsLooping;
+            }
+            set
+            {
+                if (Player != null)
+                {
+                    Player.IsLooping = value;
+                }
+            }
+        }
+
         private void SetupPlayer()
         {
             Player = UiFacade.CreateWorkerPlayer();
