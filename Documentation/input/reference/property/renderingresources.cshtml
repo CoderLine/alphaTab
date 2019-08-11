@@ -6,13 +6,55 @@ Description: The rendering resources that allow adjusting the display and
 ShowInSideBar: false
 ---
 
+@functions {
+    IEnumerable<IDocument> GetDocumentsAtPath(string relativePath)
+    {
+        return Documents.Where(d => 
+            string.Join("/", d.Get<object[]>(Keys.TreePath) ?? new object[0])
+            .StartsWith(relativePath)
+        );
+    }
+}
+
 <h2>Description</h2>
 <p>
     AlphaTab allows configuring the colors and fonts used for rendering via the rendering resources settings. Please note that as of today
     this is the primary way of changing the way how alphaTab styles elements. CSS styling in the browser cannot be guaranteed to work due to its flexibility. 
 </p>
-
-
+<p>
+Due to space reasons in the following table the common prefix of the settings are removed. Please refer to these examples to eliminate confusion on the usage: 
+</p>
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Platform</th>
+            <th>Prefix</th>
+            <th>Example Usage</th>
+        </tr>
+    </thead>    
+    <tbody>
+        <tr>
+            <td>.net</td>
+            <td><code>RenderingResources.</code></td>
+            <td><code>settings.RenderingResources.WordsFonts = ...</code></td>
+        </tr>
+        <tr>
+            <td>JavaScript</td>
+            <td><code>resources.</code></td>
+            <td>
+                <code>var settings = { resources: { wordsFonts: '...'} };</code> or<br />
+                <code>settings.resources.wordsFont = '...'</code>
+            </td>
+        </tr>
+        <tr>
+            <td>HTML</td>
+            <td><code>data-resources-</code></td>
+            <td>
+                <code>&lt;div data-resources-words-font="..."&gt</code>
+            </td>
+        </tr>
+    </tbody>
+</table>
 
 <h2>Resources</h2>
 Following resources exist for adjusting the style. 
@@ -26,202 +68,52 @@ Following resources exist for adjusting the style.
             <th>Summary</th>
         </tr>
     </thead>    
-    <tbody>    
-        <tr>
-            <td><code>BarNumberFont</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Font <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>Arial 11px</td>
-            <td>
-                The font to use for displaying the bar numbers above the music sheet. 
-            </td>
-        </tr>   
-        <tr>
-            <td><code>CopyrightFont</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Font <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>Arial 12px bold</td>
-            <td>
-                The font to use for displaying the songs copyright information in the header of the music sheet. 
-            </td>
-        </tr>   
-        <tr>
-            <td><code>TitleFont</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Font <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>Georgia 32px</td>
-            <td>
-                The font to use for displaying the songs title in the header of the music sheet. 
-            </td>
-        </tr>   
-        <tr>
-            <td><code>SubTitleFont</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Font <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>Georgia 20px</td>
-            <td>
-                The font to use for displaying the songs subtitle in the header of the music sheet. 
-            </td>
-        </tr>   
-        <tr>
-            <td><code>WordsFont</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Font <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>Georgia 15px</td>
-            <td>
-                The font to use for displaying the lyrics information in the header of the music sheet. 
-            </td>
-        </tr>   
-        <tr>
-            <td><code>EffectFont</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Font <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>Georgia 12px italic</td>
-            <td>
-                The font to use for displaying certain effect related elements in the music sheet. 
-            </td>
-        </tr>   
-        <tr>
-            <td><code>FretboardNumberFont</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Font <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>Arial 11px</td>
-            <td>
-                The font to use for displaying the fretboard numbers in chord diagrams. 
-            </td>
-        </tr>   
-        <tr>
-            <td><code>TablatureFont</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Font <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>Arial 13px</td>
-            <td>
-                The font to use for displaying the guitar tablature numbers in the music sheet. 
-            </td>
-        </tr>   
-        <tr>
-            <td><code>GraceFont</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Font <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>Arial 11px</td>
-            <td>
-                The font to use for grace notation related texts in the music sheet. 
-            </td>
-        </tr>   
-        <tr>
-            <td><code>FingeringFont</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Font <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>Georgia 14px</td>
-            <td>            
-                The font to use for displaying finger information in the music sheet. 
-            </td>
-        </tr>   
-        <tr>
-            <td><code>MarkerFont</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Font <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>Georgia 14px bold</td>
-            <td>
-                The font to use for section marker labels shown above the music sheet. 
-            </td>
-        </tr>   
-        
-        
-        <tr>
-            <td><code>BarNumberColor</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Color <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-                <code>int <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>rgb(200, 0, 0)</td>
-            <td>
-                The color to use for displaying the bar numbers above the music sheet. 
-            </td>
-        </tr>   
-        <tr>
-            <td><code>BarSeparatorColor</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Color <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-                <code>int <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>rgb(34, 34, 17)</td>
-            <td>
-                The color to use for rendering bar separators, the accolade and repeat signs. 
-            </td>
-        </tr>   
-        <tr>
-            <td><code>StaffLineColor</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Color <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-                <code>int <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>rgb(165, 165, 165)</td>
-            <td>
-                The color to use for rendering the lines of staves. 
-            </td>
-        </tr>   
-        <tr>
-            <td><code>MainGlyphColor</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Color <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-                <code>int <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>rgb(0, 0, 0)</td>
-            <td>
-                The color to use for music notation elements of the primary voice. 
-            </td>
-        </tr>   
-        <tr>
-            <td><code>SecondaryGlyphColor</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Color <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-                <code>int <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>rgba(0,0,0,0.4)</td>
-            <td>
-                The color to use for music notation elements of the secondary voices. 
-            </td>
-        </tr>
-        <tr>
-            <td><code>ScoreInfoColor</td>
-            <td>
-                <code>AlphaTab.Platform.Model.Color <span class="code-badge">.net</span></code><br />
-                <code>string <span class="code-badge">JavaScript &amp; HTML</span></code>
-                <code>int <span class="code-badge">JavaScript &amp; HTML</span></code>
-            </td>
-            <td>rgb(0, 0, 0)</td>
-            <td>
-                The color to use for displaying the song information above the music sheet. 
-            </td>
-        </tr>   
+    <tbody>   
+        @foreach(IDocument child in GetDocumentsAtPath("reference/property/renderingresources-"))
+        {
+            object[] childTreePath = child.Get<object[]>(Keys.TreePath);        
+            string[] jsTypes = child.String("JsType").Split(';');
+            string name = child.WithoutSettings.String(Keys.Title, childTreePath.Last().ToString());
+            string jsName = child.String("JsName");
+            string dataAttribute = child.String("DataAttribute");
+            if(name.StartsWith("RenderingResources")) { name = name.Substring("RenderingResources".Length); }
+            if(jsName.StartsWith("resources")) { jsName = jsName.Substring("resources".Length); }
+            if(dataAttribute.StartsWith("data-resources")) { dataAttribute = dataAttribute.Substring("data-resources".Length); }
+
+            <tr>
+                <td>
+                    <code>
+                        @name
+                        <span class="code-badge">.net</span>
+                    </code>
+                    <br />
+                    <code>
+                        @jsName
+                        <span class="code-badge">JSON</span>
+                    </code>
+                    <br />
+                    <code>
+                        @dataAttribute
+                        <span class="code-badge">HTML</span>
+                    </code>
+                </td>
+                <td>
+                    <code>
+                        @Html.Raw(child.String("Type"))
+                        <span class="code-badge">.net</span>
+                    </code>
+                    @for(int i = 0; i < jsTypes.Length; i++) 
+                    {
+                        <br />
+                        <code>@(jsTypes[i]) <span class="code-badge">JavaScript &amp; HTML</span></code>
+                    }
+                </td>
+                <td>@Html.Raw(child.String("DefaultValue"))</td>
+                <td>
+                    @(child.String(DocsKeys.Description))
+                </td>
+            </tr>
+        }    
     </tbody>
 </table>
 
