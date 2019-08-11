@@ -393,9 +393,9 @@ namespace AlphaTab.UI
                     {
                         value = (int)array[i];
                     }
-                    else if (tracks.HasMember(nameof(Track.Index)))
+                    else if (tracks.HasMember("Index"))
                     {
-                        value = array[i].Member<int>(nameof(Track.Index));
+                        value = array[i].Member<int>("Index");
                     }
                     else
                     {
@@ -410,7 +410,7 @@ namespace AlphaTab.UI
             }
             else if (tracksData.HasMember("Index"))
             {
-                tracks.Add(tracksData.Member<int>(nameof(Track.Index)));
+                tracks.Add(tracksData.Member<int>("Index"));
             }
 
             return tracks.ToArray();

@@ -23,13 +23,15 @@ namespace AlphaTab.Platform.JavaScript
         {
             get
             {
-                return Script.Write<PlayerState>("untyped __js__(\"{{0}}\", (cast Player.State, Int))");
+                var playerStateValue = (int)Player.State;
+                return Script.Write<PlayerState>("untyped __js__(\"{0}\", playerStateValue)");
             }
         }
 
         public override void Tex(string tex, int[] tracks = null)
         {
-            Tex(tex, ((BrowserUiFacade)UiFacade).ParseTracks(tracks));
+            var browser = (BrowserUiFacade)UiFacade;
+            Tex(tex, browser.ParseTracks(tracks));
         }
 
         public void Print(string width)

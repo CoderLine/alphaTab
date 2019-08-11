@@ -116,17 +116,6 @@ namespace AlphaTab.Platform.JavaScript
             context.UpdateSettings();
         }
 
-        [Name("tracks")]
-        public Track[] Tracks(JQuery element, AlphaTabApi context, dynamic tracks)
-        {
-            if (tracks)
-            {
-                ((BrowserUiFacade)context.UiFacade).SetTracks(tracks, true);
-            }
-
-            return context.Tracks;
-        }
-
         [Name("load")]
         public bool Load(JQuery element, AlphaTabApi context, object data)
         {
@@ -283,7 +272,7 @@ namespace AlphaTab.Platform.JavaScript
             return context.Score;
         }
 
-        [Name("score")]
+        [Name("settings")]
         public Settings Settings(JQuery element, AlphaTabApi context)
         {
             return context.Settings;
