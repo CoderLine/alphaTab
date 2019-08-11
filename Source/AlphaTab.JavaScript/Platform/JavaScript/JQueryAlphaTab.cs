@@ -7,6 +7,7 @@ using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
+using AlphaTab.UI;
 using AlphaTab.Util;
 using Phase;
 using Phase.Attributes;
@@ -88,6 +89,8 @@ namespace AlphaTab.Platform.JavaScript
         {
             if (tracks)
             {
+                ((BrowserUiFacade)context.UiFacade).SetTracks(tracks, true);
+
                 context.SetTracks(tracks, true);
             }
 
@@ -95,9 +98,9 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         [Name("load")]
-        public void Load(JQuery element, AlphaTabApi context, object data)
+        public bool Load(JQuery element, AlphaTabApi context, object data)
         {
-            context.Load(data);
+            return context.Load(data);
         }
 
         [Name("api")]

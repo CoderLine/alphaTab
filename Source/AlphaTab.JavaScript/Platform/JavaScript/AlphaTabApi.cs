@@ -90,46 +90,13 @@ namespace AlphaTab.Platform.JavaScript
             alphaTab.RenderTracks(Score, TrackIndexes);
         }
 
-        public void Load(object data)
+        public override void UpdateLayout(LayoutSettings layoutSettings)
         {
-            try
+            if (!(layoutSettings is LayoutSettings))
             {
-                if (Platform.InstanceOf<ArrayBuffer>(data))
-                {
-                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes(Platform.ArrayBufferToByteArray((ArrayBuffer)data),
-                        Settings));
-                }
-                else if (Platform.InstanceOf<Uint8Array>(data))
-                {
-                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes((byte[])data, Settings));
-                }
-                else if (Platform.TypeOf(data) == "string")
-                {
-                    ScoreLoader.LoadScoreAsync((string)data,
-                        s => ScoreLoaded(s),
-                        e =>
-                        {
-                            OnError("import", e);
-                        },
-                        Settings);
-                }
+                layoutSettings = Settings.LayoutFromJson(layoutSettings);
             }
-            catch (Exception e)
-            {
-                OnError("import", e);
-            }
-        }
-
-        public void UpdateLayout(object json)
-        {
-            Settings.Layout = Settings.LayoutFromJson(json);
-            Renderer.UpdateSettings(Settings);
-            Renderer.Invalidate();
-        }
-
-        public void SetTracks(object tracks, bool render)
-        {
-            ((BrowserUiFacade)UiFacade).SetTracks(tracks, render);
+            base.UpdateLayout(layoutSettings);
         }
 
         public void LoadSoundFont(object value)

@@ -39,11 +39,15 @@ The following table contains all the properties as they can be set on the genera
                     <tr>
                         <td>
                             <a href="@url">
-                                <code>@(child.WithoutSettings.String(Keys.Title, childTreePath.Last().ToString())) <span class="code-badge">.net</span></code>
+                                @if(!child.Get<bool>("JavaScriptOnly", false))
+                                {
+                                    <code>@(child.WithoutSettings.String(Keys.Title, childTreePath.Last().ToString())) <span class="code-badge">.net</span></code>
+                                    <br />
+                                }
                                 @for(int i = 0; i < jsNames.Length; i++) 
                                 {
-                                    <br />
                                     <code>@(jsNames[i]) <span class="code-badge">JavaScript</span></code>
+                                    <br />
                                 }       
                             </a>
                         </td>

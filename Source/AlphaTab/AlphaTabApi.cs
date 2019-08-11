@@ -28,7 +28,7 @@ namespace AlphaTab
         /// <summary>
         /// Gets the UI facade to use for interacting with the user interface.
         /// </summary>
-        protected IUiFacade<TSettings> UiFacade { get; }
+        protected internal IUiFacade<TSettings> UiFacade { get; }
 
         /// <summary>
         /// Gets the UI container that holds the whole alphaTab control.
@@ -285,14 +285,14 @@ namespace AlphaTab
         /// <summary>
         /// Tells alphaTab to render the given alphaTex.
         /// </summary>
-        /// <param name="contents">The alphaTex code to render.</param>
+        /// <param name="tex">The alphaTex code to render.</param>
         /// <param name="tracks">If set, the given tracks will be rendered, otherwise the first track only will be rendered.</param>
-        public void Tex(string contents, int[] tracks = null)
+        public void Tex(string tex, int[] tracks = null)
         {
             try
             {
                 var parser = new AlphaTexImporter();
-                var data = ByteBuffer.FromBuffer(Platform.Platform.StringToByteArray(contents));
+                var data = ByteBuffer.FromBuffer(Platform.Platform.StringToByteArray(tex));
                 parser.Init(data, Settings);
                 var score = parser.ReadScore();
                 if (tracks != null)
@@ -309,6 +309,47 @@ namespace AlphaTab
             {
                 OnError("import", e);
             }
+        }
+
+        /// <summary>
+        /// Attempts a load of the score represented by the given data object.
+        /// </summary>
+        /// <param name="data">The data container supported by <see cref="IUiFacade{TSettings}"/></param>
+        /// <returns>true if the data object is supported and a load was initiated, otherwise false</returns>
+        public bool Load(object data)
+        {
+            try
+            {
+                return UiFacade.Load(data,
+                    score =>
+                    {
+                        ScoreLoaded(score);
+                    },
+                    error =>
+                    {
+                        OnError("import", error);
+                    });
+            }
+            catch (Exception e)
+            {
+                OnError("import", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Attempts a load of the score represented by the given data object.
+        /// </summary>
+        /// <param name="data">The data object to decode</param>
+        /// <returns>true if the data object is supported and a load was initiated, otherwise false</returns>
+        public bool LoadSoundFont(object data)
+        {
+            if (Player == null)
+            {
+                return false;
+            }
+
+            return UiFacade.LoadSoundFont(data);
         }
 
         /// <summary>
@@ -935,6 +976,18 @@ namespace AlphaTab
                 }
             };
         }
+
+        /// <summary>
+        /// Updates the layout settings and triggers a re-rendering.
+        /// </summary>
+        /// <param name="layoutSettings">The new layout settings to apply</param>
+        public virtual void UpdateLayout(LayoutSettings layoutSettings)
+        {
+            Settings.Layout = layoutSettings;
+            Renderer.UpdateSettings(Settings);
+            Renderer.Invalidate();
+        }
+
 
         private void CursorSelectRange(SelectionInfo startBeat, SelectionInfo endBeat)
         {

@@ -12,6 +12,7 @@ using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
 using Haxe;
+using Haxe.Js.Html;
 using Phase;
 
 namespace AlphaTab.UI
@@ -186,6 +187,59 @@ namespace AlphaTab.UI
                 var jquery = Browser.Window.Member<dynamic>("jQuery");
                 jquery(element).trigger(name, details);
             }
+        }
+
+        public bool Load(object data, Action<Score> success, Action<Exception> error)
+        {
+            if (data is Score)
+            {
+                success((Score)data);
+                return true;
+            }
+
+            if (Platform.Platform.InstanceOf<ArrayBuffer>(data))
+            {
+                success(ScoreLoader.LoadScoreFromBytes(Platform.Platform.ArrayBufferToByteArray((ArrayBuffer)data),
+                    _api.Settings));
+                return true;
+            }
+
+            if (Platform.Platform.InstanceOf<Uint8Array>(data))
+            {
+                success(ScoreLoader.LoadScoreFromBytes((byte[])data, _api.Settings));
+                return true;
+            }
+
+            if (Platform.Platform.TypeOf(data) == "string")
+            {
+                ScoreLoader.LoadScoreAsync((string)data, success, error, _api.Settings);
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool LoadSoundFont(object data)
+        {
+            if (Platform.Platform.InstanceOf<ArrayBuffer>(data))
+            {
+                _api.Player.LoadSoundFont(new Uint8Array((ArrayBuffer)data).As<byte[]>());
+                return true;
+            }
+
+            if (Platform.Platform.InstanceOf<Uint8Array>(data))
+            {
+                _api.Player.LoadSoundFont(data.As<byte[]>());
+                return true;
+            }
+
+            if (Platform.Platform.TypeOf(data) == "string")
+            {
+                ((AlphaSynthWebWorkerApi)_api.Player).LoadSoundFontFromUrl((string)data);
+                return true;
+            }
+
+            return false;
         }
 
         public void InitialRender()
