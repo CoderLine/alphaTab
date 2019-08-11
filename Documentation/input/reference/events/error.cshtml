@@ -79,6 +79,16 @@ api.add_Error(function(type, details) {
 </code>
 </pre>
 
+<h2>Example - jQuery</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+$('#alphaTab').on('alphaTab.error', function(e, type, details) {
+    displayError(type, details);
+});
+</code>
+</pre>
+
 <h2>Example - HTML</h2>
 
 <pre>

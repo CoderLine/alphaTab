@@ -118,6 +118,18 @@ api.add_Resize(function(args) {
 </code>
 </pre>
 
+<h2>Example - jQuery</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+$('#alphaTab').on('alphaTab.resize', function(e, args) {
+    args.Settings.Scale = args.NewWidth > 1300 
+        ? 1.5f 
+        : (args.NewWidth > 800) ? 1.3f : 1;
+});
+</code>
+</pre>
+
 <h2>Example - HTML</h2>
 
 <pre>
