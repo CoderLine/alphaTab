@@ -91,6 +91,11 @@ namespace AlphaTab.Platform.CSharp.WinForms
             Api.Render();
         }
 
+        protected override void RenderTracks()
+        {
+            SettingsContainer.RenderTracks();
+        }
+
         protected override ISynthOutput CreateSynthOutput()
         {
             return new NAudioSynthOutput();

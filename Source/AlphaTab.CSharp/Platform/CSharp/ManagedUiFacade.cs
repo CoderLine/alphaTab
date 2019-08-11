@@ -44,7 +44,7 @@ namespace AlphaTab.Platform.CSharp
             player.Ready += () =>
             {
                 using (var sf =
-                    typeof(ManagedUiFacade<>).Assembly.GetManifestResourceStream(typeof(GdiCanvas), "default.sf2"))
+                    typeof(ManagedUiFacade<>).Assembly.GetManifestResourceStream(typeof(ManagedUiFacade<>), "default.sf2"))
                 using (var ms = new MemoryStream())
                 {
                     sf.CopyTo(ms);

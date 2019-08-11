@@ -90,8 +90,6 @@ namespace AlphaTab.Platform.JavaScript
             if (tracks)
             {
                 ((BrowserUiFacade)context.UiFacade).SetTracks(tracks, true);
-
-                context.SetTracks(tracks, true);
             }
 
             return context.Tracks;
@@ -149,7 +147,7 @@ namespace AlphaTab.Platform.JavaScript
         {
             if (layout.IsTruthy())
             {
-                context.UpdateLayout(layout);
+                context.UpdateLayout(layout.As<LayoutSettings>());
             }
 
             return context.Settings.Layout;
