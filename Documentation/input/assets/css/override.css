@@ -52,3 +52,44 @@
 .main-header .navbar .navbar-toggle {
     display: none;
 }
+
+
+.content-header {
+    background-color: #f4f4f4;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border-bottom: 2px solid #ddd;
+    margin-left: 12px;
+    margin-right: 12px;
+    
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    -webkit-flex-wrap: nowrap;
+    -ms-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+    -webkit-align-content: stretch;
+    -ms-flex-line-pack: stretch;
+    align-content: stretch;    
+    
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;    
+}
+
+.content-header h1 {
+    -webkit-flex: 1 1 auto;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    
+    background-color: initial;
+    padding: initial;
+    border-radius: initial;
+    border-bottom: initial;
+}
