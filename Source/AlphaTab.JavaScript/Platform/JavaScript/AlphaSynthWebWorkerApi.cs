@@ -257,6 +257,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 cmd = AlphaSynthWebWorker.CmdPlay
             });
+            return true;
         }
 
         /// <inheritdoc />

@@ -36,29 +36,14 @@ namespace AlphaTab
         public IContainer Container { get; }
 
         /// <summary>
-        /// Gets the UI container that will hold all rendered results.
-        /// </summary>
-        public IContainer CanvasElement { get; }
-
-        /// <summary>
         /// Gets the score renderer used for rendering the music sheet. This is the low-level API responsible for the actual rendering chain.
         /// </summary>
         public IScoreRenderer Renderer { get; }
 
         /// <summary>
-        /// Gets a value indicating whether auto-sizing is active and the music sheet will be re-rendered on resize.
-        /// </summary>
-        public bool AutoSize { get; }
-
-        /// <summary>
         /// Gets the score holding all information about the song being rendered.
         /// </summary>
         public Score Score { get; private set; }
-
-        /// <summary>
-        /// Gets the indexes of the tracks that should be rendered of the currently set score.
-        /// </summary>
-        public int[] TrackIndexes { get; private set; }
 
         /// <summary>
         /// Gets the settings that are used for rendering the music notation.
@@ -87,6 +72,21 @@ namespace AlphaTab
         }
 
         /// <summary>
+        /// Gets a value indicating whether auto-sizing is active and the music sheet will be re-rendered on resize.
+        /// </summary>
+        internal bool AutoSize => Settings.Width < 0;
+
+        /// <summary>
+        /// Gets the UI container that will hold all rendered results.
+        /// </summary>
+        internal IContainer CanvasElement { get; }
+
+        /// <summary>
+        /// Gets the indexes of the tracks that should be rendered of the currently set score.
+        /// </summary>
+        internal int[] TrackIndexes { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AlphaTabApi{TSettings}"/> class.
         /// </summary>
         /// <param name="uiFacade">The UI facade to use for interacting with the user interface.</param>
@@ -98,8 +98,6 @@ namespace AlphaTab
 
             uiFacade.Initialize(this, settings);
             Logger.LogLevel = Settings.LogLevel;
-
-            AutoSize = Settings.Width < 0;
 
             CanvasElement = uiFacade.CreateCanvasElement();
             Container.AppendChild(CanvasElement);
