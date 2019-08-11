@@ -352,7 +352,7 @@ namespace AlphaTab.UI
             _api.RenderTracks(score, ParseTracks(tracksData), render);
         }
 
-        public int[] ParseTracks(dynamic tracksData)
+        public int[] ParseTracks(object tracksData)
         {
             var tracks = new FastList<int>();
 
@@ -366,7 +366,7 @@ namespace AlphaTab.UI
                         return null;
                     }
 
-                    tracksData = Json.Parse(tracksData);
+                    tracksData = Json.Parse((string)tracksData);
                 }
                 catch
                 {
@@ -382,23 +382,24 @@ namespace AlphaTab.UI
             {
                 tracks.Add((int)tracksData);
             }
-            else if (tracksData.length)
+            else if (tracksData.HasMember("length"))
             {
-                for (var i = 0; i < tracksData.length; i++)
+                var length = tracks.Member<int>("length");
+                var array = (object[])tracksData;
+                for (var i = 0; i < length; i++)
                 {
                     int value;
-                    if (Platform.Platform.TypeOf(tracksData[i]) == "number")
+                    if (Platform.Platform.TypeOf(array) == "number")
                     {
-                        value = (int)tracksData[i];
+                        value = (int)array[i];
                     }
-                    else if (Platform.Platform.TypeOf(tracksData[i].Index) == "number")
+                    else if (tracks.HasMember(nameof(Track.Index)))
                     {
-                        Track track = tracksData[i];
-                        value = track.Index;
+                        value = array[i].Member<int>(nameof(Track.Index));
                     }
                     else
                     {
-                        value = Platform.Platform.ParseInt(tracksData[i].ToString());
+                        value = Platform.Platform.ParseInt(array[i].ToString());
                     }
 
                     if (value >= 0)
@@ -407,9 +408,9 @@ namespace AlphaTab.UI
                     }
                 }
             }
-            else if (Platform.Platform.TypeOf(tracksData.Index) == "number")
+            else if (tracksData.HasMember("Index"))
             {
-                tracks.Add(tracksData.Index.As<int>());
+                tracks.Add(tracksData.Member<int>(nameof(Track.Index)));
             }
 
             return tracks.ToArray();

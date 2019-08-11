@@ -1,5 +1,6 @@
 Title: Play()
 JsName: play()
+jQueryName: alphaTab('play')
 Category: Methods - Player
 Description: Starts the playback of the current song.
 ShowInSideBar: false
@@ -18,7 +19,10 @@ ShowInSideBar: false
             <td><code>void Play()<span class="code-badge">.net</span></code></td>
         </tr>   
         <tr>
-            <td><code>function play() <span class="code-badge">.JavaScript</span></code></td>
+            <td><code>function play() <span class="code-badge">JavaScript</span></code></td>
+        </tr>   
+        <tr>
+            <td><code>alphaTab('play) <span class="code-badge">jQuery</span></code></td>
         </tr>   
     </tbody>
 </table>
@@ -45,5 +49,14 @@ api.Play();
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
 api.play();
+</code>
+</pre>
+
+
+<h2>Example - jQuery</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+$('#alphaTab').alphaTab('play');
 </code>
 </pre>

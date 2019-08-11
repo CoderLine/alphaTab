@@ -1,5 +1,6 @@
 Title: UpdateLayout()
 JsName: updateLayout()
+jQueryName: alphaTab('updateLayout')
 Category: Methods - Core
 Description: Updates the layout settings and triggers a re-rendering.
 ShowInSideBar: false
@@ -19,7 +20,10 @@ ShowInSideBar: false
             <td><code>bool UpdateLayout(LayoutSettings layoutSettings) <span class="code-badge">.net</span></td>
         </tr>   
         <tr>
-            <td><code>function updateLayout(layoutSettings) <span class="code-badge">.JavaScript</span></td>
+            <td><code>function updateLayout(layoutSettings) <span class="code-badge">JavaScript</span></td>
+        </tr>              
+        <tr>
+            <td><code>alphaTab('updateLayout', layoutSettings) <span class="code-badge">jQuery</span></td>
         </tr>              
     </tbody>
 </table>
@@ -65,6 +69,16 @@ api.UpdateLayout(new LayoutSettings
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
 api.updateLayout({
+    mode: 'horizontal'
+});
+</code>
+</pre>
+
+<h2>Example - jQuery</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+$('#alphaTab').alphaTab('updateLayout', {
     mode: 'horizontal'
 });
 </code>

@@ -1,5 +1,6 @@
 Title: Load()
 JsName: load()
+jQueryName: alphaTab('load')
 Category: Methods - Core
 Description: Initiates a load of the score using the given data.
 ShowInSideBar: false
@@ -24,13 +25,22 @@ ShowInSideBar: false
             <td><code>void Load(Stream[] raw) <span class="code-badge">.net</span></code> - Load the score from the given stream using the available score loaders</td>
         </tr>   
         <tr>
-            <td><code>function load(arraybuffer) <span class="code-badge">.JavaScript</span></code> - Load the score from the given raw bytes using the available score loaders</td>
+            <td><code>function load(arraybuffer) <span class="code-badge">JavaScript</span></code> - Load the score from the given raw bytes using the available score loaders</td>
         </tr>   
         <tr>
-            <td><code>function load(uint8array) <span class="code-badge">.JavaScript</span></code> - Load the score from the given raw bytes using the available score loaders</td>
+            <td><code>function load(uint8array) <span class="code-badge">JavaScript</span></code> - Load the score from the given raw bytes using the available score loaders</td>
         </tr>   
         <tr>
-            <td><code>function load(url) <span class="code-badge">.JavaScript</span></code> - Load the score from the given URL via Ajax using the available score loaders</td>
+            <td><code>function load(url) <span class="code-badge">JavaScript</span></code> - Load the score from the given URL via Ajax using the available score loaders</td>
+        </tr>           
+        <tr>
+            <td><code>alphaTab('load', arraybuffer) <span class="code-badge">jQuery</span></code> - Load the score from the given raw bytes using the available score loaders</td>
+        </tr>   
+        <tr>
+            <td><code>alphaTab('load', uint8array) <span class="code-badge">jQuery</span></code> - Load the score from the given raw bytes using the available score loaders</td>
+        </tr>   
+        <tr>
+            <td><code>alphaTab('load', url) <span class="code-badge">jQuery</span></code> - Load the score from the given URL via Ajax using the available score loaders</td>
         </tr>           
     </tbody>
 </table>
@@ -61,17 +71,17 @@ ShowInSideBar: false
             <td>The stream containing a file supported by the score loaders.</td>
         </tr>   
         <tr>
-            <td><code>arraybuffer <span class="code-badge">.JavaScript</span></td>
+            <td><code>arraybuffer <span class="code-badge">.JavaScript &amp; jQuery</span></td>
             <td><code>ArrayBuffer</code></td>
             <td>The arraybuffer containing the raw bytes of a file supported by the score loaders.</td>
         </tr>   
         <tr>
-            <td><code>uint8array <span class="code-badge">.JavaScript</span></td>
+            <td><code>uint8array <span class="code-badge">.JavaScript &amp; jQuery</span></td>
             <td><code>Uint8Array</code></td>
             <td>The Uint8Array containing the raw bytes of a file supported by the score loaders.</td>
         </tr>   
         <tr>
-            <td><code>url <span class="code-badge">.JavaScript</span></td>
+            <td><code>url <span class="code-badge">.JavaScript &amp; jQuery</span></td>
             <td><code>string</code></td>
             <td>A URL that should be loaded via AJAX and the passed on to the supported score loaders for importing.</td>
         </tr>   
@@ -98,5 +108,13 @@ api.Load(System.IO.File.OpenRead("MyFile.gp"));
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
 api.load('/assets/MyFile.gp');
+</code>
+</pre>
+
+<h2>Example - jQuery</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+$('#alphaTab').alphaTab('load', '/assets/MyFile.gp');
 </code>
 </pre>

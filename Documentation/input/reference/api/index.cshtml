@@ -33,7 +33,8 @@ The following table contains all the properties as they can be set on the genera
                                             .ThenBy(x => x.WithoutSettings.String(Keys.Title)))
                 {
                     object[] childTreePath = child.Get<object[]>(Keys.TreePath);
-                    string[] jsNames = child.String("JsName").Split(';');
+                    string[] jsNames = child.String("JsName").Split(new []{';'}, StringSplitOptions.RemoveEmptyEntries);
+                    string[] jqueryNames = child.String("jQueryName", "").Split(new[]{';'}, StringSplitOptions.RemoveEmptyEntries);
                     string url = child.Get<bool>("Todo", false) ? "#todo" : Context.GetLink(child);
 
                     <tr>
@@ -47,6 +48,11 @@ The following table contains all the properties as they can be set on the genera
                                 @for(int i = 0; i < jsNames.Length; i++) 
                                 {
                                     <code>@(jsNames[i]) <span class="code-badge">JavaScript</span></code>
+                                    <br />
+                                }       
+                                @for(int i = 0; i < jqueryNames.Length; i++) 
+                                {
+                                    <code>@(jqueryNames[i]) <span class="code-badge">jQuery</span></code>
                                     <br />
                                 }       
                             </a>

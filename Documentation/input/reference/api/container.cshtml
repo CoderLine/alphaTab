@@ -1,5 +1,6 @@
 Title: Container
 JsName: container
+jQueryName: alphaTab('container')
 Category: Properties
 Description: The UI container that holds the whole alphaTab control. 
 ShowInSideBar: false
@@ -28,3 +29,29 @@ ShowInSideBar: false
         </tr>   
     </tbody>
 </table>
+
+<pre>
+<code class="language-csharp line-numbers">
+var api = new AlphaTabApi<MyControl>(...);
+var container = api.Container;
+</code>
+</pre>
+
+
+<h2>Example - JavaScript</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+var container = api.container;
+</code>
+</pre>
+
+
+<h2>Example - jQuery</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+var container = $('#alphaTab').alphaTab('container');
+</code>
+</pre>

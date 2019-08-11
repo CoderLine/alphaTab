@@ -1,5 +1,6 @@
 Title: LoadSoundFont()
 JsName: loadSoundFont()
+jQueryName: alphaTab('loadSoundFont')
 Category: Methods - Player
 Description: Triggers a load of the soundfont from the given data.
 ShowInSideBar: false
@@ -21,13 +22,22 @@ ShowInSideBar: false
             <td><code>bool LoadSoundFont(Stream[] raw) <span class="code-badge">.net</span></code> - Load the soundfont from the given stream.</td>
         </tr>   
         <tr>
-            <td><code>function loadSoundFont(arraybuffer) <span class="code-badge">.JavaScript</span></code> - Load the soundfont from the given raw bytes.</td>
+            <td><code>function loadSoundFont(arraybuffer) <span class="code-badge">JavaScript</span></code> - Load the soundfont from the given raw bytes.</td>
         </tr>   
         <tr>
-            <td><code>function loadSoundFont(uint8array) <span class="code-badge">.JavaScript</span></code> - Load the soundfont from the given raw bytes</td>
+            <td><code>function loadSoundFont(uint8array) <span class="code-badge">JavaScript</span></code> - Load the soundfont from the given raw bytes</td>
         </tr>   
         <tr>
-            <td><code>function loadSoundFont(url) <span class="code-badge">.JavaScript</span></code> - Load the soundfont from the given URL via AJAX</td>
+            <td><code>function loadSoundFont(url) <span class="code-badge">JavaScript</span></code> - Load the soundfont from the given URL via AJAX</td>
+        </tr>           
+        <tr>
+            <td><code>alphaTab('loadSoundFont', arraybuffer) <span class="code-badge">jQuery</span></code> - Load the soundfont from the given raw bytes.</td>
+        </tr>   
+        <tr>
+            <td><code>alphaTab('loadSoundFont', uint8array) <span class="code-badge">jQuery</span></code> - Load the soundfont from the given raw bytes</td>
+        </tr>   
+        <tr>
+            <td><code>alphaTab('loadSoundFont', url) <span class="code-badge">jQuery</span></code> - Load the soundfont from the given URL via AJAX</td>
         </tr>           
     </tbody>
 </table>
@@ -53,17 +63,17 @@ ShowInSideBar: false
             <td>The stream containing a SoundFont2 file.</td>
         </tr>   
         <tr>
-            <td><code>arraybuffer <span class="code-badge">.JavaScript</span></td>
+            <td><code>arraybuffer <span class="code-badge">JavaScript &amp; jQuery</span></td>
             <td><code>ArrayBuffer</code></td>
             <td>The arraybuffer containing the raw bytes of a SoundFont2 file.</td>
         </tr>   
         <tr>
-            <td><code>uint8array <span class="code-badge">.JavaScript</span></td>
+            <td><code>uint8array <span class="code-badge">JavaScript &amp; jQuery</span></td>
             <td><code>Uint8Array</code></td>
             <td>The Uint8Array containing the raw bytes of a SoundFont2 file.</td>
         </tr>   
         <tr>
-            <td><code>url <span class="code-badge">.JavaScript</span></td>
+            <td><code>url <span class="code-badge">JavaScript &amp; jQuery</span></td>
             <td><code>string</code></td>
             <td>A URL pointing to a SoundFont2 file that should be loaded via AJAX.</td>
         </tr>   
@@ -79,7 +89,7 @@ ShowInSideBar: false
 <pre>
 <code class="language-csharp line-numbers">
 var api = new AlphaTabApi<MyControl>(...);
-api.LoadSoundFont(System.IO.File.OpenRead("MyFile.gp"));
+api.LoadSoundFont(System.IO.File.OpenRead("MyFile.sf2"));
 </code>
 </pre>
 
@@ -89,6 +99,14 @@ api.LoadSoundFont(System.IO.File.OpenRead("MyFile.gp"));
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.loadSoundFont('/assets/MyFile.gp');
+api.loadSoundFont('/assets/MyFile.sf2');
+</code>
+</pre>
+
+<h2>Example - jQuery</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+$('#alphaTab').alphaTab('loadSoundFont', '/assets/MyFile.sf2');
 </code>
 </pre>

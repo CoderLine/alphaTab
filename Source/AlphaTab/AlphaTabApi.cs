@@ -137,7 +137,7 @@ namespace AlphaTab
                 Renderer = new ScoreRenderer(Settings);
             }
 
-            Renderer.RenderFinished += OnRenderFinished;
+            Renderer.RenderFinished += e => OnRenderFinished();
             Renderer.PostRenderFinished += () =>
             {
                 var duration = Platform.Platform.GetCurrentMilliseconds() - _startTime;
@@ -285,7 +285,7 @@ namespace AlphaTab
         /// </summary>
         /// <param name="tex">The alphaTex code to render.</param>
         /// <param name="tracks">If set, the given tracks will be rendered, otherwise the first track only will be rendered.</param>
-        public void Tex(string tex, int[] tracks = null)
+        public virtual void Tex(string tex, int[] tracks = null)
         {
             try
             {
@@ -360,9 +360,9 @@ namespace AlphaTab
             ModelUtils.ApplyPitchOffsets(Settings, score);
 
             Score = score;
+            OnLoaded(score);
             LoadMidiForScore();
 
-            OnLoaded(score);
             if (render)
             {
                 Render();
@@ -482,7 +482,7 @@ namespace AlphaTab
         /// </summary>
         /// <param name="tracks">The tracks for which the volume should be changed.</param>
         /// <param name="volume">The volume to set for all tracks in percent (0-1)</param>
-        public void ChangeTrackVolume(Track[] tracks, float volume)
+        public virtual void ChangeTrackVolume(Track[] tracks, float volume)
         {
             if (Player == null)
             {
@@ -504,7 +504,7 @@ namespace AlphaTab
         /// <remarks>
         /// If one or more tracks are set to solo, only those tracks are hearable.
         /// </remarks>
-        public void ChangeTrackSolo(Track[] tracks, bool solo)
+        public virtual void ChangeTrackSolo(Track[] tracks, bool solo)
         {
             if (Player == null)
             {
@@ -523,7 +523,7 @@ namespace AlphaTab
         /// </summary>
         /// <param name="tracks">The list of track to mute or unmute.</param>
         /// <param name="mute">If set to true, the tracks will be muted. If false they are unmuted.</param>
-        public void ChangeTrackMute(Track[] tracks, bool mute)
+        public virtual void ChangeTrackMute(Track[] tracks, bool mute)
         {
             if (Player == null)
             {
@@ -1122,14 +1122,14 @@ namespace AlphaTab
         /// <summary>
         /// This event is fired when the rendering of the whole music sheet is finished.
         /// </summary>
-        public event Action<RenderFinishedEventArgs> RenderFinished;
+        public event Action RenderFinished;
 
-        private void OnRenderFinished(RenderFinishedEventArgs e)
+        private void OnRenderFinished()
         {
             var handler = RenderFinished;
             if (handler != null)
             {
-                handler(e);
+                handler();
             }
 
             UiFacade.TriggerEvent(Container, "rendered");

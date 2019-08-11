@@ -1,5 +1,6 @@
 Title: Stop()
 JsName: stop()
+jQueryName: alphaTab('stop')
 Category: Methods - Player
 Description: Stops the playback of the current song, and moves the playback position back to the start.
 ShowInSideBar: false
@@ -19,7 +20,10 @@ ShowInSideBar: false
             <td><code>void Stop()<span class="code-badge">.net</span></code></td>
         </tr>   
         <tr>
-            <td><code>function stop() <span class="code-badge">.JavaScript</span></code></td>
+            <td><code>function stop() <span class="code-badge">JavaScript</span></code></td>
+        </tr>   
+        <tr>
+            <td><code>alphaTab('stop') <span class="code-badge">jQuery</span></code></td>
         </tr>   
     </tbody>
 </table>
@@ -46,5 +50,14 @@ api.Stop();
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
 api.stop();
+</code>
+</pre>
+
+
+<h2>Example - jQuery</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+$('#alphaTab').alphaTab('stop');
 </code>
 </pre>

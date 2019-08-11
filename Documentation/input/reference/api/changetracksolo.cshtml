@@ -1,5 +1,6 @@
 Title: ChangeTrackSolo()
 JsName: changeTrackSolo()
+jQueryName: alphaTab('soloTracks')
 Category: Methods - Player
 Description: Changes the given tracks to be played solo or not.
 ShowInSideBar: false
@@ -20,7 +21,10 @@ ShowInSideBar: false
             <td><code>void ChangeTrackSolo(Track[] tracks, bool solo) <span class="code-badge">.net</span></code></td>
         </tr>   
         <tr>
-            <td><code>function changeTrackSolo(tracks, solo) <span class="code-badge">.JavaScript</span></code></td>
+            <td><code>function changeTrackSolo(tracks, solo) <span class="code-badge">JavaScript</span></code></td>
+        </tr>   
+        <tr>
+            <td><code>alphaTab('soloTracks', tracks, solo) <span class="code-badge">jQuery</span></code></td>
         </tr>   
     </tbody>
 </table>
@@ -41,7 +45,7 @@ ShowInSideBar: false
             <td>The array of tracks that should be muted.</td>
         </tr>   
         <tr>
-            <td><code>solo <span class="code-badge">.JavaScript</span></td>
+            <td><code>solo <span class="code-badge">all</span></td>
             <td><code>bool</code></td>
             <td>A value indicating whether the track should be played solo or not</td>
         </tr>
@@ -57,7 +61,7 @@ Nothing
 <pre>
 <code class="language-csharp line-numbers">
 var api = new AlphaTabApi<MyControl>(...);
-api.ChangeTrackMute(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, true);
+api.ChangeTrackSolo(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, true);
 </code>
 </pre>
 
@@ -67,6 +71,16 @@ api.ChangeTrackMute(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, tr
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.changeTrackMute([api.score.tracks[0], api.score.tracks[1]], true);
+api.changeTrackSolo([api.score.tracks[0], api.score.tracks[1]], true);
+</code>
+</pre>
+
+<h2>Example - jQuery</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+var at = $('#alphaTab');
+var tracks = at.alphaTab('tracks');
+at.alphaTab('soloTracks', [tracks[0], tracks[1]], true);
 </code>
 </pre>

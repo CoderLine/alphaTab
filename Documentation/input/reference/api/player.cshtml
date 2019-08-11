@@ -1,5 +1,6 @@
 Title: Player
 JsName: player
+jQueryName: alphaTab('player')
 Category: Properties
 Description: The alphaSynth player used for playback. This is the low-level API to the Midi synthesizer used for playback.
 ShowInSideBar: false
@@ -19,3 +20,32 @@ ShowInSideBar: false
         </tr>  
     </tbody>
 </table>
+
+
+
+<h2>Example - C#</h2>
+
+<pre>
+<code class="language-csharp line-numbers">
+var api = new AlphaTabApi<MyControl>(...);
+SetupPlayerEvents(api.Player);
+</code>
+</pre>
+
+
+<h2>Example - JavaScript</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+setupPlayerEvents(api.settings);
+</code>
+</pre>
+
+<h2>Example - jQuery</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+setupPlayerEvents($('#alphaTab').alphaTab('player'));
+</code>
+</pre>

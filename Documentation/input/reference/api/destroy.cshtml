@@ -1,5 +1,6 @@
 Title: Destroy()
 JsName: destroy()
+jQueryName: alphaTab('destroy')
 Category: Methods - Core
 Description: Destroys the alphaTab control and restores the initial state of the UI.
 ShowInSideBar: false
@@ -20,7 +21,10 @@ ShowInSideBar: false
             <td><code>void Destroy() <span class="code-badge">.net</span></td>
         </tr>   
         <tr>
-            <td><code>function destroy() <span class="code-badge">.JavaScript</span></td>
+            <td><code>function destroy() <span class="code-badge">JavaScript</span></td>
+        </tr>           
+        <tr>
+            <td><code>alphaTab('destroy') <span class="code-badge">jQuery</span></td>
         </tr>           
     </tbody>
 </table>
@@ -47,5 +51,13 @@ api.Destroy();
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
 api.destroy();
+</code>
+</pre>
+
+<h2>Example - jQuery</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+$('#alphaTab').alphaTab('destroy');
 </code>
 </pre>

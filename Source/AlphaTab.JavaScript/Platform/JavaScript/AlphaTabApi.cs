@@ -4,6 +4,7 @@ using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Importer;
+using AlphaTab.Model;
 using AlphaTab.UI;
 using Haxe.Js.Html;
 
@@ -16,9 +17,9 @@ namespace AlphaTab.Platform.JavaScript
         {
         }
 
-        public void TexWithTrackData(string tex, dynamic trackData)
+        public override void Tex(string tex, int[] tracks = null)
         {
-            Tex(tex, ((BrowserUiFacade)UiFacade).ParseTracks(trackData));
+            Tex(tex, ((BrowserUiFacade)UiFacade).ParseTracks(tracks));
         }
 
         public void Print(string width)
@@ -128,22 +129,22 @@ namespace AlphaTab.Platform.JavaScript
             Browser.Document.Body.RemoveChild(dlLink);
         }
 
-        public void SetTrackVolume(object tracks, float volume)
+        public override void ChangeTrackMute(Track[] tracks, bool mute)
         {
             var trackList = TrackIndexesToTracks(((BrowserUiFacade)UiFacade).ParseTracks(tracks));
-            ChangeTrackVolume(trackList, volume);
+            base.ChangeTrackMute(trackList, mute);
         }
 
-        public void SetTrackSolo(object tracks, bool solo)
+        public override void ChangeTrackSolo(Track[] tracks, bool solo)
         {
             var trackList = TrackIndexesToTracks(((BrowserUiFacade)UiFacade).ParseTracks(tracks));
             ChangeTrackSolo(trackList, solo);
         }
 
-        public void SetTrackMute(object tracks, bool mute)
+        public override void ChangeTrackVolume(Track[] tracks, float volume)
         {
             var trackList = TrackIndexesToTracks(((BrowserUiFacade)UiFacade).ParseTracks(tracks));
-            ChangeTrackMute(trackList, mute);
+            ChangeTrackVolume(trackList, volume);
         }
     }
 }

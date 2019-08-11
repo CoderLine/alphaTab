@@ -1,5 +1,6 @@
 Title: UpdateSettings()
 JsName: updateSettings()
+jQueryName: alphaTab('updateSettings')
 Category: Methods - Core
 Description: Applies any changes that were done to the settings object and informs the Renderer about any new values to consider.
 ShowInSideBar: false
@@ -20,7 +21,10 @@ ShowInSideBar: false
             <td><code>void UpdateSettings() <span class="code-badge">.net</span></td>
         </tr>   
         <tr>
-            <td><code>function updateSettings() <span class="code-badge">.net</span></td>
+            <td><code>function updateSettings() <span class="code-badge">JavaScript</span></td>
+        </tr>
+        <tr>
+            <td><code>alphaTab('updateSettings') <span class="code-badge">jQuery</span></td>
         </tr>
     </tbody>
 </table>
@@ -52,5 +56,16 @@ var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#
 api.settings.scale = 2.0;
 api.updateSettings();
 api.render();
+</code>
+</pre>
+
+<h2>Example - jQuery</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+var at = $('#alphaTab');
+at.alphaTab('settings').scale = 2.0;
+at.alphaTab('updateSettings');
+at.alphaTab('render');
 </code>
 </pre>

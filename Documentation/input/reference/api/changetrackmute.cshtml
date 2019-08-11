@@ -1,5 +1,6 @@
 Title: ChangeTrackMute()
 JsName: changeTrackMute()
+jQueryName: alphaTab('muteTracks')
 Category: Methods - Player
 Description: Changes the given tracks to be muted or not.
 ShowInSideBar: false
@@ -19,7 +20,10 @@ ShowInSideBar: false
             <td><code>void ChangeTrackMute(Track[] tracks, bool mute) <span class="code-badge">.net</span></code></td>
         </tr>   
         <tr>
-            <td><code>function changeTrackMute(tracks, mute) <span class="code-badge">.JavaScript</span></code></td>
+            <td><code>function changeTrackMute(tracks, mute) <span class="code-badge">JavaScript</span></code></td>
+        </tr>   
+        <tr>
+            <td><code>alphaTab('muteTracks', tracks, mute) <span class="code-badge">jQuery</span></code></td>
         </tr>   
     </tbody>
 </table>
@@ -40,7 +44,7 @@ ShowInSideBar: false
             <td>The array of tracks that should be muted.</td>
         </tr>   
         <tr>
-            <td><code>mute <span class="code-badge">.JavaScript</span></td>
+            <td><code>mute <span class="code-badge">all</span></td>
             <td><code>bool</code></td>
             <td>A value indicating whether the track should be muted or not</td>
         </tr>
@@ -67,5 +71,13 @@ api.ChangeTrackMute(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, tr
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
 api.changeTrackMute([api.score.tracks[0], api.score.tracks[1]], true);
+</code>
+</pre>
+
+<pre>
+<code class="language-javascript line-numbers">
+var at = $('#alphaTab');
+var tracks = at.alphaTab('tracks');
+at.alphaTab('muteTracks', [tracks[0], tracks[1]], true);
 </code>
 </pre>

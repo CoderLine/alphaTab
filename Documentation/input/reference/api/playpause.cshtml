@@ -1,5 +1,6 @@
 Title: PlayPause()
 JsName: playPause()
+jQueryName: alphaTab('playPause')
 Category: Methods - Player
 Description: Toggles between play/pause depending on the current player state.
 ShowInSideBar: false
@@ -19,7 +20,10 @@ ShowInSideBar: false
             <td><code>void PlayPause()<span class="code-badge">.net</span></code></td>
         </tr>   
         <tr>
-            <td><code>function playPause() <span class="code-badge">.JavaScript</span></code></td>
+            <td><code>function playPause() <span class="code-badge">JavaScript</span></code></td>
+        </tr>   
+        <tr>
+            <td><code>alphaTab('playPause) <span class="code-badge">jQuery</span></code></td>
         </tr>   
     </tbody>
 </table>
@@ -46,5 +50,14 @@ api.PlayPause();
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
 api.playPause();
+</code>
+</pre>
+
+
+<h2>Example - jQuery</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+$('#alphaTab').alphaTab('playPause');
 </code>
 </pre>

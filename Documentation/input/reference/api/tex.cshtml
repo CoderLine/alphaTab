@@ -1,10 +1,10 @@
 Title: Tex()
 JsName: tex()
+jQueryName: alphaTab('tex')
 Category: Methods - Core
 Description: Tells alphaTab to render the given alphaTex.
 ShowInSideBar: false
 ---
-
 
 <h2>Description</h2>
 <p>
@@ -19,7 +19,19 @@ ShowInSideBar: false
             <td><code>void Tex(string tex) <span class="code-badge">.net</span></td>
         </tr>   
         <tr>
-            <td><code>function tex(tex) <span class="code-badge">.JavaScript</span></td>
+            <td><code>void Tex(string tex, int[] tracks) <span class="code-badge">.net</span></td>
+        </tr>   
+        <tr>
+            <td><code>function tex(tex) <span class="code-badge">JavaScript</span></td>
+        </tr>       
+        <tr>
+            <td><code>alphaTab('tex', tex) <span class="code-badge">jQuery</span></td>
+        </tr>       
+        <tr>
+            <td><code>function tex(tex, tracks) <span class="code-badge">JavaScript</span></td>
+        </tr>       
+        <tr>
+            <td><code>alphaTab('tex', tex, tracks) <span class="code-badge">jQuery</span></td>
         </tr>       
     </tbody>
 </table>
@@ -38,6 +50,16 @@ ShowInSideBar: false
             <td><code>tex <span class="code-badge">all</span></td>
             <td><code>string</code></td>
             <td>The alphaTex encoded string to load.</td>
+        </tr>
+        <tr>
+            <td><code>tracks <span class="code-badge">all</span></td>
+            <td><code>int[]</code></td>
+            <td>Which tracks to display.</td>
+        </tr>
+        <tr>
+            <td><code>tracks <span class="code-badge">JavaScript &amp; jQuery</span></td>
+            <td><code>int</code></td>
+            <td>Which track to display.</td>
         </tr>
     </tbody>
 </table>
@@ -62,5 +84,14 @@ api.Tex("\title 'Test' . 3.3.4");
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
 api.tex("\title 'Test' . 3.3.4");
+</code>
+</pre>
+
+<h2>Example - jQuery</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
+$('#alphaTab').alphaTab('tex', "\title 'Test' . 3.3.4");
 </code>
 </pre>
