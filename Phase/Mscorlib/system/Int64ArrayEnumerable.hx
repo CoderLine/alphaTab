@@ -11,7 +11,7 @@ class Int64ArrayEnumerable implements IEnumerable<Int64>
 		_array= array;
 	}
 
-	public function GetEnumerator() : IEnumerator<Int64>
+	public function getEnumerator() : IEnumerator<Int64>
 	{
 		return new Int64ArrayEnumerator(_array);
 	}

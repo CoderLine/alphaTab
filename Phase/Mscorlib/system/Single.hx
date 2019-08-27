@@ -4,37 +4,37 @@ abstract Single(Float) from Float from Int
 {
 	public inline function new(i:Float) this = i;
 
-	@:from public static inline function FromInt(i:Int) : Single return new Single(i);
-	@:from public static inline function FromByte(i:system.Byte) : Single return new Single(i.ToHaxeInt());
-	@:from public static inline function FromInt16(i:system.Int16) : Single return new Single(i.ToHaxeInt());
-	@:from public static inline function FromInt32(i:system.Int32) : Single return new Single(i.ToHaxeInt());
-	@:from public static inline function FromInt64(i:system.Int64) : Single return new Single(i.ToHaxeInt());
-	@:from public static inline function FromSByte(i:system.Byte) : Single return new Single(i.ToHaxeInt());
-	@:from public static inline function FromUInt16(i:system.UInt16) : Single return new Single(i.ToHaxeInt());
-	@:from public static inline function FromUInt32(i:system.UInt32) : Single return new Single(i.ToHaxeInt());
-	@:from public static inline function FromUInt64(i:system.UInt64) : Single return new Single(i.ToHaxeInt());
+	@:from public static inline function fromInt(i:Int) : Single return new Single(i);
+	@:from public static inline function fromByte(i:system.Byte) : Single return new Single(i.toHaxeInt());
+	@:from public static inline function fromInt16(i:system.Int16) : Single return new Single(i.toHaxeInt());
+	@:from public static inline function fromInt32(i:system.Int32) : Single return new Single(i.toHaxeInt());
+	@:from public static inline function fromInt64(i:system.Int64) : Single return new Single(i.toHaxeInt());
+	@:from public static inline function fromSByte(i:system.Byte) : Single return new Single(i.toHaxeInt());
+	@:from public static inline function fromUInt16(i:system.UInt16) : Single return new Single(i.toHaxeInt());
+	@:from public static inline function fromUInt32(i:system.UInt32) : Single return new Single(i.toHaxeInt());
+	@:from public static inline function fromUInt64(i:system.UInt64) : Single return new Single(i.toHaxeInt());
 
-	public inline function ToBoolean_IFormatProvider(provider:IFormatProvider) : system.Boolean return system.Convert.ToBoolean_Single(this);
-	public inline function ToChar_IFormatProvider(provider:IFormatProvider) : system.Char return system.Convert.ToChar_Single(this);
-	public inline function ToSByte_IFormatProvider(provider:IFormatProvider) : system.SByte return system.Convert.ToSByte_Single(this);
-	public inline function ToByte_IFormatProvider(provider:IFormatProvider) : system.Byte return system.Convert.ToByte_Single(this);
-	public inline function ToInt16_IFormatProvider(provider:IFormatProvider) : system.Int16 return system.Convert.ToInt16_Single(this);
-	public inline function ToUInt16_IFormatProvider(provider:IFormatProvider) : system.UInt16 return system.Convert.ToUInt16_Single(this);
-	public inline function ToInt32_IFormatProvider(provider:IFormatProvider) : system.Int32 return system.Convert.ToInt32_Single(this);
-	public inline function ToUInt32_IFormatProvider(provider:IFormatProvider) : system.UInt32 return system.Convert.ToUInt32_Single(this);
-	public inline function ToInt64_IFormatProvider(provider:IFormatProvider) : system.Int64 return system.Convert.ToInt64_Single(this);
-	public inline function ToUInt64_IFormatProvider(provider:IFormatProvider) : system.UInt64 return system.Convert.ToUInt64_Single(this);
-	public inline function ToSingle_IFormatProvider(provider:IFormatProvider) : system.Single return system.Convert.ToSingle_Single(this);
-	public inline function ToDouble_IFormatProvider(provider:IFormatProvider) : system.Double return system.Convert.ToDouble_Single(this);
+	public inline function toBoolean_IFormatProvider(provider:IFormatProvider) : system.Boolean return system.Convert.toBoolean_Single(this);
+	public inline function toChar_IFormatProvider(provider:IFormatProvider) : system.Char return system.Convert.toChar_Single(this);
+	public inline function toSByte_IFormatProvider(provider:IFormatProvider) : system.SByte return system.Convert.toSByte_Single(this);
+	public inline function toByte_IFormatProvider(provider:IFormatProvider) : system.Byte return system.Convert.toByte_Single(this);
+	public inline function toInt16_IFormatProvider(provider:IFormatProvider) : system.Int16 return system.Convert.toInt16_Single(this);
+	public inline function toUInt16_IFormatProvider(provider:IFormatProvider) : system.UInt16 return system.Convert.toUInt16_Single(this);
+	public inline function toInt32_IFormatProvider(provider:IFormatProvider) : system.Int32 return system.Convert.toInt32_Single(this);
+	public inline function toUInt32_IFormatProvider(provider:IFormatProvider) : system.UInt32 return system.Convert.toUInt32_Single(this);
+	public inline function toInt64_IFormatProvider(provider:IFormatProvider) : system.Int64 return system.Convert.toInt64_Single(this);
+	public inline function toUInt64_IFormatProvider(provider:IFormatProvider) : system.UInt64 return system.Convert.toUInt64_Single(this);
+	public inline function toSingle_IFormatProvider(provider:IFormatProvider) : system.Single return system.Convert.toSingle_Single(this);
+	public inline function toDouble_IFormatProvider(provider:IFormatProvider) : system.Double return system.Convert.toDouble_Single(this);
 
 
-	public inline function ToHaxeFloat(): Float return this;
-	public inline function ToString() : CsString return Std.string(this);
-	public function GetHashCode() : system.Int32 return system.Convert.ToHashCode_Single(this);
+	public inline function toHaxeFloat(): Float return this;
+	public inline function toString() : CsString return Std.string(this);
+	public function getHashCode() : system.Int32 return system.Convert.toHashCode_Single(this);
 	
 	public static var NaN(get, never) : system.Single;
 	public static inline function get_NaN() : system.Single return Math.NaN;
-	public static inline function IsNaN(v:system.Single) : system.Boolean return Math.isNaN(v.ToHaxeFloat());
+	public static inline function IsNaN(v:system.Single) : system.Boolean return Math.isNaN(v.toHaxeFloat());
 	
 	@:op(-A) public inline function neg() : system.Single return -this;
 
@@ -114,8 +114,8 @@ abstract Single(Float) from Float from Int
     @:op(A + B) public static function add13(lhs : system.Single, rhs : system.UInt64) : system.Single;	
     @:op(A + B) public static function add14(lhs : system.Single, rhs : system.Single) : system.Single;	
     @:op(A + B) public static function add15(lhs : system.Single, rhs : system.Double) : system.Single;	
-    @:op(A + B) public static inline function add16(lhs : system.Single, rhs : system.CsString) : system.CsString return lhs.ToString() + rhs;
-    @:op(A + B) public static inline function add17(lhs : system.Single, rhs : String) : system.CsString return lhs.ToString() + rhs;
+    @:op(A + B) public static inline function add16(lhs : system.Single, rhs : system.CsString) : system.CsString return lhs.toString() + rhs;
+    @:op(A + B) public static inline function add17(lhs : system.Single, rhs : String) : system.CsString return lhs.toString() + rhs;
 
                               
     @:op(A - B) public static function sub1(lhs : system.Single, rhs : Int) : system.Single;

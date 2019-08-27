@@ -13,16 +13,16 @@ class SByteArrayEnumerator implements IEnumerator<SByte>
 		_i = -1;
 	}
 	
-	public var Current(get, never):SByte;
-	public function get_Current() : SByte return _array[_i];
-	public function MoveNext() : Bool
+	public var current(get, never):SByte;
+	public function get_current() : SByte return _array[_i];
+	public function moveNext() : Bool
 	{
 		if(_i >= _array.length - 1) return false;
 		_i++;
 		return true;
 		
 	}
-	public function Reset():Void
+	public function reset():Void
 	{
 		_i = -1;
 	}

@@ -11,7 +11,7 @@ class UInt16ArrayEnumerable implements IEnumerable<UInt16>
 		_array= array;
 	}
 
-	public function GetEnumerator() : IEnumerator<UInt16>
+	public function getEnumerator() : IEnumerator<UInt16>
 	{
 		return new UInt16ArrayEnumerator(_array);
 	}

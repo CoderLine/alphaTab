@@ -11,7 +11,7 @@ class SByteArrayEnumerable implements IEnumerable<SByte>
 		_array= array;
 	}
 
-	public function GetEnumerator() : IEnumerator<SByte>
+	public function getEnumerator() : IEnumerator<SByte>
 	{
 		return new SByteArrayEnumerator(_array);
 	}

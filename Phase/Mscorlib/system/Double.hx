@@ -4,38 +4,38 @@ abstract Double(Float) from Float from Int
 {
 	public inline function new(i:Float) this = i;
 	
-	@:from public static inline function FromInt(i:Int) : Double return new Double(i);
-	@:from public static inline function FromByte(i:system.Byte) : Double return new Double(i.ToHaxeInt());
-	@:from public static inline function FromInt16(i:system.Int16) : Double return new Double(i.ToHaxeInt());
-	@:from public static inline function FromInt32(i:system.Int32) : Double return new Double(i.ToHaxeInt());
-	@:from public static inline function FromInt64(i:system.Int64) : Double return new Double(i.ToHaxeInt());
-	@:from public static inline function FromSByte(i:system.Byte) : Double return new Double(i.ToHaxeInt());
-	@:from public static inline function FromUInt16(i:system.UInt16) : Double return new Double(i.ToHaxeInt());
-	@:from public static inline function FromUInt32(i:system.UInt32) : Double return new Double(i.ToHaxeInt());
-	@:from public static inline function FromUInt64(i:system.UInt64) : Double return new Double(i.ToHaxeInt());
-	@:from public static inline function FromSingle(i:Single) : Double return new Double(i.ToHaxeFloat());
+	@:from public static inline function fromInt(i:Int) : Double return new Double(i);
+	@:from public static inline function fromByte(i:system.Byte) : Double return new Double(i.toHaxeInt());
+	@:from public static inline function fromInt16(i:system.Int16) : Double return new Double(i.toHaxeInt());
+	@:from public static inline function fromInt32(i:system.Int32) : Double return new Double(i.toHaxeInt());
+	@:from public static inline function fromInt64(i:system.Int64) : Double return new Double(i.toHaxeInt());
+	@:from public static inline function fromSByte(i:system.Byte) : Double return new Double(i.toHaxeInt());
+	@:from public static inline function fromUInt16(i:system.UInt16) : Double return new Double(i.toHaxeInt());
+	@:from public static inline function fromUInt32(i:system.UInt32) : Double return new Double(i.toHaxeInt());
+	@:from public static inline function fromUInt64(i:system.UInt64) : Double return new Double(i.toHaxeInt());
+	@:from public static inline function fromSingle(i:Single) : Double return new Double(i.toHaxeFloat());
 
-	public inline function ToHaxeFloat(): Float return this;
-	public inline function ToString() : system.CsString return Std.string(this);
+	public inline function toHaxeFloat(): Float return this;
+	public inline function toString() : system.CsString return Std.string(this);
 	
-	public inline function ToBoolean_IFormatProvider(provider:IFormatProvider) : system.Boolean return system.Convert.ToBoolean_Double(this);
-	public inline function ToChar_IFormatProvider(provider:IFormatProvider) : system.Char return system.Convert.ToChar_Double(this);
-	public inline function ToSByte_IFormatProvider(provider:IFormatProvider) : system.SByte return system.Convert.ToSByte_Double(this);
-	public inline function ToByte_IFormatProvider(provider:IFormatProvider) : system.Byte return system.Convert.ToByte_Double(this);
-	public inline function ToInt16_IFormatProvider(provider:IFormatProvider) : system.Int16 return system.Convert.ToInt16_Double(this);
-	public inline function ToUInt16_IFormatProvider(provider:IFormatProvider) : system.UInt16 return system.Convert.ToUInt16_Double(this);
-	public inline function ToInt32_IFormatProvider(provider:IFormatProvider) : system.Int32 return system.Convert.ToInt32_Double(this);
-	public inline function ToUInt32_IFormatProvider(provider:IFormatProvider) : system.UInt32 return system.Convert.ToUInt32_Double(this);
-	public inline function ToInt64_IFormatProvider(provider:IFormatProvider) : system.Int64 return system.Convert.ToInt64_Double(this);
-	public inline function ToUInt64_IFormatProvider(provider:IFormatProvider) : system.UInt64 return system.Convert.ToUInt64_Double(this);
-	public inline function ToSingle_IFormatProvider(provider:IFormatProvider) : system.Single return system.Convert.ToSingle_Double(this);
-	public inline function ToDouble_IFormatProvider(provider:IFormatProvider) : system.Double return system.Convert.ToDouble_Double(this);
+	public inline function toBoolean_IFormatProvider(provider:IFormatProvider) : system.Boolean return system.Convert.toBoolean_Double(this);
+	public inline function toChar_IFormatProvider(provider:IFormatProvider) : system.Char return system.Convert.toChar_Double(this);
+	public inline function toSByte_IFormatProvider(provider:IFormatProvider) : system.SByte return system.Convert.toSByte_Double(this);
+	public inline function toByte_IFormatProvider(provider:IFormatProvider) : system.Byte return system.Convert.toByte_Double(this);
+	public inline function toInt16_IFormatProvider(provider:IFormatProvider) : system.Int16 return system.Convert.toInt16_Double(this);
+	public inline function toUInt16_IFormatProvider(provider:IFormatProvider) : system.UInt16 return system.Convert.toUInt16_Double(this);
+	public inline function toInt32_IFormatProvider(provider:IFormatProvider) : system.Int32 return system.Convert.toInt32_Double(this);
+	public inline function toUInt32_IFormatProvider(provider:IFormatProvider) : system.UInt32 return system.Convert.toUInt32_Double(this);
+	public inline function toInt64_IFormatProvider(provider:IFormatProvider) : system.Int64 return system.Convert.toInt64_Double(this);
+	public inline function toUInt64_IFormatProvider(provider:IFormatProvider) : system.UInt64 return system.Convert.toUInt64_Double(this);
+	public inline function toSingle_IFormatProvider(provider:IFormatProvider) : system.Single return system.Convert.toSingle_Double(this);
+	public inline function toDouble_IFormatProvider(provider:IFormatProvider) : system.Double return system.Convert.toDouble_Double(this);
 	
-	public function GetHashCode() : system.Int32 return system.Convert.ToHashCode_Double(this);
+	public function getHashCode() : system.Int32 return system.Convert.toHashCode_Double(this);
 		
 	public static var NaN(get, never) : system.Double;
 	public static inline function get_NaN() : system.Double return Math.NaN;
-	public static inline function IsNaN(v:system.Double) : system.Boolean return Math.isNaN(v.ToHaxeFloat());
+	public static inline function isNaN(v:system.Double) : system.Boolean return Math.isNaN(v.toHaxeFloat());
 	
 	@:op(-A) public inline function neg() : system.Double return -this;
 

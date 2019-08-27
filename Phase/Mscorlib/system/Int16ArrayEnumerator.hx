@@ -13,16 +13,16 @@ class Int16ArrayEnumerator implements IEnumerator<Int16>
 		_i = -1;
 	}
 	
-	public var Current(get, never):Int16;
-	public function get_Current() : Int16 return _array[_i];
-	public function MoveNext() : Bool
+	public var current(get, never):Int16;
+	public function get_current() : Int16 return _array[_i];
+	public function moveNext() : Bool
 	{
 		if(_i >= _array.length - 1) return false;
 		_i++;
 		return true;
 		
 	}
-	public function Reset():Void
+	public function reset():Void
 	{
 		_i = -1;
 	}

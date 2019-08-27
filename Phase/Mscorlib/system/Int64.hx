@@ -5,27 +5,27 @@ abstract Int64(Int) from Int
 {
 	public inline function new(i:Int) this = i;
 	
-	public inline function ToHaxeInt(): Int return this;	
-	public inline function ToString() : system.CsString return Std.string(this);
+	public inline function toHaxeInt(): Int return this;	
+	public inline function toString() : system.CsString return Std.string(this);
 	
-	@:from public static inline function FromByte(c:Byte) : Int64 return new Int64(c.ToHaxeInt());
-	@:from public static inline function FromInt16(c:Int16) : Int64 return new Int64(c.ToHaxeInt());
-	@:from public static inline function FromInt32(c:Int32) : Int64 return new Int64(c.ToHaxeInt());
+	@:from public static inline function fromByte(c:Byte) : Int64 return new Int64(c.toHaxeInt());
+	@:from public static inline function fromInt16(c:Int16) : Int64 return new Int64(c.toHaxeInt());
+	@:from public static inline function fromInt32(c:Int32) : Int64 return new Int64(c.toHaxeInt());
 	
-	public inline function ToBoolean_IFormatProvider(provider:IFormatProvider) : system.Boolean return system.Convert.ToBoolean_Int64(this);
-	public inline function ToChar_IFormatProvider(provider:IFormatProvider) : system.Char return system.Convert.ToChar_Int64(this);
-	public inline function ToSByte_IFormatProvider(provider:IFormatProvider) : system.SByte return system.Convert.ToSByte_Int64(this);
-	public inline function ToByte_IFormatProvider(provider:IFormatProvider) : system.Byte return system.Convert.ToByte_Int64(this);
-	public inline function ToInt16_IFormatProvider(provider:IFormatProvider) : system.Int16 return system.Convert.ToInt16_Int64(this);
-	public inline function ToUInt16_IFormatProvider(provider:IFormatProvider) : system.UInt16 return system.Convert.ToUInt16_Int64(this);
-	public inline function ToInt32_IFormatProvider(provider:IFormatProvider) : system.Int32 return system.Convert.ToInt32_Int64(this);
-	public inline function ToUInt32_IFormatProvider(provider:IFormatProvider) : system.UInt32 return system.Convert.ToUInt32_Int64(this);
-	public inline function ToInt64_IFormatProvider(provider:IFormatProvider) : system.Int64 return system.Convert.ToInt64_Int64(this);
-	public inline function ToUInt64_IFormatProvider(provider:IFormatProvider) : system.UInt64 return system.Convert.ToUInt64_Int64(this);
-	public inline function ToSingle_IFormatProvider(provider:IFormatProvider) : system.Single return system.Convert.ToSingle_Int64(this);
-	public inline function ToDouble_IFormatProvider(provider:IFormatProvider) : system.Double return system.Convert.ToDouble_Int64(this);
+	public inline function toBoolean_IFormatProvider(provider:IFormatProvider) : system.Boolean return system.Convert.toBoolean_Int64(this);
+	public inline function toChar_IFormatProvider(provider:IFormatProvider) : system.Char return system.Convert.toChar_Int64(this);
+	public inline function toSByte_IFormatProvider(provider:IFormatProvider) : system.SByte return system.Convert.toSByte_Int64(this);
+	public inline function toByte_IFormatProvider(provider:IFormatProvider) : system.Byte return system.Convert.toByte_Int64(this);
+	public inline function toInt16_IFormatProvider(provider:IFormatProvider) : system.Int16 return system.Convert.toInt16_Int64(this);
+	public inline function toUInt16_IFormatProvider(provider:IFormatProvider) : system.UInt16 return system.Convert.toUInt16_Int64(this);
+	public inline function toInt32_IFormatProvider(provider:IFormatProvider) : system.Int32 return system.Convert.toInt32_Int64(this);
+	public inline function toUInt32_IFormatProvider(provider:IFormatProvider) : system.UInt32 return system.Convert.toUInt32_Int64(this);
+	public inline function toInt64_IFormatProvider(provider:IFormatProvider) : system.Int64 return system.Convert.toInt64_Int64(this);
+	public inline function toUInt64_IFormatProvider(provider:IFormatProvider) : system.UInt64 return system.Convert.toUInt64_Int64(this);
+	public inline function toSingle_IFormatProvider(provider:IFormatProvider) : system.Single return system.Convert.toSingle_Int64(this);
+	public inline function toDouble_IFormatProvider(provider:IFormatProvider) : system.Double return system.Convert.toDouble_Int64(this);
 	
-	public inline function GetHashCode() : system.Int32 return this;
+	public inline function getHashCode() : system.Int32 return this;
 	
 	@:op(-A) public inline function neg() : system.Int64 return -this;
 
@@ -55,9 +55,9 @@ abstract Int64(Int) from Int
     @:op(A * B) public static function mul15(lhs : system.Int64, rhs : system.Double) : system.Double;	
 
 	
-    @:op(A / B) public static inline function div0(lhs : system.Int64, rhs : system.Int64) : system.Int64 return Std.int(lhs.ToHaxeInt() / rhs.ToHaxeInt());
-    @:op(A / B) public static inline function div1(lhs : system.Int64, rhs : Int) : system.Int64 return Std.int(lhs.ToHaxeInt() / rhs);
-    @:op(A / B) public static inline function div2(lhs : Int, rhs : system.Int64) : system.Int64 return Std.int(lhs / rhs.ToHaxeInt());
+    @:op(A / B) public static inline function div0(lhs : system.Int64, rhs : system.Int64) : system.Int64 return Std.int(lhs.toHaxeInt() / rhs.toHaxeInt());
+    @:op(A / B) public static inline function div1(lhs : system.Int64, rhs : Int) : system.Int64 return Std.int(lhs.toHaxeInt() / rhs);
+    @:op(A / B) public static inline function div2(lhs : Int, rhs : system.Int64) : system.Int64 return Std.int(lhs / rhs.toHaxeInt());
     @:op(A / B) public static function div3(lhs : system.Int64, rhs : Float) : system.Double;
     @:op(A / B) public static function div4(lhs : Float, rhs : system.Int64) : system.Double;
 	
@@ -110,8 +110,8 @@ abstract Int64(Int) from Int
     // @:op(A + B) public static function add13(lhs : system.Int64, rhs : system.UInt64) : system.Int64;	
     @:op(A + B) public static function add14(lhs : system.Int64, rhs : system.Single) : system.Single;	
     @:op(A + B) public static function add15(lhs : system.Int64, rhs : system.Double) : system.Double;	
-    @:op(A + B) public static inline function add16(lhs : system.Int64, rhs : system.CsString) : system.CsString return lhs.ToString() + rhs;
-    @:op(A + B) public static inline function add17(lhs : system.Int64, rhs : String) : system.CsString return lhs.ToString() + rhs;
+    @:op(A + B) public static inline function add16(lhs : system.Int64, rhs : system.CsString) : system.CsString return lhs.toString() + rhs;
+    @:op(A + B) public static inline function add17(lhs : system.Int64, rhs : String) : system.CsString return lhs.toString() + rhs;
 
                               
     @:op(A - B) public static function sub0(lhs : system.Int64, rhs : system.Int64) : system.Int64;

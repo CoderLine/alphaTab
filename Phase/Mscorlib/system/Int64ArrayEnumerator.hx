@@ -13,16 +13,16 @@ class Int64ArrayEnumerator implements IEnumerator<Int64>
 		_i = -1;
 	}
 	
-	public var Current(get, never):Int64;
-	public function get_Current() : Int64 return _array[_i];
-	public function MoveNext() : Bool
+	public var current(get, never):Int64;
+	public function get_current() : Int64 return _array[_i];
+	public function moveNext() : Bool
 	{
 		if(_i >= _array.length - 1) return false;
 		_i++;
 		return true;
 		
 	}
-	public function Reset():Void
+	public function reset():Void
 	{
 		_i = -1;
 	}

@@ -8,7 +8,7 @@ class IterableEnumerable<T> implements IEnumerable<T>
 		_iterable= i;
 	}
 
-	public function GetEnumerator() : IEnumerator<T>
+	public function getEnumerator() : IEnumerator<T>
 	{
 		return new IteratorEnumerator(_iterable.iterator());
 	}

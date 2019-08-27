@@ -4,9 +4,9 @@ abstract EventAction(Array<Void->Void>)
 {
 	public inline function new(v:Void->Void) this = v == null ? null : [v];
 	
-	@:to public inline function ToLambda() : Void->Void return Invoke;
+	@:to public inline function toLambda() : Void->Void return invoke;
 	
-	public inline function ToArray() return this;
+	public inline function toArray() return this;
 	@:op(A + B) public static function add(lhs : EventAction, rhs : Void->Void) : EventAction
 	{
 		if(lhs == null)
@@ -15,14 +15,14 @@ abstract EventAction(Array<Void->Void>)
 		}
 		else
 		{
-			lhs.ToArray().push(rhs);
+			lhs.toArray().push(rhs);
 		}	
 		return lhs;
 	}
 	
     @:op(A - B) public static function sub(lhs : EventAction, rhs : Void->Void) : EventAction
 	{
-		var raw = lhs.ToArray();
+		var raw = lhs.toArray();
 		var index = raw.indexOf(rhs);
 		if(index != -1)
 		{
@@ -35,7 +35,7 @@ abstract EventAction(Array<Void->Void>)
 		return lhs;
 	}
 	
-	public function Invoke() : Void
+	public function invoke() : Void
 	{
 		if(this == null) return;
 		for (x in this)
