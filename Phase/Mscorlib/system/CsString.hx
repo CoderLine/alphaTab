@@ -358,4 +358,5 @@ abstract CsString(String) from String to String
 	@:op(A + B) public static inline function add16(lhs : system.CsString, rhs : system.Single) : system.CsString return lhs + rhs.toString();
     @:op(A + B) public static inline function add17(lhs : system.CsString, rhs : system.Double) : system.CsString return lhs + rhs.toString();
     @:op(A + B) public static inline function add18(lhs : system.CsString, rhs : system.CsString) : system.CsString return lhs.toHaxeString() + rhs.toHaxeString();
+    @:op(A + B) public static inline function add19(lhs : system.CsString, rhs : system.Boolean) : system.CsString return lhs.toHaxeString() + Std.string(rhs);
 }

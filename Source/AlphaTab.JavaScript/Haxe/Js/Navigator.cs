@@ -1,5 +1,4 @@
-﻿using System;
-using Haxe;
+﻿using Haxe;
 using Phase.Attributes;
 
 namespace AlphaTab.Haxe.Js

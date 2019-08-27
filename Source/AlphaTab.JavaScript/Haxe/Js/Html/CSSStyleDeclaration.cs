@@ -57,5 +57,6 @@ namespace AlphaTab.Haxe.Js.Html
 
         [Name("transitionDuration")]
         public HaxeString TransitionDuration { get; set; }
+
     }
 }

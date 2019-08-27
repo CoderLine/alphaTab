@@ -8,9 +8,12 @@ using AlphaTab.Importer;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.JavaScript;
+using AlphaTab.Platform.Model;
+using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
+using AlphaTab.Utils;
 using Haxe;
 using Haxe.Js.Html;
 using Phase;
@@ -20,6 +23,8 @@ namespace AlphaTab.UI
     internal class BrowserUiFacade : IUiFacade<object>
     {
         private event Action _rootContainerBecameVisible;
+
+        private FastDictionary<string, FontLoadingChecker> _fontCheckers;
 
         private AlphaTabApi<object> _api;
         private string _contents;
@@ -34,20 +39,52 @@ namespace AlphaTab.UI
         public IContainer RootContainer { get; }
         public bool AreWorkersSupported { get; }
 
-        public bool CanRender => _api.Settings.Engine != "html5" || Environment.IsFontLoaded;
+        public bool CanRender => AreAllFontsLoaded();
 
-        public event Action CanRenderChanged
+        private bool AreAllFontsLoaded()
         {
-            add => Environment.FontLoaded += value;
-            remove => Environment.FontLoaded += value;
+            if (!Environment.BravuraFontChecker.IsFontLoaded)
+            {
+                return false;
+            }
+
+            foreach (var font in _fontCheckers)
+            {
+                var checker = _fontCheckers[font];
+                if (!checker.IsFontLoaded)
+                {
+                    return false;
+                }
+            }
+
+            Logger.Debug("Font", "All fonts loaded: " + _fontCheckers.Count);
+
+            return true;
+        }
+
+        public event Action CanRenderChanged;
+        private void OnFontLoaded(string family)
+        {
+            FontSizes.GenerateFontLookup(family);
+
+            if (AreAllFontsLoaded())
+            {
+                var handler = CanRenderChanged;
+                if (handler != null)
+                {
+                    handler();
+                }
+            }
         }
 
         public BrowserUiFacade(Element rootElement)
         {
+            _fontCheckers = new FastDictionary<string, FontLoadingChecker>();
             rootElement.ClassList.Add("alphaTab");
             RootContainer = new HtmlElementContainer(rootElement);
             var workersUnsupported = !Browser.Window.Member<bool>("Worker");
             AreWorkersSupported = !workersUnsupported;
+            Environment.BravuraFontChecker.FontLoaded += OnFontLoaded;
         }
 
         public IScoreRenderer CreateWorkerRenderer()
@@ -104,6 +141,8 @@ namespace AlphaTab.UI
                 api.Container.Resize += ShowSvgsInViewPort;
             }
 
+            SetupFontCheckers(settings);
+
             #region build tracks array
 
             // get track data to parse
@@ -129,7 +168,6 @@ namespace AlphaTab.UI
 
             #endregion
 
-
             _contents = "";
             var element = ((HtmlElementContainer)api.Container);
             if (dataAttributes.ContainsKey("tex") && element.Element.InnerText.IsTruthy())
@@ -153,6 +191,32 @@ namespace AlphaTab.UI
             if (options && options.visibilityCheckInterval)
             {
                 _visibilityCheckInterval = options.visibilityCheckInterval;
+            }
+        }
+
+        private void SetupFontCheckers(Settings settings)
+        {
+            RegisterFontChecker(settings.RenderingResources.CopyrightFont);
+            RegisterFontChecker(settings.RenderingResources.EffectFont);
+            RegisterFontChecker(settings.RenderingResources.FingeringFont);
+            RegisterFontChecker(settings.RenderingResources.GraceFont);
+            RegisterFontChecker(settings.RenderingResources.MarkerFont);
+            RegisterFontChecker(settings.RenderingResources.TablatureFont);
+            RegisterFontChecker(settings.RenderingResources.TitleFont);
+            RegisterFontChecker(settings.RenderingResources.WordsFont);
+            RegisterFontChecker(settings.RenderingResources.BarNumberFont);
+            RegisterFontChecker(settings.RenderingResources.FretboardNumberFont);
+            RegisterFontChecker(settings.RenderingResources.SubTitleFont);
+        }
+
+        private void RegisterFontChecker(Font font)
+        {
+            if (!_fontCheckers.ContainsKey(font.Family))
+            {
+                var checker = new FontLoadingChecker(font.Family);
+                _fontCheckers[font.Family] = checker;
+                checker.FontLoaded += OnFontLoaded;
+                checker.CheckForFontAvailability();
             }
         }
 
@@ -334,7 +398,7 @@ namespace AlphaTab.UI
                 css.AppendLine("}");
                 styleElement.InnerHTML = css.ToString();
                 elementDocument.GetElementsByTagName("head").Item(0).AppendChild(styleElement);
-                Environment.CheckForFontAvailability();
+                Environment.BravuraFontChecker.CheckForFontAvailability();
             }
         }
 

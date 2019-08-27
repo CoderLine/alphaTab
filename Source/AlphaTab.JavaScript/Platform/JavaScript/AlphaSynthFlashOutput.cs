@@ -1,6 +1,5 @@
 ﻿using System;
 using AlphaTab.Audio.Synth;
-using AlphaTab.Audio.Synth.Ds;
 using AlphaTab.Collections;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;

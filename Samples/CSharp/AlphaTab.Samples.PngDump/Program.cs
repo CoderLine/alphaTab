@@ -52,7 +52,7 @@ namespace AlphaTab.Samples.PngDump
                 var info = new FileInfo(args[0]);
                 var path = Path.Combine(info.DirectoryName, Path.GetFileNameWithoutExtension(info.Name) + "-" + i + ".png");
 
-                using (var full = SKSurface.Create(totalWidth, totalHeight, SKImageInfo.PlatformColorType, SKAlphaType.Premul))
+                using (var full = SKSurface.Create(new SKImageInfo(totalWidth, totalHeight, SKImageInfo.PlatformColorType, SKAlphaType.Premul)))
                 {
                     var y = 0;
                     foreach (var image in images)

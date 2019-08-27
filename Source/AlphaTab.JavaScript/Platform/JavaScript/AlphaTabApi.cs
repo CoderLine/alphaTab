@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using AlphaTab.Audio.Generator;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Collections;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
-using AlphaTab.Importer;
 using AlphaTab.Model;
 using AlphaTab.UI;
 using Haxe.Js.Html;

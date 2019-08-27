@@ -4,8 +4,6 @@ using AlphaTab.Audio.Synth.Ds;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Haxe.Js.Html.Audio;
-using AlphaTab.Util;
-using Haxe;
 
 namespace AlphaTab.Platform.JavaScript
 {

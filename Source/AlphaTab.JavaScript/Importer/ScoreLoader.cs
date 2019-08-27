@@ -4,7 +4,6 @@ using AlphaTab.Model;
 using AlphaTab.Platform;
 using Haxe.Js.Html;
 using Phase;
-using Phase.Attributes;
 
 namespace AlphaTab.Importer
 {

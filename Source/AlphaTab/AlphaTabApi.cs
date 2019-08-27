@@ -214,6 +214,10 @@ namespace AlphaTab
             InternalRenderTracks(score, tracks.ToArray());
         }
 
+        /// <summary>
+        /// Renders the given list of tracks.
+        /// </summary>
+        /// <param name="tracks">The tracks to render. They must all belong to the same score.</param>
         public void RenderTracks(Track[] tracks)
         {
             if (tracks.Length > 0)
