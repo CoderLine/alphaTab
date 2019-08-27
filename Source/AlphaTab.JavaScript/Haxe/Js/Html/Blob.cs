@@ -1,5 +1,4 @@
-﻿using Haxe;
-using Phase.Attributes;
+﻿using Phase.Attributes;
 
 namespace AlphaTab.Haxe.Js.Html
 {

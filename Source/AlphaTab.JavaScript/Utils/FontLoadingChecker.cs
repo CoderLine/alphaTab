@@ -182,7 +182,6 @@ namespace AlphaTab.Utils
             checkerElement.Style.Overflow = "hidden";
 
             checkerElement.Style.Top = "-1000px";
-            checkerElement.Style.FontSynthesis = "none";
 
             checkerElement.Style.FontSize = "100px";
             checkerElement.Style.FontFamily = family;

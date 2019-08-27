@@ -1,7 +1,6 @@
 using System;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Model;
-using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;

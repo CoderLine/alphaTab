@@ -67,11 +67,6 @@ namespace AlphaTab.Haxe.Js.Html
         [Name("scrollLeft")]
         public HaxeInt ScrollLeft { get; set; }
 
-        [Name("scrollWidth")]
-        public HaxeInt ScrollWidth { get; set; }
-
-
-
         [Name("querySelector")]
         public extern Element QuerySelector(HaxeString selectors);
 

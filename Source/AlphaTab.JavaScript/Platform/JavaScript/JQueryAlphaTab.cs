@@ -6,7 +6,6 @@ using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
-using AlphaTab.UI;
 using AlphaTab.Util;
 using Phase;
 using Phase.Attributes;

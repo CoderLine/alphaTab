@@ -1,5 +1,4 @@
 ﻿using System;
-using AlphaTab.Audio.Synth.Ds;
 
 namespace AlphaTab.Audio.Synth
 {

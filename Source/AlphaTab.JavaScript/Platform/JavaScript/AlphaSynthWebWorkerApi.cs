@@ -2,7 +2,6 @@
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Audio.Synth.Util;
-using AlphaTab.Collections;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Model;
 using AlphaTab.Util;

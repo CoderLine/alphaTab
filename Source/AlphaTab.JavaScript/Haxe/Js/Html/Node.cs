@@ -14,9 +14,6 @@ namespace AlphaTab.Haxe.Js.Html
         [Name("nodeValue")]
         public extern HaxeString NodeValue { get; }
 
-        [Name("parentNode")]
-        public Node ParentNode { get; set; }
-
         [Name("appendChild")]
         public extern void AppendChild(Node node);
 

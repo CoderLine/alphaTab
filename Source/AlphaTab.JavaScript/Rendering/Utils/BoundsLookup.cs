@@ -1,5 +1,4 @@
 ﻿using AlphaTab.Collections;
-using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 

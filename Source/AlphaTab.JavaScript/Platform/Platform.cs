@@ -1,11 +1,7 @@
 ﻿using System;
-using AlphaTab.Audio.Synth;
-using AlphaTab.Audio.Synth.Midi;
-using AlphaTab.Audio.Synth.Midi.Event;
 using AlphaTab.Collections;
 using AlphaTab.Haxe.Js;
 using AlphaTab.IO;
-using AlphaTab.Platform.JavaScript;
 using AlphaTab.Util;
 using Haxe;
 using Haxe.Js.Html;

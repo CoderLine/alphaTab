@@ -1,5 +1,4 @@
-﻿using System;
-using AlphaTab.Importer;
+﻿using AlphaTab.Importer;
 using Haxe.Zip;
 using Phase;
 
