@@ -33,7 +33,7 @@ namespace AlphaTab.Platform.JavaScript
         public override void Tex(string tex, int[] tracks = null)
         {
             var browser = (BrowserUiFacade)UiFacade;
-            Tex(tex, browser.ParseTracks(tracks));
+            base.Tex(tex, browser.ParseTracks(tracks));
         }
 
         public void Print(string width)

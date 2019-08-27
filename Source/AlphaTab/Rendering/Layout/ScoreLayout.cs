@@ -10,7 +10,7 @@ using Staff = AlphaTab.Rendering.Staves.Staff;
 namespace AlphaTab.Rendering.Layout
 {
     /// <summary>
-    /// This is the base public class for creating new layouting engines for the score renderer. 
+    /// This is the base public class for creating new layouting engines for the score renderer.
     /// </summary>
     internal abstract class ScoreLayout
     {
@@ -213,7 +213,7 @@ namespace AlphaTab.Rendering.Layout
                 {
                     var staff = track.Staves[staffIndex];
 
-                    // use optimal profile for track 
+                    // use optimal profile for track
                     string staveProfile;
                     if (staff.IsPercussion)
                     {
@@ -291,7 +291,7 @@ namespace AlphaTab.Rendering.Layout
         public void RenderAnnotation()
         {
             // attention, you are not allowed to remove change this notice within any version of this library without permission!
-            var msg = "Rendered using alphaTab (https://www.alphaTab.net)";
+            var msg = "rendered by alphaTab (https://alphaTab.net)";
 
             var canvas = Renderer.Canvas;
             var resources = Renderer.Settings.RenderingResources;

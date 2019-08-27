@@ -1,4 +1,5 @@
 ﻿using AlphaTab.Collections;
+using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Model;
 using AlphaTab.Platform;
 
@@ -39,15 +40,17 @@ namespace AlphaTab.Rendering.Utils
 
                         foreach (var beat in bar.Beats)
                         {
-                            var bb = Platform.Platform.NewObject();
+                            BeatBounds bb = Platform.Platform.NewObject();
 
                             bb.VisualBounds = BoundsToJson(beat.VisualBounds);
                             bb.RealBounds = BoundsToJson(beat.RealBounds);
-                            bb.BeatIndex = beat.Beat.Index;
-                            bb.VoiceIndex = beat.Beat.Voice.Index;
-                            bb.BarIndex = beat.Beat.Voice.Bar.Index;
-                            bb.StaffIndex = beat.Beat.Voice.Bar.Staff.Index;
-                            bb.TrackIndex = beat.Beat.Voice.Bar.Staff.Track.Index;
+
+                            dynamic bbd = bb;
+                            bbd.BeatIndex = beat.Beat.Index;
+                            bbd.VoiceIndex = beat.Beat.Voice.Index;
+                            bbd.BarIndex = beat.Beat.Voice.Bar.Index;
+                            bbd.StaffIndex = beat.Beat.Voice.Bar.Staff.Index;
+                            bbd.TrackIndex = beat.Beat.Voice.Bar.Staff.Track.Index;
 
                             if (beat.Notes != null)
                             {
@@ -55,8 +58,9 @@ namespace AlphaTab.Rendering.Utils
 
                                 foreach (var note in beat.Notes)
                                 {
-                                    var n = Platform.Platform.NewObject();
-                                    n.Index = note.Note.Index;
+                                    NoteBounds n = Platform.Platform.NewObject();
+                                    dynamic nd = n;
+                                    nd.Index = note.Note.Index;
                                     n.NoteHeadBounds = BoundsToJson(note.NoteHeadBounds);
                                     notes.Add(n);
                                 }
@@ -80,8 +84,7 @@ namespace AlphaTab.Rendering.Utils
         public static BoundsLookup FromJson(object json, Score score)
         {
             var lookup = new BoundsLookup();
-
-            var staveGroups = json.Member<FastList<StaveGroupBounds>>("StaveGroups");
+            var staveGroups = json.Member<FastList<StaveGroupBounds>>("staveGroups");
             foreach (var staveGroup in staveGroups)
             {
                 var sg = new StaveGroupBounds();
@@ -111,12 +114,14 @@ namespace AlphaTab.Rendering.Utils
                             var bb = new BeatBounds();
                             bb.VisualBounds = beat.VisualBounds;
                             bb.RealBounds = beat.RealBounds;
+
+                            dynamic bd = beat;
                             bb.Beat = score
-                                .Tracks[beat.Member<int>("TrackIndex")]
-                                .Staves[beat.Member<int>("StaffIndex")]
-                                .Bars[beat.Member<int>("BarIndex")]
-                                .Voices[beat.Member<int>("VoiceIndex")]
-                                .Beats[beat.Member<int>("BeatIndex")];
+                                .Tracks[bd.TrackIndex]
+                                .Staves[bd.StaffIndex]
+                                .Bars[bd.BarIndex]
+                                .Voices[bd.VoiceIndex]
+                                .Beats[bd.BeatIndex];
 
                             if (beat.Notes != null)
                             {
@@ -124,7 +129,9 @@ namespace AlphaTab.Rendering.Utils
                                 foreach (var note in beat.Notes)
                                 {
                                     var n = new NoteBounds();
-                                    n.Note = bb.Beat.Notes[note.Member<int>("Index")];
+                                    dynamic nd = note;
+                                    n.Note = bb.Beat.Notes[nd.Index];
+
                                     n.NoteHeadBounds = note.NoteHeadBounds;
                                     bb.AddNote(n);
                                 }
@@ -141,7 +148,7 @@ namespace AlphaTab.Rendering.Utils
 
         private Bounds BoundsToJson(Bounds bounds)
         {
-            var json = Platform.Platform.NewObject();
+            Bounds json = Platform.Platform.NewObject();
             json.X = bounds.X;
             json.Y = bounds.Y;
             json.W = bounds.W;
