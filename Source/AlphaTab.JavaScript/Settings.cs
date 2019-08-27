@@ -128,7 +128,6 @@ namespace AlphaTab
             json.useWorker = UseWorkers;
             json.scale = Scale;
             json.slurHeight = SlurHeight;
-            json.width = Width;
             json.engine = Engine;
             json.stretchForce = StretchForce;
             json.forcePianoFingering = ForcePianoFingering;
@@ -325,15 +324,6 @@ namespace AlphaTab
             else if (dataAttributes != null && dataAttributes.ContainsKey("slurHeight"))
             {
                 settings.SlurHeight = dataAttributes["slurHeight"].As<float>();
-            }
-
-            if (Platform.Platform.JsonExists(json, "width"))
-            {
-                settings.Width = json.width;
-            }
-            else if (dataAttributes != null && dataAttributes.ContainsKey("width"))
-            {
-                settings.Width = dataAttributes["width"].As<int>();
             }
 
             if (Platform.Platform.JsonExists(json, "engine"))

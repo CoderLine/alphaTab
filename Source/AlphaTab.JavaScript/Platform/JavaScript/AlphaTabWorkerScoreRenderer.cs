@@ -12,6 +12,7 @@ namespace AlphaTab.Platform.JavaScript
     {
         private readonly AlphaTabApi<T> _api;
         private readonly Worker _worker;
+        private int _width;
 
         public BoundsLookup BoundsLookup { get; private set; }
 
@@ -24,7 +25,7 @@ namespace AlphaTab.Platform.JavaScript
             }
             catch
             {
-                // fallback to blob worker 
+                // fallback to blob worker
                 try
                 {
                     HaxeString script = "importScripts('" + settings.ScriptFile + "')";
@@ -63,21 +64,34 @@ namespace AlphaTab.Platform.JavaScript
             });
         }
 
-        public void Invalidate()
+        public void Render()
         {
             _worker.PostMessage(new
             {
-                cmd = "alphaTab.invalidate"
+                cmd = "alphaTab.render"
             });
         }
 
-        public void Resize(int width)
+        public void ResizeRender()
         {
             _worker.PostMessage(new
             {
-                cmd = "alphaTab.resize",
-                width = width
+                cmd = "alphaTab.resizeRender"
             });
+        }
+
+        public int Width
+        {
+            get => _width;
+            set
+            {
+                _width = value;
+                _worker.PostMessage(new
+                {
+                    cmd = "alphaTab.setWidth",
+                    width = value
+                });
+            }
         }
 
         private void HandleWorkerMessage(Event e)
@@ -105,12 +119,12 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
-        public void Render(Score score, int[] trackIndexes)
+        public void RenderScore(Score score, int[] trackIndexes)
         {
             var jsObject = JsonConverter.ScoreToJsObject(score);
             _worker.PostMessage(new
             {
-                cmd = "alphaTab.render",
+                cmd = "alphaTab.renderScore",
                 score = jsObject,
                 trackIndexes = trackIndexes
             });

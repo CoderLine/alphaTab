@@ -16,6 +16,7 @@ namespace AlphaTab.Platform.CSharp
         private ManualResetEventSlim _threadStartedEvent;
         private CancellationTokenSource _workerCancellationToken;
         private ScoreRenderer _renderer;
+        private int _width;
 
         public BoundsLookup BoundsLookup { get; private set; }
 
@@ -91,39 +92,56 @@ namespace AlphaTab.Platform.CSharp
             return Thread.CurrentThread == _workerThread;
         }
 
-        public void Invalidate()
+        public void Render()
         {
             if (CheckAccess())
             {
-                _renderer.Invalidate();
+                _renderer.Render();
             }
             else
             {
-                _workerQueue.Add(() => Invalidate());
+                _workerQueue.Add(Render);
             }
         }
 
-        public void Resize(int width)
+        public int Width
         {
-            if (CheckAccess())
+            get => _width;
+            set
             {
-                _renderer.Resize(width);
-            }
-            else
-            {
-                _workerQueue.Add(() => Resize(width));
+                _width = value;
+                if (CheckAccess())
+                {
+                    _renderer.Width = value;
+                }
+                else
+                {
+                    _workerQueue.Add(() => _renderer.Width = value);
+                }
             }
         }
 
-        public void Render(Score score, int[] trackIndexes)
+        public void ResizeRender()
         {
             if (CheckAccess())
             {
-                _renderer.Render(score, trackIndexes);
+                _renderer.ResizeRender();
             }
             else
             {
-                _workerQueue.Add(() => Render(score, trackIndexes));
+                _workerQueue.Add(ResizeRender);
+            }
+        }
+
+        public void RenderScore(Score score, int[] trackIndexes)
+        {
+            if (CheckAccess())
+            {
+                _renderer.RenderScore(score, trackIndexes);
+            }
+            else
+            {
+                _workerQueue.Add(() => RenderScore(score, trackIndexes));
             }
         }
 

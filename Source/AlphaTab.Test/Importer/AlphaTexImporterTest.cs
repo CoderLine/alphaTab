@@ -230,12 +230,13 @@ namespace AlphaTab.Test.Importer
             settings.Staves = new StaveSettings("harmonics");
 
             var renderer = new ScoreRenderer(settings);
+            renderer.Width = 970;
             var svg = "";
             renderer.PartialRenderFinished += r =>
             {
                 svg += r.RenderResult.ToString();
             };
-            renderer.Render(score, new[] { 0 });
+            renderer.RenderScore(score, new[] { 0 });
 
             var regexTemplate = @"<text[^>]+>\s*{0}\s*</text>";
 
@@ -278,6 +279,7 @@ namespace AlphaTab.Test.Importer
             settings.UseWorkers = false;
 
             var renderer = new ScoreRenderer(settings);
+            renderer.Width = 970;
             var partials = new FastList<string>();
             renderer.Error += (o, e) =>
             {
@@ -287,7 +289,7 @@ namespace AlphaTab.Test.Importer
             {
                 partials.Add(r.RenderResult.ToString());
             };
-            renderer.Render(score, new[] { 0 });
+            renderer.RenderScore(score, new[] { 0 });
 
             var tab = new XmlDocument(partials[0]);
 
@@ -474,7 +476,7 @@ namespace AlphaTab.Test.Importer
         [TestMethod]
         public void TestMultiStaffWithSettings()
         {
-            var tex = @"\staff{score} 1.1 | 1.1 | 
+            var tex = @"\staff{score} 1.1 | 1.1 |
                         \staff{tabs} \capo 2 2.1 | 2.1 |
                         \staff{score tabs} \tuning A1 D2 A2 D3 G3 B3 E4 3.1 | 3.1";
             var score = ParseTex(tex);
@@ -565,17 +567,17 @@ namespace AlphaTab.Test.Importer
         public void TestMultiTrackMultiStaff()
         {
             var tex =
-            @"\track ""Piano"" 
-                \staff{score} \tuning piano \instrument acousticgrandpiano 
+            @"\track ""Piano""
+                \staff{score} \tuning piano \instrument acousticgrandpiano
                 c4 d4 e4 f4 |
-                
+
                 \staff{score} \tuning piano \clef F4
                 c2 c2 c2 c2 |
 
               \track ""Guitar""
                 \staff{tabs}
                 1.2 3.2 0.1 1.1 |
-              
+
               \track ""Second Guitar""
                 1.2 3.2 0.1 1.1
             ";
@@ -652,17 +654,17 @@ namespace AlphaTab.Test.Importer
         public void TestMultiTrackMultiStaffInconsistentBars()
         {
             var tex =
-            @"\track ""Piano"" 
-                \staff{score} \tuning piano \instrument acousticgrandpiano 
+            @"\track ""Piano""
+                \staff{score} \tuning piano \instrument acousticgrandpiano
                 c4 d4 e4 f4 |
-                
+
                 \staff{score} \tuning piano \clef F4
                 c2 c2 c2 c2 | c2 c2 c2 c2 | c2 c2 c2 c2 |
 
               \track ""Guitar""
                 \staff{tabs}
                 1.2 3.2 0.1 1.1 | 1.2 3.2 0.1 1.1 |
-              
+
               \track ""Second Guitar""
                 1.2 3.2 0.1 1.1
             ";

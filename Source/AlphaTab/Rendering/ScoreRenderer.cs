@@ -9,7 +9,7 @@ using AlphaTab.Util;
 namespace AlphaTab.Rendering
 {
     /// <summary>
-    /// This is the main wrapper of the rendering engine which 
+    /// This is the main wrapper of the rendering engine which
     /// can render a single track of a score object into a notation sheet.
     /// </summary>
     public class ScoreRenderer : IScoreRenderer
@@ -76,7 +76,7 @@ namespace AlphaTab.Rendering
         }
 
         /// <inheritdoc />
-        public void Render(Score score, int[] trackIndexes)
+        public void RenderScore(Score score, int[] trackIndexes)
         {
             try
             {
@@ -104,7 +104,7 @@ namespace AlphaTab.Rendering
                 }
 
                 Tracks = tracks.ToArray();
-                Invalidate();
+                Render();
             }
             catch (Exception e)
             {
@@ -128,7 +128,7 @@ namespace AlphaTab.Rendering
             }
 
             Tracks = tracks;
-            Invalidate();
+            Render();
         }
 
 
@@ -139,9 +139,9 @@ namespace AlphaTab.Rendering
         }
 
         /// <inheritdoc />
-        public void Invalidate()
+        public void Render()
         {
-            if (Settings.Width == 0)
+            if (Width == 0)
             {
                 Logger.Warning("Rendering", "AlphaTab skipped rendering because of width=0 (element invisible)");
                 return;
@@ -172,19 +172,26 @@ namespace AlphaTab.Rendering
         }
 
         /// <inheritdoc />
-        public void Resize(int width)
+        public int Width
+        {
+            get;
+            set;
+        }
+
+
+        /// <inheritdoc />
+        public void ResizeRender()
         {
             if (RecreateLayout() || RecreateCanvas() || _renderedTracks != Tracks || Tracks == null)
             {
                 Logger.Info("Rendering", "Starting full rerendering due to layout or canvas change");
-                Invalidate();
+                Render();
             }
             else if (Layout.SupportsResize)
             {
                 Logger.Info("Rendering", "Starting optimized rerendering for resize");
                 BoundsLookup = new BoundsLookup();
                 OnPreRender();
-                Settings.Width = width;
                 Canvas.Settings = Settings;
                 Layout.Resize();
                 Layout.RenderAnnotation();

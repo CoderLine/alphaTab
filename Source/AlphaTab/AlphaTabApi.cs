@@ -23,6 +23,7 @@ namespace AlphaTab
     public class AlphaTabApi<TSettings>
     {
         private long _startTime;
+        private FastList<int> _trackIndexes;
 
         /// <summary>
         /// Gets the UI facade to use for interacting with the user interface.
@@ -50,40 +51,14 @@ namespace AlphaTab
         public Settings Settings { get; internal set; }
 
         /// <summary>
-        /// Gets a list of the tracks that should be rendered based on <see cref="Score"/> and <see cref="TrackIndexes"/>
+        /// Gets a list of the tracks that are currently rendered;
         /// </summary>
-        public Track[] Tracks
-        {
-            get
-            {
-                var tracks = TrackIndexesToTracks(TrackIndexes);
-
-                if (tracks.Length == 0 && Score.Tracks.Count > 0)
-                {
-                    return new[]
-                    {
-                        Score.Tracks[0]
-                    };
-                }
-
-                return tracks;
-            }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether auto-sizing is active and the music sheet will be re-rendered on resize.
-        /// </summary>
-        internal bool AutoSize => Settings.Width < 0;
+        public Track[] Tracks { get; private set; }
 
         /// <summary>
         /// Gets the UI container that will hold all rendered results.
         /// </summary>
         internal IContainer CanvasElement { get; }
-
-        /// <summary>
-        /// Gets the indexes of the tracks that should be rendered of the currently set score.
-        /// </summary>
-        internal int[] TrackIndexes { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AlphaTabApi{TSettings}"/> class.
@@ -101,30 +76,15 @@ namespace AlphaTab
             CanvasElement = uiFacade.CreateCanvasElement();
             Container.AppendChild(CanvasElement);
 
-            #region Auto Sizing
 
-            if (AutoSize)
-            {
-                Settings.Width = (int)Container.Width;
-
-                Container.Resize += Platform.Platform.Throttle(() =>
+            Container.Resize += Platform.Platform.Throttle(() =>
+                {
+                    if (Container.Width != Renderer.Width)
                     {
-                        if (Container.Width != Settings.Width)
-                        {
-                            TriggerResize();
-                        }
-                    },
-                    uiFacade.ResizeThrottle);
-
-                var initialResizeEventInfo = new ResizeEventArgs();
-                initialResizeEventInfo.OldWidth = 0;
-                initialResizeEventInfo.NewWidth = (int)Container.Width;
-                initialResizeEventInfo.Settings = Settings;
-                OnResize(initialResizeEventInfo);
-                Settings.Width = initialResizeEventInfo.NewWidth;
-            }
-
-            #endregion
+                        TriggerResize();
+                    }
+                },
+                uiFacade.ResizeThrottle);
 
             if (Settings.UseWorkers && UiFacade.AreWorkersSupported &&
                 Environment.GetRenderEngineFactory(Settings).SupportsWorkers)
@@ -135,6 +95,12 @@ namespace AlphaTab
             {
                 Renderer = new ScoreRenderer(Settings);
             }
+
+            var initialResizeEventInfo = new ResizeEventArgs();
+            initialResizeEventInfo.OldWidth = Renderer.Width;
+            initialResizeEventInfo.NewWidth = (int)Container.Width;
+            initialResizeEventInfo.Settings = Settings;
+            OnResize(initialResizeEventInfo);
 
             Renderer.RenderFinished += e => OnRenderFinished();
             Renderer.PostRenderFinished += () =>
@@ -177,31 +143,6 @@ namespace AlphaTab
             Renderer.Destroy();
         }
 
-        /// <summary>
-        /// Maps the given list of track indexes to tracks using the current <see cref="Score"/>
-        /// </summary>
-        /// <param name="trackIndexes">The indexes of the tracks.</param>
-        /// <returns>A list of Tracks that are available in the current <see cref="Score"/>.</returns>
-        protected Track[] TrackIndexesToTracks(int[] trackIndexes)
-        {
-            var tracks = new FastList<Track>();
-
-            if (trackIndexes == null)
-            {
-                return Score.Tracks.Clone().ToArray();
-            }
-
-            foreach (var track in trackIndexes)
-            {
-                if (track >= 0 && track < Score.Tracks.Count)
-                {
-                    tracks.Add(Score.Tracks[track]);
-                }
-            }
-
-            return tracks.ToArray();
-        }
-
         #region Rendering
 
         /// <summary>
@@ -210,6 +151,103 @@ namespace AlphaTab
         public void UpdateSettings()
         {
             Renderer.UpdateSettings(Settings);
+        }
+
+        /// <summary>
+        /// Attempts a load of the score represented by the given data object.
+        /// </summary>
+        /// <param name="scoreData">The data container supported by <see cref="IUiFacade{TSettings}"/></param>
+        /// <param name="trackIndexes">
+        /// The indexes of the tracks from the song that should be rendered. If not provided, the first track of the
+        /// song will be shown.
+        /// </param>
+        /// <returns>true if the data object is supported and a load was initiated, otherwise false</returns>
+        public bool Load(object scoreData, int[] trackIndexes = null)
+        {
+            try
+            {
+                return UiFacade.Load(scoreData,
+                    score =>
+                    {
+                        RenderScore(score, trackIndexes);
+                    },
+                    error =>
+                    {
+                        OnError("import", error);
+                    });
+            }
+            catch (Exception e)
+            {
+                OnError("import", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Initiates a rendering of the given score.
+        /// </summary>
+        /// <param name="score">The score containing the tracks to be rendered.</param>
+        /// <param name="trackIndexes">
+        /// The indexes of the tracks from the song that should be rendered. If not provided, the first track of the
+        /// song will be shown.
+        /// </param>
+        public void RenderScore(Score score, int[] trackIndexes = null)
+        {
+            var tracks = new FastList<Track>();
+            if (trackIndexes == null)
+            {
+                if (score.Tracks.Count > 0)
+                {
+                    tracks.Add(score.Tracks[0]);
+                }
+            }
+            else
+            {
+                foreach (var index in trackIndexes)
+                {
+                    if (index >= 0 && index <= score.Tracks.Count)
+                    {
+                        tracks.Add(score.Tracks[index]);
+                    }
+                }
+            }
+            InternalRenderTracks(score, tracks.ToArray());
+        }
+
+        public void RenderTracks(Track[] tracks)
+        {
+            if (tracks.Length > 0)
+            {
+                var score = tracks[0].Score;
+                foreach (var track in tracks)
+                {
+                    if (track.Score != score)
+                    {
+                        OnError("load", new AlphaTabException("All rendered tracks must belong to the same score."));
+                        return;
+                    }
+                }
+
+                InternalRenderTracks(score, tracks);
+            }
+        }
+
+        private void InternalRenderTracks(Score score, Track[] tracks)
+        {
+            ModelUtils.ApplyPitchOffsets(Settings, score);
+
+            Score = score;
+            Tracks = tracks;
+            _trackIndexes = new FastList<int>();
+            foreach (var track in tracks)
+            {
+                _trackIndexes.Add(track.Index);
+            }
+
+            OnLoaded(score);
+            LoadMidiForScore();
+
+            Render();
         }
 
         private void TriggerResize()
@@ -228,14 +266,14 @@ namespace AlphaTab
             {
                 var resizeEventInfo = new ResizeEventArgs
                 {
-                    OldWidth = Settings.Width,
+                    OldWidth = Renderer.Width,
                     NewWidth = (int)Container.Width,
                     Settings = Settings
                 };
                 OnResize(resizeEventInfo);
-                Settings.Width = resizeEventInfo.NewWidth;
                 Renderer.UpdateSettings(Settings);
-                Renderer.Resize(Settings.Width);
+                Renderer.Width = (int)Container.Width;
+                Renderer.ResizeRender();
             }
         }
 
@@ -259,27 +297,6 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// Initiates a rendering of the given tracks.
-        /// </summary>
-        /// <param name="score">The data model holding the song information.</param>
-        /// <param name="tracks">The indexes of the tracks to render.</param>
-        /// <param name="invalidate">If set to true, a redrawing will be done as part of this call. </param>
-        public void RenderTracks(Score score, int[] tracks, bool invalidate = true)
-        {
-            if (score != null && score != Score)
-            {
-                ScoreLoaded(score, false);
-            }
-
-            TrackIndexes = tracks;
-
-            if (invalidate)
-            {
-                Render();
-            }
-        }
-
-        /// <summary>
         /// Tells alphaTab to render the given alphaTex.
         /// </summary>
         /// <param name="tex">The alphaTex code to render.</param>
@@ -292,45 +309,11 @@ namespace AlphaTab
                 var data = ByteBuffer.FromBuffer(Platform.Platform.StringToByteArray(tex));
                 parser.Init(data, Settings);
                 var score = parser.ReadScore();
-                if (tracks != null)
-                {
-                    tracks = new int[]
-                    {
-                        0
-                    };
-                }
-
-                RenderTracks(score, tracks, true);
+                RenderScore(score, tracks);
             }
             catch (Exception e)
             {
                 OnError("import", e);
-            }
-        }
-
-        /// <summary>
-        /// Attempts a load of the score represented by the given data object.
-        /// </summary>
-        /// <param name="data">The data container supported by <see cref="IUiFacade{TSettings}"/></param>
-        /// <returns>true if the data object is supported and a load was initiated, otherwise false</returns>
-        public bool Load(object data)
-        {
-            try
-            {
-                return UiFacade.Load(data,
-                    score =>
-                    {
-                        ScoreLoaded(score);
-                    },
-                    error =>
-                    {
-                        OnError("import", error);
-                    });
-            }
-            catch (Exception e)
-            {
-                OnError("import", e);
-                return false;
             }
         }
 
@@ -350,25 +333,6 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// Performs any necessary steps that are needed after a new score was loaded/set.
-        /// </summary>
-        /// <param name="score">The score that was loaded.</param>
-        /// <param name="render">If set to true, a rerendering will be initiated as part of this call.</param>
-        protected internal void ScoreLoaded(Score score, bool render = true)
-        {
-            ModelUtils.ApplyPitchOffsets(Settings, score);
-
-            Score = score;
-            OnLoaded(score);
-            LoadMidiForScore();
-
-            if (render)
-            {
-                Render();
-            }
-        }
-
-        /// <summary>
         /// Initiates a re-rendering of the current setup. If rendering is not yet possible, it will be deferred until the UI changes to be ready for rendering.
         /// </summary>
         public void Render()
@@ -384,7 +348,8 @@ namespace AlphaTab
                 if (UiFacade.CanRender)
                 {
                     // when font is finally loaded, start rendering
-                    Renderer.Render(Score, TrackIndexes);
+                    Renderer.Width = (int)Container.Width;
+                    Renderer.RenderScore(Score, _trackIndexes.ToArray());
                 }
                 else
                 {
@@ -1171,7 +1136,7 @@ namespace AlphaTab
         {
             Settings.Layout = layoutSettings;
             Renderer.UpdateSettings(Settings);
-            Renderer.Invalidate();
+            Renderer.Render();
         }
 
 

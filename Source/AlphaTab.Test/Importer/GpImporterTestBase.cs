@@ -556,7 +556,7 @@ namespace AlphaTab.Test.Importer
                     totalWidth = (int)r.TotalWidth;
                     totalHeight = (int)r.TotalHeight;
                 };
-                renderer.Render(score, new[] { track.Index });
+                renderer.RenderScore(score, new[] { track.Index });
 
                 var final = new StringBuilder();
                 final.Append("<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"" + ((int)totalWidth) + "px\" height=\"" + ((int)totalHeight) + "px\">");

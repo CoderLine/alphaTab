@@ -27,6 +27,7 @@ namespace AlphaTab.UI
         private int _visibilityCheckIntervalId;
         private int _visibilityCheckInterval;
         private int _totalResultCount;
+        private int[] _initialTrackIndexes;
 
         public int ResizeThrottle => 10;
 
@@ -108,7 +109,7 @@ namespace AlphaTab.UI
             #region build tracks array
 
             // get track data to parse
-            dynamic tracksData;
+            object tracksData;
             if (options != null && options.tracks)
             {
                 tracksData = options.tracks;
@@ -125,7 +126,7 @@ namespace AlphaTab.UI
                 }
             }
 
-            SetTracks(tracksData, false);
+            _initialTrackIndexes = ParseTracks(tracksData);
 
             #endregion
 
@@ -250,11 +251,8 @@ namespace AlphaTab.UI
             {
                 // rendering was possibly delayed due to invisible element
                 // in this case we need the correct width for autosize
-                if (_api.AutoSize)
-                {
-                    _api.Settings.Width = (int)RootContainer.Width;
-                    _api.Renderer.UpdateSettings(_api.Settings);
-                }
+                _api.Renderer.Width = (int)RootContainer.Width;
+                _api.Renderer.UpdateSettings(_api.Settings);
 
                 if (!string.IsNullOrEmpty(_contents))
                 {
@@ -263,7 +261,11 @@ namespace AlphaTab.UI
                 else if (!string.IsNullOrEmpty(_file))
                 {
                     ScoreLoader.LoadScoreAsync(_file,
-                        s => _api.ScoreLoaded(s),
+                        s =>
+                        {
+                            _api.RenderScore(s, _initialTrackIndexes);
+                            _initialTrackIndexes = null;
+                        },
                         e => { _api.OnError("import", e); },
                         _api.Settings);
                 }
@@ -337,23 +339,12 @@ namespace AlphaTab.UI
             }
         }
 
-        public void SetTracks(dynamic tracksData, bool render = true)
-        {
-            Score score = null;
-            if (tracksData.length && Platform.Platform.TypeOf(tracksData[0].Index) == "number")
-            {
-                score = tracksData[0].Score;
-            }
-            else if (Platform.Platform.TypeOf(tracksData.Index) == "number")
-            {
-                score = tracksData.Score;
-            }
-
-            _api.RenderTracks(score, ParseTracks(tracksData), render);
-        }
-
         public int[] ParseTracks(object tracksData)
         {
+            if (tracksData == null)
+            {
+                return new int[0];
+            }
             var tracks = new FastList<int>();
 
             // decode string

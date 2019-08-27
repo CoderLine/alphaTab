@@ -56,12 +56,15 @@ namespace AlphaTab.Platform.JavaScript
                     _renderer.Error += Error;
                     break;
                 case "alphaTab.invalidate":
-                    _renderer.Invalidate();
+                    _renderer.Render();
                     break;
-                case "alphaTab.resize":
-                    _renderer.Resize(data.width);
+                case "alphaTab.resizeRender":
+                    _renderer.ResizeRender();
                     break;
-                case "alphaTab.render":
+                case "alphaTab.setWidth":
+                    _renderer.Width = data.width;
+                    break;
+                case "alphaTab.renderScore":
                     var score = JsonConverter.JsObjectToScore(data.score, _renderer.Settings);
                     RenderMultiple(score, data.trackIndexes);
                     break;
@@ -80,7 +83,7 @@ namespace AlphaTab.Platform.JavaScript
         {
             try
             {
-                _renderer.Render(score, trackIndexes);
+                _renderer.RenderScore(score, trackIndexes);
             }
             catch (Exception e)
             {
