@@ -42,7 +42,7 @@ namespace AlphaTab.Audio.Generator
         public MidiFileGenerator(Score score, Settings settings, IMidiFileHandler handler)
         {
             _score = score;
-            _settings = settings ?? Settings.Defaults;
+            _settings = settings == null ? Settings.Defaults : settings;
             _currentTempo = _score.Tempo;
             _handler = handler;
             TickLookup = new MidiTickLookup();
