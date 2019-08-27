@@ -5,36 +5,44 @@ using AlphaTab.Haxe.Js.Html;
 namespace AlphaTab.Platform.Svg
 {
     /// <summary>
-    /// This public class stores text widths for several fonts and allows width calculation 
+    /// This public class stores text widths for several fonts and allows width calculation
     /// </summary>
     internal partial class FontSizes
     {
-        public static byte[] GenerateFontLookup(string family)
+        public static void GenerateFontLookup(string family)
         {
             if (FontSizeLookupTables == null)
             {
-                FontSizeLookupTables = new FastDictionary<string, byte[]>();
+                Init();
             }
-
             if (FontSizeLookupTables.ContainsKey(family))
             {
-                return FontSizeLookupTables[family];
+                return;
             }
 
-            var canvas = (CanvasElement)Browser.Document.CreateElement("canvas");
-            var measureContext = (CanvasRenderingContext2D)canvas.GetContext("2d");
-            measureContext.Font = "11px " + family;
-
-            var sizes = new FastList<byte>();
-            for (var i = 0x20; i < 255; i++)
+            if (Lib.Global.document)
             {
-                var s = Platform.StringFromCharCode(i);
-                sizes.Add((byte)measureContext.MeasureText(s).Width);
-            }
+                var canvas = (CanvasElement)Browser.Document.CreateElement("canvas");
+                var measureContext = (CanvasRenderingContext2D)canvas.GetContext("2d");
+                measureContext.Font = "11px " + family;
 
-            var data = sizes.ToArray();
-            FontSizeLookupTables[family] = data;
-            return data;
+                var sizes = new FastList<byte>();
+                for (var i = 0x20; i < 255; i++)
+                {
+                    var s = Platform.StringFromCharCode(i);
+                    sizes.Add((byte)measureContext.MeasureText(s).Width);
+                }
+
+                var data = sizes.ToArray();
+                FontSizeLookupTables[family] = data;
+            }
+            else
+            {
+                FontSizeLookupTables[family] = new byte[]
+                {
+                    8
+                };
+            }
         }
     }
 }

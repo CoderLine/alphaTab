@@ -9,6 +9,7 @@ using AlphaTab.Model;
 using AlphaTab.Platform;
 using AlphaTab.Platform.JavaScript;
 using AlphaTab.Platform.Model;
+using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
@@ -62,8 +63,10 @@ namespace AlphaTab.UI
         }
 
         public event Action CanRenderChanged;
-        private void OnFontLoaded()
+        private void OnFontLoaded(string family)
         {
+            FontSizes.GenerateFontLookup(family);
+
             if (AreAllFontsLoaded())
             {
                 var handler = CanRenderChanged;

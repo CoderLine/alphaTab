@@ -5,7 +5,7 @@ using AlphaTab.Platform.Model;
 namespace AlphaTab.Platform.Svg
 {
     /// <summary>
-    /// This public class stores text widths for several fonts and allows width calculation 
+    /// This public class stores text widths for several fonts and allows width calculation
     /// </summary>
     internal partial class FontSizes
     {
@@ -57,18 +57,11 @@ namespace AlphaTab.Platform.Svg
 
             byte[] data;
             var dataSize = 11;
-            if (FontSizeLookupTables.ContainsKey(family))
+            if (!FontSizeLookupTables.ContainsKey(family))
             {
-                data = FontSizeLookupTables[family];
+                GenerateFontLookup(family);
             }
-            else
-            {
-                // TODO: on-the-fly-generation for all canvas types
-                data = new byte[]
-                {
-                    8
-                };
-            }
+            data = FontSizeLookupTables[family];
 
             float factor = 1;
             if ((style & FontStyle.Italic) != 0)

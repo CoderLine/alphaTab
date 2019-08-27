@@ -885,8 +885,6 @@ namespace AlphaTab
                     family = family.Substring(1, family.Length - 2);
                 }
 
-                FontSizes.GenerateFontLookup(family);
-
                 string fontSizeString = style.FontSize.ToLowerCase();
                 float fontSize;
                 // as per https://websemantics.uk/articles/font-size-conversion/

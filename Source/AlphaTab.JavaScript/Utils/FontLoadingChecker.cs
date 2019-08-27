@@ -16,14 +16,14 @@ namespace AlphaTab.Utils
         private readonly string _fallbackText;
         private bool _isStarted;
         public bool IsFontLoaded { get; set; }
-        public event Action FontLoaded;
+        public event Action<string> FontLoaded;
 
         private void OnFontLoaded()
         {
             var handler = FontLoaded;
             if (handler != null)
             {
-                handler();
+                handler(_family);
             }
         }
 
