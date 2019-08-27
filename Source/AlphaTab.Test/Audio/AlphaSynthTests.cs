@@ -1,11 +1,8 @@
 ﻿using System;
-using System.IO;
 using AlphaTab.Audio.Generator;
 using AlphaTab.Audio.Synth;
-using AlphaTab.Audio.Synth.Bank;
-using AlphaTab.Audio.Synth.Ds;
 using AlphaTab.Audio.Synth.Midi;
-using AlphaTab.Audio.Synth.Util;
+using AlphaTab.Audio.Synth.SoundFont;
 using AlphaTab.Collections;
 using AlphaTab.Importer;
 using AlphaTab.IO;
@@ -16,50 +13,6 @@ namespace AlphaTab.Test.Audio
     [TestClass]
     public class AlphaSynthTests
     {
-        [TestMethod, AsyncTestMethod]
-        public void TestLoadSf2PatchBank()
-        {
-            TestPlatform.LoadFile("TestFiles/Audio/default.sf2", data =>
-            {
-                var patchBank = new PatchBank();
-                var input = ByteBuffer.FromBuffer(data);
-                patchBank.LoadSf2(input);
-
-                Assert.AreEqual("GS sound set (16 bit)", patchBank.Name);
-                Assert.AreEqual("960920 ver. 1.00.16", patchBank.Comments);
-                Assert.AreEqual("0,1,2,3,4,5,6,7,8,9,16,24,32,128", string.Join(",", patchBank.LoadedBanks));
-
-                var gmBank = patchBank.GetBank(0);
-                var expectedPatches = new string[]
-                {
-                    "Piano 1", "Piano 2", "Piano 3", "Honky-tonk", "E.Piano 1", "E.Piano 2", "Harpsichord", "Clav.",
-                    "Celesta", "Glockenspiel", "Music Box", "Vibraphone", "Marimba", "Xylophone", "Tubular-bell", "Santur", "Organ 1",
-                    "Organ 2", "Organ 3", "Church Org.1", "Reed Organ", "Accordion Fr", "Harmonica", "Bandoneon",
-                    "Nylon-str.Gt", "Steel-str.Gt", "Jazz Gt.", "Clean Gt.", "Muted Gt.", "Overdrive Gt", "DistortionGt", "Gt.Harmonics",
-                    "Acoustic Bs.", "Fingered Bs.", "Picked Bs.", "Fretless Bs.", "Slap Bass 1", "Slap Bass 2", "Synth Bass 1",
-                    "Synth Bass 2", "Violin", "Viola", "Cello", "Contrabass", "Tremolo Str", "PizzicatoStr", "Harp", "Timpani", "Strings",
-                    "Slow Strings", "Syn.Strings1", "Syn.Strings2", "Choir Aahs", "Voice Oohs", "SynVox", "OrchestraHit", "Trumpet", "Trombone", "Tuba",
-                    "MutedTrumpet", "French Horns", "Brass 1", "Synth Brass1", "Synth Brass2", "Soprano Sax", "Alto Sax", "Tenor Sax", "Baritone Sax",
-                    "Oboe", "English Horn", "Bassoon", "Clarinet", "Piccolo", "Flute", "Recorder", "Pan Flute", "Bottle Blow", "Shakuhachi", "Whistle",
-                    "Ocarina", "Square Wave", "Saw Wave", "Syn.Calliope", "Chiffer Lead", "Charang", "Solo Vox", "5th Saw Wave",
-                    "Bass & Lead", "Fantasia", "Warm Pad", "Polysynth", "Space Voice", "Bowed Glass", "Metal Pad", "Halo Pad", "Sweep Pad",
-                    "Ice Rain", "Soundtrack", "Crystal", "Atmosphere", "Brightness", "Goblin", "Echo Drops", "Star Theme", "Sitar",
-                    "Banjo", "Shamisen", "Koto", "Kalimba", "Bagpipe", "Fiddle", "Shanai", "Tinkle Bell", "Agogo", "Steel Drums", "Woodblock",
-                    "Taiko", "Melo. Tom 1", "Synth Drum", "Reverse Cym.", "Gt.FretNoise", "Breath Noise", "Seashore", "Bird", "Telephone 1",
-                    "Helicopter", "Applause", "Gun Shot"
-                };
-                var actualPatches = new FastList<string>();
-                foreach (var patch in gmBank)
-                {
-                    if (patch != null)
-                    {
-                        actualPatches.Add(patch.Name);
-                    }
-                }
-                Assert.AreEqual(string.Join(",", expectedPatches), string.Join(",", actualPatches));
-            });
-        }
-
         [TestMethod, AsyncTestMethod]
         public void TestPcmGeneration()
         {
@@ -144,7 +97,7 @@ namespace AlphaTab.Test.Audio
         {
         }
 
-        public void AddSamples(SampleArray f)
+        public void AddSamples(float[] f)
         {
             for (var i = 0; i < f.Length; i++)
             {

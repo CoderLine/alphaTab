@@ -124,9 +124,10 @@ namespace AlphaTab.Platform.JavaScript
             FlashOutput.AlphaSynthSequencerFinished();
         }
 
-        public void AddSamples(SampleArray samples)
+        public void AddSamples(float[] samples)
         {
-            var uint8 = new Uint8Array(samples.ToFloat32Array().Buffer);
+            Float32Array f32 = samples.As<Float32Array>();
+            var uint8 = new Uint8Array(f32.Buffer);
             var b64 = Script.Write<string>(
                 "untyped __js__(\"window.btoa(String.fromCharCode.apply(null, {0}))\", uint8)");
             FlashOutput.AlphaSynthAddSamples(b64);

@@ -26,23 +26,50 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace AlphaTab.Audio.Synth.Util
+using System;
+using AlphaTab.Collections;
+
+namespace AlphaTab.Audio.Synth.Synthesis
 {
-    internal static class SynthConstants
+    internal class Channels
     {
-        public const int DrumBank = 128;
-        public const int DefaultChannelCount = 16 + 1 /*metronome*/;
-        public const int MetronomeChannel = DefaultChannelCount - 1;
+        public int ActiveChannel { get; set; }
+        public FastList<Channel> ChannelList { get; set; }
 
-        public const int AudioChannels = 2;
+        public Channels()
+        {
+            ChannelList = new FastList<Channel>();
+        }
 
-        public const float MinVolume = 0f;
-        public const float MaxVolume = 1f;
+        public void SetupVoice(TinySoundFont tinySoundFont, Voice voice)
+        {
+            var c = ChannelList[ActiveChannel];
+            var newpan = voice.Region.Pan + c.PanOffset;
+            voice.PlayingChannel = ActiveChannel;
+            voice.MixVolume = c.MixVolume;
+            voice.NoteGainDb += c.GainDb;
+            voice.CalcPitchRatio(
+                (c.PitchWheel == 8192
+                    ? c.Tuning
+                    : ((c.PitchWheel / 16383.0f * c.PitchRange * 2.0f) - c.PitchRange + c.Tuning)),
+                tinySoundFont.OutSampleRate
+            );
 
-        public const byte MinProgram = 0;
-        public const byte MaxProgram = 127;
-
-        public const double MinPlaybackSpeed = 0.125;
-        public const double MaxPlaybackSpeed = 8;
+            if (newpan <= -0.5f)
+            {
+                voice.PanFactorLeft = 1.0f;
+                voice.PanFactorRight = 0.0f;
+            }
+            else if (newpan >= 0.5f)
+            {
+                voice.PanFactorLeft = 0.0f;
+                voice.PanFactorRight = 1.0f;
+            }
+            else
+            {
+                voice.PanFactorLeft = (float)Math.Sqrt(0.5f - newpan);
+                voice.PanFactorRight = (float)Math.Sqrt(0.5f + newpan);
+            }
+        }
     }
 }

@@ -26,23 +26,35 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace AlphaTab.Audio.Synth.Util
+using AlphaTab.IO;
+
+namespace AlphaTab.Audio.Synth.SoundFont
 {
-    internal static class SynthConstants
+    internal class HydraPhdr
     {
-        public const int DrumBank = 128;
-        public const int DefaultChannelCount = 16 + 1 /*metronome*/;
-        public const int MetronomeChannel = DefaultChannelCount - 1;
+        public const int SizeInFile = 38;
 
-        public const int AudioChannels = 2;
+        public string PresetName { get; set; }
+        public ushort Preset { get; set; }
+        public ushort Bank { get; set; }
+        public ushort PresetBagNdx { get; set; }
+        public uint Library { get; set; }
+        public uint Genre { get; set; }
+        public uint Morphology { get; set; }
 
-        public const float MinVolume = 0f;
-        public const float MaxVolume = 1f;
+        public static HydraPhdr Load(IReadable reader)
+        {
+            HydraPhdr phdr = new HydraPhdr();
 
-        public const byte MinProgram = 0;
-        public const byte MaxProgram = 127;
+            phdr.PresetName = reader.Read8BitStringLength(20);
+            phdr.Preset = reader.ReadUInt16LE();
+            phdr.Bank = reader.ReadUInt16LE();
+            phdr.PresetBagNdx = reader.ReadUInt16LE();
+            phdr.Library = reader.ReadUInt32LE();
+            phdr.Genre = reader.ReadUInt32LE();
+            phdr.Morphology = reader.ReadUInt32LE();
 
-        public const double MinPlaybackSpeed = 0.125;
-        public const double MaxPlaybackSpeed = 8;
+            return phdr;
+        }
     }
 }

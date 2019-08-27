@@ -26,23 +26,31 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace AlphaTab.Audio.Synth.Util
+using AlphaTab.IO;
+
+namespace AlphaTab.Audio.Synth.SoundFont
 {
-    internal static class SynthConstants
+    internal class HydraGenAmount
     {
-        public const int DrumBank = 128;
-        public const int DefaultChannelCount = 16 + 1 /*metronome*/;
-        public const int MetronomeChannel = DefaultChannelCount - 1;
+        public ushort WordAmount { get; set; }
+        public short ShortAmount => (short)WordAmount;
+        public byte LowByteAmount
+        {
+            get => (byte)(WordAmount & 0x00FF);
+            set => WordAmount = (ushort)((WordAmount & 0xFF00) | value);
+        }
 
-        public const int AudioChannels = 2;
+        public byte HighByteAmount
+        {
+            get => (byte)((WordAmount & 0xFF00) >> 8);
+            set => WordAmount = (ushort)((value & 0xFF00) | (WordAmount & 0xFF));
+        }
 
-        public const float MinVolume = 0f;
-        public const float MaxVolume = 1f;
-
-        public const byte MinProgram = 0;
-        public const byte MaxProgram = 127;
-
-        public const double MinPlaybackSpeed = 0.125;
-        public const double MaxPlaybackSpeed = 8;
+        public static HydraGenAmount Load(IReadable reader)
+        {
+            var genAmount = new HydraGenAmount();
+            genAmount.WordAmount = reader.ReadUInt16LE();
+            return genAmount;
+        }
     }
 }

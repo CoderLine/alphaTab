@@ -48,6 +48,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
             Ready();
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             Close();
@@ -85,7 +86,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
         }
 
         /// <inheritdoc />
-        public void AddSamples(SampleArray f)
+        public void AddSamples(float[] f)
         {
             _circularBuffer.Write(f, 0, f.Length);
         }
@@ -122,7 +123,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
             }
             else
             {
-                var read = new SampleArray(count);
+                var read = new float[count];
                 _circularBuffer.Read(read, 0, read.Length);
 
                 for (var i = 0; i < count; i++)

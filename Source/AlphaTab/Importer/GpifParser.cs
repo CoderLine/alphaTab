@@ -62,7 +62,7 @@ namespace AlphaTab.Importer
         private FastDictionary<string, Voice> _voiceById; // contains voices by their id
 
         private FastDictionary<string, string[]>
-            _beatsOfVoice; // contains ids of beats stored in a voice (key = voice id) 
+            _beatsOfVoice; // contains ids of beats stored in a voice (key = voice id)
 
         private FastDictionary<string, string> _rhythmOfBeat; // contains ids of rhythm used by a beat (key = beat id)
         private FastDictionary<string, Beat> _beatById; // contains beats by their id
@@ -135,10 +135,10 @@ namespace AlphaTab.Importer
                 return;
             }
 
-            // the XML uses IDs for referring elements within the 
+            // the XML uses IDs for referring elements within the
             // model. Therefore we do the parsing in 2 steps:
             // - at first we read all model elements and store them by ID in a lookup table
-            // - after that we need to join up the information. 
+            // - after that we need to join up the information.
             if (root.LocalName == "GPIF")
             {
                 Score = new Score();
@@ -189,7 +189,7 @@ namespace AlphaTab.Importer
 
         //
         // <Score>...</Score>
-        // 
+        //
 
         private void ParseScoreNode(XmlNode element)
         {
@@ -252,7 +252,7 @@ namespace AlphaTab.Importer
 
         //
         // <MasterTrack>...</MasterTrack>
-        //  
+        //
 
         private void ParseMasterTrackNode(XmlNode node)
         {
@@ -364,7 +364,7 @@ namespace AlphaTab.Importer
 
         //
         // <Tracks>...</Tracks>
-        //  
+        //
 
         private void ParseTracksNode(XmlNode node)
         {
@@ -432,6 +432,7 @@ namespace AlphaTab.Importer
                             break;
                         case "GeneralMidi":
                         case "MidiConnection":
+                        case "MIDISettings":
                             ParseGeneralMidi(track, c);
                             break;
                         case "Sounds":
@@ -950,7 +951,7 @@ namespace AlphaTab.Importer
 
         //
         // <MasterBars>...</MasterBars>
-        //  
+        //
 
         private void ParseMasterBarsNode(XmlNode node)
         {
@@ -1007,7 +1008,7 @@ namespace AlphaTab.Importer
                             }
 
                             break;
-                        // TODO case "Directions": // Coda segno etc. 
+                        // TODO case "Directions": // Coda segno etc.
                         case "AlternateEndings":
                             var alternateEndings = c.InnerText.Split(' ');
                             var i = 0;
@@ -1140,7 +1141,7 @@ namespace AlphaTab.Importer
 
         //
         // <Bars>...</Bars>
-        //  
+        //
 
         private void ParseBars(XmlNode node)
         {
@@ -1235,7 +1236,7 @@ namespace AlphaTab.Importer
 
         //
         // <Voices>...</Voices>
-        // 
+        //
 
         private void ParseVoices(XmlNode node)
         {
@@ -1276,7 +1277,7 @@ namespace AlphaTab.Importer
 
         //
         // <Beats>...</Beats>
-        // 
+        //
 
         private void ParseBeats(XmlNode node)
         {
@@ -1681,7 +1682,7 @@ namespace AlphaTab.Importer
 
         //
         // <Notes>...</Notes>
-        // 
+        //
 
         private void ParseNotes(XmlNode node)
         {
@@ -1904,9 +1905,9 @@ namespace AlphaTab.Importer
                                     }
 
                                     break;
-                                // case "Element": 
-                                // case "Variation": 
-                                // case "Tone": 
+                                // case "Element":
+                                // case "Variation":
+                                // case "Tone":
                                 case "Octave":
                                     note.Octave = Platform.Platform.ParseInt(c.FindChildElement("Number").InnerText);
                                     break;
@@ -1962,7 +1963,7 @@ namespace AlphaTab.Importer
                                     }
 
                                     // NOTE: If we directly cast the expression of value to (int) it is 3 instead of 4, strange compiler
-                                    // optimizations happening here: 
+                                    // optimizations happening here:
                                     // (int)(Platform.ParseFloat(GetValue(c.FindChildElement("Float")))* BendPointValueFactor) => (int)(100f * 0.04f) => 3
                                     // (Platform.ParseFloat(GetValue(c.FindChildElement("Float")))* BendPointValueFactor) => (100f * 0.04f) => 4.0
                                     bendDestination.Value =
@@ -1989,7 +1990,7 @@ namespace AlphaTab.Importer
 
                                     break;
                                 case "HopoDestination":
-                                    // NOTE: gets automatically calculated 
+                                    // NOTE: gets automatically calculated
                                     // if (FindChildElement(node, "Enable") != null)
                                     //     note.isHammerPullDestination = true;
                                     break;

@@ -26,23 +26,42 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace AlphaTab.Audio.Synth.Util
+
+using AlphaTab.Audio.Synth.Util;
+
+namespace AlphaTab.Audio.Synth.Synthesis
 {
-    internal static class SynthConstants
+    internal class VoiceLfo
     {
-        public const int DrumBank = 128;
-        public const int DefaultChannelCount = 16 + 1 /*metronome*/;
-        public const int MetronomeChannel = DefaultChannelCount - 1;
+        public int SamplesUntil { get; set; }
+        public float Level { get; set; }
+        public float Delta { get; set; }
 
-        public const int AudioChannels = 2;
+        public void Setup(float delay, int freqCents, float outSampleRate)
+        {
+            SamplesUntil = (int)(delay * outSampleRate);
+            Delta = (4.0f * SynthHelper.Cents2Hertz(freqCents) / outSampleRate);
+            Level = 0;
+        }
 
-        public const float MinVolume = 0f;
-        public const float MaxVolume = 1f;
-
-        public const byte MinProgram = 0;
-        public const byte MaxProgram = 127;
-
-        public const double MinPlaybackSpeed = 0.125;
-        public const double MaxPlaybackSpeed = 8;
+        public void Process(int blockSamples)
+        {
+            if (SamplesUntil > blockSamples)
+            {
+                SamplesUntil -= blockSamples;
+                return;
+            }
+            Level += Delta * blockSamples;
+            if (Level > 1.0f)
+            {
+                Delta = -Delta;
+                Level = 2.0f - Level;
+            }
+            else if (Level < -1.0f)
+            {
+                Delta = -Delta;
+                Level = -2.0f - Level;
+            }
+        }
     }
 }

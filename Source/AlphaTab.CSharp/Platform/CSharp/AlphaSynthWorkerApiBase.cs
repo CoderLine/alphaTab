@@ -145,7 +145,7 @@ namespace AlphaTab.Platform.CSharp
             DispatchOnWorkerThread(() => { Player.SetChannelSolo(channel, solo); });
         }
 
-        public void SetChannelVolume(int channel, double volume)
+        public void SetChannelVolume(int channel, float volume)
         {
             DispatchOnWorkerThread(() => { Player.SetChannelVolume(channel, volume); });
         }

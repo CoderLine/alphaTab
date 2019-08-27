@@ -26,23 +26,24 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
  * USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-namespace AlphaTab.Audio.Synth.Util
+namespace AlphaTab.Audio.Synth.Synthesis
 {
-    internal static class SynthConstants
+    /// <summary>
+    /// Supported output modes by the render methods
+    /// </summary>
+    public enum OutputMode
     {
-        public const int DrumBank = 128;
-        public const int DefaultChannelCount = 16 + 1 /*metronome*/;
-        public const int MetronomeChannel = DefaultChannelCount - 1;
-
-        public const int AudioChannels = 2;
-
-        public const float MinVolume = 0f;
-        public const float MaxVolume = 1f;
-
-        public const byte MinProgram = 0;
-        public const byte MaxProgram = 127;
-
-        public const double MinPlaybackSpeed = 0.125;
-        public const double MaxPlaybackSpeed = 8;
+        /// <summary>
+        /// Two channels with single left/right samples one after another
+        /// </summary>
+        StereoInterleaved,
+        /// <summary>
+        /// Two channels with all samples for the left channel first then right
+        /// </summary>
+        StereoUnweaved,
+        /// <summary>
+        /// A single channel (stereo instruments are mixed into center)
+        /// </summary>
+        Mono
     }
 }

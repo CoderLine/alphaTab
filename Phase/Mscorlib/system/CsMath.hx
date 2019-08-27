@@ -17,6 +17,7 @@ class CsMath
 	public static inline function Round_Single(a:Single) : Single return Math.round(a.ToHaxeFloat());
 	public static inline function Sin(a:Double) : Double return Math.sin(a.ToHaxeFloat());
 	public static inline function Cos(a:Double) : Double return Math.cos(a.ToHaxeFloat());
+	public static inline function Tan(a:Double) : Double return Math.tan(a.ToHaxeFloat());
 	public static inline function Pow(v:Double, exp:Double) : Double return Math.pow(v.ToHaxeFloat(), exp.ToHaxeFloat());
 	public static inline function Ceiling_Single(v:Single) : Single return Math.ceil(v.ToHaxeFloat());
 	public static inline function Ceiling_Double(v:Double) : Double return Math.ceil(v.ToHaxeFloat());

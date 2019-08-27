@@ -3,7 +3,6 @@ using AlphaTab.Audio;
 using AlphaTab.Audio.Generator;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Midi;
-using AlphaTab.Audio.Synth.Synthesis;
 using AlphaTab.Collections;
 using AlphaTab.Importer;
 using AlphaTab.IO;
@@ -592,6 +591,15 @@ namespace AlphaTab
             Player.ReadyForPlayback += () =>
             {
                 UiFacade.TriggerEvent(Container, "playerReady");
+                if(Tracks != null)
+                {
+                    foreach (var track in Tracks)
+                    {
+                        var volume = track.PlaybackInfo.Volume / 16f;
+                        Player.SetChannelVolume(track.PlaybackInfo.PrimaryChannel, volume);
+                        Player.SetChannelVolume(track.PlaybackInfo.SecondaryChannel, volume);
+                    }
+                }
             };
 
             Player.SoundFontLoaded += () =>

@@ -1,6 +1,5 @@
 ﻿using System;
 using AlphaTab.Audio.Synth.Midi;
-using AlphaTab.Audio.Synth.Synthesis;
 
 namespace AlphaTab.Audio.Synth
 {
@@ -168,8 +167,8 @@ namespace AlphaTab.Audio.Synth
         /// Gets or sets the current and initial volume of the given channel.
         /// </summary>
         /// <param name="channel">The channel number.</param>
-        /// <param name="volume">The volume of of the channel (0.0-3.0)</param>
-        void SetChannelVolume(int channel, double volume);
+        /// <param name="volume">The volume of of the channel (0.0-1.0)</param>
+        void SetChannelVolume(int channel, float volume);
 
         /// <summary>
         /// Gets or sets the current and initial program of the given channel.

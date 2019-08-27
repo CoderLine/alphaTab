@@ -648,7 +648,7 @@ namespace AlphaTab.Audio.Generator
             }
         }
 
-        private const int DefaultBend = 0x40;
+        private const int DefaultBend = 0x20;
         private const float DefaultBendSemitone = 2.75f;
 
         private void GenerateBend(Note note, int noteStart, MidiNoteDuration noteDuration, int channel)

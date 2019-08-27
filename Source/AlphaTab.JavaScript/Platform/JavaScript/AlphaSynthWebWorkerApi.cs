@@ -1,7 +1,6 @@
 ﻿using System;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Midi;
-using AlphaTab.Audio.Synth.Synthesis;
 using AlphaTab.Audio.Synth.Util;
 using AlphaTab.Collections;
 using AlphaTab.Haxe.Js.Html;
@@ -368,9 +367,9 @@ namespace AlphaTab.Platform.JavaScript
         }
 
         /// <inheritdoc />
-        public void SetChannelVolume(int channel, double volume)
+        public void SetChannelVolume(int channel, float volume)
         {
-            volume = SynthHelper.ClampD(volume, SynthConstants.MinVolume, SynthConstants.MaxVolume);
+            volume = SynthHelper.ClampF(volume, SynthConstants.MinVolume, SynthConstants.MaxVolume);
             _synth.PostMessage(new
             {
                 cmd = AlphaSynthWebWorker.CmdSetChannelVolume,
