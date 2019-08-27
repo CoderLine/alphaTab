@@ -1,5 +1,5 @@
 Title: PlayerPositionChanged
-JsName: add_PlayerPositionChanged();remove_PlayerPositionChanged()
+JsName: addPlayerPositionChanged();removePlayerPositionChanged()
 DomName: alphaTab.positionChanged
 Category: Events - Player
 Description: This event is fired when the playback state changed.
@@ -118,7 +118,7 @@ api.PlayerPositionChanged += args =>
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.add_PlayerPositionChanged(function(args) {
+api.addPlayerPositionChanged(function(args) {
     updatePlayerPosition(args);
 });
 </code>

@@ -1,5 +1,5 @@
 Title: MidiLoaded
-JsName: add_MidiLoaded();remove_MidiLoaded()
+JsName: addMidiLoaded();removeMidiLoaded()
 DomName: alphaTab.midiFileLoaded
 Category: Events - Player
 Description: This event is fired when the Midi file needed for playback was loaded.
@@ -46,7 +46,7 @@ api.MidiLoaded += () =>
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.add_MidiLoaded(function(score) {
+api.addMidiLoaded(function(score) {
     hideGeneratingAudioIndicator();
 });
 </code>

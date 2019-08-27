@@ -1,5 +1,5 @@
 Title: Resize
-JsName: add_Resize();remove_Resize()
+JsName: addResize();removeResize()
 DomName: alphaTab.resize
 Category: Events - Core
 Description: This event is fired when alphaTab was resized and is about to rerender the music notation.
@@ -112,7 +112,7 @@ api.Resize += args =>
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.add_Resize(function(args) {
+api.addResize(function(args) {
     args.Settings.Scale = args.NewWidth > 1300 
         ? 1.5f 
         : (args.NewWidth > 800) ? 1.3f : 1;

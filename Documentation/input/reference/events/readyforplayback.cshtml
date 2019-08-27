@@ -1,5 +1,5 @@
 Title: ReadyForPlayback
-JsName: add_ReadyForPlayback();remove_ReadyForPlayback()
+JsName: addReadyForPlayback();removeReadyForPlayback()
 DomName: alphaTab.playerReady
 Category: Events - Player
 Description: This event is fired when all required data for playback is loaded and ready.
@@ -47,7 +47,7 @@ api.ReadyForPlayback += () =>
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.add_ReadyForPlayback(function(score) {
+api.addReadyForPlayback(function(score) {
     enablePlayerControls();
 });
 </code>

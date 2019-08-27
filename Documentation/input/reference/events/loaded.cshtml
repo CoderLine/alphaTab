@@ -1,5 +1,5 @@
 Title: Loaded
-JsName: add_Loaded();remove_Loaded()
+JsName: addLoaded();removeLoaded()
 DomName: alphaTab.loaded
 Category: Events - Core
 Description: This event is fired whenever a new song is loaded
@@ -65,7 +65,7 @@ api.Loaded += score =>
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.add_Loaded(function(score) {
+api.addLoaded(function(score) {
     updateSongInformationInUi(score);
 });
 </code>

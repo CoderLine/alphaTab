@@ -1,5 +1,5 @@
 Title: PlayerState
-JsName: get_PlayerState;get_PlayerState
+JsName: playerState
 jQueryName: alphaTab('playerState')
 Category: Properties - Player
 Description: The current player state
@@ -42,7 +42,7 @@ if(api.PlayerState != PlayerState.Playing) api.Play();
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-if(api.get_PlayerState() != 1) api.play();
+if(api.playerState != 1) api.play();
 </code>
 </pre>
 

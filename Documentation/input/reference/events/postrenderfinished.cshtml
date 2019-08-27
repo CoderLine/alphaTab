@@ -1,5 +1,5 @@
 Title: PostRenderFinished
-JsName: add_PostRenderFinished();remove_PostRenderFinished()
+JsName: addPostRenderFinished();removePostRenderFinished()
 DomName: alphaTab.postRenderFinished
 Category: Events - Core
 Description: This event is fired when the rendering of the whole music sheet is finished, and all handlers of RenderFinished ran.
@@ -47,7 +47,7 @@ api.PostRenderFinished += () =>
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.add_PostRenderFinished(function() {
+api.addPostRenderFinished(function() {
     hideLoadingIndicator();
 });  
 </code>

@@ -270,10 +270,10 @@
             var trackList = $('#trackList');
             trackList.empty();
             
-            for( var i = 0; i < score.Tracks.length; i++) {
+            for( var i = 0; i < score.tracks.length; i++) {
                 // build list item for track
                 var li = $('<li></li>')
-                    .data('track', score.Tracks[i].Index)
+                    .data('track', score.tracks[i].index)
                 ;
                 
                 // show/hide button and track title
@@ -282,7 +282,7 @@
                 
                 var showHide = $('<i class="fa fa-eye-slash showHide"></i>');
                 title.append(showHide);
-                title.append(score.Tracks[i].Name);
+                title.append(score.tracks[i].name);
                 title.on('click', function(e) {
                     var track = $(this).closest('li').data('track');
                     tracks = [track];
@@ -323,7 +323,7 @@
                     min: 0,
                     max: 16,
                     step: 1,
-                    value: score.Tracks[i].PlaybackInfo.Volume,
+                    value: score.tracks[i].playbackInfo.volume,
                     handle: 'square'
                 })
                 
@@ -332,9 +332,9 @@
         });
         at.on('alphaTab.rendered', function(e) {
             // load track indices
-            tracks = at.alphaTab('tracks');
+            tracks = at.alphaTab('tracks').splice();
             for(var i = 0; i < tracks.length; i++) {
-                tracks[i] = tracks[i].Index;
+                tracks[i] = tracks[i].index;
             }
             
             // check checkboxes 
