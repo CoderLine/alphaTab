@@ -6,29 +6,37 @@ using NAudio.Wave;
 
 namespace AlphaTab.Platform.CSharp.Wpf
 {
-    internal class NAudioSynthOutput : WaveProvider32, ISynthOutput
+    /// <summary>
+    /// A <see cref="ISynthOutput"/> implementation that uses NAudio to play the
+    /// sound via Directout.
+    /// </summary>
+    public class NAudioSynthOutput : WaveProvider32, ISynthOutput, IDisposable
     {
         private const int BufferSize = 4096;
         private const int BufferCount = 10;
         private const int PreferredSampleRate = 44100;
 
         private DirectSoundOut _context;
-
         private CircularSampleBuffer _circularBuffer;
-
         private bool _finished;
 
+        /// <inheritdoc />
         public int SampleRate => PreferredSampleRate;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NAudioSynthOutput"/> class.
+        /// </summary>
         public NAudioSynthOutput()
             : base(PreferredSampleRate, 2)
         {
         }
 
+        /// <inheritdoc />
         public void Activate()
         {
         }
 
+        /// <inheritdoc />
         public void Open()
         {
             _finished = false;
@@ -40,6 +48,14 @@ namespace AlphaTab.Platform.CSharp.Wpf
             Ready();
         }
 
+        public void Dispose()
+        {
+            Close();
+        }
+
+        /// <summary>
+        /// Closes the synth output and disposes all resources.
+        /// </summary>
         public void Close()
         {
             _finished = true;
@@ -48,6 +64,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
             _context.Dispose();
         }
 
+        /// <inheritdoc />
         public void Play()
         {
             RequestBuffers();
@@ -55,21 +72,25 @@ namespace AlphaTab.Platform.CSharp.Wpf
             _context.Play();
         }
 
+        /// <inheritdoc />
         public void Pause()
         {
             _context.Pause();
         }
 
+        /// <inheritdoc />
         public void SequencerFinished()
         {
             _finished = true;
         }
 
+        /// <inheritdoc />
         public void AddSamples(SampleArray f)
         {
             _circularBuffer.Write(f, 0, f.Length);
         }
 
+        /// <inheritdoc />
         public void ResetSamples()
         {
             _circularBuffer.Clear();
@@ -89,6 +110,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
             }
         }
 
+        /// <inheritdoc />
         public override int Read(float[] buffer, int offset, int count)
         {
             if (_circularBuffer.Count < count)
@@ -120,9 +142,13 @@ namespace AlphaTab.Platform.CSharp.Wpf
             return count;
         }
 
+        /// <inheritdoc />
         public event Action Ready;
+        /// <inheritdoc />
         public event Action<int> SamplesPlayed;
+        /// <inheritdoc />
         public event Action SampleRequest;
+        /// <inheritdoc />
         public event Action Finished;
     }
 }

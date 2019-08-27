@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AlphaTab.Samples.PngDump": {
+      "commandName": "Project",
+      "commandLineArgs": "$(SolutionDir)\\Documentation\\input\\assets\\files\\player\\NightWish.gp5"
+    }
+  }
+}

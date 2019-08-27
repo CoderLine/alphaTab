@@ -24,6 +24,20 @@ namespace AlphaTab.Test.Audio
             return importer.ReadScore();
         }
 
+        [TestMethod, AsyncTestMethod]
+        public void TestFullSong()
+        {
+            TestPlatform.LoadFile("TestFiles/GuitarPro5/NightWish.gp5", buffer =>
+            {
+                var readerBase = new Gp3To5Importer();
+                readerBase.Init(ByteBuffer.FromBuffer(buffer));
+                var score = readerBase.ReadScore();
+
+                var generator = new MidiFileGenerator(score, null, new FlatMidiEventGenerator());
+                generator.Generate();
+            });
+        }
+
         [TestMethod]
         public void TestCorrectMidiOrder()
         {
@@ -85,7 +99,7 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.TimeSignatureEvent { Tick = 0, Numerator = 4, Denominator = 4 },
                 new FlatMidiEventGenerator.TempoEvent { Tick = 0, Tempo = 120 },
 
-                // bend effect 
+                // bend effect
                 new FlatMidiEventGenerator.BendEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, Value = 64 }, // no bend
                 new FlatMidiEventGenerator.BendEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, Value = 64 },
                 new FlatMidiEventGenerator.BendEvent { Tick = 87, Track = 0, Channel = info.SecondaryChannel, Value = 65 },
@@ -102,7 +116,7 @@ namespace AlphaTab.Test.Audio
 
                 // note itself
                 new FlatMidiEventGenerator.NoteEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, DynamicValue = note.Dynamic, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
-                
+
                 // reset bend
                 new FlatMidiEventGenerator.BendEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, Value = 64 },
                 new FlatMidiEventGenerator.NoteEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, DynamicValue = note.Dynamic, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
@@ -306,7 +320,7 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.TimeSignatureEvent { Tick = 0, Numerator = 4, Denominator = 4 },
                 new FlatMidiEventGenerator.TempoEvent { Tick = 0, Tempo = 120 },
 
-                // bend effect 
+                // bend effect
                 new FlatMidiEventGenerator.BendEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, Value = 64 }, // no bend
                 new FlatMidiEventGenerator.BendEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, Value = 64 },
                 new FlatMidiEventGenerator.BendEvent { Tick = 43, Track = 0, Channel = info.SecondaryChannel, Value = 65 },
@@ -321,7 +335,7 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.BendEvent { Tick = 436, Track = 0, Channel = info.SecondaryChannel, Value = 74 },
                 new FlatMidiEventGenerator.BendEvent { Tick = 479, Track = 0, Channel = info.SecondaryChannel, Value = 75 }, // full bend
 
-                new FlatMidiEventGenerator.BendEvent { Tick = 480, Track = 0, Channel = info.SecondaryChannel, Value = 75 }, // full bend 
+                new FlatMidiEventGenerator.BendEvent { Tick = 480, Track = 0, Channel = info.SecondaryChannel, Value = 75 }, // full bend
                 new FlatMidiEventGenerator.BendEvent { Tick = 523, Track = 0, Channel = info.SecondaryChannel, Value = 74 },
                 new FlatMidiEventGenerator.BendEvent { Tick = 567, Track = 0, Channel = info.SecondaryChannel, Value = 73 },
                 new FlatMidiEventGenerator.BendEvent { Tick = 610, Track = 0, Channel = info.SecondaryChannel, Value = 72 },
@@ -332,7 +346,7 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.BendEvent { Tick = 829, Track = 0, Channel = info.SecondaryChannel, Value = 67 },
                 new FlatMidiEventGenerator.BendEvent { Tick = 872, Track = 0, Channel = info.SecondaryChannel, Value = 66 },
                 new FlatMidiEventGenerator.BendEvent { Tick = 916, Track = 0, Channel = info.SecondaryChannel, Value = 65 },
-                new FlatMidiEventGenerator.BendEvent { Tick = 959, Track = 0, Channel = info.SecondaryChannel, Value = 64 }, // no bend 
+                new FlatMidiEventGenerator.BendEvent { Tick = 959, Track = 0, Channel = info.SecondaryChannel, Value = 64 }, // no bend
 
                 // note itself
                 new FlatMidiEventGenerator.NoteEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, DynamicValue = note.Dynamic, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
@@ -340,7 +354,7 @@ namespace AlphaTab.Test.Audio
                 // reset bend
                 new FlatMidiEventGenerator.BendEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, Value = 64 }, // finish
                 new FlatMidiEventGenerator.NoteEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, DynamicValue = note.Dynamic, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
-                // end of track 
+                // end of track
                 new FlatMidiEventGenerator.TrackEndEvent { Tick = 3840, Track = 0 } // 3840 = end of bar
             };
 

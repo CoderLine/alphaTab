@@ -42,7 +42,7 @@ namespace AlphaTab.Audio.Generator
         public MidiFileGenerator(Score score, Settings settings, IMidiFileHandler handler)
         {
             _score = score;
-            _settings = settings;
+            _settings = settings ?? Settings.Defaults;
             _currentTempo = _score.Tempo;
             _handler = handler;
             TickLookup = new MidiTickLookup();
@@ -460,7 +460,7 @@ namespace AlphaTab.Audio.Generator
                 }
             }
 
-            if (note.IsLetRing && _settings.DisplayMode == DisplayMode.GuitarPro)
+            if (note.IsLetRing && (_settings == null || _settings.DisplayMode == DisplayMode.GuitarPro))
             {
                 // LetRing ends when:
                 // - rest
@@ -661,7 +661,7 @@ namespace AlphaTab.Audio.Generator
 
             // Bends are spread across all tied notes unless they have a bend on their own.
             double duration;
-            if (note.IsTieOrigin && (_settings == null || _settings.ExtendBendArrowsOnTiedNotes))
+            if (note.IsTieOrigin && _settings.ExtendBendArrowsOnTiedNotes)
             {
                 var endNote = note;
                 while (endNote.IsTieOrigin && !endNote.TieDestination.HasBend)
@@ -688,15 +688,8 @@ namespace AlphaTab.Audio.Generator
                         break;
                 }
 
-                if (_settings == null)
-                {
-                    duration = noteDuration.NoteOnly;
-                }
-                else
-                {
-                    duration = Math.Max(noteDuration.NoteOnly,
-                        MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
-                }
+                duration = Math.Max(noteDuration.NoteOnly,
+                    MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
             }
             else
             {
@@ -709,9 +702,8 @@ namespace AlphaTab.Audio.Generator
                 noteStart--;
             }
 
-            var bendDuration = _settings == null
-                ? duration
-                : Math.Min(duration, MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
+            var bendDuration = Math.Min(duration,
+                MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
 
             var playedBendPoints = new FastList<BendPoint>();
             switch (note.BendType)
@@ -923,9 +915,7 @@ namespace AlphaTab.Audio.Generator
                             playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, bendPoints[1].Value));
                             break;
                         case BendStyle.Fast:
-                            var whammyDuration = _settings == null
-                                ? duration
-                                : Math.Min(duration,
+                            var whammyDuration = Math.Min(duration,
                                     MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
                             GenerateSongBookWhammyOrBend(noteStart,
                                 channel,
@@ -953,9 +943,7 @@ namespace AlphaTab.Audio.Generator
                             playedBendPoints.Add(new BendPoint(BendPoint.MaxPosition, bendPoints[2].Value));
                             break;
                         case BendStyle.Fast:
-                            var whammyDuration = _settings == null
-                                ? duration
-                                : Math.Min(duration,
+                            var whammyDuration = Math.Min(duration,
                                     MidiUtils.MillisToTicks(_settings.SongBookDipDuration, _currentTempo));
                             GenerateSongBookWhammyOrBend(noteStart,
                                 channel,
@@ -992,9 +980,7 @@ namespace AlphaTab.Audio.Generator
                             var preDiveValue = DefaultBend + bendPoints[0].Value * DefaultBendSemitone;
                             _handler.AddBend(track.Index, noteStart, (byte)channel, (int)preDiveValue);
 
-                            var whammyDuration = _settings == null
-                                ? duration
-                                : Math.Min(duration,
+                            var whammyDuration = Math.Min(duration,
                                     MidiUtils.MillisToTicks(_settings.SongBookBendDuration, _currentTempo));
                             GenerateSongBookWhammyOrBend(noteStart,
                                 channel,

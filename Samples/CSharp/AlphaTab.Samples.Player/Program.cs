@@ -4,6 +4,7 @@ using AlphaTab.Audio.Generator;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Importer;
+using AlphaTab.Platform.CSharp.Wpf;
 
 namespace AlphaTab.Samples.PngDump
 {
@@ -41,10 +42,7 @@ namespace AlphaTab.Samples.PngDump
                 var currentTime = TimeSpan.FromMilliseconds(e.CurrentTime);
                 var endTime = TimeSpan.FromMilliseconds(e.EndTime);
 
-                Console.CursorTop--;
-                Console.Write("".PadLeft(Console.BufferWidth - 1, ' '));
-                Console.CursorLeft = 0;
-                Console.WriteLine("{0:mm\\:ss\\:fff} ({1}) of {2:mm\\:ss\\:fff} ({3})",
+                Console.Write("\r{0:mm\\:ss\\:fff} ({1}) of {2:mm\\:ss\\:fff} ({3})",
                     currentTime, e.CurrentTick, endTime, e.EndTick);
             };
             player.ReadyForPlayback += () =>
