@@ -16,7 +16,7 @@ Order: 10
             </tr>
         </thead>
         <tbody>
-            <tr><td>copyrightFont</td>      <td>Font</td>   <td>Music copyright information in page layouts</td> <td>12px Arial bold</td></tr>
+            <tr><td>copyrightFont</td>      <td>Font</td>   <td>Music copyright information in page layouts</td> <td>bold 12px Arial</td></tr>
             <tr><td>titleFont</td>          <td>Font</td>   <td>Title of the song in page layouts</td> <td>32px Georgia</td></tr>
             <tr><td>subTitleFont</td>       <td>Font</td>   <td>Subtitle of the song in page layouts</td> <td>20px Georgia</td></tr>
             <tr><td>wordsFont</td>          <td>Font</td>   <td>Lyrics information of the song in page layouts</td> <td>15px Georgia</td></tr>
@@ -26,7 +26,7 @@ Order: 10
             <tr><td>graceFont</td>          <td>Font</td>   <td>The numbers grace notes in tablature staves</td> <td>11px Arial</td></tr>
             <tr><td>barNumberFont</td>      <td>Font</td>   <td>The numbers above bars</td> <td>11px Arial</td></tr>
             <tr><td>fingeringFont</td>      <td>Font</td>   <td>The numbers shown for fingering information</td><td>14px Georgia</td></tr>
-            <tr><td>markerFont</td>         <td>Font</td>   <td>The section marker labels</td> <td>14px Arial bold</td> </tr>
+            <tr><td>markerFont</td>         <td>Font</td>   <td>The section marker labels</td> <td>bold 14px Arial</td> </tr>
             
             <tr><td>staffLineColor</td>     <td>Color</td>  <td>The lines for all staves</td> <td>rgb(165,165,165)</td></tr>
             <tr><td>barSeparatorColor</td>  <td>Color</td>  <td>The lines for bar separators and repeat indicators</td> <td>rgb(34,34,17)</td></tr>
@@ -44,7 +44,7 @@ Order: 10
             <h3 class="panel-title">Usage of different fonts</h3> 
         </div>
         <div class="panel-body">
-        The usage of other fonts can result in alignment or layouting issues and in a slighly worse performance. If such problems are detected, please inform us on <a href="https://github.com/CoderLine/alphaTab/issues/new/choose" target="_blank">GitHub</a>. The format for fonts is similar to the CSS shorthand font declarations but with some limitations: <code>Size Family Style</code>. No relative font sizes are supported and every size beside px will be converted to px. For styles <code>italic</code> and <code>bold</code> are supported. 
+        The usage of other fonts can result in alignment or layouting issues and in a slighly worse performance. If such problems are detected, please inform us on <a href="https://github.com/CoderLine/alphaTab/issues/new/choose" target="_blank">GitHub</a>. The format for fonts is similar to the CSS shorthand font declarations but with some limitations: <code>Style Size Family</code>. No relative font sizes are supported and every size beside px will be converted to px. For styles <code>italic</code> and <code>bold</code> are supported. 
         </div> 
     </div>
     
@@ -76,7 +76,7 @@ Order: 10
                 $('#alphaTabScriptInit').alphaTab({
                   file: '@Context.GetLink("/assets/files/features/Skillet.gp5")',
                   resources: {
-                    copyrightFont: "12px Roboto bold",
+                    copyrightFont: "bold 12px Roboto",
                     titleFont: "32px 'Roboto Slab'",
                     subTitleFont: "20px 'Roboto Slab'",
                     wordsFont: "15px 'Roboto Slab'",
@@ -86,7 +86,7 @@ Order: 10
                     graceFont: "11px Roboto",
                     barNumberFont: "11px Roboto",
                     fingeringFont: "14px 'Roboto Slab'",
-                    markerFont: "14px Roboto bold",
+                    markerFont: "bold 14px Roboto",
     
                     staffLineColor: "rgba(255,255,255, 0.8)",
                     barSeparatorColor: "rgb(255,255,255)",
@@ -105,17 +105,17 @@ Order: 10
                 .alphaTabSurface { background: #000; }
             </style>
             <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/features/Skillet.gp5")"
-                data-resources-copyrightFont="12px Roboto bold"
+                data-resources-copyrightFont="bold 12px Roboto"
                 data-resources-titleFont="32px 'Roboto Slab'"
                 data-resources-subTitleFont="20px 'Roboto Slab'"
                 data-resources-wordsFont="15px 'Roboto Slab'"
-                data-resources-effectFont="12px 'Roboto Slab' italic"
+                data-resources-effectFont=" italic 12px 'Roboto Slab'"
                 data-resources-fretboardNumberFont="11px Roboto"
                 data-resources-tablatureFont="13px Roboto"
                 data-resources-graceFont="11px Roboto"
                 data-resources-barNumberFont="11px Roboto"
                 data-resources-fingeringFont="14px 'Roboto Slab'"
-                data-resources-markerFont="14px Roboto bold"
+                data-resources-markerFont=" bold 14px Roboto"
 
                 data-resources-staffLineColor="rgba(255,255,255, 0.8)"
                 data-resources-barSeparatorColor="rgb(255,255,255)"

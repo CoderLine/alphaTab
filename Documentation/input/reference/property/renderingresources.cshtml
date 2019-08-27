@@ -122,9 +122,10 @@ Following resources exist for adjusting the style.
 
 <h3>Fonts</h3>
 <p>
-For the .net platform any installed font on the system can be used. For JavaScript until <a href="https://github.com/CoderLine/alphaTab/issues/266" target="_blank">this feature</a> is implemented the 2 fonts "Arial" and "Georgia" are officially supported. Due to the nature of Web Workers, no font metrics are available which needs a custom solution for measuring texts. 
-<br />
-On .net simply construct the <code>Font</code> object to configure your desired fonts. For JavaScript you can use any CSS font property compliant string. Relative font sizes with percentual values are not supported.
+For the .net platform any installed font on the system can be used. Simply construct the <code>Font</code> object to configure your desired fonts. 
+</p>
+<p>
+For the JavaScript platform any font that might be installed on the client machines can be used. Any additional fonts can be added via WebFonts. The rendering of the score will be delayed until it is detected that the font was loaded. Simply use any CSS font property compliant string as configuration. Relative font sizes with percentual values are not supported, remaining values will be considered if supported.
 </p>
 
 
