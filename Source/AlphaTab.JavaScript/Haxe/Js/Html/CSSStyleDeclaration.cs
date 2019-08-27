@@ -1,4 +1,5 @@
-﻿using Haxe;
+﻿using System.Net.Mail;
+using Haxe;
 using Phase.Attributes;
 
 namespace AlphaTab.Haxe.Js.Html
@@ -57,5 +58,29 @@ namespace AlphaTab.Haxe.Js.Html
 
         [Name("transitionDuration")]
         public HaxeString TransitionDuration { get; set; }
+
+        [Name("fontSynthesis")]
+        public HaxeString FontSynthesis { get; set; }
+
+        [Name("maxWidth")]
+        public HaxeString MaxWidth { get; set; }
+
+        [Name("minWidth")]
+        public HaxeString MinWidth { get; set; }
+
+        [Name("minHeight")]
+        public HaxeString MinHeight { get; set; }
+
+        [Name("margin")]
+        public HaxeString Margin { get; set; }
+
+        [Name("padding")]
+        public HaxeString Padding { get; set; }
+
+        [Name("whiteSpace")]
+        public HaxeString WhiteSpace { get; set; }
+
+        [Name("font")]
+        public HaxeString Font { get; set; }
     }
 }

@@ -67,25 +67,12 @@ namespace AlphaTab.Platform.JavaScript
                     _renderer.Width = data.width;
                     break;
                 case "alphaTab.renderScore":
-                    ImportFonts(data.fonts);
-
                     var score = JsonConverter.JsObjectToScore(data.score, _renderer.Settings);
                     RenderMultiple(score, data.trackIndexes);
                     break;
                 case "alphaTab.updateSettings":
                     UpdateSettings(data.settings);
                     break;
-            }
-        }
-
-        private void ImportFonts(FastDictionary<string, byte[]> fonts)
-        {
-            foreach (var font in fonts)
-            {
-                if (!FontSizes.FontSizeLookupTables.ContainsKey(font))
-                {
-                    FontSizes.FontSizeLookupTables[font] = fonts[font];
-                }
             }
         }
 

@@ -127,8 +127,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 cmd = "alphaTab.renderScore",
                 score = jsObject,
-                trackIndexes = trackIndexes,
-                fonts = FontSizes.FontSizeLookupTables
+                trackIndexes = trackIndexes
             });
         }
 

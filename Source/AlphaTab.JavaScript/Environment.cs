@@ -6,6 +6,7 @@ using AlphaTab.Platform.JavaScript;
 using AlphaTab.Platform.Svg;
 using AlphaTab.Rendering.Glyphs;
 using AlphaTab.Util;
+using AlphaTab.Utils;
 using Haxe;
 using Phase;
 using StringBuilder = AlphaTab.Collections.StringBuilder;
@@ -20,17 +21,8 @@ namespace AlphaTab
     internal partial class Environment
     {
         public static string ScriptFile { get; set; }
-        public static bool IsFontLoaded { get; set; }
-        public static event Action FontLoaded;
 
-        private static void OnFontLoaded()
-        {
-            var handler = FontLoaded;
-            if (handler != null)
-            {
-                handler();
-            }
-        }
+        public static FontLoadingChecker BravuraFontChecker { get; private set; }
 
         private static void PlatformInit()
         {
@@ -133,7 +125,10 @@ namespace AlphaTab
                     }
                 }
 
-                CheckForFontAvailability();
+                BravuraFontChecker = new FontLoadingChecker("alphaTab",
+                    "&#" + (int)MusicFontSymbol.ClefG + ";"
+                );
+                BravuraFontChecker.CheckForFontAvailability();
             }
             else
             {
@@ -206,96 +201,6 @@ namespace AlphaTab
             }
 
             return matches[1];
-        }
-
-        public static void CheckForFontAvailability()
-        {
-            var isWorker =
-                Script.Write<bool>(
-                    "untyped __js__(\"typeof(WorkerGlobalScope) !== 'undefined' && self instanceof WorkerGlobalScope\")");
-            if (isWorker)
-            {
-                // no web fonts in web worker
-                IsFontLoaded = false;
-                return;
-            }
-
-            var cssFontLoadingModuleSupported = Browser.Document.Fonts.IsTruthy() &&
-                                                Browser.Document.Fonts.Member<object>("load").IsTruthy();
-            if (cssFontLoadingModuleSupported)
-            {
-                Action checkFont = null;
-                checkFont = () =>
-                {
-                    Browser.Document.Fonts.Load("1em alphaTab").Then(_ =>
-                    {
-                        if (Browser.Document.Fonts.Check("1em alphaTab"))
-                        {
-                            Logger.Info("Rendering", "Font available");
-                            IsFontLoaded = true;
-                            OnFontLoaded();
-                        }
-                        else
-                        {
-                            Browser.Window.SetTimeout((Action)(() =>
-                                {
-                                    checkFont();
-                                }),
-                                250);
-                        }
-
-                        return true;
-                    });
-                };
-                checkFont();
-            }
-            else
-            {
-                Action checkFont = null;
-                checkFont = () =>
-                {
-                    var document = Browser.Document;
-                    var testItem = document.GetElementById("alphaTabFontChecker");
-
-                    if (testItem == null)
-                    {
-                        // create a hidden element with the font style set
-                        testItem = document.CreateElement("div");
-                        testItem.SetAttribute("id", "alphaTabFontChecker");
-                        testItem.Style.Opacity = "0";
-                        testItem.Style.Position = "absolute";
-                        testItem.Style.Left = "0";
-                        testItem.Style.Top = "0";
-                        testItem.Style.FontSize = "100px";
-                        testItem.ClassList.Add("at");
-                        testItem.InnerHTML = "&#" + (int)MusicFontSymbol.ClefG + ";";
-
-                        document.Body.AppendChild(testItem);
-                    }
-
-                    // get width
-                    var width = testItem.OffsetWidth;
-                    if (width > 30 && width < 100)
-                    {
-                        IsFontLoaded = true;
-                        document.Body.RemoveChild(testItem);
-                        OnFontLoaded();
-                    }
-                    else
-                    {
-                        Browser.Window.SetTimeout((Action)(() =>
-                            {
-                                checkFont();
-                            }),
-                            250);
-                    }
-                };
-                Browser.Window.AddEventListener("DOMContentLoaded",
-                    (Action)(() =>
-                    {
-                        checkFont();
-                    }));
-            }
         }
     }
 }
