@@ -20,10 +20,22 @@ Since: 0.9.4
             <td><code>bool Load(Score score) <span class="code-badge">.net</span></code> - Load the given score object</td>
         </tr>   
         <tr>
+            <td><code>bool Load(Score score, int[] trackIndexes) <span class="code-badge">.net</span></code> - Load the given score object</td>
+        </tr>   
+        <tr>
             <td><code>bool Load(byte[] raw) <span class="code-badge">.net</span></code> - Load the score from the given raw bytes using the available score loaders</td>
         </tr>   
         <tr>
+            <td><code>bool Load(byte[] raw, int[] trackIndexes) <span class="code-badge">.net</span></code> - Load the score from the given raw bytes using the available score loaders</td>
+        </tr>   
+        <tr>
             <td><code>void Load(Stream[] raw) <span class="code-badge">.net</span></code> - Load the score from the given stream using the available score loaders</td>
+        </tr>   
+        <tr>
+            <td><code>void Load(Stream[] raw, int[] trackIndexes) <span class="code-badge">.net</span></code> - Load the score from the given stream using the available score loaders</td>
+        </tr>   
+        <tr>
+            <td><code>function load(arraybuffer, trackIndexes) <span class="code-badge">JavaScript</span></code> - Load the score from the given raw bytes using the available score loaders</td>
         </tr>   
         <tr>
             <td><code>function load(arraybuffer) <span class="code-badge">JavaScript</span></code> - Load the score from the given raw bytes using the available score loaders</td>
@@ -32,16 +44,31 @@ Since: 0.9.4
             <td><code>function load(uint8array) <span class="code-badge">JavaScript</span></code> - Load the score from the given raw bytes using the available score loaders</td>
         </tr>   
         <tr>
+            <td><code>function load(uint8array, trackIndexes) <span class="code-badge">JavaScript</span></code> - Load the score from the given raw bytes using the available score loaders</td>
+        </tr>   
+        <tr>
             <td><code>function load(url) <span class="code-badge">JavaScript</span></code> - Load the score from the given URL via Ajax using the available score loaders</td>
+        </tr>           
+        <tr>
+            <td><code>function load(url, trackIndexes) <span class="code-badge">JavaScript</span></code> - Load the score from the given URL via Ajax using the available score loaders</td>
         </tr>           
         <tr>
             <td><code>alphaTab('load', arraybuffer) <span class="code-badge">jQuery</span></code> - Load the score from the given raw bytes using the available score loaders</td>
         </tr>   
         <tr>
+            <td><code>alphaTab('load', arraybuffer, trackIndexes) <span class="code-badge">jQuery</span></code> - Load the score from the given raw bytes using the available score loaders</td>
+        </tr>   
+        <tr>
             <td><code>alphaTab('load', uint8array) <span class="code-badge">jQuery</span></code> - Load the score from the given raw bytes using the available score loaders</td>
         </tr>   
         <tr>
+            <td><code>alphaTab('load', uint8array, trackIndexes) <span class="code-badge">jQuery</span></code> - Load the score from the given raw bytes using the available score loaders</td>
+        </tr>   
+        <tr>
             <td><code>alphaTab('load', url) <span class="code-badge">jQuery</span></code> - Load the score from the given URL via Ajax using the available score loaders</td>
+        </tr>           
+        <tr>
+            <td><code>alphaTab('load', url, trackIndexes) <span class="code-badge">jQuery</span></code> - Load the score from the given URL via Ajax using the available score loaders</td>
         </tr>           
     </tbody>
 </table>
@@ -85,6 +112,11 @@ Since: 0.9.4
             <td><code>url <span class="code-badge">.JavaScript &amp; jQuery</span></td>
             <td><code>string</code></td>
             <td>A URL that should be loaded via AJAX and the passed on to the supported score loaders for importing.</td>
+        </tr>   
+        <tr>
+            <td><code>trackIndexes <span class="code-badge">all</span></td>
+            <td><code>int[]</code></td>
+            <td>A indexes of the tracks that should be rendered after the track is loaded. If not supplied, the first song will be rendered.</td>
         </tr>   
     </tbody>
 </table>

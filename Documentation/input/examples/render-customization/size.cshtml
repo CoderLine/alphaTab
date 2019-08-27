@@ -4,7 +4,7 @@ Order: 1
 
 <div class="description">
     Normally the page layout scales automatically to the available width. If you 
-    want to have a fixed width (e.g. for printing) the size can be specified via <code>width: 800</code> or <code>data-width="800"</code>
+    want to have a fixed width (e.g. for printing) the size of the parent container should be set accordingly. 
 </div>
 
 <div>
@@ -15,20 +15,19 @@ Order: 1
   <div class="tab-content">
     <div class="tab-pane active example" id="scriptInit">
         <div class="html">
-            <div id="alphaTabScriptInit"></div>
+            <div id="alphaTabScriptInit" style="width: 800px"></div>
         </div>
         <div class="js">
             <script type="text/x-alphatab">
                 $('#alphaTabScriptInit').alphaTab({
-                  file: '@Context.GetLink("/assets/files/player/Canon.gp5")',
-                  width: 800
+                  file: '@Context.GetLink("/assets/files/player/Canon.gp5")'
                 })
             </script>
         </div>
     </div>
     <div class="tab-pane example" id="dataInit">
         <div class="html">
-            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/player/Canon.gp5")" data-width="800"></div>
+            <div id="alphaTabDataInit" data-file="@Context.GetLink("/assets/files/player/Canon.gp5")" style="width: 800px"></div>
         </div>
         <div class="js">
             <script type="text/x-alphatab">
