@@ -15,24 +15,14 @@ using Image = System.Windows.Controls.Image;
 
 namespace AlphaTab.Platform.CSharp.Wpf
 {
-    internal class WpfUiFacade : IUiFacade<AlphaTab>
+    internal class WpfUiFacade : ManagedUiFacade<AlphaTab>
     {
         private readonly ScrollViewer _scrollViewer;
-        private AlphaTabApi<AlphaTab> _api;
-        private AlphaTab _control;
         private event Action _rootContainerBecameVisible;
-        private readonly ConcurrentQueue<Counter> _totalResultCount = new ConcurrentQueue<Counter>();
 
-        public IContainer RootContainer { get; }
+        public override IContainer RootContainer { get; }
 
-        public bool AreWorkersSupported => true;
-        public bool CanRender => true;
-
-        public int ResizeThrottle => 25;
-
-        public event Action CanRenderChanged;
-
-        public event Action RootContainerBecameVisible
+        public override event Action RootContainerBecameVisible
         {
             add
             {
@@ -56,6 +46,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
                             _rootContainerBecameVisible = null;
                         }
                     }
+
                     void OnVisibilityChanged(object sender, DependencyPropertyChangedEventArgs e)
                     {
                         _scrollViewer.IsVisibleChanged -= OnVisibilityChanged;
@@ -70,6 +61,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
                             _rootContainerBecameVisible = null;
                         }
                     }
+
                     _rootContainerBecameVisible += value;
                     _scrollViewer.IsVisibleChanged += OnVisibilityChanged;
                     _scrollViewer.SizeChanged += OnSizeChanged;
@@ -78,35 +70,43 @@ namespace AlphaTab.Platform.CSharp.Wpf
             remove => _rootContainerBecameVisible -= value;
         }
 
-
         public WpfUiFacade(ScrollViewer scrollViewer)
         {
             _scrollViewer = scrollViewer;
             RootContainer = new FrameworkElementContainer(scrollViewer);
         }
 
-        public void Initialize(AlphaTabApi<AlphaTab> api, AlphaTab control)
+        public override void Initialize(AlphaTabApi<AlphaTab> api, AlphaTab control)
         {
-            _api = api;
-            _control = control;
+            base.Initialize(api, control);
             api.Settings = control.Settings;
             control.SettingsChanged += OnSettingsChanged;
         }
 
         private void OnSettingsChanged(Settings s)
         {
-            _api.Settings = s;
-            _api.UpdateSettings();
-            _api.Render();
+            Api.Settings = s;
+            Api.UpdateSettings();
+            Api.Render();
         }
 
-        public void Destroy()
+        protected override void RenderTracks()
         {
-            _control.SettingsChanged -= OnSettingsChanged;
+            SettingsContainer.RenderTracks();
+        }
+
+        protected override ISynthOutput CreateSynthOutput()
+        {
+            return new NAudioSynthOutput();
+        }
+
+        public override void Destroy()
+        {
+            SettingsContainer.SettingsChanged -= OnSettingsChanged;
             _scrollViewer.Content = null;
         }
 
-        public IContainer CreateCanvasElement()
+        public override IContainer CreateCanvasElement()
         {
             var canvas = new WrapPanel
             {
@@ -117,145 +117,82 @@ namespace AlphaTab.Platform.CSharp.Wpf
             return new FrameworkElementContainer(canvas);
         }
 
-        public void TriggerEvent(IContainer container, string eventName, object details = null)
+        public override void TriggerEvent(IContainer container, string eventName, object details = null)
         {
         }
 
-        private class Counter
+        public override void BeginAppendRenderResults(RenderFinishedEventArgs r)
         {
-            public int Count;
-        }
-        public void InitialRender()
-        {
-            _api.Renderer.PreRender += () =>
-            {
-                _totalResultCount.Enqueue(new Counter());
-            };
-            RootContainerBecameVisible += () =>
-            {
-                // rendering was possibly delayed due to invisible element
-                // in this case we need the correct width for autosize
-                if (_api.AutoSize)
+            SettingsContainer.Dispatcher.BeginInvoke((Action<RenderFinishedEventArgs>)(renderResult =>
                 {
-                    _api.Settings.Width = (int)RootContainer.Width;
-                    _api.Renderer.UpdateSettings(_api.Settings);
-                }
+                    var panel = (WrapPanel)((FrameworkElementContainer)Api.CanvasElement).Control;
 
-                _control.RenderTracks();
-            };
-
-        }
-
-        public void BeginAppendRenderResults(RenderFinishedEventArgs r)
-        {
-            _control.Dispatcher.BeginInvoke((Action<RenderFinishedEventArgs>)(renderResult =>
-            {
-                var panel = (WrapPanel)((FrameworkElementContainer)_api.CanvasElement).Control;
-
-                // null result indicates that the rendering finished
-                if (renderResult == null)
-                {
-                    _totalResultCount.TryDequeue(out var counter);
-                    // so we remove elements that might be from a previous render session
-                    while (panel.Children.Count > counter.Count)
+                    // null result indicates that the rendering finished
+                    if (renderResult == null)
                     {
-                        panel.Children.RemoveAt(panel.Children.Count - 1);
-                    }
-                }
-                // NOTE: here we try to replace existing children
-                else
-                {
-                    var body = renderResult.RenderResult;
-
-                    ImageSource source = null;
-                    if (body is string svg)
-                    {
-                        // TODO: svg support
-                        return;
-                    }
-                    else if (body is SKImage skiaImage)
-                    {
-                        using (skiaImage)
+                        TotalResultCount.TryDequeue(out var counter);
+                        // so we remove elements that might be from a previous render session
+                        while (panel.Children.Count > counter.Count)
                         {
-                            source = SkImageSource.Create(skiaImage);
+                            panel.Children.RemoveAt(panel.Children.Count - 1);
                         }
                     }
-                    else if (body is System.Drawing.Bitmap image)
+                    // NOTE: here we try to replace existing children
+                    else
                     {
-                        using (image)
+                        var body = renderResult.RenderResult;
+
+                        ImageSource source = null;
+                        if (body is string svg)
                         {
-                            source = GdiImageSource.Create(image);
+                            // TODO: svg support
+                            return;
+                        }
+                        else if (body is SKImage skiaImage)
+                        {
+                            using (skiaImage)
+                            {
+                                source = SkImageSource.Create(skiaImage);
+                            }
+                        }
+                        else if (body is System.Drawing.Bitmap image)
+                        {
+                            using (image)
+                            {
+                                source = GdiImageSource.Create(image);
+                            }
+                        }
+
+                        if (source != null)
+                        {
+                            TotalResultCount.TryPeek(out var counter);
+                            if (counter.Count < panel.Children.Count)
+                            {
+                                var img = (Image)panel.Children[counter.Count];
+                                img.Width = renderResult.Width;
+                                img.Height = renderResult.Height;
+                                img.Stretch = Stretch.None;
+                                img.SnapsToDevicePixels = true;
+                                img.Source = source;
+                            }
+                            else
+                            {
+                                var img = new Image();
+                                img.Width = renderResult.Width;
+                                img.Height = renderResult.Height;
+                                img.Source = source;
+                                panel.Children.Add(img);
+                            }
+
+                            counter.Count++;
                         }
                     }
-
-                    if (source != null)
-                    {
-                        _totalResultCount.TryPeek(out var counter);
-                        if (counter.Count < panel.Children.Count)
-                        {
-                            var img = (Image)panel.Children[counter.Count];
-                            img.Width = renderResult.Width;
-                            img.Height = renderResult.Height;
-                            img.Stretch = Stretch.None;
-                            img.SnapsToDevicePixels = true;
-                            img.Source = source;
-                        }
-                        else
-                        {
-                            var img = new Image();
-                            img.Width = renderResult.Width;
-                            img.Height = renderResult.Height;
-                            img.Source = source;
-                            panel.Children.Add(img);
-                        }
-                        counter.Count++;
-                    }
-                }
-            }), r);
+                }),
+                r);
         }
 
-        public IScoreRenderer CreateWorkerRenderer()
-        {
-            return new ManagedThreadScoreRenderer(_api.Settings, a =>
-            {
-                if (_control.Dispatcher.CheckAccess())
-                {
-                    a();
-                }
-                else
-                {
-                    _control.Dispatcher.BeginInvoke(a);
-                }
-            });
-        }
 
-        public IAlphaSynth CreateWorkerPlayer()
-        {
-            var player = new ManagedThreadAlphaSynthWorkerApi(new NAudioSynthOutput(), _api.Settings.LogLevel, a =>
-            {
-                if (_control.Dispatcher.CheckAccess())
-                {
-                    a();
-                }
-                else
-                {
-                    _control.Dispatcher.BeginInvoke(a);
-                }
-            });
-            player.Ready += () =>
-            {
-                using (var sf =
- typeof(WpfUiFacade).Assembly.GetManifestResourceStream(typeof(GdiCanvas), "default.sf2"))
-                using (var ms = new MemoryStream())
-                {
-                    sf.CopyTo(ms);
-                    player.LoadSoundFont(ms.ToArray());
-                }
-            };
-            return player;
-        }
-
-        public Cursors CreateCursors()
+        public override Cursors CreateCursors()
         {
             var cursorWrapper = new Canvas();
             cursorWrapper.HorizontalAlignment = HorizontalAlignment.Left;
@@ -264,11 +201,11 @@ namespace AlphaTab.Platform.CSharp.Wpf
             var selectionWrapper = new Canvas();
 
             var barCursor = new System.Windows.Shapes.Rectangle();
-            barCursor.Fill = _control.BarCursorFill;
+            barCursor.Fill = SettingsContainer.BarCursorFill;
             barCursor.IsHitTestVisible = false;
 
             var beatCursor = new System.Windows.Shapes.Rectangle();
-            beatCursor.Fill = _control.BeatCursorFill;
+            beatCursor.Fill = SettingsContainer.BeatCursorFill;
             beatCursor.IsHitTestVisible = false;
 
             cursorWrapper.Children.Add(selectionWrapper);
@@ -276,7 +213,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
             cursorWrapper.Children.Add(beatCursor);
 
             // add cursors to UI
-            var element = (Panel)((FrameworkElementContainer)_api.CanvasElement).Control.Parent;
+            var element = (Panel)((FrameworkElementContainer)Api.CanvasElement).Control.Parent;
             element.Children.Insert(0, cursorWrapper);
 
             return new Cursors(
@@ -287,37 +224,37 @@ namespace AlphaTab.Platform.CSharp.Wpf
             );
         }
 
-        public void BeginInvoke(Action action)
+        public override void BeginInvoke(Action action)
         {
-            _control.Dispatcher.BeginInvoke(action);
+            SettingsContainer.Dispatcher.BeginInvoke(action);
         }
 
-        public void RemoveHighlights()
-        {
-        }
-
-        public void HighlightElements(string groupId)
+        public override void RemoveHighlights()
         {
         }
 
-        public IContainer CreateSelectionElement()
+        public override void HighlightElements(string groupId)
+        {
+        }
+
+        public override IContainer CreateSelectionElement()
         {
             var selection = new System.Windows.Shapes.Rectangle();
-            selection.Fill = _control.SelectionFill;
+            selection.Fill = SettingsContainer.SelectionFill;
             selection.IsHitTestVisible = false;
             return new FrameworkElementContainer(selection);
         }
 
-        public IContainer GetScrollContainer()
+        public override IContainer GetScrollContainer()
         {
             return new FrameworkElementContainer(_scrollViewer);
         }
 
-        public Bounds GetOffset(IContainer relativeTo, IContainer container)
+        public override Bounds GetOffset(IContainer relativeTo, IContainer container)
         {
             var containerWpf = ((FrameworkElementContainer)container).Control;
 
-            var canvas = ((FrameworkElementContainer)_api.CanvasElement).Control;
+            var canvas = ((FrameworkElementContainer)Api.CanvasElement).Control;
             var position = containerWpf.TranslatePoint(new Point(0, 0), canvas);
 
             if (relativeTo != null && ((FrameworkElementContainer)relativeTo).Control is ScrollViewer sv)
@@ -335,7 +272,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
             };
         }
 
-        public void ScrollToY(IContainer scrollElement, int offset, int speed)
+        public override void ScrollToY(IContainer scrollElement, int offset, int speed)
         {
             if (((FrameworkElementContainer)scrollElement).Control is ScrollViewer s)
             {
@@ -346,7 +283,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
             //    new DoubleAnimation(offset, new System.Windows.Duration(TimeSpan.FromMilliseconds(speed))));
         }
 
-        public void ScrollToX(IContainer scrollElement, int offset, int speed)
+        public override void ScrollToX(IContainer scrollElement, int offset, int speed)
         {
             if (((FrameworkElementContainer)scrollElement).Control is ScrollViewer s)
             {

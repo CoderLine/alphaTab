@@ -29,7 +29,7 @@ namespace AlphaTab
         /// <summary>
         /// Gets or sets whether lazy loading for displayed elements is enabled.
         /// </summary>
-        public bool DisableLazyLoading { get; set; }
+        public bool EnableLazyLoading { get; set; }
 
         public string SoundFontFile
         {
@@ -46,6 +46,7 @@ namespace AlphaTab
         private static void SetDefaults(Settings settings)
         {
             settings.ScrollElement = "html,body";
+            settings.EnableLazyLoading = true;
         }
 
         public static void FillPlayerOptions(
@@ -147,7 +148,7 @@ namespace AlphaTab
 
             json.scriptFile = ScriptFile;
             json.fontDirectory = FontDirectory;
-            json.lazy = DisableLazyLoading;
+            json.lazy = EnableLazyLoading;
 
             json.includeNoteBounds = IncludeNoteBounds;
 
@@ -364,11 +365,11 @@ namespace AlphaTab
 
             if (Platform.Platform.JsonExists(json, "lazy"))
             {
-                settings.DisableLazyLoading = !json.lazy;
+                settings.EnableLazyLoading = json.lazy;
             }
             else if (dataAttributes != null && dataAttributes.ContainsKey("lazy"))
             {
-                settings.DisableLazyLoading = !dataAttributes["lazy"].IsTruthy();
+                settings.EnableLazyLoading = dataAttributes["lazy"].IsTruthy();
             }
 
             if (Platform.Platform.JsonExists(json, "transpositionPitches"))
@@ -402,10 +403,19 @@ namespace AlphaTab
                 settings.ScriptFile = EnsureFullUrl(json.scriptFile);
                 settings.ScriptFile = AppendScriptName(settings.ScriptFile);
             }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("scriptFile"))
+            {
+                settings.ScriptFile = EnsureFullUrl((string)dataAttributes["scriptFile"]);
+                settings.ScriptFile = AppendScriptName(settings.ScriptFile);
+            }
 
             if (Platform.Platform.JsonExists(json, "fontDirectory"))
             {
                 settings.FontDirectory = EnsureFullUrl(json.fontDirectory);
+            }
+            else if (dataAttributes != null && dataAttributes.ContainsKey("fontDirectory"))
+            {
+                settings.FontDirectory = (string)dataAttributes["fontDirectory"];
             }
 
             if (Platform.Platform.JsonExists(json, "smallGraceTabNotes"))
@@ -497,6 +507,18 @@ namespace AlphaTab
             else if (dataAttributes != null && dataAttributes.ContainsKey("layout"))
             {
                 settings.Layout = LayoutFromJson(dataAttributes["layout"]);
+            }
+
+            if (dataAttributes != null)
+            {
+                foreach (var key in dataAttributes)
+                {
+                    if (key.StartsWith("layout"))
+                    {
+                        var property = key.Substring(6);
+                        settings.Layout.AdditionalSettings[property.ToLower()] = dataAttributes[key];
+                    }
+                }
             }
 
 
@@ -595,17 +617,6 @@ namespace AlphaTab
                 }
             }
 
-            if (dataAttributes != null)
-            {
-                foreach (var key in dataAttributes)
-                {
-                    if (key.StartsWith("layout"))
-                    {
-                        var property = key.Substring(6);
-                        settings.Layout.AdditionalSettings[property.ToLower()] = dataAttributes[key];
-                    }
-                }
-            }
 
             if (Platform.Platform.JsonExists(json, "staves"))
             {

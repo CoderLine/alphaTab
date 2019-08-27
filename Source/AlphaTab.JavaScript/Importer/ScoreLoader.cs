@@ -9,7 +9,7 @@ using Phase.Attributes;
 namespace AlphaTab.Importer
 {
     /// <summary>
-    /// The ScoreLoader enables you easy loading of Scores using all 
+    /// The ScoreLoader enables you easy loading of Scores using all
     /// available importers
     /// </summary>
     public partial class ScoreLoader

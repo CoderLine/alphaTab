@@ -1,12 +1,12 @@
 ﻿using System;
 using AlphaTab.Audio.Synth;
-using AlphaTab.Audio.Synth.Synthesis;
 using AlphaTab.Collections;
 using AlphaTab.Haxe.jQuery;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Model;
 using AlphaTab.Rendering;
+using AlphaTab.UI;
 using AlphaTab.Util;
 using Phase;
 using Phase.Attributes;
@@ -56,6 +56,9 @@ namespace AlphaTab.Platform.JavaScript
             }
         }
 
+        #region Core
+
+
         [Name("init")]
         public void Init(JQuery element, AlphaTabApi context, dynamic options)
         {
@@ -77,227 +80,89 @@ namespace AlphaTab.Platform.JavaScript
             context.Destroy();
         }
 
-        [Name("tex")]
-        public void Tex(JQuery element, AlphaTabApi context, string tex, dynamic tracks)
-        {
-            context.TexWithTrackData(tex, tracks);
-        }
-
-        [Name("tracks")]
-        public Track[] Tracks(JQuery element, AlphaTabApi context, dynamic tracks)
-        {
-            if (tracks)
-            {
-                context.SetTracks(tracks, true);
-            }
-
-            return context.Tracks;
-        }
-
-        [Name("load")]
-        public void Load(JQuery element, AlphaTabApi context, object data)
-        {
-            context.Load(data);
-        }
-
-        [Name("api")]
-        public AlphaTabApi Api(JQuery element, AlphaTabApi context)
-        {
-            return context;
-        }
-
-        [Name("score")]
-        public Score Score(JQuery element, AlphaTabApi context, Score score)
-        {
-            if (score.IsTruthy())
-            {
-                context.RenderTracks(score, context.TrackIndexes);
-            }
-
-            return context.Score;
-        }
-
-        [Name("renderer")]
-        public IScoreRenderer Renderer(JQuery element, AlphaTabApi context)
-        {
-            return context.Renderer;
-        }
-
-        [Name("layout")]
-        public LayoutSettings Layout(JQuery element, AlphaTabApi context, object layout)
-        {
-            if (layout.IsTruthy())
-            {
-                context.UpdateLayout(layout);
-            }
-
-            return context.Settings.Layout;
-        }
-
         [Name("print")]
         public void Print(JQuery element, AlphaTabApi context, string width)
         {
             context.Print(width);
         }
 
+        [Name("render")]
+        public void Render(JQuery element, AlphaTabApi context)
+        {
+            context.Render();
+        }
+
+        [Name("renderTracks")]
+        public void RenderTracks(JQuery element, AlphaTabApi context, Score score, int[] tracks, bool invalidate = true)
+        {
+            context.RenderTracks(score, tracks, invalidate);
+        }
+
+        [Name("tex")]
+        public void Tex(JQuery element, AlphaTabApi context, string tex, int[] tracks)
+        {
+            context.Tex(tex, tracks);
+        }
+
+        [Name("updateLayout")]
+        public void UpdateLayout(JQuery element, AlphaTabApi context, LayoutSettings layout)
+        {
+            context.UpdateLayout(layout);
+        }
+
+        [Name("updateSettings")]
+        public void UpdateLayout(JQuery element, AlphaTabApi context)
+        {
+            context.UpdateSettings();
+        }
+
+        [Name("load")]
+        public bool Load(JQuery element, AlphaTabApi context, object data)
+        {
+            return context.Load(data);
+        }
+
+        #endregion
+
+
+
         #region Player
 
-        [Name("player")]
-        public IAlphaSynth Player(JQuery element, AlphaTabApi context)
+        [Name("muteTrack")]
+        public void ChangeTrackMute(JQuery element, AlphaTabApi context, Track[] tracks, bool mute)
         {
-            return context.Player;
+            context.ChangeTrackMute(tracks, mute);
         }
 
-        [Name("playerOptions")]
-        public Settings PlayerOptions(JQuery element, AlphaTabApi context, object options)
+        [Name("soloTrack")]
+        public void ChangeTrackSolo(JQuery element, AlphaTabApi context, Track[] tracks, bool solo)
         {
-            if (options.IsTruthy())
-            {
-                Settings.FillPlayerOptions(context.Settings, options, false);
-            }
-
-            return context.Settings;
+            context.ChangeTrackSolo(tracks, solo);
         }
 
-        [Name("cursorOptions")]
-        public Settings CursorOptions(JQuery element, AlphaTabApi context, object options)
+        [Name("trackVolume")]
+        public void ChangeTrackVolume(JQuery element, AlphaTabApi context, Track[] tracks, float volume)
         {
-            return PlayerOptions(element, context, options);
+            context.ChangeTrackVolume(tracks, volume);
         }
 
-        [Name("playerState")]
-        public PlayerState PlayerState(JQuery element, AlphaTabApi context)
+
+        [Name("loadSoundFont")]
+        public void LoadSoundFont(JQuery element, AlphaTabApi context, object value)
         {
-            if (context.Player == null)
-            {
-                return Audio.Synth.PlayerState.Paused;
-            }
-
-            return context.Player.State;
-        }
-
-        [Name("masterVolume")]
-        public float MasterVolume(JQuery element, AlphaTabApi context, float masterVolume)
-        {
-            if (context.Player == null)
-            {
-                return 0;
-            }
-
-            if (Platform.TypeOf(masterVolume) == "number")
-            {
-                context.Player.MasterVolume = masterVolume;
-            }
-
-            return context.Player.MasterVolume;
-        }
-
-        [Name("playbackSpeed")]
-        public double PlaybackSpeed(JQuery element, AlphaTabApi context, double playbackSpeed)
-        {
-            if (context.Player == null)
-            {
-                return 0;
-            }
-
-            if (Platform.TypeOf(playbackSpeed) == "number")
-            {
-                context.Player.PlaybackSpeed = playbackSpeed;
-            }
-
-            return context.Player.PlaybackSpeed;
-        }
-
-        [Name("metronomeVolume")]
-        public float MetronomeVolume(JQuery element, AlphaTabApi context, float metronomeVolume)
-        {
-            if (context.Player == null)
-            {
-                return 0;
-            }
-
-            if (Platform.TypeOf(metronomeVolume) == "number")
-            {
-                context.Player.MetronomeVolume = metronomeVolume;
-            }
-
-            return context.Player.MetronomeVolume;
-        }
-
-        [Name("tickPosition")]
-        public int TickPosition(JQuery element, AlphaTabApi context, int tickPosition)
-        {
-            if (context.Player == null)
-            {
-                return 0;
-            }
-
-            if (Platform.TypeOf(tickPosition) == "number")
-            {
-                context.Player.TickPosition = tickPosition;
-            }
-
-            return context.Player.TickPosition;
-        }
-
-        [Name("playbackRange")]
-        public PlaybackRange PlaybackRange(JQuery element, AlphaTabApi context, PlaybackRange playbackRange)
-        {
-            if (context.Player == null)
-            {
-                return null;
-            }
-
-            if (playbackRange.IsTruthy())
-            {
-                context.Player.PlaybackRange = playbackRange;
-            }
-
-            return context.Player.PlaybackRange;
-        }
-
-        [Name("loop")]
-        public bool Loop(JQuery element, AlphaTabApi context, bool loop)
-        {
-            if (context.Player == null)
-            {
-                return false;
-            }
-
-            if (Platform.TypeOf(loop) == "boolean")
-            {
-                context.Player.IsLooping = loop;
-            }
-
-            return context.Player.IsLooping;
-        }
-
-        [Name("autoScroll")]
-        public string AutoScroll(JQuery element, AlphaTabApi context, string autoScroll)
-        {
-            if (context.Player == null)
-            {
-                return null;
-            }
-
-            if (autoScroll.IsTruthy())
-            {
-                context.Settings.ScrollMode = Settings.DecodeScrollMode(autoScroll);
-            }
-
-            return Settings.EncodeScrollMode(context.Settings.ScrollMode);
-        }
-
-        [Name("play")]
-        public void Play(JQuery element, AlphaTabApi context)
-        {
-            context.Play();
+            context.LoadSoundFont(value);
         }
 
         [Name("pause")]
         public void Pause(JQuery element, AlphaTabApi context)
         {
             context.Pause();
+        }
+
+        [Name("play")]
+        public bool Play(JQuery element, AlphaTabApi context)
+        {
+            return context.Play();
         }
 
         [Name("playPause")]
@@ -312,35 +177,111 @@ namespace AlphaTab.Platform.JavaScript
             context.Stop();
         }
 
-        [Name("loadSoundFont")]
-        public void LoadSoundFont(JQuery element, AlphaTabApi context, object value)
+        #endregion
+
+        #region Properties
+
+
+        [Name("api")]
+        public AlphaTabApi Api(JQuery element, AlphaTabApi context)
         {
-            context.LoadSoundFont(value);
+            return context;
         }
 
-        [Name("muteTrack")]
-        public void MuteTrack(JQuery element, AlphaTabApi context, object tracks, bool mute)
+        [Name("player")]
+        public IAlphaSynth Player(JQuery element, AlphaTabApi context)
         {
-            context.SetTrackMute(tracks, mute);
+            return context.Player;
         }
 
-        [Name("soloTrack")]
-        public void SoloTrack(JQuery element, AlphaTabApi context, object tracks, bool solo)
+        [Name("playerState")]
+        public PlayerState PlayerState(JQuery element, AlphaTabApi context)
         {
-            context.SetTrackSolo(tracks, solo);
+            return context.PlayerState;
         }
 
-
-        [Name("trackVolume")]
-        public void TrackVolume(JQuery element, AlphaTabApi context, object tracks, float volume)
+        [Name("masterVolume")]
+        public float MasterVolume(JQuery element, AlphaTabApi context, float masterVolume)
         {
-            context.SetTrackVolume(tracks, volume);
+            if (Platform.TypeOf(masterVolume) == "number")
+            {
+                context.MasterVolume = masterVolume;
+            }
+            return context.MasterVolume;
         }
 
-        [Name("downloadMidi")]
-        public void DownloadMidi(JQuery element, AlphaTabApi context)
+        [Name("metronomeVolume")]
+        public float MetronomeVolume(JQuery element, AlphaTabApi context, float metronomeVolume)
         {
-            context.DownloadMidi();
+            if (Platform.TypeOf(metronomeVolume) == "number")
+            {
+                context.MetronomeVolume = metronomeVolume;
+            }
+            return context.MetronomeVolume;
+        }
+
+        [Name("playbackSpeed")]
+        public double PlaybackSpeed(JQuery element, AlphaTabApi context, double playbackSpeed)
+        {
+            if (Platform.TypeOf(playbackSpeed) == "number")
+            {
+                context.PlaybackSpeed = playbackSpeed;
+            }
+            return context.PlaybackSpeed;
+        }
+
+        [Name("tickPosition")]
+        public int TickPosition(JQuery element, AlphaTabApi context, int tickPosition)
+        {
+            if (Platform.TypeOf(tickPosition) == "number")
+            {
+                context.TickPosition = tickPosition;
+            }
+            return context.TickPosition;
+        }
+
+        [Name("timePosition")]
+        public double TimePosition(JQuery element, AlphaTabApi context, double timePosition)
+        {
+            if (Platform.TypeOf(timePosition) == "number")
+            {
+                context.TimePosition = timePosition;
+            }
+            return context.TimePosition;
+        }
+
+        [Name("loop")]
+        public bool Loop(JQuery element, AlphaTabApi context, bool loop)
+        {
+            if (Platform.TypeOf(loop) == "boolean")
+            {
+                context.IsLooping = loop;
+            }
+            return context.IsLooping;
+        }
+
+        [Name("renderer")]
+        public IScoreRenderer Renderer(JQuery element, AlphaTabApi context)
+        {
+            return context.Renderer;
+        }
+
+        [Name("score")]
+        public Score Score(JQuery element, AlphaTabApi context)
+        {
+            return context.Score;
+        }
+
+        [Name("settings")]
+        public Settings Settings(JQuery element, AlphaTabApi context)
+        {
+            return context.Settings;
+        }
+
+        [Name("tracks")]
+        public Track[] Tracks(JQuery element, AlphaTabApi context)
+        {
+            return context.Tracks;
         }
 
         #endregion

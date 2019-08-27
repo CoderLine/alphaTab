@@ -1,11 +1,14 @@
 ﻿using System;
 using AlphaTab.Audio.Generator;
+using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Midi;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Importer;
+using AlphaTab.Model;
 using AlphaTab.UI;
 using Haxe.Js.Html;
+using Phase;
 
 namespace AlphaTab.Platform.JavaScript
 {
@@ -16,9 +19,19 @@ namespace AlphaTab.Platform.JavaScript
         {
         }
 
-        public void TexWithTrackData(string tex, dynamic trackData)
+        public override PlayerState PlayerState
         {
-            Tex(tex, ((BrowserUiFacade)UiFacade).ParseTracks(trackData));
+            get
+            {
+                var playerStateValue = (int)Player.State;
+                return Script.Write<PlayerState>("untyped __js__(\"{0}\", playerStateValue)");
+            }
+        }
+
+        public override void Tex(string tex, int[] tracks = null)
+        {
+            var browser = (BrowserUiFacade)UiFacade;
+            Tex(tex, browser.ParseTracks(tracks));
         }
 
         public void Print(string width)
@@ -78,7 +91,7 @@ namespace AlphaTab.Platform.JavaScript
             settings.FontDirectory = Settings.FontDirectory;
             settings.Scale = 0.8f;
             settings.StretchForce = 0.8f;
-            settings.DisableLazyLoading = true;
+            settings.EnableLazyLoading = false;
             settings.UseWorkers = false;
 
             var alphaTab = new AlphaTabApi(a4, settings);
@@ -90,63 +103,13 @@ namespace AlphaTab.Platform.JavaScript
             alphaTab.RenderTracks(Score, TrackIndexes);
         }
 
-        public void Load(object data)
+        public override void UpdateLayout(LayoutSettings layoutSettings)
         {
-            try
+            if (!(layoutSettings is LayoutSettings))
             {
-                if (Platform.InstanceOf<ArrayBuffer>(data))
-                {
-                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes(Platform.ArrayBufferToByteArray((ArrayBuffer)data),
-                        Settings));
-                }
-                else if (Platform.InstanceOf<Uint8Array>(data))
-                {
-                    ScoreLoaded(ScoreLoader.LoadScoreFromBytes((byte[])data, Settings));
-                }
-                else if (Platform.TypeOf(data) == "string")
-                {
-                    ScoreLoader.LoadScoreAsync((string)data,
-                        s => ScoreLoaded(s),
-                        e =>
-                        {
-                            OnError("import", e);
-                        },
-                        Settings);
-                }
+                layoutSettings = Settings.LayoutFromJson(layoutSettings);
             }
-            catch (Exception e)
-            {
-                OnError("import", e);
-            }
-        }
-
-        public void UpdateLayout(object json)
-        {
-            Settings.Layout = Settings.LayoutFromJson(json);
-            Renderer.UpdateSettings(Settings);
-            Renderer.Invalidate();
-        }
-
-        public void SetTracks(object tracks, bool render)
-        {
-            ((BrowserUiFacade)UiFacade).SetTracks(tracks, render);
-        }
-
-        public void LoadSoundFont(object value)
-        {
-            if (Player == null)
-            {
-                return;
-            }
-
-            if (Platform.TypeOf(value) == "string")
-            {
-                ((AlphaSynthWebWorkerApi)Player).LoadSoundFontFromUrl((string)value);
-            }
-            else
-            {
-                Player.LoadSoundFont((byte[])value);
-            }
+            base.UpdateLayout(layoutSettings);
         }
 
         public void DownloadMidi()
@@ -178,22 +141,22 @@ namespace AlphaTab.Platform.JavaScript
             Browser.Document.Body.RemoveChild(dlLink);
         }
 
-        public void SetTrackVolume(object tracks, float volume)
+        public override void ChangeTrackMute(Track[] tracks, bool mute)
         {
             var trackList = TrackIndexesToTracks(((BrowserUiFacade)UiFacade).ParseTracks(tracks));
-            ChangeTrackVolume(trackList, volume);
+            base.ChangeTrackMute(trackList, mute);
         }
 
-        public void SetTrackSolo(object tracks, bool solo)
+        public override void ChangeTrackSolo(Track[] tracks, bool solo)
         {
             var trackList = TrackIndexesToTracks(((BrowserUiFacade)UiFacade).ParseTracks(tracks));
-            ChangeTrackSolo(trackList, solo);
+            base.ChangeTrackSolo(trackList, solo);
         }
 
-        public void SetTrackMute(object tracks, bool mute)
+        public override void ChangeTrackVolume(Track[] tracks, float volume)
         {
             var trackList = TrackIndexesToTracks(((BrowserUiFacade)UiFacade).ParseTracks(tracks));
-            ChangeTrackMute(trackList, mute);
+            base.ChangeTrackVolume(trackList, volume);
         }
     }
 }

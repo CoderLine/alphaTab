@@ -1,0 +1,84 @@
+Title: Engine
+JsName: engine
+DataAttribute: data-engine
+Category: Core
+Description: The engine which should be used to render the the tablature.
+ShowInSideBar: false
+Since: 0.9.4
+---
+
+<h2>Description</h2>
+<p>
+    AlphaTab can use various render engines to draw the music notation. The available render engines is specific to the platform. Please refer to the table below to find out which engines are available on which platform.    
+</p>
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Values</th>
+        </tr>
+    </thead>    
+    <tbody>    
+        <tr>
+            <td><code>string <span class="code-badge">.net</span></td>
+            <td>
+                <code>skia</code> - Available on all .net platforms. Uses <a href="https://skia.org/" target="_blank">Skia</a> for rendering<br />
+                <code>gdi</code> - Only available desktop .net. Uses <a href="https://docs.microsoft.com/en-us/dotnet/framework/winforms/advanced/graphics-and-drawing-in-windows-forms" target="_blank">GDI+</a> for rendering <br />
+                <code>svg</code> - Available on all .net platforms. Outputs SVG strings. 
+            </td>
+        </tr>   
+        <tr>
+            <td><code>string <span class="code-badge">JavaScript &amp; HTML</span></td>
+            <td>
+                <code>svg</code> - Outputs SVG strings.<br />
+                <code>html5</code> - Uses HTML5 canvas elements to render the music notation. 
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <tbody>    
+        <tr>
+            <td><code>skia <span class="code-badge">.net</span></td>
+        </tr>   
+        <tr>
+            <td><code>svg <span class="code-badge">JavaScript &amp; HTML</span></td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Example - C#</h2>
+
+<pre>
+<code class="language-csharp line-numbers">
+var settings = Settings.Defaults; 
+settings.Engine = "gdi";
+</code>
+</pre>
+
+
+<h2>Example - JavaScript</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+var settings = {
+    engine: 'html5'
+};
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'), settings);
+var japi = $('#alphaTab').alphaTab(settings);
+</code>
+</pre>
+
+<h2>Example - HTML</h2>
+
+<pre>
+<code class="language-html line-numbers">
+&lt;div id="alphaTab" data-engine="html5"&gt;&lt;/div&gt;
+</code>
+</pre>

@@ -12,6 +12,7 @@ using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 using AlphaTab.Util;
 using Haxe;
+using Haxe.Js.Html;
 using Phase;
 
 namespace AlphaTab.UI
@@ -188,6 +189,59 @@ namespace AlphaTab.UI
             }
         }
 
+        public bool Load(object data, Action<Score> success, Action<Exception> error)
+        {
+            if (data is Score)
+            {
+                success((Score)data);
+                return true;
+            }
+
+            if (Platform.Platform.InstanceOf<ArrayBuffer>(data))
+            {
+                success(ScoreLoader.LoadScoreFromBytes(Platform.Platform.ArrayBufferToByteArray((ArrayBuffer)data),
+                    _api.Settings));
+                return true;
+            }
+
+            if (Platform.Platform.InstanceOf<Uint8Array>(data))
+            {
+                success(ScoreLoader.LoadScoreFromBytes((byte[])data, _api.Settings));
+                return true;
+            }
+
+            if (Platform.Platform.TypeOf(data) == "string")
+            {
+                ScoreLoader.LoadScoreAsync((string)data, success, error, _api.Settings);
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool LoadSoundFont(object data)
+        {
+            if (Platform.Platform.InstanceOf<ArrayBuffer>(data))
+            {
+                _api.Player.LoadSoundFont(new Uint8Array((ArrayBuffer)data).As<byte[]>());
+                return true;
+            }
+
+            if (Platform.Platform.InstanceOf<Uint8Array>(data))
+            {
+                _api.Player.LoadSoundFont(data.As<byte[]>());
+                return true;
+            }
+
+            if (Platform.Platform.TypeOf(data) == "string")
+            {
+                ((AlphaSynthWebWorkerApi)_api.Player).LoadSoundFontFromUrl((string)data);
+                return true;
+            }
+
+            return false;
+        }
+
         public void InitialRender()
         {
             _api.Renderer.PreRender += () => { _totalResultCount = 0; };
@@ -298,7 +352,7 @@ namespace AlphaTab.UI
             _api.RenderTracks(score, ParseTracks(tracksData), render);
         }
 
-        public int[] ParseTracks(dynamic tracksData)
+        public int[] ParseTracks(object tracksData)
         {
             var tracks = new FastList<int>();
 
@@ -312,7 +366,7 @@ namespace AlphaTab.UI
                         return null;
                     }
 
-                    tracksData = Json.Parse(tracksData);
+                    tracksData = Json.Parse((string)tracksData);
                 }
                 catch
                 {
@@ -328,23 +382,24 @@ namespace AlphaTab.UI
             {
                 tracks.Add((int)tracksData);
             }
-            else if (tracksData.length)
+            else if (tracksData.HasMember("length"))
             {
-                for (var i = 0; i < tracksData.length; i++)
+                var length = tracks.Member<int>("length");
+                var array = (object[])tracksData;
+                for (var i = 0; i < length; i++)
                 {
                     int value;
-                    if (Platform.Platform.TypeOf(tracksData[i]) == "number")
+                    if (Platform.Platform.TypeOf(array) == "number")
                     {
-                        value = (int)tracksData[i];
+                        value = (int)array[i];
                     }
-                    else if (Platform.Platform.TypeOf(tracksData[i].Index) == "number")
+                    else if (tracks.HasMember("Index"))
                     {
-                        Track track = tracksData[i];
-                        value = track.Index;
+                        value = array[i].Member<int>("Index");
                     }
                     else
                     {
-                        value = Platform.Platform.ParseInt(tracksData[i].ToString());
+                        value = Platform.Platform.ParseInt(array[i].ToString());
                     }
 
                     if (value >= 0)
@@ -353,9 +408,9 @@ namespace AlphaTab.UI
                     }
                 }
             }
-            else if (Platform.Platform.TypeOf(tracksData.Index) == "number")
+            else if (tracksData.HasMember("Index"))
             {
-                tracks.Add(tracksData.Index.As<int>());
+                tracks.Add(tracksData.Member<int>("Index"));
             }
 
             return tracks.ToArray();
@@ -439,7 +494,7 @@ namespace AlphaTab.UI
                             canvasElement.RemoveChild(canvasElement.LastChild);
                         }
                     }
-                    // NOTE: here we try to replace existing children 
+                    // NOTE: here we try to replace existing children
                     else
                     {
                         var body = renderResult.RenderResult;
@@ -460,7 +515,7 @@ namespace AlphaTab.UI
                             placeholder.Style.Height = renderResult.Height + "px";
                             placeholder.Style.Display = "inline-block";
 
-                            if (IsElementInViewPort(placeholder) || _api.Settings.DisableLazyLoading)
+                            if (IsElementInViewPort(placeholder) || !_api.Settings.EnableLazyLoading)
                             {
                                 var bodyHtml = (string)body;
                                 placeholder.OuterHTML = bodyHtml;
@@ -492,16 +547,16 @@ namespace AlphaTab.UI
 
         /// <summary>
         /// This method creates the player. It detects browser compatibility and
-        /// initializes a alphaSynth version for the client. 
-        /// 
+        /// initializes a alphaSynth version for the client.
+        ///
         /// Compatibility:
         ///   If a browser supports WebWorkers, we will use WebWorkers for Synthesizing the samples and a Flash player for playback
-        /// 
+        ///
         /// - IE6-9   - Unsupported
         /// - IE10-11 - Flash is used for playback, Synthesizing is done in a WebWorker
-        /// - Firefox - Web Audio API is used for playback, Synthesizing is done in a WebWorker 
-        /// - Chrome  - Web Audio API is used for playback, Synthesizing is done in a WebWorker 
-        /// - Safari  - Web Audio API is used for playback, Synthesizing is done in a WebWorker 
+        /// - Firefox - Web Audio API is used for playback, Synthesizing is done in a WebWorker
+        /// - Chrome  - Web Audio API is used for playback, Synthesizing is done in a WebWorker
+        /// - Safari  - Web Audio API is used for playback, Synthesizing is done in a WebWorker
         /// - Opera   - Web Audio API is used for playback, Synthesizing is done in a WebWorker
         /// </summary>
         public IAlphaSynth CreateWorkerPlayer()
@@ -583,7 +638,7 @@ namespace AlphaTab.UI
             var beatCursor = Browser.Document.CreateElement("div");
             beatCursor.ClassList.Add("beatCursor");
 
-            // required css styles 
+            // required css styles
             element.Style.Position = "relative";
             element.Style.TextAlign = "left";
 

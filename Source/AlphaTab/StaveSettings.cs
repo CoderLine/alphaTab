@@ -3,13 +3,13 @@ using AlphaTab.Collections;
 namespace AlphaTab
 {
     /// <summary>
-    /// Represents the stave specific settings. 
+    /// Represents the stave specific settings.
     /// </summary>
     public class StaveSettings
     {
         /// <summary>
         /// The stave profile name as it is registered in <see cref="Environment.StaveProfiles"/>
-        /// Default Profiles: 
+        /// Default Profiles:
         /// <ul>
         ///  <li><strong>score-tab</strong> - Standard music notation and guitar tablature are rendered (default)</li>
         ///  <li><strong>score</strong> - Only standard music notation is rendered</li>
@@ -19,7 +19,7 @@ namespace AlphaTab
         public string Id { get; set; }
 
         /// <summary>
-        /// Additional stave specific settings
+        /// Additional staffe specific settings
         /// <strong>id=tab</strong>
         /// <ul>
         ///  <li><strong>rhythm</strong> - Renders rhythm beams to tablature notes</li>
@@ -38,7 +38,7 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// Gets the staff layout specific setting using the given key. 
+        /// Gets the staff layout specific setting using the given key.
         /// </summary>
         /// <typeparam name="T">The data type fo the stored value.</typeparam>
         /// <param name="key">The key of the setting.</param>

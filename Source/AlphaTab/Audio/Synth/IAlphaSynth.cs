@@ -34,7 +34,7 @@ namespace AlphaTab.Audio.Synth
         }
 
         /// <summary>
-        /// Gets or sets the loging level. 
+        /// Gets or sets the loging level.
         /// </summary>
         AlphaTab.Util.LogLevel LogLevel
         {
@@ -89,7 +89,7 @@ namespace AlphaTab.Audio.Synth
 
         /// <summary>
         /// Gets or sets the range of the song that should be played. Set this to null
-        /// to play the whole song. 
+        /// to play the whole song.
         /// </summary>
         PlaybackRange PlaybackRange
         {
@@ -98,7 +98,7 @@ namespace AlphaTab.Audio.Synth
         }
 
         /// <summary>
-        /// Gets or sets whether the playback should automatically restart after it finished. 
+        /// Gets or sets whether the playback should automatically restart after it finished.
         /// </summary>
         bool IsLooping
         {
@@ -113,8 +113,9 @@ namespace AlphaTab.Audio.Synth
 
         /// <summary>
         /// Starts the playback if possible
-        /// </summary>  
-        void Play();
+        /// </summary>
+        /// <returns>true if the playback was started, otherwise false. Reasons for not starting can be that the player is not ready or already playing.</returns>
+        bool Play();
 
         /// <summary>
         /// Pauses the playback if was running
@@ -138,7 +139,7 @@ namespace AlphaTab.Audio.Synth
         void LoadSoundFont(byte[] data);
 
         /// <summary>
-        /// Loads the given midi file structure. 
+        /// Loads the given midi file structure.
         /// </summary>
         /// <param name="midi"></param>
         void LoadMidiFile(MidiFile midi);
@@ -178,47 +179,47 @@ namespace AlphaTab.Audio.Synth
         void SetChannelProgram(int channel, byte program);
 
         /// <summary>
-        /// This event is fired when the player is ready to be interacted with. 
+        /// This event is fired when the player is ready to be interacted with.
         /// </summary>
         event Action Ready;
 
         /// <summary>
-        /// This event is fired when all required data for playback is loaded and ready. 
+        /// This event is fired when all required data for playback is loaded and ready.
         /// </summary>
         event Action ReadyForPlayback;
 
         /// <summary>
-        /// This event is fired when the playback of the whole song finished. 
+        /// This event is fired when the playback of the whole song finished.
         /// </summary>
         event Action<PlaybackFinishedEventArgs> Finished;
 
         /// <summary>
-        /// This event is fired when the SoundFont needed for playback was loaded. 
+        /// This event is fired when the SoundFont needed for playback was loaded.
         /// </summary>
         event Action SoundFontLoaded;
 
         /// <summary>
-        /// This event is fired when the loading of the SoundFont failed. 
+        /// This event is fired when the loading of the SoundFont failed.
         /// </summary>
         event Action<Exception> SoundFontLoadFailed;
 
         /// <summary>
-        /// This event is fired when the Midi file needed for playback was loaded. 
+        /// This event is fired when the Midi file needed for playback was loaded.
         /// </summary>
         event Action MidiLoaded;
 
         /// <summary>
-        /// This event is fired when the loading of the Midi file failed. 
+        /// This event is fired when the loading of the Midi file failed.
         /// </summary>
         event Action<Exception> MidiLoadFailed;
 
         /// <summary>
-        /// This event is fired when the playback state changed. 
+        /// This event is fired when the playback state changed.
         /// </summary>
         event Action<PlayerStateChangedEventArgs> StateChanged;
 
         /// <summary>
-        /// This event is fired when the current playback position of the song changed. 
+        /// This event is fired when the current playback position of the song changed.
         /// </summary>
         event Action<PositionChangedEventArgs> PositionChanged;
     }
