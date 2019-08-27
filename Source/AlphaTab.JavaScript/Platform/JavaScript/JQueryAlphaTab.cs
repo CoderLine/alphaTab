@@ -86,16 +86,34 @@ namespace AlphaTab.Platform.JavaScript
             context.Print(width);
         }
 
+        [Name("load")]
+        public bool Load(JQuery element, AlphaTabApi context, object data, int[] tracks = null)
+        {
+            return context.Load(data, tracks);
+        }
+
         [Name("render")]
         public void Render(JQuery element, AlphaTabApi context)
         {
             context.Render();
         }
 
-        [Name("renderTracks")]
-        public void RenderTracks(JQuery element, AlphaTabApi context, Score score, int[] tracks, bool invalidate = true)
+        [Name("renderScore")]
+        public void Render(JQuery element, AlphaTabApi context, Score score, int[] tracks = null)
         {
-            context.RenderTracks(score, tracks, invalidate);
+            context.RenderScore(score, tracks);
+        }
+
+        [Name("renderTracks")]
+        public void RenderTracks(JQuery element, AlphaTabApi context, Track[] tracks)
+        {
+            context.RenderTracks(tracks);
+        }
+
+        [Name("invalidate")]
+        public void Invalidate(JQuery element, AlphaTabApi context)
+        {
+            context.Render();
         }
 
         [Name("tex")]
@@ -114,12 +132,6 @@ namespace AlphaTab.Platform.JavaScript
         public void UpdateLayout(JQuery element, AlphaTabApi context)
         {
             context.UpdateSettings();
-        }
-
-        [Name("load")]
-        public bool Load(JQuery element, AlphaTabApi context, object data)
-        {
-            return context.Load(data);
         }
 
         #endregion

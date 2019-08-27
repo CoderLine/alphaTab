@@ -8,7 +8,7 @@ using AlphaTab.Util;
 namespace AlphaTab.Rendering.Layout
 {
     /// <summary>
-    /// This layout arranges the bars into a fixed width and dynamic height region. 
+    /// This layout arranges the bars into a fixed width and dynamic height region.
     /// </summary>
     internal class PageViewLayout : ScoreLayout
     {
@@ -53,14 +53,14 @@ namespace AlphaTab.Rendering.Layout
 
             var x = _pagePadding[0];
             var y = _pagePadding[1];
-            Width = Renderer.Settings.Width;
+            Width = Renderer.Width;
             _allMasterBarRenderers = new FastList<MasterBarsRenderers>();
 
-            // 
+            //
             // 1. Score Info
             y = LayoutAndRenderScoreInfo(x, y);
 
-            // 
+            //
             // 2. Chord Diagrms
             y = LayoutAndRenderChordDiagrams(y);
 
@@ -77,14 +77,14 @@ namespace AlphaTab.Rendering.Layout
         {
             var x = _pagePadding[0];
             var y = _pagePadding[1];
-            Width = Renderer.Settings.Width;
+            Width = Renderer.Width;
             var oldHeight = Height;
 
-            // 
+            //
             // 1. Score Info
             y = LayoutAndRenderScoreInfo(x, y, oldHeight);
 
-            // 
+            //
             // 2. Chord Digrams
             y = LayoutAndRenderChordDiagrams(y, oldHeight);
 
@@ -225,7 +225,7 @@ namespace AlphaTab.Rendering.Layout
         {
             var canvas = Renderer.Canvas;
 
-            // if we have a fixed number of bars per row, we only need to refit them. 
+            // if we have a fixed number of bars per row, we only need to refit them.
             if (Renderer.Settings.Layout.Get("barsPerRow", -1) != -1)
             {
                 for (var i = 0; i < _groups.Count; i++)
@@ -237,7 +237,7 @@ namespace AlphaTab.Rendering.Layout
                     y += PaintGroup(group, oldHeight, canvas);
                 }
             }
-            // if the bars per row are flexible, we need to recreate the stave groups 
+            // if the bars per row are flexible, we need to recreate the stave groups
             // by readding the existing groups
             else
             {
@@ -337,7 +337,7 @@ namespace AlphaTab.Rendering.Layout
             canvas.BeginRender(Width, height);
             Renderer.Canvas.Color = Renderer.Settings.RenderingResources.MainGlyphColor;
             Renderer.Canvas.TextAlign = TextAlign.Left;
-            // NOTE: we use this negation trick to make the group paint itself to 0/0 coordinates 
+            // NOTE: we use this negation trick to make the group paint itself to 0/0 coordinates
             // since we use partial drawing
             group.Paint(0, -group.Y, canvas);
 
@@ -439,6 +439,6 @@ namespace AlphaTab.Rendering.Layout
             return group;
         }
 
-        private float MaxWidth => Renderer.Settings.Width - _pagePadding[0] - _pagePadding[2];
+        private float MaxWidth => Renderer.Width - _pagePadding[0] - _pagePadding[2];
     }
 }

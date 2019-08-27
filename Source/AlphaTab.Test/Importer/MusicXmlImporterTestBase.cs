@@ -393,8 +393,8 @@ namespace AlphaTab.Test.Importer
             {
                 Mode = renderLayout
             };
-            settings.Width = 800;
             var renderer = new ScoreRenderer(settings);
+            renderer.Width = 800;
             var images = new FastList<Image>();
             var totalWidth = 0;
             var totalHeight = 0;
@@ -418,7 +418,7 @@ namespace AlphaTab.Test.Importer
                 totalWidth = (int)r.TotalWidth;
                 totalHeight = (int)r.TotalHeight;
             };
-            renderer.Render(tracks[0].Score, tracks.Select(t => t.Index).ToArray());
+            renderer.RenderScore(tracks[0].Score, tracks.Select(t => t.Index).ToArray());
             using (var bmp = new Bitmap(totalWidth, totalHeight))
             {
                 var y = 0;

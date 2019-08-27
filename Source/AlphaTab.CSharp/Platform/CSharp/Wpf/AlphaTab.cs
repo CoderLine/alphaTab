@@ -171,7 +171,7 @@ namespace AlphaTab.Platform.CSharp.Wpf
 
             if (score != null)
             {
-                Api.RenderTracks(score, trackIndexes.ToArray());
+                Api.RenderScore(score, trackIndexes.ToArray());
             }
         }
 

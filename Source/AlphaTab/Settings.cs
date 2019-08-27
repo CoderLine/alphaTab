@@ -16,12 +16,7 @@ namespace AlphaTab
         public float Scale { get; set; }
 
         /// <summary>
-        /// The initial size of the canvas during loading or the width for particular layouts (e.g. page layout).
-        /// </summary>
-        public int Width { get; set; }
-
-        /// <summary>
-        /// The engine which should be used to render the the tablature. 
+        /// The engine which should be used to render the the tablature.
         /// <ul>
         ///  <li><strong>default</strong> - Platform specific default engine</li>
         ///  <li><strong>html5</strong> - HTML5 Canvas</li>
@@ -36,7 +31,7 @@ namespace AlphaTab
         public LayoutSettings Layout { get; set; }
 
         /// <summary>
-        /// Specific settings for importers. Keys are specific for the importers. 
+        /// Specific settings for importers. Keys are specific for the importers.
         /// <strong>General</strong>
         /// <ul>
         ///  <li><strong>encoding</strong> - The text encoding to use when decoding strings (string, default:utf-8)</li>
@@ -49,30 +44,30 @@ namespace AlphaTab
         public FastDictionary<string, object> ImporterSettings { get; set; }
 
         /// <summary>
-        /// The default stretch force to use for layouting. 
+        /// The default stretch force to use for layouting.
         /// </summary>
         public float StretchForce { get; set; }
 
         /// <summary>
-        /// Forces the fingering rendering to use always the piano finger stýle where 
+        /// Forces the fingering rendering to use always the piano finger stýle where
         /// fingers are rendered as 1-5 instead of p,i,m,a,c and T,1,2,3,4.
         /// </summary>
         public bool ForcePianoFingering { get; set; }
 
         /// <summary>
-        /// The staves that should be shown in the music sheet. 
+        /// The staves that should be shown in the music sheet.
         /// This is one of the profiles registered in the <see cref="Environment.StaveProfiles"/>
         /// </summary>
         public StaveSettings Staves { get; set; }
 
         /// <summary>
-        /// The transposition pitch offsets for the individual tracks. 
+        /// The transposition pitch offsets for the individual tracks.
         /// They apply to rendering and playback.
         /// </summary>
         public int[] TranspositionPitches { get; set; }
 
         /// <summary>
-        /// The transposition pitch offsets for the individual tracks. 
+        /// The transposition pitch offsets for the individual tracks.
         /// They apply to rendering only.
         /// </summary>
         public int[] DisplayTranspositionPitches { get; set; }
@@ -89,19 +84,19 @@ namespace AlphaTab
 
         /// <summary>
         /// If set to true bend arrows expand to the end of the last tied note
-        /// of the string. Otherwise they end on the next beat. 
+        /// of the string. Otherwise they end on the next beat.
         /// </summary>
         public bool ExtendBendArrowsOnTiedNotes { get; set; }
 
         /// <summary>
         /// If set to true the note heads on tied notes
-        /// will have parenthesis if they are preceeded by bends. 
+        /// will have parenthesis if they are preceeded by bends.
         /// </summary>
         public bool ShowParenthesisForTiedBends { get; set; }
 
         /// <summary>
         /// If set to true a tab number will be shown in case
-        /// a bend is increased on a tied note. 
+        /// a bend is increased on a tied note.
         /// </summary>
         public bool ShowTabNoteOnTiedBend { get; set; }
 
@@ -111,23 +106,23 @@ namespace AlphaTab
         public DisplayMode DisplayMode { get; set; }
 
         /// <summary>
-        /// Gets or sets the fingering mode to use. 
+        /// Gets or sets the fingering mode to use.
         /// </summary>
         public FingeringMode FingeringMode { get; set; }
 
         /// <summary>
-        /// If set to true, 0 is shown on dive whammy bars. 
+        /// If set to true, 0 is shown on dive whammy bars.
         /// </summary>
         public bool ShowZeroOnDiveWhammy { get; set; }
 
         /// <summary>
         /// If set to true, line effects (like w/bar, let-ring etc)
-        /// are drawn until the end of the beat instead of the start. 
+        /// are drawn until the end of the beat instead of the start.
         /// </summary>
         public bool ExtendLineEffectsToBeatEnd { get; set; }
 
         /// <summary>
-        /// Gets or sets the settings on how the vibrato audio is generated. 
+        /// Gets or sets the settings on how the vibrato audio is generated.
         /// </summary>
         public VibratoPlaybackSettings Vibrato { get; set; }
 
@@ -138,18 +133,18 @@ namespace AlphaTab
         public float SlurHeight { get; set; }
 
         /// <summary>
-        /// Gets or sets the bend duration in milliseconds for songbook bends. 
+        /// Gets or sets the bend duration in milliseconds for songbook bends.
         /// </summary>
         public int SongBookBendDuration { get; set; }
 
         /// <summary>
-        /// Gets or sets the duration of whammy dips in milliseconds for songbook whammys. 
+        /// Gets or sets the duration of whammy dips in milliseconds for songbook whammys.
         /// </summary>
         public int SongBookDipDuration { get; set; }
 
         /// <summary>
         /// Gets or sets whether in the <see cref="BoundsLookup"/> also the
-        /// position and area of each individual note is provided. 
+        /// position and area of each individual note is provided.
         /// </summary>
         public bool IncludeNoteBounds { get; set; }
 
@@ -164,17 +159,17 @@ namespace AlphaTab
         public bool EnablePlayer { get; set; }
 
         /// <summary>
-        /// Gets or sets whether playback cursors should be displayed. 
+        /// Gets or sets whether playback cursors should be displayed.
         /// </summary>
         public bool EnableCursor { get; set; }
 
         /// <summary>
-        /// Gets or sets the width of the beat cursor in pixels. 
+        /// Gets or sets the width of the beat cursor in pixels.
         /// </summary>
         public int BeatCursorWidth { get; set; }
 
         /// <summary>
-        /// Gets or sets the X-offset to add when scrolling. 
+        /// Gets or sets the X-offset to add when scrolling.
         /// </summary>
         public int ScrollOffsetX
         {
@@ -192,7 +187,7 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// Gets or sets the mode how to scroll. 
+        /// Gets or sets the mode how to scroll.
         /// </summary>
         public ScrollMode ScrollMode
         {
@@ -210,12 +205,12 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// Gets or sets the resources used during rendering. This defines all fonts and colors used. 
+        /// Gets or sets the resources used during rendering. This defines all fonts and colors used.
         /// </summary>
         public RenderingResources RenderingResources { get; set; }
 
         /// <summary>
-        /// Gets the default settings for the songbook display mode. 
+        /// Gets the default settings for the songbook display mode.
         /// </summary>
         public static Settings SongBook
         {
@@ -249,7 +244,6 @@ namespace AlphaTab
 
                 settings.Scale = 1.0f;
                 settings.StretchForce = 1;
-                settings.Width = -1;
                 settings.Engine = "default";
                 settings.TranspositionPitches = new int[0];
                 settings.DisplayTranspositionPitches = new int[0];

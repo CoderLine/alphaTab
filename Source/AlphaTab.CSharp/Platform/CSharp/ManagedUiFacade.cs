@@ -75,11 +75,8 @@ namespace AlphaTab.Platform.CSharp
             {
                 // rendering was possibly delayed due to invisible element
                 // in this case we need the correct width for autosize
-                if (Api.AutoSize)
-                {
-                    Api.Settings.Width = (int)RootContainer.Width;
-                    Api.Renderer.UpdateSettings(Api.Settings);
-                }
+                Api.Renderer.Width = (int)RootContainer.Width;
+                Api.Renderer.UpdateSettings(Api.Settings);
 
                 RenderTracks();
             };

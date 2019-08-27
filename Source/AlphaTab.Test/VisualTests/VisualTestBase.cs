@@ -11,13 +11,13 @@ namespace AlphaTab.Test.VisualTests
     {
         protected void RunVisualTest(Settings settings, int[] tracks, string inputFileName, string referenceImage)
         {
-            settings.Width = 1300;
             TestPlatform.LoadFile(inputFileName, inputFileData =>
             {
                 TestPlatform.LoadFile(referenceImage, referenceFileData =>
                 {
                     var score = ScoreLoader.LoadScoreFromBytes(inputFileData, settings);
                     var renderer = new ScoreRenderer(settings);
+                    renderer.Width = 1300;
 
                     var result = new FastList<object>();
 
@@ -37,7 +37,7 @@ namespace AlphaTab.Test.VisualTests
                         Assert.Fail("Failed to render image: " + s + "," + e);
                     };
 
-                    renderer.Render(score, tracks);
+                    renderer.RenderScore(score, tracks);
 
                     TestPlatform.CompareVisualResult(totalWidth, totalHeight, result, referenceImage, referenceFileData);
                     TestPlatform.Done();
@@ -47,13 +47,13 @@ namespace AlphaTab.Test.VisualTests
         }
         protected void RunVisualTestTex(Settings settings, int[] tracks, string alphaTex, string referenceImage)
         {
-            settings.Width = 1300;
             TestPlatform.LoadFile(referenceImage, referenceFileData =>
             {
                 var importer = new AlphaTexImporter();
                 importer.Init(TestPlatform.CreateStringReader(alphaTex), settings);
                 var score = importer.ReadScore();
                 var renderer = new ScoreRenderer(settings);
+                renderer.Width = 1300;
 
                 var result = new FastList<object>();
 
@@ -73,7 +73,7 @@ namespace AlphaTab.Test.VisualTests
                     Assert.Fail("Failed to render image: " + s + "," + e);
                 };
 
-                renderer.Render(score, tracks);
+                renderer.RenderScore(score, tracks);
 
                 TestPlatform.CompareVisualResult(totalWidth, totalHeight, result, referenceImage, referenceFileData);
             });

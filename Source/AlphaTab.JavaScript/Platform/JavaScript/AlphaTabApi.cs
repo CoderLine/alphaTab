@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics.Contracts;
 using AlphaTab.Audio.Generator;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Midi;
+using AlphaTab.Collections;
 using AlphaTab.Haxe.Js;
 using AlphaTab.Haxe.Js.Html;
 using AlphaTab.Importer;
@@ -100,7 +102,7 @@ namespace AlphaTab.Platform.JavaScript
                 alphaTab.CanvasElement.Height = -1;
                 preview.Print();
             };
-            alphaTab.RenderTracks(Score, TrackIndexes);
+            alphaTab.RenderTracks(Tracks);
         }
 
         public override void UpdateLayout(LayoutSettings layoutSettings)
@@ -109,6 +111,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 layoutSettings = Settings.LayoutFromJson(layoutSettings);
             }
+
             base.UpdateLayout(layoutSettings);
         }
 
@@ -147,6 +150,7 @@ namespace AlphaTab.Platform.JavaScript
             base.ChangeTrackMute(trackList, mute);
         }
 
+
         public override void ChangeTrackSolo(Track[] tracks, bool solo)
         {
             var trackList = TrackIndexesToTracks(((BrowserUiFacade)UiFacade).ParseTracks(tracks));
@@ -159,10 +163,30 @@ namespace AlphaTab.Platform.JavaScript
             base.ChangeTrackVolume(trackList, volume);
         }
 
+        private Track[] TrackIndexesToTracks(int[] trackIndexes)
+        {
+            if (Score == null)
+            {
+                return new Track[0];
+            }
+
+            var tracks = new FastList<Track>();
+            foreach (var index in trackIndexes)
+            {
+                if (index >= 0 && index < Score.Tracks.Count)
+                {
+                    tracks.Add(Score.Tracks[index]);
+                }
+            }
+
+            return tracks.ToArray();
+        }
+
         /// <summary>
         /// This event is fired during the sound font loading from an external source.
         /// </summary>
         public event Action<ProgressEventArgs> SoundFontLoad;
+
         internal void OnSoundFontLoad(ProgressEventArgs e)
         {
             var handler = SoundFontLoad;
@@ -170,6 +194,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 handler(e);
             }
+
             UiFacade.TriggerEvent(Container, "soundFontLoad", e);
         }
 
@@ -179,6 +204,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 return;
             }
+
             ((AlphaSynthWebWorkerApi)Player).LoadSoundFontFromUrl(url, OnSoundFontLoad);
         }
     }

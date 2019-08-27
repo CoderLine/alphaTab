@@ -24,8 +24,8 @@ namespace AlphaTab.Samples.PngDump
             // render score with svg engine and desired rendering width
             var settings = Settings.Defaults;
             settings.Engine = "skia";
-            settings.Width = 970;
             var renderer = new ScoreRenderer(settings);
+            renderer.Width = 970;
 
             // iterate tracks
             for (int i = 0, j = score.Tracks.Count; i < j; i++)
@@ -46,7 +46,7 @@ namespace AlphaTab.Samples.PngDump
                     totalWidth = (int)r.TotalWidth;
                     totalHeight = (int)r.TotalHeight;
                 };
-                renderer.Render(score, new[] { track.Index });
+                renderer.RenderScore(score, new[] { track.Index });
 
                 // write png
                 var info = new FileInfo(args[0]);
