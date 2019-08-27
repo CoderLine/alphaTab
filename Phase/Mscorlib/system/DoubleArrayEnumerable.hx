@@ -11,7 +11,7 @@ class DoubleArrayEnumerable implements IEnumerable<Double>
 		_array= array;
 	}
 
-	public function GetEnumerator() : IEnumerator<Double>
+	public function getEnumerator() : IEnumerator<Double>
 	{
 		return new DoubleArrayEnumerator(_array);
 	}

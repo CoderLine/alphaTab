@@ -517,7 +517,7 @@ namespace AlphaTab.Audio.Generator
 
         private DynamicValue GetDynamicValue(Note note)
         {
-            var dynamicValue = note.Dynamic;
+            var dynamicValue = note.Dynamics;
 
             // more silent on hammer destination
             if (!note.Beat.Voice.Bar.Staff.IsPercussion && note.HammerPullOrigin != null)

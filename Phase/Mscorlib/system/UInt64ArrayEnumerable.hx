@@ -11,7 +11,7 @@ class UInt64ArrayEnumerable implements IEnumerable<UInt64>
 		_array= array;
 	}
 
-	public function GetEnumerator() : IEnumerator<UInt64>
+	public function getEnumerator() : IEnumerator<UInt64>
 	{
 		return new UInt64ArrayEnumerator(_array);
 	}

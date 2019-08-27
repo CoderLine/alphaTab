@@ -1062,8 +1062,8 @@ namespace AlphaTab.Importer
             if ((flags & 0x10) != 0)
             {
                 var dynamicNumber = Data.ReadSignedByte();
-                newNote.Dynamic = ToDynamicValue(dynamicNumber);
-                beat.Dynamic = newNote.Dynamic;
+                newNote.Dynamics = ToDynamicValue(dynamicNumber);
+                beat.Dynamics = newNote.Dynamics;
             }
 
             if ((flags & 0x20) != 0)
@@ -1220,7 +1220,7 @@ namespace AlphaTab.Importer
             graceNote.String = note.String;
             graceNote.Fret = Data.ReadSignedByte();
             graceBeat.Duration = Duration.ThirtySecond;
-            graceBeat.Dynamic = ToDynamicValue(Data.ReadSignedByte());
+            graceBeat.Dynamics = ToDynamicValue(Data.ReadSignedByte());
             var transition = Data.ReadSignedByte();
             switch (transition)
             {
@@ -1237,7 +1237,7 @@ namespace AlphaTab.Importer
                     break;
             }
 
-            graceNote.Dynamic = graceBeat.Dynamic;
+            graceNote.Dynamics = graceBeat.Dynamics;
             Data.Skip(1); // duration
 
             if (_versionNumber < 500)

@@ -1,5 +1,5 @@
 Title: RenderFinished
-JsName: add_RenderFinished();remove_RenderFinished()
+JsName: addRenderFinished();removeRenderFinished()
 DomName: alphaTab.rendered
 Category: Events - Core
 Description: This event is fired when the rendering of the whole music sheet is finished.
@@ -46,7 +46,7 @@ api.RenderFinished += () =>
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.add_RenderFinished(function() {
+api.addRenderFinished(function() {
     updateProgressBar("Finishing");
 });  
 </code>

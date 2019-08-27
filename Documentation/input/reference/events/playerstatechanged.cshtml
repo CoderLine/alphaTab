@@ -1,5 +1,5 @@
 Title: PlayerStateChanged
-JsName: add_PlayerStateChanged();remove_PlayerStateChanged()
+JsName: addPlayerStateChanged();removePlayerStateChanged()
 DomName: alphaTab.playerStateChanged
 Category: Events - Player
 Description: This event is fired when the playback state changed.
@@ -110,7 +110,7 @@ api.PlayerStateChanged += args =>
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.add_PlayerStateChanged(function(args) {
+api.addPlayerStateChanged(function(args) {
     updatePlayerControls(args.State, args.Stopped);
 });
 </code>

@@ -1,5 +1,5 @@
 Title: SoundFontLoaded
-JsName: add_SoundFontLoaded();remove_SoundFontLoaded()
+JsName: addSoundFontLoaded();removeSoundFontLoaded()
 DomName: alphaTab.soundFontLoaded
 Category: Events - Player
 Description: This event is fired when the SoundFont needed for playback was loaded.
@@ -46,7 +46,7 @@ api.SoundFontLoaded += () =>
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.add_SoundFontLoaded(function(score) {
+api.addSoundFontLoaded(function(score) {
     hideSoundFontLoadingIndicator();
 });
 </code>

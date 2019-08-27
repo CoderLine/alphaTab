@@ -1,1420 +1,1420 @@
 /// <reference path="alphaTab.tests.js" />
 describe("alphaTab.test.audio.AlphaSynthTests", function() {
     var __instance = new alphaTab.test.audio.AlphaSynthTests();
-    it("TestPcmGeneration", function(done) {
+    it("testPcmGeneration", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestPcmGeneration();
+        __instance.testPcmGeneration();
     });
 });
 describe("alphaTab.test.audio.MidiFileGeneratorTest", function() {
     var __instance = new alphaTab.test.audio.MidiFileGeneratorTest();
-    it("TestFullSong", function(done) {
+    it("testFullSong", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestFullSong();
+        __instance.testFullSong();
     });
-    it("TestCorrectMidiOrder", function(done) {
+    it("testCorrectMidiOrder", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestCorrectMidiOrder();
+        __instance.testCorrectMidiOrder();
         done();
     });
-    it("TestBend", function(done) {
+    it("testBend", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestBend();
+        __instance.testBend();
         done();
     });
-    it("TestGraceBeatGeneration", function(done) {
+    it("testGraceBeatGeneration", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestGraceBeatGeneration();
+        __instance.testGraceBeatGeneration();
     });
-    it("TestBendMultiPoint", function(done) {
+    it("testBendMultiPoint", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestBendMultiPoint();
+        __instance.testBendMultiPoint();
         done();
     });
 });
 describe("alphaTab.test.audio.MidiPlaybackControllerTest", function() {
     var __instance = new alphaTab.test.audio.MidiPlaybackControllerTest();
-    it("TestRepeatClose", function(done) {
+    it("testRepeatClose", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestRepeatClose();
+        __instance.testRepeatClose();
     });
-    it("TestRepeatCloseMulti", function(done) {
+    it("testRepeatCloseMulti", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestRepeatCloseMulti();
+        __instance.testRepeatCloseMulti();
     });
-    it("TestRepeatCloseWithoutStartAtBeginning", function(done) {
+    it("testRepeatCloseWithoutStartAtBeginning", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestRepeatCloseWithoutStartAtBeginning();
+        __instance.testRepeatCloseWithoutStartAtBeginning();
     });
-    it("TestRepeatCloseAlternateEndings", function(done) {
+    it("testRepeatCloseAlternateEndings", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestRepeatCloseAlternateEndings();
+        __instance.testRepeatCloseAlternateEndings();
     });
 });
 describe("alphaTab.test.importer.AlphaTexImporterTest", function() {
     var __instance = new alphaTab.test.importer.AlphaTexImporterTest();
-    it("EnsureMetadataParsing_Issue73", function(done) {
+    it("ensureMetadataParsing_Issue73", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.EnsureMetadataParsing_Issue73();
+        __instance.ensureMetadataParsing_Issue73();
         done();
     });
-    it("TestTuning", function(done) {
+    it("testTuning", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTuning();
+        __instance.testTuning();
         done();
     });
-    it("DeadNotes1_Issue79", function(done) {
+    it("deadNotes1_Issue79", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.DeadNotes1_Issue79();
+        __instance.deadNotes1_Issue79();
         done();
     });
-    it("DeadNotes2_Issue79", function(done) {
+    it("deadNotes2_Issue79", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.DeadNotes2_Issue79();
+        __instance.deadNotes2_Issue79();
         done();
     });
-    it("Trill_Issue79", function(done) {
+    it("trill_Issue79", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Trill_Issue79();
+        __instance.trill_Issue79();
         done();
     });
-    it("Tremolo_Issue79", function(done) {
+    it("tremolo_Issue79", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Tremolo_Issue79();
+        __instance.tremolo_Issue79();
         done();
     });
-    it("TremoloPicking_Issue79", function(done) {
+    it("tremoloPicking_Issue79", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TremoloPicking_Issue79();
+        __instance.tremoloPicking_Issue79();
         done();
     });
-    it("Hamonics_Issue79", function(done) {
+    it("hamonics_Issue79", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Hamonics_Issue79();
+        __instance.hamonics_Issue79();
         done();
     });
-    it("HamonicsRenderingText_Issue79", function(done) {
+    it("hamonicsRenderingText_Issue79", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.HamonicsRenderingText_Issue79();
+        __instance.hamonicsRenderingText_Issue79();
         done();
     });
-    it("Grace_Issue79", function(done) {
+    it("grace_Issue79", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Grace_Issue79();
+        __instance.grace_Issue79();
         done();
     });
-    it("BendRendering_Issue79", function(done) {
+    it("bendRendering_Issue79", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.BendRendering_Issue79();
+        __instance.bendRendering_Issue79();
         done();
     });
-    it("TestLeftHandFingerSingleNote", function(done) {
+    it("testLeftHandFingerSingleNote", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestLeftHandFingerSingleNote();
+        __instance.testLeftHandFingerSingleNote();
         done();
     });
-    it("TestRightHandFingerSingleNote", function(done) {
+    it("testRightHandFingerSingleNote", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestRightHandFingerSingleNote();
+        __instance.testRightHandFingerSingleNote();
         done();
     });
-    it("TestLeftHandFingerChord", function(done) {
+    it("testLeftHandFingerChord", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestLeftHandFingerChord();
+        __instance.testLeftHandFingerChord();
         done();
     });
-    it("TestRightHandFingerChord", function(done) {
+    it("testRightHandFingerChord", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestRightHandFingerChord();
+        __instance.testRightHandFingerChord();
         done();
     });
-    it("TestUnstringed", function(done) {
+    it("testUnstringed", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestUnstringed();
+        __instance.testUnstringed();
         done();
     });
-    it("TestMultiStaffDefaultSettings", function(done) {
+    it("testMultiStaffDefaultSettings", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestMultiStaffDefaultSettings();
+        __instance.testMultiStaffDefaultSettings();
         done();
     });
-    it("TestMultiStaffDefaultSettingsBraces", function(done) {
+    it("testMultiStaffDefaultSettingsBraces", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestMultiStaffDefaultSettingsBraces();
+        __instance.testMultiStaffDefaultSettingsBraces();
         done();
     });
-    it("TestSingleStaffWithSetting", function(done) {
+    it("testSingleStaffWithSetting", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestSingleStaffWithSetting();
+        __instance.testSingleStaffWithSetting();
         done();
     });
-    it("TestMultiStaffWithSettings", function(done) {
+    it("testMultiStaffWithSettings", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestMultiStaffWithSettings();
+        __instance.testMultiStaffWithSettings();
         done();
     });
-    it("TestMultiTrack", function(done) {
+    it("testMultiTrack", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestMultiTrack();
+        __instance.testMultiTrack();
         done();
     });
-    it("TestMultiTrackNames", function(done) {
+    it("testMultiTrackNames", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestMultiTrackNames();
+        __instance.testMultiTrackNames();
         done();
     });
-    it("TestMultiTrackMultiStaff", function(done) {
+    it("testMultiTrackMultiStaff", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestMultiTrackMultiStaff();
+        __instance.testMultiTrackMultiStaff();
         done();
     });
-    it("TestMultiTrackMultiStaffInconsistentBars", function(done) {
+    it("testMultiTrackMultiStaffInconsistentBars", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestMultiTrackMultiStaffInconsistentBars();
+        __instance.testMultiTrackMultiStaffInconsistentBars();
         done();
     });
-    it("TestSlides", function(done) {
+    it("testSlides", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestSlides();
+        __instance.testSlides();
         done();
     });
-    it("TestSection", function(done) {
+    it("testSection", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestSection();
+        __instance.testSection();
         done();
     });
-    it("TestPopSlapTap", function(done) {
+    it("testPopSlapTap", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestPopSlapTap();
+        __instance.testPopSlapTap();
         done();
     });
-    it("TestTripletFeelNumeric", function(done) {
+    it("testTripletFeelNumeric", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTripletFeelNumeric();
+        __instance.testTripletFeelNumeric();
         done();
     });
-    it("TestTripletFeelLongNames", function(done) {
+    it("testTripletFeelLongNames", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTripletFeelLongNames();
+        __instance.testTripletFeelLongNames();
         done();
     });
-    it("TestTripletFeelShortNames", function(done) {
+    it("testTripletFeelShortNames", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTripletFeelShortNames();
+        __instance.testTripletFeelShortNames();
         done();
     });
-    it("TestTripletFeelMultiBar", function(done) {
+    it("testTripletFeelMultiBar", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTripletFeelMultiBar();
+        __instance.testTripletFeelMultiBar();
         done();
     });
-    it("TestTupletRepeat", function(done) {
+    it("testTupletRepeat", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTupletRepeat();
+        __instance.testTupletRepeat();
         done();
     });
-    it("TestSimpleAnacrusis", function(done) {
+    it("testSimpleAnacrusis", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestSimpleAnacrusis();
+        __instance.testSimpleAnacrusis();
         done();
     });
-    it("TestMultiBarAnacrusis", function(done) {
+    it("testMultiBarAnacrusis", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestMultiBarAnacrusis();
+        __instance.testMultiBarAnacrusis();
         done();
     });
-    it("TestRandomAnacrusis", function(done) {
+    it("testRandomAnacrusis", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestRandomAnacrusis();
+        __instance.testRandomAnacrusis();
         done();
     });
 });
 describe("alphaTab.test.importer.Gp3ImporterTest", function() {
     var __instance = new alphaTab.test.importer.Gp3ImporterTest();
-    it("TestScoreInfo", function(done) {
+    it("testScoreInfo", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestScoreInfo();
+        __instance.testScoreInfo();
     });
-    it("TestNotes", function(done) {
+    it("testNotes", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestNotes();
+        __instance.testNotes();
     });
-    it("TestTimeSignatures", function(done) {
+    it("testTimeSignatures", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTimeSignatures();
+        __instance.testTimeSignatures();
     });
-    it("TestDead", function(done) {
+    it("testDead", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestDead();
+        __instance.testDead();
     });
-    it("TestAccentuation", function(done) {
+    it("testAccentuation", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestAccentuation();
+        __instance.testAccentuation();
     });
-    it("TestGuitarPro3Harmonics", function(done) {
+    it("testGuitarPro3Harmonics", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestGuitarPro3Harmonics();
+        __instance.testGuitarPro3Harmonics();
         done();
     });
-    it("TestHammer", function(done) {
+    it("testHammer", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestHammer();
+        __instance.testHammer();
     });
-    it("TestBend", function(done) {
+    it("testBend", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestBend();
+        __instance.testBend();
     });
-    it("TestSlides", function(done) {
+    it("testSlides", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestSlides();
+        __instance.testSlides();
     });
-    it("TestGuitarPro3Vibrato", function(done) {
+    it("testGuitarPro3Vibrato", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestGuitarPro3Vibrato();
+        __instance.testGuitarPro3Vibrato();
     });
-    it("TestOtherEffects", function(done) {
+    it("testOtherEffects", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestOtherEffects();
+        __instance.testOtherEffects();
     });
-    it("TestStroke", function(done) {
+    it("testStroke", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestStroke();
+        __instance.testStroke();
     });
-    it("TestTuplets", function(done) {
+    it("testTuplets", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTuplets();
+        __instance.testTuplets();
     });
-    it("TestRanges", function(done) {
+    it("testRanges", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestRanges();
+        __instance.testRanges();
     });
-    it("TestEffects", function(done) {
+    it("testEffects", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestEffects();
+        __instance.testEffects();
     });
-    it("TestStrings", function(done) {
+    it("testStrings", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestStrings();
+        __instance.testStrings();
     });
 });
 describe("alphaTab.test.importer.Gp4ImporterTest", function() {
     var __instance = new alphaTab.test.importer.Gp4ImporterTest();
-    it("TestScoreInfo", function(done) {
+    it("testScoreInfo", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestScoreInfo();
+        __instance.testScoreInfo();
     });
-    it("TestNotes", function(done) {
+    it("testNotes", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestNotes();
+        __instance.testNotes();
     });
-    it("TestTimeSignatures", function(done) {
+    it("testTimeSignatures", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTimeSignatures();
+        __instance.testTimeSignatures();
     });
-    it("TestDead", function(done) {
+    it("testDead", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestDead();
+        __instance.testDead();
     });
-    it("TestGrace", function(done) {
+    it("testGrace", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestGrace();
+        __instance.testGrace();
     });
-    it("TestAccentuation", function(done) {
+    it("testAccentuation", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestAccentuation();
+        __instance.testAccentuation();
     });
-    it("TestHarmonics", function(done) {
+    it("testHarmonics", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestHarmonics();
+        __instance.testHarmonics();
     });
-    it("TestHammer", function(done) {
+    it("testHammer", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestHammer();
+        __instance.testHammer();
     });
-    it("TestBend", function(done) {
+    it("testBend", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestBend();
+        __instance.testBend();
     });
-    it("TestTremolo", function(done) {
+    it("testTremolo", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTremolo();
+        __instance.testTremolo();
     });
-    it("TestSlides", function(done) {
+    it("testSlides", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestSlides();
+        __instance.testSlides();
     });
-    it("TestVibrato", function(done) {
+    it("testVibrato", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestVibrato();
+        __instance.testVibrato();
     });
-    it("TestTrills", function(done) {
+    it("testTrills", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTrills();
+        __instance.testTrills();
     });
-    it("TestOtherEffects", function(done) {
+    it("testOtherEffects", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestOtherEffects();
+        __instance.testOtherEffects();
     });
-    it("TestFingering", function(done) {
+    it("testFingering", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestFingering();
+        __instance.testFingering();
     });
-    it("TestStroke", function(done) {
+    it("testStroke", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestStroke();
+        __instance.testStroke();
     });
-    it("TestTuplets", function(done) {
+    it("testTuplets", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTuplets();
+        __instance.testTuplets();
     });
-    it("TestRanges", function(done) {
+    it("testRanges", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestRanges();
+        __instance.testRanges();
     });
-    it("TestEffects", function(done) {
+    it("testEffects", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestEffects();
+        __instance.testEffects();
     });
-    it("TestStrings", function(done) {
+    it("testStrings", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestStrings();
+        __instance.testStrings();
     });
-    it("TestColors", function(done) {
+    it("testColors", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestColors();
+        __instance.testColors();
     });
 });
 describe("alphaTab.test.importer.Gp5ImporterTest", function() {
     var __instance = new alphaTab.test.importer.Gp5ImporterTest();
-    it("TestScoreInfo", function(done) {
+    it("testScoreInfo", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestScoreInfo();
+        __instance.testScoreInfo();
     });
-    it("TestNotes", function(done) {
+    it("testNotes", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestNotes();
+        __instance.testNotes();
     });
-    it("TestTimeSignatures", function(done) {
+    it("testTimeSignatures", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTimeSignatures();
+        __instance.testTimeSignatures();
     });
-    it("TestDead", function(done) {
+    it("testDead", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestDead();
+        __instance.testDead();
     });
-    it("TestGrace", function(done) {
+    it("testGrace", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestGrace();
+        __instance.testGrace();
     });
-    it("TestAccentuation", function(done) {
+    it("testAccentuation", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestAccentuation();
+        __instance.testAccentuation();
     });
-    it("TestHarmonics", function(done) {
+    it("testHarmonics", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestHarmonics();
+        __instance.testHarmonics();
     });
-    it("TestHammer", function(done) {
+    it("testHammer", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestHammer();
+        __instance.testHammer();
     });
-    it("TestBend", function(done) {
+    it("testBend", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestBend();
+        __instance.testBend();
     });
-    it("TestTremolo", function(done) {
+    it("testTremolo", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTremolo();
+        __instance.testTremolo();
     });
-    it("TestSlides", function(done) {
+    it("testSlides", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestSlides();
+        __instance.testSlides();
     });
-    it("TestVibrato", function(done) {
+    it("testVibrato", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestVibrato();
+        __instance.testVibrato();
     });
-    it("TestTrills", function(done) {
+    it("testTrills", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTrills();
+        __instance.testTrills();
     });
-    it("TestOtherEffects", function(done) {
+    it("testOtherEffects", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestOtherEffects();
+        __instance.testOtherEffects();
     });
-    it("TestFingering", function(done) {
+    it("testFingering", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestFingering();
+        __instance.testFingering();
     });
-    it("TestStroke", function(done) {
+    it("testStroke", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestStroke();
+        __instance.testStroke();
     });
-    it("TestTuplets", function(done) {
+    it("testTuplets", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTuplets();
+        __instance.testTuplets();
     });
-    it("TestRanges", function(done) {
+    it("testRanges", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestRanges();
+        __instance.testRanges();
     });
-    it("TestEffects", function(done) {
+    it("testEffects", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestEffects();
+        __instance.testEffects();
     });
-    it("TestSerenade", function(done) {
+    it("testSerenade", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestSerenade();
+        __instance.testSerenade();
     });
-    it("TestStrings", function(done) {
+    it("testStrings", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestStrings();
+        __instance.testStrings();
     });
-    it("TestKeySignatures", function(done) {
+    it("testKeySignatures", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestKeySignatures();
+        __instance.testKeySignatures();
     });
-    it("TestChords", function(done) {
+    it("testChords", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestChords();
+        __instance.testChords();
     });
-    it("TestColors", function(done) {
+    it("testColors", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestColors();
+        __instance.testColors();
     });
-    it("TestCanon", function(done) {
+    it("testCanon", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestCanon();
+        __instance.testCanon();
     });
 });
 describe("alphaTab.test.importer.Gp7ImporterTest", function() {
     var __instance = new alphaTab.test.importer.Gp7ImporterTest();
-    it("TestScoreInfo", function(done) {
+    it("testScoreInfo", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestScoreInfo();
+        __instance.testScoreInfo();
     });
-    it("TestNotes", function(done) {
+    it("testNotes", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestNotes();
+        __instance.testNotes();
     });
-    it("TestTimeSignatures", function(done) {
+    it("testTimeSignatures", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTimeSignatures();
+        __instance.testTimeSignatures();
     });
-    it("TestDead", function(done) {
+    it("testDead", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestDead();
+        __instance.testDead();
     });
-    it("TestGrace", function(done) {
+    it("testGrace", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestGrace();
+        __instance.testGrace();
     });
-    it("TestAccentuation", function(done) {
+    it("testAccentuation", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestAccentuation();
+        __instance.testAccentuation();
     });
-    it("TestHarmonics", function(done) {
+    it("testHarmonics", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestHarmonics();
+        __instance.testHarmonics();
     });
-    it("TestHammer", function(done) {
+    it("testHammer", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestHammer();
+        __instance.testHammer();
     });
-    it("TestNumber", function(done) {
+    it("testNumber", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestNumber();
+        __instance.testNumber();
         done();
     });
-    it("TestBend", function(done) {
+    it("testBend", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestBend();
+        __instance.testBend();
     });
-    it("TestBendAdvanced", function(done) {
+    it("testBendAdvanced", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestBendAdvanced();
+        __instance.testBendAdvanced();
     });
-    it("TestWhammyAdvanced", function(done) {
+    it("testWhammyAdvanced", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestWhammyAdvanced();
+        __instance.testWhammyAdvanced();
     });
-    it("TestTremolo", function(done) {
+    it("testTremolo", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTremolo();
+        __instance.testTremolo();
     });
-    it("TestSlides", function(done) {
+    it("testSlides", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestSlides();
+        __instance.testSlides();
     });
-    it("TestVibrato", function(done) {
+    it("testVibrato", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestVibrato();
+        __instance.testVibrato();
     });
-    it("TestTrills", function(done) {
+    it("testTrills", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTrills();
+        __instance.testTrills();
     });
-    it("TestOtherEffects", function(done) {
+    it("testOtherEffects", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestOtherEffects();
+        __instance.testOtherEffects();
     });
-    it("TestFingering", function(done) {
+    it("testFingering", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestFingering();
+        __instance.testFingering();
     });
-    it("TestStroke", function(done) {
+    it("testStroke", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestStroke();
+        __instance.testStroke();
     });
-    it("TestTuplets", function(done) {
+    it("testTuplets", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTuplets();
+        __instance.testTuplets();
     });
-    it("TestRanges", function(done) {
+    it("testRanges", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestRanges();
+        __instance.testRanges();
     });
-    it("TestEffects", function(done) {
+    it("testEffects", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestEffects();
+        __instance.testEffects();
     });
-    it("TestSerenade", function(done) {
+    it("testSerenade", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestSerenade();
+        __instance.testSerenade();
     });
-    it("TestStrings", function(done) {
+    it("testStrings", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestStrings();
+        __instance.testStrings();
     });
-    it("TestKeySignatures", function(done) {
+    it("testKeySignatures", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestKeySignatures();
+        __instance.testKeySignatures();
     });
-    it("TestChords", function(done) {
+    it("testChords", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestChords();
+        __instance.testChords();
     });
-    it("TestColors", function(done) {
+    it("testColors", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestColors();
+        __instance.testColors();
     });
-    it("TestTremoloVibrato", function(done) {
+    it("testTremoloVibrato", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTremoloVibrato();
+        __instance.testTremoloVibrato();
     });
-    it("TestOttavia", function(done) {
+    it("testOttavia", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestOttavia();
+        __instance.testOttavia();
     });
-    it("TestSimileMark", function(done) {
+    it("testSimileMark", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestSimileMark();
+        __instance.testSimileMark();
     });
-    it("TestAnacrusis", function(done) {
+    it("testAnacrusis", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestAnacrusis();
+        __instance.testAnacrusis();
     });
-    it("TestFermata", function(done) {
+    it("testFermata", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestFermata();
+        __instance.testFermata();
     });
-    it("TestPickSlide", function(done) {
+    it("testPickSlide", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestPickSlide();
+        __instance.testPickSlide();
     });
 });
 describe("alphaTab.test.importer.GpxImporterTest", function() {
     var __instance = new alphaTab.test.importer.GpxImporterTest();
-    it("TestFileSystemCompressed", function(done) {
+    it("testFileSystemCompressed", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestFileSystemCompressed();
+        __instance.testFileSystemCompressed();
     });
-    it("TestScoreInfo", function(done) {
+    it("testScoreInfo", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestScoreInfo();
+        __instance.testScoreInfo();
     });
-    it("TestNotes", function(done) {
+    it("testNotes", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestNotes();
+        __instance.testNotes();
     });
-    it("TestTimeSignatures", function(done) {
+    it("testTimeSignatures", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTimeSignatures();
+        __instance.testTimeSignatures();
     });
-    it("TestDead", function(done) {
+    it("testDead", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestDead();
+        __instance.testDead();
     });
-    it("TestGrace", function(done) {
+    it("testGrace", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestGrace();
+        __instance.testGrace();
     });
-    it("TestAccentuation", function(done) {
+    it("testAccentuation", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestAccentuation();
+        __instance.testAccentuation();
     });
-    it("TestHarmonics", function(done) {
+    it("testHarmonics", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestHarmonics();
+        __instance.testHarmonics();
     });
-    it("TestHammer", function(done) {
+    it("testHammer", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestHammer();
+        __instance.testHammer();
     });
-    it("TestBend", function(done) {
+    it("testBend", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestBend();
+        __instance.testBend();
     });
-    it("TestTremolo", function(done) {
+    it("testTremolo", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTremolo();
+        __instance.testTremolo();
     });
-    it("TestSlides", function(done) {
+    it("testSlides", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestSlides();
+        __instance.testSlides();
     });
-    it("TestVibrato", function(done) {
+    it("testVibrato", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestVibrato();
+        __instance.testVibrato();
     });
-    it("TestTrills", function(done) {
+    it("testTrills", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTrills();
+        __instance.testTrills();
     });
-    it("TestOtherEffects", function(done) {
+    it("testOtherEffects", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestOtherEffects();
+        __instance.testOtherEffects();
     });
-    it("TestFingering", function(done) {
+    it("testFingering", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestFingering();
+        __instance.testFingering();
     });
-    it("TestStroke", function(done) {
+    it("testStroke", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestStroke();
+        __instance.testStroke();
     });
-    it("TestTuplets", function(done) {
+    it("testTuplets", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestTuplets();
+        __instance.testTuplets();
     });
-    it("TestRanges", function(done) {
+    it("testRanges", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestRanges();
+        __instance.testRanges();
     });
-    it("TestEffects", function(done) {
+    it("testEffects", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestEffects();
+        __instance.testEffects();
     });
-    it("TestSerenade", function(done) {
+    it("testSerenade", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestSerenade();
+        __instance.testSerenade();
     });
-    it("TestStrings", function(done) {
+    it("testStrings", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestStrings();
+        __instance.testStrings();
     });
-    it("TestKeySignatures", function(done) {
+    it("testKeySignatures", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestKeySignatures();
+        __instance.testKeySignatures();
     });
-    it("TestChords", function(done) {
+    it("testChords", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestChords();
+        __instance.testChords();
     });
-    it("TestColors", function(done) {
+    it("testColors", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestColors();
+        __instance.testColors();
     });
 });
 describe("alphaTab.test.importer.MusicXmlImporterSamplesTests", function() {
     var __instance = new alphaTab.test.importer.MusicXmlImporterSamplesTests();
-    it("Test_BeetAnGeSample", function(done) {
+    it("test_BeetAnGeSample", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_BeetAnGeSample();
+        __instance.test_BeetAnGeSample();
     });
-    it("Test_Binchois", function(done) {
+    it("test_Binchois", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_Binchois();
+        __instance.test_Binchois();
     });
-    it("Test_BrahWiMeSample", function(done) {
+    it("test_BrahWiMeSample", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_BrahWiMeSample();
+        __instance.test_BrahWiMeSample();
     });
-    it("Test_BrookeWestSample", function(done) {
+    it("test_BrookeWestSample", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_BrookeWestSample();
+        __instance.test_BrookeWestSample();
     });
-    it("Test_Chant", function(done) {
+    it("test_Chant", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_Chant();
+        __instance.test_Chant();
     });
-    it("Test_DebuMandSample", function(done) {
+    it("test_DebuMandSample", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_DebuMandSample();
+        __instance.test_DebuMandSample();
     });
-    it("Test_Dichterliebe01", function(done) {
+    it("test_Dichterliebe01", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_Dichterliebe01();
+        __instance.test_Dichterliebe01();
     });
-    it("Test_Echigo", function(done) {
+    it("test_Echigo", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_Echigo();
+        __instance.test_Echigo();
     });
-    it("Test_FaurReveSample", function(done) {
+    it("test_FaurReveSample", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_FaurReveSample();
+        __instance.test_FaurReveSample();
     });
-    it("Test_MahlFaGe4Sample", function(done) {
+    it("test_MahlFaGe4Sample", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_MahlFaGe4Sample();
+        __instance.test_MahlFaGe4Sample();
     });
-    it("Test_MozaChloSample", function(done) {
+    it("test_MozaChloSample", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_MozaChloSample();
+        __instance.test_MozaChloSample();
     });
-    it("Test_MozartPianoSonata", function(done) {
+    it("test_MozartPianoSonata", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_MozartPianoSonata();
+        __instance.test_MozartPianoSonata();
     });
-    it("Test_MozartTrio", function(done) {
+    it("test_MozartTrio", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_MozartTrio();
+        __instance.test_MozartTrio();
     });
-    it("Test_MozaVeilSample", function(done) {
+    it("test_MozaVeilSample", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_MozaVeilSample();
+        __instance.test_MozaVeilSample();
     });
-    it("Test_Saltarello", function(done) {
+    it("test_Saltarello", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_Saltarello();
+        __instance.test_Saltarello();
     });
-    it("Test_SchbAvMaSample", function(done) {
+    it("test_SchbAvMaSample", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_SchbAvMaSample();
+        __instance.test_SchbAvMaSample();
     });
-    it("Test_Telemann", function(done) {
+    it("test_Telemann", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_Telemann();
+        __instance.test_Telemann();
     });
 });
 describe("alphaTab.test.importer.MusicXmlImporterTestSuiteTests", function() {
     var __instance = new alphaTab.test.importer.MusicXmlImporterTestSuiteTests();
-    it("Test_01a_Pitches_Pitches", function(done) {
+    it("test_01a_Pitches_Pitches", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_01a_Pitches_Pitches();
+        __instance.test_01a_Pitches_Pitches();
     });
-    it("Test_01b_Pitches_Intervals", function(done) {
+    it("test_01b_Pitches_Intervals", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_01b_Pitches_Intervals();
+        __instance.test_01b_Pitches_Intervals();
     });
-    it("Test_01c_Pitches_NoVoiceElement", function(done) {
+    it("test_01c_Pitches_NoVoiceElement", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_01c_Pitches_NoVoiceElement();
+        __instance.test_01c_Pitches_NoVoiceElement();
     });
-    it("Test_01d_Pitches_Microtones", function(done) {
+    it("test_01d_Pitches_Microtones", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_01d_Pitches_Microtones();
+        __instance.test_01d_Pitches_Microtones();
     });
-    it("Test_01e_Pitches_ParenthesizedAccidentals", function(done) {
+    it("test_01e_Pitches_ParenthesizedAccidentals", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_01e_Pitches_ParenthesizedAccidentals();
+        __instance.test_01e_Pitches_ParenthesizedAccidentals();
     });
-    it("Test_01f_Pitches_ParenthesizedMicrotoneAccidentals", function(done) {
+    it("test_01f_Pitches_ParenthesizedMicrotoneAccidentals", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_01f_Pitches_ParenthesizedMicrotoneAccidentals();
+        __instance.test_01f_Pitches_ParenthesizedMicrotoneAccidentals();
     });
-    it("Test_02a_Rests_Durations", function(done) {
+    it("test_02a_Rests_Durations", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_02a_Rests_Durations();
+        __instance.test_02a_Rests_Durations();
     });
-    it("Test_02b_Rests_PitchedRests", function(done) {
+    it("test_02b_Rests_PitchedRests", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_02b_Rests_PitchedRests();
+        __instance.test_02b_Rests_PitchedRests();
     });
-    it("Test_02c_Rests_MultiMeasureRests", function(done) {
+    it("test_02c_Rests_MultiMeasureRests", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_02c_Rests_MultiMeasureRests();
+        __instance.test_02c_Rests_MultiMeasureRests();
     });
-    it("Test_02d_Rests_Multimeasure_TimeSignatures", function(done) {
+    it("test_02d_Rests_Multimeasure_TimeSignatures", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_02d_Rests_Multimeasure_TimeSignatures();
+        __instance.test_02d_Rests_Multimeasure_TimeSignatures();
     });
-    it("Test_02e_Rests_NoType", function(done) {
+    it("test_02e_Rests_NoType", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_02e_Rests_NoType();
+        __instance.test_02e_Rests_NoType();
     });
-    it("Test_03a_Rhythm_Durations", function(done) {
+    it("test_03a_Rhythm_Durations", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_03a_Rhythm_Durations();
+        __instance.test_03a_Rhythm_Durations();
     });
-    it("Test_03b_Rhythm_Backup", function(done) {
+    it("test_03b_Rhythm_Backup", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_03b_Rhythm_Backup();
+        __instance.test_03b_Rhythm_Backup();
     });
-    it("Test_03c_Rhythm_DivisionChange", function(done) {
+    it("test_03c_Rhythm_DivisionChange", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_03c_Rhythm_DivisionChange();
+        __instance.test_03c_Rhythm_DivisionChange();
     });
-    it("Test_03d_Rhythm_DottedDurations_Factors", function(done) {
+    it("test_03d_Rhythm_DottedDurations_Factors", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_03d_Rhythm_DottedDurations_Factors();
+        __instance.test_03d_Rhythm_DottedDurations_Factors();
     });
-    it("Test_11a_TimeSignatures", function(done) {
+    it("test_11a_TimeSignatures", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_11a_TimeSignatures();
+        __instance.test_11a_TimeSignatures();
     });
-    it("Test_11b_TimeSignatures_NoTime", function(done) {
+    it("test_11b_TimeSignatures_NoTime", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_11b_TimeSignatures_NoTime();
+        __instance.test_11b_TimeSignatures_NoTime();
     });
-    it("Test_11c_TimeSignatures_CompoundSimple", function(done) {
+    it("test_11c_TimeSignatures_CompoundSimple", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_11c_TimeSignatures_CompoundSimple();
+        __instance.test_11c_TimeSignatures_CompoundSimple();
     });
-    it("Test_11d_TimeSignatures_CompoundMultiple", function(done) {
+    it("test_11d_TimeSignatures_CompoundMultiple", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_11d_TimeSignatures_CompoundMultiple();
+        __instance.test_11d_TimeSignatures_CompoundMultiple();
     });
-    it("Test_11e_TimeSignatures_CompoundMixed", function(done) {
+    it("test_11e_TimeSignatures_CompoundMixed", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_11e_TimeSignatures_CompoundMixed();
+        __instance.test_11e_TimeSignatures_CompoundMixed();
     });
-    it("Test_11f_TimeSignatures_SymbolMeaning", function(done) {
+    it("test_11f_TimeSignatures_SymbolMeaning", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_11f_TimeSignatures_SymbolMeaning();
+        __instance.test_11f_TimeSignatures_SymbolMeaning();
     });
-    it("Test_11g_TimeSignatures_SingleNumber", function(done) {
+    it("test_11g_TimeSignatures_SingleNumber", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_11g_TimeSignatures_SingleNumber();
+        __instance.test_11g_TimeSignatures_SingleNumber();
     });
-    it("Test_11h_TimeSignatures_SenzaMisura", function(done) {
+    it("test_11h_TimeSignatures_SenzaMisura", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_11h_TimeSignatures_SenzaMisura();
+        __instance.test_11h_TimeSignatures_SenzaMisura();
     });
-    it("Test_12a_Clefs", function(done) {
+    it("test_12a_Clefs", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_12a_Clefs();
+        __instance.test_12a_Clefs();
     });
-    it("Test_12b_Clefs_NoKeyOrClef", function(done) {
+    it("test_12b_Clefs_NoKeyOrClef", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_12b_Clefs_NoKeyOrClef();
+        __instance.test_12b_Clefs_NoKeyOrClef();
     });
-    it("Test_13a_KeySignatures", function(done) {
+    it("test_13a_KeySignatures", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_13a_KeySignatures();
+        __instance.test_13a_KeySignatures();
     });
-    it("Test_13b_KeySignatures_ChurchModes", function(done) {
+    it("test_13b_KeySignatures_ChurchModes", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_13b_KeySignatures_ChurchModes();
+        __instance.test_13b_KeySignatures_ChurchModes();
     });
-    it("Test_13c_KeySignatures_NonTraditional", function(done) {
+    it("test_13c_KeySignatures_NonTraditional", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_13c_KeySignatures_NonTraditional();
+        __instance.test_13c_KeySignatures_NonTraditional();
     });
-    it("Test_13d_KeySignatures_Microtones", function(done) {
+    it("test_13d_KeySignatures_Microtones", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_13d_KeySignatures_Microtones();
+        __instance.test_13d_KeySignatures_Microtones();
     });
-    it("Test_14a_StaffDetails_LineChanges", function(done) {
+    it("test_14a_StaffDetails_LineChanges", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_14a_StaffDetails_LineChanges();
+        __instance.test_14a_StaffDetails_LineChanges();
     });
-    it("Test_21a_Chord_Basic", function(done) {
+    it("test_21a_Chord_Basic", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_21a_Chord_Basic();
+        __instance.test_21a_Chord_Basic();
     });
-    it("Test_21b_Chords_TwoNotes", function(done) {
+    it("test_21b_Chords_TwoNotes", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_21b_Chords_TwoNotes();
+        __instance.test_21b_Chords_TwoNotes();
     });
-    it("Test_21c_Chords_ThreeNotesDuration", function(done) {
+    it("test_21c_Chords_ThreeNotesDuration", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_21c_Chords_ThreeNotesDuration();
+        __instance.test_21c_Chords_ThreeNotesDuration();
     });
-    it("Test_21d_Chords_SchubertStabatMater", function(done) {
+    it("test_21d_Chords_SchubertStabatMater", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_21d_Chords_SchubertStabatMater();
+        __instance.test_21d_Chords_SchubertStabatMater();
     });
-    it("Test_21e_Chords_PickupMeasures", function(done) {
+    it("test_21e_Chords_PickupMeasures", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_21e_Chords_PickupMeasures();
+        __instance.test_21e_Chords_PickupMeasures();
     });
-    it("Test_21f_Chord_ElementInBetween", function(done) {
+    it("test_21f_Chord_ElementInBetween", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_21f_Chord_ElementInBetween();
+        __instance.test_21f_Chord_ElementInBetween();
     });
-    it("Test_22a_Noteheads", function(done) {
+    it("test_22a_Noteheads", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_22a_Noteheads();
+        __instance.test_22a_Noteheads();
     });
-    it("Test_22b_Staff_Notestyles", function(done) {
+    it("test_22b_Staff_Notestyles", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_22b_Staff_Notestyles();
+        __instance.test_22b_Staff_Notestyles();
     });
-    it("Test_22c_Noteheads_Chords", function(done) {
+    it("test_22c_Noteheads_Chords", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_22c_Noteheads_Chords();
+        __instance.test_22c_Noteheads_Chords();
     });
-    it("Test_22d_Parenthesized_Noteheads", function(done) {
+    it("test_22d_Parenthesized_Noteheads", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_22d_Parenthesized_Noteheads();
+        __instance.test_22d_Parenthesized_Noteheads();
     });
-    it("Test_23a_Tuplets", function(done) {
+    it("test_23a_Tuplets", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_23a_Tuplets();
+        __instance.test_23a_Tuplets();
     });
-    it("Test_23b_Tuplets_Styles", function(done) {
+    it("test_23b_Tuplets_Styles", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_23b_Tuplets_Styles();
+        __instance.test_23b_Tuplets_Styles();
     });
-    it("Test_23c_Tuplet_Display_NonStandard", function(done) {
+    it("test_23c_Tuplet_Display_NonStandard", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_23c_Tuplet_Display_NonStandard();
+        __instance.test_23c_Tuplet_Display_NonStandard();
     });
-    it("Test_23d_Tuplets_Nested", function(done) {
+    it("test_23d_Tuplets_Nested", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_23d_Tuplets_Nested();
+        __instance.test_23d_Tuplets_Nested();
     });
-    it("Test_23e_Tuplets_Tremolo", function(done) {
+    it("test_23e_Tuplets_Tremolo", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_23e_Tuplets_Tremolo();
+        __instance.test_23e_Tuplets_Tremolo();
     });
-    it("Test_23f_Tuplets_DurationButNoBracket", function(done) {
+    it("test_23f_Tuplets_DurationButNoBracket", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_23f_Tuplets_DurationButNoBracket();
+        __instance.test_23f_Tuplets_DurationButNoBracket();
     });
-    it("Test_24a_GraceNotes", function(done) {
+    it("test_24a_GraceNotes", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_24a_GraceNotes();
+        __instance.test_24a_GraceNotes();
     });
-    it("Test_24b_ChordAsGraceNote", function(done) {
+    it("test_24b_ChordAsGraceNote", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_24b_ChordAsGraceNote();
+        __instance.test_24b_ChordAsGraceNote();
     });
-    it("Test_24c_GraceNote_MeasureEnd", function(done) {
+    it("test_24c_GraceNote_MeasureEnd", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_24c_GraceNote_MeasureEnd();
+        __instance.test_24c_GraceNote_MeasureEnd();
     });
-    it("Test_24d_AfterGrace", function(done) {
+    it("test_24d_AfterGrace", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_24d_AfterGrace();
+        __instance.test_24d_AfterGrace();
     });
-    it("Test_24e_GraceNote_StaffChange", function(done) {
+    it("test_24e_GraceNote_StaffChange", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_24e_GraceNote_StaffChange();
+        __instance.test_24e_GraceNote_StaffChange();
     });
-    it("Test_24f_GraceNote_Slur", function(done) {
+    it("test_24f_GraceNote_Slur", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_24f_GraceNote_Slur();
+        __instance.test_24f_GraceNote_Slur();
     });
-    it("Test_31a_Directions", function(done) {
+    it("test_31a_Directions", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_31a_Directions();
+        __instance.test_31a_Directions();
     });
-    it("Test_31c_MetronomeMarks", function(done) {
+    it("test_31c_MetronomeMarks", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_31c_MetronomeMarks();
+        __instance.test_31c_MetronomeMarks();
     });
-    it("Test_32a_Notations", function(done) {
+    it("test_32a_Notations", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_32a_Notations();
+        __instance.test_32a_Notations();
     });
-    it("Test_32b_Articulations_Texts", function(done) {
+    it("test_32b_Articulations_Texts", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_32b_Articulations_Texts();
+        __instance.test_32b_Articulations_Texts();
     });
-    it("Test_32c_MultipleNotationChildren", function(done) {
+    it("test_32c_MultipleNotationChildren", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_32c_MultipleNotationChildren();
+        __instance.test_32c_MultipleNotationChildren();
     });
-    it("Test_32d_Arpeggio", function(done) {
+    it("test_32d_Arpeggio", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_32d_Arpeggio();
+        __instance.test_32d_Arpeggio();
     });
-    it("Test_33a_Spanners", function(done) {
+    it("test_33a_Spanners", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_33a_Spanners();
+        __instance.test_33a_Spanners();
     });
-    it("Test_33b_Spanners_Tie", function(done) {
+    it("test_33b_Spanners_Tie", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_33b_Spanners_Tie();
+        __instance.test_33b_Spanners_Tie();
     });
-    it("Test_33c_Spanners_Slurs", function(done) {
+    it("test_33c_Spanners_Slurs", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_33c_Spanners_Slurs();
+        __instance.test_33c_Spanners_Slurs();
     });
-    it("Test_33d_Spanners_OctaveShifts", function(done) {
+    it("test_33d_Spanners_OctaveShifts", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_33d_Spanners_OctaveShifts();
+        __instance.test_33d_Spanners_OctaveShifts();
     });
-    it("Test_33e_Spanners_OctaveShifts_InvalidSize", function(done) {
+    it("test_33e_Spanners_OctaveShifts_InvalidSize", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_33e_Spanners_OctaveShifts_InvalidSize();
+        __instance.test_33e_Spanners_OctaveShifts_InvalidSize();
     });
-    it("Test_33f_Trill_EndingOnGraceNote", function(done) {
+    it("test_33f_Trill_EndingOnGraceNote", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_33f_Trill_EndingOnGraceNote();
+        __instance.test_33f_Trill_EndingOnGraceNote();
     });
-    it("Test_33g_Slur_ChordedNotes", function(done) {
+    it("test_33g_Slur_ChordedNotes", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_33g_Slur_ChordedNotes();
+        __instance.test_33g_Slur_ChordedNotes();
     });
-    it("Test_33h_Spanners_Glissando", function(done) {
+    it("test_33h_Spanners_Glissando", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_33h_Spanners_Glissando();
+        __instance.test_33h_Spanners_Glissando();
     });
-    it("Test_33i_Ties_NotEnded", function(done) {
+    it("test_33i_Ties_NotEnded", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_33i_Ties_NotEnded();
+        __instance.test_33i_Ties_NotEnded();
     });
-    it("Test_41a_MultiParts_Partorder", function(done) {
+    it("test_41a_MultiParts_Partorder", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_41a_MultiParts_Partorder();
+        __instance.test_41a_MultiParts_Partorder();
     });
-    it("Test_41b_MultiParts_MoreThan10", function(done) {
+    it("test_41b_MultiParts_MoreThan10", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_41b_MultiParts_MoreThan10();
+        __instance.test_41b_MultiParts_MoreThan10();
     });
-    it("Test_41c_StaffGroups", function(done) {
+    it("test_41c_StaffGroups", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_41c_StaffGroups();
+        __instance.test_41c_StaffGroups();
     });
-    it("Test_41d_StaffGroups_Nested", function(done) {
+    it("test_41d_StaffGroups_Nested", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_41d_StaffGroups_Nested();
+        __instance.test_41d_StaffGroups_Nested();
     });
-    it("Test_41e_StaffGroups_InstrumentNames_Linebroken", function(done) {
+    it("test_41e_StaffGroups_InstrumentNames_Linebroken", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_41e_StaffGroups_InstrumentNames_Linebroken();
+        __instance.test_41e_StaffGroups_InstrumentNames_Linebroken();
     });
-    it("Test_41f_StaffGroups_Overlapping", function(done) {
+    it("test_41f_StaffGroups_Overlapping", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_41f_StaffGroups_Overlapping();
+        __instance.test_41f_StaffGroups_Overlapping();
     });
-    it("Test_41g_PartNoId", function(done) {
+    it("test_41g_PartNoId", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_41g_PartNoId();
+        __instance.test_41g_PartNoId();
     });
-    it("Test_41h_TooManyParts", function(done) {
+    it("test_41h_TooManyParts", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_41h_TooManyParts();
+        __instance.test_41h_TooManyParts();
     });
-    it("Test_41i_PartNameDisplay_Override", function(done) {
+    it("test_41i_PartNameDisplay_Override", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_41i_PartNameDisplay_Override();
+        __instance.test_41i_PartNameDisplay_Override();
     });
-    it("Test_42a_MultiVoice_TwoVoicesOnStaff_Lyrics", function(done) {
+    it("test_42a_MultiVoice_TwoVoicesOnStaff_Lyrics", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_42a_MultiVoice_TwoVoicesOnStaff_Lyrics();
+        __instance.test_42a_MultiVoice_TwoVoicesOnStaff_Lyrics();
     });
-    it("Test_42b_MultiVoice_MidMeasureClefChange", function(done) {
+    it("test_42b_MultiVoice_MidMeasureClefChange", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_42b_MultiVoice_MidMeasureClefChange();
+        __instance.test_42b_MultiVoice_MidMeasureClefChange();
     });
-    it("Test_43a_PianoStaff", function(done) {
+    it("test_43a_PianoStaff", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_43a_PianoStaff();
+        __instance.test_43a_PianoStaff();
     });
-    it("Test_43b_MultiStaff_DifferentKeys", function(done) {
+    it("test_43b_MultiStaff_DifferentKeys", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_43b_MultiStaff_DifferentKeys();
+        __instance.test_43b_MultiStaff_DifferentKeys();
     });
-    it("Test_43c_MultiStaff_DifferentKeysAfterBackup", function(done) {
+    it("test_43c_MultiStaff_DifferentKeysAfterBackup", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_43c_MultiStaff_DifferentKeysAfterBackup();
+        __instance.test_43c_MultiStaff_DifferentKeysAfterBackup();
     });
-    it("Test_43d_MultiStaff_StaffChange", function(done) {
+    it("test_43d_MultiStaff_StaffChange", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_43d_MultiStaff_StaffChange();
+        __instance.test_43d_MultiStaff_StaffChange();
     });
-    it("Test_43e_Multistaff_ClefDynamics", function(done) {
+    it("test_43e_Multistaff_ClefDynamics", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_43e_Multistaff_ClefDynamics();
+        __instance.test_43e_Multistaff_ClefDynamics();
     });
-    it("Test_45a_SimpleRepeat", function(done) {
+    it("test_45a_SimpleRepeat", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_45a_SimpleRepeat();
+        __instance.test_45a_SimpleRepeat();
     });
-    it("Test_45b_RepeatWithAlternatives", function(done) {
+    it("test_45b_RepeatWithAlternatives", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_45b_RepeatWithAlternatives();
+        __instance.test_45b_RepeatWithAlternatives();
     });
-    it("Test_45c_RepeatMultipleTimes", function(done) {
+    it("test_45c_RepeatMultipleTimes", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_45c_RepeatMultipleTimes();
+        __instance.test_45c_RepeatMultipleTimes();
     });
-    it("Test_45d_Repeats_Nested_Alternatives", function(done) {
+    it("test_45d_Repeats_Nested_Alternatives", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_45d_Repeats_Nested_Alternatives();
+        __instance.test_45d_Repeats_Nested_Alternatives();
     });
-    it("Test_45e_Repeats_Nested_Alternatives", function(done) {
+    it("test_45e_Repeats_Nested_Alternatives", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_45e_Repeats_Nested_Alternatives();
+        __instance.test_45e_Repeats_Nested_Alternatives();
     });
-    it("Test_45f_Repeats_InvalidEndings", function(done) {
+    it("test_45f_Repeats_InvalidEndings", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_45f_Repeats_InvalidEndings();
+        __instance.test_45f_Repeats_InvalidEndings();
     });
-    it("Test_45g_Repeats_NotEnded", function(done) {
+    it("test_45g_Repeats_NotEnded", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_45g_Repeats_NotEnded();
+        __instance.test_45g_Repeats_NotEnded();
     });
-    it("Test_46a_Barlines", function(done) {
+    it("test_46a_Barlines", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_46a_Barlines();
+        __instance.test_46a_Barlines();
     });
-    it("Test_46b_MidmeasureBarline", function(done) {
+    it("test_46b_MidmeasureBarline", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_46b_MidmeasureBarline();
+        __instance.test_46b_MidmeasureBarline();
     });
-    it("Test_46c_Midmeasure_Clef", function(done) {
+    it("test_46c_Midmeasure_Clef", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_46c_Midmeasure_Clef();
+        __instance.test_46c_Midmeasure_Clef();
     });
-    it("Test_46d_PickupMeasure_ImplicitMeasures", function(done) {
+    it("test_46d_PickupMeasure_ImplicitMeasures", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_46d_PickupMeasure_ImplicitMeasures();
+        __instance.test_46d_PickupMeasure_ImplicitMeasures();
     });
-    it("Test_46e_PickupMeasure_SecondVoiceStartsLater", function(done) {
+    it("test_46e_PickupMeasure_SecondVoiceStartsLater", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_46e_PickupMeasure_SecondVoiceStartsLater();
+        __instance.test_46e_PickupMeasure_SecondVoiceStartsLater();
     });
-    it("Test_46f_IncompleteMeasures", function(done) {
+    it("test_46f_IncompleteMeasures", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_46f_IncompleteMeasures();
+        __instance.test_46f_IncompleteMeasures();
     });
-    it("Test_46g_PickupMeasure_Chordnames_FiguredBass", function(done) {
+    it("test_46g_PickupMeasure_Chordnames_FiguredBass", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_46g_PickupMeasure_Chordnames_FiguredBass();
+        __instance.test_46g_PickupMeasure_Chordnames_FiguredBass();
     });
-    it("Test_51b_Header_Quotes", function(done) {
+    it("test_51b_Header_Quotes", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_51b_Header_Quotes();
+        __instance.test_51b_Header_Quotes();
     });
-    it("Test_51c_MultipleRights", function(done) {
+    it("test_51c_MultipleRights", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_51c_MultipleRights();
+        __instance.test_51c_MultipleRights();
     });
-    it("Test_51d_EmptyTitle", function(done) {
+    it("test_51d_EmptyTitle", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_51d_EmptyTitle();
+        __instance.test_51d_EmptyTitle();
     });
-    it("Test_52a_PageLayout", function(done) {
+    it("test_52a_PageLayout", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_52a_PageLayout();
+        __instance.test_52a_PageLayout();
     });
-    it("Test_52b_Breaks", function(done) {
+    it("test_52b_Breaks", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_52b_Breaks();
+        __instance.test_52b_Breaks();
     });
-    it("Test_61a_Lyrics", function(done) {
+    it("test_61a_Lyrics", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_61a_Lyrics();
+        __instance.test_61a_Lyrics();
     });
-    it("Test_61b_MultipleLyrics", function(done) {
+    it("test_61b_MultipleLyrics", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_61b_MultipleLyrics();
+        __instance.test_61b_MultipleLyrics();
     });
-    it("Test_61c_Lyrics_Pianostaff", function(done) {
+    it("test_61c_Lyrics_Pianostaff", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_61c_Lyrics_Pianostaff();
+        __instance.test_61c_Lyrics_Pianostaff();
     });
-    it("Test_61d_Lyrics_Melisma", function(done) {
+    it("test_61d_Lyrics_Melisma", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_61d_Lyrics_Melisma();
+        __instance.test_61d_Lyrics_Melisma();
     });
-    it("Test_61e_Lyrics_Chords", function(done) {
+    it("test_61e_Lyrics_Chords", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_61e_Lyrics_Chords();
+        __instance.test_61e_Lyrics_Chords();
     });
-    it("Test_61f_Lyrics_GracedNotes", function(done) {
+    it("test_61f_Lyrics_GracedNotes", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_61f_Lyrics_GracedNotes();
+        __instance.test_61f_Lyrics_GracedNotes();
     });
-    it("Test_61g_Lyrics_NameNumber", function(done) {
+    it("test_61g_Lyrics_NameNumber", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_61g_Lyrics_NameNumber();
+        __instance.test_61g_Lyrics_NameNumber();
     });
-    it("Test_61h_Lyrics_BeamsMelismata", function(done) {
+    it("test_61h_Lyrics_BeamsMelismata", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_61h_Lyrics_BeamsMelismata();
+        __instance.test_61h_Lyrics_BeamsMelismata();
     });
-    it("Test_61i_Lyrics_Chords", function(done) {
+    it("test_61i_Lyrics_Chords", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_61i_Lyrics_Chords();
+        __instance.test_61i_Lyrics_Chords();
     });
-    it("Test_61j_Lyrics_Elisions", function(done) {
+    it("test_61j_Lyrics_Elisions", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_61j_Lyrics_Elisions();
+        __instance.test_61j_Lyrics_Elisions();
     });
-    it("Test_61k_Lyrics_SpannersExtenders", function(done) {
+    it("test_61k_Lyrics_SpannersExtenders", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_61k_Lyrics_SpannersExtenders();
+        __instance.test_61k_Lyrics_SpannersExtenders();
     });
-    it("Test_71a_Chordnames", function(done) {
+    it("test_71a_Chordnames", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_71a_Chordnames();
+        __instance.test_71a_Chordnames();
     });
-    it("Test_71c_ChordsFrets", function(done) {
+    it("test_71c_ChordsFrets", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_71c_ChordsFrets();
+        __instance.test_71c_ChordsFrets();
     });
-    it("Test_71d_ChordsFrets_Multistaff", function(done) {
+    it("test_71d_ChordsFrets_Multistaff", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_71d_ChordsFrets_Multistaff();
+        __instance.test_71d_ChordsFrets_Multistaff();
     });
-    it("Test_71e_TabStaves", function(done) {
+    it("test_71e_TabStaves", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_71e_TabStaves();
+        __instance.test_71e_TabStaves();
     });
-    it("Test_71f_AllChordTypes", function(done) {
+    it("test_71f_AllChordTypes", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_71f_AllChordTypes();
+        __instance.test_71f_AllChordTypes();
     });
-    it("Test_71g_MultipleChordnames", function(done) {
+    it("test_71g_MultipleChordnames", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_71g_MultipleChordnames();
+        __instance.test_71g_MultipleChordnames();
     });
-    it("Test_72a_TransposingInstruments", function(done) {
+    it("test_72a_TransposingInstruments", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_72a_TransposingInstruments();
+        __instance.test_72a_TransposingInstruments();
     });
-    it("Test_72b_TransposingInstruments_Full", function(done) {
+    it("test_72b_TransposingInstruments_Full", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_72b_TransposingInstruments_Full();
+        __instance.test_72b_TransposingInstruments_Full();
     });
-    it("Test_72c_TransposingInstruments_Change", function(done) {
+    it("test_72c_TransposingInstruments_Change", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_72c_TransposingInstruments_Change();
+        __instance.test_72c_TransposingInstruments_Change();
     });
-    it("Test_73a_Percussion", function(done) {
+    it("test_73a_Percussion", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_73a_Percussion();
+        __instance.test_73a_Percussion();
     });
-    it("Test_74a_FiguredBass", function(done) {
+    it("test_74a_FiguredBass", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_74a_FiguredBass();
+        __instance.test_74a_FiguredBass();
     });
-    it("Test_75a_AccordionRegistrations", function(done) {
+    it("test_75a_AccordionRegistrations", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_75a_AccordionRegistrations();
+        __instance.test_75a_AccordionRegistrations();
     });
-    it("Test_99a_Sibelius5_IgnoreBeaming", function(done) {
+    it("test_99a_Sibelius5_IgnoreBeaming", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_99a_Sibelius5_IgnoreBeaming();
+        __instance.test_99a_Sibelius5_IgnoreBeaming();
     });
-    it("Test_99b_Lyrics_BeamsMelismata_IgnoreBeams", function(done) {
+    it("test_99b_Lyrics_BeamsMelismata_IgnoreBeams", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.Test_99b_Lyrics_BeamsMelismata_IgnoreBeams();
+        __instance.test_99b_Lyrics_BeamsMelismata_IgnoreBeams();
     });
 });
 describe("alphaTab.test.model.LyricsTest", function() {
     var __instance = new alphaTab.test.model.LyricsTest();
-    it("TestApplySingleLineFirstBar", function(done) {
+    it("testApplySingleLineFirstBar", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestApplySingleLineFirstBar();
+        __instance.testApplySingleLineFirstBar();
     });
-    it("TestApplySingleLineBarOffset", function(done) {
+    it("testApplySingleLineBarOffset", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestApplySingleLineBarOffset();
+        __instance.testApplySingleLineBarOffset();
     });
-    it("TestApplyMultiLineFirstBar", function(done) {
+    it("testApplyMultiLineFirstBar", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestApplyMultiLineFirstBar();
+        __instance.testApplyMultiLineFirstBar();
     });
-    it("TestApplyMultiLineBarOffset", function(done) {
+    it("testApplyMultiLineBarOffset", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestApplyMultiLineBarOffset();
+        __instance.testApplyMultiLineBarOffset();
     });
-    it("TestSpaces", function(done) {
+    it("testSpaces", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestSpaces();
+        __instance.testSpaces();
         done();
     });
-    it("TestNewLines", function(done) {
+    it("testNewLines", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestNewLines();
+        __instance.testNewLines();
         done();
     });
-    it("TestDash", function(done) {
+    it("testDash", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestDash();
+        __instance.testDash();
         done();
     });
-    it("TestPlus", function(done) {
+    it("testPlus", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestPlus();
+        __instance.testPlus();
         done();
     });
-    it("TestComments", function(done) {
+    it("testComments", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestComments();
+        __instance.testComments();
         done();
     });
 });
 describe("alphaTab.test.model.TuningParserTest", function() {
     var __instance = new alphaTab.test.model.TuningParserTest();
-    it("TestStandard", function(done) {
+    it("testStandard", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.TestStandard();
+        __instance.testStandard();
         done();
     });
 });
 describe("alphaTab.test.xml.XmlParseTest", function() {
     var __instance = new alphaTab.test.xml.XmlParseTest();
-    it("ParseSimple", function(done) {
+    it("parseSimple", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.ParseSimple();
+        __instance.parseSimple();
         done();
     });
-    it("ParseShorthand", function(done) {
+    it("parseShorthand", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.ParseShorthand();
+        __instance.parseShorthand();
         done();
     });
-    it("ParseSingleAttribute", function(done) {
+    it("parseSingleAttribute", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.ParseSingleAttribute();
+        __instance.parseSingleAttribute();
         done();
     });
-    it("ParseMultipleAttributes", function(done) {
+    it("parseMultipleAttributes", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.ParseMultipleAttributes();
+        __instance.parseMultipleAttributes();
         done();
     });
-    it("ParseSimpleText", function(done) {
+    it("parseSimpleText", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.ParseSimpleText();
+        __instance.parseSimpleText();
         done();
     });
-    it("ParseChild", function(done) {
+    it("parseChild", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.ParseChild();
+        __instance.parseChild();
         done();
     });
-    it("ParseMultiChild", function(done) {
+    it("parseMultiChild", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.ParseMultiChild();
+        __instance.parseMultiChild();
         done();
     });
-    it("ParseComments", function(done) {
+    it("parseComments", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.ParseComments();
+        __instance.parseComments();
         done();
     });
-    it("ParseDoctype", function(done) {
+    it("parseDoctype", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.ParseDoctype();
+        __instance.parseDoctype();
         done();
     });
-    it("ParseXmlHeadTest", function(done) {
+    it("parseXmlHeadTest", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.ParseXmlHeadTest();
+        __instance.parseXmlHeadTest();
         done();
     });
-    it("ParseFull", function(done) {
+    it("parseFull", function(done) {
         alphaTab.test.TestPlatform.Done = done;
-        __instance.ParseFull();
+        __instance.parseFull();
         done();
     });
 });

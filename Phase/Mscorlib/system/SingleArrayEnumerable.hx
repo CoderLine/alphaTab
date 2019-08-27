@@ -11,7 +11,7 @@ class SingleArrayEnumerable implements IEnumerable<Single>
 		_array= array;
 	}
 
-	public function GetEnumerator() : IEnumerator<Single>
+	public function getEnumerator() : IEnumerator<Single>
 	{
 		return new SingleArrayEnumerator(_array);
 	}

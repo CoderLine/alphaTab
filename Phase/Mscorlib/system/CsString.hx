@@ -4,24 +4,25 @@ abstract CsString(String) from String to String
 {
 	public inline function new(s:String) this = s;	
 	
-	public inline function ToHaxeString(): String return this;
+	public inline function toHaxeString(): String return this;
 	
-	public var Length(get, never):Int32;
-	public inline function get_Length() :Int32 return this.length;
-	public inline function get_Chars(i:Int32) : Char return Char.fromCode(this.charCodeAt(i.ToHaxeInt()));
+	public var length(get, never):Int32;
+	public inline function get_length() :Int32 return this.length;
+	public inline function get_chars(i:Int32) : Char return Char.fromCode(this.charCodeAt(i.toHaxeInt()));
+	public inline function get(i:Int32) : Char return Char.fromCode(this.charCodeAt(i.toHaxeInt()));
 	
-	public inline function Substring_Int32(start:Int32) : CsString return this.substr(start.ToHaxeInt());
-	public inline function Substring_Int32_Int32(start:Int32, length:Int32) : CsString return this.substr(start.ToHaxeInt(), length.ToHaxeInt());
-	public inline function Replace_CsString_CsString(from:CsString, with :CsString) : CsString return StringTools.replace(this, from.ToHaxeString(), with.ToHaxeString() );
-	public inline function IndexOf_Char(ch:Char) : Int32 return this.indexOf(ch.ToString());
-	public inline function IndexOf_CsString(ch:CsString) : Int32 return this.indexOf(ch.ToHaxeString());
-	public inline function LastIndexOf_Char(ch:Char) : Int32 return this.lastIndexOf(ch.ToString());
-	public inline function LastIndexOf_CsString(ch:CsString) : Int32 return this.lastIndexOf(ch.ToHaxeString());
-	public inline function EndsWith_CsString(end:CsString) : Boolean return StringTools.endsWith(this, end.ToHaxeString());
-	public inline function Contains(s:CsString) : Boolean return this.indexOf(s.ToHaxeString()) != -1;
-	public inline function Trim() : CsString return StringTools.trim(this);
+	public inline function substring_Int32(start:Int32) : CsString return this.substr(start.toHaxeInt());
+	public inline function substring_Int32_Int32(start:Int32, length:Int32) : CsString return this.substr(start.toHaxeInt(), length.toHaxeInt());
+	public inline function replace_CsString_CsString(from:CsString, with :CsString) : CsString return StringTools.replace(this, from.toHaxeString(), with.toHaxeString() );
+	public inline function indexOf_Char(ch:Char) : Int32 return this.indexOf(ch.toString());
+	public inline function indexOf_CsString(ch:CsString) : Int32 return this.indexOf(ch.toHaxeString());
+	public inline function lastIndexOf_Char(ch:Char) : Int32 return this.lastIndexOf(ch.toString());
+	public inline function lastIndexOf_CsString(ch:CsString) : Int32 return this.lastIndexOf(ch.toHaxeString());
+	public inline function endsWith_CsString(end:CsString) : Boolean return StringTools.endsWith(this, end.toHaxeString());
+	public inline function contains(s:CsString) : Boolean return this.indexOf(s.toHaxeString()) != -1;
+	public inline function trim() : CsString return StringTools.trim(this);
 	
-	public function Split_CharArray(chars:Array<Int32>) : Array<CsString>
+	public function split_CharArray(chars:Array<Int32>) : Array<CsString>
 	{
 		var strings = new Array<CsString>();
 		var startPos = 0;
@@ -49,16 +50,16 @@ abstract CsString(String) from String to String
 		return strings;
 	}
 	
-	public static inline function IsNullOrEmpty(s:CsString) : Boolean return (s == null || s.Length == 0);
-	public static inline function IsNullOrWhiteSpace(s:CsString) : Boolean return (s == null || s.Trim().Length == 0);
-	public static inline function FromCharCode(s:Int32) : CsString return String.fromCharCode(s.ToHaxeInt());
-	public static function Format(format:CsString, args:FixedArray<Any>) : CsString
+	public static inline function isNullOrEmpty(s:CsString) : Boolean return (s == null || s.length == 0);
+	public static inline function isNullOrWhiteSpace(s:CsString) : Boolean return (s == null || s.trim().length == 0);
+	public static inline function fromCharCode(s:Int32) : CsString return String.fromCharCode(s.toHaxeInt());
+	public static function format(format:CsString, args:FixedArray<Any>) : CsString
 	{
 		var sb = new StringBuf();
 		
 		// based on https://github.com/dotnet/coreclr/blob/master/src/mscorlib/shared/System/Text/StringBuilder.cs#L1362
 		var pos : Int32 = 0; 
-		var len : Int32 = format.Length;
+		var len : Int32 = format.length;
 		var ch : Char = 0;
 		var unescapedItemFormat:StringBuf = null;
 		
@@ -66,14 +67,14 @@ abstract CsString(String) from String to String
 		{
 			while(pos < len)
 			{
-				ch = format.get_Chars(pos);
+				ch = format.get_chars(pos);
 				pos++;
 				
 				// Is it a closing brace?
 				if(ch == "}")
 				{
 					// Check next character (if there is one) to see if it is escaped. eg }}
-					if(pos < len && format.get_Chars(pos) == "}")
+					if(pos < len && format.get_chars(pos) == "}")
 					{
 						pos++;
 					}
@@ -88,7 +89,7 @@ abstract CsString(String) from String to String
 				if(ch == "{")
 				{
 					// Check next character (if there is one) to see if it is escaped. eg {{
-					if(pos < len && format.get_Chars(pos) == "{")
+					if(pos < len && format.get_chars(pos) == "{")
 					{
 						pos++;
 					}
@@ -100,7 +101,7 @@ abstract CsString(String) from String to String
 					}
 				}
 				// If it neither then treat the character as just text.
-				sb.addChar(ch.ToHaxeInt());
+				sb.addChar(ch.toHaxeInt());
 			}
 			
 			//
@@ -116,7 +117,7 @@ abstract CsString(String) from String to String
 			pos++;
 			// If reached end of text then error (Unexpected end of text)
 			// or character is not a digit then error (Unexpected Character)
-			if (pos == len || (ch = format.get_Chars(pos)) < '0' || ch > '9') 
+			if (pos == len || (ch = format.get_chars(pos)) < '0' || ch > '9') 
 			{
 				throw new FormatException().FormatException_CsString("invalid format");
 			}
@@ -131,18 +132,18 @@ abstract CsString(String) from String to String
 				{
 					throw new FormatException().FormatException_CsString("invalid format");
 				}
-				ch = format.get_Chars(pos);
+				ch = format.get_chars(pos);
 				// so long as character is digit and value of the index is less than 1000000 ( index limit )
 			} while (ch >= '0' && ch <= '9' && index < 1000000);
 
 			// If value of index is not within the range of the arguments passed in then error (Index out of range)
-			if (index >= args.Length)
+			if (index >= args.length)
 			{
 				throw new FormatException().FormatException_CsString("format specifiers out of range");
 			}
 			
 			// Consume optional whitespace.
-			while (pos < len && (ch = format.get_Chars(pos)) == ' ') pos++;
+			while (pos < len && (ch = format.get_chars(pos)) == ' ') pos++;
 			// End of parsing index parameter.
 
 			//
@@ -157,13 +158,13 @@ abstract CsString(String) from String to String
 				pos++;
 
 				// Consume Optional whitespace
-				while (pos < len && format.get_Chars(pos) == ' ') pos++;
+				while (pos < len && format.get_chars(pos) == ' ') pos++;
 
 				// If reached the end of the text then error (Unexpected end of text)
 				if (pos == len) throw new FormatException().FormatException_CsString("invalid format");
 
 				// Is there a minus sign?
-				ch = format.get_Chars(pos);
+				ch = format.get_chars(pos);
 				if (ch == '-')
 				{
 					// Yes, then alignment is left justified.
@@ -171,7 +172,7 @@ abstract CsString(String) from String to String
 					pos++;
 					// If reached end of text then error (Unexpected end of text)
 					if (pos == len) throw new FormatException().FormatException_CsString("invalid format");
-					ch = format.get_Chars(pos);
+					ch = format.get_chars(pos);
 				}
 				
 				// If current character is not a digit then error (Unexpected character)
@@ -183,14 +184,14 @@ abstract CsString(String) from String to String
 					pos++;
 					// If reached end of text then error. (Unexpected end of text)
 					if (pos == len) throw new FormatException().FormatException_CsString("invalid format");
-					ch = format.get_Chars(pos);
+					ch = format.get_chars(pos);
 					// So long a current character is a digit and the value of width is less than 100000 ( width limit )
 				} while (ch >= '0' && ch <= '9' && width < 100000);
 				// end of parsing Argument Alignment
 			}
 			
 			// Consume optional whitespace
-			while (pos < len && (ch = format.get_Chars(pos)) == ' ') pos++;
+			while (pos < len && (ch = format.get_chars(pos)) == ' ') pos++;
 			
 			//
 			// Start of parsing of optional formatting parameter.
@@ -208,7 +209,7 @@ abstract CsString(String) from String to String
 				{
 					// If reached end of text then error. (Unexpected end of text)
 					if (pos == len) throw new FormatException().FormatException_CsString("invalid format");
-					ch = format.get_Chars(pos);
+					ch = format.get_chars(pos);
 					pos++;
 
 					// Is character a opening or closing brace?
@@ -217,7 +218,7 @@ abstract CsString(String) from String to String
 						if (ch == '{')
 						{
 							// Yes, is next character also a opening brace, then treat as escaped. eg {{
-							if (pos < len && format.get_Chars(pos) == '{')
+							if (pos < len && format.get_chars(pos) == '{')
 								pos++;
 							else
 								// Error Argument Holes can not be nested.
@@ -226,7 +227,7 @@ abstract CsString(String) from String to String
 						else
 						{
 							// Yes, is next character also a closing brace, then treat as escaped. eg }}
-							if (pos < len && format.get_Chars(pos) == '}')
+							if (pos < len && format.get_chars(pos) == '}')
 								pos++;
 							else
 							{
@@ -242,7 +243,7 @@ abstract CsString(String) from String to String
 						{
 							unescapedItemFormat = new StringBuf();
 						}
-						unescapedItemFormat.addSub(format, startPos.ToHaxeInt(), (pos - startPos - 1).ToHaxeInt());
+						unescapedItemFormat.addSub(format, startPos.toHaxeInt(), (pos - startPos - 1).toHaxeInt());
 						startPos = pos;
 					}
 				}
@@ -251,12 +252,12 @@ abstract CsString(String) from String to String
 				{
 					if (startPos != pos)
 					{
-						itemFormat = format.Substring_Int32_Int32(startPos, pos - startPos);
+						itemFormat = format.substring_Int32_Int32(startPos, pos - startPos);
 					}
 				}
 				else
 				{
-					unescapedItemFormat.addSub(format, startPos.ToHaxeInt(), (pos - startPos).ToHaxeInt());
+					unescapedItemFormat.addSub(format, startPos.toHaxeInt(), (pos - startPos).toHaxeInt());
 					itemFormat = unescapedItemFormat.toString();
 					unescapedItemFormat = new StringBuf();
 				}
@@ -276,47 +277,47 @@ abstract CsString(String) from String to String
 
 		return sb.toString();
 	}
-	public static function Format_CsString_Object(format:CsString, arg:system.Object) : CsString
+	public static function format_CsString_Object(format:CsString, arg:system.Object) : CsString
 	{
-		return Format(format, [arg]);
+		return CsString.format(format, [arg]);
 	}
-	public static function Format_CsString_ObjectArray(format:CsString, args:system.FixedArray<system.Object>) : CsString
+	public static function format_CsString_ObjectArray(format:CsString, args:system.FixedArray<system.Object>) : CsString
 	{
-		return Format(format, args);
+		return CsString.format(format, args);
 	}
-	public static function Join_CsString_IEnumerable_T1<T>(separator:CsString, v:system.collections.generic.IEnumerable<T>) : CsString
+	public static function join_CsString_IEnumerable_T1<T>(separator:CsString, v:system.collections.generic.IEnumerable<T>) : CsString
 	{
 		var s = "";
 
-		var enumerator = v.GetEnumerator();
+		var enumerator = v.getEnumerator();
 		var first = true;
-		while(enumerator.MoveNext())
+		while(enumerator.moveNext())
 		{
 			if(!first) s += separator;
-			s += Std.string(enumerator.Current);
+			s += Std.string(enumerator.current);
 			first = false;
 		}
 		
 		return s;
 	}
 	
-	public static function Join_CsString_IEnumerable_CsString<T>(separator:CsString, v:system.collections.generic.IEnumerable<CsString>) : CsString
+	public static function join_CsString_IEnumerable_CsString<T>(separator:CsString, v:system.collections.generic.IEnumerable<CsString>) : CsString
 	{
 		var s = "";
 
-		var enumerator = v.GetEnumerator();
+		var enumerator = v.getEnumerator();
 		var first = true;
-		while(enumerator.MoveNext())
+		while(enumerator.moveNext())
 		{
 			if(!first) s += separator;
-			s += enumerator.Current;
+			s += enumerator.current;
 			first = false;
 		}
 		
 		return s;
 	}
 
-	public static function Join_CsString_CsStringArray(separator:CsString, args: system.FixedArray<CsString> ) : CsString
+	public static function join_CsString_CsStringArray(separator:CsString, args: system.FixedArray<CsString> ) : CsString
 	{
 		var s = "";
 
@@ -331,30 +332,30 @@ abstract CsString(String) from String to String
 		return s;
 	}
 
-	public inline function StartsWith_CsString(s:CsString) : Boolean return StringTools.startsWith(this, s); 
+	public inline function startsWith_CsString(s:CsString) : Boolean return StringTools.startsWith(this, s); 
 	
-	public inline function ToLower() :CsString return this.toLowerCase();
-	public inline function ToUpper() :CsString return this.toUpperCase();
+	public inline function toLower() :CsString return this.toLowerCase();
+	public inline function toUpper() :CsString return this.toUpperCase();
 	
-	@:op(A + B) public static inline function add1(lhs : system.CsString, rhs : String) : system.CsString return lhs.ToHaxeString() + rhs;
-	@:op(A + B) public static inline function add2(lhs : String, rhs : system.CsString) : system.CsString return lhs + rhs.ToHaxeString();
+	@:op(A + B) public static inline function add1(lhs : system.CsString, rhs : String) : system.CsString return lhs.toHaxeString() + rhs;
+	@:op(A + B) public static inline function add2(lhs : String, rhs : system.CsString) : system.CsString return lhs + rhs.toHaxeString();
 	
-	@:op(A + B) public static inline function add3(lhs : system.CsString, rhs : Int) : system.CsString return lhs.ToHaxeString() + Std.string(rhs);
-	@:op(A + B) public static inline function add4(lhs : Int, rhs : system.CsString) : system.CsString return Std.string(lhs) + rhs.ToHaxeString();
+	@:op(A + B) public static inline function add3(lhs : system.CsString, rhs : Int) : system.CsString return lhs.toHaxeString() + Std.string(rhs);
+	@:op(A + B) public static inline function add4(lhs : Int, rhs : system.CsString) : system.CsString return Std.string(lhs) + rhs.toHaxeString();
 	
 	@:op(A + B) public static inline function add5(lhs : system.CsString, rhs : Float) : system.CsString return lhs + Std.string(rhs);
 	@:op(A + B) public static inline function add6(lhs : Float, rhs : system.CsString) : system.CsString return Std.string(lhs) + rhs;
 
-	@:op(A + B) public static inline function add7(lhs : system.CsString, rhs : system.Char) : system.CsString return lhs + rhs.ToString();
-	@:op(A + B) public static inline function add8(lhs : system.CsString, rhs : system.Byte) : system.CsString return lhs + rhs.ToString();
-    @:op(A + B) public static inline function add9(lhs : system.CsString, rhs : system.Int16) : system.CsString return lhs + rhs.ToString();
-    @:op(A + B) public static inline function add10(lhs : system.CsString, rhs : system.Int32) : system.CsString return lhs + rhs.ToString();
-    @:op(A + B) public static inline function add11(lhs : system.CsString, rhs : system.Int64) : system.CsString return lhs + rhs.ToString();
-    @:op(A + B) public static inline function add12(lhs : system.CsString, rhs : system.SByte) : system.CsString return lhs + rhs.ToString();
-    @:op(A + B) public static inline function add13(lhs : system.CsString, rhs : system.UInt16) : system.CsString return lhs + rhs.ToString();
-    @:op(A + B) public static inline function add14(lhs : system.CsString, rhs : system.UInt32) : system.CsString return lhs + rhs.ToString();
-    @:op(A + B) public static inline function add15(lhs : system.CsString, rhs : system.UInt64) : system.CsString return lhs + rhs.ToString();
-	@:op(A + B) public static inline function add16(lhs : system.CsString, rhs : system.Single) : system.CsString return lhs + rhs.ToString();
-    @:op(A + B) public static inline function add17(lhs : system.CsString, rhs : system.Double) : system.CsString return lhs + rhs.ToString();
-    @:op(A + B) public static inline function add18(lhs : system.CsString, rhs : system.CsString) : system.CsString return lhs.ToHaxeString() + rhs.ToHaxeString();
+	@:op(A + B) public static inline function add7(lhs : system.CsString, rhs : system.Char) : system.CsString return lhs + rhs.toString();
+	@:op(A + B) public static inline function add8(lhs : system.CsString, rhs : system.Byte) : system.CsString return lhs + rhs.toString();
+    @:op(A + B) public static inline function add9(lhs : system.CsString, rhs : system.Int16) : system.CsString return lhs + rhs.toString();
+    @:op(A + B) public static inline function add10(lhs : system.CsString, rhs : system.Int32) : system.CsString return lhs + rhs.toString();
+    @:op(A + B) public static inline function add11(lhs : system.CsString, rhs : system.Int64) : system.CsString return lhs + rhs.toString();
+    @:op(A + B) public static inline function add12(lhs : system.CsString, rhs : system.SByte) : system.CsString return lhs + rhs.toString();
+    @:op(A + B) public static inline function add13(lhs : system.CsString, rhs : system.UInt16) : system.CsString return lhs + rhs.toString();
+    @:op(A + B) public static inline function add14(lhs : system.CsString, rhs : system.UInt32) : system.CsString return lhs + rhs.toString();
+    @:op(A + B) public static inline function add15(lhs : system.CsString, rhs : system.UInt64) : system.CsString return lhs + rhs.toString();
+	@:op(A + B) public static inline function add16(lhs : system.CsString, rhs : system.Single) : system.CsString return lhs + rhs.toString();
+    @:op(A + B) public static inline function add17(lhs : system.CsString, rhs : system.Double) : system.CsString return lhs + rhs.toString();
+    @:op(A + B) public static inline function add18(lhs : system.CsString, rhs : system.CsString) : system.CsString return lhs.toHaxeString() + rhs.toHaxeString();
 }

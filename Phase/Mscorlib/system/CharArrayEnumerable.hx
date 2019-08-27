@@ -11,7 +11,7 @@ class CharArrayEnumerable implements IEnumerable<Char>
 		_array= array;
 	}
 
-	public function GetEnumerator() : IEnumerator<Char>
+	public function getEnumerator() : IEnumerator<Char>
 	{
 		return new CharArrayEnumerator(_array);
 	}

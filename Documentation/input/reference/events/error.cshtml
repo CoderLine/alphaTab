@@ -1,5 +1,5 @@
 Title: Error
-JsName: add_Error();remove_Error()
+JsName: addError();removeError()
 DomName: alphaTab.error
 Category: Events - Core
 Description: This event is fired when an error within alphatab occurred.
@@ -77,7 +77,7 @@ api.Error += (type, details) =>
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.add_Error(function(type, details) {
+api.addError(function(type, details) {
     displayError(type, details);
 });
 </code>

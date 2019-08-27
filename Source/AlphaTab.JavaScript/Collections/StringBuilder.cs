@@ -22,7 +22,7 @@ namespace AlphaTab.Collections
         [Inline]
         public void AppendChar(int i)
         {
-            Script.Write("this += String.fromCharCode(i.ToHaxeInt());");
+            Script.Write("this += String.fromCharCode(i.toHaxeInt());");
         }
 
         [Inline]

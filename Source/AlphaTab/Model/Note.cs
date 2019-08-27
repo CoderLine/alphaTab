@@ -310,7 +310,7 @@ namespace AlphaTab.Model
         /// <summary>
         /// Gets or sets the dynamics for this note.
         /// </summary>
-        public DynamicValue Dynamic { get; set; }
+        public DynamicValue Dynamics { get; set; }
 
         internal bool IsEffectSlurOrigin { get; set; }
         internal bool HasEffectSlur { get; set; }
@@ -632,7 +632,7 @@ namespace AlphaTab.Model
             BendType = BendType.None;
             BendStyle = BendStyle.Default;
             BendPoints = new FastList<BendPoint>();
-            Dynamic = DynamicValue.F;
+            Dynamics = DynamicValue.F;
 
             Accentuated = AccentuationType.None;
             Fret = int.MinValue;
@@ -683,7 +683,7 @@ namespace AlphaTab.Model
             dst.TrillSpeed = src.TrillSpeed;
             dst.DurationPercent = src.DurationPercent;
             dst.AccidentalMode = src.AccidentalMode;
-            dst.Dynamic = src.Dynamic;
+            dst.Dynamics = src.Dynamics;
             dst.Octave = src.Octave;
             dst.Tone = src.Tone;
             dst.Element = src.Element;

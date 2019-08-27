@@ -95,11 +95,9 @@ namespace AlphaTab.UI
         {
             _api = api;
 
-            dynamic options = raw;
             var dataAttributes = GetDataAttributes();
-            var settings = Settings.FromJson(options, dataAttributes);
+            var settings = Settings.FromJson(raw, dataAttributes);
             api.Settings = settings;
-
             if (settings.Engine == "default" || settings.Engine == "svg")
             {
                 api.Container.Scroll += ShowSvgsInViewPort;
@@ -110,6 +108,7 @@ namespace AlphaTab.UI
 
             // get track data to parse
             object tracksData;
+            dynamic options = raw;
             if (options != null && options.tracks)
             {
                 tracksData = options.tracks;

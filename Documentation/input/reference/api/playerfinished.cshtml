@@ -1,5 +1,5 @@
 Title: PlayerFinished
-JsName: add_PlayerFinished();remove_PlayerFinished()
+JsName: addPlayerFinished();removePlayerFinished()
 DomName: alphaTab.finished
 Category: Events - Player
 Description: This event is fired when the playback of the whole song finished.
@@ -50,12 +50,12 @@ api.Play();
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.add_Finished(function(args) {
+api.addFinished(function(args) {
     // speed trainer
-    api.set_PlaybackSpeed(Math.min(1.0, api.get_PlaybackSpeed() + 0.1));
+    api.playbackSpeed = Math.min(1.0, api.playbackSpeed + 0.1);
 });
-api.set_IsLooping(true);
-api.set_PlaybackSpeed(0.5);
+api.isLooping = true;
+api.playbackSpeed = 0.5;
 api.play()
 </code>
 </pre>
@@ -81,13 +81,13 @@ at.alphaTab('play');
 var at = document.querySelector('#alphaTab');
 var api = null;
 at.addEventListener('alphaTab.finished', function(e) {
-    api.set_PlaybackSpeed(Math.min(1.0, api.PlaybackSpeed + 0.1));
+    api.playbackSpeed = Math.min(1.0, api.playbackSpeed + 0.1);
 }, false);
 
 
 api = new alphaTab.platform.javaScript.AlphaTabApi(at);
-api.set_IsLooping(true);
-api.set_PlaybackSpeed(0.5);
+api.isLooping = true;
+api.playbackSpeed = 0.5;
 api.play()
 </code>
 </pre>

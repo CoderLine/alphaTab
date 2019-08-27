@@ -10,9 +10,9 @@ class IteratorEnumerator<T> implements IEnumerator<T>
 		_it = i;
 	}
 	
-	public var Current(get, never):T;
-	public function get_Current() : T return _current;
-	public function MoveNext() : Bool
+	public var current(get, never):T;
+	public function get_current() : T return _current;
+	public function moveNext() : Bool
 	{
 		if(_it.hasNext())
 		{
@@ -22,7 +22,7 @@ class IteratorEnumerator<T> implements IEnumerator<T>
 		return false;
 		
 	}
-	public function Reset():Void
+	public function reset():Void
 	{
 		throw "not supported";
 	}

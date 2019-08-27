@@ -3,25 +3,25 @@ package system;
 
 abstract SByte(Int) from Int
 {
-	public inline function new(i:Int) this = system.Convert.ToInt8(i);
+	public inline function new(i:Int) this = system.Convert.toInt8(i);
 	
-	public inline function ToHaxeInt(): Int return this;
-	public inline function ToString() : system.CsString return Std.string(this);
+	public inline function toHaxeInt(): Int return this;
+	public inline function toString() : system.CsString return Std.string(this);
 	
-	public inline function ToBoolean_IFormatProvider(provider:IFormatProvider) : system.Boolean return system.Convert.ToBoolean_SByte(this);
-	public inline function ToChar_IFormatProvider(provider:IFormatProvider) : system.Char return system.Convert.ToChar_SByte(this);
-	public inline function ToSByte_IFormatProvider(provider:IFormatProvider) : system.SByte return system.Convert.ToSByte_SByte(this);
-	public inline function ToByte_IFormatProvider(provider:IFormatProvider) : system.Byte return system.Convert.ToByte_SByte(this);
-	public inline function ToInt16_IFormatProvider(provider:IFormatProvider) : system.Int16 return system.Convert.ToInt16_SByte(this);
-	public inline function ToUInt16_IFormatProvider(provider:IFormatProvider) : system.UInt16 return system.Convert.ToUInt16_SByte(this);
-	public inline function ToInt32_IFormatProvider(provider:IFormatProvider) : system.Int32 return system.Convert.ToInt32_SByte(this);
-	public inline function ToUInt32_IFormatProvider(provider:IFormatProvider) : system.UInt32 return system.Convert.ToUInt32_SByte(this);
-	public inline function ToInt64_IFormatProvider(provider:IFormatProvider) : system.Int64 return system.Convert.ToInt64_SByte(this);
-	public inline function ToUInt64_IFormatProvider(provider:IFormatProvider) : system.UInt64 return system.Convert.ToUInt64_SByte(this);
-	public inline function ToSingle_IFormatProvider(provider:IFormatProvider) : system.Single return system.Convert.ToSingle_SByte(this);
-	public inline function ToDouble_IFormatProvider(provider:IFormatProvider) : system.Double return system.Convert.ToDouble_SByte(this);
+	public inline function toBoolean_IFormatProvider(provider:IFormatProvider) : system.Boolean return system.Convert.toBoolean_SByte(this);
+	public inline function toChar_IFormatProvider(provider:IFormatProvider) : system.Char return system.Convert.toChar_SByte(this);
+	public inline function toSByte_IFormatProvider(provider:IFormatProvider) : system.SByte return system.Convert.toSByte_SByte(this);
+	public inline function toByte_IFormatProvider(provider:IFormatProvider) : system.Byte return system.Convert.toByte_SByte(this);
+	public inline function toInt16_IFormatProvider(provider:IFormatProvider) : system.Int16 return system.Convert.toInt16_SByte(this);
+	public inline function toUInt16_IFormatProvider(provider:IFormatProvider) : system.UInt16 return system.Convert.toUInt16_SByte(this);
+	public inline function toInt32_IFormatProvider(provider:IFormatProvider) : system.Int32 return system.Convert.toInt32_SByte(this);
+	public inline function toUInt32_IFormatProvider(provider:IFormatProvider) : system.UInt32 return system.Convert.toUInt32_SByte(this);
+	public inline function toInt64_IFormatProvider(provider:IFormatProvider) : system.Int64 return system.Convert.toInt64_SByte(this);
+	public inline function toUInt64_IFormatProvider(provider:IFormatProvider) : system.UInt64 return system.Convert.toUInt64_SByte(this);
+	public inline function toSingle_IFormatProvider(provider:IFormatProvider) : system.Single return system.Convert.toSingle_SByte(this);
+	public inline function toDouble_IFormatProvider(provider:IFormatProvider) : system.Double return system.Convert.toDouble_SByte(this);
 
-	public inline function GetHashCode() : system.Int32 return this ^ (this << 8);
+	public inline function getHashCode() : system.Int32 return this ^ (this << 8);
 	
 	@:op(-A) public inline function neg() : Int return -this;
 
@@ -52,9 +52,9 @@ abstract SByte(Int) from Int
     @:op(A * B) public static function mul15(lhs : system.SByte, rhs : system.Double) : system.Double;	
 
 
-    @:op(A / B) public static inline function div0(lhs : system.SByte, rhs : system.SByte) : system.Int32 return Std.int(lhs.ToHaxeInt() / rhs.ToHaxeInt());
-    @:op(A / B) public static inline function div1(lhs : system.SByte, rhs : Int) : system.Int32 return Std.int(lhs.ToHaxeInt() / rhs);
-    @:op(A / B) public static inline function div2(lhs : Int, rhs : system.SByte) : system.Int32 return Std.int(lhs / rhs.ToHaxeInt());
+    @:op(A / B) public static inline function div0(lhs : system.SByte, rhs : system.SByte) : system.Int32 return Std.int(lhs.toHaxeInt() / rhs.toHaxeInt());
+    @:op(A / B) public static inline function div1(lhs : system.SByte, rhs : Int) : system.Int32 return Std.int(lhs.toHaxeInt() / rhs);
+    @:op(A / B) public static inline function div2(lhs : Int, rhs : system.SByte) : system.Int32 return Std.int(lhs / rhs.toHaxeInt());
     @:op(A / B) public static function div3(lhs : system.SByte, rhs : Float) : system.Double;
     @:op(A / B) public static function div4(lhs : Float, rhs : system.SByte) : system.Double;
 	
@@ -107,8 +107,8 @@ abstract SByte(Int) from Int
     // @:op(A + B) public static function add13(lhs : system.SByte, rhs : system.UInt64) : system.UInt64;	
     @:op(A + B) public static function add14(lhs : system.SByte, rhs : system.Single) : system.Single;	
     @:op(A + B) public static function add15(lhs : system.SByte, rhs : system.Double) : system.Double;	
-    @:op(A + B) public static inline function add16(lhs : system.SByte, rhs : system.CsString) : system.CsString return lhs.ToString() + rhs;
-    @:op(A + B) public static inline function add17(lhs : system.SByte, rhs : String) : system.CsString return lhs.ToString() + rhs;
+    @:op(A + B) public static inline function add16(lhs : system.SByte, rhs : system.CsString) : system.CsString return lhs.toString() + rhs;
+    @:op(A + B) public static inline function add17(lhs : system.SByte, rhs : String) : system.CsString return lhs.toString() + rhs;
 
 	
     @:op(A - B) public static function sub0(lhs : system.SByte, rhs : system.SByte) : system.Int32;

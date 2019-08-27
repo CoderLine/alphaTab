@@ -11,7 +11,7 @@ class UInt32ArrayEnumerable implements IEnumerable<UInt32>
 		_array= array;
 	}
 
-	public function GetEnumerator() : IEnumerator<UInt32>
+	public function getEnumerator() : IEnumerator<UInt32>
 	{
 		return new UInt32ArrayEnumerator(_array);
 	}

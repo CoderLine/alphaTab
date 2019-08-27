@@ -4,8 +4,8 @@ abstract Boolean(Bool) from Bool to Bool
 {
 	public inline function new(v:Bool) this = v;
 	
-	public inline function ToHaxeBool() : Bool return this;
-	public inline function ToString() : system.CsString return Std.string(this);
+	public inline function toHaxeBool() : Bool return this;
+	public inline function toString() : system.CsString return Std.string(this);
 
 	@:op(!A) public inline function not() : system.Boolean return !this;
 	

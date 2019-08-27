@@ -1,5 +1,5 @@
 Title: PlaybackRange
-JsName: get_PlaybackRange;set_PlaybackRange
+JsName: playbackRange
 jQueryName: alphaTab('playbackRange')
 Category: Properties - Player
 Description: The range of the song that should be played
@@ -78,7 +78,7 @@ api.PlaybackRange = new PlaybackRange { StartTick = 1000, EndTick = 50000 };
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.set_PlaybackRange({ startTick: 1000, endTick: 50000 });
+api.playbackRange = { startTick: 1000, endTick: 50000 };
 </code>
 </pre>
 

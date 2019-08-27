@@ -4,8 +4,8 @@ abstract CsType<T>(Class<T>) from Class<T> to Class<T>
 {
 	public function new(cls : Class<T>) this = cls;
 	
-	public var Name(get,never):CsString;
-	public function get_Name() : CsString 
+	public var name(get,never):CsString;
+	public function get_name() : CsString 
 	{
 		var fullName = Type.getClassName(this);
 		var i = fullName.lastIndexOf(".");

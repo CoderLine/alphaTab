@@ -5,9 +5,9 @@ abstract EventAction1<T1>(Array<T1->Void>)
 	public inline function new(v:T1->Void) this = v == null ? null : [v];
 	
 	
-	@:to public inline function ToLambda() : T1->Void return Invoke;
+	@:to public inline function toLambda() : T1->Void return invoke;
 	
-	public inline function ToArray() return this;
+	public inline function toArray() return this;
 	@:op(A + B) public static function add<T1>(lhs : EventAction1<T1>, rhs : T1->Void) : EventAction1<T1>
 	{
 		if(lhs == null)
@@ -16,14 +16,14 @@ abstract EventAction1<T1>(Array<T1->Void>)
 		}
 		else
 		{
-			lhs.ToArray().push(rhs);
+			lhs.toArray().push(rhs);
 		}	
 		return lhs;
 	}
 	
     @:op(A - B) public static function sub<T1>(lhs : EventAction1<T1>, rhs : T1->Void) : EventAction1<T1>
 	{
-		var raw = lhs.ToArray();
+		var raw = lhs.toArray();
 		var index = raw.indexOf(rhs);
 		if(index != -1)
 		{
@@ -37,7 +37,7 @@ abstract EventAction1<T1>(Array<T1->Void>)
 	}
 	
 	
-	public function Invoke(p:T1) : Void
+	public function invoke(p:T1) : Void
 	{
 		if(this == null) return;
 		for (x in this)

@@ -322,7 +322,7 @@ namespace AlphaTab.Model
         /// <summary>
         /// Gets or sets the dynamics applied to this beat.
         /// </summary>
-        public DynamicValue Dynamic { get; set; }
+        public DynamicValue Dynamics { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the beam direction should be inverted.
@@ -357,7 +357,7 @@ namespace AlphaTab.Model
             PlaybackDuration = 0;
             TupletDenominator = -1;
             TupletNumerator = -1;
-            Dynamic = DynamicValue.F;
+            Dynamics = DynamicValue.F;
             Crescendo = CrescendoType.None;
             InvertBeamDirection = false;
             Ottava = Ottavia.Regular;
@@ -402,7 +402,7 @@ namespace AlphaTab.Model
             dst.DisplayDuration = src.DisplayDuration;
             dst.PlaybackStart = src.PlaybackStart;
             dst.PlaybackDuration = src.PlaybackDuration;
-            dst.Dynamic = src.Dynamic;
+            dst.Dynamics = src.Dynamics;
             dst.IsLegatoOrigin = src.IsLegatoOrigin;
             dst.InvertBeamDirection = src.InvertBeamDirection;
             dst.WhammyBarType = src.WhammyBarType;

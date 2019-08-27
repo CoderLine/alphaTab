@@ -11,7 +11,7 @@ class ByteArrayEnumerable implements IEnumerable<Byte>
 		_array= array;
 	}
 
-	public function GetEnumerator() : IEnumerator<Byte>
+	public function getEnumerator() : IEnumerator<Byte>
 	{
 		return new ByteArrayEnumerator(_array);
 	}

@@ -2,11 +2,11 @@ package system;
 
 class Exception 
 {
-	public var Message(default, null):String;
+	public var message(default, null):String;
 	
 	public function Exception_CsString(message:String)
 	{
-		Message = message;
+		this.message = message;
 		return this;
 	}
 	
