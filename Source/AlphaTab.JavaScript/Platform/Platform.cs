@@ -32,13 +32,13 @@ namespace AlphaTab.Platform
         [Inline]
         public static float ParseFloat(string s)
         {
-            return Script.Write<float>("untyped parseFloat(s)");
+            return Script.Write<float>("untyped __js__(\"parseFloat({0})\", s)");
         }
 
         [Inline]
         public static int ParseHex(string s)
         {
-            return Script.Write<int>("untyped parseInt(s, 16)");
+            return Script.Write<int>("untyped __js__(\"parseInt({0}, 16)\", s)");
         }
 
         [Inline]
@@ -100,9 +100,10 @@ namespace AlphaTab.Platform
             return Script.Write<float>("untyped Math.log2(f)");
         }
 
+        [Name("parseIntMinValue")]
         public static int ParseInt(string s)
         {
-            var val = Script.Write<int>("untyped parseInt(s)");
+            var val = Script.Write<int>("untyped __js__(\"parseInt({0})\", s)");
             return Script.Write<bool>("Math.isNaN(untyped val)") ? int.MinValue : (int)val;
         }
 
@@ -121,7 +122,7 @@ namespace AlphaTab.Platform
         [Inline]
         public static string StringFromCharCode(int c)
         {
-            return Script.Write<string>("String.fromCharCode(c.ToHaxeInt())");
+            return Script.Write<string>("String.fromCharCode(c.toHaxeInt())");
         }
 
         public static sbyte ReadSignedByte(this IReadable readable)
@@ -246,7 +247,7 @@ namespace AlphaTab.Platform
         [Inline]
         public static bool IsNaN(float v)
         {
-            return Script.Write<bool>("Math.isNaN(v.ToHaxeFloat())");
+            return Script.Write<bool>("Math.isNaN(v.toHaxeFloat())");
         }
 
         [Inline]

@@ -43,7 +43,7 @@ namespace AlphaTab.Test.Audio
 
                 while (!finished)
                 {
-                    testOutput.Continue();
+                    testOutput.Next();
                 }
 
                 //Console.WriteLine(testOutput.Samples.Count);
@@ -81,7 +81,7 @@ namespace AlphaTab.Test.Audio
         {
         }
 
-        public void Continue()
+        public void Next()
         {
             if (_finished)
             {

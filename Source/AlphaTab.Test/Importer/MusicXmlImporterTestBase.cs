@@ -323,7 +323,7 @@ namespace AlphaTab.Test.Importer
             Assert.AreEqual(expected.TrillSpeed, actual.TrillSpeed, "Mismatch on TrillSpeed");
             Assert.AreEqual(expected.DurationPercent, actual.DurationPercent, "Mismatch on DurationPercent");
             //Assert.AreEqual(expected.AccidentalMode, actual.AccidentalMode, "Mismatch on AccidentalMode");
-            Assert.AreEqual(expected.Dynamic, actual.Dynamic, "Mismatch on Dynamic");
+            Assert.AreEqual(expected.Dynamics, actual.Dynamics, "Mismatch on Dynamic");
             Assert.AreEqual(expected.RealValue, actual.RealValue, "Mismatch on RealValue");
         }
 

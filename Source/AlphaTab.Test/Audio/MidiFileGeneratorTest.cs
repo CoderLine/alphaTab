@@ -115,11 +115,11 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.BendEvent { Tick = 959, Track = 0, Channel = info.SecondaryChannel, Value = 43 },
 
                 // note itself
-                new FlatMidiEventGenerator.NoteEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, DynamicValue = note.Dynamic, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
+                new FlatMidiEventGenerator.NoteEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, DynamicValue = note.Dynamics, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
 
                 // reset bend
                 new FlatMidiEventGenerator.BendEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, Value = 32 },
-                new FlatMidiEventGenerator.NoteEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, DynamicValue = note.Dynamic, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
+                new FlatMidiEventGenerator.NoteEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, DynamicValue = note.Dynamics, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
 
                 // end of track
                 new FlatMidiEventGenerator.TrackEndEvent { Tick = 3840, Track = 0 } // 3840 = end of bar
@@ -349,11 +349,11 @@ namespace AlphaTab.Test.Audio
                 new FlatMidiEventGenerator.BendEvent { Tick = 959, Track = 0, Channel = info.SecondaryChannel, Value = 32 }, // no bend
 
                 // note itself
-                new FlatMidiEventGenerator.NoteEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, DynamicValue = note.Dynamic, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
+                new FlatMidiEventGenerator.NoteEvent { Tick = 0, Track = 0, Channel = info.SecondaryChannel, DynamicValue = note.Dynamics, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
 
                 // reset bend
                 new FlatMidiEventGenerator.BendEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, Value = 32 }, // finish
-                new FlatMidiEventGenerator.NoteEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, DynamicValue = note.Dynamic, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
+                new FlatMidiEventGenerator.NoteEvent { Tick = 960, Track = 0, Channel = info.PrimaryChannel, DynamicValue = note.Dynamics, Key = (byte) note.RealValue, Length = note.Beat.Duration.ToTicks() },
                 // end of track
                 new FlatMidiEventGenerator.TrackEndEvent { Tick = 3840, Track = 0 } // 3840 = end of bar
             };

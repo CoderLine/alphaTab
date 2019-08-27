@@ -74,7 +74,7 @@ namespace AlphaTab.Test.Importer
 
                 Assert.IsTrue(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[0].Notes[0].IsGhost);
                 // it seems accentuation is handled as Forte Fortissimo
-                Assert.AreEqual(DynamicValue.FFF, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].Dynamic);
+                Assert.AreEqual(DynamicValue.FFF, score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[1].Notes[0].Dynamics);
                 Assert.IsTrue(score.Tracks[0].Staves[0].Bars[0].Voices[0].Beats[3].Notes[0].IsLetRing);
                 Render(score);
             });

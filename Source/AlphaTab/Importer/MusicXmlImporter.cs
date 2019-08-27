@@ -1145,28 +1145,28 @@ namespace AlphaTab.Importer
                     switch (c.LocalName)
                     {
                         case "p":
-                            beat.Dynamic = DynamicValue.P;
+                            beat.Dynamics = DynamicValue.P;
                             break;
                         case "pp":
-                            beat.Dynamic = DynamicValue.PP;
+                            beat.Dynamics = DynamicValue.PP;
                             break;
                         case "ppp":
-                            beat.Dynamic = DynamicValue.PPP;
+                            beat.Dynamics = DynamicValue.PPP;
                             break;
                         case "f":
-                            beat.Dynamic = DynamicValue.F;
+                            beat.Dynamics = DynamicValue.F;
                             break;
                         case "ff":
-                            beat.Dynamic = DynamicValue.FF;
+                            beat.Dynamics = DynamicValue.FF;
                             break;
                         case "fff":
-                            beat.Dynamic = DynamicValue.FFF;
+                            beat.Dynamics = DynamicValue.FFF;
                             break;
                         case "mp":
-                            beat.Dynamic = DynamicValue.MP;
+                            beat.Dynamics = DynamicValue.MP;
                             break;
                         case "mf":
-                            beat.Dynamic = DynamicValue.MF;
+                            beat.Dynamics = DynamicValue.MF;
                             break;
                     }
                 }

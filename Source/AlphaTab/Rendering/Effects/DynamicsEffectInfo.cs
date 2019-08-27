@@ -23,7 +23,7 @@ namespace AlphaTab.Rendering.Effects
             }
 
             var show = beat.Voice.Index == 0 && beat.Index == 0 && beat.Voice.Bar.Index == 0 ||
-                       beat.PreviousBeat != null && beat.Dynamic != beat.PreviousBeat.Dynamic;
+                       beat.PreviousBeat != null && beat.Dynamics != beat.PreviousBeat.Dynamics;
 
             // ensure we do not show duplicate dynamics
             if (show && beat.Voice.Index > 0)
@@ -33,7 +33,7 @@ namespace AlphaTab.Rendering.Effects
                     if (voice.Index < beat.Voice.Index)
                     {
                         var beatAtSamePos = voice.GetBeatAtDisplayStart(beat.DisplayStart);
-                        if (beatAtSamePos != null && beat.Dynamic == beatAtSamePos.Dynamic &&
+                        if (beatAtSamePos != null && beat.Dynamics == beatAtSamePos.Dynamics &&
                             InternalShouldCreateGlyph(beatAtSamePos))
                         {
                             show = false;
@@ -47,7 +47,7 @@ namespace AlphaTab.Rendering.Effects
 
         public EffectGlyph CreateNewGlyph(BarRendererBase renderer, Beat beat)
         {
-            return new DynamicsGlyph(0, 0, beat.Dynamic);
+            return new DynamicsGlyph(0, 0, beat.Dynamics);
         }
 
         public bool CanExpand(Beat from, Beat to)
