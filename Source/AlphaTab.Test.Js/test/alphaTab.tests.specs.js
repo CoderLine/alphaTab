@@ -8,6 +8,10 @@ describe("alphaTab.test.audio.AlphaSynthTests", function() {
 });
 describe("alphaTab.test.audio.MidiFileGeneratorTest", function() {
     var __instance = new alphaTab.test.audio.MidiFileGeneratorTest();
+    it("TestFullSong", function(done) {
+        alphaTab.test.TestPlatform.Done = done;
+        __instance.TestFullSong();
+    });
     it("TestCorrectMidiOrder", function(done) {
         alphaTab.test.TestPlatform.Done = done;
         __instance.TestCorrectMidiOrder();

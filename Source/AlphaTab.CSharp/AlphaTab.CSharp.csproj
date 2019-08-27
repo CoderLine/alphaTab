@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="1.68.0" />
-    <PackageReference Include="Wyam" Version="2.1.1" PrivateAssets="All" />
+    <PackageReference Include="Wyam" Version="2.2.5" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

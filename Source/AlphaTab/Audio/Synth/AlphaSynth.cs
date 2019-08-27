@@ -182,11 +182,11 @@ namespace AlphaTab.Audio.Synth
         }
 
         /// <inheritdoc />
-        public void Play()
+        public bool Play()
         {
             if (State == PlayerState.Playing || !IsReadyForPlayback)
             {
-                return;
+                return false;
             }
 
             Output.Activate();
@@ -196,6 +196,7 @@ namespace AlphaTab.Audio.Synth
             State = PlayerState.Playing;
             OnStateChanged(new PlayerStateChangedEventArgs(State, false));
             Output.Play();
+            return true;
         }
 
         /// <inheritdoc />

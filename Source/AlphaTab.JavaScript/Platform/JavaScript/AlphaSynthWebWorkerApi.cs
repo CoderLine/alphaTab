@@ -244,13 +244,19 @@ namespace AlphaTab.Platform.JavaScript
         // API communicating with the web worker
 
         /// <inheritdoc />
-        public void Play()
+        public bool Play()
         {
+            if (State == PlayerState.Playing || !IsReadyForPlayback)
+            {
+                return false;
+            }
+
             _output.Activate();
             _synth.PostMessage(new
             {
                 cmd = AlphaSynthWebWorker.CmdPlay
             });
+            return true;
         }
 
         /// <inheritdoc />

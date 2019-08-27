@@ -1,0 +1,47 @@
+Title: SoundFontFile
+JsName: player
+DataAttribute: data-player
+Category: JavaScript Specific
+Description: The sound font file to load for the player.
+ShowInSideBar: false
+Since: 0.9.4
+---
+
+<h2>Description</h2>
+<p>
+    This setting enables the player feature and also defines which SoundFont file to use for playback.  
+</p>
+
+<h2>Types</h2>
+
+<table class="table table-striped table-condensed type-table">
+    <tbody>    
+        <tr>
+            <td><code>string</td>
+        </tr>   
+    </tbody>
+</table>
+
+<h2>Default Value</h2>
+
+<code>null<code>
+
+<h2>Example - JavaScript</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+var settings = {
+    player: "/assets/soundfont.sf2"
+};
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'), settings);
+var japi = $('#alphaTab').alphaTab(settings);
+</code>
+</pre>
+
+<h2>Example - HTML</h2>
+
+<pre>
+<code class="language-html line-numbers">
+&lt;div id="alphaTab" data-player="/assets/soundfont.sf2"&gt;&lt;/div&gt;
+</code>
+</pre>

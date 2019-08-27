@@ -95,9 +95,14 @@ namespace AlphaTab.Platform.CSharp
             set => DispatchOnWorkerThread(() => { Player.IsLooping = value; });
         }
 
-        public void Play()
+        public bool Play()
         {
+            if (State == PlayerState.Playing || !IsReadyForPlayback)
+            {
+                return false;
+            }
             DispatchOnWorkerThread(() => { Player.Play(); });
+            return true;
         }
 
         public void Pause()

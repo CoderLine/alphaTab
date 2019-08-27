@@ -27,7 +27,7 @@ namespace AlphaTab
         /// <summary>
         /// Gets the UI facade to use for interacting with the user interface.
         /// </summary>
-        protected IUiFacade<TSettings> UiFacade { get; }
+        protected internal IUiFacade<TSettings> UiFacade { get; }
 
         /// <summary>
         /// Gets the UI container that holds the whole alphaTab control.
@@ -35,29 +35,14 @@ namespace AlphaTab
         public IContainer Container { get; }
 
         /// <summary>
-        /// Gets the UI container that will hold all rendered results.
-        /// </summary>
-        public IContainer CanvasElement { get; }
-
-        /// <summary>
         /// Gets the score renderer used for rendering the music sheet. This is the low-level API responsible for the actual rendering chain.
         /// </summary>
         public IScoreRenderer Renderer { get; }
 
         /// <summary>
-        /// Gets a value indicating whether auto-sizing is active and the music sheet will be re-rendered on resize.
-        /// </summary>
-        public bool AutoSize { get; }
-
-        /// <summary>
         /// Gets the score holding all information about the song being rendered.
         /// </summary>
         public Score Score { get; private set; }
-
-        /// <summary>
-        /// Gets the indexes of the tracks that should be rendered of the currently set score.
-        /// </summary>
-        public int[] TrackIndexes { get; private set; }
 
         /// <summary>
         /// Gets the settings that are used for rendering the music notation.
@@ -86,6 +71,21 @@ namespace AlphaTab
         }
 
         /// <summary>
+        /// Gets a value indicating whether auto-sizing is active and the music sheet will be re-rendered on resize.
+        /// </summary>
+        internal bool AutoSize => Settings.Width < 0;
+
+        /// <summary>
+        /// Gets the UI container that will hold all rendered results.
+        /// </summary>
+        internal IContainer CanvasElement { get; }
+
+        /// <summary>
+        /// Gets the indexes of the tracks that should be rendered of the currently set score.
+        /// </summary>
+        internal int[] TrackIndexes { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AlphaTabApi{TSettings}"/> class.
         /// </summary>
         /// <param name="uiFacade">The UI facade to use for interacting with the user interface.</param>
@@ -97,8 +97,6 @@ namespace AlphaTab
 
             uiFacade.Initialize(this, settings);
             Logger.LogLevel = Settings.LogLevel;
-
-            AutoSize = Settings.Width < 0;
 
             CanvasElement = uiFacade.CreateCanvasElement();
             Container.AppendChild(CanvasElement);
@@ -138,7 +136,7 @@ namespace AlphaTab
                 Renderer = new ScoreRenderer(Settings);
             }
 
-            Renderer.RenderFinished += OnRenderFinished;
+            Renderer.RenderFinished += e => OnRenderFinished();
             Renderer.PostRenderFinished += () =>
             {
                 var duration = Platform.Platform.GetCurrentMilliseconds() - _startTime;
@@ -203,7 +201,6 @@ namespace AlphaTab
 
             return tracks.ToArray();
         }
-
 
         #region Rendering
 
@@ -285,14 +282,14 @@ namespace AlphaTab
         /// <summary>
         /// Tells alphaTab to render the given alphaTex.
         /// </summary>
-        /// <param name="contents">The alphaTex code to render.</param>
+        /// <param name="tex">The alphaTex code to render.</param>
         /// <param name="tracks">If set, the given tracks will be rendered, otherwise the first track only will be rendered.</param>
-        public void Tex(string contents, int[] tracks = null)
+        public virtual void Tex(string tex, int[] tracks = null)
         {
             try
             {
                 var parser = new AlphaTexImporter();
-                var data = ByteBuffer.FromBuffer(Platform.Platform.StringToByteArray(contents));
+                var data = ByteBuffer.FromBuffer(Platform.Platform.StringToByteArray(tex));
                 parser.Init(data, Settings);
                 var score = parser.ReadScore();
                 if (tracks != null)
@@ -312,6 +309,47 @@ namespace AlphaTab
         }
 
         /// <summary>
+        /// Attempts a load of the score represented by the given data object.
+        /// </summary>
+        /// <param name="data">The data container supported by <see cref="IUiFacade{TSettings}"/></param>
+        /// <returns>true if the data object is supported and a load was initiated, otherwise false</returns>
+        public bool Load(object data)
+        {
+            try
+            {
+                return UiFacade.Load(data,
+                    score =>
+                    {
+                        ScoreLoaded(score);
+                    },
+                    error =>
+                    {
+                        OnError("import", error);
+                    });
+            }
+            catch (Exception e)
+            {
+                OnError("import", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Attempts a load of the score represented by the given data object.
+        /// </summary>
+        /// <param name="data">The data object to decode</param>
+        /// <returns>true if the data object is supported and a load was initiated, otherwise false</returns>
+        public bool LoadSoundFont(object data)
+        {
+            if (Player == null)
+            {
+                return false;
+            }
+
+            return UiFacade.LoadSoundFont(data);
+        }
+
+        /// <summary>
         /// Performs any necessary steps that are needed after a new score was loaded/set.
         /// </summary>
         /// <param name="score">The score that was loaded.</param>
@@ -321,9 +359,9 @@ namespace AlphaTab
             ModelUtils.ApplyPitchOffsets(Settings, score);
 
             Score = score;
+            OnLoaded(score);
             LoadMidiForScore();
 
-            OnLoaded(score);
             if (render)
             {
                 Render();
@@ -366,6 +404,176 @@ namespace AlphaTab
         /// Gets the alphaSynth player used for playback. This is the low-level API to the Midi synthesizer used for playback.
         /// </summary>
         public IAlphaSynth Player { get; private set; }
+
+        /// <summary>
+        /// Gets the current player state.
+        /// </summary>
+        public virtual PlayerState PlayerState
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return PlayerState.Paused;
+                }
+                return Player.State;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the current master volume as percentage. (range: 0.0-3.0, default 1.0)
+        /// </summary>
+        public float MasterVolume
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return 0;
+                }
+                return Player.MasterVolume;
+            }
+            set
+            {
+                if (Player != null)
+                {
+                    Player.MasterVolume = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the metronome volume as percentage. (range: 0.0-3.0, default 0.0)
+        /// </summary>
+        public float MetronomeVolume
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return 0;
+                }
+                return Player.MetronomeVolume;
+            }
+            set
+            {
+                if (Player != null)
+                {
+                    Player.MetronomeVolume = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the position within the song in midi ticks.
+        /// </summary>
+        public int TickPosition
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return 0;
+                }
+                return Player.TickPosition;
+            }
+            set
+            {
+                if (Player != null)
+                {
+                    Player.TickPosition = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the position within the song in milliseconds.
+        /// </summary>
+        public double TimePosition
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return 0;
+                }
+                return Player.TimePosition;
+            }
+            set
+            {
+                if (Player != null)
+                {
+                    Player.TimePosition = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the range of the song that should be played. Set this to null
+        /// to play the whole song.
+        /// </summary>
+        public PlaybackRange PlaybackRange
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return null;
+                }
+                return Player.PlaybackRange;
+            }
+            set
+            {
+                if (Player != null)
+                {
+                    Player.PlaybackRange = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the current playback speed as percentage. (range: 0.125-8.0, default: 1.0)
+        /// </summary>
+        public double PlaybackSpeed
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return 0;
+                }
+                return Player.PlaybackSpeed;
+            }
+            set
+            {
+                if (Player != null)
+                {
+                    Player.PlaybackSpeed = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the playback should automatically restart after it finished.
+        /// </summary>
+        public bool IsLooping
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return false;
+                }
+                return Player.IsLooping;
+            }
+            set
+            {
+                if (Player != null)
+                {
+                    Player.IsLooping = value;
+                }
+            }
+        }
 
         private void SetupPlayer()
         {
@@ -448,11 +656,11 @@ namespace AlphaTab
         }
 
         /// <summary>
-        /// Changes the volume of th given tracks.
+        /// Changes the volume of the given tracks.
         /// </summary>
         /// <param name="tracks">The tracks for which the volume should be changed.</param>
         /// <param name="volume">The volume to set for all tracks in percent (0-1)</param>
-        public void ChangeTrackVolume(Track[] tracks, float volume)
+        public virtual void ChangeTrackVolume(Track[] tracks, float volume)
         {
             if (Player == null)
             {
@@ -474,7 +682,7 @@ namespace AlphaTab
         /// <remarks>
         /// If one or more tracks are set to solo, only those tracks are hearable.
         /// </remarks>
-        public void ChangeTrackSolo(Track[] tracks, bool solo)
+        public virtual void ChangeTrackSolo(Track[] tracks, bool solo)
         {
             if (Player == null)
             {
@@ -493,7 +701,7 @@ namespace AlphaTab
         /// </summary>
         /// <param name="tracks">The list of track to mute or unmute.</param>
         /// <param name="mute">If set to true, the tracks will be muted. If false they are unmuted.</param>
-        public void ChangeTrackMute(Track[] tracks, bool mute)
+        public virtual void ChangeTrackMute(Track[] tracks, bool mute)
         {
             if (Player == null)
             {
@@ -510,14 +718,15 @@ namespace AlphaTab
         /// <summary>
         /// Starts the playback of the current song.
         /// </summary>
-        public void Play()
+        /// <returns>true if the playback was started, otherwise false. Reasons for not starting can be that the player is not ready or already playing.</returns>
+        public bool Play()
         {
             if (Player == null)
             {
-                return;
+                return false;
             }
 
-            Player.Play();
+            return Player.Play();
         }
 
         /// <summary>
@@ -945,6 +1154,18 @@ namespace AlphaTab
             };
         }
 
+        /// <summary>
+        /// Updates the layout settings and triggers a re-rendering.
+        /// </summary>
+        /// <param name="layoutSettings">The new layout settings to apply</param>
+        public virtual void UpdateLayout(LayoutSettings layoutSettings)
+        {
+            Settings.Layout = layoutSettings;
+            Renderer.UpdateSettings(Settings);
+            Renderer.Invalidate();
+        }
+
+
         private void CursorSelectRange(SelectionInfo startBeat, SelectionInfo endBeat)
         {
             var cache = _cursorCache;
@@ -1079,14 +1300,14 @@ namespace AlphaTab
         /// <summary>
         /// This event is fired when the rendering of the whole music sheet is finished.
         /// </summary>
-        public event Action<RenderFinishedEventArgs> RenderFinished;
+        public event Action RenderFinished;
 
-        private void OnRenderFinished(RenderFinishedEventArgs e)
+        private void OnRenderFinished()
         {
             var handler = RenderFinished;
             if (handler != null)
             {
-                handler(e);
+                handler();
             }
 
             UiFacade.TriggerEvent(Container, "rendered");
@@ -1108,9 +1329,21 @@ namespace AlphaTab
             UiFacade.TriggerEvent(Container, "postRendered");
         }
 
+        /// <summary>
+        /// This event is fired when an error within alphatab occurred.
+        /// </summary>
+        public event Action<string, Exception> Error;
+
         internal void OnError(string type, Exception details)
         {
             Logger.Error(type, "An unexpected error occurred", details);
+
+            var handler = Error;
+            if (handler != null)
+            {
+                handler(type, details);
+            }
+
             UiFacade.TriggerEvent(Container,
                 "error",
                 new

@@ -113,7 +113,8 @@ namespace AlphaTab.Audio.Synth
         /// <summary>
         /// Starts the playback if possible
         /// </summary>
-        void Play();
+        /// <returns>true if the playback was started, otherwise false. Reasons for not starting can be that the player is not ready or already playing.</returns>
+        bool Play();
 
         /// <summary>
         /// Pauses the playback if was running

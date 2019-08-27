@@ -1,12 +1,13 @@
 ﻿using System;
 using AlphaTab.Audio.Synth;
+using AlphaTab.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.UI
 {
     /// <summary>
-    /// This interface represents the UI abstraction between alphaTab and the corresponding UI framework being used. 
+    /// This interface represents the UI abstraction between alphaTab and the corresponding UI framework being used.
     /// </summary>
     /// <typeparam name="TSettings">The type of that holds the settings passed from the UI layer.</typeparam>
     public interface IUiFacade<TSettings>
@@ -17,45 +18,45 @@ namespace AlphaTab.UI
         IContainer RootContainer { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the UI framework supports worker based rendering. 
+        /// Gets a value indicating whether the UI framework supports worker based rendering.
         /// </summary>
         bool AreWorkersSupported { get; }
 
         /// <summary>
         /// Gets or sets whether the UI is ready to render the music notation. On some platforms where pre-loading of assets is done asynchronously,
-        /// rendering might need to be deferred. 
+        /// rendering might need to be deferred.
         /// </summary>
         bool CanRender { get; }
 
         /// <summary>
-        /// Gets the resize throttling in milliseconds. Then the music sheet is resized, the re-rendering is deferred until this timeout is reached. 
+        /// Gets the resize throttling in milliseconds. Then the music sheet is resized, the re-rendering is deferred until this timeout is reached.
         /// </summary>
         int ResizeThrottle { get; }
 
         /// <summary>
-        /// This events is fired when the <see cref="CanRender"/> property changes. 
+        /// This events is fired when the <see cref="CanRender"/> property changes.
         /// </summary>
         event Action CanRenderChanged;
 
         /// <summary>
-        /// This event is fired when <see cref="RootContainer"/> became visible when it was invisible at the time rendering was initiated. 
+        /// This event is fired when <see cref="RootContainer"/> became visible when it was invisible at the time rendering was initiated.
         /// </summary>
         event Action RootContainerBecameVisible;
 
         /// <summary>
-        /// Initializes the UI using the given alphaTab API and settings object. 
+        /// Initializes the UI using the given alphaTab API and settings object.
         /// </summary>
         /// <param name="api">The alphaTab API wrapper responsible for UI interaction.</param>
         /// <param name="settings">The settings object holding the settings from the UI layer.</param>
         void Initialize(AlphaTabApi<TSettings> api, TSettings settings);
 
         /// <summary>
-        /// Tells the UI layer to destroy the alphaTab controls and restore the initial state. 
+        /// Tells the UI layer to destroy the alphaTab controls and restore the initial state.
         /// </summary>
         void Destroy();
 
         /// <summary>
-        /// Creates the canvas element that wraps all individually rendered partials.  
+        /// Creates the canvas element that wraps all individually rendered partials.
         /// </summary>
         /// <returns>The canvas element that wraps all individually rendered partials.</returns>
         IContainer CreateCanvasElement();
@@ -69,42 +70,42 @@ namespace AlphaTab.UI
         void TriggerEvent(IContainer container, string eventName, object details = null);
 
         /// <summary>
-        /// Tells the UI layer to do the initial rendering. 
+        /// Tells the UI layer to do the initial rendering.
         /// </summary>
         void InitialRender();
 
         /// <summary>
-        /// Tells the UI layer to append the given render results to the UI. 
+        /// Tells the UI layer to append the given render results to the UI.
         /// </summary>
         /// <param name="renderResults">The rendered partial that should be added to the UI. </param>
         void BeginAppendRenderResults(RenderFinishedEventArgs renderResults);
 
         /// <summary>
-        /// Tells the UI layer to create the worker renderer. This method is the UI layer supports worker rendering and worker rendering is not disabled via setting. 
+        /// Tells the UI layer to create the worker renderer. This method is the UI layer supports worker rendering and worker rendering is not disabled via setting.
         /// </summary>
         /// <returns></returns>
         IScoreRenderer CreateWorkerRenderer();
 
         /// <summary>
-        /// Tells the UI layer to create a player worker. 
+        /// Tells the UI layer to create a player worker.
         /// </summary>
         /// <returns></returns>
         IAlphaSynth CreateWorkerPlayer();
 
         /// <summary>
-        /// Creates the cursor objects that are used to highlight the currently played beats and bars. 
+        /// Creates the cursor objects that are used to highlight the currently played beats and bars.
         /// </summary>
         /// <returns></returns>
         Cursors CreateCursors();
 
         /// <summary>
-        /// Tells the UI layer to invoke the given action. 
+        /// Tells the UI layer to invoke the given action.
         /// </summary>
         /// <param name="action"></param>
         void BeginInvoke(Action action);
 
         /// <summary>
-        /// Tells the UI layer to remove all highlights from highlighted music notation elements. 
+        /// Tells the UI layer to remove all highlights from highlighted music notation elements.
         /// </summary>
         void RemoveHighlights();
 
@@ -115,19 +116,19 @@ namespace AlphaTab.UI
         void HighlightElements(string groupId);
 
         /// <summary>
-        /// Creates a new UI element that is used to display the selection rectangle. 
+        /// Creates a new UI element that is used to display the selection rectangle.
         /// </summary>
         /// <returns></returns>
         IContainer CreateSelectionElement();
 
         /// <summary>
-        /// Gets the UI element that is used for scrolling during playback. 
+        /// Gets the UI element that is used for scrolling during playback.
         /// </summary>
         /// <returns></returns>
         IContainer GetScrollContainer();
 
         /// <summary>
-        /// Calculates the relative offset of a container to the scroll element. 
+        /// Calculates the relative offset of a container to the scroll element.
         /// </summary>
         /// <param name="scrollElement">The parent scroll element to which the relative position is computed. </param>
         /// <param name="container">The container element for which the relative position is calculated.</param>
@@ -135,7 +136,7 @@ namespace AlphaTab.UI
         Bounds GetOffset(IContainer scrollElement, IContainer container);
 
         /// <summary>
-        /// Initiates a vertical scroll on the given element. 
+        /// Initiates a vertical scroll on the given element.
         /// </summary>
         /// <param name="scrollElement">The element on which the scrolling should happen.</param>
         /// <param name="offset">The absolute scroll offset to which scrolling should happen.</param>
@@ -143,11 +144,27 @@ namespace AlphaTab.UI
         void ScrollToY(IContainer scrollElement, int offset, int speed);
 
         /// <summary>
-        /// Initiates a horizontal scroll on the given element. 
+        /// Initiates a horizontal scroll on the given element.
         /// </summary>
         /// <param name="scrollElement">The element on which the scrolling should happen.</param>
         /// <param name="offset">The absolute scroll offset to which scrolling should happen.</param>
         /// <param name="speed">How fast the scrolling from the current offset to the given one should happen in milliseconds.</param>
         void ScrollToX(IContainer scrollElement, int offset, int speed);
+
+        /// <summary>
+        /// Attempts a load of the score represented by the given data object.
+        /// </summary>
+        /// <param name="data">The data object to decode</param>
+        /// <param name="success">The action to call if the score was loaded</param>
+        /// <param name="error">The action to call if any error during loading ocurred.</param>
+        /// <returns>true if the data object is supported and a load was initiated, otherwise false</returns>
+        bool Load(object data, Action<Score> success, Action<Exception> error);
+
+        /// <summary>
+        /// Attempts a load of the score represented by the given data object.
+        /// </summary>
+        /// <param name="data">The data object to decode</param>
+        /// <returns>true if the data object is supported and a load was initiated, otherwise false</returns>
+        bool LoadSoundFont(object data);
     }
 }

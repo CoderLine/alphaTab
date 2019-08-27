@@ -1,0 +1,189 @@
+Title: RenderingResources
+JsName: resources
+DataAttribute: data-resources-*
+Category: Rendering Resources
+Description: The rendering resources that allow adjusting the display.
+Since: 0.9.4 
+ShowInSideBar: false
+---
+
+@functions {
+    IEnumerable<IDocument> GetDocumentsAtPath(string relativePath)
+    {
+        return Documents.Where(d => 
+            string.Join("/", d.Get<object[]>(Keys.TreePath) ?? new object[0])
+            .StartsWith(relativePath)
+        );
+    }
+}
+
+<h2>Description</h2>
+<p>
+    AlphaTab allows configuring the colors and fonts used for rendering via the rendering resources settings. Please note that as of today
+    this is the primary way of changing the way how alphaTab styles elements. CSS styling in the browser cannot be guaranteed to work due to its flexibility. 
+</p>
+<p>
+Due to space reasons in the following table the common prefix of the settings are removed. Please refer to these examples to eliminate confusion on the usage: 
+</p>
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Platform</th>
+            <th>Prefix</th>
+            <th>Example Usage</th>
+        </tr>
+    </thead>    
+    <tbody>
+        <tr>
+            <td>.net</td>
+            <td><code>RenderingResources.</code></td>
+            <td><code>settings.RenderingResources.WordsFonts = ...</code></td>
+        </tr>
+        <tr>
+            <td>JavaScript</td>
+            <td><code>resources.</code></td>
+            <td>
+                <code>var settings = { resources: { wordsFonts: '...'} };</code> or<br />
+                <code>settings.resources.wordsFont = '...'</code>
+            </td>
+        </tr>
+        <tr>
+            <td>HTML</td>
+            <td><code>data-resources-</code></td>
+            <td>
+                <code>&lt;div data-resources-words-font="..."&gt</code>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Resources</h2>
+Following resources exist for adjusting the style. 
+
+<table class="table table-striped table-condensed type-table">
+    <thead>
+        <tr>
+            <th>Resource</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Summary</th>
+        </tr>
+    </thead>    
+    <tbody>   
+        @foreach(IDocument child in GetDocumentsAtPath("reference/property/renderingresources-"))
+        {
+            object[] childTreePath = child.Get<object[]>(Keys.TreePath);        
+            string[] jsTypes = child.String("JsType").Split(';');
+            string name = child.WithoutSettings.String(Keys.Title, childTreePath.Last().ToString());
+            string jsName = child.String("JsName");
+            string dataAttribute = child.String("DataAttribute");
+            if(name.StartsWith("RenderingResources")) { name = name.Substring("RenderingResources".Length); }
+            if(jsName.StartsWith("resources")) { jsName = jsName.Substring("resources".Length); }
+            if(dataAttribute.StartsWith("data-resources")) { dataAttribute = dataAttribute.Substring("data-resources".Length); }
+
+            <tr>
+                <td>
+                    <code>
+                        @name
+                        <span class="code-badge">.net</span>
+                    </code>
+                    <br />
+                    <code>
+                        @jsName
+                        <span class="code-badge">JSON</span>
+                    </code>
+                    <br />
+                    <code>
+                        @dataAttribute
+                        <span class="code-badge">HTML</span>
+                    </code>
+                </td>
+                <td>
+                    <code>
+                        @Html.Raw(child.String("Type"))
+                        <span class="code-badge">.net</span>
+                    </code>
+                    @for(int i = 0; i < jsTypes.Length; i++) 
+                    {
+                        <br />
+                        <code>@(jsTypes[i]) <span class="code-badge">JavaScript &amp; HTML</span></code>
+                    }
+                </td>
+                <td>@Html.Raw(child.String("DefaultValue"))</td>
+                <td>
+                    @(child.String(DocsKeys.Description))
+                </td>
+            </tr>
+        }    
+    </tbody>
+</table>
+
+<h2>Types</h2>
+
+<h3>Fonts</h3>
+<p>
+For the .net platform any installed font on the system can be used. For JavaScript until <a href="https://github.com/CoderLine/alphaTab/issues/266" target="_blank">this feature</a> is implemented the 2 fonts "Arial" and "Georgia" are officially supported. Due to the nature of Web Workers, no font metrics are available which needs a custom solution for measuring texts. 
+<br />
+On .net simply construct the <code>Font</code> object to configure your desired fonts. For JavaScript you can use any CSS font property compliant string. Relative font sizes with percentual values are not supported.
+</p>
+
+
+<h3>Colors</h3>
+<p>
+On .net simply construct the <code>Color</code> object to configure your desired color. For JavaScript you can use any CSS font property compliant string. (#RGB, #RGBA, #RRGGBB, #RRGGBBAA, rgb(r,g,b), rgba(r,g,b,a) )
+</p>    
+
+<h2>Example - C#</h2>
+
+<pre>
+<code class="language-csharp line-numbers">
+var settings = Settings.Defaults; 
+settings.RenderingResources.EffectFont = new Font("Roboto Slab", 12f, FontStyle.Italic);
+settings.RenderingResources.CopyrightFont = new Font("Roboto", 12f, FontStyle.Bold);
+settings.RenderingResources.FretboardNumberFont = new Font("Roboto", 11f, FontStyle.Plain);
+settings.RenderingResources.TitleFont = new Font("Roboto Slab", 32f, FontStyle.Plain);
+settings.RenderingResources.SubTitleFont = new Font("Roboto Slab", 20f, FontStyle.Plain);
+settings.RenderingResources.WordsFont = new Font("Roboto Slab", 15f, FontStyle.Plain);
+settings.RenderingResources.TablatureFont = new Font("Roboto", 13f, FontStyle.Plain);
+settings.RenderingResources.GraceFont = new Font("Roboto", 11f, FontStyle.Plain);
+</code>
+</pre>
+
+
+<h2>Example - JavaScript</h2>
+
+<pre>
+<code class="language-javascript line-numbers">
+var settings = {
+    resources: {
+        effectFont: "italic 12px 'Roboto Slab'",
+        copyrightFont: "bold 12px Roboto",
+        fretboardNumberFont: "11px Roboto",
+        titleFont: "32px 'Roboto Slab'",
+        subTitleFont: "20px 'Roboto Slab'",
+        wordsFont: "15px 'Roboto Slab'",
+        tablatureFont: "13px 'Roboto Slab'",
+        graceFont: "11px 'Roboto Slab'"
+    }
+};
+var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'), settings);
+var japi = $('#alphaTab').alphaTab(settings);
+</code>
+</pre>
+
+<h2>Example - HTML</h2>
+
+<pre>
+<code class="language-html line-numbers">
+&lt;div id="alphaTab" 
+        data-resources-effect-font="italic 12px 'Roboto Slab'"
+        data-resources-copyright-font="bold 12px Roboto"
+        data-resources-fretboard-number-font="11px Roboto"
+        data-resources-title-font="32px 'Roboto Slab'"
+        data-resources-sub-title-font="20px 'Roboto Slab'"
+        data-resources-words-font="15px 'Roboto Slab'"
+        data-resources-tablature-font="13px 'Roboto Slab'"
+        data-resources-grace-font="1px 'Roboto Slab'"
+&gt;&lt;/div&gt;
+</code>
+</pre>

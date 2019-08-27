@@ -24,6 +24,20 @@ namespace AlphaTab.Test.Audio
             return importer.ReadScore();
         }
 
+        [TestMethod, AsyncTestMethod]
+        public void TestFullSong()
+        {
+            TestPlatform.LoadFile("TestFiles/GuitarPro5/NightWish.gp5", buffer =>
+            {
+                var readerBase = new Gp3To5Importer();
+                readerBase.Init(ByteBuffer.FromBuffer(buffer));
+                var score = readerBase.ReadScore();
+
+                var generator = new MidiFileGenerator(score, null, new FlatMidiEventGenerator());
+                generator.Generate();
+            });
+        }
+
         [TestMethod]
         public void TestCorrectMidiOrder()
         {
