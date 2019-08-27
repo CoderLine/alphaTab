@@ -190,7 +190,7 @@ namespace AlphaTab.Audio.Synth
         /// <summary>
         /// This event is fired when the playback of the whole song finished.
         /// </summary>
-        event Action<PlaybackFinishedEventArgs> Finished;
+        event Action Finished;
 
         /// <summary>
         /// This event is fired when the SoundFont needed for playback was loaded.

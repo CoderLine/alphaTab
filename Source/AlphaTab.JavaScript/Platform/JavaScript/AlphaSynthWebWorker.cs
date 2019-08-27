@@ -189,12 +189,11 @@ namespace AlphaTab.Platform.JavaScript
             });
         }
 
-        public void OnFinished(PlaybackFinishedEventArgs e)
+        public void OnFinished()
         {
             _main.PostMessage(new
             {
-                cmd = CmdFinished,
-                isLooping = e.IsLooping
+                cmd = CmdFinished
             });
         }
 

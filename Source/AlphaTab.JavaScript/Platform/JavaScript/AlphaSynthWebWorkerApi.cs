@@ -20,8 +20,6 @@ namespace AlphaTab.Platform.JavaScript
         private readonly Worker _synth;
         private readonly ISynthOutput _output;
 
-        private readonly FastDictionary<string, FastList<Delegate>> _events;
-
         private bool _workerIsReadyForPlayback;
         private bool _workerIsReady;
         private bool _outputIsReady;
@@ -197,8 +195,6 @@ namespace AlphaTab.Platform.JavaScript
             _output.SampleRequest += OnOutputSampleRequest;
             _output.Finished += OnOutputFinished;
 
-            _events = new FastDictionary<string, FastList<Delegate>>();
-
             _output.Open();
 
             try
@@ -296,7 +292,7 @@ namespace AlphaTab.Platform.JavaScript
             });
         }
 
-        public void LoadSoundFontFromUrl(string data)
+        public void LoadSoundFontFromUrl(string data, Action<ProgressEventArgs> progress)
         {
             var url = data.As<string>();
             Logger.Info("AlphaSynth", "Start loading Soundfont from url " + url);
@@ -321,7 +317,7 @@ namespace AlphaTab.Platform.JavaScript
             {
                 Logger.Debug("AlphaSynth",
                     "Soundfont downloading: " + e.Member<int>("loaded") + "/" + e.Member<int>("total") + " bytes");
-                OnSoundFontLoad(new ProgressEventArgs(e.Member<int>("loaded"), e.Member<int>("total")));
+                progress(new ProgressEventArgs(e.Member<int>("loaded"), e.Member<int>("total")));
             });
             request.Send();
         }
@@ -417,7 +413,7 @@ namespace AlphaTab.Platform.JavaScript
                     OnStateChanged(new PlayerStateChangedEventArgs(data.state, data.stopped));
                     break;
                 case AlphaSynthWebWorker.CmdFinished:
-                    OnFinished(new PlaybackFinishedEventArgs(data.isLooping));
+                    OnFinished();
                     break;
                 case AlphaSynthWebWorker.CmdSoundFontLoaded:
                     OnSoundFontLoaded();
@@ -484,8 +480,6 @@ namespace AlphaTab.Platform.JavaScript
             {
                 handler();
             }
-
-            TriggerEvent("ready");
         }
 
         public event Action ReadyForPlayback;
@@ -497,25 +491,17 @@ namespace AlphaTab.Platform.JavaScript
             {
                 handler();
             }
-
-            TriggerEvent("ready");
         }
 
-        public event Action<PlaybackFinishedEventArgs> Finished;
+        public event Action Finished;
 
-        protected virtual void OnFinished(PlaybackFinishedEventArgs e)
+        protected virtual void OnFinished()
         {
             var handler = Finished;
             if (handler != null)
             {
-                handler(e);
+                handler();
             }
-
-            TriggerEvent("finished",
-                new object[]
-                {
-                    e
-                });
         }
 
         public event Action SoundFontLoaded;
@@ -527,32 +513,6 @@ namespace AlphaTab.Platform.JavaScript
             {
                 handler();
             }
-
-            TriggerEvent("soundFontLoaded");
-        }
-
-        public event Action<ProgressEventArgs> SoundFontLoad;
-
-        protected virtual void OnSoundFontLoad(ProgressEventArgs e)
-        {
-            var handler = SoundFontLoad;
-            if (handler != null)
-            {
-                handler(e);
-            }
-
-            // multi-case only there for backwards compatibility
-            TriggerEvent("soundFontLoad",
-                new object[]
-                {
-                    new
-                    {
-                        Loaded = e.Member<int>("loaded"),
-                        loaded = e.Member<int>("loaded"),
-                        Total = e.Member<int>("total"),
-                        total = e.Member<int>("total")
-                    }
-                });
         }
 
         public event Action<Exception> SoundFontLoadFailed;
@@ -564,12 +524,6 @@ namespace AlphaTab.Platform.JavaScript
             {
                 handler(e);
             }
-
-            TriggerEvent("soundFontLoadFailed",
-                new object[]
-                {
-                    e
-                });
         }
 
 
@@ -582,8 +536,6 @@ namespace AlphaTab.Platform.JavaScript
             {
                 handler();
             }
-
-            TriggerEvent("midiFileLoaded");
         }
 
         public event Action<Exception> MidiLoadFailed;
@@ -595,12 +547,6 @@ namespace AlphaTab.Platform.JavaScript
             {
                 handler(e);
             }
-
-            TriggerEvent("midiFileLoadFailed",
-                new object[]
-                {
-                    e
-                });
         }
 
         public event Action<PlayerStateChangedEventArgs> StateChanged;
@@ -612,12 +558,6 @@ namespace AlphaTab.Platform.JavaScript
             {
                 handler(e);
             }
-
-            TriggerEvent("playerStateChanged",
-                new object[]
-                {
-                    e
-                });
         }
 
 
@@ -630,28 +570,9 @@ namespace AlphaTab.Platform.JavaScript
             {
                 handler(e);
             }
-
-            TriggerEvent("positionChanged",
-                new object[]
-                {
-                    e
-                });
         }
 
         #endregion
-
-        private void TriggerEvent(string name, object[] args = null)
-        {
-            var events = _events[name];
-            if (events != null)
-            {
-                for (var i = 0; i < events.Count; i++)
-                {
-                    var action = events[i];
-                    Script.Write("untyped __js__(\"{0}.apply(null, args)\", action);");
-                }
-            }
-        }
 
         //
         // output communication ( output -> worker )

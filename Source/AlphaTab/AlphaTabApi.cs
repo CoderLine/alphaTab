@@ -406,6 +406,22 @@ namespace AlphaTab
         public IAlphaSynth Player { get; private set; }
 
         /// <summary>
+        /// Gets whether the synthesizer is ready for playback. (output, worker are initialized, soundfont and midi are loaded)
+        /// </summary>
+        public virtual bool IsReadyForPlayback
+        {
+            get
+            {
+                if (Player == null)
+                {
+                    return false;
+                }
+
+                return Player.IsReadyForPlayback;
+            }
+        }
+
+        /// <summary>
         /// Gets the current player state.
         /// </summary>
         public virtual PlayerState PlayerState
@@ -416,6 +432,7 @@ namespace AlphaTab
                 {
                     return PlayerState.Paused;
                 }
+
                 return Player.State;
             }
         }
@@ -431,6 +448,7 @@ namespace AlphaTab
                 {
                     return 0;
                 }
+
                 return Player.MasterVolume;
             }
             set
@@ -453,6 +471,7 @@ namespace AlphaTab
                 {
                     return 0;
                 }
+
                 return Player.MetronomeVolume;
             }
             set
@@ -475,6 +494,7 @@ namespace AlphaTab
                 {
                     return 0;
                 }
+
                 return Player.TickPosition;
             }
             set
@@ -497,6 +517,7 @@ namespace AlphaTab
                 {
                     return 0;
                 }
+
                 return Player.TimePosition;
             }
             set
@@ -520,6 +541,7 @@ namespace AlphaTab
                 {
                     return null;
                 }
+
                 return Player.PlaybackRange;
             }
             set
@@ -542,6 +564,7 @@ namespace AlphaTab
                 {
                     return 0;
                 }
+
                 return Player.PlaybackSpeed;
             }
             set
@@ -564,6 +587,7 @@ namespace AlphaTab
                 {
                     return false;
                 }
+
                 return Player.IsLooping;
             }
             set
@@ -590,8 +614,8 @@ namespace AlphaTab
 
             Player.ReadyForPlayback += () =>
             {
-                UiFacade.TriggerEvent(Container, "playerReady");
-                if(Tracks != null)
+                OnReadyForPlayback();
+                if (Tracks != null)
                 {
                     foreach (var track in Tracks)
                     {
@@ -602,36 +626,21 @@ namespace AlphaTab
                 }
             };
 
-            Player.SoundFontLoaded += () =>
-            {
-                UiFacade.TriggerEvent(Container, "soundFontLoaded");
-            };
+            Player.SoundFontLoaded += OnSoundFontLoaded;
             Player.SoundFontLoadFailed += e =>
             {
-                UiFacade.TriggerEvent(Container, "soundFontLoadFailed", e);
+                OnError("soundFont", e);
             };
 
-            Player.MidiLoaded += () =>
-            {
-                UiFacade.TriggerEvent(Container, "midiFileLoaded");
-            };
+            Player.MidiLoaded += OnMidiLoaded;
             Player.MidiLoadFailed += e =>
             {
-                UiFacade.TriggerEvent(Container, "midiFileLoadFailed", e);
+                OnError("midi", e);
             };
 
-            Player.StateChanged += e =>
-            {
-                UiFacade.TriggerEvent(Container, "playerStateChanged", e);
-            };
-            Player.PositionChanged += e =>
-            {
-                UiFacade.TriggerEvent(Container, "positionChanged", e);
-            };
-            Player.Finished += e =>
-            {
-                UiFacade.TriggerEvent(Container, "finished", e);
-            };
+            Player.StateChanged += OnPlayerStateChanged;
+            Player.PositionChanged += OnPlayerPositionChanged;
+            Player.Finished += OnPlayerFinished;
 
             if (Settings.EnableCursor)
             {
@@ -1351,6 +1360,96 @@ namespace AlphaTab
                     type = type,
                     details = details
                 });
+        }
+
+        #endregion
+
+        #region Player Events
+
+        /// <summary>
+        /// This event is fired when all required data for playback is loaded and ready.
+        /// </summary>
+        public event Action ReadyForPlayback;
+        private void OnReadyForPlayback()
+        {
+            var handler = ReadyForPlayback;
+            if (handler != null)
+            {
+                handler();
+            }
+
+            UiFacade.TriggerEvent(Container, "playerReady");
+        }
+
+        /// <summary>
+        /// This event is fired when the playback of the whole song finished.
+        /// </summary>
+        public event Action PlayerFinished;
+        private void OnPlayerFinished()
+        {
+            var handler = PlayerFinished;
+            if (handler != null)
+            {
+                handler();
+            }
+
+            UiFacade.TriggerEvent(Container, "finished");
+        }
+
+        /// <summary>
+        /// This event is fired when the SoundFont needed for playback was loaded.
+        /// </summary>
+        public event Action SoundFontLoaded;
+        private void OnSoundFontLoaded()
+        {
+            var handler = SoundFontLoaded;
+            if (handler != null)
+            {
+                handler();
+            }
+            UiFacade.TriggerEvent(Container, "soundFontLoaded");
+        }
+
+        /// <summary>
+        /// This event is fired when the Midi file needed for playback was loaded.
+        /// </summary>
+        public event Action MidiLoaded;
+        private void OnMidiLoaded()
+        {
+            var handler = MidiLoaded;
+            if (handler != null)
+            {
+                handler();
+            }
+            UiFacade.TriggerEvent(Container, "midiFileLoaded");
+        }
+
+        /// <summary>
+        /// This event is fired when the playback state changed.
+        /// </summary>
+        public event Action<PlayerStateChangedEventArgs> PlayerStateChanged;
+        private void OnPlayerStateChanged(PlayerStateChangedEventArgs e)
+        {
+            var handler = PlayerStateChanged;
+            if (handler != null)
+            {
+                handler(e);
+            }
+            UiFacade.TriggerEvent(Container, "playerStateChanged", e);
+        }
+
+        /// <summary>
+        /// This event is fired when the current playback position of the song changed.
+        /// </summary>
+        public event Action<PositionChangedEventArgs> PlayerPositionChanged;
+        private void OnPlayerPositionChanged(PositionChangedEventArgs e)
+        {
+            var handler = PlayerPositionChanged;
+            if (handler != null)
+            {
+                handler(e);
+            }
+            UiFacade.TriggerEvent(Container, "positionChanged", e);
         }
 
         #endregion

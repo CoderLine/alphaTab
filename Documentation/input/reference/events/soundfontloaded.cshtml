@@ -1,16 +1,15 @@
-Title: RenderFinished
-JsName: add_RenderFinished();remove_RenderFinished()
-DomName: alphaTab.rendered
-Category: Events - Core
-Description: This event is fired when the rendering of the whole music sheet is finished.
+Title: SoundFontLoaded
+JsName: add_SoundFontLoaded();remove_SoundFontLoaded()
+DomName: alphaTab.soundFontLoaded
+Category: Events - Player
+Description: This event is fired when the SoundFont needed for playback was loaded.
 ShowInSideBar: false
 Since: 0.9.4
 ---
 
 <h2>Description</h2>
 <p>
-    This event is fired when the rendering of the whole music sheet is finished from the render engine side. There might be still tasks open for
-    the display component to visually display the rendered components when this event is notified. 
+    This event is fired when the SoundFont needed for playback was loaded.    
 </p>
 
 <h2>Types</h2>
@@ -27,28 +26,29 @@ Since: 0.9.4
 </table>
 
 <h2>Parameters</h2>
-None
+none
 
 <h2>Example - C#</h2>
 
 <pre>
 <code class="language-csharp line-numbers">
 var api = new AlphaTabApi<MyControl>(...);
-api.RenderFinished += () => 
+api.SoundFontLoaded += () => 
 {
-    UpdateProgressBar("Finishing");
+    HideSoundFontLoadingIndicator();
 };
 </code>
 </pre>
+
 
 <h2>Example - JavaScript</h2>
 
 <pre>
 <code class="language-javascript line-numbers">
 var api = new alphaTab.platform.javaScript.AlphaTabApi(document.querySelector('#alphaTab'));
-api.add_RenderFinished(function() {
-    updateProgressBar("Finishing");
-});  
+api.add_SoundFontLoaded(function(score) {
+    hideSoundFontLoadingIndicator();
+});
 </code>
 </pre>
 
@@ -56,18 +56,19 @@ api.add_RenderFinished(function() {
 
 <pre>
 <code class="language-javascript line-numbers">
-$('#alphaTab').on('alphaTab.rendered', function() {
-    updateProgressBar("Finishing");
+$('#alphaTab').on('alphaTab.soundFontLoaded', function(e, score) {
+    hideSoundFontLoadingIndicator();
 });
 </code>
 </pre>
+
 
 <h2>Example - HTML</h2>
 
 <pre>
 <code class="language-javaScript line-numbers">
-document.querySelector('#alphaTab').addEventListener('alphaTab.rendered', function(e) {
-    updateProgressBar("Finishing");
+document.querySelector('#alphaTab').addEventListener('alphaTab.soundFontLoaded', function() {
+    hideSoundFontLoadingIndicator();
 }, false);
 </code>
 </pre>

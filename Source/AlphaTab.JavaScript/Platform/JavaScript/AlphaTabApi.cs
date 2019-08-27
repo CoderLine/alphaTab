@@ -158,5 +158,28 @@ namespace AlphaTab.Platform.JavaScript
             var trackList = TrackIndexesToTracks(((BrowserUiFacade)UiFacade).ParseTracks(tracks));
             base.ChangeTrackVolume(trackList, volume);
         }
+
+        /// <summary>
+        /// This event is fired during the sound font loading from an external source.
+        /// </summary>
+        public event Action<ProgressEventArgs> SoundFontLoad;
+        internal void OnSoundFontLoad(ProgressEventArgs e)
+        {
+            var handler = SoundFontLoad;
+            if (handler != null)
+            {
+                handler(e);
+            }
+            UiFacade.TriggerEvent(Container, "soundFontLoad", e);
+        }
+
+        internal void LoadSoundFontFromUrl(string url)
+        {
+            if (Player == null)
+            {
+                return;
+            }
+            ((AlphaSynthWebWorkerApi)Player).LoadSoundFontFromUrl(url, OnSoundFontLoad);
+        }
     }
 }

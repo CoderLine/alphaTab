@@ -32,7 +32,7 @@ namespace AlphaTab.Samples.PngDump
             player.SoundFontLoaded += () => { Console.WriteLine("SoundFont loaded"); };
             player.MidiLoadFailed += e => { Console.WriteLine("Midi load failed"); };
             player.SoundFontLoadFailed += e => { Console.WriteLine("SoundFont load failed"); };
-            player.Finished += _ =>
+            player.Finished += () =>
             {
                 Console.WriteLine("Playback finished");
                 ((NAudioSynthOutput)player.Output).Close();

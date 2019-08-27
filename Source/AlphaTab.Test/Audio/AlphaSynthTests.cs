@@ -39,7 +39,7 @@ namespace AlphaTab.Test.Audio
                 synth.Play();
 
                 var finished = false;
-                synth.Finished += b => finished = true;
+                synth.Finished += () => finished = true;
 
                 while (!finished)
                 {

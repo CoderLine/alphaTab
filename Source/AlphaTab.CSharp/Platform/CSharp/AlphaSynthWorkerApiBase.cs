@@ -1,7 +1,6 @@
 ﻿using System;
 using AlphaTab.Audio.Synth;
 using AlphaTab.Audio.Synth.Midi;
-using AlphaTab.Audio.Synth.Synthesis;
 using AlphaTab.Util;
 
 namespace AlphaTab.Platform.CSharp
@@ -25,7 +24,7 @@ namespace AlphaTab.Platform.CSharp
 
         protected void Initialize()
         {
-            Player = new Audio.Synth.AlphaSynth(_output);
+            Player = new AlphaSynth(_output);
             Player.PositionChanged += OnPositionChanged;
             Player.StateChanged += OnStateChanged;
             Player.Finished += OnFinished;
@@ -157,7 +156,7 @@ namespace AlphaTab.Platform.CSharp
 
         public event Action Ready;
         public event Action ReadyForPlayback;
-        public event Action<PlaybackFinishedEventArgs> Finished;
+        public event Action Finished;
         public event Action SoundFontLoaded;
         public event Action<Exception> SoundFontLoadFailed;
         public event Action MidiLoaded;
@@ -175,9 +174,9 @@ namespace AlphaTab.Platform.CSharp
             DispatchOnUiThread(() => ReadyForPlayback?.Invoke());
         }
 
-        protected virtual void OnFinished(PlaybackFinishedEventArgs obj)
+        protected virtual void OnFinished()
         {
-            DispatchOnUiThread(() => Finished?.Invoke(obj));
+            DispatchOnUiThread(() => Finished?.Invoke());
         }
 
         protected virtual void OnSoundFontLoaded()

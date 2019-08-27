@@ -1,6 +1,7 @@
 Title: Error
 JsName: add_Error();remove_Error()
 DomName: alphaTab.error
+Category: Events - Core
 Description: This event is fired when an error within alphatab occurred.
 ShowInSideBar: false
 Since: 0.9.4
@@ -44,7 +45,9 @@ Since: 0.9.4
                 The kind of error that happened, or the module that reported the error. Possible values are: 
                 <ul>
                     <li><code>import</code> - An unexpected error while loading or parsing the score happened.</li>
-                    <li><code>render</code> - An unexpected error during rendering happened</li>
+                    <li><code>render</code> - An unexpected error during rendering happened.</li>
+                    <li><code>soundFont</code> - An unexpected error while loading the SoundFont.</li>
+                    <li><code>midi</code> - An unexpected error while loading the generated midi for the song.</li>
                 </ul>
             </td>
         </tr>   

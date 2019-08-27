@@ -235,7 +235,7 @@ namespace AlphaTab.UI
 
             if (Platform.Platform.TypeOf(data) == "string")
             {
-                ((AlphaSynthWebWorkerApi)_api.Player).LoadSoundFontFromUrl((string)data);
+                ((AlphaTabApi)_api).LoadSoundFontFromUrl((string)data);
                 return true;
             }
 
@@ -588,11 +588,7 @@ namespace AlphaTab.UI
             }
             else
             {
-                player.Ready += () => { player.LoadSoundFontFromUrl(_api.Settings.SoundFontFile); };
-                player.SoundFontLoad += (Action<object>)(data =>
-                {
-                    TriggerEvent(_api.Container, "soundFontLoad", data);
-                });
+                player.Ready += () => { ((AlphaTabApi)_api).LoadSoundFontFromUrl(_api.Settings.SoundFontFile); };
             }
 
             return player;

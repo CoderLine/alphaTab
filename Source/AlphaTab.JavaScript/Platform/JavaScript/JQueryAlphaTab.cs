@@ -194,6 +194,12 @@ namespace AlphaTab.Platform.JavaScript
             return context.Player;
         }
 
+        [Name("isReadyForPlayback")]
+        public bool IsReadyForPlayback(JQuery element, AlphaTabApi context)
+        {
+            return context.IsReadyForPlayback;
+        }
+
         [Name("playerState")]
         public PlayerState PlayerState(JQuery element, AlphaTabApi context)
         {

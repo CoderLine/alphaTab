@@ -154,7 +154,7 @@ namespace AlphaTab.Audio.Synth
                 // stop everything
                 Stop();
                 Logger.Debug("AlphaSynth", "Finished playback");
-                OnFinished(new PlaybackFinishedEventArgs(_sequencer.IsLooping));
+                OnFinished();
                 if (_sequencer.IsLooping)
                 {
                     Play();
@@ -377,14 +377,14 @@ namespace AlphaTab.Audio.Synth
         /// <summary>
         /// Occurs when the playback of the whole midi file finished.
         /// </summary>
-        public event Action<PlaybackFinishedEventArgs> Finished;
+        public event Action Finished;
 
-        private void OnFinished(PlaybackFinishedEventArgs e)
+        private void OnFinished()
         {
             var handler = Finished;
             if (handler != null)
             {
-                handler(e);
+                handler();
             }
         }
 
@@ -516,26 +516,6 @@ namespace AlphaTab.Audio.Synth
         {
             Loaded = loaded;
             Total = total;
-        }
-    }
-
-    /// <summary>
-    /// Represents the info when the playback of a whole song finished.
-    /// </summary>
-    public class PlaybackFinishedEventArgs
-    {
-        /// <summary>
-        /// Gets a value indicating whether looping is active, and the playback will start automatically again at the beginning.
-        /// </summary>
-        public bool IsLooping { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PlaybackFinishedEventArgs"/> class.
-        /// </summary>
-        /// <param name="isLooping"></param>
-        public PlaybackFinishedEventArgs(bool isLooping)
-        {
-            IsLooping = isLooping;
         }
     }
 
